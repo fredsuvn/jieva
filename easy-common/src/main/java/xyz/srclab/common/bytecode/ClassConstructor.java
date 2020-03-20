@@ -2,7 +2,7 @@ package xyz.srclab.common.bytecode;
 
 public interface ClassConstructor<T> {
 
-    T create();
+    T newInstance();
 
-    T create(Class<?>[] parameterTypes, Object[] args);
+    T newInstance(Class<?>[] parameterTypes, Object[] args);
 }
