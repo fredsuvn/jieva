@@ -1,0 +1,25 @@
+ext {
+    // tokens.* should be overwritten.
+    tokens = [
+            sonatypeUserName        : "0123456789",
+            sonatypePassword        : "0123456789",
+            signingKeyId            : "0123456789",
+            signingPassword         : "0123456789",
+            signingSecretKeyRingFile: "0123456789.gpg",
+    ]
+}
+
+// Should implement this method to overwrite tokens.*
+overwriteTokens()
+
+ext."signing.keyId" = tokens.signingKeyId
+ext."signing.password" = tokens.signingPassword
+ext."signing.secretKeyRingFile" = tokens.signingSecretKeyRingFile
+
+private def overwriteTokens() {
+    // Followed is my owned implementation, as an example:
+    def userHome = System.getProperty("user.home")
+    def userAuth = "${userHome}/Home/Auth"
+    apply from: "${userAuth}/private.gradle"
+    tokens.signingSecretKeyRingFile = "${userAuth}/${tokens.signingSecretKeyRingFile}"
+}

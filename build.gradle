@@ -1,21 +1,55 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.70'
+description = "Easy for Common: Build"
+
+// Gradle files to be applied:
+ext {
+    gradles = [
+            repositories  : "${rootProject.rootDir}/buildSrc/repositories.gradle",
+            deployJar     : "${rootProject.rootDir}/buildSrc/deploy-jar.gradle",
+            deployPlatform: "${rootProject.rootDir}/buildSrc/deploy-platform.gradle",
+            compile       : "${rootProject.rootDir}/buildSrc/compile.gradle",
+            auth          : "${rootProject.rootDir}/buildSrc/auth.gradle",
+            management    : "${rootProject.rootDir}/buildSrc/management.gradle",
+    ]
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+apply from: gradles.management
 
-repositories {
-    mavenCentral()
+ext {
+    isSnapshot = isTrue(management.snapshot)
 }
 
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+group = management.group
+management.version = (isSnapshot ? "${management.version}-SNAPSHOT" : management.version)
+management.sampleVersion = (isSnapshot ? "${management.sampleVersion}-SNAPSHOT" : management.sampleVersion)
+version = management.version
+
+// Note in gradles.auth some personal setting should be implemented.
+apply from: gradles.auth
+
+allprojects { project ->
+    processProjectInfo(project)
 }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+subprojects {
 }
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+
+def processProjectInfo(Project project) {
+    if (project == rootProject) {
+        // NOP
+    } else if (project.group == "easy-common-build.common-sample") {
+        project.group = management.sampleGroup
+        project.version = management.sampleVersion
+    } else {
+        project.group = management.group
+        project.version = management.version
+    }
+    println("Configure ${project.group}:${project.name}:${project.version}")
+}
+
+static def isTrue(String string) {
+    return string != null && (
+            Boolean.parseBoolean(string)
+                    || string.equalsIgnoreCase("yes")
+                    || string.equalsIgnoreCase("1")
+    )
 }
