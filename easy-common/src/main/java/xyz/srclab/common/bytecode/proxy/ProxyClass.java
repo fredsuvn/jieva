@@ -1,6 +1,6 @@
-package xyz.srclab.common.bytecode;
+package xyz.srclab.common.bytecode.proxy;
 
-public interface ClassConstructor<T> {
+public interface ProxyClass<T> {
 
     T newInstance();
 

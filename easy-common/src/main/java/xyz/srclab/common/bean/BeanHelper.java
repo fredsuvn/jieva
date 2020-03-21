@@ -2,6 +2,18 @@ package xyz.srclab.common.bean;
 
 public class BeanHelper {
 
+    public static Object getProperty(Object bean, String propertyName) {
+        return CommonBeanOperator.getInstance().getProperty(bean, propertyName);
+    }
+
+    public static <T> T getProperty(Object bean, String propertyName, Class<T> type) {
+        return CommonBeanOperator.getInstance().getProperty(bean, propertyName, type);
+    }
+
+    public static void setProperty(Object bean, String propertyName, Object value) {
+        CommonBeanOperator.getInstance().setProperty(bean, propertyName, value);
+    }
+
     public static void copyProperties(Object source, Object dest) {
         CommonBeanOperator.getInstance().copyProperties(source, dest);
     }
