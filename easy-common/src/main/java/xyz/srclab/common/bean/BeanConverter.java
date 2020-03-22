@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean;
 
+import org.jetbrains.annotations.Nullable;
 import xyz.srclab.common.builder.ProcessByHandlersBuilder;
 import xyz.srclab.common.format.FormatHelper;
 
@@ -9,7 +10,8 @@ public interface BeanConverter {
         return Builder.newBuilder();
     }
 
-    <T> T convert(Object from, Class<T> to);
+    @Nullable
+    <T> T convert(@Nullable Object from, Class<T> to);
 
     class Builder extends ProcessByHandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
 
@@ -30,7 +32,8 @@ public interface BeanConverter {
             }
 
             @Override
-            public <T> T convert(Object from, Class<T> to) {
+            @Nullable
+            public <T> T convert(@Nullable Object from, Class<T> to) {
                 for (BeanConverterHandler handler : handlers) {
                     if (handler.supportConvert(from, to)) {
                         return handler.convert(from, to);

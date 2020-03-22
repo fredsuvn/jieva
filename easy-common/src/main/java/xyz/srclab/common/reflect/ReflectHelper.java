@@ -1,5 +1,7 @@
 package xyz.srclab.common.reflect;
 
+import org.apache.commons.lang3.ClassUtils;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -62,5 +64,10 @@ public class ReflectHelper {
         int modifiers = method.getModifiers();
         return !Modifier.isStatic(modifiers)
                 && (Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers));
+    }
+
+    public static boolean isAssignable(Object from, Class<?> to) {
+        Class<?> fromType = from instanceof Class<?> ? (Class<?>) from : from.getClass();
+        return ClassUtils.isAssignable(fromType, to);
     }
 }

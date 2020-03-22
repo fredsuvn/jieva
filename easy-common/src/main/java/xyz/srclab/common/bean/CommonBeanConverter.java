@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean;
 
-import org.apache.commons.beanutils.ConvertUtilsBean;
+import org.jetbrains.annotations.Nullable;
 
 public class CommonBeanConverter implements BeanConverter {
 
@@ -10,10 +10,9 @@ public class CommonBeanConverter implements BeanConverter {
 
     private static final CommonBeanConverter INSTANCE = new CommonBeanConverter();
 
-    private final ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
-
     @Override
-    public <T> T convert(Object from, Class<T> to) {
-        return (T) convertUtilsBean.convert(from, to);
+    @Nullable
+    public <T> T convert(@Nullable Object from, Class<T> to) {
+        return CommonBeanConverterHandler.getInstance().convert(from, to);
     }
 }
