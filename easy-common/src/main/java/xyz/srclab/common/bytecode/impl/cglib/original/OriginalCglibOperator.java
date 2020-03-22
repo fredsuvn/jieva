@@ -1,5 +1,6 @@
 package xyz.srclab.common.bytecode.impl.cglib.original;
 
+import net.sf.cglib.beans.BeanGenerator;
 import net.sf.cglib.proxy.*;
 
 public class OriginalCglibOperator implements xyz.srclab.common.bytecode.impl.cglib.CglibOperator {
@@ -8,6 +9,12 @@ public class OriginalCglibOperator implements xyz.srclab.common.bytecode.impl.cg
     public xyz.srclab.common.bytecode.impl.cglib.Enhancer newEnhancer() {
         Enhancer actualEnhancer = new Enhancer();
         return new EnhancerImpl(actualEnhancer);
+    }
+
+    @Override
+    public xyz.srclab.common.bytecode.impl.cglib.BeanGenerator newBeanGenerator() {
+        BeanGenerator actualBeanGenerator = new BeanGenerator();
+        return new BeanGeneratorImpl(actualBeanGenerator);
     }
 
     private static class EnhancerImpl implements xyz.srclab.common.bytecode.impl.cglib.Enhancer {
@@ -79,6 +86,30 @@ public class OriginalCglibOperator implements xyz.srclab.common.bytecode.impl.cg
         @Override
         public Object create(Class<?>[] parameterTypes, Object[] args) {
             return actualEnhancer.create(parameterTypes, args);
+        }
+    }
+
+    private static class BeanGeneratorImpl implements xyz.srclab.common.bytecode.impl.cglib.BeanGenerator {
+
+        private final BeanGenerator actualBeanGenerator;
+
+        private BeanGeneratorImpl(BeanGenerator actualBeanGenerator) {
+            this.actualBeanGenerator = actualBeanGenerator;
+        }
+
+        @Override
+        public void setSuperclass(Class<?> superclass) {
+            actualBeanGenerator.setSuperclass(superclass);
+        }
+
+        @Override
+        public void addProperty(String name, Class<?> type) {
+            actualBeanGenerator.addProperty(name, type);
+        }
+
+        @Override
+        public Object create() {
+            return actualBeanGenerator.create();
         }
     }
 }

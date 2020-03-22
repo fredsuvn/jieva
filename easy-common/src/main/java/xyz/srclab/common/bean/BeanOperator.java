@@ -6,8 +6,8 @@ import java.util.Map;
 
 public interface BeanOperator {
 
-    static BeanOperatorBuilder newBuilder() {
-        return BeanOperatorBuilder.newBuilder();
+    static Builder newBuilder() {
+        return Builder.newBuilder();
     }
 
     BeanResolver getBeanResolver();
@@ -61,5 +61,64 @@ public interface BeanOperator {
         T returned = (T) ReflectHelper.newInstance(from.getClass());
         copyProperties(from, returned);
         return returned;
+    }
+
+    class Builder {
+
+        public static Builder newBuilder() {
+            return new Builder();
+        }
+
+        private BeanResolver beanResolver = CommonBeanResolver.getInstance();
+        private BeanConverter beanConverter = CommonBeanConverter.getInstance();
+        private BeanOperatorStrategy.CopyProperty copyPropertyStrategy =
+                CommonBeanOperatorStrategy.CopyProperty.getInstance();
+
+        public Builder setBeanResolver(BeanResolver beanResolver) {
+            this.beanResolver = beanResolver;
+            return this;
+        }
+
+        public Builder setBeanConverter(BeanConverter beanConverter) {
+            this.beanConverter = beanConverter;
+            return this;
+        }
+
+        public Builder setCopyPropertyStrategy(BeanOperatorStrategy.CopyProperty copyPropertyStrategy) {
+            this.copyPropertyStrategy = copyPropertyStrategy;
+            return this;
+        }
+
+        public BeanOperator build() {
+            return new BeanOperatorImpl(this);
+        }
+
+        private static class BeanOperatorImpl implements BeanOperator {
+
+            private final BeanResolver beanResolver;
+            private final BeanConverter beanConverter;
+            private final BeanOperatorStrategy.CopyProperty copyPropertyStrategy;
+
+            private BeanOperatorImpl(Builder builder) {
+                this.beanResolver = builder.beanResolver;
+                this.beanConverter = builder.beanConverter;
+                this.copyPropertyStrategy = builder.copyPropertyStrategy;
+            }
+
+            @Override
+            public BeanResolver getBeanResolver() {
+                return beanResolver;
+            }
+
+            @Override
+            public BeanConverter getBeanConverter() {
+                return beanConverter;
+            }
+
+            @Override
+            public BeanOperatorStrategy.CopyProperty getCopyPropertyStrategy() {
+                return copyPropertyStrategy;
+            }
+        }
     }
 }

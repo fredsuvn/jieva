@@ -38,7 +38,7 @@ public class ReflectHelper {
         return classOverrideableMethodsCache.get().computeIfAbsent(cls, ReflectHelper::getOverrideableMethods0);
     }
 
-    public static List<Method> getOverrideableMethods0(Class<?> cls) {
+    private static List<Method> getOverrideableMethods0(Class<?> cls) {
         Map<String, Method> returned = new LinkedHashMap<>();
         Class<?> current = cls;
         do {
