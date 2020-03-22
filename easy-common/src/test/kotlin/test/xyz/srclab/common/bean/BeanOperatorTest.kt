@@ -85,10 +85,11 @@ object BeanOperatorTest {
         })
         .build()
 
-    private val customOperator = BeanOperator.newBuilder()
+    private val customOperatorBuilder = BeanOperator.newBuilder()
         .setBeanResolver(customResolver)
         .setBeanConverter(customConverter)
-        .build()
+
+    private val customOperator = customOperatorBuilder.build()
 
     @Test
     fun testCustom() {
@@ -101,5 +102,12 @@ object BeanOperatorTest {
         val helloValue = hello?.getValue(some1)
         println("helloValue: $helloValue")
         Assert.assertEquals(helloValue, "hello customConverter")
+    }
+
+    @Test
+    fun testOperatorBuilder() {
+        val newOperator = customOperatorBuilder.build();
+        println("old operator: $customOperator, new operator: $newOperator")
+        Assert.assertEquals(newOperator, customOperator)
     }
 }
