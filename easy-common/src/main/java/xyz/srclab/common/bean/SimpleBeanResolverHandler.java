@@ -12,28 +12,31 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class PojoBeanResolverHandler implements BeanResolverHandler {
+public class SimpleBeanResolverHandler implements BeanResolverHandler {
 
-    public static PojoBeanResolverHandler getInstance() {
+    public static SimpleBeanResolverHandler getInstance() {
         return INSTANCE;
     }
 
-    private static final PojoBeanResolverHandler INSTANCE = new PojoBeanResolverHandler();
+    private static final SimpleBeanResolverHandler INSTANCE = new SimpleBeanResolverHandler();
 
     private static final ThreadLocal<WeakHashMap<Class<?>, BeanDescriptor>> descriptorCache =
             ThreadLocal.withInitial(WeakHashMap::new);
 
     @Override
-    public boolean supportBean(Object bean) {
+    public boolean supportBean(Object bean, BeanOperator beanOperator) {
         return true;
     }
 
     @Override
-    public BeanDescriptor resolve(Object bean) {
+    public BeanDescriptor resolve(Object bean, BeanOperator beanOperator) {
         return descriptorCache.get().computeIfAbsent(bean.getClass(), type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
-                return new BeanDescriptorImpl(type, buildProperties(beanInfo.getPropertyDescriptors()));
+                return BeanDescriptor.newBuilder()
+                        .setType(type)
+                        .setProperties(buildProperties(beanInfo.getPropertyDescriptors()))
+                        .build();
             } catch (IntrospectionException e) {
                 throw new ExceptionWrapper(e);
             }

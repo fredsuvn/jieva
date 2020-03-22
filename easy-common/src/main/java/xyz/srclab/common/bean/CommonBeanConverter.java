@@ -13,6 +13,12 @@ public class CommonBeanConverter implements BeanConverter {
     @Override
     @Nullable
     public <T> T convert(@Nullable Object from, Class<T> to) {
-        return CommonBeanConverterHandler.getInstance().convert(from, to);
+        return CommonBeanConverterHandler.getInstance().convert(from, to, CommonBeanOperator.getInstance());
+    }
+
+    @Nullable
+    @Override
+    public <T> T convert(@Nullable Object from, Class<T> to, BeanOperator beanOperator) {
+        return CommonBeanConverterHandler.getInstance().convert(from, to, beanOperator);
     }
 }

@@ -1,5 +1,7 @@
 package xyz.srclab.common.bean;
 
+import org.jetbrains.annotations.Nullable;
+import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.reflect.ReflectHelper;
 
 import java.util.Map;
@@ -14,7 +16,7 @@ public interface BeanOperator {
 
     BeanConverter getBeanConverter();
 
-    BeanOperatorStrategy.CopyProperty getCopyPropertyStrategy();
+    BeanOperatorStrategy getBeanOperatorStrategy();
 
     default Object getProperty(Object bean, String propertyName) {
         BeanDescriptor beanDescriptor = getBeanResolver().resolve(bean);
@@ -36,7 +38,9 @@ public interface BeanOperator {
         if (propertyDescriptor == null) {
             throw new IllegalArgumentException("Cannot find property: " + propertyName);
         }
-        propertyDescriptor.setValue(bean, value);
+        Class<?> type = propertyDescriptor.getType();
+        Object typedValue = getBeanConverter().convert(value, type);
+        propertyDescriptor.setValue(bean, typedValue);
     }
 
     default void copyProperties(Object source, Object dest) {
@@ -48,8 +52,8 @@ public interface BeanOperator {
             if (destPropertyDescriptor == null) {
                 return;
             }
-            getCopyPropertyStrategy().copyProperty(
-                    sourcePropertyDescriptor, source, destPropertyDescriptor, dest, getBeanConverter());
+            getBeanOperatorStrategy().getCopyPropertyStrategy().copyProperty(
+                    sourcePropertyDescriptor, source, destPropertyDescriptor, dest, this);
         });
     }
 
@@ -63,33 +67,36 @@ public interface BeanOperator {
         return returned;
     }
 
-    class Builder {
+    class Builder extends CacheStateBuilder<BeanOperator> {
 
         public static Builder newBuilder() {
             return new Builder();
         }
 
-        private BeanResolver beanResolver = CommonBeanResolver.getInstance();
-        private BeanConverter beanConverter = CommonBeanConverter.getInstance();
-        private BeanOperatorStrategy.CopyProperty copyPropertyStrategy =
-                CommonBeanOperatorStrategy.CopyProperty.getInstance();
+        private BeanResolver beanResolver;
+        private BeanConverter beanConverter;
+        private BeanOperatorStrategy beanOperatorStrategy;
 
         public Builder setBeanResolver(BeanResolver beanResolver) {
+            this.changeState();
             this.beanResolver = beanResolver;
             return this;
         }
 
         public Builder setBeanConverter(BeanConverter beanConverter) {
+            this.changeState();
             this.beanConverter = beanConverter;
             return this;
         }
 
-        public Builder setCopyPropertyStrategy(BeanOperatorStrategy.CopyProperty copyPropertyStrategy) {
-            this.copyPropertyStrategy = copyPropertyStrategy;
+        public Builder setBeanOperatorStrategy(BeanOperatorStrategy beanOperatorStrategy) {
+            this.changeState();
+            this.beanOperatorStrategy = beanOperatorStrategy;
             return this;
         }
 
-        public BeanOperator build() {
+        @Override
+        protected BeanOperator buildNew() {
             return new BeanOperatorImpl(this);
         }
 
@@ -97,12 +104,15 @@ public interface BeanOperator {
 
             private final BeanResolver beanResolver;
             private final BeanConverter beanConverter;
-            private final BeanOperatorStrategy.CopyProperty copyPropertyStrategy;
+            private final BeanOperatorStrategy beanOperatorStrategy;
 
             private BeanOperatorImpl(Builder builder) {
-                this.beanResolver = builder.beanResolver;
-                this.beanConverter = builder.beanConverter;
-                this.copyPropertyStrategy = builder.copyPropertyStrategy;
+                this.beanResolver = new BeanResolverProxy(builder.beanResolver == null ?
+                        CommonBeanResolver.getInstance() : builder.beanResolver);
+                this.beanConverter = new BeanConverterProxy(builder.beanConverter == null ?
+                        CommonBeanConverter.getInstance() : builder.beanConverter);
+                this.beanOperatorStrategy = builder.beanOperatorStrategy == null ?
+                        CommonBeanOperatorStrategy.getInstance() : builder.beanOperatorStrategy;
             }
 
             @Override
@@ -116,8 +126,49 @@ public interface BeanOperator {
             }
 
             @Override
-            public BeanOperatorStrategy.CopyProperty getCopyPropertyStrategy() {
-                return copyPropertyStrategy;
+            public BeanOperatorStrategy getBeanOperatorStrategy() {
+                return beanOperatorStrategy;
+            }
+
+
+            private class BeanResolverProxy implements BeanResolver {
+
+                private final BeanResolver proxied;
+
+                private BeanResolverProxy(BeanResolver proxied) {
+                    this.proxied = proxied;
+                }
+
+                @Override
+                public BeanDescriptor resolve(Object bean) {
+                    return resolve(bean, BeanOperatorImpl.this);
+                }
+
+                @Override
+                public BeanDescriptor resolve(Object bean, BeanOperator beanOperator) {
+                    return proxied.resolve(bean, beanOperator);
+                }
+            }
+
+            private class BeanConverterProxy implements BeanConverter {
+
+                private final BeanConverter proxied;
+
+                private BeanConverterProxy(BeanConverter proxied) {
+                    this.proxied = proxied;
+                }
+
+                @Nullable
+                @Override
+                public <T> T convert(@Nullable Object from, Class<T> to) {
+                    return convert(from, to, BeanOperatorImpl.this);
+                }
+
+                @Nullable
+                @Override
+                public <T> T convert(@Nullable Object from, Class<T> to, BeanOperator beanOperator) {
+                    return proxied.convert(from, to, beanOperator);
+                }
             }
         }
     }

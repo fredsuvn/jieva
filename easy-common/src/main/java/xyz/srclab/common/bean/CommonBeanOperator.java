@@ -19,7 +19,7 @@ public class CommonBeanOperator implements BeanOperator {
     }
 
     @Override
-    public BeanOperatorStrategy.CopyProperty getCopyPropertyStrategy() {
-        return CommonBeanOperatorStrategy.CopyProperty.getInstance();
+    public BeanOperatorStrategy getBeanOperatorStrategy() {
+        return CommonBeanOperatorStrategy.getInstance();
     }
 }

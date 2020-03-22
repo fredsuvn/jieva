@@ -5,10 +5,7 @@ import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 import test.xyz.srclab.common.model.SomeClass1
 import test.xyz.srclab.common.model.SomeClass1Clone
-import xyz.srclab.common.bean.BeanConverter
-import xyz.srclab.common.bean.BeanConverterHandler
-import xyz.srclab.common.bean.CommonBeanConverter
-import xyz.srclab.common.bean.CommonBeanConverterHandler
+import xyz.srclab.common.bean.*
 import xyz.srclab.common.reflect.ReflectHelper
 
 object BeanConverterTest {
@@ -18,7 +15,7 @@ object BeanConverterTest {
     private val customConverter = BeanConverter.newBuilder()
         .addHandler(CommonBeanConverterHandler.getInstance())
         .addHandler(object : BeanConverterHandler {
-            override fun supportConvert(from: Any?, to: Class<*>): Boolean {
+            override fun supportConvert(from: Any?, to: Class<*>, beanOperator: BeanOperator): Boolean {
                 if (ReflectHelper.isAssignable(to, Number::class.java)
                     || ReflectHelper.isAssignable(to, String::class.java)
                 ) {
@@ -27,7 +24,7 @@ object BeanConverterTest {
                 return false;
             }
 
-            override fun <T : Any?> convert(from: Any?, to: Class<T>): T {
+            override fun <T : Any?> convert(from: Any?, to: Class<T>, beanOperator: BeanOperator): T {
                 if (ReflectHelper.isAssignable(to, Number::class.java)) {
                     return 999 as T
                 }

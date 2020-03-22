@@ -16,16 +16,19 @@ public class MapBeanResolverHandler implements BeanResolverHandler {
             ThreadLocal.withInitial(WeakHashMap::new);
 
     @Override
-    public boolean supportBean(Object bean) {
+    public boolean supportBean(Object bean, BeanOperator beanOperator) {
         return bean instanceof Map;
     }
 
     @Override
-    public BeanDescriptor resolve(Object bean) {
+    public BeanDescriptor resolve(Object bean, BeanOperator beanOperator) {
         if (!(bean instanceof Map)) {
             throw new IllegalArgumentException("Given bean must be a Map.");
         }
-        return new BeanDescriptorImpl(Map.class, buildProperties((Map) bean));
+        return BeanDescriptor.newBuilder()
+                .setType(Map.class)
+                .setProperties(buildProperties((Map) bean))
+                .build();
     }
 
     private Map<String, BeanPropertyDescriptor> buildProperties(Map bean) {

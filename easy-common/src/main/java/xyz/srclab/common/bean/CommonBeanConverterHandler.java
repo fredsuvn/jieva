@@ -14,16 +14,15 @@ public class CommonBeanConverterHandler implements BeanConverterHandler {
     private static final CommonBeanConverterHandler INSTANCE = new CommonBeanConverterHandler();
 
     private final ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
-    private final BeanOperator beanOperator = CommonBeanOperator.getInstance();
 
     @Override
-    public boolean supportConvert(Object from, Class<?> to) {
+    public boolean supportConvert(Object from, Class<?> to, BeanOperator beanOperator) {
         return true;
     }
 
     @Override
     @Nullable
-    public <T> T convert(@Nullable Object from, Class<T> to) {
+    public <T> T convert(@Nullable Object from, Class<T> to, BeanOperator beanOperator) {
         if (from == null) {
             return (T) convertByConvertUtilsBean(from, to);
         }
@@ -35,7 +34,7 @@ public class CommonBeanConverterHandler implements BeanConverterHandler {
         if (ReflectHelper.isAssignable(result, to)) {
             return (T) result;
         }
-        result = convertByBeanOperator(from, to);
+        result = convertByBeanOperator(from, to, beanOperator);
         if (ReflectHelper.isAssignable(result, to)) {
             return (T) result;
         }
@@ -49,7 +48,7 @@ public class CommonBeanConverterHandler implements BeanConverterHandler {
         return convertUtilsBean.convert(from, to);
     }
 
-    private Object convertByBeanOperator(Object from, Class<?> to) {
+    private Object convertByBeanOperator(Object from, Class<?> to, BeanOperator beanOperator) {
         Object toInstance = ReflectHelper.newInstance(to);
         beanOperator.copyProperties(from, toInstance);
         return toInstance;

@@ -19,7 +19,7 @@ public class CommonBeanOperatorIgnoreNull implements BeanOperator {
     }
 
     @Override
-    public BeanOperatorStrategy.CopyProperty getCopyPropertyStrategy() {
-        return CommonBeanOperatorStrategy.CopyPropertyIgnoreNull.getInstance();
+    public BeanOperatorStrategy getBeanOperatorStrategy() {
+        return CommonBeanOperatorStrategyIgnoreNull.getInstance();
     }
 }

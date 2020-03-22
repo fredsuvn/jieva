@@ -13,30 +13,39 @@ public interface BeanConverter {
     @Nullable
     <T> T convert(@Nullable Object from, Class<T> to);
 
+    @Nullable
+    <T> T convert(@Nullable Object from, Class<T> to, BeanOperator beanOperator);
+
     class Builder extends ProcessByHandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
 
         public static Builder newBuilder() {
             return new Builder();
         }
 
-        public BeanConverter build() {
-            return new BeanConverterImpl(this.handlers.toArray(new BeanConverterHandler[0]));
+        protected BeanConverter buildNew() {
+            return new BeanConverterImpl(this);
         }
 
         private static class BeanConverterImpl implements BeanConverter {
 
             private final BeanConverterHandler[] handlers;
 
-            private BeanConverterImpl(BeanConverterHandler[] handlers) {
-                this.handlers = handlers;
+            private BeanConverterImpl(Builder builder) {
+                this.handlers = builder.handlers.toArray(new BeanConverterHandler[0]);
+            }
+
+            @Nullable
+            @Override
+            public <T> T convert(@Nullable Object from, Class<T> to) {
+                return convert(from, to, CommonBeanOperator.getInstance());
             }
 
             @Override
             @Nullable
-            public <T> T convert(@Nullable Object from, Class<T> to) {
+            public <T> T convert(@Nullable Object from, Class<T> to, BeanOperator beanOperator) {
                 for (BeanConverterHandler handler : handlers) {
-                    if (handler.supportConvert(from, to)) {
-                        return handler.convert(from, to);
+                    if (handler.supportConvert(from, to, beanOperator)) {
+                        return handler.convert(from, to, beanOperator);
                     }
                 }
                 throw new UnsupportedOperationException(

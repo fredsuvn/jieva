@@ -13,8 +13,16 @@ public class CommonBeanResolver implements BeanResolver {
     @Override
     public BeanDescriptor resolve(Object bean) {
         return bean instanceof Map ?
-                MapBeanResolverHandler.getInstance().resolve(bean)
+                MapBeanResolverHandler.getInstance().resolve(bean, CommonBeanOperator.getInstance())
                 :
-                PojoBeanResolverHandler.getInstance().resolve(bean);
+                SimpleBeanResolverHandler.getInstance().resolve(bean, CommonBeanOperator.getInstance());
+    }
+
+    @Override
+    public BeanDescriptor resolve(Object bean, BeanOperator beanOperator) {
+        return bean instanceof Map ?
+                MapBeanResolverHandler.getInstance().resolve(bean, beanOperator)
+                :
+                SimpleBeanResolverHandler.getInstance().resolve(bean, beanOperator);
     }
 }

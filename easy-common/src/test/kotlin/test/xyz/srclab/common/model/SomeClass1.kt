@@ -5,4 +5,5 @@ class SomeClass1 : ParentClass() {
     var some1String: String? = null
     var some1Int: Int? = null
     var some1Some: SomeClass2? = null
+    var some2Some: SomeClass2? = null
 }
