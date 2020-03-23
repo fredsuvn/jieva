@@ -82,4 +82,14 @@ public class SignatureHelper {
             Class<?>[] parameterTypes, Class<?> returnType, String methodName) {
         return "M" + methodName + signatureMethod(parameterTypes, returnType);
     }
+
+    public static String signatureMethodWithClassAndMethodName(Method method) {
+        return signatureMethodWithClassAndMethodName(
+                method.getDeclaringClass(), method.getParameterTypes(), method.getReturnType(), method.getName());
+    }
+
+    public static String signatureMethodWithClassAndMethodName(
+            Class<?> declaringClass, Class<?>[] parameterTypes, Class<?> returnType, String methodName) {
+        return "M" + signature(declaringClass) + "." + methodName + signatureMethod(parameterTypes, returnType);
+    }
 }

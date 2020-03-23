@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.format
 
-import org.testng.Assert
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
+import test.xyz.srclab.common.doTest
 import xyz.srclab.common.format.FormatHelper
 
 object FormatTest {
@@ -41,10 +41,5 @@ object FormatTest {
         return arrayOf(
             arrayOf(FormatHelper.messageFormat("123{1}56{0}89", 7, 4), "123456789")
         )
-    }
-
-    private fun doTest(actual: String, expected: String) {
-        println("actual: $actual, expected: $expected")
-        Assert.assertEquals(actual, expected)
     }
 }

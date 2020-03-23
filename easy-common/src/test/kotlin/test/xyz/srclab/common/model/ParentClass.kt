@@ -2,6 +2,18 @@ package test.xyz.srclab.common.model
 
 open class ParentClass {
 
-    var parentString: String? = null
-    var parentInt: Int? = null
+    open var parentString: String? = null
+    open var parentInt: Int? = null
+
+    open fun parentPublicFun() {
+
+    }
+
+    protected open fun parentProtectedFun() {
+
+    }
+
+    private fun parentPrivateFun() {
+
+    }
 }

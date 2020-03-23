@@ -1,4 +1,6 @@
 package test.xyz.srclab.common.model
 
-class SomeInterface1 {
+interface SomeInterface1 {
+
+    fun some1InterfaceFun()
 }
