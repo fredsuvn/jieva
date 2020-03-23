@@ -24,7 +24,7 @@ public class CommonBeanConverterHandler implements BeanConverterHandler {
     @Nullable
     public <T> T convert(@Nullable Object from, Class<T> to, BeanOperator beanOperator) {
         if (from == null) {
-            return (T) convertByConvertUtilsBean(from, to);
+            return (T) convertByConvertUtilsBean(null, to);
         }
 
         Object result = convertByConvertUtilsBean(from, to);

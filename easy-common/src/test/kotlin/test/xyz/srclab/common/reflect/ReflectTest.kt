@@ -2,9 +2,11 @@ package test.xyz.srclab.common.reflect
 
 import org.testng.Assert
 import org.testng.annotations.Test
+import test.xyz.srclab.common.doTest
 import test.xyz.srclab.common.model.SomeSomeClass1
 import xyz.srclab.common.reflect.ReflectHelper
 import xyz.srclab.common.reflect.SignatureHelper
+import java.lang.reflect.Type
 
 object ReflectTest {
 
@@ -161,5 +163,23 @@ object ReflectTest {
         println("actual all: $publicNonStatic")
         println("expected all: $expectedPublicNonStatic")
         Assert.assertEquals(HashSet(publicNonStatic), HashSet(expectedPublicNonStatic))
+    }
+
+    @Test
+    fun testFindGenericSupperClass() {
+        open class A<T>
+        open class B : A<String>()
+        open class C : B()
+        open class D : C()
+
+        val genericA = ReflectHelper.findGenericSuperclass(D::class.java, A::class.java)
+        println(genericA)
+        doTest(genericA?.javaClass is Type, true)
+        doTest(ReflectHelper.getClass(genericA), A::class.java)
+
+        val genericB = ReflectHelper.findGenericSuperclass(D::class.java, B::class.java)
+        println(genericB)
+        doTest(genericB?.javaClass is Class, true)
+        doTest(ReflectHelper.getClass(genericB), B::class.java)
     }
 }

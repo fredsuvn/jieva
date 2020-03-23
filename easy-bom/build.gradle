@@ -14,7 +14,8 @@ ext {
             commonsCodecVersion      : "1.14",
             guavaVersion             : "28.2-jre",
             testngVersion            : "7.1.0",
-            cglib                    : "3.3.0",
+            cglibVersion             : "3.3.0",
+            fastjsonVersion          : "1.2.67",
     ]
 }
 
@@ -39,7 +40,8 @@ dependencies {
         api("commons-beanutils:commons-beanutils:${libVersions.commonsBeanutilsVersion}")
         api("commons-codec:commons-codec:${libVersions.commonsCodecVersion}")
         api("com.google.guava:guava:${libVersions.guavaVersion}")
-        api("cglib:cglib:${libVersions.cglib}")
+        api("cglib:cglib:${libVersions.cglibVersion}")
+        api("com.alibaba:fastjson:${libVersions.fastjsonVersion}")
 
         api("org.testng:testng:${libVersions.testngVersion}")
     }

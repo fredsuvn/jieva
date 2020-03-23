@@ -17,13 +17,13 @@ java {
 dependencies {
     implementation(platform(project(":easy-parent")))
 
-    api("org.slf4j:slf4j-api")
-
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    api("org.slf4j:slf4j-api")
     api("org.apache.commons:commons-lang3")
     api("commons-beanutils:commons-beanutils")
     api("org.apache.commons:commons-collections4")
     api('com.google.guava:guava')
+    api('com.alibaba:fastjson')
 
     compileOnly("org.springframework:spring-core")
     compileOnly("cglib:cglib")

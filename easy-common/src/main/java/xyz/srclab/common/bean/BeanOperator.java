@@ -1,9 +1,12 @@
 package xyz.srclab.common.bean;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import org.jetbrains.annotations.Nullable;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.reflect.ReflectHelper;
 
+import java.util.List;
 import java.util.Map;
 
 public interface BeanOperator {
@@ -70,6 +73,11 @@ public interface BeanOperator {
         copyProperties(from, returned);
         return returned;
     }
+
+//    default Map<String, Object> toMap() {
+//        JSON.parseObject("", new TypeReference<List<List<List<String>>>>() {
+//        });
+//    }
 
     class Builder extends CacheStateBuilder<BeanOperator> {
 

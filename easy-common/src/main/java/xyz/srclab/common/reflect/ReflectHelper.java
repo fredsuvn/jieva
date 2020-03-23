@@ -1,9 +1,10 @@
 package xyz.srclab.common.reflect;
 
 import org.apache.commons.lang3.ClassUtils;
+import org.jetbrains.annotations.Nullable;
+import xyz.srclab.common.base.KeyHelper;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -107,7 +108,7 @@ public class ReflectHelper {
     }
 
     private static Object buildClassMethodsKey(Class<?> cls, String methodsScope) {
-        return SignatureHelper.signature(cls) + ":" + methodsScope;
+        return KeyHelper.buildKey(cls, methodsScope);
     }
 
     public static boolean canOverride(Method method) {
@@ -120,5 +121,65 @@ public class ReflectHelper {
     public static boolean isAssignable(Object from, Class<?> to) {
         Class<?> fromType = from instanceof Class<?> ? (Class<?>) from : from.getClass();
         return ClassUtils.isAssignable(fromType, to);
+    }
+
+    public static Class<?> getClass(Type type) {
+        if (type instanceof Class) {
+            return (Class<?>) type;
+        }
+
+        if (type instanceof ParameterizedType) {
+            return getClass(((ParameterizedType) type).getRawType());
+        }
+
+        if (type instanceof TypeVariable) {
+            Type boundType = ((TypeVariable<?>) type).getBounds()[0];
+            if (boundType instanceof Class) {
+                return (Class<?>) boundType;
+            }
+            return getClass(boundType);
+        }
+
+        if (type instanceof WildcardType) {
+            Type[] upperBounds = ((WildcardType) type).getUpperBounds();
+            if (upperBounds.length == 1) {
+                return getClass(upperBounds[0]);
+            }
+        }
+
+        return Object.class;
+    }
+
+    private static final ThreadLocal<WeakHashMap<Object, Type>> typeCache =
+            ThreadLocal.withInitial(WeakHashMap::new);
+
+    @Nullable
+    public static Type findGenericSuperclass(Class<?> cls, Class<?> target) {
+        Type returned = typeCache.get().computeIfAbsent(
+                buildTypeKey("findGenericSuperclass", cls, target),
+                k -> findGenericSuperclass0(cls, target)
+        );
+        return returned == NullType.INSTANCE ? null : returned;
+    }
+
+    private static Type findGenericSuperclass0(Class<?> cls, Class<?> target) {
+        Type current = cls;
+        do {
+            Class<?> currentClass = getClass(current);
+            if (target.equals(currentClass)) {
+                return current;
+            }
+            current = currentClass.getGenericSuperclass();
+        } while (current != null);
+        return NullType.INSTANCE;
+    }
+
+    private static Object buildTypeKey(Object... args) {
+        return KeyHelper.buildKey(args);
+    }
+
+    private static class NullType implements Type {
+
+        private static final NullType INSTANCE = new NullType();
     }
 }

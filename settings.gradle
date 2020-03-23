@@ -11,6 +11,6 @@ pluginManagement {
 
 rootProject.name = 'easy-common-build'
 
-include "easy-bom"
-include "easy-parent"
-include "easy-common"
+file("${rootDir}").eachDirMatch(~/easy-.*/) { file ->
+    include file.name
+}
