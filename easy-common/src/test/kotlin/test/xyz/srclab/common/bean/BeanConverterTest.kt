@@ -33,12 +33,12 @@ object BeanConverterTest {
         })
         .build()
 
-    @Test(dataProvider = "expectedConversionCommon")
+    @Test(dataProvider = "commonDataProvider")
     fun testCommon(from: Any, to: Class<*>, expected: Any) {
         doTest(commonConverter, from, to, expected)
     }
 
-    @Test(dataProvider = "expectedConversionCustom")
+    @Test(dataProvider = "customDataProvider")
     fun testCustom(from: Any, to: Class<*>, expected: Any) {
         doTest(customConverter, from, to, expected)
     }
@@ -54,7 +54,7 @@ object BeanConverterTest {
     }
 
     @DataProvider
-    fun expectedConversionCommon(): Array<Array<*>> {
+    fun commonDataProvider(): Array<Array<*>> {
         return arrayOf(
             arrayOf(1, String::class.java, "1"),
             arrayOf("1", Int::class.java, 1),
@@ -63,7 +63,7 @@ object BeanConverterTest {
     }
 
     @DataProvider
-    fun expectedConversionCustom(): Array<Array<*>> {
+    fun customDataProvider(): Array<Array<*>> {
         return arrayOf(
             arrayOf(1, String::class.java, "9999"),
             arrayOf("1", Int::class.java, 999),
