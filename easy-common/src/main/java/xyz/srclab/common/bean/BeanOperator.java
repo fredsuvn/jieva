@@ -18,6 +18,10 @@ public interface BeanOperator {
 
     BeanOperatorStrategy getBeanOperatorStrategy();
 
+    default BeanDescriptor resolve(Object bean) {
+        return getBeanResolver().resolve(bean);
+    }
+
     default Object getProperty(Object bean, String propertyName) {
         BeanDescriptor beanDescriptor = getBeanResolver().resolve(bean);
         BeanPropertyDescriptor propertyDescriptor = beanDescriptor.getPropertyDescriptor(propertyName);

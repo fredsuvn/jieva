@@ -1,5 +1,6 @@
 package xyz.srclab.common.proxy;
 
+import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.bytecode.proxy.ProxyBuilder;
 import xyz.srclab.common.bytecode.proxy.ProxyClass;
 import xyz.srclab.common.reflect.MethodBody;
@@ -22,7 +23,7 @@ public interface ClassProxy<T> {
 
     T newInstance(Class<?>[] parameterTypes, Object[] arguments);
 
-    class Builder<T> {
+    class Builder<T> extends CacheStateBuilder<ClassProxy<T>> {
         public static <T> Builder<T> newBuilder(Class<T> type) {
             return new Builder<>(type);
         }
@@ -49,7 +50,8 @@ public interface ClassProxy<T> {
             return this;
         }
 
-        public ClassProxy<T> build() {
+        @Override
+        protected ClassProxy<T> buildNew() {
             ProxyClass<T> proxyClass = buildProxyClass();
             return new ClassProxy<T>() {
                 @Override

@@ -1,5 +1,6 @@
 package xyz.srclab.common.bytecode.bean.cglib;
 
+import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.bytecode.bean.BeanBuilder;
 import xyz.srclab.common.bytecode.bean.BeanClass;
 import xyz.srclab.common.bytecode.impl.cglib.BeanGenerator;
@@ -8,7 +9,7 @@ import xyz.srclab.common.bytecode.impl.cglib.CglibOperator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CglibBeanBuilder<T> implements BeanBuilder<T> {
+public class CglibBeanBuilder<T> extends CacheStateBuilder<BeanClass<T>> implements BeanBuilder<T> {
 
     public static CglibBeanBuilder<Object> newBuilder() {
         return new CglibBeanBuilder<>(Object.class);
@@ -32,7 +33,7 @@ public class CglibBeanBuilder<T> implements BeanBuilder<T> {
     }
 
     @Override
-    public BeanClass<T> build() {
+    protected BeanClass<T> buildNew() {
         return new BeanClassImpl<T>(buildBeanGenerator());
     }
 

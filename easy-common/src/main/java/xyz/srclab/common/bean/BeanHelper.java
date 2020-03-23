@@ -2,6 +2,10 @@ package xyz.srclab.common.bean;
 
 public class BeanHelper {
 
+    public static BeanDescriptor resolve(Object bean) {
+        return CommonBeanOperator.getInstance().resolve(bean);
+    }
+
     public static Object getProperty(Object bean, String propertyName) {
         return CommonBeanOperator.getInstance().getProperty(bean, propertyName);
     }

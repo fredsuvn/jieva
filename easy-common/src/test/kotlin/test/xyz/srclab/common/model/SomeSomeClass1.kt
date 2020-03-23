@@ -3,7 +3,7 @@ package test.xyz.srclab.common.model
 open class SomeSomeClass1 : SomeClass1(), SomeInterface1 {
 
     open fun someSome1PublicFun() {
-
+        println("invoke someSome1PublicFun!")
     }
 
     protected open fun someSome1ProtectedFun() {

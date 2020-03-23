@@ -1,6 +1,7 @@
 package xyz.srclab.common.bytecode.proxy.cglib;
 
 import org.apache.commons.lang3.ArrayUtils;
+import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.bytecode.impl.cglib.*;
 import xyz.srclab.common.bytecode.proxy.ProxyBuilder;
 import xyz.srclab.common.bytecode.proxy.ProxyClass;
@@ -14,7 +15,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CglibProxyBuilder<T> implements ProxyBuilder<T> {
+public class CglibProxyBuilder<T> extends CacheStateBuilder<ProxyClass<T>> implements ProxyBuilder<T> {
 
     public static CglibProxyBuilder<Object> newBuilder() {
         return new CglibProxyBuilder<>(Object.class);
@@ -52,53 +53,61 @@ public class CglibProxyBuilder<T> implements ProxyBuilder<T> {
     }
 
     @Override
-    public ProxyClass<T> build() {
+    protected ProxyClass<T> buildNew() {
         return new ProxyClassImpl<>(buildEnhancer());
     }
 
     private Enhancer buildEnhancer() {
         Callback[] callbacks = new Callback[overrideMethods.size() + 1];
-        callbacks[0] = NoOp.INSTANCE;
-        int[] count = {1};
+        int i = 0;
+        for (MethodInfo overrideMethod : overrideMethods) {
+            callbacks[i++] = buildMethodInterceptor(overrideMethod);
+        }
+        callbacks[i] = NoOp.INSTANCE;
         CallbackFilter callbackFilter = method -> {
+            int j = 0;
             for (MethodInfo methodInfo : overrideMethods) {
                 if (method.getName().equals(methodInfo.getName())
                         && Arrays.deepEquals(method.getParameterTypes(), methodInfo.getParameterTypes())) {
-                    MethodInterceptor methodInterceptor = (object, method1, args, proxy) ->
-                            methodInfo.getBody().invoke(object, method1, args, new MethodInvoker() {
-                                @Override
-                                public Object invoke(Object object) {
-                                    try {
-                                        return proxy.invokeSuper(object, args);
-                                    } catch (Throwable throwable) {
-                                        throw new ExceptionWrapper(throwable);
-                                    }
-                                }
-
-                                @Override
-                                public Object invoke(Object object, Object[] args) {
-                                    try {
-                                        return proxy.invokeSuper(object, args);
-                                    } catch (Throwable throwable) {
-                                        throw new ExceptionWrapper(throwable);
-                                    }
-                                }
-                            });
-                    int nowIndex = count[0];
-                    callbacks[nowIndex] = methodInterceptor;
-                    count[0]++;
-                    return nowIndex;
+                    return j;
                 }
+                j++;
             }
-            return 0;
+            return callbacks.length - 1;
         };
 
         Enhancer enhancer = CglibOperator.getInstance().newEnhancer();
         enhancer.setSuperclass(superClass);
-        enhancer.setInterfaces(interfaces.toArray(ArrayUtils.EMPTY_CLASS_ARRAY));
+        if (!interfaces.isEmpty()) {
+            enhancer.setInterfaces(interfaces.toArray(ArrayUtils.EMPTY_CLASS_ARRAY));
+        }
         enhancer.setCallbacks(callbacks);
         enhancer.setCallbackFilter(callbackFilter);
         return enhancer;
+    }
+
+    private MethodInterceptor buildMethodInterceptor(MethodInfo methodInfo) {
+        MethodInterceptor methodInterceptor = (object, method1, args, proxy) ->
+                methodInfo.getBody().invoke(object, method1, args, new MethodInvoker() {
+                    @Override
+                    public Object invoke(Object object) {
+                        try {
+                            return proxy.invokeSuper(object, args);
+                        } catch (Throwable throwable) {
+                            throw new ExceptionWrapper(throwable);
+                        }
+                    }
+
+                    @Override
+                    public Object invoke(Object object, Object[] args) {
+                        try {
+                            return proxy.invokeSuper(object, args);
+                        } catch (Throwable throwable) {
+                            throw new ExceptionWrapper(throwable);
+                        }
+                    }
+                });
+        return methodInterceptor;
     }
 
     private static class ProxyClassImpl<T> implements ProxyClass<T> {
