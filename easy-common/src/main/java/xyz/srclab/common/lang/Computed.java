@@ -15,8 +15,8 @@ public interface Computed<T> extends Supplier<T> {
         return new SimpleComputed<>(supplier);
     }
 
-    static <T> Computed<T> of(Supplier<T> supplier, long timeout) {
-        return new AutoRefreshComputed<>(supplier, timeout);
+    static <T> Computed<T> of(long timeout, Supplier<T> supplier) {
+        return new AutoRefreshComputed<>(timeout, supplier);
     }
 
     void refresh();
@@ -69,7 +69,7 @@ final class AutoRefreshComputed<T> extends AbstractComputed<T> {
 
     private long lastComputedTime = 0;
 
-    AutoRefreshComputed(Supplier<T> supplier, long timeout) {
+    AutoRefreshComputed(long timeout, Supplier<T> supplier) {
         super(supplier);
         this.timeout = timeout;
     }
