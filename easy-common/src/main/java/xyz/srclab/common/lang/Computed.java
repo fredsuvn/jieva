@@ -11,11 +11,11 @@ import java.util.function.Supplier;
  */
 public interface Computed<T> extends Supplier<T> {
 
-    static <T> Computed<T> of(Supplier<T> supplier) {
+    static <T> Computed<T> with(Supplier<T> supplier) {
         return new SimpleComputed<>(supplier);
     }
 
-    static <T> Computed<T> of(long timeout, Supplier<T> supplier) {
+    static <T> Computed<T> with(long timeout, Supplier<T> supplier) {
         return new AutoRefreshComputed<>(timeout, supplier);
     }
 

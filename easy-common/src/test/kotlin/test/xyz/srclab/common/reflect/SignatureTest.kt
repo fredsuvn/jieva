@@ -2,14 +2,14 @@ package test.xyz.srclab.common.reflect
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doTest
+import test.xyz.srclab.common.doAssert
 import xyz.srclab.common.reflect.SignatureHelper
 
 object SignatureTest {
 
     @Test(dataProvider = "classSignatureDataProvider")
     fun testClassSignature(actual: String, expected: String) {
-        doTest(actual, expected)
+        doAssert(actual, expected)
     }
 
     @DataProvider
@@ -28,7 +28,7 @@ object SignatureTest {
 
     @Test(dataProvider = "methodSignatureDataProvider")
     fun testMethodSignature(actual: String, expected: String) {
-        doTest(actual, expected)
+        doAssert(actual, expected)
     }
 
     @DataProvider

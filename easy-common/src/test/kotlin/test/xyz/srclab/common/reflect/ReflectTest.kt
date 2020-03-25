@@ -2,7 +2,8 @@ package test.xyz.srclab.common.reflect
 
 import org.testng.Assert
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doTest
+import test.xyz.srclab.common.doAssert
+import test.xyz.srclab.common.model.BoundModel
 import test.xyz.srclab.common.model.SomeSomeClass1
 import xyz.srclab.common.reflect.ReflectHelper
 import xyz.srclab.common.reflect.SignatureHelper
@@ -174,12 +175,25 @@ object ReflectTest {
 
         val genericA = ReflectHelper.findGenericSuperclass(D::class.java, A::class.java)
         println(genericA)
-        doTest(genericA?.javaClass is Type, true)
-        doTest(ReflectHelper.getClass(genericA), A::class.java)
+        doAssert(genericA?.javaClass is Type, true)
+        doAssert(ReflectHelper.getClass(genericA), A::class.java)
 
         val genericB = ReflectHelper.findGenericSuperclass(D::class.java, B::class.java)
         println(genericB)
-        doTest(genericB?.javaClass is Class, true)
-        doTest(ReflectHelper.getClass(genericB), B::class.java)
+        doAssert(genericB?.javaClass is Class, true)
+        doAssert(ReflectHelper.getClass(genericB), B::class.java)
+    }
+
+    @Test
+    fun testBound() {
+        BoundModel::class.java.declaredMethods.forEach { method ->
+            println("method: ${method.name}")
+            println("generic return type: ${method.genericReturnType}")
+            println("return type: ${method.returnType}")
+            doAssert(ReflectHelper.getClass((method.genericReturnType)), method.returnType)
+            println("generic parameter type: ${method.genericParameterTypes[0]}")
+            println("parameter type: ${method.parameterTypes[0]}")
+            doAssert(ReflectHelper.getClass((method.genericParameterTypes[0])), method.parameterTypes[0])
+        }
     }
 }

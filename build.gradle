@@ -30,7 +30,7 @@ allprojects { project ->
     processProjectInfo(project)
 }
 
-subprojects {
+subprojects { project ->
 }
 
 def processProjectInfo(Project project) {

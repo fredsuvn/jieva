@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean;
 
-import org.jetbrains.annotations.Nullable;
+import com.sun.javafx.fxml.PropertyNotFoundException;
 import xyz.srclab.common.builder.CacheStateBuilder;
 
 import java.util.Collections;
@@ -14,8 +14,23 @@ public interface BeanDescriptor {
 
     Class<?> getType();
 
-    @Nullable
-    BeanPropertyDescriptor getPropertyDescriptor(String propertyName);
+    boolean containsProperty(String propertyName);
+
+    default boolean canReadProperty(String propertyName) {
+        if (!containsProperty(propertyName)) {
+            return false;
+        }
+        return getPropertyDescriptor(propertyName).isReadable();
+    }
+
+    default boolean canWriteProperty(String propertyName) {
+        if (!containsProperty(propertyName)) {
+            return false;
+        }
+        return getPropertyDescriptor(propertyName).isWriteable();
+    }
+
+    BeanPropertyDescriptor getPropertyDescriptor(String propertyName) throws PropertyNotFoundException;
 
     Map<String, BeanPropertyDescriptor> getPropertyDescriptors();
 
@@ -64,9 +79,16 @@ public interface BeanDescriptor {
                 return type;
             }
 
-            @Nullable
+            @Override
+            public boolean containsProperty(String propertyName) {
+                return properties.containsKey(propertyName);
+            }
+
             @Override
             public BeanPropertyDescriptor getPropertyDescriptor(String propertyName) {
+                if (!properties.containsKey(propertyName)) {
+                    throw new BeanPropertyNotFoundException(propertyName);
+                }
                 return properties.get(propertyName);
             }
 

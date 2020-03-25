@@ -7,10 +7,18 @@ import java.lang.reflect.Type;
 
 public class TypeRef<T> {
 
+    public static TypeRef<?> with(Type type) {
+        return new TypeRef<>(type);
+    }
+
     private final Type type;
 
     protected TypeRef() {
         this.type = reflectTypeSelf();
+    }
+
+    private TypeRef(Type type) {
+        this.type = type;
     }
 
     protected Type reflectTypeSelf() {

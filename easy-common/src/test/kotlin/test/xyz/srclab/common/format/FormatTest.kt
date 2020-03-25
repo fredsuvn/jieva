@@ -2,14 +2,14 @@ package test.xyz.srclab.common.format
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doTest
+import test.xyz.srclab.common.doAssert
 import xyz.srclab.common.format.FormatHelper
 
 object FormatTest {
 
     @Test(dataProvider = "fastFormatDataProvider")
     fun testFastFormat(actual: String, expected: String) {
-        doTest(actual, expected)
+        doAssert(actual, expected)
     }
 
     @DataProvider
@@ -21,7 +21,7 @@ object FormatTest {
 
     @Test(dataProvider = "printfFormatDataProvider")
     fun testPrintfFormat(actual: String, expected: String) {
-        doTest(actual, expected)
+        doAssert(actual, expected)
     }
 
     @DataProvider
@@ -33,7 +33,7 @@ object FormatTest {
 
     @Test(dataProvider = "messageFormatDataProvider")
     fun testMessageFormat(actual: String, expected: String) {
-        doTest(actual, expected)
+        doAssert(actual, expected)
     }
 
     @DataProvider

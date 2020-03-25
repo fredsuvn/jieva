@@ -8,28 +8,29 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class SimpleBeanResolverHandler implements BeanResolverHandler {
+public class CommonBeanResolverHandler implements BeanResolverHandler {
 
-    public static SimpleBeanResolverHandler getInstance() {
+    public static CommonBeanResolverHandler getInstance() {
         return INSTANCE;
     }
 
-    private static final SimpleBeanResolverHandler INSTANCE = new SimpleBeanResolverHandler();
+    private static final CommonBeanResolverHandler INSTANCE = new CommonBeanResolverHandler();
 
     private static final ThreadLocal<WeakHashMap<Class<?>, BeanDescriptor>> descriptorCache =
             ThreadLocal.withInitial(WeakHashMap::new);
 
     @Override
-    public boolean supportBean(Object bean, BeanOperator beanOperator) {
-        return true;
+    public boolean supportBean(Object bean) {
+        return !(bean instanceof Map);
     }
 
     @Override
-    public BeanDescriptor resolve(Object bean, BeanOperator beanOperator) {
+    public BeanDescriptor resolve(Object bean) {
         return descriptorCache.get().computeIfAbsent(bean.getClass(), type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
@@ -54,9 +55,23 @@ public class SimpleBeanResolverHandler implements BeanResolverHandler {
     private static class PojoBeanPropertyDescriptor implements BeanPropertyDescriptor {
 
         private final PropertyDescriptor descriptor;
+        private final Type genericType;
 
         private PojoBeanPropertyDescriptor(PropertyDescriptor descriptor) {
             this.descriptor = descriptor;
+            this.genericType = findGenericType(descriptor);
+        }
+
+        private Type findGenericType(PropertyDescriptor descriptor) {
+            Method getter = descriptor.getReadMethod();
+            if (getter != null) {
+                return getter.getGenericReturnType();
+            }
+            Method setter = descriptor.getWriteMethod();
+            if (setter == null) {
+                throw new IllegalStateException("Both getter and setter method are null: " + getName());
+            }
+            return setter.getGenericParameterTypes()[0];
         }
 
         @Override
@@ -67,6 +82,11 @@ public class SimpleBeanResolverHandler implements BeanResolverHandler {
         @Override
         public Class<?> getType() {
             return descriptor.getPropertyType();
+        }
+
+        @Override
+        public Type getGenericType() {
+            return genericType;
         }
 
         @Override

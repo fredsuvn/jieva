@@ -10,8 +10,6 @@ public interface BeanResolver {
 
     BeanDescriptor resolve(Object bean);
 
-    BeanDescriptor resolve(Object bean, BeanOperator beanOperator);
-
     class Builder extends ProcessByHandlersBuilder<BeanResolver, BeanResolverHandler, Builder> {
 
         public static Builder newBuilder() {
@@ -33,14 +31,9 @@ public interface BeanResolver {
 
             @Override
             public BeanDescriptor resolve(Object bean) {
-                return resolve(bean, CommonBeanOperator.getInstance());
-            }
-
-            @Override
-            public BeanDescriptor resolve(Object bean, BeanOperator beanOperator) {
                 for (BeanResolverHandler handler : handlers) {
-                    if (handler.supportBean(bean, beanOperator)) {
-                        return handler.resolve(bean, beanOperator);
+                    if (handler.supportBean(bean)) {
+                        return handler.resolve(bean);
                     }
                 }
                 throw new UnsupportedOperationException("Cannot resolve this bean: " + bean);

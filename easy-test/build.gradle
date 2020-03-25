@@ -1,0 +1,32 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+}
+
+description = "easy-test"
+
+apply from: gradles.compile
+
+apply from: gradles.repositories
+
+java {
+    registerFeature('optionalSupport') {
+        usingSourceSet(sourceSets.main)
+    }
+}
+
+dependencies {
+    implementation(platform(project(":easy-parent")))
+
+    api(project(":easy-common"))
+
+    implementation("org.testng:testng")
+
+    testCompile("org.testng:testng")
+}
+
+test {
+    useTestNG()
+    include("**/*Test.class")
+}
+
+apply from: gradles.deployJar

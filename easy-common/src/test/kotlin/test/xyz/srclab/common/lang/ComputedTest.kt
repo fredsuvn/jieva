@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.lang
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doTest
+import test.xyz.srclab.common.doAssert
 import xyz.srclab.common.lang.Computed
 
 object ComputedTest {
@@ -9,21 +9,21 @@ object ComputedTest {
     @Test
     fun testNoTimeout() {
         val count = arrayOf(0)
-        val computed = Computed.of {
+        val computed = Computed.with {
             count[0]++
             count[0]
         }
         println(computed.get())
         println(computed.get())
         println(computed.get())
-        doTest(computed.get(), 1)
-        doTest(computed.refreshAndGet(), 2)
+        doAssert(computed.get(), 1)
+        doAssert(computed.refreshAndGet(), 2)
     }
 
     @Test
     fun testTimeout() {
         val count = arrayOf(0)
-        val computed = Computed.of(1000) {
+        val computed = Computed.with(1) {
             count[0]++
             count[0]
         }
@@ -35,7 +35,7 @@ object ComputedTest {
         println(computed.get())
         println(computed.get())
         Thread.sleep(1000)
-        doTest(computed.get(), 4)
-        doTest(computed.refreshAndGet(), 5)
+        doAssert(computed.get(), 4)
+        doAssert(computed.refreshAndGet(), 5)
     }
 }

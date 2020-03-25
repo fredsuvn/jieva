@@ -17,9 +17,4 @@ public class CommonBeanOperator implements BeanOperator {
     public BeanConverter getBeanConverter() {
         return CommonBeanConverter.getInstance();
     }
-
-    @Override
-    public BeanOperatorStrategy getBeanOperatorStrategy() {
-        return CommonBeanOperatorStrategy.getInstance();
-    }
 }

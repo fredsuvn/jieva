@@ -1,8 +1,7 @@
 package test.xyz.srclab.common
 
-import org.testng.Assert
+import xyz.srclab.common.test.asserts.AssertHelper
 
-fun doTest(actual: Any?, expected: Any?) {
-    println("actual: $actual, expected: $expected")
-    Assert.assertEquals(actual, expected)
+fun doAssert(actual: Any?, expected: Any?) {
+    AssertHelper.printAssert(actual, expected)
 }

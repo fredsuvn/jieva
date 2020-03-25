@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.proxy
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doTest
+import test.xyz.srclab.common.doAssert
 import test.xyz.srclab.common.model.SomeInterface1
 import test.xyz.srclab.common.model.SomeSomeClass1
 import xyz.srclab.common.lang.Ref
@@ -22,7 +22,7 @@ object ProxyTest {
                 })
             .build()
         proxy.newInstance().some1InterfaceFun()
-        doTest(messageRef.get(), "xxxx")
+        doAssert(messageRef.get(), "xxxx")
     }
 
     @Test
@@ -37,6 +37,6 @@ object ProxyTest {
                 })
             .build()
         proxy.newInstance().someSome1PublicFun()
-        doTest(messageRef.get(), "xxxx")
+        doAssert(messageRef.get(), "xxxx")
     }
 }

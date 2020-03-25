@@ -123,7 +123,17 @@ public class ReflectHelper {
         return ClassUtils.isAssignable(fromType, to);
     }
 
+    private static final ThreadLocal<WeakHashMap<Object, Type>> typeCache =
+            ThreadLocal.withInitial(WeakHashMap::new);
+
     public static Class<?> getClass(Type type) {
+        return (Class<?>) typeCache.get().computeIfAbsent(
+                buildTypeKey("getClass", type.toString()),
+                k -> getClass0(type)
+        );
+    }
+
+    private static Class<?> getClass0(Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;
         }
@@ -149,9 +159,6 @@ public class ReflectHelper {
 
         return Object.class;
     }
-
-    private static final ThreadLocal<WeakHashMap<Object, Type>> typeCache =
-            ThreadLocal.withInitial(WeakHashMap::new);
 
     @Nullable
     public static Type findGenericSuperclass(Class<?> cls, Class<?> target) {
