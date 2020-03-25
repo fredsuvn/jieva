@@ -55,9 +55,9 @@ publishing {
         }
     }
 
-//    if (!isSnapshot) {
-    signing {
-        sign publishing.publications.maven
+    if (!isSnapshot) {
+        signing {
+            sign publishing.publications.maven
+        }
     }
-//    }
 }
