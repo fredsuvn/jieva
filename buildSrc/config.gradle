@@ -22,10 +22,8 @@ ext {
             ],
 
             oss          : [
-                    [
-                            staging : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
-                            snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
-                    ],
+                    staging : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
+                    snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
             ],
     ]
 }
