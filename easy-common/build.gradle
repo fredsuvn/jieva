@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "easy-common"
+description = "Easy for Common"
 
 apply from: gradles.compile
 

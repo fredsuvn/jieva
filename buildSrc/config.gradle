@@ -1,5 +1,5 @@
 ext {
-    management = [
+    config = [
             version      : "0.0.0",
             snapshot     : "0",
             sampleVersion: "0.0.0",

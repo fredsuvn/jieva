@@ -32,26 +32,26 @@ publishing {
             pom {
                 name = project.name
                 description = project.description
-                url = management.url
+                url = config.url
                 licenses {
-                    management.licenses.forEach {
+                    config.licenses.forEach { each ->
                         license {
-                            name = it.name
-                            url = it.url
+                            name = each.name
+                            url = each.url
                         }
                     }
                 }
                 developers {
-                    management.developers.forEach {
+                    config.developers.forEach { each ->
                         developer {
-                            email = it.email
+                            email = each.email
                         }
                     }
                 }
                 scm {
-                    connection = "scm:git:${management.url}.git"
-                    developerConnection = "scm:git:${management.url}.git"
-                    url = management.url
+                    connection = "scm:git:${config.url}.git"
+                    developerConnection = "scm:git:${config.url}.git"
+                    url = config.url
                 }
             }
         }
@@ -62,7 +62,7 @@ publishing {
 
         maven {
             name = "sonatype"
-            url = management.oss.staging
+            url = config.oss.staging
             credentials {
                 username = "${tokens.sonatypeUserName}"
                 password = "${tokens.sonatypePassword}"
@@ -70,7 +70,7 @@ publishing {
         }
         maven {
             name = "sonatypeSnapshot"
-            url = management.oss.snapshot
+            url = config.oss.snapshot
             credentials {
                 username = "${tokens.sonatypeUserName}"
                 password = "${tokens.sonatypePassword}"

@@ -8,20 +8,20 @@ ext {
             deployPlatform: "${rootProject.rootDir}/buildSrc/deploy-platform.gradle",
             compile       : "${rootProject.rootDir}/buildSrc/compile.gradle",
             auth          : "${rootProject.rootDir}/buildSrc/auth.gradle",
-            management    : "${rootProject.rootDir}/buildSrc/management.gradle",
+            config        : "${rootProject.rootDir}/buildSrc/config.gradle",
     ]
 }
 
-apply from: gradles.management
+apply from: gradles.config
 
 ext {
-    isSnapshot = isTrue(management.snapshot)
+    isSnapshot = isTrue(config.snapshot)
 }
 
-group = management.group
-management.version = (isSnapshot ? "${management.version}-SNAPSHOT" : management.version)
-management.sampleVersion = (isSnapshot ? "${management.sampleVersion}-SNAPSHOT" : management.sampleVersion)
-version = management.version
+group = config.group
+config.version = (isSnapshot ? "${config.version}-SNAPSHOT" : config.version)
+config.sampleVersion = (isSnapshot ? "${config.sampleVersion}-SNAPSHOT" : config.sampleVersion)
+version = config.version
 
 // Note in gradles.auth some personal setting should be implemented.
 apply from: gradles.auth
@@ -37,11 +37,11 @@ def processProjectInfo(Project project) {
     if (project == rootProject) {
         // NOP
     } else if (project.group == "easy-common-build.common-sample") {
-        project.group = management.sampleGroup
-        project.version = management.sampleVersion
+        project.group = config.sampleGroup
+        project.version = config.sampleVersion
     } else {
-        project.group = management.group
-        project.version = management.version
+        project.group = config.group
+        project.version = config.version
     }
     println("Configure ${project.group}:${project.name}:${project.version}")
 }
