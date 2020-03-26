@@ -6,7 +6,7 @@ interface ProxyOperator {
         return ProxyOperatorLoader.getInstance();
     }
 
-    ProxyBuilder<Object> newBuilder();
+    ProxyClass.Builder<Object> newBuilder();
 
-    <T> ProxyBuilder<T> newBuilder(Class<T> superClass);
+    <T> ProxyClass.Builder<T> newBuilder(Class<T> superClass);
 }

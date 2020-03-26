@@ -7,6 +7,7 @@ import xyz.srclab.common.reflect.ReflectHelper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +55,9 @@ public class CommonBeanConverterHandler implements BeanConverterHandler {
             return (T) result;
         }
         result = convertToBean(from, to, beanOperator);
+        if (result == null) {
+            return null;
+        }
         if (ReflectHelper.isAssignable(result, to)) {
             return (T) result;
         }
@@ -91,19 +95,19 @@ public class CommonBeanConverterHandler implements BeanConverterHandler {
     }
 
     private Object convertToBean(@Nullable Object any, Class<?> type, BeanOperator beanOperator) {
-        Object toInstance = ReflectHelper.newInstance(type);
         if (any == null) {
-            return toInstance;
+            return null;
         }
+        Object toInstance = ReflectHelper.newInstance(type);
         beanOperator.copyProperties(any, toInstance);
         return toInstance;
     }
 
     private Map convertToMap(@Nullable Object any, Type keyType, Type valueType, BeanOperator beanOperator) {
-        Map map = new HashMap<>();
         if (any == null) {
-            return map;
+            return Collections.emptyMap();
         }
+        Map map = new HashMap<>();
         if (any instanceof Map) {
             Map src = (Map) any;
             src.forEach((k, v) -> {
@@ -123,6 +127,6 @@ public class CommonBeanConverterHandler implements BeanConverterHandler {
                 map.put(key, value);
             });
         }
-        return map;
+        return Collections.unmodifiableMap(map);
     }
 }

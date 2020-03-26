@@ -3,6 +3,7 @@ package test.xyz.srclab.common.lang
 import org.testng.annotations.Test
 import test.xyz.srclab.common.doAssert
 import xyz.srclab.common.lang.Computed
+import java.util.concurrent.TimeUnit
 
 object ComputedTest {
 
@@ -23,7 +24,7 @@ object ComputedTest {
     @Test
     fun testTimeout() {
         val count = arrayOf(0)
-        val computed = Computed.with(1) {
+        val computed = Computed.with(1, TimeUnit.MILLISECONDS) {
             count[0]++
             count[0]
         }

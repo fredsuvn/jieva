@@ -16,5 +16,3 @@ dependencies {
     constraints {
     }
 }
-
-apply from: gradles.deployPlatform

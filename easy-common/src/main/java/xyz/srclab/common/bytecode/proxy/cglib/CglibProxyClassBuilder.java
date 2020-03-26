@@ -3,7 +3,6 @@ package xyz.srclab.common.bytecode.proxy.cglib;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.bytecode.impl.cglib.*;
-import xyz.srclab.common.bytecode.proxy.ProxyBuilder;
 import xyz.srclab.common.bytecode.proxy.ProxyClass;
 import xyz.srclab.common.collection.CollectionHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
@@ -15,38 +14,38 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CglibProxyBuilder<T> extends CacheStateBuilder<ProxyClass<T>> implements ProxyBuilder<T> {
+public class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> implements ProxyClass.Builder<T> {
 
-    public static CglibProxyBuilder<Object> newBuilder() {
-        return new CglibProxyBuilder<>(Object.class);
+    public static CglibProxyClassBuilder<Object> newBuilder() {
+        return new CglibProxyClassBuilder<>(Object.class);
     }
 
-    public static <T> CglibProxyBuilder<T> newBuilder(Class<?> superClass) {
-        return new CglibProxyBuilder<>(superClass);
+    public static <T> CglibProxyClassBuilder<T> newBuilder(Class<?> superClass) {
+        return new CglibProxyClassBuilder<>(superClass);
     }
 
     private final Class<?> superClass;
     private final List<Class<?>> interfaces = new LinkedList<>();
     private final List<MethodInfo> overrideMethods = new LinkedList<>();
 
-    public CglibProxyBuilder(Class<?> superClass) {
+    public CglibProxyClassBuilder(Class<?> superClass) {
         this.superClass = superClass;
     }
 
     @Override
-    public ProxyBuilder<T> addInterfaces(Iterable<Class<?>> interfaces) {
+    public CglibProxyClassBuilder<T> addInterfaces(Iterable<Class<?>> interfaces) {
         this.interfaces.addAll(CollectionHelper.castCollection(interfaces));
         return this;
     }
 
     @Override
-    public <R> ProxyBuilder<T> overrideMethod(String name, Class<?>[] parameterTypes, MethodBody<R> methodBody) {
+    public <R> CglibProxyClassBuilder<T> overrideMethod(String name, Class<?>[] parameterTypes, MethodBody<R> methodBody) {
         this.overrideMethods.add(new MethodInfo(name, parameterTypes, methodBody));
         return this;
     }
 
     @Override
-    public <R> ProxyBuilder<T> overrideMethod(MethodDefinition<R> methodDefinition) {
+    public <R> CglibProxyClassBuilder<T> overrideMethod(MethodDefinition<R> methodDefinition) {
         this.overrideMethods.add(new MethodInfo(
                 methodDefinition.getName(), methodDefinition.getParameterTypes(), methodDefinition.getBody()));
         return this;

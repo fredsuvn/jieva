@@ -1,6 +1,6 @@
 package xyz.srclab.common.bytecode.proxy;
 
-import xyz.srclab.common.bytecode.proxy.cglib.CglibProxyBuilder;
+import xyz.srclab.common.bytecode.proxy.cglib.CglibProxyClassBuilder;
 
 class ProxyOperatorLoader {
 
@@ -13,13 +13,13 @@ class ProxyOperatorLoader {
     static class CglibProxyOperator implements ProxyOperator {
 
         @Override
-        public ProxyBuilder<Object> newBuilder() {
-            return CglibProxyBuilder.newBuilder();
+        public ProxyClass.Builder<Object> newBuilder() {
+            return CglibProxyClassBuilder.newBuilder();
         }
 
         @Override
-        public <T> ProxyBuilder<T> newBuilder(Class<T> superClass) {
-            return CglibProxyBuilder.newBuilder(superClass);
+        public <T> ProxyClass.Builder<T> newBuilder(Class<T> superClass) {
+            return CglibProxyClassBuilder.newBuilder(superClass);
         }
     }
 }

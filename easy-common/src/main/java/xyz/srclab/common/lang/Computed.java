@@ -2,6 +2,7 @@ package xyz.srclab.common.lang;
 
 import xyz.srclab.common.time.TimeHelper;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -15,8 +16,12 @@ public interface Computed<T> extends Supplier<T> {
         return new SimpleComputed<>(supplier);
     }
 
-    static <T> Computed<T> with(long timeout, Supplier<T> supplier) {
-        return new AutoRefreshComputed<>(timeout, supplier);
+    static <T> Computed<T> with(long timeoutSeconds, Supplier<T> supplier) {
+        return new AutoRefreshComputed<>(timeoutSeconds, TimeUnit.SECONDS, supplier);
+    }
+
+    static <T> Computed<T> with(long timeout, TimeUnit timeUnit, Supplier<T> supplier) {
+        return new AutoRefreshComputed<>(timeout, timeUnit, supplier);
     }
 
     void refresh();
@@ -66,18 +71,21 @@ final class SimpleComputed<T> extends AbstractComputed<T> {
 final class AutoRefreshComputed<T> extends AbstractComputed<T> {
 
     private final long timeout;
+    private final TimeUnit timeUnit;
 
     private long lastComputedTime = 0;
 
-    AutoRefreshComputed(long timeout, Supplier<T> supplier) {
+    AutoRefreshComputed(long timeout, TimeUnit timeUnit, Supplier<T> supplier) {
         super(supplier);
         this.timeout = timeout;
+        this.timeUnit = timeUnit;
     }
 
     @Override
     public T get() {
         long now = TimeHelper.nowMillis();
-        return (lastComputedTime > 0 && lastComputedTime + timeout >= now) ? this.computedCache : refreshAndGet();
+        return (lastComputedTime > 0 && lastComputedTime + timeUnit.toMillis(timeout) >= now) ?
+                this.computedCache : refreshAndGet();
     }
 
     public void refresh() {

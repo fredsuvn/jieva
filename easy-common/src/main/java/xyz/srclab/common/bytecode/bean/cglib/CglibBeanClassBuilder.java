@@ -1,7 +1,6 @@
 package xyz.srclab.common.bytecode.bean.cglib;
 
 import xyz.srclab.common.builder.CacheStateBuilder;
-import xyz.srclab.common.bytecode.bean.BeanBuilder;
 import xyz.srclab.common.bytecode.bean.BeanClass;
 import xyz.srclab.common.bytecode.impl.cglib.BeanGenerator;
 import xyz.srclab.common.bytecode.impl.cglib.CglibOperator;
@@ -9,25 +8,25 @@ import xyz.srclab.common.bytecode.impl.cglib.CglibOperator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CglibBeanBuilder<T> extends CacheStateBuilder<BeanClass<T>> implements BeanBuilder<T> {
+public class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> implements BeanClass.Builder<T> {
 
-    public static CglibBeanBuilder<Object> newBuilder() {
-        return new CglibBeanBuilder<>(Object.class);
+    public static CglibBeanClassBuilder<Object> newBuilder() {
+        return new CglibBeanClassBuilder<>(Object.class);
     }
 
-    public static <T> CglibBeanBuilder<T> newBuilder(Class<?> superClass) {
-        return new CglibBeanBuilder<>(superClass);
+    public static <T> CglibBeanClassBuilder<T> newBuilder(Class<?> superClass) {
+        return new CglibBeanClassBuilder<>(superClass);
     }
 
     private final Class<?> superClass;
     private final List<PropertyInfo> propertyInfos = new LinkedList<>();
 
-    public CglibBeanBuilder(Class<?> superClass) {
+    public CglibBeanClassBuilder(Class<?> superClass) {
         this.superClass = superClass;
     }
 
     @Override
-    public BeanBuilder<T> addProperty(String name, Class<?> type) {
+    public CglibBeanClassBuilder<T> addProperty(String name, Class<?> type) {
         this.propertyInfos.add(new PropertyInfo(name, type));
         return this;
     }

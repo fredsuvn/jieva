@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Easy for Common: Test"
+description = "Easy for Common: Sample"
 
 apply from: gradles.compile
 
@@ -17,15 +17,14 @@ java {
 dependencies {
     implementation(platform(project(":easy-parent")))
 
-    api(project(":easy-common"))
-    api("org.testng:testng")
+    implementation(project(":easy-common"))
+    implementation(project(":easy-test"))
 
     testCompile("org.testng:testng")
+    testCompile("cglib:cglib")
 }
 
 test {
     useTestNG()
     include("**/*Test.class")
 }
-
-apply from: gradles.deployJar

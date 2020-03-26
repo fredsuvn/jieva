@@ -6,7 +6,7 @@ interface BeanOperator {
         return BeanOperatorLoader.getInstance();
     }
 
-    BeanBuilder<Object> newBuilder();
+    BeanClass.Builder<Object> newBuilder();
 
-    <T> BeanBuilder<T> newBuilder(Class<T> superClass);
+    <T> BeanClass.Builder<T> newBuilder(Class<T> superClass);
 }

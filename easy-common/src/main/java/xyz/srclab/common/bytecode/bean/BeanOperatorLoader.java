@@ -1,6 +1,6 @@
 package xyz.srclab.common.bytecode.bean;
 
-import xyz.srclab.common.bytecode.bean.cglib.CglibBeanBuilder;
+import xyz.srclab.common.bytecode.bean.cglib.CglibBeanClassBuilder;
 
 class BeanOperatorLoader {
 
@@ -13,13 +13,13 @@ class BeanOperatorLoader {
     static class CglibBeanOperator implements BeanOperator {
 
         @Override
-        public BeanBuilder<Object> newBuilder() {
-            return CglibBeanBuilder.newBuilder();
+        public BeanClass.Builder<Object> newBuilder() {
+            return CglibBeanClassBuilder.newBuilder();
         }
 
         @Override
-        public <T> BeanBuilder<T> newBuilder(Class<T> superClass) {
-            return CglibBeanBuilder.newBuilder(superClass);
+        public <T> BeanClass.Builder<T> newBuilder(Class<T> superClass) {
+            return CglibBeanClassBuilder.newBuilder(superClass);
         }
     }
 }

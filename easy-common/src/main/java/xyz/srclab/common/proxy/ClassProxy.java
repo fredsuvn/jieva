@@ -1,7 +1,6 @@
 package xyz.srclab.common.proxy;
 
 import xyz.srclab.common.builder.CacheStateBuilder;
-import xyz.srclab.common.bytecode.proxy.ProxyBuilder;
 import xyz.srclab.common.bytecode.proxy.ProxyClass;
 import xyz.srclab.common.reflect.MethodBody;
 import xyz.srclab.common.reflect.ReflectHelper;
@@ -67,7 +66,7 @@ public interface ClassProxy<T> {
         }
 
         private ProxyClass<T> buildProxyClass() {
-            ProxyBuilder<T> builder = ProxyBuilder.newBuilder(type);
+            ProxyClass.Builder<T> builder = ProxyClass.newBuilder(type);
             List<Method> methods = ReflectHelper.getOverrideableMethods(type);
             for (Method method : methods) {
                 for (Pair<Predicate<Method>, MethodBody<?>> predicatePair : predicatePairs) {
