@@ -185,7 +185,7 @@ public class ReflectHelper {
         return KeyHelper.buildKey(args);
     }
 
-    private static class NullType implements Type {
+    private static final class NullType implements Type {
 
         private static final NullType INSTANCE = new NullType();
     }

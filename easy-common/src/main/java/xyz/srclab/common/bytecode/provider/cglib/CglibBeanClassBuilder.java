@@ -1,18 +1,12 @@
-package xyz.srclab.common.bytecode.bean.cglib;
+package xyz.srclab.common.bytecode.provider.cglib;
 
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.bytecode.bean.BeanClass;
-import xyz.srclab.common.bytecode.impl.cglib.BeanGenerator;
-import xyz.srclab.common.bytecode.impl.cglib.CglibOperator;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> implements BeanClass.Builder<T> {
-
-    public static CglibBeanClassBuilder<Object> newBuilder() {
-        return new CglibBeanClassBuilder<>(Object.class);
-    }
+class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> implements BeanClass.Builder<T> {
 
     public static <T> CglibBeanClassBuilder<T> newBuilder(Class<?> superClass) {
         return new CglibBeanClassBuilder<>(superClass);
@@ -37,7 +31,7 @@ public class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> im
     }
 
     private BeanGenerator buildBeanGenerator() {
-        BeanGenerator beanGenerator = CglibOperator.getInstance().newBeanGenerator();
+        BeanGenerator beanGenerator = CglibAdaptor.getInstance().newBeanGenerator();
         beanGenerator.setSuperclass(superClass);
         for (PropertyInfo propertyInfo : propertyInfos) {
             beanGenerator.addProperty(propertyInfo.getName(), propertyInfo.getType());
@@ -45,7 +39,7 @@ public class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> im
         return beanGenerator;
     }
 
-    private static class BeanClassImpl<T> implements BeanClass<T> {
+    private static final class BeanClassImpl<T> implements BeanClass<T> {
 
         private final BeanGenerator beanGenerator;
 
@@ -56,6 +50,25 @@ public class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> im
         @Override
         public T newInstance() {
             return (T) beanGenerator.create();
+        }
+    }
+
+    private static final class PropertyInfo {
+
+        private final String name;
+        private final Class<?> type;
+
+        PropertyInfo(String name, Class<?> type) {
+            this.name = name;
+            this.type = type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Class<?> getType() {
+            return type;
         }
     }
 }

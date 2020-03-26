@@ -1,4 +1,4 @@
-package xyz.srclab.common.bytecode.impl.cglib;
+package xyz.srclab.common.bytecode.provider.cglib;
 
 public interface Enhancer {
 

@@ -1,23 +1,24 @@
-package xyz.srclab.common.bytecode.impl.cglib.spring;
+package xyz.srclab.common.bytecode.provider.cglib.original;
 
-import org.springframework.cglib.beans.BeanGenerator;
-import org.springframework.cglib.proxy.*;
+import net.sf.cglib.beans.BeanGenerator;
+import net.sf.cglib.proxy.*;
+import xyz.srclab.common.bytecode.provider.cglib.CglibAdaptor;
 
-public class SpringCglibOperator implements xyz.srclab.common.bytecode.impl.cglib.CglibOperator {
+public class OriginalCglibAdaptor implements CglibAdaptor {
 
     @Override
-    public xyz.srclab.common.bytecode.impl.cglib.Enhancer newEnhancer() {
+    public xyz.srclab.common.bytecode.provider.cglib.Enhancer newEnhancer() {
         Enhancer actualEnhancer = new Enhancer();
         return new EnhancerImpl(actualEnhancer);
     }
 
     @Override
-    public xyz.srclab.common.bytecode.impl.cglib.BeanGenerator newBeanGenerator() {
+    public xyz.srclab.common.bytecode.provider.cglib.BeanGenerator newBeanGenerator() {
         BeanGenerator actualBeanGenerator = new BeanGenerator();
         return new BeanGeneratorImpl(actualBeanGenerator);
     }
 
-    private static class EnhancerImpl implements xyz.srclab.common.bytecode.impl.cglib.Enhancer {
+    private static final class EnhancerImpl implements xyz.srclab.common.bytecode.provider.cglib.Enhancer {
 
         private final Enhancer actualEnhancer;
 
@@ -36,17 +37,17 @@ public class SpringCglibOperator implements xyz.srclab.common.bytecode.impl.cgli
         }
 
         @Override
-        public void setCallbacks(xyz.srclab.common.bytecode.impl.cglib.Callback[] callbacks) {
+        public void setCallbacks(xyz.srclab.common.bytecode.provider.cglib.Callback[] callbacks) {
             Callback[] actualCallbacks = new Callback[callbacks.length];
             for (int i = 0; i < callbacks.length; i++) {
-                xyz.srclab.common.bytecode.impl.cglib.Callback callback = callbacks[i];
-                if (callback instanceof xyz.srclab.common.bytecode.impl.cglib.NoOp) {
+                xyz.srclab.common.bytecode.provider.cglib.Callback callback = callbacks[i];
+                if (callback instanceof xyz.srclab.common.bytecode.provider.cglib.NoOp) {
                     actualCallbacks[i] = NoOp.INSTANCE;
                     continue;
                 }
-                if (callback instanceof xyz.srclab.common.bytecode.impl.cglib.MethodInterceptor) {
+                if (callback instanceof xyz.srclab.common.bytecode.provider.cglib.MethodInterceptor) {
                     MethodInterceptor actualMethodInterceptor = toActualMethodInterceptor(
-                            (xyz.srclab.common.bytecode.impl.cglib.MethodInterceptor) callback);
+                            (xyz.srclab.common.bytecode.provider.cglib.MethodInterceptor) callback);
                     actualCallbacks[i] = actualMethodInterceptor;
                     continue;
                 }
@@ -56,10 +57,10 @@ public class SpringCglibOperator implements xyz.srclab.common.bytecode.impl.cgli
         }
 
         private MethodInterceptor toActualMethodInterceptor(
-                xyz.srclab.common.bytecode.impl.cglib.MethodInterceptor methodInterceptor) {
+                xyz.srclab.common.bytecode.provider.cglib.MethodInterceptor methodInterceptor) {
             return (object, method, args, proxy) ->
                     methodInterceptor.intercept(object, method, args,
-                            new xyz.srclab.common.bytecode.impl.cglib.MethodProxy() {
+                            new xyz.srclab.common.bytecode.provider.cglib.MethodProxy() {
                                 @Override
                                 public Object invoke(Object object, Object[] args) throws Throwable {
                                     return proxy.invoke(object, args);
@@ -73,7 +74,7 @@ public class SpringCglibOperator implements xyz.srclab.common.bytecode.impl.cgli
         }
 
         @Override
-        public void setCallbackFilter(xyz.srclab.common.bytecode.impl.cglib.CallbackFilter callbackFilter) {
+        public void setCallbackFilter(xyz.srclab.common.bytecode.provider.cglib.CallbackFilter callbackFilter) {
             CallbackFilter actualCallbackFilter = callbackFilter::accept;
             actualEnhancer.setCallbackFilter(actualCallbackFilter);
         }
@@ -89,7 +90,7 @@ public class SpringCglibOperator implements xyz.srclab.common.bytecode.impl.cgli
         }
     }
 
-    private static class BeanGeneratorImpl implements xyz.srclab.common.bytecode.impl.cglib.BeanGenerator {
+    private static final class BeanGeneratorImpl implements xyz.srclab.common.bytecode.provider.cglib.BeanGenerator {
 
         private final BeanGenerator actualBeanGenerator;
 

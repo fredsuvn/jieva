@@ -9,4 +9,11 @@ public class AssertHelper {
         System.out.println("Assert >>> actual: " + actual + "; expected: " + expected);
         Assert.assertEquals(actual, expected);
     }
+
+    public static void printAssertThrows(Class<? extends Throwable> expected, Runnable actual) {
+        Assert.assertThrows(expected, () -> {
+            System.out.println("Assert throws >>> expected: " + expected);
+            actual.run();
+        });
+    }
 }

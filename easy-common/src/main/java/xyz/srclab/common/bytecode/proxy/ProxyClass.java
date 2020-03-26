@@ -8,7 +8,7 @@ import java.util.Arrays;
 public interface ProxyClass<T> {
 
     static Builder<Object> newBuilder() {
-        return Builder.newBuilder();
+        return Builder.newBuilder(Object.class);
     }
 
     static <T> Builder<T> newBuilder(Class<T> superClass) {
@@ -21,12 +21,8 @@ public interface ProxyClass<T> {
 
     interface Builder<T> {
 
-        static Builder<Object> newBuilder() {
-            return ProxyOperator.getInstance().newBuilder();
-        }
-
         static <T> Builder<T> newBuilder(Class<T> superClass) {
-            return ProxyOperator.getInstance().newBuilder(superClass);
+            return ProxyClassBuilderProvider.getInstance().newBuilder(superClass);
         }
 
         default Builder<T> addInterfaces(Class<?>... interfaces) {

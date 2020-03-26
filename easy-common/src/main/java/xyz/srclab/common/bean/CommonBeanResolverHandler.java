@@ -52,7 +52,7 @@ public class CommonBeanResolverHandler implements BeanResolverHandler {
         return map;
     }
 
-    private static class PojoBeanPropertyDescriptor implements BeanPropertyDescriptor {
+    private static final class PojoBeanPropertyDescriptor implements BeanPropertyDescriptor {
 
         private final PropertyDescriptor descriptor;
         private final Type genericType;

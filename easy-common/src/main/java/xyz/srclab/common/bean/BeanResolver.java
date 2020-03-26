@@ -21,7 +21,7 @@ public interface BeanResolver {
             return new BeanResolverImpl(this);
         }
 
-        private static class BeanResolverImpl implements BeanResolver {
+        private static final class BeanResolverImpl implements BeanResolver {
 
             private final BeanResolverHandler[] handlers;
 

@@ -3,7 +3,7 @@ package xyz.srclab.common.bytecode.bean;
 public interface BeanClass<T> {
 
     static Builder<Object> newBuilder() {
-        return Builder.newBuilder();
+        return Builder.newBuilder(Object.class);
     }
 
     static <T> Builder<T> newBuilder(Class<T> superClass) {
@@ -14,12 +14,8 @@ public interface BeanClass<T> {
 
     interface Builder<T> {
 
-        static Builder<Object> newBuilder() {
-            return BeanOperator.getInstance().newBuilder();
-        }
-
         static <T> Builder<T> newBuilder(Class<T> superClass) {
-            return BeanOperator.getInstance().newBuilder(superClass);
+            return BeanClassBuilderProvider.getInstance().newBuilder(superClass);
         }
 
         Builder<T> addProperty(String name, Class<?> type);

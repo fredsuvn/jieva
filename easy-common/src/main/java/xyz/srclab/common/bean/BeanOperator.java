@@ -199,7 +199,7 @@ public interface BeanOperator {
             return new BeanOperatorImpl(this);
         }
 
-        private static class BeanOperatorImpl implements BeanOperator {
+        private static final class BeanOperatorImpl implements BeanOperator {
 
             private final BeanResolver beanResolver;
             private final BeanConverter beanConverter;

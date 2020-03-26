@@ -49,7 +49,7 @@ public interface BeanConverter {
             return new BeanConverterImpl(this);
         }
 
-        private static class BeanConverterImpl implements BeanConverter {
+        private static final class BeanConverterImpl implements BeanConverter {
 
             private final BeanConverterHandler[] handlers;
 

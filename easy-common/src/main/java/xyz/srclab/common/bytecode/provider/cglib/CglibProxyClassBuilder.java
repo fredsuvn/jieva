@@ -1,8 +1,7 @@
-package xyz.srclab.common.bytecode.proxy.cglib;
+package xyz.srclab.common.bytecode.provider.cglib;
 
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.common.builder.CacheStateBuilder;
-import xyz.srclab.common.bytecode.impl.cglib.*;
 import xyz.srclab.common.bytecode.proxy.ProxyClass;
 import xyz.srclab.common.collection.CollectionHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
@@ -14,11 +13,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> implements ProxyClass.Builder<T> {
-
-    public static CglibProxyClassBuilder<Object> newBuilder() {
-        return new CglibProxyClassBuilder<>(Object.class);
-    }
+class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> implements ProxyClass.Builder<T> {
 
     public static <T> CglibProxyClassBuilder<T> newBuilder(Class<?> superClass) {
         return new CglibProxyClassBuilder<>(superClass);
@@ -75,7 +70,7 @@ public class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> 
             return callbacks.length - 1;
         };
 
-        Enhancer enhancer = CglibOperator.getInstance().newEnhancer();
+        Enhancer enhancer = CglibAdaptor.getInstance().newEnhancer();
         enhancer.setSuperclass(superClass);
         if (!interfaces.isEmpty()) {
             enhancer.setInterfaces(interfaces.toArray(ArrayUtils.EMPTY_CLASS_ARRAY));
@@ -109,7 +104,7 @@ public class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> 
         return methodInterceptor;
     }
 
-    private static class ProxyClassImpl<T> implements ProxyClass<T> {
+    private static final class ProxyClassImpl<T> implements ProxyClass<T> {
 
         private final Enhancer enhancer;
 
@@ -125,6 +120,31 @@ public class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> 
         @Override
         public T newInstance(Class<?>[] parameterTypes, Object[] args) {
             return (T) enhancer.create(parameterTypes, args);
+        }
+    }
+
+    private static final class MethodInfo {
+
+        private final String name;
+        private final Class<?>[] parameterTypes;
+        private final MethodBody<?> body;
+
+        MethodInfo(String name, Class<?>[] parameterTypes, MethodBody<?> body) {
+            this.name = name;
+            this.parameterTypes = parameterTypes;
+            this.body = body;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Class<?>[] getParameterTypes() {
+            return parameterTypes;
+        }
+
+        public MethodBody<?> getBody() {
+            return body;
         }
     }
 }

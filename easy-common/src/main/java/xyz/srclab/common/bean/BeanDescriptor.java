@@ -60,7 +60,7 @@ public interface BeanDescriptor {
             return new BeanDescriptorImpl(this);
         }
 
-        private static class BeanDescriptorImpl implements BeanDescriptor {
+        private static final class BeanDescriptorImpl implements BeanDescriptor {
 
             private final Class<?> type;
             private final Map<String, BeanPropertyDescriptor> properties;
