@@ -41,12 +41,14 @@ Other artifact in xyz.srclab.common:
 == Usage
 Like its name, Easy for Common is very easy to use:
 
+:sampledir: easy-sample/src/main/java/xyz/srclab/sample
+
 === Bean Operator
 Bean operator is used for operating beans such as convert type, copy properties, populate properties and etc.:
 
 [source,java]
 ----
-include::easy-sample/src/main/java/xyz/srclab/sample/bean/BeanSample.java[]
+include::{sampledir}/bean/BeanSample.java[]
 ----
 
 === Bytecode
@@ -54,7 +56,7 @@ Bytecode can dynamically create bean, proxy class. It use cglib or spring-cglib 
 
 [source,java]
 ----
-include::easy-sample/src/main/java/xyz/srclab/sample/bytecode/ByteCodeSample.java[]
+include::{sampledir}/bytecode/ByteCodeSample.java[]
 ----
 
 === Format
@@ -62,7 +64,7 @@ Format is used for formatting String, it support formatting as slf4j style, prin
 
 [source,java]
 ----
-include::easy-sample/src/main/java/xyz/srclab/sample/format/FormatSample.java[]
+include::{sampledir}/format/FormatSample.java[]
 ----
 
 === Lang
@@ -70,7 +72,7 @@ Package lang provides some base but elegant type:
 
 [source,java]
 ----
-include::easy-sample/src/main/java/xyz/srclab/sample/lang/LangSample.java[]
+include::{sampledir}/lang/LangSample.java[]
 ----
 
 === Proxy
@@ -78,7 +80,7 @@ Proxy use bytecode to convenient proxy class:
 
 [source,java]
 ----
-include::easy-sample/src/main/java/xyz/srclab/sample/proxy/ProxySample.java[]
+include::{sampledir}/proxy/ProxySample.java[]
 ----
 
 === Reflect
@@ -86,7 +88,7 @@ Reflect Provides reflect methods without checked exception:
 
 [source,java]
 ----
-include::easy-sample/src/main/java/xyz/srclab/sample/reflect/ReflectSample.java[]
+include::{sampledir}/reflect/ReflectSample.java[]
 ----
 
 
