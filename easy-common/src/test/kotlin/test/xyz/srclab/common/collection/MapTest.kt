@@ -5,6 +5,7 @@ import org.testng.annotations.Test
 import xyz.srclab.common.collection.MapHelper
 import xyz.srclab.common.test.asserts.AssertHelper
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
 object MapTest {
@@ -57,6 +58,60 @@ object MapTest {
             }
         }
         println("concurrentMap cost: ${stopwatch3.elapsed().toMillis()}")
+
+        var start = false
+        var testMap: Map<Int, Int> = fastMap
+        val threadNumber = 100
+        var threadOkCount = AtomicInteger(0)
+        for (i in 1..threadNumber) {
+            Thread {
+                while (true) {
+                    if (start) {
+                        for (i in 1..times) {
+                            for (i in 1..size) {
+                                testMap[i]
+                            }
+                        }
+                        threadOkCount.incrementAndGet()
+                        return@Thread
+                    }
+                    Thread.sleep(1)
+                }
+            }.start()
+        }
+        Thread.sleep(500)
+        val stopwatch4 = Stopwatch.createStarted()
+        start = true;
+        while (threadOkCount.get() < 100) {
+            Thread.sleep(1)
+        }
+        println("fastMap thread cost: ${stopwatch4.elapsed().toMillis()}")
+        start = false
+        threadOkCount.set(0)
+        testMap = concurrentMap
+        for (i in 1..threadNumber) {
+            Thread {
+                while (true) {
+                    if (start) {
+                        for (i in 1..times) {
+                            for (i in 1..size) {
+                                testMap[i]
+                            }
+                        }
+                        threadOkCount.incrementAndGet()
+                        return@Thread
+                    }
+                    Thread.sleep(1)
+                }
+            }.start()
+        }
+        Thread.sleep(500)
+        val stopwatch5 = Stopwatch.createStarted()
+        start = true;
+        while (threadOkCount.get() < 100) {
+            Thread.sleep(1)
+        }
+        println("concurrentMap thread cost: ${stopwatch5.elapsed().toMillis()}")
     }
 
     private fun createKeys(): MutableSet<Int> {

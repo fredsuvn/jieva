@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * Fast fixed-keys map, this map's keys are immutable, but values are mutable. That's means, you cannot put new key but
  * can change value of old key.
  * <p>
- * This map is thread-safe and fast, applicable to initialing scenes.
+ * This map is thread-safe for reading (not for writing), fast, applicable to initialing scenes.
  *
  * @param <K>
  * @param <V>
@@ -25,6 +25,8 @@ public class FastFixedKeysMap<K, V> implements Map<K, V> {
         }
         return returned;
     }
+
+    private static final int BINARY_SEARCH_MIN_LENGTH = 8;
 
     private final Object[] nodes;
     private final Node<K, V>[] nodeCollection;
@@ -107,7 +109,7 @@ public class FastFixedKeysMap<K, V> implements Map<K, V> {
     @Override
     public V get(Object key) {
         Node<K, V> node = findNode(key);
-        return node == null ? null : node.getValue();
+        return node == null ? null : node.value;
     }
 
     @Nullable
@@ -117,7 +119,7 @@ public class FastFixedKeysMap<K, V> implements Map<K, V> {
         if (node == null) {
             throw new UnsupportedOperationException("Current FastFixedKeysMap doesn't contains key: " + key);
         }
-        V old = node.getValue();
+        V old = node.value;
         node.setValue(value);
         return old;
     }
@@ -165,9 +167,17 @@ public class FastFixedKeysMap<K, V> implements Map<K, V> {
         }
         if (node instanceof Node) {
             Node<K, V> n = (Node<K, V>) node;
-            return Objects.equals(key, n.getKey()) ? n : null;
+            return Objects.equals(key, n.key) ? n : null;
         }
         Node<K, V>[] subNodes = (Node<K, V>[]) node;
+        if (subNodes.length < BINARY_SEARCH_MIN_LENGTH) {
+            for (int i = 0; i < subNodes.length; i++) {
+                if (Objects.equals(key, subNodes[i].key)) {
+                    return subNodes[i];
+                }
+            }
+            return null;
+        }
         return binarySearch(subNodes, hash, key);
     }
 
@@ -180,11 +190,11 @@ public class FastFixedKeysMap<K, V> implements Map<K, V> {
             int mid = (low + high) >>> 1;
             Node<K, V> midVal = nodes[mid];
 
-            if (midVal.getHash() < hash) {
+            if (midVal.hash < hash) {
                 low = mid + 1;
-            } else if (midVal.getHash() > hash) {
+            } else if (midVal.hash > hash) {
                 high = mid - 1;
-            } else if (Objects.equals(key, midVal.getKey())) {
+            } else if (Objects.equals(key, midVal.key)) {
                 return midVal; // key found
             }
         }
