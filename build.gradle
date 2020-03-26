@@ -1,0 +1,55 @@
+description = "Easy for Common: Build"
+
+// Gradle files to be applied:
+ext {
+    gradles = [
+            repositories  : "${rootProject.rootDir}/buildSrc/repositories.gradle",
+            deployJar     : "${rootProject.rootDir}/buildSrc/deploy-jar.gradle",
+            deployPlatform: "${rootProject.rootDir}/buildSrc/deploy-platform.gradle",
+            compile       : "${rootProject.rootDir}/buildSrc/compile.gradle",
+            auth          : "${rootProject.rootDir}/buildSrc/auth.gradle",
+            config        : "${rootProject.rootDir}/buildSrc/config.gradle",
+    ]
+}
+
+apply from: gradles.config
+
+ext {
+    isSnapshot = isTrue(config.snapshot)
+}
+
+group = config.group
+config.version = (isSnapshot ? "${config.version}-SNAPSHOT" : config.version)
+config.sampleVersion = (isSnapshot ? "${config.sampleVersion}-SNAPSHOT" : config.sampleVersion)
+version = config.version
+
+// Note in gradles.auth some personal setting should be implemented.
+apply from: gradles.auth
+
+allprojects { project ->
+    processProjectInfo(project)
+}
+
+subprojects { project ->
+}
+
+def processProjectInfo(Project project) {
+    if (project == rootProject) {
+        // NOP
+    } else if (project.group == "easy-common-build.common-sample") {
+        project.group = config.sampleGroup
+        project.version = config.sampleVersion
+    } else {
+        project.group = config.group
+        project.version = config.version
+    }
+    println("Configure ${project.group}:${project.name}:${project.version}")
+}
+
+static def isTrue(String string) {
+    return string != null && (
+            Boolean.parseBoolean(string)
+                    || string.equalsIgnoreCase("yes")
+                    || string.equalsIgnoreCase("1")
+    )
+}

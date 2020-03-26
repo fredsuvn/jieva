@@ -1,0 +1,18 @@
+plugins {
+    id 'java-platform'
+}
+
+description = "Easy for Common: Parent"
+
+apply from: gradles.repositories
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+    api platform(project(":easy-bom"))
+
+    constraints {
+    }
+}

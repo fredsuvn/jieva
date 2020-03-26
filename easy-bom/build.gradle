@@ -1,0 +1,50 @@
+plugins {
+    id 'java-platform'
+}
+
+description = "Easy for Common: Bom"
+
+ext {
+    libVersions = [
+            kotlinVersion            : kotlinVersion,
+            springBootVersion        : "2.2.5.RELEASE",
+            commonsLangVersion       : "3.9",
+            commonsCollectionsVersion: "4.4",
+            commonsBeanutilsVersion  : "1.9.4",
+            commonsCodecVersion      : "1.14",
+            guavaVersion             : "28.2-jre",
+            testngVersion            : "7.1.0",
+            cglibVersion             : "3.3.0",
+            fastjsonVersion          : "1.2.67",
+    ]
+}
+
+apply from: gradles.repositories
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+    api platform("org.springframework.boot:spring-boot-starter-parent:${libVersions.springBootVersion}")
+
+    constraints {
+        file("${rootDir}").eachDirMatch(~/easy-.*/) { file ->
+            api(project(":${file.getName()}"))
+        }
+
+        api("org.jetbrains.kotlin:kotlin-bom:${libVersions.kotlinVersion}")
+
+        api("org.apache.commons:commons-lang3:${libVersions.commonsLangVersion}")
+        api("org.apache.commons:commons-collections4:${libVersions.commonsCollectionsVersion}")
+        api("commons-beanutils:commons-beanutils:${libVersions.commonsBeanutilsVersion}")
+        api("commons-codec:commons-codec:${libVersions.commonsCodecVersion}")
+        api("com.google.guava:guava:${libVersions.guavaVersion}")
+        api("cglib:cglib:${libVersions.cglibVersion}")
+        api("com.alibaba:fastjson:${libVersions.fastjsonVersion}")
+
+        api("org.testng:testng:${libVersions.testngVersion}")
+    }
+}
+
+apply from: gradles.deployPlatform

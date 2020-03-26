@@ -1,0 +1,16 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    plugins {
+        id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
+    }
+}
+
+rootProject.name = 'easy-common-build'
+
+file("${rootDir}").eachDirMatch(~/easy-.*/) { file ->
+    include file.name
+}

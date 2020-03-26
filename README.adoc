@@ -1,0 +1,97 @@
+= Easy for Common
+Fred Suvn <fredsuvn@163.com>
+v0.0.0, 2020-03-26
+
+Easy for Common makes it easy to write base, less and clear java code. It is also base lib for project easy-spring-boot,
+provides base operator about bean, bytecode, format, proxy, reflect, etc.
+
+== Getting Started
+Source code: https://github.com/srclab-projects/easy-common
+
+From maven:
+
+[source,xml,indent=0]
+----
+<dependency>
+    <groupId>xyz.srclab.common</groupId>
+    <artifactId>easy-common</artifactId>
+    <version>${version}</version>
+</dependency>
+----
+
+Other artifact in xyz.srclab.common:
+
+[source,xml,indent=0]
+----
+<dependencies>
+  <dependency>
+      <groupId>xyz.srclab.common</groupId>
+      <artifactId>easy-bom</artifactId>
+      <version>${version}</version>
+  </dependency>
+
+  <dependency>
+      <groupId>xyz.srclab.common</groupId>
+      <artifactId>easy-test</artifactId>
+      <version>${version}</version>
+  </dependency>
+</dependencies>
+----
+
+== Usage
+Like its name, Easy for Common is very easy to use:
+
+:sampledir: easy-sample/src/main/java/xyz/srclab/sample
+
+=== Bean Operator
+Bean operator is used for operating beans such as convert type, copy properties, populate properties and etc.:
+
+[source,java]
+----
+include::{sampledir}/bean/BeanSample.java[]
+----
+
+=== Bytecode
+Bytecode can dynamically create bean, proxy class. It use cglib or spring-cglib according to environment:
+
+[source,java]
+----
+include::{sampledir}/bytecode/ByteCodeSample.java[]
+----
+
+=== Format
+Format is used for formatting String, it support formatting as slf4j style, printf style and message style:
+
+[source,java]
+----
+include::{sampledir}/format/FormatSample.java[]
+----
+
+=== Lang
+Package lang provides some base but elegant type:
+
+[source,java]
+----
+include::{sampledir}/lang/LangSample.java[]
+----
+
+=== Proxy
+Proxy use bytecode to convenient proxy class:
+
+[source,java]
+----
+include::{sampledir}/proxy/ProxySample.java[]
+----
+
+=== Reflect
+Reflect Provides reflect methods without checked exception:
+
+[source,java]
+----
+include::{sampledir}/reflect/ReflectSample.java[]
+----
+
+
+== License
+Easy for Common is Open Source software released under the
+https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].
