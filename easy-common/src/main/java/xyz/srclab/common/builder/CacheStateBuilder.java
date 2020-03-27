@@ -2,13 +2,9 @@ package xyz.srclab.common.builder;
 
 public abstract class CacheStateBuilder<T> implements Builder<T> {
 
-    protected T cache;
+    private T cache;
     // true: cached; false: cache invalid
-    protected boolean state;
-
-    protected void changeState() {
-        state = false;
-    }
+    private boolean state;
 
     @Override
     public T build() {
@@ -17,6 +13,10 @@ public abstract class CacheStateBuilder<T> implements Builder<T> {
             state = true;
         }
         return cache;
+    }
+
+    protected void changeState() {
+        state = false;
     }
 
     protected abstract T buildNew();

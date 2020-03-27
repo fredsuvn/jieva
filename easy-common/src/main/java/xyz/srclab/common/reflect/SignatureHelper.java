@@ -1,6 +1,6 @@
 package xyz.srclab.common.reflect;
 
-import xyz.srclab.common.format.FormatHelper;
+import xyz.srclab.common.lang.format.FormatHelper;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

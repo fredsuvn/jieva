@@ -2,7 +2,7 @@ package xyz.srclab.common.bean;
 
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.jetbrains.annotations.Nullable;
-import xyz.srclab.common.format.FormatHelper;
+import xyz.srclab.common.lang.format.FormatHelper;
 import xyz.srclab.common.reflect.ReflectHelper;
 
 import java.lang.reflect.ParameterizedType;
@@ -11,13 +11,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommonBeanConverterHandler implements BeanConverterHandler {
+public class DefaultBeanConverterHandler implements BeanConverterHandler {
 
-    public static CommonBeanConverterHandler getInstance() {
+    public static DefaultBeanConverterHandler getInstance() {
         return INSTANCE;
     }
 
-    private static final CommonBeanConverterHandler INSTANCE = new CommonBeanConverterHandler();
+    private static final DefaultBeanConverterHandler INSTANCE = new DefaultBeanConverterHandler();
 
     private final ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
 

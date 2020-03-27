@@ -2,7 +2,7 @@ package xyz.srclab.common.bean;
 
 import org.jetbrains.annotations.Nullable;
 import xyz.srclab.common.builder.ProcessByHandlersBuilder;
-import xyz.srclab.common.format.FormatHelper;
+import xyz.srclab.common.lang.format.FormatHelper;
 import xyz.srclab.common.lang.TypeRef;
 
 import java.lang.reflect.Type;
@@ -60,7 +60,7 @@ public interface BeanConverter {
             @Nullable
             @Override
             public <T> T convert(@Nullable Object from, Type to) {
-                return convert(from, to, CommonBeanOperator.getInstance());
+                return convert(from, to, DefaultBeanOperator.getInstance());
             }
 
             @Nullable

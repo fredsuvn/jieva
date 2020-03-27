@@ -4,7 +4,7 @@ import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.bytecode.proxy.ProxyClass;
 import xyz.srclab.common.reflect.MethodBody;
 import xyz.srclab.common.reflect.ReflectHelper;
-import xyz.srclab.common.tuple.Pair;
+import xyz.srclab.common.lang.tuple.Pair;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

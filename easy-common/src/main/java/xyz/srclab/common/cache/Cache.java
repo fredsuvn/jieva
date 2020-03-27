@@ -1,14 +1,15 @@
 package xyz.srclab.common.cache;
 
-import xyz.srclab.common.tuple.Pair;
-
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 public interface Cache<K, V> {
+
+    Duration getDefaultExpirationPeriod();
 
     boolean has(K key);
 
@@ -26,7 +27,7 @@ public interface Cache<K, V> {
     }
 
     default boolean hasAny(K... keys) {
-        return hasAll(Arrays.asList(keys));
+        return hasAny(Arrays.asList(keys));
     }
 
     default boolean hasAny(Iterable<K> keys) {
@@ -38,13 +39,13 @@ public interface Cache<K, V> {
         return false;
     }
 
-    V get(K key);
+    V get(K key) throws NoSuchElementException;
 
-    default Map<K, V> getAll(K... keys) {
+    default Map<K, V> getAll(K... keys) throws NoSuchElementException {
         return getAll(Arrays.asList(keys));
     }
 
-    default Map<K, V> getAll(Iterable<K> keys) {
+    default Map<K, V> getAll(Iterable<K> keys) throws NoSuchElementException {
         Map<K, V> map = new HashMap<>();
         for (K key : keys) {
             map.put(key, get(key));
@@ -52,71 +53,90 @@ public interface Cache<K, V> {
         return map;
     }
 
-    V get(K key, Function<K, V> ifAbsent);
-
-    default Map<K, V> getAllPair(Pair<K, Function<K, V>>... pairs) {
-        return getAllPair(Arrays.asList(pairs));
+    default Map<K, V> getPresent(K... keys) throws NoSuchElementException {
+        return getPresent(Arrays.asList(keys));
     }
 
-    default Map<K, V> getAllPair(Iterable<Pair<K, Function<K, V>>> pairs) {
+    default Map<K, V> getPresent(Iterable<K> keys) throws NoSuchElementException {
         Map<K, V> map = new HashMap<>();
-        for (Pair<K, Function<K, V>> pair : pairs) {
-            map.put(pair.get0(), get(pair.get0(), pair.get1()));
+        for (K key : keys) {
+            try {
+                map.put(key, get(key));
+            } catch (NoSuchElementException ignored) {
+            }
         }
         return map;
     }
 
-    void put(K key, V value);
-
-    default void putAll(Map<K, V> pairs) {
-        pairs.forEach(this::put);
+    default V get(K key, Function<K, V> ifAbsent) {
+        return get(key, getDefaultExpirationPeriod(), ifAbsent);
     }
 
-    void put(K key, V value, long expirationSeconds);
-
-    default void putAll(Map<K, V> pairs, long expirationSeconds) {
-        pairs.forEach((k, v) -> put(k, v, expirationSeconds));
+    default V get(K key, long expirationPeriodSeconds, Function<K, V> ifAbsent) {
+        return get(key, Duration.ofSeconds(expirationPeriodSeconds), ifAbsent);
     }
 
-    void put(K key, V value, long expiration, TimeUnit expirationUnit);
+    V get(K key, Duration expirationPeriod, Function<K, V> ifAbsent);
 
-    default void putAll(Map<K, V> pairs, long expirationSeconds, TimeUnit expirationUnit) {
-        pairs.forEach((k, v) -> put(k, v, expirationSeconds, expirationUnit));
+    default void put(K key, V value) {
+        put(key, value, getDefaultExpirationPeriod());
     }
 
-    void renew(K key);
-
-    default void renewAll(K... keys) {
-        renewAll(Arrays.asList(keys));
+    default void putAll(Map<K, V> data) {
+        data.forEach(this::put);
     }
 
-    default void renewAll(Iterable<K> keys) {
+    default void put(K key, V value, long expirationPeriodSeconds) {
+        put(key, value, Duration.ofSeconds(expirationPeriodSeconds));
+    }
+
+    default void putAll(Map<K, V> data, long expirationPeriodSeconds) {
+        putAll(data, Duration.ofSeconds(expirationPeriodSeconds));
+    }
+
+    void put(K key, V value, Duration expirationPeriod);
+
+    default void putAll(Map<K, V> data, Duration expirationPeriod) {
+        data.forEach((k, v) -> put(k, v, expirationPeriod));
+    }
+
+    default void expire(K key) {
+        expire(key, getDefaultExpirationPeriod());
+    }
+
+    default void expireAll(K... keys) {
+        expireAll(Arrays.asList(keys));
+    }
+
+    default void expireAll(Iterable<K> keys) {
         for (K key : keys) {
-            renew(key);
+            expire(key);
         }
     }
 
-    void renew(K key, long expirationSeconds);
-
-    default void renewAll(long expirationSeconds, K... keys) {
-        renewAll(Arrays.asList(keys), expirationSeconds);
+    default void expire(K key, long expirationPeriodSeconds) {
+        expire(key, Duration.ofSeconds(expirationPeriodSeconds));
     }
 
-    default void renewAll(Iterable<K> keys, long expirationSeconds) {
+    default void expireAll(long expirationPeriodSeconds, K... keys) {
+        expireAll(Arrays.asList(keys), expirationPeriodSeconds);
+    }
+
+    default void expireAll(Iterable<K> keys, long expirationSeconds) {
         for (K key : keys) {
-            renew(key, expirationSeconds);
+            expire(key, expirationSeconds);
         }
     }
 
-    void renew(K key, long expiration, TimeUnit expirationUnit);
+    void expire(K key, Duration expirationPeriod);
 
-    default void renewAll(long expirationSeconds, TimeUnit expirationUnit, K... keys) {
-        renewAll(Arrays.asList(keys), expirationSeconds, expirationUnit);
+    default void expireAll(Duration expirationPeriod, K... keys) {
+        expireAll(Arrays.asList(keys), expirationPeriod);
     }
 
-    default void renewAll(Iterable<K> keys, long expirationSeconds, TimeUnit expirationUnit) {
+    default void expireAll(Iterable<K> keys, Duration expirationPeriod) {
         for (K key : keys) {
-            renew(key, expirationSeconds, expirationUnit);
+            expire(key, expirationPeriod);
         }
     }
 

@@ -1,4 +1,4 @@
-package xyz.srclab.common.tuple;
+package xyz.srclab.common.lang.tuple;
 
 public interface Pair<A, B> {
 

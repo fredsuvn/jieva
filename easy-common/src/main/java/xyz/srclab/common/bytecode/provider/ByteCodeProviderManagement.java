@@ -1,16 +1,18 @@
 package xyz.srclab.common.bytecode.provider;
 
 import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProvider;
+import xyz.srclab.common.provider.AbstractProviderManagement;
 
-public class ByteCodeProviderManagement {
+public class ByteCodeProviderManagement extends AbstractProviderManagement<ByteCodeProvider> {
 
-    private static ByteCodeProvider provider = CglibByteCodeProvider.getInstance();
-
-    public static void registerProvider(ByteCodeProvider byteCodeProvider) {
-        provider = byteCodeProvider;
+    public static ByteCodeProviderManagement getInstance() {
+        return INSTANCE;
     }
 
-    public static ByteCodeProvider getByteCodeProvider() {
-        return provider;
+    private static final ByteCodeProviderManagement INSTANCE = new ByteCodeProviderManagement();
+
+    @Override
+    protected ByteCodeProvider createDefaultProvider() {
+        return CglibByteCodeProvider.getInstance();
     }
 }

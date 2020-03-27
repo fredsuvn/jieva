@@ -1,6 +1,6 @@
-package xyz.srclab.common.format.fastformat;
+package xyz.srclab.common.lang.format.fastformat;
 
-import xyz.srclab.common.format.Formatter;
+import xyz.srclab.common.lang.format.Formatter;
 
 public class FastFormatter implements Formatter {
 

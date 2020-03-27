@@ -10,7 +10,7 @@ import kotlin.random.Random
 
 object MapTest {
 
-    private val size = 100000
+    private val size = 1000
 
     @Test
     fun testFastFixedMap() {

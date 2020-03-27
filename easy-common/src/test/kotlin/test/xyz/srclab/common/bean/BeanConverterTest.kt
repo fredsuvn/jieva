@@ -11,10 +11,10 @@ import java.lang.reflect.Type
 
 object BeanConverterTest {
 
-    private val commonConverter = CommonBeanConverter.getInstance()
+    private val commonConverter = DefaultBeanConverter.getInstance()
 
     private val customConverter = BeanConverter.newBuilder()
-        .addHandler(CommonBeanConverterHandler.getInstance())
+        .addHandler(DefaultBeanConverterHandler.getInstance())
         .addHandler(object : BeanConverterHandler {
             override fun supportConvert(from: Any?, to: Type, beanOperator: BeanOperator): Boolean {
                 if (ReflectHelper.isAssignable(to, Number::class.java)

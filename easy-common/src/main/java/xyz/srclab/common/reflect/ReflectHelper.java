@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class ReflectHelper {
 
-    private static final Cache<Object, List<Method>> classMethodsCache = CacheHelper.newLocalCache();
+    private static final Cache<Object, List<Method>> classMethodsCache = CacheHelper.newThreadLocalCache();
 
     public static <T> T newInstance(Class<T> cls) {
         try {
@@ -124,7 +124,7 @@ public class ReflectHelper {
         return ClassUtils.isAssignable(fromType, to);
     }
 
-    private static final Cache<Object, Type> typeCache = CacheHelper.newLocalCache();
+    private static final Cache<Object, Type> typeCache = CacheHelper.newThreadLocalCache();
 
     public static Class<?> getClass(Type type) {
         return (Class<?>) typeCache.get(

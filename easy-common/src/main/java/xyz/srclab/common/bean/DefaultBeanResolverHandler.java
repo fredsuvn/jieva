@@ -14,15 +14,15 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommonBeanResolverHandler implements BeanResolverHandler {
+public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
-    public static CommonBeanResolverHandler getInstance() {
+    public static DefaultBeanResolverHandler getInstance() {
         return INSTANCE;
     }
 
-    private static final CommonBeanResolverHandler INSTANCE = new CommonBeanResolverHandler();
+    private static final DefaultBeanResolverHandler INSTANCE = new DefaultBeanResolverHandler();
 
-    private static final Cache<Class<?>, BeanDescriptor> descriptorCache = CacheHelper.newLocalCache();
+    private static final Cache<Class<?>, BeanDescriptor> descriptorCache = CacheHelper.newThreadLocalCache();
 
     @Override
     public boolean supportBean(Object bean) {

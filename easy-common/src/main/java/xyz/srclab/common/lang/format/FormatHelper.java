@@ -1,7 +1,7 @@
-package xyz.srclab.common.format;
+package xyz.srclab.common.lang.format;
 
 import xyz.srclab.common.base.Defaults;
-import xyz.srclab.common.format.fastformat.FastFormatter;
+import xyz.srclab.common.lang.format.fastformat.FastFormatter;
 
 import java.text.MessageFormat;
 import java.util.Locale;

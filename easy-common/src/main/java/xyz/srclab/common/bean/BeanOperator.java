@@ -206,9 +206,9 @@ public interface BeanOperator {
 
             private BeanOperatorImpl(Builder builder) {
                 this.beanResolver = builder.beanResolver == null ?
-                        CommonBeanResolver.getInstance() : builder.beanResolver;
+                        DefaultBeanResolver.getInstance() : builder.beanResolver;
                 this.beanConverter = new BeanConverterProxy(builder.beanConverter == null ?
-                        CommonBeanConverter.getInstance() : builder.beanConverter);
+                        DefaultBeanConverter.getInstance() : builder.beanConverter);
             }
 
             @Override

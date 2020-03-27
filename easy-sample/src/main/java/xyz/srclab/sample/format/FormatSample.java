@@ -1,6 +1,6 @@
 package xyz.srclab.sample.format;
 
-import xyz.srclab.common.format.FormatHelper;
+import xyz.srclab.common.lang.format.FormatHelper;
 import xyz.srclab.common.test.asserts.AssertHelper;
 
 public class FormatSample {

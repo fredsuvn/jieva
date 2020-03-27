@@ -1,4 +1,4 @@
-package xyz.srclab.common.format;
+package xyz.srclab.common.lang.format;
 
 public interface Formatter {
 

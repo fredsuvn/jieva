@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 
 object BeanOperatorTest {
 
-    private val commonOperator = CommonBeanOperator.getInstance()
+    private val commonOperator = DefaultBeanOperator.getInstance()
 
     @Test
     fun testSimpleCopyProperties() {

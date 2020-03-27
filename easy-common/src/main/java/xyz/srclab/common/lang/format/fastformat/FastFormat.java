@@ -1,4 +1,4 @@
-package xyz.srclab.common.format.fastformat;
+package xyz.srclab.common.lang.format.fastformat;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.helpers.MessageFormatter;
