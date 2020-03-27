@@ -3,6 +3,8 @@ package xyz.srclab.common.reflect;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Nullable;
 import xyz.srclab.common.base.KeyHelper;
+import xyz.srclab.common.cache.Cache;
+import xyz.srclab.common.cache.CacheHelper;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -10,8 +12,7 @@ import java.util.stream.Collectors;
 
 public class ReflectHelper {
 
-    private static final ThreadLocal<WeakHashMap<Object, List<Method>>> classMethodsCache =
-            ThreadLocal.withInitial(WeakHashMap::new);
+    private static final Cache<Object, List<Method>> classMethodsCache = CacheHelper.newLocalCache();
 
     public static <T> T newInstance(Class<T> cls) {
         try {
@@ -22,7 +23,7 @@ public class ReflectHelper {
     }
 
     public static List<Method> getAllMethods(Class<?> cls) {
-        return classMethodsCache.get().computeIfAbsent(
+        return classMethodsCache.get(
                 buildAllMethodsKey(cls),
                 c -> getAllMethods0(cls)
         );
@@ -39,7 +40,7 @@ public class ReflectHelper {
     }
 
     public static List<Method> getOverrideableMethods(Class<?> cls) {
-        return classMethodsCache.get().computeIfAbsent(
+        return classMethodsCache.get(
                 buildOverrideableMethodsKey(cls),
                 c -> getOverrideableMethods0(cls)
         );
@@ -66,7 +67,7 @@ public class ReflectHelper {
     }
 
     public static List<Method> getPublicStaticMethods(Class<?> cls) {
-        return classMethodsCache.get().computeIfAbsent(
+        return classMethodsCache.get(
                 buildPublicStaticMethodsKey(cls),
                 c -> getPublicStaticMethods0(cls)
         );
@@ -79,7 +80,7 @@ public class ReflectHelper {
     }
 
     public static List<Method> getPublicNonStaticMethods(Class<?> cls) {
-        return classMethodsCache.get().computeIfAbsent(
+        return classMethodsCache.get(
                 buildPublicNonStaticMethodsKey(cls),
                 c -> getPublicNonStaticMethods0(cls)
         );
@@ -123,11 +124,10 @@ public class ReflectHelper {
         return ClassUtils.isAssignable(fromType, to);
     }
 
-    private static final ThreadLocal<WeakHashMap<Object, Type>> typeCache =
-            ThreadLocal.withInitial(WeakHashMap::new);
+    private static final Cache<Object, Type> typeCache = CacheHelper.newLocalCache();
 
     public static Class<?> getClass(Type type) {
-        return (Class<?>) typeCache.get().computeIfAbsent(
+        return (Class<?>) typeCache.get(
                 buildTypeKey("getClass", type.toString()),
                 k -> getClass0(type)
         );
@@ -162,7 +162,7 @@ public class ReflectHelper {
 
     @Nullable
     public static Type findGenericSuperclass(Class<?> cls, Class<?> target) {
-        Type returned = typeCache.get().computeIfAbsent(
+        Type returned = typeCache.get(
                 buildTypeKey("findGenericSuperclass", cls, target),
                 k -> findGenericSuperclass0(cls, target)
         );

@@ -1,5 +1,7 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.common.cache.Cache;
+import xyz.srclab.common.cache.CacheHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 
 import java.beans.BeanInfo;
@@ -11,7 +13,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 public class CommonBeanResolverHandler implements BeanResolverHandler {
 
@@ -21,8 +22,7 @@ public class CommonBeanResolverHandler implements BeanResolverHandler {
 
     private static final CommonBeanResolverHandler INSTANCE = new CommonBeanResolverHandler();
 
-    private static final ThreadLocal<WeakHashMap<Class<?>, BeanDescriptor>> descriptorCache =
-            ThreadLocal.withInitial(WeakHashMap::new);
+    private static final Cache<Class<?>, BeanDescriptor> descriptorCache = CacheHelper.newLocalCache();
 
     @Override
     public boolean supportBean(Object bean) {
@@ -31,7 +31,7 @@ public class CommonBeanResolverHandler implements BeanResolverHandler {
 
     @Override
     public BeanDescriptor resolve(Object bean) {
-        return descriptorCache.get().computeIfAbsent(bean.getClass(), type -> {
+        return descriptorCache.get(bean.getClass(), type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
                 return BeanDescriptor.newBuilder()
