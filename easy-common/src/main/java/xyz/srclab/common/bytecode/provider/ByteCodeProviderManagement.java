@@ -1,16 +1,16 @@
 package xyz.srclab.common.bytecode.provider;
 
-import xyz.srclab.common.bytecode.bean.BeanClassBuilderProvider;
-import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProviderManagement;
-import xyz.srclab.common.bytecode.proxy.ProxyClassBuilderProvider;
+import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProvider;
 
-public interface ByteCodeProviderManagement {
+public class ByteCodeProviderManagement {
 
-    static ByteCodeProviderManagement getInstance() {
-        return CglibByteCodeProviderManagement.getInstance();
+    private static ByteCodeProvider provider = CglibByteCodeProvider.getInstance();
+
+    public static void registerProvider(ByteCodeProvider byteCodeProvider) {
+        provider = byteCodeProvider;
     }
 
-    BeanClassBuilderProvider getBeanClassBuilderProvider();
-
-    ProxyClassBuilderProvider getProxyClassBuilderProvider();
+    public static ByteCodeProvider getByteCodeProvider() {
+        return provider;
+    }
 }

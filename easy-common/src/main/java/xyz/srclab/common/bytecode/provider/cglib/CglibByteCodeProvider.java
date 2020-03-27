@@ -2,17 +2,17 @@ package xyz.srclab.common.bytecode.provider.cglib;
 
 import xyz.srclab.common.bytecode.bean.BeanClass;
 import xyz.srclab.common.bytecode.bean.BeanClassBuilderProvider;
-import xyz.srclab.common.bytecode.provider.ByteCodeProviderManagement;
+import xyz.srclab.common.bytecode.provider.ByteCodeProvider;
 import xyz.srclab.common.bytecode.proxy.ProxyClass;
 import xyz.srclab.common.bytecode.proxy.ProxyClassBuilderProvider;
 
-public class CglibByteCodeProviderManagement implements ByteCodeProviderManagement {
+public class CglibByteCodeProvider implements ByteCodeProvider {
 
-    public static CglibByteCodeProviderManagement getInstance() {
-        return CglibByteCodeProviderManagement.INSTANCE;
+    public static CglibByteCodeProvider getInstance() {
+        return CglibByteCodeProvider.INSTANCE;
     }
 
-    private static final CglibByteCodeProviderManagement INSTANCE = new CglibByteCodeProviderManagement();
+    private static final CglibByteCodeProvider INSTANCE = new CglibByteCodeProvider();
 
     @Override
     public BeanClassBuilderProvider getBeanClassBuilderProvider() {
