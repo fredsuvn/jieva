@@ -1,17 +1,20 @@
-package xyz.srclab.annotation;
+package xyz.srclab.annotation.concurrent;
 
-import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
 import javax.annotation.meta.TypeQualifierNickname;
-import javax.annotation.meta.When;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * Means static methods of annotated type are dependent-thread-safe.
+ * <p>
+ * Note in default all static methods are dependent-thread-safe.
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Nonnull(when = When.ALWAYS)
+@StaticThreadSafe(when = ThreadSafeWhen.DEPEND_ON)
 @TypeQualifierDefault({
         ElementType.METHOD,
         ElementType.FIELD,
@@ -25,5 +28,5 @@ import java.lang.annotation.RetentionPolicy;
         ElementType.ANNOTATION_TYPE,
 })
 @TypeQualifierNickname
-public @interface NonNull {
+public @interface StaticThreadSafeDependOn {
 }

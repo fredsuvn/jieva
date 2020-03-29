@@ -1,17 +1,18 @@
-package xyz.srclab.annotation;
+package xyz.srclab.annotation.concurrent;
 
-import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
 import javax.annotation.meta.TypeQualifierNickname;
-import javax.annotation.meta.When;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * Represents annotated method will return a {@link ThreadSafeDependOn} object.
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Nonnull(when = When.ALWAYS)
+@ReturnThreadSafe(when = ThreadSafeWhen.DEPEND_ON)
 @TypeQualifierDefault({
         ElementType.METHOD,
         ElementType.FIELD,
@@ -25,5 +26,5 @@ import java.lang.annotation.RetentionPolicy;
         ElementType.ANNOTATION_TYPE,
 })
 @TypeQualifierNickname
-public @interface NonNull {
+public @interface ReturnThreadSafeDependOn {
 }
