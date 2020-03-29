@@ -16,6 +16,7 @@ ext {
             testngVersion            : "7.1.0",
             cglibVersion             : "3.3.0",
             fastjsonVersion          : "1.2.67",
+            jsr305Version            : "3.0.2",
     ]
 }
 
@@ -33,6 +34,7 @@ dependencies {
             api(project(":${file.getName()}"))
         }
 
+        api("com.google.code.findbugs:jsr305:${libVersions.jsr305Version}")
         api("org.jetbrains.kotlin:kotlin-bom:${libVersions.kotlinVersion}")
 
         api("org.apache.commons:commons-lang3:${libVersions.commonsLangVersion}")
