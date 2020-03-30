@@ -1,15 +1,14 @@
-package xyz.srclab.annotation.concurrent;
+package xyz.srclab.annotation;
 
-import javax.annotation.meta.TypeQualifier;
+import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
+import javax.annotation.meta.TypeQualifierNickname;
+import javax.annotation.meta.When;
 import java.lang.annotation.*;
 
-/**
- * Represents annotated method will return a {@link ThreadSafe} object.
- */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@TypeQualifier
+@Nonnull(when = When.ALWAYS)
 @TypeQualifierDefault({
         ElementType.TYPE,
         ElementType.FIELD,
@@ -22,6 +21,7 @@ import java.lang.annotation.*;
         ElementType.TYPE_PARAMETER,
         ElementType.TYPE_USE,
 })
+@TypeQualifierNickname
 @Target({
         ElementType.TYPE,
         ElementType.FIELD,
@@ -34,7 +34,5 @@ import java.lang.annotation.*;
         ElementType.TYPE_PARAMETER,
         ElementType.TYPE_USE,
 })
-public @interface ReturnThreadSafe {
-
-    ThreadSafeWhen when() default ThreadSafeWhen.TRUE;
+public @interface DefaultNonNull {
 }
