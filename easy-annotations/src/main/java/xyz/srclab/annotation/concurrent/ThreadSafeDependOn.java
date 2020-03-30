@@ -39,18 +39,6 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @ThreadSafe(when = ThreadSafeWhen.DEPEND_ON)
-@TypeQualifierDefault({
-        ElementType.TYPE,
-        ElementType.FIELD,
-        ElementType.METHOD,
-        ElementType.PARAMETER,
-        ElementType.CONSTRUCTOR,
-        ElementType.LOCAL_VARIABLE,
-        ElementType.ANNOTATION_TYPE,
-        ElementType.PACKAGE,
-        ElementType.TYPE_PARAMETER,
-        ElementType.TYPE_USE,
-})
 @TypeQualifierNickname
 @Target({
         ElementType.TYPE,
