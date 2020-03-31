@@ -13,23 +13,25 @@ public class DefaultBeanConverter implements BeanConverter {
 
     private static final DefaultBeanConverter INSTANCE = new DefaultBeanConverter();
 
+    private final BeanConverterHandler beanConverterHandler = DefaultBeanConverterHandler.getInstance();
+
     @Override
     public <T> T convert(Object from, Type to) {
-        return DefaultBeanConverterHandler.getInstance().convert(from, to, DefaultBeanOperator.getInstance());
+        return beanConverterHandler.convert(from, to, DefaultBeanOperator.getInstance());
     }
 
     @Override
     public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
-        return DefaultBeanConverterHandler.getInstance().convert(from, to, beanOperator);
+        return beanConverterHandler.convert(from, to, beanOperator);
     }
 
     @Override
     public <T> T convert(Object from, Class<T> to) {
-        return DefaultBeanConverterHandler.getInstance().convert(from, to, DefaultBeanOperator.getInstance());
+        return beanConverterHandler.convert(from, to, DefaultBeanOperator.getInstance());
     }
 
     @Override
     public <T> T convert(Object from, Class<T> to, BeanOperator beanOperator) {
-        return DefaultBeanConverterHandler.getInstance().convert(from, to, beanOperator);
+        return beanConverterHandler.convert(from, to, beanOperator);
     }
 }

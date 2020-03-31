@@ -11,8 +11,10 @@ public class DefaultBeanResolver implements BeanResolver {
 
     private static final DefaultBeanResolver INSTANCE = new DefaultBeanResolver();
 
+    private final BeanResolverHandler beanResolverHandler = DefaultBeanResolverHandler.getInstance();
+
     @Override
     public BeanDescriptor resolve(Object bean) {
-        return DefaultBeanResolverHandler.getInstance().resolve(bean);
+        return beanResolverHandler.resolve(bean);
     }
 }

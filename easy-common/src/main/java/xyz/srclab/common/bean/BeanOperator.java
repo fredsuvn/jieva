@@ -2,9 +2,11 @@ package xyz.srclab.common.bean;
 
 import com.sun.javafx.fxml.PropertyNotFoundException;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotation.ReturnImmutable;
 import xyz.srclab.annotation.concurrent.ReturnThreadSafeDependOn;
 import xyz.srclab.annotation.concurrent.ThreadSafeDependOn;
 import xyz.srclab.common.builder.CacheStateBuilder;
+import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.lang.TypeRef;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 
@@ -168,18 +170,19 @@ public interface BeanOperator {
     }
 
     default <T> T convert(Object from, Class<T> to) {
-        return convert(from, (Type) to);
+        return getBeanConverter().convert(from, (Type) to, this);
     }
 
     default <T> T convert(Object from, TypeRef<T> to) {
-        return convert(from, to.getType());
+        return getBeanConverter().convert(from, to.getType(), this);
     }
 
     TypeRef<Map<String, Object>> TO_MAP_TYPE_OF = new TypeRef<Map<String, Object>>() {
     };
 
+    @ReturnImmutable
     default Map<String, Object> toMap(Object bean) {
-        return convert(bean, TO_MAP_TYPE_OF);
+        return MapHelper.immutableMap(getBeanConverter().convert(bean, TO_MAP_TYPE_OF, this));
     }
 
     class Builder extends CacheStateBuilder<BeanOperator> {

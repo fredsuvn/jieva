@@ -11,13 +11,16 @@ public class DefaultBeanOperator implements BeanOperator {
 
     private static final DefaultBeanOperator INSTANCE = new DefaultBeanOperator();
 
+    private final BeanResolver beanResolver = DefaultBeanResolver.getInstance();
+    private final BeanConverter beanConverter = DefaultBeanConverter.getInstance();
+
     @Override
     public BeanResolver getBeanResolver() {
-        return DefaultBeanResolver.getInstance();
+        return beanResolver;
     }
 
     @Override
     public BeanConverter getBeanConverter() {
-        return DefaultBeanConverter.getInstance();
+        return beanConverter;
     }
 }
