@@ -133,7 +133,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         if (List.class.equals(to)) {
             return convertToList(from, Object.class, beanOperator);
         }
-        if (Set.class.equals(to)) {
+        if (Set.class.equals(to) || Collection.class.equals(to)) {
             return convertToSet(from, Object.class, beanOperator);
         }
         if (to.isArray()) {
@@ -158,7 +158,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         if (List.class.equals(rawType)) {
             return convertToList(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
         }
-        if (Set.class.equals(rawType)) {
+        if (Set.class.equals(rawType) || Collection.class.equals(rawType)) {
             return convertToSet(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
         }
         if (rawType.isArray()) {
