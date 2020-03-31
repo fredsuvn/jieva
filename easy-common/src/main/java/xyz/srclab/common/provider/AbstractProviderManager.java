@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ThreadSafe
-public abstract class AbstractProviderManagement<T> implements ProviderManagement<T> {
+public abstract class AbstractProviderManager<T> implements ProviderManager<T> {
 
     private final Map<String, T> providerMap = new ConcurrentHashMap<>();
     private @Nullable String defaultProviderName;

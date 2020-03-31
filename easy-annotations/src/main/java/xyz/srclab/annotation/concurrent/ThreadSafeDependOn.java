@@ -1,6 +1,5 @@
 package xyz.srclab.annotation.concurrent;
 
-import javax.annotation.meta.TypeQualifierDefault;
 import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
 

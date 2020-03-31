@@ -3,8 +3,8 @@ package test.xyz.srclab.common.bytecode
 import org.testng.annotations.Test
 import test.xyz.srclab.common.doAssert
 import test.xyz.srclab.common.model.SomeSomeClass1
-import xyz.srclab.common.bean.BeanHelper
 import xyz.srclab.bytecode.bean.BeanClass
+import xyz.srclab.common.bean.BeanHelper
 
 object BeanTest {
 

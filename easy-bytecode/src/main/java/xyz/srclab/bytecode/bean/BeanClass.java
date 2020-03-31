@@ -1,5 +1,8 @@
 package xyz.srclab.bytecode.bean;
 
+import xyz.srclab.annotation.concurrent.ThreadSafe;
+
+@ThreadSafe
 public interface BeanClass<T> {
 
     static Builder<Object> newBuilder() {

@@ -19,6 +19,7 @@ final class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> imp
 
     @Override
     public CglibBeanClassBuilder<T> addProperty(String name, Class<?> type) {
+        this.changeState();
         this.propertyInfos.add(new PropertyInfo(name, type));
         return this;
     }

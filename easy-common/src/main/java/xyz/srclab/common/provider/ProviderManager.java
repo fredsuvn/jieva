@@ -1,6 +1,6 @@
 package xyz.srclab.common.provider;
 
-public interface ProviderManagement<T> {
+public interface ProviderManager<T> {
 
     default void registerProvider(String className) {
         registerProvider(className, false);

@@ -1,13 +1,11 @@
 package xyz.srclab.bytecode.proxy;
 
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.reflect.method.MethodBody;
 import xyz.srclab.common.reflect.method.MethodDefinition;
 
+@ThreadSafe
 public interface ProxyClass<T> {
-
-    static Builder<Object> newBuilder() {
-        return ProxyClassBuilderHelper.newBuilder(Object.class);
-    }
 
     static <T> Builder<T> newBuilder(Class<T> superClass) {
         return ProxyClassBuilderHelper.newBuilder(superClass);

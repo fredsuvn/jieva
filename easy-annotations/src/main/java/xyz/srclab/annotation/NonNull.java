@@ -1,7 +1,6 @@
 package xyz.srclab.annotation;
 
 import javax.annotation.Nonnull;
-import javax.annotation.meta.TypeQualifierDefault;
 import javax.annotation.meta.TypeQualifierNickname;
 import javax.annotation.meta.When;
 import java.lang.annotation.*;

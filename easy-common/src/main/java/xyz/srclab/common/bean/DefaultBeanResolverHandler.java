@@ -4,7 +4,6 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
-import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 
 import java.beans.BeanInfo;
@@ -35,7 +34,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
     @Override
     public BeanDescriptor resolve(Object bean) {
-        return descriptorCache.get(bean.getClass(), type -> {
+        return descriptorCache.getNonNull(bean.getClass(), type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
                 return BeanDescriptor.newBuilder()
@@ -53,7 +52,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         for (PropertyDescriptor descriptor : descriptors) {
             map.put(descriptor.getName(), new BeanPropertyDescriptorImpl(descriptor));
         }
-        return MapHelper.immutableMap(map);
+        return map;
     }
 
     @ThreadSafe

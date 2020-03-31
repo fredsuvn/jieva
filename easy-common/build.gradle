@@ -26,6 +26,7 @@ dependencies {
     api("org.apache.commons:commons-collections4")
     api('com.google.guava:guava')
 
+    compileOnly(project(":easy-bytecode"))
     compileOnly("org.springframework:spring-core")
     compileOnly("cglib:cglib")
 

@@ -4,16 +4,16 @@ import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.bytecode.provider.cglib.CglibByteCodeProvider;
 import xyz.srclab.bytecode.provider.cglib.SpringCglibByteCodeProvider;
 import xyz.srclab.common.base.EnvironmentHelper;
-import xyz.srclab.common.provider.AbstractProviderManagement;
+import xyz.srclab.common.provider.AbstractProviderManager;
 
 @ThreadSafe
-public class ByteCodeProviderManagement extends AbstractProviderManagement<ByteCodeProvider> {
+public class ByteCodeProviderManager extends AbstractProviderManager<ByteCodeProvider> {
 
-    public static ByteCodeProviderManagement getInstance() {
+    public static ByteCodeProviderManager getInstance() {
         return INSTANCE;
     }
 
-    private static final ByteCodeProviderManagement INSTANCE = new ByteCodeProviderManagement();
+    private static final ByteCodeProviderManager INSTANCE = new ByteCodeProviderManager();
 
     @Override
     protected ByteCodeProvider createDefaultProvider() {

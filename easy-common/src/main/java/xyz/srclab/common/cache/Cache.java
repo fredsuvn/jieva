@@ -85,6 +85,30 @@ public interface Cache<K, V> {
     @Nullable
     V get(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent);
 
+    default V getNonNull(K key) throws NoSuchElementException, NullPointerException {
+        @Nullable V result = get(key);
+        if (result == null) {
+            throw new NullPointerException();
+        }
+        return result;
+    }
+
+    default V getNonNull(K key, Function<K, V> ifAbsent) {
+        return getNonNull(key, getDefaultExpirationPeriod(), ifAbsent);
+    }
+
+    default V getNonNull(K key, long expirationPeriodSeconds, Function<K, V> ifAbsent) {
+        return getNonNull(key, Duration.ofSeconds(expirationPeriodSeconds), ifAbsent);
+    }
+
+    default V getNonNull(K key, Duration expirationPeriod, Function<K, V> ifAbsent) {
+        @Nullable V result = get(key, expirationPeriod, ifAbsent);
+        if (result == null) {
+            throw new NullPointerException();
+        }
+        return result;
+    }
+
     default void put(K key, @Nullable V value) {
         put(key, value, getDefaultExpirationPeriod());
     }
