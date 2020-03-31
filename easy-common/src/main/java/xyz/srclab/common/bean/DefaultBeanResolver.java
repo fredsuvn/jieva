@@ -1,5 +1,8 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotation.concurrent.ThreadSafe;
+
+@ThreadSafe
 public class DefaultBeanResolver implements BeanResolver {
 
     public static DefaultBeanResolver getInstance() {

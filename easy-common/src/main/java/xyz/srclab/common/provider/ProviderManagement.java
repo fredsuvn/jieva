@@ -6,11 +6,25 @@ public interface ProviderManagement<T> {
         registerProvider(className, false);
     }
 
+    default void registerProvider(T provider) {
+        registerProvider(provider, false);
+    }
+
+    default void registerProvider(String className, T provider) {
+        registerProvider(className, provider, false);
+    }
+
     void registerProvider(String className, boolean isDefault);
 
-    T getProvider();
+    default void registerProvider(T provider, boolean isDefault) {
+        registerProvider(provider.getClass().getName(), provider, isDefault);
+    }
 
-    T getProvider(String className);
+    void registerProvider(String name, T provider, boolean isDefault);
 
-    void removeProvider(String className);
+    T getProvider() throws ProviderNotFoundException;
+
+    T getProvider(String name) throws ProviderNotFoundException;
+
+    void removeProvider(String name);
 }

@@ -1,0 +1,34 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+}
+
+description = "Easy for Bytecode Support"
+
+apply from: gradles.compile
+
+apply from: gradles.repositories
+
+java {
+    registerFeature('optionalSupport') {
+        usingSourceSet(sourceSets.main)
+    }
+}
+
+dependencies {
+    implementation(platform(project(":easy-parent")))
+
+    implementation(project(":easy-common"))
+
+    compileOnly("org.springframework:spring-core")
+    compileOnly("cglib:cglib")
+
+    testCompile(project(":easy-test"))
+    testCompile("org.testng:testng")
+}
+
+test {
+    useTestNG()
+    include("**/*Test.class")
+}
+
+apply from: gradles.deployJar

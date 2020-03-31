@@ -1,9 +1,10 @@
 package xyz.srclab.common.bean;
 
-import org.jetbrains.annotations.Nullable;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 
 import java.lang.reflect.Type;
 
+@ThreadSafe
 public class DefaultBeanConverter implements BeanConverter {
 
     public static DefaultBeanConverter getInstance() {
@@ -12,27 +13,23 @@ public class DefaultBeanConverter implements BeanConverter {
 
     private static final DefaultBeanConverter INSTANCE = new DefaultBeanConverter();
 
-    @Nullable
     @Override
-    public <T> T convert(@Nullable Object from, Type to) {
+    public <T> T convert(Object from, Type to) {
         return DefaultBeanConverterHandler.getInstance().convert(from, to, DefaultBeanOperator.getInstance());
     }
 
-    @Nullable
     @Override
-    public <T> T convert(@Nullable Object from, Type to, BeanOperator beanOperator) {
+    public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
         return DefaultBeanConverterHandler.getInstance().convert(from, to, beanOperator);
     }
 
-    @Nullable
     @Override
-    public <T> T convert(@Nullable Object from, Class<T> to) {
+    public <T> T convert(Object from, Class<T> to) {
         return DefaultBeanConverterHandler.getInstance().convert(from, to, DefaultBeanOperator.getInstance());
     }
 
-    @Nullable
     @Override
-    public <T> T convert(@Nullable Object from, Class<T> to, BeanOperator beanOperator) {
+    public <T> T convert(Object from, Class<T> to, BeanOperator beanOperator) {
         return DefaultBeanConverterHandler.getInstance().convert(from, to, beanOperator);
     }
 }

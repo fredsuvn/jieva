@@ -17,6 +17,8 @@ java {
 dependencies {
     implementation(platform(project(":easy-parent")))
 
+    api(project(":easy-annotations"))
+
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("org.slf4j:slf4j-api")
     api("org.apache.commons:commons-lang3")

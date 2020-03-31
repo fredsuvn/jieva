@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Easy for Common: Annotations"
+description = "Easy: Annotations"
 
 apply from: gradles.compile
 
@@ -17,7 +17,7 @@ java {
 dependencies {
     implementation(platform(project(":easy-parent")))
 
-    implementation("com.google.code.findbugs:jsr305")
+    api("com.google.code.findbugs:jsr305")
 }
 
 apply from: gradles.deployJar

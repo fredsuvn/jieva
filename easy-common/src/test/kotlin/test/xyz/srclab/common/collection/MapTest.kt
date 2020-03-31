@@ -2,7 +2,7 @@ package test.xyz.srclab.common.collection
 
 import com.google.common.base.Stopwatch
 import org.testng.annotations.Test
-import xyz.srclab.common.collection.MapHelper
+import xyz.srclab.common.collection.CollectionHelper
 import xyz.srclab.common.test.asserts.AssertHelper
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -15,7 +15,7 @@ object MapTest {
     @Test
     fun testFastFixedMap() {
         val keys = createKeys()
-        val fastMap: MutableMap<Int, Int> = MapHelper.fastFixedKeysMap(keys)
+        val fastMap: MutableMap<Int, Int> = CollectionHelper.newFastFixedKeysMap(keys)
         val hashMap = HashMap<Int, Int>()
         val concurrentMap = ConcurrentHashMap<Int, Int>()
         for (key in keys) {

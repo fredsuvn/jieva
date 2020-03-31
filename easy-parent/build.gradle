@@ -2,7 +2,7 @@ plugins {
     id 'java-platform'
 }
 
-description = "Easy for Common: Parent"
+description = "Easy for Parent"
 
 apply from: gradles.repositories
 

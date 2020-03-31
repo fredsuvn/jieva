@@ -1,5 +1,8 @@
 package xyz.srclab.common.cache;
 
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.collection.map.MapHelper;
+
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,25 +42,26 @@ public interface Cache<K, V> {
         return false;
     }
 
+    @Nullable
     V get(K key) throws NoSuchElementException;
 
-    default Map<K, V> getAll(K... keys) throws NoSuchElementException {
+    default Map<K, @Nullable V> getAll(K... keys) throws NoSuchElementException {
         return getAll(Arrays.asList(keys));
     }
 
-    default Map<K, V> getAll(Iterable<K> keys) throws NoSuchElementException {
+    default Map<K, @Nullable V> getAll(Iterable<K> keys) throws NoSuchElementException {
         Map<K, V> map = new HashMap<>();
         for (K key : keys) {
             map.put(key, get(key));
         }
-        return map;
+        return MapHelper.immutableMap(map);
     }
 
-    default Map<K, V> getPresent(K... keys) throws NoSuchElementException {
+    default Map<K, @Nullable V> getPresent(K... keys) throws NoSuchElementException {
         return getPresent(Arrays.asList(keys));
     }
 
-    default Map<K, V> getPresent(Iterable<K> keys) throws NoSuchElementException {
+    default Map<K, @Nullable V> getPresent(Iterable<K> keys) throws NoSuchElementException {
         Map<K, V> map = new HashMap<>();
         for (K key : keys) {
             try {
@@ -65,38 +69,41 @@ public interface Cache<K, V> {
             } catch (NoSuchElementException ignored) {
             }
         }
-        return map;
+        return MapHelper.immutableMap(map);
     }
 
-    default V get(K key, Function<K, V> ifAbsent) {
+    @Nullable
+    default V get(K key, Function<K, @Nullable V> ifAbsent) {
         return get(key, getDefaultExpirationPeriod(), ifAbsent);
     }
 
-    default V get(K key, long expirationPeriodSeconds, Function<K, V> ifAbsent) {
+    @Nullable
+    default V get(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
         return get(key, Duration.ofSeconds(expirationPeriodSeconds), ifAbsent);
     }
 
-    V get(K key, Duration expirationPeriod, Function<K, V> ifAbsent);
+    @Nullable
+    V get(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent);
 
-    default void put(K key, V value) {
+    default void put(K key, @Nullable V value) {
         put(key, value, getDefaultExpirationPeriod());
     }
 
-    default void putAll(Map<K, V> data) {
+    default void putAll(Map<K, @Nullable V> data) {
         data.forEach(this::put);
     }
 
-    default void put(K key, V value, long expirationPeriodSeconds) {
+    default void put(K key, @Nullable V value, long expirationPeriodSeconds) {
         put(key, value, Duration.ofSeconds(expirationPeriodSeconds));
     }
 
-    default void putAll(Map<K, V> data, long expirationPeriodSeconds) {
+    default void putAll(Map<K, @Nullable V> data, long expirationPeriodSeconds) {
         putAll(data, Duration.ofSeconds(expirationPeriodSeconds));
     }
 
-    void put(K key, V value, Duration expirationPeriod);
+    void put(K key, @Nullable V value, Duration expirationPeriod);
 
-    default void putAll(Map<K, V> data, Duration expirationPeriod) {
+    default void putAll(Map<K, @Nullable V> data, Duration expirationPeriod) {
         data.forEach((k, v) -> put(k, v, expirationPeriod));
     }
 

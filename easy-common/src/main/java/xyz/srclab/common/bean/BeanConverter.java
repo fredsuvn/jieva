@@ -1,8 +1,9 @@
 package xyz.srclab.common.bean;
 
-import org.jetbrains.annotations.Nullable;
+import xyz.srclab.annotation.concurrent.ReturnThreadSafeDependOn;
+import xyz.srclab.annotation.concurrent.ThreadSafeDependOn;
 import xyz.srclab.common.builder.ProcessByHandlersBuilder;
-import xyz.srclab.common.lang.format.FormatHelper;
+import xyz.srclab.common.format.FormatHelper;
 import xyz.srclab.common.lang.TypeRef;
 
 import java.lang.reflect.Type;
@@ -10,45 +11,43 @@ import java.lang.reflect.Type;
 public interface BeanConverter {
 
     static Builder newBuilder() {
-        return Builder.newBuilder();
+        return new Builder();
     }
 
-    @Nullable
-    <T> T convert(@Nullable Object from, Type to);
+    <T> T convert(Object from, Type to);
 
-    @Nullable
-    <T> T convert(@Nullable Object from, Type to, BeanOperator beanOperator);
+    <T> T convert(Object from, Type to, BeanOperator beanOperator);
 
-    @Nullable
-    default <T> T convert(@Nullable Object from, Class<T> to) {
+    default <T> T convert(Object from, Class<T> to) {
         return convert(from, (Type) to);
     }
 
-    @Nullable
-    default <T> T convert(@Nullable Object from, Class<T> to, BeanOperator beanOperator) {
+    default <T> T convert(Object from, Class<T> to, BeanOperator beanOperator) {
         return convert(from, (Type) to, beanOperator);
     }
 
-    @Nullable
-    default <T> T convert(@Nullable Object from, TypeRef<T> to) {
+    default <T> T convert(Object from, TypeRef<T> to) {
         return convert(from, to.getType());
     }
 
-    @Nullable
-    default <T> T convert(@Nullable Object from, TypeRef<T> to, BeanOperator beanOperator) {
+    default <T> T convert(Object from, TypeRef<T> to, BeanOperator beanOperator) {
         return convert(from, to.getType(), beanOperator);
     }
 
     class Builder extends ProcessByHandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
 
-        public static Builder newBuilder() {
-            return new Builder();
+        @ReturnThreadSafeDependOn
+        @Override
+        public BeanConverter build() {
+            return super.build();
         }
 
+        @ReturnThreadSafeDependOn
         protected BeanConverter buildNew() {
             return new BeanConverterImpl(this);
         }
 
+        @ThreadSafeDependOn
         private static final class BeanConverterImpl implements BeanConverter {
 
             private final BeanConverterHandler[] handlers;
@@ -57,15 +56,13 @@ public interface BeanConverter {
                 this.handlers = builder.handlers.toArray(new BeanConverterHandler[0]);
             }
 
-            @Nullable
             @Override
-            public <T> T convert(@Nullable Object from, Type to) {
+            public <T> T convert(Object from, Type to) {
                 return convert(from, to, DefaultBeanOperator.getInstance());
             }
 
-            @Nullable
             @Override
-            public <T> T convert(@Nullable Object from, Type to, BeanOperator beanOperator) {
+            public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
                 for (BeanConverterHandler handler : handlers) {
                     if (handler.supportConvert(from, to, beanOperator)) {
                         return handler.convert(from, to, beanOperator);

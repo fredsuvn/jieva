@@ -1,7 +1,10 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.cache.CacheHelper;
+import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
+import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 
 import java.beans.BeanInfo;
@@ -14,6 +17,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+@ThreadSafe
 public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
     public static DefaultBeanResolverHandler getInstance() {
@@ -22,7 +26,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
     private static final DefaultBeanResolverHandler INSTANCE = new DefaultBeanResolverHandler();
 
-    private static final Cache<Class<?>, BeanDescriptor> descriptorCache = CacheHelper.newThreadLocalCache();
+    private static final Cache<Class<?>, BeanDescriptor> descriptorCache = new ThreadLocalCache<>();
 
     @Override
     public boolean supportBean(Object bean) {
@@ -47,17 +51,18 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
     private Map<String, BeanPropertyDescriptor> buildProperties(PropertyDescriptor[] descriptors) {
         Map<String, BeanPropertyDescriptor> map = new HashMap<>();
         for (PropertyDescriptor descriptor : descriptors) {
-            map.put(descriptor.getName(), new PojoBeanPropertyDescriptor(descriptor));
+            map.put(descriptor.getName(), new BeanPropertyDescriptorImpl(descriptor));
         }
-        return map;
+        return MapHelper.immutableMap(map);
     }
 
-    private static final class PojoBeanPropertyDescriptor implements BeanPropertyDescriptor {
+    @ThreadSafe
+    private static final class BeanPropertyDescriptorImpl implements BeanPropertyDescriptor {
 
         private final PropertyDescriptor descriptor;
         private final Type genericType;
 
-        private PojoBeanPropertyDescriptor(PropertyDescriptor descriptor) {
+        private BeanPropertyDescriptorImpl(PropertyDescriptor descriptor) {
             this.descriptor = descriptor;
             this.genericType = findGenericType(descriptor);
         }
@@ -94,6 +99,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
             return descriptor.getReadMethod() != null;
         }
 
+        @Nullable
         @Override
         public Object getValue(Object bean) throws UnsupportedOperationException {
             if (!isReadable()) {
@@ -115,7 +121,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         }
 
         @Override
-        public void setValue(Object bean, Object value) throws UnsupportedOperationException {
+        public void setValue(Object bean, @Nullable Object value) throws UnsupportedOperationException {
             if (!isWriteable()) {
                 throw new UnsupportedOperationException("Property is not writeable: " + descriptor);
             }

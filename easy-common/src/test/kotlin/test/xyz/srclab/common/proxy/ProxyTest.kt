@@ -6,7 +6,7 @@ import test.xyz.srclab.common.model.SomeInterface1
 import test.xyz.srclab.common.model.SomeSomeClass1
 import xyz.srclab.common.lang.Ref
 import xyz.srclab.common.proxy.ClassProxy
-import xyz.srclab.common.reflect.MethodBody
+import xyz.srclab.common.reflect.method.MethodBody
 
 object ProxyTest {
 

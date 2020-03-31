@@ -1,16 +1,30 @@
 package xyz.srclab.common.bean;
 
-import org.apache.commons.beanutils.ConvertUtilsBean;
-import org.jetbrains.annotations.Nullable;
-import xyz.srclab.common.lang.format.FormatHelper;
-import xyz.srclab.common.reflect.ReflectHelper;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
+import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.collection.iterable.IterableHelper;
+import xyz.srclab.common.collection.list.ListHelper;
+import xyz.srclab.common.collection.map.MapHelper;
+import xyz.srclab.common.collection.set.SetHelper;
+import xyz.srclab.common.format.FormatHelper;
+import xyz.srclab.common.reflect.instance.InstanceHelper;
+import xyz.srclab.common.reflect.type.TypeHelper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@ThreadSafe
 public class DefaultBeanConverterHandler implements BeanConverterHandler {
 
     public static DefaultBeanConverterHandler getInstance() {
@@ -19,114 +33,226 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
 
     private static final DefaultBeanConverterHandler INSTANCE = new DefaultBeanConverterHandler();
 
-    private final ConvertUtilsBean convertUtilsBean = new ConvertUtilsBean();
-
     @Override
-    public boolean supportConvert(@Nullable Object from, Type to, BeanOperator beanOperator) {
+    public boolean supportConvert(Object from, Type to, BeanOperator beanOperator) {
         return true;
     }
 
     @Override
-    public boolean supportConvert(@Nullable Object from, Class<?> to, BeanOperator beanOperator) {
+    public boolean supportConvert(Object from, Class<?> to, BeanOperator beanOperator) {
         return true;
     }
 
-    @Nullable
     @Override
-    public <T> T convert(@Nullable Object from, Type to, BeanOperator beanOperator) {
-        if (to instanceof Class) {
-            return convert(from, (Class<T>) to, beanOperator);
-        }
-        return (T) convertByBeanOperator(from, to, beanOperator);
+    public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
+        return (T) convertType(from, to, beanOperator);
     }
 
     @Override
-    @Nullable
-    public <T> T convert(@Nullable Object from, Class<T> to, BeanOperator beanOperator) {
-        if (Map.class.equals(to)) {
-            return (T) convertToMap(from, Object.class, Object.class, beanOperator);
-        }
-
-        Object result = convertByConvertUtilsBean(from, to);
-        if (result == null) {
-            return null;
-        }
-        if (ReflectHelper.isAssignable(result, to)) {
-            return (T) result;
-        }
-        result = convertToBean(from, to, beanOperator);
-        if (result == null) {
-            return null;
-        }
-        if (ReflectHelper.isAssignable(result, to)) {
-            return (T) result;
-        }
-        throw new UnsupportedOperationException(
-                FormatHelper.fastFormat("Cannot convert object {} to type {}", from, to)
-        );
+    public <T> T convert(Object from, Class<T> to, BeanOperator beanOperator) {
+        return (T) convertClass(from, to, beanOperator);
     }
 
-    @Nullable
-    private Object convertByConvertUtilsBean(@Nullable Object from, Class<?> to) {
-        return convertUtilsBean.convert(from, to);
-    }
-
-    private Object convertByBeanOperator(@Nullable Object from, Type to, BeanOperator beanOperator) {
-        if (to.equals(Map.class)) {
-            return convertToMap(from, String.class, Object.class, beanOperator);
+    private Object convertClass(Object from, Class<?> to, BeanOperator beanOperator) {
+        if (to.isAssignableFrom(String.class)) {
+            return from.toString();
         }
-        if (to instanceof Class) {
-            Class<?> cls = (Class<?>) to;
-            if (cls.isInterface()) {
-                throw new UnsupportedOperationException(
-                        FormatHelper.fastFormat("Cannot convert object {} to type {}", from, to));
+        if (boolean.class.equals(to) || Boolean.class.equals(to)) {
+            return Boolean.valueOf(from.toString());
+        }
+        if (int.class.equals(to) || Integer.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).intValue();
             }
-            return convert(from, cls, beanOperator);
+            return Integer.valueOf(from.toString());
         }
-        Class<?> toClass = ReflectHelper.getClass(to);
-        if (to instanceof ParameterizedType && Map.class.equals(toClass)) {
-            ParameterizedType mapType = (ParameterizedType) to;
-            Type[] mapGenericType = mapType.getActualTypeArguments();
-            Type keyType = mapGenericType[0];
-            Type valueType = mapGenericType[1];
-            return convertToMap(from, keyType, valueType, beanOperator);
+        if (long.class.equals(to) || Long.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).longValue();
+            }
+            return Long.valueOf(from.toString());
         }
-        return convert(from, toClass, beanOperator);
+        if (to.isAssignableFrom(Date.class)) {
+            try {
+                return DateUtils.parseDate(from.toString(),
+                        DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.toString());
+            } catch (ParseException e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+        if (to.isAssignableFrom(LocalDateTime.class)) {
+            return LocalDateTime.parse(from.toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        }
+        if (to.isAssignableFrom(Instant.class)) {
+            return Instant.parse(from.toString());
+        }
+        if (char.class.equals(to) || Character.class.equals(to)) {
+            if (from instanceof Number) {
+                return (char) (((Number) from).intValue());
+            }
+            String fromString = from.toString();
+            if (fromString.length() == 1) {
+                return fromString.charAt(0);
+            }
+            throw new UnsupportedOperationException(
+                    FormatHelper.fastFormat("Cannot convert object {} to type {}", from, to));
+        }
+        if (float.class.equals(to) || Float.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).floatValue();
+            }
+            return Float.valueOf(from.toString());
+        }
+        if (double.class.equals(to) || Double.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).doubleValue();
+            }
+            return Double.valueOf(from.toString());
+        }
+        if (short.class.equals(to) || Short.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).shortValue();
+            }
+            return Short.valueOf(from.toString());
+        }
+        if (BigDecimal.class.equals(to)) {
+            if (from instanceof BigInteger) {
+                return new BigDecimal((BigInteger) from);
+            }
+            return new BigDecimal(from.toString());
+        }
+        if (BigInteger.class.equals(to)) {
+            return new BigInteger(from.toString());
+        }
+        if (to.isAssignableFrom(Number.class)) {
+            return Double.valueOf(from.toString());
+        }
+        if (Map.class.equals(to)) {
+            return convertToMap(from, Object.class, Object.class, beanOperator);
+        }
+        if (List.class.equals(to)) {
+            return convertToList(from, Object.class, beanOperator);
+        }
+        if (Set.class.equals(to)) {
+            return convertToSet(from, Object.class, beanOperator);
+        }
+        if (to.isArray()) {
+            return convertToArray(from, Object.class, beanOperator);
+        }
+        return convertToBean(from, to, beanOperator);
     }
 
-    private Object convertToBean(@Nullable Object any, Class<?> type, BeanOperator beanOperator) {
-        if (any == null) {
-            return null;
+    private Object convertType(Object from, Type to, BeanOperator beanOperator) {
+        if (to instanceof Class) {
+            return convertClass(from, (Class<?>) to, beanOperator);
         }
-        Object toInstance = ReflectHelper.newInstance(type);
-        beanOperator.copyProperties(any, toInstance);
+        Class<?> rawType = TypeHelper.getRawClass(to);
+        if (!(to instanceof ParameterizedType)) {
+            return convertToBean(from, rawType, beanOperator);
+        }
+        ParameterizedType parameterizedType = (ParameterizedType) to;
+        if (Map.class.equals(rawType)) {
+            Type[] kv = parameterizedType.getActualTypeArguments();
+            return convertToMap(from, kv[0], kv[1], beanOperator);
+        }
+        if (List.class.equals(rawType)) {
+            return convertToList(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
+        }
+        if (Set.class.equals(rawType)) {
+            return convertToSet(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
+        }
+        if (rawType.isArray()) {
+            return convertToArray(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
+        }
+        return convertToBean(from, rawType, beanOperator);
+    }
+
+    private Object convertToBean(Object from, Class<?> to, BeanOperator beanOperator) {
+        Object toInstance = InstanceHelper.newInstance(to);
+        beanOperator.copyProperties(from, toInstance);
         return toInstance;
     }
 
-    private Map convertToMap(@Nullable Object any, Type keyType, Type valueType, BeanOperator beanOperator) {
-        if (any == null) {
-            return Collections.emptyMap();
-        }
+    private Map convertToMap(Object from, Type toKeyType, Type toValueType, BeanOperator beanOperator) {
         Map map = new HashMap<>();
-        if (any instanceof Map) {
-            Map src = (Map) any;
+        if (from instanceof Map) {
+            Map src = (Map) from;
             src.forEach((k, v) -> {
-                Object key = convert(k, keyType, beanOperator);
-                Object value = convert(v, valueType, beanOperator);
+                Object key = convert(k, toKeyType, beanOperator);
+                Object value = convert(v, toValueType, beanOperator);
                 map.put(key, value);
             });
         } else {
-            BeanDescriptor sourceDescriptor = beanOperator.resolve(any);
+            BeanDescriptor sourceDescriptor = beanOperator.resolve(from);
             sourceDescriptor.getPropertyDescriptors().forEach((name, descriptor) -> {
                 if (!descriptor.isReadable()) {
                     return;
                 }
-                Object sourceValue = descriptor.getValue(any);
-                Object key = convert(name, keyType, beanOperator);
-                Object value = convert(sourceValue, valueType, beanOperator);
+                @Nullable Object sourceValue = descriptor.getValue(from);
+                Object key = convert(name, toKeyType, beanOperator);
+                @Nullable Object value = sourceValue == null ? null : convert(sourceValue, toValueType, beanOperator);
                 map.put(key, value);
             });
         }
-        return Collections.unmodifiableMap(map);
+        return MapHelper.immutableMap(map);
+    }
+
+    private Object convertToList(Object from, Type toElementType, BeanOperator beanOperator) {
+        if (from.getClass().isArray()) {
+            Object[] array = (Object[]) from;
+            return ListHelper.immutableList(
+                    Arrays.stream(array)
+                            .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
+                            .collect(Collectors.toList())
+            );
+        }
+        if (Iterable.class.isAssignableFrom(from.getClass())) {
+            Iterable<Object> iterable = (Iterable<Object>) from;
+            return ListHelper.immutableList(
+                    IterableHelper.castToList(iterable)
+                            .stream()
+                            .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
+                            .collect(Collectors.toList())
+            );
+        }
+        throw new UnsupportedOperationException(FormatHelper.fastFormat(
+                "Cannot convert object {} to list of element type {}", from, toElementType));
+    }
+
+    private Object convertToArray(Object from, Type toElementType, BeanOperator beanOperator) {
+        if (from.getClass().isArray()) {
+            Object[] array = (Object[]) from;
+            return ArrayHelper.map(
+                    array, toElementType, o -> o == null ? null : convert(o, toElementType, beanOperator));
+        }
+        if (Iterable.class.isAssignableFrom(from.getClass())) {
+            Iterable iterable = (Iterable) from;
+            return ArrayHelper.toArray(
+                    iterable, toElementType, o -> o == null ? null : convert(o, toElementType, beanOperator));
+        }
+        throw new UnsupportedOperationException(FormatHelper.fastFormat(
+                "Cannot convert object {} to array of element type {}", from, toElementType));
+    }
+
+    private Object convertToSet(Object from, Type toElementType, BeanOperator beanOperator) {
+        if (from.getClass().isArray()) {
+            Object[] array = (Object[]) from;
+            return SetHelper.immutableSet(
+                    Arrays.stream(array)
+                            .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
+                            .collect(Collectors.toSet())
+            );
+        }
+        if (Iterable.class.isAssignableFrom(from.getClass())) {
+            Iterable<Object> iterable = (Iterable<Object>) from;
+            return SetHelper.immutableSet(
+                    IterableHelper.castToList(iterable)
+                            .stream()
+                            .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
+                            .collect(Collectors.toSet())
+            );
+        }
+        throw new UnsupportedOperationException(FormatHelper.fastFormat(
+                "Cannot convert object {} to set of element type {}", from, toElementType));
     }
 }

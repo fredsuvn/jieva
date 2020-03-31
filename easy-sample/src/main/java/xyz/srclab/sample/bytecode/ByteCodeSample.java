@@ -5,7 +5,7 @@ import xyz.srclab.common.bean.BeanDescriptor;
 import xyz.srclab.common.bean.BeanHelper;
 import xyz.srclab.common.bytecode.bean.BeanClass;
 import xyz.srclab.common.bytecode.proxy.ProxyClass;
-import xyz.srclab.common.reflect.MethodBody;
+import xyz.srclab.common.reflect.method.MethodBody;
 import xyz.srclab.common.test.asserts.AssertHelper;
 
 public class ByteCodeSample {

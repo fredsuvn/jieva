@@ -1,11 +1,13 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotation.concurrent.ReturnThreadSafeDependOn;
+import xyz.srclab.annotation.concurrent.ThreadSafeDependOn;
 import xyz.srclab.common.builder.ProcessByHandlersBuilder;
 
 public interface BeanResolver {
 
     static Builder newBuilder() {
-        return Builder.newBuilder();
+        return new Builder();
     }
 
     BeanDescriptor resolve(Object bean);
@@ -16,11 +18,19 @@ public interface BeanResolver {
             return new Builder();
         }
 
+        @ReturnThreadSafeDependOn
+        @Override
+        public BeanResolver build() {
+            return super.build();
+        }
+
+        @ReturnThreadSafeDependOn
         @Override
         protected BeanResolver buildNew() {
             return new BeanResolverImpl(this);
         }
 
+        @ThreadSafeDependOn
         private static final class BeanResolverImpl implements BeanResolver {
 
             private final BeanResolverHandler[] handlers;

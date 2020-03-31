@@ -1,15 +1,19 @@
 package xyz.srclab.common.bean;
 
 import com.sun.javafx.fxml.PropertyNotFoundException;
+import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.builder.CacheStateBuilder;
+import xyz.srclab.common.collection.map.MapHelper;
 
 import java.util.Collections;
 import java.util.Map;
 
+@Immutable
 public interface BeanDescriptor {
 
     static Builder newBuilder() {
-        return Builder.newBuilder();
+        return new Builder();
     }
 
     Class<?> getType();
@@ -32,16 +36,13 @@ public interface BeanDescriptor {
 
     BeanPropertyDescriptor getPropertyDescriptor(String propertyName) throws PropertyNotFoundException;
 
+    @Immutable
     Map<String, BeanPropertyDescriptor> getPropertyDescriptors();
 
     class Builder extends CacheStateBuilder<BeanDescriptor> {
 
-        public static Builder newBuilder() {
-            return new Builder();
-        }
-
-        private Class<?> type;
-        private Map<String, BeanPropertyDescriptor> properties;
+        private @Nullable Class<?> type;
+        private @Nullable Map<String, BeanPropertyDescriptor> properties;
 
         public Builder setType(Class<?> type) {
             this.changeState();
@@ -71,7 +72,7 @@ public interface BeanDescriptor {
                 }
                 this.type = builder.type;
                 this.properties = builder.properties == null ?
-                        Collections.emptyMap() : Collections.unmodifiableMap(builder.properties);
+                        Collections.emptyMap() : MapHelper.immutableMap(builder.properties);
             }
 
             @Override

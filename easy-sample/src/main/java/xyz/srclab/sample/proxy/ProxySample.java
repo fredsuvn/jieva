@@ -2,7 +2,7 @@ package xyz.srclab.sample.proxy;
 
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.common.proxy.ClassProxy;
-import xyz.srclab.common.reflect.MethodBody;
+import xyz.srclab.common.reflect.method.MethodBody;
 import xyz.srclab.common.test.asserts.AssertHelper;
 
 public class ProxySample {

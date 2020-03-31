@@ -3,7 +3,7 @@ package test.xyz.srclab.common.format
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 import test.xyz.srclab.common.doAssert
-import xyz.srclab.common.lang.format.FormatHelper
+import xyz.srclab.common.format.FormatHelper
 
 object FormatTest {
 

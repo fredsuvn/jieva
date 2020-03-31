@@ -1,6 +1,6 @@
 package xyz.srclab.common.state;
 
-import org.jetbrains.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 
 public class StringStateHelper {
 
@@ -10,7 +10,7 @@ public class StringStateHelper {
 
     public static <T extends StringState<T>> String toString(T state) {
         String code = state.getCode();
-        String description = state.getDescription();
+        @Nullable String description = state.getDescription();
         return description == null ? code : code + ": " + description;
     }
 }

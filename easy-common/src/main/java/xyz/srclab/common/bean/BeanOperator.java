@@ -1,9 +1,12 @@
 package xyz.srclab.common.bean;
 
-import org.jetbrains.annotations.Nullable;
+import com.sun.javafx.fxml.PropertyNotFoundException;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotation.concurrent.ReturnThreadSafeDependOn;
+import xyz.srclab.annotation.concurrent.ThreadSafeDependOn;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.lang.TypeRef;
-import xyz.srclab.common.reflect.ReflectHelper;
+import xyz.srclab.common.reflect.instance.InstanceHelper;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -11,7 +14,7 @@ import java.util.Map;
 public interface BeanOperator {
 
     static Builder newBuilder() {
-        return Builder.newBuilder();
+        return new Builder();
     }
 
     BeanResolver getBeanResolver();
@@ -27,36 +30,42 @@ public interface BeanOperator {
         return beanDescriptor.containsProperty(propertyName);
     }
 
-    default Object getProperty(Object bean, String propertyName) {
+    @Nullable
+    default Object getProperty(Object bean, String propertyName)
+            throws PropertyNotFoundException, UnsupportedOperationException {
         BeanDescriptor beanDescriptor = resolve(bean);
-        if (!beanDescriptor.canReadProperty(propertyName)) {
-            throw new UnsupportedOperationException("Property is not readable: " + propertyName);
-        }
         BeanPropertyDescriptor propertyDescriptor = beanDescriptor.getPropertyDescriptor(propertyName);
         return propertyDescriptor.getValue(bean);
     }
 
-    default <T> T getProperty(Object bean, String propertyName, Type type) {
-        Object property = getProperty(bean, propertyName);
-        return convert(property, type);
+    @Nullable
+    default <T> T getProperty(Object bean, String propertyName, Type type)
+            throws PropertyNotFoundException, UnsupportedOperationException {
+        @Nullable Object value = getProperty(bean, propertyName);
+        if (value == null) {
+            return null;
+        }
+        return convert(value, type);
     }
 
-    default <T> T getProperty(Object bean, String propertyName, Class<T> type) {
+    @Nullable
+    default <T> T getProperty(Object bean, String propertyName, Class<T> type)
+            throws PropertyNotFoundException, UnsupportedOperationException {
         return getProperty(bean, propertyName, (Type) type);
     }
 
-    default <T> T getProperty(Object bean, String propertyName, TypeRef<T> type) {
+    @Nullable
+    default <T> T getProperty(Object bean, String propertyName, TypeRef<T> type)
+            throws PropertyNotFoundException, UnsupportedOperationException {
         return getProperty(bean, propertyName, type.getType());
     }
 
-    default void setProperty(Object bean, String propertyName, Object value) {
+    default void setProperty(Object bean, String propertyName, @Nullable Object value)
+            throws PropertyNotFoundException, UnsupportedOperationException {
         BeanDescriptor beanDescriptor = resolve(bean);
-        if (!beanDescriptor.canWriteProperty(propertyName)) {
-            throw new UnsupportedOperationException("Property is not writeable: " + propertyName);
-        }
         BeanPropertyDescriptor propertyDescriptor = beanDescriptor.getPropertyDescriptor(propertyName);
-        Type type = propertyDescriptor.getGenericType();
-        propertyDescriptor.setValue(bean, convert(value, type));
+        propertyDescriptor.setValue(bean, value == null ?
+                null : convert(value, propertyDescriptor.getGenericType()));
     }
 
     default void copyProperties(Object source, Object dest) {
@@ -98,7 +107,7 @@ public interface BeanOperator {
                 if (!descriptor.isReadable()) {
                     return;
                 }
-                Object sourceValue = descriptor.getValue(source);
+                @Nullable Object sourceValue = descriptor.getValue(source);
                 setPropertyAction.doSet(
                         name, sourceValue, Object.class, value -> des.put(name, value), this);
             });
@@ -111,7 +120,7 @@ public interface BeanOperator {
                     return;
                 }
                 BeanPropertyDescriptor destPropertyDescriptor = destDescriptor.getPropertyDescriptor(name);
-                Object sourceValue = sourcePropertyDescriptor.getValue(source);
+                @Nullable Object sourceValue = sourcePropertyDescriptor.getValue(source);
                 setPropertyAction.doSet(
                         name,
                         sourceValue,
@@ -141,7 +150,7 @@ public interface BeanOperator {
                 if (!descriptor.isReadable()) {
                     return;
                 }
-                Object sourceValue = descriptor.getValue(source);
+                @Nullable Object sourceValue = descriptor.getValue(source);
                 setPropertyAction.doSet(
                         name, sourceValue, Object.class, value -> dest.put(name, value), this);
             });
@@ -149,7 +158,7 @@ public interface BeanOperator {
     }
 
     default <T> T clone(T from) {
-        T returned = (T) ReflectHelper.newInstance(from.getClass());
+        T returned = InstanceHelper.newInstance(from.getClass());
         copyProperties(from, returned);
         return returned;
     }
@@ -175,12 +184,8 @@ public interface BeanOperator {
 
     class Builder extends CacheStateBuilder<BeanOperator> {
 
-        public static Builder newBuilder() {
-            return new Builder();
-        }
-
-        private BeanResolver beanResolver;
-        private BeanConverter beanConverter;
+        private @Nullable BeanResolver beanResolver;
+        private @Nullable BeanConverter beanConverter;
 
         public Builder setBeanResolver(BeanResolver beanResolver) {
             this.changeState();
@@ -194,11 +199,19 @@ public interface BeanOperator {
             return this;
         }
 
+        @ReturnThreadSafeDependOn
+        @Override
+        public BeanOperator build() {
+            return super.build();
+        }
+
+        @ReturnThreadSafeDependOn
         @Override
         protected BeanOperator buildNew() {
             return new BeanOperatorImpl(this);
         }
 
+        @ThreadSafeDependOn
         private static final class BeanOperatorImpl implements BeanOperator {
 
             private final BeanResolver beanResolver;
@@ -221,6 +234,7 @@ public interface BeanOperator {
                 return beanConverter;
             }
 
+            @ThreadSafeDependOn
             private class BeanConverterProxy implements BeanConverter {
 
                 private final BeanConverter proxied;
@@ -229,15 +243,13 @@ public interface BeanOperator {
                     this.proxied = proxied;
                 }
 
-                @Nullable
                 @Override
-                public <T> T convert(@Nullable Object from, Type to) {
+                public <T> T convert(Object from, Type to) {
                     return proxied.convert(from, to, BeanOperatorImpl.this);
                 }
 
-                @Nullable
                 @Override
-                public <T> T convert(@Nullable Object from, Type to, BeanOperator beanOperator) {
+                public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
                     return proxied.convert(from, to, beanOperator);
                 }
             }
@@ -248,8 +260,8 @@ public interface BeanOperator {
 
         SetPropertyAction COMMON =
                 (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator) -> {
-                    Object destPropertyValue = beanOperator.convert(sourcePropertyValue, destPropertyType);
-                    destPropertySetter.set(destPropertyValue);
+                    destPropertySetter.set(sourcePropertyValue == null ?
+                            null : beanOperator.convert(sourcePropertyValue, destPropertyType));
                 };
 
         SetPropertyAction COMMON_IGNORE_NULL =
@@ -262,13 +274,13 @@ public interface BeanOperator {
                 };
 
         void doSet(
-                Object sourcePropertyName, Object sourcePropertyValue,
+                Object sourcePropertyName, @Nullable Object sourcePropertyValue,
                 Type destPropertyType, PropertySetter destPropertySetter,
                 BeanOperator beanOperator
         );
     }
 
     interface PropertySetter {
-        void set(Object value);
+        void set(@Nullable Object value);
     }
 }

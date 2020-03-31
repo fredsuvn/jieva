@@ -1,5 +1,6 @@
 package xyz.srclab.common.exception;
 
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.state.StringStateHelper;
 
 public enum CommonExceptionStatus implements ExceptionStatus {
@@ -21,6 +22,7 @@ public enum CommonExceptionStatus implements ExceptionStatus {
     }
 
     @Override
+    @Nullable
     public String getDescription() {
         return description;
     }

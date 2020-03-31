@@ -1,10 +1,13 @@
 package xyz.srclab.common.lang;
 
-import xyz.srclab.common.reflect.ReflectHelper;
+import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.reflect.type.TypeHelper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+@Immutable
 public class TypeRef<T> {
 
     public static TypeRef<?> with(Type type) {
@@ -22,7 +25,7 @@ public class TypeRef<T> {
     }
 
     protected Type reflectTypeSelf() {
-        Type generic = ReflectHelper.findGenericSuperclass(getClass(), TypeRef.class);
+        @Nullable Type generic = TypeHelper.findGenericSuperclass(getClass(), TypeRef.class);
         if (!(generic instanceof ParameterizedType)) {
             throw new IllegalStateException("Must be extend from TypeRef with parameterized.");
         }
@@ -32,5 +35,9 @@ public class TypeRef<T> {
 
     public Type getType() {
         return type;
+    }
+
+    public <S> Class<S> getRawType() {
+        return TypeHelper.getRawClass(type);
     }
 }

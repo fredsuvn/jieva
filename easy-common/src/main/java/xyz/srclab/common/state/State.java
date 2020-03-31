@@ -1,6 +1,6 @@
 package xyz.srclab.common.state;
 
-import org.jetbrains.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 
 public interface State<Code, Description, T extends State<Code, Description, T>> {
 

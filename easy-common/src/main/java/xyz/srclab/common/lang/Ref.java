@@ -1,5 +1,7 @@
 package xyz.srclab.common.lang;
 
+import xyz.srclab.annotation.Nullable;
+
 public interface Ref<T> {
 
     static <T> Ref<T> withEmpty() {
@@ -10,14 +12,15 @@ public interface Ref<T> {
         return new RefImpl<>(object);
     }
 
+    @Nullable
     T get();
 
-    void set(T value);
+    void set(@Nullable T value);
 }
 
 final class RefImpl<T> implements Ref<T> {
 
-    private T object;
+    private @Nullable T object;
 
     public RefImpl() {
     }
@@ -26,11 +29,12 @@ final class RefImpl<T> implements Ref<T> {
         this.object = object;
     }
 
+    @Nullable
     public T get() {
         return object;
     }
 
-    public void set(T object) {
+    public void set(@Nullable T object) {
         this.object = object;
     }
 }

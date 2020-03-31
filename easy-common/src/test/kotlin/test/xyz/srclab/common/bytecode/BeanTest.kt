@@ -4,13 +4,13 @@ import org.testng.annotations.Test
 import test.xyz.srclab.common.doAssert
 import test.xyz.srclab.common.model.SomeSomeClass1
 import xyz.srclab.common.bean.BeanHelper
-import xyz.srclab.common.bytecode.bean.BeanClass
+import xyz.srclab.bytecode.bean.BeanClass
 
 object BeanTest {
 
     @Test
     fun testBean() {
-        val beanClass = BeanClass.newBuilder(SomeSomeClass1::class.java)
+        val beanClass = xyz.srclab.bytecode.bean.BeanClass.newBuilder(SomeSomeClass1::class.java)
             .addProperty("hello", String::class.java)
             .addProperty("world", String::class.java)
             .build()

@@ -2,6 +2,7 @@ package xyz.srclab.common.collection.map;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.lang.tuple.Pair;
 
 import java.util.*;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
  * @param <K>
  * @param <V>
  */
+@ThreadSafe
 public class FastFixedKeysMap<K, V> implements Map<K, V> {
 
     private static <K, V> Map<K, V> keysToMap(Iterable<K> keys) {

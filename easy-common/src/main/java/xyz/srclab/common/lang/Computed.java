@@ -1,5 +1,6 @@
 package xyz.srclab.common.lang;
 
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.time.TimeHelper;
 
 import java.time.Duration;
@@ -32,47 +33,44 @@ public interface Computed<T> extends Supplier<T> {
 abstract class AbstractComputed<T> implements Computed<T> {
 
     protected final Supplier<T> supplier;
-    protected T computedCache;
+    protected @Nullable T cache;
 
     protected AbstractComputed(Supplier<T> supplier) {
         this.supplier = supplier;
     }
 
     @Override
+    public T get() {
+        if (cache == null) {
+            cache = supplier.get();
+        }
+        return cache;
+    }
+
+    @Override
+    public void refresh() {
+        cache = supplier.get();
+    }
+
+    @Override
     public T refreshAndGet() {
         refresh();
-        return computedCache;
+        assert cache != null;
+        return cache;
     }
 }
 
 final class SimpleComputed<T> extends AbstractComputed<T> {
 
-    private boolean cached;
-
     SimpleComputed(Supplier<T> supplier) {
         super(supplier);
-    }
-
-    @Override
-    public T get() {
-        if (!cached) {
-            refresh();
-        }
-        return this.computedCache;
-    }
-
-    @Override
-    public void refresh() {
-        this.computedCache = this.supplier.get();
-        cached = true;
     }
 }
 
 final class AutoRefreshComputed<T> extends AbstractComputed<T> {
 
     private final Duration timeout;
-
-    private long lastComputedTime = 0;
+    private long cacheTimeMillis = 0;
 
     AutoRefreshComputed(Duration timeout, Supplier<T> supplier) {
         super(supplier);
@@ -81,13 +79,17 @@ final class AutoRefreshComputed<T> extends AbstractComputed<T> {
 
     @Override
     public T get() {
+        if (cache == null) {
+            refresh();
+            return cache;
+        }
         long now = TimeHelper.nowMillis();
-        return (lastComputedTime > 0 && lastComputedTime + timeout.toMillis() >= now) ?
-                this.computedCache : refreshAndGet();
+        return (cacheTimeMillis > 0 && cacheTimeMillis + timeout.toMillis() >= now) ?
+                this.cache : refreshAndGet();
     }
 
     public void refresh() {
-        this.computedCache = this.supplier.get();
-        lastComputedTime = TimeHelper.nowMillis();
+        super.refresh();
+        cacheTimeMillis = TimeHelper.nowMillis();
     }
 }

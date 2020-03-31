@@ -1,5 +1,6 @@
 package xyz.srclab.common.exception;
 
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.state.StringStateHelper;
 
 public class BusinessException extends RuntimeException implements ExceptionStatus {
@@ -14,7 +15,7 @@ public class BusinessException extends RuntimeException implements ExceptionStat
         this(status, null);
     }
 
-    public BusinessException(ExceptionStatus status, Throwable cause) {
+    public BusinessException(ExceptionStatus status, @Nullable Throwable cause) {
         super(buildMessage(status), cause);
         this.status = status;
     }
@@ -25,6 +26,7 @@ public class BusinessException extends RuntimeException implements ExceptionStat
     }
 
     @Override
+    @Nullable
     public String getDescription() {
         return status.getDescription();
     }
