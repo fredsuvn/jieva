@@ -1,10 +1,6 @@
 package xyz.srclab.bytecode.provider.cglib;
 
-public interface CglibAdaptor {
-
-    static CglibAdaptor getInstance() {
-        return CglibEnvironmentHelper.findCglibAdaptor();
-    }
+interface CglibAdaptor {
 
     Enhancer newEnhancer();
 

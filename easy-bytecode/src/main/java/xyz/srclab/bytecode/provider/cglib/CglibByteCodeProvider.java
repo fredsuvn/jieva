@@ -2,10 +2,8 @@ package xyz.srclab.bytecode.provider.cglib;
 
 import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.bytecode.bean.BeanClass;
-import xyz.srclab.bytecode.bean.BeanClassBuilderProvider;
 import xyz.srclab.bytecode.provider.ByteCodeProvider;
 import xyz.srclab.bytecode.proxy.ProxyClass;
-import xyz.srclab.bytecode.proxy.ProxyClassBuilderProvider;
 
 @ThreadSafe
 public class CglibByteCodeProvider implements ByteCodeProvider {
@@ -16,41 +14,15 @@ public class CglibByteCodeProvider implements ByteCodeProvider {
 
     private static final CglibByteCodeProvider INSTANCE = new CglibByteCodeProvider();
 
-    @Override
-    public BeanClassBuilderProvider getBeanClassBuilderProvider() {
-        return BeanClassBuilderProviderImpl.getInstance();
-    }
+    private final OriginalCglibAdaptor originalCglibAdaptor = new OriginalCglibAdaptor();
 
     @Override
-    public ProxyClassBuilderProvider getProxyClassBuilderProvider() {
-        return ProxyClassBuilderProviderImpl.getInstance();
+    public <T> BeanClass.Builder<T> newBeanClassBuilder(Class<T> superClass) {
+        return new CglibBeanClassBuilder<>(originalCglibAdaptor, superClass);
     }
 
-    private static final class BeanClassBuilderProviderImpl implements BeanClassBuilderProvider {
-
-        static BeanClassBuilderProviderImpl getInstance() {
-            return BeanClassBuilderProviderImpl.INSTANCE;
-        }
-
-        private static final BeanClassBuilderProviderImpl INSTANCE = new BeanClassBuilderProviderImpl();
-
-        @Override
-        public <T> BeanClass.Builder<T> newBuilder(Class<T> superClass) {
-            return CglibBeanClassBuilder.newBuilder(superClass);
-        }
-    }
-
-    private static final class ProxyClassBuilderProviderImpl implements ProxyClassBuilderProvider {
-
-        static ProxyClassBuilderProviderImpl getInstance() {
-            return ProxyClassBuilderProviderImpl.INSTANCE;
-        }
-
-        private static final ProxyClassBuilderProviderImpl INSTANCE = new ProxyClassBuilderProviderImpl();
-
-        @Override
-        public <T> ProxyClass.Builder<T> newBuilder(Class<T> superClass) {
-            return CglibProxyClassBuilder.newBuilder(superClass);
-        }
+    @Override
+    public <T> ProxyClass.Builder<T> newProxyClassBuilder(Class<T> superClass) {
+        return new CglibProxyClassBuilder<>(originalCglibAdaptor, superClass);
     }
 }

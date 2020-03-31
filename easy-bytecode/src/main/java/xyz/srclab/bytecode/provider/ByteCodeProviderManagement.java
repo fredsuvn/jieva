@@ -2,6 +2,8 @@ package xyz.srclab.bytecode.provider;
 
 import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.bytecode.provider.cglib.CglibByteCodeProvider;
+import xyz.srclab.bytecode.provider.cglib.SpringCglibByteCodeProvider;
+import xyz.srclab.common.base.EnvironmentHelper;
 import xyz.srclab.common.provider.AbstractProviderManagement;
 
 @ThreadSafe
@@ -15,6 +17,7 @@ public class ByteCodeProviderManagement extends AbstractProviderManagement<ByteC
 
     @Override
     protected ByteCodeProvider createDefaultProvider() {
-        return CglibByteCodeProvider.getInstance();
+        return EnvironmentHelper.hasPackage("org.springframework.cglib.proxy") ?
+                SpringCglibByteCodeProvider.getInstance() : CglibByteCodeProvider.getInstance();
     }
 }

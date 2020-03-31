@@ -6,16 +6,14 @@ import xyz.srclab.common.builder.CacheStateBuilder;
 import java.util.LinkedList;
 import java.util.List;
 
-class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> implements BeanClass.Builder<T> {
+final class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> implements BeanClass.Builder<T> {
 
-    public static <T> CglibBeanClassBuilder<T> newBuilder(Class<?> superClass) {
-        return new CglibBeanClassBuilder<>(superClass);
-    }
-
+    private final CglibAdaptor cglibAdaptor;
     private final Class<?> superClass;
     private final List<PropertyInfo> propertyInfos = new LinkedList<>();
 
-    public CglibBeanClassBuilder(Class<?> superClass) {
+    CglibBeanClassBuilder(CglibAdaptor cglibAdaptor, Class<?> superClass) {
+        this.cglibAdaptor = cglibAdaptor;
         this.superClass = superClass;
     }
 
@@ -31,7 +29,7 @@ class CglibBeanClassBuilder<T> extends CacheStateBuilder<BeanClass<T>> implement
     }
 
     private BeanGenerator buildBeanGenerator() {
-        BeanGenerator beanGenerator = CglibAdaptor.getInstance().newBeanGenerator();
+        BeanGenerator beanGenerator = cglibAdaptor.newBeanGenerator();
         beanGenerator.setSuperclass(superClass);
         for (PropertyInfo propertyInfo : propertyInfos) {
             beanGenerator.addProperty(propertyInfo.getName(), propertyInfo.getType());

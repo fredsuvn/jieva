@@ -13,17 +13,15 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> implements ProxyClass.Builder<T> {
+final class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> implements ProxyClass.Builder<T> {
 
-    public static <T> CglibProxyClassBuilder<T> newBuilder(Class<?> superClass) {
-        return new CglibProxyClassBuilder<>(superClass);
-    }
-
+    private final CglibAdaptor cglibAdaptor;
     private final Class<?> superClass;
     private final List<Class<?>> interfaces = new LinkedList<>();
     private final List<MethodInfo> overrideMethods = new LinkedList<>();
 
-    public CglibProxyClassBuilder(Class<?> superClass) {
+    public CglibProxyClassBuilder(CglibAdaptor cglibAdaptor, Class<?> superClass) {
+        this.cglibAdaptor = cglibAdaptor;
         this.superClass = superClass;
     }
 
@@ -70,7 +68,7 @@ class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> impleme
             return callbacks.length - 1;
         };
 
-        Enhancer enhancer = CglibAdaptor.getInstance().newEnhancer();
+        Enhancer enhancer = cglibAdaptor.newEnhancer();
         enhancer.setSuperclass(superClass);
         if (!interfaces.isEmpty()) {
             enhancer.setInterfaces(interfaces.toArray(ArrayUtils.EMPTY_CLASS_ARRAY));

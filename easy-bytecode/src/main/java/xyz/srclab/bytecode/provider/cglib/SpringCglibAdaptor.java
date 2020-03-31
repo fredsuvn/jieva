@@ -1,14 +1,12 @@
-package xyz.srclab.bytecode.provider.cglib.original;
+package xyz.srclab.bytecode.provider.cglib;
 
-import net.sf.cglib.beans.BeanGenerator;
-import net.sf.cglib.proxy.*;
-import xyz.srclab.bytecode.provider.cglib.CglibAdaptor;
+import org.springframework.cglib.beans.BeanGenerator;
 
-public class OriginalCglibAdaptor implements CglibAdaptor {
+final class SpringCglibAdaptor implements CglibAdaptor {
 
     @Override
     public xyz.srclab.bytecode.provider.cglib.Enhancer newEnhancer() {
-        Enhancer actualEnhancer = new Enhancer();
+        org.springframework.cglib.proxy.Enhancer actualEnhancer = new org.springframework.cglib.proxy.Enhancer();
         return new EnhancerImpl(actualEnhancer);
     }
 
@@ -20,9 +18,9 @@ public class OriginalCglibAdaptor implements CglibAdaptor {
 
     private static final class EnhancerImpl implements xyz.srclab.bytecode.provider.cglib.Enhancer {
 
-        private final Enhancer actualEnhancer;
+        private final org.springframework.cglib.proxy.Enhancer actualEnhancer;
 
-        private EnhancerImpl(Enhancer actualEnhancer) {
+        private EnhancerImpl(org.springframework.cglib.proxy.Enhancer actualEnhancer) {
             this.actualEnhancer = actualEnhancer;
         }
 
@@ -38,15 +36,15 @@ public class OriginalCglibAdaptor implements CglibAdaptor {
 
         @Override
         public void setCallbacks(xyz.srclab.bytecode.provider.cglib.Callback[] callbacks) {
-            Callback[] actualCallbacks = new Callback[callbacks.length];
+            org.springframework.cglib.proxy.Callback[] actualCallbacks = new org.springframework.cglib.proxy.Callback[callbacks.length];
             for (int i = 0; i < callbacks.length; i++) {
                 xyz.srclab.bytecode.provider.cglib.Callback callback = callbacks[i];
                 if (callback instanceof xyz.srclab.bytecode.provider.cglib.NoOp) {
-                    actualCallbacks[i] = NoOp.INSTANCE;
+                    actualCallbacks[i] = org.springframework.cglib.proxy.NoOp.INSTANCE;
                     continue;
                 }
                 if (callback instanceof xyz.srclab.bytecode.provider.cglib.MethodInterceptor) {
-                    MethodInterceptor actualMethodInterceptor = toActualMethodInterceptor(
+                    org.springframework.cglib.proxy.MethodInterceptor actualMethodInterceptor = toActualMethodInterceptor(
                             (xyz.srclab.bytecode.provider.cglib.MethodInterceptor) callback);
                     actualCallbacks[i] = actualMethodInterceptor;
                     continue;
@@ -56,7 +54,7 @@ public class OriginalCglibAdaptor implements CglibAdaptor {
             actualEnhancer.setCallbacks(actualCallbacks);
         }
 
-        private MethodInterceptor toActualMethodInterceptor(
+        private org.springframework.cglib.proxy.MethodInterceptor toActualMethodInterceptor(
                 xyz.srclab.bytecode.provider.cglib.MethodInterceptor methodInterceptor) {
             return (object, method, args, proxy) ->
                     methodInterceptor.intercept(object, method, args,
@@ -75,7 +73,7 @@ public class OriginalCglibAdaptor implements CglibAdaptor {
 
         @Override
         public void setCallbackFilter(xyz.srclab.bytecode.provider.cglib.CallbackFilter callbackFilter) {
-            CallbackFilter actualCallbackFilter = callbackFilter::accept;
+            org.springframework.cglib.proxy.CallbackFilter actualCallbackFilter = callbackFilter::accept;
             actualEnhancer.setCallbackFilter(actualCallbackFilter);
         }
 

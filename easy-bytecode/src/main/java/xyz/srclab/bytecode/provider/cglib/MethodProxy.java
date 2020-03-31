@@ -1,6 +1,6 @@
 package xyz.srclab.bytecode.provider.cglib;
 
-public interface MethodProxy {
+interface MethodProxy {
 
     Object invoke(Object object, Object[] args) throws Throwable;
 

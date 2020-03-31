@@ -1,6 +1,6 @@
 package xyz.srclab.bytecode.provider.cglib;
 
-public interface Enhancer {
+interface Enhancer {
 
     void setSuperclass(Class<?> superclass);
 

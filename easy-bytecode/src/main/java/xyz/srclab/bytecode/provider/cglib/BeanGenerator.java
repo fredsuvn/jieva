@@ -1,6 +1,6 @@
 package xyz.srclab.bytecode.provider.cglib;
 
-public interface BeanGenerator {
+interface BeanGenerator {
 
     void setSuperclass(Class<?> superclass);
 

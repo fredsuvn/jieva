@@ -1,6 +1,6 @@
 package xyz.srclab.bytecode.provider.cglib;
 
-public interface NoOp extends Callback {
+interface NoOp extends Callback {
 
     NoOp INSTANCE = new NoOp() {
     };

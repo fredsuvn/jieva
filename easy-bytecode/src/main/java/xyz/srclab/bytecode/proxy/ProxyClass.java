@@ -3,16 +3,14 @@ package xyz.srclab.bytecode.proxy;
 import xyz.srclab.common.reflect.method.MethodBody;
 import xyz.srclab.common.reflect.method.MethodDefinition;
 
-import java.util.Arrays;
-
 public interface ProxyClass<T> {
 
     static Builder<Object> newBuilder() {
-        return Builder.newBuilder(Object.class);
+        return ProxyClassBuilderHelper.newBuilder(Object.class);
     }
 
     static <T> Builder<T> newBuilder(Class<T> superClass) {
-        return Builder.newBuilder(superClass);
+        return ProxyClassBuilderHelper.newBuilder(superClass);
     }
 
     T newInstance();
@@ -20,14 +18,6 @@ public interface ProxyClass<T> {
     T newInstance(Class<?>[] parameterTypes, Object[] args);
 
     interface Builder<T> {
-
-        static <T> Builder<T> newBuilder(Class<T> superClass) {
-            return ProxyClassBuilderProvider.getInstance().newBuilder(superClass);
-        }
-
-        default Builder<T> addInterfaces(Class<?>... interfaces) {
-            return addInterfaces(Arrays.asList(interfaces));
-        }
 
         Builder<T> addInterfaces(Iterable<Class<?>> interfaces);
 

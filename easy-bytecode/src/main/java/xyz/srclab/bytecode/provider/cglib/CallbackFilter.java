@@ -2,7 +2,7 @@ package xyz.srclab.bytecode.provider.cglib;
 
 import java.lang.reflect.Method;
 
-public interface CallbackFilter {
+interface CallbackFilter {
 
     int accept(Method method);
 }
