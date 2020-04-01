@@ -1,5 +1,6 @@
 package test.xyz.srclab.common
 
+import org.apache.commons.lang3.ArrayUtils
 import org.apache.commons.lang3.StringUtils
 import org.testng.Assert
 
@@ -17,6 +18,27 @@ private fun toString(any: Any?): String {
     }
     if (any is Array<*>) {
         return "[${StringUtils.join(any, ",")}]"
+    }
+    if (any is IntArray) {
+        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
+    }
+    if (any is LongArray) {
+        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
+    }
+    if (any is ByteArray) {
+        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
+    }
+    if (any is BooleanArray) {
+        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
+    }
+    if (any is DoubleArray) {
+        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
+    }
+    if (any is FloatArray) {
+        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
+    }
+    if (any is ShortArray) {
+        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
     }
     return any.toString()
 }
