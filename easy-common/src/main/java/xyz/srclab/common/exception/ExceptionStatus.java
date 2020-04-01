@@ -1,6 +1,5 @@
 package xyz.srclab.common.exception;
 
-import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.state.StringState;
 import xyz.srclab.common.state.StringStateHelper;
 
@@ -16,7 +15,6 @@ public interface ExceptionStatus extends StringState<ExceptionStatus> {
             }
 
             @Override
-            @Nullable
             public String getDescription() {
                 return StringStateHelper.buildDescription(ExceptionStatus.this.getDescription(), moreDescription);
             }

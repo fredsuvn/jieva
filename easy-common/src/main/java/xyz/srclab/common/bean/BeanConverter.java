@@ -1,14 +1,19 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.concurrent.ReturnThreadSafeDependOn;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.annotation.concurrent.ThreadSafeDependOn;
 import xyz.srclab.common.builder.ProcessByHandlersBuilder;
-import xyz.srclab.common.format.FormatHelper;
 import xyz.srclab.common.lang.TypeRef;
+import xyz.srclab.common.string.format.fastformat.FastFormat;
 
 import java.lang.reflect.Type;
 
 public interface BeanConverter {
+
+    @ThreadSafe
+    BeanConverter DEFAULT = new DefaultBeanConverter();
 
     static Builder newBuilder() {
         return new Builder();
@@ -36,6 +41,14 @@ public interface BeanConverter {
 
     class Builder extends ProcessByHandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
 
+        private @Nullable BeanOperator beanOperator;
+
+        public Builder setBeanOperator(BeanOperator beanOperator) {
+            this.changeState();
+            this.beanOperator = beanOperator;
+            return this;
+        }
+
         @ReturnThreadSafeDependOn
         @Override
         public BeanConverter build() {
@@ -50,15 +63,17 @@ public interface BeanConverter {
         @ThreadSafeDependOn
         private static final class BeanConverterImpl implements BeanConverter {
 
+            private final BeanOperator beanOperator;
             private final BeanConverterHandler[] handlers;
 
             private BeanConverterImpl(Builder builder) {
+                this.beanOperator = builder.beanOperator == null ? BeanOperator.DEFAULT : builder.beanOperator;
                 this.handlers = builder.handlers.toArray(new BeanConverterHandler[0]);
             }
 
             @Override
             public <T> T convert(Object from, Type to) {
-                return convert(from, to, DefaultBeanOperator.getInstance());
+                return convert(from, to, beanOperator);
             }
 
             @Override
@@ -69,7 +84,7 @@ public interface BeanConverter {
                     }
                 }
                 throw new UnsupportedOperationException(
-                        FormatHelper.fastFormat("Cannot convert object from {} to {}", from, to));
+                        FastFormat.format("Cannot convert object from {} to {}", from, to));
             }
         }
     }

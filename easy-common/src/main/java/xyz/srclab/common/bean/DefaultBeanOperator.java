@@ -5,14 +5,8 @@ import xyz.srclab.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class DefaultBeanOperator implements BeanOperator {
 
-    public static DefaultBeanOperator getInstance() {
-        return INSTANCE;
-    }
-
-    private static final DefaultBeanOperator INSTANCE = new DefaultBeanOperator();
-
-    private final BeanResolver beanResolver = DefaultBeanResolver.getInstance();
-    private final BeanConverter beanConverter = DefaultBeanConverter.getInstance();
+    private final BeanResolver beanResolver = BeanResolver.DEFAULT;
+    private final BeanConverter beanConverter = BeanConverter.DEFAULT;
 
     @Override
     public BeanResolver getBeanResolver() {

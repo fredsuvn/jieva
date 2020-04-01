@@ -10,10 +10,19 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.time.temporal.Temporal;
+import java.util.Date;
 
 public class TypeHelper {
 
     private static final Cache<Object, Type> typeCache = new ThreadLocalCache<>();
+
+    public static boolean isBasic(Object any) {
+        return any instanceof CharSequence
+                || any instanceof Number
+                || any instanceof Date
+                || any instanceof Temporal;
+    }
 
     public static boolean isAssignable(Object from, Class<?> to) {
         Class<?> fromType = from instanceof Class<?> ? (Class<?>) from : from.getClass();
@@ -21,7 +30,7 @@ public class TypeHelper {
     }
 
     public static <T> Class<T> getRawClass(Type type) {
-        return (Class<T>) typeCache.get(
+        return (Class<T>) typeCache.getNonNull(
                 buildTypeKey("getRawClass", type.toString()),
                 k -> getRawClass0(type)
         );
@@ -56,7 +65,7 @@ public class TypeHelper {
 
     @Nullable
     public static Type findGenericSuperclass(Class<?> cls, Class<?> target) {
-        Type returned = typeCache.get(
+        Type returned = typeCache.getNonNull(
                 buildTypeKey("findGenericSuperclass", cls, target),
                 k -> findGenericSuperclass0(cls, target)
         );

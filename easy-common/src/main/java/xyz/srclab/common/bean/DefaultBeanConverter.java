@@ -7,17 +7,11 @@ import java.lang.reflect.Type;
 @ThreadSafe
 public class DefaultBeanConverter implements BeanConverter {
 
-    public static DefaultBeanConverter getInstance() {
-        return INSTANCE;
-    }
-
-    private static final DefaultBeanConverter INSTANCE = new DefaultBeanConverter();
-
-    private final BeanConverterHandler beanConverterHandler = DefaultBeanConverterHandler.getInstance();
+    private final BeanConverterHandler beanConverterHandler = new DefaultBeanConverterHandler();
 
     @Override
     public <T> T convert(Object from, Type to) {
-        return beanConverterHandler.convert(from, to, DefaultBeanOperator.getInstance());
+        return beanConverterHandler.convert(from, to, BeanOperator.DEFAULT);
     }
 
     @Override
@@ -27,7 +21,7 @@ public class DefaultBeanConverter implements BeanConverter {
 
     @Override
     public <T> T convert(Object from, Class<T> to) {
-        return beanConverterHandler.convert(from, to, DefaultBeanOperator.getInstance());
+        return beanConverterHandler.convert(from, to, BeanOperator.DEFAULT);
     }
 
     @Override

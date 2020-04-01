@@ -1,4 +1,4 @@
 @DefaultNonNull
-package xyz.srclab.common.format.fastformat;
+package xyz.srclab.common.string;
 
 import xyz.srclab.annotation.DefaultNonNull;

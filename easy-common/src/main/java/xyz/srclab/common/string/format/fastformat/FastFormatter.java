@@ -1,7 +1,7 @@
-package xyz.srclab.common.format.fastformat;
+package xyz.srclab.common.string.format.fastformat;
 
 import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.common.format.Formatter;
+import xyz.srclab.common.string.format.Formatter;
 
 @ThreadSafe
 public class FastFormatter implements Formatter {

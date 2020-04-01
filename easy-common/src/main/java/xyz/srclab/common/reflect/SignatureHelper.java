@@ -1,6 +1,6 @@
 package xyz.srclab.common.reflect;
 
-import xyz.srclab.common.format.FormatHelper;
+import xyz.srclab.common.string.format.fastformat.FastFormat;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -65,7 +65,7 @@ public class SignatureHelper {
     }
 
     public static String signatureMethod(Class<?>[] parameterTypes, Class<?> returnType) {
-        return FormatHelper.fastFormat(
+        return FastFormat.format(
                 "({}){}",
                 Arrays.stream(parameterTypes)
                         .map(SignatureHelper::signature)

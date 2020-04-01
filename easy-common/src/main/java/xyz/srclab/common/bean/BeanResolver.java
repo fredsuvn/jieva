@@ -1,10 +1,14 @@
 package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.concurrent.ReturnThreadSafeDependOn;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.annotation.concurrent.ThreadSafeDependOn;
 import xyz.srclab.common.builder.ProcessByHandlersBuilder;
 
 public interface BeanResolver {
+
+    @ThreadSafe
+    BeanResolver DEFAULT = new DefaultBeanResolver();
 
     static Builder newBuilder() {
         return new Builder();

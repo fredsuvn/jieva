@@ -15,7 +15,7 @@ public class MethodHelper {
     private static final Cache<Object, List<Method>> classMethodsCache = new ThreadLocalCache<>();
 
     public static List<Method> getAllMethods(Class<?> cls) {
-        return classMethodsCache.get(
+        return classMethodsCache.getNonNull(
                 buildAllMethodsKey(cls),
                 c -> getAllMethods0(cls)
         );
@@ -32,7 +32,7 @@ public class MethodHelper {
     }
 
     public static List<Method> getOverrideableMethods(Class<?> cls) {
-        return classMethodsCache.get(
+        return classMethodsCache.getNonNull(
                 buildOverrideableMethodsKey(cls),
                 c -> getOverrideableMethods0(cls)
         );
@@ -59,7 +59,7 @@ public class MethodHelper {
     }
 
     public static List<Method> getPublicStaticMethods(Class<?> cls) {
-        return classMethodsCache.get(
+        return classMethodsCache.getNonNull(
                 buildPublicStaticMethodsKey(cls),
                 c -> getPublicStaticMethods0(cls)
         );
@@ -72,7 +72,7 @@ public class MethodHelper {
     }
 
     public static List<Method> getPublicNonStaticMethods(Class<?> cls) {
-        return classMethodsCache.get(
+        return classMethodsCache.getNonNull(
                 buildPublicNonStaticMethodsKey(cls),
                 c -> getPublicNonStaticMethods0(cls)
         );

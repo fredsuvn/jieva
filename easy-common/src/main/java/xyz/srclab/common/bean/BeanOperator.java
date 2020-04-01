@@ -4,6 +4,7 @@ import com.sun.javafx.fxml.PropertyNotFoundException;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.ReturnImmutable;
 import xyz.srclab.annotation.concurrent.ReturnThreadSafeDependOn;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.annotation.concurrent.ThreadSafeDependOn;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
@@ -14,6 +15,9 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 public interface BeanOperator {
+
+    @ThreadSafe
+    BeanOperator DEFAULT = new DefaultBeanOperator();
 
     static Builder newBuilder() {
         return new Builder();
@@ -222,9 +226,9 @@ public interface BeanOperator {
 
             private BeanOperatorImpl(Builder builder) {
                 this.beanResolver = builder.beanResolver == null ?
-                        DefaultBeanResolver.getInstance() : builder.beanResolver;
+                        BeanResolver.DEFAULT : builder.beanResolver;
                 this.beanConverter = new BeanConverterProxy(builder.beanConverter == null ?
-                        DefaultBeanConverter.getInstance() : builder.beanConverter);
+                        BeanConverter.DEFAULT : builder.beanConverter);
             }
 
             @Override

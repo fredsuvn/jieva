@@ -1,8 +1,8 @@
 package xyz.srclab.common.test.mark;
 
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.srclab.annotation.Nullable;
 
 import java.io.PrintStream;
 import java.util.HashMap;

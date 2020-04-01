@@ -9,9 +9,9 @@ import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.list.ListHelper;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.collection.set.SetHelper;
-import xyz.srclab.common.format.FormatHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 import xyz.srclab.common.reflect.type.TypeHelper;
+import xyz.srclab.common.string.format.fastformat.FastFormat;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -26,12 +26,6 @@ import java.util.stream.Collectors;
 
 @ThreadSafe
 public class DefaultBeanConverterHandler implements BeanConverterHandler {
-
-    public static DefaultBeanConverterHandler getInstance() {
-        return INSTANCE;
-    }
-
-    private static final DefaultBeanConverterHandler INSTANCE = new DefaultBeanConverterHandler();
 
     @Override
     public boolean supportConvert(Object from, Type to, BeanOperator beanOperator) {
@@ -95,7 +89,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
                 return fromString.charAt(0);
             }
             throw new UnsupportedOperationException(
-                    FormatHelper.fastFormat("Cannot convert object {} to type {}", from, to));
+                    FastFormat.format("Cannot convert object {} to type {}", from, to));
         }
         if (float.class.equals(to) || Float.class.equals(to)) {
             if (from instanceof Number) {
@@ -215,7 +209,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
                             .collect(Collectors.toList())
             );
         }
-        throw new UnsupportedOperationException(FormatHelper.fastFormat(
+        throw new UnsupportedOperationException(FastFormat.format(
                 "Cannot convert object {} to list of element type {}", from, toElementType));
     }
 
@@ -230,7 +224,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return ArrayHelper.toArray(
                     iterable, toElementType, o -> o == null ? null : convert(o, toElementType, beanOperator));
         }
-        throw new UnsupportedOperationException(FormatHelper.fastFormat(
+        throw new UnsupportedOperationException(FastFormat.format(
                 "Cannot convert object {} to array of element type {}", from, toElementType));
     }
 
@@ -252,7 +246,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
                             .collect(Collectors.toSet())
             );
         }
-        throw new UnsupportedOperationException(FormatHelper.fastFormat(
+        throw new UnsupportedOperationException(FastFormat.format(
                 "Cannot convert object {} to set of element type {}", from, toElementType));
     }
 }

@@ -9,9 +9,9 @@ public enum CommonExceptionStatus implements ExceptionStatus {
     ;
 
     private final String code;
-    private final String description;
+    private final @Nullable String description;
 
-    CommonExceptionStatus(String code, String description) {
+    CommonExceptionStatus(String code, @Nullable String description) {
         this.code = code;
         this.description = description;
     }

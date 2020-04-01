@@ -1,17 +1,19 @@
-package xyz.srclab.common.format.fastformat;
+package xyz.srclab.common.string.format.fastformat;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.helpers.MessageFormatter;
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.lang.CachedNonNull;
 
 @Immutable
-public class FastFormat {
+public class FastFormat extends CachedNonNull<String> {
+
+    public static String format(String messagePattern, Object... args) {
+        return new FastFormat(messagePattern, args).format();
+    }
 
     private final String pattern;
     private final Object[] args;
-
-    private @Nullable String formatMessage;
 
     public FastFormat(String pattern, Object... args) {
         this.pattern = pattern;
@@ -20,10 +22,12 @@ public class FastFormat {
 
     @Override
     public String toString() {
-        if (formatMessage == null) {
-            formatMessage = format();
-        }
-        return formatMessage;
+        return getNonNull();
+    }
+
+    @Override
+    protected String newNonNull() {
+        return format();
     }
 
     private String format() {

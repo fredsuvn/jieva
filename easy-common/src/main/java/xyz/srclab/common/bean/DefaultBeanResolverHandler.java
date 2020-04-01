@@ -19,12 +19,6 @@ import java.util.Map;
 @ThreadSafe
 public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
-    public static DefaultBeanResolverHandler getInstance() {
-        return INSTANCE;
-    }
-
-    private static final DefaultBeanResolverHandler INSTANCE = new DefaultBeanResolverHandler();
-
     private static final Cache<Class<?>, BeanDescriptor> descriptorCache = new ThreadLocalCache<>();
 
     @Override

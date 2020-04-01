@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class BeanHelper {
 
-    private static final BeanOperator beanOperator = DefaultBeanOperator.getInstance();
+    private static final BeanOperator beanOperator = BeanOperator.DEFAULT;
 
     public static BeanResolver getBeanResolver() {
         return beanOperator.getBeanResolver();

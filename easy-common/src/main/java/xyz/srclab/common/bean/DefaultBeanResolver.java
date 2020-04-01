@@ -5,13 +5,7 @@ import xyz.srclab.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class DefaultBeanResolver implements BeanResolver {
 
-    public static DefaultBeanResolver getInstance() {
-        return INSTANCE;
-    }
-
-    private static final DefaultBeanResolver INSTANCE = new DefaultBeanResolver();
-
-    private final BeanResolverHandler beanResolverHandler = DefaultBeanResolverHandler.getInstance();
+    private final BeanResolverHandler beanResolverHandler = new DefaultBeanResolverHandler();
 
     @Override
     public BeanDescriptor resolve(Object bean) {

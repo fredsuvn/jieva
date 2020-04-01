@@ -30,26 +30,22 @@ public interface Computed<T> extends Supplier<T> {
     T refreshAndGet();
 }
 
-abstract class AbstractComputed<T> implements Computed<T> {
+final class SimpleComputed<T> extends CachedNonNull<T> implements Computed<T> {
 
-    protected final Supplier<T> supplier;
-    protected @Nullable T cache;
+    private final Supplier<T> supplier;
 
-    protected AbstractComputed(Supplier<T> supplier) {
+    SimpleComputed(Supplier<T> supplier) {
         this.supplier = supplier;
     }
 
     @Override
     public T get() {
-        if (cache == null) {
-            cache = supplier.get();
-        }
-        return cache;
+        return getNonNull();
     }
 
     @Override
     public void refresh() {
-        cache = supplier.get();
+        this.refreshNonNull();
     }
 
     @Override
@@ -58,28 +54,29 @@ abstract class AbstractComputed<T> implements Computed<T> {
         assert cache != null;
         return cache;
     }
-}
 
-final class SimpleComputed<T> extends AbstractComputed<T> {
-
-    SimpleComputed(Supplier<T> supplier) {
-        super(supplier);
+    @Override
+    protected T newNonNull() {
+        return supplier.get();
     }
 }
 
-final class AutoRefreshComputed<T> extends AbstractComputed<T> {
+final class AutoRefreshComputed<T> implements Computed<T> {
 
+    private final Supplier<T> supplier;
     private final Duration timeout;
+
+    private @Nullable T cache;
     private long cacheTimeMillis = 0;
 
     AutoRefreshComputed(Duration timeout, Supplier<T> supplier) {
-        super(supplier);
+        this.supplier = supplier;
         this.timeout = timeout;
     }
 
     @Override
     public T get() {
-        if (cache == null) {
+        if (this.cache == null) {
             refresh();
             return cache;
         }
@@ -89,7 +86,14 @@ final class AutoRefreshComputed<T> extends AbstractComputed<T> {
     }
 
     public void refresh() {
-        super.refresh();
+        cache = supplier.get();
         cacheTimeMillis = TimeHelper.nowMillis();
+    }
+
+    @Override
+    public T refreshAndGet() {
+        refresh();
+        assert cache != null;
+        return cache;
     }
 }
