@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Easy for Common"
+description = "Easy for Common: Proxy Support"
 
 apply from: gradles.compile
 
@@ -17,18 +17,11 @@ java {
 dependencies {
     implementation(platform(project(":easy-parent")))
 
-    api(project(":easy-annotations"))
-
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    api("org.slf4j:slf4j-api")
-    api("org.apache.commons:commons-lang3")
-    api("commons-beanutils:commons-beanutils")
-    api("org.apache.commons:commons-collections4")
-    api('com.google.guava:guava')
+    implementation(project(":easy-common"))
+    implementation(project(":easy-bytecode"))
 
     testCompile(project(":easy-test"))
     testCompile("org.testng:testng")
-    testCompile("cglib:cglib")
 }
 
 test {

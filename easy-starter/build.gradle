@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Easy for Common"
+description = "Easy Starter"
 
 apply from: gradles.compile
 
@@ -18,17 +18,10 @@ dependencies {
     implementation(platform(project(":easy-parent")))
 
     api(project(":easy-annotations"))
-
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    api("org.slf4j:slf4j-api")
-    api("org.apache.commons:commons-lang3")
-    api("commons-beanutils:commons-beanutils")
-    api("org.apache.commons:commons-collections4")
-    api('com.google.guava:guava')
+    api(project(":easy-common"))
+    api(project(":easy-common-proxy"))
 
     testCompile(project(":easy-test"))
-    testCompile("org.testng:testng")
-    testCompile("cglib:cglib")
 }
 
 test {

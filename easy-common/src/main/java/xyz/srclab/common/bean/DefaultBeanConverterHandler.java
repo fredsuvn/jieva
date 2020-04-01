@@ -4,6 +4,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.concurrent.ThreadSafe;
+import xyz.srclab.common.array.ArrayBuilder;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.list.ListHelper;
@@ -214,15 +215,17 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     private Object convertToArray(Object from, Type toElementType, BeanOperator beanOperator) {
+        Class<?> arrayType = ArrayHelper.findArrayType(toElementType);
         if (from.getClass().isArray()) {
-            Object[] array = (Object[]) from;
-            return ArrayHelper.map(
-                    array, toElementType, o -> o == null ? null : convert(o, toElementType, beanOperator));
+            return ArrayBuilder.map(from, arrayType)
+                    .setEachElement((i, o) -> o == null ? null : convert(o, toElementType, beanOperator))
+                    .build();
         }
         if (Iterable.class.isAssignableFrom(from.getClass())) {
-            Iterable iterable = (Iterable) from;
-            return ArrayHelper.toArray(
-                    iterable, toElementType, o -> o == null ? null : convert(o, toElementType, beanOperator));
+            Iterable<Object> iterable = (Iterable<Object>) from;
+            return ArrayBuilder.map(iterable, arrayType)
+                    .setEachElement((i, o) -> o == null ? null : convert(o, toElementType, beanOperator))
+                    .build();
         }
         throw new UnsupportedOperationException(FastFormat.format(
                 "Cannot convert object {} to array of element type {}", from, toElementType));

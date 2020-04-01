@@ -13,9 +13,6 @@ import java.util.stream.Collectors;
  * can change value of old key.
  * <p>
  * This map is thread-safe for reading (not for writing), fast, applicable to initialing scenes.
- *
- * @param <K>
- * @param <V>
  */
 @ThreadSafe
 public class FastFixedKeysMap<K, V> implements Map<K, V> {

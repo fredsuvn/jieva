@@ -34,7 +34,7 @@ public class ConcurrentCache<K, V> implements Cache<K, V> {
     public ConcurrentCache(Duration defaultExpirationPeriod, int concurrencyLevel) {
         this.defaultExpirationPeriod = defaultExpirationPeriod;
         this.segments = ArrayBuilder
-                .withArray(new TypeRef<Cache<K, V>>() {}, concurrencyLevel)
+                .newArray(new TypeRef<Cache<K, V>[]>() {}, concurrencyLevel)
                 .setEachElement(i -> new WeakCache<>(defaultExpirationPeriod, true))
                 .build();
     }

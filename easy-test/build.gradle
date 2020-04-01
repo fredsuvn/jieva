@@ -17,8 +17,8 @@ java {
 dependencies {
     implementation(platform(project(":easy-parent")))
 
-    api(project(":easy-common"))
-    api("org.testng:testng")
+    implementation(project(":easy-common"))
+    implementation("org.testng:testng")
 
     testCompile("org.testng:testng")
 }
