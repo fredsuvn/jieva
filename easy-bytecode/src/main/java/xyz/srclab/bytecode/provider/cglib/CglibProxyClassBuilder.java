@@ -28,7 +28,7 @@ final class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> i
     @Override
     public CglibProxyClassBuilder<T> addInterfaces(Iterable<Class<?>> interfaces) {
         this.changeState();
-        this.interfaces.addAll(IterableHelper.castToList(interfaces));
+        this.interfaces.addAll(IterableHelper.asList(interfaces));
         return this;
     }
 

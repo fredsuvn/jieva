@@ -2,10 +2,9 @@ package xyz.srclab.common.array;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.builder.CacheStateBuilder;
-import xyz.srclab.common.reflect.type.TypeHelper;
+import xyz.srclab.common.lang.TypeRef;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.util.function.Function;
 
 public class NewArrayBuilder<E, A> extends CacheStateBuilder<A> implements ArrayBuilder<A> {
@@ -13,22 +12,46 @@ public class NewArrayBuilder<E, A> extends CacheStateBuilder<A> implements Array
     private final A array;
     private @Nullable Function<Integer, E> eachElement;
 
-    NewArrayBuilder(A array) {
+    NewArrayBuilder(A array, Class<E> componentType) {
         if (!array.getClass().isArray()) {
             throw new IllegalStateException("Must be array: " + array);
         }
         this.array = array;
     }
 
-    NewArrayBuilder(Class<A> arrayType, int length) {
-        this.array = ArrayHelper.newArray(arrayType.getComponentType(), length);
+    NewArrayBuilder(A array, TypeRef<E> componentType) {
+        if (!array.getClass().isArray()) {
+            throw new IllegalStateException("Must be array: " + array);
+        }
+        this.array = array;
     }
 
-    NewArrayBuilder(Type arrayType, int length) {
-        this((Class<A>) TypeHelper.getRawClass(arrayType).getComponentType(), length);
+    NewArrayBuilder(Class<A> arrayType, Class<E> componentType, int length) {
+        if (!arrayType.isArray()) {
+            throw new IllegalStateException("Must be array: " + arrayType);
+        }
+        this.array = ArrayHelper.newArray(componentType, length);
+    }
+
+    NewArrayBuilder(Class<A> arrayType, TypeRef<E> componentType, int length) {
+        if (!arrayType.isArray()) {
+            throw new IllegalStateException("Must be array: " + arrayType);
+        }
+        this.array = ArrayHelper.newArray(componentType.getRawType(), length);
+    }
+
+    NewArrayBuilder(TypeRef<A> arrayType, Class<E> componentType, int length) {
+        // Cannot check generic array type!
+        this.array = ArrayHelper.newArray(componentType, length);
+    }
+
+    NewArrayBuilder(TypeRef<A> arrayType, TypeRef<E> componentType, int length) {
+        // Cannot check generic array type!
+        this.array = ArrayHelper.newArray(componentType.getRawType(), length);
     }
 
     public NewArrayBuilder<E, A> setEachElement(Function<Integer, E> eachElement) {
+        this.changeState();
         this.eachElement = eachElement;
         return this;
     }

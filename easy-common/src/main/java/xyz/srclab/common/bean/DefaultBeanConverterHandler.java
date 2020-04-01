@@ -14,6 +14,7 @@ import xyz.srclab.common.reflect.instance.InstanceHelper;
 import xyz.srclab.common.reflect.type.TypeHelper;
 import xyz.srclab.common.string.format.fastformat.FastFormat;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -49,6 +50,9 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     private Object convertClass(Object from, Class<?> to, BeanOperator beanOperator) {
+        if (to.isAssignableFrom(from.getClass())) {
+            return from;
+        }
         if (to.isAssignableFrom(String.class)) {
             return from.toString();
         }
@@ -204,7 +208,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         if (Iterable.class.isAssignableFrom(from.getClass())) {
             Iterable<Object> iterable = (Iterable<Object>) from;
             return ListHelper.immutableList(
-                    IterableHelper.castToList(iterable)
+                    IterableHelper.asList(iterable)
                             .stream()
                             .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
                             .collect(Collectors.toList())
@@ -215,17 +219,22 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     private Object convertToArray(Object from, Type toElementType, BeanOperator beanOperator) {
-        Class<?> arrayType = ArrayHelper.findArrayType(toElementType);
+        Class<?> componentType = TypeHelper.getRawClass(toElementType);
+        Class<?> arrayType = ArrayHelper.findArrayType(componentType);
         if (from.getClass().isArray()) {
-            return ArrayBuilder.map(from, arrayType)
-                    .setEachElement((i, o) -> o == null ? null : convert(o, toElementType, beanOperator))
+            return ArrayBuilder.newArray(arrayType, componentType, Array.getLength(from))
+                    .setEachElement(i -> {
+                        Object o = Array.get(from, i);
+                        return o == null ? null : convert(o, toElementType, beanOperator);
+                    })
                     .build();
         }
         if (Iterable.class.isAssignableFrom(from.getClass())) {
             Iterable<Object> iterable = (Iterable<Object>) from;
-            return ArrayBuilder.map(iterable, arrayType)
-                    .setEachElement((i, o) -> o == null ? null : convert(o, toElementType, beanOperator))
-                    .build();
+            List<Object> list = IterableHelper.asList(iterable);
+            return list.stream()
+                    .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
+                    .toArray(length -> ArrayHelper.newArray(componentType, length));
         }
         throw new UnsupportedOperationException(FastFormat.format(
                 "Cannot convert object {} to array of element type {}", from, toElementType));
@@ -243,7 +252,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         if (Iterable.class.isAssignableFrom(from.getClass())) {
             Iterable<Object> iterable = (Iterable<Object>) from;
             return SetHelper.immutableSet(
-                    IterableHelper.castToList(iterable)
+                    IterableHelper.asList(iterable)
                             .stream()
                             .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
                             .collect(Collectors.toSet())
