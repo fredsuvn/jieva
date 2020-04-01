@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.lang
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssert
+import test.xyz.srclab.common.doAssertEquals
 import xyz.srclab.common.lang.Computed
 import java.time.Duration
 
@@ -17,8 +17,8 @@ object ComputedTest {
         println(computed.get())
         println(computed.get())
         println(computed.get())
-        doAssert(computed.get(), 1)
-        doAssert(computed.refreshAndGet(), 2)
+        doAssertEquals(computed.get(), 1)
+        doAssertEquals(computed.refreshAndGet(), 2)
     }
 
     @Test
@@ -36,7 +36,7 @@ object ComputedTest {
         println(computed.get())
         println(computed.get())
         Thread.sleep(1000)
-        doAssert(computed.get(), 4)
-        doAssert(computed.refreshAndGet(), 5)
+        doAssertEquals(computed.get(), 4)
+        doAssertEquals(computed.refreshAndGet(), 5)
     }
 }

@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.lang
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssert
+import test.xyz.srclab.common.doAssertEquals
 import xyz.srclab.common.lang.Ref
 import xyz.srclab.common.lang.TypeRef
 
@@ -19,6 +19,6 @@ object TypeRefTest {
 
         val generic = D().type
         println(generic)
-        doAssert(generic, TypeRefTest::class.java.getDeclaredMethod("forGeneric").genericReturnType)
+        doAssertEquals(generic, TypeRefTest::class.java.getDeclaredMethod("forGeneric").genericReturnType)
     }
 }

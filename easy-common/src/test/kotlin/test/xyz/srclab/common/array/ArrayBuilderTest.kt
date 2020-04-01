@@ -1,8 +1,9 @@
 package test.xyz.srclab.common.array
 
-import org.testng.Assert
 import org.testng.annotations.Test
+import test.xyz.srclab.common.doAssertEquals
 import xyz.srclab.common.array.ArrayBuilder
+import xyz.srclab.common.array.ArrayHelper
 import xyz.srclab.common.lang.TypeRef
 
 object ArrayBuilderTest {
@@ -13,7 +14,13 @@ object ArrayBuilderTest {
             .fill(intArrayOf(1, 2, 3), Int::class.java)
             .setEachElement { i -> i * 100 }
             .build()
-        Assert.assertEquals(intArray, intArrayOf(0, 100, 200))
+        doAssertEquals(intArray, intArrayOf(0, 100, 200))
+
+        val stringArray = ArrayBuilder
+            .fill(arrayOf(A("000"), A("100"), A("200")), object : TypeRef<A<String>>() {})
+            .setEachElement { i -> A(i.toString() + "00") }
+            .build()
+        doAssertEquals(stringArray, arrayOf(A("000"), A("100"), A("200")))
     }
 
     @Test
@@ -22,13 +29,25 @@ object ArrayBuilderTest {
             .newArray(IntArray::class.java, Int::class.java, 3)
             .setEachElement { i -> i * 100 }
             .build()
-        Assert.assertEquals(intArray, intArrayOf(0, 100, 200))
+        doAssertEquals(intArray, intArrayOf(0, 100, 200))
 
-        val stringArray = ArrayBuilder
+        val rawTypeRefArray = ArrayBuilder
+            .newArray(ArrayHelper.findArrayType(A::class.java), object : TypeRef<A<String>>() {}, 3)
+            .setEachElement { i -> A(i.toString() + "00") }
+            .build()
+        doAssertEquals(rawTypeRefArray, arrayOf(A("000"), A("100"), A("200")))
+
+        val typeRefRaw = ArrayBuilder
+            .newArray(object : TypeRef<Array<A<String>>>() {}, A::class.java, 3)
+            .setEachElement { i -> A(i.toString() + "00") }
+            .build()
+        doAssertEquals(typeRefRaw, arrayOf(A("000"), A("100"), A("200")))
+
+        val typeRefTypeRefArray = ArrayBuilder
             .newArray(object : TypeRef<Array<A<String>>>() {}, object : TypeRef<A<String>>() {}, 3)
             .setEachElement { i -> A(i.toString() + "00") }
             .build()
-        Assert.assertEquals(stringArray, arrayOf(A("000"), A("100"), A("200")))
+        doAssertEquals(typeRefTypeRefArray, arrayOf(A("000"), A("100"), A("200")))
     }
 
     data class A<T>(val content: T)

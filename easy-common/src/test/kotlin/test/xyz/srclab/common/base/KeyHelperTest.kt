@@ -2,14 +2,14 @@ package test.xyz.srclab.common.base
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssert
+import test.xyz.srclab.common.doAssertEquals
 import xyz.srclab.common.base.KeyHelper
 
 object KeyHelperTest {
 
     @Test(dataProvider = "keyHelperDataProvider")
     fun testKeyHelper(actual: Any, expected: Any) {
-        doAssert(actual, expected)
+        doAssertEquals(actual, expected)
     }
 
     @DataProvider
