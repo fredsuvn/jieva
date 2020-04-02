@@ -17,6 +17,8 @@ public class TypeHelper {
 
     private static final Cache<Object, Type> typeCache = new ThreadLocalCache<>();
 
+    private static final Cache<Object, Type[]> typesCache = new ThreadLocalCache<>();
+
     public static boolean isBasic(Object any) {
         return any instanceof CharSequence
                 || any instanceof Number
@@ -31,7 +33,7 @@ public class TypeHelper {
 
     public static <T> Class<T> getRawClass(Type type) {
         return (Class<T>) typeCache.getNonNull(
-                buildTypeKey("getRawClass", type.toString()),
+                buildTypeKey(type, "getRawClass"),
                 k -> getRawClass0(type)
         );
     }
@@ -63,10 +65,21 @@ public class TypeHelper {
         return Object.class;
     }
 
+    public static Type[] getGenericTypes(ParameterizedType parameterizedType) {
+        return typesCache.getNonNull(buildTypeKey(
+                parameterizedType, "getGenericTypes"),
+                k -> getGenericTypes0(parameterizedType)
+        );
+    }
+
+    private static Type[] getGenericTypes0(ParameterizedType parameterizedType) {
+        return parameterizedType.getActualTypeArguments();
+    }
+
     @Nullable
     public static Type findGenericSuperclass(Class<?> cls, Class<?> target) {
         Type returned = typeCache.getNonNull(
-                buildTypeKey("findGenericSuperclass", cls, target),
+                buildTypeKey(cls, target, "findGenericSuperclass"),
                 k -> findGenericSuperclass0(cls, target)
         );
         return returned == NullType.INSTANCE ? null : returned;

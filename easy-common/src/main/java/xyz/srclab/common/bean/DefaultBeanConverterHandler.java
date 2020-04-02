@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,78 +54,12 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         if (to.isAssignableFrom(from.getClass())) {
             return from;
         }
-        if (to.isAssignableFrom(String.class)) {
-            return from.toString();
+        @Nullable Object basic = tryConvertToBasic(from, to);
+        if (basic != null) {
+            return basic;
         }
-        if (boolean.class.equals(to) || Boolean.class.equals(to)) {
-            return Boolean.valueOf(from.toString());
-        }
-        if (int.class.equals(to) || Integer.class.equals(to)) {
-            if (from instanceof Number) {
-                return ((Number) from).intValue();
-            }
-            return Integer.valueOf(from.toString());
-        }
-        if (long.class.equals(to) || Long.class.equals(to)) {
-            if (from instanceof Number) {
-                return ((Number) from).longValue();
-            }
-            return Long.valueOf(from.toString());
-        }
-        if (to.isAssignableFrom(Date.class)) {
-            try {
-                return DateUtils.parseDate(from.toString(),
-                        DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.toString());
-            } catch (ParseException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-        if (to.isAssignableFrom(LocalDateTime.class)) {
-            return LocalDateTime.parse(from.toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        }
-        if (to.isAssignableFrom(Instant.class)) {
-            return Instant.parse(from.toString());
-        }
-        if (char.class.equals(to) || Character.class.equals(to)) {
-            if (from instanceof Number) {
-                return (char) (((Number) from).intValue());
-            }
-            String fromString = from.toString();
-            if (fromString.length() == 1) {
-                return fromString.charAt(0);
-            }
-            throw new UnsupportedOperationException(
-                    FastFormat.format("Cannot convert object {} to type {}", from, to));
-        }
-        if (float.class.equals(to) || Float.class.equals(to)) {
-            if (from instanceof Number) {
-                return ((Number) from).floatValue();
-            }
-            return Float.valueOf(from.toString());
-        }
-        if (double.class.equals(to) || Double.class.equals(to)) {
-            if (from instanceof Number) {
-                return ((Number) from).doubleValue();
-            }
-            return Double.valueOf(from.toString());
-        }
-        if (short.class.equals(to) || Short.class.equals(to)) {
-            if (from instanceof Number) {
-                return ((Number) from).shortValue();
-            }
-            return Short.valueOf(from.toString());
-        }
-        if (BigDecimal.class.equals(to)) {
-            if (from instanceof BigInteger) {
-                return new BigDecimal((BigInteger) from);
-            }
-            return new BigDecimal(from.toString());
-        }
-        if (BigInteger.class.equals(to)) {
-            return new BigInteger(from.toString());
-        }
-        if (to.isAssignableFrom(Number.class)) {
-            return Double.valueOf(from.toString());
+        if (to.isArray()) {
+            return convertToArray(from, Object.class, beanOperator);
         }
         if (Map.class.equals(to)) {
             return convertToMap(from, Object.class, Object.class, beanOperator);
@@ -134,9 +69,6 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         }
         if (Set.class.equals(to) || Collection.class.equals(to)) {
             return convertToSet(from, Object.class, beanOperator);
-        }
-        if (to.isArray()) {
-            return convertToArray(from, Object.class, beanOperator);
         }
         return convertToBean(from, to, beanOperator);
     }
@@ -150,18 +82,18 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return convertToBean(from, rawType, beanOperator);
         }
         ParameterizedType parameterizedType = (ParameterizedType) to;
+        if (rawType.isArray()) {
+            return convertToArray(from, TypeHelper.getGenericTypes(parameterizedType)[0], beanOperator);
+        }
         if (Map.class.equals(rawType)) {
-            Type[] kv = parameterizedType.getActualTypeArguments();
+            Type[] kv = TypeHelper.getGenericTypes(parameterizedType);
             return convertToMap(from, kv[0], kv[1], beanOperator);
         }
         if (List.class.equals(rawType)) {
-            return convertToList(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
+            return convertToList(from, TypeHelper.getGenericTypes(parameterizedType)[0], beanOperator);
         }
         if (Set.class.equals(rawType) || Collection.class.equals(rawType)) {
-            return convertToSet(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
-        }
-        if (rawType.isArray()) {
-            return convertToArray(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
+            return convertToSet(from, TypeHelper.getGenericTypes(parameterizedType)[0], beanOperator);
         }
         return convertToBean(from, rawType, beanOperator);
     }
@@ -260,5 +192,89 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         }
         throw new UnsupportedOperationException(FastFormat.format(
                 "Cannot convert object {} to set of element type {}", from, toElementType));
+    }
+
+    @Nullable
+    private Object tryConvertToBasic(Object from, Class<?> to) {
+        if (String.class.equals(to) || CharSequence.class.equals(to)) {
+            return from.toString();
+        }
+        if (boolean.class.equals(to) || Boolean.class.equals(to)) {
+            return Boolean.valueOf(from.toString());
+        }
+        if (int.class.equals(to) || Integer.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).intValue();
+            }
+            return Integer.valueOf(from.toString());
+        }
+        if (long.class.equals(to) || Long.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).longValue();
+            }
+            return Long.valueOf(from.toString());
+        }
+        if (char.class.equals(to) || Character.class.equals(to)) {
+            if (from instanceof Number) {
+                return (char) (((Number) from).intValue());
+            }
+            String fromString = from.toString();
+            if (fromString.length() == 1) {
+                return fromString.charAt(0);
+            }
+            throw new UnsupportedOperationException(
+                    FastFormat.format("Cannot convert object {} to type {}", from, to));
+        }
+        if (float.class.equals(to) || Float.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).floatValue();
+            }
+            return Float.valueOf(from.toString());
+        }
+        if (double.class.equals(to) || Double.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).doubleValue();
+            }
+            return Double.valueOf(from.toString());
+        }
+        if (byte.class.equals(to) || Byte.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).byteValue();
+            }
+            return Byte.valueOf(from.toString());
+        }
+        if (short.class.equals(to) || Short.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).shortValue();
+            }
+            return Short.valueOf(from.toString());
+        }
+        if (BigDecimal.class.equals(to)) {
+            if (from instanceof BigInteger) {
+                return new BigDecimal((BigInteger) from);
+            }
+            return new BigDecimal(from.toString());
+        }
+        if (BigInteger.class.equals(to)) {
+            return new BigInteger(from.toString());
+        }
+        if (Date.class.equals(to)) {
+            try {
+                return DateUtils.parseDate(from.toString(),
+                        DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.toString());
+            } catch (ParseException e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+        if (LocalDateTime.class.equals(to)) {
+            return LocalDateTime.parse(from.toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        }
+        if (Instant.class.equals(to)) {
+            return Instant.parse(from.toString());
+        }
+        if (Duration.class.equals(to)) {
+            return Duration.parse(from.toString());
+        }
+        return null;
     }
 }

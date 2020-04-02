@@ -1,5 +1,6 @@
 package xyz.srclab.common.array;
 
+import xyz.srclab.annotation.WriteReturn;
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 
@@ -11,6 +12,96 @@ public class ArrayHelper {
 
     public static <A> A newArray(Class<?> componentType, int length) {
         return (A) Array.newInstance(componentType, length);
+    }
+
+    public static byte[] newArray(@WriteReturn byte[] array, int from, int to, EachByte each) {
+        if (from > to) {
+            throw new IllegalArgumentException("from > to");
+        }
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static char[] newArray(@WriteReturn char[] array, int from, int to, EachChar each) {
+        if (from > to) {
+            throw new IllegalArgumentException("from > to");
+        }
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static int[] newArray(@WriteReturn int[] array, int from, int to, EachInt each) {
+        if (from > to) {
+            throw new IllegalArgumentException("from > to");
+        }
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static long[] newArray(@WriteReturn long[] array, int from, int to, EachLong each) {
+        if (from > to) {
+            throw new IllegalArgumentException("from > to");
+        }
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static float[] newArray(@WriteReturn float[] array, int from, int to, EachFloat each) {
+        if (from > to) {
+            throw new IllegalArgumentException("from > to");
+        }
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static double[] newArray(@WriteReturn double[] array, int from, int to, EachDouble each) {
+        if (from > to) {
+            throw new IllegalArgumentException("from > to");
+        }
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static boolean[] newArray(@WriteReturn boolean[] array, int from, int to, EachBoolean each) {
+        if (from > to) {
+            throw new IllegalArgumentException("from > to");
+        }
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static short[] newArray(@WriteReturn short[] array, int from, int to, EachShort each) {
+        if (from > to) {
+            throw new IllegalArgumentException("from > to");
+        }
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static <T> T[] newArray(@WriteReturn T[] array, int from, int to, Each<T> each) {
+        if (from > to) {
+            throw new IllegalArgumentException("from > to");
+        }
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
     }
 
     public static Class<?> findArrayType(Class<?> elementType) {
@@ -26,5 +117,41 @@ public class ArrayHelper {
 
     private static Object buildArrayTypeKey(Class<?> cls, String typeScope) {
         return KeyHelper.buildKey(cls, typeScope);
+    }
+
+    public interface Each<T> {
+        T apply(int index);
+    }
+
+    public interface EachByte {
+        byte apply(int index);
+    }
+
+    public interface EachChar {
+        char apply(int index);
+    }
+
+    public interface EachInt {
+        int apply(int index);
+    }
+
+    public interface EachLong {
+        long apply(int index);
+    }
+
+    public interface EachFloat {
+        float apply(int index);
+    }
+
+    public interface EachDouble {
+        double apply(int index);
+    }
+
+    public interface EachBoolean {
+        boolean apply(int index);
+    }
+
+    public interface EachShort {
+        short apply(int index);
     }
 }

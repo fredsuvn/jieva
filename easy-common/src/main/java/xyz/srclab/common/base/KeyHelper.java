@@ -1,6 +1,8 @@
 package xyz.srclab.common.base;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.reflect.SignatureHelper;
 
 public class KeyHelper {
@@ -9,12 +11,9 @@ public class KeyHelper {
         if (ArrayUtils.isEmpty(args)) {
             return "";
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Object arg : args) {
-            stringBuilder.append(":");
-            stringBuilder.append(buildKey(arg));
-        }
-        return stringBuilder.toString();
+        Object[] keys = ArrayHelper.newArray(new String[args.length], 0, args.length,
+                i -> buildKey(args[i]));
+        return StringUtils.join(keys, ":");
     }
 
     public static Object buildKey(Object any) {

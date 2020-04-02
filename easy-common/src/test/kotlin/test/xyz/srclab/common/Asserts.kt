@@ -19,22 +19,25 @@ private fun toString(any: Any?): String {
     if (any is Array<*>) {
         return "[${StringUtils.join(any, ",")}]"
     }
+    if (any is ByteArray) {
+        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
+    }
+    if (any is CharArray) {
+        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
+    }
     if (any is IntArray) {
         return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
     }
     if (any is LongArray) {
         return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
     }
-    if (any is ByteArray) {
-        return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
-    }
-    if (any is BooleanArray) {
+    if (any is FloatArray) {
         return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
     }
     if (any is DoubleArray) {
         return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
     }
-    if (any is FloatArray) {
+    if (any is BooleanArray) {
         return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
     }
     if (any is ShortArray) {
