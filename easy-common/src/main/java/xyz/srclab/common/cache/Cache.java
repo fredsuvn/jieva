@@ -5,7 +5,7 @@ import xyz.srclab.common.collection.map.MapHelper;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
@@ -50,11 +50,11 @@ public interface Cache<K, V> {
     }
 
     default Map<K, @Nullable V> getAll(Iterable<K> keys) throws NoSuchElementException {
-        Map<K, V> map = new HashMap<>();
+        Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
             map.put(key, get(key));
         }
-        return MapHelper.immutableMap(map);
+        return MapHelper.immutable(map);
     }
 
     default Map<K, @Nullable V> getPresent(K... keys) throws NoSuchElementException {
@@ -62,14 +62,14 @@ public interface Cache<K, V> {
     }
 
     default Map<K, @Nullable V> getPresent(Iterable<K> keys) throws NoSuchElementException {
-        Map<K, V> map = new HashMap<>();
+        Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
             try {
                 map.put(key, get(key));
             } catch (NoSuchElementException ignored) {
             }
         }
-        return MapHelper.immutableMap(map);
+        return MapHelper.immutable(map);
     }
 
     @Nullable

@@ -10,13 +10,15 @@ public class MapHelper {
 
     public static <TK, TV, SK, SV> Map<TK, TV> map(
             Map<SK, SV> sourceMap, Function<SK, TK> keyMapper, Function<SV, TV> valueMapper) {
-        return sourceMap
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        e -> keyMapper.apply(e.getKey()),
-                        e -> valueMapper.apply(e.getValue())
-                ));
+        return immutable(
+                sourceMap
+                        .entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                e -> keyMapper.apply(e.getKey()),
+                                e -> valueMapper.apply(e.getValue())
+                        )))
+                ;
     }
 
     public static <K, V> void removeAll(Map<K, V> map, Iterable<? extends K> keys) {
@@ -25,7 +27,7 @@ public class MapHelper {
         }
     }
 
-    public static <K, V> Map<K, V> immutableMap(Map<? extends K, ? extends V> map) {
+    public static <K, V> Map<K, V> immutable(Map<? extends K, ? extends V> map) {
         return ImmutableMap.copyOf(map);
     }
 }

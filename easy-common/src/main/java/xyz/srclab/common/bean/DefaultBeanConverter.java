@@ -1,13 +1,10 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.annotation.concurrent.ThreadSafe;
-
 import java.lang.reflect.Type;
 
-@ThreadSafe
 public class DefaultBeanConverter implements BeanConverter {
 
-    private final BeanConverterHandler beanConverterHandler = new DefaultBeanConverterHandler();
+    private final BeanConverterHandler beanConverterHandler = BeanConverterHandler.DEFAULT;
 
     @Override
     public <T> T convert(Object from, Type to) {

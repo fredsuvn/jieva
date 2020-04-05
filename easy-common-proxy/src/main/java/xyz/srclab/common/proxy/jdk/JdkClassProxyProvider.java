@@ -8,13 +8,13 @@ import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.proxy.ClassProxy;
 import xyz.srclab.common.proxy.ClassProxyProvider;
 import xyz.srclab.common.reflect.method.MethodBody;
-import xyz.srclab.common.reflect.method.MethodInvoker;
+import xyz.srclab.common.reflect.method.MethodInvoker2;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
 
         private JdkClassProxy(Class<?> type, List<Pair<Predicate<Method>, MethodBody<?>>> predicatePairs) {
             this.type = type;
-            Map<Method, MethodBody<?>> map = new HashMap<>();
+            Map<Method, MethodBody<?>> map = new LinkedHashMap<>();
             Method[] methods = type.getMethods();
             for (Method method : methods) {
                 for (Pair<Predicate<Method>, MethodBody<?>> predicatePair : predicatePairs) {
@@ -73,7 +73,7 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
                     }
                 }
             }
-            this.methodMap = MapHelper.immutableMap(map);
+            this.methodMap = MapHelper.immutable(map);
         }
 
         @Override
@@ -85,7 +85,7 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
                     if (methodBody == null) {
                         return method.invoke(proxy, args);
                     }
-                    return methodBody.invoke(proxy, method, args, new MethodInvoker() {
+                    return methodBody.invoke(proxy, method, args, new MethodInvoker2() {
                         @Override
                         public Object invoke(Object object) {
                             try {

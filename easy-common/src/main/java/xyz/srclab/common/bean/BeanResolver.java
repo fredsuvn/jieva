@@ -1,20 +1,18 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.annotation.concurrent.ReturnThreadSafeDependOn;
-import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.annotation.concurrent.ThreadSafeDependOn;
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.builder.ProcessByHandlersBuilder;
 
+@Immutable
 public interface BeanResolver {
 
-    @ThreadSafe
     BeanResolver DEFAULT = new DefaultBeanResolver();
 
     static Builder newBuilder() {
         return new Builder();
     }
 
-    BeanDescriptor resolve(Object bean);
+    BeanClass resolve(Object bean);
 
     class Builder extends ProcessByHandlersBuilder<BeanResolver, BeanResolverHandler, Builder> {
 
@@ -22,19 +20,16 @@ public interface BeanResolver {
             return new Builder();
         }
 
-        @ReturnThreadSafeDependOn
         @Override
         public BeanResolver build() {
             return super.build();
         }
 
-        @ReturnThreadSafeDependOn
         @Override
         protected BeanResolver buildNew() {
             return new BeanResolverImpl(this);
         }
 
-        @ThreadSafeDependOn
         private static final class BeanResolverImpl implements BeanResolver {
 
             private final BeanResolverHandler[] handlers;
@@ -44,7 +39,7 @@ public interface BeanResolver {
             }
 
             @Override
-            public BeanDescriptor resolve(Object bean) {
+            public BeanClass resolve(Object bean) {
                 for (BeanResolverHandler handler : handlers) {
                     if (handler.supportBean(bean)) {
                         return handler.resolve(bean);

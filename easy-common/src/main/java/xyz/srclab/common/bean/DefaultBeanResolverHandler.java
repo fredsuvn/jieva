@@ -1,25 +1,22 @@
 package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.exception.ExceptionWrapper;
+import xyz.srclab.common.reflect.SignatureHelper;
+import xyz.srclab.common.reflect.invoke.InvokerHelper;
+import xyz.srclab.common.reflect.invoke.MethodInvoker;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
+import java.beans.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-@ThreadSafe
 public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
-    private static final Cache<Class<?>, BeanDescriptor> descriptorCache = new ThreadLocalCache<>();
+    private static final Cache<Class<?>, BeanClass> CACHE = new ThreadLocalCache<>();
 
     @Override
     public boolean supportBean(Object bean) {
@@ -27,13 +24,14 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
     }
 
     @Override
-    public BeanDescriptor resolve(Object bean) {
-        return descriptorCache.getNonNull(bean.getClass(), type -> {
+    public BeanClass resolve(Object bean) {
+        return CACHE.getNonNull(bean.getClass(), type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
-                return BeanDescriptor.newBuilder()
+                return BeanClassSupport.newBuilder()
                         .setType(type)
                         .setProperties(buildProperties(beanInfo.getPropertyDescriptors()))
+                        .setMethods(buildMethods(beanInfo.getMethodDescriptors()))
                         .build();
             } catch (IntrospectionException e) {
                 throw new ExceptionWrapper(e);
@@ -41,35 +39,44 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         });
     }
 
-    private Map<String, BeanPropertyDescriptor> buildProperties(PropertyDescriptor[] descriptors) {
-        Map<String, BeanPropertyDescriptor> map = new HashMap<>();
+    private Map<String, BeanProperty> buildProperties(PropertyDescriptor[] descriptors) {
+        Map<String, BeanProperty> map = new LinkedHashMap<>();
         for (PropertyDescriptor descriptor : descriptors) {
-            map.put(descriptor.getName(), new BeanPropertyDescriptorImpl(descriptor));
+            map.put(descriptor.getName(), new BeanPropertyImpl(descriptor));
         }
         return map;
     }
 
-    @ThreadSafe
-    private static final class BeanPropertyDescriptorImpl implements BeanPropertyDescriptor {
+    private Map<String, BeanMethod> buildMethods(MethodDescriptor[] descriptors) {
+        Map<String, BeanMethod> map = new LinkedHashMap<>();
+        for (MethodDescriptor descriptor : descriptors) {
+            BeanMethod beanMethod = new BeanMethodImpl(descriptor);
+            map.put(beanMethod.getSignature(), beanMethod);
+        }
+        return map;
+    }
+
+    private static final class BeanPropertyImpl implements BeanProperty {
 
         private final PropertyDescriptor descriptor;
         private final Type genericType;
 
-        private BeanPropertyDescriptorImpl(PropertyDescriptor descriptor) {
-            this.descriptor = descriptor;
-            this.genericType = findGenericType(descriptor);
-        }
+        private final @Nullable MethodInvoker getter;
+        private final @Nullable MethodInvoker setter;
 
-        private Type findGenericType(PropertyDescriptor descriptor) {
+        private BeanPropertyImpl(PropertyDescriptor descriptor) {
+            this.descriptor = descriptor;
             Method getter = descriptor.getReadMethod();
-            if (getter != null) {
-                return getter.getGenericReturnType();
-            }
             Method setter = descriptor.getWriteMethod();
-            if (setter == null) {
+            if (getter == null && setter == null) {
                 throw new IllegalStateException("Both getter and setter method are null: " + getName());
             }
-            return setter.getGenericParameterTypes()[0];
+            this.genericType = getter == null ?
+                    setter.getGenericParameterTypes()[0]
+                    :
+                    getter.getGenericReturnType();
+            this.getter = getter == null ? null : InvokerHelper.getMethodInvoker(getter);
+            this.setter = setter == null ? null : InvokerHelper.getMethodInvoker(setter);
         }
 
         @Override
@@ -89,7 +96,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
         @Override
         public boolean isReadable() {
-            return descriptor.getReadMethod() != null;
+            return getter != null;
         }
 
         @Nullable
@@ -98,19 +105,12 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
             if (!isReadable()) {
                 throw new UnsupportedOperationException("Property is not readable: " + descriptor);
             }
-            Method method = descriptor.getReadMethod();
-            try {
-                return method.invoke(bean);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            } catch (InvocationTargetException e) {
-                throw new ExceptionWrapper(e.getTargetException());
-            }
+            return getter.invoke(bean);
         }
 
         @Override
         public boolean isWriteable() {
-            return descriptor.getWriteMethod() != null;
+            return setter != null;
         }
 
         @Override
@@ -118,14 +118,60 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
             if (!isWriteable()) {
                 throw new UnsupportedOperationException("Property is not writeable: " + descriptor);
             }
-            Method method = descriptor.getWriteMethod();
-            try {
-                method.invoke(bean, value);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            } catch (InvocationTargetException e) {
-                throw new ExceptionWrapper(e.getTargetException());
-            }
+            setter.invoke(bean, value);
+        }
+    }
+
+    private static final class BeanMethodImpl implements BeanMethod {
+
+        private final Method method;
+        private final String signature;
+        private final MethodInvoker methodInvoker;
+
+        private BeanMethodImpl(MethodDescriptor methodDescriptor) {
+            this.method = methodDescriptor.getMethod();
+            this.signature = SignatureHelper.signMethod(method);
+            this.methodInvoker = InvokerHelper.getMethodInvoker(method);
+        }
+
+        @Override
+        public String getName() {
+            return method.getName();
+        }
+
+        @Override
+        public String getSignature() {
+            return signature;
+        }
+
+        @Override
+        public Class<?>[] getParameterTypes() {
+            return method.getParameterTypes();
+        }
+
+        @Override
+        public Type[] getGenericParameterTypes() {
+            return method.getGenericParameterTypes();
+        }
+
+        @Override
+        public int getParameterCount() {
+            return method.getParameterCount();
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return method.getReturnType();
+        }
+
+        @Override
+        public Type getGenericReturnType() {
+            return method.getGenericReturnType();
+        }
+
+        @Override
+        public @Nullable Object invoke(Object bean, Object... args) {
+            return methodInvoker.invoke(bean, args);
         }
     }
 }

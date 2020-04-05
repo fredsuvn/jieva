@@ -3,12 +3,17 @@ package xyz.srclab.common.array;
 import xyz.srclab.annotation.WriteReturn;
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
+import xyz.srclab.common.reflect.type.TypeHelper;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Type;
 
 public class ArrayHelper {
 
     private static final ThreadLocalCache<Object, Class<?>> arrayTypeCache = new ThreadLocalCache<>();
+
+    private static final ThreadLocalCache<Object, Type> genericComponentTypeCache = new ThreadLocalCache<>();
 
     public static <A> A newArray(Class<?> componentType, int length) {
         return (A) Array.newInstance(componentType, length);
@@ -180,6 +185,24 @@ public class ArrayHelper {
 
     private static Object buildArrayTypeKey(Class<?> cls, String typeScope) {
         return KeyHelper.buildKey(cls, typeScope);
+    }
+
+    public static Type getGenericComponentType(Type type) {
+        return genericComponentTypeCache.getNonNull(
+                buildGenericComponentTypeKey(type, "getGenericComponentType"),
+                o -> getGenericComponentType0(type)
+        );
+    }
+
+    private static Type getGenericComponentType0(Type type) {
+        if (type instanceof GenericArrayType) {
+            return ((GenericArrayType) type).getGenericComponentType();
+        }
+        return TypeHelper.getRawClass(type).getComponentType();
+    }
+
+    private static Object buildGenericComponentTypeKey(Type type, String typeScope) {
+        return KeyHelper.buildKey(type, typeScope);
     }
 
     public interface Each<T> {

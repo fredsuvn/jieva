@@ -1,8 +1,13 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotation.Immutable;
+
+@Immutable
 public interface BeanResolverHandler {
+
+    BeanResolverHandler DEFAULT = new DefaultBeanResolverHandler();
 
     boolean supportBean(Object bean);
 
-    BeanDescriptor resolve(Object bean);
+    BeanClass resolve(Object bean);
 }

@@ -22,7 +22,7 @@ public class ListHelper {
         return result;
     }
 
-    public static <E> List<E> immutableList(Iterable<? extends E> elements) {
+    public static <E> List<E> immutable(Iterable<? extends E> elements) {
         return ImmutableList.copyOf(elements);
     }
 }

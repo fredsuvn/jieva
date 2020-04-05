@@ -1,17 +1,17 @@
 package xyz.srclab.common.provider;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.base.EnvironmentHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ThreadSafe
 public abstract class AbstractProviderManager<T> implements ProviderManager<T> {
 
-    private final Map<String, T> providerMap = new ConcurrentHashMap<>();
+    private final @ThreadSafe Map<String, T> providerMap = new ConcurrentHashMap<>();
     private @Nullable String defaultProviderName;
     private @Nullable T defaultProvider;
 

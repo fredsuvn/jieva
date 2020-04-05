@@ -1,7 +1,7 @@
 package xyz.srclab.sample.bytecode;
 
 import org.apache.commons.lang3.ArrayUtils;
-import xyz.srclab.common.bean.BeanDescriptor;
+import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.bean.BeanHelper;
 import xyz.srclab.common.bytecode.bean.BeanClass;
 import xyz.srclab.common.bytecode.proxy.ProxyClass;
@@ -26,8 +26,8 @@ public class ByteCodeSample {
                 .addProperty("hello", String.class)
                 .build();
         A a = beanClass.newInstance();
-        BeanDescriptor beanDescriptor = BeanHelper.resolve(a);
-        beanDescriptor.getPropertyDescriptor("hello").setValue(a, "world");
+        BeanClass beanDescriptor = BeanHelper.resolve(a);
+        beanDescriptor.getProperty("hello").setValue(a, "world");
         Object value = a.getClass().getMethod("getHello").invoke(a);
         AssertHelper.printAssert(value, "world");
     }

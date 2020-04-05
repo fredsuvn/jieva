@@ -7,7 +7,7 @@ import xyz.srclab.common.lang.TypeRef;
 import java.lang.reflect.Array;
 import java.util.function.Function;
 
-public class NewArrayBuilder<E, A> extends CacheStateBuilder<A> implements ArrayBuilder<A> {
+public class NewArrayBuilder<A, E> extends CacheStateBuilder<A> implements ArrayBuilder<A> {
 
     private final A array;
     private @Nullable Function<Integer, E> eachElement;
@@ -41,7 +41,7 @@ public class NewArrayBuilder<E, A> extends CacheStateBuilder<A> implements Array
     }
 
     NewArrayBuilder(TypeRef<A> arrayType, Class<E> componentType, int length) {
-        // Cannot check generic array type!
+        
         this.array = ArrayHelper.newArray(componentType, length);
     }
 
@@ -50,7 +50,7 @@ public class NewArrayBuilder<E, A> extends CacheStateBuilder<A> implements Array
         this.array = ArrayHelper.newArray(componentType.getRawType(), length);
     }
 
-    public NewArrayBuilder<E, A> setEachElement(Function<Integer, E> eachElement) {
+    public NewArrayBuilder<A, E> setEachElement(Function<Integer, E> eachElement) {
         this.changeState();
         this.eachElement = eachElement;
         return this;

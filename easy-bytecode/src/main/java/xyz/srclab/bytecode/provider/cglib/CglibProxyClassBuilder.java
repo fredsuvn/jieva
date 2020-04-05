@@ -7,7 +7,7 @@ import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.reflect.method.MethodBody;
 import xyz.srclab.common.reflect.method.MethodDefinition;
-import xyz.srclab.common.reflect.method.MethodInvoker;
+import xyz.srclab.common.reflect.method.MethodInvoker2;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -83,7 +83,7 @@ final class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> i
 
     private MethodInterceptor buildMethodInterceptor(MethodInfo methodInfo) {
         MethodInterceptor methodInterceptor = (object, method1, args, proxy) ->
-                methodInfo.getBody().invoke(object, method1, args, new MethodInvoker() {
+                methodInfo.getBody().invoke(object, method1, args, new MethodInvoker2() {
                     @Override
                     public Object invoke(Object object) {
                         try {

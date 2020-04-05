@@ -3,7 +3,7 @@ package xyz.srclab.common.string.tostring;
 import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.bean.BeanDescriptor;
+import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.lang.CachedNonNull;
 import xyz.srclab.common.reflect.type.TypeHelper;
@@ -79,11 +79,11 @@ public class ToString extends CachedNonNull<String> {
 
     private void buildBeanToString(Object bean, StringBuilder buffer, ToStringContext context) {
         writeBeanStart(buffer);
-        BeanDescriptor beanDescriptor = beanOperator.resolve(bean);
+        BeanClass beanClass = beanOperator.resolve(bean);
         context.pushParent(bean);
         context.pushIndent();
         int[] count = {0};
-        beanDescriptor.getPropertyDescriptors().forEach((name, property) -> {
+        beanClass.getAllProperties().forEach((name, property) -> {
             if (!property.isReadable()) {
                 return;
             }

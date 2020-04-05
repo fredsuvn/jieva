@@ -6,7 +6,7 @@ import xyz.srclab.annotation.Nullable;
 import java.lang.reflect.Type;
 
 @Immutable
-public interface BeanPropertyDescriptor {
+public interface BeanProperty {
 
     String getName();
 

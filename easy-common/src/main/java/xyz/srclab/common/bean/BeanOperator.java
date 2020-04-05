@@ -1,22 +1,20 @@
 package xyz.srclab.common.bean;
 
 import com.sun.javafx.fxml.PropertyNotFoundException;
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.annotation.ReturnImmutable;
-import xyz.srclab.annotation.concurrent.ReturnThreadSafeDependOn;
-import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.annotation.concurrent.ThreadSafeDependOn;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.lang.TypeRef;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 
 import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Immutable
 public interface BeanOperator {
 
-    @ThreadSafe
     BeanOperator DEFAULT = new DefaultBeanOperator();
 
     static Builder newBuilder() {
@@ -27,21 +25,21 @@ public interface BeanOperator {
 
     BeanConverter getBeanConverter();
 
-    default BeanDescriptor resolve(Object bean) {
+    default BeanClass resolve(Object bean) {
         return getBeanResolver().resolve(bean);
     }
 
     default boolean containsProperty(Object bean, String propertyName) {
-        BeanDescriptor beanDescriptor = resolve(bean);
-        return beanDescriptor.containsProperty(propertyName);
+        BeanClass beanClass = resolve(bean);
+        return beanClass.containsProperty(propertyName);
     }
 
     @Nullable
     default Object getProperty(Object bean, String propertyName)
             throws PropertyNotFoundException, UnsupportedOperationException {
-        BeanDescriptor beanDescriptor = resolve(bean);
-        BeanPropertyDescriptor propertyDescriptor = beanDescriptor.getPropertyDescriptor(propertyName);
-        return propertyDescriptor.getValue(bean);
+        BeanClass beanClass = resolve(bean);
+        BeanProperty beanProperty = beanClass.getProperty(propertyName);
+        return beanProperty.getValue(bean);
     }
 
     @Nullable
@@ -68,97 +66,112 @@ public interface BeanOperator {
 
     default void setProperty(Object bean, String propertyName, @Nullable Object value)
             throws PropertyNotFoundException, UnsupportedOperationException {
-        BeanDescriptor beanDescriptor = resolve(bean);
-        BeanPropertyDescriptor propertyDescriptor = beanDescriptor.getPropertyDescriptor(propertyName);
-        propertyDescriptor.setValue(bean, value == null ?
-                null : convert(value, propertyDescriptor.getGenericType()));
+        BeanClass beanClass = resolve(bean);
+        BeanProperty beanProperty = beanClass.getProperty(propertyName);
+        beanProperty.setValue(bean, value == null ?
+                null : convert(value, beanProperty.getGenericType()));
     }
 
     default void copyProperties(Object source, Object dest) {
-        copyProperties(source, dest, SetPropertyAction.COMMON);
+        copyProperties(source, dest, EachProperty.DEFAULT);
     }
 
     default void copyPropertiesIgnoreNull(Object source, Object dest) {
-        copyProperties(source, dest, SetPropertyAction.COMMON_IGNORE_NULL);
+        copyProperties(source, dest, EachProperty.DEFAULT_IGNORE_NULL);
     }
 
-    default void copyProperties(Object source, Object dest, SetPropertyAction setPropertyAction) {
+    default void copyProperties(Object source, Object dest, EachProperty eachProperty) {
         if (source instanceof Map && dest instanceof Map) {
             Map src = (Map) source;
             Map des = (Map) dest;
             src.forEach((k, v) -> {
-                setPropertyAction.doSet(k, v, Object.class, value -> des.put(k, value), this);
+                if (k == null) {
+                    return;
+                }
+                eachProperty.apply(k, v, Object.class, value -> des.put(k, value), this);
             });
         } else if (source instanceof Map) {
             Map src = (Map) source;
-            BeanDescriptor destDescriptor = resolve(dest);
+            BeanClass destBean = resolve(dest);
             src.forEach((k, v) -> {
                 String propertyName = String.valueOf(k);
-                if (!destDescriptor.canWriteProperty(propertyName)) {
+                if (!destBean.canWriteProperty(propertyName)) {
                     return;
                 }
-                BeanPropertyDescriptor destPropertyDescriptor = destDescriptor.getPropertyDescriptor(propertyName);
-                setPropertyAction.doSet(
+                BeanProperty destProperty = destBean.getProperty(propertyName);
+                eachProperty.apply(
                         k,
                         v,
-                        destPropertyDescriptor.getGenericType(),
-                        value -> destPropertyDescriptor.setValue(dest, value),
+                        destProperty.getGenericType(),
+                        value -> destProperty.setValue(dest, value),
                         this
                 );
             });
         } else if (dest instanceof Map) {
-            BeanDescriptor sourceDescriptor = resolve(source);
+            BeanClass sourceBean = resolve(source);
             Map des = (Map) dest;
-            sourceDescriptor.getPropertyDescriptors().forEach((name, descriptor) -> {
-                if (!descriptor.isReadable()) {
+            sourceBean.getAllProperties().forEach((name, property) -> {
+                if (!property.isReadable()) {
                     return;
                 }
-                @Nullable Object sourceValue = descriptor.getValue(source);
-                setPropertyAction.doSet(
+                @Nullable Object sourceValue = property.getValue(source);
+                eachProperty.apply(
                         name, sourceValue, Object.class, value -> des.put(name, value), this);
             });
         } else {
-            BeanDescriptor sourceDescriptor = resolve(source);
-            BeanDescriptor destDescriptor = resolve(dest);
-            sourceDescriptor.getPropertyDescriptors().forEach((name, sourcePropertyDescriptor) -> {
-                if (!sourcePropertyDescriptor.isReadable()
-                        || !destDescriptor.canWriteProperty(name)) {
+            BeanClass sourceBean = resolve(source);
+            BeanClass destBean = resolve(dest);
+            sourceBean.getAllProperties().forEach((name, sourceProperty) -> {
+                if (!sourceProperty.isReadable()
+                        || !destBean.canWriteProperty(name)) {
                     return;
                 }
-                BeanPropertyDescriptor destPropertyDescriptor = destDescriptor.getPropertyDescriptor(name);
-                @Nullable Object sourceValue = sourcePropertyDescriptor.getValue(source);
-                setPropertyAction.doSet(
+                BeanProperty destProperty = destBean.getProperty(name);
+                @Nullable Object sourceValue = sourceProperty.getValue(source);
+                eachProperty.apply(
                         name,
                         sourceValue,
-                        destPropertyDescriptor.getGenericType(),
-                        value -> destPropertyDescriptor.setValue(dest, value),
+                        destProperty.getGenericType(),
+                        value -> destProperty.setValue(dest, value),
                         this
                 );
             });
         }
     }
 
-    default void populateProperties(Object source, Map dest) {
-        populateProperties(source, dest, SetPropertyAction.COMMON);
+    default <K, V> void populateProperties(Object source, Map<K, V> dest) {
+        populateProperties(
+                source, dest,
+                (name, value, setter, beanOperator) -> setter.set((K) name, (V) value));
     }
 
-    default void populatePropertiesIgnoreNull(Object source, Map dest) {
-        populateProperties(source, dest, SetPropertyAction.COMMON_IGNORE_NULL);
+    default <K, V> void populatePropertiesIgnoreNull(Object source, Map<K, V> dest) {
+        populateProperties(
+                source, dest,
+                (name, value, setter, beanOperator) -> {
+                    if (value != null) {
+                        setter.set((K) name, (V) value);
+                    }
+                });
     }
 
-    default void populateProperties(Object source, Map dest, SetPropertyAction setPropertyAction) {
+    default <K, V> void populateProperties(Object source, Map<K, V> dest, EachEntry<K, V> eachEntry) {
         if (source instanceof Map) {
-            Map src = (Map) source;
-            src.forEach((k, v) -> setPropertyAction.doSet(k, v, Object.class, value -> dest.put(k, value), this));
-        } else {
-            BeanDescriptor sourceDescriptor = resolve(source);
-            sourceDescriptor.getPropertyDescriptors().forEach((name, descriptor) -> {
-                if (!descriptor.isReadable()) {
+            Map<Object, Object> src = (Map<Object, Object>) source;
+            src.forEach((k, v) -> {
+                if (k == null) {
                     return;
                 }
-                @Nullable Object sourceValue = descriptor.getValue(source);
-                setPropertyAction.doSet(
-                        name, sourceValue, Object.class, value -> dest.put(name, value), this);
+                eachEntry.apply(k, v, dest::put, this);
+            });
+        } else {
+            BeanClass sourceBean = resolve(source);
+            sourceBean.getAllProperties().forEach((name, property) -> {
+                if (!property.isReadable()) {
+                    return;
+                }
+                @Nullable Object sourceValue = property.getValue(source);
+                eachEntry.apply(name, sourceValue, dest::put, this);
             });
         }
     }
@@ -181,12 +194,17 @@ public interface BeanOperator {
         return getBeanConverter().convert(from, to.getType(), this);
     }
 
-    TypeRef<Map<String, Object>> TO_MAP_TYPE_OF = new TypeRef<Map<String, Object>>() {
-    };
-
-    @ReturnImmutable
+    @Immutable
     default Map<String, Object> toMap(Object bean) {
-        return MapHelper.immutableMap(getBeanConverter().convert(bean, TO_MAP_TYPE_OF, this));
+        Map<String, Object> result = new LinkedHashMap<>();
+        resolve(bean).getAllProperties().forEach((name, property) -> {
+            if (!property.isReadable()) {
+                return;
+            }
+            @Nullable Object value = property.getValue(bean);
+            result.put(name, value);
+        });
+        return MapHelper.immutable(result);
     }
 
     class Builder extends CacheStateBuilder<BeanOperator> {
@@ -206,19 +224,16 @@ public interface BeanOperator {
             return this;
         }
 
-        @ReturnThreadSafeDependOn
         @Override
         public BeanOperator build() {
             return super.build();
         }
 
-        @ReturnThreadSafeDependOn
         @Override
         protected BeanOperator buildNew() {
             return new BeanOperatorImpl(this);
         }
 
-        @ThreadSafeDependOn
         private static final class BeanOperatorImpl implements BeanOperator {
 
             private final BeanResolver beanResolver;
@@ -241,7 +256,6 @@ public interface BeanOperator {
                 return beanConverter;
             }
 
-            @ThreadSafeDependOn
             private class BeanConverterProxy implements BeanConverter {
 
                 private final BeanConverter proxied;
@@ -263,15 +277,14 @@ public interface BeanOperator {
         }
     }
 
-    interface SetPropertyAction {
+    interface EachProperty {
 
-        SetPropertyAction COMMON =
-                (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator) -> {
-                    destPropertySetter.set(sourcePropertyValue == null ?
-                            null : beanOperator.convert(sourcePropertyValue, destPropertyType));
-                };
+        EachProperty DEFAULT =
+                (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator) ->
+                        destPropertySetter.set(sourcePropertyValue == null ?
+                                null : beanOperator.convert(sourcePropertyValue, destPropertyType));
 
-        SetPropertyAction COMMON_IGNORE_NULL =
+        EachProperty DEFAULT_IGNORE_NULL =
                 (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator) -> {
                     if (sourcePropertyValue == null) {
                         return;
@@ -280,14 +293,30 @@ public interface BeanOperator {
                     destPropertySetter.set(destPropertyValue);
                 };
 
-        void doSet(
-                Object sourcePropertyName, @Nullable Object sourcePropertyValue,
-                Type destPropertyType, PropertySetter destPropertySetter,
+        void apply(
+                Object sourcePropertyName,
+                @Nullable Object sourcePropertyValue,
+                Type destPropertyType,
+                PropertySetter destPropertySetter,
                 BeanOperator beanOperator
         );
     }
 
     interface PropertySetter {
         void set(@Nullable Object value);
+    }
+
+    interface EachEntry<K, V> {
+
+        void apply(
+                Object sourcePropertyName,
+                @Nullable Object sourcePropertyValue,
+                KeyValueSetter<K, V> keyValueSetter,
+                BeanOperator beanOperator
+        );
+    }
+
+    interface KeyValueSetter<K, V> {
+        void set(K key, @Nullable V value);
     }
 }

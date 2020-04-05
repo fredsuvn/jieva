@@ -1,10 +1,6 @@
 package xyz.srclab.common.bean;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.common.array.ArrayBuilder;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.list.ListHelper;
@@ -19,15 +15,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.ParseException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
-import java.util.stream.Collectors;
 
-@ThreadSafe
 public class DefaultBeanConverterHandler implements BeanConverterHandler {
 
     @Override
@@ -59,7 +52,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return basic;
         }
         if (to.isArray()) {
-            return convertToArray(from, Object.class, beanOperator);
+            return convertToArray(from, to, beanOperator);
         }
         if (Map.class.equals(to)) {
             return convertToMap(from, Object.class, Object.class, beanOperator);
@@ -83,7 +76,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         }
         ParameterizedType parameterizedType = (ParameterizedType) to;
         if (rawType.isArray()) {
-            return convertToArray(from, TypeHelper.getGenericTypes(parameterizedType)[0], beanOperator);
+            return convertToArray(from, to, beanOperator);
         }
         if (Map.class.equals(rawType)) {
             Type[] kv = TypeHelper.getGenericTypes(parameterizedType);
@@ -104,94 +97,91 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         return toInstance;
     }
 
-    private Map convertToMap(Object from, Type toKeyType, Type toValueType, BeanOperator beanOperator) {
-        Map map = new HashMap<>();
-        if (from instanceof Map) {
-            Map src = (Map) from;
-            src.forEach((k, v) -> {
-                Object key = convert(k, toKeyType, beanOperator);
-                Object value = convert(v, toValueType, beanOperator);
-                map.put(key, value);
-            });
-        } else {
-            BeanDescriptor sourceDescriptor = beanOperator.resolve(from);
-            sourceDescriptor.getPropertyDescriptors().forEach((name, descriptor) -> {
-                if (!descriptor.isReadable()) {
-                    return;
-                }
-                @Nullable Object sourceValue = descriptor.getValue(from);
-                Object key = convert(name, toKeyType, beanOperator);
-                @Nullable Object value = sourceValue == null ? null : convert(sourceValue, toValueType, beanOperator);
-                map.put(key, value);
-            });
-        }
-        return MapHelper.immutableMap(map);
+    private Map convertToMap(Object from, Type keyType, Type valueType, BeanOperator beanOperator) {
+        Map map = new LinkedHashMap<>();
+        beanOperator.populateProperties(from, map,
+                (sourcePropertyName, sourcePropertyValue, keyValueSetter, beanOperator1) -> {
+                    Object key = beanOperator.convert(sourcePropertyName, keyType);
+                    @Nullable Object value = sourcePropertyValue == null ?
+                            null : beanOperator.convert(sourcePropertyValue, valueType);
+                    keyValueSetter.set(key, value);
+                });
+        return MapHelper.immutable(map);
     }
 
-    private Object convertToList(Object from, Type toElementType, BeanOperator beanOperator) {
+    private Object convertToList(Object from, Type elementType, BeanOperator beanOperator) {
         if (from.getClass().isArray()) {
-            Object[] array = (Object[]) from;
-            return ListHelper.immutableList(
-                    Arrays.stream(array)
-                            .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
-                            .collect(Collectors.toList())
-            );
+            List<Object> result = new LinkedList<>();
+            putCollectionFromArray(from, elementType, beanOperator, result);
+            return ListHelper.immutable(result);
         }
-        if (Iterable.class.isAssignableFrom(from.getClass())) {
+        if (from instanceof Iterable) {
             Iterable<Object> iterable = (Iterable<Object>) from;
-            return ListHelper.immutableList(
-                    IterableHelper.asList(iterable)
-                            .stream()
-                            .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
-                            .collect(Collectors.toList())
-            );
+            List<Object> result = new LinkedList<>();
+            for (@Nullable Object o : iterable) {
+                result.add(o == null ? null : beanOperator.convert(o, elementType));
+            }
+            return ListHelper.immutable(result);
         }
         throw new UnsupportedOperationException(FastFormat.format(
-                "Cannot convert object {} to list of element type {}", from, toElementType));
+                "Cannot convert object {} to list of element type {}", from, elementType));
     }
 
-    private Object convertToArray(Object from, Type toElementType, BeanOperator beanOperator) {
-        Class<?> componentType = TypeHelper.getRawClass(toElementType);
-        Class<?> arrayType = ArrayHelper.findArrayType(componentType);
+    private Object convertToSet(Object from, Type elementType, BeanOperator beanOperator) {
         if (from.getClass().isArray()) {
-            return ArrayBuilder.newArray(arrayType, componentType, Array.getLength(from))
-                    .setEachElement(i -> {
-                        Object o = Array.get(from, i);
-                        return o == null ? null : convert(o, toElementType, beanOperator);
-                    })
-                    .build();
+            Set<Object> result = new LinkedHashSet<>();
+            putCollectionFromArray(from, elementType, beanOperator, result);
+            return SetHelper.immutable(result);
         }
-        if (Iterable.class.isAssignableFrom(from.getClass())) {
+        if (from instanceof Iterable) {
             Iterable<Object> iterable = (Iterable<Object>) from;
-            List<Object> list = IterableHelper.asList(iterable);
-            return list.stream()
-                    .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
-                    .toArray(length -> ArrayHelper.newArray(componentType, length));
+            Set<Object> result = new LinkedHashSet<>();
+            for (@Nullable Object o : iterable) {
+                result.add(o == null ? null : beanOperator.convert(o, elementType));
+            }
+            return SetHelper.immutable(result);
         }
         throw new UnsupportedOperationException(FastFormat.format(
-                "Cannot convert object {} to array of element type {}", from, toElementType));
+                "Cannot convert object {} to set of element type {}", from, elementType));
     }
 
-    private Object convertToSet(Object from, Type toElementType, BeanOperator beanOperator) {
+    private Object convertToArray(Object from, Type arrayType, BeanOperator beanOperator) {
+        Type componentType = ArrayHelper.getGenericComponentType(arrayType);
+        Class<?> rawComponentType = TypeHelper.getRawClass(componentType);
         if (from.getClass().isArray()) {
-            Object[] array = (Object[]) from;
-            return SetHelper.immutableSet(
-                    Arrays.stream(array)
-                            .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
-                            .collect(Collectors.toSet())
-            );
+            int arrayLength = Array.getLength(from);
+            Object resultArray = Array.newInstance(rawComponentType, arrayLength);
+            for (int i = 0; i < arrayLength; i++) {
+                @Nullable Object fromValue = Array.get(from, i);
+                @Nullable Object resultValue =
+                        fromValue == null ? null : beanOperator.convert(fromValue, componentType);
+                Array.set(resultArray, i, resultValue);
+            }
+            return resultArray;
         }
-        if (Iterable.class.isAssignableFrom(from.getClass())) {
-            Iterable<Object> iterable = (Iterable<Object>) from;
-            return SetHelper.immutableSet(
-                    IterableHelper.asList(iterable)
-                            .stream()
-                            .map(o -> o == null ? null : convert(o, toElementType, beanOperator))
-                            .collect(Collectors.toSet())
-            );
+        if (from instanceof Iterable) {
+            Collection<Object> collection = IterableHelper.asCollection((Iterable<Object>) from);
+            Object resultArray = Array.newInstance(rawComponentType, collection.size());
+            int i = 0;
+            for (@Nullable Object o : collection) {
+                @Nullable Object resultValue =
+                        o == null ? null : beanOperator.convert(o, componentType);
+                Array.set(resultArray, i, resultValue);
+                i++;
+            }
+            return resultArray;
         }
         throw new UnsupportedOperationException(FastFormat.format(
-                "Cannot convert object {} to set of element type {}", from, toElementType));
+                "Cannot convert object {} to array of element type {}", from, componentType));
+    }
+
+    private void putCollectionFromArray(
+            Object array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        int arrayLength = Array.getLength(array);
+        for (int i = 0; i < arrayLength; i++) {
+            @Nullable Object value = Array.get(array, i);
+            collection.add(value == null ? null : beanOperator.convert(value, elementType));
+        }
     }
 
     @Nullable
@@ -259,22 +249,83 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return new BigInteger(from.toString());
         }
         if (Date.class.equals(to)) {
-            try {
-                return DateUtils.parseDate(from.toString(),
-                        DateFormatUtils.ISO_8601_EXTENDED_DATETIME_FORMAT.toString());
-            } catch (ParseException e) {
-                throw new IllegalArgumentException(e);
-            }
+            return toDate(from);
         }
         if (LocalDateTime.class.equals(to)) {
-            return LocalDateTime.parse(from.toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            return toLocalDateTime(from);
         }
         if (Instant.class.equals(to)) {
-            return Instant.parse(from.toString());
+            return toInstant(from);
         }
         if (Duration.class.equals(to)) {
-            return Duration.parse(from.toString());
+            return toDuration(from);
+        }
+        if (ZonedDateTime.class.equals(to)) {
+            return toZonedDateTime(from);
+        }
+        if (OffsetDateTime.class.equals(to)) {
+            return toZonedDateTime(from).toOffsetDateTime();
         }
         return null;
+    }
+
+    private Date toDate(Object from) {
+        if (from instanceof Number) {
+            return new Date(((Number) from).longValue());
+        }
+        if (from instanceof Instant) {
+            return Date.from((Instant) from);
+        }
+        if (from instanceof TemporalAccessor) {
+            return Date.from(Instant.from((TemporalAccessor) from));
+        }
+        return Date.from(toZonedDateTime(from).toInstant());
+    }
+
+    private Instant toInstant(Object from) {
+        if (from instanceof Number) {
+            return Instant.ofEpochMilli(((Number) from).longValue());
+        }
+        if (from instanceof TemporalAccessor) {
+            return Instant.from((TemporalAccessor) from);
+        }
+        return toZonedDateTimeWithoutTemporal(from).toInstant();
+    }
+
+    private ZonedDateTime toZonedDateTime(Object from) {
+        if (from instanceof TemporalAccessor) {
+            return toZonedDateTimeWithTemporal((TemporalAccessor) from);
+        }
+        return toZonedDateTimeWithoutTemporal(from);
+    }
+
+    private ZonedDateTime toZonedDateTimeWithTemporal(TemporalAccessor temporalAccessor) {
+        if (temporalAccessor.isSupported(ChronoField.OFFSET_SECONDS)) {
+            return ZonedDateTime.from(temporalAccessor);
+        }
+        LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
+        return localDateTime.atZone(ZoneId.systemDefault());
+    }
+
+    private ZonedDateTime toZonedDateTimeWithoutTemporal(Object from) {
+        if (from instanceof Number) {
+            ZonedDateTime.ofInstant(Instant.ofEpochMilli((Long) from), ZoneId.systemDefault());
+        }
+        TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_DATE_TIME.parse(from.toString());
+        return toZonedDateTimeWithTemporal(temporalAccessor);
+    }
+
+    private LocalDateTime toLocalDateTime(Object from) {
+        if (from instanceof Number) {
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli((Long) from), ZoneId.systemDefault());
+        }
+        return LocalDateTime.parse(from.toString(), DateTimeFormatter.ISO_DATE_TIME);
+    }
+
+    private Duration toDuration(Object from) {
+        if (from instanceof Number) {
+            return Duration.ofMillis(((Number) from).longValue());
+        }
+        return Duration.parse(from.toString());
     }
 }

@@ -1,12 +1,12 @@
 package test.xyz.srclab.common.bean
 
-import xyz.srclab.common.bean.BeanPropertyDescriptor
+import xyz.srclab.common.bean.BeanProperty
 import java.lang.reflect.Type
 
-class CustomBeanPropertyDescriptor(
+class CustomBeanProperty(
     private val _name: String,
     private val _type: Class<*>
-) : BeanPropertyDescriptor {
+) : BeanProperty {
 
     override fun getName(): String {
         return _name

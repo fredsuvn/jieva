@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.annotation.ReturnImmutable;
 import xyz.srclab.common.lang.TypeRef;
 
 import java.lang.reflect.Type;
@@ -19,7 +19,7 @@ public class BeanHelper {
         return beanOperator.getBeanConverter();
     }
 
-    public static BeanDescriptor resolve(Object bean) {
+    public static BeanClass resolve(Object bean) {
         return beanOperator.resolve(bean);
     }
 
@@ -59,20 +59,20 @@ public class BeanHelper {
         beanOperator.copyPropertiesIgnoreNull(source, dest);
     }
 
-    public static void copyProperties(Object source, Object dest, BeanOperator.SetPropertyAction setPropertyAction) {
-        beanOperator.copyProperties(source, dest, setPropertyAction);
+    public static void copyProperties(Object source, Object dest, BeanOperator.EachProperty eachProperty) {
+        beanOperator.copyProperties(source, dest, eachProperty);
     }
 
-    public static void populateProperties(Object source, Map dest) {
+    public static <K, V> void populateProperties(Object source, Map<K, V> dest) {
         beanOperator.populateProperties(source, dest);
     }
 
-    public static void populatePropertiesIgnoreNull(Object source, Map dest) {
+    public static <K, V> void populatePropertiesIgnoreNull(Object source, Map<K, V> dest) {
         beanOperator.populatePropertiesIgnoreNull(source, dest);
     }
 
-    public static void populateProperties(Object source, Map dest, BeanOperator.SetPropertyAction setPropertyAction) {
-        beanOperator.populateProperties(source, dest, setPropertyAction);
+    public static <K, V> void populateProperties(Object source, Map<K, V> dest, BeanOperator.EachEntry<K, V> eachEntry) {
+        beanOperator.populateProperties(source, dest, eachEntry);
     }
 
     public static <T> T clone(T from) {
@@ -91,7 +91,7 @@ public class BeanHelper {
         return beanOperator.convert(from, to);
     }
 
-    @ReturnImmutable
+    @Immutable
     public static Map<String, Object> toMap(Object bean) {
         return beanOperator.toMap(bean);
     }

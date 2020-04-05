@@ -1,6 +1,6 @@
 package xyz.srclab.common.reflect.method;
 
-public interface MethodInvoker<T> {
+public interface MethodInvoker2<T> {
 
     T invoke(Object object);
 

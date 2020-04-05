@@ -27,5 +27,3 @@ test {
     useTestNG()
     include("**/*Test.class")
 }
-
-apply from: gradles.deployJar

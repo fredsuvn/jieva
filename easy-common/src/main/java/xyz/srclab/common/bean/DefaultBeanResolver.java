@@ -1,14 +1,11 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.annotation.concurrent.ThreadSafe;
-
-@ThreadSafe
 public class DefaultBeanResolver implements BeanResolver {
 
-    private final BeanResolverHandler beanResolverHandler = new DefaultBeanResolverHandler();
+    private final BeanResolverHandler beanResolverHandler = BeanResolverHandler.DEFAULT;
 
     @Override
-    public BeanDescriptor resolve(Object bean) {
+    public BeanClass resolve(Object bean) {
         return beanResolverHandler.resolve(bean);
     }
 }
