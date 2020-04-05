@@ -14,6 +14,69 @@ public class ArrayHelper {
         return (A) Array.newInstance(componentType, length);
     }
 
+    public static byte[] newArray(@WriteReturn byte[] array, EachByte each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static char[] newArray(@WriteReturn char[] array, EachChar each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static int[] newArray(@WriteReturn int[] array, EachInt each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static long[] newArray(@WriteReturn long[] array, EachLong each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static float[] newArray(@WriteReturn float[] array, EachFloat each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static double[] newArray(@WriteReturn double[] array, EachDouble each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static boolean[] newArray(@WriteReturn boolean[] array, EachBoolean each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static short[] newArray(@WriteReturn short[] array, EachShort each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
+    public static <T> T[] newArray(@WriteReturn T[] array, Each<T> each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return array;
+    }
+
     public static byte[] newArray(@WriteReturn byte[] array, int from, int to, EachByte each) {
         if (from > to) {
             throw new IllegalArgumentException("from > to");
