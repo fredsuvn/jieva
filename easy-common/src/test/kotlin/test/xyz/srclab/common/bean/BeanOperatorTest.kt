@@ -61,7 +61,7 @@ object BeanOperatorTest {
             }
 
             override fun resolve(bean: Any): BeanClass {
-                return BeanClass.newBuilder()
+                return BeanClassSupport.newBuilder()
                     .setType(bean.javaClass)
                     .setProperties(
                         mapOf(
@@ -150,23 +150,6 @@ object BeanOperatorTest {
 //        commonOperator.copyProperties(complexMap, newMap)
 //        println(newMap)
 //        doAssertEquals(newMap.toString(), complexMap.toString())
-    }
-
-    private fun testEqualBean(a: Any, aName: String, b: Any, bName: String, beanOperator: BeanOperator): String {
-        val propertiesB = beanOperator.resolve(b).allProperties
-        beanOperator.resolve(a).allProperties.forEach { name, property ->
-            if (!property.isReadable) {
-                return@forEach
-            }
-            val value = property.getValue(a)
-            val bProperty = propertiesB[name]
-            if (bProperty == null || !bProperty.isReadable) {
-                println("${aName}.${name} = ${value}, but $bName doesn't has property $name or is not readable")
-                return@forEach
-            }
-            val bValue = bProperty.getValue(b)
-            println("${aName}.${name} = ${value}, but $bName doesn't has property $name or is not readable")
-        }
     }
 
     @Test

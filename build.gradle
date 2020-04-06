@@ -33,6 +33,10 @@ allprojects { project ->
 subprojects { project ->
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
 def processProjectInfo(Project project) {
     if (project == rootProject) {
         // NOP
