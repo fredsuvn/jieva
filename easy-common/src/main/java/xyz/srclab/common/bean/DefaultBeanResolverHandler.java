@@ -8,7 +8,10 @@ import xyz.srclab.common.reflect.SignatureHelper;
 import xyz.srclab.common.reflect.invoke.InvokerHelper;
 import xyz.srclab.common.reflect.invoke.MethodInvoker;
 
-import java.beans.*;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
@@ -28,10 +31,11 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         return CACHE.getNonNull(bean.getClass(), type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
+                Method[] methods = type.getMethods();
                 return BeanClassSupport.newBuilder()
                         .setType(type)
                         .setProperties(buildProperties(beanInfo.getPropertyDescriptors()))
-                        .setMethods(buildMethods(beanInfo.getMethodDescriptors()))
+                        .setMethods(buildMethods(methods))
                         .build();
             } catch (IntrospectionException e) {
                 throw new ExceptionWrapper(e);
@@ -47,10 +51,10 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         return map;
     }
 
-    private Map<String, BeanMethod> buildMethods(MethodDescriptor[] descriptors) {
+    private Map<String, BeanMethod> buildMethods(Method[] methods) {
         Map<String, BeanMethod> map = new LinkedHashMap<>();
-        for (MethodDescriptor descriptor : descriptors) {
-            BeanMethod beanMethod = new BeanMethodImpl(descriptor);
+        for (Method method : methods) {
+            BeanMethod beanMethod = new BeanMethodImpl(method);
             map.put(beanMethod.getSignature(), beanMethod);
         }
         return map;
@@ -128,10 +132,10 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         private final String signature;
         private final MethodInvoker methodInvoker;
 
-        private BeanMethodImpl(MethodDescriptor methodDescriptor) {
-            this.method = methodDescriptor.getMethod();
-            this.signature = SignatureHelper.signMethod(method);
-            this.methodInvoker = InvokerHelper.getMethodInvoker(method);
+        private BeanMethodImpl(Method method) {
+            this.method = method;
+            this.signature = SignatureHelper.signMethod(this.method);
+            this.methodInvoker = InvokerHelper.getMethodInvoker(this.method);
         }
 
         @Override
