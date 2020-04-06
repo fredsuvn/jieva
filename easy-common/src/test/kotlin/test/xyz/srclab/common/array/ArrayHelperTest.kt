@@ -94,6 +94,7 @@ object ArrayHelperTest {
     @Test
     fun testFindArrayType() {
         doAssertEquals(ArrayHelper.findArrayType(Int::class.java), intArrayOf(1).javaClass)
+        doAssertEquals(ArrayHelper.findArrayType(String::class.java), arrayOf("1").javaClass)
     }
 
     data class A<T>(val content: T)
