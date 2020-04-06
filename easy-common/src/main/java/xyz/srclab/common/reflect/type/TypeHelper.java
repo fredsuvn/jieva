@@ -33,7 +33,7 @@ public class TypeHelper {
 
     public static <T> Class<T> getRawClass(Type type) {
         return (Class<T>) TYPE_CACHE.getNonNull(
-                buildTypeKey(type, "getRawClass"),
+                KeyHelper.buildKey(type, "getRawClass"),
                 k -> getRawClass0(type)
         );
     }
@@ -66,8 +66,8 @@ public class TypeHelper {
     }
 
     public static Type[] getGenericTypes(ParameterizedType parameterizedType) {
-        return TYPES_CACHE.getNonNull(buildTypeKey(
-                parameterizedType, "getGenericTypes"),
+        return TYPES_CACHE.getNonNull(
+                KeyHelper.buildKey(parameterizedType, "getGenericTypes"),
                 k -> getGenericTypes0(parameterizedType)
         );
     }
@@ -79,7 +79,7 @@ public class TypeHelper {
     @Nullable
     public static Type findGenericSuperclass(Class<?> cls, Class<?> target) {
         Type returned = TYPE_CACHE.getNonNull(
-                buildTypeKey(cls, target, "findGenericSuperclass"),
+                KeyHelper.buildKey(cls, target, "findGenericSuperclass"),
                 k -> findGenericSuperclass0(cls, target)
         );
         return returned == NullType.INSTANCE ? null : returned;
@@ -95,10 +95,6 @@ public class TypeHelper {
             current = currentClass.getGenericSuperclass();
         } while (current != null);
         return NullType.INSTANCE;
-    }
-
-    private static Object buildTypeKey(Object... args) {
-        return KeyHelper.buildKey(args);
     }
 
     private static final class NullType implements Type {

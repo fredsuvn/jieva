@@ -1,5 +1,6 @@
 package xyz.srclab.common.reflect.method;
 
+import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
@@ -12,12 +13,31 @@ import java.util.stream.Collectors;
 
 public class MethodHelper {
 
+    public static final Class<?>[] EMPTY_PARAMETER_TYPES = ArrayUtils.EMPTY_CLASS_ARRAY;
+
+    private static final Cache<Object, Method> METHOD_CACHE = new ThreadLocalCache<>();
+
     private static final Cache<Object, List<Method>> METHODS_CACHE = new ThreadLocalCache<>();
+
+    public static Method getMethod(Class<?> cls, String methodName, Class<?>[] parameterTypes) {
+        return METHOD_CACHE.getNonNull(
+                KeyHelper.buildKey(cls, methodName, parameterTypes),
+                k -> getMethod0(cls, methodName, parameterTypes)
+        );
+    }
+
+    private static Method getMethod0(Class<?> cls, String methodName, Class<?>[] parameterTypes) {
+        try {
+            return cls.getMethod(methodName, parameterTypes);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
     public static List<Method> getAllMethods(Class<?> cls) {
         return METHODS_CACHE.getNonNull(
-                buildAllMethodsKey(cls),
-                c -> getAllMethods0(cls)
+                KeyHelper.buildKey(cls, "getAllMethods"),
+                k -> getAllMethods0(cls)
         );
     }
 
@@ -33,8 +53,8 @@ public class MethodHelper {
 
     public static List<Method> getOverrideableMethods(Class<?> cls) {
         return METHODS_CACHE.getNonNull(
-                buildOverrideableMethodsKey(cls),
-                c -> getOverrideableMethods0(cls)
+                KeyHelper.buildKey(cls, "getOverrideableMethods"),
+                k -> getOverrideableMethods0(cls)
         );
     }
 
@@ -60,8 +80,8 @@ public class MethodHelper {
 
     public static List<Method> getPublicStaticMethods(Class<?> cls) {
         return METHODS_CACHE.getNonNull(
-                buildPublicStaticMethodsKey(cls),
-                c -> getPublicStaticMethods0(cls)
+                KeyHelper.buildKey(cls, "getPublicStaticMethods"),
+                k -> getPublicStaticMethods0(cls)
         );
     }
 
@@ -73,8 +93,8 @@ public class MethodHelper {
 
     public static List<Method> getPublicNonStaticMethods(Class<?> cls) {
         return METHODS_CACHE.getNonNull(
-                buildPublicNonStaticMethodsKey(cls),
-                c -> getPublicNonStaticMethods0(cls)
+                KeyHelper.buildKey(cls, "getPublicNonStaticMethods"),
+                kc -> getPublicNonStaticMethods0(cls)
         );
     }
 
@@ -82,26 +102,6 @@ public class MethodHelper {
         return Arrays.stream(cls.getMethods())
                 .filter(m -> Modifier.isPublic(m.getModifiers()) && !Modifier.isStatic(m.getModifiers()))
                 .collect(Collectors.toList());
-    }
-
-    private static Object buildAllMethodsKey(Class<?> cls) {
-        return buildClassMethodsKey(cls, "all");
-    }
-
-    private static Object buildOverrideableMethodsKey(Class<?> cls) {
-        return buildClassMethodsKey(cls, "overrideable");
-    }
-
-    private static Object buildPublicStaticMethodsKey(Class<?> cls) {
-        return buildClassMethodsKey(cls, "public static");
-    }
-
-    private static Object buildPublicNonStaticMethodsKey(Class<?> cls) {
-        return buildClassMethodsKey(cls, "public non-static");
-    }
-
-    private static Object buildClassMethodsKey(Class<?> cls, String methodsScope) {
-        return KeyHelper.buildKey(cls, methodsScope);
     }
 
     public static boolean canOverride(Method method) {
