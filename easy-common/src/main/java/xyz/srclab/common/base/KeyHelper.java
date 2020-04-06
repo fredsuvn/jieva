@@ -11,7 +11,7 @@ public class KeyHelper {
         if (ArrayUtils.isEmpty(args)) {
             return "";
         }
-        Object[] keys = ArrayHelper.newArray(new String[args.length], 0, args.length,
+        Object[] keys = ArrayHelper.newArray(new String[args.length],
                 i -> buildKey(args[i]));
         return StringUtils.join(keys, ":");
     }
