@@ -17,10 +17,12 @@ public class InvokerProviderManager extends AbstractProviderManager<InvokerProvi
 
     @Override
     protected InvokerProvider createDefaultProvider() {
-        return new DefaultInvokerProvider();
+        // MethodHandle is stupid.
+        //return new MethodHandleInvokerProvider();
+        return new ReflectedInvokerProvider();
     }
 
-    private static final class DefaultInvokerProvider implements InvokerProvider {
+    private static final class MethodHandleInvokerProvider implements InvokerProvider {
         @Override
         public MethodInvoker newMethodInvoker(Method method) {
             return new MethodHandleMethodInvoker(method);
@@ -29,6 +31,18 @@ public class InvokerProviderManager extends AbstractProviderManager<InvokerProvi
         @Override
         public ConstructorInvoker newConstructorInvoker(Constructor<?> constructor) {
             return new MethodHandleConstructorInvoker(constructor);
+        }
+    }
+
+    private static final class ReflectedInvokerProvider implements InvokerProvider {
+        @Override
+        public MethodInvoker newMethodInvoker(Method method) {
+            return new ReflectedMethodInvoker(method);
+        }
+
+        @Override
+        public ConstructorInvoker newConstructorInvoker(Constructor<?> constructor) {
+            return new ReflectedConstructorInvoker(constructor);
         }
     }
 }
