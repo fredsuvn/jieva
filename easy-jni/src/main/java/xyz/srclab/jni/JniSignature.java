@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 public class JniSignature {
 
     public static String sign(Class<?> cls) {
-        return SignatureHelper.sign(cls);
+        return SignatureHelper.signClass(cls);
     }
 
     public static String signMethod(Method method) {

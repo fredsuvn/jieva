@@ -4,12 +4,12 @@ import java.lang.reflect.Method;
 
 public class SignatureHelper {
 
-    public static String sign(Class<?> cls) {
+    public static String signClass(Class<?> cls) {
         if (cls.isPrimitive()) {
-            return signPrimitive(cls);
+            return signPrimitiveClass(cls);
         }
         if (cls.isArray()) {
-            return signArray(cls);
+            return signArrayClass(cls);
         }
         if (void.class.equals(cls)) {
             // Java doc doesn't say whether void is primitive,
@@ -19,7 +19,7 @@ public class SignatureHelper {
         return "L" + cls.getName().replaceAll("\\.", "/") + ";";
     }
 
-    public static String signPrimitive(Class<?> primitiveClass) {
+    public static String signPrimitiveClass(Class<?> primitiveClass) {
         if (void.class.equals(primitiveClass)) {
             // Note java doc doesn't say whether void is primitive,
             // but in performance it is, so here it is.
@@ -52,8 +52,8 @@ public class SignatureHelper {
         throw new IllegalArgumentException("Type is not primitive: " + primitiveClass);
     }
 
-    public static String signArray(Class<?> arrayClass) {
-        return "[" + sign(arrayClass.getComponentType());
+    public static String signArrayClass(Class<?> arrayClass) {
+        return "[" + signClass(arrayClass.getComponentType());
     }
 
     public static String signMethod(Method method) {
