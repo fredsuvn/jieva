@@ -3,7 +3,6 @@ package xyz.srclab.common.base;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.common.array.ArrayHelper;
-import xyz.srclab.common.reflect.SignatureHelper;
 
 public class KeyHelper {
 
@@ -18,7 +17,7 @@ public class KeyHelper {
 
     public static Object buildKey(Object any) {
         if (any instanceof Class) {
-            return SignatureHelper.signature((Class<?>) any);
+            return ((Class<?>) any).getName();
         }
         return String.valueOf(any);
     }

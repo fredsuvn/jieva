@@ -15,9 +15,9 @@ import java.util.Date;
 
 public class TypeHelper {
 
-    private static final Cache<Object, Type> typeCache = new ThreadLocalCache<>();
+    private static final Cache<Object, Type> TYPE_CACHE = new ThreadLocalCache<>();
 
-    private static final Cache<Object, Type[]> typesCache = new ThreadLocalCache<>();
+    private static final Cache<Object, Type[]> TYPES_CACHE = new ThreadLocalCache<>();
 
     public static boolean isBasic(Object any) {
         return any instanceof CharSequence
@@ -32,7 +32,7 @@ public class TypeHelper {
     }
 
     public static <T> Class<T> getRawClass(Type type) {
-        return (Class<T>) typeCache.getNonNull(
+        return (Class<T>) TYPE_CACHE.getNonNull(
                 buildTypeKey(type, "getRawClass"),
                 k -> getRawClass0(type)
         );
@@ -66,7 +66,7 @@ public class TypeHelper {
     }
 
     public static Type[] getGenericTypes(ParameterizedType parameterizedType) {
-        return typesCache.getNonNull(buildTypeKey(
+        return TYPES_CACHE.getNonNull(buildTypeKey(
                 parameterizedType, "getGenericTypes"),
                 k -> getGenericTypes0(parameterizedType)
         );
@@ -78,7 +78,7 @@ public class TypeHelper {
 
     @Nullable
     public static Type findGenericSuperclass(Class<?> cls, Class<?> target) {
-        Type returned = typeCache.getNonNull(
+        Type returned = TYPE_CACHE.getNonNull(
                 buildTypeKey(cls, target, "findGenericSuperclass"),
                 k -> findGenericSuperclass0(cls, target)
         );

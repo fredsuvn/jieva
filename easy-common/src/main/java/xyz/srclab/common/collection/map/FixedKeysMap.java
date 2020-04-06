@@ -9,13 +9,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Fast fixed-keys map, this map's keys are immutable, but values are mutable. That's means, you cannot put new key but
+ * Fixed-keys map, this map's keys are immutable, but values are mutable. That's means, you cannot put new key but
  * can change value of old key.
  * <p>
  * This map is thread-safe for reading (not for writing), fast, applicable to initialing scenes.
  */
 @ThreadSafe
-public class FastFixedKeysMap<K, V> implements Map<K, V> {
+public class FixedKeysMap<K, V> implements Map<K, V> {
 
     private static <K, V> Map<K, V> keysToMap(Iterable<K> keys) {
         Map<K, V> returned = new HashMap<>();
@@ -31,14 +31,14 @@ public class FastFixedKeysMap<K, V> implements Map<K, V> {
     private final Node<K, V>[] nodeCollection;
     private final int size;
 
-    public FastFixedKeysMap(Map<? extends K, ? extends V> data) {
+    public FixedKeysMap(Map<? extends K, ? extends V> data) {
         Pair<Object[], Node<K, V>[]> pair = computeNodes(data);
         this.nodes = pair.get0();
         this.nodeCollection = pair.get1();
         this.size = data.size();
     }
 
-    public FastFixedKeysMap(Iterable<? extends K> keys) {
+    public FixedKeysMap(Iterable<? extends K> keys) {
         this(keysToMap(keys));
     }
 
