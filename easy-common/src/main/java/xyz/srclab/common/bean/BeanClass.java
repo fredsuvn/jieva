@@ -38,10 +38,10 @@ public interface BeanClass {
     boolean containsMethod(String methodSignature);
 
     default BeanMethod getMethod(String methodName, Class<?>[] parameterTypes) throws BeanMethodNotFoundException {
-        return getMethod(SignatureHelper.signMethod(methodName, parameterTypes));
+        return getMethodBySignature(SignatureHelper.signMethod(methodName, parameterTypes));
     }
 
-    BeanMethod getMethod(String methodSignature) throws BeanMethodNotFoundException;
+    BeanMethod getMethodBySignature(String methodSignature) throws BeanMethodNotFoundException;
 
     /**
      * Keys are method signatures.

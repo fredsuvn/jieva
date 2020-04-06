@@ -1,6 +1,7 @@
 package test.xyz.srclab.common.bean
 
 import xyz.srclab.common.bean.BeanProperty
+import java.lang.reflect.Method
 import java.lang.reflect.Type
 
 class CustomBeanProperty(
@@ -20,12 +21,20 @@ class CustomBeanProperty(
         return _type
     }
 
+    override fun getReadMethod(): Method? {
+        TODO("Not yet implemented")
+    }
+
     override fun isReadable(): Boolean {
         return true
     }
 
     override fun isWriteable(): Boolean {
         return true
+    }
+
+    override fun getWriteMethod(): Method? {
+        TODO("Not yet implemented")
     }
 
     override fun getValue(bean: Any?): Any {

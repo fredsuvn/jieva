@@ -56,11 +56,11 @@ object BeanOperatorTest {
     private val customResolver = BeanResolver.newBuilder()
         .addHandler(object : BeanResolverHandler {
 
-            override fun supportBean(bean: Any): Boolean {
+            override fun supportBean(bean: Class<*>): Boolean {
                 return true
             }
 
-            override fun resolve(bean: Any): BeanClass {
+            override fun resolve(bean: Class<*>): BeanClass {
                 return BeanClassSupport.newBuilder()
                     .setType(bean.javaClass)
                     .setProperties(
@@ -77,7 +77,6 @@ object BeanOperatorTest {
                     )
                     .build()
             }
-
         })
         .build()
 
@@ -105,7 +104,7 @@ object BeanOperatorTest {
         some1.parentInt = 1
         some1.parentString = "some1.parentString"
         some1.some1String = "some1.some1String"
-        val beanDescriptor = customOperator.beanResolver.resolve(some1)
+        val beanDescriptor = customOperator.beanResolver.resolve(some1.javaClass)
         val hello = beanDescriptor.getProperty("hello")
         val helloValue = hello?.getValue(some1)
         println("helloValue: $helloValue")
@@ -126,7 +125,14 @@ object BeanOperatorTest {
         val b = B()
         b.clear()
         BeanHelper.copyProperties(a, b)
+        doAssertEquals(b.stringProperty, a.stringProperty)
+        doAssertEquals(b.intProperty, a.intProperty)
+        doAssertEquals(b.stringSet, setOf(1, 2, 3))
         doAssertEquals(b.listMap?.get(2), listOf(2, 3, 4))
+        doAssertEquals(
+            b.listMap2,
+            mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50))
+        )
 
 //        //bean to map
 //        val complexMap = mutableMapOf<Any, Any>()
@@ -195,6 +201,8 @@ object BeanOperatorTest {
         var stringMap: Map<String, String>? = mapOf("1" to "1", "2" to "2", "3" to "3")
         var listMap: Map<String, List<String>>? =
             mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
+        var listMap2: Map<in String, List<out String>>? =
+            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
 
         fun clear() {
             stringProperty = null
@@ -204,12 +212,13 @@ object BeanOperatorTest {
             stringSet = null
             stringMap = null
             listMap = null
+            listMap2 = null
         }
     }
 
     class B {
-        var stringProperty: String? = "A.stringProperty"
-        var intProperty = 998
+        var stringProperty: String? = "B.stringProperty"
+        var intProperty = 1998
         var intArray: Array<String>? = arrayOf("1", "2", "3")
         var stringArray: Array<Int>? = arrayOf(1, 2, 3)
         var stringList: List<Int>? = listOf(1, 2, 3)
@@ -217,6 +226,8 @@ object BeanOperatorTest {
         var stringMap: Map<Int, Int>? = mapOf(1 to 1, 2 to 2, 3 to 3)
         var listMap: Map<Int, List<Int>>? =
             mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5))
+        var listMap2: Map<out Int, List<out Int>>? =
+            mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50))
 
         fun clear() {
             stringProperty = null
@@ -226,6 +237,7 @@ object BeanOperatorTest {
             stringSet = null
             stringMap = null
             listMap = null
+            listMap2 = null
         }
     }
 }

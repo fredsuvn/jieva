@@ -7,7 +7,7 @@ public interface BeanResolverHandler {
 
     BeanResolverHandler DEFAULT = new DefaultBeanResolverHandler();
 
-    boolean supportBean(Object bean);
+    boolean supportBean(Class<?> beanClass);
 
-    BeanClass resolve(Object bean);
+    BeanClass resolve(Class<?> beanClass);
 }

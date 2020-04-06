@@ -89,7 +89,7 @@ public class BeanClassSupport {
             }
 
             @Override
-            public BeanMethod getMethod(String methodSignature) throws BeanMethodNotFoundException {
+            public BeanMethod getMethodBySignature(String methodSignature) throws BeanMethodNotFoundException {
                 if (!methodMap.containsKey(methodSignature)) {
                     throw new BeanMethodNotFoundException(methodSignature);
                 }

@@ -22,13 +22,13 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
     private static final Cache<Class<?>, BeanClass> CACHE = new ThreadLocalCache<>();
 
     @Override
-    public boolean supportBean(Object bean) {
-        return !(bean instanceof Map);
+    public boolean supportBean(Class<?> beanClass) {
+        return true;
     }
 
     @Override
-    public BeanClass resolve(Object bean) {
-        return CACHE.getNonNull(bean.getClass(), type -> {
+    public BeanClass resolve(Class<?> beanClass) {
+        return CACHE.getNonNull(beanClass, type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
                 Method[] methods = type.getMethods();
@@ -113,6 +113,11 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         }
 
         @Override
+        public @Nullable Method getReadMethod() {
+            return descriptor.getReadMethod();
+        }
+
+        @Override
         public boolean isWriteable() {
             return setter != null;
         }
@@ -123,6 +128,11 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
                 throw new UnsupportedOperationException("Property is not writeable: " + descriptor);
             }
             setter.invoke(bean, value);
+        }
+
+        @Override
+        public @Nullable Method getWriteMethod() {
+            return descriptor.getWriteMethod();
         }
     }
 
@@ -171,6 +181,11 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         @Override
         public Type getGenericReturnType() {
             return method.getGenericReturnType();
+        }
+
+        @Override
+        public Method getMethod() {
+            return method;
         }
 
         @Override

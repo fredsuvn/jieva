@@ -19,8 +19,8 @@ public class BeanHelper {
         return beanOperator.getBeanConverter();
     }
 
-    public static BeanClass resolve(Object bean) {
-        return beanOperator.resolve(bean);
+    public static BeanClass resolve(Class<?> beanClass) {
+        return beanOperator.resolve(beanClass);
     }
 
     public static boolean containsProperty(Object bean, String propertyName) {

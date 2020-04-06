@@ -25,19 +25,19 @@ public interface BeanOperator {
 
     BeanConverter getBeanConverter();
 
-    default BeanClass resolve(Object bean) {
-        return getBeanResolver().resolve(bean);
+    default BeanClass resolve(Class<?> beanClass) {
+        return getBeanResolver().resolve(beanClass);
     }
 
     default boolean containsProperty(Object bean, String propertyName) {
-        BeanClass beanClass = resolve(bean);
+        BeanClass beanClass = resolve(bean.getClass());
         return beanClass.containsProperty(propertyName);
     }
 
     @Nullable
     default Object getProperty(Object bean, String propertyName)
             throws PropertyNotFoundException, UnsupportedOperationException {
-        BeanClass beanClass = resolve(bean);
+        BeanClass beanClass = resolve(bean.getClass());
         BeanProperty beanProperty = beanClass.getProperty(propertyName);
         return beanProperty.getValue(bean);
     }
@@ -66,7 +66,7 @@ public interface BeanOperator {
 
     default void setProperty(Object bean, String propertyName, @Nullable Object value)
             throws PropertyNotFoundException, UnsupportedOperationException {
-        BeanClass beanClass = resolve(bean);
+        BeanClass beanClass = resolve(bean.getClass());
         BeanProperty beanProperty = beanClass.getProperty(propertyName);
         beanProperty.setValue(bean, value == null ?
                 null : convert(value, beanProperty.getGenericType()));
@@ -92,7 +92,7 @@ public interface BeanOperator {
             });
         } else if (source instanceof Map) {
             Map src = (Map) source;
-            BeanClass destBean = resolve(dest);
+            BeanClass destBean = resolve(dest.getClass());
             src.forEach((k, v) -> {
                 String propertyName = String.valueOf(k);
                 if (!destBean.canWriteProperty(propertyName)) {
@@ -108,7 +108,7 @@ public interface BeanOperator {
                 );
             });
         } else if (dest instanceof Map) {
-            BeanClass sourceBean = resolve(source);
+            BeanClass sourceBean = resolve(source.getClass());
             Map des = (Map) dest;
             sourceBean.getAllProperties().forEach((name, property) -> {
                 if (!property.isReadable()) {
@@ -119,8 +119,8 @@ public interface BeanOperator {
                         name, sourceValue, Object.class, value -> des.put(name, value), this);
             });
         } else {
-            BeanClass sourceBean = resolve(source);
-            BeanClass destBean = resolve(dest);
+            BeanClass sourceBean = resolve(source.getClass());
+            BeanClass destBean = resolve(dest.getClass());
             sourceBean.getAllProperties().forEach((name, sourceProperty) -> {
                 if (!sourceProperty.isReadable()
                         || !destBean.canWriteProperty(name)) {
@@ -165,7 +165,7 @@ public interface BeanOperator {
                 eachEntry.apply(k, v, dest::put, this);
             });
         } else {
-            BeanClass sourceBean = resolve(source);
+            BeanClass sourceBean = resolve(source.getClass());
             sourceBean.getAllProperties().forEach((name, property) -> {
                 if (!property.isReadable()) {
                     return;
@@ -197,7 +197,7 @@ public interface BeanOperator {
     @Immutable
     default Map<String, Object> toMap(Object bean) {
         Map<String, Object> result = new LinkedHashMap<>();
-        resolve(bean).getAllProperties().forEach((name, property) -> {
+        resolve(bean.getClass()).getAllProperties().forEach((name, property) -> {
             if (!property.isReadable()) {
                 return;
             }

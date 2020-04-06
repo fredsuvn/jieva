@@ -79,7 +79,7 @@ public class ToString extends CachedNonNull<String> {
 
     private void buildBeanToString(Object bean, StringBuilder buffer, ToStringContext context) {
         writeBeanStart(buffer);
-        BeanClass beanClass = beanOperator.resolve(bean);
+        BeanClass beanClass = beanOperator.resolve(bean.getClass());
         context.pushParent(bean);
         context.pushIndent();
         int[] count = {0};

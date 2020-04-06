@@ -72,7 +72,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         }
         Class<?> rawType = TypeHelper.getRawClass(to);
         if (!(to instanceof ParameterizedType)) {
-            return convertToBean(from, rawType, beanOperator);
+            return convertClass(from, rawType, beanOperator);
         }
         ParameterizedType parameterizedType = (ParameterizedType) to;
         if (rawType.isArray()) {
