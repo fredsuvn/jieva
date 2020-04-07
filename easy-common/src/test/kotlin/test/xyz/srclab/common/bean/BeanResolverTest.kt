@@ -123,7 +123,7 @@ object BeanResolverTest {
         .build()
 
     @Test
-    fun testCustom() {
+    fun testCustomResolver() {
         val customBeanClass = customBeanResolver.resolve(Object::class.java)
         doAssertEquals(customBeanClass.getProperty("1").getValue(""), 1)
         customBeanClass.getProperty("1").setValue("1", "222")

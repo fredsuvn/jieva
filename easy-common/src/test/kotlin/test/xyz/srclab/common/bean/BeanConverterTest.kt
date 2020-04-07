@@ -3,24 +3,37 @@ package test.xyz.srclab.common.bean
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 import test.xyz.srclab.common.doAssertEquals
+import test.xyz.srclab.common.doExpectThrowable
 import xyz.srclab.common.bean.BeanConverter
 import xyz.srclab.common.bean.BeanConverterHandler
 import xyz.srclab.common.bean.BeanOperator
+import xyz.srclab.common.lang.TypeRef
 import xyz.srclab.common.time.TimeHelper
 import java.lang.reflect.Type
+import java.math.BigDecimal
 import java.time.*
 import java.util.*
 
 object BeanConverterTest {
 
-    @Test(dataProvider = "testConvertBasicData")
+    @Test(dataProvider = "testConvertData")
     fun testConvertBasic(from: Any, to: Class<*>, expected: Any) {
         val converter = BeanConverter.DEFAULT
+        val operator = BeanOperator.DEFAULT
         doAssertEquals(converter.convert(from, to), expected)
+        doAssertEquals(converter.convert(from, to, operator), expected)
+    }
+
+    @Test(dataProvider = "testConvertData")
+    fun testConvertTypeRef(from: Any, to: Class<*>, expected: Any) {
+        val converter = BeanConverter.DEFAULT
+        val operator = BeanOperator.DEFAULT
+        doAssertEquals(converter.convert(from, TypeRef.with(to)), expected)
+        doAssertEquals(converter.convert(from, TypeRef.with(to), operator), expected)
     }
 
     @DataProvider
-    fun testConvertBasicData(): Array<Array<*>> {
+    fun testConvertData(): Array<Array<*>> {
         val myDateString = "2001-04-25T16:10:00"
 //        val myDateFormatString = "yyyy-MM-dd'T'mm:hh:ss"
         val nowMillis = TimeHelper.nowMillis()
@@ -56,9 +69,10 @@ object BeanConverterTest {
     }
 
     val customBeanConverter = BeanConverter.newBuilder()
+        .setBeanOperator(BeanOperator.DEFAULT)
         .addHandler(object : BeanConverterHandler {
             override fun supportConvert(from: Any, to: Type, beanOperator: BeanOperator): Boolean {
-                return true
+                return from is Int || from is String
             }
 
             override fun convert(from: Any, to: Type, beanOperator: BeanOperator): Any {
@@ -78,7 +92,13 @@ object BeanConverterTest {
 
     @Test
     fun testCustomConverter() {
+        val operator = BeanOperator.DEFAULT
         doAssertEquals(customBeanConverter.convert("s", String::class.java), "6")
+        doAssertEquals(customBeanConverter.convert("s", String::class.java, operator), "6")
         doAssertEquals(customBeanConverter.convert(9, Int::class.java), 9)
+        doAssertEquals(customBeanConverter.convert(9, Int::class.java, operator), 9)
+        doExpectThrowable(UnsupportedOperationException::class.java) {
+            customBeanConverter.convert(BigDecimal.ONE, Object::class.java)
+        }
     }
 }

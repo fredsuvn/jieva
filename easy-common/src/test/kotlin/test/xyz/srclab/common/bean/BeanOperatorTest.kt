@@ -255,7 +255,7 @@ object BeanOperatorTest {
         .build()
 
     @Test
-    fun testCustom() {
+    fun testCustomOperator() {
         val a = A()
         val map = mutableMapOf<String, Object>()
         customBeanOperator.copyProperties(a, map)

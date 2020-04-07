@@ -67,6 +67,38 @@ public interface BeanConverter {
             }
 
             @Override
+            public Object convert(Object from, Class<?> to) {
+                return convert(from, to, beanOperator);
+            }
+
+            @Override
+            public Object convert(Object from, Class<?> to, BeanOperator beanOperator) {
+                for (BeanConverterHandler handler : handlers) {
+                    if (handler.supportConvert(from, to, beanOperator)) {
+                        return handler.convert(from, to, beanOperator);
+                    }
+                }
+                throw new UnsupportedOperationException(
+                        FastFormat.format("Cannot convert object from {} to {}", from, to));
+            }
+
+            @Override
+            public Object convert(Object from, TypeRef<?> to) {
+                return convert(from, to, beanOperator);
+            }
+
+            @Override
+            public Object convert(Object from, TypeRef<?> to, BeanOperator beanOperator) {
+                for (BeanConverterHandler handler : handlers) {
+                    if (handler.supportConvert(from, to, beanOperator)) {
+                        return handler.convert(from, to, beanOperator);
+                    }
+                }
+                throw new UnsupportedOperationException(
+                        FastFormat.format("Cannot convert object from {} to {}", from, to));
+            }
+
+            @Override
             public Object convert(Object from, Type to) {
                 return convert(from, to, beanOperator);
             }
