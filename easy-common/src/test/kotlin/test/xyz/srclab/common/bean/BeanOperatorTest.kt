@@ -2,11 +2,8 @@ package test.xyz.srclab.common.bean
 
 import org.testng.annotations.Test
 import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.model.ComplexModel
-import test.xyz.srclab.common.model.SomeClass1
-import test.xyz.srclab.common.model.SomeClass2
+import test.xyz.srclab.common.doExpectThrowable
 import xyz.srclab.common.bean.*
-import java.lang.reflect.Type
 
 object BeanOperatorTest {
 
@@ -265,6 +262,36 @@ object BeanOperatorTest {
         doAssertEquals(map["1"], 9)
         val c = customBeanOperator.convert<String>("", String::class.java)
         doAssertEquals(c, "6")
+    }
+
+    @Test
+    fun testEmptyOperator() {
+        doExpectThrowable(IllegalStateException::class.java) {
+            BeanClassSupport.newBuilder().build()
+        }
+
+        val emptyBeanOperator = BeanOperator.newBuilder()
+            .setBeanConverter(BeanConverter.DEFAULT)
+            .setBeanResolver(
+                BeanResolver.newBuilder()
+                    .addHandlers(
+                        object : BeanResolverHandler {
+                            override fun supportBean(beanClass: Class<*>): Boolean {
+                                return true;
+                            }
+
+                            override fun resolve(beanClass: Class<*>): BeanClass {
+                                return BeanClassSupport.newBuilder()
+                                    .setType(Object::class.java)
+                                    .build()
+                            }
+                        }
+                    )
+                    .build()
+            )
+            .build()
+        val emptyBeanClass = emptyBeanOperator.resolve(Object::class.java);
+        doAssertEquals(emptyBeanClass.type, Object::class.java)
     }
 
     class A {

@@ -1,6 +1,8 @@
 package xyz.srclab.common.collection.iterable;
 
 import org.apache.commons.collections4.IterableUtils;
+import xyz.srclab.annotation.Immutable;
+import xyz.srclab.common.collection.set.SetHelper;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,11 +26,12 @@ public class IterableHelper {
                 (Set<E>) iterable : toSet(iterable);
     }
 
+    @Immutable
     private static <E> Set<E> toSet(Iterable<E> iterable) {
         Set<E> set = new HashSet<>();
         for (E e : iterable) {
             set.add(e);
         }
-        return set;
+        return SetHelper.immutable(set);
     }
 }

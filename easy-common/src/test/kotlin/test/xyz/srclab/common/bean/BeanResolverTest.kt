@@ -5,7 +5,6 @@ import test.xyz.srclab.common.doAssertEquals
 import test.xyz.srclab.common.doExpectThrowable
 import xyz.srclab.common.bean.*
 import xyz.srclab.common.reflect.SignatureHelper
-import java.lang.UnsupportedOperationException
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 
@@ -19,6 +18,11 @@ object BeanResolverTest {
         val readProperty = beanClass.getProperty("read")
         doAssertEquals(beanClass.canReadProperty("read"), true)
         doAssertEquals(beanClass.canWriteProperty("read"), false)
+        doAssertEquals(beanClass.containsProperty("read"), true)
+        doAssertEquals(beanClass.containsProperty("read0"), false)
+        doExpectThrowable(BeanPropertyNotFoundException::class.java) {
+            beanClass.getProperty("read0")
+        }
         doAssertEquals(readProperty.getValue(a), a.read)
         doExpectThrowable(UnsupportedOperationException::class.java) {
             readProperty.setValue(a, "read2")
@@ -40,8 +44,20 @@ object BeanResolverTest {
             e.key
         }.toSet()
         doAssertEquals(propertyNames, setOf("class", "read", "www", "xyz"))
+        val readablePropertyNames = beanClass.readableProperties.map { e ->
+            e.key
+        }.toSet()
+        doAssertEquals(readablePropertyNames, setOf("class", "read", "www"))
+        val writeablePropertyNames = beanClass.writeableProperties.map { e ->
+            e.key
+        }.toSet()
+        doAssertEquals(writeablePropertyNames, setOf("www", "xyz"))
 
         val realMethod = A::class.java.getMethod("someMethod", String::class.java)
+        doExpectThrowable(BeanMethodNotFoundException::class.java) {
+            beanClass.getMethod("someMethod0")
+        }
+        doAssertEquals(beanClass.allMethods.contains(SignatureHelper.signMethod(realMethod)), true)
         doAssertEquals(beanClass.containsMethod("someMethod", String::class.java), true)
         doAssertEquals(beanClass.containsMethodBySignature(SignatureHelper.signMethod(realMethod)), true)
         val someMethod = beanClass.getMethod("someMethod", String::class.java)

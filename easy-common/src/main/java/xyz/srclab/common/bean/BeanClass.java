@@ -21,6 +21,12 @@ public interface BeanClass {
     @Immutable
     Map<String, BeanProperty> getAllProperties();
 
+    @Immutable
+    Map<String, BeanProperty> getReadableProperties();
+
+    @Immutable
+    Map<String, BeanProperty> getWriteableProperties();
+
     default boolean containsMethod(String methodName, Class<?>... parameterTypes) {
         return containsMethodBySignature(SignatureHelper.signMethod(methodName, parameterTypes));
     }

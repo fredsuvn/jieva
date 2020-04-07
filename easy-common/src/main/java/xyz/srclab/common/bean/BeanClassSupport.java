@@ -47,6 +47,8 @@ public class BeanClassSupport {
 
             private final Class<?> type;
             private final Map<String, BeanProperty> propertyMap;
+            private final Map<String, BeanProperty> readablePropertyMap;
+            private final Map<String, BeanProperty> writeablePropertyMap;
             private final Map<String, BeanMethod> methodMap;
 
             private BeanClassImpl(BeanClassBuilder builder) {
@@ -56,6 +58,8 @@ public class BeanClassSupport {
                 this.type = builder.type;
                 this.propertyMap = builder.propertyMap == null ?
                         Collections.emptyMap() : MapHelper.immutable(builder.propertyMap);
+                this.readablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isReadable());
+                this.writeablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isWriteable());
                 this.methodMap = builder.methodMap == null ?
                         Collections.emptyMap() : MapHelper.immutable(builder.methodMap);
             }
@@ -95,6 +99,16 @@ public class BeanClassSupport {
             @Override
             public @Immutable Map<String, BeanProperty> getAllProperties() {
                 return propertyMap;
+            }
+
+            @Override
+            public @Immutable Map<String, BeanProperty> getReadableProperties() {
+                return readablePropertyMap;
+            }
+
+            @Override
+            public @Immutable Map<String, BeanProperty> getWriteableProperties() {
+                return writeablePropertyMap;
             }
 
             @Override

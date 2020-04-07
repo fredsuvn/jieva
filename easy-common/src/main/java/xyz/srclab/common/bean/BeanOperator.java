@@ -110,10 +110,7 @@ public interface BeanOperator {
         } else if (dest instanceof Map) {
             BeanClass sourceBean = resolve(source.getClass());
             Map des = (Map) dest;
-            sourceBean.getAllProperties().forEach((name, property) -> {
-                if (!property.isReadable()) {
-                    return;
-                }
+            sourceBean.getReadableProperties().forEach((name, property) -> {
                 @Nullable Object sourceValue = property.getValue(source);
                 eachProperty.apply(
                         name, sourceValue, Object.class, value -> des.put(name, value), this);
@@ -121,9 +118,8 @@ public interface BeanOperator {
         } else {
             BeanClass sourceBean = resolve(source.getClass());
             BeanClass destBean = resolve(dest.getClass());
-            sourceBean.getAllProperties().forEach((name, sourceProperty) -> {
-                if (!sourceProperty.isReadable()
-                        || !destBean.canWriteProperty(name)) {
+            sourceBean.getReadableProperties().forEach((name, sourceProperty) -> {
+                if (!destBean.canWriteProperty(name)) {
                     return;
                 }
                 BeanProperty destProperty = destBean.getProperty(name);
