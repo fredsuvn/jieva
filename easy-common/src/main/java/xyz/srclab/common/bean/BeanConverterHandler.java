@@ -20,13 +20,13 @@ public interface BeanConverterHandler {
         return supportConvert(from, to.getType(), beanOperator);
     }
 
-    <T> T convert(Object from, Type to, BeanOperator beanOperator);
+    Object convert(Object from, Type to, BeanOperator beanOperator);
 
-    default <T> T convert(Object from, Class<T> to, BeanOperator beanOperator) {
+    default Object convert(Object from, Class<?> to, BeanOperator beanOperator) {
         return convert(from, (Type) to, beanOperator);
     }
 
-    default <T> T convert(Object from, TypeRef<T> to, BeanOperator beanOperator) {
+    default Object convert(Object from, TypeRef<?> to, BeanOperator beanOperator) {
         return convert(from, to.getType(), beanOperator);
     }
 }

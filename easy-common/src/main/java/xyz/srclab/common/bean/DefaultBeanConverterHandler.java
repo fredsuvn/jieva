@@ -34,13 +34,13 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     @Override
-    public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
-        return (T) convertType(from, to, beanOperator);
+    public Object convert(Object from, Type to, BeanOperator beanOperator) {
+        return convertType(from, to, beanOperator);
     }
 
     @Override
-    public <T> T convert(Object from, Class<T> to, BeanOperator beanOperator) {
-        return (T) convertClass(from, to, beanOperator);
+    public Object convert(Object from, Class<?> to, BeanOperator beanOperator) {
+        return convertClass(from, to, beanOperator);
     }
 
     private Object convertClass(Object from, Class<?> to, BeanOperator beanOperator) {
