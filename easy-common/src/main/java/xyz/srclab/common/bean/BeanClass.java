@@ -12,19 +12,9 @@ public interface BeanClass {
 
     boolean containsProperty(String propertyName);
 
-    default boolean canReadProperty(String propertyName) {
-        if (!containsProperty(propertyName)) {
-            return false;
-        }
-        return getProperty(propertyName).isReadable();
-    }
+    boolean canReadProperty(String propertyName);
 
-    default boolean canWriteProperty(String propertyName) {
-        if (!containsProperty(propertyName)) {
-            return false;
-        }
-        return getProperty(propertyName).isWriteable();
-    }
+    boolean canWriteProperty(String propertyName);
 
     BeanProperty getProperty(String propertyName) throws BeanPropertyNotFoundException;
 

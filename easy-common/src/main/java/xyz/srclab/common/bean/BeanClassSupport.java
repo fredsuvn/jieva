@@ -71,6 +71,20 @@ public class BeanClassSupport {
             }
 
             @Override
+            public boolean canReadProperty(String propertyName) {
+                return propertyMap.containsKey(propertyName)
+                        &&
+                        propertyMap.get(propertyName).isReadable();
+            }
+
+            @Override
+            public boolean canWriteProperty(String propertyName) {
+                return propertyMap.containsKey(propertyName)
+                        &&
+                        propertyMap.get(propertyName).isWriteable();
+            }
+
+            @Override
             public BeanProperty getProperty(String propertyName) {
                 if (!propertyMap.containsKey(propertyName)) {
                     throw new BeanPropertyNotFoundException(propertyName);
