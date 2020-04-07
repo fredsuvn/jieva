@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
@@ -67,11 +68,12 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
         private final @Nullable MethodInvoker getter;
         private final @Nullable MethodInvoker setter;
+        private final int hashCode;
 
         private BeanPropertyImpl(PropertyDescriptor descriptor) {
             this.descriptor = descriptor;
-            Method getter = descriptor.getReadMethod();
-            Method setter = descriptor.getWriteMethod();
+            @Nullable Method getter = descriptor.getReadMethod();
+            @Nullable Method setter = descriptor.getWriteMethod();
             if (getter == null && setter == null) {
                 throw new IllegalStateException("Both getter and setter method are null: " + getName());
             }
@@ -81,6 +83,13 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
                     getter.getGenericReturnType();
             this.getter = getter == null ? null : InvokerHelper.getMethodInvoker(getter);
             this.setter = setter == null ? null : InvokerHelper.getMethodInvoker(setter);
+            this.hashCode = getter == null ?
+                    setter.hashCode()
+                    :
+                    setter == null ?
+                            getter.hashCode()
+                            :
+                            getter.hashCode() + setter.hashCode();
         }
 
         @Override
@@ -133,6 +142,24 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         @Override
         public @Nullable Method getWriteMethod() {
             return descriptor.getWriteMethod();
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+            if (object instanceof BeanProperty) {
+                return Objects.equals(getReadMethod(), ((BeanProperty) object).getReadMethod())
+                        &&
+                        Objects.equals(getWriteMethod(), ((BeanProperty) object).getWriteMethod());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return hashCode;
         }
     }
 
@@ -191,6 +218,22 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         @Override
         public @Nullable Object invoke(Object bean, Object... args) {
             return methodInvoker.invoke(bean, args);
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+            if (object instanceof BeanMethod) {
+                return method.equals(((BeanMethod) object).getMethod());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return method.hashCode();
         }
     }
 }

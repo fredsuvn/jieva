@@ -2,9 +2,10 @@ package test.xyz.srclab.common.bean
 
 import org.testng.annotations.Test
 import test.xyz.srclab.common.doAssertEquals
-import xyz.srclab.common.base.KeyHelper
+import test.xyz.srclab.common.doExpectThrowable
 import xyz.srclab.common.bean.*
 import xyz.srclab.common.reflect.SignatureHelper
+import java.lang.UnsupportedOperationException
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 
@@ -14,33 +15,41 @@ object BeanResolverTest {
     fun testResolve() {
         val a = A()
         val beanClass = BeanHelper.resolve(A::class.java)
-        doAssertEquals(
-            beanClass.getProperty("listMap2").getValue(a),
-            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
-        )
-        val clear = beanClass.getMethod("clear", arrayOf())
-        clear.invoke(a)
-        doAssertEquals(
-            beanClass.getProperty("listMap2").getValue(a), null
-        )
-        val someMethodInvoker = beanClass.getMethod(
-            "someMethod",
-            arrayOf(String::class.java, List::class.java)
-        )
-        val someMethodMethod = someMethodInvoker.method
-        val someMethodInvokerResult = someMethodInvoker.invoke(a, "aa", listOf("l1", "l2"))
-        val someMethodMethodResult = someMethodMethod.invoke(a, "aa", listOf("l1", "l2"))
-        doAssertEquals(someMethodInvokerResult, "aa:[l1, l2]")
-        doAssertEquals(someMethodMethodResult, "aa:[l1, l2]")
-        val clear2 =
-            beanClass.getMethodBySignature(SignatureHelper.signMethod("clear", arrayOf()))
-        doAssertEquals(clear2, clear)
 
-        val intPropertyGetter = beanClass.getMethod("getIntProperty", arrayOf())
-        val intPropertySetter = beanClass.getMethod("setIntProperty", arrayOf(Int::class.java))
-        doAssertEquals(intPropertyGetter.invoke(a), 998)
-        intPropertySetter.invoke(a, 123)
-        doAssertEquals(intPropertyGetter.invoke(a), 123)
+        val readProperty = beanClass.getProperty("read")
+        doAssertEquals(beanClass.canReadProperty("read"), true)
+        doAssertEquals(beanClass.canWriteProperty("read"), false)
+        doAssertEquals(readProperty.getValue(a), a.read)
+        doExpectThrowable(UnsupportedOperationException::class.java) {
+            readProperty.setValue(a, "read2")
+        }
+
+        val wwwProperty = beanClass.getProperty("www")
+        if (beanClass.canReadProperty("www")) {
+            doAssertEquals(wwwProperty.getValue(a), a.www)
+        }
+        val xyzProperty = beanClass.getProperty("xyz")
+        doAssertEquals(beanClass.canReadProperty("xyz"), false)
+        xyzProperty.setValue(a, "8888")
+        doAssertEquals(wwwProperty.getValue(a), "8888")
+        doExpectThrowable(UnsupportedOperationException::class.java) {
+            xyzProperty.getValue(a)
+        }
+
+        val propertyNames = beanClass.allProperties.map { e ->
+            e.key
+        }.toSet()
+        doAssertEquals(propertyNames, setOf("class", "read", "www", "xyz"))
+
+        val realMethod = A::class.java.getMethod("someMethod", String::class.java)
+        doAssertEquals(beanClass.containsMethod("someMethod", String::class.java), true)
+        doAssertEquals(beanClass.containsMethodBySignature(SignatureHelper.signMethod(realMethod)), true)
+        val someMethod = beanClass.getMethod("someMethod", String::class.java)
+        val someMethodSignature = beanClass.getMethodBySignature(SignatureHelper.signMethod(realMethod))
+        doAssertEquals(someMethod.method, realMethod)
+        doAssertEquals(someMethodSignature.method, realMethod)
+        doAssertEquals(someMethod, someMethodSignature)
+        doAssertEquals(someMethod.invoke(a, "a"), "aa")
     }
 
     val customBeanResolver = BeanResolver.newBuilder()
@@ -106,31 +115,16 @@ object BeanResolverTest {
     }
 
     class A {
-        var stringProperty: String? = "A.stringProperty"
-        var intProperty = 998
-        var intArray: IntArray? = intArrayOf(1, 2, 3)
-        var stringArray: Array<String>? = arrayOf("1", "2", "3")
-        var stringList: List<String>? = listOf("1", "2", "3")
-        var stringSet: Set<String>? = setOf("1", "2", "3")
-        var stringMap: Map<String, String>? = mapOf("1" to "1", "2" to "2", "3" to "3")
-        var listMap: Map<String, List<String>>? =
-            mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
-        var listMap2: Map<in String, List<out String>>? =
-            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
 
-        fun clear() {
-            stringProperty = null
-            intArray = null
-            stringArray = null
-            stringList = null
-            stringSet = null
-            stringMap = null
-            listMap = null
-            listMap2 = null
+        val read: String = "read"
+
+        var www: String? = null
+        fun setXyz(www: String?) {
+            this.www = www
         }
 
-        fun someMethod(a: String, b: List<out String>): String {
-            return KeyHelper.buildKey(a, b).toString()
+        fun someMethod(argument: String): String {
+            return argument + argument
         }
     }
 }

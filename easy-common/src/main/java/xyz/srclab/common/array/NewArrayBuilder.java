@@ -3,8 +3,11 @@ package xyz.srclab.common.array;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.lang.TypeRef;
+import xyz.srclab.common.reflect.type.TypeHelper;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Type;
 import java.util.function.Function;
 
 public class NewArrayBuilder<A, E> extends CacheStateBuilder<A> implements ArrayBuilder<A> {
@@ -41,12 +44,18 @@ public class NewArrayBuilder<A, E> extends CacheStateBuilder<A> implements Array
     }
 
     NewArrayBuilder(TypeRef<A> arrayType, Class<E> componentType, int length) {
-        
+        Type type = arrayType.getType();
+        if (!(type instanceof GenericArrayType) && !TypeHelper.getRawClass(type).isArray()) {
+            throw new IllegalStateException("Must be array: " + arrayType);
+        }
         this.array = ArrayHelper.newArray(componentType, length);
     }
 
     NewArrayBuilder(TypeRef<A> arrayType, TypeRef<E> componentType, int length) {
-        // Cannot check generic array type!
+        Type type = arrayType.getType();
+        if (!(type instanceof GenericArrayType) && !TypeHelper.getRawClass(type).isArray()) {
+            throw new IllegalStateException("Must be array: " + arrayType);
+        }
         this.array = ArrayHelper.newArray(componentType.getRawType(), length);
     }
 

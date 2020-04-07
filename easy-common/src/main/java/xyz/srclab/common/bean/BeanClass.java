@@ -31,13 +31,13 @@ public interface BeanClass {
     @Immutable
     Map<String, BeanProperty> getAllProperties();
 
-    default boolean containsMethod(String methodName, Class<?>[] parameterTypes) {
-        return containsMethod(SignatureHelper.signMethod(methodName, parameterTypes));
+    default boolean containsMethod(String methodName, Class<?>... parameterTypes) {
+        return containsMethodBySignature(SignatureHelper.signMethod(methodName, parameterTypes));
     }
 
-    boolean containsMethod(String methodSignature);
+    boolean containsMethodBySignature(String methodSignature);
 
-    default BeanMethod getMethod(String methodName, Class<?>[] parameterTypes) throws BeanMethodNotFoundException {
+    default BeanMethod getMethod(String methodName, Class<?>... parameterTypes) throws BeanMethodNotFoundException {
         return getMethodBySignature(SignatureHelper.signMethod(methodName, parameterTypes));
     }
 

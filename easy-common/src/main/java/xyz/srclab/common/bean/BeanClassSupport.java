@@ -84,7 +84,7 @@ public class BeanClassSupport {
             }
 
             @Override
-            public boolean containsMethod(String methodSignature) {
+            public boolean containsMethodBySignature(String methodSignature) {
                 return methodMap.containsKey(methodSignature);
             }
 

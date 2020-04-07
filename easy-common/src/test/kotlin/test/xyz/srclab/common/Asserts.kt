@@ -9,6 +9,11 @@ fun doAssertEquals(actual: Any?, expected: Any?) {
     Assert.assertEquals(actual, expected);
 }
 
+fun doExpectThrowable(expected: Class<out Throwable>, run: () -> Unit) {
+    println("Expect throwable >>> ${expected}");
+    Assert.expectThrows(expected, run)
+}
+
 private fun toString(any: Any?): String {
     if (any == null) {
         return any.toString()

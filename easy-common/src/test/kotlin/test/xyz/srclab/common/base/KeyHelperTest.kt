@@ -15,6 +15,7 @@ object KeyHelperTest {
     @DataProvider
     fun keyHelperDataProvider(): Array<Array<*>> {
         return arrayOf(
+            arrayOf(KeyHelper.buildKey(), ""),
             arrayOf(KeyHelper.buildKey(Object::class.java), "Ljava/lang/Object;"),
             arrayOf(KeyHelper.buildKey(Object::class.java, "ss"), "Ljava/lang/Object;:ss")
         )
