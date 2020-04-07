@@ -183,15 +183,15 @@ public interface BeanOperator {
     }
 
     default <T> T convert(Object from, Type to) {
-        return getBeanConverter().convert(from, to, this);
+        return (T) getBeanConverter().convert(from, to, this);
     }
 
     default <T> T convert(Object from, Class<T> to) {
-        return getBeanConverter().convert(from, (Type) to, this);
+        return (T) getBeanConverter().convert(from, (Type) to, this);
     }
 
     default <T> T convert(Object from, TypeRef<T> to) {
-        return getBeanConverter().convert(from, to.getType(), this);
+        return (T) getBeanConverter().convert(from, to.getType(), this);
     }
 
     @Immutable
@@ -265,12 +265,12 @@ public interface BeanOperator {
                 }
 
                 @Override
-                public <T> T convert(Object from, Type to) {
+                public Object convert(Object from, Type to) {
                     return proxied.convert(from, to, BeanOperatorImpl.this);
                 }
 
                 @Override
-                public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
+                public Object convert(Object from, Type to, BeanOperator beanOperator) {
                     return proxied.convert(from, to, beanOperator);
                 }
             }

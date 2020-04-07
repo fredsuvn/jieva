@@ -86,8 +86,8 @@ object BeanOperatorTest {
                 return true
             }
 
-            override fun <T : Any?> convert(from: Any?, to: Type?, beanOperator: BeanOperator?): T? {
-                return "$from customConverter" as T
+            override fun convert(from: Any?, to: Type?, beanOperator: BeanOperator?): Any {
+                return "$from customConverter"
             }
         })
         .build()

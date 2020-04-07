@@ -63,8 +63,8 @@ object BeanConverterTest {
                     return true
                 }
 
-                override fun <T : Any?> convert(from: Any, to: Type, beanOperator: BeanOperator): T {
-                    return "6" as T
+                override fun convert(from: Any, to: Type, beanOperator: BeanOperator): Any {
+                    return "6"
                 }
             })
             .addHandler(object : BeanConverterHandler {
@@ -72,8 +72,8 @@ object BeanConverterTest {
                     return from is Int
                 }
 
-                override fun <T : Any?> convert(from: Any, to: Type, beanOperator: BeanOperator): T {
-                    return 9 as T
+                override fun convert(from: Any, to: Type, beanOperator: BeanOperator): Any {
+                    return 9
                 }
             })
             .build();
