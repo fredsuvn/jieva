@@ -55,29 +55,30 @@ object BeanConverterTest {
         )
     }
 
+    val customBeanConverter = BeanConverter.newBuilder()
+        .addHandler(object : BeanConverterHandler {
+            override fun supportConvert(from: Any, to: Type, beanOperator: BeanOperator): Boolean {
+                return true
+            }
+
+            override fun convert(from: Any, to: Type, beanOperator: BeanOperator): Any {
+                return "6"
+            }
+        })
+        .addHandler(object : BeanConverterHandler {
+            override fun supportConvert(from: Any, to: Type, beanOperator: BeanOperator): Boolean {
+                return from is Int
+            }
+
+            override fun convert(from: Any, to: Type, beanOperator: BeanOperator): Any {
+                return 9
+            }
+        })
+        .build();
+
     @Test
     fun testCustomConverter() {
-        val converter = BeanConverter.newBuilder()
-            .addHandler(object : BeanConverterHandler {
-                override fun supportConvert(from: Any, to: Type, beanOperator: BeanOperator): Boolean {
-                    return true
-                }
-
-                override fun convert(from: Any, to: Type, beanOperator: BeanOperator): Any {
-                    return "6"
-                }
-            })
-            .addHandler(object : BeanConverterHandler {
-                override fun supportConvert(from: Any, to: Type, beanOperator: BeanOperator): Boolean {
-                    return from is Int
-                }
-
-                override fun convert(from: Any, to: Type, beanOperator: BeanOperator): Any {
-                    return 9
-                }
-            })
-            .build();
-        doAssertEquals(converter.convert("s", String::class.java), "6")
-        doAssertEquals(converter.convert(9, Int::class.java), 9)
+        doAssertEquals(customBeanConverter.convert("s", String::class.java), "6")
+        doAssertEquals(customBeanConverter.convert(9, Int::class.java), 9)
     }
 }

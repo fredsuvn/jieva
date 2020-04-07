@@ -18,7 +18,6 @@ object TypeRefTest {
         open class D : C()
 
         val generic = D().type
-        println(generic)
         doAssertEquals(generic, TypeRefTest::class.java.getDeclaredMethod("forGeneric").genericReturnType)
     }
 }

@@ -3,8 +3,10 @@ package test.xyz.srclab.common.bean
 import org.testng.annotations.Test
 import test.xyz.srclab.common.doAssertEquals
 import xyz.srclab.common.base.KeyHelper
-import xyz.srclab.common.bean.BeanHelper
+import xyz.srclab.common.bean.*
 import xyz.srclab.common.reflect.SignatureHelper
+import java.lang.reflect.Method
+import java.lang.reflect.Type
 
 object BeanResolverTest {
 
@@ -30,8 +32,77 @@ object BeanResolverTest {
         val someMethodMethodResult = someMethodMethod.invoke(a, "aa", listOf("l1", "l2"))
         doAssertEquals(someMethodInvokerResult, "aa:[l1, l2]")
         doAssertEquals(someMethodMethodResult, "aa:[l1, l2]")
-        val clear2 = beanClass.getMethodBySignature(SignatureHelper.signMethod("clear", arrayOf()))
+        val clear2 =
+            beanClass.getMethodBySignature(SignatureHelper.signMethod("clear", arrayOf()))
         doAssertEquals(clear2, clear)
+
+        val intPropertyGetter = beanClass.getMethod("getIntProperty", arrayOf())
+        val intPropertySetter = beanClass.getMethod("setIntProperty", arrayOf(Int::class.java))
+        doAssertEquals(intPropertyGetter.invoke(a), 998)
+        intPropertySetter.invoke(a, 123)
+        doAssertEquals(intPropertyGetter.invoke(a), 123)
+    }
+
+    val customBeanResolver = BeanResolver.newBuilder()
+        .addHandler(object : BeanResolverHandler {
+            override fun supportBean(beanClass: Class<*>): Boolean {
+                return true;
+            }
+
+            override fun resolve(beanClass: Class<*>): BeanClass {
+                return BeanClassSupport.newBuilder()
+                    .setType(beanClass)
+                    .setProperties(mapOf("1" to object : BeanProperty {
+
+                        private var value: Int? = 1
+
+                        override fun setValue(bean: Any, value: Any?) {
+                            this.value = Integer.parseInt(value.toString())
+                        }
+
+                        override fun getGenericType(): Type {
+                            return type
+                        }
+
+                        override fun getReadMethod(): Method? {
+                            return null
+                        }
+
+                        override fun isReadable(): Boolean {
+                            return true
+                        }
+
+                        override fun isWriteable(): Boolean {
+                            return true
+                        }
+
+                        override fun getWriteMethod(): Method? {
+                            return null
+                        }
+
+                        override fun getName(): String {
+                            return "1"
+                        }
+
+                        override fun getType(): Class<*> {
+                            return Int::class.java
+                        }
+
+                        override fun getValue(bean: Any): Any? {
+                            return this.value
+                        }
+                    }))
+                    .build()
+            }
+        })
+        .build()
+
+    @Test
+    fun testCustom() {
+        val customBeanClass = customBeanResolver.resolve(Object::class.java)
+        doAssertEquals(customBeanClass.getProperty("1").getValue(""), 1)
+        customBeanClass.getProperty("1").setValue("1", "222")
+        doAssertEquals(customBeanClass.getProperty("1").getValue(""), 222)
     }
 
     class A {

@@ -10,114 +10,6 @@ import java.lang.reflect.Type
 
 object BeanOperatorTest {
 
-    private val commonOperator = DefaultBeanOperator.DEFAULT
-
-    @Test
-    fun testSimpleCopyProperties() {
-        val some1 = SomeClass1()
-        some1.parentInt = 1
-        some1.parentString = "some1.parentString"
-        some1.some1String = "some1.some1String"
-        val some2 = SomeClass2()
-        some2.parentInt = 1
-        some2.parentString = "some2.parentString"
-        some2.some2String = "some2.some2String"
-        commonOperator.copyProperties(some1, some2)
-        println("some1.parentString: ${some1.parentString}")
-        println("some2.parentString: ${some2.parentString}")
-        doAssertEquals(some2.parentString, some1.parentString)
-
-        some1.some1Some = some2
-        commonOperator.copyProperties(some1, some2)
-        println("some1.some1Some?.parentString: ${some1.some1Some?.parentString}")
-        println("some2.some1Some?.parentString: ${some2.some1Some?.parentString}")
-        doAssertEquals(some2.some1Some?.parentString, "some1.parentString")
-
-        some1.some1Some = null
-        commonOperator.copyPropertiesIgnoreNull(some1, some2)
-        println("some1.some1Some?.parentString: ${some1.some1Some?.parentString}")
-        println("some2.some1Some?.parentString: ${some2.some1Some?.parentString}")
-        doAssertEquals(some2.some1Some?.parentString, "some1.parentString")
-        commonOperator.copyProperties(some1, some2)
-        println("some1.some1Some?.parentString: ${some1.some1Some?.parentString}")
-        println("some2.some1Some?.parentString: ${some2.some1Some?.parentString}")
-        doAssertEquals(some2.some1Some, null)
-
-        val map1 = mutableMapOf<Any, Any>()
-        commonOperator.copyProperties(some1, map1)
-        println(map1)
-        doAssertEquals(map1["parentString"], "some1.parentString")
-        map1["parentString"] = "sssss"
-        commonOperator.copyProperties(some1, map1)
-        doAssertEquals(map1["parentString"], some1.parentString)
-        doAssertEquals(map1["some1String"], some1.some1String)
-    }
-
-    private val customResolver = BeanResolver.newBuilder()
-        .addHandler(object : BeanResolverHandler {
-
-            override fun supportBean(bean: Class<*>): Boolean {
-                return true
-            }
-
-            override fun resolve(bean: Class<*>): BeanClass {
-                return BeanClassSupport.newBuilder()
-                    .setType(bean.javaClass)
-                    .setProperties(
-                        mapOf(
-                            "hello" to CustomBeanProperty(
-                                "hello",
-                                String::class.java
-                            ),
-                            "world" to CustomBeanProperty(
-                                "world",
-                                String::class.java
-                            )
-                        )
-                    )
-                    .build()
-            }
-        })
-        .build()
-
-    private val customConverter = BeanConverter.newBuilder()
-        .addHandler(object : BeanConverterHandler {
-            override fun supportConvert(from: Any?, to: Type?, beanOperator: BeanOperator?): Boolean {
-                return true
-            }
-
-            override fun convert(from: Any?, to: Type?, beanOperator: BeanOperator?): Any {
-                return "$from customConverter"
-            }
-        })
-        .build()
-
-    private val customOperatorBuilder = BeanOperator.newBuilder()
-        .setBeanResolver(customResolver)
-        .setBeanConverter(customConverter)
-
-    private val customOperator = customOperatorBuilder.build()
-
-    @Test
-    fun testCustom() {
-        val some1 = SomeClass1()
-        some1.parentInt = 1
-        some1.parentString = "some1.parentString"
-        some1.some1String = "some1.some1String"
-        val beanDescriptor = customOperator.beanResolver.resolve(some1.javaClass)
-        val hello = beanDescriptor.getProperty("hello")
-        val helloValue = hello?.getValue(some1)
-        println("helloValue: $helloValue")
-        doAssertEquals(helloValue, "hello")
-    }
-
-    @Test
-    fun testOperatorBuilder() {
-        val newOperator = customOperatorBuilder.build();
-        println("old operator: $customOperator, new operator: $newOperator")
-        doAssertEquals(newOperator, customOperator)
-    }
-
     @Test
     fun testCopyProperties() {
         // bean to bean
@@ -127,68 +19,252 @@ object BeanOperatorTest {
         BeanHelper.copyProperties(a, b)
         doAssertEquals(b.stringProperty, a.stringProperty)
         doAssertEquals(b.intProperty, a.intProperty)
+        doAssertEquals(b.intArray, arrayOf("1", "2", "3"))
+        doAssertEquals(b.stringArray, arrayOf(1, 2, 3))
+        doAssertEquals(b.stringList, listOf(1, 2, 3))
         doAssertEquals(b.stringSet, setOf(1, 2, 3))
-        doAssertEquals(b.listMap?.get(2), listOf(2, 3, 4))
-        doAssertEquals(
-            b.listMap2,
-            mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50))
-        )
+        doAssertEquals(b.stringMap, mapOf(1 to 1, 2 to 2, 3 to 3))
+        doAssertEquals(b.listMap, mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5)))
+        doAssertEquals(b.listMap2, mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50)))
+        doAssertEquals(b.aa?.intString, 110)
 
-//        //bean to map
-//        val complexMap = mutableMapOf<Any, Any>()
-//        commonOperator.copyProperties(complex, complexMap)
-//        println(complexMap)
-//        doAssertEquals(complexMap["string"], "complex")
-//        doAssertEquals((complexMap["map"] as Map<*, *>)["3"], "3")
-//        doAssertEquals((complexMap["mapGeneric"] as Map<*, *>)[1], 1)
-//        complex.mapNest = mapOf("99" to mapOf(88 to 88))
-//        commonOperator.copyProperties(complex, complexMap)
-//        println(complexMap)
-//        doAssertEquals(complexMap["mapNest"].toString(), mapOf(99L to mapOf(88 to 88)).toString())
-//
-//        //map to bean
-//        commonOperator.copyProperties(complexMap, complex2)
-//        println(complex2.mapNest)
-//        doAssertEquals(complex2.mapNest.toString(), mapOf(99L to mapOf(88 to 88)).toString())
-//
-//        //map to map
-//        val newMap = mutableMapOf<Any, Any>()
-//        commonOperator.copyProperties(complexMap, newMap)
-//        println(newMap)
-//        doAssertEquals(newMap.toString(), complexMap.toString())
+        //bean to map
+        val map = mutableMapOf<String, Object>()
+        BeanHelper.copyProperties(a, map)
+        doAssertEquals(map["stringProperty"], a.stringProperty)
+        doAssertEquals(map["intProperty"], a.intProperty)
+        doAssertEquals(map["intArray"], arrayOf(1, 2, 3))
+        doAssertEquals(map["stringArray"], arrayOf("1", "2", "3"))
+        doAssertEquals(map["stringList"], listOf("1", "2", "3"))
+        doAssertEquals(map["stringSet"], setOf("1", "2", "3"))
+        doAssertEquals(map["stringMap"], mapOf("1" to "1", "2" to "2", "3" to "3"))
+        doAssertEquals(
+            map["listMap"],
+            mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
+        )
+        doAssertEquals(
+            map["listMap2"],
+            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
+        )
+        doAssertEquals((map["aa"] as Aa).intString, "110")
+
+        //map to map
+        val map2 = mutableMapOf<String, Object>()
+        BeanHelper.copyProperties(map, map2)
+        doAssertEquals(map2["stringProperty"], a.stringProperty)
+        doAssertEquals(map2["intProperty"], a.intProperty)
+        doAssertEquals(map2["intArray"], arrayOf(1, 2, 3))
+        doAssertEquals(map2["stringArray"], arrayOf("1", "2", "3"))
+        doAssertEquals(map2["stringList"], listOf("1", "2", "3"))
+        doAssertEquals(map2["stringSet"], setOf("1", "2", "3"))
+        doAssertEquals(map2["stringMap"], mapOf("1" to "1", "2" to "2", "3" to "3"))
+        doAssertEquals(
+            map2["listMap"],
+            mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
+        )
+        doAssertEquals(
+            map2["listMap2"],
+            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
+        )
+        doAssertEquals((map2["aa"] as Aa).intString, "110")
+
+        //map to bean
+        b.clear()
+        BeanHelper.copyProperties(map, b)
+        doAssertEquals(b.stringProperty, a.stringProperty)
+        doAssertEquals(b.intProperty, a.intProperty)
+        doAssertEquals(b.intArray, arrayOf("1", "2", "3"))
+        doAssertEquals(b.stringArray, arrayOf(1, 2, 3))
+        doAssertEquals(b.stringList, listOf(1, 2, 3))
+        doAssertEquals(b.stringSet, setOf(1, 2, 3))
+        doAssertEquals(b.stringMap, mapOf(1 to 1, 2 to 2, 3 to 3))
+        doAssertEquals(b.listMap, mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5)))
+        doAssertEquals(b.listMap2, mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50)))
+        doAssertEquals(b.aa?.intString, 110)
+    }
+
+    @Test
+    fun testCopyPropertiesIgnoreNull() {
+        // bean to bean
+        val a = A()
+        val b = B()
+        a.stringProperty = null
+        BeanHelper.copyPropertiesIgnoreNull(a, b)
+        doAssertEquals(b.stringProperty, "B.stringProperty")
+        doAssertEquals(b.intProperty, a.intProperty)
+        doAssertEquals(b.intArray, arrayOf("1", "2", "3"))
+        doAssertEquals(b.stringArray, arrayOf(1, 2, 3))
+        doAssertEquals(b.stringList, listOf(1, 2, 3))
+        doAssertEquals(b.stringSet, setOf(1, 2, 3))
+        doAssertEquals(b.stringMap, mapOf(1 to 1, 2 to 2, 3 to 3))
+        doAssertEquals(b.listMap, mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5)))
+        doAssertEquals(b.listMap2, mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50)))
+        doAssertEquals(b.aa?.intString, 110)
+
+        //bean to map
+        val map = mutableMapOf<String, Object>()
+        BeanHelper.copyPropertiesIgnoreNull(a, map)
+        doAssertEquals(map["stringProperty"], null)
+        doAssertEquals(map["intProperty"], a.intProperty)
+        doAssertEquals(map["intArray"], arrayOf(1, 2, 3))
+        doAssertEquals(map["stringArray"], arrayOf("1", "2", "3"))
+        doAssertEquals(map["stringList"], listOf("1", "2", "3"))
+        doAssertEquals(map["stringSet"], setOf("1", "2", "3"))
+        doAssertEquals(map["stringMap"], mapOf("1" to "1", "2" to "2", "3" to "3"))
+        doAssertEquals(
+            map["listMap"],
+            mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
+        )
+        doAssertEquals(
+            map["listMap2"],
+            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
+        )
+        doAssertEquals((map["aa"] as Aa).intString, "110")
+
+        //map to map
+        val map2 = mutableMapOf<String, Object>()
+        BeanHelper.copyPropertiesIgnoreNull(map, map2)
+        doAssertEquals(map2["stringProperty"], null)
+        doAssertEquals(map2["intProperty"], a.intProperty)
+        doAssertEquals(map2["intArray"], arrayOf(1, 2, 3))
+        doAssertEquals(map2["stringArray"], arrayOf("1", "2", "3"))
+        doAssertEquals(map2["stringList"], listOf("1", "2", "3"))
+        doAssertEquals(map2["stringSet"], setOf("1", "2", "3"))
+        doAssertEquals(map2["stringMap"], mapOf("1" to "1", "2" to "2", "3" to "3"))
+        doAssertEquals(
+            map2["listMap"],
+            mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
+        )
+        doAssertEquals(
+            map2["listMap2"],
+            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
+        )
+        doAssertEquals((map2["aa"] as Aa).intString, "110")
+
+        //map to bean
+        val newB = B()
+        BeanHelper.copyPropertiesIgnoreNull(map, newB)
+        doAssertEquals(newB.stringProperty, "B.stringProperty")
+        doAssertEquals(newB.intProperty, a.intProperty)
+        doAssertEquals(newB.intArray, arrayOf("1", "2", "3"))
+        doAssertEquals(newB.stringArray, arrayOf(1, 2, 3))
+        doAssertEquals(newB.stringList, listOf(1, 2, 3))
+        doAssertEquals(newB.stringSet, setOf(1, 2, 3))
+        doAssertEquals(newB.stringMap, mapOf(1 to 1, 2 to 2, 3 to 3))
+        doAssertEquals(newB.listMap, mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5)))
+        doAssertEquals(newB.listMap2, mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50)))
+        doAssertEquals(b.aa?.intString, 110)
     }
 
     @Test
     fun testPopulateProperties() {
-        val complex = ComplexModel()
-        complex.string = "complex"
-        complex.map = mapOf("3" to "3", "6" to "6")
-        complex.mapGeneric = mapOf(1 to 1, 2 to 2)
+        // bean to bean
+        val a = A()
+        val b = B()
+        b.clear()
 
         //bean to map
-        val complexMap = mutableMapOf<Any, Any>()
-        commonOperator.populateProperties(complex, complexMap)
-        println(complexMap)
-        doAssertEquals(complexMap["string"], "complex")
-        doAssertEquals((complexMap["map"] as Map<*, *>)["3"], "3")
-        doAssertEquals((complexMap["mapGeneric"] as Map<*, *>)[1], 1)
-        complex.mapNest = mapOf("99" to mapOf(88 to 88))
-        commonOperator.populateProperties(complex, complexMap)
-        println(complexMap)
-        doAssertEquals(complexMap["mapNest"].toString(), mapOf(99L to mapOf(88 to 88)).toString())
+        val map = mutableMapOf<String, Object>()
+        BeanHelper.populateProperties(a, map)
+        doAssertEquals(map["stringProperty"], a.stringProperty)
+        doAssertEquals(map["intProperty"], a.intProperty)
+        doAssertEquals(map["intArray"], arrayOf(1, 2, 3))
+        doAssertEquals(map["stringArray"], arrayOf("1", "2", "3"))
+        doAssertEquals(map["stringList"], listOf("1", "2", "3"))
+        doAssertEquals(map["stringSet"], setOf("1", "2", "3"))
+        doAssertEquals(map["stringMap"], mapOf("1" to "1", "2" to "2", "3" to "3"))
+        doAssertEquals(
+            map["listMap"],
+            mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
+        )
+        doAssertEquals(
+            map["listMap2"],
+            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
+        )
+        doAssertEquals((map["aa"] as Aa).intString, "110")
 
         //map to map
-        val newMap = mutableMapOf<Any, Any>()
-        commonOperator.populateProperties(complexMap, newMap)
-        println(newMap)
-        doAssertEquals(newMap.toString(), complexMap.toString())
+        val map2 = mutableMapOf<String, Object>()
+        BeanHelper.populateProperties(map, map2)
+        doAssertEquals(map2["stringProperty"], a.stringProperty)
+        doAssertEquals(map2["intProperty"], a.intProperty)
+        doAssertEquals(map2["intArray"], arrayOf(1, 2, 3))
+        doAssertEquals(map2["stringArray"], arrayOf("1", "2", "3"))
+        doAssertEquals(map2["stringList"], listOf("1", "2", "3"))
+        doAssertEquals(map2["stringSet"], setOf("1", "2", "3"))
+        doAssertEquals(map2["stringMap"], mapOf("1" to "1", "2" to "2", "3" to "3"))
+        doAssertEquals(
+            map2["listMap"],
+            mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
+        )
+        doAssertEquals(
+            map2["listMap2"],
+            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
+        )
+        doAssertEquals((map2["aa"] as Aa).intString, "110")
+    }
 
-        //ignore null
-        complex.string = null
-        commonOperator.populatePropertiesIgnoreNull(complex, complexMap)
-        doAssertEquals(complexMap["string"], "complex")
-        commonOperator.populateProperties(complex, complexMap)
-        doAssertEquals(complexMap["string"], null)
+    @Test
+    fun testPopulatePropertiesIgnoreNull() {
+        // bean to bean
+        val a = A()
+        val b = B()
+        a.stringProperty = null
+
+        //bean to map
+        val map = mutableMapOf<String, Object>()
+        BeanHelper.populatePropertiesIgnoreNull(a, map)
+        doAssertEquals(map["stringProperty"], null)
+        doAssertEquals(map["intProperty"], a.intProperty)
+        doAssertEquals(map["intArray"], arrayOf(1, 2, 3))
+        doAssertEquals(map["stringArray"], arrayOf("1", "2", "3"))
+        doAssertEquals(map["stringList"], listOf("1", "2", "3"))
+        doAssertEquals(map["stringSet"], setOf("1", "2", "3"))
+        doAssertEquals(map["stringMap"], mapOf("1" to "1", "2" to "2", "3" to "3"))
+        doAssertEquals(
+            map["listMap"],
+            mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
+        )
+        doAssertEquals(
+            map["listMap2"],
+            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
+        )
+        doAssertEquals((map["aa"] as Aa).intString, "110")
+
+        //map to map
+        val map2 = mutableMapOf<String, Object>()
+        BeanHelper.populatePropertiesIgnoreNull(map, map2)
+        doAssertEquals(map2["stringProperty"], null)
+        doAssertEquals(map2["intProperty"], a.intProperty)
+        doAssertEquals(map2["intArray"], arrayOf(1, 2, 3))
+        doAssertEquals(map2["stringArray"], arrayOf("1", "2", "3"))
+        doAssertEquals(map2["stringList"], listOf("1", "2", "3"))
+        doAssertEquals(map2["stringSet"], setOf("1", "2", "3"))
+        doAssertEquals(map2["stringMap"], mapOf("1" to "1", "2" to "2", "3" to "3"))
+        doAssertEquals(
+            map2["listMap"],
+            mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
+        )
+        doAssertEquals(
+            map2["listMap2"],
+            mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
+        )
+        doAssertEquals((map2["aa"] as Aa).intString, "110")
+    }
+
+    private val customBeanOperator = BeanOperator.newBuilder()
+        .setBeanConverter(BeanConverterTest.customBeanConverter)
+        .setBeanResolver(BeanResolverTest.customBeanResolver)
+        .build()
+
+    @Test
+    fun testCustom() {
+        val a = A()
+        val map = mutableMapOf<String, Object>()
+        customBeanOperator.copyProperties(a, map)
+        doAssertEquals(map["1"], 9)
+        val c = customBeanOperator.convert<String>("", String::class.java)
+        doAssertEquals(c, "6")
     }
 
     class A {
@@ -203,6 +279,7 @@ object BeanOperatorTest {
             mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
         var listMap2: Map<in String, List<out String>>? =
             mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
+        var aa: Aa? = Aa()
 
         fun clear() {
             stringProperty = null
@@ -213,7 +290,12 @@ object BeanOperatorTest {
             stringMap = null
             listMap = null
             listMap2 = null
+            aa = null
         }
+    }
+
+    class Aa {
+        var intString: String? = "110"
     }
 
     class B {
@@ -228,6 +310,7 @@ object BeanOperatorTest {
             mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5))
         var listMap2: Map<out Int, List<out Int>>? =
             mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50))
+        var aa: Bb? = Bb()
 
         fun clear() {
             stringProperty = null
@@ -238,6 +321,11 @@ object BeanOperatorTest {
             stringMap = null
             listMap = null
             listMap2 = null
+            aa = null
         }
+    }
+
+    class Bb {
+        var intString: Int? = 0
     }
 }

@@ -14,9 +14,6 @@ object ComputedTest {
             count[0]++
             count[0]
         }
-        println(computed.get())
-        println(computed.get())
-        println(computed.get())
         doAssertEquals(computed.get(), 1)
         doAssertEquals(computed.refreshAndGet(), 2)
     }
@@ -28,13 +25,11 @@ object ComputedTest {
             count[0]++
             count[0]
         }
-        println(computed.get())
+        doAssertEquals(computed.get(), 1)
         Thread.sleep(1000)
-        println(computed.get())
+        doAssertEquals(computed.get(), 2)
         Thread.sleep(1000)
-        println(computed.get())
-        println(computed.get())
-        println(computed.get())
+        doAssertEquals(computed.get(), 3)
         Thread.sleep(1000)
         doAssertEquals(computed.get(), 4)
         doAssertEquals(computed.refreshAndGet(), 5)
