@@ -40,7 +40,8 @@ public class WeakCache<K, V> implements Cache<K, V> {
 
     @Override
     public boolean has(K key) {
-        return weakHashMap.containsKey(key);
+        return weakHashMap.containsKey(key)
+                && !isExpired(weakHashMap.get(key).getExpirationMillisAt(), TimeHelper.nowMillis());
     }
 
     @Nullable

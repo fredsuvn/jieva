@@ -4,6 +4,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.time.TimeHelper;
 
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 /**
@@ -23,6 +24,15 @@ public interface Computed<T> extends Supplier<T> {
 
     static <T> Computed<T> with(Duration timeout, Supplier<T> supplier) {
         return new AutoRefreshComputed<>(timeout, supplier);
+    }
+
+    static Computed<Long> withCounter(long timeoutSeconds) {
+        return withCounter(Duration.ofSeconds(timeoutSeconds));
+    }
+
+    static Computed<Long> withCounter(Duration timeout) {
+        AtomicLong atomicLong = new AtomicLong(0);
+        return new AutoRefreshComputed<>(timeout, atomicLong::getAndIncrement);
     }
 
     void refresh();
