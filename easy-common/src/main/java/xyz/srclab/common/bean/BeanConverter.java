@@ -21,20 +21,20 @@ public interface BeanConverter {
 
     Object convert(Object from, Type to, BeanOperator beanOperator);
 
-    default Object convert(Object from, Class<?> to) {
-        return convert(from, (Type) to);
+    default <T> T convert(Object from, Class<T> to) {
+        return (T) convert(from, (Type) to);
     }
 
-    default Object convert(Object from, Class<?> to, BeanOperator beanOperator) {
-        return convert(from, (Type) to, beanOperator);
+    default <T> T convert(Object from, Class<T> to, BeanOperator beanOperator) {
+        return (T) convert(from, (Type) to, beanOperator);
     }
 
-    default Object convert(Object from, TypeRef<?> to) {
-        return convert(from, to.getType());
+    default <T> T convert(Object from, TypeRef<T> to) {
+        return (T) convert(from, to.getType());
     }
 
-    default Object convert(Object from, TypeRef<?> to, BeanOperator beanOperator) {
-        return convert(from, to.getType(), beanOperator);
+    default <T> T convert(Object from, TypeRef<T> to, BeanOperator beanOperator) {
+        return (T) convert(from, to.getType(), beanOperator);
     }
 
     class Builder extends ProcessByHandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
@@ -64,38 +64,6 @@ public interface BeanConverter {
             private BeanConverterImpl(Builder builder) {
                 this.beanOperator = builder.beanOperator == null ? BeanOperator.DEFAULT : builder.beanOperator;
                 this.handlers = builder.handlers.toArray(new BeanConverterHandler[0]);
-            }
-
-            @Override
-            public Object convert(Object from, Class<?> to) {
-                return convert(from, to, beanOperator);
-            }
-
-            @Override
-            public Object convert(Object from, Class<?> to, BeanOperator beanOperator) {
-                for (BeanConverterHandler handler : handlers) {
-                    if (handler.supportConvert(from, to, beanOperator)) {
-                        return handler.convert(from, to, beanOperator);
-                    }
-                }
-                throw new UnsupportedOperationException(
-                        FastFormat.format("Cannot convert object from {} to {}", from, to));
-            }
-
-            @Override
-            public Object convert(Object from, TypeRef<?> to) {
-                return convert(from, to, beanOperator);
-            }
-
-            @Override
-            public Object convert(Object from, TypeRef<?> to, BeanOperator beanOperator) {
-                for (BeanConverterHandler handler : handlers) {
-                    if (handler.supportConvert(from, to, beanOperator)) {
-                        return handler.convert(from, to, beanOperator);
-                    }
-                }
-                throw new UnsupportedOperationException(
-                        FastFormat.format("Cannot convert object from {} to {}", from, to));
             }
 
             @Override

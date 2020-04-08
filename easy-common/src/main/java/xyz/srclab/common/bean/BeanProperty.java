@@ -5,6 +5,7 @@ import xyz.srclab.annotation.Nullable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Optional;
 
 @Immutable
 public interface BeanProperty {
@@ -20,13 +21,11 @@ public interface BeanProperty {
     @Nullable
     Object getValue(Object bean) throws UnsupportedOperationException;
 
-    @Nullable
-    Method getReadMethod();
+    Optional<Method> getReadMethod();
 
     boolean isWriteable();
 
     void setValue(Object bean, @Nullable Object value) throws UnsupportedOperationException;
 
-    @Nullable
-    Method getWriteMethod();
+    Optional<Method> getWriteMethod();
 }

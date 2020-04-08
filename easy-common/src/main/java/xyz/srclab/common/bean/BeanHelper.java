@@ -11,44 +11,41 @@ public class BeanHelper {
 
     private static final BeanOperator beanOperator = BeanOperator.DEFAULT;
 
-    public static BeanResolver getBeanResolver() {
-        return beanOperator.getBeanResolver();
-    }
-
-    public static BeanConverter getBeanConverter() {
-        return beanOperator.getBeanConverter();
-    }
-
     public static BeanClass resolve(Class<?> beanClass) {
         return beanOperator.resolve(beanClass);
     }
 
-    public static boolean containsProperty(Object bean, String propertyName) {
-        return beanOperator.containsProperty(bean, propertyName);
-    }
-
-    @Nullable
-    public static Object getProperty(Object bean, String propertyName) {
+    public static BeanProperty getProperty(Object bean, String propertyName) throws BeanPropertyNotFoundException {
         return beanOperator.getProperty(bean, propertyName);
     }
 
     @Nullable
-    public static <T> T getProperty(Object bean, String propertyName, Type type) {
-        return beanOperator.getProperty(bean, propertyName, type);
+    public static Object getPropertyValue(Object bean, String propertyName)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        return beanOperator.getPropertyValue(bean, propertyName);
     }
 
     @Nullable
-    public static <T> T getProperty(Object bean, String propertyName, Class<T> type) {
-        return beanOperator.getProperty(bean, propertyName, type);
+    public static <T> T getPropertyValue(Object bean, String propertyName, Type type)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        return beanOperator.getPropertyValue(bean, propertyName, type);
     }
 
     @Nullable
-    public static <T> T getProperty(Object bean, String propertyName, TypeRef<T> type) {
-        return beanOperator.getProperty(bean, propertyName, type);
+    public static <T> T getPropertyValue(Object bean, String propertyName, Class<T> type)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        return beanOperator.getPropertyValue(bean, propertyName, type);
     }
 
-    public static void setProperty(Object bean, String propertyName, @Nullable Object value) {
-        beanOperator.setProperty(bean, propertyName, value);
+    @Nullable
+    public static <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        return beanOperator.getPropertyValue(bean, propertyName, type);
+    }
+
+    public static void setProperty(Object bean, String propertyName, @Nullable Object value)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        beanOperator.setPropertyValue(bean, propertyName, value);
     }
 
     public static void copyProperties(Object source, Object dest) {
@@ -94,5 +91,15 @@ public class BeanHelper {
     @Immutable
     public static Map<String, Object> toMap(Object bean) {
         return beanOperator.toMap(bean);
+    }
+
+    public static BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
+            throws BeanMethodNotFoundException {
+        return beanOperator.getMethod(bean, methodName, parameterTypes);
+    }
+
+    public static BeanMethod getMethodBySignature(Object bean, String methodSignature)
+            throws BeanMethodNotFoundException {
+        return beanOperator.getMethodBySignature(bean, methodSignature);
     }
 }

@@ -15,14 +15,4 @@ public class DefaultBeanConverter implements BeanConverter {
     public Object convert(Object from, Type to, BeanOperator beanOperator) {
         return beanConverterHandler.convert(from, to, beanOperator);
     }
-
-    @Override
-    public Object convert(Object from, Class<?> to) {
-        return beanConverterHandler.convert(from, to, BeanOperator.DEFAULT);
-    }
-
-    @Override
-    public Object convert(Object from, Class<?> to, BeanOperator beanOperator) {
-        return beanConverterHandler.convert(from, to, beanOperator);
-    }
 }

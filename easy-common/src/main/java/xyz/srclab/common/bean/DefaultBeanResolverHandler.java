@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
 public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
@@ -39,6 +39,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
                         .setMethods(buildMethods(methods))
                         .build();
             } catch (IntrospectionException e) {
+                // Don't know how to trigger this exception
                 throw new ExceptionWrapper(e);
             }
         });
@@ -66,30 +67,35 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         private final PropertyDescriptor descriptor;
         private final Type genericType;
 
+        private final Optional<Method> readMethod;
+        private final Optional<Method> writeMethod;
         private final @Nullable MethodInvoker getter;
         private final @Nullable MethodInvoker setter;
         private final int hashCode;
 
         private BeanPropertyImpl(PropertyDescriptor descriptor) {
             this.descriptor = descriptor;
-            @Nullable Method getter = descriptor.getReadMethod();
-            @Nullable Method setter = descriptor.getWriteMethod();
-            if (getter == null && setter == null) {
+            @Nullable Method readMethod = descriptor.getReadMethod();
+            @Nullable Method writeMethod = descriptor.getWriteMethod();
+            if (readMethod == null && writeMethod == null) {
+                // Should never reached:
                 throw new IllegalStateException("Both getter and setter method are null: " + getName());
             }
-            this.genericType = getter == null ?
-                    setter.getGenericParameterTypes()[0]
+            this.genericType = readMethod == null ?
+                    writeMethod.getGenericParameterTypes()[0]
                     :
-                    getter.getGenericReturnType();
-            this.getter = getter == null ? null : InvokerHelper.getMethodInvoker(getter);
-            this.setter = setter == null ? null : InvokerHelper.getMethodInvoker(setter);
-            this.hashCode = getter == null ?
-                    setter.hashCode()
+                    readMethod.getGenericReturnType();
+            this.readMethod = Optional.ofNullable(readMethod);
+            this.writeMethod = Optional.ofNullable(writeMethod);
+            this.getter = readMethod == null ? null : InvokerHelper.getMethodInvoker(readMethod);
+            this.setter = writeMethod == null ? null : InvokerHelper.getMethodInvoker(writeMethod);
+            this.hashCode = readMethod == null ?
+                    writeMethod.hashCode()
                     :
-                    setter == null ?
-                            getter.hashCode()
+                    writeMethod == null ?
+                            readMethod.hashCode()
                             :
-                            getter.hashCode() + setter.hashCode();
+                            readMethod.hashCode() + writeMethod.hashCode();
         }
 
         @Override
@@ -122,8 +128,8 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         }
 
         @Override
-        public @Nullable Method getReadMethod() {
-            return descriptor.getReadMethod();
+        public Optional<Method> getReadMethod() {
+            return readMethod;
         }
 
         @Override
@@ -140,27 +146,28 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         }
 
         @Override
-        public @Nullable Method getWriteMethod() {
-            return descriptor.getWriteMethod();
+        public Optional<Method> getWriteMethod() {
+            return writeMethod;
         }
 
-        @Override
-        public boolean equals(Object object) {
-            if (this == object) {
-                return true;
-            }
-            if (object instanceof BeanProperty) {
-                return Objects.equals(getReadMethod(), ((BeanProperty) object).getReadMethod())
-                        &&
-                        Objects.equals(getWriteMethod(), ((BeanProperty) object).getWriteMethod());
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return hashCode;
-        }
+        // Never used:
+        //@Override
+        //public boolean equals(Object object) {
+        //    if (this == object) {
+        //        return true;
+        //    }
+        //    if (object instanceof BeanProperty) {
+        //        return Objects.equals(getReadMethod(), ((BeanProperty) object).getReadMethod())
+        //                &&
+        //                Objects.equals(getWriteMethod(), ((BeanProperty) object).getWriteMethod());
+        //    }
+        //    return false;
+        //}
+        //
+        //@Override
+        //public int hashCode() {
+        //    return hashCode;
+        //}
     }
 
     private static final class BeanMethodImpl implements BeanMethod {
@@ -220,20 +227,18 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
             return methodInvoker.invoke(bean, args);
         }
 
-        @Override
-        public boolean equals(Object object) {
-            if (this == object) {
-                return true;
-            }
-            if (object instanceof BeanMethod) {
-                return method.equals(((BeanMethod) object).getMethod());
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return method.hashCode();
-        }
+        // Never used:
+        //@Override
+        //public boolean equals(Object object) {
+        //    if (this == object) return true;
+        //    if (object == null || getClass() != object.getClass()) return false;
+        //    BeanMethodImpl that = (BeanMethodImpl) object;
+        //    return method.equals(that.method);
+        //}
+        //
+        //@Override
+        //public int hashCode() {
+        //    return Objects.hash(method);
+        //}
     }
 }

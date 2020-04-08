@@ -1,16 +1,17 @@
 package xyz.srclab.common.bean;
 
-import com.sun.javafx.fxml.PropertyNotFoundException;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.lang.TypeRef;
+import xyz.srclab.common.reflect.SignatureHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Immutable
 public interface BeanOperator {
@@ -29,23 +30,25 @@ public interface BeanOperator {
         return getBeanResolver().resolve(beanClass);
     }
 
-    default boolean containsProperty(Object bean, String propertyName) {
+    default BeanProperty getProperty(Object bean, String propertyName) throws BeanPropertyNotFoundException {
         BeanClass beanClass = resolve(bean.getClass());
-        return beanClass.containsProperty(propertyName);
+        Optional<BeanProperty> beanProperty = beanClass.getProperty(propertyName);
+        if (!beanProperty.isPresent()) {
+            throw new BeanPropertyNotFoundException(propertyName);
+        }
+        return beanProperty.get();
     }
 
     @Nullable
-    default Object getProperty(Object bean, String propertyName)
-            throws PropertyNotFoundException, UnsupportedOperationException {
-        BeanClass beanClass = resolve(bean.getClass());
-        BeanProperty beanProperty = beanClass.getProperty(propertyName);
-        return beanProperty.getValue(bean);
+    default Object getPropertyValue(Object bean, String propertyName)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        return getProperty(bean, propertyName).getValue(bean);
     }
 
     @Nullable
-    default <T> T getProperty(Object bean, String propertyName, Type type)
-            throws PropertyNotFoundException, UnsupportedOperationException {
-        @Nullable Object value = getProperty(bean, propertyName);
+    default <T> T getPropertyValue(Object bean, String propertyName, Type type)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        @Nullable Object value = getPropertyValue(bean, propertyName);
         if (value == null) {
             return null;
         }
@@ -53,23 +56,20 @@ public interface BeanOperator {
     }
 
     @Nullable
-    default <T> T getProperty(Object bean, String propertyName, Class<T> type)
-            throws PropertyNotFoundException, UnsupportedOperationException {
-        return getProperty(bean, propertyName, (Type) type);
+    default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        return getPropertyValue(bean, propertyName, (Type) type);
     }
 
     @Nullable
-    default <T> T getProperty(Object bean, String propertyName, TypeRef<T> type)
-            throws PropertyNotFoundException, UnsupportedOperationException {
-        return getProperty(bean, propertyName, type.getType());
+    default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        return getPropertyValue(bean, propertyName, type.getType());
     }
 
-    default void setProperty(Object bean, String propertyName, @Nullable Object value)
-            throws PropertyNotFoundException, UnsupportedOperationException {
-        BeanClass beanClass = resolve(bean.getClass());
-        BeanProperty beanProperty = beanClass.getProperty(propertyName);
-        beanProperty.setValue(bean, value == null ?
-                null : convert(value, beanProperty.getGenericType()));
+    default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        getProperty(bean, propertyName).setValue(bean, value);
     }
 
     default void copyProperties(Object source, Object dest) {
@@ -98,7 +98,7 @@ public interface BeanOperator {
                 if (!destBean.canWriteProperty(propertyName)) {
                     return;
                 }
-                BeanProperty destProperty = destBean.getProperty(propertyName);
+                BeanProperty destProperty = getProperty(dest, propertyName);
                 eachProperty.apply(
                         k,
                         v,
@@ -122,7 +122,7 @@ public interface BeanOperator {
                 if (!destBean.canWriteProperty(name)) {
                     return;
                 }
-                BeanProperty destProperty = destBean.getProperty(name);
+                BeanProperty destProperty = getProperty(dest, name);
                 @Nullable Object sourceValue = sourceProperty.getValue(source);
                 eachProperty.apply(
                         name,
@@ -162,10 +162,7 @@ public interface BeanOperator {
             });
         } else {
             BeanClass sourceBean = resolve(source.getClass());
-            sourceBean.getAllProperties().forEach((name, property) -> {
-                if (!property.isReadable()) {
-                    return;
-                }
+            sourceBean.getReadableProperties().forEach((name, property) -> {
                 @Nullable Object sourceValue = property.getValue(source);
                 eachEntry.apply(name, sourceValue, dest::put, this);
             });
@@ -193,14 +190,29 @@ public interface BeanOperator {
     @Immutable
     default Map<String, Object> toMap(Object bean) {
         Map<String, Object> result = new LinkedHashMap<>();
-        resolve(bean.getClass()).getAllProperties().forEach((name, property) -> {
-            if (!property.isReadable()) {
-                return;
-            }
+        resolve(bean.getClass()).getReadableProperties().forEach((name, property) -> {
             @Nullable Object value = property.getValue(bean);
             result.put(name, value);
         });
         return MapHelper.immutable(result);
+    }
+
+    default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
+            throws BeanMethodNotFoundException {
+        Optional<BeanMethod> methodOptional = resolve(bean.getClass()).getMethod(methodName, parameterTypes);
+        if (!methodOptional.isPresent()) {
+            throw new BeanMethodNotFoundException(SignatureHelper.signMethod(methodName, parameterTypes));
+        }
+        return methodOptional.get();
+    }
+
+    default BeanMethod getMethodBySignature(Object bean, String methodSignature)
+            throws BeanMethodNotFoundException {
+        Optional<BeanMethod> methodOptional = resolve(bean.getClass()).getMethodBySignature(methodSignature);
+        if (!methodOptional.isPresent()) {
+            throw new BeanMethodNotFoundException(methodSignature);
+        }
+        return methodOptional.get();
     }
 
     class Builder extends CacheStateBuilder<BeanOperator> {
@@ -238,8 +250,8 @@ public interface BeanOperator {
             private BeanOperatorImpl(Builder builder) {
                 this.beanResolver = builder.beanResolver == null ?
                         BeanResolver.DEFAULT : builder.beanResolver;
-                this.beanConverter = new BeanConverterProxy(builder.beanConverter == null ?
-                        BeanConverter.DEFAULT : builder.beanConverter);
+                this.beanConverter = builder.beanConverter == null ?
+                        BeanConverter.DEFAULT : builder.beanConverter;
             }
 
             @Override
@@ -252,24 +264,25 @@ public interface BeanOperator {
                 return beanConverter;
             }
 
-            private class BeanConverterProxy implements BeanConverter {
-
-                private final BeanConverter proxied;
-
-                private BeanConverterProxy(BeanConverter proxied) {
-                    this.proxied = proxied;
-                }
-
-                @Override
-                public Object convert(Object from, Type to) {
-                    return proxied.convert(from, to, BeanOperatorImpl.this);
-                }
-
-                @Override
-                public Object convert(Object from, Type to, BeanOperator beanOperator) {
-                    return proxied.convert(from, to, beanOperator);
-                }
-            }
+            // No use
+            //private class BeanConverterProxy implements BeanConverter {
+            //
+            //    private final BeanConverter proxied;
+            //
+            //    private BeanConverterProxy(BeanConverter proxied) {
+            //        this.proxied = proxied;
+            //    }
+            //
+            //    @Override
+            //    public Object convert(Object from, Type to) {
+            //        return proxied.convert(from, to, BeanOperatorImpl.this);
+            //    }
+            //
+            //    @Override
+            //    public Object convert(Object from, Type to, BeanOperator beanOperator) {
+            //        return proxied.convert(from, to, beanOperator);
+            //    }
+            //}
         }
     }
 

@@ -15,7 +15,7 @@ public class ClassProxyProviderManager extends AbstractProviderManager<ClassProx
 
     @Override
     protected ClassProxyProvider createDefaultProvider() {
-        return EnvironmentHelper.hasPackage("xyz.srclab.bytecode") ?
+        return EnvironmentHelper.findPackage("xyz.srclab.bytecode").isPresent() ?
                 BytecodeClassProxyProvider.getInstance() : JdkClassProxyProvider.getInstance();
     }
 }

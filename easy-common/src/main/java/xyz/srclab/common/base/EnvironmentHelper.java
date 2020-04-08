@@ -2,27 +2,20 @@ package xyz.srclab.common.base;
 
 import xyz.srclab.annotation.Nullable;
 
+import java.util.Optional;
+
 public class EnvironmentHelper {
 
-    public static boolean hasPackage(String packageName) {
-        return findPackage(packageName) != null;
+    public static Optional<Package> findPackage(String packageName) {
+        @Nullable Package pkg = Package.getPackage(packageName);
+        return Optional.ofNullable(pkg);
     }
 
-    @Nullable
-    public static Package findPackage(String packageName) {
-        return Package.getPackage(packageName);
-    }
-
-    public static boolean hasClass(String className) {
-        return findClass(className) != null;
-    }
-
-    @Nullable
-    public static Class<?> findClass(String className) {
+    public static Optional<Class<?>> findClass(String className) {
         try {
-            return Class.forName(className);
+            return Optional.of(Class.forName(className));
         } catch (ClassNotFoundException e) {
-            return null;
+            return Optional.empty();
         }
     }
 }

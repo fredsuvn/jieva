@@ -7,6 +7,7 @@ import xyz.srclab.common.collection.map.MapHelper;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 public class BeanClassSupport {
 
@@ -70,30 +71,8 @@ public class BeanClassSupport {
             }
 
             @Override
-            public boolean containsProperty(String propertyName) {
-                return propertyMap.containsKey(propertyName);
-            }
-
-            @Override
-            public boolean canReadProperty(String propertyName) {
-                return propertyMap.containsKey(propertyName)
-                        &&
-                        propertyMap.get(propertyName).isReadable();
-            }
-
-            @Override
-            public boolean canWriteProperty(String propertyName) {
-                return propertyMap.containsKey(propertyName)
-                        &&
-                        propertyMap.get(propertyName).isWriteable();
-            }
-
-            @Override
-            public BeanProperty getProperty(String propertyName) {
-                if (!propertyMap.containsKey(propertyName)) {
-                    throw new BeanPropertyNotFoundException(propertyName);
-                }
-                return propertyMap.get(propertyName);
+            public Optional<BeanProperty> getProperty(String propertyName) {
+                return Optional.ofNullable(propertyMap.get(propertyName));
             }
 
             @Override
@@ -112,16 +91,8 @@ public class BeanClassSupport {
             }
 
             @Override
-            public boolean containsMethodBySignature(String methodSignature) {
-                return methodMap.containsKey(methodSignature);
-            }
-
-            @Override
-            public BeanMethod getMethodBySignature(String methodSignature) throws BeanMethodNotFoundException {
-                if (!methodMap.containsKey(methodSignature)) {
-                    throw new BeanMethodNotFoundException(methodSignature);
-                }
-                return methodMap.get(methodSignature);
+            public Optional<BeanMethod> getMethodBySignature(String methodSignature) {
+                return Optional.ofNullable(methodMap.get(methodSignature));
             }
 
             @Override

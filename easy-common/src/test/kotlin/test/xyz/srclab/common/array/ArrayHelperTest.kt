@@ -133,9 +133,9 @@ object ArrayHelperTest {
     }
 
     interface G {
-        fun listArray(): Array<List<out String>>
+        fun listArray(): Array<List<String>>
 
-        fun list(): List<out String>
+        fun list(): List<String>
     }
 
     data class A<T>(val content: T)

@@ -16,10 +16,6 @@ public interface BeanResolver {
 
     class Builder extends ProcessByHandlersBuilder<BeanResolver, BeanResolverHandler, Builder> {
 
-        public static Builder newBuilder() {
-            return new Builder();
-        }
-
         @Override
         public BeanResolver build() {
             return super.build();

@@ -5,13 +5,33 @@ import org.apache.commons.lang3.StringUtils
 import org.testng.Assert
 
 fun doAssertEquals(actual: Any?, expected: Any?) {
-    println("Assert >>> actual: ${toString(actual)}; expected: ${toString(expected)}");
-    Assert.assertEquals(actual, expected);
+    println("Assert >>> actual: ${toString(actual)}; expected: ${toString(expected)}")
+    Assert.assertEquals(actual, expected)
 }
 
-fun doExpectThrowable(expected: Class<out Throwable>, run: () -> Unit) {
-    println("Expect throwable >>> ${expected}");
-    Assert.expectThrows(expected, run)
+fun <T : Throwable> doExpectThrowable(expected: Class<T>, runnable: () -> Unit): ThrowableCatcher<T> {
+    println("Expect throwable >>> $expected")
+    try {
+        runnable()
+    } catch (t: Throwable) {
+        if (expected.isInstance(t)) {
+            return object : ThrowableCatcher<T> {
+                override fun catch(action: (T) -> Unit) {
+                    action(expected.cast(t))
+                }
+            }
+        } else {
+            val mismatchMessage = String.format(
+                "Expected %s to be thrown, but %s was thrown",
+                expected.simpleName, t.javaClass.simpleName
+            )
+            throw AssertionError(mismatchMessage, t)
+        }
+    }
+    val message = String.format(
+        "Expected %s to be thrown, but nothing was thrown", expected.simpleName
+    )
+    throw AssertionError(message)
 }
 
 private fun toString(any: Any?): String {
@@ -49,4 +69,9 @@ private fun toString(any: Any?): String {
         return "[${StringUtils.join(ArrayUtils.toObject(any), ",")}]"
     }
     return any.toString()
+}
+
+interface ThrowableCatcher<T> {
+
+    fun catch(action: (T) -> Unit)
 }

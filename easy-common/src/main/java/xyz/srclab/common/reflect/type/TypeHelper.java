@@ -19,6 +19,8 @@ public class TypeHelper {
 
     private static final Cache<Object, Type[]> TYPES_CACHE = new ThreadLocalCache<>();
 
+    private static final Cache<Object, TypeVariable[]> TYPE_VARIABLES_CACHE = new ThreadLocalCache<>();
+
     public static boolean isBasic(Object any) {
         return any instanceof CharSequence
                 || any instanceof Number
@@ -74,6 +76,17 @@ public class TypeHelper {
 
     private static Type[] getGenericTypes0(ParameterizedType parameterizedType) {
         return parameterizedType.getActualTypeArguments();
+    }
+
+    public static TypeVariable<?>[] getTypeParameters(Class<?> cls) {
+        return TYPE_VARIABLES_CACHE.getNonNull(
+                KeyHelper.buildKey(cls, "getTypeParameters"),
+                k -> getTypeParameters0(cls)
+        );
+    }
+
+    private static TypeVariable<?>[] getTypeParameters0(Class<?> cls) {
+        return cls.getTypeParameters();
     }
 
     @Nullable

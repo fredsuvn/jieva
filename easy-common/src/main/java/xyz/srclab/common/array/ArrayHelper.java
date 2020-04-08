@@ -1,6 +1,7 @@
 package xyz.srclab.common.array;
 
 import xyz.srclab.annotation.WriteReturn;
+import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.reflect.type.TypeHelper;
@@ -83,9 +84,7 @@ public class ArrayHelper {
     }
 
     public static byte[] newArray(@WriteReturn byte[] array, int from, int to, EachByte each) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
-        }
+        Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
@@ -93,9 +92,7 @@ public class ArrayHelper {
     }
 
     public static char[] newArray(@WriteReturn char[] array, int from, int to, EachChar each) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
-        }
+        Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
@@ -103,9 +100,7 @@ public class ArrayHelper {
     }
 
     public static int[] newArray(@WriteReturn int[] array, int from, int to, EachInt each) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
-        }
+        Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
@@ -113,9 +108,7 @@ public class ArrayHelper {
     }
 
     public static long[] newArray(@WriteReturn long[] array, int from, int to, EachLong each) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
-        }
+        Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
@@ -123,9 +116,7 @@ public class ArrayHelper {
     }
 
     public static float[] newArray(@WriteReturn float[] array, int from, int to, EachFloat each) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
-        }
+        Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
@@ -133,9 +124,7 @@ public class ArrayHelper {
     }
 
     public static double[] newArray(@WriteReturn double[] array, int from, int to, EachDouble each) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
-        }
+        Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
@@ -143,9 +132,7 @@ public class ArrayHelper {
     }
 
     public static boolean[] newArray(@WriteReturn boolean[] array, int from, int to, EachBoolean each) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
-        }
+        Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
@@ -153,9 +140,7 @@ public class ArrayHelper {
     }
 
     public static short[] newArray(@WriteReturn short[] array, int from, int to, EachShort each) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
-        }
+        Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
@@ -163,9 +148,7 @@ public class ArrayHelper {
     }
 
     public static <T> T[] newArray(@WriteReturn T[] array, int from, int to, Each<T> each) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
-        }
+        Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
@@ -174,7 +157,7 @@ public class ArrayHelper {
 
     public static Class<?> findArrayType(Class<?> elementType) {
         return arrayTypeCache.getNonNull(
-                buildArrayTypeKey(elementType, "findArrayType"),
+                KeyHelper.buildKey(elementType, "findArrayType"),
                 o -> findArrayType0(elementType)
         );
     }
@@ -183,13 +166,9 @@ public class ArrayHelper {
         return Array.newInstance(elementType, 0).getClass();
     }
 
-    private static Object buildArrayTypeKey(Class<?> cls, String typeScope) {
-        return KeyHelper.buildKey(cls, typeScope);
-    }
-
     public static Type getGenericComponentType(Type type) {
         return genericComponentTypeCache.getNonNull(
-                buildGenericComponentTypeKey(type, "getGenericComponentType"),
+                KeyHelper.buildKey(type, "getGenericComponentType"),
                 o -> getGenericComponentType0(type)
         );
     }
@@ -199,10 +178,6 @@ public class ArrayHelper {
             return ((GenericArrayType) type).getGenericComponentType();
         }
         return TypeHelper.getRawClass(type).getComponentType();
-    }
-
-    private static Object buildGenericComponentTypeKey(Type type, String typeScope) {
-        return KeyHelper.buildKey(type, typeScope);
     }
 
     public interface Each<T> {

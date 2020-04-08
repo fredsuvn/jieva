@@ -21,10 +21,9 @@ public abstract class AbstractProviderManager<T> implements ProviderManager<T> {
             if (providerMap.containsKey(className)) {
                 throw new IllegalStateException("Provider has already registered: " + className);
             }
-            @Nullable Class<?> providerClass = EnvironmentHelper.findClass(className);
-            if (providerClass == null) {
-                throw new IllegalArgumentException(new ClassNotFoundException(className));
-            }
+            Class<?> providerClass = EnvironmentHelper
+                    .findClass(className)
+                    .orElseThrow(() -> new IllegalArgumentException(new ClassNotFoundException(className)));
             T provider = createProvider((Class<T>) providerClass);
             providerMap.put(className, provider);
             if (isDefault) {

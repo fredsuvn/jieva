@@ -4,19 +4,24 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.reflect.SignatureHelper;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Immutable
 public interface BeanClass {
 
     Class<?> getType();
 
-    boolean containsProperty(String propertyName);
+    default boolean canReadProperty(String propertyName) {
+        Optional<BeanProperty> optional = getProperty(propertyName);
+        return optional.isPresent() && optional.get().isReadable();
+    }
 
-    boolean canReadProperty(String propertyName);
+    default boolean canWriteProperty(String propertyName) {
+        Optional<BeanProperty> optional = getProperty(propertyName);
+        return optional.isPresent() && optional.get().isWriteable();
+    }
 
-    boolean canWriteProperty(String propertyName);
-
-    BeanProperty getProperty(String propertyName) throws BeanPropertyNotFoundException;
+    Optional<BeanProperty> getProperty(String propertyName);
 
     @Immutable
     Map<String, BeanProperty> getAllProperties();
@@ -27,22 +32,16 @@ public interface BeanClass {
     @Immutable
     Map<String, BeanProperty> getWriteableProperties();
 
-    default boolean containsMethod(String methodName, Class<?>... parameterTypes) {
-        return containsMethodBySignature(SignatureHelper.signMethod(methodName, parameterTypes));
-    }
-
-    boolean containsMethodBySignature(String methodSignature);
-
-    default BeanMethod getMethod(String methodName, Class<?>... parameterTypes) throws BeanMethodNotFoundException {
+    default Optional<BeanMethod> getMethod(String methodName, Class<?>... parameterTypes) {
         return getMethodBySignature(SignatureHelper.signMethod(methodName, parameterTypes));
     }
 
-    BeanMethod getMethodBySignature(String methodSignature) throws BeanMethodNotFoundException;
+    Optional<BeanMethod> getMethodBySignature(String methodSignature);
 
     /**
      * Keys are method signatures.
      *
-     * @return
+     * @return Immutable map contains method signature and bean method
      */
     @Immutable
     Map<String, BeanMethod> getAllMethods();

@@ -5,7 +5,7 @@ import xyz.srclab.common.reflect.SignatureHelper;
 public class MarkHelper {
 
     public static Object generateDefaultMark(Marked marked, Object key) {
-        return SignatureHelper.signature(marked.getClass())
+        return SignatureHelper.signClass(marked.getClass())
                 + ":"
                 + key
                 + ":"

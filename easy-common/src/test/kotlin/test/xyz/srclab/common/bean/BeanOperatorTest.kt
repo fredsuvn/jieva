@@ -26,7 +26,7 @@ object BeanOperatorTest {
         doAssertEquals(b.aa?.intString, 110)
 
         //bean to map
-        val map = mutableMapOf<String, Object>()
+        val map = mutableMapOf<String, Any>()
         BeanHelper.copyProperties(a, map)
         doAssertEquals(map["stringProperty"], a.stringProperty)
         doAssertEquals(map["intProperty"], a.intProperty)
@@ -46,7 +46,7 @@ object BeanOperatorTest {
         doAssertEquals((map["aa"] as Aa).intString, "110")
 
         //map to map
-        val map2 = mutableMapOf<String, Object>()
+        val map2 = mutableMapOf<String, Any>()
         BeanHelper.copyProperties(map, map2)
         doAssertEquals(map2["stringProperty"], a.stringProperty)
         doAssertEquals(map2["intProperty"], a.intProperty)
@@ -78,6 +78,12 @@ object BeanOperatorTest {
         doAssertEquals(b.listMap, mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5)))
         doAssertEquals(b.listMap2, mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50)))
         doAssertEquals(b.aa?.intString, 110)
+
+        //null key
+        val nullKey = mapOf(null to "null")
+        val destNullKey = mutableMapOf<Any, Any>()
+        BeanHelper.copyProperties(nullKey, destNullKey)
+        doAssertEquals(destNullKey, mapOf<Any, Any>())
     }
 
     @Test
@@ -99,7 +105,7 @@ object BeanOperatorTest {
         doAssertEquals(b.aa?.intString, 110)
 
         //bean to map
-        val map = mutableMapOf<String, Object>()
+        val map = mutableMapOf<String, Any>()
         BeanHelper.copyPropertiesIgnoreNull(a, map)
         doAssertEquals(map["stringProperty"], null)
         doAssertEquals(map["intProperty"], a.intProperty)
@@ -119,7 +125,7 @@ object BeanOperatorTest {
         doAssertEquals((map["aa"] as Aa).intString, "110")
 
         //map to map
-        val map2 = mutableMapOf<String, Object>()
+        val map2 = mutableMapOf<String, Any>()
         BeanHelper.copyPropertiesIgnoreNull(map, map2)
         doAssertEquals(map2["stringProperty"], null)
         doAssertEquals(map2["intProperty"], a.intProperty)
@@ -161,7 +167,7 @@ object BeanOperatorTest {
         b.clear()
 
         //bean to map
-        val map = mutableMapOf<String, Object>()
+        val map = mutableMapOf<String, Any>()
         BeanHelper.populateProperties(a, map)
         doAssertEquals(map["stringProperty"], a.stringProperty)
         doAssertEquals(map["intProperty"], a.intProperty)
@@ -181,7 +187,7 @@ object BeanOperatorTest {
         doAssertEquals((map["aa"] as Aa).intString, "110")
 
         //map to map
-        val map2 = mutableMapOf<String, Object>()
+        val map2 = mutableMapOf<String, Any>()
         BeanHelper.populateProperties(map, map2)
         doAssertEquals(map2["stringProperty"], a.stringProperty)
         doAssertEquals(map2["intProperty"], a.intProperty)
@@ -199,17 +205,22 @@ object BeanOperatorTest {
             mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
         )
         doAssertEquals((map2["aa"] as Aa).intString, "110")
+
+        //null key
+        val nullKey = mapOf(null to "null")
+        val destNullKey = mutableMapOf<Any, Any>()
+        BeanHelper.populateProperties(nullKey, destNullKey)
+        doAssertEquals(destNullKey, mapOf<Any, Any>())
     }
 
     @Test
     fun testPopulatePropertiesIgnoreNull() {
         // bean to bean
         val a = A()
-        val b = B()
         a.stringProperty = null
 
         //bean to map
-        val map = mutableMapOf<String, Object>()
+        val map = mutableMapOf<String, Any>()
         BeanHelper.populatePropertiesIgnoreNull(a, map)
         doAssertEquals(map["stringProperty"], null)
         doAssertEquals(map["intProperty"], a.intProperty)
@@ -229,7 +240,7 @@ object BeanOperatorTest {
         doAssertEquals((map["aa"] as Aa).intString, "110")
 
         //map to map
-        val map2 = mutableMapOf<String, Object>()
+        val map2 = mutableMapOf<String, Any>()
         BeanHelper.populatePropertiesIgnoreNull(map, map2)
         doAssertEquals(map2["stringProperty"], null)
         doAssertEquals(map2["intProperty"], a.intProperty)
@@ -257,7 +268,7 @@ object BeanOperatorTest {
     @Test
     fun testCustomOperator() {
         val a = A()
-        val map = mutableMapOf<String, Object>()
+        val map = mutableMapOf<String, Any>()
         customBeanOperator.copyProperties(a, map)
         doAssertEquals(map["1"], 9)
         val c = customBeanOperator.convert<String>("", String::class.java)
@@ -304,7 +315,7 @@ object BeanOperatorTest {
         var stringMap: Map<String, String>? = mapOf("1" to "1", "2" to "2", "3" to "3")
         var listMap: Map<String, List<String>>? =
             mapOf("1" to listOf("1", "2", "3"), "2" to listOf("2", "3", "4"), "3" to listOf("3", "4", "5"))
-        var listMap2: Map<in String, List<out String>>? =
+        var listMap2: Map<in String, List<String>>? =
             mapOf("1" to listOf("10", "20", "30"), "2" to listOf("20", "30", "40"), "3" to listOf("30", "40", "50"))
         var aa: Aa? = Aa()
 
@@ -335,7 +346,7 @@ object BeanOperatorTest {
         var stringMap: Map<Int, Int>? = mapOf(1 to 1, 2 to 2, 3 to 3)
         var listMap: Map<Int, List<Int>>? =
             mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5))
-        var listMap2: Map<out Int, List<out Int>>? =
+        var listMap2: Map<out Int, List<Int>>? =
             mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50))
         var aa: Bb? = Bb()
 

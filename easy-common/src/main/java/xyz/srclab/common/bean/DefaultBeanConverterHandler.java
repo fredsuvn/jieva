@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean;
 
+import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.collection.iterable.IterableHelper;
@@ -10,9 +11,7 @@ import xyz.srclab.common.reflect.instance.InstanceHelper;
 import xyz.srclab.common.reflect.type.TypeHelper;
 import xyz.srclab.common.string.format.fastformat.FastFormat;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.*;
@@ -29,18 +28,11 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     @Override
-    public boolean supportConvert(Object from, Class<?> to, BeanOperator beanOperator) {
-        return true;
-    }
-
-    @Override
     public Object convert(Object from, Type to, BeanOperator beanOperator) {
-        return convertType(from, to, beanOperator);
-    }
-
-    @Override
-    public Object convert(Object from, Class<?> to, BeanOperator beanOperator) {
-        return convertClass(from, to, beanOperator);
+        return to instanceof Class ?
+                convertClass(from, (Class<?>) to, beanOperator)
+                :
+                convertType(from, to, beanOperator);
     }
 
     private Object convertClass(Object from, Class<?> to, BeanOperator beanOperator) {
@@ -67,17 +59,18 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     private Object convertType(Object from, Type to, BeanOperator beanOperator) {
-        if (to instanceof Class) {
-            return convertClass(from, (Class<?>) to, beanOperator);
+        if (to instanceof GenericArrayType) {
+            return convertToArray(from, to, beanOperator);
         }
         Class<?> rawType = TypeHelper.getRawClass(to);
         if (!(to instanceof ParameterizedType)) {
             return convertClass(from, rawType, beanOperator);
         }
         ParameterizedType parameterizedType = (ParameterizedType) to;
-        if (rawType.isArray()) {
-            return convertToArray(from, to, beanOperator);
-        }
+        // Never reached
+        // if (rawType.isArray()) {
+        //     return convertToArray(from, to, beanOperator);
+        // }
         if (Map.class.equals(rawType)) {
             Type[] kv = TypeHelper.getGenericTypes(parameterizedType);
             return convertToMap(from, kv[0], kv[1], beanOperator);
@@ -88,17 +81,11 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         if (Set.class.equals(rawType) || Collection.class.equals(rawType)) {
             return convertToSet(from, TypeHelper.getGenericTypes(parameterizedType)[0], beanOperator);
         }
-        return convertToBean(from, rawType, beanOperator);
+        return convertToGenericBean(from, rawType, parameterizedType.getActualTypeArguments(), beanOperator);
     }
 
-    private Object convertToBean(Object from, Class<?> to, BeanOperator beanOperator) {
-        Object toInstance = InstanceHelper.newInstance(to);
-        beanOperator.copyProperties(from, toInstance);
-        return toInstance;
-    }
-
-    private Map convertToMap(Object from, Type keyType, Type valueType, BeanOperator beanOperator) {
-        Map map = new LinkedHashMap<>();
+    private Map<Object, Object> convertToMap(Object from, Type keyType, Type valueType, BeanOperator beanOperator) {
+        Map<Object, Object> map = new LinkedHashMap<>();
         beanOperator.populateProperties(from, map,
                 (sourcePropertyName, sourcePropertyValue, keyValueSetter, beanOperator1) -> {
                     Object key = beanOperator.convert(sourcePropertyName, keyType);
@@ -116,7 +103,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return ListHelper.immutable(result);
         }
         if (from instanceof Iterable) {
-            Iterable<Object> iterable = (Iterable<Object>) from;
+            Iterable<?> iterable = (Iterable<?>) from;
             List<Object> result = new LinkedList<>();
             for (@Nullable Object o : iterable) {
                 result.add(o == null ? null : beanOperator.convert(o, elementType));
@@ -134,7 +121,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return SetHelper.immutable(result);
         }
         if (from instanceof Iterable) {
-            Iterable<Object> iterable = (Iterable<Object>) from;
+            Iterable<?> iterable = (Iterable<?>) from;
             Set<Object> result = new LinkedHashSet<>();
             for (@Nullable Object o : iterable) {
                 result.add(o == null ? null : beanOperator.convert(o, elementType));
@@ -160,7 +147,7 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return resultArray;
         }
         if (from instanceof Iterable) {
-            Collection<Object> collection = IterableHelper.asCollection((Iterable<Object>) from);
+            Collection<?> collection = IterableHelper.asCollection((Iterable<?>) from);
             Object resultArray = Array.newInstance(rawComponentType, collection.size());
             int i = 0;
             for (@Nullable Object o : collection) {
@@ -182,6 +169,29 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             @Nullable Object value = Array.get(array, i);
             collection.add(value == null ? null : beanOperator.convert(value, elementType));
         }
+    }
+
+    private Object convertToBean(Object from, Class<?> to, BeanOperator beanOperator) {
+        Object toInstance = InstanceHelper.newInstance(to);
+        beanOperator.copyProperties(from, toInstance);
+        return toInstance;
+    }
+
+    private Object convertToGenericBean(Object from, Class<?> rawType, Type[] genericTypes, BeanOperator beanOperator) {
+        TypeVariable<?>[] typeVariables = TypeHelper.getTypeParameters(rawType);
+        Object toInstance = InstanceHelper.newInstance(rawType);
+        beanOperator.copyProperties(from, toInstance,
+                (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator1) -> {
+                    Type destType = Object.class;
+                    int index = ArrayUtils.indexOf(typeVariables, destPropertyType);
+                    if (index >= 0) {
+                        destType = genericTypes[index];
+                    }
+                    @Nullable Object destValue = sourcePropertyValue == null ?
+                            null : beanOperator.convert(sourcePropertyValue, destType);
+                    destPropertySetter.set(destValue);
+                });
+        return toInstance;
     }
 
     @Nullable
@@ -215,6 +225,12 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             throw new UnsupportedOperationException(
                     FastFormat.format("Cannot convert object {} to type {}", from, to));
         }
+        if (byte.class.equals(to) || Byte.class.equals(to)) {
+            if (from instanceof Number) {
+                return ((Number) from).byteValue();
+            }
+            return Byte.valueOf(from.toString());
+        }
         if (float.class.equals(to) || Float.class.equals(to)) {
             if (from instanceof Number) {
                 return ((Number) from).floatValue();
@@ -226,12 +242,6 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
                 return ((Number) from).doubleValue();
             }
             return Double.valueOf(from.toString());
-        }
-        if (byte.class.equals(to) || Byte.class.equals(to)) {
-            if (from instanceof Number) {
-                return ((Number) from).byteValue();
-            }
-            return Byte.valueOf(from.toString());
         }
         if (short.class.equals(to) || Short.class.equals(to)) {
             if (from instanceof Number) {
@@ -277,7 +287,8 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return Date.from((Instant) from);
         }
         if (from instanceof TemporalAccessor) {
-            return Date.from(Instant.from((TemporalAccessor) from));
+            TemporalAccessor temporalAccessor = toOffsetTemporalAccessor((TemporalAccessor) from);
+            return Date.from(Instant.from(temporalAccessor));
         }
         return Date.from(toZonedDateTime(from).toInstant());
     }
@@ -287,31 +298,30 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return Instant.ofEpochMilli(((Number) from).longValue());
         }
         if (from instanceof TemporalAccessor) {
-            return Instant.from((TemporalAccessor) from);
+            TemporalAccessor temporalAccessor = toOffsetTemporalAccessor((TemporalAccessor) from);
+            return Instant.from(temporalAccessor);
         }
         return toZonedDateTimeWithoutTemporal(from).toInstant();
     }
 
     private ZonedDateTime toZonedDateTime(Object from) {
         if (from instanceof TemporalAccessor) {
-            return toZonedDateTimeWithTemporal((TemporalAccessor) from);
+            TemporalAccessor temporalAccessor = toOffsetTemporalAccessor((TemporalAccessor) from);
+            return toZonedDateTimeWithTemporal(temporalAccessor);
         }
         return toZonedDateTimeWithoutTemporal(from);
     }
 
     private ZonedDateTime toZonedDateTimeWithTemporal(TemporalAccessor temporalAccessor) {
-        if (temporalAccessor.isSupported(ChronoField.OFFSET_SECONDS)) {
-            return ZonedDateTime.from(temporalAccessor);
-        }
-        LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
-        return localDateTime.atZone(ZoneId.systemDefault());
+        return ZonedDateTime.from(temporalAccessor);
     }
 
     private ZonedDateTime toZonedDateTimeWithoutTemporal(Object from) {
         if (from instanceof Number) {
-            ZonedDateTime.ofInstant(Instant.ofEpochMilli((Long) from), ZoneId.systemDefault());
+            return ZonedDateTime.ofInstant(Instant.ofEpochMilli((Long) from), ZoneId.systemDefault());
         }
-        TemporalAccessor temporalAccessor = DateTimeFormatter.ISO_DATE_TIME.parse(from.toString());
+        TemporalAccessor temporalAccessor = toOffsetTemporalAccessor(
+                DateTimeFormatter.ISO_DATE_TIME.parse(from.toString()));
         return toZonedDateTimeWithTemporal(temporalAccessor);
     }
 
@@ -327,5 +337,13 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return Duration.ofMillis(((Number) from).longValue());
         }
         return Duration.parse(from.toString());
+    }
+
+    private TemporalAccessor toOffsetTemporalAccessor(TemporalAccessor temporalAccessor) {
+        if (temporalAccessor.isSupported(ChronoField.OFFSET_SECONDS)) {
+            return temporalAccessor;
+        }
+        LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
+        return localDateTime.atZone(ZoneId.systemDefault());
     }
 }
