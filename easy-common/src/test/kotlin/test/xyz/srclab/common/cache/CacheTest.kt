@@ -22,7 +22,7 @@ object CacheTest {
         Thread.sleep(SLEEP_TIME)
     }
 
-    @Test(dataProvider = "testCacheProvider")
+    @Test(dataProvider = "testCacheDataProvider")
     fun testGet(cache: Cache<String, Computed<Long>>) {
         doAssertEquals(cache.has("1"), false)
         doAssertEquals(cache.hasAll("1", "2"), false)
@@ -103,7 +103,7 @@ object CacheTest {
         doAssertEquals(map1It, mapOf("1" to counter))
     }
 
-    @Test(dataProvider = "testCacheProvider")
+    @Test(dataProvider = "testCacheDataProvider")
     fun testPut(cache: Cache<String, Computed<Long>>) {
         val counter = Computed.withCounter(100000)
         counter.get()
@@ -124,7 +124,7 @@ object CacheTest {
         }
     }
 
-    @Test(dataProvider = "testCacheExpireProvider")
+    @Test(dataProvider = "testCacheExpireDataProvider")
     fun testExpire(cache: Cache<String, Computed<Long>>) {
         val counter = Computed.withCounter(100000)
         counter.get()
@@ -235,7 +235,7 @@ object CacheTest {
         }
     }
 
-    @Test(dataProvider = "testCacheProvider")
+    @Test(dataProvider = "testCacheDataProvider")
     fun testInvalidate(cache: Cache<String, Computed<Long>>) {
         val counter = Computed.withCounter(100000)
         counter.get()
@@ -273,7 +273,7 @@ object CacheTest {
     }
 
     @DataProvider
-    fun testCacheProvider(): Array<Array<Cache<String, Computed<Long>>>> {
+    fun testCacheDataProvider(): Array<Array<Cache<String, Computed<Long>>>> {
         return arrayOf(
             arrayOf(WeakCache()),
             arrayOf(WeakCache(true)),
@@ -284,7 +284,7 @@ object CacheTest {
     }
 
     @DataProvider
-    fun testCacheExpireProvider(): Array<Array<Cache<String, Computed<Long>>>> {
+    fun testCacheExpireDataProvider(): Array<Array<Cache<String, Computed<Long>>>> {
         return arrayOf(
             arrayOf(WeakCache(Duration.ofSeconds(1))),
             arrayOf(WeakCache(Duration.ofSeconds(1), true)),
