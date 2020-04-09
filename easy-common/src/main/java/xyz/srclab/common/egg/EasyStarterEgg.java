@@ -5,12 +5,12 @@ import xyz.srclab.common.time.TimeHelper;
 class EasyStarterEgg implements Egg {
 
     /*
-     *                                         _____              _____
-     * ___________ ____________  __      _________  /______ _________  /_____________
-     * _  _ \  __ `/_  ___/_  / / /________  ___/  __/  __ `/_  ___/  __/  _ \_  ___/
-     * /  __/ /_/ /_(__  )_  /_/ /_/_____/(__  )/ /_ / /_/ /_  /   / /_ /  __/  /
-     * \___/\__,_/ /____/ _\__, /        /____/ \__/ \__,_/ /_/    \__/ \___//_/
-     *                    /____/
+     * __________                            ____________              _____
+     * ___  ____/_____ ____________  __      __  ___/_  /______ _________  /_____________
+     * __  __/  _  __ `/_  ___/_  / / /___________ \_  __/  __ `/_  ___/  __/  _ \_  ___/
+     * _  /___  / /_/ /_(__  )_  /_/ /_/_____/___/ // /_ / /_/ /_  /   / /_ /  __/  /
+     * /_____/  \__,_/ /____/ _\__, /        /____/ \__/ \__,_/ /_/    \__/ \___//_/
+     *                        /____/
      *
      * Source: http://www.network-science.de/ascii/
      * Font: speed
@@ -23,17 +23,17 @@ class EasyStarterEgg implements Egg {
     }
 
     private void printLogo() {
-        System.out.println("                                         _____              _____             ");
-        System.out.println("___________ ____________  __      _________  /______ _________  /_____________");
-        System.out.println("_  _ \\  __ `/_  ___/_  / / /________  ___/  __/  __ `/_  ___/  __/  _ \\_  ___/");
-        System.out.println("/  __/ /_/ /_(__  )_  /_/ /_/_____/(__  )/ /_ / /_/ /_  /   / /_ /  __/  /    ");
-        System.out.println("\\___/\\__,_/ /____/ _\\__, /        /____/ \\__/ \\__,_/ /_/    \\__/ \\___//_/     ");
-        System.out.println("                   /____/                                                     ");
-        System.out.println("                                                           srclab.xyz, sunqian");
-        System.out.println("                                                              fredsuvn@163.com");
-        System.out.println("                                                                              ");
-        System.out.println("Source: http://www.network-science.de/ascii/                                  ");
-        System.out.println("Font: speed                                                                   ");
+        System.out.println("__________                            ____________              _____             ");
+        System.out.println("___  ____/_____ ____________  __      __  ___/_  /______ _________  /_____________");
+        System.out.println("__  __/  _  __ `/_  ___/_  / / /___________ \\_  __/  __ `/_  ___/  __/  _ \\_  ___/");
+        System.out.println("_  /___  / /_/ /_(__  )_  /_/ /_/_____/___/ // /_ / /_/ /_  /   / /_ /  __/  /    ");
+        System.out.println("/_____/  \\__,_/ /____/ _\\__, /        /____/ \\__/ \\__,_/ /_/    \\__/ \\___//_/     ");
+        System.out.println("                       /____/                                                     ");
+        System.out.println("                                                               srclab.xyz, sunqian");
+        System.out.println("                                                                  fredsuvn@163.com");
+        System.out.println("                                                                                  ");
+        System.out.println("Source: http://www.network-science.de/ascii/                                      ");
+        System.out.println("Font: speed                                                                       ");
     }
 
     private void startGame() {
