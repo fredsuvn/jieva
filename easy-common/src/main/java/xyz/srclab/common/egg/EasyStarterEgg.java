@@ -11,6 +11,8 @@ class EasyStarterEgg implements Egg {
      * _  /___  / /_/ /_(__  )_  /_/ /_/_____/___/ // /_ / /_/ /_  /   / /_ /  __/  /
      * /_____/  \__,_/ /____/ _\__, /        /____/ \__/ \__,_/ /_/    \__/ \___//_/
      *                        /____/
+     *                                                                srclab.xyz, sunqian
+     *                                                                   fredsuvn@163.com
      *
      * Source: http://www.network-science.de/ascii/
      * Font: speed
