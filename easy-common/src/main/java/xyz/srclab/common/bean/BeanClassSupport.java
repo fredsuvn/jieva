@@ -7,7 +7,6 @@ import xyz.srclab.common.collection.map.MapHelper;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 public class BeanClassSupport {
 
@@ -71,8 +70,8 @@ public class BeanClassSupport {
             }
 
             @Override
-            public Optional<BeanProperty> getProperty(String propertyName) {
-                return Optional.ofNullable(propertyMap.get(propertyName));
+            public @Nullable BeanProperty getProperty(String propertyName) {
+                return propertyMap.get(propertyName);
             }
 
             @Override
@@ -91,8 +90,8 @@ public class BeanClassSupport {
             }
 
             @Override
-            public Optional<BeanMethod> getMethodBySignature(String methodSignature) {
-                return Optional.ofNullable(methodMap.get(methodSignature));
+            public @Nullable BeanMethod getMethodBySignature(String methodSignature) {
+                return methodMap.get(methodSignature);
             }
 
             @Override

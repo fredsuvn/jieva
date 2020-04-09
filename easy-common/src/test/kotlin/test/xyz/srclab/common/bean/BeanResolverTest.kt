@@ -7,7 +7,6 @@ import xyz.srclab.common.bean.*
 import xyz.srclab.common.reflect.SignatureHelper
 import java.lang.reflect.Method
 import java.lang.reflect.Type
-import java.util.*
 
 object BeanResolverTest {
 
@@ -19,21 +18,21 @@ object BeanResolverTest {
         val readProperty = beanClass.getProperty("read")
         doAssertEquals(beanClass.canReadProperty("read"), true)
         doAssertEquals(beanClass.canWriteProperty("read"), false)
-        doAssertEquals(readProperty.get().getValue(a), a.read)
+        doAssertEquals(readProperty?.getValue(a), a.read)
         doExpectThrowable(UnsupportedOperationException::class.java) {
-            readProperty.get().setValue(a, "read2")
+            readProperty?.setValue(a, "read2")
         }
 
         val wwwProperty = beanClass.getProperty("www")
         if (beanClass.canReadProperty("www")) {
-            doAssertEquals(wwwProperty.get().getValue(a), a.www)
+            doAssertEquals(wwwProperty?.getValue(a), a.www)
         }
         val xyzProperty = beanClass.getProperty("xyz")
         doAssertEquals(beanClass.canReadProperty("xyz"), false)
-        xyzProperty.get().setValue(a, "8888")
-        doAssertEquals(wwwProperty.get().getValue(a), "8888")
+        xyzProperty?.setValue(a, "8888")
+        doAssertEquals(wwwProperty?.getValue(a), "8888")
         doExpectThrowable(UnsupportedOperationException::class.java) {
-            xyzProperty.get().getValue(a)
+            xyzProperty?.getValue(a)
         }
 
         val propertyNames = beanClass.allProperties.map { e ->
@@ -53,10 +52,10 @@ object BeanResolverTest {
         doAssertEquals(beanClass.allMethods.contains(SignatureHelper.signMethod(realMethod)), true)
         val someMethod = beanClass.getMethod("someMethod", String::class.java)
         val someMethodSignature = beanClass.getMethodBySignature(SignatureHelper.signMethod(realMethod))
-        doAssertEquals(someMethod.get().method, realMethod)
-        doAssertEquals(someMethodSignature.get().method, realMethod)
-        doAssertEquals(someMethod.get(), someMethodSignature.get())
-        doAssertEquals(someMethod.get().invoke(a, "a"), "aa")
+        doAssertEquals(someMethod?.method, realMethod)
+        doAssertEquals(someMethodSignature?.method, realMethod)
+        doAssertEquals(someMethod, someMethodSignature)
+        doAssertEquals(someMethod?.invoke(a, "a"), "aa")
     }
 
     val customBeanResolver = BeanResolver.newBuilder()
@@ -80,8 +79,8 @@ object BeanResolverTest {
                             return type
                         }
 
-                        override fun getReadMethod(): Optional<Method> {
-                            return Optional.empty()
+                        override fun getReadMethod(): Method? {
+                            return null
                         }
 
                         override fun isReadable(): Boolean {
@@ -92,8 +91,8 @@ object BeanResolverTest {
                             return true
                         }
 
-                        override fun getWriteMethod(): Optional<Method> {
-                            return Optional.empty()
+                        override fun getWriteMethod(): Method? {
+                            return null
                         }
 
                         override fun getName(): String {
@@ -116,9 +115,9 @@ object BeanResolverTest {
     @Test
     fun testCustomResolver() {
         val customBeanClass = customBeanResolver.resolve(Object::class.java)
-        doAssertEquals(customBeanClass.getProperty("1").get().getValue(""), 1)
-        customBeanClass.getProperty("1").get().setValue("1", "222")
-        doAssertEquals(customBeanClass.getProperty("1").get().getValue(""), 222)
+        doAssertEquals(customBeanClass.getProperty("1")?.getValue(""), 1)
+        customBeanClass.getProperty("1")?.setValue("1", "222")
+        doAssertEquals(customBeanClass.getProperty("1")?.getValue(""), 222)
 
         doExpectThrowable(UnsupportedOperationException::class.java) {
             customBeanResolver.resolve(1.javaClass)
@@ -134,26 +133,26 @@ object BeanResolverTest {
         val byEmpty = emptyBeanResolver.resolve(Any::class.java)
         doAssertEquals(byEmpty.allProperties, byDefault.allProperties)
 
-        val propertyByDefault = byDefault.getProperty("class").get()
-        val propertyByEmpty = byEmpty.getProperty("class").get()
+        val propertyByDefault = byDefault.getProperty("class")
+        val propertyByEmpty = byEmpty.getProperty("class")
         doAssertEquals(propertyByEmpty, propertyByDefault)
         doAssertEquals(propertyByEmpty == propertyByDefault, true)
-        doAssertEquals(propertyByEmpty.name, propertyByDefault.name)
-        doAssertEquals(propertyByEmpty.type, propertyByDefault.type)
-        doAssertEquals(propertyByEmpty.genericType, propertyByDefault.genericType)
-        doAssertEquals(propertyByEmpty.readMethod, propertyByDefault.readMethod)
-        doAssertEquals(propertyByEmpty.writeMethod, propertyByDefault.writeMethod)
+        doAssertEquals(propertyByEmpty?.name, propertyByDefault?.name)
+        doAssertEquals(propertyByEmpty?.type, propertyByDefault?.type)
+        doAssertEquals(propertyByEmpty?.genericType, propertyByDefault?.genericType)
+        doAssertEquals(propertyByEmpty?.readMethod, propertyByDefault?.readMethod)
+        doAssertEquals(propertyByEmpty?.writeMethod, propertyByDefault?.writeMethod)
 
-        val methodByDefault = byDefault.getMethod("getClass").get()
-        val methodByEmpty = byEmpty.getMethod("getClass").get()
+        val methodByDefault = byDefault.getMethod("getClass")
+        val methodByEmpty = byEmpty.getMethod("getClass")
         doAssertEquals(methodByEmpty, methodByDefault)
         doAssertEquals(methodByEmpty == methodByDefault, true)
-        doAssertEquals(methodByEmpty.name, methodByDefault.name)
-        doAssertEquals(methodByEmpty.returnType, methodByDefault.returnType)
-        doAssertEquals(methodByEmpty.genericReturnType, methodByDefault.genericReturnType)
-        doAssertEquals(methodByEmpty.parameterCount, methodByDefault.parameterCount)
-        doAssertEquals(methodByEmpty.parameterTypes, methodByDefault.parameterTypes)
-        doAssertEquals(methodByEmpty.genericParameterTypes, methodByDefault.genericParameterTypes)
+        doAssertEquals(methodByEmpty?.name, methodByDefault?.name)
+        doAssertEquals(methodByEmpty?.returnType, methodByDefault?.returnType)
+        doAssertEquals(methodByEmpty?.genericReturnType, methodByDefault?.genericReturnType)
+        doAssertEquals(methodByEmpty?.parameterCount, methodByDefault?.parameterCount)
+        doAssertEquals(methodByEmpty?.parameterTypes, methodByDefault?.parameterTypes)
+        doAssertEquals(methodByEmpty?.genericParameterTypes, methodByDefault?.genericParameterTypes)
     }
 
     class A {

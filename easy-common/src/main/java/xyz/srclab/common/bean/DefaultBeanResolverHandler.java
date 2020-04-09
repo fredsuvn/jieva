@@ -16,7 +16,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
@@ -67,16 +66,15 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         private final PropertyDescriptor descriptor;
         private final Type genericType;
 
-        private final Optional<Method> readMethod;
-        private final Optional<Method> writeMethod;
+        private final @Nullable Method readMethod;
+        private final @Nullable Method writeMethod;
         private final @Nullable MethodInvoker getter;
         private final @Nullable MethodInvoker setter;
-        private final int hashCode;
 
         private BeanPropertyImpl(PropertyDescriptor descriptor) {
             this.descriptor = descriptor;
-            @Nullable Method readMethod = descriptor.getReadMethod();
-            @Nullable Method writeMethod = descriptor.getWriteMethod();
+            this.readMethod = descriptor.getReadMethod();
+            this.writeMethod = descriptor.getWriteMethod();
             if (readMethod == null && writeMethod == null) {
                 // Should never reached:
                 throw new IllegalStateException("Both getter and setter method are null: " + getName());
@@ -85,17 +83,8 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
                     writeMethod.getGenericParameterTypes()[0]
                     :
                     readMethod.getGenericReturnType();
-            this.readMethod = Optional.ofNullable(readMethod);
-            this.writeMethod = Optional.ofNullable(writeMethod);
             this.getter = readMethod == null ? null : InvokerHelper.getMethodInvoker(readMethod);
             this.setter = writeMethod == null ? null : InvokerHelper.getMethodInvoker(writeMethod);
-            this.hashCode = readMethod == null ?
-                    writeMethod.hashCode()
-                    :
-                    writeMethod == null ?
-                            readMethod.hashCode()
-                            :
-                            readMethod.hashCode() + writeMethod.hashCode();
         }
 
         @Override
@@ -128,7 +117,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         }
 
         @Override
-        public Optional<Method> getReadMethod() {
+        public @Nullable Method getReadMethod() {
             return readMethod;
         }
 
@@ -146,7 +135,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         }
 
         @Override
-        public Optional<Method> getWriteMethod() {
+        public @Nullable Method getWriteMethod() {
             return writeMethod;
         }
 

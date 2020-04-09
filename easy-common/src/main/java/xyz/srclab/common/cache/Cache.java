@@ -150,13 +150,11 @@ public interface Cache<K, V> {
     }
 
     default void expireAll(long expirationPeriodSeconds, K... keys) {
-        expireAll(Arrays.asList(keys), expirationPeriodSeconds);
+        expireAll(Duration.ofSeconds(expirationPeriodSeconds), keys);
     }
 
-    default void expireAll(Iterable<K> keys, long expirationSeconds) {
-        for (K key : keys) {
-            expire(key, expirationSeconds);
-        }
+    default void expireAll(Iterable<K> keys, long expirationPeriodSeconds) {
+        expireAll(keys, Duration.ofSeconds(expirationPeriodSeconds));
     }
 
     void expire(K key, Duration expirationPeriod);

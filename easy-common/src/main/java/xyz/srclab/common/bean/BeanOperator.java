@@ -11,7 +11,6 @@ import xyz.srclab.common.reflect.instance.InstanceHelper;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Immutable
 public interface BeanOperator {
@@ -32,11 +31,11 @@ public interface BeanOperator {
 
     default BeanProperty getProperty(Object bean, String propertyName) throws BeanPropertyNotFoundException {
         BeanClass beanClass = resolve(bean.getClass());
-        Optional<BeanProperty> beanProperty = beanClass.getProperty(propertyName);
-        if (!beanProperty.isPresent()) {
+        @Nullable BeanProperty beanProperty = beanClass.getProperty(propertyName);
+        if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
         }
-        return beanProperty.get();
+        return beanProperty;
     }
 
     @Nullable
@@ -199,20 +198,20 @@ public interface BeanOperator {
 
     default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
             throws BeanMethodNotFoundException {
-        Optional<BeanMethod> methodOptional = resolve(bean.getClass()).getMethod(methodName, parameterTypes);
-        if (!methodOptional.isPresent()) {
+        @Nullable BeanMethod beanMethod = resolve(bean.getClass()).getMethod(methodName, parameterTypes);
+        if (beanMethod == null) {
             throw new BeanMethodNotFoundException(SignatureHelper.signMethod(methodName, parameterTypes));
         }
-        return methodOptional.get();
+        return beanMethod;
     }
 
     default BeanMethod getMethodBySignature(Object bean, String methodSignature)
             throws BeanMethodNotFoundException {
-        Optional<BeanMethod> methodOptional = resolve(bean.getClass()).getMethodBySignature(methodSignature);
-        if (!methodOptional.isPresent()) {
+        @Nullable BeanMethod beanMethod = resolve(bean.getClass()).getMethodBySignature(methodSignature);
+        if (beanMethod == null) {
             throw new BeanMethodNotFoundException(methodSignature);
         }
-        return methodOptional.get();
+        return beanMethod;
     }
 
     class Builder extends CacheStateBuilder<BeanOperator> {
