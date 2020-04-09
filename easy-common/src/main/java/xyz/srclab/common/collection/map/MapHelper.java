@@ -4,26 +4,25 @@ import com.google.common.collect.ImmutableMap;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.WriteReturn;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class MapHelper {
 
     @Immutable
-    public static <TK, TV, SK, SV> Map<TK, TV> map(
-            Map<SK, SV> sourceMap, Function<SK, TK> keyMapper, Function<SV, TV> valueMapper) {
-        return immutable(
-                sourceMap
-                        .entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(
-                                e -> keyMapper.apply(e.getKey()),
-                                e -> valueMapper.apply(e.getValue())
-                        )))
-                ;
+    public static <NK, NV, OK, OV> Map<NK, NV> map(
+            Map<OK, OV> sourceMap, Function<OK, NK> keyMapper, Function<OV, NV> valueMapper) {
+        Map<NK, NV> newMap = new LinkedHashMap<>();
+        sourceMap.forEach((k, v) -> newMap.put(keyMapper.apply(k), valueMapper.apply(v)));
+        return immutable(newMap);
+    }
+
+    @SafeVarargs
+    public static <K, V> void removeAll(@WriteReturn Map<K, V> map, K... keys) {
+        removeAll(map, Arrays.asList(keys));
     }
 
     public static <K, V> void removeAll(@WriteReturn Map<K, V> map, Iterable<? extends K> keys) {
