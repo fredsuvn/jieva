@@ -15,18 +15,19 @@ object FixedKeysMapTest {
 
 
     @Test(
-//        enabled = false,
+        enabled = false,
         invocationCount = 100000,
         threadPoolSize = 500
     )
     fun testMap() {
-        runTest(hashMap)
+        runTest(fixedKeysMap)
     }
 
     private fun runTest(map: MutableMap<String, String>) {
         val key = Random.nextLong(1, 2).toString()
         val value = Random.nextLong(1, 100000).toString()
         map[key] = value
+        Thread.sleep(1)
         val expectedValue = value
         val actualValue = map[key]
         if (expectedValue != actualValue) {
