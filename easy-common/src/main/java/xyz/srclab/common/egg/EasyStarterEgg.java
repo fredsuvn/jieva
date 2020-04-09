@@ -1,8 +1,8 @@
-package xyz.srclab.common.base.logo;
+package xyz.srclab.common.egg;
 
 import xyz.srclab.common.time.TimeHelper;
 
-class EasyStarterLogo implements Logo {
+class EasyStarterEgg implements Egg {
 
     /*
      *                                         _____              _____
@@ -17,7 +17,12 @@ class EasyStarterLogo implements Logo {
      */
 
     @Override
-    public void printLgo() {
+    public void hatchOut(String spell) {
+        printLogo();
+        startGame();
+    }
+
+    private void printLogo() {
         System.out.println("                                         _____              _____             ");
         System.out.println("___________ ____________  __      _________  /______ _________  /_____________");
         System.out.println("_  _ \\  __ `/_  ___/_  / / /________  ___/  __/  __ `/_  ___/  __/  _ \\_  ___/");
@@ -31,10 +36,15 @@ class EasyStarterLogo implements Logo {
         System.out.println("Font: speed                                                                   ");
     }
 
-    static final String SECRET_CODE;
+    private void startGame() {
+        System.out.println();
+        System.out.println("Welcome!");
+    }
+
+    static final String SPELL;
 
     static {
         long nowMillis = TimeHelper.nowMillis();
-        SECRET_CODE = "" + Math.sqrt(nowMillis);
+        SPELL = "" + Math.sqrt(nowMillis);
     }
 }

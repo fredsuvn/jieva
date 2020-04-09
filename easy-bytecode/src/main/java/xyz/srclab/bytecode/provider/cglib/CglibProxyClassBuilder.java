@@ -7,6 +7,7 @@ import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.reflect.method.MethodBody;
 import xyz.srclab.common.reflect.method.MethodDefinition;
+import xyz.srclab.common.reflect.method.MethodHelper;
 import xyz.srclab.common.reflect.method.MethodInvoker2;
 
 import java.util.Arrays;
@@ -74,7 +75,7 @@ final class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> i
         Enhancer enhancer = cglibAdaptor.newEnhancer();
         enhancer.setSuperclass(superClass);
         if (!interfaces.isEmpty()) {
-            enhancer.setInterfaces(interfaces.toArray(ArrayUtils.EMPTY_CLASS_ARRAY));
+            enhancer.setInterfaces(interfaces.toArray(MethodHelper.EMPTY_PARAMETER_TYPES));
         }
         enhancer.setCallbacks(callbacks);
         enhancer.setCallbackFilter(callbackFilter);

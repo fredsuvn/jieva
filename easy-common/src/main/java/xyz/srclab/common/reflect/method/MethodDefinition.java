@@ -66,7 +66,7 @@ public interface MethodDefinition<T> {
                 throw new IllegalStateException("No method body.");
             }
             if (parameterTypes == null) {
-                parameterTypes = ArrayUtils.EMPTY_CLASS_ARRAY;
+                parameterTypes = MethodHelper.EMPTY_PARAMETER_TYPES;
             }
 
             return new MethodDefinition<T>() {
