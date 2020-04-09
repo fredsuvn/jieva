@@ -32,18 +32,18 @@ object CacheTest {
         val counter = Computed.withCounter(100000)
         counter.get()
         val v1 = cache.get("1") {
-            counter.refreshAndGet()
+            counter.refreshGet()
             counter
         }
         doAssertEquals(v1?.get(), 1L)
         val v2 = cache.get("2", 1) {
-            counter.refreshAndGet()
+            counter.refreshGet()
             counter
         }
         doAssertEquals(v2?.get(), 2L)
         Thread.sleep(2000)
         cache.get("2", 1) {
-            counter.refreshAndGet()
+            counter.refreshGet()
             counter
         }
         doAssertEquals(v2?.get(), 3L)

@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.bean.BeanOperator;
-import xyz.srclab.common.lang.CachedNonNull;
+import xyz.srclab.common.lang.Computed;
 import xyz.srclab.common.reflect.type.TypeHelper;
 
 import java.util.Arrays;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Immutable
-public class ToString extends CachedNonNull<String> {
+public class ToString implements Computed<String> {
 
     public static String toString(@Nullable Object any) {
         if (any == null || TypeHelper.isBasic(any)) {
@@ -34,7 +34,7 @@ public class ToString extends CachedNonNull<String> {
     private final ToStringStyle style;
     private final BeanOperator beanOperator;
 
-    private @Nullable String toString;
+    private @Nullable String cache;
 
     public ToString(@Nullable Object any, ToStringStyle style, BeanOperator beanOperator) {
         this.any = any;
@@ -44,18 +44,10 @@ public class ToString extends CachedNonNull<String> {
 
     @Override
     public String toString() {
-        return getNonNull();
-    }
-
-    @Override
-    protected String newNonNull() {
-        if (any == null || TypeHelper.isBasic(any)) {
-            return String.valueOf(any);
+        if (cache == null) {
+            return refreshGet();
         }
-        StringBuilder buffer = new StringBuilder();
-        ToStringContext context = new ToStringContext();
-        buildToString(any, buffer, context);
-        return buffer.toString();
+        return cache;
     }
 
     private void buildToString(@Nullable Object object, StringBuilder buffer, ToStringContext context) {
@@ -213,6 +205,23 @@ public class ToString extends CachedNonNull<String> {
 
     private void writeIndicator(StringBuilder buffer) {
         buffer.append(style.getIndicator());
+    }
+
+    @Override
+    public String get() {
+        return toString();
+    }
+
+    @Override
+    public String refreshGet() {
+        if (any == null || TypeHelper.isBasic(any)) {
+            return String.valueOf(any);
+        }
+        StringBuilder buffer = new StringBuilder();
+        ToStringContext context = new ToStringContext();
+        buildToString(any, buffer, context);
+        cache = buffer.toString();
+        return cache;
     }
 
     private static final class ToStringContext {

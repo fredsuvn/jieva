@@ -35,14 +35,16 @@ public interface Computed<T> extends Supplier<T> {
         return new AutoRefreshComputed<>(timeout, atomicLong::getAndIncrement);
     }
 
-    void refresh();
+    @Override
+    T get();
 
-    T refreshAndGet();
+    T refreshGet();
 }
 
-final class SimpleComputed<T> extends CachedNonNull<T> implements Computed<T> {
+final class SimpleComputed<T> implements Computed<T> {
 
     private final Supplier<T> supplier;
+    private @Nullable T cache;
 
     SimpleComputed(Supplier<T> supplier) {
         this.supplier = supplier;
@@ -50,24 +52,16 @@ final class SimpleComputed<T> extends CachedNonNull<T> implements Computed<T> {
 
     @Override
     public T get() {
-        return getNonNull();
-    }
-
-    @Override
-    public void refresh() {
-        this.refreshNonNull();
-    }
-
-    @Override
-    public T refreshAndGet() {
-        refresh();
-        assert cache != null;
+        if (cache == null) {
+            return refreshGet();
+        }
         return cache;
     }
 
     @Override
-    protected T newNonNull() {
-        return supplier.get();
+    public T refreshGet() {
+        cache = supplier.get();
+        return cache;
     }
 }
 
@@ -87,22 +81,17 @@ final class AutoRefreshComputed<T> implements Computed<T> {
     @Override
     public T get() {
         if (this.cache == null) {
-            refresh();
-            return cache;
+            return refreshGet();
         }
         long now = TimeHelper.nowMillis();
         return (cacheTimeMillis > 0 && cacheTimeMillis + timeout.toMillis() >= now) ?
-                this.cache : refreshAndGet();
-    }
-
-    public void refresh() {
-        cache = supplier.get();
-        cacheTimeMillis = TimeHelper.nowMillis();
+                this.cache : refreshGet();
     }
 
     @Override
-    public T refreshAndGet() {
-        refresh();
+    public T refreshGet() {
+        cache = supplier.get();
+        cacheTimeMillis = TimeHelper.nowMillis();
         assert cache != null;
         return cache;
     }

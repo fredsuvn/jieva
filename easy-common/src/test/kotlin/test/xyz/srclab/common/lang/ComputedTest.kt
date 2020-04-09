@@ -15,7 +15,7 @@ object ComputedTest {
             count[0]
         }
         doAssertEquals(computed.get(), 1)
-        doAssertEquals(computed.refreshAndGet(), 2)
+        doAssertEquals(computed.refreshGet(), 2)
     }
 
     @Test
@@ -32,6 +32,6 @@ object ComputedTest {
         doAssertEquals(computed.get(), 3)
         Thread.sleep(1000)
         doAssertEquals(computed.get(), 4)
-        doAssertEquals(computed.refreshAndGet(), 5)
+        doAssertEquals(computed.refreshGet(), 5)
     }
 }

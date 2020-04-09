@@ -3,10 +3,11 @@ package xyz.srclab.common.string.format.fastformat;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.helpers.MessageFormatter;
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.lang.CachedNonNull;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.lang.Computed;
 
 @Immutable
-public class FastFormat extends CachedNonNull<String> {
+public class FastFormat implements Computed<String> {
 
     public static String format(String messagePattern, Object... args) {
         return new FastFormat(messagePattern, args).format();
@@ -15,6 +16,8 @@ public class FastFormat extends CachedNonNull<String> {
     private final String pattern;
     private final Object[] args;
 
+    private @Nullable String cache;
+
     public FastFormat(String pattern, Object... args) {
         this.pattern = pattern;
         this.args = args;
@@ -22,12 +25,10 @@ public class FastFormat extends CachedNonNull<String> {
 
     @Override
     public String toString() {
-        return getNonNull();
-    }
-
-    @Override
-    protected String newNonNull() {
-        return format();
+        if (cache == null) {
+            return refreshGet();
+        }
+        return cache;
     }
 
     private String format() {
@@ -43,5 +44,16 @@ public class FastFormat extends CachedNonNull<String> {
         if (lastEntry instanceof Throwable) {
             args[args.length - 1] = lastEntry.toString();
         }
+    }
+
+    @Override
+    public String get() {
+        return toString();
+    }
+
+    @Override
+    public String refreshGet() {
+        cache = format();
+        return cache;
     }
 }
