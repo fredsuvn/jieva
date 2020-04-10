@@ -1,6 +1,9 @@
 package test.xyz.srclab.common.collection
 
 import org.testng.annotations.Test
+import test.xyz.srclab.common.Config
+import test.xyz.srclab.common.doAssertEquals
+import test.xyz.srclab.common.doExpectThrowable
 import xyz.srclab.common.collection.map.FixedKeysMap
 import kotlin.random.Random
 
@@ -9,17 +12,58 @@ import kotlin.random.Random
  */
 object FixedKeysMapTest {
 
-    private val fixedKeysMap = FixedKeysMap<String, String>(mapDataProvider())
+    private val fixedKeysMap = FixedKeysMap(mapDataProvider())
 
     private val hashMap = HashMap<String, String>(mapDataProvider())
 
+    @Test
+    fun testMap() {
+        val hashMap = mapOf(1 to 1, 2 to 2)
+        val fixed: MutableMap<Int, Int?> = FixedKeysMap(mapOf(1 to 1, 2 to 2))
+
+        doAssertEquals(fixed, hashMap)
+        doAssertEquals(fixed == mapOf(1 to 1, 2 to 2), true)
+        doAssertEquals(fixed == mapOf(1 to 1), false)
+        doAssertEquals(fixed == fixed, true)
+        doAssertEquals(fixed.entries, hashMap.entries)
+        doAssertEquals(fixed.keys, hashMap.keys)
+        doAssertEquals(fixed.values, hashMap.values)
+        doAssertEquals(fixed.isEmpty(), false)
+        doAssertEquals(fixed.containsKey(1), true)
+        doAssertEquals(fixed.containsKey(3), false)
+        doAssertEquals(fixed.containsValue(8), false)
+        doAssertEquals(fixed.hashCode(), hashMap.hashCode())
+
+        fixed[1] = 8
+        doAssertEquals(fixed[1], 8)
+        doAssertEquals(fixed.containsValue(8), true)
+        fixed.putAll(mapOf(1 to 2, 2 to 3))
+        doAssertEquals(fixed, mapOf(1 to 2, 2 to 3))
+
+        doExpectThrowable(UnsupportedOperationException::class.java) {
+            fixed[3] = 3
+        }
+        doExpectThrowable(UnsupportedOperationException::class.java) {
+            fixed.putAll(mapOf(1 to 2, 2 to 3, 3 to 4))
+        }
+        doExpectThrowable(UnsupportedOperationException::class.java) {
+            fixed.remove(1)
+        }
+        doExpectThrowable(UnsupportedOperationException::class.java) {
+            fixed[1] = null
+        }
+        doExpectThrowable(UnsupportedOperationException::class.java) {
+            fixed.clear()
+        }
+    }
+
 
     @Test(
-        enabled = false,
+        enabled = Config.enableConcurrent,
         invocationCount = 100000,
         threadPoolSize = 500
     )
-    fun testMap() {
+    fun testMapConcurrent() {
         runTest(fixedKeysMap)
     }
 

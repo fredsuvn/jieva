@@ -15,6 +15,9 @@ object BeanResolverTest {
         val a = A()
         val beanClass = BeanHelper.resolve(A::class.java)
 
+        val publicField = beanClass.getProperty("publicField")
+        doAssertEquals(publicField, null)
+
         val readProperty = beanClass.getProperty("read")
         doAssertEquals(beanClass.canReadProperty("read"), true)
         doAssertEquals(beanClass.canWriteProperty("read"), false)
@@ -156,6 +159,9 @@ object BeanResolverTest {
     }
 
     class A {
+
+        @JvmField
+        var publicField: String? = null
 
         val read: String = "read"
 

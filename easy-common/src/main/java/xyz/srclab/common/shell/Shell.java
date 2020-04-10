@@ -4,7 +4,9 @@ import xyz.srclab.common.base.Defaults;
 
 public interface Shell {
 
-    Shell DEFAULT = new DefaultShell();
+    static Shell newDefault() {
+        return new DefaultShell();
+    }
 
     void print(Object any);
 

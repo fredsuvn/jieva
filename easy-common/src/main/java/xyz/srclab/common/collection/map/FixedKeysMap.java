@@ -72,7 +72,7 @@ public class FixedKeysMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean containsValue(Object value) {
-        throw new UnsupportedOperationException();
+        return hashMap.containsValue(value);
     }
 
     @Override
@@ -88,5 +88,23 @@ public class FixedKeysMap<K, V> implements Map<K, V> {
     @Override
     public Set<Entry<K, V>> entrySet() {
         return hashMap.entrySet();
+    }
+
+    @Override
+    public String toString() {
+        return hashMap.toString();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        return hashMap.equals(object);
+    }
+
+    @Override
+    public int hashCode() {
+        return hashMap.hashCode();
     }
 }

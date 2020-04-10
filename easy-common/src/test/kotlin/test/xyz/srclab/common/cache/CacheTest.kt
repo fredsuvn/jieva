@@ -2,6 +2,7 @@ package test.xyz.srclab.common.cache
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
+import test.xyz.srclab.common.Config
 import test.xyz.srclab.common.doAssertEquals
 import test.xyz.srclab.common.doExpectThrowable
 import xyz.srclab.common.cache.Cache
@@ -22,7 +23,10 @@ object CacheTest {
         Thread.sleep(SLEEP_TIME)
     }
 
-    @Test(dataProvider = "testCacheDataProvider")
+    @Test(
+        enabled = Config.enableBlocked,
+        dataProvider = "testCacheDataProvider"
+    )
     fun testGet(cache: Cache<String, Computed<Long>>) {
         doAssertEquals(cache.has("1"), false)
         doAssertEquals(cache.hasAll("1", "2"), false)
@@ -103,7 +107,10 @@ object CacheTest {
         doAssertEquals(map1It, mapOf("1" to counter))
     }
 
-    @Test(dataProvider = "testCacheDataProvider")
+    @Test(
+        enabled = Config.enableBlocked,
+        dataProvider = "testCacheDataProvider"
+    )
     fun testPut(cache: Cache<String, Computed<Long>>) {
         val counter = Computed.withCounter(100000)
         counter.get()
@@ -124,7 +131,10 @@ object CacheTest {
         }
     }
 
-    @Test(dataProvider = "testCacheExpireDataProvider")
+    @Test(
+        enabled = Config.enableBlocked,
+        dataProvider = "testCacheExpireDataProvider"
+    )
     fun testExpire(cache: Cache<String, Computed<Long>>) {
         val counter = Computed.withCounter(100000)
         counter.get()
@@ -235,7 +245,10 @@ object CacheTest {
         }
     }
 
-    @Test(dataProvider = "testCacheDataProvider")
+    @Test(
+        enabled = Config.enableBlocked,
+        dataProvider = "testCacheDataProvider"
+    )
     fun testInvalidate(cache: Cache<String, Computed<Long>>) {
         val counter = Computed.withCounter(100000)
         counter.get()

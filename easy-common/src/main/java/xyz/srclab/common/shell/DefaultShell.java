@@ -8,7 +8,7 @@ public class DefaultShell implements Shell {
 
     @Override
     public void print(Object any) {
-        System.out.println(any);
+        System.out.print(any);
     }
 
     @Override

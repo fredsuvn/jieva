@@ -1,6 +1,7 @@
 package test.xyz.srclab.common.collection
 
 import org.testng.annotations.Test
+import test.xyz.srclab.common.Config
 import test.xyz.srclab.common.doAssertEquals
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -16,7 +17,7 @@ object MapTest {
 
 
     @Test(
-        enabled = false,
+        enabled = Config.enableConcurrent,
         invocationCount = 10000,
         threadPoolSize = 500
     )

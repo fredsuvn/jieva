@@ -6,7 +6,13 @@ import org.testng.Assert
 
 fun doAssertEquals(actual: Any?, expected: Any?) {
     println("Assert >>> actual: ${toString(actual)}; expected: ${toString(expected)}")
-    Assert.assertEquals(actual, expected)
+    if (actual is Map<*, *> && expected is Map<*, *>) {
+        Assert.assertEquals(actual, expected)
+    } else if (actual is Collection<*> && expected is Collection<*>) {
+        Assert.assertEquals(actual, expected)
+    } else {
+        Assert.assertEquals(actual, expected)
+    }
 }
 
 fun <T : Throwable> doExpectThrowable(expected: Class<T>, runnable: () -> Unit): ThrowableCatcher<T> {
