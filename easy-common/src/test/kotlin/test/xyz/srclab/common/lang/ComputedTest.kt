@@ -1,6 +1,7 @@
 package test.xyz.srclab.common.lang
 
 import org.testng.annotations.Test
+import test.xyz.srclab.common.Config
 import test.xyz.srclab.common.doAssertEquals
 import xyz.srclab.common.lang.Computed
 import java.time.Duration
@@ -18,7 +19,9 @@ object ComputedTest {
         doAssertEquals(computed.refreshGet(), 2)
     }
 
-    @Test
+    @Test(
+        enabled = Config.enableBlocked
+    )
     fun testTimeout() {
         val count = arrayOf(0)
         val computed = Computed.with(Duration.ofMillis(1)) {
