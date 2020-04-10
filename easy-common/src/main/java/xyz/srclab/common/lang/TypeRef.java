@@ -25,7 +25,7 @@ public class TypeRef<T> {
     }
 
     protected Type reflectTypeSelf() {
-        @Nullable Type generic = TypeHelper.findGenericSuperclass(getClass(), TypeRef.class);
+        @Nullable Type generic = TypeHelper.findSuperclassGeneric(getClass(), TypeRef.class);
         if (!(generic instanceof ParameterizedType)) {
             throw new IllegalStateException("Must be extend from TypeRef with parameterized.");
         }
@@ -38,6 +38,6 @@ public class TypeRef<T> {
     }
 
     public <S> Class<S> getRawType() {
-        return TypeHelper.getRawClass(type);
+        return (Class<S>) TypeHelper.getRawClass(type);
     }
 }

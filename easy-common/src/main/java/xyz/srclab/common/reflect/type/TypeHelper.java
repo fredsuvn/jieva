@@ -19,7 +19,7 @@ public class TypeHelper {
 
     private static final Cache<Object, Type[]> TYPES_CACHE = new ThreadLocalCache<>();
 
-    private static final Cache<Object, TypeVariable[]> TYPE_VARIABLES_CACHE = new ThreadLocalCache<>();
+    private static final Cache<Object, TypeVariable<?>[]> TYPE_VARIABLES_CACHE = new ThreadLocalCache<>();
 
     public static boolean isBasic(Object any) {
         return any instanceof CharSequence
@@ -34,8 +34,8 @@ public class TypeHelper {
         return ClassUtils.isAssignable(fromType, to);
     }
 
-    public static <T> Class<T> getRawClass(Type type) {
-        return (Class<T>) TYPE_CACHE.getNonNull(
+    public static Class<?> getRawClass(Type type) {
+        return (Class<?>) TYPE_CACHE.getNonNull(
                 KeyHelper.buildKey(type, "getRawClass"),
                 k -> getRawClass0(type)
         );
@@ -91,15 +91,15 @@ public class TypeHelper {
     }
 
     @Nullable
-    public static Type findGenericSuperclass(Class<?> cls, Class<?> target) {
+    public static Type findSuperclassGeneric(Class<?> cls, Class<?> target) {
         Type returned = TYPE_CACHE.getNonNull(
                 KeyHelper.buildKey(cls, target, "findGenericSuperclass"),
-                k -> findGenericSuperclass0(cls, target)
+                k -> findSuperclassGeneric0(cls, target)
         );
         return returned == NullType.INSTANCE ? null : returned;
     }
 
-    private static Type findGenericSuperclass0(Class<?> cls, Class<?> target) {
+    private static Type findSuperclassGeneric0(Class<?> cls, Class<?> target) {
         Type current = cls;
         do {
             Class<?> currentClass = getRawClass(current);
