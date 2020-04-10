@@ -8,10 +8,7 @@ import xyz.srclab.common.reflect.SignatureHelper;
 import xyz.srclab.common.reflect.invoke.InvokerHelper;
 import xyz.srclab.common.reflect.invoke.MethodInvoker;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
+import java.beans.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
@@ -19,7 +16,7 @@ import java.util.Map;
 
 public class DefaultBeanResolverHandler implements BeanResolverHandler {
 
-    private static final Cache<Class<?>, BeanClass> CACHE = new ThreadLocalCache<>();
+    private static final Cache<Class<?>, BeanStruct> CACHE = new ThreadLocalCache<>();
 
     @Override
     public boolean supportBean(Class<?> beanClass) {
@@ -27,12 +24,12 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
     }
 
     @Override
-    public BeanClass resolve(Class<?> beanClass) {
+    public BeanStruct resolve(Class<?> beanClass) {
         return CACHE.getNonNull(beanClass, type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
                 Method[] methods = type.getMethods();
-                return BeanClassSupport.newBuilder()
+                return BeanStructSupport.newBuilder()
                         .setType(type)
                         .setProperties(buildProperties(beanInfo.getPropertyDescriptors()))
                         .setMethods(buildMethods(methods))
@@ -47,6 +44,9 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
     private Map<String, BeanProperty> buildProperties(PropertyDescriptor[] descriptors) {
         Map<String, BeanProperty> map = new LinkedHashMap<>();
         for (PropertyDescriptor descriptor : descriptors) {
+            if (descriptor instanceof IndexedPropertyDescriptor) {
+                continue;
+            }
             map.put(descriptor.getName(), new BeanPropertyImpl(descriptor));
         }
         return map;

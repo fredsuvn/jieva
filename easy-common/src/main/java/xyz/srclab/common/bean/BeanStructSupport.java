@@ -8,42 +8,42 @@ import xyz.srclab.common.collection.map.MapHelper;
 import java.util.Collections;
 import java.util.Map;
 
-public class BeanClassSupport {
+public class BeanStructSupport {
 
-    public static BeanClassBuilder newBuilder() {
-        return new BeanClassBuilder();
+    public static BeanStructBuilder newBuilder() {
+        return new BeanStructBuilder();
     }
 
-    public static class BeanClassBuilder extends CacheStateBuilder<BeanClass> {
+    public static class BeanStructBuilder extends CacheStateBuilder<BeanStruct> {
 
         private @Nullable Class<?> type;
         private @Nullable Map<String, BeanProperty> propertyMap;
         private @Nullable Map<String, BeanMethod> methodMap;
 
-        public BeanClassBuilder setType(Class<?> type) {
+        public BeanStructBuilder setType(Class<?> type) {
             this.changeState();
             this.type = type;
             return this;
         }
 
-        public BeanClassBuilder setProperties(Map<String, BeanProperty> properties) {
+        public BeanStructBuilder setProperties(Map<String, BeanProperty> properties) {
             this.changeState();
             this.propertyMap = properties;
             return this;
         }
 
-        public BeanClassBuilder setMethods(Map<String, BeanMethod> methodMap) {
+        public BeanStructBuilder setMethods(Map<String, BeanMethod> methodMap) {
             this.changeState();
             this.methodMap = methodMap;
             return this;
         }
 
         @Override
-        protected BeanClass buildNew() {
-            return new BeanClassImpl(this);
+        protected BeanStruct buildNew() {
+            return new BeanStructImpl(this);
         }
 
-        private static final class BeanClassImpl implements BeanClass {
+        private static final class BeanStructImpl implements BeanStruct {
 
             private final Class<?> type;
             private final Map<String, BeanProperty> propertyMap;
@@ -51,7 +51,7 @@ public class BeanClassSupport {
             private final Map<String, BeanProperty> writeablePropertyMap;
             private final Map<String, BeanMethod> methodMap;
 
-            private BeanClassImpl(BeanClassBuilder builder) {
+            private BeanStructImpl(BeanStructBuilder builder) {
                 if (builder.type == null) {
                     throw new IllegalStateException("Type cannot be null.");
                 }

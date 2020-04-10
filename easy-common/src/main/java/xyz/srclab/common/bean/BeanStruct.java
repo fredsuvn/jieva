@@ -7,7 +7,7 @@ import xyz.srclab.common.reflect.SignatureHelper;
 import java.util.Map;
 
 @Immutable
-public interface BeanClass {
+public interface BeanStruct {
 
     Class<?> getType();
 

@@ -3,7 +3,7 @@ package xyz.srclab.common.string.tostring;
 import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.bean.BeanClass;
+import xyz.srclab.common.bean.BeanStruct;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.lang.Computed;
 import xyz.srclab.common.reflect.type.TypeHelper;
@@ -99,11 +99,11 @@ public class ToString implements Computed<String> {
 
     private void buildBeanToString(Object bean, StringBuilder buffer, ToStringContext context) {
         writeBeanStart(buffer);
-        BeanClass beanClass = beanOperator.resolve(bean.getClass());
+        BeanStruct beanStruct = beanOperator.resolve(bean.getClass());
         context.pushParent(bean);
         context.pushIndent();
         int[] count = {0};
-        beanClass.getReadableProperties().forEach((name, property) -> {
+        beanStruct.getReadableProperties().forEach((name, property) -> {
             context.pushName("." + name);
             writeWrapping(buffer);
             writeIndent(buffer, context.getIndent());

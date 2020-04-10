@@ -24,6 +24,9 @@ dependencies {
 
     testCompile(project(":easy-test"))
     testCompile("org.testng:testng")
+
+    testCompile("org.springframework:spring-core")
+    testCompile("cglib:cglib")
 }
 
 test {

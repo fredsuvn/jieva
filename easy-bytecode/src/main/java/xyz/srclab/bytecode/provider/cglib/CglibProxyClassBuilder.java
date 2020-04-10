@@ -1,14 +1,13 @@
 package xyz.srclab.bytecode.provider.cglib;
 
-import org.apache.commons.lang3.ArrayUtils;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.bytecode.proxy.ProxyClass;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
-import xyz.srclab.common.reflect.method.MethodBody;
-import xyz.srclab.common.reflect.method.MethodDefinition;
+import xyz.srclab.common.reflect.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.method.MethodHelper;
-import xyz.srclab.common.reflect.method.MethodInvoker2;
+import xyz.srclab.common.reflect.method.ProxyMethod;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -34,17 +33,10 @@ final class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> i
     }
 
     @Override
-    public <R> CglibProxyClassBuilder<T> overrideMethod(String name, Class<?>[] parameterTypes, MethodBody<R> methodBody) {
+    public ProxyClass.Builder<T> overrideMethod(
+            String name, Class<?>[] parameterTypes, ProxyMethod proxyMethod) {
         this.changeState();
-        this.overrideMethods.add(new MethodInfo(name, parameterTypes, methodBody));
-        return this;
-    }
-
-    @Override
-    public <R> CglibProxyClassBuilder<T> overrideMethod(MethodDefinition<R> methodDefinition) {
-        this.changeState();
-        this.overrideMethods.add(new MethodInfo(
-                methodDefinition.getName(), methodDefinition.getParameterTypes(), methodDefinition.getBody()));
+        this.overrideMethods.add(new MethodInfo(name, parameterTypes, proxyMethod));
         return this;
     }
 
@@ -83,19 +75,10 @@ final class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> i
     }
 
     private MethodInterceptor buildMethodInterceptor(MethodInfo methodInfo) {
-        MethodInterceptor methodInterceptor = (object, method1, args, proxy) ->
-                methodInfo.getBody().invoke(object, method1, args, new MethodInvoker2() {
+        MethodInterceptor methodInterceptor = (object, method, args, proxy) ->
+                methodInfo.getProxyMethod().invoke(object, args, method, new MethodInvoker() {
                     @Override
-                    public Object invoke(Object object) {
-                        try {
-                            return proxy.invokeSuper(object, args);
-                        } catch (Throwable throwable) {
-                            throw new ExceptionWrapper(throwable);
-                        }
-                    }
-
-                    @Override
-                    public Object invoke(Object object, Object[] args) {
+                    public @Nullable Object invoke(Object object, Object... args) {
                         try {
                             return proxy.invokeSuper(object, args);
                         } catch (Throwable throwable) {
@@ -129,12 +112,12 @@ final class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> i
 
         private final String name;
         private final Class<?>[] parameterTypes;
-        private final MethodBody<?> body;
+        private final ProxyMethod proxyMethod;
 
-        MethodInfo(String name, Class<?>[] parameterTypes, MethodBody<?> body) {
+        MethodInfo(String name, Class<?>[] parameterTypes, ProxyMethod proxyMethod) {
             this.name = name;
             this.parameterTypes = parameterTypes;
-            this.body = body;
+            this.proxyMethod = proxyMethod;
         }
 
         public String getName() {
@@ -145,8 +128,8 @@ final class CglibProxyClassBuilder<T> extends CacheStateBuilder<ProxyClass<T>> i
             return parameterTypes;
         }
 
-        public MethodBody<?> getBody() {
-            return body;
+        public ProxyMethod getProxyMethod() {
+            return proxyMethod;
         }
     }
 }

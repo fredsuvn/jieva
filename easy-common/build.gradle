@@ -28,7 +28,6 @@ dependencies {
 
     testCompile(project(":easy-test"))
     testCompile("org.testng:testng")
-    testCompile("cglib:cglib")
 }
 
 test {

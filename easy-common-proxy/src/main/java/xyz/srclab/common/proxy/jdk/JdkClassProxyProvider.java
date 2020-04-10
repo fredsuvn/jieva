@@ -1,5 +1,6 @@
 package xyz.srclab.common.proxy.jdk;
 
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
@@ -7,11 +8,10 @@ import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.proxy.ClassProxy;
 import xyz.srclab.common.proxy.ClassProxyProvider;
-import xyz.srclab.common.reflect.method.MethodBody;
-import xyz.srclab.common.reflect.method.MethodInvoker2;
+import xyz.srclab.common.reflect.invoke.MethodInvoker;
+import xyz.srclab.common.reflect.method.ProxyMethod;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.LinkedHashMap;
@@ -38,16 +38,16 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
             extends CacheStateBuilder<ClassProxy<T>> implements ClassProxy.Builder<T> {
 
         private final Class<T> type;
-        private final List<Pair<Predicate<Method>, MethodBody<?>>> predicatePairs = new LinkedList<>();
+        private final List<Pair<Predicate<Method>, ProxyMethod>> predicatePairs = new LinkedList<>();
 
         public JdkClassProxyBuilder(Class<T> type) {
             this.type = type;
         }
 
         @Override
-        public ClassProxy.Builder<T> proxyMethod(Predicate<Method> methodPredicate, MethodBody<?> methodBody) {
+        public ClassProxy.Builder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod) {
             this.changeState();
-            predicatePairs.add(Pair.of(methodPredicate, methodBody));
+            predicatePairs.add(Pair.of(methodPredicate, proxyMethod));
             return this;
         }
 
@@ -60,14 +60,14 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
     private static final class JdkClassProxy<T> implements ClassProxy<T> {
 
         private final Class<?> type;
-        private final Map<Method, MethodBody<?>> methodMap;
+        private final Map<Method, ProxyMethod> methodMap;
 
-        private JdkClassProxy(Class<?> type, List<Pair<Predicate<Method>, MethodBody<?>>> predicatePairs) {
+        private JdkClassProxy(Class<?> type, List<Pair<Predicate<Method>, ProxyMethod>> predicatePairs) {
             this.type = type;
-            Map<Method, MethodBody<?>> map = new LinkedHashMap<>();
+            Map<Method, ProxyMethod> map = new LinkedHashMap<>();
             Method[] methods = type.getMethods();
             for (Method method : methods) {
-                for (Pair<Predicate<Method>, MethodBody<?>> predicatePair : predicatePairs) {
+                for (Pair<Predicate<Method>, ProxyMethod> predicatePair : predicatePairs) {
                     if (predicatePair.get0().test(method)) {
                         map.put(method, predicatePair.get1());
                     }
@@ -80,30 +80,17 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
         public T newInstance() {
             Object instance = Proxy.newProxyInstance(getClass().getClassLoader(), type.getInterfaces(), new InvocationHandler() {
                 @Override
-                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    MethodBody<?> methodBody = methodMap.get(method);
-                    if (methodBody == null) {
-                        return method.invoke(proxy, args);
+                public Object invoke(Object object, Method method, Object[] args) throws Throwable {
+                    ProxyMethod proxyMethod = methodMap.get(method);
+                    if (proxyMethod == null) {
+                        return method.invoke(object, args);
                     }
-                    return methodBody.invoke(proxy, method, args, new MethodInvoker2() {
+                    return proxyMethod.invoke(object, args, method, new MethodInvoker() {
                         @Override
-                        public Object invoke(Object object) {
+                        public @Nullable Object invoke(Object object, Object... args) {
                             try {
                                 return method.invoke(object, args);
-                            } catch (IllegalAccessException e) {
-                                throw new IllegalStateException(e);
-                            } catch (InvocationTargetException e) {
-                                throw new ExceptionWrapper(e);
-                            }
-                        }
-
-                        @Override
-                        public Object invoke(Object object, Object[] args) {
-                            try {
-                                return method.invoke(object, args);
-                            } catch (IllegalAccessException e) {
-                                throw new IllegalStateException(e);
-                            } catch (InvocationTargetException e) {
+                            } catch (Exception e) {
                                 throw new ExceptionWrapper(e);
                             }
                         }

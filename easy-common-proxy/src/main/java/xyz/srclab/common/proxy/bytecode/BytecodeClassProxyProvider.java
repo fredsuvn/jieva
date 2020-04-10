@@ -3,12 +3,12 @@ package xyz.srclab.common.proxy.bytecode;
 import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.bytecode.provider.ByteCodeProvider;
 import xyz.srclab.bytecode.provider.ByteCodeProviderManager;
+import xyz.srclab.common.reflect.method.ProxyMethod;
 import xyz.srclab.bytecode.proxy.ProxyClass;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.proxy.ClassProxy;
 import xyz.srclab.common.proxy.ClassProxyProvider;
-import xyz.srclab.common.reflect.method.MethodBody;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
@@ -35,16 +35,16 @@ public class BytecodeClassProxyProvider implements ClassProxyProvider {
         private static final ByteCodeProvider byteCodeProvider = ByteCodeProviderManager.getInstance().getProvider();
 
         private final Class<T> type;
-        private final List<Pair<Predicate<Method>, MethodBody<?>>> predicatePairs = new LinkedList<>();
+        private final List<Pair<Predicate<Method>, ProxyMethod>> predicatePairs = new LinkedList<>();
 
         public BytecodeClassProxyBuilder(Class<T> type) {
             this.type = type;
         }
 
         @Override
-        public ClassProxy.Builder<T> proxyMethod(Predicate<Method> methodPredicate, MethodBody<?> methodBody) {
+        public ClassProxy.Builder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod) {
             this.changeState();
-            predicatePairs.add(Pair.of(methodPredicate, methodBody));
+            predicatePairs.add(Pair.of(methodPredicate, proxyMethod));
             return this;
         }
 
@@ -53,7 +53,7 @@ public class BytecodeClassProxyProvider implements ClassProxyProvider {
             ProxyClass.Builder<T> proxyClassBuilder = byteCodeProvider.newProxyClassBuilder(type);
             Method[] methods = type.getMethods();
             for (Method method : methods) {
-                for (Pair<Predicate<Method>, MethodBody<?>> predicatePair : predicatePairs) {
+                for (Pair<Predicate<Method>, ProxyMethod> predicatePair : predicatePairs) {
                     if (predicatePair.get0().test(method)) {
                         proxyClassBuilder.overrideMethod(
                                 method.getName(), method.getParameterTypes(), predicatePair.get1());

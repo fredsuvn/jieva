@@ -25,13 +25,13 @@ public interface BeanOperator {
 
     BeanConverter getBeanConverter();
 
-    default BeanClass resolve(Class<?> beanClass) {
+    default BeanStruct resolve(Class<?> beanClass) {
         return getBeanResolver().resolve(beanClass);
     }
 
     default BeanProperty getProperty(Object bean, String propertyName) throws BeanPropertyNotFoundException {
-        BeanClass beanClass = resolve(bean.getClass());
-        @Nullable BeanProperty beanProperty = beanClass.getProperty(propertyName);
+        BeanStruct beanStruct = resolve(bean.getClass());
+        @Nullable BeanProperty beanProperty = beanStruct.getProperty(propertyName);
         if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
         }
@@ -91,7 +91,7 @@ public interface BeanOperator {
             });
         } else if (source instanceof Map) {
             Map src = (Map) source;
-            BeanClass destBean = resolve(dest.getClass());
+            BeanStruct destBean = resolve(dest.getClass());
             src.forEach((k, v) -> {
                 String propertyName = String.valueOf(k);
                 if (!destBean.canWriteProperty(propertyName)) {
@@ -107,7 +107,7 @@ public interface BeanOperator {
                 );
             });
         } else if (dest instanceof Map) {
-            BeanClass sourceBean = resolve(source.getClass());
+            BeanStruct sourceBean = resolve(source.getClass());
             Map des = (Map) dest;
             sourceBean.getReadableProperties().forEach((name, property) -> {
                 @Nullable Object sourceValue = property.getValue(source);
@@ -115,8 +115,8 @@ public interface BeanOperator {
                         name, sourceValue, Object.class, value -> des.put(name, value), this);
             });
         } else {
-            BeanClass sourceBean = resolve(source.getClass());
-            BeanClass destBean = resolve(dest.getClass());
+            BeanStruct sourceBean = resolve(source.getClass());
+            BeanStruct destBean = resolve(dest.getClass());
             sourceBean.getReadableProperties().forEach((name, sourceProperty) -> {
                 if (!destBean.canWriteProperty(name)) {
                     return;
@@ -160,7 +160,7 @@ public interface BeanOperator {
                 eachEntry.apply(k, v, dest::put, this);
             });
         } else {
-            BeanClass sourceBean = resolve(source.getClass());
+            BeanStruct sourceBean = resolve(source.getClass());
             sourceBean.getReadableProperties().forEach((name, property) -> {
                 @Nullable Object sourceValue = property.getValue(source);
                 eachEntry.apply(name, sourceValue, dest::put, this);

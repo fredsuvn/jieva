@@ -1,10 +1,9 @@
 package xyz.srclab.bytecode.proxy;
 
-import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.common.reflect.method.MethodBody;
-import xyz.srclab.common.reflect.method.MethodDefinition;
+import xyz.srclab.annotation.Immutable;
+import xyz.srclab.common.reflect.method.ProxyMethod;
 
-@ThreadSafe
+@Immutable
 public interface ProxyClass<T> {
 
     static <T> Builder<T> newBuilder(Class<T> superClass) {
@@ -19,9 +18,7 @@ public interface ProxyClass<T> {
 
         Builder<T> addInterfaces(Iterable<Class<?>> interfaces);
 
-        <R> Builder<T> overrideMethod(String name, Class<?>[] parameterTypes, MethodBody<R> methodBody);
-
-        <R> Builder<T> overrideMethod(MethodDefinition<R> methodDefinition);
+        Builder<T> overrideMethod(String name, Class<?>[] parameterTypes, ProxyMethod proxyMethod);
 
         ProxyClass<T> build();
     }

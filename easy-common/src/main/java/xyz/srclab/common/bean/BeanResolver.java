@@ -12,7 +12,7 @@ public interface BeanResolver {
         return new Builder();
     }
 
-    BeanClass resolve(Class<?> beanClass);
+    BeanStruct resolve(Class<?> beanClass);
 
     class Builder extends ProcessByHandlersBuilder<BeanResolver, BeanResolverHandler, Builder> {
 
@@ -35,7 +35,7 @@ public interface BeanResolver {
             }
 
             @Override
-            public BeanClass resolve(Class<?> beanClass) {
+            public BeanStruct resolve(Class<?> beanClass) {
                 for (BeanResolverHandler handler : handlers) {
                     if (handler.supportBean(beanClass)) {
                         return handler.resolve(beanClass);

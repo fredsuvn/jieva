@@ -11,7 +11,7 @@ public class BeanHelper {
 
     private static final BeanOperator beanOperator = BeanOperator.DEFAULT;
 
-    public static BeanClass resolve(Class<?> beanClass) {
+    public static BeanStruct resolve(Class<?> beanClass) {
         return beanOperator.resolve(beanClass);
     }
 

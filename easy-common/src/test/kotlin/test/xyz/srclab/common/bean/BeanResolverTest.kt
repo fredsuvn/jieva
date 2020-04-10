@@ -73,8 +73,8 @@ object BeanResolverTest {
                 return !Int::class.java.equals(beanClass);
             }
 
-            override fun resolve(beanClass: Class<*>): BeanClass {
-                return BeanClassSupport.newBuilder()
+            override fun resolve(beanClass: Class<*>): BeanStruct {
+                return BeanStructSupport.newBuilder()
                     .setType(beanClass)
                     .setProperties(mapOf("1" to object : BeanProperty {
 
