@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.bean
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.bean.*
 
 object BeanOperatorTest {
@@ -21,8 +21,14 @@ object BeanOperatorTest {
         doAssertEquals(b.stringList, listOf(1, 2, 3))
         doAssertEquals(b.stringSet, setOf(1, 2, 3))
         doAssertEquals(b.stringMap, mapOf(1 to 1, 2 to 2, 3 to 3))
-        doAssertEquals(b.listMap, mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5)))
-        doAssertEquals(b.listMap2, mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50)))
+        doAssertEquals(
+            b.listMap,
+            mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5))
+        )
+        doAssertEquals(
+            b.listMap2,
+            mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50))
+        )
         doAssertEquals(b.aa?.intString, 110)
 
         //bean to map
@@ -75,8 +81,14 @@ object BeanOperatorTest {
         doAssertEquals(b.stringList, listOf(1, 2, 3))
         doAssertEquals(b.stringSet, setOf(1, 2, 3))
         doAssertEquals(b.stringMap, mapOf(1 to 1, 2 to 2, 3 to 3))
-        doAssertEquals(b.listMap, mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5)))
-        doAssertEquals(b.listMap2, mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50)))
+        doAssertEquals(
+            b.listMap,
+            mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5))
+        )
+        doAssertEquals(
+            b.listMap2,
+            mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50))
+        )
         doAssertEquals(b.aa?.intString, 110)
 
         //null key
@@ -100,8 +112,14 @@ object BeanOperatorTest {
         doAssertEquals(b.stringList, listOf(1, 2, 3))
         doAssertEquals(b.stringSet, setOf(1, 2, 3))
         doAssertEquals(b.stringMap, mapOf(1 to 1, 2 to 2, 3 to 3))
-        doAssertEquals(b.listMap, mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5)))
-        doAssertEquals(b.listMap2, mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50)))
+        doAssertEquals(
+            b.listMap,
+            mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5))
+        )
+        doAssertEquals(
+            b.listMap2,
+            mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50))
+        )
         doAssertEquals(b.aa?.intString, 110)
 
         //bean to map
@@ -154,8 +172,14 @@ object BeanOperatorTest {
         doAssertEquals(newB.stringList, listOf(1, 2, 3))
         doAssertEquals(newB.stringSet, setOf(1, 2, 3))
         doAssertEquals(newB.stringMap, mapOf(1 to 1, 2 to 2, 3 to 3))
-        doAssertEquals(newB.listMap, mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5)))
-        doAssertEquals(newB.listMap2, mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50)))
+        doAssertEquals(
+            newB.listMap,
+            mapOf(1 to listOf(1, 2, 3), 2 to listOf(2, 3, 4), 3 to listOf(3, 4, 5))
+        )
+        doAssertEquals(
+            newB.listMap2,
+            mapOf(1 to listOf(10, 20, 30), 2 to listOf(20, 30, 40), 3 to listOf(30, 40, 50))
+        )
         doAssertEquals(b.aa?.intString, 110)
     }
 

@@ -26,6 +26,7 @@ dependencies {
     api("org.apache.commons:commons-collections4")
     api('com.google.guava:guava')
 
+    testCompile(project(":easy-test"))
     testCompile("org.testng:testng")
     testCompile("cglib:cglib")
 }

@@ -1,7 +1,7 @@
 package xyz.srclab.sample.format;
 
 import xyz.srclab.common.string.format.fastformat.FastFormat;
-import xyz.srclab.common.test.asserts.AssertHelper;
+import xyz.srclab.test.asserts.AssertHelper;
 
 public class FormatSample {
 

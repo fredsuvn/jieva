@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.exception
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
+import xyz.srclab.test.doAssertEquals
 import xyz.srclab.common.exception.BusinessException
 import xyz.srclab.common.exception.DefaultExceptionStatus
 import xyz.srclab.common.exception.ExceptionStatus
@@ -30,7 +30,10 @@ object ExceptionTest {
         val status = ExceptionStatus.from(DefaultExceptionStatus.INTERNAL)
         doAssertEquals(status, b1)
         doAssertEquals(status.hashCode(), b1.hashCode())
-        doAssertEquals(status.withMoreDescription("sss"), b1.withMoreDescription("sss"))
+        doAssertEquals(
+            status.withMoreDescription("sss"),
+            b1.withMoreDescription("sss")
+        )
 
         doAssertEquals(ExceptionStatus.newExceptionStatus("666").code, "666")
         doAssertEquals(ExceptionStatus.newExceptionStatus("666").description, null)

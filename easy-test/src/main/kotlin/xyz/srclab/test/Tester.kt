@@ -1,11 +1,17 @@
-package test.xyz.srclab.common
+@file:JvmName("Tester")
+
+package xyz.srclab.test
 
 import org.apache.commons.lang3.ArrayUtils
 import org.apache.commons.lang3.StringUtils
 import org.testng.Assert
 
 fun doAssertEquals(actual: Any?, expected: Any?) {
-    println("Assert >>> actual: ${toString(actual)}; expected: ${toString(expected)}")
+    println(
+        "Assert >>> actual: ${toString(actual)}; expected: ${toString(
+            expected
+        )}"
+    )
     if (actual is Map<*, *> && expected is Map<*, *>) {
         Assert.assertEquals(actual, expected)
     } else if (actual is Collection<*> && expected is Collection<*>) {
@@ -44,7 +50,7 @@ private fun toString(any: Any?): String {
     if (any == null) {
         return any.toString()
     }
-    if (any is Collection<*>) {
+    if (any is Iterable<*>) {
         return "[${StringUtils.join(any, ",")}]"
     }
     if (any is Array<*>) {

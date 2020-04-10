@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.array
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.array.ArrayHelper
 
 object ArrayHelperTest {
@@ -121,8 +121,14 @@ object ArrayHelperTest {
 
     @Test
     fun testFindArrayType() {
-        doAssertEquals(ArrayHelper.findArrayType(Int::class.java), intArrayOf(1).javaClass)
-        doAssertEquals(ArrayHelper.findArrayType(String::class.java), arrayOf("1").javaClass)
+        doAssertEquals(
+            ArrayHelper.findArrayType(Int::class.java),
+            intArrayOf(1).javaClass
+        )
+        doAssertEquals(
+            ArrayHelper.findArrayType(String::class.java),
+            arrayOf("1").javaClass
+        )
     }
 
     @Test

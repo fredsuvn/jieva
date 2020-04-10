@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.base
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.base.Checker
 
 /**

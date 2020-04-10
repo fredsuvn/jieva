@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.base
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.base.EnvironmentHelper
 
 object EnvironmentHelperTest {
@@ -21,7 +21,10 @@ object EnvironmentHelperTest {
     @Test
     fun testFindClass() {
         val cls = EnvironmentHelper.findClass("test.xyz.srclab.common.base.EnvironmentHelperTest")
-        doAssertEquals(cls.get(), Class.forName("test.xyz.srclab.common.base.EnvironmentHelperTest"))
+        doAssertEquals(
+            cls.get(),
+            Class.forName("test.xyz.srclab.common.base.EnvironmentHelperTest")
+        )
 
         val noClass = EnvironmentHelper.findClass("test.xyz.srclab.common.base.EnvironmentHelperTest0")
         doExpectThrowable(NoSuchElementException::class.java) {

@@ -2,8 +2,8 @@ package test.xyz.srclab.common.bean
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.bean.BeanConverter
 import xyz.srclab.common.bean.BeanConverterHandler
 import xyz.srclab.common.bean.BeanHelper
@@ -223,7 +223,13 @@ object BeanConverterTest {
     fun testCustomConverter() {
         val operator = BeanOperator.DEFAULT
         doAssertEquals(customBeanConverter.convert("s", String::class.java), "6")
-        doAssertEquals(customBeanConverter.convert("s", String::class.java, operator), "6")
+        doAssertEquals(
+            customBeanConverter.convert(
+                "s",
+                String::class.java,
+                operator
+            ), "6"
+        )
         doAssertEquals(customBeanConverter.convert(9, Int::class.java), 9)
         doAssertEquals(customBeanConverter.convert(9, Int::class.java, operator), 9)
         doExpectThrowable(UnsupportedOperationException::class.java) {

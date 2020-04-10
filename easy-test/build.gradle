@@ -17,7 +17,10 @@ java {
 dependencies {
     implementation(platform(project(":easy-parent")))
 
-    implementation(project(":easy-common"))
+    implementation(project(":easy-annotations"))
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.testng:testng")
 
     testCompile("org.testng:testng")

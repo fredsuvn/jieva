@@ -4,7 +4,7 @@ import xyz.srclab.common.bean.BeanHelper;
 import xyz.srclab.common.lang.Computed;
 import xyz.srclab.common.lang.Ref;
 import xyz.srclab.common.lang.TypeRef;
-import xyz.srclab.common.test.asserts.AssertHelper;
+import xyz.srclab.test.asserts.AssertHelper;
 
 import java.util.Map;
 

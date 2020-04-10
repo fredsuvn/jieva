@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.string
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.bean.BeanOperator
 import xyz.srclab.common.string.tostring.PropertyOrElementReferenceLoopException
 import xyz.srclab.common.string.tostring.ToString

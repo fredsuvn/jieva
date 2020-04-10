@@ -2,7 +2,7 @@ package test.xyz.srclab.common.base
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
+import xyz.srclab.test.doAssertEquals
 import xyz.srclab.common.base.KeyHelper
 
 object KeyHelperTest {

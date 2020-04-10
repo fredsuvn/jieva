@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.base
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.egg.EggHelper
 import java.lang.IllegalArgumentException
 
@@ -16,7 +16,7 @@ object EggTest {
         val spell = field.get(null) as String
         egg.hatchOut(spell)
 
-        doExpectThrowable(IllegalArgumentException::class.java){
+        doExpectThrowable(IllegalArgumentException::class.java) {
             EggHelper.findEgg("xyz.srclab.common.egg.EasyStarterEgg0")
         }
     }

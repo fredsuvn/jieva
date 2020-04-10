@@ -2,7 +2,7 @@ package test.xyz.srclab.common.lang
 
 import org.testng.annotations.Test
 import test.xyz.srclab.common.Config
-import test.xyz.srclab.common.doAssertEquals
+import xyz.srclab.test.doAssertEquals
 import xyz.srclab.common.lang.Computed
 import java.time.Duration
 

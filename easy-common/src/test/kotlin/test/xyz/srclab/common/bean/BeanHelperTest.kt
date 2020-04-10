@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.bean
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.bean.BeanHelper
 import xyz.srclab.common.bean.BeanMethodNotFoundException
 import xyz.srclab.common.bean.BeanPropertyNotFoundException
@@ -83,7 +83,10 @@ object BeanHelperTest {
         doExpectThrowable(BeanMethodNotFoundException::class.java) {
             BeanHelper.getMethod(Any(), "FFFF")
         }.catch { e ->
-            doAssertEquals(e.methodSignature, SignatureHelper.signMethod("FFFF", arrayOf()))
+            doAssertEquals(
+                e.methodSignature,
+                SignatureHelper.signMethod("FFFF", arrayOf())
+            )
         }
         doExpectThrowable(BeanMethodNotFoundException::class.java) {
             BeanHelper.getMethodBySignature(Any(), "FFFF")

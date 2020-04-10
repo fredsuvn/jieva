@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.array
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.array.ArrayBuilder
 import xyz.srclab.common.array.ArrayHelper
 import xyz.srclab.common.lang.TypeRef

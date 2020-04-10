@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.bean
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.bean.*
 import xyz.srclab.common.reflect.SignatureHelper
 import java.lang.reflect.Method
@@ -52,7 +52,13 @@ object BeanResolverTest {
         doAssertEquals(writeablePropertyNames, setOf("www", "xyz"))
 
         val realMethod = A::class.java.getMethod("someMethod", String::class.java)
-        doAssertEquals(beanClass.allMethods.contains(SignatureHelper.signMethod(realMethod)), true)
+        doAssertEquals(
+            beanClass.allMethods.contains(
+                SignatureHelper.signMethod(
+                    realMethod
+                )
+            ), true
+        )
         val someMethod = beanClass.getMethod("someMethod", String::class.java)
         val someMethodSignature = beanClass.getMethodBySignature(SignatureHelper.signMethod(realMethod))
         doAssertEquals(someMethod?.method, realMethod)
@@ -152,10 +158,22 @@ object BeanResolverTest {
         doAssertEquals(methodByEmpty == methodByDefault, true)
         doAssertEquals(methodByEmpty?.name, methodByDefault?.name)
         doAssertEquals(methodByEmpty?.returnType, methodByDefault?.returnType)
-        doAssertEquals(methodByEmpty?.genericReturnType, methodByDefault?.genericReturnType)
-        doAssertEquals(methodByEmpty?.parameterCount, methodByDefault?.parameterCount)
-        doAssertEquals(methodByEmpty?.parameterTypes, methodByDefault?.parameterTypes)
-        doAssertEquals(methodByEmpty?.genericParameterTypes, methodByDefault?.genericParameterTypes)
+        doAssertEquals(
+            methodByEmpty?.genericReturnType,
+            methodByDefault?.genericReturnType
+        )
+        doAssertEquals(
+            methodByEmpty?.parameterCount,
+            methodByDefault?.parameterCount
+        )
+        doAssertEquals(
+            methodByEmpty?.parameterTypes,
+            methodByDefault?.parameterTypes
+        )
+        doAssertEquals(
+            methodByEmpty?.genericParameterTypes,
+            methodByDefault?.genericParameterTypes
+        )
     }
 
     class A {

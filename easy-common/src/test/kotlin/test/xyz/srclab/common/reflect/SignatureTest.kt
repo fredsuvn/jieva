@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.reflect
 
 import org.testng.annotations.Test
-import test.xyz.srclab.common.doAssertEquals
-import test.xyz.srclab.common.doExpectThrowable
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.reflect.SignatureHelper
 
 object SignatureTest {
@@ -19,8 +19,14 @@ object SignatureTest {
         doAssertEquals(SignatureHelper.signClass(1.toChar().javaClass), "C")
         doAssertEquals(SignatureHelper.signClass(1.toShort().javaClass), "S")
 
-        doAssertEquals(SignatureHelper.signClass(Any::class.java), "Ljava/lang/Object;")
-        doAssertEquals(SignatureHelper.signClass(Array<Any>::class.java), "[Ljava/lang/Object;")
+        doAssertEquals(
+            SignatureHelper.signClass(Any::class.java),
+            "Ljava/lang/Object;"
+        )
+        doAssertEquals(
+            SignatureHelper.signClass(Array<Any>::class.java),
+            "[Ljava/lang/Object;"
+        )
 
         doExpectThrowable(IllegalArgumentException::class.java) {
             SignatureHelper.signPrimitiveClass(Any::class.java)
