@@ -11,11 +11,11 @@ public class SignatureHelper {
         if (cls.isArray()) {
             return signArrayClass(cls);
         }
-        if (void.class.equals(cls)) {
-            // Java doc doesn't say whether void is primitive,
-            // so here may run or never run.
-            return "V";
-        }
+        //if (void.class.equals(cls)) {
+        // Java doc doesn't say whether void is primitive,
+        // so here may run or never run.
+        //return "V";
+        //}
         return "L" + cls.getName().replaceAll("\\.", "/") + ";";
     }
 
