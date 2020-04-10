@@ -19,7 +19,7 @@ public abstract class AbstractProviderManager<T> implements ProviderManager<T> {
     public void registerProvider(String className, boolean isDefault) {
         synchronized (this) {
             if (providerMap.containsKey(className)) {
-                throw new IllegalStateException("Provider has already registered: " + className);
+                throw new IllegalArgumentException("Provider has already registered: " + className);
             }
             @Nullable Class<?> providerClass = EnvironmentHelper.findClass(className);
             if (providerClass == null) {
@@ -38,7 +38,7 @@ public abstract class AbstractProviderManager<T> implements ProviderManager<T> {
     public void registerProvider(String name, T provider, boolean isDefault) {
         synchronized (this) {
             if (providerMap.containsKey(name)) {
-                throw new IllegalStateException("Provider has already registered: " + name);
+                throw new IllegalArgumentException("Provider has already registered: " + name);
             }
             providerMap.put(name, provider);
             if (isDefault) {

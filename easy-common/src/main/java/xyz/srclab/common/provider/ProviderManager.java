@@ -10,8 +10,8 @@ public interface ProviderManager<T> {
         registerProvider(provider, false);
     }
 
-    default void registerProvider(String className, T provider) {
-        registerProvider(className, provider, false);
+    default void registerProvider(String name, T provider) {
+        registerProvider(name, provider, false);
     }
 
     void registerProvider(String className, boolean isDefault);
