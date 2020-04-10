@@ -1,14 +1,14 @@
-package xyz.srclab.common.proxy.jdk;
+package xyz.srclab.common.proxy.provider.jdk;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.proxy.ClassProxy;
-import xyz.srclab.common.proxy.ClassProxyProvider;
+import xyz.srclab.common.proxy.provider.ClassProxyProvider;
 import xyz.srclab.common.reflect.invoke.MethodInvoker;
+import xyz.srclab.common.reflect.method.MethodHelper;
 import xyz.srclab.common.reflect.method.ProxyMethod;
 
 import java.lang.reflect.Method;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-@ThreadSafe
 public class JdkClassProxyProvider implements ClassProxyProvider {
 
     public static JdkClassProxyProvider getInstance() {
@@ -77,13 +76,14 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
 
         @Override
         public T newInstance() {
-            Object instance = Proxy.newProxyInstance(getClass().getClassLoader(), type.getInterfaces(),
+            Object instance = Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type},
                     (object, method, args) -> {
+                        Object[] realArgs = args == null ? MethodHelper.EMPTY_ARGUMENTS : args;
                         ProxyMethod proxyMethod = methodMap.get(method);
                         if (proxyMethod == null) {
-                            return method.invoke(object, args);
+                            return method.invoke(object, realArgs);
                         }
-                        return proxyMethod.invoke(object, args, method, new MethodInvoker() {
+                        return proxyMethod.invoke(object, realArgs, method, new MethodInvoker() {
                             @Override
                             public @Nullable Object invoke(Object object, Object... args) {
                                 try {

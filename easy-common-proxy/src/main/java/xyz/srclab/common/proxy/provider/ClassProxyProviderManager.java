@@ -1,9 +1,9 @@
-package xyz.srclab.common.proxy;
+package xyz.srclab.common.proxy.provider;
 
 import xyz.srclab.common.base.EnvironmentHelper;
 import xyz.srclab.common.provider.AbstractProviderManager;
-import xyz.srclab.common.proxy.bytecode.BytecodeClassProxyProvider;
-import xyz.srclab.common.proxy.jdk.JdkClassProxyProvider;
+import xyz.srclab.common.proxy.provider.bytecode.ByteCodeClassProxyProvider;
+import xyz.srclab.common.proxy.provider.jdk.JdkClassProxyProvider;
 
 public class ClassProxyProviderManager extends AbstractProviderManager<ClassProxyProvider> {
 
@@ -16,6 +16,6 @@ public class ClassProxyProviderManager extends AbstractProviderManager<ClassProx
     @Override
     protected ClassProxyProvider createDefaultProvider() {
         return EnvironmentHelper.findPackage("xyz.srclab.bytecode").isPresent() ?
-                BytecodeClassProxyProvider.getInstance() : JdkClassProxyProvider.getInstance();
+                ByteCodeClassProxyProvider.getInstance() : JdkClassProxyProvider.getInstance();
     }
 }

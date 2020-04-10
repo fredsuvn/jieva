@@ -1,4 +1,4 @@
 @DefaultNonNull
-package xyz.srclab.common.proxy.jdk;
+package xyz.srclab.common.proxy.provider;
 
 import xyz.srclab.annotation.DefaultNonNull;

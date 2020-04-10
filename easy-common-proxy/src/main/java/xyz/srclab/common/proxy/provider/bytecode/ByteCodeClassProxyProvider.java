@@ -1,28 +1,26 @@
-package xyz.srclab.common.proxy.bytecode;
+package xyz.srclab.common.proxy.provider.bytecode;
 
-import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.bytecode.provider.ByteCodeProvider;
 import xyz.srclab.bytecode.provider.ByteCodeProviderManager;
-import xyz.srclab.common.reflect.method.ProxyMethod;
 import xyz.srclab.bytecode.proxy.ProxyClass;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.proxy.ClassProxy;
-import xyz.srclab.common.proxy.ClassProxyProvider;
+import xyz.srclab.common.proxy.provider.ClassProxyProvider;
+import xyz.srclab.common.reflect.method.ProxyMethod;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
 
-@ThreadSafe
-public class BytecodeClassProxyProvider implements ClassProxyProvider {
+public class ByteCodeClassProxyProvider implements ClassProxyProvider {
 
-    public static BytecodeClassProxyProvider getInstance() {
+    public static ByteCodeClassProxyProvider getInstance() {
         return INSTANCE;
     }
 
-    private static final BytecodeClassProxyProvider INSTANCE = new BytecodeClassProxyProvider();
+    private static final ByteCodeClassProxyProvider INSTANCE = new ByteCodeClassProxyProvider();
 
     @Override
     public <T> ClassProxy.Builder<T> newBuilder(Class<T> type) {

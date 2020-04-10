@@ -15,6 +15,8 @@ public class MethodHelper {
 
     public static final Class<?>[] EMPTY_PARAMETER_TYPES = ArrayUtils.EMPTY_CLASS_ARRAY;
 
+    public static final Object[] EMPTY_ARGUMENTS = ArrayUtils.EMPTY_OBJECT_ARRAY;
+
     private static final Cache<Object, Method> METHOD_CACHE = new ThreadLocalCache<>();
 
     private static final Cache<Object, List<Method>> METHODS_CACHE = new ThreadLocalCache<>();

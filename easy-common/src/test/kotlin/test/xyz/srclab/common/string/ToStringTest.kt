@@ -1,12 +1,13 @@
 package test.xyz.srclab.common.string
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
-import xyz.srclab.test.doExpectThrowable
+import xyz.srclab.common.base.Defaults
 import xyz.srclab.common.bean.BeanOperator
 import xyz.srclab.common.string.tostring.PropertyOrElementReferenceLoopException
 import xyz.srclab.common.string.tostring.ToString
 import xyz.srclab.common.string.tostring.ToStringStyle
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 
 /**
  * @author sunqian
@@ -35,22 +36,22 @@ object ToStringTest {
 
         doAssertEquals(
             ToString.toString(a, ToStringStyle.HUMAN_READABLE, BeanOperator.DEFAULT),
-            "{\n" +
-                    "    aaa = aaa, \n" +
-                    "    array = [\n" +
-                    "        1\n" +
-                    "    ], \n" +
-                    "    array2 = [], \n" +
-                    "    b = {\n" +
-                    "        class = ${B::class.java.name}, \n" +
-                    "        set = [\n" +
-                    "            bbb\n" +
-                    "        ]\n" +
-                    "    }, \n" +
-                    "    class = ${A::class.java.name}, \n" +
-                    "    map = {\n" +
-                    "        1 = 1\n" +
-                    "    }\n" +
+            "{" + Defaults.LINE_SEPARATOR +
+                    "    aaa = aaa, " + Defaults.LINE_SEPARATOR +
+                    "    array = [" + Defaults.LINE_SEPARATOR +
+                    "        1" + Defaults.LINE_SEPARATOR +
+                    "    ], " + Defaults.LINE_SEPARATOR +
+                    "    array2 = [], " + Defaults.LINE_SEPARATOR +
+                    "    b = {" + Defaults.LINE_SEPARATOR +
+                    "        class = ${B::class.java.name}, " + Defaults.LINE_SEPARATOR +
+                    "        set = [" + Defaults.LINE_SEPARATOR +
+                    "            bbb" + Defaults.LINE_SEPARATOR +
+                    "        ]" + Defaults.LINE_SEPARATOR +
+                    "    }, " + Defaults.LINE_SEPARATOR +
+                    "    class = ${A::class.java.name}, " + Defaults.LINE_SEPARATOR +
+                    "    map = {" + Defaults.LINE_SEPARATOR +
+                    "        1 = 1" + Defaults.LINE_SEPARATOR +
+                    "    }" + Defaults.LINE_SEPARATOR +
                     "}"
         )
 

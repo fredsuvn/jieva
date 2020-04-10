@@ -1,5 +1,8 @@
 package xyz.srclab.common.proxy;
 
+import xyz.srclab.common.proxy.provider.ClassProxyProvider;
+import xyz.srclab.common.proxy.provider.ClassProxyProviderManager;
+
 class ClassProxyBuilderHelper {
 
     private static final ClassProxyProvider classProxyProvider = ClassProxyProviderManager.getInstance().getProvider();
