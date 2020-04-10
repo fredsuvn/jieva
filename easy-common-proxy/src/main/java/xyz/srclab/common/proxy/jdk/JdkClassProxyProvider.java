@@ -11,7 +11,6 @@ import xyz.srclab.common.proxy.ClassProxyProvider;
 import xyz.srclab.common.reflect.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.method.ProxyMethod;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.LinkedHashMap;
@@ -78,25 +77,23 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
 
         @Override
         public T newInstance() {
-            Object instance = Proxy.newProxyInstance(getClass().getClassLoader(), type.getInterfaces(), new InvocationHandler() {
-                @Override
-                public Object invoke(Object object, Method method, Object[] args) throws Throwable {
-                    ProxyMethod proxyMethod = methodMap.get(method);
-                    if (proxyMethod == null) {
-                        return method.invoke(object, args);
-                    }
-                    return proxyMethod.invoke(object, args, method, new MethodInvoker() {
-                        @Override
-                        public @Nullable Object invoke(Object object, Object... args) {
-                            try {
-                                return method.invoke(object, args);
-                            } catch (Exception e) {
-                                throw new ExceptionWrapper(e);
-                            }
+            Object instance = Proxy.newProxyInstance(getClass().getClassLoader(), type.getInterfaces(),
+                    (object, method, args) -> {
+                        ProxyMethod proxyMethod = methodMap.get(method);
+                        if (proxyMethod == null) {
+                            return method.invoke(object, args);
                         }
+                        return proxyMethod.invoke(object, args, method, new MethodInvoker() {
+                            @Override
+                            public @Nullable Object invoke(Object object, Object... args) {
+                                try {
+                                    return method.invoke(object, args);
+                                } catch (Exception e) {
+                                    throw new ExceptionWrapper(e);
+                                }
+                            }
+                        });
                     });
-                }
-            });
             return (T) instance;
         }
 

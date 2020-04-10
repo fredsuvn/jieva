@@ -18,10 +18,15 @@ dependencies {
     implementation(platform(project(":easy-parent")))
 
     implementation(project(":easy-common"))
-    implementation(project(":easy-bytecode"))
+
+    compileOnly(project(":easy-bytecode"))
 
     testCompile(project(":easy-test"))
     testCompile("org.testng:testng")
+
+    testCompile(project(":easy-bytecode"))
+    testCompile("org.springframework:spring-core")
+    testCompile("cglib:cglib")
 }
 
 test {
