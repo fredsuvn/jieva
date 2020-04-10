@@ -3,40 +3,32 @@ package xyz.srclab.common.string.format.fastformat;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.helpers.MessageFormatter;
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.lang.Computed;
+import xyz.srclab.annotation.Written;
 
 @Immutable
-public class FastFormat implements Computed<String> {
+public class FastFormat {
 
     public static String format(String messagePattern, Object... args) {
-        return new FastFormat(messagePattern, args).format();
+        return new FastFormat(messagePattern, args).toString();
     }
 
-    private final String pattern;
-    private final Object[] args;
-
-    private @Nullable String cache;
+    private final String toString;
 
     public FastFormat(String pattern, Object... args) {
-        this.pattern = pattern;
-        this.args = args;
+        this.toString = format0(pattern, args);
     }
 
     @Override
     public String toString() {
-        if (cache == null) {
-            return refreshGet();
-        }
-        return cache;
+        return toString;
     }
 
-    private String format() {
-        processArguments();
+    private String format0(String pattern, Object... args) {
+        processArguments(args);
         return MessageFormatter.arrayFormat(pattern, args, null).getMessage();
     }
 
-    private void processArguments() {
+    private void processArguments(@Written Object... args) {
         if (ArrayUtils.isEmpty(args)) {
             return;
         }
@@ -44,16 +36,5 @@ public class FastFormat implements Computed<String> {
         if (lastEntry instanceof Throwable) {
             args[args.length - 1] = lastEntry.toString();
         }
-    }
-
-    @Override
-    public String get() {
-        return toString();
-    }
-
-    @Override
-    public String refreshGet() {
-        cache = format();
-        return cache;
     }
 }

@@ -1,12 +1,25 @@
 package xyz.srclab.common.string.tostring;
 
 import xyz.srclab.annotation.Immutable;
+import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.builder.CacheStateBuilder;
 
 @Immutable
 public interface ToStringStyle {
 
     ToStringStyle DEFAULT = new Builder().build();
+
+    ToStringStyle HUMAN_READABLE = new Builder()
+            .setBeanStart("{")
+            .setBeanEnd("}")
+            .setSeparator(", ")
+            .setIndicator(" = ")
+            .setIndent("    ")
+            .setListStart("[")
+            .setListEnd("]")
+            .setWrapping(Defaults.LINE_SEPARATOR)
+            .setIgnoreReferenceLoop(false)
+            .build();
 
     String getBeanStart();
 

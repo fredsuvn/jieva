@@ -8,6 +8,6 @@ public class FastFormatter implements Formatter {
 
     @Override
     public String format(String pattern, Object... args) {
-        return new FastFormat(pattern, args).toString();
+        return FastFormat.format(pattern, args);
     }
 }

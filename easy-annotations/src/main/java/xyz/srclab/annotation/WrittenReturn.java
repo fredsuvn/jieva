@@ -10,5 +10,5 @@ import java.lang.annotation.*;
 @Target({
         ElementType.PARAMETER,
 })
-public @interface WriteReturn {
+public @interface WrittenReturn {
 }

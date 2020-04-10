@@ -1,14 +1,16 @@
 package xyz.srclab.common.string.format;
 
 import xyz.srclab.common.base.Defaults;
-import xyz.srclab.common.string.format.fastformat.FastFormat;
+import xyz.srclab.common.string.format.fastformat.FastFormatter;
 
 import java.text.MessageFormat;
 
 public class FormatHelper {
 
+    private static final Formatter fastFormatter = new FastFormatter();
+
     public static String fastFormat(String messagePattern, Object... args) {
-        return FastFormat.format(messagePattern, args);
+        return fastFormatter.format(messagePattern, args);
     }
 
     public static String printfFormat(String messagePattern, Object... args) {

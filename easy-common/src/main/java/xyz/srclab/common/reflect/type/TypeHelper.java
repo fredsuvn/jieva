@@ -24,6 +24,7 @@ public class TypeHelper {
     public static boolean isBasic(Object any) {
         return any instanceof CharSequence
                 || any instanceof Number
+                || any instanceof Type
                 || any instanceof Date
                 || any instanceof Temporal;
     }

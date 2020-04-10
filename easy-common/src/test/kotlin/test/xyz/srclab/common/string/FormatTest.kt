@@ -1,4 +1,4 @@
-package test.xyz.srclab.common.format
+package test.xyz.srclab.common.string
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
@@ -15,7 +15,16 @@ object FormatTest {
     @DataProvider
     fun fastFormatDataProvider(): Array<Array<*>> {
         return arrayOf(
-            arrayOf(FormatHelper.fastFormat("123{}56{{}89{}", 4, 7), "123456{789{}")
+            arrayOf(
+                FormatHelper.fastFormat("123{}56{{}89{}"), "123{}56{{}89{}"
+            ),
+            arrayOf(
+                FormatHelper.fastFormat("123{}56{{}89{}", 4, 7), "123456{789{}"
+            ),
+            arrayOf(
+                FormatHelper.fastFormat("123{}56{{}89{}", 4, 7, NullPointerException()),
+                "123456{789${NullPointerException()}"
+            )
         )
     }
 

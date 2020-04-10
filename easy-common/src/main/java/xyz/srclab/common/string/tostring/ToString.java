@@ -8,6 +8,7 @@ import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.lang.Computed;
 import xyz.srclab.common.reflect.type.TypeHelper;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class ToString implements Computed<String> {
         if (any == null || TypeHelper.isBasic(any)) {
             return String.valueOf(any);
         }
-        return toString(any, ToStringStyle.DEFAULT, BeanOperator.DEFAULT);
+        return new ToString(any).toString();
     }
 
     public static String toString(@Nullable Object any, ToStringStyle style, BeanOperator beanOperator) {
@@ -30,30 +31,57 @@ public class ToString implements Computed<String> {
         return new ToString(any, style, beanOperator).toString();
     }
 
-    private final @Nullable Object any;
+    private final Object any;
     private final ToStringStyle style;
     private final BeanOperator beanOperator;
 
     private @Nullable String cache;
 
-    public ToString(@Nullable Object any, ToStringStyle style, BeanOperator beanOperator) {
+    public ToString(Object any) {
+        this(any, ToStringStyle.DEFAULT, BeanOperator.DEFAULT);
+    }
+
+    public ToString(Object any, ToStringStyle style, BeanOperator beanOperator) {
         this.any = any;
         this.style = style;
         this.beanOperator = beanOperator;
     }
 
     @Override
-    public String toString() {
+    public String get() {
         if (cache == null) {
             return refreshGet();
         }
         return cache;
     }
 
+    @Override
+    public String refreshGet() {
+        if (TypeHelper.isBasic(any)) {
+            return String.valueOf(any);
+        }
+        StringBuilder buffer = new StringBuilder();
+        ToStringContext context = new ToStringContext();
+        buildToString(any, buffer, context);
+        cache = buffer.toString();
+        return cache;
+    }
+
+    @Override
+    public String toString() {
+        return get();
+    }
+
     private void buildToString(@Nullable Object object, StringBuilder buffer, ToStringContext context) {
         if (object == null || TypeHelper.isBasic(object)) {
-            buffer.append(object);
+            buffer.append(object instanceof Type ? ((Type) object).getTypeName() : object);
+            return;
         }
+
+        if (!style.getIgnoreReferenceLoop() && context.hasParent(object)) {
+            throw new PropertyOrElementReferenceLoopException(context.getNameStackTrace());
+        }
+
         if (object instanceof Object[]) {
             buildArrayToString((Object[]) object, buffer, context);
             return;
@@ -75,14 +103,12 @@ public class ToString implements Computed<String> {
         context.pushParent(bean);
         context.pushIndent();
         int[] count = {0};
-        beanClass.getAllProperties().forEach((name, property) -> {
-            if (!property.isReadable()) {
-                return;
-            }
+        beanClass.getReadableProperties().forEach((name, property) -> {
             context.pushName("." + name);
             writeWrapping(buffer);
             writeIndent(buffer, context.getIndent());
-            buffer.append(name).append(style.getSeparator());
+            buffer.append(name);
+            writeIndicator(buffer);
             buildToString(property.getValue(bean), buffer, context);
             writeSeparator(buffer);
             context.popName();
@@ -207,23 +233,6 @@ public class ToString implements Computed<String> {
         buffer.append(style.getIndicator());
     }
 
-    @Override
-    public String get() {
-        return toString();
-    }
-
-    @Override
-    public String refreshGet() {
-        if (any == null || TypeHelper.isBasic(any)) {
-            return String.valueOf(any);
-        }
-        StringBuilder buffer = new StringBuilder();
-        ToStringContext context = new ToStringContext();
-        buildToString(any, buffer, context);
-        cache = buffer.toString();
-        return cache;
-    }
-
     private static final class ToStringContext {
 
         private final LinkedList<Object> parentStackTrace = new LinkedList<>();
@@ -238,8 +247,8 @@ public class ToString implements Computed<String> {
             parentStackTrace.removeLast();
         }
 
-        public LinkedList<Object> getParentStackTrace() {
-            return parentStackTrace;
+        public boolean hasParent(Object any) {
+            return parentStackTrace.contains(any);
         }
 
         public void pushName(String name) {

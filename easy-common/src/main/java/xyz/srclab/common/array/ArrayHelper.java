@@ -1,6 +1,6 @@
 package xyz.srclab.common.array;
 
-import xyz.srclab.annotation.WriteReturn;
+import xyz.srclab.annotation.WrittenReturn;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
@@ -20,70 +20,70 @@ public class ArrayHelper {
         return (A) Array.newInstance(componentType, length);
     }
 
-    public static byte[] newArray(@WriteReturn byte[] array, EachByte each) {
+    public static byte[] newArray(@WrittenReturn byte[] array, EachByte each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static char[] newArray(@WriteReturn char[] array, EachChar each) {
+    public static char[] newArray(@WrittenReturn char[] array, EachChar each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static int[] newArray(@WriteReturn int[] array, EachInt each) {
+    public static int[] newArray(@WrittenReturn int[] array, EachInt each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static long[] newArray(@WriteReturn long[] array, EachLong each) {
+    public static long[] newArray(@WrittenReturn long[] array, EachLong each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static float[] newArray(@WriteReturn float[] array, EachFloat each) {
+    public static float[] newArray(@WrittenReturn float[] array, EachFloat each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static double[] newArray(@WriteReturn double[] array, EachDouble each) {
+    public static double[] newArray(@WrittenReturn double[] array, EachDouble each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static boolean[] newArray(@WriteReturn boolean[] array, EachBoolean each) {
+    public static boolean[] newArray(@WrittenReturn boolean[] array, EachBoolean each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static short[] newArray(@WriteReturn short[] array, EachShort each) {
+    public static short[] newArray(@WrittenReturn short[] array, EachShort each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static <T> T[] newArray(@WriteReturn T[] array, Each<T> each) {
+    public static <T> T[] newArray(@WrittenReturn T[] array, Each<T> each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static byte[] newArray(@WriteReturn byte[] array, int from, int to, EachByte each) {
+    public static byte[] newArray(@WrittenReturn byte[] array, int from, int to, EachByte each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
@@ -91,7 +91,7 @@ public class ArrayHelper {
         return array;
     }
 
-    public static char[] newArray(@WriteReturn char[] array, int from, int to, EachChar each) {
+    public static char[] newArray(@WrittenReturn char[] array, int from, int to, EachChar each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
@@ -99,7 +99,7 @@ public class ArrayHelper {
         return array;
     }
 
-    public static int[] newArray(@WriteReturn int[] array, int from, int to, EachInt each) {
+    public static int[] newArray(@WrittenReturn int[] array, int from, int to, EachInt each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
@@ -107,7 +107,7 @@ public class ArrayHelper {
         return array;
     }
 
-    public static long[] newArray(@WriteReturn long[] array, int from, int to, EachLong each) {
+    public static long[] newArray(@WrittenReturn long[] array, int from, int to, EachLong each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
@@ -115,7 +115,7 @@ public class ArrayHelper {
         return array;
     }
 
-    public static float[] newArray(@WriteReturn float[] array, int from, int to, EachFloat each) {
+    public static float[] newArray(@WrittenReturn float[] array, int from, int to, EachFloat each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
@@ -123,7 +123,7 @@ public class ArrayHelper {
         return array;
     }
 
-    public static double[] newArray(@WriteReturn double[] array, int from, int to, EachDouble each) {
+    public static double[] newArray(@WrittenReturn double[] array, int from, int to, EachDouble each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
@@ -131,7 +131,7 @@ public class ArrayHelper {
         return array;
     }
 
-    public static boolean[] newArray(@WriteReturn boolean[] array, int from, int to, EachBoolean each) {
+    public static boolean[] newArray(@WrittenReturn boolean[] array, int from, int to, EachBoolean each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
@@ -139,7 +139,7 @@ public class ArrayHelper {
         return array;
     }
 
-    public static short[] newArray(@WriteReturn short[] array, int from, int to, EachShort each) {
+    public static short[] newArray(@WrittenReturn short[] array, int from, int to, EachShort each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
@@ -147,7 +147,7 @@ public class ArrayHelper {
         return array;
     }
 
-    public static <T> T[] newArray(@WriteReturn T[] array, int from, int to, Each<T> each) {
+    public static <T> T[] newArray(@WrittenReturn T[] array, int from, int to, Each<T> each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);

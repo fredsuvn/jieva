@@ -2,7 +2,7 @@ package xyz.srclab.common.collection.map;
 
 import com.google.common.collect.ImmutableMap;
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.WriteReturn;
+import xyz.srclab.annotation.WrittenReturn;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -21,11 +21,11 @@ public class MapHelper {
     }
 
     @SafeVarargs
-    public static <K, V> void removeAll(@WriteReturn Map<K, V> map, K... keys) {
+    public static <K, V> void removeAll(@WrittenReturn Map<K, V> map, K... keys) {
         removeAll(map, Arrays.asList(keys));
     }
 
-    public static <K, V> void removeAll(@WriteReturn Map<K, V> map, Iterable<? extends K> keys) {
+    public static <K, V> void removeAll(@WrittenReturn Map<K, V> map, Iterable<? extends K> keys) {
         for (K key : keys) {
             map.remove(key);
         }
