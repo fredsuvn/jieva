@@ -1,9 +1,9 @@
 package test.xyz.srclab.common.cache
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.cache.concurent.ConcurrentCache
+import xyz.srclab.test.doAssertEquals
 import kotlin.random.Random
 
 /**

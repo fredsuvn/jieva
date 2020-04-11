@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.lang
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
 import xyz.srclab.common.lang.Ref
+import xyz.srclab.test.doAssertEquals
 
 /**
  * @author sunqian

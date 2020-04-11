@@ -5,7 +5,7 @@ import xyz.srclab.common.proxy.provider.ClassProxyProviderManager;
 
 class ClassProxyBuilderHelper {
 
-    private static final ClassProxyProvider classProxyProvider = ClassProxyProviderManager.getInstance().getProvider();
+    private static final ClassProxyProvider classProxyProvider = ClassProxyProviderManager.INSTANCE.getProvider();
 
     static <T> ClassProxy.Builder<T> newBuilder(Class<T> superClass) {
         return classProxyProvider.newBuilder(superClass);

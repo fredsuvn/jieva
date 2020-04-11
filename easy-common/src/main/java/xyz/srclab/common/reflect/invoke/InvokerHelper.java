@@ -10,25 +10,25 @@ import java.lang.reflect.Method;
 
 public class InvokerHelper {
 
-    private static final Cache<Object, MethodInvoker> METHOD_INVOKER_CACHE = new ThreadLocalCache<>();
+    private static final Cache<Object, MethodInvoker> methodInvokerCache = new ThreadLocalCache<>();
 
-    private static final Cache<Object, ConstructorInvoker> CONSTRUCTOR_INVOKER_CACHE =
+    private static final Cache<Object, ConstructorInvoker> constructorInvokerCache =
             new ThreadLocalCache<>();
 
     public static MethodInvoker getMethodInvoker(Method method) {
-        return METHOD_INVOKER_CACHE.getNonNull(method, k -> MethodInvoker.of(method));
+        return methodInvokerCache.getNonNull(method, k -> MethodInvoker.of(method));
     }
 
-    public static MethodInvoker getMethodInvoker(Class<?> cls, String methodName, Class<?>[] parameterTypes) {
+    public static MethodInvoker getMethodInvoker(Class<?> cls, String methodName, Class<?>... parameterTypes) {
         Method method = MethodHelper.getMethod(cls, methodName, parameterTypes);
         return getMethodInvoker(method);
     }
 
     public static ConstructorInvoker getConstructorInvoker(Constructor<?> constructor) {
-        return CONSTRUCTOR_INVOKER_CACHE.getNonNull(constructor, k -> ConstructorInvoker.of(constructor));
+        return constructorInvokerCache.getNonNull(constructor, k -> ConstructorInvoker.of(constructor));
     }
 
-    public static ConstructorInvoker getConstructorInvoker(Class<?> cls, Class<?>[] parameterTypes) {
+    public static ConstructorInvoker getConstructorInvoker(Class<?> cls, Class<?>... parameterTypes) {
         Constructor<?> constructor = InstanceHelper.getConstructor(cls, parameterTypes);
         return getConstructorInvoker(constructor);
     }

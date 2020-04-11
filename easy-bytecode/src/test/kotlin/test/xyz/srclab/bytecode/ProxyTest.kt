@@ -33,8 +33,8 @@ object ProxyTest {
 
     @Test
     fun testWithProvider() {
-        doTestProxy(CglibByteCodeProvider.getInstance(), A3::class.java)
-        doTestProxy(SpringCglibByteCodeProvider.getInstance(), A2::class.java)
+        doTestProxy(CglibByteCodeProvider.INSTANCE, A3::class.java)
+        doTestProxy(SpringCglibByteCodeProvider.INSTANCE, A2::class.java)
     }
 
     private fun <T : Any> doTestProxy(provider: ByteCodeProvider, baseClass: Class<T>) {

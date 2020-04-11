@@ -8,11 +8,7 @@ import xyz.srclab.bytecode.proxy.ProxyClass;
 @ThreadSafe
 public class CglibByteCodeProvider implements ByteCodeProvider {
 
-    public static CglibByteCodeProvider getInstance() {
-        return CglibByteCodeProvider.INSTANCE;
-    }
-
-    private static final CglibByteCodeProvider INSTANCE = new CglibByteCodeProvider();
+    public static final CglibByteCodeProvider INSTANCE = new CglibByteCodeProvider();
 
     private final OriginalCglibAdaptor originalCglibAdaptor = new OriginalCglibAdaptor();
 

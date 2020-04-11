@@ -5,14 +5,14 @@ import java.lang.reflect.Method;
 
 class InvokerSupport {
 
-    private static final InvokerProvider INVOKER_PROVIDER =
-            InvokerProviderManager.getInstance().getProvider();
+    private static final InvokerProvider invokerProvider =
+            InvokerProviderManager.INSTANCE.getProvider();
 
     static MethodInvoker newMethodInvoker(Method method) {
-        return INVOKER_PROVIDER.newMethodInvoker(method);
+        return invokerProvider.newMethodInvoker(method);
     }
 
     static ConstructorInvoker newConstructorInvoker(Constructor<?> constructor) {
-        return INVOKER_PROVIDER.newConstructorInvoker(constructor);
+        return invokerProvider.newConstructorInvoker(constructor);
     }
 }

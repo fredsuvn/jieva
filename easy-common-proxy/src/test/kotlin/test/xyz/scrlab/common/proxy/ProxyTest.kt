@@ -30,8 +30,8 @@ object ProxyTest {
 
     @Test
     fun testWithProvider() {
-        doTestProxy(JdkClassProxyProvider.getInstance(), A::class.java)
-        doTestProxy(ByteCodeClassProxyProvider.getInstance(), A::class.java)
+        doTestProxy(JdkClassProxyProvider.INSTANCE, A::class.java)
+        doTestProxy(ByteCodeClassProxyProvider.INSTANCE, A::class.java)
     }
 
     private fun <T : A> doTestProxy(provider: ClassProxyProvider, baseClass: Class<T>) {

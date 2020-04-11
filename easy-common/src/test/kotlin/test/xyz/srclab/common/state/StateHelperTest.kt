@@ -1,9 +1,9 @@
 package test.xyz.srclab.common.state
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
 import xyz.srclab.common.exception.ExceptionStatus
 import xyz.srclab.common.state.StateHelper
+import xyz.srclab.test.doAssertEquals
 
 /**
  * @author sunqian

@@ -9,15 +9,11 @@ import xyz.srclab.common.provider.AbstractProviderManager;
 @ThreadSafe
 public class ByteCodeProviderManager extends AbstractProviderManager<ByteCodeProvider> {
 
-    public static ByteCodeProviderManager getInstance() {
-        return INSTANCE;
-    }
-
-    private static final ByteCodeProviderManager INSTANCE = new ByteCodeProviderManager();
+    public static final ByteCodeProviderManager INSTANCE = new ByteCodeProviderManager();
 
     @Override
     protected ByteCodeProvider createDefaultProvider() {
         return EnvironmentHelper.hasPackage("org.springframework.cglib.proxy") ?
-                SpringCglibByteCodeProvider.getInstance() : CglibByteCodeProvider.getInstance();
+                SpringCglibByteCodeProvider.INSTANCE : CglibByteCodeProvider.INSTANCE;
     }
 }

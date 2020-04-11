@@ -1,10 +1,10 @@
 package test.xyz.srclab.common.bean
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
-import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.bean.*
 import xyz.srclab.common.reflect.SignatureHelper
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 

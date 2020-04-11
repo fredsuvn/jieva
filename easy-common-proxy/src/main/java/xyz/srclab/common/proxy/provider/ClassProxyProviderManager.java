@@ -7,15 +7,11 @@ import xyz.srclab.common.proxy.provider.jdk.JdkClassProxyProvider;
 
 public class ClassProxyProviderManager extends AbstractProviderManager<ClassProxyProvider> {
 
-    public static ClassProxyProviderManager getInstance() {
-        return INSTANCE;
-    }
-
-    private static final ClassProxyProviderManager INSTANCE = new ClassProxyProviderManager();
+    public static final ClassProxyProviderManager INSTANCE = new ClassProxyProviderManager();
 
     @Override
     protected ClassProxyProvider createDefaultProvider() {
         return EnvironmentHelper.hasPackage("xyz.srclab.bytecode") ?
-                ByteCodeClassProxyProvider.getInstance() : JdkClassProxyProvider.getInstance();
+                ByteCodeClassProxyProvider.INSTANCE : JdkClassProxyProvider.INSTANCE;
     }
 }

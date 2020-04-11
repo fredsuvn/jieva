@@ -8,11 +8,11 @@ import java.lang.reflect.Constructor;
 
 public class InstanceHelper {
 
-    private static final ThreadLocalCache<Object, Constructor<?>> CONSTRUCTOR_CACHE =
+    private static final ThreadLocalCache<Object, Constructor<?>> constructorCache =
             new ThreadLocalCache<>();
 
     public static <T> T newInstance(Class<?> cls) {
-        Constructor<?> constructor = CONSTRUCTOR_CACHE.getNonNull(
+        Constructor<?> constructor = constructorCache.getNonNull(
                 KeyHelper.buildKey(cls),
                 k -> {
                     try {
@@ -25,7 +25,7 @@ public class InstanceHelper {
     }
 
     public static Constructor<?> getConstructor(Class<?> cls, Class<?>[] parameterTypes) {
-        return CONSTRUCTOR_CACHE.getNonNull(
+        return constructorCache.getNonNull(
                 KeyHelper.buildKey(cls, parameterTypes),
                 k -> getConstructor0(cls, parameterTypes)
         );

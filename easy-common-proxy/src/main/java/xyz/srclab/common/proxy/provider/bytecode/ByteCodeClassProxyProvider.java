@@ -16,11 +16,7 @@ import java.util.function.Predicate;
 
 public class ByteCodeClassProxyProvider implements ClassProxyProvider {
 
-    public static ByteCodeClassProxyProvider getInstance() {
-        return INSTANCE;
-    }
-
-    private static final ByteCodeClassProxyProvider INSTANCE = new ByteCodeClassProxyProvider();
+    public static final ByteCodeClassProxyProvider INSTANCE = new ByteCodeClassProxyProvider();
 
     @Override
     public <T> ClassProxy.Builder<T> newBuilder(Class<T> type) {
@@ -30,7 +26,7 @@ public class ByteCodeClassProxyProvider implements ClassProxyProvider {
     private static final class BytecodeClassProxyBuilder<T>
             extends CacheStateBuilder<ClassProxy<T>> implements ClassProxy.Builder<T> {
 
-        private static final ByteCodeProvider byteCodeProvider = ByteCodeProviderManager.getInstance().getProvider();
+        private static final ByteCodeProvider byteCodeProvider = ByteCodeProviderManager.INSTANCE.getProvider();
 
         private final Class<T> type;
         private final List<Pair<Predicate<Method>, ProxyMethod>> predicatePairs = new LinkedList<>();

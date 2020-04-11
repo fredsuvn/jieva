@@ -5,7 +5,7 @@ import xyz.srclab.bytecode.provider.ByteCodeProviderManager;
 
 class ProxyClassBuilderHelper {
 
-    private static final ByteCodeProvider byteCodeProvider = ByteCodeProviderManager.getInstance().getProvider();
+    private static final ByteCodeProvider byteCodeProvider = ByteCodeProviderManager.INSTANCE.getProvider();
 
     static <T> ProxyClass.Builder<T> newBuilder(Class<T> superClass) {
         return byteCodeProvider.newProxyClassBuilder(superClass);

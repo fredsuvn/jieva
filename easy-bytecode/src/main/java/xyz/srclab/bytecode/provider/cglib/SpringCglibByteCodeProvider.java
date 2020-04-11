@@ -8,11 +8,7 @@ import xyz.srclab.bytecode.proxy.ProxyClass;
 @ThreadSafe
 public class SpringCglibByteCodeProvider implements ByteCodeProvider {
 
-    public static SpringCglibByteCodeProvider getInstance() {
-        return SpringCglibByteCodeProvider.INSTANCE;
-    }
-
-    private static final SpringCglibByteCodeProvider INSTANCE = new SpringCglibByteCodeProvider();
+    public static final SpringCglibByteCodeProvider INSTANCE = new SpringCglibByteCodeProvider();
 
     private final SpringCglibAdaptor springCglibAdaptor = new SpringCglibAdaptor();
 

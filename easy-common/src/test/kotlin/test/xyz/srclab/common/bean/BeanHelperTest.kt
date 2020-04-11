@@ -1,13 +1,13 @@
 package test.xyz.srclab.common.bean
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
-import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.bean.BeanHelper
 import xyz.srclab.common.bean.BeanMethodNotFoundException
 import xyz.srclab.common.bean.BeanPropertyNotFoundException
 import xyz.srclab.common.lang.TypeRef
 import xyz.srclab.common.reflect.SignatureHelper
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import java.lang.reflect.Type
 
 /**

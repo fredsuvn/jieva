@@ -21,11 +21,7 @@ import java.util.function.Predicate;
 
 public class JdkClassProxyProvider implements ClassProxyProvider {
 
-    public static JdkClassProxyProvider getInstance() {
-        return INSTANCE;
-    }
-
-    private static final JdkClassProxyProvider INSTANCE = new JdkClassProxyProvider();
+    public static final JdkClassProxyProvider INSTANCE = new JdkClassProxyProvider();
 
     @Override
     public <T> ClassProxy.Builder<T> newBuilder(Class<T> type) {

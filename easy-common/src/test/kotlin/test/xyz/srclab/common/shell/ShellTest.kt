@@ -1,9 +1,9 @@
 package test.xyz.srclab.common.shell
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
 import xyz.srclab.common.base.Defaults
 import xyz.srclab.common.shell.Shell
+import xyz.srclab.test.doAssertEquals
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream

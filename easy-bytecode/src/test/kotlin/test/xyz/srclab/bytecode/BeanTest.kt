@@ -32,8 +32,8 @@ object BeanTest {
 
     @Test
     fun testWithProvider() {
-        doTestBean(CglibByteCodeProvider.getInstance(), A2::class.java)
-        doTestBean(SpringCglibByteCodeProvider.getInstance(), A3::class.java)
+        doTestBean(CglibByteCodeProvider.INSTANCE, A2::class.java)
+        doTestBean(SpringCglibByteCodeProvider.INSTANCE, A3::class.java)
     }
 
     private fun <T : Any> doTestBean(provider: ByteCodeProvider, baseClass: Class<T>) {

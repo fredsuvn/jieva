@@ -1,11 +1,11 @@
 package test.xyz.srclab.common.reflect
 
 import org.testng.annotations.Test
+import xyz.srclab.common.reflect.SignatureHelper
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable
-import xyz.srclab.common.reflect.SignatureHelper
 
-object SignatureTest {
+object SignatureHelperTest {
 
     @Test
     fun testSignClass() {

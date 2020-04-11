@@ -1,9 +1,9 @@
 package test.xyz.srclab.common.lang
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
 import xyz.srclab.common.lang.tuple.Pair
 import xyz.srclab.common.lang.tuple.Tuple
+import xyz.srclab.test.doAssertEquals
 
 /**
  * @author sunqian

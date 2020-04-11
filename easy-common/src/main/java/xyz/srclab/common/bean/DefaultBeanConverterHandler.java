@@ -1,6 +1,5 @@
 package xyz.srclab.common.bean;
 
-import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.collection.iterable.IterableHelper;
@@ -82,14 +81,14 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         //     return convertToArray(from, to, beanOperator);
         // }
         if (Map.class.equals(rawType)) {
-            Type[] kv = TypeHelper.getGenericTypes(parameterizedType);
-            return convertToMap(from, kv[0], kv[1], beanOperator);
+            List<Type> kv = TypeHelper.getGenericTypes(parameterizedType);
+            return convertToMap(from, kv.get(0), kv.get(1), beanOperator);
         }
         if (List.class.equals(rawType)) {
-            return convertToList(from, TypeHelper.getGenericTypes(parameterizedType)[0], beanOperator);
+            return convertToList(from, TypeHelper.getGenericTypes(parameterizedType).get(0), beanOperator);
         }
         if (Set.class.equals(rawType) || Collection.class.equals(rawType)) {
-            return convertToSet(from, TypeHelper.getGenericTypes(parameterizedType)[0], beanOperator);
+            return convertToSet(from, TypeHelper.getGenericTypes(parameterizedType).get(0), beanOperator);
         }
         return convertToGenericBean(from, rawType, parameterizedType.getActualTypeArguments(), beanOperator);
     }
@@ -200,12 +199,12 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     private Object convertToGenericBean(Object from, Class<?> rawType, Type[] genericTypes, BeanOperator beanOperator) {
-        TypeVariable<?>[] typeVariables = TypeHelper.getTypeParameters(rawType);
+        List<TypeVariable<?>> typeVariables = TypeHelper.getTypeParameters(rawType);
         Object toInstance = InstanceHelper.newInstance(rawType);
         beanOperator.copyProperties(from, toInstance,
                 (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator1) -> {
                     Type destType = Object.class;
-                    int index = ArrayUtils.indexOf(typeVariables, destPropertyType);
+                    int index = typeVariables.indexOf(destPropertyType);
                     if (index >= 0) {
                         destType = genericTypes[index];
                     }

@@ -1,11 +1,11 @@
 package test.xyz.srclab.common.array
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
-import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.array.ArrayBuilder
 import xyz.srclab.common.array.ArrayHelper
 import xyz.srclab.common.lang.TypeRef
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 
 object ArrayBuilderTest {
 

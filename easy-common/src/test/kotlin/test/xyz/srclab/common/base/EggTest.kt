@@ -1,9 +1,8 @@
 package test.xyz.srclab.common.base
 
 import org.testng.annotations.Test
-import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.egg.EggHelper
-import java.lang.IllegalArgumentException
+import xyz.srclab.test.doExpectThrowable
 
 object EggTest {
 

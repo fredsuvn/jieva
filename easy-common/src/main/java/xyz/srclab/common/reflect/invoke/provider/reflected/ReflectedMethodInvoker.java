@@ -1,7 +1,8 @@
-package xyz.srclab.common.reflect.invoke;
+package xyz.srclab.common.reflect.invoke.provider.reflected;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.exception.ExceptionWrapper;
+import xyz.srclab.common.reflect.invoke.MethodInvoker;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

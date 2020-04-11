@@ -1,4 +1,6 @@
-package xyz.srclab.common.reflect.invoke;
+package xyz.srclab.common.reflect.invoke.provider.methodhandle;
+
+import xyz.srclab.common.reflect.invoke.ConstructorInvoker;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
