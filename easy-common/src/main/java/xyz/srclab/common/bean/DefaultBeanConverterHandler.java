@@ -62,11 +62,21 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
         if (to instanceof GenericArrayType) {
             return convertToArray(from, to, beanOperator);
         }
-        Class<?> rawType = TypeHelper.getRawClass(to);
-        if (!(to instanceof ParameterizedType)) {
-            return convertClass(from, rawType, beanOperator);
+        if (to instanceof ParameterizedType) {
+            return convertParameterizedType(from, (ParameterizedType) to, beanOperator);
         }
-        ParameterizedType parameterizedType = (ParameterizedType) to;
+        if (to instanceof TypeVariable) {
+            return convertTypeVariable(from, (TypeVariable<?>) to, beanOperator);
+        }
+        if (to instanceof WildcardType) {
+            return convertWildcardType(from, (WildcardType) to, beanOperator);
+        }
+        throw new IllegalArgumentException("Cannot convert object {" + from + "} to type: " + to);
+    }
+
+    private Object convertParameterizedType(
+            Object from, ParameterizedType parameterizedType, BeanOperator beanOperator) {
+        Class<?> rawType = TypeHelper.getRawClass(parameterizedType);
         // Never reached
         // if (rawType.isArray()) {
         //     return convertToArray(from, to, beanOperator);
@@ -82,6 +92,18 @@ public class DefaultBeanConverterHandler implements BeanConverterHandler {
             return convertToSet(from, TypeHelper.getGenericTypes(parameterizedType)[0], beanOperator);
         }
         return convertToGenericBean(from, rawType, parameterizedType.getActualTypeArguments(), beanOperator);
+    }
+
+    private Object convertWildcardType(Object from, WildcardType to, BeanOperator beanOperator) {
+        Class<?> rawType = TypeHelper.getRawClass(to);
+        return convertClass(from, rawType, beanOperator);
+    }
+
+    private Object convertTypeVariable(Object from, TypeVariable<?> to, BeanOperator beanOperator) {
+        throw new IllegalArgumentException(
+                FastFormat.format("Cannot find runtime type for {}.{}",
+                        to.getGenericDeclaration(), to.getName())
+        );
     }
 
     private Map<Object, Object> convertToMap(Object from, Type keyType, Type valueType, BeanOperator beanOperator) {

@@ -2,14 +2,14 @@ package test.xyz.srclab.common.bean
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import xyz.srclab.test.doAssertEquals
-import xyz.srclab.test.doExpectThrowable
 import xyz.srclab.common.bean.BeanConverter
 import xyz.srclab.common.bean.BeanConverterHandler
 import xyz.srclab.common.bean.BeanHelper
 import xyz.srclab.common.bean.BeanOperator
 import xyz.srclab.common.lang.TypeRef
 import xyz.srclab.common.time.TimeHelper
+import xyz.srclab.test.doAssertEquals
+import xyz.srclab.test.doExpectThrowable
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -179,6 +179,13 @@ object BeanConverterTest {
                 arrayOf(bInt)
             )
         )
+    }
+
+    @Test
+    fun testConvertGeneric() {
+        val b1 = B<String>()
+        b1.t = "999"
+        doAssertEquals(BeanConverter.DEFAULT.convert(b1, object : TypeRef<B<Int>>() {}).t, 999)
     }
 
     @Test

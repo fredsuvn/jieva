@@ -1,9 +1,9 @@
 package test.xyz.srclab.common.bean
 
 import org.testng.annotations.Test
+import xyz.srclab.common.bean.*
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable
-import xyz.srclab.common.bean.*
 
 object BeanOperatorTest {
 
@@ -96,6 +96,14 @@ object BeanOperatorTest {
         val destNullKey = mutableMapOf<Any, Any>()
         BeanHelper.copyProperties(nullKey, destNullKey)
         doAssertEquals(destNullKey, mapOf<Any, Any>())
+
+        //generic
+        val c1 = C<String>()
+        c1.t = "123"
+        val c2 = C<Int>()
+        doExpectThrowable(IllegalArgumentException::class.java) {
+            BeanHelper.copyProperties(c1, c2)
+        }
     }
 
     @Test
@@ -389,5 +397,9 @@ object BeanOperatorTest {
 
     class Bb {
         var intString: Int? = 0
+    }
+
+    class C<T> {
+        var t: T? = null
     }
 }
