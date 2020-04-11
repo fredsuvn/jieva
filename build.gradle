@@ -40,7 +40,7 @@ tasks.withType(JavaCompile) {
 def processProjectInfo(Project project) {
     if (project == rootProject) {
         // NOP
-    } else if (project.group == "easy-common-build.common-sample") {
+    } else if (project.group.toString().startsWith("easy-common-build.common-samples")) {
         project.group = config.sampleGroup
         project.version = config.sampleVersion
     } else {

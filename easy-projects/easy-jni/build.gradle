@@ -15,11 +15,11 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":easy-parent")))
+    implementation(platform(project(":easy-projects:easy-parent")))
 
-    implementation(project(":easy-common"))
+    implementation(project(":easy-projects:easy-common"))
 
-    testCompile(project(":easy-test"))
+    testCompile(project(":easy-projects:easy-test"))
     testCompile("org.testng:testng")
 }
 
@@ -27,3 +27,5 @@ test {
     useTestNG()
     include("**/*Test.class")
 }
+
+//apply from: gradles.deployJar

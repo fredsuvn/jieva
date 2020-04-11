@@ -15,9 +15,9 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":easy-parent")))
+    implementation(platform(project(":easy-projects:easy-parent")))
 
-    api(project(":easy-annotations"))
+    api(project(":easy-projects:easy-annotations"))
 
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("org.slf4j:slf4j-api")
@@ -26,7 +26,7 @@ dependencies {
     api("org.apache.commons:commons-collections4")
     api('com.google.guava:guava')
 
-    testCompile(project(":easy-test"))
+    testCompile(project(":easy-projects:easy-test"))
     testCompile("org.testng:testng")
 }
 

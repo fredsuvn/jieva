@@ -15,9 +15,9 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":easy-parent")))
+    implementation(platform(project(":easy-projects:easy-parent")))
 
-    implementation(project(":easy-annotations"))
+    implementation(project(":easy-projects:easy-annotations"))
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.apache.commons:commons-lang3")

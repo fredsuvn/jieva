@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Easy for Common: Proxy Support"
+description = "Easy for Bytecode Support"
 
 apply from: gradles.compile
 
@@ -15,16 +15,16 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":easy-parent")))
+    implementation(platform(project(":easy-projects:easy-parent")))
 
-    implementation(project(":easy-common"))
+    implementation(project(":easy-projects:easy-common"))
 
-    compileOnly(project(":easy-bytecode"))
+    compileOnly("org.springframework:spring-core")
+    compileOnly("cglib:cglib")
 
-    testCompile(project(":easy-test"))
+    testCompile(project(":easy-projects:easy-test"))
     testCompile("org.testng:testng")
 
-    testCompile(project(":easy-bytecode"))
     testCompile("org.springframework:spring-core")
     testCompile("cglib:cglib")
 }
