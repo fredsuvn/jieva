@@ -1,9 +1,28 @@
-= Easy for Common
-Fred Suvn <fredsuvn@163.com>
-v0.0.0, 2020-03-26
+= Easy Starter: Base Integration Libraries for Java
+Sun Qian <fredsuvn@163.com>
+// v0.0.0, 2020-03-26
+v1.0.0, 2020-04-12
 
-Easy for Common makes it easy to write base, less and clear java code. It is also base lib for project easy-spring-boot,
-provides base operator about bean, bytecode, format, proxy, reflect, etc.
+Easy Starter is a base integration library for java, it consists of a set of core easy-components and selected third
+base library with appropriate versions.
+
+Core easy-components includes:
+
+* easy-annotations: defines core annotations, some of them are optimized from jsr305;
+* easy-common: base component for easy-starter. It encapsulates common operation for array, bean, builder, cache,
+  collection, exception, lang, provider, reflect, shell, state, string, time, etc.;
+* easy-bytecode: provides uniform bytecode interface and builtin implementations (cglib and spring-cglib);
+* easy-common-proxy: provides proxy operation;
+* easy-jni: provides jni operation;
+* easy-test: provides assistant tools for testing.
+
+There are also some selected third base library to use directly use:
+
+* https://kotlinlang.org/[kotlin],
+* https://commons.apache.org/proper/commons-lang/[commons-lang3],
+* https://commons.apache.org/proper/commons-beanutils/[commons-beanutils],
+* https://commons.apache.org/proper/commons-collections/[commons-collections],
+* https://github.com/google/guava[Guava].
 
 == Getting Started
 Source code: https://github.com/srclab-projects/easy-common
