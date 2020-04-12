@@ -30,13 +30,13 @@ dependencies {
     api platform("org.springframework.boot:spring-boot-starter-parent:${libVersions.springBootVersion}")
 
     constraints {
-//        api(project(":easy-bom"))
-//        file("${rootDir}/easy-projects").eachDirMatch(~/easy-.*/) { file ->
-//            api(project(":easy-projects:${file.name}"))
-//        }
-//        file("${rootDir}/easy-starters").eachDirMatch(~/easy-.*/) { file ->
-//            api(project(":easy-starters:${file.name}"))
-//        }
+        api(project(":easy-bom"))
+        file("${rootDir}/easy-projects").eachDirMatch(~/easy-.*/) { file ->
+            api(project(":easy-projects:${file.name}"))
+        }
+        file("${rootDir}/easy-starters").eachDirMatch(~/easy-.*/) { file ->
+            api(project(":easy-starters:${file.name}"))
+        }
 
         api("com.google.code.findbugs:jsr305:${libVersions.jsr305Version}")
         api("org.jetbrains.kotlin:kotlin-bom:${libVersions.kotlinVersion}")
