@@ -13,7 +13,7 @@ public class ByteCodeProviderManager extends AbstractProviderManager<ByteCodePro
 
     @Override
     protected ByteCodeProvider createDefaultProvider() {
-        return EnvironmentHelper.hasPackage("org.springframework.cglib.proxy") ?
+        return EnvironmentHelper.hasClass("org.springframework.cglib.proxy.Enhancer") ?
                 SpringCglibByteCodeProvider.INSTANCE : CglibByteCodeProvider.INSTANCE;
     }
 }
