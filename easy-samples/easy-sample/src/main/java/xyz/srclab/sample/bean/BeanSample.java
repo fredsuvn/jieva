@@ -1,120 +1,140 @@
-//package xyz.srclab.sample.bean;
-//
-//import xyz.srclab.common.bean.BeanConverter;
-//import xyz.srclab.common.bean.BeanHelper;
-//import xyz.srclab.common.bean.BeanOperator;
-//import xyz.srclab.common.bean.BeanResolver;
-//import xyz.srclab.common.lang.TypeRef;
-//import xyz.srclab.common.test.asserts.AssertHelper;
-//
-//import java.util.HashMap;
-//import java.util.Map;
-//
-//public class BeanSample {
-//
-//    public void showConvert() throws Exception {
-//        String string = "10086";
-//        long l = BeanHelper.convert(string, Long.class);
-//        AssertHelper.printAssert(l, 10086L);
-//
-//        Map<Long, Long> longMap = new HashMap<>();
-//        longMap.put(3L, 3L);
-//        longMap.put(6L, 6L);
-//        longMap.put(9L, 9L);
-//        Map<String, String> stringMap = BeanHelper.convert(longMap, new TypeRef<Map<String, String>>() {
-//        });
-//        System.out.println(stringMap);
-//        AssertHelper.printAssert(stringMap.get("6"), "6");
-//    }
-//
-//    public void showCopyProperties() throws Exception {
-//        A a = new A();
-//        a.setString("A");
-//        Map<? super Integer, ? extends Integer> aMap = new HashMap<>();
-//        ((Map) aMap).put(1, 1);
-//        ((Map) aMap).put(2, 2);
-//        a.setMap(aMap);
-//        B b = new B();
-//        BeanHelper.copyProperties(a, b);
-//        Map<? extends String, ? extends String> bMap = b.getMap();
-//        System.out.println(bMap);
-//        AssertHelper.printAssert(bMap.get("1"), "1");
-//
-//        BeanHelper.copyPropertiesIgnoreNull(a, b);
-//        BeanHelper.copyProperties(a, b,
-//                (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator) -> {
-//                    // Do what you like here...
-//                });
-//    }
-//
-//    public void showPopulateProperties() {
-//        A a = new A();
-//        a.setString("A");
-//        Map<? super Integer, ? extends Integer> aMap = new HashMap<>();
-//        ((Map) aMap).put(1, 1);
-//        ((Map) aMap).put(2, 2);
-//        a.setMap(aMap);
-//        Map map = new HashMap();
-//        BeanHelper.populateProperties(a, map);
-//        System.out.println(map);
-//        AssertHelper.printAssert(((Map) map.get("map")).get(1), 1);
-//
-//        BeanHelper.populatePropertiesIgnoreNull(a, map);
-//        BeanHelper.populateProperties(a, map,
-//                (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator) -> {
-//                    // Do what you like here...
-//                });
-//    }
-//
-//    public void showCustom() {
-//        BeanOperator beanOperator = BeanOperator.newBuilder()
-//                .setBeanResolver(BeanResolver.newBuilder()
-//                        .build())
-//                .setBeanConverter(BeanConverter.newBuilder()
-//                        .build())
-//                .build();
-//    }
-//
-//    public static class A {
-//        private String string;
-//        private Map<? super Integer, ? extends Integer> map;
-//
-//        public String getString() {
-//            return string;
-//        }
-//
-//        public void setString(String string) {
-//            this.string = string;
-//        }
-//
-//        public Map<? super Integer, ? extends Integer> getMap() {
-//            return map;
-//        }
-//
-//        public void setMap(Map<? super Integer, ? extends Integer> map) {
-//            this.map = map;
-//        }
-//
-//    }
-//
-//    public static class B {
-//        private String string;
-//        private Map<? extends String, ? extends String> map;
-//
-//        public String getString() {
-//            return string;
-//        }
-//
-//        public void setString(String string) {
-//            this.string = string;
-//        }
-//
-//        public Map<? extends String, ? extends String> getMap() {
-//            return map;
-//        }
-//
-//        public void setMap(Map<? extends String, ? extends String> map) {
-//            this.map = map;
-//        }
-//    }
-//}
+package xyz.srclab.sample.bean;
+
+import xyz.srclab.common.bean.BeanHelper;
+import xyz.srclab.common.bean.BeanOperator;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class BeanSample {
+
+    public static void main(String[] args) throws Exception {
+        A a = new A();
+        a.setStringProperty("123");
+        a.setIntProperty(456);
+        a.setDateProperty("2020-02-02T02:02:22");
+        Map<? super Integer, List<? extends String>> map = new HashMap<>();
+        map.put(8, Arrays.asList("8", "9", "10"));
+        a.setMap(map);
+        C<String> c = new C<>();
+        c.setT("666");
+        a.setC(c);
+
+        B b = new B();
+        //BeanUtils.copyProperties(a, b);
+        BeanHelper.copyProperties(a, b);
+        System.out.println(b.getMap().get("8").get(1));
+        System.out.println(b.getC().getT());
+    }
+
+    public static class A {
+        private String stringProperty;
+        private int intProperty;
+        private String dateProperty;
+        private Map<? super Integer, List<? extends String>> map;
+        private C<String> c;
+
+        public String getStringProperty() {
+            return stringProperty;
+        }
+
+        public void setStringProperty(String stringProperty) {
+            this.stringProperty = stringProperty;
+        }
+
+        public int getIntProperty() {
+            return intProperty;
+        }
+
+        public void setIntProperty(int intProperty) {
+            this.intProperty = intProperty;
+        }
+
+        public String getDateProperty() {
+            return dateProperty;
+        }
+
+        public void setDateProperty(String dateProperty) {
+            this.dateProperty = dateProperty;
+        }
+
+        public Map<? super Integer, List<? extends String>> getMap() {
+            return map;
+        }
+
+        public void setMap(Map<? super Integer, List<? extends String>> map) {
+            this.map = map;
+        }
+
+        public C<String> getC() {
+            return c;
+        }
+
+        public void setC(C<String> c) {
+            this.c = c;
+        }
+    }
+
+    public static class B {
+        private int stringProperty;
+        private String intProperty;
+        private LocalDateTime dateProperty;
+        private Map<? extends String, List<? extends Integer>> map;
+        private C<Integer> c;
+
+        public int getStringProperty() {
+            return stringProperty;
+        }
+
+        public void setStringProperty(int stringProperty) {
+            this.stringProperty = stringProperty;
+        }
+
+        public String getIntProperty() {
+            return intProperty;
+        }
+
+        public void setIntProperty(String intProperty) {
+            this.intProperty = intProperty;
+        }
+
+        public LocalDateTime getDateProperty() {
+            return dateProperty;
+        }
+
+        public void setDateProperty(LocalDateTime dateProperty) {
+            this.dateProperty = dateProperty;
+        }
+
+        public Map<? extends String, List<? extends Integer>> getMap() {
+            return map;
+        }
+
+        public void setMap(Map<? extends String, List<? extends Integer>> map) {
+            this.map = map;
+        }
+
+        public C<Integer> getC() {
+            return c;
+        }
+
+        public void setC(C<Integer> c) {
+            this.c = c;
+        }
+    }
+
+    public static class C<T> {
+        private T t;
+
+        public T getT() {
+            return t;
+        }
+
+        public void setT(T t) {
+            this.t = t;
+        }
+    }
+}

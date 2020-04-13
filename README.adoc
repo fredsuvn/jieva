@@ -2,115 +2,298 @@
 Sun Qian <fredsuvn@163.com>
 // v0.0.0, 2020-03-26
 v1.0.0, 2020-04-12
+:encoding: UTF-8
+:easy-starter-version: 1.0.0
 
 Easy Starter is a base integration library for java, it consists of a set of core easy-components and selected third
-base library with appropriate versions.
+base libraries of appropriate versions.
 
 Core easy-components includes:
 
 * easy-annotations: defines core annotations, some of them are optimized from jsr305;
 * easy-common: base component for easy-starter. It encapsulates common operation for array, bean, builder, cache,
-  collection, exception, lang, provider, reflect, shell, state, string, time, etc.;
+collection, exception, lang, provider, reflect, shell, state, string, time, etc.;
 * easy-bytecode: provides uniform bytecode interface and builtin implementations (cglib and spring-cglib);
 * easy-common-proxy: provides proxy operation;
 * easy-jni: provides jni operation;
 * easy-test: provides assistant tools for testing.
 
-There are also some selected third base library to use directly use:
+There are also selected third base libraries in it to directly use:
 
-* https://kotlinlang.org/[kotlin],
-* https://commons.apache.org/proper/commons-lang/[commons-lang3],
-* https://commons.apache.org/proper/commons-beanutils/[commons-beanutils],
-* https://commons.apache.org/proper/commons-collections/[commons-collections],
+* https://kotlinlang.org/[kotlin]；
+* https://commons.apache.org/proper/commons-lang/[commons-lang3]；
+* https://commons.apache.org/proper/commons-beanutils/[commons-beanutils]；
+* https://commons.apache.org/proper/commons-collections/[commons-collections]；
 * https://github.com/google/guava[Guava].
 
 == Getting Started
+
 Source code: https://github.com/srclab-projects/easy-common
 
-From maven:
+Simply directly to use from maven or gradle:
 
-[source,xml,indent=0]
+[source,xml,indent=0,subs="attributes+"]
 ----
 <dependency>
     <groupId>xyz.srclab.common</groupId>
-    <artifactId>easy-common</artifactId>
-    <version>${version}</version>
+    <artifactId>easy-starter</artifactId>
+    <version>{easy-starter-version}</version>
 </dependency>
 ----
 
-Other artifact in xyz.srclab.common:
-
-[source,xml,indent=0]
+[source,gradle,indent=0,subs="attributes+"]
 ----
-<dependencies>
-  <dependency>
-      <groupId>xyz.srclab.common</groupId>
-      <artifactId>easy-bom</artifactId>
-      <version>${version}</version>
-  </dependency>
+implementation("xyz.srclab.common:easy-starter:{easy-starter-version}")
+----
 
-  <dependency>
+Typically, we use easy-bom as dependency manager:
+
+[source,xml,indent=2,subs="attributes+"]
+----
+<project>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>xyz.srclab.common</groupId>
+        <artifactId>easy-bom</artifactId>
+        <version>{easy-starter-version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>xyz.srclab.common</groupId>
+      <artifactId>easy-starter</artifactId>
+    </dependency>
+  </dependencies>
+</project>
+----
+
+[source,gradle,indent=0,subs="attributes+"]
+----
+implementation(platform("xyz.srclab.common:easy-bom:{easy-starter-version}"))
+implementation("xyz.srclab.common:easy-starter")
+----
+
+Or, use easy-parent for customizing easy-starter project:
+
+[source,xml,indent=2,subs="attributes+"]
+----
+<project>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>xyz.srclab.common</groupId>
+        <artifactId>easy-parent</artifactId>
+        <version>{easy-starter-version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>xyz.srclab.common</groupId>
+      <artifactId>easy-common</artifactId>
+    </dependency>
+    <dependency>
       <groupId>xyz.srclab.common</groupId>
       <artifactId>easy-test</artifactId>
-      <version>${version}</version>
-  </dependency>
-</dependencies>
+    </dependency>
+  </dependencies>
+</project>
 ----
 
-== Usage
-Like its name, Easy for Common is very easy to use:
+[source,gradle,indent=0,subs="attributes+"]
+----
+implementation(platform("xyz.srclab.common:easy-parent:{easy-starter-version}"))
+implementation("xyz.srclab.common:easy-common")
+implementation("xyz.srclab.common:easy-test")
+----
 
-:sampledir: easy-sample/src/main/java/xyz/srclab/sample
+== User Guide
 
-=== Bean Operator
-Bean operator is used for operating beans such as convert type, copy properties, populate properties and etc.:
+Futures of easy-starter:
+
+* <<user_guide_bean>>
+* <<user_guide_reflect>>
+* <<user_guide_array>>
+* <<user_guide_string>>
+* <<user_guide_lang>>
+* <<user_guide_state_and_exception>>
+* <<user_guide_proxy>>
+* <<user_guide_bytecode>>
+* <<user_guide_other>>
+
+[#user_guide_bean]
+=== Bean
+
+easy-starter provides powerful bean operation ability. For a quick example, assume three class like:
 
 [source,java]
 ----
-include::{sampledir}/bean/BeanSample.java[]
+public static class A {
+    private String stringProperty;
+    private int intProperty;
+    private String dateProperty;
+    private Map<? super Integer, List<? extends String>> map;
+    private C<String> c;
+
+    // getters and setter...
+}
+
+public static class B {
+    private int stringProperty;
+    private String intProperty;
+    private LocalDateTime dateProperty;
+    private Map<? extends String, List<? extends Integer>> map;
+    private C<Integer> c;
+
+    // getters and setter...
+}
+
+public static class C<T> {
+    private T t;
+
+    // getters and setter...
+}
 ----
 
-=== Bytecode
-Bytecode can dynamically create bean, proxy class. It use cglib or spring-cglib according to environment:
+If we want to copy properties from *A* to *B*, *BeanUtils.copyProperties* is invalid because types (include generic
+types) are different for same-name-properties. But use *BeanHelper*, we can pass it:
 
 [source,java]
 ----
-include::{sampledir}/bytecode/ByteCodeSample.java[]
+public class BeanSample {
+
+    public static void main(String[] args) throws Exception {
+        A a = new A();
+        a.setStringProperty("123");
+        a.setIntProperty(456);
+        a.setDateProperty("2020-02-02T02:02:22");
+        Map<? super Integer, List<? extends String>> map = new HashMap<>();
+        map.put(8, Arrays.asList("8", "9", "10"));
+        a.setMap(map);
+        C<String> c = new C<>();
+        c.setT("666");
+        a.setC(c);
+
+        B b = new B();
+        //BeanUtils.copyProperties(a, b);
+        BeanHelper.copyProperties(a, b);
+        System.out.println(b.getMap().get("8").get(1));
+        System.out.println(b.getC().getT());
+    }
+}
 ----
 
-=== Format
-Format is used for formatting String, it support formatting as slf4j style, printf style and message style:
+*BeanHelper* use default implementation of *BeanOperator*, so above codes are equivalent to:
 
-[source,java]
+[source]
 ----
-include::{sampledir}/format/FormatSample.java[]
-----
-
-=== Lang
-Package lang provides some base but elegant type:
-
-[source,java]
-----
-include::{sampledir}/lang/LangSample.java[]
+BeanOperator.DEFAULT.copyProperties(a, b);
 ----
 
-=== Proxy
-Proxy use bytecode to convenient proxy class:
+Note, generic type will be erased so this still be invalid:
 
-[source,java]
+[source]
 ----
-include::{sampledir}/proxy/ProxySample.java[]
+C<String> c1 = ...
+C<Integer> c2 = ...
+BeanOperator.DEFAULT.copyProperties(c1, c2);
 ----
 
+But we can use *convert* methods to instead of:
+
+[source]
+----
+C<String> c1 = ...
+C<Integer> c2 = BeanOperator.DEFAULT.convert(c1, new TypeRef<C<Integer>>(){});
+----
+
+If *TypeRef<C<Integer>>* is frequently used, we can:
+
+[source]
+----
+TypeRef<C<Integer>> type = new TypeRef<C<Integer>>(){};
+C<String> c1 = ...
+C<Integer> c2 = BeanOperator.DEFAULT.convert(c1, type);
+----
+
+we can customize *BeanOperator* by BeanOperator.Builder:
+
+[source]
+----
+BeanOperator.Builder builder = BeanOperator.newBuilder();
+----
+
+And each needed interface for *BeanOperator.Builder* has its builder and *DEFAULT* implementation to help.
+
+[#user_guide_reflect]
 === Reflect
-Reflect Provides reflect methods without checked exception:
+
+easy-starter provides a way to invoke method called *MethodInvoker* (and *ConstructorInvoker*):
 
 [source,java]
 ----
-include::{sampledir}/reflect/ReflectSample.java[]
+public class ReflectSample {
+
+    public static void main(String[] args) {
+        MethodInvoker invoker = InvokerHelper.getMethodInvoker(A.class, "hello");
+        System.out.println(invoker.invoke(new A()));
+    }
+
+    public static class A {
+        public String hello() {
+            return "hello";
+        }
+    }
+}
 ----
 
+Signature helper:
+
+[source]
+----
+System.out.println(SignatureHelper.signClass(A.class));
+----
+
+Signature is helpful for making Class as a map (or cache) key.
+
+[#user_guide_array]
+=== Array
+
+easy-starter provides some practical method for array. For example, try to quickly create an array of which elements are
+from 1 to 100:
+
+[source,java]
+----
+public class ArraySample {
+
+    public static void main(String[] args) {
+        int[] array = ArrayHelper.newArray(new int[100], i -> i + 1);
+        System.out.println(Arrays.toString(array));
+    }
+}
+----
+
+[#user_guide_string]
+=== String
+
+[#user_guide_lang]
+=== Lang
+
+[#user_guide_state_and_exception]
+=== State and Exception
+
+[#user_guide_proxy]
+=== Proxy
+
+[#user_guide_bytecode]
+=== Bytecode
+
+[#user_guide_other]
+=== Others
 
 == License
+
 Easy for Common is Open Source software released under the
 https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].
