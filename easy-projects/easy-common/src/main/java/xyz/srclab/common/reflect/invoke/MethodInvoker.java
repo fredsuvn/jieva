@@ -13,5 +13,5 @@ public interface MethodInvoker {
     }
 
     @Nullable
-    Object invoke(Object object, Object... args);
+    Object invoke(@Nullable Object object, Object... args);
 }
