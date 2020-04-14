@@ -17,21 +17,21 @@ import java.util.Set;
 @Immutable
 public class ToString implements Computed<String> {
 
-    public static String toString(@Nullable Object any) {
+    public static String buildToString(@Nullable Object any) {
         if (any == null || TypeHelper.isBasic(any)) {
             return String.valueOf(any);
         }
         return new ToString(any).toString();
     }
 
-    public static String buildString(@Nullable Object any, ToStringStyle style) {
+    public static String buildToString(@Nullable Object any, ToStringStyle style) {
         if (any == null || TypeHelper.isBasic(any)) {
             return String.valueOf(any);
         }
         return new ToString(any, style).toString();
     }
 
-    public static String toString(@Nullable Object any, ToStringStyle style, BeanOperator beanOperator) {
+    public static String buildToString(@Nullable Object any, ToStringStyle style, BeanOperator beanOperator) {
         if (any == null || TypeHelper.isBasic(any)) {
             return String.valueOf(any);
         }

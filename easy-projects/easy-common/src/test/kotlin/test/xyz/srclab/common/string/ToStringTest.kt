@@ -16,10 +16,11 @@ object ToStringTest {
 
     @Test
     fun testToString() {
-        doAssertEquals(ToString.toString("ss"), "ss")
+        doAssertEquals(ToString.buildToString("ss"), "ss")
+        doAssertEquals(ToString.buildToString("ss", ToStringStyle.HUMAN_READABLE), "ss")
         val a = A()
         doAssertEquals(
-            ToString.toString(a),
+            ToString.buildToString(a),
             "{aaa=aaa," +
                     "array=[1],array2=[]," +
                     "b={class=${B::class.java.name}," +
@@ -29,13 +30,13 @@ object ToStringTest {
         val c = C()
         c.a = c
         doExpectThrowable(PropertyOrElementReferenceLoopException::class.java) {
-            ToString.toString(c)
+            ToString.buildToString(c)
         }.catch { e ->
             doAssertEquals(e.nameStackTrace, ".a")
         }
 
         doAssertEquals(
-            ToString.buildString(a, ToStringStyle.HUMAN_READABLE),
+            ToString.buildToString(a, ToStringStyle.HUMAN_READABLE),
             "{" + Defaults.LINE_SEPARATOR +
                     "    aaa = aaa, " + Defaults.LINE_SEPARATOR +
                     "    array = [" + Defaults.LINE_SEPARATOR +
@@ -56,7 +57,7 @@ object ToStringTest {
         )
 
         doAssertEquals(
-            ToString.toString(a, ToStringStyle.HUMAN_READABLE, BeanOperator.DEFAULT),
+            ToString.buildToString(a, ToStringStyle.HUMAN_READABLE, BeanOperator.DEFAULT),
             "{" + Defaults.LINE_SEPARATOR +
                     "    aaa = aaa, " + Defaults.LINE_SEPARATOR +
                     "    array = [" + Defaults.LINE_SEPARATOR +
@@ -81,7 +82,7 @@ object ToStringTest {
         doAssertEquals(toString.refreshGet(), toString.toString())
         doAssertEquals(ToString("ss").toString(), "ss")
         doAssertEquals(
-            ToString.toString("ss", ToStringStyle.DEFAULT, BeanOperator.DEFAULT),
+            ToString.buildToString("ss", ToStringStyle.DEFAULT, BeanOperator.DEFAULT),
             "ss"
         )
     }
