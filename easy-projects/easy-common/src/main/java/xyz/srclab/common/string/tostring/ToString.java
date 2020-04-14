@@ -24,6 +24,13 @@ public class ToString implements Computed<String> {
         return new ToString(any).toString();
     }
 
+    public static String buildString(@Nullable Object any, ToStringStyle style) {
+        if (any == null || TypeHelper.isBasic(any)) {
+            return String.valueOf(any);
+        }
+        return new ToString(any, style).toString();
+    }
+
     public static String toString(@Nullable Object any, ToStringStyle style, BeanOperator beanOperator) {
         if (any == null || TypeHelper.isBasic(any)) {
             return String.valueOf(any);
@@ -39,6 +46,10 @@ public class ToString implements Computed<String> {
 
     public ToString(Object any) {
         this(any, ToStringStyle.DEFAULT, BeanOperator.DEFAULT);
+    }
+
+    public ToString(Object any, ToStringStyle style) {
+        this(any, style, BeanOperator.DEFAULT);
     }
 
     public ToString(Object any, ToStringStyle style, BeanOperator beanOperator) {

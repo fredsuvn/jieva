@@ -35,6 +35,27 @@ object ToStringTest {
         }
 
         doAssertEquals(
+            ToString.buildString(a, ToStringStyle.HUMAN_READABLE),
+            "{" + Defaults.LINE_SEPARATOR +
+                    "    aaa = aaa, " + Defaults.LINE_SEPARATOR +
+                    "    array = [" + Defaults.LINE_SEPARATOR +
+                    "        1" + Defaults.LINE_SEPARATOR +
+                    "    ], " + Defaults.LINE_SEPARATOR +
+                    "    array2 = [], " + Defaults.LINE_SEPARATOR +
+                    "    b = {" + Defaults.LINE_SEPARATOR +
+                    "        class = ${B::class.java.name}, " + Defaults.LINE_SEPARATOR +
+                    "        set = [" + Defaults.LINE_SEPARATOR +
+                    "            bbb" + Defaults.LINE_SEPARATOR +
+                    "        ]" + Defaults.LINE_SEPARATOR +
+                    "    }, " + Defaults.LINE_SEPARATOR +
+                    "    class = ${A::class.java.name}, " + Defaults.LINE_SEPARATOR +
+                    "    map = {" + Defaults.LINE_SEPARATOR +
+                    "        1 = 1" + Defaults.LINE_SEPARATOR +
+                    "    }" + Defaults.LINE_SEPARATOR +
+                    "}"
+        )
+
+        doAssertEquals(
             ToString.toString(a, ToStringStyle.HUMAN_READABLE, BeanOperator.DEFAULT),
             "{" + Defaults.LINE_SEPARATOR +
                     "    aaa = aaa, " + Defaults.LINE_SEPARATOR +
