@@ -24,7 +24,7 @@ dependencies {
     testCompile(project(":easy-projects:easy-test"))
     testCompile("org.testng:testng")
 
-    //testCompile(project(":easy-projects:easy-bytecode"))
+    testCompile(project(":easy-projects:easy-bytecode"))
     testCompile("org.springframework:spring-core")
     testCompile("cglib:cglib")
 }

@@ -1,9 +1,9 @@
 package xyz.srclab.common.lang.tuple;
 
-public interface Tuple<A, B, C> {
+public interface Triple<A, B, C> {
 
-    static <A, B, C> Tuple<A, B, C> of(A first, B second, C third) {
-        return new Tuple<A, B, C>() {
+    static <A, B, C> Triple<A, B, C> of(A first, B second, C third) {
+        return new Triple<A, B, C>() {
             @Override
             public A get0() {
                 return first;
