@@ -32,7 +32,7 @@ Source code: https://github.com/srclab-projects/easy-common
 
 Simply directly to use from maven or gradle:
 
-[source,xml,indent=0,subs="attributes+"]
+[source,subs="attributes+"]
 ----
 <dependency>
     <groupId>xyz.srclab.common</groupId>
@@ -41,14 +41,14 @@ Simply directly to use from maven or gradle:
 </dependency>
 ----
 
-[source,gradle,indent=0,subs="attributes+"]
+[source,subs="attributes+"]
 ----
 implementation("xyz.srclab.common:easy-starter:{easy-starter-version}")
 ----
 
 Typically, we use easy-bom as dependency manager:
 
-[source,xml,indent=2,subs="attributes+"]
+[source,subs="attributes+"]
 ----
 <project>
   <dependencyManagement>
@@ -69,7 +69,7 @@ Typically, we use easy-bom as dependency manager:
 </project>
 ----
 
-[source,gradle,indent=0,subs="attributes+"]
+[source,subs="attributes+"]
 ----
 implementation(platform("xyz.srclab.common:easy-bom:{easy-starter-version}"))
 implementation("xyz.srclab.common:easy-starter")
@@ -77,7 +77,7 @@ implementation("xyz.srclab.common:easy-starter")
 
 Or, use easy-parent for customizing easy-starter project:
 
-[source,xml,indent=2,subs="attributes+"]
+[source,subs="attributes+"]
 ----
 <project>
   <dependencyManagement>
@@ -102,7 +102,7 @@ Or, use easy-parent for customizing easy-starter project:
 </project>
 ----
 
-[source,gradle,indent=0,subs="attributes+"]
+[source,subs="attributes+"]
 ----
 implementation(platform("xyz.srclab.common:easy-parent:{easy-starter-version}"))
 implementation("xyz.srclab.common:easy-common")
@@ -126,9 +126,9 @@ Futures of easy-starter:
 [#user_guide_bean]
 === Bean
 
-easy-starter provides powerful bean operation ability. For a quick example, assume three class like:
+Bean package provides powerful bean operation ability. For a quick example, assume three class like:
 
-[source,java]
+[source]
 ----
 public static class A {
     private String stringProperty;
@@ -137,7 +137,7 @@ public static class A {
     private Map<? super Integer, List<? extends String>> map;
     private C<String> c;
 
-    // getters and setter...
+    // getters and setterd...
 }
 
 public static class B {
@@ -147,92 +147,100 @@ public static class B {
     private Map<? extends String, List<? extends Integer>> map;
     private C<Integer> c;
 
-    // getters and setter...
+    // getters and setterd...
 }
 
 public static class C<T> {
     private T t;
 
-    // getters and setter...
+    // getters and setterd...
 }
 ----
 
 If we want to copy properties from *A* to *B*, *BeanUtils.copyProperties* is invalid because types (include generic
-types) are different for same-name-properties. But use *BeanHelper*, we can pass it:
+types) are different between same-name-properties. However, use *BeanHelper*, we can pass it:
 
-[source,java]
+[source]
 ----
-public class BeanSample {
+    A a = new A();
+    a.setStringProperty("123");
+    a.setIntProperty(456);
+    a.setDateProperty("2020-02-02T02:02:22");
+    Map<? super Integer, List<? extends String>> map = new HashMap<>();
+    map.put(8, Arrays.asList("8", "9", "10"));
+    a.setMap(map);
+    C<String> c = new C<>();
+    c.setT("666");
+    a.setC(c);
 
-    public static void main(String[] args) throws Exception {
-        A a = new A();
-        a.setStringProperty("123");
-        a.setIntProperty(456);
-        a.setDateProperty("2020-02-02T02:02:22");
-        Map<? super Integer, List<? extends String>> map = new HashMap<>();
-        map.put(8, Arrays.asList("8", "9", "10"));
-        a.setMap(map);
-        C<String> c = new C<>();
-        c.setT("666");
-        a.setC(c);
-
-        B b = new B();
-        //BeanUtils.copyProperties(a, b);
-        BeanHelper.copyProperties(a, b);
-        System.out.println(b.getMap().get("8").get(1));
-        System.out.println(b.getC().getT());
-    }
-}
+    B b = new B();
+    // BeanUtils.copyProperties(a, b) is invalid!
+    BeanHelper.copyProperties(a, b);
+    System.out.println(b.getMap().get("8").get(1));
+    System.out.println(b.getC().getT());
 ----
 
 *BeanHelper* use default implementation of *BeanOperator*, so above codes are equivalent to:
 
 [source]
 ----
-BeanOperator.DEFAULT.copyProperties(a, b);
+    // Same with BeanHelper.copyProperties(a, b);
+    BeanOperator.DEFAULT.copyProperties(a, b);
 ----
 
 Note, generic type will be erased so this still be invalid:
 
 [source]
 ----
-C<String> c1 = ...
-C<Integer> c2 = ...
-BeanOperator.DEFAULT.copyProperties(c1, c2);
+    C<String> c1 = ...
+    C<Integer> c2 = ...
+    BeanHelper.copyProperties(c1, c2);
 ----
 
-But we can use *convert* methods to instead of:
-
-[source]
-----
-C<String> c1 = ...
-C<Integer> c2 = BeanOperator.DEFAULT.convert(c1, new TypeRef<C<Integer>>(){});
-----
-
-If *TypeRef<C<Integer>>* is frequently used, we can:
+For the effect, we can use *convert* :
 
 [source]
 ----
-TypeRef<C<Integer>> type = new TypeRef<C<Integer>>(){};
-C<String> c1 = ...
-C<Integer> c2 = BeanOperator.DEFAULT.convert(c1, type);
+    C<String> c1 = ...
+    C<Integer> c2 = BeanHelper.convert(c1, new TypeRef<C<Integer>>(){});
 ----
 
-we can customize *BeanOperator* by BeanOperator.Builder:
+If *TypeRef<C<Integer>>* is frequently used, we can make it const:
 
 [source]
 ----
-BeanOperator.Builder builder = BeanOperator.newBuilder();
+    private static final TypeRef<C<Integer>> type = new TypeRef<C<Integer>>(){};
+
+    //...
+
+    C<String> c1 = ...
+    C<Integer> c2 = BeanHelper.convert(c1, type);
 ----
 
-And each needed interface for *BeanOperator.Builder* has its builder and *DEFAULT* implementation to help.
+*BeanOperator* consists of *BeanResolver* and *BeanConverter*, the former is used to resolve bean, the later as its name
+is used to convert type. We can customize *BeanOperator* by BeanOperator.Builder:
+
+[source]
+----
+    BeanOperator myBeanOperator = BeanOperator.newBuilder()
+        .setBeanResolver(
+            //...
+        )
+        .setBeanConverter(
+            //...
+        )
+        .build();
+----
+
+The interface *BeanResolver*, *BeanConverter* or its needed interfaces, has a *DEFAULT* implementation and *Builder* to
+help to implement.
 
 [#user_guide_reflect]
 === Reflect
 
-easy-starter provides a way to invoke method called *MethodInvoker* (and *ConstructorInvoker*):
+Reflect provides a way to invoke method called *MethodInvoker* (and *ConstructorInvoker*):
 
-[source,java]
+[source]
 ----
 public class ReflectSample {
 
@@ -249,22 +257,22 @@ public class ReflectSample {
 }
 ----
 
-Signature helper:
+Provides signature helper:
 
 [source]
 ----
-System.out.println(SignatureHelper.signClass(A.class));
+    System.out.println(SignatureHelper.signClass(A.class));
 ----
 
-Signature is helpful for making Class as a map (or cache) key.
+There are also *TypeHelper*, *MethodHelper*, *InvokerHelper*, *InstanceHelper* , etc. in the reflect package.
 
 [#user_guide_array]
 === Array
 
-easy-starter provides some practical method for array. For example, try to quickly create an array of which elements are
-from 1 to 100:
+Array package provides some practical method for Array. For example, try to quickly create an array of which elements
+are from 1 to 100:
 
-[source,java]
+[source]
 ----
 public class ArraySample {
 
@@ -278,14 +286,147 @@ public class ArraySample {
 [#user_guide_string]
 === String
 
+String package provides *FastFormat* to provide a fast, slf4j-style formatting:
+
+[source]
+----
+    System.out.println(FastFormat.format("This is {} style!", "slf4j"));
+----
+
+Provides *ToString* and *ToStringStyle* to conveniently build string for an object:
+
+[source]
+----
+public class ToStringSample {
+
+    public static void main(String[] args) {
+        System.out.println(ToString.buildToString(new A()));
+        System.out.println(ToString.buildToString(new A(), ToStringStyle.HUMAN_READABLE));
+    }
+
+    public static class A {
+        private String string = "string";
+        private List<String> list = Arrays.asList("string1", "string2");
+        private B b = new B();
+
+        // getters and setters...
+    }
+
+    public static class B {
+        private String string = "string";
+        private List<String> list = Arrays.asList("string1", "string2");
+
+        // getters and setters...
+    }
+}
+----
+
+Above source will output:
+
+----
+{b={class=xyz.srclab.sample.string.ToStringSample$B,list=[string1,string2],string=string},class=xyz.srclab.sample.\\
+string.ToStringSample$A,list=[string1,string2],string=string}
+{
+    b = {
+        class = xyz.srclab.sample.string.ToStringSample$B,
+        list = [
+            string1,
+            string2
+        ],
+        string = string
+    },
+    class = xyz.srclab.sample.string.ToStringSample$A,
+    list = [
+        string1,
+        string2
+    ],
+    string = string
+}
+----
+
 [#user_guide_lang]
 === Lang
+
+Lang package provides some additional class:
+
+[source]
+----
+    Computed<String> computed = Computed.with(() -> "complex build string");
+    System.out.println(computed.get());
+
+    Ref<String> ref = Ref.with("123");
+    System.out.println(ref.get());
+
+    Pair<String, Integer> pair = Pair.of("0", 1);
+    System.out.println(pair.get0());
+    System.out.println(pair.get1());
+
+    Tuple<String, Integer, Long> tuple = Tuple.of("0", 1, 2L);
+    System.out.println(tuple.get0());
+    System.out.println(tuple.get1());
+    System.out.println(tuple.get2());
+
+    TypeRef<List<String>> listTypeRef = new TypeRef<List<String>>() {};
+    System.out.println(listTypeRef.getType());
+----
+
+For these classes：
+
+* Computed: used to delayed get, and supports refresh on time;
+* Ref: as a container to solve the problem that variable must be final in some cases, such as accessing out-scope
+variable from lam expression;
+* Pair: represents a tuple with 2 components;
+* Triple: represents a tuple with 3 components;
+* TypeRef: help create a generic type, it is widely used in base libraries.
 
 [#user_guide_state_and_exception]
 === State and Exception
 
+State package defines some common *State* interfaces and supporting classes such as *StateHelper* to replace simple
+string or int. *BusinessException* also be a *State*, that means a *BusinessException* can be easier incorporated into
+an exception handling system based on *State*.
+
+See:
+
+----
+xyz.srclab.common.state;
+xyz.srclab.common.exception;
+----
+
 [#user_guide_proxy]
 === Proxy
+
+Proxy package supports JDK dynamic proxy by default:
+
+[source]
+----
+public class ProxySample {
+
+    public static void main(String[] args) {
+        ClassProxy<A> classProxy = ClassProxy.newBuilder(A.class)
+                .proxyMethod("someMethod", new Class<?>[0], (o, objects, method, methodInvoker) -> {
+                    String result = "proxy method";
+                    System.out.println(result);
+                    return result;
+                })
+                .build();
+        System.out.println(classProxy.newInstance().someMethod());
+    }
+
+    public interface A {
+
+        default String someMethod() {
+            System.out.println("someMethod");
+            return "someMethod";
+        }
+    }
+}
+----
+
+JDK proxy system only supports proxy methods which defined in interfaces, for more powerful proxy, we can import
+component easy-byte:
+
+
 
 [#user_guide_bytecode]
 === Bytecode

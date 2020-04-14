@@ -1,7 +1,8 @@
 package xyz.srclab.sample.bean;
 
 import xyz.srclab.common.bean.BeanHelper;
-import xyz.srclab.common.bean.BeanOperator;
+import xyz.srclab.common.bean.BeanStruct;
+import xyz.srclab.common.lang.TypeRef;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -28,6 +29,14 @@ public class BeanSample {
         BeanHelper.copyProperties(a, b);
         System.out.println(b.getMap().get("8").get(1));
         System.out.println(b.getC().getT());
+
+        C<String> c1 = new C<String>();
+        c1.setT("111");
+        C<Integer> c2 = BeanHelper.convert(c1, new TypeRef<C<Integer>>() {});
+        //C<Integer> c2 = BeanConverter.DEFAULT.convert(c1, new TypeRef<C<Integer>>() {});
+
+        BeanStruct beanStruct = BeanHelper.resolve(A.class);
+        //BeanStruct beanStruct = BeanOperator.DEFAULT.resolve(A.class);
     }
 
     public static class A {
