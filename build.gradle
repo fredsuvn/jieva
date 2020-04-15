@@ -19,8 +19,8 @@ ext {
 }
 
 group = config.group
-config.version = (isSnapshot ? "${config.version}-SNAPSHOT" : config.version)
-config.sampleVersion = (isSnapshot ? "${config.sampleVersion}-SNAPSHOT" : config.sampleVersion)
+config.version = (isSnapshot ? "${version}-SNAPSHOT" : version)
+config.sampleVersion = (isSnapshot ? "${version}-SNAPSHOT" : version)
 version = config.version
 
 // Note in gradles.auth some personal setting should be implemented.
