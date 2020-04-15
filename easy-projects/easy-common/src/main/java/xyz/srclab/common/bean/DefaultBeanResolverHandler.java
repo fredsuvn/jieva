@@ -29,8 +29,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
                 Method[] methods = type.getMethods();
-                return BeanStructSupport.newBuilder()
-                        .setType(type)
+                return BeanStruct.newBuilder(type)
                         .setProperties(buildProperties(beanInfo.getPropertyDescriptors()))
                         .setMethods(buildMethods(methods))
                         .build();

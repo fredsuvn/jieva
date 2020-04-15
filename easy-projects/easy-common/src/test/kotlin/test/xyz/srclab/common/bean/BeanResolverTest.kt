@@ -74,8 +74,7 @@ object BeanResolverTest {
             }
 
             override fun resolve(beanClass: Class<*>): BeanStruct {
-                return BeanStructSupport.newBuilder()
-                    .setType(beanClass)
+                return BeanStruct.newBuilder(beanClass)
                     .setProperties(mapOf("1" to object : BeanProperty {
 
                         private var value: Int? = 1

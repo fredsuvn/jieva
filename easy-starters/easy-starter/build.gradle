@@ -19,7 +19,6 @@ dependencies {
 
     api(project(":easy-projects:easy-annotations"))
     api(project(":easy-projects:easy-common"))
-    api(project(":easy-projects:easy-common-proxy"))
 }
 
 apply from: gradles.deployJar

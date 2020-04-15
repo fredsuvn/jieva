@@ -426,10 +426,8 @@ public class ProxySample {
 JDK proxy system only supports proxy methods which defined in interfaces, for more powerful proxy, we can import
 component easy-byte:
 
-
-
 [#user_guide_bytecode]
-=== Bytecode
+=== Byte Code
 
 [#user_guide_other]
 === Others

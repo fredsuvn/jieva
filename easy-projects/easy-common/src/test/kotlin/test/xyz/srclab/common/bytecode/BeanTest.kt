@@ -1,24 +1,66 @@
-//package test.xyz.srclab.common.bytecode
-//
-//import org.testng.annotations.Test
-//import test.xyz.srclab.common.doAssert
-//import test.xyz.srclab.common.model.SomeSomeClass1
-//import xyz.srclab.bytecode.bean.BeanClass
-//import xyz.srclab.common.bean.BeanHelper
-//
-//object BeanTest {
-//
-//    @Test
-//    fun testBean() {
-//        val beanClass = xyz.srclab.bytecode.bean.BeanClass.newBuilder(SomeSomeClass1::class.java)
-//            .addProperty("hello", String::class.java)
-//            .addProperty("world", String::class.java)
-//            .build()
-//        val bean = beanClass.newInstance()
-//        val beanDescriptor = BeanHelper.resolve(bean)
-//        val helloProperty = beanDescriptor?.getPropertyDescriptor("hello")
-//        val worldProperty = beanDescriptor?.getPropertyDescriptor("world")
-//        doAssert(helloProperty?.name, "hello")
-//        doAssert(worldProperty?.name, "world")
-//    }
-//}
+package test.xyz.srclab.common.bytecode
+
+import org.testng.annotations.Test
+import xyz.srclab.common.bean.BeanHelper
+import xyz.srclab.common.bytecode.bean.BeanClass
+import xyz.srclab.common.bytecode.provider.ByteCodeProvider
+import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProvider
+import xyz.srclab.common.bytecode.provider.cglib.SpringCglibByteCodeProvider
+import xyz.srclab.test.doAssertEquals
+
+/**
+ * @author sunqian
+ */
+object BeanTest {
+
+    @Test
+    fun testBean() {
+        val beanClass = BeanClass.newBuilder(A1::class.java)
+            .addProperty("b", Int::class.java)
+            .build()
+        val instance = beanClass.newInstance()
+        BeanHelper.setProperty(instance, "b", 110)
+        doAssertEquals(BeanHelper.getPropertyValue(instance, "b"), 110)
+
+        val beanClass2 = BeanClass.newBuilder()
+            .addProperty("b", Int::class.java)
+            .build()
+        val instance2 = beanClass2.newInstance()
+        BeanHelper.setProperty(instance2, "b", 110)
+        doAssertEquals(BeanHelper.getPropertyValue(instance2, "b"), 110)
+    }
+
+    @Test
+    fun testWithProvider() {
+        doTestBean(CglibByteCodeProvider.INSTANCE, A2::class.java)
+        doTestBean(SpringCglibByteCodeProvider.INSTANCE, A3::class.java)
+    }
+
+    private fun <T : Any> doTestBean(provider: ByteCodeProvider, baseClass: Class<T>) {
+        val beanClass = provider.newBeanClassBuilder(baseClass)
+            .addProperty("b", Int::class.java)
+            .build()
+        val instance = beanClass.newInstance()
+        BeanHelper.setProperty(instance, "b", 110)
+        doAssertEquals(BeanHelper.getPropertyValue(instance, "b"), 110)
+
+        val beanClass2 = BeanClass.newBuilder()
+            .addProperty("b", Int::class.java)
+            .build()
+        val instance2 = beanClass2.newInstance()
+        BeanHelper.setProperty(instance2, "b", 110)
+        doAssertEquals(BeanHelper.getPropertyValue(instance2, "b"), 110)
+    }
+
+    open class A1 {
+        var a = "a"
+    }
+
+    open class A2 {
+        var a = "a"
+    }
+
+    open class A3 {
+        var a = "a"
+    }
+}

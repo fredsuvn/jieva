@@ -26,8 +26,14 @@ dependencies {
     api("org.apache.commons:commons-collections4")
     api('com.google.guava:guava')
 
+    compileOnly("org.springframework:spring-core")
+    compileOnly("cglib:cglib")
+
     testCompile(project(":easy-projects:easy-test"))
     testCompile("org.testng:testng")
+
+    testCompile("org.springframework:spring-core")
+    testCompile("cglib:cglib")
 }
 
 test {

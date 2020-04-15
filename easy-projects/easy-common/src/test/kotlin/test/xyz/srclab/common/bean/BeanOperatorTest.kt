@@ -309,10 +309,6 @@ object BeanOperatorTest {
 
     @Test
     fun testEmptyOperator() {
-        doExpectThrowable(IllegalStateException::class.java) {
-            BeanStructSupport.newBuilder().build()
-        }
-
         val emptyBeanOperator = BeanOperator.newBuilder()
             .setBeanConverter(BeanConverter.DEFAULT)
             .setBeanResolver(
@@ -324,8 +320,7 @@ object BeanOperatorTest {
                             }
 
                             override fun resolve(beanClass: Class<*>): BeanStruct {
-                                return BeanStructSupport.newBuilder()
-                                    .setType(Object::class.java)
+                                return BeanStruct.newBuilder(Object::class.java)
                                     .build()
                             }
                         }
