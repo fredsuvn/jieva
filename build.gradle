@@ -18,7 +18,6 @@ ext {
     isSnapshot = isTrue(config.snapshot)
 }
 
-group = config.group
 config.version = (isSnapshot ? "${version}-SNAPSHOT" : version)
 config.sampleVersion = (isSnapshot ? "${version}-SNAPSHOT" : version)
 version = config.version
@@ -40,7 +39,10 @@ tasks.withType(JavaCompile) {
 def processProjectInfo(Project project) {
     if (project == rootProject) {
         // NOP
-    } else if (project.group.toString().startsWith("easy-common-build.common-samples")) {
+    } else if (project.group.toString().startsWith("easy-starter-build.easy-starters")) {
+        project.group = config.starterGroup
+        project.version = config.version
+    } else if (project.group.toString().startsWith("easy-starter-build.easy-samples")) {
         project.group = config.sampleGroup
         project.version = config.sampleVersion
     } else {

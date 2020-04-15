@@ -6,17 +6,17 @@ description = "Bom of Easy Projects"
 
 ext {
     libVersions = [
-            kotlinVersion            : kotlinVersion,
-            springBootVersion        : "2.2.5.RELEASE",
-            commonsLangVersion       : "3.9",
-            commonsCollectionsVersion: "4.4",
-            commonsBeanutilsVersion  : "1.9.4",
-            commonsCodecVersion      : "1.14",
-            guavaVersion             : "28.2-jre",
-            testngVersion            : "7.1.0",
-            cglibVersion             : "3.3.0",
-            fastjsonVersion          : "1.2.67",
-            jsr305Version            : "3.0.2",
+            kotlinVersion             : kotlinVersion,
+            springBootVersion         : "2.2.5.RELEASE",
+            jsr305Version             : "3.0.2",
+            commonsLang3Version       : "3.9",
+            commonsCollections4Version: "4.4",
+            commonsBeanutilsVersion   : "1.9.4",
+            commonsCodecVersion       : "1.14",
+            guavaVersion              : "28.2-jre",
+            fastjsonVersion           : "1.2.67",
+            cglibVersion              : "3.3.0",
+            testngVersion             : "7.1.0",
     ]
 }
 
@@ -27,18 +27,18 @@ javaPlatform {
 }
 
 dependencies {
-    api platform("org.springframework.boot:spring-boot-starter-parent:${libVersions.springBootVersion}")
     api platform("org.jetbrains.kotlin:kotlin-bom:${libVersions.kotlinVersion}")
+    api platform("org.springframework.boot:spring-boot-starter-parent:${libVersions.springBootVersion}")
 
     constraints {
         api("com.google.code.findbugs:jsr305:${libVersions.jsr305Version}")
-        api("org.apache.commons:commons-lang3:${libVersions.commonsLangVersion}")
-        api("org.apache.commons:commons-collections4:${libVersions.commonsCollectionsVersion}")
+        api("org.apache.commons:commons-lang3:${libVersions.commonsLang3Version}")
+        api("org.apache.commons:commons-collections4:${libVersions.commonsCollections4Version}")
         api("commons-beanutils:commons-beanutils:${libVersions.commonsBeanutilsVersion}")
         api("commons-codec:commons-codec:${libVersions.commonsCodecVersion}")
         api("com.google.guava:guava:${libVersions.guavaVersion}")
-        api("cglib:cglib:${libVersions.cglibVersion}")
         api("com.alibaba:fastjson:${libVersions.fastjsonVersion}")
+        api("cglib:cglib:${libVersions.cglibVersion}")
         api("org.testng:testng:${libVersions.testngVersion}")
     }
 }
