@@ -19,14 +19,14 @@ object BeanTest {
             .addProperty("b", Int::class.java)
             .build()
         val instance = beanClass.newInstance()
-        BeanHelper.setProperty(instance, "b", 110)
+        BeanHelper.setPropertyValue(instance, "b", 110)
         doAssertEquals(BeanHelper.getPropertyValue(instance, "b"), 110)
 
         val beanClass2 = BeanClass.newBuilder()
             .addProperty("b", Int::class.java)
             .build()
         val instance2 = beanClass2.newInstance()
-        BeanHelper.setProperty(instance2, "b", 110)
+        BeanHelper.setPropertyValue(instance2, "b", 110)
         doAssertEquals(BeanHelper.getPropertyValue(instance2, "b"), 110)
     }
 
@@ -41,14 +41,14 @@ object BeanTest {
             .addProperty("b", Int::class.java)
             .build()
         val instance = beanClass.newInstance()
-        BeanHelper.setProperty(instance, "b", 110)
+        BeanHelper.setPropertyValue(instance, "b", 110)
         doAssertEquals(BeanHelper.getPropertyValue(instance, "b"), 110)
 
         val beanClass2 = BeanClass.newBuilder()
             .addProperty("b", Int::class.java)
             .build()
         val instance2 = beanClass2.newInstance()
-        BeanHelper.setProperty(instance2, "b", 110)
+        BeanHelper.setPropertyValue(instance2, "b", 110)
         doAssertEquals(BeanHelper.getPropertyValue(instance2, "b"), 110)
     }
 

@@ -51,7 +51,7 @@ object BeanHelperTest {
             BeanHelper.getPropertyValue(a, "property", TypeRef.with(Double::class.java))
         doAssertEquals(valueAsDouble, 666.0)
 
-        BeanHelper.setProperty(a, "property", null)
+        BeanHelper.setPropertyValue(a, "property", null)
         val valueAsNull = BeanHelper.getPropertyValue(a, "property", Int::class.java)
         doAssertEquals(valueAsNull, null)
     }

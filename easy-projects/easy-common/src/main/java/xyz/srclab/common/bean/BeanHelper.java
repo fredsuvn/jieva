@@ -43,7 +43,7 @@ public class BeanHelper {
         return beanOperator.getPropertyValue(bean, propertyName, type);
     }
 
-    public static void setProperty(Object bean, String propertyName, @Nullable Object value)
+    public static void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         beanOperator.setPropertyValue(bean, propertyName, value);
     }

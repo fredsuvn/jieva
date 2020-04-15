@@ -60,7 +60,7 @@ Typically, we use easy-bom as dependency manager:
     <dependencies>
       <dependency>
         <groupId>xyz.srclab.common</groupId>
-        <artifactId>easy-bom</artifactId>
+        <artifactId>easy-starter-parent</artifactId>
         <version>{easy-starter-version}</version>
       </dependency>
     </dependencies>
@@ -76,48 +76,15 @@ Typically, we use easy-bom as dependency manager:
 
 [source,subs="attributes+"]
 ----
-implementation(platform("xyz.srclab.common:easy-bom:{easy-starter-version}"))
+implementation(platform("xyz.srclab.common:easy-starter-parent:{easy-starter-version}"))
 implementation("xyz.srclab.common:easy-starter")
-----
-
-Or, use easy-parent for customizing easy-starter project:
-
-[source,subs="attributes+"]
-----
-<project>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>xyz.srclab.common</groupId>
-        <artifactId>easy-parent</artifactId>
-        <version>{easy-starter-version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>xyz.srclab.common</groupId>
-      <artifactId>easy-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xyz.srclab.common</groupId>
-      <artifactId>easy-test</artifactId>
-    </dependency>
-  </dependencies>
-</project>
-----
-
-[source,subs="attributes+"]
-----
-implementation(platform("xyz.srclab.common:easy-parent:{easy-starter-version}"))
-implementation("xyz.srclab.common:easy-common")
-implementation("xyz.srclab.common:easy-test")
 ----
 
 == User Guide
 
 Futures of easy-starter:
 
+* <<user_guide_annotations>>
 * <<user_guide_bean>>
 * <<user_guide_reflect>>
 * <<user_guide_array>>
@@ -127,6 +94,27 @@ Futures of easy-starter:
 * <<user_guide_proxy>>
 * <<user_guide_bytecode>>
 * <<user_guide_other>>
+
+[#user_guide_annotations]
+=== Annotations
+
+There are a set of annotations to help us build a well-convention project:
+
+* DefaultNonNull / DefaultNullable: indicates all parameters, variables, fields or other type or objects are
+non-null/null default, usually used in package-info.java.
+This annotation extends Nonnull of jsr305, and IDE such as IDEA can recognize it;
+* NonNull / Nullable: indicates a parameter, variable, field or other type or object is non-null/null.
+This annotation extends Nonnull of jsr305, and IDE such as IDEA can recognize it;
+* Written / WrittenReturn: indicates the parameter may be written (and as return value for *Return*);
+* Immutable: indicates the class annotated is immutable and thread-safe;
+* ThreadSafe: indicates the class annotated is thread-safe;
+* ThreadSafeDependOn: indicates whether annotated class is thread-safe depends on its dependent class, code of annotated
+class itself is thread-safe;
+* ReturnTreadSafe / ReturnTreadSafeDependOn: indicates return value of annotated method is thread-safe or
+tread-safe-depend-on;
+* StaticThreadSafe / StaticThreadSafeDependOn: indicates static methods of annotated class are thread-safe
+or tread-safe-depend-on.
+Note this is default.
 
 [#user_guide_bean]
 === Bean
@@ -401,7 +389,7 @@ xyz.srclab.common.exception;
 [#user_guide_proxy]
 === Proxy
 
-Proxy package supports JDK dynamic proxy by default:
+Proxy package supports class dynamic proxy:
 
 [source]
 ----
@@ -418,9 +406,9 @@ public class ProxySample {
         System.out.println(classProxy.newInstance().someMethod());
     }
 
-    public interface A {
+    public static class A {
 
-        default String someMethod() {
+        public String someMethod() {
             System.out.println("someMethod");
             return "someMethod";
         }
@@ -428,14 +416,68 @@ public class ProxySample {
 }
 ----
 
-JDK proxy system only supports proxy methods which defined in interfaces, for more powerful proxy, we can import
-component easy-byte:
+Proxy package use *ClassProxyProviderManager* to manage implementation of proxy. By default, the manager use
+*ByteCodeClassProxyProvider* to implement proxy functionality, we can use *JdkClassProxyProvider* to implement by JDK
+dynamic proxy.
 
 [#user_guide_bytecode]
 === Byte Code
 
+Bytecode package provide uniform interfaces to easier handle bytecodes:
+
+[source]
+----
+public class ByteCodeSample {
+
+    public static void main(String[] args) {
+        BeanClass<A> beanClass = BeanClass.newBuilder(A.class)
+                .addProperty("b", String.class)
+                .build();
+        A a1 = beanClass.newInstance();
+        BeanHelper.setPropertyValue(a1, "b", "bbb");
+        System.out.println(BeanHelper.getPropertyValue(a1, "b"));
+
+        EnhancedClass<A> enhancedClass = EnhancedClass.newBuilder(A.class)
+                .overrideMethod("someMethod", ArrayUtils.EMPTY_CLASS_ARRAY, new ProxyMethod() {
+                    @Override
+                    public Object invoke(Object o, Object[] objects, Method method, MethodInvoker methodInvoker) {
+                        return "proxy: " + methodInvoker.invoke(o, objects);
+                    }
+                })
+                .build();
+        A a2 = enhancedClass.newInstance();
+        System.out.println(a2.someMethod());
+    }
+
+    public static class A {
+
+        private String a;
+
+        public String getA() {
+            return a;
+        }
+
+        public void setA(String a) {
+            this.a = a;
+        }
+
+        public String someMethod() {
+            System.out.println("someMethod");
+            return "someMethod";
+        }
+    }
+}
+----
+
+Bytecode package use *ByteCodeProviderManager* to manage implementation of proxy. By default, the manager use
+*CglibByteCodeProvider* to implement bytecode functionality, we can use *SpringCglibByteCodeProvider* to implement by
+spring-cglib.
+
 [#user_guide_other]
 === Others
+
+Beside above features, there are also many useful tools such as *CacheStateBuilder*, *ProcessByHandlersBuilder*,
+*AbstractProviderManager* and lots of **XxxHelper**s.
 
 == License
 

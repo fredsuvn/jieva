@@ -1,41 +1,51 @@
-//package xyz.srclab.sample.bytecode;
-//
-//import org.apache.commons.lang3.ArrayUtils;
-//import xyz.srclab.common.bean.BeanClass;
-//import xyz.srclab.common.bean.BeanHelper;
-//import xyz.srclab.common.bytecode.proxy.ProxyClass;
-//import xyz.srclab.common.reflect.method.MethodBody;
-//import xyz.srclab.common.test.asserts.AssertHelper;
-//
-//public class ByteCodeSample {
-//
-//    public void showProxy() {
-//        ProxyClass<A> proxyClass = ProxyClass.newBuilder(A.class)
-//                .overrideMethod("someMethod",
-//                        ArrayUtils.EMPTY_CLASS_ARRAY,
-//                        (MethodBody<String>) (object, method, args, invoker) -> "proxied: " + invoker.invoke(object)
-//                )
-//                .build();
-//        A a = proxyClass.newInstance();
-//        AssertHelper.printAssert(a.someMethod(), "proxied: someMethod");
-//    }
-//
-//    public void showBean() throws Exception {
-//        BeanClass<A> beanClass = BeanClass.newBuilder(A.class)
-//                .addProperty("hello", String.class)
-//                .build();
-//        A a = beanClass.newInstance();
-//        BeanClass beanDescriptor = BeanHelper.resolve(a);
-//        beanDescriptor.getProperty("hello").setValue(a, "world");
-//        Object value = a.getClass().getMethod("getHello").invoke(a);
-//        AssertHelper.printAssert(value, "world");
-//    }
-//
-//    public static class A {
-//
-//        public String someMethod() {
-//            System.out.println("someMethod");
-//            return "someMethod";
-//        }
-//    }
-//}
+package xyz.srclab.sample.bytecode;
+
+import org.apache.commons.lang3.ArrayUtils;
+import xyz.srclab.common.bean.BeanHelper;
+import xyz.srclab.common.bytecode.bean.BeanClass;
+import xyz.srclab.common.bytecode.enhance.EnhancedClass;
+import xyz.srclab.common.reflect.invoke.MethodInvoker;
+import xyz.srclab.common.reflect.method.ProxyMethod;
+
+import java.lang.reflect.Method;
+
+public class ByteCodeSample {
+
+    public static void main(String[] args) {
+        BeanClass<A> beanClass = BeanClass.newBuilder(A.class)
+                .addProperty("b", String.class)
+                .build();
+        A a1 = beanClass.newInstance();
+        BeanHelper.setPropertyValue(a1, "b", "bbb");
+        System.out.println(BeanHelper.getPropertyValue(a1, "b"));
+
+        EnhancedClass<A> enhancedClass = EnhancedClass.newBuilder(A.class)
+                .overrideMethod("someMethod", ArrayUtils.EMPTY_CLASS_ARRAY, new ProxyMethod() {
+                    @Override
+                    public Object invoke(Object o, Object[] objects, Method method, MethodInvoker methodInvoker) {
+                        return "proxy: " + methodInvoker.invoke(o, objects);
+                    }
+                })
+                .build();
+        A a2 = enhancedClass.newInstance();
+        System.out.println(a2.someMethod());
+    }
+
+    public static class A {
+
+        private String a;
+
+        public String getA() {
+            return a;
+        }
+
+        public void setA(String a) {
+            this.a = a;
+        }
+
+        public String someMethod() {
+            System.out.println("someMethod");
+            return "someMethod";
+        }
+    }
+}

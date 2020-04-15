@@ -15,9 +15,9 @@ public class ProxySample {
         System.out.println(classProxy.newInstance().someMethod());
     }
 
-    public interface A {
+    public static class A {
 
-        default String someMethod() {
+        public String someMethod() {
             System.out.println("someMethod");
             return "someMethod";
         }
