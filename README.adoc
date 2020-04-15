@@ -11,12 +11,17 @@ base libraries of appropriate versions.
 Core easy-components includes:
 
 * easy-annotations: defines core annotations, some of them are optimized from jsr305;
-* easy-common: base component for easy-starter. It encapsulates common operation for array, bean, builder, cache,
-collection, exception, lang, provider, reflect, shell, state, string, time, etc.;
-* easy-bytecode: provides uniform bytecode interface and builtin implementations (cglib and spring-cglib);
-* easy-common-proxy: provides proxy operation;
+* easy-common: base component for easy-starter. It encapsulates common operation for array, bean, builder, bytecode,
+cache, collection, exception, lang, provider, proxy, reflect, shell, state, string, time, etc.;
 * easy-jni: provides jni operation;
 * easy-test: provides assistant tools for testing.
+
+We do not recommend that use those components directly, instead, by starters:
+
+* easy-starter: include core functionalities, in most cases just only import it to meeting requirements.
+* easy-starter-parent: it is a bom, used for dependencies management of easy projects. If you need more than one
+easy-components, use it.
+* easy-starter-test: provides convenient functionalities for testing, adds support for kotlin.
 
 There are also selected third base libraries in it to directly use:
 

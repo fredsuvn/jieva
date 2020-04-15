@@ -2,7 +2,7 @@ plugins {
     id 'java-platform'
 }
 
-description = "Easy for Bom"
+description = "Bom of Easy Projects"
 
 ext {
     libVersions = [
@@ -31,14 +31,6 @@ dependencies {
     api platform("org.jetbrains.kotlin:kotlin-bom:${libVersions.kotlinVersion}")
 
     constraints {
-        api(project(":easy-bom"))
-        file("${rootDir}/easy-projects").eachDirMatch(~/easy-.*/) { file ->
-            api(project(":easy-projects:${file.name}"))
-        }
-        file("${rootDir}/easy-starters").eachDirMatch(~/easy-.*/) { file ->
-            api(project(":easy-starters:${file.name}"))
-        }
-
         api("com.google.code.findbugs:jsr305:${libVersions.jsr305Version}")
         api("org.apache.commons:commons-lang3:${libVersions.commonsLangVersion}")
         api("org.apache.commons:commons-collections4:${libVersions.commonsCollectionsVersion}")
@@ -47,7 +39,6 @@ dependencies {
         api("com.google.guava:guava:${libVersions.guavaVersion}")
         api("cglib:cglib:${libVersions.cglibVersion}")
         api("com.alibaba:fastjson:${libVersions.fastjsonVersion}")
-
         api("org.testng:testng:${libVersions.testngVersion}")
     }
 }

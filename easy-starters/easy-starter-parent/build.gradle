@@ -1,0 +1,17 @@
+plugins {
+    id 'java-platform'
+}
+
+description = "Easy Starter Parent"
+
+apply from: gradles.repositories
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+    api platform(project(":easy-projects:easy-parent"))
+}
+
+apply from: gradles.deployPlatform

@@ -2,7 +2,7 @@ plugins {
     id 'java-platform'
 }
 
-description = "Easy for Parent"
+description = "Parent of Easy Projects"
 
 apply from: gradles.repositories
 
@@ -14,6 +14,13 @@ dependencies {
     api platform(project(":easy-bom"))
 
     constraints {
+        api(project(":easy-bom"))
+        file("${rootDir}/easy-projects").eachDirMatch(~/easy-.*/) { file ->
+            api(project(":easy-projects:${file.name}"))
+        }
+        file("${rootDir}/easy-starters").eachDirMatch(~/easy-.*/) { file ->
+            api(project(":easy-starters:${file.name}"))
+        }
     }
 }
 
