@@ -33,7 +33,7 @@ There are also selected third base libraries in it to directly use:
 
 == Getting Started
 
-Source code: https://github.com/srclab-projects/easy-common
+Source code: https://github.com/srclab-projects/easy-starter
 
 Simply directly to use from maven or gradle:
 
