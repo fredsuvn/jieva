@@ -9,7 +9,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'easy-common-build'
+rootProject.name = 'easy-starter-build'
 
 // bom file
 include ":easy-bom"

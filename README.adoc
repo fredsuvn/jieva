@@ -40,7 +40,7 @@ Simply directly to use from maven or gradle:
 [source,subs="attributes+"]
 ----
 <dependency>
-    <groupId>xyz.srclab.common</groupId>
+    <groupId>xyz.srclab.starter</groupId>
     <artifactId>easy-starter</artifactId>
     <version>{easy-starter-version}</version>
 </dependency>
@@ -48,7 +48,7 @@ Simply directly to use from maven or gradle:
 
 [source,subs="attributes+"]
 ----
-implementation("xyz.srclab.common:easy-starter:{easy-starter-version}")
+implementation("xyz.srclab.starter:easy-starter:{easy-starter-version}")
 ----
 
 Typically, we use easy-bom as dependency manager:
@@ -59,7 +59,7 @@ Typically, we use easy-bom as dependency manager:
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>xyz.srclab.common</groupId>
+        <groupId>xyz.srclab.starter</groupId>
         <artifactId>easy-starter-parent</artifactId>
         <version>{easy-starter-version}</version>
       </dependency>
@@ -67,7 +67,7 @@ Typically, we use easy-bom as dependency manager:
   </dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>xyz.srclab.common</groupId>
+      <groupId>xyz.srclab.starter</groupId>
       <artifactId>easy-starter</artifactId>
     </dependency>
   </dependencies>
@@ -76,8 +76,8 @@ Typically, we use easy-bom as dependency manager:
 
 [source,subs="attributes+"]
 ----
-implementation(platform("xyz.srclab.common:easy-starter-parent:{easy-starter-version}"))
-implementation("xyz.srclab.common:easy-starter")
+implementation(platform("xyz.srclab.starter:easy-starter-parent:{easy-starter-version}"))
+implementation("xyz.srclab.starter:easy-starter")
 ----
 
 == User Guide
