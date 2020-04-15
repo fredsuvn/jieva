@@ -1,6 +1,6 @@
 package xyz.srclab.common.reflect.invoke;
 
-import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotation.Immutable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

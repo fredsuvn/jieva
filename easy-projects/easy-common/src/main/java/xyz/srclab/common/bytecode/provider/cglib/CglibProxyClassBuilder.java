@@ -1,6 +1,6 @@
 package xyz.srclab.common.bytecode.provider.cglib;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.bytecode.enhance.EnhancedClass;
 import xyz.srclab.common.collection.iterable.IterableHelper;

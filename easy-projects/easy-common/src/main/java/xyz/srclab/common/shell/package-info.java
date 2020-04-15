@@ -1,4 +1,4 @@
 @DefaultNonNull
 package xyz.srclab.common.shell;
 
-import xyz.srclab.annotations.DefaultNonNull;
+import xyz.srclab.annotation.DefaultNonNull;

@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache.concurent;
 
-import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.array.ArrayBuilder;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.weak.WeakCache;

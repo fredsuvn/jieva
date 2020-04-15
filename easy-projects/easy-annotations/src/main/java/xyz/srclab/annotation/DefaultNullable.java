@@ -1,4 +1,4 @@
-package xyz.srclab.annotations;
+package xyz.srclab.annotation;
 
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Nonnull(when = When.ALWAYS)
+@Nonnull(when = When.MAYBE)
 @TypeQualifierDefault({
         ElementType.TYPE,
         ElementType.FIELD,
@@ -34,5 +34,5 @@ import java.lang.annotation.*;
         ElementType.TYPE_PARAMETER,
         ElementType.TYPE_USE,
 })
-public @interface DefaultNonNull {
+public @interface DefaultNullable {
 }

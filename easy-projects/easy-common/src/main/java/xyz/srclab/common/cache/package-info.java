@@ -1,4 +1,4 @@
 @DefaultNonNull
 package xyz.srclab.common.cache;
 
-import xyz.srclab.annotations.DefaultNonNull;
+import xyz.srclab.annotation.DefaultNonNull;

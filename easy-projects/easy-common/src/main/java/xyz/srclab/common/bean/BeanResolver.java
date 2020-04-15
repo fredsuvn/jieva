@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.builder.ProcessByHandlersBuilder;
 
 @Immutable

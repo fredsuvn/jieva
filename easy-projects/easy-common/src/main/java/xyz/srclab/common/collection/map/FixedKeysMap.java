@@ -1,6 +1,6 @@
 package xyz.srclab.common.collection.map;
 
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 
 import java.util.Collection;
 import java.util.HashMap;

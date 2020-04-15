@@ -1,6 +1,6 @@
 package xyz.srclab.common.lang;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.time.TimeHelper;
 
 import java.time.Duration;

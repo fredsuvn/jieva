@@ -1,6 +1,6 @@
 package xyz.srclab.common.bytecode.provider;
 
-import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.bytecode.bean.BeanClass;
 import xyz.srclab.common.bytecode.enhance.EnhancedClass;
 

@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.EnvironmentHelper;
 import xyz.srclab.common.reflect.method.MethodHelper;
 

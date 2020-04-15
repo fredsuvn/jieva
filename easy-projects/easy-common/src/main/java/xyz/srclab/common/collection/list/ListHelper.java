@@ -1,7 +1,7 @@
 package xyz.srclab.common.collection.list;
 
 import com.google.common.collect.ImmutableList;
-import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 
 import java.util.Arrays;

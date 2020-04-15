@@ -1,6 +1,6 @@
 package xyz.srclab.common.builder;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 
 public abstract class CacheStateBuilder<T> implements Builder<T> {
 

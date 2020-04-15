@@ -1,6 +1,6 @@
 package xyz.srclab.common.exception;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.state.State;
 import xyz.srclab.common.state.StateHelper;
 

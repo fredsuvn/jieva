@@ -1,4 +1,4 @@
 @DefaultNonNull
 package xyz.srclab.test.mark;
 
-import xyz.srclab.annotations.DefaultNonNull;
+import xyz.srclab.annotation.DefaultNonNull;

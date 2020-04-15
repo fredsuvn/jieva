@@ -2,8 +2,8 @@ package xyz.srclab.common.string.format.fastformat;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.helpers.MessageFormatter;
-import xyz.srclab.annotations.Immutable;
-import xyz.srclab.annotations.Written;
+import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotation.Written;
 
 @Immutable
 public class FastFormat {

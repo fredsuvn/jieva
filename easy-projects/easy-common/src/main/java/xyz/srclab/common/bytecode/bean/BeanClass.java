@@ -1,6 +1,6 @@
 package xyz.srclab.common.bytecode.bean;
 
-import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotation.Immutable;
 
 @Immutable
 public interface BeanClass<T> {

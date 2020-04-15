@@ -1,6 +1,6 @@
 package xyz.srclab.common.reflect.invoke.provider.methodhandle;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.reflect.invoke.MethodInvoker;
 
 import java.lang.invoke.MethodHandle;

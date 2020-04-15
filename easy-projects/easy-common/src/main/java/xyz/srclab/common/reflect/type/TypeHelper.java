@@ -2,7 +2,7 @@ package xyz.srclab.common.reflect.type;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Nullable;
-import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;

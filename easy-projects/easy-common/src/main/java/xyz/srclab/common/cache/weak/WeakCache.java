@@ -1,6 +1,6 @@
 package xyz.srclab.common.cache.weak;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.time.TimeHelper;
 

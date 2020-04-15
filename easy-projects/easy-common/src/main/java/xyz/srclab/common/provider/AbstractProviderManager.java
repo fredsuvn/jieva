@@ -1,7 +1,7 @@
 package xyz.srclab.common.provider;
 
-import xyz.srclab.annotations.Nullable;
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.base.EnvironmentHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 

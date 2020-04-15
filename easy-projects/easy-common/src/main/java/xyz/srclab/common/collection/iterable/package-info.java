@@ -1,4 +1,4 @@
 @DefaultNonNull
 package xyz.srclab.common.collection.iterable;
 
-import xyz.srclab.annotations.DefaultNonNull;
+import xyz.srclab.annotation.DefaultNonNull;

@@ -1,6 +1,6 @@
 package xyz.srclab.common.array;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.builder.CacheStateBuilder;
 import xyz.srclab.common.lang.TypeRef;
 import xyz.srclab.common.reflect.type.TypeHelper;

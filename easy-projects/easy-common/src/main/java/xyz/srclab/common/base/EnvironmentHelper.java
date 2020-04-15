@@ -1,6 +1,6 @@
 package xyz.srclab.common.base;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 
 public class EnvironmentHelper {
 

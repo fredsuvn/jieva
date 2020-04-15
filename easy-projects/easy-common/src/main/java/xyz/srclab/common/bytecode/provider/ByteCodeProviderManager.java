@@ -1,6 +1,6 @@
 package xyz.srclab.common.bytecode.provider;
 
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.base.EnvironmentHelper;
 import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProvider;
 import xyz.srclab.common.bytecode.provider.cglib.SpringCglibByteCodeProvider;

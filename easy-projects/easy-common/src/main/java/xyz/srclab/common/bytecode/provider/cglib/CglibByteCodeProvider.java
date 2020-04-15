@@ -1,6 +1,6 @@
 package xyz.srclab.common.bytecode.provider.cglib;
 
-import xyz.srclab.annotations.concurrent.ThreadSafe;
+import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.bytecode.bean.BeanClass;
 import xyz.srclab.common.bytecode.enhance.EnhancedClass;
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider;

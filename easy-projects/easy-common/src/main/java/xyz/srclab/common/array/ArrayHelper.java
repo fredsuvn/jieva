@@ -1,6 +1,6 @@
 package xyz.srclab.common.array;
 
-import xyz.srclab.annotations.WrittenReturn;
+import xyz.srclab.annotation.WrittenReturn;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;

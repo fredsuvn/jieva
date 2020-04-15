@@ -1,6 +1,6 @@
 package xyz.srclab.test.mark;
 
-import xyz.srclab.annotations.Nullable;
+import xyz.srclab.annotation.Nullable;
 
 public interface Marked {
 

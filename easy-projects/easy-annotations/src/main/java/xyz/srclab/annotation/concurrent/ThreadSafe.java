@@ -1,4 +1,4 @@
-package xyz.srclab.annotations.concurrent;
+package xyz.srclab.annotation.concurrent;
 
 import javax.annotation.meta.TypeQualifier;
 import java.lang.annotation.*;
