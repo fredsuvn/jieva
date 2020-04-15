@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation(platform("xyz.srclab.common:easy-starter-parent:1.0.0"))
+
+    implementation("xyz.srclab.common:easy-starter")
+
+    implementation("cglib:cglib")
+}

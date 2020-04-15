@@ -19,8 +19,8 @@ ext {
 }
 
 group = config.group
-config.version = (isSnapshot ? "${config.version}-SNAPSHOT" : config.version)
-config.sampleVersion = (isSnapshot ? "${config.sampleVersion}-SNAPSHOT" : config.sampleVersion)
+config.version = (isSnapshot ? "${version}-SNAPSHOT" : version)
+config.sampleVersion = (isSnapshot ? "${version}-SNAPSHOT" : version)
 version = config.version
 
 // Note in gradles.auth some personal setting should be implemented.
@@ -33,10 +33,14 @@ allprojects { project ->
 subprojects { project ->
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
 def processProjectInfo(Project project) {
     if (project == rootProject) {
         // NOP
-    } else if (project.group == "easy-common-build.common-sample") {
+    } else if (project.group.toString().startsWith("easy-common-build.common-samples")) {
         project.group = config.sampleGroup
         project.version = config.sampleVersion
     } else {

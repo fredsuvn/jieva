@@ -1,8 +1,8 @@
 ext {
     config = [
-            version      : "0.0.0",
+            //version      : "0.0.0",
             snapshot     : "0",
-            sampleVersion: "0.0.0",
+            //sampleVersion: "0.0.0",
             group        : "xyz.srclab.common",
             sampleGroup  : "xyz.srclab.common.sample",
 
