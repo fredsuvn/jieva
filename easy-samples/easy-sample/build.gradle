@@ -10,9 +10,9 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("xyz.srclab.common:easy-starter-parent:1.0.0"))
+    implementation(platform("xyz.srclab.starter:easy-starter-parent:1.0.0"))
 
-    implementation("xyz.srclab.common:easy-starter")
+    implementation("xyz.srclab.starter:easy-starter")
 
     implementation("cglib:cglib")
 }
