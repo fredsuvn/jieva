@@ -28,6 +28,7 @@ javaPlatform {
 
 dependencies {
     api platform("org.springframework.boot:spring-boot-starter-parent:${libVersions.springBootVersion}")
+    api platform("org.jetbrains.kotlin:kotlin-bom:${libVersions.kotlinVersion}")
 
     constraints {
         api(project(":easy-bom"))
@@ -39,8 +40,6 @@ dependencies {
         }
 
         api("com.google.code.findbugs:jsr305:${libVersions.jsr305Version}")
-        api("org.jetbrains.kotlin:kotlin-bom:${libVersions.kotlinVersion}")
-
         api("org.apache.commons:commons-lang3:${libVersions.commonsLangVersion}")
         api("org.apache.commons:commons-collections4:${libVersions.commonsCollectionsVersion}")
         api("commons-beanutils:commons-beanutils:${libVersions.commonsBeanutilsVersion}")
