@@ -31,7 +31,7 @@ There are also selected third base libraries in it to directly use:
 * https://commons.apache.org/proper/commons-collections/[commons-collections]；
 * https://github.com/google/guava[Guava].
 
-== Getting Started2
+== Getting Started
 
 Source code: https://github.com/srclab-projects/easy-common
 
