@@ -1,6 +1,6 @@
 package xyz.srclab.common.reflect.invoke;
 
-import xyz.srclab.annotation.concurrent.ThreadSafe;
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.provider.AbstractProviderManager;
 import xyz.srclab.common.reflect.invoke.provider.reflected.ReflectedInvokerProvider;
 

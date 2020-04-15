@@ -1,8 +1,8 @@
 package xyz.srclab.common.string.tostring;
 
 import org.apache.commons.lang3.StringUtils;
-import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.bean.BeanStruct;
 import xyz.srclab.common.lang.Computed;

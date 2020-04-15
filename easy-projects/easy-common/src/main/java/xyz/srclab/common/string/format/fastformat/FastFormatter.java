@@ -1,6 +1,6 @@
 package xyz.srclab.common.string.format.fastformat;
 
-import xyz.srclab.annotation.concurrent.ThreadSafe;
+import xyz.srclab.annotations.concurrent.ThreadSafe;
 import xyz.srclab.common.string.format.Formatter;
 
 @ThreadSafe

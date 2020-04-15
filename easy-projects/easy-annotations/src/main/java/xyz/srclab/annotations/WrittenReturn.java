@@ -1,4 +1,4 @@
-package xyz.srclab.annotation;
+package xyz.srclab.annotations;
 
 import java.lang.annotation.*;
 

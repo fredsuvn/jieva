@@ -1,14 +1,14 @@
-package xyz.srclab.annotation;
+package xyz.srclab.annotations.concurrent;
 
-import javax.annotation.Nonnull;
-import javax.annotation.meta.TypeQualifierNickname;
-import javax.annotation.meta.When;
+import javax.annotation.meta.TypeQualifier;
 import java.lang.annotation.*;
 
+/**
+ * Means static methods of annotated type are thread-safe.
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Nonnull(when = When.MAYBE)
-@TypeQualifierNickname
+@TypeQualifier
 @Target({
         ElementType.TYPE,
         ElementType.FIELD,
@@ -21,5 +21,7 @@ import java.lang.annotation.*;
         ElementType.TYPE_PARAMETER,
         ElementType.TYPE_USE,
 })
-public @interface Nullable {
+public @interface StaticThreadSafe {
+
+    ThreadSafeWhen when() default ThreadSafeWhen.TRUE;
 }

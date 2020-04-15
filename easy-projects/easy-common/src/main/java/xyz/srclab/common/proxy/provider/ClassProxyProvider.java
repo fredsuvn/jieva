@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy.provider;
 
-import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotations.Immutable;
 import xyz.srclab.common.proxy.ClassProxy;
 
 @Immutable

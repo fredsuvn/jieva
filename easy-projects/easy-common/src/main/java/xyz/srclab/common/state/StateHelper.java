@@ -1,6 +1,6 @@
 package xyz.srclab.common.state;
 
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotations.Nullable;
 
 import java.util.Objects;
 

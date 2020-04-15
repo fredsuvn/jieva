@@ -1,7 +1,7 @@
 package xyz.srclab.common.collection.iterable;
 
 import org.apache.commons.collections4.IterableUtils;
-import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotations.Immutable;
 import xyz.srclab.common.collection.set.SetHelper;
 
 import java.util.Collection;

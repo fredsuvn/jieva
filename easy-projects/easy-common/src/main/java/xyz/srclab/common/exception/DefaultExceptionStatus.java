@@ -1,6 +1,6 @@
 package xyz.srclab.common.exception;
 
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotations.Nullable;
 
 public enum DefaultExceptionStatus implements ExceptionStatus {
 

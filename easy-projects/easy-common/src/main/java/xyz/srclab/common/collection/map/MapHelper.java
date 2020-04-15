@@ -1,8 +1,8 @@
 package xyz.srclab.common.collection.map;
 
 import com.google.common.collect.ImmutableMap;
-import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.WrittenReturn;
+import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotations.WrittenReturn;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;

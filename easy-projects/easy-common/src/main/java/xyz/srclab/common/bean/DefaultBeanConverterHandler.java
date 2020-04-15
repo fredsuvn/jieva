@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.list.ListHelper;

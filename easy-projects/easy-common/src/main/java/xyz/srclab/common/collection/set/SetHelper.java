@@ -1,7 +1,7 @@
 package xyz.srclab.common.collection.set;
 
 import com.google.common.collect.ImmutableSet;
-import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotations.Immutable;
 
 import java.util.Set;
 

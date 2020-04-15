@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.exception.ExceptionWrapper;

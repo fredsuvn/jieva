@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.builder.ProcessByHandlersBuilder;
 import xyz.srclab.common.lang.TypeRef;
 import xyz.srclab.common.string.format.fastformat.FastFormat;

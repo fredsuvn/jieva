@@ -1,4 +1,4 @@
-package xyz.srclab.annotation.concurrent;
+package xyz.srclab.annotations.concurrent;
 
 public enum ThreadSafeWhen {
 

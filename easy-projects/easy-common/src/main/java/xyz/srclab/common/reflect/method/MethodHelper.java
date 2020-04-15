@@ -1,7 +1,7 @@
 package xyz.srclab.common.reflect.method;
 
 import org.apache.commons.lang3.ArrayUtils;
-import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotations.Immutable;
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;

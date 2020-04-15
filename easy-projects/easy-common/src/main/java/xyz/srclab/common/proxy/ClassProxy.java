@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy;
 
-import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotations.Immutable;
 import xyz.srclab.common.reflect.method.ProxyMethod;
 
 import java.lang.reflect.Method;

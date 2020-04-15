@@ -1,6 +1,6 @@
 package xyz.srclab.common.cache;
 
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.collection.map.MapHelper;
 
 import java.time.Duration;

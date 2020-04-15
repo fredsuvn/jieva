@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;

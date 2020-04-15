@@ -1,7 +1,7 @@
 package xyz.srclab.common.exception;
 
-import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotations.Immutable;
+import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.state.StringState;
 import xyz.srclab.common.state.StringStateHelper;
 
