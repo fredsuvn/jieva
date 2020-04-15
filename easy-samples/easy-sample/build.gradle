@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("xyz.srclab.common:easy-bom:1.0.0"))
+    implementation(platform("xyz.srclab.common:easy-starter-parent:1.0.0"))
 
     implementation("xyz.srclab.common:easy-starter")
 }
