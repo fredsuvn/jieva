@@ -3,13 +3,14 @@ package xyz.srclab.common.reflect.invoke.provider.methodhandle;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.reflect.invoke.ConstructorInvoker;
+import xyz.srclab.common.reflect.invoke.FunctionInvoker;
 import xyz.srclab.common.reflect.invoke.MethodInvoker;
 
 import java.lang.invoke.MethodHandle;
 
 final class InvokeByMethodHandle {
 
-    static final class DefaultConstructorInvoker implements ConstructorInvoker {
+    static final class DefaultConstructorInvoker<T> implements ConstructorInvoker<T> {
 
         private final StaticMethodInvoker staticMethodInvoker;
 
@@ -18,8 +19,8 @@ final class InvokeByMethodHandle {
         }
 
         @Override
-        public Object invoke(Object... args) {
-            return staticMethodInvoker.invoke(null, args);
+        public T invoke(Object... args) {
+            return (T) staticMethodInvoker.invoke(null, args);
         }
     }
 
@@ -32,7 +33,7 @@ final class InvokeByMethodHandle {
         }
 
         @Override
-        public @Nullable Object invoke(Object object, Object... args) {
+        public @Nullable Object invoke(@Nullable Object object, Object... args) {
             try {
                 return invoke0(object, args);
             } catch (Throwable throwable) {
@@ -40,7 +41,7 @@ final class InvokeByMethodHandle {
             }
         }
 
-        private @Nullable Object invoke0(Object object, Object... args) throws Throwable {
+        private @Nullable Object invoke0(@Nullable Object object, Object... args) throws Throwable {
             switch (args.length) {
                 case 0:
                     return methodHandle.invoke(object);
@@ -63,7 +64,7 @@ final class InvokeByMethodHandle {
         }
     }
 
-    static final class StaticMethodInvoker implements MethodInvoker {
+    static final class StaticMethodInvoker implements MethodInvoker, FunctionInvoker {
 
         private final MethodHandle methodHandle;
 
@@ -72,15 +73,24 @@ final class InvokeByMethodHandle {
         }
 
         @Override
-        public @Nullable Object invoke(Object object, Object... args) {
+        public @Nullable Object invoke(@Nullable Object object, Object... args) {
             try {
-                return invoke0(object, args);
+                return invoke0(args);
             } catch (Throwable throwable) {
                 throw new ExceptionWrapper(throwable);
             }
         }
 
-        private @Nullable Object invoke0(Object object, Object... args) throws Throwable {
+        @Override
+        public @Nullable Object invoke(Object... args) {
+            try {
+                return invoke0(args);
+            } catch (Throwable throwable) {
+                throw new ExceptionWrapper(throwable);
+            }
+        }
+
+        private @Nullable Object invoke0(Object... args) throws Throwable {
             switch (args.length) {
                 case 0:
                     return methodHandle.invoke();
@@ -97,6 +107,11 @@ final class InvokeByMethodHandle {
                 default:
                     return methodHandle.invokeWithArguments(args);
             }
+        }
+
+        @Override
+        public MethodInvoker asMethodInvoker() {
+            return this;
         }
     }
 }

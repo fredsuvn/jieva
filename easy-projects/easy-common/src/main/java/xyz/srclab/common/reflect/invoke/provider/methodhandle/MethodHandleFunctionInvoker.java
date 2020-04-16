@@ -1,7 +1,7 @@
 package xyz.srclab.common.reflect.invoke.provider.methodhandle;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.reflect.invoke.MethodInvoker;
+import xyz.srclab.common.reflect.invoke.FunctionInvoker;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -9,20 +9,17 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-final class MethodHandleMethodInvoker implements MethodInvoker {
+final class MethodHandleFunctionInvoker implements FunctionInvoker {
 
-    private final MethodInvoker invokeByMethodHandle;
+    private final FunctionInvoker invokeByMethodHandle;
 
-    MethodHandleMethodInvoker(Method method) {
+    MethodHandleFunctionInvoker(Method method) {
         this.invokeByMethodHandle = buildMethodHandleInvoker(method);
     }
 
-    private MethodInvoker buildMethodHandleInvoker(Method method) {
+    private FunctionInvoker buildMethodHandleInvoker(Method method) {
         MethodHandle methodHandle = buildMethodHandle(method);
-        return Modifier.isStatic(method.getModifiers()) ?
-                new InvokeByMethodHandle.StaticMethodInvoker(methodHandle).asMethodInvoker()
-                :
-                new InvokeByMethodHandle.VirtualMethodInvoker(methodHandle);
+        return new InvokeByMethodHandle.StaticMethodInvoker(methodHandle);
     }
 
     private MethodHandle buildMethodHandle(Method method) {
@@ -49,7 +46,7 @@ final class MethodHandleMethodInvoker implements MethodInvoker {
     }
 
     @Override
-    public @Nullable Object invoke(@Nullable Object object, Object... args) {
-        return invokeByMethodHandle.invoke(object, args);
+    public @Nullable Object invoke(Object... args) {
+        return invokeByMethodHandle.invoke(args);
     }
 }

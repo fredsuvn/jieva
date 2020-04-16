@@ -6,16 +6,16 @@ import xyz.srclab.common.reflect.invoke.ConstructorInvoker;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-final class ReflectedConstructorInvoker implements ConstructorInvoker {
+final class ReflectedConstructorInvoker<T> implements ConstructorInvoker<T> {
 
-    private final Constructor<?> constructor;
+    private final Constructor<T> constructor;
 
-    ReflectedConstructorInvoker(Constructor<?> constructor) {
+    ReflectedConstructorInvoker(Constructor<T> constructor) {
         this.constructor = constructor;
     }
 
     @Override
-    public Object invoke(Object... args) {
+    public T invoke(Object... args) {
         try {
             return constructor.newInstance(args);
         } catch (IllegalAccessException | InstantiationException e) {

@@ -8,11 +8,19 @@ class InvokerSupport {
     private static final InvokerProvider invokerProvider =
             InvokerProviderManager.INSTANCE.getProvider();
 
-    static MethodInvoker newMethodInvoker(Method method) {
-        return invokerProvider.newMethodInvoker(method);
+    static <T> ConstructorInvoker<T> getConstructorInvoker(Constructor<T> constructor) {
+        return invokerProvider.getConstructorInvoker(constructor);
     }
 
-    static ConstructorInvoker newConstructorInvoker(Constructor<?> constructor) {
-        return invokerProvider.newConstructorInvoker(constructor);
+    static <T> ConstructorInvoker<T> getConstructorInvoker(Class<T> type, Class<?>... parameterTypes) {
+        return invokerProvider.getConstructorInvoker(type, parameterTypes);
+    }
+
+    static MethodInvoker getMethodInvoker(Method method) {
+        return invokerProvider.getMethodInvoker(method);
+    }
+
+    static MethodInvoker getMethodInvoker(Class<?> type, String methodName, Class<?>... parameterTypes) {
+        return invokerProvider.getMethodInvoker(type, methodName, parameterTypes);
     }
 }

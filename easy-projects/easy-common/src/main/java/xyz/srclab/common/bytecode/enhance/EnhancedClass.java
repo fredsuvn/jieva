@@ -24,7 +24,7 @@ public interface EnhancedClass<T> {
 
         Builder<T> addInterfaces(Iterable<Class<?>> interfaces);
 
-        Builder<T> overrideMethod(String name, Class<?>[] parameterTypes, ProxyMethod proxyMethod);
+        Builder<T> overrideMethod(String methodName, Class<?>[] parameterTypes, ProxyMethod proxyMethod);
 
         EnhancedClass<T> build();
     }

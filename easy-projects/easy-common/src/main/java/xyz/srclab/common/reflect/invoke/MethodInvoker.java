@@ -9,7 +9,11 @@ import java.lang.reflect.Method;
 public interface MethodInvoker {
 
     static MethodInvoker of(Method method) {
-        return InvokerSupport.newMethodInvoker(method);
+        return InvokerSupport.getMethodInvoker(method);
+    }
+
+    static MethodInvoker of(Class<?> type, String methodName, Class<?>... parameterTypes) {
+        return InvokerSupport.getMethodInvoker(type, methodName, parameterTypes);
     }
 
     @Nullable

@@ -12,7 +12,7 @@ public class InvokerHelper {
 
     private static final Cache<Object, MethodInvoker> methodInvokerCache = new ThreadLocalCache<>();
 
-    private static final Cache<Object, ConstructorInvoker> constructorInvokerCache =
+    private static final Cache<Object, ConstructorInvoker<?>> constructorInvokerCache =
             new ThreadLocalCache<>();
 
     public static MethodInvoker getMethodInvoker(Method method) {
@@ -24,12 +24,13 @@ public class InvokerHelper {
         return getMethodInvoker(method);
     }
 
-    public static ConstructorInvoker getConstructorInvoker(Constructor<?> constructor) {
-        return constructorInvokerCache.getNonNull(constructor, k -> ConstructorInvoker.of(constructor));
+    public static <T> ConstructorInvoker<T> getConstructorInvoker(Constructor<T> constructor) {
+        return (ConstructorInvoker<T>) constructorInvokerCache.getNonNull(
+                constructor, k -> ConstructorInvoker.of(constructor));
     }
 
-    public static ConstructorInvoker getConstructorInvoker(Class<?> cls, Class<?>... parameterTypes) {
+    public static <T> ConstructorInvoker<T> getConstructorInvoker(Class<T> cls, Class<?>... parameterTypes) {
         Constructor<?> constructor = InstanceHelper.getConstructor(cls, parameterTypes);
-        return getConstructorInvoker(constructor);
+        return (ConstructorInvoker<T>) getConstructorInvoker(constructor);
     }
 }

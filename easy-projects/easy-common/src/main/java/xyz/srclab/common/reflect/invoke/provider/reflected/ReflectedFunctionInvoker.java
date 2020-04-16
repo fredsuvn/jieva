@@ -2,23 +2,26 @@ package xyz.srclab.common.reflect.invoke.provider.reflected;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.exception.ExceptionWrapper;
-import xyz.srclab.common.reflect.invoke.MethodInvoker;
+import xyz.srclab.common.reflect.invoke.FunctionInvoker;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-final class ReflectedMethodInvoker implements MethodInvoker {
+/**
+ * @author sunqian
+ */
+final class ReflectedFunctionInvoker implements FunctionInvoker {
 
     private final Method method;
 
-    ReflectedMethodInvoker(Method method) {
+    ReflectedFunctionInvoker(Method method) {
         this.method = method;
     }
 
     @Override
-    public @Nullable Object invoke(@Nullable Object object, Object... args) {
+    public @Nullable Object invoke(Object... args) {
         try {
-            return method.invoke(object, args);
+            return method.invoke(null, args);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         } catch (InvocationTargetException e) {

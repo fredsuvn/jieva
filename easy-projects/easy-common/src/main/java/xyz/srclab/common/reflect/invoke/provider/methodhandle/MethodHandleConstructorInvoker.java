@@ -7,15 +7,15 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 
-final class MethodHandleConstructorInvoker implements ConstructorInvoker {
+final class MethodHandleConstructorInvoker<T> implements ConstructorInvoker<T> {
 
-    private final ConstructorInvoker invokeByMethodHandle;
+    private final ConstructorInvoker<T> invokeByMethodHandle;
 
-    MethodHandleConstructorInvoker(Constructor<?> constructor) {
+    MethodHandleConstructorInvoker(Constructor<T> constructor) {
         this.invokeByMethodHandle = buildMethodHandleInvoker(constructor);
     }
 
-    private ConstructorInvoker buildMethodHandleInvoker(Constructor<?> constructor) {
+    private ConstructorInvoker<T> buildMethodHandleInvoker(Constructor<T> constructor) {
         MethodHandle methodHandle = buildMethodHandle(constructor);
         return new InvokeByMethodHandle.DefaultConstructorInvoker(methodHandle);
     }
@@ -41,7 +41,7 @@ final class MethodHandleConstructorInvoker implements ConstructorInvoker {
     }
 
     @Override
-    public Object invoke(Object... args) {
+    public T invoke(Object... args) {
         return invokeByMethodHandle.invoke(args);
     }
 }

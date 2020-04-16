@@ -4,17 +4,34 @@ import xyz.srclab.annotation.WrittenReturn;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
+import xyz.srclab.common.collection.iterable.IterableHelper;
+import xyz.srclab.common.lang.TypeRef;
 import xyz.srclab.common.reflect.type.TypeHelper;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
+import java.util.Collection;
 
 public class ArrayHelper {
 
     private static final ThreadLocalCache<Object, Class<?>> arrayTypeCache = new ThreadLocalCache<>();
 
     private static final ThreadLocalCache<Object, Type> genericComponentTypeCache = new ThreadLocalCache<>();
+
+    public static <T> T[] toArray(Iterable<? extends T> iterable, Type componentType) {
+        Collection<T> collection = IterableHelper.asCollection((Iterable<T>) iterable);
+        T[] array = (T[]) Array.newInstance(TypeHelper.getRawClass(componentType), collection.size());
+        int i = 0;
+        for (T t : collection) {
+            array[i++] = t;
+        }
+        return array;
+    }
+
+    public static <T> T[] toArray(Iterable<? extends T> iterable, TypeRef<T> componentType) {
+        return toArray(iterable, componentType.getType());
+    }
 
     public static <A> A newArray(Class<?> componentType, int length) {
         return (A) Array.newInstance(componentType, length);

@@ -24,14 +24,15 @@ public class InstanceHelper {
         return (T) InvokerHelper.getConstructorInvoker(constructor).invoke();
     }
 
-    public static Constructor<?> getConstructor(Class<?> cls, Class<?>[] parameterTypes) {
-        return constructorCache.getNonNull(
+    public static <T> Constructor<T> getConstructor(Class<T> cls, Class<?>... parameterTypes) {
+        Constructor<?> constructor = constructorCache.getNonNull(
                 KeyHelper.buildKey(cls, parameterTypes),
                 k -> getConstructor0(cls, parameterTypes)
         );
+        return (Constructor<T>) constructor;
     }
 
-    private static Constructor<?> getConstructor0(Class<?> cls, Class<?>[] parameterTypes) {
+    private static Constructor<?> getConstructor0(Class<?> cls, Class<?>... parameterTypes) {
         try {
             return cls.getConstructor(parameterTypes);
         } catch (NoSuchMethodException e) {

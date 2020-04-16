@@ -1,6 +1,7 @@
 package xyz.srclab.common.reflect.invoke.provider.methodhandle;
 
 import xyz.srclab.common.reflect.invoke.ConstructorInvoker;
+import xyz.srclab.common.reflect.invoke.FunctionInvoker;
 import xyz.srclab.common.reflect.invoke.InvokerProvider;
 import xyz.srclab.common.reflect.invoke.MethodInvoker;
 
@@ -12,12 +13,17 @@ public class MethodHandleInvokerProvider implements InvokerProvider {
     public static final MethodHandleInvokerProvider INSTANCE = new MethodHandleInvokerProvider();
 
     @Override
-    public MethodInvoker newMethodInvoker(Method method) {
+    public <T> ConstructorInvoker<T> getConstructorInvoker(Constructor<T> constructor) {
+        return new MethodHandleConstructorInvoker<>(constructor);
+    }
+
+    @Override
+    public MethodInvoker getMethodInvoker(Method method) {
         return new MethodHandleMethodInvoker(method);
     }
 
     @Override
-    public ConstructorInvoker newConstructorInvoker(Constructor<?> constructor) {
-        return new MethodHandleConstructorInvoker(constructor);
+    public FunctionInvoker getFunctionInvoker(Method method) {
+        return new MethodHandleFunctionInvoker(method);
     }
 }

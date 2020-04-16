@@ -5,7 +5,7 @@ import xyz.srclab.common.bean.BeanHelper
 import xyz.srclab.common.bytecode.enhance.EnhancedClass
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider
 import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProvider
-import xyz.srclab.common.bytecode.provider.cglib.SpringCglibByteCodeProvider
+import xyz.srclab.common.bytecode.provider.spring.SpringByteCodeProvider
 import xyz.srclab.test.doAssertEquals
 
 /**
@@ -34,7 +34,7 @@ object EnhancedTest {
     @Test
     fun testWithProvider() {
         doTestProxy(CglibByteCodeProvider.INSTANCE, A3::class.java)
-        doTestProxy(SpringCglibByteCodeProvider.INSTANCE, A2::class.java)
+        doTestProxy(SpringByteCodeProvider.INSTANCE, A2::class.java)
     }
 
     private fun <T : Any> doTestProxy(provider: ByteCodeProvider, baseClass: Class<T>) {

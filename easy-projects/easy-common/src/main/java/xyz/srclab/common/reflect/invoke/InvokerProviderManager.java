@@ -2,6 +2,7 @@ package xyz.srclab.common.reflect.invoke;
 
 import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.provider.AbstractProviderManager;
+import xyz.srclab.common.reflect.invoke.provider.bytecode.ByteCodeInvokerProvider;
 import xyz.srclab.common.reflect.invoke.provider.reflected.ReflectedInvokerProvider;
 
 @ThreadSafe
@@ -13,6 +14,11 @@ public class InvokerProviderManager extends AbstractProviderManager<InvokerProvi
     protected InvokerProvider createDefaultProvider() {
         // MethodHandle is stupid.
         //return MethodHandleInvokerProvider.INSTANCE;
-        return ReflectedInvokerProvider.INSTANCE;
+
+        try {
+            return ByteCodeInvokerProvider.INSTANCE;
+        } catch (Exception e) {
+            return ReflectedInvokerProvider.INSTANCE;
+        }
     }
 }

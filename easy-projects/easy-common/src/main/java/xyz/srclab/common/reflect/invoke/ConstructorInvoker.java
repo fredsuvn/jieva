@@ -5,11 +5,15 @@ import xyz.srclab.annotation.Immutable;
 import java.lang.reflect.Constructor;
 
 @Immutable
-public interface ConstructorInvoker {
+public interface ConstructorInvoker<T> {
 
-    static ConstructorInvoker of(Constructor<?> constructor) {
-        return InvokerSupport.newConstructorInvoker(constructor);
+    static <T> ConstructorInvoker<T> of(Constructor<T> constructor) {
+        return InvokerSupport.getConstructorInvoker(constructor);
     }
 
-    Object invoke(Object... args);
+    static <T> ConstructorInvoker<T> of(Class<T> type, Class<?>... parameterTypes) {
+        return InvokerSupport.getConstructorInvoker(type, parameterTypes);
+    }
+
+    T invoke(Object... args);
 }

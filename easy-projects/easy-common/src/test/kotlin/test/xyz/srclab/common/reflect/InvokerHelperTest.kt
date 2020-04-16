@@ -52,29 +52,29 @@ object InvokerHelperTest {
             Int::class.java,
             Int::class.java
         )
-        doAssertEquals(invokerProvider.newMethodInvoker(method).invoke(a), method.invoke(a))
+        doAssertEquals(invokerProvider.getMethodInvoker(method).invoke(a), method.invoke(a))
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method1).invoke(a, 1),
+            invokerProvider.getMethodInvoker(method1).invoke(a, 1),
             method1.invoke(a, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method2).invoke(a, 1, 1),
+            invokerProvider.getMethodInvoker(method2).invoke(a, 1, 1),
             method2.invoke(a, 1, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method3).invoke(a, 1, 1, 1),
+            invokerProvider.getMethodInvoker(method3).invoke(a, 1, 1, 1),
             method3.invoke(a, 1, 1, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method4).invoke(a, 1, 1, 1, 1),
+            invokerProvider.getMethodInvoker(method4).invoke(a, 1, 1, 1, 1),
             method4.invoke(a, 1, 1, 1, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method5).invoke(a, 1, 1, 1, 1, 1),
+            invokerProvider.getMethodInvoker(method5).invoke(a, 1, 1, 1, 1, 1),
             method5.invoke(a, 1, 1, 1, 1, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method6).invoke(a, 1, 1, 1, 1, 1, 1),
+            invokerProvider.getMethodInvoker(method6).invoke(a, 1, 1, 1, 1, 1, 1),
             method6.invoke(a, 1, 1, 1, 1, 1, 1)
         )
     }
@@ -104,29 +104,29 @@ object InvokerHelperTest {
             Int::class.java,
             Int::class.java
         )
-        doAssertEquals(invokerProvider.newMethodInvoker(method).invoke(a), method.invoke(a))
+        doAssertEquals(invokerProvider.getMethodInvoker(method).invoke(a), method.invoke(a))
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method1).invoke(a, 1),
+            invokerProvider.getMethodInvoker(method1).invoke(a, 1),
             method1.invoke(a, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method2).invoke(a, 1, 1),
+            invokerProvider.getMethodInvoker(method2).invoke(a, 1, 1),
             method2.invoke(a, 1, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method3).invoke(a, 1, 1, 1),
+            invokerProvider.getMethodInvoker(method3).invoke(a, 1, 1, 1),
             method3.invoke(a, 1, 1, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method4).invoke(a, 1, 1, 1, 1),
+            invokerProvider.getMethodInvoker(method4).invoke(a, 1, 1, 1, 1),
             method4.invoke(a, 1, 1, 1, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method5).invoke(a, 1, 1, 1, 1, 1),
+            invokerProvider.getMethodInvoker(method5).invoke(a, 1, 1, 1, 1, 1),
             method5.invoke(a, 1, 1, 1, 1, 1)
         )
         doAssertEquals(
-            invokerProvider.newMethodInvoker(method6).invoke(a, 1, 1, 1, 1, 1, 1),
+            invokerProvider.getMethodInvoker(method6).invoke(a, 1, 1, 1, 1, 1, 1),
             method6.invoke(a, 1, 1, 1, 1, 1, 1)
         )
     }

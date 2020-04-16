@@ -1,4 +1,4 @@
-package xyz.srclab.common.bytecode.provider.cglib;
+package xyz.srclab.common.bytecode.provider.spring;
 
 import xyz.srclab.common.bytecode.bean.BeanClass;
 import xyz.srclab.common.bytecode.enhance.EnhancedClass;
@@ -8,9 +8,9 @@ import xyz.srclab.common.bytecode.provider.ByteCodeProvider;
 /**
  * @author sunqian
  */
-public class CglibByteCodeProvider implements ByteCodeProvider {
+public class SpringByteCodeProvider implements ByteCodeProvider {
 
-    public static final CglibByteCodeProvider INSTANCE = new CglibByteCodeProvider();
+    public static final SpringByteCodeProvider INSTANCE = new SpringByteCodeProvider();
 
     @Override
     public <T> BeanClass.Builder<T> newBeanClassBuilder(Class<T> superClass) {

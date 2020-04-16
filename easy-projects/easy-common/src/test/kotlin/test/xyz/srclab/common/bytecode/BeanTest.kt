@@ -5,7 +5,7 @@ import xyz.srclab.common.bean.BeanHelper
 import xyz.srclab.common.bytecode.bean.BeanClass
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider
 import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProvider
-import xyz.srclab.common.bytecode.provider.cglib.SpringCglibByteCodeProvider
+import xyz.srclab.common.bytecode.provider.spring.SpringByteCodeProvider
 import xyz.srclab.test.doAssertEquals
 
 /**
@@ -33,7 +33,7 @@ object BeanTest {
     @Test
     fun testWithProvider() {
         doTestBean(CglibByteCodeProvider.INSTANCE, A2::class.java)
-        doTestBean(SpringCglibByteCodeProvider.INSTANCE, A3::class.java)
+        doTestBean(SpringByteCodeProvider.INSTANCE, A3::class.java)
     }
 
     private fun <T : Any> doTestBean(provider: ByteCodeProvider, baseClass: Class<T>) {
