@@ -8,36 +8,36 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 @Immutable
-public class TypeRef<T> {
+public class TypeRef<T extends Type> {
 
-    public static TypeRef<?> with(Type type) {
+    public static <T extends Type> TypeRef<T> with(T type) {
         return new TypeRef<>(type);
     }
 
-    private final Type type;
+    private final T type;
 
     protected TypeRef() {
-        this.type = reflectTypeSelf();
+        this.type = (T) reflectTypeSelf();
     }
 
-    private TypeRef(Type type) {
+    private TypeRef(T type) {
         this.type = type;
     }
 
     protected Type reflectTypeSelf() {
         @Nullable Type generic = TypeHelper.findSuperclassGeneric(getClass(), TypeRef.class);
         if (!(generic instanceof ParameterizedType)) {
-            throw new IllegalStateException("Must be extend from TypeRef with parameterized.");
+            throw new IllegalStateException("Must be extend from parameterized type.");
         }
         ParameterizedType parameterizedType = (ParameterizedType) generic;
         return parameterizedType.getActualTypeArguments()[0];
     }
 
-    public Type getType() {
+    public T getType() {
         return type;
     }
 
-    public <S> Class<S> getRawType() {
-        return (Class<S>) TypeHelper.getRawClass(type);
+    public <U> Class<U> getRawType() {
+        return (Class<U>) TypeHelper.getRawClass(type);
     }
 }
