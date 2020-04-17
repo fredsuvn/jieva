@@ -2,7 +2,7 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.builder.ProcessByHandlersBuilder;
+import xyz.srclab.common.pattern.builder.HandlersBuilder;
 import xyz.srclab.common.lang.TypeRef;
 import xyz.srclab.common.string.format.fastformat.FastFormat;
 
@@ -37,12 +37,12 @@ public interface BeanConverter {
         return (T) convert(from, to.getType(), beanOperator);
     }
 
-    class Builder extends ProcessByHandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
+    class Builder extends HandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
 
         private @Nullable BeanOperator beanOperator;
 
         public Builder setBeanOperator(BeanOperator beanOperator) {
-            this.changeState();
+            this.commitChanges();
             this.beanOperator = beanOperator;
             return this;
         }

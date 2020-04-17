@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.provider
 
 import org.testng.annotations.Test
-import xyz.srclab.common.provider.AbstractProviderManager
-import xyz.srclab.common.provider.ProviderNotFoundException
+import xyz.srclab.common.pattern.provider.AbstractProviderManager
+import xyz.srclab.common.pattern.provider.ProviderNotFoundException
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable
 

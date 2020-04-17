@@ -2,7 +2,7 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.builder.CacheStateBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.lang.TypeRef;
 import xyz.srclab.common.reflect.SignatureHelper;
@@ -214,19 +214,19 @@ public interface BeanOperator {
         return beanMethod;
     }
 
-    class Builder extends CacheStateBuilder<BeanOperator> {
+    class Builder extends CachedBuilder<BeanOperator> {
 
         private @Nullable BeanResolver beanResolver;
         private @Nullable BeanConverter beanConverter;
 
         public Builder setBeanResolver(BeanResolver beanResolver) {
-            this.changeState();
+            this.commitChanges();
             this.beanResolver = beanResolver;
             return this;
         }
 
         public Builder setBeanConverter(BeanConverter beanConverter) {
-            this.changeState();
+            this.commitChanges();
             this.beanConverter = beanConverter;
             return this;
         }

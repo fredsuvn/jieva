@@ -8,19 +8,19 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 @Immutable
-public class TypeRef<T extends Type> {
+public class TypeRef<T> {
 
-    public static <T extends Type> TypeRef<T> with(T type) {
+    public static <T> TypeRef<T> with(Type type) {
         return new TypeRef<>(type);
     }
 
-    private final T type;
+    private final Type type;
 
     protected TypeRef() {
-        this.type = (T) reflectTypeSelf();
+        this.type = reflectTypeSelf();
     }
 
-    private TypeRef(T type) {
+    private TypeRef(Type type) {
         this.type = type;
     }
 
@@ -33,7 +33,7 @@ public class TypeRef<T extends Type> {
         return parameterizedType.getActualTypeArguments()[0];
     }
 
-    public T getType() {
+    public Type getType() {
         return type;
     }
 

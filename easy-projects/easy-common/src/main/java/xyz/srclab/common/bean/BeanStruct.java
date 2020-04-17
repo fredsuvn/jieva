@@ -2,7 +2,7 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.builder.CacheStateBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.reflect.SignatureHelper;
 
@@ -55,7 +55,7 @@ public interface BeanStruct {
     @Immutable
     Map<String, BeanMethod> getAllMethods();
 
-    class Builder extends CacheStateBuilder<BeanStruct> {
+    class Builder extends CachedBuilder<BeanStruct> {
 
         private final Class<?> type;
         private @Nullable Map<String, BeanProperty> propertyMap;
@@ -66,13 +66,13 @@ public interface BeanStruct {
         }
 
         public Builder setProperties(Map<String, BeanProperty> properties) {
-            this.changeState();
+            this.commitChanges();
             this.propertyMap = properties;
             return this;
         }
 
         public Builder setMethods(Map<String, BeanMethod> methodMap) {
-            this.changeState();
+            this.commitChanges();
             this.methodMap = methodMap;
             return this;
         }

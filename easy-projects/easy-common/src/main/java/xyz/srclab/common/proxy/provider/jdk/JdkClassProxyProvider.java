@@ -1,13 +1,13 @@
 package xyz.srclab.common.proxy.provider.jdk;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.builder.CacheStateBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.proxy.ClassProxy;
 import xyz.srclab.common.proxy.provider.ClassProxyProvider;
-import xyz.srclab.common.reflect.invoke.MethodInvoker;
+import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.method.MethodHelper;
 import xyz.srclab.common.reflect.method.ProxyMethod;
 
@@ -29,7 +29,7 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
     }
 
     private static final class JdkClassProxyBuilder<T>
-            extends CacheStateBuilder<ClassProxy<T>> implements ClassProxy.Builder<T> {
+            extends CachedBuilder<ClassProxy<T>> implements ClassProxy.Builder<T> {
 
         private final Class<T> type;
         private final List<Pair<Predicate<Method>, ProxyMethod>> predicatePairs = new LinkedList<>();
@@ -40,7 +40,7 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
 
         @Override
         public ClassProxy.Builder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod) {
-            this.changeState();
+            this.commitChanges();
             predicatePairs.add(Pair.of(methodPredicate, proxyMethod));
             return this;
         }

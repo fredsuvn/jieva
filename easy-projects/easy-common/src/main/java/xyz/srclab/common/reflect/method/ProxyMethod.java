@@ -1,6 +1,6 @@
 package xyz.srclab.common.reflect.method;
 
-import xyz.srclab.common.reflect.invoke.MethodInvoker;
+import xyz.srclab.common.invoke.MethodInvoker;
 
 import java.lang.reflect.Method;
 

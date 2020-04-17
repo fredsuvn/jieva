@@ -1,7 +1,7 @@
 package xyz.srclab.common.egg;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.EnvironmentHelper;
+import xyz.srclab.common.system.ClassPathHelper;
 import xyz.srclab.common.reflect.method.MethodHelper;
 
 import java.lang.reflect.Constructor;
@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 public class EggHelper {
 
     public static Egg findEgg(String eggName) {
-        @Nullable Class<?> eggClass = EnvironmentHelper.findClass(eggName);
+        @Nullable Class<?> eggClass = ClassPathHelper.findClass(eggName);
         if (eggClass == null) {
             throw new IllegalArgumentException("Egg not found: " + eggName);
         }

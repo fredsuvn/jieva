@@ -1,14 +1,14 @@
 package xyz.srclab.common.bytecode.provider.spring;
 
 import org.springframework.cglib.beans.BeanGenerator;
-import xyz.srclab.common.builder.CacheStateBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.bytecode.bean.BeanClass;
 
 /**
  * @author sunqian
  */
 final class BeanClassBuilderImpl<T>
-        extends CacheStateBuilder<BeanClass<T>> implements BeanClass.Builder<T> {
+        extends CachedBuilder<BeanClass<T>> implements BeanClass.Builder<T> {
 
     private final BeanGenerator beanGenerator;
 
@@ -19,7 +19,7 @@ final class BeanClassBuilderImpl<T>
 
     @Override
     public BeanClass.Builder<T> addProperty(String name, Class<?> type) {
-        changeState();
+        commitChanges();
         beanGenerator.addProperty(name, type);
         return this;
     }

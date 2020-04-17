@@ -1,7 +1,7 @@
 package xyz.srclab.common.bytecode.invoke;
 
-import xyz.srclab.common.reflect.invoke.ConstructorInvoker;
-import xyz.srclab.common.reflect.invoke.MethodInvoker;
+import xyz.srclab.common.invoke.ConstructorInvoker;
+import xyz.srclab.common.invoke.MethodInvoker;
 
 /**
  * @author sunqian

@@ -1,7 +1,7 @@
 package xyz.srclab.common.array;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.builder.CacheStateBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.lang.TypeRef;
 import xyz.srclab.common.reflect.type.TypeHelper;
 
@@ -10,7 +10,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.function.Function;
 
-public class NewArrayBuilder<A, E> extends CacheStateBuilder<A> implements ArrayBuilder<A> {
+public class NewArrayBuilder<A, E> extends CachedBuilder<A> implements ArrayBuilder<A> {
 
     private final A array;
     private @Nullable Function<Integer, E> eachElement;
@@ -60,7 +60,7 @@ public class NewArrayBuilder<A, E> extends CacheStateBuilder<A> implements Array
     }
 
     public NewArrayBuilder<A, E> setEachElement(Function<Integer, E> eachElement) {
-        this.changeState();
+        this.commitChanges();
         this.eachElement = eachElement;
         return this;
     }

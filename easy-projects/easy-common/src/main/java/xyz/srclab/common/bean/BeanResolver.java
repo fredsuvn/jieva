@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.builder.ProcessByHandlersBuilder;
+import xyz.srclab.common.pattern.builder.HandlersBuilder;
 
 @Immutable
 public interface BeanResolver {
@@ -14,7 +14,7 @@ public interface BeanResolver {
 
     BeanStruct resolve(Class<?> beanClass);
 
-    class Builder extends ProcessByHandlersBuilder<BeanResolver, BeanResolverHandler, Builder> {
+    class Builder extends HandlersBuilder<BeanResolver, BeanResolverHandler, Builder> {
 
         @Override
         public BeanResolver build() {

@@ -1,10 +1,10 @@
 package test.xyz.srclab.common.reflect
 
 import org.testng.annotations.Test
-import xyz.srclab.common.reflect.invoke.InvokerHelper
-import xyz.srclab.common.reflect.invoke.InvokerProvider
-import xyz.srclab.common.reflect.invoke.provider.methodhandle.MethodHandleInvokerProvider
-import xyz.srclab.common.reflect.invoke.provider.reflected.ReflectedInvokerProvider
+import xyz.srclab.common.invoke.InvokerHelper
+import xyz.srclab.common.invoke.InvokerProvider
+import xyz.srclab.common.invoke.provider.methodhandle.MethodHandleInvokerProvider
+import xyz.srclab.common.invoke.provider.reflected.ReflectedInvokerProvider
 import xyz.srclab.test.doAssertEquals
 
 object InvokerHelperTest {

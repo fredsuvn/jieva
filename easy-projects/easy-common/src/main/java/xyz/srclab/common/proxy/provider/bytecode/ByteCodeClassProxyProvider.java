@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy.provider.bytecode;
 
-import xyz.srclab.common.builder.CacheStateBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.bytecode.enhance.EnhancedClass;
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider;
 import xyz.srclab.common.bytecode.provider.ByteCodeProviderManager;
@@ -24,7 +24,7 @@ public class ByteCodeClassProxyProvider implements ClassProxyProvider {
     }
 
     private static final class ByteCodeClassProxyBuilder<T>
-            extends CacheStateBuilder<ClassProxy<T>> implements ClassProxy.Builder<T> {
+            extends CachedBuilder<ClassProxy<T>> implements ClassProxy.Builder<T> {
 
         private static final ByteCodeProvider byteCodeProvider = ByteCodeProviderManager.INSTANCE.getProvider();
 
@@ -37,7 +37,7 @@ public class ByteCodeClassProxyProvider implements ClassProxyProvider {
 
         @Override
         public ClassProxy.Builder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod) {
-            this.changeState();
+            this.commitChanges();
             predicatePairs.add(Pair.of(methodPredicate, proxyMethod));
             return this;
         }

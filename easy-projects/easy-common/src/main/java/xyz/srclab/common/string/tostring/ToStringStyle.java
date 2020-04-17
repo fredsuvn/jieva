@@ -2,7 +2,7 @@ package xyz.srclab.common.string.tostring;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Defaults;
-import xyz.srclab.common.builder.CacheStateBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 
 @Immutable
 public interface ToStringStyle {
@@ -39,7 +39,7 @@ public interface ToStringStyle {
 
     boolean getIgnoreReferenceLoop();
 
-    class Builder extends CacheStateBuilder<ToStringStyle> {
+    class Builder extends CachedBuilder<ToStringStyle> {
 
         private String beanStart = "{";
         private String beanEnd = "}";
@@ -52,55 +52,55 @@ public interface ToStringStyle {
         private boolean ignoreReferenceLoop = false;
 
         public Builder setBeanStart(String beanStart) {
-            this.changeState();
+            this.commitChanges();
             this.beanStart = beanStart;
             return this;
         }
 
         public Builder setBeanEnd(String beanEnd) {
-            this.changeState();
+            this.commitChanges();
             this.beanEnd = beanEnd;
             return this;
         }
 
         public Builder setListStart(String listStart) {
-            this.changeState();
+            this.commitChanges();
             this.listStart = listStart;
             return this;
         }
 
         public Builder setListEnd(String listEnd) {
-            this.changeState();
+            this.commitChanges();
             this.listEnd = listEnd;
             return this;
         }
 
         public Builder setWrapping(String wrapping) {
-            this.changeState();
+            this.commitChanges();
             this.wrapping = wrapping;
             return this;
         }
 
         public Builder setIndent(String indent) {
-            this.changeState();
+            this.commitChanges();
             this.indent = indent;
             return this;
         }
 
         public Builder setSeparator(String separator) {
-            this.changeState();
+            this.commitChanges();
             this.separator = separator;
             return this;
         }
 
         public Builder setIndicator(String indicator) {
-            this.changeState();
+            this.commitChanges();
             this.indicator = indicator;
             return this;
         }
 
         public Builder setIgnoreReferenceLoop(boolean ignoreReferenceLoop) {
-            this.changeState();
+            this.commitChanges();
             this.ignoreReferenceLoop = ignoreReferenceLoop;
             return this;
         }

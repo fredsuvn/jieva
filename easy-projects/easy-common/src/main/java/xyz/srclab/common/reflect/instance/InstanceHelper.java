@@ -2,7 +2,7 @@ package xyz.srclab.common.reflect.instance;
 
 import xyz.srclab.common.base.KeyHelper;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
-import xyz.srclab.common.reflect.invoke.InvokerHelper;
+import xyz.srclab.common.invoke.InvokerHelper;
 
 import java.lang.reflect.Constructor;
 

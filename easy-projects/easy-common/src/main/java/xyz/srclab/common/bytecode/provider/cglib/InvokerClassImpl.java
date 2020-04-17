@@ -10,8 +10,8 @@ import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.reflect.SignatureHelper;
-import xyz.srclab.common.reflect.invoke.ConstructorInvoker;
-import xyz.srclab.common.reflect.invoke.MethodInvoker;
+import xyz.srclab.common.invoke.ConstructorInvoker;
+import xyz.srclab.common.invoke.MethodInvoker;
 
 import java.lang.reflect.InvocationTargetException;
 
