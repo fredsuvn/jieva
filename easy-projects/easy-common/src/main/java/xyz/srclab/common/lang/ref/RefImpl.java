@@ -1,23 +1,10 @@
-package xyz.srclab.common.lang;
+package xyz.srclab.common.lang.ref;
 
 import xyz.srclab.annotation.Nullable;
 
-public interface Ref<T> {
-
-    static <T> Ref<T> withEmpty() {
-        return new RefImpl<>();
-    }
-
-    static <T> Ref<T> with(T object) {
-        return new RefImpl<>(object);
-    }
-
-    @Nullable
-    T get();
-
-    void set(@Nullable T value);
-}
-
+/**
+ * @author sunqian
+ */
 final class RefImpl<T> implements Ref<T> {
 
     private @Nullable T object;

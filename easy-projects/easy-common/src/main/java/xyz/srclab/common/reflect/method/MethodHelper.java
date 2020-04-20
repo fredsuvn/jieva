@@ -2,7 +2,7 @@ package xyz.srclab.common.reflect.method;
 
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.base.KeyHelper;
+import xyz.srclab.common.lang.key.KeySupport;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.collection.list.ListHelper;
@@ -26,7 +26,7 @@ public class MethodHelper {
 
     public static Method getMethod(Class<?> cls, String methodName, Class<?>... parameterTypes) {
         return methodCache.getNonNull(
-                KeyHelper.buildKey(cls, methodName, parameterTypes),
+                KeySupport.buildKey(cls, methodName, parameterTypes),
                 k -> getMethod0(cls, methodName, parameterTypes)
         );
     }
@@ -42,7 +42,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getAllMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                KeyHelper.buildKey(cls, "getAllMethods"),
+                KeySupport.buildKey(cls, "getAllMethods"),
                 k -> ListHelper.immutable(getAllMethods0(cls))
         );
     }
@@ -60,7 +60,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getOverrideableMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                KeyHelper.buildKey(cls, "getOverrideableMethods"),
+                KeySupport.buildKey(cls, "getOverrideableMethods"),
                 k -> ListHelper.immutable(getOverrideableMethods0(cls))
         );
     }
@@ -79,7 +79,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getPublicStaticMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                KeyHelper.buildKey(cls, "getPublicStaticMethods"),
+                KeySupport.buildKey(cls, "getPublicStaticMethods"),
                 k -> ListHelper.immutable(getPublicStaticMethods0(cls))
         );
     }
@@ -93,7 +93,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getPublicNonStaticMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                KeyHelper.buildKey(cls, "getPublicNonStaticMethods"),
+                KeySupport.buildKey(cls, "getPublicNonStaticMethods"),
                 kc -> ListHelper.immutable(getPublicNonStaticMethods0(cls))
         );
     }

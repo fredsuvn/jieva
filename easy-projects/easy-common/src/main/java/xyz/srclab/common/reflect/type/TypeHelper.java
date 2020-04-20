@@ -3,7 +3,7 @@ package xyz.srclab.common.reflect.type;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Nullable;
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.base.KeyHelper;
+import xyz.srclab.common.lang.key.KeySupport;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.collection.list.ListHelper;
@@ -40,7 +40,7 @@ public class TypeHelper {
 
     public static Class<?> getRawClass(Type type) {
         return (Class<?>) typeCache.getNonNull(
-                KeyHelper.buildKey(type, "getRawClass"),
+                KeySupport.buildKey(type, "getRawClass"),
                 k -> getRawClass0(type)
         );
     }
@@ -75,7 +75,7 @@ public class TypeHelper {
     @Immutable
     public static List<Type> getGenericTypes(ParameterizedType parameterizedType) {
         return typesCache.getNonNull(
-                KeyHelper.buildKey(parameterizedType, "getGenericTypes"),
+                KeySupport.buildKey(parameterizedType, "getGenericTypes"),
                 k -> ListHelper.immutable(Arrays.asList(getGenericTypes0(parameterizedType)))
         );
     }
@@ -87,7 +87,7 @@ public class TypeHelper {
     @Immutable
     public static List<TypeVariable<?>> getTypeParameters(Class<?> cls) {
         return typeVariablesCache.getNonNull(
-                KeyHelper.buildKey(cls, "getTypeParameters"),
+                KeySupport.buildKey(cls, "getTypeParameters"),
                 k -> ListHelper.immutable(Arrays.asList(getTypeParameters0(cls)))
         );
     }
@@ -99,7 +99,7 @@ public class TypeHelper {
     @Nullable
     public static Type findSuperclassGeneric(Class<?> cls, Class<?> target) {
         Type returned = typeCache.getNonNull(
-                KeyHelper.buildKey(cls, target, "findGenericSuperclass"),
+                KeySupport.buildKey(cls, target, "findGenericSuperclass"),
                 k -> findSuperclassGeneric0(cls, target)
         );
         return returned == NullType.INSTANCE ? null : returned;

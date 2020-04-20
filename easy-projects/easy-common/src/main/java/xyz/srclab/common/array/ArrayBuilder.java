@@ -1,6 +1,6 @@
 package xyz.srclab.common.array;
 
-import xyz.srclab.common.lang.TypeRef;
+import xyz.srclab.common.reflect.type.TypeRef;
 
 public interface ArrayBuilder<A> {
 

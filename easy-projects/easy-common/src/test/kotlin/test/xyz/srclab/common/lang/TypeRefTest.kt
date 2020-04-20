@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.lang
 
 import org.testng.annotations.Test
-import xyz.srclab.common.lang.Ref
-import xyz.srclab.common.lang.TypeRef
+import xyz.srclab.common.lang.ref.Ref
+import xyz.srclab.common.reflect.type.TypeRef
 import xyz.srclab.test.doAssertEquals
 
 object TypeRefTest {

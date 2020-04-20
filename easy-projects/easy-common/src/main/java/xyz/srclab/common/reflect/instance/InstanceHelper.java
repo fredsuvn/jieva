@@ -1,6 +1,6 @@
 package xyz.srclab.common.reflect.instance;
 
-import xyz.srclab.common.base.KeyHelper;
+import xyz.srclab.common.lang.key.Key;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.invoke.InvokerHelper;
 
@@ -8,12 +8,12 @@ import java.lang.reflect.Constructor;
 
 public class InstanceHelper {
 
-    private static final ThreadLocalCache<Object, Constructor<?>> constructorCache =
+    private static final ThreadLocalCache<Key, Constructor<?>> constructorCache =
             new ThreadLocalCache<>();
 
     public static <T> T newInstance(Class<?> cls) {
         Constructor<?> constructor = constructorCache.getNonNull(
-                KeyHelper.buildKey(cls),
+                Key.from(cls),
                 k -> {
                     try {
                         return cls.getConstructor();
@@ -26,7 +26,7 @@ public class InstanceHelper {
 
     public static <T> Constructor<T> getConstructor(Class<T> cls, Class<?>... parameterTypes) {
         Constructor<?> constructor = constructorCache.getNonNull(
-                KeyHelper.buildKey(cls, parameterTypes),
+                Key.from(cls, parameterTypes),
                 k -> getConstructor0(cls, parameterTypes)
         );
         return (Constructor<T>) constructor;

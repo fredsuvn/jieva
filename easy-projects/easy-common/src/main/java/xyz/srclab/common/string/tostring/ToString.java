@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.bean.BeanStruct;
-import xyz.srclab.common.lang.Computed;
+import xyz.srclab.common.lang.computed.Computed;
 import xyz.srclab.common.reflect.type.TypeHelper;
 
 import java.lang.reflect.Type;

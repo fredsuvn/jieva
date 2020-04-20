@@ -1,7 +1,12 @@
 package xyz.srclab.common.pattern.provider;
 
-import java.sql.DriverManager;
-import java.util.function.Supplier;
+import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.environment.ClassPathHelper;
+import xyz.srclab.common.reflect.instance.InstanceHelper;
+
+import java.util.Map;
 
 public interface ProviderManager<T> {
 
@@ -13,27 +18,32 @@ public interface ProviderManager<T> {
         registerProvider(provider, false);
     }
 
-    default void registerProvider(String providerName, T provider) {
-        registerProvider(providerName, false, provider);
+    default void registerProvider(String className, boolean isDefault) {
+        @Nullable Class<T> providerClass = ClassPathHelper.getClass(className);
+        Checker.checkArguments(providerClass != null, "Can not find class: " + className);
+        T provider = InstanceHelper.newInstance(providerClass);
+        registerProvider(className, provider, isDefault);
     }
-
-    default void registerProvider(String providerName, Supplier<T> providerSupplier) {
-        registerProvider(providerName, false, providerSupplier);
-    }
-
-    void registerProvider(String className, boolean isDefault);
 
     default void registerProvider(T provider, boolean isDefault) {
-        registerProvider(provider.getClass().getName());
+        registerProvider(provider.getClass().getName(), provider, isDefault);
     }
 
-    void registerProvider(String providerName, boolean isDefault, T provider);
+    default void registerProvider(String providerName, T provider) {
+        registerProvider(providerName, provider, false);
+    }
 
-    void registerProvider(String providerName, boolean isDefault, Supplier<T> providerSupplier);
+    void registerProvider(String providerName, T provider, boolean isDefault);
+
+    void setDefaultProvider(String providerName);
 
     T getProvider() throws ProviderNotFoundException;
 
-    T getProvider(String providerName) throws ProviderNotFoundException;
+    @Nullable
+    T getProvider(String providerName);
+
+    @Immutable
+    Map<String, T> getAllProviders();
 
     void removeProvider(String providerName);
 }

@@ -1,8 +1,7 @@
-package xyz.srclab.common.lang;
+package xyz.srclab.common.reflect.type;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.reflect.type.TypeHelper;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

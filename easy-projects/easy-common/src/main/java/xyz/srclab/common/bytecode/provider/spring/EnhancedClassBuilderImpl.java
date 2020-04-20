@@ -3,7 +3,7 @@ package xyz.srclab.common.bytecode.provider.spring;
 import org.springframework.cglib.proxy.*;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
-import xyz.srclab.common.lang.Counter;
+import xyz.srclab.common.lang.count.Counter;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.bytecode.enhance.EnhancedClass;
 import xyz.srclab.common.exception.ExceptionWrapper;

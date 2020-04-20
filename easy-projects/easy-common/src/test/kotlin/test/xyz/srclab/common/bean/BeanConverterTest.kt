@@ -6,7 +6,7 @@ import xyz.srclab.common.bean.BeanConverter
 import xyz.srclab.common.bean.BeanConverterHandler
 import xyz.srclab.common.bean.BeanHelper
 import xyz.srclab.common.bean.BeanOperator
-import xyz.srclab.common.lang.TypeRef
+import xyz.srclab.common.reflect.type.TypeRef
 import xyz.srclab.common.time.TimeHelper
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable

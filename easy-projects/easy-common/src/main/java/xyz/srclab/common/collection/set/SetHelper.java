@@ -11,4 +11,10 @@ public class SetHelper {
     public static <E> Set<E> immutable(Iterable<? extends E> elements) {
         return ImmutableSet.copyOf(elements);
     }
+
+    @SafeVarargs
+    @Immutable
+    public static <E> Set<E> immutable(E... elements) {
+        return ImmutableSet.copyOf(elements);
+    }
 }

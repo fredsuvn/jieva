@@ -2,7 +2,7 @@ package test.xyz.srclab.common.reflect
 
 import org.testng.annotations.Test
 import xyz.srclab.common.bean.BeanHelper
-import xyz.srclab.common.lang.TypeRef
+import xyz.srclab.common.reflect.type.TypeRef
 import xyz.srclab.common.reflect.type.TypeHelper
 import xyz.srclab.test.doAssertEquals
 import java.lang.reflect.ParameterizedType

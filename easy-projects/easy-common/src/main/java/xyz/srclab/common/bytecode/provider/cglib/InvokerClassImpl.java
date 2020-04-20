@@ -4,7 +4,7 @@ import net.sf.cglib.reflect.FastClass;
 import net.sf.cglib.reflect.FastConstructor;
 import net.sf.cglib.reflect.FastMethod;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.KeyHelper;
+import xyz.srclab.common.lang.key.KeySupport;
 import xyz.srclab.common.bytecode.invoke.InvokerClass;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
@@ -40,7 +40,7 @@ final class InvokerClassImpl<T> implements InvokerClass<T> {
 
     @Override
     public ConstructorInvoker<T> getConstructorInvoker(Class<?>... parameterTypes) {
-        Object key = KeyHelper.buildKey(parameterTypes);
+        Object key = KeySupport.buildKey(parameterTypes);
         ConstructorInvoker<?> constructorInvoker = constructorCache.getNonNull(
                 key,
                 k -> new ConstructorInvokerImpl(parameterTypes)

@@ -2,7 +2,7 @@ package xyz.srclab.common.pattern.provider;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.common.system.ClassPathHelper;
+import xyz.srclab.common.environment.ClassPathHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 
 import java.util.Map;
@@ -21,7 +21,7 @@ public abstract class AbstractProviderManager<T> implements ProviderManager<T> {
             if (providerMap.containsKey(className)) {
                 throw new IllegalArgumentException("Provider has already registered: " + className);
             }
-            @Nullable Class<?> providerClass = ClassPathHelper.findClass(className);
+            @Nullable Class<?> providerClass = ClassPathHelper.getClass(className);
             if (providerClass == null) {
                 throw new IllegalArgumentException(new ClassNotFoundException(className));
             }

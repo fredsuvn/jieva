@@ -5,7 +5,7 @@ import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.array.ArrayBuilder;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.weak.WeakCache;
-import xyz.srclab.common.lang.TypeRef;
+import xyz.srclab.common.reflect.type.TypeRef;
 
 import java.time.Duration;
 import java.util.NoSuchElementException;

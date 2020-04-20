@@ -29,4 +29,10 @@ public class ListHelper {
     public static <E> List<E> immutable(Iterable<? extends E> elements) {
         return ImmutableList.copyOf(elements);
     }
+
+    @SafeVarargs
+    @Immutable
+    public static <E> List<E> immutable(E... elements) {
+        return ImmutableList.copyOf(elements);
+    }
 }

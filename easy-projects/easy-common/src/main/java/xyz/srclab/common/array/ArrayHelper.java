@@ -2,10 +2,10 @@ package xyz.srclab.common.array;
 
 import xyz.srclab.annotation.WrittenReturn;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.base.KeyHelper;
+import xyz.srclab.common.lang.key.KeySupport;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.collection.iterable.IterableHelper;
-import xyz.srclab.common.lang.TypeRef;
+import xyz.srclab.common.reflect.type.TypeRef;
 import xyz.srclab.common.reflect.type.TypeHelper;
 
 import java.lang.reflect.Array;
@@ -174,7 +174,7 @@ public class ArrayHelper {
 
     public static Class<?> findArrayType(Class<?> elementType) {
         return arrayTypeCache.getNonNull(
-                KeyHelper.buildKey(elementType, "findArrayType"),
+                KeySupport.buildKey(elementType, "findArrayType"),
                 o -> findArrayType0(elementType)
         );
     }
@@ -185,7 +185,7 @@ public class ArrayHelper {
 
     public static Type getGenericComponentType(Type type) {
         return genericComponentTypeCache.getNonNull(
-                KeyHelper.buildKey(type, "getGenericComponentType"),
+                KeySupport.buildKey(type, "getGenericComponentType"),
                 o -> getGenericComponentType0(type)
         );
     }

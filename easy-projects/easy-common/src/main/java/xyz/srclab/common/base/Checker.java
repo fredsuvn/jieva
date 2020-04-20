@@ -13,4 +13,28 @@ public class Checker {
             throw new IndexOutOfBoundsException("from: " + from + ", to: " + to);
         }
     }
+
+    public static void checkArguments(boolean expression) {
+        if (!expression) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static void checkArguments(boolean expression, String message) {
+        if (!expression) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    public static void checkState(boolean expression) {
+        if (!expression) {
+            throw new IllegalStateException();
+        }
+    }
+
+    public static void checkState(boolean expression, String message) {
+        if (!expression) {
+            throw new IllegalStateException(message);
+        }
+    }
 }
