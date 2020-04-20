@@ -7,6 +7,7 @@ import xyz.srclab.common.environment.ClassPathHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public interface ProviderManager<T> {
 
@@ -37,7 +38,7 @@ public interface ProviderManager<T> {
 
     void setDefaultProvider(String providerName);
 
-    T getProvider() throws ProviderNotFoundException;
+    T getProvider() throws NoSuchElementException;
 
     @Nullable
     T getProvider(String providerName);
