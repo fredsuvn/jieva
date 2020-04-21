@@ -11,13 +11,9 @@ import java.util.NoSuchElementException;
 
 public interface ProviderManager<T> {
 
-    default void registerProvider(String className) {
-        registerProvider(className, false);
-    }
+    void registerProvider(String className);
 
-    default void registerProvider(T provider) {
-        registerProvider(provider, false);
-    }
+    void registerProvider(T provider);
 
     default void registerProvider(String className, boolean isDefault) {
         @Nullable Class<T> providerClass = ClassPathHelper.getClass(className);
@@ -36,7 +32,7 @@ public interface ProviderManager<T> {
 
     void registerProvider(String providerName, T provider, boolean isDefault);
 
-    void setDefaultProvider(String providerName);
+    void setDefaultProvider(String providerName) throws NoSuchElementException;
 
     T getProvider() throws NoSuchElementException;
 
@@ -46,5 +42,5 @@ public interface ProviderManager<T> {
     @Immutable
     Map<String, T> getAllProviders();
 
-    void removeProvider(String providerName);
+    void deregisterProvider(String providerName);
 }

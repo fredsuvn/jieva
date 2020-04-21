@@ -11,7 +11,7 @@ object ProviderTest {
     fun testProvider() {
         val p1 = TestProvider()
         val p2 = TestProvider()
-        val testProviderManager = TestProviderManager()
+        val testProviderManager = TestProviderManagerBase()
         testProviderManager.registerProvider(p1)
         testProviderManager.registerProvider(TestProvider2::class.java.name)
         testProviderManager.registerProvider("ss", p2)
@@ -19,23 +19,23 @@ object ProviderTest {
         doAssertEquals(testProviderManager.getProvider(TestProvider2::class.java.name), TestProvider2())
         doAssertEquals(testProviderManager.getProvider("ss"), p2)
 
-        testProviderManager.removeProvider(TestProvider::class.java.name)
-        testProviderManager.removeProvider(TestProvider2::class.java.name)
-        testProviderManager.removeProvider("ss")
+        testProviderManager.deregisterProvider(TestProvider::class.java.name)
+        testProviderManager.deregisterProvider(TestProvider2::class.java.name)
+        testProviderManager.deregisterProvider("ss")
 
         doExpectThrowable(ProviderNotFoundException::class.java) {
             testProviderManager.getProvider("ss")
         }
 
         doAssertEquals(testProviderManager.provider, TestProvider0())
-        testProviderManager.removeProvider(TestProvider0::class.java.name)
+        testProviderManager.deregisterProvider(TestProvider0::class.java.name)
         doExpectThrowable(ProviderNotFoundException::class.java) {
             testProviderManager.getProvider(TestProvider0::class.java.name)
         }
 
         testProviderManager.registerProvider("ss", p2, true)
         doAssertEquals(testProviderManager.provider, p2)
-        testProviderManager.removeProvider("ss")
+        testProviderManager.deregisterProvider("ss")
         doExpectThrowable(ProviderNotFoundException::class.java) {
             testProviderManager.getProvider("ss")
         }.catch {
@@ -89,7 +89,7 @@ object ProviderTest {
         }
     }
 
-    class TestProviderManager : AbstractProviderManager<TestProvider>() {
+    class TestProviderManagerBase : AbstractProviderManager<TestProvider>() {
         override fun createDefaultProvider(): TestProvider {
             return TestProvider0()
         }

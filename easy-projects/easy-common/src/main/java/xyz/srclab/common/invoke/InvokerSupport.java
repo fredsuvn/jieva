@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 class InvokerSupport {
 
     private static final InvokerProvider invokerProvider =
-            InvokerProviderManager.INSTANCE.getProvider();
+            InvokerProviderManagerBase.INSTANCE.getProvider();
 
     static <T> ConstructorInvoker<T> getConstructorInvoker(Constructor<T> constructor) {
         return invokerProvider.getConstructorInvoker(constructor);

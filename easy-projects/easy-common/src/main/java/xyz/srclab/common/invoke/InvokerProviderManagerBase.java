@@ -6,9 +6,9 @@ import xyz.srclab.common.invoke.provider.bytecode.ByteCodeInvokerProvider;
 import xyz.srclab.common.invoke.provider.reflected.ReflectedInvokerProvider;
 
 @ThreadSafe
-public class InvokerProviderManager extends AbstractProviderManager<InvokerProvider> {
+public class InvokerProviderManagerBase extends AbstractProviderManager<InvokerProvider> {
 
-    public static final InvokerProviderManager INSTANCE = new InvokerProviderManager();
+    public static final InvokerProviderManagerBase INSTANCE = new InvokerProviderManagerBase();
 
     @Override
     protected InvokerProvider createDefaultProvider() {

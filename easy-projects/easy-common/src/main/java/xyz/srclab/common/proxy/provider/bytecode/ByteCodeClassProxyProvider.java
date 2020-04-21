@@ -3,7 +3,7 @@ package xyz.srclab.common.proxy.provider.bytecode;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.bytecode.enhance.EnhancedClass;
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider;
-import xyz.srclab.common.bytecode.provider.ByteCodeProviderManager;
+import xyz.srclab.common.bytecode.provider.ByteCodeProviderManagerBase;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.proxy.ClassProxy;
 import xyz.srclab.common.proxy.provider.ClassProxyProvider;
@@ -26,7 +26,7 @@ public class ByteCodeClassProxyProvider implements ClassProxyProvider {
     private static final class ByteCodeClassProxyBuilder<T>
             extends CachedBuilder<ClassProxy<T>> implements ClassProxy.Builder<T> {
 
-        private static final ByteCodeProvider byteCodeProvider = ByteCodeProviderManager.INSTANCE.getProvider();
+        private static final ByteCodeProvider byteCodeProvider = ByteCodeProviderManagerBase.INSTANCE.getProvider();
 
         private final Class<T> type;
         private final List<Pair<Predicate<Method>, ProxyMethod>> predicatePairs = new LinkedList<>();

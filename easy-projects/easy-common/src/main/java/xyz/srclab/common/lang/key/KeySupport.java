@@ -3,6 +3,8 @@ package xyz.srclab.common.lang.key;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.list.ListHelper;
 
+import java.lang.reflect.Array;
+import java.util.LinkedList;
 import java.util.List;
 
 public class KeySupport {
@@ -16,7 +18,42 @@ public class KeySupport {
         private final List<Object> keyComponents;
 
         private KeyImpl(Object... keyComponents) {
-            this.keyComponents = ListHelper.immutable(keyComponents);
+            this.keyComponents = buildKeyComponents(keyComponents);
+        }
+
+        private List<Object> buildKeyComponents(Object... keyComponents) {
+            if (!hasArray(keyComponents)) {
+                return ListHelper.immutable(keyComponents);
+            }
+            List<Object> result = new LinkedList<>();
+            for (Object keyComponent : keyComponents) {
+                if (!keyComponent.getClass().isArray()) {
+                    result.add(keyComponent);
+                    continue;
+                }
+                resolveArrayAndPush(keyComponent, result);
+            }
+            return ListHelper.immutable(result);
+        }
+
+        private boolean hasArray(Object[] keyComponents) {
+            for (Object keyComponent : keyComponents) {
+                if (keyComponent.getClass().isArray()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private void resolveArrayAndPush(Object array, List<Object> container) {
+            for (int i = 0; i < Array.getLength(array); i++) {
+                Object element = Array.get(array, i);
+                if (element.getClass().isArray()) {
+                    resolveArrayAndPush(element, container);
+                    continue;
+                }
+                container.add(element);
+            }
         }
 
         @Override
