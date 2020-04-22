@@ -2,7 +2,7 @@ package test.xyz.srclab.common.bytecode
 
 import org.testng.annotations.Test
 import xyz.srclab.common.bean.BeanHelper
-import xyz.srclab.common.bytecode.bean.BeanClass
+import xyz.srclab.common.bytecode.BeanClass
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider
 import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProvider
 import xyz.srclab.common.bytecode.provider.spring.SpringByteCodeProvider

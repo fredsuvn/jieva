@@ -1,4 +1,4 @@
-package xyz.srclab.common.bytecode.invoke;
+package xyz.srclab.common.bytecode;
 
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.invoke.MethodInvoker;
@@ -9,7 +9,7 @@ import xyz.srclab.common.invoke.MethodInvoker;
 public interface InvokerClass<T> {
 
     static <T> InvokerClass<T> ofType(Class<T> type) {
-        return InvokerClassSupport.getInvokerClass(type);
+        return ByteCodeSupport.getInvokerClass(type);
     }
 
     ConstructorInvoker<T> getConstructorInvoker(Class<?>... parameterTypes);

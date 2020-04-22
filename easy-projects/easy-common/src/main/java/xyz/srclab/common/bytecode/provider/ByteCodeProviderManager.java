@@ -7,9 +7,9 @@ import xyz.srclab.common.bytecode.provider.spring.SpringByteCodeProvider;
 import xyz.srclab.common.pattern.provider.AbstractProviderManager;
 
 @ThreadSafe
-public class ByteCodeProviderManagerBase extends AbstractProviderManager<ByteCodeProvider> {
+public class ByteCodeProviderManager extends AbstractProviderManager<ByteCodeProvider> {
 
-    public static final ByteCodeProviderManagerBase INSTANCE = new ByteCodeProviderManagerBase();
+    public static final ByteCodeProviderManager INSTANCE = new ByteCodeProviderManager();
 
     @Override
     protected ByteCodeProvider createDefaultProvider() {

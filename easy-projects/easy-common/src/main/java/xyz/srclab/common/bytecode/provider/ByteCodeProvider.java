@@ -1,9 +1,9 @@
 package xyz.srclab.common.bytecode.provider;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.bytecode.bean.BeanClass;
-import xyz.srclab.common.bytecode.enhance.EnhancedClass;
-import xyz.srclab.common.bytecode.invoke.InvokerClass;
+import xyz.srclab.common.bytecode.BeanClass;
+import xyz.srclab.common.bytecode.EnhancedClass;
+import xyz.srclab.common.bytecode.InvokerClass;
 
 @Immutable
 public interface ByteCodeProvider {

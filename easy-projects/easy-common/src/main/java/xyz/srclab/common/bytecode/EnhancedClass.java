@@ -1,4 +1,4 @@
-package xyz.srclab.common.bytecode.enhance;
+package xyz.srclab.common.bytecode;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.reflect.method.ProxyMethod;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 public interface EnhancedClass<T> {
 
     static <T> Builder<T> newBuilder(Class<T> superClass) {
-        return EnhancedClassBuilderSupport.newBuilder(superClass);
+        return ByteCodeSupport.newEnhancedClassBuilder(superClass);
     }
 
     T newInstance();

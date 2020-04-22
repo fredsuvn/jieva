@@ -1,8 +1,8 @@
 package xyz.srclab.common.bytecode.provider.cglib;
 
-import xyz.srclab.common.bytecode.bean.BeanClass;
-import xyz.srclab.common.bytecode.enhance.EnhancedClass;
-import xyz.srclab.common.bytecode.invoke.InvokerClass;
+import xyz.srclab.common.bytecode.BeanClass;
+import xyz.srclab.common.bytecode.EnhancedClass;
+import xyz.srclab.common.bytecode.InvokerClass;
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider;
 
 /**

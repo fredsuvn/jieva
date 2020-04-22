@@ -5,7 +5,7 @@ import net.sf.cglib.reflect.FastConstructor;
 import net.sf.cglib.reflect.FastMethod;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.lang.key.KeySupport;
-import xyz.srclab.common.bytecode.invoke.InvokerClass;
+import xyz.srclab.common.bytecode.InvokerClass;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.exception.ExceptionWrapper;

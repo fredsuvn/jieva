@@ -28,14 +28,14 @@ object TypeHelperTest {
     @Test
     fun testSuperclassGeneric() {
         doAssertEquals(
-            (TypeHelper.getGenericType(
+            (TypeHelper.getGenericSuperclass(
                 C::class.java,
                 TypeRef::class.java
             ) as ParameterizedType).actualTypeArguments[0],
             C().type
         )
         doAssertEquals(
-            TypeHelper.getGenericType(B::class.java, TypeRef::class.java),
+            TypeHelper.getGenericSuperclass(B::class.java, TypeRef::class.java),
             null
         )
     }

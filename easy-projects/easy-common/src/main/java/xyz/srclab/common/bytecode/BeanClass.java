@@ -1,4 +1,4 @@
-package xyz.srclab.common.bytecode.bean;
+package xyz.srclab.common.bytecode;
 
 import xyz.srclab.annotation.Immutable;
 
@@ -6,11 +6,11 @@ import xyz.srclab.annotation.Immutable;
 public interface BeanClass<T> {
 
     static Builder<Object> newBuilder() {
-        return BeanClassBuilderSupport.newBuilder(Object.class);
+        return ByteCodeSupport.newBeanClassBuilder(Object.class);
     }
 
     static <T> Builder<T> newBuilder(Class<T> superClass) {
-        return BeanClassBuilderSupport.newBuilder(superClass);
+        return ByteCodeSupport.newBeanClassBuilder(superClass);
     }
 
     T newInstance();

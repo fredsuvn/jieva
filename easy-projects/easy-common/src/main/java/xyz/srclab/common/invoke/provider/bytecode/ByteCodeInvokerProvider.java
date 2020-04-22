@@ -1,7 +1,7 @@
 package xyz.srclab.common.invoke.provider.bytecode;
 
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider;
-import xyz.srclab.common.bytecode.provider.ByteCodeProviderManagerBase;
+import xyz.srclab.common.bytecode.provider.ByteCodeProviderManager;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.invoke.provider.InvokerProvider;
 import xyz.srclab.common.invoke.MethodInvoker;
@@ -16,7 +16,7 @@ public class ByteCodeInvokerProvider implements InvokerProvider {
     private final ByteCodeProvider byteCodeProvider;
 
     public ByteCodeInvokerProvider() {
-        this(ByteCodeProviderManagerBase.INSTANCE.getProvider());
+        this(ByteCodeProviderManager.INSTANCE.getProvider());
     }
 
     public ByteCodeInvokerProvider(ByteCodeProvider byteCodeProvider) {
