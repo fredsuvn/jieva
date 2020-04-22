@@ -17,7 +17,9 @@ final class MethodHandleConstructorInvoker<T> implements ConstructorInvoker<T> {
 
     private ConstructorInvoker<T> buildMethodHandleInvoker(Constructor<T> constructor) {
         MethodHandle methodHandle = buildMethodHandle(constructor);
-        return new InvokeByMethodHandle.DefaultConstructorInvoker(methodHandle);
+        InvokeByMethodHandle.StaticMethodInvoker staticMethodInvoker =
+                new InvokeByMethodHandle.StaticMethodInvoker(methodHandle);
+        return args -> (T) staticMethodInvoker.invoke(args);
     }
 
     private MethodHandle buildMethodHandle(Constructor<?> constructor) {

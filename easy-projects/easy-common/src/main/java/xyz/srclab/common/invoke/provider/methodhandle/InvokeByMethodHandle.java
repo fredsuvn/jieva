@@ -2,27 +2,12 @@ package xyz.srclab.common.invoke.provider.methodhandle;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.exception.ExceptionWrapper;
-import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.invoke.FunctionInvoker;
 import xyz.srclab.common.invoke.MethodInvoker;
 
 import java.lang.invoke.MethodHandle;
 
 final class InvokeByMethodHandle {
-
-    static final class DefaultConstructorInvoker<T> implements ConstructorInvoker<T> {
-
-        private final StaticMethodInvoker staticMethodInvoker;
-
-        DefaultConstructorInvoker(MethodHandle methodHandle) {
-            this.staticMethodInvoker = new StaticMethodInvoker(methodHandle);
-        }
-
-        @Override
-        public T invoke(Object... args) {
-            return (T) staticMethodInvoker.invoke(null, args);
-        }
-    }
 
     static final class VirtualMethodInvoker implements MethodInvoker {
 
@@ -64,21 +49,12 @@ final class InvokeByMethodHandle {
         }
     }
 
-    static final class StaticMethodInvoker implements MethodInvoker, FunctionInvoker {
+    static final class StaticMethodInvoker implements FunctionInvoker {
 
         private final MethodHandle methodHandle;
 
         StaticMethodInvoker(MethodHandle methodHandle) {
             this.methodHandle = methodHandle;
-        }
-
-        @Override
-        public @Nullable Object invoke(@Nullable Object object, Object... args) {
-            try {
-                return invoke0(args);
-            } catch (Throwable throwable) {
-                throw new ExceptionWrapper(throwable);
-            }
         }
 
         @Override
@@ -107,11 +83,6 @@ final class InvokeByMethodHandle {
                 default:
                     return methodHandle.invokeWithArguments(args);
             }
-        }
-
-        @Override
-        public MethodInvoker asMethodInvoker() {
-            return this;
         }
     }
 }

@@ -1,4 +1,4 @@
-package xyz.srclab.common.pattern.provider.load;
+package xyz.srclab.common.pattern.provider;
 
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.reflect.instance.InstanceHelper;

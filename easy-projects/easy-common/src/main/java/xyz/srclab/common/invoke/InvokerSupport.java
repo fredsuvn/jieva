@@ -6,10 +6,9 @@ import xyz.srclab.common.invoke.provider.InvokerProviderManager;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-class InvokerSupport {
+final class InvokerSupport {
 
-    private static final InvokerProvider invokerProvider =
-            InvokerProviderManager.INSTANCE.getProvider();
+    private static final InvokerProvider invokerProvider = InvokerProviderManager.INSTANCE.getProvider();
 
     static <T> ConstructorInvoker<T> getConstructorInvoker(Constructor<T> constructor) {
         return invokerProvider.getConstructorInvoker(constructor);
@@ -25,5 +24,13 @@ class InvokerSupport {
 
     static MethodInvoker getMethodInvoker(Class<?> type, String methodName, Class<?>... parameterTypes) {
         return invokerProvider.getMethodInvoker(type, methodName, parameterTypes);
+    }
+
+    static FunctionInvoker getFunctionInvoker(Method method) {
+        return invokerProvider.getFunctionInvoker(method);
+    }
+
+    static FunctionInvoker getFunctionInvoker(Class<?> type, String methodName, Class<?>... parameterTypes) {
+        return invokerProvider.getFunctionInvoker(type, methodName, parameterTypes);
     }
 }

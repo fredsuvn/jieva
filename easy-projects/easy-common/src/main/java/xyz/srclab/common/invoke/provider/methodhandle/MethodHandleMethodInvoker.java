@@ -19,10 +19,17 @@ final class MethodHandleMethodInvoker implements MethodInvoker {
 
     private MethodInvoker buildMethodHandleInvoker(Method method) {
         MethodHandle methodHandle = buildMethodHandle(method);
-        return Modifier.isStatic(method.getModifiers()) ?
-                new InvokeByMethodHandle.StaticMethodInvoker(methodHandle).asMethodInvoker()
-                :
-                new InvokeByMethodHandle.VirtualMethodInvoker(methodHandle);
+        if (Modifier.isStatic(method.getModifiers())) {
+            InvokeByMethodHandle.StaticMethodInvoker staticMethodInvoker =
+                    new InvokeByMethodHandle.StaticMethodInvoker(methodHandle);
+            return new MethodInvoker() {
+                @Override
+                public @Nullable Object invoke(@Nullable Object object, Object... args) {
+                    return staticMethodInvoker.invoke(args);
+                }
+            };
+        }
+        return new InvokeByMethodHandle.VirtualMethodInvoker(methodHandle);
     }
 
     private MethodHandle buildMethodHandle(Method method) {
