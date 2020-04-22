@@ -3,10 +3,10 @@ package xyz.srclab.common.reflect.type;
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Nullable;
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.lang.key.KeySupport;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.collection.list.ListHelper;
+import xyz.srclab.common.lang.key.KeySupport;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.List;
 
 public class TypeHelper {
+
+    private static final Cache<Type, Class<?>> rawTypeCache = new ThreadLocalCache<>();
 
     private static final Cache<Object, Type> typeCache = new ThreadLocalCache<>();
 
@@ -39,8 +41,8 @@ public class TypeHelper {
     }
 
     public static Class<?> getRawClass(Type type) {
-        return (Class<?>) typeCache.getNonNull(
-                KeySupport.buildKey(type, "getRawClass"),
+        return rawTypeCache.getNonNull(
+                type,
                 k -> getRawClass0(type)
         );
     }
@@ -97,7 +99,7 @@ public class TypeHelper {
     }
 
     @Nullable
-    public static Type findSuperclassGeneric(Class<?> cls, Class<?> target) {
+    public static Type getGenericType(Class<?> cls, Class<?> target) {
         Type returned = typeCache.getNonNull(
                 KeySupport.buildKey(cls, target, "findGenericSuperclass"),
                 k -> findSuperclassGeneric0(cls, target)
