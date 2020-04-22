@@ -5,14 +5,13 @@ import xyz.srclab.annotation.Nullable;
 public abstract class CachedBuilder<T> implements Builder<T> {
 
     private @Nullable T cache;
-    // true: cached; false: cache invalid
-    private boolean changed;
+    private boolean update = false;
 
     @Override
     public T build() {
-        if (cache == null || !changed) {
+        if (cache == null || update) {
             cache = buildNew();
-            changed = true;
+            update = false;
         }
         return cache;
     }
@@ -20,8 +19,8 @@ public abstract class CachedBuilder<T> implements Builder<T> {
     /**
      * Called after any change which leads to refresh cache.
      */
-    protected void commitChanges() {
-        changed = false;
+    protected void updateState() {
+        update = true;
     }
 
     protected abstract T buildNew();

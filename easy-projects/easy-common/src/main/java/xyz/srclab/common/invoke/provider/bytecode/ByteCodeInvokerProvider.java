@@ -3,7 +3,7 @@ package xyz.srclab.common.invoke.provider.bytecode;
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider;
 import xyz.srclab.common.bytecode.provider.ByteCodeProviderManagerBase;
 import xyz.srclab.common.invoke.ConstructorInvoker;
-import xyz.srclab.common.invoke.InvokerProvider;
+import xyz.srclab.common.invoke.provider.InvokerProvider;
 import xyz.srclab.common.invoke.MethodInvoker;
 
 import java.lang.reflect.Constructor;

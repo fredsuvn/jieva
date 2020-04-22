@@ -4,7 +4,6 @@ import xyz.srclab.annotation.WrittenReturn;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.collection.iterable.IterableHelper;
-import xyz.srclab.common.lang.key.Key;
 import xyz.srclab.common.reflect.type.TypeHelper;
 import xyz.srclab.common.reflect.type.TypeRef;
 
@@ -15,9 +14,9 @@ import java.util.Collection;
 
 public class ArrayHelper {
 
-    private static final ThreadLocalCache<Key, Class<?>> arrayTypeCache = new ThreadLocalCache<>();
+    private static final ThreadLocalCache<Type, Class<?>> arrayTypeCache = new ThreadLocalCache<>();
 
-    private static final ThreadLocalCache<Key, Type> genericComponentTypeCache = new ThreadLocalCache<>();
+    private static final ThreadLocalCache<Type, Type> componentTypeCache = new ThreadLocalCache<>();
 
     public static <T> T[] toArray(Iterable<T> iterable, Type componentType) {
         Collection<T> collection = IterableHelper.asCollection(iterable);
@@ -174,7 +173,7 @@ public class ArrayHelper {
 
     public static Class<?> findArrayType(Class<?> elementType) {
         return arrayTypeCache.getNonNull(
-                Key.from(elementType, "findArrayType"),
+                elementType,
                 o -> findArrayType0(elementType)
         );
     }
@@ -184,8 +183,8 @@ public class ArrayHelper {
     }
 
     public static Type getGenericComponentType(Type type) {
-        return genericComponentTypeCache.getNonNull(
-                Key.from(type, "getGenericComponentType"),
+        return componentTypeCache.getNonNull(
+                type,
                 o -> getGenericComponentType0(type)
         );
     }

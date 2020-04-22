@@ -1,7 +1,9 @@
-package xyz.srclab.common.bean;
+package xyz.srclab.common.bean.provider.defaults;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.bean.BeanConverterHandler;
+import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.list.ListHelper;
 import xyz.srclab.common.collection.map.MapHelper;
@@ -19,7 +21,9 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
-public class DefaultBeanConverterHandler implements BeanConverterHandler {
+final class DefaultBeanConverterHandler implements BeanConverterHandler {
+
+    static DefaultBeanConverterHandler INSTANCE = new DefaultBeanConverterHandler();
 
     @Override
     public boolean supportConvert(Object from, Type to, BeanOperator beanOperator) {

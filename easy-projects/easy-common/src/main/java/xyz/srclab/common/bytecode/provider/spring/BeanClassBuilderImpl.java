@@ -19,7 +19,7 @@ final class BeanClassBuilderImpl<T>
 
     @Override
     public BeanClass.Builder<T> addProperty(String name, Class<?> type) {
-        commitChanges();
+        updateState();
         beanGenerator.addProperty(name, type);
         return this;
     }

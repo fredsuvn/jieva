@@ -1,12 +1,15 @@
 package xyz.srclab.common.invoke;
 
+import xyz.srclab.common.invoke.provider.InvokerProvider;
+import xyz.srclab.common.invoke.provider.InvokerProviderManager;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 class InvokerSupport {
 
     private static final InvokerProvider invokerProvider =
-            InvokerProviderManagerBase.INSTANCE.getProvider();
+            InvokerProviderManager.INSTANCE.getProvider();
 
     static <T> ConstructorInvoker<T> getConstructorInvoker(Constructor<T> constructor) {
         return invokerProvider.getConstructorInvoker(constructor);

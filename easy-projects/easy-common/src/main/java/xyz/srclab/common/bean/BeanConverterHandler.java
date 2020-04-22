@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 @Immutable
 public interface BeanConverterHandler {
 
-    BeanConverterHandler DEFAULT = new DefaultBeanConverterHandler();
+    BeanConverterHandler DEFAULT = BeanSupport.getBeanConverterHandler();
 
     boolean supportConvert(Object from, Type to, BeanOperator beanOperator);
 

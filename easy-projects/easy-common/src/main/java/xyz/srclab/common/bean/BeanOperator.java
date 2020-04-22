@@ -2,11 +2,11 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
-import xyz.srclab.common.reflect.type.TypeRef;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.SignatureHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
+import xyz.srclab.common.reflect.type.TypeRef;
 
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
 @Immutable
 public interface BeanOperator {
 
-    BeanOperator DEFAULT = new DefaultBeanOperator();
+    BeanOperator DEFAULT = BeanSupport.getBeanOperator();
 
     static Builder newBuilder() {
         return new Builder();
@@ -25,12 +25,12 @@ public interface BeanOperator {
 
     BeanConverter getBeanConverter();
 
-    default BeanStruct resolve(Class<?> beanClass) {
+    default BeanStruct resolveBean(Class<?> beanClass) {
         return getBeanResolver().resolve(beanClass);
     }
 
     default BeanProperty getProperty(Object bean, String propertyName) throws BeanPropertyNotFoundException {
-        BeanStruct beanStruct = resolve(bean.getClass());
+        BeanStruct beanStruct = resolveBean(bean.getClass());
         @Nullable BeanProperty beanProperty = beanStruct.getProperty(propertyName);
         if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
@@ -91,7 +91,7 @@ public interface BeanOperator {
             });
         } else if (source instanceof Map) {
             Map src = (Map) source;
-            BeanStruct destBean = resolve(dest.getClass());
+            BeanStruct destBean = resolveBean(dest.getClass());
             src.forEach((k, v) -> {
                 String propertyName = String.valueOf(k);
                 if (!destBean.canWriteProperty(propertyName)) {
@@ -107,7 +107,7 @@ public interface BeanOperator {
                 );
             });
         } else if (dest instanceof Map) {
-            BeanStruct sourceBean = resolve(source.getClass());
+            BeanStruct sourceBean = resolveBean(source.getClass());
             Map des = (Map) dest;
             sourceBean.getReadableProperties().forEach((name, property) -> {
                 @Nullable Object sourceValue = property.getValue(source);
@@ -115,8 +115,8 @@ public interface BeanOperator {
                         name, sourceValue, Object.class, value -> des.put(name, value), this);
             });
         } else {
-            BeanStruct sourceBean = resolve(source.getClass());
-            BeanStruct destBean = resolve(dest.getClass());
+            BeanStruct sourceBean = resolveBean(source.getClass());
+            BeanStruct destBean = resolveBean(dest.getClass());
             sourceBean.getReadableProperties().forEach((name, sourceProperty) -> {
                 if (!destBean.canWriteProperty(name)) {
                     return;
@@ -160,7 +160,7 @@ public interface BeanOperator {
                 eachEntry.apply(k, v, dest::put, this);
             });
         } else {
-            BeanStruct sourceBean = resolve(source.getClass());
+            BeanStruct sourceBean = resolveBean(source.getClass());
             sourceBean.getReadableProperties().forEach((name, property) -> {
                 @Nullable Object sourceValue = property.getValue(source);
                 eachEntry.apply(name, sourceValue, dest::put, this);
@@ -189,7 +189,7 @@ public interface BeanOperator {
     @Immutable
     default Map<String, Object> toMap(Object bean) {
         Map<String, Object> result = new LinkedHashMap<>();
-        resolve(bean.getClass()).getReadableProperties().forEach((name, property) -> {
+        resolveBean(bean.getClass()).getReadableProperties().forEach((name, property) -> {
             @Nullable Object value = property.getValue(bean);
             result.put(name, value);
         });
@@ -198,7 +198,7 @@ public interface BeanOperator {
 
     default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
             throws BeanMethodNotFoundException {
-        @Nullable BeanMethod beanMethod = resolve(bean.getClass()).getMethod(methodName, parameterTypes);
+        @Nullable BeanMethod beanMethod = resolveBean(bean.getClass()).getMethod(methodName, parameterTypes);
         if (beanMethod == null) {
             throw new BeanMethodNotFoundException(SignatureHelper.signMethod(methodName, parameterTypes));
         }
@@ -207,82 +207,11 @@ public interface BeanOperator {
 
     default BeanMethod getMethodBySignature(Object bean, String methodSignature)
             throws BeanMethodNotFoundException {
-        @Nullable BeanMethod beanMethod = resolve(bean.getClass()).getMethodBySignature(methodSignature);
+        @Nullable BeanMethod beanMethod = resolveBean(bean.getClass()).getMethodBySignature(methodSignature);
         if (beanMethod == null) {
             throw new BeanMethodNotFoundException(methodSignature);
         }
         return beanMethod;
-    }
-
-    class Builder extends CachedBuilder<BeanOperator> {
-
-        private @Nullable BeanResolver beanResolver;
-        private @Nullable BeanConverter beanConverter;
-
-        public Builder setBeanResolver(BeanResolver beanResolver) {
-            this.commitChanges();
-            this.beanResolver = beanResolver;
-            return this;
-        }
-
-        public Builder setBeanConverter(BeanConverter beanConverter) {
-            this.commitChanges();
-            this.beanConverter = beanConverter;
-            return this;
-        }
-
-        @Override
-        public BeanOperator build() {
-            return super.build();
-        }
-
-        @Override
-        protected BeanOperator buildNew() {
-            return new BeanOperatorImpl(this);
-        }
-
-        private static final class BeanOperatorImpl implements BeanOperator {
-
-            private final BeanResolver beanResolver;
-            private final BeanConverter beanConverter;
-
-            private BeanOperatorImpl(Builder builder) {
-                this.beanResolver = builder.beanResolver == null ?
-                        BeanResolver.DEFAULT : builder.beanResolver;
-                this.beanConverter = builder.beanConverter == null ?
-                        BeanConverter.DEFAULT : builder.beanConverter;
-            }
-
-            @Override
-            public BeanResolver getBeanResolver() {
-                return beanResolver;
-            }
-
-            @Override
-            public BeanConverter getBeanConverter() {
-                return beanConverter;
-            }
-
-            // No use
-            //private class BeanConverterProxy implements BeanConverter {
-            //
-            //    private final BeanConverter proxied;
-            //
-            //    private BeanConverterProxy(BeanConverter proxied) {
-            //        this.proxied = proxied;
-            //    }
-            //
-            //    @Override
-            //    public Object convert(Object from, Type to) {
-            //        return proxied.convert(from, to, BeanOperatorImpl.this);
-            //    }
-            //
-            //    @Override
-            //    public Object convert(Object from, Type to, BeanOperator beanOperator) {
-            //        return proxied.convert(from, to, beanOperator);
-            //    }
-            //}
-        }
     }
 
     interface EachProperty {
@@ -326,5 +255,51 @@ public interface BeanOperator {
 
     interface KeyValueSetter<K, V> {
         void set(K key, @Nullable V value);
+    }
+
+    final class Builder extends CachedBuilder<BeanOperator> {
+
+        private @Nullable BeanResolver beanResolver;
+        private @Nullable BeanConverter beanConverter;
+
+        public Builder setBeanResolver(BeanResolver beanResolver) {
+            this.beanResolver = beanResolver;
+            this.updateState();
+            return this;
+        }
+
+        public Builder setBeanConverter(BeanConverter beanConverter) {
+            this.beanConverter = beanConverter;
+            this.updateState();
+            return this;
+        }
+
+        @Override
+        protected BeanOperator buildNew() {
+            return new BeanOperatorImpl(this);
+        }
+
+        private static final class BeanOperatorImpl implements BeanOperator {
+
+            private final BeanResolver beanResolver;
+            private final BeanConverter beanConverter;
+
+            private BeanOperatorImpl(Builder builder) {
+                this.beanResolver = builder.beanResolver == null ?
+                        BeanResolver.DEFAULT : builder.beanResolver;
+                this.beanConverter = builder.beanConverter == null ?
+                        BeanConverter.DEFAULT : builder.beanConverter;
+            }
+
+            @Override
+            public BeanResolver getBeanResolver() {
+                return beanResolver;
+            }
+
+            @Override
+            public BeanConverter getBeanConverter() {
+                return beanConverter;
+            }
+        }
     }
 }

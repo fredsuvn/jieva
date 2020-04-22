@@ -27,7 +27,7 @@ object EnhancedTest {
         val instance = proxyClass.newInstance()
         doAssertEquals(instance.hello(), "proxy: world")
         doAssertEquals(
-            BeanHelper.resolve(instance.javaClass).getMethod("bb").invoke(instance), "proxy: bb"
+            BeanHelper.resolveBean(instance.javaClass).getMethod("bb").invoke(instance), "proxy: bb"
         )
     }
 
@@ -49,11 +49,11 @@ object EnhancedTest {
             .build()
         val instance = proxyClass.newInstance()
         doAssertEquals(
-            BeanHelper.resolve(instance.javaClass).getMethod("hello").invoke(instance),
+            BeanHelper.resolveBean(instance.javaClass).getMethod("hello").invoke(instance),
             "proxy: world"
         )
         doAssertEquals(
-            BeanHelper.resolve(instance.javaClass).getMethod("bb").invoke(instance),
+            BeanHelper.resolveBean(instance.javaClass).getMethod("bb").invoke(instance),
             "proxy: bb"
         )
     }

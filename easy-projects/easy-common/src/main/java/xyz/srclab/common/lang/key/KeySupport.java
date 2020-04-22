@@ -7,7 +7,7 @@ import java.lang.reflect.Array;
 import java.util.LinkedList;
 import java.util.List;
 
-public class KeySupport {
+final class KeySupport {
 
     static Key buildCacheKey(Object... keyComponents) {
         return new KeyImpl(keyComponents);
@@ -16,9 +16,13 @@ public class KeySupport {
     private static final class KeyImpl implements Key {
 
         private final List<Object> keyComponents;
+        private final int hashCode;
+        private final String toString;
 
         private KeyImpl(Object... keyComponents) {
             this.keyComponents = buildKeyComponents(keyComponents);
+            this.hashCode = this.keyComponents.hashCode();
+            this.toString = this.keyComponents.toString();
         }
 
         private List<Object> buildKeyComponents(Object... keyComponents) {
@@ -46,7 +50,8 @@ public class KeySupport {
         }
 
         private void resolveArrayAndPush(Object array, List<Object> container) {
-            for (int i = 0; i < Array.getLength(array); i++) {
+            int length = Array.getLength(array);
+            for (int i = 0; i < length; i++) {
                 Object element = Array.get(array, i);
                 if (element.getClass().isArray()) {
                     resolveArrayAndPush(element, container);
@@ -70,7 +75,7 @@ public class KeySupport {
 
         @Override
         public int hashCode() {
-            return keyComponents.hashCode();
+            return hashCode;
         }
 
         @Override
@@ -80,7 +85,7 @@ public class KeySupport {
 
         @Override
         public String toString() {
-            return keyComponents.toString();
+            return toString;
         }
     }
 }

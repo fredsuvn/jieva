@@ -20,7 +20,7 @@ object TypeHelperTest {
         doAssertEquals(TypeHelper.getRawClass(A::class.java.typeParameters[0]), Throwable::class.java)
         doAssertEquals(TypeHelper.getRawClass(A2::class.java.typeParameters[0]), List::class.java)
         doAssertEquals(
-            TypeHelper.getRawClass(BeanHelper.resolve(B::class.java).getProperty("array")?.genericType),
+            TypeHelper.getRawClass(BeanHelper.resolveBean(B::class.java).getProperty("array")?.genericType),
             Any::class.java
         )
     }

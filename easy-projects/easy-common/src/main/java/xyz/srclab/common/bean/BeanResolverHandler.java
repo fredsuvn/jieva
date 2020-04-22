@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Immutable;
 @Immutable
 public interface BeanResolverHandler {
 
-    BeanResolverHandler DEFAULT = new DefaultBeanResolverHandler();
+    BeanResolverHandler DEFAULT = BeanSupport.getBeanResolverHandler();
 
     boolean supportBean(Class<?> beanClass);
 

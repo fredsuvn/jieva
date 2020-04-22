@@ -1,8 +1,11 @@
 package xyz.srclab.common.reflect.instance;
 
-import xyz.srclab.common.lang.key.Key;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
+import xyz.srclab.common.environment.ClassPathHelper;
 import xyz.srclab.common.invoke.InvokerHelper;
+import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.Constructor;
 
@@ -10,6 +13,12 @@ public class InstanceHelper {
 
     private static final ThreadLocalCache<Key, Constructor<?>> constructorCache =
             new ThreadLocalCache<>();
+
+    public static <T> T newInstance(String className) {
+        @Nullable Class<T> cls = ClassPathHelper.getClass(className);
+        Checker.checkArguments(cls != null, "Class not found: " + className);
+        return newInstance(cls);
+    }
 
     public static <T> T newInstance(Class<?> cls) {
         Constructor<?> constructor = constructorCache.getNonNull(

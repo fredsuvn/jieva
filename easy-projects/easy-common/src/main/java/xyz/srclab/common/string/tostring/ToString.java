@@ -110,7 +110,7 @@ public class ToString implements Computed<String> {
 
     private void buildBeanToString(Object bean, StringBuilder buffer, ToStringContext context) {
         writeBeanStart(buffer);
-        BeanStruct beanStruct = beanOperator.resolve(bean.getClass());
+        BeanStruct beanStruct = beanOperator.resolveBean(bean.getClass());
         context.pushParent(bean);
         context.pushIndent();
         int[] count = {0};

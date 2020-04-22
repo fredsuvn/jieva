@@ -16,13 +16,4 @@ public interface FunctionInvoker {
 
     @Nullable
     Object invoke(Object... args);
-
-    default MethodInvoker asMethodInvoker() {
-        return new MethodInvoker() {
-            @Override
-            public @Nullable Object invoke(@Nullable Object object, Object... args) {
-                return FunctionInvoker.this.invoke(args);
-            }
-        };
-    }
 }

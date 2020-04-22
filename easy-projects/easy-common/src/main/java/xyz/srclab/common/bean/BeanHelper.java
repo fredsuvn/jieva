@@ -11,8 +11,8 @@ public class BeanHelper {
 
     private static final BeanOperator beanOperator = BeanOperator.DEFAULT;
 
-    public static BeanStruct resolve(Class<?> beanClass) {
-        return beanOperator.resolve(beanClass);
+    public static BeanStruct resolveBean(Class<?> beanClass) {
+        return beanOperator.resolveBean(beanClass);
     }
 
     public static BeanProperty getProperty(Object bean, String propertyName) throws BeanPropertyNotFoundException {

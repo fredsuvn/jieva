@@ -6,7 +6,7 @@ import xyz.srclab.common.pattern.builder.HandlersBuilder;
 @Immutable
 public interface BeanResolver {
 
-    BeanResolver DEFAULT = new DefaultBeanResolver();
+    BeanResolver DEFAULT = BeanSupport.getBeanResolver();
 
     static Builder newBuilder() {
         return new Builder();
@@ -14,12 +14,7 @@ public interface BeanResolver {
 
     BeanStruct resolve(Class<?> beanClass);
 
-    class Builder extends HandlersBuilder<BeanResolver, BeanResolverHandler, Builder> {
-
-        @Override
-        public BeanResolver build() {
-            return super.build();
-        }
+    final class Builder extends HandlersBuilder<BeanResolver, BeanResolverHandler, Builder> {
 
         @Override
         protected BeanResolver buildNew() {

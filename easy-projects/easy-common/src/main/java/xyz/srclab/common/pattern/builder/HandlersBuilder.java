@@ -10,7 +10,7 @@ public abstract class HandlersBuilder<Product, Handler, Builder
 
     public Builder addHandler(Handler handler) {
         handlers.addFirst(handler);
-        this.commitChanges();
+        this.updateState();
         return (Builder) this;
     }
 
@@ -22,7 +22,7 @@ public abstract class HandlersBuilder<Product, Handler, Builder
         for (Handler handler : handlers) {
             this.handlers.addFirst(handler);
         }
-        this.commitChanges();
+        this.updateState();
         return (Builder) this;
     }
 }

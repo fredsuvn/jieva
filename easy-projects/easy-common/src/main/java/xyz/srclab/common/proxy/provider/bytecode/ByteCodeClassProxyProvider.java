@@ -37,7 +37,7 @@ public class ByteCodeClassProxyProvider implements ClassProxyProvider {
 
         @Override
         public ClassProxy.Builder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod) {
-            this.commitChanges();
+            this.updateState();
             predicatePairs.add(Pair.of(methodPredicate, proxyMethod));
             return this;
         }

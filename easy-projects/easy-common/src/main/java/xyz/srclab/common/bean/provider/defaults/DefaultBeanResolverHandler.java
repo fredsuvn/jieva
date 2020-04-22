@@ -1,12 +1,15 @@
-package xyz.srclab.common.bean;
+package xyz.srclab.common.bean.provider.defaults;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.bean.BeanMethod;
+import xyz.srclab.common.bean.BeanProperty;
+import xyz.srclab.common.bean.BeanResolverHandler;
+import xyz.srclab.common.bean.BeanStruct;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.exception.ExceptionWrapper;
-import xyz.srclab.common.reflect.SignatureHelper;
-import xyz.srclab.common.invoke.InvokerHelper;
 import xyz.srclab.common.invoke.MethodInvoker;
+import xyz.srclab.common.reflect.SignatureHelper;
 
 import java.beans.*;
 import java.lang.reflect.Method;
@@ -14,7 +17,9 @@ import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class DefaultBeanResolverHandler implements BeanResolverHandler {
+final class DefaultBeanResolverHandler implements BeanResolverHandler {
+
+    static DefaultBeanResolverHandler INSTANCE = new DefaultBeanResolverHandler();
 
     private static final Cache<Class<?>, BeanStruct> CACHE = new ThreadLocalCache<>();
 
@@ -82,8 +87,8 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
                     writeMethod.getGenericParameterTypes()[0]
                     :
                     readMethod.getGenericReturnType();
-            this.getter = readMethod == null ? null : InvokerHelper.getMethodInvoker(readMethod);
-            this.setter = writeMethod == null ? null : InvokerHelper.getMethodInvoker(writeMethod);
+            this.getter = readMethod == null ? null : MethodInvoker.of(readMethod);
+            this.setter = writeMethod == null ? null : MethodInvoker.of(writeMethod);
         }
 
         @Override
@@ -167,7 +172,7 @@ public class DefaultBeanResolverHandler implements BeanResolverHandler {
         private BeanMethodImpl(Method method) {
             this.method = method;
             this.signature = SignatureHelper.signMethod(this.method);
-            this.methodInvoker = InvokerHelper.getMethodInvoker(this.method);
+            this.methodInvoker = MethodInvoker.of(this.method);
         }
 
         @Override

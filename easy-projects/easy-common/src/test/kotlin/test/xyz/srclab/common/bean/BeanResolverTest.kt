@@ -13,7 +13,7 @@ object BeanResolverTest {
     @Test
     fun testResolve() {
         val a = A()
-        val beanClass = BeanHelper.resolve(A::class.java)
+        val beanClass = BeanHelper.resolveBean(A::class.java)
 
         val publicField = beanClass.getProperty("publicField")
         doAssertEquals(publicField, null)

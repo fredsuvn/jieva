@@ -52,55 +52,55 @@ public interface ToStringStyle {
         private boolean ignoreReferenceLoop = false;
 
         public Builder setBeanStart(String beanStart) {
-            this.commitChanges();
+            this.updateState();
             this.beanStart = beanStart;
             return this;
         }
 
         public Builder setBeanEnd(String beanEnd) {
-            this.commitChanges();
+            this.updateState();
             this.beanEnd = beanEnd;
             return this;
         }
 
         public Builder setListStart(String listStart) {
-            this.commitChanges();
+            this.updateState();
             this.listStart = listStart;
             return this;
         }
 
         public Builder setListEnd(String listEnd) {
-            this.commitChanges();
+            this.updateState();
             this.listEnd = listEnd;
             return this;
         }
 
         public Builder setWrapping(String wrapping) {
-            this.commitChanges();
+            this.updateState();
             this.wrapping = wrapping;
             return this;
         }
 
         public Builder setIndent(String indent) {
-            this.commitChanges();
+            this.updateState();
             this.indent = indent;
             return this;
         }
 
         public Builder setSeparator(String separator) {
-            this.commitChanges();
+            this.updateState();
             this.separator = separator;
             return this;
         }
 
         public Builder setIndicator(String indicator) {
-            this.commitChanges();
+            this.updateState();
             this.indicator = indicator;
             return this;
         }
 
         public Builder setIgnoreReferenceLoop(boolean ignoreReferenceLoop) {
-            this.commitChanges();
+            this.updateState();
             this.ignoreReferenceLoop = ignoreReferenceLoop;
             return this;
         }

@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 @Immutable
 public interface BeanConverter {
 
-    BeanConverter DEFAULT = new DefaultBeanConverter();
+    BeanConverter DEFAULT = BeanSupport.getBeanConverter();
 
     static Builder newBuilder() {
         return new Builder();
@@ -37,19 +37,14 @@ public interface BeanConverter {
         return (T) convert(from, to.getType(), beanOperator);
     }
 
-    class Builder extends HandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
+    final class Builder extends HandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
 
         private @Nullable BeanOperator beanOperator;
 
         public Builder setBeanOperator(BeanOperator beanOperator) {
-            this.commitChanges();
             this.beanOperator = beanOperator;
+            this.updateState();
             return this;
-        }
-
-        @Override
-        public BeanConverter build() {
-            return super.build();
         }
 
         protected BeanConverter buildNew() {

@@ -328,7 +328,7 @@ object BeanOperatorTest {
                     .build()
             )
             .build()
-        val emptyBeanClass = emptyBeanOperator.resolve(Object::class.java);
+        val emptyBeanClass = emptyBeanOperator.resolveBean(Object::class.java);
         doAssertEquals(emptyBeanClass.type, Object::class.java)
     }
 
