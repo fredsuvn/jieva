@@ -12,8 +12,12 @@ public class EasyBoot {
     @Immutable
     private static final Map<String, String> providerProperties;
 
+    @Immutable
+    private static final Map<String, String> defaultsProperties;
+
     static {
         providerProperties = loadProviderProperties();
+        defaultsProperties = loadDefaultsProperties();
     }
 
     @Immutable
@@ -23,9 +27,24 @@ public class EasyBoot {
 
     @Immutable
     private static Map<String, String> loadProviderProperties() {
+        return loadProperties("/META-INF/providers.properties");
+    }
+
+    @Immutable
+    public static Map<String, String> getDefaultsProperties() {
+        return defaultsProperties;
+    }
+
+    @Immutable
+    private static Map<String, String> loadDefaultsProperties() {
+        return loadProperties("/META-INF/defaults.properties");
+    }
+
+    @Immutable
+    private static Map<String, String> loadProperties(String resourcePath) {
         Properties properties = new Properties();
         try {
-            properties.load(EasyBoot.class.getResourceAsStream("/META-INF/providers.properties"));
+            properties.load(EasyBoot.class.getResourceAsStream(resourcePath));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
