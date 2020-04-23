@@ -1,5 +1,6 @@
-package xyz.srclab.common.reflect;
+package xyz.srclab.common.reflect.signature;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 public class SignatureHelper {
@@ -56,28 +57,41 @@ public class SignatureHelper {
         return "[" + signClass(arrayClass.getComponentType());
     }
 
+    public static String signConstructor(Constructor<?> constructor) {
+        return signConstructor(constructor.getDeclaringClass(), constructor.getParameterTypes());
+    }
+
+    public static String signConstructor(Class<?> cls, Class<?>... parameterTypes) {
+        return cls.getName() +
+                "(" +
+                signClassArray(parameterTypes) +
+                ")";
+    }
+
     public static String signMethod(Method method) {
         return signMethod(method.getName(), method.getParameterTypes());
     }
 
-    public static String signMethod(String methodName, Class<?>[] parameterTypes) {
-        StringBuilder buf = new StringBuilder();
-        buf.append(methodName);
-        buf.append("(");
-        switch (parameterTypes.length) {
+    public static String signMethod(String methodName, Class<?>... parameterTypes) {
+        return methodName +
+                "(" +
+                signClassArray(parameterTypes) +
+                ")";
+    }
+
+    private static String signClassArray(Class<?>... classes) {
+        switch (classes.length) {
             case 0:
-                buf.append(")");
-                return buf.toString();
+                return "";
             case 1:
-                buf.append(parameterTypes[0].getName());
-                buf.append(")");
-                return buf.toString();
+                return classes[0].getName();
             default:
-                for (Class<?> parameterType : parameterTypes) {
-                    buf.append(parameterType.getName());
+                StringBuilder buf = new StringBuilder();
+                for (Class<?> cls : classes) {
+                    buf.append(cls.getName());
                     buf.append(",");
                 }
-                buf.replace(buf.length() - 1, buf.length(), ")");
+                buf.delete(buf.length() - 1, buf.length());
                 return buf.toString();
         }
     }

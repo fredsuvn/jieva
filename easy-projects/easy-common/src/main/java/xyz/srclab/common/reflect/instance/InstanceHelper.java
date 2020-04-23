@@ -1,11 +1,11 @@
 package xyz.srclab.common.reflect.instance;
 
-import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.environment.ClassPathHelper;
 import xyz.srclab.common.invoke.InvokerHelper;
+import xyz.srclab.common.reflect.signature.SignatureHelper;
 
 import java.lang.reflect.Constructor;
 
@@ -22,7 +22,7 @@ public class InstanceHelper {
 
     public static <T> T newInstance(Class<?> cls) {
         Constructor<?> constructor = constructorCache.getNonNull(
-                generateConstructorCacheKey(cls),
+                SignatureHelper.signConstructor(cls),
                 k -> {
                     try {
                         return cls.getConstructor();
@@ -35,7 +35,7 @@ public class InstanceHelper {
 
     public static <T> Constructor<T> getConstructor(Class<T> cls, Class<?>... parameterTypes) {
         Constructor<?> constructor = constructorCache.getNonNull(
-                generateConstructorCacheKey(cls, parameterTypes),
+                SignatureHelper.signConstructor(cls, parameterTypes),
                 k -> getConstructor0(cls, parameterTypes)
         );
         return (Constructor<T>) constructor;
@@ -47,11 +47,5 @@ public class InstanceHelper {
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    private static String generateConstructorCacheKey(Class<?> cls, Class<?>... parameterTypes) {
-        return cls.toString() + "("
-                + StringUtils.join(parameterTypes, ',')
-                + ")";
     }
 }

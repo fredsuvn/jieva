@@ -1,11 +1,11 @@
 package xyz.srclab.common.reflect.method;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.collection.list.ListHelper;
+import xyz.srclab.common.reflect.signature.SignatureHelper;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -112,7 +112,7 @@ public class MethodHelper {
     }
 
     private static String generateMethodCacheKey(Class<?> cls, String methodName, Class<?>... parameterTypes) {
-        return cls + methodName + "(" + StringUtils.join(parameterTypes, ',') + ")";
+        return cls + "." + SignatureHelper.signMethod(methodName, parameterTypes);
     }
 
     private static String generateMethodsCacheKey(Class<?> cls, String scope) {
