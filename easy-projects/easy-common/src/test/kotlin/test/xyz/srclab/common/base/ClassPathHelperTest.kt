@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.base
 
 import org.testng.annotations.Test
-import xyz.srclab.common.environment.ClassPathHelper
+import xyz.srclab.common.reflect.classpath.ClassPathHelper
 import xyz.srclab.test.doAssertEquals
 
 object ClassPathHelperTest {

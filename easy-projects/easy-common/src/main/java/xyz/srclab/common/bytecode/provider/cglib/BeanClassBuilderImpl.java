@@ -1,8 +1,8 @@
 package xyz.srclab.common.bytecode.provider.cglib;
 
 import net.sf.cglib.beans.BeanGenerator;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.bytecode.BeanClass;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 
 /**
  * @author sunqian
@@ -20,7 +20,7 @@ final class BeanClassBuilderImpl<T>
     @Override
     public BeanClass.Builder<T> addProperty(String name, Class<?> type) {
         updateState();
-        beanGenerator.addProperty(name, type);
+        addProperty(name, type);
         return this;
     }
 

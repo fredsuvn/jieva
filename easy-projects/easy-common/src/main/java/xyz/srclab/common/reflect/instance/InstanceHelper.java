@@ -3,7 +3,7 @@ package xyz.srclab.common.reflect.instance;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
-import xyz.srclab.common.environment.ClassPathHelper;
+import xyz.srclab.common.reflect.classpath.ClassPathHelper;
 import xyz.srclab.common.invoke.InvokerHelper;
 import xyz.srclab.common.reflect.signature.SignatureHelper;
 

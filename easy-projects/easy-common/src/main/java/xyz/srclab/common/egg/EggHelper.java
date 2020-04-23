@@ -1,7 +1,7 @@
 package xyz.srclab.common.egg;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.environment.ClassPathHelper;
+import xyz.srclab.common.reflect.classpath.ClassPathHelper;
 import xyz.srclab.common.reflect.method.MethodHelper;
 
 import java.lang.reflect.Constructor;

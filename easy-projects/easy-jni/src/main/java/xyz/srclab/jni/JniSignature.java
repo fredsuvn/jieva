@@ -1,6 +1,6 @@
 package xyz.srclab.jni;
 
-import xyz.srclab.common.reflect.SignatureHelper;
+import xyz.srclab.common.reflect.signature.SignatureHelper;
 
 import java.lang.reflect.Method;
 

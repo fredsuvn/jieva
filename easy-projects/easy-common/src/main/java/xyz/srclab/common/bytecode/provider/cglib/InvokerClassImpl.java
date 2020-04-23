@@ -9,7 +9,7 @@ import xyz.srclab.common.bytecode.InvokerClass;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.exception.ExceptionWrapper;
-import xyz.srclab.common.reflect.SignatureHelper;
+import xyz.srclab.common.reflect.signature.SignatureHelper;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.invoke.MethodInvoker;
 

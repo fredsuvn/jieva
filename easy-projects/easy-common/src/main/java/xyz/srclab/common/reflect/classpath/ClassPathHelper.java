@@ -1,4 +1,4 @@
-package xyz.srclab.common.environment;
+package xyz.srclab.common.reflect.classpath;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;

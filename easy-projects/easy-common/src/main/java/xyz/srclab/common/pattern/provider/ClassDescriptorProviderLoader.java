@@ -3,7 +3,7 @@ package xyz.srclab.common.pattern.provider;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.collection.list.ListHelper;
-import xyz.srclab.common.environment.ClassPathHelper;
+import xyz.srclab.common.reflect.classpath.ClassPathHelper;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 

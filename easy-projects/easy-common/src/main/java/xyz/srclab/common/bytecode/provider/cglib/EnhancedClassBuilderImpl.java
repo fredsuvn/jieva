@@ -7,7 +7,7 @@ import xyz.srclab.common.lang.count.Counter;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.bytecode.EnhancedClass;
 import xyz.srclab.common.exception.ExceptionWrapper;
-import xyz.srclab.common.reflect.SignatureHelper;
+import xyz.srclab.common.reflect.signature.SignatureHelper;
 import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.method.ProxyMethod;
 

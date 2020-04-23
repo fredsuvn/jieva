@@ -1,7 +1,7 @@
 package xyz.srclab.common.bytecode.provider;
 
 import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.common.environment.ClassPathHelper;
+import xyz.srclab.common.reflect.classpath.ClassPathHelper;
 import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProvider;
 import xyz.srclab.common.bytecode.provider.spring.SpringByteCodeProvider;
 import xyz.srclab.common.pattern.provider.AbstractProviderManager;
