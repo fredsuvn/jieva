@@ -1,17 +1,17 @@
 package xyz.srclab.common.reflect.instance;
 
+import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.environment.ClassPathHelper;
 import xyz.srclab.common.invoke.InvokerHelper;
-import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.Constructor;
 
 public class InstanceHelper {
 
-    private static final ThreadLocalCache<Key, Constructor<?>> constructorCache =
+    private static final ThreadLocalCache<String, Constructor<?>> constructorCache =
             new ThreadLocalCache<>();
 
     public static <T> T newInstance(String className) {
@@ -22,7 +22,7 @@ public class InstanceHelper {
 
     public static <T> T newInstance(Class<?> cls) {
         Constructor<?> constructor = constructorCache.getNonNull(
-                Key.from(cls),
+                generateConstructorCacheKey(cls),
                 k -> {
                     try {
                         return cls.getConstructor();
@@ -35,7 +35,7 @@ public class InstanceHelper {
 
     public static <T> Constructor<T> getConstructor(Class<T> cls, Class<?>... parameterTypes) {
         Constructor<?> constructor = constructorCache.getNonNull(
-                Key.from(cls, parameterTypes),
+                generateConstructorCacheKey(cls, parameterTypes),
                 k -> getConstructor0(cls, parameterTypes)
         );
         return (Constructor<T>) constructor;
@@ -47,5 +47,11 @@ public class InstanceHelper {
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    private static String generateConstructorCacheKey(Class<?> cls, Class<?>... parameterTypes) {
+        return cls.toString() + "("
+                + StringUtils.join(parameterTypes, ',')
+                + ")";
     }
 }

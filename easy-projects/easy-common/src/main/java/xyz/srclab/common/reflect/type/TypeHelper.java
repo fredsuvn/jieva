@@ -2,30 +2,22 @@ package xyz.srclab.common.reflect.type;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Nullable;
-import xyz.srclab.annotation.Immutable;
+import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
-import xyz.srclab.common.collection.list.ListHelper;
-import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.time.temporal.Temporal;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public class TypeHelper {
 
     private static final Cache<Type, Class<?>> rawTypeCache = new ThreadLocalCache<>();
 
-    private static final Cache<Key, Type> typeCache = new ThreadLocalCache<>();
-
-    private static final Cache<Key, List<Type>> typesCache = new ThreadLocalCache<>();
-
-    private static final Cache<Key, List<TypeVariable<?>>> typeVariablesCache = new ThreadLocalCache<>();
+    private static final Cache<String, Type> genericSuperClassCache = new ThreadLocalCache<>();
 
     public static boolean isBasic(Object any) {
         return any instanceof CharSequence
@@ -76,8 +68,9 @@ public class TypeHelper {
 
     @Nullable
     public static Type getGenericSuperclass(Class<?> cls, Class<?> target) {
-        Type returned = typeCache.getNonNull(
-                Key.from(cls, target, "getGenericSuperclass"),
+        Checker.checkArguments(target.isAssignableFrom(cls), target + "is not parent of " + cls);
+        Type returned = genericSuperClassCache.getNonNull(
+                getGenericSuperclassCacheKey(cls, target),
                 k -> getGenericSuperclass0(cls, target)
         );
         return returned == NullType.INSTANCE ? null : returned;
@@ -95,28 +88,8 @@ public class TypeHelper {
         return NullType.INSTANCE;
     }
 
-    @Immutable
-    public static List<Type> getGenericTypes(ParameterizedType parameterizedType) {
-        return typesCache.getNonNull(
-                Key.from(parameterizedType, "getGenericTypes"),
-                k -> ListHelper.immutable(Arrays.asList(getGenericTypes0(parameterizedType)))
-        );
-    }
-
-    private static Type[] getGenericTypes0(ParameterizedType parameterizedType) {
-        return parameterizedType.getActualTypeArguments();
-    }
-
-    @Immutable
-    public static List<TypeVariable<?>> getTypeParameters(Class<?> cls) {
-        return typeVariablesCache.getNonNull(
-                Key.from(cls, "getTypeParameters"),
-                k -> ListHelper.immutable(Arrays.asList(getTypeParameters0(cls)))
-        );
-    }
-
-    private static TypeVariable<?>[] getTypeParameters0(Class<?> cls) {
-        return cls.getTypeParameters();
+    private static String getGenericSuperclassCacheKey(Class<?> cls, Class<?> superClass) {
+        return cls + " -> " + superClass;
     }
 
     private static final class NullType implements Type {
