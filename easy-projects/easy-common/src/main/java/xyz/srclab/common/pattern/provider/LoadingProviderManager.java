@@ -7,8 +7,8 @@ import java.util.Map;
  */
 public class LoadingProviderManager<T> extends AbstractProviderManager<T> {
 
-    public LoadingProviderManager(String classNamesDescriptor) {
-        Map<String, Object> providerMap = ProviderLoader.loadFromClassNames(classNamesDescriptor).getProviders();
+    public LoadingProviderManager(String classesDescriptor) {
+        Map<String, Object> providerMap = ProviderLoader.loadFromClassNames(classesDescriptor).getProviders();
         providerMap.forEach((k, v) -> registerProvider(k, (T) v));
         String defaultProviderName = providerMap.keySet().stream().findFirst().orElseThrow(() ->
                 new IllegalArgumentException("No default provider found")

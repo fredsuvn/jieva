@@ -10,8 +10,8 @@ import java.util.Map;
  */
 public interface ProviderLoader<T> {
 
-    static <T> ProviderLoader<T> loadFromClassNames(String classNamesDescriptor) {
-        return new ClassNamesProviderLoader<>(classNamesDescriptor);
+    static <T> ProviderLoader<T> loadFromClassNames(String classesDescriptor) {
+        return new ClassDescriptorProviderLoader<>(classesDescriptor);
     }
 
     T getProvider();
