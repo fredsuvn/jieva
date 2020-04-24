@@ -1,10 +1,10 @@
 package test.xyz.srclab.common.proxy
 
 import org.testng.annotations.Test
-import xyz.srclab.common.proxy.ClassProxy
-import xyz.srclab.common.proxy.provider.ClassProxyProvider
-import xyz.srclab.common.proxy.provider.bytecode.ByteCodeClassProxyProvider
-import xyz.srclab.common.proxy.provider.jdk.JdkClassProxyProvider
+import xyz.srclab.common.util.proxy.ClassProxy
+import xyz.srclab.common.util.proxy.provider.ClassProxyProvider
+import xyz.srclab.common.util.proxy.provider.bytecode.ByteCodeClassProxyProvider
+import xyz.srclab.common.util.proxy.provider.jdk.JdkClassProxyProvider
 import xyz.srclab.common.invoke.MethodInvoker
 import xyz.srclab.common.reflect.method.ProxyMethod
 import xyz.srclab.test.doAssertEquals

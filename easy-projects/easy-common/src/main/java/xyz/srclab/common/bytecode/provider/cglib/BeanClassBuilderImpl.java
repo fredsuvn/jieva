@@ -2,7 +2,7 @@ package xyz.srclab.common.bytecode.provider.cglib;
 
 import net.sf.cglib.beans.BeanGenerator;
 import xyz.srclab.common.bytecode.BeanClass;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.util.pattern.builder.CachedBuilder;
 
 /**
  * @author sunqian

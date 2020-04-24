@@ -11,7 +11,7 @@ import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.collection.set.SetHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 import xyz.srclab.common.reflect.type.TypeHelper;
-import xyz.srclab.common.string.format.fastformat.FastFormat;
+import xyz.srclab.common.lang.format.fastformat.FastFormat;
 
 import java.lang.reflect.*;
 import java.math.BigDecimal;

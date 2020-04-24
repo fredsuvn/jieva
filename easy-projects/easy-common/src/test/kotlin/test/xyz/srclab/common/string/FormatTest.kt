@@ -2,7 +2,7 @@ package test.xyz.srclab.common.string
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import xyz.srclab.common.string.format.FormatHelper
+import xyz.srclab.common.lang.format.FormatHelper
 import xyz.srclab.test.doAssertEquals
 
 object FormatTest {

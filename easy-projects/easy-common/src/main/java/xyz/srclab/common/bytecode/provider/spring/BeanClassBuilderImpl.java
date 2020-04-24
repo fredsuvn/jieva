@@ -1,7 +1,7 @@
 package xyz.srclab.common.bytecode.provider.spring;
 
 import org.springframework.cglib.beans.BeanGenerator;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.util.pattern.builder.CachedBuilder;
 import xyz.srclab.common.bytecode.BeanClass;
 
 /**

@@ -2,7 +2,7 @@ package xyz.srclab.common.invoke.provider;
 
 import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.EasyBoot;
-import xyz.srclab.common.pattern.provider.LoadingProviderManager;
+import xyz.srclab.common.util.pattern.provider.LoadingProviderManager;
 
 @ThreadSafe
 public class InvokerProviderManager extends LoadingProviderManager<InvokerProvider> {

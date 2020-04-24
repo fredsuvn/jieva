@@ -4,7 +4,7 @@ import net.sf.cglib.beans.BeanGenerator;
 import net.sf.cglib.proxy.Enhancer;
 import xyz.srclab.common.bytecode.BClass;
 import xyz.srclab.common.collection.iterable.IterableHelper;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.util.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.signature.SignatureHelper;
 
 import java.util.LinkedHashMap;

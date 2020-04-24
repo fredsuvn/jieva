@@ -3,9 +3,9 @@ package test.xyz.srclab.common.string
 import org.testng.annotations.Test
 import xyz.srclab.common.base.Defaults
 import xyz.srclab.common.bean.BeanOperator
-import xyz.srclab.common.string.tostring.PropertyOrElementReferenceLoopException
-import xyz.srclab.common.string.tostring.ToString
-import xyz.srclab.common.string.tostring.ToStringStyle
+import xyz.srclab.common.util.string.tostring.PropertyOrElementReferenceLoopException
+import xyz.srclab.common.util.string.tostring.ToString
+import xyz.srclab.common.util.string.tostring.ToStringStyle
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable
 

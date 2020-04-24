@@ -4,7 +4,7 @@ import org.springframework.cglib.proxy.*;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.lang.count.Counter;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.util.pattern.builder.CachedBuilder;
 import xyz.srclab.common.bytecode.EnhancedClass;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.reflect.signature.SignatureHelper;
