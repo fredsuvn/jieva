@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Bootstrap for easy-starter.
+ */
 public class EasyBoot {
 
     @Immutable
