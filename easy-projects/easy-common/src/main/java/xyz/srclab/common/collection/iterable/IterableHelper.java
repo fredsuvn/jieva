@@ -11,16 +11,19 @@ import java.util.Set;
 
 public class IterableHelper {
 
+    @Immutable
     public static <E> List<E> asList(Iterable<E> iterable) {
         return iterable instanceof List ?
                 (List<E>) iterable : IterableUtils.toList(iterable);
     }
 
+    @Immutable
     public static <E> Collection<E> asCollection(Iterable<E> iterable) {
         return iterable instanceof Collection ?
-                (Collection<E>) iterable : IterableUtils.toList(iterable);
+                (Collection<E>) iterable : toSet(iterable);
     }
 
+    @Immutable
     public static <E> Set<E> asSet(Iterable<E> iterable) {
         return iterable instanceof Set ?
                 (Set<E>) iterable : toSet(iterable);
