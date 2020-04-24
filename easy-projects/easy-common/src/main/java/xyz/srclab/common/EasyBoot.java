@@ -1,11 +1,14 @@
 package xyz.srclab.common;
 
 import xyz.srclab.annotation.Immutable;
+import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.collection.map.MapHelper;
+import xyz.srclab.common.pattern.provider.ProviderLoader;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EasyBoot {
 
@@ -14,6 +17,8 @@ public class EasyBoot {
 
     @Immutable
     private static final Map<String, String> defaultsProperties;
+
+    private static final Map<String, Object> providerMap = new ConcurrentHashMap<>();
 
     static {
         providerProperties = loadProviderProperties();
@@ -54,5 +59,16 @@ public class EasyBoot {
                 Object::toString
         );
         return MapHelper.immutable(result);
+    }
+
+    public static <T> T getProvider(String interfaceName) {
+        return (T) providerMap.computeIfAbsent(interfaceName, EasyBoot::loadProvider);
+    }
+
+    private static <T> T loadProvider(String interfaceName) {
+        String classesDescriptor = getProviderProperties().get(interfaceName);
+        Checker.checkArguments(classesDescriptor != null, "No provider of " + interfaceName);
+        ProviderLoader<T> providerLoader = ProviderLoader.loadFromClassNames(classesDescriptor);
+        return providerLoader.getProvider();
     }
 }

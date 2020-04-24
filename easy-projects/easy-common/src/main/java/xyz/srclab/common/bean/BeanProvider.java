@@ -1,4 +1,4 @@
-package xyz.srclab.common.bean.provider;
+package xyz.srclab.common.bean;
 
 import xyz.srclab.common.bean.*;
 

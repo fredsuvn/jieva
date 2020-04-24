@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean.provider.defaults;
 
 import xyz.srclab.common.bean.*;
-import xyz.srclab.common.bean.provider.BeanProvider;
+import xyz.srclab.common.bean.BeanProvider;
 
 /**
  * @author sunqian

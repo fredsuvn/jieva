@@ -1,14 +1,13 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.common.bean.provider.BeanProvider;
-import xyz.srclab.common.bean.provider.BeanProviderManager;
+import xyz.srclab.common.EasyBoot;
 
 /**
  * @author sunqian
  */
 final class BeanSupport {
 
-    private static final BeanProvider beanProvider = BeanProviderManager.INSTANCE.getProvider();
+    private static final BeanProvider beanProvider = EasyBoot.getProvider(BeanProvider.class.getName());
 
     static BeanOperator getBeanOperator() {
         return beanProvider.getBeanOperator();
