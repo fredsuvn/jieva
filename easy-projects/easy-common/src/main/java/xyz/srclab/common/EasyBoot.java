@@ -2,12 +2,14 @@ package xyz.srclab.common;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.pattern.provider.ProviderLoader;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -21,7 +23,7 @@ public class EasyBoot {
     @Immutable
     private static final Map<String, String> defaultsProperties;
 
-    private static final Map<String, Object> providerMap = new ConcurrentHashMap<>();
+    private static final Map<String, ProviderLoader<?>> providerMap = new ConcurrentHashMap<>();
 
     static {
         providerProperties = loadProviderProperties();
@@ -65,13 +67,18 @@ public class EasyBoot {
     }
 
     public static <T> T getProvider(String interfaceName) {
-        return (T) providerMap.computeIfAbsent(interfaceName, EasyBoot::loadProvider);
+        return (T) providerMap.computeIfAbsent(interfaceName, EasyBoot::loadProvider).getProvider();
     }
 
-    private static <T> T loadProvider(String interfaceName) {
+    @Immutable
+    public static <T> Set<T> getProviders(String interfaceName) {
+        return (Set<T>) IterableHelper.asSet(
+                providerMap.computeIfAbsent(interfaceName, EasyBoot::loadProvider).getProviders().values());
+    }
+
+    private static <T> ProviderLoader<T> loadProvider(String interfaceName) {
         String classesDescriptor = getProviderProperties().get(interfaceName);
         Checker.checkArguments(classesDescriptor != null, "No provider of " + interfaceName);
-        ProviderLoader<T> providerLoader = ProviderLoader.loadFromClassNames(classesDescriptor);
-        return providerLoader.getProvider();
+        return ProviderLoader.loadFromClassNames(classesDescriptor);
     }
 }
