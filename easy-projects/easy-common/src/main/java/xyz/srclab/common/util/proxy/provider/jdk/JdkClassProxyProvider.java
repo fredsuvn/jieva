@@ -1,7 +1,7 @@
 package xyz.srclab.common.util.proxy.provider.jdk;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.util.pattern.builder.CachedBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.lang.tuple.Pair;

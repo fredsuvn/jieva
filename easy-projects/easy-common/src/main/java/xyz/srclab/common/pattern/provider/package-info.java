@@ -1,4 +1,4 @@
 @DefaultNonNull
-package xyz.srclab.common.shell;
+package xyz.srclab.common.pattern.provider;
 
 import xyz.srclab.annotation.DefaultNonNull;

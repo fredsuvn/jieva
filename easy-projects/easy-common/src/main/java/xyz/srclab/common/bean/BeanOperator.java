@@ -3,7 +3,7 @@ package xyz.srclab.common.bean;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.map.MapHelper;
-import xyz.srclab.common.util.pattern.builder.CachedBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.signature.SignatureHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 import xyz.srclab.common.reflect.type.TypeRef;

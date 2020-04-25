@@ -1,6 +1,6 @@
 package xyz.srclab.common.util.proxy.provider;
 
-import xyz.srclab.common.util.pattern.provider.AbstractProviderManager;
+import xyz.srclab.common.pattern.provider.AbstractProviderManager;
 import xyz.srclab.common.util.proxy.provider.bytecode.ByteCodeClassProxyProvider;
 
 public class ClassProxyProviderManagerBase extends AbstractProviderManager<ClassProxyProvider> {

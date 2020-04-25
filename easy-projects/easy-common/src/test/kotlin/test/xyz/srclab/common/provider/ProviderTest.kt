@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.provider
 
 import org.testng.annotations.Test
-import xyz.srclab.common.util.pattern.provider.AbstractProviderManager
+import xyz.srclab.common.pattern.provider.AbstractProviderManager
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable
 

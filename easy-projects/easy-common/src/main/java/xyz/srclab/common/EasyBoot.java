@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.map.MapHelper;
-import xyz.srclab.common.util.pattern.provider.ProviderLoader;
+import xyz.srclab.common.pattern.provider.ProviderLoader;
 
 import java.io.IOException;
 import java.util.Map;

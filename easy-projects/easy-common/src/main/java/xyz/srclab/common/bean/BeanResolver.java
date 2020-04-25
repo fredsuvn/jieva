@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.util.pattern.builder.HandlersBuilder;
+import xyz.srclab.common.pattern.builder.HandlersBuilder;
 
 @Immutable
 public interface BeanResolver {

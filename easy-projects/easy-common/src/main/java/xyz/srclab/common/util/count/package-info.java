@@ -1,4 +1,4 @@
 @DefaultNonNull
-package xyz.srclab.common.util.pattern;
+package xyz.srclab.common.util.count;
 
 import xyz.srclab.annotation.DefaultNonNull;

@@ -1,4 +1,4 @@
-package xyz.srclab.common.lang.count;
+package xyz.srclab.common.util.count;
 
 /**
  * @author sunqian

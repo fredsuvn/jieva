@@ -4,7 +4,7 @@ import xyz.srclab.annotation.concurrent.ThreadSafe;
 import xyz.srclab.common.reflect.classpath.ClassPathHelper;
 import xyz.srclab.common.bytecode.provider.cglib.CglibByteCodeProvider;
 import xyz.srclab.common.bytecode.provider.spring.SpringByteCodeProvider;
-import xyz.srclab.common.util.pattern.provider.AbstractProviderManager;
+import xyz.srclab.common.pattern.provider.AbstractProviderManager;
 
 @ThreadSafe
 public class ByteCodeProviderManager extends AbstractProviderManager<ByteCodeProvider> {

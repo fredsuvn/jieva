@@ -1,4 +1,4 @@
-package xyz.srclab.common.shell;
+package xyz.srclab.common.util.shell;
 
 import java.util.Scanner;
 

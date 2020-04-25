@@ -1,4 +1,4 @@
-package xyz.srclab.common.util.pattern.builder;
+package xyz.srclab.common.pattern.builder;
 
 import java.util.Arrays;
 import java.util.LinkedList;

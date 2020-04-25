@@ -1,4 +1,4 @@
-package xyz.srclab.common.util.pattern.provider;
+package xyz.srclab.common.pattern.provider;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;

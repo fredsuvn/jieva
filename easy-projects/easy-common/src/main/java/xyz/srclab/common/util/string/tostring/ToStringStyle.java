@@ -2,7 +2,7 @@ package xyz.srclab.common.util.string.tostring;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Defaults;
-import xyz.srclab.common.util.pattern.builder.CachedBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 
 @Immutable
 public interface ToStringStyle {

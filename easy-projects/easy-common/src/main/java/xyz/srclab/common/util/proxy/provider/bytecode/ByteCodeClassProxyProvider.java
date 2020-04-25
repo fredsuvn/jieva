@@ -1,6 +1,6 @@
 package xyz.srclab.common.util.proxy.provider.bytecode;
 
-import xyz.srclab.common.util.pattern.builder.CachedBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.bytecode.EnhancedClass;
 import xyz.srclab.common.bytecode.provider.ByteCodeProvider;
 import xyz.srclab.common.bytecode.provider.ByteCodeProviderManager;

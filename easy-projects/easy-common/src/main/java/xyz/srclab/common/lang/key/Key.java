@@ -2,8 +2,6 @@ package xyz.srclab.common.lang.key;
 
 import xyz.srclab.annotation.Immutable;
 
-import java.util.List;
-
 /**
  * @author sunqian
  */
@@ -14,6 +12,9 @@ public interface Key {
         return KeySupport.buildCacheKey(keyComponents);
     }
 
-    @Immutable
-    List<Object> getKeyComponents();
+    @Override
+    int hashCode();
+
+    @Override
+    boolean equals(Object other);
 }
