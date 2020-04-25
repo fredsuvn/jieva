@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
+import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -17,7 +18,7 @@ public class TypeHelper {
 
     private static final Cache<Type, Class<?>> rawTypeCache = new ThreadLocalCache<>();
 
-    private static final Cache<String, Type> genericSuperClassCache = new ThreadLocalCache<>();
+    private static final Cache<Key, Type> genericSuperClassCache = new ThreadLocalCache<>();
 
     public static boolean isBasic(Object any) {
         return any instanceof CharSequence
@@ -70,7 +71,7 @@ public class TypeHelper {
     public static Type getGenericSuperclass(Class<?> cls, Class<?> target) {
         Checker.checkArguments(target.isAssignableFrom(cls), target + "is not parent of " + cls);
         Type returned = genericSuperClassCache.getNonNull(
-                getGenericSuperclassCacheKey(cls, target),
+                Key.from(cls, target),
                 k -> getGenericSuperclass0(cls, target)
         );
         return returned == NullType.INSTANCE ? null : returned;
@@ -86,10 +87,6 @@ public class TypeHelper {
             current = currentClass.getGenericSuperclass();
         } while (current != null);
         return NullType.INSTANCE;
-    }
-
-    private static String getGenericSuperclassCacheKey(Class<?> cls, Class<?> superClass) {
-        return cls + " -> " + superClass;
     }
 
     private static final class NullType implements Type {

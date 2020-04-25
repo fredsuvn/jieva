@@ -99,6 +99,13 @@ public class ArrayHelper {
         return array;
     }
 
+    public static <T> T[] buildArray(@WrittenReturn Object[] array, TypeRef<T> type, Each<T> each) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = each.apply(i);
+        }
+        return (T[]) array;
+    }
+
     public static byte[] buildArray(@WrittenReturn byte[] array, int from, int to, EachByte each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
@@ -169,6 +176,14 @@ public class ArrayHelper {
             array[i] = each.apply(i);
         }
         return array;
+    }
+
+    public static <T> T[] buildArray(@WrittenReturn Object[] array, TypeRef<T> type, int from, int to, Each<T> each) {
+        Checker.checkBoundsFromTo(array.length, from, to);
+        for (int i = from; i < to; i++) {
+            array[i] = each.apply(i);
+        }
+        return (T[]) array;
     }
 
     public static Class<?> findArrayType(Class<?> elementType) {

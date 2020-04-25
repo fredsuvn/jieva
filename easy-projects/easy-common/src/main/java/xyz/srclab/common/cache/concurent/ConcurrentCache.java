@@ -2,6 +2,7 @@ package xyz.srclab.common.cache.concurent;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.concurrent.ThreadSafe;
+import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.weak.WeakCache;
 import xyz.srclab.common.reflect.type.TypeRef;
@@ -32,12 +33,11 @@ public class ConcurrentCache<K, V> implements Cache<K, V> {
 
     public ConcurrentCache(Duration defaultExpirationPeriod, int concurrencyLevel) {
         this.defaultExpirationPeriod = defaultExpirationPeriod;
-        this.segments = ArrayBuilder
-                .newArray(new TypeRef<Cache<K, V>[]>() {
-                }, new TypeRef<Cache<K, V>>() {
-                }, concurrencyLevel)
-                .setEachElement(i -> new WeakCache<>(defaultExpirationPeriod, true))
-                .build();
+        this.segments = ArrayHelper.buildArray(
+                new Cache[concurrencyLevel],
+                new TypeRef<Cache<K, V>>() {},
+                i -> new WeakCache<>(defaultExpirationPeriod, true)
+        );
     }
 
     private Cache<K, V> getSegment(K key) {

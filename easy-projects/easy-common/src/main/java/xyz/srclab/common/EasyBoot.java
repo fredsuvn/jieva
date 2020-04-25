@@ -1,14 +1,13 @@
 package xyz.srclab.common;
 
+import org.yaml.snakeyaml.Yaml;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.pattern.provider.ProviderLoader;
 
-import java.io.IOException;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,17 +16,25 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EasyBoot {
 
-    @Immutable
-    private static final Map<String, String> providerProperties;
+    private static final String version;
 
     @Immutable
     private static final Map<String, String> defaultsProperties;
 
+    @Immutable
+    private static final Map<String, String> providerProperties;
+
     private static final Map<String, ProviderLoader<?>> providerMap = new ConcurrentHashMap<>();
 
     static {
-        providerProperties = loadProviderProperties();
-        defaultsProperties = loadDefaultsProperties();
+        Map<String, Object> properties = loadAll();
+        version = (String) properties.get("version");
+        defaultsProperties = MapHelper.immutable((Map<String, String>) (properties.get("providers")));
+        providerProperties = MapHelper.immutable((Map<String, String>) (properties.get("defaults")));
+    }
+
+    public static String getVersion() {
+        return version;
     }
 
     @Immutable
@@ -36,34 +43,16 @@ public class EasyBoot {
     }
 
     @Immutable
-    private static Map<String, String> loadProviderProperties() {
-        return loadProperties("/META-INF/providers.properties");
-    }
-
-    @Immutable
     public static Map<String, String> getDefaultsProperties() {
         return defaultsProperties;
     }
 
     @Immutable
-    private static Map<String, String> loadDefaultsProperties() {
-        return loadProperties("/META-INF/defaults.properties");
-    }
-
-    @Immutable
-    private static Map<String, String> loadProperties(String resourcePath) {
-        Properties properties = new Properties();
-        try {
-            properties.load(EasyBoot.class.getResourceAsStream(resourcePath));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-        Map<String, String> result = MapHelper.map(
-                properties,
-                Object::toString,
-                Object::toString
-        );
-        return MapHelper.immutable(result);
+    private static Map<String, Object> loadAll() {
+        Yaml yaml = new Yaml();
+        Map<String, Object> yamlProperties =
+                yaml.load(EasyBoot.class.getResourceAsStream("/META-INF/easy.yaml"));
+        return MapHelper.immutable(yamlProperties);
     }
 
     public static <T> T getProvider(String interfaceName) {

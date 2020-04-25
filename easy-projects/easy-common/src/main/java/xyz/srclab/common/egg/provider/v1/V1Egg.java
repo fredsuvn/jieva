@@ -1,8 +1,11 @@
-package xyz.srclab.common.egg;
+package xyz.srclab.common.egg.provider.v1;
 
+import xyz.srclab.common.egg.Egg;
 import xyz.srclab.common.time.TimeHelper;
 
-class EasyStarterEgg implements Egg {
+final class V1Egg implements Egg {
+
+    static final V1Egg INSTANCE = new V1Egg();
 
     /*
      * __________                            ____________              _____
@@ -18,8 +21,11 @@ class EasyStarterEgg implements Egg {
      * Font: speed
      */
 
+    private V1Egg() {
+    }
+
     @Override
-    public void hatchOut(String spell) {
+    public void hatchOut() {
         printLogo();
         startGame();
     }
