@@ -1,13 +1,14 @@
 package xyz.srclab.common.bytecode;
 
 import com.google.common.base.CharMatcher;
+import xyz.srclab.common.base.Shares;
 
 /**
  * @author sunqian
  */
 public class ByteCodeHelper {
 
-    private static final CharMatcher charMatcher = CharMatcher.is('.');
+    private static final CharMatcher charMatcher = Shares.DOT_CHAR_MATCHER;
 
     public static String getInternalName(Class<?> type) {
         return charMatcher.replaceFrom(type.getName(), '/');
