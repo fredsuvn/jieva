@@ -2,7 +2,7 @@ package test.xyz.srclab.common.base
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import xyz.srclab.common.lang.key.KeySupport
+import xyz.srclab.common.lang.key.Key
 import xyz.srclab.test.doAssertEquals
 
 object KeySupportTest {
@@ -15,9 +15,9 @@ object KeySupportTest {
     @DataProvider
     fun keyHelperDataProvider(): Array<Array<*>> {
         return arrayOf(
-            arrayOf(KeySupport.buildKey(), ""),
-            arrayOf(KeySupport.buildKey(Object::class.java), "Ljava/lang/Object;"),
-            arrayOf(KeySupport.buildKey(Object::class.java, "ss"), "Ljava/lang/Object;:ss")
+            arrayOf(Key.from(), ""),
+            arrayOf(Key.from(Object::class.java), "Ljava/lang/Object;"),
+            arrayOf(Key.from(Object::class.java, "ss"), "Ljava/lang/Object;:ss")
         )
     }
 }

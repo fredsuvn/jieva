@@ -4,5 +4,5 @@ defaults:
   charset: UTF-8
   time-unit: SECONDS
 providers:
-  xyz.srclab.common.bean.provider: xyz srclab.common.bean.provider.defaults.DefaultBeanProvider
-  xyz.srclab.common.invoke.provider: xyz.srclab.common.invoke.provider.reflected.ReflectedInvokerProvider
+  xyz.srclab.common.bean.provider: "xyz srclab.common.bean.provider.defaults.DefaultBeanProvider"
+  xyz.srclab.common.invoke.provider: "xyz.srclab.common.invoke.provider.reflected.ReflectedInvokerProvider"

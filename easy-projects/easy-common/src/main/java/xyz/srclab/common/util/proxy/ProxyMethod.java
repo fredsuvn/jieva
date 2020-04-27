@@ -1,4 +1,4 @@
-package xyz.srclab.common.reflect.method;
+package xyz.srclab.common.util.proxy;
 
 import xyz.srclab.common.invoke.MethodInvoker;
 

@@ -1,7 +1,7 @@
 package xyz.srclab.common.bytecode;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.reflect.method.ProxyMethod;
+import xyz.srclab.common.util.proxy.ProxyMethod;
 
 import java.util.Arrays;
 

@@ -1,22 +1,23 @@
 package xyz.srclab.common.util.proxy;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.reflect.method.ProxyMethod;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
 @Immutable
-public interface ClassProxy<T> {
+public interface ProxyClass<T> {
 
     static <T> Builder<T> newBuilder(Class<T> type) {
-        return ClassProxyBuilderSupport.newBuilder(type);
+        return ProxyClassSupport.newBuilder(type);
     }
 
     T newInstance();
 
-    T newInstance(Class<?>[] parameterTypes, Object[] arguments);
+    T newInstance(Class<?>[] parameterTypes, Object[] args);
+
+    Class<T> getProxyClass();
 
     interface Builder<T> {
 
@@ -30,6 +31,6 @@ public interface ClassProxy<T> {
 
         Builder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod);
 
-        ClassProxy<T> build();
+        ProxyClass<T> build();
     }
 }

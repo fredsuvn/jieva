@@ -9,7 +9,7 @@ import xyz.srclab.common.bytecode.EnhancedClass;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.reflect.signature.SignatureHelper;
 import xyz.srclab.common.invoke.MethodInvoker;
-import xyz.srclab.common.reflect.method.ProxyMethod;
+import xyz.srclab.common.util.proxy.ProxyMethod;
 
 import java.util.HashMap;
 import java.util.Map;

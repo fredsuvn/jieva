@@ -1,15 +1,14 @@
 package xyz.srclab.common.util.proxy.provider.jdk;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
-import xyz.srclab.common.exception.ExceptionWrapper;
-import xyz.srclab.common.lang.tuple.Pair;
-import xyz.srclab.common.util.proxy.ClassProxy;
-import xyz.srclab.common.util.proxy.provider.ClassProxyProvider;
 import xyz.srclab.common.invoke.MethodInvoker;
+import xyz.srclab.common.lang.tuple.Pair;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.method.MethodHelper;
-import xyz.srclab.common.reflect.method.ProxyMethod;
+import xyz.srclab.common.util.proxy.ClassProxyProvider;
+import xyz.srclab.common.util.proxy.ProxyClass;
+import xyz.srclab.common.util.proxy.ProxyMethod;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -24,12 +23,12 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
     public static final JdkClassProxyProvider INSTANCE = new JdkClassProxyProvider();
 
     @Override
-    public <T> ClassProxy.Builder<T> newBuilder(Class<T> type) {
+    public <T> ProxyClass.Builder<T> newBuilder(Class<T> type) {
         return new JdkClassProxyBuilder<>(type);
     }
 
     private static final class JdkClassProxyBuilder<T>
-            extends CachedBuilder<ClassProxy<T>> implements ClassProxy.Builder<T> {
+            extends CachedBuilder<ProxyClass<T>> implements ProxyClass.Builder<T> {
 
         private final Class<T> type;
         private final List<Pair<Predicate<Method>, ProxyMethod>> predicatePairs = new LinkedList<>();
@@ -39,24 +38,24 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
         }
 
         @Override
-        public ClassProxy.Builder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod) {
-            this.updateState();
+        public ProxyClass.Builder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod) {
             predicatePairs.add(Pair.of(methodPredicate, proxyMethod));
+            this.updateState();
             return this;
         }
 
         @Override
-        protected ClassProxy<T> buildNew() {
-            return new JdkClassProxy<>(type, predicatePairs);
+        protected ProxyClass<T> buildNew() {
+            return new JdkProxyClass<>(type, predicatePairs);
         }
     }
 
-    private static final class JdkClassProxy<T> implements ClassProxy<T> {
+    private static final class JdkProxyClass<T> implements ProxyClass<T> {
 
         private final Class<?> type;
         private final Map<Method, ProxyMethod> methodMap;
 
-        private JdkClassProxy(Class<?> type, List<Pair<Predicate<Method>, ProxyMethod>> predicatePairs) {
+        private JdkProxyClass(Class<?> type, List<Pair<Predicate<Method>, ProxyMethod>> predicatePairs) {
             this.type = type;
             Map<Method, ProxyMethod> map = new LinkedHashMap<>();
             Method[] methods = type.getMethods();
@@ -79,16 +78,7 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
                         if (proxyMethod == null) {
                             return method.invoke(object, realArgs);
                         }
-                        return proxyMethod.invoke(object, realArgs, method, new MethodInvoker() {
-                            @Override
-                            public @Nullable Object invoke(Object object, Object... args) {
-                                try {
-                                    return method.invoke(object, args);
-                                } catch (Exception e) {
-                                    throw new ExceptionWrapper(e);
-                                }
-                            }
-                        });
+                        return proxyMethod.invoke(object, realArgs, method, UnsupportedMethodInvoker.INSTANCE);
                     });
             return (T) instance;
         }
@@ -96,6 +86,22 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
         @Override
         public T newInstance(Class<?>[] parameterTypes, Object[] arguments) {
             throw new UnsupportedOperationException("JDK proxy doesn't support this");
+        }
+
+        @Override
+        public Class<T> getProxyClass() {
+            throw new UnsupportedOperationException("JDK proxy doesn't support this");
+        }
+
+        private static final class UnsupportedMethodInvoker implements MethodInvoker {
+
+            private static final UnsupportedMethodInvoker INSTANCE = new UnsupportedMethodInvoker();
+
+            @Override
+            public @Nullable Object invoke(@Nullable Object object, Object... args) {
+                throw new UnsupportedOperationException("JDK proxy only supports proxying for interface, " +
+                        "so the interface method is abstract and cannot be invoked.");
+            }
         }
     }
 }
