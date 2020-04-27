@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 
 public class MethodHelper {
 
-    public static final Class<?>[] EMPTY_PARAMETER_TYPES = ArrayUtils.EMPTY_CLASS_ARRAY;
-
     public static final Object[] EMPTY_ARGUMENTS = ArrayUtils.EMPTY_OBJECT_ARRAY;
 
     private static final Cache<String, Method> methodCache = new ThreadLocalCache<>();

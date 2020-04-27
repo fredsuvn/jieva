@@ -21,10 +21,10 @@ object InvokerHelperTest {
             InvokerHelper.getConstructorInvoker(A::class.java, String::class.java).invoke("cc"),
             A("cc")
         )
-        doTestMethodInvoker(ReflectedInvokerProvider.INSTANCE)
-        doTestMethodInvoker(MethodHandleInvokerProvider.INSTANCE)
-        doTestStaticMethodInvoker(ReflectedInvokerProvider.INSTANCE)
-        doTestStaticMethodInvoker(MethodHandleInvokerProvider.INSTANCE)
+        //doTestMethodInvoker(ReflectedInvokerProvider.INSTANCE)
+        //doTestMethodInvoker(MethodHandleInvokerProvider.INSTANCE)
+        //doTestStaticMethodInvoker(ReflectedInvokerProvider.INSTANCE)
+        //doTestStaticMethodInvoker(MethodHandleInvokerProvider.INSTANCE)
     }
 
     private fun doTestMethodInvoker(invokerProvider: InvokerProvider) {

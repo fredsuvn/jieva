@@ -11,7 +11,11 @@ public class ByteCodeHelper {
     private static final CharMatcher charMatcher = Shares.DOT_CHAR_MATCHER;
 
     public static String getInternalName(Class<?> type) {
-        return charMatcher.replaceFrom(type.getName(), '/');
+        return getInternalName(type.getName());
+    }
+
+    public static String getInternalName(String className) {
+        return charMatcher.replaceFrom(className, '/');
     }
 
     public static String getDescriptor(Class<?> type) {
