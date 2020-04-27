@@ -55,6 +55,10 @@ public class EasyBoot {
         return MapHelper.immutable(yamlProperties);
     }
 
+    public static <T> T getProvider(Class<T> interfaceClass) {
+        return getProvider(interfaceClass.getName());
+    }
+
     public static <T> T getProvider(String interfaceName) {
         return (T) providerMap.computeIfAbsent(interfaceName, EasyBoot::loadProvider).getProvider();
     }

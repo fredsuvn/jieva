@@ -6,3 +6,4 @@ defaults:
 providers:
   xyz.srclab.common.bean.provider: "xyz srclab.common.bean.provider.defaults.DefaultBeanProvider"
   xyz.srclab.common.invoke.provider: "xyz.srclab.common.invoke.provider.reflected.ReflectedInvokerProvider"
+  xyz.srclab.common.util.proxy: "xyz.srclab.common.util.proxy.provider.jdk.JdkClassProxyProvider"

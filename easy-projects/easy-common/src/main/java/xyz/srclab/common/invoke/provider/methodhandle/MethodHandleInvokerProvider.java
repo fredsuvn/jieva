@@ -2,12 +2,13 @@ package xyz.srclab.common.invoke.provider.methodhandle;
 
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.invoke.FunctionInvoker;
+import xyz.srclab.common.invoke.InvokerProvider;
 import xyz.srclab.common.invoke.MethodInvoker;
-import xyz.srclab.common.invoke.provider.InvokerProvider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
+@Deprecated
 public class MethodHandleInvokerProvider implements InvokerProvider {
 
     @Override

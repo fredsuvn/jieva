@@ -3,7 +3,7 @@ package xyz.srclab.common.invoke.provider.reflected;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.invoke.FunctionInvoker;
 import xyz.srclab.common.invoke.MethodInvoker;
-import xyz.srclab.common.invoke.provider.InvokerProvider;
+import xyz.srclab.common.invoke.InvokerProvider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

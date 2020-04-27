@@ -1,4 +1,4 @@
-package xyz.srclab.common.invoke.provider;
+package xyz.srclab.common.invoke;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.invoke.ConstructorInvoker;

@@ -24,7 +24,8 @@ dependencies {
     api("org.apache.commons:commons-lang3")
     api("commons-beanutils:commons-beanutils")
     api("org.apache.commons:commons-collections4")
-    api('com.google.guava:guava')
+    api("com.google.guava:guava")
+    api("org.yaml:snakeyaml")
 
     compileOnly("org.springframework:spring-core")
     compileOnly("cglib:cglib")

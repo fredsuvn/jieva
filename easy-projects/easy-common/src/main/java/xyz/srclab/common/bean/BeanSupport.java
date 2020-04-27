@@ -7,7 +7,7 @@ import xyz.srclab.common.EasyBoot;
  */
 final class BeanSupport {
 
-    private static final BeanProvider beanProvider = EasyBoot.getProvider(BeanProvider.class.getName());
+    private static final BeanProvider beanProvider = EasyBoot.getProvider(BeanProvider.class);
 
     static BeanOperator getBeanOperator() {
         return beanProvider.getBeanOperator();
