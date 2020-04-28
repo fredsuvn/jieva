@@ -16,6 +16,8 @@ public interface FunctionInvoker {
         return InvokerSupport.getFunctionInvoker(type, methodName, parameterTypes);
     }
 
+    Method getMethod();
+
     @Nullable
     Object invoke(Object... args);
 }

@@ -15,5 +15,7 @@ public interface ConstructorInvoker<T> {
         return InvokerSupport.getConstructorInvoker(type, parameterTypes);
     }
 
+    Constructor<T> getConstructor();
+
     T invoke(Object... args);
 }

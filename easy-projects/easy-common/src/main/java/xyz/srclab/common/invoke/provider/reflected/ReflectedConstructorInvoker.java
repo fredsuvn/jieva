@@ -15,6 +15,11 @@ final class ReflectedConstructorInvoker<T> implements ConstructorInvoker<T> {
     }
 
     @Override
+    public Constructor<T> getConstructor() {
+        return constructor;
+    }
+
+    @Override
     public T invoke(Object... args) {
         try {
             return constructor.newInstance(args);

@@ -19,6 +19,11 @@ final class ReflectedFunctionInvoker implements FunctionInvoker {
     }
 
     @Override
+    public Method getMethod() {
+        return method;
+    }
+
+    @Override
     public @Nullable Object invoke(Object... args) {
         try {
             return method.invoke(null, args);
