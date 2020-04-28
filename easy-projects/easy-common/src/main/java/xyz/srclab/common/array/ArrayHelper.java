@@ -18,12 +18,12 @@ public class ArrayHelper {
 
     private static final ThreadLocalCache<Type, Type> componentTypeCache = new ThreadLocalCache<>();
 
-    public static <T> T[] toArray(Iterable<T> iterable, Type componentType) {
-        Collection<T> collection = IterableHelper.asCollection(iterable);
-        T[] array = (T[]) Array.newInstance(TypeHelper.getRawClass(componentType), collection.size());
+    public static <E> E[] toArray(Iterable<E> iterable, Type componentType) {
+        Collection<E> collection = IterableHelper.asCollection(iterable);
+        E[] array = (E[]) Array.newInstance(TypeHelper.getRawClass(componentType), collection.size());
         int i = 0;
-        for (T t : collection) {
-            array[i++] = t;
+        for (E e : collection) {
+            array[i++] = e;
         }
         return array;
     }
@@ -32,8 +32,12 @@ public class ArrayHelper {
         return toArray(iterable, componentType.getType());
     }
 
-    public static <A> A newArray(Class<?> componentType, int length) {
-        return (A) Array.newInstance(componentType, length);
+    public static <E> E[] newArray(Class<E> componentType, int length) {
+        return (E[]) Array.newInstance(componentType, length);
+    }
+
+    public static <E> E[] newArray(TypeRef<E> componentType, int length) {
+        return newArray(componentType.getRawType(), length);
     }
 
     public static byte[] buildArray(@WrittenReturn byte[] array, EachByte each) {
@@ -92,18 +96,18 @@ public class ArrayHelper {
         return array;
     }
 
-    public static <T> T[] buildArray(@WrittenReturn T[] array, Each<T> each) {
+    public static <E> E[] buildArray(@WrittenReturn E[] array, Each<E> each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
         return array;
     }
 
-    public static <T> T[] buildArray(@WrittenReturn Object[] array, TypeRef<T> type, Each<T> each) {
+    public static <E> E[] buildArray(@WrittenReturn Object[] array, TypeRef<E> type, Each<E> each) {
         for (int i = 0; i < array.length; i++) {
             array[i] = each.apply(i);
         }
-        return (T[]) array;
+        return (E[]) array;
     }
 
     public static byte[] buildArray(@WrittenReturn byte[] array, int from, int to, EachByte each) {
@@ -170,7 +174,7 @@ public class ArrayHelper {
         return array;
     }
 
-    public static <T> T[] buildArray(@WrittenReturn T[] array, int from, int to, Each<T> each) {
+    public static <E> E[] buildArray(@WrittenReturn E[] array, int from, int to, Each<E> each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
@@ -178,12 +182,12 @@ public class ArrayHelper {
         return array;
     }
 
-    public static <T> T[] buildArray(@WrittenReturn Object[] array, TypeRef<T> type, int from, int to, Each<T> each) {
+    public static <E> E[] buildArray(@WrittenReturn Object[] array, TypeRef<E> type, int from, int to, Each<E> each) {
         Checker.checkBoundsFromTo(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.apply(i);
         }
-        return (T[]) array;
+        return (E[]) array;
     }
 
     public static Class<?> findArrayType(Class<?> elementType) {
@@ -211,8 +215,8 @@ public class ArrayHelper {
         return TypeHelper.getRawClass(type).getComponentType();
     }
 
-    public interface Each<T> {
-        T apply(int index);
+    public interface Each<E> {
+        E apply(int index);
     }
 
     public interface EachByte {
