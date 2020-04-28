@@ -33,8 +33,8 @@ public class TypeHelper {
         return ClassUtils.isAssignable(fromType, to);
     }
 
-    public static Class<?> getRawClass(Type type) {
-        return rawTypeCache.getNonNull(
+    public static <T> Class<T> getRawType(Type type) {
+        return (Class<T>) rawTypeCache.getNonNull(
                 type,
                 k -> getRawClass0(type)
         );
@@ -46,7 +46,7 @@ public class TypeHelper {
         }
 
         if (type instanceof ParameterizedType) {
-            return getRawClass(((ParameterizedType) type).getRawType());
+            return getRawType(((ParameterizedType) type).getRawType());
         }
 
         if (type instanceof TypeVariable) {
@@ -54,13 +54,13 @@ public class TypeHelper {
             if (boundType instanceof Class) {
                 return (Class<?>) boundType;
             }
-            return getRawClass(boundType);
+            return getRawType(boundType);
         }
 
         if (type instanceof WildcardType) {
             Type[] upperBounds = ((WildcardType) type).getUpperBounds();
             if (upperBounds.length == 1) {
-                return getRawClass(upperBounds[0]);
+                return getRawType(upperBounds[0]);
             }
         }
 
@@ -80,7 +80,7 @@ public class TypeHelper {
     private static Type getGenericSuperclass0(Class<?> cls, Class<?> superClass) {
         Type current = cls;
         do {
-            Class<?> currentClass = getRawClass(current);
+            Class<?> currentClass = getRawType(current);
             if (superClass.equals(currentClass)) {
                 return current;
             }

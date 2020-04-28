@@ -1,5 +1,6 @@
 package xyz.srclab.common.array;
 
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.WrittenReturn;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
@@ -20,7 +21,7 @@ public class ArrayHelper {
 
     public static <E> E[] toArray(Iterable<E> iterable, Type componentType) {
         Collection<E> collection = IterableHelper.asCollection(iterable);
-        E[] array = (E[]) Array.newInstance(TypeHelper.getRawClass(componentType), collection.size());
+        E[] array = (E[]) Array.newInstance(TypeHelper.getRawType(componentType), collection.size());
         int i = 0;
         for (E e : collection) {
             array[i++] = e;
@@ -36,8 +37,12 @@ public class ArrayHelper {
         return (E[]) Array.newInstance(componentType, length);
     }
 
+    public static <E> E[] newArray(Type componentType, int length) {
+        return newArray(TypeHelper.getRawType(componentType), length);
+    }
+
     public static <E> E[] newArray(TypeRef<E> componentType, int length) {
-        return newArray(componentType.getRawType(), length);
+        return newArray(componentType.getType(), length);
     }
 
     public static byte[] buildArray(@WrittenReturn byte[] array, EachByte each) {
@@ -212,10 +217,11 @@ public class ArrayHelper {
         if (type instanceof GenericArrayType) {
             return ((GenericArrayType) type).getGenericComponentType();
         }
-        return TypeHelper.getRawClass(type).getComponentType();
+        return TypeHelper.getRawType(type).getComponentType();
     }
 
     public interface Each<E> {
+        @Nullable
         E apply(int index);
     }
 

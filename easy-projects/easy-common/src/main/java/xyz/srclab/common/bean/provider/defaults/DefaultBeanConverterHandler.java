@@ -9,9 +9,9 @@ import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.list.ListHelper;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.collection.set.SetHelper;
+import xyz.srclab.common.lang.format.fastformat.FastFormat;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 import xyz.srclab.common.reflect.type.TypeHelper;
-import xyz.srclab.common.lang.format.fastformat.FastFormat;
 
 import java.lang.reflect.*;
 import java.math.BigDecimal;
@@ -80,7 +80,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
 
     private Object convertParameterizedType(
             Object from, ParameterizedType parameterizedType, BeanOperator beanOperator) {
-        Class<?> rawType = TypeHelper.getRawClass(parameterizedType);
+        Class<?> rawType = TypeHelper.getRawType(parameterizedType);
         // Never reached
         // if (rawType.isArray()) {
         //     return convertToArray(from, to, beanOperator);
@@ -99,7 +99,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     private Object convertWildcardType(Object from, WildcardType to, BeanOperator beanOperator) {
-        Class<?> rawType = TypeHelper.getRawClass(to);
+        Class<?> rawType = TypeHelper.getRawType(to);
         return convertClass(from, rawType, beanOperator);
     }
 
@@ -160,21 +160,21 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
 
     private Object convertToArray(Object from, Type arrayType, BeanOperator beanOperator) {
         Type componentType = ArrayHelper.getGenericComponentType(arrayType);
-        Class<?> rawComponentType = TypeHelper.getRawClass(componentType);
         if (from.getClass().isArray()) {
             int arrayLength = Array.getLength(from);
-            Object resultArray = Array.newInstance(rawComponentType, arrayLength);
-            for (int i = 0; i < arrayLength; i++) {
-                @Nullable Object fromValue = Array.get(from, i);
-                @Nullable Object resultValue =
-                        fromValue == null ? null : beanOperator.convert(fromValue, componentType);
-                Array.set(resultArray, i, resultValue);
-            }
-            return resultArray;
+            return ArrayHelper.buildArray(
+                    ArrayHelper.newArray(componentType, arrayLength),
+                    i -> {
+                        @Nullable Object fromValue = Array.get(from, i);
+                        @Nullable Object toValue =
+                                fromValue == null ? null : beanOperator.convert(fromValue, componentType);
+                        return toValue;
+                    }
+            );
         }
         if (from instanceof Iterable) {
             Collection<?> collection = IterableHelper.asCollection((Iterable<?>) from);
-            Object resultArray = Array.newInstance(rawComponentType, collection.size());
+            Object resultArray = ArrayHelper.newArray(componentType, collection.size());
             int i = 0;
             for (@Nullable Object o : collection) {
                 @Nullable Object resultValue =

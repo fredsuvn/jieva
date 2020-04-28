@@ -37,6 +37,6 @@ public class TypeRef<T> {
     }
 
     public <U> Class<U> getRawType() {
-        return (Class<U>) TypeHelper.getRawClass(type);
+        return TypeHelper.getRawType(type);
     }
 }

@@ -17,10 +17,10 @@ object TypeHelperTest {
 
     @Test
     fun testRawClass() {
-        doAssertEquals(TypeHelper.getRawClass(A::class.java.typeParameters[0]), Throwable::class.java)
-        doAssertEquals(TypeHelper.getRawClass(A2::class.java.typeParameters[0]), List::class.java)
+        doAssertEquals(TypeHelper.getRawType(A::class.java.typeParameters[0]), Throwable::class.java)
+        doAssertEquals(TypeHelper.getRawType(A2::class.java.typeParameters[0]), List::class.java)
         doAssertEquals(
-            TypeHelper.getRawClass(BeanHelper.resolveBean(B::class.java).getProperty("array")?.genericType),
+            TypeHelper.getRawType(BeanHelper.resolveBean(B::class.java).getProperty("array")?.genericType),
             Any::class.java
         )
     }
