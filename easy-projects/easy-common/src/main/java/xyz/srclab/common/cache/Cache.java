@@ -1,6 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.cache.weak.WeakCacheBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
 
 import java.time.Duration;
@@ -12,13 +13,11 @@ import java.util.function.Function;
 
 public interface Cache<K, V> {
 
-    Duration getDefaultExpirationPeriod();
+    static <K, V> WeakCacheBuilder<K, V> newWeakCacheBuilder() {
+        return new WeakCacheBuilder<>();
+    }
 
     boolean has(K key);
-
-    default boolean hasAll(K... keys) {
-        return hasAll(Arrays.asList(keys));
-    }
 
     default boolean hasAll(Iterable<K> keys) {
         for (K key : keys) {
@@ -27,10 +26,6 @@ public interface Cache<K, V> {
             }
         }
         return true;
-    }
-
-    default boolean hasAny(K... keys) {
-        return hasAny(Arrays.asList(keys));
     }
 
     default boolean hasAny(Iterable<K> keys) {
@@ -43,29 +38,21 @@ public interface Cache<K, V> {
     }
 
     @Nullable
-    V get(K key) throws NoSuchElementException;
+    V getIfPresent(K key) throws NoSuchElementException;
 
-    default Map<K, @Nullable V> getAll(K... keys) throws NoSuchElementException {
-        return getAll(Arrays.asList(keys));
-    }
-
-    default Map<K, @Nullable V> getAll(Iterable<K> keys) throws NoSuchElementException {
+    default Map<K, @Nullable V> getIfPresent(Iterable<K> keys) throws NoSuchElementException {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
-            map.put(key, get(key));
+            map.put(key, getIfPresent(key));
         }
         return MapHelper.immutable(map);
-    }
-
-    default Map<K, @Nullable V> getPresent(K... keys) throws NoSuchElementException {
-        return getPresent(Arrays.asList(keys));
     }
 
     default Map<K, @Nullable V> getPresent(Iterable<K> keys) throws NoSuchElementException {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
             try {
-                map.put(key, get(key));
+                map.put(key, getIfPresent(key));
             } catch (NoSuchElementException ignored) {
             }
         }
@@ -73,20 +60,20 @@ public interface Cache<K, V> {
     }
 
     @Nullable
-    default V get(K key, Function<K, @Nullable V> ifAbsent) {
-        return get(key, getDefaultExpirationPeriod(), ifAbsent);
+    default V getIfPresent(K key, Function<K, @Nullable V> ifAbsent) {
+        return getIfPresent(key, getDefaultExpirationPeriod(), ifAbsent);
     }
 
     @Nullable
-    default V get(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
-        return get(key, Duration.ofSeconds(expirationPeriodSeconds), ifAbsent);
+    default V getIfPresent(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
+        return getIfPresent(key, Duration.ofSeconds(expirationPeriodSeconds), ifAbsent);
     }
 
     @Nullable
-    V get(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent);
+    V getIfPresent(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent);
 
     default V getNonNull(K key) throws NoSuchElementException, NullPointerException {
-        @Nullable V result = get(key);
+        @Nullable V result = getIfPresent(key);
         if (result == null) {
             throw new NullPointerException();
         }
@@ -102,7 +89,7 @@ public interface Cache<K, V> {
     }
 
     default V getNonNull(K key, Duration expirationPeriod, Function<K, V> ifAbsent) {
-        @Nullable V result = get(key, expirationPeriod, ifAbsent);
+        @Nullable V result = getIfPresent(key, expirationPeriod, ifAbsent);
         if (result == null) {
             throw new NullPointerException();
         }

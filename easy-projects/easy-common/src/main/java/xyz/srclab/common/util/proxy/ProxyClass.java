@@ -19,7 +19,7 @@ public interface ProxyClass<T> {
 
     Class<T> getProxyClass();
 
-    interface Builder<T> {
+    interface Builder<T> extends xyz.srclab.common.pattern.builder.Builder<ProxyClass<T>> {
 
         default Builder<T> proxyMethod(String methodName, Class<?>[] parameterTypes, ProxyMethod proxyMethod) {
             return proxyMethod(
@@ -30,7 +30,5 @@ public interface ProxyClass<T> {
         }
 
         Builder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod);
-
-        ProxyClass<T> build();
     }
 }

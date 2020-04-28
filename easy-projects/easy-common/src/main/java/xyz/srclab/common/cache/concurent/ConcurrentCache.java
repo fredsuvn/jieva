@@ -56,26 +56,26 @@ public class ConcurrentCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V get(K key) throws NoSuchElementException {
-        return getSegment(key).get(key);
+    public V getIfPresent(K key) throws NoSuchElementException {
+        return getSegment(key).getIfPresent(key);
     }
 
     @Override
     @Nullable
-    public V get(K key, Function<K, @Nullable V> ifAbsent) {
-        return getSegment(key).get(key, ifAbsent);
+    public V getIfPresent(K key, Function<K, @Nullable V> ifAbsent) {
+        return getSegment(key).getIfPresent(key, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V get(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
-        return getSegment(key).get(key, expirationPeriodSeconds, ifAbsent);
+    public V getIfPresent(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
+        return getSegment(key).getIfPresent(key, expirationPeriodSeconds, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V get(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
-        return getSegment(key).get(key, expirationPeriod, ifAbsent);
+    public V getIfPresent(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
+        return getSegment(key).getIfPresent(key, expirationPeriod, ifAbsent);
     }
 
     @Override

@@ -1,8 +1,10 @@
 package xyz.srclab.common.cache.threadlocal;
 
+import com.google.common.cache.CacheBuilder;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.weak.WeakCache;
+import xyz.srclab.common.cache.weak.WeakCacheBuilder;
 
 import java.time.Duration;
 import java.util.Map;
@@ -13,12 +15,18 @@ public class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     private final ThreadLocal<WeakCache<K, V>> threadLocal;
 
-    public ThreadLocalCache() {
-        this(Duration.ZERO);
-    }
-
-    public ThreadLocalCache(Duration defaultExpirationPeriod) {
-        this.threadLocal = ThreadLocal.withInitial(() -> new WeakCache<>(defaultExpirationPeriod));
+    ThreadLocalCache(Duration defaultExpirationPeriod) {
+        com.google.common.cache.Cache<String,String> guavaCache = CacheBuilder.newBuilder()
+                .build();
+        WeakCache<String, String> weakCache = Cache.newWeakCacheBuilder()
+                .build0();
+        this.threadLocal = ThreadLocal.withInitial(() -> {
+                    WeakCacheBuilder<K, V> weakCacheBuilder = Cache.newWeakCacheBuilder();
+                    return Cache.newWeakCacheBuilder()
+                            .setDefaultExpirationPeriod(defaultExpirationPeriod)
+                            .build();
+                }
+        );
     }
 
     @Override
@@ -53,18 +61,18 @@ public class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V get(K key) throws NoSuchElementException {
-        return threadLocal.get().get(key);
+    public V getIfPresent(K key) throws NoSuchElementException {
+        return threadLocal.get().getIfPresent(key);
     }
 
     @Override
     public Map<K, @Nullable V> getAll(K... keys) throws NoSuchElementException {
-        return threadLocal.get().getAll(keys);
+        return threadLocal.get().getIfPresent(keys);
     }
 
     @Override
-    public Map<K, @Nullable V> getAll(Iterable<K> keys) throws NoSuchElementException {
-        return threadLocal.get().getAll(keys);
+    public Map<K, @Nullable V> getIfPresent(Iterable<K> keys) throws NoSuchElementException {
+        return threadLocal.get().getIfPresent(keys);
     }
 
     @Override
@@ -79,20 +87,20 @@ public class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V get(K key, Function<K, @Nullable V> ifAbsent) {
-        return threadLocal.get().get(key, ifAbsent);
+    public V getIfPresent(K key, Function<K, @Nullable V> ifAbsent) {
+        return threadLocal.get().getIfPresent(key, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V get(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
-        return threadLocal.get().get(key, expirationPeriodSeconds, ifAbsent);
+    public V getIfPresent(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
+        return threadLocal.get().getIfPresent(key, expirationPeriodSeconds, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V get(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
-        return threadLocal.get().get(key, expirationPeriod, ifAbsent);
+    public V getIfPresent(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
+        return threadLocal.get().getIfPresent(key, expirationPeriod, ifAbsent);
     }
 
     @Override
