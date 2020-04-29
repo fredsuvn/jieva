@@ -17,6 +17,7 @@ public class WeakCache<K, V> implements Cache<K, V> {
     private final Duration defaultExpirationPeriod;
 
     WeakCache(Duration defaultExpirationPeriod, boolean isSynchronized) {
+
         this.defaultExpirationPeriod = defaultExpirationPeriod;
         this.weakHashMap = isSynchronized ? Collections.synchronizedMap(new WeakHashMap<>()) : new WeakHashMap<>();
     }
@@ -34,7 +35,7 @@ public class WeakCache<K, V> implements Cache<K, V> {
 
     @Nullable
     @Override
-    public V getIfPresent(K key) throws NoSuchElementException {
+    public V get(K key) throws NoSuchElementException {
         Node<V> node = weakHashMap.get(key);
         long now = TimeHelper.nowMillis();
         if (node == null || isExpired(node.getExpirationMillisAt(), now)) {
@@ -45,7 +46,7 @@ public class WeakCache<K, V> implements Cache<K, V> {
 
     @Nullable
     @Override
-    public V getIfPresent(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
+    public V get(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
         Node<V> node = weakHashMap.get(key);
         long now = TimeHelper.nowMillis();
         if (node == null) {
@@ -86,12 +87,12 @@ public class WeakCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void invalidate(K key) {
+    public void remove(K key) {
         weakHashMap.remove(key);
     }
 
     @Override
-    public void invalidateAll() {
+    public void removeAll() {
         weakHashMap.clear();
     }
 

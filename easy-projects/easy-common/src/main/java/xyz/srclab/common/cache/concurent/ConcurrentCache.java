@@ -56,26 +56,26 @@ public class ConcurrentCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V getIfPresent(K key) throws NoSuchElementException {
-        return getSegment(key).getIfPresent(key);
+    public V get(K key) throws NoSuchElementException {
+        return getSegment(key).get(key);
     }
 
     @Override
     @Nullable
-    public V getIfPresent(K key, Function<K, @Nullable V> ifAbsent) {
-        return getSegment(key).getIfPresent(key, ifAbsent);
+    public V get(K key, Function<K, @Nullable V> ifAbsent) {
+        return getSegment(key).get(key, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V getIfPresent(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
-        return getSegment(key).getIfPresent(key, expirationPeriodSeconds, ifAbsent);
+    public V get(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
+        return getSegment(key).get(key, expirationPeriodSeconds, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V getIfPresent(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
-        return getSegment(key).getIfPresent(key, expirationPeriod, ifAbsent);
+    public V get(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
+        return getSegment(key).get(key, expirationPeriod, ifAbsent);
     }
 
     @Override
@@ -109,14 +109,14 @@ public class ConcurrentCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void invalidate(K key) {
-        getSegment(key).invalidate(key);
+    public void remove(K key) {
+        getSegment(key).remove(key);
     }
 
     @Override
-    public void invalidateAll() {
+    public void removeAll() {
         for (Cache<K, V> segment : segments) {
-            segment.invalidateAll();
+            segment.removeAll();
         }
     }
 }

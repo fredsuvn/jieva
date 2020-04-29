@@ -61,8 +61,8 @@ public class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V getIfPresent(K key) throws NoSuchElementException {
-        return threadLocal.get().getIfPresent(key);
+    public V get(K key) throws NoSuchElementException {
+        return threadLocal.get().get(key);
     }
 
     @Override
@@ -71,8 +71,8 @@ public class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public Map<K, @Nullable V> getIfPresent(Iterable<K> keys) throws NoSuchElementException {
-        return threadLocal.get().getIfPresent(keys);
+    public Map<K, @Nullable V> getAll(Iterable<K> keys) throws NoSuchElementException {
+        return threadLocal.get().getAll(keys);
     }
 
     @Override
@@ -87,20 +87,20 @@ public class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V getIfPresent(K key, Function<K, @Nullable V> ifAbsent) {
-        return threadLocal.get().getIfPresent(key, ifAbsent);
+    public V get(K key, Function<K, @Nullable V> ifAbsent) {
+        return threadLocal.get().get(key, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V getIfPresent(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
-        return threadLocal.get().getIfPresent(key, expirationPeriodSeconds, ifAbsent);
+    public V get(K key, long expirationPeriodSeconds, Function<K, @Nullable V> ifAbsent) {
+        return threadLocal.get().get(key, expirationPeriodSeconds, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V getIfPresent(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
-        return threadLocal.get().getIfPresent(key, expirationPeriod, ifAbsent);
+    public V get(K key, Duration expirationPeriod, Function<K, @Nullable V> ifAbsent) {
+        return threadLocal.get().get(key, expirationPeriod, ifAbsent);
     }
 
     @Override
@@ -179,22 +179,21 @@ public class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void invalidate(K key) {
-        threadLocal.get().invalidate(key);
+    public void remove(K key) {
+        threadLocal.get().remove(key);
+    }
+
+    public void removeAll(K... keys) {
+        threadLocal.get().removeAll(keys);
     }
 
     @Override
-    public void invalidateAll(K... keys) {
-        threadLocal.get().invalidateAll(keys);
+    public void removeAll(Iterable<K> keys) {
+        threadLocal.get().removeAll(keys);
     }
 
     @Override
-    public void invalidateAll(Iterable<K> keys) {
-        threadLocal.get().invalidateAll(keys);
-    }
-
-    @Override
-    public void invalidateAll() {
-        threadLocal.get().invalidateAll();
+    public void removeAll() {
+        threadLocal.get().removeAll();
     }
 }

@@ -34,19 +34,19 @@ object CacheTest {
         doAssertEquals(cache.hasAny("1", "2"), false)
         doAssertEquals(cache.hasAny(listOf("1", "2")), false)
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("1")
+            cache.get("1")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("1", "2", "3")
+            cache.get("1", "2", "3")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent(listOf("1", "2", "3"))
+            cache.getAll(listOf("1", "2", "3"))
         }
 
         val counter = Computed.withCounter(100000)
         counter.get()
 
-        val v1 = cache.getIfPresent("1") {
+        val v1 = cache.get("1") {
             counter.refreshGet()
             counter
         }
@@ -61,7 +61,7 @@ object CacheTest {
         val map1ItPresent = cache.getPresent(listOf("1", "2"))
         doAssertEquals(map1ItPresent, mapOf("1" to counter))
 
-        val v2 = cache.getIfPresent("2", 1) {
+        val v2 = cache.get("2", 1) {
             counter.refreshGet()
             counter
         }
@@ -83,16 +83,16 @@ object CacheTest {
                 null
             }
         }
-        doAssertEquals(cache.getIfPresent("4"), null)
+        doAssertEquals(cache.get("4"), null)
 
         sleep()
-        cache.getIfPresent("2", 1) {
+        cache.get("2", 1) {
             counter.refreshGet()
             counter
         }
         doAssertEquals(v2?.get(), 3L)
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("4")
+            cache.get("4")
         }
 
         doAssertEquals(cache.has("1"), true)
@@ -101,9 +101,9 @@ object CacheTest {
         doAssertEquals(cache.hasAll("1"), true)
         doAssertEquals(cache.hasAll(listOf("1")), true)
 
-        val map1 = cache.getIfPresent("1")
+        val map1 = cache.get("1")
         doAssertEquals(map1, mapOf("1" to counter))
-        val map1It = cache.getIfPresent(listOf("1"))
+        val map1It = cache.getAll(listOf("1"))
         doAssertEquals(map1It, mapOf("1" to counter))
     }
 
@@ -120,14 +120,14 @@ object CacheTest {
         cache.putAll(mapOf("3" to counter))
         cache.putAll(mapOf("4" to counter), 1)
         cache.putAll(mapOf("5" to counter), Duration.ofSeconds(1))
-        doAssertEquals(cache.getIfPresent("1"), counter)
-        doAssertEquals(cache.getIfPresent("3"), counter)
+        doAssertEquals(cache.get("1"), counter)
+        doAssertEquals(cache.get("3"), counter)
         sleep()
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("2")
+            cache.get("2")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("4")
+            cache.get("4")
         }
     }
 
@@ -157,24 +157,24 @@ object CacheTest {
         cache.put("16", counter, Duration.ofSeconds(100))
         cache.put("17", counter, 100)
         cache.put("18", counter, Duration.ofSeconds(100))
-        doAssertEquals(cache.getIfPresent("1"), counter)
-        doAssertEquals(cache.getIfPresent("2"), counter)
-        doAssertEquals(cache.getIfPresent("3"), counter)
-        doAssertEquals(cache.getIfPresent("4"), counter)
-        doAssertEquals(cache.getIfPresent("5"), counter)
-        doAssertEquals(cache.getIfPresent("6"), counter)
-        doAssertEquals(cache.getIfPresent("7"), counter)
-        doAssertEquals(cache.getIfPresent("8"), counter)
-        doAssertEquals(cache.getIfPresent("9"), counter)
-        doAssertEquals(cache.getIfPresent("10"), counter)
-        doAssertEquals(cache.getIfPresent("11"), counter)
-        doAssertEquals(cache.getIfPresent("12"), counter)
-        doAssertEquals(cache.getIfPresent("13"), counter)
-        doAssertEquals(cache.getIfPresent("14"), counter)
-        doAssertEquals(cache.getIfPresent("15"), counter)
-        doAssertEquals(cache.getIfPresent("16"), counter)
-        doAssertEquals(cache.getIfPresent("17"), counter)
-        doAssertEquals(cache.getIfPresent("18"), counter)
+        doAssertEquals(cache.get("1"), counter)
+        doAssertEquals(cache.get("2"), counter)
+        doAssertEquals(cache.get("3"), counter)
+        doAssertEquals(cache.get("4"), counter)
+        doAssertEquals(cache.get("5"), counter)
+        doAssertEquals(cache.get("6"), counter)
+        doAssertEquals(cache.get("7"), counter)
+        doAssertEquals(cache.get("8"), counter)
+        doAssertEquals(cache.get("9"), counter)
+        doAssertEquals(cache.get("10"), counter)
+        doAssertEquals(cache.get("11"), counter)
+        doAssertEquals(cache.get("12"), counter)
+        doAssertEquals(cache.get("13"), counter)
+        doAssertEquals(cache.get("14"), counter)
+        doAssertEquals(cache.get("15"), counter)
+        doAssertEquals(cache.get("16"), counter)
+        doAssertEquals(cache.get("17"), counter)
+        doAssertEquals(cache.get("18"), counter)
 
         cache.expire("1")
         cache.expire("2", 1)
@@ -185,63 +185,63 @@ object CacheTest {
         cache.expireAll(listOf("11", "12"))
         cache.expire("13", Duration.ofSeconds(1))
         cache.expireAll(Duration.ofSeconds(1), "14", "15", "16")
-        cache.invalidateAll(listOf("17", "18"))
+        cache.removeAll(listOf("17", "18"))
 
         sleep()
 
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("1")
+            cache.get("1")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("2")
+            cache.get("2")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("3")
+            cache.get("3")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("4")
+            cache.get("4")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("5")
+            cache.get("5")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("6")
+            cache.get("6")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("7")
+            cache.get("7")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("8")
+            cache.get("8")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("9")
+            cache.get("9")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("10")
+            cache.get("10")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("11")
+            cache.get("11")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("12")
+            cache.get("12")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("13")
+            cache.get("13")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("14")
+            cache.get("14")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("15")
+            cache.get("15")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("16")
+            cache.get("16")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("17")
+            cache.get("17")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("18")
+            cache.get("18")
         }
     }
 
@@ -254,34 +254,34 @@ object CacheTest {
         counter.get()
 
         cache.put("1", counter)
-        doAssertEquals(cache.getIfPresent("1"), counter)
-        cache.invalidate("1")
+        doAssertEquals(cache.get("1"), counter)
+        cache.remove("1")
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("1")
+            cache.get("1")
         }
 
         cache.put("1", counter)
         cache.put("2", counter)
-        doAssertEquals(cache.getIfPresent("1"), counter)
-        doAssertEquals(cache.getIfPresent("2"), counter)
-        cache.invalidateAll("1", "2")
+        doAssertEquals(cache.get("1"), counter)
+        doAssertEquals(cache.get("2"), counter)
+        cache.removeAll("1", "2")
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("1")
+            cache.get("1")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("2")
+            cache.get("2")
         }
 
         cache.put("1", counter)
         cache.put("2", counter)
-        doAssertEquals(cache.getIfPresent("1"), counter)
-        doAssertEquals(cache.getIfPresent("2"), counter)
-        cache.invalidateAll()
+        doAssertEquals(cache.get("1"), counter)
+        doAssertEquals(cache.get("2"), counter)
+        cache.removeAll()
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("1")
+            cache.get("1")
         }
         doExpectThrowable(NoSuchElementException::class.java) {
-            cache.getIfPresent("2")
+            cache.get("2")
         }
     }
 
