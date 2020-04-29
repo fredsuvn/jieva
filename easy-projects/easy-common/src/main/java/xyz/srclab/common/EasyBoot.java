@@ -16,6 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EasyBoot {
 
+    private static final String DEFAULT_CONFIG_PATH = "/META-INF/easy.yaml";
+    private static final String[] CUSTOM_CONFIG_PATHS = {
+            "/easy.yaml", "/easy.yml", "/META-INF/easy.yaml", "/META-INF/easy.yml"};
+
     private static final String version;
 
     @Immutable
