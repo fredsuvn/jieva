@@ -16,6 +16,18 @@ public interface Cache<K, V> {
         return new WeakCacheBuilder<>();
     }
 
+    static <K, V> Cache<K, V> newSimpleThreadLocal() {
+        return new ThreadLocalCache<>(new SimpleCache<>(0));
+    }
+
+    static <K, V> Cache<K, V> newSimpleConcurrent() {
+        return new SimpleCache<>(SimpleCache.DEFAULT_CONCURRENCY_LEVEL);
+    }
+
+    static <K, V> Cache<K, V> newSimpleConcurrent(int concurrencyLevel) {
+        return new SimpleCache<>(concurrencyLevel);
+    }
+
     boolean has(K key);
 
     default boolean hasAll(Iterable<K> keys) {
