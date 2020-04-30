@@ -1,7 +1,6 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.cache.weak.WeakCacheBuilder;
 import xyz.srclab.common.collection.map.MapHelper;
 
 import java.time.Duration;
@@ -12,16 +11,12 @@ import java.util.function.Function;
 
 public interface Cache<K, V> {
 
-    static <K, V> WeakCacheBuilder<K, V> newWeakCacheBuilder() {
-        return new WeakCacheBuilder<>();
-    }
-
     static <K, V> Cache<K, V> newSimpleThreadLocal() {
         return new ThreadLocalCache<>(new SimpleCache<>(0));
     }
 
     static <K, V> Cache<K, V> newSimpleConcurrent() {
-        return new SimpleCache<>(SimpleCache.DEFAULT_CONCURRENCY_LEVEL);
+        return new SimpleCache<>(CacheSupport.DEFAULT_CONCURRENCY_LEVEL);
     }
 
     static <K, V> Cache<K, V> newSimpleConcurrent(int concurrencyLevel) {
