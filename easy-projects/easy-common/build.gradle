@@ -25,6 +25,7 @@ dependencies {
     api("commons-beanutils:commons-beanutils")
     api("org.apache.commons:commons-collections4")
     api("com.google.guava:guava")
+    api("com.github.ben-manes.caffeine:caffeine")
     api("org.yaml:snakeyaml")
 
     compileOnly("org.springframework:spring-core")
