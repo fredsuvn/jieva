@@ -14,8 +14,12 @@ final class SimpleCache<K, V> implements Cache<K, V> {
 
     private final Map<K, ValueWrapper<V>> autoCleanMap;
 
-    public SimpleCache(Map<K, ValueWrapper<V>> autoCleanMap) {
-        this.autoCleanMap = autoCleanMap;
+    public SimpleCache() {
+        this(0);
+    }
+
+    public SimpleCache(int concurrencyLevel) {
+        this.autoCleanMap = CacheSupport.newAutoCleanMap(concurrencyLevel);
     }
 
     @Override
