@@ -10,8 +10,6 @@ import java.util.WeakHashMap;
  */
 final class CacheSupport {
 
-    static final int DEFAULT_CONCURRENCY_LEVEL = 32;
-
     static <K, V> Map<K, V> newAutoCleanMap(int concurrencyLevel) {
         if (concurrencyLevel <= 1) {
             return new WeakHashMap<>();

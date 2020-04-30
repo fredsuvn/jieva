@@ -1,6 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.map.MapHelper;
 
 import java.time.Duration;
@@ -16,7 +17,7 @@ public interface Cache<K, V> {
     }
 
     static <K, V> Cache<K, V> newSimpleConcurrent() {
-        return new SimpleCache<>(CacheSupport.DEFAULT_CONCURRENCY_LEVEL);
+        return new SimpleCache<>(Defaults.DEFAULT_CONCURRENCY_LEVEL);
     }
 
     static <K, V> Cache<K, V> newSimpleConcurrent(int concurrencyLevel) {

@@ -1,8 +1,11 @@
 version: 1.0.0
+
 defaults:
   local: US
   charset: UTF-8
   time-unit: SECONDS
+  concurrency-level: 32
+
 providers:
   xyz.srclab.common.bean.provider: "xyz srclab.common.bean.provider.defaults.DefaultBeanProvider"
   xyz.srclab.common.invoke.provider: "xyz.srclab.common.invoke.provider.reflected.ReflectedInvokerProvider"

@@ -18,6 +18,8 @@ public class Defaults {
 
     public static final TimeUnit TIME_UNIT;
 
+    public static final int DEFAULT_CONCURRENCY_LEVEL;
+
     static {
         try {
             Map<String, String> defaultsProperties = EasyBoot.getDefaultsProperties();
@@ -26,6 +28,7 @@ public class Defaults {
             CHARSET = Charset.forName(defaultsProperties.get("charset"));
             TIME_UNIT = (TimeUnit) FieldUtils.readStaticField(
                     FieldUtils.getField(TimeUnit.class, defaultsProperties.get("time-unit")));
+            DEFAULT_CONCURRENCY_LEVEL = Integer.parseInt(defaultsProperties.get("concurrency-level"));
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
