@@ -12,7 +12,8 @@ import java.util.function.Predicate;
 
 public class MapHelper {
 
-    public static <NK, NV, OK, OV> @Immutable Map<NK, NV> map(
+    @Immutable
+    public static <NK, NV, OK, OV> Map<NK, NV> map(
             Map<OK, OV> sourceMap, Function<OK, NK> keyMapper, Function<OV, NV> valueMapper) {
         Map<NK, NV> newMap = new LinkedHashMap<>();
         sourceMap.forEach((k, v) -> newMap.put(keyMapper.apply(k), valueMapper.apply(v)));
@@ -30,11 +31,13 @@ public class MapHelper {
         }
     }
 
-    public static <K, V> @Immutable Map<K, V> immutable(Map<? extends K, ? extends V> map) {
+    @Immutable
+    public static <K, V> Map<K, V> immutable(Map<? extends K, ? extends V> map) {
         return ImmutableMap.copyOf(map);
     }
 
-    public static <K, V> @Immutable Map<K, V> filter(
+    @Immutable
+    public static <K, V> Map<K, V> filter(
             Map<? extends K, ? extends V> map, Predicate<Map.Entry<? extends K, ? extends V>> predicate) {
         Map<K, V> result = new LinkedHashMap<>();
         map.entrySet().forEach(e -> {
