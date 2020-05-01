@@ -7,22 +7,70 @@ import xyz.srclab.annotation.Nullable;
  */
 public interface CacheRemoveListener<K, V> extends CacheListener<K, V> {
 
-    static <K, V> CacheRemoveListener<K, V> getDefault() {
-        return DefaultCacheRemoveListener.INSTANCE;
-    }
+    void beforeRemove(K key, @Nullable V value, Cause cause);
 
-    void beforeRemove(K key, @Nullable V value);
+    void afterRemove(K key, @Nullable V value, Cause cause);
 
-    void afterRemove(K key, @Nullable V value);
+    enum Cause {
 
-    class DefaultCacheRemoveListener<K, V> implements CacheRemoveListener<K, V> {
+        /**
+         * The entry was manually removed by the user. This can result from the user invoking any of the
+         * following methods on the cache or map view.
+         */
+        EXPLICIT {
+            @Override
+            public boolean isEvicted() {
+                return false;
+            }
+        },
 
-        private static final DefaultCacheRemoveListener INSTANCE = new DefaultCacheRemoveListener();
+        /**
+         * The entry itself was not actually removed, but its value was replaced by the user. This can
+         * result from the user invoking any of the following methods on the cache or map view.
+         */
+        REPLACED {
+            @Override
+            public boolean isEvicted() {
+                return false;
+            }
+        },
 
-        @Override
-        public void beforeRemove(K key, @Nullable V value) {}
+        /**
+         * The entry was removed automatically because its key or value was garbage-collected.
+         */
+        COLLECTED {
+            @Override
+            public boolean isEvicted() {
+                return true;
+            }
+        },
 
-        @Override
-        public void afterRemove(K key, @Nullable V value) { }
+        /**
+         * The entry's expiration timestamp has passed.
+         */
+        EXPIRED {
+            @Override
+            public boolean isEvicted() {
+                return true;
+            }
+        },
+
+        /**
+         * The entry was evicted due to size constraints.
+         */
+        SIZE {
+            @Override
+            public boolean isEvicted() {
+                return true;
+            }
+        };
+
+        /**
+         * Returns {@code true} if there was an automatic removal due to eviction (the cause is neither
+         * {@link #EXPLICIT} nor {@link #REPLACED}).
+         *
+         * @return if the entry was automatically removed due to eviction
+         */
+        public abstract boolean isEvicted();
     }
 }
