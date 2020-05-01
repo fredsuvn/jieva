@@ -14,15 +14,15 @@ import java.util.function.Function;
 
 public interface Cache<K, V> {
 
-    static <K, V> Cache<K, V> newSimpleThreadLocal() {
+    static <K, V> Cache<K, V> newGcThreadLocal() {
         return new ThreadLocalCache<>(new SimpleCache<>(0));
     }
 
-    static <K, V> Cache<K, V> newSimpleConcurrent() {
-        return newSimpleConcurrent(Defaults.DEFAULT_CONCURRENCY_LEVEL);
+    static <K, V> Cache<K, V> newGcConcurrent() {
+        return newGcConcurrent(Defaults.DEFAULT_CONCURRENCY_LEVEL);
     }
 
-    static <K, V> Cache<K, V> newSimpleConcurrent(int concurrencyLevel) {
+    static <K, V> Cache<K, V> newGcConcurrent(int concurrencyLevel) {
         return new SimpleCache<>(concurrencyLevel);
     }
 

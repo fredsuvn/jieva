@@ -10,7 +10,7 @@ import java.util.WeakHashMap;
  */
 final class CacheSupport {
 
-    static <K, V> Map<K, V> newAutoCleanMap(int concurrencyLevel) {
+    static <K, V> Map<K, V> newGcMap(int concurrencyLevel) {
         if (concurrencyLevel <= 1) {
             return new WeakHashMap<>();
         }
