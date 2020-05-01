@@ -1,18 +1,10 @@
 package xyz.srclab.common.cache;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.github.benmanes.caffeine.cache.RemovalListener;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Defaults;
-import xyz.srclab.common.cache.listener.CacheListener;
-import xyz.srclab.common.collection.list.ListHelper;
+import xyz.srclab.common.cache.listener.*;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author sunqian
@@ -24,19 +16,26 @@ public final class CacheBuilder<K, V> {
     }
 
     private long maxSize = Long.MAX_VALUE;
-
-    private @Nullable Duration expiryAfterCreate;
-
-    private @Nullable Duration expiryAfterRead;
-
-    private @Nullable Duration expiryAfterUpdate;
-
     private int concurrencyLevel = Defaults.DEFAULT_CONCURRENCY_LEVEL;
 
-    private final List<CacheListener<K, V>> listeners = new LinkedList<>();
+    private @Nullable Duration expiryAfterCreate;
+    private @Nullable Duration expiryAfterRead;
+    private @Nullable Duration expiryAfterUpdate;
+
+    private @Nullable CacheCreateListener<K, V> createListener;
+    private @Nullable CacheReadListener<K, V> readListener;
+    private @Nullable CacheUpdateListener<K, V> updateListener;
+    private @Nullable CacheRemoveListener<K, V> removeListener;
+
+    private boolean useGuava = false;
 
     public CacheBuilder<K, V> setMaxSize(long maxSize) {
         this.maxSize = maxSize;
+        return this;
+    }
+
+    public CacheBuilder<K, V> setConcurrencyLevel(int concurrencyLevel) {
+        this.concurrencyLevel = concurrencyLevel;
         return this;
     }
 
@@ -55,58 +54,74 @@ public final class CacheBuilder<K, V> {
         return this;
     }
 
-    public CacheBuilder<K, V> setConcurrencyLevel(int concurrencyLevel) {
-        this.concurrencyLevel = concurrencyLevel;
+    public CacheBuilder<K, V> setCreateListener(CacheCreateListener<K, V> createListener) {
+        this.createListener = createListener;
         return this;
     }
 
-    @SafeVarargs
-    public final CacheBuilder<K, V> setListeners(CacheListener<K, V>... listeners) {
-        return setListeners(Arrays.asList(listeners));
-    }
-
-    public CacheBuilder<K, V> setListeners(Iterable<CacheListener<K, V>> listeners) {
+    public CacheBuilder<K, V> setReadListener(CacheReadListener<K, V> readListener) {
+        this.readListener = readListener;
         return this;
     }
 
-    long getMaxSize() {
+    public CacheBuilder<K, V> setUpdateListener(CacheUpdateListener<K, V> updateListener) {
+        this.updateListener = updateListener;
+        return this;
+    }
+
+    public CacheBuilder<K, V> setRemoveListener(CacheRemoveListener<K, V> removeListener) {
+        this.removeListener = removeListener;
+        return this;
+    }
+
+    public CacheBuilder<K, V> useGuava() {
+        this.useGuava = true;
+        return this;
+    }
+
+    public CacheBuilder<K, V> useCaffeine() {
+        this.useGuava = false;
+        return this;
+    }
+
+    public long getMaxSize() {
         return maxSize;
     }
 
-    Duration getExpiryAfterCreate() {
-        return expiryAfterCreate == null ? Duration.ZERO : expiryAfterCreate;
-    }
-
-    Duration getExpiryAfterRead() {
-        return expiryAfterRead == null ? Duration.ZERO : expiryAfterRead;
-    }
-
-    Duration getExpiryAfterUpdate() {
-        return expiryAfterUpdate == null ? Duration.ZERO : expiryAfterUpdate;
-    }
-
-    int getConcurrencyLevel() {
+    public int getConcurrencyLevel() {
         return concurrencyLevel;
     }
 
-    List<CacheListener<K, V>> getListeners() {
-        return ListHelper.immutable(listeners);
+    public Duration getExpiryAfterCreate() {
+        return expiryAfterCreate == null ? Duration.ZERO : expiryAfterCreate;
+    }
+
+    public Duration getExpiryAfterRead() {
+        return expiryAfterRead == null ? Duration.ZERO : expiryAfterRead;
+    }
+
+    public Duration getExpiryAfterUpdate() {
+        return expiryAfterUpdate == null ? Duration.ZERO : expiryAfterUpdate;
+    }
+
+    public CacheCreateListener<K, V> getCreateListener() {
+        return createListener == null ? CacheListener.emptyCreateListener() : createListener;
+    }
+
+    public CacheReadListener<K, V> getReadListener() {
+        return readListener == null ? CacheListener.emptyReadListener() : readListener;
+    }
+
+    public CacheUpdateListener<K, V> getUpdateListener() {
+        return updateListener == null ? CacheListener.emptyUpdateListener() : updateListener;
+    }
+
+    public CacheRemoveListener<K, V> getRemoveListener() {
+        return removeListener == null ? CacheListener.emptyRemoveListener() : removeListener;
     }
 
     public <K1 extends K, V1 extends V> Cache<K1, V1> build() {
-        Caffeine<Object, Object> caffeine = Caffeine.newBuilder().maximumSize(maxSize);
-        if (expiryAfterUpdate != null) {
-            caffeine.expireAfterWrite(expiryAfterUpdate);
-        }
-        if (expiryAfterRead != null) {
-            caffeine.expireAfterAccess(expiryAfterRead);
-        }
-        caffeine.removalListener(new RemovalListener<K, V>() {
-            @Override
-            public void onRemoval(@org.checkerframework.checker.nullness.qual.Nullable K key, @org.checkerframework.checker.nullness.qual.Nullable V value, @NonNull RemovalCause cause) {
-
-            }
-        });
-        return new CaffeineCache<>(caffeine.build());
+        Cache<K, V> cache = useGuava ? new GuavaCache<>(this) : new CaffeineCache<>(this);
+        return (Cache<K1, V1>) cache;
     }
 }

@@ -1,6 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Checker;
 
 import java.time.Duration;
 import java.util.Map;
@@ -26,9 +27,7 @@ final class SimpleCache<K, V> implements Cache<K, V> {
     @Override
     public V get(K key) throws NoSuchElementException {
         @Nullable ValueWrapper<V> valueWrapper = autoCleanMap.get(key);
-        if (valueWrapper == null) {
-            throw new NoSuchElementException("key: " + key);
-        }
+        Checker.checkElementByKey(valueWrapper != null, key);
         return valueWrapper.getValue();
     }
 

@@ -1,6 +1,8 @@
 package xyz.srclab.common.cache;
 
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.map.MapHelper;
 
@@ -17,11 +19,15 @@ public interface Cache<K, V> {
     }
 
     static <K, V> Cache<K, V> newSimpleConcurrent() {
-        return new SimpleCache<>(Defaults.DEFAULT_CONCURRENCY_LEVEL);
+        return newSimpleConcurrent(Defaults.DEFAULT_CONCURRENCY_LEVEL);
     }
 
     static <K, V> Cache<K, V> newSimpleConcurrent(int concurrencyLevel) {
         return new SimpleCache<>(concurrencyLevel);
+    }
+
+    static <K, V> CacheBuilder<K, V> newBuilder() {
+        return new CacheBuilder<>();
     }
 
     boolean has(K key);
@@ -53,6 +59,7 @@ public interface Cache<K, V> {
     @Nullable
     V get(K key, CacheValueFunction<K, @Nullable V> ifAbsent);
 
+    @Immutable
     default Map<K, @Nullable V> getAll(Iterable<K> keys) throws NoSuchElementException {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
@@ -61,6 +68,7 @@ public interface Cache<K, V> {
         return MapHelper.immutable(map);
     }
 
+    @Immutable
     default Map<K, @Nullable V> getAll(Iterable<K> keys, Function<K, @Nullable V> ifAbsent) {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
@@ -69,6 +77,7 @@ public interface Cache<K, V> {
         return MapHelper.immutable(map);
     }
 
+    @Immutable
     default Map<K, @Nullable V> getAll(Iterable<K> keys, CacheValueFunction<K, @Nullable V> ifAbsent) {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
@@ -77,6 +86,7 @@ public interface Cache<K, V> {
         return MapHelper.immutable(map);
     }
 
+    @Immutable
     default Map<K, @Nullable V> getPresent(Iterable<K> keys) {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
@@ -90,25 +100,19 @@ public interface Cache<K, V> {
 
     default V getNonNull(K key) throws NoSuchElementException, NullPointerException {
         @Nullable V result = get(key);
-        if (result == null) {
-            throw new NullPointerException();
-        }
+        Checker.checkNull(result != null);
         return result;
     }
 
     default V getNonNull(K key, Function<K, @Nullable V> ifAbsent) throws NullPointerException {
         @Nullable V result = get(key, ifAbsent);
-        if (result == null) {
-            throw new NullPointerException();
-        }
+        Checker.checkNull(result != null);
         return result;
     }
 
     default V getNonNull(K key, CacheValueFunction<K, @Nullable V> ifAbsent) throws NullPointerException {
         @Nullable V result = get(key, ifAbsent);
-        if (result == null) {
-            throw new NullPointerException();
-        }
+        Checker.checkNull(result != null);
         return result;
     }
 
