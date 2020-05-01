@@ -1,5 +1,7 @@
 package xyz.srclab.common.base;
 
+import java.util.NoSuchElementException;
+
 /**
  * @author sunqian
  */
@@ -35,6 +37,30 @@ public class Checker {
     public static void checkState(boolean expression, String message) {
         if (!expression) {
             throw new IllegalStateException(message);
+        }
+    }
+
+    public static void checkNull(boolean expression) {
+        if (!expression) {
+            throw new NullPointerException();
+        }
+    }
+
+    public static void checkNull(boolean expression, String message) {
+        if (!expression) {
+            throw new NullPointerException(message);
+        }
+    }
+
+    public static void checkElement(boolean expression) {
+        if (!expression) {
+            throw new NoSuchElementException();
+        }
+    }
+
+    public static void checkElementByKey(boolean expression, Object key) {
+        if (!expression) {
+            throw new NoSuchElementException("key: " + key);
         }
     }
 }
