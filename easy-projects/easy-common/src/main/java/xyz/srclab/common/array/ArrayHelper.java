@@ -3,7 +3,7 @@ package xyz.srclab.common.array;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.WrittenReturn;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
+import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.reflect.type.TypeHelper;
 import xyz.srclab.common.reflect.type.TypeRef;
@@ -15,13 +15,14 @@ import java.util.Collection;
 
 public class ArrayHelper {
 
-    private static final ThreadLocalCache<Type, Class<?>> arrayTypeCache = new ThreadLocalCache<>();
+    private static final Cache<Type, Class<?>> arrayTypeCache = Cache.newGcThreadLocal();
 
-    private static final ThreadLocalCache<Type, Type> componentTypeCache = new ThreadLocalCache<>();
+    private static final Cache<Type, Type> componentTypeCache = Cache.newGcThreadLocal();
 
     public static <E> E[] toArray(Iterable<E> iterable, Type componentType) {
         Collection<E> collection = IterableHelper.asCollection(iterable);
-        E[] array = (E[]) Array.newInstance(TypeHelper.getRawType(componentType), collection.size());
+        Class<?> classType = TypeHelper.getRawType(componentType);
+        E[] array = (E[]) Array.newInstance(classType, collection.size());
         int i = 0;
         for (E e : collection) {
             array[i++] = e;
