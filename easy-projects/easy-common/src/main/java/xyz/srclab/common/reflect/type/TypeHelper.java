@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.lang.key.Key;
+import xyz.srclab.common.reflect.NullRole;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -69,11 +70,11 @@ public class TypeHelper {
                 targetSuperClass.isAssignableFrom(cls),
                 targetSuperClass + "is not parent of " + cls
         );
-        Type returned = genericSuperClassCache.getNonNull(
+        Type result = genericSuperClassCache.getNonNull(
                 Key.from(cls, targetSuperClass),
                 k -> getGenericSuperclass0(cls, targetSuperClass)
         );
-        return returned == NullType.INSTANCE ? null : returned;
+        return result == NullRole.getNullType() ? null : result;
     }
 
     private static Type getGenericSuperclass0(Class<?> cls, Class<?> superClass) {
@@ -85,16 +86,6 @@ public class TypeHelper {
             }
             current = currentClass.getGenericSuperclass();
         } while (current != null);
-        return NullType.INSTANCE;
-    }
-
-    private static final class NullType implements Type {
-
-        private static final NullType INSTANCE = new NullType();
-
-        @Override
-        public String toString() {
-            return "NullType";
-        }
+        return NullRole.getNullType();
     }
 }

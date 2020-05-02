@@ -2,9 +2,11 @@ package xyz.srclab.common.reflect.method;
 
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.list.ListHelper;
 import xyz.srclab.common.lang.key.Key;
+import xyz.srclab.common.reflect.NullRole;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -21,18 +23,23 @@ public class MethodHelper {
 
     private static final Cache<Key, List<Method>> methodsCache = Cache.newGcThreadLocalL2();
 
+    @Nullable
     public static Method getMethod(Class<?> cls, String methodName, Class<?>... parameterTypes) {
-        return methodCache.getNonNull(
+        Method result = methodCache.getNonNull(
                 Key.from(cls, methodName, parameterTypes),
                 k -> getMethod0(cls, methodName, parameterTypes)
         );
+        if (result == NullRole.getNullMethod()) {
+            return null;
+        }
+        return result;
     }
 
     private static Method getMethod0(Class<?> cls, String methodName, Class<?>... parameterTypes) {
         try {
             return cls.getMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(e);
+            return NullRole.getNullMethod();
         }
     }
 
