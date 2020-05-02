@@ -5,7 +5,6 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
-import xyz.srclab.common.reflect.signature.SignatureHelper;
 import xyz.srclab.common.reflect.type.TypeRef;
 
 import java.lang.reflect.Method;
@@ -201,7 +200,7 @@ public interface BeanOperator {
             throws BeanMethodNotFoundException {
         @Nullable BeanMethod beanMethod = resolveBean(bean.getClass()).getMethod(methodName, parameterTypes);
         if (beanMethod == null) {
-            throw new BeanMethodNotFoundException(SignatureHelper.signMethod(methodName, parameterTypes));
+            throw new BeanMethodNotFoundException(methodName);
         }
         return beanMethod;
     }
