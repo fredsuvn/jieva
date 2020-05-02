@@ -13,12 +13,25 @@ public class CollectionHelper {
         if (collection1.size() != collection2.size()) {
             return false;
         }
-        Iterator<?> it1 = collection1.iterator();
-        Iterator<?> it2 = collection2.iterator();
-        while (it1.hasNext()) {
-            Object e1 = it1.next();
-            Object e2 = it2.next();
-            if (!Objects.deepEquals(e1, e2)) {
+        Iterator<?> iterator1 = collection1.iterator();
+        Iterator<?> iterator2 = collection2.iterator();
+        while (iterator1.hasNext()) {
+            if (!iterator2.hasNext()) {
+                return false;
+            }
+            Object o1 = iterator1.next();
+            Object o2 = iterator2.next();
+            if (o1 instanceof Collection && o2 instanceof Collection) {
+                if (deepEquals((Collection<?>) o1, (Collection<?>) o2)) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+            if (o1 instanceof Collection || o2 instanceof Collection) {
+                return false;
+            }
+            if (!Objects.deepEquals(o1, o2)) {
                 return false;
             }
         }

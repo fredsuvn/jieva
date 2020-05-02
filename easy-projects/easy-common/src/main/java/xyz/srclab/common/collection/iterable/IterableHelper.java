@@ -34,4 +34,33 @@ public class IterableHelper {
         }
         return set;
     }
+
+    public static boolean deepEquals(Iterable<?> iterable1, Iterable<?> iterable2) {
+        if (iterable1 == iterable2) {
+            return true;
+        }
+        Iterator<?> iterator1 = iterable1.iterator();
+        Iterator<?> iterator2 = iterable2.iterator();
+        while (iterator1.hasNext()) {
+            if (!iterator2.hasNext()) {
+                return false;
+            }
+            Object o1 = iterator1.next();
+            Object o2 = iterator2.next();
+            if (o1 instanceof Iterable && o2 instanceof Iterable) {
+                if (deepEquals((Iterable<?>) o1, (Iterable<?>) o2)) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+            if (o1 instanceof Iterable || o2 instanceof Iterable) {
+                return false;
+            }
+            if (!Objects.deepEquals(o1, o2)) {
+                return false;
+            }
+        }
+        return !iterator2.hasNext();
+    }
 }

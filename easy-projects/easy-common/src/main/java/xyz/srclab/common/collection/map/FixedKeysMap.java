@@ -12,7 +12,10 @@ import java.util.Set;
  * can change value of old key.
  * <p>
  * This map is thread-safe for reading (not for writing), fast, applicable to initialing scenes.
+ *
+ * @deprecated use {@link MapHelper#immutable(Map)}
  */
+@Deprecated
 @ThreadSafe
 public class FixedKeysMap<K, V> implements Map<K, V> {
 
