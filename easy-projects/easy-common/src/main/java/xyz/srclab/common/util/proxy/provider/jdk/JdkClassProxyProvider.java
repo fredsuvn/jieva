@@ -95,12 +95,19 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
 
         private static final class UnsupportedMethodInvoker implements MethodInvoker {
 
+            private static final String UNSUPPORTED_MESSAGE = "JDK proxy only supports proxying for interface, " +
+                    "so the interface method is abstract and cannot be invoked.";
+
             private static final UnsupportedMethodInvoker INSTANCE = new UnsupportedMethodInvoker();
 
             @Override
+            public Method getMethod() {
+                throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
+            }
+
+            @Override
             public @Nullable Object invoke(@Nullable Object object, Object... args) {
-                throw new UnsupportedOperationException("JDK proxy only supports proxying for interface, " +
-                        "so the interface method is abstract and cannot be invoked.");
+                throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
             }
         }
     }
