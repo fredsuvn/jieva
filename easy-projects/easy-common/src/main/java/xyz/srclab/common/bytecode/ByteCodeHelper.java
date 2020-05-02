@@ -10,20 +10,20 @@ public class ByteCodeHelper {
 
     private static final CharMatcher charMatcher = Shares.DOT_CHAR_MATCHER;
 
-    public static String getInternalName(Class<?> type) {
-        return getInternalName(type.getName());
+    public static String getTypeInternalName(Class<?> type) {
+        return getTypeInternalName(type.getName());
     }
 
-    public static String getInternalName(String className) {
+    public static String getTypeInternalName(String className) {
         return charMatcher.replaceFrom(className, '/');
     }
 
-    public static String getDescriptor(Class<?> type) {
+    public static String getTypeDescriptor(Class<?> type) {
         if (type.isPrimitive()) {
-            return getPrimitiveDescriptor(type);
+            return getPrimitiveTypeDescriptor(type);
         }
         if (type.isArray()) {
-            return getArrayDescriptor(type);
+            return getArrayTypeDescriptor(type);
         }
         //if (void.class.equals(cls)) {
         // Java doc doesn't say whether void is primitive,
@@ -33,7 +33,7 @@ public class ByteCodeHelper {
         return "L" + charMatcher.replaceFrom(type.getName(), '/') + ";";
     }
 
-    public static String getPrimitiveDescriptor(Class<?> primitiveType) {
+    public static String getPrimitiveTypeDescriptor(Class<?> primitiveType) {
         if (void.class.equals(primitiveType)) {
             // Note java doc doesn't say whether void is primitive,
             // but in performance it is, so here it is.
@@ -66,15 +66,15 @@ public class ByteCodeHelper {
         throw new IllegalArgumentException("Type is not primitive: " + primitiveType);
     }
 
-    public static String getArrayDescriptor(Class<?> arrayType) {
-        return "[" + getDescriptor(arrayType.getComponentType());
+    public static String getArrayTypeDescriptor(Class<?> arrayType) {
+        return "[" + getTypeDescriptor(arrayType.getComponentType());
     }
 
     public static String getMethodDescriptor(Class<?> returnType, Class<?>... parameterTypes) {
         StringBuilder buf = new StringBuilder();
         for (Class<?> parameterType : parameterTypes) {
-            buf.append(getDescriptor(parameterType));
+            buf.append(getTypeDescriptor(parameterType));
         }
-        return "(" + buf + ")" + getDescriptor(returnType);
+        return "(" + buf + ")" + getTypeDescriptor(returnType);
     }
 }
