@@ -15,9 +15,7 @@ import java.util.Collection;
 
 public class ArrayHelper {
 
-    private static final Cache<Type, Class<?>> arrayTypeCache = Cache.newGcThreadLocal();
-
-    private static final Cache<Type, Type> componentTypeCache = Cache.newGcThreadLocal();
+    private static final Cache<Type, Class<?>> elementToArrayTypeCache = Cache.newGcThreadLocalL2();
 
     public static <E> E[] toArray(Iterable<E> iterable, Type componentType) {
         Collection<E> collection = IterableHelper.asCollection(iterable);
@@ -197,7 +195,7 @@ public class ArrayHelper {
     }
 
     public static Class<?> findArrayType(Class<?> elementType) {
-        return arrayTypeCache.getNonNull(
+        return elementToArrayTypeCache.getNonNull(
                 elementType,
                 o -> findArrayType0(elementType)
         );
@@ -208,13 +206,6 @@ public class ArrayHelper {
     }
 
     public static Type getGenericComponentType(Type type) {
-        return componentTypeCache.getNonNull(
-                type,
-                o -> getGenericComponentType0(type)
-        );
-    }
-
-    private static Type getGenericComponentType0(Type type) {
         if (type instanceof GenericArrayType) {
             return ((GenericArrayType) type).getGenericComponentType();
         }
