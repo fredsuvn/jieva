@@ -4,6 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.reflect.type.TypeRef;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -98,8 +99,8 @@ public class BeanHelper {
         return beanOperator.getMethod(bean, methodName, parameterTypes);
     }
 
-    public static BeanMethod getMethodBySignature(Object bean, String methodSignature)
+    public static BeanMethod getMethodBySignature(Object bean, Method method)
             throws BeanMethodNotFoundException {
-        return beanOperator.getMethodBySignature(bean, methodSignature);
+        return beanOperator.getMethod(bean, method);
     }
 }

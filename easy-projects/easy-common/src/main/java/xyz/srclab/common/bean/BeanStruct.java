@@ -4,8 +4,9 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.signature.SignatureHelper;
+import xyz.srclab.common.reflect.method.MethodHelper;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 
@@ -40,26 +41,20 @@ public interface BeanStruct {
     @Immutable
     Map<String, BeanProperty> getWriteableProperties();
 
-    default @Nullable BeanMethod getMethod(String methodName, Class<?>... parameterTypes) {
-        return getMethodBySignature(SignatureHelper.signMethod(methodName, parameterTypes));
-    }
+    @Nullable
+    BeanMethod getMethod(String methodName, Class<?>... parameterTypes);
 
     @Nullable
-    BeanMethod getMethodBySignature(String methodSignature);
+    BeanMethod getMethod(Method method);
 
-    /**
-     * Keys are method signatures.
-     *
-     * @return Immutable map contains method signature and bean method
-     */
     @Immutable
-    Map<String, BeanMethod> getAllMethods();
+    Map<Method, BeanMethod> getAllMethods();
 
     final class Builder extends CachedBuilder<BeanStruct> {
 
         private final Class<?> type;
         private @Nullable Map<String, BeanProperty> propertyMap;
-        private @Nullable Map<String, BeanMethod> methodMap;
+        private @Nullable Map<Method, BeanMethod> methodMap;
 
         public Builder(Class<?> type) {
             this.type = type;
@@ -71,7 +66,7 @@ public interface BeanStruct {
             return this;
         }
 
-        public Builder setMethods(Map<String, BeanMethod> methodMap) {
+        public Builder setMethods(Map<Method, BeanMethod> methodMap) {
             this.methodMap = methodMap;
             this.updateState();
             return this;
@@ -85,10 +80,10 @@ public interface BeanStruct {
         private static final class BeanStructImpl implements BeanStruct {
 
             private final Class<?> type;
-            private final Map<String, BeanProperty> propertyMap;
-            private final Map<String, BeanProperty> readablePropertyMap;
-            private final Map<String, BeanProperty> writeablePropertyMap;
-            private final Map<String, BeanMethod> methodMap;
+            private final @Immutable Map<String, BeanProperty> propertyMap;
+            private final @Immutable Map<String, BeanProperty> readablePropertyMap;
+            private final @Immutable Map<String, BeanProperty> writeablePropertyMap;
+            private final @Immutable Map<Method, BeanMethod> methodMap;
 
             private BeanStructImpl(Builder builder) {
                 this.type = builder.type;
@@ -126,12 +121,18 @@ public interface BeanStruct {
             }
 
             @Override
-            public @Nullable BeanMethod getMethodBySignature(String methodSignature) {
-                return methodMap.get(methodSignature);
+            public @Nullable BeanMethod getMethod(String methodName, Class<?>... parameterTypes) {
+                @Nullable Method method = MethodHelper.getMethod(type, methodName, parameterTypes);
+                return method == null ? null : methodMap.get(method);
             }
 
             @Override
-            public @Immutable Map<String, BeanMethod> getAllMethods() {
+            public @Nullable BeanMethod getMethod(Method method) {
+                return methodMap.get(method);
+            }
+
+            @Override
+            public @Immutable Map<Method, BeanMethod> getAllMethods() {
                 return methodMap;
             }
         }

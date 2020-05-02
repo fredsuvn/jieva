@@ -1,7 +1,5 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.common.bean.*;
-
 /**
  * @author sunqian
  */

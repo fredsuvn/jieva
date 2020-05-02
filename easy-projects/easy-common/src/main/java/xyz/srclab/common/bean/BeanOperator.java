@@ -4,10 +4,11 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.signature.SignatureHelper;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
+import xyz.srclab.common.reflect.signature.SignatureHelper;
 import xyz.srclab.common.reflect.type.TypeRef;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -205,11 +206,11 @@ public interface BeanOperator {
         return beanMethod;
     }
 
-    default BeanMethod getMethodBySignature(Object bean, String methodSignature)
+    default BeanMethod getMethod(Object bean, Method method)
             throws BeanMethodNotFoundException {
-        @Nullable BeanMethod beanMethod = resolveBean(bean.getClass()).getMethodBySignature(methodSignature);
+        @Nullable BeanMethod beanMethod = resolveBean(bean.getClass()).getMethod(method);
         if (beanMethod == null) {
-            throw new BeanMethodNotFoundException(methodSignature);
+            throw new BeanMethodNotFoundException(method.toGenericString());
         }
         return beanMethod;
     }
