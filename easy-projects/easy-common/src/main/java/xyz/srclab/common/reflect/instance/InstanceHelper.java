@@ -2,40 +2,31 @@ package xyz.srclab.common.reflect.instance;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
-import xyz.srclab.common.reflect.classpath.ClassPathHelper;
+import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.invoke.InvokerHelper;
-import xyz.srclab.common.reflect.signature.SignatureHelper;
+import xyz.srclab.common.lang.key.Key;
+import xyz.srclab.common.reflect.classpath.ClassPathHelper;
 
 import java.lang.reflect.Constructor;
 
 public class InstanceHelper {
 
-    private static final ThreadLocalCache<String, Constructor<?>> constructorCache =
-            new ThreadLocalCache<>();
+    private static final Cache<Key, Constructor<?>> constructorCache = Cache.newGcThreadLocalL2();
 
     public static <T> T newInstance(String className) {
-        @Nullable Class<T> cls = ClassPathHelper.getClass(className);
+        @Nullable Class<?> cls = ClassPathHelper.getClass(className);
         Checker.checkArguments(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }
 
     public static <T> T newInstance(Class<?> cls) {
-        Constructor<?> constructor = constructorCache.getNonNull(
-                SignatureHelper.signConstructor(cls),
-                k -> {
-                    try {
-                        return cls.getConstructor();
-                    } catch (NoSuchMethodException e) {
-                        throw new IllegalArgumentException(e);
-                    }
-                });
+        Constructor<?> constructor = getConstructor(cls);
         return (T) InvokerHelper.getConstructorInvoker(constructor).invoke();
     }
 
     public static <T> Constructor<T> getConstructor(Class<T> cls, Class<?>... parameterTypes) {
         Constructor<?> constructor = constructorCache.getNonNull(
-                SignatureHelper.signConstructor(cls, parameterTypes),
+                Key.from(cls, parameterTypes),
                 k -> getConstructor0(cls, parameterTypes)
         );
         return (Constructor<T>) constructor;

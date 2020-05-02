@@ -27,9 +27,9 @@ public class ClassPathHelper {
     }
 
     @Nullable
-    public static Class<?> getClass(String className) {
+    public static <T> Class<T> getClass(String className) {
         try {
-            return Class.forName(className);
+            return (Class<T>) Class.forName(className);
         } catch (ClassNotFoundException e) {
             return null;
         }

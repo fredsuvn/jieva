@@ -4,7 +4,6 @@ import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.ParameterizedType;
@@ -16,9 +15,9 @@ import java.util.Date;
 
 public class TypeHelper {
 
-    private static final Cache<Type, Class<?>> rawTypeCache = new ThreadLocalCache<>();
+    private static final Cache<Type, Class<?>> rawTypeCache = Cache.newGcThreadLocalL2();
 
-    private static final Cache<Key, Type> genericSuperClassCache = new ThreadLocalCache<>();
+    private static final Cache<Key, Type> genericSuperClassCache = Cache.newGcThreadLocalL2();
 
     public static boolean isBasic(Object any) {
         return any instanceof CharSequence
@@ -34,21 +33,20 @@ public class TypeHelper {
     }
 
     public static <T> Class<T> getRawType(Type type) {
-        return (Class<T>) rawTypeCache.getNonNull(
+        Class<?> rawType = rawTypeCache.getNonNull(
                 type,
                 k -> getRawClass0(type)
         );
+        return (Class<T>) rawType;
     }
 
     private static Class<?> getRawClass0(Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;
         }
-
         if (type instanceof ParameterizedType) {
             return getRawType(((ParameterizedType) type).getRawType());
         }
-
         if (type instanceof TypeVariable) {
             Type boundType = ((TypeVariable<?>) type).getBounds()[0];
             if (boundType instanceof Class) {
@@ -56,23 +54,24 @@ public class TypeHelper {
             }
             return getRawType(boundType);
         }
-
         if (type instanceof WildcardType) {
             Type[] upperBounds = ((WildcardType) type).getUpperBounds();
             if (upperBounds.length == 1) {
                 return getRawType(upperBounds[0]);
             }
         }
-
         return Object.class;
     }
 
     @Nullable
-    public static Type getGenericSuperclass(Class<?> cls, Class<?> target) {
-        Checker.checkArguments(target.isAssignableFrom(cls), target + "is not parent of " + cls);
+    public static Type getGenericSuperclass(Class<?> cls, Class<?> targetSuperClass) {
+        Checker.checkArguments(
+                targetSuperClass.isAssignableFrom(cls),
+                targetSuperClass + "is not parent of " + cls
+        );
         Type returned = genericSuperClassCache.getNonNull(
-                Key.from(cls, target),
-                k -> getGenericSuperclass0(cls, target)
+                Key.from(cls, targetSuperClass),
+                k -> getGenericSuperclass0(cls, targetSuperClass)
         );
         return returned == NullType.INSTANCE ? null : returned;
     }
@@ -92,5 +91,10 @@ public class TypeHelper {
     private static final class NullType implements Type {
 
         private static final NullType INSTANCE = new NullType();
+
+        @Override
+        public String toString() {
+            return "NullType";
+        }
     }
 }

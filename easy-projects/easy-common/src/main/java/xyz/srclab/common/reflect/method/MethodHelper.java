@@ -3,9 +3,8 @@ package xyz.srclab.common.reflect.method;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.collection.list.ListHelper;
-import xyz.srclab.common.reflect.signature.SignatureHelper;
+import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -18,13 +17,13 @@ public class MethodHelper {
 
     public static final Object[] EMPTY_ARGUMENTS = ArrayUtils.EMPTY_OBJECT_ARRAY;
 
-    private static final Cache<String, Method> methodCache = new ThreadLocalCache<>();
+    private static final Cache<Key, Method> methodCache = Cache.newGcThreadLocalL2();
 
-    private static final Cache<String, List<Method>> methodsCache = new ThreadLocalCache<>();
+    private static final Cache<Key, List<Method>> methodsCache = Cache.newGcThreadLocalL2();
 
     public static Method getMethod(Class<?> cls, String methodName, Class<?>... parameterTypes) {
         return methodCache.getNonNull(
-                generateMethodCacheKey(cls, methodName, parameterTypes),
+                Key.from(cls, methodName, parameterTypes),
                 k -> getMethod0(cls, methodName, parameterTypes)
         );
     }
@@ -40,7 +39,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getAllMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                generateMethodsCacheKey(cls, "getAllMethods"),
+                Key.from("getAllMethods", cls),
                 k -> ListHelper.immutable(getAllMethods0(cls))
         );
     }
@@ -58,7 +57,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getOverrideableMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                generateMethodsCacheKey(cls, "getOverrideableMethods"),
+                Key.from("getOverrideableMethods", cls),
                 k -> ListHelper.immutable(getOverrideableMethods0(cls))
         );
     }
@@ -77,7 +76,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getPublicStaticMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                generateMethodsCacheKey(cls, "getPublicStaticMethods"),
+                Key.from("getPublicStaticMethods", cls),
                 k -> ListHelper.immutable(getPublicStaticMethods0(cls))
         );
     }
@@ -91,29 +90,22 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getPublicNonStaticMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                generateMethodsCacheKey(cls, "getPublicNonStaticMethods"),
+                Key.from("getPublicNonStaticMethods", cls),
                 kc -> ListHelper.immutable(getPublicNonStaticMethods0(cls))
         );
     }
 
     private static List<Method> getPublicNonStaticMethods0(Class<?> cls) {
         return Arrays.stream(cls.getMethods())
-                .filter(m -> !Modifier.isStatic(m.getModifiers()))
+                .filter(m -> !m.isBridge() && !Modifier.isStatic(m.getModifiers()))
                 .collect(Collectors.toList());
     }
 
     public static boolean canOverride(Method method) {
         int modifiers = method.getModifiers();
-        return !Modifier.isStatic(modifiers)
+        return !method.isBridge()
+                && !Modifier.isStatic(modifiers)
                 && !Modifier.isFinal(modifiers)
                 && (Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers));
-    }
-
-    private static String generateMethodCacheKey(Class<?> cls, String methodName, Class<?>... parameterTypes) {
-        return cls + "." + SignatureHelper.signMethod(methodName, parameterTypes);
-    }
-
-    private static String generateMethodsCacheKey(Class<?> cls, String scope) {
-        return cls + "(" + scope + ")";
     }
 }
