@@ -12,7 +12,7 @@ final class RefImpl<T> implements Ref<T> {
     public RefImpl() {
     }
 
-    public RefImpl(T object) {
+    public RefImpl(@Nullable T object) {
         this.object = object;
     }
 

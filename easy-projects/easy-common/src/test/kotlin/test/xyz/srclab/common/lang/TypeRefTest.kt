@@ -8,7 +8,7 @@ import xyz.srclab.test.doAssertEquals
 object TypeRefTest {
 
     private fun forGeneric(): Ref<String> {
-        return Ref.withEmpty()
+        return Ref.ofEmpty()
     }
 
     @Test

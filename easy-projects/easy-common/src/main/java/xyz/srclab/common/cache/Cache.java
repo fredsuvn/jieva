@@ -5,6 +5,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.map.MapHelper;
+import xyz.srclab.common.lang.ref.Ref;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
@@ -24,6 +25,16 @@ public interface Cache<K, V> {
 
     static <K, V> Cache<K, V> newGcConcurrent(int concurrencyLevel) {
         return new SimpleCache<>(concurrencyLevel);
+    }
+
+    static <K, V> Cache<K, V> newGcThreadLocalL2() {
+        return newGcThreadLocalL2(Defaults.DEFAULT_CONCURRENCY_LEVEL);
+    }
+
+    static <K, V> Cache<K, V> newGcThreadLocalL2(int concurrencyLevel) {
+        Cache<K, V> l2 = newGcThreadLocal();
+        Cache<K, V> l1 = newGcConcurrent(concurrencyLevel);
+        return new L2Cache<>(l1, l2);
     }
 
     static <K, V> CacheBuilder<K, V> newBuilder() {
@@ -52,6 +63,9 @@ public interface Cache<K, V> {
 
     @Nullable
     V get(K key) throws NoSuchElementException;
+
+    @Nullable
+    Ref<V> getIfPresent(K key);
 
     @Nullable
     V get(K key, Function<K, @Nullable V> ifAbsent);
@@ -90,9 +104,9 @@ public interface Cache<K, V> {
     default Map<K, @Nullable V> getPresent(Iterable<K> keys) {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
-            try {
-                map.put(key, get(key));
-            } catch (NoSuchElementException ignored) {
+            @Nullable Ref<V> ref = getIfPresent(key);
+            if (ref != null) {
+                map.put(key, ref.get());
             }
         }
         return MapHelper.immutable(map);
@@ -127,7 +141,11 @@ public interface Cache<K, V> {
     }
 
     default void putAll(Iterable<K> keys, Function<K, @Nullable V> valueFunction) {
-        keys.forEach(k -> put(k, valueFunction));
+        Map<K, @Nullable V> data = new LinkedHashMap<>();
+        for (K key : keys) {
+            data.put(key, valueFunction.apply(key));
+        }
+        putAll(data);
     }
 
     default void putAll(Iterable<K> keys, CacheValueFunction<K, @Nullable V> valueFunction) {

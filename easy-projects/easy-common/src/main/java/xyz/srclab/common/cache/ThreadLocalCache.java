@@ -1,6 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.lang.ref.Ref;
 
 import java.time.Duration;
 import java.util.Map;
@@ -41,6 +42,11 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     @Nullable
     public V get(K key) throws NoSuchElementException {
         return getCache().get(key);
+    }
+
+    @Override
+    public @Nullable Ref<V> getIfPresent(K key) {
+        return getCache().getIfPresent(key);
     }
 
     @Override

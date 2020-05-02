@@ -11,12 +11,12 @@ object RefTest {
 
     @Test
     fun testRef() {
-        val ref = Ref.withEmpty<Int>()
+        val ref = Ref.ofEmpty<Int>()
         doAssertEquals(ref.get(), null)
         ref.set(1)
         doAssertEquals(ref.get(), 1)
 
-        val ref2 = Ref.with("1")
+        val ref2 = Ref.of("1")
         doAssertEquals(ref.get(), 1)
     }
 }

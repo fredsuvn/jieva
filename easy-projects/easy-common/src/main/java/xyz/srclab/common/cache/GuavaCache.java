@@ -6,6 +6,7 @@ import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
 import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.collection.map.MapHelper;
+import xyz.srclab.common.lang.ref.Ref;
 
 import java.time.Duration;
 import java.util.*;
@@ -82,6 +83,13 @@ final class GuavaCache<K, V> implements Cache<K, V> {
         @Nullable Object value = guava.getIfPresent(key);
         Checker.checkElementByKey(value != null, key);
         return unmaskValue(value);
+    }
+
+    @Override
+    public @Nullable Ref<V> getIfPresent(K key) {
+        @Nullable Object value = guava.getIfPresent(key);
+        return value == null ?
+                null : Ref.of(unmaskValue(value));
     }
 
     @Override

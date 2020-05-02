@@ -2,6 +2,7 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.lang.ref.Ref;
 
 import java.time.Duration;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.function.Function;
  */
 final class SimpleCache<K, V> implements Cache<K, V> {
 
-    private final Map<K, ValueWrapper<V>> gcMap;
+    private final Map<K, Ref<V>> gcMap;
 
     public SimpleCache(int concurrencyLevel) {
         this.gcMap = CacheSupport.newGcMap(concurrencyLevel);
@@ -26,15 +27,20 @@ final class SimpleCache<K, V> implements Cache<K, V> {
 
     @Override
     public V get(K key) throws NoSuchElementException {
-        @Nullable ValueWrapper<V> valueWrapper = gcMap.get(key);
-        Checker.checkElementByKey(valueWrapper != null, key);
-        return valueWrapper.getValue();
+        @Nullable Ref<V> ref = gcMap.get(key);
+        Checker.checkElementByKey(ref != null, key);
+        return ref.get();
+    }
+
+    @Override
+    public @Nullable Ref<V> getIfPresent(K key) {
+        return gcMap.get(key);
     }
 
     @Override
     public V get(K key, Function<K, @Nullable V> ifAbsent) {
         return gcMap.computeIfAbsent(key,
-                k -> new ValueWrapper<>(ifAbsent.apply(k))).getValue();
+                k -> Ref.of(ifAbsent.apply(k))).get();
     }
 
     @Override
@@ -44,12 +50,12 @@ final class SimpleCache<K, V> implements Cache<K, V> {
 
     @Override
     public void put(K key, @Nullable V value) {
-        gcMap.put(key, new ValueWrapper<>(value));
+        gcMap.put(key, Ref.of(value));
     }
 
     @Override
     public void put(K key, Function<K, @Nullable V> valueFunction) {
-        gcMap.put(key, new ValueWrapper<>(valueFunction.apply(key)));
+        gcMap.put(key, Ref.of(valueFunction.apply(key)));
     }
 
     @Override
@@ -73,19 +79,5 @@ final class SimpleCache<K, V> implements Cache<K, V> {
     @Override
     public void removeAll() {
         gcMap.clear();
-    }
-
-    private static final class ValueWrapper<V> {
-
-        private final @Nullable V value;
-
-        private ValueWrapper(@Nullable V value) {
-            this.value = value;
-        }
-
-        @Nullable
-        public V getValue() {
-            return value;
-        }
     }
 }
