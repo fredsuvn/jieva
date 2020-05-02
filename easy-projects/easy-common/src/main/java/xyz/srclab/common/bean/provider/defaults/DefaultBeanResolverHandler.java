@@ -6,10 +6,8 @@ import xyz.srclab.common.bean.BeanProperty;
 import xyz.srclab.common.bean.BeanResolverHandler;
 import xyz.srclab.common.bean.BeanStruct;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.cache.threadlocal.ThreadLocalCache;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.invoke.MethodInvoker;
-import xyz.srclab.common.reflect.signature.SignatureHelper;
 
 import java.beans.*;
 import java.lang.reflect.Method;
@@ -21,7 +19,7 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
     static DefaultBeanResolverHandler INSTANCE = new DefaultBeanResolverHandler();
 
-    private static final Cache<Class<?>, BeanStruct> CACHE = new ThreadLocalCache<>();
+    private static final Cache<Class<?>, BeanStruct> cache = Cache.newGcThreadLocalL2();
 
     @Override
     public boolean supportBean(Class<?> beanClass) {
@@ -30,7 +28,7 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
     @Override
     public BeanStruct resolve(Class<?> beanClass) {
-        return CACHE.getNonNull(beanClass, type -> {
+        return cache.getNonNull(beanClass, type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
                 Method[] methods = type.getMethods();
@@ -56,11 +54,11 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
         return map;
     }
 
-    private Map<String, BeanMethod> buildMethods(Method[] methods) {
-        Map<String, BeanMethod> map = new LinkedHashMap<>();
+    private Map<Method, BeanMethod> buildMethods(Method[] methods) {
+        Map<Method, BeanMethod> map = new LinkedHashMap<>();
         for (Method method : methods) {
             BeanMethod beanMethod = new BeanMethodImpl(method);
-            map.put(beanMethod.getSignature(), beanMethod);
+            map.put(method, beanMethod);
         }
         return map;
     }
@@ -72,8 +70,9 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
         private final @Nullable Method readMethod;
         private final @Nullable Method writeMethod;
-        private final @Nullable MethodInvoker getter;
-        private final @Nullable MethodInvoker setter;
+
+        private @Nullable MethodInvoker getter;
+        private @Nullable MethodInvoker setter;
 
         private BeanPropertyImpl(PropertyDescriptor descriptor) {
             this.descriptor = descriptor;
@@ -87,8 +86,6 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
                     writeMethod.getGenericParameterTypes()[0]
                     :
                     readMethod.getGenericReturnType();
-            this.getter = readMethod == null ? null : MethodInvoker.of(readMethod);
-            this.setter = writeMethod == null ? null : MethodInvoker.of(writeMethod);
         }
 
         @Override
@@ -108,7 +105,7 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
         @Override
         public boolean isReadable() {
-            return getter != null;
+            return readMethod != null;
         }
 
         @Nullable
@@ -116,6 +113,9 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
         public Object getValue(Object bean) throws UnsupportedOperationException {
             if (!isReadable()) {
                 throw new UnsupportedOperationException("Property is not readable: " + descriptor);
+            }
+            if (getter == null) {
+                getter = MethodInvoker.of(readMethod);
             }
             return getter.invoke(bean);
         }
@@ -127,13 +127,16 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
         @Override
         public boolean isWriteable() {
-            return setter != null;
+            return writeMethod != null;
         }
 
         @Override
         public void setValue(Object bean, @Nullable Object value) throws UnsupportedOperationException {
             if (!isWriteable()) {
                 throw new UnsupportedOperationException("Property is not writeable: " + descriptor);
+            }
+            if (setter == null) {
+                setter = MethodInvoker.of(writeMethod);
             }
             setter.invoke(bean, value);
         }
@@ -166,23 +169,15 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
     private static final class BeanMethodImpl implements BeanMethod {
 
         private final Method method;
-        private final String signature;
-        private final MethodInvoker methodInvoker;
+        private @Nullable MethodInvoker methodInvoker;
 
         private BeanMethodImpl(Method method) {
             this.method = method;
-            this.signature = SignatureHelper.signMethod(this.method);
-            this.methodInvoker = MethodInvoker.of(this.method);
         }
 
         @Override
         public String getName() {
             return method.getName();
-        }
-
-        @Override
-        public String getSignature() {
-            return signature;
         }
 
         @Override
@@ -217,6 +212,9 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
         @Override
         public @Nullable Object invoke(Object bean, Object... args) {
+            if (methodInvoker == null) {
+                methodInvoker = MethodInvoker.of(method);
+            }
             return methodInvoker.invoke(bean, args);
         }
 

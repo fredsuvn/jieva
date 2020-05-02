@@ -11,8 +11,6 @@ public interface BeanMethod {
 
     String getName();
 
-    String getSignature();
-
     Class<?>[] getParameterTypes();
 
     Type[] getGenericParameterTypes();
