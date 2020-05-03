@@ -9,5 +9,13 @@ public interface CharsRef extends CharSequence {
         return new DefaultCharsRef(chars, start, end);
     }
 
+    int indexOf(char c);
+
+    int indexOf(String string);
+
+    int lastIndexOf(char c);
+
+    int lastIndexOf(String string);
+
     CharsRef trim();
 }

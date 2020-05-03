@@ -4,9 +4,9 @@ import xyz.srclab.common.base.Checker;
 
 public class CharsHelper {
 
-    public static int indexOf(CharSequence charSequence, int from, int to, char c) {
-        Checker.checkSubBounds(charSequence.length(), from, to);
-        for (int i = from; i < to; i++) {
+    public static int indexOf(CharSequence charSequence, int start, int end, char c) {
+        Checker.checkSubBounds(charSequence.length(), start, end);
+        for (int i = start; i < end; i++) {
             if (charSequence.charAt(i) == c) {
                 return i;
             }
@@ -14,9 +14,9 @@ public class CharsHelper {
         return -1;
     }
 
-    public static int lastIndexOf(CharSequence charSequence, int from, int to, char c) {
-        Checker.checkSubBounds(charSequence.length(), from, to);
-        for (int i = to - 1; i >= from; i--) {
+    public static int lastIndexOf(CharSequence charSequence, int start, int end, char c) {
+        Checker.checkSubBounds(charSequence.length(), start, end);
+        for (int i = end - 1; i >= start; i--) {
             if (charSequence.charAt(i) == c) {
                 return i;
             }
@@ -24,14 +24,14 @@ public class CharsHelper {
         return -1;
     }
 
-    public static int indexOf(CharSequence charSequence, int from, int to, CharSequence chars) {
-        Checker.checkSubBounds(charSequence.length(), from, to);
+    public static int indexOf(CharSequence charSequence, int start, int end, CharSequence chars) {
+        Checker.checkSubBounds(charSequence.length(), start, end);
         int charsLength = chars.length();
-        if (to - from < charsLength) {
+        if (end - start < charsLength) {
             return -1;
         }
-        int possibleTo = to - charsLength + 1;
-        for (int i = from; i < possibleTo; i++) {
+        int possibleTo = end - charsLength + 1;
+        for (int i = start; i < possibleTo; i++) {
             int c = 0;
             for (int j = 0; j < charsLength; j++) {
                 if (charSequence.charAt(i + j) != chars.charAt(j)) {
@@ -46,14 +46,14 @@ public class CharsHelper {
         return -1;
     }
 
-    public static int lastIndexOf(CharSequence charSequence, int from, int to, CharSequence chars) {
-        Checker.checkSubBounds(charSequence.length(), from, to);
+    public static int lastIndexOf(CharSequence charSequence, int start, int end, CharSequence chars) {
+        Checker.checkSubBounds(charSequence.length(), start, end);
         int charsLength = chars.length();
-        if (to - from < charsLength) {
+        if (end - start < charsLength) {
             return -1;
         }
-        int possibleFrom = from + charsLength - 1;
-        for (int i = to - 1; i >= possibleFrom; i--) {
+        int possibleFrom = start + charsLength - 1;
+        for (int i = end - 1; i >= possibleFrom; i--) {
             int c = 0;
             int charsFrom = charsLength - 1;
             for (int j = charsFrom; j >= 0; j--) {

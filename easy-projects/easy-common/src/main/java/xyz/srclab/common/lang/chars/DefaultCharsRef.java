@@ -34,6 +34,26 @@ final class DefaultCharsRef implements CharsRef {
     }
 
     @Override
+    public int indexOf(char c) {
+        return CharsHelper.indexOf(source, start, end, c);
+    }
+
+    @Override
+    public int indexOf(String string) {
+        return CharsHelper.indexOf(source, start, end, string);
+    }
+
+    @Override
+    public int lastIndexOf(char c) {
+        return CharsHelper.lastIndexOf(source, start, end, c);
+    }
+
+    @Override
+    public int lastIndexOf(String string) {
+        return CharsHelper.lastIndexOf(source, start, end, string);
+    }
+
+    @Override
     public CharsRef trim() {
         int len = length();
         int st = 0;
