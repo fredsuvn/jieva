@@ -1,4 +1,4 @@
-package xyz.srclab.common.chars;
+package xyz.srclab.common.lang.chars;
 
 import xyz.srclab.common.base.Checker;
 

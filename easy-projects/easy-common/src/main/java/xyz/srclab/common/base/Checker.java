@@ -7,12 +7,12 @@ import java.util.NoSuchElementException;
  */
 public class Checker {
 
-    public static void checkBoundsFromTo(int length, int from, int to) {
-        if (from > to) {
-            throw new IllegalArgumentException("from > to");
+    public static void checkSubBounds(int length, int start, int end) {
+        if (start > end) {
+            throw new IllegalArgumentException("Sub bounds setting error: start : " + start + ", end: " + end);
         }
-        if (from < 0 || to > length) {
-            throw new IndexOutOfBoundsException("from: " + from + ", to: " + to);
+        if (start < 0 || end > length) {
+            throw new IndexOutOfBoundsException("start: " + start + ", end: " + end);
         }
     }
 
