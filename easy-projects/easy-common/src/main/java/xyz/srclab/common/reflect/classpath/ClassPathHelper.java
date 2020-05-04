@@ -26,10 +26,23 @@ public class ClassPathHelper {
         return getClass(className) != null;
     }
 
+    public static boolean hasClass(String className, ClassLoader classLoader) {
+        return getClass(className, classLoader) != null;
+    }
+
     @Nullable
     public static <T> Class<T> getClass(String className) {
         try {
             return (Class<T>) Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    @Nullable
+    public static <T> Class<T> getClass(String className, ClassLoader classLoader) {
+        try {
+            return (Class<T>) Class.forName(className, true, classLoader);
         } catch (ClassNotFoundException e) {
             return null;
         }
