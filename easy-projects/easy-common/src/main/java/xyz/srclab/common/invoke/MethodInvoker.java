@@ -2,6 +2,7 @@ package xyz.srclab.common.invoke;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.reflect.method.MethodHelper;
 
 import java.lang.reflect.Method;
 
@@ -14,7 +15,11 @@ public interface MethodInvoker {
 
     @Nullable
     static MethodInvoker of(Class<?> type, String methodName, Class<?>... parameterTypes) {
-        return InvokerSupport.getMethodInvoker(type, methodName, parameterTypes);
+        @Nullable Method method = MethodHelper.getMethod(type, methodName, parameterTypes);
+        if (method == null) {
+            return null;
+        }
+        return of(method);
     }
 
     Method getMethod();
