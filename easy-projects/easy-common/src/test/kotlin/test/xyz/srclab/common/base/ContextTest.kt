@@ -21,13 +21,13 @@ object ContextTest {
 
     @Test
     fun testFindClass() {
-        val cls = Context.getClass("test.xyz.srclab.common.base.EnvironmentHelperTest")
+        val cls = Context.getClass<Class<*>>("test.xyz.srclab.common.base.EnvironmentHelperTest")
         doAssertEquals(
             cls,
             Class.forName("test.xyz.srclab.common.base.EnvironmentHelperTest")
         )
 
-        val noClass = Context.getClass("test.xyz.srclab.common.base.EnvironmentHelperTest0")
+        val noClass = Context.getClass<Class<*>>("test.xyz.srclab.common.base.EnvironmentHelperTest0")
         doAssertEquals(
             Context.hasClass("test.xyz.srclab.common.base.EnvironmentHelperTest0"),
             false
