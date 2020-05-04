@@ -1,6 +1,7 @@
 package xyz.srclab.common.base;
 
 import java.util.NoSuchElementException;
+import java.util.function.Supplier;
 
 /**
  * @author sunqian
@@ -28,6 +29,12 @@ public class Checker {
         }
     }
 
+    public static void checkArguments(boolean expression, Supplier<String> messageSupplier) {
+        if (!expression) {
+            throw new IllegalArgumentException(messageSupplier.get());
+        }
+    }
+
     public static void checkState(boolean expression) {
         if (!expression) {
             throw new IllegalStateException();
@@ -40,6 +47,12 @@ public class Checker {
         }
     }
 
+    public static void checkState(boolean expression, Supplier<String> messageSupplier) {
+        if (!expression) {
+            throw new IllegalStateException(messageSupplier.get());
+        }
+    }
+
     public static void checkNull(boolean expression) {
         if (!expression) {
             throw new NullPointerException();
@@ -49,6 +62,12 @@ public class Checker {
     public static void checkNull(boolean expression, String message) {
         if (!expression) {
             throw new NullPointerException(message);
+        }
+    }
+
+    public static void checkNull(boolean expression, Supplier<String> messageSupplier) {
+        if (!expression) {
+            throw new NullPointerException(messageSupplier.get());
         }
     }
 

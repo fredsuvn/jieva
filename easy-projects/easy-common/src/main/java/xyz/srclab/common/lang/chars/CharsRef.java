@@ -9,6 +9,17 @@ public interface CharsRef extends CharSequence {
         return new DefaultCharsRef(chars, start, end);
     }
 
+    static CharsRef of(CharSequence chars, int start) {
+        return of(chars, start, chars.length());
+    }
+
+    @Override
+    CharsRef subSequence(int start, int end);
+
+    default CharsRef subSequence(int start) {
+        return subSequence(start, length());
+    }
+
     int indexOf(char c);
 
     int indexOf(String string);

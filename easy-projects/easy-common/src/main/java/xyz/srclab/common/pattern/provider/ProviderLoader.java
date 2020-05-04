@@ -1,7 +1,6 @@
 package xyz.srclab.common.pattern.provider;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.Nullable;
 
 import java.util.Map;
 
@@ -10,15 +9,10 @@ import java.util.Map;
  */
 public interface ProviderLoader<T> {
 
-    static <T> ProviderLoader<T> loadFromClassNames(String classesDescriptor) {
-        return new ClassDescriptorProviderLoader<>(classesDescriptor);
+    static <T> ProviderLoader<T> newStringDescriptorLoader(String stringDescriptor) {
+        return new StringDescriptorProviderLoader<>(stringDescriptor);
     }
 
-    T getProvider();
-
-    @Nullable
-    T getProvider(String providerName);
-
     @Immutable
-    Map<String, T> getProviders();
+    Map<String, T> load();
 }
