@@ -8,4 +8,6 @@ import com.google.common.base.CharMatcher;
 public class Shares {
 
     public static final CharMatcher DOT_CHAR_MATCHER = CharMatcher.is('.');
+
+    public static final CharMatcher $_CHAR_MATCHER = CharMatcher.is('$');
 }

@@ -8,14 +8,14 @@ import xyz.srclab.common.base.Shares;
  */
 public class ByteCodeHelper {
 
-    private static final CharMatcher charMatcher = Shares.DOT_CHAR_MATCHER;
+    private static final CharMatcher dotMatcher = Shares.DOT_CHAR_MATCHER;
 
     public static String getTypeInternalName(Class<?> type) {
         return getTypeInternalName(type.getName());
     }
 
     public static String getTypeInternalName(String className) {
-        return charMatcher.replaceFrom(className, '/');
+        return dotMatcher.replaceFrom(className, '/');
     }
 
     public static String getTypeDescriptor(Class<?> type) {
@@ -30,7 +30,7 @@ public class ByteCodeHelper {
         // so here may run or never run.
         //return "V";
         //}
-        return "L" + charMatcher.replaceFrom(type.getName(), '/') + ";";
+        return "L" + dotMatcher.replaceFrom(type.getName(), '/') + ";";
     }
 
     public static String getPrimitiveTypeDescriptor(Class<?> primitiveType) {

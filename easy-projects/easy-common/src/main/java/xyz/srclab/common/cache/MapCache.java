@@ -12,34 +12,34 @@ import java.util.function.Function;
 /**
  * @author sunqian
  */
-final class SimpleCache<K, V> implements Cache<K, V> {
+final class MapCache<K, V> implements Cache<K, V> {
 
-    private final Map<K, Ref<V>> gcMap;
+    private final Map<K, Ref<V>> map;
 
-    public SimpleCache(int concurrencyLevel) {
-        this.gcMap = CacheSupport.newGcMap(concurrencyLevel);
+    public MapCache(Map<K, Ref<V>> map) {
+        this.map = map;
     }
 
     @Override
     public boolean has(K key) {
-        return gcMap.containsKey(key);
+        return map.containsKey(key);
     }
 
     @Override
     public V get(K key) throws NoSuchElementException {
-        @Nullable Ref<V> ref = gcMap.get(key);
+        @Nullable Ref<V> ref = map.get(key);
         Checker.checkElementByKey(ref != null, key);
         return ref.get();
     }
 
     @Override
     public @Nullable Ref<V> getIfPresent(K key) {
-        return gcMap.get(key);
+        return map.get(key);
     }
 
     @Override
     public V get(K key, Function<K, @Nullable V> ifAbsent) {
-        return gcMap.computeIfAbsent(key,
+        return map.computeIfAbsent(key,
                 k -> Ref.of(ifAbsent.apply(k))).get();
     }
 
@@ -50,12 +50,12 @@ final class SimpleCache<K, V> implements Cache<K, V> {
 
     @Override
     public void put(K key, @Nullable V value) {
-        gcMap.put(key, Ref.of(value));
+        map.put(key, Ref.of(value));
     }
 
     @Override
     public void put(K key, Function<K, @Nullable V> valueFunction) {
-        gcMap.put(key, Ref.of(valueFunction.apply(key)));
+        map.put(key, Ref.of(valueFunction.apply(key)));
     }
 
     @Override
@@ -73,11 +73,11 @@ final class SimpleCache<K, V> implements Cache<K, V> {
 
     @Override
     public void remove(K key) {
-        gcMap.remove(key);
+        map.remove(key);
     }
 
     @Override
     public void removeAll() {
-        gcMap.clear();
+        map.clear();
     }
 }

@@ -30,7 +30,7 @@ public class Defaults {
             TIME_UNIT = (TimeUnit) FieldUtils.readStaticField(FieldUtils.getField(
                     TimeUnit.class, defaultsProperties.getOrDefault("time-unit", "SECONDS")));
             DEFAULT_CONCURRENCY_LEVEL = Integer.parseInt(
-                    defaultsProperties.getOrDefault("concurrency-level", "32"));
+                    defaultsProperties.getOrDefault("concurrency-level", "16"));
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

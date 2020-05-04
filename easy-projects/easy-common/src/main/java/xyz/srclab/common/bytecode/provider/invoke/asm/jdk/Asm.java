@@ -1,4 +1,4 @@
-//package xyz.srclab.common.bytecode.provider.invoke.jdkasm;
+//package xyz.srclab.common.bytecode.provider.invoke.asm.jdkasm;
 //
 //import com.google.common.base.CharMatcher;
 //import jdk.internal.org.objectweb.asm.ClassWriter;

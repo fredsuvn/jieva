@@ -8,6 +8,7 @@ import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.lang.ref.Ref;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -15,8 +16,22 @@ import java.util.function.Function;
 
 public interface Cache<K, V> {
 
+    static <K, V> Cache<K, V> newPermanent() {
+        return newPermanent(Defaults.DEFAULT_CONCURRENCY_LEVEL);
+    }
+
+    static <K, V> Cache<K, V> newPermanent(int concurrencyLevel) {
+        Map<K, Ref<V>> map = concurrencyLevel <= 1 ?
+                new HashMap<>() : MapHelper.newConcurrentMap(concurrencyLevel);
+        return new MapCache<>(map);
+    }
+
+    static <K, V> Cache<K, V> newMapped(Map<K, Ref<V>> map) {
+        return new MapCache<>(map);
+    }
+
     static <K, V> Cache<K, V> newGcThreadLocal() {
-        return new ThreadLocalCache<>(new SimpleCache<>(0));
+        return new ThreadLocalCache<>(newMapped(CacheSupport.newGcMap(0)));
     }
 
     static <K, V> Cache<K, V> newGcConcurrent() {
@@ -24,7 +39,11 @@ public interface Cache<K, V> {
     }
 
     static <K, V> Cache<K, V> newGcConcurrent(int concurrencyLevel) {
-        return new SimpleCache<>(concurrencyLevel);
+        return new MapCache<>(CacheSupport.newGcMap(concurrencyLevel));
+    }
+
+    static <K, V> Cache<K, V> newL2Cache(Cache<K, V> l1, Cache<K, V> l2) {
+        return new L2Cache<>(l1, l2);
     }
 
     static <K, V> Cache<K, V> newGcThreadLocalL2() {
@@ -32,9 +51,13 @@ public interface Cache<K, V> {
     }
 
     static <K, V> Cache<K, V> newGcThreadLocalL2(int concurrencyLevel) {
-        Cache<K, V> l2 = newGcThreadLocal();
         Cache<K, V> l1 = newGcConcurrent(concurrencyLevel);
-        return new L2Cache<>(l1, l2);
+        return newGcThreadLocalL2(l1);
+    }
+
+    static <K, V> Cache<K, V> newGcThreadLocalL2(Cache<K, V> l1) {
+        Cache<K, V> l2 = newGcThreadLocal();
+        return newL2Cache(l1, l2);
     }
 
     static <K, V> CacheBuilder<K, V> newBuilder() {

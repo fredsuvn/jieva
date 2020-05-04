@@ -1,4 +1,4 @@
-package xyz.srclab.common.bytecode.provider.invoke.jdkasm;
+package xyz.srclab.common.bytecode.provider.invoke.asm.jdk;
 
 public class AsmConstructorInvoker {
 
