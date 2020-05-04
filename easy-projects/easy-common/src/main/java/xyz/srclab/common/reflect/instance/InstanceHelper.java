@@ -6,7 +6,7 @@ import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.invoke.InvokerHelper;
 import xyz.srclab.common.lang.key.Key;
 import xyz.srclab.common.reflect.NullRole;
-import xyz.srclab.common.reflect.classpath.ClassPathHelper;
+import xyz.srclab.common.base.Context;
 
 import java.lang.reflect.Constructor;
 
@@ -15,7 +15,7 @@ public class InstanceHelper {
     private static final Cache<Key, Constructor<?>> constructorCache = Cache.newGcThreadLocalL2();
 
     public static <T> T newInstance(String className) {
-        @Nullable Class<?> cls = ClassPathHelper.getClass(className);
+        @Nullable Class<?> cls = Context.getClass(className);
         Checker.checkArguments(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }

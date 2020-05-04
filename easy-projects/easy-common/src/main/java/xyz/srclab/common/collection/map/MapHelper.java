@@ -26,19 +26,21 @@ public class MapHelper {
 
     @Immutable
     public static <NK, NV, OK, OV> Map<NK, NV> map(
-            Map<OK, OV> sourceMap, Function<OK, NK> keyMapper, Function<OV, NV> valueMapper) {
+            Map<OK, OV> sourceMap,
+            Function<OK, ? extends NK> keyMapper,
+            Function<OV, ? extends NV> valueMapper
+    ) {
         Map<NK, NV> newMap = new LinkedHashMap<>();
         sourceMap.forEach((k, v) -> newMap.put(keyMapper.apply(k), valueMapper.apply(v)));
         return immutable(newMap);
     }
 
-    @SafeVarargs
-    public static <K, V> void removeAll(@WrittenReturn Map<K, V> map, K... keys) {
+    public static void removeAll(@WrittenReturn Map<?, ?> map, Object... keys) {
         removeAll(map, Arrays.asList(keys));
     }
 
-    public static <K, V> void removeAll(@WrittenReturn Map<K, V> map, Iterable<? extends K> keys) {
-        for (K key : keys) {
+    public static void removeAll(@WrittenReturn Map<?, ?> map, Iterable<Object> keys) {
+        for (Object key : keys) {
             map.remove(key);
         }
     }

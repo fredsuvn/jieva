@@ -1,4 +1,4 @@
-package xyz.srclab.common.reflect.classpath;
+package xyz.srclab.common.base;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
@@ -7,10 +7,13 @@ import xyz.srclab.common.exception.ExceptionWrapper;
 
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ClassPathHelper {
+public class Context {
+
+    public static ClassLoader getClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
+    }
 
     public static boolean hasPackage(String packageName) {
         return getPackage(packageName) != null;
@@ -49,23 +52,19 @@ public class ClassPathHelper {
     }
 
     public static boolean hasResource(String resourceName) {
-        return Thread.currentThread().getContextClassLoader().getResource(resourceName) != null;
+        return getResource(resourceName) != null;
     }
 
     @Nullable
     public static URL getResource(String resourceName) {
-        return Thread.currentThread().getContextClassLoader().getResource(resourceName);
+        return getClassLoader().getResource(resourceName);
     }
 
     @Immutable
     public static Set<URL> getResources(String resourceName) {
         try {
-            Enumeration<URL> urlEnumeration = Thread.currentThread().getContextClassLoader().getResources(resourceName);
-            Set<URL> result = new LinkedHashSet<>();
-            while (urlEnumeration.hasMoreElements()) {
-                result.add(urlEnumeration.nextElement());
-            }
-            return SetHelper.immutable(result);
+            Enumeration<URL> urlEnumeration = getClassLoader().getResources(resourceName);
+            return SetHelper.enumerationToSet(urlEnumeration);
         } catch (Exception e) {
             throw new ExceptionWrapper(e);
         }

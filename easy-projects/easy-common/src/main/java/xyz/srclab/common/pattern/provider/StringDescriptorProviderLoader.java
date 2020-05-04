@@ -8,7 +8,7 @@ import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.lang.chars.CharsHelper;
 import xyz.srclab.common.lang.chars.CharsRef;
 import xyz.srclab.common.lang.tuple.Pair;
-import xyz.srclab.common.reflect.classpath.ClassPathHelper;
+import xyz.srclab.common.base.Context;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 
 import java.util.Arrays;
@@ -200,7 +200,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
 
         @Override
         public boolean test(String className) {
-            return ClassPathHelper.hasClass(className);
+            return Context.hasClass(className);
         }
     }
 
@@ -213,7 +213,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
 
         @Override
         public boolean test(String className) {
-            return !ClassPathHelper.hasClass(className);
+            return !Context.hasClass(className);
         }
     }
 }

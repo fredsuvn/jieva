@@ -3,7 +3,7 @@ package xyz.srclab.common.pattern.provider;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.reflect.classpath.ClassPathHelper;
+import xyz.srclab.common.base.Context;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 
 import java.util.Map;
@@ -16,7 +16,7 @@ public interface ProviderManager<T> {
     void registerProvider(T provider);
 
     default void registerProvider(String className, boolean isDefault) {
-        @Nullable Class<T> providerClass = ClassPathHelper.getClass(className);
+        @Nullable Class<T> providerClass = Context.getClass(className);
         Checker.checkArguments(providerClass != null, "Can not find class: " + className);
         T provider = InstanceHelper.newInstance(providerClass);
         registerProvider(className, provider, isDefault);

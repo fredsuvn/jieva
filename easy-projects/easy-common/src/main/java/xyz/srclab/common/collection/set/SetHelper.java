@@ -3,9 +3,7 @@ package xyz.srclab.common.collection.set;
 import com.google.common.collect.ImmutableSet;
 import xyz.srclab.annotation.Immutable;
 
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class SetHelper {
     @Immutable
@@ -17,6 +15,15 @@ public class SetHelper {
     @Immutable
     public static <E> Set<E> immutable(E... elements) {
         return ImmutableSet.copyOf(elements);
+    }
+
+    @Immutable
+    public static <E> Set<E> enumerationToSet(Enumeration<? extends E> enumeration) {
+        Set<E> result = new LinkedHashSet<>();
+        while (enumeration.hasMoreElements()) {
+            result.add(enumeration.nextElement());
+        }
+        return immutable(result);
     }
 
     public static boolean deepEquals(Set<?> set1, Set<?> set2) {
