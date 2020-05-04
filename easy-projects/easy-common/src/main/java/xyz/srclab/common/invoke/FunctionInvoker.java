@@ -12,6 +12,7 @@ public interface FunctionInvoker {
         return InvokerSupport.getFunctionInvoker(method);
     }
 
+    @Nullable
     static FunctionInvoker of(Class<?> type, String methodName, Class<?>... parameterTypes) {
         return InvokerSupport.getFunctionInvoker(type, methodName, parameterTypes);
     }

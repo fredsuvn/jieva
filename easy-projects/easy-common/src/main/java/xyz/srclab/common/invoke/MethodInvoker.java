@@ -12,6 +12,7 @@ public interface MethodInvoker {
         return InvokerSupport.getMethodInvoker(method);
     }
 
+    @Nullable
     static MethodInvoker of(Class<?> type, String methodName, Class<?>... parameterTypes) {
         return InvokerSupport.getMethodInvoker(type, methodName, parameterTypes);
     }

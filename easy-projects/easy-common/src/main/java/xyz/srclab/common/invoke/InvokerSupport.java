@@ -1,5 +1,6 @@
 package xyz.srclab.common.invoke;
 
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.ToovaBoot;
 
 import java.lang.reflect.Constructor;
@@ -13,6 +14,7 @@ final class InvokerSupport {
         return invokerProvider.getConstructorInvoker(constructor);
     }
 
+    @Nullable
     static <T> ConstructorInvoker<T> getConstructorInvoker(Class<T> type, Class<?>... parameterTypes) {
         return invokerProvider.getConstructorInvoker(type, parameterTypes);
     }
@@ -21,6 +23,7 @@ final class InvokerSupport {
         return invokerProvider.getMethodInvoker(method);
     }
 
+    @Nullable
     static MethodInvoker getMethodInvoker(Class<?> type, String methodName, Class<?>... parameterTypes) {
         return invokerProvider.getMethodInvoker(type, methodName, parameterTypes);
     }
@@ -29,6 +32,7 @@ final class InvokerSupport {
         return invokerProvider.getFunctionInvoker(method);
     }
 
+    @Nullable
     static FunctionInvoker getFunctionInvoker(Class<?> type, String methodName, Class<?>... parameterTypes) {
         return invokerProvider.getFunctionInvoker(type, methodName, parameterTypes);
     }
