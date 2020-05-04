@@ -1,7 +1,7 @@
 package xyz.srclab.common.base;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
-import xyz.srclab.common.EasyBoot;
+import xyz.srclab.common.ToovaBoot;
 
 import java.nio.charset.Charset;
 import java.util.Locale;
@@ -22,7 +22,7 @@ public class Defaults {
 
     static {
         try {
-            Map<String, String> defaultsProperties = EasyBoot.getDefaultsProperties();
+            Map<String, String> defaultsProperties = ToovaBoot.getDefaultsProperties();
             LOCALE = (Locale) FieldUtils.readStaticField(
                     FieldUtils.getField(Locale.class, defaultsProperties.get("local")));
             CHARSET = Charset.forName(defaultsProperties.get("charset"));

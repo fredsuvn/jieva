@@ -1,13 +1,13 @@
 package xyz.srclab.common.invoke;
 
-import xyz.srclab.common.EasyBoot;
+import xyz.srclab.common.ToovaBoot;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 final class InvokerSupport {
 
-    private static final InvokerProvider invokerProvider = EasyBoot.getProvider(InvokerProvider.class);
+    private static final InvokerProvider invokerProvider = ToovaBoot.getProvider(InvokerProvider.class);
 
     static <T> ConstructorInvoker<T> getConstructorInvoker(Constructor<T> constructor) {
         return invokerProvider.getConstructorInvoker(constructor);

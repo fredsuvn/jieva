@@ -60,6 +60,15 @@ public class Context {
         return getClassLoader().getResource(resourceName);
     }
 
+    public static boolean hasResource(String resourceName, Class<?> from) {
+        return getResource(resourceName, from) != null;
+    }
+
+    @Nullable
+    public static URL getResource(String resourceName, Class<?> from) {
+        return from.getResource(resourceName);
+    }
+
     @Immutable
     public static Set<URL> getResources(String resourceName) {
         try {

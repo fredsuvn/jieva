@@ -1,13 +1,13 @@
 package xyz.srclab.common.bean;
 
-import xyz.srclab.common.EasyBoot;
+import xyz.srclab.common.ToovaBoot;
 
 /**
  * @author sunqian
  */
 final class BeanSupport {
 
-    private static final BeanProvider beanProvider = EasyBoot.getProvider(BeanProvider.class);
+    private static final BeanProvider beanProvider = ToovaBoot.getProvider(BeanProvider.class);
 
     static BeanOperator getBeanOperator() {
         return beanProvider.getBeanOperator();

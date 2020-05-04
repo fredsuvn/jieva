@@ -12,13 +12,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Bootstrap for easy-starter.
+ * Bootstrap for toova-starter.
  */
-public class EasyBoot {
+public class ToovaBoot {
 
-    private static final String DEFAULT_CONFIG_PATH = "/META-INF/easy.yaml";
-    private static final String[] CUSTOM_CONFIG_PATHS = {
-            "/easy.yaml", "/easy.yml", "/META-INF/easy.yaml", "/META-INF/easy.yml"};
+    private static final String CONFIG_PATH = "/META-INF/easy.yaml";
 
     private static final String version;
 
@@ -35,6 +33,10 @@ public class EasyBoot {
         version = (String) properties.get("version");
         defaultsProperties = MapHelper.immutable((Map<String, String>) (properties.get("providers")));
         providerProperties = MapHelper.immutable((Map<String, String>) (properties.get("defaults")));
+    }
+
+    public static <T> ProviderLoader<T> getDefaultProviderLoader(String providerDescriptor) {
+        return ProviderLoader.newStringDescriptorLoader(providerDescriptor);
     }
 
     public static String getVersion() {
@@ -55,7 +57,7 @@ public class EasyBoot {
     private static Map<String, Object> loadAll() {
         Yaml yaml = new Yaml();
         Map<String, Object> yamlProperties =
-                yaml.load(EasyBoot.class.getResourceAsStream("/META-INF/easy.yaml"));
+                yaml.load(ToovaBoot.class.getResourceAsStream("/META-INF/easy.yaml"));
         return MapHelper.immutable(yamlProperties);
     }
 
@@ -64,18 +66,18 @@ public class EasyBoot {
     }
 
     public static <T> T getProvider(String interfaceName) {
-        return (T) providerMap.computeIfAbsent(interfaceName, EasyBoot::loadProvider).getProvider();
+        return (T) providerMap.computeIfAbsent(interfaceName, ToovaBoot::loadProvider).getProvider();
     }
 
     @Immutable
     public static <T> Set<T> getProviders(String interfaceName) {
         return (Set<T>) IterableHelper.asSet(
-                providerMap.computeIfAbsent(interfaceName, EasyBoot::loadProvider).getProviders().values());
+                providerMap.computeIfAbsent(interfaceName, ToovaBoot::loadProvider).getProviders().values());
     }
 
     private static <T> ProviderLoader<T> loadProvider(String interfaceName) {
         String classesDescriptor = getProviderProperties().get(interfaceName);
         Checker.checkArguments(classesDescriptor != null, "No provider of " + interfaceName);
-        return ProviderLoader.loadFromClassNames(classesDescriptor);
+        return ProviderLoader.newStringDescriptorLoader(classesDescriptor);
     }
 }
