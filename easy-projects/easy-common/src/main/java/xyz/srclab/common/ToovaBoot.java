@@ -2,13 +2,18 @@ package xyz.srclab.common;
 
 import org.yaml.snakeyaml.Yaml;
 import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.collection.iterable.IterableHelper;
+import xyz.srclab.common.base.Context;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.pattern.provider.ProviderLoader;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -16,27 +21,62 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ToovaBoot {
 
-    private static final String CONFIG_PATH = "/META-INF/easy.yaml";
+    private static final String CONFIG_PATH = "/META-INF/toova.yaml";
 
     private static final String version;
 
     @Immutable
-    private static final Map<String, String> defaultsProperties;
+    private static final Map<String, String> defaultProperties;
 
     @Immutable
     private static final Map<String, String> providerProperties;
-
-    private static final Map<String, ProviderLoader<?>> providerMap = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, ?>> providerMap = new ConcurrentHashMap<>();
 
     static {
-        Map<String, Object> properties = loadAll();
+        Map<String, Object> toovaProperties = loadYaml(ToovaBoot.class.getClassLoader());
+        Map<String, Object> userProperties = loadYaml(Context.getClassLoader());
+        Map<String, Object> properties = new LinkedHashMap<>();
+        mergeProperties(toovaProperties, userProperties, properties);
+
         version = (String) properties.get("version");
-        defaultsProperties = MapHelper.immutable((Map<String, String>) (properties.get("providers")));
+        defaultProperties = MapHelper.immutable((Map<String, String>) (properties.get("providers")));
         providerProperties = MapHelper.immutable((Map<String, String>) (properties.get("defaults")));
     }
 
-    public static <T> ProviderLoader<T> getDefaultProviderLoader(String providerDescriptor) {
-        return ProviderLoader.newStringDescriptorLoader(providerDescriptor);
+    @Immutable
+    private static Map<String, Object> loadYaml(ClassLoader classLoader) {
+        @Nullable URL url = classLoader.getResource(CONFIG_PATH);
+        if (url == null) {
+            return Collections.emptyMap();
+        }
+        try (InputStream inputStream = url.openStream()) {
+            Yaml yaml = new Yaml();
+            Map<String, Object> yamlProperties = yaml.load(inputStream);
+            return MapHelper.immutable(yamlProperties);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static void mergeProperties(
+            Map<String, Object> toovaProperties,
+            Map<String, Object> userProperties,
+            Map<String, Object> container
+    ) {
+        toovaProperties.forEach((k, v) -> {
+            if (v instanceof Map) {
+                if (userProperties.containsKey(k)) {
+                    Map<String, Object> newMap = new LinkedHashMap<>();
+                    Map<String, Object> users = (Map<String, Object>) userProperties.get(k);
+                    mergeProperties((Map<String, Object>) v, users, newMap);
+                    container.put(k, newMap);
+                } else {
+                    container.put(k, v);
+                }
+            } else {
+                container.put(k, userProperties.getOrDefault(k, v));
+            }
+        });
     }
 
     public static String getVersion() {
@@ -49,16 +89,8 @@ public class ToovaBoot {
     }
 
     @Immutable
-    public static Map<String, String> getDefaultsProperties() {
-        return defaultsProperties;
-    }
-
-    @Immutable
-    private static Map<String, Object> loadAll() {
-        Yaml yaml = new Yaml();
-        Map<String, Object> yamlProperties =
-                yaml.load(ToovaBoot.class.getResourceAsStream("/META-INF/easy.yaml"));
-        return MapHelper.immutable(yamlProperties);
+    public static Map<String, String> getDefaultProperties() {
+        return defaultProperties;
     }
 
     public static <T> T getProvider(Class<T> interfaceClass) {
@@ -66,18 +98,20 @@ public class ToovaBoot {
     }
 
     public static <T> T getProvider(String interfaceName) {
-        return (T) providerMap.computeIfAbsent(interfaceName, ToovaBoot::loadProvider).getProvider();
+        return MapHelper.getFirstValueNonNull(getProviders(interfaceName));
     }
 
-    @Immutable
-    public static <T> Set<T> getProviders(String interfaceName) {
-        return (Set<T>) IterableHelper.asSet(
-                providerMap.computeIfAbsent(interfaceName, ToovaBoot::loadProvider).getProviders().values());
+    public static <T> Map<String, T> getProviders(Class<T> interfaceClass) {
+        return getProviders(interfaceClass.getName());
     }
 
-    private static <T> ProviderLoader<T> loadProvider(String interfaceName) {
-        String classesDescriptor = getProviderProperties().get(interfaceName);
-        Checker.checkArguments(classesDescriptor != null, "No provider of " + interfaceName);
-        return ProviderLoader.newStringDescriptorLoader(classesDescriptor);
+    public static <T> Map<String, T> getProviders(String interfaceName) {
+        Map<String, ?> result = providerMap.computeIfAbsent(interfaceName, iName -> {
+            @Nullable String providerDescriptor = getProviderProperties().get(iName);
+            Checker.checkArguments(
+                    providerDescriptor != null, "Cannot find provider for " + interfaceName);
+            return ProviderLoader.newStringDescriptorLoader(providerDescriptor).load();
+        });
+        return (Map<String, T>) result;
     }
 }

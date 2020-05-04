@@ -1,6 +1,5 @@
 package xyz.srclab.common.bean.provider.defaults;
 
-import xyz.srclab.common.ToovaBoot;
 import xyz.srclab.common.bean.*;
 
 /**
@@ -8,11 +7,7 @@ import xyz.srclab.common.bean.*;
  */
 final class DefaultBeanSupport {
 
-    private static final BeanProvider beanProvider = ToovaBoot.getProvider(BeanProvider.class);
-
-    static BeanOperator getBeanOperator() {
-        return beanProvider.getBeanOperator();
-    }
+    private static final BeanProvider beanProvider = new DefaultBeanProvider();
 
     static BeanConverter getBeanConverter() {
         return beanProvider.getBeanConverter();

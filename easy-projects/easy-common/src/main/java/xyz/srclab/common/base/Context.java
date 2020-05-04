@@ -60,19 +60,29 @@ public class Context {
         return getClassLoader().getResource(resourceName);
     }
 
-    public static boolean hasResource(String resourceName, Class<?> from) {
-        return getResource(resourceName, from) != null;
-    }
-
-    @Nullable
-    public static URL getResource(String resourceName, Class<?> from) {
-        return from.getResource(resourceName);
-    }
-
     @Immutable
     public static Set<URL> getResources(String resourceName) {
         try {
             Enumeration<URL> urlEnumeration = getClassLoader().getResources(resourceName);
+            return SetHelper.enumerationToSet(urlEnumeration);
+        } catch (Exception e) {
+            throw new ExceptionWrapper(e);
+        }
+    }
+
+    public static boolean hasResource(String resourceName, ClassLoader classLoader) {
+        return getResource(resourceName, classLoader) != null;
+    }
+
+    @Nullable
+    public static URL getResource(String resourceName, ClassLoader classLoader) {
+        return classLoader.getResource(resourceName);
+    }
+
+    @Immutable
+    public static Set<URL> getResources(String resourceName, ClassLoader classLoader) {
+        try {
+            Enumeration<URL> urlEnumeration = classLoader.getResources(resourceName);
             return SetHelper.enumerationToSet(urlEnumeration);
         } catch (Exception e) {
             throw new ExceptionWrapper(e);
