@@ -2,12 +2,12 @@ package test.xyz.srclab.common.bean
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
+import xyz.srclab.common.base.Context
 import xyz.srclab.common.bean.BeanConverter
 import xyz.srclab.common.bean.BeanConverterHandler
 import xyz.srclab.common.bean.BeanHelper
 import xyz.srclab.common.bean.BeanOperator
 import xyz.srclab.common.reflect.type.TypeRef
-import xyz.srclab.common.time.TimeHelper
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable
 import java.lang.reflect.Type
@@ -33,7 +33,7 @@ object BeanConverterTest {
     @DataProvider
     fun testConvertClassData(): Array<Array<*>> {
         val myDateString = "2001-04-25T16:10:00"
-        val nowMillis = TimeHelper.nowMillis()
+        val nowMillis = Context.millis()
         val nowDate = Date(nowMillis)
         val nowInstant = nowDate.toInstant()
         val myDate = Date.from(LocalDateTime.parse(myDateString).atZone(ZoneId.systemDefault()).toInstant())

@@ -1,7 +1,7 @@
 package xyz.srclab.common.egg.provider.v1;
 
+import xyz.srclab.common.base.Context;
 import xyz.srclab.common.egg.Egg;
-import xyz.srclab.common.time.TimeHelper;
 
 final class V1Egg implements Egg {
 
@@ -52,7 +52,7 @@ final class V1Egg implements Egg {
     static final String SPELL;
 
     static {
-        long nowMillis = TimeHelper.nowMillis();
+        long nowMillis = Context.millis();
         SPELL = "" + Math.sqrt(nowMillis);
     }
 }

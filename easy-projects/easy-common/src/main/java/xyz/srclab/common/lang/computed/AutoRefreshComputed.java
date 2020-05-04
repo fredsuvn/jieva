@@ -1,7 +1,7 @@
 package xyz.srclab.common.lang.computed;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.time.TimeHelper;
+import xyz.srclab.common.lang.time.TimeHelper;
 
 import java.time.Duration;
 import java.util.function.Supplier;

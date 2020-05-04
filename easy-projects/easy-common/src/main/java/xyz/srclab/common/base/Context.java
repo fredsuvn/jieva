@@ -11,6 +11,10 @@ import java.util.Set;
 
 public class Context {
 
+    public static long millis() {
+        return System.currentTimeMillis();
+    }
+
     public static ClassLoader getClassLoader() {
         return Thread.currentThread().getContextClassLoader();
     }
