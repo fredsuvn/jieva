@@ -2,11 +2,11 @@ package xyz.srclab.common.reflect.instance;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Context;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.invoke.InvokerHelper;
+import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.lang.key.Key;
 import xyz.srclab.common.reflect.NullRole;
-import xyz.srclab.common.base.Context;
 
 import java.lang.reflect.Constructor;
 
@@ -20,9 +20,16 @@ public class InstanceHelper {
         return newInstance(cls);
     }
 
+    public static <T> T newInstance(String className, ClassLoader classLoader) {
+        @Nullable Class<?> cls = Context.getClass(className, classLoader);
+        Checker.checkArguments(cls != null, "Class not found: " + className);
+        return newInstance(cls);
+    }
+
     public static <T> T newInstance(Class<?> cls) {
-        Constructor<?> constructor = getConstructor(cls);
-        return (T) InvokerHelper.getConstructorInvoker(constructor).invoke();
+        @Nullable Constructor<?> constructor = getConstructor(cls);
+        Checker.checkArguments(constructor != null, "Constructor not found: " + cls);
+        return (T) ConstructorInvoker.of(constructor).invoke();
     }
 
     @Nullable

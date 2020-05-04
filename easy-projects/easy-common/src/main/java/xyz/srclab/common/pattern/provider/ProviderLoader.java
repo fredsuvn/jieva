@@ -13,6 +13,10 @@ public interface ProviderLoader<T> {
         return new StringDescriptorProviderLoader<>(stringDescriptor);
     }
 
+    static <T> ProviderLoader<T> newStringDescriptorLoader(String stringDescriptor, ClassLoader classLoader) {
+        return new StringDescriptorProviderLoader<>(stringDescriptor, classLoader);
+    }
+
     @Immutable
     Map<String, T> load();
 }

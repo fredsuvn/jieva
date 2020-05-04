@@ -3,12 +3,12 @@ package xyz.srclab.common.pattern.provider;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Context;
 import xyz.srclab.common.collection.list.ListHelper;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.lang.chars.CharsHelper;
 import xyz.srclab.common.lang.chars.CharsRef;
 import xyz.srclab.common.lang.tuple.Pair;
-import xyz.srclab.common.base.Context;
 import xyz.srclab.common.reflect.instance.InstanceHelper;
 
 import java.util.Arrays;
@@ -33,12 +33,19 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     @Immutable
     private final Map<String, T> providers;
 
+    private final ClassLoader classLoader;
+
     StringDescriptorProviderLoader(String stringDescriptor) {
+        this(stringDescriptor, Context.getClassLoader());
+    }
+
+    StringDescriptorProviderLoader(String stringDescriptor, ClassLoader classLoader) {
         List<ProviderCandidate> candidates = parseStringDescriptor(stringDescriptor);
         this.providers = MapHelper.immutable(candidates.stream().collect(Collectors.toMap(
                 ProviderCandidate::getProviderName,
                 c -> newProviderInstance(c.getProviderClassName())
         )));
+        this.classLoader = classLoader;
     }
 
     @Override
@@ -145,7 +152,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     }
 
     private T newProviderInstance(String className) {
-        return InstanceHelper.newInstance(className);
+        return InstanceHelper.newInstance(className, classLoader);
     }
 
     private static final class ProviderCandidate {
