@@ -1,5 +1,6 @@
 package xyz.srclab.common.bytecode.provider.invoke.asm.jdk;
 
+import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerGenerator;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.invoke.FunctionInvoker;

@@ -50,8 +50,4 @@ public class ConstructorHelper {
             return NullRole.getNullConstructor();
         }
     }
-
-    public static String constructorToString(Class<?> declaringClass, Class<?>... parameterTypes) {
-        return MethodHelper.methodToString(declaringClass, "<init>", parameterTypes);
-    }
 }
