@@ -1,6 +1,7 @@
 package xyz.srclab.common.bytecode;
 
 import com.google.common.base.CharMatcher;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Shares;
 
 /**

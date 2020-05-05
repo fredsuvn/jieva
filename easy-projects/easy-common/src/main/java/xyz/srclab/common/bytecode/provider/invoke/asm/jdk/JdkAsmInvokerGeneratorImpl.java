@@ -4,7 +4,10 @@ import org.objectweb.asm.*;
 import net.sf.cglib.reflect.FastClass;
 import net.sf.cglib.reflect.FastConstructor;
 import xyz.srclab.common.base.Context;
+import xyz.srclab.common.bytecode.ByteCodeHelper;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerGenerator;
+import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
+import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerSupport;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.invoke.FunctionInvoker;
 import xyz.srclab.common.invoke.MethodInvoker;
@@ -19,8 +22,40 @@ import java.util.Arrays;
  */
 final class JdkAsmInvokerGeneratorImpl implements AsmInvokerGenerator {
 
+    private static final String GENERATOR_NAME = "JdkAsm";
+
     @Override
     public <T> ConstructorInvoker<T> newConstructorInvoker(Constructor<T> constructor) {
+        try {
+            ClassReader classReader = new ClassReader(AConstructorInvoker.class.getName());
+            classReader.accept(new ReadVisitor(), ClassReader.SKIP_CODE);
+
+            String newClassName =
+                    AsmInvokerHelper.generateConstructorInvokerClassName(constructor, GENERATOR_NAME);
+            String newClassInternalName = ByteCodeHelper.getTypeInternalName(newClassName);
+            String newClassSignature = "Ljava/lang/Object;Lxyz/srclab/common/invoke/ConstructorInvoker<Lxyz/srclab/common/bytecode/provider/invoke/asm/jdk/JdkAsmInvokerGeneratorImpl$A;>;";
+            String constructorInvokerInternalName = ConstructorInvoker.class.getName().replaceAll("\\.", "/");
+            ClassWriter classWriter = new ClassWriter(0);
+
+            classWriter.visit(
+                    Opcodes.V1_8,
+                    Opcodes.ACC_PUBLIC,
+                    newClassInternalName,
+                    newClassSignature,
+                    null,
+                    new String[]{constructorInvokerInternalName}
+            );
+
+            classWriter.visitField(
+                    Opcodes.ACC_PRIVATE | Opcodes.ACC_FINAL,
+                    "constructor",
+                    "Ljava/lang/reflect/Constructor",
+                    "Ljava/lang/reflect/Constructor<Lxyz/srclab/common/bytecode/provider/invoke/asm/jdk/JdkAsmInvokerGeneratorImpl$A;>;",
+                    null
+            );
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
         return null;
     }
 
@@ -44,33 +79,6 @@ final class JdkAsmInvokerGeneratorImpl implements AsmInvokerGenerator {
         //showTime("Static invoker", times, constructorInvoker::invoke);
         //showTime("Fast constructor invoker", times, fastConstructor::newInstance);
 
-        ClassReader classReader = new ClassReader(AConstructorInvoker.class.getName());
-        classReader.accept(new ReadVisitor(), ClassReader.SKIP_CODE);
-
-        String newClassName = "a.b.C";
-        String newClassInternalName = newClassName.replaceAll("\\.", "/");
-        String newClassSignature = "Ljava/lang/Object;Lxyz/srclab/common/invoke/ConstructorInvoker<Lxyz/srclab/common/bytecode/provider/invoke/asm/jdk/JdkAsmInvokerGeneratorImpl$A;>;";
-        String constructorInvokerInternalName = ConstructorInvoker.class.getName().replaceAll("\\.", "/");
-        ClassWriter classWriter = new ClassWriter(0);
-
-        classWriter.visit(
-                Opcodes.V1_8,
-                Opcodes.ACC_PUBLIC,
-                newClassInternalName,
-                newClassSignature,
-                null,
-                new String[]{constructorInvokerInternalName}
-                );
-
-        classWriter.visitField(
-                Opcodes.ACC_PRIVATE | Opcodes.ACC_FINAL,
-                "constructor",
-                "Ljava/lang/reflect/Constructor",
-                "Ljava/lang/reflect/Constructor<Lxyz/srclab/common/bytecode/provider/invoke/asm/jdk/JdkAsmInvokerGeneratorImpl$A;>;",
-                null
-        );
-
-        classWriter
     }
 
     private static void showTime(String title, long times, RunThrow runnable) {
