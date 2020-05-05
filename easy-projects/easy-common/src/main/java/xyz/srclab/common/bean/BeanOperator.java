@@ -4,8 +4,8 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.instance.InstanceHelper;
-import xyz.srclab.common.reflect.type.TypeRef;
+import xyz.srclab.common.reflect.ConstructorHelper;
+import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -169,7 +169,7 @@ public interface BeanOperator {
     }
 
     default <T> T clone(T from) {
-        T returned = InstanceHelper.newInstance(from.getClass());
+        T returned = ConstructorHelper.newInstance(from.getClass());
         copyProperties(from, returned);
         return returned;
     }

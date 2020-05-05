@@ -5,7 +5,7 @@ import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.method.MethodHelper;
+import xyz.srclab.common.reflect.MethodHelper;
 import xyz.srclab.common.util.proxy.ClassProxyProvider;
 import xyz.srclab.common.util.proxy.ProxyClass;
 import xyz.srclab.common.util.proxy.ProxyMethod;

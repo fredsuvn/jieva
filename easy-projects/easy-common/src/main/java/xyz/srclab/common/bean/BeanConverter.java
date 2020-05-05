@@ -3,7 +3,7 @@ package xyz.srclab.common.bean;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.pattern.builder.HandlersBuilder;
-import xyz.srclab.common.reflect.type.TypeRef;
+import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.lang.format.fastformat.FastFormat;
 
 import java.lang.reflect.Type;

@@ -6,7 +6,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.bean.BeanStruct;
 import xyz.srclab.common.lang.computed.Computed;
-import xyz.srclab.common.reflect.type.TypeHelper;
+import xyz.srclab.common.reflect.TypeHelper;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;

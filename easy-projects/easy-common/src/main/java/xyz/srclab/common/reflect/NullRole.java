@@ -4,7 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-public final class NullRole {
+final class NullRole {
 
     private static final Constructor<?> NULL_CONSTRUCTOR;
 

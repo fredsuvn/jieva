@@ -1,4 +1,4 @@
-package xyz.srclab.common.reflect.type;
+package xyz.srclab.common.reflect;
 
 import org.apache.commons.lang3.ClassUtils;
 import org.jetbrains.annotations.Nullable;

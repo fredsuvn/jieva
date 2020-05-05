@@ -1,4 +1,4 @@
-package xyz.srclab.common.reflect.type;
+package xyz.srclab.common.reflect;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;

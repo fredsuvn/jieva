@@ -10,8 +10,8 @@ import xyz.srclab.common.collection.list.ListHelper;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.collection.set.SetHelper;
 import xyz.srclab.common.lang.format.fastformat.FastFormat;
-import xyz.srclab.common.reflect.instance.InstanceHelper;
-import xyz.srclab.common.reflect.type.TypeHelper;
+import xyz.srclab.common.reflect.ConstructorHelper;
+import xyz.srclab.common.reflect.TypeHelper;
 
 import java.lang.reflect.*;
 import java.math.BigDecimal;
@@ -198,14 +198,14 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     private Object convertToBean(Object from, Class<?> to, BeanOperator beanOperator) {
-        Object toInstance = InstanceHelper.newInstance(to);
+        Object toInstance = ConstructorHelper.newInstance(to);
         beanOperator.copyProperties(from, toInstance);
         return toInstance;
     }
 
     private Object convertToGenericBean(Object from, Class<?> rawType, Type[] genericTypes, BeanOperator beanOperator) {
         TypeVariable<?>[] typeVariables = rawType.getTypeParameters();
-        Object toInstance = InstanceHelper.newInstance(rawType);
+        Object toInstance = ConstructorHelper.newInstance(rawType);
         beanOperator.copyProperties(from, toInstance,
                 (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator1) -> {
                     Type destType = Object.class;

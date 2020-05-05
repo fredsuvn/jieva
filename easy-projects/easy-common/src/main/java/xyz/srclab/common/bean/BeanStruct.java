@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.method.MethodHelper;
+import xyz.srclab.common.reflect.MethodHelper;
 
 import java.lang.reflect.Method;
 import java.util.Collections;

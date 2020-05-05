@@ -1,4 +1,4 @@
-package xyz.srclab.common.reflect.instance;
+package xyz.srclab.common.reflect;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
@@ -6,12 +6,10 @@ import xyz.srclab.common.base.Context;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.lang.key.Key;
-import xyz.srclab.common.reflect.NullRole;
-import xyz.srclab.common.reflect.method.MethodHelper;
 
 import java.lang.reflect.Constructor;
 
-public class InstanceHelper {
+public class ConstructorHelper {
 
     private static final Cache<Key, Constructor<?>> constructorCache = Cache.newGcThreadLocalL2();
 

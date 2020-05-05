@@ -5,8 +5,8 @@ import xyz.srclab.annotation.WrittenReturn;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.iterable.IterableHelper;
-import xyz.srclab.common.reflect.type.TypeHelper;
-import xyz.srclab.common.reflect.type.TypeRef;
+import xyz.srclab.common.reflect.TypeHelper;
+import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;

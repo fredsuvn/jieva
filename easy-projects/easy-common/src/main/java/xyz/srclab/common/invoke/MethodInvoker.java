@@ -2,7 +2,8 @@ package xyz.srclab.common.invoke;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.reflect.method.MethodHelper;
+import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.reflect.MethodHelper;
 
 import java.lang.reflect.Method;
 
@@ -13,12 +14,10 @@ public interface MethodInvoker {
         return InvokerSupport.getMethodInvoker(method);
     }
 
-    @Nullable
     static MethodInvoker of(Class<?> type, String methodName, Class<?>... parameterTypes) {
         @Nullable Method method = MethodHelper.getMethod(type, methodName, parameterTypes);
-        if (method == null) {
-            return null;
-        }
+        Checker.checkState(method != null, () ->
+                "Method not found: " + MethodHelper.methodToString(type, methodName, parameterTypes));
         return of(method);
     }
 

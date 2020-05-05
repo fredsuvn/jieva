@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.reflect
 
 import org.testng.annotations.Test
-import xyz.srclab.common.reflect.method.MethodHelper
+import xyz.srclab.common.reflect.MethodHelper
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable
 import java.lang.reflect.Modifier
@@ -21,7 +21,8 @@ object MethodHelperTest {
         doAssertEquals(MethodHelper.getAllMethods(A::class.java), allMethods)
         allMethods.remove(Any::class.java.getMethod("toString"))
         allMethods.remove(A::class.java.getMethod("staticFun"))
-        doAssertEquals(MethodHelper.getOverrideableMethods(A::class.java),
+        doAssertEquals(
+            MethodHelper.getOverrideableMethods(A::class.java),
             A::class.java.methods.filter { m -> !Modifier.isStatic(m.modifiers) && !Modifier.isFinal(m.modifiers) })
 
         doAssertEquals(
