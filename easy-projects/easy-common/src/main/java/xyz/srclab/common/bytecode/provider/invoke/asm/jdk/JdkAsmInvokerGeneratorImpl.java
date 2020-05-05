@@ -27,4 +27,8 @@ final class JdkAsmInvokerGeneratorImpl implements AsmInvokerGenerator {
     public FunctionInvoker newFunctionInvoker(Method method) {
         return null;
     }
+
+    public static void main(String[] args) {
+        System.out.println("123");
+    }
 }

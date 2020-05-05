@@ -1,7 +1,7 @@
 package xyz.srclab.common.lang.computed;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.lang.time.TimeHelper;
+import xyz.srclab.common.base.Context;
 
 import java.time.Duration;
 import java.util.function.Supplier;
@@ -27,7 +27,7 @@ final class AutoRefreshComputed<T> implements Computed<T> {
         if (this.cache == null) {
             return refreshGet();
         }
-        long now = TimeHelper.nowMillis();
+        long now = Context.millis();
         return (cacheTimeMillis > 0 && cacheTimeMillis + timeout.toMillis() >= now) ?
                 this.cache : refreshGet();
     }
@@ -35,7 +35,7 @@ final class AutoRefreshComputed<T> implements Computed<T> {
     @Override
     public T refreshGet() {
         cache = supplier.get();
-        cacheTimeMillis = TimeHelper.nowMillis();
+        cacheTimeMillis = Context.millis();
         assert cache != null;
         return cache;
     }

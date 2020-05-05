@@ -5,7 +5,7 @@ import xyz.srclab.common.collection.map.MapHelper;
 import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.MethodHelper;
+import xyz.srclab.common.reflect.ReflectConstants;
 import xyz.srclab.common.util.proxy.ClassProxyProvider;
 import xyz.srclab.common.util.proxy.ProxyClass;
 import xyz.srclab.common.util.proxy.ProxyMethod;
@@ -73,7 +73,7 @@ public class JdkClassProxyProvider implements ClassProxyProvider {
         public T newInstance() {
             Object instance = Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type},
                     (object, method, args) -> {
-                        Object[] realArgs = args == null ? MethodHelper.EMPTY_ARGUMENTS : args;
+                        Object[] realArgs = args == null ? ReflectConstants.EMPTY_ARGUMENTS : args;
                         ProxyMethod proxyMethod = methodMap.get(method);
                         if (proxyMethod == null) {
                             return method.invoke(object, realArgs);
