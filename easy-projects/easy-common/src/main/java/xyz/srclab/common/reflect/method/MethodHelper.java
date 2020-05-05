@@ -1,8 +1,11 @@
 package xyz.srclab.common.reflect.method;
 
+import com.google.common.base.Joiner;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.base.Shares;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.list.ListHelper;
 import xyz.srclab.common.lang.key.Key;
@@ -17,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class MethodHelper {
 
-    public static final Object[] EMPTY_ARGUMENTS = ArrayUtils.EMPTY_OBJECT_ARRAY;
+    private static final Joiner PARAMETER_TYPES_JOINER = Shares.COMMA_JOINER;
 
     private static final Cache<Key, Method> methodCache = Cache.newGcThreadLocalL2();
 
@@ -114,5 +117,16 @@ public class MethodHelper {
                 && !Modifier.isStatic(modifiers)
                 && !Modifier.isFinal(modifiers)
                 && (Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers));
+    }
+
+    public static String methodToString(Class<?> declaringClass, String methodName, Class<?>... parameterTypes) {
+        return declaringClass.getName() +
+                "." +
+                methodName +
+                "(" +
+                PARAMETER_TYPES_JOINER.join(
+                        ArrayHelper.buildArray(new String[parameterTypes.length], i -> parameterTypes[i].getName())
+                ) +
+                ")";
     }
 }

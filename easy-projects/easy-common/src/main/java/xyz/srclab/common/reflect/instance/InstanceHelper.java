@@ -7,6 +7,7 @@ import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.lang.key.Key;
 import xyz.srclab.common.reflect.NullRole;
+import xyz.srclab.common.reflect.method.MethodHelper;
 
 import java.lang.reflect.Constructor;
 
@@ -50,5 +51,9 @@ public class InstanceHelper {
         } catch (NoSuchMethodException e) {
             return NullRole.getNullConstructor();
         }
+    }
+
+    public static String constructorToString(Class<?> declaringClass, Class<?>... parameterTypes) {
+        return MethodHelper.methodToString(declaringClass, "<init>", parameterTypes);
     }
 }
