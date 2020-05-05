@@ -29,7 +29,7 @@ dependencies {
     api("org.yaml:snakeyaml")
 
     compileOnly("org.springframework:spring-core")
-    compileOnly("cglib:cglib")
+    api("cglib:cglib")
 
     testCompile(project(":easy-projects:easy-test"))
     testCompile("org.testng:testng")
