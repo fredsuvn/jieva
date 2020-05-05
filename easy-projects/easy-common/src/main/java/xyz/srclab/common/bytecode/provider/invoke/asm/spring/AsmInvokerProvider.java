@@ -1,4 +1,4 @@
-package xyz.srclab.common.bytecode.provider.invoke.asm.jdk;
+package xyz.srclab.common.bytecode.provider.invoke.asm.spring;
 
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerGenerator;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerSupport;
@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  */
 public final class AsmInvokerProvider implements InvokerProvider {
 
-    private final AsmInvokerGenerator invokerGenerator = new JdkAsmInvokerGeneratorImpl();
+    private final AsmInvokerGenerator invokerGenerator = new SpringAsmInvokerGeneratorImpl();
 
     @Override
     public <T> ConstructorInvoker<T> getConstructorInvoker(Constructor<T> constructor) {
