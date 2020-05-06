@@ -11,7 +11,7 @@ public class StringHelper {
         return join(delimiter, array, Object::toString);
     }
 
-    public static String join(CharSequence delimiter, Object[] array, Function<Object, String> toString) {
+    public static <T> String join(CharSequence delimiter, T[] array, Function<T, String> toString) {
         return String.join(delimiter,
                 ArrayHelper.buildArray(new String[array.length], i -> toString.apply(array[i]))
         );
@@ -21,10 +21,11 @@ public class StringHelper {
         return join(delimiter, iterable, Object::toString);
     }
 
-    public static String join(CharSequence delimiter, Iterable<?> iterable, Function<Object, String> toString) {
+    public static <T> String join(
+            CharSequence delimiter, Iterable<? extends T> iterable, Function<T, String> toString) {
         StringJoiner joiner = new StringJoiner(delimiter);
-        for (Object o : iterable) {
-            joiner.add(toString.apply(o));
+        for (T t : iterable) {
+            joiner.add(toString.apply(t));
         }
         return joiner.toString();
     }
