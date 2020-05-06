@@ -1,8 +1,8 @@
 package xyz.srclab.common.bytecode;
 
 import com.google.common.base.CharMatcher;
-import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Shares;
+import xyz.srclab.common.util.string.StringHelper;
 
 /**
  * @author sunqian
@@ -32,6 +32,10 @@ public class ByteCodeHelper {
         //return "V";
         //}
         return "L" + dotMatcher.replaceFrom(type.getName(), '/') + ";";
+    }
+
+    public static String getTypeDescriptor(String className) {
+        return "L" + dotMatcher.replaceFrom(className, '/') + ";";
     }
 
     public static String getPrimitiveTypeDescriptor(Class<?> primitiveType) {
@@ -71,11 +75,34 @@ public class ByteCodeHelper {
         return "[" + getTypeDescriptor(arrayType.getComponentType());
     }
 
-    public static String getMethodDescriptor(Class<?> returnType, Class<?>... parameterTypes) {
+    public static String getMethodDescriptor(Class<?>[] parameterTypes, Class<?> returnType) {
         StringBuilder buf = new StringBuilder();
         for (Class<?> parameterType : parameterTypes) {
             buf.append(getTypeDescriptor(parameterType));
         }
         return "(" + buf + ")" + getTypeDescriptor(returnType);
+    }
+
+    public static String getMethodDescriptor(BType[] parameterTypes, BType returnType) {
+        String parameterTypesDescriptor = StringHelper.join("", parameterTypes, BType::getDescriptor);
+        return "(" + parameterTypesDescriptor + ")" + returnType.getDescriptor();
+    }
+
+    public static String getTypeSignature(BTypeVariable[] typeVariables, BType[] inheritances) {
+        String typeVariablesDeclaration = joinTypeVariableDeclaration(typeVariables);
+        String extensionsSignature = StringHelper.join("", inheritances, BType::getSignature);
+        return typeVariablesDeclaration + extensionsSignature;
+    }
+
+    public static String getMethodSignature(BTypeVariable[] typeVariables, BType[] parameterTypes, BType returnType) {
+        String typeVariablesDeclaration = joinTypeVariableDeclaration(typeVariables);
+        String parameterTypesSignature = StringHelper.join("", parameterTypes, BType::getSignature);
+        return typeVariablesDeclaration + "(" + parameterTypesSignature + ")" + returnType.getSignature();
+    }
+
+    private static String joinTypeVariableDeclaration(BTypeVariable... typeVariables) {
+        return "<" +
+                StringHelper.join("", typeVariables, BTypeVariable::getDeclaration) +
+                ">";
     }
 }

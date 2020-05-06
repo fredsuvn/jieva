@@ -27,9 +27,9 @@ dependencies {
     api("com.google.guava:guava")
     api("com.github.ben-manes.caffeine:caffeine")
     api("org.yaml:snakeyaml")
+    api("cglib:cglib")
 
     compileOnly("org.springframework:spring-core")
-    api("cglib:cglib")
 
     testCompile(project(":easy-projects:easy-test"))
     testCompile("org.testng:testng")
