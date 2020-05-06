@@ -82,6 +82,14 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
 
         ClassReader classReader = new ClassReader(Abc.class.getName());
         classReader.accept(new ReadVisitor(), ClassReader.SKIP_CODE);
+
+        System.out.println("--------");
+
+        //BTypeVariable
+        //BNewType bNewType = BNewType.of(
+        //        "a.b.C",
+        //
+        //)
     }
 
     private static void showTime(String title, long times, RunThrow runnable) {
@@ -171,7 +179,9 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
             return null;
         }
 
-        public <S extends Integer & Runnable> List<? extends S>[] ss(String string, S s, List<? super S> list, List<? extends String> list2) {
+        public <S extends Integer & Runnable> List<? extends S>[] ss(
+                String string, S s, List<? super S> list, List<? extends String> list2,
+                List<String> list3, List<S> list4, List<S[]> list5) {
             return null;
         }
     }

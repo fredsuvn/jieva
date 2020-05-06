@@ -3,13 +3,29 @@ package xyz.srclab.common.bytecode;
 /**
  * @author sunqian
  */
-public interface BWildcardType extends BType {
+public class BWildcardType implements ByteCodeType {
 
-    static BWildcardType newBWildcardType(BType[] bounds, boolean upper) {
-        return BTypeSupport.newBWildcardType(bounds, upper);
+    public static final String NO_BOUND = "";
+
+    public static final String UPPER_BOUND = "+";
+
+    public static final String LOWER_BOUND = "-";
+
+    private final String boundDescriptor;
+    private final ByteCodeType bound;
+
+    public BWildcardType(String boundDescriptor, ByteCodeType bound) {
+        this.boundDescriptor = boundDescriptor;
+        this.bound = bound;
     }
 
-    BType[] getUpperBounds();
+    @Override
+    public String getDescriptor() {
+        return LOWER_BOUND.equals(boundDescriptor) ? BType.OBJECT_TYPE.getDescriptor() : bound.getDescriptor();
+    }
 
-    BType[] getLowerBounds();
+    @Override
+    public String getSignature() {
+        return boundDescriptor + bound.getSignature();
+    }
 }

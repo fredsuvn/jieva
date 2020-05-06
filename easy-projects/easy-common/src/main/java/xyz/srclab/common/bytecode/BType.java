@@ -1,20 +1,63 @@
 package xyz.srclab.common.bytecode;
 
-public interface BType {
+import com.google.common.collect.Iterables;
+import xyz.srclab.common.util.string.StringHelper;
 
-    static BType of(Class<?> cls) {
-        return BTypeSupport.newBType(cls);
+import java.util.Arrays;
+import java.util.LinkedList;
+
+/**
+ * @author sunqian
+ */
+public class BType implements ByteCodeType {
+
+    public static final BType OBJECT_TYPE = new BType(Object.class);
+
+    private final String name;
+    private final String internalName;
+    private final String descriptor;
+
+    private final LinkedList<ByteCodeType> genericTypes = new LinkedList<>();
+
+    public BType(Class<?> type) {
+        this(type.getName());
     }
 
-    static BType of(String className, BType[] genericTypes, boolean array) {
-        return BTypeSupport.newBType(className, genericTypes, array);
+    public BType(String name) {
+        this.name = name;
+        this.internalName = ByteCodeHelper.getTypeInternalName(name);
+        this.descriptor = ByteCodeHelper.getTypeDescriptor(name);
     }
 
-    String getClassName();
+    public void addGenericTypes(ByteCodeType... genericTypes) {
+        addGenericTypes(Arrays.asList(genericTypes));
+    }
 
-    String getInternalName();
+    public void addGenericTypes(Iterable<ByteCodeType> genericTypes) {
+        Iterables.addAll(this.genericTypes, genericTypes);
+    }
 
-    String getDescriptor();
+    public String getName() {
+        return name;
+    }
 
-    String getSignature();
+    public String getInternalName() {
+        return internalName;
+    }
+
+    @Override
+    public String getDescriptor() {
+        return descriptor;
+    }
+
+    @Override
+    public String getSignature() {
+        if (genericTypes.isEmpty()) {
+            return descriptor;
+        }
+        return descriptor +
+                "<" +
+                StringHelper.join("", genericTypes, ByteCodeType::getSignature) +
+                ">;";
+    }
 }

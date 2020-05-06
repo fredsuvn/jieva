@@ -87,32 +87,32 @@ public class ByteCodeHelper {
         return "(" + buf + ")" + getTypeDescriptor(returnType);
     }
 
-    public static String getMethodDescriptor(BType[] parameterTypes, BType returnType) {
+    public static String getMethodDescriptor(ByteCodeType[] parameterTypes, ByteCodeType returnType) {
         if (ArrayUtils.isEmpty(parameterTypes)) {
             return "()" + returnType.getDescriptor();
         }
-        String parameterTypesDescriptor = StringHelper.join("", parameterTypes, BType::getDescriptor);
+        String parameterTypesDescriptor = StringHelper.join("", parameterTypes, ByteCodeType::getDescriptor);
         return "(" + parameterTypesDescriptor + ")" + returnType.getDescriptor();
     }
 
-    public static String getTypeSignature(String className, BType[] genericTypes) {
+    public static String getTypeSignature(String className, ByteCodeType[] genericTypes) {
         if (ArrayUtils.isEmpty(genericTypes)) {
             return getTypeDescriptor(className);
         }
-        String genericSignature = "<" + StringHelper.join("", genericTypes, BType::getSignature) + ">";
+        String genericSignature = "<" + StringHelper.join("", genericTypes, ByteCodeType::getSignature) + ">";
         return "L" + getTypeInternalName(className) + genericSignature + ";";
     }
 
     public static String getMethodSignature(
-            BTypeVariable[] typeVariables, BType[] parameterTypes, BType returnType) {
+            BTypeVariable[] typeVariables, ByteCodeType[] parameterTypes, ByteCodeType returnType) {
         String typeVariablesDeclaration = buildTypeVariableDeclaration(typeVariables);
-        String parameterTypesSignature = StringHelper.join("", parameterTypes, BType::getSignature);
+        String parameterTypesSignature = StringHelper.join("", parameterTypes, ByteCodeType::getSignature);
         return typeVariablesDeclaration + "(" + parameterTypesSignature + ")" + returnType.getSignature();
     }
 
-    public static String getTypeDeclarationSignature(BTypeVariable[] typeVariables, BType[] inheritances) {
+    public static String getTypeDeclarationSignature(BTypeVariable[] typeVariables, ByteCodeType[] inheritances) {
         String typeVariablesDeclaration = buildTypeVariableDeclaration(typeVariables);
-        String extensionsSignature = StringHelper.join("", inheritances, BType::getSignature);
+        String extensionsSignature = StringHelper.join("", inheritances, ByteCodeType::getSignature);
         return typeVariablesDeclaration + extensionsSignature;
     }
 
