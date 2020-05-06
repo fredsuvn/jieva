@@ -1,7 +1,6 @@
 package xyz.srclab.common.base;
 
-import com.google.common.base.Joiner;
-import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.util.string.StringHelper;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -10,8 +9,6 @@ import java.lang.reflect.Method;
  * @author sunqian
  */
 public class Describer {
-
-    private static final Joiner PARAMETER_TYPES_JOINER = Joiner.on(", ");
 
     public static String constructorToString(Constructor<?> constructor) {
         return constructorToString(constructor.getDeclaringClass(), constructor.getParameterTypes());
@@ -35,8 +32,6 @@ public class Describer {
     }
 
     public static String parameterTypesToString(Class<?>... parameterTypes) {
-        return PARAMETER_TYPES_JOINER.join(
-                ArrayHelper.buildArray(new String[parameterTypes.length], i -> parameterTypes[i].getName())
-        );
+        return StringHelper.join(", ", parameterTypes, Class::getName);
     }
 }
