@@ -33,8 +33,8 @@ public class BTypeVariable implements ByteCodeType {
             return name + ":" + BType.OBJECT_TYPE.getDescriptor();
         }
         return name +
-                (isInterface ? ":" : "") +
-                StringHelper.join("", bounds, ByteCodeType::getSignature);
+                (isInterface ? "::" : ":") +
+                StringHelper.join(":", bounds, ByteCodeType::getSignature);
     }
 
     public String getName() {
@@ -48,7 +48,7 @@ public class BTypeVariable implements ByteCodeType {
 
     @Override
     public String getSignature() {
-        return "T" + name + ":";
+        return "T" + name + ";";
     }
 
     private ByteCodeType getNearly() {

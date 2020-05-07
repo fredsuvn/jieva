@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ToovaBoot {
 
-    private static final String CONFIG_PATH = "/META-INF/toova.yaml";
+    private static final String CONFIG_PATH = "META-INF/toova.yaml";
 
     private static final String version;
 

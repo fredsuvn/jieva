@@ -55,7 +55,8 @@ public class BType implements ByteCodeType {
         if (genericTypes.isEmpty()) {
             return descriptor;
         }
-        return descriptor +
+        return "L" +
+                internalName +
                 "<" +
                 StringHelper.join("", genericTypes, ByteCodeType::getSignature) +
                 ">;";
