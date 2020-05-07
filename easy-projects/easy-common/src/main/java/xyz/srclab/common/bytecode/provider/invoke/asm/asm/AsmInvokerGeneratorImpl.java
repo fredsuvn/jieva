@@ -1,8 +1,7 @@
 package xyz.srclab.common.bytecode.provider.invoke.asm.asm;
 
-import org.objectweb.asm.*;
-import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Context;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import xyz.srclab.common.bytecode.ByteCodeHelper;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerGenerator;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
@@ -12,11 +11,6 @@ import xyz.srclab.common.invoke.MethodInvoker;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
 
 /**
  * @author sunqian
@@ -28,8 +22,6 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
     @Override
     public <T> ConstructorInvoker<T> newConstructorInvoker(Constructor<T> constructor) {
         try {
-            ClassReader classReader = new ClassReader(AConstructorInvoker.class.getName());
-            classReader.accept(new ReadVisitor(), ClassReader.SKIP_CODE);
 
             String newClassName =
                     AsmInvokerHelper.generateConstructorInvokerClassName(constructor, GENERATOR_NAME);
@@ -80,9 +72,6 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
         //showTime("Static invoker", times, constructorInvoker::invoke);
         //showTime("Fast constructor invoker", times, fastConstructor::newInstance);
 
-        ClassReader classReader = new ClassReader(Abc.class.getName());
-        classReader.accept(new ReadVisitor(), ClassReader.SKIP_CODE);
-
         System.out.println("--------");
 
         //BTypeVariable
@@ -90,19 +79,6 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
         //        "a.b.C",
         //
         //)
-    }
-
-    private static void showTime(String title, long times, RunThrow runnable) {
-        try {
-            long startTime = Context.millis();
-            for (long i = 0; i < times; i++) {
-                runnable.run();
-            }
-            long endTime = Context.millis();
-            System.out.println(title + ": " + (endTime - startTime));
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     private static <T> T cast(Object any) {
@@ -133,56 +109,6 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
         @Override
         public A invoke(Object... args) {
             return new A();
-        }
-    }
-
-    interface RunThrow {
-
-        void run() throws Exception;
-    }
-
-    static final class ReadVisitor extends ClassVisitor {
-
-        public ReadVisitor() {
-            super(Opcodes.ASM7);
-        }
-
-        @Override
-        public void visit(int i, int i1, String s, String s1, String s2, String[] strings) {
-            System.out.println("class: " + s + " : " + s1 + " : " + s2 + " : " + Arrays.toString(strings));
-            super.visit(i, i1, s, s1, s2, strings);
-        }
-
-        @Override
-        public FieldVisitor visitField(int i, String s, String s1, String s2, Object o) {
-            System.out.println("field: " + s + " : " + s1 + " : " + s2 + " : " + o);
-            return super.visitField(i, s, s1, s2, o);
-        }
-
-        @Override
-        public MethodVisitor visitMethod(int i, String s, String s1, String s2, String[] strings) {
-            System.out.println("method: " + s + " : " + s1 + " : " + s2 + " : " + Arrays.toString(strings));
-            return super.visitMethod(i, s, s1, s2, strings);
-        }
-    }
-
-    public static class Fff<T> {
-
-    }
-
-    public static class Abc<T extends List<V> & Runnable & Callable<V>, U extends Set<String>, V extends T> extends Fff<U> implements Function<U, String> {
-
-        private final @Nullable U u = null;
-
-        @Override
-        public String apply(U strings) {
-            return null;
-        }
-
-        public <S extends Integer & Runnable> List<? extends S>[] ss(
-                String string, S s, List<? super S> list, List<? extends String> list2,
-                List<String> list3, List<S> list4, List<S[]> list5) {
-            return null;
         }
     }
 }

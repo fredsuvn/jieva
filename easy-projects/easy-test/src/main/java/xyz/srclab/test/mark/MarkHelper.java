@@ -2,8 +2,8 @@ package xyz.srclab.test.mark;
 
 public class MarkHelper {
 
-    public static Object generateDefaultMark(Marked marked, Object key) {
-        return marked.getClass().getName()
+    public static Object generateMark(MarkTesting markTesting, Object key) {
+        return markTesting.getClass().getName()
                 + ":"
                 + key
                 + ":"

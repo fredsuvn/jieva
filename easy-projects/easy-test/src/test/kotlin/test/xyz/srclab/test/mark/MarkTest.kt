@@ -3,7 +3,7 @@ package test.xyz.srclab.test.mark
 import org.testng.annotations.Test
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.mark.MarkHelper
-import xyz.srclab.test.mark.Marked
+import xyz.srclab.test.mark.MarkTesting
 
 object MarkTest {
 
@@ -13,14 +13,22 @@ object MarkTest {
         testMark.mark()
         testMark.mark("hello")
         testMark.mark("world", "!")
-        doAssertEquals(testMark.actualMark, MarkHelper.generateDefaultMark(testMark, testMark))
-        doAssertEquals(testMark.getActualMark("hello"), MarkHelper.generateDefaultMark(testMark, "hello"))
-        doAssertEquals(testMark.getActualMark("world"), "!")
+        doAssertEquals(testMark.mark, MarkHelper.generateMark(testMark, testMark))
+        doAssertEquals(testMark.getMark("hello"), MarkHelper.generateMark(testMark, "hello"))
+        doAssertEquals(testMark.getMark("world"), "!")
+        testMark.unmark()
+        testMark.unmark("hello")
+        testMark.unmark("world")
+        doAssertEquals(testMark.mark, null)
+        doAssertEquals(testMark.getMark("hello"), null)
+        doAssertEquals(testMark.getMark("world"), null)
+
+        testMark.mark(1, 2)
+        doAssertEquals(testMark.getMark(1), 2)
         testMark.clearMarks()
-        doAssertEquals(testMark.actualMark, null)
-        doAssertEquals(testMark.getActualMark("hello"), null)
-        doAssertEquals(testMark.getActualMark("world"), null)
+        doAssertEquals(testMark.getMark(1), null)
+        doAssertEquals(testMark.allMarks.size, 0)
     }
 
-    class TestMark : Marked
+    class TestMark : MarkTesting
 }
