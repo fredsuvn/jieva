@@ -6,6 +6,8 @@ import net.sf.cglib.reflect.FastMethod;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.bytecode.BType;
+import xyz.srclab.common.bytecode.ByteCodeConstants;
 import xyz.srclab.common.bytecode.ByteCodeHelper;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerGenerator;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
@@ -26,35 +28,41 @@ import java.util.Arrays;
  */
 final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
 
-    private static final String GENERATOR_NAME = "JdkAsm";
+    private static final String GENERATOR_NAME = "Asm";
 
     @Override
     public <T> ConstructorInvoker<T> newConstructorInvoker(Constructor<T> constructor) {
         try {
-
             String newClassName =
                     AsmInvokerHelper.generateConstructorInvokerClassName(constructor, GENERATOR_NAME);
-            String newClassInternalName = ByteCodeHelper.getTypeInternalName(newClassName);
-            String newClassSignature = "Ljava/lang/Object;Lxyz/srclab/common/invoke/ConstructorInvoker<Lxyz/srclab/common/bytecode/provider/invoke/asm/jdk/JdkAsmInvokerGeneratorImpl$A;>;";
-            String constructorInvokerInternalName = ConstructorInvoker.class.getName().replaceAll("\\.", "/");
-            ClassWriter classWriter = new ClassWriter(0);
+            BType constructorType = new BType(constructor.getClass());
+            BType generatedType = new BType(newClassName);
+            BType interfaceType = new BType(ConstructorInvoker.class);
+            BType targetType = new BType(constructor.getDeclaringClass());
+            constructorType.addGenericTypes(targetType);
+            interfaceType.addGenericTypes(targetType);
 
+            ClassWriter classWriter = new ClassWriter(0);
             classWriter.visit(
                     Opcodes.V1_8,
                     Opcodes.ACC_PUBLIC,
-                    newClassInternalName,
-                    newClassSignature,
+                    generatedType.getInternalName(),
+                    BType.OBJECT_TYPE.getSignature() + interfaceType.getSignature(),
                     null,
-                    new String[]{constructorInvokerInternalName}
+                    new String[]{interfaceType.getInternalName()}
             );
-
             classWriter.visitField(
                     Opcodes.ACC_PRIVATE | Opcodes.ACC_FINAL,
                     "constructor",
-                    "Ljava/lang/reflect/Constructor",
-                    "Ljava/lang/reflect/Constructor<Lxyz/srclab/common/bytecode/provider/invoke/asm/jdk/JdkAsmInvokerGeneratorImpl$A;>;",
+                    constructorType.getDescriptor(),
+                    constructorType.getSignature(),
                     null
             );
+            classWriter.visitMethod(
+                    Opcodes.ACC_PUBLIC,
+                    ByteCodeConstants.CONSTRUCTOR_NAME,
+
+            )
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -69,116 +77,5 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
     @Override
     public FunctionInvoker newFunctionInvoker(Method method) {
         return null;
-    }
-
-    public static void main(String[] args) throws Exception {
-        Constructor<A> constructor = A.class.getConstructor();
-        Method method = A.class.getMethod("doSomething");
-        ConstructorInvoker<A<String>> constructorInvoker = cast(new AConstructorInvoker(constructor));
-        MethodInvoker methodInvoker = new AMethodInvoker(method);
-        FastClass fastClass = FastClass.create(A.class);
-        FastConstructor fastConstructor = fastClass.getConstructor(ReflectConstants.EMPTY_PARAMETER_TYPES);
-        FastMethod fastMethod = fastClass.getMethod(method);
-        long times = 3000000000L;
-        A a = new A();
-        Object[] empty = new Object[0];
-        Performer.doPerforms(Arrays.asList(
-                new PerformInfo("Direct constructor invoker", () -> new A()),
-                new PerformInfo("Direct method invoker", () -> a.doSomething()),
-                new PerformInfo("Reflect constructor invoker", () -> {
-                    try {
-                        constructor.newInstance();
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                }),
-                new PerformInfo("Reflect method invoker", () -> {
-                    try {
-                        method.invoke(a);
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                }),
-                new PerformInfo("Static constructor invoker", () -> constructorInvoker.invoke()),
-                new PerformInfo("Static method invoker", () -> methodInvoker.invoke(a)),
-                new PerformInfo("Fast constructor invoker", () -> {
-                    try {
-                        fastConstructor.newInstance();
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                }),
-                new PerformInfo("Fast method invoker", () -> {
-                    try {
-                        fastMethod.invoke(a, empty);
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                })
-                ),
-                times,
-                System.out,
-                ChronoUnit.MILLIS
-        );
-
-        System.out.println("--------");
-
-        //BTypeVariable
-        //BNewType bNewType = BNewType.of(
-        //        "a.b.C",
-        //
-        //)
-    }
-
-    private static <T> T cast(Object any) {
-        return (T) any;
-    }
-
-    public static class A<T> {
-
-        public A() {
-        }
-
-        public Object doSomething() {
-            return null;
-        }
-    }
-
-    public static final class AConstructorInvoker implements ConstructorInvoker<A> {
-
-        private final Constructor<A> constructor;
-
-        public AConstructorInvoker(Constructor<A> constructor) {
-            this.constructor = constructor;
-        }
-
-        @Override
-        public Constructor<A> getConstructor() {
-            return constructor;
-        }
-
-        @Override
-        public A invoke(Object... args) {
-            return new A();
-        }
-    }
-
-    public static final class AMethodInvoker implements MethodInvoker {
-
-        private final Method method;
-
-        public AMethodInvoker(Method method) {
-            this.method = method;
-        }
-
-        @Override
-        public Method getMethod() {
-            return method;
-        }
-
-        @Override
-        public Object invoke(@Nullable Object object, Object... args) {
-            return ((A) object).doSomething();
-        }
     }
 }

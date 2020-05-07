@@ -20,24 +20,24 @@ public class AsmInvokerHelper {
 
     private static final CharMatcher nonJavaNamingMatcher = Shares.NON_JAVA_NAMING_MATCHER;
 
-    public static String generateConstructorInvokerClassName(Constructor<?> constructor, String signature) {
+    public static String generateConstructorInvokerClassName(Constructor<?> constructor, String providerName) {
         String constructorDescription = Describer.constructorToString(constructor);
         return GENERATED_CLASS_ROOT_PACKAGE +
                 "." +
                 nonJavaNamingMatcher.replaceFrom(constructorDescription, "$") +
                 "$$CreatedBy$" +
-                signature +
+                providerName +
                 "$$" +
                 classCounter.getAndIncrement();
     }
 
-    public static String generateMethodInvokerClassName(Method method, String signature) {
+    public static String generateMethodInvokerClassName(Method method, String providerName) {
         String methodDescription = Describer.methodToString(method);
         return GENERATED_CLASS_ROOT_PACKAGE +
                 "." +
                 nonJavaNamingMatcher.replaceFrom(methodDescription, "$") +
                 "$$CreatedBy$" +
-                signature +
+                providerName +
                 "$$" +
                 classCounter.getAndIncrement();
     }
