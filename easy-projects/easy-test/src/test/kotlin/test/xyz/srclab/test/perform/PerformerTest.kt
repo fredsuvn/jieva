@@ -38,7 +38,14 @@ object PerformerTest {
 
     class Invoker {
         fun doSomething() {
-            Random.nextDouble()
+            factorial(100)
+        }
+
+        private fun factorial(num: Long): Long {
+            if (num == 2L) {
+                return 2L
+            }
+            return num * factorial(num - 1)
         }
     }
 }

@@ -31,7 +31,7 @@ dependencies {
 
     compileOnly("org.springframework:spring-core")
 
-    testCompile(project(":easy-projects:easy-test"))
+    api(project(":easy-projects:easy-test"))
     testCompile("org.testng:testng")
 
     testCompile("org.springframework:spring-core")

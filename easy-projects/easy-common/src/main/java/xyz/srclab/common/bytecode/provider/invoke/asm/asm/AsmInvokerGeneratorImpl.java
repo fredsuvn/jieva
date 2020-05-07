@@ -1,16 +1,25 @@
 package xyz.srclab.common.bytecode.provider.invoke.asm.asm;
 
+import net.sf.cglib.reflect.FastClass;
+import net.sf.cglib.reflect.FastConstructor;
+import net.sf.cglib.reflect.FastMethod;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bytecode.ByteCodeHelper;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerGenerator;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.invoke.FunctionInvoker;
 import xyz.srclab.common.invoke.MethodInvoker;
+import xyz.srclab.common.reflect.ReflectConstants;
+import xyz.srclab.test.perform.PerformInfo;
+import xyz.srclab.test.perform.Performer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 
 /**
  * @author sunqian
@@ -63,14 +72,54 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
     }
 
     public static void main(String[] args) throws Exception {
-        //Constructor<A> constructor = A.class.getConstructor();
-        //ConstructorInvoker<A<String>> constructorInvoker = cast(new AConstructorInvoker());
-        //FastClass fastClass = FastClass.create(A.class);
-        //FastConstructor fastConstructor = fastClass.getConstructor(ReflectConstants.EMPTY_PARAMETER_TYPES);
-        //long times = 10000000000L;
-        //showTime("Reflect invoker", times, constructor::newInstance);
-        //showTime("Static invoker", times, constructorInvoker::invoke);
-        //showTime("Fast constructor invoker", times, fastConstructor::newInstance);
+        Constructor<A> constructor = A.class.getConstructor();
+        Method method = A.class.getMethod("doSomething");
+        ConstructorInvoker<A<String>> constructorInvoker = cast(new AConstructorInvoker(constructor));
+        MethodInvoker methodInvoker = new AMethodInvoker(method);
+        FastClass fastClass = FastClass.create(A.class);
+        FastConstructor fastConstructor = fastClass.getConstructor(ReflectConstants.EMPTY_PARAMETER_TYPES);
+        FastMethod fastMethod = fastClass.getMethod(method);
+        long times = 3000000000L;
+        A a = new A();
+        Object[] empty = new Object[0];
+        Performer.doPerforms(Arrays.asList(
+                new PerformInfo("Direct constructor invoker", () -> new A()),
+                new PerformInfo("Direct method invoker", () -> a.doSomething()),
+                new PerformInfo("Reflect constructor invoker", () -> {
+                    try {
+                        constructor.newInstance();
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                }),
+                new PerformInfo("Reflect method invoker", () -> {
+                    try {
+                        method.invoke(a);
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                }),
+                new PerformInfo("Static constructor invoker", () -> constructorInvoker.invoke()),
+                new PerformInfo("Static method invoker", () -> methodInvoker.invoke(a)),
+                new PerformInfo("Fast constructor invoker", () -> {
+                    try {
+                        fastConstructor.newInstance();
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                }),
+                new PerformInfo("Fast method invoker", () -> {
+                    try {
+                        fastMethod.invoke(a, empty);
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                })
+                ),
+                times,
+                System.out,
+                ChronoUnit.MILLIS
+        );
 
         System.out.println("--------");
 
@@ -87,18 +136,20 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
 
     public static class A<T> {
 
+        public A() {
+        }
+
+        public Object doSomething() {
+            return null;
+        }
     }
 
     public static final class AConstructorInvoker implements ConstructorInvoker<A> {
 
         private final Constructor<A> constructor;
 
-        {
-            try {
-                constructor = A.class.getConstructor();
-            } catch (NoSuchMethodException e) {
-                throw new IllegalStateException(e);
-            }
+        public AConstructorInvoker(Constructor<A> constructor) {
+            this.constructor = constructor;
         }
 
         @Override
@@ -109,6 +160,25 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
         @Override
         public A invoke(Object... args) {
             return new A();
+        }
+    }
+
+    public static final class AMethodInvoker implements MethodInvoker {
+
+        private final Method method;
+
+        public AMethodInvoker(Method method) {
+            this.method = method;
+        }
+
+        @Override
+        public Method getMethod() {
+            return method;
+        }
+
+        @Override
+        public Object invoke(@Nullable Object object, Object... args) {
+            return ((A) object).doSomething();
         }
     }
 }
