@@ -21,7 +21,7 @@ public class BWildcardType implements ByteCodeType {
 
     @Override
     public String getDescriptor() {
-        return LOWER_BOUND.equals(boundDescriptor) ? BType.OBJECT_TYPE.getDescriptor() : bound.getDescriptor();
+        return LOWER_BOUND.equals(boundDescriptor) ? BTypeHelper.OBJECT_TYPE.getDescriptor() : bound.getDescriptor();
     }
 
     @Override

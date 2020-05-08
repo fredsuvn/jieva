@@ -30,7 +30,7 @@ public class BTypeVariable implements ByteCodeType {
 
     public String getDeclaration() {
         if (bounds.isEmpty()) {
-            return name + ":" + BType.OBJECT_TYPE.getDescriptor();
+            return name + ":" + BTypeHelper.OBJECT_TYPE.getDescriptor();
         }
         return name +
                 (isInterface ? "::" : ":") +
@@ -52,6 +52,6 @@ public class BTypeVariable implements ByteCodeType {
     }
 
     private ByteCodeType getNearly() {
-        return bounds.isEmpty() ? BType.OBJECT_TYPE : bounds.getFirst();
+        return bounds.isEmpty() ? BTypeHelper.OBJECT_TYPE : bounds.getFirst();
     }
 }

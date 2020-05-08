@@ -144,11 +144,23 @@ object ByteCodeTest {
                 }
                 return super.visitMethod(i, s, s1, s2, strings)
             }
+
+            override fun visitSource(source: String?, debug: String?) {
+                println("source: $source : $debug")
+                super.visitSource(source, debug)
+            }
+
+            override fun visitAttribute(attribute: Attribute?) {
+                println("attribute: $attribute")
+                super.visitAttribute(attribute)
+            }
         }, 0)
         return info
     }
 
-    open class G<T>
+    interface I
+
+    open class G<T> : I
 
     class Abc<T, U : MutableSet<in String>, O : T> : G<U>(), Function<U, String>
             where T : List<O>, T : Runnable, T : Callable<O> {
@@ -168,6 +180,10 @@ object ByteCodeTest {
             list4: MutableList<in Array<S>>
         ): Array<Array<S>> where S : Number, S : Runnable {
             return arrayOf()
+        }
+
+        fun invoke(vararg args: Any): String? {
+            return null
         }
     }
 

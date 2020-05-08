@@ -11,8 +11,6 @@ import java.util.LinkedList;
  */
 public class BType implements ByteCodeType {
 
-    public static final BType OBJECT_TYPE = new BType(Object.class);
-
     private final String name;
     private final String internalName;
     private final String descriptor;
@@ -20,7 +18,9 @@ public class BType implements ByteCodeType {
     private final LinkedList<ByteCodeType> genericTypes = new LinkedList<>();
 
     public BType(Class<?> type) {
-        this(type.getName());
+        this.name = type.getName();
+        this.internalName = ByteCodeHelper.getTypeInternalName(type);
+        this.descriptor = ByteCodeHelper.getTypeDescriptor(type);
     }
 
     public BType(String name) {

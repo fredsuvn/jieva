@@ -10,8 +10,6 @@ import xyz.srclab.common.util.string.StringHelper;
  */
 public class ByteCodeHelper {
 
-    private static final BTypeVariable[] EMPTY_TYPE_VARIABLE = new BTypeVariable[0];
-
     private static final CharMatcher dotMatcher = Shares.DOT_CHAR_MATCHER;
 
     public static String getTypeInternalName(Class<?> type) {
@@ -106,14 +104,14 @@ public class ByteCodeHelper {
     }
 
     public static String getMethodSignature(ByteCodeType[] parameterTypes, ByteCodeType returnType) {
-        return getMethodSignature(parameterTypes, returnType, EMPTY_TYPE_VARIABLE);
+        return getMethodSignature(parameterTypes, returnType, BTypeHelper.EMPTY_TYPE_VARIABLE_ARRAY);
     }
 
     public static String getMethodSignature(
             ByteCodeType[] parameterTypes, ByteCodeType returnType, BTypeVariable[] typeVariables) {
         String typeVariablesDeclaration = ArrayUtils.isEmpty(typeVariables) ? "" :
                 buildTypeVariableDeclaration(typeVariables);
-        String parameterTypesSignature = ArrayUtils.isEmpty(parameterTypes) ? "()" :
+        String parameterTypesSignature = ArrayUtils.isEmpty(parameterTypes) ? "" :
                 StringHelper.join("", parameterTypes, ByteCodeType::getSignature);
         return typeVariablesDeclaration + "(" + parameterTypesSignature + ")" + returnType.getSignature();
     }
