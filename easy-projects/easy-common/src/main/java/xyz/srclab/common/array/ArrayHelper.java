@@ -20,8 +20,7 @@ public class ArrayHelper {
 
     public static <E> E[] toArray(Iterable<? extends E> iterable, Type componentType) {
         Collection<E> collection = IterableHelper.asCollection(iterable);
-        Class<?> classType = TypeHelper.getRawType(componentType);
-        E[] array = (E[]) Array.newInstance(classType, collection.size());
+        E[] array = newArray(componentType, collection.size());
         int i = 0;
         for (E e : collection) {
             array[i++] = e;
@@ -119,14 +118,6 @@ public class ArrayHelper {
         return array;
     }
 
-    public static <E> E[] buildArray(
-            @WrittenReturn Object[] array, TypeRef<E> type, ElementSupplier<E> elementSupplier) {
-        for (int i = 0; i < array.length; i++) {
-            array[i] = elementSupplier.get(i);
-        }
-        return (E[]) array;
-    }
-
     public static byte[] buildArray(@WrittenReturn byte[] array, int from, int to, ByteElementSupplier each) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
@@ -197,15 +188,6 @@ public class ArrayHelper {
             array[i] = elementSupplier.get(i);
         }
         return array;
-    }
-
-    public static <E> E[] buildArray(
-            @WrittenReturn Object[] array, TypeRef<E> type, int from, int to, ElementSupplier<E> elementSupplier) {
-        Checker.checkSubBounds(array.length, from, to);
-        for (int i = from; i < to; i++) {
-            array[i] = elementSupplier.get(i);
-        }
-        return (E[]) array;
     }
 
     public static Class<?> findArrayType(Class<?> elementType) {
