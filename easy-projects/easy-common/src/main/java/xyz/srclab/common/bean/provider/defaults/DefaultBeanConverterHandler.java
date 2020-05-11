@@ -5,11 +5,11 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.bean.BeanConverterHandler;
 import xyz.srclab.common.bean.BeanOperator;
-import xyz.srclab.common.collection.iterable.IterableHelper;
-import xyz.srclab.common.collection.list.ListHelper;
-import xyz.srclab.common.collection.map.MapHelper;
-import xyz.srclab.common.collection.set.SetHelper;
-import xyz.srclab.common.lang.format.fastformat.FastFormat;
+import xyz.srclab.common.collection.IterableHelper;
+import xyz.srclab.common.collection.ListHelper;
+import xyz.srclab.common.collection.MapHelper;
+import xyz.srclab.common.collection.SetHelper;
+import xyz.srclab.common.lang.Formatter;
 import xyz.srclab.common.reflect.ConstructorHelper;
 import xyz.srclab.common.reflect.TypeHelper;
 
@@ -105,7 +105,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
 
     private Object convertTypeVariable(Object from, TypeVariable<?> to, BeanOperator beanOperator) {
         throw new IllegalArgumentException(
-                FastFormat.format("Cannot find runtime type for {}.{}",
+                Formatter.fastFormat("Cannot find runtime type for {}.{}",
                         to.getGenericDeclaration(), to.getName())
         );
     }
@@ -136,7 +136,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
             }
             return ListHelper.immutable(result);
         }
-        throw new UnsupportedOperationException(FastFormat.format(
+        throw new UnsupportedOperationException(Formatter.fastFormat(
                 "Cannot convert object {} to list of element type {}", from, elementType));
     }
 
@@ -154,7 +154,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
             }
             return SetHelper.immutable(result);
         }
-        throw new UnsupportedOperationException(FastFormat.format(
+        throw new UnsupportedOperationException(Formatter.fastFormat(
                 "Cannot convert object {} to set of element type {}", from, elementType));
     }
 
@@ -184,7 +184,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
             }
             return resultArray;
         }
-        throw new UnsupportedOperationException(FastFormat.format(
+        throw new UnsupportedOperationException(Formatter.fastFormat(
                 "Cannot convert object {} to array of element type {}", from, componentType));
     }
 
@@ -249,7 +249,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
                 return fromString.charAt(0);
             }
             throw new UnsupportedOperationException(
-                    FastFormat.format("Cannot convert object {} to type {}", from, to));
+                    Formatter.fastFormat("Cannot convert object {} to type {}", from, to));
         }
         if (byte.class.equals(to) || Byte.class.equals(to)) {
             if (from instanceof Number) {

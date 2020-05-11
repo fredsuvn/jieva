@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.collection
 
 import org.testng.annotations.Test
-import xyz.srclab.common.collection.map.MapHelper
+import xyz.srclab.common.collection.MapHelper
 import xyz.srclab.test.doAssertEquals
 
 object MapHelperTest {

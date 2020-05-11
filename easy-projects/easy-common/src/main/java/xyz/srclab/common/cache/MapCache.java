@@ -2,7 +2,7 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.lang.ref.Ref;
+import xyz.srclab.common.lang.Ref;
 
 import java.time.Duration;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package xyz.srclab.common.collection.set;
+package xyz.srclab.common.collection;
 
 import com.google.common.collect.ImmutableSet;
 import xyz.srclab.annotation.Immutable;

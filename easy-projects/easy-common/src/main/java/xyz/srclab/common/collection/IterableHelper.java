@@ -1,4 +1,4 @@
-package xyz.srclab.common.collection.iterable;
+package xyz.srclab.common.collection;
 
 import xyz.srclab.annotation.WrittenReturn;
 

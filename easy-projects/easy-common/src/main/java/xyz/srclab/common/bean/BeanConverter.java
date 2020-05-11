@@ -2,9 +2,9 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.lang.Formatter;
 import xyz.srclab.common.pattern.builder.HandlersBuilder;
 import xyz.srclab.common.reflect.TypeRef;
-import xyz.srclab.common.lang.format.fastformat.FastFormat;
 
 import java.lang.reflect.Type;
 
@@ -74,7 +74,7 @@ public interface BeanConverter {
                     }
                 }
                 throw new UnsupportedOperationException(
-                        FastFormat.format("Cannot convert object from {} to {}", from, to));
+                        Formatter.fastFormat("Cannot convert object from {} to {}", from, to));
             }
         }
     }

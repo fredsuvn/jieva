@@ -1,24 +1,46 @@
-package xyz.srclab.common.lang.key;
+package xyz.srclab.common.lang;
 
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.array.ArrayHelper;
 
 import java.util.Arrays;
 
-final class KeySupport {
+/**
+ * @author sunqian
+ */
+@Immutable
+public abstract class Key {
 
-    static Key buildCacheKey(Object... keyComponents) {
+    static Key from(Object... keyComponents) {
         return new KeyImpl(keyComponents);
     }
 
-    private static final class KeyImpl implements Key {
+    static Key from(Iterable<?> keyComponents) {
+        return new KeyImpl(keyComponents);
+    }
+
+    @Override
+    public abstract int hashCode();
+
+    @Override
+    public abstract boolean equals(Object other);
+
+    private static final class KeyImpl extends Key {
+
+        private static final long HASH_CODE_MASK = 0xffffffff00000000L;
 
         private final Object[] keyComponents;
-        private final int hashCode;
+
+        private long hashCode;
         private @Nullable String toString;
 
         private KeyImpl(Object... keyComponents) {
             this.keyComponents = keyComponents.clone();
-            this.hashCode = Arrays.deepHashCode(keyComponents);
+        }
+
+        private KeyImpl(Iterable<?> keyComponents) {
+            this.keyComponents = ArrayHelper.toArray(keyComponents, Object.class);
         }
 
         @Override
@@ -35,7 +57,10 @@ final class KeySupport {
 
         @Override
         public int hashCode() {
-            return hashCode;
+            if ((hashCode & HASH_CODE_MASK) == 0L) {
+                hashCode = Arrays.deepHashCode(keyComponents) | HASH_CODE_MASK;
+            }
+            return (int) hashCode;
         }
 
         @Override

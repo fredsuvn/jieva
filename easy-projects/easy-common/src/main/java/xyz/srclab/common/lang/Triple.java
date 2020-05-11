@@ -1,4 +1,4 @@
-package xyz.srclab.common.lang.tuple;
+package xyz.srclab.common.lang;
 
 public interface Triple<A, B, C> {
 

@@ -2,7 +2,7 @@ package xyz.srclab.common.base;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.set.SetHelper;
+import xyz.srclab.common.collection.SetHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 
 import java.net.URL;

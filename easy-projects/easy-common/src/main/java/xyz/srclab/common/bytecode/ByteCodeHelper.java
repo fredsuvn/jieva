@@ -3,7 +3,7 @@ package xyz.srclab.common.bytecode;
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.common.base.Shares;
-import xyz.srclab.common.util.string.StringHelper;
+import xyz.srclab.common.string.StringHelper;
 
 /**
  * @author sunqian

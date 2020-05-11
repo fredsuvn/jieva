@@ -2,7 +2,7 @@ package test.xyz.srclab.common.collection
 
 import org.testng.annotations.Test
 import test.xyz.srclab.common.Config
-import xyz.srclab.common.collection.map.FixedKeysMap
+import xyz.srclab.common.collection.FixedKeysMap
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable
 import kotlin.random.Random
@@ -19,7 +19,8 @@ object FixedKeysMapTest {
     @Test
     fun testMap() {
         val hashMap = mapOf(1 to 1, 2 to 2)
-        val fixed: MutableMap<Int, Int?> = FixedKeysMap(mapOf(1 to 1, 2 to 2))
+        val fixed: MutableMap<Int, Int?> =
+            FixedKeysMap(mapOf(1 to 1, 2 to 2))
 
         doAssertEquals(fixed, hashMap)
         doAssertEquals(fixed == mapOf(1 to 1, 2 to 2), true)

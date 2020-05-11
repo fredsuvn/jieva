@@ -1,8 +1,12 @@
-package xyz.srclab.common.lang.chars;
+package xyz.srclab.common.string;
 
+import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.base.Checker;
 
-public class CharsHelper {
+import java.util.StringJoiner;
+import java.util.function.Function;
+
+public class StringHelper {
 
     public static int indexOf(CharSequence charSequence, int start, int end, char c) {
         Checker.checkSubBounds(charSequence.length(), start, end);
@@ -67,5 +71,28 @@ public class CharsHelper {
             }
         }
         return -1;
+    }
+
+    public static String join(CharSequence delimiter, Object... array) {
+        return join(delimiter, array, Object::toString);
+    }
+
+    public static <T> String join(CharSequence delimiter, T[] array, Function<T, String> toString) {
+        return String.join(delimiter,
+                ArrayHelper.buildArray(new String[array.length], i -> toString.apply(array[i]))
+        );
+    }
+
+    public static String join(CharSequence delimiter, Iterable<?> iterable) {
+        return join(delimiter, iterable, Object::toString);
+    }
+
+    public static <T> String join(
+            CharSequence delimiter, Iterable<? extends T> iterable, Function<T, String> toString) {
+        StringJoiner joiner = new StringJoiner(delimiter);
+        for (T t : iterable) {
+            joiner.add(toString.apply(t));
+        }
+        return joiner.toString();
     }
 }

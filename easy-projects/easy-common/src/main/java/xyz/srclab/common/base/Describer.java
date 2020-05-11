@@ -1,6 +1,6 @@
 package xyz.srclab.common.base;
 
-import xyz.srclab.common.util.string.StringHelper;
+import xyz.srclab.common.string.StringHelper;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

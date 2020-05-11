@@ -1,9 +1,9 @@
 package xyz.srclab.common.util.proxy.provider.jdk;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.map.MapHelper;
+import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.invoke.MethodInvoker;
-import xyz.srclab.common.lang.tuple.Pair;
+import xyz.srclab.common.lang.Pair;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.ReflectConstants;
 import xyz.srclab.common.util.proxy.ClassProxyProvider;

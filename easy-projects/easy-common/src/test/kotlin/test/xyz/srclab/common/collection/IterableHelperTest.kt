@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.collection
 
 import org.testng.annotations.Test
-import xyz.srclab.common.collection.iterable.IterableHelper
+import xyz.srclab.common.collection.IterableHelper
 import xyz.srclab.test.doAssertEquals
 
 /**

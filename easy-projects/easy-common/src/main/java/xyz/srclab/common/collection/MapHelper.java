@@ -1,4 +1,4 @@
-package xyz.srclab.common.collection.map;
+package xyz.srclab.common.collection;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapMaker;

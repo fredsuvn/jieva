@@ -1,6 +1,6 @@
-package xyz.srclab.common.util.string.tostring;
+package xyz.srclab.common.string;
 
-import xyz.srclab.common.util.string.StringHelper;
+import xyz.srclab.common.string.StringHelper;
 
 import java.util.List;
 

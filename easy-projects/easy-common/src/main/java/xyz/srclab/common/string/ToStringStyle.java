@@ -1,4 +1,4 @@
-package xyz.srclab.common.util.string.tostring;
+package xyz.srclab.common.string;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Defaults;

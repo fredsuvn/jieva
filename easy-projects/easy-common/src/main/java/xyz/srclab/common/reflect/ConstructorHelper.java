@@ -5,7 +5,7 @@ import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Context;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.invoke.ConstructorInvoker;
-import xyz.srclab.common.lang.key.Key;
+import xyz.srclab.common.lang.Key;
 
 import java.lang.reflect.Constructor;
 

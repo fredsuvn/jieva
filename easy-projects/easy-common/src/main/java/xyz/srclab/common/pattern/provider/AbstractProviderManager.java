@@ -3,7 +3,7 @@ package xyz.srclab.common.pattern.provider;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.common.collection.map.MapHelper;
+import xyz.srclab.common.collection.MapHelper;
 
 import java.util.Map;
 import java.util.NoSuchElementException;

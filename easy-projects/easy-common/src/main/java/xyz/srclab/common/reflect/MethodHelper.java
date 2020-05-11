@@ -3,8 +3,8 @@ package xyz.srclab.common.reflect;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.collection.list.ListHelper;
-import xyz.srclab.common.lang.key.Key;
+import xyz.srclab.common.collection.ListHelper;
+import xyz.srclab.common.lang.Key;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

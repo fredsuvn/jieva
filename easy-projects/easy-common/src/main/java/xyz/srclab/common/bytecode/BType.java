@@ -2,8 +2,8 @@ package xyz.srclab.common.bytecode;
 
 import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.iterable.IterableHelper;
-import xyz.srclab.common.util.string.StringHelper;
+import xyz.srclab.common.collection.IterableHelper;
+import xyz.srclab.common.string.StringHelper;
 
 import java.util.Arrays;
 import java.util.LinkedList;

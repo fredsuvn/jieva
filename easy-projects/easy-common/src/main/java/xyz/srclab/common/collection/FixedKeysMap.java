@@ -1,4 +1,4 @@
-package xyz.srclab.common.collection.map;
+package xyz.srclab.common.collection;
 
 import xyz.srclab.annotation.concurrent.ThreadSafe;
 

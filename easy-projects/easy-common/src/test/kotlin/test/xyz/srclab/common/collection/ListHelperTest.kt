@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.collection
 
 import org.testng.annotations.Test
-import xyz.srclab.common.collection.list.ListHelper
+import xyz.srclab.common.collection.ListHelper
 import xyz.srclab.test.doAssertEquals
 
 /**
