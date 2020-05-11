@@ -57,8 +57,9 @@ public class BeanHelper {
         beanOperator.copyPropertiesIgnoreNull(source, dest);
     }
 
-    public static void copyProperties(Object source, Object dest, BeanOperator.EachProperty eachProperty) {
-        beanOperator.copyProperties(source, dest, eachProperty);
+    public static void copyProperties(
+            Object source, Object dest, BeanOperator.CopyPropertiesFunction copyPropertiesFunction) {
+        beanOperator.copyProperties(source, dest, copyPropertiesFunction);
     }
 
     public static <K, V> void populateProperties(Object source, Map<K, V> dest) {
@@ -69,8 +70,9 @@ public class BeanHelper {
         beanOperator.populatePropertiesIgnoreNull(source, dest);
     }
 
-    public static <K, V> void populateProperties(Object source, Map<K, V> dest, BeanOperator.EachEntry<K, V> eachEntry) {
-        beanOperator.populateProperties(source, dest, eachEntry);
+    public static <K, V> void populateProperties(
+            Object source, Map<K, V> dest, BeanOperator.PopulatePropertiesFunction<K, V> populatePropertiesFunction) {
+        beanOperator.populateProperties(source, dest, populatePropertiesFunction);
     }
 
     public static <T> T clone(T from) {

@@ -72,14 +72,14 @@ public interface BeanOperator {
     }
 
     default void copyProperties(Object source, Object dest) {
-        copyProperties(source, dest, EachProperty.DEFAULT);
+        copyProperties(source, dest, CopyPropertiesFunction.DEFAULT);
     }
 
     default void copyPropertiesIgnoreNull(Object source, Object dest) {
-        copyProperties(source, dest, EachProperty.DEFAULT_IGNORE_NULL);
+        copyProperties(source, dest, CopyPropertiesFunction.DEFAULT_IGNORE_NULL);
     }
 
-    default void copyProperties(Object source, Object dest, EachProperty eachProperty) {
+    default void copyProperties(Object source, Object dest, CopyPropertiesFunction copyPropertiesFunction) {
         if (source instanceof Map && dest instanceof Map) {
             Map src = (Map) source;
             Map des = (Map) dest;
@@ -87,32 +87,29 @@ public interface BeanOperator {
                 if (k == null) {
                     return;
                 }
-                eachProperty.apply(k, v, Object.class, value -> des.put(k, value), this);
+                BeanProperty kProperty = BeanSupport.newMapProperty(k);
+                copyPropertiesFunction.apply(src, kProperty, des, kProperty, this);
             });
         } else if (source instanceof Map) {
             Map src = (Map) source;
             BeanStruct destBean = resolveBean(dest.getClass());
             src.forEach((k, v) -> {
+                if (k == null) {
+                    return;
+                }
                 String propertyName = String.valueOf(k);
                 if (!destBean.canWriteProperty(propertyName)) {
                     return;
                 }
+                BeanProperty sourceProperty = BeanSupport.newMapProperty(k);
                 BeanProperty destProperty = getProperty(dest, propertyName);
-                eachProperty.apply(
-                        k,
-                        v,
-                        destProperty.getGenericType(),
-                        value -> destProperty.setValue(dest, value),
-                        this
-                );
+                copyPropertiesFunction.apply(src, sourceProperty, dest, destProperty, this);
             });
         } else if (dest instanceof Map) {
             BeanStruct sourceBean = resolveBean(source.getClass());
-            Map des = (Map) dest;
-            sourceBean.getReadableProperties().forEach((name, property) -> {
-                @Nullable Object sourceValue = property.getValue(source);
-                eachProperty.apply(
-                        name, sourceValue, Object.class, value -> des.put(name, value), this);
+            sourceBean.getReadableProperties().forEach((name, sourceProperty) -> {
+                BeanProperty destProperty = BeanSupport.newMapProperty(name);
+                copyPropertiesFunction.apply(source, sourceProperty, dest, destProperty, this);
             });
         } else {
             BeanStruct sourceBean = resolveBean(source.getClass());
@@ -122,14 +119,7 @@ public interface BeanOperator {
                     return;
                 }
                 BeanProperty destProperty = getProperty(dest, name);
-                @Nullable Object sourceValue = sourceProperty.getValue(source);
-                eachProperty.apply(
-                        name,
-                        sourceValue,
-                        destProperty.getGenericType(),
-                        value -> destProperty.setValue(dest, value),
-                        this
-                );
+                copyPropertiesFunction.apply(source, sourceProperty, dest, destProperty, this);
             });
         }
     }
@@ -150,20 +140,21 @@ public interface BeanOperator {
                 });
     }
 
-    default <K, V> void populateProperties(Object source, Map<K, V> dest, EachEntry<K, V> eachEntry) {
+    default <K, V> void populateProperties(
+            Object source, Map<K, V> dest, PopulatePropertiesFunction<K, V> populatePropertiesFunction) {
         if (source instanceof Map) {
             Map<Object, Object> src = (Map<Object, Object>) source;
             src.forEach((k, v) -> {
                 if (k == null) {
                     return;
                 }
-                eachEntry.apply(k, v, dest::put, this);
+                populatePropertiesFunction.apply(k, v, dest::put, this);
             });
         } else {
             BeanStruct sourceBean = resolveBean(source.getClass());
             sourceBean.getReadableProperties().forEach((name, property) -> {
                 @Nullable Object sourceValue = property.getValue(source);
-                eachEntry.apply(name, sourceValue, dest::put, this);
+                populatePropertiesFunction.apply(name, sourceValue, dest::put, this);
             });
         }
     }
@@ -214,46 +205,42 @@ public interface BeanOperator {
         return beanMethod;
     }
 
-    interface EachProperty {
+    interface CopyPropertiesFunction {
 
-        EachProperty DEFAULT =
-                (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator) ->
-                        destPropertySetter.set(sourcePropertyValue == null ?
-                                null : beanOperator.convert(sourcePropertyValue, destPropertyType));
-
-        EachProperty DEFAULT_IGNORE_NULL =
-                (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator) -> {
-                    if (sourcePropertyValue == null) {
-                        return;
-                    }
-                    Object destPropertyValue = beanOperator.convert(sourcePropertyValue, destPropertyType);
-                    destPropertySetter.set(destPropertyValue);
+        CopyPropertiesFunction DEFAULT =
+                (source, sourceProperty, dest, destProperty, beanOperator) -> {
+                    @Nullable Object sourceValue = sourceProperty.getValue(source);
+                    @Nullable Object destValue = sourceValue == null ? null :
+                            beanOperator.convert(sourceValue, destProperty.getGenericType());
+                    destProperty.setValue(dest, destValue);
                 };
 
+        CopyPropertiesFunction DEFAULT_IGNORE_NULL =
+                (source, sourceProperty, dest, destProperty, beanOperator) -> {
+                    @Nullable Object sourceValue = sourceProperty.getValue(source);
+                    if (sourceValue == null) {
+                        return;
+                    }
+                    @Nullable Object destValue = beanOperator.convert(sourceValue, destProperty.getGenericType());
+                    destProperty.setValue(dest, destValue);
+                };
+
+        void apply(Object source, BeanProperty sourceProperty,
+                   Object dest, BeanProperty destProperty,
+                   BeanOperator beanOperator);
+    }
+
+    interface PopulatePropertiesFunction<K, V> {
+
         void apply(
                 Object sourcePropertyName,
                 @Nullable Object sourcePropertyValue,
-                Type destPropertyType,
-                PropertySetter destPropertySetter,
+                MapPropertySetter<K, V> mapPropertySetter,
                 BeanOperator beanOperator
         );
     }
 
-    interface PropertySetter {
-        void set(@Nullable Object value);
-    }
-
-    interface EachEntry<K, V> {
-
-        void apply(
-                Object sourcePropertyName,
-                @Nullable Object sourcePropertyValue,
-                KeyValueSetter<K, V> keyValueSetter,
-                BeanOperator beanOperator
-        );
-    }
-
-    interface KeyValueSetter<K, V> {
+    interface MapPropertySetter<K, V> {
         void set(K key, @Nullable V value);
     }
 

@@ -27,7 +27,7 @@ public class MapHelper {
 
     @Immutable
     public static <NK, NV, OK, OV> Map<NK, NV> map(
-            Map<OK, OV> sourceMap,
+            Map<? extends OK, ? extends OV> sourceMap,
             Function<OK, ? extends NK> keyMapper,
             Function<OV, ? extends NV> valueMapper
     ) {

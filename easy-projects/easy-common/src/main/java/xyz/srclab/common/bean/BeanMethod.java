@@ -7,9 +7,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 @Immutable
-public interface BeanMethod {
-
-    String getName();
+public interface BeanMethod extends BeanMember {
 
     Class<?>[] getParameterTypes();
 
