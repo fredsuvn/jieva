@@ -4,51 +4,65 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.bytecode.*;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collections;
 
 final class ConstructorInvokerClassGenerator {
 
     public static Class<?> generateClass(Constructor<?> constructor) {
         try {
             String newClassName =
-                    AsmInvokerHelper.generateConstructorInvokerClassName(constructor, GenerateConstants.GENERATOR_NAME);
-            BType constructorType = new BType(constructor.getClass());
-            BType generatedType = new BType(newClassName);
-            BType interfaceType = new BType(ConstructorInvoker.class);
+                    AsmInvokerHelper.generateConstructorInvokerClassName(constructor, GenerateSupper.GENERATOR_NAME);
+            BType constructorClass = new BType(constructor.getClass());
+            BType constructorInvokerInterface = new BType(ConstructorInvoker.class);
             BType targetType = new BType(constructor.getDeclaringClass());
-            constructorType.addGenericTypes(targetType);
-            interfaceType.addGenericTypes(targetType);
+            constructorClass.addGenericTypes(targetType);
+            constructorInvokerInterface.addGenericTypes(targetType);
+
+            BNewType newTypeClass = new BNewType(
+                    newClassName,
+                    null,
+                    null,
+                    Collections.singletonList(constructorInvokerInterface)
+            );
 
             ClassWriter classWriter = new ClassWriter(0);
             classWriter.visit(
                     Opcodes.V1_8,
                     Opcodes.ACC_PUBLIC,
-                    generatedType.getInternalName(),
-                    BTypeHelper.OBJECT_TYPE.getSignature() + interfaceType.getSignature(),
-                    BTypeHelper.OBJECT_TYPE.getInternalName(),
-                    new String[]{interfaceType.getInternalName()}
+                    newTypeClass.getInternalName(),
+                    newTypeClass.getSignature(),
+                    newTypeClass.getSuperClass().getInternalName(),
+                    ArrayHelper.toArray(newTypeClass.getInterfaces(), String.class, BType::getInternalName)
             );
 
             // private Constructor constructor;
             FieldVisitor fieldVisitor = classWriter.visitField(
                     Opcodes.ACC_PRIVATE | Opcodes.ACC_FINAL,
                     "constructor",
-                    constructorType.getDescriptor(),
-                    constructorType.getSignature(),
+                    constructorClass.getDescriptor(),
+                    constructorClass.getSignature(),
                     null
             );
             fieldVisitor.visitEnd();
 
             // <init>(Constructor constructor)
+            BMethod init = new BMethod(
+                    ByteCodeHelper.OBJECT_INIT.getName(),
+                    null,
+                    Collections.singletonList(constructorClass),
+                    null
+            );
             MethodVisitor methodVisitor = classWriter.visitMethod(
                     Opcodes.ACC_PUBLIC,
-                    ByteCodeConstants.CONSTRUCTOR_NAME,
-                    ByteCodeHelper.getMethodDescriptor(new ByteCodeType[]{constructorType}, BTypeHelper.PRIMITIVE_VOID_TYPE),
+                    init.getName(),
+                    init.getDescriptor(),
                     null,
                     null
             );
@@ -56,9 +70,9 @@ final class ConstructorInvokerClassGenerator {
             methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
             methodVisitor.visitMethodInsn(
                     Opcodes.INVOKESPECIAL,
-                    BTypeHelper.OBJECT_TYPE.getInternalName(),
-                    ByteCodeConstants.CONSTRUCTOR_NAME,
-                    ByteCodeConstants.EMPTY_CONSTRUCTOR_DESCRIPTOR,
+                    ByteCodeHelper.OBJECT.getInternalName(),
+                    ByteCodeHelper.OBJECT_INIT.getName(),
+                    ByteCodeHelper.OBJECT_INIT.getDescriptor(),
                     false
             );
             // this.constructor = constructor
@@ -66,39 +80,47 @@ final class ConstructorInvokerClassGenerator {
             methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
             methodVisitor.visitFieldInsn(
                     Opcodes.PUTFIELD,
-                    generatedType.getInternalName(),
+                    newTypeClass.getInternalName(),
                     "constructor",
-                    constructorType.getDescriptor()
+                    constructorClass.getDescriptor()
             );
             methodVisitor.visitInsn(Opcodes.RETURN);
             methodVisitor.visitMaxs(2, 2);
             methodVisitor.visitEnd();
 
-            Method getConstructorMethod = ConstructorInvoker.class.getMethod("getConstructor");
+            //Constructor getConstructor()
+            BMethod getConstructorMethod =
+                    new BMethod("getConstructor", constructorClass, null, null);
             methodVisitor = classWriter.visitMethod(
                     Opcodes.ACC_PUBLIC,
                     getConstructorMethod.getName(),
-                    ByteCodeHelper.getMethodDescriptor(BTypeHelper.EMPTY_TYPE_ARRAY, constructorType),
-                    ByteCodeHelper.getMethodSignature(BTypeHelper.EMPTY_TYPE_ARRAY, constructorType),
+                    getConstructorMethod.getDescriptor(),
+                    getConstructorMethod.getSignature(),
                     null
             );
             methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
             methodVisitor.visitFieldInsn(
                     Opcodes.GETFIELD,
-                    generatedType.getInternalName(),
+                    newTypeClass.getInternalName(),
                     "constructor",
-                    constructorType.getDescriptor()
+                    constructorClass.getDescriptor()
             );
             methodVisitor.visitInsn(Opcodes.ARETURN);
             methodVisitor.visitMaxs(1, 1);
             methodVisitor.visitEnd();
 
-            Method invokeMethod = ConstructorInvoker.class.getMethod("invoke", Object[].class);
+            //T invoke()
+            BMethod invokeMethod = new BMethod(
+                    "invoke",
+                    targetType,
+                    Arrays.asList(ByteCodeHelper.OBJECT_ARRAY_PARAMETER),
+                    null
+            );
             methodVisitor = classWriter.visitMethod(
                     Opcodes.ACC_PUBLIC,
                     invokeMethod.getName(),
-                    ByteCodeHelper.getMethodDescriptor(BTypeHelper.OBJECT_ARRAY_PARAMETER, targetType),
-                    ByteCodeHelper.getMethodSignature(BTypeHelper.OBJECT_ARRAY_PARAMETER, targetType),
+                    invokeMethod.getDescriptor(),
+                    invokeMethod.getSignature(),
                     null
             );
             methodVisitor.visitTypeInsn(Opcodes.NEW, targetType.getInternalName());
@@ -106,27 +128,34 @@ final class ConstructorInvokerClassGenerator {
             methodVisitor.visitMethodInsn(
                     Opcodes.INVOKESPECIAL,
                     targetType.getInternalName(),
-                    ByteCodeConstants.CONSTRUCTOR_NAME,
-                    ByteCodeConstants.EMPTY_CONSTRUCTOR_DESCRIPTOR,
+                    ByteCodeHelper.OBJECT_INIT.getName(),
+                    ByteCodeHelper.OBJECT_INIT.getDescriptor(),
                     false
             );
             methodVisitor.visitInsn(Opcodes.ARETURN);
             methodVisitor.visitMaxs(2, 2);
             methodVisitor.visitEnd();
+            //Object invoke()
+            BMethod invokeMethodBridge = new BMethod(
+                    "invoke",
+                    ByteCodeHelper.OBJECT,
+                    Arrays.asList(ByteCodeHelper.OBJECT_ARRAY_PARAMETER),
+                    null
+            );
             methodVisitor = classWriter.visitMethod(
                     Opcodes.ACC_PUBLIC | Opcodes.ACC_BRIDGE,
-                    invokeMethod.getName(),
-                    ByteCodeHelper.getMethodDescriptor(BTypeHelper.OBJECT_ARRAY_PARAMETER, BTypeHelper.OBJECT_TYPE),
-                    ByteCodeHelper.getMethodSignature(BTypeHelper.OBJECT_ARRAY_PARAMETER, BTypeHelper.OBJECT_TYPE),
+                    invokeMethodBridge.getName(),
+                    invokeMethodBridge.getDescriptor(),
+                    invokeMethodBridge.getSignature(),
                     null
             );
             methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
             methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
             methodVisitor.visitMethodInsn(
                     Opcodes.INVOKEVIRTUAL,
-                    generatedType.getInternalName(),
+                    newTypeClass.getInternalName(),
                     invokeMethod.getName(),
-                    ByteCodeHelper.getMethodDescriptor(BTypeHelper.OBJECT_ARRAY_PARAMETER, targetType),
+                    invokeMethod.getDescriptor(),
                     false
             );
             methodVisitor.visitInsn(Opcodes.ARETURN);

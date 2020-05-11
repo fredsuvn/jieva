@@ -12,6 +12,23 @@ public class ByteCodeHelper {
 
     private static final CharMatcher dotMatcher = Shares.DOT_CHAR_MATCHER;
 
+    public static final String CONSTRUCTOR_NAME = "<init>";
+
+    public static final BType PRIMITIVE_VOID = new BType(void.class);
+
+    public static final BType OBJECT = new BType(Object.class);
+
+    public static final BArrayType OBJECT_ARRAY = new BArrayType(OBJECT, 1);
+
+    public static final BDescribable[] EMPTY_DESCRIBABLE_ARRAY = new BDescribable[0];
+
+    public static final BTypeVariable[] EMPTY_TYPE_VARIABLE_ARRAY = new BTypeVariable[0];
+
+    public static final BDescribable[] OBJECT_ARRAY_PARAMETER = {OBJECT_ARRAY};
+
+    public static final BMethod OBJECT_INIT =
+            new BMethod(CONSTRUCTOR_NAME, null, null, null);
+
     public static String getTypeInternalName(Class<?> type) {
         return getTypeInternalName(type.getName());
     }
@@ -80,51 +97,8 @@ public class ByteCodeHelper {
         if (ArrayUtils.isEmpty(parameterTypes)) {
             return "()" + getTypeDescriptor(returnType);
         }
-        StringBuilder buf = new StringBuilder();
-        for (Class<?> parameterType : parameterTypes) {
-            buf.append(getTypeDescriptor(parameterType));
-        }
-        return "(" + buf + ")" + getTypeDescriptor(returnType);
-    }
-
-    public static String getMethodDescriptor(ByteCodeType[] parameterTypes, ByteCodeType returnType) {
-        if (ArrayUtils.isEmpty(parameterTypes)) {
-            return "()" + returnType.getDescriptor();
-        }
-        String parameterTypesDescriptor = StringHelper.join("", parameterTypes, ByteCodeType::getDescriptor);
-        return "(" + parameterTypesDescriptor + ")" + returnType.getDescriptor();
-    }
-
-    public static String getTypeSignature(String className, ByteCodeType[] genericTypes) {
-        if (ArrayUtils.isEmpty(genericTypes)) {
-            return getTypeDescriptor(className);
-        }
-        String genericSignature = "<" + StringHelper.join("", genericTypes, ByteCodeType::getSignature) + ">";
-        return "L" + getTypeInternalName(className) + genericSignature + ";";
-    }
-
-    public static String getMethodSignature(ByteCodeType[] parameterTypes, ByteCodeType returnType) {
-        return getMethodSignature(parameterTypes, returnType, BTypeHelper.EMPTY_TYPE_VARIABLE_ARRAY);
-    }
-
-    public static String getMethodSignature(
-            ByteCodeType[] parameterTypes, ByteCodeType returnType, BTypeVariable[] typeVariables) {
-        String typeVariablesDeclaration = ArrayUtils.isEmpty(typeVariables) ? "" :
-                buildTypeVariableDeclaration(typeVariables);
-        String parameterTypesSignature = ArrayUtils.isEmpty(parameterTypes) ? "" :
-                StringHelper.join("", parameterTypes, ByteCodeType::getSignature);
-        return typeVariablesDeclaration + "(" + parameterTypesSignature + ")" + returnType.getSignature();
-    }
-
-    public static String getTypeDeclarationSignature(BTypeVariable[] typeVariables, ByteCodeType[] inheritances) {
-        String typeVariablesDeclaration = buildTypeVariableDeclaration(typeVariables);
-        String extensionsSignature = StringHelper.join("", inheritances, ByteCodeType::getSignature);
-        return typeVariablesDeclaration + extensionsSignature;
-    }
-
-    private static String buildTypeVariableDeclaration(BTypeVariable... typeVariables) {
-        return "<" +
-                StringHelper.join("", typeVariables, BTypeVariable::getDeclaration) +
-                ">";
+        String parametersDescriptor =
+                StringHelper.join("", parameterTypes, ByteCodeHelper::getTypeDescriptor);
+        return "(" + parametersDescriptor + ")" + getTypeDescriptor(returnType);
     }
 }

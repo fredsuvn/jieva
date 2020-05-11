@@ -12,12 +12,13 @@ import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.function.Function;
 
 public class ArrayHelper {
 
     private static final Cache<Type, Class<?>> elementToArrayTypeCache = Cache.newGcThreadLocalL2();
 
-    public static <E> E[] toArray(Iterable<E> iterable, Type componentType) {
+    public static <E> E[] toArray(Iterable<? extends E> iterable, Type componentType) {
         Collection<E> collection = IterableHelper.asCollection(iterable);
         Class<?> classType = TypeHelper.getRawType(componentType);
         E[] array = (E[]) Array.newInstance(classType, collection.size());
@@ -28,8 +29,19 @@ public class ArrayHelper {
         return array;
     }
 
-    public static <T> T[] toArray(Iterable<T> iterable, TypeRef<T> componentType) {
+    public static <E> E[] toArray(Iterable<? extends E> iterable, TypeRef<E> componentType) {
         return toArray(iterable, componentType.getType());
+    }
+
+    public static <NE, OE> NE[] toArray(
+            Iterable<? extends OE> iterable, Type componentType, Function<OE, NE> elementMapper) {
+        Iterable<NE> newIterable = IterableHelper.map(iterable, elementMapper);
+        return toArray(newIterable, componentType);
+    }
+
+    public static <NE, OE> NE[] toArray(
+            Iterable<? extends OE> iterable, TypeRef<NE> componentType, Function<OE, NE> elementMapper) {
+        return toArray(iterable, componentType.getType(), elementMapper);
     }
 
     public static <E> E[] newArray(Class<E> componentType, int length) {

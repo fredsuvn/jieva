@@ -1,6 +1,8 @@
 package xyz.srclab.common.bytecode;
 
-import com.google.common.collect.Iterables;
+import org.apache.commons.collections4.CollectionUtils;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.collection.iterable.IterableHelper;
 import xyz.srclab.common.util.string.StringHelper;
 
 import java.util.Arrays;
@@ -9,32 +11,32 @@ import java.util.LinkedList;
 /**
  * @author sunqian
  */
-public class BTypeVariable implements ByteCodeType {
+public class BTypeVariable implements BDescribable {
 
     private final String name;
     private final boolean isInterface;
-    private final LinkedList<ByteCodeType> bounds = new LinkedList<>();
+    private @Nullable LinkedList<BDescribable> bounds;
 
     public BTypeVariable(String name, boolean isInterface) {
         this.name = name;
         this.isInterface = isInterface;
     }
 
-    public void addBounds(ByteCodeType... bounds) {
+    public void addBounds(BDescribable... bounds) {
         addBounds(Arrays.asList(bounds));
     }
 
-    public void addBounds(Iterable<ByteCodeType> bounds) {
-        Iterables.addAll(this.bounds, bounds);
+    public void addBounds(Iterable<BDescribable> bounds) {
+        IterableHelper.addAll(getBounds(), bounds);
     }
 
     public String getDeclaration() {
-        if (bounds.isEmpty()) {
-            return name + ":" + BTypeHelper.OBJECT_TYPE.getDescriptor();
+        if (CollectionUtils.isEmpty(bounds)) {
+            return name + ":" + ByteCodeHelper.OBJECT.getDescriptor();
         }
         return name +
                 (isInterface ? "::" : ":") +
-                StringHelper.join(":", bounds, ByteCodeType::getSignature);
+                StringHelper.join(":", bounds, BDescribable::getSignature);
     }
 
     public String getName() {
@@ -51,7 +53,14 @@ public class BTypeVariable implements ByteCodeType {
         return "T" + name + ";";
     }
 
-    private ByteCodeType getNearly() {
-        return bounds.isEmpty() ? BTypeHelper.OBJECT_TYPE : bounds.getFirst();
+    private BDescribable getNearly() {
+        return CollectionUtils.isEmpty(bounds) ? ByteCodeHelper.OBJECT : bounds.getFirst();
+    }
+
+    private LinkedList<BDescribable> getBounds() {
+        if (bounds == null) {
+            bounds = new LinkedList<>();
+        }
+        return bounds;
     }
 }

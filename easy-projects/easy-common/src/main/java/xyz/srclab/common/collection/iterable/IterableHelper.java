@@ -1,6 +1,9 @@
 package xyz.srclab.common.collection.iterable;
 
+import xyz.srclab.annotation.WrittenReturn;
+
 import java.util.*;
+import java.util.function.Function;
 
 public class IterableHelper {
 
@@ -62,5 +65,19 @@ public class IterableHelper {
             }
         }
         return !iterator2.hasNext();
+    }
+
+    public static <T extends Collection<E>, E> T addAll(
+            @WrittenReturn T container, Iterable<? extends E> iterable) {
+        container.addAll(asCollection(iterable));
+        return container;
+    }
+
+    public static <NE, OE> Iterable<NE> map(Iterable<? extends OE> old, Function<OE, NE> mapper) {
+        List<NE> newList = new LinkedList<>();
+        for (OE oe : old) {
+            newList.add(mapper.apply(oe));
+        }
+        return newList;
     }
 }

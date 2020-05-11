@@ -1,27 +1,32 @@
 package xyz.srclab.common.bytecode;
 
+import xyz.srclab.annotation.Immutable;
+
 /**
  * @author sunqian
  */
-public class BWildcardType implements ByteCodeType {
-
-    public static final String NO_BOUND = "";
+@Immutable
+public class BWildcardType implements BDescribable {
 
     public static final String UPPER_BOUND = "+";
 
     public static final String LOWER_BOUND = "-";
 
     private final String boundDescriptor;
-    private final ByteCodeType bound;
+    private final BDescribable bound;
 
-    public BWildcardType(String boundDescriptor, ByteCodeType bound) {
+    public BWildcardType(BDescribable bound) {
+        this("", bound);
+    }
+
+    public BWildcardType(String boundDescriptor, BDescribable bound) {
         this.boundDescriptor = boundDescriptor;
         this.bound = bound;
     }
 
     @Override
     public String getDescriptor() {
-        return LOWER_BOUND.equals(boundDescriptor) ? BTypeHelper.OBJECT_TYPE.getDescriptor() : bound.getDescriptor();
+        return LOWER_BOUND.equals(boundDescriptor) ? ByteCodeHelper.OBJECT.getDescriptor() : bound.getDescriptor();
     }
 
     @Override

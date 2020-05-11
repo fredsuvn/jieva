@@ -1,6 +1,6 @@
 package xyz.srclab.common.bytecode;
 
-public interface ByteCodeType {
+public interface BDescribable {
 
     String getDescriptor();
 
