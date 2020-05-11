@@ -56,152 +56,154 @@ public class ArrayHelper {
         return newArray(componentType.getType(), length);
     }
 
-    public static byte[] buildArray(@WrittenReturn byte[] array, EachByte each) {
+    public static byte[] buildArray(@WrittenReturn byte[] array, ByteElementSupplier each) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static char[] buildArray(@WrittenReturn char[] array, EachChar each) {
+    public static char[] buildArray(@WrittenReturn char[] array, CharElementSupplier each) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static int[] buildArray(@WrittenReturn int[] array, EachInt each) {
+    public static int[] buildArray(@WrittenReturn int[] array, IntElementSupplier each) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static long[] buildArray(@WrittenReturn long[] array, EachLong each) {
+    public static long[] buildArray(@WrittenReturn long[] array, LongElementSupplier each) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static float[] buildArray(@WrittenReturn float[] array, EachFloat each) {
+    public static float[] buildArray(@WrittenReturn float[] array, FloatElementSupplier each) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static double[] buildArray(@WrittenReturn double[] array, EachDouble each) {
+    public static double[] buildArray(@WrittenReturn double[] array, DoubleElementSupplier each) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static boolean[] buildArray(@WrittenReturn boolean[] array, EachBoolean each) {
+    public static boolean[] buildArray(@WrittenReturn boolean[] array, BooleanElementSupplier each) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static short[] buildArray(@WrittenReturn short[] array, EachShort each) {
+    public static short[] buildArray(@WrittenReturn short[] array, ShortElementSupplier each) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static <E> E[] buildArray(@WrittenReturn E[] array, Each<E> each) {
+    public static <E> E[] buildArray(@WrittenReturn E[] array, ElementSupplier<E> elementSupplier) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = elementSupplier.get(i);
         }
         return array;
     }
 
-    public static <E> E[] buildArray(@WrittenReturn Object[] array, TypeRef<E> type, Each<E> each) {
+    public static <E> E[] buildArray(
+            @WrittenReturn Object[] array, TypeRef<E> type, ElementSupplier<E> elementSupplier) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = each.apply(i);
+            array[i] = elementSupplier.get(i);
         }
         return (E[]) array;
     }
 
-    public static byte[] buildArray(@WrittenReturn byte[] array, int from, int to, EachByte each) {
+    public static byte[] buildArray(@WrittenReturn byte[] array, int from, int to, ByteElementSupplier each) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static char[] buildArray(@WrittenReturn char[] array, int from, int to, EachChar each) {
+    public static char[] buildArray(@WrittenReturn char[] array, int from, int to, CharElementSupplier each) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static int[] buildArray(@WrittenReturn int[] array, int from, int to, EachInt each) {
+    public static int[] buildArray(@WrittenReturn int[] array, int from, int to, IntElementSupplier each) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static long[] buildArray(@WrittenReturn long[] array, int from, int to, EachLong each) {
+    public static long[] buildArray(@WrittenReturn long[] array, int from, int to, LongElementSupplier each) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static float[] buildArray(@WrittenReturn float[] array, int from, int to, EachFloat each) {
+    public static float[] buildArray(@WrittenReturn float[] array, int from, int to, FloatElementSupplier each) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static double[] buildArray(@WrittenReturn double[] array, int from, int to, EachDouble each) {
+    public static double[] buildArray(@WrittenReturn double[] array, int from, int to, DoubleElementSupplier each) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static boolean[] buildArray(@WrittenReturn boolean[] array, int from, int to, EachBoolean each) {
+    public static boolean[] buildArray(@WrittenReturn boolean[] array, int from, int to, BooleanElementSupplier each) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static short[] buildArray(@WrittenReturn short[] array, int from, int to, EachShort each) {
+    public static short[] buildArray(@WrittenReturn short[] array, int from, int to, ShortElementSupplier each) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = each.get(i);
         }
         return array;
     }
 
-    public static <E> E[] buildArray(@WrittenReturn E[] array, int from, int to, Each<E> each) {
+    public static <E> E[] buildArray(@WrittenReturn E[] array, int from, int to, ElementSupplier<E> elementSupplier) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = elementSupplier.get(i);
         }
         return array;
     }
 
-    public static <E> E[] buildArray(@WrittenReturn Object[] array, TypeRef<E> type, int from, int to, Each<E> each) {
+    public static <E> E[] buildArray(
+            @WrittenReturn Object[] array, TypeRef<E> type, int from, int to, ElementSupplier<E> elementSupplier) {
         Checker.checkSubBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
-            array[i] = each.apply(i);
+            array[i] = elementSupplier.get(i);
         }
         return (E[]) array;
     }
@@ -224,40 +226,40 @@ public class ArrayHelper {
         return TypeHelper.getRawType(type).getComponentType();
     }
 
-    public interface Each<E> {
+    public interface ElementSupplier<E> {
         @Nullable
-        E apply(int index);
+        E get(int index);
     }
 
-    public interface EachByte {
-        byte apply(int index);
+    public interface ByteElementSupplier {
+        byte get(int index);
     }
 
-    public interface EachChar {
-        char apply(int index);
+    public interface CharElementSupplier {
+        char get(int index);
     }
 
-    public interface EachInt {
-        int apply(int index);
+    public interface IntElementSupplier {
+        int get(int index);
     }
 
-    public interface EachLong {
-        long apply(int index);
+    public interface LongElementSupplier {
+        long get(int index);
     }
 
-    public interface EachFloat {
-        float apply(int index);
+    public interface FloatElementSupplier {
+        float get(int index);
     }
 
-    public interface EachDouble {
-        double apply(int index);
+    public interface DoubleElementSupplier {
+        double get(int index);
     }
 
-    public interface EachBoolean {
-        boolean apply(int index);
+    public interface BooleanElementSupplier {
+        boolean get(int index);
     }
 
-    public interface EachShort {
-        short apply(int index);
+    public interface ShortElementSupplier {
+        short get(int index);
     }
 }
