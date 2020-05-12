@@ -1,11 +1,14 @@
 package xyz.srclab.common.bean;
 
-import java.util.List;
+import xyz.srclab.annotation.Immutable;
 
 /**
  * @author sunqian
  */
+@Immutable
 public interface BeanVisitor {
 
-    void visit(Object object, BeanProperty property, List<Object> visitPath);
+    boolean needDeepVisit(Object object, BeanProperty property, BeanPath path);
+
+    void visitProperty(Object object, BeanProperty property, BeanPath path);
 }

@@ -2,6 +2,8 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.common.ToovaBoot;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +33,8 @@ final class BeanSupport {
         return beanProvider.getBeanResolverHandler();
     }
 
-    static BeanWalker newBeanWalker(BeanOperator beanOperator, BeanClass beanClass) {
+    static BeanWalker newBeanWalker(BeanOperator beanOperator, Object bean) {
+        return new BeanWalkerImpl(beanOperator, bean);
     }
 
     private static final class BeanWalkerImpl implements BeanWalker {
@@ -48,7 +51,35 @@ final class BeanSupport {
         public void walk(BeanVisitor visitor) {
             BeanClass beanClass = beanOperator.resolveBean(bean.getClass());
             Map<String, BeanProperty> propertyMap = beanClass.getReadableProperties();
+            List<Object> visitPath = new LinkedList<>();
+            propertyMap.forEach((name, property)->{
 
+            });
+        }
+    }
+
+    private static final class BeanPathImpl implements BeanPath {
+
+
+
+        @Override
+        public boolean contains(BeanProperty property, Object owner) {
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return "BeanPathImpl{}";
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return super.equals(obj);
         }
     }
 }
