@@ -15,49 +15,42 @@ import java.util.function.Supplier;
 @Immutable
 public abstract class Computed<T> implements Supplier<T> {
 
-    static <T> Computed<T> of(Supplier<T> computation) {
+    public static <T> Computed<T> of(Supplier<T> computation) {
         return new SimpleComputed<>(computation);
     }
 
-    static <T> Computed<T> of(long timeoutSeconds, Supplier<T> computation) {
+    public static <T> Computed<T> of(long timeoutSeconds, Supplier<T> computation) {
         return new AutoRefreshComputed<>(Duration.ofSeconds(timeoutSeconds), computation);
     }
 
-    static <T> Computed<T> of(Duration timeout, Supplier<T> computation) {
+    public static <T> Computed<T> of(Duration timeout, Supplier<T> computation) {
         return new AutoRefreshComputed<>(timeout, computation);
     }
 
     protected final Supplier<T> computation;
+    protected @Nullable T cache;
 
     protected Computed(Supplier<T> computation) {
         this.computation = computation;
     }
 
     @Override
-    public abstract T get();
+    public T get() {
+        if (cache == null) {
+            return refreshGet();
+        }
+        return cache;
+    }
 
-    public abstract T refreshGet();
+    public T refreshGet() {
+        cache = computation.get();
+        return cache;
+    }
 
     private static final class SimpleComputed<T> extends Computed<T> {
 
-        private @Nullable T cache;
-
         SimpleComputed(Supplier<T> computation) {
             super(computation);
-        }
-
-        @Override
-        public T get() {
-            if (cache == null) {
-                return refreshGet();
-            }
-            return cache;
-        }
-
-        @Override
-        public T refreshGet() {
-            cache = computation.get();
-            return cache;
         }
     }
 
@@ -65,7 +58,6 @@ public abstract class Computed<T> implements Supplier<T> {
 
         private final Duration timeout;
 
-        private @Nullable T cache;
         private long cacheTimeMillis = 0;
 
         AutoRefreshComputed(Duration timeout, Supplier<T> computation) {

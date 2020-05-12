@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanMethod;
 import xyz.srclab.common.bean.BeanProperty;
 import xyz.srclab.common.bean.BeanResolverHandler;
-import xyz.srclab.common.bean.BeanStruct;
+import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.invoke.MethodInvoker;
@@ -19,7 +19,7 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
     static DefaultBeanResolverHandler INSTANCE = new DefaultBeanResolverHandler();
 
-    private static final Cache<Class<?>, BeanStruct> cache = Cache.newGcThreadLocalL2();
+    private static final Cache<Class<?>, BeanClass> cache = Cache.newGcThreadLocalL2();
 
     @Override
     public boolean supportBean(Class<?> beanClass) {
@@ -27,12 +27,12 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
     }
 
     @Override
-    public BeanStruct resolve(Class<?> beanClass) {
+    public BeanClass resolve(Class<?> beanClass) {
         return cache.getNonNull(beanClass, type -> {
             try {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
                 Method[] methods = type.getMethods();
-                return BeanStruct.newBuilder(type)
+                return BeanClass.newBuilder(type)
                         .setProperties(buildProperties(beanInfo.getPropertyDescriptors()))
                         .setMethods(buildMethods(methods))
                         .build();

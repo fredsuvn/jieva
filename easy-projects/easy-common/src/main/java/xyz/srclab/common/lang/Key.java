@@ -12,11 +12,11 @@ import java.util.Arrays;
 @Immutable
 public abstract class Key {
 
-    static Key from(Object... keyComponents) {
+    public static Key from(Object... keyComponents) {
         return new KeyImpl(keyComponents);
     }
 
-    static Key from(Iterable<?> keyComponents) {
+    public static Key from(Iterable<?> keyComponents) {
         return new KeyImpl(keyComponents);
     }
 

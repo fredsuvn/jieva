@@ -9,5 +9,5 @@ public interface BeanResolverHandler {
 
     boolean supportBean(Class<?> beanClass);
 
-    BeanStruct resolve(Class<?> beanClass);
+    BeanClass resolve(Class<?> beanClass);
 }

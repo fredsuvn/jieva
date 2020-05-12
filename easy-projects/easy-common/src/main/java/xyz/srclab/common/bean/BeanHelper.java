@@ -12,7 +12,7 @@ public class BeanHelper {
 
     private static final BeanOperator beanOperator = BeanOperator.DEFAULT;
 
-    public static BeanStruct resolveBean(Class<?> beanClass) {
+    public static BeanClass resolveBean(Class<?> beanClass) {
         return beanOperator.resolveBean(beanClass);
     }
 
@@ -57,9 +57,8 @@ public class BeanHelper {
         beanOperator.copyPropertiesIgnoreNull(source, dest);
     }
 
-    public static void copyProperties(
-            Object source, Object dest, BeanOperator.CopyPropertiesFunction copyPropertiesFunction) {
-        beanOperator.copyProperties(source, dest, copyPropertiesFunction);
+    public static BeanOperator.CopyPreparation prepareCopyProperties(Object source, Object dest) {
+        return beanOperator.prepareCopyProperties(source, dest);
     }
 
     public static <K, V> void populateProperties(Object source, Map<K, V> dest) {
@@ -70,9 +69,9 @@ public class BeanHelper {
         beanOperator.populatePropertiesIgnoreNull(source, dest);
     }
 
-    public static <K, V> void populateProperties(
-            Object source, Map<K, V> dest, BeanOperator.PopulatePropertiesFunction<K, V> populatePropertiesFunction) {
-        beanOperator.populateProperties(source, dest, populatePropertiesFunction);
+    public static <K, V> BeanOperator.PopulatePreparation<K, V> preparePopulateProperties(
+            Object source, Map<K, V> dest) {
+        return beanOperator.preparePopulateProperties(source, dest);
     }
 
     public static <T> T clone(T from) {
@@ -101,7 +100,7 @@ public class BeanHelper {
         return beanOperator.getMethod(bean, methodName, parameterTypes);
     }
 
-    public static BeanMethod getMethodBySignature(Object bean, Method method)
+    public static BeanMethod getMethod(Object bean, Method method)
             throws BeanMethodNotFoundException {
         return beanOperator.getMethod(bean, method);
     }

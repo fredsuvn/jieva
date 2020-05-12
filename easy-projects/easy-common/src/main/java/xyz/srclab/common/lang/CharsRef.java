@@ -8,12 +8,12 @@ import xyz.srclab.common.string.StringHelper;
 @Immutable
 public abstract class CharsRef implements CharSequence {
 
-    static CharsRef of(CharSequence chars, int start, int end) {
+    public static CharsRef of(CharSequence chars, int start, int end) {
         Checker.checkSubBounds(chars.length(), start, end);
         return new DefaultCharsRef(chars, start, end);
     }
 
-    static CharsRef of(CharSequence chars, int start) {
+    public static CharsRef of(CharSequence chars, int start) {
         return of(chars, start, chars.length());
     }
 

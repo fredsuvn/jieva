@@ -2,15 +2,15 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.ConstructorHelper;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 @Immutable
 public interface BeanOperator {
@@ -25,13 +25,13 @@ public interface BeanOperator {
 
     BeanConverter getBeanConverter();
 
-    default BeanStruct resolveBean(Class<?> beanClass) {
+    default BeanClass resolveBean(Class<?> beanClass) {
         return getBeanResolver().resolve(beanClass);
     }
 
     default BeanProperty getProperty(Object bean, String propertyName) throws BeanPropertyNotFoundException {
-        BeanStruct beanStruct = resolveBean(bean.getClass());
-        @Nullable BeanProperty beanProperty = beanStruct.getProperty(propertyName);
+        BeanClass beanClass = resolveBean(bean.getClass());
+        @Nullable BeanProperty beanProperty = beanClass.getProperty(propertyName);
         if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
         }
@@ -72,91 +72,31 @@ public interface BeanOperator {
     }
 
     default void copyProperties(Object source, Object dest) {
-        copyProperties(source, dest, CopyPropertiesFunction.DEFAULT);
+        prepareCopyProperties(source, dest).doCopy();
     }
 
     default void copyPropertiesIgnoreNull(Object source, Object dest) {
-        copyProperties(source, dest, CopyPropertiesFunction.DEFAULT_IGNORE_NULL);
+        prepareCopyProperties(source, dest)
+                .filter(CopyPreparation.ignoreNullFilter)
+                .doCopy();
     }
 
-    default void copyProperties(Object source, Object dest, CopyPropertiesFunction copyPropertiesFunction) {
-        if (source instanceof Map && dest instanceof Map) {
-            Map src = (Map) source;
-            Map des = (Map) dest;
-            src.forEach((k, v) -> {
-                if (k == null) {
-                    return;
-                }
-                BeanProperty kProperty = BeanSupport.newMapProperty(k);
-                copyPropertiesFunction.apply(src, kProperty, des, kProperty, this);
-            });
-        } else if (source instanceof Map) {
-            Map src = (Map) source;
-            BeanStruct destBean = resolveBean(dest.getClass());
-            src.forEach((k, v) -> {
-                if (k == null) {
-                    return;
-                }
-                String propertyName = String.valueOf(k);
-                if (!destBean.canWriteProperty(propertyName)) {
-                    return;
-                }
-                BeanProperty sourceProperty = BeanSupport.newMapProperty(k);
-                BeanProperty destProperty = getProperty(dest, propertyName);
-                copyPropertiesFunction.apply(src, sourceProperty, dest, destProperty, this);
-            });
-        } else if (dest instanceof Map) {
-            BeanStruct sourceBean = resolveBean(source.getClass());
-            sourceBean.getReadableProperties().forEach((name, sourceProperty) -> {
-                BeanProperty destProperty = BeanSupport.newMapProperty(name);
-                copyPropertiesFunction.apply(source, sourceProperty, dest, destProperty, this);
-            });
-        } else {
-            BeanStruct sourceBean = resolveBean(source.getClass());
-            BeanStruct destBean = resolveBean(dest.getClass());
-            sourceBean.getReadableProperties().forEach((name, sourceProperty) -> {
-                if (!destBean.canWriteProperty(name)) {
-                    return;
-                }
-                BeanProperty destProperty = getProperty(dest, name);
-                copyPropertiesFunction.apply(source, sourceProperty, dest, destProperty, this);
-            });
-        }
+    default CopyPreparation prepareCopyProperties(Object source, Object dest) {
+        return new CopyPreparation(this, source, dest);
     }
 
     default <K, V> void populateProperties(Object source, Map<K, V> dest) {
-        populateProperties(
-                source, dest,
-                (name, value, setter, beanOperator) -> setter.set((K) name, (V) value));
+        preparePopulateProperties(source, dest).doPopulate();
     }
 
     default <K, V> void populatePropertiesIgnoreNull(Object source, Map<K, V> dest) {
-        populateProperties(
-                source, dest,
-                (name, value, setter, beanOperator) -> {
-                    if (value != null) {
-                        setter.set((K) name, (V) value);
-                    }
-                });
+        preparePopulateProperties(source, dest)
+                .filter(PopulatePreparation.ignoreNullFilter)
+                .doPopulate();
     }
 
-    default <K, V> void populateProperties(
-            Object source, Map<K, V> dest, PopulatePropertiesFunction<K, V> populatePropertiesFunction) {
-        if (source instanceof Map) {
-            Map<Object, Object> src = (Map<Object, Object>) source;
-            src.forEach((k, v) -> {
-                if (k == null) {
-                    return;
-                }
-                populatePropertiesFunction.apply(k, v, dest::put, this);
-            });
-        } else {
-            BeanStruct sourceBean = resolveBean(source.getClass());
-            sourceBean.getReadableProperties().forEach((name, property) -> {
-                @Nullable Object sourceValue = property.getValue(source);
-                populatePropertiesFunction.apply(name, sourceValue, dest::put, this);
-            });
-        }
+    default <K, V> PopulatePreparation<K, V> preparePopulateProperties(Object source, Map<K, V> dest) {
+        return new PopulatePreparation<>(this, source, dest);
     }
 
     default <T> T clone(T from) {
@@ -166,25 +106,20 @@ public interface BeanOperator {
     }
 
     default <T> T convert(Object from, Type to) {
-        return (T) getBeanConverter().convert(from, to, this);
+        return getBeanConverter().convert(from, to, this);
     }
 
     default <T> T convert(Object from, Class<T> to) {
-        return (T) getBeanConverter().convert(from, (Type) to, this);
+        return getBeanConverter().convert(from, (Type) to, this);
     }
 
     default <T> T convert(Object from, TypeRef<T> to) {
-        return (T) getBeanConverter().convert(from, to.getType(), this);
+        return getBeanConverter().convert(from, to.getType(), this);
     }
 
     @Immutable
     default Map<String, Object> toMap(Object bean) {
-        Map<String, Object> result = new LinkedHashMap<>();
-        resolveBean(bean.getClass()).getReadableProperties().forEach((name, property) -> {
-            @Nullable Object value = property.getValue(bean);
-            result.put(name, value);
-        });
-        return MapHelper.immutable(result);
+        return resolveBean(bean.getClass()).toMap(bean);
     }
 
     default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
@@ -205,43 +140,160 @@ public interface BeanOperator {
         return beanMethod;
     }
 
-    interface CopyPropertiesFunction {
+    final class CopyPreparation {
 
-        CopyPropertiesFunction DEFAULT =
-                (source, sourceProperty, dest, destProperty, beanOperator) -> {
-                    @Nullable Object sourceValue = sourceProperty.getValue(source);
-                    @Nullable Object destValue = sourceValue == null ? null :
-                            beanOperator.convert(sourceValue, destProperty.getGenericType());
-                    destProperty.setValue(dest, destValue);
-                };
+        private static final BiPredicate<Object, Object> nopFilter = (name, value) -> true;
+        private static final BiPredicate<Object, Object> ignoreNullFilter = (name, value) -> value != null;
 
-        CopyPropertiesFunction DEFAULT_IGNORE_NULL =
-                (source, sourceProperty, dest, destProperty, beanOperator) -> {
-                    @Nullable Object sourceValue = sourceProperty.getValue(source);
-                    if (sourceValue == null) {
+        private static final Function<Object, Object> nopNameMapper = name -> name;
+
+        private final BeanOperator beanOperator;
+        private final Object source;
+        private final Object dest;
+
+        private BiPredicate<Object, Object> filter = nopFilter;
+        private Function<Object, Object> nameMapper = nopNameMapper;
+
+        public CopyPreparation(BeanOperator beanOperator, Object source, Object dest) {
+            this.beanOperator = beanOperator;
+            this.source = source;
+            this.dest = dest;
+        }
+
+        public CopyPreparation filter(BiPredicate<Object, Object> filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        public CopyPreparation mapName(Function<Object, Object> nameMapper) {
+            this.nameMapper = nameMapper;
+            return this;
+        }
+
+        public void doCopy() {
+            if (source instanceof Map && dest instanceof Map) {
+                Map src = (Map) source;
+                Map des = (Map) dest;
+                src.forEach((key, value) -> {
+                    if (key == null || !filter.test(key, value)) {
                         return;
                     }
-                    @Nullable Object destValue = beanOperator.convert(sourceValue, destProperty.getGenericType());
-                    destProperty.setValue(dest, destValue);
-                };
-
-        void apply(Object source, BeanProperty sourceProperty,
-                   Object dest, BeanProperty destProperty,
-                   BeanOperator beanOperator);
+                    Object newKey = nameMapper.apply(key);
+                    if (!des.containsKey(newKey)) {
+                        return;
+                    }
+                    des.put(newKey, value);
+                });
+            } else if (source instanceof Map) {
+                Map src = (Map) source;
+                BeanClass destBean = beanOperator.resolveBean(dest.getClass());
+                src.forEach((key, value) -> {
+                    if (key == null || !filter.test(key, value)) {
+                        return;
+                    }
+                    String destPropertyName = nameMapper.apply(key).toString();
+                    if (!destBean.canWriteProperty(destPropertyName)) {
+                        return;
+                    }
+                    BeanProperty destProperty = destBean.getProperty(destPropertyName);
+                    destProperty.setValue(dest, beanOperator.convert(value, destProperty.getGenericType()));
+                });
+            } else if (dest instanceof Map) {
+                BeanClass sourceBean = beanOperator.resolveBean(source.getClass());
+                Map des = (Map) dest;
+                sourceBean.getReadableProperties().forEach((name, property) -> {
+                    @Nullable Object value = property.getValue(source);
+                    if (!filter.test(name, value)) {
+                        return;
+                    }
+                    Object newKey = nameMapper.apply(name);
+                    if (!des.containsKey(newKey)) {
+                        return;
+                    }
+                    des.put(newKey, value);
+                });
+            } else {
+                BeanClass sourceBean = beanOperator.resolveBean(source.getClass());
+                BeanClass destBean = beanOperator.resolveBean(dest.getClass());
+                sourceBean.getReadableProperties().forEach((name, sourceProperty) -> {
+                    if (!destBean.canWriteProperty(name)) {
+                        return;
+                    }
+                    @Nullable Object value = sourceProperty.getValue(source);
+                    if (!filter.test(name, value)) {
+                        return;
+                    }
+                    String destPropertyName = nameMapper.apply(name).toString();
+                    if (!destBean.canWriteProperty(destPropertyName)) {
+                        return;
+                    }
+                    BeanProperty destProperty = destBean.getProperty(destPropertyName);
+                    destProperty.setValue(dest, beanOperator.convert(value, destProperty.getGenericType()));
+                });
+            }
+        }
     }
 
-    interface PopulatePropertiesFunction<K, V> {
+    final class PopulatePreparation<K, V> {
 
-        void apply(
-                Object sourcePropertyName,
-                @Nullable Object sourcePropertyValue,
-                MapPropertySetter<K, V> mapPropertySetter,
-                BeanOperator beanOperator
-        );
-    }
+        private static final BiPredicate<Object, Object> nopFilter = (name, value) -> true;
+        private static final BiPredicate<Object, Object> ignoreNullFilter = (name, value) -> value != null;
 
-    interface MapPropertySetter<K, V> {
-        void set(K key, @Nullable V value);
+        private static final Function<Object, Object> emptyMapper = o -> o;
+
+        private final BeanOperator beanOperator;
+        private final Object source;
+        private final Map<K, V> dest;
+
+        private BiPredicate<Object, Object> filter = nopFilter;
+        private Function<Object, K> keyMapper = (Function<Object, K>) emptyMapper;
+        private Function<Object, V> valueMapper = (Function<Object, V>) emptyMapper;
+
+        public PopulatePreparation(BeanOperator beanOperator, Object source, Map<K, V> dest) {
+            this.beanOperator = beanOperator;
+            this.source = source;
+            this.dest = dest;
+        }
+
+        public PopulatePreparation<K, V> filter(BiPredicate<Object, Object> filter) {
+            this.filter = filter;
+            return this;
+        }
+
+        public PopulatePreparation<K, V> mapKey(Function<Object, K> keyMapper) {
+            this.keyMapper = keyMapper;
+            return this;
+        }
+
+        public PopulatePreparation<K, V> mapValue(Function<Object, V> valueMapper) {
+            this.valueMapper = valueMapper;
+            return this;
+        }
+
+        public void doPopulate() {
+            if (source instanceof Map) {
+                Map src = (Map) source;
+                src.forEach((key, value) -> {
+                    if (key == null || !filter.test(key, value)) {
+                        return;
+                    }
+                    K newKey = keyMapper.apply(key);
+                    @Nullable V newValue = valueMapper.apply(value);
+                    dest.put(newKey, newValue);
+                });
+            } else {
+                BeanClass sourceBean = beanOperator.resolveBean(source.getClass());
+                sourceBean.getReadableProperties().forEach((name, property) -> {
+                    @Nullable Object sourceValue = property.getValue(source);
+                    if (!filter.test(name, sourceValue)) {
+                        return;
+                    }
+                    K newKey = keyMapper.apply(name);
+                    @Nullable V newValue = valueMapper.apply(sourceValue);
+                    dest.put(newKey, newValue);
+                });
+            }
+        }
     }
 
     final class Builder extends CachedBuilder<BeanOperator> {

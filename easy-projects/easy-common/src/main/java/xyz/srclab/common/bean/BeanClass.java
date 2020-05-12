@@ -11,13 +11,16 @@ import java.util.Collections;
 import java.util.Map;
 
 @Immutable
-public interface BeanStruct {
+public interface BeanClass {
 
     static Builder newBuilder(Class<?> type) {
         return new Builder(type);
     }
 
     Class<?> getType();
+
+    @Nullable
+    BeanProperty getProperty(String propertyName);
 
     default boolean canReadProperty(String propertyName) {
         @Nullable BeanProperty property = getProperty(propertyName);
@@ -29,9 +32,6 @@ public interface BeanStruct {
         return property != null && property.isWriteable();
     }
 
-    @Nullable
-    BeanProperty getProperty(String propertyName);
-
     @Immutable
     Map<String, BeanProperty> getAllProperties();
 
@@ -40,6 +40,11 @@ public interface BeanStruct {
 
     @Immutable
     Map<String, BeanProperty> getWriteableProperties();
+
+    @Immutable
+    default Map<String, Object> toMap(Object bean) {
+        return MapHelper.map(getReadableProperties(), name -> name, property -> property.getValue(bean));
+    }
 
     @Nullable
     BeanMethod getMethod(String methodName, Class<?>... parameterTypes);
@@ -50,7 +55,7 @@ public interface BeanStruct {
     @Immutable
     Map<Method, BeanMethod> getAllMethods();
 
-    final class Builder extends CachedBuilder<BeanStruct> {
+    final class Builder extends CachedBuilder<BeanClass> {
 
         private final Class<?> type;
         private @Nullable Map<String, BeanProperty> propertyMap;
@@ -73,11 +78,11 @@ public interface BeanStruct {
         }
 
         @Override
-        protected BeanStruct buildNew() {
-            return new BeanStructImpl(this);
+        protected BeanClass buildNew() {
+            return new BeanClassImpl(this);
         }
 
-        private static final class BeanStructImpl implements BeanStruct {
+        private static final class BeanClassImpl implements BeanClass {
 
             private final Class<?> type;
             private final @Immutable Map<String, BeanProperty> propertyMap;
@@ -85,7 +90,7 @@ public interface BeanStruct {
             private final @Immutable Map<String, BeanProperty> writeablePropertyMap;
             private final @Immutable Map<Method, BeanMethod> methodMap;
 
-            private BeanStructImpl(Builder builder) {
+            private BeanClassImpl(Builder builder) {
                 this.type = builder.type;
                 this.propertyMap = builder.propertyMap == null ?
                         Collections.emptyMap() : MapHelper.immutable(builder.propertyMap);

@@ -2,7 +2,7 @@ package xyz.srclab.common.bean.provider.defaults;
 
 import xyz.srclab.common.bean.BeanResolver;
 import xyz.srclab.common.bean.BeanResolverHandler;
-import xyz.srclab.common.bean.BeanStruct;
+import xyz.srclab.common.bean.BeanClass;
 
 final class DefaultBeanResolver implements BeanResolver {
 
@@ -11,7 +11,7 @@ final class DefaultBeanResolver implements BeanResolver {
     private final BeanResolverHandler beanResolverHandler = DefaultBeanSupport.getBeanResolverHandler();
 
     @Override
-    public BeanStruct resolve(Class<?> beanClass) {
+    public BeanClass resolve(Class<?> beanClass) {
         return beanResolverHandler.resolve(beanClass);
     }
 }

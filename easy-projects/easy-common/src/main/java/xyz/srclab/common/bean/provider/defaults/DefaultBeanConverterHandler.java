@@ -3,8 +3,10 @@ package xyz.srclab.common.bean.provider.defaults;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.bean.BeanConverterHandler;
 import xyz.srclab.common.bean.BeanOperator;
+import xyz.srclab.common.bean.BeanProperty;
 import xyz.srclab.common.collection.IterableHelper;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.collection.MapHelper;
@@ -32,7 +34,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     @Override
-    public  <T> T convert(Object from, Type to, BeanOperator beanOperator) {
+    public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
         Object result = to instanceof Class ?
                 convertClass(from, (Class<?>) to, beanOperator)
                 :
@@ -44,28 +46,28 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
         if (to.isAssignableFrom(from.getClass())) {
             return from;
         }
-        @Nullable Object basic = tryConvertToBasic(from, to);
+        @Nullable Object basic = tryToBasic(from, to);
         if (basic != null) {
             return basic;
         }
         if (to.isArray()) {
-            return convertToArray(from, to, beanOperator);
+            return toArray(from, to, beanOperator);
         }
         if (Map.class.equals(to)) {
-            return convertToMap(from, Object.class, Object.class, beanOperator);
+            return toMap(from, Object.class, Object.class, beanOperator);
         }
         if (List.class.equals(to)) {
-            return convertToList(from, Object.class, beanOperator);
+            return toList(from, Object.class, beanOperator);
         }
         if (Set.class.equals(to) || Collection.class.equals(to)) {
-            return convertToSet(from, Object.class, beanOperator);
+            return toSet(from, Object.class, beanOperator);
         }
-        return convertToBean(from, to, beanOperator);
+        return toBean(from, to, beanOperator);
     }
 
     private Object convertType(Object from, Type to, BeanOperator beanOperator) {
         if (to instanceof GenericArrayType) {
-            return convertToArray(from, to, beanOperator);
+            return toArray(from, to, beanOperator);
         }
         if (to instanceof ParameterizedType) {
             return convertParameterizedType(from, (ParameterizedType) to, beanOperator);
@@ -88,15 +90,15 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
         // }
         if (Map.class.equals(rawType)) {
             Type[] kv = parameterizedType.getActualTypeArguments();
-            return convertToMap(from, kv[0], kv[1], beanOperator);
+            return toMap(from, kv[0], kv[1], beanOperator);
         }
         if (List.class.equals(rawType)) {
-            return convertToList(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
+            return toList(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
         }
         if (Set.class.equals(rawType) || Collection.class.equals(rawType)) {
-            return convertToSet(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
+            return toSet(from, parameterizedType.getActualTypeArguments()[0], beanOperator);
         }
-        return convertToGenericBean(from, rawType, parameterizedType.getActualTypeArguments(), beanOperator);
+        return toGenericBean(from, rawType, parameterizedType.getActualTypeArguments(), beanOperator);
     }
 
     private Object convertWildcardType(Object from, WildcardType to, BeanOperator beanOperator) {
@@ -111,19 +113,16 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
         );
     }
 
-    private Map<Object, Object> convertToMap(Object from, Type keyType, Type valueType, BeanOperator beanOperator) {
+    private Map<Object, Object> toMap(Object from, Type keyType, Type valueType, BeanOperator beanOperator) {
         Map<Object, Object> map = new LinkedHashMap<>();
-        beanOperator.populateProperties(from, map,
-                (sourcePropertyName, sourcePropertyValue, keyValueSetter, beanOperator1) -> {
-                    Object key = beanOperator.convert(sourcePropertyName, keyType);
-                    @Nullable Object value = sourcePropertyValue == null ?
-                            null : beanOperator.convert(sourcePropertyValue, valueType);
-                    keyValueSetter.set(key, value);
-                });
+        beanOperator.preparePopulateProperties(from, map)
+                .mapKey(k -> beanOperator.convert(k, keyType))
+                .mapValue(v -> v == null ? null : beanOperator.convert(v, valueType))
+                .doPopulate();
         return MapHelper.immutable(map);
     }
 
-    private Object convertToList(Object from, Type elementType, BeanOperator beanOperator) {
+    private Object toList(Object from, Type elementType, BeanOperator beanOperator) {
         if (from.getClass().isArray()) {
             List<Object> result = new LinkedList<>();
             putCollectionFromArray(from, elementType, beanOperator, result);
@@ -141,7 +140,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
                 "Cannot convert object {} to list of element type {}", from, elementType));
     }
 
-    private Object convertToSet(Object from, Type elementType, BeanOperator beanOperator) {
+    private Object toSet(Object from, Type elementType, BeanOperator beanOperator) {
         if (from.getClass().isArray()) {
             Set<Object> result = new LinkedHashSet<>();
             putCollectionFromArray(from, elementType, beanOperator, result);
@@ -159,7 +158,7 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
                 "Cannot convert object {} to set of element type {}", from, elementType));
     }
 
-    private Object convertToArray(Object from, Type arrayType, BeanOperator beanOperator) {
+    private Object toArray(Object from, Type arrayType, BeanOperator beanOperator) {
         Type componentType = ArrayHelper.getGenericComponentType(arrayType);
         if (from.getClass().isArray()) {
             int arrayLength = Array.getLength(from);
@@ -198,31 +197,60 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
         }
     }
 
-    private Object convertToBean(Object from, Class<?> to, BeanOperator beanOperator) {
+    private Object toBean(Object from, Class<?> to, BeanOperator beanOperator) {
         Object toInstance = ConstructorHelper.newInstance(to);
         beanOperator.copyProperties(from, toInstance);
         return toInstance;
     }
 
-    private Object convertToGenericBean(Object from, Class<?> rawType, Type[] genericTypes, BeanOperator beanOperator) {
+    private Object toGenericBean(Object from, Class<?> rawType, Type[] genericTypes, BeanOperator beanOperator) {
         TypeVariable<?>[] typeVariables = rawType.getTypeParameters();
         Object toInstance = ConstructorHelper.newInstance(rawType);
-        beanOperator.copyProperties(from, toInstance,
-                (sourcePropertyName, sourcePropertyValue, destPropertyType, destPropertySetter, beanOperator1) -> {
-                    Type destType = Object.class;
-                    int index = ArrayUtils.indexOf(typeVariables, destPropertyType);
-                    if (index >= 0) {
-                        destType = genericTypes[index];
-                    }
-                    @Nullable Object destValue = sourcePropertyValue == null ?
-                            null : beanOperator.convert(sourcePropertyValue, destType);
-                    destPropertySetter.set(destValue);
-                });
+        BeanClass toBeanClass = beanOperator.resolveBean(rawType);
+        if (from instanceof Map) {
+            Map map = (Map) from;
+            map.forEach((key, value) -> {
+                if (key == null) {
+                    return;
+                }
+                String propertyName = key.toString();
+                if (!toBeanClass.canWriteProperty(propertyName)) {
+                    return;
+                }
+                BeanProperty destProperty = toBeanClass.getProperty(propertyName);
+                @Nullable Object destValue = value == null ? null :
+                        beanOperator.convert(value, findTargetType(
+                                destProperty.getGenericType(), typeVariables, genericTypes));
+                destProperty.setValue(toInstance, destValue);
+            });
+        } else {
+            BeanClass fromBeanClass = beanOperator.resolveBean(from.getClass());
+            fromBeanClass.getReadableProperties().forEach((name, property) -> {
+                if (!toBeanClass.canWriteProperty(name)) {
+                    return;
+                }
+                BeanProperty destProperty = toBeanClass.getProperty(name);
+                @Nullable Object value = property.getValue(from);
+                @Nullable Object destValue = value == null ? null :
+                        beanOperator.convert(value, findTargetType(
+                                destProperty.getGenericType(), typeVariables, genericTypes));
+                destProperty.setValue(toInstance, destValue);
+            });
+        }
         return toInstance;
     }
 
+    private Type findTargetType(Type propertyType, TypeVariable<?>[] typeVariables, Type[] genericTypes) {
+        Type destType = Object.class;
+        int index = ArrayUtils.indexOf(typeVariables, propertyType);
+        if (index >= 0) {
+            destType = genericTypes[index];
+        }
+        return destType;
+    }
+
     @Nullable
-    private Object tryConvertToBasic(Object from, Class<?> to) {
+    private Object tryToBasic(Object from, Class<?> to) {
         if (String.class.equals(to) || CharSequence.class.equals(to)) {
             return from.toString();
         }

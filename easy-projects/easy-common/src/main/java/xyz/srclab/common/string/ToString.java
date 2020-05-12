@@ -3,8 +3,8 @@ package xyz.srclab.common.string;
 import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.bean.BeanOperator;
-import xyz.srclab.common.bean.BeanStruct;
 import xyz.srclab.common.lang.Computed;
 import xyz.srclab.common.reflect.TypeHelper;
 
@@ -13,9 +13,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 @Immutable
-public class ToString implements Computed<String> {
+public class ToString extends Computed<String> {
 
     public static String buildToString(@Nullable Object any) {
         if (any == null || TypeHelper.isBasic(any)) {
@@ -38,12 +39,6 @@ public class ToString implements Computed<String> {
         return new ToString(any, style, beanOperator).toString();
     }
 
-    private final Object any;
-    private final ToStringStyle style;
-    private final BeanOperator beanOperator;
-
-    private @Nullable String cache;
-
     public ToString(Object any) {
         this(any, ToStringStyle.DEFAULT, BeanOperator.DEFAULT);
     }
@@ -53,29 +48,7 @@ public class ToString implements Computed<String> {
     }
 
     public ToString(Object any, ToStringStyle style, BeanOperator beanOperator) {
-        this.any = any;
-        this.style = style;
-        this.beanOperator = beanOperator;
-    }
-
-    @Override
-    public String get() {
-        if (cache == null) {
-            return refreshGet();
-        }
-        return cache;
-    }
-
-    @Override
-    public String refreshGet() {
-        if (TypeHelper.isBasic(any)) {
-            return String.valueOf(any);
-        }
-        StringBuilder buffer = new StringBuilder();
-        ToStringContext context = new ToStringContext();
-        buildToString(any, buffer, context);
-        cache = buffer.toString();
-        return cache;
+        super(new ToStringSupplier(any, style, beanOperator));
     }
 
     @Override
@@ -83,207 +56,231 @@ public class ToString implements Computed<String> {
         return get();
     }
 
-    private void buildToString(@Nullable Object object, StringBuilder buffer, ToStringContext context) {
-        if (object == null || TypeHelper.isBasic(object)) {
-            buffer.append(object instanceof Type ? ((Type) object).getTypeName() : object);
-            return;
+    private static final class ToStringSupplier implements Supplier<String> {
+
+        private final Object any;
+        private final ToStringStyle style;
+        private final BeanOperator beanOperator;
+
+        private ToStringSupplier(Object any, ToStringStyle style, BeanOperator beanOperator) {
+            this.any = any;
+            this.style = style;
+            this.beanOperator = beanOperator;
         }
 
-        if (!style.getIgnoreReferenceLoop() && context.hasParent(object)) {
-            throw new PropertyOrElementReferenceLoopException(context.getNameStackTrace());
+        @Override
+        public String get() {
+            if (TypeHelper.isBasic(any)) {
+                return String.valueOf(any);
+            }
+            StringBuilder buffer = new StringBuilder();
+            ToStringContext context = new ToStringContext();
+            buildToString(any, buffer, context);
+            return buffer.toString();
         }
 
-        if (object instanceof Object[]) {
-            buildArrayToString((Object[]) object, buffer, context);
-            return;
-        }
-        if (object instanceof Iterable) {
-            buildIterableToString((Iterable<Object>) object, buffer, context);
-            return;
-        }
-        if (object instanceof Map) {
-            buildMapToString((Map<Object, Object>) object, buffer, context);
-            return;
-        }
-        buildBeanToString(object, buffer, context);
-    }
+        private void buildToString(@Nullable Object object, StringBuilder buffer, ToStringContext context) {
+            if (object == null || TypeHelper.isBasic(object)) {
+                buffer.append(object instanceof Type ? ((Type) object).getTypeName() : object);
+                return;
+            }
 
-    private void buildBeanToString(Object bean, StringBuilder buffer, ToStringContext context) {
-        writeBeanStart(buffer);
-        BeanStruct beanStruct = beanOperator.resolveBean(bean.getClass());
-        context.pushParent(bean);
-        context.pushIndent();
-        int[] count = {0};
-        beanStruct.getReadableProperties().forEach((name, property) -> {
-            context.pushName("." + name);
-            writeWrapping(buffer);
-            writeIndent(buffer, context.getIndent());
-            buffer.append(name);
-            writeIndicator(buffer);
-            buildToString(property.getValue(bean), buffer, context);
-            writeSeparator(buffer);
-            context.popName();
-            count[0]++;
-        });
-        context.popIndent();
-        context.popParent();
-        if (count[0] > 0) {
-            unWriteSeparator(buffer);
-            writeWrapping(buffer);
-            writeIndent(buffer, context.getIndent());
-        }
-        writeBeanEnd(buffer);
-    }
+            if (!style.getIgnoreReferenceLoop() && context.hasParent(object)) {
+                throw new PropertyOrElementReferenceLoopException(context.getNameStackTrace());
+            }
 
-    private void buildArrayToString(Object[] array, StringBuilder buffer, ToStringContext context) {
-        if (array.length == 0) {
+            if (object instanceof Object[]) {
+                buildArrayToString((Object[]) object, buffer, context);
+                return;
+            }
+            if (object instanceof Iterable) {
+                buildIterableToString((Iterable<Object>) object, buffer, context);
+                return;
+            }
+            if (object instanceof Map) {
+                buildMapToString((Map<Object, Object>) object, buffer, context);
+                return;
+            }
+            buildBeanToString(object, buffer, context);
+        }
+
+        private void buildBeanToString(Object bean, StringBuilder buffer, ToStringContext context) {
+            writeBeanStart(buffer);
+            BeanClass beanClass = beanOperator.resolveBean(bean.getClass());
+            context.pushParent(bean);
+            context.pushIndent();
+            int[] count = {0};
+            beanClass.getReadableProperties().forEach((name, property) -> {
+                context.pushName("." + name);
+                writeWrapping(buffer);
+                writeIndent(buffer, context.getIndent());
+                buffer.append(name);
+                writeIndicator(buffer);
+                buildToString(property.getValue(bean), buffer, context);
+                writeSeparator(buffer);
+                context.popName();
+                count[0]++;
+            });
+            context.popIndent();
+            context.popParent();
+            if (count[0] > 0) {
+                unWriteSeparator(buffer);
+                writeWrapping(buffer);
+                writeIndent(buffer, context.getIndent());
+            }
+            writeBeanEnd(buffer);
+        }
+
+        private void buildArrayToString(Object[] array, StringBuilder buffer, ToStringContext context) {
+            if (array.length == 0) {
+                writeListStart(buffer);
+                writeListEnd(buffer);
+                return;
+            }
+            buildIterableToString(Arrays.asList(array), buffer, context);
+        }
+
+        private void buildIterableToString(Iterable<Object> iterable, StringBuilder buffer, ToStringContext context) {
             writeListStart(buffer);
+            context.pushParent(iterable);
+            context.pushIndent();
+            int[] count = {0};
+            for (Object o : iterable) {
+                String name = iterable instanceof Set ? "[" + o + "]" : "[" + count[0] + "]";
+                context.pushName(name);
+                writeWrapping(buffer);
+                writeIndent(buffer, context.getIndent());
+                buildToString(o, buffer, context);
+                writeSeparator(buffer);
+                context.popName();
+                count[0]++;
+            }
+            context.popIndent();
+            context.popParent();
+            if (count[0] > 0) {
+                unWriteSeparator(buffer);
+                writeWrapping(buffer);
+                writeIndent(buffer, context.getIndent());
+            }
             writeListEnd(buffer);
-            return;
-        }
-        buildIterableToString(Arrays.asList(array), buffer, context);
-    }
-
-    private void buildIterableToString(Iterable<Object> iterable, StringBuilder buffer, ToStringContext context) {
-        writeListStart(buffer);
-        context.pushParent(iterable);
-        context.pushIndent();
-        int[] count = {0};
-        for (Object o : iterable) {
-            String name = iterable instanceof Set ? "[" + o + "]" : "[" + count[0] + "]";
-            context.pushName(name);
-            writeWrapping(buffer);
-            writeIndent(buffer, context.getIndent());
-            buildToString(o, buffer, context);
-            writeSeparator(buffer);
-            context.popName();
-            count[0]++;
-        }
-        context.popIndent();
-        context.popParent();
-        if (count[0] > 0) {
-            unWriteSeparator(buffer);
-            writeWrapping(buffer);
-            writeIndent(buffer, context.getIndent());
-        }
-        writeListEnd(buffer);
-    }
-
-    private void buildMapToString(Map<Object, Object> map, StringBuilder buffer, ToStringContext context) {
-        writeBeanStart(buffer);
-        context.pushParent(map);
-        context.pushIndent();
-        int[] count = {0};
-        map.forEach((k, v) -> {
-            String keyName = "[key:" + String.valueOf(k) + "]";
-            context.pushName(keyName);
-            writeWrapping(buffer);
-            writeIndent(buffer, context.getIndent());
-            buildToString(k, buffer, context);
-            context.popName();
-            context.pushName("." + k);
-            writeIndicator(buffer);
-            buildToString(v, buffer, context);
-            writeSeparator(buffer);
-            context.popName();
-            count[0]++;
-        });
-        context.popIndent();
-        context.popParent();
-        if (count[0] > 0) {
-            unWriteSeparator(buffer);
-            writeWrapping(buffer);
-            writeIndent(buffer, context.getIndent());
-        }
-        writeBeanEnd(buffer);
-    }
-
-    private void writeBeanStart(StringBuilder buffer) {
-        buffer.append(style.getBeanStart());
-    }
-
-    private void writeBeanEnd(StringBuilder buffer) {
-        buffer.append(style.getBeanEnd());
-    }
-
-    private void writeListStart(StringBuilder buffer) {
-        buffer.append(style.getListStart());
-    }
-
-    private void writeListEnd(StringBuilder buffer) {
-        buffer.append(style.getListEnd());
-    }
-
-    private void writeWrapping(StringBuilder buffer) {
-        if (StringUtils.isEmpty(style.getWrapping())) {
-            return;
-        }
-        buffer.append(style.getWrapping());
-    }
-
-    private void writeIndent(StringBuilder buffer, int level) {
-        if (StringUtils.isEmpty(style.getIndent())) {
-            return;
-        }
-        for (int i = 0; i < level; i++) {
-            buffer.append(style.getIndent());
-        }
-    }
-
-    private void writeSeparator(StringBuilder buffer) {
-        buffer.append(style.getSeparator());
-    }
-
-    private void unWriteSeparator(StringBuilder buffer) {
-        int bufferLength = buffer.length();
-        int separatorLength = style.getSeparator().length();
-        buffer.delete(bufferLength - separatorLength, bufferLength);
-    }
-
-    private void writeIndicator(StringBuilder buffer) {
-        buffer.append(style.getIndicator());
-    }
-
-    private static final class ToStringContext {
-
-        private final LinkedList<Object> parentStackTrace = new LinkedList<>();
-        private final LinkedList<String> nameStackTrace = new LinkedList<>();
-        private int indent = 0;
-
-        public void pushParent(Object parent) {
-            parentStackTrace.addLast(parent);
         }
 
-        public void popParent() {
-            parentStackTrace.removeLast();
+        private void buildMapToString(Map<Object, Object> map, StringBuilder buffer, ToStringContext context) {
+            writeBeanStart(buffer);
+            context.pushParent(map);
+            context.pushIndent();
+            int[] count = {0};
+            map.forEach((k, v) -> {
+                String keyName = "[key:" + String.valueOf(k) + "]";
+                context.pushName(keyName);
+                writeWrapping(buffer);
+                writeIndent(buffer, context.getIndent());
+                buildToString(k, buffer, context);
+                context.popName();
+                context.pushName("." + k);
+                writeIndicator(buffer);
+                buildToString(v, buffer, context);
+                writeSeparator(buffer);
+                context.popName();
+                count[0]++;
+            });
+            context.popIndent();
+            context.popParent();
+            if (count[0] > 0) {
+                unWriteSeparator(buffer);
+                writeWrapping(buffer);
+                writeIndent(buffer, context.getIndent());
+            }
+            writeBeanEnd(buffer);
         }
 
-        public boolean hasParent(Object any) {
-            return parentStackTrace.contains(any);
+        private void writeBeanStart(StringBuilder buffer) {
+            buffer.append(style.getBeanStart());
         }
 
-        public void pushName(String name) {
-            nameStackTrace.addLast(name);
+        private void writeBeanEnd(StringBuilder buffer) {
+            buffer.append(style.getBeanEnd());
         }
 
-        public void popName() {
-            nameStackTrace.removeLast();
+        private void writeListStart(StringBuilder buffer) {
+            buffer.append(style.getListStart());
         }
 
-        public LinkedList<String> getNameStackTrace() {
-            return nameStackTrace;
+        private void writeListEnd(StringBuilder buffer) {
+            buffer.append(style.getListEnd());
         }
 
-        public void pushIndent() {
-            this.indent += 1;
+        private void writeWrapping(StringBuilder buffer) {
+            if (StringUtils.isEmpty(style.getWrapping())) {
+                return;
+            }
+            buffer.append(style.getWrapping());
         }
 
-        public void popIndent() {
-            this.indent -= 1;
+        private void writeIndent(StringBuilder buffer, int level) {
+            if (StringUtils.isEmpty(style.getIndent())) {
+                return;
+            }
+            for (int i = 0; i < level; i++) {
+                buffer.append(style.getIndent());
+            }
         }
 
-        public int getIndent() {
-            return indent;
+        private void writeSeparator(StringBuilder buffer) {
+            buffer.append(style.getSeparator());
+        }
+
+        private void unWriteSeparator(StringBuilder buffer) {
+            int bufferLength = buffer.length();
+            int separatorLength = style.getSeparator().length();
+            buffer.delete(bufferLength - separatorLength, bufferLength);
+        }
+
+        private void writeIndicator(StringBuilder buffer) {
+            buffer.append(style.getIndicator());
+        }
+
+        private static final class ToStringContext {
+
+            private final LinkedList<Object> parentStackTrace = new LinkedList<>();
+            private final LinkedList<String> nameStackTrace = new LinkedList<>();
+            private int indent = 0;
+
+            public void pushParent(Object parent) {
+                parentStackTrace.addLast(parent);
+            }
+
+            public void popParent() {
+                parentStackTrace.removeLast();
+            }
+
+            public boolean hasParent(Object any) {
+                return parentStackTrace.contains(any);
+            }
+
+            public void pushName(String name) {
+                nameStackTrace.addLast(name);
+            }
+
+            public void popName() {
+                nameStackTrace.removeLast();
+            }
+
+            public LinkedList<String> getNameStackTrace() {
+                return nameStackTrace;
+            }
+
+            public void pushIndent() {
+                this.indent += 1;
+            }
+
+            public void popIndent() {
+                this.indent -= 1;
+            }
+
+            public int getIndent() {
+                return indent;
+            }
         }
     }
 }

@@ -4,11 +4,11 @@ import xyz.srclab.annotation.Nullable;
 
 public abstract class Ref<T> {
 
-    static <T> Ref<T> ofEmpty() {
+    public static <T> Ref<T> ofEmpty() {
         return new RefImpl<>();
     }
 
-    static <T> Ref<T> of(@Nullable T object) {
+    public static <T> Ref<T> of(@Nullable T object) {
         return new RefImpl<>(object);
     }
 
