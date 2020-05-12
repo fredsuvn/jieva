@@ -1,9 +1,12 @@
 package xyz.srclab.annotation;
 
+import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
+@javax.annotation.concurrent.Immutable
+@TypeQualifierNickname
 @Target({
         ElementType.TYPE,
         ElementType.FIELD,
