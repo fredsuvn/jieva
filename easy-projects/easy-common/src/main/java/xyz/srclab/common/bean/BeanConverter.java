@@ -17,24 +17,24 @@ public interface BeanConverter {
         return new Builder();
     }
 
-    Object convert(Object from, Type to);
+    <T> T convert(Object from, Type to);
 
-    Object convert(Object from, Type to, BeanOperator beanOperator);
+    <T> T convert(Object from, Type to, BeanOperator beanOperator);
 
     default <T> T convert(Object from, Class<T> to) {
-        return (T) convert(from, (Type) to);
+        return convert(from, (Type) to);
     }
 
     default <T> T convert(Object from, Class<T> to, BeanOperator beanOperator) {
-        return (T) convert(from, (Type) to, beanOperator);
+        return convert(from, (Type) to, beanOperator);
     }
 
     default <T> T convert(Object from, TypeRef<T> to) {
-        return (T) convert(from, to.getType());
+        return convert(from, to.getType());
     }
 
     default <T> T convert(Object from, TypeRef<T> to, BeanOperator beanOperator) {
-        return (T) convert(from, to.getType(), beanOperator);
+        return convert(from, to.getType(), beanOperator);
     }
 
     final class Builder extends HandlersBuilder<BeanConverter, BeanConverterHandler, Builder> {
@@ -62,12 +62,12 @@ public interface BeanConverter {
             }
 
             @Override
-            public Object convert(Object from, Type to) {
+            public <T> T convert(Object from, Type to) {
                 return convert(from, to, beanOperator);
             }
 
             @Override
-            public Object convert(Object from, Type to, BeanOperator beanOperator) {
+            public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
                 for (BeanConverterHandler handler : handlers) {
                     if (handler.supportConvert(from, to, beanOperator)) {
                         return handler.convert(from, to, beanOperator);

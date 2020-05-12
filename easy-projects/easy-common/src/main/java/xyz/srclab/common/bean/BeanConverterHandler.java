@@ -11,5 +11,5 @@ public interface BeanConverterHandler {
 
     boolean supportConvert(Object from, Type to, BeanOperator beanOperator);
 
-    Object convert(Object from, Type to, BeanOperator beanOperator);
+    <T> T convert(Object from, Type to, BeanOperator beanOperator);
 }

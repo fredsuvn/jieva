@@ -32,11 +32,12 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     @Override
-    public Object convert(Object from, Type to, BeanOperator beanOperator) {
-        return to instanceof Class ?
+    public  <T> T convert(Object from, Type to, BeanOperator beanOperator) {
+        Object result = to instanceof Class ?
                 convertClass(from, (Class<?>) to, beanOperator)
                 :
                 convertType(from, to, beanOperator);
+        return (T) result;
     }
 
     private Object convertClass(Object from, Class<?> to, BeanOperator beanOperator) {

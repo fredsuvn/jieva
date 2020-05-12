@@ -13,12 +13,12 @@ final class DefaultBeanConverter implements BeanConverter {
     private final BeanConverterHandler beanConverterHandler = DefaultBeanSupport.getBeanConverterHandler();
 
     @Override
-    public Object convert(Object from, Type to) {
+    public <T> T convert(Object from, Type to) {
         return beanConverterHandler.convert(from, to, BeanOperator.DEFAULT);
     }
 
     @Override
-    public Object convert(Object from, Type to, BeanOperator beanOperator) {
+    public <T> T convert(Object from, Type to, BeanOperator beanOperator) {
         return beanConverterHandler.convert(from, to, beanOperator);
     }
 }
