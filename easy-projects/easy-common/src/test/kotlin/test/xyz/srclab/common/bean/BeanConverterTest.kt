@@ -26,8 +26,8 @@ object BeanConverterTest {
         doAssertEquals(converter.convert(from, to, operator), expected)
         doAssertEquals(converter.convert(from, to as Class<*>), expected)
         doAssertEquals(converter.convert(from, to as Type, operator), expected)
-        doAssertEquals(converter.convert(from, TypeRef.with(to)), expected)
-        doAssertEquals(converter.convert(from, TypeRef.with(to), operator), expected)
+        doAssertEquals(converter.convert(from, TypeRef.of(to)), expected)
+        doAssertEquals(converter.convert(from, TypeRef.of(to), operator), expected)
     }
 
     @DataProvider

@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 @Immutable
 public class TypeRef<T> {
 
-    public static <T> TypeRef<T> with(Type type) {
+    public static <T> TypeRef<T> of(Type type) {
         return new TypeRef<>(type);
     }
 
