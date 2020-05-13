@@ -1,10 +1,10 @@
 package xyz.srclab.common.bean.provider.defaults;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.bean.BeanMethod;
 import xyz.srclab.common.bean.BeanProperty;
 import xyz.srclab.common.bean.BeanResolverHandler;
-import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.invoke.MethodInvoker;
@@ -146,24 +146,21 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
             return writeMethod;
         }
 
-        // Never used:
-        //@Override
-        //public boolean equals(Object object) {
-        //    if (this == object) {
-        //        return true;
-        //    }
-        //    if (object instanceof BeanProperty) {
-        //        return Objects.equals(getReadMethod(), ((BeanProperty) object).getReadMethod())
-        //                &&
-        //                Objects.equals(getWriteMethod(), ((BeanProperty) object).getWriteMethod());
-        //    }
-        //    return false;
-        //}
-        //
-        //@Override
-        //public int hashCode() {
-        //    return hashCode;
-        //}
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+            if (object instanceof BeanPropertyImpl) {
+                return descriptor.equals(((BeanPropertyImpl) object).descriptor);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return descriptor.hashCode();
+        }
     }
 
     private static final class BeanMethodImpl implements BeanMethod {
@@ -218,18 +215,20 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
             return methodInvoker.invoke(bean, args);
         }
 
-        // Never used:
-        //@Override
-        //public boolean equals(Object object) {
-        //    if (this == object) return true;
-        //    if (object == null || getClass() != object.getClass()) return false;
-        //    BeanMethodImpl that = (BeanMethodImpl) object;
-        //    return method.equals(that.method);
-        //}
-        //
-        //@Override
-        //public int hashCode() {
-        //    return Objects.hash(method);
-        //}
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+            if (object instanceof BeanMethodImpl) {
+                return method.equals(((BeanMethodImpl) object).method);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return method.hashCode();
+        }
     }
 }
