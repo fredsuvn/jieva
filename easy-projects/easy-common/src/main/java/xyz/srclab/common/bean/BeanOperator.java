@@ -45,23 +45,22 @@ public interface BeanOperator {
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, Type type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable Object value = getPropertyValue(bean, propertyName);
-        if (value == null) {
-            return null;
-        }
-        return convert(value, type);
+        BeanClass beanClass = resolveBean(bean.getClass());
+        return beanClass.getPropertyValue(bean, propertyName, type, getBeanConverter());
     }
 
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return getPropertyValue(bean, propertyName, (Type) type);
+        BeanClass beanClass = resolveBean(bean.getClass());
+        return beanClass.getPropertyValue(bean, propertyName, type, getBeanConverter());
     }
 
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return getPropertyValue(bean, propertyName, type.getType());
+        BeanClass beanClass = resolveBean(bean.getClass());
+        return beanClass.getPropertyValue(bean, propertyName, type, getBeanConverter());
     }
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
@@ -109,11 +108,11 @@ public interface BeanOperator {
     }
 
     default <T> T convert(Object from, Class<T> to) {
-        return getBeanConverter().convert(from, (Type) to, this);
+        return getBeanConverter().convert(from, to, this);
     }
 
     default <T> T convert(Object from, TypeRef<T> to) {
-        return getBeanConverter().convert(from, to.getType(), this);
+        return getBeanConverter().convert(from, to, this);
     }
 
     @Immutable
@@ -122,7 +121,7 @@ public interface BeanOperator {
     }
 
     default BeanWalker walkProperties(Object bean) {
-        return BeanWalkerSupport.newBeanWalker(this, bean);
+        return BeanSupport.newBeanWalker(this, bean);
     }
 
     default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)

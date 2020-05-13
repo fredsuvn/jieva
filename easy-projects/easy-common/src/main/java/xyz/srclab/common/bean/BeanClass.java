@@ -5,8 +5,10 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.MethodHelper;
+import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
@@ -33,6 +35,28 @@ public interface BeanClass {
             throw new UnsupportedOperationException("Cannot read property: " + beanProperty.getName());
         }
         return beanProperty.getValue(bean);
+    }
+
+    @Nullable
+    default <T> T getPropertyValue(Object bean, String propertyName, Type type, BeanConverter beanConverter)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        @Nullable Object value = getPropertyValue(bean, propertyName);
+        if (value == null) {
+            return null;
+        }
+        return beanConverter.convert(value, type);
+    }
+
+    @Nullable
+    default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type, BeanConverter beanConverter)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        return getPropertyValue(bean, propertyName, (Type) type, beanConverter);
+    }
+
+    @Nullable
+    default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type, BeanConverter beanConverter)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        return getPropertyValue(bean, propertyName, type.getType(), beanConverter);
     }
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)

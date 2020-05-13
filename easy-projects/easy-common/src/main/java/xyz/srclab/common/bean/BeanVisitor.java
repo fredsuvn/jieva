@@ -8,5 +8,5 @@ import xyz.srclab.annotation.Immutable;
 @Immutable
 public interface BeanVisitor {
 
-    void visit(Object owner, BeanProperty property, BeanPath path, BeanWalker walker);
+    void visit(Object owner, BeanProperty property, BeanWalker walker);
 }
