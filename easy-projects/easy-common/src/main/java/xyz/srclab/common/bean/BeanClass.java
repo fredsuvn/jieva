@@ -22,6 +22,46 @@ public interface BeanClass {
     @Nullable
     BeanProperty getProperty(String propertyName);
 
+    @Nullable
+    default Object getPropertyValue(Object bean, String propertyName)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        @Nullable BeanProperty beanProperty = getProperty(propertyName);
+        if (beanProperty == null) {
+            throw new BeanPropertyNotFoundException(propertyName);
+        }
+        if (!beanProperty.isReadable()) {
+            throw new UnsupportedOperationException("Cannot read property: " + beanProperty.getName());
+        }
+        return beanProperty.getValue(bean);
+    }
+
+    default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        @Nullable BeanProperty beanProperty = getProperty(propertyName);
+        if (beanProperty == null) {
+            throw new BeanPropertyNotFoundException(propertyName);
+        }
+        if (!beanProperty.isWriteable()) {
+            throw new UnsupportedOperationException("Cannot write property: " + beanProperty.getName());
+        }
+        beanProperty.setValue(bean, value);
+    }
+
+    default void setPropertyValue(
+            Object bean, String propertyName, @Nullable Object value, BeanConverter beanConverter)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        @Nullable BeanProperty beanProperty = getProperty(propertyName);
+        if (beanProperty == null) {
+            throw new BeanPropertyNotFoundException(propertyName);
+        }
+        if (!beanProperty.isWriteable()) {
+            throw new UnsupportedOperationException("Cannot write property: " + beanProperty.getName());
+        }
+        @Nullable Object targetValue = value == null ? null :
+                beanConverter.convert(value, beanProperty.getGenericType());
+        beanProperty.setValue(bean, targetValue);
+    }
+
     default boolean canReadProperty(String propertyName) {
         @Nullable BeanProperty property = getProperty(propertyName);
         return property != null && property.isReadable();
@@ -54,6 +94,12 @@ public interface BeanClass {
 
     @Immutable
     Map<Method, BeanMethod> getAllMethods();
+
+    @Override
+    boolean equals(Object other);
+
+    @Override
+    int hashCode();
 
     final class Builder extends CachedBuilder<BeanClass> {
 
@@ -139,6 +185,22 @@ public interface BeanClass {
             @Override
             public @Immutable Map<Method, BeanMethod> getAllMethods() {
                 return methodMap;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (o instanceof BeanClassImpl) {
+                    return type.equals(((BeanClassImpl) o).type);
+                }
+                return false;
+            }
+
+            @Override
+            public int hashCode() {
+                return type.hashCode();
             }
         }
     }

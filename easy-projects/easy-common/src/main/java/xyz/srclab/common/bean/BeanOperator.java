@@ -29,19 +29,17 @@ public interface BeanOperator {
         return getBeanResolver().resolve(beanClass);
     }
 
-    default BeanProperty getProperty(Object bean, String propertyName) throws BeanPropertyNotFoundException {
+    @Nullable
+    default BeanProperty getProperty(Object bean, String propertyName) {
         BeanClass beanClass = resolveBean(bean.getClass());
-        @Nullable BeanProperty beanProperty = beanClass.getProperty(propertyName);
-        if (beanProperty == null) {
-            throw new BeanPropertyNotFoundException(propertyName);
-        }
-        return beanProperty;
+        return beanClass.getProperty(propertyName);
     }
 
     @Nullable
     default Object getPropertyValue(Object bean, String propertyName)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return getProperty(bean, propertyName).getValue(bean);
+        BeanClass beanClass = resolveBean(bean.getClass());
+        return beanClass.getPropertyValue(bean, propertyName);
     }
 
     @Nullable
@@ -68,7 +66,8 @@ public interface BeanOperator {
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        getProperty(bean, propertyName).setValue(bean, value);
+        BeanClass beanClass = resolveBean(bean.getClass());
+        beanClass.setPropertyValue(bean, propertyName, value, getBeanConverter());
     }
 
     default void copyProperties(Object source, Object dest) {
@@ -123,7 +122,7 @@ public interface BeanOperator {
     }
 
     default BeanWalker walkProperties(Object bean) {
-        return BeanSupport.newBeanWalker(this, resolveBean(bean.getClass()));
+        return BeanWalkerSupport.newBeanWalker(this, bean);
     }
 
     default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)

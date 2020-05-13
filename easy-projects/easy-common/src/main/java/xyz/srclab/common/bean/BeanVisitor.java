@@ -8,7 +8,5 @@ import xyz.srclab.annotation.Immutable;
 @Immutable
 public interface BeanVisitor {
 
-    boolean needDeepVisit(Object object, BeanProperty property, BeanPath path);
-
-    void visitProperty(Object object, BeanProperty property, BeanPath path);
+    void visit(Object owner, BeanProperty property, BeanPath path, BeanWalker walker);
 }

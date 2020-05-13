@@ -2,14 +2,9 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 
+import java.nio.file.Path;
+
 @Immutable
-public interface BeanPath {
+public abstract class BeanPath {
 
-    boolean contains(BeanProperty property, Object owner);
-
-    String toString();
-
-    int hashCode();
-
-    boolean equals(Object other);
 }
