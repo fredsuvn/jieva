@@ -120,10 +120,6 @@ public interface BeanOperator {
         return resolveBean(bean.getClass()).toMap(bean);
     }
 
-    default BeanWalker walkProperties(Object bean) {
-        return BeanSupport.newBeanWalker(bean, this);
-    }
-
     default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
             throws BeanMethodNotFoundException {
         @Nullable BeanMethod beanMethod = resolveBean(bean.getClass()).getMethod(methodName, parameterTypes);
