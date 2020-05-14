@@ -3,7 +3,7 @@ package test.xyz.srclab.common.string
 import org.testng.annotations.Test
 import xyz.srclab.common.base.Defaults
 import xyz.srclab.common.bean.BeanOperator
-import xyz.srclab.common.string.PropertyOrElementReferenceLoopException
+import xyz.srclab.common.string.LoopElementException
 import xyz.srclab.common.string.ToString
 import xyz.srclab.common.string.ToStringStyle
 import xyz.srclab.test.doAssertEquals
@@ -29,7 +29,7 @@ object ToStringTest {
         )
         val c = C()
         c.a = c
-        doExpectThrowable(PropertyOrElementReferenceLoopException::class.java) {
+        doExpectThrowable(LoopElementException::class.java) {
             ToString.buildToString(c)
         }.catch { e ->
             doAssertEquals(e.nameStackTrace, ".a")

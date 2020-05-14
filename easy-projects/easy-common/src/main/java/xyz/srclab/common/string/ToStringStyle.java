@@ -3,9 +3,16 @@ package xyz.srclab.common.string;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.reflect.TypeHelper;
+
+import java.util.function.Predicate;
 
 @Immutable
 public interface ToStringStyle {
+
+    static Builder newBuilder() {
+        return new Builder();
+    }
 
     ToStringStyle DEFAULT = new Builder().build();
 
@@ -39,6 +46,8 @@ public interface ToStringStyle {
 
     boolean getIgnoreReferenceLoop();
 
+    Predicate<Object> getDeepToStringPredicate();
+
     class Builder extends CachedBuilder<ToStringStyle> {
 
         private String beanStart = "{";
@@ -50,6 +59,7 @@ public interface ToStringStyle {
         private String separator = ",";
         private String indicator = "=";
         private boolean ignoreReferenceLoop = false;
+        private Predicate<Object> deepToStringPredicate = o -> !TypeHelper.isBasic(o);
 
         public Builder setBeanStart(String beanStart) {
             this.beanStart = beanStart;
@@ -105,6 +115,11 @@ public interface ToStringStyle {
             return this;
         }
 
+        public Builder setDeepToStringPredicate(Predicate<Object> deepToStringPredicate) {
+            this.deepToStringPredicate = deepToStringPredicate;
+            return this;
+        }
+
         @Override
         protected ToStringStyle buildNew() {
             return new ToStringStyle() {
@@ -118,6 +133,7 @@ public interface ToStringStyle {
                 private final String separator = Builder.this.separator;
                 private final String indicator = Builder.this.indicator;
                 private final boolean ignoreReferenceLoop = Builder.this.ignoreReferenceLoop;
+                private final Predicate<Object> deepToStringPredicate = Builder.this.deepToStringPredicate;
 
                 @Override
                 public String getBeanStart() {
@@ -162,6 +178,11 @@ public interface ToStringStyle {
                 @Override
                 public boolean getIgnoreReferenceLoop() {
                     return ignoreReferenceLoop;
+                }
+
+                @Override
+                public Predicate<Object> getDeepToStringPredicate() {
+                    return deepToStringPredicate;
                 }
             };
         }
