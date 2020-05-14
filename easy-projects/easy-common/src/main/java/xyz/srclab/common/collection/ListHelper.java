@@ -2,9 +2,9 @@ package xyz.srclab.common.collection;
 
 import com.google.common.collect.ImmutableList;
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.collection.IterableHelper;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class ListHelper {
 
@@ -32,6 +32,15 @@ public class ListHelper {
     @Immutable
     public static <E> List<E> immutable(E... elements) {
         return ImmutableList.copyOf(elements);
+    }
+
+    @Immutable
+    public static <NE, OE> List<NE> map(Iterable<? extends OE> iterable, Function<OE, NE> mapper) {
+        List<NE> result = new LinkedList<>();
+        for (OE o : iterable) {
+            result.add(mapper.apply(o));
+        }
+        return immutable(result);
     }
 
     public static boolean deepEquals(List<?> list1, List<?> list2) {

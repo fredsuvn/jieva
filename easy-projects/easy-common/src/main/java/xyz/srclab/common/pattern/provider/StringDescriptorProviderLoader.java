@@ -9,6 +9,7 @@ import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.lang.CharsRef;
 import xyz.srclab.common.lang.Pair;
 import xyz.srclab.common.reflect.ConstructorHelper;
+import xyz.srclab.common.string.StringHelper;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -76,7 +77,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     private ProviderCandidate parseCandidateGroup(CharsRef groupRef) {
         int index = -1;
         do {
-            int separator = CharsHelper.indexOf(groupRef, index + 1, groupRef.length(), '|');
+            int separator = StringHelper.indexOf(groupRef, index + 1, groupRef.length(), '|');
             ProviderCandidate candidate;
             if (separator < 0) {
                 candidate = parseCandidate(groupRef.subSequence(index + 1).trim());

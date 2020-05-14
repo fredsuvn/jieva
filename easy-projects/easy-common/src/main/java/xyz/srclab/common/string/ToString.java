@@ -5,7 +5,6 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.lang.Computed;
-import xyz.srclab.common.reflect.TypeHelper;
 import xyz.srclab.common.walk.WalkVisitResult;
 import xyz.srclab.common.walk.WalkVisitor;
 import xyz.srclab.common.walk.Walker;
@@ -17,18 +16,15 @@ import java.util.function.Supplier;
 @Immutable
 public class ToString extends Computed<String> {
 
-    public static String buildToString(@Nullable Object any) {
-        if (any == null || TypeHelper.isBasic(any)) {
-            return String.valueOf(any);
-        }
+    public static String toString(Object any) {
         return new ToString(any).toString();
     }
 
-    public static String buildToString(@Nullable Object any, ToStringStyle style) {
+    public static String toString(Object any, ToStringStyle style) {
         return new ToString(any, style).toString();
     }
 
-    public static String buildToString(@Nullable Object any, ToStringStyle style, BeanOperator beanOperator) {
+    public static String toString(Object any, ToStringStyle style, BeanOperator beanOperator) {
         return new ToString(any, style, beanOperator).toString();
     }
 

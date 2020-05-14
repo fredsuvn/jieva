@@ -7,6 +7,7 @@ import org.objectweb.asm.Opcodes;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.bytecode.*;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
+import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 
 import java.lang.reflect.Constructor;
@@ -110,6 +111,7 @@ final class ConstructorInvokerClassGenerator {
             methodVisitor.visitEnd();
 
             //T invoke()
+            Class<?>[] parameterTypes = constructor.getParameterTypes();
             BMethod invokeMethod = new BMethod(
                     "invoke",
                     targetType,
@@ -125,6 +127,16 @@ final class ConstructorInvokerClassGenerator {
             );
             methodVisitor.visitTypeInsn(Opcodes.NEW, targetType.getInternalName());
             methodVisitor.visitInsn(Opcodes.DUP);
+            for (int i = 0; i < parameterTypes.length; i++) {
+                methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
+                methodVisitor.visitLdcInsn(i);
+                methodVisitor.visitInsn(Opcodes.AALOAD);
+            }
+            BMethod newTargetMethod = new BMethod(
+                    ByteCodeHelper.OBJECT_INIT.getName(),
+                    null,
+                    ListHelper.map()
+            );
             methodVisitor.visitMethodInsn(
                     Opcodes.INVOKESPECIAL,
                     targetType.getInternalName(),
