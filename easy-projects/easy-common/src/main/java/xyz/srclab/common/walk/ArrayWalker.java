@@ -35,56 +35,119 @@ public class ArrayWalker implements Walker {
     }
 
     private void walk(Object[] walked, WalkVisitor visitor) {
+        loop:
         for (int i = 0; i < walked.length; i++) {
-            visitor.visit(i, walked[i], walkerProvider);
+            WalkVisitResult result = visitor.visit(i, walked[i], walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
         }
     }
 
     private void walkPrimitive(boolean[] walked, WalkVisitor visitor) {
+        loop:
         for (int i = 0; i < walked.length; i++) {
-            visitor.visit(i, walked[i], walkerProvider);
+            WalkVisitResult result = visitor.visit(i, walked[i], walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
         }
     }
 
     private void walkPrimitive(byte[] walked, WalkVisitor visitor) {
+        loop:
         for (int i = 0; i < walked.length; i++) {
-            visitor.visit(i, walked[i], walkerProvider);
+            WalkVisitResult result = visitor.visit(i, walked[i], walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
         }
     }
 
     private void walkPrimitive(char[] walked, WalkVisitor visitor) {
+        loop:
         for (int i = 0; i < walked.length; i++) {
-            visitor.visit(i, walked[i], walkerProvider);
+            WalkVisitResult result = visitor.visit(i, walked[i], walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
         }
     }
 
     private void walkPrimitive(short[] walked, WalkVisitor visitor) {
+        loop:
         for (int i = 0; i < walked.length; i++) {
-            visitor.visit(i, walked[i], walkerProvider);
+            WalkVisitResult result = visitor.visit(i, walked[i], walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
         }
     }
 
     private void walkPrimitive(int[] walked, WalkVisitor visitor) {
+        loop:
         for (int i = 0; i < walked.length; i++) {
-            visitor.visit(i, walked[i], walkerProvider);
+            WalkVisitResult result = visitor.visit(i, walked[i], walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
         }
     }
 
     private void walkPrimitive(long[] walked, WalkVisitor visitor) {
+        loop:
         for (int i = 0; i < walked.length; i++) {
-            visitor.visit(i, walked[i], walkerProvider);
+            WalkVisitResult result = visitor.visit(i, walked[i], walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
         }
     }
 
     private void walkPrimitive(float[] walked, WalkVisitor visitor) {
+        loop:
         for (int i = 0; i < walked.length; i++) {
-            visitor.visit(i, walked[i], walkerProvider);
+            WalkVisitResult result = visitor.visit(i, walked[i], walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
         }
     }
 
     private void walkPrimitive(double[] walked, WalkVisitor visitor) {
+        loop:
         for (int i = 0; i < walked.length; i++) {
-            visitor.visit(i, walked[i], walkerProvider);
+            WalkVisitResult result = visitor.visit(i, walked[i], walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
         }
     }
 }

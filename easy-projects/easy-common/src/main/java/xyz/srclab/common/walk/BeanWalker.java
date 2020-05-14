@@ -3,6 +3,10 @@ package xyz.srclab.common.walk;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.bean.BeanOperator;
+import xyz.srclab.common.bean.BeanProperty;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author sunqian
@@ -20,9 +24,19 @@ public class BeanWalker implements Walker {
     @Override
     public void walk(Object walked, WalkVisitor visitor) {
         BeanClass beanClass = beanOperator.resolveBean(walked.getClass());
-        beanClass.getReadableProperties().forEach((name, property) -> {
+        Set<Map.Entry<String, BeanProperty>> set = beanClass.getReadableProperties().entrySet();
+        loop:
+        for (Map.Entry<String, BeanProperty> entry : set) {
+            String name = entry.getKey();
+            BeanProperty property = entry.getValue();
             @Nullable Object value = property.getValue(walked);
-            visitor.visit(name, value, walkerProvider);
-        });
+            WalkVisitResult result = visitor.visit(name, value, walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
+        }
     }
 }

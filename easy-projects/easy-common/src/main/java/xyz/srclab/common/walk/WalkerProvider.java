@@ -5,7 +5,7 @@ package xyz.srclab.common.walk;
  */
 public interface WalkerProvider {
 
-    static WalkerProvider DEFAULT = new DefaultWalkProvider();
+    WalkerProvider DEFAULT = new DefaultWalkProvider();
 
     Walker getWalker(Object walked);
 }

@@ -15,8 +15,15 @@ public class IterableWalker implements Walker {
     public void walk(Object walked, WalkVisitor visitor) {
         Iterable<?> iterable = (Iterable<?>) walked;
         int i = 0;
+        loop:
         for (Object o : iterable) {
-            visitor.visit(i, o, walkerProvider);
+            WalkVisitResult result = visitor.visit(i, o, walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
             i++;
         }
     }

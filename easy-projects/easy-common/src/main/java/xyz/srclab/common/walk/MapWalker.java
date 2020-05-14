@@ -1,6 +1,7 @@
 package xyz.srclab.common.walk;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author sunqian
@@ -16,6 +17,18 @@ public class MapWalker implements Walker {
     @Override
     public void walk(Object walked, WalkVisitor visitor) {
         Map<?, ?> map = (Map<?, ?>) walked;
-        map.forEach((k, v) -> visitor.visit(k, v, walkerProvider));
+        Set<? extends Map.Entry<?, ?>> set = map.entrySet();
+        loop:
+        for (Map.Entry<?, ?> entry : set) {
+            Object index = entry.getKey();
+            Object value = entry.getValue();
+            WalkVisitResult result = visitor.visit(index, value, walkerProvider);
+            switch (result) {
+                case CONTINUE:
+                    continue loop;
+                case TERMINATE:
+                    break loop;
+            }
+        }
     }
 }

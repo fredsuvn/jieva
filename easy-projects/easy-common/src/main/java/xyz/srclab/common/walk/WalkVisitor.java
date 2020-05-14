@@ -7,5 +7,5 @@ import xyz.srclab.annotation.Nullable;
  */
 public interface WalkVisitor {
 
-    void visit(Object index, @Nullable Object value, WalkerProvider walkerProvider);
+    WalkVisitResult visit(Object index, @Nullable Object value, WalkerProvider walkerProvider);
 }
