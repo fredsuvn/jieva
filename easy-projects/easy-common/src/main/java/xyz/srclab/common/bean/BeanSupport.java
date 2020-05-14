@@ -31,31 +31,35 @@ final class BeanSupport {
         return beanProvider.getBeanResolverHandler();
     }
 
-    static BeanWalker newBeanWalker(BeanOperator beanOperator, Object bean) {
-        return new BeanWalkerImpl(beanOperator, bean);
+    static BeanWalker newBeanWalker(Object bean, BeanOperator beanOperator) {
+        return new BeanWalkerImpl(bean, beanOperator);
+    }
+
+    static BeanWalker newBeanWalker(Object bean, BeanClass beanClass, BeanOperator beanOperator) {
+        return new BeanWalkerImpl(bean, beanClass, beanOperator);
     }
 
     private static final class BeanWalkerImpl implements BeanWalker {
 
+        private final Object bean;
         private final BeanClass beanClass;
         private final BeanOperator beanOperator;
-        private final Object bean;
 
-        private BeanWalkerImpl(BeanOperator beanOperator, Object bean) {
-            this(beanOperator.resolveBean(bean.getClass()), beanOperator, bean);
+        private BeanWalkerImpl(Object bean, BeanOperator beanOperator) {
+            this(bean, beanOperator.resolveBean(bean.getClass()), beanOperator);
         }
 
-        private BeanWalkerImpl(BeanClass beanClass, BeanOperator beanOperator, Object bean) {
+        private BeanWalkerImpl(Object bean, BeanClass beanClass, BeanOperator beanOperator) {
+            this.bean = bean;
             this.beanClass = beanClass;
             this.beanOperator = beanOperator;
-            this.bean = bean;
         }
 
         @Override
         public void walk(BeanVisitor visitor) {
             Map<String, BeanProperty> propertyMap = beanClass.getReadableProperties();
             propertyMap.forEach((name, property) -> {
-                //visitor.visit();
+                visitor.visit(bean, property, beanOperator, this);
             });
         }
     }

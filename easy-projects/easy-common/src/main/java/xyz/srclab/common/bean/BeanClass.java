@@ -110,6 +110,10 @@ public interface BeanClass {
         return MapHelper.map(getReadableProperties(), name -> name, property -> property.getValue(bean));
     }
 
+    default BeanWalker walkProperties(Object bean, BeanOperator beanOperator) {
+        return BeanSupport.newBeanWalker(bean, this, beanOperator);
+    }
+
     @Nullable
     BeanMethod getMethod(String methodName, Class<?>... parameterTypes);
 

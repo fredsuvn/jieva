@@ -121,7 +121,7 @@ public interface BeanOperator {
     }
 
     default BeanWalker walkProperties(Object bean) {
-        return BeanSupport.newBeanWalker(this, bean);
+        return BeanSupport.newBeanWalker(bean, this);
     }
 
     default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
