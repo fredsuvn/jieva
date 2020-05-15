@@ -7,6 +7,6 @@ defaults:
   concurrency-level: 16
 
 providers:
-  xyz.srclab.common.bean.BeanProvider: "xyz srclab.common.bean.provider.defaults.DefaultBeanProvider"
+  xyz.srclab.common.bean.BeanProvider: "xyz.srclab.common.bean.provider.defaults.DefaultBeanProvider"
   xyz.srclab.common.invoke.InvokerProvider: "xyz.srclab.common.invoke.provider.reflected.ReflectedInvokerProvider"
   xyz.srclab.common.util.proxy.ClassProxyProvider: "xyz.srclab.common.util.proxy.provider.jdk.JdkClassProxyProvider"
