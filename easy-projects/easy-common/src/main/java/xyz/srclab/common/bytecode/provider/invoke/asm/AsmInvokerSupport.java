@@ -8,7 +8,7 @@ import xyz.srclab.common.invoke.MethodInvoker;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-public class AsmInvokerSupport {
+final class AsmInvokerSupport {
 
     private static final Cache<Constructor<?>, ConstructorInvoker<?>> constructorInvokerCache =
             Cache.newGcThreadLocalL2(Cache.newPermanent());
