@@ -36,8 +36,8 @@ final class AsmInvokerGeneratorImpl implements AsmInvokerGenerator {
 
     public static void main(String[] args) throws Exception {
         AsmInvokerGeneratorImpl impl = new AsmInvokerGeneratorImpl();
-        Constructor<String> constructor = String.class.getConstructor();
+        Constructor<String> constructor = String.class.getConstructor(String.class);
         ConstructorInvoker<String> constructorInvoker = impl.newConstructorInvoker(constructor);
-        System.out.println(constructorInvoker.invoke());
+        System.out.println(constructorInvoker.invoke("123", "456"));
     }
 }

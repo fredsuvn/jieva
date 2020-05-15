@@ -14,17 +14,17 @@ public class ByteCodeHelper {
 
     public static final String CONSTRUCTOR_NAME = "<init>";
 
-    public static final BType PRIMITIVE_VOID = new BType(void.class);
+    public static final BRefType PRIMITIVE_VOID = new BRefType(void.class);
 
-    public static final BType OBJECT = new BType(Object.class);
+    public static final BRefType OBJECT = new BRefType(Object.class);
 
     public static final BArrayType OBJECT_ARRAY = new BArrayType(OBJECT, 1);
 
-    public static final BDescribable[] EMPTY_DESCRIBABLE_ARRAY = new BDescribable[0];
+    public static final BType[] EMPTY_DESCRIBABLE_ARRAY = new BType[0];
 
     public static final BTypeVariable[] EMPTY_TYPE_VARIABLE_ARRAY = new BTypeVariable[0];
 
-    public static final BDescribable[] OBJECT_ARRAY_PARAMETER = {OBJECT_ARRAY};
+    public static final BType[] OBJECT_ARRAY_PARAMETER = {OBJECT_ARRAY};
 
     public static final BMethod OBJECT_INIT =
             new BMethod(CONSTRUCTOR_NAME, null, null, null);

@@ -11,22 +11,22 @@ import java.util.LinkedList;
 /**
  * @author sunqian
  */
-public class BTypeVariable implements BDescribable {
+public class BTypeVariable implements BType {
 
     private final String name;
     private final boolean isInterface;
-    private @Nullable LinkedList<BDescribable> bounds;
+    private @Nullable LinkedList<BType> bounds;
 
     public BTypeVariable(String name, boolean isInterface) {
         this.name = name;
         this.isInterface = isInterface;
     }
 
-    public void addBounds(BDescribable... bounds) {
+    public void addBounds(BType... bounds) {
         addBounds(Arrays.asList(bounds));
     }
 
-    public void addBounds(Iterable<BDescribable> bounds) {
+    public void addBounds(Iterable<BType> bounds) {
         IterableHelper.addAll(getBounds(), bounds);
     }
 
@@ -44,6 +44,11 @@ public class BTypeVariable implements BDescribable {
     }
 
     @Override
+    public String getInternalName() {
+        return getNearly().getInternalName();
+    }
+
+    @Override
     public String getDescriptor() {
         return getNearly().getDescriptor();
     }
@@ -53,11 +58,11 @@ public class BTypeVariable implements BDescribable {
         return "T" + name + ";";
     }
 
-    private BDescribable getNearly() {
+    private BType getNearly() {
         return CollectionUtils.isEmpty(bounds) ? ByteCodeHelper.OBJECT : bounds.getFirst();
     }
 
-    private LinkedList<BDescribable> getBounds() {
+    private LinkedList<BType> getBounds() {
         if (bounds == null) {
             bounds = new LinkedList<>();
         }

@@ -13,12 +13,12 @@ import java.util.List;
  * @author sunqian
  */
 @Immutable
-public class BNewType implements BDescribable {
+public class BNewType implements BType {
 
     private final String name;
     private final @Immutable List<BTypeVariable> typeVariables;
-    private final BType superClass;
-    private final @Immutable List<BType> interfaces;
+    private final BRefType superClass;
+    private final @Immutable List<BRefType> interfaces;
 
     private final String internalName;
     private final String descriptor;
@@ -27,8 +27,8 @@ public class BNewType implements BDescribable {
     public BNewType(
             String className,
             @Nullable Iterable<BTypeVariable> typeVariables,
-            @Nullable BType superClass,
-            @Nullable Iterable<BType> interfaces
+            @Nullable BRefType superClass,
+            @Nullable Iterable<BRefType> interfaces
     ) {
         this.name = className;
         this.typeVariables = typeVariables == null ? Collections.emptyList() :
@@ -44,6 +44,7 @@ public class BNewType implements BDescribable {
         return name;
     }
 
+    @Override
     public String getInternalName() {
         return internalName;
     }
@@ -52,11 +53,11 @@ public class BNewType implements BDescribable {
         return typeVariables;
     }
 
-    public BType getSuperClass() {
+    public BRefType getSuperClass() {
         return superClass;
     }
 
-    public List<BType> getInterfaces() {
+    public List<BRefType> getInterfaces() {
         return interfaces;
     }
 

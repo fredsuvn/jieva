@@ -17,8 +17,8 @@ import java.util.List;
 public class BMethod implements BDescribable {
 
     private final String name;
-    private final BDescribable returnType;
-    private final @Immutable List<BDescribable> parameterTypes;
+    private final BType returnType;
+    private final @Immutable List<BType> parameterTypes;
     private final @Immutable List<BTypeVariable> typeVariables;
 
     private @Nullable String descriptor;
@@ -26,8 +26,8 @@ public class BMethod implements BDescribable {
 
     public BMethod(
             String name,
-            @Nullable BDescribable returnType,
-            @Nullable Iterable<BDescribable> parameterTypes,
+            @Nullable BType returnType,
+            @Nullable Iterable<BType> parameterTypes,
             @Nullable Iterable<BTypeVariable> typeVariables
     ) {
         this.name = name;
@@ -42,12 +42,20 @@ public class BMethod implements BDescribable {
         return name;
     }
 
-    public BDescribable getReturnType() {
+    public BType getReturnType() {
         return returnType;
     }
 
-    public List<BDescribable> getParameterTypes() {
+    public BType getParameterType(int index) {
+        return parameterTypes.get(index);
+    }
+
+    public List<BType> getParameterTypes() {
         return parameterTypes;
+    }
+
+    public BTypeVariable getBTypeVariable(int index) {
+        return typeVariables.get(index);
     }
 
     public List<BTypeVariable> getTypeVariables() {

@@ -7,14 +7,19 @@ import xyz.srclab.annotation.Immutable;
  * @author sunqian
  */
 @Immutable
-public class BArrayType implements BDescribable {
+public class BArrayType implements BType {
 
-    private final BDescribable componentType;
+    private final BType componentType;
     private final String prefix;
 
-    public BArrayType(BDescribable componentType, int dimension) {
+    public BArrayType(BType componentType, int dimension) {
         this.componentType = componentType;
         this.prefix = StringUtils.repeat('[', dimension);
+    }
+
+    @Override
+    public String getInternalName() {
+        return getDescriptor();
     }
 
     @Override

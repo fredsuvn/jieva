@@ -20,9 +20,9 @@ final class ConstructorInvokerClassGenerator {
         try {
             String newClassName =
                     AsmInvokerHelper.generateConstructorInvokerClassName(constructor, GenerateSupper.GENERATOR_NAME);
-            BType constructorClass = new BType(constructor.getClass());
-            BType constructorInvokerInterface = new BType(ConstructorInvoker.class);
-            BType targetType = new BType(constructor.getDeclaringClass());
+            BRefType constructorClass = new BRefType(constructor.getClass());
+            BRefType constructorInvokerInterface = new BRefType(ConstructorInvoker.class);
+            BRefType targetType = new BRefType(constructor.getDeclaringClass());
             constructorClass.addGenericTypes(targetType);
             constructorInvokerInterface.addGenericTypes(targetType);
 
@@ -40,7 +40,7 @@ final class ConstructorInvokerClassGenerator {
                     newTypeClass.getInternalName(),
                     newTypeClass.getSignature(),
                     newTypeClass.getSuperClass().getInternalName(),
-                    ArrayHelper.toArray(newTypeClass.getInterfaces(), String.class, BType::getInternalName)
+                    ArrayHelper.toArray(newTypeClass.getInterfaces(), String.class, BRefType::getInternalName)
             );
 
             // private Constructor constructor;
@@ -125,27 +125,36 @@ final class ConstructorInvokerClassGenerator {
                     invokeMethod.getSignature(),
                     null
             );
+            BMethod targetConstructorMethod = new BMethod(
+                    ByteCodeHelper.OBJECT_INIT.getName(),
+                    null,
+                    ListHelper.map(parameterTypes, BRefType::new),
+                    null
+            );
             methodVisitor.visitTypeInsn(Opcodes.NEW, targetType.getInternalName());
             methodVisitor.visitInsn(Opcodes.DUP);
             for (int i = 0; i < parameterTypes.length; i++) {
                 methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
                 methodVisitor.visitLdcInsn(i);
                 methodVisitor.visitInsn(Opcodes.AALOAD);
+                methodVisitor.visitTypeInsn(
+                        Opcodes.CHECKCAST,
+                        targetConstructorMethod.getParameterType(i).getInternalName()
+                );
             }
-            BMethod newTargetMethod = new BMethod(
-                    ByteCodeHelper.OBJECT_INIT.getName(),
-                    null,
-                    ListHelper.map()
-            );
             methodVisitor.visitMethodInsn(
                     Opcodes.INVOKESPECIAL,
                     targetType.getInternalName(),
-                    ByteCodeHelper.OBJECT_INIT.getName(),
-                    ByteCodeHelper.OBJECT_INIT.getDescriptor(),
+                    targetConstructorMethod.getName(),
+                    targetConstructorMethod.getDescriptor(),
                     false
             );
             methodVisitor.visitInsn(Opcodes.ARETURN);
-            methodVisitor.visitMaxs(2, 2);
+            int maxStack = parameterTypes.length == 0 ? 2 : 2 + parameterTypes.length + 2;
+            methodVisitor.visitMaxs(
+                    maxStack,
+                    maxStack
+            );
             methodVisitor.visitEnd();
             //Object invoke()
             BMethod invokeMethodBridge = new BMethod(

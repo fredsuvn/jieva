@@ -3,6 +3,7 @@ package xyz.srclab.common.bytecode.provider.invoke.asm.asm;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 
 /**
  * @author sunqian
@@ -23,7 +24,7 @@ public class CC implements ConstructorInvoker<String> {
     @Override
     public String invoke(Object... args) {
         s2(args[0], args[1], args[2]);
-        return new String(args[0].toString());
+        return new String(Arrays.deepToString((Object[])args[0]));
     }
 
     public void s(Object... args) {

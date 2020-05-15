@@ -13,13 +13,13 @@ public class BWildcardType implements BDescribable {
     public static final String LOWER_BOUND = "-";
 
     private final String boundDescriptor;
-    private final BDescribable bound;
+    private final BType bound;
 
-    public BWildcardType(BDescribable bound) {
+    public BWildcardType(BType bound) {
         this("", bound);
     }
 
-    public BWildcardType(String boundDescriptor, BDescribable bound) {
+    public BWildcardType(String boundDescriptor, BType bound) {
         this.boundDescriptor = boundDescriptor;
         this.bound = bound;
     }
