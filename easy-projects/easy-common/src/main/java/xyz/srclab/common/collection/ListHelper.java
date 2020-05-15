@@ -35,6 +35,15 @@ public class ListHelper {
     }
 
     @Immutable
+    public static <NE, OE> List<NE> map(OE[] array, Function<OE, NE> mapper) {
+        List<NE> result = new ArrayList<>(array.length);
+        for (OE o : array) {
+            result.add(mapper.apply(o));
+        }
+        return immutable(result);
+    }
+
+    @Immutable
     public static <NE, OE> List<NE> map(Iterable<? extends OE> iterable, Function<OE, NE> mapper) {
         List<NE> result = new LinkedList<>();
         for (OE o : iterable) {
