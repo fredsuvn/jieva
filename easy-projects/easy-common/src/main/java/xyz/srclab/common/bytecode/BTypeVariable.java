@@ -3,8 +3,10 @@ package xyz.srclab.common.bytecode;
 import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.IterableHelper;
+import xyz.srclab.common.reflect.TypeHelper;
 import xyz.srclab.common.string.StringHelper;
 
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -20,6 +22,10 @@ public class BTypeVariable implements BType {
     public BTypeVariable(String name, boolean isInterface) {
         this.name = name;
         this.isInterface = isInterface;
+    }
+
+    public BTypeVariable(TypeVariable<?> typeVariable) {
+        this(typeVariable.getName(), TypeHelper.getRawType(typeVariable.getBounds()[0]).isInterface());
     }
 
     public void addBounds(BType... bounds) {

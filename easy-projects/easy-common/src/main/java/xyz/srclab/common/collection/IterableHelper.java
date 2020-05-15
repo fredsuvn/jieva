@@ -38,6 +38,14 @@ public class IterableHelper {
         return set;
     }
 
+    public static <NE, OE> Iterable<NE> map(Iterable<? extends OE> old, Function<OE, NE> mapper) {
+        List<NE> newList = new LinkedList<>();
+        for (OE oe : old) {
+            newList.add(mapper.apply(oe));
+        }
+        return newList;
+    }
+
     public static boolean deepEquals(Iterable<?> iterable1, Iterable<?> iterable2) {
         if (iterable1 == iterable2) {
             return true;
@@ -71,13 +79,5 @@ public class IterableHelper {
             @WrittenReturn T container, Iterable<? extends E> iterable) {
         container.addAll(asCollection(iterable));
         return container;
-    }
-
-    public static <NE, OE> Iterable<NE> map(Iterable<? extends OE> old, Function<OE, NE> mapper) {
-        List<NE> newList = new LinkedList<>();
-        for (OE oe : old) {
-            newList.add(mapper.apply(oe));
-        }
-        return newList;
     }
 }

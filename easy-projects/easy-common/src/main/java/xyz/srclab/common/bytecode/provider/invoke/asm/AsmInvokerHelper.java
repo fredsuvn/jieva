@@ -25,7 +25,7 @@ public class AsmInvokerHelper {
         return GENERATED_CLASS_ROOT_PACKAGE +
                 "." +
                 nonJavaNamingMatcher.replaceFrom(constructorDescription, "$") +
-                "$$CreatedBy$" +
+                "$$ConstructorInvoker$CreatedBy$" +
                 providerName +
                 "$$" +
                 classCounter.getAndIncrement();
@@ -36,7 +36,7 @@ public class AsmInvokerHelper {
         return GENERATED_CLASS_ROOT_PACKAGE +
                 "." +
                 nonJavaNamingMatcher.replaceFrom(methodDescription, "$") +
-                "$$CreatedBy$" +
+                "$$MethodInvoker$CreatedBy$" +
                 providerName +
                 "$$" +
                 classCounter.getAndIncrement();

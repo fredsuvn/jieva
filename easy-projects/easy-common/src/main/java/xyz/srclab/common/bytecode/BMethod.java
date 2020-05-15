@@ -7,6 +7,7 @@ import xyz.srclab.common.collection.IterableHelper;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.string.StringHelper;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +37,15 @@ public class BMethod implements BDescribable {
                 ListHelper.immutable(IterableHelper.asList(parameterTypes));
         this.typeVariables = typeVariables == null ? Collections.emptyList() :
                 ListHelper.immutable(IterableHelper.asList(typeVariables));
+    }
+
+    public BMethod(Method method) {
+        this(
+                method.getName(),
+                new BRefType(method.getReturnType()),
+                ListHelper.map(method.getParameterTypes(), BRefType::new),
+                ListHelper.map(method.getTypeParameters(), BTypeVariable::new)
+        );
     }
 
     public String getName() {

@@ -87,4 +87,35 @@ public class TypeHelper {
         } while (current != null);
         return NullRole.getNullType();
     }
+
+    public static Class<?> primitiveToWrapper(Class<?> primitive) {
+        if (boolean.class.equals(primitive)) {
+            return Boolean.class;
+        }
+        if (byte.class.equals(primitive)) {
+            return Byte.class;
+        }
+        if (short.class.equals(primitive)) {
+            return Short.class;
+        }
+        if (char.class.equals(primitive)) {
+            return Character.class;
+        }
+        if (int.class.equals(primitive)) {
+            return Integer.class;
+        }
+        if (long.class.equals(primitive)) {
+            return Long.class;
+        }
+        if (float.class.equals(primitive)) {
+            return Float.class;
+        }
+        if (double.class.equals(primitive)) {
+            return Double.class;
+        }
+        if (void.class.equals(primitive)) {
+            return Void.class;
+        }
+        throw new IllegalArgumentException("Unknown primitive type: " + primitive);
+    }
 }

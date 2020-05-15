@@ -1,41 +1,48 @@
 package xyz.srclab.common.bytecode.provider.invoke.asm.asm;
 
-import xyz.srclab.common.invoke.ConstructorInvoker;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.invoke.FunctionInvoker;
+import xyz.srclab.common.invoke.MethodInvoker;
 
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
+import java.lang.reflect.Method;
 
 /**
  * @author sunqian
  */
-public class CC implements ConstructorInvoker<String> {
+public class CC implements MethodInvoker, FunctionInvoker {
 
-    private final Constructor<String> constructor;
+    private final Method method;
 
-    public CC(Constructor<String> constructor) {
-        this.constructor = constructor;
+    public CC(Method method) {
+        this.method = method;
     }
 
     @Override
-    public Constructor<String> getConstructor() {
-        return constructor;
+    public Method getMethod() {
+        return method;
     }
 
     @Override
-    public String invoke(Object... args) {
-        s2(args[0], args[1], args[2]);
-        return new String(Arrays.deepToString((Object[])args[0]));
+    public @Nullable Object invoke(Object... args) {
+        A.sstatic();
+        return null;
     }
 
-    public void s(Object... args) {
-        System.out.println(args[0]);
-        System.out.println(args[1]);
-        System.out.println(args[2]);
+    @Override
+    public @Nullable Object invoke(@Nullable Object object, Object... args) {
+        A a = (A) object;
+        a.ss((Short) args[0], (String) args[1]);
+        return null;
     }
 
-    public void s2(Object o1, Object o2, Object o3) {
-        System.out.println(o1);
-        System.out.println(o2);
-        System.out.println(o3);
+    public static class A {
+
+        public static void sstatic() {
+
+        }
+
+        public void ss(short a1, String a2) {
+            System.out.println("ss: " + a1 + a2);
+        }
     }
 }

@@ -7,29 +7,29 @@ import org.objectweb.asm.Opcodes;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.bytecode.*;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
-import xyz.srclab.common.collection.ListHelper;
-import xyz.srclab.common.invoke.ConstructorInvoker;
+import xyz.srclab.common.invoke.FunctionInvoker;
+import xyz.srclab.common.invoke.MethodInvoker;
 
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 
-final class ConstructorInvokerClassGenerator {
+final class MethodInvokerClassGenerator {
 
-    public static Class<?> generateClass(Constructor<?> constructor) {
+    public static Class<?> generateClass(Method method) {
         try {
             String newClassName =
-                    AsmInvokerHelper.generateConstructorInvokerClassName(constructor, AsmSupport.GENERATOR_NAME);
-            BRefType constructorClass = new BRefType(constructor.getClass());
-            BRefType constructorInvokerInterface = new BRefType(ConstructorInvoker.class);
-            BRefType targetType = new BRefType(constructor.getDeclaringClass());
-            constructorClass.addGenericTypes(targetType);
-            constructorInvokerInterface.addGenericTypes(targetType);
+                    AsmInvokerHelper.generateMethodInvokerClassName(method, AsmSupport.GENERATOR_NAME);
+            BRefType methodClass = new BRefType(method.getClass());
+            BRefType methodInvokerInterface = new BRefType(MethodInvoker.class);
+            BRefType functionInvokerInterface = new BRefType(FunctionInvoker.class);
+            BRefType ownerType = new BRefType(method.getDeclaringClass());
 
             BNewType newTypeClass = new BNewType(
                     newClassName,
                     null,
                     null,
-                    Collections.singletonList(constructorInvokerInterface)
+                    Arrays.asList(methodInvokerInterface, functionInvokerInterface)
             );
 
             ClassWriter classWriter = new ClassWriter(0);
@@ -42,21 +42,21 @@ final class ConstructorInvokerClassGenerator {
                     ArrayHelper.toArray(newTypeClass.getInterfaces(), String.class, BRefType::getInternalName)
             );
 
-            // private Constructor constructor;
+            // private Method method;
             FieldVisitor fieldVisitor = classWriter.visitField(
                     Opcodes.ACC_PRIVATE | Opcodes.ACC_FINAL,
-                    "constructor",
-                    constructorClass.getDescriptor(),
-                    constructorClass.getSignature(),
+                    "method",
+                    methodClass.getDescriptor(),
+                    methodClass.getSignature(),
                     null
             );
             fieldVisitor.visitEnd();
 
-            // <init>(Constructor constructor)
+            // <init>(Method method)
             BMethod init = new BMethod(
                     ByteCodeHelper.OBJECT_INIT.getName(),
                     null,
-                    Collections.singletonList(constructorClass),
+                    Collections.singletonList(methodClass),
                     null
             );
             MethodVisitor methodVisitor = classWriter.visitMethod(
@@ -81,46 +81,41 @@ final class ConstructorInvokerClassGenerator {
             methodVisitor.visitFieldInsn(
                     Opcodes.PUTFIELD,
                     newTypeClass.getInternalName(),
-                    "constructor",
-                    constructorClass.getDescriptor()
+                    "method",
+                    methodClass.getDescriptor()
             );
             methodVisitor.visitInsn(Opcodes.RETURN);
             methodVisitor.visitMaxs(2, 2);
             methodVisitor.visitEnd();
 
-            //Constructor getConstructor()
-            BMethod getConstructorMethod =
-                    new BMethod("getConstructor", constructorClass, null, null);
+            //Method getMethod()
+            BMethod getMethodMethod =
+                    new BMethod("getMethod", methodClass, null, null);
             methodVisitor = classWriter.visitMethod(
                     Opcodes.ACC_PUBLIC,
-                    getConstructorMethod.getName(),
-                    getConstructorMethod.getDescriptor(),
-                    getConstructorMethod.getSignature(),
+                    getMethodMethod.getName(),
+                    getMethodMethod.getDescriptor(),
+                    getMethodMethod.getSignature(),
                     null
             );
             methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
             methodVisitor.visitFieldInsn(
                     Opcodes.GETFIELD,
                     newTypeClass.getInternalName(),
-                    "constructor",
-                    constructorClass.getDescriptor()
+                    "method",
+                    methodClass.getDescriptor()
             );
             methodVisitor.visitInsn(Opcodes.ARETURN);
             methodVisitor.visitMaxs(1, 1);
             methodVisitor.visitEnd();
 
-            //T invoke()
-            Class<?>[] parameterTypes = constructor.getParameterTypes();
-            BMethod targetConstructorMethod = new BMethod(
-                    ByteCodeHelper.OBJECT_INIT.getName(),
-                    null,
-                    ListHelper.map(parameterTypes, BRefType::new),
-                    null
-            );
+            //T invoke(@Nullable Object, Object[])
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            BMethod targetMethod = new BMethod(method);
             BMethod invokeMethod = new BMethod(
                     "invoke",
-                    targetType,
-                    Collections.singletonList(ByteCodeHelper.OBJECT_ARRAY),
+                    ByteCodeHelper.OBJECT,
+                    Arrays.asList(ByteCodeHelper.OBJECT, ByteCodeHelper.OBJECT_ARRAY),
                     null
             );
             methodVisitor = classWriter.visitMethod(
@@ -130,53 +125,73 @@ final class ConstructorInvokerClassGenerator {
                     invokeMethod.getSignature(),
                     null
             );
-            methodVisitor.visitTypeInsn(Opcodes.NEW, targetType.getInternalName());
-            methodVisitor.visitInsn(Opcodes.DUP);
+            methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
+            methodVisitor.visitTypeInsn(
+                    Opcodes.CHECKCAST,
+                    ownerType.getInternalName()
+            );
+            methodVisitor.visitVarInsn(Opcodes.ASTORE, 3);
+            methodVisitor.visitVarInsn(Opcodes.ALOAD, 3);
             for (int i = 0; i < parameterTypes.length; i++) {
-                methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
+                methodVisitor.visitVarInsn(Opcodes.ALOAD, 2);
                 methodVisitor.visitLdcInsn(i);
                 methodVisitor.visitInsn(Opcodes.AALOAD);
-                AsmSupport.checkCast(methodVisitor, parameterTypes[i], targetConstructorMethod.getParameterType(i));
+                AsmSupport.checkCast(methodVisitor, parameterTypes[i], targetMethod.getParameterType(i));
             }
             methodVisitor.visitMethodInsn(
-                    Opcodes.INVOKESPECIAL,
-                    targetType.getInternalName(),
-                    targetConstructorMethod.getName(),
-                    targetConstructorMethod.getDescriptor(),
+                    Opcodes.INVOKEVIRTUAL,
+                    ownerType.getInternalName(),
+                    targetMethod.getName(),
+                    targetMethod.getDescriptor(),
                     false
             );
+            if (void.class.equals(method.getReturnType())) {
+                methodVisitor.visitInsn(Opcodes.ACONST_NULL);
+            }
             methodVisitor.visitInsn(Opcodes.ARETURN);
             int maxStack = parameterTypes.length == 0 ? 2 : 2 + parameterTypes.length + 1;
             methodVisitor.visitMaxs(
                     maxStack,
-                    2
+                    4
             );
             methodVisitor.visitEnd();
-            //Object invoke()
-            BMethod invokeMethodBridge = new BMethod(
+
+            //Object invoke(Object[])
+            BMethod functionMethod = new BMethod(
                     "invoke",
                     ByteCodeHelper.OBJECT,
                     Collections.singletonList(ByteCodeHelper.OBJECT_ARRAY),
                     null
             );
             methodVisitor = classWriter.visitMethod(
-                    Opcodes.ACC_PUBLIC | Opcodes.ACC_BRIDGE,
-                    invokeMethodBridge.getName(),
-                    invokeMethodBridge.getDescriptor(),
-                    invokeMethodBridge.getSignature(),
+                    Opcodes.ACC_PUBLIC,
+                    functionMethod.getName(),
+                    functionMethod.getDescriptor(),
+                    functionMethod.getSignature(),
                     null
             );
-            methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
-            methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
+            for (int i = 0; i < parameterTypes.length; i++) {
+                methodVisitor.visitVarInsn(Opcodes.ALOAD, 1);
+                methodVisitor.visitLdcInsn(i);
+                methodVisitor.visitInsn(Opcodes.AALOAD);
+                AsmSupport.checkCast(methodVisitor, parameterTypes[i], targetMethod.getParameterType(i));
+            }
             methodVisitor.visitMethodInsn(
-                    Opcodes.INVOKEVIRTUAL,
-                    newTypeClass.getInternalName(),
-                    invokeMethod.getName(),
-                    invokeMethod.getDescriptor(),
+                    Opcodes.INVOKESTATIC,
+                    ownerType.getInternalName(),
+                    targetMethod.getName(),
+                    targetMethod.getDescriptor(),
                     false
             );
+            if (void.class.equals(method.getReturnType())) {
+                methodVisitor.visitInsn(Opcodes.ACONST_NULL);
+            }
             methodVisitor.visitInsn(Opcodes.ARETURN);
-            methodVisitor.visitMaxs(2, 2);
+            maxStack = parameterTypes.length == 0 ? 1 : parameterTypes.length + 1;
+            methodVisitor.visitMaxs(
+                    maxStack,
+                    2
+            );
             methodVisitor.visitEnd();
 
             classWriter.visitEnd();
