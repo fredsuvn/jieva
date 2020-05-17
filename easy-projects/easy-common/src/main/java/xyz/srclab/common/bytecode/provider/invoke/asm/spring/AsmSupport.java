@@ -11,7 +11,7 @@ import xyz.srclab.common.reflect.TypeHelper;
  */
 final class AsmSupport {
 
-    static final String GENERATOR_NAME = "ASM";
+    static final String GENERATOR_NAME = "SpringAsm";
 
     static void checkCast(MethodVisitor methodVisitor, Class<?> parameterType, BType bType) {
         if (parameterType.isPrimitive()) {
