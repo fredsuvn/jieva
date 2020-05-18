@@ -50,13 +50,21 @@ public interface BeanClass {
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type, BeanConverter beanConverter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return getPropertyValue(bean, propertyName, (Type) type, beanConverter);
+        @Nullable Object value = getPropertyValue(bean, propertyName);
+        if (value == null) {
+            return null;
+        }
+        return beanConverter.convert(value, type);
     }
 
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type, BeanConverter beanConverter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return getPropertyValue(bean, propertyName, type.getType(), beanConverter);
+        @Nullable Object value = getPropertyValue(bean, propertyName);
+        if (value == null) {
+            return null;
+        }
+        return beanConverter.convert(value, type);
     }
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
@@ -156,16 +164,15 @@ public interface BeanClass {
 
             private final Class<?> type;
             private final @Immutable Map<String, BeanProperty> propertyMap;
-            private final @Immutable Map<String, BeanProperty> readablePropertyMap;
-            private final @Immutable Map<String, BeanProperty> writeablePropertyMap;
             private final @Immutable Map<Method, BeanMethod> methodMap;
+
+            private @Nullable @Immutable Map<String, BeanProperty> readablePropertyMap;
+            private @Nullable @Immutable Map<String, BeanProperty> writeablePropertyMap;
 
             private BeanClassImpl(Builder builder) {
                 this.type = builder.type;
                 this.propertyMap = builder.propertyMap == null ?
                         Collections.emptyMap() : MapHelper.immutable(builder.propertyMap);
-                this.readablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isReadable());
-                this.writeablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isWriteable());
                 this.methodMap = builder.methodMap == null ?
                         Collections.emptyMap() : MapHelper.immutable(builder.methodMap);
             }
@@ -187,11 +194,17 @@ public interface BeanClass {
 
             @Override
             public @Immutable Map<String, BeanProperty> getReadableProperties() {
+                if (readablePropertyMap == null) {
+                    readablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isReadable());
+                }
                 return readablePropertyMap;
             }
 
             @Override
             public @Immutable Map<String, BeanProperty> getWriteableProperties() {
+                if (writeablePropertyMap == null) {
+                    writeablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isWriteable());
+                }
                 return writeablePropertyMap;
             }
 

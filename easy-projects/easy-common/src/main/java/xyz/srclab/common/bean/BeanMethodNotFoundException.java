@@ -2,14 +2,14 @@ package xyz.srclab.common.bean;
 
 public class BeanMethodNotFoundException extends RuntimeException {
 
-    private final String methodSignature;
+    private final String methodDescription;
 
-    public BeanMethodNotFoundException(String methodSignature) {
-        super("Method: " + methodSignature);
-        this.methodSignature = methodSignature;
+    public BeanMethodNotFoundException(String methodDescription) {
+        super("Method: " + methodDescription);
+        this.methodDescription = methodDescription;
     }
 
-    public String getMethodSignature() {
-        return methodSignature;
+    public String getMethodDescription() {
+        return methodDescription;
     }
 }

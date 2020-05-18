@@ -121,11 +121,6 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
         }
 
         @Override
-        public @Nullable Method getReadMethod() {
-            return readMethod;
-        }
-
-        @Override
         public boolean isWriteable() {
             return writeMethod != null;
         }
@@ -139,11 +134,6 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
                 setter = MethodInvoker.of(writeMethod);
             }
             setter.invoke(bean, value);
-        }
-
-        @Override
-        public @Nullable Method getWriteMethod() {
-            return writeMethod;
         }
 
         @Override
@@ -208,11 +198,11 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
         }
 
         @Override
-        public @Nullable Object invoke(Object bean, Object... args) {
+        public MethodInvoker getMethodInvoker() {
             if (methodInvoker == null) {
                 methodInvoker = MethodInvoker.of(method);
             }
-            return methodInvoker.invoke(bean, args);
+            return methodInvoker;
         }
 
         @Override

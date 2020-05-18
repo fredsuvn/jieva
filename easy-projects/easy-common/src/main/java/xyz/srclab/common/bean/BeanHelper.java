@@ -16,7 +16,8 @@ public class BeanHelper {
         return beanOperator.resolveBean(beanClass);
     }
 
-    public static BeanProperty getProperty(Object bean, String propertyName) throws BeanPropertyNotFoundException {
+    @Nullable
+    public static BeanProperty getProperty(Object bean, String propertyName) {
         return beanOperator.getProperty(bean, propertyName);
     }
 

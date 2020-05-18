@@ -53,12 +53,14 @@ public interface BeanConverter {
 
         private static final class BeanConverterImpl implements BeanConverter {
 
+            private static final BeanConverterHandler[] TO_ARRAY = new BeanConverterHandler[0];
+
             private final BeanOperator beanOperator;
             private final BeanConverterHandler[] handlers;
 
             private BeanConverterImpl(Builder builder) {
                 this.beanOperator = builder.beanOperator == null ? BeanOperator.DEFAULT : builder.beanOperator;
-                this.handlers = builder.handlers.toArray(new BeanConverterHandler[0]);
+                this.handlers = builder.handlers.toArray(TO_ARRAY);
             }
 
             @Override
