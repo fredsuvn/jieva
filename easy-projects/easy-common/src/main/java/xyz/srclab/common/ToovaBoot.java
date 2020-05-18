@@ -114,4 +114,8 @@ public class ToovaBoot {
         });
         return (Map<String, T>) result;
     }
+
+    private static final class ToovaConfig {
+
+    }
 }
