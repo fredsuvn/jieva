@@ -52,7 +52,7 @@ final class V1Egg implements Egg {
     static final String SPELL;
 
     static {
-        long nowMillis = Context.millis();
+        long nowMillis = Context.currentMillis();
         SPELL = "" + Math.sqrt(nowMillis);
     }
 }
