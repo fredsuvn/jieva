@@ -4,6 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.reflect.MethodHelper;
 import xyz.srclab.common.reflect.TypeRef;
 
@@ -11,6 +12,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.Predicate;
 
 @Immutable
 public interface BeanClass {
@@ -116,6 +118,22 @@ public interface BeanClass {
     @Immutable
     default Map<String, Object> toMap(Object bean) {
         return MapHelper.map(getReadableProperties(), name -> name, property -> property.getValue(bean));
+    }
+
+    @Immutable
+    default Map<String, Object> deepToMap(Object bean) {
+        return deepToMap(bean, o -> !ClassHelper.isBasic(o));
+    }
+
+    @Immutable
+    default Map<String, Object> deepToMap(Object bean, Predicate<Object> resolvePredicate) {
+        return MapHelper.map(getReadableProperties(), name -> name, property -> {
+            @Nullable Object value = property.getValue(bean);
+            if (value == null || !resolvePredicate.test(value)) {
+                return value;
+            }
+            return deepToMap(bean, resolvePredicate);
+        });
     }
 
     @Nullable

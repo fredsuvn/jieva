@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Immutable
 public interface BeanOperator {
@@ -118,6 +119,16 @@ public interface BeanOperator {
     @Immutable
     default Map<String, Object> toMap(Object bean) {
         return resolveBean(bean.getClass()).toMap(bean);
+    }
+
+    @Immutable
+    default Map<String, Object> deepToMap(Object bean) {
+        return resolveBean(bean.getClass()).deepToMap(bean);
+    }
+
+    @Immutable
+    default Map<String, Object> deepToMap(Object bean, Predicate<Object> resolvePredicate) {
+        return resolveBean(bean.getClass()).deepToMap(bean, resolvePredicate);
     }
 
     default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)

@@ -7,6 +7,7 @@ import xyz.srclab.common.reflect.TypeRef;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class BeanHelper {
 
@@ -94,6 +95,16 @@ public class BeanHelper {
     @Immutable
     public static Map<String, Object> toMap(Object bean) {
         return beanOperator.toMap(bean);
+    }
+
+    @Immutable
+    public static Map<String, Object> deepToMap(Object bean) {
+        return beanOperator.deepToMap(bean);
+    }
+
+    @Immutable
+    public static Map<String, Object> deepToMap(Object bean, Predicate<Object> resolvePredicate) {
+        return beanOperator.deepToMap(bean, resolvePredicate);
     }
 
     public static BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
