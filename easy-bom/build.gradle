@@ -15,7 +15,10 @@ ext {
             commonsCodecVersion       : "1.14",
             guavaVersion              : "28.2-jre",
             fastjsonVersion           : "1.2.67",
+
             cglibVersion              : "3.3.0",
+            okhttp3                   : "4.7.1",
+
             testngVersion             : "7.1.0",
     ]
 }
@@ -38,8 +41,12 @@ dependencies {
         api("commons-codec:commons-codec:${libVersions.commonsCodecVersion}")
         api("com.google.guava:guava:${libVersions.guavaVersion}")
         api("com.alibaba:fastjson:${libVersions.fastjsonVersion}")
+
         api("cglib:cglib:${libVersions.cglibVersion}")
+        api("com.squareup.okhttp3:okhttp:${libVersions.okhttp3}")
+
         api("org.testng:testng:${libVersions.testngVersion}")
+        api("com.squareup.okhttp3:mockwebserver:${libVersions.okhttp3}")
     }
 }
 

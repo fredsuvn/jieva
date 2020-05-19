@@ -3,6 +3,7 @@ package xyz.srclab.common.lang;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.base.Equals;
 
 import java.util.Arrays;
 
@@ -52,7 +53,7 @@ public abstract class Key {
                 return false;
             }
             KeyImpl that = (KeyImpl) other;
-            return Arrays.deepEquals(this.keyComponents, that.keyComponents);
+            return Equals.deepEquals(this.keyComponents, that.keyComponents);
         }
 
         @Override

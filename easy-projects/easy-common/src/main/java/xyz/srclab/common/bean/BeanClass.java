@@ -4,6 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.reflect.MethodHelper;
 import xyz.srclab.common.reflect.TypeRef;
 
@@ -11,6 +12,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.Predicate;
 
 @Immutable
 public interface BeanClass {
@@ -50,13 +52,21 @@ public interface BeanClass {
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type, BeanConverter beanConverter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return getPropertyValue(bean, propertyName, (Type) type, beanConverter);
+        @Nullable Object value = getPropertyValue(bean, propertyName);
+        if (value == null) {
+            return null;
+        }
+        return beanConverter.convert(value, type);
     }
 
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type, BeanConverter beanConverter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return getPropertyValue(bean, propertyName, type.getType(), beanConverter);
+        @Nullable Object value = getPropertyValue(bean, propertyName);
+        if (value == null) {
+            return null;
+        }
+        return beanConverter.convert(value, type);
     }
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
@@ -110,6 +120,22 @@ public interface BeanClass {
         return MapHelper.map(getReadableProperties(), name -> name, property -> property.getValue(bean));
     }
 
+    @Immutable
+    default Map<String, Object> deepToMap(Object bean) {
+        return deepToMap(bean, o -> !ClassHelper.isBasic(o));
+    }
+
+    @Immutable
+    default Map<String, Object> deepToMap(Object bean, Predicate<Object> resolvePredicate) {
+        return MapHelper.map(getReadableProperties(), name -> name, property -> {
+            @Nullable Object value = property.getValue(bean);
+            if (value == null || !resolvePredicate.test(value)) {
+                return value;
+            }
+            return deepToMap(bean, resolvePredicate);
+        });
+    }
+
     @Nullable
     BeanMethod getMethod(String methodName, Class<?>... parameterTypes);
 
@@ -156,16 +182,15 @@ public interface BeanClass {
 
             private final Class<?> type;
             private final @Immutable Map<String, BeanProperty> propertyMap;
-            private final @Immutable Map<String, BeanProperty> readablePropertyMap;
-            private final @Immutable Map<String, BeanProperty> writeablePropertyMap;
             private final @Immutable Map<Method, BeanMethod> methodMap;
+
+            private @Nullable @Immutable Map<String, BeanProperty> readablePropertyMap;
+            private @Nullable @Immutable Map<String, BeanProperty> writeablePropertyMap;
 
             private BeanClassImpl(Builder builder) {
                 this.type = builder.type;
                 this.propertyMap = builder.propertyMap == null ?
                         Collections.emptyMap() : MapHelper.immutable(builder.propertyMap);
-                this.readablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isReadable());
-                this.writeablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isWriteable());
                 this.methodMap = builder.methodMap == null ?
                         Collections.emptyMap() : MapHelper.immutable(builder.methodMap);
             }
@@ -187,11 +212,17 @@ public interface BeanClass {
 
             @Override
             public @Immutable Map<String, BeanProperty> getReadableProperties() {
+                if (readablePropertyMap == null) {
+                    readablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isReadable());
+                }
                 return readablePropertyMap;
             }
 
             @Override
             public @Immutable Map<String, BeanProperty> getWriteableProperties() {
+                if (writeablePropertyMap == null) {
+                    writeablePropertyMap = MapHelper.filter(this.propertyMap, e -> e.getValue().isWriteable());
+                }
                 return writeablePropertyMap;
             }
 

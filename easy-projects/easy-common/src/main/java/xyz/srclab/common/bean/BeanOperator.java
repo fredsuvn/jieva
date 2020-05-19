@@ -3,7 +3,7 @@ package xyz.srclab.common.bean;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.ConstructorHelper;
+import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Method;
@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Immutable
 public interface BeanOperator {
@@ -98,7 +99,7 @@ public interface BeanOperator {
     }
 
     default <T> T clone(T from) {
-        T returned = ConstructorHelper.newInstance(from.getClass());
+        T returned = ClassHelper.newInstance(from.getClass());
         copyProperties(from, returned);
         return returned;
     }
@@ -118,6 +119,16 @@ public interface BeanOperator {
     @Immutable
     default Map<String, Object> toMap(Object bean) {
         return resolveBean(bean.getClass()).toMap(bean);
+    }
+
+    @Immutable
+    default Map<String, Object> deepToMap(Object bean) {
+        return resolveBean(bean.getClass()).deepToMap(bean);
+    }
+
+    @Immutable
+    default Map<String, Object> deepToMap(Object bean, Predicate<Object> resolvePredicate) {
+        return resolveBean(bean.getClass()).deepToMap(bean, resolvePredicate);
     }
 
     default BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
@@ -170,51 +181,51 @@ public interface BeanOperator {
 
         public void doCopy() {
             if (source instanceof Map && dest instanceof Map) {
-                Map src = (Map) source;
-                Map des = (Map) dest;
-                src.forEach((key, value) -> {
+                Map sourceMap = (Map) source;
+                Map destMap = (Map) dest;
+                sourceMap.forEach((key, value) -> {
                     if (key == null || !filter.test(key, value)) {
                         return;
                     }
                     Object newKey = nameMapper.apply(key);
-                    if (!des.containsKey(newKey)) {
+                    if (!destMap.containsKey(newKey)) {
                         return;
                     }
-                    des.put(newKey, value);
+                    destMap.put(newKey, value);
                 });
             } else if (source instanceof Map) {
-                Map src = (Map) source;
-                BeanClass destBean = beanOperator.resolveBean(dest.getClass());
-                src.forEach((key, value) -> {
+                Map sourceMap = (Map) source;
+                BeanClass destClass = beanOperator.resolveBean(dest.getClass());
+                sourceMap.forEach((key, value) -> {
                     if (key == null || !filter.test(key, value)) {
                         return;
                     }
                     String destPropertyName = nameMapper.apply(key).toString();
-                    if (!destBean.canWriteProperty(destPropertyName)) {
+                    if (!destClass.canWriteProperty(destPropertyName)) {
                         return;
                     }
-                    BeanProperty destProperty = destBean.getProperty(destPropertyName);
+                    BeanProperty destProperty = destClass.getProperty(destPropertyName);
                     destProperty.setValue(dest, beanOperator.convert(value, destProperty.getGenericType()));
                 });
             } else if (dest instanceof Map) {
-                BeanClass sourceBean = beanOperator.resolveBean(source.getClass());
-                Map des = (Map) dest;
-                sourceBean.getReadableProperties().forEach((name, property) -> {
+                BeanClass sourceClass = beanOperator.resolveBean(source.getClass());
+                Map destMap = (Map) dest;
+                sourceClass.getReadableProperties().forEach((name, property) -> {
                     @Nullable Object value = property.getValue(source);
                     if (!filter.test(name, value)) {
                         return;
                     }
                     Object newKey = nameMapper.apply(name);
-                    if (!des.containsKey(newKey)) {
+                    if (!destMap.containsKey(newKey)) {
                         return;
                     }
-                    des.put(newKey, value);
+                    destMap.put(newKey, value);
                 });
             } else {
-                BeanClass sourceBean = beanOperator.resolveBean(source.getClass());
-                BeanClass destBean = beanOperator.resolveBean(dest.getClass());
-                sourceBean.getReadableProperties().forEach((name, sourceProperty) -> {
-                    if (!destBean.canWriteProperty(name)) {
+                BeanClass sourceClass = beanOperator.resolveBean(source.getClass());
+                BeanClass destClass = beanOperator.resolveBean(dest.getClass());
+                sourceClass.getReadableProperties().forEach((name, sourceProperty) -> {
+                    if (!destClass.canWriteProperty(name)) {
                         return;
                     }
                     @Nullable Object value = sourceProperty.getValue(source);
@@ -222,10 +233,10 @@ public interface BeanOperator {
                         return;
                     }
                     String destPropertyName = nameMapper.apply(name).toString();
-                    if (!destBean.canWriteProperty(destPropertyName)) {
+                    if (!destClass.canWriteProperty(destPropertyName)) {
                         return;
                     }
-                    BeanProperty destProperty = destBean.getProperty(destPropertyName);
+                    BeanProperty destProperty = destClass.getProperty(destPropertyName);
                     destProperty.setValue(dest, beanOperator.convert(value, destProperty.getGenericType()));
                 });
             }
@@ -270,8 +281,8 @@ public interface BeanOperator {
 
         public void doPopulate() {
             if (source instanceof Map) {
-                Map src = (Map) source;
-                src.forEach((key, value) -> {
+                Map sourceMap = (Map) source;
+                sourceMap.forEach((key, value) -> {
                     if (key == null || !filter.test(key, value)) {
                         return;
                     }
@@ -280,8 +291,8 @@ public interface BeanOperator {
                     dest.put(newKey, newValue);
                 });
             } else {
-                BeanClass sourceBean = beanOperator.resolveBean(source.getClass());
-                sourceBean.getReadableProperties().forEach((name, property) -> {
+                BeanClass sourceClass = beanOperator.resolveBean(source.getClass());
+                sourceClass.getReadableProperties().forEach((name, property) -> {
                     @Nullable Object sourceValue = property.getValue(source);
                     if (!filter.test(name, sourceValue)) {
                         return;

@@ -39,7 +39,7 @@ final class ConstructorInvokerClassGenerator {
                     newTypeClass.getInternalName(),
                     newTypeClass.getSignature(),
                     newTypeClass.getSuperClass().getInternalName(),
-                    ArrayHelper.toArray(newTypeClass.getInterfaces(), String.class, BRefType::getInternalName)
+                    ArrayHelper.map(newTypeClass.getInterfaces(), String.class, BRefType::getInternalName)
             );
 
             // private Constructor constructor;

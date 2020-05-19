@@ -8,7 +8,7 @@ import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.lang.CharsRef;
 import xyz.srclab.common.lang.Pair;
-import xyz.srclab.common.reflect.ConstructorHelper;
+import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.string.StringHelper;
 
 import java.util.Arrays;
@@ -30,27 +30,36 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
             new ConditionOnMissingClass()
     ));
 
-    @Immutable
-    private final Map<String, T> providers;
-
+    private final String stringDescriptor;
     private final ClassLoader classLoader;
+
+    @Immutable
+    private @Nullable Map<String, T> providers;
 
     StringDescriptorProviderLoader(String stringDescriptor) {
         this(stringDescriptor, Context.getClassLoader());
     }
 
     StringDescriptorProviderLoader(String stringDescriptor, ClassLoader classLoader) {
-        List<ProviderCandidate> candidates = parseStringDescriptor(stringDescriptor);
-        this.providers = MapHelper.immutable(candidates.stream().collect(Collectors.toMap(
-                ProviderCandidate::getProviderName,
-                c -> newProviderInstance(c.getProviderClassName())
-        )));
+        this.stringDescriptor = stringDescriptor;
         this.classLoader = classLoader;
     }
 
     @Override
     public @Immutable Map<String, T> load() {
+        if (providers == null) {
+            providers = load0();
+        }
         return providers;
+    }
+
+    @Immutable
+    private Map<String, T> load0() {
+        List<ProviderCandidate> candidates = parseStringDescriptor(stringDescriptor);
+        return MapHelper.immutable(candidates.stream().collect(Collectors.toMap(
+                ProviderCandidate::getProviderName,
+                c -> newProviderInstance(c.getProviderClassName())
+        )));
     }
 
     private List<ProviderCandidate> parseStringDescriptor(String stringDescriptor) {
@@ -152,7 +161,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     }
 
     private T newProviderInstance(String className) {
-        return ConstructorHelper.newInstance(className, classLoader);
+        return ClassHelper.newInstance(className, classLoader);
     }
 
     private static final class ProviderCandidate {

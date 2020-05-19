@@ -12,7 +12,7 @@ import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.collection.SetHelper;
 import xyz.srclab.common.lang.Formatter;
-import xyz.srclab.common.reflect.ConstructorHelper;
+import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.reflect.TypeHelper;
 
 import java.lang.reflect.*;
@@ -198,14 +198,14 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
     }
 
     private Object toBean(Object from, Class<?> to, BeanOperator beanOperator) {
-        Object toInstance = ConstructorHelper.newInstance(to);
+        Object toInstance = ClassHelper.newInstance(to);
         beanOperator.copyProperties(from, toInstance);
         return toInstance;
     }
 
     private Object toGenericBean(Object from, Class<?> rawType, Type[] genericTypes, BeanOperator beanOperator) {
         TypeVariable<?>[] typeVariables = rawType.getTypeParameters();
-        Object toInstance = ConstructorHelper.newInstance(rawType);
+        Object toInstance = ClassHelper.newInstance(rawType);
         BeanClass toBeanClass = beanOperator.resolveBean(rawType);
         if (from instanceof Map) {
             Map map = (Map) from;

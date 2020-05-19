@@ -24,7 +24,7 @@ public class TypeRef<T> {
     }
 
     protected Type reflectTypeSelf() {
-        @Nullable Type generic = TypeHelper.getGenericSuperclass(getClass(), TypeRef.class);
+        @Nullable Type generic = ClassHelper.getGenericSuperclass(getClass(), TypeRef.class);
         if (!(generic instanceof ParameterizedType)) {
             throw new IllegalStateException("Must be extend from parameterized type.");
         }

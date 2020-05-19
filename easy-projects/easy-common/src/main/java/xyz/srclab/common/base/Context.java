@@ -11,8 +11,12 @@ import java.util.Set;
 
 public class Context {
 
-    public static long millis() {
+    public static long currentMillis() {
         return System.currentTimeMillis();
+    }
+
+    public static long currentNano() {
+        return System.nanoTime();
     }
 
     public static ClassLoader getClassLoader() {

@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 public class ArrayHelper {
 
-    private static final Cache<Type, Class<?>> elementToArrayTypeCache = Cache.newGcThreadLocalL2();
+    private static final Cache<Type, Class<?>> findArrayTypeCache = Cache.newGcThreadLocalL2();
 
     public static <E> E[] toArray(Iterable<? extends E> iterable, Type componentType) {
         Collection<E> collection = IterableHelper.asCollection(iterable);
@@ -32,17 +32,6 @@ public class ArrayHelper {
         return toArray(iterable, componentType.getType());
     }
 
-    public static <NE, OE> NE[] toArray(
-            Iterable<? extends OE> iterable, Type componentType, Function<OE, NE> elementMapper) {
-        Iterable<NE> newIterable = IterableHelper.map(iterable, elementMapper);
-        return toArray(newIterable, componentType);
-    }
-
-    public static <NE, OE> NE[] toArray(
-            Iterable<? extends OE> iterable, TypeRef<NE> componentType, Function<OE, NE> elementMapper) {
-        return toArray(iterable, componentType.getType(), elementMapper);
-    }
-
     public static <E> E[] newArray(Class<E> componentType, int length) {
         return (E[]) Array.newInstance(componentType, length);
     }
@@ -53,6 +42,17 @@ public class ArrayHelper {
 
     public static <E> E[] newArray(TypeRef<E> componentType, int length) {
         return newArray(componentType.getType(), length);
+    }
+
+    public static <NE, OE> NE[] map(
+            Iterable<? extends OE> iterable, Type newComponentType, Function<OE, NE> elementMapper) {
+        Iterable<NE> newIterable = IterableHelper.map(iterable, elementMapper);
+        return toArray(newIterable, newComponentType);
+    }
+
+    public static <NE, OE> NE[] map(
+            Iterable<? extends OE> iterable, TypeRef<NE> newComponentType, Function<OE, NE> elementMapper) {
+        return map(iterable, newComponentType.getType(), elementMapper);
     }
 
     public static byte[] buildArray(@WrittenReturn byte[] array, ByteElementSupplier each) {
@@ -191,7 +191,7 @@ public class ArrayHelper {
     }
 
     public static Class<?> findArrayType(Class<?> elementType) {
-        return elementToArrayTypeCache.getNonNull(
+        return findArrayTypeCache.getNonNull(
                 elementType,
                 o -> findArrayType0(elementType)
         );
@@ -205,7 +205,11 @@ public class ArrayHelper {
         if (type instanceof GenericArrayType) {
             return ((GenericArrayType) type).getGenericComponentType();
         }
-        return TypeHelper.getRawType(type).getComponentType();
+        Class<?> rawType = TypeHelper.getRawType(type);
+        if (!rawType.isArray()) {
+            throw new IllegalArgumentException("Type is not array: " + type);
+        }
+        return rawType.getComponentType();
     }
 
     public interface ElementSupplier<E> {

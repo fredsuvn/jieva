@@ -17,7 +17,7 @@ import java.util.function.Function;
 public interface Cache<K, V> {
 
     static <K, V> Cache<K, V> newPermanent() {
-        return newPermanent(Defaults.DEFAULT_CONCURRENCY_LEVEL);
+        return newPermanent(Defaults.CONCURRENCY_LEVEL);
     }
 
     static <K, V> Cache<K, V> newPermanent(int concurrencyLevel) {
@@ -35,7 +35,7 @@ public interface Cache<K, V> {
     }
 
     static <K, V> Cache<K, V> newGcConcurrent() {
-        return newGcConcurrent(Defaults.DEFAULT_CONCURRENCY_LEVEL);
+        return newGcConcurrent(Defaults.CONCURRENCY_LEVEL);
     }
 
     static <K, V> Cache<K, V> newGcConcurrent(int concurrencyLevel) {
@@ -47,7 +47,7 @@ public interface Cache<K, V> {
     }
 
     static <K, V> Cache<K, V> newGcThreadLocalL2() {
-        return newGcThreadLocalL2(Defaults.DEFAULT_CONCURRENCY_LEVEL);
+        return newGcThreadLocalL2(Defaults.CONCURRENCY_LEVEL);
     }
 
     static <K, V> Cache<K, V> newGcThreadLocalL2(int concurrencyLevel) {

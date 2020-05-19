@@ -70,7 +70,7 @@ public abstract class Computed<T> implements Supplier<T> {
             if (this.cache == null) {
                 return refreshGet();
             }
-            long now = Context.millis();
+            long now = Context.currentMillis();
             return (cacheTimeMillis > 0 && cacheTimeMillis + timeout.toMillis() >= now) ?
                     this.cache : refreshGet();
         }
@@ -78,7 +78,7 @@ public abstract class Computed<T> implements Supplier<T> {
         @Override
         public T refreshGet() {
             cache = computation.get();
-            cacheTimeMillis = Context.millis();
+            cacheTimeMillis = Context.currentMillis();
             assert cache != null;
             return cache;
         }

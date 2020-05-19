@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Context;
-import xyz.srclab.common.reflect.ConstructorHelper;
+import xyz.srclab.common.reflect.ClassHelper;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -18,7 +18,7 @@ public interface ProviderManager<T> {
     default void registerProvider(String className, boolean isDefault) {
         @Nullable Class<T> providerClass = Context.getClass(className);
         Checker.checkArguments(providerClass != null, "Can not find class: " + className);
-        T provider = ConstructorHelper.newInstance(providerClass);
+        T provider = ClassHelper.newInstance(providerClass);
         registerProvider(className, provider, isDefault);
     }
 

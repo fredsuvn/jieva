@@ -16,7 +16,7 @@ public final class CacheBuilder<K, V> {
     }
 
     private long maxSize = Long.MAX_VALUE;
-    private int concurrencyLevel = Defaults.DEFAULT_CONCURRENCY_LEVEL;
+    private int concurrencyLevel = Defaults.CONCURRENCY_LEVEL;
 
     private @Nullable Duration expiryAfterCreate;
     private @Nullable Duration expiryAfterRead;

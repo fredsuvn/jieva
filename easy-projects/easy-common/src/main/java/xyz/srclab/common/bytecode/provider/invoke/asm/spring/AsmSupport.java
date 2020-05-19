@@ -4,6 +4,7 @@ import org.springframework.asm.MethodVisitor;
 import org.springframework.asm.Opcodes;
 import xyz.srclab.common.bytecode.BRefType;
 import xyz.srclab.common.bytecode.BType;
+import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.reflect.TypeHelper;
 
 /**
@@ -26,7 +27,7 @@ final class AsmSupport {
 
     private static void checkCastPrimitive(
             MethodVisitor methodVisitor, Class<?> parameterType, BType primitiveType) {
-        Class<?> wrapperClass = TypeHelper.primitiveToWrapper(parameterType);
+        Class<?> wrapperClass = ClassHelper.primitiveToWrapper(parameterType);
         BRefType wrapperType = new BRefType(wrapperClass);
         methodVisitor.visitTypeInsn(
                 Opcodes.CHECKCAST,

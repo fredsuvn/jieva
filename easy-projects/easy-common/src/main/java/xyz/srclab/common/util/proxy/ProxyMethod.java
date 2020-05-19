@@ -1,7 +1,5 @@
 package xyz.srclab.common.util.proxy;
 
-import xyz.srclab.common.invoke.MethodInvoker;
-
 import java.lang.reflect.Method;
 
 /**
@@ -9,5 +7,5 @@ import java.lang.reflect.Method;
  */
 public interface ProxyMethod {
 
-    Object invoke(Object object, Object[] args, Method method, MethodInvoker superInvoker);
+    Object invoke(Object object, Object[] args, Method method, SuperInvoker superInvoker);
 }

@@ -33,7 +33,7 @@ object BeanConverterTest {
     @DataProvider
     fun testConvertClassData(): Array<Array<*>> {
         val myDateString = "2001-04-25T16:10:00"
-        val nowMillis = Context.millis()
+        val nowMillis = Context.currentMillis()
         val nowDate = Date(nowMillis)
         val nowInstant = nowDate.toInstant()
         val myDate = Date.from(LocalDateTime.parse(myDateString).atZone(ZoneId.systemDefault()).toInstant())
