@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean.provider.defaults;
 
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.bean.BeanMethod;
@@ -8,12 +9,17 @@ import xyz.srclab.common.bean.BeanResolverHandler;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.invoke.MethodInvoker;
+import xyz.srclab.common.reflect.NullMember;
 
 import java.beans.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
@@ -33,7 +39,7 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
                 BeanInfo beanInfo = Introspector.getBeanInfo(type);
                 Method[] methods = type.getMethods();
                 return BeanClass.newBuilder(type)
-                        .setProperties(buildProperties(beanInfo.getPropertyDescriptors()))
+                        .setProperties(buildProperties(beanClass, beanInfo.getPropertyDescriptors()))
                         .setMethods(buildMethods(methods))
                         .build();
             } catch (IntrospectionException e) {
@@ -43,13 +49,13 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
         });
     }
 
-    private Map<String, BeanProperty> buildProperties(PropertyDescriptor[] descriptors) {
+    private Map<String, BeanProperty> buildProperties(Class<?> ownerType, PropertyDescriptor[] descriptors) {
         Map<String, BeanProperty> map = new LinkedHashMap<>();
         for (PropertyDescriptor descriptor : descriptors) {
             if (descriptor instanceof IndexedPropertyDescriptor) {
                 continue;
             }
-            map.put(descriptor.getName(), new BeanPropertyImpl(descriptor));
+            map.put(descriptor.getName(), new BeanPropertyImpl(ownerType, descriptor));
         }
         return map;
     }
@@ -65,6 +71,7 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
     private static final class BeanPropertyImpl implements BeanProperty {
 
+        private final Class<?> ownerType;
         private final PropertyDescriptor descriptor;
         private final Type genericType;
 
@@ -73,8 +80,11 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
         private @Nullable MethodInvoker getter;
         private @Nullable MethodInvoker setter;
+        private @Nullable Field field;
+        private @Nullable @Immutable List<Annotation> annotations;
 
-        private BeanPropertyImpl(PropertyDescriptor descriptor) {
+        private BeanPropertyImpl(Class<?> ownerType, PropertyDescriptor descriptor) {
+            this.ownerType = ownerType;
             this.descriptor = descriptor;
             this.readMethod = descriptor.getReadMethod();
             this.writeMethod = descriptor.getWriteMethod();
@@ -91,6 +101,11 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
         @Override
         public String getName() {
             return descriptor.getName();
+        }
+
+        @Override
+        public Class<?> getOwnerType() {
+            return ownerType;
         }
 
         @Override
@@ -134,6 +149,29 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
                 setter = MethodInvoker.of(writeMethod);
             }
             setter.invoke(bean, value);
+        }
+
+        @Override
+        public @Nullable Field getField() {
+            if (field == null) {
+                try {
+                    field = ownerType.getDeclaredField(getName());
+                } catch (NoSuchFieldException e) {
+                    field = NullMember.asField();
+                }
+            }
+            return Objects.equals(NullMember.asField(), field) ? null : field;
+        }
+
+        @Override
+        public @Immutable List<Annotation> getFieldAnnotations() throws UnsupportedOperationException {
+
+            @Nullable Field field = getField();
+            if (field == null) {
+                throw new UnsupportedOperationException("Field " + getName() + " not found.");
+            }
+            field.getAnnotations();
+            return null;
         }
 
         @Override

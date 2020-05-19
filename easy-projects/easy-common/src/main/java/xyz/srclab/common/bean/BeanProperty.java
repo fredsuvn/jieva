@@ -3,10 +3,15 @@ package xyz.srclab.common.bean;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.List;
 
 @Immutable
 public interface BeanProperty extends BeanMember {
+
+    Class<?> getOwnerType();
 
     Class<?> getType();
 
@@ -20,4 +25,10 @@ public interface BeanProperty extends BeanMember {
     boolean isWriteable();
 
     void setValue(Object bean, @Nullable Object value) throws UnsupportedOperationException;
+
+    @Nullable
+    Field getField();
+
+    @Immutable
+    List<Annotation> getFieldAnnotations() throws UnsupportedOperationException;
 }

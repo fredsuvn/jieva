@@ -67,7 +67,7 @@ public class ClassHelper {
                 Key.from(cls, targetSuperClass),
                 k -> getGenericSuperclass0(cls, targetSuperClass)
         );
-        return result == NullRole.getNullType() ? null : result;
+        return result == NullMember.asType() ? null : result;
     }
 
     private static Type getGenericSuperclass0(Class<?> cls, Class<?> superClass) {
@@ -79,7 +79,7 @@ public class ClassHelper {
             }
             current = currentClass.getGenericSuperclass();
         } while (current != null);
-        return NullRole.getNullType();
+        return NullMember.asType();
     }
 
     public static Class<?> primitiveToWrapper(Class<?> primitive) {

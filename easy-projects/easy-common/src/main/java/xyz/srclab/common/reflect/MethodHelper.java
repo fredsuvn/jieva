@@ -25,7 +25,7 @@ public class MethodHelper {
                 Key.from(cls, methodName, parameterTypes),
                 k -> getMethod0(cls, methodName, parameterTypes)
         );
-        if (result == NullRole.getNullMethod()) {
+        if (result == NullMember.asMethod()) {
             return null;
         }
         return result;
@@ -35,7 +35,7 @@ public class MethodHelper {
         try {
             return cls.getMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException e) {
-            return NullRole.getNullMethod();
+            return NullMember.asMethod();
         }
     }
 

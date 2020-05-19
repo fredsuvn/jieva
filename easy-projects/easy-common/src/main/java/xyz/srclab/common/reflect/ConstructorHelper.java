@@ -16,7 +16,7 @@ public class ConstructorHelper {
                 Key.from(cls, parameterTypes),
                 k -> getConstructor0(cls, parameterTypes)
         );
-        if (constructor == NullRole.getNullConstructor()) {
+        if (constructor == NullMember.asConstructor()) {
             return null;
         }
         return (Constructor<T>) constructor;
@@ -26,7 +26,7 @@ public class ConstructorHelper {
         try {
             return cls.getConstructor(parameterTypes);
         } catch (NoSuchMethodException e) {
-            return NullRole.getNullConstructor();
+            return NullMember.asConstructor();
         }
     }
 }

@@ -1,10 +1,11 @@
 package xyz.srclab.common.reflect;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-final class NullRole {
+public class NullMember {
 
     private static final Constructor<?> NULL_CONSTRUCTOR;
 
@@ -18,26 +19,33 @@ final class NullRole {
         }
     };
 
-    public static Constructor<?> getNullConstructor() {
+    private static final Field NULL_FIELD;
+
+    public static Constructor<?> asConstructor() {
         return NULL_CONSTRUCTOR;
     }
 
-    public static Method getNullMethod() {
+    public static Method asMethod() {
         return NULL_METHOD;
     }
 
-    public static Type getNullType() {
+    public static Type asType() {
         return NULL_TYPE;
     }
 
-    private static void nullMethod() {
-        throw new IllegalStateException("This method should never be invoked!");
+    public static Field asField() {
+        return NULL_FIELD;
+    }
+
+    private static void invokeNull() {
+        throw new NullPointerException();
     }
 
     static {
         try {
-            NULL_CONSTRUCTOR = NullRole.class.getConstructor();
-            NULL_METHOD = NullRole.class.getMethod("nullMethod");
+            NULL_CONSTRUCTOR = NullMember.class.getDeclaredConstructor();
+            NULL_METHOD = NullMember.class.getDeclaredMethod("invokeNull");
+            NULL_FIELD = NullMember.class.getDeclaredField("NULL_FIELD");
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
