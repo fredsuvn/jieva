@@ -18,7 +18,7 @@ public class Defaults {
 
     public static final TimeUnit TIME_UNIT;
 
-    public static final int DEFAULT_CONCURRENCY_LEVEL;
+    public static final int CONCURRENCY_LEVEL;
 
     static {
         try {
@@ -29,7 +29,7 @@ public class Defaults {
                     defaultsProperties.getOrDefault("charset", "UTF-8"));
             TIME_UNIT = (TimeUnit) FieldUtils.readStaticField(FieldUtils.getField(
                     TimeUnit.class, defaultsProperties.getOrDefault("time-unit", "SECONDS")));
-            DEFAULT_CONCURRENCY_LEVEL = Integer.parseInt(
+            CONCURRENCY_LEVEL = Integer.parseInt(
                     defaultsProperties.getOrDefault("concurrency-level", "16"));
         } catch (Exception e) {
             throw new IllegalStateException(e);
