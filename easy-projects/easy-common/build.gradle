@@ -27,15 +27,17 @@ dependencies {
     api("com.google.guava:guava")
     api("com.github.ben-manes.caffeine:caffeine")
     api("org.yaml:snakeyaml")
-    api("cglib:cglib")
 
     compileOnly("org.springframework:spring-core")
+    compileOnly("cglib:cglib")
+    compileOnly("com.squareup.okhttp3:okhttp")
 
-    api(project(":easy-projects:easy-test"))
+    testCompile(project(":easy-projects:easy-test"))
+
     testCompile("org.testng:testng")
-
     testCompile("org.springframework:spring-core")
     testCompile("cglib:cglib")
+    testCompile("com.squareup.okhttp3:okhttp")
 }
 
 test {
