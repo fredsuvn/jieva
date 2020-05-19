@@ -2,20 +2,12 @@ package xyz.srclab.common.util.proxy.provider.jdk;
 
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.MapHelper;
-import xyz.srclab.common.invoke.MethodInvoker;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.ConstructorHelper;
 import xyz.srclab.common.reflect.ReflectConstants;
-import xyz.srclab.common.util.proxy.ProxyClassProvider;
-import xyz.srclab.common.util.proxy.ProxyClass;
-import xyz.srclab.common.util.proxy.ProxyClassBuilder;
-import xyz.srclab.common.util.proxy.ProxyMethod;
+import xyz.srclab.common.util.proxy.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -28,21 +20,10 @@ public class JdkProxyClassProvider implements ProxyClassProvider {
         return new JdkProxyClassBuilder<>(type);
     }
 
-    private static final class JdkProxyClassBuilder<T>
-            extends CachedBuilder<ProxyClass<T>> implements ProxyClassBuilder<T> {
-
-        private final Class<T> type;
-        private final Map<Predicate<Method>, ProxyMethod> proxyMethodMap = new LinkedHashMap<>();
+    private static final class JdkProxyClassBuilder<T> extends AbstractProxyClassBuilder<T> {
 
         public JdkProxyClassBuilder(Class<T> type) {
-            this.type = type;
-        }
-
-        @Override
-        public ProxyClassBuilder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod) {
-            proxyMethodMap.put(methodPredicate, proxyMethod);
-            this.updateState();
-            return this;
+            super(type);
         }
 
         @Override
@@ -51,27 +32,10 @@ public class JdkProxyClassProvider implements ProxyClassProvider {
         }
     }
 
-    private static final class JdkProxyClass<T> implements ProxyClass<T> {
-
-        private final Class<?> type;
-        private final Map<Method, ProxyMethod> methodMap;
+    private static final class JdkProxyClass<T> extends AbstractProxyClass<T> {
 
         private JdkProxyClass(Class<?> type, Map<Predicate<Method>, ProxyMethod> proxyMethodMap) {
-            this.type = type;
-            if (proxyMethodMap.isEmpty()) {
-                this.methodMap = Collections.emptyMap();
-                return;
-            }
-            Map<Method, ProxyMethod> methodMap = new LinkedHashMap<>();
-            Method[] methods = type.getMethods();
-            for (Method method : methods) {
-                proxyMethodMap.forEach((predicate, proxyMethod) -> {
-                    if (predicate.test(method)) {
-                        methodMap.put(method, proxyMethod);
-                    }
-                });
-            }
-            this.methodMap = MapHelper.immutable(methodMap);
+            super(type, proxyMethodMap);
         }
 
         @Override
@@ -103,23 +67,18 @@ public class JdkProxyClassProvider implements ProxyClassProvider {
         public Class<T> getProxyClass() {
             throw new UnsupportedOperationException("JDK proxy doesn't support this");
         }
+    }
 
-        private static final class UnsupportedMethodInvoker implements MethodInvoker {
+    private static final class UnsupportedMethodInvoker implements SuperInvoker {
 
-            private static final String UNSUPPORTED_MESSAGE = "JDK proxy only supports proxying for interface, " +
-                    "so the interface method is abstract and cannot be invoked.";
+        private static final String UNSUPPORTED_MESSAGE = "JDK proxy only supports proxying for interface, " +
+                "so the interface method is abstract and cannot be invoked.";
 
-            private static final UnsupportedMethodInvoker INSTANCE = new UnsupportedMethodInvoker();
+        private static final UnsupportedMethodInvoker INSTANCE = new UnsupportedMethodInvoker();
 
-            @Override
-            public Method getMethod() {
-                throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
-            }
-
-            @Override
-            public @Nullable Object invoke(@Nullable Object object, Object... args) {
-                throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
-            }
+        @Override
+        public @Nullable Object invoke(@Nullable Object object, Object... args) {
+            throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
         }
     }
 }

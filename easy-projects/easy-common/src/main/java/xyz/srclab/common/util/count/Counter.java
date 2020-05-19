@@ -5,11 +5,11 @@ package xyz.srclab.common.util.count;
  */
 public interface Counter {
 
-    static Counter withZero() {
+    static Counter fromZero() {
         return new CounterImpl();
     }
 
-    static Counter with(long value) {
+    static Counter from(long value) {
         return new CounterImpl(value);
     }
 
