@@ -8,7 +8,7 @@ import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.lang.CharsRef;
 import xyz.srclab.common.lang.Pair;
-import xyz.srclab.common.reflect.ConstructorHelper;
+import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.string.StringHelper;
 
 import java.util.Arrays;
@@ -152,7 +152,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     }
 
     private T newProviderInstance(String className) {
-        return ConstructorHelper.newInstance(className, classLoader);
+        return ClassHelper.newInstance(className, classLoader);
     }
 
     private static final class ProviderCandidate {
