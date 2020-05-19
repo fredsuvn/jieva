@@ -31,6 +31,12 @@ public class ConstructorHelper {
         return (T) ConstructorInvoker.of(constructor).invoke();
     }
 
+    public static <T> T newInstance(Class<?> cls, Class<?>[] parameterTypes, Object[] arguments) {
+        @Nullable Constructor<?> constructor = getConstructor(cls, parameterTypes);
+        Checker.checkArguments(constructor != null, "Constructor not found: " + cls);
+        return (T) ConstructorInvoker.of(constructor).invoke(arguments);
+    }
+
     @Nullable
     public static <T> Constructor<T> getConstructor(Class<T> cls, Class<?>... parameterTypes) {
         Constructor<?> constructor = constructorCache.getNonNull(

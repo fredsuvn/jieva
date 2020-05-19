@@ -5,5 +5,5 @@ import xyz.srclab.annotation.Immutable;
 @Immutable
 public interface ClassProxyProvider {
 
-    <T> ProxyClass.Builder<T> newBuilder(Class<T> type);
+    <T> ProxyClassBuilder<T> newBuilder(Class<T> type);
 }
