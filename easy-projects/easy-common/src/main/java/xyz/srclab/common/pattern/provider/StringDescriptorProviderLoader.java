@@ -30,27 +30,36 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
             new ConditionOnMissingClass()
     ));
 
-    @Immutable
-    private final Map<String, T> providers;
-
+    private final String stringDescriptor;
     private final ClassLoader classLoader;
+
+    @Immutable
+    private @Nullable Map<String, T> providers;
 
     StringDescriptorProviderLoader(String stringDescriptor) {
         this(stringDescriptor, Context.getClassLoader());
     }
 
     StringDescriptorProviderLoader(String stringDescriptor, ClassLoader classLoader) {
-        List<ProviderCandidate> candidates = parseStringDescriptor(stringDescriptor);
-        this.providers = MapHelper.immutable(candidates.stream().collect(Collectors.toMap(
-                ProviderCandidate::getProviderName,
-                c -> newProviderInstance(c.getProviderClassName())
-        )));
+        this.stringDescriptor = stringDescriptor;
         this.classLoader = classLoader;
     }
 
     @Override
     public @Immutable Map<String, T> load() {
+        if (providers == null) {
+            providers = load0();
+        }
         return providers;
+    }
+
+    @Immutable
+    private Map<String, T> load0() {
+        List<ProviderCandidate> candidates = parseStringDescriptor(stringDescriptor);
+        return MapHelper.immutable(candidates.stream().collect(Collectors.toMap(
+                ProviderCandidate::getProviderName,
+                c -> newProviderInstance(c.getProviderClassName())
+        )));
     }
 
     private List<ProviderCandidate> parseStringDescriptor(String stringDescriptor) {
