@@ -4,9 +4,9 @@ import xyz.srclab.common.ToovaBoot;
 
 final class ProxyClassSupport {
 
-    private static final ClassProxyProvider classProxyProvider = ToovaBoot.getProvider(ClassProxyProvider.class);
+    private static final ProxyClassProvider proxyClassProvider = ToovaBoot.getProvider(ProxyClassProvider.class);
 
     static <T> ProxyClassBuilder<T> newBuilder(Class<T> superClass) {
-        return classProxyProvider.newBuilder(superClass);
+        return proxyClassProvider.newBuilder(superClass);
     }
 }

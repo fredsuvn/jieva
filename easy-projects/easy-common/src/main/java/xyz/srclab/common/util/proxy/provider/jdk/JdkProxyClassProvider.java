@@ -7,7 +7,7 @@ import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.ConstructorHelper;
 import xyz.srclab.common.reflect.ReflectConstants;
-import xyz.srclab.common.util.proxy.ClassProxyProvider;
+import xyz.srclab.common.util.proxy.ProxyClassProvider;
 import xyz.srclab.common.util.proxy.ProxyClass;
 import xyz.srclab.common.util.proxy.ProxyClassBuilder;
 import xyz.srclab.common.util.proxy.ProxyMethod;
@@ -19,9 +19,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class JdkClassProxyProvider implements ClassProxyProvider {
+public class JdkProxyClassProvider implements ProxyClassProvider {
 
-    public static final JdkClassProxyProvider INSTANCE = new JdkClassProxyProvider();
+    public static final JdkProxyClassProvider INSTANCE = new JdkProxyClassProvider();
 
     @Override
     public <T> ProxyClassBuilder<T> newBuilder(Class<T> type) {
