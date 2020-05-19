@@ -20,5 +20,5 @@ public interface ProxyClassBuilder<T> {
 
     ProxyClassBuilder<T> proxyMethod(Predicate<Method> methodPredicate, ProxyMethod proxyMethod);
 
-    <T1 extends T> ProxyClass<T1> build();
+    ProxyClass<T> build();
 }

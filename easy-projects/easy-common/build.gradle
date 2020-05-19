@@ -30,7 +30,7 @@ dependencies {
 
     compileOnly("org.springframework:spring-core")
     compileOnly("cglib:cglib")
-    compileOnly("com.squareup.okhttp3:okhttp")
+    api("com.squareup.okhttp3:okhttp")
 
     testCompile(project(":easy-projects:easy-test"))
 
@@ -38,6 +38,7 @@ dependencies {
     testCompile("org.springframework:spring-core")
     testCompile("cglib:cglib")
     testCompile("com.squareup.okhttp3:okhttp")
+    testCompile("com.squareup.okhttp3:mockwebserver")
 }
 
 test {
