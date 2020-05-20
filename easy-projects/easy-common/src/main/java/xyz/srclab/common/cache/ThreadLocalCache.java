@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.lang.Ref;
 
 import java.time.Duration;
 import java.util.Map;
@@ -29,12 +29,12 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public boolean hasAll(Iterable<K> keys) {
+    public boolean hasAll(Iterable<? extends K> keys) {
         return getCache().hasAll(keys);
     }
 
     @Override
-    public boolean hasAny(Iterable<K> keys) {
+    public boolean hasAny(Iterable<? extends K> keys) {
         return getCache().hasAny(keys);
     }
 
@@ -45,39 +45,44 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public @Nullable Ref<V> getIfPresent(K key) {
-        return getCache().getIfPresent(key);
+    @Nullable
+    public V getOrDefault(K key, @Nullable V defaultValue) {
+        return getCache().getOrDefault(key, defaultValue);
     }
 
     @Override
     @Nullable
-    public V get(K key, Function<K, @Nullable V> ifAbsent) {
-        return getCache().get(key, ifAbsent);
+    public V getOrCompute(K key, Function<? super K, ? extends @Nullable V> ifAbsent) {
+        return getCache().getOrCompute(key, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V get(K key, CacheValueFunction<K, @Nullable V> ifAbsent) {
-        return getCache().get(key, ifAbsent);
+    public V getOrCompute(K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) {
+        return getCache().getOrCompute(key, ifAbsent);
     }
 
     @Override
-    public Map<K, @Nullable V> getAll(Iterable<K> keys) throws NoSuchElementException {
+    @Immutable
+    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys) throws NoSuchElementException {
         return getCache().getAll(keys);
     }
 
     @Override
-    public Map<K, @Nullable V> getAll(Iterable<K> keys, Function<K, @Nullable V> ifAbsent) {
+    @Immutable
+    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys, Function<? super K, ? extends @Nullable V> ifAbsent) {
         return getCache().getAll(keys, ifAbsent);
     }
 
     @Override
-    public Map<K, @Nullable V> getAll(Iterable<K> keys, CacheValueFunction<K, @Nullable V> ifAbsent) {
+    @Immutable
+    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) {
         return getCache().getAll(keys, ifAbsent);
     }
 
     @Override
-    public Map<K, @Nullable V> getPresent(Iterable<K> keys) {
+    @Immutable
+    public Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
         return getCache().getPresent(keys);
     }
 
@@ -87,12 +92,12 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V getNonNull(K key, Function<K, @Nullable V> ifAbsent) throws NullPointerException {
+    public V getNonNull(K key, Function<? super K, ? extends @Nullable V> ifAbsent) throws NullPointerException {
         return getCache().getNonNull(key, ifAbsent);
     }
 
     @Override
-    public V getNonNull(K key, CacheValueFunction<K, @Nullable V> ifAbsent) throws NullPointerException {
+    public V getNonNull(K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) throws NullPointerException {
         return getCache().getNonNull(key, ifAbsent);
     }
 
@@ -102,27 +107,22 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void put(K key, Function<K, @Nullable V> valueFunction) {
-        getCache().put(key, valueFunction);
+    public void put(K key, @Nullable V value, CacheExpiry expiry) {
+        getCache().put(key, value, expiry);
     }
 
     @Override
-    public void put(K key, CacheValueFunction<K, @Nullable V> valueFunction) {
-        getCache().put(key, valueFunction);
-    }
-
-    @Override
-    public void putAll(Map<K, @Nullable V> data) {
+    public void putAll(Map<K, ? extends @Nullable V> data) {
         getCache().putAll(data);
     }
 
     @Override
-    public void putAll(Iterable<K> keys, Function<K, @Nullable V> valueFunction) {
+    public void putAll(Iterable<? extends K> keys, Function<? super K, ? extends @Nullable V> valueFunction) {
         getCache().putAll(keys, valueFunction);
     }
 
     @Override
-    public void putAll(Iterable<K> keys, CacheValueFunction<K, @Nullable V> valueFunction) {
+    public void putAll(Iterable<? extends K> keys, CacheFunction<? super K, ? extends @Nullable V> valueFunction) {
         getCache().putAll(keys, valueFunction);
     }
 
@@ -137,22 +137,22 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void expire(K key, Function<K, Duration> durationFunction) {
+    public void expire(K key, Function<? super K, Duration> durationFunction) {
         getCache().expire(key, durationFunction);
     }
 
     @Override
-    public void expireAll(Iterable<K> keys, long seconds) {
+    public void expireAll(Iterable<? extends K> keys, long seconds) {
         getCache().expireAll(keys, seconds);
     }
 
     @Override
-    public void expireAll(Iterable<K> keys, Duration duration) {
+    public void expireAll(Iterable<? extends K> keys, Duration duration) {
         getCache().expireAll(keys, duration);
     }
 
     @Override
-    public void expireAll(Iterable<K> keys, Function<K, Duration> durationFunction) {
+    public void expireAll(Iterable<? extends K> keys, Function<? super K, Duration> durationFunction) {
         getCache().expireAll(keys, durationFunction);
     }
 
@@ -162,7 +162,7 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void removeAll(Iterable<K> keys) {
+    public void removeAll(Iterable<? extends K> keys) {
         getCache().removeAll(keys);
     }
 

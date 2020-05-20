@@ -103,7 +103,7 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V get(K key, CacheValueFunction<K, @Nullable V> ifAbsent) {
+    public V get(K key, CacheExpiry<K, @Nullable V> ifAbsent) {
         return get(key, (Function<K, @Nullable V>) ifAbsent);
     }
 
@@ -133,7 +133,7 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public Map<K, V> getAll(Iterable<K> keys, CacheValueFunction<K, @Nullable V> ifAbsent) {
+    public Map<K, V> getAll(Iterable<K> keys, CacheExpiry<K, @Nullable V> ifAbsent) {
         return getAll(keys, (Function<K, @Nullable V>) ifAbsent);
     }
 
@@ -154,7 +154,7 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void put(K key, CacheValueFunction<K, @Nullable V> valueFunction) {
+    public void put(K key, CacheExpiry<K, @Nullable V> valueFunction) {
         put(key, (Function<K, @Nullable V>) valueFunction);
     }
 
@@ -173,7 +173,7 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void putAll(Iterable<K> keys, CacheValueFunction<K, @Nullable V> valueFunction) {
+    public void putAll(Iterable<K> keys, CacheExpiry<K, @Nullable V> valueFunction) {
         putAll(keys, (Function<K, @Nullable V>) valueFunction);
     }
 

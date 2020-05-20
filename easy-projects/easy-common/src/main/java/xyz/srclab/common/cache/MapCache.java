@@ -2,7 +2,7 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.lang.Ref;
+import xyz.srclab.common.base.Null;
 
 import java.time.Duration;
 import java.util.Map;
@@ -14,9 +14,9 @@ import java.util.function.Function;
  */
 final class MapCache<K, V> implements Cache<K, V> {
 
-    private final Map<K, Ref<V>> map;
+    private final Map<K, Object> map;
 
-    public MapCache(Map<K, Ref<V>> map) {
+    public MapCache(Map<K, Object> map) {
         this.map = map;
     }
 
@@ -27,40 +27,46 @@ final class MapCache<K, V> implements Cache<K, V> {
 
     @Override
     public V get(K key) throws NoSuchElementException {
-        @Nullable Ref<V> ref = map.get(key);
-        Checker.checkElementByKey(ref != null, key);
-        return ref.get();
+        @Nullable Object value = map.get(key);
+        Checker.checkElementByKey(value != null, key);
+        return unmask(value);
     }
 
     @Override
-    public @Nullable Ref<V> getIfPresent(K key) {
-        return map.get(key);
+    public V getOrDefault(K key, @Nullable V defaultValue) {
+        @Nullable Object value = map.getOrDefault(key, defaultValue);
+        if (value == defaultValue) {
+            return defaultValue;
+        }
+        if (value == null) {
+            return null;
+        }
+        return unmask(value);
     }
 
     @Override
-    public V get(K key, Function<K, @Nullable V> ifAbsent) {
-        return map.computeIfAbsent(key,
-                k -> Ref.of(ifAbsent.apply(k))).get();
+    public V getOrCompute(K key, Function<? super K, ? extends @Nullable V> ifAbsent) {
+        Object result = map.computeIfAbsent(key,
+                k -> {
+                    @Nullable V value = ifAbsent.apply(k);
+                    return value == null ? Null.asObject() : value;
+                });
+        return unmask(result);
     }
 
     @Override
-    public V get(K key, CacheValueFunction<K, @Nullable V> ifAbsent) {
-        return get(key, (Function<K, @Nullable V>) ifAbsent);
+    public V getOrCompute(K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) {
+        return getOrCompute(key, (Function<K, V>) k -> ifAbsent.apply(k).getValue());
     }
 
     @Override
     public void put(K key, @Nullable V value) {
-        map.put(key, Ref.of(value));
+        map.put(key, mask(value));
     }
 
     @Override
-    public void put(K key, Function<K, @Nullable V> valueFunction) {
-        map.put(key, Ref.of(valueFunction.apply(key)));
-    }
-
-    @Override
-    public void put(K key, CacheValueFunction<K, @Nullable V> valueFunction) {
-        put(key, (Function<K, @Nullable V>) valueFunction);
+    public void put(K key, @Nullable V value, CacheExpiry expiry) {
+        put(key, value);
     }
 
     @Override
@@ -68,7 +74,7 @@ final class MapCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void expire(K key, Function<K, Duration> durationFunction) {
+    public void expire(K key, Function<? super K, Duration> durationFunction) {
     }
 
     @Override
@@ -79,5 +85,14 @@ final class MapCache<K, V> implements Cache<K, V> {
     @Override
     public void removeAll() {
         map.clear();
+    }
+
+    private Object mask(@Nullable V value) {
+        return value == null ? Null.asObject() : value;
+    }
+
+    @Nullable
+    private V unmask(Object object) {
+        return Null.isNull(object) ? null : (V) object;
     }
 }

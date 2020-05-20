@@ -1,6 +1,7 @@
 package xyz.srclab.common.lang;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Checker;
 
 public abstract class Ref<T> {
 
@@ -14,6 +15,12 @@ public abstract class Ref<T> {
 
     @Nullable
     public abstract T get();
+
+    public T getNonNull() {
+        @Nullable T result = get();
+        Checker.checkNull(result != null);
+        return result;
+    }
 
     public abstract void set(@Nullable T value);
 
