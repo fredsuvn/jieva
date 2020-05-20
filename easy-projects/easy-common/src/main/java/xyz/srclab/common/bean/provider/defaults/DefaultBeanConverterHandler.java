@@ -158,6 +158,94 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
                 "Cannot convert object {} to set of element type {}", from, elementType));
     }
 
+    private void putCollectionFromArray(
+            Object array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        if (array instanceof Object[]) {
+            putCollectionFromArray((Object[]) array, elementType, beanOperator, collection);
+        } else if (array instanceof boolean[]) {
+            putCollectionFromArray((boolean[]) array, elementType, beanOperator, collection);
+        } else if (array instanceof byte[]) {
+            putCollectionFromArray((byte[]) array, elementType, beanOperator, collection);
+        } else if (array instanceof short[]) {
+            putCollectionFromArray((short[]) array, elementType, beanOperator, collection);
+        } else if (array instanceof char[]) {
+            putCollectionFromArray((char[]) array, elementType, beanOperator, collection);
+        } else if (array instanceof int[]) {
+            putCollectionFromArray((int[]) array, elementType, beanOperator, collection);
+        } else if (array instanceof long[]) {
+            putCollectionFromArray((long[]) array, elementType, beanOperator, collection);
+        } else if (array instanceof float[]) {
+            putCollectionFromArray((float[]) array, elementType, beanOperator, collection);
+        } else if (array instanceof double[]) {
+            putCollectionFromArray((double[]) array, elementType, beanOperator, collection);
+        } else {
+            throw new IllegalStateException("Unknown array type: " + array);
+        }
+    }
+
+    private void putCollectionFromArray(
+            Object[] array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        for (@Nullable Object o : array) {
+            collection.add(o == null ? null : beanOperator.convert(o, elementType));
+        }
+    }
+
+    private void putCollectionFromArray(
+            boolean[] array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        for (boolean o : array) {
+            collection.add(beanOperator.convert(o, elementType));
+        }
+    }
+
+    private void putCollectionFromArray(
+            byte[] array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        for (byte o : array) {
+            collection.add(beanOperator.convert(o, elementType));
+        }
+    }
+
+    private void putCollectionFromArray(
+            short[] array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        for (short o : array) {
+            collection.add(beanOperator.convert(o, elementType));
+        }
+    }
+
+    private void putCollectionFromArray(
+            char[] array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        for (char o : array) {
+            collection.add(beanOperator.convert(o, elementType));
+        }
+    }
+
+    private void putCollectionFromArray(
+            int[] array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        for (int o : array) {
+            collection.add(beanOperator.convert(o, elementType));
+        }
+    }
+
+    private void putCollectionFromArray(
+            long[] array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        for (long o : array) {
+            collection.add(beanOperator.convert(o, elementType));
+        }
+    }
+
+    private void putCollectionFromArray(
+            float[] array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        for (float o : array) {
+            collection.add(beanOperator.convert(o, elementType));
+        }
+    }
+
+    private void putCollectionFromArray(
+            double[] array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
+        for (double o : array) {
+            collection.add(beanOperator.convert(o, elementType));
+        }
+    }
+
     private Object toArray(Object from, Type arrayType, BeanOperator beanOperator) {
         Type componentType = ArrayHelper.getGenericComponentType(arrayType);
         if (from.getClass().isArray()) {
@@ -186,15 +274,6 @@ final class DefaultBeanConverterHandler implements BeanConverterHandler {
         }
         throw new UnsupportedOperationException(Formatter.fastFormat(
                 "Cannot convert object {} to array of element type {}", from, componentType));
-    }
-
-    private void putCollectionFromArray(
-            Object array, Type elementType, BeanOperator beanOperator, Collection<?> collection) {
-        int arrayLength = Array.getLength(array);
-        for (int i = 0; i < arrayLength; i++) {
-            @Nullable Object value = Array.get(array, i);
-            collection.add(value == null ? null : beanOperator.convert(value, elementType));
-        }
     }
 
     private Object toBean(Object from, Class<?> to, BeanOperator beanOperator) {
