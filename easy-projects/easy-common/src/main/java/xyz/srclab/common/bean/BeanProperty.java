@@ -30,5 +30,5 @@ public interface BeanProperty extends BeanMember {
     Field getField();
 
     @Immutable
-    List<Annotation> getFieldAnnotations() throws UnsupportedOperationException;
+    List<Annotation> getFieldAnnotations();
 }

@@ -2,24 +2,22 @@ package xyz.srclab.common.bean.provider.defaults;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Null;
 import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.bean.BeanMethod;
 import xyz.srclab.common.bean.BeanProperty;
 import xyz.srclab.common.bean.BeanResolverHandler;
 import xyz.srclab.common.cache.Cache;
+import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.invoke.MethodInvoker;
-import xyz.srclab.common.reflect.NullMember;
 
 import java.beans.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 final class DefaultBeanResolverHandler implements BeanResolverHandler {
 
@@ -157,21 +155,23 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
                 try {
                     field = ownerType.getDeclaredField(getName());
                 } catch (NoSuchFieldException e) {
-                    field = NullMember.asField();
+                    field = Null.asField();
                 }
             }
-            return Objects.equals(NullMember.asField(), field) ? null : field;
+            return Null.isNull(field) ? null : field;
         }
 
         @Override
-        public @Immutable List<Annotation> getFieldAnnotations() throws UnsupportedOperationException {
-
-            @Nullable Field field = getField();
-            if (field == null) {
-                throw new UnsupportedOperationException("Field " + getName() + " not found.");
+        public @Immutable List<Annotation> getFieldAnnotations() {
+            if (annotations == null) {
+                @Nullable Field field = getField();
+                if (field == null) {
+                    annotations = Collections.emptyList();
+                } else {
+                    annotations = ListHelper.immutable(Arrays.asList(field.getAnnotations()));
+                }
             }
-            field.getAnnotations();
-            return null;
+            return annotations;
         }
 
         @Override

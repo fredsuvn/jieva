@@ -23,12 +23,16 @@ public class Defaults {
     static {
         try {
             Map<String, String> defaultsProperties = ToovaBoot.getDefaultProperties();
+
             LOCALE = (Locale) FieldUtils.readStaticField(FieldUtils.getField(
                     Locale.class, defaultsProperties.getOrDefault("local", "US")));
+
             CHARSET = Charset.forName(
                     defaultsProperties.getOrDefault("charset", "UTF-8"));
+
             TIME_UNIT = (TimeUnit) FieldUtils.readStaticField(FieldUtils.getField(
                     TimeUnit.class, defaultsProperties.getOrDefault("time-unit", "SECONDS")));
+
             CONCURRENCY_LEVEL = Integer.parseInt(
                     defaultsProperties.getOrDefault("concurrency-level", "16"));
         } catch (Exception e) {

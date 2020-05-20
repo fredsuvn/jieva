@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ClassUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Context;
+import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 import xyz.srclab.common.lang.Key;
@@ -67,7 +68,7 @@ public class ClassHelper {
                 Key.from(cls, targetSuperClass),
                 k -> getGenericSuperclass0(cls, targetSuperClass)
         );
-        return result == NullMember.asType() ? null : result;
+        return Null.isNull(result) ? null : result;
     }
 
     private static Type getGenericSuperclass0(Class<?> cls, Class<?> superClass) {
@@ -79,7 +80,7 @@ public class ClassHelper {
             }
             current = currentClass.getGenericSuperclass();
         } while (current != null);
-        return NullMember.asType();
+        return Null.asType();
     }
 
     public static Class<?> primitiveToWrapper(Class<?> primitive) {

@@ -2,6 +2,7 @@ package xyz.srclab.common.reflect;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.lang.Key;
@@ -25,17 +26,14 @@ public class MethodHelper {
                 Key.from(cls, methodName, parameterTypes),
                 k -> getMethod0(cls, methodName, parameterTypes)
         );
-        if (result == NullMember.asMethod()) {
-            return null;
-        }
-        return result;
+        return Null.isNull(result) ? null : result;
     }
 
     private static Method getMethod0(Class<?> cls, String methodName, Class<?>... parameterTypes) {
         try {
             return cls.getMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException e) {
-            return NullMember.asMethod();
+            return Null.asMethod();
         }
     }
 

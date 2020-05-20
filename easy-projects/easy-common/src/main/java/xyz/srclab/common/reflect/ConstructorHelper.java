@@ -1,6 +1,7 @@
 package xyz.srclab.common.reflect;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.lang.Key;
 
@@ -16,17 +17,14 @@ public class ConstructorHelper {
                 Key.from(cls, parameterTypes),
                 k -> getConstructor0(cls, parameterTypes)
         );
-        if (constructor == NullMember.asConstructor()) {
-            return null;
-        }
-        return (Constructor<T>) constructor;
+        return Null.isNull(constructor) ? null : (Constructor<T>) constructor;
     }
 
     private static Constructor<?> getConstructor0(Class<?> cls, Class<?>... parameterTypes) {
         try {
             return cls.getConstructor(parameterTypes);
         } catch (NoSuchMethodException e) {
-            return NullMember.asConstructor();
+            return Null.asConstructor();
         }
     }
 }
