@@ -60,7 +60,7 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public boolean has(K key) {
+    public boolean contains(K key) {
         return caffeine.getIfPresent(key) != null;
     }
 

@@ -17,8 +17,8 @@ final class L2Cache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public boolean has(K key) {
-        return l2.has(key) || l1.has(key);
+    public boolean contains(K key) {
+        return l2.contains(key) || l1.contains(key);
     }
 
     @Override
@@ -27,17 +27,17 @@ final class L2Cache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V getOrDefault(K key, @Nullable V defaultValue) {
+    public V get(K key, @Nullable V defaultValue) {
         return null;
     }
 
     @Override
-    public V getOrCompute(K key, Function<? super K, ? extends V> ifAbsent) {
+    public V get(K key, Function<? super K, ? extends V> ifAbsent) {
         return null;
     }
 
     @Override
-    public V getOrCompute(K key, CacheFunction<? super K, ? extends V> ifAbsent) {
+    public V get(K key, CacheFunction<? super K, ? extends V> ifAbsent) {
         return null;
     }
 

@@ -1,5 +1,6 @@
 package xyz.srclab.common.cache;
 
+import com.google.common.collect.MapMaker;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
@@ -7,10 +8,8 @@ import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.MapHelper;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public interface Cache<K, V> {
@@ -21,7 +20,7 @@ public interface Cache<K, V> {
 
     static <K, V> Cache<K, V> newPermanent(int concurrencyLevel) {
         Map<K, Object> map = concurrencyLevel <= 1 ?
-                new HashMap<>() : MapHelper.newConcurrentMap(concurrencyLevel);
+                new HashMap<>() : new MapMaker().concurrencyLevel(concurrencyLevel).makeMap();
         return new MapCache<>(map);
     }
 
@@ -63,20 +62,20 @@ public interface Cache<K, V> {
         return new CacheBuilder<>();
     }
 
-    boolean has(K key);
+    boolean contains(K key);
 
-    default boolean hasAll(Iterable<? extends K> keys) {
+    default boolean containsAll(Iterable<? extends K> keys) {
         for (K key : keys) {
-            if (!has(key)) {
+            if (!contains(key)) {
                 return false;
             }
         }
         return true;
     }
 
-    default boolean hasAny(Iterable<? extends K> keys) {
+    default boolean containsAny(Iterable<? extends K> keys) {
         for (K key : keys) {
-            if (has(key)) {
+            if (contains(key)) {
                 return true;
             }
         }
@@ -87,13 +86,16 @@ public interface Cache<K, V> {
     V get(K key) throws NoSuchElementException;
 
     @Nullable
-    V getOrDefault(K key, @Nullable V defaultValue);
+    V get(K key, @Nullable V defaultValue);
 
     @Nullable
-    V getOrCompute(K key, Function<? super K, ? extends @Nullable V> ifAbsent);
+    V get(K key, Function<? super K, ? extends @Nullable V> ifAbsent);
 
     @Nullable
-    V getOrCompute(K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent);
+    V get(K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent);
+
+    @Nullable
+    V compute(K key, BiFunction<? super K, ? super @Nullable V, ? extends @Nullable V> remappingFunction);
 
     @Immutable
     default Map<K, @Nullable V> getAll(Iterable<? extends K> keys) throws NoSuchElementException {
@@ -109,7 +111,7 @@ public interface Cache<K, V> {
             Iterable<? extends K> keys, Function<? super K, ? extends @Nullable V> ifAbsent) {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
-            map.put(key, getOrCompute(key, ifAbsent));
+            map.put(key, get(key, ifAbsent));
         }
         return MapHelper.immutable(map);
     }
@@ -119,7 +121,7 @@ public interface Cache<K, V> {
             Iterable<? extends K> keys, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
-            map.put(key, getOrCompute(key, ifAbsent));
+            map.put(key, get(key, ifAbsent));
         }
         return MapHelper.immutable(map);
     }
@@ -130,7 +132,7 @@ public interface Cache<K, V> {
         Cache<K, Object> cast = (Cache<K, Object>) this;
         Object defaultValue = new Object();
         for (K key : keys) {
-            @Nullable Object value = cast.getOrDefault(key, defaultValue);
+            @Nullable Object value = cast.get(key, defaultValue);
             if (value == defaultValue) {
                 continue;
             }
@@ -148,14 +150,14 @@ public interface Cache<K, V> {
 
     default V getNonNull(
             K key, Function<? super K, ? extends @Nullable V> ifAbsent) throws NullPointerException {
-        @Nullable V result = getOrCompute(key, ifAbsent);
+        @Nullable V result = get(key, ifAbsent);
         Checker.checkNull(result != null);
         return result;
     }
 
     default V getNonNull(
             K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) throws NullPointerException {
-        @Nullable V result = getOrCompute(key, ifAbsent);
+        @Nullable V result = get(key, ifAbsent);
         Checker.checkNull(result != null);
         return result;
     }

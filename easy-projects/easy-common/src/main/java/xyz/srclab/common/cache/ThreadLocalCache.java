@@ -24,18 +24,18 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public boolean has(K key) {
-        return getCache().has(key);
+    public boolean contains(K key) {
+        return getCache().contains(key);
     }
 
     @Override
-    public boolean hasAll(Iterable<? extends K> keys) {
-        return getCache().hasAll(keys);
+    public boolean containsAll(Iterable<? extends K> keys) {
+        return getCache().containsAll(keys);
     }
 
     @Override
-    public boolean hasAny(Iterable<? extends K> keys) {
-        return getCache().hasAny(keys);
+    public boolean containsAny(Iterable<? extends K> keys) {
+        return getCache().containsAny(keys);
     }
 
     @Override
@@ -46,20 +46,20 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V getOrDefault(K key, @Nullable V defaultValue) {
-        return getCache().getOrDefault(key, defaultValue);
+    public V get(K key, @Nullable V defaultValue) {
+        return getCache().get(key, defaultValue);
     }
 
     @Override
     @Nullable
-    public V getOrCompute(K key, Function<? super K, ? extends @Nullable V> ifAbsent) {
-        return getCache().getOrCompute(key, ifAbsent);
+    public V get(K key, Function<? super K, ? extends @Nullable V> ifAbsent) {
+        return getCache().get(key, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V getOrCompute(K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) {
-        return getCache().getOrCompute(key, ifAbsent);
+    public V get(K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) {
+        return getCache().get(key, ifAbsent);
     }
 
     @Override

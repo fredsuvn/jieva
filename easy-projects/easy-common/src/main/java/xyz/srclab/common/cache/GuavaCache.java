@@ -64,7 +64,7 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public boolean has(K key) {
+    public boolean contains(K key) {
         return guava.getIfPresent(key) != null;
     }
 

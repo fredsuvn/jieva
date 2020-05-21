@@ -1,7 +1,6 @@
 package xyz.srclab.common.collection;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.MapMaker;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.WrittenReturn;
@@ -61,9 +60,5 @@ public class MapHelper {
             }
         });
         return immutable((result));
-    }
-
-    public static <K, V> Map<K, V> newConcurrentMap(int concurrentLevel) {
-        return new MapMaker().concurrencyLevel(concurrentLevel).makeMap();
     }
 }
