@@ -8,7 +8,7 @@ import java.util.WeakHashMap;
 /**
  * @author sunqian
  */
-final class CacheSupport {
+final class CacheKit {
 
     static <K, V> Map<K, V> newGcMap(int concurrencyLevel) {
         if (concurrencyLevel <= 1) {

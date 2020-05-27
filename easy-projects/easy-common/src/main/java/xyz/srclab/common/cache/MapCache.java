@@ -1,12 +1,13 @@
 package xyz.srclab.common.cache;
 
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Null;
+import xyz.srclab.common.collection.MapHelper;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 /**
@@ -14,9 +15,9 @@ import java.util.function.Function;
  */
 final class MapCache<K, V> implements Cache<K, V> {
 
-    private final Map<K, Object> map;
+    private final Map<K, V> map;
 
-    public MapCache(Map<K, Object> map) {
+    public MapCache(Map<K, V> map) {
         this.map = map;
     }
 
@@ -26,47 +27,47 @@ final class MapCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V get(K key) throws NoSuchElementException {
-        @Nullable Object value = map.get(key);
-        Checker.checkElementByKey(value != null, key);
-        return unmask(value);
+    public V get(K key) {
+        return map.get(key);
     }
 
     @Override
     public V get(K key, @Nullable V defaultValue) {
-        @Nullable Object value = map.getOrDefault(key, defaultValue);
-        if (value == defaultValue) {
-            return defaultValue;
-        }
-        if (value == null) {
-            return null;
-        }
-        return unmask(value);
+        return map.getOrDefault(key, defaultValue);
     }
 
     @Override
     public V get(K key, Function<? super K, ? extends @Nullable V> ifAbsent) {
-        Object result = map.computeIfAbsent(key,
-                k -> {
-                    @Nullable V value = ifAbsent.apply(k);
-                    return value == null ? Null.asObject() : value;
-                });
-        return unmask(result);
+        return map.computeIfAbsent(key, ifAbsent);
     }
 
     @Override
-    public V get(K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) {
-        return get(key, (Function<K, V>) k -> ifAbsent.apply(k).getValue());
+    public V get(K key, CacheLoader<? super K, ? extends V> loader) {
+        return get(key, loader::load);
+    }
+
+    @Override
+    public @Immutable Map<K, V> getPresent(Iterable<? extends K> keys) {
+        Map<K, V> result = new LinkedHashMap<>();
+        Map<K, Object> _map = (Map<K, Object>) map;
+        for (K key : keys) {
+            @Nullable Object value = _map.getOrDefault(key, Null.asObject());
+            if (value != null && Null.isNull(value)) {
+                continue;
+            }
+            result.put(key, (V) value);
+        }
+        return MapHelper.immutable(result);
     }
 
     @Override
     public void put(K key, @Nullable V value) {
-        map.put(key, mask(value));
+        map.put(key, value);
     }
 
     @Override
-    public void put(K key, @Nullable V value, CacheExpiry expiry) {
-        put(key, value);
+    public void put(K key, CacheLoader<? super K, ? extends V> loader) {
+        put(key, loader.load(key));
     }
 
     @Override
@@ -85,14 +86,5 @@ final class MapCache<K, V> implements Cache<K, V> {
     @Override
     public void removeAll() {
         map.clear();
-    }
-
-    private Object mask(@Nullable V value) {
-        return value == null ? Null.asObject() : value;
-    }
-
-    @Nullable
-    private V unmask(Object object) {
-        return Null.isNull(object) ? null : (V) object;
     }
 }

@@ -8,8 +8,9 @@ import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.MapHelper;
 
 import java.time.Duration;
-import java.util.*;
-import java.util.function.BiFunction;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 public interface Cache<K, V> {
@@ -29,7 +30,7 @@ public interface Cache<K, V> {
     }
 
     static <K, V> Cache<K, V> newGcThreadLocal() {
-        return new ThreadLocalCache<>(newMapped(CacheSupport.newGcMap(0)));
+        return new ThreadLocalCache<>(newMapped(CacheKit.newGcMap(0)));
     }
 
     static <K, V> Cache<K, V> newGcConcurrent() {
@@ -37,7 +38,7 @@ public interface Cache<K, V> {
     }
 
     static <K, V> Cache<K, V> newGcConcurrent(int concurrencyLevel) {
-        return new MapCache<>(CacheSupport.newGcMap(concurrencyLevel));
+        return new MapCache<>(CacheKit.newGcMap(concurrencyLevel));
     }
 
     static <K, V> Cache<K, V> newL2Cache(Cache<K, V> l1, Cache<K, V> l2) {
@@ -83,32 +84,23 @@ public interface Cache<K, V> {
     }
 
     @Nullable
-    V get(K key) throws NoSuchElementException;
+    V get(K key);
 
     @Nullable
     V get(K key, @Nullable V defaultValue);
 
     @Nullable
-    V get(K key, Function<? super K, ? extends @Nullable V> ifAbsent);
+    V get(K key, Function<? super K, @Nullable ? extends V> ifAbsent);
 
     @Nullable
-    V get(K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent);
-
-    @Nullable
-    V compute(K key, BiFunction<? super K, ? super @Nullable V, ? extends @Nullable V> remappingFunction);
+    V get(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
 
     @Immutable
-    default Map<K, @Nullable V> getAll(Iterable<? extends K> keys) throws NoSuchElementException {
-        Map<K, V> map = new LinkedHashMap<>();
-        for (K key : keys) {
-            map.put(key, get(key));
-        }
-        return MapHelper.immutable(map);
-    }
+    Map<K, @Nullable V> getPresent(Iterable<? extends K> keys);
 
     @Immutable
     default Map<K, @Nullable V> getAll(
-            Iterable<? extends K> keys, Function<? super K, ? extends @Nullable V> ifAbsent) {
+            Iterable<? extends K> keys, Function<? super K, @Nullable ? extends V> ifAbsent) {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
             map.put(key, get(key, ifAbsent));
@@ -118,76 +110,43 @@ public interface Cache<K, V> {
 
     @Immutable
     default Map<K, @Nullable V> getAll(
-            Iterable<? extends K> keys, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) {
+            Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
         Map<K, V> map = new LinkedHashMap<>();
         for (K key : keys) {
-            map.put(key, get(key, ifAbsent));
+            map.put(key, get(key, loader));
         }
         return MapHelper.immutable(map);
     }
 
-    @Immutable
-    default Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
-        Map<K, V> map = new LinkedHashMap<>();
-        Cache<K, Object> cast = (Cache<K, Object>) this;
-        Object defaultValue = new Object();
-        for (K key : keys) {
-            @Nullable Object value = cast.get(key, defaultValue);
-            if (value == defaultValue) {
-                continue;
-            }
-            @Nullable V v = value == null ? null : (V) value;
-            map.put(key, v);
-        }
-        return MapHelper.immutable(map);
-    }
-
-    default V getNonNull(K key) throws NoSuchElementException, NullPointerException {
+    default V getNonNull(K key) throws NullPointerException {
         @Nullable V result = get(key);
         Checker.checkNull(result != null);
         return result;
     }
 
-    default V getNonNull(
-            K key, Function<? super K, ? extends @Nullable V> ifAbsent) throws NullPointerException {
+    default V getNonNull(K key, Function<? super K, @Nullable ? extends V> ifAbsent) throws NullPointerException {
         @Nullable V result = get(key, ifAbsent);
         Checker.checkNull(result != null);
         return result;
     }
 
-    default V getNonNull(
-            K key, CacheFunction<? super K, ? extends @Nullable V> ifAbsent) throws NullPointerException {
-        @Nullable V result = get(key, ifAbsent);
+    default V getNonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NullPointerException {
+        @Nullable V result = get(key, loader);
         Checker.checkNull(result != null);
         return result;
     }
 
     void put(K key, @Nullable V value);
 
-    void put(K key, @Nullable V value, CacheExpiry expiry);
+    void put(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
 
-    default void putAll(Map<K, ? extends @Nullable V> data) {
+    default void putAll(Map<K, @Nullable ? extends V> data) {
         data.forEach(this::put);
     }
 
-    default void putAll(
-            Iterable<? extends K> keys, Function<? super K, ? extends @Nullable V> valueFunction) {
+    default void putAll(Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
         for (K key : keys) {
-            @Nullable V value = valueFunction.apply(key);
-            put(key, value);
-        }
-    }
-
-    default void putAll(
-            Iterable<? extends K> keys, CacheFunction<? super K, ? extends @Nullable V> valueFunction) {
-        for (K key : keys) {
-            Cached<? extends V> cached = valueFunction.apply(key);
-            @Nullable CacheExpiry expiry = cached.getExpiry();
-            if (expiry == null) {
-                put(key, cached.getValue());
-            } else {
-                put(key, cached.getValue(), expiry);
-            }
+            put(key, loader);
         }
     }
 
@@ -197,18 +156,24 @@ public interface Cache<K, V> {
 
     void expire(K key, Duration duration);
 
-    void expire(K key, Function<? super K, Duration> durationFunction);
+    default void expire(K key, Function<? super K, Duration> durationFunction) {
+        expire(key, durationFunction.apply(key));
+    }
 
     default void expireAll(Iterable<? extends K> keys, long seconds) {
         expireAll(keys, Duration.ofSeconds(seconds));
     }
 
     default void expireAll(Iterable<? extends K> keys, Duration duration) {
-        expireAll(keys, k -> duration);
+        for (K key : keys) {
+            expire(key, duration);
+        }
     }
 
     default void expireAll(Iterable<? extends K> keys, Function<? super K, Duration> durationFunction) {
-        keys.forEach(k -> expire(k, durationFunction));
+        for (K key : keys) {
+            expire(key, durationFunction);
+        }
     }
 
     void remove(K key);

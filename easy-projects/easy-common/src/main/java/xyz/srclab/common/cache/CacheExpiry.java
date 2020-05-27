@@ -10,10 +10,17 @@ import java.time.Duration;
  */
 public interface CacheExpiry {
 
+    static Builder newBuilder() {
+        return new Builder();
+    }
+
+    @Nullable
     Duration getExpiryAfterCreate();
 
+    @Nullable
     Duration getExpiryAfterUpdate();
 
+    @Nullable
     Duration getExpiryAfterRead();
 
     final class Builder extends CachedBuilder<CacheExpiry> {
@@ -46,27 +53,31 @@ public interface CacheExpiry {
         }
 
         private static final class CacheExpiryImpl implements CacheExpiry {
-            private final Duration expiryAfterCreate;
-            private final Duration expiryAfterRead;
-            private final Duration expiryAfterUpdate;
+
+            private final @Nullable Duration expiryAfterCreate;
+            private final @Nullable Duration expiryAfterRead;
+            private final @Nullable Duration expiryAfterUpdate;
 
             private CacheExpiryImpl(Builder builder) {
-                this.expiryAfterCreate = builder.expiryAfterCreate == null ? Duration.ZERO : builder.expiryAfterCreate;
-                this.expiryAfterRead = builder.expiryAfterRead == null ? Duration.ZERO : builder.expiryAfterRead;
-                this.expiryAfterUpdate = builder.expiryAfterUpdate == null ? Duration.ZERO : builder.expiryAfterUpdate;
+                this.expiryAfterCreate = builder.expiryAfterCreate;
+                this.expiryAfterRead = builder.expiryAfterRead;
+                this.expiryAfterUpdate = builder.expiryAfterUpdate;
             }
 
             @Override
+            @Nullable
             public Duration getExpiryAfterCreate() {
                 return expiryAfterCreate;
             }
 
             @Override
+            @Nullable
             public Duration getExpiryAfterUpdate() {
                 return expiryAfterRead;
             }
 
             @Override
+            @Nullable
             public Duration getExpiryAfterRead() {
                 return expiryAfterUpdate;
             }

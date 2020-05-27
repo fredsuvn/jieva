@@ -2,9 +2,10 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Defaults;
-import xyz.srclab.common.cache.listener.*;
-
-import java.time.Duration;
+import xyz.srclab.common.cache.listener.CacheCreateListener;
+import xyz.srclab.common.cache.listener.CacheReadListener;
+import xyz.srclab.common.cache.listener.CacheRemoveListener;
+import xyz.srclab.common.cache.listener.CacheUpdateListener;
 
 /**
  * @author sunqian
@@ -18,9 +19,9 @@ public final class CacheBuilder<K, V> {
     private long maxSize = Long.MAX_VALUE;
     private int concurrencyLevel = Defaults.CONCURRENCY_LEVEL;
 
-    private @Nullable Duration expiryAfterCreate;
-    private @Nullable Duration expiryAfterRead;
-    private @Nullable Duration expiryAfterUpdate;
+    private @Nullable CacheExpiry expiry;
+
+    private @Nullable CacheLoader<? super K, @Nullable ? extends V> loader;
 
     private @Nullable CacheCreateListener<K, V> createListener;
     private @Nullable CacheReadListener<K, V> readListener;
@@ -39,18 +40,13 @@ public final class CacheBuilder<K, V> {
         return this;
     }
 
-    public CacheBuilder<K, V> setExpiryAfterCreate(Duration expiryAfterCreate) {
-        this.expiryAfterCreate = expiryAfterCreate;
+    public CacheBuilder<K, V> setExpiry(CacheExpiry expiry) {
+        this.expiry = expiry;
         return this;
     }
 
-    public CacheBuilder<K, V> setExpiryAfterRead(Duration expiryAfterRead) {
-        this.expiryAfterRead = expiryAfterRead;
-        return this;
-    }
-
-    public CacheBuilder<K, V> setExpiryAfterUpdate(Duration expiryAfterUpdate) {
-        this.expiryAfterUpdate = expiryAfterUpdate;
+    public CacheBuilder<K, V> setLoader(CacheLoader<? super K, @Nullable ? extends V> loader) {
+        this.loader = loader;
         return this;
     }
 
@@ -84,40 +80,46 @@ public final class CacheBuilder<K, V> {
         return this;
     }
 
-    public long getMaxSize() {
+    long getMaxSize() {
         return maxSize;
     }
 
-    public int getConcurrencyLevel() {
+    int getConcurrencyLevel() {
         return concurrencyLevel;
     }
 
-    public Duration getExpiryAfterCreate() {
-        return expiryAfterCreate == null ? Duration.ZERO : expiryAfterCreate;
+    @Nullable
+    CacheExpiry getExpiry() {
+        return expiry;
     }
 
-    public Duration getExpiryAfterRead() {
-        return expiryAfterRead == null ? Duration.ZERO : expiryAfterRead;
+    @Nullable
+    CacheLoader<? super K, @Nullable ? extends V> getLoader() {
+        return loader;
     }
 
-    public Duration getExpiryAfterUpdate() {
-        return expiryAfterUpdate == null ? Duration.ZERO : expiryAfterUpdate;
+    @Nullable
+    CacheCreateListener<K, V> getCreateListener() {
+        return createListener;
     }
 
-    public CacheCreateListener<K, V> getCreateListener() {
-        return createListener == null ? CacheListener.emptyCreateListener() : createListener;
+    @Nullable
+    CacheReadListener<K, V> getReadListener() {
+        return readListener;
     }
 
-    public CacheReadListener<K, V> getReadListener() {
-        return readListener == null ? CacheListener.emptyReadListener() : readListener;
+    @Nullable
+    CacheUpdateListener<K, V> getUpdateListener() {
+        return updateListener;
     }
 
-    public CacheUpdateListener<K, V> getUpdateListener() {
-        return updateListener == null ? CacheListener.emptyUpdateListener() : updateListener;
+    @Nullable
+    CacheRemoveListener<K, V> getRemoveListener() {
+        return removeListener;
     }
 
-    public CacheRemoveListener<K, V> getRemoveListener() {
-        return removeListener == null ? CacheListener.emptyRemoveListener() : removeListener;
+    boolean isUseGuava() {
+        return useGuava;
     }
 
     public <K1 extends K, V1 extends V> Cache<K1, V1> build() {

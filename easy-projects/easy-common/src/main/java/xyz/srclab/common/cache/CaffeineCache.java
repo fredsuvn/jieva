@@ -1,15 +1,14 @@
 package xyz.srclab.common.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
-import xyz.srclab.common.collection.IterableHelper;
-import xyz.srclab.common.collection.MapHelper;
-import xyz.srclab.common.lang.Ref;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -17,46 +16,62 @@ import java.util.function.Function;
  */
 final class CaffeineCache<K, V> implements Cache<K, V> {
 
-    private static final Object NULL = new Object();
-
     private final com.github.benmanes.caffeine.cache.Cache<K, Object> caffeine;
 
-    private final CacheRemoveListener<K, V> cacheRemoveListener;
-
     CaffeineCache(CacheBuilder<K, V> builder) {
-        this.cacheRemoveListener = builder.getRemoveListener();
-        Caffeine<K, Object> caffeine = Caffeine.newBuilder()
-                .maximumSize(builder.getMaxSize())
-                .expireAfterWrite(builder.getExpiryAfterUpdate())
-                .expireAfterAccess(builder.getExpiryAfterCreate())
-                .softValues()
-                .removalListener((key, value, cause) -> {
-                    if (key == null || value == null) {
-                        return;
-                    }
-                    CacheRemoveListener.Cause removeCause;
-                    switch (cause) {
-                        case SIZE:
-                            removeCause = CacheRemoveListener.Cause.SIZE;
-                            break;
-                        case EXPIRED:
-                            removeCause = CacheRemoveListener.Cause.EXPIRED;
-                            break;
-                        case COLLECTED:
-                            removeCause = CacheRemoveListener.Cause.COLLECTED;
-                            break;
-                        case EXPLICIT:
-                            removeCause = CacheRemoveListener.Cause.EXPLICIT;
-                            break;
-                        case REPLACED:
-                            removeCause = CacheRemoveListener.Cause.REPLACED;
-                            break;
-                        default:
-                            throw new IllegalStateException("Unknown remove cause: " + cause);
-                    }
-                    cacheRemoveListener.afterRemove(key, unmaskValue(value), removeCause);
-                });
-        this.caffeine = caffeine.build();
+        Caffeine<K, Object> caffeine = (Caffeine<K, Object>) Caffeine.newBuilder();
+        caffeine.maximumSize(builder.getMaxSize());
+        if (builder.getExpiry() != null) {
+            CacheExpiry expiry = builder.getExpiry();
+            if (expiry.getExpiryAfterUpdate() != null) {
+                caffeine.expireAfterWrite(expiry.getExpiryAfterUpdate());
+            }
+            if (expiry.getExpiryAfterCreate() != null) {
+                caffeine.expireAfterAccess(expiry.getExpiryAfterCreate());
+            }
+        }
+        if (builder.getRemoveListener() != null) {
+            CacheRemoveListener<K, V> cacheRemoveListener = builder.getRemoveListener();
+            caffeine.removalListener((key, value, cause) -> {
+                if (key == null || value == null) {
+                    return;
+                }
+                CacheRemoveListener.Cause removeCause;
+                switch (cause) {
+                    case SIZE:
+                        removeCause = CacheRemoveListener.Cause.SIZE;
+                        break;
+                    case EXPIRED:
+                        removeCause = CacheRemoveListener.Cause.EXPIRED;
+                        break;
+                    case COLLECTED:
+                        removeCause = CacheRemoveListener.Cause.COLLECTED;
+                        break;
+                    case EXPLICIT:
+                        removeCause = CacheRemoveListener.Cause.EXPLICIT;
+                        break;
+                    case REPLACED:
+                        removeCause = CacheRemoveListener.Cause.REPLACED;
+                        break;
+                    default:
+                        throw new IllegalStateException("Unknown remove cause: " + cause);
+                }
+                cacheRemoveListener.afterRemove(key, unmask(value), removeCause);
+            });
+        }
+        if (builder.getLoader() == null) {
+            this.caffeine = caffeine.build();
+        } else {
+            CacheLoader<? super K, @Nullable ? extends V> loader = builder.getLoader();
+            this.caffeine = caffeine.build(new com.github.benmanes.caffeine.cache.CacheLoader<K, Object>() {
+                @org.checkerframework.checker.nullness.qual.Nullable
+                @Override
+                public Object load(@NonNull K key) throws Exception {
+                    @Nullable V value = loader.load(key);
+                    return value == null ? Null.asObject() : value;
+                }
+            });
+        }
     }
 
     @Override
@@ -65,150 +80,64 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public boolean hasAll(Iterable<K> keys) {
-        return caffeine.getAllPresent(keys).size() == IterableHelper.asCollection(keys).size();
-    }
-
-    @Override
-    public boolean hasAny(Iterable<K> keys) {
-        return !caffeine.getAllPresent(keys).isEmpty();
-    }
-
-    @Override
-    public V get(K key) throws NoSuchElementException {
+    public V get(K key) {
         @Nullable Object value = caffeine.getIfPresent(key);
-        Checker.checkElementByKey(value != null, key);
-        return unmaskValue(value);
+        return value == null ? null : unmask(value);
     }
 
     @Override
-    public @Nullable Ref<V> getIfPresent(K key) {
+    public V get(K key, @Nullable V defaultValue) {
         @Nullable Object value = caffeine.getIfPresent(key);
-        return value == null ?
-                null : Ref.of(unmaskValue(value));
+        return value == null ? defaultValue : unmask(value);
     }
 
     @Override
-    public V get(K key, Function<K, @Nullable V> ifAbsent) {
-        Object value = Objects.requireNonNull(caffeine.get(key, k -> maskValue(ifAbsent.apply(k))));
-        return unmaskValue(value);
+    public V get(K key, Function<? super K, ? extends V> ifAbsent) {
+        Object value = caffeine.get(key, ifAbsent::apply);
+        return null;
     }
 
     @Override
-    public V get(K key, CacheExpiry<K, @Nullable V> ifAbsent) {
-        return get(key, (Function<K, @Nullable V>) ifAbsent);
+    public V get(K key, CacheLoader<? super K, ? extends V> loader) {
+        return null;
     }
 
     @Override
-    public Map<K, V> getAll(Iterable<K> keys) throws NoSuchElementException {
-        Collection<K> keyCollection = IterableHelper.asCollection(keys);
-        Map<K, Object> result = caffeine.getAllPresent(keys);
-        Checker.checkElementByKey(result.size() == keyCollection.size(), keys);
-        return MapHelper.map(result, k -> k, this::unmaskValue);
-    }
-
-    @Override
-    public Map<K, V> getAll(Iterable<K> keys, Function<K, @Nullable V> ifAbsent) {
-        Map<K, Object> result = caffeine.getAll(keys, ks -> {
-            Map<K, Object> newValues = new LinkedHashMap<>();
-            for (K k : ks) {
-                newValues.put(k, maskValue(ifAbsent.apply(k)));
-            }
-            return newValues;
-        });
-        return MapHelper.map(result, k -> k, this::unmaskValue);
-    }
-
-    @Override
-    public Map<K, V> getAll(Iterable<K> keys, CacheExpiry<K, @Nullable V> ifAbsent) {
-        return getAll(keys, (Function<K, @Nullable V>) ifAbsent);
-    }
-
-    @Override
-    public Map<K, V> getPresent(Iterable<K> keys) {
-        Map<K, Object> result = caffeine.getAllPresent(keys);
-        return MapHelper.map(result, k -> k, this::unmaskValue);
+    public @Immutable Map<K, V> getPresent(Iterable<? extends K> keys) {
+        return null;
     }
 
     @Override
     public void put(K key, @Nullable V value) {
-        caffeine.put(key, maskValue(value));
+
     }
 
     @Override
-    public void put(K key, Function<K, @Nullable V> valueFunction) {
-        caffeine.put(key, maskValue(valueFunction.apply(key)));
-    }
+    public void put(K key, CacheLoader<? super K, ? extends V> loader) {
 
-    @Override
-    public void put(K key, CacheExpiry<K, @Nullable V> valueFunction) {
-        put(key, (Function<K, @Nullable V>) valueFunction);
-    }
-
-    @Override
-    public void putAll(Map<K, @Nullable V> data) {
-        caffeine.putAll(MapHelper.map(data, k -> k, this::maskValue));
-    }
-
-    @Override
-    public void putAll(Iterable<K> keys, Function<K, @Nullable V> valueFunction) {
-        Map<K, Object> data = new LinkedHashMap<>();
-        for (K key : keys) {
-            data.put(key, maskValue(valueFunction.apply(key)));
-        }
-        caffeine.putAll(data);
-    }
-
-    @Override
-    public void putAll(Iterable<K> keys, CacheExpiry<K, @Nullable V> valueFunction) {
-        putAll(keys, (Function<K, @Nullable V>) valueFunction);
-    }
-
-    @Override
-    public void expire(K key, long seconds) {
     }
 
     @Override
     public void expire(K key, Duration duration) {
-    }
 
-    @Override
-    public void expire(K key, Function<K, Duration> kDurationFunction) {
-    }
-
-    @Override
-    public void expireAll(Iterable<K> keys, long seconds) {
-    }
-
-    @Override
-    public void expireAll(Iterable<K> keys, Duration duration) {
-    }
-
-    @Override
-    public void expireAll(Iterable<K> keys, Function<K, Duration> kDurationFunction) {
     }
 
     @Override
     public void remove(K key) {
-        caffeine.invalidate(key);
-    }
 
-    @Override
-    public void removeAll(Iterable<K> keys) {
-        caffeine.invalidateAll(keys);
     }
 
     @Override
     public void removeAll() {
-        caffeine.invalidateAll();
+
     }
 
-    private Object maskValue(@Nullable V value) {
-        return value == null ? NULL : value;
+    private Object mask(@Nullable V value) {
+        return value == null ? Null.asObject() : value;
     }
 
     @Nullable
-    private V unmaskValue(Object value) {
-        return value == NULL ? null : (V) value;
+    private V unmask(Object value) {
+        return Null.isNull(value) ? null : (V) value;
     }
 }
