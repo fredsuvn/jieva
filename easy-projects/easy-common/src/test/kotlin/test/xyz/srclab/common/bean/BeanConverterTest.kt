@@ -2,7 +2,7 @@ package test.xyz.srclab.common.bean
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import xyz.srclab.common.base.Context
+import xyz.srclab.common.base.Loader
 import xyz.srclab.common.bean.BeanConverter
 import xyz.srclab.common.bean.BeanConverterHandler
 import xyz.srclab.common.bean.BeanHelper
@@ -33,7 +33,7 @@ object BeanConverterTest {
     @DataProvider
     fun testConvertClassData(): Array<Array<*>> {
         val myDateString = "2001-04-25T16:10:00"
-        val nowMillis = Context.currentMillis()
+        val nowMillis = Loader.currentMillis()
         val nowDate = Date(nowMillis)
         val nowInstant = nowDate.toInstant()
         val myDate = Date.from(LocalDateTime.parse(myDateString).atZone(ZoneId.systemDefault()).toInstant())

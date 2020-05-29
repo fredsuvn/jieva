@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.provider.v1;
 
-import xyz.srclab.common.base.Context;
+import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.egg.Egg;
 
 final class V1Egg implements Egg {
@@ -52,7 +52,7 @@ final class V1Egg implements Egg {
     static final String SPELL;
 
     static {
-        long nowMillis = Context.currentMillis();
+        long nowMillis = Loader.currentMillis();
         SPELL = "" + Math.sqrt(nowMillis);
     }
 }

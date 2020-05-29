@@ -3,7 +3,7 @@ package xyz.srclab.common.reflect;
 import org.apache.commons.lang3.ClassUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.base.Context;
+import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.invoke.ConstructorInvoker;
@@ -22,13 +22,13 @@ public class ClassHelper {
     private static final Cache<Key, Type> genericSuperClassCache = Cache.newGcThreadLocalL2();
 
     public static <T> T newInstance(String className) {
-        @Nullable Class<?> cls = Context.getClass(className);
+        @Nullable Class<?> cls = Loader.loadClass(className);
         Checker.checkArguments(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }
 
     public static <T> T newInstance(String className, ClassLoader classLoader) {
-        @Nullable Class<?> cls = Context.getClass(className, classLoader);
+        @Nullable Class<?> cls = Loader.loadClass(className, classLoader);
         Checker.checkArguments(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }

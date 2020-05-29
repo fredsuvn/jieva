@@ -9,7 +9,7 @@ import xyz.srclab.common.string.StringHelper;
 public abstract class CharsRef implements CharSequence {
 
     public static CharsRef of(CharSequence chars, int start, int end) {
-        Checker.checkSubBounds(chars.length(), start, end);
+        Checker.checkBounds(chars.length(), start, end);
         return new DefaultCharsRef(chars, start, end);
     }
 
@@ -62,7 +62,7 @@ public abstract class CharsRef implements CharSequence {
 
         @Override
         public CharsRef subSequence(int start, int end) {
-            Checker.checkSubBounds(length(), start, end);
+            Checker.checkBounds(length(), start, end);
             return new DefaultCharsRef(this, start, end);
         }
 

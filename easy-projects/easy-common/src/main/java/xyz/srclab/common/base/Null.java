@@ -398,7 +398,7 @@ public class Null {
 
         @Override
         public int hashCode() {
-            return getClass().hashCode();
+            return 0;
         }
 
         @Override

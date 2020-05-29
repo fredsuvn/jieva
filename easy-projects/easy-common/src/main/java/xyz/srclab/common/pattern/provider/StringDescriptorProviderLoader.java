@@ -3,7 +3,7 @@ package xyz.srclab.common.pattern.provider;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.base.Context;
+import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.lang.CharsRef;
@@ -37,7 +37,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     private @Nullable Map<String, T> providers;
 
     StringDescriptorProviderLoader(String stringDescriptor) {
-        this(stringDescriptor, Context.getClassLoader());
+        this(stringDescriptor, Loader.currentClassLoader());
     }
 
     StringDescriptorProviderLoader(String stringDescriptor, ClassLoader classLoader) {
@@ -216,7 +216,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
 
         @Override
         public boolean test(String className) {
-            return Context.hasClass(className);
+            return Loader.hasClass(className);
         }
     }
 
@@ -229,7 +229,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
 
         @Override
         public boolean test(String className) {
-            return !Context.hasClass(className);
+            return !Loader.hasClass(className);
         }
     }
 }

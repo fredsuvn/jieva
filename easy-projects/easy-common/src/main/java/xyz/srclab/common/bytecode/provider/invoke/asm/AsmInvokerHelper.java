@@ -21,7 +21,7 @@ public class AsmInvokerHelper {
     private static final CharMatcher nonJavaNamingMatcher = Shares.NON_JAVA_NAMING_MATCHER;
 
     public static String generateConstructorInvokerClassName(Constructor<?> constructor, String providerName) {
-        String constructorDescription = Describer.constructorToString(constructor);
+        String constructorDescription = Describer.describe(constructor);
         return GENERATED_CLASS_ROOT_PACKAGE +
                 "." +
                 nonJavaNamingMatcher.replaceFrom(constructorDescription, "$") +

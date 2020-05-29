@@ -8,12 +8,16 @@ import java.util.function.Supplier;
  */
 public class Checker {
 
-    public static void checkSubBounds(int length, int start, int end) {
+    public static void checkBounds(int length, int start, int end) {
         if (start > end) {
-            throw new IllegalArgumentException("Sub bounds setting error: start : " + start + ", end: " + end);
+            throw new IllegalArgumentException(
+                    "Bounds setting error: start > end [start : " + start + ", end: " + end + "]");
         }
-        if (start < 0 || end > length) {
-            throw new IndexOutOfBoundsException("start: " + start + ", end: " + end);
+        if (start < 0) {
+            throw new IndexOutOfBoundsException("start < 0: " + start);
+        }
+        if (end > length) {
+            throw new IndexOutOfBoundsException("end > length [end: " + end + ", length: " + length + "]");
         }
     }
 
@@ -77,7 +81,7 @@ public class Checker {
         }
     }
 
-    public static void checkElementByKey(boolean expression, Object key) {
+    public static void checkElementForKey(boolean expression, Object key) {
         if (!expression) {
             throw new NoSuchElementException("key: " + key);
         }

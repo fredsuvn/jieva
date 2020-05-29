@@ -9,7 +9,7 @@ import java.util.function.Function;
 public class StringHelper {
 
     public static int indexOf(CharSequence charSequence, int start, int end, char c) {
-        Checker.checkSubBounds(charSequence.length(), start, end);
+        Checker.checkBounds(charSequence.length(), start, end);
         for (int i = start; i < end; i++) {
             if (charSequence.charAt(i) == c) {
                 return i;
@@ -19,7 +19,7 @@ public class StringHelper {
     }
 
     public static int lastIndexOf(CharSequence charSequence, int start, int end, char c) {
-        Checker.checkSubBounds(charSequence.length(), start, end);
+        Checker.checkBounds(charSequence.length(), start, end);
         for (int i = end - 1; i >= start; i--) {
             if (charSequence.charAt(i) == c) {
                 return i;
@@ -29,7 +29,7 @@ public class StringHelper {
     }
 
     public static int indexOf(CharSequence charSequence, int start, int end, CharSequence chars) {
-        Checker.checkSubBounds(charSequence.length(), start, end);
+        Checker.checkBounds(charSequence.length(), start, end);
         int charsLength = chars.length();
         if (end - start < charsLength) {
             return -1;
@@ -51,7 +51,7 @@ public class StringHelper {
     }
 
     public static int lastIndexOf(CharSequence charSequence, int start, int end, CharSequence chars) {
-        Checker.checkSubBounds(charSequence.length(), start, end);
+        Checker.checkBounds(charSequence.length(), start, end);
         int charsLength = chars.length();
         if (end - start < charsLength) {
             return -1;

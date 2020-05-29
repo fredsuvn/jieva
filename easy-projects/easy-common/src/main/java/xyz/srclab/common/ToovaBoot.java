@@ -4,7 +4,7 @@ import org.yaml.snakeyaml.Yaml;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.base.Context;
+import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.pattern.provider.ProviderLoader;
 
@@ -34,7 +34,7 @@ public class ToovaBoot {
 
     static {
         Map<String, Object> toovaProperties = loadYaml(ToovaBoot.class.getClassLoader());
-        Map<String, Object> userProperties = loadYaml(Context.getClassLoader());
+        Map<String, Object> userProperties = loadYaml(Loader.currentClassLoader());
         Map<String, Object> properties = new LinkedHashMap<>();
         mergeProperties(toovaProperties, userProperties, properties);
 

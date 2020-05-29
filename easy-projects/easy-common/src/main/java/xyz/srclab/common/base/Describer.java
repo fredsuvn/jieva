@@ -10,11 +10,11 @@ import java.lang.reflect.Method;
  */
 public class Describer {
 
-    public static String constructorToString(Constructor<?> constructor) {
-        return constructorToString(constructor.getDeclaringClass(), constructor.getParameterTypes());
+    public static String describe(Constructor<?> constructor) {
+        return describe(constructor.getDeclaringClass(), constructor.getParameterTypes());
     }
 
-    public static String constructorToString(Class<?> declaringClass, Class<?>... parameterTypes) {
+    public static String describe(Class<?> declaringClass, Class<?>... parameterTypes) {
         return methodToString(declaringClass, "<init>", parameterTypes);
     }
 

@@ -119,7 +119,7 @@ public class ArrayHelper {
     }
 
     public static byte[] buildArray(@WrittenReturn byte[] array, int from, int to, ByteElementSupplier each) {
-        Checker.checkSubBounds(array.length, from, to);
+        Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.get(i);
         }
@@ -127,7 +127,7 @@ public class ArrayHelper {
     }
 
     public static char[] buildArray(@WrittenReturn char[] array, int from, int to, CharElementSupplier each) {
-        Checker.checkSubBounds(array.length, from, to);
+        Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.get(i);
         }
@@ -135,7 +135,7 @@ public class ArrayHelper {
     }
 
     public static int[] buildArray(@WrittenReturn int[] array, int from, int to, IntElementSupplier each) {
-        Checker.checkSubBounds(array.length, from, to);
+        Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.get(i);
         }
@@ -143,7 +143,7 @@ public class ArrayHelper {
     }
 
     public static long[] buildArray(@WrittenReturn long[] array, int from, int to, LongElementSupplier each) {
-        Checker.checkSubBounds(array.length, from, to);
+        Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.get(i);
         }
@@ -151,7 +151,7 @@ public class ArrayHelper {
     }
 
     public static float[] buildArray(@WrittenReturn float[] array, int from, int to, FloatElementSupplier each) {
-        Checker.checkSubBounds(array.length, from, to);
+        Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.get(i);
         }
@@ -159,7 +159,7 @@ public class ArrayHelper {
     }
 
     public static double[] buildArray(@WrittenReturn double[] array, int from, int to, DoubleElementSupplier each) {
-        Checker.checkSubBounds(array.length, from, to);
+        Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.get(i);
         }
@@ -167,7 +167,7 @@ public class ArrayHelper {
     }
 
     public static boolean[] buildArray(@WrittenReturn boolean[] array, int from, int to, BooleanElementSupplier each) {
-        Checker.checkSubBounds(array.length, from, to);
+        Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.get(i);
         }
@@ -175,7 +175,7 @@ public class ArrayHelper {
     }
 
     public static short[] buildArray(@WrittenReturn short[] array, int from, int to, ShortElementSupplier each) {
-        Checker.checkSubBounds(array.length, from, to);
+        Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = each.get(i);
         }
@@ -183,7 +183,7 @@ public class ArrayHelper {
     }
 
     public static <E> E[] buildArray(@WrittenReturn E[] array, int from, int to, ElementSupplier<E> elementSupplier) {
-        Checker.checkSubBounds(array.length, from, to);
+        Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = elementSupplier.get(i);
         }

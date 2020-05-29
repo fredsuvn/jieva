@@ -18,7 +18,7 @@ public interface ConstructorInvoker<T> {
     static <T> ConstructorInvoker<T> of(Class<T> type, Class<?>... parameterTypes) {
         @Nullable Constructor<T> constructor = ConstructorHelper.getConstructor(type, parameterTypes);
         Checker.checkState(constructor != null, () ->
-                "Constructor not found: " + Describer.constructorToString(type, parameterTypes));
+                "Constructor not found: " + Describer.describe(type, parameterTypes));
         return of(constructor);
     }
 

@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 /**
  * @author sunqian
  */
+@Deprecated
 public class Deep {
 
     public static void deepWalk(Object object, Consumer<Object> consumer) {

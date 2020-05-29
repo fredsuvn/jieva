@@ -1,6 +1,7 @@
 package xyz.srclab.common.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import okhttp3.OkHttpClient;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
@@ -19,6 +20,7 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
     private final com.github.benmanes.caffeine.cache.Cache<K, Object> caffeine;
 
     CaffeineCache(CacheBuilder<K, V> builder) {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().getReadTimeout$okhttp()
         Caffeine<K, Object> caffeine = (Caffeine<K, Object>) Caffeine.newBuilder();
         caffeine.maximumSize(builder.getMaxSize());
         if (builder.getExpiry() != null) {

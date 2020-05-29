@@ -2,7 +2,7 @@ package xyz.srclab.common.lang;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Context;
+import xyz.srclab.common.base.Loader;
 
 import java.time.Duration;
 import java.util.function.Supplier;
@@ -70,7 +70,7 @@ public abstract class Computed<T> implements Supplier<T> {
             if (this.cache == null) {
                 return refreshGet();
             }
-            long now = Context.currentMillis();
+            long now = Loader.currentMillis();
             return (cacheTimeMillis > 0 && cacheTimeMillis + timeout.toMillis() >= now) ?
                     this.cache : refreshGet();
         }
@@ -78,7 +78,7 @@ public abstract class Computed<T> implements Supplier<T> {
         @Override
         public T refreshGet() {
             cache = computation.get();
-            cacheTimeMillis = Context.currentMillis();
+            cacheTimeMillis = Loader.currentMillis();
             assert cache != null;
             return cache;
         }

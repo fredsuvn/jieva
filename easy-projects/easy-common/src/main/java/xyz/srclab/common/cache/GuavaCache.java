@@ -81,7 +81,7 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     @Override
     public V get(K key) throws NoSuchElementException {
         @Nullable Object value = guava.getIfPresent(key);
-        Checker.checkElementByKey(value != null, key);
+        Checker.checkElementForKey(value != null, key);
         return unmaskValue(value);
     }
 
@@ -111,7 +111,7 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     public Map<K, V> getAll(Iterable<K> keys) throws NoSuchElementException {
         Collection<K> keyCollection = IterableHelper.asCollection(keys);
         Map<K, Object> result = guava.getAllPresent(keys);
-        Checker.checkElementByKey(result.size() == keyCollection.size(), keys);
+        Checker.checkElementForKey(result.size() == keyCollection.size(), keys);
         return MapHelper.map(result, k -> k, this::unmaskValue);
     }
 
