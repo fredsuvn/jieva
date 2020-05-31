@@ -1,12 +1,8 @@
 package xyz.srclab.common.cache;
 
-import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Null;
-import xyz.srclab.common.collection.MapHelper;
 
 import java.time.Duration;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -37,27 +33,13 @@ final class MapCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V get(K key, Function<? super K, ? extends @Nullable V> ifAbsent) {
+    public V get(K key, Function<? super K, ? extends V> ifAbsent) {
         return map.computeIfAbsent(key, ifAbsent);
     }
 
     @Override
-    public V get(K key, CacheLoader<? super K, ? extends V> loader) {
-        return get(key, loader::load);
-    }
-
-    @Override
-    public @Immutable Map<K, V> getPresent(Iterable<? extends K> keys) {
-        Map<K, V> result = new LinkedHashMap<>();
-        Map<K, Object> _map = (Map<K, Object>) map;
-        for (K key : keys) {
-            @Nullable Object value = _map.getOrDefault(key, Null.asObject());
-            if (value != null && Null.isNull(value)) {
-                continue;
-            }
-            result.put(key, (V) value);
-        }
-        return MapHelper.immutable(result);
+    public V load(K key, CacheLoader<? super K, ? extends V> loader) {
+        return map.computeIfAbsent(key, k -> loader.load(k).value());
     }
 
     @Override
@@ -66,8 +48,12 @@ final class MapCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void put(K key, CacheLoader<? super K, ? extends V> loader) {
-        put(key, loader.load(key));
+    public void put(CacheEntry<? extends K, ? extends V> entry) {
+        map.put(entry.key(), entry.value());
+    }
+
+    @Override
+    public void expire(K key, long seconds) {
     }
 
     @Override
@@ -75,16 +61,12 @@ final class MapCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void expire(K key, Function<? super K, Duration> durationFunction) {
-    }
-
-    @Override
-    public void remove(K key) {
+    public void invalidate(K key) {
         map.remove(key);
     }
 
     @Override
-    public void removeAll() {
+    public void invalidateAll() {
         map.clear();
     }
 }

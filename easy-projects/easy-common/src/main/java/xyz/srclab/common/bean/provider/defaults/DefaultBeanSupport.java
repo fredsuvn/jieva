@@ -1,6 +1,8 @@
 package xyz.srclab.common.bean.provider.defaults;
 
 import xyz.srclab.common.bean.*;
+import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.convert.ConvertHandler;
 
 /**
  * @author sunqian
@@ -9,11 +11,11 @@ final class DefaultBeanSupport {
 
     private static final BeanProvider beanProvider = new DefaultBeanProvider();
 
-    static BeanConverter getBeanConverter() {
+    static Converter getBeanConverter() {
         return beanProvider.getBeanConverter();
     }
 
-    static BeanConverterHandler getBeanConverterHandler() {
+    static ConvertHandler getBeanConverterHandler() {
         return beanProvider.getBeanConverterHandler();
     }
 

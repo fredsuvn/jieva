@@ -1,8 +1,11 @@
 package xyz.srclab.common.cache;
 
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Cast;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
@@ -22,8 +25,8 @@ final class L2Cache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V get(K key) throws NoSuchElementException {
-        return l2.getOrCompute(key, k->l1.get(k));
+    public V get(K key) {
+        return l2.get(key, l1.get(key));
     }
 
     @Override
@@ -37,7 +40,37 @@ final class L2Cache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V get(K key, CacheFunction<? super K, ? extends V> ifAbsent) {
+    public V load(K key, CacheLoader<? super K, ? extends V> loader) {
+        return null;
+    }
+
+    @Override
+    public @Immutable Map<K, V> getPresent(Iterable<? extends K> keys) {
+        return null;
+    }
+
+    @Override
+    public @Immutable Map<K, V> getAll(Iterable<? extends K> keys, Function<? super K, ? extends V> ifAbsent) {
+        return null;
+    }
+
+    @Override
+    public @Immutable Map<K, V> loadAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) {
+        return null;
+    }
+
+    @Override
+    public V getNonNull(K key) throws NullPointerException {
+        return null;
+    }
+
+    @Override
+    public V getNonNull(K key, Function<? super K, ? extends V> ifAbsent) throws NullPointerException {
+        return null;
+    }
+
+    @Override
+    public V loadNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NullPointerException {
         return null;
     }
 
@@ -47,7 +80,22 @@ final class L2Cache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void put(K key, @Nullable V value, CacheExpiry expiry) {
+    public void put(CacheEntry<? extends K, ? extends V> entry) {
+
+    }
+
+    @Override
+    public void putAll(Map<K, ? extends V> entries) {
+
+    }
+
+    @Override
+    public void putAll(Iterable<? extends CacheEntry<? extends K, ? extends V>> cacheEntries) {
+
+    }
+
+    @Override
+    public void expire(K key, long seconds) {
 
     }
 
@@ -62,12 +110,32 @@ final class L2Cache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void remove(K key) {
+    public void expireAll(Iterable<? extends K> keys, long seconds) {
 
     }
 
     @Override
-    public void removeAll() {
+    public void expireAll(Iterable<? extends K> keys, Duration duration) {
+
+    }
+
+    @Override
+    public void expireAll(Iterable<? extends K> keys, Function<? super K, Duration> durationFunction) {
+
+    }
+
+    @Override
+    public void invalidate(K key) {
+
+    }
+
+    @Override
+    public void invalidateAll(Iterable<? extends K> keys) {
+
+    }
+
+    @Override
+    public void invalidateAll() {
 
     }
 }

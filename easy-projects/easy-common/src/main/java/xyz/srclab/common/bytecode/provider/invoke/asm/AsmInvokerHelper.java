@@ -2,7 +2,7 @@ package xyz.srclab.common.bytecode.provider.invoke.asm;
 
 import com.google.common.base.CharMatcher;
 import xyz.srclab.common.base.Describer;
-import xyz.srclab.common.base.Shares;
+import xyz.srclab.common.base.CharMatchers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -18,7 +18,7 @@ public class AsmInvokerHelper {
 
     private static final AtomicLong classCounter = new AtomicLong();
 
-    private static final CharMatcher nonJavaNamingMatcher = Shares.NON_JAVA_NAMING_MATCHER;
+    private static final CharMatcher nonJavaNamingMatcher = CharMatchers.NON_JAVA_NAMING_MATCHER;
 
     public static String generateConstructorInvokerClassName(Constructor<?> constructor, String providerName) {
         String constructorDescription = Describer.describe(constructor);

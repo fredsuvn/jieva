@@ -3,8 +3,8 @@ package test.xyz.srclab.common.bean
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 import xyz.srclab.common.base.Loader
-import xyz.srclab.common.bean.BeanConverter
-import xyz.srclab.common.bean.BeanConverterHandler
+import xyz.srclab.common.convert.Converter
+import xyz.srclab.common.convert.ConvertHandler
 import xyz.srclab.common.bean.BeanHelper
 import xyz.srclab.common.bean.BeanOperator
 import xyz.srclab.common.reflect.TypeRef
@@ -16,11 +16,11 @@ import java.math.BigInteger
 import java.time.*
 import java.util.*
 
-object BeanConverterTest {
+object ConverterTest {
 
     @Test(dataProvider = "testConvertClassData")
     fun testConvertClass(from: Any, to: Type, expected: Any) {
-        val converter = BeanConverter.DEFAULT
+        val converter = Converter.DEFAULT
         val operator = BeanOperator.DEFAULT
         doAssertEquals(converter.convert(from, to), expected)
         doAssertEquals(converter.convert(from, to, operator), expected)
@@ -133,7 +133,7 @@ object BeanConverterTest {
 
     @Test(dataProvider = "testConvertTypeData")
     fun testConvertType(from: Any, to: TypeRef<*>, expected: Any) {
-        val converter = BeanConverter.DEFAULT
+        val converter = Converter.DEFAULT
         val operator = BeanOperator.DEFAULT
         doAssertEquals(converter.convert(from, to.type), expected)
         doAssertEquals(converter.convert(from, to.type, operator), expected)
@@ -185,7 +185,7 @@ object BeanConverterTest {
     fun testConvertGeneric() {
         val b1 = B<String>()
         b1.t = "999"
-        doAssertEquals(BeanConverter.DEFAULT.convert(b1, object : TypeRef<B<Int>>() {}).t, 999)
+        doAssertEquals(Converter.DEFAULT.convert(b1, object : TypeRef<B<Int>>() {}).t, 999)
     }
 
     @Test
@@ -204,9 +204,9 @@ object BeanConverterTest {
         }
     }
 
-    val customBeanConverter = BeanConverter.newBuilder()
+    val customBeanConverter = Converter.newBuilder()
         .setBeanOperator(BeanOperator.DEFAULT)
-        .addHandler(object : BeanConverterHandler {
+        .addHandler(object : ConvertHandler {
             override fun supportConvert(from: Any, to: Type, beanOperator: BeanOperator): Boolean {
                 return from is Int || from is String
             }
@@ -215,7 +215,7 @@ object BeanConverterTest {
                 return "6"
             }
         })
-        .addHandler(object : BeanConverterHandler {
+        .addHandler(object : ConvertHandler {
             override fun supportConvert(from: Any, to: Type, beanOperator: BeanOperator): Boolean {
                 return from is Int
             }
@@ -246,9 +246,9 @@ object BeanConverterTest {
 
     @Test
     fun testEmptyConverter() {
-        val emptyBeanConverter = BeanConverter.newBuilder()
+        val emptyBeanConverter = Converter.newBuilder()
             .setBeanOperator(BeanOperator.DEFAULT)
-            .addHandler(BeanConverterHandler.DEFAULT)
+            .addHandler(ConvertHandler.DEFAULT)
             .build()
         doAssertEquals(emptyBeanConverter.convert(9, Int::class.java), 9)
     }

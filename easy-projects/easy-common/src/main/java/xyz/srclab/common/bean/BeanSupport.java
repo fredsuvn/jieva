@@ -1,6 +1,8 @@
 package xyz.srclab.common.bean;
 
 import xyz.srclab.common.ToovaBoot;
+import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.convert.ConvertHandler;
 
 /**
  * @author sunqian
@@ -13,11 +15,11 @@ final class BeanSupport {
         return beanProvider.getBeanOperator();
     }
 
-    static BeanConverter getBeanConverter() {
+    static Converter getBeanConverter() {
         return beanProvider.getBeanConverter();
     }
 
-    static BeanConverterHandler getBeanConverterHandler() {
+    static ConvertHandler getBeanConverterHandler() {
         return beanProvider.getBeanConverterHandler();
     }
 

@@ -2,6 +2,7 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.reflect.TypeRef;
@@ -24,7 +25,7 @@ public interface BeanOperator {
 
     BeanResolver getBeanResolver();
 
-    BeanConverter getBeanConverter();
+    Converter getConverter();
 
     default BeanClass resolveBean(Class<?> beanClass) {
         return getBeanResolver().resolve(beanClass);
@@ -47,27 +48,27 @@ public interface BeanOperator {
     default <T> T getPropertyValue(Object bean, String propertyName, Type type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         BeanClass beanClass = resolveBean(bean.getClass());
-        return beanClass.getPropertyValue(bean, propertyName, type, getBeanConverter());
+        return beanClass.getPropertyValue(bean, propertyName, type, getConverter());
     }
 
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         BeanClass beanClass = resolveBean(bean.getClass());
-        return beanClass.getPropertyValue(bean, propertyName, type, getBeanConverter());
+        return beanClass.getPropertyValue(bean, propertyName, type, getConverter());
     }
 
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         BeanClass beanClass = resolveBean(bean.getClass());
-        return beanClass.getPropertyValue(bean, propertyName, type, getBeanConverter());
+        return beanClass.getPropertyValue(bean, propertyName, type, getConverter());
     }
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         BeanClass beanClass = resolveBean(bean.getClass());
-        beanClass.setPropertyValue(bean, propertyName, value, getBeanConverter());
+        beanClass.setPropertyValue(bean, propertyName, value, getConverter());
     }
 
     default void copyProperties(Object source, Object dest) {
@@ -105,15 +106,15 @@ public interface BeanOperator {
     }
 
     default <T> T convert(Object from, Type to) {
-        return getBeanConverter().convert(from, to, this);
+        return getConverter().convert(from, to, this);
     }
 
     default <T> T convert(Object from, Class<T> to) {
-        return getBeanConverter().convert(from, to, this);
+        return getConverter().convert(from, to, this);
     }
 
     default <T> T convert(Object from, TypeRef<T> to) {
-        return getBeanConverter().convert(from, to, this);
+        return getConverter().convert(from, to, this);
     }
 
     @Immutable
@@ -308,7 +309,7 @@ public interface BeanOperator {
     final class Builder extends CachedBuilder<BeanOperator> {
 
         private @Nullable BeanResolver beanResolver;
-        private @Nullable BeanConverter beanConverter;
+        private @Nullable Converter converter;
 
         public Builder setBeanResolver(BeanResolver beanResolver) {
             this.beanResolver = beanResolver;
@@ -316,8 +317,8 @@ public interface BeanOperator {
             return this;
         }
 
-        public Builder setBeanConverter(BeanConverter beanConverter) {
-            this.beanConverter = beanConverter;
+        public Builder setConverter(Converter converter) {
+            this.converter = converter;
             this.updateState();
             return this;
         }
@@ -330,13 +331,13 @@ public interface BeanOperator {
         private static final class BeanOperatorImpl implements BeanOperator {
 
             private final BeanResolver beanResolver;
-            private final BeanConverter beanConverter;
+            private final Converter converter;
 
             private BeanOperatorImpl(Builder builder) {
                 this.beanResolver = builder.beanResolver == null ?
                         BeanResolver.DEFAULT : builder.beanResolver;
-                this.beanConverter = builder.beanConverter == null ?
-                        BeanConverter.DEFAULT : builder.beanConverter;
+                this.converter = builder.converter == null ?
+                        Converter.DEFAULT : builder.converter;
             }
 
             @Override
@@ -345,8 +346,8 @@ public interface BeanOperator {
             }
 
             @Override
-            public BeanConverter getBeanConverter() {
-                return beanConverter;
+            public Converter getConverter() {
+                return converter;
             }
         }
     }

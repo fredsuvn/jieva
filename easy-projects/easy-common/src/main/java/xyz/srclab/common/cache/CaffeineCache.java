@@ -1,15 +1,13 @@
 package xyz.srclab.common.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import okhttp3.OkHttpClient;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -20,11 +18,10 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
     private final com.github.benmanes.caffeine.cache.Cache<K, Object> caffeine;
 
     CaffeineCache(CacheBuilder<K, V> builder) {
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().getReadTimeout$okhttp()
-        Caffeine<K, Object> caffeine = (Caffeine<K, Object>) Caffeine.newBuilder();
-        caffeine.maximumSize(builder.getMaxSize());
-        if (builder.getExpiry() != null) {
-            CacheExpiry expiry = builder.getExpiry();
+        Caffeine<K, Object> caffeine = Cast.as(Caffeine.newBuilder());
+        caffeine.maximumSize(builder.maxSize());
+        if (builder.expiry() != null) {
+            CacheExpiry expiry = builder.expiry();
             if (expiry.getExpiryAfterUpdate() != null) {
                 caffeine.expireAfterWrite(expiry.getExpiryAfterUpdate());
             }
@@ -32,11 +29,11 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
                 caffeine.expireAfterAccess(expiry.getExpiryAfterCreate());
             }
         }
-        if (builder.getRemoveListener() != null) {
-            CacheRemoveListener<K, V> cacheRemoveListener = builder.getRemoveListener();
+        if (builder.removeListener() != null) {
+            CacheRemoveListener<K, V> cacheRemoveListener = builder.removeListener();
             caffeine.removalListener((key, value, cause) -> {
                 if (key == null || value == null) {
-                    return;
+                    throw new IllegalStateException("Unexpected entry: key = " + key + ", value = " + value);
                 }
                 CacheRemoveListener.Cause removeCause;
                 switch (cause) {
@@ -61,19 +58,24 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
                 cacheRemoveListener.afterRemove(key, unmask(value), removeCause);
             });
         }
-        if (builder.getLoader() == null) {
+        if (builder.loader() == null) {
             this.caffeine = caffeine.build();
         } else {
-            CacheLoader<? super K, @Nullable ? extends V> loader = builder.getLoader();
-            this.caffeine = caffeine.build(new com.github.benmanes.caffeine.cache.CacheLoader<K, Object>() {
-                @org.checkerframework.checker.nullness.qual.Nullable
-                @Override
-                public Object load(@NonNull K key) throws Exception {
-                    @Nullable V value = loader.load(key);
-                    return value == null ? Null.asObject() : value;
-                }
+            CacheLoader<? super K, @Nullable ? extends V> loader = builder.loader();
+            this.caffeine = caffeine.build(key -> {
+                CacheEntry<? super K, @Nullable ? extends V> entry = loader.load(key);
+                return mask(entry.value());
             });
         }
+    }
+
+    private Object mask(@Nullable V value) {
+        return value == null ? Null.asObject() : value;
+    }
+
+    @Nullable
+    private V unmask(Object value) {
+        return Null.isNull(value) ? null : Cast.as(value);
     }
 
     @Override
@@ -95,51 +97,53 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
 
     @Override
     public V get(K key, Function<? super K, ? extends V> ifAbsent) {
-        Object value = caffeine.get(key, ifAbsent::apply);
-        return null;
+        @Nullable Object value = caffeine.get(key, k -> {
+            @Nullable V v = ifAbsent.apply(k);
+            return mask(v);
+        });
+        checkEntry(value != null, key);
+        return unmask(value);
     }
 
     @Override
-    public V get(K key, CacheLoader<? super K, ? extends V> loader) {
-        return null;
-    }
-
-    @Override
-    public @Immutable Map<K, V> getPresent(Iterable<? extends K> keys) {
-        return null;
+    public V load(K key, CacheLoader<? super K, ? extends V> loader) {
+        return get(key, k -> loader.load(k).value());
     }
 
     @Override
     public void put(K key, @Nullable V value) {
-
+        caffeine.put(key, mask(value));
     }
 
     @Override
-    public void put(K key, CacheLoader<? super K, ? extends V> loader) {
+    public void put(CacheEntry<? extends K, ? extends V> entry) {
+        put(entry.key(), entry.value());
+    }
 
+    @Override
+    public void expire(K key, long seconds) {
     }
 
     @Override
     public void expire(K key, Duration duration) {
-
     }
 
     @Override
-    public void remove(K key) {
-
+    public void invalidate(K key) {
+        caffeine.invalidate(key);
     }
 
     @Override
-    public void removeAll() {
-
+    public void invalidateAll(Iterable<? extends K> keys) {
+        caffeine.invalidateAll(keys);
     }
 
-    private Object mask(@Nullable V value) {
-        return value == null ? Null.asObject() : value;
+    @Override
+    public void invalidateAll() {
+        caffeine.invalidateAll();
     }
 
-    @Nullable
-    private V unmask(Object value) {
-        return Null.isNull(value) ? null : (V) value;
+    private void checkEntry(boolean expression, K key) {
+        Checker.checkState(expression, "Unexpected value of key: " + key);
     }
 }

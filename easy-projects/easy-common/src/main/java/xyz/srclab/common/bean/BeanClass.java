@@ -3,6 +3,7 @@ package xyz.srclab.common.bean;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.MapHelper;
+import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.reflect.MethodHelper;
@@ -40,33 +41,33 @@ public interface BeanClass {
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, Type type, BeanConverter beanConverter)
+    default <T> T getPropertyValue(Object bean, String propertyName, Type type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         @Nullable Object value = getPropertyValue(bean, propertyName);
         if (value == null) {
             return null;
         }
-        return beanConverter.convert(value, type);
+        return converter.convert(value, type);
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type, BeanConverter beanConverter)
+    default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         @Nullable Object value = getPropertyValue(bean, propertyName);
         if (value == null) {
             return null;
         }
-        return beanConverter.convert(value, type);
+        return converter.convert(value, type);
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type, BeanConverter beanConverter)
+    default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         @Nullable Object value = getPropertyValue(bean, propertyName);
         if (value == null) {
             return null;
         }
-        return beanConverter.convert(value, type);
+        return converter.convert(value, type);
     }
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
@@ -82,7 +83,7 @@ public interface BeanClass {
     }
 
     default void setPropertyValue(
-            Object bean, String propertyName, @Nullable Object value, BeanConverter beanConverter)
+            Object bean, String propertyName, @Nullable Object value, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         @Nullable BeanProperty beanProperty = getProperty(propertyName);
         if (beanProperty == null) {
@@ -92,7 +93,7 @@ public interface BeanClass {
             throw new UnsupportedOperationException("Cannot write property: " + beanProperty.getName());
         }
         @Nullable Object targetValue = value == null ? null :
-                beanConverter.convert(value, beanProperty.getGenericType());
+                converter.convert(value, beanProperty.getGenericType());
         beanProperty.setValue(bean, targetValue);
     }
 

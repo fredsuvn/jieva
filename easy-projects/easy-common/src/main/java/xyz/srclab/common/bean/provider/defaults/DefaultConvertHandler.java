@@ -4,7 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayHelper;
 import xyz.srclab.common.bean.BeanClass;
-import xyz.srclab.common.bean.BeanConverterHandler;
+import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.bean.BeanProperty;
 import xyz.srclab.common.collection.IterableHelper;
@@ -24,9 +24,9 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
-final class DefaultBeanConverterHandler implements BeanConverterHandler {
+final class DefaultConvertHandler implements ConvertHandler {
 
-    static DefaultBeanConverterHandler INSTANCE = new DefaultBeanConverterHandler();
+    static DefaultConvertHandler INSTANCE = new DefaultConvertHandler();
 
     @Override
     public boolean supportConvert(Object from, Type to, BeanOperator beanOperator) {

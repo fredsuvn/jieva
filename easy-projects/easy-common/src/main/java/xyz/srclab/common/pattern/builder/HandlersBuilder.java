@@ -8,17 +8,17 @@ public abstract class HandlersBuilder<Product, Handler, Builder
 
     protected LinkedList<Handler> handlers = new LinkedList<>();
 
-    public Builder addHandler(Handler handler) {
+    public Builder handler(Handler handler) {
         handlers.addFirst(handler);
         this.updateState();
         return (Builder) this;
     }
 
-    public Builder addHandlers(Handler... handlers) {
-        return addHandlers(Arrays.asList(handlers));
+    public Builder handlers(Handler... handlers) {
+        return handlers(Arrays.asList(handlers));
     }
 
-    public Builder addHandlers(Iterable<Handler> handlers) {
+    public Builder handlers(Iterable<Handler> handlers) {
         for (Handler handler : handlers) {
             this.handlers.addFirst(handler);
         }

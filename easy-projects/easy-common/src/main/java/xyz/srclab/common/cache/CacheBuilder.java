@@ -30,95 +30,90 @@ public final class CacheBuilder<K, V> {
 
     private boolean useGuava = false;
 
-    public CacheBuilder<K, V> setMaxSize(long maxSize) {
+    public CacheBuilder<K, V> maxSize(long maxSize) {
         this.maxSize = maxSize;
         return this;
     }
 
-    public CacheBuilder<K, V> setConcurrencyLevel(int concurrencyLevel) {
+    public CacheBuilder<K, V> concurrencyLevel(int concurrencyLevel) {
         this.concurrencyLevel = concurrencyLevel;
         return this;
     }
 
-    public CacheBuilder<K, V> setExpiry(CacheExpiry expiry) {
+    public CacheBuilder<K, V> expiry(CacheExpiry expiry) {
         this.expiry = expiry;
         return this;
     }
 
-    public CacheBuilder<K, V> setLoader(CacheLoader<? super K, @Nullable ? extends V> loader) {
+    public CacheBuilder<K, V> loader(CacheLoader<? super K, @Nullable ? extends V> loader) {
         this.loader = loader;
         return this;
     }
 
-    public CacheBuilder<K, V> setCreateListener(CacheCreateListener<K, V> createListener) {
+    public CacheBuilder<K, V> createListener(CacheCreateListener<K, V> createListener) {
         this.createListener = createListener;
         return this;
     }
 
-    public CacheBuilder<K, V> setReadListener(CacheReadListener<K, V> readListener) {
+    public CacheBuilder<K, V> readListener(CacheReadListener<K, V> readListener) {
         this.readListener = readListener;
         return this;
     }
 
-    public CacheBuilder<K, V> setUpdateListener(CacheUpdateListener<K, V> updateListener) {
+    public CacheBuilder<K, V> updateListener(CacheUpdateListener<K, V> updateListener) {
         this.updateListener = updateListener;
         return this;
     }
 
-    public CacheBuilder<K, V> setRemoveListener(CacheRemoveListener<K, V> removeListener) {
+    public CacheBuilder<K, V> removeListener(CacheRemoveListener<K, V> removeListener) {
         this.removeListener = removeListener;
         return this;
     }
 
-    public CacheBuilder<K, V> useGuava() {
-        this.useGuava = true;
+    public CacheBuilder<K, V> useGuava(boolean useGuava) {
+        this.useGuava = useGuava;
         return this;
     }
 
-    public CacheBuilder<K, V> useCaffeine() {
-        this.useGuava = false;
-        return this;
-    }
-
-    long getMaxSize() {
+    long maxSize() {
         return maxSize;
     }
 
-    int getConcurrencyLevel() {
+    int concurrencyLevel() {
         return concurrencyLevel;
     }
 
     @Nullable
-    CacheExpiry getExpiry() {
+    CacheExpiry expiry() {
         return expiry;
     }
 
     @Nullable
-    CacheLoader<? super K, @Nullable ? extends V> getLoader() {
+    CacheLoader<? super K, @Nullable ? extends V> loader() {
         return loader;
     }
 
     @Nullable
-    CacheCreateListener<K, V> getCreateListener() {
+    CacheCreateListener<K, V> createListener() {
         return createListener;
     }
 
     @Nullable
-    CacheReadListener<K, V> getReadListener() {
+    CacheReadListener<K, V> readListener() {
         return readListener;
     }
 
     @Nullable
-    CacheUpdateListener<K, V> getUpdateListener() {
+    CacheUpdateListener<K, V> updateListener() {
         return updateListener;
     }
 
     @Nullable
-    CacheRemoveListener<K, V> getRemoveListener() {
+    CacheRemoveListener<K, V> removeListener() {
         return removeListener;
     }
 
-    boolean isUseGuava() {
+    boolean useGuava() {
         return useGuava;
     }
 

@@ -5,7 +5,7 @@ import com.google.common.base.CharMatcher;
 /**
  * @author sunqian
  */
-public class Shares {
+public class CharMatchers {
 
     public static final CharMatcher DOT_CHAR_MATCHER = CharMatcher.is('.');
 

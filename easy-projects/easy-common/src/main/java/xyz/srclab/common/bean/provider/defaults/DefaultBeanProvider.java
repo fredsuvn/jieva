@@ -2,6 +2,8 @@ package xyz.srclab.common.bean.provider.defaults;
 
 import xyz.srclab.common.bean.*;
 import xyz.srclab.common.bean.BeanProvider;
+import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.convert.ConvertHandler;
 
 /**
  * @author sunqian
@@ -9,13 +11,13 @@ import xyz.srclab.common.bean.BeanProvider;
 public class DefaultBeanProvider implements BeanProvider {
 
     @Override
-    public BeanConverter getBeanConverter() {
-        return DefaultBeanConverter.INSTANCE;
+    public Converter getBeanConverter() {
+        return DefaultConverter.INSTANCE;
     }
 
     @Override
-    public BeanConverterHandler getBeanConverterHandler() {
-        return DefaultBeanConverterHandler.INSTANCE;
+    public ConvertHandler getBeanConverterHandler() {
+        return DefaultConvertHandler.INSTANCE;
     }
 
     @Override

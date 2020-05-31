@@ -51,14 +51,14 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V get(K key, Function<? super K, ? extends @Nullable V> ifAbsent) {
+    public V get(K key, Function<? super K, ? extends V> ifAbsent) {
         return getCache().get(key, ifAbsent);
     }
 
     @Override
     @Nullable
-    public V get(K key, CacheLoader<? super K, ? extends @Nullable V> loader) {
-        return getCache().get(key, loader);
+    public V load(K key, CacheLoader<? super K, ? extends V> loader) {
+        return getCache().load(key, loader);
     }
 
     @Override
@@ -69,14 +69,14 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Immutable
-    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys, Function<? super K, ? extends @Nullable V> ifAbsent) {
+    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys, Function<? super K, ? extends V> ifAbsent) {
         return getCache().getAll(keys, ifAbsent);
     }
 
     @Override
     @Immutable
-    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends @Nullable V> loader) {
-        return getCache().getAll(keys, loader);
+    public Map<K, @Nullable V> loadAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) {
+        return getCache().loadAll(keys, loader);
     }
 
     @Override
@@ -85,13 +85,13 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V getNonNull(K key, Function<? super K, ? extends @Nullable V> ifAbsent) throws NullPointerException {
+    public V getNonNull(K key, Function<? super K, ? extends V> ifAbsent) throws NullPointerException {
         return getCache().getNonNull(key, ifAbsent);
     }
 
     @Override
-    public V getNonNull(K key, CacheLoader<? super K, ? extends @Nullable V> loader) throws NullPointerException {
-        return getCache().getNonNull(key, loader);
+    public V loadNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NullPointerException {
+        return getCache().loadNonNull(key, loader);
     }
 
     @Override
@@ -100,18 +100,18 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void put(K key, CacheLoader<? super K, ? extends @Nullable V> loader) {
-        getCache().put(key, loader);
+    public void put(CacheEntry<? extends K, ? extends V> entry) {
+        getCache().put(entry);
     }
 
     @Override
-    public void putAll(Map<K, ? extends @Nullable V> data) {
-        getCache().putAll(data);
+    public void putAll(Map<K, ? extends V> entries) {
+        getCache().putAll(entries);
     }
 
     @Override
-    public void putAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends @Nullable V> loader) {
-        getCache().putAll(keys, loader);
+    public void putAll(Iterable<? extends CacheEntry<? extends K, ? extends V>> cacheEntries) {
+        getCache().putAll(cacheEntries);
     }
 
     @Override
@@ -145,17 +145,17 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void remove(K key) {
-        getCache().remove(key);
+    public void invalidate(K key) {
+        getCache().invalidate(key);
     }
 
     @Override
-    public void removeAll(Iterable<? extends K> keys) {
-        getCache().removeAll(keys);
+    public void invalidateAll(Iterable<? extends K> keys) {
+        getCache().invalidateAll(keys);
     }
 
     @Override
-    public void removeAll() {
-        getCache().removeAll();
+    public void invalidateAll() {
+        getCache().invalidateAll();
     }
 }

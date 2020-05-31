@@ -3,6 +3,7 @@ package xyz.srclab.common.cache;
 import com.google.common.collect.MapMaker;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.MapHelper;
@@ -87,35 +88,49 @@ public interface Cache<K, V> {
     V get(K key);
 
     @Nullable
-    V get(K key, @Nullable V defaultValue);
-
-    @Nullable
     V get(K key, Function<? super K, @Nullable ? extends V> ifAbsent);
 
     @Nullable
-    V get(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
+    V load(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
+
+    @Nullable
+    V getOrDefault(K key, @Nullable V defaultValue);
+
+    @Nullable
+    V getOrDefault(K key, Function<? super K, @Nullable ? extends V> defaultFunction);
 
     @Immutable
-    Map<K, @Nullable V> getPresent(Iterable<? extends K> keys);
-
-    @Immutable
-    default Map<K, @Nullable V> getAll(
-            Iterable<? extends K> keys, Function<? super K, @Nullable ? extends V> ifAbsent) {
-        Map<K, V> map = new LinkedHashMap<>();
+    default Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
+        Map<K, V> result = new LinkedHashMap<>();
+        Cache<K, Object> _this = Cast.as(this);
+        Object defaultValue = Cache0.DEFAULT_VALUE;
         for (K key : keys) {
-            map.put(key, get(key, ifAbsent));
+            @Nullable Object value = _this.getOrDefault(key, defaultValue);
+            if (value != defaultValue) {
+                result.put(key, value == null ? null : Cast.as(value));
+            }
         }
-        return MapHelper.immutable(map);
+        return MapHelper.immutable(result);
     }
 
     @Immutable
     default Map<K, @Nullable V> getAll(
-            Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
-        Map<K, V> map = new LinkedHashMap<>();
+            Iterable<? extends K> keys, Function<? super K, @Nullable ? extends V> ifAbsent) {
+        Map<K, V> result = new LinkedHashMap<>();
         for (K key : keys) {
-            map.put(key, get(key, loader));
+            result.put(key, get(key, ifAbsent));
         }
-        return MapHelper.immutable(map);
+        return MapHelper.immutable(result);
+    }
+
+    @Immutable
+    default Map<K, @Nullable V> loadAll(
+            Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
+        Map<K, V> result = new LinkedHashMap<>();
+        for (K key : keys) {
+            result.put(key, load(key, loader));
+        }
+        return MapHelper.immutable(result);
     }
 
     default V getNonNull(K key) throws NullPointerException {
@@ -130,29 +145,25 @@ public interface Cache<K, V> {
         return result;
     }
 
-    default V getNonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NullPointerException {
-        @Nullable V result = get(key, loader);
+    default V loadNonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NullPointerException {
+        @Nullable V result = load(key, loader);
         Checker.checkNull(result != null);
         return result;
     }
 
     void put(K key, @Nullable V value);
 
-    void put(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
+    void put(CacheEntry<? extends K, @Nullable ? extends V> entry);
 
-    default void putAll(Map<K, @Nullable ? extends V> data) {
-        data.forEach(this::put);
+    default void putAll(Map<K, @Nullable ? extends V> entries) {
+        entries.forEach(this::put);
     }
 
-    default void putAll(Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
-        for (K key : keys) {
-            put(key, loader);
-        }
+    default void putAll(Iterable<? extends CacheEntry<? extends K, @Nullable ? extends V>> entries) {
+        entries.forEach(this::put);
     }
 
-    default void expire(K key, long seconds) {
-        expire(key, Duration.ofSeconds(seconds));
-    }
+    void expire(K key, long seconds);
 
     void expire(K key, Duration duration);
 
@@ -161,7 +172,9 @@ public interface Cache<K, V> {
     }
 
     default void expireAll(Iterable<? extends K> keys, long seconds) {
-        expireAll(keys, Duration.ofSeconds(seconds));
+        for (K key : keys) {
+            expire(key, seconds);
+        }
     }
 
     default void expireAll(Iterable<? extends K> keys, Duration duration) {
@@ -176,13 +189,13 @@ public interface Cache<K, V> {
         }
     }
 
-    void remove(K key);
+    void invalidate(K key);
 
-    default void removeAll(Iterable<? extends K> keys) {
+    default void invalidateAll(Iterable<? extends K> keys) {
         for (K key : keys) {
-            remove(key);
+            invalidate(key);
         }
     }
 
-    void removeAll();
+    void invalidateAll();
 }

@@ -1,13 +1,16 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.convert.ConvertHandler;
+
 /**
  * @author sunqian
  */
 public interface BeanProvider {
 
-    BeanConverter getBeanConverter();
+    Converter getBeanConverter();
 
-    BeanConverterHandler getBeanConverterHandler();
+    ConvertHandler getBeanConverterHandler();
 
     BeanResolver getBeanResolver();
 

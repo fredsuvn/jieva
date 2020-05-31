@@ -2,6 +2,7 @@ package xyz.srclab.common.array;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.WrittenReturn;
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.IterableHelper;
@@ -33,7 +34,7 @@ public class ArrayHelper {
     }
 
     public static <E> E[] newArray(Class<E> componentType, int length) {
-        return (E[]) Array.newInstance(componentType, length);
+        return Cast.as(Array.newInstance(componentType, length));
     }
 
     public static <E> E[] newArray(Type componentType, int length) {
