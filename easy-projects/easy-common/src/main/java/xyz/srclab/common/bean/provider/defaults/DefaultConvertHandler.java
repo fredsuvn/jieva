@@ -11,7 +11,7 @@ import xyz.srclab.common.collection.IterableHelper;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.collection.SetHelper;
-import xyz.srclab.common.lang.Formatter;
+import xyz.srclab.common.lang.format.Formatter;
 import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.reflect.TypeHelper;
 

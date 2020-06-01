@@ -7,7 +7,7 @@ import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.invoke.ConstructorInvoker;
-import xyz.srclab.common.lang.Key;
+import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
@@ -65,7 +65,7 @@ public class ClassHelper {
                 targetSuperClass + "is not parent of " + cls
         );
         Type result = genericSuperClassCache.getNonNull(
-                Key.from(cls, targetSuperClass),
+                Key.of(cls, targetSuperClass),
                 k -> getGenericSuperclass0(cls, targetSuperClass)
         );
         return Null.isNull(result) ? null : result;

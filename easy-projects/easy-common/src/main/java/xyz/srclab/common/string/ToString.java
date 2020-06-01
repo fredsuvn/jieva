@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanOperator;
-import xyz.srclab.common.lang.Computed;
+import xyz.srclab.common.lang.computed.Computed;
 import xyz.srclab.common.walk.WalkVisitResult;
 import xyz.srclab.common.walk.WalkVisitor;
 import xyz.srclab.common.walk.Walker;

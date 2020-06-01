@@ -79,7 +79,7 @@ object ToStringTest {
 
         val toString = ToString(a)
         doAssertEquals(toString.get(), toString.toString())
-        doAssertEquals(toString.refreshGet(), toString.toString())
+        doAssertEquals(toString.refreshAndGet(), toString.toString())
         doAssertEquals(ToString("ss").toString(), "ss")
         doAssertEquals(
             ToString.buildToString("ss", ToStringStyle.DEFAULT, BeanOperator.DEFAULT),

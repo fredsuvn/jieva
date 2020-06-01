@@ -1,8 +1,8 @@
 package test.xyz.srclab.common.lang
 
 import org.testng.annotations.Test
-import xyz.srclab.common.lang.Pair
-import xyz.srclab.common.lang.Triple
+import xyz.srclab.common.lang.tuple.Pair
+import xyz.srclab.common.lang.tuple.Triple
 import xyz.srclab.test.doAssertEquals
 
 /**

@@ -1,9 +1,8 @@
-package xyz.srclab.common.lang;
+package xyz.srclab.common.string;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.string.StringHelper;
 
 @Immutable
 public abstract class CharsRef implements CharSequence {

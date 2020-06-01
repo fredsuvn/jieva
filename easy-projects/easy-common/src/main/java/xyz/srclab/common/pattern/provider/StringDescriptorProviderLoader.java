@@ -6,8 +6,8 @@ import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.collection.MapHelper;
-import xyz.srclab.common.lang.CharsRef;
-import xyz.srclab.common.lang.Pair;
+import xyz.srclab.common.string.CharsRef;
+import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.string.StringHelper;
 
@@ -123,8 +123,8 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
         } else {
             Pair<Condition, String> pair =
                     parseConditionPair(candidateRef.subSequence(conditionBegin));
-            condition = pair.get0();
-            conditionValue = pair.get1();
+            condition = pair.first();
+            conditionValue = pair.second();
         }
         CharsRef nonConditionPart;
         if (condition == null) {

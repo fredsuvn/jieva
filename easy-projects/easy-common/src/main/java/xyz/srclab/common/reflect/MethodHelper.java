@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.ListHelper;
-import xyz.srclab.common.lang.Key;
+import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -23,7 +23,7 @@ public class MethodHelper {
     @Nullable
     public static Method getMethod(Class<?> cls, String methodName, Class<?>... parameterTypes) {
         Method result = methodCache.getNonNull(
-                Key.from(cls, methodName, parameterTypes),
+                Key.of(cls, methodName, parameterTypes),
                 k -> getMethod0(cls, methodName, parameterTypes)
         );
         return Null.isNull(result) ? null : result;
@@ -40,7 +40,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getAllMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                Key.from("getAllMethods", cls),
+                Key.of("getAllMethods", cls),
                 k -> ListHelper.immutable(getAllMethods0(cls))
         );
     }
@@ -58,7 +58,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getOverrideableMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                Key.from("getOverrideableMethods", cls),
+                Key.of("getOverrideableMethods", cls),
                 k -> ListHelper.immutable(getOverrideableMethods0(cls))
         );
     }
@@ -77,7 +77,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getPublicStaticMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                Key.from("getPublicStaticMethods", cls),
+                Key.of("getPublicStaticMethods", cls),
                 k -> ListHelper.immutable(getPublicStaticMethods0(cls))
         );
     }
@@ -91,7 +91,7 @@ public class MethodHelper {
     @Immutable
     public static List<Method> getPublicNonStaticMethods(Class<?> cls) {
         return methodsCache.getNonNull(
-                Key.from("getPublicNonStaticMethods", cls),
+                Key.of("getPublicNonStaticMethods", cls),
                 kc -> ListHelper.immutable(getPublicNonStaticMethods0(cls))
         );
     }

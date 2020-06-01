@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 public class ArrayHelper {
 
-    private static final Cache<Type, Class<?>> findArrayTypeCache = Cache.newGcThreadLocalL2();
+    private static final Cache<Type, Class<?>> findArrayTypeCache = Cache.newGcL2();
 
     public static <E> E[] toArray(Iterable<? extends E> iterable, Type componentType) {
         Collection<E> collection = IterableHelper.asCollection(iterable);
