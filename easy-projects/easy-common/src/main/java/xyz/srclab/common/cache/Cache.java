@@ -4,13 +4,13 @@ import com.google.common.collect.MapMaker;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
-import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.MapHelper;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 
@@ -117,21 +117,15 @@ public interface Cache<K, V> {
     }
 
     default V getNonNull(K key) throws NullPointerException {
-        @Nullable V result = get(key);
-        Checker.checkNull(result != null);
-        return result;
+        return Objects.requireNonNull(get(key));
     }
 
     default V getNonNull(K key, Function<? super K, @Nullable ? extends V> ifAbsent) throws NullPointerException {
-        @Nullable V result = get(key, ifAbsent);
-        Checker.checkNull(result != null);
-        return result;
+        return Objects.requireNonNull(get(key, ifAbsent));
     }
 
     default V loadNonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NullPointerException {
-        @Nullable V result = load(key, loader);
-        Checker.checkNull(result != null);
-        return result;
+        return Objects.requireNonNull(load(key, loader));
     }
 
     void put(K key, @Nullable V value);
