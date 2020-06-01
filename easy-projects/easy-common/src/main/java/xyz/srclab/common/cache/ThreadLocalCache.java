@@ -45,12 +45,6 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V get(K key, @Nullable V defaultValue) {
-        return getCache().get(key, defaultValue);
-    }
-
-    @Override
-    @Nullable
     public V get(K key, Function<? super K, ? extends V> ifAbsent) {
         return getCache().get(key, ifAbsent);
     }
@@ -59,6 +53,18 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     @Nullable
     public V load(K key, CacheLoader<? super K, ? extends V> loader) {
         return getCache().load(key, loader);
+    }
+
+    @Override
+    @Nullable
+    public V getOrDefault(K key, @Nullable V defaultValue) {
+        return getCache().getOrDefault(key, defaultValue);
+    }
+
+    @Override
+    @Nullable
+    public V getOrDefault(K key, Function<? super K, ? extends V> defaultFunction) {
+        return getCache().getOrDefault(key, defaultFunction);
     }
 
     @Override
@@ -100,18 +106,18 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void put(CacheEntry<? extends K, ? extends V> entry) {
-        getCache().put(entry);
+    public void put(K key, CacheValue<? extends V> entry) {
+        getCache().put(key, entry);
     }
 
     @Override
-    public void putAll(Map<K, ? extends V> entries) {
+    public void putAll(Map<? extends K, ? extends V> entries) {
         getCache().putAll(entries);
     }
 
     @Override
-    public void putAll(Iterable<? extends CacheEntry<? extends K, ? extends V>> cacheEntries) {
-        getCache().putAll(cacheEntries);
+    public void putAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) {
+        getCache().putAll(keys, loader);
     }
 
     @Override

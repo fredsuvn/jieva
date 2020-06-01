@@ -1,12 +1,9 @@
 package xyz.srclab.common.cache;
 
-import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 
 import java.time.Duration;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 final class L2Cache<K, V> implements Cache<K, V> {
@@ -26,116 +23,76 @@ final class L2Cache<K, V> implements Cache<K, V> {
 
     @Override
     public V get(K key) {
-        return l2.get(key, l1.get(key));
-    }
-
-    @Override
-    public V get(K key, @Nullable V defaultValue) {
-        return null;
+        return l2.getOrDefault(key, k -> {
+            Cache<K, Object> _l1 = Cast.as(l1);
+            Object defaultValue = Cache0.DEFAULT_VALUE;
+            @Nullable Object value = _l1.getOrDefault(k, defaultValue);
+            if (value == defaultValue) {
+                return null;
+            }
+            @Nullable V v = Cast.nullable(value);
+            l2.put(k, v);
+            return v;
+        });
     }
 
     @Override
     public V get(K key, Function<? super K, ? extends V> ifAbsent) {
-        return null;
+        return l2.get(key, k -> l1.get(k, ifAbsent));
     }
 
     @Override
     public V load(K key, CacheLoader<? super K, ? extends V> loader) {
-        return null;
+        return get(key, k -> loader.load(k).value());
     }
 
     @Override
-    public @Immutable Map<K, V> getPresent(Iterable<? extends K> keys) {
-        return null;
-    }
-
-    @Override
-    public @Immutable Map<K, V> getAll(Iterable<? extends K> keys, Function<? super K, ? extends V> ifAbsent) {
-        return null;
-    }
-
-    @Override
-    public @Immutable Map<K, V> loadAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) {
-        return null;
-    }
-
-    @Override
-    public V getNonNull(K key) throws NullPointerException {
-        return null;
-    }
-
-    @Override
-    public V getNonNull(K key, Function<? super K, ? extends V> ifAbsent) throws NullPointerException {
-        return null;
-    }
-
-    @Override
-    public V loadNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NullPointerException {
-        return null;
+    public V getOrDefault(K key, @Nullable V defaultValue) {
+        return l2.getOrDefault(key, k -> {
+            Cache<K, Object> _l1 = Cast.as(l1);
+            @Nullable Object value = _l1.getOrDefault(k, defaultValue);
+            if (value == defaultValue) {
+                return defaultValue;
+            }
+            @Nullable V v = Cast.nullable(value);
+            l2.put(k, v);
+            return v;
+        });
     }
 
     @Override
     public void put(K key, @Nullable V value) {
-
+        l1.put(key, value);
+        l2.put(key, value);
     }
 
     @Override
-    public void put(CacheEntry<? extends K, ? extends V> entry) {
-
-    }
-
-    @Override
-    public void putAll(Map<K, ? extends V> entries) {
-
-    }
-
-    @Override
-    public void putAll(Iterable<? extends CacheEntry<? extends K, ? extends V>> cacheEntries) {
-
+    public void put(K key, CacheValue<? extends V> entry) {
+        l1.put(key, entry);
+        l2.put(key, entry);
     }
 
     @Override
     public void expire(K key, long seconds) {
-
+        l1.expire(key, seconds);
+        l2.expire(key, seconds);
     }
 
     @Override
     public void expire(K key, Duration duration) {
-
-    }
-
-    @Override
-    public void expire(K key, Function<? super K, Duration> durationFunction) {
-
-    }
-
-    @Override
-    public void expireAll(Iterable<? extends K> keys, long seconds) {
-
-    }
-
-    @Override
-    public void expireAll(Iterable<? extends K> keys, Duration duration) {
-
-    }
-
-    @Override
-    public void expireAll(Iterable<? extends K> keys, Function<? super K, Duration> durationFunction) {
-
+        l1.expire(key, duration);
+        l2.expire(key, duration);
     }
 
     @Override
     public void invalidate(K key) {
-
-    }
-
-    @Override
-    public void invalidateAll(Iterable<? extends K> keys) {
-
+        l1.invalidate(key);
+        l2.invalidate(key);
     }
 
     @Override
     public void invalidateAll() {
-
+        l1.invalidateAll();
+        l2.invalidateAll();
     }
 }

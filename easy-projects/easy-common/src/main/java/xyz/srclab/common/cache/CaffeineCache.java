@@ -63,7 +63,7 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
         } else {
             CacheLoader<? super K, @Nullable ? extends V> loader = builder.loader();
             this.caffeine = caffeine.build(key -> {
-                CacheEntry<? super K, @Nullable ? extends V> entry = loader.load(key);
+                CacheValue<@Nullable ? extends V> entry = loader.load(key);
                 return mask(entry.value());
             });
         }
@@ -90,12 +90,6 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V get(K key, @Nullable V defaultValue) {
-        @Nullable Object value = caffeine.getIfPresent(key);
-        return value == null ? defaultValue : unmask(value);
-    }
-
-    @Override
     public V get(K key, Function<? super K, ? extends V> ifAbsent) {
         @Nullable Object value = caffeine.get(key, k -> {
             @Nullable V v = ifAbsent.apply(k);
@@ -111,13 +105,19 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
     }
 
     @Override
+    public V getOrDefault(K key, @Nullable V defaultValue) {
+        @Nullable Object value = caffeine.getIfPresent(key);
+        return value == null ? defaultValue : unmask(value);
+    }
+
+    @Override
     public void put(K key, @Nullable V value) {
         caffeine.put(key, mask(value));
     }
 
     @Override
-    public void put(CacheEntry<? extends K, ? extends V> entry) {
-        put(entry.key(), entry.value());
+    public void put(K key, CacheValue<? extends V> entry) {
+        put(key, entry.value());
     }
 
     @Override

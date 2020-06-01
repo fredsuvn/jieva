@@ -9,55 +9,30 @@ import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.MapHelper;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 
 public interface Cache<K, V> {
 
-    static <K, V> Cache<K, V> newPermanent() {
-        return newPermanent(Defaults.CONCURRENCY_LEVEL);
-    }
-
-    static <K, V> Cache<K, V> newPermanent(int concurrencyLevel) {
-        Map<K, Object> map = concurrencyLevel <= 1 ?
-                new HashMap<>() : new MapMaker().concurrencyLevel(concurrencyLevel).makeMap();
+    static <K, V> Cache<K, V> newMapped(Map<K, V> map) {
         return new MapCache<>(map);
     }
 
-    static <K, V> Cache<K, V> newMapped(Map<K, Object> map) {
-        return new MapCache<>(map);
+    static <K, V> Cache<K, V> newThreadLocal(Cache<K, V> cache) {
+        return new ThreadLocalCache<>(cache);
     }
 
-    static <K, V> Cache<K, V> newGcThreadLocal() {
-        return new ThreadLocalCache<>(newMapped(CacheKit.newGcMap(0)));
-    }
-
-    static <K, V> Cache<K, V> newGcConcurrent() {
-        return newGcConcurrent(Defaults.CONCURRENCY_LEVEL);
-    }
-
-    static <K, V> Cache<K, V> newGcConcurrent(int concurrencyLevel) {
-        return new MapCache<>(CacheKit.newGcMap(concurrencyLevel));
-    }
-
-    static <K, V> Cache<K, V> newL2Cache(Cache<K, V> l1, Cache<K, V> l2) {
+    static <K, V> Cache<K, V> newGcL2() {
+        Cache<K, V> l1 = newMapped(
+                new MapMaker()
+                        .concurrencyLevel(Defaults.CONCURRENCY_LEVEL)
+                        .weakKeys()
+                        .makeMap()
+        );
+        Cache<K, V> l2 = newThreadLocal(newMapped(new WeakHashMap<>()));
         return new L2Cache<>(l1, l2);
-    }
-
-    static <K, V> Cache<K, V> newGcThreadLocalL2() {
-        return newGcThreadLocalL2(Defaults.CONCURRENCY_LEVEL);
-    }
-
-    static <K, V> Cache<K, V> newGcThreadLocalL2(int concurrencyLevel) {
-        Cache<K, V> l1 = newGcConcurrent(concurrencyLevel);
-        return newGcThreadLocalL2(l1);
-    }
-
-    static <K, V> Cache<K, V> newGcThreadLocalL2(Cache<K, V> l1) {
-        Cache<K, V> l2 = newGcThreadLocal();
-        return newL2Cache(l1, l2);
     }
 
     static <K, V> CacheBuilder<K, V> newBuilder() {
@@ -97,7 +72,15 @@ public interface Cache<K, V> {
     V getOrDefault(K key, @Nullable V defaultValue);
 
     @Nullable
-    V getOrDefault(K key, Function<? super K, @Nullable ? extends V> defaultFunction);
+    default V getOrDefault(K key, Function<? super K, @Nullable ? extends V> defaultFunction) {
+        Cache<K, Object> _this = Cast.as(this);
+        Object defaultValue = Cache0.DEFAULT_VALUE;
+        @Nullable Object value = _this.getOrDefault(key, defaultValue);
+        if (value == defaultValue) {
+            return defaultFunction.apply(key);
+        }
+        return Cast.nullable(value);
+    }
 
     @Immutable
     default Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
@@ -107,7 +90,7 @@ public interface Cache<K, V> {
         for (K key : keys) {
             @Nullable Object value = _this.getOrDefault(key, defaultValue);
             if (value != defaultValue) {
-                result.put(key, value == null ? null : Cast.as(value));
+                result.put(key, Cast.nullable(value));
             }
         }
         return MapHelper.immutable(result);
@@ -153,14 +136,16 @@ public interface Cache<K, V> {
 
     void put(K key, @Nullable V value);
 
-    void put(CacheEntry<? extends K, @Nullable ? extends V> entry);
+    void put(K key, CacheValue<@Nullable ? extends V> entry);
 
-    default void putAll(Map<K, @Nullable ? extends V> entries) {
+    default void putAll(Map<? extends K, @Nullable ? extends V> entries) {
         entries.forEach(this::put);
     }
 
-    default void putAll(Iterable<? extends CacheEntry<? extends K, @Nullable ? extends V>> entries) {
-        entries.forEach(this::put);
+    default void putAll(Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
+        for (K key : keys) {
+            put(key, loader.load(key));
+        }
     }
 
     void expire(K key, long seconds);

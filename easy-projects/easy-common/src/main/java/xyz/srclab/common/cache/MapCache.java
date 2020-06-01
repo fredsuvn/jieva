@@ -28,11 +28,6 @@ final class MapCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V get(K key, @Nullable V defaultValue) {
-        return map.getOrDefault(key, defaultValue);
-    }
-
-    @Override
     public V get(K key, Function<? super K, ? extends V> ifAbsent) {
         return map.computeIfAbsent(key, ifAbsent);
     }
@@ -43,13 +38,18 @@ final class MapCache<K, V> implements Cache<K, V> {
     }
 
     @Override
+    public V getOrDefault(K key, @Nullable V defaultValue) {
+        return map.getOrDefault(key, defaultValue);
+    }
+
+    @Override
     public void put(K key, @Nullable V value) {
         map.put(key, value);
     }
 
     @Override
-    public void put(CacheEntry<? extends K, ? extends V> entry) {
-        map.put(entry.key(), entry.value());
+    public void put(K key, CacheValue<? extends V> entry) {
+        put(key, entry.value());
     }
 
     @Override

@@ -13,8 +13,19 @@ public abstract class Ref<T> {
         return new RefImpl<>(object);
     }
 
+    private @Nullable T object;
+
+    protected Ref() {
+    }
+
+    protected Ref(@Nullable T object) {
+        this.object = object;
+    }
+
     @Nullable
-    public abstract T get();
+    public T get() {
+        return object;
+    }
 
     public T getNonNull() {
         @Nullable T result = get();
@@ -22,26 +33,20 @@ public abstract class Ref<T> {
         return result;
     }
 
-    public abstract void set(@Nullable T value);
+    public void set(@Nullable T value) {
+        this.object = object;
+    }
+
+    public boolean isPresent() {
+        return object != null;
+    }
 
     private static final class RefImpl<T> extends Ref<T> {
-
-        private @Nullable T object;
-
         public RefImpl() {
         }
 
         public RefImpl(@Nullable T object) {
-            this.object = object;
-        }
-
-        @Nullable
-        public T get() {
-            return object;
-        }
-
-        public void set(@Nullable T object) {
-            this.object = object;
+            super(object);
         }
     }
 }

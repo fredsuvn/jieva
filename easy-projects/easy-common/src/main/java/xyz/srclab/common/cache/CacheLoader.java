@@ -1,24 +1,24 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.collection.SetHelper;
+import xyz.srclab.common.collection.MapHelper;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author sunqian
  */
 public interface CacheLoader<K, V> {
 
-    CacheEntry<K, V> load(K key);
+    CacheValue<V> load(K key);
 
     @Immutable
-    default Set<CacheEntry<K, V>> loadAll(Iterable<? extends K> keys) {
-        Set<CacheEntry<K, V>> result = new LinkedHashSet<>();
+    default Map<K, CacheValue<V>> loadAll(Iterable<? extends K> keys) {
+        Map<K, CacheValue<V>> result = new LinkedHashMap<>();
         for (K key : keys) {
-            result.add(load(key));
+            result.put(key, load(key));
         }
-        return SetHelper.immutable(result);
+        return MapHelper.immutable(result);
     }
 }

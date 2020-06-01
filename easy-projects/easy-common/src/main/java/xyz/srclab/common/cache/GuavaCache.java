@@ -1,8 +1,6 @@
 package xyz.srclab.common.cache;
 
 import com.google.common.cache.RemovalCause;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
@@ -18,8 +16,6 @@ import java.util.function.Function;
  * @author sunqian
  */
 final class GuavaCache<K, V> implements Cache<K, V> {
-
-    private static final Object NULL = new Object();
 
     private final com.google.common.cache.Cache<K, Object> guava;
 
@@ -38,37 +34,34 @@ final class GuavaCache<K, V> implements Cache<K, V> {
         }
         if (builder.removeListener() != null) {
             CacheRemoveListener<K, V> cacheRemoveListener = builder.removeListener();
-            guava.removalListener(new RemovalListener<K, Object>() {
-                @Override
-                public void onRemoval(RemovalNotification<K, Object> removalNotification) {
-                    @Nullable K key = removalNotification.getKey();
-                    @Nullable Object value = removalNotification.getValue();
-                    if (key == null || value == null) {
-                        throw new IllegalStateException("Unexpected entry: key = " + key + ", value = " + value);
-                    }
-                    RemovalCause cause = removalNotification.getCause();
-                    CacheRemoveListener.Cause removeCause;
-                    switch (cause) {
-                        case SIZE:
-                            removeCause = CacheRemoveListener.Cause.SIZE;
-                            break;
-                        case EXPIRED:
-                            removeCause = CacheRemoveListener.Cause.EXPIRED;
-                            break;
-                        case COLLECTED:
-                            removeCause = CacheRemoveListener.Cause.COLLECTED;
-                            break;
-                        case EXPLICIT:
-                            removeCause = CacheRemoveListener.Cause.EXPLICIT;
-                            break;
-                        case REPLACED:
-                            removeCause = CacheRemoveListener.Cause.REPLACED;
-                            break;
-                        default:
-                            throw new IllegalStateException("Unknown remove cause: " + cause);
-                    }
-                    cacheRemoveListener.afterRemove(key, unmask(value), removeCause);
+            guava.removalListener(removalNotification -> {
+                @Nullable K key = removalNotification.getKey();
+                @Nullable Object value = removalNotification.getValue();
+                if (key == null || value == null) {
+                    throw new IllegalStateException("Unexpected entry: key = " + key + ", value = " + value);
                 }
+                RemovalCause cause = removalNotification.getCause();
+                CacheRemoveListener.Cause removeCause;
+                switch (cause) {
+                    case SIZE:
+                        removeCause = CacheRemoveListener.Cause.SIZE;
+                        break;
+                    case EXPIRED:
+                        removeCause = CacheRemoveListener.Cause.EXPIRED;
+                        break;
+                    case COLLECTED:
+                        removeCause = CacheRemoveListener.Cause.COLLECTED;
+                        break;
+                    case EXPLICIT:
+                        removeCause = CacheRemoveListener.Cause.EXPLICIT;
+                        break;
+                    case REPLACED:
+                        removeCause = CacheRemoveListener.Cause.REPLACED;
+                        break;
+                    default:
+                        throw new IllegalStateException("Unknown remove cause: " + cause);
+                }
+                cacheRemoveListener.afterRemove(key, unmask(value), removeCause);
             });
         }
         if (builder.loader() == null) {
@@ -78,7 +71,7 @@ final class GuavaCache<K, V> implements Cache<K, V> {
             this.guava = guava.build(new com.google.common.cache.CacheLoader<K, Object>() {
                 @Override
                 public Object load(K k) {
-                    CacheEntry<? super K, @Nullable ? extends V> entry = loader.load(k);
+                    CacheValue<@Nullable ? extends V> entry = loader.load(k);
                     return mask(entry.value());
                 }
             });
@@ -106,14 +99,8 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V get(K key, @Nullable V defaultValue) {
-        @Nullable Object value = guava.getIfPresent(key);
-        return value == null ? defaultValue : unmask(value);
-    }
-
-    @Override
     public V get(K key, Function<? super K, ? extends V> ifAbsent) {
-        @Nullable Object value = null;
+        @Nullable Object value;
         try {
             value = guava.get(key, () -> {
                 @Nullable V v = ifAbsent.apply(key);
@@ -132,13 +119,19 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     }
 
     @Override
+    public V getOrDefault(K key, @Nullable V defaultValue) {
+        @Nullable Object value = guava.getIfPresent(key);
+        return value == null ? defaultValue : unmask(value);
+    }
+
+    @Override
     public void put(K key, @Nullable V value) {
         guava.put(key, mask(value));
     }
 
     @Override
-    public void put(CacheEntry<? extends K, ? extends V> entry) {
-        put(entry.key(), entry.value());
+    public void put(K key, CacheValue<? extends V> entry) {
+        put(key, entry.value());
     }
 
     @Override
