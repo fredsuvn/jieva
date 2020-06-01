@@ -1,6 +1,6 @@
 package xyz.srclab.common.lang.lazy;
 
-import xyz.srclab.annotation.Nullable;
+import kotlin.LazyKt;
 
 import java.util.function.Supplier;
 
@@ -15,24 +15,15 @@ final class Lazy0 {
 
     private static final class LazyImpl<T> implements Lazy<T> {
 
-        private final Supplier<T> supplier;
-
-        private volatile @Nullable T value;
+        private final kotlin.Lazy<T> kotlinLazy;
 
         private LazyImpl(Supplier<T> supplier) {
-            this.supplier = supplier;
+            this.kotlinLazy = LazyKt.lazy(supplier::get);
         }
 
         @Override
         public T get() {
-            if (value == null) {
-                synchronized (this) {
-                    if (value == null) {
-                        value = supplier.get();
-                    }
-                }
-            }
-            return value;
+            return kotlinLazy.getValue();
         }
     }
 }

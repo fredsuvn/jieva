@@ -6,7 +6,7 @@ import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.collection.MapHelper;
-import xyz.srclab.common.string.CharsRef;
+import xyz.srclab.common.string.StringRef;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.string.StringHelper;
@@ -69,10 +69,10 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
             int separator = stringDescriptor.indexOf(',', index + 1);
             @Nullable ProviderCandidate candidate;
             if (separator < 0) {
-                candidate = parseCandidateGroup(CharsRef.of(stringDescriptor, 0).trim());
+                candidate = parseCandidateGroup(StringRef.of(stringDescriptor, 0).trim());
                 index = stringDescriptor.length();
             } else {
-                candidate = parseCandidateGroup(CharsRef.of(stringDescriptor, index + 1, separator).trim());
+                candidate = parseCandidateGroup(StringRef.of(stringDescriptor, index + 1, separator).trim());
                 index = separator;
             }
             if (candidate != null) {
@@ -83,7 +83,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     }
 
     @Nullable
-    private ProviderCandidate parseCandidateGroup(CharsRef groupRef) {
+    private ProviderCandidate parseCandidateGroup(StringRef groupRef) {
         int index = -1;
         do {
             int separator = StringHelper.indexOf(groupRef, index + 1, groupRef.length(), '|');
@@ -105,7 +105,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
         return null;
     }
 
-    private ProviderCandidate parseCandidate(CharsRef candidateRef) {
+    private ProviderCandidate parseCandidate(StringRef candidateRef) {
         int conditionBegin = candidateRef.indexOf('(');
         Checker.checkArguments(conditionBegin < 0 ||
                         (conditionBegin > 0
@@ -126,7 +126,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
             condition = pair.first();
             conditionValue = pair.second();
         }
-        CharsRef nonConditionPart;
+        StringRef nonConditionPart;
         if (condition == null) {
             nonConditionPart = candidateRef;
         } else {
@@ -143,7 +143,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
         return new ProviderCandidate(providerName, providerClassName, condition, conditionValue);
     }
 
-    private Pair<@Nullable Condition, @Nullable String> parseConditionPair(CharsRef conditionRef) {
+    private Pair<@Nullable Condition, @Nullable String> parseConditionPair(StringRef conditionRef) {
         int conditionValueIndicator = conditionRef.indexOf(':');
         Checker.checkArguments(
                 conditionValueIndicator > 1 && conditionValueIndicator < conditionRef.length() - 1,
