@@ -20,19 +20,23 @@ public interface Cache<K, V> {
         return new MapCache<>(map);
     }
 
-    static <K, V> Cache<K, V> newThreadLocal(Cache<K, V> cache) {
-        return new ThreadLocalCache<>(cache);
+    static <K, V> Cache<K, V> newL2() {
+        return newL2(Defaults.CONCURRENCY_LEVEL);
     }
 
-    static <K, V> Cache<K, V> newGcL2() {
+    static <K, V> Cache<K, V> newL2(int concurrentLevel) {
         Cache<K, V> l1 = newMapped(
                 new MapMaker()
-                        .concurrencyLevel(Defaults.CONCURRENCY_LEVEL)
+                        .concurrencyLevel(concurrentLevel)
                         .weakKeys()
                         .makeMap()
         );
-        Cache<K, V> l2 = newThreadLocal(newMapped(new WeakHashMap<>()));
+        Cache<K, V> l2 = toThreadLocal(newMapped(new WeakHashMap<>()));
         return new L2Cache<>(l1, l2);
+    }
+
+    static <K, V> Cache<K, V> toThreadLocal(Cache<K, V> cache) {
+        return new ThreadLocalCache<>(cache);
     }
 
     static <K, V> CacheBuilder<K, V> newBuilder() {

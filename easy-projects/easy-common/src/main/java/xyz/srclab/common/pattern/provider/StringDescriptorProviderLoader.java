@@ -8,7 +8,7 @@ import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.string.StringRef;
 import xyz.srclab.common.lang.tuple.Pair;
-import xyz.srclab.common.reflect.ClassHelper;
+import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.string.StringKit;
 
 import java.util.Arrays;
@@ -161,7 +161,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     }
 
     private T newProviderInstance(String className) {
-        return ClassHelper.newInstance(className, classLoader);
+        return ClassKit.newInstance(className, classLoader);
     }
 
     private static final class ProviderCandidate {

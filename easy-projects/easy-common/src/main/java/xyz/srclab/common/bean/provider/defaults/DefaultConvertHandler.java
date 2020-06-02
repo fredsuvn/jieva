@@ -12,7 +12,7 @@ import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
 import xyz.srclab.common.lang.format.Formatter;
-import xyz.srclab.common.reflect.ClassHelper;
+import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeKit;
 
 import java.lang.reflect.*;
@@ -277,14 +277,14 @@ final class DefaultConvertHandler implements ConvertHandler {
     }
 
     private Object toBean(Object from, Class<?> to, BeanOperator beanOperator) {
-        Object toInstance = ClassHelper.newInstance(to);
+        Object toInstance = ClassKit.newInstance(to);
         beanOperator.copyProperties(from, toInstance);
         return toInstance;
     }
 
     private Object toGenericBean(Object from, Class<?> rawType, Type[] genericTypes, BeanOperator beanOperator) {
         TypeVariable<?>[] typeVariables = rawType.getTypeParameters();
-        Object toInstance = ClassHelper.newInstance(rawType);
+        Object toInstance = ClassKit.newInstance(rawType);
         BeanClass toBeanClass = beanOperator.resolveBean(rawType);
         if (from instanceof Map) {
             Map map = (Map) from;

@@ -1,7 +1,5 @@
 package xyz.srclab.common.bytecode;
 
-import xyz.srclab.common.reflect.ClassLoaderHelper;
-
 /**
  * @author sunqian
  */

@@ -1,4 +1,4 @@
 package xyz.srclab.common.reflect;
 
-public class ReflectHelper {
+public class ReflectKit {
 }

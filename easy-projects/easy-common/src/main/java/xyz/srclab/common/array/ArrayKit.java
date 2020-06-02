@@ -249,7 +249,7 @@ public class ArrayKit {
     private static final class ArrayTypeTable {
 
         // Key: component type, value: array type
-        private static final Cache<Class<?>, Class<?>> cache = Cache.newGcL2();
+        private static final Cache<Class<?>, Class<?>> cache = Cache.newL2();
 
         private static final Class<?>[] table = {
                 Object.class, Object[].class,

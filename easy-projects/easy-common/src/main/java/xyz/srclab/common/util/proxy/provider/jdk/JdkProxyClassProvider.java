@@ -2,7 +2,7 @@ package xyz.srclab.common.util.proxy.provider.jdk;
 
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.reflect.ClassHelper;
+import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.util.proxy.*;
 
 import java.lang.reflect.Method;
@@ -40,7 +40,7 @@ public class JdkProxyClassProvider implements ProxyClassProvider {
         @Override
         public T newInstance() {
             if (methodMap.isEmpty()) {
-                return ClassHelper.newInstance(type);
+                return ClassKit.newInstance(type);
             }
             Object instance = Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type},
                     (object, method, args) -> {
@@ -57,7 +57,7 @@ public class JdkProxyClassProvider implements ProxyClassProvider {
         @Override
         public T newInstance(Class<?>[] parameterTypes, Object[] arguments) {
             if (methodMap.isEmpty()) {
-                return ClassHelper.newInstance(type, parameterTypes, arguments);
+                return ClassKit.newInstance(type, parameterTypes, arguments);
             }
             throw new UnsupportedOperationException("JDK proxy doesn't support this");
         }

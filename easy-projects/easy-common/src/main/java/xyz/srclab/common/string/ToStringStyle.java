@@ -3,7 +3,7 @@ package xyz.srclab.common.string;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.ClassHelper;
+import xyz.srclab.common.reflect.ClassKit;
 
 import java.util.function.Predicate;
 
@@ -59,7 +59,7 @@ public interface ToStringStyle {
         private String separator = ",";
         private String indicator = "=";
         private boolean ignoreReferenceLoop = false;
-        private Predicate<Object> deepToStringPredicate = o -> !ClassHelper.isBasic(o);
+        private Predicate<Object> deepToStringPredicate = o -> !ClassKit.isBasic(o);
 
         public Builder setBeanStart(String beanStart) {
             this.beanStart = beanStart;

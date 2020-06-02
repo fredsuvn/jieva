@@ -5,8 +5,8 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.ClassHelper;
-import xyz.srclab.common.reflect.MethodHelper;
+import xyz.srclab.common.reflect.ClassKit;
+import xyz.srclab.common.reflect.MethodKit;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Method;
@@ -123,7 +123,7 @@ public interface BeanClass {
 
     @Immutable
     default Map<String, Object> deepToMap(Object bean) {
-        return deepToMap(bean, o -> !ClassHelper.isBasic(o));
+        return deepToMap(bean, o -> !ClassKit.isBasic(o));
     }
 
     @Immutable
@@ -229,7 +229,7 @@ public interface BeanClass {
 
             @Override
             public @Nullable BeanMethod getMethod(String methodName, Class<?>... parameterTypes) {
-                @Nullable Method method = MethodHelper.getMethod(type, methodName, parameterTypes);
+                @Nullable Method method = MethodKit.getMethod(type, methodName, parameterTypes);
                 return method == null ? null : methodMap.get(method);
             }
 

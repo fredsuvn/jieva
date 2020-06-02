@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class SetKit {
 
@@ -24,6 +25,17 @@ public class SetKit {
         Set<NE> result = new LinkedHashSet<>();
         for (OE o : iterable) {
             result.add(mapper.apply(o));
+        }
+        return immutable(result);
+    }
+
+    @Immutable
+    public static <E> Set<E> filter(Iterable<? extends E> iterable, Predicate<? super E> predicate) {
+        Set<E> result = new LinkedHashSet<>();
+        for (E e : iterable) {
+            if (predicate.test(e)) {
+                result.add(e);
+            }
         }
         return immutable(result);
     }

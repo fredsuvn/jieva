@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class ListKit {
 
@@ -25,6 +26,17 @@ public class ListKit {
         List<NE> result = new LinkedList<>();
         for (OE o : iterable) {
             result.add(mapper.apply(o));
+        }
+        return immutable(result);
+    }
+
+    @Immutable
+    public static <E> List<E> filter(Iterable<? extends E> iterable, Predicate<? super E> predicate) {
+        List<E> result = new LinkedList<>();
+        for (E e : iterable) {
+            if (predicate.test(e)) {
+                result.add(e);
+            }
         }
         return immutable(result);
     }
