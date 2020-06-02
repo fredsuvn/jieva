@@ -16,7 +16,7 @@ public class Defaults {
     public static final int CONCURRENCY_LEVEL = 16;
 
     public static boolean isBasicType(Class<?> type) {
-        return BasicTypeTable.find(type);
+        return type.isPrimitive() || BasicTypeTable.find(type);
     }
 
     private static final class BasicTypeTable {
@@ -31,7 +31,7 @@ public class Defaults {
 
         private static boolean find(Class<?> type) {
             for (Class<?> aClass : table) {
-                if (aClass.equals(type)) {
+                if (aClass.isAssignableFrom(type)) {
                     return true;
                 }
             }

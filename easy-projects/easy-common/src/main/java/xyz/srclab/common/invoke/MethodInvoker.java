@@ -3,7 +3,6 @@ package xyz.srclab.common.invoke;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.base.Describer;
 import xyz.srclab.common.reflect.MethodKit;
 
 import java.lang.reflect.Method;

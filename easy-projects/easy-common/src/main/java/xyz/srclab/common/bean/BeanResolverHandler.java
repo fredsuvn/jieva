@@ -2,12 +2,10 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 
+import java.util.Map;
+
 @Immutable
 public interface BeanResolverHandler {
 
-    BeanResolverHandler DEFAULT = BeanSupport.getBeanResolverHandler();
-
-    boolean supportBean(Class<?> beanClass);
-
-    BeanClass resolve(Class<?> beanClass);
+    void resolve(Class<?> beanClass, Map<String, BeanProperty> context);
 }

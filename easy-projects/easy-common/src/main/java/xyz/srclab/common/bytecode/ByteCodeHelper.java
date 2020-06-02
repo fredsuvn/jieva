@@ -2,7 +2,6 @@ package xyz.srclab.common.bytecode;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.ArrayUtils;
-import xyz.srclab.common.base.CharMatchers;
 import xyz.srclab.common.string.StringKit;
 
 /**

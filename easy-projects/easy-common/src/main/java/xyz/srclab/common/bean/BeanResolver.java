@@ -6,8 +6,6 @@ import xyz.srclab.common.pattern.builder.HandlersBuilder;
 @Immutable
 public interface BeanResolver {
 
-    BeanResolver DEFAULT = BeanSupport.getBeanResolver();
-
     static Builder newBuilder() {
         return new Builder();
     }

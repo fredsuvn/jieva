@@ -150,7 +150,7 @@ public class Equals {
         return deepEquals0(a, b);
     }
 
-    public static boolean deepEquals0(Map<?, ?> a, Map<?, ?> b) {
+    private static boolean deepEquals0(Map<?, ?> a, Map<?, ?> b) {
         if (a.size() != b.size()) {
             return false;
         }

@@ -2,15 +2,16 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.MethodKit;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -41,33 +42,24 @@ public interface BeanClass {
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, Type type, Converter converter)
-            throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable Object value = getPropertyValue(bean, propertyName);
-        if (value == null) {
-            return null;
-        }
-        return converter.convert(value, type);
-    }
-
-    @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         @Nullable Object value = getPropertyValue(bean, propertyName);
-        if (value == null) {
-            return null;
-        }
-        return converter.convert(value, type);
+        return value == null ? null : converter.convert(value, type);
+    }
+
+    @Nullable
+    default <T> T getPropertyValue(Object bean, String propertyName, Type type, Converter converter)
+            throws BeanPropertyNotFoundException, UnsupportedOperationException {
+        @Nullable Object value = getPropertyValue(bean, propertyName);
+        return value == null ? null : converter.convert(value, type);
     }
 
     @Nullable
     default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         @Nullable Object value = getPropertyValue(bean, propertyName);
-        if (value == null) {
-            return null;
-        }
-        return converter.convert(value, type);
+        return value == null ? null : converter.convert(value, type);
     }
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
@@ -123,17 +115,23 @@ public interface BeanClass {
 
     @Immutable
     default Map<String, Object> deepToMap(Object bean) {
-        return deepToMap(bean, o -> !ClassKit.isBasic(o));
+        return deepToMap(bean, o -> {
+            if (o == null || o instanceof Collection || o instanceof Map) {
+                return false;
+            }
+            Class<?> type = o.getClass();
+            return !type.isArray() && !Defaults.isBasicType(o.getClass());
+        });
     }
 
     @Immutable
-    default Map<String, Object> deepToMap(Object bean, Predicate<Object> resolvePredicate) {
+    default Map<String, Object> deepToMap(Object bean, Predicate<Object> shouldResolve) {
         return MapKit.map(getReadableProperties(), name -> name, property -> {
             @Nullable Object value = property.getValue(bean);
-            if (value == null || !resolvePredicate.test(value)) {
+            if (value == null || !shouldResolve.test(value)) {
                 return value;
             }
-            return deepToMap(bean, resolvePredicate);
+            return deepToMap(value, shouldResolve);
         });
     }
 
