@@ -2,7 +2,7 @@ package xyz.srclab.common.bytecode;
 
 import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.IterableHelper;
+import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.string.StringHelper;
 
 import java.util.Arrays;
@@ -37,7 +37,7 @@ public class BRefType implements BType {
     }
 
     public void addGenericTypes(Iterable<BDescribable> genericTypes) {
-        IterableHelper.addAll(getGenericTypes(), genericTypes);
+        IterableKit.addAll(getGenericTypes(), genericTypes);
     }
 
     public String getName() {

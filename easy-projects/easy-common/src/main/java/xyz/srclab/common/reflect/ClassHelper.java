@@ -74,7 +74,7 @@ public class ClassHelper {
     private static Type getGenericSuperclass0(Class<?> cls, Class<?> superClass) {
         Type current = cls;
         do {
-            Class<?> currentClass = TypeHelper.getRawType(current);
+            Class<?> currentClass = TypeKit.getRawType(current);
             if (superClass.equals(currentClass)) {
                 return current;
             }

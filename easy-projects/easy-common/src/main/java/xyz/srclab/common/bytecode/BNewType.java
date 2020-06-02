@@ -2,7 +2,7 @@ package xyz.srclab.common.bytecode;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.IterableHelper;
+import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.string.StringHelper;
 
@@ -32,10 +32,10 @@ public class BNewType implements BType {
     ) {
         this.name = className;
         this.typeVariables = typeVariables == null ? Collections.emptyList() :
-                ListHelper.immutable(IterableHelper.asList(typeVariables));
+                ListHelper.immutable(IterableKit.asList(typeVariables));
         this.superClass = superClass == null ? ByteCodeHelper.OBJECT : superClass;
         this.interfaces = interfaces == null ? Collections.emptyList() :
-                ListHelper.immutable(IterableHelper.asList(interfaces));
+                ListHelper.immutable(IterableKit.asList(interfaces));
         this.internalName = ByteCodeHelper.getTypeInternalName(className);
         this.descriptor = ByteCodeHelper.getTypeDescriptor(className);
     }

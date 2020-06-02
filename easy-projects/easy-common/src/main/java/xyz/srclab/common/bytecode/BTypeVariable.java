@@ -2,8 +2,8 @@ package xyz.srclab.common.bytecode;
 
 import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.IterableHelper;
-import xyz.srclab.common.reflect.TypeHelper;
+import xyz.srclab.common.collection.IterableKit;
+import xyz.srclab.common.reflect.TypeKit;
 import xyz.srclab.common.string.StringHelper;
 
 import java.lang.reflect.TypeVariable;
@@ -25,7 +25,7 @@ public class BTypeVariable implements BType {
     }
 
     public BTypeVariable(TypeVariable<?> typeVariable) {
-        this(typeVariable.getName(), TypeHelper.getRawType(typeVariable.getBounds()[0]).isInterface());
+        this(typeVariable.getName(), TypeKit.getRawType(typeVariable.getBounds()[0]).isInterface());
     }
 
     public void addBounds(BType... bounds) {
@@ -33,7 +33,7 @@ public class BTypeVariable implements BType {
     }
 
     public void addBounds(Iterable<BType> bounds) {
-        IterableHelper.addAll(getBounds(), bounds);
+        IterableKit.addAll(getBounds(), bounds);
     }
 
     public String getDeclaration() {

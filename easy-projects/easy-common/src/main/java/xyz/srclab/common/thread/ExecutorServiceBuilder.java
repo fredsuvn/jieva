@@ -8,7 +8,11 @@ import java.util.concurrent.*;
 /**
  * @author sunqian
  */
-public class ExecutorBuilder {
+public class ExecutorServiceBuilder {
+
+    public static ExecutorServiceBuilder newBuilder() {
+        return new ExecutorServiceBuilder();
+    }
 
     private int corePoolSize = 1;
     private int maximumPoolSize = 1;
@@ -18,37 +22,37 @@ public class ExecutorBuilder {
     private @Nullable ThreadFactory threadFactory;
     private @Nullable RejectedExecutionHandler rejectedExecutionHandler;
 
-    public ExecutorBuilder setCorePoolSize(int corePoolSize) {
+    public ExecutorServiceBuilder corePoolSize(int corePoolSize) {
         this.corePoolSize = corePoolSize;
         return this;
     }
 
-    public ExecutorBuilder setMaximumPoolSize(int maximumPoolSize) {
+    public ExecutorServiceBuilder maximumPoolSize(int maximumPoolSize) {
         this.maximumPoolSize = maximumPoolSize;
         return this;
     }
 
-    public ExecutorBuilder setWorkQueueCapacity(int workQueueCapacity) {
+    public ExecutorServiceBuilder workQueueCapacity(int workQueueCapacity) {
         this.workQueueCapacity = workQueueCapacity;
         return this;
     }
 
-    public ExecutorBuilder setKeepAliveTime(Duration keepAliveTime) {
+    public ExecutorServiceBuilder keepAliveTime(Duration keepAliveTime) {
         this.keepAliveTime = keepAliveTime;
         return this;
     }
 
-    public ExecutorBuilder setWorkQueue(BlockingQueue<Runnable> workQueue) {
+    public ExecutorServiceBuilder workQueue(BlockingQueue<Runnable> workQueue) {
         this.workQueue = workQueue;
         return this;
     }
 
-    public ExecutorBuilder setThreadFactory(ThreadFactory threadFactory) {
+    public ExecutorServiceBuilder threadFactory(ThreadFactory threadFactory) {
         this.threadFactory = threadFactory;
         return this;
     }
 
-    public ExecutorBuilder setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
+    public ExecutorServiceBuilder rejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
         this.rejectedExecutionHandler = rejectedExecutionHandler;
         return this;
     }

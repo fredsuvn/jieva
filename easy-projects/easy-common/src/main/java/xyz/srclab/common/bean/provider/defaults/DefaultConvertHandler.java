@@ -2,18 +2,18 @@ package xyz.srclab.common.bean.provider.defaults;
 
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.bean.BeanClass;
 import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.bean.BeanProperty;
-import xyz.srclab.common.collection.IterableHelper;
+import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.collection.MapHelper;
 import xyz.srclab.common.collection.SetHelper;
 import xyz.srclab.common.lang.format.Formatter;
 import xyz.srclab.common.reflect.ClassHelper;
-import xyz.srclab.common.reflect.TypeHelper;
+import xyz.srclab.common.reflect.TypeKit;
 
 import java.lang.reflect.*;
 import java.math.BigDecimal;
@@ -83,7 +83,7 @@ final class DefaultConvertHandler implements ConvertHandler {
 
     private Object convertParameterizedType(
             Object from, ParameterizedType parameterizedType, BeanOperator beanOperator) {
-        Class<?> rawType = TypeHelper.getRawType(parameterizedType);
+        Class<?> rawType = TypeKit.getRawType(parameterizedType);
         // Never reached
         // if (rawType.isArray()) {
         //     return convertToArray(from, to, beanOperator);
@@ -102,7 +102,7 @@ final class DefaultConvertHandler implements ConvertHandler {
     }
 
     private Object convertWildcardType(Object from, WildcardType to, BeanOperator beanOperator) {
-        Class<?> rawType = TypeHelper.getRawType(to);
+        Class<?> rawType = TypeKit.getRawType(to);
         return convertClass(from, rawType, beanOperator);
     }
 
@@ -247,11 +247,11 @@ final class DefaultConvertHandler implements ConvertHandler {
     }
 
     private Object toArray(Object from, Type arrayType, BeanOperator beanOperator) {
-        Type componentType = ArrayHelper.getGenericComponentType(arrayType);
+        Type componentType = ArrayKit.getGenericComponentType(arrayType);
         if (from.getClass().isArray()) {
             int arrayLength = Array.getLength(from);
-            return ArrayHelper.buildArray(
-                    ArrayHelper.newArray(componentType, arrayLength),
+            return ArrayKit.buildArray(
+                    ArrayKit.newArray(componentType, arrayLength),
                     i -> {
                         @Nullable Object fromValue = Array.get(from, i);
                         @Nullable Object toValue =
@@ -261,8 +261,8 @@ final class DefaultConvertHandler implements ConvertHandler {
             );
         }
         if (from instanceof Iterable) {
-            Collection<?> collection = IterableHelper.asCollection((Iterable<?>) from);
-            Object resultArray = ArrayHelper.newArray(componentType, collection.size());
+            Collection<?> collection = IterableKit.asCollection((Iterable<?>) from);
+            Object resultArray = ArrayKit.newArray(componentType, collection.size());
             int i = 0;
             for (@Nullable Object o : collection) {
                 @Nullable Object resultValue =

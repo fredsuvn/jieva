@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 
-public class TypeHelper {
+public class TypeKit {
 
     private static final Cache<Type, Class<?>> rawTypeCache = Cache.newGcThreadLocalL2();
 

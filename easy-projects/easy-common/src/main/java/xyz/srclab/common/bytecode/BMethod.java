@@ -3,7 +3,7 @@ package xyz.srclab.common.bytecode;
 import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.IterableHelper;
+import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.collection.ListHelper;
 import xyz.srclab.common.string.StringHelper;
 
@@ -34,9 +34,9 @@ public class BMethod implements BDescribable {
         this.name = name;
         this.returnType = returnType == null ? ByteCodeHelper.PRIMITIVE_VOID : returnType;
         this.parameterTypes = parameterTypes == null ? Collections.emptyList() :
-                ListHelper.immutable(IterableHelper.asList(parameterTypes));
+                ListHelper.immutable(IterableKit.asList(parameterTypes));
         this.typeVariables = typeVariables == null ? Collections.emptyList() :
-                ListHelper.immutable(IterableHelper.asList(typeVariables));
+                ListHelper.immutable(IterableKit.asList(typeVariables));
     }
 
     public BMethod(Method method) {

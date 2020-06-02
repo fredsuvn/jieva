@@ -1,6 +1,6 @@
 package xyz.srclab.common.lang.key;
 
-import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.array.ArrayKit;
 
 import java.util.Arrays;
 
@@ -26,7 +26,7 @@ final class Key0 {
         }
 
         private KeyImpl(Iterable<?> elements) {
-            this((Object[]) ArrayHelper.toArray(elements, Object.class));
+            this((Object[]) ArrayKit.toArray(elements, Object.class));
         }
 
         @Override

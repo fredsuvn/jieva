@@ -2,25 +2,25 @@ package test.xyz.srclab.common.reflect
 
 import org.testng.annotations.Test
 import xyz.srclab.common.bean.BeanHelper
-import xyz.srclab.common.reflect.TypeHelper
+import xyz.srclab.common.reflect.TypeKit
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.test.doAssertEquals
 import java.lang.reflect.ParameterizedType
 
-object TypeHelperTest {
+object TypeKitTest {
 
     @Test
     fun testAssignable() {
-        doAssertEquals(TypeHelper.isAssignable(Any(), Any::class.java), true)
-        doAssertEquals(TypeHelper.isAssignable(Any::class.java, Any::class.java), true)
+        doAssertEquals(TypeKit.isAssignable(Any(), Any::class.java), true)
+        doAssertEquals(TypeKit.isAssignable(Any::class.java, Any::class.java), true)
     }
 
     @Test
     fun testRawClass() {
-        doAssertEquals(TypeHelper.getRawType<Any>(A::class.java.typeParameters[0]), Throwable::class.java)
-        doAssertEquals(TypeHelper.getRawType<Any>(A2::class.java.typeParameters[0]), List::class.java)
+        doAssertEquals(TypeKit.getRawType<Any>(A::class.java.typeParameters[0]), Throwable::class.java)
+        doAssertEquals(TypeKit.getRawType<Any>(A2::class.java.typeParameters[0]), List::class.java)
         doAssertEquals(
-            TypeHelper.getRawType<Any>(BeanHelper.resolveBean(B::class.java).getProperty("array")?.genericType),
+            TypeKit.getRawType<Any>(BeanHelper.resolveBean(B::class.java).getProperty("array")?.genericType),
             Any::class.java
         )
     }
@@ -28,14 +28,14 @@ object TypeHelperTest {
     @Test
     fun testSuperclassGeneric() {
         doAssertEquals(
-            (TypeHelper.getGenericSuperclass(
+            (TypeKit.getGenericSuperclass(
                 C::class.java,
                 TypeRef::class.java
             ) as ParameterizedType).actualTypeArguments[0],
             C().type
         )
         doAssertEquals(
-            TypeHelper.getGenericSuperclass(B::class.java, TypeRef::class.java),
+            TypeKit.getGenericSuperclass(B::class.java, TypeRef::class.java),
             null
         )
     }

@@ -5,7 +5,7 @@ import xyz.srclab.annotation.WrittenReturn;
 import java.util.*;
 import java.util.function.Function;
 
-public class IterableHelper {
+public class IterableKit {
 
     public static <E> List<E> asList(Iterable<? extends E> iterable) {
         return iterable instanceof List ?

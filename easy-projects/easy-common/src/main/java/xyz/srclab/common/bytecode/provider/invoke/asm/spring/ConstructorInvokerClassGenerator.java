@@ -4,7 +4,7 @@ import org.springframework.asm.ClassWriter;
 import org.springframework.asm.FieldVisitor;
 import org.springframework.asm.MethodVisitor;
 import org.springframework.asm.Opcodes;
-import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.bytecode.*;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
 import xyz.srclab.common.collection.ListHelper;
@@ -39,7 +39,7 @@ final class ConstructorInvokerClassGenerator {
                     newTypeClass.getInternalName(),
                     newTypeClass.getSignature(),
                     newTypeClass.getSuperClass().getInternalName(),
-                    ArrayHelper.map(newTypeClass.getInterfaces(), String.class, BRefType::getInternalName)
+                    ArrayKit.map(newTypeClass.getInterfaces(), String.class, BRefType::getInternalName)
             );
 
             // private Constructor constructor;

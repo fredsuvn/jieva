@@ -1,6 +1,6 @@
 package xyz.srclab.common.string;
 
-import xyz.srclab.common.array.ArrayHelper;
+import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.Checker;
 
 import java.util.StringJoiner;
@@ -79,7 +79,7 @@ public class StringHelper {
 
     public static <T> String join(CharSequence delimiter, T[] array, Function<T, String> toString) {
         return String.join(delimiter,
-                ArrayHelper.buildArray(new String[array.length], i -> toString.apply(array[i]))
+                ArrayKit.buildArray(new String[array.length], i -> toString.apply(array[i]))
         );
     }
 

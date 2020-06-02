@@ -6,11 +6,19 @@ package xyz.srclab.common.util.count;
 public interface Counter {
 
     static Counter fromZero() {
-        return new CounterImpl();
+        return Count0.newCounter();
     }
 
     static Counter from(long value) {
-        return new CounterImpl(value);
+        return Count0.newCounter(value);
+    }
+
+    static Counter fromZeroThreadSafe() {
+        return Count0.newThreadSafeCounter();
+    }
+
+    static Counter fromThreadSafe(long value) {
+        return Count0.newThreadSafeCounter(value);
     }
 
     default int getInt() {
@@ -19,23 +27,23 @@ public interface Counter {
 
     long getLong();
 
-    default void setInt(int i) {
-        setLong(i);
+    default void setInt(int value) {
+        setLong(value);
     }
 
-    void setLong(long l);
+    void setLong(long value);
 
-    default int addAndGetInt(int i) {
-        return (int) addAndGetLong(i);
+    default int addAndGetInt(int value) {
+        return (int) addAndGetLong(value);
     }
 
-    long addAndGetLong(long l);
+    long addAndGetLong(long value);
 
-    default int getIntAndAdd(int i) {
-        return (int) getLongAndAdd(i);
+    default int getIntAndAdd(int value) {
+        return (int) getLongAndAdd(value);
     }
 
-    long getLongAndAdd(long l);
+    long getLongAndAdd(long value);
 
     default int getIntAndIncrement() {
         return (int) getLongAndIncrement();

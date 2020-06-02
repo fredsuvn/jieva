@@ -21,7 +21,7 @@ public class ListHelper {
     public static <E> List<E> concat(Iterable<Iterable<? extends E>> iterables) {
         List<E> result = new LinkedList<>();
         for (Iterable<? extends E> iterable : iterables) {
-            result.addAll(IterableHelper.asList(iterable));
+            result.addAll(IterableKit.asList(iterable));
         }
         return immutable(result);
     }
