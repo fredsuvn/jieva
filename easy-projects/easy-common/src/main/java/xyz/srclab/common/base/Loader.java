@@ -3,7 +3,7 @@ package xyz.srclab.common.base;
 import org.apache.commons.io.IOUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.SetHelper;
+import xyz.srclab.common.collection.SetKit;
 import xyz.srclab.common.exception.ExceptionWrapper;
 
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class Loader {
     public static Set<URL> loadResources(String resourceName, ClassLoader classLoader) {
         try {
             Enumeration<URL> urlEnumeration = classLoader.getResources(resourceName);
-            return SetHelper.enumerationToSet(urlEnumeration);
+            return SetKit.enumerationToSet(urlEnumeration);
         } catch (Exception e) {
             throw new ExceptionWrapper(e);
         }

@@ -3,7 +3,7 @@ package xyz.srclab.common.bytecode;
 import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.IterableKit;
-import xyz.srclab.common.string.StringHelper;
+import xyz.srclab.common.string.StringKit;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -62,7 +62,7 @@ public class BRefType implements BType {
         return "L" +
                 internalName +
                 "<" +
-                StringHelper.join("", genericTypes, BDescribable::getSignature) +
+                StringKit.join("", genericTypes, BDescribable::getSignature) +
                 ">;";
     }
 

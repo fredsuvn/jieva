@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Loader;
-import xyz.srclab.common.collection.MapHelper;
+import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.pattern.provider.ProviderLoader;
 
 import java.io.IOException;
@@ -39,8 +39,8 @@ public class ToovaBoot {
         mergeProperties(toovaProperties, userProperties, properties);
 
         version = (String) properties.get("version");
-        defaultProperties = MapHelper.immutable((Map<String, String>) (properties.get("providers")));
-        providerProperties = MapHelper.immutable((Map<String, String>) (properties.get("defaults")));
+        defaultProperties = MapKit.immutable((Map<String, String>) (properties.get("providers")));
+        providerProperties = MapKit.immutable((Map<String, String>) (properties.get("defaults")));
     }
 
     @Immutable
@@ -52,7 +52,7 @@ public class ToovaBoot {
         try (InputStream inputStream = url.openStream()) {
             Yaml yaml = new Yaml();
             Map<String, Object> yamlProperties = yaml.load(inputStream);
-            return MapHelper.immutable(yamlProperties);
+            return MapKit.immutable(yamlProperties);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -98,7 +98,7 @@ public class ToovaBoot {
     }
 
     public static <T> T getProvider(String interfaceName) {
-        return MapHelper.getFirstValueNonNull(getProviders(interfaceName));
+        return MapKit.firstValueNonNull(getProviders(interfaceName));
     }
 
     public static <T> Map<String, T> getProviders(Class<T> interfaceClass) {

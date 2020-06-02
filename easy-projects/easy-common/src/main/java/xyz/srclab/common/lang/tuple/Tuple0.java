@@ -3,7 +3,7 @@ package xyz.srclab.common.lang.tuple;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.string.StringHelper;
+import xyz.srclab.common.string.StringKit;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -87,7 +87,7 @@ final class Tuple0 {
 
         @Override
         public String toString() {
-            return "(" + StringHelper.join(", ", values) + ")";
+            return "(" + StringKit.join(", ", values) + ")";
         }
     }
 

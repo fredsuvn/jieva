@@ -1,6 +1,6 @@
 package xyz.srclab.common.base;
 
-import xyz.srclab.common.string.StringHelper;
+import xyz.srclab.common.string.StringKit;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -32,6 +32,6 @@ public class Describer {
     }
 
     public static String parameterTypesToString(Class<?>... parameterTypes) {
-        return StringHelper.join(", ", parameterTypes, Class::getName);
+        return StringKit.join(", ", parameterTypes, Class::getName);
     }
 }

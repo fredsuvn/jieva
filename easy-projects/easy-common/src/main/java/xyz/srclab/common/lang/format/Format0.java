@@ -2,7 +2,7 @@ package xyz.srclab.common.lang.format;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.helpers.MessageFormatter;
-import xyz.srclab.annotation.Written;
+import xyz.srclab.annotation.Out;
 
 /**
  * @author sunqian
@@ -23,7 +23,7 @@ final class Format0 {
             return MessageFormatter.arrayFormat(pattern, args, null).getMessage();
         }
 
-        private void processArguments(@Written Object... args) {
+        private void processArguments(@Out Object... args) {
             if (ArrayUtils.isEmpty(args)) {
                 return;
             }

@@ -2,7 +2,6 @@ package test.xyz.srclab.common.collection
 
 import org.testng.annotations.Test
 import test.xyz.srclab.common.Config
-import xyz.srclab.common.collection.FixedKeysMap
 import xyz.srclab.test.doAssertEquals
 import xyz.srclab.test.doExpectThrowable
 import kotlin.random.Random

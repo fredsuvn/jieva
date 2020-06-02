@@ -4,8 +4,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.IterableKit;
-import xyz.srclab.common.collection.ListHelper;
-import xyz.srclab.common.string.StringHelper;
+import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.string.StringKit;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -34,17 +34,17 @@ public class BMethod implements BDescribable {
         this.name = name;
         this.returnType = returnType == null ? ByteCodeHelper.PRIMITIVE_VOID : returnType;
         this.parameterTypes = parameterTypes == null ? Collections.emptyList() :
-                ListHelper.immutable(IterableKit.asList(parameterTypes));
+                ListKit.immutable(IterableKit.asList(parameterTypes));
         this.typeVariables = typeVariables == null ? Collections.emptyList() :
-                ListHelper.immutable(IterableKit.asList(typeVariables));
+                ListKit.immutable(IterableKit.asList(typeVariables));
     }
 
     public BMethod(Method method) {
         this(
                 method.getName(),
                 new BRefType(method.getReturnType()),
-                ListHelper.map(method.getParameterTypes(), BRefType::new),
-                ListHelper.map(method.getTypeParameters(), BTypeVariable::new)
+                ListKit.map(method.getParameterTypes(), BRefType::new),
+                ListKit.map(method.getTypeParameters(), BTypeVariable::new)
         );
     }
 
@@ -84,7 +84,7 @@ public class BMethod implements BDescribable {
         if (CollectionUtils.isEmpty(parameterTypes)) {
             return "()" + returnType.getDescriptor();
         }
-        String parameterTypesDescriptor = StringHelper.join("", parameterTypes, BDescribable::getDescriptor);
+        String parameterTypesDescriptor = StringKit.join("", parameterTypes, BDescribable::getDescriptor);
         return "(" + parameterTypesDescriptor + ")" + returnType.getDescriptor();
     }
 
@@ -98,9 +98,9 @@ public class BMethod implements BDescribable {
 
     private String getSignature0() {
         String typeVariablesDeclaration = CollectionUtils.isEmpty(typeVariables) ? "" :
-                ("<" + StringHelper.join("", typeVariables, BTypeVariable::getDeclaration) + ">");
+                ("<" + StringKit.join("", typeVariables, BTypeVariable::getDeclaration) + ">");
         String parameterTypesSignature = CollectionUtils.isEmpty(parameterTypes) ? "" :
-                StringHelper.join("", parameterTypes, BDescribable::getSignature);
+                StringKit.join("", parameterTypes, BDescribable::getSignature);
         return typeVariablesDeclaration + "(" + parameterTypesSignature + ")" + returnType.getSignature();
     }
 }

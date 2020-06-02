@@ -2,7 +2,7 @@ package xyz.srclab.common.array;
 
 import com.google.common.collect.Iterables;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.annotation.WrittenReturn;
+import xyz.srclab.annotation.OutReturn;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
@@ -59,70 +59,70 @@ public class ArrayKit {
         return toArray(newIterable, newComponentType);
     }
 
-    public static <T> T[] buildArray(@WrittenReturn T[] array, ObjectSupplier<T> supplier) {
+    public static <T> T[] buildArray(@OutReturn T[] array, ObjectSupplier<T> supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get(i);
         }
         return array;
     }
 
-    public static boolean[] buildArray(@WrittenReturn boolean[] array, BooleanSupplier supplier) {
+    public static boolean[] buildArray(@OutReturn boolean[] array, BooleanSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get(i);
         }
         return array;
     }
 
-    public static byte[] buildArray(@WrittenReturn byte[] array, ByteSupplier supplier) {
+    public static byte[] buildArray(@OutReturn byte[] array, ByteSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get(i);
         }
         return array;
     }
 
-    public static short[] buildArray(@WrittenReturn short[] array, ShortSupplier supplier) {
+    public static short[] buildArray(@OutReturn short[] array, ShortSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get(i);
         }
         return array;
     }
 
-    public static char[] buildArray(@WrittenReturn char[] array, CharSupplier supplier) {
+    public static char[] buildArray(@OutReturn char[] array, CharSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get(i);
         }
         return array;
     }
 
-    public static int[] buildArray(@WrittenReturn int[] array, IntSupplier supplier) {
+    public static int[] buildArray(@OutReturn int[] array, IntSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get(i);
         }
         return array;
     }
 
-    public static long[] buildArray(@WrittenReturn long[] array, LongSupplier supplier) {
+    public static long[] buildArray(@OutReturn long[] array, LongSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get(i);
         }
         return array;
     }
 
-    public static float[] buildArray(@WrittenReturn float[] array, FloatSupplier supplier) {
+    public static float[] buildArray(@OutReturn float[] array, FloatSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get(i);
         }
         return array;
     }
 
-    public static double[] buildArray(@WrittenReturn double[] array, DoubleSupplier supplier) {
+    public static double[] buildArray(@OutReturn double[] array, DoubleSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get(i);
         }
         return array;
     }
 
-    public static <T> T[] buildArray(@WrittenReturn T[] array, int from, int to, ObjectSupplier<T> supplier) {
+    public static <T> T[] buildArray(@OutReturn T[] array, int from, int to, ObjectSupplier<T> supplier) {
         Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
@@ -130,7 +130,7 @@ public class ArrayKit {
         return array;
     }
 
-    public static boolean[] buildArray(@WrittenReturn boolean[] array, int from, int to, BooleanSupplier supplier) {
+    public static boolean[] buildArray(@OutReturn boolean[] array, int from, int to, BooleanSupplier supplier) {
         Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
@@ -138,7 +138,7 @@ public class ArrayKit {
         return array;
     }
 
-    public static byte[] buildArray(@WrittenReturn byte[] array, int from, int to, ByteSupplier supplier) {
+    public static byte[] buildArray(@OutReturn byte[] array, int from, int to, ByteSupplier supplier) {
         Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
@@ -146,7 +146,7 @@ public class ArrayKit {
         return array;
     }
 
-    public static short[] buildArray(@WrittenReturn short[] array, int from, int to, ShortSupplier supplier) {
+    public static short[] buildArray(@OutReturn short[] array, int from, int to, ShortSupplier supplier) {
         Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
@@ -154,7 +154,7 @@ public class ArrayKit {
         return array;
     }
 
-    public static char[] buildArray(@WrittenReturn char[] array, int from, int to, CharSupplier supplier) {
+    public static char[] buildArray(@OutReturn char[] array, int from, int to, CharSupplier supplier) {
         Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
@@ -162,7 +162,7 @@ public class ArrayKit {
         return array;
     }
 
-    public static int[] buildArray(@WrittenReturn int[] array, int from, int to, IntSupplier supplier) {
+    public static int[] buildArray(@OutReturn int[] array, int from, int to, IntSupplier supplier) {
         Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
@@ -170,7 +170,7 @@ public class ArrayKit {
         return array;
     }
 
-    public static long[] buildArray(@WrittenReturn long[] array, int from, int to, LongSupplier supplier) {
+    public static long[] buildArray(@OutReturn long[] array, int from, int to, LongSupplier supplier) {
         Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
@@ -178,7 +178,7 @@ public class ArrayKit {
         return array;
     }
 
-    public static float[] buildArray(@WrittenReturn float[] array, int from, int to, FloatSupplier supplier) {
+    public static float[] buildArray(@OutReturn float[] array, int from, int to, FloatSupplier supplier) {
         Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
@@ -186,7 +186,7 @@ public class ArrayKit {
         return array;
     }
 
-    public static double[] buildArray(@WrittenReturn double[] array, int from, int to, DoubleSupplier supplier) {
+    public static double[] buildArray(@OutReturn double[] array, int from, int to, DoubleSupplier supplier) {
         Checker.checkBounds(array.length, from, to);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);

@@ -8,7 +8,7 @@ import xyz.srclab.common.bean.BeanMethod;
 import xyz.srclab.common.bean.BeanProperty;
 import xyz.srclab.common.bean.BeanResolverHandler;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.collection.ListHelper;
+import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.exception.ExceptionWrapper;
 import xyz.srclab.common.invoke.MethodInvoker;
 
@@ -168,7 +168,7 @@ final class DefaultBeanResolverHandler implements BeanResolverHandler {
                 if (field == null) {
                     annotations = Collections.emptyList();
                 } else {
-                    annotations = ListHelper.immutable(Arrays.asList(field.getAnnotations()));
+                    annotations = ListKit.immutable(Arrays.asList(field.getAnnotations()));
                 }
             }
             return annotations;

@@ -3,7 +3,7 @@ package xyz.srclab.common.pattern.provider;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.common.collection.MapHelper;
+import xyz.srclab.common.collection.MapKit;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -63,7 +63,7 @@ public abstract class AbstractProviderManager<T> implements ProviderManager<T> {
 
     @Override
     public @Immutable Map<String, T> getAllProviders() {
-        return MapHelper.immutable(providerMaps);
+        return MapKit.immutable(providerMaps);
     }
 
     @Override

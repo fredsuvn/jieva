@@ -3,8 +3,8 @@ package xyz.srclab.common.bytecode;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.IterableKit;
-import xyz.srclab.common.collection.ListHelper;
-import xyz.srclab.common.string.StringHelper;
+import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.string.StringKit;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,10 +32,10 @@ public class BNewType implements BType {
     ) {
         this.name = className;
         this.typeVariables = typeVariables == null ? Collections.emptyList() :
-                ListHelper.immutable(IterableKit.asList(typeVariables));
+                ListKit.immutable(IterableKit.asList(typeVariables));
         this.superClass = superClass == null ? ByteCodeHelper.OBJECT : superClass;
         this.interfaces = interfaces == null ? Collections.emptyList() :
-                ListHelper.immutable(IterableKit.asList(interfaces));
+                ListKit.immutable(IterableKit.asList(interfaces));
         this.internalName = ByteCodeHelper.getTypeInternalName(className);
         this.descriptor = ByteCodeHelper.getTypeDescriptor(className);
     }
@@ -76,8 +76,8 @@ public class BNewType implements BType {
 
     private String getSignature0() {
         String typeVariablesDeclaration =
-                "<" + StringHelper.join("", typeVariables, BTypeVariable::getDeclaration) + ">";
-        String interfacesSignature = StringHelper.join("", interfaces, BDescribable::getSignature);
+                "<" + StringKit.join("", typeVariables, BTypeVariable::getDeclaration) + ">";
+        String interfacesSignature = StringKit.join("", interfaces, BDescribable::getSignature);
         return typeVariablesDeclaration + superClass.getSignature() + interfacesSignature;
     }
 }

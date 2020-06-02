@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.collection.MapHelper;
+import xyz.srclab.common.collection.MapKit;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,6 +19,6 @@ public interface CacheLoader<K, V> {
         for (K key : keys) {
             result.put(key, load(key));
         }
-        return MapHelper.immutable(result);
+        return MapKit.immutable(result);
     }
 }

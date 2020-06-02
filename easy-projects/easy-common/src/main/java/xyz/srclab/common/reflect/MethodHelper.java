@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.collection.ListHelper;
+import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.Method;
@@ -41,7 +41,7 @@ public class MethodHelper {
     public static List<Method> getAllMethods(Class<?> cls) {
         return methodsCache.getNonNull(
                 Key.of("getAllMethods", cls),
-                k -> ListHelper.immutable(getAllMethods0(cls))
+                k -> ListKit.immutable(getAllMethods0(cls))
         );
     }
 
@@ -59,12 +59,12 @@ public class MethodHelper {
     public static List<Method> getOverrideableMethods(Class<?> cls) {
         return methodsCache.getNonNull(
                 Key.of("getOverrideableMethods", cls),
-                k -> ListHelper.immutable(getOverrideableMethods0(cls))
+                k -> ListKit.immutable(getOverrideableMethods0(cls))
         );
     }
 
     private static List<Method> getOverrideableMethods0(Class<?> cls) {
-        List<Method> result = ListHelper.concat(
+        List<Method> result = ListKit.concat(
                 Arrays.asList(cls.getMethods()),
                 Arrays.asList(cls.getDeclaredMethods())
         );
@@ -78,7 +78,7 @@ public class MethodHelper {
     public static List<Method> getPublicStaticMethods(Class<?> cls) {
         return methodsCache.getNonNull(
                 Key.of("getPublicStaticMethods", cls),
-                k -> ListHelper.immutable(getPublicStaticMethods0(cls))
+                k -> ListKit.immutable(getPublicStaticMethods0(cls))
         );
     }
 
@@ -92,7 +92,7 @@ public class MethodHelper {
     public static List<Method> getPublicNonStaticMethods(Class<?> cls) {
         return methodsCache.getNonNull(
                 Key.of("getPublicNonStaticMethods", cls),
-                kc -> ListHelper.immutable(getPublicNonStaticMethods0(cls))
+                kc -> ListKit.immutable(getPublicNonStaticMethods0(cls))
         );
     }
 

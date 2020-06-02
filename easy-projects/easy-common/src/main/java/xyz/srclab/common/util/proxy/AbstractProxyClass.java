@@ -1,7 +1,7 @@
 package xyz.srclab.common.util.proxy;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.collection.MapHelper;
+import xyz.srclab.common.collection.MapKit;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -30,6 +30,6 @@ public abstract class AbstractProxyClass<T> implements ProxyClass<T> {
                 }
             });
         }
-        this.methodMap = MapHelper.immutable(methodMap);
+        this.methodMap = MapKit.immutable(methodMap);
     }
 }

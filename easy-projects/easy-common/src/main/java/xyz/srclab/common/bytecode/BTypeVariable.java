@@ -4,7 +4,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.reflect.TypeKit;
-import xyz.srclab.common.string.StringHelper;
+import xyz.srclab.common.string.StringKit;
 
 import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ public class BTypeVariable implements BType {
         }
         return name +
                 (isInterface ? "::" : ":") +
-                StringHelper.join(":", bounds, BDescribable::getSignature);
+                StringKit.join(":", bounds, BDescribable::getSignature);
     }
 
     public String getName() {

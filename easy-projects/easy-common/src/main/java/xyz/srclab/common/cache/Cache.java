@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Defaults;
-import xyz.srclab.common.collection.MapHelper;
+import xyz.srclab.common.collection.MapKit;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
@@ -93,7 +93,7 @@ public interface Cache<K, V> {
                 result.put(key, Cast.nullable(value));
             }
         }
-        return MapHelper.immutable(result);
+        return MapKit.immutable(result);
     }
 
     @Immutable
@@ -103,7 +103,7 @@ public interface Cache<K, V> {
         for (K key : keys) {
             result.put(key, get(key, ifAbsent));
         }
-        return MapHelper.immutable(result);
+        return MapKit.immutable(result);
     }
 
     @Immutable
@@ -113,7 +113,7 @@ public interface Cache<K, V> {
         for (K key : keys) {
             result.put(key, load(key, loader));
         }
-        return MapHelper.immutable(result);
+        return MapKit.immutable(result);
     }
 
     default V getNonNull(K key) throws NullPointerException {

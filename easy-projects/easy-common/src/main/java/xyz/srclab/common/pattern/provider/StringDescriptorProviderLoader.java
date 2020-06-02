@@ -4,12 +4,12 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Loader;
-import xyz.srclab.common.collection.ListHelper;
-import xyz.srclab.common.collection.MapHelper;
+import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.string.StringRef;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.reflect.ClassHelper;
-import xyz.srclab.common.string.StringHelper;
+import xyz.srclab.common.string.StringKit;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -25,7 +25,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
 
     private static final String PARSE_ERROR = "Failed to parse provider descriptor: ";
 
-    private static final List<Condition> conditions = ListHelper.immutable(Arrays.asList(
+    private static final List<Condition> conditions = ListKit.immutable(Arrays.asList(
             new ConditionOnClass(),
             new ConditionOnMissingClass()
     ));
@@ -56,7 +56,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     @Immutable
     private Map<String, T> load0() {
         List<ProviderCandidate> candidates = parseStringDescriptor(stringDescriptor);
-        return MapHelper.immutable(candidates.stream().collect(Collectors.toMap(
+        return MapKit.immutable(candidates.stream().collect(Collectors.toMap(
                 ProviderCandidate::getProviderName,
                 c -> newProviderInstance(c.getProviderClassName())
         )));
@@ -86,7 +86,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     private ProviderCandidate parseCandidateGroup(StringRef groupRef) {
         int index = -1;
         do {
-            int separator = StringHelper.indexOf(groupRef, index + 1, groupRef.length(), '|');
+            int separator = StringKit.indexOf(groupRef, index + 1, groupRef.length(), '|');
             ProviderCandidate candidate;
             if (separator < 0) {
                 candidate = parseCandidate(groupRef.subSequence(index + 1).trim());

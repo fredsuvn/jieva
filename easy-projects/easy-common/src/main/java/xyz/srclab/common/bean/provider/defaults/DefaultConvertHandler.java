@@ -8,9 +8,9 @@ import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.bean.BeanProperty;
 import xyz.srclab.common.collection.IterableKit;
-import xyz.srclab.common.collection.ListHelper;
-import xyz.srclab.common.collection.MapHelper;
-import xyz.srclab.common.collection.SetHelper;
+import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.SetKit;
 import xyz.srclab.common.lang.format.Formatter;
 import xyz.srclab.common.reflect.ClassHelper;
 import xyz.srclab.common.reflect.TypeKit;
@@ -119,14 +119,14 @@ final class DefaultConvertHandler implements ConvertHandler {
                 .mapKey(k -> beanOperator.convert(k, keyType))
                 .mapValue(v -> v == null ? null : beanOperator.convert(v, valueType))
                 .doPopulate();
-        return MapHelper.immutable(map);
+        return MapKit.immutable(map);
     }
 
     private Object toList(Object from, Type elementType, BeanOperator beanOperator) {
         if (from.getClass().isArray()) {
             List<Object> result = new LinkedList<>();
             putCollectionFromArray(from, elementType, beanOperator, result);
-            return ListHelper.immutable(result);
+            return ListKit.immutable(result);
         }
         if (from instanceof Iterable) {
             Iterable<?> iterable = (Iterable<?>) from;
@@ -134,7 +134,7 @@ final class DefaultConvertHandler implements ConvertHandler {
             for (@Nullable Object o : iterable) {
                 result.add(o == null ? null : beanOperator.convert(o, elementType));
             }
-            return ListHelper.immutable(result);
+            return ListKit.immutable(result);
         }
         throw new UnsupportedOperationException(Formatter.fastFormat(
                 "Cannot convert object {} to list of element type {}", from, elementType));
@@ -144,7 +144,7 @@ final class DefaultConvertHandler implements ConvertHandler {
         if (from.getClass().isArray()) {
             Set<Object> result = new LinkedHashSet<>();
             putCollectionFromArray(from, elementType, beanOperator, result);
-            return SetHelper.immutable(result);
+            return SetKit.immutable(result);
         }
         if (from instanceof Iterable) {
             Iterable<?> iterable = (Iterable<?>) from;
@@ -152,7 +152,7 @@ final class DefaultConvertHandler implements ConvertHandler {
             for (@Nullable Object o : iterable) {
                 result.add(o == null ? null : beanOperator.convert(o, elementType));
             }
-            return SetHelper.immutable(result);
+            return SetKit.immutable(result);
         }
         throw new UnsupportedOperationException(Formatter.fastFormat(
                 "Cannot convert object {} to set of element type {}", from, elementType));

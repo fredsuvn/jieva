@@ -7,7 +7,7 @@ import org.springframework.asm.Opcodes;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.bytecode.*;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
-import xyz.srclab.common.collection.ListHelper;
+import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 
 import java.lang.reflect.Constructor;
@@ -114,7 +114,7 @@ final class ConstructorInvokerClassGenerator {
             BMethod targetConstructorMethod = new BMethod(
                     ByteCodeHelper.OBJECT_INIT.getName(),
                     null,
-                    ListHelper.map(parameterTypes, BRefType::new),
+                    ListKit.map(parameterTypes, BRefType::new),
                     null
             );
             BMethod invokeMethod = new BMethod(

@@ -8,18 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
 
-public class SetHelper {
-
-    @Immutable
-    public static <E> Set<E> immutable(Iterable<? extends E> elements) {
-        return ImmutableSet.copyOf(elements);
-    }
-
-    @SafeVarargs
-    @Immutable
-    public static <E> Set<E> immutable(E... elements) {
-        return ImmutableSet.copyOf(elements);
-    }
+public class SetKit {
 
     @Immutable
     public static <NE, OE> Set<NE> map(OE[] array, Function<OE, NE> mapper) {
@@ -46,5 +35,16 @@ public class SetHelper {
             result.add(enumeration.nextElement());
         }
         return immutable(result);
+    }
+
+    @Immutable
+    public static <E> Set<E> immutable(Iterable<? extends E> elements) {
+        return ImmutableSet.copyOf(elements);
+    }
+
+    @SafeVarargs
+    @Immutable
+    public static <E> Set<E> immutable(E... elements) {
+        return ImmutableSet.copyOf(elements);
     }
 }

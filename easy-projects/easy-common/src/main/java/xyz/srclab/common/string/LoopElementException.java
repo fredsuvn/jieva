@@ -7,7 +7,7 @@ public class LoopElementException extends RuntimeException {
     private final String nameStackTrace;
 
     public LoopElementException(List<Object> nameStackTrace) {
-        super(StringHelper.join(".", nameStackTrace));
+        super(StringKit.join(".", nameStackTrace));
         this.nameStackTrace = getMessage();
     }
 
