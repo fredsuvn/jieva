@@ -11,24 +11,24 @@ import java.util.List;
 @Immutable
 public interface BeanProperty extends BeanMember {
 
-    Class<?> getOwnerType();
+    Class<?> type();
 
-    Class<?> getType();
+    Type genericType();
 
-    Type getGenericType();
+    boolean readable();
 
-    boolean isReadable();
+    boolean writeable();
+
+    @Nullable
+    Field field();
+
+    @Immutable
+    List<Annotation> fieldAnnotations();
 
     @Nullable
     Object getValue(Object bean) throws UnsupportedOperationException;
 
-    boolean isWriteable();
-
     void setValue(Object bean, @Nullable Object value) throws UnsupportedOperationException;
 
-    @Nullable
-    Field getField();
-
-    @Immutable
-    List<Annotation> getFieldAnnotations();
+    Class<?> ownerType();
 }

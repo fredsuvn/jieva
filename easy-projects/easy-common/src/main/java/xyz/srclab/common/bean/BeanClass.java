@@ -2,41 +2,31 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.convert.Converter;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
-import xyz.srclab.common.reflect.MethodKit;
 import xyz.srclab.common.reflect.TypeRef;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 @Immutable
 public interface BeanClass {
 
-    static Builder newBuilder(Class<?> type) {
-        return new Builder(type);
-    }
-
-    Class<?> getType();
+    Class<?> type();
 
     @Nullable
-    BeanProperty getProperty(String propertyName);
+    BeanProperty property(String propertyName);
 
     @Nullable
     default Object getPropertyValue(Object bean, String propertyName)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable BeanProperty beanProperty = getProperty(propertyName);
+        @Nullable BeanProperty beanProperty = property(propertyName);
         if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
         }
-        if (!beanProperty.isReadable()) {
-            throw new UnsupportedOperationException("Cannot read property: " + beanProperty.getName());
+        if (!beanProperty.readable()) {
+            throw new UnsupportedOperationException("Cannot read property: " + beanProperty.name());
         }
         return beanProperty.getValue(bean);
     }
@@ -64,12 +54,12 @@ public interface BeanClass {
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable BeanProperty beanProperty = getProperty(propertyName);
+        @Nullable BeanProperty beanProperty = property(propertyName);
         if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
         }
-        if (!beanProperty.isWriteable()) {
-            throw new UnsupportedOperationException("Cannot write property: " + beanProperty.getName());
+        if (!beanProperty.writeable()) {
+            throw new UnsupportedOperationException("Cannot write property: " + beanProperty.name());
         }
         beanProperty.setValue(bean, value);
     }
@@ -77,185 +67,61 @@ public interface BeanClass {
     default void setPropertyValue(
             Object bean, String propertyName, @Nullable Object value, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable BeanProperty beanProperty = getProperty(propertyName);
+        @Nullable BeanProperty beanProperty = property(propertyName);
         if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
         }
-        if (!beanProperty.isWriteable()) {
-            throw new UnsupportedOperationException("Cannot write property: " + beanProperty.getName());
+        if (!beanProperty.writeable()) {
+            throw new UnsupportedOperationException("Cannot write property: " + beanProperty.name());
         }
         @Nullable Object targetValue = value == null ? null :
-                converter.convert(value, beanProperty.getGenericType());
+                converter.convert(value, beanProperty.genericType());
         beanProperty.setValue(bean, targetValue);
     }
 
     default boolean canReadProperty(String propertyName) {
-        @Nullable BeanProperty property = getProperty(propertyName);
-        return property != null && property.isReadable();
+        @Nullable BeanProperty property = property(propertyName);
+        return property != null && property.readable();
     }
 
     default boolean canWriteProperty(String propertyName) {
-        @Nullable BeanProperty property = getProperty(propertyName);
-        return property != null && property.isWriteable();
+        @Nullable BeanProperty property = property(propertyName);
+        return property != null && property.writeable();
     }
 
     @Immutable
-    Map<String, BeanProperty> getAllProperties();
+    Map<String, BeanProperty> properties();
 
     @Immutable
-    Map<String, BeanProperty> getReadableProperties();
+    Map<String, BeanProperty> readableProperties();
 
     @Immutable
-    Map<String, BeanProperty> getWriteableProperties();
+    Map<String, BeanProperty> writeableProperties();
 
     @Immutable
     default Map<String, Object> toMap(Object bean) {
-        return MapKit.map(getReadableProperties(), name -> name, property -> property.getValue(bean));
+        return MapKit.map(readableProperties(), name -> name, property -> property.getValue(bean));
     }
 
     @Immutable
     default Map<String, Object> deepToMap(Object bean) {
-        return deepToMap(bean, o -> {
-            if (o == null || o instanceof Collection || o instanceof Map) {
-                return false;
-            }
-            Class<?> type = o.getClass();
-            return !type.isArray() && !Defaults.isBasicType(o.getClass());
-        });
+        return deepToMap(bean, BeanClass0.newDeepToMapFunction(this));
     }
 
     @Immutable
-    default Map<String, Object> deepToMap(Object bean, Predicate<Object> shouldResolve) {
-        return MapKit.map(getReadableProperties(), name -> name, property -> {
+    default Map<String, Object> deepToMap(Object bean, Function<Object, @Nullable Object> resolver) {
+        return MapKit.map(readableProperties(), name -> name, property -> {
             @Nullable Object value = property.getValue(bean);
-            if (value == null || !shouldResolve.test(value)) {
-                return value;
-            }
-            return deepToMap(value, shouldResolve);
+            return value == null ? null : resolver.apply(value);
         });
     }
 
-    @Nullable
-    BeanMethod getMethod(String methodName, Class<?>... parameterTypes);
-
-    @Nullable
-    BeanMethod getMethod(Method method);
-
-    @Immutable
-    Map<Method, BeanMethod> getAllMethods();
+    @Override
+    int hashCode();
 
     @Override
     boolean equals(Object other);
 
     @Override
-    int hashCode();
-
-    final class Builder extends CachedBuilder<BeanClass> {
-
-        private final Class<?> type;
-        private @Nullable Map<String, BeanProperty> propertyMap;
-        private @Nullable Map<Method, BeanMethod> methodMap;
-
-        public Builder(Class<?> type) {
-            this.type = type;
-        }
-
-        public Builder setProperties(Map<String, BeanProperty> properties) {
-            this.propertyMap = properties;
-            this.updateState();
-            return this;
-        }
-
-        public Builder setMethods(Map<Method, BeanMethod> methodMap) {
-            this.methodMap = methodMap;
-            this.updateState();
-            return this;
-        }
-
-        @Override
-        protected BeanClass buildNew() {
-            return new BeanClassImpl(this);
-        }
-
-        private static final class BeanClassImpl implements BeanClass {
-
-            private final Class<?> type;
-            private final @Immutable Map<String, BeanProperty> propertyMap;
-            private final @Immutable Map<Method, BeanMethod> methodMap;
-
-            private @Nullable @Immutable Map<String, BeanProperty> readablePropertyMap;
-            private @Nullable @Immutable Map<String, BeanProperty> writeablePropertyMap;
-
-            private BeanClassImpl(Builder builder) {
-                this.type = builder.type;
-                this.propertyMap = builder.propertyMap == null ?
-                        Collections.emptyMap() : MapKit.immutable(builder.propertyMap);
-                this.methodMap = builder.methodMap == null ?
-                        Collections.emptyMap() : MapKit.immutable(builder.methodMap);
-            }
-
-            @Override
-            public Class<?> getType() {
-                return type;
-            }
-
-            @Override
-            public @Nullable BeanProperty getProperty(String propertyName) {
-                return propertyMap.get(propertyName);
-            }
-
-            @Override
-            public @Immutable Map<String, BeanProperty> getAllProperties() {
-                return propertyMap;
-            }
-
-            @Override
-            public @Immutable Map<String, BeanProperty> getReadableProperties() {
-                if (readablePropertyMap == null) {
-                    readablePropertyMap = MapKit.filter(this.propertyMap, e -> e.getValue().isReadable());
-                }
-                return readablePropertyMap;
-            }
-
-            @Override
-            public @Immutable Map<String, BeanProperty> getWriteableProperties() {
-                if (writeablePropertyMap == null) {
-                    writeablePropertyMap = MapKit.filter(this.propertyMap, e -> e.getValue().isWriteable());
-                }
-                return writeablePropertyMap;
-            }
-
-            @Override
-            public @Nullable BeanMethod getMethod(String methodName, Class<?>... parameterTypes) {
-                @Nullable Method method = MethodKit.getMethod(type, methodName, parameterTypes);
-                return method == null ? null : methodMap.get(method);
-            }
-
-            @Override
-            public @Nullable BeanMethod getMethod(Method method) {
-                return methodMap.get(method);
-            }
-
-            @Override
-            public @Immutable Map<Method, BeanMethod> getAllMethods() {
-                return methodMap;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) {
-                    return true;
-                }
-                if (o instanceof BeanClassImpl) {
-                    return type.equals(((BeanClassImpl) o).type);
-                }
-                return false;
-            }
-
-            @Override
-            public int hashCode() {
-                return type.hashCode();
-            }
-        }
-    }
+    String toString();
 }

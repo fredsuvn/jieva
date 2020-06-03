@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotation.Hide;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.invoke.MethodInvoker;
@@ -7,25 +8,26 @@ import xyz.srclab.common.invoke.MethodInvoker;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+@Hide
 @Immutable
 public interface BeanMethod extends BeanMember {
 
-    Class<?>[] getParameterTypes();
+    int parameterCount();
 
-    Type[] getGenericParameterTypes();
+    Class<?>[] parameterTypes();
 
-    int getParameterCount();
+    Type[] genericParameterTypes();
 
-    Class<?> getReturnType();
+    Class<?> returnType();
 
-    Type getGenericReturnType();
+    Type genericReturnType();
 
-    Method getMethod();
+    Method method();
 
-    MethodInvoker getMethodInvoker();
+    MethodInvoker methodInvoker();
 
     @Nullable
     default Object invoke(Object bean, Object... args) {
-        return getMethodInvoker().invoke(bean, args);
+        return methodInvoker().invoke(bean, args);
     }
 }

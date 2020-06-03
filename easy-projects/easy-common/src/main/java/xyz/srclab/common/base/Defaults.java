@@ -1,5 +1,7 @@
 package xyz.srclab.common.base;
 
+import xyz.srclab.annotation.Nullable;
+
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +18,7 @@ public class Defaults {
     public static final int CONCURRENCY_LEVEL = 16;
 
     public static boolean isBasicType(Class<?> type) {
-        return type.isPrimitive() || BasicTypeTable.find(type);
+        return type.isPrimitive() || (BasicTypeTable.search(type) != null);
     }
 
     private static final class BasicTypeTable {
@@ -29,13 +31,14 @@ public class Defaults {
                 Temporal.class,
         };
 
-        private static boolean find(Class<?> type) {
+        @Nullable
+        private static Class<?> search(Class<?> type) {
             for (Class<?> aClass : table) {
                 if (aClass.isAssignableFrom(type)) {
-                    return true;
+                    return aClass;
                 }
             }
-            return false;
+            return null;
         }
     }
 }

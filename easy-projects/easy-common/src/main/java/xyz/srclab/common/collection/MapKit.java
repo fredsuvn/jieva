@@ -25,14 +25,14 @@ public class MapKit {
 
     @Immutable
     public static <K, V> Map<K, V> filter(
-            Map<? extends K, ? extends V> map, Predicate<Map.Entry<? extends K, ? extends V>> predicate) {
+            Map<? extends K, ? extends V> map, Predicate<? super Map.Entry<? extends K, ? extends V>> predicate) {
         Map<K, V> result = new LinkedHashMap<>();
         map.entrySet().forEach(e -> {
             if (predicate.test(e)) {
                 result.put(e.getKey(), e.getValue());
             }
         });
-        return immutable((result));
+        return immutable(result);
     }
 
     public static <K, V> Map.Entry<K, V> first(Map<K, V> map) throws NoSuchElementException {
@@ -56,10 +56,20 @@ public class MapKit {
         removeAll(map, Arrays.asList(keys));
     }
 
-    public static void removeAll(@Out Map<?, ?> map, Iterable<Object> keys) {
+    public static void removeAll(@Out Map<?, ?> map, Iterable<?> keys) {
         for (Object key : keys) {
             map.remove(key);
         }
+    }
+
+    public static void removeIf(@Out Map<?, ?> map, Predicate<? super Map.Entry<?, ?>> predicate) {
+        List<Object> removed = new LinkedList<>();
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            if (predicate.test(entry)) {
+                removed.add(entry.getKey());
+            }
+        }
+        removeAll(map, removed);
     }
 
     @Immutable

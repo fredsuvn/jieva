@@ -4,14 +4,13 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.reflect.TypeRef;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 public class BeanHelper {
 
-    private static final BeanOperator beanOperator = BeanOperator.DEFAULT;
+    private static final BeanOperator beanOperator = BeanOperator.getDefault();
 
     public static BeanClass resolveBean(Class<?> beanClass) {
         return beanOperator.resolveBean(beanClass);
@@ -103,17 +102,7 @@ public class BeanHelper {
     }
 
     @Immutable
-    public static Map<String, Object> deepToMap(Object bean, Predicate<Object> resolvePredicate) {
-        return beanOperator.deepToMap(bean, resolvePredicate);
-    }
-
-    public static BeanMethod getMethod(Object bean, String methodName, Class<?>... parameterTypes)
-            throws BeanMethodNotFoundException {
-        return beanOperator.getMethod(bean, methodName, parameterTypes);
-    }
-
-    public static BeanMethod getMethod(Object bean, Method method)
-            throws BeanMethodNotFoundException {
-        return beanOperator.getMethod(bean, method);
+    public static Map<String, Object> deepToMap(Object bean, Function<Object, @Nullable Object> resolver) {
+        return beanOperator.deepToMap(bean, resolver);
     }
 }

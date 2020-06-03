@@ -12,6 +12,10 @@ import java.util.Arrays;
 @Immutable
 public interface Converter {
 
+    static Converter getDefault() {
+        return null;
+    }
+
     static Builder newBuilder() {
         return new Builder();
     }

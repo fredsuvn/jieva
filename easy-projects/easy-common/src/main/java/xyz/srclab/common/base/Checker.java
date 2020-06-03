@@ -62,6 +62,24 @@ public class Checker {
         }
     }
 
+    public static void checkSupported(boolean expression) {
+        if (!expression) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public static void checkSupported(boolean expression, String message) {
+        if (!expression) {
+            throw new UnsupportedOperationException(message);
+        }
+    }
+
+    public static void checkSupported(boolean expression, Supplier<String> messageSupplier) {
+        if (!expression) {
+            throw new UnsupportedOperationException(messageSupplier.get());
+        }
+    }
+
     public static void checkElement(boolean expression) {
         if (!expression) {
             throw new NoSuchElementException();

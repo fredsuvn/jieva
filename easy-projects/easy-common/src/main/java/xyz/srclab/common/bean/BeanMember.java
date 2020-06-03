@@ -1,15 +1,21 @@
 package xyz.srclab.common.bean;
 
+import xyz.srclab.annotation.Hide;
+
 /**
  * @author sunqian
  */
+@Hide
 public interface BeanMember {
 
-    String getName();
+    String name();
+
+    @Override
+    int hashCode();
 
     @Override
     boolean equals(Object other);
 
     @Override
-    int hashCode();
+    String toString();
 }

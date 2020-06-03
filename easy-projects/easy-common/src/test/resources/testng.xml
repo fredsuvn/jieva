@@ -10,9 +10,9 @@
             <package name="test.xyz.srclab.common.base"/>
         </packages>
     </test>
-    <test name="bean">
+    <test name="beanClass">
         <packages>
-            <package name="test.xyz.srclab.common.bean"/>
+            <package name="test.xyz.srclab.common.beanClass"/>
         </packages>
     </test>
     <test name="builder">

@@ -1,6 +1,8 @@
 package xyz.srclab.common.array;
 
 import com.google.common.collect.Iterables;
+import kotlin.collections.ArraysKt;
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.OutReturn;
 import xyz.srclab.common.base.Cast;
@@ -13,6 +15,7 @@ import xyz.srclab.common.reflect.TypeRef;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.function.Function;
 
 public class ArrayKit {
@@ -39,6 +42,51 @@ public class ArrayKit {
 
     public static <T> T[] toArray(Iterable<? extends T> iterable, TypeRef<T> componentType) {
         return toArray(iterable, componentType.getType());
+    }
+
+    @Immutable
+    public static <T> List<T> toList(T[] array) {
+        return ArraysKt.asList(array);
+    }
+
+    @Immutable
+    public static List<Boolean> toList(boolean[] array) {
+        return ArraysKt.asList(array);
+    }
+
+    @Immutable
+    public static List<Byte> toList(byte[] array) {
+        return ArraysKt.asList(array);
+    }
+
+    @Immutable
+    public static List<Short> toList(short[] array) {
+        return ArraysKt.asList(array);
+    }
+
+    @Immutable
+    public static List<Character> toList(char[] array) {
+        return ArraysKt.asList(array);
+    }
+
+    @Immutable
+    public static List<Integer> toList(int[] array) {
+        return ArraysKt.asList(array);
+    }
+
+    @Immutable
+    public static List<Long> toList(long[] array) {
+        return ArraysKt.asList(array);
+    }
+
+    @Immutable
+    public static List<Float> toList(float[] array) {
+        return ArraysKt.asList(array);
+    }
+
+    @Immutable
+    public static List<Double> toList(double[] array) {
+        return ArraysKt.asList(array);
     }
 
     public static <NT, OT> NT[] map(

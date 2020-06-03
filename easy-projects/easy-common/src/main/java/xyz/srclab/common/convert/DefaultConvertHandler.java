@@ -1,10 +1,9 @@
-package xyz.srclab.common.bean.provider.defaults;
+package xyz.srclab.common.convert;
 
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.bean.BeanClass;
-import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.bean.BeanProperty;
 import xyz.srclab.common.collection.IterableKit;
@@ -296,23 +295,23 @@ final class DefaultConvertHandler implements ConvertHandler {
                 if (!toBeanClass.canWriteProperty(propertyName)) {
                     return;
                 }
-                BeanProperty destProperty = toBeanClass.getProperty(propertyName);
+                BeanProperty destProperty = toBeanClass.property(propertyName);
                 @Nullable Object destValue = value == null ? null :
                         beanOperator.convert(value, findTargetType(
-                                destProperty.getGenericType(), typeVariables, genericTypes));
+                                destProperty.genericType(), typeVariables, genericTypes));
                 destProperty.setValue(toInstance, destValue);
             });
         } else {
             BeanClass fromBeanClass = beanOperator.resolveBean(from.getClass());
-            fromBeanClass.getReadableProperties().forEach((name, property) -> {
+            fromBeanClass.readableProperties().forEach((name, property) -> {
                 if (!toBeanClass.canWriteProperty(name)) {
                     return;
                 }
-                BeanProperty destProperty = toBeanClass.getProperty(name);
+                BeanProperty destProperty = toBeanClass.property(name);
                 @Nullable Object value = property.getValue(from);
                 @Nullable Object destValue = value == null ? null :
                         beanOperator.convert(value, findTargetType(
-                                destProperty.getGenericType(), typeVariables, genericTypes));
+                                destProperty.genericType(), typeVariables, genericTypes));
                 destProperty.setValue(toInstance, destValue);
             });
         }
