@@ -2,6 +2,7 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.pattern.builder.HandlersBuilder;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.reflect.MethodKit;
@@ -14,13 +15,38 @@ import java.util.Map;
 
 public class BeanResolverBuilder extends HandlersBuilder<BeanResolver, BeanResolverHandler, BeanResolverBuilder> {
 
+    private boolean useCache = true;
+
+    public BeanResolverBuilder useCache(boolean useCache) {
+        this.useCache = useCache;
+        this.updateState();
+        return this;
+    }
+
     @Override
     protected BeanResolver buildNew() {
         if (handlers.isEmpty()) {
             throw new IllegalArgumentException("There is no handler added");
         }
-        return new BeanResolverImpl(handlers);
+        BeanResolver resolver = new BeanResolverImpl(handlers);
+        return useCache ? new CachedBeanResolver(resolver) : resolver;
     }
+
+    private static final class CachedBeanResolver implements BeanResolver {
+
+        private final BeanResolver resolver;
+        private final Cache<Class<?>, BeanClass> cache = Cache.newL2();
+
+        private CachedBeanResolver(BeanResolver resolver) {
+            this.resolver = resolver;
+        }
+
+        @Override
+        public BeanClass resolve(Class<?> beanClass) {
+            return cache.getNonNull(beanClass, resolver::resolve);
+        }
+    }
+
 
     private static final class BeanResolverImpl implements BeanResolver {
 

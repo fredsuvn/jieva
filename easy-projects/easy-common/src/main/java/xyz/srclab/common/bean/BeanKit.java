@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.function.Function;
 
-public class BeanHelper {
+public class BeanKit {
 
     private static final BeanOperator beanOperator = BeanOperator.getDefault();
 
@@ -104,5 +104,13 @@ public class BeanHelper {
     @Immutable
     public static Map<String, Object> deepToMap(Object bean, Function<Object, @Nullable Object> resolver) {
         return beanOperator.deepToMap(bean, resolver);
+    }
+
+    public static <T, K, V> T toBean(Map<K, V> map, Class<T> beanType) {
+        return beanOperator.toBean(map, beanType);
+    }
+
+    public static <T, K, V> void toBean(Map<K, V> map, T bean) {
+        beanOperator.toBean(map, bean);
     }
 }

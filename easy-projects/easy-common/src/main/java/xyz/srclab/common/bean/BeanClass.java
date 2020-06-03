@@ -4,6 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
@@ -113,6 +114,44 @@ public interface BeanClass {
         return MapKit.map(readableProperties(), name -> name, property -> {
             @Nullable Object value = property.getValue(bean);
             return value == null ? null : resolver.apply(value);
+        });
+    }
+
+    default <T, K, V> T toBean(Map<K, V> map) {
+        T bean = ClassKit.newInstance(type());
+        toBean(map, bean);
+        return bean;
+    }
+
+    default <T, K, V> T toBean(Map<K, V> map, Converter converter) {
+        T bean = ClassKit.newInstance(type());
+        toBean(map, bean, converter);
+        return bean;
+    }
+
+    default <T, K, V> void toBean(Map<K, V> map, T bean) {
+        map.forEach((k, v) -> {
+            String propertyName = String.valueOf(k);
+            @Nullable BeanProperty property = property(propertyName);
+            if (property == null || !property.writeable()) {
+                return;
+            }
+            property.setValue(bean, v);
+        });
+    }
+
+    default <T, K, V> void toBean(Map<K, V> map, T bean, Converter converter) {
+        map.forEach((k, v) -> {
+            String propertyName = String.valueOf(k);
+            @Nullable BeanProperty property = property(propertyName);
+            if (property == null || !property.writeable()) {
+                return;
+            }
+            if (v == null) {
+                property.setValue(bean, null);
+                return;
+            }
+            property.setValue(bean, converter.convert(v, property.genericType()));
         });
     }
 

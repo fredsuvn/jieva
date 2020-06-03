@@ -5,7 +5,7 @@ import org.testng.annotations.Test
 import xyz.srclab.common.base.Loader
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.convert.ConvertHandler
-import xyz.srclab.common.bean.BeanHelper
+import xyz.srclab.common.bean.BeanKit
 import xyz.srclab.common.bean.BeanOperator
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.test.doAssertEquals
@@ -191,16 +191,16 @@ object ConverterTest {
     @Test
     fun testUnsupported() {
         doExpectThrowable(java.lang.UnsupportedOperationException::class.java) {
-            BeanHelper.convert("", List::class.java)
+            BeanKit.convert("", List::class.java)
         }
         doExpectThrowable(java.lang.UnsupportedOperationException::class.java) {
-            BeanHelper.convert("", Set::class.java)
+            BeanKit.convert("", Set::class.java)
         }
         doExpectThrowable(java.lang.UnsupportedOperationException::class.java) {
-            BeanHelper.convert("", Array<Any>::class.java)
+            BeanKit.convert("", Array<Any>::class.java)
         }
         doExpectThrowable(java.lang.UnsupportedOperationException::class.java) {
-            BeanHelper.convert("123", Char::class.java)
+            BeanKit.convert("123", Char::class.java)
         }
     }
 

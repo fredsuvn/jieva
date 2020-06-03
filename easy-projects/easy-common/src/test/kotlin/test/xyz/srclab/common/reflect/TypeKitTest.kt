@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.reflect
 
 import org.testng.annotations.Test
-import xyz.srclab.common.bean.BeanHelper
+import xyz.srclab.common.bean.BeanKit
 import xyz.srclab.common.reflect.TypeKit
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.test.doAssertEquals
@@ -20,7 +20,7 @@ object TypeKitTest {
         doAssertEquals(TypeKit.getRawType<Any>(A::class.java.typeParameters[0]), Throwable::class.java)
         doAssertEquals(TypeKit.getRawType<Any>(A2::class.java.typeParameters[0]), List::class.java)
         doAssertEquals(
-            TypeKit.getRawType<Any>(BeanHelper.resolveBean(B::class.java).property("array")?.genericType()),
+            TypeKit.getRawType<Any>(BeanKit.resolveBean(B::class.java).property("array")?.genericType()),
             Any::class.java
         )
     }
