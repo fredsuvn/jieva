@@ -2,7 +2,7 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeRef;
@@ -72,7 +72,8 @@ public interface BeanOperator {
     }
 
     default void copyProperties(Object source, Object dest) {
-
+        Map<Object, Object> sourceMap = toRawMap(source);
+        toBean(sourceMap, dest);
     }
 
     default void copyPropertiesIgnoreNull(Object source, Object dest) {
@@ -119,10 +120,6 @@ public interface BeanOperator {
 
     @Immutable
     default Map<String, Object> toMap(Object bean) {
-        if (bean instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) bean;
-            return MapKit.map(map, String::valueOf, v -> v);
-        }
         return resolveBean(bean.getClass()).toMap(bean);
     }
 
@@ -142,6 +139,13 @@ public interface BeanOperator {
 
     default <T, K, V> void toBean(Map<K, V> map, T bean) {
         resolveBean(bean.getClass()).toBean(map, bean, converter());
+    }
+
+    default Map<Object, Object> toRawMap(Object beanOrMap) {
+        if (beanOrMap instanceof Map) {
+            return Cast.as(beanOrMap);
+        }
+        return Cast.as(toMap(beanOrMap));
     }
 
     final class CopyPreparation {
