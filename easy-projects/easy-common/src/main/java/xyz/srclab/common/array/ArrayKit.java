@@ -15,6 +15,7 @@ import xyz.srclab.common.reflect.TypeRef;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -45,8 +46,43 @@ public class ArrayKit {
     }
 
     @Immutable
-    public static <T> List<T> toList(T[] array) {
-        return ArraysKt.asList(array);
+    public static List<Object> primitiveToList(Object primitiveArray) {
+        if (primitiveArray instanceof boolean[]) {
+            return Cast.as(toList((boolean[]) primitiveArray));
+        }
+        if (primitiveArray instanceof byte[]) {
+            return Cast.as(toList((byte[]) primitiveArray));
+        }
+        if (primitiveArray instanceof short[]) {
+            return Cast.as(toList((short[]) primitiveArray));
+        }
+        if (primitiveArray instanceof char[]) {
+            return Cast.as(toList((char[]) primitiveArray));
+        }
+        if (primitiveArray instanceof int[]) {
+            return Cast.as(toList((int[]) primitiveArray));
+        }
+        if (primitiveArray instanceof long[]) {
+            return Cast.as(toList((long[]) primitiveArray));
+        }
+        if (primitiveArray instanceof float[]) {
+            return Cast.as(toList((float[]) primitiveArray));
+        }
+        if (primitiveArray instanceof double[]) {
+            return Cast.as(toList((double[]) primitiveArray));
+        }
+        throw new IllegalArgumentException("Unknown primitive array: " + primitiveArray);
+    }
+
+    @Immutable
+    public static List<Object> toList(Object array) {
+        if (array instanceof Object[]) {
+            return Arrays.asList((Object[]) array);
+        }
+        if (array.getClass().getComponentType().isPrimitive()) {
+            return primitiveToList(array);
+        }
+        throw new IllegalArgumentException("Unknown array: " + array);
     }
 
     @Immutable
@@ -328,10 +364,10 @@ public class ArrayKit {
                     i += 2;
                 }
             }
-            return cache.getNonNull(componentType, ArrayTypeTable::find);
+            return cache.getNonNull(componentType, ArrayTypeTable::find0);
         }
 
-        private static Class<?> find(Class<?> componentType) {
+        private static Class<?> find0(Class<?> componentType) {
             return newArray(componentType, 0).getClass().getComponentType();
         }
     }

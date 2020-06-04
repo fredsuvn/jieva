@@ -1,8 +1,10 @@
 package xyz.srclab.common.bean;
 
+import org.apache.commons.beanutils.BeanUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeRef;
@@ -26,6 +28,10 @@ public interface BeanOperator {
     BeanResolver resolver();
 
     Converter converter();
+
+    default boolean canResolve(Object object) {
+        return BeanOperator0.canResolve(object);
+    }
 
     default BeanClass resolveBean(Class<?> beanClass) {
         return resolver().resolve(beanClass);
@@ -86,8 +92,10 @@ public interface BeanOperator {
         return new CopyPreparation(this, source, dest);
     }
 
-    default <K, V> void populateProperties(Object source, Map<K, V> dest) {
-        preparePopulateProperties(source, dest).doPopulate();
+    default void populateProperties(Object source, Map<?, ?> dest) {
+        Map<?, ?> sourceMap = toRawMap(source);
+        BeanUtils.pu
+        dest.putAll(sourceMap);
     }
 
     default <K, V> void populatePropertiesIgnoreNull(Object source, Map<K, V> dest) {
@@ -119,33 +127,34 @@ public interface BeanOperator {
     }
 
     @Immutable
-    default Map<String, Object> toMap(Object bean) {
-        return resolveBean(bean.getClass()).toMap(bean);
+    default Map<String, Object> toMap(Object beanOrMap) {
+        if (beanOrMap instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) beanOrMap;
+            return MapKit.map(map, String::valueOf, v -> v);
+        }
+        return resolveBean(beanOrMap.getClass()).toMap(beanOrMap);
     }
 
     @Immutable
-    default Map<String, Object> deepToMap(Object bean) {
-        return resolveBean(bean.getClass()).deepToMap(bean);
+    default Map<String, Object> deepToMap(Object beanOrMap) {
+        if (beanOrMap instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) beanOrMap;
+            return MapKit.map(map, String::valueOf, v -> v == null ? null : deepToMap(v));
+        }
+        return resolveBean(beanOrMap.getClass()).deepToMap(beanOrMap, this);
     }
 
-    @Immutable
-    default Map<String, Object> deepToMap(Object bean, Function<Object, @Nullable Object> resolver) {
-        return resolveBean(bean.getClass()).deepToMap(bean, resolver);
-    }
-
-    default <T, K, V> T toBean(Map<K, V> map, Class<T> beanType) {
+    default <T> T toBean(Map<?, ?> map, Class<T> beanType) {
         return resolveBean(beanType).toBean(map, converter());
     }
 
-    default <T, K, V> void toBean(Map<K, V> map, T bean) {
-        resolveBean(bean.getClass()).toBean(map, bean, converter());
-    }
-
-    default Map<Object, Object> toRawMap(Object beanOrMap) {
+    default void toBean(Map<?, ?> map, Object beanOrMap) {
         if (beanOrMap instanceof Map) {
-            return Cast.as(beanOrMap);
+            Map<?, ?> dest = (Map<?, ?>) beanOrMap;
+            dest.putAll(Cast.as(map));
+            return;
         }
-        return Cast.as(toMap(beanOrMap));
+        resolveBean(beanOrMap.getClass()).fill(map, beanOrMap, converter());
     }
 
     final class CopyPreparation {

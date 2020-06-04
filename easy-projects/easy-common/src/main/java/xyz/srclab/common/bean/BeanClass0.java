@@ -1,24 +1,22 @@
 package xyz.srclab.common.bean;
 
+import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.Checker;
-import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
 import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.FieldKit;
+import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -39,8 +37,9 @@ final class BeanClass0 {
         return new BeanPropertyOnMethods(ownerType, name, readMethod, writeMethod);
     }
 
-    static DeepToMapFunction newDeepToMapFunction(BeanClass beanClass) {
-        return new DeepToMapFunction(beanClass);
+    static DeepToMapFunction getDeepToMapFunction(BeanOperator operator) {
+        return operator.equals(BeanOperator.getDefault()) ?
+                DeepToMapFunction.DEFAULT : new DeepToMapFunction(operator);
     }
 
     private static final class BeanClassImpl implements BeanClass {
@@ -305,18 +304,22 @@ final class BeanClass0 {
         }
     }
 
-    private static final class DeepToMapFunction implements Function<Object, @Nullable Object> {
+    static final class DeepToMapFunction implements Function<Object, @Nullable Object> {
 
-        private final BeanClass beanClass;
+        private static final DeepToMapFunction DEFAULT = new DeepToMapFunction(BeanOperator.getDefault());
 
-        private DeepToMapFunction(BeanClass beanClass) {
-            this.beanClass = beanClass;
+        private static final TypeRef<Map<String, Object>> MAP_TYPE = new TypeRef<Map<String, Object>>() {};
+
+        private final BeanOperator operator;
+
+        private DeepToMapFunction(BeanOperator operator) {
+            this.operator = operator;
         }
 
         @Override
         @Nullable
         public Object apply(Object object) {
-            if (object == null || Defaults.isBasicType(object.getClass())) {
+            if (object == null || !operator.canResolve(object)) {
                 return object;
             }
             if (object instanceof List) {
@@ -330,38 +333,84 @@ final class BeanClass0 {
             }
             Class<?> type = object.getClass();
             if (type.isArray()) {
-                return arrayToList(object);
+                return ListKit.map(ArrayKit.toList(object), this);
             }
-            return beanClass.deepToMap(object, this);
+            return MapKit.map(operator.convert(object, MAP_TYPE), this, this);
+        }
+    }
+
+    private static final class BeanMap implements Map<String, Object> {
+
+        private final BeanClass beanClass;
+        private final Object bean;
+
+        private BeanMap(BeanClass beanClass, Object bean) {
+            this.beanClass = beanClass;
+            this.bean = bean;
         }
 
-        private List<?> arrayToList(Object array) {
-            if (array instanceof boolean[]) {
-                return ArrayKit.toList((boolean[]) array);
-            }
-            if (array instanceof byte[]) {
-                return ArrayKit.toList((byte[]) array);
-            }
-            if (array instanceof short[]) {
-                return ArrayKit.toList((short[]) array);
-            }
-            if (array instanceof char[]) {
-                return ArrayKit.toList((char[]) array);
-            }
-            if (array instanceof int[]) {
-                return ArrayKit.toList((int[]) array);
-            }
-            if (array instanceof long[]) {
-                return ArrayKit.toList((long[]) array);
-            }
-            if (array instanceof float[]) {
-                return ArrayKit.toList((float[]) array);
-            }
-            if (array instanceof double[]) {
-                return ArrayKit.toList((double[]) array);
-            }
-            Object[] a = (Object[]) array;
-            return ListKit.map(a, this);
+        @Override
+        public int size() {
+            return beanClass.properties().size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return size() == 0;
+        }
+
+        @Override
+        public boolean containsKey(Object key) {
+            return beanClass.properties().containsKey(key);
+        }
+
+        @Override
+        public boolean containsValue(Object value) {
+            return false;
+        }
+
+        @Override
+        public Object get(Object key) {
+            return null;
+        }
+
+        @org.jetbrains.annotations.Nullable
+        @Override
+        public Object put(String key, Object value) {
+            return null;
+        }
+
+        @Override
+        public Object remove(Object key) {
+            return null;
+        }
+
+        @Override
+        public void putAll(@NotNull Map<? extends String, ?> m) {
+
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @NotNull
+        @Override
+        public Set<String> keySet() {
+            return null;
+        }
+
+        @NotNull
+        @Override
+        public Collection<Object> values() {
+            return null;
+        }
+
+        @NotNull
+        @Override
+        public Set<Entry<String, Object>> entrySet() {
+            return null;
         }
     }
 }

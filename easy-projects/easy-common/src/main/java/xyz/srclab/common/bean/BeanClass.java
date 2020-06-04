@@ -9,7 +9,6 @@ import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.function.Function;
 
 @Immutable
 public interface BeanClass {
@@ -106,30 +105,33 @@ public interface BeanClass {
 
     @Immutable
     default Map<String, Object> deepToMap(Object bean) {
-        return deepToMap(bean, BeanClass0.newDeepToMapFunction(this));
+        return deepToMap(bean, BeanOperator.getDefault());
     }
 
     @Immutable
-    default Map<String, Object> deepToMap(Object bean, Function<Object, @Nullable Object> resolver) {
+    default Map<String, Object> deepToMap(Object bean, BeanOperator operator) {
         return MapKit.map(readableProperties(), name -> name, property -> {
             @Nullable Object value = property.getValue(bean);
-            return value == null ? null : resolver.apply(value);
+            if (value == null) {
+                return null;
+            }
+            return BeanClass0.getDeepToMapFunction(operator).apply(value);
         });
     }
 
     default <T, K, V> T toBean(Map<K, V> map) {
         T bean = ClassKit.newInstance(type());
-        toBean(map, bean);
+        fill(map, bean);
         return bean;
     }
 
     default <T, K, V> T toBean(Map<K, V> map, Converter converter) {
         T bean = ClassKit.newInstance(type());
-        toBean(map, bean, converter);
+        fill(map, bean, converter);
         return bean;
     }
 
-    default <T, K, V> void toBean(Map<K, V> map, T bean) {
+    default <K, V> void fill(Map<K, V> map, Object bean) {
         map.forEach((k, v) -> {
             String propertyName = String.valueOf(k);
             @Nullable BeanProperty property = property(propertyName);
@@ -140,7 +142,7 @@ public interface BeanClass {
         });
     }
 
-    default <T, K, V> void toBean(Map<K, V> map, T bean, Converter converter) {
+    default <K, V> void fill(Map<K, V> map, Object bean, Converter converter) {
         map.forEach((k, v) -> {
             String propertyName = String.valueOf(k);
             @Nullable BeanProperty property = property(propertyName);
