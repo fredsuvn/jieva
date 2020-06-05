@@ -39,23 +39,23 @@ public class Null {
     }
 
     public static <E> Set<E> asSet() {
-        return (Set<E>) SET;
+        return Cast.as(SET);
     }
 
     public static <E> List<E> asList() {
-        return (List<E>) LIST;
+        return Cast.as(LIST);
     }
 
     public static <E> Collection<E> asCollection() {
-        return (Collection<E>) COLLECTION;
+        return Cast.as(COLLECTION);
     }
 
     public static <K, V> Map<K, V> asMap() {
-        return (Map<K, V>) MAP;
+        return Cast.as(MAP);
     }
 
     public static <T> Class<T> asClass() {
-        return (Class<T>) CLASS;
+        return Cast.as(CLASS);
     }
 
     public static Type asType() {
@@ -385,9 +385,11 @@ public class Null {
         private final String nullField = null;
 
         private NullClass() {
+            throw new NullPointerException();
         }
 
         private void nullMethod() {
+            throw new NullPointerException();
         }
     }
 
