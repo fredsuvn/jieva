@@ -19,6 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Util for array.
+ */
 public class ArrayKit {
 
     public static <T> T[] newArray(Class<T> componentType, int length) {
@@ -71,7 +74,7 @@ public class ArrayKit {
         if (primitiveArray instanceof double[]) {
             return Cast.as(toList((double[]) primitiveArray));
         }
-        throw new IllegalArgumentException("Unknown primitive array: " + primitiveArray);
+        throw new IllegalArgumentException("Unknown primitive array object: " + primitiveArray);
     }
 
     @Immutable
@@ -79,10 +82,11 @@ public class ArrayKit {
         if (array instanceof Object[]) {
             return Arrays.asList((Object[]) array);
         }
-        if (array.getClass().getComponentType().isPrimitive()) {
+        Class<?> cls = array.getClass();
+        if (cls.isArray() && cls.getComponentType().isPrimitive()) {
             return primitiveToList(array);
         }
-        throw new IllegalArgumentException("Unknown array: " + array);
+        throw new IllegalArgumentException("Unknown array object: " + array);
     }
 
     @Immutable
@@ -126,20 +130,20 @@ public class ArrayKit {
     }
 
     public static <NT, OT> NT[] map(
-            Iterable<? extends OT> iterable, Class<NT> newComponentType, Function<OT, NT> elementMapper) {
-        Iterable<NT> newIterable = IterableKit.map(iterable, elementMapper);
+            Iterable<? extends OT> iterable, Class<NT> newComponentType, Function<OT, NT> mapper) {
+        Iterable<NT> newIterable = IterableKit.map(iterable, mapper);
         return toArray(newIterable, newComponentType);
     }
 
     public static <NT, OT> NT[] map(
-            Iterable<? extends OT> iterable, Type newComponentType, Function<OT, NT> elementMapper) {
-        Iterable<NT> newIterable = IterableKit.map(iterable, elementMapper);
+            Iterable<? extends OT> iterable, Type newComponentType, Function<OT, NT> mapper) {
+        Iterable<NT> newIterable = IterableKit.map(iterable, mapper);
         return toArray(newIterable, newComponentType);
     }
 
     public static <NT, OT> NT[] map(
-            Iterable<? extends OT> iterable, TypeRef<NT> newComponentType, Function<OT, NT> elementMapper) {
-        Iterable<NT> newIterable = IterableKit.map(iterable, elementMapper);
+            Iterable<? extends OT> iterable, TypeRef<NT> newComponentType, Function<OT, NT> mapper) {
+        Iterable<NT> newIterable = IterableKit.map(iterable, mapper);
         return toArray(newIterable, newComponentType);
     }
 
@@ -289,7 +293,7 @@ public class ArrayKit {
         return rawType.getComponentType();
     }
 
-    public static Class<?> findArrayType(Type componentType) {
+    public static Class<?> getArrayType(Type componentType) {
         return ArrayTypeTable.search(TypeKit.getRawType(componentType));
     }
 
@@ -333,7 +337,7 @@ public class ArrayKit {
     private static final class ArrayTypeTable {
 
         // Key: component type, value: array type
-        private static final Cache<Class<?>, Class<?>> cache = Cache.newL2();
+        private static final Cache<Type, Class<?>> cache = Cache.newL2();
 
         private static final Class<?>[] table = {
                 Object.class, Object[].class,
@@ -356,7 +360,7 @@ public class ArrayKit {
                 Double.class, Double[].class,
         };
 
-        private static Class<?> search(Class<?> componentType) {
+        public static Class<?> search(Type componentType) {
             for (int i = 0; i < table.length; ) {
                 if (table[i].equals(componentType)) {
                     return table[i + 1];
@@ -364,10 +368,10 @@ public class ArrayKit {
                     i += 2;
                 }
             }
-            return cache.getNonNull(componentType, ArrayTypeTable::find0);
+            return cache.getNonNull(componentType, ArrayTypeTable::make);
         }
 
-        private static Class<?> find0(Class<?> componentType) {
+        private static Class<?> make(Type componentType) {
             return newArray(componentType, 0).getClass().getComponentType();
         }
     }
