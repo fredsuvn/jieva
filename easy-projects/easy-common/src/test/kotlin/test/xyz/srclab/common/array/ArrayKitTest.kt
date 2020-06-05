@@ -122,11 +122,11 @@ object ArrayKitTest {
     @Test
     fun testFindArrayType() {
         doAssertEquals(
-            ArrayKit.findArrayType(Int::class.java),
+            ArrayKit.getArrayType(Int::class.java),
             intArrayOf(1).javaClass
         )
         doAssertEquals(
-            ArrayKit.findArrayType(String::class.java),
+            ArrayKit.getArrayType(String::class.java),
             arrayOf("1").javaClass
         )
     }

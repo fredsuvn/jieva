@@ -11,9 +11,9 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 @Immutable
-public interface BeanClass {
+public interface BeanClass<T> {
 
-    Class<?> type();
+    Class<T> type();
 
     @Nullable
     BeanProperty property(String propertyName);
@@ -32,21 +32,21 @@ public interface BeanClass {
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type, Converter converter)
+    default <V> V getPropertyValue(Object bean, String propertyName, Class<V> type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         @Nullable Object value = getPropertyValue(bean, propertyName);
         return value == null ? null : converter.convert(value, type);
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, Type type, Converter converter)
+    default <V> V getPropertyValue(Object bean, String propertyName, Type type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         @Nullable Object value = getPropertyValue(bean, propertyName);
         return value == null ? null : converter.convert(value, type);
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type, Converter converter)
+    default <V> V getPropertyValue(Object bean, String propertyName, TypeRef<V> type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         @Nullable Object value = getPropertyValue(bean, propertyName);
         return value == null ? null : converter.convert(value, type);

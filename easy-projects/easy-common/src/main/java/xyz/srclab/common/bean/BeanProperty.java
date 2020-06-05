@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 @Immutable
-public interface BeanProperty extends BeanMember {
+public interface BeanProperty<T> extends BeanMember {
 
     Class<?> type();
 
