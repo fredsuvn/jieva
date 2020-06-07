@@ -295,7 +295,7 @@ final class DefaultConvertHandler implements ConvertHandler {
                 if (!toBeanClass.canWriteProperty(propertyName)) {
                     return;
                 }
-                BeanProperty destProperty = toBeanClass.property(propertyName);
+                BeanProperty destProperty = toBeanClass.getProperty(propertyName);
                 @Nullable Object destValue = value == null ? null :
                         beanOperator.convert(value, findTargetType(
                                 destProperty.genericType(), typeVariables, genericTypes));
@@ -303,11 +303,11 @@ final class DefaultConvertHandler implements ConvertHandler {
             });
         } else {
             BeanClass fromBeanClass = beanOperator.resolveBean(from.getClass());
-            fromBeanClass.readableProperties().forEach((name, property) -> {
+            fromBeanClass.getReadableProperties().forEach((name, property) -> {
                 if (!toBeanClass.canWriteProperty(name)) {
                     return;
                 }
-                BeanProperty destProperty = toBeanClass.property(name);
+                BeanProperty destProperty = toBeanClass.getProperty(name);
                 @Nullable Object value = property.getValue(from);
                 @Nullable Object destValue = value == null ? null :
                         beanOperator.convert(value, findTargetType(

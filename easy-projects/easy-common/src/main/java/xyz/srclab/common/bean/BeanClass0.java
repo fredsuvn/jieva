@@ -62,22 +62,22 @@ final class BeanClass0 {
         }
 
         @Override
-        public @Nullable BeanProperty property(String propertyName) {
+        public @Nullable BeanProperty getProperty(String propertyName) {
             return propertyMap.get(propertyName);
         }
 
         @Override
-        public @Immutable Map<String, BeanProperty> properties() {
+        public @Immutable Map<String, BeanProperty> getAllProperties() {
             return propertyMap;
         }
 
         @Override
-        public @Immutable Map<String, BeanProperty> readableProperties() {
+        public @Immutable Map<String, BeanProperty> getReadableProperties() {
             return readablePropertyMap;
         }
 
         @Override
-        public @Immutable Map<String, BeanProperty> writeableProperties() {
+        public @Immutable Map<String, BeanProperty> getWriteableProperties() {
             return writeablePropertyMap;
         }
 
@@ -142,12 +142,12 @@ final class BeanClass0 {
         }
 
         @Override
-        public Field field() {
+        public Field tryField() {
             return field;
         }
 
         @Override
-        public @Immutable List<Annotation> fieldAnnotations() {
+        public @Immutable List<Annotation> tryFieldAnnotations() {
             return fieldAnnotations;
         }
 
@@ -251,12 +251,12 @@ final class BeanClass0 {
         }
 
         @Override
-        public @Nullable Field field() {
+        public @Nullable Field tryField() {
             return field;
         }
 
         @Override
-        public @Immutable List<Annotation> fieldAnnotations() {
+        public @Immutable List<Annotation> tryFieldAnnotations() {
             return fieldAnnotations;
         }
 
@@ -351,7 +351,7 @@ final class BeanClass0 {
 
         @Override
         public int size() {
-            return beanClass.properties().size();
+            return beanClass.getAllProperties().size();
         }
 
         @Override
@@ -361,7 +361,76 @@ final class BeanClass0 {
 
         @Override
         public boolean containsKey(Object key) {
-            return beanClass.properties().containsKey(key);
+            return beanClass.getAllProperties().containsKey(key);
+        }
+
+        @Override
+        public boolean containsValue(Object value) {
+            return false;
+        }
+
+        @Override
+        public Object get(Object key) {
+            return null;
+        }
+
+        @org.jetbrains.annotations.Nullable
+        @Override
+        public Object put(String key, Object value) {
+            return null;
+        }
+
+        @Override
+        public Object remove(Object key) {
+            return null;
+        }
+
+        @Override
+        public void putAll(@NotNull Map<? extends String, ?> m) {
+
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @NotNull
+        @Override
+        public Set<String> keySet() {
+            return null;
+        }
+
+        @NotNull
+        @Override
+        public Collection<Object> values() {
+            return null;
+        }
+
+        @NotNull
+        @Override
+        public Set<Entry<String, Object>> entrySet() {
+            return null;
+        }
+    }
+
+    private static final class BeanViewMap implements Map<String, Object> {
+
+        private final BeanClass
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean containsKey(Object key) {
+            return false;
         }
 
         @Override

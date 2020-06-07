@@ -24,7 +24,7 @@ public class BeanWalker implements Walker {
     @Override
     public void walk(Object walked, WalkVisitor visitor) {
         BeanClass beanClass = beanOperator.resolveBean(walked.getClass());
-        Set<Map.Entry<String, BeanProperty>> set = beanClass.readableProperties().entrySet();
+        Set<Map.Entry<String, BeanProperty>> set = beanClass.getReadableProperties().entrySet();
         loop:
         for (Map.Entry<String, BeanProperty> entry : set) {
             String name = entry.getKey();

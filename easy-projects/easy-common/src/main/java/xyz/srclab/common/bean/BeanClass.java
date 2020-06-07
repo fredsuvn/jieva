@@ -8,25 +8,32 @@ import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Predicate;
 
 @Immutable
-public interface BeanClass<T> {
+public interface BeanClass {
 
-    Class<T> type();
+    Class<?> type();
 
     @Nullable
-    BeanProperty property(String propertyName);
+    BeanProperty getProperty(String propertyName);
+
+    @Immutable
+    default Map<String, BeanProperty> getProperties(Object bean, String... propertyNames) {
+        return getProperties(bean, Arrays.asList(propertyNames));
+    }
+
+    @Immutable
+    Map<String, BeanProperty> getProperties(Object bean, Iterable<? extends String> propertyNames);
 
     @Nullable
     default Object getPropertyValue(Object bean, String propertyName)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable BeanProperty beanProperty = property(propertyName);
+        @Nullable BeanProperty beanProperty = getProperty(propertyName);
         if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
-        }
-        if (!beanProperty.readable()) {
-            throw new UnsupportedOperationException("Cannot read property: " + beanProperty.name());
         }
         return beanProperty.getValue(bean);
     }
@@ -34,32 +41,52 @@ public interface BeanClass<T> {
     @Nullable
     default <V> V getPropertyValue(Object bean, String propertyName, Class<V> type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable Object value = getPropertyValue(bean, propertyName);
-        return value == null ? null : converter.convert(value, type);
+        @Nullable BeanProperty beanProperty = getProperty(propertyName);
+        if (beanProperty == null) {
+            throw new BeanPropertyNotFoundException(propertyName);
+        }
+        return beanProperty.getValue(bean, type, converter);
     }
 
     @Nullable
     default <V> V getPropertyValue(Object bean, String propertyName, Type type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable Object value = getPropertyValue(bean, propertyName);
-        return value == null ? null : converter.convert(value, type);
+        @Nullable BeanProperty beanProperty = getProperty(propertyName);
+        if (beanProperty == null) {
+            throw new BeanPropertyNotFoundException(propertyName);
+        }
+        return beanProperty.getValue(bean, type, converter);
     }
 
     @Nullable
     default <V> V getPropertyValue(Object bean, String propertyName, TypeRef<V> type, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable Object value = getPropertyValue(bean, propertyName);
-        return value == null ? null : converter.convert(value, type);
+        @Nullable BeanProperty beanProperty = getProperty(propertyName);
+        if (beanProperty == null) {
+            throw new BeanPropertyNotFoundException(propertyName);
+        }
+        return beanProperty.getValue(bean, type, converter);
+    }
+
+    @Immutable
+    default Map<String, Object> getPropertyValues(Object bean, String... propertyNames) {
+        return getPropertyValues(bean, Arrays.asList(propertyNames));
+    }
+
+    @Immutable
+    default Map<String, Object> getPropertyValues(Object bean, Iterable<? extends String> propertyNames) {
+        return MapKit.map(
+                MapKit.filter(getProperties(bean, propertyNames), e -> e.getValue().readable()),
+                name -> name,
+                property -> property.getValue(bean)
+        );
     }
 
     default void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable BeanProperty beanProperty = property(propertyName);
+        @Nullable BeanProperty beanProperty = getProperty(propertyName);
         if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
-        }
-        if (!beanProperty.writeable()) {
-            throw new UnsupportedOperationException("Cannot write property: " + beanProperty.name());
         }
         beanProperty.setValue(bean, value);
     }
@@ -67,40 +94,53 @@ public interface BeanClass<T> {
     default void setPropertyValue(
             Object bean, String propertyName, @Nullable Object value, Converter converter)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        @Nullable BeanProperty beanProperty = property(propertyName);
+        @Nullable BeanProperty beanProperty = getProperty(propertyName);
         if (beanProperty == null) {
             throw new BeanPropertyNotFoundException(propertyName);
         }
-        if (!beanProperty.writeable()) {
-            throw new UnsupportedOperationException("Cannot write property: " + beanProperty.name());
-        }
-        @Nullable Object targetValue = value == null ? null :
-                converter.convert(value, beanProperty.genericType());
-        beanProperty.setValue(bean, targetValue);
+        beanProperty.setValue(bean, value, converter);
+    }
+
+    default void setPropertyValues(Object bean, Map<String, Object> properties) {
+        MapKit.filter(
+                getProperties(bean, properties.keySet()),
+                e -> e.getValue().writeable()
+        ).forEach((name, property) -> property.setValue(bean, properties.get(name)));
+    }
+
+    default void setPropertyValues(Object bean, Map<String, Object> properties, Converter converter) {
+        MapKit.filter(
+                getProperties(bean, properties.keySet()),
+                e -> e.getValue().writeable()
+        ).forEach((name, property) -> property.setValue(bean, properties.get(name), converter));
     }
 
     default boolean canReadProperty(String propertyName) {
-        @Nullable BeanProperty property = property(propertyName);
+        @Nullable BeanProperty property = getProperty(propertyName);
         return property != null && property.readable();
     }
 
     default boolean canWriteProperty(String propertyName) {
-        @Nullable BeanProperty property = property(propertyName);
+        @Nullable BeanProperty property = getProperty(propertyName);
         return property != null && property.writeable();
     }
 
     @Immutable
-    Map<String, BeanProperty> properties();
+    Map<String, BeanProperty> getAllProperties();
 
     @Immutable
-    Map<String, BeanProperty> readableProperties();
+    Map<String, BeanProperty> getReadableProperties();
 
     @Immutable
-    Map<String, BeanProperty> writeableProperties();
+    Map<String, BeanProperty> getWriteableProperties();
+
+    default Map<String, Object> asMap(Object bean) {
+
+    }
 
     @Immutable
     default Map<String, Object> toMap(Object bean) {
-        return MapKit.map(readableProperties(), name -> name, property -> property.getValue(bean));
+        return MapKit.map(getReadableProperties(), name -> name, property -> property.getValue(bean));
     }
 
     @Immutable
@@ -110,7 +150,7 @@ public interface BeanClass<T> {
 
     @Immutable
     default Map<String, Object> deepToMap(Object bean, BeanOperator operator) {
-        return MapKit.map(readableProperties(), name -> name, property -> {
+        return MapKit.map(getReadableProperties(), name -> name, property -> {
             @Nullable Object value = property.getValue(bean);
             if (value == null) {
                 return null;
@@ -134,7 +174,7 @@ public interface BeanClass<T> {
     default <K, V> void fill(Map<K, V> map, Object bean) {
         map.forEach((k, v) -> {
             String propertyName = String.valueOf(k);
-            @Nullable BeanProperty property = property(propertyName);
+            @Nullable BeanProperty property = getProperty(propertyName);
             if (property == null || !property.writeable()) {
                 return;
             }
@@ -145,7 +185,7 @@ public interface BeanClass<T> {
     default <K, V> void fill(Map<K, V> map, Object bean, Converter converter) {
         map.forEach((k, v) -> {
             String propertyName = String.valueOf(k);
-            @Nullable BeanProperty property = property(propertyName);
+            @Nullable BeanProperty property = getProperty(propertyName);
             if (property == null || !property.writeable()) {
                 return;
             }
