@@ -40,7 +40,7 @@ public interface BeanOperator {
     @Nullable
     default BeanProperty getProperty(Object bean, String propertyName) {
         BeanClass beanClass = resolveBean(bean.getClass());
-        return beanClass.getProperty(propertyName);
+        return beanClass.property(propertyName);
     }
 
     @Nullable
@@ -212,13 +212,13 @@ public interface BeanOperator {
                     if (!destClass.canWriteProperty(destPropertyName)) {
                         return;
                     }
-                    BeanProperty destProperty = destClass.getProperty(destPropertyName);
+                    BeanProperty destProperty = destClass.property(destPropertyName);
                     destProperty.setValue(dest, beanOperator.convert(value, destProperty.genericType()));
                 });
             } else if (dest instanceof Map) {
                 BeanClass sourceClass = beanOperator.resolveBean(source.getClass());
                 Map destMap = (Map) dest;
-                sourceClass.getReadableProperties().forEach((name, property) -> {
+                sourceClass.readableProperties().forEach((name, property) -> {
                     @Nullable Object value = property.getValue(source);
                     if (!filter.test(name, value)) {
                         return;
@@ -232,7 +232,7 @@ public interface BeanOperator {
             } else {
                 BeanClass sourceClass = beanOperator.resolveBean(source.getClass());
                 BeanClass destClass = beanOperator.resolveBean(dest.getClass());
-                sourceClass.getReadableProperties().forEach((name, sourceProperty) -> {
+                sourceClass.readableProperties().forEach((name, sourceProperty) -> {
                     if (!destClass.canWriteProperty(name)) {
                         return;
                     }
@@ -244,7 +244,7 @@ public interface BeanOperator {
                     if (!destClass.canWriteProperty(destPropertyName)) {
                         return;
                     }
-                    BeanProperty destProperty = destClass.getProperty(destPropertyName);
+                    BeanProperty destProperty = destClass.property(destPropertyName);
                     destProperty.setValue(dest, beanOperator.convert(value, destProperty.genericType()));
                 });
             }
@@ -300,7 +300,7 @@ public interface BeanOperator {
                 });
             } else {
                 BeanClass sourceClass = beanOperator.resolveBean(source.getClass());
-                sourceClass.getReadableProperties().forEach((name, property) -> {
+                sourceClass.readableProperties().forEach((name, property) -> {
                     @Nullable Object sourceValue = property.getValue(source);
                     if (!filter.test(name, sourceValue)) {
                         return;

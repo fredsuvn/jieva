@@ -82,15 +82,15 @@ public class Loader {
 
         private static final BytesClassLoader INSTANCE = new BytesClassLoader();
 
-        private Class<?> loadBytes(byte[] bytes) {
+        public Class<?> loadBytes(byte[] bytes) {
             return loadBytes(bytes, 0, bytes.length);
         }
 
-        private Class<?> loadBytes(byte[] bytes, int offset, int length) {
+        public Class<?> loadBytes(byte[] bytes, int offset, int length) {
             return super.defineClass(null, bytes, offset, length);
         }
 
-        private Class<?> loadStream(InputStream inputStream) {
+        public Class<?> loadStream(InputStream inputStream) {
             try {
                 return loadBytes(IOUtils.toByteArray(inputStream));
             } catch (IOException e) {
@@ -98,7 +98,7 @@ public class Loader {
             }
         }
 
-        private Class<?> loadBuffer(ByteBuffer byteBuffer) {
+        public Class<?> loadBuffer(ByteBuffer byteBuffer) {
             return super.defineClass(null, byteBuffer, null);
         }
     }

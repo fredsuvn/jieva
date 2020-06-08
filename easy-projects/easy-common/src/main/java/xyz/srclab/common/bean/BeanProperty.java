@@ -28,9 +28,6 @@ public interface BeanProperty extends BeanMember {
 
     @Nullable
     default <T> T getValue(Object bean, Class<T> type, Converter converter) throws UnsupportedOperationException {
-        if (!readable()) {
-            throw new UnsupportedOperationException("Property is not readable: " + this);
-        }
         @Nullable Object value = getValue(bean);
         if (value == null) {
             return null;
@@ -40,9 +37,6 @@ public interface BeanProperty extends BeanMember {
 
     @Nullable
     default <T> T getValue(Object bean, Type type, Converter converter) throws UnsupportedOperationException {
-        if (!readable()) {
-            throw new UnsupportedOperationException("Property is not readable: " + this);
-        }
         @Nullable Object value = getValue(bean);
         if (value == null) {
             return null;
@@ -52,9 +46,6 @@ public interface BeanProperty extends BeanMember {
 
     @Nullable
     default <T> T getValue(Object bean, TypeRef<T> type, Converter converter) throws UnsupportedOperationException {
-        if (!readable()) {
-            throw new UnsupportedOperationException("Property is not readable: " + this);
-        }
         @Nullable Object value = getValue(bean);
         if (value == null) {
             return null;

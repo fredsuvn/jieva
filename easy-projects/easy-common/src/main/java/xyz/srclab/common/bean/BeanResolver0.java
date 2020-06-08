@@ -56,7 +56,7 @@ final class BeanResolver0 {
                 if (properties.containsKey(field.getName())) {
                     continue;
                 }
-                properties.put(field.getName(), BeanClass0.newBeanPropertyOnField(beanClass, field));
+                properties.put(field.getName(), BeanSupport.newBeanPropertyOnField(beanClass, field));
             }
         }
     }
@@ -76,7 +76,7 @@ final class BeanResolver0 {
                 }
                 @Nullable Method setter = setters.get(name);
                 if (setter == null) {
-                    properties.put(name, BeanClass0.newBeanPropertyOnMethods(
+                    properties.put(name, BeanSupport.newBeanPropertyOnMethods(
                             beanClass,
                             name,
                             getter,
@@ -87,7 +87,7 @@ final class BeanResolver0 {
                 if (!getter.getReturnType().equals(setter.getParameterTypes()[0])) {
                     return;
                 }
-                properties.put(name, BeanClass0.newBeanPropertyOnMethods(
+                properties.put(name, BeanSupport.newBeanPropertyOnMethods(
                         beanClass,
                         name,
                         getter,
@@ -99,7 +99,7 @@ final class BeanResolver0 {
                 if (properties.containsKey(name)) {
                     return;
                 }
-                properties.put(name, BeanClass0.newBeanPropertyOnMethods(
+                properties.put(name, BeanSupport.newBeanPropertyOnMethods(
                         beanClass,
                         name,
                         null,

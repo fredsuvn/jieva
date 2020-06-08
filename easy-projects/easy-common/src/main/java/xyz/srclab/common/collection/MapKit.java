@@ -7,6 +7,7 @@ import xyz.srclab.annotation.Out;
 import xyz.srclab.common.base.Checker;
 
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -25,11 +26,11 @@ public class MapKit {
 
     @Immutable
     public static <K, V> Map<K, V> filter(
-            Map<? extends K, ? extends V> map, Predicate<? super Map.Entry<? extends K, ? extends V>> predicate) {
+            Map<? extends K, ? extends V> map, BiPredicate<? super K, ? super V> predicate) {
         Map<K, V> result = new LinkedHashMap<>();
-        map.entrySet().forEach(e -> {
-            if (predicate.test(e)) {
-                result.put(e.getKey(), e.getValue());
+        map.forEach((k, v) -> {
+            if (predicate.test(k, v)) {
+                result.put(k, v);
             }
         });
         return immutable(result);

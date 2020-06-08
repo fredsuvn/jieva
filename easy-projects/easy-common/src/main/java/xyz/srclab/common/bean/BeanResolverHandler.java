@@ -35,7 +35,7 @@ public interface BeanResolverHandler {
 
         Map<String, BeanProperty> properties();
 
-        void notSupport();
+        void nonsupport();
 
         void terminate();
     }

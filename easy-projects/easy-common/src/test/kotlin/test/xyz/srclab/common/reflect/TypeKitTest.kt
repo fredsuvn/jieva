@@ -20,7 +20,7 @@ object TypeKitTest {
         doAssertEquals(TypeKit.getRawType<Any>(A::class.java.typeParameters[0]), Throwable::class.java)
         doAssertEquals(TypeKit.getRawType<Any>(A2::class.java.typeParameters[0]), List::class.java)
         doAssertEquals(
-            TypeKit.getRawType<Any>(BeanKit.resolveBean(B::class.java).getProperty("array")?.genericType()),
+            TypeKit.getRawType<Any>(BeanKit.resolveBean(B::class.java).property("array")?.genericType()),
             Any::class.java
         )
     }
