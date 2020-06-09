@@ -368,10 +368,10 @@ public class ArrayKit {
                     i += 2;
                 }
             }
-            return cache.getNonNull(componentType, ArrayTypeTable::make);
+            return cache.getNonNull(componentType, ArrayTypeTable::makeThenGet);
         }
 
-        private static Class<?> make(Type componentType) {
+        private static Class<?> makeThenGet(Type componentType) {
             return newArray(componentType, 0).getClass().getComponentType();
         }
     }

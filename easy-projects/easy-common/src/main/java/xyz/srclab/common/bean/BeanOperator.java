@@ -4,9 +4,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
-import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.convert.Converter;
-import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
@@ -29,43 +27,35 @@ public interface BeanOperator {
 
     Converter converter();
 
-    default boolean canResolve(Object object) {
-        return BeanOperator0.canResolve(object);
-    }
+    boolean canResolve(Object object);
 
     default BeanClass resolveBean(Class<?> beanClass) {
         return resolver().resolve(beanClass);
     }
 
     @Nullable
-    default BeanProperty getProperty(Object bean, String propertyName) {
-        BeanClass beanClass = resolveBean(bean.getClass());
-        return beanClass.property(propertyName);
-    }
-
-    @Nullable
-    default Object getPropertyValue(Object bean, String propertyName)
+    default Object getValue(Object bean, String propertyName)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         BeanClass beanClass = resolveBean(bean.getClass());
         return beanClass.getPropertyValue(bean, propertyName);
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, Type type)
+    default <T> T getValue(Object bean, String propertyName, Type type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         BeanClass beanClass = resolveBean(bean.getClass());
         return beanClass.getPropertyValue(bean, propertyName, type, converter());
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, Class<T> type)
+    default <T> T getValue(Object bean, String propertyName, Class<T> type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         BeanClass beanClass = resolveBean(bean.getClass());
         return beanClass.getPropertyValue(bean, propertyName, type, converter());
     }
 
     @Nullable
-    default <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type)
+    default <T> T getValue(Object bean, String propertyName, TypeRef<T> type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
         BeanClass beanClass = resolveBean(bean.getClass());
         return beanClass.getPropertyValue(bean, propertyName, type, converter());
@@ -77,9 +67,72 @@ public interface BeanOperator {
         beanClass.setPropertyValue(bean, propertyName, value, converter());
     }
 
+    @Immutable
+    default Map<String, Object> getPropertiesValues(Object bean, String... propertyNames) {
+        return resolveBean(bean.getClass()).getPropertiesValues(bean, propertyNames);
+    }
+
+    @Immutable
+    default Map<String, Object> getPropertiesValues(Object bean, Iterable<String> propertyNames) {
+        return resolveBean(bean.getClass()).getPropertiesValues(bean, propertyNames);
+    }
+
+    default void setPropertiesValues(Object bean, Map<String, Object> properties) {
+        resolveBean(bean.getClass()).setPropertiesValues(bean, properties, converter());
+    }
+
+    default void setPropertiesValues(
+            Object bean, Iterable<String> propertyNames, Function<String, Object> function) {
+        resolveBean(bean.getClass()).setPropertiesValues(bean, propertyNames, function);
+    }
+
+    default void clearPropertiesValues(Object bean) {
+        resolveBean(bean.getClass()).clearPropertiesValues(bean);
+    }
+
+    default Map<String, Object> asMap(Object bean) {
+        return resolveBean(bean.getClass()).asMap(bean);
+    }
+
+    default Map<String, Object> asReadableMap(Object bean) {
+        return resolveBean(bean.getClass()).asReadableMap(bean);
+    }
+
+    default Map<String, Object> asWriteableMap(Object bean) {
+        return resolveBean(bean.getClass()).asWriteableMap(bean);
+    }
+
+    @Immutable
+    default Map<String, Object> toMap(Object beanOrMap) {
+        return resolveBean(beanOrMap.getClass()).toMap(beanOrMap);
+    }
+
+    default <T> T toBean(Class<T> type, Map<String, Object> properties) {
+        return Cast.as(resolveBean(type).toBean(properties, converter()));
+    }
+
+    default <T> T toBean(Class<T> type, Iterable<String> propertyNames, Function<String, Object> function) {
+        return Cast.as(resolveBean(type).toBean(propertyNames, function));
+    }
+
+    default <T> T duplicate(T from) {
+        return Cast.as(resolveBean(from.getClass()).duplicate(from));
+    }
+
+    default <T> T convert(Object from, Type to) {
+        return converter().convert(from, to);
+    }
+
+    default <T> T convert(Object from, Class<T> to) {
+        return converter().convert(from, to);
+    }
+
+    default <T> T convert(Object from, TypeRef<T> to) {
+        return converter().convert(from, to);
+    }
+
     default void copyProperties(Object source, Object dest) {
-        Map<Object, Object> sourceMap = toRawMap(source);
-        toBean(sourceMap, dest);
+
     }
 
     default void copyPropertiesIgnoreNull(Object source, Object dest) {
@@ -106,55 +159,6 @@ public interface BeanOperator {
 
     default <K, V> PopulatePreparation<K, V> preparePopulateProperties(Object source, Map<K, V> dest) {
         return new PopulatePreparation<>(this, source, dest);
-    }
-
-    default <T> T clone(T from) {
-        T returned = ClassKit.newInstance(from.getClass());
-        copyProperties(from, returned);
-        return returned;
-    }
-
-    default <T> T convert(Object from, Type to) {
-        return converter().convert(from, to);
-    }
-
-    default <T> T convert(Object from, Class<T> to) {
-        return converter().convert(from, to);
-    }
-
-    default <T> T convert(Object from, TypeRef<T> to) {
-        return converter().convert(from, to);
-    }
-
-    @Immutable
-    default Map<String, Object> toMap(Object beanOrMap) {
-        if (beanOrMap instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) beanOrMap;
-            return MapKit.map(map, String::valueOf, v -> v);
-        }
-        return resolveBean(beanOrMap.getClass()).toMap(beanOrMap);
-    }
-
-    @Immutable
-    default Map<String, Object> deepToMap(Object beanOrMap) {
-        if (beanOrMap instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) beanOrMap;
-            return MapKit.map(map, String::valueOf, v -> v == null ? null : deepToMap(v));
-        }
-        return resolveBean(beanOrMap.getClass()).deepToMap(beanOrMap, this);
-    }
-
-    default <T> T toBean(Map<?, ?> map, Class<T> beanType) {
-        return resolveBean(beanType).toBean(map, converter());
-    }
-
-    default void toBean(Map<?, ?> map, Object beanOrMap) {
-        if (beanOrMap instanceof Map) {
-            Map<?, ?> dest = (Map<?, ?>) beanOrMap;
-            dest.putAll(Cast.as(map));
-            return;
-        }
-        resolveBean(beanOrMap.getClass()).fill(map, beanOrMap, converter());
     }
 
     final class CopyPreparation {

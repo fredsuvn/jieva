@@ -24,25 +24,25 @@ public class BeanKit {
     @Nullable
     public static Object getPropertyValue(Object bean, String propertyName)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return beanOperator.getPropertyValue(bean, propertyName);
+        return beanOperator.getValue(bean, propertyName);
     }
 
     @Nullable
     public static <T> T getPropertyValue(Object bean, String propertyName, Type type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return beanOperator.getPropertyValue(bean, propertyName, type);
+        return beanOperator.getValue(bean, propertyName, type);
     }
 
     @Nullable
     public static <T> T getPropertyValue(Object bean, String propertyName, Class<T> type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return beanOperator.getPropertyValue(bean, propertyName, type);
+        return beanOperator.getValue(bean, propertyName, type);
     }
 
     @Nullable
     public static <T> T getPropertyValue(Object bean, String propertyName, TypeRef<T> type)
             throws BeanPropertyNotFoundException, UnsupportedOperationException {
-        return beanOperator.getPropertyValue(bean, propertyName, type);
+        return beanOperator.getValue(bean, propertyName, type);
     }
 
     public static void setPropertyValue(Object bean, String propertyName, @Nullable Object value)
@@ -76,7 +76,7 @@ public class BeanKit {
     }
 
     public static <T> T clone(T from) {
-        return beanOperator.clone(from);
+        return beanOperator.duplicate(from);
     }
 
     public static <T> T convert(Object from, Type to) {

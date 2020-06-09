@@ -7,11 +7,21 @@ import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 
 @Immutable
 public interface BeanProperty extends BeanMember {
+
+    static BeanProperty newBeanPropertyOnField(Class<?> ownerType, Field field) {
+        return BeanProperty0.newBeanPropertyOnField(ownerType, field);
+    }
+
+    static BeanProperty newBeanPropertyOnMethods(
+            Class<?> ownerType, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
+        return BeanProperty0.newBeanPropertyOnMethods(ownerType, name, readMethod, writeMethod);
+    }
 
     Class<?> type();
 

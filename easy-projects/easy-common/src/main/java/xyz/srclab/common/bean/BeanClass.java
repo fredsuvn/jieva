@@ -17,6 +17,18 @@ import java.util.function.Function;
 @Immutable
 public interface BeanClass {
 
+    static BeanClass resolve(Object bean) {
+        return BeanResolver.getDefault().resolve(bean.getClass());
+    }
+
+    static BeanClass newBeanClass(Class<?> type, Map<String, BeanProperty> propertyMap) {
+        return BeanClass0.newBeanClass(type, propertyMap);
+    }
+
+    static Map<String, @Nullable Object> newBeanViewMap(Object bean, Map<String, BeanProperty> properties) {
+        return BeanClass0.newBeanViewMap(bean, properties);
+    }
+
     Class<?> type();
 
     @Immutable
@@ -149,12 +161,12 @@ public interface BeanClass {
     }
 
     @Immutable
-    default Map<String, Object> getPropertiesValues(Object bean, String... propertyNames) {
+    default Map<String, @Nullable Object> getPropertiesValues(Object bean, String... propertyNames) {
         return getPropertiesValues(bean, Arrays.asList(propertyNames));
     }
 
     @Immutable
-    default Map<String, Object> getPropertiesValues(Object bean, Iterable<String> propertyNames) {
+    default Map<String, @Nullable Object> getPropertiesValues(Object bean, Iterable<String> propertyNames) {
         return MapKit.map(
                 readableProperties(propertyNames),
                 name -> name,
@@ -162,18 +174,18 @@ public interface BeanClass {
         );
     }
 
-    default void setPropertiesValues(Object bean, Map<String, Object> properties) {
+    default void setPropertiesValues(Object bean, Map<String, @Nullable Object> properties) {
         writeableProperties(properties.keySet())
                 .forEach((name, property) -> property.setValue(bean, properties.get(name)));
     }
 
-    default void setPropertiesValues(Object bean, Map<String, Object> properties, Converter converter) {
+    default void setPropertiesValues(Object bean, Map<String, @Nullable Object> properties, Converter converter) {
         writeableProperties(properties.keySet())
                 .forEach((name, property) -> property.setValue(bean, properties.get(name), converter));
     }
 
     default void setPropertiesValues(
-            Object bean, Iterable<String> propertyNames, Function<String, Object> function) {
+            Object bean, Iterable<String> propertyNames, Function<String, @Nullable Object> function) {
         writeableProperties(propertyNames)
                 .forEach((name, property) -> property.setValue(bean, function.apply(name)));
     }
@@ -184,30 +196,42 @@ public interface BeanClass {
     }
 
     default Map<String, Object> asMap(Object bean) {
-        return BeanSupport.newBeanViewMap(this, bean);
+        return BeanClass.newBeanViewMap(bean, properties());
+    }
+
+    default Map<String, Object> asReadableMap(Object bean) {
+        return BeanClass.newBeanViewMap(bean, readableProperties());
+    }
+
+    default Map<String, Object> asWriteableMap(Object bean) {
+        return BeanClass.newBeanViewMap(bean, writeableProperties());
     }
 
     @Immutable
-    default Map<String, Object> toMap(Object bean) {
+    default Map<String, @Nullable Object> toMap(Object bean) {
         return MapKit.map(readableProperties(), name -> name, property -> property.getValue(bean));
     }
 
-    default Object toBean(Map<String, Object> properties) {
+    default Object toBean(Map<String, @Nullable Object> properties) {
         Object bean = ClassKit.newInstance(type());
         setPropertiesValues(bean, properties);
         return bean;
     }
 
-    default Object toBean(Map<String, Object> properties, Converter converter) {
+    default Object toBean(Map<String, @Nullable Object> properties, Converter converter) {
         Object bean = ClassKit.newInstance(type());
         setPropertiesValues(bean, properties, converter);
         return bean;
     }
 
-    default Object toBean(Iterable<String> propertyNames, Function<String, Object> function) {
+    default Object toBean(Iterable<String> propertyNames, Function<String, @Nullable Object> function) {
         Object bean = ClassKit.newInstance(type());
         setPropertiesValues(bean, propertyNames, function);
         return bean;
+    }
+
+    default Object duplicate(Object from) {
+        return toBean(toMap(from));
     }
 
     @Override

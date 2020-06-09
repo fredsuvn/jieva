@@ -6,9 +6,7 @@ import xyz.srclab.annotation.Out;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author sunqian
@@ -56,7 +54,7 @@ final class BeanResolver0 {
                 if (properties.containsKey(field.getName())) {
                     continue;
                 }
-                properties.put(field.getName(), BeanSupport.newBeanPropertyOnField(beanClass, field));
+                properties.put(field.getName(), BeanProperty.newBeanPropertyOnField(beanClass, field));
             }
         }
     }
@@ -65,51 +63,101 @@ final class BeanResolver0 {
 
         @Override
         public void resolve(Class<?> beanClass, Context context) {
+
+            final class PropertyBuilder {
+
+                private final String name;
+                private @Nullable Method readMethod;
+                private @Nullable Method writeMethod;
+
+                private PropertyBuilder(String name) {
+                    this.name = name;
+                }
+
+                public String getName() {
+                    return name;
+                }
+
+                @Nullable
+                public Method getReadMethod() {
+                    return readMethod;
+                }
+
+                public void setReadMethod(Method readMethod) {
+                    this.readMethod = readMethod;
+                }
+
+                @Nullable
+                public Method getWriteMethod() {
+                    return writeMethod;
+                }
+
+                public void setWriteMethod(Method writeMethod) {
+                    this.writeMethod = writeMethod;
+                }
+
+                public BeanProperty build() {
+                    return BeanProperty.newBeanPropertyOnMethods(beanClass, name, readMethod, writeMethod);
+                }
+            }
+
             Map<String, BeanProperty> properties = context.properties();
-            Map<String, Method> getters = new LinkedHashMap<>();
-            Map<String, Method> setters = new LinkedHashMap<>();
+            Set<PropertyOnMethod> getters = new LinkedHashSet<>();
+            Set<PropertyOnMethod> setters = new LinkedHashSet<>();
             List<Method> methods = context.methods();
+
             sortGetterSetter(methods, getters, setters);
-            getters.forEach((name, getter) -> {
-                if (properties.containsKey(name)) {
-                    return;
-                }
-                @Nullable Method setter = setters.get(name);
-                if (setter == null) {
-                    properties.put(name, BeanSupport.newBeanPropertyOnMethods(
-                            beanClass,
-                            name,
-                            getter,
-                            null
-                    ));
-                    return;
-                }
-                if (!getter.getReturnType().equals(setter.getParameterTypes()[0])) {
-                    return;
-                }
-                properties.put(name, BeanSupport.newBeanPropertyOnMethods(
-                        beanClass,
-                        name,
-                        getter,
-                        setter
-                ));
-                setters.remove(name);
+            Map<String, PropertyBuilder> builderMap = new LinkedHashMap<>();
+
+            getters.forEach(propertyOnMethod -> {
+                PropertyBuilder builder = builderMap.computeIfAbsent(
+                        propertyOnMethod.getName(),
+                        PropertyBuilder::new);
+                builder.setReadMethod(propertyOnMethod.getMethod());
             });
-            setters.forEach((name, setter) -> {
-                if (properties.containsKey(name)) {
+
+            setters.forEach(propertyOnMethod -> {
+                PropertyBuilder builder = builderMap.computeIfAbsent(
+                        propertyOnMethod.getName(),
+                        PropertyBuilder::new);
+                if (builder.getWriteMethod() != null) {
                     return;
                 }
-                properties.put(name, BeanSupport.newBeanPropertyOnMethods(
-                        beanClass,
-                        name,
-                        null,
-                        setter
-                ));
+                Method writeMethod = propertyOnMethod.getMethod();
+                @Nullable Method readMethod = builder.getReadMethod();
+                if (readMethod == null) {
+                    builder.setWriteMethod(writeMethod);
+                    return;
+                }
+                if (readMethod.getGenericReturnType().equals(writeMethod.getGenericParameterTypes()[0])) {
+                    builder.setWriteMethod(writeMethod);
+                }
             });
+
+            builderMap.forEach((name, builder) -> properties.put(name, builder.build()));
         }
 
         protected abstract void sortGetterSetter(
-                List<Method> methods, @Out Map<String, Method> getters, @Out Map<String, Method> setters);
+                List<Method> methods, @Out Set<PropertyOnMethod> getters, @Out Set<PropertyOnMethod> setters);
+
+        private static final class PropertyOnMethod {
+
+            private final String name;
+            private final Method method;
+
+            private PropertyOnMethod(String name, Method method) {
+                this.name = name;
+                this.method = method;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public Method getMethod() {
+                return method;
+            }
+        }
     }
 
     private static final class GetterSetterHandler extends MethodHandler {
@@ -121,22 +169,22 @@ final class BeanResolver0 {
 
         @Override
         protected void sortGetterSetter(
-                List<Method> methods, Map<String, Method> getters, Map<String, Method> setters) {
+                List<Method> methods, @Out Set<PropertyOnMethod> getters, @Out Set<PropertyOnMethod> setters) {
             for (Method method : methods) {
                 String name = method.getName();
                 if (method.getParameterCount() == 0) {
                     if (name.startsWith("get") && name.length() > 3) {
-                        getters.put(StringUtils.uncapitalize(name.substring(3)), method);
+                        getters.add(new PropertyOnMethod(StringUtils.uncapitalize(name.substring(3)), method));
                         continue;
                     }
                     if (name.startsWith("is") && name.length() > 2) {
-                        getters.put(StringUtils.uncapitalize(name.substring(2)), method);
+                        getters.add(new PropertyOnMethod(StringUtils.uncapitalize(name.substring(2)), method));
                         continue;
                     }
                 }
                 if (method.getParameterCount() == 1) {
                     if (name.startsWith("set") && name.length() > 3) {
-                        setters.put(StringUtils.uncapitalize(name.substring(3)), method);
+                        getters.add(new PropertyOnMethod(StringUtils.uncapitalize(name.substring(3)), method));
                     }
                 }
             }
@@ -152,15 +200,14 @@ final class BeanResolver0 {
 
         @Override
         protected void sortGetterSetter(
-                List<Method> methods, Map<String, Method> getters, Map<String, Method> setters) {
+                List<Method> methods, @Out Set<PropertyOnMethod> getters, @Out Set<PropertyOnMethod> setters) {
             for (Method method : methods) {
-                String name = method.getName();
                 if (method.getParameterCount() == 0) {
-                    getters.put(StringUtils.uncapitalize(name), method);
+                    getters.add(new PropertyOnMethod(method.getName(), method));
                     continue;
                 }
                 if (method.getParameterCount() == 1) {
-                    setters.put(StringUtils.uncapitalize(name), method);
+                    getters.add(new PropertyOnMethod(method.getName(), method));
                 }
             }
         }

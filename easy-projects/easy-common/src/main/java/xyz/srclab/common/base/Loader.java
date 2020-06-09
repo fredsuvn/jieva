@@ -4,7 +4,6 @@ import org.apache.commons.io.IOUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.SetKit;
-import xyz.srclab.common.exception.ExceptionWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,7 +73,7 @@ public class Loader {
             Enumeration<URL> urlEnumeration = classLoader.getResources(resourceName);
             return SetKit.enumerationToSet(urlEnumeration);
         } catch (Exception e) {
-            throw new ExceptionWrapper(e);
+            throw new IllegalStateException(e);
         }
     }
 

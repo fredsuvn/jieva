@@ -72,7 +72,7 @@ public class BeanResolverBuilder extends HandlersBuilder<BeanResolver, BeanResol
             if (context.unsupportedCount == times) {
                 throw new UnsupportedOperationException("Cannot resolve this class: " + beanClass);
             }
-            return BeanSupport.newBeanClass(beanClass, context.properties);
+            return BeanClass0.newBeanClass(beanClass, context.properties);
         }
 
         private static final class ContextImpl implements BeanResolverHandler.Context {
@@ -112,7 +112,7 @@ public class BeanResolverBuilder extends HandlersBuilder<BeanResolver, BeanResol
             }
 
             @Override
-            public void nonsupport() {
+            public void unsupport() {
                 unsupportedCount++;
             }
 

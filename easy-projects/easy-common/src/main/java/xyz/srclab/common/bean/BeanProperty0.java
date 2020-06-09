@@ -4,7 +4,6 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.collection.ListKit;
-import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.FieldKit;
 
@@ -12,86 +11,21 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author sunqian
  */
-public final class BeanSupport {
+final class BeanProperty0 {
 
-    public static BeanClass newBeanClass(Class<?> type, Map<String, BeanProperty> propertyMap) {
-        return new BeanClassImpl(type, propertyMap);
-    }
-
-    public static BeanProperty newBeanPropertyOnField(Class<?> ownerType, Field field) {
+    static BeanProperty newBeanPropertyOnField(Class<?> ownerType, Field field) {
         return new BeanPropertyOnField(ownerType, field);
     }
 
-    public static BeanProperty newBeanPropertyOnMethods(
+    static BeanProperty newBeanPropertyOnMethods(
             Class<?> ownerType, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
         return new BeanPropertyOnMethods(ownerType, name, readMethod, writeMethod);
-    }
-
-    public static Map<String, Object> newBeanViewMap(BeanClass beanClass, Object bean) {
-        return new BeanViewMap(beanClass, bean);
-    }
-
-    private static final class BeanClassImpl implements BeanClass {
-
-        protected final Class<?> type;
-        protected final @Immutable Map<String, BeanProperty> properties;
-
-        protected final @Immutable Map<String, BeanProperty> readableProperties;
-        protected final @Immutable Map<String, BeanProperty> writeableProperties;
-
-        public BeanClassImpl(Class<?> type, Map<String, BeanProperty> properties) {
-            this.type = type;
-            this.properties = MapKit.immutable(properties);
-            this.readableProperties = MapKit.filter(this.properties, (name, property) -> property.readable());
-            this.writeableProperties = MapKit.filter(this.properties, (name, property) -> property.writeable());
-        }
-
-        @Override
-        public Class<?> type() {
-            return type;
-        }
-
-        @Override
-        public @Immutable Map<String, BeanProperty> properties() {
-            return properties;
-        }
-
-        @Override
-        public @Immutable Map<String, BeanProperty> readableProperties() {
-            return readableProperties;
-        }
-
-        @Override
-        public @Immutable Map<String, BeanProperty> writeableProperties() {
-            return writeableProperties;
-        }
-
-        @Override
-        public int hashCode() {
-            return type.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o instanceof BeanClassImpl) {
-                return type.equals(((BeanClassImpl) o).type);
-            }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return "bean " + type.getName();
-        }
     }
 
     private static final class BeanPropertyOnField implements BeanProperty {
@@ -306,67 +240,6 @@ public final class BeanSupport {
         @Override
         public String toString() {
             return name + ": " + genericType.toString();
-        }
-    }
-
-    private static final class BeanViewMap extends AbstractMap<String, Object> implements Map<String, Object> {
-
-        private final BeanClass beanClass;
-        private final Object bean;
-
-        private @Nullable Set<Entry<String, Object>> entrySet;
-
-        private BeanViewMap(BeanClass beanClass, Object bean) {
-            this.beanClass = beanClass;
-            this.bean = bean;
-        }
-
-        @Override
-        public Set<Entry<String, Object>> entrySet() {
-            if (entrySet == null) {
-                entrySet = newEntrySet();
-            }
-            return entrySet;
-        }
-
-        @Override
-        public Object put(String key, Object value) {
-            @Nullable BeanProperty beanProperty = beanClass.property(key);
-            if (beanProperty == null || !beanProperty.writeable()) {
-                throw new UnsupportedOperationException("Property not found: " + key);
-            }
-            @Nullable Object old = beanProperty.readable() ? beanProperty.getValue(bean) : null;
-            beanProperty.setValue(bean, value);
-            return old;
-        }
-
-        private Set<Entry<String, Object>> newEntrySet() {
-            return beanClass.properties()
-                    .entrySet()
-                    .stream()
-                    .map(e -> new Entry<String, Object>() {
-                                @Override
-                                public String getKey() {
-                                    return e.getKey();
-                                }
-
-                                @Override
-                                @Nullable
-                                public Object getValue() {
-                                    return e.getValue().getValue(bean);
-                                }
-
-                                @Override
-                                @Nullable
-                                public Object setValue(Object value) {
-                                    BeanProperty beanProperty = e.getValue();
-                                    @Nullable Object old = beanProperty.readable() ? beanProperty.getValue(bean) : null;
-                                    beanProperty.setValue(bean, value);
-                                    return old;
-                                }
-                            }
-                    )
-                    .collect(Collectors.toSet());
         }
     }
 }
