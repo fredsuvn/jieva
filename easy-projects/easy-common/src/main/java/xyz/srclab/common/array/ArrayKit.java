@@ -1,22 +1,19 @@
 package xyz.srclab.common.array;
 
-import com.google.common.collect.Iterables;
 import kotlin.collections.ArraysKt;
-import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.OutReturn;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.reflect.TypeKit;
-import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -24,127 +21,80 @@ import java.util.function.Function;
  */
 public class ArrayKit {
 
-    public static <T> T[] newArray(Class<T> componentType, int length) {
-        return Cast.as(Array.newInstance(componentType, length));
+    public static <A> A newArray(Class<?> componentType, int length) {
+        Object array = Array.newInstance(componentType, length);
+        return Cast.as(array);
     }
 
-    public static <T> T[] newArray(Type componentType, int length) {
-        return newArray(TypeKit.getRawType(componentType), length);
-    }
-
-    public static <T> T[] newArray(TypeRef<T> componentType, int length) {
-        return newArray(componentType.getType(), length);
-    }
-
-    public static <T> T[] toArray(Iterable<? extends T> iterable, Class<T> componentType) {
-        return Iterables.toArray(iterable, componentType);
-    }
-
-    public static <T> T[] toArray(Iterable<? extends T> iterable, Type componentType) {
-        return toArray(iterable, TypeKit.getRawType(componentType));
-    }
-
-    public static <T> T[] toArray(Iterable<? extends T> iterable, TypeRef<T> componentType) {
-        return toArray(iterable, componentType.getType());
-    }
-
-    @Immutable
-    public static List<Object> primitiveToList(Object primitiveArray) {
-        if (primitiveArray instanceof boolean[]) {
-            return Cast.as(toList((boolean[]) primitiveArray));
-        }
-        if (primitiveArray instanceof byte[]) {
-            return Cast.as(toList((byte[]) primitiveArray));
-        }
-        if (primitiveArray instanceof short[]) {
-            return Cast.as(toList((short[]) primitiveArray));
-        }
-        if (primitiveArray instanceof char[]) {
-            return Cast.as(toList((char[]) primitiveArray));
-        }
-        if (primitiveArray instanceof int[]) {
-            return Cast.as(toList((int[]) primitiveArray));
-        }
-        if (primitiveArray instanceof long[]) {
-            return Cast.as(toList((long[]) primitiveArray));
-        }
-        if (primitiveArray instanceof float[]) {
-            return Cast.as(toList((float[]) primitiveArray));
-        }
-        if (primitiveArray instanceof double[]) {
-            return Cast.as(toList((double[]) primitiveArray));
-        }
-        throw new IllegalArgumentException("Unknown primitive array object: " + primitiveArray);
-    }
-
-    @Immutable
-    public static List<Object> toList(Object array) {
+    public static <T> List<T> asList(Object array) {
         if (array instanceof Object[]) {
-            return Arrays.asList((Object[]) array);
+            return Cast.as(Arrays.asList((Object[]) array));
         }
-        Class<?> cls = array.getClass();
-        if (cls.isArray() && cls.getComponentType().isPrimitive()) {
-            return primitiveToList(array);
+        if (array instanceof boolean[]) {
+            return Cast.as(asList((boolean[]) array));
+        }
+        if (array instanceof byte[]) {
+            return Cast.as(asList((byte[]) array));
+        }
+        if (array instanceof short[]) {
+            return Cast.as(asList((short[]) array));
+        }
+        if (array instanceof char[]) {
+            return Cast.as(asList((char[]) array));
+        }
+        if (array instanceof int[]) {
+            return Cast.as(asList((int[]) array));
+        }
+        if (array instanceof long[]) {
+            return Cast.as(asList((long[]) array));
+        }
+        if (array instanceof float[]) {
+            return Cast.as(asList((float[]) array));
+        }
+        if (array instanceof double[]) {
+            return Cast.as(asList((double[]) array));
         }
         throw new IllegalArgumentException("Unknown array object: " + array);
     }
 
-    @Immutable
-    public static List<Boolean> toList(boolean[] array) {
+    public static List<Boolean> asList(boolean[] array) {
         return ArraysKt.asList(array);
     }
 
-    @Immutable
-    public static List<Byte> toList(byte[] array) {
+    public static List<Byte> asList(byte[] array) {
         return ArraysKt.asList(array);
     }
 
-    @Immutable
-    public static List<Short> toList(short[] array) {
+    public static List<Short> asList(short[] array) {
         return ArraysKt.asList(array);
     }
 
-    @Immutable
-    public static List<Character> toList(char[] array) {
+    public static List<Character> asList(char[] array) {
         return ArraysKt.asList(array);
     }
 
-    @Immutable
-    public static List<Integer> toList(int[] array) {
+    public static List<Integer> asList(int[] array) {
         return ArraysKt.asList(array);
     }
 
-    @Immutable
-    public static List<Long> toList(long[] array) {
+    public static List<Long> asList(long[] array) {
         return ArraysKt.asList(array);
     }
 
-    @Immutable
-    public static List<Float> toList(float[] array) {
+    public static List<Float> asList(float[] array) {
         return ArraysKt.asList(array);
     }
 
-    @Immutable
-    public static List<Double> toList(double[] array) {
+    public static List<Double> asList(double[] array) {
         return ArraysKt.asList(array);
     }
 
-    public static <NT, OT> NT[] map(
-            Iterable<? extends OT> iterable, Class<NT> newComponentType, Function<OT, NT> mapper) {
-        Iterable<NT> newIterable = IterableKit.map(iterable, mapper);
-        return toArray(newIterable, newComponentType);
-    }
-
-    public static <NT, OT> NT[] map(
-            Iterable<? extends OT> iterable, Type newComponentType, Function<OT, NT> mapper) {
-        Iterable<NT> newIterable = IterableKit.map(iterable, mapper);
-        return toArray(newIterable, newComponentType);
-    }
-
-    public static <NT, OT> NT[] map(
-            Iterable<? extends OT> iterable, TypeRef<NT> newComponentType, Function<OT, NT> mapper) {
-        Iterable<NT> newIterable = IterableKit.map(iterable, mapper);
-        return toArray(newIterable, newComponentType);
+    public static <O, N> N[] map(O[] old, Class<?> newComponentType, Function<? super O, ? extends N> mapper) {
+        N[] newArray = newArray(newComponentType, old.length);
+        for (int i = 0; i < newArray.length; i++) {
+            newArray[i] = mapper.apply(old[i]);
+        }
+        return newArray;
     }
 
     public static <T> T[] buildArray(@OutReturn T[] array, ObjectSupplier<T> supplier) {
@@ -282,7 +232,7 @@ public class ArrayKit {
         return array;
     }
 
-    public static Type getGenericComponentType(Type type) {
+    public static Type getComponentType(Type type) {
         if (type instanceof GenericArrayType) {
             return ((GenericArrayType) type).getGenericComponentType();
         }
@@ -293,8 +243,8 @@ public class ArrayKit {
         return rawType.getComponentType();
     }
 
-    public static Class<?> getArrayType(Type componentType) {
-        return ArrayTypeTable.search(TypeKit.getRawType(componentType));
+    public static Type getArrayType(Type componentType) {
+        return ArrayTypeTable.search(componentType);
     }
 
     public interface ObjectSupplier<E> {
@@ -337,7 +287,7 @@ public class ArrayKit {
     private static final class ArrayTypeTable {
 
         // Key: component type, value: array type
-        private static final Cache<Type, Class<?>> cache = Cache.newL2();
+        private static final Cache<Type, Type> cache = Cache.newL2();
 
         private static final Class<?>[] table = {
                 Object.class, Object[].class,
@@ -360,7 +310,7 @@ public class ArrayKit {
                 Double.class, Double[].class,
         };
 
-        public static Class<?> search(Type componentType) {
+        public static Type search(Type componentType) {
             for (int i = 0; i < table.length; ) {
                 if (table[i].equals(componentType)) {
                     return table[i + 1];
@@ -368,11 +318,53 @@ public class ArrayKit {
                     i += 2;
                 }
             }
-            return cache.getNonNull(componentType, ArrayTypeTable::makeThenGet);
+            return cache.getNonNull(componentType, ArrayTypeTable::make);
         }
 
-        private static Class<?> makeThenGet(Type componentType) {
-            return newArray(componentType, 0).getClass().getComponentType();
+        private static Type make(Type componentType) {
+            if (componentType instanceof Class) {
+                return newArray((Class<?>) componentType, 0).getClass();
+            }
+            return new GenericArrayTypeImpl(componentType);
+        }
+
+        private static final class GenericArrayTypeImpl implements GenericArrayType {
+
+            private final Type componentType;
+
+            private GenericArrayTypeImpl(Type componentType) {
+                this.componentType = componentType;
+            }
+
+            @Override
+            public Type getGenericComponentType() {
+                return componentType;
+            }
+
+            @Override
+            public String getTypeName() {
+                String typeName = componentType instanceof Class ?
+                        ((Class<?>) componentType).getName() : componentType.toString();
+                return typeName + "[]";
+            }
+
+            @Override
+            public boolean equals(Object object) {
+                if (!(object instanceof GenericArrayType)) {
+                    return false;
+                }
+                return getGenericComponentType().equals(((GenericArrayType) object).getGenericComponentType());
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(componentType);
+            }
+
+            @Override
+            public String toString() {
+                return getTypeName();
+            }
         }
     }
 }
