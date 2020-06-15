@@ -246,7 +246,7 @@ final class DefaultConvertHandler implements ConvertHandler {
     }
 
     private Object toArray(Object from, Type arrayType, BeanOperator beanOperator) {
-        Type componentType = ArrayKit.getGenericComponentType(arrayType);
+        Type componentType = ArrayKit.getComponentType(arrayType);
         if (from.getClass().isArray()) {
             int arrayLength = Array.getLength(from);
             return ArrayKit.buildArray(

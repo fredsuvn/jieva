@@ -13,19 +13,30 @@ import java.util.function.Predicate;
 public class ListKit {
 
     @Immutable
-    public static <NE, OE> List<NE> map(OE[] array, Function<? super OE, ? extends NE> mapper) {
-        List<NE> result = new ArrayList<>(array.length);
-        for (OE o : array) {
+    public static <O, N> List<N> map(O[] array, Function<? super O, ? extends N> mapper) {
+        List<N> result = new ArrayList<>(array.length);
+        for (O o : array) {
             result.add(mapper.apply(o));
         }
         return immutable(result);
     }
 
     @Immutable
-    public static <NE, OE> List<NE> map(Iterable<? extends OE> iterable, Function<? super OE, ? extends NE> mapper) {
-        List<NE> result = new LinkedList<>();
-        for (OE o : iterable) {
+    public static <O, N> List<N> map(Iterable<? extends O> iterable, Function<? super O, ? extends N> mapper) {
+        List<N> result = new LinkedList<>();
+        for (O o : iterable) {
             result.add(mapper.apply(o));
+        }
+        return immutable(result);
+    }
+
+    @Immutable
+    public static <E> List<E> filter(E[] array, Predicate<? super E> predicate) {
+        List<E> result = new LinkedList<>();
+        for (E e : array) {
+            if (predicate.test(e)) {
+                result.add(e);
+            }
         }
         return immutable(result);
     }
@@ -48,10 +59,10 @@ public class ListKit {
     }
 
     @Immutable
-    public static <E> List<E> concat(Iterable<Iterable<? extends E>> iterables) {
+    public static <E> List<E> concat(Iterable<? extends Iterable<? extends E>> iterables) {
         List<E> result = new LinkedList<>();
         for (Iterable<? extends E> iterable : iterables) {
-            CollectionKit.addAll(result, iterable);
+            result.addAll(IterableKit.toList(iterable));
         }
         return immutable(result);
     }

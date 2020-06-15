@@ -4,12 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.Out;
-import xyz.srclab.common.base.Checker;
 
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class MapKit {
 
@@ -36,23 +34,6 @@ public class MapKit {
         return immutable(result);
     }
 
-    public static <K, V> Map.Entry<K, V> first(Map<K, V> map) throws NoSuchElementException {
-        Checker.checkElement(!map.isEmpty());
-        Optional<? extends Map.Entry<K, V>> optional = map.entrySet().stream().findFirst();
-        return optional.orElseThrow(NoSuchElementException::new);
-    }
-
-    @Nullable
-    public static <V> V firstValue(Map<?, ? extends V> map) throws NoSuchElementException {
-        Checker.checkElement(!map.isEmpty());
-        Optional<? extends Map.Entry<?, ? extends V>> optional = map.entrySet().stream().findFirst();
-        return optional.orElseThrow(NoSuchElementException::new).getValue();
-    }
-
-    public static <V> V firstValueNonNull(Map<?, ? extends V> map) throws NoSuchElementException {
-        return Objects.requireNonNull(firstValue(map));
-    }
-
     public static void removeAll(@Out Map<?, ?> map, Object... keys) {
         removeAll(map, Arrays.asList(keys));
     }
@@ -63,10 +44,10 @@ public class MapKit {
         }
     }
 
-    public static void removeIf(@Out Map<?, ?> map, Predicate<? super Map.Entry<?, ?>> predicate) {
+    public static <K, V> void removeIf(@Out Map<K, V> map, BiPredicate<? super K, ? super V> predicate) {
         List<Object> removed = new LinkedList<>();
-        for (Map.Entry<?, ?> entry : map.entrySet()) {
-            if (predicate.test(entry)) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (predicate.test(entry.getKey(), entry.getValue())) {
                 removed.add(entry.getKey());
             }
         }
@@ -76,5 +57,18 @@ public class MapKit {
     @Immutable
     public static <K, V> Map<K, V> immutable(Map<? extends K, ? extends V> map) {
         return ImmutableMap.copyOf(map);
+    }
+
+    public static <K, V> Map.Entry<K, V> firstEntry(Map<K, V> map) throws NoSuchElementException {
+        return map.entrySet().iterator().next();
+    }
+
+    @Nullable
+    public static <V> V firstValue(Map<?, ? extends V> map) throws NoSuchElementException {
+        return map.entrySet().iterator().next().getValue();
+    }
+
+    public static <V> V firstValueNonNull(Map<?, ? extends V> map) throws NoSuchElementException {
+        return Objects.requireNonNull(firstValue(map));
     }
 }

@@ -6,6 +6,7 @@ import xyz.srclab.annotation.OutReturn;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
+import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.reflect.TypeKit;
 
 import java.lang.reflect.Array;
@@ -95,6 +96,10 @@ public class ArrayKit {
             newArray[i] = mapper.apply(old[i]);
         }
         return newArray;
+    }
+
+    public static <E> E[] toArray(Iterable<? extends E> iterable, Class<?> componentType) {
+        return IterableKit.toArray(iterable, componentType);
     }
 
     public static <T> T[] buildArray(@OutReturn T[] array, ObjectSupplier<T> supplier) {

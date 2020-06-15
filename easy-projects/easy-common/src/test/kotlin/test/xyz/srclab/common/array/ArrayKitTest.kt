@@ -135,7 +135,7 @@ object ArrayKitTest {
     fun testGetGenericComponentType() {
         val arrayType = G::class.java.getMethod("listArray").genericReturnType
         val componentType = G::class.java.getMethod("list").genericReturnType
-        doAssertEquals(ArrayKit.getGenericComponentType(arrayType), componentType)
+        doAssertEquals(ArrayKit.getComponentType(arrayType), componentType)
     }
 
     interface G {

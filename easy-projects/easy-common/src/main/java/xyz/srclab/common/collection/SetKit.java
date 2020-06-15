@@ -3,6 +3,7 @@ package xyz.srclab.common.collection;
 import com.google.common.collect.ImmutableSet;
 import xyz.srclab.annotation.Immutable;
 
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -12,19 +13,30 @@ import java.util.function.Predicate;
 public class SetKit {
 
     @Immutable
-    public static <NE, OE> Set<NE> map(OE[] array, Function<OE, NE> mapper) {
-        Set<NE> result = new LinkedHashSet<>(array.length);
-        for (OE o : array) {
+    public static <O, N> Set<N> map(O[] array, Function<? super O, ? extends N> mapper) {
+        Set<N> result = new LinkedHashSet<>(array.length);
+        for (O o : array) {
             result.add(mapper.apply(o));
         }
         return immutable(result);
     }
 
     @Immutable
-    public static <NE, OE> Set<NE> map(Iterable<? extends OE> iterable, Function<OE, NE> mapper) {
-        Set<NE> result = new LinkedHashSet<>();
-        for (OE o : iterable) {
+    public static <O, N> Set<N> map(Iterable<? extends O> iterable, Function<? super O, ? extends N> mapper) {
+        Set<N> result = new LinkedHashSet<>();
+        for (O o : iterable) {
             result.add(mapper.apply(o));
+        }
+        return immutable(result);
+    }
+
+    @Immutable
+    public static <E> Set<E> filter(E[] array, Predicate<? super E> predicate) {
+        Set<E> result = new LinkedHashSet<>();
+        for (E e : array) {
+            if (predicate.test(e)) {
+                result.add(e);
+            }
         }
         return immutable(result);
     }
@@ -36,6 +48,21 @@ public class SetKit {
             if (predicate.test(e)) {
                 result.add(e);
             }
+        }
+        return immutable(result);
+    }
+
+    @SafeVarargs
+    @Immutable
+    public static <E> Set<E> concat(Iterable<? extends E>... iterables) {
+        return concat(Arrays.asList(iterables));
+    }
+
+    @Immutable
+    public static <E> Set<E> concat(Iterable<? extends Iterable<? extends E>> iterables) {
+        Set<E> result = new LinkedHashSet<>();
+        for (Iterable<? extends E> iterable : iterables) {
+            result.addAll(IterableKit.toList(iterable));
         }
         return immutable(result);
     }
@@ -58,5 +85,9 @@ public class SetKit {
     @Immutable
     public static <E> Set<E> immutable(E... elements) {
         return ImmutableSet.copyOf(elements);
+    }
+
+    public static <E> E firstElement(Iterable<? extends E> iterable) {
+        return IterableKit.firstElement(iterable);
     }
 }
