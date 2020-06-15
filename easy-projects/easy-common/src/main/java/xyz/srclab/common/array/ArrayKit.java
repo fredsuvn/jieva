@@ -89,7 +89,7 @@ public class ArrayKit {
         return ArraysKt.asList(array);
     }
 
-    public static <O, N> N[] map(O[] old, Class<?> newComponentType, Function<? super O, ? extends N> mapper) {
+    public static <N, O> N[] map(O[] old, Class<?> newComponentType, Function<? super O, ? extends N> mapper) {
         N[] newArray = newArray(newComponentType, old.length);
         for (int i = 0; i < newArray.length; i++) {
             newArray[i] = mapper.apply(old[i]);
