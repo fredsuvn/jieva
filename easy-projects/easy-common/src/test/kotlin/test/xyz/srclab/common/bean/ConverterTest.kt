@@ -3,8 +3,8 @@ package test.xyz.srclab.common.bean
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 import xyz.srclab.common.base.Loader
-import xyz.srclab.common.convert.Converter
-import xyz.srclab.common.convert.ConvertHandler
+import xyz.srclab.common.`object`.Converter
+import xyz.srclab.common.`object`.ConvertHandler
 import xyz.srclab.common.bean.BeanKit
 import xyz.srclab.common.bean.BeanOperator
 import xyz.srclab.common.reflect.TypeRef

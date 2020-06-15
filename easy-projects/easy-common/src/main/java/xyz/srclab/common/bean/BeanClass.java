@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.object.Converter;
 import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeRef;
 
@@ -29,25 +29,25 @@ public interface BeanClass {
         return BeanClass0.newBeanViewMap(bean, properties);
     }
 
-    Class<?> type();
+    Class<?> getBeanType();
 
     @Immutable
-    Map<String, BeanProperty> properties();
+    Map<String, BeanProperty> getProperties();
 
-    default int propertiesSize() {
-        return properties().size();
+    default int getPropertiesCount() {
+        return getProperties().size();
     }
 
     @Immutable
-    default Map<String, BeanProperty> properties(String... propertyNames) {
-        return properties(Arrays.asList(propertyNames));
+    default Map<String, BeanProperty> getProperties(String... propertyNames) {
+        return getProperties(Arrays.asList(propertyNames));
     }
 
     @Immutable
-    default Map<String, BeanProperty> properties(Iterable<String> propertyNames) {
+    default Map<String, BeanProperty> getProperties(Iterable<String> propertyNames) {
         Set<String> set = IterableKit.toSet(propertyNames);
         return MapKit.filter(
-                properties(),
+                getProperties(),
                 (name, property) -> set.contains(name)
         );
     }
@@ -88,7 +88,7 @@ public interface BeanClass {
 
     @Nullable
     default BeanProperty property(String propertyName) {
-        return properties().get(propertyName);
+        return getProperties().get(propertyName);
     }
 
     default boolean canReadProperty(String propertyName) {
@@ -196,7 +196,7 @@ public interface BeanClass {
     }
 
     default Map<String, Object> asMap(Object bean) {
-        return BeanClass.newBeanViewMap(bean, properties());
+        return BeanClass.newBeanViewMap(bean, getProperties());
     }
 
     default Map<String, Object> asReadableMap(Object bean) {
@@ -213,19 +213,19 @@ public interface BeanClass {
     }
 
     default Object toBean(Map<String, @Nullable Object> properties) {
-        Object bean = ClassKit.newInstance(type());
+        Object bean = ClassKit.newInstance(getBeanType());
         setPropertiesValues(bean, properties);
         return bean;
     }
 
     default Object toBean(Map<String, @Nullable Object> properties, Converter converter) {
-        Object bean = ClassKit.newInstance(type());
+        Object bean = ClassKit.newInstance(getBeanType());
         setPropertiesValues(bean, properties, converter);
         return bean;
     }
 
     default Object toBean(Iterable<String> propertyNames, Function<String, @Nullable Object> function) {
-        Object bean = ClassKit.newInstance(type());
+        Object bean = ClassKit.newInstance(getBeanType());
         setPropertiesValues(bean, propertyNames, function);
         return bean;
     }

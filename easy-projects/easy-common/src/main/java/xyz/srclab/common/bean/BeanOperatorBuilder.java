@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.object.Converter;
 import xyz.srclab.common.pattern.builder.CachedBuilder;
 
 /**

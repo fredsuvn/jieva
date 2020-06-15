@@ -4,7 +4,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
-import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.object.Converter;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;

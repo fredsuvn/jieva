@@ -38,12 +38,12 @@ final class BeanClass0 {
         }
 
         @Override
-        public Class<?> type() {
+        public Class<?> getBeanType() {
             return type;
         }
 
         @Override
-        public @Immutable Map<String, BeanProperty> properties() {
+        public @Immutable Map<String, BeanProperty> getProperties() {
             return properties;
         }
 

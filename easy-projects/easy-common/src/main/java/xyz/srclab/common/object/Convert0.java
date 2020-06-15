@@ -1,4 +1,4 @@
-package xyz.srclab.common.convert;
+package xyz.srclab.common.object;
 
 /**
  * @author sunqian
