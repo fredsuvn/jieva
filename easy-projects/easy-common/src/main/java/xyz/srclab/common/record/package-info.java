@@ -1,4 +1,4 @@
 @DefaultNonNull
-package xyz.srclab.common.egg.provider.v1;
+package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.DefaultNonNull;

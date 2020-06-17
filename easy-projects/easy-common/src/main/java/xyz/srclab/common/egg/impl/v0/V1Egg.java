@@ -1,7 +1,11 @@
-package xyz.srclab.common.egg.provider.v1;
+package xyz.srclab.common.egg.impl.v0;
 
-import xyz.srclab.common.base.Loader;
+import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Current;
 import xyz.srclab.common.egg.Egg;
+
+import java.io.Console;
+import java.io.PrintWriter;
 
 final class V1Egg implements Egg {
 
@@ -52,7 +56,38 @@ final class V1Egg implements Egg {
     static final String SPELL;
 
     static {
-        long nowMillis = Loader.currentMillis();
+        long nowMillis = Current.mills();
         SPELL = "" + Math.sqrt(nowMillis);
+    }
+
+
+    private static final class Screen {
+
+        private final PrintWriter printWriter;
+
+        private Screen() {
+            this.printWriter = getPrintWriter();
+        }
+
+        private PrintWriter getPrintWriter() {
+            @Nullable Console console = System.console();
+            if (console == null) {
+                return new PrintWriter(System.out);
+            }
+            return console.writer();
+        }
+
+        public void print(Object content) {
+            printWriter.print(content);
+        }
+
+        public void println(Object content) {
+            print(content);
+            printWriter.println();
+        }
+
+        public String read() {
+
+        }
     }
 }

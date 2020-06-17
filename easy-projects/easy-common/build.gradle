@@ -24,6 +24,7 @@ dependencies {
     api("org.apache.commons:commons-lang3")
     api("org.apache.commons:commons-collections4")
     api("commons-beanutils:commons-beanutils")
+    api("commons-codec:commons-codec")
     api("commons-io:commons-io")
     api("com.google.guava:guava")
     api("com.github.ben-manes.caffeine:caffeine")

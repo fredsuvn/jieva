@@ -363,7 +363,7 @@ public class ArrayKit {
 
             @Override
             public int hashCode() {
-                return Objects.hash(componentType);
+                return componentType.hashCode();
             }
 
             @Override

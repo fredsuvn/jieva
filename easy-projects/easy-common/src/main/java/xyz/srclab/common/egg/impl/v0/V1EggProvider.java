@@ -1,4 +1,4 @@
-package xyz.srclab.common.egg.provider.v1;
+package xyz.srclab.common.egg.impl.v0;
 
 import xyz.srclab.common.egg.Egg;
 import xyz.srclab.common.egg.EggProvider;
