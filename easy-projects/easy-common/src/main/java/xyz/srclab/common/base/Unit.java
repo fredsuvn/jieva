@@ -7,25 +7,27 @@ import java.util.function.Predicate;
  */
 public class Unit {
 
+    public static Predicate<Class<?>> defaultUnitPredicate() {
+        return UnitPredicateHolder.INSTANCE;
+    }
+
     public static UnitPredicateBuilder newUnitPredicateBuilder() {
         return UnitPredicateBuilder.newBuilder();
     }
 
-    public static Predicate<Class<?>> unitPredicate() {
-        return UnitPredicate.INSTANCE;
-    }
+    private static final class UnitPredicateHolder {
 
-    private static final class UnitPredicateTable {
-
-        public static final Predicate<Class<?>> UNIT_PREDICATE = newUnitPredicateBuilder()
-                .
-
-        private static final Class<?>[] INCLUDE_TYPES = {
+        private static final Class<?>[] PASS_TYPES = {
 
         };
 
-        private static final Class<?>[] EXCLUDE_TYPES = {
+        private static final Class<?>[] FAIL_TYPES = {
 
         };
+
+        public static final Predicate<Class<?>> INSTANCE = newUnitPredicateBuilder()
+                .passTypes(PASS_TYPES)
+                .failTypes(FAIL_TYPES)
+                .build();
     }
 }
