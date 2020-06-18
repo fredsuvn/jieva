@@ -12,10 +12,10 @@ import java.util.NoSuchElementException;
  */
 public class RecordKit {
 
-    private static final Recorder recorder = Recorder.getDefault();
+    private static final Recorder recorder = Recorder.getInstance();
 
     public static Recorder getDefault() {
-        return Recorder.getDefault();
+        return Recorder.getInstance();
     }
 
     @Immutable

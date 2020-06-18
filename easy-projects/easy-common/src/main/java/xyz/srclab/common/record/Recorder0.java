@@ -19,6 +19,10 @@ import java.util.Set;
  */
 final class Recorder0 {
 
+    static Recorder defaultRecorder() {
+        return RecorderHolder.INSTANCE;
+    }
+
     @Nullable
     static Object getValue(Object record, String key, Recorder recorder) throws NoSuchElementException {
         @Nullable RecordEntry entry = getEntry(record, key, recorder);
@@ -237,5 +241,12 @@ final class Recorder0 {
             entry.setValue(record, value);
             return old;
         }
+    }
+
+    private static final class RecorderHolder {
+
+        public static final Recorder INSTANCE = Recorder.newBuilder()
+                .handler(ResolverHandler.getBeanPatternHandler())
+                .build();
     }
 }

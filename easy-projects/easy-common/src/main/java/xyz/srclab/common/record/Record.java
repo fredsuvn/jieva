@@ -11,14 +11,14 @@ import java.util.Map;
 /**
  * @author sunqian
  */
-public class Record<T extends Record<T>> {
+public abstract class Record<T extends Record<T>> {
 
     private final Recorder resolver;
-    private @Nullable Map<String, RecordEntry> entryMap;
-    private @Nullable Map<String, @Nullable Object> viewMap;
+    private transient @Nullable Map<String, RecordEntry> entryMap;
+    private transient @Nullable Map<String, @Nullable Object> viewMap;
 
     protected Record() {
-        this(Recorder.getDefault());
+        this(Recorder.getInstance());
     }
 
     protected Record(Recorder resolver) {

@@ -14,13 +14,12 @@ import java.util.Objects;
  */
 public interface Recorder {
 
-    static Recorder getDefault() {
-        return new Recorder() {
-            @Override
-            public @Immutable Map<String, RecordEntry> resolve(Class<?> recordClass) {
-                return null;
-            }
-        };
+    static Recorder getInstance() {
+        return Recorder0.defaultRecorder();
+    }
+
+    static RecorderBuilder newBuilder() {
+        return RecorderBuilder.newBuilder();
     }
 
     @Immutable
