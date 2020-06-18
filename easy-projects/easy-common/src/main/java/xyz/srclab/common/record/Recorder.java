@@ -3,7 +3,7 @@ package xyz.srclab.common.record;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.object.Converter;
+import xyz.srclab.common.convert.Converter;
 
 import java.util.Map;
 import java.util.NoSuchElementException;

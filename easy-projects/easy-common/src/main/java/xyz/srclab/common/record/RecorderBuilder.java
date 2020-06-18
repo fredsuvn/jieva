@@ -4,26 +4,36 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.cache.Cache;
+import xyz.srclab.common.collection.CollectionKit;
 import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.pattern.builder.HandlersBuilder;
+import xyz.srclab.common.pattern.builder.CachedBuilder;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.reflect.MethodKit;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class RecorderBuilder extends HandlersBuilder<Recorder, ResolverHandler, RecorderBuilder> {
+public class RecorderBuilder extends CachedBuilder<Recorder> {
 
     static RecorderBuilder newBuilder() {
         return new RecorderBuilder();
     }
 
+    private final List<ResolveHandler> resolveHandlers = new LinkedList<>();
     private boolean useCache = true;
 
     private RecorderBuilder() {
+    }
+
+    public RecorderBuilder resolveHandlers(ResolveHandler... resolveHandlers) {
+        return resolveHandlers(Arrays.asList(resolveHandlers));
+    }
+
+    public RecorderBuilder resolveHandlers(Iterable<ResolveHandler> resolveHandlers) {
+        CollectionKit.addAll(this.resolveHandlers, resolveHandlers);
+        this.updateState();
+        return this;
     }
 
     public RecorderBuilder useCache(boolean useCache) {
@@ -34,10 +44,10 @@ public class RecorderBuilder extends HandlersBuilder<Recorder, ResolverHandler, 
 
     @Override
     protected Recorder buildNew() {
-        if (handlers.isEmpty()) {
+        if (resolveHandlers.isEmpty()) {
             throw new IllegalArgumentException("There is no handler added");
         }
-        Recorder recorder = new RecorderImpl(handlers);
+        Recorder recorder = new RecorderImpl(resolveHandlers);
         return useCache ? new CachedRecorder(recorder) : recorder;
     }
 
@@ -58,10 +68,10 @@ public class RecorderBuilder extends HandlersBuilder<Recorder, ResolverHandler, 
 
     private static final class RecorderImpl implements Recorder {
 
-        private final ResolverHandler[] handlers;
+        private final ResolveHandler[] handlers;
 
-        private RecorderImpl(List<ResolverHandler> handlers) {
-            this.handlers = ArrayKit.toArray(handlers, ResolverHandler.class);
+        private RecorderImpl(List<ResolveHandler> handlers) {
+            this.handlers = ArrayKit.toArray(handlers, ResolveHandler.class);
         }
 
         @Override
@@ -83,7 +93,7 @@ public class RecorderBuilder extends HandlersBuilder<Recorder, ResolverHandler, 
             return MapKit.immutable(context.entryMap());
         }
 
-        private static final class ContextImpl implements ResolverHandler.Context {
+        private static final class ContextImpl implements ResolveHandler.Context {
 
             private final Class<?> recordClass;
 

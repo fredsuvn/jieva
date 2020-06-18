@@ -6,7 +6,7 @@ import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
-import xyz.srclab.common.object.Converter;
+import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.reflect.ClassKit;
 
 import java.util.AbstractMap;
@@ -246,7 +246,7 @@ final class Recorder0 {
     private static final class RecorderHolder {
 
         public static final Recorder INSTANCE = Recorder.newBuilder()
-                .handler(ResolverHandler.getBeanPatternHandler())
+                .resolveHandlers(ResolveHandler.getBeanPatternHandler())
                 .build();
     }
 }

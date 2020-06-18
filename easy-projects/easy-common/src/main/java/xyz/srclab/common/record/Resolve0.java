@@ -18,17 +18,17 @@ import java.util.*;
 /**
  * @author sunqian
  */
-final class Resolver0 {
+final class Resolve0 {
 
-    static ResolverHandler getFieldHandler() {
+    static ResolveHandler getFieldHandler() {
         return FieldHandler.INSTANCE;
     }
 
-    static ResolverHandler getBeanPatternHandler() {
+    static ResolveHandler getBeanPatternHandler() {
         return BeanPatternHandler.INSTANCE;
     }
 
-    static ResolverHandler getNamingPatternHandler() {
+    static ResolveHandler getNamingPatternHandler() {
         return NamingPatternHandler.INSTANCE;
     }
 
@@ -235,7 +235,7 @@ final class Resolver0 {
         }
     }
 
-    private static final class FieldHandler implements ResolverHandler {
+    private static final class FieldHandler implements ResolveHandler {
 
         public static final FieldHandler INSTANCE = new FieldHandler();
 
@@ -251,7 +251,7 @@ final class Resolver0 {
         }
     }
 
-    private static abstract class MethodHandler implements ResolverHandler {
+    private static abstract class MethodHandler implements ResolveHandler {
 
         @Override
         public void resolve(Class<?> recordClass, Context context) {

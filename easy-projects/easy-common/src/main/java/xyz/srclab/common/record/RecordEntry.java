@@ -2,7 +2,7 @@ package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.object.Converter;
+import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.annotation.Annotation;
@@ -17,12 +17,12 @@ import java.util.List;
 public interface RecordEntry {
 
     static RecordEntry newEntryOnField(Field field) {
-        return Resolver0.newEntryOnField(field);
+        return Resolve0.newEntryOnField(field);
     }
 
     static RecordEntry newEntryOnMethods(
             String name, @Nullable Method readMethod, @Nullable Method writeMethod, Class<?> owner) {
-        return Resolver0.newEntryOnMethods(name, readMethod, writeMethod, owner);
+        return Resolve0.newEntryOnMethods(name, readMethod, writeMethod, owner);
     }
 
     String getKey();
