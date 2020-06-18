@@ -86,9 +86,9 @@ public class Checker {
         }
     }
 
-    public static void checkElementForKey(boolean expression, Object key) {
+    public static void checkElement(boolean expression, Object key) {
         if (!expression) {
-            throw new NoSuchElementException("key: " + key);
+            throw new NoSuchElementException(String.valueOf(key));
         }
     }
 

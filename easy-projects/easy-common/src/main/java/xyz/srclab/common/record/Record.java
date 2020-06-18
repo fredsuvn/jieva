@@ -2,7 +2,9 @@ package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.object.Converter;
 
 import java.util.Map;
 
@@ -12,8 +14,8 @@ import java.util.Map;
 public class Record<T extends Record<T>> {
 
     private final Recorder resolver;
-    private @Nullable Map<String, RecordEntry> entries;
-    private @Nullable Map<String, @Nullable Object> view;
+    private @Nullable Map<String, RecordEntry> entryMap;
+    private @Nullable Map<String, @Nullable Object> viewMap;
 
     protected Record() {
         this(Recorder.getDefault());
@@ -24,15 +26,26 @@ public class Record<T extends Record<T>> {
     }
 
     @Immutable
-    public Map<String, RecordEntry> toEntryMap() {
-        if (entries == null) {
+    public Map<String, RecordEntry> entryMap() {
+        if (entryMap == null) {
             synchronized (this) {
-                if (entries == null) {
-                    entries = resolver.resolve(getClass());
+                if (entryMap == null) {
+                    entryMap = resolver.resolve(getClass());
                 }
             }
         }
-        return entries;
+        return entryMap;
+    }
+
+    public Map<String, Object> asMap() {
+        if (viewMap == null) {
+            synchronized (this) {
+                if (viewMap == null) {
+                    viewMap = resolver.asMap(this);
+                }
+            }
+        }
+        return viewMap;
     }
 
     @Immutable
@@ -40,22 +53,32 @@ public class Record<T extends Record<T>> {
         return MapKit.immutable(asMap());
     }
 
-    public Map<String, Object> asMap() {
-        if (view == null) {
-            synchronized (this) {
-                if (view == null) {
-                    view = RecordKit.asMap(this, toEntryMap());
-                }
-            }
-        }
-        return view;
+    public void set(Map<String, @Nullable Object> values) {
+        resolver.set(this, values);
+    }
+
+    public void set(Map<String, @Nullable Object> values, Converter converter) {
+        resolver.set(this, values, converter);
     }
 
     public T copy() {
+        return Cast.as(resolver.copy(this));
     }
 
-    public void set(Map<String, @Nullable Object> entries) {
+    public void copyEntries(Object dest) {
+        resolver.copyEntries(this, dest);
+    }
 
+    public void copyEntries(Object dest, Converter converter) {
+        resolver.copyEntries(this, dest, converter);
+    }
+
+    public void copyEntriesIgnoreNull(Object dest) {
+        resolver.copyEntriesIgnoreNull(this, dest);
+    }
+
+    public void copyEntriesIgnoreNull(Object dest, Converter converter) {
+        resolver.copyEntriesIgnoreNull(this, dest, converter);
     }
 
     @Override
@@ -69,10 +92,9 @@ public class Record<T extends Record<T>> {
             return false;
         }
         if (that instanceof Record) {
-            return toMap().equals(((Record) that).toMap());
+            return toMap().equals(((Record<?>) that).toMap());
         }
-        Map<String, RecordEntry> thatEntries = resolver.resolve(that.getClass());
-        return toMap().equals(RecordKit.toMap(that, thatEntries));
+        return toMap().equals(resolver.toMap(that));
     }
 
     @Override

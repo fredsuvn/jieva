@@ -3,6 +3,7 @@ package xyz.srclab.common.record;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.object.Converter;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -14,28 +15,20 @@ import java.util.Objects;
 public interface Recorder {
 
     static Recorder getDefault() {
-        return null;
+        return new Recorder() {
+            @Override
+            public @Immutable Map<String, RecordEntry> resolve(Class<?> recordClass) {
+                return null;
+            }
+        };
     }
 
     @Immutable
     Map<String, RecordEntry> resolve(Class<?> recordClass);
 
-    default Map<String, @Nullable Object> asMap(Object record) {
-        return Record0.newRecordViewMap(record, resolve(record.getClass()));
-    }
-
-    @Immutable
-    default Map<String, @Nullable Object> toMap(Object record) {
-        return MapKit.immutable(asMap(record));
-    }
-
     @Nullable
     default Object getValue(Object record, String key) throws NoSuchElementException {
-        @Nullable RecordEntry entry = resolve(record.getClass()).get(key);
-        if (entry == null) {
-            throw new NoSuchElementException(key);
-        }
-        return entry.getValue(record);
+        return Recorder0.getValue(record, key, this);
     }
 
     default Object getValueNonNull(Object record, String key) throws NoSuchElementException {
@@ -43,18 +36,48 @@ public interface Recorder {
     }
 
     default void setValue(Object record, String key, @Nullable Object value) throws NoSuchElementException {
-        @Nullable RecordEntry entry = resolve(record.getClass()).get(key);
-        if (entry == null) {
-            throw new NoSuchElementException(key);
-        }
-        entry.setValue(record, value);
+        Recorder0.setValue(record, key, value, this);
     }
 
-    default void setValues(Object record, Map<String, @Nullable Object> values) {
-        asMap(record).putAll(values);
+    default void setValue(Object record, String key, @Nullable Object value, Converter converter)
+            throws NoSuchElementException {
+        Recorder0.setValue(record, key, value, this, converter);
+    }
+
+    default Map<String, @Nullable Object> asMap(Object record) {
+        return Recorder0.asMap(record, this);
+    }
+
+    @Immutable
+    default Map<String, @Nullable Object> toMap(Object record) {
+        return MapKit.immutable(asMap(record));
+    }
+
+    default void set(Object record, Map<String, @Nullable Object> values) {
+        Recorder0.set(record, values, this);
+    }
+
+    default void set(Object record, Map<String, @Nullable Object> values, Converter converter) {
+        Recorder0.set(record, values, this, converter);
+    }
+
+    default <T> T copy(T record) {
+        return Recorder0.copy(record, this);
     }
 
     default void copyEntries(Object source, Object dest) {
+        Recorder0.copyEntries(source, dest, this);
+    }
 
+    default void copyEntries(Object source, Object dest, Converter converter) {
+        Recorder0.copyEntries(source, dest, this, converter);
+    }
+
+    default void copyEntriesIgnoreNull(Object source, Object dest) {
+        Recorder0.copyEntriesIgnoreNull(source, dest, this);
+    }
+
+    default void copyEntriesIgnoreNull(Object source, Object dest, Converter converter) {
+        Recorder0.copyEntriesIgnoreNull(source, dest, this, converter);
     }
 }
