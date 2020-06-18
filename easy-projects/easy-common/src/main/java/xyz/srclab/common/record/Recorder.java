@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 public interface Recorder {
 
-    static Recorder getInstance() {
+    static Recorder defaultRecorder() {
         return Recorder0.defaultRecorder();
     }
 

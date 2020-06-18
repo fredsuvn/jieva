@@ -18,7 +18,7 @@ public abstract class Record<T extends Record<T>> {
     private transient @Nullable Map<String, @Nullable Object> viewMap;
 
     protected Record() {
-        this(Recorder.getInstance());
+        this(Recorder.defaultRecorder());
     }
 
     protected Record(Recorder resolver) {
