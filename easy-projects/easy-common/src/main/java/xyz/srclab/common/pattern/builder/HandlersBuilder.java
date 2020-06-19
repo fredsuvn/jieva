@@ -1,17 +1,20 @@
 package xyz.srclab.common.pattern.builder;
 
+import xyz.srclab.common.base.Cast;
+
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 public abstract class HandlersBuilder<Product, Handler, Builder
         extends HandlersBuilder<Product, Handler, Builder>> extends CachedBuilder<Product> {
 
-    protected LinkedList<Handler> handlers = new LinkedList<>();
+    protected final List<Handler> handlers = new LinkedList<>();
 
     public Builder handler(Handler handler) {
-        handlers.addFirst(handler);
+        handlers.add(handler);
         this.updateState();
-        return (Builder) this;
+        return Cast.as(this);
     }
 
     public Builder handlers(Handler... handlers) {
@@ -20,9 +23,9 @@ public abstract class HandlersBuilder<Product, Handler, Builder
 
     public Builder handlers(Iterable<Handler> handlers) {
         for (Handler handler : handlers) {
-            this.handlers.addFirst(handler);
+            this.handlers.add(handler);
         }
         this.updateState();
-        return (Builder) this;
+        return Cast.as(this);
     }
 }

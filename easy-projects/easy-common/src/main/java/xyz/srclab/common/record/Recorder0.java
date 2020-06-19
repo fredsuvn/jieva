@@ -11,7 +11,6 @@ import xyz.srclab.common.reflect.ClassKit;
 
 import java.util.AbstractMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -19,37 +18,12 @@ import java.util.Set;
  */
 final class Recorder0 {
 
-    static Recorder defaultRecorder() {
-        return RecorderHolder.INSTANCE;
+    static Map<String, @Nullable Object> asMap(Recorder _this, Object record) {
+        return new RecordView(record, _this.getEntryMap(record));
     }
 
-    @Nullable
-    static Object getValue(Object record, String key, Recorder recorder) throws NoSuchElementException {
-        @Nullable RecordEntry entry = getEntry(record, key, recorder);
-        Checker.checkElement(entry != null, key);
-        return entry.getValue(record);
-    }
-
-    static void setValue(Object record, String key, @Nullable Object value, Recorder recorder)
-            throws NoSuchElementException {
-        @Nullable RecordEntry entry = getEntry(record, key, recorder);
-        Checker.checkElement(entry != null, key);
-        entry.setValue(record, value);
-    }
-
-    static void setValue(Object record, String key, @Nullable Object value, Recorder recorder, Converter converter)
-            throws NoSuchElementException {
-        @Nullable RecordEntry entry = getEntry(record, key, recorder);
-        Checker.checkElement(entry != null, key);
-        entry.setValue(record, value == null ? null : converter.convert(value, entry.getGenericType()));
-    }
-
-    static Map<String, @Nullable Object> asMap(Object record, Recorder recorder) {
-        return new RecordView(record, getEntryMap(record, recorder));
-    }
-
-    static void set(Object record, Map<String, @Nullable Object> values, Recorder recorder) {
-        Map<String, RecordEntry> entryMap = getEntryMap(record, recorder);
+    static void set(Recorder _this, Object record, Map<String, @Nullable Object> values) {
+        Map<String, RecordEntry> entryMap = _this.getEntryMap(record);
         values.forEach((k, v) -> {
             @Nullable RecordEntry entry = entryMap.get(k);
             if (entry == null) {
@@ -59,8 +33,8 @@ final class Recorder0 {
         });
     }
 
-    static void set(Object record, Map<String, @Nullable Object> values, Recorder recorder, Converter converter) {
-        Map<String, RecordEntry> entryMap = getEntryMap(record, recorder);
+    static void set(Recorder _this, Object record, Map<String, @Nullable Object> values, Converter converter) {
+        Map<String, RecordEntry> entryMap = _this.getEntryMap(record);
         values.forEach((k, v) -> {
             @Nullable RecordEntry entry = entryMap.get(k);
             if (entry == null) {
@@ -70,29 +44,29 @@ final class Recorder0 {
         });
     }
 
-    static <T> T copy(T record, Recorder recorder) {
+    static <T> T copy(Recorder _this, T record) {
         T newInstance = ClassKit.newInstance(record.getClass());
-        copyEntries(record, newInstance, recorder);
+        copyEntries(_this, record, newInstance);
         return newInstance;
     }
 
-    static void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap, Recorder recorder) {
+    static void copyEntries(Recorder _this, Object sourceRecordOrMap, Object destRecordOrMap) {
         Map<Object, Object> source = Cast.as(sourceRecordOrMap instanceof Map ?
-                sourceRecordOrMap : asMap(sourceRecordOrMap, recorder));
+                sourceRecordOrMap : _this.asMap(sourceRecordOrMap));
         Map<Object, Object> dest = Cast.as(destRecordOrMap instanceof Map ?
-                destRecordOrMap : asMap(destRecordOrMap, recorder));
+                destRecordOrMap : _this.asMap(destRecordOrMap));
         copyEntries0(source, dest);
     }
 
-    static void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap, Recorder recorder, Converter converter) {
+    static void copyEntries(Recorder _this, Object sourceRecordOrMap, Object destRecordOrMap, Converter converter) {
         Map<Object, Object> source = Cast.as(sourceRecordOrMap instanceof Map ?
-                sourceRecordOrMap : asMap(sourceRecordOrMap, recorder));
+                sourceRecordOrMap : _this.asMap(sourceRecordOrMap));
         if (destRecordOrMap instanceof Map) {
             Map<Object, Object> dest = Cast.as(destRecordOrMap);
             copyEntries0(source, dest);
             return;
         }
-        Map<String, RecordEntry> destEntries = getEntryMap(destRecordOrMap, recorder);
+        Map<String, RecordEntry> destEntries = _this.getEntryMap(destRecordOrMap);
         destEntries.forEach((k, e) -> {
             if (!source.containsKey(k)) {
                 return;
@@ -102,24 +76,24 @@ final class Recorder0 {
         });
     }
 
-    static void copyEntriesIgnoreNull(Object sourceRecordOrMap, Object destRecordOrMap, Recorder recorder) {
+    static void copyEntriesIgnoreNull(Recorder _this, Object sourceRecordOrMap, Object destRecordOrMap) {
         Map<Object, Object> source = Cast.as(sourceRecordOrMap instanceof Map ?
-                sourceRecordOrMap : asMap(sourceRecordOrMap, recorder));
+                sourceRecordOrMap : _this.asMap(sourceRecordOrMap));
         Map<Object, Object> dest = Cast.as(destRecordOrMap instanceof Map ?
-                destRecordOrMap : asMap(destRecordOrMap, recorder));
+                destRecordOrMap : _this.asMap(destRecordOrMap));
         copyEntriesIgnoreNull0(source, dest);
     }
 
     static void copyEntriesIgnoreNull(
-            Object sourceRecordOrMap, Object destRecordOrMap, Recorder recorder, Converter converter) {
+            Recorder _this, Object sourceRecordOrMap, Object destRecordOrMap, Converter converter) {
         Map<Object, Object> source = Cast.as(sourceRecordOrMap instanceof Map ?
-                sourceRecordOrMap : asMap(sourceRecordOrMap, recorder));
+                sourceRecordOrMap : _this.asMap(sourceRecordOrMap));
         if (destRecordOrMap instanceof Map) {
             Map<Object, Object> dest = Cast.as(destRecordOrMap);
             copyEntriesIgnoreNull0(source, dest);
             return;
         }
-        Map<String, RecordEntry> destEntries = getEntryMap(destRecordOrMap, recorder);
+        Map<String, RecordEntry> destEntries = _this.getEntryMap(destRecordOrMap);
         destEntries.forEach((k, e) -> {
             if (!source.containsKey(k)) {
                 return;
@@ -155,22 +129,6 @@ final class Recorder0 {
             }
             destEntry.setValue(value);
         }
-    }
-
-    @Nullable
-    private static RecordEntry getEntry(Object record, String key, Recorder recorder) {
-        if (record instanceof Record<?>) {
-            return ((Record<?>) record).entryMap().get(key);
-        }
-        return recorder.resolve(record.getClass()).get(key);
-    }
-
-    @Immutable
-    private static Map<String, RecordEntry> getEntryMap(Object record, Recorder recorder) {
-        if (record instanceof Record<?>) {
-            return ((Record<?>) record).entryMap();
-        }
-        return recorder.resolve(record.getClass());
     }
 
     private static final class RecordView
@@ -241,12 +199,5 @@ final class Recorder0 {
             entry.setValue(record, value);
             return old;
         }
-    }
-
-    private static final class RecorderHolder {
-
-        public static final Recorder INSTANCE = Recorder.newBuilder()
-                .resolveHandlers(ResolveHandler.getBeanPatternHandler())
-                .build();
     }
 }

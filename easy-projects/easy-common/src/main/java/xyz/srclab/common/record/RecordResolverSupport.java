@@ -18,17 +18,21 @@ import java.util.*;
 /**
  * @author sunqian
  */
-final class Resolve0 {
+final class RecordResolverSupport {
 
-    static ResolveHandler getFieldHandler() {
+    static RecordResolver defaultResolver() {
+        return RecordResolverHolder.INSTANCE;
+    }
+
+    static RecordResolverHandler getFieldHandler() {
         return FieldHandler.INSTANCE;
     }
 
-    static ResolveHandler getBeanPatternHandler() {
+    static RecordResolverHandler getBeanPatternHandler() {
         return BeanPatternHandler.INSTANCE;
     }
 
-    static ResolveHandler getNamingPatternHandler() {
+    static RecordResolverHandler getNamingPatternHandler() {
         return NamingPatternHandler.INSTANCE;
     }
 
@@ -235,7 +239,7 @@ final class Resolve0 {
         }
     }
 
-    private static final class FieldHandler implements ResolveHandler {
+    private static final class FieldHandler implements RecordResolverHandler {
 
         public static final FieldHandler INSTANCE = new FieldHandler();
 
@@ -243,6 +247,9 @@ final class Resolve0 {
         public void resolve(Class<?> recordClass, Context context) {
             Map<String, RecordEntry> entryMap = context.entryMap();
             for (Field field : context.fields()) {
+                if (Record.class.equals(field.getDeclaringClass())) {
+                    continue;
+                }
                 if (entryMap.containsKey(field.getName())) {
                     continue;
                 }
@@ -251,7 +258,7 @@ final class Resolve0 {
         }
     }
 
-    private static abstract class MethodHandler implements ResolveHandler {
+    private static abstract class MethodHandler implements RecordResolverHandler {
 
         @Override
         public void resolve(Class<?> recordClass, Context context) {
@@ -358,6 +365,9 @@ final class Resolve0 {
         protected void findAccessor(
                 List<Method> methods, @Out Set<KeyOnMethod> getters, @Out Set<KeyOnMethod> setters) {
             for (Method method : methods) {
+                if (Record.class.equals(method.getDeclaringClass())) {
+                    continue;
+                }
                 String name = method.getName();
                 if (method.getParameterCount() == 0) {
                     if (name.startsWith("get") && name.length() > 3) {
@@ -386,6 +396,9 @@ final class Resolve0 {
         protected void findAccessor(
                 List<Method> methods, @Out Set<MethodHandler.KeyOnMethod> getters, @Out Set<MethodHandler.KeyOnMethod> setters) {
             for (Method method : methods) {
+                if (Record.class.equals(method.getDeclaringClass())) {
+                    continue;
+                }
                 if (method.getParameterCount() == 0) {
                     getters.add(new KeyOnMethod(method.getName(), method));
                     continue;
@@ -395,5 +408,12 @@ final class Resolve0 {
                 }
             }
         }
+    }
+
+    private static final class RecordResolverHolder {
+
+        public static final RecordResolver INSTANCE = RecordResolver.newBuilder()
+                .handler(RecordResolverHandler.getBeanPatternHandler())
+                .build();
     }
 }

@@ -17,12 +17,12 @@ import java.util.List;
 public interface RecordEntry {
 
     static RecordEntry newEntryOnField(Field field) {
-        return Resolve0.newEntryOnField(field);
+        return RecordResolverSupport.newEntryOnField(field);
     }
 
     static RecordEntry newEntryOnMethods(
             String name, @Nullable Method readMethod, @Nullable Method writeMethod, Class<?> owner) {
-        return Resolve0.newEntryOnMethods(name, readMethod, writeMethod, owner);
+        return RecordResolverSupport.newEntryOnMethods(name, readMethod, writeMethod, owner);
     }
 
     String getKey();

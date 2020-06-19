@@ -14,13 +14,22 @@ public class RecordKit {
 
     private static final Recorder recorder = Recorder.defaultRecorder();
 
-    public static Recorder getDefault() {
-        return Recorder.defaultRecorder();
+    public static Map<String, RecordEntry> resolve(Class<?> recordClass) {
+        return recorder.resolve(recordClass);
+    }
+
+    @Nullable
+    public static RecordEntry getEntry(Object record, String key) {
+        return recorder.getEntry(record, key);
+    }
+
+    public static RecordEntry getEntryNonNull(Object record, String key) throws NoSuchElementException {
+        return recorder.getEntryNonNull(record, key);
     }
 
     @Immutable
-    public static Map<String, RecordEntry> resolve(Class<?> recordClass) {
-        return recorder.resolve(recordClass);
+    public static Map<String, RecordEntry> getEntryMap(Object record) {
+        return recorder.getEntryMap(record);
     }
 
     @Nullable

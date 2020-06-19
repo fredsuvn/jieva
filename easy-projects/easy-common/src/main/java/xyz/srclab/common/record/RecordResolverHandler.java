@@ -9,18 +9,18 @@ import java.util.List;
 import java.util.Map;
 
 @Immutable
-public interface ResolveHandler {
+public interface RecordResolverHandler {
 
-    static ResolveHandler getFieldHandler() {
-        return Resolve0.getFieldHandler();
+    static RecordResolverHandler getFieldHandler() {
+        return RecordResolverSupport.getFieldHandler();
     }
 
-    static ResolveHandler getBeanPatternHandler() {
-        return Resolve0.getBeanPatternHandler();
+    static RecordResolverHandler getBeanPatternHandler() {
+        return RecordResolverSupport.getBeanPatternHandler();
     }
 
-    static ResolveHandler getNamingPatternHandler() {
-        return Resolve0.getNamingPatternHandler();
+    static RecordResolverHandler getNamingPatternHandler() {
+        return RecordResolverSupport.getNamingPatternHandler();
     }
 
     void resolve(Class<?> recordClass, @Out Context context);
