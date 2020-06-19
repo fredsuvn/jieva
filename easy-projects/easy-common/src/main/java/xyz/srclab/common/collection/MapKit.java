@@ -14,8 +14,8 @@ public class MapKit {
     @Immutable
     public static <NK, NV, OK, OV> Map<NK, NV> map(
             Map<? extends OK, ? extends OV> map,
-            Function<OK, ? extends NK> keyMapper,
-            Function<OV, ? extends NV> valueMapper
+            Function<? super OK, ? extends NK> keyMapper,
+            Function<? super OV, ? extends NV> valueMapper
     ) {
         Map<NK, NV> newMap = new LinkedHashMap<>();
         map.forEach((k, v) -> newMap.put(keyMapper.apply(k), valueMapper.apply(v)));
@@ -70,5 +70,43 @@ public class MapKit {
 
     public static <V> V firstValueNonNull(Map<?, ? extends V> map) throws NoSuchElementException {
         return Objects.requireNonNull(firstValue(map));
+    }
+
+    @Immutable
+    public static <K, V> Map<K, V> keyToMap(
+            Iterable<? extends K> keys, Function<? super K, ? extends V> mapper) {
+        Map<K, V> result = new LinkedHashMap<>();
+        for (K key : keys) {
+            result.put(key, mapper.apply(key));
+        }
+        return immutable(result);
+    }
+
+    @Immutable
+    public static <K, V> Map<K, V> valueToMap(
+            Iterable<? extends V> values, Function<? super V, ? extends K> mapper) {
+        Map<K, V> result = new LinkedHashMap<>();
+        for (V value : values) {
+            result.put(mapper.apply(value), value);
+        }
+        return immutable(result);
+    }
+
+    @Immutable
+    public static <K, V> Map<K, V> pairToMap(
+            Iterable<?> elements,
+            Function<Object, ? extends K> keyMapper,
+            Function<Object, ? extends V> valueMapper) {
+        Map<K, V> result = new LinkedHashMap<>();
+        boolean nowKey = true;
+        Iterator<?> iterator = elements.iterator();
+        while (iterator.hasNext()) {
+            Object k = iterator.next();
+            K key = keyMapper.apply(k);
+            if (iterator.hasNext()) {
+
+            }
+        }
+        return immutable(result);
     }
 }
