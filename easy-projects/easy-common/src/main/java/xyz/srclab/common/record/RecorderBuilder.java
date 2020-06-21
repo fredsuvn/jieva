@@ -72,7 +72,7 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
 
         @Override
         public @Immutable Map<String, RecordEntry> resolve(Class<?> recordClass) {
-            return cache.getNonNull(recordClass, resolver()::resolve);
+            return cache.getNonNull(recordClass, resolver::resolve);
         }
     }
 }

@@ -13,16 +13,16 @@ import java.util.Map;
  */
 public abstract class Record<T extends Record<T>> {
 
-    private final Recorder resolver;
-    private transient @Nullable Map<String, RecordEntry> entryMap;
-    private transient @Nullable Map<String, @Nullable Object> viewMap;
+    protected final Recorder recorder;
+    protected transient @Nullable Map<String, RecordEntry> entryMap;
+    protected transient @Nullable Map<String, @Nullable Object> viewMap;
 
     protected Record() {
         this(Recorder.defaultRecorder());
     }
 
-    protected Record(Recorder resolver) {
-        this.resolver = resolver;
+    protected Record(Recorder recorder) {
+        this.recorder = recorder;
     }
 
     @Immutable
@@ -30,18 +30,18 @@ public abstract class Record<T extends Record<T>> {
         if (entryMap == null) {
             synchronized (this) {
                 if (entryMap == null) {
-                    entryMap = resolver.resolve(getClass());
+                    entryMap = recorder.resolve(getClass());
                 }
             }
         }
         return entryMap;
     }
 
-    public Map<String, Object> asMap() {
+    public Map<String, @Nullable Object> asMap() {
         if (viewMap == null) {
             synchronized (this) {
                 if (viewMap == null) {
-                    viewMap = resolver.asMap(this);
+                    viewMap = RecorderSupport.newRecordView(this, entryMap());
                 }
             }
         }
@@ -49,36 +49,36 @@ public abstract class Record<T extends Record<T>> {
     }
 
     @Immutable
-    public Map<String, Object> toMap() {
+    public Map<String, @Nullable Object> toMap() {
         return MapKit.immutable(asMap());
     }
 
     public void set(Map<String, @Nullable Object> values) {
-        resolver.set(this, values);
+        recorder.set(this, values);
     }
 
     public void set(Map<String, @Nullable Object> values, Converter converter) {
-        resolver.set(this, values, converter);
+        recorder.set(this, values, converter);
     }
 
     public T copy() {
-        return Cast.as(resolver.copy(this));
+        return Cast.as(recorder.copy(this));
     }
 
     public void copyEntries(Object dest) {
-        resolver.copyEntries(this, dest);
+        recorder.copyEntries(this, dest);
     }
 
     public void copyEntries(Object dest, Converter converter) {
-        resolver.copyEntries(this, dest, converter);
+        recorder.copyEntries(this, dest, converter);
     }
 
     public void copyEntriesIgnoreNull(Object dest) {
-        resolver.copyEntriesIgnoreNull(this, dest);
+        recorder.copyEntriesIgnoreNull(this, dest);
     }
 
     public void copyEntriesIgnoreNull(Object dest, Converter converter) {
-        resolver.copyEntriesIgnoreNull(this, dest, converter);
+        recorder.copyEntriesIgnoreNull(this, dest, converter);
     }
 
     @Override
@@ -88,13 +88,10 @@ public abstract class Record<T extends Record<T>> {
 
     @Override
     public boolean equals(@Nullable Object that) {
-        if (that == null || !getClass().isAssignableFrom(that.getClass())) {
+        if (that == null || !getClass().equals(that.getClass())) {
             return false;
         }
-        if (that instanceof Record) {
-            return toMap().equals(((Record<?>) that).toMap());
-        }
-        return toMap().equals(resolver.toMap(that));
+        return toMap().equals(((Record<?>) that).toMap());
     }
 
     @Override

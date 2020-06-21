@@ -14,8 +14,14 @@ public class RecordKit {
 
     private static final Recorder recorder = Recorder.defaultRecorder();
 
+    @Immutable
     public static Map<String, RecordEntry> resolve(Class<?> recordClass) {
         return recorder.resolve(recordClass);
+    }
+
+    @Immutable
+    public static Map<String, RecordEntry> entryMap(Object record) {
+        return recorder.entryMap(record);
     }
 
     @Nullable
@@ -25,11 +31,6 @@ public class RecordKit {
 
     public static RecordEntry getEntryNonNull(Object record, String key) throws NoSuchElementException {
         return recorder.getEntryNonNull(record, key);
-    }
-
-    @Immutable
-    public static Map<String, RecordEntry> getEntryMap(Object record) {
-        return recorder.getEntryMap(record);
     }
 
     @Nullable
@@ -45,7 +46,8 @@ public class RecordKit {
         recorder.setValue(record, key, value);
     }
 
-    public static void setValue(Object record, String key, @Nullable Object value, Converter converter) throws NoSuchElementException {
+    public static void setValue(
+            Object record, String key, @Nullable Object value, Converter converter) throws NoSuchElementException {
         recorder.setValue(record, key, value, converter);
     }
 
@@ -70,19 +72,23 @@ public class RecordKit {
         return recorder.copy(record);
     }
 
-    public static void copyEntries(Object source, Object dest) {
-        recorder.copyEntries(source, dest);
+    public static void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap) {
+        recorder.copyEntries(sourceRecordOrMap, destRecordOrMap);
     }
 
-    public static void copyEntries(Object source, Object dest, Converter converter) {
-        recorder.copyEntries(source, dest, converter);
+    public static void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap, Converter converter) {
+        recorder.copyEntries(sourceRecordOrMap, destRecordOrMap, converter);
     }
 
-    public static void copyEntriesIgnoreNull(Object source, Object dest) {
-        recorder.copyEntriesIgnoreNull(source, dest);
+    public static void copyEntriesIgnoreNull(Object sourceRecordOrMap, Object destRecordOrMap) {
+        recorder.copyEntriesIgnoreNull(sourceRecordOrMap, destRecordOrMap);
     }
 
-    public static void copyEntriesIgnoreNull(Object source, Object dest, Converter converter) {
-        recorder.copyEntriesIgnoreNull(source, dest, converter);
+    public static void copyEntriesIgnoreNull(Object sourceRecordOrMap, Object destRecordOrMap, Converter converter) {
+        recorder.copyEntriesIgnoreNull(sourceRecordOrMap, destRecordOrMap, converter);
+    }
+
+    public static boolean contentEquals(Object recordOrMapA, Object recordOrMapB) {
+        return recorder.contentEquals(recordOrMapA, recordOrMapB);
     }
 }

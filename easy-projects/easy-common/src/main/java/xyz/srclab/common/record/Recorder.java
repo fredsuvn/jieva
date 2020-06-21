@@ -2,9 +2,11 @@ package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.NonNull;
+import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.Require;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.reflect.ClassKit;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -24,26 +26,27 @@ public interface Recorder {
 
     RecordResolver resolver();
 
+    @Immutable
     Map<String, RecordEntry> resolve(Class<?> recordClass);
+
+    @Immutable
+    default Map<String, RecordEntry> entryMap(Object record) {
+        if (record instanceof Record) {
+            return ((Record<?>) record).entryMap();
+        }
+        return resolve(record.getClass());
+    }
 
     @Nullable
     default RecordEntry getEntry(Object record, String key) {
-        if (record instanceof Record<?>) {
+        if (record instanceof Record) {
             return ((Record<?>) record).entryMap().get(key);
         }
         return resolve(record.getClass()).get(key);
     }
 
     default RecordEntry getEntryNonNull(Object record, String key) throws NoSuchElementException {
-        return NonNull.requireElement(getEntry(record, key));
-    }
-
-    @Immutable
-    default Map<String, RecordEntry> getEntryMap(Object record) {
-        if (record instanceof Record<?>) {
-            return ((Record<?>) record).entryMap();
-        }
-        return resolve(record.getClass());
+        return Require.nonNullElement(getEntry(record, key));
     }
 
     @Nullable
@@ -52,7 +55,7 @@ public interface Recorder {
     }
 
     default Object getValueNonNull(Object record, String key) throws NoSuchElementException {
-        return NonNull.requireElement(getValue(record, key));
+        return Require.nonNullElement(getValue(record, key));
     }
 
     default void setValue(Object record, String key, @Nullable Object value) throws NoSuchElementException {
@@ -65,7 +68,10 @@ public interface Recorder {
     }
 
     default Map<String, @Nullable Object> asMap(Object record) {
-        return Recorder0.asMap(this, record);
+        if (record instanceof Record) {
+            return ((Record<?>) record).asMap();
+        }
+        return RecorderSupport.newRecordView(record, entryMap(record));
     }
 
     @Immutable
@@ -74,30 +80,85 @@ public interface Recorder {
     }
 
     default void set(Object record, Map<String, @Nullable Object> values) {
-        Recorder0.set(this, record, values);
+        Map<String, RecordEntry> entryMap = entryMap(record);
+        values.forEach((k, v) -> {
+            @Nullable RecordEntry entry = entryMap.get(k);
+            if (entry == null) {
+                return;
+            }
+            entry.setValue(record, v);
+        });
     }
 
     default void set(Object record, Map<String, @Nullable Object> values, Converter converter) {
-        Recorder0.set(this, record, values, converter);
+        Map<String, RecordEntry> entryMap = entryMap(record);
+        values.forEach((k, v) -> {
+            @Nullable RecordEntry entry = entryMap.get(k);
+            if (entry == null) {
+                return;
+            }
+            entry.setValue(record, v, converter);
+        });
     }
 
     default <T> T copy(T record) {
-        return Recorder0.copy(this, record);
+        T newInstance = ClassKit.newInstance(record.getClass());
+        copyEntries(record, newInstance);
+        return newInstance;
     }
 
-    default void copyEntries(Object source, Object dest) {
-        Recorder0.copyEntries(this, source, dest);
+    default void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap) {
+        Map<Object, @Nullable Object> source = Recorder0.anyAsMap(this, sourceRecordOrMap);
+        Map<Object, @Nullable Object> dest = Recorder0.anyAsMap(this, destRecordOrMap);
+        Recorder0.copyEntries0(source, dest);
     }
 
-    default void copyEntries(Object source, Object dest, Converter converter) {
-        Recorder0.copyEntries(this, source, dest, converter);
+    default void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap, Converter converter) {
+        Map<Object, @Nullable Object> source = Recorder0.anyAsMap(this, sourceRecordOrMap);
+        if (destRecordOrMap instanceof Map) {
+            Map<Object, @Nullable Object> dest = Cast.as(destRecordOrMap);
+            Recorder0.copyEntries0(source, dest);
+            return;
+        }
+        Map<String, RecordEntry> destEntries = this.entryMap(destRecordOrMap);
+        destEntries.forEach((k, e) -> {
+            if (!source.containsKey(k)) {
+                return;
+            }
+            @Nullable Object value = source.get(k);
+            e.setValue(destRecordOrMap, value, converter);
+        });
     }
 
-    default void copyEntriesIgnoreNull(Object source, Object dest) {
-        Recorder0.copyEntriesIgnoreNull(this, source, dest);
+    default void copyEntriesIgnoreNull(Object sourceRecordOrMap, Object destRecordOrMap) {
+        Map<Object, @Nullable Object> source = Recorder0.anyAsMap(this, sourceRecordOrMap);
+        Map<Object, @Nullable Object> dest = Recorder0.anyAsMap(this, destRecordOrMap);
+        Recorder0.copyEntriesIgnoreNull0(source, dest);
     }
 
-    default void copyEntriesIgnoreNull(Object source, Object dest, Converter converter) {
-        Recorder0.copyEntriesIgnoreNull(this, source, dest, converter);
+    default void copyEntriesIgnoreNull(Object sourceRecordOrMap, Object destRecordOrMap, Converter converter) {
+        Map<Object, @Nullable Object> source = Recorder0.anyAsMap(this, sourceRecordOrMap);
+        if (destRecordOrMap instanceof Map) {
+            Map<Object, @Nullable Object> dest = Cast.as(destRecordOrMap);
+            Recorder0.copyEntriesIgnoreNull0(source, dest);
+            return;
+        }
+        Map<String, RecordEntry> destEntries = this.entryMap(destRecordOrMap);
+        destEntries.forEach((k, e) -> {
+            if (!source.containsKey(k)) {
+                return;
+            }
+            @Nullable Object value = source.get(k);
+            if (value == null) {
+                return;
+            }
+            e.setValue(destRecordOrMap, value, converter);
+        });
+    }
+
+    default boolean contentEquals(Object recordOrMapA, Object recordOrMapB) {
+        Map<Object, @Nullable Object> a = Recorder0.anyAsMap(this, recordOrMapA);
+        Map<Object, @Nullable Object> b = Recorder0.anyAsMap(this, recordOrMapB);
+        return a.equals(b);
     }
 }
