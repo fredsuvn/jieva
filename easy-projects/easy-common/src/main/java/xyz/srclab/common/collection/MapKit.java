@@ -1,9 +1,9 @@
 package xyz.srclab.common.collection;
 
-import com.google.common.collect.ImmutableMap;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.Out;
+import xyz.srclab.common.base.Cast;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -56,7 +56,7 @@ public class MapKit {
 
     @Immutable
     public static <K, V> Map<K, V> immutable(Map<? extends K, ? extends V> map) {
-        return ImmutableMap.copyOf(map);
+        return Collections.unmodifiableMap(new LinkedHashMap<>(map));
     }
 
     public static <K, V> Map.Entry<K, V> firstEntry(Map<K, V> map) throws NoSuchElementException {
@@ -98,13 +98,32 @@ public class MapKit {
             Function<Object, ? extends K> keyMapper,
             Function<Object, ? extends V> valueMapper) {
         Map<K, V> result = new LinkedHashMap<>();
-        boolean nowKey = true;
         Iterator<?> iterator = elements.iterator();
         while (iterator.hasNext()) {
             Object k = iterator.next();
             K key = keyMapper.apply(k);
             if (iterator.hasNext()) {
+                Object v = iterator.next();
+                V value = valueMapper.apply(v);
+                result.put(key, value);
+            } else {
+                result.put(key, null);
+            }
+        }
+        return immutable(result);
+    }
 
+    @Immutable
+    public static <K, V> Map<K, V> pairToMap(Object... elements) {
+        Map<K, V> result = new LinkedHashMap<>();
+        for (int i = 0; i < elements.length; ) {
+            K key = Cast.as(elements[i]);
+            i++;
+            if (i < elements.length) {
+                V value = Cast.nullable(elements[i]);
+                result.put(key, value);
+            } else {
+                result.put(key, null);
             }
         }
         return immutable(result);

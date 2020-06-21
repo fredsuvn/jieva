@@ -1,12 +1,8 @@
 package xyz.srclab.common.collection;
 
-import com.google.common.collect.ImmutableSet;
 import xyz.srclab.annotation.Immutable;
 
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -76,15 +72,15 @@ public class SetKit {
         return immutable(result);
     }
 
-    @Immutable
-    public static <E> Set<E> immutable(Iterable<? extends E> elements) {
-        return ImmutableSet.copyOf(elements);
-    }
-
     @SafeVarargs
     @Immutable
     public static <E> Set<E> immutable(E... elements) {
-        return ImmutableSet.copyOf(elements);
+        return Collections.unmodifiableSet(new LinkedHashSet<>(ListKit.immutable(elements)));
+    }
+
+    @Immutable
+    public static <E> Set<E> immutable(Iterable<? extends E> elements) {
+        return Collections.unmodifiableSet(new LinkedHashSet<>(ListKit.immutable(elements)));
     }
 
     public static <E> E firstElement(Iterable<? extends E> iterable) {

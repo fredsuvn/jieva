@@ -1,6 +1,7 @@
 package xyz.srclab.common.array;
 
 import kotlin.collections.ArraysKt;
+import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.OutReturn;
 import xyz.srclab.common.base.Cast;
@@ -20,6 +21,14 @@ import java.util.function.Function;
  * Util for array.
  */
 public class ArrayKit {
+
+    public static final Object[] EMPTY_OBJECT_ARRAY = ArrayUtils.EMPTY_OBJECT_ARRAY;
+
+    public static final Class<?>[] EMPTY_CLASS_ARRAY = ArrayUtils.EMPTY_CLASS_ARRAY;
+
+    public static final Type[] EMPTY_TYPE_ARRAY = new Type[0];
+
+    public static final String[] EMPTY_STRING_ARRAY = ArrayUtils.EMPTY_STRING_ARRAY;
 
     public static <A> A newArray(Class<?> componentType, int length) {
         Object array = Array.newInstance(componentType, length);
