@@ -8,6 +8,7 @@ import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.IterableKit;
+import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.reflect.TypeKit;
 
 import java.lang.reflect.Array;
@@ -15,6 +16,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -257,7 +259,7 @@ public class ArrayKit {
     }
 
     public static Type getArrayType(Type componentType) {
-        return ArrayTypeTable.search(componentType);
+        return ArrayTypeFinder.find(componentType);
     }
 
     public interface ObjectSupplier<E> {
@@ -297,41 +299,19 @@ public class ArrayKit {
         double get(int index);
     }
 
-    private static final class ArrayTypeTable {
+    private static final class ArrayTypeFinder {
 
         // Key: component type, value: array type
         private static final Cache<Type, Type> cache = Cache.newL2();
 
-        private static final Class<?>[] table = {
-                Object.class, Object[].class,
-                String.class, String[].class,
-                boolean.class, boolean[].class,
-                byte.class, byte[].class,
-                short.class, short[].class,
-                char.class, char[].class,
-                int.class, int[].class,
-                long.class, long[].class,
-                float.class, float[].class,
-                double.class, double[].class,
-                Boolean.class, Boolean[].class,
-                Byte.class, Byte[].class,
-                Short.class, Short[].class,
-                Character.class, Character[].class,
-                Integer.class, Integer[].class,
-                Long.class, Long[].class,
-                Float.class, Float[].class,
-                Double.class, Double[].class,
-        };
+        private static final Map<Type, Type> table = MapKit.pairToMap((Object[]) ArrayTypeTable.TABLE);
 
-        public static Type search(Type componentType) {
-            for (int i = 0; i < table.length; ) {
-                if (table[i].equals(componentType)) {
-                    return table[i + 1];
-                } else {
-                    i += 2;
-                }
+        public static Type find(Type componentType) {
+            @Nullable Type arrayType = table.get(componentType);
+            if (arrayType != null) {
+                return arrayType;
             }
-            return cache.getNonNull(componentType, ArrayTypeTable::make);
+            return cache.getNonNull(componentType, ArrayTypeFinder::make);
         }
 
         private static Type make(Type componentType) {
@@ -378,6 +358,30 @@ public class ArrayKit {
             public String toString() {
                 return getTypeName();
             }
+        }
+
+        private static final class ArrayTypeTable {
+
+            private static final Type[] TABLE = {
+                    Object.class, Object[].class,
+                    String.class, String[].class,
+                    boolean.class, boolean[].class,
+                    byte.class, byte[].class,
+                    short.class, short[].class,
+                    char.class, char[].class,
+                    int.class, int[].class,
+                    long.class, long[].class,
+                    float.class, float[].class,
+                    double.class, double[].class,
+                    Boolean.class, Boolean[].class,
+                    Byte.class, Byte[].class,
+                    Short.class, Short[].class,
+                    Character.class, Character[].class,
+                    Integer.class, Integer[].class,
+                    Long.class, Long[].class,
+                    Float.class, Float[].class,
+                    Double.class, Double[].class,
+            };
         }
     }
 }
