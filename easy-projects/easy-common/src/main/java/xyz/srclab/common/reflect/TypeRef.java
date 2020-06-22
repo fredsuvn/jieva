@@ -16,17 +16,17 @@ public class TypeRef<T> {
     private final Type type;
 
     protected TypeRef() {
-        this.type = reflectTypeSelf();
+        this.type = getGenericSuperclass();
     }
 
     private TypeRef(Type type) {
         this.type = type;
     }
 
-    protected Type reflectTypeSelf() {
+    protected Type getGenericSuperclass() {
         @Nullable Type generic = ClassKit.getGenericSuperclass(getClass(), TypeRef.class);
         if (!(generic instanceof ParameterizedType)) {
-            throw new IllegalStateException("Must be extend from parameterized type.");
+            throw new IllegalStateException("generic super class must be a parameterized type");
         }
         ParameterizedType parameterizedType = (ParameterizedType) generic;
         return parameterizedType.getActualTypeArguments()[0];

@@ -13,19 +13,19 @@ public class TypeKit {
         if (type instanceof Class) {
             return Cast.as(type);
         }
-        return Cast.as(RawTypeTable.search(type));
+        return Cast.as(RawTypeFinder.find(type));
     }
 
-    private static final class RawTypeTable {
+    private static final class RawTypeFinder {
 
         // Don't need cache now.
         //private static final Cache<Type, Class<?>> cache = Cache.newL2();
 
-        private static Class<?> search(Type type) {
-            return find(type);
+        public static Class<?> find(Type type) {
+            return find0(type);
         }
 
-        private static Class<?> find(Type type) {
+        private static Class<?> find0(Type type) {
             //if (type instanceof Class) {
             //    return (Class<?>) type;
             //}

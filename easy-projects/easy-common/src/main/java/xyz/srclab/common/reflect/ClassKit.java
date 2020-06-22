@@ -4,10 +4,12 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Loader;
+import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * @author sunqian
@@ -43,28 +45,28 @@ public class ClassKit {
                 target.isAssignableFrom(cls),
                 target + " is not parent of " + cls
         );
-        @Nullable Type result = GenericSuperclassTable.search(cls, target);
+        @Nullable Type result = GenericSuperclassFinder.find(cls, target);
         Checker.checkState(
                 result != null, "Unexpected error: cls = " + cls + ", target = " + target);
         return result;
     }
 
     public static Class<?> toWrapper(Class<?> primitive) {
-        @Nullable Class<?> wrapper = WrapperTable.search(primitive);
+        @Nullable Class<?> wrapper = WrapperFinder.find(primitive);
         return wrapper == null ? primitive : wrapper;
     }
 
-    private static final class GenericSuperclassTable {
+    private static final class GenericSuperclassFinder {
 
         //private static final Cache<Key, Type> cache = Cache.newL2();
 
         @Nullable
-        private static Type search(Class<?> cls, Class<?> targetSuperClass) {
-            return find(cls, targetSuperClass);
+        public static Type find(Class<?> cls, Class<?> targetSuperClass) {
+            return find0(cls, targetSuperClass);
         }
 
         @Nullable
-        private static Type find(Class<?> cls, Class<?> superClass) {
+        private static Type find0(Class<?> cls, Class<?> superClass) {
             Type current = cls;
             do {
                 Class<?> currentClass = TypeKit.getRawType(current);
@@ -77,29 +79,28 @@ public class ClassKit {
         }
     }
 
-    private static final class WrapperTable {
+    private static final class WrapperFinder {
 
-        private static final Class<?>[] table = {
-                boolean.class, Boolean.class,
-                byte.class, Byte.class,
-                short.class, Short.class,
-                char.class, Character.class,
-                int.class, Integer.class,
-                long.class, Long.class,
-                float.class, Float.class,
-                double.class, Double.class,
-                void.class, Void.class,
-        };
+        private static final Map<Class<?>, Class<?>> table = MapKit.pairToMap((Object[]) WrapperClassTable.TABLE);
 
         @Nullable
-        private static Class<?> search(Class<?> primitive) {
-            for (int i = 0; i < table.length; ) {
-                if (table[i].equals(primitive)) {
-                    return table[i + 1];
-                }
-                i += 2;
-            }
-            return null;
+        public static Class<?> find(Class<?> primitive) {
+            return table.get(primitive);
+        }
+
+        private static final class WrapperClassTable {
+
+            private static final Class<?>[] TABLE = {
+                    boolean.class, Boolean.class,
+                    byte.class, Byte.class,
+                    short.class, Short.class,
+                    char.class, Character.class,
+                    int.class, Integer.class,
+                    long.class, Long.class,
+                    float.class, Float.class,
+                    double.class, Double.class,
+                    void.class, Void.class,
+            };
         }
     }
 }

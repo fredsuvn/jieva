@@ -38,6 +38,23 @@ public class MethodKit {
         return ListKit.immutable(cls.getDeclaredMethods());
     }
 
+    @Nullable
+    public static Object invoke(Method method, @Nullable Object object, Object... args) {
+        return invoke(method, false, object, args);
+    }
+
+    @Nullable
+    public static Object invoke(Method method, boolean force, @Nullable Object object, Object... args) {
+        try {
+            if (force) {
+                method.setAccessible(true);
+            }
+            return method.invoke(object, args);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public static boolean canOverride(Method method) {
         int modifiers = method.getModifiers();
         return !method.isBridge()
