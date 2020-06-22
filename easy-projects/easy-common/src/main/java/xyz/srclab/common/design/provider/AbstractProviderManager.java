@@ -1,4 +1,4 @@
-package xyz.srclab.common.pattern.provider;
+package xyz.srclab.common.design.provider;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;

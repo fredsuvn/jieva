@@ -6,7 +6,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.pattern.provider.ProviderLoader;
+import xyz.srclab.common.design.provider.ProviderLoader;
 
 import java.io.IOException;
 import java.io.InputStream;

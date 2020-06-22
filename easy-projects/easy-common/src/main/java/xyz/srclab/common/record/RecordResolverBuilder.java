@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.pattern.builder.HandlersBuilder;
+import xyz.srclab.common.design.builder.HandlersBuilder;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.reflect.MethodKit;
 

@@ -3,7 +3,7 @@ package xyz.srclab.common.record;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.CachedBuilder;
 
 import java.util.Map;
 

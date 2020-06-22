@@ -1,6 +1,6 @@
 package xyz.srclab.common.util.proxy;
 
-import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.CachedBuilder;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;

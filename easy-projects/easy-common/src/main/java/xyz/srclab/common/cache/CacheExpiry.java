@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.CachedBuilder;
 
 import java.time.Duration;
 

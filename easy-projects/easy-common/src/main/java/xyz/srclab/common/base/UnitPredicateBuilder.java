@@ -3,7 +3,7 @@ package xyz.srclab.common.base;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.collection.CollectionKit;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.CachedBuilder;
 
 import java.util.Arrays;
 import java.util.LinkedList;

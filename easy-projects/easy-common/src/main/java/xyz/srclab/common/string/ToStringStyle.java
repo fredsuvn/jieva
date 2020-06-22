@@ -2,7 +2,7 @@ package xyz.srclab.common.string;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Defaults;
-import xyz.srclab.common.pattern.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.CachedBuilder;
 import xyz.srclab.common.reflect.ClassKit;
 
 import java.util.function.Predicate;

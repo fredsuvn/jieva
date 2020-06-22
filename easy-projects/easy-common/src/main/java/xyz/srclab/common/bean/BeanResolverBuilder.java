@@ -3,7 +3,7 @@ package xyz.srclab.common.bean;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.pattern.builder.HandlersBuilder;
+import xyz.srclab.common.design.builder.HandlersBuilder;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.reflect.MethodKit;
 

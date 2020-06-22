@@ -1,4 +1,4 @@
-package xyz.srclab.common.pattern.builder;
+package xyz.srclab.common.design.builder;
 
 public interface Builder<T> {
 
