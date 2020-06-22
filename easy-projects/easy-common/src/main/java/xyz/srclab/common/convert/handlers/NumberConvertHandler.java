@@ -18,7 +18,7 @@ public class NumberConvertHandler implements ConvertHandler {
 
     @Override
     public @Nullable Object convert(Object from, Type to, Converter converter) {
-        @Nullable ConvertFunction convertFunction = ConvertFunctionFinder.find(to);
+        @Nullable Function<Object, Object> convertFunction = ConvertFunctionFinder.find(to);
         if (convertFunction == null) {
             return null;
         }
@@ -27,24 +27,24 @@ public class NumberConvertHandler implements ConvertHandler {
 
     private static final class ConvertFunctionFinder {
 
-        private static final Map<Type, ConvertFunction> table = MapKit.pairToMap(ConvertFunctionTable.TABLE);
+        private static final Map<Type, Function<Object, Object>> table = MapKit.pairToMap(ConvertFunctionTable.TABLE);
 
         @Nullable
-        public static ConvertFunction find(Type type) {
+        public static Function<Object, Object> find(Type type) {
             return table.get(type);
         }
 
         private static final class ConvertFunctionTable {
 
-            private static final ConvertFunction TO_BYTE = ConvertFunctionTable::toByte;
-            private static final ConvertFunction TO_SHORT = ConvertFunctionTable::toShort;
-            private static final ConvertFunction TO_CHAR = ConvertFunctionTable::toChar;
-            private static final ConvertFunction TO_INT = ConvertFunctionTable::toInt;
-            private static final ConvertFunction TO_LONG = ConvertFunctionTable::toLong;
-            private static final ConvertFunction TO_FLOAT = ConvertFunctionTable::toFloat;
-            private static final ConvertFunction TO_DOUBLE = ConvertFunctionTable::toDouble;
-            private static final ConvertFunction TO_BIG_INTEGER = ConvertFunctionTable::toBigInteger;
-            private static final ConvertFunction TO_BIG_DECIMAL = ConvertFunctionTable::toBigDecimal;
+            private static final Function<Object, Object> TO_BYTE = ConvertFunctionTable::toByte;
+            private static final Function<Object, Object> TO_SHORT = ConvertFunctionTable::toShort;
+            private static final Function<Object, Object> TO_CHAR = ConvertFunctionTable::toChar;
+            private static final Function<Object, Object> TO_INT = ConvertFunctionTable::toInt;
+            private static final Function<Object, Object> TO_LONG = ConvertFunctionTable::toLong;
+            private static final Function<Object, Object> TO_FLOAT = ConvertFunctionTable::toFloat;
+            private static final Function<Object, Object> TO_DOUBLE = ConvertFunctionTable::toDouble;
+            private static final Function<Object, Object> TO_BIG_INTEGER = ConvertFunctionTable::toBigInteger;
+            private static final Function<Object, Object> TO_BIG_DECIMAL = ConvertFunctionTable::toBigDecimal;
 
             private static final Object[] TABLE = {
                     byte.class, TO_BYTE,
@@ -128,8 +128,5 @@ public class NumberConvertHandler implements ConvertHandler {
                 return new BigDecimal(from.toString());
             }
         }
-    }
-
-    private interface ConvertFunction extends Function<Object, Object> {
     }
 }
