@@ -114,7 +114,7 @@ public class MapKit {
     }
 
     @Immutable
-    public static <K, V> Map<K, V> pairToMap(Object... elements) {
+    public static <K, V, E> Map<K, V> pairToMap(E... elements) {
         Map<K, V> result = new LinkedHashMap<>();
         for (int i = 0; i < elements.length; ) {
             K key = Cast.as(elements[i]);

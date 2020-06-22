@@ -115,7 +115,7 @@ public class ClassKit {
 
     private static final class WrapperFinder {
 
-        private static final Map<Class<?>, Class<?>> table = MapKit.pairToMap((Object[]) WrapperClassTable.TABLE);
+        private static final Map<Class<?>, Class<?>> table = MapKit.pairToMap(WrapperClassTable.TABLE);
 
         @Nullable
         public static Class<?> find(Class<?> primitive) {

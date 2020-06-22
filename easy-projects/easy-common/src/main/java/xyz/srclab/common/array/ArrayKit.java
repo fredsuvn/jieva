@@ -304,7 +304,7 @@ public class ArrayKit {
         // Key: component type, value: array type
         private static final Cache<Type, Type> cache = Cache.newL2();
 
-        private static final Map<Type, Type> table = MapKit.pairToMap((Object[]) ArrayTypeTable.TABLE);
+        private static final Map<Type, Type> table = MapKit.pairToMap(ArrayTypeTable.TABLE);
 
         public static Type find(Type componentType) {
             @Nullable Type arrayType = table.get(componentType);
