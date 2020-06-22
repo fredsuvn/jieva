@@ -11,10 +11,6 @@ import java.util.Map;
 @Immutable
 public interface RecordResolverHandler {
 
-    static RecordResolverHandler getFieldHandler() {
-        return RecordResolverSupport.getFieldHandler();
-    }
-
     static RecordResolverHandler getBeanPatternHandler() {
         return RecordResolverSupport.getBeanPatternHandler();
     }

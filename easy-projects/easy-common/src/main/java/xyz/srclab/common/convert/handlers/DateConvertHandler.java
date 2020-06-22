@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 /**
  * @author sunqian
  */
-public class NumberHandler implements ConvertHandler {
+public class DateConvertHandler implements ConvertHandler {
 
     @Override
     public @Nullable Object convert(Object from, Type to, Converter converter) {

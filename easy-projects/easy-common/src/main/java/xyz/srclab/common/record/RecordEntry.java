@@ -16,14 +16,12 @@ import java.util.List;
  */
 public interface RecordEntry {
 
-    static RecordEntry newEntryOnField(Field field) {
-        return RecordResolverSupport.newEntryOnField(field);
+    static RecordEntry newEntry(
+            Class<?> owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
+        return RecordResolverSupport.newEntry(owner, name, readMethod, writeMethod);
     }
 
-    static RecordEntry newEntryOnMethods(
-            String name, @Nullable Method readMethod, @Nullable Method writeMethod, Class<?> owner) {
-        return RecordResolverSupport.newEntryOnMethods(name, readMethod, writeMethod, owner);
-    }
+    Class<?> getOwner();
 
     String getKey();
 
@@ -85,8 +83,6 @@ public interface RecordEntry {
 
     @Immutable
     List<Annotation> getFieldAnnotations();
-
-    Class<?> getOwner();
 
     @Override
     int hashCode();

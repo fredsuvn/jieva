@@ -7,7 +7,9 @@ import xyz.srclab.annotation.Out;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.invoke.MethodInvoker;
+import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.FieldKit;
+import xyz.srclab.common.reflect.TypeKit;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -24,10 +26,6 @@ final class RecordResolverSupport {
         return RecordResolverHolder.INSTANCE;
     }
 
-    static RecordResolverHandler getFieldHandler() {
-        return FieldHandler.INSTANCE;
-    }
-
     static RecordResolverHandler getBeanPatternHandler() {
         return BeanPatternHandler.INSTANCE;
     }
@@ -36,13 +34,9 @@ final class RecordResolverSupport {
         return NamingPatternHandler.INSTANCE;
     }
 
-    static RecordEntry newEntryOnField(Field field) {
-        return new EntryOnField(field);
-    }
-
-    static RecordEntry newEntryOnMethods(
-            String name, @Nullable Method readMethod, @Nullable Method writeMethod, Class<?> owner) {
-        return new EntryOnMethods(name, readMethod, writeMethod, owner);
+    static RecordEntry newEntry(
+            Class<?> owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
+        return new EntryOnMethods(owner, name, readMethod, writeMethod);
     }
 
     private static abstract class RecordEntryImplBase implements RecordEntry {
@@ -72,73 +66,12 @@ final class RecordResolverSupport {
         }
     }
 
-    private static final class EntryOnField extends RecordEntryImplBase {
-
-        private final Field field;
-        private final List<Annotation> fieldAnnotations;
-
-        private EntryOnField(Field field) {
-            this.field = field;
-            this.fieldAnnotations = ListKit.immutable(this.field.getAnnotations());
-        }
-
-        @Override
-        public String getKey() {
-            return field.getName();
-        }
-
-        @Override
-        public Class<?> getType() {
-            return field.getType();
-        }
-
-        @Override
-        public Type getGenericType() {
-            return field.getGenericType();
-        }
-
-        @Override
-        public boolean isReadable() {
-            return true;
-        }
-
-        @Override
-        public boolean isWriteable() {
-            return true;
-        }
-
-        @Override
-        public @Nullable Object getValue(Object bean) throws UnsupportedOperationException {
-            return FieldKit.getValue(field, bean);
-        }
-
-        @Override
-        public void setValue(Object bean, @Nullable Object value) throws UnsupportedOperationException {
-            FieldKit.setValue(field, bean, value);
-        }
-
-        @Override
-        public Field getField() {
-            return field;
-        }
-
-        @Override
-        public @Immutable List<Annotation> getFieldAnnotations() {
-            return fieldAnnotations;
-        }
-
-        @Override
-        public Class<?> getOwner() {
-            return field.getDeclaringClass();
-        }
-    }
-
     private static final class EntryOnMethods extends RecordEntryImplBase {
 
+        private final Class<?> owner;
         private final String name;
         private final Class<?> type;
         private final Type genericType;
-        private final Class<?> owner;
 
         private final @Nullable Method readMethod;
         private final @Nullable Method writeMethod;
@@ -148,24 +81,33 @@ final class RecordResolverSupport {
         private final @Nullable Field field;
         private final List<Annotation> fieldAnnotations;
 
-        private EntryOnMethods(String name, @Nullable Method readMethod, @Nullable Method writeMethod, Class<?> owner) {
-            this.name = name;
+        private EntryOnMethods(Class<?> owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
             this.owner = owner;
+            this.name = name;
             this.readMethod = readMethod;
             this.writeMethod = writeMethod;
 
             if (readMethod == null) {
                 Checker.checkState(writeMethod != null, "Both read and write method are null");
-                this.type = writeMethod.getParameterTypes()[0];
-                this.genericType = writeMethod.getGenericParameterTypes()[0];
+                Type type = ClassKit.getActualType(
+                        writeMethod.getGenericParameterTypes()[0], owner, writeMethod.getDeclaringClass());
+                this.type = TypeKit.getRawType(type);
+                this.genericType = type;
             } else {
-                this.type = readMethod.getReturnType();
-                this.genericType = readMethod.getGenericReturnType();
+                Type type = ClassKit.getActualType(
+                        readMethod.getGenericReturnType(), owner, readMethod.getDeclaringClass());
+                this.type = TypeKit.getRawType(type);
+                this.genericType = type;
             }
 
             this.field = FieldKit.getDeclaredField(owner, name);
             this.fieldAnnotations = field == null ? Collections.emptyList() :
                     ListKit.immutable(field.getAnnotations());
+        }
+
+        @Override
+        public Class<?> getOwner() {
+            return owner;
         }
 
         @Override
@@ -232,30 +174,6 @@ final class RecordResolverSupport {
         public @Immutable List<Annotation> getFieldAnnotations() {
             return fieldAnnotations;
         }
-
-        @Override
-        public Class<?> getOwner() {
-            return owner;
-        }
-    }
-
-    private static final class FieldHandler implements RecordResolverHandler {
-
-        public static final FieldHandler INSTANCE = new FieldHandler();
-
-        @Override
-        public void resolve(Class<?> recordClass, Context context) {
-            Map<String, RecordEntry> entryMap = context.entryMap();
-            for (Field field : context.fields()) {
-                if (Record.class.equals(field.getDeclaringClass())) {
-                    continue;
-                }
-                if (entryMap.containsKey(field.getName())) {
-                    continue;
-                }
-                entryMap.put(field.getName(), RecordEntry.newEntryOnField(field));
-            }
-        }
     }
 
     private static abstract class MethodHandler implements RecordResolverHandler {
@@ -296,7 +214,7 @@ final class RecordResolverSupport {
                 }
 
                 public RecordEntry build() {
-                    return RecordEntry.newEntryOnMethods(key, readMethod, writeMethod, recordClass);
+                    return RecordEntry.newEntry(recordClass, key, readMethod, writeMethod);
                 }
             }
 
@@ -365,7 +283,7 @@ final class RecordResolverSupport {
         protected void findAccessor(
                 List<Method> methods, @Out Set<KeyOnMethod> getters, @Out Set<KeyOnMethod> setters) {
             for (Method method : methods) {
-                if (Record.class.equals(method.getDeclaringClass())) {
+                if (method.isBridge() || Record.class.equals(method.getDeclaringClass())) {
                     continue;
                 }
                 String name = method.getName();
@@ -396,7 +314,7 @@ final class RecordResolverSupport {
         protected void findAccessor(
                 List<Method> methods, @Out Set<MethodHandler.KeyOnMethod> getters, @Out Set<MethodHandler.KeyOnMethod> setters) {
             for (Method method : methods) {
-                if (Record.class.equals(method.getDeclaringClass())) {
+                if (method.isBridge() || Record.class.equals(method.getDeclaringClass())) {
                     continue;
                 }
                 if (method.getParameterCount() == 0) {
