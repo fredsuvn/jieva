@@ -1,11 +1,12 @@
 package xyz.srclab.common.collection;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.Cast;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -69,56 +70,14 @@ public class ListKit {
     @SafeVarargs
     @Immutable
     public static <E> List<E> immutable(E... elements) {
-        return ImmutableList.from(elements);
+        return ImmutableSupport.ImmutableList.from(elements);
     }
 
     @Immutable
     public static <E> List<E> immutable(Iterable<? extends E> elements) {
-        return ImmutableList.from(elements);
-    }
-
-    private static final class ImmutableList<E> extends AbstractList<E> {
-
-        @SafeVarargs
-        public static <E> List<E> from(E... elements) {
-            return from0(elements);
+        if (elements instanceof ImmutableSupport.ImmutableList) {
+            return Cast.as(elements);
         }
-
-        public static <E> List<E> from(Iterable<? extends E> elements) {
-            Object[] array = iterableToArray(elements);
-            return from0(array);
-        }
-
-        private static <E> List<E> from0(Object[] elements) {
-            return elements.length == 0 ? Collections.emptyList() : new ImmutableList<>(elements);
-        }
-
-        private static <E> Object[] iterableToArray(Iterable<? extends E> elements) {
-            if (elements instanceof Collection) {
-                return ((Collection<?>) elements).toArray();
-            }
-            List<E> result = new LinkedList<>();
-            for (E element : elements) {
-                result.add(element);
-            }
-            return result.isEmpty() ? ArrayKit.EMPTY_OBJECT_ARRAY : result.toArray();
-        }
-
-        private final Object[] elementData;
-
-        private ImmutableList(Object[] elementData) {
-            this.elementData = elementData;
-        }
-
-        @Override
-        @Nullable
-        public E get(int index) {
-            return Cast.nullable(elementData[index]);
-        }
-
-        @Override
-        public int size() {
-            return elementData.length;
-        }
+        return ImmutableSupport.ImmutableList.from(elements);
     }
 }

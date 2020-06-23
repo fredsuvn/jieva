@@ -56,7 +56,10 @@ public class MapKit {
 
     @Immutable
     public static <K, V> Map<K, V> immutable(Map<? extends K, ? extends V> map) {
-        return Collections.unmodifiableMap(new LinkedHashMap<>(map));
+        if (map instanceof ImmutableSupport.ImmutableMap) {
+            return Cast.as(map);
+        }
+        return new ImmutableSupport.ImmutableMap<>(map);
     }
 
     public static <K, V> Map.Entry<K, V> firstEntry(Map<K, V> map) throws NoSuchElementException {

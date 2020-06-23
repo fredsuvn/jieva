@@ -1,8 +1,12 @@
 package xyz.srclab.common.collection;
 
 import xyz.srclab.annotation.Immutable;
+import xyz.srclab.common.base.Cast;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -75,12 +79,15 @@ public class SetKit {
     @SafeVarargs
     @Immutable
     public static <E> Set<E> immutable(E... elements) {
-        return Collections.unmodifiableSet(new LinkedHashSet<>(ListKit.immutable(elements)));
+        return new ImmutableSupport.ImmutableSet<E>(elements);
     }
 
     @Immutable
     public static <E> Set<E> immutable(Iterable<? extends E> elements) {
-        return Collections.unmodifiableSet(new LinkedHashSet<>(ListKit.immutable(elements)));
+        if (elements instanceof ImmutableSupport.ImmutableSet) {
+            return Cast.as(elements);
+        }
+        return new ImmutableSupport.ImmutableSet<E>(elements);
     }
 
     public static <E> E firstElement(Iterable<? extends E> iterable) {
