@@ -9,19 +9,21 @@ import java.util.function.Predicate;
 
 final class FinderSupport {
 
-    static <K, V> Finder<K, V> newFinder(Object... table) {
+    @SafeVarargs
+    static <K, V, E> Finder<K, V> newFinder(E... table) {
         return new MapFinderImpl<>(table);
     }
 
-    static <K, V> Finder<K, V> newFinder(Predicate<? super K> predicate, Object... table) {
+    @SafeVarargs
+    static <K, V, E> Finder<K, V> newFinder(Predicate<? super K> predicate, E... table) {
         return new CommonFinderImpl<>(predicate, table);
     }
 
-    private static final class MapFinderImpl<K, V> implements Finder<K, V> {
+    private static final class MapFinderImpl<K, V, E> implements Finder<K, V> {
 
         private final Map<K, @Nullable V> tableMap;
 
-        private MapFinderImpl(Object[] table) {
+        private MapFinderImpl(E[] table) {
             this.tableMap = MapKit.pairToMap(table);
         }
 
@@ -32,13 +34,14 @@ final class FinderSupport {
         }
     }
 
-    private static final class CommonFinderImpl<K, V> implements Finder<K, V> {
+    private static final class CommonFinderImpl<K, V, E> implements Finder<K, V> {
 
         private final Predicate<? super K> predicate;
         private final Map<K, @Nullable V> tableMap;
         private final Object[] table;
 
-        private CommonFinderImpl(Predicate<? super K> predicate, Object... table) {
+        @SafeVarargs
+        private CommonFinderImpl(Predicate<? super K> predicate, E... table) {
             this.predicate = predicate;
             this.table = table;
             this.tableMap = MapKit.pairToMap(table);

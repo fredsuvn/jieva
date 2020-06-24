@@ -6,11 +6,13 @@ import java.util.function.Predicate;
 
 public interface Finder<K, V> {
 
-    static <K, V> Finder<K, V> newFinder(Object... table) {
+    @SafeVarargs
+    static <K, V, E> Finder<K, V> newFinder(E... table) {
         return FinderSupport.newFinder(table);
     }
 
-    static <K, V> Finder<K, V> newFinder(Predicate<? super K> predicate, Object... table) {
+    @SafeVarargs
+    static <K, V, E> Finder<K, V> newFinder(Predicate<? super K> predicate, E... table) {
         return FinderSupport.newFinder(predicate, table);
     }
 

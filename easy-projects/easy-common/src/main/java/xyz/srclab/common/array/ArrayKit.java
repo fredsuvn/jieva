@@ -8,7 +8,7 @@ import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Checker;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.IterableKit;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.lang.finder.Finder;
 import xyz.srclab.common.reflect.TypeKit;
 
 import java.lang.reflect.Array;
@@ -16,7 +16,6 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -304,10 +303,10 @@ public class ArrayKit {
         // Key: component type, value: array type
         private static final Cache<Type, Type> cache = Cache.newL2();
 
-        private static final Map<Type, Type> table = MapKit.pairToMap(ArrayTypeTable.TABLE);
+        private static final Finder<Type, Type> finder = Finder.newFinder(ArrayTypeTable.TABLE);
 
         public static Type find(Type componentType) {
-            @Nullable Type arrayType = table.get(componentType);
+            @Nullable Type arrayType = finder.get(componentType);
             if (arrayType != null) {
                 return arrayType;
             }
