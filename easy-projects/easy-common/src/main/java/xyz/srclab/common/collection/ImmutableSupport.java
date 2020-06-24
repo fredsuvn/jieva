@@ -7,6 +7,7 @@ import xyz.srclab.common.base.Cast;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -14,36 +15,69 @@ import java.util.stream.Stream;
  */
 final class ImmutableSupport {
 
-    static final class ImmutableList<E> extends AbstractList<E> {
+    @SafeVarargs
+    static <E> List<E> list(E... elements) {
+        return new ImmutableListByArray<>(elements);
+    }
 
-        @SafeVarargs
-        public static <E> List<E> from(E... elements) {
-            return from0(elements);
+    static <E> List<E> list(Iterable<? extends E> elements) {
+        if (elements instanceof ImmutableList) {
+            return Cast.as(elements);
         }
+        Object[] array = iterableToArray(elements);
+        return Cast.as(list(array));
+    }
 
-        public static <E> List<E> from(Iterable<? extends E> elements) {
-            Object[] array = iterableToArray(elements);
-            return from0(array);
+    static <E> List<E> listFromArray(Object array) {
+        Class<?> type = array.getClass();
+        if (!type.isArray()) {
+            throw new IllegalArgumentException("Given object is not an array");
         }
+        if (array instanceof Object[]) {
+            return Cast.as(list((Object[]) array));
+        }
+        List<E> primitiveView = ArrayKit.asList(array);
+        return new ImmutableListByList<>(primitiveView);
+    }
 
-        private static <E> List<E> from0(Object[] elements) {
-            return new ImmutableList<>(elements);
-        }
+    @SafeVarargs
+    static <E> Set<E> set(E... elements) {
+        return new ImmutableSet<>(elements);
+    }
 
-        private static <E> Object[] iterableToArray(Iterable<? extends E> elements) {
-            if (elements instanceof Collection) {
-                return ((Collection<?>) elements).toArray();
-            }
-            List<E> result = new LinkedList<>();
-            for (E element : elements) {
-                result.add(element);
-            }
-            return result.isEmpty() ? ArrayKit.EMPTY_OBJECT_ARRAY : result.toArray();
+    static <E> Set<E> set(Iterable<? extends E> elements) {
+        if (elements instanceof ImmutableSet) {
+            return Cast.as(elements);
         }
+        return new ImmutableSet<>(elements);
+    }
+
+    static <K, V> Map<K, V> map(Map<? extends K, ? extends V> elements) {
+        if (elements instanceof ImmutableMap) {
+            return Cast.as(elements);
+        }
+        return new ImmutableMap<>(elements);
+    }
+
+    private static <E> Object[] iterableToArray(Iterable<? extends E> elements) {
+        if (elements instanceof Collection) {
+            return ((Collection<?>) elements).toArray();
+        }
+        List<E> result = new LinkedList<>();
+        for (E element : elements) {
+            result.add(element);
+        }
+        return result.isEmpty() ? ArrayKit.EMPTY_OBJECT_ARRAY : result.toArray();
+    }
+
+    private static abstract class ImmutableList<E> extends AbstractList<E> {
+    }
+
+    private static final class ImmutableListByArray<E> extends ImmutableList<E> {
 
         private final Object[] elementData;
 
-        private ImmutableList(Object[] elementData) {
+        private ImmutableListByArray(Object[] elementData) {
             this.elementData = elementData;
         }
 
@@ -58,20 +92,20 @@ final class ImmutableSupport {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
-        public <T> T[] toArray(T[] a) {
+        public <T> T[] toArray(T[] array) {
             int size = size();
-            if (a.length < size)
-                return Arrays.copyOf(this.elementData, size,
-                        (Class<? extends T[]>) a.getClass());
-            System.arraycopy(this.elementData, 0, a, 0, size);
-            if (a.length > size)
-                a[size] = null;
-            return a;
+            if (array.length < size) {
+                return Cast.as(Arrays.copyOf(this.elementData, size, array.getClass()));
+            }
+            System.arraycopy(this.elementData, 0, array, 0, size);
+            if (array.length > size) {
+                array[size] = null;
+            }
+            return array;
         }
 
-        @Override
         @Nullable
+        @Override
         public E get(int index) {
             return Cast.nullable(elementData[index]);
         }
@@ -93,39 +127,208 @@ final class ImmutableSupport {
 
         @Override
         public void forEach(Consumer<? super E> action) {
-            Objects.requireNonNull(action);
+            Consumer<Object> actionCast = Cast.as(action);
             for (Object e : elementData) {
-                action.accept(Cast.nullable(e));
+                actionCast.accept(e);
             }
         }
 
         @Override
         public void replaceAll(UnaryOperator<E> operator) {
-            Objects.requireNonNull(operator);
-            Object[] a = this.elementData;
             UnaryOperator<Object> unaryOperator = Cast.as(operator);
+            Object[] a = this.elementData;
             for (int i = 0; i < a.length; i++) {
                 a[i] = unaryOperator.apply(a[i]);
             }
         }
 
         @Override
-        public void sort(Comparator<? super E> c) {
-            Arrays.sort(elementData, Cast.as(c));
+        public void sort(Comparator<? super E> comparator) {
+            Comparator<Object> comparatorCast = Cast.as(comparator);
+            Arrays.sort(elementData, comparatorCast);
         }
     }
 
-    static final class ImmutableSet<E> implements Set<E> {
+    private static final class ImmutableListByList<E> extends ImmutableList<E> {
+
+        private final List<E> elementData;
+
+        private ImmutableListByList(List<E> elementData) {
+            this.elementData = elementData;
+        }
+
+        @Override
+        public int size() {
+            return elementData.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return elementData.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return elementData.contains(o);
+        }
+
+        @Override
+        public Iterator<E> iterator() {
+            return elementData.iterator();
+        }
+
+        @Override
+        public Object[] toArray() {
+            return elementData.toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return elementData.toArray(a);
+        }
+
+        @Override
+        public boolean add(E e) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            return elementData.containsAll(c);
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends E> c) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends E> c) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void replaceAll(UnaryOperator<E> operator) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void sort(Comparator<? super E> c) {
+            elementData.sort(c);
+        }
+
+        @Override
+        public void clear() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return elementData.equals(o);
+        }
+
+        @Override
+        public int hashCode() {
+            return elementData.hashCode();
+        }
+
+        @Override
+        public E get(int index) {
+            return elementData.get(index);
+        }
+
+        @Override
+        public E set(int index, E element) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void add(int index, E element) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public E remove(int index) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            return elementData.indexOf(o);
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            return elementData.lastIndexOf(o);
+        }
+
+        @Override
+        public ListIterator<E> listIterator() {
+            return elementData.listIterator();
+        }
+
+        @Override
+        public ListIterator<E> listIterator(int index) {
+            return elementData.listIterator(index);
+        }
+
+        @Override
+        public List<E> subList(int fromIndex, int toIndex) {
+            return elementData.subList(fromIndex, toIndex);
+        }
+
+        @Override
+        public Spliterator<E> spliterator() {
+            return elementData.spliterator();
+        }
+
+        @Override
+        public boolean removeIf(Predicate<? super E> filter) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Stream<E> stream() {
+            return elementData.stream();
+        }
+
+        @Override
+        public Stream<E> parallelStream() {
+            return elementData.parallelStream();
+        }
+
+        @Override
+        public void forEach(Consumer<? super E> action) {
+            elementData.forEach(action);
+        }
+    }
+
+    private static final class ImmutableSet<E> implements Set<E> {
 
         private final Set<E> source;
 
         @SafeVarargs
-        ImmutableSet(E... elements) {
-            this.source = Collections.unmodifiableSet(CollectionKit.addAll(new LinkedHashSet<>(), elements));
+        private ImmutableSet(E... elements) {
+            this.source = CollectionKit.addAll(new LinkedHashSet<>(), elements);
         }
 
-        ImmutableSet(Iterable<? extends E> elements) {
-            this.source = Collections.unmodifiableSet(CollectionKit.addAll(new LinkedHashSet<>(), elements));
+        private ImmutableSet(Iterable<? extends E> elements) {
+            this.source = CollectionKit.addAll(new LinkedHashSet<>(), elements);
         }
 
         @Override
@@ -160,12 +363,12 @@ final class ImmutableSupport {
 
         @Override
         public boolean add(E e) {
-            return source.add(e);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public boolean remove(Object o) {
-            return source.remove(o);
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -175,22 +378,22 @@ final class ImmutableSupport {
 
         @Override
         public boolean addAll(Collection<? extends E> c) {
-            return source.addAll(c);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public boolean retainAll(Collection<?> c) {
-            return source.retainAll(c);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public boolean removeAll(Collection<?> c) {
-            return source.removeAll(c);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void clear() {
-            source.clear();
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -210,7 +413,7 @@ final class ImmutableSupport {
 
         @Override
         public boolean removeIf(Predicate<? super E> filter) {
-            return source.removeIf(filter);
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -229,12 +432,12 @@ final class ImmutableSupport {
         }
     }
 
-    static final class ImmutableMap<K, V> implements Map<K, V> {
+    private static final class ImmutableMap<K, V> implements Map<K, V> {
 
         private final Map<K, V> source;
 
-        ImmutableMap(Map<? extends K, ? extends V> source) {
-            this.source = Collections.unmodifiableMap(new LinkedHashMap<>(source));
+        private ImmutableMap(Map<? extends K, ? extends V> source) {
+            this.source = new LinkedHashMap<>(source);
         }
 
         @Override
@@ -264,22 +467,22 @@ final class ImmutableSupport {
 
         @Override
         public V put(K key, V value) {
-            return source.put(key, value);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public V remove(Object key) {
-            return source.remove(key);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void putAll(Map<? extends K, ? extends V> m) {
-            source.putAll(m);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public void clear() {
-            source.clear();
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -292,9 +495,41 @@ final class ImmutableSupport {
             return source.values();
         }
 
+        private @Nullable Set<Entry<K, V>> entrySet;
+
         @Override
         public Set<Entry<K, V>> entrySet() {
-            return source.entrySet();
+            if (entrySet == null) {
+                synchronized (this) {
+                    if (entrySet == null) {
+                        entrySet = newEntrySet();
+                    }
+                }
+            }
+            return entrySet;
+        }
+
+        private Set<Entry<K, V>> newEntrySet() {
+            return Collections.unmodifiableSet(
+                    source.entrySet().stream()
+                            .map(e -> new Entry<K, V>() {
+                                @Override
+                                public K getKey() {
+                                    return e.getKey();
+                                }
+
+                                @Override
+                                public V getValue() {
+                                    return e.getValue();
+                                }
+
+                                @Override
+                                public V setValue(V value) {
+                                    throw new UnsupportedOperationException();
+                                }
+                            })
+                            .collect(Collectors.toSet())
+            );
         }
 
         @Override
@@ -319,48 +554,49 @@ final class ImmutableSupport {
 
         @Override
         public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
-            source.replaceAll(function);
+            throw new UnsupportedOperationException();
         }
 
+        @Nullable
         @Override
         public V putIfAbsent(K key, V value) {
-            return source.putIfAbsent(key, value);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public boolean remove(Object key, Object value) {
-            return source.remove(key, value);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public boolean replace(K key, V oldValue, V newValue) {
-            return source.replace(key, oldValue, newValue);
+            throw new UnsupportedOperationException();
         }
 
+        @Nullable
         @Override
         public V replace(K key, V value) {
-            return source.replace(key, value);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
-            return source.computeIfAbsent(key, mappingFunction);
+            throw new UnsupportedOperationException();
         }
 
         @Override
-        @Nullable
         public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-            return source.computeIfPresent(key, remappingFunction);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-            return source.compute(key, remappingFunction);
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
-            return source.merge(key, value, remappingFunction);
+            throw new UnsupportedOperationException();
         }
     }
 }

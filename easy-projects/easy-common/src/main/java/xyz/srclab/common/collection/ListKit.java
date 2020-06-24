@@ -1,7 +1,6 @@
 package xyz.srclab.common.collection;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.base.Cast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,14 +69,16 @@ public class ListKit {
     @SafeVarargs
     @Immutable
     public static <E> List<E> immutable(E... elements) {
-        return ImmutableSupport.ImmutableList.from(elements);
+        return ImmutableSupport.list(elements);
     }
 
     @Immutable
     public static <E> List<E> immutable(Iterable<? extends E> elements) {
-        if (elements instanceof ImmutableSupport.ImmutableList) {
-            return Cast.as(elements);
-        }
-        return ImmutableSupport.ImmutableList.from(elements);
+        return ImmutableSupport.list(elements);
+    }
+
+    @Immutable
+    public static <E> List<E> immutableFromArray(Object array) {
+        return ImmutableSupport.listFromArray(array);
     }
 }

@@ -1,7 +1,6 @@
 package xyz.srclab.common.collection;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.base.Cast;
 
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -79,15 +78,12 @@ public class SetKit {
     @SafeVarargs
     @Immutable
     public static <E> Set<E> immutable(E... elements) {
-        return new ImmutableSupport.ImmutableSet<E>(elements);
+        return ImmutableSupport.set(elements);
     }
 
     @Immutable
     public static <E> Set<E> immutable(Iterable<? extends E> elements) {
-        if (elements instanceof ImmutableSupport.ImmutableSet) {
-            return Cast.as(elements);
-        }
-        return new ImmutableSupport.ImmutableSet<E>(elements);
+        return ImmutableSupport.set(elements);
     }
 
     public static <E> E firstElement(Iterable<? extends E> iterable) {
