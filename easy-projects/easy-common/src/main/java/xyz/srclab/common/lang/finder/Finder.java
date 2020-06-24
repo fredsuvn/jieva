@@ -8,7 +8,7 @@ public interface Finder<K, V> {
 
     @SafeVarargs
     static <K, V, E> Finder<K, V> newFinder(E... table) {
-        return FinderSupport.newFinder(table);
+        return FinderSupport.pairFinder(table);
     }
 
     @SafeVarargs
