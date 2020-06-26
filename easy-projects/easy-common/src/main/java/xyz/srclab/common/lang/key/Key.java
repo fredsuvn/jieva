@@ -10,11 +10,11 @@ import xyz.srclab.annotation.Nullable;
 public interface Key {
 
     static Key of(Object... elements) {
-        return Key0.newKey(elements);
+        return KeySupport.newKey(elements);
     }
 
     static Key of(Iterable<?> elements) {
-        return Key0.newKey(elements);
+        return KeySupport.newKey(elements);
     }
 
     @Override

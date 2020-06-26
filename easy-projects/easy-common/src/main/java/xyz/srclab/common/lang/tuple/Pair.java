@@ -9,7 +9,7 @@ import java.util.Objects;
 public interface Pair<A, B> extends Tuple {
 
     static <A, B> Pair<A, B> of(@Nullable A first, @Nullable B second) {
-        return Tuple0.newPair(first, second);
+        return TupleSupport.newPair(first, second);
     }
 
     static <A, B> MutablePair<A, B> mutable() {

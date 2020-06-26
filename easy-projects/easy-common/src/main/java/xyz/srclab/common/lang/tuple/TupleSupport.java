@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  * @author sunqian
  */
-final class Tuple0 {
+final class TupleSupport {
 
     static Tuple newTuple(Object... values) {
         return new TupleImpl(values);

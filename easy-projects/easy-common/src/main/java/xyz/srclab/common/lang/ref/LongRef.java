@@ -6,11 +6,11 @@ package xyz.srclab.common.lang.ref;
 public interface LongRef {
 
     static LongRef empty() {
-        return Ref0.newLongRef();
+        return RefSupport.newLongRef();
     }
 
     static LongRef of(long value) {
-        return Ref0.newLongRef(value);
+        return RefSupport.newLongRef(value);
     }
 
     long get();

@@ -8,7 +8,7 @@ import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.invoke.ConstructorInvoker;
-import xyz.srclab.common.lang.format.Formatter;
+import xyz.srclab.common.base.Format;
 import xyz.srclab.common.lang.key.Key;
 
 import java.lang.reflect.Constructor;
@@ -97,14 +97,14 @@ public class ClassKit {
                 Type genericSuperclass = ClassKit.getGenericSuperclass(userClass, declaringClass);
                 if (!(genericSuperclass instanceof ParameterizedType)) {
                     throw new IllegalStateException(
-                            Formatter.fastFormat("Cannot find actual type \"{}\" from {} to {}",
+                            Format.fastFormat("Cannot find actual type \"{}\" from {} to {}",
                                     type, declaringClass, userClass));
                 }
                 TypeVariable<?>[] typeVariables = declaringClass.getTypeParameters();
                 int index = ArrayUtils.indexOf(typeVariables, type);
                 if (index < 0) {
                     throw new IllegalStateException(
-                            Formatter.fastFormat("Cannot find actual type \"{}\" from {} to {}",
+                            Format.fastFormat("Cannot find actual type \"{}\" from {} to {}",
                                     type, declaringClass, userClass));
                 }
                 return ((ParameterizedType) genericSuperclass).getActualTypeArguments()[index];

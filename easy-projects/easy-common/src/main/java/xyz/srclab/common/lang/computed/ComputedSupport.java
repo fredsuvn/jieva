@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * @author sunqian
  */
-final class Computed0 {
+final class ComputedSupport {
 
     static <T> Computed<T> newOnceComputed(Supplier<T> computation) {
         return new OnceComputed<>(computation);

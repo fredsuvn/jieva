@@ -6,11 +6,11 @@ package xyz.srclab.common.lang.ref;
 public interface CharRef {
 
     static CharRef empty() {
-        return Ref0.newCharRef();
+        return RefSupport.newCharRef();
     }
 
     static CharRef of(char value) {
-        return Ref0.newCharRef(value);
+        return RefSupport.newCharRef(value);
     }
 
     char get();

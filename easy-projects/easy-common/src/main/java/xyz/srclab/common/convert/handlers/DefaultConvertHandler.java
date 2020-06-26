@@ -11,7 +11,7 @@ import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
 import xyz.srclab.common.convert.ConvertHandler;
-import xyz.srclab.common.lang.format.Formatter;
+import xyz.srclab.common.base.Format;
 import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeKit;
 
@@ -19,9 +19,6 @@ import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 final class DefaultConvertHandler implements ConvertHandler {
@@ -108,7 +105,7 @@ final class DefaultConvertHandler implements ConvertHandler {
 
     private Object convertTypeVariable(Object from, TypeVariable<?> to, BeanOperator beanOperator) {
         throw new IllegalArgumentException(
-                Formatter.fastFormat("Cannot find runtime type for {}.{}",
+                Format.fastFormat("Cannot find runtime type for {}.{}",
                         to.getGenericDeclaration(), to.getName())
         );
     }
@@ -136,7 +133,7 @@ final class DefaultConvertHandler implements ConvertHandler {
             }
             return ListKit.immutable(result);
         }
-        throw new UnsupportedOperationException(Formatter.fastFormat(
+        throw new UnsupportedOperationException(Format.fastFormat(
                 "Cannot convert object {} to list of element type {}", from, elementType));
     }
 
@@ -154,7 +151,7 @@ final class DefaultConvertHandler implements ConvertHandler {
             }
             return SetKit.immutable(result);
         }
-        throw new UnsupportedOperationException(Formatter.fastFormat(
+        throw new UnsupportedOperationException(Format.fastFormat(
                 "Cannot convert object {} to set of element type {}", from, elementType));
     }
 
@@ -272,7 +269,7 @@ final class DefaultConvertHandler implements ConvertHandler {
             }
             return resultArray;
         }
-        throw new UnsupportedOperationException(Formatter.fastFormat(
+        throw new UnsupportedOperationException(Format.fastFormat(
                 "Cannot convert object {} to array of element type {}", from, componentType));
     }
 
@@ -357,7 +354,7 @@ final class DefaultConvertHandler implements ConvertHandler {
                 return fromString.charAt(0);
             }
             throw new UnsupportedOperationException(
-                    Formatter.fastFormat("Cannot convert object {} to type {}", from, to));
+                    Format.fastFormat("Cannot convert object {} to type {}", from, to));
         }
         if (byte.class.equals(to) || Byte.class.equals(to)) {
             if (from instanceof Number) {

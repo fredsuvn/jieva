@@ -1,23 +1,30 @@
-package xyz.srclab.common.lang.format;
+package xyz.srclab.common.base;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.helpers.MessageFormatter;
 import xyz.srclab.annotation.Out;
 
-/**
- * @author sunqian
- */
-final class Format0 {
+import java.text.MessageFormat;
+import java.util.Locale;
 
-    static Formatter getFastFormatter() {
-        return FastFormatter.INSTANCE;
+public class Format {
+
+    public static String fastFormat(String messagePattern, Object... args) {
+        return FastFormat.INSTANCE.format(messagePattern, args);
     }
 
-    private static final class FastFormatter implements Formatter {
+    public static String printfFormat(String messagePattern, Object... args) {
+        return String.format(Locale.getDefault(), messagePattern, args);
+    }
 
-        private static final Formatter INSTANCE = new FastFormatter();
+    public static String messageFormat(String messagePattern, Object... args) {
+        return MessageFormat.format(messagePattern, args);
+    }
 
-        @Override
+    private static final class FastFormat {
+
+        private static final FastFormat INSTANCE = new FastFormat();
+
         public String format(String pattern, Object... args) {
             processArguments(args);
             return MessageFormatter.arrayFormat(pattern, args, null).getMessage();

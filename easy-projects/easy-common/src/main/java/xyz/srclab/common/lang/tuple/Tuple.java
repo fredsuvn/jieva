@@ -12,7 +12,7 @@ import java.util.Objects;
 public interface Tuple {
 
     static Tuple of(Object... values) {
-        return Tuple0.newTuple(values);
+        return TupleSupport.newTuple(values);
     }
 
     static MutableTuple mutable(int length) {

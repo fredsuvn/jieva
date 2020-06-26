@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 public interface Lazy<T> {
 
     static <T> Lazy<T> of(Supplier<T> supplier) {
-        return Lazy0.newLazy(supplier);
+        return LazySupport.newLazy(supplier);
     }
 
     T get();

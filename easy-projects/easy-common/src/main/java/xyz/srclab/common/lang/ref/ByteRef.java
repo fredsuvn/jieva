@@ -6,11 +6,11 @@ package xyz.srclab.common.lang.ref;
 public interface ByteRef {
 
     static ByteRef empty() {
-        return Ref0.newByteRef();
+        return RefSupport.newByteRef();
     }
 
     static ByteRef of(byte value) {
-        return Ref0.newByteRef(value);
+        return RefSupport.newByteRef(value);
     }
 
     byte get();

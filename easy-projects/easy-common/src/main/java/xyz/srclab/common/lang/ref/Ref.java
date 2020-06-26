@@ -7,11 +7,11 @@ import java.util.Objects;
 public interface Ref<T> {
 
     static <T> Ref<T> empty() {
-        return Ref0.newRef();
+        return RefSupport.newRef();
     }
 
     static <T> Ref<T> of(@Nullable T value) {
-        return Ref0.newRef(value);
+        return RefSupport.newRef(value);
     }
 
     @Nullable

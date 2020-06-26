@@ -6,11 +6,11 @@ package xyz.srclab.common.lang.ref;
 public interface ShortRef {
 
     static ShortRef empty() {
-        return Ref0.newShortRef();
+        return RefSupport.newShortRef();
     }
 
     static ShortRef of(short value) {
-        return Ref0.newShortRef(value);
+        return RefSupport.newShortRef(value);
     }
 
     short get();

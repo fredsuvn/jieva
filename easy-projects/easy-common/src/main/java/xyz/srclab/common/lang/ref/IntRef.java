@@ -6,11 +6,11 @@ package xyz.srclab.common.lang.ref;
 public interface IntRef {
 
     static IntRef empty() {
-        return Ref0.newIntRef();
+        return RefSupport.newIntRef();
     }
 
     static IntRef of(int value) {
-        return Ref0.newIntRef(value);
+        return RefSupport.newIntRef(value);
     }
 
     int get();

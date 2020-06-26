@@ -6,11 +6,11 @@ package xyz.srclab.common.lang.ref;
 public interface DoubleRef {
 
     static DoubleRef empty() {
-        return Ref0.newDoubleRef();
+        return RefSupport.newDoubleRef();
     }
 
     static DoubleRef of(double value) {
-        return Ref0.newDoubleRef(value);
+        return RefSupport.newDoubleRef(value);
     }
 
     double get();

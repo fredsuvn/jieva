@@ -6,11 +6,11 @@ package xyz.srclab.common.lang.ref;
 public interface FloatRef {
 
     static FloatRef empty() {
-        return Ref0.newFloatRef();
+        return RefSupport.newFloatRef();
     }
 
     static FloatRef of(float value) {
-        return Ref0.newFloatRef(value);
+        return RefSupport.newFloatRef(value);
     }
 
     float get();

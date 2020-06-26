@@ -14,19 +14,19 @@ import java.util.function.Supplier;
 public interface Computed<T> {
 
     static <T> Computed<T> onceOf(Supplier<T> computation) {
-        return Computed0.newOnceComputed(computation);
+        return ComputedSupport.newOnceComputed(computation);
     }
 
     static <T> Computed<T> multiOf(Supplier<Computed.Result<T>> computation) {
-        return Computed0.newMultiComputed(computation);
+        return ComputedSupport.newMultiComputed(computation);
     }
 
     static <T> Computed<T> refreshableOf(long timeoutNanos, Supplier<T> computation) {
-        return Computed0.newRefreshableComputed(timeoutNanos, computation);
+        return ComputedSupport.newRefreshableComputed(timeoutNanos, computation);
     }
 
     static <T> Computed<T> refreshableOf(Duration duration, Supplier<T> computation) {
-        return Computed0.newRefreshableComputed(duration, computation);
+        return ComputedSupport.newRefreshableComputed(duration, computation);
     }
 
     T get();

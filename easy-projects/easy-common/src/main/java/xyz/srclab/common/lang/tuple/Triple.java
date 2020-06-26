@@ -9,7 +9,7 @@ import java.util.Objects;
 public interface Triple<A, B, C> extends Pair<A, B> {
 
     static <A, B, C> Triple<A, B, C> of(@Nullable A first, @Nullable B second, @Nullable C third) {
-        return Tuple0.newTriple(first, second, third);
+        return TupleSupport.newTriple(first, second, third);
     }
 
     static <A, B, C> MutableTriple<A, B, C> mutable() {

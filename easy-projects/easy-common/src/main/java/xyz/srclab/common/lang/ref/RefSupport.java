@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Nullable;
 /**
  * @author sunqian
  */
-final class Ref0 {
+final class RefSupport {
 
     static <T> Ref<T> newRef() {
         return new RefImpl<>();

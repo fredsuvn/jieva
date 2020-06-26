@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  * @author sunqian
  */
-final class Key0 {
+final class KeySupport {
 
     static Key newKey(Object... elements) {
         return new KeyImpl(elements);

@@ -6,11 +6,11 @@ package xyz.srclab.common.lang.ref;
 public interface BooleanRef {
 
     static BooleanRef empty() {
-        return Ref0.newBooleanRef();
+        return RefSupport.newBooleanRef();
     }
 
     static BooleanRef of(boolean value) {
-        return Ref0.newBooleanRef(value);
+        return RefSupport.newBooleanRef(value);
     }
 
     boolean get();
