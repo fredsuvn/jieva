@@ -1,29 +1,81 @@
 package xyz.srclab.common.lang.finder;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.SetKit;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 final class FinderSupport {
 
     @SafeVarargs
-    static <K, V, E> Finder<K, V> pairFinder(E... table) {
-        return new SimplePairFinder<>(table);
+    static <E> Finder<E, E> newSetFinder(E... table) {
+        return new SimpleSetFinder<>(table);
     }
 
     @SafeVarargs
-    static <K, V, E> Finder<K, V> pairFinder(Predicate<? super K> predicate, E... table) {
-        return new PredicatePairFinder<>(predicate, table);
+    static <E> Finder<E, E> newSetFinder(Predicate<? super E> predicate, E... table) {
+        return new PredicateSetFinder<>(predicate, table);
     }
 
-    private static final class SimplePairFinder<K, V, E> implements Finder<K, V> {
+    @SafeVarargs
+    static <K, V, E> Finder<K, V> newMapFinder(E... table) {
+        return new SimpleMapFinder<>(table);
+    }
+
+    @SafeVarargs
+    static <K, V, E> Finder<K, V> newMapFinder(Predicate<? super K> predicate, E... table) {
+        return new PredicateMapFinder<>(predicate, table);
+    }
+
+    private static final class SimpleSetFinder<E> implements Finder<E, E> {
+
+        private final Set<E> tableSet;
+
+        private SimpleSetFinder(E[] table) {
+            this.tableSet = SetKit.toSet(table);
+        }
+
+        @Nullable
+        @Override
+        public E get(E key) {
+            return tableSet.contains(key) ? key : null;
+        }
+    }
+
+    private static final class PredicateSetFinder<E> implements Finder<E, E> {
+
+        private final Predicate<? super E> predicate;
+        private final Set<E> tableSet;
+        private final E[] table;
+
+        @SafeVarargs
+        private PredicateSetFinder(Predicate<? super E> predicate, E... table) {
+            this.predicate = predicate;
+            this.table = table;
+            this.tableSet = SetKit.toSet(table);
+        }
+
+        @Nullable
+        @Override
+        public E get(E key) {
+            if (tableSet.contains(key)) {
+                return key;
+            }
+            int i = ArrayKit.find(table, predicate);
+            return i >= 0 ? table[i] : null;
+        }
+    }
+
+    private static final class SimpleMapFinder<K, V, E> implements Finder<K, V> {
 
         private final Map<K, @Nullable V> tableMap;
 
-        private SimplePairFinder(E[] table) {
+        private SimpleMapFinder(E[] table) {
             this.tableMap = MapKit.pairToMap(table);
         }
 
@@ -34,15 +86,15 @@ final class FinderSupport {
         }
     }
 
-    private static final class PredicatePairFinder<K, V, E> implements Finder<K, V> {
+    private static final class PredicateMapFinder<K, V, E> implements Finder<K, V> {
 
-        private final Predicate<? super K> predicate;
+        private final Predicate<Object> predicate;
         private final Map<K, @Nullable V> tableMap;
         private final Object[] table;
 
         @SafeVarargs
-        private PredicatePairFinder(Predicate<? super K> predicate, E... table) {
-            this.predicate = predicate;
+        private PredicateMapFinder(Predicate<? super K> predicate, E... table) {
+            this.predicate = Cast.as(predicate);
             this.table = table;
             this.tableMap = MapKit.pairToMap(table);
         }
@@ -54,15 +106,8 @@ final class FinderSupport {
             if (value != null) {
                 return value;
             }
-            for (int i = 0; i < table.length; i++) {
-                if (predicate.test(Cast.as(table[i]))) {
-                    if (i + 1 < table.length) {
-                        return Cast.nullable(table[i + 1]);
-                    }
-                    return null;
-                }
-            }
-            return null;
+            int i = ArrayKit.find(table, predicate);
+            return i >= 0 ? Cast.nullable(table[i]) : null;
         }
     }
 }

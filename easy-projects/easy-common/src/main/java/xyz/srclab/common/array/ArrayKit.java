@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Util for array.
@@ -109,6 +110,87 @@ public class ArrayKit {
 
     public static <E> E[] toArray(Iterable<? extends E> iterable, Class<?> componentType) {
         return IterableKit.toArray(iterable, componentType);
+    }
+
+    public static <T> int find(T[] array, Predicate<? super T> predicate) {
+        for (int i = 0; i < array.length; i++) {
+            if (predicate.test(array[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int find(boolean[] array, Predicate<? super Boolean> predicate) {
+        for (int i = 0; i < array.length; i++) {
+            if (predicate.test(array[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int find(byte[] array, Predicate<? super Byte> predicate) {
+        for (int i = 0; i < array.length; i++) {
+            if (predicate.test(array[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int find(short[] array, Predicate<? super Short> predicate) {
+        for (int i = 0; i < array.length; i++) {
+            if (predicate.test(array[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int find(char[] array, Predicate<? super Character> predicate) {
+        for (int i = 0; i < array.length; i++) {
+            if (predicate.test(array[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int find(int[] array, Predicate<? super Integer> predicate) {
+        for (int i = 0; i < array.length; i++) {
+            if (predicate.test(array[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int find(long[] array, Predicate<? super Long> predicate) {
+        for (int i = 0; i < array.length; i++) {
+            if (predicate.test(array[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int find(float[] array, Predicate<? super Float> predicate) {
+        for (int i = 0; i < array.length; i++) {
+            if (predicate.test(array[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int find(double[] array, Predicate<? super Double> predicate) {
+        for (int i = 0; i < array.length; i++) {
+            if (predicate.test(array[i])) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public static <T> T[] buildArray(@OutReturn T[] array, ObjectSupplier<T> supplier) {

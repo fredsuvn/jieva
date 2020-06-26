@@ -2,10 +2,7 @@ package xyz.srclab.common.collection;
 
 import xyz.srclab.annotation.Immutable;
 
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -88,5 +85,20 @@ public class SetKit {
 
     public static <E> E firstElement(Iterable<? extends E> iterable) {
         return IterableKit.firstElement(iterable);
+    }
+
+    @SafeVarargs
+    @Immutable
+    public static <E> Set<E> toSet(E... array) {
+        return toSet(Arrays.asList(array));
+    }
+
+    @Immutable
+    public static <E> Set<E> toSet(Iterable<? extends E> iterable) {
+        Set<E> set = new HashSet<>();
+        for (E e : iterable) {
+            set.add(e);
+        }
+        return immutable(set);
     }
 }

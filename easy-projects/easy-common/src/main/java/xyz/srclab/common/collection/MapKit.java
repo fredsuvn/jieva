@@ -113,6 +113,7 @@ public class MapKit {
         return immutable(result);
     }
 
+    @SafeVarargs
     @Immutable
     public static <K, V, E> Map<K, V> pairToMap(E... elements) {
         Map<K, V> result = new LinkedHashMap<>();
