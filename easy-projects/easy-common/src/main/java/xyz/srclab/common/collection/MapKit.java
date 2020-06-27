@@ -17,9 +17,9 @@ public class MapKit {
             Function<? super OK, ? extends NK> keyMapper,
             Function<? super OV, ? extends NV> valueMapper
     ) {
-        Map<NK, NV> newMap = new LinkedHashMap<>();
-        map.forEach((k, v) -> newMap.put(keyMapper.apply(k), valueMapper.apply(v)));
-        return immutable(newMap);
+        Map<NK, NV> result = new LinkedHashMap<>();
+        map.forEach((k, v) -> result.put(keyMapper.apply(k), valueMapper.apply(v)));
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -31,7 +31,7 @@ public class MapKit {
                 result.put(k, v);
             }
         });
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     public static void removeAll(@Out Map<?, ?> map, Object... keys) {
@@ -59,6 +59,11 @@ public class MapKit {
         return ImmutableSupport.map(map);
     }
 
+    @Immutable
+    public static <K, V> Map<K, V> unmodifiable(Map<? extends K, ? extends V> map) {
+        return Collections.unmodifiableMap(map);
+    }
+
     public static <K, V> Map.Entry<K, V> firstEntry(Map<K, V> map) throws NoSuchElementException {
         return map.entrySet().iterator().next();
     }
@@ -79,7 +84,7 @@ public class MapKit {
         for (K key : keys) {
             result.put(key, mapper.apply(key));
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -89,7 +94,7 @@ public class MapKit {
         for (V value : values) {
             result.put(mapper.apply(value), value);
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -110,7 +115,7 @@ public class MapKit {
                 result.put(key, null);
             }
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @SafeVarargs
@@ -127,6 +132,6 @@ public class MapKit {
                 result.put(key, null);
             }
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 }

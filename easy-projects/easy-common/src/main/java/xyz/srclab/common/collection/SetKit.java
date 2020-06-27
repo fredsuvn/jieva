@@ -14,7 +14,7 @@ public class SetKit {
         for (O o : array) {
             result.add(mapper.apply(o));
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -23,7 +23,7 @@ public class SetKit {
         for (O o : iterable) {
             result.add(mapper.apply(o));
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -34,7 +34,7 @@ public class SetKit {
                 result.add(e);
             }
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -45,7 +45,7 @@ public class SetKit {
                 result.add(e);
             }
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @SafeVarargs
@@ -60,7 +60,7 @@ public class SetKit {
         for (Iterable<? extends E> iterable : iterables) {
             result.addAll(IterableKit.toList(iterable));
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -69,7 +69,7 @@ public class SetKit {
         while (enumeration.hasMoreElements()) {
             result.add(enumeration.nextElement());
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @SafeVarargs
@@ -83,22 +83,12 @@ public class SetKit {
         return ImmutableSupport.set(elements);
     }
 
+    @Immutable
+    public static <E> Set<E> unmodifiable(Iterable<? extends E> elements) {
+        return Collections.unmodifiableSet(IterableKit.asSet(elements));
+    }
+
     public static <E> E firstElement(Iterable<? extends E> iterable) {
         return IterableKit.firstElement(iterable);
-    }
-
-    @SafeVarargs
-    @Immutable
-    public static <E> Set<E> toSet(E... array) {
-        return toSet(Arrays.asList(array));
-    }
-
-    @Immutable
-    public static <E> Set<E> toSet(Iterable<? extends E> iterable) {
-        Set<E> set = new HashSet<>();
-        for (E e : iterable) {
-            set.add(e);
-        }
-        return immutable(set);
     }
 }

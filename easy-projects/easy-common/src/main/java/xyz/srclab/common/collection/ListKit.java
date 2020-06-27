@@ -2,10 +2,7 @@ package xyz.srclab.common.collection;
 
 import xyz.srclab.annotation.Immutable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -17,7 +14,7 @@ public class ListKit {
         for (O o : array) {
             result.add(mapper.apply(o));
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -26,7 +23,7 @@ public class ListKit {
         for (O o : iterable) {
             result.add(mapper.apply(o));
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -37,7 +34,7 @@ public class ListKit {
                 result.add(e);
             }
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @Immutable
@@ -48,7 +45,7 @@ public class ListKit {
                 result.add(e);
             }
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @SafeVarargs
@@ -63,7 +60,7 @@ public class ListKit {
         for (Iterable<? extends E> iterable : iterables) {
             CollectionKit.addAll(result, iterable);
         }
-        return immutable(result);
+        return unmodifiable(result);
     }
 
     @SafeVarargs
@@ -78,7 +75,7 @@ public class ListKit {
     }
 
     @Immutable
-    public static <E> List<E> immutableFromArray(Object array) {
-        return ImmutableSupport.listFromArray(array);
+    public static <E> List<E> unmodifiable(Iterable<? extends E> elements) {
+        return Collections.unmodifiableList(IterableKit.asList(elements));
     }
 }

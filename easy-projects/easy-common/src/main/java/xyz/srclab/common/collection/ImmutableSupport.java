@@ -28,18 +28,6 @@ final class ImmutableSupport {
         return Cast.as(list(array));
     }
 
-    static <E> List<E> listFromArray(Object array) {
-        Class<?> type = array.getClass();
-        if (!type.isArray()) {
-            throw new IllegalArgumentException("Given object is not an array");
-        }
-        if (array instanceof Object[]) {
-            return Cast.as(list((Object[]) array));
-        }
-        List<E> primitiveView = ArrayKit.asList(array);
-        return new ImmutableListByList<>(primitiveView);
-    }
-
     @SafeVarargs
     static <E> Set<E> set(E... elements) {
         return new ImmutableSet<>(elements);

@@ -4,6 +4,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.collection.CollectionKit;
 import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.lang.finder.Finder;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -59,13 +60,15 @@ public class UnitPredicateBuilder extends CachedBuilder<Predicate<Class<?>>> {
 
     private static final class UnitPredicateImpl implements Predicate<Class<?>> {
 
-        private final Class<?>[] passTypes;
-        private final Class<?>[] failTypes;
+        private final Finder<Class<?>, Class<?>> passTypes;
+        private final Finder<Class<?>, Class<?>> failTypes;
         private final @Nullable Predicate<Class<?>> extraPredicate;
 
         private UnitPredicateImpl(UnitPredicateBuilder builder) {
-            this.passTypes = ArrayKit.toArray(builder.passTypes, Class.class);
-            this.failTypes = ArrayKit.toArray(builder.failTypes, Class.class);
+            this.passTypes = Finder.newSetFinder(
+                    c->
+                    ArrayKit.toArray(builder.passTypes, Class.class));
+            this.failTypes = Finder.newSetFinder(ArrayKit.toArray(builder.failTypes, Class.class));
             this.extraPredicate = builder.extraPredicate;
         }
 

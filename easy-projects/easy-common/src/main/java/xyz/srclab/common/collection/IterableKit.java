@@ -4,10 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.Cast;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -55,6 +52,21 @@ public class IterableKit {
                 .flatMap(iterable -> StreamSupport.stream(iterable.spliterator(), false))
                 .iterator()
         );
+    }
+
+    @Immutable
+    public static <E> List<E> asList(Iterable<? extends E> iterable) {
+        return iterable instanceof List ? Cast.as(iterable) : toList(iterable);
+    }
+
+    @Immutable
+    public static <E> Set<E> asSet(Iterable<? extends E> iterable) {
+        return iterable instanceof Set ? Cast.as(iterable) : toSet(iterable);
+    }
+
+    @Immutable
+    public static <E> Collection<E> asCollection(Iterable<? extends E> iterable) {
+        return iterable instanceof Collection ? Cast.as(iterable) : toSet(iterable);
     }
 
     @Immutable
