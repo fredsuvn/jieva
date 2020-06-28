@@ -26,9 +26,9 @@ public class Unit {
     private static final class UnitPredicateHolder {
 
         private static final Class<?>[] PASS_TYPES = {
+                CharSequence.class,
                 Enum.class,
                 Annotation.class,
-                CharSequence.class,
                 Number.class,
                 Date.class,
                 TemporalAccessor.class,

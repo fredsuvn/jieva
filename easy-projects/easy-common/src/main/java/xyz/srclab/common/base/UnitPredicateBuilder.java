@@ -60,14 +60,14 @@ public class UnitPredicateBuilder extends CachedBuilder<Predicate<Class<?>>> {
 
     private static final class UnitPredicateImpl implements Predicate<Class<?>> {
 
-        private final Finder<Class<?>, Class<?>> passTypes;
-        private final Finder<Class<?>, Class<?>> failTypes;
+        private final Finder<Class<?>> passTypes;
+        private final Finder<Class<?>> failTypes;
         private final @Nullable Predicate<Class<?>> extraPredicate;
 
         private UnitPredicateImpl(UnitPredicateBuilder builder) {
-            this.passTypes = Finder.newSetFinder(
-                    c->
-                    ArrayKit.toArray(builder.passTypes, Class.class));
+            Class<?>[] passTypesClasses = ArrayKit.toArray(builder.passTypes, Class.class);
+            Class<?>[] failTypesClasses = ArrayKit.toArray(builder.failTypes, Class.class);
+            this.passTypes = Finder.newMapFinder(passTypesClasses, );
             this.failTypes = Finder.newSetFinder(ArrayKit.toArray(builder.failTypes, Class.class));
             this.extraPredicate = builder.extraPredicate;
         }
