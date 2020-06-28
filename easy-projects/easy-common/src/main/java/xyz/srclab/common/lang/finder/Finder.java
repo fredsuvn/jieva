@@ -2,30 +2,43 @@ package xyz.srclab.common.lang.finder;
 
 import xyz.srclab.annotation.Nullable;
 
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 
-public interface Finder<K, V> {
+public interface Finder<T> {
 
     @SafeVarargs
-    static <E> Finder<E, E> newSetFinder(E... table) {
-        return FinderSupport.newSetFinder(table);
+    static <T> Finder<T> newSimpleFinder(T... table) {
+        return FinderSupport.newSimpleFinder(table);
     }
 
-    @SafeVarargs
-    static <E> Finder<E, E> newSetFinder(Predicate<? super E> predicate, E... table) {
-        return FinderSupport.newSetFinder(predicate, table);
+    static <T> Finder<T> newSimpleFinder(Iterable<? extends T> table) {
+        return FinderSupport.newSimpleFinder(table);
     }
 
-    @SafeVarargs
-    static <K, V, E> Finder<K, V> newMapFinder(E... table) {
+    static <T> Finder<T> newPredicateFinder(T[] table, BiPredicate<Object, ? super T> predicate) {
+        return FinderSupport.newPredicateFinder(table, predicate);
+    }
+
+    static <T> Finder<T> newPredicateFinder(Iterable<? extends T> table, BiPredicate<Object, ? super T> predicate) {
+        return FinderSupport.newPredicateFinder(table, predicate);
+    }
+
+    static <T> Finder<T> newMapFinder(Object... table) {
         return FinderSupport.newMapFinder(table);
     }
 
-    @SafeVarargs
-    static <K, V, E> Finder<K, V> newMapFinder(Predicate<? super K> predicate, E... table) {
-        return FinderSupport.newMapFinder(predicate, table);
+    static <T> Finder<T> newMapFinder(Iterable<?> table) {
+        return FinderSupport.newMapFinder(table);
+    }
+
+    static <K, V> Finder<V> newPredicateMapFinder(Object[] table, BiPredicate<Object, ? super K> predicate) {
+        return FinderSupport.newPredicateMapFinder(table, predicate);
+    }
+
+    static <K, V> Finder<V> newPredicateMapFinder(Iterable<?> table, BiPredicate<Object, ? super K> predicate) {
+        return FinderSupport.newPredicateMapFinder(table, predicate);
     }
 
     @Nullable
-    V get(K key);
+    T find(Object key);
 }
