@@ -12,7 +12,7 @@ public class Cast {
     }
 
     @Nullable
-    public static <T, R> R nullable(@Nullable T any) throws ClassCastException {
+    public static <T, R> R asNullable(@Nullable T any) throws ClassCastException {
         return any == null ? null : as(any);
     }
 }

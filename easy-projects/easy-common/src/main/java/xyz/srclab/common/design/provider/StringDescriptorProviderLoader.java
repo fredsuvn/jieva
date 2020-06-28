@@ -2,7 +2,7 @@ package xyz.srclab.common.design.provider;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
@@ -107,7 +107,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
 
     private ProviderCandidate parseCandidate(StringRef candidateRef) {
         int conditionBegin = candidateRef.indexOf('(');
-        Checker.checkArguments(conditionBegin < 0 ||
+        Check.checkArguments(conditionBegin < 0 ||
                         (conditionBegin > 0
                                 && conditionBegin < candidateRef.length() - 2
                                 && candidateRef.charAt(candidateRef.length() - 1) == ')'),
@@ -145,7 +145,7 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
 
     private Pair<@Nullable Condition, @Nullable String> parseConditionPair(StringRef conditionRef) {
         int conditionValueIndicator = conditionRef.indexOf(':');
-        Checker.checkArguments(
+        Check.checkArguments(
                 conditionValueIndicator > 1 && conditionValueIndicator < conditionRef.length() - 1,
                 () -> PARSE_ERROR + conditionRef
         );

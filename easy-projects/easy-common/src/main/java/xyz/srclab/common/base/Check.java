@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 /**
  * @author sunqian
  */
-public class Checker {
+public class Check {
 
     public static void checkArguments(boolean expression) {
         if (!expression) {
@@ -110,16 +110,17 @@ public class Checker {
         }
     }
 
-    public static void checkBounds(int length, int start, int end) {
+    public static void checkIndexRange(int start, int end, int length) {
         if (start > end) {
             throw new IllegalArgumentException(
-                    "Bounds setting error: start > end [start : " + start + ", end: " + end + "]");
+                    "Index range error: start > end [start : " + start + ", end: " + end + "]");
         }
         if (start < 0) {
-            throw new IndexOutOfBoundsException("start < 0: " + start);
+            throw new IndexOutOfBoundsException("Index range error: start < 0 [start: " + start + "]");
         }
         if (end > length) {
-            throw new IndexOutOfBoundsException("end > length [end: " + end + ", length: " + length + "]");
+            throw new IndexOutOfBoundsException(
+                    "Index range error: end > length [end: " + end + ", length: " + length + "]");
         }
     }
 }

@@ -83,7 +83,7 @@ public interface Cache<K, V> {
         if (value == defaultValue) {
             return defaultFunction.apply(key);
         }
-        return Cast.nullable(value);
+        return Cast.asNullable(value);
     }
 
     @Immutable
@@ -94,7 +94,7 @@ public interface Cache<K, V> {
         for (K key : keys) {
             @Nullable Object value = _this.getOrDefault(key, defaultValue);
             if (value != defaultValue) {
-                result.put(key, Cast.nullable(value));
+                result.put(key, Cast.asNullable(value));
             }
         }
         return MapKit.immutable(result);

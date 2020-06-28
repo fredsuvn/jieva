@@ -2,7 +2,7 @@ package xyz.srclab.common.bean;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.FieldKit;
@@ -137,7 +137,7 @@ final class BeanProperty0 {
             this.writeMethod = writeMethod;
 
             if (readMethod == null) {
-                Checker.checkState(writeMethod != null, "both read and write method are null");
+                Check.checkState(writeMethod != null, "both read and write method are null");
                 this.type = writeMethod.getParameterTypes()[0];
                 this.genericType = writeMethod.getGenericParameterTypes()[0];
             } else {

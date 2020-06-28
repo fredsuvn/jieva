@@ -1,18 +1,18 @@
 package test.xyz.srclab.common.base
 
 import org.testng.annotations.Test
-import xyz.srclab.common.base.Checker
+import xyz.srclab.common.base.Check
 import xyz.srclab.test.doExpectThrowable
 
 /**
  * @author sunqian
  */
-object CheckerTest {
+object CheckTest {
 
     @Test
     fun testCheckIndexFromTo() {
         doExpectThrowable(IndexOutOfBoundsException::class.java) {
-            Checker.checkBounds(0, 1, 2)
+            Check.checkIndexRange(1, 2, 0)
         }
     }
 }

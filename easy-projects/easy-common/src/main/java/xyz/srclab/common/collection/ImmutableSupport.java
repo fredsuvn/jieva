@@ -95,7 +95,7 @@ final class ImmutableSupport {
         @Nullable
         @Override
         public E get(int index) {
-            return Cast.nullable(elementData[index]);
+            return Cast.asNullable(elementData[index]);
         }
 
         @Override

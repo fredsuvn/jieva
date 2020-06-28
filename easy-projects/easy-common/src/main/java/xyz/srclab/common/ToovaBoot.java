@@ -3,7 +3,7 @@ package xyz.srclab.common;
 import org.yaml.snakeyaml.Yaml;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.design.provider.ProviderLoader;
@@ -108,7 +108,7 @@ public class ToovaBoot {
     public static <T> Map<String, T> getProviders(String interfaceName) {
         Map<String, ?> result = providerMap.computeIfAbsent(interfaceName, iName -> {
             @Nullable String providerDescriptor = getProviderProperties().get(iName);
-            Checker.checkArguments(
+            Check.checkArguments(
                     providerDescriptor != null, "Cannot find provider for " + interfaceName);
             return ProviderLoader.newStringDescriptorLoader(providerDescriptor).load();
         });

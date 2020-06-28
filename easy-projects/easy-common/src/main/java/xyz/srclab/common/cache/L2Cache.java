@@ -30,7 +30,7 @@ final class L2Cache<K, V> implements Cache<K, V> {
             if (value == defaultValue) {
                 return null;
             }
-            @Nullable V v = Cast.nullable(value);
+            @Nullable V v = Cast.asNullable(value);
             l2.put(k, v);
             return v;
         });
@@ -54,7 +54,7 @@ final class L2Cache<K, V> implements Cache<K, V> {
             if (value == defaultValue) {
                 return defaultValue;
             }
-            @Nullable V v = Cast.nullable(value);
+            @Nullable V v = Cast.asNullable(value);
             l2.put(k, v);
             return v;
         });

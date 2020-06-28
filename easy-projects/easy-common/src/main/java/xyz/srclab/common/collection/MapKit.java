@@ -126,7 +126,7 @@ public class MapKit {
             K key = Cast.as(elements[i]);
             i++;
             if (i < elements.length) {
-                V value = Cast.nullable(elements[i]);
+                V value = Cast.asNullable(elements[i]);
                 result.put(key, value);
             } else {
                 result.put(key, null);

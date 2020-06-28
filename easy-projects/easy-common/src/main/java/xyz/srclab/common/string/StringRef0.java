@@ -1,6 +1,6 @@
 package xyz.srclab.common.string;
 
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 
 import java.util.function.IntPredicate;
 
@@ -10,7 +10,7 @@ import java.util.function.IntPredicate;
 final class StringRef0 {
 
     static <T extends CharSequence> StringRef<T> newStringRef(T origin, int start, int end) {
-        Checker.checkBounds(origin.length(), start, end);
+        Check.checkIndexRange(start, end, origin.length());
         return new StringRefImpl<>(origin, start, end);
     }
 
@@ -129,7 +129,7 @@ final class StringRef0 {
 
         @Override
         public StringRef<T> subSequence(int start, int end) {
-            Checker.checkBounds(length(), start, end);
+            Check.checkIndexRange(start, end, length());
             int offset = this.start + start;
             int length = end - start;
             return new StringRefImpl<>(origin, offset, offset + length);

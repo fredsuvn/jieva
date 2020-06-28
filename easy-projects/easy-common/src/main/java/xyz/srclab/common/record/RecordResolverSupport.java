@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.Out;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.ClassKit;
@@ -88,7 +88,7 @@ final class RecordResolverSupport {
             this.writeMethod = writeMethod;
 
             if (readMethod == null) {
-                Checker.checkState(writeMethod != null, "Both read and write method are null");
+                Check.checkState(writeMethod != null, "Both read and write method are null");
                 Type type = ClassKit.getActualType(
                         writeMethod.getGenericParameterTypes()[0], owner, writeMethod.getDeclaringClass());
                 this.type = TypeKit.getRawType(type);

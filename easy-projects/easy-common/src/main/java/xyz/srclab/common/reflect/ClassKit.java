@@ -3,7 +3,7 @@ package xyz.srclab.common.reflect;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.MapKit;
@@ -24,25 +24,25 @@ public class ClassKit {
 
     public static <T> T newInstance(String className) {
         @Nullable Class<?> cls = Loader.loadClass(className);
-        Checker.checkArguments(cls != null, "Class not found: " + className);
+        Check.checkArguments(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }
 
     public static <T> T newInstance(String className, ClassLoader classLoader) {
         @Nullable Class<?> cls = Loader.loadClass(className, classLoader);
-        Checker.checkArguments(cls != null, "Class not found: " + className);
+        Check.checkArguments(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }
 
     public static <T> T newInstance(Class<?> cls) {
         @Nullable Constructor<?> constructor = ConstructorKit.getConstructor(cls);
-        Checker.checkArguments(constructor != null, "Constructor not found: " + cls);
+        Check.checkArguments(constructor != null, "Constructor not found: " + cls);
         return Cast.as(ConstructorInvoker.of(constructor).invoke());
     }
 
     public static <T> T newInstance(Class<?> cls, Class<?>[] parameterTypes, Object[] arguments) {
         @Nullable Constructor<?> constructor = ConstructorKit.getConstructor(cls, parameterTypes);
-        Checker.checkArguments(constructor != null, "Constructor not found: " + cls);
+        Check.checkArguments(constructor != null, "Constructor not found: " + cls);
         return Cast.as(ConstructorInvoker.of(constructor).invoke(arguments));
     }
 

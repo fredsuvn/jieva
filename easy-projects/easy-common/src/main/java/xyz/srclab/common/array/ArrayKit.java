@@ -5,7 +5,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.OutReturn;
 import xyz.srclab.common.base.Cast;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.lang.finder.Finder;
@@ -257,7 +257,7 @@ public class ArrayKit {
     }
 
     public static <T> T[] buildArray(@OutReturn T[] array, int from, int to, ObjectSupplier<T> supplier) {
-        Checker.checkBounds(array.length, from, to);
+        Check.checkIndexRange(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -265,7 +265,7 @@ public class ArrayKit {
     }
 
     public static boolean[] buildArray(@OutReturn boolean[] array, int from, int to, BooleanSupplier supplier) {
-        Checker.checkBounds(array.length, from, to);
+        Check.checkIndexRange(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -273,7 +273,7 @@ public class ArrayKit {
     }
 
     public static byte[] buildArray(@OutReturn byte[] array, int from, int to, ByteSupplier supplier) {
-        Checker.checkBounds(array.length, from, to);
+        Check.checkIndexRange(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -281,7 +281,7 @@ public class ArrayKit {
     }
 
     public static short[] buildArray(@OutReturn short[] array, int from, int to, ShortSupplier supplier) {
-        Checker.checkBounds(array.length, from, to);
+        Check.checkIndexRange(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -289,7 +289,7 @@ public class ArrayKit {
     }
 
     public static char[] buildArray(@OutReturn char[] array, int from, int to, CharSupplier supplier) {
-        Checker.checkBounds(array.length, from, to);
+        Check.checkIndexRange(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -297,7 +297,7 @@ public class ArrayKit {
     }
 
     public static int[] buildArray(@OutReturn int[] array, int from, int to, IntSupplier supplier) {
-        Checker.checkBounds(array.length, from, to);
+        Check.checkIndexRange(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -305,7 +305,7 @@ public class ArrayKit {
     }
 
     public static long[] buildArray(@OutReturn long[] array, int from, int to, LongSupplier supplier) {
-        Checker.checkBounds(array.length, from, to);
+        Check.checkIndexRange(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -313,7 +313,7 @@ public class ArrayKit {
     }
 
     public static float[] buildArray(@OutReturn float[] array, int from, int to, FloatSupplier supplier) {
-        Checker.checkBounds(array.length, from, to);
+        Check.checkIndexRange(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -321,7 +321,7 @@ public class ArrayKit {
     }
 
     public static double[] buildArray(@OutReturn double[] array, int from, int to, DoubleSupplier supplier) {
-        Checker.checkBounds(array.length, from, to);
+        Check.checkIndexRange(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }

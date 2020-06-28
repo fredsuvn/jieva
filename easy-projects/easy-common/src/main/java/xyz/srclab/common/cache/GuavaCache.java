@@ -3,7 +3,7 @@ package xyz.srclab.common.cache;
 import com.google.common.cache.RemovalCause;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
 import xyz.srclab.common.exception.ExceptionWrapper;
@@ -158,6 +158,6 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     }
 
     private void checkEntry(boolean expression, K key) {
-        Checker.checkState(expression, "Unexpected value of key: " + key);
+        Check.checkState(expression, "Unexpected value of key: " + key);
     }
 }

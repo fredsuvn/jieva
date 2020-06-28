@@ -2,7 +2,7 @@ package xyz.srclab.common.design.provider;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.reflect.ClassKit;
 
@@ -17,7 +17,7 @@ public interface ProviderManager<T> {
 
     default void registerProvider(String className, boolean isDefault) {
         @Nullable Class<T> providerClass = Loader.loadClass(className);
-        Checker.checkArguments(providerClass != null, "Can not find class: " + className);
+        Check.checkArguments(providerClass != null, "Can not find class: " + className);
         T provider = ClassKit.newInstance(providerClass);
         registerProvider(className, provider, isDefault);
     }

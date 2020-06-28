@@ -2,7 +2,7 @@ package xyz.srclab.common.invoke;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.reflect.ConstructorKit;
 
 import java.lang.reflect.Constructor;
@@ -16,7 +16,7 @@ public interface ConstructorInvoker<T> {
 
     static <T> ConstructorInvoker<T> of(Class<T> type, Class<?>... parameterTypes) {
         @Nullable Constructor<T> constructor = ConstructorKit.getConstructor(type, parameterTypes);
-        Checker.checkState(constructor != null, () ->
+        Check.checkState(constructor != null, () ->
                 "Constructor not found: " + Describer.describeConstructor(type, parameterTypes));
         return of(constructor);
     }

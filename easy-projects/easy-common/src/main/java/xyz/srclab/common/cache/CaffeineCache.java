@@ -3,7 +3,7 @@ package xyz.srclab.common.cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Null;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
 
@@ -144,6 +144,6 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
     }
 
     private void checkEntry(boolean expression, K key) {
-        Checker.checkState(expression, "Unexpected value of key: " + key);
+        Check.checkState(expression, "Unexpected value of key: " + key);
     }
 }

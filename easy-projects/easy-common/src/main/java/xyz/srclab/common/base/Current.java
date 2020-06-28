@@ -5,8 +5,10 @@ import xyz.srclab.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author sunqian
@@ -15,7 +17,7 @@ public class Current {
 
     @Nullable
     public static <T> T get(Object key) {
-        return Cast.nullable(ThreadLocalHolder.get(key));
+        return Cast.asNullable(ThreadLocalHolder.get(key));
     }
 
     public static <T> T getNonNull(Object key) {
@@ -24,6 +26,14 @@ public class Current {
 
     public static void set(Object key, @Nullable Object value) {
         ThreadLocalHolder.set(key, value);
+    }
+
+    public static <T> Future<T> run(Runnable task) {
+        return Cast.as(executor().submit(task));
+    }
+
+    public static <T> Future<T> run(Callable<T> task) {
+        return executor().submit(task);
     }
 
     public static long mills() {

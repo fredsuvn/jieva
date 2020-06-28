@@ -3,7 +3,7 @@ package xyz.srclab.common.record;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
-import xyz.srclab.common.base.Checker;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.design.builder.HandlersBuilder;
 import xyz.srclab.common.reflect.FieldKit;
@@ -30,7 +30,7 @@ public class RecordResolverBuilder extends
 
     @Override
     protected RecordResolver buildNew() {
-        Checker.checkState(!handlers.isEmpty(), "There is no handler");
+        Check.checkState(!handlers.isEmpty(), "There is no handler");
         return new RecorderImpl(handlers);
     }
 
