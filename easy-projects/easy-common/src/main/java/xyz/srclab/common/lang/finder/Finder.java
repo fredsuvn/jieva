@@ -23,19 +23,20 @@ public interface Finder<T> {
         return FinderSupport.newPredicateFinder(table, predicate);
     }
 
-    static <T> Finder<T> newMapFinder(Object... table) {
+    @SafeVarargs
+    static <T, E> Finder<T> newMapFinder(E... table) {
         return FinderSupport.newMapFinder(table);
     }
 
-    static <T> Finder<T> newMapFinder(Iterable<?> table) {
+    static <T, E> Finder<T> newMapFinder(Iterable<? extends E> table) {
         return FinderSupport.newMapFinder(table);
     }
 
-    static <K, V> Finder<V> newPredicateMapFinder(Object[] table, BiPredicate<Object, ? super K> predicate) {
+    static <K, V, E> Finder<V> newPredicateMapFinder(E[] table, BiPredicate<Object, ? super K> predicate) {
         return FinderSupport.newPredicateMapFinder(table, predicate);
     }
 
-    static <K, V> Finder<V> newPredicateMapFinder(Iterable<?> table, BiPredicate<Object, ? super K> predicate) {
+    static <K, V, E> Finder<V> newPredicateMapFinder(Iterable<? extends E> table, BiPredicate<Object, ? super K> predicate) {
         return FinderSupport.newPredicateMapFinder(table, predicate);
     }
 

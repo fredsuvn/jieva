@@ -28,19 +28,20 @@ final class FinderSupport {
         return new PredicateFinder<>(table, predicate);
     }
 
-    static <T> Finder<T> newMapFinder(Object... table) {
+    @SafeVarargs
+    static <T, E> Finder<T> newMapFinder(E... table) {
         return new MapFinder<>(table);
     }
 
-    static <T> Finder<T> newMapFinder(Iterable<?> table) {
+    static <T, E> Finder<T> newMapFinder(Iterable<? extends E> table) {
         return new MapFinder<>(table);
     }
 
-    static <K, V> Finder<V> newPredicateMapFinder(Object[] table, BiPredicate<Object, ? super K> predicate) {
+    static <K, V, E> Finder<V> newPredicateMapFinder(E[] table, BiPredicate<Object, ? super K> predicate) {
         return new PredicateMapFinder<>(table, predicate);
     }
 
-    static <K, V> Finder<V> newPredicateMapFinder(Iterable<?> table, BiPredicate<Object, ? super K> predicate) {
+    static <K, V, E> Finder<V> newPredicateMapFinder(Iterable<? extends E> table, BiPredicate<Object, ? super K> predicate) {
         return new PredicateMapFinder<>(table, predicate);
     }
 
@@ -88,15 +89,15 @@ final class FinderSupport {
         }
     }
 
-    private static final class MapFinder<T> implements Finder<T> {
+    private static final class MapFinder<T, E> implements Finder<T> {
 
         private final Map<Object, T> tableMap;
 
-        private MapFinder(Object[] table) {
+        private MapFinder(E[] table) {
             this.tableMap = MapKit.pairToMap(table);
         }
 
-        private MapFinder(Iterable<?> table) {
+        private MapFinder(Iterable<? extends E> table) {
             this.tableMap = MapKit.pairToMap(table);
         }
 
@@ -107,17 +108,17 @@ final class FinderSupport {
         }
     }
 
-    private static final class PredicateMapFinder<K, V> implements Finder<V> {
+    private static final class PredicateMapFinder<K, V, E> implements Finder<V> {
 
         private final Map<K, V> tableMap;
         private final BiPredicate<Object, ? super K> predicate;
 
-        private PredicateMapFinder(Object[] table, BiPredicate<Object, ? super K> predicate) {
+        private PredicateMapFinder(E[] table, BiPredicate<Object, ? super K> predicate) {
             this.tableMap = MapKit.pairToMap(table);
             this.predicate = predicate;
         }
 
-        private PredicateMapFinder(Iterable<?> table, BiPredicate<Object, ? super K> predicate) {
+        private PredicateMapFinder(Iterable<? extends E> table, BiPredicate<Object, ? super K> predicate) {
             this.tableMap = MapKit.pairToMap(table);
             this.predicate = predicate;
         }
