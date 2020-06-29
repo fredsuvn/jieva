@@ -9,6 +9,10 @@ import java.util.*;
  */
 public class Equals {
 
+    public static boolean equals(@Nullable Object a, @Nullable Object b) {
+        return Objects.equals(a, b);
+    }
+
     public static boolean deepEquals(@Nullable Object a, @Nullable Object b) {
         if (a == b) {
             return true;
