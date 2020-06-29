@@ -6,6 +6,8 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.OutReturn;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Check;
+import xyz.srclab.common.base.Equals;
+import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.lang.finder.Finder;
@@ -385,7 +387,7 @@ public class ArrayKit {
         // Key: component type, value: array type
         private static final Cache<Type, Type> cache = Cache.newL2();
 
-        private static final Finder<Type> finder = Finder.newMapFinder(ArrayTypeTable.TABLE);
+        private static final Finder<Type, Type> finder = Finder.newMapFinder(ArrayTypeTable.TABLE);
 
         public static Type find(Type componentType) {
             @Nullable Type arrayType = finder.find(componentType);
@@ -396,49 +398,45 @@ public class ArrayKit {
         }
 
         private static Type make(Type componentType) {
+
             if (componentType instanceof Class) {
                 return newArray((Class<?>) componentType, 0).getClass();
             }
-            return new GenericArrayTypeImpl(componentType);
-        }
 
-        private static final class GenericArrayTypeImpl implements GenericArrayType {
+            class GenericArrayTypeImpl implements GenericArrayType {
 
-            private final Type componentType;
-
-            private GenericArrayTypeImpl(Type componentType) {
-                this.componentType = componentType;
-            }
-
-            @Override
-            public Type getGenericComponentType() {
-                return componentType;
-            }
-
-            @Override
-            public String getTypeName() {
-                String typeName = componentType instanceof Class ?
-                        ((Class<?>) componentType).getName() : componentType.toString();
-                return typeName + "[]";
-            }
-
-            @Override
-            public boolean equals(Object object) {
-                if (!(object instanceof GenericArrayType)) {
-                    return false;
+                public Type getGenericComponentType() {
+                    return componentType;
                 }
-                return getGenericComponentType().equals(((GenericArrayType) object).getGenericComponentType());
+
+                public String toString() {
+                    Type componentType = this.getGenericComponentType();
+                    StringBuilder buffer = new StringBuilder();
+                    if (componentType instanceof Class) {
+                        buffer.append(((Class<?>) componentType).getName());
+                    } else {
+                        buffer.append(componentType.toString());
+                    }
+
+                    buffer.append("[]");
+                    return buffer.toString();
+                }
+
+                public boolean equals(Object any) {
+                    if (any instanceof GenericArrayType) {
+                        GenericArrayType that = (GenericArrayType) any;
+                        return Equals.equals(componentType, that.getGenericComponentType());
+                    } else {
+                        return false;
+                    }
+                }
+
+                public int hashCode() {
+                    return Hash.hashCode(componentType);
+                }
             }
 
-            @Override
-            public int hashCode() {
-                return componentType.hashCode();
-            }
-
-            @Override
-            public String toString() {
-                return getTypeName();
-            }
+            return new GenericArrayTypeImpl();
         }
 
         private static final class ArrayTypeTable {
