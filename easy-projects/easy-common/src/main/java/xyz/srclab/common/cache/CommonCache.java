@@ -1,17 +1,26 @@
 package xyz.srclab.common.cache;
 
+import com.google.common.collect.MapMaker;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 
 import java.time.Duration;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 
-final class L2Cache<K, V> implements Cache<K, V> {
+final class CommonCache<K, V> implements Cache<K, V> {
 
     private final Cache<K, V> l1;
     private final Cache<K, V> l2;
 
-    L2Cache(Cache<K, V> l1, Cache<K, V> l2) {
+    CommonCache(int concurrentLevel) {
+        Cache<K, V> l1 = Cache.newMapCache(
+                new MapMaker()
+                        .concurrencyLevel(concurrentLevel)
+                        .weakKeys()
+                        .makeMap()
+        );
+        Cache<K, V> l2 = Cache.toThreadLocal(Cache.newMapCache(new WeakHashMap<>()));
         this.l1 = l1;
         this.l2 = l2;
     }
@@ -25,7 +34,7 @@ final class L2Cache<K, V> implements Cache<K, V> {
     public V get(K key) {
         return l2.getOrDefault(key, k -> {
             Cache<K, Object> _l1 = Cast.as(l1);
-            Object defaultValue = Cache0.DEFAULT_VALUE;
+            Object defaultValue = CacheSupport.DEFAULT_VALUE;
             @Nullable Object value = _l1.getOrDefault(k, defaultValue);
             if (value == defaultValue) {
                 return null;

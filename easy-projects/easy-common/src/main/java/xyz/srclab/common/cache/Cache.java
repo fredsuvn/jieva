@@ -1,38 +1,29 @@
 package xyz.srclab.common.cache;
 
-import com.google.common.collect.MapMaker;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Defaults;
+import xyz.srclab.common.base.Require;
 import xyz.srclab.common.collection.MapKit;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
 import java.util.function.Function;
 
 public interface Cache<K, V> {
 
-    static <K, V> Cache<K, V> newMapped(Map<K, V> map) {
+    static <K, V> Cache<K, V> newCommonCache() {
+        return newCommonCache(Defaults.CONCURRENCY_LEVEL);
+    }
+
+    static <K, V> Cache<K, V> newCommonCache(int concurrentLevel) {
+        return new CommonCache<>(concurrentLevel);
+    }
+
+    static <K, V> Cache<K, V> newMapCache(Map<K, V> map) {
         return new MapCache<>(map);
-    }
-
-    static <K, V> Cache<K, V> newL2() {
-        return newL2(Defaults.CONCURRENCY_LEVEL);
-    }
-
-    static <K, V> Cache<K, V> newL2(int concurrentLevel) {
-        Cache<K, V> l1 = newMapped(
-                new MapMaker()
-                        .concurrencyLevel(concurrentLevel)
-                        .weakKeys()
-                        .makeMap()
-        );
-        Cache<K, V> l2 = toThreadLocal(newMapped(new WeakHashMap<>()));
-        return new L2Cache<>(l1, l2);
     }
 
     static <K, V> Cache<K, V> toThreadLocal(Cache<K, V> cache) {
@@ -78,7 +69,7 @@ public interface Cache<K, V> {
     @Nullable
     default V getOrDefault(K key, Function<? super K, @Nullable ? extends V> defaultFunction) {
         Cache<K, Object> _this = Cast.as(this);
-        Object defaultValue = Cache0.DEFAULT_VALUE;
+        Object defaultValue = CacheSupport.DEFAULT_VALUE;
         @Nullable Object value = _this.getOrDefault(key, defaultValue);
         if (value == defaultValue) {
             return defaultFunction.apply(key);
@@ -90,7 +81,7 @@ public interface Cache<K, V> {
     default Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
         Map<K, V> result = new LinkedHashMap<>();
         Cache<K, Object> _this = Cast.as(this);
-        Object defaultValue = Cache0.DEFAULT_VALUE;
+        Object defaultValue = CacheSupport.DEFAULT_VALUE;
         for (K key : keys) {
             @Nullable Object value = _this.getOrDefault(key, defaultValue);
             if (value != defaultValue) {
@@ -121,15 +112,15 @@ public interface Cache<K, V> {
     }
 
     default V getNonNull(K key) throws NullPointerException {
-        return Objects.requireNonNull(get(key));
+        return Require.nonNull(get(key));
     }
 
     default V getNonNull(K key, Function<? super K, @Nullable ? extends V> ifAbsent) throws NullPointerException {
-        return Objects.requireNonNull(get(key, ifAbsent));
+        return Require.nonNull(get(key, ifAbsent));
     }
 
     default V loadNonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NullPointerException {
-        return Objects.requireNonNull(load(key, loader));
+        return Require.nonNull(load(key, loader));
     }
 
     void put(K key, @Nullable V value);

@@ -35,7 +35,7 @@ public class BeanResolverBuilder extends HandlersBuilder<BeanResolver, BeanResol
     private static final class CachedBeanResolver implements BeanResolver {
 
         private final BeanResolver resolver;
-        private final Cache<Class<?>, BeanClass> cache = Cache.newL2();
+        private final Cache<Class<?>, BeanClass> cache = Cache.newCommonCache();
 
         private CachedBeanResolver(BeanResolver resolver) {
             this.resolver = resolver;

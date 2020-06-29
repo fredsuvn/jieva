@@ -385,7 +385,7 @@ public class ArrayKit {
     private static final class ArrayTypeFinder {
 
         // Key: component type, value: array type
-        private static final Cache<Type, Type> cache = Cache.newL2();
+        private static final Cache<Type, Type> cache = Cache.newCommonCache();
 
         private static final Finder<Type, Type> finder = Finder.newMapFinder(ArrayTypeTable.TABLE);
 

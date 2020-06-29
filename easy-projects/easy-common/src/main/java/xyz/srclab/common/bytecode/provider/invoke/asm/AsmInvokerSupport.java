@@ -11,13 +11,13 @@ import java.lang.reflect.Method;
 final class AsmInvokerSupport {
 
     private static final Cache<Constructor<?>, ConstructorInvoker<?>> constructorInvokerCache =
-            Cache.newGcThreadLocalL2(Cache.newMapped());
+            Cache.newGcThreadLocalL2(Cache.newMapCache());
 
     private static final Cache<Method, MethodInvoker> methodInvokerCache =
-            Cache.newGcThreadLocalL2(Cache.newMapped());
+            Cache.newGcThreadLocalL2(Cache.newMapCache());
 
     private static final Cache<Method, FunctionInvoker> functionInvokerCache =
-            Cache.newGcThreadLocalL2(Cache.newMapped());
+            Cache.newGcThreadLocalL2(Cache.newMapCache());
 
     public static <T> ConstructorInvoker<T> getConstructorInvoker(
             Constructor<T> constructor, AsmInvokerGenerator generator) {

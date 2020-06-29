@@ -83,7 +83,7 @@ public class ClassKit {
 
     private static final class ActualTypeFinder {
 
-        private static final Cache<Key, Type> cache = Cache.newL2();
+        private static final Cache<Key, Type> cache = Cache.newCommonCache();
 
         public static Type find(Type type, Class<?> userClass, Class<?> declaringClass) {
             return cache.getNonNull(

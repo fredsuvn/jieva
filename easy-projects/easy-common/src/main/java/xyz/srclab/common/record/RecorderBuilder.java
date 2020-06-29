@@ -57,7 +57,7 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
 
     private static final class CachedRecorderImpl implements Recorder {
 
-        private final Cache<Class<?>, Map<String, RecordEntry>> cache = Cache.newL2();
+        private final Cache<Class<?>, Map<String, RecordEntry>> cache = Cache.newCommonCache();
 
         private final RecordResolver resolver;
 

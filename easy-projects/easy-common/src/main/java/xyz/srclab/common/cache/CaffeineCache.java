@@ -69,15 +69,6 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
         }
     }
 
-    private Object mask(@Nullable V value) {
-        return value == null ? Null.asObject() : value;
-    }
-
-    @Nullable
-    private V unmask(Object value) {
-        return Null.isNull(value) ? null : Cast.as(value);
-    }
-
     @Override
     public boolean contains(K key) {
         return caffeine.getIfPresent(key) != null;
@@ -141,6 +132,15 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
     @Override
     public void invalidateAll() {
         caffeine.invalidateAll();
+    }
+
+    private Object mask(@Nullable V value) {
+        return value == null ? Null.asObject() : value;
+    }
+
+    @Nullable
+    private V unmask(Object value) {
+        return Null.isNull(value) ? null : Cast.as(value);
     }
 
     private void checkEntry(boolean expression, K key) {
