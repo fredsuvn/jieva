@@ -1,9 +1,10 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.lang.finder.Finder;
 
 import java.lang.reflect.Type;
 import java.time.*;
@@ -11,126 +12,164 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * @author sunqian
  */
 public class DateConvertHandler implements ConvertHandler {
 
-    @Override
-    public @Nullable Object convert(Object from, Type to, Converter converter) {
-        @Nullable Function<Object, Object> convertFunction = ConvertFunctionFinder.find(to);
-        if (convertFunction == null) {
-            return null;
-        }
-        return convertFunction.apply(from);
+    private final Finder<Type, BiFunction<Object, DateTimeFormatter, Object>> finder =
+            Finder.newMapFinder(ConvertFunctions.TABLE);
+
+    private final DateTimeFormatter dateTimeFormatter;
+
+    public DateConvertHandler() {
+        this(DateTimeFormatter.ISO_DATE_TIME);
     }
 
-    private static final class ConvertFunctionFinder {
+    public DateConvertHandler(DateTimeFormatter dateTimeFormatter) {
+        this.dateTimeFormatter = dateTimeFormatter;
+    }
 
-        private static final Map<Type, Function<Object, Object>> table = MapKit.pairToMap(ConvertFunctionTable.TABLE);
+    public DateConvertHandler(String pattern) {
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+    }
 
-        @Nullable
-        public static Function<Object, Object> find(Type type) {
-            return table.get(type);
+    @Override
+    public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
+        return convert(from, (Type) to, converter);
+    }
+
+    @Override
+    public @Nullable Object convert(Object from, Type to, Converter converter) {
+        if (Cast.canCast(to, CharSequence.class)) {
+            return toString(from, dateTimeFormatter);
+        }
+        @Nullable BiFunction<Object, DateTimeFormatter, Object> function = finder.find(to);
+        if (function == null) {
+            return null;
+        }
+        return function.apply(from, dateTimeFormatter);
+    }
+
+    @Nullable
+    private static String toString(Object from, DateTimeFormatter dateTimeFormatter) {
+        if (from instanceof TemporalAccessor) {
+            return dateTimeFormatter.format((TemporalAccessor) from);
+        }
+        if (from instanceof Date) {
+            return dateTimeFormatter.format(((Date) from).toInstant());
+        }
+        return null;
+    }
+
+    private static final class ConvertFunctions {
+
+        private static final BiFunction<Object, DateTimeFormatter, Object> TO_DATE =
+                ConvertFunctions::toDate;
+        private static final BiFunction<Object, DateTimeFormatter, Object> TO_INSTANT =
+                ConvertFunctions::toInstant;
+        private static final BiFunction<Object, DateTimeFormatter, Object> TO_LOCAL_DATE_TIME =
+                ConvertFunctions::toLocalDateTime;
+        private static final BiFunction<Object, DateTimeFormatter, Object> TO_ZONED_DATE_TIME =
+                ConvertFunctions::toZonedDateTime;
+        private static final BiFunction<Object, DateTimeFormatter, Object> TO_OFFSET_DATE_TIME =
+                ConvertFunctions::toOffsetDateTime;
+        private static final BiFunction<Object, DateTimeFormatter, Object> TO_DURATION =
+                ConvertFunctions::toDuration;
+
+        private static final Object[] TABLE = {
+                Date.class, TO_DATE,
+                Instant.class, TO_INSTANT,
+                LocalDateTime.class, TO_LOCAL_DATE_TIME,
+                ZonedDateTime.class, TO_ZONED_DATE_TIME,
+                OffsetDateTime.class, TO_OFFSET_DATE_TIME,
+                Duration.class, TO_DURATION,
+
+        };
+
+        private static Date toDate(Object from, DateTimeFormatter dateTimeFormatter) {
+            if (from instanceof Number) {
+                return new Date(((Number) from).longValue());
+            }
+            if (from instanceof Instant) {
+                return Date.from((Instant) from);
+            }
+            if (from instanceof TemporalAccessor) {
+                TemporalAccessor temporalAccessor = toInstantTemporalAccessor((TemporalAccessor) from);
+                return Date.from(Instant.from(temporalAccessor));
+            }
+            return Date.from(toZonedDateTime(from, dateTimeFormatter).toInstant());
         }
 
-        private static final class ConvertFunctionTable {
-
-            private static final Function<Object, Object> TO_BYTE = ConvertFunctionTable::toByte;
-            private static final Function<Object, Object> TO_SHORT = ConvertFunctionTable::toShort;
-            private static final Function<Object, Object> TO_CHAR = ConvertFunctionTable::toChar;
-            private static final Function<Object, Object> TO_INT = ConvertFunctionTable::toInt;
-            private static final Function<Object, Object> TO_LONG = ConvertFunctionTable::toLong;
-            private static final Function<Object, Object> TO_FLOAT = ConvertFunctionTable::toFloat;
-            private static final Function<Object, Object> TO_DOUBLE = ConvertFunctionTable::toDouble;
-
-            private static final Object[] TABLE = {
-                    byte.class, TO_BYTE,
-                    short.class, TO_SHORT,
-                    char.class, TO_CHAR,
-                    int.class, TO_INT,
-                    long.class, TO_LONG,
-                    float.class, TO_FLOAT,
-                    double.class, TO_DOUBLE,
-                    Byte.class, TO_BYTE,
-                    Short.class, TO_SHORT,
-                    Character.class, TO_CHAR,
-                    Integer.class, TO_INT,
-                    Long.class, TO_LONG,
-                    Float.class, TO_FLOAT,
-                    Double.class, TO_DOUBLE,
-            };
-
-            private static Date toDate(Object from) {
-                if (from instanceof Number) {
-                    return new Date(((Number) from).longValue());
-                }
-                if (from instanceof Instant) {
-                    return Date.from((Instant) from);
-                }
-                if (from instanceof TemporalAccessor) {
-                    TemporalAccessor temporalAccessor = toOffsetTemporalAccessor((TemporalAccessor) from);
-                    return Date.from(Instant.from(temporalAccessor));
-                }
-                return Date.from(toZonedDateTime(from).toInstant());
+        private static Instant toInstant(Object from, DateTimeFormatter dateTimeFormatter) {
+            if (from instanceof Number) {
+                return Instant.ofEpochMilli(((Number) from).longValue());
             }
-
-            private static Instant toInstant(Object from) {
-                if (from instanceof Number) {
-                    return Instant.ofEpochMilli(((Number) from).longValue());
-                }
-                if (from instanceof TemporalAccessor) {
-                    TemporalAccessor temporalAccessor = toOffsetTemporalAccessor((TemporalAccessor) from);
-                    return Instant.from(temporalAccessor);
-                }
-                return toZonedDateTimeWithoutTemporal(from).toInstant();
+            if (from instanceof TemporalAccessor) {
+                TemporalAccessor temporalAccessor = toInstantTemporalAccessor((TemporalAccessor) from);
+                return Instant.from(temporalAccessor);
             }
+            return toZonedDateTimeWithoutTemporal(from, dateTimeFormatter).toInstant();
+        }
 
-            private static ZonedDateTime toZonedDateTime(Object from) {
-                if (from instanceof TemporalAccessor) {
-                    TemporalAccessor temporalAccessor = toOffsetTemporalAccessor((TemporalAccessor) from);
-                    return toZonedDateTimeWithTemporal(temporalAccessor);
-                }
-                return toZonedDateTimeWithoutTemporal(from);
-            }
-
-            private static ZonedDateTime toZonedDateTimeWithTemporal(TemporalAccessor temporalAccessor) {
-                return ZonedDateTime.from(temporalAccessor);
-            }
-
-            private static ZonedDateTime toZonedDateTimeWithoutTemporal(Object from) {
-                if (from instanceof Number) {
-                    return ZonedDateTime.ofInstant(Instant.ofEpochMilli((Long) from), ZoneId.systemDefault());
-                }
-                TemporalAccessor temporalAccessor = toOffsetTemporalAccessor(
-                        DateTimeFormatter.ISO_DATE_TIME.parse(from.toString()));
+        private static ZonedDateTime toZonedDateTime(Object from, DateTimeFormatter dateTimeFormatter) {
+            if (from instanceof TemporalAccessor) {
+                TemporalAccessor temporalAccessor = toOffsetTemporalAccessor((TemporalAccessor) from);
                 return toZonedDateTimeWithTemporal(temporalAccessor);
             }
+            return toZonedDateTimeWithoutTemporal(from, dateTimeFormatter);
+        }
 
-            private static LocalDateTime toLocalDateTime(Object from) {
-                if (from instanceof Number) {
-                    return LocalDateTime.ofInstant(Instant.ofEpochMilli((Long) from), ZoneId.systemDefault());
-                }
-                return LocalDateTime.parse(from.toString(), DateTimeFormatter.ISO_DATE_TIME);
+        private static LocalDateTime toLocalDateTime(Object from, DateTimeFormatter dateTimeFormatter) {
+            if (from instanceof Number) {
+                return LocalDateTime.ofInstant(Instant.ofEpochMilli((Long) from), ZoneId.systemDefault());
             }
+            return LocalDateTime.parse(from.toString(), dateTimeFormatter);
+        }
 
-            private static Duration toDuration(Object from) {
-                if (from instanceof Number) {
-                    return Duration.ofMillis(((Number) from).longValue());
-                }
-                return Duration.parse(from.toString());
+        private static OffsetDateTime toOffsetDateTime(Object from, DateTimeFormatter dateTimeFormatter) {
+            if (from instanceof Number) {
+                return OffsetDateTime.ofInstant(Instant.ofEpochMilli((Long) from), ZoneId.systemDefault());
             }
+            return OffsetDateTime.parse(from.toString(), dateTimeFormatter);
+        }
 
-            private static TemporalAccessor toOffsetTemporalAccessor(TemporalAccessor temporalAccessor) {
-                if (temporalAccessor.isSupported(ChronoField.OFFSET_SECONDS)) {
-                    return temporalAccessor;
-                }
-                LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
-                return localDateTime.atZone(ZoneId.systemDefault());
+        private static Duration toDuration(Object from, DateTimeFormatter dateTimeFormatter) {
+            if (from instanceof Number) {
+                return Duration.ofMillis(((Number) from).longValue());
             }
+            return Duration.parse(from.toString());
+        }
+
+        private static ZonedDateTime toZonedDateTimeWithTemporal(TemporalAccessor temporalAccessor) {
+            return ZonedDateTime.from(temporalAccessor);
+        }
+
+        private static ZonedDateTime toZonedDateTimeWithoutTemporal(Object from, DateTimeFormatter dateTimeFormatter) {
+            if (from instanceof Number) {
+                return ZonedDateTime.ofInstant(Instant.ofEpochMilli((Long) from), ZoneId.systemDefault());
+            }
+            TemporalAccessor temporalAccessor = toOffsetTemporalAccessor(dateTimeFormatter.parse(from.toString()));
+            return toZonedDateTimeWithTemporal(temporalAccessor);
+        }
+
+        private static TemporalAccessor toInstantTemporalAccessor(TemporalAccessor temporalAccessor) {
+            if (temporalAccessor.isSupported(ChronoField.INSTANT_SECONDS)
+                    && temporalAccessor.isSupported(ChronoField.NANO_OF_SECOND)) {
+                return temporalAccessor;
+            }
+            LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
+            return localDateTime.atZone(ZoneId.systemDefault());
+        }
+
+        private static TemporalAccessor toOffsetTemporalAccessor(TemporalAccessor temporalAccessor) {
+            if (temporalAccessor.isSupported(ChronoField.OFFSET_SECONDS)) {
+                return temporalAccessor;
+            }
+            LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
+            return localDateTime.atZone(ZoneId.systemDefault());
         }
     }
 }

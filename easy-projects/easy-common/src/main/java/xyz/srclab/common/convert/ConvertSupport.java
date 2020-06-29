@@ -1,7 +1,5 @@
 package xyz.srclab.common.convert;
 
-import xyz.srclab.common.convert.handlers.NumberConvertHandler;
-
 /**
  * @author sunqian
  */
@@ -14,9 +12,7 @@ final class ConvertSupport {
     private static final class ConverterHolder {
 
         public static final Converter INSTANCE = Converter.newBuilder()
-                .handlers(
-                        new NumberConvertHandler()
-                )
+                .handlers(ConvertHandler.defaultHandlers())
                 .build();
     }
 }
