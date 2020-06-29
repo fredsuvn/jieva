@@ -1,7 +1,6 @@
 package xyz.srclab.common.lang.finder;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
 
@@ -12,40 +11,42 @@ import java.util.function.BiPredicate;
 final class FinderSupport {
 
     @SafeVarargs
-    static <T> Finder<T> newSimpleFinder(T... table) {
+    static <T> Finder<T, T> newSimpleFinder(T... table) {
         return new SimpleFinder<>(table);
     }
 
-    static <T> Finder<T> newSimpleFinder(Iterable<? extends T> table) {
+    static <T> Finder<T, T> newSimpleFinder(Iterable<? extends T> table) {
         return new SimpleFinder<>(table);
     }
 
-    static <T> Finder<T> newPredicateFinder(T[] table, BiPredicate<Object, ? super T> predicate) {
+    static <T> Finder<T, T> newPredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
         return new PredicateFinder<>(table, predicate);
     }
 
-    static <T> Finder<T> newPredicateFinder(Iterable<? extends T> table, BiPredicate<Object, ? super T> predicate) {
+    static <T> Finder<T, T> newPredicateFinder(
+            Iterable<? extends T> table, BiPredicate<? super T, ? super T> predicate) {
         return new PredicateFinder<>(table, predicate);
     }
 
     @SafeVarargs
-    static <T, E> Finder<T> newMapFinder(E... table) {
+    static <K, V, E> Finder<K, V> newMapFinder(E... table) {
         return new MapFinder<>(table);
     }
 
-    static <T, E> Finder<T> newMapFinder(Iterable<? extends E> table) {
+    static <K, V, E> Finder<K, V> newMapFinder(Iterable<? extends E> table) {
         return new MapFinder<>(table);
     }
 
-    static <K, V, E> Finder<V> newPredicateMapFinder(E[] table, BiPredicate<Object, ? super K> predicate) {
+    static <K, V, E> Finder<K, V> newPredicateMapFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
         return new PredicateMapFinder<>(table, predicate);
     }
 
-    static <K, V, E> Finder<V> newPredicateMapFinder(Iterable<? extends E> table, BiPredicate<Object, ? super K> predicate) {
+    static <K, V, E> Finder<K, V> newPredicateMapFinder(
+            Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
         return new PredicateMapFinder<>(table, predicate);
     }
 
-    private static final class SimpleFinder<T> implements Finder<T> {
+    private static final class SimpleFinder<T> implements Finder<T, T> {
 
         private final Set<T> tableSet;
 
@@ -59,39 +60,39 @@ final class FinderSupport {
 
         @Nullable
         @Override
-        public T find(Object key) {
-            return tableSet.contains(key) ? Cast.as(key) : null;
+        public T find(T key) {
+            return tableSet.contains(key) ? key : null;
         }
     }
 
-    private static final class PredicateFinder<T> implements Finder<T> {
+    private static final class PredicateFinder<T> implements Finder<T, T> {
 
         private final Set<T> tableSet;
-        private final BiPredicate<Object, ? super T> predicate;
+        private final BiPredicate<? super T, ? super T> predicate;
 
-        private PredicateFinder(T[] table, BiPredicate<Object, ? super T> predicate) {
+        private PredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
             this.tableSet = SetKit.immutable(table);
             this.predicate = predicate;
         }
 
-        private PredicateFinder(Iterable<? extends T> table, BiPredicate<Object, ? super T> predicate) {
+        private PredicateFinder(Iterable<? extends T> table, BiPredicate<? super T, ? super T> predicate) {
             this.tableSet = SetKit.immutable(table);
             this.predicate = predicate;
         }
 
         @Nullable
         @Override
-        public T find(Object key) {
+        public T find(T key) {
             if (tableSet.contains(key)) {
-                return Cast.as(key);
+                return key;
             }
-            return tableSet.stream().filter(v -> predicate.test(key, v)).findFirst().orElse(null);
+            return tableSet.stream().filter(e -> predicate.test(key, e)).findFirst().orElse(null);
         }
     }
 
-    private static final class MapFinder<T, E> implements Finder<T> {
+    private static final class MapFinder<K, V, E> implements Finder<K, V> {
 
-        private final Map<Object, T> tableMap;
+        private final Map<K, V> tableMap;
 
         private MapFinder(E[] table) {
             this.tableMap = MapKit.pairToMap(table);
@@ -103,29 +104,29 @@ final class FinderSupport {
 
         @Nullable
         @Override
-        public T find(Object key) {
+        public V find(K key) {
             return tableMap.get(key);
         }
     }
 
-    private static final class PredicateMapFinder<K, V, E> implements Finder<V> {
+    private static final class PredicateMapFinder<K, V, E> implements Finder<K, V> {
 
         private final Map<K, V> tableMap;
-        private final BiPredicate<Object, ? super K> predicate;
+        private final BiPredicate<? super K, ? super K> predicate;
 
-        private PredicateMapFinder(E[] table, BiPredicate<Object, ? super K> predicate) {
+        private PredicateMapFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
             this.tableMap = MapKit.pairToMap(table);
             this.predicate = predicate;
         }
 
-        private PredicateMapFinder(Iterable<? extends E> table, BiPredicate<Object, ? super K> predicate) {
+        private PredicateMapFinder(Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
             this.tableMap = MapKit.pairToMap(table);
             this.predicate = predicate;
         }
 
         @Nullable
         @Override
-        public V find(Object key) {
+        public V find(K key) {
             @Nullable V value = tableMap.get(key);
             if (value != null) {
                 return value;

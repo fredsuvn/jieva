@@ -4,42 +4,44 @@ import xyz.srclab.annotation.Nullable;
 
 import java.util.function.BiPredicate;
 
-public interface Finder<T> {
+public interface Finder<K, V> {
 
     @SafeVarargs
-    static <T> Finder<T> newSimpleFinder(T... table) {
+    static <T> Finder<T, T> newSimpleFinder(T... table) {
         return FinderSupport.newSimpleFinder(table);
     }
 
-    static <T> Finder<T> newSimpleFinder(Iterable<? extends T> table) {
+    static <T> Finder<T, T> newSimpleFinder(Iterable<? extends T> table) {
         return FinderSupport.newSimpleFinder(table);
     }
 
-    static <T> Finder<T> newPredicateFinder(T[] table, BiPredicate<Object, ? super T> predicate) {
+    static <T> Finder<T, T> newPredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
         return FinderSupport.newPredicateFinder(table, predicate);
     }
 
-    static <T> Finder<T> newPredicateFinder(Iterable<? extends T> table, BiPredicate<Object, ? super T> predicate) {
+    static <T> Finder<T, T> newPredicateFinder(
+            Iterable<? extends T> table, BiPredicate<? super T, ? super T> predicate) {
         return FinderSupport.newPredicateFinder(table, predicate);
     }
 
     @SafeVarargs
-    static <T, E> Finder<T> newMapFinder(E... table) {
+    static <K, V, E> Finder<K, V> newMapFinder(E... table) {
         return FinderSupport.newMapFinder(table);
     }
 
-    static <T, E> Finder<T> newMapFinder(Iterable<? extends E> table) {
+    static <K, V, E> Finder<K, V> newMapFinder(Iterable<? extends E> table) {
         return FinderSupport.newMapFinder(table);
     }
 
-    static <K, V, E> Finder<V> newPredicateMapFinder(E[] table, BiPredicate<Object, ? super K> predicate) {
+    static <K, V, E> Finder<K, V> newPredicateMapFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
         return FinderSupport.newPredicateMapFinder(table, predicate);
     }
 
-    static <K, V, E> Finder<V> newPredicateMapFinder(Iterable<? extends E> table, BiPredicate<Object, ? super K> predicate) {
+    static <K, V, E> Finder<K, V> newPredicateMapFinder(
+            Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
         return FinderSupport.newPredicateMapFinder(table, predicate);
     }
 
     @Nullable
-    T find(Object key);
+    V find(K key);
 }
