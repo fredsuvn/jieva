@@ -59,13 +59,13 @@ final class FinderSupport {
         }
 
         @Override
-        public boolean contains(T key) {
+        public boolean has(T key) {
             return tableSet.contains(key);
         }
 
         @Nullable
         @Override
-        public T get(T key) {
+        public T find(T key) {
             return tableSet.contains(key) ? key : null;
         }
     }
@@ -86,7 +86,7 @@ final class FinderSupport {
         }
 
         @Override
-        public boolean contains(T key) {
+        public boolean has(T key) {
             if (tableSet.contains(key)) {
                 return true;
             }
@@ -95,7 +95,7 @@ final class FinderSupport {
 
         @Nullable
         @Override
-        public T get(T key) {
+        public T find(T key) {
             if (tableSet.contains(key)) {
                 return key;
             }
@@ -116,13 +116,13 @@ final class FinderSupport {
         }
 
         @Override
-        public boolean contains(K key) {
+        public boolean has(K key) {
             return tableMap.containsKey(key);
         }
 
         @Nullable
         @Override
-        public V get(K key) {
+        public V find(K key) {
             return tableMap.get(key);
         }
     }
@@ -143,7 +143,7 @@ final class FinderSupport {
         }
 
         @Override
-        public boolean contains(K key) {
+        public boolean has(K key) {
             if (tableMap.containsKey(key)) {
                 return true;
             }
@@ -152,7 +152,7 @@ final class FinderSupport {
 
         @Nullable
         @Override
-        public V get(K key) {
+        public V find(K key) {
             @Nullable V value = tableMap.get(key);
             if (value != null) {
                 return value;
