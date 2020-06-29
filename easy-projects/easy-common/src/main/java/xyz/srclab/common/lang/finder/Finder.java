@@ -42,6 +42,8 @@ public interface Finder<K, V> {
         return FinderSupport.newPredicateMapFinder(table, predicate);
     }
 
+    boolean contains(K key);
+
     @Nullable
     V find(K key);
 }

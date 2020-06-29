@@ -58,6 +58,11 @@ final class FinderSupport {
             this.tableSet = SetKit.immutable(table);
         }
 
+        @Override
+        public boolean contains(T key) {
+            return tableSet.contains(key);
+        }
+
         @Nullable
         @Override
         public T find(T key) {
@@ -78,6 +83,14 @@ final class FinderSupport {
         private PredicateFinder(Iterable<? extends T> table, BiPredicate<? super T, ? super T> predicate) {
             this.tableSet = SetKit.immutable(table);
             this.predicate = predicate;
+        }
+
+        @Override
+        public boolean contains(T key) {
+            if (tableSet.contains(key)) {
+                return true;
+            }
+            return tableSet.stream().anyMatch(e -> predicate.test(key, e));
         }
 
         @Nullable
@@ -102,6 +115,11 @@ final class FinderSupport {
             this.tableMap = MapKit.pairToMap(table);
         }
 
+        @Override
+        public boolean contains(K key) {
+            return tableMap.containsKey(key);
+        }
+
         @Nullable
         @Override
         public V find(K key) {
@@ -122,6 +140,14 @@ final class FinderSupport {
         private PredicateMapFinder(Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
             this.tableMap = MapKit.pairToMap(table);
             this.predicate = predicate;
+        }
+
+        @Override
+        public boolean contains(K key) {
+            if (tableMap.containsKey(key)) {
+                return true;
+            }
+            return tableMap.keySet().stream().anyMatch(k -> predicate.test(key, k));
         }
 
         @Nullable
