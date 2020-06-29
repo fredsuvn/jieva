@@ -15,4 +15,8 @@ public class Cast {
     public static <T, R> R asNullable(@Nullable T any) throws ClassCastException {
         return any == null ? null : as(any);
     }
+
+    public static boolean canCast(Class<?> source, Class<?> target) {
+        return target.isAssignableFrom(source);
+    }
 }

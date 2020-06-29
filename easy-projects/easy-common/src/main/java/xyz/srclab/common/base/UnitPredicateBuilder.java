@@ -60,48 +60,30 @@ public class UnitPredicateBuilder extends CachedBuilder<Predicate<Class<?>>> {
 
     private static final class UnitPredicateImpl implements Predicate<Class<?>> {
 
-        private final Finder<Class<?>> passTypes;
-        private final Finder<Class<?>> failTypes;
+        private final Finder<Class<?>, Class<?>> passTypeFinder;
+        private final Finder<Class<?>, Class<?>> failTypeFinder;
         private final @Nullable Predicate<Class<?>> extraPredicate;
 
         private UnitPredicateImpl(UnitPredicateBuilder builder) {
             Class<?>[] passTypesClasses = ArrayKit.toArray(builder.passTypes, Class.class);
             Class<?>[] failTypesClasses = ArrayKit.toArray(builder.failTypes, Class.class);
-            this.passTypes = Finder.newMapFinder(passTypesClasses, );
-            this.failTypes = Finder.newSetFinder(ArrayKit.toArray(builder.failTypes, Class.class));
+            this.passTypeFinder = Finder.newPredicateMapFinder(passTypesClasses, Cast::canCast);
+            this.failTypeFinder = Finder.newPredicateMapFinder(failTypesClasses, Cast::canCast);
             this.extraPredicate = builder.extraPredicate;
         }
 
         @Override
-        public boolean test(Class<?> aClass) {
+        public boolean test(Class<?> cls) {
+            if (passTypeFinder.has(cls)) {
+                return true;
+            }
             if (extraPredicate == null) {
-                return fastTest(aClass);
+                return false;
             }
-            return slowTest(aClass);
-        }
-
-        private boolean fastTest(Class<?> aClass) {
-            for (Class<?> includeType : passTypes) {
-                if (includeType.isAssignableFrom(aClass)) {
-                    return true;
-                }
+            if (failTypeFinder.has(cls)) {
+                return false;
             }
-            return false;
-        }
-
-        private boolean slowTest(Class<?> aClass) {
-            for (Class<?> includeType : passTypes) {
-                if (includeType.isAssignableFrom(aClass)) {
-                    return true;
-                }
-            }
-            for (Class<?> excludeType : failTypes) {
-                if (excludeType.isAssignableFrom(aClass)) {
-                    return false;
-                }
-            }
-            assert extraPredicate != null;
-            return extraPredicate.test(aClass);
+            return extraPredicate.test(cls);
         }
     }
 }
