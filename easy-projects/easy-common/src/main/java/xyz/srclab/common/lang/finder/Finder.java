@@ -45,5 +45,5 @@ public interface Finder<K, V> {
     boolean contains(K key);
 
     @Nullable
-    V find(K key);
+    V get(K key);
 }

@@ -65,7 +65,7 @@ final class FinderSupport {
 
         @Nullable
         @Override
-        public T find(T key) {
+        public T get(T key) {
             return tableSet.contains(key) ? key : null;
         }
     }
@@ -95,7 +95,7 @@ final class FinderSupport {
 
         @Nullable
         @Override
-        public T find(T key) {
+        public T get(T key) {
             if (tableSet.contains(key)) {
                 return key;
             }
@@ -122,7 +122,7 @@ final class FinderSupport {
 
         @Nullable
         @Override
-        public V find(K key) {
+        public V get(K key) {
             return tableMap.get(key);
         }
     }
@@ -152,7 +152,7 @@ final class FinderSupport {
 
         @Nullable
         @Override
-        public V find(K key) {
+        public V get(K key) {
             @Nullable V value = tableMap.get(key);
             if (value != null) {
                 return value;
