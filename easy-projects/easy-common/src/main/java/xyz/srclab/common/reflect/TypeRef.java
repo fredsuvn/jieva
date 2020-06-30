@@ -24,7 +24,7 @@ public class TypeRef<T> {
     }
 
     protected Type getGenericSuperclass() {
-        @Nullable Type generic = ClassKit.getGenericSuperclass(getClass(), TypeRef.class);
+        @Nullable Type generic = TypeKit.getGenericSuperclass(getClass(), TypeRef.class);
         if (!(generic instanceof ParameterizedType)) {
             throw new IllegalStateException("Generic super class must be a parameterized type");
         }
