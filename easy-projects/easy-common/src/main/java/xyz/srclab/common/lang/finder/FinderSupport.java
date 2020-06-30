@@ -29,21 +29,21 @@ final class FinderSupport {
     }
 
     @SafeVarargs
-    static <K, V, E> Finder<K, V> newMapFinder(E... table) {
-        return new MapFinder<>(table);
+    static <K, V, E> Finder<K, V> newPairFinder(E... table) {
+        return new PairFinder<>(table);
     }
 
-    static <K, V, E> Finder<K, V> newMapFinder(Iterable<? extends E> table) {
-        return new MapFinder<>(table);
+    static <K, V, E> Finder<K, V> newPairFinder(Iterable<? extends E> table) {
+        return new PairFinder<>(table);
     }
 
-    static <K, V, E> Finder<K, V> newPredicateMapFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
-        return new PredicateMapFinder<>(table, predicate);
+    static <K, V, E> Finder<K, V> newPredicatePairFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
+        return new PredicatePairFinder<>(table, predicate);
     }
 
-    static <K, V, E> Finder<K, V> newPredicateMapFinder(
+    static <K, V, E> Finder<K, V> newPredicatePairFinder(
             Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
-        return new PredicateMapFinder<>(table, predicate);
+        return new PredicatePairFinder<>(table, predicate);
     }
 
     private static final class SimpleFinder<T> implements Finder<T, T> {
@@ -103,15 +103,15 @@ final class FinderSupport {
         }
     }
 
-    private static final class MapFinder<K, V, E> implements Finder<K, V> {
+    private static final class PairFinder<K, V, E> implements Finder<K, V> {
 
         private final Map<K, V> tableMap;
 
-        private MapFinder(E[] table) {
+        private PairFinder(E[] table) {
             this.tableMap = MapKit.pairToMap(table);
         }
 
-        private MapFinder(Iterable<? extends E> table) {
+        private PairFinder(Iterable<? extends E> table) {
             this.tableMap = MapKit.pairToMap(table);
         }
 
@@ -127,17 +127,17 @@ final class FinderSupport {
         }
     }
 
-    private static final class PredicateMapFinder<K, V, E> implements Finder<K, V> {
+    private static final class PredicatePairFinder<K, V, E> implements Finder<K, V> {
 
         private final Map<K, V> tableMap;
         private final BiPredicate<? super K, ? super K> predicate;
 
-        private PredicateMapFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
+        private PredicatePairFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
             this.tableMap = MapKit.pairToMap(table);
             this.predicate = predicate;
         }
 
-        private PredicateMapFinder(Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
+        private PredicatePairFinder(Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
             this.tableMap = MapKit.pairToMap(table);
             this.predicate = predicate;
         }

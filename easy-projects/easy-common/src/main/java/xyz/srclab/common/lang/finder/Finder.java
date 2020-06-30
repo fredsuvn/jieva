@@ -25,21 +25,21 @@ public interface Finder<K, V> {
     }
 
     @SafeVarargs
-    static <K, V, E> Finder<K, V> newMapFinder(E... table) {
-        return FinderSupport.newMapFinder(table);
+    static <K, V, E> Finder<K, V> newPairFinder(E... table) {
+        return FinderSupport.newPairFinder(table);
     }
 
-    static <K, V, E> Finder<K, V> newMapFinder(Iterable<? extends E> table) {
-        return FinderSupport.newMapFinder(table);
+    static <K, V, E> Finder<K, V> newPairFinder(Iterable<? extends E> table) {
+        return FinderSupport.newPairFinder(table);
     }
 
-    static <K, V, E> Finder<K, V> newPredicateMapFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
-        return FinderSupport.newPredicateMapFinder(table, predicate);
+    static <K, V, E> Finder<K, V> newPredicatePairFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
+        return FinderSupport.newPredicatePairFinder(table, predicate);
     }
 
-    static <K, V, E> Finder<K, V> newPredicateMapFinder(
+    static <K, V, E> Finder<K, V> newPredicatePairFinder(
             Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
-        return FinderSupport.newPredicateMapFinder(table, predicate);
+        return FinderSupport.newPredicatePairFinder(table, predicate);
     }
 
     boolean has(K key);
