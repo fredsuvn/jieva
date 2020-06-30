@@ -67,8 +67,8 @@ public class UnitPredicateBuilder extends CachedBuilder<Predicate<Class<?>>> {
         private UnitPredicateImpl(UnitPredicateBuilder builder) {
             Class<?>[] passTypesClasses = ArrayKit.toArray(builder.passTypes, Class.class);
             Class<?>[] failTypesClasses = ArrayKit.toArray(builder.failTypes, Class.class);
-            this.passTypeFinder = Finder.newPredicateMapFinder(passTypesClasses, Cast::canCast);
-            this.failTypeFinder = Finder.newPredicateMapFinder(failTypesClasses, Cast::canCast);
+            this.passTypeFinder = Finder.newPredicatePairFinder(passTypesClasses, Cast::canCast);
+            this.failTypeFinder = Finder.newPredicatePairFinder(failTypesClasses, Cast::canCast);
             this.extraPredicate = builder.extraPredicate;
         }
 

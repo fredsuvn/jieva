@@ -39,7 +39,7 @@ public class TypeKit {
     private static final class RawTypeFinder {
 
         // Don't need cache now.
-        //private static final Cache<Type, Class<?>> cache = Cache.newL2();
+        //private static final Cache<Type, Class<?>> cache = Cache.newCommonCache();
 
         public static Class<?> find(Type type) {
             return find0(type);
