@@ -117,9 +117,7 @@ public class TypeKit {
         private static Type findTypeVariableForClass(TypeVariable<?> type, Class<?> owner, Class<?> declaringClass) {
             Type genericSuperclass = getGenericSuperclass(owner, declaringClass);
             if (!(genericSuperclass instanceof ParameterizedType)) {
-                throw new IllegalStateException(
-                        Format.fastFormat("Cannot find actual type \"{}\" from {} to {}",
-                                type, declaringClass, owner));
+                return type;
             }
             Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
             @Nullable Type result = findTypeVariable0(type, actualTypeArguments, declaringClass);
