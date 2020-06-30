@@ -17,11 +17,11 @@ import java.util.List;
 public interface RecordEntry {
 
     static RecordEntry newEntry(
-            Class<?> owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
+            Type owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
         return RecordResolverSupport.newEntry(owner, name, readMethod, writeMethod);
     }
 
-    Class<?> getOwner();
+    Type getOwner();
 
     String getKey();
 
@@ -65,7 +65,8 @@ public interface RecordEntry {
 
     void setValue(Object bean, @Nullable Object value) throws UnsupportedOperationException;
 
-    default void setValue(Object bean, @Nullable Object value, Converter converter) throws UnsupportedOperationException {
+    default void setValue(Object bean, @Nullable Object value, Converter converter)
+            throws UnsupportedOperationException {
         if (value == null) {
             setValue(bean, null);
             return;

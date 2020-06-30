@@ -7,7 +7,6 @@ import xyz.srclab.annotation.Out;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.invoke.MethodInvoker;
-import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.reflect.TypeKit;
 
@@ -35,11 +34,11 @@ final class RecordResolverSupport {
     }
 
     static RecordEntry newEntry(
-            Class<?> owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
+            Type owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
         return new EntryOnMethods(owner, name, readMethod, writeMethod);
     }
 
-    private static abstract class RecordEntryImplBase implements RecordEntry {
+    private static abstract class EntryImplBase implements RecordEntry {
 
         @Override
         public int hashCode() {
@@ -66,9 +65,9 @@ final class RecordResolverSupport {
         }
     }
 
-    private static final class EntryOnMethods extends RecordEntryImplBase {
+    private static final class EntryOnMethods extends EntryImplBase {
 
-        private final Class<?> owner;
+        private final Type owner;
         private final String name;
         private final Class<?> type;
         private final Type genericType;
@@ -81,7 +80,7 @@ final class RecordResolverSupport {
         private final @Nullable Field field;
         private final List<Annotation> fieldAnnotations;
 
-        private EntryOnMethods(Class<?> owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
+        private EntryOnMethods(Type owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
             this.owner = owner;
             this.name = name;
             this.readMethod = readMethod;
@@ -89,24 +88,24 @@ final class RecordResolverSupport {
 
             if (readMethod == null) {
                 Check.checkState(writeMethod != null, "Both read and write method are null");
-                Type type = ClassKit.getActualType(
+                Type type = TypeKit.getActualType(
                         writeMethod.getGenericParameterTypes()[0], owner, writeMethod.getDeclaringClass());
                 this.type = TypeKit.getRawType(type);
                 this.genericType = type;
             } else {
-                Type type = ClassKit.getActualType(
+                Type type = TypeKit.getActualType(
                         readMethod.getGenericReturnType(), owner, readMethod.getDeclaringClass());
                 this.type = TypeKit.getRawType(type);
                 this.genericType = type;
             }
 
-            this.field = FieldKit.getDeclaredField(owner, name);
+            this.field = FieldKit.getDeclaredField(TypeKit.getRawType(owner), name);
             this.fieldAnnotations = field == null ? Collections.emptyList() :
                     ListKit.immutable(field.getAnnotations());
         }
 
         @Override
-        public Class<?> getOwner() {
+        public Type getOwner() {
             return owner;
         }
 
@@ -179,7 +178,7 @@ final class RecordResolverSupport {
     private static abstract class MethodHandler implements RecordResolverHandler {
 
         @Override
-        public void resolve(Class<?> recordClass, Context context) {
+        public void resolve(Type recordType, Context context) {
 
             final class EntryBuilder {
 
@@ -214,7 +213,7 @@ final class RecordResolverSupport {
                 }
 
                 public RecordEntry build() {
-                    return RecordEntry.newEntry(recordClass, key, readMethod, writeMethod);
+                    return RecordEntry.newEntry(recordType, key, readMethod, writeMethod);
                 }
             }
 

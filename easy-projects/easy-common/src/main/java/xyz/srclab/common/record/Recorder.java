@@ -8,6 +8,7 @@ import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.reflect.ClassKit;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -27,7 +28,7 @@ public interface Recorder {
     RecordResolver resolver();
 
     @Immutable
-    Map<String, RecordEntry> resolve(Class<?> recordClass);
+    Map<String, RecordEntry> resolve(Type recordType);
 
     @Immutable
     default Map<String, RecordEntry> entryMap(Object record) {

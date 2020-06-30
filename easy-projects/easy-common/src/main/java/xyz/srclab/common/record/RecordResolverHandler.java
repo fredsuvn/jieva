@@ -5,6 +5,7 @@ import xyz.srclab.annotation.Out;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public interface RecordResolverHandler {
         return RecordResolverSupport.getNamingPatternHandler();
     }
 
-    void resolve(Class<?> recordClass, @Out Context context);
+    void resolve(Type recordType, @Out Context context);
 
     interface Context {
 

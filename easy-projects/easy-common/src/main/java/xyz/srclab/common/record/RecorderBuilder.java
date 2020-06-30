@@ -2,9 +2,11 @@ package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.design.builder.CachedBuilder;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 public class RecorderBuilder extends CachedBuilder<Recorder> {
@@ -33,6 +35,7 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
 
     @Override
     protected Recorder buildNew() {
+        Check.checkArguments(resolver != null, "Resolver was not be set");
         return useCache ? new CachedRecorderImpl(this) : new RecorderImpl(this);
     }
 
@@ -41,7 +44,8 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
         private final RecordResolver resolver;
 
         private RecorderImpl(RecorderBuilder builder) {
-            this.resolver = builder.resolver == null ? RecordResolver.defaultResolver() : builder.resolver;
+            assert builder.resolver != null;
+            this.resolver = builder.resolver;
         }
 
         @Override
@@ -50,19 +54,20 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
         }
 
         @Override
-        public Map<String, RecordEntry> resolve(Class<?> recordClass) {
-            return resolver.resolve(recordClass);
+        public Map<String, RecordEntry> resolve(Type recordType) {
+            return resolver.resolve(recordType);
         }
     }
 
     private static final class CachedRecorderImpl implements Recorder {
 
-        private final Cache<Class<?>, Map<String, RecordEntry>> cache = Cache.newCommonCache();
+        private final Cache<Type, Map<String, RecordEntry>> cache = Cache.newCommonCache();
 
         private final RecordResolver resolver;
 
         private CachedRecorderImpl(RecorderBuilder builder) {
-            this.resolver = builder.resolver == null ? RecordResolver.defaultResolver() : builder.resolver;
+            assert builder.resolver != null;
+            this.resolver = builder.resolver;
         }
 
         @Override
@@ -71,8 +76,8 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
         }
 
         @Override
-        public @Immutable Map<String, RecordEntry> resolve(Class<?> recordClass) {
-            return cache.getNonNull(recordClass, resolver::resolve);
+        public @Immutable Map<String, RecordEntry> resolve(Type recordType) {
+            return cache.getNonNull(recordType, resolver::resolve);
         }
     }
 }

@@ -2,6 +2,7 @@ package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.Immutable;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -18,5 +19,5 @@ public interface RecordResolver {
     }
 
     @Immutable
-    Map<String, RecordEntry> resolve(Class<?> recordClass);
+    Map<String, RecordEntry> resolve(Type recordType);
 }
