@@ -15,14 +15,23 @@ import java.lang.reflect.WildcardType;
 public class TypeKit {
 
     public static <T> Class<T> getRawType(Type type) {
-        if (type instanceof Class) {
-            return Cast.as(type);
-        }
         return Cast.as(RawTypeFinder.find(type));
     }
 
-    public static Type getGenericSuperclass(Class<?> cls, Class<?> targetClass) {
-        return GenericSuperclassFinder.find(cls, targetClass);
+    public static Type getGenericType(TypeRef<?> typeRef) {
+        return typeRef.getType();
+    }
+
+    public static Type getGenericSignature(Type type, Class<?> target) {
+        return target.isInterface() ? getGenericInterface(type, target) : getGenericSuperclass(type, target);
+    }
+
+    public static Type getGenericSuperclass(Type type, Class<?> targetClass) {
+        return GenericSuperclassFinder.find(type, targetClass);
+    }
+
+    public static Type getGenericInterface(Type type, Class<?> targetInterface) {
+        return GenericInterfaceFinder.find(type, targetInterface);
     }
 
     public static Type getActualType(Type type, Type owner, Class<?> declaringClass) {
@@ -38,17 +47,14 @@ public class TypeKit {
 
     private static final class RawTypeFinder {
 
-        // Don't need cache now.
-        //private static final Cache<Type, Class<?>> cache = Cache.newCommonCache();
-
         public static Class<?> find(Type type) {
             return find0(type);
         }
 
         private static Class<?> find0(Type type) {
-            //if (type instanceof Class) {
-            //    return (Class<?>) type;
-            //}
+            if (type instanceof Class) {
+                return (Class<?>) type;
+            }
             if (type instanceof ParameterizedType) {
                 return getRawType(((ParameterizedType) type).getRawType());
             }
@@ -71,23 +77,67 @@ public class TypeKit {
 
     private static final class GenericSuperclassFinder {
 
-        public static Type find(Class<?> cls, Class<?> targetClass) {
-            if (!targetClass.isAssignableFrom(cls)) {
-                throw new IllegalArgumentException("Target class must be super class of given class");
-            }
-            return find0(cls, targetClass);
+        public static Type find(Type type, Class<?> targetClass) {
+            return find0(type, targetClass);
         }
 
-        private static Type find0(Class<?> cls, Class<?> targetClass) {
-            Type current = cls;
+        private static Type find0(Type type, Class<?> targetClass) {
+            Type currentType = type;
             do {
-                Class<?> currentClass = TypeKit.getRawType(current);
+                Class<?> currentClass = TypeKit.getRawType(currentType);
                 if (targetClass.equals(currentClass)) {
-                    return current;
+                    return currentType;
                 }
-                current = currentClass.getGenericSuperclass();
-            } while (current != null);
-            throw new IllegalStateException("Unexpected error: cls = " + cls + ", targetClass = " + targetClass);
+                currentType = currentClass.getGenericSuperclass();
+            } while (currentType != null);
+            throw new IllegalStateException(
+                    "Cannot find generic super class: type = " + type + ", target = " + targetClass);
+        }
+    }
+
+    private static final class GenericInterfaceFinder {
+
+        private static final Cache<Key, Type> cache = Cache.newCommonCache();
+
+        public static Type find(Type type, Class<?> targetInterface) {
+            Class<?> rawType = TypeKit.getRawType(type);
+            if (rawType.equals(targetInterface)) {
+                return type;
+            }
+            return cache.getNonNull(Key.of(rawType, targetInterface), k -> find0(rawType, targetInterface));
+        }
+
+        private static Type find0(Class<?> rawType, Class<?> targetInterface) {
+            Type[] types = rawType.getGenericInterfaces();
+            if (!ArrayUtils.isEmpty(types)) {
+                for (Type type : types) {
+                    @Nullable Type type0 = find0(type, targetInterface);
+                    if (type0 != null) {
+                        return type0;
+                    }
+                }
+            }
+            throw new IllegalStateException(
+                    "Cannot find generic super interface: type = " + rawType + ", target = " + targetInterface);
+        }
+
+        @Nullable
+        private static Type find0(Type type, Class<?> targetInterface) {
+            Class<?> rawType = TypeKit.getRawType(type);
+            if (rawType.equals(targetInterface)) {
+                return type;
+            }
+            Type[] types = rawType.getGenericInterfaces();
+            if (ArrayUtils.isEmpty(types)) {
+                return null;
+            }
+            for (Type t : types) {
+                @Nullable Type type0 = find0(t, targetInterface);
+                if (type0 != null) {
+                    return type0;
+                }
+            }
+            return null;
         }
     }
 
@@ -103,46 +153,18 @@ public class TypeKit {
         }
 
         private static Type findTypeVariable(TypeVariable<?> type, Type owner, Class<?> declaringClass) {
-            if (owner instanceof Class) {
-                return findTypeVariableForClass(type, (Class<?>) owner, declaringClass);
-            }
-            if (owner instanceof ParameterizedType) {
-                return findTypeVariableForParameterizedType(type, (ParameterizedType) owner, declaringClass);
-            }
-            throw new IllegalStateException(
-                    Format.fastFormat("Cannot find actual type \"{}\" from {} to {}",
-                            type, declaringClass, owner));
-        }
-
-        private static Type findTypeVariableForClass(TypeVariable<?> type, Class<?> owner, Class<?> declaringClass) {
-            Type genericSuperclass = getGenericSuperclass(owner, declaringClass);
-            if (!(genericSuperclass instanceof ParameterizedType)) {
+            Type genericSignature = getGenericSignature(owner, declaringClass);
+            if (!(genericSignature instanceof ParameterizedType)) {
                 return type;
             }
-            Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
+            Type[] actualTypeArguments = ((ParameterizedType) genericSignature).getActualTypeArguments();
             @Nullable Type result = findTypeVariable0(type, actualTypeArguments, declaringClass);
             if (result == null) {
                 throw new IllegalStateException(
-                        Format.fastFormat("Cannot find actual type \"{}\" from {} to {}",
+                        Format.fastFormat("Cannot find actual type {} from {} to {}",
                                 type, declaringClass, owner));
             }
             return result;
-        }
-
-        private static Type findTypeVariableForParameterizedType(
-                TypeVariable<?> type, ParameterizedType owner, Class<?> declaringClass) {
-            Class<?> rawOwner = TypeKit.getRawType(owner);
-            if (rawOwner.equals(declaringClass)) {
-                Type[] actualTypeArguments = owner.getActualTypeArguments();
-                @Nullable Type result = findTypeVariable0(type, actualTypeArguments, declaringClass);
-                if (result == null) {
-                    throw new IllegalStateException(
-                            Format.fastFormat("Cannot find actual type \"{}\" from {} to {}",
-                                    type, declaringClass, owner));
-                }
-                return result;
-            }
-            return findTypeVariableForClass(type, rawOwner, declaringClass);
         }
 
         @Nullable
