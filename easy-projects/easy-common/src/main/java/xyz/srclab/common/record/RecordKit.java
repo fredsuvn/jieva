@@ -4,6 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.convert.Converter;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -15,8 +16,8 @@ public class RecordKit {
     private static final Recorder recorder = Recorder.defaultRecorder();
 
     @Immutable
-    public static Map<String, RecordEntry> resolve(Class<?> recordClass) {
-        return recorder.resolve(recordClass);
+    public static Map<String, RecordEntry> resolve(Type recordType) {
+        return recorder.resolve(recordType);
     }
 
     @Immutable
