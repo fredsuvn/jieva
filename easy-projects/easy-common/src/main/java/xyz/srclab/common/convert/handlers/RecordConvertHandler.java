@@ -3,10 +3,11 @@ package xyz.srclab.common.convert.handlers;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.record.RecordEntry;
 import xyz.srclab.common.record.Recorder;
+import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeKit;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,7 +29,9 @@ public class RecordConvertHandler implements ConvertHandler {
 
     @Override
     public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        if (from)
+        Object result = ClassKit.newInstance(to);
+        recorder.copyEntries(from, result, converter);
+        return result;
     }
 
     @Override
@@ -36,12 +39,17 @@ public class RecordConvertHandler implements ConvertHandler {
         if (to instanceof Class) {
             return convert(from, (Class<?>) to, converter);
         }
-        Class<?> rawTo = TypeKit.getRawType(to);
-        if (rawTo.equals(Map.class) && to instanceof ParameterizedType) {
-            Type[] actualTypes = ((ParameterizedType) to).getActualTypeArguments();
-            return toMap(from, actualTypes[0], actualTypes[1], converter);
-        }
-        return null;
+        Object result = ClassKit.newInstance(TypeKit.getRawType(to));
+        Map<String, RecordEntry> entryMap = recorder.resolve(to);
+        Map<?, ?> map = from instanceof Map ? (Map<?, ?>) from : recorder.toMap(from);
+        map.forEach((k, v) -> {
+            @Nullable RecordEntry entry = entryMap.get(k);
+            if (entry == null) {
+                return;
+            }
+            entry.setValue(result, v, converter);
+        });
+        return result;
     }
 
     private Object toMap(Object from, Type keyType, Type valueType, Converter converter) {

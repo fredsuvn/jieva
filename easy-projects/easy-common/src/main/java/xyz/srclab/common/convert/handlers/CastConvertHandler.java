@@ -14,6 +14,9 @@ public class CastConvertHandler implements ConvertHandler {
 
     @Override
     public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
+        if (to.equals(Object.class) || to.equals(from.getClass())) {
+            return from;
+        }
         if (Cast.canCast(from, to)) {
             return from;
         }

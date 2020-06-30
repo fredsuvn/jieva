@@ -1,7 +1,6 @@
 package xyz.srclab.common.base;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.reflect.TypeKit;
 
 import java.lang.reflect.Type;
 
@@ -24,7 +23,7 @@ public class Cast {
             return target.isAssignableFrom((Class<?>) instanceOrType);
         }
         if (instanceOrType instanceof Type) {
-            return target.isAssignableFrom(TypeKit.getRawType((Type) instanceOrType));
+            return false;
         }
         return target.isAssignableFrom(instanceOrType.getClass());
     }

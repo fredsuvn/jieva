@@ -10,9 +10,11 @@ import xyz.srclab.common.reflect.TypeKit;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author sunqian
@@ -30,16 +32,7 @@ public class ListConvertHandler implements ConvertHandler {
             }
             return null;
         }
-        if (to.equals(List.class) || to.equals(Iterable.class)) {
-            if (from instanceof Iterable) {
-                Iterable<?> iterable = (Iterable<?>) from;
-                return iterableToList(iterable, converter);
-            } else if (from.getClass().isArray()) {
-                return arrayToList(from, converter);
-            }
-            return null;
-        }
-        return null;
+        return toList(from, to, converter);
     }
 
     @Override
@@ -56,13 +49,71 @@ public class ListConvertHandler implements ConvertHandler {
             }
             return null;
         }
-        Class<?> rawTo = TypeKit.getRawType(to);
-        if (rawTo.equals(List.class) || rawTo.equals(Iterable.class)) {
+        if (to instanceof ParameterizedType) {
+            return toList(from, (ParameterizedType) to, converter);
+        }
+        return null;
+    }
+
+    @Nullable
+    private List<?> toList(Object from, Class<?> listType, Converter converter) {
+        if (listType.equals(List.class) || listType.equals(Iterable.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
-                return iterableToList(iterable, to, converter);
+                return iterableToList(iterable, converter, LinkedList::new);
             } else if (from.getClass().isArray()) {
-                return arrayToList(from, to, converter);
+                return arrayToList(from, converter, ArrayList::new);
+            }
+            return null;
+        }
+        if (listType.equals(ArrayList.class)) {
+            if (from instanceof Iterable) {
+                Iterable<?> iterable = (Iterable<?>) from;
+                return iterableToList(iterable, converter, ArrayList::new);
+            } else if (from.getClass().isArray()) {
+                return arrayToList(from, converter, ArrayList::new);
+            }
+            return null;
+        }
+        if (listType.equals(LinkedList.class)) {
+            if (from instanceof Iterable) {
+                Iterable<?> iterable = (Iterable<?>) from;
+                return iterableToList(iterable, converter, LinkedList::new);
+            } else if (from.getClass().isArray()) {
+                return arrayToList(from, converter, i -> new LinkedList<>());
+            }
+            return null;
+        }
+        return null;
+    }
+
+    @Nullable
+    private List<?> toList(Object from, ParameterizedType listType, Converter converter) {
+        Class<?> rawListType = TypeKit.getRawType(listType);
+        if (rawListType.equals(List.class) || rawListType.equals(Iterable.class)) {
+            if (from instanceof Iterable) {
+                Iterable<?> iterable = (Iterable<?>) from;
+                return iterableToList(iterable, listType, converter, LinkedList::new);
+            } else if (from.getClass().isArray()) {
+                return arrayToList(from, listType, converter, ArrayList::new);
+            }
+            return null;
+        }
+        if (rawListType.equals(ArrayList.class)) {
+            if (from instanceof Iterable) {
+                Iterable<?> iterable = (Iterable<?>) from;
+                return iterableToList(iterable, listType, converter, ArrayList::new);
+            } else if (from.getClass().isArray()) {
+                return arrayToList(from, listType, converter, ArrayList::new);
+            }
+            return null;
+        }
+        if (rawListType.equals(LinkedList.class)) {
+            if (from instanceof Iterable) {
+                Iterable<?> iterable = (Iterable<?>) from;
+                return iterableToList(iterable, listType, converter, LinkedList::new);
+            } else if (from.getClass().isArray()) {
+                return arrayToList(from, listType, converter, i -> new LinkedList<>());
             }
             return null;
         }
@@ -77,18 +128,14 @@ public class ListConvertHandler implements ConvertHandler {
         return iterableToArray0(iterable, TypeKit.getRawType(arrayType.getGenericComponentType()), converter);
     }
 
-    private List<?> iterableToList(Iterable<?> iterable, Converter converter) {
-        return iterableToList0(iterable, Object.class, converter);
+    private List<?> iterableToList(
+            Iterable<?> iterable, Converter converter, Supplier<List<Object>> listSupplier) {
+        return iterableToList0(iterable, Object.class, converter, listSupplier);
     }
 
-    private List<?> iterableToList(Iterable<?> iterable, Type type, Converter converter) {
-        if (type instanceof ParameterizedType) {
-            return iterableToList0(iterable, ((ParameterizedType) type).getActualTypeArguments()[0], converter);
-        }
-        if (type instanceof WildcardType) {
-            return iterableToList0(iterable, ((WildcardType) type).getUpperBounds()[0], converter);
-        }
-        throw new UnsupportedOperationException("Unsupported convert type: " + type);
+    private List<?> iterableToList(
+            Iterable<?> iterable, ParameterizedType type, Converter converter, Supplier<List<Object>> listSupplier) {
+        return iterableToList0(iterable, type.getActualTypeArguments()[0], converter, listSupplier);
     }
 
     private Object arrayToArray(Object array, Class<?> arrayClass, Converter converter) {
@@ -99,22 +146,19 @@ public class ListConvertHandler implements ConvertHandler {
         return arrayToArray0(array, TypeKit.getRawType(arrayType.getGenericComponentType()), converter);
     }
 
-    private List<?> arrayToList(Object array, Converter converter) {
-        return arrayToList0(array, Object.class, converter);
+    private List<?> arrayToList(
+            Object array, Converter converter, Function<Integer, List<Object>> listFunction) {
+        return arrayToList0(array, Object.class, converter, listFunction);
     }
 
-    private List<?> arrayToList(Object array, Type type, Converter converter) {
-        if (type instanceof ParameterizedType) {
-            return arrayToList0(array, ((ParameterizedType) type).getActualTypeArguments()[0], converter);
-        }
-        if (type instanceof WildcardType) {
-            return arrayToList0(array, ((WildcardType) type).getUpperBounds()[0], converter);
-        }
-        throw new UnsupportedOperationException("Unsupported convert type: " + type);
+    private List<?> arrayToList(
+            Object array, ParameterizedType type, Converter converter, Function<Integer, List<Object>> listFunction) {
+        return arrayToList0(array, type.getActualTypeArguments()[0], converter, listFunction);
     }
 
-    private List<?> iterableToList0(Iterable<?> iterable, Type componentType, Converter converter) {
-        List<Object> result = new LinkedList<>();
+    private List<?> iterableToList0(
+            Iterable<?> iterable, Type componentType, Converter converter, Supplier<List<Object>> listSupplier) {
+        List<Object> result = listSupplier.get();
         for (@Nullable Object o : iterable) {
             if (o == null) {
                 result.add(null);
@@ -126,8 +170,10 @@ public class ListConvertHandler implements ConvertHandler {
         return result;
     }
 
-    private List<?> arrayToList0(Object array, Type componentType, Converter converter) {
-        return iterableToList0(ArrayKit.asList(array), componentType, converter);
+    private List<?> arrayToList0(
+            Object array, Type componentType, Converter converter, Function<Integer, List<Object>> listFunction) {
+        List<Object> list = ArrayKit.asList(array);
+        return iterableToList0(list, componentType, converter, () -> listFunction.apply(list.size()));
     }
 
     private Object iterableToArray0(Iterable<?> iterable, Class<?> componentType, Converter converter) {

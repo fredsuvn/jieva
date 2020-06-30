@@ -17,11 +17,12 @@ final class ConvertHandlerSupport {
         return ListKit.immutable(Arrays.asList(
                 new CastConvertHandler(),
                 new DateConvertHandler(),
+                new StringConvertHandler(),
+                new NumberConvertHandler(),
+                new TypeBoundsConvertHandler(),
                 new MapConvertHandler(),
                 new ListConvertHandler(),
                 new SetConvertHandler(),
-                new NumberConvertHandler(),
-                new StringConvertHandler(),
                 new RecordConvertHandler()
         ));
     }

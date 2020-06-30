@@ -13,7 +13,7 @@ import java.util.function.Function;
 public class NumberConvertHandler extends TypeFinderConvertHandler {
 
     private static final Finder<Type, Function<Object, Object>> finder =
-            Finder.newMapFinder(ConvertFunctions.TABLE);
+            Finder.newPairFinder(ConvertFunctions.TABLE);
 
     @Override
     protected Finder<Type, Function<Object, Object>> getFinder() {
