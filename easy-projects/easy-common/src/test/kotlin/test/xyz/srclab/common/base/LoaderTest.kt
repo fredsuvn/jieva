@@ -21,13 +21,13 @@ object LoaderTest {
 
     @Test
     fun testFindClass() {
-        val cls = Loader.loadClass<Class<*>>("test.xyz.srclab.common.base.EnvironmentHelperTest")
+        val cls = Loader.findClass<Class<*>>("test.xyz.srclab.common.base.EnvironmentHelperTest")
         doAssertEquals(
             cls,
             Class.forName("test.xyz.srclab.common.base.EnvironmentHelperTest")
         )
 
-        val noClass = Loader.loadClass<Class<*>>("test.xyz.srclab.common.base.EnvironmentHelperTest0")
+        val noClass = Loader.findClass<Class<*>>("test.xyz.srclab.common.base.EnvironmentHelperTest0")
         doAssertEquals(
             Loader.hasClass("test.xyz.srclab.common.base.EnvironmentHelperTest0"),
             false

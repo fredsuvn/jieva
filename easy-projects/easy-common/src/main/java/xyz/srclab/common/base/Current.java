@@ -2,6 +2,8 @@ package xyz.srclab.common.base;
 
 import xyz.srclab.annotation.Nullable;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +16,22 @@ import java.util.concurrent.Future;
  * @author sunqian
  */
 public class Current {
+
+    public static Environment environment() {
+        return Environment.currentEnvironment();
+    }
+
+    public static Thread thread() {
+        return Thread.currentThread();
+    }
+
+    public static long mills() {
+        return System.currentTimeMillis();
+    }
+
+    public static long nanos() {
+        return System.nanoTime();
+    }
 
     @Nullable
     public static <T> T get(Object key) {
@@ -28,28 +46,32 @@ public class Current {
         ThreadLocalHolder.set(key, value);
     }
 
-    public static <T> Future<T> run(Runnable task) {
-        return Cast.as(executor().submit(task));
+    public static Future<?> run(Runnable task) {
+        return ImmediateExecutorServiceHolder.INSTANCE.submit(task);
     }
 
     public static <T> Future<T> run(Callable<T> task) {
-        return executor().submit(task);
+        return ImmediateExecutorServiceHolder.INSTANCE.submit(task);
     }
 
-    public static long mills() {
-        return System.currentTimeMillis();
+    public static Future<?> submit(Runnable task) {
+        return BackedExecutorServiceHolder.INSTANCE.submit(task);
     }
 
-    public static long nanos() {
-        return System.nanoTime();
+    public static <T> Future<T> submit(Callable<T> task) {
+        return BackedExecutorServiceHolder.INSTANCE.submit(task);
     }
 
-    public static Thread thread() {
-        return Thread.currentThread();
+    public static Path processPath() {
+        return CurrentHolder.USER_DIR;
     }
 
-    public static ExecutorService executor() {
-        return ExecutorServiceHolder.GLOBAL_EXECUTOR_SERVICE;
+    public static Path homePath() {
+        return CurrentHolder.USER_HOME;
+    }
+
+    public static Path tempPath() {
+        return CurrentHolder.TEMP_DIR;
     }
 
     private static final class ThreadLocalHolder {
@@ -67,9 +89,22 @@ public class Current {
         }
     }
 
-    private static final class ExecutorServiceHolder {
+    private static final class ImmediateExecutorServiceHolder {
 
-        public static final ExecutorService GLOBAL_EXECUTOR_SERVICE =
+        public static final ExecutorService INSTANCE =
                 Executors.newCachedThreadPool();
+    }
+
+    private static final class BackedExecutorServiceHolder {
+
+        public static final ExecutorService INSTANCE =
+                Executors.newSingleThreadExecutor();
+    }
+
+    private static final class CurrentHolder {
+
+        public static final Path USER_DIR = Paths.get(environment().getUserDir());
+        public static final Path USER_HOME = Paths.get(environment().getUserHome());
+        public static final Path TEMP_DIR = Paths.get(environment().getJavaIoTmpdir());
     }
 }

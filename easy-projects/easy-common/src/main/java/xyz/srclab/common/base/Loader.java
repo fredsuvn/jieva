@@ -19,7 +19,7 @@ public class Loader {
     }
 
     @Nullable
-    public static <T> Class<T> loadClass(String className) {
+    public static <T> Class<T> findClass(String className) {
         try {
             return Cast.as(Class.forName(className));
         } catch (ClassNotFoundException e) {
@@ -28,7 +28,7 @@ public class Loader {
     }
 
     @Nullable
-    public static <T> Class<T> loadClass(String className, ClassLoader classLoader) {
+    public static <T> Class<T> findClass(String className, ClassLoader classLoader) {
         try {
             return Cast.as(Class.forName(className, true, classLoader));
         } catch (ClassNotFoundException e) {
@@ -37,38 +37,38 @@ public class Loader {
     }
 
     public static <T> Class<T> loadClass(byte[] bytes) {
-        return Cast.as(BytesClassLoader.INSTANCE.loadBytes(bytes));
+        return Cast.as(BytesClassLoader.INSTANCE.loadClass(bytes));
     }
 
     public static <T> Class<T> loadClass(byte[] bytes, int offset, int length) {
-        return Cast.as(BytesClassLoader.INSTANCE.loadBytes(bytes, offset, length));
+        return Cast.as(BytesClassLoader.INSTANCE.loadClass(bytes, offset, length));
     }
 
     public static <T> Class<T> loadClass(InputStream inputStream) {
-        return Cast.as(BytesClassLoader.INSTANCE.loadStream(inputStream));
+        return Cast.as(BytesClassLoader.INSTANCE.loadClass(inputStream));
     }
 
     public static <T> Class<T> loadClass(ByteBuffer byteBuffer) {
-        return Cast.as(BytesClassLoader.INSTANCE.loadBuffer(byteBuffer));
+        return Cast.as(BytesClassLoader.INSTANCE.loadClass(byteBuffer));
     }
 
     @Nullable
-    public static URL loadResource(String resourceName) {
-        return loadResource(resourceName, currentClassLoader());
+    public static URL findResource(String resourceName) {
+        return findResource(resourceName, currentClassLoader());
     }
 
     @Nullable
-    public static URL loadResource(String resourceName, ClassLoader classLoader) {
+    public static URL findResource(String resourceName, ClassLoader classLoader) {
         return classLoader.getResource(resourceName);
     }
 
     @Immutable
-    public static Set<URL> loadResources(String resourceName) {
-        return loadResources(resourceName, currentClassLoader());
+    public static Set<URL> findResources(String resourceName) {
+        return findResources(resourceName, currentClassLoader());
     }
 
     @Immutable
-    public static Set<URL> loadResources(String resourceName, ClassLoader classLoader) {
+    public static Set<URL> findResources(String resourceName, ClassLoader classLoader) {
         try {
             Enumeration<URL> urlEnumeration = classLoader.getResources(resourceName);
             return SetKit.enumerationToSet(urlEnumeration);
@@ -81,23 +81,23 @@ public class Loader {
 
         private static final BytesClassLoader INSTANCE = new BytesClassLoader();
 
-        public Class<?> loadBytes(byte[] bytes) {
-            return loadBytes(bytes, 0, bytes.length);
+        public Class<?> loadClass(byte[] bytes) {
+            return loadClass(bytes, 0, bytes.length);
         }
 
-        public Class<?> loadBytes(byte[] bytes, int offset, int length) {
+        public Class<?> loadClass(byte[] bytes, int offset, int length) {
             return super.defineClass(null, bytes, offset, length);
         }
 
-        public Class<?> loadStream(InputStream inputStream) {
+        public Class<?> loadClass(InputStream inputStream) {
             try {
-                return loadBytes(IOUtils.toByteArray(inputStream));
+                return loadClass(IOUtils.toByteArray(inputStream));
             } catch (IOException e) {
                 throw new IllegalStateException(e);
             }
         }
 
-        public Class<?> loadBuffer(ByteBuffer byteBuffer) {
+        public Class<?> loadClass(ByteBuffer byteBuffer) {
             return super.defineClass(null, byteBuffer, null);
         }
     }

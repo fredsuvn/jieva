@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 public class Hash {
 
-    public static int hashCode(@Nullable Object any) {
+    public static int hash(@Nullable Object any) {
         if (any == null) {
             return 0;
         }

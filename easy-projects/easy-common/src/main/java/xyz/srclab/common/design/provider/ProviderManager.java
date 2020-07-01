@@ -16,7 +16,7 @@ public interface ProviderManager<T> {
     void registerProvider(T provider);
 
     default void registerProvider(String className, boolean isDefault) {
-        @Nullable Class<T> providerClass = Loader.loadClass(className);
+        @Nullable Class<T> providerClass = Loader.findClass(className);
         Check.checkArguments(providerClass != null, "Can not find class: " + className);
         T provider = ClassKit.newInstance(providerClass);
         registerProvider(className, provider, isDefault);

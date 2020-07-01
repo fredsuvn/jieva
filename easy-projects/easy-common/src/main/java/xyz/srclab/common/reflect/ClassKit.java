@@ -15,13 +15,13 @@ import java.lang.reflect.Constructor;
 public class ClassKit {
 
     public static <T> T newInstance(String className) {
-        @Nullable Class<?> cls = Loader.loadClass(className);
+        @Nullable Class<?> cls = Loader.findClass(className);
         Check.checkArguments(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }
 
     public static <T> T newInstance(String className, ClassLoader classLoader) {
-        @Nullable Class<?> cls = Loader.loadClass(className, classLoader);
+        @Nullable Class<?> cls = Loader.findClass(className, classLoader);
         Check.checkArguments(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }

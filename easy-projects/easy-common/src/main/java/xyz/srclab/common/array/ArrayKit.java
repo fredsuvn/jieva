@@ -432,7 +432,7 @@ public class ArrayKit {
                 }
 
                 public int hashCode() {
-                    return Hash.hashCode(componentType);
+                    return Hash.hash(componentType);
                 }
             }
 
