@@ -11,6 +11,8 @@ import xyz.srclab.common.reflect.ClassKit;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * @author sunqian
@@ -27,13 +29,11 @@ public interface Recorder {
 
     RecordResolver resolver();
 
-    @Immutable
-    Map<String, RecordEntry> resolve(Type recordType);
+    RecordType resolve(Type type);
 
-    @Immutable
-    default Map<String, RecordEntry> entryMap(Object record) {
+    default RecordType recordType(Object record) {
         if (record instanceof Record) {
-            return ((Record<?>) record).entryMap();
+            return ((Record<?>) record).recordType();
         }
         return resolve(record.getClass());
     }
@@ -41,9 +41,9 @@ public interface Recorder {
     @Nullable
     default RecordEntry getEntry(Object record, String key) {
         if (record instanceof Record) {
-            return ((Record<?>) record).entryMap().get(key);
+            return ((Record<?>) record).recordType().entryMap().get(key);
         }
-        return resolve(record.getClass()).get(key);
+        return resolve(record.getClass()).entryMap().get(key);
     }
 
     default RecordEntry getEntryNonNull(Object record, String key) throws NoSuchElementException {
@@ -72,7 +72,7 @@ public interface Recorder {
         if (record instanceof Record) {
             return ((Record<?>) record).asMap();
         }
-        return RecorderSupport.newRecordView(record, entryMap(record));
+        return RecorderSupport.newRecordView(record, recordType(record).entryMap());
     }
 
     @Immutable
@@ -81,7 +81,7 @@ public interface Recorder {
     }
 
     default void set(Object record, Map<String, @Nullable Object> values) {
-        Map<String, RecordEntry> entryMap = entryMap(record);
+        Map<String, RecordEntry> entryMap = recordType(record).entryMap();
         values.forEach((k, v) -> {
             @Nullable RecordEntry entry = entryMap.get(k);
             if (entry == null) {
@@ -92,7 +92,7 @@ public interface Recorder {
     }
 
     default void set(Object record, Map<String, @Nullable Object> values, Converter converter) {
-        Map<String, RecordEntry> entryMap = entryMap(record);
+        Map<String, RecordEntry> entryMap = recordType(record).entryMap();
         values.forEach((k, v) -> {
             @Nullable RecordEntry entry = entryMap.get(k);
             if (entry == null) {
@@ -109,51 +109,145 @@ public interface Recorder {
     }
 
     default void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap) {
-        Map<Object, @Nullable Object> source = Recorder0.anyAsMap(this, sourceRecordOrMap);
-        Map<Object, @Nullable Object> dest = Recorder0.anyAsMap(this, destRecordOrMap);
-        Recorder0.copyEntries0(source, dest);
+        copyEntries(sourceRecordOrMap, destRecordOrMap, Converter.defaultConverter());
     }
 
     default void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap, Converter converter) {
-        Map<Object, @Nullable Object> source = Recorder0.anyAsMap(this, sourceRecordOrMap);
-        if (destRecordOrMap instanceof Map) {
-            Map<Object, @Nullable Object> dest = Cast.as(destRecordOrMap);
-            Recorder0.copyEntries0(source, dest);
-            return;
-        }
-        Map<String, RecordEntry> destEntries = this.entryMap(destRecordOrMap);
-        destEntries.forEach((k, e) -> {
-            if (!source.containsKey(k)) {
-                return;
-            }
-            @Nullable Object value = source.get(k);
-            e.setValue(destRecordOrMap, value, converter);
-        });
+        copyEntries(sourceRecordOrMap, destRecordOrMap, destRecordOrMap.getClass(), converter);
+    }
+
+    default void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap, Type destType) {
+        copyEntries(sourceRecordOrMap, destRecordOrMap, destType, Converter.defaultConverter());
+    }
+
+    default void copyEntries(Object sourceRecordOrMap, Object destRecordOrMap, Type destType, Converter converter) {
+        copyEntries(sourceRecordOrMap, destRecordOrMap, destType, converter, o -> true);
     }
 
     default void copyEntriesIgnoreNull(Object sourceRecordOrMap, Object destRecordOrMap) {
-        Map<Object, @Nullable Object> source = Recorder0.anyAsMap(this, sourceRecordOrMap);
-        Map<Object, @Nullable Object> dest = Recorder0.anyAsMap(this, destRecordOrMap);
-        Recorder0.copyEntriesIgnoreNull0(source, dest);
+        copyEntriesIgnoreNull(sourceRecordOrMap, destRecordOrMap, Converter.defaultConverter());
     }
 
     default void copyEntriesIgnoreNull(Object sourceRecordOrMap, Object destRecordOrMap, Converter converter) {
-        Map<Object, @Nullable Object> source = Recorder0.anyAsMap(this, sourceRecordOrMap);
-        if (destRecordOrMap instanceof Map) {
-            Map<Object, @Nullable Object> dest = Cast.as(destRecordOrMap);
-            Recorder0.copyEntriesIgnoreNull0(source, dest);
-            return;
+        copyEntriesIgnoreNull(sourceRecordOrMap, destRecordOrMap, destRecordOrMap.getClass(), converter);
+    }
+
+    default void copyEntriesIgnoreNull(Object sourceRecordOrMap, Object destRecordOrMap, Type destType) {
+        copyEntriesIgnoreNull(sourceRecordOrMap, destRecordOrMap, destType, Converter.defaultConverter());
+    }
+
+    default void copyEntriesIgnoreNull(
+            Object sourceRecordOrMap, Object destRecordOrMap, Type destType, Converter converter) {
+        copyEntries(sourceRecordOrMap, destRecordOrMap, destType, converter, Objects::nonNull);
+    }
+
+    default void copyEntries(
+            Object sourceRecordOrMap, Object destRecordOrMap, Type destType,
+            Converter converter, Predicate<@Nullable Object> predicate) {
+        if (sourceRecordOrMap instanceof Map) {
+            if (destRecordOrMap instanceof Map) {
+
+                copyMapToMap(
+                        Cast.as(sourceRecordOrMap),
+                        Cast.as(destRecordOrMap), Object.class, Object.class,
+                        converter, predicate
+                );
+            } else {
+                copyMapToRecord(
+                        Cast.as(sourceRecordOrMap),
+                        destRecordOrMap, resolve(destType),
+                        converter, predicate
+                );
+            }
+        } else {
+            if (destRecordOrMap instanceof Map) {
+
+                copyRecordToMap(
+                        sourceRecordOrMap, recordType(sourceRecordOrMap),
+                        Cast.as(destRecordOrMap), Object.class, Object.class,
+                        converter, predicate
+                );
+            } else {
+                copyRecordToRecord(
+                        sourceRecordOrMap, recordType(sourceRecordOrMap),
+                        destRecordOrMap, resolve(destType),
+                        converter, predicate
+                );
+            }
         }
-        Map<String, RecordEntry> destEntries = this.entryMap(destRecordOrMap);
-        destEntries.forEach((k, e) -> {
-            if (!source.containsKey(k)) {
+    }
+
+    default void copyRecordToMap(Object record, RecordType recordType,
+                                 Map<Object, Object> map, Type keyType, Type valueType,
+                                 Converter converter,
+                                 Predicate<@Nullable Object> predicate
+    ) {
+        recordType.entryMap().forEach((name, entry) -> {
+            Object mapKey = converter.convert(name, keyType);
+            if (!map.containsKey(mapKey)) {
                 return;
             }
-            @Nullable Object value = source.get(k);
-            if (value == null) {
+            @Nullable Object source = entry.getValue(record);
+            if (!predicate.test(source)) {
                 return;
             }
-            e.setValue(destRecordOrMap, value, converter);
+            @Nullable Object target = source == null ? null : converter.convert(source, valueType);
+            map.put(mapKey, target);
+        });
+    }
+
+    default void copyRecordToRecord(Object sourceRecord, RecordType sourceRecordType,
+                                    Object destRecord, RecordType destRecordType,
+                                    Converter converter,
+                                    Predicate<@Nullable Object> predicate
+    ) {
+        sourceRecordType.entryMap().forEach((name, entry) -> {
+            @Nullable RecordEntry destEntry = destRecordType.entryMap().get(name);
+            if (destEntry == null) {
+                return;
+            }
+            @Nullable Object source = entry.getValue(sourceRecord);
+            if (!predicate.test(source)) {
+                return;
+            }
+            destEntry.setValue(destRecord, source, converter);
+        });
+    }
+
+    default void copyMapToRecord(Map<?, ?> map,
+                                 Object record, RecordType recordType,
+                                 Converter converter,
+                                 Predicate<@Nullable Object> predicate
+    ) {
+        map.forEach((key, value) -> {
+            if (!predicate.test(value)) {
+                return;
+            }
+            String recordKey = converter.toString(key);
+            @Nullable RecordEntry destEntry = recordType.entryMap().get(recordKey);
+            if (destEntry == null) {
+                return;
+            }
+            destEntry.setValue(record, value, converter);
+        });
+    }
+
+
+    default void copyMapToMap(Map<?, ?> sourceMap,
+                              Map<Object, Object> destMap, Type destKeyType, Type destValueType,
+                              Converter converter,
+                              Predicate<@Nullable Object> predicate
+    ) {
+        sourceMap.forEach((key, value) -> {
+            Object destKey = converter.convert(key, destKeyType);
+            if (!destMap.containsKey(destKey)) {
+                return;
+            }
+            if (!predicate.test(value)) {
+                return;
+            }
+            @Nullable Object destValue = value == null ? null : converter.convert(value, destValueType);
+            destMap.put(destKey, destValue);
         });
     }
 

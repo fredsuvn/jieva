@@ -4,7 +4,6 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.Check;
-import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.design.builder.HandlersBuilder;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.reflect.MethodKit;
@@ -45,22 +44,22 @@ public class RecordResolverBuilder extends
         }
 
         @Override
-        public Map<String, RecordEntry> resolve(Type recordType) {
-            ContextImpl context = new ContextImpl(recordType);
+        public RecordType resolve(Type type) {
+            ContextImpl context = new ContextImpl(type);
             for (int i = 0; i < handlers.length; i++) {
-                handlers[i].resolve(recordType, context);
+                handlers[i].resolve(type, context);
                 if (context.terminate) {
-                    return resolveFromContext(recordType, i + 1, context);
+                    return resolveFromContext(type, i + 1, context);
                 }
             }
-            return resolveFromContext(recordType, handlers.length, context);
+            return resolveFromContext(type, handlers.length, context);
         }
 
-        private Map<String, RecordEntry> resolveFromContext(Type recordType, int times, ContextImpl context) {
+        private RecordType resolveFromContext(Type type, int times, ContextImpl context) {
             if (context.unsupportCount == times) {
-                throw new UnsupportedOperationException("Cannot resolve this class: " + recordType);
+                throw new UnsupportedOperationException("Cannot resolve this class: " + type);
             }
-            return MapKit.immutable(context.entryMap());
+            return RecordType.newRecordType(type, context.entryMap());
         }
 
         private static final class ContextImpl implements RecordResolverHandler.Context {

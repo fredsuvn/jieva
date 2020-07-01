@@ -1,13 +1,11 @@
 package xyz.srclab.common.record;
 
-import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.design.builder.CachedBuilder;
 
 import java.lang.reflect.Type;
-import java.util.Map;
 
 public class RecorderBuilder extends CachedBuilder<Recorder> {
 
@@ -54,14 +52,14 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
         }
 
         @Override
-        public Map<String, RecordEntry> resolve(Type recordType) {
-            return resolver.resolve(recordType);
+        public RecordType resolve(Type type) {
+            return resolver.resolve(type);
         }
     }
 
     private static final class CachedRecorderImpl implements Recorder {
 
-        private final Cache<Type, Map<String, RecordEntry>> cache = Cache.newCommonCache();
+        private final Cache<Type, RecordType> cache = Cache.newCommonCache();
 
         private final RecordResolver resolver;
 
@@ -76,8 +74,8 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
         }
 
         @Override
-        public @Immutable Map<String, RecordEntry> resolve(Type recordType) {
-            return cache.getNonNull(recordType, resolver::resolve);
+        public RecordType resolve(Type type) {
+            return cache.getNonNull(type, resolver::resolve);
         }
     }
 }

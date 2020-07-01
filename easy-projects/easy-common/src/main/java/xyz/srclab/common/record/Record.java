@@ -14,7 +14,7 @@ import java.util.Map;
 public abstract class Record<T extends Record<T>> {
 
     protected final Recorder recorder;
-    protected transient @Nullable Map<String, RecordEntry> entryMap;
+    protected transient @Nullable RecordType recordType;
     protected transient @Nullable Map<String, @Nullable Object> viewMap;
 
     protected Record() {
@@ -26,22 +26,22 @@ public abstract class Record<T extends Record<T>> {
     }
 
     @Immutable
-    public Map<String, RecordEntry> entryMap() {
-        if (entryMap == null) {
+    public RecordType recordType() {
+        if (recordType == null) {
             synchronized (this) {
-                if (entryMap == null) {
-                    entryMap = recorder.resolve(getClass());
+                if (recordType == null) {
+                    recordType = recorder.resolve(getClass());
                 }
             }
         }
-        return entryMap;
+        return recordType;
     }
 
     public Map<String, @Nullable Object> asMap() {
         if (viewMap == null) {
             synchronized (this) {
                 if (viewMap == null) {
-                    viewMap = RecorderSupport.newRecordView(this, entryMap());
+                    viewMap = RecorderSupport.newRecordView(this, recordType().entryMap());
                 }
             }
         }

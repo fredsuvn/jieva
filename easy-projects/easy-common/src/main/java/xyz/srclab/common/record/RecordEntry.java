@@ -21,24 +21,26 @@ public interface RecordEntry {
         return RecordResolverSupport.newEntry(owner, name, readMethod, writeMethod);
     }
 
-    Type getOwner();
+    Class<?> ownerType();
 
-    String getKey();
+    Type genericOwnerType();
 
-    Class<?> getType();
+    String key();
 
-    Type getGenericType();
+    Class<?> type();
 
-    boolean isReadable();
+    Type genericType();
 
-    boolean isWriteable();
+    boolean readable();
+
+    boolean writeable();
 
     @Nullable
-    Object getValue(Object bean) throws UnsupportedOperationException;
+    Object getValue(Object record) throws UnsupportedOperationException;
 
     @Nullable
-    default <T> T getValue(Object bean, Class<T> type, Converter converter) throws UnsupportedOperationException {
-        @Nullable Object value = getValue(bean);
+    default <T> T getValue(Object record, Class<T> type, Converter converter) throws UnsupportedOperationException {
+        @Nullable Object value = getValue(record);
         if (value == null) {
             return null;
         }
@@ -46,8 +48,8 @@ public interface RecordEntry {
     }
 
     @Nullable
-    default <T> T getValue(Object bean, Type type, Converter converter) throws UnsupportedOperationException {
-        @Nullable Object value = getValue(bean);
+    default <T> T getValue(Object record, Type type, Converter converter) throws UnsupportedOperationException {
+        @Nullable Object value = getValue(record);
         if (value == null) {
             return null;
         }
@@ -55,24 +57,24 @@ public interface RecordEntry {
     }
 
     @Nullable
-    default <T> T getValue(Object bean, TypeRef<T> type, Converter converter) throws UnsupportedOperationException {
-        @Nullable Object value = getValue(bean);
+    default <T> T getValue(Object record, TypeRef<T> type, Converter converter) throws UnsupportedOperationException {
+        @Nullable Object value = getValue(record);
         if (value == null) {
             return null;
         }
         return converter.convert(value, type);
     }
 
-    void setValue(Object bean, @Nullable Object value) throws UnsupportedOperationException;
+    void setValue(Object record, @Nullable Object value) throws UnsupportedOperationException;
 
-    default void setValue(Object bean, @Nullable Object value, Converter converter)
+    default void setValue(Object record, @Nullable Object value, Converter converter)
             throws UnsupportedOperationException {
         if (value == null) {
-            setValue(bean, null);
+            setValue(record, null);
             return;
         }
-        Object convertedValue = converter.convert(value, getGenericType());
-        setValue(bean, convertedValue);
+        Object convertedValue = converter.convert(value, genericType());
+        setValue(record, convertedValue);
     }
 
     default boolean hasField() {

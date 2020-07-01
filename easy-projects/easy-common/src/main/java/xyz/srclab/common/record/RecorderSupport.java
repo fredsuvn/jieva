@@ -83,10 +83,10 @@ final class RecorderSupport {
 
         @Nullable
         private Object put0(RecordEntry entry, @Nullable Object value) {
-            if (!entry.isWriteable()) {
-                throw new UnsupportedOperationException("Entry is not writeable: " + entry.getKey());
+            if (!entry.writeable()) {
+                throw new UnsupportedOperationException("Entry is not writeable: " + entry.key());
             }
-            @Nullable Object old = entry.isReadable() ? entry.getValue(record) : null;
+            @Nullable Object old = entry.readable() ? entry.getValue(record) : null;
             entry.setValue(record, value);
             return old;
         }

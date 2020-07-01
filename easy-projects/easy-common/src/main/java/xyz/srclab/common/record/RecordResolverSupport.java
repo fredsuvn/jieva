@@ -6,6 +6,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.Out;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.reflect.TypeKit;
@@ -33,16 +34,69 @@ final class RecordResolverSupport {
         return NamingPatternHandler.INSTANCE;
     }
 
+    static RecordType newRecordType(Type type, Map<String, RecordEntry> entryMap) {
+        return new RecordTypeImpl(type, entryMap);
+    }
+
     static RecordEntry newEntry(
             Type owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
         return new EntryOnMethods(owner, name, readMethod, writeMethod);
+    }
+
+    private static final class RecordTypeImpl implements RecordType {
+
+        private final Class<?> type;
+        private final Type genericType;
+        private final @Immutable Map<String, RecordEntry> entryMap;
+
+        private RecordTypeImpl(Type type, Map<String, RecordEntry> entryMap) {
+            this.type = TypeKit.getRawType(type);
+            this.genericType = type;
+            this.entryMap = MapKit.immutable(entryMap);
+        }
+
+        @Override
+        public Class<?> type() {
+            return type;
+        }
+
+        @Override
+        public Type genericType() {
+            return genericType;
+        }
+
+        @Override
+        public @Immutable Map<String, RecordEntry> entryMap() {
+            return entryMap;
+        }
+
+        @Override
+        public int hashCode() {
+            return genericType().hashCode();
+        }
+
+        @Override
+        public boolean equals(@Nullable Object that) {
+            if (this == that) {
+                return true;
+            }
+            if (!(that instanceof RecordType)) {
+                return false;
+            }
+            return genericType().equals(((RecordType) that).genericType());
+        }
+
+        @Override
+        public String toString() {
+            return "record " + genericType().getTypeName();
+        }
     }
 
     private static abstract class EntryImplBase implements RecordEntry {
 
         @Override
         public int hashCode() {
-            return getKey().hashCode();
+            return key().hashCode();
         }
 
         @Override
@@ -53,20 +107,21 @@ final class RecordResolverSupport {
             if (!(that instanceof RecordEntry)) {
                 return false;
             }
-            return getOwner().equals(((RecordEntry) that).getOwner())
-                    && getKey().equals(((RecordEntry) that).getKey());
+            return genericOwnerType().equals(((RecordEntry) that).genericOwnerType())
+                    && key().equals(((RecordEntry) that).key());
         }
 
         @Override
         public String toString() {
-            return getGenericType().getTypeName() + " "
-                    + getOwner().getTypeName() + "."
-                    + getKey();
+            return genericType().getTypeName() + " "
+                    + genericOwnerType().getTypeName() + "."
+                    + key();
         }
     }
 
     private static final class EntryOnMethods extends EntryImplBase {
 
+        private final Class<?> ownerType;
         private final Type owner;
         private final String name;
         private final Class<?> type;
@@ -81,6 +136,7 @@ final class RecordResolverSupport {
         private final List<Annotation> fieldAnnotations;
 
         private EntryOnMethods(Type owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
+            this.ownerType = TypeKit.getRawType(owner);
             this.owner = owner;
             this.name = name;
             this.readMethod = readMethod;
@@ -105,39 +161,44 @@ final class RecordResolverSupport {
         }
 
         @Override
-        public Type getOwner() {
+        public Class<?> ownerType() {
+            return ownerType;
+        }
+
+        @Override
+        public Type genericOwnerType() {
             return owner;
         }
 
         @Override
-        public String getKey() {
+        public String key() {
             return name;
         }
 
         @Override
-        public Class<?> getType() {
+        public Class<?> type() {
             return type;
         }
 
         @Override
-        public Type getGenericType() {
+        public Type genericType() {
             return genericType;
         }
 
         @Override
-        public boolean isReadable() {
+        public boolean readable() {
             return readMethod != null;
         }
 
         @Override
-        public boolean isWriteable() {
+        public boolean writeable() {
             return writeMethod != null;
         }
 
         @Override
-        public @Nullable Object getValue(Object bean) throws UnsupportedOperationException {
-            if (!isReadable()) {
-                throw new UnsupportedOperationException("Entry is not readable: " + getKey());
+        public @Nullable Object getValue(Object record) throws UnsupportedOperationException {
+            if (!readable()) {
+                throw new UnsupportedOperationException("Entry is not readable: " + key());
             }
             if (getter == null) {
                 synchronized (readMethod) {
@@ -146,13 +207,13 @@ final class RecordResolverSupport {
                     }
                 }
             }
-            return getter.invoke(bean);
+            return getter.invoke(record);
         }
 
         @Override
-        public void setValue(Object bean, @Nullable Object value) throws UnsupportedOperationException {
-            if (!isWriteable()) {
-                throw new UnsupportedOperationException("Entry is not writeable: " + getKey());
+        public void setValue(Object record, @Nullable Object value) throws UnsupportedOperationException {
+            if (!writeable()) {
+                throw new UnsupportedOperationException("Entry is not writeable: " + key());
             }
             if (setter == null) {
                 synchronized (writeMethod) {
@@ -161,7 +222,7 @@ final class RecordResolverSupport {
                     }
                 }
             }
-            setter.invoke(bean, value);
+            setter.invoke(record, value);
         }
 
         @Override
