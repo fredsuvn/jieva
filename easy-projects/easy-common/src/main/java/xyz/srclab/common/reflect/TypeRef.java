@@ -35,8 +35,4 @@ public class TypeRef<T> {
     public Type getType() {
         return type;
     }
-
-    public <U> Class<U> getRawType() {
-        return TypeKit.getRawType(type);
-    }
 }

@@ -40,11 +40,11 @@ public class MethodKit {
 
     @Nullable
     public static Object invoke(Method method, @Nullable Object object, Object... args) {
-        return invoke(method, false, object, args);
+        return invoke(method, object, args, false);
     }
 
     @Nullable
-    public static Object invoke(Method method, boolean force, @Nullable Object object, Object... args) {
+    public static Object invoke(Method method, @Nullable Object object, Object[] args, boolean force) {
         try {
             if (force) {
                 method.setAccessible(true);
@@ -55,11 +55,20 @@ public class MethodKit {
         }
     }
 
-    public static boolean canOverride(Method method) {
+    public static boolean canOverride(Method method, Class<?> cls) {
         int modifiers = method.getModifiers();
-        return !method.isBridge()
-                && !Modifier.isStatic(modifiers)
-                && !Modifier.isFinal(modifiers)
-                && (Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers));
+        if (Modifier.isStatic(modifiers)
+                || Modifier.isPrivate(modifiers)
+                || Modifier.isFinal(modifiers)) {
+            return false;
+        }
+        if (Modifier.isPublic(modifiers)) {
+            return true;
+        }
+        Class<?> declaring = method.getDeclaringClass();
+        if (Modifier.isProtected(modifiers)) {
+            return declaring.isAssignableFrom(cls);
+        }
+        return declaring.getPackage().equals(cls.getPackage());
     }
 }
