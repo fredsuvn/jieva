@@ -18,10 +18,6 @@ public class TypeKit {
         return Cast.as(RawTypeFinder.find(type));
     }
 
-    public static Type getGenericType(TypeRef<?> typeRef) {
-        return typeRef.getType();
-    }
-
     public static Type getGenericSignature(Type type, Class<?> target) {
         return target.isInterface() ? getGenericInterface(type, target) : getGenericSuperclass(type, target);
     }
