@@ -45,30 +45,39 @@ public class TypeKit {
         return ActualTypeFinder.find(typeVariable, owner, declaringClass);
     }
 
+    public static Type getUpperType(Type type) {
+        if (type instanceof TypeVariable) {
+            return getUpperType(((TypeVariable<?>) type).getBounds()[0]);
+        }
+        if (type instanceof WildcardType) {
+            Type[] upperBounds = ((WildcardType) type).getUpperBounds();
+            if (upperBounds.length == 1) {
+                return getUpperType(upperBounds[0]);
+            }
+        }
+        return type;
+    }
+
     private static final class RawTypeFinder {
 
-        public static Class<?> find(Type type) {
-            return find0(type);
-        }
-
-        private static Class<?> find0(Type type) {
+        private static Class<?> find(Type type) {
             if (type instanceof Class) {
                 return (Class<?>) type;
             }
             if (type instanceof ParameterizedType) {
-                return getRawType(((ParameterizedType) type).getRawType());
+                return find(((ParameterizedType) type).getRawType());
             }
             if (type instanceof TypeVariable) {
                 Type boundType = ((TypeVariable<?>) type).getBounds()[0];
                 if (boundType instanceof Class) {
                     return (Class<?>) boundType;
                 }
-                return getRawType(boundType);
+                return find(boundType);
             }
             if (type instanceof WildcardType) {
                 Type[] upperBounds = ((WildcardType) type).getUpperBounds();
                 if (upperBounds.length == 1) {
-                    return getRawType(upperBounds[0]);
+                    return find(upperBounds[0]);
                 }
             }
             return Object.class;
@@ -77,11 +86,7 @@ public class TypeKit {
 
     private static final class GenericSuperclassFinder {
 
-        public static Type find(Type type, Class<?> targetClass) {
-            return find0(type, targetClass);
-        }
-
-        private static Type find0(Type type, Class<?> targetClass) {
+        private static Type find(Type type, Class<?> targetClass) {
             Type currentType = type;
             do {
                 Class<?> currentClass = TypeKit.getRawType(currentType);
