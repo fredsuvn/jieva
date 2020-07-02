@@ -384,10 +384,31 @@ public class ArrayKit {
 
     private static final class ArrayTypeFinder {
 
+        private static final Type[] ARRAY_TYPE_TABLE = {
+                Object.class, Object[].class,
+                String.class, String[].class,
+                boolean.class, boolean[].class,
+                byte.class, byte[].class,
+                short.class, short[].class,
+                char.class, char[].class,
+                int.class, int[].class,
+                long.class, long[].class,
+                float.class, float[].class,
+                double.class, double[].class,
+                Boolean.class, Boolean[].class,
+                Byte.class, Byte[].class,
+                Short.class, Short[].class,
+                Character.class, Character[].class,
+                Integer.class, Integer[].class,
+                Long.class, Long[].class,
+                Float.class, Float[].class,
+                Double.class, Double[].class,
+        };
+
         // Key: component type, value: array type
         private static final Cache<Type, Type> cache = Cache.newCommonCache();
 
-        private static final Finder<Type, Type> finder = Finder.pairHashFinder(ArrayTypeTable.TABLE);
+        private static final Finder<Type, Type> finder = Finder.pairHashFinder(ARRAY_TYPE_TABLE);
 
         public static Type find(Type componentType) {
             @Nullable Type arrayType = finder.find(componentType);
@@ -398,69 +419,49 @@ public class ArrayKit {
         }
 
         private static Type make(Type componentType) {
-
             if (componentType instanceof Class) {
                 return newArray((Class<?>) componentType, 0).getClass();
             }
+            return new GenericArrayTypeImpl(componentType);
+        }
+    }
 
-            class GenericArrayTypeImpl implements GenericArrayType {
+    private static final class GenericArrayTypeImpl implements GenericArrayType {
 
-                public Type getGenericComponentType() {
-                    return componentType;
-                }
+        private final Type componentType;
 
-                public String toString() {
-                    Type componentType = this.getGenericComponentType();
-                    StringBuilder buffer = new StringBuilder();
-                    if (componentType instanceof Class) {
-                        buffer.append(((Class<?>) componentType).getName());
-                    } else {
-                        buffer.append(componentType.toString());
-                    }
-
-                    buffer.append("[]");
-                    return buffer.toString();
-                }
-
-                public boolean equals(Object any) {
-                    if (any instanceof GenericArrayType) {
-                        GenericArrayType that = (GenericArrayType) any;
-                        return Equals.equals(componentType, that.getGenericComponentType());
-                    } else {
-                        return false;
-                    }
-                }
-
-                public int hashCode() {
-                    return Hash.hash(componentType);
-                }
-            }
-
-            return new GenericArrayTypeImpl();
+        private GenericArrayTypeImpl(Type componentType) {
+            this.componentType = componentType;
         }
 
-        private static final class ArrayTypeTable {
+        public Type getGenericComponentType() {
+            return componentType;
+        }
 
-            private static final Type[] TABLE = {
-                    Object.class, Object[].class,
-                    String.class, String[].class,
-                    boolean.class, boolean[].class,
-                    byte.class, byte[].class,
-                    short.class, short[].class,
-                    char.class, char[].class,
-                    int.class, int[].class,
-                    long.class, long[].class,
-                    float.class, float[].class,
-                    double.class, double[].class,
-                    Boolean.class, Boolean[].class,
-                    Byte.class, Byte[].class,
-                    Short.class, Short[].class,
-                    Character.class, Character[].class,
-                    Integer.class, Integer[].class,
-                    Long.class, Long[].class,
-                    Float.class, Float[].class,
-                    Double.class, Double[].class,
-            };
+        public String toString() {
+            Type componentType = this.getGenericComponentType();
+            StringBuilder buffer = new StringBuilder();
+            if (componentType instanceof Class) {
+                buffer.append(((Class<?>) componentType).getName());
+            } else {
+                buffer.append(componentType.toString());
+            }
+
+            buffer.append("[]");
+            return buffer.toString();
+        }
+
+        public boolean equals(Object any) {
+            if (any instanceof GenericArrayType) {
+                GenericArrayType that = (GenericArrayType) any;
+                return Equals.equals(componentType, that.getGenericComponentType());
+            } else {
+                return false;
+            }
+        }
+
+        public int hashCode() {
+            return Hash.hash(componentType);
         }
     }
 }
