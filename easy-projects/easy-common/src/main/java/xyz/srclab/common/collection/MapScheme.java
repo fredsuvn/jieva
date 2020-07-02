@@ -10,18 +10,12 @@ import java.lang.reflect.Type;
 @Immutable
 public interface MapScheme {
 
-    static MapScheme getMapScheme(Type keyType, Type valueType) {
-        return new MapScheme() {
-            @Override
-            public Type keyType() {
-                return keyType;
-            }
+    static MapScheme getMapScheme(Type type) {
+        return MapSchemeSupport.getMapScheme(type);
+    }
 
-            @Override
-            public Type valueType() {
-                return valueType;
-            }
-        };
+    static MapScheme newMapScheme(Type keyType, Type valueType) {
+        return MapSchemeSupport.newMapScheme(keyType, valueType);
     }
 
     Type keyType();

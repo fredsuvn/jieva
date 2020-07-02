@@ -6,6 +6,7 @@ import xyz.srclab.common.reflect.TypeKit;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author sunqian
@@ -14,27 +15,24 @@ final class MapSchemeSupport {
 
     private static final Cache<Type, MapScheme> cache = Cache.newCommonCache();
 
+    static MapScheme newMapScheme(Type keyType, Type valueType) {
+        return new MapSchemeImpl(keyType, valueType);
+    }
+
     static MapScheme getMapScheme(Type type) {
-        Type scheme = TypeKit.getGenericInterface(type, Map.class);
-        if (scheme instanceof Class) {
-            return new MapSchemeImpl(Object.class, Object.class);
-        }
-        if (scheme instanceof ParameterizedType) {
-            Type[] types = ((ParameterizedType) scheme).getActualTypeArguments();
-            return
-        }
+        return cache.getNonNull(type, MapSchemeSupport::getMapScheme0);
     }
 
     private static MapScheme getMapScheme0(Type type) {
         Type scheme = TypeKit.getGenericInterface(type, Map.class);
         if (scheme instanceof Class) {
-            return new MapSchemeImpl(Object.class, Object.class);
+            return MapScheme.newMapScheme(Object.class, Object.class);
         }
         if (scheme instanceof ParameterizedType) {
             Type[] types = ((ParameterizedType) scheme).getActualTypeArguments();
-            return new MapSchemeImpl(types[0], types[1]);
+            return MapScheme.newMapScheme(types[0], types[1]);
         }
-        //if (scheme instanceof )
+        throw new IllegalStateException("Unexpected type: " + scheme);
     }
 
     private static final class MapSchemeImpl implements MapScheme {
@@ -55,6 +53,29 @@ final class MapSchemeSupport {
         @Override
         public Type valueType() {
             return valueType;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+            if (object == null || !getClass().equals(object.getClass())) {
+                return false;
+            }
+            MapSchemeImpl mapScheme = (MapSchemeImpl) object;
+            return keyType.equals(mapScheme.keyType) &&
+                    valueType.equals(mapScheme.valueType);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(keyType, valueType);
+        }
+
+        @Override
+        public String toString() {
+            return "Map<" + keyType.getTypeName() + ", " + valueType.getTypeName() + ">";
         }
     }
 }
