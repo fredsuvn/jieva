@@ -5,6 +5,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Require;
 import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapScheme;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.reflect.ClassKit;
 
@@ -146,10 +147,10 @@ public interface Recorder {
             Converter converter, Predicate<@Nullable Object> predicate) {
         if (sourceRecordOrMap instanceof Map) {
             if (destRecordOrMap instanceof Map) {
-
+                MapScheme mapScheme = MapScheme.getMapScheme(destType);
                 copyMapToMap(
                         Cast.as(sourceRecordOrMap),
-                        Cast.as(destRecordOrMap), Object.class, Object.class,
+                        Cast.as(destRecordOrMap), mapScheme.keyType(), mapScheme.valueType(),
                         converter, predicate
                 );
             } else {
@@ -161,10 +162,10 @@ public interface Recorder {
             }
         } else {
             if (destRecordOrMap instanceof Map) {
-
+                MapScheme mapScheme = MapScheme.getMapScheme(destType);
                 copyRecordToMap(
                         sourceRecordOrMap, recordType(sourceRecordOrMap),
-                        Cast.as(destRecordOrMap), Object.class, Object.class,
+                        Cast.as(destRecordOrMap), mapScheme.keyType(), mapScheme.valueType(),
                         converter, predicate
                 );
             } else {
