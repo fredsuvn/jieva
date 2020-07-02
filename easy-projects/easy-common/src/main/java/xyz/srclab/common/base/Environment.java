@@ -1,5 +1,11 @@
 package xyz.srclab.common.base;
 
+import xyz.srclab.annotation.Immutable;
+import xyz.srclab.annotation.Out;
+import xyz.srclab.common.collection.MapKit;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -15,6 +21,7 @@ public class Environment {
     private final Os os;
     private final User user;
     private final App app;
+    private final Ext ext;
 
     private Environment() {
         this(System.getProperties());
@@ -25,6 +32,9 @@ public class Environment {
         this.os = new Os(properties);
         this.user = new User(properties);
         this.app = new App(properties);
+        Map<String, String> already = MapKit.merge(
+                java.properties(), os.properties(), user.properties(), app.properties());
+        this.ext = new Ext(properties, already);
     }
 
     public Java getJavaEnvironment() {
@@ -41,6 +51,10 @@ public class Environment {
 
     public App getAppEnvironment() {
         return app;
+    }
+
+    public Ext getExtEnvironment() {
+        return ext;
     }
 
     public String getJavaVersion() {
@@ -155,7 +169,19 @@ public class Environment {
         return user.getDir();
     }
 
-    public static final class Java {
+    private static abstract class Env {
+
+        protected String getProperty(String key, Properties source, @Out Map<String, String> dest) {
+            String value = source.getProperty(key);
+            dest.put(key, value);
+            return value;
+        }
+
+        @Immutable
+        public abstract Map<String, String> properties();
+    }
+
+    public static final class Java extends Env {
 
         private final String version;
         private final String vendor;
@@ -177,26 +203,30 @@ public class Environment {
         private final String compiler;
         private final String extDirs;
 
+        private final @Immutable Map<String, String> properties;
+
         private Java(Properties properties) {
-            this.version = properties.getProperty("java.version");
-            this.vendor = properties.getProperty("java.vendor");
-            this.vendorUrl = properties.getProperty("java.vendor.url");
-            this.home = properties.getProperty("java.home");
-            this.vmSpecificationVersion = properties.getProperty("java.vm.specification.version");
-            this.vmSpecificationVendor = properties.getProperty("java.vm.specification.vendor");
-            this.vmSpecificationName = properties.getProperty("java.vm.specification.name");
-            this.vmVersion = properties.getProperty("java.vm.version");
-            this.vmVendor = properties.getProperty("java.vm.vendor");
-            this.vmName = properties.getProperty("java.vm.name");
-            this.specificationVersion = properties.getProperty("java.specification.version");
-            this.specificationVendor = properties.getProperty("java.specification.vendor");
-            this.specificationName = properties.getProperty("java.specification.name");
-            this.classVersion = properties.getProperty("java.class.version");
-            this.classPath = properties.getProperty("java.class.path");
-            this.libraryPath = properties.getProperty("java.library.path");
-            this.ioTmpdir = properties.getProperty("java.io.tmpdir");
-            this.compiler = properties.getProperty("java.compiler");
-            this.extDirs = properties.getProperty("java.ext.dirs");
+            Map<String, String> javaProperties = new HashMap<>();
+            this.version = getProperty("java.version", properties, javaProperties);
+            this.vendor = getProperty("java.vendor", properties, javaProperties);
+            this.vendorUrl = getProperty("java.vendor.url", properties, javaProperties);
+            this.home = getProperty("java.home", properties, javaProperties);
+            this.vmSpecificationVersion = getProperty("java.vm.specification.version", properties, javaProperties);
+            this.vmSpecificationVendor = getProperty("java.vm.specification.vendor", properties, javaProperties);
+            this.vmSpecificationName = getProperty("java.vm.specification.name", properties, javaProperties);
+            this.vmVersion = getProperty("java.vm.version", properties, javaProperties);
+            this.vmVendor = getProperty("java.vm.vendor", properties, javaProperties);
+            this.vmName = getProperty("java.vm.name", properties, javaProperties);
+            this.specificationVersion = getProperty("java.specification.version", properties, javaProperties);
+            this.specificationVendor = getProperty("java.specification.vendor", properties, javaProperties);
+            this.specificationName = getProperty("java.specification.name", properties, javaProperties);
+            this.classVersion = getProperty("java.class.version", properties, javaProperties);
+            this.classPath = getProperty("java.class.path", properties, javaProperties);
+            this.libraryPath = getProperty("java.library.path", properties, javaProperties);
+            this.ioTmpdir = getProperty("java.io.tmpdir", properties, javaProperties);
+            this.compiler = getProperty("java.compiler", properties, javaProperties);
+            this.extDirs = getProperty("java.ext.dirs", properties, javaProperties);
+            this.properties = MapKit.unmodifiable(javaProperties);
         }
 
         public String getVersion() {
@@ -274,9 +304,14 @@ public class Environment {
         public String getExtDirs() {
             return extDirs;
         }
+
+        @Override
+        public @Immutable Map<String, String> properties() {
+            return properties;
+        }
     }
 
-    public static final class Os {
+    public static final class Os extends Env {
 
         private final String name;
         private final String arch;
@@ -285,13 +320,17 @@ public class Environment {
         private final String pathSeparator;
         private final String lineSeparator;
 
+        private final @Immutable Map<String, String> properties;
+
         private Os(Properties properties) {
-            this.name = properties.getProperty("os.name");
-            this.arch = properties.getProperty("os.arch");
-            this.version = properties.getProperty("os.version");
-            this.fileSeparator = properties.getProperty("file.separator");
-            this.pathSeparator = properties.getProperty("path.separator");
-            this.lineSeparator = properties.getProperty("line.separator");
+            Map<String, String> osProperties = new HashMap<>();
+            this.name = getProperty("os.name", properties, osProperties);
+            this.arch = getProperty("os.arch", properties, osProperties);
+            this.version = getProperty("os.version", properties, osProperties);
+            this.fileSeparator = getProperty("file.separator", properties, osProperties);
+            this.pathSeparator = getProperty("path.separator", properties, osProperties);
+            this.lineSeparator = getProperty("line.separator", properties, osProperties);
+            this.properties = MapKit.unmodifiable(osProperties);
         }
 
         public String getName() {
@@ -317,18 +356,27 @@ public class Environment {
         public String getLineSeparator() {
             return lineSeparator;
         }
+
+        @Override
+        public @Immutable Map<String, String> properties() {
+            return properties;
+        }
     }
 
-    public static final class User {
+    public static final class User extends Env {
 
         private final String name;
         private final String home;
         private final String dir;
 
+        private final @Immutable Map<String, String> properties;
+
         private User(Properties properties) {
-            this.name = properties.getProperty("user.name");
-            this.home = properties.getProperty("user.home");
-            this.dir = properties.getProperty("user.dir");
+            Map<String, String> userProperties = new HashMap<>();
+            this.name = getProperty("user.name", properties, userProperties);
+            this.home = getProperty("user.home", properties, userProperties);
+            this.dir = getProperty("user.dir", properties, userProperties);
+            this.properties = MapKit.unmodifiable(userProperties);
         }
 
         public String getName() {
@@ -342,11 +390,47 @@ public class Environment {
         public String getDir() {
             return dir;
         }
+
+        @Override
+        public @Immutable Map<String, String> properties() {
+            return properties;
+        }
     }
 
-    public static final class App {
+    public static final class App extends Env {
+
+        private final @Immutable Map<String, String> properties;
 
         private App(Properties properties) {
+            Map<String, String> appProperties = new HashMap<>();
+            this.properties = MapKit.unmodifiable(appProperties);
+        }
+
+        @Override
+        public @Immutable Map<String, String> properties() {
+            return properties;
+        }
+    }
+
+    public static final class Ext extends Env {
+
+        private final @Immutable Map<String, String> properties;
+
+        private Ext(Properties properties, Map<String, String> already) {
+            Map<String, String> extProperties = new HashMap<>();
+            properties.forEach((k, v) -> {
+                String key = k.toString();
+                if (already.containsKey(key)) {
+                    return;
+                }
+                extProperties.put(key, String.valueOf(v));
+            });
+            this.properties = MapKit.unmodifiable(extProperties);
+        }
+
+        @Override
+        public @Immutable Map<String, String> properties() {
+            return properties;
         }
     }
 

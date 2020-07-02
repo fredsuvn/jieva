@@ -54,6 +54,21 @@ public class MapKit {
         removeAll(map, removed);
     }
 
+    @SafeVarargs
+    @Immutable
+    public static <K, V> Map<K, V> merge(Map<K, V>... maps) {
+        return merge(Arrays.asList(maps));
+    }
+
+    @Immutable
+    public static <K, V> Map<K, V> merge(Iterable<? extends Map<K, V>> maps) {
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map<K, V> map : maps) {
+            result.putAll(map);
+        }
+        return unmodifiable(result);
+    }
+
     @Immutable
     public static <K, V> Map<K, V> immutable(Map<? extends K, ? extends V> map) {
         return ImmutableSupport.map(map);
