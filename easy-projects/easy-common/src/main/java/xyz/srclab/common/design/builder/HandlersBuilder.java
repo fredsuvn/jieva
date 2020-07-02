@@ -1,5 +1,6 @@
 package xyz.srclab.common.design.builder;
 
+import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 
 import java.util.Arrays;
@@ -9,10 +10,10 @@ import java.util.List;
 public abstract class HandlersBuilder<Product, Handler, Builder
         extends HandlersBuilder<Product, Handler, Builder>> extends CachedBuilder<Product> {
 
-    protected final List<Handler> handlers = new LinkedList<>();
+    private @Nullable List<Handler> handlers;
 
     public Builder handler(Handler handler) {
-        handlers.add(handler);
+        handlers().add(handler);
         this.updateState();
         return Cast.as(this);
     }
@@ -23,9 +24,23 @@ public abstract class HandlersBuilder<Product, Handler, Builder
 
     public Builder handlers(Iterable<Handler> handlers) {
         for (Handler handler : handlers) {
-            this.handlers.add(handler);
+            this.handlers().add(handler);
         }
         this.updateState();
         return Cast.as(this);
+    }
+
+    protected List<Handler> handlers() {
+        if (handlers == null) {
+            handlers = new LinkedList<>();
+        }
+        return handlers;
+    }
+
+    private List<Handler> getHandlers() {
+        if (handlers == null) {
+            handlers = new LinkedList<>();
+        }
+        return handlers;
     }
 }

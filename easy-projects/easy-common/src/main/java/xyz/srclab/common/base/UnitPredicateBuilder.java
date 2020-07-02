@@ -9,6 +9,7 @@ import xyz.srclab.common.lang.finder.Finder;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 /**
@@ -20,8 +21,10 @@ public class UnitPredicateBuilder extends CachedBuilder<Predicate<Class<?>>> {
         return new UnitPredicateBuilder();
     }
 
-    private final List<Class<?>> passTypes = new LinkedList<>();
-    private final List<Class<?>> failTypes = new LinkedList<>();
+    private @Nullable List<Class<?>> passTypes;
+    private @Nullable List<Class<?>> failTypes;
+    private @Nullable List<Class<?>> predicateTypes;
+    private @Nullable BiPredicate<Class<?>, Class<?>> typePredicate;
     private @Nullable Predicate<Class<?>> extraPredicate;
 
     private UnitPredicateBuilder() {
@@ -32,7 +35,7 @@ public class UnitPredicateBuilder extends CachedBuilder<Predicate<Class<?>>> {
     }
 
     public UnitPredicateBuilder passTypes(Iterable<Class<?>> passTypes) {
-        CollectionKit.addAll(this.passTypes, passTypes);
+        CollectionKit.addAll(passTypes(), passTypes);
         updateState();
         return this;
     }
@@ -42,7 +45,17 @@ public class UnitPredicateBuilder extends CachedBuilder<Predicate<Class<?>>> {
     }
 
     public UnitPredicateBuilder failTypes(Iterable<Class<?>> failTypes) {
-        CollectionKit.addAll(this.failTypes, failTypes);
+        CollectionKit.addAll(failTypes(), failTypes);
+        updateState();
+        return this;
+    }
+
+    public UnitPredicateBuilder predicateTypes(Class<?>... predicateTypes) {
+        return failTypes(Arrays.asList(predicateTypes));
+    }
+
+    public UnitPredicateBuilder predicateTypes(Iterable<Class<?>> predicateTypes) {
+        CollectionKit.addAll(predicateTypes(), predicateTypes);
         updateState();
         return this;
     }
@@ -51,6 +64,27 @@ public class UnitPredicateBuilder extends CachedBuilder<Predicate<Class<?>>> {
         this.extraPredicate = predicate;
         updateState();
         return this;
+    }
+
+    private List<Class<?>> passTypes() {
+        if (passTypes == null) {
+            passTypes = new LinkedList<>();
+        }
+        return passTypes;
+    }
+
+    private List<Class<?>> failTypes() {
+        if (failTypes == null) {
+            failTypes = new LinkedList<>();
+        }
+        return failTypes;
+    }
+
+    private List<Class<?>> predicateTypes() {
+        if (predicateTypes == null) {
+            predicateTypes = new LinkedList<>();
+        }
+        return predicateTypes;
     }
 
     @Override

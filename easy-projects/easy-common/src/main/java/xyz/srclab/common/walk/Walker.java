@@ -1,7 +1,5 @@
 package xyz.srclab.common.walk;
 
-import xyz.srclab.common.bean.BeanOperator;
-
 /**
  * @author sunqian
  */
