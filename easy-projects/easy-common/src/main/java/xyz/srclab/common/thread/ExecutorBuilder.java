@@ -8,10 +8,10 @@ import java.util.concurrent.*;
 /**
  * @author sunqian
  */
-public class ExecutorServiceBuilder {
+public class ExecutorBuilder {
 
-    public static ExecutorServiceBuilder newBuilder() {
-        return new ExecutorServiceBuilder();
+    public static ExecutorBuilder newBuilder() {
+        return new ExecutorBuilder();
     }
 
     private int corePoolSize = 1;
@@ -22,42 +22,42 @@ public class ExecutorServiceBuilder {
     private @Nullable ThreadFactory threadFactory;
     private @Nullable RejectedExecutionHandler rejectedExecutionHandler;
 
-    public ExecutorServiceBuilder corePoolSize(int corePoolSize) {
+    public ExecutorBuilder corePoolSize(int corePoolSize) {
         this.corePoolSize = corePoolSize;
         return this;
     }
 
-    public ExecutorServiceBuilder maximumPoolSize(int maximumPoolSize) {
+    public ExecutorBuilder maximumPoolSize(int maximumPoolSize) {
         this.maximumPoolSize = maximumPoolSize;
         return this;
     }
 
-    public ExecutorServiceBuilder workQueueCapacity(int workQueueCapacity) {
+    public ExecutorBuilder workQueueCapacity(int workQueueCapacity) {
         this.workQueueCapacity = workQueueCapacity;
         return this;
     }
 
-    public ExecutorServiceBuilder keepAliveTime(Duration keepAliveTime) {
+    public ExecutorBuilder keepAliveTime(Duration keepAliveTime) {
         this.keepAliveTime = keepAliveTime;
         return this;
     }
 
-    public ExecutorServiceBuilder workQueue(BlockingQueue<Runnable> workQueue) {
+    public ExecutorBuilder workQueue(BlockingQueue<Runnable> workQueue) {
         this.workQueue = workQueue;
         return this;
     }
 
-    public ExecutorServiceBuilder threadFactory(ThreadFactory threadFactory) {
+    public ExecutorBuilder threadFactory(ThreadFactory threadFactory) {
         this.threadFactory = threadFactory;
         return this;
     }
 
-    public ExecutorServiceBuilder rejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
+    public ExecutorBuilder rejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
         this.rejectedExecutionHandler = rejectedExecutionHandler;
         return this;
     }
 
-    public ExecutorService build() {
+    public ExecutorService buildExecutor() {
         long keepTime;
         TimeUnit keepUnit;
         if (keepAliveTime == null) {
@@ -88,7 +88,7 @@ public class ExecutorServiceBuilder {
                 );
     }
 
-    public ScheduledExecutorService buildScheduled() {
+    public ScheduledExecutorService buildScheduledExecutor() {
         if (threadFactory == null) {
             threadFactory = Executors.defaultThreadFactory();
         }
