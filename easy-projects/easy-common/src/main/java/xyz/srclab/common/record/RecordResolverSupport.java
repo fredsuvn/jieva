@@ -144,12 +144,12 @@ final class RecordResolverSupport {
 
             if (readMethod == null) {
                 Check.checkState(writeMethod != null, "Both read and write method are null");
-                Type type = TypeKit.getActualType(
+                Type type = TypeKit.tryActualType(
                         writeMethod.getGenericParameterTypes()[0], owner, writeMethod.getDeclaringClass());
                 this.type = TypeKit.getRawType(type);
                 this.genericType = type;
             } else {
-                Type type = TypeKit.getActualType(
+                Type type = TypeKit.tryActualType(
                         readMethod.getGenericReturnType(), owner, readMethod.getDeclaringClass());
                 this.type = TypeKit.getRawType(type);
                 this.genericType = type;
