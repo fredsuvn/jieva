@@ -3,6 +3,7 @@ package xyz.srclab.common.base;
 import xyz.srclab.common.record.Record;
 
 import java.lang.annotation.Annotation;
+import java.math.BigInteger;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
 import java.util.Collection;
@@ -33,6 +34,18 @@ public class Unit {
                 Date.class,
                 TemporalAccessor.class,
                 TemporalAmount.class,
+                String.class,
+                boolean.class, Integer.class,
+                byte.class, Integer.class,
+                short.class, Integer.class,
+                char.class, Integer.class,
+                int.class, Integer.class,
+                long.class, Integer.class,
+                float.class, Integer.class,
+                double.class, Integer.class,
+                void.class, Integer.class,
+                BigInteger.class,
+
         };
 
         private static final Class<?>[] FAIL_TYPES = {

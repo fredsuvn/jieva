@@ -45,7 +45,7 @@ public class ClassKit {
 
     private static final class WrapperFinder {
 
-        private static final Finder<Class<?>, Class<?>> finder = Finder.newPairFinder(WrapperClasses.TABLE);
+        private static final Finder<Class<?>, Class<?>> finder = Finder.pairHashFinder(WrapperClasses.TABLE);
 
         @Nullable
         public static Class<?> find(Class<?> primitive) {

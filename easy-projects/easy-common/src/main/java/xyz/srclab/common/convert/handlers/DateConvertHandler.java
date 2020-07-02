@@ -20,7 +20,7 @@ import java.util.function.BiFunction;
 public class DateConvertHandler implements ConvertHandler {
 
     private final Finder<Type, BiFunction<Object, DateTimeFormatter, Object>> finder =
-            Finder.newPairFinder(ConvertFunctions.TABLE);
+            Finder.pairHashFinder(ConvertFunctions.TABLE);
 
     private final DateTimeFormatter dateTimeFormatter;
 

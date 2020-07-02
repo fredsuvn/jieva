@@ -387,7 +387,7 @@ public class ArrayKit {
         // Key: component type, value: array type
         private static final Cache<Type, Type> cache = Cache.newCommonCache();
 
-        private static final Finder<Type, Type> finder = Finder.newPairFinder(ArrayTypeTable.TABLE);
+        private static final Finder<Type, Type> finder = Finder.pairHashFinder(ArrayTypeTable.TABLE);
 
         public static Type find(Type componentType) {
             @Nullable Type arrayType = finder.find(componentType);

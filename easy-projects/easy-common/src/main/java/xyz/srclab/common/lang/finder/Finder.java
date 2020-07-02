@@ -7,39 +7,48 @@ import java.util.function.BiPredicate;
 public interface Finder<K, V> {
 
     @SafeVarargs
-    static <T> Finder<T, T> newSimpleFinder(T... table) {
-        return FinderSupport.newSimpleFinder(table);
+    static <T> Finder<T, T> hashFinder(T... table) {
+        return FinderSupport.newHashFinder(table);
     }
 
-    static <T> Finder<T, T> newSimpleFinder(Iterable<? extends T> table) {
-        return FinderSupport.newSimpleFinder(table);
+    static <T> Finder<T, T> hashFinder(Iterable<? extends T> table) {
+        return FinderSupport.newHashFinder(table);
     }
 
-    static <T> Finder<T, T> newPredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
-        return FinderSupport.newPredicateFinder(table, predicate);
+    static <T> Finder<T, T> hashPredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
+        return FinderSupport.newHashPredicateFinder(table, predicate);
     }
 
-    static <T> Finder<T, T> newPredicateFinder(
+    static <T> Finder<T, T> hashPredicateFinder(
             Iterable<? extends T> table, BiPredicate<? super T, ? super T> predicate) {
-        return FinderSupport.newPredicateFinder(table, predicate);
+        return FinderSupport.newHashPredicateFinder(table, predicate);
     }
 
     @SafeVarargs
-    static <K, V, E> Finder<K, V> newPairFinder(E... table) {
-        return FinderSupport.newPairFinder(table);
+    static <K, V, E> Finder<K, V> pairHashFinder(E... table) {
+        return FinderSupport.newPairHashFinder(table);
     }
 
-    static <K, V, E> Finder<K, V> newPairFinder(Iterable<? extends E> table) {
-        return FinderSupport.newPairFinder(table);
+    static <K, V, E> Finder<K, V> pairHashFinder(Iterable<? extends E> table) {
+        return FinderSupport.newPairHashFinder(table);
     }
 
-    static <K, V, E> Finder<K, V> newPredicatePairFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
-        return FinderSupport.newPredicatePairFinder(table, predicate);
+    static <K, V, E> Finder<K, V> pairHashPredicateFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
+        return FinderSupport.newPairHashPredicateFinder(table, predicate);
     }
 
-    static <K, V, E> Finder<K, V> newPredicatePairFinder(
+    static <K, V, E> Finder<K, V> pairHashPredicateFinder(
             Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
-        return FinderSupport.newPredicatePairFinder(table, predicate);
+        return FinderSupport.newPairHashPredicateFinder(table, predicate);
+    }
+
+    @SafeVarargs
+    static <K, V> Finder<K, V> concat(Finder<K, V>... finders) {
+        return FinderSupport.newConcatFinder(finders);
+    }
+
+    static <K, V> Finder<K, V> concat(Iterable<? extends Finder<K, V>> finders) {
+        return FinderSupport.newConcatFinder(finders);
     }
 
     boolean has(K key);

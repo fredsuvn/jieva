@@ -1,6 +1,7 @@
 package xyz.srclab.common.lang.finder;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
 
@@ -11,50 +12,59 @@ import java.util.function.BiPredicate;
 final class FinderSupport {
 
     @SafeVarargs
-    static <T> Finder<T, T> newSimpleFinder(T... table) {
-        return new SimpleFinder<>(table);
+    static <T> Finder<T, T> newHashFinder(T... table) {
+        return new HashFinder<>(table);
     }
 
-    static <T> Finder<T, T> newSimpleFinder(Iterable<? extends T> table) {
-        return new SimpleFinder<>(table);
+    static <T> Finder<T, T> newHashFinder(Iterable<? extends T> table) {
+        return new HashFinder<>(table);
     }
 
-    static <T> Finder<T, T> newPredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
-        return new PredicateFinder<>(table, predicate);
+    static <T> Finder<T, T> newHashPredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
+        return new HashPredicateFinder<>(table, predicate);
     }
 
-    static <T> Finder<T, T> newPredicateFinder(
+    static <T> Finder<T, T> newHashPredicateFinder(
             Iterable<? extends T> table, BiPredicate<? super T, ? super T> predicate) {
-        return new PredicateFinder<>(table, predicate);
+        return new HashPredicateFinder<>(table, predicate);
     }
 
     @SafeVarargs
-    static <K, V, E> Finder<K, V> newPairFinder(E... table) {
-        return new PairFinder<>(table);
+    static <K, V, E> Finder<K, V> newPairHashFinder(E... table) {
+        return new PairHashFinder<>(table);
     }
 
-    static <K, V, E> Finder<K, V> newPairFinder(Iterable<? extends E> table) {
-        return new PairFinder<>(table);
+    static <K, V, E> Finder<K, V> newPairHashFinder(Iterable<? extends E> table) {
+        return new PairHashFinder<>(table);
     }
 
-    static <K, V, E> Finder<K, V> newPredicatePairFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
-        return new PredicatePairFinder<>(table, predicate);
+    static <K, V, E> Finder<K, V> newPairHashPredicateFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
+        return new PairHashPredicateFinder<>(table, predicate);
     }
 
-    static <K, V, E> Finder<K, V> newPredicatePairFinder(
+    static <K, V, E> Finder<K, V> newPairHashPredicateFinder(
             Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
-        return new PredicatePairFinder<>(table, predicate);
+        return new PairHashPredicateFinder<>(table, predicate);
     }
 
-    private static final class SimpleFinder<T> implements Finder<T, T> {
+    @SafeVarargs
+    static <K, V> Finder<K, V> newConcatFinder(Finder<K, V>... finders) {
+        return new ConcatFinder<>(finders);
+    }
+
+    static <K, V> Finder<K, V> newConcatFinder(Iterable<? extends Finder<K, V>> finders) {
+        return new ConcatFinder<>(finders);
+    }
+
+    private static final class HashFinder<T> implements Finder<T, T> {
 
         private final Set<T> tableSet;
 
-        private SimpleFinder(T[] table) {
+        private HashFinder(T[] table) {
             this.tableSet = SetKit.immutable(table);
         }
 
-        private SimpleFinder(Iterable<? extends T> table) {
+        private HashFinder(Iterable<? extends T> table) {
             this.tableSet = SetKit.immutable(table);
         }
 
@@ -70,17 +80,17 @@ final class FinderSupport {
         }
     }
 
-    private static final class PredicateFinder<T> implements Finder<T, T> {
+    private static final class HashPredicateFinder<T> implements Finder<T, T> {
 
         private final Set<T> tableSet;
         private final BiPredicate<? super T, ? super T> predicate;
 
-        private PredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
+        private HashPredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
             this.tableSet = SetKit.immutable(table);
             this.predicate = predicate;
         }
 
-        private PredicateFinder(Iterable<? extends T> table, BiPredicate<? super T, ? super T> predicate) {
+        private HashPredicateFinder(Iterable<? extends T> table, BiPredicate<? super T, ? super T> predicate) {
             this.tableSet = SetKit.immutable(table);
             this.predicate = predicate;
         }
@@ -103,15 +113,15 @@ final class FinderSupport {
         }
     }
 
-    private static final class PairFinder<K, V, E> implements Finder<K, V> {
+    private static final class PairHashFinder<K, V, E> implements Finder<K, V> {
 
         private final Map<K, V> tableMap;
 
-        private PairFinder(E[] table) {
+        private PairHashFinder(E[] table) {
             this.tableMap = MapKit.pairToMap(table);
         }
 
-        private PairFinder(Iterable<? extends E> table) {
+        private PairHashFinder(Iterable<? extends E> table) {
             this.tableMap = MapKit.pairToMap(table);
         }
 
@@ -127,17 +137,17 @@ final class FinderSupport {
         }
     }
 
-    private static final class PredicatePairFinder<K, V, E> implements Finder<K, V> {
+    private static final class PairHashPredicateFinder<K, V, E> implements Finder<K, V> {
 
         private final Map<K, V> tableMap;
         private final BiPredicate<? super K, ? super K> predicate;
 
-        private PredicatePairFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
+        private PairHashPredicateFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
             this.tableMap = MapKit.pairToMap(table);
             this.predicate = predicate;
         }
 
-        private PredicatePairFinder(Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
+        private PairHashPredicateFinder(Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
             this.tableMap = MapKit.pairToMap(table);
             this.predicate = predicate;
         }
@@ -162,6 +172,42 @@ final class FinderSupport {
                     .findFirst()
                     .orElse(null);
             return realKey == null ? null : tableMap.get(realKey);
+        }
+    }
+
+    private static final class ConcatFinder<K, V> implements Finder<K, V> {
+
+        private final Finder<K, V>[] finders;
+
+        @SafeVarargs
+        private ConcatFinder(Finder<K, V>... finders) {
+            this.finders = finders.clone();
+        }
+
+        private ConcatFinder(Iterable<? extends Finder<K, V>> finders) {
+            this.finders = ArrayKit.toArray(finders, Finder.class);
+        }
+
+        @Override
+        public boolean has(K key) {
+            for (Finder<K, V> finder : finders) {
+                if (finder.has(key)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Nullable
+        @Override
+        public V find(K key) {
+            for (Finder<K, V> finder : finders) {
+                @Nullable V result = finder.find(key);
+                if (result != null) {
+                    return result;
+                }
+            }
+            return null;
         }
     }
 }
