@@ -14,7 +14,12 @@ final class ConvertHandlerSupport {
 
     @Immutable
     static List<ConvertHandler> defaultHandlers() {
-        return ListKit.immutable(Arrays.asList(
+        return DefaultHandlersHolder.INSTANCES;
+    }
+
+    private static final class DefaultHandlersHolder {
+
+        public static final List<ConvertHandler> INSTANCES = ListKit.immutable(Arrays.asList(
                 new CastConvertHandler(),
                 new DateConvertHandler(),
                 new StringConvertHandler(),
@@ -22,7 +27,7 @@ final class ConvertHandlerSupport {
                 new TypeBoundsConvertHandler(),
                 new ListConvertHandler(),
                 new SetConvertHandler(),
-                new ObjectConvertHandler()
+                new RecordConvertHandler()
         ));
     }
 }

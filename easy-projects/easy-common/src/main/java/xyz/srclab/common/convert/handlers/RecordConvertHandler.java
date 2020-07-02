@@ -14,25 +14,44 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 /**
  * @author sunqian
  */
-public class ObjectConvertHandler implements ConvertHandler {
+public class RecordConvertHandler implements ConvertHandler {
+
+    private static final Predicate<Type> DEFAULT_RECORD_TYPE_PREDICATE = o -> true;
 
     private final Recorder recorder;
+    private final Predicate<Type> recordTypePredicate;
 
-    public ObjectConvertHandler() {
+    public RecordConvertHandler() {
         this(Recorder.defaultRecorder());
     }
 
-    public ObjectConvertHandler(Recorder recorder) {
+    public RecordConvertHandler(Recorder recorder) {
+        this(recorder, DEFAULT_RECORD_TYPE_PREDICATE);
+    }
+
+    public RecordConvertHandler(Predicate<Type> recordTypePredicate) {
+        this(Recorder.defaultRecorder(), recordTypePredicate);
+    }
+
+    public RecordConvertHandler(Recorder recorder, Predicate<Type> recordTypePredicate) {
         this.recorder = recorder;
+        this.recordTypePredicate = recordTypePredicate;
     }
 
     @Override
     public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        Object result = newInstance(to);
+        if (!(from instanceof Map || recordTypePredicate.test(from.getClass()))) {
+            return null;
+        }
+        @Nullable Object result = newInstance(to);
+        if (result == null) {
+            return null;
+        }
         recorder.copyEntries(from, result, converter);
         return result;
     }
@@ -45,14 +64,24 @@ public class ObjectConvertHandler implements ConvertHandler {
         if (!(to instanceof ParameterizedType)) {
             return null;
         }
+        if (!(from instanceof Map || recordTypePredicate.test(from.getClass()))) {
+            return null;
+        }
         ParameterizedType parameterizedType = (ParameterizedType) to;
         Class<?> rawType = TypeKit.getRawType(parameterizedType.getRawType());
-        Object result = newInstance(rawType);
+        @Nullable Object result = newInstance(rawType);
+        if (result == null) {
+            return null;
+        }
         recorder.copyEntries(from, result, to, converter);
         return result;
     }
 
+    @Nullable
     private Object newInstance(Class<?> type) {
+        if (!recordTypePredicate.test(type)) {
+            return null;
+        }
         Object result;
         if (type.equals(Map.class) || type.equals(LinkedHashMap.class)) {
             result = new LinkedHashMap<>();
