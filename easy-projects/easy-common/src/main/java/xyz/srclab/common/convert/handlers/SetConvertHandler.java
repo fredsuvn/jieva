@@ -24,27 +24,27 @@ public class SetConvertHandler implements ConvertHandler {
                 || to.equals(LinkedHashSet.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
-                return iterableToSet(iterable, converter, LinkedHashSet::new);
+                return iterableToSet(iterable, Object.class, converter, LinkedHashSet::new);
             } else if (from.getClass().isArray()) {
-                return arrayToSet(from, converter, LinkedHashSet::new);
+                return arrayToSet(from, Object.class, converter, LinkedHashSet::new);
             }
             return null;
         }
         if (to.equals(HashSet.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
-                return iterableToSet(iterable, converter, HashSet::new);
+                return iterableToSet(iterable, Object.class, converter, HashSet::new);
             } else if (from.getClass().isArray()) {
-                return arrayToSet(from, converter, HashSet::new);
+                return arrayToSet(from, Object.class, converter, HashSet::new);
             }
             return null;
         }
         if (to.equals(TreeSet.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
-                return iterableToSet(iterable, converter, TreeSet::new);
+                return iterableToSet(iterable, Object.class, converter, TreeSet::new);
             } else if (from.getClass().isArray()) {
-                return arrayToSet(from, converter, i -> new TreeSet<>());
+                return arrayToSet(from, Object.class, converter, i -> new TreeSet<>());
             }
             return null;
         }
@@ -59,34 +59,34 @@ public class SetConvertHandler implements ConvertHandler {
         if (!(to instanceof ParameterizedType)) {
             return null;
         }
-        ParameterizedType parameterizedTo = (ParameterizedType) to;
-        Class<?> rawTo = TypeKit.getRawType(to);
-        if (rawTo.equals(Collection.class)
-                || rawTo.equals(Set.class)
-                || rawTo.equals(LinkedHashSet.class)) {
+        ParameterizedType setType = (ParameterizedType) to;
+        Class<?> rawSetType = TypeKit.getRawType(setType.getRawType());
+        if (rawSetType.equals(Collection.class)
+                || rawSetType.equals(Set.class)
+                || rawSetType.equals(LinkedHashSet.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
-                return iterableToSet(iterable, parameterizedTo, converter, LinkedHashSet::new);
+                return iterableToSet(iterable, setType.getActualTypeArguments()[0], converter, LinkedHashSet::new);
             } else if (from.getClass().isArray()) {
-                return arrayToSet(from, parameterizedTo, converter, LinkedHashSet::new);
+                return arrayToSet(from, setType.getActualTypeArguments()[0], converter, LinkedHashSet::new);
             }
             return null;
         }
-        if (rawTo.equals(HashSet.class)) {
+        if (rawSetType.equals(HashSet.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
-                return iterableToSet(iterable, parameterizedTo, converter, HashSet::new);
+                return iterableToSet(iterable, setType.getActualTypeArguments()[0], converter, HashSet::new);
             } else if (from.getClass().isArray()) {
-                return arrayToSet(from, parameterizedTo, converter, HashSet::new);
+                return arrayToSet(from, setType.getActualTypeArguments()[0], converter, HashSet::new);
             }
             return null;
         }
-        if (rawTo.equals(TreeSet.class)) {
+        if (rawSetType.equals(TreeSet.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
-                return iterableToSet(iterable, parameterizedTo, converter, TreeSet::new);
+                return iterableToSet(iterable, setType.getActualTypeArguments()[0], converter, TreeSet::new);
             } else if (from.getClass().isArray()) {
-                return arrayToSet(from, parameterizedTo, converter, i -> new TreeSet<>());
+                return arrayToSet(from, setType.getActualTypeArguments()[0], converter, i -> new TreeSet<>());
             }
             return null;
         }
@@ -94,27 +94,6 @@ public class SetConvertHandler implements ConvertHandler {
     }
 
     private Set<?> iterableToSet(
-            Iterable<?> iterable, Converter converter, Supplier<Set<Object>> setSupplier) {
-        return iterableToSet0(iterable, Object.class, converter, setSupplier);
-    }
-
-    private Set<?> iterableToSet(
-            Iterable<?> iterable, ParameterizedType type, Converter converter, Supplier<Set<Object>> setSupplier) {
-        return iterableToSet0(
-                iterable, ((ParameterizedType) type).getActualTypeArguments()[0], converter, setSupplier);
-    }
-
-    private Set<?> arrayToSet(
-            Object array, Converter converter, Function<Integer, Set<Object>> setFunction) {
-        return arrayToSet0(array, Object.class, converter, setFunction);
-    }
-
-    private Set<?> arrayToSet(
-            Object array, ParameterizedType type, Converter converter, Function<Integer, Set<Object>> setFunction) {
-        return arrayToSet0(array, ((ParameterizedType) type).getActualTypeArguments()[0], converter, setFunction);
-    }
-
-    private Set<?> iterableToSet0(
             Iterable<?> iterable, Type componentType, Converter converter, Supplier<Set<Object>> setSupplier) {
         Set<Object> result = setSupplier.get();
         for (@Nullable Object o : iterable) {
@@ -128,9 +107,9 @@ public class SetConvertHandler implements ConvertHandler {
         return result;
     }
 
-    private Set<?> arrayToSet0(
+    private Set<?> arrayToSet(
             Object array, Type componentType, Converter converter, Function<Integer, Set<Object>> setFunction) {
         List<Object> list = ArrayKit.asList(array);
-        return iterableToSet0(list, componentType, converter, () -> setFunction.apply(list.size()));
+        return iterableToSet(list, componentType, converter, () -> setFunction.apply(list.size()));
     }
 }

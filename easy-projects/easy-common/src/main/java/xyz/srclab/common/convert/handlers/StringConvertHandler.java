@@ -14,7 +14,7 @@ public class StringConvertHandler implements ConvertHandler {
 
     @Override
     public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        if (Cast.canCast(to, CharSequence.class)) {
+        if (to.equals(String.class) || Cast.canCast(to, CharSequence.class)) {
             return from.toString();
         }
         return null;

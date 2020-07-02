@@ -20,10 +20,9 @@ final class ConvertHandlerSupport {
                 new StringConvertHandler(),
                 new NumberConvertHandler(),
                 new TypeBoundsConvertHandler(),
-                new MapConvertHandler(),
                 new ListConvertHandler(),
                 new SetConvertHandler(),
-                new RecordConvertHandler()
+                new ObjectConvertHandler()
         ));
     }
 }
