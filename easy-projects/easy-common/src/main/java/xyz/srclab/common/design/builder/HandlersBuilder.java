@@ -1,7 +1,9 @@
 package xyz.srclab.common.design.builder;
 
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.collection.ListKit;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -11,6 +13,7 @@ public abstract class HandlersBuilder<Product, Handler, Builder
         extends HandlersBuilder<Product, Handler, Builder>> extends CachedBuilder<Product> {
 
     private @Nullable List<Handler> handlers;
+    private @Nullable @Immutable List<Handler> result;
 
     public Builder handler(Handler handler) {
         handlers().add(handler);
@@ -37,10 +40,20 @@ public abstract class HandlersBuilder<Product, Handler, Builder
         return handlers;
     }
 
-    private List<Handler> getHandlers() {
-        if (handlers == null) {
-            handlers = new LinkedList<>();
+    @Immutable
+    protected List<Handler> handlersResult() {
+        if (result == null || isUpdateSinceLastBuild()) {
+            result = newResult();
         }
-        return handlers;
+        return result;
+    }
+
+    @Immutable
+    private List<Handler> newResult() {
+        if (handlers == null) {
+            return ListKit.empty();
+        } else {
+            return ListKit.immutable(handlers);
+        }
     }
 }
