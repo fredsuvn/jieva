@@ -2,6 +2,7 @@ package xyz.srclab.common.lang.finder;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
 
@@ -10,6 +11,10 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 
 final class FinderSupport {
+
+    static <K, V> Finder<K, V> getEmptyFinder() {
+        return Cast.as(EmptyFinder.INSTANCE);
+    }
 
     @SafeVarargs
     static <T> Finder<T, T> newHashFinder(T... table) {
@@ -210,4 +215,23 @@ final class FinderSupport {
             return null;
         }
     }
+
+    private static final class EmptyFinder implements Finder<Object, Object> {
+
+        public static EmptyFinder INSTANCE = new EmptyFinder();
+
+        private EmptyFinder() {
+        }
+
+        @Override
+        public boolean has(Object key) {
+            return false;
+        }
+
+        @Override
+        public Object find(Object key) {
+            return null;
+        }
+    }
+
 }

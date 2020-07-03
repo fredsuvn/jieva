@@ -6,6 +6,10 @@ import java.util.function.BiPredicate;
 
 public interface Finder<K, V> {
 
+    static <K, V> Finder<K, V> emptyFinder() {
+        return FinderSupport.getEmptyFinder();
+    }
+
     @SafeVarargs
     static <T> Finder<T, T> hashFinder(T... table) {
         return FinderSupport.newHashFinder(table);
