@@ -26,13 +26,10 @@ public class RecordResolverBuilder extends
         return new RecordResolverBuilder();
     }
 
-    private RecordResolverBuilder() {
-    }
-
     @Override
     protected RecordResolver buildNew() {
-        Check.checkState(!handlers.isEmpty(), "There is no handler");
-        return new RecorderImpl(handlers);
+        Check.checkState(!handlersResult().isEmpty(), "There is no handler");
+        return new RecorderImpl(handlersResult());
     }
 
     private static final class RecorderImpl implements RecordResolver {

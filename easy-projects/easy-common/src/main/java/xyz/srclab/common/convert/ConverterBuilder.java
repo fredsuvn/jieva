@@ -19,13 +19,10 @@ public class ConverterBuilder extends HandlersBuilder<Converter, ConvertHandler,
         return new ConverterBuilder();
     }
 
-    private ConverterBuilder() {
-    }
-
     @Override
     protected Converter buildNew() {
-        Check.checkState(!handlers.isEmpty(), "There is no handler");
-        return new ConverterImpl(handlers);
+        Check.checkState(!handlersResult().isEmpty(), "There is no handler");
+        return new ConverterImpl(handlersResult());
     }
 
     private static final class ConverterImpl implements Converter {
