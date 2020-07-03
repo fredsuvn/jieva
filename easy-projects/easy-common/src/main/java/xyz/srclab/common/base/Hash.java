@@ -43,4 +43,8 @@ public class Hash {
         }
         return Objects.hashCode(any);
     }
+
+    public static int hash(Object... objects) {
+        return Arrays.deepHashCode(objects);
+    }
 }

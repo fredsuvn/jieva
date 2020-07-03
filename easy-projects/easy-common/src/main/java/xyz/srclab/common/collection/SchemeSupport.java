@@ -1,5 +1,6 @@
 package xyz.srclab.common.collection;
 
+import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.reflect.TypeKit;
 
@@ -11,7 +12,7 @@ import java.util.Objects;
 /**
  * @author sunqian
  */
-final class MapSchemeSupport {
+final class SchemeSupport {
 
     private static final Cache<Type, MapScheme> cache = Cache.newCommonCache();
 
@@ -20,7 +21,7 @@ final class MapSchemeSupport {
     }
 
     static MapScheme getMapScheme(Type type) {
-        return cache.getNonNull(type, MapSchemeSupport::getMapScheme0);
+        return cache.getNonNull(type, SchemeSupport::getMapScheme0);
     }
 
     private static MapScheme getMapScheme0(Type type) {
@@ -33,6 +34,42 @@ final class MapSchemeSupport {
             return MapScheme.newMapScheme(types[0], types[1]);
         }
         throw new IllegalStateException("Unexpected type: " + scheme);
+    }
+
+    private static final class IterableSchemeImpl implements IterableScheme {
+
+        private final Type elementType;
+
+        private IterableSchemeImpl(Type elementType) {
+            this.elementType = elementType;
+        }
+
+        @Override
+        public Type elementType() {
+            return elementType;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) {
+                return true;
+            }
+            if (object == null || !getClass().equals(object.getClass())) {
+                return false;
+            }
+            IterableSchemeImpl iterableScheme = (IterableSchemeImpl) object;
+            return elementType.equals(iterableScheme.elementType)
+        }
+
+        @Override
+        public int hashCode() {
+            return Hash.hash(elementType);
+        }
+
+        @Override
+        public String toString() {
+            return "Map<" + keyType.getTypeName() + ", " + valueType.getTypeName() + ">";
+        }
     }
 
     private static final class MapSchemeImpl implements MapScheme {
@@ -70,7 +107,7 @@ final class MapSchemeSupport {
 
         @Override
         public int hashCode() {
-            return Objects.hash(keyType, valueType);
+            return Hash.hash(keyType, valueType);
         }
 
         @Override

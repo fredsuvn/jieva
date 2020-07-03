@@ -1,21 +1,15 @@
 package xyz.srclab.common.walk;
 
+import java.lang.reflect.Type;
+
 /**
  * @author sunqian
  */
 public interface Walker {
 
-    Object ROOT_INDEX = new Object();
-
-    Walker DEFAULT = WalkerSupport.getDefaultWalker();
-
-    static Walker withBeanOperator(BeanOperator beanOperator) {
-        return WalkerSupport.withBeanOperator(beanOperator);
+    default void walk(Object any) {
+        walk(any, any.getClass());
     }
 
-    static Walker withProvider(WalkerProvider walkerProvider) {
-        return WalkerSupport.withProvider(walkerProvider);
-    }
-
-    void walk(Object walked, WalkVisitor visitor);
+    void walk(Object any, Type type);
 }
