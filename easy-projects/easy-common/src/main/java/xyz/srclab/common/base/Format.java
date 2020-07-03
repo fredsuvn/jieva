@@ -13,7 +13,7 @@ public class Format {
         return FastFormat.INSTANCE.format(messagePattern, args);
     }
 
-    public static String printfFormat(String messagePattern, Object... args) {
+    public static String stringFormat(String messagePattern, Object... args) {
         return String.format(Locale.getDefault(), messagePattern, args);
     }
 
