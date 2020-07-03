@@ -3,6 +3,7 @@ package xyz.srclab.common.convert.handlers;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.convert.Converter;
+import xyz.srclab.common.object.UnitPredicate;
 import xyz.srclab.common.record.Recorder;
 import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.reflect.TypeKit;
@@ -14,44 +15,38 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
 
 /**
  * @author sunqian
  */
 public class RecordConvertHandler implements ConvertHandler {
 
-    private static final Predicate<Type> DEFAULT_RECORD_TYPE_PREDICATE = o -> true;
-
     private final Recorder recorder;
-    private final Predicate<Type> recordTypePredicate;
+    private final UnitPredicate unitPredicate;
 
     public RecordConvertHandler() {
         this(Recorder.defaultRecorder());
     }
 
     public RecordConvertHandler(Recorder recorder) {
-        this(recorder, DEFAULT_RECORD_TYPE_PREDICATE);
+        this(recorder, UnitPredicate.defaultPredicate());
     }
 
-    public RecordConvertHandler(Predicate<Type> recordTypePredicate) {
-        this(Recorder.defaultRecorder(), recordTypePredicate);
+    public RecordConvertHandler(UnitPredicate unitPredicate) {
+        this(Recorder.defaultRecorder(), unitPredicate);
     }
 
-    public RecordConvertHandler(Recorder recorder, Predicate<Type> recordTypePredicate) {
+    public RecordConvertHandler(Recorder recorder, UnitPredicate unitPredicate) {
         this.recorder = recorder;
-        this.recordTypePredicate = recordTypePredicate;
+        this.unitPredicate = unitPredicate;
     }
 
     @Override
     public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        if (!(from instanceof Map || recordTypePredicate.test(from.getClass()))) {
+        if (unitPredicate.test(from.getClass()) || unitPredicate.test(to)) {
             return null;
         }
-        @Nullable Object result = newInstance(to);
-        if (result == null) {
-            return null;
-        }
+        Object result = newInstance(to);
         recorder.copyEntries(from, result, converter);
         return result;
     }
@@ -64,24 +59,17 @@ public class RecordConvertHandler implements ConvertHandler {
         if (!(to instanceof ParameterizedType)) {
             return null;
         }
-        if (!(from instanceof Map || recordTypePredicate.test(from.getClass()))) {
+        if (unitPredicate.test(from.getClass()) || unitPredicate.test(to)) {
             return null;
         }
         ParameterizedType parameterizedType = (ParameterizedType) to;
         Class<?> rawType = TypeKit.getRawType(parameterizedType.getRawType());
-        @Nullable Object result = newInstance(rawType);
-        if (result == null) {
-            return null;
-        }
+        Object result = newInstance(rawType);
         recorder.copyEntries(from, result, to, converter);
         return result;
     }
 
-    @Nullable
     private Object newInstance(Class<?> type) {
-        if (!recordTypePredicate.test(type)) {
-            return null;
-        }
         Object result;
         if (type.equals(Map.class) || type.equals(LinkedHashMap.class)) {
             result = new LinkedHashMap<>();

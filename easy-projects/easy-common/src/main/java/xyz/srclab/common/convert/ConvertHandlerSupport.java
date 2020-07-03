@@ -27,7 +27,7 @@ final class ConvertHandlerSupport {
                 new TypeBoundsConvertHandler(),
                 new ListConvertHandler(),
                 new SetConvertHandler(),
-                new RecordConvertHandler()
+                new RecordConvertHandler(t -> true)
         ));
     }
 }
