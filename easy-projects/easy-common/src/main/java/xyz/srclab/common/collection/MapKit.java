@@ -79,6 +79,11 @@ public class MapKit {
         return Collections.unmodifiableMap(map);
     }
 
+    @Immutable
+    public static <K, V> Map<K, V> empty() {
+        return Collections.emptyMap();
+    }
+
     public static <K, V> Map.Entry<K, V> firstEntry(Map<K, V> map) throws NoSuchElementException {
         return map.entrySet().iterator().next();
     }

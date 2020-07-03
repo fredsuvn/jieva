@@ -88,6 +88,11 @@ public class SetKit {
         return Collections.unmodifiableSet(IterableKit.asSet(elements));
     }
 
+    @Immutable
+    public static <E> Set<E> empty() {
+        return Collections.emptySet();
+    }
+
     public static <E> E firstElement(Iterable<? extends E> iterable) {
         return IterableKit.firstElement(iterable);
     }

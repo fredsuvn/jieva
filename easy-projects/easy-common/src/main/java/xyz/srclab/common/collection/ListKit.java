@@ -78,4 +78,9 @@ public class ListKit {
     public static <E> List<E> unmodifiable(Iterable<? extends E> elements) {
         return Collections.unmodifiableList(IterableKit.asList(elements));
     }
+
+    @Immutable
+    public static <E> List<E> empty() {
+        return Collections.emptyList();
+    }
 }
