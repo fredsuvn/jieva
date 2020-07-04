@@ -7,6 +7,10 @@ import java.lang.reflect.Type;
  */
 public interface Walker {
 
+    static WalkerBuilder newBuilder() {
+        return WalkerBuilder.newBuilder();
+    }
+
     default void walk(Object any) {
         walk(any, any.getClass());
     }
