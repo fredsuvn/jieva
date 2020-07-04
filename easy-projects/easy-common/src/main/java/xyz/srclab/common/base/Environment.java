@@ -23,6 +23,8 @@ public class Environment {
     private final App app;
     private final Ext ext;
 
+    private final @Immutable Map<String, String> properties;
+
     private Environment() {
         this(System.getProperties());
     }
@@ -35,138 +37,143 @@ public class Environment {
         Map<String, String> already = MapKit.merge(
                 java.properties(), os.properties(), user.properties(), app.properties());
         this.ext = new Ext(properties, already);
+        this.properties = MapKit.map(properties, String::valueOf, String::valueOf);
     }
 
-    public Java getJavaEnvironment() {
+    public Java javaEnvironment() {
         return java;
     }
 
-    public Os getOsEnvironment() {
+    public Os osEnvironment() {
         return os;
     }
 
-    public User getUserEnvironment() {
+    public User userEnvironment() {
         return user;
     }
 
-    public App getAppEnvironment() {
+    public App appEnvironment() {
         return app;
     }
 
-    public Ext getExtEnvironment() {
+    public Ext extEnvironment() {
         return ext;
     }
 
-    public String getJavaVersion() {
-        return java.getVersion();
+    public Map<String, String> asMap() {
+        return properties;
     }
 
-    public String getJavaVendor() {
-        return java.getVendor();
+    public String javaVersion() {
+        return java.version();
     }
 
-    public String getJavaVendorUrl() {
-        return java.getVendorUrl();
+    public String javaVendor() {
+        return java.vendor();
     }
 
-    public String getJavaHome() {
-        return java.getHome();
+    public String javaVendorUrl() {
+        return java.vendorUrl();
     }
 
-    public String getJavaVmSpecificationVersion() {
-        return java.getVmSpecificationVersion();
+    public String javaHome() {
+        return java.home();
     }
 
-    public String getJavaVmSpecificationVendor() {
-        return java.getVmSpecificationVendor();
+    public String javaVmSpecificationVersion() {
+        return java.vmSpecificationVersion();
     }
 
-    public String getJavaVmSpecificationName() {
-        return java.getVmSpecificationName();
+    public String javaVmSpecificationVendor() {
+        return java.vmSpecificationVendor();
     }
 
-    public String getJavaVmVersion() {
-        return java.getVmVersion();
+    public String javaVmSpecificationName() {
+        return java.vmSpecificationName();
     }
 
-    public String getJavaVmVendor() {
-        return java.getVmVendor();
+    public String javaVmVersion() {
+        return java.vmVersion();
     }
 
-    public String getJavaVmName() {
-        return java.getVmName();
+    public String javaVmVendor() {
+        return java.vmVendor();
     }
 
-    public String getJavaSpecificationVersion() {
-        return java.getSpecificationVersion();
+    public String javaVmName() {
+        return java.vmName();
     }
 
-    public String getJavaSpecificationVendor() {
-        return java.getSpecificationVendor();
+    public String javaSpecificationVersion() {
+        return java.specificationVersion();
     }
 
-    public String getJavaSpecificationName() {
-        return java.getSpecificationName();
+    public String javaSpecificationVendor() {
+        return java.specificationVendor();
     }
 
-    public String getJavaClassVersion() {
-        return java.getClassVersion();
+    public String javaSpecificationName() {
+        return java.specificationName();
     }
 
-    public String getJavaClassPath() {
-        return java.getClassPath();
+    public String javaClassVersion() {
+        return java.classVersion();
     }
 
-    public String getJavaLibraryPath() {
-        return java.getLibraryPath();
+    public String javaClassPath() {
+        return java.classPath();
     }
 
-    public String getJavaIoTmpdir() {
-        return java.getIoTmpdir();
+    public String javaLibraryPath() {
+        return java.libraryPath();
     }
 
-    public String getJavaCompiler() {
-        return java.getCompiler();
+    public String javaIoTmpdir() {
+        return java.ioTmpdir();
     }
 
-    public String getJavaExtDirs() {
-        return java.getExtDirs();
+    public String javaCompiler() {
+        return java.compiler();
     }
 
-    public String getOsName() {
-        return os.getName();
+    public String javaExtDirs() {
+        return java.extDirs();
     }
 
-    public String getOsArch() {
-        return os.getArch();
+    public String osName() {
+        return os.name();
     }
 
-    public String getOsVersion() {
-        return os.getVersion();
+    public String osArch() {
+        return os.arch();
     }
 
-    public String getOsFileSeparator() {
-        return os.getFileSeparator();
+    public String osVersion() {
+        return os.version();
     }
 
-    public String getOsPathSeparator() {
-        return os.getPathSeparator();
+    public String osFileSeparator() {
+        return os.fileSeparator();
     }
 
-    public String getOsLineSeparator() {
-        return os.getLineSeparator();
+    public String osPathSeparator() {
+        return os.pathSeparator();
     }
 
-    public String getUserName() {
-        return user.getName();
+    public String osLineSeparator() {
+        return os.lineSeparator();
     }
 
-    public String getUserHome() {
-        return user.getHome();
+    public String userName() {
+        return user.name();
     }
 
-    public String getUserDir() {
-        return user.getDir();
+    public String userHome() {
+        return user.home();
+    }
+
+    public String userDir() {
+        return user.dir();
     }
 
     private static abstract class Env {
@@ -229,79 +236,79 @@ public class Environment {
             this.properties = MapKit.unmodifiable(javaProperties);
         }
 
-        public String getVersion() {
+        public String version() {
             return version;
         }
 
-        public String getVendor() {
+        public String vendor() {
             return vendor;
         }
 
-        public String getVendorUrl() {
+        public String vendorUrl() {
             return vendorUrl;
         }
 
-        public String getHome() {
+        public String home() {
             return home;
         }
 
-        public String getVmSpecificationVersion() {
+        public String vmSpecificationVersion() {
             return vmSpecificationVersion;
         }
 
-        public String getVmSpecificationVendor() {
+        public String vmSpecificationVendor() {
             return vmSpecificationVendor;
         }
 
-        public String getVmSpecificationName() {
+        public String vmSpecificationName() {
             return vmSpecificationName;
         }
 
-        public String getVmVersion() {
+        public String vmVersion() {
             return vmVersion;
         }
 
-        public String getVmVendor() {
+        public String vmVendor() {
             return vmVendor;
         }
 
-        public String getVmName() {
+        public String vmName() {
             return vmName;
         }
 
-        public String getSpecificationVersion() {
+        public String specificationVersion() {
             return specificationVersion;
         }
 
-        public String getSpecificationVendor() {
+        public String specificationVendor() {
             return specificationVendor;
         }
 
-        public String getSpecificationName() {
+        public String specificationName() {
             return specificationName;
         }
 
-        public String getClassVersion() {
+        public String classVersion() {
             return classVersion;
         }
 
-        public String getClassPath() {
+        public String classPath() {
             return classPath;
         }
 
-        public String getLibraryPath() {
+        public String libraryPath() {
             return libraryPath;
         }
 
-        public String getIoTmpdir() {
+        public String ioTmpdir() {
             return ioTmpdir;
         }
 
-        public String getCompiler() {
+        public String compiler() {
             return compiler;
         }
 
-        public String getExtDirs() {
+        public String extDirs() {
             return extDirs;
         }
 
@@ -333,27 +340,27 @@ public class Environment {
             this.properties = MapKit.unmodifiable(osProperties);
         }
 
-        public String getName() {
+        public String name() {
             return name;
         }
 
-        public String getArch() {
+        public String arch() {
             return arch;
         }
 
-        public String getVersion() {
+        public String version() {
             return version;
         }
 
-        public String getFileSeparator() {
+        public String fileSeparator() {
             return fileSeparator;
         }
 
-        public String getPathSeparator() {
+        public String pathSeparator() {
             return pathSeparator;
         }
 
-        public String getLineSeparator() {
+        public String lineSeparator() {
             return lineSeparator;
         }
 
@@ -379,15 +386,15 @@ public class Environment {
             this.properties = MapKit.unmodifiable(userProperties);
         }
 
-        public String getName() {
+        public String name() {
             return name;
         }
 
-        public String getHome() {
+        public String home() {
             return home;
         }
 
-        public String getDir() {
+        public String dir() {
             return dir;
         }
 
