@@ -15,6 +15,14 @@ public class Require {
         return Objects.requireNonNull(nullable);
     }
 
+    public static <T> T nonNull(@Nullable T nullable, String message) throws NullPointerException {
+        return Objects.requireNonNull(nullable, message);
+    }
+
+    public static <T> T nonNull(@Nullable T nullable, Supplier<String> messageSupplier) throws NullPointerException {
+        return Objects.requireNonNull(nullable, messageSupplier);
+    }
+
     public static <T> T nonNullElement(@Nullable T nullable) throws NoSuchElementException {
         Check.checkElement(nullable != null);
         return nullable;
