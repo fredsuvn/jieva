@@ -3,6 +3,7 @@ package xyz.srclab.common.collection;
 import xyz.srclab.annotation.Immutable;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * @author sunqian
@@ -14,9 +15,9 @@ public interface MapScheme {
         return SchemeSupport.getMapScheme(type);
     }
 
-    static MapScheme newMapScheme(Type keyType, Type valueType) {
-        return SchemeSupport.newMapScheme(keyType, valueType);
-    }
+    Type mapType();
+
+    Class<? extends Map<?, ?>> rawMapType();
 
     Type keyType();
 

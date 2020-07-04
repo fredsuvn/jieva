@@ -1,5 +1,6 @@
 package xyz.srclab.common.collection;
 
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.reflect.TypeKit;
@@ -7,41 +8,54 @@ import xyz.srclab.common.reflect.TypeKit;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author sunqian
  */
 final class SchemeSupport {
 
-    private static final Cache<Type, MapScheme> cache = Cache.newCommonCache();
-
-    static MapScheme newMapScheme(Type keyType, Type valueType) {
-        return new MapSchemeImpl(keyType, valueType);
+    static IterableScheme getIterableScheme(Type iterableType) {
+        return IterableSchemeImpl.getImpl(iterableType);
     }
 
-    static MapScheme getMapScheme(Type type) {
-        return cache.getNonNull(type, SchemeSupport::getMapScheme0);
-    }
-
-    private static MapScheme getMapScheme0(Type type) {
-        Type scheme = TypeKit.getGenericInterface(type, Map.class);
-        if (scheme instanceof Class) {
-            return MapScheme.newMapScheme(Object.class, Object.class);
-        }
-        if (scheme instanceof ParameterizedType) {
-            Type[] types = ((ParameterizedType) scheme).getActualTypeArguments();
-            return MapScheme.newMapScheme(types[0], types[1]);
-        }
-        throw new IllegalStateException("Unexpected type: " + scheme);
+    static MapScheme getMapScheme(Type mapType) {
+        return MapSchemeImpl.getImpl(mapType);
     }
 
     private static final class IterableSchemeImpl implements IterableScheme {
 
+        public static IterableSchemeImpl getImpl(Type iterableType) {
+            return cache.getNonNull(iterableType, IterableSchemeImpl::new);
+        }
+
+        private static final Cache<Type, IterableSchemeImpl> cache = Cache.newCommonCache();
+
+        private final Type iterableType;
+        private final Class<? extends Iterable<?>> rawIterableType;
         private final Type elementType;
 
-        private IterableSchemeImpl(Type elementType) {
-            this.elementType = elementType;
+        private IterableSchemeImpl(Type iterableType) {
+            this.iterableType = iterableType;
+            Type scheme = TypeKit.getGenericInterface(iterableType, Iterable.class);
+            if (scheme instanceof Class) {
+                this.rawIterableType = Cast.as(TypeKit.getRawType(scheme));
+                this.elementType = Object.class;
+            } else if (scheme instanceof ParameterizedType) {
+                Type[] types = ((ParameterizedType) scheme).getActualTypeArguments();
+                this.rawIterableType = Cast.as(TypeKit.getRawType(scheme));
+                this.elementType = types[0];
+            }
+            throw new IllegalArgumentException("Unexpected type: " + scheme);
+        }
+
+        @Override
+        public Type iterableType() {
+            return iterableType;
+        }
+
+        @Override
+        public Class<? extends Iterable<?>> rawIterableType() {
+            return rawIterableType;
         }
 
         @Override
@@ -58,28 +72,57 @@ final class SchemeSupport {
                 return false;
             }
             IterableSchemeImpl iterableScheme = (IterableSchemeImpl) object;
-            return elementType.equals(iterableScheme.elementType)
+            return iterableType.equals(iterableScheme.iterableType);
         }
 
         @Override
         public int hashCode() {
-            return Hash.hash(elementType);
+            return Hash.hash(iterableType);
         }
 
         @Override
         public String toString() {
-            return "Map<" + keyType.getTypeName() + ", " + valueType.getTypeName() + ">";
+            return iterableType.getTypeName();
         }
     }
 
     private static final class MapSchemeImpl implements MapScheme {
 
+        public static MapSchemeImpl getImpl(Type mapType) {
+            return cache.getNonNull(mapType, MapSchemeImpl::new);
+        }
+
+        private static final Cache<Type, MapSchemeImpl> cache = Cache.newCommonCache();
+
+        private final Type mapType;
+        private final Class<? extends Map<?, ?>> rawMapType;
         private final Type keyType;
         private final Type valueType;
 
-        private MapSchemeImpl(Type keyType, Type valueType) {
-            this.keyType = keyType;
-            this.valueType = valueType;
+        private MapSchemeImpl(Type mapType) {
+            this.mapType = mapType;
+            Type scheme = TypeKit.getGenericInterface(mapType, Map.class);
+            if (scheme instanceof Class) {
+                this.rawMapType = Cast.as(TypeKit.getRawType(scheme));
+                this.keyType = Object.class;
+                this.valueType = Object.class;
+            } else if (scheme instanceof ParameterizedType) {
+                Type[] types = ((ParameterizedType) scheme).getActualTypeArguments();
+                this.rawMapType = Cast.as(TypeKit.getRawType(scheme));
+                this.keyType = types[0];
+                this.valueType = types[1];
+            }
+            throw new IllegalArgumentException("Unexpected type: " + scheme);
+        }
+
+        @Override
+        public Type mapType() {
+            return mapType;
+        }
+
+        @Override
+        public Class<? extends Map<?, ?>> rawMapType() {
+            return rawMapType;
         }
 
         @Override
@@ -101,18 +144,17 @@ final class SchemeSupport {
                 return false;
             }
             MapSchemeImpl mapScheme = (MapSchemeImpl) object;
-            return keyType.equals(mapScheme.keyType) &&
-                    valueType.equals(mapScheme.valueType);
+            return mapType.equals(mapScheme.mapType);
         }
 
         @Override
         public int hashCode() {
-            return Hash.hash(keyType, valueType);
+            return Hash.hash(mapType);
         }
 
         @Override
         public String toString() {
-            return "Map<" + keyType.getTypeName() + ", " + valueType.getTypeName() + ">";
+            return mapType.getTypeName();
         }
     }
 }
