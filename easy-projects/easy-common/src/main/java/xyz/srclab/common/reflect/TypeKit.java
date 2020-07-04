@@ -65,7 +65,8 @@ public class TypeKit {
         return type;
     }
 
-    public static Type tryActualType(TypeVariable<?> typeVariable, Type owner, Class<?> declaringClass) {
+    public static Type tryActualType(
+            TypeVariable<?> typeVariable, Type owner, Class<?> declaringClass) {
         return ActualTypeFinder.find(typeVariable, owner, declaringClass);
     }
 
@@ -123,7 +124,7 @@ public class TypeKit {
                 }
                 currentType = currentClass.getGenericSuperclass();
             } while (currentType != null);
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     "Cannot find generic super class: type = " + type + ", target = " + targetSuperclass);
         }
 
@@ -149,7 +150,7 @@ public class TypeKit {
                     }
                 }
             }
-            throw new IllegalStateException(
+            throw new IllegalArgumentException(
                     "Cannot find generic super interface: type = " + rawType + ", target = " + targetInterface
             );
         }
@@ -193,7 +194,7 @@ public class TypeKit {
             Type[] actualTypeArguments = ((ParameterizedType) genericSignature).getActualTypeArguments();
             @Nullable Type result = findTypeVariable0(type, actualTypeArguments, declaringClass);
             if (result == null) {
-                throw new IllegalStateException(
+                throw new IllegalArgumentException(
                         Format.fastFormat("Cannot find actual type {} from {} to {}",
                                 type, declaringClass, owner));
             }
