@@ -11,13 +11,13 @@ public interface WalkHandler {
 
     void doUnit(@Nullable Object unit, Type type);
 
-    void doEntry(Object key, Type keyType, @Nullable Object value, Type type, Walker walker);
+    void doElement(Object index, Type indexType, @Nullable Object value, Type type);
 
-    void beforeList(@Nullable Object list, Type type, Walker walker);
+    void beforeObject(@Nullable Object record, Type type);
 
-    void afterList(@Nullable Object list, Type type, Walker walker);
+    void afterObject(@Nullable Object record, Type type);
 
-    void beforeRecord(@Nullable Object record, Type type, Walker walker);
+    void beforeList(@Nullable Object list, Type type);
 
-    void afterRecord(@Nullable Object record, Type type, Walker walker);
+    void afterList(@Nullable Object list, Type type);
 }
