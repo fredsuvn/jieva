@@ -11,7 +11,6 @@ import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.lang.finder.Finder;
-import xyz.srclab.common.reflect.TypeKit;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -47,6 +46,20 @@ public class ArrayKit {
             return false;
         }
         return ((Class<?>) type).isArray();
+    }
+
+    public static Type getComponentType(Type arrayType) {
+        if (arrayType instanceof GenericArrayType) {
+            return ((GenericArrayType) arrayType).getGenericComponentType();
+        }
+        if (!(arrayType instanceof Class)) {
+            throw new IllegalArgumentException("Incorrect array type: " + arrayType.getTypeName());
+        }
+        return ((Class<?>) arrayType).getComponentType();
+    }
+
+    public static Type getArrayType(Type componentType) {
+        return ArrayTypeFinder.find(componentType);
     }
 
     public static <T> List<T> asList(Object array) {
@@ -338,21 +351,6 @@ public class ArrayKit {
             array[i] = supplier.get(i);
         }
         return array;
-    }
-
-    public static Type getComponentType(Type type) {
-        if (type instanceof GenericArrayType) {
-            return ((GenericArrayType) type).getGenericComponentType();
-        }
-        Class<?> rawType = TypeKit.getRawType(type);
-        if (!rawType.isArray()) {
-            throw new IllegalArgumentException("Type is not array: " + type);
-        }
-        return rawType.getComponentType();
-    }
-
-    public static Type getArrayType(Type componentType) {
-        return ArrayTypeFinder.find(componentType);
     }
 
     public interface ObjectSupplier<E> {
