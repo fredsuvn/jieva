@@ -39,6 +39,16 @@ public class ArrayKit {
         return Cast.as(array);
     }
 
+    public static boolean isArray(Type type) {
+        if (type instanceof GenericArrayType) {
+            return true;
+        }
+        if (!(type instanceof Class)) {
+            return false;
+        }
+        return ((Class<?>) type).isArray();
+    }
+
     public static <T> List<T> asList(Object array) {
         if (array instanceof Object[]) {
             return Cast.as(Arrays.asList((Object[]) array));
