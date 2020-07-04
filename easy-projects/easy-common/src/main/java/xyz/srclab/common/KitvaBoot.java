@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Bootstrap for toova-starter.
  */
-public class ToovaBoot {
+public class KitvaBoot {
 
     private static final String CONFIG_PATH = "META-INF/toova.yaml";
 
@@ -33,7 +33,7 @@ public class ToovaBoot {
     private static final Map<String, Map<String, ?>> providerMap = new ConcurrentHashMap<>();
 
     static {
-        Map<String, Object> toovaProperties = loadYaml(ToovaBoot.class.getClassLoader());
+        Map<String, Object> toovaProperties = loadYaml(KitvaBoot.class.getClassLoader());
         Map<String, Object> userProperties = loadYaml(Loader.currentClassLoader());
         Map<String, Object> properties = new LinkedHashMap<>();
         mergeProperties(toovaProperties, userProperties, properties);
