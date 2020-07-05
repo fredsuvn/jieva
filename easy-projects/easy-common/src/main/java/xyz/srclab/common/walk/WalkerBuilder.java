@@ -80,7 +80,7 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
                 Map<?, ?> map = (Map<?, ?>) any;
                 MapScheme mapScheme = MapScheme.getMapScheme(type);
                 map.forEach((k, v) -> {
-                    walkHandler.doElement(k, mapScheme.keyType(), v, mapScheme.valueType());
+                    walkHandler.doEntry(k, mapScheme.keyType(), v, mapScheme.valueType());
                     walk0(v, mapScheme.valueType());
                 });
                 walkHandler.afterObject(any, type);
@@ -91,7 +91,7 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
                 Type elementType = iterableScheme.elementType();
                 int index = 0;
                 for (@Nullable Object o : iterable) {
-                    walkHandler.doElement(index, int.class, o, elementType);
+                    walkHandler.doElement(index, o, elementType);
                     walk0(o, elementType);
                 }
                 walkHandler.afterList(any, type);
@@ -101,7 +101,7 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
                 Type componentType = ArrayKit.getComponentType(type);
                 int index = 0;
                 for (@Nullable Object o : list) {
-                    walkHandler.doElement(index, int.class, o, componentType);
+                    walkHandler.doElement(index, o, componentType);
                     walk0(o, componentType);
                 }
                 walkHandler.afterList(any, type);
@@ -109,7 +109,7 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
                 walkHandler.beforeObject(any, type);
                 RecordType recordType = recorder.recordType(any);
                 recordType.entryMap().forEach((name, entry) -> {
-                    walkHandler.doElement(name, String.class, entry.getValue(any), entry.genericType());
+                    walkHandler.doEntry(name, String.class, entry.getValue(any), entry.genericType());
                 });
                 walkHandler.afterObject(any, type);
             }

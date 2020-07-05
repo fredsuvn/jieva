@@ -1,17 +1,15 @@
 package xyz.srclab.common.string;
 
 import org.apache.commons.lang3.StringUtils;
-import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanOperator;
-import xyz.srclab.common.lang.computed.Computed;
-import xyz.srclab.common.walk.Walker;
+import xyz.srclab.common.lang.lazy.Lazy;
+import xyz.srclab.common.walk.WalkHandler;
 
+import java.lang.reflect.Type;
 import java.util.LinkedList;
-import java.util.function.Supplier;
 
-@Immutable
-public class ToString extends Computed<String> {
+public class ToString implements Lazy<String> {
 
     public static String toString(Object any) {
         return new ToString(any).toString();
@@ -24,6 +22,9 @@ public class ToString extends Computed<String> {
     public static String toString(Object any, ToStringStyle style, BeanOperator beanOperator) {
         return new ToString(any, style, beanOperator).toString();
     }
+
+    private final ToStringStyle toStringStyle;
+    private @Nullable String toString;
 
     public ToString(Object any) {
         this(any, ToStringStyle.DEFAULT, BeanOperator.DEFAULT);
@@ -39,33 +40,18 @@ public class ToString extends Computed<String> {
 
     @Override
     public String toString() {
-        return get();
+        if (toString == null) {
+            toString = get();
+        }
+        return toString;
     }
 
-    private static final class ToStringSupplier implements Supplier<String> {
-
-        private final Object any;
-        private final ToStringStyle style;
-        private final BeanOperator beanOperator;
-
-        private ToStringSupplier(Object any, ToStringStyle style, BeanOperator beanOperator) {
-            this.any = any;
-            this.style = style;
-            this.beanOperator = beanOperator;
-        }
-
-        @Override
-        public String get() {
-            if (!style.getDeepToStringPredicate().test(any)) {
-                return String.valueOf(any);
-            }
-            ToStringVisitor toStringVisitor = new ToStringVisitor(style);
-            Walker.withBeanOperator(beanOperator).walk(any, toStringVisitor);
-            return toStringVisitor.getBuffer().toString();
-        }
+    @Override
+    public String get() {
+        return new ToStringImpl(toStringStyle).toString();
     }
 
-    private static final class ToStringVisitor implements WalkVisitor {
+    private static final class ToStringImpl {
 
         protected final ToStringStyle toStringStyle;
         protected final StringBuilder buffer = new StringBuilder();
@@ -73,103 +59,118 @@ public class ToString extends Computed<String> {
         protected final LinkedList<Object> indexStackTrace = new LinkedList<>();
         protected int level = 0;
 
-        private ToStringVisitor(ToStringStyle toStringStyle) {
+        private ToStringImpl(ToStringStyle toStringStyle) {
             this.toStringStyle = toStringStyle;
         }
 
-        public StringBuilder getBuffer() {
-            return buffer;
+        public String toString() {
+
+        }
+
+
+    }
+
+    private static class ToStringHandler implements WalkHandler {
+
+        private final ToStringStyle toStringStyle;
+        private final StringBuilder buffer = new StringBuilder();
+        private int level = 0;
+        private int elementCount = 0;
+
+        private ToStringHandler(ToStringStyle toStringStyle) {
+            this.toStringStyle = toStringStyle;
         }
 
         @Override
-        public WalkVisitResult visit(Object index, @Nullable Object value, WalkerProvider walkerProvider) {
-            if (Walker.ROOT_INDEX != index) {
-                writeWrapping();
-                writeIndent(level);
-                writeObject(index);
-                writeIndicator();
-            }
-
-            if (value == null || !toStringStyle.getDeepToStringPredicate().test(value)) {
-                writeObject(value);
-                writeSeparator();
-                return WalkVisitResult.CONTINUE;
-            }
-
-            if (valueStackTrace.contains(value)) {
-                if (!toStringStyle.getIgnoreReferenceLoop()) {
-                    throw new LoopElementException(indexStackTrace);
-                }
-                return WalkVisitResult.CONTINUE;
-            }
-
-            valueStackTrace.add(value);
-            if (Walker.ROOT_INDEX != index) {
-                indexStackTrace.add(index);
-            }
-            Walker walker = walkerProvider.getWalker(value);
-            if (value instanceof Iterable || value.getClass().isArray()) {
-                writeListStart();
-                walker.walk(value, this);
-                unWriteSeparator();
-                writeListEnd();
-            } else {
-                writeBeanStart();
-                walker.walk(value, this);
-                unWriteSeparator();
-                writeBeanEnd();
-            }
-            return WalkVisitResult.CONTINUE;
+        public void doUnit(@Nullable Object unit, Type type) {
+            writeUnit(unit);
         }
 
-        protected void writeObject(@Nullable Object any) {
+        @Override
+        public void doElement(int index, @Nullable Object value, Type type) {
+            elementCount++;
+        }
+
+        @Override
+        public void doEntry(Object index, Type indexType, @Nullable Object value, Type type) {
+
+        }
+
+        @Override
+        public void beforeObject(@Nullable Object record, Type type) {
+
+        }
+
+        @Override
+        public void afterObject(@Nullable Object record, Type type) {
+
+        }
+
+        @Override
+        public void beforeList(@Nullable Object list, Type type) {
+
+        }
+
+        @Override
+        public void afterList(@Nullable Object list, Type type) {
+
+        }
+
+        private StringBuilder buffer() {
+            return buffer;
+        }
+
+        private void writeUnit(@Nullable Object any) {
             buffer.append(any);
         }
 
-        protected void writeBeanStart() {
-            buffer.append(toStringStyle.getBeanStart());
+        private void writeObjectStart() {
+            buffer.append(toStringStyle.objectStart());
         }
 
-        protected void writeBeanEnd() {
-            buffer.append(toStringStyle.getBeanEnd());
+        private void writeObjectEnd() {
+            buffer.append(toStringStyle.objectEnd());
         }
 
-        protected void writeListStart() {
-            buffer.append(toStringStyle.getListStart());
+        private void writeListStart() {
+            buffer.append(toStringStyle.listStart());
         }
 
-        protected void writeListEnd() {
-            buffer.append(toStringStyle.getListEnd());
+        private void writeListEnd() {
+            buffer.append(toStringStyle.listEnd());
         }
 
-        protected void writeWrapping() {
-            if (StringUtils.isEmpty(toStringStyle.getWrapping())) {
+        private void writeWrapping() {
+            if (StringUtils.isEmpty(toStringStyle.wrapping())) {
                 return;
             }
-            buffer.append(toStringStyle.getWrapping());
+            buffer.append(toStringStyle.wrapping());
         }
 
-        protected void writeIndent(int level) {
-            if (level == 0 || StringUtils.isEmpty(toStringStyle.getIndent())) {
+        private void writeIndent(int level) {
+            if (level == 0 || StringUtils.isEmpty(toStringStyle.indent())) {
                 return;
             }
             for (int i = 0; i < level; i++) {
-                buffer.append(toStringStyle.getIndent());
+                buffer.append(toStringStyle.indent());
             }
         }
 
-        protected void writeSeparator() {
-            buffer.append(toStringStyle.getSeparator());
+        private void writeSeparator() {
+            buffer.append(toStringStyle.separator());
         }
 
-        protected void unWriteSeparator() {
+        private void unWriteSeparator() {
+            if (elementCount <= 0) {
+                return;
+            }
             int bufferLength = buffer.length();
-            int separatorLength = toStringStyle.getSeparator().length();
+            int separatorLength = toStringStyle.separator().length();
             buffer.delete(bufferLength - separatorLength, bufferLength);
         }
 
-        protected void writeIndicator() {
-            buffer.append(toStringStyle.getIndicator());
+        private void writeIndicator() {
+            buffer.append(toStringStyle.indicator());
         }
     }
 }

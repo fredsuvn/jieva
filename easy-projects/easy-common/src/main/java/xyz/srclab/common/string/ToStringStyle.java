@@ -1,11 +1,10 @@
 package xyz.srclab.common.string;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.base.Defaults;
+import xyz.srclab.common.base.Environment;
 import xyz.srclab.common.design.builder.CachedBuilder;
-import xyz.srclab.common.reflect.ClassKit;
-
-import java.util.function.Predicate;
+import xyz.srclab.common.object.UnitPredicate;
+import xyz.srclab.common.record.Recorder;
 
 @Immutable
 public interface ToStringStyle {
@@ -17,41 +16,41 @@ public interface ToStringStyle {
     ToStringStyle DEFAULT = new Builder().build();
 
     ToStringStyle HUMAN_READABLE = new Builder()
-            .setBeanStart("{")
-            .setBeanEnd("}")
-            .setSeparator(", ")
-            .setIndicator(" = ")
-            .setIndent("    ")
-            .setListStart("[")
-            .setListEnd("]")
-            .setWrapping(Defaults.LINE_SEPARATOR)
-            .setIgnoreReferenceLoop(false)
+            .objectStart("{")
+            .objectEnd("}")
+            .separator(", ")
+            .indicator(" = ")
+            .indent("    ")
+            .listStart("[")
+            .listEnd("]")
+            .wrapping(Environment.currentEnvironment().osLineSeparator())
+            .ignoreReferenceLoop(false)
             .build();
 
-    String getBeanStart();
+    String objectStart();
 
-    String getBeanEnd();
+    String objectEnd();
 
-    String getListStart();
+    String listStart();
 
-    String getListEnd();
+    String listEnd();
 
-    String getWrapping();
+    String wrapping();
 
-    String getIndent();
+    String indent();
 
-    String getSeparator();
+    String separator();
 
-    String getIndicator();
+    String indicator();
 
-    boolean getIgnoreReferenceLoop();
+    boolean ignoreReferenceLoop();
 
-    Predicate<Object> getDeepToStringPredicate();
+    UnitPredicate unitPredicate();
 
     class Builder extends CachedBuilder<ToStringStyle> {
 
-        private String beanStart = "{";
-        private String beanEnd = "}";
+        private String objectStart = "{";
+        private String objectEnd = "}";
         private String listStart = "[";
         private String listEnd = "]";
         private String wrapping = "";
@@ -59,64 +58,70 @@ public interface ToStringStyle {
         private String separator = ",";
         private String indicator = "=";
         private boolean ignoreReferenceLoop = false;
-        private Predicate<Object> deepToStringPredicate = o -> !ClassKit.isBasic(o);
+        private UnitPredicate unitPredicate = UnitPredicate.defaultPredicate();
+        private Recorder recorder = Recorder.defaultRecorder();
 
-        public Builder setBeanStart(String beanStart) {
-            this.beanStart = beanStart;
+        public Builder objectStart(String objectStart) {
+            this.objectStart = objectStart;
             this.updateState();
             return this;
         }
 
-        public Builder setBeanEnd(String beanEnd) {
-            this.beanEnd = beanEnd;
+        public Builder objectEnd(String objectEnd) {
+            this.objectEnd = objectEnd;
             this.updateState();
             return this;
         }
 
-        public Builder setListStart(String listStart) {
+        public Builder listStart(String listStart) {
             this.listStart = listStart;
             this.updateState();
             return this;
         }
 
-        public Builder setListEnd(String listEnd) {
+        public Builder listEnd(String listEnd) {
             this.listEnd = listEnd;
             this.updateState();
             return this;
         }
 
-        public Builder setWrapping(String wrapping) {
+        public Builder wrapping(String wrapping) {
             this.wrapping = wrapping;
             this.updateState();
             return this;
         }
 
-        public Builder setIndent(String indent) {
+        public Builder indent(String indent) {
             this.indent = indent;
             this.updateState();
             return this;
         }
 
-        public Builder setSeparator(String separator) {
+        public Builder separator(String separator) {
             this.separator = separator;
             this.updateState();
             return this;
         }
 
-        public Builder setIndicator(String indicator) {
+        public Builder indicator(String indicator) {
             this.indicator = indicator;
             this.updateState();
             return this;
         }
 
-        public Builder setIgnoreReferenceLoop(boolean ignoreReferenceLoop) {
+        public Builder ignoreReferenceLoop(boolean ignoreReferenceLoop) {
             this.ignoreReferenceLoop = ignoreReferenceLoop;
             this.updateState();
             return this;
         }
 
-        public Builder setDeepToStringPredicate(Predicate<Object> deepToStringPredicate) {
-            this.deepToStringPredicate = deepToStringPredicate;
+        public Builder unitPredicate(UnitPredicate unitPredicate) {
+            this.unitPredicate = unitPredicate;
+            return this;
+        }
+
+        public Builder recorder(Recorder recorder) {
+            this.recorder = recorder;
             return this;
         }
 
@@ -124,8 +129,8 @@ public interface ToStringStyle {
         protected ToStringStyle buildNew() {
             return new ToStringStyle() {
 
-                private final String beanStart = Builder.this.beanStart;
-                private final String beanEnd = Builder.this.beanEnd;
+                private final String objectStart = Builder.this.objectStart;
+                private final String objectEnd = Builder.this.objectEnd;
                 private final String listStart = Builder.this.listStart;
                 private final String listEnd = Builder.this.listEnd;
                 private final String wrapping = Builder.this.wrapping;
@@ -133,56 +138,61 @@ public interface ToStringStyle {
                 private final String separator = Builder.this.separator;
                 private final String indicator = Builder.this.indicator;
                 private final boolean ignoreReferenceLoop = Builder.this.ignoreReferenceLoop;
-                private final Predicate<Object> deepToStringPredicate = Builder.this.deepToStringPredicate;
+                private final UnitPredicate unitPredicate = Builder.this.unitPredicate;
+                private final Recorder recorder = Builder.this.recorder;
 
                 @Override
-                public String getBeanStart() {
-                    return beanStart;
+                public String objectStart() {
+                    return objectStart;
                 }
 
                 @Override
-                public String getBeanEnd() {
-                    return beanEnd;
+                public String objectEnd() {
+                    return objectEnd;
                 }
 
                 @Override
-                public String getListStart() {
+                public String listStart() {
                     return listStart;
                 }
 
                 @Override
-                public String getListEnd() {
+                public String listEnd() {
                     return listEnd;
                 }
 
                 @Override
-                public String getWrapping() {
+                public String wrapping() {
                     return wrapping;
                 }
 
                 @Override
-                public String getIndent() {
+                public String indent() {
                     return indent;
                 }
 
                 @Override
-                public String getSeparator() {
+                public String separator() {
                     return separator;
                 }
 
                 @Override
-                public String getIndicator() {
+                public String indicator() {
                     return indicator;
                 }
 
                 @Override
-                public boolean getIgnoreReferenceLoop() {
+                public boolean ignoreReferenceLoop() {
                     return ignoreReferenceLoop;
                 }
 
                 @Override
-                public Predicate<Object> getDeepToStringPredicate() {
-                    return deepToStringPredicate;
+                public UnitPredicate unitPredicate() {
+                    return unitPredicate;
+                }
+
+                public Recorder recorder() {
+                    return recorder;
                 }
             };
         }
