@@ -11,9 +11,9 @@ public interface WalkHandler {
 
     void doUnit(@Nullable Object unit, Type type);
 
-    void doElement(int index, @Nullable Object value, Type type);
+    void doElement(int index, @Nullable Object value, Type type, Walker walker);
 
-    void doEntry(Object index, Type indexType, @Nullable Object value, Type type);
+    void doEntry(Object index, Type indexType, @Nullable Object value, Type type, Walker walker);
 
     void beforeObject(@Nullable Object record, Type type);
 

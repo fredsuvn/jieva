@@ -46,8 +46,12 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
     @Override
     protected Walker buildNew() {
         Check.checkArguments(walkHandler != null, "Need walk handler");
-        Check.checkArguments(unitPredicate != null, "Need unit predicate");
-        Check.checkArguments(recorder != null, "Need walk recorder");
+        if (unitPredicate == null) {
+            unitPredicate = UnitPredicate.defaultPredicate();
+        }
+        if (recorder == null) {
+            recorder = Recorder.defaultRecorder();
+        }
         return new WalkerImpl(walkHandler, unitPredicate, recorder);
     }
 
@@ -64,11 +68,7 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
         }
 
         @Override
-        public void walk(Object any, Type type) {
-            walk0(any, type);
-        }
-
-        private void walk0(@Nullable Object any, Type type) {
+        public void walk(@Nullable Object any, Type type) {
             if (any == null) {
                 walkNull(type);
                 return;
@@ -80,8 +80,7 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
                 Map<?, ?> map = (Map<?, ?>) any;
                 MapScheme mapScheme = MapScheme.getMapScheme(type);
                 map.forEach((k, v) -> {
-                    walkHandler.doEntry(k, mapScheme.keyType(), v, mapScheme.valueType());
-                    walk0(v, mapScheme.valueType());
+                    walkHandler.doEntry(k, mapScheme.keyType(), v, mapScheme.valueType(), this);
                 });
                 walkHandler.afterObject(any, type);
             } else if (any instanceof Iterable) {
@@ -91,8 +90,7 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
                 Type elementType = iterableScheme.elementType();
                 int index = 0;
                 for (@Nullable Object o : iterable) {
-                    walkHandler.doElement(index, o, elementType);
-                    walk0(o, elementType);
+                    walkHandler.doElement(index, o, elementType, this);
                 }
                 walkHandler.afterList(any, type);
             } else if (ArrayKit.isArray(type)) {
@@ -101,15 +99,14 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
                 Type componentType = ArrayKit.getComponentType(type);
                 int index = 0;
                 for (@Nullable Object o : list) {
-                    walkHandler.doElement(index, o, componentType);
-                    walk0(o, componentType);
+                    walkHandler.doElement(index, o, componentType, this);
                 }
                 walkHandler.afterList(any, type);
             } else {
                 walkHandler.beforeObject(any, type);
                 RecordType recordType = recorder.recordType(any);
                 recordType.entryMap().forEach((name, entry) -> {
-                    walkHandler.doEntry(name, String.class, entry.getValue(any), entry.genericType());
+                    walkHandler.doEntry(name, String.class, entry.getValue(any), entry.genericType(), this);
                 });
                 walkHandler.afterObject(any, type);
             }

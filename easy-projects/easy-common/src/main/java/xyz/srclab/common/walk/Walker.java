@@ -1,5 +1,7 @@
 package xyz.srclab.common.walk;
 
+import xyz.srclab.annotation.Nullable;
+
 import java.lang.reflect.Type;
 
 /**
@@ -15,5 +17,5 @@ public interface Walker {
         walk(any, any.getClass());
     }
 
-    void walk(Object any, Type type);
+    void walk(@Nullable Object any, Type type);
 }
