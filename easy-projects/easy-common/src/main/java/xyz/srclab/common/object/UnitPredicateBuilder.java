@@ -121,6 +121,10 @@ public class UnitPredicateBuilder extends CachedBuilder<UnitPredicate> {
         return new UnitPredicateImpl(this);
     }
 
+    public UnitPredicate build() {
+        return buildCached();
+    }
+
     private static final class UnitPredicateImpl implements UnitPredicate {
 
         private static final BiPredicate<Type, Type> DEFAULT_TYPE_PREDICATE =
