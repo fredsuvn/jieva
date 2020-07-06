@@ -25,6 +25,10 @@ public class ConverterBuilder extends HandlersBuilder<Converter, ConvertHandler,
         return new ConverterImpl(handlersResult());
     }
 
+    public Converter build() {
+        return buildCached();
+    }
+
     private static final class ConverterImpl implements Converter {
 
         private final ConvertHandler[] handlers;
