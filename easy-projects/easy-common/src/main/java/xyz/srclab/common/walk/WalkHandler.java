@@ -7,19 +7,21 @@ import java.lang.reflect.Type;
 /**
  * @author sunqian
  */
-public interface WalkHandler {
+public interface WalkHandler<S> {
 
-    void doUnit(@Nullable Object unit, Type type);
+    S newStack();
 
-    void doElement(int index, @Nullable Object value, Type type, Walker walker);
+    void doUnit(@Nullable Object unit, Type type, S stack);
 
-    void doEntry(Object index, Type indexType, @Nullable Object value, Type type, Walker walker);
+    void beforeList(@Nullable Object list, Type type, S stack);
 
-    void beforeObject(@Nullable Object record, Type type);
+    void doListElement(int index, @Nullable Object value, Type type, S stack, Walker walker);
 
-    void afterObject(@Nullable Object record, Type type);
+    void afterList(@Nullable Object list, Type type, S stack);
 
-    void beforeList(@Nullable Object list, Type type);
+    void beforeObject(@Nullable Object record, Type type, S stack);
 
-    void afterList(@Nullable Object list, Type type);
+    void doObjectElement(Object index, Type indexType, @Nullable Object value, Type type, S stack, Walker walker);
+
+    void afterObject(@Nullable Object record, Type type, S stack);
 }
