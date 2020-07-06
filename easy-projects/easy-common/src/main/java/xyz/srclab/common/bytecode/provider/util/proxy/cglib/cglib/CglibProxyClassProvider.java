@@ -2,7 +2,7 @@ package xyz.srclab.common.bytecode.provider.util.proxy.cglib.cglib;
 
 import net.sf.cglib.proxy.*;
 import xyz.srclab.common.exception.ExceptionWrapper;
-import xyz.srclab.common.util.count.Counter;
+import xyz.srclab.common.lang.count.Counter;
 import xyz.srclab.common.util.proxy.*;
 
 import java.lang.reflect.Method;
