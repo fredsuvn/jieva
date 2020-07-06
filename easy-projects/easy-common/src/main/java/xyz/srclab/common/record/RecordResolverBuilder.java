@@ -32,6 +32,10 @@ public class RecordResolverBuilder extends
         return new RecorderImpl(handlersResult());
     }
 
+    public RecordResolver build() {
+        return buildCached();
+    }
+
     private static final class RecorderImpl implements RecordResolver {
 
         private final RecordResolverHandler[] handlers;

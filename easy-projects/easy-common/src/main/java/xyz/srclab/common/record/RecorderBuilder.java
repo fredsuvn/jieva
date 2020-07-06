@@ -37,6 +37,10 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
         return useCache ? new CachedRecorderImpl(this) : new RecorderImpl(this);
     }
 
+    public Recorder build() {
+        return buildCached();
+    }
+
     private static final class RecorderImpl implements Recorder {
 
         private final RecordResolver resolver;
