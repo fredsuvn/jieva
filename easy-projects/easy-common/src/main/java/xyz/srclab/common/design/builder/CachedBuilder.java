@@ -2,14 +2,13 @@ package xyz.srclab.common.design.builder;
 
 import xyz.srclab.annotation.Nullable;
 
-public abstract class CachedBuilder<T> implements Builder<T> {
+public abstract class CachedBuilder<T> {
 
     private @Nullable T cache;
     private int stateVersion = 0;
     private int buildVersion = 0;
 
-    @Override
-    public T build() {
+    protected T buildCached() {
         if (cache == null || isUpdateSinceLastBuild()) {
             cache = buildNew();
             buildVersion = stateVersion;
