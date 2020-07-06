@@ -6,19 +6,19 @@ package xyz.srclab.common.util.count;
 public interface Counter {
 
     static Counter fromZero() {
-        return Count0.newCounter();
+        return CounterSupport.newCounter();
     }
 
     static Counter from(long value) {
-        return Count0.newCounter(value);
+        return CounterSupport.newCounter(value);
     }
 
-    static Counter fromZeroThreadSafe() {
-        return Count0.newThreadSafeCounter();
+    static Counter atomicFromZero() {
+        return CounterSupport.newAtomicCounter();
     }
 
-    static Counter fromThreadSafe(long value) {
-        return Count0.newThreadSafeCounter(value);
+    static Counter atomicFromZero(long value) {
+        return CounterSupport.newAtomicCounter(value);
     }
 
     default int getInt() {

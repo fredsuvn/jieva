@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author sunqian
  */
-public class Count0 {
+public class CounterSupport {
 
     static Counter newCounter() {
         return new CounterImpl();
@@ -15,12 +15,12 @@ public class Count0 {
         return new CounterImpl(value);
     }
 
-    static Counter newThreadSafeCounter() {
-        return new SynchronizedCounterImpl();
+    static Counter newAtomicCounter() {
+        return new AtomicCounterImpl();
     }
 
-    static Counter newThreadSafeCounter(long value) {
-        return new SynchronizedCounterImpl(value);
+    static Counter newAtomicCounter(long value) {
+        return new AtomicCounterImpl(value);
     }
 
     private static final class CounterImpl implements Counter {
@@ -69,15 +69,15 @@ public class Count0 {
         }
     }
 
-    private static final class SynchronizedCounterImpl implements Counter {
+    private static final class AtomicCounterImpl implements Counter {
 
         private final AtomicLong value;
 
-        private SynchronizedCounterImpl() {
+        private AtomicCounterImpl() {
             this.value = new AtomicLong();
         }
 
-        private SynchronizedCounterImpl(long value) {
+        private AtomicCounterImpl(long value) {
             this.value = new AtomicLong(value);
         }
 
