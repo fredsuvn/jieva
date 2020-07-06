@@ -47,6 +47,8 @@ public interface ToStringStyle {
 
     UnitPredicate unitPredicate();
 
+    Recorder recorder();
+
     class Builder extends CachedBuilder<ToStringStyle> {
 
         private String objectStart = "{";
@@ -191,6 +193,7 @@ public interface ToStringStyle {
                     return unitPredicate;
                 }
 
+                @Override
                 public Recorder recorder() {
                     return recorder;
                 }

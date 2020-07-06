@@ -99,6 +99,7 @@ public class WalkerBuilder<C> extends CachedBuilder<Walker<C>> {
                             k, mapScheme.keyType(), v, mapScheme.valueType(), contextStack,
                             (o, t) -> walk0(o, t, contextStack));
                 });
+                contextStack.pop();
                 walkHandler.afterObject(any, type, contextStack);
             } else if (any instanceof Iterable) {
                 walkHandler.beforeList(any, type, contextStack);
@@ -121,6 +122,7 @@ public class WalkerBuilder<C> extends CachedBuilder<Walker<C>> {
                             name, String.class, entry.getValue(any), entry.genericType(), contextStack,
                             (o, t) -> walk0(o, t, contextStack));
                 });
+                contextStack.pop();
                 walkHandler.afterObject(any, type, contextStack);
             }
             return contextStack.popNonNull();
@@ -135,6 +137,7 @@ public class WalkerBuilder<C> extends CachedBuilder<Walker<C>> {
                 walkHandler.doListElement(index, e, elementType, contextStack,
                         (o, t) -> walk0(o, t, contextStack));
             }
+            contextStack.pop();
             walkHandler.afterList(any, type, contextStack);
         }
 

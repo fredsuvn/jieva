@@ -10,48 +10,18 @@ import xyz.srclab.common.walk.Walker;
 
 import java.lang.reflect.Type;
 
-public class ToString implements Lazy<String> {
+public class ToString {
 
-    public static String toString(Object any) {
-        return new ToString(any).toString();
-    }
+    private final Walker<ToStringContext> walker;
 
-    public static String toString(Object any, ToStringStyle style) {
-        return new ToString(any, style).toString();
-    }
-
-    public static String toString(Object any, ToStringStyle style, BeanOperator beanOperator) {
-        return new ToString(any, style, beanOperator).toString();
-    }
-
-    private final ToStringStyle toStringStyle;
-    private @Nullable String toString;
-
-    public ToString(Object any) {
-        this(any, ToStringStyle.DEFAULT, BeanOperator.DEFAULT);
-    }
-
-    public ToString(Object any, ToStringStyle style) {
-        this(any, style, BeanOperator.DEFAULT);
-    }
-
-    public ToString(Object any, ToStringStyle style, BeanOperator beanOperator) {
-        super(new ToStringSupplier(any, style, beanOperator));
-    }
-
-    @Override
-    public String toString() {
-        if (toString == null) {
-            toString = get();
-        }
-        return toString;
-    }
-
-    @Override
-    public String get() {
-        if (toStringStyle.ignoreCircularReference()) {
-            ToStringContext context =
-        }
+    public ToString(ToStringStyle style) {
+        ToStringHandler toStringHandler = style.ignoreCircularReference() ?
+                new ToStringHandler(style) : new AcyclicToStringHandler(style);
+        this.walker = Walker.newBuilder()
+                .recorder(style.recorder())
+                .unitPredicate(style.unitPredicate())
+                .walkHandler(toStringHandler)
+                .build();
     }
 
     private static class ToStringHandler implements WalkHandler<ToStringContext> {
@@ -73,53 +43,62 @@ public class ToString implements Lazy<String> {
         }
 
         @Override
-        public void doUnit(@Nullable Object unit, Type type, ToStringContext context) {
-            writeUnit(unit, context);
+        public void doUnit(@Nullable Object unit, Type type, Stack<ToStringContext> contextStack) {
+            writeUnit(unit, contextStack.topNonNull());
         }
 
         @Override
-        public void beforeList(@Nullable Object list, Type type, ToStringContext context) {
+        public void beforeList(@Nullable Object list, Type type, Stack<ToStringContext> contextStack) {
+            ToStringContext context = contextStack.topNonNull();
             writeListStart(context);
+            writeWrapping(context);
         }
 
         @Override
         public void doListElement(
-                int index,
-                @Nullable Object value, Type type,
-                ToStringContext context, Walker<ToStringContext> walker) {
+                int index, @Nullable Object value, Type type,
+                Stack<ToStringContext> contextStack, Walker<ToStringContext> walker
+        ) {
+            ToStringContext context = contextStack.topNonNull();
+            writeIndent(context);
             walker.walk(value, type);
             writeSeparator(context);
             context.increaseElementCount();
         }
 
         @Override
-        public void afterList(@Nullable Object list, Type type, ToStringContext context) {
+        public void afterList(@Nullable Object list, Type type, Stack<ToStringContext> contextStack) {
+            ToStringContext context = contextStack.topNonNull();
             unWriteSeparator(context);
             writeListEnd(context);
         }
 
         @Override
-        public void beforeObject(@Nullable Object record, Type type, ToStringContext context) {
-            writeObjectStart();
-            level++;
+        public void beforeObject(@Nullable Object record, Type type, Stack<ToStringContext> contextStack) {
+            ToStringContext context = contextStack.topNonNull();
+            writeObjectStart(context);
+            writeWrapping(context);
         }
 
         @Override
         public void doObjectElement(
-                Object index, Type indexType,
-                @Nullable Object value, Type type,
-                ToStringContext context, Walker<ToStringContext> walker) {
+                Object index, Type indexType, @Nullable Object value, Type type,
+                Stack<ToStringContext> contextStack, Walker<ToStringContext> walker
+        ) {
+            ToStringContext context = contextStack.topNonNull();
+            writeIndent(context);
             walker.walk(index, indexType);
-            writeIndicator();
+            writeIndicator(context);
             walker.walk(value, type);
-            writeSeparator();
+            writeSeparator(context);
+            context.increaseElementCount();
         }
 
         @Override
-        public void afterObject(@Nullable Object object, Type type, ToStringContext context) {
-            level--;
-            unWriteSeparator(stack);
-            writeObjectEnd();
+        public void afterObject(@Nullable Object object, Type type, Stack<ToStringContext> contextStack) {
+            ToStringContext context = contextStack.topNonNull();
+            unWriteSeparator(context);
+            writeObjectEnd(context);
         }
 
         private void writeUnit(@Nullable Object any, ToStringContext context) {
@@ -186,66 +165,66 @@ public class ToString implements Lazy<String> {
         }
 
         @Override
-        public void doUnit(@Nullable Object unit, Type type, ToStringContext context) {
+        public void doUnit(@Nullable Object unit, Type type, Stack<ToStringContext> contextStack) {
             if (unit != null && valueStack.search(unit)) {
                 throw new CircularReferenceException(indexStack.toList());
             }
-            super.doUnit(unit, type, context);
+            super.doUnit(unit, type, contextStack);
         }
 
         @Override
-        public void beforeList(@Nullable Object list, Type type, ToStringContext stack) {
+        public void beforeList(@Nullable Object list, Type type, Stack<ToStringContext> contextStack) {
             if (list != null && valueStack.search(list)) {
                 throw new CircularReferenceException(indexStack.toList());
             }
             if (list != null) {
                 valueStack.push(list);
             }
-            super.beforeList(list, type, stack);
+            super.beforeList(list, type, contextStack);
         }
 
         @Override
         public void doListElement(
-                int index,
-                @Nullable Object value, Type type,
-                ToStringContext stack, Walker walker) {
+                int index, @Nullable Object value, Type type,
+                Stack<ToStringContext> contextStack, Walker<ToStringContext> walker
+        ) {
             indexStack.push("[" + index + "]");
-            super.doListElement(index, value, type, stack, walker);
+            super.doListElement(index, value, type, contextStack, walker);
             indexStack.pop();
         }
 
         @Override
-        public void afterList(@Nullable Object list, Type type, ToStringContext stack) {
-            super.afterList(list, type, stack);
+        public void afterList(@Nullable Object list, Type type, Stack<ToStringContext> contextStack) {
+            super.afterList(list, type, contextStack);
             if (list != null) {
                 valueStack.pop();
             }
         }
 
         @Override
-        public void beforeObject(@Nullable Object object, Type type, ToStringContext stack) {
+        public void beforeObject(@Nullable Object object, Type type, Stack<ToStringContext> contextStack) {
             if (object != null && valueStack.search(object)) {
                 throw new CircularReferenceException(indexStack.toList());
             }
             if (object != null) {
                 valueStack.push(object);
             }
-            super.beforeObject(object, type, stack);
+            super.beforeObject(object, type, contextStack);
         }
 
         @Override
         public void doObjectElement(
-                Object index, Type indexType,
-                @Nullable Object value, Type type,
-                ToStringContext stack, Walker walker) {
+                Object index, Type indexType, @Nullable Object value, Type type,
+                Stack<ToStringContext> contextStack, Walker<ToStringContext> walker
+        ) {
             indexStack.push(index);
-            super.doObjectElement(index, indexType, value, type, stack, walker);
+            super.doObjectElement(index, indexType, value, type, contextStack, walker);
             indexStack.pop();
         }
 
         @Override
-        public void afterObject(@Nullable Object object, Type type, ToStringContext stack) {
-            super.afterObject(object, type, stack);
+        public void afterObject(@Nullable Object object, Type type, Stack<ToStringContext> contextStack) {
+            super.afterObject(object, type, contextStack);
             if (object != null) {
                 valueStack.pop();
             }
