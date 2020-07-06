@@ -2,10 +2,12 @@ package xyz.srclab.common.walk;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.collection.IterableScheme;
 import xyz.srclab.common.collection.MapScheme;
 import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.lang.stack.Stack;
 import xyz.srclab.common.object.UnitPredicate;
 import xyz.srclab.common.record.RecordType;
 import xyz.srclab.common.record.Recorder;
@@ -18,33 +20,33 @@ import java.util.Map;
 /**
  * @author sunqian
  */
-public class WalkerBuilder extends CachedBuilder<Walker> {
+public class WalkerBuilder<C> extends CachedBuilder<Walker<C>> {
 
-    public static WalkerBuilder newBuilder() {
-        return new WalkerBuilder();
+    public static <C> WalkerBuilder<C> newBuilder() {
+        return new WalkerBuilder<>();
     }
 
-    private @Nullable WalkHandler<?> walkHandler;
+    private @Nullable WalkHandler<C> walkHandler;
     private @Nullable UnitPredicate unitPredicate;
     private @Nullable Recorder recorder;
 
-    public WalkerBuilder walkHandler(WalkHandler<?> walkHandler) {
+    public WalkerBuilder<C> walkHandler(WalkHandler<C> walkHandler) {
         this.walkHandler = walkHandler;
         return this;
     }
 
-    public WalkerBuilder unitPredicate(UnitPredicate unitPredicate) {
+    public WalkerBuilder<C> unitPredicate(UnitPredicate unitPredicate) {
         this.unitPredicate = unitPredicate;
         return this;
     }
 
-    public WalkerBuilder recorder(Recorder recorder) {
+    public WalkerBuilder<C> recorder(Recorder recorder) {
         this.recorder = recorder;
         return this;
     }
 
     @Override
-    protected Walker buildNew() {
+    protected Walker<C> buildNew() {
         Check.checkArguments(walkHandler != null, "Need walk handler");
         if (unitPredicate == null) {
             unitPredicate = UnitPredicate.defaultPredicate();
@@ -55,85 +57,102 @@ public class WalkerBuilder extends CachedBuilder<Walker> {
         return new WalkerImpl<>(walkHandler, unitPredicate, recorder);
     }
 
-    private static final class WalkerImpl<S> implements Walker {
+    public <C1 extends C> Walker<C1> build() {
+        return Cast.as(super.buildCached());
+    }
 
-        private final WalkHandler<S> walkHandler;
+    private static final class WalkerImpl<C> implements Walker<C> {
+
+        private final WalkHandler<C> walkHandler;
         private final UnitPredicate unitPredicate;
         private final Recorder recorder;
 
-        private WalkerImpl(WalkHandler<S> walkHandler, UnitPredicate unitPredicate, Recorder recorder) {
+        private WalkerImpl(WalkHandler<C> walkHandler, UnitPredicate unitPredicate, Recorder recorder) {
             this.walkHandler = walkHandler;
             this.unitPredicate = unitPredicate;
             this.recorder = recorder;
         }
 
         @Override
-        public void walk(@Nullable Object any, Type type) {
-            S stack = walkHandler.newStack();
-            walk0(any, type, stack);
+        public C walk(@Nullable Object any, Type type) {
+            C context = walkHandler.newContext();
+            Stack<C> contextStack = Stack.newStack();
+            contextStack.push(context);
+            return walk0(any, type, contextStack);
         }
 
-        public void walk0(@Nullable Object any, Type type, S stack) {
+        public C walk0(@Nullable Object any, Type type, Stack<C> contextStack) {
             if (any == null) {
-                walkNull(type, stack);
-                return;
+                walkNull(type, contextStack);
+                return contextStack.popNonNull();
             }
             if (unitPredicate.test(type)) {
-                walkHandler.doUnit(any, type, stack);
+                walkHandler.doUnit(any, type, contextStack);
             } else if (any instanceof Map) {
-                walkHandler.beforeObject(any, type, stack);
+                walkHandler.beforeObject(any, type, contextStack);
                 Map<?, ?> map = (Map<?, ?>) any;
                 MapScheme mapScheme = MapScheme.getMapScheme(type);
+                C nextContext = walkHandler.newContext(contextStack.topNonNull());
+                contextStack.push(nextContext);
                 map.forEach((k, v) -> {
                     walkHandler.doObjectElement(
-                            k, mapScheme.keyType(), v, mapScheme.valueType(), stack, this);
+                            k, mapScheme.keyType(), v, mapScheme.valueType(), contextStack,
+                            (o, t) -> walk0(o, t, contextStack));
                 });
-                walkHandler.afterObject(any, type, stack);
+                walkHandler.afterObject(any, type, contextStack);
             } else if (any instanceof Iterable) {
-                walkHandler.beforeList(any, type, stack);
+                walkHandler.beforeList(any, type, contextStack);
                 Iterable<?> iterable = (Iterable<?>) any;
                 IterableScheme iterableScheme = IterableScheme.getIterableScheme(type);
                 Type elementType = iterableScheme.elementType();
-                int index = 0;
-                for (@Nullable Object o : iterable) {
-                    walkHandler.doListElement(index, o, elementType, stack, this);
-                }
-                walkHandler.afterList(any, type, stack);
+                walkIterable(any, type, contextStack, iterable, elementType);
             } else if (ArrayKit.isArray(type)) {
-                walkHandler.beforeList(any, type, stack);
+                walkHandler.beforeList(any, type, contextStack);
                 List<?> list = ArrayKit.asList(any);
                 Type componentType = ArrayKit.getComponentType(type);
-                int index = 0;
-                for (@Nullable Object o : list) {
-                    walkHandler.doListElement(index, o, componentType, stack, this);
-                }
-                walkHandler.afterList(any, type, stack);
+                walkIterable(any, type, contextStack, list, componentType);
             } else {
-                walkHandler.beforeObject(any, type, stack);
+                walkHandler.beforeObject(any, type, contextStack);
                 RecordType recordType = recorder.recordType(any);
+                C nextContext = walkHandler.newContext(contextStack.topNonNull());
+                contextStack.push(nextContext);
                 recordType.entryMap().forEach((name, entry) -> {
                     walkHandler.doObjectElement(
-                            name, String.class, entry.getValue(any), entry.genericType(), stack, this);
+                            name, String.class, entry.getValue(any), entry.genericType(), contextStack,
+                            (o, t) -> walk0(o, t, contextStack));
                 });
-                walkHandler.afterObject(any, type, stack);
+                walkHandler.afterObject(any, type, contextStack);
             }
+            return contextStack.popNonNull();
         }
 
-        private void walkNull(Type type, S stack) {
+        public void walkIterable(
+                @Nullable Object any, Type type, Stack<C> contextStack, Iterable<?> iterable, Type elementType) {
+            C nextStack = walkHandler.newContext(contextStack.topNonNull());
+            contextStack.push(nextStack);
+            int index = 0;
+            for (@Nullable Object e : iterable) {
+                walkHandler.doListElement(index, e, elementType, contextStack,
+                        (o, t) -> walk0(o, t, contextStack));
+            }
+            walkHandler.afterList(any, type, contextStack);
+        }
+
+        private void walkNull(Type type, Stack<C> contextStack) {
             if (unitPredicate.test(type)) {
-                walkHandler.doUnit(null, type, stack);
+                walkHandler.doUnit(null, type, contextStack);
                 return;
             }
             Class<?> rawType = TypeKit.getRawType(type);
             if (Map.class.isAssignableFrom(rawType)) {
-                walkHandler.beforeObject(null, type, stack);
-                walkHandler.afterObject(null, type, stack);
+                walkHandler.beforeObject(null, type, contextStack);
+                walkHandler.afterObject(null, type, contextStack);
             } else if (Iterable.class.isAssignableFrom(rawType) || ArrayKit.isArray(type)) {
-                walkHandler.beforeList(null, type, stack);
-                walkHandler.afterList(null, type, stack);
+                walkHandler.beforeList(null, type, contextStack);
+                walkHandler.afterList(null, type, contextStack);
             } else {
-                walkHandler.beforeObject(null, type, stack);
-                walkHandler.afterObject(null, type, stack);
+                walkHandler.beforeObject(null, type, contextStack);
+                walkHandler.afterObject(null, type, contextStack);
             }
         }
     }

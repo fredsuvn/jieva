@@ -1,27 +1,32 @@
 package xyz.srclab.common.walk;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.lang.stack.Stack;
 
 import java.lang.reflect.Type;
 
 /**
  * @author sunqian
  */
-public interface WalkHandler<S> {
+public interface WalkHandler<C> {
 
-    S newStack();
+    C newContext();
 
-    void doUnit(@Nullable Object unit, Type type, S stack);
+    C newContext(C lastContext);
 
-    void beforeList(@Nullable Object list, Type type, S stack);
+    void doUnit(@Nullable Object unit, Type type, Stack<C> contextStack);
 
-    void doListElement(int index, @Nullable Object value, Type type, S stack, Walker walker);
+    void beforeList(@Nullable Object list, Type type, Stack<C> contextStack);
 
-    void afterList(@Nullable Object list, Type type, S stack);
+    void doListElement(
+            int index, @Nullable Object value, Type type, Stack<C> contextStack, Walker<C> walker);
 
-    void beforeObject(@Nullable Object record, Type type, S stack);
+    void afterList(@Nullable Object list, Type type, Stack<C> contextStack);
 
-    void doObjectElement(Object index, Type indexType, @Nullable Object value, Type type, S stack, Walker walker);
+    void beforeObject(@Nullable Object record, Type type, Stack<C> contextStack);
 
-    void afterObject(@Nullable Object record, Type type, S stack);
+    void doObjectElement(
+            Object index, Type indexType, @Nullable Object value, Type type, Stack<C> contextStack, Walker<C> walker);
+
+    void afterObject(@Nullable Object object, Type type, Stack<C> contextStack);
 }

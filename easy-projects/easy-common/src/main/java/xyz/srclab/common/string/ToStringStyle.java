@@ -24,7 +24,7 @@ public interface ToStringStyle {
             .listStart("[")
             .listEnd("]")
             .wrapping(Environment.currentEnvironment().osLineSeparator())
-            .ignoreReferenceLoop(false)
+            .ignoreCircularReference(false)
             .build();
 
     String objectStart();
@@ -43,7 +43,7 @@ public interface ToStringStyle {
 
     String indicator();
 
-    boolean ignoreReferenceLoop();
+    boolean ignoreCircularReference();
 
     UnitPredicate unitPredicate();
 
@@ -57,7 +57,7 @@ public interface ToStringStyle {
         private String indent = "";
         private String separator = ",";
         private String indicator = "=";
-        private boolean ignoreReferenceLoop = false;
+        private boolean ignoreCircularReference = false;
         private UnitPredicate unitPredicate = UnitPredicate.defaultPredicate();
         private Recorder recorder = Recorder.defaultRecorder();
 
@@ -109,8 +109,8 @@ public interface ToStringStyle {
             return this;
         }
 
-        public Builder ignoreReferenceLoop(boolean ignoreReferenceLoop) {
-            this.ignoreReferenceLoop = ignoreReferenceLoop;
+        public Builder ignoreCircularReference(boolean ignoreCircularReference) {
+            this.ignoreCircularReference = ignoreCircularReference;
             this.updateState();
             return this;
         }
@@ -137,7 +137,7 @@ public interface ToStringStyle {
                 private final String indent = Builder.this.indent;
                 private final String separator = Builder.this.separator;
                 private final String indicator = Builder.this.indicator;
-                private final boolean ignoreReferenceLoop = Builder.this.ignoreReferenceLoop;
+                private final boolean ignoreCircularReference = Builder.this.ignoreCircularReference;
                 private final UnitPredicate unitPredicate = Builder.this.unitPredicate;
                 private final Recorder recorder = Builder.this.recorder;
 
@@ -182,8 +182,8 @@ public interface ToStringStyle {
                 }
 
                 @Override
-                public boolean ignoreReferenceLoop() {
-                    return ignoreReferenceLoop;
+                public boolean ignoreCircularReference() {
+                    return ignoreCircularReference;
                 }
 
                 @Override
@@ -195,6 +195,10 @@ public interface ToStringStyle {
                     return recorder;
                 }
             };
+        }
+
+        public ToStringStyle build() {
+            return buildCached();
         }
     }
 }

@@ -4,10 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.bean.BeanOperator;
 import xyz.srclab.common.lang.lazy.Lazy;
+import xyz.srclab.common.lang.stack.Stack;
 import xyz.srclab.common.walk.WalkHandler;
+import xyz.srclab.common.walk.Walker;
 
 import java.lang.reflect.Type;
-import java.util.LinkedList;
 
 public class ToString implements Lazy<String> {
 
@@ -48,129 +49,241 @@ public class ToString implements Lazy<String> {
 
     @Override
     public String get() {
-        return new ToStringImpl(toStringStyle).toString();
+        if (toStringStyle.ignoreCircularReference()) {
+            ToStringContext context =
+        }
     }
 
-    private static final class ToStringImpl {
-
-        protected final ToStringStyle toStringStyle;
-        protected final StringBuilder buffer = new StringBuilder();
-        protected final LinkedList<Object> valueStackTrace = new LinkedList<>();
-        protected final LinkedList<Object> indexStackTrace = new LinkedList<>();
-        protected int level = 0;
-
-        private ToStringImpl(ToStringStyle toStringStyle) {
-            this.toStringStyle = toStringStyle;
-        }
-
-        public String toString() {
-
-        }
-
-
-    }
-
-    private static class ToStringHandler implements WalkHandler {
+    private static class ToStringHandler implements WalkHandler<ToStringContext> {
 
         private final ToStringStyle toStringStyle;
-        private final StringBuilder buffer = new StringBuilder();
-        private int level = 0;
-        private int elementCount = 0;
 
         private ToStringHandler(ToStringStyle toStringStyle) {
             this.toStringStyle = toStringStyle;
         }
 
         @Override
-        public void doUnit(@Nullable Object unit, Type type) {
-            writeUnit(unit);
+        public ToStringContext newContext() {
+            return new ToStringContext();
         }
 
         @Override
-        public void doElement(int index, @Nullable Object value, Type type) {
-            elementCount++;
+        public ToStringContext newContext(ToStringContext lastContext) {
+            return new ToStringContext(lastContext);
         }
 
         @Override
-        public void doEntry(Object index, Type indexType, @Nullable Object value, Type type) {
-
+        public void doUnit(@Nullable Object unit, Type type, ToStringContext context) {
+            writeUnit(unit, context);
         }
 
         @Override
-        public void beforeObject(@Nullable Object record, Type type) {
-
+        public void beforeList(@Nullable Object list, Type type, ToStringContext context) {
+            writeListStart(context);
         }
 
         @Override
-        public void afterObject(@Nullable Object record, Type type) {
-
+        public void doListElement(
+                int index,
+                @Nullable Object value, Type type,
+                ToStringContext context, Walker<ToStringContext> walker) {
+            walker.walk(value, type);
+            writeSeparator(context);
+            context.increaseElementCount();
         }
 
         @Override
-        public void beforeList(@Nullable Object list, Type type) {
-
+        public void afterList(@Nullable Object list, Type type, ToStringContext context) {
+            unWriteSeparator(context);
+            writeListEnd(context);
         }
 
         @Override
-        public void afterList(@Nullable Object list, Type type) {
-
+        public void beforeObject(@Nullable Object record, Type type, ToStringContext context) {
+            writeObjectStart();
+            level++;
         }
 
-        private StringBuilder buffer() {
-            return buffer;
+        @Override
+        public void doObjectElement(
+                Object index, Type indexType,
+                @Nullable Object value, Type type,
+                ToStringContext context, Walker<ToStringContext> walker) {
+            walker.walk(index, indexType);
+            writeIndicator();
+            walker.walk(value, type);
+            writeSeparator();
         }
 
-        private void writeUnit(@Nullable Object any) {
-            buffer.append(any);
+        @Override
+        public void afterObject(@Nullable Object object, Type type, ToStringContext context) {
+            level--;
+            unWriteSeparator(stack);
+            writeObjectEnd();
         }
 
-        private void writeObjectStart() {
-            buffer.append(toStringStyle.objectStart());
+        private void writeUnit(@Nullable Object any, ToStringContext context) {
+            context.buffer().append(any);
         }
 
-        private void writeObjectEnd() {
-            buffer.append(toStringStyle.objectEnd());
+        private void writeObjectStart(ToStringContext context) {
+            context.buffer().append(toStringStyle.objectStart());
         }
 
-        private void writeListStart() {
-            buffer.append(toStringStyle.listStart());
+        private void writeObjectEnd(ToStringContext context) {
+            context.buffer().append(toStringStyle.objectEnd());
         }
 
-        private void writeListEnd() {
-            buffer.append(toStringStyle.listEnd());
+        private void writeListStart(ToStringContext context) {
+            context.buffer().append(toStringStyle.listStart());
         }
 
-        private void writeWrapping() {
+        private void writeListEnd(ToStringContext context) {
+            context.buffer().append(toStringStyle.listEnd());
+        }
+
+        private void writeWrapping(ToStringContext context) {
             if (StringUtils.isEmpty(toStringStyle.wrapping())) {
                 return;
             }
-            buffer.append(toStringStyle.wrapping());
+            context.buffer().append(toStringStyle.wrapping());
         }
 
-        private void writeIndent(int level) {
-            if (level == 0 || StringUtils.isEmpty(toStringStyle.indent())) {
+        private void writeIndent(ToStringContext context) {
+            if (context.level() == 0 || StringUtils.isEmpty(toStringStyle.indent())) {
                 return;
             }
-            for (int i = 0; i < level; i++) {
-                buffer.append(toStringStyle.indent());
+            for (int i = 0; i < context.level(); i++) {
+                context.buffer().append(toStringStyle.indent());
             }
         }
 
-        private void writeSeparator() {
-            buffer.append(toStringStyle.separator());
+        private void writeSeparator(ToStringContext context) {
+            context.buffer().append(toStringStyle.separator());
         }
 
-        private void unWriteSeparator() {
-            if (elementCount <= 0) {
+        private void unWriteSeparator(ToStringContext context) {
+            if (context.elementCount() <= 0) {
                 return;
             }
-            int bufferLength = buffer.length();
+            int bufferLength = context.buffer().length();
             int separatorLength = toStringStyle.separator().length();
-            buffer.delete(bufferLength - separatorLength, bufferLength);
+            context.buffer().delete(bufferLength - separatorLength, bufferLength);
         }
 
-        private void writeIndicator() {
-            buffer.append(toStringStyle.indicator());
+        private void writeIndicator(ToStringContext context) {
+            context.buffer().append(toStringStyle.indicator());
+        }
+    }
+
+    private static final class AcyclicToStringHandler extends ToStringHandler {
+
+        private final Stack<Object> indexStack = Stack.newStack();
+        private final Stack<Object> valueStack = Stack.newStack();
+
+        private AcyclicToStringHandler(ToStringStyle toStringStyle) {
+            super(toStringStyle);
+        }
+
+        @Override
+        public void doUnit(@Nullable Object unit, Type type, ToStringContext context) {
+            if (unit != null && valueStack.search(unit)) {
+                throw new CircularReferenceException(indexStack.toList());
+            }
+            super.doUnit(unit, type, context);
+        }
+
+        @Override
+        public void beforeList(@Nullable Object list, Type type, ToStringContext stack) {
+            if (list != null && valueStack.search(list)) {
+                throw new CircularReferenceException(indexStack.toList());
+            }
+            if (list != null) {
+                valueStack.push(list);
+            }
+            super.beforeList(list, type, stack);
+        }
+
+        @Override
+        public void doListElement(
+                int index,
+                @Nullable Object value, Type type,
+                ToStringContext stack, Walker walker) {
+            indexStack.push("[" + index + "]");
+            super.doListElement(index, value, type, stack, walker);
+            indexStack.pop();
+        }
+
+        @Override
+        public void afterList(@Nullable Object list, Type type, ToStringContext stack) {
+            super.afterList(list, type, stack);
+            if (list != null) {
+                valueStack.pop();
+            }
+        }
+
+        @Override
+        public void beforeObject(@Nullable Object object, Type type, ToStringContext stack) {
+            if (object != null && valueStack.search(object)) {
+                throw new CircularReferenceException(indexStack.toList());
+            }
+            if (object != null) {
+                valueStack.push(object);
+            }
+            super.beforeObject(object, type, stack);
+        }
+
+        @Override
+        public void doObjectElement(
+                Object index, Type indexType,
+                @Nullable Object value, Type type,
+                ToStringContext stack, Walker walker) {
+            indexStack.push(index);
+            super.doObjectElement(index, indexType, value, type, stack, walker);
+            indexStack.pop();
+        }
+
+        @Override
+        public void afterObject(@Nullable Object object, Type type, ToStringContext stack) {
+            super.afterObject(object, type, stack);
+            if (object != null) {
+                valueStack.pop();
+            }
+        }
+    }
+
+    private static final class ToStringContext {
+
+        private final StringBuilder buffer;
+        private final int level;
+        private int elementCount;
+
+        public ToStringContext() {
+            this.buffer = new StringBuilder();
+            this.level = 0;
+            this.elementCount = 0;
+        }
+
+        public ToStringContext(ToStringContext lastContext) {
+            this.buffer = lastContext.buffer;
+            this.level = lastContext.level() + 1;
+            this.elementCount = 0;
+        }
+
+        public StringBuilder buffer() {
+            return buffer;
+        }
+
+        public int level() {
+            return level;
+        }
+
+        public int elementCount() {
+            return elementCount;
+        }
+
+        public void increaseElementCount() {
+            this.elementCount++;
         }
     }
 }

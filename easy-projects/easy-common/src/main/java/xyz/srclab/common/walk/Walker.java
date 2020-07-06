@@ -7,15 +7,15 @@ import java.lang.reflect.Type;
 /**
  * @author sunqian
  */
-public interface Walker {
+public interface Walker<C> {
 
-    static WalkerBuilder newBuilder() {
+    static <C> WalkerBuilder<C> newBuilder() {
         return WalkerBuilder.newBuilder();
     }
 
-    default void walk(Object any) {
-        walk(any, any.getClass());
+    default C walk(Object any) {
+        return walk(any, any.getClass());
     }
 
-    void walk(@Nullable Object any, Type type);
+    C walk(@Nullable Object any, Type type);
 }
