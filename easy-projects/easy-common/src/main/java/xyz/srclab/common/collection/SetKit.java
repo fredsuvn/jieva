@@ -83,7 +83,6 @@ public class SetKit {
         return ImmutableSupport.set(elements);
     }
 
-    @Immutable
     public static <E> Set<E> unmodifiable(Iterable<? extends E> elements) {
         return Collections.unmodifiableSet(IterableKit.asSet(elements));
     }

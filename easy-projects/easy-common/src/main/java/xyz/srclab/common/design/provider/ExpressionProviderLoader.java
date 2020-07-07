@@ -6,22 +6,37 @@ import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.string.StringRef;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.string.StringKit;
+import xyz.srclab.common.string.StringRef;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * @author sunqian
  */
-final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
+public class ExpressionProviderLoader<T> implements ProviderLoader<T> {
+
+
+    private static final String CLASS_NAME_PATTERN = "";
+
+
+
+
+
+
+
+
+
+
 
     private static final String PARSE_ERROR = "Failed to parse provider descriptor: ";
 
@@ -34,23 +49,23 @@ final class StringDescriptorProviderLoader<T> implements ProviderLoader<T> {
     private final ClassLoader classLoader;
 
     @Immutable
-    private @Nullable Map<String, T> providers;
+    private @Nullable Map<String, T> providerMap;
 
-    StringDescriptorProviderLoader(String stringDescriptor) {
-        this(stringDescriptor, Loader.currentClassLoader());
+    ExpressionProviderLoader(String expression) {
+        this(expression, Loader.currentClassLoader());
     }
 
-    StringDescriptorProviderLoader(String stringDescriptor, ClassLoader classLoader) {
-        this.stringDescriptor = stringDescriptor;
+    ExpressionProviderLoader(String expression, ClassLoader classLoader) {
+        this.stringDescriptor = expression;
         this.classLoader = classLoader;
     }
 
     @Override
-    public @Immutable Map<String, T> load() {
-        if (providers == null) {
-            providers = load0();
+    public ProviderPool<T> load() {
+        if (providerMap == null) {
+            providerMap = load0();
         }
-        return providers;
+        return ProviderPool.fromProviderMap(providerMap);
     }
 
     @Immutable

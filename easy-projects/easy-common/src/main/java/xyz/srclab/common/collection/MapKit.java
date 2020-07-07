@@ -74,7 +74,6 @@ public class MapKit {
         return ImmutableSupport.map(map);
     }
 
-    @Immutable
     public static <K, V> Map<K, V> unmodifiable(Map<? extends K, ? extends V> map) {
         return Collections.unmodifiableMap(map);
     }

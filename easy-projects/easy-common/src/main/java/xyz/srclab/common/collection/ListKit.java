@@ -74,7 +74,6 @@ public class ListKit {
         return ImmutableSupport.list(elements);
     }
 
-    @Immutable
     public static <E> List<E> unmodifiable(Iterable<? extends E> elements) {
         return Collections.unmodifiableList(IterableKit.asList(elements));
     }
