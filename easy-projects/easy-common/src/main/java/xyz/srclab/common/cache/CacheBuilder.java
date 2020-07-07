@@ -1,16 +1,18 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.cache.listener.CacheCreateListener;
 import xyz.srclab.common.cache.listener.CacheReadListener;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
 import xyz.srclab.common.cache.listener.CacheUpdateListener;
+import xyz.srclab.common.design.builder.CachedBuilder;
 
 /**
  * @author sunqian
  */
-public final class CacheBuilder<K, V> {
+public final class CacheBuilder<K, V> extends CachedBuilder<Cache<K, V>> {
 
     public static <K, V> CacheBuilder<K, V> newBuilder() {
         return new CacheBuilder<>();
@@ -23,10 +25,10 @@ public final class CacheBuilder<K, V> {
 
     private @Nullable CacheLoader<? super K, @Nullable ? extends V> loader;
 
-    private @Nullable CacheCreateListener<K, V> createListener;
-    private @Nullable CacheReadListener<K, V> readListener;
-    private @Nullable CacheUpdateListener<K, V> updateListener;
-    private @Nullable CacheRemoveListener<K, V> removeListener;
+    private @Nullable CacheCreateListener<? super K, ? super V> createListener;
+    private @Nullable CacheReadListener<? super K, ? super V> readListener;
+    private @Nullable CacheUpdateListener<? super K, ? super V> updateListener;
+    private @Nullable CacheRemoveListener<? super K, ? super V> removeListener;
 
     private boolean useGuava = false;
 
@@ -45,29 +47,34 @@ public final class CacheBuilder<K, V> {
         return this;
     }
 
-    public CacheBuilder<K, V> loader(CacheLoader<? super K, @Nullable ? extends V> loader) {
-        this.loader = loader;
-        return this;
+    public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> loader(
+            CacheLoader<? super K1, @Nullable ? extends V1> loader) {
+        this.loader = Cast.as(loader);
+        return Cast.as(this);
     }
 
-    public CacheBuilder<K, V> createListener(CacheCreateListener<K, V> createListener) {
-        this.createListener = createListener;
-        return this;
+    public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> createListener(
+            CacheCreateListener<? super K1, ? super V1> createListener) {
+        this.createListener = Cast.as(createListener);
+        return Cast.as(this);
     }
 
-    public CacheBuilder<K, V> readListener(CacheReadListener<K, V> readListener) {
-        this.readListener = readListener;
-        return this;
+    public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> readListener(
+            CacheReadListener<? super K1, ? super V1> readListener) {
+        this.readListener = Cast.as(readListener);
+        return Cast.as(this);
     }
 
-    public CacheBuilder<K, V> updateListener(CacheUpdateListener<K, V> updateListener) {
-        this.updateListener = updateListener;
-        return this;
+    public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> updateListener(
+            CacheUpdateListener<? super K1, ? super V1> updateListener) {
+        this.updateListener = Cast.as(updateListener);
+        return Cast.as(this);
     }
 
-    public CacheBuilder<K, V> removeListener(CacheRemoveListener<K, V> removeListener) {
-        this.removeListener = removeListener;
-        return this;
+    public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> removeListener(
+            CacheRemoveListener<? super K1, ? super V1> removeListener) {
+        this.removeListener = Cast.as(removeListener);
+        return Cast.as(this);
     }
 
     public CacheBuilder<K, V> useGuava(boolean useGuava) {
@@ -94,22 +101,22 @@ public final class CacheBuilder<K, V> {
     }
 
     @Nullable
-    CacheCreateListener<K, V> createListener() {
+    CacheCreateListener<? super K, ? super V> createListener() {
         return createListener;
     }
 
     @Nullable
-    CacheReadListener<K, V> readListener() {
+    CacheReadListener<? super K, ? super V> readListener() {
         return readListener;
     }
 
     @Nullable
-    CacheUpdateListener<K, V> updateListener() {
+    CacheUpdateListener<? super K, ? super V> updateListener() {
         return updateListener;
     }
 
     @Nullable
-    CacheRemoveListener<K, V> removeListener() {
+    CacheRemoveListener<? super K, ? super V> removeListener() {
         return removeListener;
     }
 
@@ -117,8 +124,12 @@ public final class CacheBuilder<K, V> {
         return useGuava;
     }
 
+    @Override
+    protected Cache<K, V> buildNew() {
+        return useGuava ? new GuavaCache<>(this) : new CaffeineCache<>(this);
+    }
+
     public <K1 extends K, V1 extends V> Cache<K1, V1> build() {
-        Cache<K, V> cache = useGuava ? new GuavaCache<>(this) : new CaffeineCache<>(this);
-        return (Cache<K1, V1>) cache;
+        return Cast.as(buildCached());
     }
 }

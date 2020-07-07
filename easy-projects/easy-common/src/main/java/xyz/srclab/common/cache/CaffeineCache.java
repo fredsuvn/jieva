@@ -30,7 +30,7 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
             }
         }
         if (builder.removeListener() != null) {
-            CacheRemoveListener<K, V> cacheRemoveListener = builder.removeListener();
+            CacheRemoveListener<? super K, ? super V> cacheRemoveListener = builder.removeListener();
             caffeine.removalListener((key, value, cause) -> {
                 if (key == null || value == null) {
                     throw new IllegalStateException("Unexpected entry: key = " + key + ", value = " + value);

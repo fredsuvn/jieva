@@ -33,7 +33,7 @@ final class GuavaCache<K, V> implements Cache<K, V> {
             }
         }
         if (builder.removeListener() != null) {
-            CacheRemoveListener<K, V> cacheRemoveListener = builder.removeListener();
+            CacheRemoveListener<? super K, ? super V> cacheRemoveListener = builder.removeListener();
             guava.removalListener(removalNotification -> {
                 @Nullable K key = removalNotification.getKey();
                 @Nullable Object value = removalNotification.getValue();
