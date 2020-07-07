@@ -69,6 +69,10 @@ final class CaffeineCache<K, V> implements Cache<K, V> {
         }
     }
 
+    CaffeineCache(com.github.benmanes.caffeine.cache.Cache<K, Object> caffeine) {
+        this.caffeine = caffeine;
+    }
+
     @Override
     public boolean contains(K key) {
         return caffeine.getIfPresent(key) != null;

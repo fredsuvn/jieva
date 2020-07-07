@@ -78,6 +78,10 @@ final class GuavaCache<K, V> implements Cache<K, V> {
         }
     }
 
+    GuavaCache(com.google.common.cache.Cache<K, Object> guavaCache) {
+        this.guava = guavaCache;
+    }
+
     @Override
     public boolean contains(K key) {
         return guava.getIfPresent(key) != null;

@@ -26,6 +26,14 @@ public interface Cache<K, V> {
         return new MapCache<>(map);
     }
 
+    static <K, V> Cache<K, V> caffeine(com.github.benmanes.caffeine.cache.Cache<K, Object> caffeine) {
+        return new CaffeineCache<>(caffeine);
+    }
+
+    static <K, V> Cache<K, V> guava(com.google.common.cache.Cache<K, Object> cache) {
+        return new GuavaCache<>(cache);
+    }
+
     static <K, V> Cache<K, V> threadLocal(Cache<K, V> cache) {
         return new ThreadLocalCache<>(cache);
     }
