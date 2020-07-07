@@ -14,19 +14,19 @@ import java.util.function.Function;
 
 public interface Cache<K, V> {
 
-    static <K, V> Cache<K, V> newCommonCache() {
-        return newCommonCache(Defaults.CONCURRENCY_LEVEL);
+    static <K, V> Cache<K, V> commonCache() {
+        return commonCache(Defaults.CONCURRENCY_LEVEL);
     }
 
-    static <K, V> Cache<K, V> newCommonCache(int concurrentLevel) {
+    static <K, V> Cache<K, V> commonCache(int concurrentLevel) {
         return new CommonCache<>(concurrentLevel);
     }
 
-    static <K, V> Cache<K, V> newMapCache(Map<K, V> map) {
+    static <K, V> Cache<K, V> mapCache(Map<K, V> map) {
         return new MapCache<>(map);
     }
 
-    static <K, V> Cache<K, V> toThreadLocal(Cache<K, V> cache) {
+    static <K, V> Cache<K, V> threadLocal(Cache<K, V> cache) {
         return new ThreadLocalCache<>(cache);
     }
 

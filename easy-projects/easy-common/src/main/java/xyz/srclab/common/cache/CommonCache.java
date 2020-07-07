@@ -14,13 +14,13 @@ final class CommonCache<K, V> implements Cache<K, V> {
     private final Cache<K, V> l2;
 
     CommonCache(int concurrentLevel) {
-        Cache<K, V> l1 = Cache.newMapCache(
+        Cache<K, V> l1 = Cache.mapCache(
                 new MapMaker()
                         .concurrencyLevel(concurrentLevel)
                         .weakKeys()
                         .makeMap()
         );
-        Cache<K, V> l2 = Cache.toThreadLocal(Cache.newMapCache(new WeakHashMap<>()));
+        Cache<K, V> l2 = Cache.threadLocal(Cache.mapCache(new WeakHashMap<>()));
         this.l1 = l1;
         this.l2 = l2;
     }

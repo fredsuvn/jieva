@@ -414,7 +414,7 @@ public class ArrayKit {
         };
 
         // Key: component type, value: array type
-        private static final Cache<Type, Type> cache = Cache.newCommonCache();
+        private static final Cache<Type, Type> cache = Cache.commonCache();
 
         private static final Finder<Type, Type> finder = Finder.pairHashFinder(ARRAY_TYPE_TABLE);
 

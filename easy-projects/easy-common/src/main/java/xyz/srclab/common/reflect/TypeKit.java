@@ -109,7 +109,7 @@ public class TypeKit {
 
     private static final class GenericSignatureFinder {
 
-        private static final Cache<Key, Type> cache = Cache.newCommonCache();
+        private static final Cache<Key, Type> cache = Cache.commonCache();
 
         @ReturnType({
                 Class.class,
@@ -177,7 +177,7 @@ public class TypeKit {
 
     private static final class ActualTypeFinder {
 
-        private static final Cache<Key, Type> cache = Cache.newCommonCache();
+        private static final Cache<Key, Type> cache = Cache.commonCache();
 
         public static Type find(TypeVariable<?> type, Type owner, Class<?> declaringClass) {
             return cache.getNonNull(

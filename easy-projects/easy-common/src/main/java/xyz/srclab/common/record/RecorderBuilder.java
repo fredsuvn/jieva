@@ -63,7 +63,7 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
 
     private static final class CachedRecorderImpl implements Recorder {
 
-        private final Cache<Type, RecordType> cache = Cache.newCommonCache();
+        private final Cache<Type, RecordType> cache = Cache.commonCache();
 
         private final RecordResolver resolver;
 
