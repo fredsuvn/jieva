@@ -9,8 +9,8 @@ import java.lang.reflect.Type;
  */
 public interface Walker<C> {
 
-    static <C> WalkerBuilder<C> newBuilder() {
-        return WalkerBuilder.newBuilder();
+    static <C> WalkerBuilder<C> newBuilder(WalkHandler<C> walkHandler) {
+        return WalkerBuilder.newBuilder(walkHandler);
     }
 
     default C walk(Object any) {

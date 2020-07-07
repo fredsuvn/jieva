@@ -2,8 +2,6 @@ package xyz.srclab.common.walk;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
-import xyz.srclab.common.base.Cast;
-import xyz.srclab.common.base.Check;
 import xyz.srclab.common.collection.IterableScheme;
 import xyz.srclab.common.collection.MapScheme;
 import xyz.srclab.common.design.builder.CachedBuilder;
@@ -22,17 +20,16 @@ import java.util.Map;
  */
 public class WalkerBuilder<C> extends CachedBuilder<Walker<C>> {
 
-    public static <C> WalkerBuilder<C> newBuilder() {
-        return new WalkerBuilder<>();
+    public static <C> WalkerBuilder<C> newBuilder(WalkHandler<C> walkHandler) {
+        return new WalkerBuilder<>(walkHandler);
     }
 
-    private @Nullable WalkHandler<C> walkHandler;
+    private final WalkHandler<C> walkHandler;
     private @Nullable UnitPredicate unitPredicate;
     private @Nullable Recorder recorder;
 
-    public WalkerBuilder<C> walkHandler(WalkHandler<C> walkHandler) {
+    public WalkerBuilder(WalkHandler<C> walkHandler) {
         this.walkHandler = walkHandler;
-        return this;
     }
 
     public WalkerBuilder<C> unitPredicate(UnitPredicate unitPredicate) {
@@ -47,7 +44,6 @@ public class WalkerBuilder<C> extends CachedBuilder<Walker<C>> {
 
     @Override
     protected Walker<C> buildNew() {
-        Check.checkArguments(walkHandler != null, "Need walk handler");
         if (unitPredicate == null) {
             unitPredicate = UnitPredicate.defaultPredicate();
         }
@@ -57,8 +53,8 @@ public class WalkerBuilder<C> extends CachedBuilder<Walker<C>> {
         return new WalkerImpl<>(walkHandler, unitPredicate, recorder);
     }
 
-    public <C1 extends C> Walker<C1> build() {
-        return Cast.as(super.buildCached());
+    public Walker<C> build() {
+        return super.buildCached();
     }
 
     private static final class WalkerImpl<C> implements Walker<C> {
