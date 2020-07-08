@@ -34,7 +34,7 @@ public interface Cache<K, V> {
         return new GuavaCache<>(guavaCache);
     }
 
-    static <K, V> Cache<K, V> threadLocalCache(Cache<K, V> cache) {
+    static <K, V> Cache<K, V> threadLocal(Cache<K, V> cache) {
         return new ThreadLocalCache<>(cache);
     }
 
@@ -66,10 +66,7 @@ public interface Cache<K, V> {
     V get(K key);
 
     @Nullable
-    V get(K key, Function<? super K, @Nullable ? extends V> ifAbsent);
-
-    @Nullable
-    V load(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
+    V get(K key, CacheLoader<? super K, @Nullable ? extends V> ifAbsent);
 
     @Nullable
     V getOrDefault(K key, @Nullable V defaultValue);
@@ -101,20 +98,10 @@ public interface Cache<K, V> {
 
     @Immutable
     default Map<K, @Nullable V> getAll(
-            Iterable<? extends K> keys, Function<? super K, @Nullable ? extends V> ifAbsent) {
+            Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> ifAbsent) {
         Map<K, V> result = new LinkedHashMap<>();
         for (K key : keys) {
             result.put(key, get(key, ifAbsent));
-        }
-        return MapKit.immutable(result);
-    }
-
-    @Immutable
-    default Map<K, @Nullable V> loadAll(
-            Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
-        Map<K, V> result = new LinkedHashMap<>();
-        for (K key : keys) {
-            result.put(key, load(key, loader));
         }
         return MapKit.immutable(result);
     }
@@ -133,7 +120,7 @@ public interface Cache<K, V> {
 
     void put(K key, @Nullable V value);
 
-    void put(K key, CacheValue<@Nullable ? extends V> entry);
+    void put(CacheEntry<K, @Nullable ? extends V> entry);
 
     default void putAll(Map<? extends K, @Nullable ? extends V> entries) {
         entries.forEach(this::put);
@@ -141,7 +128,7 @@ public interface Cache<K, V> {
 
     default void putAll(Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
         for (K key : keys) {
-            put(key, loader.load(key));
+            put(loader.loadEntry(key));
         }
     }
 

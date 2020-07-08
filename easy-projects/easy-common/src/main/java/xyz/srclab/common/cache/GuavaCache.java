@@ -1,6 +1,8 @@
 package xyz.srclab.common.cache;
 
 import com.google.common.cache.RemovalCause;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Check;
@@ -20,55 +22,27 @@ final class GuavaCache<K, V> implements Cache<K, V> {
     private final com.google.common.cache.Cache<K, Object> guava;
 
     GuavaCache(CacheBuilder<K, V> builder) {
-        com.google.common.cache.CacheBuilder<K, Object> guava =
+        com.google.common.cache.CacheBuilder<K, Object> guavaBuilder =
                 Cast.as(com.google.common.cache.CacheBuilder.newBuilder());
-        guava.maximumSize(builder.maxSize());
+        guavaBuilder.maximumSize(builder.maxSize());
         if (builder.expiry() != null) {
             CacheExpiry expiry = builder.expiry();
             if (expiry.getExpiryAfterUpdate() != null) {
-                guava.expireAfterWrite(expiry.getExpiryAfterUpdate());
+                guavaBuilder.expireAfterWrite(expiry.getExpiryAfterUpdate());
             }
             if (expiry.getExpiryAfterCreate() != null) {
-                guava.expireAfterAccess(expiry.getExpiryAfterCreate());
+                guavaBuilder.expireAfterAccess(expiry.getExpiryAfterCreate());
             }
         }
         if (builder.removeListener() != null) {
             CacheRemoveListener<? super K, ? super V> cacheRemoveListener = builder.removeListener();
-            guava.removalListener(removalNotification -> {
-                @Nullable K key = removalNotification.getKey();
-                @Nullable Object value = removalNotification.getValue();
-                if (key == null || value == null) {
-                    throw new IllegalStateException("Unexpected entry: key = " + key + ", value = " + value);
-                }
-                RemovalCause cause = removalNotification.getCause();
-                CacheRemoveListener.Cause removeCause;
-                switch (cause) {
-                    case SIZE:
-                        removeCause = CacheRemoveListener.Cause.SIZE;
-                        break;
-                    case EXPIRED:
-                        removeCause = CacheRemoveListener.Cause.EXPIRED;
-                        break;
-                    case COLLECTED:
-                        removeCause = CacheRemoveListener.Cause.COLLECTED;
-                        break;
-                    case EXPLICIT:
-                        removeCause = CacheRemoveListener.Cause.EXPLICIT;
-                        break;
-                    case REPLACED:
-                        removeCause = CacheRemoveListener.Cause.REPLACED;
-                        break;
-                    default:
-                        throw new IllegalStateException("Unknown remove cause: " + cause);
-                }
-                cacheRemoveListener.afterRemove(key, unmask(value), removeCause);
-            });
+            guavaBuilder.removalListener(new RemovalListenerImpl(cacheRemoveListener));
         }
         if (builder.loader() == null) {
-            this.guava = guava.build();
+            this.guava = guavaBuilder.build();
         } else {
             CacheLoader<? super K, @Nullable ? extends V> loader = builder.loader();
-            this.guava = guava.build(new com.google.common.cache.CacheLoader<K, Object>() {
+            this.guava = guavaBuilder.build(new com.google.common.cache.CacheLoader<K, Object>() {
                 @Override
                 public Object load(K k) {
                     CacheValue<@Nullable ? extends V> entry = loader.load(k);
@@ -163,5 +137,46 @@ final class GuavaCache<K, V> implements Cache<K, V> {
 
     private void checkEntry(boolean expression, K key) {
         Check.checkState(expression, "Unexpected value of key: " + key);
+    }
+
+    private final class RemovalListenerImpl implements RemovalListener<K, Object> {
+
+        private final CacheRemoveListener<? super K, ? super V> listener;
+
+        private RemovalListenerImpl(CacheRemoveListener<? super K, ? super V> listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onRemoval(RemovalNotification<K, Object> removalNotification) {
+            @Nullable K key = removalNotification.getKey();
+            @Nullable Object value = removalNotification.getValue();
+            if (key == null) {
+                throw new IllegalStateException("Null cached key");
+            }
+            if (value == null) {
+                throw new IllegalStateException("Null cached value: " + key);
+            }
+            RemovalCause removalCause = removalNotification.getCause();
+            CacheRemoveListener.Cause cause = parseCause(removalCause);
+            listener.afterRemove(key, unmask(value), cause);
+        }
+
+        private CacheRemoveListener.Cause parseCause(RemovalCause removalCause) {
+            switch (removalCause) {
+                case SIZE:
+                    return CacheRemoveListener.Cause.SIZE;
+                case EXPIRED:
+                    return CacheRemoveListener.Cause.EXPIRED;
+                case COLLECTED:
+                    return CacheRemoveListener.Cause.COLLECTED;
+                case EXPLICIT:
+                    return CacheRemoveListener.Cause.EXPLICIT;
+                case REPLACED:
+                    return CacheRemoveListener.Cause.REPLACED;
+                default:
+                    throw new IllegalStateException("Unknown removal cause: " + removalCause);
+            }
+        }
     }
 }

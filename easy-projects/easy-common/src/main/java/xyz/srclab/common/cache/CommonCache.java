@@ -20,7 +20,7 @@ final class CommonCache<K, V> implements Cache<K, V> {
                         .weakKeys()
                         .makeMap()
         );
-        Cache<K, V> l2 = Cache.threadLocalCache(Cache.mapCache(new WeakHashMap<>()));
+        Cache<K, V> l2 = Cache.threadLocal(Cache.mapCache(new WeakHashMap<>()));
         this.l1 = l1;
         this.l2 = l2;
     }
