@@ -2,23 +2,16 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
 
-import java.time.Duration;
-
 /**
  * @author sunqian
  */
 public interface CacheLoader<K, V> {
 
-    default CacheEntry<K, V> loadEntry(K key) {
-        return CacheEntry.newBuilder()
-                .key(key)
-                .value(loadValue(key))
-                .expiryAfterCreate(Duration.ZERO)
-                .expiryAfterRead(Duration.ZERO)
-                .expiryAfterUpdate(Duration.ZERO)
-                .build();
+    @Nullable
+    default CacheValue<V> loadDetail(K key) {
+        return CacheValue.of(load(key));
     }
 
     @Nullable
-    V loadValue(K key);
+    V load(K key);
 }

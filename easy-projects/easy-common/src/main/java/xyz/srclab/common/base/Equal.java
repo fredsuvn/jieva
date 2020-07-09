@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * @author sunqian
  */
-public class Equals {
+public class Equal {
 
     public static boolean equals(@Nullable Object a, @Nullable Object b) {
         return Objects.equals(a, b);

@@ -2,7 +2,7 @@ package xyz.srclab.common.lang.stack;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Equals;
+import xyz.srclab.common.base.Equal;
 
 import java.util.List;
 
@@ -70,7 +70,7 @@ final class StackSupport {
         public boolean search(E element) {
             @Nullable Node<E> last = this.last;
             while (last != null) {
-                if (Equals.equals(element, last.getValue())) {
+                if (Equal.equals(element, last.getValue())) {
                     return true;
                 }
                 last = last.getPrev();

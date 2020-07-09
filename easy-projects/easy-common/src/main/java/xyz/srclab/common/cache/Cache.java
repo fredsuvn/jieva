@@ -2,14 +2,15 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.base.Require;
 import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.lang.ref.BooleanRef;
 
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 public interface Cache<K, V> {
@@ -66,61 +67,53 @@ public interface Cache<K, V> {
     V get(K key);
 
     @Nullable
-    V get(K key, CacheLoader<? super K, @Nullable ? extends V> ifAbsent);
+    V get(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
 
     @Nullable
-    V getOrDefault(K key, @Nullable V defaultValue);
-
-    @Nullable
-    default V getOrDefault(K key, Function<? super K, @Nullable ? extends V> defaultFunction) {
-        Cache<K, Object> _this = Cast.as(this);
-        Object defaultValue = CacheSupport.DEFAULT_VALUE;
-        @Nullable Object value = _this.getOrDefault(key, defaultValue);
-        if (value == defaultValue) {
-            return defaultFunction.apply(key);
+    default V getOrDefault(K key, @Nullable V defaultValue) {
+        BooleanRef containsFlag = BooleanRef.of(true);
+        @Nullable V value = get(key, CacheSupport.newContainsCacheLoader(containsFlag));
+        if (containsFlag.get()) {
+            return value;
         }
-        return Cast.asNullable(value);
+        return defaultValue;
     }
 
     @Immutable
     default Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
         Map<K, V> result = new LinkedHashMap<>();
-        Cache<K, Object> _this = Cast.as(this);
-        Object defaultValue = CacheSupport.DEFAULT_VALUE;
+        BooleanRef containsFlag = BooleanRef.of(true);
         for (K key : keys) {
-            @Nullable Object value = _this.getOrDefault(key, defaultValue);
-            if (value != defaultValue) {
-                result.put(key, Cast.asNullable(value));
+            @Nullable V value = get(key, CacheSupport.newContainsCacheLoader(containsFlag));
+            if (containsFlag.get()) {
+                result.put(key, value);
             }
+            containsFlag.set(true);
         }
-        return MapKit.immutable(result);
+        return MapKit.unmodifiable(result);
     }
 
     @Immutable
     default Map<K, @Nullable V> getAll(
-            Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> ifAbsent) {
+            Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
         Map<K, V> result = new LinkedHashMap<>();
         for (K key : keys) {
-            result.put(key, get(key, ifAbsent));
+            result.put(key, get(key, loader));
         }
-        return MapKit.immutable(result);
+        return MapKit.unmodifiable(result);
     }
 
-    default V getNonNull(K key) throws NullPointerException {
-        return Require.nonNull(get(key));
+    default V getNonNull(K key) throws NoSuchElementException {
+        return Require.nonNullElement(get(key));
     }
 
-    default V getNonNull(K key, Function<? super K, @Nullable ? extends V> ifAbsent) throws NullPointerException {
-        return Require.nonNull(get(key, ifAbsent));
-    }
-
-    default V loadNonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NullPointerException {
-        return Require.nonNull(load(key, loader));
+    default V getNonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NoSuchElementException {
+        return Require.nonNullElement(get(key, loader));
     }
 
     void put(K key, @Nullable V value);
 
-    void put(CacheEntry<K, @Nullable ? extends V> entry);
+    void put(K key, CacheValue<@Nullable ? extends V> cacheValue);
 
     default void putAll(Map<? extends K, @Nullable ? extends V> entries) {
         entries.forEach(this::put);
@@ -128,7 +121,11 @@ public interface Cache<K, V> {
 
     default void putAll(Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
         for (K key : keys) {
-            put(loader.loadEntry(key));
+            @Nullable CacheValue<? extends V> cacheValue = loader.loadDetail(key);
+            if (cacheValue == null) {
+                continue;
+            }
+            put(key, cacheValue.value());
         }
     }
 

@@ -6,7 +6,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.OutReturn;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Check;
-import xyz.srclab.common.base.Equals;
+import xyz.srclab.common.base.Equal;
 import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collection.IterableKit;
@@ -462,7 +462,7 @@ public class ArrayKit {
         public boolean equals(Object any) {
             if (any instanceof GenericArrayType) {
                 GenericArrayType that = (GenericArrayType) any;
-                return Equals.equals(componentType, that.getGenericComponentType());
+                return Equal.equals(componentType, that.getGenericComponentType());
             } else {
                 return false;
             }

@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Nullable;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author sunqian
@@ -13,8 +13,12 @@ final class MapCache<K, V> implements Cache<K, V> {
 
     private final Map<K, V> map;
 
-    public MapCache(Map<K, V> map) {
+    MapCache(Map<K, V> map) {
         this.map = map;
+    }
+
+    MapCache(Supplier<Map<K, V>> mapSupplier) {
+        this.map = mapSupplier.get();
     }
 
     @Override
@@ -22,19 +26,26 @@ final class MapCache<K, V> implements Cache<K, V> {
         return map.containsKey(key);
     }
 
+    @Nullable
     @Override
     public V get(K key) {
         return map.get(key);
     }
 
+    @Nullable
     @Override
-    public V get(K key, Function<? super K, ? extends V> ifAbsent) {
-        return map.computeIfAbsent(key, ifAbsent);
-    }
-
-    @Override
-    public V load(K key, CacheLoader<? super K, ? extends V> loader) {
-        return map.computeIfAbsent(key, k -> loader.load(k).value());
+    public V get(K key, CacheLoader<? super K, ? extends V> loader) {
+        try {
+            return map.computeIfAbsent(key, k -> {
+                @Nullable CacheValue<? extends V> cacheValue = loader.loadDetail(k);
+                if (cacheValue == null) {
+                    throw new LoadNullException();
+                }
+                return cacheValue.value();
+            });
+        } catch (LoadNullException e) {
+            return null;
+        }
     }
 
     @Override
@@ -68,5 +79,12 @@ final class MapCache<K, V> implements Cache<K, V> {
     @Override
     public void invalidateAll() {
         map.clear();
+    }
+
+    private static final class LoadNullException extends RuntimeException {
+
+        public LoadNullException() {
+            super(null, null, false, false);
+        }
     }
 }

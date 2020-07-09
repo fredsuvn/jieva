@@ -5,6 +5,7 @@ import xyz.srclab.annotation.Nullable;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 /**
@@ -45,26 +46,14 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Nullable
-    public V get(K key, Function<? super K, ? extends V> ifAbsent) {
-        return getCache().get(key, ifAbsent);
-    }
-
-    @Override
-    @Nullable
-    public V load(K key, CacheLoader<? super K, ? extends V> loader) {
-        return getCache().load(key, loader);
+    public V get(K key, CacheLoader<? super K, ? extends V> loader) {
+        return getCache().get(key, loader);
     }
 
     @Override
     @Nullable
     public V getOrDefault(K key, @Nullable V defaultValue) {
         return getCache().getOrDefault(key, defaultValue);
-    }
-
-    @Override
-    @Nullable
-    public V getOrDefault(K key, Function<? super K, ? extends V> defaultFunction) {
-        return getCache().getOrDefault(key, defaultFunction);
     }
 
     @Override
@@ -75,29 +64,18 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     @Immutable
-    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys, Function<? super K, ? extends V> ifAbsent) {
-        return getCache().getAll(keys, ifAbsent);
+    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) {
+        return getCache().getAll(keys, loader);
     }
 
     @Override
-    @Immutable
-    public Map<K, @Nullable V> loadAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) {
-        return getCache().loadAll(keys, loader);
-    }
-
-    @Override
-    public V getNonNull(K key) throws NullPointerException {
+    public V getNonNull(K key) throws NoSuchElementException {
         return getCache().getNonNull(key);
     }
 
     @Override
-    public V getNonNull(K key, Function<? super K, ? extends V> ifAbsent) throws NullPointerException {
-        return getCache().getNonNull(key, ifAbsent);
-    }
-
-    @Override
-    public V loadNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NullPointerException {
-        return getCache().loadNonNull(key, loader);
+    public V getNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
+        return getCache().getNonNull(key, loader);
     }
 
     @Override
@@ -106,8 +84,8 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void put(K key, CacheValue<? extends V> entry) {
-        getCache().put(key, entry);
+    public void put(K key, CacheValue<? extends V> cacheValue) {
+        getCache().put(key, cacheValue);
     }
 
     @Override
