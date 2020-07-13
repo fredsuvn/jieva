@@ -46,6 +46,10 @@ public class Current {
         ThreadLocalHolder.set(key, value);
     }
 
+    public static void clear() {
+        ThreadLocalHolder.clear();
+    }
+
     public static Future<?> run(Runnable task) {
         return ImmediateExecutorServiceHolder.INSTANCE.submit(task);
     }
@@ -87,6 +91,10 @@ public class Current {
         public static void set(Object key, @Nullable Object value) {
             globalThreadLocal.get().put(key, value);
         }
+
+        public static void clear() {
+            globalThreadLocal.get().clear();
+        }
     }
 
     private static final class ImmediateExecutorServiceHolder {
@@ -103,8 +111,8 @@ public class Current {
 
     private static final class CurrentHolder {
 
-        public static final Path USER_DIR = Paths.get(environment().getUserDir());
-        public static final Path USER_HOME = Paths.get(environment().getUserHome());
-        public static final Path TEMP_DIR = Paths.get(environment().getJavaIoTmpdir());
+        public static final Path USER_DIR = Paths.get(environment().userDir());
+        public static final Path USER_HOME = Paths.get(environment().userHome());
+        public static final Path TEMP_DIR = Paths.get(environment().javaIoTmpdir());
     }
 }
