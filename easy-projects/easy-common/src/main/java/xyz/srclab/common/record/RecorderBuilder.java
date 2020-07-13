@@ -79,7 +79,7 @@ public class RecorderBuilder extends BaseProductCachingBuilder<Recorder> {
 
         @Override
         public RecordType resolve(Type type) {
-            return cache.getNonNull(type, resolver::resolve);
+            return cache.nonNull(type, resolver::resolve);
         }
     }
 }

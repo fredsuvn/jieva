@@ -1,5 +1,6 @@
 package xyz.srclab.common.cache;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Defaults;
@@ -126,7 +127,27 @@ public final class CacheBuilder<K, V> extends BaseProductCachingBuilder<Cache<K,
 
     @Override
     protected Cache<K, V> buildNew() {
-        return useGuava ? new GuavaCache<>(this) : new CaffeineCache<>(this);
+        if (useGuava) {
+            com.google.common.cache.CacheBuilder<K, Object> guavaBuilder = GuavaCacheSupport.toGuavaCacheBuilder(this);
+            if (loader == null) {
+                com.google.common.cache.Cache<K, Object> guavaCache = guavaBuilder.build();
+                return Cache.guavaCache(guavaCache);
+            } else {
+                com.google.common.cache.LoadingCache<K, Object> loadingGuavaCache =
+                        guavaBuilder.build(GuavaCacheSupport.toGuavaCacheLoader(loader));
+                return Cache.loadingGuavaCache(loadingGuavaCache);
+            }
+        } else {
+            Caffeine<K, Object> caffeine = CaffeineCacheSupport.toCaffeineCacheBuilder(this);
+            if (loader == null) {
+                com.github.benmanes.caffeine.cache.Cache<K, Object> caffeineCache = caffeine.build();
+                return Cache.caffeineCache(caffeineCache);
+            } else {
+                com.github.benmanes.caffeine.cache.LoadingCache<K, Object> loadingCaffeineCache =
+                        caffeine.build(CaffeineCacheSupport.toCaffeineCacheLoader(loader));
+                return Cache.loadingCaffeineCache(loadingCaffeineCache);
+            }
+        }
     }
 
     public <K1 extends K, V1 extends V> Cache<K1, V1> build() {

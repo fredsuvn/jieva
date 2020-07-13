@@ -69,13 +69,13 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public V getNonNull(K key) throws NoSuchElementException {
-        return getCache().getNonNull(key);
+    public V nonNull(K key) throws NoSuchElementException {
+        return getCache().nonNull(key);
     }
 
     @Override
-    public V getNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
-        return getCache().getNonNull(key, loader);
+    public V nonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
+        return getCache().nonNull(key, loader);
     }
 
     @Override
@@ -84,8 +84,8 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void put(K key, CacheValue<? extends V> cacheValue) {
-        getCache().put(key, cacheValue);
+    public void put(K key, @Nullable V value, @Nullable CacheExpiry expiry) {
+        getCache().put(key, value, expiry);
     }
 
     @Override

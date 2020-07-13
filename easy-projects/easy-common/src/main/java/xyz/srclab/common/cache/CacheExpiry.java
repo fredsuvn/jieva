@@ -1,9 +1,10 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
+import xyz.srclab.common.design.builder.ProductCachingBuilder;
 
 import java.time.Duration;
+import java.util.Objects;
 
 /**
  * @author sunqian
@@ -15,33 +16,33 @@ public interface CacheExpiry {
     }
 
     @Nullable
-    Duration getExpiryAfterCreate();
+    Duration expiryAfterCreate();
 
     @Nullable
-    Duration getExpiryAfterUpdate();
+    Duration expiryAfterRead();
 
     @Nullable
-    Duration getExpiryAfterRead();
+    Duration expiryAfterUpdate();
 
-    final class Builder extends BaseProductCachingBuilder<CacheExpiry> {
+    final class Builder extends ProductCachingBuilder<CacheExpiry> {
 
         private @Nullable Duration expiryAfterCreate;
         private @Nullable Duration expiryAfterRead;
         private @Nullable Duration expiryAfterUpdate;
 
-        public Builder setExpiryAfterCreate(Duration expiryAfterCreate) {
+        public Builder expiryAfterCreate(Duration expiryAfterCreate) {
             this.expiryAfterCreate = expiryAfterCreate;
             this.updateState();
             return this;
         }
 
-        public Builder setExpiryAfterRead(Duration expiryAfterRead) {
+        public Builder expiryAfterRead(Duration expiryAfterRead) {
             this.expiryAfterRead = expiryAfterRead;
             this.updateState();
             return this;
         }
 
-        public Builder setExpiryAfterUpdate(Duration expiryAfterUpdate) {
+        public Builder expiryAfterUpdate(Duration expiryAfterUpdate) {
             this.expiryAfterUpdate = expiryAfterUpdate;
             this.updateState();
             return this;
@@ -64,22 +65,37 @@ public interface CacheExpiry {
                 this.expiryAfterUpdate = builder.expiryAfterUpdate;
             }
 
-            @Override
             @Nullable
-            public Duration getExpiryAfterCreate() {
+            @Override
+            public Duration expiryAfterCreate() {
                 return expiryAfterCreate;
             }
 
-            @Override
             @Nullable
-            public Duration getExpiryAfterUpdate() {
+            @Override
+            public Duration expiryAfterRead() {
                 return expiryAfterRead;
             }
 
-            @Override
             @Nullable
-            public Duration getExpiryAfterRead() {
+            @Override
+            public Duration expiryAfterUpdate() {
                 return expiryAfterUpdate;
+            }
+
+            @Override
+            public boolean equals(Object object) {
+                if (this == object) return true;
+                if (object == null || getClass() != object.getClass()) return false;
+                CacheExpiryImpl that = (CacheExpiryImpl) object;
+                return Objects.equals(expiryAfterCreate, that.expiryAfterCreate) &&
+                        Objects.equals(expiryAfterRead, that.expiryAfterRead) &&
+                        Objects.equals(expiryAfterUpdate, that.expiryAfterUpdate);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(expiryAfterCreate, expiryAfterRead, expiryAfterUpdate);
             }
         }
     }

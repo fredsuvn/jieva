@@ -1,6 +1,8 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.Null;
 import xyz.srclab.common.lang.ref.BooleanRef;
 
 /**
@@ -8,29 +10,40 @@ import xyz.srclab.common.lang.ref.BooleanRef;
  */
 final class CacheSupport {
 
-    static Object DEFAULT_VALUE = new Object();
-
-    static <K, V> CacheLoader<K, V> newContainsCacheLoader(BooleanRef containsFlag) {
-        return new ContainsCacheLoader<>(containsFlag);
+    static <K, V> CacheLoader<K, V> newContainsFlagCacheLoader(BooleanRef containsFlag) {
+        return new ContainsFlagCacheLoader<>(containsFlag);
     }
 
-    private static final class ContainsCacheLoader<K, V> implements CacheLoader<K, V> {
+    static Object mask(@Nullable Object value) {
+        return value == null ? Null.asObject() : value;
+    }
 
-        private final BooleanRef containsFlag;
+    @Nullable
+    static <V> V unmask(@Nullable Object value) {
+        if (value == null) {
+            return null;
+        }
+        return Null.isNull(value) ? null : Cast.as(value);
+    }
 
-        private ContainsCacheLoader(BooleanRef containsFlag) {
-            this.containsFlag = containsFlag;
+    private static final class ContainsFlagCacheLoader<K, V> implements CacheLoader<K, V> {
+
+        private final BooleanRef flag;
+
+        private ContainsFlagCacheLoader(BooleanRef flag) {
+            this.flag = flag;
         }
 
+        @Nullable
         @Override
-        public @Nullable CacheValue<V> loadDetail(K key) {
-            containsFlag.set(false);
+        public Result<V> load(K key) {
+            flag.set(false);
             return null;
         }
 
         @Override
-        public V load(K key) {
-            containsFlag.set(false);
+        public V simplyLoadValue(K key) {
+            flag.set(false);
             return null;
         }
     }

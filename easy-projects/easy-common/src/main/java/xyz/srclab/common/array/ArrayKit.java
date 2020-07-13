@@ -423,7 +423,7 @@ public class ArrayKit {
             if (arrayType != null) {
                 return arrayType;
             }
-            return cache.getNonNull(componentType, ArrayTypeFinder::make);
+            return cache.nonNull(componentType, ArrayTypeFinder::make);
         }
 
         private static Type make(Type componentType) {

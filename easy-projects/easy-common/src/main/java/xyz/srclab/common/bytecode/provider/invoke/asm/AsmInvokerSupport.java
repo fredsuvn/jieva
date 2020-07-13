@@ -22,15 +22,15 @@ final class AsmInvokerSupport {
     public static <T> ConstructorInvoker<T> getConstructorInvoker(
             Constructor<T> constructor, AsmInvokerGenerator generator) {
         ConstructorInvoker<?> result =
-                constructorInvokerCache.getNonNull(constructor, generator::newConstructorInvoker);
+                constructorInvokerCache.nonNull(constructor, generator::newConstructorInvoker);
         return (ConstructorInvoker<T>) result;
     }
 
     public static MethodInvoker getMethodInvoker(Method method, AsmInvokerGenerator generator) {
-        return methodInvokerCache.getNonNull(method, generator::newMethodInvoker);
+        return methodInvokerCache.nonNull(method, generator::newMethodInvoker);
     }
 
     public static FunctionInvoker getFunctionInvoker(Method method, AsmInvokerGenerator generator) {
-        return functionInvokerCache.getNonNull(method, generator::newFunctionInvoker);
+        return functionInvokerCache.nonNull(method, generator::newFunctionInvoker);
     }
 }

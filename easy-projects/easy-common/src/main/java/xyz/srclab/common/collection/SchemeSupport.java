@@ -25,7 +25,7 @@ final class SchemeSupport {
     private static final class IterableSchemeImpl implements IterableScheme {
 
         public static IterableSchemeImpl getImpl(Type iterableType) {
-            return cache.getNonNull(iterableType, IterableSchemeImpl::new);
+            return cache.nonNull(iterableType, IterableSchemeImpl::new);
         }
 
         private static final Cache<Type, IterableSchemeImpl> cache = Cache.commonCache();
@@ -89,7 +89,7 @@ final class SchemeSupport {
     private static final class MapSchemeImpl implements MapScheme {
 
         public static MapSchemeImpl getImpl(Type mapType) {
-            return cache.getNonNull(mapType, MapSchemeImpl::new);
+            return cache.nonNull(mapType, MapSchemeImpl::new);
         }
 
         private static final Cache<Type, MapSchemeImpl> cache = Cache.commonCache();
