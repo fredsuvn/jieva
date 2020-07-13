@@ -9,11 +9,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class HandlersBuilder<Product, Handler, Builder
-        extends HandlersBuilder<Product, Handler, Builder>> extends BaseProductCachingBuilder<Product> {
+public abstract class HandlersProductBuilder<Product, Handler, Builder
+        extends HandlersProductBuilder<Product, Handler, Builder>> extends BaseProductCachingBuilder<Product> {
 
     private @Nullable List<Handler> handlers;
-    private @Nullable @Immutable List<Handler> result;
+    private @Nullable @Immutable List<Handler> handlersResult;
 
     public Builder handler(Handler handler) {
         handlers().add(handler);
@@ -42,10 +42,10 @@ public abstract class HandlersBuilder<Product, Handler, Builder
 
     @Immutable
     protected List<Handler> handlersResult() {
-        if (result == null || isUpdatedSinceLastBuild()) {
-            result = newResult();
+        if (handlersResult == null || isUpdatedSinceLastBuild()) {
+            handlersResult = newResult();
         }
-        return result;
+        return handlersResult;
     }
 
     @Immutable

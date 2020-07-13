@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.Check;
-import xyz.srclab.common.design.builder.HandlersBuilder;
+import xyz.srclab.common.design.builder.HandlersProductBuilder;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.reflect.MethodKit;
 import xyz.srclab.common.reflect.TypeKit;
@@ -20,7 +20,7 @@ import java.util.Map;
  * @author sunqian
  */
 public class RecordResolverBuilder extends
-        HandlersBuilder<RecordResolver, RecordResolverHandler, RecordResolverBuilder> {
+        HandlersProductBuilder<RecordResolver, RecordResolverHandler, RecordResolverBuilder> {
 
     static RecordResolverBuilder newBuilder() {
         return new RecordResolverBuilder();

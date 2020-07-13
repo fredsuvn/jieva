@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Check;
-import xyz.srclab.common.design.builder.HandlersBuilder;
+import xyz.srclab.common.design.builder.HandlersProductBuilder;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author sunqian
  */
-public class ConverterBuilder extends HandlersBuilder<Converter, ConvertHandler, ConverterBuilder> {
+public class ConverterBuilder extends HandlersProductBuilder<Converter, ConvertHandler, ConverterBuilder> {
 
     static ConverterBuilder newBuilder() {
         return new ConverterBuilder();
