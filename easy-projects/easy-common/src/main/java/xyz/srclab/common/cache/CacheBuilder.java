@@ -7,12 +7,12 @@ import xyz.srclab.common.cache.listener.CacheCreateListener;
 import xyz.srclab.common.cache.listener.CacheReadListener;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
 import xyz.srclab.common.cache.listener.CacheUpdateListener;
-import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 
 /**
  * @author sunqian
  */
-public final class CacheBuilder<K, V> extends CachedBuilder<Cache<K, V>> {
+public final class CacheBuilder<K, V> extends BaseProductCachingBuilder<Cache<K, V>> {
 
     public static <K, V> CacheBuilder<K, V> newBuilder() {
         return new CacheBuilder<>();
@@ -130,6 +130,6 @@ public final class CacheBuilder<K, V> extends CachedBuilder<Cache<K, V>> {
     }
 
     public <K1 extends K, V1 extends V> Cache<K1, V1> build() {
-        return Cast.as(buildCached());
+        return Cast.as(buildCaching());
     }
 }

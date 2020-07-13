@@ -2,7 +2,7 @@ package xyz.srclab.common.object;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.collection.CollectionKit;
-import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 import xyz.srclab.common.lang.finder.Finder;
 import xyz.srclab.common.reflect.TypeKit;
 
@@ -15,7 +15,7 @@ import java.util.function.BiPredicate;
 /**
  * @author sunqian
  */
-public class UnitPredicateBuilder extends CachedBuilder<UnitPredicate> {
+public class UnitPredicateBuilder extends BaseProductCachingBuilder<UnitPredicate> {
 
     public static UnitPredicateBuilder newBuilder() {
         return new UnitPredicateBuilder();
@@ -122,7 +122,7 @@ public class UnitPredicateBuilder extends CachedBuilder<UnitPredicate> {
     }
 
     public UnitPredicate build() {
-        return buildCached();
+        return buildCaching();
     }
 
     private static final class UnitPredicateImpl implements UnitPredicate {

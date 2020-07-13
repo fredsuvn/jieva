@@ -2,7 +2,7 @@ package xyz.srclab.common.string;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.base.Environment;
-import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 import xyz.srclab.common.object.UnitPredicate;
 import xyz.srclab.common.record.Recorder;
 
@@ -49,7 +49,7 @@ public interface ToStringStyle {
 
     Recorder recorder();
 
-    class Builder extends CachedBuilder<ToStringStyle> {
+    class Builder extends BaseProductCachingBuilder<ToStringStyle> {
 
         private String objectStart = "{";
         private String objectEnd = "}";
@@ -201,7 +201,7 @@ public interface ToStringStyle {
         }
 
         public ToStringStyle build() {
-            return buildCached();
+            return buildCaching();
         }
     }
 }

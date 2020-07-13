@@ -5,7 +5,7 @@ import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Equal;
 import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.base.ToString;
-import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 
 import java.time.Duration;
 
@@ -48,7 +48,7 @@ public interface CacheValue<V> {
      */
     Duration expiryAfterUpdate();
 
-    class Builder<V> extends CachedBuilder<CacheValue<V>> {
+    class Builder<V> extends BaseProductCachingBuilder<CacheValue<V>> {
 
         private @Nullable V value;
         private Duration expiryAfterCreate = Duration.ZERO;
@@ -76,7 +76,7 @@ public interface CacheValue<V> {
         }
 
         public <V1 extends V> CacheValue<V1> build() {
-            return Cast.as(buildCached());
+            return Cast.as(buildCaching());
         }
 
         @Override

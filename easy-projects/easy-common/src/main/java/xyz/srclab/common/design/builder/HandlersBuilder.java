@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class HandlersBuilder<Product, Handler, Builder
-        extends HandlersBuilder<Product, Handler, Builder>> extends CachedBuilder<Product> {
+        extends HandlersBuilder<Product, Handler, Builder>> extends BaseProductCachingBuilder<Product> {
 
     private @Nullable List<Handler> handlers;
     private @Nullable @Immutable List<Handler> result;
@@ -42,7 +42,7 @@ public abstract class HandlersBuilder<Product, Handler, Builder
 
     @Immutable
     protected List<Handler> handlersResult() {
-        if (result == null || isUpdateSinceLastBuild()) {
+        if (result == null || isUpdatedSinceLastBuild()) {
             result = newResult();
         }
         return result;

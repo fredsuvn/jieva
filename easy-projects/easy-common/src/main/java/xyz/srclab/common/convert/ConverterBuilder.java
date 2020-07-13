@@ -26,7 +26,7 @@ public class ConverterBuilder extends HandlersBuilder<Converter, ConvertHandler,
     }
 
     public Converter build() {
-        return buildCached();
+        return buildCaching();
     }
 
     private static final class ConverterImpl implements Converter {

@@ -2,21 +2,21 @@ package xyz.srclab.common.design.builder;
 
 import xyz.srclab.annotation.Nullable;
 
-public abstract class CachedBuilder<T> {
+public abstract class BaseProductCachingBuilder<T> {
 
     private @Nullable T cache;
     private int stateVersion = 0;
     private int buildVersion = 0;
 
-    protected T buildCached() {
-        if (cache == null || isUpdateSinceLastBuild()) {
+    protected abstract T buildNew();
+
+    protected T buildCaching() {
+        if (cache == null || isUpdatedSinceLastBuild()) {
             cache = buildNew();
-            buildVersion = stateVersion;
+            refreshBuildVersion();
         }
         return cache;
     }
-
-    protected abstract T buildNew();
 
     /**
      * Called after any change which leads to refresh cache.
@@ -28,7 +28,11 @@ public abstract class CachedBuilder<T> {
         }
     }
 
-    protected boolean isUpdateSinceLastBuild() {
+    protected boolean isUpdatedSinceLastBuild() {
         return stateVersion != buildVersion;
+    }
+
+    private void refreshBuildVersion() {
+        buildVersion = stateVersion;
     }
 }

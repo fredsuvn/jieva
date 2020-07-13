@@ -1,6 +1,6 @@
 package xyz.srclab.common.util.proxy;
 
-import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 public abstract class AbstractProxyClassBuilder<T>
-        extends CachedBuilder<ProxyClass<T>> implements ProxyClassBuilder<T> {
+        extends BaseProductCachingBuilder<ProxyClass<T>> implements ProxyClassBuilder<T> {
 
     protected final Class<T> type;
     protected final Map<Predicate<Method>, ProxyMethod> proxyMethodMap = new LinkedHashMap<>();

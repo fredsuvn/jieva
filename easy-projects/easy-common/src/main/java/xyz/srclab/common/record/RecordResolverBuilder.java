@@ -33,7 +33,7 @@ public class RecordResolverBuilder extends
     }
 
     public RecordResolver build() {
-        return buildCached();
+        return buildCaching();
     }
 
     private static final class RecorderImpl implements RecordResolver {

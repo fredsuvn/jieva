@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.collection.IterableScheme;
 import xyz.srclab.common.collection.MapScheme;
-import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 import xyz.srclab.common.lang.stack.Stack;
 import xyz.srclab.common.object.UnitPredicate;
 import xyz.srclab.common.record.RecordType;
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * @author sunqian
  */
-public class WalkerBuilder<C> extends CachedBuilder<Walker<C>> {
+public class WalkerBuilder<C> extends BaseProductCachingBuilder<Walker<C>> {
 
     public static <C> WalkerBuilder<C> newBuilder(WalkHandler<C> walkHandler) {
         return new WalkerBuilder<>(walkHandler);
@@ -54,7 +54,7 @@ public class WalkerBuilder<C> extends CachedBuilder<Walker<C>> {
     }
 
     public Walker<C> build() {
-        return super.buildCached();
+        return super.buildCaching();
     }
 
     private static final class WalkerImpl<C> implements Walker<C> {

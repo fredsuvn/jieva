@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 
 import java.time.Duration;
 
@@ -23,7 +23,7 @@ public interface CacheExpiry {
     @Nullable
     Duration getExpiryAfterRead();
 
-    final class Builder extends CachedBuilder<CacheExpiry> {
+    final class Builder extends BaseProductCachingBuilder<CacheExpiry> {
 
         private @Nullable Duration expiryAfterCreate;
         private @Nullable Duration expiryAfterRead;

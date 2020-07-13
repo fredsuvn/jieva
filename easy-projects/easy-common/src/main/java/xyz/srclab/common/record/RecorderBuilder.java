@@ -3,11 +3,11 @@ package xyz.srclab.common.record;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.design.builder.CachedBuilder;
+import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 
 import java.lang.reflect.Type;
 
-public class RecorderBuilder extends CachedBuilder<Recorder> {
+public class RecorderBuilder extends BaseProductCachingBuilder<Recorder> {
 
     static RecorderBuilder newBuilder() {
         return new RecorderBuilder();
@@ -38,7 +38,7 @@ public class RecorderBuilder extends CachedBuilder<Recorder> {
     }
 
     public Recorder build() {
-        return buildCached();
+        return buildCaching();
     }
 
     private static final class RecorderImpl implements Recorder {
