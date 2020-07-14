@@ -1,7 +1,6 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.lang.finder.Finder;
@@ -38,13 +37,20 @@ public class DateConvertHandler implements ConvertHandler {
 
     @Override
     public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        return convert(from, (Type) to, converter);
+        if (to.isAssignableFrom(String.class) || to.isAssignableFrom(CharSequence.class)) {
+            return toString(from, dateTimeFormatter);
+        }
+        @Nullable BiFunction<Object, DateTimeFormatter, Object> function = finder.find(to);
+        if (function == null) {
+            return null;
+        }
+        return function.apply(from, dateTimeFormatter);
     }
 
     @Override
     public @Nullable Object convert(Object from, Type to, Converter converter) {
-        if (Cast.canCast(to, CharSequence.class)) {
-            return toString(from, dateTimeFormatter);
+        if (to instanceof Class) {
+            return convert(from, (Class<?>) to, converter);
         }
         @Nullable BiFunction<Object, DateTimeFormatter, Object> function = finder.find(to);
         if (function == null) {
@@ -86,7 +92,6 @@ public class DateConvertHandler implements ConvertHandler {
                 ZonedDateTime.class, TO_ZONED_DATE_TIME,
                 OffsetDateTime.class, TO_OFFSET_DATE_TIME,
                 Duration.class, TO_DURATION,
-
         };
 
         private static Date toDate(Object from, DateTimeFormatter dateTimeFormatter) {

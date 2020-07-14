@@ -1,7 +1,6 @@
 package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.convert.Converter;
 
@@ -14,7 +13,9 @@ public class StringConvertHandler implements ConvertHandler {
 
     @Override
     public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        if (to.equals(String.class) || Cast.canCast(to, CharSequence.class)) {
+        if (to.equals(String.class)
+                || to.isAssignableFrom(String.class)
+                || to.isAssignableFrom(CharSequence.class)) {
             return from.toString();
         }
         return null;
