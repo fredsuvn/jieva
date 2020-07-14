@@ -2,8 +2,10 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.Check;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 /**
@@ -65,6 +67,15 @@ final class MapCacheSupport {
         @Override
         public V getOrDefault(K key, @Nullable V defaultValue) {
             return map.getOrDefault(key, defaultValue);
+        }
+
+        @Override
+        public V getNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
+            return map.computeIfAbsent(key, k -> {
+                @Nullable V v = loader.simplyLoadValue(k);
+                Check.checkElement(v != null, k);
+                return v;
+            });
         }
 
         @Override

@@ -79,6 +79,18 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
+    @Immutable
+    public Map<K, V> getPresentNonNull(Iterable<? extends K> keys) {
+        return getCache().getPresentNonNull(keys);
+    }
+
+    @Override
+    @Immutable
+    public Map<K, V> getAllNonNull(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
+        return getCache().getAllNonNull(keys, loader);
+    }
+
+    @Override
     public void put(K key, @Nullable V value) {
         getCache().put(key, value);
     }

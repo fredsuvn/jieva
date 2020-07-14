@@ -143,8 +143,28 @@ public interface Cache<K, V> {
         return Require.nonNullElement(get(key));
     }
 
-    default V getNonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NoSuchElementException {
-        return Require.nonNullElement(get(key, loader));
+    V getNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException;
+
+    @Immutable
+    default Map<K, V> getPresentNonNull(Iterable<? extends K> keys) {
+        Map<K, V> result = new LinkedHashMap<>();
+        for (K key : keys) {
+            @Nullable V value = get(key);
+            if (value != null) {
+                result.put(key, value);
+            }
+        }
+        return MapKit.unmodifiable(result);
+    }
+
+    @Immutable
+    default Map<K, V> getAllNonNull(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader)
+            throws NoSuchElementException {
+        Map<K, V> result = new LinkedHashMap<>();
+        for (K key : keys) {
+            result.put(key, getNonNull(key, loader));
+        }
+        return MapKit.unmodifiable(result);
     }
 
     void put(K key, @Nullable V value);

@@ -4,7 +4,6 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Equal;
 import xyz.srclab.common.base.Hash;
-import xyz.srclab.common.base.ToString;
 import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 
 /**
@@ -111,7 +110,7 @@ public interface CacheLoader<K, V> {
 
                     @Override
                     public String toString() {
-                        return ToString.toString(value)
+                        return value
                                 + "(needCache: " + needCache
                                 + ", expiry: " + expiry
                                 + ")";
