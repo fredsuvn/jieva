@@ -139,11 +139,11 @@ public interface Cache<K, V> {
         return MapKit.unmodifiable(result);
     }
 
-    default V nonNull(K key) throws NoSuchElementException {
+    default V getNonNull(K key) throws NoSuchElementException {
         return Require.nonNullElement(get(key));
     }
 
-    default V nonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NoSuchElementException {
+    default V getNonNull(K key, CacheLoader<? super K, @Nullable ? extends V> loader) throws NoSuchElementException {
         return Require.nonNullElement(get(key, loader));
     }
 

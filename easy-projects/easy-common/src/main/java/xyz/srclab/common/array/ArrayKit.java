@@ -413,17 +413,17 @@ public class ArrayKit {
                 Double.class, Double[].class,
         };
 
-        // Key: component type, value: array type
-        private static final Cache<Type, Type> cache = Cache.commonCache();
-
         private static final Finder<Type, Type> finder = Finder.pairHashFinder(ARRAY_TYPE_TABLE);
+
+        // Key: component type, value: array type
+        private static final Cache<Type, Type> cache = Cache.loadingCache(ArrayTypeFinder::make);
 
         public static Type find(Type componentType) {
             @Nullable Type arrayType = finder.find(componentType);
             if (arrayType != null) {
                 return arrayType;
             }
-            return cache.nonNull(componentType, ArrayTypeFinder::make);
+            return cache.getNonNull(componentType);
         }
 
         private static Type make(Type componentType) {
