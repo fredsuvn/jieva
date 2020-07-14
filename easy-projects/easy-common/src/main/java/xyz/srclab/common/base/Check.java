@@ -88,7 +88,7 @@ public class Check {
 
     public static void checkElement(boolean expression, Object key) {
         if (!expression) {
-            throw new NoSuchElementException(String.valueOf(key));
+            throw new NoSuchElementException(ToString.toString(key));
         }
     }
 
