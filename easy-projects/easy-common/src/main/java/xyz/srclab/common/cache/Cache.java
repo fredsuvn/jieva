@@ -4,13 +4,12 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.base.Require;
+import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.lang.ref.BooleanRef;
 
 import java.time.Duration;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -78,53 +77,24 @@ public interface Cache<K, V> {
         return new CacheBuilder<>();
     }
 
-    boolean contains(K key);
-
-    default boolean containsAll(Iterable<? extends K> keys) {
-        for (K key : keys) {
-            if (!contains(key)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    default boolean containsAny(Iterable<? extends K> keys) {
-        for (K key : keys) {
-            if (contains(key)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Nullable
     V get(K key);
 
     @Nullable
     V get(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
 
-    @Nullable
-    default V getOrDefault(K key, @Nullable V defaultValue) {
-        BooleanRef containsFlag = BooleanRef.of(true);
-        @Nullable V value = get(key, CacheSupport.newContainsFlagCacheLoader(containsFlag));
-        if (containsFlag.get()) {
-            return value;
-        }
-        return defaultValue;
-    }
-
     @Immutable
     default Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
-        Map<K, V> result = new LinkedHashMap<>();
-        BooleanRef containsFlag = BooleanRef.of(true);
-        CacheLoader<K, V> cacheLoader = CacheSupport.newContainsFlagCacheLoader(containsFlag);
+        Map<K, @Nullable V> result = new LinkedHashMap<>();
+        BooleanRef resultFlag = BooleanRef.of(true);
+        CacheLoader<K, @Nullable V> cacheLoader = new NoResultCacheLoader<>(resultFlag);
         for (K key : keys) {
             @Nullable V value = get(key, cacheLoader);
-            if (containsFlag.get()) {
-                result.put(key, value);
+            if (!resultFlag.get()) {
+                resultFlag.set(true);
+                continue;
             }
-            containsFlag.set(true);
+            result.put(key, value);
         }
         return MapKit.unmodifiable(result);
     }
@@ -132,10 +102,11 @@ public interface Cache<K, V> {
     @Immutable
     default Map<K, @Nullable V> getAll(
             Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
-        Map<K, V> result = new LinkedHashMap<>();
-        for (K key : keys) {
-            result.put(key, get(key, loader));
-        }
+        Map<K, @Nullable V> present = getPresent(keys);
+        Map<K, @Nullable V> result = new LinkedHashMap<>(present);
+        Set<K> presentKeys = present.keySet();
+        Iterable<K> rest = IterableKit.filter(keys, k-> !presentKeys.contains(k));
+        loader.loadAll(rest);
         return MapKit.unmodifiable(result);
     }
 

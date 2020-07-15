@@ -7,17 +7,17 @@ import java.util.function.Function;
 /**
  * @author sunqian
  */
-final class MapCacheLoaderFunction<K, V> implements Function<K, V> {
+final class CacheLoaderFunction<K, V> implements Function<K, V> {
 
     private final CacheLoader<K, V> cacheLoader;
 
-    MapCacheLoaderFunction(CacheLoader<K, V> cacheLoader) {
+    CacheLoaderFunction(CacheLoader<K, V> cacheLoader) {
         this.cacheLoader = cacheLoader;
     }
 
     @Nullable
     @Override
-    public V apply(K k) throws NoResultException {
+    public V apply(K k) throws NoResultException, NotCacheException {
         @Nullable CacheLoader.Result<V> result = cacheLoader.load(k);
         if (result == null) {
             throw new NoResultException();

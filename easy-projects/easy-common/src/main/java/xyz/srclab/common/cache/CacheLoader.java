@@ -6,6 +6,9 @@ import xyz.srclab.common.base.Equal;
 import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * @author sunqian
  */
@@ -14,6 +17,18 @@ public interface CacheLoader<K, V> {
     @Nullable
     default Result<V> load(K key) {
         return Result.of(simplyLoadValue(key));
+    }
+
+    default Map<K, Result<V>> loadAll(Iterable<? extends K> keys) {
+        Map<K, Result<V>> resultMap = new LinkedHashMap<>();
+        for (K key : keys) {
+            @Nullable Result<V> result = load(key);
+            if (result == null) {
+                continue;
+            }
+            resultMap.put(key, result);
+        }
+        return resultMap;
     }
 
     @Nullable

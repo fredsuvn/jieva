@@ -2,8 +2,6 @@ package xyz.srclab.common.cache;
 
 import com.google.common.collect.MapMaker;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
-import xyz.srclab.common.base.Check;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -54,30 +52,22 @@ final class CommonCacheSupport {
         @Override
         public V get(K key, CacheLoader<? super K, ? extends V> loader) {
             try {
-                return l2.get().computeIfAbsent(key, k -> l1.computeIfAbsent(k, new MapCacheLoaderFunction<>(loader)));
+                return l2.get().computeIfAbsent(key, k ->
+                        l1.computeIfAbsent(k, new CacheLoaderFunction<>(loader)));
             } catch (NoResultException e) {
                 return null;
             } catch (NotCacheException e) {
-                return Cast.asNullable(e.getValue());
+                return e.getValue();
             }
         }
 
         @Override
         public V getNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
             try {
-                return l2.get().computeIfAbsent(key, k -> l1.computeIfAbsent(k, k0 -> {
-                    @Nullable CacheLoader.Result<? extends V> result = loader.load(k0);
-                    Check.checkElement(result != null, k0);
-                    @Nullable V v = result.value();
-                    Check.checkElement(v != null, k0);
-                    if (!result.needCache()) {
-                        throw new NotCacheException(v);
-                    }
-                    return v;
-                }));
+                return l2.get().computeIfAbsent(key, k ->
+                        l1.computeIfAbsent(k, new NonNullCacheLoaderFunction<>(loader)));
             } catch (NotCacheException e) {
-                assert e.getValue() != null;
-                return Cast.as(e.getValue());
+                return e.getValueNonNull();
             }
         }
 

@@ -3,11 +3,17 @@ package xyz.srclab.common.cache;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.*;
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
+import xyz.srclab.common.collection.MapKit;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 /**
  * @author sunqian
@@ -111,27 +117,65 @@ final class CaffeineCacheSupport {
 
         @Override
         public V get(K key, xyz.srclab.common.cache.CacheLoader<? super K, ? extends V> loader) {
-            return CacheSupport.unmask(get0(key, loader));
-        }
-
-        @Nullable
-        private Object get0(K key, xyz.srclab.common.cache.CacheLoader<? super K, ? extends V> loader) {
             try {
-                return caffeineCache.get(key, k -> {
-                    @Nullable xyz.srclab.common.cache.CacheLoader.Result<? extends V> result = loader.load(k);
-                    if (result == null) {
-                        return null;
-                    }
-                    if (!result.needCache()) {
-                        throw new NotCacheException(result.value());
-                    }
-                    return CacheSupport.mask(result.value());
-                });
+                return CacheSupport.unmask(caffeineCache.get(key, new CacheLoaderFunction<>(loader)));
             } catch (NoResultException e) {
                 return null;
             } catch (NotCacheException e) {
-                return Cast.asNullable(e.getValue());
+                return CacheSupport.unmask(e.getValue());
             }
+        }
+
+        @Override
+        public V getOrDefault(K key, @Nullable V defaultValue) {
+            @Nullable Object result = caffeineCache.getIfPresent(key);
+            return result == null ? defaultValue : CacheSupport.unmask(result);
+        }
+
+        @Override
+        public @Immutable Map<K, V> getPresent(Iterable<? extends K> keys) {
+            Map<K, Object> result = caffeineCache.getAllPresent(keys);
+            return MapKit.map(result, k -> k, CacheSupport::unmask);
+        }
+
+        @Override
+        public @Immutable Map<K, V> getAll(
+                Iterable<? extends K> keys, xyz.srclab.common.cache.CacheLoader<? super K, ? extends V> loader) {
+            Map<K, Object> result = caffeineCache.getAll(keys, new Function<Iterable<? extends K>, Map<K, Object>>() {
+                @Override
+                public Map<K, Object> apply(Iterable<? extends K> ks) {
+                    Map<K, Object> absent = new LinkedHashMap<>();
+                    for (K k : ks) {
+
+                    }
+                    return null;
+                }
+            })
+            return MapKit.map(result, k -> k, CacheSupport::unmask);
+        }
+
+        @Override
+        public V getNonNull(K key) throws NoSuchElementException {
+            return null;
+        }
+
+        @Override
+        public V getNonNull(
+                K key,
+                xyz.srclab.common.cache.CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
+            return null;
+        }
+
+        @Override
+        public @Immutable Map<K, V> getPresentNonNull(Iterable<? extends K> keys) {
+            return null;
+        }
+
+        @Override
+        public @Immutable Map<K, V> getAllNonNull(
+                Iterable<? extends K> keys,
+                xyz.srclab.common.cache.CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
+            return null;
         }
 
         @Override
@@ -163,7 +207,7 @@ final class CaffeineCacheSupport {
             } catch (NoResultException e) {
                 return null;
             } catch (NotCacheException e) {
-                return CacheSupport.unmask(Cast.asNullable(e.getValue()));
+                return CacheSupport.unmask(e.getValue());
             }
         }
     }

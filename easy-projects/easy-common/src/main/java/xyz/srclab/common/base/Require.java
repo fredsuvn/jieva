@@ -38,4 +38,11 @@ public class Require {
         Check.checkElement(nullable != null, messageSupplier);
         return nullable;
     }
+
+    public static <T> T nonNullElement(@Nullable T nullable, @Nullable Object key) throws NoSuchElementException {
+        if (nullable == null) {
+            throw new NoSuchElementException("Key: " + key);
+        }
+        return nullable;
+    }
 }
