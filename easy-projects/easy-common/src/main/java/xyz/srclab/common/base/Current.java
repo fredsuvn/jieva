@@ -35,7 +35,7 @@ public class Current {
 
     @Nullable
     public static <T> T get(Object key) {
-        return Cast.asNullable(ThreadLocalHolder.get(key));
+        return Cast.asNullable(CurrentContextHolder.contextMap().get(key));
     }
 
     public static <T> T getNonNull(Object key) {
@@ -43,27 +43,31 @@ public class Current {
     }
 
     public static void set(Object key, @Nullable Object value) {
-        ThreadLocalHolder.set(key, value);
+        CurrentContextHolder.contextMap().put(key, value);
     }
 
     public static void clear() {
-        ThreadLocalHolder.clear();
+        CurrentContextHolder.contextMap().clear();
     }
 
-    public static Future<?> run(Runnable task) {
-        return ImmediateExecutorServiceHolder.INSTANCE.submit(task);
+    public static Map<Object, Object> contextMap() {
+        return CurrentContextHolder.contextMap();
+    }
+
+    public static void run(Runnable task) {
+        UnlimitedExecutorServiceHolder.INSTANCE.submit(task);
     }
 
     public static <T> Future<T> run(Callable<T> task) {
-        return ImmediateExecutorServiceHolder.INSTANCE.submit(task);
+        return UnlimitedExecutorServiceHolder.INSTANCE.submit(task);
     }
 
-    public static Future<?> submit(Runnable task) {
-        return BackedExecutorServiceHolder.INSTANCE.submit(task);
+    public static void submit(Runnable task) {
+        SingleExecutorServiceHolder.INSTANCE.submit(task);
     }
 
     public static <T> Future<T> submit(Callable<T> task) {
-        return BackedExecutorServiceHolder.INSTANCE.submit(task);
+        return SingleExecutorServiceHolder.INSTANCE.submit(task);
     }
 
     public static Path processPath() {
@@ -78,32 +82,23 @@ public class Current {
         return CurrentHolder.TEMP_DIR;
     }
 
-    private static final class ThreadLocalHolder {
+    private static final class CurrentContextHolder {
 
-        private static final ThreadLocal<Map<Object, Object>> globalThreadLocal =
+        private static final ThreadLocal<Map<Object, Object>> contextMap =
                 ThreadLocal.withInitial(HashMap::new);
 
-        @Nullable
-        public static Object get(Object key) {
-            return globalThreadLocal.get().get(key);
-        }
-
-        public static void set(Object key, @Nullable Object value) {
-            globalThreadLocal.get().put(key, value);
-        }
-
-        public static void clear() {
-            globalThreadLocal.get().clear();
+        public static Map<Object, Object> contextMap() {
+            return contextMap.get();
         }
     }
 
-    private static final class ImmediateExecutorServiceHolder {
+    private static final class UnlimitedExecutorServiceHolder {
 
         public static final ExecutorService INSTANCE =
                 Executors.newCachedThreadPool();
     }
 
-    private static final class BackedExecutorServiceHolder {
+    private static final class SingleExecutorServiceHolder {
 
         public static final ExecutorService INSTANCE =
                 Executors.newSingleThreadExecutor();
