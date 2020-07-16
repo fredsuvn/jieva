@@ -9,11 +9,14 @@ import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.lang.ref.BooleanRef;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public interface Cache<K, V> {
+public interface Cache<K, V> extends SimpleCache<K, V> {
 
     static <K, V> Cache<K, V> commonCache() {
         return commonCache(Defaults.CONCURRENCY_LEVEL);
@@ -78,20 +81,17 @@ public interface Cache<K, V> {
     }
 
     @Nullable
-    V get(K key);
-
-    @Nullable
-    V get(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
+    V load(K key, CacheLoader<? super K, @Nullable ? extends V> loader);
 
     @Immutable
-    default Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
+    default Map<K, @Nullable V> loadPresent(Iterable<? extends K> keys) {
         Map<K, @Nullable V> result = new LinkedHashMap<>();
-        BooleanRef resultFlag = BooleanRef.of(true);
-        CacheLoader<K, @Nullable V> cacheLoader = new NoResultCacheLoader<>(resultFlag);
+        BooleanRef noResultFlag = BooleanRef.of(false);
+        CacheLoader<K, @Nullable V> cacheLoader = new NoResultCacheLoader<>(noResultFlag);
         for (K key : keys) {
-            @Nullable V value = get(key, cacheLoader);
-            if (!resultFlag.get()) {
-                resultFlag.set(true);
+            @Nullable V value = load(key, cacheLoader);
+            if (noResultFlag.get()) {
+                noResultFlag.set(false);
                 continue;
             }
             result.put(key, value);
@@ -100,21 +100,21 @@ public interface Cache<K, V> {
     }
 
     @Immutable
-    default Map<K, @Nullable V> getAll(
+    default Map<K, @Nullable V> loadAll(
             Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
         Map<K, @Nullable V> present = getPresent(keys);
         Map<K, @Nullable V> result = new LinkedHashMap<>(present);
         Set<K> presentKeys = present.keySet();
-        Iterable<K> rest = IterableKit.filter(keys, k-> !presentKeys.contains(k));
-        loader.loadAll(rest);
+        Iterable<K> restKeys = IterableKit.filter(keys, k -> !presentKeys.contains(k));
+        for (K restKey : restKeys) {
+            result.put(restKey, load(restKey, loader));
+        }
         return MapKit.unmodifiable(result);
     }
 
-    default V getNonNull(K key) throws NoSuchElementException {
-        return Require.nonNullElement(get(key));
-    }
+    default V loadNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
 
-    V getNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException;
+    }
 
     @Immutable
     default Map<K, V> getPresentNonNull(Iterable<? extends K> keys) {

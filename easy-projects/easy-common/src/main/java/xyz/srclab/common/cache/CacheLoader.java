@@ -1,5 +1,6 @@
 package xyz.srclab.common.cache;
 
+import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.base.Equal;
@@ -15,10 +16,9 @@ import java.util.Map;
 public interface CacheLoader<K, V> {
 
     @Nullable
-    default Result<V> load(K key) {
-        return Result.of(simplyLoadValue(key));
-    }
+    Result<V> load(K key);
 
+    @Immutable
     default Map<K, Result<V>> loadAll(Iterable<? extends K> keys) {
         Map<K, Result<V>> resultMap = new LinkedHashMap<>();
         for (K key : keys) {
@@ -31,9 +31,6 @@ public interface CacheLoader<K, V> {
         return resultMap;
     }
 
-    @Nullable
-    V simplyLoadValue(K key);
-
     interface Result<V> {
 
         static <V> Builder<V> newBuilder() {
@@ -41,9 +38,7 @@ public interface CacheLoader<K, V> {
         }
 
         static <V> Result<V> of(@Nullable V value) {
-            return newBuilder()
-                    .value(value)
-                    .build();
+            return newBuilder().value(value).build();
         }
 
         boolean needCache();
@@ -126,7 +121,8 @@ public interface CacheLoader<K, V> {
                     @Override
                     public String toString() {
                         return value
-                                + "(needCache: " + needCache
+                                + "(" +
+                                "needCache: " + needCache
                                 + ", expiry: " + expiry
                                 + ")";
                     }

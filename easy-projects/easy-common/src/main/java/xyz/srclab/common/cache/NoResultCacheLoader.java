@@ -1,37 +1,37 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.lang.ref.BooleanRef;
+
+import java.util.Map;
 
 /**
  * @author sunqian
  */
-final class NoResultCacheLoader<K, V> implements CacheLoader<K, V> {
+public class NoResultCacheLoader<K, V> implements CacheLoader<K, V> {
 
-    private final @Nullable BooleanRef flag;
+    private final @Nullable BooleanRef noResultFlag;
 
     NoResultCacheLoader() {
-        this.flag = null;
+        this.noResultFlag = null;
     }
 
-    NoResultCacheLoader(BooleanRef flag) {
-        this.flag = flag;
+    NoResultCacheLoader(BooleanRef noResultFlag) {
+        this.noResultFlag = noResultFlag;
     }
 
     @Nullable
     @Override
     public Result<V> load(K key) {
-        if (flag != null) {
-            flag.set(false);
+        if (noResultFlag != null) {
+            noResultFlag.set(true);
         }
         return null;
     }
 
     @Override
-    public V simplyLoadValue(K key) {
-        if (flag != null) {
-            flag.set(false);
-        }
-        return null;
+    public Map<K, Result<V>> loadAll(Iterable<? extends K> keys) {
+        return MapKit.empty();
     }
 }
