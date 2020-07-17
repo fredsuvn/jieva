@@ -97,7 +97,7 @@ final class CaffeineCacheSupport {
         }
     }
 
-    private static class CaffeineCache<K, V> implements FixedExpiryCache<K, V> {
+    private static class CaffeineCache<K, V> extends AbstractCache<K, V> implements FixedExpiryCache<K, V> {
 
         protected final Cache<K, Object> caffeineCache;
 
@@ -106,75 +106,23 @@ final class CaffeineCacheSupport {
         }
 
         @Override
-        public boolean contains(K key) {
-            return caffeineCache.getIfPresent(key) != null;
-        }
-
-        @Override
         public V get(K key) {
             return CacheSupport.unmask(caffeineCache.getIfPresent(key));
         }
 
         @Override
-        public V get(K key, xyz.srclab.common.cache.CacheLoader<? super K, ? extends V> loader) {
-            try {
-                return CacheSupport.unmask(caffeineCache.get(key, new CacheLoaderFunction<>(loader)));
-            } catch (NoResultException e) {
-                return null;
-            } catch (NotCacheException e) {
-                return CacheSupport.unmask(e.getValue());
-            }
-        }
-
-        @Override
-        public V getOrDefault(K key, @Nullable V defaultValue) {
-            @Nullable Object result = caffeineCache.getIfPresent(key);
-            return result == null ? defaultValue : CacheSupport.unmask(result);
+        public V get(K key, Function<? super K, ? extends V> function) {
+            return CacheSupport.unmask(caffeineCache.get(key, function));
         }
 
         @Override
         public @Immutable Map<K, V> getPresent(Iterable<? extends K> keys) {
-            Map<K, Object> result = caffeineCache.getAllPresent(keys);
+            Map<K,Object> result = caffeineCache.getAllPresent(keys);
             return MapKit.map(result, k -> k, CacheSupport::unmask);
         }
 
         @Override
-        public @Immutable Map<K, V> getAll(
-                Iterable<? extends K> keys, xyz.srclab.common.cache.CacheLoader<? super K, ? extends V> loader) {
-            Map<K, Object> result = caffeineCache.getAll(keys, new Function<Iterable<? extends K>, Map<K, Object>>() {
-                @Override
-                public Map<K, Object> apply(Iterable<? extends K> ks) {
-                    Map<K, Object> absent = new LinkedHashMap<>();
-                    for (K k : ks) {
-
-                    }
-                    return null;
-                }
-            })
-            return MapKit.map(result, k -> k, CacheSupport::unmask);
-        }
-
-        @Override
-        public V getNonNull(K key) throws NoSuchElementException {
-            return null;
-        }
-
-        @Override
-        public V getNonNull(
-                K key,
-                xyz.srclab.common.cache.CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
-            return null;
-        }
-
-        @Override
-        public @Immutable Map<K, V> getPresentNonNull(Iterable<? extends K> keys) {
-            return null;
-        }
-
-        @Override
-        public @Immutable Map<K, V> getAllNonNull(
-                Iterable<? extends K> keys,
-                xyz.srclab.common.cache.CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
+        public @Immutable Map<K, V> getAll(Iterable<? extends K> keys, Function<Iterable<? extends K>, Map<K, @Nullable V>> function) {
             return null;
         }
 
@@ -189,7 +137,12 @@ final class CaffeineCacheSupport {
         }
 
         @Override
-        public void invalidateAll() {
+        public void invalidateAll(Iterable<? extends K> keys) {
+            caffeineCache.invalidate(keys);
+        }
+
+        @Override
+        public void invalidateALL() {
             caffeineCache.invalidateAll();
         }
     }

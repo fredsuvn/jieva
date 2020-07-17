@@ -4,8 +4,8 @@ import com.google.common.collect.MapMaker;
 import xyz.srclab.annotation.Nullable;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.WeakHashMap;
+import java.util.function.Function;
 
 /**
  * @author sunqian
@@ -16,11 +16,15 @@ final class CommonCacheSupport {
         return new CommonCache<>(concurrentLevel);
     }
 
-    static <K, V> Cache<K, V> newLoadingCache(int concurrentLevel, CacheLoader<? super K, ? extends V> cacheLoader) {
-        return new LoadingCache<>(concurrentLevel, cacheLoader);
+    static <K, V> Cache<K, V> newFunctionCache(int concurrentLevel, Function<? super K, ? extends V> function) {
+        return new FunctionCommonCache<>(concurrentLevel, function);
     }
 
-    private static class CommonCache<K, V> implements FixedExpiryCache<K, V> {
+    static <K, V> Cache<K, V> newLoadingCache(int concurrentLevel, CacheLoader<? super K, ? extends V> cacheLoader) {
+        return new LoadingCommonCache<>(concurrentLevel, cacheLoader);
+    }
+
+    private static class CommonCache<K, V> extends AbstractCache<K, V> implements FixedExpiryCache<K, V> {
 
         private final Map<K, V> l1;
         private final ThreadLocal<Map<K, V>> l2;
@@ -31,11 +35,6 @@ final class CommonCacheSupport {
                     .weakKeys()
                     .makeMap();
             l2 = ThreadLocal.withInitial(WeakHashMap::new);
-        }
-
-        @Override
-        public boolean contains(K key) {
-            return l2.get().containsKey(key) || l1.containsKey(key);
         }
 
         @Override
@@ -50,25 +49,8 @@ final class CommonCacheSupport {
         }
 
         @Override
-        public V get(K key, CacheLoader<? super K, ? extends V> loader) {
-            try {
-                return l2.get().computeIfAbsent(key, k ->
-                        l1.computeIfAbsent(k, new CacheLoaderFunction<>(loader)));
-            } catch (NoResultException e) {
-                return null;
-            } catch (NotCacheException e) {
-                return e.getValue();
-            }
-        }
-
-        @Override
-        public V getNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
-            try {
-                return l2.get().computeIfAbsent(key, k ->
-                        l1.computeIfAbsent(k, new NonNullCacheLoaderFunction<>(loader)));
-            } catch (NotCacheException e) {
-                return e.getValueNonNull();
-            }
+        public V get(K key, Function<? super K, ? extends V> function) {
+            return l2.get().computeIfAbsent(key, k -> l1.computeIfAbsent(k, function));
         }
 
         @Override
@@ -84,24 +66,39 @@ final class CommonCacheSupport {
         }
 
         @Override
-        public void invalidateAll() {
+        public void invalidateALL() {
             l1.clear();
             l2.get().clear();
         }
     }
 
-    private static final class LoadingCache<K, V> extends CommonCache<K, V> {
+    private static final class FunctionCommonCache<K, V> extends CommonCache<K, V> {
+
+        private final Function<? super K, ? extends V> function;
+
+        FunctionCommonCache(int concurrentLevel, Function<? super K, ? extends V> function) {
+            super(concurrentLevel);
+            this.function = function;
+        }
+
+        @Override
+        public V get(K key) {
+            return get(key, function);
+        }
+    }
+
+    private static final class LoadingCommonCache<K, V> extends CommonCache<K, V> {
 
         private final CacheLoader<? super K, ? extends V> cacheLoader;
 
-        LoadingCache(int concurrentLevel, CacheLoader<? super K, ? extends V> cacheLoader) {
+        LoadingCommonCache(int concurrentLevel, CacheLoader<? super K, ? extends V> cacheLoader) {
             super(concurrentLevel);
             this.cacheLoader = cacheLoader;
         }
 
         @Override
         public V get(K key) {
-            return super.get(key, cacheLoader);
+            return load(key, cacheLoader);
         }
     }
 }

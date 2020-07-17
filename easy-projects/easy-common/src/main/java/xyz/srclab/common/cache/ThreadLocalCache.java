@@ -19,139 +19,148 @@ final class ThreadLocalCache<K, V> implements Cache<K, V> {
         this.threadLocal = ThreadLocal.withInitial(() -> cache);
     }
 
-    private Cache<K, V> getCache() {
+    private Cache<K, V> getLocalCache() {
         return threadLocal.get();
     }
 
     @Override
-    public boolean contains(K key) {
-        return getCache().contains(key);
+    @Nullable
+    public V load(K key, CacheLoader<? super K, ? extends V> loader) {
+        return getLocalCache().load(key, loader);
     }
 
     @Override
-    public boolean containsAll(Iterable<? extends K> keys) {
-        return getCache().containsAll(keys);
+    @Immutable
+    public Map<K, @Nullable V> loadPresent(Iterable<? extends K> keys) {
+        return getLocalCache().loadPresent(keys);
     }
 
     @Override
-    public boolean containsAny(Iterable<? extends K> keys) {
-        return getCache().containsAny(keys);
+    @Immutable
+    public Map<K, @Nullable V> loadAll(Iterable<? extends K> keys, CacheLoader<K, ? extends V> loader) {
+        return getLocalCache().loadAll(keys, loader);
+    }
+
+    @Override
+    public V loadNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
+        return getLocalCache().loadNonNull(key, loader);
+    }
+
+    @Override
+    @Immutable
+    public Map<K, V> loadPresentNonNull(Iterable<? extends K> keys) {
+        return getLocalCache().loadPresentNonNull(keys);
+    }
+
+    @Override
+    @Immutable
+    public Map<K, V> loadAllNonNull(Iterable<? extends K> keys, CacheLoader<K, ? extends V> loader) throws NoSuchElementException {
+        return getLocalCache().loadAllNonNull(keys, loader);
+    }
+
+    @Override
+    public void putEntry(CacheEntry<? extends K, ? extends V> entry) {
+        getLocalCache().putEntry(entry);
+    }
+
+    @Override
+    public void putEntries(Iterable<? extends CacheEntry<? extends K, ? extends V>> cacheEntries) {
+        getLocalCache().putEntries(cacheEntries);
+    }
+
+    @Override
+    public void expire(K key, long seconds) {
+        getLocalCache().expire(key, seconds);
+    }
+
+    @Override
+    public void expire(K key, Duration duration) {
+        getLocalCache().expire(key, duration);
+    }
+
+    @Override
+    public void expireAll(Iterable<? extends K> keys, long seconds) {
+        getLocalCache().expireAll(keys, seconds);
+    }
+
+    @Override
+    public void expireAll(Iterable<? extends K> keys, Duration duration) {
+        getLocalCache().expireAll(keys, duration);
+    }
+
+    @Override
+    public void expireAll(Map<? extends K, Duration> expiryMap) {
+        getLocalCache().expireAll(expiryMap);
     }
 
     @Override
     @Nullable
     public V get(K key) {
-        return getCache().get(key);
+        return getLocalCache().get(key);
     }
 
     @Override
     @Nullable
-    public V get(K key, CacheLoader<? super K, ? extends V> loader) {
-        return getCache().get(key, loader);
-    }
-
-    @Override
-    @Nullable
-    public V getOrDefault(K key, @Nullable V defaultValue) {
-        return getCache().getOrDefault(key, defaultValue);
+    public V get(K key, Function<? super K, ? extends V> function) {
+        return getLocalCache().get(key, function);
     }
 
     @Override
     @Immutable
     public Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
-        return getCache().getPresent(keys);
+        return getLocalCache().getPresent(keys);
     }
 
     @Override
     @Immutable
-    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) {
-        return getCache().getAll(keys, loader);
+    public Map<K, @Nullable V> getAll(Iterable<? extends K> keys, Function<Iterable<? extends K>, Map<K, @Nullable V>> function) {
+        return getLocalCache().getAll(keys, function);
     }
 
     @Override
     public V getNonNull(K key) throws NoSuchElementException {
-        return getCache().getNonNull(key);
+        return getLocalCache().getNonNull(key);
     }
 
     @Override
-    public V getNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
-        return getCache().getNonNull(key, loader);
+    public V getNonNull(K key, Function<? super K, ? extends V> function) throws NoSuchElementException {
+        return getLocalCache().getNonNull(key, function);
     }
 
     @Override
     @Immutable
     public Map<K, V> getPresentNonNull(Iterable<? extends K> keys) {
-        return getCache().getPresentNonNull(keys);
+        return getLocalCache().getPresentNonNull(keys);
     }
 
     @Override
     @Immutable
-    public Map<K, V> getAllNonNull(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
-        return getCache().getAllNonNull(keys, loader);
+    public Map<K, V> getAllNonNull(Iterable<? extends K> keys, Function<Iterable<? extends K>, Map<K, V>> function) throws NoSuchElementException {
+        return getLocalCache().getAllNonNull(keys, function);
     }
 
     @Override
     public void put(K key, @Nullable V value) {
-        getCache().put(key, value);
+        getLocalCache().put(key, value);
     }
 
     @Override
-    public void put(K key, @Nullable V value, @Nullable CacheExpiry expiry) {
-        getCache().put(key, value, expiry);
-    }
-
-    @Override
-    public void putAll(Map<? extends K, ? extends V> entries) {
-        getCache().putAll(entries);
-    }
-
-    @Override
-    public void putAll(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader) {
-        getCache().putAll(keys, loader);
-    }
-
-    @Override
-    public void expire(K key, long seconds) {
-        getCache().expire(key, seconds);
-    }
-
-    @Override
-    public void expire(K key, Duration duration) {
-        getCache().expire(key, duration);
-    }
-
-    @Override
-    public void expire(K key, Function<? super K, Duration> durationFunction) {
-        getCache().expire(key, durationFunction);
-    }
-
-    @Override
-    public void expireAll(Iterable<? extends K> keys, long seconds) {
-        getCache().expireAll(keys, seconds);
-    }
-
-    @Override
-    public void expireAll(Iterable<? extends K> keys, Duration duration) {
-        getCache().expireAll(keys, duration);
-    }
-
-    @Override
-    public void expireAll(Iterable<? extends K> keys, Function<? super K, Duration> durationFunction) {
-        getCache().expireAll(keys, durationFunction);
+    public void putAll(Map<K, @Nullable V> entries) {
+        getLocalCache().putAll(entries);
     }
 
     @Override
     public void invalidate(K key) {
-        getCache().invalidate(key);
+        getLocalCache().invalidate(key);
     }
 
     @Override
     public void invalidateAll(Iterable<? extends K> keys) {
-        getCache().invalidateAll(keys);
+        getLocalCache().invalidateAll(keys);
     }
 
     @Override
-    public void invalidateAll() {
-        getCache().invalidateAll();
+    public void invalidateALL() {
+        getLocalCache().invalidateALL();
     }
 }

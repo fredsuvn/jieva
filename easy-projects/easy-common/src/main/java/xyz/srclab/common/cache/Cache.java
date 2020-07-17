@@ -3,9 +3,8 @@ package xyz.srclab.common.cache;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Defaults;
-import xyz.srclab.common.base.Require;
-import xyz.srclab.common.collection.IterableKit;
 import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.SetKit;
 import xyz.srclab.common.lang.ref.BooleanRef;
 
 import java.time.Duration;
@@ -13,9 +12,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
+/**
+ * @param <K>
+ * @param <V>
+ * @see SimpleCache
+ */
 public interface Cache<K, V> extends SimpleCache<K, V> {
 
     static <K, V> Cache<K, V> commonCache() {
@@ -87,9 +91,9 @@ public interface Cache<K, V> extends SimpleCache<K, V> {
     default Map<K, @Nullable V> loadPresent(Iterable<? extends K> keys) {
         Map<K, @Nullable V> result = new LinkedHashMap<>();
         BooleanRef noResultFlag = BooleanRef.of(false);
-        CacheLoader<K, @Nullable V> cacheLoader = new NoResultCacheLoader<>(noResultFlag);
+        CacheLoader<K, @Nullable V> noResultCacheLoader = new NoResultCacheLoader<>(noResultFlag);
         for (K key : keys) {
-            @Nullable V value = load(key, cacheLoader);
+            @Nullable V value = load(key, noResultCacheLoader);
             if (noResultFlag.get()) {
                 noResultFlag.set(false);
                 continue;
@@ -100,69 +104,82 @@ public interface Cache<K, V> extends SimpleCache<K, V> {
     }
 
     @Immutable
-    default Map<K, @Nullable V> loadAll(
-            Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
-        Map<K, @Nullable V> present = getPresent(keys);
-        Map<K, @Nullable V> result = new LinkedHashMap<>(present);
-        Set<K> presentKeys = present.keySet();
-        Iterable<K> restKeys = IterableKit.filter(keys, k -> !presentKeys.contains(k));
-        for (K restKey : restKeys) {
-            result.put(restKey, load(restKey, loader));
+    default Map<K, @Nullable V> loadAll(Iterable<? extends K> keys, CacheLoader<K, @Nullable ? extends V> loader) {
+        Map<K, @Nullable V> present = loadPresent(keys);
+        Set<K> presentsKeys = present.keySet();
+        Set<K> restKeys = SetKit.filter(keys, k -> !presentsKeys.contains(k));
+        if (restKeys.isEmpty()) {
+            return present;
         }
-        return MapKit.unmodifiable(result);
+        Map<K, ? extends CacheLoader.Result<@Nullable ? extends V>> restResultMap = loader.loadAll(restKeys);
+        Iterable<CacheEntry<K, ? extends V>> restEntries = restResultMap.entrySet().stream()
+                .filter(e -> e.getValue().needCache())
+                .map(e -> e.getValue().toEntry(e.getKey()))
+                .collect(Collectors.toList());
+        putEntries(restEntries);
+        Map<K, @Nullable V> restMap = MapKit.map(
+                restResultMap,
+                k -> k,
+                CacheLoader.Result::value
+        );
+        return MapKit.merge(present, restMap);
     }
 
-    default V loadNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException {
-
-    }
+    V loadNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException;
 
     @Immutable
-    default Map<K, V> getPresentNonNull(Iterable<? extends K> keys) {
+    default Map<K, V> loadPresentNonNull(Iterable<? extends K> keys) {
         Map<K, V> result = new LinkedHashMap<>();
+        BooleanRef noResultFlag = BooleanRef.of(false);
+        CacheLoader<K, V> noResultCacheLoader = new NoResultCacheLoader<>(noResultFlag);
         for (K key : keys) {
-            @Nullable V value = get(key);
-            if (value != null) {
-                result.put(key, value);
-            }
-        }
-        return MapKit.unmodifiable(result);
-    }
-
-    @Immutable
-    default Map<K, V> getAllNonNull(Iterable<? extends K> keys, CacheLoader<? super K, ? extends V> loader)
-            throws NoSuchElementException {
-        Map<K, V> result = new LinkedHashMap<>();
-        for (K key : keys) {
-            result.put(key, getNonNull(key, loader));
-        }
-        return MapKit.unmodifiable(result);
-    }
-
-    void put(K key, @Nullable V value);
-
-    void put(K key, @Nullable V value, @Nullable CacheExpiry expiry);
-
-    default void putAll(Map<? extends K, @Nullable ? extends V> entries) {
-        entries.forEach(this::put);
-    }
-
-    default void putAll(Iterable<? extends K> keys, CacheLoader<? super K, @Nullable ? extends V> loader) {
-        for (K key : keys) {
-            @Nullable CacheLoader.Result<? extends V> result = loader.load(key);
-            if (result == null) {
+            @Nullable V value = load(key, noResultCacheLoader);
+            if (noResultFlag.get()) {
+                noResultFlag.set(false);
                 continue;
             }
-            put(key, result.value(), result.expiry());
+            if (value == null) {
+                continue;
+            }
+            result.put(key, value);
+        }
+        return MapKit.unmodifiable(result);
+    }
+
+    @Immutable
+    default Map<K, V> loadAllNonNull(Iterable<? extends K> keys, CacheLoader<K, ? extends V> loader)
+            throws NoSuchElementException {
+        Map<K, V> present = loadPresentNonNull(keys);
+        Set<K> presentsKeys = present.keySet();
+        Set<K> restKeys = SetKit.filter(keys, k -> !presentsKeys.contains(k));
+        if (restKeys.isEmpty()) {
+            return present;
+        }
+        Map<K, ? extends CacheLoader.Result<? extends V>> restResultMap = loader.loadAllNonNull(restKeys);
+        Iterable<CacheEntry<K, ? extends V>> restEntries = restResultMap.entrySet().stream()
+                .filter(e -> e.getValue().needCache())
+                .map(e -> e.getValue().toEntry(e.getKey()))
+                .collect(Collectors.toList());
+        putEntries(restEntries);
+        Map<K, V> restMap = MapKit.map(
+                restResultMap,
+                k -> k,
+                CacheLoader.Result::value
+        );
+        return MapKit.merge(present, restMap);
+    }
+
+    void putEntry(CacheEntry<? extends K, ? extends V> entry);
+
+    default void putEntries(Iterable<? extends CacheEntry<? extends K, ? extends V>> entries) {
+        for (CacheEntry<? extends K, ? extends V> entry : entries) {
+            putEntry(entry);
         }
     }
 
     void expire(K key, long seconds);
 
     void expire(K key, Duration duration);
-
-    default void expire(K key, Function<? super K, Duration> durationFunction) {
-        expire(key, durationFunction.apply(key));
-    }
 
     default void expireAll(Iterable<? extends K> keys, long seconds) {
         for (K key : keys) {
@@ -176,19 +193,7 @@ public interface Cache<K, V> extends SimpleCache<K, V> {
         }
     }
 
-    default void expireAll(Iterable<? extends K> keys, Function<? super K, Duration> durationFunction) {
-        for (K key : keys) {
-            expire(key, durationFunction);
-        }
+    default void expireAll(Map<? extends K, Duration> expiryMap) {
+        expiryMap.forEach(this::expire);
     }
-
-    void invalidate(K key);
-
-    default void invalidateAll(Iterable<? extends K> keys) {
-        for (K key : keys) {
-            invalidate(key);
-        }
-    }
-
-    void invalidateAll();
 }

@@ -3,12 +3,14 @@ package xyz.srclab.common.cache;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Equal;
 import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * @author sunqian
@@ -26,6 +28,30 @@ public interface CacheLoader<K, V> {
             if (result == null) {
                 continue;
             }
+            resultMap.put(key, result);
+        }
+        return resultMap;
+    }
+
+    @Nullable
+    default Result<V> loadNonNull(K key) throws NoSuchElementException {
+        @Nullable Result<V> result = load(key);
+        if (result == null) {
+            return null;
+        }
+        Check.checkElement(result.value() != null, key);
+        return result;
+    }
+
+    @Immutable
+    default Map<K, Result<V>> loadAllNonNull(Iterable<? extends K> keys) throws NoSuchElementException {
+        Map<K, Result<V>> resultMap = new LinkedHashMap<>();
+        for (K key : keys) {
+            @Nullable Result<V> result = load(key);
+            if (result == null) {
+                continue;
+            }
+            Check.checkElement(result.value() != null, key);
             resultMap.put(key, result);
         }
         return resultMap;
@@ -49,6 +75,13 @@ public interface CacheLoader<K, V> {
         @Nullable
         CacheExpiry expiry();
 
+        default <K> CacheEntry<K, V> toEntry(K key) {
+            return CacheEntry.newBuilder(key)
+                    .value(value())
+                    .expiry(expiry())
+                    .build();
+        }
+
         class Builder<V> extends BaseProductCachingBuilder<Result<V>> {
 
             private boolean needCache = true;
@@ -67,7 +100,7 @@ public interface CacheLoader<K, V> {
                 return Cast.as(this);
             }
 
-            public <V1 extends V> Builder<V1> expiry(CacheExpiry expiry) {
+            public <V1 extends V> Builder<V1> expiry(@Nullable CacheExpiry expiry) {
                 this.expiry = expiry;
                 this.updateState();
                 return Cast.as(this);

@@ -97,6 +97,15 @@ public interface CacheExpiry {
             public int hashCode() {
                 return Objects.hash(expiryAfterCreate, expiryAfterRead, expiryAfterUpdate);
             }
+
+            @Override
+            public String toString() {
+                return "(" +
+                        "expiryAfterCreate=" + expiryAfterCreate +
+                        ", expiryAfterRead=" + expiryAfterRead +
+                        ", expiryAfterUpdate=" + expiryAfterUpdate +
+                        ')';
+            }
         }
     }
 }
