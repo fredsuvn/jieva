@@ -2,7 +2,9 @@ package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Defaults;
+import xyz.srclab.common.base.Require;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
 import xyz.srclab.common.lang.ref.BooleanRef;
@@ -12,15 +14,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
  * @param <K>
  * @param <V>
- * @see SimpleCache
  */
-public interface Cache<K, V> extends SimpleCache<K, V> {
+public interface Cache<K, V> {
 
     static <K, V> Cache<K, V> commonCache() {
         return commonCache(Defaults.CONCURRENCY_LEVEL);
@@ -82,6 +84,77 @@ public interface Cache<K, V> extends SimpleCache<K, V> {
 
     static <K, V> CacheBuilder<K, V> newBuilder() {
         return new CacheBuilder<>();
+    }
+
+    @Nullable
+    V get(K key);
+
+    @Nullable
+    V get(K key, Function<? super K, @Nullable ? extends V> function);
+
+    @Immutable
+    default Map<K, @Nullable V> getPresent(Iterable<? extends K> keys) {
+        Map<K, @Nullable V> result = new LinkedHashMap<>();
+        for (K key : keys) {
+            @Nullable V value = get(key, k->{
+                throw new NoResultException();
+            });
+            result.put(key, get(key));
+        }
+        return MapKit.unmodifiable(result);
+    }
+
+    @Immutable
+    default Map<K, @Nullable V> getAll(
+            Iterable<? extends K> keys, Function<Iterable<? extends K>, Map<K, @Nullable V>> function) {
+        Map<K, @Nullable V> present = getPresent(keys);
+        Set<K> presentsKeys = present.keySet();
+        Set<K> restKeys = SetKit.filter(keys, k -> !presentsKeys.contains(k));
+        if (restKeys.isEmpty()) {
+            return present;
+        }
+        Map<K, @Nullable V> restMap = function.apply(restKeys);
+        putAll(restMap);
+        return MapKit.merge(present, restMap);
+    }
+
+    default V getNonNull(K key) throws NoSuchElementException {
+        return Require.nonNullElement(get(key), key);
+    }
+
+    default V getNonNull(K key, Function<? super K, ? extends V> function) throws NoSuchElementException {
+        return Require.nonNullElement(
+                get(key, k -> Require.nonNullElement(function.apply(k), k)),
+                key
+        );
+    }
+
+    @Immutable
+    default Map<K, V> getPresentNonNull(Iterable<? extends K> keys) {
+        Map<K, V> result = new LinkedHashMap<>();
+        for (K key : keys) {
+            @Nullable V value = get(key);
+            if (value == null) {
+                continue;
+            }
+            result.put(key, value);
+        }
+        return MapKit.unmodifiable(result);
+    }
+
+    @Immutable
+    default Map<K, V> getAllNonNull(Iterable<? extends K> keys, Function<Iterable<? extends K>, Map<K, V>> function)
+            throws NoSuchElementException {
+        Map<K, V> present = getPresentNonNull(keys);
+        Set<K> presentsKeys = present.keySet();
+        Set<K> restKeys = SetKit.filter(keys, k -> !presentsKeys.contains(k));
+        if (restKeys.isEmpty()) {
+            return present;
+        }
+        Map<K, V> restMap = function.apply(restKeys);
+        restMap.forEach((k, v) -> Check.checkElement(v != null, k));
+        putAll(restMap);
+        return MapKit.merge(present, restMap);
     }
 
     @Nullable
@@ -169,6 +242,12 @@ public interface Cache<K, V> extends SimpleCache<K, V> {
         return MapKit.merge(present, restMap);
     }
 
+    void put(K key, @Nullable V value);
+
+    default void putAll(Map<K, @Nullable V> entries) {
+        entries.forEach(this::put);
+    }
+
     void putEntry(CacheEntry<? extends K, ? extends V> entry);
 
     default void putEntries(Iterable<? extends CacheEntry<? extends K, ? extends V>> entries) {
@@ -196,4 +275,14 @@ public interface Cache<K, V> extends SimpleCache<K, V> {
     default void expireAll(Map<? extends K, Duration> expiryMap) {
         expiryMap.forEach(this::expire);
     }
+
+    void invalidate(K key);
+
+    default void invalidateAll(Iterable<? extends K> keys) {
+        for (K key : keys) {
+            invalidate(key);
+        }
+    }
+
+    void invalidateALL();
 }
