@@ -13,6 +13,35 @@ import java.util.Properties;
  */
 public class Environment {
 
+    public static String JAVA_VERSION = "java.version";
+    public static String JAVA_VENDOR = "java.vendor";
+    public static String JAVA_VENDOR_URL = "java.vendor.url";
+    public static String JAVA_HOME = "java.home";
+    public static String JAVA_VM_SPECIFICATION_VERSION = "java.vm.specification.version";
+    public static String JAVA_VM_SPECIFICATION_VENDOR = "java.vm.specification.vendor";
+    public static String JAVA_VM_SPECIFICATION_NAME = "java.vm.specification.name";
+    public static String JAVA_VM_VERSION = "java.vm.version";
+    public static String JAVA_VM_VENDOR = "java.vm.vendor";
+    public static String JAVA_VM_NAME = "java.vm.name";
+    public static String JAVA_SPECIFICATION_VERSION = "java.specification.version";
+    public static String JAVA_SPECIFICATION_VENDOR = "java.specification.vendor";
+    public static String JAVA_SPECIFICATION_NAME = "java.specification.name";
+    public static String JAVA_CLASS_VERSION = "java.class.version";
+    public static String JAVA_CLASS_PATH = "java.class.path";
+    public static String JAVA_LIBRARY_PATH = "java.library.path";
+    public static String JAVA_IO_TMPDIR = "java.io.tmpdir";
+    public static String JAVA_COMPILER = "java.compiler";
+    public static String JAVA_EXT_DIRS = "java.ext.dirs";
+    public static String OS_NAME = "os.name";
+    public static String OS_ARCH = "os.arch";
+    public static String OS_VERSION = "os.version";
+    public static String FILE_SEPARATOR = "file.separator";
+    public static String PATH_SEPARATOR = "path.separator";
+    public static String LINE_SEPARATOR = "line.separator";
+    public static String USER_NAME = "user.name";
+    public static String USER_HOME = "user.home";
+    public static String USER_DIR = "user.dir";
+
     public static Environment currentEnvironment() {
         return EnvironmentHolder.INSTANCE;
     }
@@ -406,11 +435,30 @@ public class Environment {
 
     public static final class App extends Env {
 
+        private final String name;
+        private final String version;
+        private final String description;
+
         private final @Immutable Map<String, String> properties;
 
         private App(Properties properties) {
             Map<String, String> appProperties = new HashMap<>();
+            this.name = getProperty("app.name", properties, appProperties);
+            this.version = getProperty("app.version", properties, appProperties);
+            this.description = getProperty("app.description", properties, appProperties);
             this.properties = MapKit.unmodifiable(appProperties);
+        }
+
+        public String name() {
+            return name;
+        }
+
+        public String version() {
+            return version;
+        }
+
+        public String description() {
+            return description;
         }
 
         @Override
