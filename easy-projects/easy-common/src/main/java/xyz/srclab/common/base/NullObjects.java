@@ -1,5 +1,7 @@
 package xyz.srclab.common.base;
 
+import xyz.srclab.annotation.Nullable;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -22,7 +24,7 @@ public class NullObjects {
 
     public static final Class<?> CLASS = NullClass.class;
 
-    public static final Type TYPE = new NullType();
+    public static final Type TYPE = CLASS;
 
     public static final Constructor<?> CONSTRUCTOR;
 
@@ -33,10 +35,19 @@ public class NullObjects {
     static {
         try {
             CONSTRUCTOR = NullClass.class.getDeclaredConstructor();
-            METHOD = NullClass.class.getDeclaredMethod("nullMethod");
             FIELD = NullClass.class.getDeclaredField("nullField");
+            METHOD = NullClass.class.getDeclaredMethod("nullMethod");
         } catch (Exception e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    private static final class NullClass {
+
+        private final @Nullable NullClass nullField = null;
+
+        public void nullMethod() {
+            throw new NullPointerException();
         }
     }
 }
