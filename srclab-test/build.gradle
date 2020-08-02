@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Easy for Test"
+description = "Test of SrcLab Common"
 
 apply from: gradles.compile
 
@@ -15,9 +15,9 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":easy-starters:easy-starter-parent")))
+    implementation(platform(project(":srclab-common-parent")))
 
-    implementation(project(":easy-projects:easy-annotations"))
+    implementation(project(":srclab-annotations"))
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.apache.commons:commons-lang3")

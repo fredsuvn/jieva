@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Easy for Common"
+description = "SrcLab Common"
 
 apply from: gradles.compile
 
@@ -15,9 +15,9 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":easy-starters:easy-starter-parent")))
+    implementation(platform(project(":srclab-common-parent")))
 
-    api(project(":easy-projects:easy-annotations"))
+    api(project(":srclab-annotations"))
 
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("org.slf4j:slf4j-api")
@@ -34,13 +34,11 @@ dependencies {
     compileOnly("cglib:cglib")
     api("com.squareup.okhttp3:okhttp")
 
-    testCompile(project(":easy-projects:easy-test"))
+    testCompile(project(":srclab-test"))
 
     testCompile("org.testng:testng")
     testCompile("org.springframework:spring-core")
     testCompile("cglib:cglib")
-    testCompile("com.squareup.okhttp3:okhttp")
-    testCompile("com.squareup.okhttp3:mockwebserver")
 }
 
 test {

@@ -1,0 +1,31 @@
+plugins {
+    id 'java-platform'
+}
+
+description = "Parent of SraLab Common"
+
+ext {
+    libVersions = [
+            bomVersion: "1.0.2",
+    ]
+}
+
+apply from: gradles.repositories
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+    api platform("xyz.srclab.bom:srclab-bom:${libVersions.bomVersion}")
+
+    constraints {
+        api(project(":srclab-annotations"))
+        api(project(":srclab-test"))
+        file("${rootDir}").eachDirMatch(~/srclab-common.*/) { file ->
+            api(project(":${file.name}"))
+        }
+    }
+}
+
+apply from: gradles.deployPlatform

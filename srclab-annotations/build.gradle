@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Easy Starter"
+description = "Annotations of SrcLab Projects"
 
 apply from: gradles.compile
 
@@ -15,9 +15,9 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":easy-starters:easy-starter-parent")))
+    implementation(platform(project(":srclab-common-parent")))
 
-    api(project(":easy-projects:easy-common"))
+    api("com.google.code.findbugs:jsr305:")
 }
 
 apply from: gradles.deployJar

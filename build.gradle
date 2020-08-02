@@ -39,10 +39,10 @@ tasks.withType(JavaCompile) {
 def processProjectInfo(Project project) {
     if (project == rootProject) {
         // NOP
-    } else if (project.group.toString().startsWith("easy-starter-build.easy-starters")) {
+    } else if (project.group.toString().startsWith("srclab-")) {
         project.group = config.starterGroup
         project.version = config.version
-    } else if (project.group.toString().startsWith("easy-starter-build.easy-samples")) {
+    } else if (project.group.toString().startsWith("srclab-samples")) {
         project.group = config.sampleGroup
         project.version = config.sampleVersion
     } else {

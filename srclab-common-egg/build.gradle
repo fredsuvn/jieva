@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Easy for JNI"
+description = "Happy Easy Egg!"
 
 apply from: gradles.compile
 
@@ -15,11 +15,11 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":easy-starters:easy-starter-parent")))
+    implementation(platform(project(":srclab-common-parent")))
 
-    implementation(project(":easy-projects:easy-common"))
+    implementation(project(":srclab-common"))
 
-    testCompile(project(":easy-projects:easy-test"))
+    testCompile(project(":srclab-test"))
     testCompile("org.testng:testng")
 }
 
@@ -28,4 +28,4 @@ test {
     include("**/*Test.class")
 }
 
-//apply from: gradles.deployJar
+apply from: gradles.deployJar
