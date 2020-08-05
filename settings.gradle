@@ -12,8 +12,6 @@ pluginManagement {
 rootProject.name = 'srclab-common-build'
 
 // SrcLab Common projects
-include ":srclab-annotations"
-include ":srclab-test"
-file("${rootDir}/").eachDirMatch(~/srclab-common.*/) { file ->
+file("${rootDir}/").eachDirMatch(~/srclab-.*/) { file ->
     include ":${file.name}"
 }

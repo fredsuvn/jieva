@@ -6,7 +6,7 @@ description = "Parent of SraLab Common"
 
 ext {
     libVersions = [
-            bomVersion: "1.0.2",
+            dependenciesVersion: "1.0.0",
     ]
 }
 
@@ -17,12 +17,10 @@ javaPlatform {
 }
 
 dependencies {
-    api platform("xyz.srclab.bom:srclab-bom:${libVersions.bomVersion}")
+    api platform("xyz.srclab.bom:srclab-dependencies:${libVersions.dependenciesVersion}")
 
     constraints {
-        api(project(":srclab-annotations"))
-        api(project(":srclab-test"))
-        file("${rootDir}").eachDirMatch(~/srclab-common.*/) { file ->
+        file("${rootDir}").eachDirMatch(~/srclab-.*/) { file ->
             api(project(":${file.name}"))
         }
     }
