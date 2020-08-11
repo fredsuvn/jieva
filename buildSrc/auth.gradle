@@ -19,7 +19,7 @@ ext."signing.secretKeyRingFile" = tokens.signingSecretKeyRingFile
 private def overwriteTokens() {
     // Followed is my owned implementation, as an example:
     def userHome = System.getProperty("user.home")
-    def userAuth = "${userHome}/Home/Auth"
+    def userAuth = "${userHome}/OneDrive/home/srclab/auth"
     apply from: "${userAuth}/private.gradle"
     tokens.signingSecretKeyRingFile = "${userAuth}/${tokens.signingSecretKeyRingFile}"
 }
