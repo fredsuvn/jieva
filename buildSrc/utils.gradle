@@ -13,6 +13,13 @@ def isEnable(String string) {
     )
 }
 
+def currentGradleDirectoryPath(buildscript) {
+    java.nio.file.Path sourcePath = buildscript.sourceFile.toPath()
+    def parent = sourcePath.getParent()
+    return parent.toString() + File.separator
+}
+
 ext {
     isEnable = this.&isEnable
+    currentGradleDirectoryPath = this.&currentGradleDirectoryPath
 }
