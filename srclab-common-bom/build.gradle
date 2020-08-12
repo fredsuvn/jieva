@@ -2,7 +2,7 @@ plugins {
     id 'java-platform'
 }
 
-description = "Parent of SraLab Common"
+description = "SraLab Common BOM"
 
 ext {
     libVersions = [

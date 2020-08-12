@@ -15,12 +15,11 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":srclab-common-parent")))
+    implementation(platform(project(":srclab-common-bom")))
 
     implementation(project(":srclab-common"))
 
     testCompile(project(":srclab-test"))
-    testCompile("org.testng:testng")
 }
 
 test {

@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Test of SrcLab Common"
+description = "SrcLab Common Data"
 
 apply from: gradles.compile
 
@@ -17,14 +17,9 @@ java {
 dependencies {
     implementation(platform(project(":srclab-common-bom")))
 
-    implementation(project(":srclab-annotations"))
+    implementation(project(":srclab-common"))
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.apache.commons:commons-lang3")
-    implementation("com.google.guava:guava")
-    api("org.testng:testng")
-
-    testCompile("org.testng:testng")
+    testCompile(project(":srclab-test"))
 }
 
 test {

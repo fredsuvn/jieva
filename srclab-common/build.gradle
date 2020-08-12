@@ -15,7 +15,7 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":srclab-common-parent")))
+    implementation(platform(project(":srclab-common-bom")))
 
     api(project(":srclab-annotations"))
 
@@ -35,8 +35,6 @@ dependencies {
     api("com.squareup.okhttp3:okhttp")
 
     testCompile(project(":srclab-test"))
-
-    testCompile("org.testng:testng")
     testCompile("org.springframework:spring-core")
     testCompile("cglib:cglib")
 }
