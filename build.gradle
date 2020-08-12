@@ -3,59 +3,41 @@ description = "Easy for Common: Build"
 // Gradle files to be applied:
 ext {
     gradles = [
+            utils         : "${rootProject.rootDir}/buildSrc/utils.gradle",
             repositories  : "${rootProject.rootDir}/buildSrc/repositories.gradle",
             deployJar     : "${rootProject.rootDir}/buildSrc/deploy-jar.gradle",
             deployPlatform: "${rootProject.rootDir}/buildSrc/deploy-platform.gradle",
             compile       : "${rootProject.rootDir}/buildSrc/compile.gradle",
-            auth          : "${rootProject.rootDir}/buildSrc/auth.gradle",
-            config        : "${rootProject.rootDir}/buildSrc/config.gradle",
+            passwords     : "${rootProject.rootDir}/buildSrc/passwords.gradle",
+            versions      : "${rootProject.rootDir}/buildSrc/versions.gradle",
     ]
 }
 
-apply from: gradles.config
+apply from: gradles.utils
+apply from: gradles.versions
 
 ext {
-    isSnapshot = isTrue(config.snapshot)
+    isSnapshot = isEnable(version)
 }
 
-config.version = (isSnapshot ? "${version}-SNAPSHOT" : version)
-config.sampleVersion = (isSnapshot ? "${version}-SNAPSHOT" : version)
-version = config.version
+apply from: gradles.passwords
 
-// Note in gradles.auth some personal setting should be implemented.
-apply from: gradles.auth
-
-allprojects { project ->
-    processProjectInfo(project)
+allprojects { p ->
+    processProject(p)
 }
 
-subprojects { project ->
+subprojects { p ->
 }
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
-def processProjectInfo(Project project) {
+def processProject(Project project) {
+    project.group = versions.group
     if (project == rootProject) {
-        // NOP
-    } else if (project.group.toString().startsWith("srclab-")) {
-        project.group = config.starterGroup
-        project.version = config.version
-    } else if (project.group.toString().startsWith("srclab-samples")) {
-        project.group = config.sampleGroup
-        project.version = config.sampleVersion
+        println("Configure root ${project.group}:${project.name}:${project.version}")
     } else {
-        project.group = config.group
-        project.version = config.version
+        println("Configure ${project.group}:${project.name}:${project.version}")
     }
-    println("Configure ${project.group}:${project.name}:${project.version}")
-}
-
-static def isTrue(String string) {
-    return string != null && (
-            Boolean.parseBoolean(string)
-                    || string.equalsIgnoreCase("yes")
-                    || string.equalsIgnoreCase("1")
-    )
 }

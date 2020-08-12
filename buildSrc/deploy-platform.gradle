@@ -9,26 +9,27 @@ publishing {
             pom {
                 name = project.name
                 description = project.description
-                url = config.url
+                url = versions.url
+                inceptionYear = versions.inceptionYear
                 licenses {
-                    config.licenses.forEach { each ->
+                    versions.licenses.forEach { each ->
                         license {
                             name = each.name
                             url = each.url
                         }
                     }
                 }
+                scm {
+                    connection = "scm:git:${versions.url}.git"
+                    developerConnection = "scm:git:${versions.url}.git"
+                    url = versions.url
+                }
                 developers {
-                    config.developers.forEach { each ->
+                    versions.developers.forEach { each ->
                         developer {
                             email = each.email
                         }
                     }
-                }
-                scm {
-                    connection = "scm:git:${config.url}.git"
-                    developerConnection = "scm:git:${config.url}.git"
-                    url = config.url
                 }
             }
         }
@@ -39,18 +40,18 @@ publishing {
 
         maven {
             name = "sonatype"
-            url = config.oss.staging
+            url = versions.oss.staging
             credentials {
-                username = "${tokens.sonatypeUserName}"
-                password = "${tokens.sonatypePassword}"
+                username = "${passwords.sonatype.username}"
+                password = "${passwords.sonatype.password}"
             }
         }
         maven {
             name = "sonatypeSnapshot"
-            url = config.oss.snapshot
+            url = versions.oss.snapshot
             credentials {
-                username = "${tokens.sonatypeUserName}"
-                password = "${tokens.sonatypePassword}"
+                username = "${passwords.sonatype.username}"
+                password = "${passwords.sonatype.password}"
             }
         }
     }

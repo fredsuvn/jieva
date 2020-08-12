@@ -1,0 +1,18 @@
+/*
+ * Utilities for build.
+ */
+
+def isEnable(String string) {
+    return string != null && (
+            string.equalsIgnoreCase("true")
+                    || string.equalsIgnoreCase("yes")
+                    || string.equalsIgnoreCase("1")
+                    || string.equalsIgnoreCase("t")
+                    || string.equalsIgnoreCase("open")
+                    || string.equalsIgnoreCase("enbale")
+    )
+}
+
+ext {
+    isEnable = this.&isEnable
+}
