@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 /**
  * @author sunqian
  */
-public interface IntChain extends IntStream {
+public interface IntChain extends IntStream, Iterable<Integer> {
 
     static IntChain from(int[] array) {
         return from(array, 0, array.length);

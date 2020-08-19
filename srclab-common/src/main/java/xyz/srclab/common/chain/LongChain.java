@@ -9,7 +9,7 @@ import java.util.stream.LongStream;
 /**
  * @author sunqian
  */
-public interface LongChain extends LongStream {
+public interface LongChain extends LongStream, Iterable<Long> {
 
     static LongChain from(long[] array) {
         return from(array, 0, array.length);

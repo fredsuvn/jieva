@@ -9,7 +9,7 @@ import java.util.stream.DoubleStream;
 /**
  * @author sunqian
  */
-public interface DoubleChain extends DoubleStream {
+public interface DoubleChain extends DoubleStream, Iterable<Double> {
 
     static DoubleChain from(double[] array) {
         return from(array, 0, array.length);
