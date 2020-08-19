@@ -1,8 +1,8 @@
 package xyz.srclab.common.chain;
 
-import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
@@ -16,7 +16,32 @@ import java.util.stream.*;
  *
  * @author sunqian
  */
-public interface Chain<T> extends Stream<T> {
+public interface Chain<T> extends Stream<T>, Iterable<T> {
+
+    @SafeVarargs
+    static <T> Chain<T> of(T... elements) {
+        return from(elements, 0, elements.length);
+    }
+
+    static <T> Chain<T> from(T[] array, int startInclusive, int endExclusive) {
+        return new StreamChain<>(Arrays.stream(array, startInclusive, endExclusive));
+    }
+
+    static <T> Chain<T> from(Collection<? extends T> collection) {
+        return new StreamChain<>(Cast.as(collection.stream()));
+    }
+
+    static <T> Chain<T> from(Iterable<? extends T> iterable) {
+        return new StreamChain<>(Cast.as(StreamSupport.stream(iterable.spliterator(), false)));
+    }
+
+    static <T> Chain<T> from(Iterator<? extends T> iterator) {
+        return from(Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED));
+    }
+
+    static <T> Chain<T> from(Spliterator<? extends T> spliterator) {
+        return new StreamChain<>(Cast.as(StreamSupport.stream(spliterator, false)));
+    }
 
     @Override
     Chain<T> filter(Predicate<@Nullable ? super T> predicate);
@@ -84,7 +109,7 @@ public interface Chain<T> extends Stream<T> {
     T reduce(@Nullable T identity, BinaryOperator<@Nullable T> accumulator);
 
     @Override
-    Optional<T> reduce(BinaryOperator<@Nullable T> accumulator);
+    Optional<T> reduce(BinaryOperator<@Nullable T> accumulator) throws NullPointerException;
 
     @Nullable
     @Override
@@ -99,7 +124,7 @@ public interface Chain<T> extends Stream<T> {
         return reduce(null, accumulator);
     }
 
-    default T reduceNonNull(BinaryOperator<@Nullable T> accumulator) {
+    default T reduceNonNull(BinaryOperator<@Nullable T> accumulator) throws NullPointerException {
         return reduce(accumulator).orElseThrow(NullPointerException::new);
     }
 
@@ -117,16 +142,8 @@ public interface Chain<T> extends Stream<T> {
         return collect(Collectors.toList());
     }
 
-    default List<T> toList(Supplier<List<T>> supplier) {
-        return collect(new ChainCollector<>(
-                supplier,
-                List::add,
-                (left, right) -> {
-                    left.addAll(right);
-                    return left;
-                },
-                ChainCollector.CH_ID)
-        );
+    default List<T> toList(Supplier<List<T>> listSupplier) {
+        return collect(ChainCollector.toList(listSupplier));
     }
 
     @Immutable
@@ -138,16 +155,8 @@ public interface Chain<T> extends Stream<T> {
         return collect(Collectors.toSet());
     }
 
-    default Set<T> toSet(Supplier<Set<T>> supplier) {
-        return collect(new ChainCollector<>(
-                supplier,
-                Set::add,
-                (left, right) -> {
-                    left.addAll(right);
-                    return left;
-                },
-                ChainCollector.CH_UNORDERED_ID)
-        );
+    default Set<T> toSet(Supplier<Set<T>> setSupplier) {
+        return collect(ChainCollector.toSet(setSupplier));
     }
 
     @Immutable
@@ -190,23 +199,52 @@ public interface Chain<T> extends Stream<T> {
     default <K, V> Map<K, V> toMap(
             Function<@Nullable ? super T, @Nullable ? extends K> keyMapper,
             Function<@Nullable ? super T, @Nullable ? extends V> valueMapper,
-            BinaryOperator<@Nullable V> mergeFunction,
-            Supplier<Map<K,V>> supplier
+            Supplier<Map<K, V>> mapSupplier
     ) {
-        BiConsumer<Map<K,V>, T> accumulator
-                = (map, element) -> map.merge(keyMapper.apply(element),
-                valueMapper.apply(element), mergeFunction);
-        return new Collectors.CollectorImpl<>(mapSupplier, accumulator, mapMerger(mergeFunction), CH_ID);
-        return collect(Collectors.toMap(keyMapper, valueMapper, mergeFunction, supplier));
+        return collect(Collectors.toMap(keyMapper, valueMapper, (v1, v2) -> v2, mapSupplier));
     }
 
-    @NotNull
-    @Override
-    Optional<T> min(Comparator<? super T> comparator);
+    @Immutable
+    default <K, V> Map<K, V> toImmutableMap(
+            Function<@Nullable ? super T, @Nullable ? extends K> keyMapper,
+            Function<@Nullable ? super T, @Nullable ? extends V> valueMapper,
+            Supplier<Map<K, V>> mapSupplier
+    ) {
+        return MapKit.immutable(toMap(keyMapper, valueMapper, mapSupplier));
+    }
 
-    @NotNull
+    default <K, V> Map<K, V> toMap(
+            Function<@Nullable ? super T, @Nullable ? extends K> keyMapper,
+            Function<@Nullable ? super T, @Nullable ? extends V> valueMapper,
+            BinaryOperator<@Nullable V> mergeFunction,
+            Supplier<Map<K, V>> mapSupplier
+    ) {
+        return collect(ChainCollector.toMap(keyMapper, valueMapper, mergeFunction, mapSupplier));
+    }
+
+    @Immutable
+    default <K, V> Map<K, V> toImmutableMap(
+            Function<@Nullable ? super T, @Nullable ? extends K> keyMapper,
+            Function<@Nullable ? super T, @Nullable ? extends V> valueMapper,
+            BinaryOperator<@Nullable V> mergeFunction,
+            Supplier<Map<K, V>> mapSupplier
+    ) {
+        return MapKit.immutable(toMap(keyMapper, valueMapper, mergeFunction, mapSupplier));
+    }
+
     @Override
-    Optional<T> max(Comparator<? super T> comparator);
+    Optional<T> min(Comparator<? super T> comparator) throws NullPointerException;
+
+    default T minNonNull(Comparator<? super T> comparator) throws NullPointerException {
+        return min(comparator).orElseThrow(NullPointerException::new);
+    }
+
+    @Override
+    Optional<T> max(Comparator<? super T> comparator) throws NullPointerException;
+
+    default T maxNonNull(Comparator<? super T> comparator) throws NullPointerException {
+        return max(comparator).orElseThrow(NullPointerException::new);
+    }
 
     @Override
     long count();
@@ -220,38 +258,56 @@ public interface Chain<T> extends Stream<T> {
     @Override
     boolean noneMatch(Predicate<? super T> predicate);
 
-    @NotNull
     @Override
-    Optional<T> findFirst();
+    Optional<T> findFirst() throws NullPointerException;
 
-    @NotNull
+    @Nullable
+    default T findFirstNullable() {
+        Iterator<T> iterator = iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }
+        return null;
+    }
+
+    default T findFirstNonNull() throws NullPointerException {
+        Iterator<T> iterator = elementNonNull().iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }
+        throw new NullPointerException();
+    }
+
     @Override
-    Optional<T> findAny();
+    Optional<T> findAny() throws NullPointerException;
 
-    @NotNull
+    @Nullable
+    default T findAnyNullable() {
+        return findFirstNullable();
+    }
+
+    default T findAnyNonNull() throws NullPointerException {
+        return findFirstNonNull();
+    }
+
     @Override
     Iterator<T> iterator();
 
-    @NotNull
     @Override
     Spliterator<T> spliterator();
 
     @Override
     boolean isParallel();
 
-    @NotNull
     @Override
     Chain<T> sequential();
 
-    @NotNull
     @Override
     Chain<T> parallel();
 
-    @NotNull
     @Override
     Chain<T> unordered();
 
-    @NotNull
     @Override
     Chain<T> onClose(Runnable closeHandler);
 

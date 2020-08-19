@@ -6,6 +6,7 @@ import xyz.srclab.annotation.Out;
 import xyz.srclab.common.base.Cast;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -152,5 +153,14 @@ public class MapKit {
             }
         }
         return unmodifiable(result);
+    }
+
+    public static <K, V> void mergeNullable(
+            Map<K, V> map, K key, @Nullable V value,
+            BiFunction<@Nullable ? super V, @Nullable ? super V, @Nullable ? extends V> remappingFunction
+    ) {
+        @Nullable V oldValue = map.get(key);
+        @Nullable V newValue = remappingFunction.apply(oldValue, value);
+        map.put(key, newValue);
     }
 }
