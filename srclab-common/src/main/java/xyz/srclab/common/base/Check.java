@@ -123,4 +123,26 @@ public class Check {
                     "Index range error: end > length [end: " + end + ", length: " + length + "]");
         }
     }
+
+    public static void checkIndexRange(int start, int end, int originStart, int originEnd) {
+        if (originStart > originEnd) {
+            throw new IllegalArgumentException(
+                    "Index range error: originStart > originEnd " +
+                            "[originStart : " + originStart + ", originEnd: " + originEnd + "]");
+        }
+        if (start > end) {
+            throw new IllegalArgumentException(
+                    "Index range error: start > end [start : " + start + ", end: " + end + "]");
+        }
+        if (start < originStart) {
+            throw new IndexOutOfBoundsException(
+                    "Index range error: start < originStart " +
+                            "[start: " + start + ", originStart: " + originStart + "]");
+        }
+        if (end > originEnd) {
+            throw new IndexOutOfBoundsException(
+                    "Index range error: end > originEnd " +
+                            "[end: " + end + ", originEnd: " + originEnd + "]");
+        }
+    }
 }
