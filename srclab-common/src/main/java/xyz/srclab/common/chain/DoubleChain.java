@@ -1,6 +1,7 @@
 package xyz.srclab.common.chain;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.lang.count.IntCounter;
 
 import java.util.*;
 import java.util.function.*;
@@ -13,6 +14,66 @@ public interface DoubleChain extends DoubleStream, Iterable<Double> {
 
     static DoubleChain from(DoubleStream doubleStream) {
         return new DoubleStreamChain(doubleStream);
+    }
+
+    static DoubleChain from(boolean[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static DoubleChain from(boolean[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asDoubleChain();
+    }
+
+    static DoubleChain from(byte[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static DoubleChain from(byte[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asDoubleChain();
+    }
+
+    static DoubleChain from(short[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static DoubleChain from(short[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asDoubleChain();
+    }
+
+    static DoubleChain from(char[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static DoubleChain from(char[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asDoubleChain();
+    }
+
+    static DoubleChain from(int[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static DoubleChain from(int[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asDoubleChain();
+    }
+
+    static DoubleChain from(long[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static DoubleChain from(long[] array, int startInclusive, int endExclusive) {
+        return LongChain.from(array, startInclusive, endExclusive).asDoubleStream();
+    }
+
+    static DoubleChain from(float[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static DoubleChain from(float[] array, int startInclusive, int endExclusive) {
+        IntCounter intCounter = IntCounter.fromZero();
+        return from(DoubleStream
+                .generate(() -> array[startInclusive + intCounter.getAndIncrement()])
+                .limit(endExclusive - startInclusive)
+        );
     }
 
     static DoubleChain from(double[] array) {

@@ -15,12 +15,68 @@ public interface IntChain extends IntStream, Iterable<Integer> {
         return new IntStreamChain(intStream);
     }
 
+    static IntChain from(boolean[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static IntChain from(boolean[] array, int startInclusive, int endExclusive) {
+        return from(IntStream.range(startInclusive, endExclusive).map(i -> array[i] ? 1 : 0));
+    }
+
+    static IntChain from(byte[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static IntChain from(byte[] array, int startInclusive, int endExclusive) {
+        return from(IntStream.range(startInclusive, endExclusive).map(i -> array[i]));
+    }
+
+    static IntChain from(short[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static IntChain from(short[] array, int startInclusive, int endExclusive) {
+        return from(IntStream.range(startInclusive, endExclusive).map(i -> array[i]));
+    }
+
+    static IntChain from(char[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static IntChain from(char[] array, int startInclusive, int endExclusive) {
+        return from(IntStream.range(startInclusive, endExclusive).map(i -> array[i]));
+    }
+
     static IntChain from(int[] array) {
         return from(array, 0, array.length);
     }
 
     static IntChain from(int[] array, int startInclusive, int endExclusive) {
         return from(Arrays.stream(array, startInclusive, endExclusive));
+    }
+
+    static IntChain from(long[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static IntChain from(long[] array, int startInclusive, int endExclusive) {
+        return from(IntStream.range(startInclusive, endExclusive).map(i -> (int) array[i]));
+    }
+
+    static IntChain from(float[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static IntChain from(float[] array, int startInclusive, int endExclusive) {
+        return from(IntStream.range(startInclusive, endExclusive).map(i -> (int) array[i]));
+    }
+
+    static IntChain from(double[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static IntChain from(double[] array, int startInclusive, int endExclusive) {
+        return from(IntStream.range(startInclusive, endExclusive).map(i -> (int) array[i]));
     }
 
     @Override
@@ -134,8 +190,16 @@ public interface IntChain extends IntStream, Iterable<Integer> {
     @Override
     LongChain asLongStream();
 
+    default LongChain asLongChain() {
+        return asLongStream();
+    }
+
     @Override
     DoubleChain asDoubleStream();
+
+    default DoubleChain asDoubleChain() {
+        return asDoubleStream();
+    }
 
     @Override
     Chain<Integer> boxed();

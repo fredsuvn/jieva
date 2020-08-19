@@ -1,6 +1,7 @@
 package xyz.srclab.common.chain;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.lang.count.IntCounter;
 
 import java.util.*;
 import java.util.function.*;
@@ -15,12 +16,72 @@ public interface LongChain extends LongStream, Iterable<Long> {
         return new LongStreamChain(longStream);
     }
 
+    static LongChain from(boolean[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static LongChain from(boolean[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asLongChain();
+    }
+
+    static LongChain from(byte[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static LongChain from(byte[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asLongChain();
+    }
+
+    static LongChain from(short[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static LongChain from(short[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asLongChain();
+    }
+
+    static LongChain from(char[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static LongChain from(char[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asLongChain();
+    }
+
+    static LongChain from(int[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static LongChain from(int[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive).asLongChain();
+    }
+
     static LongChain from(long[] array) {
         return from(array, 0, array.length);
     }
 
     static LongChain from(long[] array, int startInclusive, int endExclusive) {
         return from(Arrays.stream(array, startInclusive, endExclusive));
+    }
+
+    static LongChain from(float[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static LongChain from(float[] array, int startInclusive, int endExclusive) {
+        IntCounter intCounter = IntCounter.fromZero();
+        return from(LongStream
+                .generate(() -> (long) array[startInclusive + intCounter.getAndIncrement()])
+                .limit(endExclusive - startInclusive)
+        );
+    }
+
+    static LongChain from(double[] array) {
+        return from(array, 0, array.length);
+    }
+
+    static LongChain from(double[] array, int startInclusive, int endExclusive) {
+        return DoubleChain.from(array, startInclusive, endExclusive).mapToLong(d -> (long) d);
     }
 
     @Override
@@ -133,6 +194,10 @@ public interface LongChain extends LongStream, Iterable<Long> {
 
     @Override
     DoubleChain asDoubleStream();
+
+    default DoubleChain asDoubleChain() {
+        return asDoubleStream();
+    }
 
     @Override
     Chain<Long> boxed();
