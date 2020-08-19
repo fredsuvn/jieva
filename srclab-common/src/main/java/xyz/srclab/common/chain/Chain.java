@@ -48,6 +48,48 @@ public interface Chain<T> extends Stream<T>, Iterable<T> {
         return from(StreamSupport.stream(spliterator, false));
     }
 
+    //IntChain:
+
+    static IntChain from(IntStream intStream) {
+        return IntChain.from(intStream);
+    }
+
+    static IntChain from(int[] array) {
+        return IntChain.from(array);
+    }
+
+    static IntChain from(int[] array, int startInclusive, int endExclusive) {
+        return IntChain.from(array, startInclusive, endExclusive);
+    }
+
+    //LongChain:
+
+    static LongChain from(LongStream longStream) {
+        return LongChain.from(longStream);
+    }
+
+    static LongChain from(long[] array) {
+        return LongChain.from(array);
+    }
+
+    static LongChain from(long[] array, int startInclusive, int endExclusive) {
+        return LongChain.from(array, startInclusive, endExclusive);
+    }
+
+    //DoubleChain:
+
+    static DoubleChain from(DoubleStream doubleStream) {
+        return DoubleChain.from(doubleStream);
+    }
+
+    static DoubleChain from(double[] array) {
+        return DoubleChain.from(array);
+    }
+
+    static DoubleChain from(double[] array, int startInclusive, int endExclusive) {
+        return DoubleChain.from(array, startInclusive, endExclusive);
+    }
+
     @Override
     Chain<T> filter(Predicate<@Nullable ? super T> predicate);
 
