@@ -11,12 +11,16 @@ import java.util.stream.LongStream;
  */
 public interface LongChain extends LongStream, Iterable<Long> {
 
+    static LongChain from(LongStream longStream) {
+        return new LongStreamChain(longStream);
+    }
+
     static LongChain from(long[] array) {
         return from(array, 0, array.length);
     }
 
     static LongChain from(long[] array, int startInclusive, int endExclusive) {
-        return new LongStreamChain(Arrays.stream(array, startInclusive, endExclusive));
+        return from(Arrays.stream(array, startInclusive, endExclusive));
     }
 
     @Override

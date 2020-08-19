@@ -6,6 +6,7 @@ import xyz.srclab.common.base.Cast;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
+import xyz.srclab.common.lang.count.Counter;
 
 import java.util.*;
 import java.util.function.*;
@@ -23,16 +24,20 @@ public interface Chain<T> extends Stream<T>, Iterable<T> {
         return from(elements, 0, elements.length);
     }
 
+    static <T> Chain<T> from(Stream<? extends T> stream) {
+        return new StreamChain<>(Cast.as(stream));
+    }
+
     static <T> Chain<T> from(T[] array, int startInclusive, int endExclusive) {
-        return new StreamChain<>(Arrays.stream(array, startInclusive, endExclusive));
+        return from(Arrays.stream(array, startInclusive, endExclusive));
     }
 
     static <T> Chain<T> from(Collection<? extends T> collection) {
-        return new StreamChain<>(Cast.as(collection.stream()));
+        return from(collection.stream());
     }
 
     static <T> Chain<T> from(Iterable<? extends T> iterable) {
-        return new StreamChain<>(Cast.as(StreamSupport.stream(iterable.spliterator(), false)));
+        return from(StreamSupport.stream(iterable.spliterator(), false));
     }
 
     static <T> Chain<T> from(Iterator<? extends T> iterator) {
@@ -40,7 +45,7 @@ public interface Chain<T> extends Stream<T>, Iterable<T> {
     }
 
     static <T> Chain<T> from(Spliterator<? extends T> spliterator) {
-        return new StreamChain<>(Cast.as(StreamSupport.stream(spliterator, false)));
+        return from(StreamSupport.stream(spliterator, false));
     }
 
     @Override
@@ -97,6 +102,11 @@ public interface Chain<T> extends Stream<T>, Iterable<T> {
 
     @Override
     void forEachOrdered(Consumer<@Nullable ? super T> action);
+
+    default void forEachOrdered(ObjLongConsumer<@Nullable ? super T> action) {
+        Counter counter = Counter.fromZero();
+        forEachOrdered(t -> action.accept(t, counter.getLongAndIncrement()));
+    }
 
     @Override
     Object[] toArray();

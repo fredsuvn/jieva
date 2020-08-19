@@ -11,12 +11,16 @@ import java.util.stream.IntStream;
  */
 public interface IntChain extends IntStream, Iterable<Integer> {
 
+    static IntChain from(IntStream intStream) {
+        return new IntStreamChain(intStream);
+    }
+
     static IntChain from(int[] array) {
         return from(array, 0, array.length);
     }
 
     static IntChain from(int[] array, int startInclusive, int endExclusive) {
-        return new IntStreamChain(Arrays.stream(array, startInclusive, endExclusive));
+        return from(Arrays.stream(array, startInclusive, endExclusive));
     }
 
     @Override

@@ -11,6 +11,10 @@ import java.util.stream.DoubleStream;
  */
 public interface DoubleChain extends DoubleStream, Iterable<Double> {
 
+    static DoubleChain from(DoubleStream doubleStream) {
+        return new DoubleStreamChain(doubleStream);
+    }
+
     static DoubleChain from(double[] array) {
         return from(array, 0, array.length);
     }
