@@ -1,8 +1,10 @@
 package xyz.srclab.common.chain;
 
+import com.google.common.collect.Maps;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.Require;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.SetKit;
@@ -10,14 +12,17 @@ import xyz.srclab.common.lang.count.Counter;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Provides chaining operation like {@link java.util.stream.Stream} and type conversion for iterable type.
  *
  * @author sunqian
  */
-public interface Chain<T> extends Stream<T>, Iterable<T> {
+public interface Chain<T> extends BaseChain<T, Chain<T>> {
 
     @SafeVarargs
     static <T> Chain<T> of(T... elements) {
@@ -48,105 +53,81 @@ public interface Chain<T> extends Stream<T>, Iterable<T> {
         return from(StreamSupport.stream(spliterator, false));
     }
 
-    @Override
     Chain<T> filter(Predicate<@Nullable ? super T> predicate);
 
     default Chain<T> elementNonNull() {
         return filter(e -> e != null);
     }
 
-    @Override
     <R> Chain<R> map(Function<@Nullable ? super T, @Nullable ? extends R> mapper);
 
-    @Override
     IntChain mapToInt(ToIntFunction<@Nullable ? super T> mapper);
 
-    @Override
     LongChain mapToLong(ToLongFunction<@Nullable ? super T> mapper);
 
-    @Override
     DoubleChain mapToDouble(ToDoubleFunction<@Nullable ? super T> mapper);
 
-    @Override
-    <R> Chain<R> flatMap(Function<@Nullable ? super T, ? extends Stream<? extends R>> mapper);
+    <R> Chain<R> flat(Function<@Nullable ? super T, ? extends Chain<? extends R>> mapper);
 
-    @Override
-    IntChain flatMapToInt(Function<@Nullable ? super T, ? extends IntStream> mapper);
+    IntChain flatToInt(Function<@Nullable ? super T, ? extends IntChain> mapper);
 
-    @Override
-    LongChain flatMapToLong(Function<@Nullable ? super T, ? extends LongStream> mapper);
+    LongChain flatToLong(Function<@Nullable ? super T, ? extends LongChain> mapper);
 
-    @Override
-    DoubleChain flatMapToDouble(Function<@Nullable ? super T, ? extends DoubleStream> mapper);
-
-    @Override
-    Chain<T> distinct();
-
-    @Override
-    Chain<T> sorted();
-
-    @Override
-    Chain<T> sorted(Comparator<@Nullable ? super T> comparator);
-
-    @Override
-    Chain<T> peek(Consumer<@Nullable ? super T> action);
-
-    @Override
-    Chain<T> limit(long maxSize);
-
-    @Override
-    Chain<T> skip(long n);
-
-    @Override
-    void forEach(Consumer<@Nullable ? super T> action);
-
-    @Override
-    void forEachOrdered(Consumer<@Nullable ? super T> action);
-
-    default void forEachOrdered(ObjLongConsumer<@Nullable ? super T> action) {
-        Counter counter = Counter.fromZero();
-        forEachOrdered(t -> action.accept(t, counter.getLongAndIncrement()));
-    }
-
-    @Override
-    Object[] toArray();
-
-    @Override
-    <A> A[] toArray(IntFunction<A[]> generator);
+    DoubleChain flatToDouble(Function<@Nullable ? super T, ? extends DoubleChain> mapper);
 
     @Nullable
-    @Override
     T reduce(@Nullable T identity, BinaryOperator<@Nullable T> accumulator);
 
-    @Override
-    Optional<T> reduce(BinaryOperator<@Nullable T> accumulator) throws NullPointerException;
+    @Nullable
+    T reduce(BinaryOperator<@Nullable T> accumulator);
 
     @Nullable
-    @Override
-    <U> U reduce(
+    public <U> U reduce(
             @Nullable U identity,
             BiFunction<@Nullable U, @Nullable ? super T, U> accumulator,
             BinaryOperator<@Nullable U> combiner
     );
 
     @Nullable
-    default T reduceNullable(BinaryOperator<@Nullable T> accumulator) {
-        return reduce(null, accumulator);
+    default T reduceNonNull(@Nullable T identity, BinaryOperator<@Nullable T> accumulator) {
+        return Require.nonNull(reduce(identity, accumulator));
     }
 
-    default T reduceNonNull(BinaryOperator<@Nullable T> accumulator) throws NullPointerException {
-        return reduce(accumulator).orElseThrow(NullPointerException::new);
+    @Nullable
+    default T reduceNonNull(BinaryOperator<@Nullable T> accumulator) {
+        return Require.nonNull(reduce(accumulator));
     }
 
-    @Override
+    @Nullable
+    default <U> U reduceNonNull(
+            @Nullable U identity,
+            BiFunction<@Nullable U, @Nullable ? super T, U> accumulator,
+            BinaryOperator<@Nullable U> combiner
+    ) {
+        return Require.nonNull(reduce(identity, accumulator, combiner));
+    }
+
+    @Nullable
+    T min(Comparator<? super T> comparator);
+
+    default T minNonNull(Comparator<? super T> comparator) {
+        return Require.nonNull(min(comparator));
+    }
+
+    @Nullable
+    T max(Comparator<? super T> comparator);
+
+    default T maxNonNull(Comparator<? super T> comparator) {
+        return Require.nonNull(max(comparator));
+    }
+
     <R> R collect(
             Supplier<R> supplier,
             BiConsumer<R, @Nullable ? super T> accumulator,
             BiConsumer<R, R> combiner
     );
 
-    @Override
-    <R, A> R collect(Collector<@Nullable ? super T, @Nullable A, R> collector);
+    <R, A> R collect(Collector<@Nullable ? super T, A, R> collector);
 
     default List<T> toList() {
         return collect(Collectors.toList());
@@ -242,19 +223,69 @@ public interface Chain<T> extends Stream<T>, Iterable<T> {
         return MapKit.immutable(toMap(keyMapper, valueMapper, mergeFunction, mapSupplier));
     }
 
-    @Override
-    Optional<T> min(Comparator<? super T> comparator) throws NullPointerException;
+    default Map<T, T> pairToMap(
+            Supplier<Map<T, T>> mapSupplier,
+            BinaryOperator<@Nullable T> mergeFunction,
 
-    default T minNonNull(Comparator<? super T> comparator) throws NullPointerException {
-        return min(comparator).orElseThrow(NullPointerException::new);
+    ) {
+        return collect(ChainCollector.toMap(keyMapper, valueMapper, mergeFunction, mapSupplier));
+    }
+
+    <R> Chain<R> merge(
+            Supplier<R> supplier,
+            BiFunction<R, @Nullable ? super T, R> accumulator
+    );
+
+    <R> Chain<R> merge(Function<@Nullable ? super T, R> accumulator);
+
+    <R> Chain<R> merge(Consumer<T[]> mergeSizer, Function<T[], R> accumulator);
+
+    <R> Chain<R> mergePair(BiFunction<@Nullable ? super T, @Nullable ? super T, R> accumulator);
+
+    <R> R mergeCollect(
+            Supplier<R> supplier,
+            BiConsumer<R, @Nullable ? super T> accumulator,
+            BiConsumer<R, R> combiner
+    );
+
+    <R, A> R mergeCollect(Collector<@Nullable ? super T, A, R> collector);
+
+    <K, V> Map<K, V> mergeToMap();
+
+    @Override
+    Chain<T> distinct();
+
+    @Override
+    Chain<T> sorted();
+
+    @Override
+    Chain<T> sorted(Comparator<@Nullable ? super T> comparator);
+
+    @Override
+    Chain<T> peek(Consumer<@Nullable ? super T> action);
+
+    @Override
+    Chain<T> limit(long maxSize);
+
+    @Override
+    Chain<T> skip(long n);
+
+    @Override
+    void forEach(Consumer<@Nullable ? super T> action);
+
+    @Override
+    void forEachOrdered(Consumer<@Nullable ? super T> action);
+
+    default void forEachOrdered(ObjLongConsumer<@Nullable ? super T> action) {
+        Counter counter = Counter.fromZero();
+        forEachOrdered(t -> action.accept(t, counter.getLongAndIncrement()));
     }
 
     @Override
-    Optional<T> max(Comparator<? super T> comparator) throws NullPointerException;
+    Object[] toArray();
 
-    default T maxNonNull(Comparator<? super T> comparator) throws NullPointerException {
-        return max(comparator).orElseThrow(NullPointerException::new);
-    }
+    @Override
+    <A> A[] toArray(IntFunction<A[]> generator);
 
     @Override
     long count();
