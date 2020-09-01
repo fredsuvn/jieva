@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public class NullObjects {
+public class Null {
 
     public static final Object OBJECT = new Object();
 
