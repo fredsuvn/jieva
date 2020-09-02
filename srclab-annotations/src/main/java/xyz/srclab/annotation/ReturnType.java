@@ -3,6 +3,8 @@ package xyz.srclab.annotation;
 import java.lang.annotation.*;
 
 /**
+ * To specify limited type of return value.
+ *
  * @author sunqian
  */
 @Documented
