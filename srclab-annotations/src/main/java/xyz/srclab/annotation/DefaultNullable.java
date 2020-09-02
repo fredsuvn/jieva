@@ -24,15 +24,15 @@ import java.lang.annotation.*;
 @TypeQualifierNickname
 @Target({
         ElementType.TYPE,
-        ElementType.FIELD,
+        //ElementType.FIELD,
         ElementType.METHOD,
-        ElementType.PARAMETER,
+        //ElementType.PARAMETER,
         ElementType.CONSTRUCTOR,
-        ElementType.LOCAL_VARIABLE,
-        ElementType.ANNOTATION_TYPE,
+        //ElementType.LOCAL_VARIABLE,
+        //ElementType.ANNOTATION_TYPE,
         ElementType.PACKAGE,
-        ElementType.TYPE_PARAMETER,
-        ElementType.TYPE_USE,
+        //ElementType.TYPE_PARAMETER,
+        //ElementType.TYPE_USE,
 })
 public @interface DefaultNullable {
 }

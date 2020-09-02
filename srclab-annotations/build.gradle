@@ -17,7 +17,8 @@ java {
 dependencies {
     implementation(platform(project(":srclab-common-bom")))
 
-    api("com.google.code.findbugs:jsr305:")
+    api("com.google.code.findbugs:jsr305")
+    //api("org.jetbrains:annotations")
 }
 
 apply from: gradles.deployJar

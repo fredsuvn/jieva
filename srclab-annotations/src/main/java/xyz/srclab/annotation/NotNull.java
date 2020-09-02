@@ -10,16 +10,16 @@ import java.lang.annotation.*;
 @Nonnull(when = When.ALWAYS)
 @TypeQualifierNickname
 @Target({
-        ElementType.TYPE,
+        //ElementType.TYPE,
         ElementType.FIELD,
         ElementType.METHOD,
         ElementType.PARAMETER,
-        ElementType.CONSTRUCTOR,
+        //ElementType.CONSTRUCTOR,
         ElementType.LOCAL_VARIABLE,
-        ElementType.ANNOTATION_TYPE,
-        ElementType.PACKAGE,
+        //ElementType.ANNOTATION_TYPE,
+        //ElementType.PACKAGE,
         ElementType.TYPE_PARAMETER,
-        ElementType.TYPE_USE,
+        //ElementType.TYPE_USE,
 })
 public @interface NotNull {
 }
