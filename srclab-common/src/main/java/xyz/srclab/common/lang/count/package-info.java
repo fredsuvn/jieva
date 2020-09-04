@@ -1,4 +1,4 @@
-@DefaultNonNull
+@DefaultNotNull
 package xyz.srclab.common.lang.count;
 
-import xyz.srclab.annotation.DefaultNonNull;
+import xyz.srclab.annotation.DefaultNotNull;

@@ -1,4 +1,4 @@
-@DefaultNonNull
+@DefaultNotNull
 package xyz.srclab.common.util.proxy;
 
-import xyz.srclab.annotation.DefaultNonNull;
+import xyz.srclab.annotation.DefaultNotNull;

@@ -1,10 +1,13 @@
 package xyz.srclab.common;
 
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.functions.Function2;
 import org.yaml.snakeyaml.Yaml;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Loader;
+import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.design.provider.ProviderLoader;
 
@@ -106,6 +109,9 @@ public class KitvaBoot {
     }
 
     public static <T> Map<String, T> getProviders(String interfaceName) {
+        ListOps<String> listOps = null;
+
+        //listOps.
         Map<String, ?> result = providerMap.computeIfAbsent(interfaceName, iName -> {
             @Nullable String providerDescriptor = getProviderProperties().get(iName);
             Check.checkArguments(

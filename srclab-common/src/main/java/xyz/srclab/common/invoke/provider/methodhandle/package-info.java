@@ -1,4 +1,4 @@
-@DefaultNonNull
+@DefaultNotNull
 package xyz.srclab.common.invoke.provider.methodhandle;
 
-import xyz.srclab.annotation.DefaultNonNull;
+import xyz.srclab.annotation.DefaultNotNull;

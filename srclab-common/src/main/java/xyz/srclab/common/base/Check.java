@@ -1,7 +1,6 @@
 package xyz.srclab.common.base;
 
 import java.util.NoSuchElementException;
-import java.util.function.Supplier;
 
 /**
  * @author sunqian
@@ -14,15 +13,15 @@ public class Check {
         }
     }
 
-    public static void checkArguments(boolean expression, String message) {
+    public static void checkArguments(boolean expression, Object message) {
         if (!expression) {
             throw new IllegalArgumentException(message);
         }
     }
 
-    public static void checkArguments(boolean expression, Supplier<String> messageSupplier) {
+    public static void checkArguments(boolean expression, String messagePattern, Object... messageArgs) {
         if (!expression) {
-            throw new IllegalArgumentException(messageSupplier.get());
+            throw new IllegalArgumentException(Format.fastFormat(messagePattern, messageArgs));
         }
     }
 
@@ -32,15 +31,15 @@ public class Check {
         }
     }
 
-    public static void checkState(boolean expression, String message) {
+    public static void checkState(boolean expression, Object message) {
         if (!expression) {
             throw new IllegalStateException(message);
         }
     }
 
-    public static void checkState(boolean expression, Supplier<String> messageSupplier) {
+    public static void checkState(boolean expression, String messagePattern, Object... messageArgs) {
         if (!expression) {
-            throw new IllegalStateException(messageSupplier.get());
+            throw new IllegalStateException(Format.fastFormat(messagePattern, messageArgs));
         }
     }
 
@@ -50,15 +49,15 @@ public class Check {
         }
     }
 
-    public static void checkNull(boolean expression, String message) {
+    public static void checkNull(boolean expression, Object message) {
         if (!expression) {
             throw new NullPointerException(message);
         }
     }
 
-    public static void checkNull(boolean expression, Supplier<String> messageSupplier) {
+    public static void checkNull(boolean expression, String messagePattern, Object... messageArgs) {
         if (!expression) {
-            throw new NullPointerException(messageSupplier.get());
+            throw new NullPointerException(Format.fastFormat(messagePattern, messageArgs));
         }
     }
 
@@ -68,15 +67,15 @@ public class Check {
         }
     }
 
-    public static void checkSupported(boolean expression, String message) {
+    public static void checkSupported(boolean expression, Object message) {
         if (!expression) {
             throw new UnsupportedOperationException(message);
         }
     }
 
-    public static void checkSupported(boolean expression, Supplier<String> messageSupplier) {
+    public static void checkSupported(boolean expression, String messagePattern, Object... messageArgs) {
         if (!expression) {
-            throw new UnsupportedOperationException(messageSupplier.get());
+            throw new UnsupportedOperationException(Format.fastFormat(messagePattern, messageArgs));
         }
     }
 
@@ -92,21 +91,27 @@ public class Check {
         }
     }
 
+    public static void checkElement(boolean expression, String messagePattern, Object... messageArgs) {
+        if (!expression) {
+            throw new NoSuchElementException(Format.fastFormat(messagePattern, messageArgs));
+        }
+    }
+
     public static void checkIndex(boolean expression) {
         if (!expression) {
             throw new IndexOutOfBoundsException();
         }
     }
 
-    public static void checkIndex(boolean expression, int index) {
+    public static void checkIndex(boolean expression, Object index) {
         if (!expression) {
-            throw new IndexOutOfBoundsException("index: " + index);
+            throw new IndexOutOfBoundsException(ToString.toString(index));
         }
     }
 
-    public static void checkIndex(boolean expression, Supplier<String> messageSupplier) {
+    public static void checkIndex(boolean expression, String messagePattern, Object... messageArgs) {
         if (!expression) {
-            throw new IndexOutOfBoundsException(messageSupplier.get());
+            throw new IndexOutOfBoundsException(Format.fastFormat(messagePattern, messageArgs));
         }
     }
 
@@ -124,25 +129,37 @@ public class Check {
         }
     }
 
-    public static void checkIndexRange(int start, int end, int originStart, int originEnd) {
-        if (originStart > originEnd) {
+    public static void checkIndexRange(int start, int end, int startBound, int endBound) {
+        if (startBound > endBound) {
             throw new IllegalArgumentException(
-                    "Index range error: originStart > originEnd " +
-                            "[originStart : " + originStart + ", originEnd: " + originEnd + "]");
+                    "Range error: startBound > endBound " +
+                            "[startBound : " + startBound + ", endBound: " + endBound + "]");
         }
         if (start > end) {
-            throw new IllegalArgumentException(
+            throw new IndexOutOfBoundsException(
                     "Index range error: start > end [start : " + start + ", end: " + end + "]");
         }
-        if (start < originStart) {
+        if (start < startBound) {
             throw new IndexOutOfBoundsException(
-                    "Index range error: start < originStart " +
-                            "[start: " + start + ", originStart: " + originStart + "]");
+                    "Index range error: start < startBound " +
+                            "[start: " + start + ", startBound: " + startBound + "]");
         }
-        if (end > originEnd) {
+        if (end > endBound) {
             throw new IndexOutOfBoundsException(
-                    "Index range error: end > originEnd " +
-                            "[end: " + end + ", originEnd: " + originEnd + "]");
+                    "Index range error: end > endBound " +
+                            "[end: " + end + ", endBound: " + endBound + "]");
+        }
+    }
+
+    public static void checkIndexIn(int index, int startBound, int endBound) {
+        if (startBound > endBound) {
+            throw new IllegalArgumentException(
+                    "Range error: startBound > endBound " +
+                            "[startBound : " + startBound + ", endBound: " + endBound + "]");
+        }
+        if (index < startBound || index > endBound) {
+            throw new IndexOutOfBoundsException("Index: " + index +
+                    "[startBound: " + startBound + ", endBound: " + endBound + "]");
         }
     }
 }

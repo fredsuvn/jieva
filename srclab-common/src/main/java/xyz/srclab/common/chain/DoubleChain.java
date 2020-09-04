@@ -69,7 +69,7 @@ public interface DoubleChain extends DoubleStream, Iterable<Double> {
     }
 
     static DoubleChain from(float[] array, int startInclusive, int endExclusive) {
-        IntCounter intCounter = IntCounter.fromZero();
+        IntCounter intCounter = IntCounter.zero();
         return from(DoubleStream
                 .generate(() -> array[startInclusive + intCounter.getAndIncrement()])
                 .limit(endExclusive - startInclusive)

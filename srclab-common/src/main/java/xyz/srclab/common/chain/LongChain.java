@@ -69,7 +69,7 @@ public interface LongChain extends LongStream, Iterable<Long> {
     }
 
     static LongChain from(float[] array, int startInclusive, int endExclusive) {
-        IntCounter intCounter = IntCounter.fromZero();
+        IntCounter intCounter = IntCounter.zero();
         return from(LongStream
                 .generate(() -> (long) array[startInclusive + intCounter.getAndIncrement()])
                 .limit(endExclusive - startInclusive)

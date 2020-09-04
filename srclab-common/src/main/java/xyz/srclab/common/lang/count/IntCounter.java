@@ -2,20 +2,28 @@ package xyz.srclab.common.lang.count;
 
 public interface IntCounter {
 
-    static IntCounter fromZero() {
+    static IntCounter zero() {
         return IntCounterSupport.newSimpleIntCounter();
     }
 
-    static IntCounter from(int value) {
-        return IntCounterSupport.newSimpleIntCounter(value);
+    static IntCounter from(int init) {
+        return IntCounterSupport.newSimpleIntCounter(init);
+    }
+
+    static IntCounter atomicZero() {
+        return IntCounterSupport.newAtomicIntCounter();
+    }
+
+    static IntCounter atomic(int init) {
+        return IntCounterSupport.newAtomicIntCounter(init);
     }
 
     int get();
 
     void set(int value);
 
-    default void add(int addend) {
-        set(get() + addend);
+    default void add(int value) {
+        set(get() + value);
     }
 
     default int getAndSet(int value) {
@@ -24,14 +32,14 @@ public interface IntCounter {
         return result;
     }
 
-    default int getAndAdd(int delta) {
+    default int getAndAdd(int value) {
         int result = get();
-        add(delta);
+        set(result + value);
         return result;
     }
 
-    default int addAndGet(int delta) {
-        add(delta);
+    default int addAndGet(int value) {
+        add(value);
         return get();
     }
 

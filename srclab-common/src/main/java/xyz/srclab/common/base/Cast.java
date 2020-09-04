@@ -1,18 +1,18 @@
 package xyz.srclab.common.base;
 
-import xyz.srclab.annotation.Nullable;
+import xyz.srclab.annotation.NotNull;
 
 /**
  * @author sunqian
  */
 public class Cast {
 
-    public static <T, R> R as(T any) throws ClassCastException {
+    @NotNull
+    public static <T, R> R as(@NotNull T any) throws ClassCastException {
         return (R) any;
     }
 
-    @Nullable
-    public static <T, R> R asNullable(@Nullable T any) throws ClassCastException {
+    public static <T, R> R asNullable(T any) throws ClassCastException {
         return any == null ? null : as(any);
     }
 }

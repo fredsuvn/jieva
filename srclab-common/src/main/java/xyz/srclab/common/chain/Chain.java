@@ -1,6 +1,5 @@
 package xyz.srclab.common.chain;
 
-import com.google.common.collect.Maps;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Cast;
@@ -107,20 +106,6 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
         return Require.nonNull(reduce(identity, accumulator, combiner));
     }
 
-    @Nullable
-    T min(Comparator<? super T> comparator);
-
-    default T minNonNull(Comparator<? super T> comparator) {
-        return Require.nonNull(min(comparator));
-    }
-
-    @Nullable
-    T max(Comparator<? super T> comparator);
-
-    default T maxNonNull(Comparator<? super T> comparator) {
-        return Require.nonNull(max(comparator));
-    }
-
     <R> R collect(
             Supplier<R> supplier,
             BiConsumer<R, @Nullable ? super T> accumulator,
@@ -128,6 +113,45 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
     );
 
     <R, A> R collect(Collector<@Nullable ? super T, A, R> collector);
+
+    <R> Chain<R> merge(Supplier<T[]> mergeSizer, Function<T[], R> accumulator);
+
+    <R> Chain<R> mergePair(BiFunction<@Nullable ? super T, @Nullable ? super T, R> accumulator);
+
+    <R> R mergeCollect(
+            Supplier<R> supplier,
+            Supplier<T[]> mergeSizer,
+            BiConsumer<R, T[]> accumulator,
+            BiConsumer<R, R> combiner
+    );
+
+    <R, A> R mergeCollect(Supplier<T[]> mergeSizer, Collector<T[], A, R> collector);
+
+    <R> R mergePairCollect(
+            Supplier<R> supplier,
+            BiFunction<@Nullable ? super T, @Nullable ? super T, R> accumulator,
+            BiConsumer<R, R> combiner
+    );
+
+    Chain<T> concat(Chain<@Nullable ? extends T> chain);
+
+    Chain<T> concat(Collection<@Nullable ? extends T> collection);
+
+    Chain<T> concat(Iterable<@Nullable ? extends T> iterable);
+
+    Chain<T> concat(Stream<@Nullable ? extends T> stream);
+
+    Chain<T> concat(T[] array);
+
+    Chain<T> concat(long offset, Chain<@Nullable ? extends T> chain);
+
+    Chain<T> concat(long offset, Collection<@Nullable ? extends T> collection);
+
+    Chain<T> concat(long offset, Iterable<@Nullable ? extends T> iterable);
+
+    Chain<T> concat(long offset, Stream<@Nullable ? extends T> stream);
+
+    Chain<T> concat(long offset, T[] array);
 
     default List<T> toList() {
         return collect(Collectors.toList());
@@ -223,34 +247,20 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
         return MapKit.immutable(toMap(keyMapper, valueMapper, mergeFunction, mapSupplier));
     }
 
-    default Map<T, T> pairToMap(
-            Supplier<Map<T, T>> mapSupplier,
-            BinaryOperator<@Nullable T> mergeFunction,
 
-    ) {
-        return collect(ChainCollector.toMap(keyMapper, valueMapper, mergeFunction, mapSupplier));
+    @Nullable
+    T min(Comparator<? super T> comparator);
+
+    default T minNonNull(Comparator<? super T> comparator) {
+        return Require.nonNull(min(comparator));
     }
 
-    <R> Chain<R> merge(
-            Supplier<R> supplier,
-            BiFunction<R, @Nullable ? super T, R> accumulator
-    );
+    @Nullable
+    T max(Comparator<? super T> comparator);
 
-    <R> Chain<R> merge(Function<@Nullable ? super T, R> accumulator);
-
-    <R> Chain<R> merge(Consumer<T[]> mergeSizer, Function<T[], R> accumulator);
-
-    <R> Chain<R> mergePair(BiFunction<@Nullable ? super T, @Nullable ? super T, R> accumulator);
-
-    <R> R mergeCollect(
-            Supplier<R> supplier,
-            BiConsumer<R, @Nullable ? super T> accumulator,
-            BiConsumer<R, R> combiner
-    );
-
-    <R, A> R mergeCollect(Collector<@Nullable ? super T, A, R> collector);
-
-    <K, V> Map<K, V> mergeToMap();
+    default T maxNonNull(Comparator<? super T> comparator) {
+        return Require.nonNull(max(comparator));
+    }
 
     @Override
     Chain<T> distinct();
@@ -330,28 +340,4 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
     default T findAnyNonNull() throws NullPointerException {
         return findFirstNonNull();
     }
-
-    @Override
-    Iterator<T> iterator();
-
-    @Override
-    Spliterator<T> spliterator();
-
-    @Override
-    boolean isParallel();
-
-    @Override
-    Chain<T> sequential();
-
-    @Override
-    Chain<T> parallel();
-
-    @Override
-    Chain<T> unordered();
-
-    @Override
-    Chain<T> onClose(Runnable closeHandler);
-
-    @Override
-    void close();
 }
