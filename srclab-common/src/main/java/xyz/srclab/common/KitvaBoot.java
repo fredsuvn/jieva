@@ -1,7 +1,5 @@
 package xyz.srclab.common;
 
-import kotlin.jvm.functions.Function1;
-import kotlin.jvm.functions.Function2;
 import org.yaml.snakeyaml.Yaml;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;

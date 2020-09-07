@@ -1,6 +1,5 @@
 package xyz.srclab.common.base;
 
-import kotlin.collections.CollectionsKt;
 import xyz.srclab.annotation.Nullable;
 
 import java.util.*;
@@ -173,64 +172,5 @@ public class Equal {
             }
         }
         return true;
-    }
-
-    public static class SomeDto {
-
-        @Nullable
-        private String prop1;
-        @Nullable
-        private String prop2;
-        @Nullable
-        private String prop3;
-        @Nullable
-        private String prop4;
-        @Nullable
-        private String prop5;
-
-        @Nullable
-        public String getProp1() {
-            return prop1;
-        }
-
-        public void setProp1(@Nullable String prop1) {
-            this.prop1 = prop1;
-        }
-
-        @Nullable
-        public String getProp2() {
-            return prop2;
-        }
-
-        public void setProp2(@Nullable String prop2) {
-            this.prop2 = prop2;
-        }
-
-        @Nullable
-        public String getProp3() {
-            return prop3;
-        }
-
-        public void setProp3(@Nullable String prop3) {
-            this.prop3 = prop3;
-        }
-
-        @Nullable
-        public String getProp4() {
-            return prop4;
-        }
-
-        public void setProp4(@Nullable String prop4) {
-            this.prop4 = prop4;
-        }
-
-        @Nullable
-        public String getProp5() {
-            return prop5;
-        }
-
-        public void setProp5(@Nullable String prop5) {
-            this.prop5 = prop5;
-        }
     }
 }
