@@ -1,5 +1,6 @@
 package xyz.srclab.common.collection
 
+import xyz.srclab.common.base.Require
 import xyz.srclab.common.base.Sort
 
 /**
@@ -254,7 +255,8 @@ interface BaseIterableOps<T, I : Iterable<T>, O : BaseIterableOps<T, I, O>> : It
     }
 
     fun max(comparator: Comparator<in T>): T {
-        return operated().maxWith(comparator)
+        val maxOrNull = maxOrNull(comparator)
+        return Require.notNull(maxOrNull, "Collection is empty.")
     }
 
     fun maxOrNull(): T?
@@ -286,7 +288,7 @@ interface BaseIterableOps<T, I : Iterable<T>, O : BaseIterableOps<T, I, O>> : It
     }
 
     fun reversed(): O {
-        return self(reversed())
+        return self(operated().reversed())
     }
 
     fun sorted(): O

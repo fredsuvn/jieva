@@ -38,13 +38,13 @@ final class RecorderSupport {
         @Override
         @Nullable
         public Object get(Object key) {
-            return Require.nonNullElement(entryMap.get(key)).getValue(record);
+            return Require.notNullElement(entryMap.get(key)).getValue(record);
         }
 
         @Override
         @Nullable
         public Object put(String key, @Nullable Object value) {
-            return put0(Require.nonNullElement(entryMap.get(key)), value);
+            return put0(Require.notNullElement(entryMap.get(key)), value);
         }
 
         @Override

@@ -43,7 +43,7 @@ public interface ArrayRef<T> {
     Class<?> componentType();
 
     default ArrayRef<T> subArray(int startIndex, int endIndex) {
-        Check.checkIndexRange(startIndex, endIndex, originStartIndex(), originEndIndex());
+        Check.checkRangeInBounds(startIndex, endIndex, originStartIndex(), originEndIndex());
         return of(origin(), originStartIndex() + startIndex, originStartIndex() + endIndex);
     }
 
@@ -64,7 +64,7 @@ public interface ArrayRef<T> {
     }
 
     default ArrayRef<T> copyTo(@Out T[] array, int offset) {
-        Check.checkIndexRange(offset, array.length, array.length);
+        Check.checkRangeInBounds(offset, array.length, array.length);
         T[] origin = origin();
         int sourceStart = originStartIndex();
         int destStart = offset;
@@ -80,7 +80,7 @@ public interface ArrayRef<T> {
 
     default <U> ArrayRef<T> copyTo(
             @Out U[] array, int offset, Function<@Nullable ? super T, @Nullable ? extends U> mapper) {
-        Check.checkIndexRange(offset, array.length, array.length);
+        Check.checkRangeInBounds(offset, array.length, array.length);
         T[] origin = origin();
         int start = originStartIndex();
         int end = originEndIndex();

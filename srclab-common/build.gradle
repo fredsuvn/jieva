@@ -18,6 +18,7 @@ dependencies {
     implementation(platform(project(":srclab-common-bom")))
 
     api(project(":srclab-annotations"))
+    api("org.jetbrains.kotlin:kotlin-annotations-jvm")
 
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("org.slf4j:slf4j-api")

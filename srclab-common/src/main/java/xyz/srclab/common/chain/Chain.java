@@ -2,7 +2,7 @@ package xyz.srclab.common.chain;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Require;
 import xyz.srclab.common.collection.ListKit;
 import xyz.srclab.common.collection.MapKit;
@@ -29,7 +29,7 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
     }
 
     static <T> Chain<T> from(Stream<? extends T> stream) {
-        return new StreamChain<>(Cast.as(stream));
+        return new StreamChain<>(As.notNull(stream));
     }
 
     static <T> Chain<T> from(T[] array, int startInclusive, int endExclusive) {
@@ -89,12 +89,12 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
 
     @Nullable
     default T reduceNonNull(@Nullable T identity, BinaryOperator<@Nullable T> accumulator) {
-        return Require.nonNull(reduce(identity, accumulator));
+        return Require.notNull(reduce(identity, accumulator));
     }
 
     @Nullable
     default T reduceNonNull(BinaryOperator<@Nullable T> accumulator) {
-        return Require.nonNull(reduce(accumulator));
+        return Require.notNull(reduce(accumulator));
     }
 
     @Nullable
@@ -103,7 +103,7 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
             BiFunction<@Nullable U, @Nullable ? super T, U> accumulator,
             BinaryOperator<@Nullable U> combiner
     ) {
-        return Require.nonNull(reduce(identity, accumulator, combiner));
+        return Require.notNull(reduce(identity, accumulator, combiner));
     }
 
     <R> R collect(
@@ -252,14 +252,14 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
     T min(Comparator<? super T> comparator);
 
     default T minNonNull(Comparator<? super T> comparator) {
-        return Require.nonNull(min(comparator));
+        return Require.notNull(min(comparator));
     }
 
     @Nullable
     T max(Comparator<? super T> comparator);
 
     default T maxNonNull(Comparator<? super T> comparator) {
-        return Require.nonNull(max(comparator));
+        return Require.notNull(max(comparator));
     }
 
     @Override

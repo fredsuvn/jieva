@@ -2,7 +2,7 @@ package xyz.srclab.common.convert;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.design.builder.HandlersProductBuilder;
 import xyz.srclab.common.reflect.TypeRef;
@@ -40,7 +40,7 @@ public class ConverterBuilder extends HandlersProductBuilder<Converter, ConvertH
         @Override
         public <T> T convert(Object from, Class<T> to) throws UnsupportedOperationException {
             for (ConvertHandler handler : handlers) {
-                @Nullable T value = Cast.asNullable(handler.convert(from, to, this));
+                @Nullable T value = As.nullable(handler.convert(from, to, this));
                 if (value != null) {
                     return value;
                 }
@@ -51,7 +51,7 @@ public class ConverterBuilder extends HandlersProductBuilder<Converter, ConvertH
         @Override
         public <T> T convert(Object from, Type to) throws UnsupportedOperationException {
             for (ConvertHandler handler : handlers) {
-                @Nullable T value = Cast.asNullable(handler.convert(from, to, this));
+                @Nullable T value = As.nullable(handler.convert(from, to, this));
                 if (value != null) {
                     return value;
                 }
@@ -62,7 +62,7 @@ public class ConverterBuilder extends HandlersProductBuilder<Converter, ConvertH
         @Override
         public <T> T convert(Object from, TypeRef<T> to) throws UnsupportedOperationException {
             for (ConvertHandler handler : handlers) {
-                @Nullable T value = Cast.asNullable(handler.convert(from, to.getType(), this));
+                @Nullable T value = As.nullable(handler.convert(from, to.getType(), this));
                 if (value != null) {
                     return value;
                 }

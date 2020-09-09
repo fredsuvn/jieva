@@ -1,7 +1,7 @@
 package xyz.srclab.common.chain;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -29,8 +29,8 @@ public class StreamChain<T> implements Chain<T> {
 
     @Override
     public <R> Chain<R> map(Function<? super T, ? extends R> mapper) {
-        stream = Cast.as(stream.map(mapper));
-        return Cast.as(this);
+        stream = As.notNull(stream.map(mapper));
+        return As.notNull(this);
     }
 
     @Override
@@ -50,8 +50,8 @@ public class StreamChain<T> implements Chain<T> {
 
     @Override
     public <R> Chain<R> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper) {
-        stream = Cast.as(stream.flatMap(mapper));
-        return Cast.as(this);
+        stream = As.notNull(stream.flatMap(mapper));
+        return As.notNull(this);
     }
 
     @Override

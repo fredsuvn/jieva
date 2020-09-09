@@ -3,7 +3,7 @@ package xyz.srclab.common.collection;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.Out;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -143,10 +143,10 @@ public class MapKit {
     public static <K, V, E> Map<K, V> pairToMap(E... elements) {
         Map<K, V> result = new LinkedHashMap<>();
         for (int i = 0; i < elements.length; ) {
-            K key = Cast.as(elements[i]);
+            K key = As.notNull(elements[i]);
             i++;
             if (i < elements.length) {
-                V value = Cast.asNullable(elements[i]);
+                V value = As.nullable(elements[i]);
                 result.put(key, value);
             } else {
                 result.put(key, null);

@@ -1,6 +1,6 @@
 package xyz.srclab.common.collection;
 
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.reflect.TypeKit;
@@ -38,11 +38,11 @@ final class SchemeSupport {
             this.iterableType = iterableType;
             Type scheme = TypeKit.getGenericInterface(iterableType, Iterable.class);
             if (scheme instanceof Class) {
-                this.rawIterableType = Cast.as(TypeKit.getRawType(scheme));
+                this.rawIterableType = As.notNull(TypeKit.getRawType(scheme));
                 this.elementType = Object.class;
             } else if (scheme instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) scheme).getActualTypeArguments();
-                this.rawIterableType = Cast.as(TypeKit.getRawType(scheme));
+                this.rawIterableType = As.notNull(TypeKit.getRawType(scheme));
                 this.elementType = types[0];
             }
             throw new IllegalArgumentException("Unexpected type: " + scheme);
@@ -103,12 +103,12 @@ final class SchemeSupport {
             this.mapType = mapType;
             Type scheme = TypeKit.getGenericInterface(mapType, Map.class);
             if (scheme instanceof Class) {
-                this.rawMapType = Cast.as(TypeKit.getRawType(scheme));
+                this.rawMapType = As.notNull(TypeKit.getRawType(scheme));
                 this.keyType = Object.class;
                 this.valueType = Object.class;
             } else if (scheme instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) scheme).getActualTypeArguments();
-                this.rawMapType = Cast.as(TypeKit.getRawType(scheme));
+                this.rawMapType = As.notNull(TypeKit.getRawType(scheme));
                 this.keyType = types[0];
                 this.valueType = types[1];
             }

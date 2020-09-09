@@ -1,7 +1,7 @@
 package xyz.srclab.common.reflect;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.invoke.ConstructorInvoker;
@@ -29,13 +29,13 @@ public class ClassKit {
     public static <T> T newInstance(Class<?> cls) {
         @Nullable Constructor<?> constructor = ConstructorKit.getConstructor(cls);
         Check.checkArguments(constructor != null, "Constructor not found: " + cls);
-        return Cast.as(ConstructorInvoker.of(constructor).invoke());
+        return As.notNull(ConstructorInvoker.of(constructor).invoke());
     }
 
     public static <T> T newInstance(Class<?> cls, Class<?>[] parameterTypes, Object[] arguments) {
         @Nullable Constructor<?> constructor = ConstructorKit.getConstructor(cls, parameterTypes);
         Check.checkArguments(constructor != null, "Constructor not found: " + cls);
-        return Cast.as(ConstructorInvoker.of(constructor).invoke(arguments));
+        return As.notNull(ConstructorInvoker.of(constructor).invoke(arguments));
     }
 
     public static Class<?> toWrapper(Class<?> primitive) {

@@ -119,12 +119,12 @@ public interface Cache<K, V> {
     }
 
     default V getNonNull(K key) throws NoSuchElementException {
-        return Require.nonNullElement(get(key), key);
+        return Require.notNullElement(get(key), key);
     }
 
     default V getNonNull(K key, Function<? super K, ? extends V> function) throws NoSuchElementException {
-        return Require.nonNullElement(
-                get(key, k -> Require.nonNullElement(function.apply(k), k)),
+        return Require.notNullElement(
+                get(key, k -> Require.notNullElement(function.apply(k), k)),
                 key
         );
     }

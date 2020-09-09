@@ -28,14 +28,14 @@ public interface Stack<E> {
     E pop();
 
     default E popNonNull() throws NoSuchElementException {
-        return Require.nonNull(pop());
+        return Require.notNull(pop());
     }
 
     @Nullable
     E top();
 
     default E topNonNull() throws NoSuchElementException {
-        return Require.nonNull(top());
+        return Require.notNull(top());
     }
 
     default boolean isEmpty() {

@@ -35,7 +35,7 @@ public class Current {
 
     @Nullable
     public static <T> T get(Object key) {
-        return Cast.asNullable(CurrentContextHolder.contextMap().get(key));
+        return As.nullable(CurrentContextHolder.contextMap().get(key));
     }
 
     public static <T> T getNonNull(Object key) {

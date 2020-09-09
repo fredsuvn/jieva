@@ -3,7 +3,7 @@ package xyz.srclab.common.collection;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 
 import java.util.*;
 import java.util.function.*;
@@ -22,10 +22,10 @@ final class ImmutableSupport {
 
     static <E> List<E> list(Iterable<? extends E> elements) {
         if (elements instanceof ImmutableList) {
-            return Cast.as(elements);
+            return As.notNull(elements);
         }
         Object[] array = iterableToArray(elements);
-        return Cast.as(list(array));
+        return As.notNull(list(array));
     }
 
     @SafeVarargs
@@ -35,14 +35,14 @@ final class ImmutableSupport {
 
     static <E> Set<E> set(Iterable<? extends E> elements) {
         if (elements instanceof ImmutableSet) {
-            return Cast.as(elements);
+            return As.notNull(elements);
         }
         return new ImmutableSet<>(elements);
     }
 
     static <K, V> Map<K, V> map(Map<? extends K, ? extends V> elements) {
         if (elements instanceof ImmutableMap) {
-            return Cast.as(elements);
+            return As.notNull(elements);
         }
         return new ImmutableMap<>(elements);
     }
@@ -83,7 +83,7 @@ final class ImmutableSupport {
         public <T> T[] toArray(T[] array) {
             int size = size();
             if (array.length < size) {
-                return Cast.as(Arrays.copyOf(this.elementData, size, array.getClass()));
+                return As.notNull(Arrays.copyOf(this.elementData, size, array.getClass()));
             }
             System.arraycopy(this.elementData, 0, array, 0, size);
             if (array.length > size) {
@@ -95,7 +95,7 @@ final class ImmutableSupport {
         @Nullable
         @Override
         public E get(int index) {
-            return Cast.asNullable(elementData[index]);
+            return As.nullable(elementData[index]);
         }
 
         @Override
@@ -115,7 +115,7 @@ final class ImmutableSupport {
 
         @Override
         public void forEach(Consumer<? super E> action) {
-            Consumer<Object> actionCast = Cast.as(action);
+            Consumer<Object> actionCast = As.notNull(action);
             for (Object e : elementData) {
                 actionCast.accept(e);
             }
@@ -123,7 +123,7 @@ final class ImmutableSupport {
 
         @Override
         public void replaceAll(UnaryOperator<E> operator) {
-            UnaryOperator<Object> unaryOperator = Cast.as(operator);
+            UnaryOperator<Object> unaryOperator = As.notNull(operator);
             Object[] a = this.elementData;
             for (int i = 0; i < a.length; i++) {
                 a[i] = unaryOperator.apply(a[i]);
@@ -132,7 +132,7 @@ final class ImmutableSupport {
 
         @Override
         public void sort(Comparator<? super E> comparator) {
-            Comparator<Object> comparatorCast = Cast.as(comparator);
+            Comparator<Object> comparatorCast = As.notNull(comparator);
             Arrays.sort(elementData, comparatorCast);
         }
     }

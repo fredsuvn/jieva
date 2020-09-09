@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Equal;
 import xyz.srclab.common.base.Hash;
@@ -45,23 +45,23 @@ public interface CacheEntry<K, V> {
         public <K1 extends K, V1 extends V> Builder<K1, V1> key(K1 key) {
             this.key = key;
             this.updateState();
-            return Cast.as(this);
+            return As.notNull(this);
         }
 
         public <K1 extends K, V1 extends V> Builder<K1, V1> value(@Nullable V1 value) {
             this.value = value;
             this.updateState();
-            return Cast.as(this);
+            return As.notNull(this);
         }
 
         public <K1 extends K, V1 extends V> Builder<K1, V1> expiry(@Nullable CacheExpiry expiry) {
             this.expiry = expiry;
             this.updateState();
-            return Cast.as(this);
+            return As.notNull(this);
         }
 
         public <K1 extends K, V1 extends V> CacheEntry<K1, V1> build() {
-            return Cast.as(buildCaching());
+            return As.notNull(buildCaching());
         }
 
         @Override

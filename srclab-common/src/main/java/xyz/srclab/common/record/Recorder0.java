@@ -1,7 +1,7 @@
 package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 
 import java.util.Map;
 
@@ -11,6 +11,6 @@ import java.util.Map;
 final class Recorder0 {
 
     static Map<Object, @Nullable Object> anyAsMap(Recorder _this, Object recordOrMap) {
-        return Cast.as(recordOrMap instanceof Map ? recordOrMap : _this.asMap(recordOrMap));
+        return As.notNull(recordOrMap instanceof Map ? recordOrMap : _this.asMap(recordOrMap));
     }
 }

@@ -1,7 +1,7 @@
 package xyz.srclab.common.chain;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.collection.MapKit;
 
 import java.util.*;
@@ -94,7 +94,7 @@ public class ChainCollector<T, A, R> implements Collector<T, A, R> {
                    BiConsumer<A, T> accumulator,
                    BinaryOperator<A> combiner,
                    Set<Characteristics> characteristics) {
-        this(supplier, accumulator, combiner, Cast::as, characteristics);
+        this(supplier, accumulator, combiner, As::notNull, characteristics);
     }
 
     @Override

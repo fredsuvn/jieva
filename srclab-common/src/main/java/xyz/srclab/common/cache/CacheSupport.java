@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Null;
 import xyz.srclab.common.lang.ref.BooleanRef;
 
@@ -23,7 +23,7 @@ final class CacheSupport {
         if (value == null) {
             return null;
         }
-        return Null.isNull(value) ? null : Cast.as(value);
+        return Null.isNull(value) ? null : As.notNull(value);
     }
 
     private static final class ContainsFlagCacheLoader<K, V> implements CacheLoader<K, V> {

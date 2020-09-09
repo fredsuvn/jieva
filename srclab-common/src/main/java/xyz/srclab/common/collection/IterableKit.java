@@ -2,7 +2,7 @@ package xyz.srclab.common.collection;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.common.array.ArrayKit;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 
 import java.util.*;
 import java.util.function.Function;
@@ -13,7 +13,7 @@ import java.util.stream.StreamSupport;
 public class IterableKit {
 
     public static <E> Iterable<E> fromIterator(Iterator<? extends E> iterator) {
-        Iterator<E> castIterator = Cast.as(iterator);
+        Iterator<E> castIterator = As.notNull(iterator);
         return () -> castIterator;
     }
 
@@ -56,17 +56,17 @@ public class IterableKit {
 
     @Immutable
     public static <E> List<E> asList(Iterable<? extends E> iterable) {
-        return iterable instanceof List ? Cast.as(iterable) : toList(iterable);
+        return iterable instanceof List ? As.notNull(iterable) : toList(iterable);
     }
 
     @Immutable
     public static <E> Set<E> asSet(Iterable<? extends E> iterable) {
-        return iterable instanceof Set ? Cast.as(iterable) : toSet(iterable);
+        return iterable instanceof Set ? As.notNull(iterable) : toSet(iterable);
     }
 
     @Immutable
     public static <E> Collection<E> asCollection(Iterable<? extends E> iterable) {
-        return iterable instanceof Collection ? Cast.as(iterable) : toSet(iterable);
+        return iterable instanceof Collection ? As.notNull(iterable) : toSet(iterable);
     }
 
     @Immutable

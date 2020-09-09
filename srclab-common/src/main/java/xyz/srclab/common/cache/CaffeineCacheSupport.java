@@ -5,14 +5,12 @@ import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.*;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
 import xyz.srclab.common.collection.MapKit;
 
 import java.time.Duration;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 /**
@@ -30,7 +28,7 @@ final class CaffeineCacheSupport {
 
     static <K, V> Caffeine<K, Object> toCaffeineCacheBuilder(
             xyz.srclab.common.cache.CacheBuilder<K, V> builder) {
-        Caffeine<K, Object> caffeineBuilder = Cast.as(Caffeine.newBuilder());
+        Caffeine<K, Object> caffeineBuilder = As.notNull(Caffeine.newBuilder());
         caffeineBuilder.maximumSize(builder.maxSize());
         if (builder.expiry() != null) {
             CacheExpiry expiry = builder.expiry();

@@ -2,7 +2,7 @@ package xyz.srclab.common.design.builder;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.collection.ListKit;
 
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public abstract class HandlersProductBuilder<Product, Handler, Builder
     public Builder handler(Handler handler) {
         handlers().add(handler);
         this.updateState();
-        return Cast.as(this);
+        return As.notNull(this);
     }
 
     public Builder handlers(Handler... handlers) {
@@ -30,7 +30,7 @@ public abstract class HandlersProductBuilder<Product, Handler, Builder
             this.handlers().add(handler);
         }
         this.updateState();
-        return Cast.as(this);
+        return As.notNull(this);
     }
 
     protected List<Handler> handlers() {

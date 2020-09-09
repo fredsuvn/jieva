@@ -4,7 +4,7 @@ import kotlin.collections.ArraysKt;
 import org.apache.commons.lang3.ArrayUtils;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.OutReturn;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Equal;
 import xyz.srclab.common.base.Hash;
@@ -35,7 +35,7 @@ public class ArrayKit {
 
     public static <A> A newArray(Class<?> componentType, int length) {
         Object array = Array.newInstance(componentType, length);
-        return Cast.as(array);
+        return As.notNull(array);
     }
 
     public static boolean isArray(Type type) {
@@ -64,31 +64,31 @@ public class ArrayKit {
 
     public static <T> List<T> asList(Object array) {
         if (array instanceof Object[]) {
-            return Cast.as(Arrays.asList((Object[]) array));
+            return As.notNull(Arrays.asList((Object[]) array));
         }
         if (array instanceof boolean[]) {
-            return Cast.as(asList((boolean[]) array));
+            return As.notNull(asList((boolean[]) array));
         }
         if (array instanceof byte[]) {
-            return Cast.as(asList((byte[]) array));
+            return As.notNull(asList((byte[]) array));
         }
         if (array instanceof short[]) {
-            return Cast.as(asList((short[]) array));
+            return As.notNull(asList((short[]) array));
         }
         if (array instanceof char[]) {
-            return Cast.as(asList((char[]) array));
+            return As.notNull(asList((char[]) array));
         }
         if (array instanceof int[]) {
-            return Cast.as(asList((int[]) array));
+            return As.notNull(asList((int[]) array));
         }
         if (array instanceof long[]) {
-            return Cast.as(asList((long[]) array));
+            return As.notNull(asList((long[]) array));
         }
         if (array instanceof float[]) {
-            return Cast.as(asList((float[]) array));
+            return As.notNull(asList((float[]) array));
         }
         if (array instanceof double[]) {
-            return Cast.as(asList((double[]) array));
+            return As.notNull(asList((double[]) array));
         }
         throw new IllegalArgumentException("Unknown array object: " + array);
     }
@@ -282,7 +282,7 @@ public class ArrayKit {
     }
 
     public static <T> T[] buildArray(@OutReturn T[] array, int from, int to, ObjectSupplier<T> supplier) {
-        Check.checkIndexRange(from, to, array.length);
+        Check.checkRangeInBounds(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -290,7 +290,7 @@ public class ArrayKit {
     }
 
     public static boolean[] buildArray(@OutReturn boolean[] array, int from, int to, BooleanSupplier supplier) {
-        Check.checkIndexRange(from, to, array.length);
+        Check.checkRangeInBounds(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -298,7 +298,7 @@ public class ArrayKit {
     }
 
     public static byte[] buildArray(@OutReturn byte[] array, int from, int to, ByteSupplier supplier) {
-        Check.checkIndexRange(from, to, array.length);
+        Check.checkRangeInBounds(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -306,7 +306,7 @@ public class ArrayKit {
     }
 
     public static short[] buildArray(@OutReturn short[] array, int from, int to, ShortSupplier supplier) {
-        Check.checkIndexRange(from, to, array.length);
+        Check.checkRangeInBounds(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -314,7 +314,7 @@ public class ArrayKit {
     }
 
     public static char[] buildArray(@OutReturn char[] array, int from, int to, CharSupplier supplier) {
-        Check.checkIndexRange(from, to, array.length);
+        Check.checkRangeInBounds(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -322,7 +322,7 @@ public class ArrayKit {
     }
 
     public static int[] buildArray(@OutReturn int[] array, int from, int to, IntSupplier supplier) {
-        Check.checkIndexRange(from, to, array.length);
+        Check.checkRangeInBounds(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -330,7 +330,7 @@ public class ArrayKit {
     }
 
     public static long[] buildArray(@OutReturn long[] array, int from, int to, LongSupplier supplier) {
-        Check.checkIndexRange(from, to, array.length);
+        Check.checkRangeInBounds(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -338,7 +338,7 @@ public class ArrayKit {
     }
 
     public static float[] buildArray(@OutReturn float[] array, int from, int to, FloatSupplier supplier) {
-        Check.checkIndexRange(from, to, array.length);
+        Check.checkRangeInBounds(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }
@@ -346,7 +346,7 @@ public class ArrayKit {
     }
 
     public static double[] buildArray(@OutReturn double[] array, int from, int to, DoubleSupplier supplier) {
-        Check.checkIndexRange(from, to, array.length);
+        Check.checkRangeInBounds(from, to, array.length);
         for (int i = from; i < to; i++) {
             array[i] = supplier.get(i);
         }

@@ -2,7 +2,7 @@ package xyz.srclab.common.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.cache.listener.CacheCreateListener;
 import xyz.srclab.common.cache.listener.CacheReadListener;
@@ -50,32 +50,32 @@ public final class CacheBuilder<K, V> extends BaseProductCachingBuilder<Cache<K,
 
     public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> loader(
             CacheLoader<? super K1, @Nullable ? extends V1> loader) {
-        this.loader = Cast.as(loader);
-        return Cast.as(this);
+        this.loader = As.notNull(loader);
+        return As.notNull(this);
     }
 
     public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> createListener(
             CacheCreateListener<? super K1, ? super V1> createListener) {
-        this.createListener = Cast.as(createListener);
-        return Cast.as(this);
+        this.createListener = As.notNull(createListener);
+        return As.notNull(this);
     }
 
     public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> readListener(
             CacheReadListener<? super K1, ? super V1> readListener) {
-        this.readListener = Cast.as(readListener);
-        return Cast.as(this);
+        this.readListener = As.notNull(readListener);
+        return As.notNull(this);
     }
 
     public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> updateListener(
             CacheUpdateListener<? super K1, ? super V1> updateListener) {
-        this.updateListener = Cast.as(updateListener);
-        return Cast.as(this);
+        this.updateListener = As.notNull(updateListener);
+        return As.notNull(this);
     }
 
     public <K1 extends K, V1 extends V> CacheBuilder<K1, V1> removeListener(
             CacheRemoveListener<? super K1, ? super V1> removeListener) {
-        this.removeListener = Cast.as(removeListener);
-        return Cast.as(this);
+        this.removeListener = As.notNull(removeListener);
+        return As.notNull(this);
     }
 
     public CacheBuilder<K, V> useGuava(boolean useGuava) {
@@ -151,6 +151,6 @@ public final class CacheBuilder<K, V> extends BaseProductCachingBuilder<Cache<K,
     }
 
     public <K1 extends K, V1 extends V> Cache<K1, V1> build() {
-        return Cast.as(buildCaching());
+        return As.notNull(buildCaching());
     }
 }

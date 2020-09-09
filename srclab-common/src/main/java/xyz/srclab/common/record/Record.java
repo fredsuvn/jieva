@@ -2,7 +2,7 @@ package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.convert.Converter;
 
@@ -62,7 +62,7 @@ public abstract class Record<T extends Record<T>> {
     }
 
     public T copy() {
-        return Cast.as(recorder.copy(this));
+        return As.notNull(recorder.copy(this));
     }
 
     public void copyEntries(Object dest) {

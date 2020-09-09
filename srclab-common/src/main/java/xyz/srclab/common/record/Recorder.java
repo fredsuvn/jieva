@@ -2,7 +2,7 @@ package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Require;
 import xyz.srclab.common.collection.MapKit;
 import xyz.srclab.common.collection.MapScheme;
@@ -48,7 +48,7 @@ public interface Recorder {
     }
 
     default RecordEntry getEntryNonNull(Object record, String key) throws NoSuchElementException {
-        return Require.nonNullElement(getEntry(record, key));
+        return Require.notNullElement(getEntry(record, key));
     }
 
     @Nullable
@@ -57,7 +57,7 @@ public interface Recorder {
     }
 
     default Object getValueNonNull(Object record, String key) throws NoSuchElementException {
-        return Require.nonNullElement(getValue(record, key));
+        return Require.notNullElement(getValue(record, key));
     }
 
     default void setValue(Object record, String key, @Nullable Object value) throws NoSuchElementException {
@@ -149,13 +149,13 @@ public interface Recorder {
             if (destRecordOrMap instanceof Map) {
                 MapScheme mapScheme = MapScheme.getMapScheme(destType);
                 copyMapToMap(
-                        Cast.as(sourceRecordOrMap),
-                        Cast.as(destRecordOrMap), mapScheme.keyType(), mapScheme.valueType(),
+                        As.notNull(sourceRecordOrMap),
+                        As.notNull(destRecordOrMap), mapScheme.keyType(), mapScheme.valueType(),
                         converter, predicate
                 );
             } else {
                 copyMapToRecord(
-                        Cast.as(sourceRecordOrMap),
+                        As.notNull(sourceRecordOrMap),
                         destRecordOrMap, resolve(destType),
                         converter, predicate
                 );
@@ -165,7 +165,7 @@ public interface Recorder {
                 MapScheme mapScheme = MapScheme.getMapScheme(destType);
                 copyRecordToMap(
                         sourceRecordOrMap, recordType(sourceRecordOrMap),
-                        Cast.as(destRecordOrMap), mapScheme.keyType(), mapScheme.valueType(),
+                        As.notNull(destRecordOrMap), mapScheme.keyType(), mapScheme.valueType(),
                         converter, predicate
                 );
             } else {

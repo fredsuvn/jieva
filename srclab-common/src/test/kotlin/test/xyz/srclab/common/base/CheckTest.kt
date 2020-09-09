@@ -12,7 +12,7 @@ object CheckTest {
     @Test
     fun testCheckIndexFromTo() {
         doExpectThrowable(IndexOutOfBoundsException::class.java) {
-            Check.checkIndexRange(1, 2, 0)
+            Check.checkRangeInBounds(1, 2, 0)
         }
     }
 }

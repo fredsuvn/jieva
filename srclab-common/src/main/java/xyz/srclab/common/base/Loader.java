@@ -21,7 +21,7 @@ public class Loader {
     @Nullable
     public static <T> Class<T> findClass(String className) {
         try {
-            return Cast.as(Class.forName(className));
+            return As.notNull(Class.forName(className));
         } catch (ClassNotFoundException e) {
             return null;
         }
@@ -30,26 +30,26 @@ public class Loader {
     @Nullable
     public static <T> Class<T> findClass(String className, ClassLoader classLoader) {
         try {
-            return Cast.as(Class.forName(className, true, classLoader));
+            return As.notNull(Class.forName(className, true, classLoader));
         } catch (ClassNotFoundException e) {
             return null;
         }
     }
 
     public static <T> Class<T> loadClass(byte[] bytes) {
-        return Cast.as(BytesClassLoader.INSTANCE.loadClass(bytes));
+        return As.notNull(BytesClassLoader.INSTANCE.loadClass(bytes));
     }
 
     public static <T> Class<T> loadClass(byte[] bytes, int offset, int length) {
-        return Cast.as(BytesClassLoader.INSTANCE.loadClass(bytes, offset, length));
+        return As.notNull(BytesClassLoader.INSTANCE.loadClass(bytes, offset, length));
     }
 
     public static <T> Class<T> loadClass(InputStream inputStream) {
-        return Cast.as(BytesClassLoader.INSTANCE.loadClass(inputStream));
+        return As.notNull(BytesClassLoader.INSTANCE.loadClass(inputStream));
     }
 
     public static <T> Class<T> loadClass(ByteBuffer byteBuffer) {
-        return Cast.as(BytesClassLoader.INSTANCE.loadClass(byteBuffer));
+        return As.notNull(BytesClassLoader.INSTANCE.loadClass(byteBuffer));
     }
 
     @Nullable

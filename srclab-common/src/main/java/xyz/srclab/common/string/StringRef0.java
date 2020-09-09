@@ -10,7 +10,7 @@ import java.util.function.IntPredicate;
 final class StringRef0 {
 
     static <T extends CharSequence> StringRef<T> newStringRef(T origin, int start, int end) {
-        Check.checkIndexRange(start, end, origin.length());
+        Check.checkRangeInBounds(start, end, origin.length());
         return new StringRefImpl<>(origin, start, end);
     }
 
@@ -129,7 +129,7 @@ final class StringRef0 {
 
         @Override
         public StringRef<T> subSequence(int start, int end) {
-            Check.checkIndexRange(start, end, length());
+            Check.checkRangeInBounds(start, end, length());
             int offset = this.start + start;
             int length = end - start;
             return new StringRefImpl<>(origin, offset, offset + length);

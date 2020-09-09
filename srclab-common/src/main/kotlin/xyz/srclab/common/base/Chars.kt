@@ -1,26 +1,24 @@
-package xyz.srclab.common.base;
+package xyz.srclab.common.base
 
-import xyz.srclab.annotation.NotNull;
+object Chars {
 
-public class Chars {
-
-    @NotNull
-    public static String toString(@NotNull char[] chars) {
-        return new String(chars);
+    @JvmStatic
+    fun toString(chars: CharArray): String {
+        return String(chars)
     }
 
-    @NotNull
-    public static String toString(@NotNull byte[] bytes) {
-        return new String(bytes, Defaults.CHARSET);
+    @JvmStatic
+    fun toString(bytes: ByteArray): String {
+        return String(bytes, Defaults.charset())
     }
 
-    @NotNull
-    public static byte[] toBytes(@NotNull char[] chars) {
-        return new String(chars).getBytes(Defaults.CHARSET);
+    @JvmStatic
+    fun toBytes(chars: CharArray): ByteArray {
+        return String(chars).toByteArray(Defaults.charset())
     }
 
-    @NotNull
-    public static byte[] toBytes(@NotNull CharSequence chars) {
-        return chars.toString().getBytes(Defaults.CHARSET);
+    @JvmStatic
+    fun toBytes(chars: CharSequence): ByteArray {
+        return chars.toString().toByteArray(Defaults.charset())
     }
 }

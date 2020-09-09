@@ -1,7 +1,7 @@
 package xyz.srclab.common.lang.tuple;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.string.StringKit;
 
@@ -60,7 +60,7 @@ final class TupleSupport {
 
         @Override
         public <T> @Nullable T get(int index) {
-            return Cast.asNullable(values[index]);
+            return As.nullable(values[index]);
         }
 
         @Override
@@ -134,7 +134,7 @@ final class TupleSupport {
         @Override
         public <T> @Nullable T get(int index) {
             Check.checkIndex(index >= 0 && index < 2, index);
-            return Cast.asNullable(index == 0 ? first : second);
+            return As.nullable(index == 0 ? first : second);
         }
 
         @Override
@@ -186,7 +186,7 @@ final class TupleSupport {
         @Override
         public <T> @Nullable T get(int index) {
             Check.checkIndex(index >= 0 && index < 2, index);
-            return Cast.asNullable(index == 0 ? first : second);
+            return As.nullable(index == 0 ? first : second);
         }
 
         @Override
@@ -203,9 +203,9 @@ final class TupleSupport {
         public void set(int index, @Nullable Object value) {
             Check.checkIndex(index >= 0 && index < 2, index);
             if (index == 0) {
-                first(Cast.asNullable(value));
+                first(As.nullable(value));
             } else {
-                second(Cast.asNullable(value));
+                second(As.nullable(value));
             }
         }
 
@@ -262,7 +262,7 @@ final class TupleSupport {
         @Override
         public <T> @Nullable T get(int index) {
             Check.checkIndex(index >= 0 && index < 3, index);
-            return Cast.asNullable(index == 0 ? first : (index == 1 ? second : third));
+            return As.nullable(index == 0 ? first : (index == 1 ? second : third));
         }
 
         @Override
@@ -323,7 +323,7 @@ final class TupleSupport {
         @Override
         public <T> @Nullable T get(int index) {
             Check.checkIndex(index >= 0 && index < 3, index);
-            return Cast.asNullable(index == 0 ? first : (index == 1 ? second : third));
+            return As.nullable(index == 0 ? first : (index == 1 ? second : third));
         }
 
         @Override
@@ -345,11 +345,11 @@ final class TupleSupport {
         public void set(int index, @Nullable Object value) {
             Check.checkIndex(index >= 0 && index < 3, index);
             if (index == 0) {
-                first(Cast.asNullable(value));
+                first(As.nullable(value));
             } else if (index == 1) {
-                second(Cast.asNullable(value));
+                second(As.nullable(value));
             } else {
-                third(Cast.asNullable(value));
+                third(As.nullable(value));
             }
         }
 

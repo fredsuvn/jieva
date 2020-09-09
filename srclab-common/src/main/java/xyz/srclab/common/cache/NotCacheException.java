@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Check;
 
 /**
@@ -18,7 +18,7 @@ final class NotCacheException extends RuntimeException {
 
     @Nullable
     public <V> V getValue() {
-        return Cast.asNullable(value);
+        return As.nullable(value);
     }
 
     public <V> V getValueNonNull() {

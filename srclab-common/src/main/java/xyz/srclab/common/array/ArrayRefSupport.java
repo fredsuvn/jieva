@@ -10,7 +10,7 @@ final class ArrayRefSupport {
     }
 
     static <T> ArrayRef<T> newArrayRef(T[] array, int startIndex, int endIndex) {
-        Check.checkIndexRange(startIndex, endIndex, array.length);
+        Check.checkRangeInBounds(startIndex, endIndex, array.length);
         return new ArrayRefImpl<>(array, startIndex, endIndex);
     }
 

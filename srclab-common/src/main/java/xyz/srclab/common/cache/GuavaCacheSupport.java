@@ -6,7 +6,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.*;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.base.Cast;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
 
 import java.time.Duration;
@@ -27,7 +27,7 @@ final class GuavaCacheSupport {
 
     static <K, V> CacheBuilder<K, Object> toGuavaCacheBuilder(
             xyz.srclab.common.cache.CacheBuilder<K, V> builder) {
-        CacheBuilder<K, Object> guavaBuilder = Cast.as(CacheBuilder.newBuilder());
+        CacheBuilder<K, Object> guavaBuilder = As.notNull(CacheBuilder.newBuilder());
         guavaBuilder.maximumSize(builder.maxSize());
         if (builder.expiry() != null) {
             CacheExpiry expiry = builder.expiry();

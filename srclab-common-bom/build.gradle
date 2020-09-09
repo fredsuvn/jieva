@@ -19,6 +19,8 @@ javaPlatform {
 dependencies {
     api platform("xyz.srclab.bom:srclab-dependencies:${libVersions.dependenciesVersion}")
 
+    api("org.jetbrains.kotlin:kotlin-annotations-jvm:$kotlinVersion")
+
     constraints {
         file("${rootDir}").eachDirMatch(~/srclab-.*/) { file ->
             api(project(":${file.name}"))

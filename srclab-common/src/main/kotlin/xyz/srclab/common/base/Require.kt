@@ -1,48 +1,48 @@
-package xyz.srclab.common.base;
-
-import xyz.srclab.annotation.Nullable;
-
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.function.Supplier;
+package xyz.srclab.common.base
 
 /**
  * @author sunqian
  */
-public class Require {
+object Require {
 
-    public static <T> T nonNull(@Nullable T nullable) throws NullPointerException {
-        return Objects.requireNonNull(nullable);
+    @JvmStatic
+    fun <T : Any> notNull(any: T?): T {
+        Check.checkNull(any != null)
+        return any as T
     }
 
-    public static <T> T nonNull(@Nullable T nullable, String message) throws NullPointerException {
-        return Objects.requireNonNull(nullable, message);
+    @JvmStatic
+    fun <T : Any> notNull(any: T?, message: String?): T {
+        Check.checkNull(any != null, message)
+        return any as T
     }
 
-    public static <T> T nonNull(@Nullable T nullable, Supplier<String> messageSupplier) throws NullPointerException {
-        return Objects.requireNonNull(nullable, messageSupplier);
+    @JvmStatic
+    fun <T : Any> notNull(any: T?, messagePattern: String?, vararg messageArgs: Any?): T {
+        Check.checkNull(any != null, messagePattern, messageArgs)
+        return any as T
     }
 
-    public static <T> T nonNullElement(@Nullable T nullable) throws NoSuchElementException {
-        Check.checkElement(nullable != null);
-        return nullable;
+    @JvmStatic
+    fun <T : Any> notNullElement(element: T?): T {
+        Check.checkElement(element != null)
+        return element as T
     }
 
-    public static <T> T nonNullElement(@Nullable T nullable, String message) throws NoSuchElementException {
-        Check.checkElement(nullable != null, message);
-        return nullable;
+    @JvmStatic
+    fun <T : Any> notNullElement(element: T?, message: String?): T {
+        Check.checkElement(element != null, message)
+        return element as T
     }
 
-    public static <T> T nonNullElement(@Nullable T nullable, Supplier<String> messageSupplier)
-            throws NoSuchElementException {
-        Check.checkElement(nullable != null, messageSupplier);
-        return nullable;
+    @JvmStatic
+    fun <T : Any> notNullElement(element: T?, messagePattern: String?, vararg messageArgs: Any?): T {
+        Check.checkElement(element != null, messagePattern, messageArgs)
+        return element as T
     }
 
-    public static <T> T nonNullElement(@Nullable T nullable, @Nullable Object key) throws NoSuchElementException {
-        if (nullable == null) {
-            throw new NoSuchElementException("Key: " + key);
-        }
-        return nullable;
+    @JvmStatic
+    fun <T : Any> notNullElementByKey(element: T?, key: Any?): T {
+        return notNullElement(element, "Key: {}.", key)
     }
 }
