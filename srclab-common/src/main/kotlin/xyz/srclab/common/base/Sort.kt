@@ -1,6 +1,5 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.As.notNull
 import java.util.*
 
 /**
@@ -17,6 +16,6 @@ object Sort {
 
     @JvmStatic
     fun <T> selfComparableComparator(): Comparator<T> {
-        return notNull(SELF_COMPARABLE_COMPARATOR)
+        return As.notNull(SELF_COMPARABLE_COMPARATOR)
     }
 }

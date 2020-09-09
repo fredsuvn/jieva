@@ -1,7 +1,6 @@
 package xyz.srclab.common.string;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.base.Environment;
 import xyz.srclab.common.design.builder.BaseProductCachingBuilder;
 import xyz.srclab.common.object.UnitPredicate;
 import xyz.srclab.common.record.Recorder;

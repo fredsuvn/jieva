@@ -68,7 +68,7 @@ final class ComputedSupport {
             if (this.value == null || lastMillis == 0 || timeoutNanos == 0) {
                 return refreshAndGet();
             }
-            long now = Current.mills();
+            long now = Current.milliseconds();
             long diff = now - lastMillis;
             return diff * 1000000 <= timeoutNanos ? value : refreshAndGet();
         }
@@ -76,7 +76,7 @@ final class ComputedSupport {
         @Override
         public T refreshAndGet() {
             Result<T> result = computation.get();
-            lastMillis = Current.mills();
+            lastMillis = Current.milliseconds();
             value = result.value();
             timeoutNanos = result.expiry().toNanos();
             return value;
@@ -101,7 +101,7 @@ final class ComputedSupport {
             if (this.value == null || lastMillis == 0) {
                 return refreshAndGet();
             }
-            long now = Current.mills();
+            long now = Current.milliseconds();
             long diff = now - lastMillis;
             return diff * 1000000 <= timeoutNanos ? value : refreshAndGet();
         }
@@ -109,7 +109,7 @@ final class ComputedSupport {
         @Override
         public T refreshAndGet() {
             value = computation.get();
-            lastMillis = Current.mills();
+            lastMillis = Current.milliseconds();
             assert value != null;
             return value;
         }

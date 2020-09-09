@@ -56,7 +56,7 @@ final class V1Egg implements Egg {
     static final String SPELL;
 
     static {
-        long nowMillis = Current.mills();
+        long nowMillis = Current.milliseconds();
         SPELL = "" + Math.sqrt(nowMillis);
     }
 
