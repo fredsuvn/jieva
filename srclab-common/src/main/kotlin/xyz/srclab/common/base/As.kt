@@ -12,6 +12,6 @@ object As {
 
     @JvmStatic
     fun <R> nullable(any: Any?): R? {
-        return if (any == null) null else any as R
+        return if (any == null) null else any as R?
     }
 }

@@ -36,10 +36,13 @@ interface Format {
                 if (args.isEmpty()) {
                     return
                 }
+
+                /*
                 val lastElement = args[args.size - 1]
                 if (lastElement is Throwable) {
                     args[args.size - 1] = lastElement.toString()
                 }
+                 */
             }
         }
     }
