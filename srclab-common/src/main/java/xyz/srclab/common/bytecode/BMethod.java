@@ -3,8 +3,8 @@ package xyz.srclab.common.bytecode;
 import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.IterableKit;
-import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.collection.IterableOps;
+import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.string.StringKit;
 
 import java.lang.reflect.Method;
@@ -34,17 +34,17 @@ public class BMethod implements BDescribable {
         this.name = name;
         this.returnType = returnType == null ? ByteCodeHelper.PRIMITIVE_VOID : returnType;
         this.parameterTypes = parameterTypes == null ? Collections.emptyList() :
-                ListKit.immutable(IterableKit.asList(parameterTypes));
+                ListOps.immutable(IterableOps.asList(parameterTypes));
         this.typeVariables = typeVariables == null ? Collections.emptyList() :
-                ListKit.immutable(IterableKit.asList(typeVariables));
+                ListOps.immutable(IterableOps.asList(typeVariables));
     }
 
     public BMethod(Method method) {
         this(
                 method.getName(),
                 new BRefType(method.getReturnType()),
-                ListKit.map(method.getParameterTypes(), BRefType::new),
-                ListKit.map(method.getTypeParameters(), BTypeVariable::new)
+                ListOps.map(method.getParameterTypes(), BRefType::new),
+                ListOps.map(method.getTypeParameters(), BTypeVariable::new)
         );
     }
 

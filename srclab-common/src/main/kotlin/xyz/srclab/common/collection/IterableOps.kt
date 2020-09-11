@@ -1,7 +1,7 @@
 package xyz.srclab.common.collection
 
-/**
- * @author sunqian
- */
-interface IterableOps {
+interface IterableOps<T> : Iterable<T> {
+
+    companion object {
+    }
 }

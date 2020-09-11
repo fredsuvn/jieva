@@ -3,7 +3,7 @@ package xyz.srclab.common.record;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.As;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapOps;
 import xyz.srclab.common.convert.Converter;
 
 import java.util.Map;
@@ -50,7 +50,7 @@ public abstract class Record<T extends Record<T>> {
 
     @Immutable
     public Map<String, @Nullable Object> toMap() {
-        return MapKit.immutable(asMap());
+        return MapOps.immutable(asMap());
     }
 
     public void set(Map<String, @Nullable Object> values) {

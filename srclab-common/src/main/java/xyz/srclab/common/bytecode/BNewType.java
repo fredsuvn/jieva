@@ -2,8 +2,8 @@ package xyz.srclab.common.bytecode;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.IterableKit;
-import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.collection.IterableOps;
+import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.string.StringKit;
 
 import java.util.Collections;
@@ -32,10 +32,10 @@ public class BNewType implements BType {
     ) {
         this.name = className;
         this.typeVariables = typeVariables == null ? Collections.emptyList() :
-                ListKit.immutable(IterableKit.asList(typeVariables));
+                ListOps.immutable(IterableOps.asList(typeVariables));
         this.superClass = superClass == null ? ByteCodeHelper.OBJECT : superClass;
         this.interfaces = interfaces == null ? Collections.emptyList() :
-                ListKit.immutable(IterableKit.asList(interfaces));
+                ListOps.immutable(IterableOps.asList(interfaces));
         this.internalName = ByteCodeHelper.getTypeInternalName(className);
         this.descriptor = ByteCodeHelper.getTypeDescriptor(className);
     }

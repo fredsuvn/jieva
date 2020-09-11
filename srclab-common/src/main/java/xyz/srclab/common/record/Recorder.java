@@ -4,7 +4,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Require;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapOps;
 import xyz.srclab.common.collection.MapScheme;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.reflect.ClassKit;
@@ -78,7 +78,7 @@ public interface Recorder {
 
     @Immutable
     default Map<String, @Nullable Object> toMap(Object record) {
-        return MapKit.immutable(asMap(record));
+        return MapOps.immutable(asMap(record));
     }
 
     default void set(Object record, Map<String, @Nullable Object> values) {

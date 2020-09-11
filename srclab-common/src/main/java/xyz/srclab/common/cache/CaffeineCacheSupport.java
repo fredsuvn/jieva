@@ -7,7 +7,7 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.As;
 import xyz.srclab.common.cache.listener.CacheRemoveListener;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapOps;
 
 import java.time.Duration;
 import java.util.Map;
@@ -116,7 +116,7 @@ final class CaffeineCacheSupport {
         @Override
         public @Immutable Map<K, V> getPresent(Iterable<? extends K> keys) {
             Map<K,Object> result = caffeineCache.getAllPresent(keys);
-            return MapKit.map(result, k -> k, CacheSupport::unmask);
+            return MapOps.map(result, k -> k, CacheSupport::unmask);
         }
 
         @Override

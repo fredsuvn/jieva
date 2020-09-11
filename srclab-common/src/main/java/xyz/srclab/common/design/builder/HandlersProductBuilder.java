@@ -3,7 +3,7 @@ package xyz.srclab.common.design.builder;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.As;
-import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.collection.ListOps;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -51,9 +51,9 @@ public abstract class HandlersProductBuilder<Product, Handler, Builder
     @Immutable
     private List<Handler> newResult() {
         if (handlers == null) {
-            return ListKit.empty();
+            return ListOps.empty();
         } else {
-            return ListKit.immutable(handlers);
+            return ListOps.immutable(handlers);
         }
     }
 }

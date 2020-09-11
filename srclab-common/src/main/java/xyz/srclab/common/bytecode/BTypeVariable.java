@@ -2,7 +2,7 @@ package xyz.srclab.common.bytecode;
 
 import org.apache.commons.collections4.CollectionUtils;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.IterableKit;
+import xyz.srclab.common.collection.IterableOps;
 import xyz.srclab.common.reflect.TypeKit;
 import xyz.srclab.common.string.StringKit;
 
@@ -33,7 +33,7 @@ public class BTypeVariable implements BType {
     }
 
     public void addBounds(Iterable<BType> bounds) {
-        IterableKit.addAll(getBounds(), bounds);
+        IterableOps.addAll(getBounds(), bounds);
     }
 
     public String getDeclaration() {

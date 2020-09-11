@@ -1,7 +1,7 @@
 package xyz.srclab.common.cache;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapOps;
 import xyz.srclab.common.lang.ref.BooleanRef;
 
 import java.util.Map;
@@ -32,6 +32,6 @@ public class NoResultCacheLoader<K, V> implements CacheLoader<K, V> {
 
     @Override
     public Map<K, Result<V>> loadAll(Iterable<? extends K> keys) {
-        return MapKit.empty();
+        return MapOps.empty();
     }
 }

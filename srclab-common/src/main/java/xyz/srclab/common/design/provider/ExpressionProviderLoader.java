@@ -4,8 +4,8 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Loader;
-import xyz.srclab.common.collection.ListKit;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.ListOps;
+import xyz.srclab.common.collection.MapOps;
 import xyz.srclab.common.lang.tuple.Pair;
 import xyz.srclab.common.reflect.ClassKit;
 import xyz.srclab.common.string.StringKit;
@@ -16,8 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +38,7 @@ public class ExpressionProviderLoader<T> implements ProviderLoader<T> {
 
     private static final String PARSE_ERROR = "Failed to parse provider descriptor: ";
 
-    private static final List<Condition> conditions = ListKit.immutable(Arrays.asList(
+    private static final List<Condition> conditions = ListOps.immutable(Arrays.asList(
             new ConditionOnClass(),
             new ConditionOnMissingClass()
     ));
@@ -71,7 +69,7 @@ public class ExpressionProviderLoader<T> implements ProviderLoader<T> {
     @Immutable
     private Map<String, T> load0() {
         List<ProviderCandidate> candidates = parseStringDescriptor(stringDescriptor);
-        return MapKit.immutable(candidates.stream().collect(Collectors.toMap(
+        return MapOps.immutable(candidates.stream().collect(Collectors.toMap(
                 ProviderCandidate::getProviderName,
                 c -> newProviderInstance(c.getProviderClassName())
         )));

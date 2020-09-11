@@ -5,8 +5,8 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.Out;
 import xyz.srclab.common.base.Check;
-import xyz.srclab.common.collection.ListKit;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.ListOps;
+import xyz.srclab.common.collection.MapOps;
 import xyz.srclab.common.invoke.MethodInvoker;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.reflect.TypeKit;
@@ -52,7 +52,7 @@ final class RecordResolverSupport {
         private RecordTypeImpl(Type type, Map<String, RecordEntry> entryMap) {
             this.type = TypeKit.getRawType(type);
             this.genericType = type;
-            this.entryMap = MapKit.immutable(entryMap);
+            this.entryMap = MapOps.immutable(entryMap);
         }
 
         @Override
@@ -157,7 +157,7 @@ final class RecordResolverSupport {
 
             this.field = FieldKit.getDeclaredField(TypeKit.getRawType(owner), name);
             this.fieldAnnotations = field == null ? Collections.emptyList() :
-                    ListKit.immutable(field.getAnnotations());
+                    ListOps.immutable(field.getAnnotations());
         }
 
         @Override

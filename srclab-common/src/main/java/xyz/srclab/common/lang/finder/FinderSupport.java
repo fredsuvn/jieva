@@ -3,8 +3,8 @@ package xyz.srclab.common.lang.finder;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
 import xyz.srclab.common.base.As;
-import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.collection.SetKit;
+import xyz.srclab.common.collection.MapOps;
+import xyz.srclab.common.collection.SetOps;
 
 import java.util.Map;
 import java.util.Set;
@@ -66,11 +66,11 @@ final class FinderSupport {
         private final Set<T> tableSet;
 
         private HashFinder(T[] table) {
-            this.tableSet = SetKit.immutable(table);
+            this.tableSet = SetOps.immutable(table);
         }
 
         private HashFinder(Iterable<? extends T> table) {
-            this.tableSet = SetKit.immutable(table);
+            this.tableSet = SetOps.immutable(table);
         }
 
         @Override
@@ -91,12 +91,12 @@ final class FinderSupport {
         private final BiPredicate<? super T, ? super T> predicate;
 
         private HashPredicateFinder(T[] table, BiPredicate<? super T, ? super T> predicate) {
-            this.tableSet = SetKit.immutable(table);
+            this.tableSet = SetOps.immutable(table);
             this.predicate = predicate;
         }
 
         private HashPredicateFinder(Iterable<? extends T> table, BiPredicate<? super T, ? super T> predicate) {
-            this.tableSet = SetKit.immutable(table);
+            this.tableSet = SetOps.immutable(table);
             this.predicate = predicate;
         }
 
@@ -123,11 +123,11 @@ final class FinderSupport {
         private final Map<K, V> tableMap;
 
         private PairHashFinder(E[] table) {
-            this.tableMap = MapKit.pairToMap(table);
+            this.tableMap = MapOps.pairToMap(table);
         }
 
         private PairHashFinder(Iterable<? extends E> table) {
-            this.tableMap = MapKit.pairToMap(table);
+            this.tableMap = MapOps.pairToMap(table);
         }
 
         @Override
@@ -148,12 +148,12 @@ final class FinderSupport {
         private final BiPredicate<? super K, ? super K> predicate;
 
         private PairHashPredicateFinder(E[] table, BiPredicate<? super K, ? super K> predicate) {
-            this.tableMap = MapKit.pairToMap(table);
+            this.tableMap = MapOps.pairToMap(table);
             this.predicate = predicate;
         }
 
         private PairHashPredicateFinder(Iterable<? extends E> table, BiPredicate<? super K, ? super K> predicate) {
-            this.tableMap = MapKit.pairToMap(table);
+            this.tableMap = MapOps.pairToMap(table);
             this.predicate = predicate;
         }
 

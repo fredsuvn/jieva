@@ -9,7 +9,7 @@ import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Equal;
 import xyz.srclab.common.base.Hash;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.collection.IterableKit;
+import xyz.srclab.common.collection.IterableOps;
 import xyz.srclab.common.lang.finder.Finder;
 
 import java.lang.reflect.Array;
@@ -134,7 +134,7 @@ public class ArrayKit {
     }
 
     public static <E> E[] toArray(Iterable<? extends E> iterable, Class<?> componentType) {
-        return IterableKit.toArray(iterable, componentType);
+        return IterableOps.toArray(iterable, componentType);
     }
 
     public static <T> int find(T[] array, Predicate<? super T> predicate) {

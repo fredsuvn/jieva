@@ -2,7 +2,7 @@ package xyz.srclab.common.chain;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.As;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapOps;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -59,14 +59,14 @@ public class ChainCollector<T, A, R> implements Collector<T, A, R> {
             Supplier<Map<K, V>> mapSupplier
     ) {
         BiConsumer<Map<K, V>, T> accumulator = (map, element) ->
-                MapKit.mergeNullable(map, keyMapper.apply(element), valueMapper.apply(element), mergeFunction);
+                MapOps.mergeNullable(map, keyMapper.apply(element), valueMapper.apply(element), mergeFunction);
         return new ChainCollector<>(mapSupplier, accumulator, mapMerger(mergeFunction), ChainCollector.CH_ID);
     }
 
     private static <K, V, M extends Map<K, V>> BinaryOperator<M> mapMerger(BinaryOperator<V> mergeFunction) {
         return (m1, m2) -> {
             for (Map.Entry<K, V> e : m2.entrySet()) {
-                MapKit.mergeNullable(m1, e.getKey(), e.getValue(), mergeFunction);
+                MapOps.mergeNullable(m1, e.getKey(), e.getValue(), mergeFunction);
             }
             return m1;
         };

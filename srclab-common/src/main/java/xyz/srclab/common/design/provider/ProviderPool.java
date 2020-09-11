@@ -1,7 +1,7 @@
 package xyz.srclab.common.design.provider;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapOps;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -24,7 +24,7 @@ public interface ProviderPool<T> {
     }
 
     default T defaultProvider() throws NoSuchElementException {
-        return MapKit.firstValueNonNull(providerMap());
+        return MapOps.firstValueNonNull(providerMap());
     }
 
     @Immutable

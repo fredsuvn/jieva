@@ -3,8 +3,8 @@ package xyz.srclab.common.record;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Require;
-import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.collection.SetKit;
+import xyz.srclab.common.collection.MapOps;
+import xyz.srclab.common.collection.SetOps;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ final class RecorderSupport {
 
         private RecordView(Object record, Map<String, RecordEntry> entryMap) {
             this.record = record;
-            this.entryMap = MapKit.immutable(entryMap);
+            this.entryMap = MapOps.immutable(entryMap);
         }
 
         @Override
@@ -60,7 +60,7 @@ final class RecorderSupport {
         }
 
         private Set<Entry<String, @Nullable Object>> newEntrySet() {
-            return SetKit.map(entryMap.entrySet(), e -> new Entry<String, @Nullable Object>() {
+            return SetOps.map(entryMap.entrySet(), e -> new Entry<String, @Nullable Object>() {
 
                 @Override
                 public String getKey() {

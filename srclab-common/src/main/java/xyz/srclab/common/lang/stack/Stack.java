@@ -3,7 +3,7 @@ package xyz.srclab.common.lang.stack;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Require;
-import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.collection.ListOps;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public interface Stack<E> {
     @Immutable
     default List<E> toList() {
         if (isEmpty()) {
-            return ListKit.empty();
+            return ListOps.empty();
         }
         int i = size();
         List<E> result = new ArrayList<>(i);
@@ -57,7 +57,7 @@ public interface Stack<E> {
             result.add(popNonNull());
             i--;
         }
-        return ListKit.unmodifiable(result);
+        return ListOps.unmodifiable(result);
     }
 
     boolean search(E element);

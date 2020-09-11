@@ -5,8 +5,8 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Defaults;
 import xyz.srclab.common.base.Require;
-import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.collection.SetKit;
+import xyz.srclab.common.collection.MapOps;
+import xyz.srclab.common.collection.SetOps;
 import xyz.srclab.common.lang.ref.BooleanRef;
 
 import java.time.Duration;
@@ -101,7 +101,7 @@ public interface Cache<K, V> {
             });
             result.put(key, get(key));
         }
-        return MapKit.unmodifiable(result);
+        return MapOps.unmodifiable(result);
     }
 
     @Immutable
@@ -109,13 +109,13 @@ public interface Cache<K, V> {
             Iterable<? extends K> keys, Function<Iterable<? extends K>, Map<K, @Nullable V>> function) {
         Map<K, @Nullable V> present = getPresent(keys);
         Set<K> presentsKeys = present.keySet();
-        Set<K> restKeys = SetKit.filter(keys, k -> !presentsKeys.contains(k));
+        Set<K> restKeys = SetOps.filter(keys, k -> !presentsKeys.contains(k));
         if (restKeys.isEmpty()) {
             return present;
         }
         Map<K, @Nullable V> restMap = function.apply(restKeys);
         putAll(restMap);
-        return MapKit.merge(present, restMap);
+        return MapOps.merge(present, restMap);
     }
 
     default V getNonNull(K key) throws NoSuchElementException {
@@ -139,7 +139,7 @@ public interface Cache<K, V> {
             }
             result.put(key, value);
         }
-        return MapKit.unmodifiable(result);
+        return MapOps.unmodifiable(result);
     }
 
     @Immutable
@@ -147,14 +147,14 @@ public interface Cache<K, V> {
             throws NoSuchElementException {
         Map<K, V> present = getPresentNonNull(keys);
         Set<K> presentsKeys = present.keySet();
-        Set<K> restKeys = SetKit.filter(keys, k -> !presentsKeys.contains(k));
+        Set<K> restKeys = SetOps.filter(keys, k -> !presentsKeys.contains(k));
         if (restKeys.isEmpty()) {
             return present;
         }
         Map<K, V> restMap = function.apply(restKeys);
         restMap.forEach((k, v) -> Check.checkElement(v != null, k));
         putAll(restMap);
-        return MapKit.merge(present, restMap);
+        return MapOps.merge(present, restMap);
     }
 
     @Nullable
@@ -173,14 +173,14 @@ public interface Cache<K, V> {
             }
             result.put(key, value);
         }
-        return MapKit.unmodifiable(result);
+        return MapOps.unmodifiable(result);
     }
 
     @Immutable
     default Map<K, @Nullable V> loadAll(Iterable<? extends K> keys, CacheLoader<K, @Nullable ? extends V> loader) {
         Map<K, @Nullable V> present = loadPresent(keys);
         Set<K> presentsKeys = present.keySet();
-        Set<K> restKeys = SetKit.filter(keys, k -> !presentsKeys.contains(k));
+        Set<K> restKeys = SetOps.filter(keys, k -> !presentsKeys.contains(k));
         if (restKeys.isEmpty()) {
             return present;
         }
@@ -190,12 +190,12 @@ public interface Cache<K, V> {
                 .map(e -> e.getValue().toEntry(e.getKey()))
                 .collect(Collectors.toList());
         putEntries(restEntries);
-        Map<K, @Nullable V> restMap = MapKit.map(
+        Map<K, @Nullable V> restMap = MapOps.map(
                 restResultMap,
                 k -> k,
                 CacheLoader.Result::value
         );
-        return MapKit.merge(present, restMap);
+        return MapOps.merge(present, restMap);
     }
 
     V loadNonNull(K key, CacheLoader<? super K, ? extends V> loader) throws NoSuchElementException;
@@ -216,7 +216,7 @@ public interface Cache<K, V> {
             }
             result.put(key, value);
         }
-        return MapKit.unmodifiable(result);
+        return MapOps.unmodifiable(result);
     }
 
     @Immutable
@@ -224,7 +224,7 @@ public interface Cache<K, V> {
             throws NoSuchElementException {
         Map<K, V> present = loadPresentNonNull(keys);
         Set<K> presentsKeys = present.keySet();
-        Set<K> restKeys = SetKit.filter(keys, k -> !presentsKeys.contains(k));
+        Set<K> restKeys = SetOps.filter(keys, k -> !presentsKeys.contains(k));
         if (restKeys.isEmpty()) {
             return present;
         }
@@ -234,12 +234,12 @@ public interface Cache<K, V> {
                 .map(e -> e.getValue().toEntry(e.getKey()))
                 .collect(Collectors.toList());
         putEntries(restEntries);
-        Map<K, V> restMap = MapKit.map(
+        Map<K, V> restMap = MapOps.map(
                 restResultMap,
                 k -> k,
                 CacheLoader.Result::value
         );
-        return MapKit.merge(present, restMap);
+        return MapOps.merge(present, restMap);
     }
 
     void put(K key, @Nullable V value);

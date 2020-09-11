@@ -1,7 +1,7 @@
 package xyz.srclab.common.design.provider;
 
 import xyz.srclab.annotation.Immutable;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapOps;
 
 import java.util.Map;
 
@@ -19,7 +19,7 @@ final class ProviderPoolSupport {
         private final @Immutable Map<String, T> providerMap;
 
         private ProviderPoolImp(@Immutable Map<String, T> providerMap) {
-            this.providerMap = MapKit.immutable(providerMap);
+            this.providerMap = MapOps.immutable(providerMap);
         }
 
         @Override

@@ -5,39 +5,17 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-interface Defaults {
+object Defaults {
 
-    val charset: Charset
+    @JvmStatic
+    fun charset(): Charset = StandardCharsets.UTF_8
 
-    val locale: Locale
+    @JvmStatic
+    fun locale(): Locale = Locale.getDefault()
 
-    val timeUnit: TimeUnit
+    @JvmStatic
+    fun timeUnit(): TimeUnit = TimeUnit.SECONDS
 
-    val concurrencyLevel: Int
-
-    companion object {
-
-        @JvmStatic
-        fun charset() = DefaultsImpl.charset
-
-        @JvmStatic
-        fun locale() = DefaultsImpl.locale
-
-        @JvmStatic
-        fun timeUnit() = DefaultsImpl.timeUnit
-
-        @JvmStatic
-        fun concurrencyLevel() = DefaultsImpl.concurrencyLevel
-
-        private object DefaultsImpl : Defaults {
-            override val charset: Charset
-                get() = StandardCharsets.UTF_8
-            override val locale: Locale
-                get() = Locale.getDefault()
-            override val timeUnit: TimeUnit
-                get() = TimeUnit.SECONDS
-            override val concurrencyLevel: Int
-                get() = 16
-        }
-    }
+    @JvmStatic
+    fun concurrencyLevel(): Int = 16
 }

@@ -4,9 +4,9 @@ import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Require;
-import xyz.srclab.common.collection.ListKit;
-import xyz.srclab.common.collection.MapKit;
-import xyz.srclab.common.collection.SetKit;
+import xyz.srclab.common.collection.ListOps;
+import xyz.srclab.common.collection.MapOps;
+import xyz.srclab.common.collection.SetOps;
 import xyz.srclab.common.lang.count.Counter;
 
 import java.util.*;
@@ -163,7 +163,7 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
 
     @Immutable
     default List<T> toImmutableList() {
-        return ListKit.immutable(toList());
+        return ListOps.immutable(toList());
     }
 
     default Set<T> toSet() {
@@ -176,7 +176,7 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
 
     @Immutable
     default Set<T> toImmutableSet() {
-        return SetKit.immutable(toSet());
+        return SetOps.immutable(toSet());
     }
 
     default <K, V> Map<K, V> toMap(
@@ -191,7 +191,7 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
             Function<@Nullable ? super T, @Nullable ? extends K> keyMapper,
             Function<@Nullable ? super T, @Nullable ? extends V> valueMapper
     ) {
-        return MapKit.immutable(toMap(keyMapper, valueMapper));
+        return MapOps.immutable(toMap(keyMapper, valueMapper));
     }
 
     default <K, V> Map<K, V> toMap(
@@ -208,7 +208,7 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
             Function<@Nullable ? super T, @Nullable ? extends V> valueMapper,
             BinaryOperator<@Nullable V> mergeFunction
     ) {
-        return MapKit.immutable(toMap(keyMapper, valueMapper, mergeFunction));
+        return MapOps.immutable(toMap(keyMapper, valueMapper, mergeFunction));
     }
 
     default <K, V> Map<K, V> toMap(
@@ -225,7 +225,7 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
             Function<@Nullable ? super T, @Nullable ? extends V> valueMapper,
             Supplier<Map<K, V>> mapSupplier
     ) {
-        return MapKit.immutable(toMap(keyMapper, valueMapper, mapSupplier));
+        return MapOps.immutable(toMap(keyMapper, valueMapper, mapSupplier));
     }
 
     default <K, V> Map<K, V> toMap(
@@ -244,7 +244,7 @@ public interface Chain<T> extends BaseChain<T, Chain<T>> {
             BinaryOperator<@Nullable V> mergeFunction,
             Supplier<Map<K, V>> mapSupplier
     ) {
-        return MapKit.immutable(toMap(keyMapper, valueMapper, mergeFunction, mapSupplier));
+        return MapOps.immutable(toMap(keyMapper, valueMapper, mergeFunction, mapSupplier));
     }
 
 

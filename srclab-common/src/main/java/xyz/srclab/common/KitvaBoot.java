@@ -6,7 +6,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.collection.ListOps;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapOps;
 import xyz.srclab.common.design.provider.ProviderLoader;
 
 import java.io.IOException;
@@ -40,8 +40,8 @@ public class KitvaBoot {
         mergeProperties(toovaProperties, userProperties, properties);
 
         version = (String) properties.get("version");
-        defaultProperties = MapKit.immutable((Map<String, String>) (properties.get("providers")));
-        providerProperties = MapKit.immutable((Map<String, String>) (properties.get("defaults")));
+        defaultProperties = MapOps.immutable((Map<String, String>) (properties.get("providers")));
+        providerProperties = MapOps.immutable((Map<String, String>) (properties.get("defaults")));
     }
 
     @Immutable
@@ -53,7 +53,7 @@ public class KitvaBoot {
         try (InputStream inputStream = url.openStream()) {
             Yaml yaml = new Yaml();
             Map<String, Object> yamlProperties = yaml.load(inputStream);
-            return MapKit.immutable(yamlProperties);
+            return MapOps.immutable(yamlProperties);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -99,7 +99,7 @@ public class KitvaBoot {
     }
 
     public static <T> T getProvider(String interfaceName) {
-        return MapKit.firstValueNonNull(getProviders(interfaceName));
+        return MapOps.firstValueNonNull(getProviders(interfaceName));
     }
 
     public static <T> Map<String, T> getProviders(Class<T> interfaceClass) {

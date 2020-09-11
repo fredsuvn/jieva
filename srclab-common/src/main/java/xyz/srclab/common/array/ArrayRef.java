@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.Out;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.chain.Chain;
-import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.collection.ListOps;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -160,7 +160,7 @@ public interface ArrayRef<T> {
 
     @Immutable
     default List<T> toImmutableList() {
-        return ListKit.immutable(toArrayList());
+        return ListOps.immutable(toArrayList());
     }
 
     default Chain<T> toChain() {

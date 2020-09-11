@@ -2,7 +2,7 @@ package xyz.srclab.common.reflect;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.collection.ListKit;
+import xyz.srclab.common.collection.ListOps;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -30,12 +30,12 @@ public class MethodKit {
 
     @Immutable
     public static List<Method> getMethods(Class<?> cls) {
-        return ListKit.immutable(cls.getMethods());
+        return ListOps.immutable(cls.getMethods());
     }
 
     @Immutable
     public static List<Method> getDeclaredMethods(Class<?> cls) {
-        return ListKit.immutable(cls.getDeclaredMethods());
+        return ListOps.immutable(cls.getDeclaredMethods());
     }
 
     @Nullable

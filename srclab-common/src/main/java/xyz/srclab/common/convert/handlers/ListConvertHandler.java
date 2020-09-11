@@ -2,7 +2,7 @@ package xyz.srclab.common.convert.handlers;
 
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.array.ArrayKit;
-import xyz.srclab.common.collection.IterableKit;
+import xyz.srclab.common.collection.IterableOps;
 import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.reflect.TypeKit;
@@ -134,7 +134,7 @@ public class ListConvertHandler implements ConvertHandler {
     }
 
     private Object iterableToArray(Iterable<?> iterable, Class<?> componentType, Converter converter) {
-        List<?> list = IterableKit.asList(iterable);
+        List<?> list = IterableOps.asList(iterable);
         Object result = ArrayKit.newArray(componentType, list.size());
         int i = 0;
         if (result instanceof Object[]) {

@@ -3,7 +3,7 @@ package xyz.srclab.common.design.provider;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.concurrent.ThreadSafe;
-import xyz.srclab.common.collection.MapKit;
+import xyz.srclab.common.collection.MapOps;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -63,7 +63,7 @@ public abstract class AbstractProviderManager<T> implements ProviderManager<T> {
 
     @Override
     public @Immutable Map<String, T> getAllProviders() {
-        return MapKit.immutable(providerMaps);
+        return MapOps.immutable(providerMaps);
     }
 
     @Override
