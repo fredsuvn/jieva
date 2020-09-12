@@ -5,46 +5,137 @@ package xyz.srclab.common.collection
  */
 object OpsForMap {
 
+    @JvmStatic
+    inline fun <K, V> find(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
+        return map.entries.find(predicate)
+    }
+
+    @JvmStatic
+    inline fun <K, V> findLast(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
+        return map.entries.findLast(predicate)
+    }
+
+    @JvmStatic
+    fun <K, V> first(map: Map<K, V>): Map.Entry<K, V> {
+        return map.entries.first()
+    }
+
+    @JvmStatic
+    inline fun <K, V> first(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V> {
+        return map.entries.first(predicate)
+    }
+
+    @JvmStatic
+    fun <K, V> firstOrNull(map: Map<K, V>): Map.Entry<K, V>? {
+        return map.entries.firstOrNull()
+    }
+
+    @JvmStatic
+    inline fun <K, V> firstOrNull(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
+        return map.entries.firstOrNull(predicate)
+    }
+
+    @JvmStatic
+    fun <K, V> last(map: Map<K, V>): Map.Entry<K, V> {
+        return map.entries.last()
+    }
+
+    @JvmStatic
+    inline fun <K, V> last(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V> {
+        return map.entries.last(predicate)
+    }
+
+    @JvmStatic
+    fun <K, V> lastOrNull(map: Map<K, V>): Map.Entry<K, V>? {
+        return map.entries.lastOrNull()
+    }
+
+    @JvmStatic
+    inline fun <K, V> lastOrNull(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
+        return map.entries.lastOrNull(predicate)
+    }
+
+    @JvmStatic
     inline fun <K, V> all(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Boolean {
         return map.all(predicate)
     }
 
+    @JvmStatic
     fun <K, V> any(map: Map<K, V>): Boolean {
         return map.any()
     }
 
+    @JvmStatic
     inline fun <K, V> any(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Boolean {
         return map.any(predicate)
     }
 
+    @JvmStatic
+    fun <K, V> none(map: Map<K, V>): Boolean {
+        return map.none()
+    }
+
+    @JvmStatic
+    inline fun <K, V> none(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Boolean {
+        return map.none(predicate)
+    }
+
+    @JvmStatic
     fun <K, V> count(map: Map<K, V>): Int {
         return map.count()
     }
 
+    @JvmStatic
     inline fun <K, V> count(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Int {
         return map.count(predicate)
     }
 
-    inline fun <K, V, R> flatMap(map: Map<K, V>, transform: (Map.Entry<K, V>) -> Iterable<R>): List<R> {
-        return map.flatMap(transform)
-    }
-
-    inline fun <K, V, R, C : MutableCollection<in R>> flatMapTo(
+    @JvmStatic
+    inline fun <K,V, C : MutableMap<in K,in V>> filterTo(
         map: Map<K, V>,
         destination: C,
-        transform: (Map.Entry<K, V>) -> Iterable<R>
+        predicate: (Map.Entry<K, V>) -> Boolean
     ): C {
-        return map.flatMapTo(destination, transform)
+        return map.filterTo(destination, predicate)
     }
 
+    @JvmStatic
     inline fun <K, V, R> map(map: Map<K, V>, transform: (Map.Entry<K, V>) -> R): List<R> {
         return map.map(transform)
     }
 
+    @JvmStatic
     inline fun <K, V, R : Any> mapNotNull(map: Map<K, V>, transform: (Map.Entry<K, V>) -> R?): List<R> {
         return map.mapNotNull(transform)
     }
 
+    @JvmStatic
+    inline fun <K, V, RK, RV> map(
+        map: Map<K, V>,
+        crossinline keySelector: (K) -> RK,
+        crossinline valueTransform: (V) -> RV
+    ): Map<RK, RV> {
+        return mapTo(map, LinkedHashMap(), keySelector, valueTransform)
+    }
+
+    @JvmStatic
+    inline fun <K, V, RK, RV> map(
+        map: Map<K, V>,
+        transform: (K, V) -> Pair<RK, RV>
+    ): Map<RK, RV> {
+        return mapTo(map, LinkedHashMap(), transform)
+    }
+
+    @JvmStatic
+    inline fun <K, V, R, C : MutableCollection<in R>> mapTo(
+        map: Map<K, V>,
+        destination: C,
+        transform: (Map.Entry<K, V>) -> R
+    ): C {
+        return map.mapTo(destination, transform)
+    }
+
+    @JvmStatic
     inline fun <K, V, R : Any, C : MutableCollection<in R>> mapNotNullTo(
         map: Map<K, V>,
         destination: C,
@@ -53,87 +144,45 @@ object OpsForMap {
         return map.mapNotNullTo(destination, transform)
     }
 
-    inline fun <K, V, R, C : MutableCollection<in R>> mapTo(
+    @JvmStatic
+    inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> mapTo(
         map: Map<K, V>,
         destination: C,
-        transform: (Map.Entry<K, V>) -> R
+        crossinline keySelector: (K) -> RK,
+        crossinline valueTransform: (V) -> RV
     ): C {
+        map.forEach { (k, v) ->
+            val rk = keySelector(k)
+            val rv = valueTransform(v)
+            destination.put(rk, rv)
+        }
+        return destination
     }
 
-    inline fun <K, V, R : Comparable<R>> maxBy(map: Map<K, V>, selector: (Map.Entry<K, V>) -> R): Map.Entry<K, V>? {}
-
-    inline fun <K, V, R : Comparable<R>> maxByOrNull(
+    @JvmStatic
+    inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> mapTo(
         map: Map<K, V>,
-        selector: (Map.Entry<K, V>) -> R
-    ): Map.Entry<K, V>? {
+        destination: C,
+        transform: (K, V) -> Pair<RK, RV>
+    ): C {
+        map.forEach { (k, v) ->
+            val pair = transform(k, v)
+            destination.put(pair.first, pair.second)
+        }
+        return destination
     }
 
-    inline fun <K, V, R : Comparable<R>> maxOf(map: Map<K, V>, selector: (Map.Entry<K, V>) -> R): R {}
+    @JvmStatic
+    inline fun <K, V, R> flatMap(map: Map<K, V>, transform: (Map.Entry<K, V>) -> Iterable<R>): List<R> {
+        return map.flatMap(transform)
+    }
 
-    inline fun <K, V> maxOf(map: Map<K, V>, selector: (Map.Entry<K, V>) -> Double): Double {}
-
-    inline fun <K, V> maxOf(map: Map<K, V>, selector: (Map.Entry<K, V>) -> Float): Float {}
-
-    inline fun <K, V, R : Comparable<R>> maxOfOrNull(map: Map<K, V>, selector: (Map.Entry<K, V>) -> R): R? {}
-
-    inline fun <K, V> maxOfOrNull(map: Map<K, V>, selector: (Map.Entry<K, V>) -> Double): Double? {}
-
-    inline fun <K, V> maxOfOrNull(map: Map<K, V>, selector: (Map.Entry<K, V>) -> Float): Float? {}
-
-    inline fun <K, V, R> maxOfWith(map: Map<K, V>, comparator: Comparator<in R>, selector: (Map.Entry<K, V>) -> R): R {}
-
-    inline fun <K, V, R> maxOfWithOrNull(
+    @JvmStatic
+    inline fun <K, V, R, C : MutableCollection<in R>> flatMapTo(
         map: Map<K, V>,
-        comparator: Comparator<in R>,
-        selector: (Map.Entry<K, V>) -> R
-    ): R? {
+        destination: C,
+        transform: (Map.Entry<K, V>) -> Iterable<R>
+    ): C {
+        return map.flatMapTo(destination, transform)
     }
-
-    inline fun <K, V> maxWith(map: Map<K, V>, comparator: Comparator<in Map.Entry<K, V>>): Map.Entry<K, V>? {}
-
-    inline fun <K, V> maxWithOrNull(map: Map<K, V>, comparator: Comparator<in Map.Entry<K, V>>): Map.Entry<K, V>? {}
-
-    inline fun <K, V, R : Comparable<R>> minBy(map: Map<K, V>, selector: (Map.Entry<K, V>) -> R): Map.Entry<K, V>? {}
-
-    inline fun <K, V, R : Comparable<R>> minByOrNull(
-        map: Map<K, V>,
-        selector: (Map.Entry<K, V>) -> R
-    ): Map.Entry<K, V>? {
-    }
-
-    inline fun <K, V, R : Comparable<R>> minOf(map: Map<K, V>, selector: (Map.Entry<K, V>) -> R): R {}
-
-    inline fun <K, V> minOf(map: Map<K, V>, selector: (Map.Entry<K, V>) -> Double): Double {}
-
-    inline fun <K, V> minOf(map: Map<K, V>, selector: (Map.Entry<K, V>) -> Float): Float {}
-
-    inline fun <K, V, R : Comparable<R>> minOfOrNull(map: Map<K, V>, selector: (Map.Entry<K, V>) -> R): R? {}
-
-    inline fun <K, V> minOfOrNull(map: Map<K, V>, selector: (Map.Entry<K, V>) -> Double): Double? {}
-
-    inline fun <K, V> minOfOrNull(map: Map<K, V>, selector: (Map.Entry<K, V>) -> Float): Float? {}
-
-    inline fun <K, V, R> minOfWith(map: Map<K, V>, comparator: Comparator<in R>, selector: (Map.Entry<K, V>) -> R): R {}
-
-    inline fun <K, V, R> minOfWithOrNull(
-        map: Map<K, V>,
-        comparator: Comparator<in R>,
-        selector: (Map.Entry<K, V>) -> R
-    ): R? {
-    }
-
-    fun <K, V> minWith(map: Map<K, V>, comparator: Comparator<in Map.Entry<K, V>>): Map.Entry<K, V>? {}
-
-    inline fun <K, V> minWithOrNull(map: Map<K, V>, comparator: Comparator<in Map.Entry<K, V>>): Map.Entry<K, V>? {}
-
-    fun <K, V> none(map: Map<K, V>): Boolean {}
-
-    inline fun <K, V> none(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Boolean {}
-
-    inline fun <K, V, M : Map<out K, V>> M.onEach(action: (Map.Entry<K, V>) -> Unit): M {}
-
-    inline fun <K, V, M : Map<out K, V>> M.onEachIndexed(action: (Int, Map.Entry<K, V>) -> Unit): M {}
-
-    fun <K, V> toList(map: Map<K, V>): List<Pair<K, V>> {}
-
 }

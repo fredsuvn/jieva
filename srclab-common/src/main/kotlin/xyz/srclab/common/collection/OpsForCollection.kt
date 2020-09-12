@@ -1,5 +1,6 @@
 package xyz.srclab.common.collection
 
+import xyz.srclab.common.base.As
 import xyz.srclab.common.base.Require
 import xyz.srclab.common.base.Sort
 import xyz.srclab.common.base.To
@@ -8,6 +9,7 @@ import java.math.BigInteger
 import java.util.*
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
+import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 
 /**
@@ -514,6 +516,11 @@ object OpsForCollection {
     }
 
     @JvmStatic
+    inline fun <T, K, V> associate(iterable: Iterable<T>, transform: (T) -> Pair<K, V>): Map<K, V> {
+        return iterable.associate(transform)
+    }
+
+    @JvmStatic
     inline fun <T, K> associateKey(iterable: Iterable<T>, keySelector: (T) -> K): Map<K, T> {
         return iterable.associateBy(keySelector)
     }
@@ -524,6 +531,20 @@ object OpsForCollection {
     }
 
     @JvmStatic
+    inline fun <T, K, V> associateWithNext(
+        iterable: Iterable<T>,
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): Map<K, V> {
+        return associateWithNextTo(iterable, LinkedHashMap(), keySelector, valueTransform)
+    }
+
+    @JvmStatic
+    inline fun <T, K, V> associateWithNext(iterable: Iterable<T>, transform: (T, T) -> Pair<K, V>): Map<K, V> {
+        return associateWithNextTo(iterable, LinkedHashMap(), transform)
+    }
+
+    @JvmStatic
     inline fun <T, K, V, M : MutableMap<in K, in V>> associateTo(
         iterable: Iterable<T>,
         destination: M,
@@ -531,6 +552,15 @@ object OpsForCollection {
         valueTransform: (T) -> V
     ): M {
         return iterable.associateByTo(destination, keySelector, valueTransform)
+    }
+
+    @JvmStatic
+    inline fun <T, K, V, M : MutableMap<in K, in V>> associateTo(
+        iterable: Iterable<T>,
+        destination: M,
+        transform: (T) -> Pair<K, V>
+    ): M {
+        return iterable.associateTo(destination, transform)
     }
 
     @JvmStatic
@@ -549,6 +579,53 @@ object OpsForCollection {
         valueSelector: (T) -> V
     ): M {
         return iterable.associateWithTo(destination, valueSelector)
+    }
+
+    @JvmStatic
+    inline fun <T, K, V, M : MutableMap<in K, in V>> associateWithNextTo(
+        iterable: Iterable<T>,
+        destination: M,
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): M {
+        val iterator = iterable.iterator()
+        while (iterator.hasNext()) {
+            val tk = iterator.next()
+            val k = keySelector(tk)
+            if (iterator.hasNext()) {
+                val tv = iterator.next()
+                val v = valueTransform(tv)
+                destination.put(k, v)
+            } else {
+                val v: V = As.any(null)
+                destination.put(k, v)
+                break
+            }
+        }
+        return destination
+    }
+
+    @JvmStatic
+    inline fun <T, K, V, M : MutableMap<in K, in V>> associateWithNextTo(
+        iterable: Iterable<T>,
+        destination: M,
+        transform: (T, T) -> Pair<K, V>
+    ): M {
+        val iterator = iterable.iterator()
+        while (iterator.hasNext()) {
+            val tk = iterator.next()
+            if (iterator.hasNext()) {
+                val tv = iterator.next()
+                val pair = transform(tk, tv)
+                destination.put(pair.first, pair.second)
+            } else {
+                val tv: T = As.any(null)
+                val pair = transform(tk, tv)
+                destination.put(pair.first, pair.second)
+                break
+            }
+        }
+        return destination
     }
 
     @JvmStatic

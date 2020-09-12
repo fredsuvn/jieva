@@ -6,6 +6,7 @@ import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Format;
 import xyz.srclab.common.collection.OpsForCollection;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,5 +20,6 @@ public class Tt {
         As.notNull("");
         As.nullable("");
         //IterableOps.IterableOpsCompanion.
+        OpsForCollection.associateValueTo(null, new HashMap<>(), v->null);
     }
 }
