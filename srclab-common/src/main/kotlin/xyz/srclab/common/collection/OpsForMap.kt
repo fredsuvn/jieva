@@ -91,11 +91,19 @@ object OpsForMap {
     }
 
     @JvmStatic
-    inline fun <K,V, C : MutableMap<in K,in V>> filterTo(
+    inline fun <K, V> filter(
         map: Map<K, V>,
-        destination: C,
         predicate: (Map.Entry<K, V>) -> Boolean
-    ): C {
+    ): Map<K, V> {
+        return map.filter(predicate)
+    }
+
+    @JvmStatic
+    inline fun <K, V, M : MutableMap<in K, in V>> filterTo(
+        map: Map<K, V>,
+        destination: M,
+        predicate: (Map.Entry<K, V>) -> Boolean
+    ): M {
         return map.filterTo(destination, predicate)
     }
 
@@ -184,5 +192,43 @@ object OpsForMap {
         transform: (Map.Entry<K, V>) -> Iterable<R>
     ): C {
         return map.flatMapTo(destination, transform)
+    }
+
+    @JvmStatic
+    fun <K, V> plus(map: MutableMap<K, V>, other: Map<out K, V>): Map<K, V> {
+        return map.plus(other)
+    }
+
+    @JvmStatic
+    fun <K, V> minus(map: Map<K, V>, key: K): Map<K, V> {
+        return map.minus(key)
+    }
+
+    @JvmStatic
+    fun <K, V> minus(map: Map<K, V>, keys: Array<out K>): Map<K, V> {
+        return map.minus(keys)
+    }
+
+    @JvmStatic
+    fun <K, V> minus(map: Map<K, V>, keys: Iterable<K>): Map<K, V> {
+        return map.minus(keys)
+    }
+
+    @JvmStatic
+    fun <K, V, M : MutableMap<in K, in V>> toMutableMap(map: Map<K, V>, destination: M): M {
+        for (entry in map) {
+            destination.put(entry.key, entry.value)
+        }
+        return destination
+    }
+
+    @JvmStatic
+    fun <K, V> toMutableMap(map: Map<K, V>): MutableMap<K, V> {
+        return toMutableMap(map, LinkedHashMap())
+    }
+
+    @JvmStatic
+    fun <K, V> toPair(entry: Map.Entry<K, V>): Pair<K, V> {
+        return entry.toPair()
     }
 }

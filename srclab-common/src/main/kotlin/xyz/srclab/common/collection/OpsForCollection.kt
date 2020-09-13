@@ -1,6 +1,5 @@
 package xyz.srclab.common.collection
 
-import xyz.srclab.common.base.As
 import xyz.srclab.common.base.Require
 import xyz.srclab.common.base.Sort
 import xyz.srclab.common.base.To
@@ -347,6 +346,14 @@ object OpsForCollection {
         return iterable.filterNotNullTo(destination)
     }
 
+    fun <T> binarySearch(list: List<T>, element: T): Int {
+        return list.binarySearch(element, Sort.selfComparableComparator())
+    }
+
+    fun <T> binarySearch(list: List<T>, element: T, comparator: Comparator<in T>): Int {
+        return list.binarySearch(element, comparator)
+    }
+
     @JvmStatic
     inline fun <T, R> map(iterable: Iterable<T>, transform: (T) -> R): List<R> {
         return iterable.map(transform)
@@ -534,13 +541,13 @@ object OpsForCollection {
     inline fun <T, K, V> associateWithNext(
         iterable: Iterable<T>,
         keySelector: (T) -> K,
-        valueTransform: (T) -> V
+        valueTransform: (T?) -> V
     ): Map<K, V> {
         return associateWithNextTo(iterable, LinkedHashMap(), keySelector, valueTransform)
     }
 
     @JvmStatic
-    inline fun <T, K, V> associateWithNext(iterable: Iterable<T>, transform: (T, T) -> Pair<K, V>): Map<K, V> {
+    inline fun <T, K, V> associateWithNext(iterable: Iterable<T>, transform: (T, T?) -> Pair<K, V>): Map<K, V> {
         return associateWithNextTo(iterable, LinkedHashMap(), transform)
     }
 
@@ -586,7 +593,7 @@ object OpsForCollection {
         iterable: Iterable<T>,
         destination: M,
         keySelector: (T) -> K,
-        valueTransform: (T) -> V
+        valueTransform: (T?) -> V
     ): M {
         val iterator = iterable.iterator()
         while (iterator.hasNext()) {
@@ -597,7 +604,7 @@ object OpsForCollection {
                 val v = valueTransform(tv)
                 destination.put(k, v)
             } else {
-                val v: V = As.any(null)
+                val v = valueTransform(null)
                 destination.put(k, v)
                 break
             }
@@ -609,7 +616,7 @@ object OpsForCollection {
     inline fun <T, K, V, M : MutableMap<in K, in V>> associateWithNextTo(
         iterable: Iterable<T>,
         destination: M,
-        transform: (T, T) -> Pair<K, V>
+        transform: (T, T?) -> Pair<K, V>
     ): M {
         val iterator = iterable.iterator()
         while (iterator.hasNext()) {
@@ -619,8 +626,7 @@ object OpsForCollection {
                 val pair = transform(tk, tv)
                 destination.put(pair.first, pair.second)
             } else {
-                val tv: T = As.any(null)
-                val pair = transform(tk, tv)
+                val pair = transform(tk, null)
                 destination.put(pair.first, pair.second)
                 break
             }
@@ -855,16 +861,6 @@ object OpsForCollection {
     }
 
     @JvmStatic
-    fun <T> distinct(iterable: Iterable<T>): List<T> {
-        return iterable.distinct()
-    }
-
-    @JvmStatic
-    inline fun <T, K> distinct(iterable: Iterable<T>, selector: (T) -> K): List<T> {
-        return iterable.distinctBy(selector)
-    }
-
-    @JvmStatic
     fun <T> shuffle(list: MutableList<T>) {
         list.shuffle()
     }
@@ -875,9 +871,78 @@ object OpsForCollection {
     }
 
     @JvmStatic
+    fun <T> shuffled(iterable: Iterable<T>): List<T> {
+        return iterable.shuffled()
+    }
+
+    @JvmStatic
+    fun <T> shuffled(iterable: Iterable<T>, random: Random): List<T> {
+        return iterable.shuffled(random)
+    }
+
+    @JvmStatic
+    fun <T> distinct(iterable: Iterable<T>): List<T> {
+        return iterable.distinct()
+    }
+
+    @JvmStatic
+    inline fun <T, K> distinct(iterable: Iterable<T>, selector: (T) -> K): List<T> {
+        return iterable.distinctBy(selector)
+    }
+
+    @JvmStatic
     inline fun <T> forEachIndexed(iterable: Iterable<T>, action: (index: Int, T) -> Unit) {
         return iterable.forEachIndexed(action)
     }
+
+    @JvmStatic
+    fun <T> addAll(collection: MutableCollection<T>, elements: Array<out T>): Boolean {
+        return collection.addAll(elements)
+    }
+
+    @JvmStatic
+    fun <T> addAll(collection: MutableCollection<T>, elements: Iterable<T>): Boolean {
+        return collection.addAll(elements)
+    }
+
+    inline fun <T> remove(collection: MutableCollection<T>, element: T): Boolean {
+        return collection.remove(element)
+    }
+
+    inline fun <T> removeAt(list: MutableList<T>, index: Int): T {return list.removeAt(index)
+    }
+
+    fun <T> removeAll(collection: MutableCollection<T>, elements: Array<out T>): Boolean {}
+
+    fun <T> removeAll(collection: MutableCollection<T>, elements: Iterable<T>): Boolean {}
+
+    fun <T> removeAll(collection: MutableCollection<T>, elements: Sequence<T>): Boolean {}
+
+    inline fun <T> removeAll(collection: MutableCollection<T>, elements: Collection<T>): Boolean {}
+
+    fun <T> removeAll(iterable: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {}
+
+    fun <T> removeAll(list: MutableList<T>, predicate: (T) -> Boolean): Boolean {}
+
+    fun <T> removeFirst(list: MutableList<T>): T {}
+
+    fun <T> removeFirstOrNull(list: MutableList<T>): T? {}
+
+    fun <T> removeLast(list: MutableList<T>): T {}
+
+    fun <T> removeLastOrNull(list: MutableList<T>): T? {}
+
+    fun <T> retainAll(collection: MutableCollection<T>, elements: Array<out T>): Boolean {}
+
+    fun <T> retainAll(collection: MutableCollection<T>, elements: Iterable<T>): Boolean {}
+
+    fun <T> retainAll(collection: MutableCollection<T>, elements: Sequence<T>): Boolean {}
+
+    inline fun <T> retainAll(collection: MutableCollection<T>, elements: Collection<T>): Boolean {}
+
+    fun <T> retainAll(iterable: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {}
+
+    fun <T> retainAll(list: MutableList<T>, predicate: (T) -> Boolean): Boolean {}
 
     @JvmStatic
     fun <T> plus(iterable: Iterable<T>, element: T): List<T> {
@@ -1005,7 +1070,7 @@ object OpsForCollection {
     }
 
     @JvmStatic
-    fun <T> toSortedSet(iterable: Iterable<T>, comparator: java.util.Comparator<in T>): SortedSet<T> {
+    fun <T> toSortedSet(iterable: Iterable<T>, comparator: Comparator<in T>): SortedSet<T> {
         return iterable.toSortedSet(comparator)
     }
 

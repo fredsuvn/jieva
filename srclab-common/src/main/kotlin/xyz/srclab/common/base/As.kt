@@ -6,17 +6,17 @@ package xyz.srclab.common.base
 object As {
 
     @JvmStatic
-    fun <R> any(any: Any?): R {
-        return any as R
+    fun <T> any(any: Any?): T {
+        return any as T
     }
 
     @JvmStatic
-    fun <R : Any> notNull(any: Any): R {
-        return any as R
+    fun <T : Any> notNull(any: Any): T {
+        return any as T
     }
 
     @JvmStatic
-    fun <R> nullable(any: Any?): R? {
-        return if (any == null) null else any as R?
+    fun <T> nullable(any: Any?): T? {
+        return if (any == null) null else any as T?
     }
 }
