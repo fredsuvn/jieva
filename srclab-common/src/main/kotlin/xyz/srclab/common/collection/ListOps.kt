@@ -1,8 +1,7 @@
 package xyz.srclab.common.collection
 
-interface ListOps<T> : IterableOps<T>, List<T> {
+class ListOps<T> private constructor(list: List<T>) : IterableOps<T>(list) {
 
-    companion object {
-
-    }
+    override var inProcess: List<T>? = list
+    override var sequence: Sequence<T>? = null
 }

@@ -12,20 +12,959 @@ import java.util.stream.StreamSupport
 import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 
-open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
+abstract class BaseIterableOps<T, CX : Iterable<T>, O : BaseIterableOps<T, CX, O>> 
+protected constructor(operated: CX) {
 
-    protected open var inProcess: Iterable<T>? = iterable
-    protected open var sequence: Sequence<T>? = null
+    protected  var iterable: CX? = operated
+    protected  var sequence: Sequence<T>? = null
+    
+    inline fun find( predicate: (T) -> Boolean): T? {
+        return getC().find(predicate)
+    }
 
+    
+    inline fun findLast( predicate: (T) -> Boolean): T? {
+        return getC().findLast(predicate)
+    }
 
+    
+    fun first(): T {
+        return getC().first()
+    }
 
+    
+    inline fun first( predicate: (T) -> Boolean): T {
+        return getC().first(predicate)
+    }
+
+    
+    fun firstOrNull(): T? {
+        return getC().firstOrNull()
+    }
+
+    
+    inline fun firstOrNull( predicate: (T) -> Boolean): T? {
+        return getC().firstOrNull(predicate)
+    }
+
+    
+    fun last(): T {
+        return getC().last()
+    }
+
+    
+    inline fun last( predicate: (T) -> Boolean): T {
+        return getC().last(predicate)
+    }
+
+    
+    fun lastOrNull(): T? {
+        return getC().lastOrNull()
+    }
+
+    
+    inline fun lastOrNull( predicate: (T) -> Boolean): T? {
+        return getC().lastOrNull(predicate)
+    }
+
+    
+    inline fun all( predicate: (T) -> Boolean): Boolean {
+        return getC().all(predicate)
+    }
+
+    
+    fun any(): Boolean {
+        return getC().any()
+    }
+
+    
+    inline fun any( predicate: (T) -> Boolean): Boolean {
+        return getC().any(predicate)
+    }
+
+    
+    fun none(): Boolean {
+        return getC().none()
+    }
+
+    
+    inline fun none( predicate: (T) -> Boolean): Boolean {
+        return getC().none(predicate)
+    }
+
+    
+    fun single(): T {
+        return getC().single()
+    }
+
+    
+    inline fun single( predicate: (T) -> Boolean): T {
+        return getC().single(predicate)
+    }
+
+    
+    fun singleOrNull(): T? {
+        return getC().singleOrNull()
+    }
+
+    
+    inline fun singleOrNull( predicate: (T) -> Boolean): T? {
+        return getC().singleOrNull(predicate)
+    }
+
+    
+    fun contains( element: T): Boolean {
+        return getC().contains(element)
+    }
+
+    
+    fun count(): Int {
+        return getC().count()
+    }
+
+    
+    inline fun count( predicate: (T) -> Boolean): Int {
+        return getC().count(predicate)
+    }
+
+    
+    fun elementAt( index: Int): T {
+        return getC().elementAt(index)
+    }
+
+    
+    fun elementAtOrElse(
+        
+        index: Int,
+        defaultValue: (index: Int) -> T
+    ): T {
+        return getC().elementAtOrElse(index, defaultValue)
+    }
+
+    
+    fun elementAtOrNull( index: Int): T? {
+        return getC().elementAtOrNull(index)
+    }
+
+    
+    fun indexOf( element: T): Int {
+        return getC().indexOf(element)
+    }
+
+    
+    inline fun indexOf( predicate: (T) -> Boolean): Int {
+        return getC().indexOfFirst(predicate)
+    }
+
+    
+    fun lastIndexOf( element: T): Int {
+        return getC().lastIndexOf(element)
+    }
+
+    
+    inline fun lastIndexOf( predicate: (T) -> Boolean): Int {
+        return getC().indexOfLast(predicate)
+    }
+
+    
+    fun drop( n: Int): List<T> {
+        return getC().drop(n)
+    }
+
+    
+    inline fun dropWhile( predicate: (T) -> Boolean): List<T> {
+        return getC().dropWhile(predicate)
+    }
+
+    
+    fun take( n: Int): List<T> {
+        return getC().take(n)
+    }
+
+    
+    inline fun takeWhile( predicate: (T) -> Boolean): List<T> {
+        return getC().takeWhile(predicate)
+    }
+
+    
+    inline fun filter( predicate: (T) -> Boolean): List<T> {
+        return getC().filter(predicate)
+    }
+
+    
+    inline fun filterIndexed( predicate: (index: Int, T) -> Boolean): List<T> {
+        return getC().filterIndexed(predicate)
+    }
+
+    
+//    fun <T : Any> filterNotNull(iterable: Iterable<T?>): List<T> {
+//        return getC().filterNotNull()
+//    }
+
+    
+    inline fun <C : MutableCollection<in T>> filterTo(
+        
+        destination: C,
+        predicate: (T) -> Boolean
+    ): C {
+        return getC().filterTo(destination, predicate)
+    }
+
+    
+    inline fun <C : MutableCollection<in T>> filterIndexedTo(
+        
+        destination: C,
+        predicate: (index: Int, T) -> Boolean
+    ): C {
+        return getC().filterIndexedTo(destination, predicate)
+    }
+
+    
+//    fun <C : MutableCollection<in T>, T : Any> filterNotNullTo(
+//        iterable: Iterable<T?>,
+//        destination: C
+//    ): C {
+//        return getC().filterNotNullTo(destination)
+//    }
+
+    
+    inline fun <R> map( transform: (T) -> R): List<R> {
+        return getC().map(transform)
+    }
+
+    
+    inline fun <R> mapIndexed( transform: (index: Int, T) -> R): List<R> {
+        return getC().mapIndexed(transform)
+    }
+
+    
+    inline fun <R> mapNotNull( transform: (T) -> R): List<R> {
+        return getC().mapNotNull(transform)
+    }
+
+    
+    inline fun <R> mapIndexedNotNull( transform: (index: Int, T) -> R): List<R> {
+        return getC().mapIndexedNotNull(transform)
+    }
+
+    
+    inline fun <R, C : MutableCollection<in R>> mapTo(
+        
+        destination: C,
+        transform: (T) -> R
+    ): C {
+        return getC().mapTo(destination, transform)
+    }
+
+    
+    inline fun <R, C : MutableCollection<in R>> mapIndexedTo(
+        
+        destination: C,
+        transform: (index: Int, T) -> R
+    ): C {
+        return getC().mapIndexedTo(destination, transform)
+    }
+
+    
+    inline fun <R : Any, C : MutableCollection<in R>> mapNotNullTo(
+        
+        destination: C,
+        transform: (T) -> R?
+    ): C {
+        return getC().mapNotNullTo(destination, transform)
+    }
+
+    
+    inline fun <R : Any, C : MutableCollection<in R>> mapIndexedNotNullTo(
+        
+        destination: C,
+        transform: (index: Int, T) -> R?
+    ): C {
+        return getC().mapIndexedNotNullTo(destination, transform)
+    }
+
+    
+    inline fun <R> flatMap( transform: (T) -> Iterable<R>): List<R> {
+        return getC().flatMap(transform)
+    }
+
+    
+    inline fun <R> flatMapIndexed( transform: (index: Int, T) -> Iterable<R>): List<R> {
+        return getC().flatMapIndexed(transform)
+    }
+
+    
+    inline fun <R, C : MutableCollection<in R>> flatMapTo(
+        
+        destination: C,
+        transform: (T) -> Iterable<R>
+    ): C {
+        return getC().flatMapTo(destination, transform)
+    }
+
+    
+    inline fun <R, C : MutableCollection<in R>> flatMapIndexedTo(
+        
+        destination: C,
+        transform: (index: Int, T) -> Iterable<R>
+    ): C {
+        return getC().flatMapIndexedTo(destination, transform)
+    }
+
+    
+    inline fun <S, T : S> reduce( operation: (S, T) -> S): S {
+        return getC().reduce(operation)
+    }
+
+    
+    inline fun <S, T : S> reduceIndexed( operation: (index: Int, S, T) -> S): S {
+        return getC().reduceIndexed(operation)
+    }
+
+    
+    inline fun <S, T : S> reduceOrNull( operation: (S, T) -> S): S? {
+        return getC().reduceOrNull(operation)
+    }
+
+    
+    inline fun <S, T : S> reduceIndexedOrNull( operation: (index: Int, S, T) -> S): S? {
+        return getC().reduceIndexedOrNull(operation)
+    }
+
+    
+    inline fun <R> reduce(
+        
+        initial: R,
+        operation: (R, T) -> R
+    ): R {
+        return getC().fold(initial, operation)
+    }
+
+    
+    inline fun <R> reduceIndexed(
+        
+        initial: R,
+        operation: (index: Int, R, T) -> R
+    ): R {
+        return getC().foldIndexed(initial, operation)
+    }
+
+    
+    inline fun <K, V> associate(
+        
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): Map<K, V> {
+        return getC().associateBy(keySelector, valueTransform)
+    }
+
+    
+    inline fun <K, V> associate( transform: (T) -> Pair<K, V>): Map<K, V> {
+        return getC().associate(transform)
+    }
+
+    
+    inline fun <K> associateKey( keySelector: (T) -> K): Map<K, T> {
+        return getC().associateBy(keySelector)
+    }
+
+    
+    inline fun <V> associateValue( valueSelector: (T) -> V): Map<V> {
+        return getC().associateWith(valueSelector)
+    }
+
+    
+    inline fun <K, V> associateWithNext(
+        
+        keySelector: (T) -> K,
+        valueTransform: (T?) -> V
+    ): Map<K, V> {
+        return associateWithNextTo(iterable, LinkedHashMap(), keySelector, valueTransform)
+    }
+
+    
+    inline fun <K, V> associateWithNext( transform: (T, T?) -> Pair<K, V>): Map<K, V> {
+        return associateWithNextTo(iterable, LinkedHashMap(), transform)
+    }
+
+    
+    inline fun <K, V, M : MutableMap<in K, in V>> associateTo(
+        
+        destination: M,
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): M {
+        return getC().associateByTo(destination, keySelector, valueTransform)
+    }
+
+    
+    inline fun <K, V, M : MutableMap<in K, in V>> associateTo(
+        
+        destination: M,
+        transform: (T) -> Pair<K, V>
+    ): M {
+        return getC().associateTo(destination, transform)
+    }
+
+    
+    inline fun <K, M : MutableMap<in K, in T>> associateKeyTo(
+        
+        destination: M,
+        keySelector: (T) -> K
+    ): M {
+        return getC().associateByTo(destination, keySelector)
+    }
+
+    
+    inline fun <V, M : MutableMap<in T, in V>> associateValueTo(
+        
+        destination: M,
+        valueSelector: (T) -> V
+    ): M {
+        return getC().associateWithTo(destination, valueSelector)
+    }
+
+    
+    inline fun <K, V, M : MutableMap<in K, in V>> associateWithNextTo(
+        
+        destination: M,
+        keySelector: (T) -> K,
+        valueTransform: (T?) -> V
+    ): M {
+        val iterator = getC().iterator()
+        while (iterator.hasNext()) {
+            val tk = iterator.next()
+            val k = keySelector(tk)
+            if (iterator.hasNext()) {
+                val tv = iterator.next()
+                val v = valueTransform(tv)
+                destination.put(k, v)
+            } else {
+                val v = valueTransform(null)
+                destination.put(k, v)
+                break
+            }
+        }
+        return destination
+    }
+
+    
+    inline fun <K, V, M : MutableMap<in K, in V>> associateWithNextTo(
+        
+        destination: M,
+        transform: (T, T?) -> Pair<K, V>
+    ): M {
+        val iterator = getC().iterator()
+        while (iterator.hasNext()) {
+            val tk = iterator.next()
+            if (iterator.hasNext()) {
+                val tv = iterator.next()
+                val pair = transform(tk, tv)
+                destination.put(pair.first, pair.second)
+            } else {
+                val pair = transform(tk, null)
+                destination.put(pair.first, pair.second)
+                break
+            }
+        }
+        return destination
+    }
+
+    
+    inline fun <K> groupBy( keySelector: (T) -> K): Map<K, List<T>> {
+        return getC().groupBy(keySelector)
+    }
+
+    
+    inline fun <K, V> groupBy(
+        
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): Map<K, List<V>> {
+        return getC().groupBy(keySelector, valueTransform)
+    }
+
+    
+    inline fun <K, M : MutableMap<in K, MutableList<T>>> groupByTo(
+        
+        destination: M,
+        keySelector: (T) -> K
+    ): M {
+        return getC().groupByTo(destination, keySelector)
+    }
+
+    
+    inline fun <K, V, M : MutableMap<in K, MutableList<V>>> groupByTo(
+        
+        destination: M,
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): M {
+        return getC().groupByTo(destination, keySelector, valueTransform)
+    }
+
+    
+    fun chunked( size: Int): List<List<T>> {
+        return getC().chunked(size)
+    }
+
+    
+    fun <R> chunked(
+        
+        size: Int,
+        transform: (List<T>) -> R
+    ): List<R> {
+        return getC().chunked(size, transform)
+    }
+
+    
+    fun windowed(
+        
+        size: Int,
+        step: Int = 1,
+        partialWindows: Boolean = false
+    ): List<List<T>> {
+        return getC().windowed(size, step, partialWindows)
+    }
+
+    
+    fun <R> windowed(
+        
+        size: Int,
+        step: Int = 1,
+        partialWindows: Boolean = false,
+        transform: (List<T>) -> R
+    ): List<R> {
+        return getC().windowed(size, step, partialWindows, transform)
+    }
+
+    
+    inline fun <R, V> zip(
+        
+        other: Array<out R>,
+        transform: (T, R) -> V
+    ): List<V> {
+        return getC().zip(other, transform)
+    }
+
+    
+    inline fun <R, V> zip(
+        
+        other: Iterable<R>,
+        transform: (T, R) -> V
+    ): List<V> {
+        return getC().zip(other, transform)
+    }
+
+    
+    inline fun <R> zipWithNext( transform: (T, T) -> R): List<R> {
+        return getC().zipWithNext(transform)
+    }
+
+    
+    fun <T : Comparable<T>> max(): T {
+        return Require.notNull(maxOrNull(iterable))
+    }
+
+    
+    fun <T : Comparable<T>> maxOrNull(): T? {
+        return getC().maxOrNull()
+    }
+
+    
+    fun max( comparator: Comparator<in T>): T {
+        return Require.notNull(maxOrNull(iterable, comparator))
+    }
+
+    
+    fun maxOrNull( comparator: Comparator<in T>): T? {
+        return getC().maxWithOrNull(comparator)
+    }
+
+    
+    fun <T : Comparable<T>> min(): T {
+        return Require.notNull(minOrNull(iterable))
+    }
+
+    
+    fun <T : Comparable<T>> minOrNull(): T? {
+        return getC().minOrNull()
+    }
+
+    
+    fun min( comparator: Comparator<in T>): T {
+        return Require.notNull(minOrNull(iterable, comparator))
+    }
+
+    
+    fun minOrNull( comparator: Comparator<in T>): T? {
+        return getC().minWithOrNull(comparator)
+    }
+
+    
+    fun sumInt(): Int {
+        return sumInt(iterable) { To.toInt(it) }
+    }
+
+    
+    fun sumLong(): Long {
+        return sumLong(iterable) { To.toLong(it) }
+    }
+
+    
+    fun sumDouble(): Double {
+        return sumDouble(iterable) { To.toDouble(it) }
+    }
+
+    
+    fun sumBigInteger(): BigInteger {
+        return sumBigInteger(iterable) { To.toBigInteger(it) }
+    }
+
+    
+    fun sumBigDecimal(): BigDecimal {
+        return sumBigDecimal(iterable) { To.toBigDecimal(it) }
+    }
+
+    
+    inline fun sumInt( selector: (T) -> Int): Int {
+        return getC().sumOf(selector)
+    }
+
+    
+    inline fun sumLong( selector: (T) -> Long): Long {
+        return getC().sumOf(selector)
+    }
+
+    
+    fun sumDouble( selector: (T) -> Double): Double {
+        return getC().sumOf(selector)
+    }
+
+    
+    fun sumBigInteger( selector: (T) -> BigInteger): BigInteger {
+        return getC().sumOf(selector)
+    }
+
+    
+    fun sumBigDecimal( selector: (T) -> BigDecimal): BigDecimal {
+        return getC().sumOf(selector)
+    }
+
+    
+    fun intersect( other: Iterable<T>): Set<T> {
+        return getC().intersect(other)
+    }
+
+    
+    fun union( other: Iterable<T>): Set<T> {
+        return getC().union(other)
+    }
+
+    
+    fun subtract( other: Iterable<T>): Set<T> {
+        return getC().subtract(other)
+    }
+
+    
+    fun reversed(): List<T> {
+        return getC().reversed()
+    }
+
+    
+    fun <T : Comparable<T>> sorted(): List<T> {
+        return getC().sorted()
+    }
+
+    
+    fun sorted( comparator: Comparator<in T>): List<T> {
+        return getC().sortedWith(comparator)
+    }
+
+    
+    fun shuffled(): List<T> {
+        return getC().shuffled()
+    }
+
+    
+    fun shuffled( random: Random): List<T> {
+        return getC().shuffled(random)
+    }
+
+    
+    fun distinct(): List<T> {
+        return getC().distinct()
+    }
+
+    
+    inline fun <K> distinct( selector: (T) -> K): List<T> {
+        return getC().distinctBy(selector)
+    }
+
+    
+    inline fun forEachIndexed( action: (index: Int, T) -> Unit) {
+        return getC().forEachIndexed(action)
+    }
+
+    
+    fun removeAll(iterable: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {
+        return getC().removeAll(predicate)
+    }
+
+    
+    fun removeFirst(iterable: MutableIterable<T>): T {
+        val iterator = getC().iterator()
+        Check.checkElement(iterator.hasNext(), "Iterable is empty.")
+        val first = iterator.next()
+        iterator.remove()
+        return first
+    }
+
+    
+    fun removeFirstOrNull(iterable: MutableIterable<T>): T? {
+        val iterator = getC().iterator()
+        if (!iterator.hasNext()) {
+            return null
+        }
+        val first = iterator.next()
+        iterator.remove()
+        return first
+    }
+
+    
+    fun removeLast(iterable: MutableIterable<T>): T {
+        val iterator = getC().iterator()
+        Check.checkElement(iterator.hasNext(), "Iterable is empty.")
+        var last = iterator.next()
+        while (iterator.hasNext()) {
+            last = iterator.next()
+        }
+        iterator.remove()
+        return last
+    }
+
+    
+    fun removeLastOrNull(iterable: MutableIterable<T>): T? {
+        val iterator = getC().iterator()
+        if (!iterator.hasNext()) {
+            return null
+        }
+        var last = iterator.next()
+        while (iterator.hasNext()) {
+            last = iterator.next()
+        }
+        iterator.remove()
+        return last
+    }
+
+    
+    fun retainAll(iterable: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {
+        return getC().retainAll(predicate)
+    }
+
+    
+    fun plus( element: T): List<T> {
+        return getC().plus(element)
+    }
+
+    
+    fun plus( elements: Array<out T>): List<T> {
+        return getC().plus(elements)
+    }
+
+    
+    fun plus( elements: Iterable<T>): List<T> {
+        return getC().plus(elements)
+    }
+
+    
+    fun minus( element: T): List<T> {
+        return getC().minus(element)
+    }
+
+    
+    fun minus( elements: Array<out T>): List<T> {
+        return getC().minus(elements)
+    }
+
+    
+    fun minus( elements: Iterable<T>): List<T> {
+        return getC().minus(elements)
+    }
+
+    
+    fun <C : MutableCollection<in T>> toCollection( destination: C): C {
+        return getC().toCollection(destination)
+    }
+
+    
+    fun toSet(): Set<T> {
+        return getC().toSet()
+    }
+
+    
+    fun toMutableSet(): MutableSet<T> {
+        return getC().toMutableSet()
+    }
+
+    
+    fun toHashSet(): HashSet<T> {
+        return getC().toHashSet()
+    }
+
+    
+    fun toSortedSet(): SortedSet<T> {
+        return toSortedSet(iterable, Sort.selfComparableComparator())
+    }
+
+    
+    fun toSortedSet( comparator: Comparator<in T>): SortedSet<T> {
+        return getC().toSortedSet(comparator)
+    }
+
+    
+    fun toList(): List<T> {
+        return getC().toList()
+    }
+
+    
+    fun toMutableList(): MutableList<T> {
+        return getC().toMutableList()
+    }
+
+    
+    fun toStream(): Stream<T> {
+        return toStream(iterable, false)
+    }
+
+    
+    fun toStream( parallel: Boolean): Stream<T> {
+        return StreamSupport.stream(getC().spliterator(), parallel)
+    }
+
+    
+    fun toArray(): Array<Any?> {
+        val list = toList(iterable)
+        val result = arrayOfNulls<Any?>(list.size)
+        list.forEachIndexed { i, t -> result[i] = t }
+        return result
+    }
+
+    
+    inline fun toArray( generator: (size: Int) -> Array<T>): Array<T> {
+        val list = toList(iterable)
+        val result = generator(list.size)
+        list.forEachIndexed { i, t -> result[i] = t }
+        return result
+    }
+
+    
+    fun toBooleanArray(): BooleanArray {
+        return toBooleanArray(iterable) { To.toBoolean(it) }
+    }
+
+    
+    inline fun toBooleanArray( selector: (T) -> Boolean): BooleanArray {
+        val list = toList(iterable)
+        val result = BooleanArray(list.size)
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+        return result
+    }
+
+    
+    fun toByteArray(): ByteArray {
+        return toByteArray(iterable) { To.toByte(it) }
+    }
+
+    
+    inline fun toByteArray( selector: (T) -> Byte): ByteArray {
+        val list = toList(iterable)
+        val result = ByteArray(list.size)
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+        return result
+    }
+
+    
+    fun toShortArray(): ShortArray {
+        return toShortArray(iterable) { To.toShort(it) }
+    }
+
+    
+    inline fun toShortArray( selector: (T) -> Short): ShortArray {
+        val list = toList(iterable)
+        val result = ShortArray(list.size)
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+        return result
+    }
+
+    
+    fun toCharArray(): CharArray {
+        return toCharArray(iterable) { To.toChar(it) }
+    }
+
+    
+    inline fun toCharArray( selector: (T) -> Char): CharArray {
+        val list = toList(iterable)
+        val result = CharArray(list.size)
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+        return result
+    }
+
+    
+    fun toIntArray(): IntArray {
+        return toIntArray(iterable) { To.toInt(it) }
+    }
+
+    
+    inline fun toIntArray( selector: (T) -> Int): IntArray {
+        val list = toList(iterable)
+        val result = IntArray(list.size)
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+        return result
+    }
+
+    
+    fun toLongArray(): LongArray {
+        return toLongArray(iterable) { To.toLong(it) }
+    }
+
+    
+    inline fun toLongArray( selector: (T) -> Long): LongArray {
+        val list = toList(iterable)
+        val result = LongArray(list.size)
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+        return result
+    }
+
+    
+    fun toFloatArray(): FloatArray {
+        return toFloatArray(iterable) { To.toFloat(it) }
+    }
+
+    
+    inline fun toFloatArray( selector: (T) -> Float): FloatArray {
+        val list = toList(iterable)
+        val result = FloatArray(list.size)
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+        return result
+    }
+
+    
+    fun toDoubleArray(): DoubleArray {
+        return toDoubleArray(iterable) { To.toDouble(it) }
+    }
+
+    
+    inline fun toDoubleArray( selector: (T) -> Double): DoubleArray {
+        val list = toList(iterable)
+        val result = DoubleArray(list.size)
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+        return result
+    }
+    
+    abstract fun getC(): CX
 
     companion object {
-
-        @JvmStatic
-        fun <T> opsFor(iterable: Iterable<T>): IterableOps<T> {
-            return IterableOps(iterable)
-        }
 
         @JvmStatic
         inline fun <T> find(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {

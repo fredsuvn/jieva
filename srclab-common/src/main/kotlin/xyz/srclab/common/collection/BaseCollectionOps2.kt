@@ -12,20 +12,12 @@ import java.util.stream.StreamSupport
 import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 
-open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
-
-    protected open var inProcess: Iterable<T>? = iterable
-    protected open var sequence: Sequence<T>? = null
-
-
-
+/**
+ * @author sunqian
+ */
+interface BaseCollectionOps2 {
 
     companion object {
-
-        @JvmStatic
-        fun <T> opsFor(iterable: Iterable<T>): IterableOps<T> {
-            return IterableOps(iterable)
-        }
 
         @JvmStatic
         inline fun <T> find(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
@@ -35,6 +27,11 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         @JvmStatic
         inline fun <T> findLast(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
             return iterable.findLast(predicate)
+        }
+
+        @JvmStatic
+        inline fun <T> findLast(list: List<T>, predicate: (T) -> Boolean): T? {
+            return list.findLast(predicate)
         }
 
         @JvmStatic
@@ -58,6 +55,16 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         }
 
         @JvmStatic
+        fun <T> first(list: List<T>): T {
+            return list.first()
+        }
+
+        @JvmStatic
+        fun <T> firstOrNull(list: List<T>): T? {
+            return list.firstOrNull()
+        }
+
+        @JvmStatic
         fun <T> last(iterable: Iterable<T>): T {
             return iterable.last()
         }
@@ -75,6 +82,26 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         @JvmStatic
         inline fun <T> lastOrNull(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
             return iterable.lastOrNull(predicate)
+        }
+
+        @JvmStatic
+        fun <T> last(list: List<T>): T {
+            return list.last()
+        }
+
+        @JvmStatic
+        inline fun <T> last(list: List<T>, predicate: (T) -> Boolean): T {
+            return list.last(predicate)
+        }
+
+        @JvmStatic
+        fun <T> lastOrNull(list: List<T>): T? {
+            return list.lastOrNull()
+        }
+
+        @JvmStatic
+        inline fun <T> lastOrNull(list: List<T>, predicate: (T) -> Boolean): T? {
+            return list.lastOrNull(predicate)
         }
 
         @JvmStatic
@@ -123,6 +150,16 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         }
 
         @JvmStatic
+        fun <T> single(list: List<T>): T {
+            return list.single()
+        }
+
+        @JvmStatic
+        fun <T> singleOrNull(list: List<T>): T? {
+            return list.singleOrNull()
+        }
+
+        @JvmStatic
         fun <T> contains(iterable: Iterable<T>, element: T): Boolean {
             return iterable.contains(element)
         }
@@ -135,6 +172,11 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         @JvmStatic
         inline fun <T> count(iterable: Iterable<T>, predicate: (T) -> Boolean): Int {
             return iterable.count(predicate)
+        }
+
+        @JvmStatic
+        fun <T> count(collection: Collection<T>): Int {
+            return collection.count()
         }
 
         @JvmStatic
@@ -154,6 +196,21 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         @JvmStatic
         fun <T> elementAtOrNull(iterable: Iterable<T>, index: Int): T? {
             return iterable.elementAtOrNull(index)
+        }
+
+        @JvmStatic
+        fun <T> elementAt(list: List<T>, index: Int): T {
+            return list.elementAt(index)
+        }
+
+        @JvmStatic
+        inline fun <T> elementAtOrElse(list: List<T>, index: Int, defaultValue: (Int) -> T): T {
+            return list.elementAtOrElse(index, defaultValue)
+        }
+
+        @JvmStatic
+        fun <T> elementAtOrNull(list: List<T>, index: Int): T? {
+            return list.elementAtOrNull(index)
         }
 
         @JvmStatic
@@ -177,6 +234,26 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         }
 
         @JvmStatic
+        fun <T> indexOf(list: List<T>, element: T): Int {
+            return list.indexOf(element)
+        }
+
+        @JvmStatic
+        inline fun <T> indexOf(list: List<T>, predicate: (T) -> Boolean): Int {
+            return list.indexOfFirst(predicate)
+        }
+
+        @JvmStatic
+        fun <T> lastIndexOf(list: List<T>, element: T): Int {
+            return list.lastIndexOf(element)
+        }
+
+        @JvmStatic
+        inline fun <T> lastIndexOf(list: List<T>, predicate: (T) -> Boolean): Int {
+            return list.indexOfLast(predicate)
+        }
+
+        @JvmStatic
         fun <T> drop(iterable: Iterable<T>, n: Int): List<T> {
             return iterable.drop(n)
         }
@@ -187,6 +264,16 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         }
 
         @JvmStatic
+        fun <T> dropLast(list: List<T>, n: Int): List<T> {
+            return list.dropLast(n)
+        }
+
+        @JvmStatic
+        inline fun <T> dropLastWhile(list: List<T>, predicate: (T) -> Boolean): List<T> {
+            return list.dropLastWhile(predicate)
+        }
+
+        @JvmStatic
         fun <T> take(iterable: Iterable<T>, n: Int): List<T> {
             return iterable.take(n)
         }
@@ -194,6 +281,31 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         @JvmStatic
         inline fun <T> takeWhile(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
             return iterable.takeWhile(predicate)
+        }
+
+        @JvmStatic
+        fun <T> takeLast(list: List<T>, n: Int): List<T> {
+            return list.takeLast(n)
+        }
+
+        @JvmStatic
+        inline fun <T> takeLastWhile(list: List<T>, predicate: (T) -> Boolean): List<T> {
+            return list.takeLastWhile(predicate)
+        }
+
+        @JvmStatic
+        fun <T> slice(list: List<T>, indices: IntArray): List<T> {
+            return slice(list, indices.asIterable())
+        }
+
+        @JvmStatic
+        fun <T> slice(list: List<T>, indices: Iterable<Int>): List<T> {
+            return list.slice(indices)
+        }
+
+        @JvmStatic
+        fun <T> slice(list: List<T>, indices: IntRange): List<T> {
+            return list.slice(indices)
         }
 
         @JvmStatic
@@ -235,6 +347,14 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
             destination: C
         ): C {
             return iterable.filterNotNullTo(destination)
+        }
+
+        fun <T> binarySearch(list: List<T>, element: T): Int {
+            return list.binarySearch(element, Sort.selfComparableComparator())
+        }
+
+        fun <T> binarySearch(list: List<T>, element: T, comparator: Comparator<in T>): Int {
+            return list.binarySearch(element, comparator)
         }
 
         @JvmStatic
@@ -342,6 +462,29 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         }
 
         @JvmStatic
+        inline fun <S, T : S> reduceRight(list: List<T>, operation: (T, S) -> S): S {
+            return list.reduceRight(operation)
+        }
+
+        @JvmStatic
+        inline fun <S, T : S> reduceRightIndexed(list: List<T>, operation: (Int, T, S) -> S): S {
+            return list.reduceRightIndexed(operation)
+        }
+
+        @JvmStatic
+        inline fun <S, T : S> reduceRightOrNull(list: List<T>, operation: (T, S) -> S): S? {
+            return list.reduceRightOrNull(operation)
+        }
+
+        @JvmStatic
+        inline fun <S, T : S> reduceRightIndexedOrNull(
+            list: List<T>,
+            operation: (Int, T, S) -> S
+        ): S? {
+            return list.reduceRightIndexedOrNull(operation)
+        }
+
+        @JvmStatic
         inline fun <T, R> reduce(
             iterable: Iterable<T>,
             initial: R,
@@ -357,6 +500,20 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
             operation: (index: Int, R, T) -> R
         ): R {
             return iterable.foldIndexed(initial, operation)
+        }
+
+        @JvmStatic
+        inline fun <T, R> reduceRight(list: List<T>, initial: R, operation: (T, R) -> R): R {
+            return list.foldRight(initial, operation)
+        }
+
+        @JvmStatic
+        inline fun <T, R> reduceRightIndexed(
+            list: List<T>,
+            initial: R,
+            operation: (Int, T, R) -> R
+        ): R {
+            return list.foldRightIndexed(initial, operation)
         }
 
         @JvmStatic
@@ -677,8 +834,23 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         }
 
         @JvmStatic
+        fun <T> reverse(list: MutableList<T>) {
+            list.reverse()
+        }
+
+        @JvmStatic
         fun <T> reversed(iterable: Iterable<T>): List<T> {
             return iterable.reversed()
+        }
+
+        @JvmStatic
+        fun <T : Comparable<T>> sort(list: MutableList<T>) {
+            list.sort()
+        }
+
+        @JvmStatic
+        fun <T> sort(list: MutableList<T>, comparator: Comparator<in T>) {
+            list.sortWith(comparator)
         }
 
         @JvmStatic
@@ -689,6 +861,16 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         @JvmStatic
         fun <T> sorted(iterable: Iterable<T>, comparator: Comparator<in T>): List<T> {
             return iterable.sortedWith(comparator)
+        }
+
+        @JvmStatic
+        fun <T> shuffle(list: MutableList<T>) {
+            list.shuffle()
+        }
+
+        @JvmStatic
+        fun <T> shuffle(list: MutableList<T>, random: Random) {
+            list.shuffle(random)
         }
 
         @JvmStatic
@@ -717,8 +899,38 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         }
 
         @JvmStatic
+        fun <T> addAll(collection: MutableCollection<T>, elements: Array<out T>): Boolean {
+            return collection.addAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> addAll(collection: MutableCollection<T>, elements: Iterable<T>): Boolean {
+            return collection.addAll(elements)
+        }
+
+        @JvmStatic
         fun <T> removeAll(iterable: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {
             return iterable.removeAll(predicate)
+        }
+
+        @JvmStatic
+        fun <T> removeAll(collection: MutableCollection<T>, elements: Array<out T>): Boolean {
+            return collection.removeAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> removeAll(collection: MutableCollection<T>, elements: Iterable<T>): Boolean {
+            return collection.removeAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> removeAll(collection: MutableCollection<T>, elements: Collection<T>): Boolean {
+            return collection.removeAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> removeAll(list: MutableList<T>, predicate: (T) -> Boolean): Boolean {
+            return list.removeAll(predicate)
         }
 
         @JvmStatic
@@ -739,6 +951,16 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
             val first = iterator.next()
             iterator.remove()
             return first
+        }
+
+        @JvmStatic
+        fun <T> removeFirst(list: MutableList<T>): T {
+            return list.removeFirst()
+        }
+
+        @JvmStatic
+        fun <T> removeFirstOrNull(list: MutableList<T>): T? {
+            return list.removeFirstOrNull()
         }
 
         @JvmStatic
@@ -768,8 +990,38 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         }
 
         @JvmStatic
+        fun <T> removeLast(list: MutableList<T>): T {
+            return list.removeLast()
+        }
+
+        @JvmStatic
+        fun <T> removeLastOrNull(list: MutableList<T>): T? {
+            return list.removeLastOrNull()
+        }
+
+        @JvmStatic
+        fun <T> retainAll(collection: MutableCollection<T>, elements: Array<out T>): Boolean {
+            return collection.retainAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> retainAll(collection: MutableCollection<T>, elements: Iterable<T>): Boolean {
+            return collection.retainAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> retainAll(collection: MutableCollection<T>, elements: Collection<T>): Boolean {
+            return collection.retainAll(elements)
+        }
+
+        @JvmStatic
         fun <T> retainAll(iterable: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {
             return iterable.retainAll(predicate)
+        }
+
+        @JvmStatic
+        fun <T> retainAll(list: MutableList<T>, predicate: (T) -> Boolean): Boolean {
+            return list.retainAll(predicate)
         }
 
         @JvmStatic
@@ -788,6 +1040,51 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         }
 
         @JvmStatic
+        fun <T> plus(iterable: Iterable<T>, elements: Sequence<T>): List<T> {
+            return iterable.plus(elements)
+        }
+
+        @JvmStatic
+        fun <T> plus(collection: Collection<T>, element: T): List<T> {
+            return collection.plus(element)
+        }
+
+        @JvmStatic
+        fun <T> plus(collection: Collection<T>, elements: Array<out T>): List<T> {
+            return collection.plus(elements)
+        }
+
+        @JvmStatic
+        fun <T> plus(collection: Collection<T>, elements: Iterable<T>): List<T> {
+            return collection.plus(elements)
+        }
+
+        @JvmStatic
+        fun <T> plus(collection: Collection<T>, elements: Sequence<T>): List<T> {
+            return collection.plus(elements)
+        }
+
+        @JvmStatic
+        fun <T> plus(set: Set<T>, element: T): Set<T> {
+            return set.plus(element)
+        }
+
+        @JvmStatic
+        fun <T> plus(set: Set<T>, elements: Array<out T>): Set<T> {
+            return set.plus(elements)
+        }
+
+        @JvmStatic
+        fun <T> plus(set: Set<T>, elements: Iterable<T>): Set<T> {
+            return set.plus(elements)
+        }
+
+        @JvmStatic
+        fun <T> plus(set: Set<T>, elements: Sequence<T>): Set<T> {
+            return set.plus(elements)
+        }
+
+        @JvmStatic
         fun <T> minus(iterable: Iterable<T>, element: T): List<T> {
             return iterable.minus(element)
         }
@@ -800,6 +1097,31 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         @JvmStatic
         fun <T> minus(iterable: Iterable<T>, elements: Iterable<T>): List<T> {
             return iterable.minus(elements)
+        }
+
+        @JvmStatic
+        fun <T> minus(iterable: Iterable<T>, elements: Sequence<T>): List<T> {
+            return iterable.minus(elements)
+        }
+
+        @JvmStatic
+        fun <T> minus(set: Set<T>, element: T): Set<T> {
+            return set.minus(element)
+        }
+
+        @JvmStatic
+        fun <T> minus(set: Set<T>, elements: Array<out T>): Set<T> {
+            return set.minus(elements)
+        }
+
+        @JvmStatic
+        fun <T> minus(set: Set<T>, elements: Iterable<T>): Set<T> {
+            return set.minus(elements)
+        }
+
+        @JvmStatic
+        fun <T> minus(set: Set<T>, elements: Sequence<T>): Set<T> {
+            return set.minus(elements)
         }
 
         @JvmStatic
@@ -840,6 +1162,11 @@ open class IterableOps<T> protected constructor(iterable: Iterable<T>) {
         @JvmStatic
         fun <T> toMutableList(iterable: Iterable<T>): MutableList<T> {
             return iterable.toMutableList()
+        }
+
+        @JvmStatic
+        fun <T> toMutableList(collection: Collection<T>): MutableList<T> {
+            return collection.toMutableList()
         }
 
         @JvmStatic
