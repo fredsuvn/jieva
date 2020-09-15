@@ -11,7 +11,7 @@ object As {
     }
 
     @JvmStatic
-    fun <T : Any> notNull(any: Any): T {
+    fun <T : Any> notNull(any: Any?): T {
         return any as T
     }
 

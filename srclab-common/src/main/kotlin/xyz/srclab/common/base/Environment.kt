@@ -7,118 +7,34 @@ import java.util.*
  */
 object Environment {
 
-    const val JAVA_VERSION_KEY = "java.version"
-    const val JAVA_VENDOR_KEY = "java.vendor"
-    const val JAVA_VENDOR_URL_KEY = "java.vendor.url"
-    const val JAVA_HOME_KEY = "java.home"
-    const val JAVA_VM_SPECIFICATION_VERSION_KEY = "java.vm.specification.version"
-    const val JAVA_VM_SPECIFICATION_VENDOR_KEY = "java.vm.specification.vendor"
-    const val JAVA_VM_SPECIFICATION_NAME_KEY = "java.vm.specification.name"
-    const val JAVA_VM_VERSION_KEY = "java.vm.version"
-    const val JAVA_VM_VENDOR_KEY = "java.vm.vendor"
-    const val JAVA_VM_NAME_KEY = "java.vm.name"
-    const val JAVA_SPECIFICATION_VERSION_KEY = "java.specification.version"
-    const val JAVA_SPECIFICATION_VENDOR_KEY = "java.specification.vendor"
-    const val JAVA_SPECIFICATION_NAME_KEY = "java.specification.name"
-    const val JAVA_CLASS_VERSION_KEY = "java.class.version"
-    const val JAVA_CLASS_PATH_KEY = "java.class.path"
-    const val JAVA_LIBRARY_PATH_KEY = "java.library.path"
-    const val JAVA_IO_TMPDIR_KEY = "java.io.tmpdir"
-    const val JAVA_COMPILER_KEY = "java.compiler"
-    const val JAVA_EXT_DIRS_KEY = "java.ext.dirs"
-    const val OS_NAME_KEY = "os.name"
-    const val OS_ARCH_KEY = "os.arch"
-    const val OS_VERSION_KEY = "os.version"
-    const val FILE_SEPARATOR_KEY = "file.separator"
-    const val PATH_SEPARATOR_KEY = "path.separator"
-    const val LINE_SEPARATOR_KEY = "line.separator"
-    const val USER_NAME_KEY = "user.name"
-    const val USER_HOME_KEY = "user.home"
-    const val USER_DIR_KEY = "user.dir"
-
-    @JvmStatic
-    fun javaVersion(): String? = getSystemProperty(JAVA_VERSION_KEY)
-
-    @JvmStatic
-    fun javaVendor(): String? = getSystemProperty(JAVA_VENDOR_KEY)
-
-    @JvmStatic
-    fun javaVendorUrl(): String? = getSystemProperty(JAVA_VENDOR_URL_KEY)
-
-    @JvmStatic
-    fun javaHome(): String? = getSystemProperty(JAVA_HOME_KEY)
-
-    @JvmStatic
-    fun javaVmSpecificationVersion(): String? = getSystemProperty(JAVA_VM_SPECIFICATION_VERSION_KEY)
-
-    @JvmStatic
-    fun javaVmSpecificationVendor(): String? = getSystemProperty(JAVA_VM_SPECIFICATION_VENDOR_KEY)
-
-    @JvmStatic
-    fun javaVmSpecificationName(): String? = getSystemProperty(JAVA_VM_SPECIFICATION_NAME_KEY)
-
-    @JvmStatic
-    fun javaVmVersion(): String? = getSystemProperty(JAVA_VM_VERSION_KEY)
-
-    @JvmStatic
-    fun javaVmVendor(): String? = getSystemProperty(JAVA_VM_VENDOR_KEY)
-
-    @JvmStatic
-    fun javaVmName(): String? = getSystemProperty(JAVA_VM_NAME_KEY)
-
-    @JvmStatic
-    fun javaSpecificationVersion(): String? = getSystemProperty(JAVA_SPECIFICATION_VERSION_KEY)
-
-    @JvmStatic
-    fun javaSpecificationVendor(): String? = getSystemProperty(JAVA_SPECIFICATION_VENDOR_KEY)
-
-    @JvmStatic
-    fun javaSpecificationName(): String? = getSystemProperty(JAVA_SPECIFICATION_NAME_KEY)
-
-    @JvmStatic
-    fun javaClassVersion(): String? = getSystemProperty(JAVA_CLASS_VERSION_KEY)
-
-    @JvmStatic
-    fun javaClassPath(): String? = getSystemProperty(JAVA_CLASS_PATH_KEY)
-
-    @JvmStatic
-    fun javaLibraryPath(): String? = getSystemProperty(JAVA_LIBRARY_PATH_KEY)
-
-    @JvmStatic
-    fun javaIoTmpdir(): String? = getSystemProperty(JAVA_IO_TMPDIR_KEY)
-
-    @JvmStatic
-    fun javaCompiler(): String? = getSystemProperty(JAVA_COMPILER_KEY)
-
-    @JvmStatic
-    fun javaExtDirs(): String? = getSystemProperty(JAVA_EXT_DIRS_KEY)
-
-    @JvmStatic
-    fun osName(): String? = getSystemProperty(OS_NAME_KEY)
-
-    @JvmStatic
-    fun osArch(): String? = getSystemProperty(OS_ARCH_KEY)
-
-    @JvmStatic
-    fun osVersion(): String? = getSystemProperty(OS_VERSION_KEY)
-
-    @JvmStatic
-    fun fileSeparator(): String? = getSystemProperty(FILE_SEPARATOR_KEY)
-
-    @JvmStatic
-    fun pathSeparator(): String? = getSystemProperty(PATH_SEPARATOR_KEY)
-
-    @JvmStatic
-    fun lineSeparator(): String? = getSystemProperty(LINE_SEPARATOR_KEY)
-
-    @JvmStatic
-    fun userName(): String? = getSystemProperty(USER_NAME_KEY)
-
-    @JvmStatic
-    fun userHome(): String? = getSystemProperty(USER_HOME_KEY)
-
-    @JvmStatic
-    fun userDir(): String? = getSystemProperty(USER_DIR_KEY)
+    const val KEY_OF_JAVA_VERSION = "java.version"
+    const val KEY_OF_JAVA_VENDOR = "java.vendor"
+    const val KEY_OF_JAVA_VENDOR_URL = "java.vendor.url"
+    const val KEY_OF_JAVA_HOME = "java.home"
+    const val KEY_OF_JAVA_VM_SPECIFICATION_VERSION = "java.vm.specification.version"
+    const val KEY_OF_JAVA_VM_SPECIFICATION_VENDOR = "java.vm.specification.vendor"
+    const val KEY_OF_JAVA_VM_SPECIFICATION_NAME = "java.vm.specification.name"
+    const val KEY_OF_JAVA_VM_VERSION = "java.vm.version"
+    const val KEY_OF_JAVA_VM_VENDOR = "java.vm.vendor"
+    const val KEY_OF_JAVA_VM_NAME = "java.vm.name"
+    const val KEY_OF_JAVA_SPECIFICATION_VERSION = "java.specification.version"
+    const val KEY_OF_JAVA_SPECIFICATION_VENDOR = "java.specification.vendor"
+    const val KEY_OF_JAVA_SPECIFICATION_NAME = "java.specification.name"
+    const val KEY_OF_JAVA_CLASS_VERSION = "java.class.version"
+    const val KEY_OF_JAVA_CLASS_PATH = "java.class.path"
+    const val KEY_OF_JAVA_LIBRARY_PATH = "java.library.path"
+    const val KEY_OF_JAVA_IO_TMPDIR = "java.io.tmpdir"
+    const val KEY_OF_JAVA_COMPILER = "java.compiler"
+    const val KEY_OF_JAVA_EXT_DIRS = "java.ext.dirs"
+    const val KEY_OF_OS_NAME = "os.name"
+    const val KEY_OF_OS_ARCH = "os.arch"
+    const val KEY_OF_OS_VERSION = "os.version"
+    const val KEY_OF_FILE_SEPARATOR = "file.separator"
+    const val KEY_OF_PATH_SEPARATOR = "path.separator"
+    const val KEY_OF_LINE_SEPARATOR = "line.separator"
+    const val KEY_OF_USER_NAME = "user.name"
+    const val KEY_OF_USER_HOME = "user.home"
+    const val KEY_OF_USER_DIR = "user.dir"
 
     @JvmStatic
     fun getProperty(key: String): String? = getSystemProperty(key)
@@ -155,4 +71,88 @@ object Environment {
     fun variables(): Map<String, String> {
         return System.getenv()
     }
+
+    @JvmStatic
+    fun javaVersion(): String? = getSystemProperty(KEY_OF_JAVA_VERSION)
+
+    @JvmStatic
+    fun javaVendor(): String? = getSystemProperty(KEY_OF_JAVA_VENDOR)
+
+    @JvmStatic
+    fun javaVendorUrl(): String? = getSystemProperty(KEY_OF_JAVA_VENDOR_URL)
+
+    @JvmStatic
+    fun javaHome(): String? = getSystemProperty(KEY_OF_JAVA_HOME)
+
+    @JvmStatic
+    fun javaVmSpecificationVersion(): String? = getSystemProperty(KEY_OF_JAVA_VM_SPECIFICATION_VERSION)
+
+    @JvmStatic
+    fun javaVmSpecificationVendor(): String? = getSystemProperty(KEY_OF_JAVA_VM_SPECIFICATION_VENDOR)
+
+    @JvmStatic
+    fun javaVmSpecificationName(): String? = getSystemProperty(KEY_OF_JAVA_VM_SPECIFICATION_NAME)
+
+    @JvmStatic
+    fun javaVmVersion(): String? = getSystemProperty(KEY_OF_JAVA_VM_VERSION)
+
+    @JvmStatic
+    fun javaVmVendor(): String? = getSystemProperty(KEY_OF_JAVA_VM_VENDOR)
+
+    @JvmStatic
+    fun javaVmName(): String? = getSystemProperty(KEY_OF_JAVA_VM_NAME)
+
+    @JvmStatic
+    fun javaSpecificationVersion(): String? = getSystemProperty(KEY_OF_JAVA_SPECIFICATION_VERSION)
+
+    @JvmStatic
+    fun javaSpecificationVendor(): String? = getSystemProperty(KEY_OF_JAVA_SPECIFICATION_VENDOR)
+
+    @JvmStatic
+    fun javaSpecificationName(): String? = getSystemProperty(KEY_OF_JAVA_SPECIFICATION_NAME)
+
+    @JvmStatic
+    fun javaClassVersion(): String? = getSystemProperty(KEY_OF_JAVA_CLASS_VERSION)
+
+    @JvmStatic
+    fun javaClassPath(): String? = getSystemProperty(KEY_OF_JAVA_CLASS_PATH)
+
+    @JvmStatic
+    fun javaLibraryPath(): String? = getSystemProperty(KEY_OF_JAVA_LIBRARY_PATH)
+
+    @JvmStatic
+    fun javaIoTmpdir(): String? = getSystemProperty(KEY_OF_JAVA_IO_TMPDIR)
+
+    @JvmStatic
+    fun javaCompiler(): String? = getSystemProperty(KEY_OF_JAVA_COMPILER)
+
+    @JvmStatic
+    fun javaExtDirs(): String? = getSystemProperty(KEY_OF_JAVA_EXT_DIRS)
+
+    @JvmStatic
+    fun osName(): String? = getSystemProperty(KEY_OF_OS_NAME)
+
+    @JvmStatic
+    fun osArch(): String? = getSystemProperty(KEY_OF_OS_ARCH)
+
+    @JvmStatic
+    fun osVersion(): String? = getSystemProperty(KEY_OF_OS_VERSION)
+
+    @JvmStatic
+    fun fileSeparator(): String? = getSystemProperty(KEY_OF_FILE_SEPARATOR)
+
+    @JvmStatic
+    fun pathSeparator(): String? = getSystemProperty(KEY_OF_PATH_SEPARATOR)
+
+    @JvmStatic
+    fun lineSeparator(): String? = getSystemProperty(KEY_OF_LINE_SEPARATOR)
+
+    @JvmStatic
+    fun userName(): String? = getSystemProperty(KEY_OF_USER_NAME)
+
+    @JvmStatic
+    fun userHome(): String? = getSystemProperty(KEY_OF_USER_HOME)
+
+    @JvmStatic
+    fun userDir(): String? = getSystemProperty(KEY_OF_USER_DIR)
 }
