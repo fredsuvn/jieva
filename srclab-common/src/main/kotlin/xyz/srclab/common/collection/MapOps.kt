@@ -1,10 +1,16 @@
 package xyz.srclab.common.collection
 
-interface MapOps {
+class MapOps<K, V> private constructor(map: Map<K, V>) {
 
     companion object {
 
+        @JvmStatic
+        fun <K, V> opsFor(map: Map<K, V>): MapOps<K, V> {
+            return MapOps(map)
+        }
+
         fun <K, V> mutableEntry(key: K, value: V): MutableMap.MutableEntry<K, V> {
+
             return object : MutableMap.MutableEntry<K, V> {
 
                 private var _value: V = value

@@ -35,5 +35,7 @@ public class Tt {
 
         IterableOps.opsFor(list);
         BaseIterableOps b = null;
+
+        SequencesKt
     }
 }
