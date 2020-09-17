@@ -1,6 +1,5 @@
 package xyz.srclab.common.collection
 
-import xyz.srclab.common.base.Check
 import xyz.srclab.common.base.Require
 import xyz.srclab.common.base.Sort
 import xyz.srclab.common.base.To
@@ -675,75 +674,6 @@ object SequenceOps {
     }
 
     @JvmStatic
-    fun <T> removeAll(sequence: MutableIterable<T>): Boolean {
-        val iterator = sequence.iterator()
-        if (!iterator.hasNext()) {
-            return false
-        }
-        do {
-            iterator.next()
-            iterator.remove()
-        } while (iterator.hasNext())
-        return true
-    }
-
-    @JvmStatic
-    fun <T> removeAll(sequence: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {
-        return sequence.removeAll(predicate)
-    }
-
-    @JvmStatic
-    fun <T> removeFirst(sequence: MutableIterable<T>): T {
-        val iterator = sequence.iterator()
-        Check.checkElement(iterator.hasNext(), "Iterable is empty.")
-        val first = iterator.next()
-        iterator.remove()
-        return first
-    }
-
-    @JvmStatic
-    fun <T> removeFirstOrNull(sequence: MutableIterable<T>): T? {
-        val iterator = sequence.iterator()
-        if (!iterator.hasNext()) {
-            return null
-        }
-        val first = iterator.next()
-        iterator.remove()
-        return first
-    }
-
-    @JvmStatic
-    fun <T> removeLast(sequence: MutableIterable<T>): T {
-        val iterator = sequence.iterator()
-        Check.checkElement(iterator.hasNext(), "Iterable is empty.")
-        var last = iterator.next()
-        while (iterator.hasNext()) {
-            last = iterator.next()
-        }
-        iterator.remove()
-        return last
-    }
-
-    @JvmStatic
-    fun <T> removeLastOrNull(sequence: MutableIterable<T>): T? {
-        val iterator = sequence.iterator()
-        if (!iterator.hasNext()) {
-            return null
-        }
-        var last = iterator.next()
-        while (iterator.hasNext()) {
-            last = iterator.next()
-        }
-        iterator.remove()
-        return last
-    }
-
-    @JvmStatic
-    fun <T> retainAll(sequence: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {
-        return sequence.retainAll(predicate)
-    }
-
-    @JvmStatic
     fun <T> plus(sequence: Sequence<T>, element: T): Sequence<T> {
         return sequence.plus(element)
     }
@@ -821,6 +751,12 @@ object SequenceOps {
     @JvmStatic
     fun <T> toStream(sequence: Sequence<T>, parallel: Boolean): Stream<T> {
         return StreamSupport.stream(sequence.asIterable().spliterator(), parallel)
+    }
+
+    @JvmStatic
+    fun <T> toArray(sequence: Sequence<T>): Array<Any?> {
+        val list = toCollection(sequence, LinkedList())
+        return list.toArray()
     }
 
     @JvmStatic
