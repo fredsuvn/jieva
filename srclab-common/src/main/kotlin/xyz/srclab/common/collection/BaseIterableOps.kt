@@ -9,7 +9,7 @@ import java.util.stream.StreamSupport
 import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 
-abstract class BaseIterableOps<T, I : Iterable<T>, MI : MutableIterable<T>, O : BaseIterableOps<T, I, MI, O>>
+abstract class BaseIterableOps<T, I : Iterable<T>, MI : MutableIterable<T>, THIS : BaseIterableOps<T, I, MI, THIS>>
 protected constructor(operated: I) {
 
     protected var processed: I? = operated
@@ -17,13 +17,19 @@ protected constructor(operated: I) {
 
     private var mode = IMMEDIATE_MODE
 
-    protected abstract fun sequenceToCollection(sequence: Sequence<T>): I
-
     protected abstract fun <T> toListOps(iterable: Iterable<T>): ListOps<T>
 
     protected abstract fun <T> toListOps(sequence: Sequence<T>): ListOps<T>
 
-    fun lazyMode(): O {
+    protected abstract fun <T> toSetOps(iterable: Iterable<T>): SetOps<T>
+
+    protected abstract fun <T> toSetOps(sequence: Sequence<T>): SetOps<T>
+
+    protected abstract fun <K, V> toMapOps(map: Map<K, V>): MapOps<K, V>
+
+    protected abstract fun sequenceToCollection(sequence: Sequence<T>): I
+
+    fun lazyMode(): THIS {
         if (mode == LAZY_MODE) {
             return asThis()
         }
@@ -39,7 +45,7 @@ protected constructor(operated: I) {
         return asThis()
     }
 
-    fun immediateMode(): O {
+    fun immediateMode(): THIS {
         if (mode == IMMEDIATE_MODE) {
             return asThis()
         }
@@ -57,184 +63,184 @@ protected constructor(operated: I) {
 
     fun find(predicate: (T) -> Boolean): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().find(predicate)
-            LAZY_MODE -> sequence().find(predicate)
+            IMMEDIATE_MODE -> find(processed(), predicate)
+            LAZY_MODE -> SequenceOps.find(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun findLast(predicate: (T) -> Boolean): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().findLast(predicate)
-            LAZY_MODE -> sequence().findLast(predicate)
+            IMMEDIATE_MODE -> findLast(processed(), predicate)
+            LAZY_MODE -> SequenceOps.findLast(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun first(): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().first()
-            LAZY_MODE -> sequence().first()
+            IMMEDIATE_MODE -> first(processed())
+            LAZY_MODE -> SequenceOps.first(sequence())
             else -> throwIllegalMode()
         }
     }
 
     fun first(predicate: (T) -> Boolean): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().first(predicate)
-            LAZY_MODE -> sequence().first(predicate)
+            IMMEDIATE_MODE -> first(processed(), predicate)
+            LAZY_MODE -> SequenceOps.first(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun firstOrNull(): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().firstOrNull()
-            LAZY_MODE -> sequence().firstOrNull()
+            IMMEDIATE_MODE -> firstOrNull(processed())
+            LAZY_MODE -> SequenceOps.firstOrNull(sequence())
             else -> throwIllegalMode()
         }
     }
 
     fun firstOrNull(predicate: (T) -> Boolean): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().firstOrNull(predicate)
-            LAZY_MODE -> sequence().firstOrNull(predicate)
+            IMMEDIATE_MODE -> firstOrNull(processed(), predicate)
+            LAZY_MODE -> SequenceOps.firstOrNull(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun last(): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().last()
-            LAZY_MODE -> sequence().last()
+            IMMEDIATE_MODE -> last(processed())
+            LAZY_MODE -> SequenceOps.last(sequence())
             else -> throwIllegalMode()
         }
     }
 
     fun last(predicate: (T) -> Boolean): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().last(predicate)
-            LAZY_MODE -> sequence().last(predicate)
+            IMMEDIATE_MODE -> last(processed(), predicate)
+            LAZY_MODE -> SequenceOps.last(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun lastOrNull(): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().lastOrNull()
-            LAZY_MODE -> sequence().lastOrNull()
+            IMMEDIATE_MODE -> lastOrNull(processed())
+            LAZY_MODE -> SequenceOps.lastOrNull(sequence())
             else -> throwIllegalMode()
         }
     }
 
     fun lastOrNull(predicate: (T) -> Boolean): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().lastOrNull(predicate)
-            LAZY_MODE -> sequence().lastOrNull(predicate)
+            IMMEDIATE_MODE -> lastOrNull(processed(), predicate)
+            LAZY_MODE -> SequenceOps.lastOrNull(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun all(predicate: (T) -> Boolean): Boolean {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().all(predicate)
-            LAZY_MODE -> sequence().all(predicate)
+            IMMEDIATE_MODE -> all(processed(), predicate)
+            LAZY_MODE -> SequenceOps.all(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun any(): Boolean {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().any()
-            LAZY_MODE -> sequence().any()
+            IMMEDIATE_MODE -> any(processed())
+            LAZY_MODE -> SequenceOps.any(sequence())
             else -> throwIllegalMode()
         }
     }
 
     fun any(predicate: (T) -> Boolean): Boolean {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().any(predicate)
-            LAZY_MODE -> sequence().any(predicate)
+            IMMEDIATE_MODE -> any(processed(), predicate)
+            LAZY_MODE -> SequenceOps.any(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun none(): Boolean {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().none()
-            LAZY_MODE -> sequence().none()
+            IMMEDIATE_MODE -> none(processed())
+            LAZY_MODE -> SequenceOps.none(sequence())
             else -> throwIllegalMode()
         }
     }
 
     fun none(predicate: (T) -> Boolean): Boolean {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().none(predicate)
-            LAZY_MODE -> sequence().none(predicate)
+            IMMEDIATE_MODE -> none(processed(), predicate)
+            LAZY_MODE -> SequenceOps.none(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun single(): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().single()
-            LAZY_MODE -> sequence().single()
+            IMMEDIATE_MODE -> single(processed())
+            LAZY_MODE -> SequenceOps.single(sequence())
             else -> throwIllegalMode()
         }
     }
 
     fun single(predicate: (T) -> Boolean): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().single(predicate)
-            LAZY_MODE -> sequence().single(predicate)
+            IMMEDIATE_MODE -> single(processed(), predicate)
+            LAZY_MODE -> SequenceOps.single(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun singleOrNull(): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().singleOrNull()
-            LAZY_MODE -> sequence().singleOrNull()
+            IMMEDIATE_MODE -> singleOrNull(processed())
+            LAZY_MODE -> SequenceOps.singleOrNull(sequence())
             else -> throwIllegalMode()
         }
     }
 
     fun singleOrNull(predicate: (T) -> Boolean): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().singleOrNull(predicate)
-            LAZY_MODE -> sequence().singleOrNull(predicate)
+            IMMEDIATE_MODE -> singleOrNull(processed(), predicate)
+            LAZY_MODE -> SequenceOps.singleOrNull(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun contains(element: T): Boolean {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().contains(element)
-            LAZY_MODE -> sequence().contains(element)
+            IMMEDIATE_MODE -> contains(processed(), element)
+            LAZY_MODE -> SequenceOps.contains(sequence(), element)
             else -> throwIllegalMode()
         }
     }
 
     fun count(): Int {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().count()
-            LAZY_MODE -> sequence().count()
+            IMMEDIATE_MODE -> count(processed())
+            LAZY_MODE -> SequenceOps.count(sequence())
             else -> throwIllegalMode()
         }
     }
 
     fun count(predicate: (T) -> Boolean): Int {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().count(predicate)
-            LAZY_MODE -> sequence().count(predicate)
+            IMMEDIATE_MODE -> count(processed(), predicate)
+            LAZY_MODE -> SequenceOps.count(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun elementAt(index: Int): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().elementAt(index)
-            LAZY_MODE -> sequence().elementAt(index)
+            IMMEDIATE_MODE -> elementAt(processed(), index)
+            LAZY_MODE -> SequenceOps.elementAt(sequence(), index)
             else -> throwIllegalMode()
         }
     }
@@ -244,96 +250,96 @@ protected constructor(operated: I) {
         defaultValue: (index: Int) -> T
     ): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().elementAtOrElse(index,defaultValue)
-            LAZY_MODE -> sequence().elementAtOrElse(index,defaultValue)
+            IMMEDIATE_MODE -> elementAtOrElse(processed(), index, defaultValue)
+            LAZY_MODE -> SequenceOps.elementAtOrElse(sequence(), index, defaultValue)
             else -> throwIllegalMode()
         }
     }
 
     fun elementAtOrNull(index: Int): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().elementAtOrNull(index)
-            LAZY_MODE -> sequence().elementAtOrNull(index)
+            IMMEDIATE_MODE -> elementAtOrNull(processed(), index)
+            LAZY_MODE -> SequenceOps.elementAtOrNull(sequence(), index)
             else -> throwIllegalMode()
         }
     }
 
     fun indexOf(element: T): Int {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().indexOf(element)
-            LAZY_MODE -> sequence().indexOf(element)
+            IMMEDIATE_MODE -> indexOf(processed(), element)
+            LAZY_MODE -> SequenceOps.indexOf(sequence(), element)
             else -> throwIllegalMode()
         }
     }
 
     fun indexOf(predicate: (T) -> Boolean): Int {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().indexOf(predicate)
-            LAZY_MODE -> sequence().indexOf(predicate)
+            IMMEDIATE_MODE -> indexOf(processed(), predicate)
+            LAZY_MODE -> SequenceOps.indexOf(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun lastIndexOf(element: T): Int {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().lastIndexOf(element)
-            LAZY_MODE -> sequence().lastIndexOf(element)
+            IMMEDIATE_MODE -> lastIndexOf(processed(), element)
+            LAZY_MODE -> SequenceOps.lastIndexOf(sequence(), element)
             else -> throwIllegalMode()
         }
     }
 
     fun lastIndexOf(predicate: (T) -> Boolean): Int {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().lastIndexOf(predicate)
-            LAZY_MODE -> sequence().lastIndexOf(predicate)
+            IMMEDIATE_MODE -> lastIndexOf(processed(), predicate)
+            LAZY_MODE -> SequenceOps.lastIndexOf(sequence(), predicate)
             else -> throwIllegalMode()
         }
     }
 
     fun drop(n: Int): ListOps<T> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().drop(n))
-            LAZY_MODE -> toListOps(sequence().drop(n))
+            IMMEDIATE_MODE -> toListOps(drop(processed(), n))
+            LAZY_MODE -> toListOps(SequenceOps.drop(sequence(), n))
             else -> throwIllegalMode()
         }
     }
 
     fun dropWhile(predicate: (T) -> Boolean): ListOps<T> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().dropWhile(predicate))
-            LAZY_MODE -> toListOps(sequence().dropWhile(predicate))
+            IMMEDIATE_MODE -> toListOps(dropWhile(processed(), predicate))
+            LAZY_MODE -> toListOps(SequenceOps.dropWhile(sequence(), predicate))
             else -> throwIllegalMode()
         }
     }
 
     fun take(n: Int): ListOps<T> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().take(n))
-            LAZY_MODE -> toListOps(sequence().take(n))
+            IMMEDIATE_MODE -> toListOps(take(processed(), n))
+            LAZY_MODE -> toListOps(SequenceOps.take(sequence(), n))
             else -> throwIllegalMode()
         }
     }
 
     fun takeWhile(predicate: (T) -> Boolean): ListOps<T> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().takeWhile(predicate))
-            LAZY_MODE -> toListOps(sequence().takeWhile(predicate))
+            IMMEDIATE_MODE -> toListOps(takeWhile(processed(), predicate))
+            LAZY_MODE -> toListOps(SequenceOps.takeWhile(sequence(), predicate))
             else -> throwIllegalMode()
         }
     }
 
     fun filter(predicate: (T) -> Boolean): ListOps<T> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().filter(predicate))
-            LAZY_MODE -> toListOps(sequence().filter(predicate))
+            IMMEDIATE_MODE -> toListOps(filter(processed(), predicate))
+            LAZY_MODE -> toListOps(SequenceOps.filter(sequence(), predicate))
             else -> throwIllegalMode()
         }
     }
 
     fun filterIndexed(predicate: (index: Int, T) -> Boolean): ListOps<T> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().filterIndexed(predicate))
-            LAZY_MODE -> toListOps(sequence().filterIndexed(predicate))
+            IMMEDIATE_MODE -> toListOps(filterIndexed(processed(), predicate))
+            LAZY_MODE -> toListOps(SequenceOps.filterIndexed(sequence(), predicate))
             else -> throwIllegalMode()
         }
     }
@@ -347,8 +353,8 @@ protected constructor(operated: I) {
         predicate: (T) -> Boolean
     ): C {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().filterTo(destination,predicate)
-            LAZY_MODE -> sequence().filterTo(destination, predicate)
+            IMMEDIATE_MODE -> filterTo(processed(), destination, predicate)
+            LAZY_MODE -> SequenceOps.filterTo(sequence(), destination, predicate)
             else -> throwIllegalMode()
         }
     }
@@ -358,8 +364,8 @@ protected constructor(operated: I) {
         predicate: (index: Int, T) -> Boolean
     ): C {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().filterIndexedTo(destination,predicate)
-            LAZY_MODE -> sequence().filterIndexedTo(destination, predicate)
+            IMMEDIATE_MODE -> filterIndexedTo(processed(), destination, predicate)
+            LAZY_MODE -> SequenceOps.filterIndexedTo(sequence(), destination, predicate)
             else -> throwIllegalMode()
         }
     }
@@ -372,32 +378,32 @@ protected constructor(operated: I) {
 
     fun <R> map(transform: (T) -> R): ListOps<R> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().map(transform))
-            LAZY_MODE -> toListOps(sequence().map(transform))
+            IMMEDIATE_MODE -> toListOps(map(processed(), transform))
+            LAZY_MODE -> toListOps(SequenceOps.map(sequence(), transform))
             else -> throwIllegalMode()
         }
     }
 
     fun <R> mapIndexed(transform: (index: Int, T) -> R): ListOps<R> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().mapIndexed(transform))
-            LAZY_MODE -> toListOps(sequence().mapIndexed(transform))
+            IMMEDIATE_MODE -> toListOps(mapIndexed(processed(), transform))
+            LAZY_MODE -> toListOps(SequenceOps.mapIndexed(sequence(), transform))
             else -> throwIllegalMode()
         }
     }
 
     fun <R> mapNotNull(transform: (T) -> R): ListOps<R> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().mapNotNull(transform))
-            LAZY_MODE -> toListOps(sequence().mapNotNull(transform))
+            IMMEDIATE_MODE -> toListOps(mapNotNull(processed(), transform))
+            LAZY_MODE -> toListOps(SequenceOps.mapNotNull(sequence(), transform))
             else -> throwIllegalMode()
         }
     }
 
     fun <R> mapIndexedNotNull(transform: (index: Int, T) -> R): ListOps<R> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().mapIndexedNotNull(transform))
-            LAZY_MODE -> toListOps(sequence().mapIndexedNotNull(transform))
+            IMMEDIATE_MODE -> toListOps(mapIndexedNotNull(processed(), transform))
+            LAZY_MODE -> toListOps(SequenceOps.mapIndexedNotNull(sequence(), transform))
             else -> throwIllegalMode()
         }
     }
@@ -407,8 +413,8 @@ protected constructor(operated: I) {
         transform: (T) -> R
     ): C {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().mapTo(destination,transform)
-            LAZY_MODE -> sequence().mapTo(destination, transform)
+            IMMEDIATE_MODE -> mapTo(processed(), destination, transform)
+            LAZY_MODE -> SequenceOps.mapTo(sequence(), destination, transform)
             else -> throwIllegalMode()
         }
     }
@@ -418,8 +424,8 @@ protected constructor(operated: I) {
         transform: (index: Int, T) -> R
     ): C {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().mapIndexedTo(destination,transform)
-            LAZY_MODE -> sequence().mapIndexedTo(destination, transform)
+            IMMEDIATE_MODE -> mapIndexedTo(processed(), destination, transform)
+            LAZY_MODE -> SequenceOps.mapIndexedTo(sequence(), destination, transform)
             else -> throwIllegalMode()
         }
     }
@@ -429,8 +435,8 @@ protected constructor(operated: I) {
         transform: (T) -> R?
     ): C {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().mapNotNullTo(destination,transform)
-            LAZY_MODE -> sequence().mapNotNullTo(destination, transform)
+            IMMEDIATE_MODE -> mapNotNullTo(processed(), destination, transform)
+            LAZY_MODE -> SequenceOps.mapNotNullTo(sequence(), destination, transform)
             else -> throwIllegalMode()
         }
     }
@@ -440,24 +446,24 @@ protected constructor(operated: I) {
         transform: (index: Int, T) -> R?
     ): C {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().mapIndexedNotNullTo(destination,transform)
-            LAZY_MODE -> sequence().mapIndexedNotNullTo(destination, transform)
+            IMMEDIATE_MODE -> mapIndexedNotNullTo(processed(), destination, transform)
+            LAZY_MODE -> SequenceOps.mapIndexedNotNullTo(sequence(), destination, transform)
             else -> throwIllegalMode()
         }
     }
 
     fun <R> flatMap(transform: (T) -> Iterable<R>): ListOps<R> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().flatMap(transform))
-            LAZY_MODE -> toListOps(sequence().flatMap(transform))
+            IMMEDIATE_MODE -> toListOps(flatMap(processed(), transform))
+            LAZY_MODE -> toListOps(SequenceOps.flatMap(sequence(), transform))
             else -> throwIllegalMode()
         }
     }
 
     fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): ListOps<R> {
         return when (mode) {
-            IMMEDIATE_MODE -> toListOps(processed().flatMapIndexed(transform))
-            LAZY_MODE -> toListOps(sequence().flatMapIndexed(transform))
+            IMMEDIATE_MODE -> toListOps(flatMapIndexed(processed(), transform))
+            LAZY_MODE -> toListOps(SequenceOps.flatMapIndexed(sequence(), transform))
             else -> throwIllegalMode()
         }
     }
@@ -467,8 +473,8 @@ protected constructor(operated: I) {
         transform: (T) -> Iterable<R>
     ): C {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().flatMapTo(destination,transform)
-            LAZY_MODE -> sequence().flatMapTo(destination, transform)
+            IMMEDIATE_MODE -> flatMapTo(processed(), destination, transform)
+            LAZY_MODE -> SequenceOps.flatMapTo(sequence(), destination, transform)
             else -> throwIllegalMode()
         }
     }
@@ -478,40 +484,40 @@ protected constructor(operated: I) {
         transform: (index: Int, T) -> Iterable<R>
     ): C {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().flatMapIndexedTo(destination,transform)
-            LAZY_MODE -> sequence().flatMapIndexedTo(destination, transform)
+            IMMEDIATE_MODE -> flatMapIndexedTo(processed(), destination, transform)
+            LAZY_MODE -> SequenceOps.flatMapIndexedTo(sequence(), destination, transform)
             else -> throwIllegalMode()
         }
     }
 
     fun reduce(operation: (T, T) -> T): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().reduce(operation)
-            LAZY_MODE -> sequence().reduce(operation)
+            IMMEDIATE_MODE -> reduce(processed(), operation)
+            LAZY_MODE -> SequenceOps.reduce(sequence(), operation)
             else -> throwIllegalMode()
         }
     }
 
     fun reduceIndexed(operation: (index: Int, T, T) -> T): T {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().reduceIndexed(operation)
-            LAZY_MODE -> sequence().reduceIndexed(operation)
+            IMMEDIATE_MODE -> reduceIndexed(processed(), operation)
+            LAZY_MODE -> SequenceOps.reduceIndexed(sequence(), operation)
             else -> throwIllegalMode()
         }
     }
 
     fun reduceOrNull(operation: (T, T) -> T): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().reduceOrNull(operation)
-            LAZY_MODE -> sequence().reduceOrNull(operation)
+            IMMEDIATE_MODE -> reduceOrNull(processed(), operation)
+            LAZY_MODE -> SequenceOps.reduceOrNull(sequence(), operation)
             else -> throwIllegalMode()
         }
     }
 
     fun reduceIndexedOrNull(operation: (index: Int, T, T) -> T): T? {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().reduceIndexedOrNull(operation)
-            LAZY_MODE -> sequence().reduceIndexedOrNull(operation)
+            IMMEDIATE_MODE -> reduceIndexedOrNull(processed(), operation)
+            LAZY_MODE -> SequenceOps.reduceIndexedOrNull(sequence(), operation)
             else -> throwIllegalMode()
         }
     }
@@ -521,8 +527,8 @@ protected constructor(operated: I) {
         operation: (R, T) -> R
     ): R {
         return when (mode) {
-            IMMEDIATE_MODE -> reduce(processed(), initial,operation)
-            LAZY_MODE -> sequence().fold(initial, operation)
+            IMMEDIATE_MODE -> reduce(processed(), initial, operation)
+            LAZY_MODE -> SequenceOps.reduce(sequence(), initial, operation)
             else -> throwIllegalMode()
         }
     }
@@ -532,8 +538,8 @@ protected constructor(operated: I) {
         operation: (index: Int, R, T) -> R
     ): R {
         return when (mode) {
-            IMMEDIATE_MODE -> processed().reduceIndexed(destination,transform)
-            LAZY_MODE -> sequence().reduceIndexed(destination, transform)
+            IMMEDIATE_MODE -> reduceIndexed(processed(), initial, operation)
+            LAZY_MODE -> SequenceOps.reduceIndexed(sequence(), initial, operation)
             else -> throwIllegalMode()
         }
     }
@@ -541,31 +547,55 @@ protected constructor(operated: I) {
     fun <K, V> associate(
         keySelector: (T) -> K,
         valueTransform: (T) -> V
-    ): Map<K, V> {
-        return processed().associateBy(keySelector, valueTransform)
+    ): MapOps<K, V> {
+        return when (mode) {
+            IMMEDIATE_MODE -> toMapOps(associate(processed(), keySelector, valueTransform))
+            LAZY_MODE -> toMapOps(SequenceOps.associate(sequence(), keySelector, valueTransform))
+            else -> throwIllegalMode()
+        }
     }
 
-    fun <K, V> associate(transform: (T) -> Pair<K, V>): Map<K, V> {
-        return processed().associate(transform)
+    fun <K, V> associate(transform: (T) -> Pair<K, V>): MapOps<K, V> {
+        return when (mode) {
+            IMMEDIATE_MODE -> toMapOps(associate(processed(), transform))
+            LAZY_MODE -> toMapOps(SequenceOps.associate(sequence(), transform))
+            else -> throwIllegalMode()
+        }
     }
 
-    fun <K> associateKey(keySelector: (T) -> K): Map<K, T> {
-        return processed().associateBy(keySelector)
+    fun <K> associateKey(keySelector: (T) -> K): MapOps<K, T> {
+        return when (mode) {
+            IMMEDIATE_MODE -> toMapOps(associateKey(processed(), keySelector))
+            LAZY_MODE -> toMapOps(SequenceOps.associateKey(sequence(), keySelector))
+            else -> throwIllegalMode()
+        }
     }
 
-    fun <V> associateValue(valueSelector: (T) -> V): Map<T, V> {
-        return processed().associateWith(valueSelector)
+    fun <V> associateValue(valueSelector: (T) -> V): MapOps<T, V> {
+        return when (mode) {
+            IMMEDIATE_MODE -> toMapOps(associateValue(processed(), valueSelector))
+            LAZY_MODE -> toMapOps(SequenceOps.associateValue(sequence(), valueSelector))
+            else -> throwIllegalMode()
+        }
     }
 
     fun <K, V> associateWithNext(
         keySelector: (T) -> K,
         valueTransform: (T?) -> V
-    ): Map<K, V> {
-        return associateWithNextTo(LinkedHashMap(), keySelector, valueTransform)
+    ): MapOps<K, V> {
+        return when (mode) {
+            IMMEDIATE_MODE -> toMapOps(associateWithNext(processed(), keySelector, valueTransform))
+            LAZY_MODE -> toMapOps(SequenceOps.associateWithNext(sequence(), keySelector, valueTransform))
+            else -> throwIllegalMode()
+        }
     }
 
-    fun <K, V> associateWithNext(transform: (T, T?) -> Pair<K, V>): Map<K, V> {
-        return associateWithNextTo(LinkedHashMap(), transform)
+    fun <K, V> associateWithNext(transform: (T, T?) -> Pair<K, V>): MapOps<K, V> {
+        return when (mode) {
+            IMMEDIATE_MODE -> toMapOps(associateWithNext(processed(), transform))
+            LAZY_MODE -> toMapOps(SequenceOps.associateWithNext(sequence(), transform))
+            else -> throwIllegalMode()
+        }
     }
 
     fun <K, V, M : MutableMap<in K, in V>> associateTo(
@@ -573,28 +603,44 @@ protected constructor(operated: I) {
         keySelector: (T) -> K,
         valueTransform: (T) -> V
     ): M {
-        return processed().associateByTo(destination, keySelector, valueTransform)
+        return when (mode) {
+            IMMEDIATE_MODE -> associateTo(processed(), destination, keySelector, valueTransform)
+            LAZY_MODE -> SequenceOps.associateTo(sequence(), destination, keySelector, valueTransform)
+            else -> throwIllegalMode()
+        }
     }
 
     fun <K, V, M : MutableMap<in K, in V>> associateTo(
         destination: M,
         transform: (T) -> Pair<K, V>
     ): M {
-        return processed().associateTo(destination, transform)
+        return when (mode) {
+            IMMEDIATE_MODE -> associateTo(processed(), destination, transform)
+            LAZY_MODE -> SequenceOps.associateTo(sequence(), destination, transform)
+            else -> throwIllegalMode()
+        }
     }
 
     fun <K, M : MutableMap<in K, in T>> associateKeyTo(
         destination: M,
         keySelector: (T) -> K
     ): M {
-        return processed().associateByTo(destination, keySelector)
+        return when (mode) {
+            IMMEDIATE_MODE -> associateKeyTo(processed(), destination, keySelector)
+            LAZY_MODE -> SequenceOps.associateKeyTo(sequence(), destination, keySelector)
+            else -> throwIllegalMode()
+        }
     }
 
     fun <V, M : MutableMap<in T, in V>> associateValueTo(
         destination: M,
         valueSelector: (T) -> V
     ): M {
-        return processed().associateWithTo(destination, valueSelector)
+        return when (mode) {
+            IMMEDIATE_MODE -> associateValueTo(processed(), destination, valueSelector)
+            LAZY_MODE -> SequenceOps.associateValueTo(sequence(), destination, valueSelector)
+            else -> throwIllegalMode()
+        }
     }
 
     fun <K, V, M : MutableMap<in K, in V>> associateWithNextTo(
@@ -1047,19 +1093,19 @@ protected constructor(operated: I) {
         throw IllegalStateException("Wrong mode: $mode.")
     }
 
-    private fun processed(): I {
+    protected fun processed(): I {
         return As.notNull(processed)
     }
 
-    private fun mutableProcessed(): MI {
+    protected fun mutableProcessed(): MI {
         return As.notNull(processed)
     }
 
-    private fun sequence(): Sequence<T> {
+    protected fun sequence(): Sequence<T> {
         return As.notNull(sequence)
     }
 
-    private fun asThis(): O {
+    protected fun asThis(): THIS {
         return As.any(this)
     }
 
@@ -1618,13 +1664,13 @@ protected constructor(operated: I) {
         }
 
         @JvmStatic
-        fun <T : Comparable<T>> maxOrNull(iterable: Iterable<T>): T? {
-            return iterable.maxOrNull()
+        fun <T> max(iterable: Iterable<T>, comparator: Comparator<in T>): T {
+            return Require.notNull(maxOrNull(iterable, comparator))
         }
 
         @JvmStatic
-        fun <T> max(iterable: Iterable<T>, comparator: Comparator<in T>): T {
-            return Require.notNull(maxOrNull(iterable, comparator))
+        fun <T : Comparable<T>> maxOrNull(iterable: Iterable<T>): T? {
+            return iterable.maxOrNull()
         }
 
         @JvmStatic
@@ -1638,13 +1684,13 @@ protected constructor(operated: I) {
         }
 
         @JvmStatic
-        fun <T : Comparable<T>> minOrNull(iterable: Iterable<T>): T? {
-            return iterable.minOrNull()
+        fun <T> min(iterable: Iterable<T>, comparator: Comparator<in T>): T {
+            return Require.notNull(minOrNull(iterable, comparator))
         }
 
         @JvmStatic
-        fun <T> min(iterable: Iterable<T>, comparator: Comparator<in T>): T {
-            return Require.notNull(minOrNull(iterable, comparator))
+        fun <T : Comparable<T>> minOrNull(iterable: Iterable<T>): T? {
+            return iterable.minOrNull()
         }
 
         @JvmStatic
@@ -1658,28 +1704,13 @@ protected constructor(operated: I) {
         }
 
         @JvmStatic
-        fun <T> sumLong(iterable: Iterable<T>): Long {
-            return sumLong(iterable) { To.toLong(it) }
-        }
-
-        @JvmStatic
-        fun <T> sumDouble(iterable: Iterable<T>): Double {
-            return sumDouble(iterable) { To.toDouble(it) }
-        }
-
-        @JvmStatic
-        fun <T> sumBigInteger(iterable: Iterable<T>): BigInteger {
-            return sumBigInteger(iterable) { To.toBigInteger(it) }
-        }
-
-        @JvmStatic
-        fun <T> sumBigDecimal(iterable: Iterable<T>): BigDecimal {
-            return sumBigDecimal(iterable) { To.toBigDecimal(it) }
-        }
-
-        @JvmStatic
         inline fun <T> sumInt(iterable: Iterable<T>, selector: (T) -> Int): Int {
             return iterable.sumOf(selector)
+        }
+
+        @JvmStatic
+        fun <T> sumLong(iterable: Iterable<T>): Long {
+            return sumLong(iterable) { To.toLong(it) }
         }
 
         @JvmStatic
@@ -1688,13 +1719,28 @@ protected constructor(operated: I) {
         }
 
         @JvmStatic
+        fun <T> sumDouble(iterable: Iterable<T>): Double {
+            return sumDouble(iterable) { To.toDouble(it) }
+        }
+
+        @JvmStatic
         fun <T> sumDouble(iterable: Iterable<T>, selector: (T) -> Double): Double {
             return iterable.sumOf(selector)
         }
 
         @JvmStatic
+        fun <T> sumBigInteger(iterable: Iterable<T>): BigInteger {
+            return sumBigInteger(iterable) { To.toBigInteger(it) }
+        }
+
+        @JvmStatic
         fun <T> sumBigInteger(iterable: Iterable<T>, selector: (T) -> BigInteger): BigInteger {
             return iterable.sumOf(selector)
+        }
+
+        @JvmStatic
+        fun <T> sumBigDecimal(iterable: Iterable<T>): BigDecimal {
+            return sumBigDecimal(iterable) { To.toBigDecimal(it) }
         }
 
         @JvmStatic
@@ -1906,24 +1952,27 @@ protected constructor(operated: I) {
             return StreamSupport.stream(iterable.spliterator(), parallel)
         }
 
+        @JvmStatic
         fun <T> toSequence(iterable: Iterable<T>): Sequence<T> {
             return iterable.asSequence()
         }
 
         @JvmStatic
         fun <T> toArray(iterable: Iterable<T>): Array<Any?> {
-            val list = toList(iterable)
-            val result = arrayOfNulls<Any?>(list.size)
-            list.forEachIndexed { i, t -> result[i] = t }
-            return result
+            val list = toCollection(iterable, LinkedList())
+            return list.toArray()
         }
 
         @JvmStatic
         inline fun <T> toArray(iterable: Iterable<T>, generator: (size: Int) -> Array<T>): Array<T> {
-            val list = toList(iterable)
-            val result = generator(list.size)
-            list.forEachIndexed { i, t -> result[i] = t }
-            return result
+            val list = toCollection(iterable, LinkedList())
+            return list.toArray(generator(list.size))
+        }
+
+        @JvmStatic
+        inline fun <reified T> toTypedArray(iterable: Iterable<T>): Array<T> {
+            val list = toCollection(iterable, LinkedList())
+            return list.toTypedArray()
         }
 
         @JvmStatic
@@ -1933,7 +1982,7 @@ protected constructor(operated: I) {
 
         @JvmStatic
         inline fun <T> toBooleanArray(iterable: Iterable<T>, selector: (T) -> Boolean): BooleanArray {
-            val list = toList(iterable)
+            val list = toCollection(iterable, LinkedList())
             val result = BooleanArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
@@ -1946,7 +1995,7 @@ protected constructor(operated: I) {
 
         @JvmStatic
         inline fun <T> toByteArray(iterable: Iterable<T>, selector: (T) -> Byte): ByteArray {
-            val list = toList(iterable)
+            val list = toCollection(iterable, LinkedList())
             val result = ByteArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
@@ -1959,7 +2008,7 @@ protected constructor(operated: I) {
 
         @JvmStatic
         inline fun <T> toShortArray(iterable: Iterable<T>, selector: (T) -> Short): ShortArray {
-            val list = toList(iterable)
+            val list = toCollection(iterable, LinkedList())
             val result = ShortArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
@@ -1972,7 +2021,7 @@ protected constructor(operated: I) {
 
         @JvmStatic
         inline fun <T> toCharArray(iterable: Iterable<T>, selector: (T) -> Char): CharArray {
-            val list = toList(iterable)
+            val list = toCollection(iterable, LinkedList())
             val result = CharArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
@@ -1985,7 +2034,7 @@ protected constructor(operated: I) {
 
         @JvmStatic
         inline fun <T> toIntArray(iterable: Iterable<T>, selector: (T) -> Int): IntArray {
-            val list = toList(iterable)
+            val list = toCollection(iterable, LinkedList())
             val result = IntArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
@@ -1998,7 +2047,7 @@ protected constructor(operated: I) {
 
         @JvmStatic
         inline fun <T> toLongArray(iterable: Iterable<T>, selector: (T) -> Long): LongArray {
-            val list = toList(iterable)
+            val list = toCollection(iterable, LinkedList())
             val result = LongArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
@@ -2011,7 +2060,7 @@ protected constructor(operated: I) {
 
         @JvmStatic
         inline fun <T> toFloatArray(iterable: Iterable<T>, selector: (T) -> Float): FloatArray {
-            val list = toList(iterable)
+            val list = toCollection(iterable, LinkedList())
             val result = FloatArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
@@ -2024,7 +2073,7 @@ protected constructor(operated: I) {
 
         @JvmStatic
         inline fun <T> toDoubleArray(iterable: Iterable<T>, selector: (T) -> Double): DoubleArray {
-            val list = toList(iterable)
+            val list = toCollection(iterable, LinkedList())
             val result = DoubleArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
