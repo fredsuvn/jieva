@@ -8,14 +8,16 @@ import java.util.*
 object Sort {
 
     @JvmStatic
-    val SELF_COMPARABLE_COMPARATOR: Comparator<*> = Comparator { o1: Any?, o2: Any? ->
-        val c1 = o1 as Comparable<Any?>
-        val c2 = o2 as Comparable<Any?>
-        c1.compareTo(c2)
+    fun <T> selfComparableComparator(): Comparator<T> {
+        return As.notNull(SELF_COMPARABLE_COMPARATOR)
     }
 
     @JvmStatic
-    fun <T> selfComparableComparator(): Comparator<T> {
-        return As.notNull(SELF_COMPARABLE_COMPARATOR)
+    private val SELF_COMPARABLE_COMPARATOR: Comparator<*> by lazy {
+        Comparator { o1: Any?, o2: Any? ->
+            val c1 = o1 as Comparable<Any?>
+            val c2 = o2 as Comparable<Any?>
+            c1.compareTo(c2)
+        }
     }
 }
