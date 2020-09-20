@@ -1,6 +1,7 @@
 package xyz.srclab.common;
 
 import xyz.srclab.common.base.Format;
+import xyz.srclab.common.collection.ListOps;
 
 /**
  * @author sunqian
@@ -26,5 +27,10 @@ public class Tt {
         //
         //SequencesKt
         //IterableOps.opsFor(null).filterNotNull().
+        ListOps<Object> ops = ListOps.opsFor(null)
+                .addAll(new Object[0])
+                .subList(0)
+                .parentList()
+                .removeAll(new Object[0]);
     }
 }

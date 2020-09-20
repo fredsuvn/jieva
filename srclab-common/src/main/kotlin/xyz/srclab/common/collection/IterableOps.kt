@@ -45,6 +45,10 @@ class IterableOps<T> private constructor(iterable: Iterable<T>) :
         return mutableOperated()
     }
 
+    override fun toSelfOps(): IterableOps<T> {
+        return this
+    }
+
     override fun <T> toIterableOps(iterable: Iterable<T>): IterableOps<T> {
         this.operated = As.any(iterable)
         return As.any(this)

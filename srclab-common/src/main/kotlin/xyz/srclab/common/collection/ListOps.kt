@@ -8,6 +8,8 @@ import kotlin.random.Random
 class ListOps<T> private constructor(list: List<T>) :
     CollectionOps<T, List<T>, MutableList<T>, ListOps<T>>(list) {
 
+    private var subListStack: MutableList<List<T>>? = null
+
     override fun findLast(predicate: (T) -> Boolean): T? {
         return findLast(operated(), predicate)
     }
@@ -88,6 +90,32 @@ class ListOps<T> private constructor(list: List<T>) :
         return toListOps(takeLastWhile(operated(), predicate))
     }
 
+    @JvmOverloads
+    fun subList(fromIndex: Int, toIndex: Int = count()): ListOps<T> {
+        val stack = subListStack()
+        val operated = operated()
+        stack.add(operated)
+        val subList = operated().subList(fromIndex, toIndex)
+        return toListOps(subList)
+    }
+
+    fun parentList(): ListOps<T> {
+        val stack = subListStack()
+        return if (stack.isEmpty()) {
+            this
+        } else {
+            val parentList = stack.removeLast()
+            toListOps(parentList)
+        }
+    }
+
+    private fun subListStack(): MutableList<List<T>> {
+        if (subListStack == null) {
+            subListStack = LinkedList()
+        }
+        return subListStack as MutableList<List<T>>
+    }
+
     fun slice(indices: IntArray): ListOps<T> {
         return toListOps(slice(operated(), indices))
     }
@@ -134,31 +162,32 @@ class ListOps<T> private constructor(list: List<T>) :
 
     fun reverse(): ListOps<T> {
         reverse(mutableOperated())
-        return this
+        return toSelfOps()
     }
 
     fun sort(): ListOps<T> {
         sort(mutableOperated())
-        return this
+        return toSelfOps()
     }
 
     fun sort(comparator: Comparator<in T>): ListOps<T> {
         sort(mutableOperated(), comparator)
-        return this
+        return toSelfOps()
     }
 
     fun shuffle(): ListOps<T> {
         shuffle(mutableOperated())
-        return this
+        return toSelfOps()
     }
 
     fun shuffle(random: Random): ListOps<T> {
         shuffle(mutableOperated(), random)
-        return this
+        return toSelfOps()
     }
 
-    override fun removeAll(predicate: (T) -> Boolean): Boolean {
-        return removeAll(mutableOperated(), predicate)
+    override fun removeAll(predicate: (T) -> Boolean): ListOps<T> {
+        removeAll(mutableOperated(), predicate)
+        return toSelfOps()
     }
 
     override fun removeFirst(): T {
@@ -177,8 +206,54 @@ class ListOps<T> private constructor(list: List<T>) :
         return removeLastOrNull(mutableOperated())
     }
 
-    override fun retainAll(predicate: (T) -> Boolean): Boolean {
-        return retainAll(mutableOperated(), predicate)
+    override fun retainAll(predicate: (T) -> Boolean): ListOps<T> {
+        retainAll(mutableOperated(), predicate)
+        return toSelfOps()
+    }
+
+    fun addAll(index: Int, elements: Array<out T>): ListOps<T> {
+        addAll(mutableOperated(), index, elements)
+        return toSelfOps()
+    }
+
+    fun addAll(index: Int, elements: Iterable<T>): ListOps<T> {
+        addAll(mutableOperated(), index, elements)
+        return toSelfOps()
+    }
+
+    fun addAll(index: Int, elements: Collection<T>): ListOps<T> {
+        addAll(mutableOperated(), index, elements)
+        return toSelfOps()
+    }
+
+    fun removeAll(index: Int, elements: Array<out T>): ListOps<T> {
+        removeAll(mutableOperated(), index, elements)
+        return toSelfOps()
+    }
+
+    fun removeAll(index: Int, elements: Iterable<T>): ListOps<T> {
+        removeAll(mutableOperated(), index, elements)
+        return toSelfOps()
+    }
+
+    fun removeAll(index: Int, elements: Collection<T>): ListOps<T> {
+        removeAll(mutableOperated(), index, elements)
+        return toSelfOps()
+    }
+
+    fun retainAll(index: Int, elements: Array<out T>): ListOps<T> {
+        retainAll(mutableOperated(), index, elements)
+        return toSelfOps()
+    }
+
+    fun retainAll(index: Int, elements: Iterable<T>): ListOps<T> {
+        retainAll(mutableOperated(), index, elements)
+        return toSelfOps()
+    }
+
+    fun retainAll(index: Int, elements: Collection<T>): ListOps<T> {
+        retainAll(mutableOperated(), index, elements)
+        return toSelfOps()
     }
 
     fun plus(element: T): ListOps<T> {
@@ -219,6 +294,10 @@ class ListOps<T> private constructor(list: List<T>) :
 
     fun finalMutableList(): MutableList<T> {
         return mutableOperated()
+    }
+
+    override fun toSelfOps(): ListOps<T> {
+        return this
     }
 
     override fun <T> toIterableOps(iterable: Iterable<T>): IterableOps<T> {
@@ -360,10 +439,12 @@ class ListOps<T> private constructor(list: List<T>) :
             return list.slice(indices)
         }
 
+        @JvmStatic
         fun <T> binarySearch(list: List<T>, element: T): Int {
             return list.binarySearch(element, Sort.selfComparableComparator())
         }
 
+        @JvmStatic
         fun <T> binarySearch(list: List<T>, element: T, comparator: Comparator<in T>): Int {
             return list.binarySearch(element, comparator)
         }
@@ -458,6 +539,51 @@ class ListOps<T> private constructor(list: List<T>) :
         @JvmStatic
         fun <T> retainAll(list: MutableList<T>, predicate: (T) -> Boolean): Boolean {
             return list.retainAll(predicate)
+        }
+
+        @JvmStatic
+        fun <T> addAll(list: MutableList<T>, index: Int, elements: Array<out T>): Boolean {
+            return list.subList(index, list.size).addAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> addAll(list: MutableList<T>, index: Int, elements: Iterable<T>): Boolean {
+            return list.subList(index, list.size).addAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> addAll(list: MutableList<T>, index: Int, elements: Collection<T>): Boolean {
+            return list.addAll(index, elements)
+        }
+
+        @JvmStatic
+        fun <T> removeAll(list: MutableList<T>, index: Int, elements: Array<out T>): Boolean {
+            return list.subList(index, list.size).removeAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> removeAll(list: MutableList<T>, index: Int, elements: Iterable<T>): Boolean {
+            return list.subList(index, list.size).removeAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> removeAll(list: MutableList<T>, index: Int, elements: Collection<T>): Boolean {
+            return list.subList(index, list.size).removeAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> retainAll(list: MutableList<T>, index: Int, elements: Array<out T>): Boolean {
+            return list.subList(index, list.size).retainAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> retainAll(list: MutableList<T>, index: Int, elements: Iterable<T>): Boolean {
+            return list.subList(index, list.size).retainAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> retainAll(list: MutableList<T>, index: Int, elements: Collection<T>): Boolean {
+            return list.subList(index, list.size).retainAll(elements)
         }
     }
 }

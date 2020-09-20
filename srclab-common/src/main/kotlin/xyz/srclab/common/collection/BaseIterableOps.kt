@@ -10,9 +10,13 @@ import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 
 abstract class BaseIterableOps<T, I : Iterable<T>, MI : MutableIterable<T>, THIS : BaseIterableOps<T, I, MI, THIS>>
-protected constructor(operated: I) {
+protected constructor(operated: I) : MutableIterable<T> {
 
     protected var operated: I = operated
+
+    override fun iterator(): MutableIterator<T> {
+        return mutableOperated().iterator()
+    }
 
     fun find(predicate: (T) -> Boolean): T? {
         return find(operated(), predicate)
@@ -92,6 +96,18 @@ protected constructor(operated: I) {
 
     fun contains(element: T): Boolean {
         return contains(operated(), element)
+    }
+
+    open fun containsAll(elements: Array<out T>): Boolean {
+        return containsAll(operated(), elements)
+    }
+
+    open fun containsAll(elements: Iterable<T>): Boolean {
+        return containsAll(operated(), elements)
+    }
+
+    open fun containsAll(elements: Collection<T>): Boolean {
+        return containsAll(operated(), elements)
     }
 
     open fun count(): Int {
@@ -537,11 +553,12 @@ protected constructor(operated: I) {
 
     fun forEachIndexed(action: (index: Int, T) -> Unit): THIS {
         forEachIndexed(operated(), action)
-        return As.any(this)
+        return toSelfOps()
     }
 
-    open fun removeAll(predicate: (T) -> Boolean): Boolean {
-        return removeAll(mutableOperated(), predicate)
+    open fun removeAll(predicate: (T) -> Boolean): THIS {
+        removeAll(mutableOperated(), predicate)
+        return toSelfOps()
     }
 
     open fun removeFirst(): T {
@@ -560,8 +577,9 @@ protected constructor(operated: I) {
         return removeLastOrNull(mutableOperated())
     }
 
-    open fun retainAll(predicate: (T) -> Boolean): Boolean {
-        return retainAll(mutableOperated(), predicate)
+    open fun retainAll(predicate: (T) -> Boolean): THIS {
+        retainAll(mutableOperated(), predicate)
+        return toSelfOps()
     }
 
     fun <C : MutableCollection<in T>> toCollection(destination: C): C {
@@ -688,6 +706,8 @@ protected constructor(operated: I) {
         return As.any(operated())
     }
 
+    protected abstract fun toSelfOps(): THIS
+
     protected abstract fun <T> toIterableOps(iterable: Iterable<T>): IterableOps<T>
 
     protected abstract fun <T> toListOps(list: List<T>): ListOps<T>
@@ -796,6 +816,21 @@ protected constructor(operated: I) {
         @JvmStatic
         fun <T> contains(iterable: Iterable<T>, element: T): Boolean {
             return iterable.contains(element)
+        }
+
+        @JvmStatic
+        fun <T> containsAll(iterable: Iterable<T>, elements: Array<out T>): Boolean {
+            return containsAll(iterable, elements.toSet())
+        }
+
+        @JvmStatic
+        fun <T> containsAll(iterable: Iterable<T>, elements: Iterable<T>): Boolean {
+            return containsAll(iterable, elements.toSet())
+        }
+
+        @JvmStatic
+        fun <T> containsAll(iterable: Iterable<T>, elements: Collection<T>): Boolean {
+            return iterable.toSet().containsAll(elements)
         }
 
         @JvmStatic

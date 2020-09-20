@@ -45,6 +45,10 @@ class SetOps<T> private constructor(set: Set<T>) :
         return mutableOperated()
     }
 
+    override fun toSelfOps(): SetOps<T> {
+        return this
+    }
+
     override fun <T> toIterableOps(iterable: Iterable<T>): IterableOps<T> {
         return IterableOps.opsFor(iterable)
     }

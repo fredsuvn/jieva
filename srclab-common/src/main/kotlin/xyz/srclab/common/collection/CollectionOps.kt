@@ -11,40 +11,61 @@ protected constructor(operated: C) :
         return count(operated())
     }
 
-    fun add(elements: Array<out T>): Boolean {
-        return addAll(mutableOperated(), elements)
+    override fun containsAll(elements: Array<out T>): Boolean {
+        return containsAll(operated(), elements)
     }
 
-    fun addAll(elements: Array<out T>): Boolean {
-        return addAll(mutableOperated(), elements)
+    override fun containsAll(elements: Iterable<T>): Boolean {
+        return containsAll(operated(), elements)
     }
 
-    fun addAll(elements: Iterable<T>): Boolean {
-        return addAll(mutableOperated(), elements)
+    override fun containsAll(elements: Collection<T>): Boolean {
+        return containsAll(operated(), elements)
     }
 
-    fun removeAll(elements: Array<out T>): Boolean {
-        return removeAll(mutableOperated(), elements)
+    fun add(element: T): THIS {
+        mutableOperated().add(element)
+        return toSelfOps()
     }
 
-    fun removeAll(elements: Iterable<T>): Boolean {
-        return removeAll(mutableOperated(), elements)
+    fun addAll(elements: Array<out T>): THIS {
+        addAll(mutableOperated(), elements)
+        return toSelfOps()
     }
 
-    fun removeAll(elements: Collection<T>): Boolean {
-        return removeAll(mutableOperated(), elements)
+    fun addAll(elements: Iterable<T>): THIS {
+        addAll(mutableOperated(), elements)
+        return toSelfOps()
     }
 
-    fun retainAll(elements: Array<out T>): Boolean {
-        return retainAll(mutableOperated(), elements)
+    fun removeAll(elements: Array<out T>): THIS {
+        removeAll(mutableOperated(), elements)
+        return toSelfOps()
     }
 
-    fun retainAll(elements: Iterable<T>): Boolean {
-        return retainAll(mutableOperated(), elements)
+    fun removeAll(elements: Iterable<T>): THIS {
+        removeAll(mutableOperated(), elements)
+        return toSelfOps()
     }
 
-    fun retainAll(elements: Collection<T>): Boolean {
-        return retainAll(mutableOperated(), elements)
+    fun removeAll(elements: Collection<T>): THIS {
+        removeAll(mutableOperated(), elements)
+        return toSelfOps()
+    }
+
+    fun retainAll(elements: Array<out T>): THIS {
+        retainAll(mutableOperated(), elements)
+        return toSelfOps()
+    }
+
+    fun retainAll(elements: Iterable<T>): THIS {
+        retainAll(mutableOperated(), elements)
+        return toSelfOps()
+    }
+
+    fun retainAll(elements: Collection<T>): THIS {
+        retainAll(mutableOperated(), elements)
+        return toSelfOps()
     }
 
     companion object {
@@ -52,6 +73,21 @@ protected constructor(operated: C) :
         @JvmStatic
         fun <T> count(collection: Collection<T>): Int {
             return collection.count()
+        }
+
+        @JvmStatic
+        fun <T> containsAll(collection: Collection<T>, elements: Array<out T>): Boolean {
+            return containsAll(collection, elements.toSet())
+        }
+
+        @JvmStatic
+        fun <T> containsAll(collection: Collection<T>, elements: Iterable<T>): Boolean {
+            return containsAll(collection, elements.toSet())
+        }
+
+        @JvmStatic
+        fun <T> containsAll(collection: Collection<T>, elements: Collection<T>): Boolean {
+            return collection.containsAll(elements)
         }
 
         @JvmStatic
