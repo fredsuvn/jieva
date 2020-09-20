@@ -427,7 +427,7 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun max(): T {
-        return max(Sort.selfComparableComparator())
+        return max(sequence)
     }
 
     fun max(comparator: Comparator<in T>): T {
@@ -435,7 +435,7 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun maxOrNull(): T? {
-        return maxOrNull(Sort.selfComparableComparator())
+        return maxOrNull(sequence)
     }
 
     fun maxOrNull(comparator: Comparator<in T>): T? {
@@ -443,7 +443,7 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun min(): T {
-        return min(Sort.selfComparableComparator())
+        return min(sequence)
     }
 
     fun min(comparator: Comparator<in T>): T {
@@ -451,7 +451,7 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun minOrNull(): T? {
-        return minOrNull(Sort.selfComparableComparator())
+        return minOrNull(sequence)
     }
 
     fun minOrNull(comparator: Comparator<in T>): T? {
@@ -499,7 +499,7 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun sorted(): SequenceOps<T> {
-        return sorted(Sort.selfComparableComparator())
+        return toSequenceOps(sorted(sequence))
     }
 
     fun sorted(comparator: Comparator<in T>): SequenceOps<T> {
@@ -539,6 +539,10 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         return toSequenceOps(plus(sequence, elements))
     }
 
+    fun plus(elements: Sequence<T>): SequenceOps<T> {
+        return toSequenceOps(plus(sequence, elements))
+    }
+
     fun minus(element: T): SequenceOps<T> {
         return toSequenceOps(minus(sequence, element))
     }
@@ -548,6 +552,10 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun minus(elements: Iterable<T>): SequenceOps<T> {
+        return toSequenceOps(minus(sequence, elements))
+    }
+
+    fun minus(elements: Sequence<T>): SequenceOps<T> {
         return toSequenceOps(minus(sequence, elements))
     }
 
@@ -663,6 +671,10 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         return toDoubleArray(sequence, selector)
     }
 
+    fun finalSequence(): Sequence<T> {
+        return sequence
+    }
+
     private fun <R> toSequenceOps(sequence: Sequence<R>): SequenceOps<R> {
         this.sequence = As.any(sequence)
         return As.any(this)
@@ -677,6 +689,11 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         @JvmStatic
         fun <T> opsFor(sequence: Sequence<T>): SequenceOps<T> {
             return SequenceOps(sequence)
+        }
+
+        @JvmStatic
+        fun <T> opsFor(iterable: Iterable<T>): SequenceOps<T> {
+            return SequenceOps(iterable.asSequence())
         }
 
         @JvmStatic
@@ -1215,7 +1232,7 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         }
 
         @JvmStatic
-        fun <T : Comparable<T>> max(sequence: Sequence<T>): T {
+        fun <T> max(sequence: Sequence<T>): T {
             return Require.notNull(maxOrNull(sequence))
         }
 
@@ -1225,8 +1242,8 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         }
 
         @JvmStatic
-        fun <T : Comparable<T>> maxOrNull(sequence: Sequence<T>): T? {
-            return sequence.maxOrNull()
+        fun <T> maxOrNull(sequence: Sequence<T>): T? {
+            return maxOrNull(sequence, Sort.selfComparableComparator())
         }
 
         @JvmStatic
@@ -1235,7 +1252,7 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         }
 
         @JvmStatic
-        fun <T : Comparable<T>> min(sequence: Sequence<T>): T {
+        fun <T> min(sequence: Sequence<T>): T {
             return Require.notNull(minOrNull(sequence))
         }
 
@@ -1245,8 +1262,8 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         }
 
         @JvmStatic
-        fun <T : Comparable<T>> minOrNull(sequence: Sequence<T>): T? {
-            return sequence.minOrNull()
+        fun <T> minOrNull(sequence: Sequence<T>): T? {
+            return minOrNull(sequence, Sort.selfComparableComparator())
         }
 
         @JvmStatic
@@ -1305,8 +1322,8 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         }
 
         @JvmStatic
-        fun <T : Comparable<T>> sorted(sequence: Sequence<T>): Sequence<T> {
-            return sequence.sorted()
+        fun <T> sorted(sequence: Sequence<T>): Sequence<T> {
+            return sorted(sequence, Sort.selfComparableComparator())
         }
 
         @JvmStatic
@@ -1355,6 +1372,11 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         }
 
         @JvmStatic
+        fun <T> plus(sequence: Sequence<T>, elements: Sequence<T>): Sequence<T> {
+            return sequence.plus(elements)
+        }
+
+        @JvmStatic
         fun <T> minus(sequence: Sequence<T>, element: T): Sequence<T> {
             return sequence.minus(element)
         }
@@ -1366,6 +1388,11 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
 
         @JvmStatic
         fun <T> minus(sequence: Sequence<T>, elements: Iterable<T>): Sequence<T> {
+            return sequence.minus(elements)
+        }
+
+        @JvmStatic
+        fun <T> minus(sequence: Sequence<T>, elements: Sequence<T>): Sequence<T> {
             return sequence.minus(elements)
         }
 
