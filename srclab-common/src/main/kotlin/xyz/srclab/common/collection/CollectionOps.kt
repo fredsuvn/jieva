@@ -11,6 +11,10 @@ protected constructor(operated: C) :
         return count(operated())
     }
 
+    fun add(elements: Array<out T>): Boolean {
+        return addAll(mutableOperated(), elements)
+    }
+
     fun addAll(elements: Array<out T>): Boolean {
         return addAll(mutableOperated(), elements)
     }
