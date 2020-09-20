@@ -144,31 +144,31 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun drop(n: Int): SequenceOps<T> {
-        return asSelf(drop(sequence, n))
+        return toSequenceOps(drop(sequence, n))
     }
 
     fun dropWhile(predicate: (T) -> Boolean): SequenceOps<T> {
-        return asSelf(dropWhile(sequence, predicate))
+        return toSequenceOps(dropWhile(sequence, predicate))
     }
 
     fun take(n: Int): SequenceOps<T> {
-        return asSelf(take(sequence, n))
+        return toSequenceOps(take(sequence, n))
     }
 
     fun takeWhile(predicate: (T) -> Boolean): SequenceOps<T> {
-        return asSelf(takeWhile(sequence, predicate))
+        return toSequenceOps(takeWhile(sequence, predicate))
     }
 
     fun filter(predicate: (T) -> Boolean): SequenceOps<T> {
-        return asSelf(filter(sequence, predicate))
+        return toSequenceOps(filter(sequence, predicate))
     }
 
     fun filterIndexed(predicate: (index: Int, T) -> Boolean): SequenceOps<T> {
-        return asSelf(filterIndexed(sequence, predicate))
+        return toSequenceOps(filterIndexed(sequence, predicate))
     }
 
     fun filterNotNull(): SequenceOps<T> {
-        return asSelf(filterNotNull(sequence))
+        return toSequenceOps(filterNotNull(sequence))
     }
 
     fun <C : MutableCollection<in T>> filterTo(
@@ -192,19 +192,19 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun <R> map(transform: (T) -> R): SequenceOps<R> {
-        return asSelf(map(sequence, transform))
+        return toSequenceOps(map(sequence, transform))
     }
 
     fun <R> mapIndexed(transform: (index: Int, T) -> R): SequenceOps<R> {
-        return asSelf(mapIndexed(sequence, transform))
+        return toSequenceOps(mapIndexed(sequence, transform))
     }
 
     fun <R> mapNotNull(transform: (T) -> R): SequenceOps<R> {
-        return asSelf(mapNotNull(sequence, transform))
+        return toSequenceOps(mapNotNull(sequence, transform))
     }
 
     fun <R> mapIndexedNotNull(transform: (index: Int, T) -> R): SequenceOps<R> {
-        return asSelf(mapIndexedNotNull(sequence, transform))
+        return toSequenceOps(mapIndexedNotNull(sequence, transform))
     }
 
     fun <R, C : MutableCollection<in R>> mapTo(
@@ -236,11 +236,11 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun <R> flatMap(transform: (T) -> Iterable<R>): SequenceOps<R> {
-        return asSelf(flatMap(sequence, transform))
+        return toSequenceOps(flatMap(sequence, transform))
     }
 
     fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): SequenceOps<R> {
-        return asSelf(flatMapIndexed(sequence, transform))
+        return toSequenceOps(flatMapIndexed(sequence, transform))
     }
 
     fun <R, C : MutableCollection<in R>> flatMapTo(
@@ -290,31 +290,31 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     fun <K, V> associate(
         keySelector: (T) -> K,
         valueTransform: (T) -> V
-    ): Map<K, V> {
-        return associate(sequence, keySelector, valueTransform)
+    ): MapOps<K, V> {
+        return toMapOps(associate(sequence, keySelector, valueTransform))
     }
 
-    fun <K, V> associate(transform: (T) -> Pair<K, V>): Map<K, V> {
-        return associate(sequence, transform)
+    fun <K, V> associate(transform: (T) -> Pair<K, V>): MapOps<K, V> {
+        return toMapOps(associate(sequence, transform))
     }
 
-    fun <K> associateKey(keySelector: (T) -> K): Map<K, T> {
-        return associateKey(sequence, keySelector)
+    fun <K> associateKey(keySelector: (T) -> K): MapOps<K, T> {
+        return toMapOps(associateKey(sequence, keySelector))
     }
 
-    fun <V> associateValue(valueSelector: (T) -> V): Map<T, V> {
-        return associateValue(sequence, valueSelector)
+    fun <V> associateValue(valueSelector: (T) -> V): MapOps<T, V> {
+        return toMapOps(associateValue(sequence, valueSelector))
     }
 
     fun <K, V> associateWithNext(
         keySelector: (T) -> K,
         valueTransform: (T?) -> V
-    ): Map<K, V> {
-        return associateWithNext(sequence, keySelector, valueTransform)
+    ): MapOps<K, V> {
+        return toMapOps(associateWithNext(sequence, keySelector, valueTransform))
     }
 
-    fun <K, V> associateWithNext(transform: (T, T?) -> Pair<K, V>): Map<K, V> {
-        return associateWithNext(sequence, transform)
+    fun <K, V> associateWithNext(transform: (T, T?) -> Pair<K, V>): MapOps<K, V> {
+        return toMapOps(associateWithNext(sequence, transform))
     }
 
     fun <K, V, M : MutableMap<in K, in V>> associateTo(
@@ -361,15 +361,15 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         return associateWithNextTo(sequence, destination, transform)
     }
 
-    fun <K> groupBy(keySelector: (T) -> K): Map<K, List<T>> {
-        return groupBy(sequence, keySelector)
+    fun <K> groupBy(keySelector: (T) -> K): MapOps<K, List<T>> {
+        return toMapOps(groupBy(sequence, keySelector))
     }
 
     fun <K, V> groupBy(
         keySelector: (T) -> K,
         valueTransform: (T) -> V
-    ): Map<K, List<V>> {
-        return groupBy(sequence, keySelector, valueTransform)
+    ): MapOps<K, List<V>> {
+        return toMapOps(groupBy(sequence, keySelector, valueTransform))
     }
 
     fun <K, M : MutableMap<in K, MutableList<T>>> groupByTo(
@@ -388,14 +388,14 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun chunked(size: Int): SequenceOps<List<T>> {
-        return asSelf(chunked(sequence, size))
+        return toSequenceOps(chunked(sequence, size))
     }
 
     fun <R> chunked(
         size: Int,
         transform: (List<T>) -> R
     ): SequenceOps<R> {
-        return asSelf(chunked(sequence, size, transform))
+        return toSequenceOps(chunked(sequence, size, transform))
     }
 
     fun windowed(
@@ -403,7 +403,7 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         step: Int = 1,
         partialWindows: Boolean = false
     ): SequenceOps<List<T>> {
-        return asSelf(windowed(sequence, size, step, partialWindows))
+        return toSequenceOps(windowed(sequence, size, step, partialWindows))
     }
 
     fun <R> windowed(
@@ -412,18 +412,18 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         partialWindows: Boolean = false,
         transform: (List<T>) -> R
     ): SequenceOps<R> {
-        return asSelf(windowed(sequence, size, step, partialWindows, transform))
+        return toSequenceOps(windowed(sequence, size, step, partialWindows, transform))
     }
 
     fun <R, V> zip(
         other: Sequence<R>,
         transform: (T, R) -> V
     ): SequenceOps<V> {
-        return asSelf(zip(sequence, other, transform))
+        return toSequenceOps(zip(sequence, other, transform))
     }
 
     fun <R> zipWithNext(transform: (T, T) -> R): SequenceOps<R> {
-        return asSelf(zipWithNext(sequence, transform))
+        return toSequenceOps(zipWithNext(sequence, transform))
     }
 
     fun max(): T {
@@ -503,51 +503,52 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     }
 
     fun sorted(comparator: Comparator<in T>): SequenceOps<T> {
-        return asSelf(sorted(sequence, comparator))
+        return toSequenceOps(sorted(sequence, comparator))
     }
 
     fun shuffled(): SequenceOps<T> {
-        return asSelf(shuffled(sequence))
+        return toSequenceOps(shuffled(sequence))
     }
 
     fun shuffled(random: Random): SequenceOps<T> {
-        return asSelf(shuffled(sequence, random))
+        return toSequenceOps(shuffled(sequence, random))
     }
 
     fun distinct(): SequenceOps<T> {
-        return asSelf(distinct(sequence))
+        return toSequenceOps(distinct(sequence))
     }
 
     fun <K> distinct(selector: (T) -> K): SequenceOps<T> {
-        return asSelf(distinct(sequence, selector))
+        return toSequenceOps(distinct(sequence, selector))
     }
 
-    fun forEachIndexed(action: (index: Int, T) -> Unit) {
-        return forEachIndexed(sequence, action)
+    fun forEachIndexed(action: (index: Int, T) -> Unit): SequenceOps<T> {
+        forEachIndexed(sequence, action)
+        return this
     }
 
     fun plus(element: T): SequenceOps<T> {
-        return asSelf(plus(sequence, element))
+        return toSequenceOps(plus(sequence, element))
     }
 
     fun plus(elements: Array<out T>): SequenceOps<T> {
-        return asSelf(plus(sequence, elements))
+        return toSequenceOps(plus(sequence, elements))
     }
 
     fun plus(elements: Iterable<T>): SequenceOps<T> {
-        return asSelf(plus(sequence, elements))
+        return toSequenceOps(plus(sequence, elements))
     }
 
     fun minus(element: T): SequenceOps<T> {
-        return asSelf(minus(sequence, element))
+        return toSequenceOps(minus(sequence, element))
     }
 
     fun minus(elements: Array<out T>): SequenceOps<T> {
-        return asSelf(minus(sequence, elements))
+        return toSequenceOps(minus(sequence, elements))
     }
 
     fun minus(elements: Iterable<T>): SequenceOps<T> {
-        return asSelf(minus(sequence, elements))
+        return toSequenceOps(minus(sequence, elements))
     }
 
     fun <C : MutableCollection<in T>> toCollection(destination: C): C {
@@ -662,12 +663,21 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         return toDoubleArray(sequence, selector)
     }
 
-    private fun <R> asSelf(sequence: Sequence<R>): SequenceOps<R> {
+    private fun <R> toSequenceOps(sequence: Sequence<R>): SequenceOps<R> {
         this.sequence = As.any(sequence)
         return As.any(this)
     }
 
+    private fun <K, V> toMapOps(map: Map<K, V>): MapOps<K, V> {
+        return MapOps.opsFor(map)
+    }
+
     companion object {
+
+        @JvmStatic
+        fun <T> opsFor(sequence: Sequence<T>): SequenceOps<T> {
+            return SequenceOps(sequence)
+        }
 
         @JvmStatic
         inline fun <T> find(sequence: Sequence<T>, predicate: (T) -> Boolean): T? {
