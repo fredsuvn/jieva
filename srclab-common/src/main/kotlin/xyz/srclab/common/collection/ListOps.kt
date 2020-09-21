@@ -211,6 +211,16 @@ class ListOps<T> private constructor(list: List<T>) :
         return toSelfOps()
     }
 
+    fun add(index: Int, element: T): ListOps<T> {
+        add(mutableOperated(), index, element)
+        return toSelfOps()
+    }
+
+    fun removeAt(index: Int, element: T): ListOps<T> {
+        removeAt(mutableOperated(), index)
+        return toSelfOps()
+    }
+
     fun addAll(index: Int, elements: Array<out T>): ListOps<T> {
         addAll(mutableOperated(), index, elements)
         return toSelfOps()
@@ -542,13 +552,24 @@ class ListOps<T> private constructor(list: List<T>) :
         }
 
         @JvmStatic
+        fun <T> add(list: MutableList<T>, index: Int, element: T): Boolean {
+            list.add(index, element)
+            return true
+        }
+
+        @JvmStatic
+        fun <T> removeAt(list: MutableList<T>, index: Int): T {
+            return list.removeAt(index)
+        }
+
+        @JvmStatic
         fun <T> addAll(list: MutableList<T>, index: Int, elements: Array<out T>): Boolean {
-            return list.subList(index, list.size).addAll(elements)
+            return addAll(list, index, elements.toList())
         }
 
         @JvmStatic
         fun <T> addAll(list: MutableList<T>, index: Int, elements: Iterable<T>): Boolean {
-            return list.subList(index, list.size).addAll(elements)
+            return addAll(list, index, elements.toList())
         }
 
         @JvmStatic

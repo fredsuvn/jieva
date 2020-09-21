@@ -556,6 +556,16 @@ protected constructor(operated: I) : MutableIterable<T> {
         return toSelfOps()
     }
 
+    fun remove(element: T): THIS {
+        remove(mutableOperated(), element)
+        return toSelfOps()
+    }
+
+    fun remove(predicate: (T) -> Boolean): THIS {
+        remove(mutableOperated(), predicate)
+        return toSelfOps()
+    }
+
     open fun removeAll(predicate: (T) -> Boolean): THIS {
         removeAll(mutableOperated(), predicate)
         return toSelfOps()
@@ -1423,16 +1433,34 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> removeAll(iterable: MutableIterable<T>): Boolean {
+        fun <T> remove(iterable: MutableIterable<T>, element: T): Boolean {
             val iterator = iterable.iterator()
-            if (!iterator.hasNext()) {
-                return false
+            while (iterator.hasNext()) {
+                val next = iterator.next()
+                if (next == element) {
+                    iterator.remove()
+                    return true
+                }
             }
-            do {
-                iterator.next()
-                iterator.remove()
-            } while (iterator.hasNext())
-            return true
+            return false
+        }
+
+        @JvmStatic
+        fun <T> remove(iterable: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {
+            val iterator = iterable.iterator()
+            while (iterator.hasNext()) {
+                val next = iterator.next()
+                if (predicate(next)) {
+                    iterator.remove()
+                    return true
+                }
+            }
+            return false
+        }
+
+        @JvmStatic
+        fun <T> removeAll(iterable: MutableIterable<T>): Boolean {
+            return removeAll(iterable) { true }
         }
 
         @JvmStatic

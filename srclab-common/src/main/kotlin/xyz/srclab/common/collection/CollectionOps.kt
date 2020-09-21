@@ -24,7 +24,12 @@ protected constructor(operated: C) :
     }
 
     fun add(element: T): THIS {
-        mutableOperated().add(element)
+        add(element)
+        return toSelfOps()
+    }
+
+    fun remove(element: T): THIS {
+        remove(element)
         return toSelfOps()
     }
 
@@ -88,6 +93,16 @@ protected constructor(operated: C) :
         @JvmStatic
         fun <T> containsAll(collection: Collection<T>, elements: Collection<T>): Boolean {
             return collection.containsAll(elements)
+        }
+
+        @JvmStatic
+        fun <T> add(collection: MutableCollection<T>, element: T): Boolean {
+            return collection.add(element)
+        }
+
+        @JvmStatic
+        fun <T> remove(collection: MutableCollection<T>, element: T): Boolean {
+            return collection.remove(element)
         }
 
         @JvmStatic
