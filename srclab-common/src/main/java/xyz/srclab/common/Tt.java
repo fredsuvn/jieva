@@ -3,6 +3,8 @@ package xyz.srclab.common;
 import xyz.srclab.common.base.Format;
 import xyz.srclab.common.collection.ListOps;
 
+import java.util.Map;
+
 /**
  * @author sunqian
  */
@@ -27,6 +29,7 @@ public class Tt {
         //
         //SequencesKt
         //IterableOps.opsFor(null).filterNotNull().
+        Map
         ListOps<Object> ops = ListOps.opsFor(null)
                 .addAll(new Object[0])
                 .subList(0)

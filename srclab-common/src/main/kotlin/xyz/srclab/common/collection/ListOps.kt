@@ -100,6 +100,9 @@ class ListOps<T> private constructor(list: List<T>) :
     }
 
     fun parentList(): ListOps<T> {
+        if (subListStack == null) {
+            return this
+        }
         val stack = subListStack()
         return if (stack.isEmpty()) {
             this

@@ -39,6 +39,11 @@ interface NamingCase {
         }
 
         @JvmStatic
+        fun capitalizeUnderscore(): NamingCase {
+            return CapitalizeUnderscore
+        }
+
+        @JvmStatic
         fun lowerHyphen(): NamingCase {
             return LowerHyphen
         }
@@ -46,6 +51,11 @@ interface NamingCase {
         @JvmStatic
         fun upperHyphen(): NamingCase {
             return UpperHyphen
+        }
+
+        @JvmStatic
+        fun capitalizeHyphen(): NamingCase {
+            return CapitalizeHyphen
         }
 
         private object LowerCamel : CamelCase() {
@@ -72,6 +82,12 @@ interface NamingCase {
             }
         }
 
+        private object CapitalizeUnderscore : UnderscoreCase() {
+            override fun doWord(word: String): String {
+                return word.toLowerCase(Defaults.locale()).capitalize(Defaults.locale())
+            }
+        }
+
         private object LowerHyphen : HyphenCase() {
             override fun doWord(word: String): String {
                 return word.toLowerCase(Defaults.locale())
@@ -81,6 +97,12 @@ interface NamingCase {
         private object UpperHyphen : HyphenCase() {
             override fun doWord(word: String): String {
                 return word.toUpperCase(Defaults.locale())
+            }
+        }
+
+        private object CapitalizeHyphen : HyphenCase() {
+            override fun doWord(word: String): String {
+                return word.toLowerCase(Defaults.locale()).capitalize(Defaults.locale())
             }
         }
 

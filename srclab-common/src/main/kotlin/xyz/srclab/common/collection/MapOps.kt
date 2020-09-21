@@ -82,6 +82,38 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
         return singleOrNull(operated(), predicate)
     }
 
+    fun containsKey(key: K): Boolean {
+        return containsKey(operated(), key)
+    }
+
+    fun containsKeys(keys: Array<out K>): Boolean {
+        return containsKeys(operated(), keys)
+    }
+
+    fun containsKeys(keys: Iterable<K>): Boolean {
+        return containsKeys(operated(), keys)
+    }
+
+    fun containsKeys(keys: Collection<K>): Boolean {
+        return containsKeys(operated(), keys)
+    }
+
+    fun containsValue(value: V): Boolean {
+        return containsValue(operated(), value)
+    }
+
+    fun containsValues(values: Array<out V>): Boolean {
+        return containsValues(operated(), values)
+    }
+
+    fun containsValues(values: Iterable<V>): Boolean {
+        return containsValues(operated(), values)
+    }
+
+    fun containsValues(values: Collection<V>): Boolean {
+        return containsValues(operated(), values)
+    }
+
     fun count(): Int {
         return count(operated())
     }
@@ -142,6 +174,51 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
         return flatMapTo(operated(), destination, transform)
     }
 
+    fun putAll(elements: Map<out K, V>): MapOps<K, V> {
+        putAll(mutableOperated(), elements)
+        return this
+    }
+
+    fun putAll(elements: Array<out Map.Entry<K, V>>): MapOps<K, V> {
+        putAll(mutableOperated(), elements)
+        return this
+    }
+
+    fun putAll(elements: Iterable<Map.Entry<K, V>>): MapOps<K, V> {
+        putAll(mutableOperated(), elements)
+        return this
+    }
+
+    fun removeAll(keys: Array<out K>): MapOps<K, V> {
+        removeAll(mutableOperated(), keys)
+        return this
+    }
+
+    fun removeAll(keys: Iterable<K>): MapOps<K, V> {
+        removeAll(mutableOperated(), keys)
+        return this
+    }
+
+    fun removeAll(keys: Collection<K>): MapOps<K, V> {
+        removeAll(mutableOperated(), keys)
+        return this
+    }
+
+    fun retainAll(keys: Array<out K>): MapOps<K, V> {
+        retainAll(mutableOperated(), keys)
+        return this
+    }
+
+    fun retainAll(keys: Iterable<K>): MapOps<K, V> {
+        retainAll(mutableOperated(), keys)
+        return this
+    }
+
+    fun retainAll(keys: Collection<K>): MapOps<K, V> {
+        retainAll(mutableOperated(), keys)
+        return this
+    }
+
     fun plus(other: Map<out K, V>): MapOps<K, V> {
         return toMapOps(plus(operated(), other))
     }
@@ -156,14 +233,6 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
 
     fun minus(keys: Iterable<K>): MapOps<K, V> {
         return toMapOps(minus(operated(), keys))
-    }
-
-    fun toMap(): Map<K, V> {
-        return toMap(mutableOperated())
-    }
-
-    fun <M : MutableMap<in K, in V>> toMutableMap(destination: M): M {
-        return toMutableMap(operated(), destination)
     }
 
     fun toSequenceOps(): SequenceOps<Map.Entry<K, V>> {
@@ -305,6 +374,46 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
         }
 
         @JvmStatic
+        fun <K, V> containsKey(map: Map<K, V>, key: K): Boolean {
+            return map.containsKey(key)
+        }
+
+        @JvmStatic
+        fun <K, V> containsKeys(map: Map<K, V>, keys: Array<out K>): Boolean {
+            return containsKeys(map, keys.toSet())
+        }
+
+        @JvmStatic
+        fun <K, V> containsKeys(map: Map<K, V>, keys: Iterable<K>): Boolean {
+            return containsKeys(map, keys.toSet())
+        }
+
+        @JvmStatic
+        fun <K, V> containsKeys(map: Map<K, V>, keys: Collection<K>): Boolean {
+            return map.keys.containsAll(keys)
+        }
+
+        @JvmStatic
+        fun <K, V> containsValue(map: Map<K, V>, value: V): Boolean {
+            return map.containsValue(value)
+        }
+
+        @JvmStatic
+        fun <K, V> containsValues(map: Map<K, V>, values: Array<out V>): Boolean {
+            return containsValues(map, values.toSet())
+        }
+
+        @JvmStatic
+        fun <K, V> containsValues(map: Map<K, V>, values: Iterable<V>): Boolean {
+            return containsValues(map, values.toSet())
+        }
+
+        @JvmStatic
+        fun <K, V> containsValues(map: Map<K, V>, values: Collection<V>): Boolean {
+            return map.values.containsAll(values)
+        }
+
+        @JvmStatic
         fun <K, V> count(map: Map<K, V>): Int {
             return map.count()
         }
@@ -418,6 +527,65 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
             return map.flatMapTo(destination, transform)
         }
 
+        //@JvmStatic
+        //fun <K, V> put(map: MutableMap<K, V>, key: K): Boolean {
+        //    return collection.add(element)
+        //}
+
+        @JvmStatic
+        fun <K, V> remove(map: MutableMap<K, V>, key: K): V? {
+             return map.remove(key)
+        }
+
+        @JvmStatic
+        fun <K, V> putAll(map: MutableMap<K, V>, elements: Map<out K, V>) {
+            map.putAll(elements)
+        }
+
+        @JvmStatic
+        fun <K, V> putAll(map: MutableMap<K, V>, elements: Array<out Map.Entry<K, V>>) {
+            for (element in elements) {
+                map[element.key] = element.value
+            }
+        }
+
+        @JvmStatic
+        fun <K, V> putAll(map: MutableMap<K, V>, elements: Iterable<Map.Entry<K, V>>) {
+            for (element in elements) {
+                map[element.key] = element.value
+            }
+        }
+
+        @JvmStatic
+        fun <K, V> removeAll(map: MutableMap<K, V>, keys: Array<out K>): Boolean {
+            return map.keys.removeAll(keys)
+        }
+
+        @JvmStatic
+        fun <K, V> removeAll(map: MutableMap<K, V>, keys: Iterable<K>): Boolean {
+            return map.keys.removeAll(keys)
+        }
+
+        @JvmStatic
+        fun <K, V> removeAll(map: MutableMap<K, V>, keys: Collection<K>): Boolean {
+            return map.keys.removeAll(keys)
+        }
+
+        @JvmStatic
+        fun <K, V> retainAll(map: MutableMap<K, V>, keys: Array<out K>): Boolean {
+            return map.keys.retainAll(keys)
+        }
+
+        @JvmStatic
+        fun <K, V> retainAll(map: MutableMap<K, V>, keys: Iterable<K>): Boolean {
+            return map.keys.retainAll(keys)
+        }
+
+        @JvmStatic
+        fun <K, V> retainAll(map: MutableMap<K, V>, keys: Collection<K>): Boolean {
+            return map.keys.retainAll(keys)
+        }
+
         @JvmStatic
         fun <K, V> plus(map: Map<K, V>, other: Map<out K, V>): Map<K, V> {
             return map.plus(other)
@@ -436,19 +604,6 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
         @JvmStatic
         fun <K, V> minus(map: Map<K, V>, keys: Iterable<K>): Map<K, V> {
             return map.minus(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> toMap(map: MutableMap<K, V>): Map<K, V> {
-            return map.toMap()
-        }
-
-        @JvmStatic
-        fun <K, V, M : MutableMap<in K, in V>> toMutableMap(map: Map<K, V>, destination: M): M {
-            for (entry in map) {
-                destination.put(entry.key, entry.value)
-            }
-            return destination
         }
 
         @JvmStatic

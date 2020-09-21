@@ -596,6 +596,21 @@ protected constructor(operated: I) : MutableIterable<T> {
         return toSelfOps()
     }
 
+    fun addTo(destination: Array<in T>): THIS {
+        addTo(operated(), destination)
+        return toSelfOps()
+    }
+
+    fun addTo(destination: Array<in T>, fromIndex: Int, toIndex: Int): THIS {
+        addTo(operated(), destination, fromIndex, toIndex)
+        return toSelfOps()
+    }
+
+    fun addTo(destination: MutableCollection<T>): THIS {
+        addTo(operated(), destination)
+        return toSelfOps()
+    }
+
     fun <C : MutableCollection<in T>> toCollection(destination: C): C {
         return toCollection(operated(), destination)
     }
@@ -1521,6 +1536,32 @@ protected constructor(operated: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> retainAll(iterable: MutableIterable<T>, predicate: (T) -> Boolean): Boolean {
             return iterable.retainAll(predicate)
+        }
+
+        @JvmStatic
+        fun <T> addTo(iterable: Iterable<T>, destination: Array<in T>): Boolean {
+            return addTo(iterable, destination, 0, destination.size)
+        }
+
+        @JvmStatic
+        fun <T> addTo(iterable: Iterable<T>, destination: Array<in T>, fromIndex: Int, toIndex: Int): Boolean {
+            Check.checkRangeInBounds(fromIndex, toIndex, destination.size)
+            var result = false
+            val iterator = iterable.iterator()
+            for (i in fromIndex until toIndex) {
+                if (iterator.hasNext()) {
+                    destination[i] = iterator.next()
+                    result = true
+                } else {
+                    return result
+                }
+            }
+            return result
+        }
+
+        @JvmStatic
+        fun <T> addTo(iterable: Iterable<T>, destination: MutableCollection<T>): Boolean {
+            return destination.addAll(iterable)
         }
 
         @JvmStatic

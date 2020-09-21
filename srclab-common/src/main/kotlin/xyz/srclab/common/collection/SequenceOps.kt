@@ -1,9 +1,6 @@
 package xyz.srclab.common.collection
 
-import xyz.srclab.common.base.As
-import xyz.srclab.common.base.Require
-import xyz.srclab.common.base.Sort
-import xyz.srclab.common.base.To
+import xyz.srclab.common.base.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -524,6 +521,21 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
 
     fun forEachIndexed(action: (index: Int, T) -> Unit): SequenceOps<T> {
         forEachIndexed(sequence, action)
+        return this
+    }
+
+    fun addTo(destination: Array<in T>): SequenceOps<T> {
+        addTo(sequence, destination)
+        return this
+    }
+
+    fun addTo(destination: Array<in T>, fromIndex: Int, toIndex: Int): SequenceOps<T> {
+        addTo(sequence, destination, fromIndex, toIndex)
+        return this
+    }
+
+    fun addTo(destination: MutableCollection<T>): SequenceOps<T> {
+        addTo(sequence, destination)
         return this
     }
 
@@ -1378,6 +1390,32 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         @JvmStatic
         inline fun <T> forEachIndexed(sequence: Sequence<T>, action: (index: Int, T) -> Unit) {
             return sequence.forEachIndexed(action)
+        }
+
+        @JvmStatic
+        fun <T> addTo(sequence: Sequence<T>, destination: Array<in T>): Boolean {
+            return addTo(sequence, destination, 0, destination.size)
+        }
+
+        @JvmStatic
+        fun <T> addTo(sequence: Sequence<T>, destination: Array<in T>, fromIndex: Int, toIndex: Int): Boolean {
+            Check.checkRangeInBounds(fromIndex, toIndex, destination.size)
+            var result = false
+            val iterator = sequence.iterator()
+            for (i in fromIndex until toIndex) {
+                if (iterator.hasNext()) {
+                    destination[i] = iterator.next()
+                    result = true
+                } else {
+                    return result
+                }
+            }
+            return result
+        }
+
+        @JvmStatic
+        fun <T> addTo(sequence: Sequence<T>, destination: MutableCollection<T>): Boolean {
+            return destination.addAll(sequence)
         }
 
         @JvmStatic
