@@ -28,7 +28,7 @@ protected constructor(operated: C) :
         return toSelfOps()
     }
 
-    fun remove(element: T): THIS {
+    override fun remove(element: T): THIS {
         remove(element)
         return toSelfOps()
     }

@@ -556,7 +556,7 @@ protected constructor(operated: I) : MutableIterable<T> {
         return toSelfOps()
     }
 
-    fun remove(element: T): THIS {
+    open fun remove(element: T): THIS {
         remove(mutableOperated(), element)
         return toSelfOps()
     }
@@ -571,20 +571,24 @@ protected constructor(operated: I) : MutableIterable<T> {
         return toSelfOps()
     }
 
-    open fun removeFirst(): T {
-        return removeFirst(mutableOperated())
+    open fun removeFirst(): THIS {
+        removeFirst(mutableOperated())
+        return toSelfOps()
     }
 
-    open fun removeFirstOrNull(): T? {
-        return removeFirstOrNull(mutableOperated())
+    open fun removeFirstOrNull(): THIS {
+        removeFirstOrNull(mutableOperated())
+        return toSelfOps()
     }
 
-    open fun removeLast(): T {
-        return removeLast(mutableOperated())
+    open fun removeLast(): THIS {
+        removeLast(mutableOperated())
+        return toSelfOps()
     }
 
-    open fun removeLastOrNull(): T? {
-        return removeLastOrNull(mutableOperated())
+    open fun removeLastOrNull(): THIS {
+        removeLastOrNull(mutableOperated())
+        return toSelfOps()
     }
 
     open fun retainAll(predicate: (T) -> Boolean): THIS {

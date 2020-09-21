@@ -190,20 +190,24 @@ class ListOps<T> private constructor(list: List<T>) :
         return toSelfOps()
     }
 
-    override fun removeFirst(): T {
-        return removeFirst(mutableOperated())
+    override fun removeFirst(): ListOps<T> {
+        removeFirst(mutableOperated())
+        return toSelfOps()
     }
 
-    override fun removeFirstOrNull(): T? {
-        return removeFirstOrNull(mutableOperated())
+    override fun removeFirstOrNull(): ListOps<T> {
+        removeFirstOrNull(mutableOperated())
+        return toSelfOps()
     }
 
-    override fun removeLast(): T {
-        return removeLast(mutableOperated())
+    override fun removeLast(): ListOps<T> {
+        removeLast(mutableOperated())
+        return toSelfOps()
     }
 
-    override fun removeLastOrNull(): T? {
-        return removeLastOrNull(mutableOperated())
+    override fun removeLastOrNull(): ListOps<T> {
+        removeLastOrNull(mutableOperated())
+        return toSelfOps()
     }
 
     override fun retainAll(predicate: (T) -> Boolean): ListOps<T> {
