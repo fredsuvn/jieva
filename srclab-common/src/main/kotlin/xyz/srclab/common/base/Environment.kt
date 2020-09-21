@@ -37,7 +37,7 @@ object Environment {
     const val KEY_OF_USER_DIR = "user.dir"
 
     @JvmStatic
-    fun getProperty(key: String): String? = getSystemProperty(key)
+    fun property(key: String): String? = getSystemProperty(key)
 
     @JvmStatic
     fun setProperty(key: String, value: String) {
@@ -63,7 +63,7 @@ object Environment {
     }
 
     @JvmStatic
-    fun getVariable(key: String): String? {
+    fun variable(key: String): String? {
         return System.getenv(key)
     }
 
