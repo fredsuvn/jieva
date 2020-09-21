@@ -302,6 +302,14 @@ class ListOps<T> private constructor(list: List<T>) :
         return toListOps(minus(operated(), elements))
     }
 
+    fun toIterableOps(): IterableOps<T> {
+        return toIterableOps(operated())
+    }
+
+    fun toSetOps(): SetOps<T> {
+        return toSetOps(operated().toSet())
+    }
+
     fun finalList(): List<T> {
         return operated()
     }

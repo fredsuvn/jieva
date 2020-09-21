@@ -37,6 +37,14 @@ class SetOps<T> private constructor(set: Set<T>) :
         return toSetOps(minus(operated(), elements))
     }
 
+    fun toIterableOps(): IterableOps<T> {
+        return toIterableOps(operated())
+    }
+
+    fun toListOps(): ListOps<T> {
+        return toListOps(operated().toList())
+    }
+
     fun finalSet(): Set<T> {
         return operated()
     }

@@ -671,6 +671,18 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         return toDoubleArray(sequence, selector)
     }
 
+    fun toIterableOps(): IterableOps<T> {
+        return toIterableOps(sequence.asIterable())
+    }
+
+    fun toListOps(): ListOps<T> {
+        return toListOps(sequence.toList())
+    }
+
+    fun toSetOps(): SetOps<T> {
+        return toSetOps(sequence.toSet())
+    }
+
     fun finalSequence(): Sequence<T> {
         return sequence
     }
@@ -678,6 +690,18 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
     private fun <R> toSequenceOps(sequence: Sequence<R>): SequenceOps<R> {
         this.sequence = As.any(sequence)
         return As.any(this)
+    }
+
+    private fun <T> toIterableOps(iterable: Iterable<T>): IterableOps<T> {
+        return IterableOps.opsFor(iterable)
+    }
+
+    private fun <T> toListOps(list: List<T>): ListOps<T> {
+        return ListOps.opsFor(list)
+    }
+
+    private fun <T> toSetOps(set: Set<T>): SetOps<T> {
+        return SetOps.opsFor(set)
     }
 
     private fun <K, V> toMapOps(map: Map<K, V>): MapOps<K, V> {

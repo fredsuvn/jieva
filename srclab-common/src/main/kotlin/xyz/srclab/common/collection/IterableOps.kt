@@ -37,6 +37,14 @@ class IterableOps<T> private constructor(iterable: Iterable<T>) :
         return toListOps(minus(operated(), elements))
     }
 
+    fun toListOps(): ListOps<T> {
+        return toListOps(operated().toList())
+    }
+
+    fun toSetOps(): SetOps<T> {
+        return toSetOps(operated().toSet())
+    }
+
     fun finalIterable(): Iterable<T> {
         return operated()
     }
