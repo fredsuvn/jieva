@@ -18,6 +18,76 @@ protected constructor(operated: I) : MutableIterable<T> {
         return mutableOperated().iterator()
     }
 
+    fun <R> map(transform: (T) -> R): ListOps<R> {
+        return toListOps(map(operated(), transform))
+    }
+
+    fun <R> mapIndexed(transform: (index: Int, T) -> R): ListOps<R> {
+        return toListOps(mapIndexed(operated(), transform))
+    }
+
+    fun <R> mapNotNull(transform: (T) -> R?): ListOps<R> {
+        return toListOps(mapNotNull(operated(), transform))
+    }
+
+    fun <R> mapIndexedNotNull(transform: (index: Int, T) -> R?): ListOps<R> {
+        return toListOps(mapIndexedNotNull(operated(), transform))
+    }
+
+    fun <R, C : MutableCollection<in R>> mapTo(
+        destination: C,
+        transform: (T) -> R
+    ): C {
+        return mapTo(operated(), destination, transform)
+    }
+
+    fun <R, C : MutableCollection<in R>> mapIndexedTo(
+        destination: C,
+        transform: (index: Int, T) -> R
+    ): C {
+        return mapIndexedTo(operated(), destination, transform)
+    }
+
+    fun <R : Any, C : MutableCollection<in R>> mapNotNullTo(
+        destination: C,
+        transform: (T) -> R?
+    ): C {
+        return mapNotNullTo(operated(), destination, transform)
+    }
+
+    fun <R : Any, C : MutableCollection<in R>> mapIndexedNotNullTo(
+        destination: C,
+        transform: (index: Int, T) -> R?
+    ): C {
+        return mapIndexedNotNullTo(operated(), destination, transform)
+    }
+
+    fun <R, V> zip(
+        other: Array<out R>,
+        transform: (T, R) -> V
+    ): ListOps<V> {
+        return toListOps(zip(operated(), other, transform))
+    }
+
+    fun <R, V> zip(
+        other: Iterable<R>,
+        transform: (T, R) -> V
+    ): ListOps<V> {
+        return toListOps(zip(operated(), other, transform))
+    }
+
+    fun <R> zipWithNext(transform: (T, T) -> R): ListOps<R> {
+        return toListOps(zipWithNext(operated(), transform))
+    }
+
+    fun <R, V> unzip(transform: (T) -> Pair<R, V>): Pair<List<R>, List<V>> {
+        return unzip(operated(), transform)
+    }
+
+    fun <R> unzipWithNext(transform: (T) -> Pair<R, R>): ListOps<R> {
+        return toListOps(unzipWithNext(operated(), transform))
+    }
+
     fun find(predicate: (T) -> Boolean): T? {
         return find(operated(), predicate)
     }
@@ -195,50 +265,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         destination: C
     ): C {
         return filterNotNullTo(As.any(operated()), destination)
-    }
-
-    fun <R> map(transform: (T) -> R): ListOps<R> {
-        return toListOps(map(operated(), transform))
-    }
-
-    fun <R> mapIndexed(transform: (index: Int, T) -> R): ListOps<R> {
-        return toListOps(mapIndexed(operated(), transform))
-    }
-
-    fun <R> mapNotNull(transform: (T) -> R): ListOps<R> {
-        return toListOps(mapNotNull(operated(), transform))
-    }
-
-    fun <R> mapIndexedNotNull(transform: (index: Int, T) -> R): ListOps<R> {
-        return toListOps(mapIndexedNotNull(operated(), transform))
-    }
-
-    fun <R, C : MutableCollection<in R>> mapTo(
-        destination: C,
-        transform: (T) -> R
-    ): C {
-        return mapTo(operated(), destination, transform)
-    }
-
-    fun <R, C : MutableCollection<in R>> mapIndexedTo(
-        destination: C,
-        transform: (index: Int, T) -> R
-    ): C {
-        return mapIndexedTo(operated(), destination, transform)
-    }
-
-    fun <R : Any, C : MutableCollection<in R>> mapNotNullTo(
-        destination: C,
-        transform: (T) -> R?
-    ): C {
-        return mapNotNullTo(operated(), destination, transform)
-    }
-
-    fun <R : Any, C : MutableCollection<in R>> mapIndexedNotNullTo(
-        destination: C,
-        transform: (index: Int, T) -> R?
-    ): C {
-        return mapIndexedNotNullTo(operated(), destination, transform)
     }
 
     fun <R> flatMap(transform: (T) -> Iterable<R>): ListOps<R> {
@@ -419,24 +445,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         transform: (List<T>) -> R
     ): ListOps<R> {
         return toListOps(windowed(operated(), size, step, partialWindows, transform))
-    }
-
-    fun <R, V> zip(
-        other: Array<out R>,
-        transform: (T, R) -> V
-    ): ListOps<V> {
-        return toListOps(zip(operated(), other, transform))
-    }
-
-    fun <R, V> zip(
-        other: Iterable<R>,
-        transform: (T, R) -> V
-    ): ListOps<V> {
-        return toListOps(zip(operated(), other, transform))
-    }
-
-    fun <R> zipWithNext(transform: (T, T) -> R): ListOps<R> {
-        return toListOps(zipWithNext(operated(), transform))
     }
 
     fun max(): T {
@@ -748,6 +756,116 @@ protected constructor(operated: I) : MutableIterable<T> {
     companion object {
 
         @JvmStatic
+        inline fun <T, R> map(iterable: Iterable<T>, transform: (T) -> R): List<R> {
+            return iterable.map(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R> mapIndexed(iterable: Iterable<T>, transform: (index: Int, T) -> R): List<R> {
+            return iterable.mapIndexed(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R : Any> mapNotNull(iterable: Iterable<T>, transform: (T) -> R?): List<R> {
+            return iterable.mapNotNull(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R : Any> mapIndexedNotNull(iterable: Iterable<T>, transform: (index: Int, T) -> R?): List<R> {
+            return iterable.mapIndexedNotNull(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R, C : MutableCollection<in R>> mapTo(
+            iterable: Iterable<T>,
+            destination: C,
+            transform: (T) -> R
+        ): C {
+            return iterable.mapTo(destination, transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R, C : MutableCollection<in R>> mapIndexedTo(
+            iterable: Iterable<T>,
+            destination: C,
+            transform: (index: Int, T) -> R
+        ): C {
+            return iterable.mapIndexedTo(destination, transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R : Any, C : MutableCollection<in R>> mapNotNullTo(
+            iterable: Iterable<T>,
+            destination: C,
+            transform: (T) -> R?
+        ): C {
+            return iterable.mapNotNullTo(destination, transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R : Any, C : MutableCollection<in R>> mapIndexedNotNullTo(
+            iterable: Iterable<T>,
+            destination: C,
+            transform: (index: Int, T) -> R?
+        ): C {
+            return iterable.mapIndexedNotNullTo(destination, transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R, V> zip(
+            iterable: Iterable<T>,
+            other: Array<out R>,
+            transform: (T, R) -> V
+        ): List<V> {
+            return iterable.zip(other, transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R, V> zip(
+            iterable: Iterable<T>,
+            other: Iterable<R>,
+            transform: (T, R) -> V
+        ): List<V> {
+            return iterable.zip(other, transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R> zipWithNext(iterable: Iterable<T>, transform: (T, T) -> R): List<R> {
+            val l = listOf(1 to 2)
+            val un = l.unzip()
+            return iterable.zipWithNext(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R, V> unzip(
+            iterable: Iterable<V>,
+            transform: (V) -> Pair<T, R>
+        ): Pair<List<T>, List<R>> {
+            val listT = LinkedList<T>()
+            val listR = LinkedList<R>()
+            for (e in iterable) {
+                val pair = transform(e)
+                listT.add(pair.first)
+                listR.add(pair.second)
+            }
+            return listT to listR
+        }
+
+        @JvmStatic
+        inline fun <T, R> unzipWithNext(
+            iterable: Iterable<R>,
+            transform: (R) -> Pair<T, T>
+        ): List<T> {
+            val listT = LinkedList<T>()
+            for (e in iterable) {
+                val pair = transform(e)
+                listT.add(pair.first)
+                listT.add(pair.second)
+            }
+            return listT
+        }
+
+        @JvmStatic
         inline fun <T> find(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
             return iterable.find(predicate)
         }
@@ -970,62 +1088,6 @@ protected constructor(operated: I) : MutableIterable<T> {
             destination: C
         ): C {
             return iterable.filterNotNullTo(destination)
-        }
-
-        @JvmStatic
-        inline fun <T, R> map(iterable: Iterable<T>, transform: (T) -> R): List<R> {
-            return iterable.map(transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R> mapIndexed(iterable: Iterable<T>, transform: (index: Int, T) -> R): List<R> {
-            return iterable.mapIndexed(transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R> mapNotNull(iterable: Iterable<T>, transform: (T) -> R): List<R> {
-            return iterable.mapNotNull(transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R> mapIndexedNotNull(iterable: Iterable<T>, transform: (index: Int, T) -> R): List<R> {
-            return iterable.mapIndexedNotNull(transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> mapTo(
-            iterable: Iterable<T>,
-            destination: C,
-            transform: (T) -> R
-        ): C {
-            return iterable.mapTo(destination, transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> mapIndexedTo(
-            iterable: Iterable<T>,
-            destination: C,
-            transform: (index: Int, T) -> R
-        ): C {
-            return iterable.mapIndexedTo(destination, transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R : Any, C : MutableCollection<in R>> mapNotNullTo(
-            iterable: Iterable<T>,
-            destination: C,
-            transform: (T) -> R?
-        ): C {
-            return iterable.mapNotNullTo(destination, transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R : Any, C : MutableCollection<in R>> mapIndexedNotNullTo(
-            iterable: Iterable<T>,
-            destination: C,
-            transform: (index: Int, T) -> R?
-        ): C {
-            return iterable.mapIndexedNotNullTo(destination, transform)
         }
 
         @JvmStatic
@@ -1281,29 +1343,6 @@ protected constructor(operated: I) : MutableIterable<T> {
             transform: (List<T>) -> R
         ): List<R> {
             return iterable.windowed(size, step, partialWindows, transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R, V> zip(
-            iterable: Iterable<T>,
-            other: Array<out R>,
-            transform: (T, R) -> V
-        ): List<V> {
-            return iterable.zip(other, transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R, V> zip(
-            iterable: Iterable<T>,
-            other: Iterable<R>,
-            transform: (T, R) -> V
-        ): List<V> {
-            return iterable.zip(other, transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R> zipWithNext(iterable: Iterable<T>, transform: (T, T) -> R): List<R> {
-            return iterable.zipWithNext(transform)
         }
 
         @JvmStatic

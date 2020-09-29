@@ -9,7 +9,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'srclab-common-root'
+rootProject.name = 'srclab-common-build'
 
 // SrcLab Common projects
 file("${rootDir}/").eachDirMatch(~/srclab-.*/) { file ->
