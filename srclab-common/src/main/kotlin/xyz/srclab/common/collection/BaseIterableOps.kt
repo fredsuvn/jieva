@@ -6,6 +6,7 @@ import java.math.BigInteger
 import java.util.*
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
+import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 
@@ -88,6 +89,183 @@ protected constructor(operated: I) : MutableIterable<T> {
         return toListOps(unzipWithNext(operated(), transform))
     }
 
+    fun <K, V> associate(
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): MapOps<K, V> {
+        return toMapOps(associate(operated(), keySelector, valueTransform))
+    }
+
+    fun <K, V> associate(transform: (T) -> Pair<K, V>): MapOps<K, V> {
+        return toMapOps(associate(operated(), transform))
+    }
+
+    fun <K> associateKey(keySelector: (T) -> K): MapOps<K, T> {
+        return toMapOps(associateKey(operated(), keySelector))
+    }
+
+    fun <V> associateValue(valueSelector: (T) -> V): MapOps<T, V> {
+        return toMapOps(associateValue(operated(), valueSelector))
+    }
+
+    fun <K, V> associatePair(
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): MapOps<K, V> {
+        return toMapOps(associatePair(operated(), keySelector, valueTransform))
+    }
+
+    fun <K, V> associatePair(transform: (T, T) -> Pair<K, V>): MapOps<K, V> {
+        return toMapOps(associatePair(operated(), transform))
+    }
+
+    fun <K, V> associatePair(
+        complementValue: T,
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): MapOps<K, V> {
+        return toMapOps(associatePair(operated(), complementValue, keySelector, valueTransform))
+    }
+
+    fun <K, V> associatePair(complementValue: T, transform: (T, T) -> Pair<K, V>): MapOps<K, V> {
+        return toMapOps(associatePair(operated(), complementValue, transform))
+    }
+
+    fun <K, V, M : MutableMap<in K, in V>> associateTo(
+        destination: M,
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): M {
+        return associateTo(operated(), destination, keySelector, valueTransform)
+    }
+
+    fun <K, V, M : MutableMap<in K, in V>> associateTo(
+        destination: M,
+        transform: (T) -> Pair<K, V>
+    ): M {
+        return associateTo(operated(), destination, transform)
+    }
+
+    fun <K, M : MutableMap<in K, in T>> associateKeyTo(
+        destination: M,
+        keySelector: (T) -> K
+    ): M {
+        return associateKeyTo(operated(), destination, keySelector)
+    }
+
+    fun <V, M : MutableMap<in T, in V>> associateValueTo(
+        destination: M,
+        valueSelector: (T) -> V
+    ): M {
+        return associateValueTo(operated(), destination, valueSelector)
+    }
+
+    fun <K, V, M : MutableMap<in K, in V>> associatePairTo(
+        destination: M,
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): M {
+        return associatePairTo(operated(), destination, keySelector, valueTransform)
+    }
+
+    fun <K, V, M : MutableMap<in K, in V>> associatePairTo(
+        destination: M,
+        transform: (T, T) -> Pair<K, V>
+    ): M {
+        return associatePairTo(operated(), destination, transform)
+    }
+
+    fun <K, V, M : MutableMap<in K, in V>> associatePairTo(
+        complementValue: T,
+        destination: M,
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): M {
+        return associatePairTo(operated(), complementValue, destination, keySelector, valueTransform)
+    }
+
+    fun <K, V, M : MutableMap<in K, in V>> associatePairTo(
+        complementValue: T,
+        destination: M,
+        transform: (T, T) -> Pair<K, V>
+    ): M {
+        return associatePairTo(operated(), complementValue, destination, transform)
+    }
+
+    fun <R> flatMap(transform: (T) -> Iterable<R>): ListOps<R> {
+        return toListOps(flatMap(operated(), transform))
+    }
+
+    fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): ListOps<R> {
+        return toListOps(flatMapIndexed(operated(), transform))
+    }
+
+    fun <R, C : MutableCollection<in R>> flatMapTo(
+        destination: C,
+        transform: (T) -> Iterable<R>
+    ): C {
+        return flatMapTo(operated(), destination, transform)
+    }
+
+    fun <R, C : MutableCollection<in R>> flatMapIndexedTo(
+        destination: C,
+        transform: (index: Int, T) -> Iterable<R>
+    ): C {
+        return flatMapIndexedTo(operated(), destination, transform)
+    }
+
+    fun filter(predicate: (T) -> Boolean): ListOps<T> {
+        return toListOps(filter(operated(), predicate))
+    }
+
+    fun filterIndexed(predicate: (index: Int, T) -> Boolean): ListOps<T> {
+        return toListOps(filterIndexed(operated(), predicate))
+    }
+
+    fun filterNotNull(): ListOps<T> {
+        return toListOps(filterNotNull(operated()))
+    }
+
+    fun <C : MutableCollection<in T>> filterTo(
+        destination: C,
+        predicate: (T) -> Boolean
+    ): C {
+        return filterTo(operated(), destination, predicate)
+    }
+
+    fun <C : MutableCollection<in T>> filterIndexedTo(
+        destination: C,
+        predicate: (index: Int, T) -> Boolean
+    ): C {
+        return filterIndexedTo(operated(), destination, predicate)
+    }
+
+    fun <C : MutableCollection<in T>> filterNotNullTo(
+        destination: C
+    ): C {
+        return filterNotNullTo(As.any(operated()), destination)
+    }
+
+    fun any(): Boolean {
+        return any(operated())
+    }
+
+    fun any(predicate: (T) -> Boolean): Boolean {
+        return any(operated(), predicate)
+    }
+
+    fun none(): Boolean {
+        return none(operated())
+    }
+
+    fun none(predicate: (T) -> Boolean): Boolean {
+        return none(operated(), predicate)
+    }
+
+    fun all(predicate: (T) -> Boolean): Boolean {
+        return all(operated(), predicate)
+    }
+
     fun find(predicate: (T) -> Boolean): T? {
         return find(operated(), predicate)
     }
@@ -126,26 +304,6 @@ protected constructor(operated: I) : MutableIterable<T> {
 
     open fun lastOrNull(predicate: (T) -> Boolean): T? {
         return lastOrNull(operated(), predicate)
-    }
-
-    fun all(predicate: (T) -> Boolean): Boolean {
-        return all(operated(), predicate)
-    }
-
-    fun any(): Boolean {
-        return any(operated())
-    }
-
-    fun any(predicate: (T) -> Boolean): Boolean {
-        return any(operated(), predicate)
-    }
-
-    fun none(): Boolean {
-        return none(operated())
-    }
-
-    fun none(predicate: (T) -> Boolean): Boolean {
-        return none(operated(), predicate)
     }
 
     open fun single(): T {
@@ -235,60 +393,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         return toListOps(takeWhile(operated(), predicate))
     }
 
-    fun filter(predicate: (T) -> Boolean): ListOps<T> {
-        return toListOps(filter(operated(), predicate))
-    }
-
-    fun filterIndexed(predicate: (index: Int, T) -> Boolean): ListOps<T> {
-        return toListOps(filterIndexed(operated(), predicate))
-    }
-
-    fun filterNotNull(): ListOps<T> {
-        return toListOps(filterNotNull(operated()))
-    }
-
-    fun <C : MutableCollection<in T>> filterTo(
-        destination: C,
-        predicate: (T) -> Boolean
-    ): C {
-        return filterTo(operated(), destination, predicate)
-    }
-
-    fun <C : MutableCollection<in T>> filterIndexedTo(
-        destination: C,
-        predicate: (index: Int, T) -> Boolean
-    ): C {
-        return filterIndexedTo(operated(), destination, predicate)
-    }
-
-    fun <C : MutableCollection<in T>> filterNotNullTo(
-        destination: C
-    ): C {
-        return filterNotNullTo(As.any(operated()), destination)
-    }
-
-    fun <R> flatMap(transform: (T) -> Iterable<R>): ListOps<R> {
-        return toListOps(flatMap(operated(), transform))
-    }
-
-    fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): ListOps<R> {
-        return toListOps(flatMapIndexed(operated(), transform))
-    }
-
-    fun <R, C : MutableCollection<in R>> flatMapTo(
-        destination: C,
-        transform: (T) -> Iterable<R>
-    ): C {
-        return flatMapTo(operated(), destination, transform)
-    }
-
-    fun <R, C : MutableCollection<in R>> flatMapIndexedTo(
-        destination: C,
-        transform: (index: Int, T) -> Iterable<R>
-    ): C {
-        return flatMapIndexedTo(operated(), destination, transform)
-    }
-
     fun reduce(operation: (T, T) -> T): T {
         return reduce(operated(), operation)
     }
@@ -317,80 +421,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         operation: (index: Int, R, T) -> R
     ): R {
         return reduceIndexed(operated(), initial, operation)
-    }
-
-    fun <K, V> associate(
-        keySelector: (T) -> K,
-        valueTransform: (T) -> V
-    ): MapOps<K, V> {
-        return toMapOps(associate(operated(), keySelector, valueTransform))
-    }
-
-    fun <K, V> associate(transform: (T) -> Pair<K, V>): MapOps<K, V> {
-        return toMapOps(associate(operated(), transform))
-    }
-
-    fun <K> associateKey(keySelector: (T) -> K): MapOps<K, T> {
-        return toMapOps(associateKey(operated(), keySelector))
-    }
-
-    fun <V> associateValue(valueSelector: (T) -> V): MapOps<T, V> {
-        return toMapOps(associateValue(operated(), valueSelector))
-    }
-
-    fun <K, V> associateWithNext(
-        keySelector: (T) -> K,
-        valueTransform: (T?) -> V
-    ): MapOps<K, V> {
-        return toMapOps(associateWithNext(operated(), keySelector, valueTransform))
-    }
-
-    fun <K, V> associateWithNext(transform: (T, T?) -> Pair<K, V>): MapOps<K, V> {
-        return toMapOps(associateWithNext(operated(), transform))
-    }
-
-    fun <K, V, M : MutableMap<in K, in V>> associateTo(
-        destination: M,
-        keySelector: (T) -> K,
-        valueTransform: (T) -> V
-    ): M {
-        return associateTo(operated(), destination, keySelector, valueTransform)
-    }
-
-    fun <K, V, M : MutableMap<in K, in V>> associateTo(
-        destination: M,
-        transform: (T) -> Pair<K, V>
-    ): M {
-        return associateTo(operated(), destination, transform)
-    }
-
-    fun <K, M : MutableMap<in K, in T>> associateKeyTo(
-        destination: M,
-        keySelector: (T) -> K
-    ): M {
-        return associateKeyTo(operated(), destination, keySelector)
-    }
-
-    fun <V, M : MutableMap<in T, in V>> associateValueTo(
-        destination: M,
-        valueSelector: (T) -> V
-    ): M {
-        return associateValueTo(operated(), destination, valueSelector)
-    }
-
-    fun <K, V, M : MutableMap<in K, in V>> associateWithNextTo(
-        destination: M,
-        keySelector: (T) -> K,
-        valueTransform: (T?) -> V
-    ): M {
-        return associateWithNextTo(operated(), destination, keySelector, valueTransform)
-    }
-
-    fun <K, V, M : MutableMap<in K, in V>> associateWithNextTo(
-        destination: M,
-        transform: (T, T?) -> Pair<K, V>
-    ): M {
-        return associateWithNextTo(operated(), destination, transform)
     }
 
     fun <K> groupBy(keySelector: (T) -> K): MapOps<K, List<T>> {
@@ -831,8 +861,6 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         inline fun <T, R> zipWithNext(iterable: Iterable<T>, transform: (T, T) -> R): List<R> {
-            val l = listOf(1 to 2)
-            val un = l.unzip()
             return iterable.zipWithNext(transform)
         }
 
@@ -841,14 +869,25 @@ protected constructor(operated: I) : MutableIterable<T> {
             iterable: Iterable<V>,
             transform: (V) -> Pair<T, R>
         ): Pair<List<T>, List<R>> {
-            val listT = LinkedList<T>()
-            val listR = LinkedList<R>()
-            for (e in iterable) {
-                val pair = transform(e)
-                listT.add(pair.first)
-                listR.add(pair.second)
+            if (iterable is Collection<V>) {
+                val listT = ArrayList<T>(iterable.size)
+                val listR = ArrayList<R>(iterable.size)
+                for (e in iterable) {
+                    val pair = transform(e)
+                    listT.add(pair.first)
+                    listR.add(pair.second)
+                }
+                return listT to listR
+            } else {
+                val listT = LinkedList<T>()
+                val listR = LinkedList<R>()
+                for (e in iterable) {
+                    val pair = transform(e)
+                    listT.add(pair.first)
+                    listR.add(pair.second)
+                }
+                return ArrayList(listT) to ArrayList(listR)
             }
-            return listT to listR
         }
 
         @JvmStatic
@@ -856,13 +895,302 @@ protected constructor(operated: I) : MutableIterable<T> {
             iterable: Iterable<R>,
             transform: (R) -> Pair<T, T>
         ): List<T> {
-            val listT = LinkedList<T>()
-            for (e in iterable) {
-                val pair = transform(e)
-                listT.add(pair.first)
-                listT.add(pair.second)
+            if (iterable is Collection<R>) {
+                val listT = ArrayList<T>(iterable.size)
+                for (e in iterable) {
+                    val pair = transform(e)
+                    listT.add(pair.first)
+                    listT.add(pair.second)
+                }
+                return listT
+            } else {
+                val listT = LinkedList<T>()
+                for (e in iterable) {
+                    val pair = transform(e)
+                    listT.add(pair.first)
+                    listT.add(pair.second)
+                }
+                return ArrayList(listT)
             }
-            return listT
+        }
+
+        @JvmStatic
+        inline fun <T, K, V> associate(
+            iterable: Iterable<T>,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): Map<K, V> {
+            return iterable.associateBy(keySelector, valueTransform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V> associate(iterable: Iterable<T>, transform: (T) -> Pair<K, V>): Map<K, V> {
+            return iterable.associate(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, K> associateKey(iterable: Iterable<T>, keySelector: (T) -> K): Map<K, T> {
+            return iterable.associateBy(keySelector)
+        }
+
+        @JvmStatic
+        inline fun <T, V> associateValue(iterable: Iterable<T>, valueSelector: (T) -> V): Map<T, V> {
+            return iterable.associateWith(valueSelector)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V> associatePair(
+            iterable: Iterable<T>,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): Map<K, V> {
+            return associatePairTo(iterable, LinkedHashMap(), keySelector, valueTransform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V> associatePair(iterable: Iterable<T>, transform: (T, T) -> Pair<K, V>): Map<K, V> {
+            return associatePairTo(iterable, LinkedHashMap(), transform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V> associatePair(
+            iterable: Iterable<T>,
+            complementValue: T,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): Map<K, V> {
+            return associatePairTo(iterable, complementValue, LinkedHashMap(), keySelector, valueTransform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V> associatePair(
+            iterable: Iterable<T>,
+            complementValue: T,
+            transform: (T, T) -> Pair<K, V>
+        ): Map<K, V> {
+            return associatePairTo(iterable, complementValue, LinkedHashMap(), transform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, in V>> associateTo(
+            iterable: Iterable<T>,
+            destination: M,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): M {
+            return iterable.associateByTo(destination, keySelector, valueTransform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, in V>> associateTo(
+            iterable: Iterable<T>,
+            destination: M,
+            transform: (T) -> Pair<K, V>
+        ): M {
+            return iterable.associateTo(destination, transform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, M : MutableMap<in K, in T>> associateKeyTo(
+            iterable: Iterable<T>,
+            destination: M,
+            keySelector: (T) -> K
+        ): M {
+            return iterable.associateByTo(destination, keySelector)
+        }
+
+        @JvmStatic
+        inline fun <T, V, M : MutableMap<in T, in V>> associateValueTo(
+            iterable: Iterable<T>,
+            destination: M,
+            valueSelector: (T) -> V
+        ): M {
+            return iterable.associateWithTo(destination, valueSelector)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, in V>> associatePairTo(
+            iterable: Iterable<T>,
+            destination: M,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): M {
+            val iterator = iterable.iterator()
+            while (iterator.hasNext()) {
+                val ik = iterator.next()
+                if (iterator.hasNext()) {
+                    val iv = iterator.next()
+                    val k = keySelector(ik)
+                    val v = valueTransform(iv)
+                    destination.put(k, v)
+                } else {
+                    break
+                }
+            }
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, in V>> associatePairTo(
+            iterable: Iterable<T>,
+            destination: M,
+            transform: (T, T) -> Pair<K, V>
+        ): M {
+            val iterator = iterable.iterator()
+            while (iterator.hasNext()) {
+                val ik = iterator.next()
+                if (iterator.hasNext()) {
+                    val iv = iterator.next()
+                    val pair = transform(ik, iv)
+                    destination.put(pair.first, pair.second)
+                } else {
+                    break
+                }
+            }
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, in V>> associatePairTo(
+            iterable: Iterable<T>,
+            complementValue: T,
+            destination: M,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): M {
+            val iterator = iterable.iterator()
+            while (iterator.hasNext()) {
+                val ik = iterator.next()
+                if (iterator.hasNext()) {
+                    val iv = iterator.next()
+                    val k = keySelector(ik)
+                    val v = valueTransform(iv)
+                    destination.put(k, v)
+                } else {
+                    val k = keySelector(ik)
+                    val v = valueTransform(complementValue)
+                    destination.put(k, v)
+                    break
+                }
+            }
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, in V>> associatePairTo(
+            iterable: Iterable<T>,
+            complementValue: T,
+            destination: M,
+            transform: (T, T) -> Pair<K, V>
+        ): M {
+            val iterator = iterable.iterator()
+            while (iterator.hasNext()) {
+                val ik = iterator.next()
+                if (iterator.hasNext()) {
+                    val iv = iterator.next()
+                    val pair = transform(ik, iv)
+                    destination.put(pair.first, pair.second)
+                } else {
+                    val pair = transform(ik, complementValue)
+                    destination.put(pair.first, pair.second)
+                    break
+                }
+            }
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T, R> flatMap(iterable: Iterable<T>, transform: (T) -> Iterable<R>): List<R> {
+            return iterable.flatMap(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R> flatMapIndexed(iterable: Iterable<T>, transform: (index: Int, T) -> Iterable<R>): List<R> {
+            return iterable.flatMapIndexed(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R, C : MutableCollection<in R>> flatMapTo(
+            iterable: Iterable<T>,
+            destination: C,
+            transform: (T) -> Iterable<R>
+        ): C {
+            return iterable.flatMapTo(destination, transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R, C : MutableCollection<in R>> flatMapIndexedTo(
+            iterable: Iterable<T>,
+            destination: C,
+            transform: (index: Int, T) -> Iterable<R>
+        ): C {
+            return iterable.flatMapIndexedTo(destination, transform)
+        }
+
+        @JvmStatic
+        inline fun <T> filter(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
+            return iterable.filter(predicate)
+        }
+
+        @JvmStatic
+        inline fun <T> filterIndexed(iterable: Iterable<T>, predicate: (index: Int, T) -> Boolean): List<T> {
+            return iterable.filterIndexed(predicate)
+        }
+
+        @JvmStatic
+        fun <T : Any> filterNotNull(iterable: Iterable<T?>): List<T> {
+            return iterable.filterNotNull()
+        }
+
+        @JvmStatic
+        inline fun <T, C : MutableCollection<in T>> filterTo(
+            iterable: Iterable<T>,
+            destination: C,
+            predicate: (T) -> Boolean
+        ): C {
+            return iterable.filterTo(destination, predicate)
+        }
+
+        @JvmStatic
+        inline fun <T, C : MutableCollection<in T>> filterIndexedTo(
+            iterable: Iterable<T>,
+            destination: C,
+            predicate: (index: Int, T) -> Boolean
+        ): C {
+            return iterable.filterIndexedTo(destination, predicate)
+        }
+
+        @JvmStatic
+        fun <C : MutableCollection<in T>, T : Any> filterNotNullTo(
+            iterable: Iterable<T?>,
+            destination: C
+        ): C {
+            return iterable.filterNotNullTo(destination)
+        }
+
+        @JvmStatic
+        fun <T> any(iterable: Iterable<T>): Boolean {
+            return iterable.any()
+        }
+
+        @JvmStatic
+        inline fun <T> any(iterable: Iterable<T>, predicate: (T) -> Boolean): Boolean {
+            return iterable.any(predicate)
+        }
+
+        @JvmStatic
+        fun <T> none(iterable: Iterable<T>): Boolean {
+            return iterable.none()
+        }
+
+        @JvmStatic
+        inline fun <T> none(iterable: Iterable<T>, predicate: (T) -> Boolean): Boolean {
+            return iterable.none(predicate)
+        }
+
+        @JvmStatic
+        inline fun <T> all(iterable: Iterable<T>, predicate: (T) -> Boolean): Boolean {
+            return iterable.all(predicate)
         }
 
         @JvmStatic
@@ -913,31 +1241,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         @JvmStatic
         inline fun <T> lastOrNull(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
             return iterable.lastOrNull(predicate)
-        }
-
-        @JvmStatic
-        inline fun <T> all(iterable: Iterable<T>, predicate: (T) -> Boolean): Boolean {
-            return iterable.all(predicate)
-        }
-
-        @JvmStatic
-        fun <T> any(iterable: Iterable<T>): Boolean {
-            return iterable.any()
-        }
-
-        @JvmStatic
-        inline fun <T> any(iterable: Iterable<T>, predicate: (T) -> Boolean): Boolean {
-            return iterable.any(predicate)
-        }
-
-        @JvmStatic
-        fun <T> none(iterable: Iterable<T>): Boolean {
-            return iterable.none()
-        }
-
-        @JvmStatic
-        inline fun <T> none(iterable: Iterable<T>, predicate: (T) -> Boolean): Boolean {
-            return iterable.none(predicate)
         }
 
         @JvmStatic
@@ -1050,75 +1353,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        inline fun <T> filter(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
-            return iterable.filter(predicate)
-        }
-
-        @JvmStatic
-        inline fun <T> filterIndexed(iterable: Iterable<T>, predicate: (index: Int, T) -> Boolean): List<T> {
-            return iterable.filterIndexed(predicate)
-        }
-
-        @JvmStatic
-        fun <T : Any> filterNotNull(iterable: Iterable<T?>): List<T> {
-            return iterable.filterNotNull()
-        }
-
-        @JvmStatic
-        inline fun <T, C : MutableCollection<in T>> filterTo(
-            iterable: Iterable<T>,
-            destination: C,
-            predicate: (T) -> Boolean
-        ): C {
-            return iterable.filterTo(destination, predicate)
-        }
-
-        @JvmStatic
-        inline fun <T, C : MutableCollection<in T>> filterIndexedTo(
-            iterable: Iterable<T>,
-            destination: C,
-            predicate: (index: Int, T) -> Boolean
-        ): C {
-            return iterable.filterIndexedTo(destination, predicate)
-        }
-
-        @JvmStatic
-        fun <C : MutableCollection<in T>, T : Any> filterNotNullTo(
-            iterable: Iterable<T?>,
-            destination: C
-        ): C {
-            return iterable.filterNotNullTo(destination)
-        }
-
-        @JvmStatic
-        inline fun <T, R> flatMap(iterable: Iterable<T>, transform: (T) -> Iterable<R>): List<R> {
-            return iterable.flatMap(transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R> flatMapIndexed(iterable: Iterable<T>, transform: (index: Int, T) -> Iterable<R>): List<R> {
-            return iterable.flatMapIndexed(transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> flatMapTo(
-            iterable: Iterable<T>,
-            destination: C,
-            transform: (T) -> Iterable<R>
-        ): C {
-            return iterable.flatMapTo(destination, transform)
-        }
-
-        @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> flatMapIndexedTo(
-            iterable: Iterable<T>,
-            destination: C,
-            transform: (index: Int, T) -> Iterable<R>
-        ): C {
-            return iterable.flatMapIndexedTo(destination, transform)
-        }
-
-        @JvmStatic
         inline fun <S, T : S> reduce(iterable: Iterable<T>, operation: (S, T) -> S): S {
             return iterable.reduce(operation)
         }
@@ -1154,127 +1388,6 @@ protected constructor(operated: I) : MutableIterable<T> {
             operation: (index: Int, R, T) -> R
         ): R {
             return iterable.foldIndexed(initial, operation)
-        }
-
-        @JvmStatic
-        inline fun <T, K, V> associate(
-            iterable: Iterable<T>,
-            keySelector: (T) -> K,
-            valueTransform: (T) -> V
-        ): Map<K, V> {
-            return iterable.associateBy(keySelector, valueTransform)
-        }
-
-        @JvmStatic
-        inline fun <T, K, V> associate(iterable: Iterable<T>, transform: (T) -> Pair<K, V>): Map<K, V> {
-            return iterable.associate(transform)
-        }
-
-        @JvmStatic
-        inline fun <T, K> associateKey(iterable: Iterable<T>, keySelector: (T) -> K): Map<K, T> {
-            return iterable.associateBy(keySelector)
-        }
-
-        @JvmStatic
-        inline fun <T, V> associateValue(iterable: Iterable<T>, valueSelector: (T) -> V): Map<T, V> {
-            return iterable.associateWith(valueSelector)
-        }
-
-        @JvmStatic
-        inline fun <T, K, V> associateWithNext(
-            iterable: Iterable<T>,
-            keySelector: (T) -> K,
-            valueTransform: (T?) -> V
-        ): Map<K, V> {
-            return associateWithNextTo(iterable, LinkedHashMap(), keySelector, valueTransform)
-        }
-
-        @JvmStatic
-        inline fun <T, K, V> associateWithNext(iterable: Iterable<T>, transform: (T, T?) -> Pair<K, V>): Map<K, V> {
-            return associateWithNextTo(iterable, LinkedHashMap(), transform)
-        }
-
-        @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, in V>> associateTo(
-            iterable: Iterable<T>,
-            destination: M,
-            keySelector: (T) -> K,
-            valueTransform: (T) -> V
-        ): M {
-            return iterable.associateByTo(destination, keySelector, valueTransform)
-        }
-
-        @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, in V>> associateTo(
-            iterable: Iterable<T>,
-            destination: M,
-            transform: (T) -> Pair<K, V>
-        ): M {
-            return iterable.associateTo(destination, transform)
-        }
-
-        @JvmStatic
-        inline fun <T, K, M : MutableMap<in K, in T>> associateKeyTo(
-            iterable: Iterable<T>,
-            destination: M,
-            keySelector: (T) -> K
-        ): M {
-            return iterable.associateByTo(destination, keySelector)
-        }
-
-        @JvmStatic
-        inline fun <T, V, M : MutableMap<in T, in V>> associateValueTo(
-            iterable: Iterable<T>,
-            destination: M,
-            valueSelector: (T) -> V
-        ): M {
-            return iterable.associateWithTo(destination, valueSelector)
-        }
-
-        @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, in V>> associateWithNextTo(
-            iterable: Iterable<T>,
-            destination: M,
-            keySelector: (T) -> K,
-            valueTransform: (T?) -> V
-        ): M {
-            val iterator = iterable.iterator()
-            while (iterator.hasNext()) {
-                val tk = iterator.next()
-                val k = keySelector(tk)
-                if (iterator.hasNext()) {
-                    val tv = iterator.next()
-                    val v = valueTransform(tv)
-                    destination.put(k, v)
-                } else {
-                    val v = valueTransform(null)
-                    destination.put(k, v)
-                    break
-                }
-            }
-            return destination
-        }
-
-        @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, in V>> associateWithNextTo(
-            iterable: Iterable<T>,
-            destination: M,
-            transform: (T, T?) -> Pair<K, V>
-        ): M {
-            val iterator = iterable.iterator()
-            while (iterator.hasNext()) {
-                val tk = iterator.next()
-                if (iterator.hasNext()) {
-                    val tv = iterator.next()
-                    val pair = transform(tk, tv)
-                    destination.put(pair.first, pair.second)
-                } else {
-                    val pair = transform(tk, null)
-                    destination.put(pair.first, pair.second)
-                    break
-                }
-            }
-            return destination
         }
 
         @JvmStatic
