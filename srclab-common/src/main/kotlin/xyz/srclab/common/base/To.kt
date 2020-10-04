@@ -146,17 +146,35 @@ object To {
 
     @JvmStatic
     fun toBigInteger(number: Number?): BigInteger {
-        return BigInteger.valueOf(toLong(number))
+        return when (number) {
+            null, 0 -> BigInteger.ZERO
+            1 -> BigInteger.ONE
+            10 -> BigInteger.TEN
+            else -> BigInteger(number.toString())
+        }
     }
 
     @JvmStatic
     fun toBigInteger(number: String?): BigInteger {
-        return BigInteger.valueOf(toLong(number))
+        return when (number) {
+            null, "0" -> BigInteger.ZERO
+            "1" -> BigInteger.ONE
+            "10" -> BigInteger.TEN
+            else -> BigInteger(number.toString())
+        }
     }
 
     @JvmStatic
     fun toBigInteger(any: Any?): BigInteger {
-        return BigInteger.valueOf(toLong(any))
+        if (any == null) {
+            return BigInteger.ZERO
+        }
+        return when (any) {
+            0, "0" -> BigInteger.ZERO
+            1, "1" -> BigInteger.ONE
+            10, "10" -> BigInteger.TEN
+            else -> BigInteger(any.toString())
+        }
     }
 
     @JvmStatic
@@ -164,13 +182,11 @@ object To {
         if (any == null) {
             return BigDecimal.ZERO
         }
-        val str = any.toString()
-        if ("1" == str) {
-            return BigDecimal.ONE
+        return when (any) {
+            0, "0" -> BigDecimal.ZERO
+            1, "1" -> BigDecimal.ONE
+            10, "10" -> BigDecimal.TEN
+            else -> BigDecimal(any.toString())
         }
-        if ("10" == str) {
-            return BigDecimal.TEN
-        }
-        return BigDecimal(str)
     }
 }

@@ -19,6 +19,11 @@ protected constructor(operated: I) : MutableIterable<T> {
         return mutableOperated().iterator()
     }
 
+    fun forEachIndexed(action: (index: Int, T) -> Unit): THIS {
+        forEachIndexed(operated(), action)
+        return toSelfOps()
+    }
+
     fun <R> map(transform: (T) -> R): ListOps<R> {
         return toListOps(map(operated(), transform))
     }
@@ -266,12 +271,106 @@ protected constructor(operated: I) : MutableIterable<T> {
         return all(operated(), predicate)
     }
 
-    fun find(predicate: (T) -> Boolean): T? {
-        return find(operated(), predicate)
+    fun plus(element: T): ListOps<T> {
+        return toListOps(plus(operated(), element))
     }
 
-    open fun findLast(predicate: (T) -> Boolean): T? {
-        return findLast(operated(), predicate)
+    fun plus(elements: Array<out T>): ListOps<T> {
+        return toListOps(plus(operated(), elements))
+    }
+
+    fun plus(elements: Iterable<T>): ListOps<T> {
+        return toListOps(plus(operated(), elements))
+    }
+
+    fun plus(elements: Sequence<T>): ListOps<T> {
+        return toListOps(plus(operated(), elements))
+    }
+
+    fun minus(element: T): ListOps<T> {
+        return toListOps(minus(operated(), element))
+    }
+
+    fun minus(elements: Array<out T>): ListOps<T> {
+        return toListOps(minus(operated(), elements))
+    }
+
+    fun minus(elements: Iterable<T>): ListOps<T> {
+        return toListOps(minus(operated(), elements))
+    }
+
+    fun minus(elements: Sequence<T>): ListOps<T> {
+        return toListOps(minus(operated(), elements))
+    }
+
+    fun <K> groupBy(keySelector: (T) -> K): MapOps<K, List<T>> {
+        return toMapOps(groupBy(operated(), keySelector))
+    }
+
+    fun <K, V> groupBy(
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): MapOps<K, List<V>> {
+        return toMapOps(groupBy(operated(), keySelector, valueTransform))
+    }
+
+    fun <K, M : MutableMap<in K, MutableList<T>>> groupByTo(
+        destination: M,
+        keySelector: (T) -> K
+    ): M {
+        return groupByTo(operated(), destination, keySelector)
+    }
+
+    fun <K, V, M : MutableMap<in K, MutableList<V>>> groupByTo(
+        destination: M,
+        keySelector: (T) -> K,
+        valueTransform: (T) -> V
+    ): M {
+        return groupByTo(operated(), destination, keySelector, valueTransform)
+    }
+
+    fun take(n: Int): ListOps<T> {
+        return toListOps(take(operated(), n))
+    }
+
+    fun takeWhile(predicate: (T) -> Boolean): ListOps<T> {
+        return toListOps(takeWhile(operated(), predicate))
+    }
+
+    fun drop(n: Int): ListOps<T> {
+        return toListOps(drop(operated(), n))
+    }
+
+    fun dropWhile(predicate: (T) -> Boolean): ListOps<T> {
+        return toListOps(dropWhile(operated(), predicate))
+    }
+
+    fun chunked(size: Int): ListOps<List<T>> {
+        return toListOps(chunked(operated(), size))
+    }
+
+    fun <R> chunked(
+        size: Int,
+        transform: (List<T>) -> R
+    ): ListOps<R> {
+        return toListOps(chunked(operated(), size, transform))
+    }
+
+    fun windowed(
+        size: Int,
+        step: Int = 1,
+        partialWindows: Boolean = false
+    ): ListOps<List<T>> {
+        return toListOps(windowed(operated(), size, step, partialWindows))
+    }
+
+    fun <R> windowed(
+        size: Int,
+        step: Int = 1,
+        partialWindows: Boolean = false,
+        transform: (List<T>) -> R
+    ): ListOps<R> {
+        return toListOps(windowed(operated(), size, step, partialWindows, transform))
     }
 
     open fun first(): T {
@@ -306,20 +405,27 @@ protected constructor(operated: I) : MutableIterable<T> {
         return lastOrNull(operated(), predicate)
     }
 
-    open fun single(): T {
-        return single(operated())
+    open fun elementAt(index: Int): T {
+        return elementAt(operated(), index)
     }
 
-    fun single(predicate: (T) -> Boolean): T {
-        return single(operated(), predicate)
+    open fun elementAtOrElse(
+        index: Int,
+        defaultValue: (index: Int) -> T
+    ): T {
+        return elementAtOrElse(operated(), index, defaultValue)
     }
 
-    open fun singleOrNull(): T? {
-        return singleOrNull(operated())
+    open fun elementAtOrNull(index: Int): T? {
+        return elementAtOrNull(operated(), index)
     }
 
-    fun singleOrNull(predicate: (T) -> Boolean): T? {
-        return singleOrNull(operated(), predicate)
+    fun find(predicate: (T) -> Boolean): T? {
+        return find(operated(), predicate)
+    }
+
+    open fun findLast(predicate: (T) -> Boolean): T? {
+        return findLast(operated(), predicate)
     }
 
     fun contains(element: T): Boolean {
@@ -338,59 +444,32 @@ protected constructor(operated: I) : MutableIterable<T> {
         return containsAll(operated(), elements)
     }
 
-    open fun count(): Int {
-        return count(operated())
+    fun isEmpty(): Boolean {
+        return isEmpty(operated())
     }
 
-    fun count(predicate: (T) -> Boolean): Int {
-        return count(operated(), predicate)
+    fun isNotEmpty(): Boolean {
+        return isNotEmpty(operated())
     }
 
-    open fun elementAt(index: Int): T {
-        return elementAt(operated(), index)
+    fun sorted(): ListOps<T> {
+        return toListOps(sorted(operated()))
     }
 
-    open fun elementAtOrElse(
-        index: Int,
-        defaultValue: (index: Int) -> T
-    ): T {
-        return elementAtOrElse(operated(), index, defaultValue)
+    fun sorted(comparator: Comparator<in T>): ListOps<T> {
+        return toListOps(sorted(operated(), comparator))
     }
 
-    open fun elementAtOrNull(index: Int): T? {
-        return elementAtOrNull(operated(), index)
+    fun reversed(): ListOps<T> {
+        return toListOps(reversed(operated()))
     }
 
-    open fun indexOf(element: T): Int {
-        return indexOf(operated(), element)
+    fun shuffled(): ListOps<T> {
+        return toListOps(shuffled(operated()))
     }
 
-    open fun indexOf(predicate: (T) -> Boolean): Int {
-        return indexOf(operated(), predicate)
-    }
-
-    open fun lastIndexOf(element: T): Int {
-        return lastIndexOf(operated(), element)
-    }
-
-    open fun lastIndexOf(predicate: (T) -> Boolean): Int {
-        return lastIndexOf(operated(), predicate)
-    }
-
-    fun drop(n: Int): ListOps<T> {
-        return toListOps(drop(operated(), n))
-    }
-
-    fun dropWhile(predicate: (T) -> Boolean): ListOps<T> {
-        return toListOps(dropWhile(operated(), predicate))
-    }
-
-    fun take(n: Int): ListOps<T> {
-        return toListOps(take(operated(), n))
-    }
-
-    fun takeWhile(predicate: (T) -> Boolean): ListOps<T> {
-        return toListOps(takeWhile(operated(), predicate))
+    fun shuffled(random: Random): ListOps<T> {
+        return toListOps(shuffled(operated(), random))
     }
 
     fun reduce(operation: (T, T) -> T): T {
@@ -423,58 +502,12 @@ protected constructor(operated: I) : MutableIterable<T> {
         return reduceIndexed(operated(), initial, operation)
     }
 
-    fun <K> groupBy(keySelector: (T) -> K): MapOps<K, List<T>> {
-        return toMapOps(groupBy(operated(), keySelector))
+    open fun count(): Int {
+        return count(operated())
     }
 
-    fun <K, V> groupBy(
-        keySelector: (T) -> K,
-        valueTransform: (T) -> V
-    ): MapOps<K, List<V>> {
-        return toMapOps(groupBy(operated(), keySelector, valueTransform))
-    }
-
-    fun <K, M : MutableMap<in K, MutableList<T>>> groupByTo(
-        destination: M,
-        keySelector: (T) -> K
-    ): M {
-        return groupByTo(operated(), destination, keySelector)
-    }
-
-    fun <K, V, M : MutableMap<in K, MutableList<V>>> groupByTo(
-        destination: M,
-        keySelector: (T) -> K,
-        valueTransform: (T) -> V
-    ): M {
-        return groupByTo(operated(), destination, keySelector, valueTransform)
-    }
-
-    fun chunked(size: Int): ListOps<List<T>> {
-        return toListOps(chunked(operated(), size))
-    }
-
-    fun <R> chunked(
-        size: Int,
-        transform: (List<T>) -> R
-    ): ListOps<R> {
-        return toListOps(chunked(operated(), size, transform))
-    }
-
-    fun windowed(
-        size: Int,
-        step: Int = 1,
-        partialWindows: Boolean = false
-    ): ListOps<List<T>> {
-        return toListOps(windowed(operated(), size, step, partialWindows))
-    }
-
-    fun <R> windowed(
-        size: Int,
-        step: Int = 1,
-        partialWindows: Boolean = false,
-        transform: (List<T>) -> R
-    ): ListOps<R> {
-        return toListOps(windowed(operated(), size, step, partialWindows, transform))
+    fun count(predicate: (T) -> Boolean): Int {
+        return count(operated(), predicate)
     }
 
     fun max(): T {
@@ -549,6 +582,78 @@ protected constructor(operated: I) : MutableIterable<T> {
         return sumBigDecimal(operated(), selector)
     }
 
+    fun averageInt(): Int {
+        return averageInt(operated())
+    }
+
+    fun averageInt(selector: (T) -> Int): Int {
+        return averageInt(operated(), selector)
+    }
+
+    fun averageLong(): Long {
+        return averageLong(operated())
+    }
+
+    fun averageLong(selector: (T) -> Long): Long {
+        return averageLong(operated(), selector)
+    }
+
+    fun averageDouble(): Double {
+        return averageDouble(operated())
+    }
+
+    fun averageDouble(selector: (T) -> Double): Double {
+        return averageDouble(operated(), selector)
+    }
+
+    fun averageBigInteger(): BigInteger {
+        return averageBigInteger(operated())
+    }
+
+    fun averageBigInteger(selector: (T) -> BigInteger): BigInteger {
+        return averageBigInteger(operated(), selector)
+    }
+
+    fun averageBigDecimal(): BigDecimal {
+        return averageBigDecimal(operated())
+    }
+
+    fun averageBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+        return averageBigDecimal(operated(), selector)
+    }
+
+    open fun single(): T {
+        return single(operated())
+    }
+
+    fun single(predicate: (T) -> Boolean): T {
+        return single(operated(), predicate)
+    }
+
+    open fun singleOrNull(): T? {
+        return singleOrNull(operated())
+    }
+
+    fun singleOrNull(predicate: (T) -> Boolean): T? {
+        return singleOrNull(operated(), predicate)
+    }
+
+    open fun indexOf(element: T): Int {
+        return indexOf(operated(), element)
+    }
+
+    open fun indexOf(predicate: (T) -> Boolean): Int {
+        return indexOf(operated(), predicate)
+    }
+
+    open fun lastIndexOf(element: T): Int {
+        return lastIndexOf(operated(), element)
+    }
+
+    open fun lastIndexOf(predicate: (T) -> Boolean): Int {
+        return lastIndexOf(operated(), predicate)
+    }
+
     fun intersect(other: Iterable<T>): SetOps<T> {
         return toSetOps(intersect(operated(), other))
     }
@@ -561,37 +666,12 @@ protected constructor(operated: I) : MutableIterable<T> {
         return toSetOps(subtract(operated(), other))
     }
 
-    fun reversed(): ListOps<T> {
-        return toListOps(reversed(operated()))
-    }
-
-    fun sorted(): ListOps<T> {
-        return toListOps(sorted(operated()))
-    }
-
-    fun sorted(comparator: Comparator<in T>): ListOps<T> {
-        return toListOps(sorted(operated(), comparator))
-    }
-
-    fun shuffled(): ListOps<T> {
-        return toListOps(shuffled(operated()))
-    }
-
-    fun shuffled(random: Random): ListOps<T> {
-        return toListOps(shuffled(operated(), random))
-    }
-
     fun distinct(): ListOps<T> {
         return toListOps(distinct(operated()))
     }
 
     fun <K> distinct(selector: (T) -> K): ListOps<T> {
         return toListOps(distinct(operated(), selector))
-    }
-
-    fun forEachIndexed(action: (index: Int, T) -> Unit): THIS {
-        forEachIndexed(operated(), action)
-        return toSelfOps()
     }
 
     open fun remove(element: T): THIS {
@@ -784,6 +864,11 @@ protected constructor(operated: I) : MutableIterable<T> {
     protected abstract fun <K, V> toMapOps(map: Map<K, V>): MapOps<K, V>
 
     companion object {
+
+        @JvmStatic
+        inline fun <T> forEachIndexed(iterable: Iterable<T>, action: (index: Int, T) -> Unit) {
+            return iterable.forEachIndexed(action)
+        }
 
         @JvmStatic
         inline fun <T, R> map(iterable: Iterable<T>, transform: (T) -> R): List<R> {
@@ -1194,13 +1279,131 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        inline fun <T> find(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
-            return iterable.find(predicate)
+        fun <T> plus(iterable: Iterable<T>, element: T): List<T> {
+            return iterable.plus(element)
         }
 
         @JvmStatic
-        inline fun <T> findLast(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
-            return iterable.findLast(predicate)
+        fun <T> plus(iterable: Iterable<T>, elements: Array<out T>): List<T> {
+            return iterable.plus(elements)
+        }
+
+        @JvmStatic
+        fun <T> plus(iterable: Iterable<T>, elements: Iterable<T>): List<T> {
+            return iterable.plus(elements)
+        }
+
+        @JvmStatic
+        fun <T> plus(iterable: Iterable<T>, elements: Sequence<T>): List<T> {
+            return iterable.plus(elements)
+        }
+
+        @JvmStatic
+        fun <T> minus(iterable: Iterable<T>, element: T): List<T> {
+            return iterable.minus(element)
+        }
+
+        @JvmStatic
+        fun <T> minus(iterable: Iterable<T>, elements: Array<out T>): List<T> {
+            return iterable.minus(elements)
+        }
+
+        @JvmStatic
+        fun <T> minus(iterable: Iterable<T>, elements: Iterable<T>): List<T> {
+            return iterable.minus(elements)
+        }
+
+        @JvmStatic
+        fun <T> minus(iterable: Iterable<T>, elements: Sequence<T>): List<T> {
+            return iterable.minus(elements)
+        }
+
+        @JvmStatic
+        inline fun <T, K> groupBy(iterable: Iterable<T>, keySelector: (T) -> K): Map<K, List<T>> {
+            return iterable.groupBy(keySelector)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V> groupBy(
+            iterable: Iterable<T>,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): Map<K, List<V>> {
+            return iterable.groupBy(keySelector, valueTransform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, M : MutableMap<in K, MutableList<T>>> groupByTo(
+            iterable: Iterable<T>,
+            destination: M,
+            keySelector: (T) -> K
+        ): M {
+            return iterable.groupByTo(destination, keySelector)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, MutableList<V>>> groupByTo(
+            iterable: Iterable<T>,
+            destination: M,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): M {
+            return iterable.groupByTo(destination, keySelector, valueTransform)
+        }
+
+        @JvmStatic
+        fun <T> take(iterable: Iterable<T>, n: Int): List<T> {
+            return iterable.take(n)
+        }
+
+        @JvmStatic
+        inline fun <T> takeWhile(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
+            return iterable.takeWhile(predicate)
+        }
+
+        @JvmStatic
+        fun <T> drop(iterable: Iterable<T>, n: Int): List<T> {
+            return iterable.drop(n)
+        }
+
+        @JvmStatic
+        inline fun <T> dropWhile(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
+            return iterable.dropWhile(predicate)
+        }
+
+        @JvmStatic
+        fun <T> chunked(iterable: Iterable<T>, size: Int): List<List<T>> {
+            return iterable.chunked(size)
+        }
+
+        @JvmStatic
+        fun <T, R> chunked(
+            iterable: Iterable<T>,
+            size: Int,
+            transform: (List<T>) -> R
+        ): List<R> {
+            return iterable.chunked(size, transform)
+        }
+
+        @JvmStatic
+        fun <T> windowed(
+            iterable: Iterable<T>,
+            size: Int,
+            step: Int = 1,
+            partialWindows: Boolean = false
+        ): List<List<T>> {
+            return iterable.windowed(size, step, partialWindows)
+        }
+
+        @JvmStatic
+        fun <T, R> windowed(
+            iterable: Iterable<T>,
+            size: Int,
+            step: Int = 1,
+            partialWindows: Boolean = false,
+            transform: (List<T>) -> R
+        ): List<R> {
+            return iterable.windowed(size, step, partialWindows, transform)
         }
 
         @JvmStatic
@@ -1244,23 +1447,32 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> single(iterable: Iterable<T>): T {
-            return iterable.single()
+        fun <T> elementAt(iterable: Iterable<T>, index: Int): T {
+            return iterable.elementAt(index)
         }
 
         @JvmStatic
-        inline fun <T> single(iterable: Iterable<T>, predicate: (T) -> Boolean): T {
-            return iterable.single(predicate)
+        fun <T> elementAtOrElse(
+            iterable: Iterable<T>,
+            index: Int,
+            defaultValue: (index: Int) -> T
+        ): T {
+            return iterable.elementAtOrElse(index, defaultValue)
         }
 
         @JvmStatic
-        fun <T> singleOrNull(iterable: Iterable<T>): T? {
-            return iterable.singleOrNull()
+        fun <T> elementAtOrNull(iterable: Iterable<T>, index: Int): T? {
+            return iterable.elementAtOrNull(index)
         }
 
         @JvmStatic
-        inline fun <T> singleOrNull(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
-            return iterable.singleOrNull(predicate)
+        inline fun <T> find(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
+            return iterable.find(predicate)
+        }
+
+        @JvmStatic
+        inline fun <T> findLast(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
+            return iterable.findLast(predicate)
         }
 
         @JvmStatic
@@ -1284,72 +1496,43 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> count(iterable: Iterable<T>): Int {
-            return iterable.count()
+        fun <T> isEmpty(iterable: Iterable<T>): Boolean {
+            var hasElement = false
+            for (t in iterable) {
+                hasElement = true
+                break
+            }
+            return !hasElement
         }
 
         @JvmStatic
-        inline fun <T> count(iterable: Iterable<T>, predicate: (T) -> Boolean): Int {
-            return iterable.count(predicate)
+        fun <T> isNotEmpty(iterable: Iterable<T>): Boolean {
+            return !isEmpty(iterable)
         }
 
         @JvmStatic
-        fun <T> elementAt(iterable: Iterable<T>, index: Int): T {
-            return iterable.elementAt(index)
+        fun <T> sorted(iterable: Iterable<T>): List<T> {
+            return sorted(iterable, Sort.selfComparableComparator())
         }
 
         @JvmStatic
-        fun <T> elementAtOrElse(
-            iterable: Iterable<T>,
-            index: Int,
-            defaultValue: (index: Int) -> T
-        ): T {
-            return iterable.elementAtOrElse(index, defaultValue)
+        fun <T> sorted(iterable: Iterable<T>, comparator: Comparator<in T>): List<T> {
+            return iterable.sortedWith(comparator)
         }
 
         @JvmStatic
-        fun <T> elementAtOrNull(iterable: Iterable<T>, index: Int): T? {
-            return iterable.elementAtOrNull(index)
+        fun <T> reversed(iterable: Iterable<T>): List<T> {
+            return iterable.reversed()
         }
 
         @JvmStatic
-        fun <T> indexOf(iterable: Iterable<T>, element: T): Int {
-            return iterable.indexOf(element)
+        fun <T> shuffled(iterable: Iterable<T>): List<T> {
+            return iterable.shuffled()
         }
 
         @JvmStatic
-        inline fun <T> indexOf(iterable: Iterable<T>, predicate: (T) -> Boolean): Int {
-            return iterable.indexOfFirst(predicate)
-        }
-
-        @JvmStatic
-        fun <T> lastIndexOf(iterable: Iterable<T>, element: T): Int {
-            return iterable.lastIndexOf(element)
-        }
-
-        @JvmStatic
-        inline fun <T> lastIndexOf(iterable: Iterable<T>, predicate: (T) -> Boolean): Int {
-            return iterable.indexOfLast(predicate)
-        }
-
-        @JvmStatic
-        fun <T> drop(iterable: Iterable<T>, n: Int): List<T> {
-            return iterable.drop(n)
-        }
-
-        @JvmStatic
-        inline fun <T> dropWhile(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
-            return iterable.dropWhile(predicate)
-        }
-
-        @JvmStatic
-        fun <T> take(iterable: Iterable<T>, n: Int): List<T> {
-            return iterable.take(n)
-        }
-
-        @JvmStatic
-        inline fun <T> takeWhile(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
-            return iterable.takeWhile(predicate)
+        fun <T> shuffled(iterable: Iterable<T>, random: Random): List<T> {
+            return iterable.shuffled(random)
         }
 
         @JvmStatic
@@ -1391,71 +1574,13 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        inline fun <T, K> groupBy(iterable: Iterable<T>, keySelector: (T) -> K): Map<K, List<T>> {
-            return iterable.groupBy(keySelector)
+        fun <T> count(iterable: Iterable<T>): Int {
+            return iterable.count()
         }
 
         @JvmStatic
-        inline fun <T, K, V> groupBy(
-            iterable: Iterable<T>,
-            keySelector: (T) -> K,
-            valueTransform: (T) -> V
-        ): Map<K, List<V>> {
-            return iterable.groupBy(keySelector, valueTransform)
-        }
-
-        @JvmStatic
-        inline fun <T, K, M : MutableMap<in K, MutableList<T>>> groupByTo(
-            iterable: Iterable<T>,
-            destination: M,
-            keySelector: (T) -> K
-        ): M {
-            return iterable.groupByTo(destination, keySelector)
-        }
-
-        @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, MutableList<V>>> groupByTo(
-            iterable: Iterable<T>,
-            destination: M,
-            keySelector: (T) -> K,
-            valueTransform: (T) -> V
-        ): M {
-            return iterable.groupByTo(destination, keySelector, valueTransform)
-        }
-
-        @JvmStatic
-        fun <T> chunked(iterable: Iterable<T>, size: Int): List<List<T>> {
-            return iterable.chunked(size)
-        }
-
-        @JvmStatic
-        fun <T, R> chunked(
-            iterable: Iterable<T>,
-            size: Int,
-            transform: (List<T>) -> R
-        ): List<R> {
-            return iterable.chunked(size, transform)
-        }
-
-        @JvmStatic
-        fun <T> windowed(
-            iterable: Iterable<T>,
-            size: Int,
-            step: Int = 1,
-            partialWindows: Boolean = false
-        ): List<List<T>> {
-            return iterable.windowed(size, step, partialWindows)
-        }
-
-        @JvmStatic
-        fun <T, R> windowed(
-            iterable: Iterable<T>,
-            size: Int,
-            step: Int = 1,
-            partialWindows: Boolean = false,
-            transform: (List<T>) -> R
-        ): List<R> {
-            return iterable.windowed(size, step, partialWindows, transform)
+        inline fun <T> count(iterable: Iterable<T>, predicate: (T) -> Boolean): Int {
+            return iterable.count(predicate)
         }
 
         @JvmStatic
@@ -1549,6 +1674,126 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
+        fun <T> averageInt(iterable: Iterable<T>): Int {
+            return averageInt(iterable) { To.toInt(it) }
+        }
+
+        @JvmStatic
+        inline fun <T> averageInt(iterable: Iterable<T>, selector: (T) -> Int): Int {
+            var sum = 0
+            var count = 0
+            for (t in iterable) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) 0 else sum / count
+        }
+
+        @JvmStatic
+        fun <T> averageLong(iterable: Iterable<T>): Long {
+            return averageLong(iterable) { To.toLong(it) }
+        }
+
+        @JvmStatic
+        inline fun <T> averageLong(iterable: Iterable<T>, selector: (T) -> Long): Long {
+            var sum = 0L
+            var count = 0
+            for (t in iterable) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) 0 else sum / count
+        }
+
+        @JvmStatic
+        fun <T> averageDouble(iterable: Iterable<T>): Double {
+            return averageDouble(iterable) { To.toDouble(it) }
+        }
+
+        @JvmStatic
+        inline fun <T> averageDouble(iterable: Iterable<T>, selector: (T) -> Double): Double {
+            var sum = 0.0
+            var count = 0
+            for (t in iterable) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) 0.0 else sum / count
+        }
+
+        @JvmStatic
+        fun <T> averageBigInteger(iterable: Iterable<T>): BigInteger {
+            return averageBigInteger(iterable) { To.toBigInteger(it) }
+        }
+
+        @JvmStatic
+        inline fun <T> averageBigInteger(iterable: Iterable<T>, selector: (T) -> BigInteger): BigInteger {
+            var sum = BigInteger.ZERO
+            var count = 0
+            for (t in iterable) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) BigInteger.ZERO else sum / To.toBigInteger(count)
+        }
+
+        @JvmStatic
+        fun <T> averageBigDecimal(iterable: Iterable<T>): BigDecimal {
+            return averageBigDecimal(iterable) { To.toBigDecimal(it) }
+        }
+
+        @JvmStatic
+        inline fun <T> averageBigDecimal(iterable: Iterable<T>, selector: (T) -> BigDecimal): BigDecimal {
+            var sum = BigDecimal.ZERO
+            var count = 0
+            for (t in iterable) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) BigDecimal.ZERO else sum / To.toBigDecimal(count)
+        }
+
+        @JvmStatic
+        fun <T> single(iterable: Iterable<T>): T {
+            return iterable.single()
+        }
+
+        @JvmStatic
+        inline fun <T> single(iterable: Iterable<T>, predicate: (T) -> Boolean): T {
+            return iterable.single(predicate)
+        }
+
+        @JvmStatic
+        fun <T> singleOrNull(iterable: Iterable<T>): T? {
+            return iterable.singleOrNull()
+        }
+
+        @JvmStatic
+        inline fun <T> singleOrNull(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
+            return iterable.singleOrNull(predicate)
+        }
+
+        @JvmStatic
+        fun <T> indexOf(iterable: Iterable<T>, element: T): Int {
+            return iterable.indexOf(element)
+        }
+
+        @JvmStatic
+        inline fun <T> indexOf(iterable: Iterable<T>, predicate: (T) -> Boolean): Int {
+            return iterable.indexOfFirst(predicate)
+        }
+
+        @JvmStatic
+        fun <T> lastIndexOf(iterable: Iterable<T>, element: T): Int {
+            return iterable.lastIndexOf(element)
+        }
+
+        @JvmStatic
+        inline fun <T> lastIndexOf(iterable: Iterable<T>, predicate: (T) -> Boolean): Int {
+            return iterable.indexOfLast(predicate)
+        }
+
+        @JvmStatic
         fun <T> intersect(iterable: Iterable<T>, other: Iterable<T>): Set<T> {
             return iterable.intersect(other)
         }
@@ -1564,31 +1809,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> reversed(iterable: Iterable<T>): List<T> {
-            return iterable.reversed()
-        }
-
-        @JvmStatic
-        fun <T> sorted(iterable: Iterable<T>): List<T> {
-            return sorted(iterable, Sort.selfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> sorted(iterable: Iterable<T>, comparator: Comparator<in T>): List<T> {
-            return iterable.sortedWith(comparator)
-        }
-
-        @JvmStatic
-        fun <T> shuffled(iterable: Iterable<T>): List<T> {
-            return iterable.shuffled()
-        }
-
-        @JvmStatic
-        fun <T> shuffled(iterable: Iterable<T>, random: Random): List<T> {
-            return iterable.shuffled(random)
-        }
-
-        @JvmStatic
         fun <T> distinct(iterable: Iterable<T>): List<T> {
             return iterable.distinct()
         }
@@ -1596,11 +1816,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         @JvmStatic
         inline fun <T, K> distinct(iterable: Iterable<T>, selector: (T) -> K): List<T> {
             return iterable.distinctBy(selector)
-        }
-
-        @JvmStatic
-        inline fun <T> forEachIndexed(iterable: Iterable<T>, action: (index: Int, T) -> Unit) {
-            return iterable.forEachIndexed(action)
         }
 
         @JvmStatic
@@ -1714,46 +1929,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> addTo(iterable: Iterable<T>, destination: MutableCollection<T>): Boolean {
             return destination.addAll(iterable)
-        }
-
-        @JvmStatic
-        fun <T> plus(iterable: Iterable<T>, element: T): List<T> {
-            return iterable.plus(element)
-        }
-
-        @JvmStatic
-        fun <T> plus(iterable: Iterable<T>, elements: Array<out T>): List<T> {
-            return iterable.plus(elements)
-        }
-
-        @JvmStatic
-        fun <T> plus(iterable: Iterable<T>, elements: Iterable<T>): List<T> {
-            return iterable.plus(elements)
-        }
-
-        @JvmStatic
-        fun <T> plus(iterable: Iterable<T>, elements: Sequence<T>): List<T> {
-            return iterable.plus(elements)
-        }
-
-        @JvmStatic
-        fun <T> minus(iterable: Iterable<T>, element: T): List<T> {
-            return iterable.minus(element)
-        }
-
-        @JvmStatic
-        fun <T> minus(iterable: Iterable<T>, elements: Array<out T>): List<T> {
-            return iterable.minus(elements)
-        }
-
-        @JvmStatic
-        fun <T> minus(iterable: Iterable<T>, elements: Iterable<T>): List<T> {
-            return iterable.minus(elements)
-        }
-
-        @JvmStatic
-        fun <T> minus(iterable: Iterable<T>, elements: Sequence<T>): List<T> {
-            return iterable.minus(elements)
         }
 
         @JvmStatic
