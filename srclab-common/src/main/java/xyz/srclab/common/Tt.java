@@ -1,9 +1,11 @@
 package xyz.srclab.common;
 
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Format;
 import xyz.srclab.common.collection.ListOps;
-
-import java.util.Map;
+import xyz.srclab.common.run.Running;
+import xyz.srclab.common.run.ScheduledRunner;
+import xyz.srclab.common.run.ScheduledRunning;
 
 /**
  * @author sunqian
@@ -29,11 +31,19 @@ public class Tt {
         //
         //SequencesKt
         //IterableOps.opsFor(null).filterNotNull().
-        Map
         ListOps<Object> ops = ListOps.opsFor(null)
                 .addAll(new Object[0])
                 .subList(0)
                 .parentList()
                 .removeAll(new Object[0]);
+        String s = As.asAny(null);
+        Running<String> running = null;
+        assert running != null;
+        String result = running.get();
+
+        new Thread().start();
+
+        ScheduledRunner scheduledRunner = null;
+        ScheduledRunning<?> scheduledRunning = scheduledRunner.scheduleAtFixedRate(null, null, null);
     }
 }

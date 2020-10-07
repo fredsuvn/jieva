@@ -1,6 +1,7 @@
 package xyz.srclab.common.base
 
 import org.apache.commons.lang3.StringUtils
+import java.util.*
 
 /**
  * @author sunqian
@@ -113,7 +114,7 @@ interface NamingCase {
                 if (length <= 1) {
                     return listOf(name.toString())
                 }
-                val result = ArrayList<String>()
+                val result = LinkedList<String>()
                 val buffer = StringBuilder()
                 var lastLower = true
                 for (c in name) {
@@ -153,7 +154,7 @@ interface NamingCase {
                 if (buffer.isNotEmpty()) {
                     result.add(buffer.toString())
                 }
-                return result
+                return result.toList()
             }
 
             override fun join(words: List<CharSequence>): String {

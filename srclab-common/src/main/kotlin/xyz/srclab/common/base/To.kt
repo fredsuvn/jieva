@@ -1,192 +1,224 @@
+@file:JvmName("To")
+
 package xyz.srclab.common.base
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.util.*
+import kotlin.text.toBoolean as stringToBoolean
+import kotlin.text.toByte as stringToByte
+import kotlin.text.toDouble as stringToDouble
+import kotlin.text.toFloat as stringToFloat
+import kotlin.text.toInt as stringToInt
+import kotlin.text.toLong as stringToLong
+import kotlin.text.toShort as stringToShort
 
-/**
- * @author sunqian
- */
-object To {
-
-    @JvmStatic
-    fun toString(any: Any?): String {
-        return ToString.toString(any)
+fun Any?.toBoolean(): Boolean {
+    return when (this) {
+        null -> false
+        is Boolean -> this
+        else -> toString().stringToBoolean()
     }
+}
 
-    @JvmStatic
-    fun toBoolean(any: Any?): Boolean {
-        if (any == null) {
-            return false
-        }
-        return any.toString().toBoolean()
+fun Number?.toByte(): Byte {
+    return this?.toByte() ?: 0
+}
+
+fun CharSequence?.toByte(): Byte {
+    return this?.toString()?.stringToByte() ?: 0
+}
+
+fun Any?.toByte(): Byte {
+    return when (this) {
+        is Number -> toByte()
+        is String -> stringToByte()
+        else -> toString().stringToByte()
     }
+}
 
-    @JvmStatic
-    fun toByte(number: Number?): Byte {
-        return number?.toByte() ?: 0
+fun Number?.toShort(): Short {
+    return this?.toShort() ?: 0
+}
+
+fun CharSequence?.toShort(): Short {
+    return this?.toString()?.stringToShort() ?: 0
+}
+
+fun Any?.toShort(): Short {
+    return when (this) {
+        is Number -> toShort()
+        is String -> stringToShort()
+        else -> toString().stringToShort()
     }
+}
 
-    @JvmStatic
-    fun toByte(number: String?): Byte {
-        return number?.toByte() ?: 0
+fun Number?.toChar(): Char {
+    return this?.toChar() ?: 0.toChar()
+}
+
+fun CharSequence?.toChar(): Char {
+    return this?.toString()?.stringToInt().toChar() ?: 0.toChar()
+}
+
+fun Any?.toChar(): Char {
+    return when (this) {
+        is Number -> toChar()
+        is String -> stringToInt().toChar()
+        else -> toString().stringToInt().toChar()
     }
+}
 
-    @JvmStatic
-    fun toByte(any: Any?): Byte {
-        if (any == null) {
-            return 0
-        }
-        return if (any is Number) any.toByte() else any.toString().toByte()
+fun Number?.toInt(): Int {
+    return this?.toInt() ?: 0
+}
+
+fun CharSequence?.toInt(): Int {
+    return this?.toString()?.stringToInt() ?: 0
+}
+
+fun Any?.toInt(): Int {
+    return when (this) {
+        is Number -> toInt()
+        is String -> stringToInt()
+        else -> toString().stringToInt()
     }
+}
 
-    @JvmStatic
-    fun toShort(number: Number?): Short {
-        return number?.toShort() ?: 0
+fun Number?.toLong(): Long {
+    return this?.toLong() ?: 0
+}
+
+fun CharSequence?.toLong(): Long {
+    return this?.toString()?.stringToLong() ?: 0
+}
+
+fun Any?.toLong(): Long {
+    return when (this) {
+        is Number -> toLong()
+        is String -> stringToLong()
+        else -> toString().stringToLong()
     }
+}
 
-    @JvmStatic
-    fun toShort(number: String?): Short {
-        return number?.toShort() ?: 0
+fun Number?.toFloat(): Float {
+    return this?.toFloat() ?: 0f
+}
+
+fun CharSequence?.toFloat(): Float {
+    return this?.toString()?.stringToFloat() ?: 0f
+}
+
+fun Any?.toFloat(): Float {
+    return when (this) {
+        is Number -> toFloat()
+        is String -> stringToFloat()
+        else -> toString().stringToFloat()
     }
+}
 
-    @JvmStatic
-    fun toShort(any: Any?): Short {
-        if (any == null) {
-            return 0
-        }
-        return if (any is Number) any.toShort() else any.toString().toShort()
+fun Number?.toDouble(): Double {
+    return this?.toDouble() ?: 0.0
+}
+
+fun CharSequence?.toDouble(): Double {
+    return this?.toString()?.stringToDouble() ?: 0.0
+}
+
+fun Any?.toDouble(): Double {
+    return when (this) {
+        is Number -> toDouble()
+        is String -> stringToDouble()
+        else -> toString().stringToDouble()
     }
+}
 
-    @JvmStatic
-    fun toChar(number: Number?): Char {
-        return As.notNull(toInt(number))
+fun Number?.toBigInteger(): BigInteger {
+    return when (this) {
+        null, 0, 0L, 0f, 0.0 -> BigInteger.ZERO
+        1, 1L, 1f, 1.0 -> BigInteger.ONE
+        10, 10L, 10f, 10.0 -> BigInteger.TEN
+        is BigInteger -> this
+        is BigDecimal -> toBigInteger()
+        else -> BigInteger(toString())
     }
+}
 
-    @JvmStatic
-    fun toChar(number: String?): Char {
-        return As.notNull(toInt(number))
+fun CharSequence?.toBigInteger(): BigInteger {
+    return when (this) {
+        null, "0" -> BigInteger.ZERO
+        "1" -> BigInteger.ONE
+        "10" -> BigInteger.TEN
+        else -> BigInteger(toString())
     }
+}
 
-    @JvmStatic
-    fun toChar(any: Any?): Char {
-        return As.notNull(toInt(any))
+fun Any?.toBigInteger(): BigInteger {
+    return when (this) {
+        null -> BigInteger.ZERO
+        is Number -> toBigInteger()
+        is String -> toBigInteger()
+        else -> toString().toBigInteger()
     }
+}
 
-    @JvmStatic
-    fun toInt(number: Number?): Int {
-        return number?.toInt() ?: 0
+fun Number?.toBigDecimal(): BigDecimal {
+    return when (this) {
+        null, 0, 0L, 0f, 0.0 -> BigDecimal.ZERO
+        1, 1L, 1f, 1.0 -> BigDecimal.ONE
+        10, 10L, 10f, 10.0 -> BigDecimal.TEN
+        is BigInteger -> BigDecimal(this)
+        is BigDecimal -> this
+        else -> BigDecimal(toString())
     }
+}
 
-    @JvmStatic
-    fun toInt(number: String?): Int {
-        return number?.toInt() ?: 0
+fun CharSequence?.toBigDecimal(): BigDecimal {
+    return when (this) {
+        null, "0" -> BigDecimal.ZERO
+        "1" -> BigDecimal.ONE
+        "10" -> BigDecimal.TEN
+        else -> BigDecimal(toString())
     }
+}
 
-    @JvmStatic
-    fun toInt(any: Any?): Int {
-        if (any == null) {
-            return 0
-        }
-        return if (any is Number) any.toInt() else any.toString().toInt()
+fun Any?.toBigDecimal(): BigDecimal {
+    return when (this) {
+        null -> BigDecimal.ZERO
+        is Number -> toBigDecimal()
+        is String -> toBigDecimal()
+        else -> toString().toBigDecimal()
     }
+}
 
-    @JvmStatic
-    fun toLong(number: Number?): Long {
-        return number?.toLong() ?: 0
-    }
+fun CharArray.toChars(): String {
+    return String(this)
+}
 
-    @JvmStatic
-    fun toLong(number: String?): Long {
-        return number?.toLong() ?: 0
-    }
+fun ByteArray.toChars(): String {
+    return String(this, Defaults.charset())
+}
 
-    @JvmStatic
-    fun toLong(any: Any?): Long {
-        if (any == null) {
-            return 0
-        }
-        return if (any is Number) any.toLong() else any.toString().toLong()
-    }
+fun CharArray.toBytes(): ByteArray {
+    return toChars().toByteArray(Defaults.charset())
+}
 
-    @JvmStatic
-    fun toFloat(number: Number?): Float {
-        return number?.toFloat() ?: 0f
-    }
+fun CharSequence.toBytes(): ByteArray {
+    return toString().toByteArray(Defaults.charset())
+}
 
-    @JvmStatic
-    fun toFloat(number: String?): Float {
-        return number?.toFloat() ?: 0f
-    }
-
-    @JvmStatic
-    fun toFloat(any: Any?): Float {
-        if (any == null) {
-            return 0f
-        }
-        return if (any is Number) any.toFloat() else any.toString().toFloat()
-    }
-
-    @JvmStatic
-    fun toDouble(number: Number?): Double {
-        return number?.toDouble() ?: 0.0
-    }
-
-    @JvmStatic
-    fun toDouble(number: String?): Double {
-        return number?.toDouble() ?: 0.0
-    }
-
-    @JvmStatic
-    fun toDouble(any: Any?): Double {
-        if (any == null) {
-            return 0.0
-        }
-        return if (any is Number) any.toDouble() else any.toString().toDouble()
-    }
-
-    @JvmStatic
-    fun toBigInteger(number: Number?): BigInteger {
-        return when (number) {
-            null, 0 -> BigInteger.ZERO
-            1 -> BigInteger.ONE
-            10 -> BigInteger.TEN
-            else -> BigInteger(number.toString())
-        }
-    }
-
-    @JvmStatic
-    fun toBigInteger(number: String?): BigInteger {
-        return when (number) {
-            null, "0" -> BigInteger.ZERO
-            "1" -> BigInteger.ONE
-            "10" -> BigInteger.TEN
-            else -> BigInteger(number.toString())
-        }
-    }
-
-    @JvmStatic
-    fun toBigInteger(any: Any?): BigInteger {
-        if (any == null) {
-            return BigInteger.ZERO
-        }
-        return when (any) {
-            0, "0" -> BigInteger.ZERO
-            1, "1" -> BigInteger.ONE
-            10, "10" -> BigInteger.TEN
-            else -> BigInteger(any.toString())
-        }
-    }
-
-    @JvmStatic
-    fun toBigDecimal(any: Any?): BigDecimal {
-        if (any == null) {
-            return BigDecimal.ZERO
-        }
-        return when (any) {
-            0, "0" -> BigDecimal.ZERO
-            1, "1" -> BigDecimal.ONE
-            10, "10" -> BigDecimal.TEN
-            else -> BigDecimal(any.toString())
-        }
+fun Any?.deepToString(): String {
+    return when (this) {
+        null -> toString()
+        is Array<*> -> Arrays.deepToString(this)
+        is BooleanArray -> Arrays.toString(this)
+        is ByteArray -> Arrays.toString(this)
+        is ShortArray -> Arrays.toString(this)
+        is CharArray -> Arrays.toString(this)
+        is IntArray -> Arrays.toString(this)
+        is LongArray -> Arrays.toString(this)
+        is FloatArray -> Arrays.toString(this)
+        is DoubleArray -> Arrays.toString(this)
+        else -> toString()
     }
 }

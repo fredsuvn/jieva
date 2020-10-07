@@ -33,13 +33,18 @@ object Current {
     }
 
     @JvmStatic
+    fun context(): MutableMap<Any, Any?> {
+        return localContext.get()
+    }
+
+    @JvmStatic
     fun <T : Any> get(key: Any): T {
-        return As.notNull(Require.notNullElement(localContext.get()[key]))
+        return localContext.get()[key].notNull().asAny()
     }
 
     @JvmStatic
     fun <T : Any> getOrNull(key: Any): T? {
-        return As.nullable(localContext.get()[key])
+        return localContext.get()[key].notNull().asAny()
     }
 
     @JvmStatic
@@ -50,11 +55,6 @@ object Current {
     @JvmStatic
     fun clear() {
         localContext.get().clear()
-    }
-
-    @JvmStatic
-    fun contextMap(): Map<Any, Any?> {
-        return localContext.get()
     }
 
     @JvmStatic

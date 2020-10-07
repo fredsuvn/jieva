@@ -9,14 +9,14 @@ object Sort {
 
     @JvmStatic
     fun <T> selfComparableComparator(): Comparator<T> {
-        return As.notNull(SELF_COMPARABLE_COMPARATOR)
+        return SELF_COMPARABLE_COMPARATOR.asNotNull()
     }
 
     @JvmStatic
     private val SELF_COMPARABLE_COMPARATOR: Comparator<*> by lazy {
         Comparator { o1: Any?, o2: Any? ->
-            val c1 = o1 as Comparable<Any?>
-            val c2 = o2 as Comparable<Any?>
+            val c1: Comparable<Any?> = o1.asAny()
+            val c2: Comparable<Any?> = o2.asAny()
             c1.compareTo(c2)
         }
     }

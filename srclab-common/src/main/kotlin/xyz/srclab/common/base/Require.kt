@@ -1,48 +1,37 @@
+@file:JvmName("Require")
+
 package xyz.srclab.common.base
 
-/**
- * @author sunqian
- */
-object Require {
+fun <T : Any> T?.notNull(): T {
+    Check.checkNull(this != null)
+    return this.asNotNull()
+}
 
-    @JvmStatic
-    fun <T : Any> notNull(any: T?): T {
-        Check.checkNull(any != null)
-        return any as T
-    }
+fun <T : Any> T?.notNull(message: String?): T {
+    Check.checkNull(this != null, message)
+    return this.asNotNull()
+}
 
-    @JvmStatic
-    fun <T : Any> notNull(any: T?, message: String?): T {
-        Check.checkNull(any != null, message)
-        return any as T
-    }
+fun <T : Any> T?.notNull(messagePattern: String?, vararg messageArgs: Any?): T {
+    Check.checkNull(this != null, messagePattern, messageArgs)
+    return this.asNotNull()
+}
 
-    @JvmStatic
-    fun <T : Any> notNull(any: T?, messagePattern: String?, vararg messageArgs: Any?): T {
-        Check.checkNull(any != null, messagePattern, messageArgs)
-        return any as T
-    }
+fun <T : Any> T?.notNullElement(): T {
+    Check.checkElement(this != null)
+    return this.asNotNull()
+}
 
-    @JvmStatic
-    fun <T : Any> notNullElement(element: T?): T {
-        Check.checkElement(element != null)
-        return element as T
-    }
+fun <T : Any> T?.notNullElement(message: String?): T {
+    Check.checkElement(this != null, message)
+    return this.asNotNull()
+}
 
-    @JvmStatic
-    fun <T : Any> notNullElement(element: T?, message: String?): T {
-        Check.checkElement(element != null, message)
-        return element as T
-    }
+fun <T : Any> T?.notNullElement(messagePattern: String?, vararg messageArgs: Any?): T {
+    Check.checkElement(this != null, messagePattern, messageArgs)
+    return this.asNotNull()
+}
 
-    @JvmStatic
-    fun <T : Any> notNullElement(element: T?, messagePattern: String?, vararg messageArgs: Any?): T {
-        Check.checkElement(element != null, messagePattern, messageArgs)
-        return element as T
-    }
-
-    @JvmStatic
-    fun <T : Any> notNullElementByKey(element: T?, key: Any?): T {
-        return notNullElement(element, "Key: {}.", key)
-    }
+fun <T : Any> T?.notNullElementByKey(key: Any?): T {
+    return this.notNullElement("Key: {}.", key)
 }
