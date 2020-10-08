@@ -1,6 +1,7 @@
 package xyz.srclab.common.run
 
 import java.time.Duration
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.SynchronousQueue
 
@@ -12,7 +13,7 @@ interface Runner {
     companion object {
 
         private val newThreadRunner: Runner by lazy {
-            threadPoolRunnerBuilder()
+            executorServiceRunnerBuilder()
                 .corePoolSize(0)
                 .maximumPoolSize(Int.MAX_VALUE)
                 .keepAliveTime(Duration.ZERO)
@@ -22,13 +23,38 @@ interface Runner {
         }
 
         @JvmStatic
-        fun <V> runWithNewThread(block: () -> V): Running<V> {
-            return newThreadRunner.run(block)
+        fun currentRunner(): Runner {
+            return CurrentRunner
         }
 
         @JvmStatic
-        fun threadPoolRunnerBuilder(): ThreadPoolRunnerBuilder {
-            return ThreadPoolRunnerBuilder()
+        fun newThreadRunner(): Runner {
+            return newThreadRunner
+        }
+
+        @JvmStatic
+        fun executorServiceRunner(executorService: ExecutorService): Runner {
+            return ExecutorServiceRunner(executorService)
+        }
+
+        @JvmStatic
+        fun executorServiceRunnerBuilder(): ExecutorServiceRunnerBuilder {
+            return ExecutorServiceRunnerBuilder()
+        }
+
+        @JvmStatic
+        fun <V> runCurrent(block: () -> V): Running<V> {
+            return currentRunner().run(block)
+        }
+
+        @JvmStatic
+        fun <V> runNew(block: () -> V): Running<V> {
+            return runNewThread(block)
+        }
+
+        @JvmStatic
+        fun <V> runNewThread(block: () -> V): Running<V> {
+            return newThreadRunner().run(block)
         }
     }
 }

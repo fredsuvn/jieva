@@ -2,16 +2,17 @@ package xyz.srclab.common.run
 
 import xyz.srclab.common.base.Check
 import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asNotNull
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.*
 
-class ScheduledThreadPoolRunner(
-    private val scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor
-) : ThreadPoolRunner(scheduledThreadPoolExecutor), ScheduledRunner {
+class ScheduledExecutorServiceRunner(
+    private val scheduledExecutorService: ScheduledExecutorService
+) : ExecutorServiceRunner(scheduledExecutorService), ScheduledRunner {
 
     override fun <V> schedule(block: () -> V, delay: Duration): ScheduledRunning<V> {
-        return ScheduledThreadPoolRunning(scheduledThreadPoolExecutor, block, delay)
+        return ScheduledThreadPoolRunning(scheduledExecutorService, block, delay)
     }
 
     override fun <V> scheduleAtFixedRate(
@@ -19,7 +20,7 @@ class ScheduledThreadPoolRunner(
         initialDelay: Duration,
         period: Duration
     ): ScheduledRunning<V> {
-        return RepeatableScheduledThreadPoolRunningAtFixedRate(scheduledThreadPoolExecutor, block, initialDelay, period)
+        return RepeatableScheduledThreadPoolRunningAtFixedRate(scheduledExecutorService, block, initialDelay, period)
     }
 
     override fun <V> scheduleWithFixedDelay(
@@ -28,7 +29,7 @@ class ScheduledThreadPoolRunner(
         period: Duration
     ): ScheduledRunning<V> {
         return RepeatableScheduledThreadPoolRunningWithFixedDelay(
-            scheduledThreadPoolExecutor,
+            scheduledExecutorService,
             block,
             initialDelay,
             period
@@ -36,7 +37,7 @@ class ScheduledThreadPoolRunner(
     }
 
     private open class ScheduledThreadPoolRunning<V>(
-        private val scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor,
+        private val scheduledExecutorService: ScheduledExecutorService,
         private val block: () -> V,
         private val delay: Duration
     ) : ScheduledRunning<V> {
@@ -55,12 +56,12 @@ class ScheduledThreadPoolRunner(
 
         override fun startTime(): LocalDateTime {
             Check.checkState(runningBlock.startTime != null, "Task was not started.")
-            return runningBlock.startTime!!
+            return runningBlock.startTime.asNotNull()
         }
 
         override fun endTime(): LocalDateTime {
             Check.checkState(runningBlock.endTime != null, "Task was not done.")
-            return runningBlock.endTime!!
+            return runningBlock.endTime.asNotNull()
         }
 
         override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
@@ -100,25 +101,25 @@ class ScheduledThreadPoolRunner(
         }
 
         protected open fun createScheduledFuture(): ScheduledFuture<V> {
-            return scheduledThreadPoolExecutor.schedule(runningBlock, delay.toNanos(), TimeUnit.NANOSECONDS)
+            return scheduledExecutorService.schedule(runningBlock, delay.toNanos(), TimeUnit.NANOSECONDS)
         }
     }
 
     private open class RepeatableScheduledThreadPoolRunning<V>(
-        private val scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor,
+        private val scheduledExecutorService: ScheduledExecutorService,
         private val block: () -> V,
         private val initialDelay: Duration,
         private val period: Duration
-    ) : ScheduledThreadPoolRunning<V>(scheduledThreadPoolExecutor, block, initialDelay) {
+    ) : ScheduledThreadPoolRunning<V>(scheduledExecutorService, block, initialDelay) {
 
         override fun get(): V {
             scheduledFuture.get()
-            return (runningBlock as RepeatableRunningBlock).result!!
+            return (runningBlock as RepeatableRunningBlock).result.asAny()
         }
 
         override fun get(timeout: Long, unit: TimeUnit): V {
             scheduledFuture.get(timeout, unit)
-            return (runningBlock as RepeatableRunningBlock).result!!
+            return (runningBlock as RepeatableRunningBlock).result.asAny()
         }
 
         override fun createRunningBlock(): RunningBlock<V> {
@@ -127,14 +128,14 @@ class ScheduledThreadPoolRunner(
     }
 
     private open class RepeatableScheduledThreadPoolRunningAtFixedRate<V>(
-        private val scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor,
+        private val scheduledExecutorService: ScheduledExecutorService,
         private val block: () -> V,
         private val initialDelay: Duration,
         private val period: Duration
-    ) : ScheduledThreadPoolRunning<V>(scheduledThreadPoolExecutor, block, initialDelay) {
+    ) : ScheduledThreadPoolRunning<V>(scheduledExecutorService, block, initialDelay) {
 
         override fun createScheduledFuture(): ScheduledFuture<V> {
-            return scheduledThreadPoolExecutor.scheduleAtFixedRate(
+            return scheduledExecutorService.scheduleAtFixedRate(
                 { runningBlock.call() },
                 initialDelay.toNanos(),
                 period.toNanos(),
@@ -144,14 +145,14 @@ class ScheduledThreadPoolRunner(
     }
 
     private open class RepeatableScheduledThreadPoolRunningWithFixedDelay<V>(
-        private val scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor,
+        private val scheduledExecutorService: ScheduledExecutorService,
         private val block: () -> V,
         private val initialDelay: Duration,
         private val period: Duration
-    ) : ScheduledThreadPoolRunning<V>(scheduledThreadPoolExecutor, block, initialDelay) {
+    ) : ScheduledThreadPoolRunning<V>(scheduledExecutorService, block, initialDelay) {
 
         override fun createScheduledFuture(): ScheduledFuture<V> {
-            return scheduledThreadPoolExecutor.scheduleWithFixedDelay(
+            return scheduledExecutorService.scheduleWithFixedDelay(
                 { runningBlock.call() },
                 initialDelay.toNanos(),
                 period.toNanos(),
@@ -193,32 +194,32 @@ class ScheduledThreadPoolRunner(
     }
 }
 
-class ScheduledThreadPoolRunnerBuilder {
+class ScheduledExecutorServiceRunnerBuilder {
 
     private var corePoolSize = 1
     private var threadFactory: ThreadFactory? = null
     private var rejectedExecutionHandler: RejectedExecutionHandler? = null
 
-    fun corePoolSize(corePoolSize: Int): ScheduledThreadPoolRunnerBuilder {
+    fun corePoolSize(corePoolSize: Int): ScheduledExecutorServiceRunnerBuilder {
         this.corePoolSize = corePoolSize
         return this
     }
 
-    fun threadFactory(threadFactory: ThreadFactory): ScheduledThreadPoolRunnerBuilder {
+    fun threadFactory(threadFactory: ThreadFactory): ScheduledExecutorServiceRunnerBuilder {
         this.threadFactory = threadFactory
         return this
     }
 
-    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler): ScheduledThreadPoolRunnerBuilder {
+    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler): ScheduledExecutorServiceRunnerBuilder {
         this.rejectedExecutionHandler = rejectedExecutionHandler
         return this
     }
 
-    fun build(): ScheduledThreadPoolRunner {
-        return ScheduledThreadPoolRunner(createScheduledThreadPoolExecutor())
+    fun build(): ScheduledExecutorServiceRunner {
+        return ScheduledExecutorServiceRunner(createScheduledExecutorService())
     }
 
-    private fun createScheduledThreadPoolExecutor(): ScheduledThreadPoolExecutor {
+    private fun createScheduledExecutorService(): ScheduledExecutorService {
         if (threadFactory == null) {
             threadFactory = Executors.defaultThreadFactory()
         }

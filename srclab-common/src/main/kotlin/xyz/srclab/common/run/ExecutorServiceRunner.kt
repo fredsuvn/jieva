@@ -1,20 +1,21 @@
 package xyz.srclab.common.run
 
 import xyz.srclab.common.base.Check
+import xyz.srclab.common.base.asNotNull
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.*
 
-open class ThreadPoolRunner(
-    private val threadPoolExecutor: ThreadPoolExecutor
+open class ExecutorServiceRunner(
+    private val executorService: ExecutorService
 ) : Runner {
 
     override fun <V> run(block: () -> V): Running<V> {
-        return ThreadPoolRunning(threadPoolExecutor, block)
+        return ThreadPoolRunning(executorService, block)
     }
 
     private class ThreadPoolRunning<V>(
-        threadPoolExecutor: ThreadPoolExecutor,
+        executorService: ExecutorService,
         block: () -> V
     ) : Running<V> {
 
@@ -22,7 +23,7 @@ open class ThreadPoolRunner(
         private val future: Future<V>
 
         init {
-            future = threadPoolExecutor.submit(runningBlock)
+            future = executorService.submit(runningBlock)
         }
 
         override fun isStart(): Boolean {
@@ -31,12 +32,12 @@ open class ThreadPoolRunner(
 
         override fun startTime(): LocalDateTime {
             Check.checkState(runningBlock.startTime != null, "Task was not started.")
-            return runningBlock.startTime!!
+            return runningBlock.startTime.asNotNull()
         }
 
         override fun endTime(): LocalDateTime {
             Check.checkState(runningBlock.endTime != null, "Task was not done.")
-            return runningBlock.endTime!!
+            return runningBlock.endTime.asNotNull()
         }
 
         override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
@@ -80,7 +81,7 @@ open class ThreadPoolRunner(
     }
 }
 
-class ThreadPoolRunnerBuilder {
+class ExecutorServiceRunnerBuilder {
 
     private var corePoolSize = 1
     private var maximumPoolSize = 1
@@ -90,46 +91,46 @@ class ThreadPoolRunnerBuilder {
     private var threadFactory: ThreadFactory? = null
     private var rejectedExecutionHandler: RejectedExecutionHandler? = null
 
-    fun corePoolSize(corePoolSize: Int): ThreadPoolRunnerBuilder {
+    fun corePoolSize(corePoolSize: Int): ExecutorServiceRunnerBuilder {
         this.corePoolSize = corePoolSize
         return this
     }
 
-    fun maximumPoolSize(maximumPoolSize: Int): ThreadPoolRunnerBuilder {
+    fun maximumPoolSize(maximumPoolSize: Int): ExecutorServiceRunnerBuilder {
         this.maximumPoolSize = maximumPoolSize
         return this
     }
 
-    fun workQueueCapacity(workQueueCapacity: Int): ThreadPoolRunnerBuilder {
+    fun workQueueCapacity(workQueueCapacity: Int): ExecutorServiceRunnerBuilder {
         this.workQueueCapacity = workQueueCapacity
         return this
     }
 
-    fun keepAliveTime(keepAliveTime: Duration): ThreadPoolRunnerBuilder {
+    fun keepAliveTime(keepAliveTime: Duration): ExecutorServiceRunnerBuilder {
         this.keepAliveTime = keepAliveTime
         return this
     }
 
-    fun workQueue(workQueue: BlockingQueue<Runnable>): ThreadPoolRunnerBuilder {
+    fun workQueue(workQueue: BlockingQueue<Runnable>): ExecutorServiceRunnerBuilder {
         this.workQueue = workQueue
         return this
     }
 
-    fun threadFactory(threadFactory: ThreadFactory): ThreadPoolRunnerBuilder {
+    fun threadFactory(threadFactory: ThreadFactory): ExecutorServiceRunnerBuilder {
         this.threadFactory = threadFactory
         return this
     }
 
-    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler): ThreadPoolRunnerBuilder {
+    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler): ExecutorServiceRunnerBuilder {
         this.rejectedExecutionHandler = rejectedExecutionHandler
         return this
     }
 
-    fun build(): ThreadPoolRunner {
-        return ThreadPoolRunner(createThreadPoolExecutor())
+    fun build(): ExecutorServiceRunner {
+        return ExecutorServiceRunner(createExecutorService())
     }
 
-    private fun createThreadPoolExecutor(): ThreadPoolExecutor {
+    private fun createExecutorService(): ExecutorService {
         val keepTime: Long
         val keepUnit: TimeUnit
         if (keepAliveTime == null) {
