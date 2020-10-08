@@ -3,82 +3,74 @@ package xyz.srclab.common.run
 import java.time.Duration
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledThreadPoolExecutor
 
 interface ScheduledRunner : Runner {
 
     @Throws(RejectedExecutionException::class)
-    fun <V> schedule(block: () -> V, delay: Duration): ScheduledRunning<V>
+    fun <V> schedule(task: () -> V, delay: Duration): ScheduledRunning<V>
 
     @Throws(RejectedExecutionException::class)
-    fun <V> scheduleAtFixedRate(block: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V>
+    fun <V> scheduleAtFixedRate(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V>
 
     @Throws(RejectedExecutionException::class)
-    fun <V> scheduleWithFixedDelay(block: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V>
+    fun <V> scheduleWithFixedDelay(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V>
 
     companion object {
 
-        private val newThreadScheduledRunner: ScheduledRunner by lazy {
-            scheduledExecutorServiceRunnerBuilder()
+        private val scheduledAsyncRunner: ScheduledRunner by lazy {
+            ScheduledThreadPoolRunner.Builder()
                 .corePoolSize(0)
                 .threadFactory { r -> Thread(r) }
+                .keepAliveTime(Duration.ZERO)
                 .build()
         }
 
         @JvmStatic
-        fun newThreadScheduledRunner(): ScheduledRunner {
-            return newThreadScheduledRunner
+        fun scheduledAsyncRunner(): ScheduledRunner {
+            return scheduledAsyncRunner
         }
 
         @JvmStatic
-        fun scheduledExecutorServiceRunner(scheduledExecutorService: ScheduledExecutorService): Runner {
+        fun scheduledExecutorServiceRunner(
+            scheduledExecutorService: ScheduledExecutorService
+        ): ScheduledExecutorServiceRunner {
             return ScheduledExecutorServiceRunner(scheduledExecutorService)
         }
 
         @JvmStatic
-        fun scheduledExecutorServiceRunnerBuilder(): ScheduledExecutorServiceRunnerBuilder {
-            return ScheduledExecutorServiceRunnerBuilder()
+        fun scheduledThreadPoolRunner(
+            scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor
+        ): ScheduledThreadPoolRunner {
+            return ScheduledThreadPoolRunner(scheduledThreadPoolExecutor)
         }
 
         @JvmStatic
-        fun <V> scheduleNew(block: () -> V, delay: Duration): ScheduledRunning<V> {
-            return scheduleNewThread(block, delay)
+        fun scheduledThreadPoolRunnerBuilder(): ScheduledThreadPoolRunner.Builder {
+            return ScheduledThreadPoolRunner.Builder()
         }
 
         @JvmStatic
-        fun <V> scheduleNewAtFixedRate(block: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V> {
-            return scheduleNewThreadAtFixedRate(block, initialDelay, period)
+        fun <V> scheduleAsync(task: () -> V, delay: Duration): ScheduledRunning<V> {
+            return scheduledAsyncRunner().schedule(task, delay)
         }
 
         @JvmStatic
-        fun <V> scheduleNewWithFixedDelay(
-            block: () -> V,
+        fun <V> scheduleAsyncAtFixedRate(
+            task: () -> V,
             initialDelay: Duration,
             period: Duration
         ): ScheduledRunning<V> {
-            return scheduleNewThreadWithFixedDelay(block, initialDelay, period)
+            return scheduledAsyncRunner().scheduleAtFixedRate(task, initialDelay, period)
         }
 
         @JvmStatic
-        fun <V> scheduleNewThread(block: () -> V, delay: Duration): ScheduledRunning<V> {
-            return newThreadScheduledRunner().schedule(block, delay)
-        }
-
-        @JvmStatic
-        fun <V> scheduleNewThreadAtFixedRate(
-            block: () -> V,
+        fun <V> scheduleAsyncWithFixedDelay(
+            task: () -> V,
             initialDelay: Duration,
             period: Duration
         ): ScheduledRunning<V> {
-            return newThreadScheduledRunner().scheduleAtFixedRate(block, initialDelay, period)
-        }
-
-        @JvmStatic
-        fun <V> scheduleNewThreadWithFixedDelay(
-            block: () -> V,
-            initialDelay: Duration,
-            period: Duration
-        ): ScheduledRunning<V> {
-            return newThreadScheduledRunner().scheduleAtFixedRate(block, initialDelay, period)
+            return scheduledAsyncRunner().scheduleWithFixedDelay(task, initialDelay, period)
         }
     }
 }

@@ -9,7 +9,7 @@ object Sort {
 
     @JvmStatic
     fun <T> selfComparableComparator(): Comparator<T> {
-        return SELF_COMPARABLE_COMPARATOR.asNotNull()
+        return SELF_COMPARABLE_COMPARATOR.asAny()
     }
 
     @JvmStatic

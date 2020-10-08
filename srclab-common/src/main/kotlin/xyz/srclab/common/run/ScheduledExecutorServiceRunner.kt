@@ -7,67 +7,72 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.*
 
-class ScheduledExecutorServiceRunner(
+open class ScheduledExecutorServiceRunner(
     private val scheduledExecutorService: ScheduledExecutorService
 ) : ExecutorServiceRunner(scheduledExecutorService), ScheduledRunner {
 
-    override fun <V> schedule(block: () -> V, delay: Duration): ScheduledRunning<V> {
-        return ScheduledThreadPoolRunning(scheduledExecutorService, block, delay)
+    override fun <V> schedule(task: () -> V, delay: Duration): ScheduledRunning<V> {
+        return ScheduledExecutorServiceRunning(scheduledExecutorService, task, delay)
     }
 
     override fun <V> scheduleAtFixedRate(
-        block: () -> V,
+        task: () -> V,
         initialDelay: Duration,
         period: Duration
     ): ScheduledRunning<V> {
-        return RepeatableScheduledThreadPoolRunningAtFixedRate(scheduledExecutorService, block, initialDelay, period)
-    }
-
-    override fun <V> scheduleWithFixedDelay(
-        block: () -> V,
-        initialDelay: Duration,
-        period: Duration
-    ): ScheduledRunning<V> {
-        return RepeatableScheduledThreadPoolRunningWithFixedDelay(
+        return RepeatableScheduledExecutorServiceRunningAtFixedRate(
             scheduledExecutorService,
-            block,
+            task,
             initialDelay,
             period
         )
     }
 
-    private open class ScheduledThreadPoolRunning<V>(
+    override fun <V> scheduleWithFixedDelay(
+        task: () -> V,
+        initialDelay: Duration,
+        period: Duration
+    ): ScheduledRunning<V> {
+        return RepeatableScheduledExecutorServiceRunningWithFixedDelay(
+            scheduledExecutorService,
+            task,
+            initialDelay,
+            period
+        )
+    }
+
+    private open class ScheduledExecutorServiceRunning<V>(
         private val scheduledExecutorService: ScheduledExecutorService,
-        private val block: () -> V,
+        private val task: () -> V,
         private val delay: Duration
     ) : ScheduledRunning<V> {
 
-        protected val runningBlock: RunningBlock<V>
+        protected val runningTask: RunningTask<V>
         protected val scheduledFuture: ScheduledFuture<V>
 
         init {
-            runningBlock = createRunningBlock()
+            runningTask = createRunningTask()
             scheduledFuture = createScheduledFuture()
         }
 
         override fun isStart(): Boolean {
-            return runningBlock.startTime != null
+            return runningTask.startTime != null
         }
 
         override fun startTime(): LocalDateTime {
-            Check.checkState(runningBlock.startTime != null, "Task was not started.")
-            return runningBlock.startTime.asNotNull()
+            Check.checkState(runningTask.startTime != null, "Task was not started.")
+            return runningTask.startTime.asNotNull()
         }
 
         override fun endTime(): LocalDateTime {
-            Check.checkState(runningBlock.endTime != null, "Task was not done.")
-            return runningBlock.endTime.asNotNull()
+            Check.checkState(runningTask.endTime != null, "Task was not done.")
+            return runningTask.endTime.asNotNull()
         }
 
         override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
             val canceled = scheduledFuture.cancel(mayInterruptIfRunning)
             if (canceled) {
-                runningBlock.endTime = LocalDateTime.now()
+                runningTask.endTime = LocalDateTime.now()
             }
             return canceled
         }
@@ -96,47 +101,47 @@ class ScheduledExecutorServiceRunner(
             return scheduledFuture.getDelay(unit)
         }
 
-        protected open fun createRunningBlock(): RunningBlock<V> {
-            return RunningBlock(block)
+        protected open fun createRunningTask(): RunningTask<V> {
+            return RunningTask(task)
         }
 
         protected open fun createScheduledFuture(): ScheduledFuture<V> {
-            return scheduledExecutorService.schedule(runningBlock, delay.toNanos(), TimeUnit.NANOSECONDS)
+            return scheduledExecutorService.schedule(runningTask, delay.toNanos(), TimeUnit.NANOSECONDS)
         }
     }
 
-    private open class RepeatableScheduledThreadPoolRunning<V>(
+    private open class RepeatableScheduledExecutorServiceRunning<V>(
         private val scheduledExecutorService: ScheduledExecutorService,
-        private val block: () -> V,
+        private val task: () -> V,
         private val initialDelay: Duration,
         private val period: Duration
-    ) : ScheduledThreadPoolRunning<V>(scheduledExecutorService, block, initialDelay) {
+    ) : ScheduledExecutorServiceRunning<V>(scheduledExecutorService, task, initialDelay) {
 
         override fun get(): V {
             scheduledFuture.get()
-            return (runningBlock as RepeatableRunningBlock).result.asAny()
+            return (runningTask as RepeatableRunningTask).result.asAny()
         }
 
         override fun get(timeout: Long, unit: TimeUnit): V {
             scheduledFuture.get(timeout, unit)
-            return (runningBlock as RepeatableRunningBlock).result.asAny()
+            return (runningTask as RepeatableRunningTask).result.asAny()
         }
 
-        override fun createRunningBlock(): RunningBlock<V> {
-            return RepeatableRunningBlock(block)
+        override fun createRunningTask(): RunningTask<V> {
+            return RepeatableRunningTask(task)
         }
     }
 
-    private open class RepeatableScheduledThreadPoolRunningAtFixedRate<V>(
+    private open class RepeatableScheduledExecutorServiceRunningAtFixedRate<V>(
         private val scheduledExecutorService: ScheduledExecutorService,
-        private val block: () -> V,
+        private val task: () -> V,
         private val initialDelay: Duration,
         private val period: Duration
-    ) : ScheduledThreadPoolRunning<V>(scheduledExecutorService, block, initialDelay) {
+    ) : ScheduledExecutorServiceRunning<V>(scheduledExecutorService, task, initialDelay) {
 
         override fun createScheduledFuture(): ScheduledFuture<V> {
             return scheduledExecutorService.scheduleAtFixedRate(
-                { runningBlock.call() },
+                { runningTask.call() },
                 initialDelay.toNanos(),
                 period.toNanos(),
                 TimeUnit.NANOSECONDS
@@ -144,16 +149,16 @@ class ScheduledExecutorServiceRunner(
         }
     }
 
-    private open class RepeatableScheduledThreadPoolRunningWithFixedDelay<V>(
+    private open class RepeatableScheduledExecutorServiceRunningWithFixedDelay<V>(
         private val scheduledExecutorService: ScheduledExecutorService,
-        private val block: () -> V,
+        private val task: () -> V,
         private val initialDelay: Duration,
         private val period: Duration
-    ) : ScheduledThreadPoolRunning<V>(scheduledExecutorService, block, initialDelay) {
+    ) : ScheduledExecutorServiceRunning<V>(scheduledExecutorService, task, initialDelay) {
 
         override fun createScheduledFuture(): ScheduledFuture<V> {
             return scheduledExecutorService.scheduleWithFixedDelay(
-                { runningBlock.call() },
+                { runningTask.call() },
                 initialDelay.toNanos(),
                 period.toNanos(),
                 TimeUnit.NANOSECONDS
@@ -161,7 +166,7 @@ class ScheduledExecutorServiceRunner(
         }
     }
 
-    private open class RunningBlock<V>(private val block: () -> V) : Callable<V> {
+    private open class RunningTask<V>(private val task: () -> V) : Callable<V> {
 
         var startTime: LocalDateTime? = null
         var endTime: LocalDateTime? = null
@@ -169,14 +174,14 @@ class ScheduledExecutorServiceRunner(
         override fun call(): V {
             try {
                 startTime = LocalDateTime.now()
-                return block()
+                return task()
             } finally {
                 endTime = LocalDateTime.now()
             }
         }
     }
 
-    private class RepeatableRunningBlock<V>(private val block: () -> V) : RunningBlock<V>(block) {
+    private class RepeatableRunningTask<V>(private val task: () -> V) : RunningTask<V>(task) {
 
         var result: V? = null
 
@@ -191,41 +196,5 @@ class ScheduledExecutorServiceRunner(
             startTime = null
             endTime = null
         }
-    }
-}
-
-class ScheduledExecutorServiceRunnerBuilder {
-
-    private var corePoolSize = 1
-    private var threadFactory: ThreadFactory? = null
-    private var rejectedExecutionHandler: RejectedExecutionHandler? = null
-
-    fun corePoolSize(corePoolSize: Int) = apply {
-        this.corePoolSize = corePoolSize
-        return this
-    }
-
-    fun threadFactory(threadFactory: ThreadFactory) = apply {
-        this.threadFactory = threadFactory
-        return this
-    }
-
-    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler) = apply {
-        this.rejectedExecutionHandler = rejectedExecutionHandler
-        return this
-    }
-
-    fun build(): ScheduledExecutorServiceRunner {
-        return ScheduledExecutorServiceRunner(createScheduledExecutorService())
-    }
-
-    private fun createScheduledExecutorService(): ScheduledExecutorService {
-        if (threadFactory == null) {
-            threadFactory = Executors.defaultThreadFactory()
-        }
-        return if (rejectedExecutionHandler == null) ScheduledThreadPoolExecutor(
-            corePoolSize,
-            threadFactory
-        ) else ScheduledThreadPoolExecutor(corePoolSize, threadFactory, rejectedExecutionHandler)
     }
 }

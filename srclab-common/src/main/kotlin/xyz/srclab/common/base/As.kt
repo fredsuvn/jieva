@@ -6,6 +6,6 @@ fun <T> Any?.asAny(): T {
     return this as T
 }
 
-fun <T : Any> Any?.asNotNull(): T {
+fun <T : Any> T?.asNotNull(): T {
     return this as T
 }

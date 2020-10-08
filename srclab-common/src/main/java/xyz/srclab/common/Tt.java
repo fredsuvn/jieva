@@ -6,6 +6,7 @@ import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.run.Running;
 import xyz.srclab.common.run.ScheduledRunner;
 import xyz.srclab.common.run.ScheduledRunning;
+import xyz.srclab.common.run.ThreadPoolRunner;
 
 /**
  * @author sunqian
@@ -45,5 +46,7 @@ public class Tt {
 
         ScheduledRunner scheduledRunner = null;
         ScheduledRunning<?> scheduledRunning = scheduledRunner.scheduleAtFixedRate(null, null, null);
+
+        new ThreadPoolRunner.Builder().corePoolSize(1).build();
     }
 }

@@ -4,16 +4,17 @@ import java.time.Duration
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadPoolExecutor
 
 interface Runner {
 
     @Throws(RejectedExecutionException::class)
-    fun <V> run(block: () -> V): Running<V>
+    fun <V> run(task: () -> V): Running<V>
 
     companion object {
 
-        private val newThreadRunner: Runner by lazy {
-            executorServiceRunnerBuilder()
+        private val AsyncRunner: Runner by lazy {
+            ThreadPoolRunner.Builder()
                 .corePoolSize(0)
                 .maximumPoolSize(Int.MAX_VALUE)
                 .keepAliveTime(Duration.ZERO)
@@ -23,38 +24,38 @@ interface Runner {
         }
 
         @JvmStatic
-        fun currentRunner(): Runner {
-            return CurrentRunner
+        fun syncRunner(): Runner {
+            return SyncRunner
         }
 
         @JvmStatic
-        fun newThreadRunner(): Runner {
-            return newThreadRunner
+        fun asyncRunner(): Runner {
+            return AsyncRunner
         }
 
         @JvmStatic
-        fun executorServiceRunner(executorService: ExecutorService): Runner {
+        fun executorServiceRunner(executorService: ExecutorService): ExecutorServiceRunner {
             return ExecutorServiceRunner(executorService)
         }
 
         @JvmStatic
-        fun executorServiceRunnerBuilder(): ExecutorServiceRunnerBuilder {
-            return ExecutorServiceRunnerBuilder()
+        fun threadPoolRunner(threadPoolExecutor: ThreadPoolExecutor): ThreadPoolRunner {
+            return ThreadPoolRunner(threadPoolExecutor)
         }
 
         @JvmStatic
-        fun <V> runCurrent(block: () -> V): Running<V> {
-            return currentRunner().run(block)
+        fun threadPoolRunnerBuilder(): ThreadPoolRunner.Builder {
+            return ThreadPoolRunner.Builder()
         }
 
         @JvmStatic
-        fun <V> runNew(block: () -> V): Running<V> {
-            return runNewThread(block)
+        fun <V> runSync(task: () -> V): Running<V> {
+            return syncRunner().run(task)
         }
 
         @JvmStatic
-        fun <V> runNewThread(block: () -> V): Running<V> {
-            return newThreadRunner().run(block)
+        fun <V> runAsync(task: () -> V): Running<V> {
+            return asyncRunner().run(task)
         }
     }
 }

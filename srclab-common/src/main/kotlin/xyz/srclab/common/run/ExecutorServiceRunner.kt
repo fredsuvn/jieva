@@ -4,46 +4,76 @@ import xyz.srclab.common.base.Check
 import xyz.srclab.common.base.asNotNull
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.concurrent.*
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 
 open class ExecutorServiceRunner(
     private val executorService: ExecutorService
 ) : Runner {
 
-    override fun <V> run(block: () -> V): Running<V> {
-        return ThreadPoolRunning(executorService, block)
+    override fun <V> run(task: () -> V): Running<V> {
+        return ExecutorServiceRunning(executorService, task)
     }
 
-    private class ThreadPoolRunning<V>(
+    fun shutdown() {
+        executorService.shutdown()
+    }
+
+    fun shutdownNow(): List<Runnable> {
+        return executorService.shutdownNow()
+    }
+
+    fun isShutdown(): Boolean {
+        return executorService.isShutdown
+    }
+
+    fun isTerminated(): Boolean {
+        return executorService.isTerminated
+    }
+
+    /**
+     * @throws InterruptedException
+     */
+    fun awaitTermination(duration: Duration): Boolean {
+        return executorService.awaitTermination(duration.toNanos(), TimeUnit.NANOSECONDS)
+    }
+
+    override fun toString(): String {
+        return executorService.toString()
+    }
+
+    private class ExecutorServiceRunning<V>(
         executorService: ExecutorService,
-        block: () -> V
+        task: () -> V
     ) : Running<V> {
 
-        private val runningBlock = RunningBlock(block)
+        private val runningTask = RunningTask(task)
         private val future: Future<V>
 
         init {
-            future = executorService.submit(runningBlock)
+            future = executorService.submit(runningTask)
         }
 
         override fun isStart(): Boolean {
-            return runningBlock.startTime != null
+            return runningTask.startTime != null
         }
 
         override fun startTime(): LocalDateTime {
-            Check.checkState(runningBlock.startTime != null, "Task was not started.")
-            return runningBlock.startTime.asNotNull()
+            Check.checkState(runningTask.startTime != null, "Task was not started.")
+            return runningTask.startTime.asNotNull()
         }
 
         override fun endTime(): LocalDateTime {
-            Check.checkState(runningBlock.endTime != null, "Task was not done.")
-            return runningBlock.endTime.asNotNull()
+            Check.checkState(runningTask.endTime != null, "Task was not done.")
+            return runningTask.endTime.asNotNull()
         }
 
         override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
             val canceled = future.cancel(mayInterruptIfRunning)
             if (canceled) {
-                runningBlock.endTime = LocalDateTime.now()
+                runningTask.endTime = LocalDateTime.now()
             }
             return canceled
         }
@@ -64,7 +94,7 @@ open class ExecutorServiceRunner(
             return future.get(timeout, unit)
         }
 
-        private class RunningBlock<V>(private val block: () -> V) : Callable<V> {
+        private class RunningTask<V>(private val task: () -> V) : Callable<V> {
 
             var startTime: LocalDateTime? = null
             var endTime: LocalDateTime? = null
@@ -72,89 +102,11 @@ open class ExecutorServiceRunner(
             override fun call(): V {
                 try {
                     startTime = LocalDateTime.now()
-                    return block()
+                    return task()
                 } finally {
                     endTime = LocalDateTime.now()
                 }
             }
         }
-    }
-}
-
-class ExecutorServiceRunnerBuilder {
-
-    private var corePoolSize = 1
-    private var maximumPoolSize = 1
-    private var workQueueCapacity = Int.MAX_VALUE
-    private var keepAliveTime: Duration? = null
-    private var workQueue: BlockingQueue<Runnable>? = null
-    private var threadFactory: ThreadFactory? = null
-    private var rejectedExecutionHandler: RejectedExecutionHandler? = null
-
-    fun corePoolSize(corePoolSize: Int) = apply {
-        this.corePoolSize = corePoolSize
-    }
-
-    fun maximumPoolSize(maximumPoolSize: Int) = apply {
-        this.maximumPoolSize = maximumPoolSize
-        return this
-    }
-
-    fun workQueueCapacity(workQueueCapacity: Int) = apply {
-        this.workQueueCapacity = workQueueCapacity
-        return this
-    }
-
-    fun keepAliveTime(keepAliveTime: Duration) = apply {
-        this.keepAliveTime = keepAliveTime
-        return this
-    }
-
-    fun workQueue(workQueue: BlockingQueue<Runnable>) = apply {
-        this.workQueue = workQueue
-        return this
-    }
-
-    fun threadFactory(threadFactory: ThreadFactory) = apply {
-        this.threadFactory = threadFactory
-        return this
-    }
-
-    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler) = apply {
-        this.rejectedExecutionHandler = rejectedExecutionHandler
-        return this
-    }
-
-    fun build(): ExecutorServiceRunner {
-        return ExecutorServiceRunner(createExecutorService())
-    }
-
-    private fun createExecutorService(): ExecutorService {
-        val keepTime: Long
-        val keepUnit: TimeUnit
-        if (keepAliveTime == null) {
-            keepTime = 0
-            keepUnit = TimeUnit.MILLISECONDS
-        } else {
-            keepTime = keepAliveTime!!.toNanos()
-            keepUnit = TimeUnit.NANOSECONDS
-        }
-        if (workQueue == null) {
-            workQueue = LinkedBlockingQueue(workQueueCapacity)
-        }
-        if (threadFactory == null) {
-            threadFactory = Executors.defaultThreadFactory()
-        }
-        return if (rejectedExecutionHandler == null) ThreadPoolExecutor(
-            corePoolSize, maximumPoolSize, keepTime, keepUnit, workQueue, threadFactory
-        ) else ThreadPoolExecutor(
-            corePoolSize,
-            maximumPoolSize,
-            keepTime,
-            keepUnit,
-            workQueue,
-            threadFactory,
-            rejectedExecutionHandler
-        )
     }
 }
