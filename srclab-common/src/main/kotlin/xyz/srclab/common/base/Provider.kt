@@ -1,21 +1,26 @@
 package xyz.srclab.common.base
 
-/**
- * Specification for provider: className1&#91, className2]...
- *
- * @author sunqian
- */
 interface Provider<T : Any> {
 
     fun provide(): T
 
     companion object {
 
+        /**
+         * Specification for provider: className1&#91, className2]...
+         *
+         * This method will ignore wrong provider specification.
+         */
         @JvmStatic
         fun <T, P : Provider<T>> fromSpec(spec: String): List<P> {
             return parseSpec(spec)
         }
 
+        /**
+         * Specification for provider: className1&#91, className2]...
+         *
+         * This method will throw [IllegalArgumentException] when instantiate provider failed.
+         */
         @JvmStatic
         fun <T, P : Provider<T>> fromSpecStrictly(spec: String): List<P> {
             return parseSpecStrictly(spec)
@@ -26,19 +31,16 @@ interface Provider<T : Any> {
             val result = ArrayList<P>(classNames.size)
             for (className in classNames) {
                 val trimmedClassName = className.trim()
-                val `class` = Loader.findClass<Class<P>>(trimmedClassName) ?: continue
-                if (!Provider::class.java.isAssignableFrom(`class`)) {
+                val providerClass = Loader.findClass<Class<P>>(trimmedClassName) ?: continue
+                if (!Provider::class.java.isAssignableFrom(providerClass)) {
                     continue
                 }
                 val instance = try {
-                    `class`.newInstance()
+                    providerClass.newInstance()
                 } catch (e: Exception) {
                     continue
                 }
-                if (instance !is Provider<*>) {
-                    continue
-                }
-                result.add(As.notNull(instance))
+                result.add(instance.asAny())
             }
             return result
         }
@@ -48,20 +50,17 @@ interface Provider<T : Any> {
             val result = ArrayList<P>(classNames.size)
             for (className in classNames) {
                 val trimmedClassName = className.trim()
-                val `class` = Loader.findClass<Class<P>>(trimmedClassName)
+                val providerClass = Loader.findClass<Class<P>>(trimmedClassName)
                     ?: throw IllegalArgumentException("Class $trimmedClassName was not found.")
-                if (!Provider::class.java.isAssignableFrom(`class`)) {
+                if (!Provider::class.java.isAssignableFrom(providerClass)) {
                     throw IllegalArgumentException("Class $trimmedClassName is not type of ${Provider::class.java}.")
                 }
                 val instance = try {
-                    `class`.newInstance()
+                    providerClass.newInstance()
                 } catch (e: Exception) {
                     throw IllegalArgumentException(e)
                 }
-                if (instance !is Provider<*>) {
-                    throw IllegalArgumentException("Class $trimmedClassName is not type of ${Provider::class.java}.")
-                }
-                result.add(As.notNull(instance))
+                result.add(instance.asAny())
             }
             return result
         }

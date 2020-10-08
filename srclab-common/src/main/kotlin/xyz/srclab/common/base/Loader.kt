@@ -15,7 +15,7 @@ object Loader {
     @JvmStatic
     fun <T> findClass(className: String): Class<T>? {
         return try {
-            As.notNull(Class.forName(className))
+            Class.forName(className).asAny()
         } catch (e: ClassNotFoundException) {
             null
         }
@@ -24,7 +24,7 @@ object Loader {
     @JvmStatic
     fun <T> findClass(className: String, classLoader: ClassLoader): Class<T>? {
         return try {
-            As.notNull(Class.forName(className, true, classLoader))
+            Class.forName(className, true, classLoader).asAny()
         } catch (e: ClassNotFoundException) {
             null
         }
@@ -33,17 +33,17 @@ object Loader {
     @JvmStatic
     @JvmOverloads
     fun <T> loadClass(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size - offset): Class<T> {
-        return As.notNull(BytesClassLoader.loadClass(bytes, offset, length))
+        return BytesClassLoader.loadClass(bytes, offset, length).asAny()
     }
 
     @JvmStatic
     fun <T> loadClass(inputStream: InputStream): Class<T> {
-        return As.notNull(BytesClassLoader.loadClass(inputStream))
+        return BytesClassLoader.loadClass(inputStream).asAny()
     }
 
     @JvmStatic
     fun <T> loadClass(byteBuffer: ByteBuffer): Class<T> {
-        return As.notNull(BytesClassLoader.loadClass(byteBuffer))
+        return BytesClassLoader.loadClass(byteBuffer).asAny()
     }
 
     @JvmStatic

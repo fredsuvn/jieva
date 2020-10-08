@@ -200,17 +200,17 @@ class ScheduledExecutorServiceRunnerBuilder {
     private var threadFactory: ThreadFactory? = null
     private var rejectedExecutionHandler: RejectedExecutionHandler? = null
 
-    fun corePoolSize(corePoolSize: Int): ScheduledExecutorServiceRunnerBuilder {
+    fun corePoolSize(corePoolSize: Int) = apply {
         this.corePoolSize = corePoolSize
         return this
     }
 
-    fun threadFactory(threadFactory: ThreadFactory): ScheduledExecutorServiceRunnerBuilder {
+    fun threadFactory(threadFactory: ThreadFactory) = apply {
         this.threadFactory = threadFactory
         return this
     }
 
-    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler): ScheduledExecutorServiceRunnerBuilder {
+    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler) = apply {
         this.rejectedExecutionHandler = rejectedExecutionHandler
         return this
     }

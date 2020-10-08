@@ -28,7 +28,7 @@ interface Format {
         private object FastFormat : Format {
 
             override fun format(pattern: String, vararg args: Any?): String {
-                processArguments(As.notNull(args))
+                processArguments(args.asAny())
                 return MessageFormatter.arrayFormat(pattern, args, null).message
             }
 

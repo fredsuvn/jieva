@@ -61,7 +61,6 @@ object Equal {
         } else mapDeepEquals(a, b)
     }
 
-    @JvmStatic
     private fun deepEquals0(a: Any, b: Any): Boolean {
         if (a is Array<*> && b is Array<*>) {
             return deepEquals(a, b)
@@ -108,27 +107,22 @@ object Equal {
         return a == b
     }
 
-    @JvmStatic
     private fun listDeepEquals(a: List<*>, b: List<*>): Boolean {
         return collectionDeepEquals0(a, b)
     }
 
-    @JvmStatic
     private fun setDeepEquals(a: Set<*>, b: Set<*>): Boolean {
         return collectionDeepEquals0(a, b)
     }
 
-    @JvmStatic
     private fun collectionDeepEquals(a: Collection<*>, b: Collection<*>): Boolean {
         return collectionDeepEquals0(a, b)
     }
 
-    @JvmStatic
     private fun iterableDeepEquals(a: Iterable<*>, b: Iterable<*>): Boolean {
         return iterableDeepEquals0(a, b)
     }
 
-    @JvmStatic
     private fun collectionDeepEquals0(a: Collection<*>, b: Collection<*>): Boolean {
         if (a.size != b.size) {
             return false
@@ -138,7 +132,6 @@ object Equal {
         } else iterableDeepEquals0(a, b)
     }
 
-    @JvmStatic
     private fun iterableDeepEquals0(a: Iterable<*>, b: Iterable<*>): Boolean {
         val iteratorA = a.iterator()
         val iteratorB = b.iterator()
@@ -150,7 +143,6 @@ object Equal {
         return true
     }
 
-    @JvmStatic
     private fun mapDeepEquals(a: Map<*, *>, b: Map<*, *>): Boolean {
         if (a.size != b.size) {
             return false

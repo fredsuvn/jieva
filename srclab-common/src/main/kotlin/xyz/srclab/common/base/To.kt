@@ -12,6 +12,7 @@ import kotlin.text.toFloat as stringToFloat
 import kotlin.text.toInt as stringToInt
 import kotlin.text.toLong as stringToLong
 import kotlin.text.toShort as stringToShort
+import kotlin.toString as defaultToString
 
 fun Any?.toBoolean(): Boolean {
     return when (this) {
@@ -205,6 +206,10 @@ fun CharArray.toBytes(): ByteArray {
 
 fun CharSequence.toBytes(): ByteArray {
     return toString().toByteArray(Defaults.charset())
+}
+
+fun Any?.toString(): String {
+    return defaultToString()
 }
 
 fun Any?.deepToString(): String {

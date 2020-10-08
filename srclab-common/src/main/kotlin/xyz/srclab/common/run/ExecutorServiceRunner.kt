@@ -91,37 +91,36 @@ class ExecutorServiceRunnerBuilder {
     private var threadFactory: ThreadFactory? = null
     private var rejectedExecutionHandler: RejectedExecutionHandler? = null
 
-    fun corePoolSize(corePoolSize: Int): ExecutorServiceRunnerBuilder {
+    fun corePoolSize(corePoolSize: Int) = apply {
         this.corePoolSize = corePoolSize
-        return this
     }
 
-    fun maximumPoolSize(maximumPoolSize: Int): ExecutorServiceRunnerBuilder {
+    fun maximumPoolSize(maximumPoolSize: Int) = apply {
         this.maximumPoolSize = maximumPoolSize
         return this
     }
 
-    fun workQueueCapacity(workQueueCapacity: Int): ExecutorServiceRunnerBuilder {
+    fun workQueueCapacity(workQueueCapacity: Int) = apply {
         this.workQueueCapacity = workQueueCapacity
         return this
     }
 
-    fun keepAliveTime(keepAliveTime: Duration): ExecutorServiceRunnerBuilder {
+    fun keepAliveTime(keepAliveTime: Duration) = apply {
         this.keepAliveTime = keepAliveTime
         return this
     }
 
-    fun workQueue(workQueue: BlockingQueue<Runnable>): ExecutorServiceRunnerBuilder {
+    fun workQueue(workQueue: BlockingQueue<Runnable>) = apply {
         this.workQueue = workQueue
         return this
     }
 
-    fun threadFactory(threadFactory: ThreadFactory): ExecutorServiceRunnerBuilder {
+    fun threadFactory(threadFactory: ThreadFactory) = apply {
         this.threadFactory = threadFactory
         return this
     }
 
-    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler): ExecutorServiceRunnerBuilder {
+    fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler) = apply {
         this.rejectedExecutionHandler = rejectedExecutionHandler
         return this
     }
