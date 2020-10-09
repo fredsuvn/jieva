@@ -3,6 +3,7 @@ package xyz.srclab.common;
 import xyz.srclab.common.base.As;
 import xyz.srclab.common.base.Format;
 import xyz.srclab.common.collection.ListOps;
+import xyz.srclab.common.exception.CommonException;
 import xyz.srclab.common.run.Running;
 import xyz.srclab.common.run.ScheduledRunner;
 import xyz.srclab.common.run.ScheduledRunning;
@@ -48,5 +49,7 @@ public class Tt {
         ScheduledRunning<?> scheduledRunning = scheduledRunner.scheduleAtFixedRate(null, null, null);
 
         new ThreadPoolRunner.Builder().corePoolSize(1).build();
+
+        new CommonException((Throwable) null);
     }
 }

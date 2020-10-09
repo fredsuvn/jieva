@@ -1,7 +1,7 @@
 package xyz.srclab.common.invoke.provider.reflected;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.exception.ExceptionWrapper;
+import xyz.srclab.common.exception.RuntimeExceptionWrapper;
 import xyz.srclab.common.invoke.MethodInvoker;
 
 import java.lang.reflect.InvocationTargetException;
@@ -27,7 +27,7 @@ final class ReflectedMethodInvoker implements MethodInvoker {
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         } catch (InvocationTargetException e) {
-            throw new ExceptionWrapper(e);
+            throw new RuntimeExceptionWrapper(e);
         }
     }
 }

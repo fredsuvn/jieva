@@ -1,7 +1,7 @@
 package xyz.srclab.common.bytecode.provider.util.proxy.cglib.spring;
 
 import org.springframework.cglib.proxy.*;
-import xyz.srclab.common.exception.ExceptionWrapper;
+import xyz.srclab.common.exception.RuntimeExceptionWrapper;
 import xyz.srclab.common.lang.count.Counter;
 import xyz.srclab.common.util.proxy.*;
 
@@ -65,7 +65,7 @@ public class CglibProxyClassProvider implements ProxyClassProvider {
                         try {
                             return proxy.invokeSuper(o, as);
                         } catch (Throwable throwable) {
-                            throw new ExceptionWrapper(throwable);
+                            throw new RuntimeExceptionWrapper(throwable);
                         }
                     });
         }

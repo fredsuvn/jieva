@@ -1,7 +1,7 @@
 package xyz.srclab.common.invoke.provider.methodhandle;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.exception.ExceptionWrapper;
+import xyz.srclab.common.exception.RuntimeExceptionWrapper;
 import xyz.srclab.common.invoke.MethodInvoker;
 
 import java.lang.invoke.MethodHandle;
@@ -27,7 +27,7 @@ final class VirtualMethodHandle implements MethodInvoker {
         try {
             return invoke0(object, args);
         } catch (Throwable throwable) {
-            throw new ExceptionWrapper(throwable);
+            throw new RuntimeExceptionWrapper(throwable);
         }
     }
 

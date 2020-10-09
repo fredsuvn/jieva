@@ -1,6 +1,6 @@
 package xyz.srclab.common.invoke.provider.reflected;
 
-import xyz.srclab.common.exception.ExceptionWrapper;
+import xyz.srclab.common.exception.RuntimeExceptionWrapper;
 import xyz.srclab.common.invoke.ConstructorInvoker;
 
 import java.lang.reflect.Constructor;
@@ -26,7 +26,7 @@ final class ReflectedConstructorInvoker<T> implements ConstructorInvoker<T> {
         } catch (IllegalAccessException | InstantiationException e) {
             throw new IllegalStateException(e);
         } catch (InvocationTargetException e) {
-            throw new ExceptionWrapper(e);
+            throw new RuntimeExceptionWrapper(e);
         }
     }
 }

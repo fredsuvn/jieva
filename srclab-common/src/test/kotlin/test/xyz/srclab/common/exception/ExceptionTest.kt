@@ -1,11 +1,11 @@
 package test.xyz.srclab.common.exception
 
 import org.testng.annotations.Test
-import xyz.srclab.common.exception.BusinessException
+import xyz.srclab.common.exception.CommonException
 import xyz.srclab.common.exception.DefaultExceptionStatus
 import xyz.srclab.common.exception.ExceptionStatus
-import xyz.srclab.common.exception.ExceptionWrapper
-import xyz.srclab.common.state.StateHelper
+import xyz.srclab.common.exception.RuntimeExceptionWrapper
+import xyz.srclab.common.state.StateKit
 import xyz.srclab.test.doAssertEquals
 
 /**
@@ -16,10 +16,10 @@ object ExceptionTest {
     @Test
     fun testBusinessException() {
         val cause = IllegalStateException()
-        val b1 = BusinessException(DefaultExceptionStatus.INTERNAL)
+        val b1 = CommonException(DefaultExceptionStatus.INTERNAL)
         doAssertEquals(b1.code, DefaultExceptionStatus.INTERNAL.code)
         doAssertEquals(b1.description, DefaultExceptionStatus.INTERNAL.description)
-        doAssertEquals(StateHelper.equals(b1, DefaultExceptionStatus.INTERNAL), true)
+        doAssertEquals(StateKit.equals(b1, DefaultExceptionStatus.INTERNAL), true)
         doAssertEquals(b1 == b1, true)
         doAssertEquals(
             b1.withMoreDescription("sss"),
@@ -42,7 +42,7 @@ object ExceptionTest {
     @Test
     fun testExceptionWrapper() {
         val cause = IllegalStateException()
-        val wrapper = ExceptionWrapper(cause)
+        val wrapper = RuntimeExceptionWrapper(cause)
         doAssertEquals(wrapper.wrapped, cause)
     }
 }
