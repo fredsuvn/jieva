@@ -8,9 +8,55 @@ open class ThreadPoolRunner(
     private val threadPoolExecutor: ThreadPoolExecutor
 ) : ExecutorServiceRunner(threadPoolExecutor) {
 
-    fun corePoolSize(): Int {
-        return threadPoolExecutor.corePoolSize
-    }
+    val corePoolSize: Int
+        @JvmName("corePoolSize") get() {
+            return threadPoolExecutor.corePoolSize
+        }
+
+    val allowCoreThreadTimeOut: Boolean
+        @JvmName("allowCoreThreadTimeOut") get() {
+            return threadPoolExecutor.allowsCoreThreadTimeOut()
+        }
+
+    val maximumPoolSize: Int
+        @JvmName("maximumPoolSize") get() {
+            return threadPoolExecutor.maximumPoolSize
+        }
+
+    val keepAliveTime: Duration
+        @JvmName("keepAliveTime") get() {
+            return Duration.ofNanos(threadPoolExecutor.getKeepAliveTime(TimeUnit.NANOSECONDS))
+        }
+
+    val queue: BlockingQueue<Runnable>
+        @JvmName("queue") get() {
+            return threadPoolExecutor.queue
+        }
+
+    val poolSize: Int
+        @JvmName("poolSize") get() {
+            return threadPoolExecutor.poolSize
+        }
+
+    val activeCount: Int
+        @JvmName("activeCount") get() {
+            return threadPoolExecutor.activeCount
+        }
+
+    val largestPoolSize: Int
+        @JvmName("largestPoolSize") get() {
+            return threadPoolExecutor.largestPoolSize
+        }
+
+    val taskCount: Long
+        @JvmName("taskCount") get() {
+            return threadPoolExecutor.taskCount
+        }
+
+    val completedTaskCount: Long
+        @JvmName("completedTaskCount") get() {
+            return threadPoolExecutor.completedTaskCount
+        }
 
     fun prestartCoreThread(): Boolean {
         return threadPoolExecutor.prestartCoreThread()
@@ -20,48 +66,12 @@ open class ThreadPoolRunner(
         return threadPoolExecutor.prestartAllCoreThreads()
     }
 
-    fun allowCoreThreadTimeOut(): Boolean {
-        return threadPoolExecutor.allowsCoreThreadTimeOut()
-    }
-
-    fun maximumPoolSize(): Int {
-        return threadPoolExecutor.maximumPoolSize
-    }
-
-    fun keepAliveTime(): Duration {
-        return Duration.ofNanos(threadPoolExecutor.getKeepAliveTime(TimeUnit.NANOSECONDS))
-    }
-
-    fun queue(): BlockingQueue<Runnable?>? {
-        return threadPoolExecutor.queue
-    }
-
     fun remove(task: Runnable?): Boolean {
         return threadPoolExecutor.remove(task)
     }
 
     fun purge() {
         threadPoolExecutor.purge()
-    }
-
-    fun poolSize(): Int {
-        return threadPoolExecutor.poolSize
-    }
-
-    fun activeCount(): Int {
-        return threadPoolExecutor.activeCount
-    }
-
-    fun largestPoolSize(): Int {
-        return threadPoolExecutor.largestPoolSize
-    }
-
-    fun taskCount(): Long {
-        return threadPoolExecutor.taskCount
-    }
-
-    fun completedTaskCount(): Long {
-        return threadPoolExecutor.completedTaskCount
     }
 
     override fun toString(): String {

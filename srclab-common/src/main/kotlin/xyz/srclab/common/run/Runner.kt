@@ -48,7 +48,7 @@ interface Runner {
 
         @JvmOverloads
         @JvmStatic
-        fun workStealingPool(parallelism: Int = Environment.availableProcessors()): ExecutorServiceRunner {
+        fun workStealingPool(parallelism: Int = Environment.availableProcessors): ExecutorServiceRunner {
             return executorServiceRunner(Executors.newWorkStealingPool(parallelism))
         }
 

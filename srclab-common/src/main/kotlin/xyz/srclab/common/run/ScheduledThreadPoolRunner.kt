@@ -8,9 +8,70 @@ class ScheduledThreadPoolRunner(
     private val scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor
 ) : ScheduledExecutorServiceRunner(scheduledThreadPoolExecutor) {
 
-    fun corePoolSize(): Int {
-        return scheduledThreadPoolExecutor.corePoolSize
-    }
+    val corePoolSize: Int
+        @JvmName("corePoolSize") get() {
+            return scheduledThreadPoolExecutor.corePoolSize
+        }
+
+    val allowCoreThreadTimeOut: Boolean
+        @JvmName("allowCoreThreadTimeOut") get() {
+            return scheduledThreadPoolExecutor.allowsCoreThreadTimeOut()
+        }
+
+    val maximumPoolSize: Int
+        @JvmName("maximumPoolSize") get() {
+            return scheduledThreadPoolExecutor.maximumPoolSize
+        }
+
+    val keepAliveTime: Duration
+        @JvmName("keepAliveTime") get() {
+            return Duration.ofNanos(scheduledThreadPoolExecutor.getKeepAliveTime(TimeUnit.NANOSECONDS))
+        }
+
+    val queue: BlockingQueue<Runnable>
+        @JvmName("queue") get() {
+            return scheduledThreadPoolExecutor.queue
+        }
+
+    val poolSize: Int
+        @JvmName("poolSize") get() {
+            return scheduledThreadPoolExecutor.poolSize
+        }
+
+    val activeCount: Int
+        @JvmName("activeCount") get() {
+            return scheduledThreadPoolExecutor.activeCount
+        }
+
+    val largestPoolSize: Int
+        @JvmName("largestPoolSize") get() {
+            return scheduledThreadPoolExecutor.largestPoolSize
+        }
+
+    val taskCount: Long
+        @JvmName("taskCount") get() {
+            return scheduledThreadPoolExecutor.taskCount
+        }
+
+    val completedTaskCount: Long
+        @JvmName("completedTaskCount") get() {
+            return scheduledThreadPoolExecutor.completedTaskCount
+        }
+
+    val continueExistingPeriodicTasksAfterShutdownPolicy: Boolean
+        @JvmName("continueExistingPeriodicTasksAfterShutdownPolicy") get() {
+            return scheduledThreadPoolExecutor.continueExistingPeriodicTasksAfterShutdownPolicy
+        }
+
+    val executeExistingDelayedTasksAfterShutdownPolicy: Boolean
+        @JvmName("executeExistingDelayedTasksAfterShutdownPolicy") get() {
+            return scheduledThreadPoolExecutor.executeExistingDelayedTasksAfterShutdownPolicy
+        }
+
+    val removeOnCancelPolicy: Boolean
+        @JvmName("removeOnCancelPolicy") get() {
+            return scheduledThreadPoolExecutor.removeOnCancelPolicy
+        }
 
     fun prestartCoreThread(): Boolean {
         return scheduledThreadPoolExecutor.prestartCoreThread()
@@ -20,60 +81,12 @@ class ScheduledThreadPoolRunner(
         return scheduledThreadPoolExecutor.prestartAllCoreThreads()
     }
 
-    fun allowCoreThreadTimeOut(): Boolean {
-        return scheduledThreadPoolExecutor.allowsCoreThreadTimeOut()
-    }
-
-    fun maximumPoolSize(): Int {
-        return scheduledThreadPoolExecutor.maximumPoolSize
-    }
-
-    fun keepAliveTime(): Duration {
-        return Duration.ofNanos(scheduledThreadPoolExecutor.getKeepAliveTime(TimeUnit.NANOSECONDS))
-    }
-
-    fun queue(): BlockingQueue<Runnable?>? {
-        return scheduledThreadPoolExecutor.queue
-    }
-
     fun remove(task: Runnable?): Boolean {
         return scheduledThreadPoolExecutor.remove(task)
     }
 
     fun purge() {
         scheduledThreadPoolExecutor.purge()
-    }
-
-    fun poolSize(): Int {
-        return scheduledThreadPoolExecutor.poolSize
-    }
-
-    fun activeCount(): Int {
-        return scheduledThreadPoolExecutor.activeCount
-    }
-
-    fun largestPoolSize(): Int {
-        return scheduledThreadPoolExecutor.largestPoolSize
-    }
-
-    fun taskCount(): Long {
-        return scheduledThreadPoolExecutor.taskCount
-    }
-
-    fun completedTaskCount(): Long {
-        return scheduledThreadPoolExecutor.completedTaskCount
-    }
-
-    fun continueExistingPeriodicTasksAfterShutdownPolicy(): Boolean {
-        return scheduledThreadPoolExecutor.continueExistingPeriodicTasksAfterShutdownPolicy
-    }
-
-    fun executeExistingDelayedTasksAfterShutdownPolicy(): Boolean {
-        return scheduledThreadPoolExecutor.executeExistingDelayedTasksAfterShutdownPolicy
-    }
-
-    fun removeOnCancelPolicy(): Boolean {
-        return scheduledThreadPoolExecutor.removeOnCancelPolicy
     }
 
     override fun toString(): String {

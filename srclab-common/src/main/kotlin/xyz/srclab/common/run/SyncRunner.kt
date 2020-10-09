@@ -16,22 +16,11 @@ object SyncRunner : Runner {
     }
 
     private abstract class Result<V>(
-        private val startTime: LocalDateTime
+        override val startTime: LocalDateTime
     ) : Running<V> {
 
-        private val endTime: LocalDateTime = LocalDateTime.now()
-
-        override fun isStart(): Boolean {
-            return true
-        }
-
-        override fun startTime(): LocalDateTime {
-            return startTime
-        }
-
-        override fun endTime(): LocalDateTime {
-            return endTime
-        }
+        override val isStart: Boolean = true
+        override val endTime: LocalDateTime = LocalDateTime.now()
 
         override fun get(timeout: Long, unit: TimeUnit): V {
             return get()

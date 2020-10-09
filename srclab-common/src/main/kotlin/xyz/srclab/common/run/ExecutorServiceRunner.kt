@@ -17,20 +17,22 @@ open class ExecutorServiceRunner(
         return ExecutorServiceRunning(executorService, task)
     }
 
+    val isShutdown: Boolean
+        @JvmName("isShutdown") get() {
+            return executorService.isShutdown
+        }
+
+    val isTerminated: Boolean
+        @JvmName("isTerminated") get() {
+            return executorService.isTerminated
+        }
+
     fun shutdown() {
         executorService.shutdown()
     }
 
     fun shutdownNow(): List<Runnable> {
         return executorService.shutdownNow()
-    }
-
-    fun isShutdown(): Boolean {
-        return executorService.isShutdown
-    }
-
-    fun isTerminated(): Boolean {
-        return executorService.isTerminated
     }
 
     /**
@@ -56,19 +58,22 @@ open class ExecutorServiceRunner(
             future = executorService.submit(runningTask)
         }
 
-        override fun isStart(): Boolean {
-            return runningTask.startTime != null
-        }
+        override val isStart: Boolean
+            get() {
+                return runningTask.startTime != null
+            }
 
-        override fun startTime(): LocalDateTime {
-            Check.checkState(runningTask.startTime != null, "Task was not started.")
-            return runningTask.startTime.asNotNull()
-        }
+        override val startTime: LocalDateTime
+            get() {
+                Check.checkState(runningTask.startTime != null, "Task was not started.")
+                return runningTask.startTime.asNotNull()
+            }
 
-        override fun endTime(): LocalDateTime {
-            Check.checkState(runningTask.endTime != null, "Task was not done.")
-            return runningTask.endTime.asNotNull()
-        }
+        override val endTime: LocalDateTime
+            get() {
+                Check.checkState(runningTask.endTime != null, "Task was not done.")
+                return runningTask.endTime.asNotNull()
+            }
 
         override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
             val canceled = future.cancel(mayInterruptIfRunning)

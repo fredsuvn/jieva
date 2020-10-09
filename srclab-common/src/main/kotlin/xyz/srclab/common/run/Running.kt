@@ -7,27 +7,41 @@ import java.util.concurrent.*
 
 interface Running<V> : Future<V> {
 
-    fun isStart(): Boolean
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val isStart: Boolean
+        @JvmName("isStart") get
 
-    fun startTime(): LocalDateTime
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val startTime: LocalDateTime
+        @JvmName("startTime") get
 
-    fun endTime(): LocalDateTime
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val endTime: LocalDateTime
+        @JvmName("endTime") get
 
-    fun startMilliseconds(): Long {
-        return startTime().toInstant(ZoneOffset.UTC).toEpochMilli()
-    }
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val startMilliseconds: Long
+        @JvmName("startMilliseconds") get() {
+            return startTime.toInstant(ZoneOffset.UTC).toEpochMilli()
+        }
 
-    fun endMilliseconds(): Long {
-        return endTime().toInstant(ZoneOffset.UTC).toEpochMilli()
-    }
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val endMilliseconds: Long
+        @JvmName("endMilliseconds") get() {
+            return endTime.toInstant(ZoneOffset.UTC).toEpochMilli()
+        }
 
-    fun cost(): Duration {
-        return Duration.between(startTime(), endTime())
-    }
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val cost: Duration
+        @JvmName("cost") get() {
+            return Duration.between(startTime, endTime)
+        }
 
-    fun costMillis(): Long {
-        return cost().toMillis()
-    }
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val costMillis: Long
+        @JvmName("costMillis") get() {
+            return cost.toMillis()
+        }
 
     /**
      * @throws CancellationException if the computation was cancelled
