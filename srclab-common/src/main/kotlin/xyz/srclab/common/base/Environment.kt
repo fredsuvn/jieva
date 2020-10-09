@@ -151,4 +151,7 @@ object Environment {
         properties.forEach { k: Any?, v: Any? -> map[k.toString()] = v.toString() }
         return map
     }
+
+    @JvmStatic
+    fun availableProcessors(): Int = Runtime.getRuntime().availableProcessors()
 }

@@ -1,6 +1,7 @@
 package xyz.srclab.common.run
 
 import java.time.Duration
+import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
@@ -27,8 +28,18 @@ interface ScheduledRunner : Runner {
         }
 
         @JvmStatic
-        fun scheduledAsyncRunner(): ScheduledRunner {
+        fun asyncRunner(): ScheduledRunner {
             return scheduledAsyncRunner
+        }
+
+        @JvmStatic
+        fun singleThreadRunner(): ScheduledExecutorServiceRunner {
+            return scheduledExecutorServiceRunner(Executors.newSingleThreadScheduledExecutor())
+        }
+
+        @JvmStatic
+        fun threadPoolRunner(corePoolSize: Int): ScheduledExecutorServiceRunner {
+            return scheduledExecutorServiceRunner(Executors.newScheduledThreadPool(corePoolSize))
         }
 
         @JvmStatic
@@ -52,7 +63,7 @@ interface ScheduledRunner : Runner {
 
         @JvmStatic
         fun <V> scheduleAsync(task: () -> V, delay: Duration): ScheduledRunning<V> {
-            return scheduledAsyncRunner().schedule(task, delay)
+            return asyncRunner().schedule(task, delay)
         }
 
         @JvmStatic
@@ -61,7 +72,7 @@ interface ScheduledRunner : Runner {
             initialDelay: Duration,
             period: Duration
         ): ScheduledRunning<V> {
-            return scheduledAsyncRunner().scheduleAtFixedRate(task, initialDelay, period)
+            return asyncRunner().scheduleAtFixedRate(task, initialDelay, period)
         }
 
         @JvmStatic
@@ -70,7 +81,7 @@ interface ScheduledRunner : Runner {
             initialDelay: Duration,
             period: Duration
         ): ScheduledRunning<V> {
-            return scheduledAsyncRunner().scheduleWithFixedDelay(task, initialDelay, period)
+            return asyncRunner().scheduleWithFixedDelay(task, initialDelay, period)
         }
     }
 }

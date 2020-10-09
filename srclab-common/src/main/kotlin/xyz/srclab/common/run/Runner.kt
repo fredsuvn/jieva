@@ -1,10 +1,8 @@
 package xyz.srclab.common.run
 
+import xyz.srclab.common.base.Environment
 import java.time.Duration
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.RejectedExecutionException
-import java.util.concurrent.SynchronousQueue
-import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.*
 
 interface Runner {
 
@@ -31,6 +29,27 @@ interface Runner {
         @JvmStatic
         fun asyncRunner(): Runner {
             return AsyncRunner
+        }
+
+        @JvmStatic
+        fun singleThreadRunner(): ExecutorServiceRunner {
+            return executorServiceRunner(Executors.newSingleThreadExecutor())
+        }
+
+        @JvmStatic
+        fun cachedThreadPoolRunner(): ExecutorServiceRunner {
+            return executorServiceRunner(Executors.newCachedThreadPool())
+        }
+
+        @JvmStatic
+        fun fixedThreadPoolRunner(threadNumber: Int): ExecutorServiceRunner {
+            return executorServiceRunner(Executors.newFixedThreadPool(threadNumber))
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun workStealingPool(parallelism: Int = Environment.availableProcessors()): ExecutorServiceRunner {
+            return executorServiceRunner(Executors.newWorkStealingPool(parallelism))
         }
 
         @JvmStatic
