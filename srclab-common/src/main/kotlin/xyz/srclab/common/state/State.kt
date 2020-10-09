@@ -7,9 +7,13 @@ import xyz.srclab.common.base.Hash
  */
 interface State<C, DESC, T : State<C, DESC, T>> {
 
-    fun code(): C
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val code: C
+        @JvmName("code") get
 
-    fun description(): DESC?
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val description: DESC?
+        @JvmName("description") get
 
     fun withMoreDescription(moreDescription: DESC?): T
 
@@ -17,8 +21,8 @@ interface State<C, DESC, T : State<C, DESC, T>> {
 
         @JvmStatic
         fun toString(state: State<*, *, *>): String {
-            val code = state.code()
-            val description = state.description()
+            val code = state.code
+            val description = state.description
             return if (description == null) code.toString() else "$code-$description"
         }
 
@@ -30,12 +34,12 @@ interface State<C, DESC, T : State<C, DESC, T>> {
             if (other !is State<*, *, *>) {
                 return false
             }
-            return (state.code() == other.code() && state.description() == other.description())
+            return (state.code == other.code && state.description == other.description)
         }
 
         @JvmStatic
         fun hashCode(state: State<*, *, *>): Int {
-            return Hash.hash(state.code(), state.description())
+            return Hash.hash(state.code, state.description)
         }
     }
 }
