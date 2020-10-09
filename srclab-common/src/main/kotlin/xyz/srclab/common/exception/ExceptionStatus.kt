@@ -9,7 +9,7 @@ interface ExceptionStatus : StringState<ExceptionStatus> {
         return if (moreDescription == null)
             this
         else
-            newInstance(code(), StringState.buildDescription(description(), moreDescription))
+            newInstance(code, StringState.buildDescription(description, moreDescription))
     }
 
     companion object {
@@ -22,21 +22,13 @@ interface ExceptionStatus : StringState<ExceptionStatus> {
 
         @JvmStatic
         fun from(state: StringState<*>): ExceptionStatus {
-            return newInstance(state.code(), state.description())
+            return newInstance(state.code, state.description)
         }
 
         private class ExceptionStatusImpl(
-            private val code: String,
-            private val descriptor: String?
+            override val code: String,
+            override val description: String?
         ) : ExceptionStatus {
-
-            override fun code(): String {
-                return code
-            }
-
-            override fun description(): String? {
-                return descriptor
-            }
 
             override fun toString(): String {
                 return State.toString(this)

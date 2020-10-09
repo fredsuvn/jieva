@@ -3,6 +3,7 @@ package xyz.srclab.common;
 import xyz.srclab.common.base.*;
 import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.exception.CommonException;
+import xyz.srclab.common.exception.ExceptionStatus;
 import xyz.srclab.common.run.Running;
 import xyz.srclab.common.run.ScheduledRunner;
 import xyz.srclab.common.run.ScheduledRunning;
@@ -49,7 +50,10 @@ public class Tt {
 
         new ThreadPoolRunner.Builder().corePoolSize(1).build();
 
-        new CommonException((Throwable) null);
+        new CommonException((Throwable) null).code();
+
+        ExceptionStatus exceptionStatus = null;
+        exceptionStatus.code();
 
         System.out.println(Defaults.charset());
 

@@ -19,7 +19,7 @@ open class CommonException @JvmOverloads constructor(
     constructor(message: String?) : this(DefaultExceptionStatus.INTERNAL.withMoreDescription(message))
 
     constructor(message: String?, cause: Throwable?) : this(
-        buildExceptionStatus(DefaultExceptionStatus.INTERNAL.code(), message, cause),
+        buildExceptionStatus(DefaultExceptionStatus.INTERNAL.code, message, cause),
         cause
     )
 
@@ -28,13 +28,13 @@ open class CommonException @JvmOverloads constructor(
         cause
     )
 
-    override fun code(): String {
-        return status.code()
-    }
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    override val code: String
+        @JvmName("code") get() = status.code
 
-    override fun description(): String? {
-        return status.description()
-    }
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    override val description: String?
+        @JvmName("description") get() = status.description
 
     override fun equals(other: Any?): Boolean {
         return State.equals(this, other)
