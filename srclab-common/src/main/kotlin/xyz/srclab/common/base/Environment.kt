@@ -37,6 +37,19 @@ object Environment {
     const val KEY_OF_USER_DIR = "user.dir"
 
     @JvmStatic
+    val properties: Map<String, String>
+        @JvmName("properties") get() {
+            val properties = System.getProperties() ?: return mapOf()
+            return propertiesToMap(properties)
+        }
+
+    @JvmStatic
+    val variables: Map<String, String>
+        @JvmName("variables") get() {
+            return System.getenv()
+        }
+
+    @JvmStatic
     val javaVersion: String
         @JvmName("javaVersion") get() = getPropertyNotNull(KEY_OF_JAVA_VERSION)
 
@@ -152,10 +165,6 @@ object Environment {
     val availableProcessors: Int
         @JvmName("availableProcessors") get() = Runtime.getRuntime().availableProcessors()
 
-    private fun getPropertyNotNull(key: String): String {
-        return getProperty(key).asNotNull()
-    }
-
     @JvmStatic
     fun getProperty(key: String): String? {
         return System.getProperty(key)
@@ -167,24 +176,17 @@ object Environment {
     }
 
     @JvmStatic
-    fun allProperties(): Map<String, String> {
-        val properties = System.getProperties() ?: return mapOf()
-        return propertiesToMap(properties)
-    }
-
-    @JvmStatic
     fun getVariable(key: String): String? {
         return System.getenv(key)
-    }
-
-    @JvmStatic
-    fun allVariables(): Map<String, String> {
-        return System.getenv()
     }
 
     private fun propertiesToMap(properties: Properties): Map<String, String> {
         val map = mutableMapOf<String, String>()
         properties.forEach { k: Any?, v: Any? -> map[k.toString()] = v.toString() }
         return map
+    }
+
+    private fun getPropertyNotNull(key: String): String {
+        return getProperty(key).asNotNull()
     }
 }

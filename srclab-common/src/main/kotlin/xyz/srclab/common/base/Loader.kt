@@ -8,9 +8,10 @@ import java.nio.ByteBuffer
 object Loader {
 
     @JvmStatic
-    fun currentClassLoader(): ClassLoader {
-        return Current.classLoader()
-    }
+    val currentClassLoader: ClassLoader
+        @JvmName("currentClassLoader") get() {
+            return Current.classLoader
+        }
 
     @JvmStatic
     fun <T> findClass(className: String): Class<T>? {
@@ -48,7 +49,7 @@ object Loader {
 
     @JvmStatic
     fun findResource(resourceName: String): URL? {
-        return findResource(resourceName, currentClassLoader())
+        return findResource(resourceName, currentClassLoader)
     }
 
     @JvmStatic
@@ -58,7 +59,7 @@ object Loader {
 
     @JvmStatic
     fun findResources(resourceName: String): List<URL> {
-        return findResources(resourceName, currentClassLoader())
+        return findResources(resourceName, currentClassLoader)
     }
 
     @JvmStatic

@@ -10,29 +10,34 @@ object Current {
     }
 
     @JvmStatic
-    fun milliseconds(): Long {
-        return System.currentTimeMillis()
-    }
+    val milliseconds: Long
+        @JvmName("milliseconds") get() {
+            return System.currentTimeMillis()
+        }
 
     @JvmStatic
-    fun nanoseconds(): Long {
-        return System.nanoTime()
-    }
+    val nanoseconds: Long
+        @JvmName("nanoseconds") get() {
+            return System.nanoTime()
+        }
 
     @JvmStatic
-    fun thread(): Thread {
-        return Thread.currentThread()
-    }
+    val thread: Thread
+        @JvmName("thread") get() {
+            return Thread.currentThread()
+        }
 
     @JvmStatic
-    fun classLoader(): ClassLoader {
-        return thread().contextClassLoader
-    }
+    val classLoader: ClassLoader
+        @JvmName("classLoader") get() {
+            return thread.contextClassLoader
+        }
 
     @JvmStatic
-    fun context(): MutableMap<Any, Any?> {
-        return localContext.get()
-    }
+    val context: MutableMap<Any, Any?>
+        @JvmName("context") get() {
+            return localContext.get()
+        }
 
     @JvmStatic
     fun <T : Any> get(key: Any): T {
@@ -50,7 +55,7 @@ object Current {
     }
 
     @JvmStatic
-    fun clear() {
+    fun clearContext() {
         localContext.get().clear()
     }
 }
