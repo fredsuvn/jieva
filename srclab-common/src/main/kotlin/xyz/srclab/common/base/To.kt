@@ -197,15 +197,15 @@ fun CharArray.toChars(): String {
 }
 
 fun ByteArray.toChars(): String {
-    return String(this, Defaults.charset())
+    return String(this, Defaults.charset)
 }
 
 fun CharArray.toBytes(): ByteArray {
-    return toChars().toByteArray(Defaults.charset())
+    return toChars().toByteArray(Defaults.charset)
 }
 
 fun CharSequence.toBytes(): ByteArray {
-    return toString().toByteArray(Defaults.charset())
+    return toString().toByteArray(Defaults.charset)
 }
 
 fun Any?.toString(): String {

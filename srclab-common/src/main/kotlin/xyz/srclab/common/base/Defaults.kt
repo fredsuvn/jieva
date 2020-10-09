@@ -1,5 +1,6 @@
 package xyz.srclab.common.base
 
+import java.io.File
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -8,14 +9,30 @@ import java.util.concurrent.TimeUnit
 object Defaults {
 
     @JvmStatic
-    fun charset(): Charset = StandardCharsets.UTF_8
+    val charset: Charset
+        @JvmName("charset") get() = StandardCharsets.UTF_8
 
     @JvmStatic
-    fun locale(): Locale = Locale.getDefault()
+    val locale: Locale
+        @JvmName("locale") get() = Locale.getDefault()
 
     @JvmStatic
-    fun timeUnit(): TimeUnit = TimeUnit.SECONDS
+    val timeUnit: TimeUnit
+        @JvmName("timeUnit") get() = TimeUnit.SECONDS
 
     @JvmStatic
-    fun concurrencyLevel(): Int = 16
+    val concurrencyLevel: Int
+        @JvmName("concurrencyLevel") get() = 16
+
+    @JvmStatic
+    val fileSeparator: String
+        @JvmName("fileSeparator") get() = File.separator
+
+    @JvmStatic
+    val pathSeparator: String
+        @JvmName("pathSeparator") get() = File.pathSeparator
+
+    @JvmStatic
+    val lineSeparator: String
+        @JvmName("lineSeparator") get() = System.lineSeparator()
 }

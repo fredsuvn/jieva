@@ -1,7 +1,6 @@
 package xyz.srclab.common;
 
-import xyz.srclab.common.base.As;
-import xyz.srclab.common.base.Format;
+import xyz.srclab.common.base.*;
 import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.exception.CommonException;
 import xyz.srclab.common.run.Running;
@@ -51,5 +50,12 @@ public class Tt {
         new ThreadPoolRunner.Builder().corePoolSize(1).build();
 
         new CommonException((Throwable) null);
+
+        System.out.println(Defaults.charset());
+
+        About about = About.current();
+        about.name();
+
+        Environment.fileSeparator();
     }
 }

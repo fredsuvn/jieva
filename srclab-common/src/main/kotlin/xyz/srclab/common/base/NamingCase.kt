@@ -20,90 +20,82 @@ interface NamingCase {
     companion object {
 
         @JvmStatic
-        fun lowerCamel(): NamingCase {
-            return LowerCamel
-        }
+        val lowerCamel: NamingCase
+            @JvmName("lowerCamel") get() = LowerCamel
 
         @JvmStatic
-        fun upperCamel(): NamingCase {
-            return UpperCamel
-        }
+        val upperCamel: NamingCase
+            @JvmName("upperCamel") get() = UpperCamel
 
         @JvmStatic
-        fun lowerUnderscore(): NamingCase {
-            return LowerUnderscore
-        }
+        val lowerUnderscore: NamingCase
+            @JvmName("lowerUnderscore") get() = LowerUnderscore
 
         @JvmStatic
-        fun upperUnderscore(): NamingCase {
-            return UpperUnderscore
-        }
+        val upperUnderscore: NamingCase
+            @JvmName("upperUnderscore") get() = UpperUnderscore
 
         @JvmStatic
-        fun capitalizeUnderscore(): NamingCase {
-            return CapitalizeUnderscore
-        }
+        val capitalizeUnderscore: NamingCase
+            @JvmName("capitalizeUnderscore") get() = CapitalizeUnderscore
 
         @JvmStatic
-        fun lowerHyphen(): NamingCase {
-            return LowerHyphen
-        }
+        val lowerHyphen: NamingCase
+            @JvmName("lowerHyphen") get() = LowerHyphen
 
         @JvmStatic
-        fun upperHyphen(): NamingCase {
-            return UpperHyphen
-        }
+        val upperHyphen: NamingCase
+            @JvmName("upperHyphen") get() = UpperHyphen
 
         @JvmStatic
-        fun capitalizeHyphen(): NamingCase {
-            return CapitalizeHyphen
-        }
+        val capitalizeHyphen: NamingCase
+            @JvmName("capitalizeHyphen") get() = CapitalizeHyphen
 
         private object LowerCamel : CamelCase() {
             override fun doFirst(first: String): String {
-                return first.decapitalize(Defaults.locale())
+                return first.decapitalize(Defaults.locale)
             }
         }
 
         private object UpperCamel : CamelCase() {
             override fun doFirst(first: String): String {
-                return first.capitalize(Defaults.locale())
+                return first.capitalize(Defaults.locale)
             }
         }
 
         private object LowerUnderscore : UnderscoreCase() {
             override fun doWord(word: String): String {
-                return word.toLowerCase(Defaults.locale())
+                return word.toLowerCase(Defaults.locale)
             }
         }
 
         private object UpperUnderscore : UnderscoreCase() {
             override fun doWord(word: String): String {
-                return word.toUpperCase(Defaults.locale())
+                return word.toUpperCase(Defaults.locale)
             }
         }
 
         private object CapitalizeUnderscore : UnderscoreCase() {
             override fun doWord(word: String): String {
-                return word.toLowerCase(Defaults.locale()).capitalize(Defaults.locale())
+                return word.toLowerCase(Defaults.locale).capitalize(Defaults.locale)
             }
         }
 
         private object LowerHyphen : HyphenCase() {
             override fun doWord(word: String): String {
-                return word.toLowerCase(Defaults.locale())
+                return word.toLowerCase(Defaults.locale)
             }
         }
 
         private object UpperHyphen : HyphenCase() {
             override fun doWord(word: String): String {
-                return word.toUpperCase(Defaults.locale())
+                return word.toUpperCase(Defaults.locale)
             }
         }
 
         private object CapitalizeHyphen : HyphenCase() {
             override fun doWord(word: String): String {
-                return word.toLowerCase(Defaults.locale()).capitalize(Defaults.locale())
+                return word.toLowerCase(Defaults.locale).capitalize(Defaults.locale)
             }
         }
 
@@ -166,11 +158,11 @@ interface NamingCase {
                     throw IllegalArgumentException("Word of given first joined word should have at least 1 char.")
                 }
                 if (first.length > 1 && StringUtils.isAllUpperCase(first)) {
-                    return words.joinToString("") { it.toString().capitalize(Defaults.locale()) }
+                    return words.joinToString("") { it.toString().capitalize(Defaults.locale) }
                 }
                 return doFirst(first) +
                         words.subList(1, words.size).joinToString("") {
-                            it.toString().capitalize(Defaults.locale())
+                            it.toString().capitalize(Defaults.locale)
                         }
             }
 
