@@ -5,7 +5,7 @@ import xyz.srclab.annotation.Nullable;
 import xyz.srclab.annotation.ReturnType;
 import xyz.srclab.common.base.Format;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.lang.key.Key;
+import xyz.srclab.common.base.Key;
 
 import java.lang.reflect.*;
 

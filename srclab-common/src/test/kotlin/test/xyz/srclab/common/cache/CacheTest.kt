@@ -7,7 +7,7 @@
 //import xyz.srclab.common.cache.concurent.ConcurrentCache
 //import xyz.srclab.common.cache.threadlocal.ThreadLocalCache
 //import xyz.srclab.common.cache.weak.WeakCache
-//import xyz.srclab.common.lang.computed.Computed
+//import xyz.srclab.common.base.Computed
 //import xyz.srclab.test.doAssertEquals
 //import xyz.srclab.test.doExpectThrowable
 //import java.time.Duration

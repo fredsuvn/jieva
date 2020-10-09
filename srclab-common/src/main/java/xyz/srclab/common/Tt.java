@@ -1,5 +1,7 @@
 package xyz.srclab.common;
 
+import kotlin.Lazy;
+import kotlin.LazyKt;
 import xyz.srclab.common.base.*;
 import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.exception.CommonException;
@@ -61,5 +63,10 @@ public class Tt {
         about.name();
 
         Environment.fileSeparator();
+
+        Lazy<String> lazy = LazyKt.lazy(() -> "");
+        lazy.getValue();
+
+        Object uv = Parts.UNINITIALIZED_VALUE;
     }
 }

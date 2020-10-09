@@ -30,16 +30,16 @@ interface ExceptionStatus : StringState<ExceptionStatus> {
             override val description: String?
         ) : ExceptionStatus {
 
-            override fun toString(): String {
-                return State.toString(this)
-            }
-
             override fun equals(other: Any?): Boolean {
                 return State.equals(this, other)
             }
 
             override fun hashCode(): Int {
                 return State.hashCode(this)
+            }
+
+            override fun toString(): String {
+                return State.toString(this)
             }
         }
     }

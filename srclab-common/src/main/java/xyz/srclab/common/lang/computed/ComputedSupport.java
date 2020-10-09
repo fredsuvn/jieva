@@ -1,6 +1,7 @@
 package xyz.srclab.common.lang.computed;
 
 import xyz.srclab.annotation.Nullable;
+import xyz.srclab.common.base.Computed;
 import xyz.srclab.common.base.Current;
 
 import java.time.Duration;

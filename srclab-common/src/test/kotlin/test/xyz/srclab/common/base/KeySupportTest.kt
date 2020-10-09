@@ -2,7 +2,7 @@ package test.xyz.srclab.common.base
 
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import xyz.srclab.common.lang.key.Key
+import xyz.srclab.common.base.Key
 import xyz.srclab.test.doAssertEquals
 
 object KeySupportTest {

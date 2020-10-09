@@ -20,13 +20,6 @@ interface State<C, DESC, T : State<C, DESC, T>> {
     companion object {
 
         @JvmStatic
-        fun toString(state: State<*, *, *>): String {
-            val code = state.code
-            val description = state.description
-            return if (description == null) code.toString() else "$code-$description"
-        }
-
-        @JvmStatic
         fun equals(state: State<*, *, *>, other: Any?): Boolean {
             if (state === other) {
                 return true
@@ -40,6 +33,13 @@ interface State<C, DESC, T : State<C, DESC, T>> {
         @JvmStatic
         fun hashCode(state: State<*, *, *>): Int {
             return Hash.hash(state.code, state.description)
+        }
+
+        @JvmStatic
+        fun toString(state: State<*, *, *>): String {
+            val code = state.code
+            val description = state.description
+            return if (description == null) code.toString() else "$code-$description"
         }
     }
 }
