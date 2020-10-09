@@ -9,6 +9,16 @@ object Hash {
 
     @JvmStatic
     fun hash(any: Any?): Int {
+        return Objects.hashCode(any)
+    }
+
+    @JvmStatic
+    fun hash(vararg objects: Any?): Int {
+        return Objects.hash(objects)
+    }
+
+    @JvmStatic
+    fun deepHash(any: Any?): Int {
         if (any == null) {
             return 0
         }
@@ -43,7 +53,7 @@ object Hash {
     }
 
     @JvmStatic
-    fun hash(vararg objects: Any?): Int {
+    fun deepHash(vararg objects: Any?): Int {
         return objects.contentDeepHashCode()
     }
 }
