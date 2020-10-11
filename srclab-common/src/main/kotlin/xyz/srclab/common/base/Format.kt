@@ -1,49 +1,58 @@
+@file:JvmName("Format")
+@file:JvmMultifileClass
 package xyz.srclab.common.base
 
-import org.slf4j.helpers.MessageFormatter
 import java.text.MessageFormat
-import java.util.*
+import org.slf4j.helpers.MessageFormatter as Slf4jMessageFormatter
 
-interface Format {
+interface Formatter {
 
     fun format(pattern: String, vararg args: Any?): String
+}
 
-    companion object {
+fun fastFormat(pattern: String, vararg args: Any?): String {
+    return FastFormatter.format(pattern, *args)
+}
 
-        @JvmStatic
-        fun fastFormat(pattern: String, vararg args: Any?): String {
-            return FastFormat.format(pattern, *args)
+fun printfFormat(pattern: String, vararg args: Any?): String {
+    return PrintfFormatter.format(pattern, *args)
+}
+
+fun messageFormat(pattern: String, vararg args: Any?): String {
+    return MessageFormatter.format(pattern, *args)
+}
+
+object FastFormatter : Formatter {
+
+    override fun format(pattern: String, vararg args: Any?): String {
+        processArguments(args.asAny())
+        return Slf4jMessageFormatter.arrayFormat(pattern, args, null).message
+    }
+
+    private fun processArguments(args: Array<Any?>) {
+        if (args.isEmpty()) {
+            return
         }
 
-        @JvmStatic
-        fun printfFormat(pattern: String, vararg args: Any?): String {
-            return String.format(Locale.getDefault(), pattern, *args)
+        /*
+        val lastElement = args[args.size - 1]
+        if (lastElement is Throwable) {
+            args[args.size - 1] = lastElement.toString()
         }
+         */
+    }
+}
 
-        @JvmStatic
-        fun messageFormat(pattern: String, vararg args: Any?): String {
-            return MessageFormat.format(pattern, *args)
-        }
+object PrintfFormatter : Formatter {
 
-        private object FastFormat : Format {
+    override fun format(pattern: String, vararg args: Any?): String {
+        return String.format(Defaults.locale, pattern, *args)
+    }
+}
 
-            override fun format(pattern: String, vararg args: Any?): String {
-                processArguments(args.asAny())
-                return MessageFormatter.arrayFormat(pattern, args, null).message
-            }
+object MessageFormatter : Formatter {
 
-            private fun processArguments(args: Array<Any?>) {
-                if (args.isEmpty()) {
-                    return
-                }
-
-                /*
-                val lastElement = args[args.size - 1]
-                if (lastElement is Throwable) {
-                    args[args.size - 1] = lastElement.toString()
-                }
-                 */
-            }
-        }
+    override fun format(pattern: String, vararg args: Any?): String {
+        return MessageFormat.format(pattern, *args)
     }
 }

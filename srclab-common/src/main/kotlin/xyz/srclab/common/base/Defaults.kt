@@ -9,30 +9,34 @@ import java.util.concurrent.TimeUnit
 object Defaults {
 
     @JvmStatic
-    val charset: Charset
-        @JvmName("charset") get() = StandardCharsets.UTF_8
+    @get:JvmName("charset")
+    val charset: Charset = StandardCharsets.UTF_8
 
     @JvmStatic
     val locale: Locale
-        @JvmName("locale") get() = Locale.getDefault()
+        @JvmName("locale") get() {
+            return Locale.getDefault()
+        }
 
     @JvmStatic
-    val timeUnit: TimeUnit
-        @JvmName("timeUnit") get() = TimeUnit.SECONDS
+    @get:JvmName("timeUnit")
+    val timeUnit: TimeUnit = TimeUnit.SECONDS
 
     @JvmStatic
-    val concurrencyLevel: Int
-        @JvmName("concurrencyLevel") get() = 16
+    @get:JvmName("concurrencyLevel")
+    val concurrencyLevel: Int = 16
 
     @JvmStatic
-    val fileSeparator: String
-        @JvmName("fileSeparator") get() = File.separator
+    @get:JvmName("fileSeparator")
+    val fileSeparator: String = File.separator
 
     @JvmStatic
-    val pathSeparator: String
-        @JvmName("pathSeparator") get() = File.pathSeparator
+    @get:JvmName("pathSeparator")
+    val pathSeparator: String = File.pathSeparator
 
     @JvmStatic
     val lineSeparator: String
-        @JvmName("lineSeparator") get() = System.lineSeparator()
+        @JvmName("lineSeparator") get() {
+            return System.lineSeparator()
+        }
 }

@@ -1,3 +1,6 @@
+@file:JvmName("Keys")
+@file:JvmMultifileClass
+
 package xyz.srclab.common.base
 
 /**
@@ -6,41 +9,36 @@ package xyz.srclab.common.base
 interface Key {
 
     @Suppress("INAPPLICABLE_JVM_NAME")
+    @get:JvmName("content")
     val content: List<*>
-        @JvmName("content") get
 
     override fun equals(other: Any?): Boolean
 
     override fun hashCode(): Int
+}
 
-    companion object {
+fun keyOf(vararg content: Any?): Key {
+    return KeyImpl(listOf(content))
+}
 
-        @JvmStatic
-        fun of(vararg content: Any?): Key? {
-            return KeyImpl(listOf(content))
+fun keyOf(content: Iterable<*>): Key {
+    return KeyImpl(content.toList())
+}
+
+private class KeyImpl(override val content: List<*>) : Key {
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is Key) {
+            return false
         }
+        return content == other.content
+    }
 
-        @JvmStatic
-        fun of(content: Iterable<*>): Key? {
-            return KeyImpl(content.toList())
-        }
+    override fun hashCode(): Int {
+        return hash(content)
+    }
 
-        private class KeyImpl(override val content: List<*>) : Key {
-
-            override fun equals(other: Any?): Boolean {
-                if (other !is Key) {
-                    return false
-                }
-                return content == other.content
-            }
-
-            override fun hashCode(): Int {
-                return Hash.hash(content)
-            }
-
-            override fun toString(): String {
-                return "Key[$content]"
-            }
-        }
+    override fun toString(): String {
+        return "Key[$content]"
     }
 }

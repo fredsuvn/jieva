@@ -15,9 +15,9 @@ object KeySupportTest {
     @DataProvider
     fun keyHelperDataProvider(): Array<Array<*>> {
         return arrayOf(
-            arrayOf(Key.of(), ""),
-            arrayOf(Key.of(Object::class.java), "Ljava/lang/Object;"),
-            arrayOf(Key.of(Object::class.java, "ss"), "Ljava/lang/Object;:ss")
+            arrayOf(Key.keyOf(), ""),
+            arrayOf(Key.keyOf(Object::class.java), "Ljava/lang/Object;"),
+            arrayOf(Key.keyOf(Object::class.java, "ss"), "Ljava/lang/Object;:ss")
         )
     }
 }

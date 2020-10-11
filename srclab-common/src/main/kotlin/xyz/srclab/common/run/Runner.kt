@@ -1,3 +1,5 @@
+@file:JvmName("Run")
+@file:JvmMultifileClass
 package xyz.srclab.common.run
 
 import xyz.srclab.common.base.Environment
@@ -66,15 +68,13 @@ interface Runner {
         fun threadPoolRunnerBuilder(): ThreadPoolRunner.Builder {
             return ThreadPoolRunner.Builder()
         }
-
-        @JvmStatic
-        fun <V> runSync(task: () -> V): Running<V> {
-            return syncRunner().run(task)
-        }
-
-        @JvmStatic
-        fun <V> runAsync(task: () -> V): Running<V> {
-            return asyncRunner().run(task)
-        }
     }
+}
+
+fun <V> runSync(task: () -> V): Running<V> {
+    return Runner.syncRunner().run(task)
+}
+
+fun <V> runAsync(task: () -> V): Running<V> {
+    return Runner.asyncRunner().run(task)
 }

@@ -6,10 +6,7 @@ import xyz.srclab.common.base.*;
 import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.exception.CommonException;
 import xyz.srclab.common.exception.ExceptionStatus;
-import xyz.srclab.common.run.Running;
-import xyz.srclab.common.run.ScheduledRunner;
-import xyz.srclab.common.run.ScheduledRunning;
-import xyz.srclab.common.run.ThreadPoolRunner;
+import xyz.srclab.common.run.*;
 
 /**
  * @author sunqian
@@ -68,5 +65,11 @@ public class Tt {
         lazy.getValue();
 
         Object uv = Parts.UNINITIALIZED_VALUE;
+
+        Runner r = Runner.asyncRunner();
+
+        Keys.keyOf("").content();
+
+        Current.milliseconds();
     }
 }

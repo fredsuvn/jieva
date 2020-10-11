@@ -1,4 +1,5 @@
 @file:JvmName("To")
+@file:JvmMultifileClass
 
 package xyz.srclab.common.base
 

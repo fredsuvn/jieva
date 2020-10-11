@@ -1,3 +1,6 @@
+@file:JvmName("Loader")
+@file:JvmMultifileClass
+
 package xyz.srclab.common.base
 
 import java.io.IOException
@@ -5,89 +8,71 @@ import java.io.InputStream
 import java.net.URL
 import java.nio.ByteBuffer
 
-object Loader {
+fun <T> findClass(className: String): Class<T>? {
+    return try {
+        Class.forName(className).asAny()
+    } catch (e: ClassNotFoundException) {
+        null
+    }
+}
 
-    @JvmStatic
-    val currentClassLoader: ClassLoader
-        @JvmName("currentClassLoader") get() {
-            return Current.classLoader
-        }
+fun <T> findClass(className: String, classLoader: ClassLoader): Class<T>? {
+    return try {
+        Class.forName(className, true, classLoader).asAny()
+    } catch (e: ClassNotFoundException) {
+        null
+    }
+}
 
-    @JvmStatic
-    fun <T> findClass(className: String): Class<T>? {
+@JvmOverloads
+fun <T> loadClass(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size - offset): Class<T> {
+    return BytesClassLoader.loadClass(bytes, offset, length).asAny()
+}
+
+fun <T> loadClass(inputStream: InputStream): Class<T> {
+    return BytesClassLoader.loadClass(inputStream).asAny()
+}
+
+fun <T> loadClass(byteBuffer: ByteBuffer): Class<T> {
+    return BytesClassLoader.loadClass(byteBuffer).asAny()
+}
+
+fun findResource(resourceName: String): URL? {
+    return findResource(resourceName, Current.classLoader)
+}
+
+fun findResource(resourceName: String, classLoader: ClassLoader): URL? {
+    return classLoader.getResource(resourceName)
+}
+
+fun findResources(resourceName: String): List<URL> {
+    return findResources(resourceName, Current.classLoader)
+}
+
+fun findResources(resourceName: String?, classLoader: ClassLoader): List<URL> {
+    return try {
+        val urlEnumeration = classLoader.getResources(resourceName)
+        urlEnumeration.toList()
+    } catch (e: Exception) {
+        throw IllegalStateException(e)
+    }
+}
+
+object BytesClassLoader : ClassLoader() {
+
+    fun loadClass(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size): Class<*> {
+        return super.defineClass(null, bytes, offset, length)
+    }
+
+    fun loadClass(inputStream: InputStream): Class<*> {
         return try {
-            Class.forName(className).asAny()
-        } catch (e: ClassNotFoundException) {
-            null
-        }
-    }
-
-    @JvmStatic
-    fun <T> findClass(className: String, classLoader: ClassLoader): Class<T>? {
-        return try {
-            Class.forName(className, true, classLoader).asAny()
-        } catch (e: ClassNotFoundException) {
-            null
-        }
-    }
-
-    @JvmStatic
-    @JvmOverloads
-    fun <T> loadClass(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size - offset): Class<T> {
-        return BytesClassLoader.loadClass(bytes, offset, length).asAny()
-    }
-
-    @JvmStatic
-    fun <T> loadClass(inputStream: InputStream): Class<T> {
-        return BytesClassLoader.loadClass(inputStream).asAny()
-    }
-
-    @JvmStatic
-    fun <T> loadClass(byteBuffer: ByteBuffer): Class<T> {
-        return BytesClassLoader.loadClass(byteBuffer).asAny()
-    }
-
-    @JvmStatic
-    fun findResource(resourceName: String): URL? {
-        return findResource(resourceName, currentClassLoader)
-    }
-
-    @JvmStatic
-    fun findResource(resourceName: String, classLoader: ClassLoader): URL? {
-        return classLoader.getResource(resourceName)
-    }
-
-    @JvmStatic
-    fun findResources(resourceName: String): List<URL> {
-        return findResources(resourceName, currentClassLoader)
-    }
-
-    @JvmStatic
-    fun findResources(resourceName: String?, classLoader: ClassLoader): List<URL> {
-        return try {
-            val urlEnumeration = classLoader.getResources(resourceName)
-            urlEnumeration.toList()
-        } catch (e: Exception) {
+            loadClass(inputStream.readBytes())
+        } catch (e: IOException) {
             throw IllegalStateException(e)
         }
     }
 
-    private object BytesClassLoader : ClassLoader() {
-
-        fun loadClass(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size): Class<*> {
-            return super.defineClass(null, bytes, offset, length)
-        }
-
-        fun loadClass(inputStream: InputStream): Class<*> {
-            return try {
-                loadClass(inputStream.readBytes())
-            } catch (e: IOException) {
-                throw IllegalStateException(e)
-            }
-        }
-
-        fun loadClass(byteBuffer: ByteBuffer): Class<*> {
-            return super.defineClass(null, byteBuffer, null)
-        }
+    fun loadClass(byteBuffer: ByteBuffer): Class<*> {
+        return super.defineClass(null, byteBuffer, null)
     }
 }

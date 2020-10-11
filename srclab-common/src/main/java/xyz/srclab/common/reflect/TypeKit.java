@@ -137,7 +137,7 @@ public class TypeKit {
             if (rawType.equals(targetInterface)) {
                 return type;
             }
-            return cache.getNonNull(Key.of(rawType, targetInterface), k -> findFromRawType(rawType, targetInterface));
+            return cache.getNonNull(Key.keyOf(rawType, targetInterface), k -> findFromRawType(rawType, targetInterface));
         }
 
         private static Type findFromRawType(Class<?> rawType, Class<?> targetInterface) {
@@ -181,7 +181,7 @@ public class TypeKit {
 
         public static Type find(TypeVariable<?> type, Type owner, Class<?> declaringClass) {
             return cache.getNonNull(
-                    Key.of(type, owner, declaringClass),
+                    Key.keyOf(type, owner, declaringClass),
                     k -> findTypeVariable(type, owner, declaringClass)
             );
         }

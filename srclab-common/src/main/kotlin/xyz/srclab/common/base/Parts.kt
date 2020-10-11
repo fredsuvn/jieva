@@ -1,6 +1,6 @@
+@file:JvmName("Parts")
+@file:JvmMultifileClass
+
 package xyz.srclab.common.base
 
-object Parts {
-
-    const val UNINITIALIZED_VALUE = "UNINITIALIZED_VALUE"
-}
+const val UNINITIALIZED_VALUE = "UNINITIALIZED_VALUE"
