@@ -5,7 +5,7 @@ import org.testng.annotations.Test
 //import xyz.srclab.common.lang.FormatHelper
 import xyz.srclab.test.doAssertEquals
 
-object FormatterTest {
+object FormatTest {
 
     @Test(dataProvider = "fastFormatDataProvider")
     fun testFastFormat(actual: String, expected: String) {

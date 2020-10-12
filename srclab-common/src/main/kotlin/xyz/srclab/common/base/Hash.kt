@@ -5,48 +5,40 @@ package xyz.srclab.common.base
 
 import java.util.*
 
-fun hash(any: Any?): Int {
-    return Objects.hashCode(any)
+fun Any?.hash(): Int {
+    return this.hashCode()
 }
 
-fun hash(vararg objects: Any?): Int {
-    return Objects.hash(objects)
+fun Any?.elementHash(): Int {
+    if (this === null) {
+        return this.hashCode()
+    }
+    return when (this) {
+        is BooleanArray -> Arrays.hashCode(this)
+        is ShortArray -> Arrays.hashCode(this)
+        is CharArray -> Arrays.hashCode(this)
+        is IntArray -> Arrays.hashCode(this)
+        is LongArray -> Arrays.hashCode(this)
+        is FloatArray -> Arrays.hashCode(this)
+        is DoubleArray -> Arrays.hashCode(this)
+        is Array<*> -> Arrays.hashCode(this)
+        else -> this.hashCode()
+    }
 }
 
-fun deepHash(any: Any?): Int {
-    if (any == null) {
-        return 0
+fun Any?.elementDeepHash(): Int {
+    if (this === null) {
+        return this.hashCode()
     }
-    if (any is Array<*>) {
-        return Arrays.deepHashCode(any)
+    return when (this) {
+        is BooleanArray -> Arrays.hashCode(this)
+        is ShortArray -> Arrays.hashCode(this)
+        is CharArray -> Arrays.hashCode(this)
+        is IntArray -> Arrays.hashCode(this)
+        is LongArray -> Arrays.hashCode(this)
+        is FloatArray -> Arrays.hashCode(this)
+        is DoubleArray -> Arrays.hashCode(this)
+        is Array<*> -> Arrays.deepHashCode(this)
+        else -> this.hashCode()
     }
-    if (any is BooleanArray) {
-        return Arrays.hashCode(any)
-    }
-    if (any is ByteArray) {
-        return Arrays.hashCode(any)
-    }
-    if (any is ShortArray) {
-        return Arrays.hashCode(any)
-    }
-    if (any is CharArray) {
-        return Arrays.hashCode(any)
-    }
-    if (any is IntArray) {
-        return Arrays.hashCode(any)
-    }
-    if (any is LongArray) {
-        return Arrays.hashCode(any)
-    }
-    if (any is FloatArray) {
-        return Arrays.hashCode(any)
-    }
-    if (any is DoubleArray) {
-        return Arrays.hashCode(any)
-    }
-    return Objects.hashCode(any)
-}
-
-fun deepHash(vararg objects: Any?): Int {
-    return objects.contentDeepHashCode()
 }

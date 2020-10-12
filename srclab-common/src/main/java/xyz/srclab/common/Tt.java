@@ -68,8 +68,6 @@ public class Tt {
 
         Runner r = Runner.asyncRunner();
 
-        Keys.keyOf("").content();
-
         Current.milliseconds();
     }
 }

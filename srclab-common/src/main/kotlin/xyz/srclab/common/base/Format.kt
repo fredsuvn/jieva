@@ -1,28 +1,44 @@
-@file:JvmName("Format")
-@file:JvmMultifileClass
 package xyz.srclab.common.base
 
-import java.text.MessageFormat
 import org.slf4j.helpers.MessageFormatter as Slf4jMessageFormatter
+import java.text.MessageFormat as JavaMessageFormat
 
-interface Formatter {
+interface Format {
 
     fun format(pattern: String, vararg args: Any?): String
+
+    companion object {
+
+        @JvmStatic
+        fun fast(pattern: String, vararg args: Any?): String {
+            return FastFormat.format(pattern, *args)
+        }
+
+        @JvmStatic
+        fun printf(pattern: String, vararg args: Any?): String {
+            return PrintfFormat.format(pattern, *args)
+        }
+
+        @JvmStatic
+        fun message(pattern: String, vararg args: Any?): String {
+            return MessageFormat.format(pattern, *args)
+        }
+    }
 }
 
 fun fastFormat(pattern: String, vararg args: Any?): String {
-    return FastFormatter.format(pattern, *args)
+    return Format.fast(pattern, *args)
 }
 
 fun printfFormat(pattern: String, vararg args: Any?): String {
-    return PrintfFormatter.format(pattern, *args)
+    return Format.printf(pattern, *args)
 }
 
 fun messageFormat(pattern: String, vararg args: Any?): String {
-    return MessageFormatter.format(pattern, *args)
+    return Format.message(pattern, *args)
 }
 
-object FastFormatter : Formatter {
+object FastFormat : Format {
 
     override fun format(pattern: String, vararg args: Any?): String {
         processArguments(args.asAny())
@@ -43,16 +59,16 @@ object FastFormatter : Formatter {
     }
 }
 
-object PrintfFormatter : Formatter {
+object PrintfFormat : Format {
 
     override fun format(pattern: String, vararg args: Any?): String {
         return String.format(Defaults.locale, pattern, *args)
     }
 }
 
-object MessageFormatter : Formatter {
+object MessageFormat : Format {
 
     override fun format(pattern: String, vararg args: Any?): String {
-        return MessageFormat.format(pattern, *args)
+        return JavaMessageFormat.format(pattern, *args)
     }
 }

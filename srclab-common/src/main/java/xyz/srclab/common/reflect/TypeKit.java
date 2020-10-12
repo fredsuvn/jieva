@@ -195,7 +195,7 @@ public class TypeKit {
             @Nullable Type result = findTypeVariable0(type, actualTypeArguments, declaringClass);
             if (result == null) {
                 throw new IllegalArgumentException(
-                        Format.fastFormat("Cannot find actual type {} from {} to {}",
+                        Format.fast("Cannot find actual type {} from {} to {}",
                                 type, declaringClass, owner));
             }
             return result;
