@@ -112,7 +112,7 @@ public class KitvaBoot {
         //listOps.
         Map<String, ?> result = providerMap.computeIfAbsent(interfaceName, iName -> {
             @Nullable String providerDescriptor = getProviderProperties().get(iName);
-            Check.checkArguments(
+            Check.checkArgument(
                     providerDescriptor != null, "Cannot find provider for " + interfaceName);
             return ProviderLoader.newStringDescriptorLoader(providerDescriptor).load();
         });

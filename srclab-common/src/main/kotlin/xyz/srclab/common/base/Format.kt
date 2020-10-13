@@ -10,32 +10,32 @@ interface Format {
     companion object {
 
         @JvmStatic
-        fun fast(pattern: String, vararg args: Any?): String {
+        fun fastFormat(pattern: String, vararg args: Any?): String {
             return FastFormat.format(pattern, *args)
         }
 
         @JvmStatic
-        fun printf(pattern: String, vararg args: Any?): String {
+        fun printfFormat(pattern: String, vararg args: Any?): String {
             return PrintfFormat.format(pattern, *args)
         }
 
         @JvmStatic
-        fun message(pattern: String, vararg args: Any?): String {
+        fun messageFormat(pattern: String, vararg args: Any?): String {
             return MessageFormat.format(pattern, *args)
         }
     }
 }
 
 fun fastFormat(pattern: String, vararg args: Any?): String {
-    return Format.fast(pattern, *args)
+    return Format.fastFormat(pattern, *args)
 }
 
 fun printfFormat(pattern: String, vararg args: Any?): String {
-    return Format.printf(pattern, *args)
+    return Format.printfFormat(pattern, *args)
 }
 
 fun messageFormat(pattern: String, vararg args: Any?): String {
-    return Format.message(pattern, *args)
+    return Format.messageFormat(pattern, *args)
 }
 
 object FastFormat : Format {

@@ -5,136 +5,134 @@ package xyz.srclab.common.base
 
 import java.util.*
 
-fun checkArguments(expression: Boolean) {
-    if (!expression) {
+fun Boolean.checkArguments() {
+    if (!this) {
         throw IllegalArgumentException()
     }
 }
 
-fun checkArguments(expression: Boolean, message: String?) {
-    if (!expression) {
+fun Boolean.checkArguments(message: String?) {
+    if (!this) {
         throw IllegalArgumentException(message)
     }
 }
 
-fun checkArguments(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
-    if (!expression) {
+fun Boolean.checkArguments(messagePattern: String?, vararg messageArgs: Any?) {
+    if (!this) {
         throw IllegalArgumentException(format(messagePattern, messageArgs))
     }
 }
 
-fun checkState(expression: Boolean) {
-    if (!expression) {
+fun Boolean.checkState() {
+    if (!this) {
         throw IllegalStateException()
     }
 }
 
-fun checkState(expression: Boolean, message: String?) {
-    if (!expression) {
+fun Boolean.checkState(message: String?) {
+    if (!this) {
         throw IllegalStateException(message)
     }
 }
 
-fun checkState(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
-    if (!expression) {
+fun Boolean.checkState(messagePattern: String?, vararg messageArgs: Any?) {
+    if (!this) {
         throw IllegalStateException(format(messagePattern, messageArgs))
     }
 }
 
-fun checkNull(expression: Boolean) {
-    if (!expression) {
+fun Boolean.checkNull() {
+    if (!this) {
         throw NullPointerException()
     }
 }
 
-fun checkNull(expression: Boolean, message: String?) {
-    if (!expression) {
+fun Boolean.checkNull(message: String?) {
+    if (!this) {
         throw NullPointerException(message)
     }
 }
 
-fun checkNull(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
-    if (!expression) {
+fun Boolean.checkNull(messagePattern: String?, vararg messageArgs: Any?) {
+    if (!this) {
         throw NullPointerException(format(messagePattern, messageArgs))
     }
 }
 
-fun checkSupported(expression: Boolean) {
-    if (!expression) {
+fun Boolean.checkSupported() {
+    if (!this) {
         throw UnsupportedOperationException()
     }
 }
 
-fun checkSupported(expression: Boolean, message: String?) {
-    if (!expression) {
+fun Boolean.checkSupported(message: String?) {
+    if (!this) {
         throw UnsupportedOperationException(message)
     }
 }
 
-fun checkSupported(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
-    if (!expression) {
+fun Boolean.checkSupported(messagePattern: String?, vararg messageArgs: Any?) {
+    if (!this) {
         throw UnsupportedOperationException(format(messagePattern, messageArgs))
     }
 }
 
-fun checkElement(expression: Boolean) {
-    if (!expression) {
+fun Boolean.checkElement() {
+    if (!this) {
         throw NoSuchElementException()
     }
 }
 
-fun checkElement(expression: Boolean, message: String?) {
-    if (!expression) {
+fun Boolean.checkElement(message: String?) {
+    if (!this) {
         throw NoSuchElementException(message)
     }
 }
 
-fun checkElement(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
-    if (!expression) {
+fun Boolean.checkElement(messagePattern: String?, vararg messageArgs: Any?) {
+    if (!this) {
         throw NoSuchElementException(format(messagePattern, messageArgs))
     }
 }
 
-fun checkBounds(expression: Boolean) {
-    if (!expression) {
+fun Boolean.checkBounds() {
+    if (!this) {
         throw IndexOutOfBoundsException()
     }
 }
 
-fun checkBounds(expression: Boolean, message: String?) {
-    if (!expression) {
+fun Boolean.checkBounds(message: String?) {
+    if (!this) {
         throw IndexOutOfBoundsException(message)
     }
 }
 
-fun checkBounds(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
-    if (!expression) {
+fun Boolean.checkBounds(messagePattern: String?, vararg messageArgs: Any?) {
+    if (!this) {
         throw IndexOutOfBoundsException(format(messagePattern, messageArgs))
     }
 }
 
-fun isIndexInRange(index: Int, startInclusive: Int, endExclusive: Int): Boolean {
-    return index >= startInclusive && index < endExclusive
+fun Int.isIndexInRange(startInclusive: Int, endExclusive: Int): Boolean {
+    return this in startInclusive until endExclusive
 }
 
-fun isIndexInRange(index: Long, startInclusive: Long, endExclusive: Long): Boolean {
-    return index >= startInclusive && index < endExclusive
+fun Int.isIndexInRange(startInclusive: Long, endExclusive: Long): Boolean {
+    return this in startInclusive until endExclusive
 }
 
-fun checkIndexInRange(index: Int, startInclusive: Int, endExclusive: Int) {
-    checkBounds(
-        isIndexInRange(index, startInclusive, endExclusive),
+fun Int.checkIndexInRange(startInclusive: Int, endExclusive: Int) {
+    isIndexInRange(startInclusive, endExclusive).checkBounds(
         "Index out of bounds[" +
-                "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
+                "index: $this, startInclusive: $startInclusive, endExclusive: $endExclusive" +
                 "]."
     )
 }
 
-fun checkIndexInRange(index: Long, startInclusive: Long, endExclusive: Long) {
-    checkBounds(
-        isIndexInRange(index, startInclusive, endExclusive),
+fun Int.checkIndexInRange(startInclusive: Long, endExclusive: Long) {
+    isIndexInRange(startInclusive, endExclusive).checkBounds(
         "Index out of bounds[" +
-                "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
+                "index: $this, startInclusive: $startInclusive, endExclusive: $endExclusive" +
                 "]."
     )
 }
@@ -164,8 +162,7 @@ fun isRangeInBounds(
 }
 
 fun checkRangeInBounds(startInclusive: Int, endExclusive: Int, length: Int) {
-    checkBounds(
-        isRangeInBounds(startInclusive, endExclusive, length),
+    isRangeInBounds(startInclusive, endExclusive, length).checkBounds(
         "Range out of bounds[" +
                 "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
                 "]."
@@ -173,8 +170,7 @@ fun checkRangeInBounds(startInclusive: Int, endExclusive: Int, length: Int) {
 }
 
 fun checkRangeInBounds(startInclusive: Long, endExclusive: Long, length: Long) {
-    checkBounds(
-        isRangeInBounds(startInclusive, endExclusive, length),
+    isRangeInBounds(startInclusive, endExclusive, length).checkBounds(
         "Range out of bounds[" +
                 "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
                 "]."
@@ -182,8 +178,7 @@ fun checkRangeInBounds(startInclusive: Long, endExclusive: Long, length: Long) {
 }
 
 fun checkRangeInBounds(startInclusive: Int, endExclusive: Int, startBoundInclusive: Int, endBoundExclusive: Int) {
-    checkBounds(
-        isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive),
+    isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive).checkBounds(
         "Range out of bounds[" +
                 "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
                 "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +
@@ -197,8 +192,7 @@ fun checkRangeInBounds(
     startBoundInclusive: Long,
     endBoundExclusive: Long
 ) {
-    checkBounds(
-        isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive),
+    isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive).checkBounds(
         "Range out of bounds[" +
                 "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
                 "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +

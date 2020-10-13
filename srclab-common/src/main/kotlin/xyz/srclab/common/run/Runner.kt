@@ -1,5 +1,3 @@
-@file:JvmName("Run")
-@file:JvmMultifileClass
 package xyz.srclab.common.run
 
 import xyz.srclab.common.base.Environment

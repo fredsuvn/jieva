@@ -1,6 +1,7 @@
 package xyz.srclab.common.exception
 
-import xyz.srclab.common.state.State
+import xyz.srclab.common.state.stateEquals
+import xyz.srclab.common.state.stateHash
 
 open class CommonException @JvmOverloads constructor(
     private val status: ExceptionStatus,
@@ -37,29 +38,27 @@ open class CommonException @JvmOverloads constructor(
         @JvmName("description") get() = status.description
 
     override fun equals(other: Any?): Boolean {
-        return State.equals(this, other)
+        return stateEquals(other)
     }
 
     override fun hashCode(): Int {
-        return State.hashCode(this)
+        return stateHash()
     }
 
     companion object {
 
-        @JvmStatic
-        fun buildExceptionStatus(exceptionStatus: ExceptionStatus, cause: Throwable?): ExceptionStatus {
+        private fun buildExceptionStatus(exceptionStatus: ExceptionStatus, cause: Throwable?): ExceptionStatus {
             return if (cause == null)
                 exceptionStatus
             else
                 exceptionStatus.withMoreDescription(cause.message)
         }
 
-        @JvmStatic
-        fun buildExceptionStatus(code: String, description: String?, cause: Throwable?): ExceptionStatus {
+        private fun buildExceptionStatus(code: String, description: String?, cause: Throwable?): ExceptionStatus {
             return if (cause == null)
-                ExceptionStatus.newInstance(code, description)
+                ExceptionStatus.of(code, description)
             else
-                ExceptionStatus.newInstance(code, "$description[cause: ${cause.message}]")
+                ExceptionStatus.of(code, "$description[cause: ${cause.message}]")
         }
     }
 }

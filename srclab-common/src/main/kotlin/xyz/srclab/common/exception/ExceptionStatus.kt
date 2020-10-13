@@ -1,7 +1,6 @@
 package xyz.srclab.common.exception
 
-import xyz.srclab.common.state.State
-import xyz.srclab.common.state.StringState
+import xyz.srclab.common.state.*
 
 interface ExceptionStatus : StringState<ExceptionStatus> {
 
@@ -9,38 +8,46 @@ interface ExceptionStatus : StringState<ExceptionStatus> {
         return if (moreDescription == null)
             this
         else
-            newInstance(code, StringState.buildDescription(description, moreDescription))
+            exceptionStatusOf(code, description.moreStateDescription(moreDescription))
     }
 
     companion object {
 
         @JvmOverloads
         @JvmStatic
-        fun newInstance(code: String, description: String? = null): ExceptionStatus {
+        fun of(code: String, description: String? = null): ExceptionStatus {
             return ExceptionStatusImpl(code, description)
         }
 
         @JvmStatic
-        fun from(state: StringState<*>): ExceptionStatus {
-            return newInstance(state.code, state.description)
+        fun of(state: StringState<*>): ExceptionStatus {
+            return of(state.code, state.description)
         }
+    }
+}
 
-        private class ExceptionStatusImpl(
-            override val code: String,
-            override val description: String?
-        ) : ExceptionStatus {
+fun exceptionStatusOf(code: String, description: String? = null): ExceptionStatus {
+    return ExceptionStatus.of(code, description)
+}
 
-            override fun equals(other: Any?): Boolean {
-                return State.equals(this, other)
-            }
+fun exceptionStatusOf(state: StringState<*>): ExceptionStatus {
+    return ExceptionStatus.of(state)
+}
 
-            override fun hashCode(): Int {
-                return State.hashCode(this)
-            }
+private class ExceptionStatusImpl(
+    override val code: String,
+    override val description: String?
+) : ExceptionStatus {
 
-            override fun toString(): String {
-                return State.toString(this)
-            }
-        }
+    override fun equals(other: Any?): Boolean {
+        return this.stateEquals(other)
+    }
+
+    override fun hashCode(): Int {
+        return this.stateHash()
+    }
+
+    override fun toString(): String {
+        return this.stateToString()
     }
 }

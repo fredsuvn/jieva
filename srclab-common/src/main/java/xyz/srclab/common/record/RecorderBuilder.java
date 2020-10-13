@@ -33,7 +33,7 @@ public class RecorderBuilder extends BaseProductCachingBuilder<Recorder> {
 
     @Override
     protected Recorder buildNew() {
-        Check.checkArguments(resolver != null, "Resolver was not be set");
+        Check.checkArgument(resolver != null, "Resolver was not be set");
         return useCache ? new CachedRecorderImpl(this) : new RecorderImpl(this);
     }
 

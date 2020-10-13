@@ -66,7 +66,7 @@ public interface CacheEntry<K, V> {
 
         @Override
         protected CacheEntry<K, V> buildNew() {
-            Check.checkArguments(Builder.this.key != null);
+            Check.checkArgument(Builder.this.key != null);
             return new CacheEntry<K, V>() {
 
                 private final K key = Builder.this.key;

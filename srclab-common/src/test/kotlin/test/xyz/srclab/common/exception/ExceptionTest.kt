@@ -27,7 +27,7 @@ object ExceptionTest {
         )
         doAssertEquals(b1 == cause, false)
 
-        val status = ExceptionStatus.from(DefaultExceptionStatus.INTERNAL)
+        val status = ExceptionStatus.of(DefaultExceptionStatus.INTERNAL)
         doAssertEquals(status, b1)
         doAssertEquals(status.hashCode(), b1.hashCode())
         doAssertEquals(

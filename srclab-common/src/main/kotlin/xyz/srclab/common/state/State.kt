@@ -1,6 +1,6 @@
 package xyz.srclab.common.state
 
-import xyz.srclab.common.base.Hash
+import xyz.srclab.common.base.hash
 
 /**
  * @author sunqian
@@ -32,7 +32,7 @@ interface State<C, DESC, T : State<C, DESC, T>> {
 
         @JvmStatic
         fun hashCode(state: State<*, *, *>): Int {
-            return Hash.hash(state.code, state.description)
+            return hash(state.code, state.description)
         }
 
         @JvmStatic
@@ -42,4 +42,16 @@ interface State<C, DESC, T : State<C, DESC, T>> {
             return if (description == null) code.toString() else "$code-$description"
         }
     }
+}
+
+fun State<*, *, *>.stateEquals(other: Any?): Boolean {
+    return State.equals(this, other)
+}
+
+fun State<*, *, *>.stateHash(): Int {
+    return State.hashCode(this)
+}
+
+fun State<*, *, *>.stateToString(): String {
+    return State.toString(this)
 }

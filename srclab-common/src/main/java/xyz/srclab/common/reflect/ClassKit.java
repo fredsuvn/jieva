@@ -16,25 +16,25 @@ public class ClassKit {
 
     public static <T> T newInstance(String className) {
         @Nullable Class<?> cls = Loader.findClass(className);
-        Check.checkArguments(cls != null, "Class not found: " + className);
+        Check.checkArgument(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }
 
     public static <T> T newInstance(String className, ClassLoader classLoader) {
         @Nullable Class<?> cls = Loader.findClass(className, classLoader);
-        Check.checkArguments(cls != null, "Class not found: " + className);
+        Check.checkArgument(cls != null, "Class not found: " + className);
         return newInstance(cls);
     }
 
     public static <T> T newInstance(Class<?> cls) {
         @Nullable Constructor<?> constructor = ConstructorKit.getConstructor(cls);
-        Check.checkArguments(constructor != null, "Constructor not found: " + cls);
+        Check.checkArgument(constructor != null, "Constructor not found: " + cls);
         return As.notNull(ConstructorInvoker.of(constructor).invoke());
     }
 
     public static <T> T newInstance(Class<?> cls, Class<?>[] parameterTypes, Object[] arguments) {
         @Nullable Constructor<?> constructor = ConstructorKit.getConstructor(cls, parameterTypes);
-        Check.checkArguments(constructor != null, "Constructor not found: " + cls);
+        Check.checkArgument(constructor != null, "Constructor not found: " + cls);
         return As.notNull(ConstructorInvoker.of(constructor).invoke(arguments));
     }
 

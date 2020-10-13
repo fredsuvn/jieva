@@ -5,11 +5,15 @@ interface StringState<T : StringState<T>> : State<String, String, T> {
     companion object {
 
         @JvmStatic
-        fun buildDescription(description: String?, moreDescription: String?): String? {
+        fun moreDescription(description: String?, moreDescription: String?): String? {
             return if (description == null)
                 moreDescription
             else
                 "$description[$moreDescription]"
         }
     }
+}
+
+fun String?.moreStateDescription(moreDescription: String?): String? {
+    return StringState.moreDescription(this, moreDescription)
 }

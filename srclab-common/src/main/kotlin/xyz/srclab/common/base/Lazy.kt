@@ -17,48 +17,68 @@ interface Lazy<T> {
     companion object {
 
         @JvmStatic
-        fun <T> once(supplier: () -> T): Lazy<T> {
+        fun <T> of(supplier: () -> T): Lazy<T> {
             return OnceLazy(supplier)
         }
 
         @JvmStatic
-        fun <T> period(period: Duration, supplier: () -> T): Lazy<T> {
+        fun <T> periodOf(period: Duration, supplier: () -> T): Lazy<T> {
             return FixedPeriodRefreshableLazy(period, supplier)
         }
 
         @JvmStatic
-        fun <T> period(supplier: () -> Pair<T, Duration>): Lazy<T> {
+        fun <T> periodOf(supplier: () -> Pair<T, Duration>): Lazy<T> {
             return DynamicPeriodRefreshableLazy(supplier)
         }
     }
 }
 
 fun <T> lazyOf(supplier: () -> T): Lazy<T> {
-    return Lazy.once(supplier)
+    return Lazy.of(supplier)
 }
 
 fun <T> periodLazyOf(period: Duration, supplier: () -> T): Lazy<T> {
-    return Lazy.period(period, supplier)
+    return Lazy.periodOf(period, supplier)
 }
 
 fun <T> periodLazyOf(supplier: () -> Pair<T, Duration>): Lazy<T> {
-    return Lazy.period(supplier)
+    return Lazy.periodOf(supplier)
 }
 
-private class OnceLazy<T>(supplier: () -> T) : Lazy<T> {
+private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
 
-    private val kotlinLazy = lazy(supplier)
+    @Volatile
+    private var hasGet = false
+
+    @Volatile
+    private var lastValue: T? = null
 
     override fun get(): T {
-        return kotlinLazy.value
+        if (hasGet) {
+            return lastValue.asAny()
+        }
+        return synchronized(this) {
+            if (hasGet) {
+                lastValue
+            }
+            lastValue = supplier()
+            hasGet = true
+            lastValue.asAny()
+        }
     }
 
     override fun refresh() {
-        throw UnsupportedOperationException()
+        synchronized(this) {
+            hasGet = false
+        }
     }
 
     override fun refreshAndGet(): T {
-        throw UnsupportedOperationException()
+        return synchronized(this) {
+            lastValue = supplier()
+            hasGet = true
+            lastValue.asAny()
+        }
     }
 }
 

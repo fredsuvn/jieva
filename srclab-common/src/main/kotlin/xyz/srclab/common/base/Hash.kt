@@ -42,3 +42,7 @@ fun Any?.elementDeepHash(): Int {
         else -> this.hashCode()
     }
 }
+
+fun hash(vararg args: Any?): Int {
+    return Objects.hash(args)
+}

@@ -1,6 +1,6 @@
 package xyz.srclab.common.exception
 
-import xyz.srclab.common.state.State
+import xyz.srclab.common.state.stateToString
 
 enum class DefaultExceptionStatus(
     @get:JvmName("code") override val code: String,
@@ -12,6 +12,6 @@ enum class DefaultExceptionStatus(
     ;
 
     override fun toString(): String {
-        return State.toString(this)
+        return stateToString()
     }
 }
