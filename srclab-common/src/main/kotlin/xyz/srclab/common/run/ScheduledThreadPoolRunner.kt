@@ -147,14 +147,14 @@ class ScheduledThreadPoolRunner(
         }
 
         private fun createScheduledExecutorService(): ScheduledThreadPoolExecutor {
-            if (threadFactory == null) {
+            if (threadFactory === null) {
                 threadFactory = Executors.defaultThreadFactory()
             }
-            val scheduledThreadPoolExecutor = if (rejectedExecutionHandler == null) ScheduledThreadPoolExecutor(
+            val scheduledThreadPoolExecutor = if (rejectedExecutionHandler === null) ScheduledThreadPoolExecutor(
                 corePoolSize,
                 threadFactory
             ) else ScheduledThreadPoolExecutor(corePoolSize, threadFactory, rejectedExecutionHandler)
-            if (keepAliveTime != null) {
+            if (keepAliveTime !== null) {
                 scheduledThreadPoolExecutor.setKeepAliveTime(keepAliveTime.asNotNull().toNanos(), TimeUnit.NANOSECONDS)
             }
             scheduledThreadPoolExecutor.allowCoreThreadTimeOut(allowCoreThreadTimeOut)

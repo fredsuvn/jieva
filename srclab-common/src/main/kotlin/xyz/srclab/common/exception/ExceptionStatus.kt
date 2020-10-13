@@ -4,11 +4,18 @@ import xyz.srclab.common.state.*
 
 interface ExceptionStatus : StringState<ExceptionStatus> {
 
-    override fun withMoreDescription(moreDescription: String?): ExceptionStatus {
-        return if (moreDescription == null)
+    override fun withNewDescription(newDescription: String?): ExceptionStatus {
+        return if (description == newDescription)
             this
         else
-            exceptionStatusOf(code, description.moreStateDescription(moreDescription))
+            of(code, newDescription)
+    }
+
+    override fun withMoreDescription(moreDescription: String?): ExceptionStatus {
+        return if (moreDescription === null)
+            this
+        else
+            of(code, description.moreStateDescription(moreDescription))
     }
 
     companion object {

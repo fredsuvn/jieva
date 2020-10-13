@@ -15,6 +15,8 @@ interface State<C, DESC, T : State<C, DESC, T>> {
     val description: DESC?
         @JvmName("description") get
 
+    fun withNewDescription(newDescription: DESC?): T
+
     fun withMoreDescription(moreDescription: DESC?): T
 
     companion object {
@@ -39,7 +41,7 @@ interface State<C, DESC, T : State<C, DESC, T>> {
         fun toString(state: State<*, *, *>): String {
             val code = state.code
             val description = state.description
-            return if (description == null) code.toString() else "$code-$description"
+            return if (description === null) code.toString() else "$code-$description"
         }
     }
 }

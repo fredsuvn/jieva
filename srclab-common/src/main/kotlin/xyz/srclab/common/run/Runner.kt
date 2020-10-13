@@ -1,8 +1,10 @@
 package xyz.srclab.common.run
 
 import xyz.srclab.common.base.Environment
-import java.time.Duration
-import java.util.concurrent.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.ThreadPoolExecutor
 
 interface Runner {
 
@@ -10,16 +12,6 @@ interface Runner {
     fun <V> run(task: () -> V): Running<V>
 
     companion object {
-
-        private val AsyncRunner: Runner by lazy {
-            ThreadPoolRunner.Builder()
-                .corePoolSize(0)
-                .maximumPoolSize(Int.MAX_VALUE)
-                .keepAliveTime(Duration.ZERO)
-                .workQueue(SynchronousQueue())
-                .threadFactory { r -> Thread(r) }
-                .build()
-        }
 
         @JvmStatic
         fun syncRunner(): Runner {
@@ -66,13 +58,23 @@ interface Runner {
         fun threadPoolRunnerBuilder(): ThreadPoolRunner.Builder {
             return ThreadPoolRunner.Builder()
         }
+
+        @JvmStatic
+        fun <V> runSync(task: () -> V): Running<V> {
+            return syncRunner().run(task)
+        }
+
+        @JvmStatic
+        fun <V> runAsync(task: () -> V): Running<V> {
+            return asyncRunner().run(task)
+        }
     }
 }
 
-fun <V> runSync(task: () -> V): Running<V> {
-    return Runner.syncRunner().run(task)
+fun <V> (() -> V).runSync(): Running<V> {
+    return Runner.runSync(this)
 }
 
-fun <V> runAsync(task: () -> V): Running<V> {
-    return Runner.asyncRunner().run(task)
+fun <V> (() -> V).runAsync(): Running<V> {
+    return Runner.runAsync(this)
 }

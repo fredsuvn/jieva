@@ -1,7 +1,7 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.Check
 import xyz.srclab.common.base.asNotNull
+import xyz.srclab.common.base.checkState
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.Callable
@@ -14,7 +14,7 @@ open class ExecutorServiceRunner(
 ) : Runner {
 
     override fun <V> run(task: () -> V): Running<V> {
-        return ExecutorServiceRunning(executorService, task)
+        return ExecutorServiceRunning(task)
     }
 
     val isShutdown: Boolean
@@ -46,8 +46,7 @@ open class ExecutorServiceRunner(
         return executorService.toString()
     }
 
-    private class ExecutorServiceRunning<V>(
-        executorService: ExecutorService,
+    private inner class ExecutorServiceRunning<V>(
         task: () -> V
     ) : Running<V> {
 
@@ -60,18 +59,18 @@ open class ExecutorServiceRunner(
 
         override val isStart: Boolean
             get() {
-                return runningTask.startTime != null
+                return runningTask.startTime !== null
             }
 
         override val startTime: LocalDateTime
             get() {
-                Check.checkState(runningTask.startTime != null, "Task was not started.")
+                (runningTask.startTime !== null).checkState("Task was not started.")
                 return runningTask.startTime.asNotNull()
             }
 
         override val endTime: LocalDateTime
             get() {
-                Check.checkState(runningTask.endTime != null, "Task was not done.")
+                (runningTask.endTime !== null).checkState("Task was not done.")
                 return runningTask.endTime.asNotNull()
             }
 
@@ -99,7 +98,7 @@ open class ExecutorServiceRunner(
             return future.get(timeout, unit)
         }
 
-        private class RunningTask<V>(private val task: () -> V) : Callable<V> {
+        private inner class RunningTask<V>(private val task: () -> V) : Callable<V> {
 
             var startTime: LocalDateTime? = null
             var endTime: LocalDateTime? = null

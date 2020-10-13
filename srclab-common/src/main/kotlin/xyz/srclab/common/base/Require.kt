@@ -4,32 +4,32 @@
 package xyz.srclab.common.base
 
 fun <T : Any> T?.notNull(): T {
-    checkNull(this != null)
+    (this !== null).checkNull()
     return this.asNotNull()
 }
 
 fun <T : Any> T?.notNull(message: String?): T {
-    checkNull(this != null, message)
+    (this !== null).checkNull(message)
     return this.asNotNull()
 }
 
 fun <T : Any> T?.notNull(messagePattern: String?, vararg messageArgs: Any?): T {
-    checkNull(this != null, messagePattern, messageArgs)
+    (this !== null).checkNull(messagePattern, messageArgs)
     return this.asNotNull()
 }
 
 fun <T : Any> T?.notNullElement(): T {
-    checkElement(this != null)
+    (this !== null).checkElement()
     return this.asNotNull()
 }
 
 fun <T : Any> T?.notNullElement(message: String?): T {
-    checkElement(this != null, message)
+    (this !== null).checkElement(message)
     return this.asNotNull()
 }
 
 fun <T : Any> T?.notNullElement(messagePattern: String?, vararg messageArgs: Any?): T {
-    checkElement(this != null, messagePattern, messageArgs)
+    (this !== null).checkElement(messagePattern, messageArgs)
     return this.asNotNull()
 }
 

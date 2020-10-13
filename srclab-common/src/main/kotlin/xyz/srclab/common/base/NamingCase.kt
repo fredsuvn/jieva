@@ -8,12 +8,12 @@ import java.util.*
  */
 interface NamingCase {
 
-    fun split(name: CharSequence): List<String>
+    fun segment(name: CharSequence): List<String>
 
     fun join(words: List<CharSequence>): String
 
     fun convert(name: CharSequence, namingCase: NamingCase): String {
-        val words = split(name)
+        val words = segment(name)
         return namingCase.join(words)
     }
 
@@ -103,7 +103,7 @@ object CapitalizeHyphen : HyphenCase() {
 
 abstract class CamelCase : NamingCase {
 
-    override fun split(name: CharSequence): List<String> {
+    override fun segment(name: CharSequence): List<String> {
         val length = name.length
         if (length <= 1) {
             return listOf(name.toString())
@@ -173,7 +173,7 @@ abstract class CamelCase : NamingCase {
 
 abstract class UnderscoreCase : NamingCase {
 
-    override fun split(name: CharSequence): List<String> {
+    override fun segment(name: CharSequence): List<String> {
         return name.split("_")
     }
 
@@ -186,7 +186,7 @@ abstract class UnderscoreCase : NamingCase {
 
 abstract class HyphenCase : NamingCase {
 
-    override fun split(name: CharSequence): List<String> {
+    override fun segment(name: CharSequence): List<String> {
         return name.split("-")
     }
 

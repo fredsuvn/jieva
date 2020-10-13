@@ -113,35 +113,35 @@ fun Boolean.checkBounds(messagePattern: String?, vararg messageArgs: Any?) {
     }
 }
 
-fun Int.isIndexInRange(startInclusive: Int, endExclusive: Int): Boolean {
+fun Int.isIndexInBounds(startInclusive: Int, endExclusive: Int): Boolean {
     return this in startInclusive until endExclusive
 }
 
-fun Int.isIndexInRange(startInclusive: Long, endExclusive: Long): Boolean {
+fun Int.isIndexInBounds(startInclusive: Long, endExclusive: Long): Boolean {
     return this in startInclusive until endExclusive
 }
 
-fun Int.checkIndexInRange(startInclusive: Int, endExclusive: Int) {
-    isIndexInRange(startInclusive, endExclusive).checkBounds(
+fun Int.checkIndexInBounds(startInclusive: Int, endExclusive: Int) {
+    isIndexInBounds(startInclusive, endExclusive).checkBounds(
         "Index out of bounds[" +
                 "index: $this, startInclusive: $startInclusive, endExclusive: $endExclusive" +
                 "]."
     )
 }
 
-fun Int.checkIndexInRange(startInclusive: Long, endExclusive: Long) {
-    isIndexInRange(startInclusive, endExclusive).checkBounds(
+fun Int.checkIndexInBounds(startInclusive: Long, endExclusive: Long) {
+    isIndexInBounds(startInclusive, endExclusive).checkBounds(
         "Index out of bounds[" +
                 "index: $this, startInclusive: $startInclusive, endExclusive: $endExclusive" +
                 "]."
     )
 }
 
-fun isRangeInBounds(startInclusive: Int, endExclusive: Int, length: Int): Boolean {
+fun isRangeInLength(startInclusive: Int, endExclusive: Int, length: Int): Boolean {
     return startInclusive >= 0 && endExclusive <= length && startInclusive <= endExclusive
 }
 
-fun isRangeInBounds(startInclusive: Long, endExclusive: Long, length: Long): Boolean {
+fun isRangeInLength(startInclusive: Long, endExclusive: Long, length: Long): Boolean {
     return startInclusive >= 0 && endExclusive <= length && startInclusive <= endExclusive
 }
 
@@ -161,16 +161,16 @@ fun isRangeInBounds(
             && startInclusive <= endExclusive
 }
 
-fun checkRangeInBounds(startInclusive: Int, endExclusive: Int, length: Int) {
-    isRangeInBounds(startInclusive, endExclusive, length).checkBounds(
+fun checkRangeInLength(startInclusive: Int, endExclusive: Int, length: Int) {
+    isRangeInLength(startInclusive, endExclusive, length).checkBounds(
         "Range out of bounds[" +
                 "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
                 "]."
     )
 }
 
-fun checkRangeInBounds(startInclusive: Long, endExclusive: Long, length: Long) {
-    isRangeInBounds(startInclusive, endExclusive, length).checkBounds(
+fun checkRangeInLength(startInclusive: Long, endExclusive: Long, length: Long) {
+    isRangeInLength(startInclusive, endExclusive, length).checkBounds(
         "Range out of bounds[" +
                 "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
                 "]."
@@ -201,7 +201,7 @@ fun checkRangeInBounds(
 }
 
 private fun format(pattern: String?, vararg args: Any?): String? {
-    if (pattern == null) {
+    if (pattern === null) {
         return null
     }
     return fastFormat(pattern, args)

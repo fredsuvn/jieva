@@ -1,8 +1,8 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.Check
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.base.asNotNull
+import xyz.srclab.common.base.checkState
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.*
@@ -12,7 +12,7 @@ open class ScheduledExecutorServiceRunner(
 ) : ExecutorServiceRunner(scheduledExecutorService), ScheduledRunner {
 
     override fun <V> schedule(task: () -> V, delay: Duration): ScheduledRunning<V> {
-        return ScheduledExecutorServiceRunning(scheduledExecutorService, task, delay)
+        return ScheduledExecutorServiceRunning(task, delay)
     }
 
     override fun <V> scheduleAtFixedRate(
@@ -21,7 +21,6 @@ open class ScheduledExecutorServiceRunner(
         period: Duration
     ): ScheduledRunning<V> {
         return RepeatableScheduledExecutorServiceRunningAtFixedRate(
-            scheduledExecutorService,
             task,
             initialDelay,
             period
@@ -34,15 +33,13 @@ open class ScheduledExecutorServiceRunner(
         period: Duration
     ): ScheduledRunning<V> {
         return RepeatableScheduledExecutorServiceRunningWithFixedDelay(
-            scheduledExecutorService,
             task,
             initialDelay,
             period
         )
     }
 
-    private open class ScheduledExecutorServiceRunning<V>(
-        private val scheduledExecutorService: ScheduledExecutorService,
+    private open inner class ScheduledExecutorServiceRunning<V>(
         private val task: () -> V,
         private val delay: Duration
     ) : ScheduledRunning<V> {
@@ -57,18 +54,18 @@ open class ScheduledExecutorServiceRunner(
 
         override val isStart: Boolean
             get() {
-                return runningTask.startTime != null
+                return runningTask.startTime !== null
             }
 
         override val startTime: LocalDateTime
             get() {
-                Check.checkState(runningTask.startTime != null, "Task was not started.")
+                (runningTask.startTime !== null).checkState("Task was not started.")
                 return runningTask.startTime.asNotNull()
             }
 
         override val endTime: LocalDateTime
             get() {
-                Check.checkState(runningTask.endTime != null, "Task was not done.")
+                (runningTask.endTime !== null).checkState("Task was not done.")
                 return runningTask.endTime.asNotNull()
             }
 
@@ -113,12 +110,10 @@ open class ScheduledExecutorServiceRunner(
         }
     }
 
-    private open class RepeatableScheduledExecutorServiceRunning<V>(
-        private val scheduledExecutorService: ScheduledExecutorService,
+    private open inner class RepeatableScheduledExecutorServiceRunning<V>(
         private val task: () -> V,
-        private val initialDelay: Duration,
-        private val period: Duration
-    ) : ScheduledExecutorServiceRunning<V>(scheduledExecutorService, task, initialDelay) {
+        initialDelay: Duration
+    ) : ScheduledExecutorServiceRunning<V>(task, initialDelay) {
 
         override fun get(): V {
             scheduledFuture.get()
@@ -135,12 +130,11 @@ open class ScheduledExecutorServiceRunner(
         }
     }
 
-    private open class RepeatableScheduledExecutorServiceRunningAtFixedRate<V>(
-        private val scheduledExecutorService: ScheduledExecutorService,
-        private val task: () -> V,
+    private open inner class RepeatableScheduledExecutorServiceRunningAtFixedRate<V>(
+        task: () -> V,
         private val initialDelay: Duration,
         private val period: Duration
-    ) : ScheduledExecutorServiceRunning<V>(scheduledExecutorService, task, initialDelay) {
+    ) : RepeatableScheduledExecutorServiceRunning<V>(task, initialDelay) {
 
         override fun createScheduledFuture(): ScheduledFuture<V> {
             return scheduledExecutorService.scheduleAtFixedRate(
@@ -152,12 +146,11 @@ open class ScheduledExecutorServiceRunner(
         }
     }
 
-    private open class RepeatableScheduledExecutorServiceRunningWithFixedDelay<V>(
-        private val scheduledExecutorService: ScheduledExecutorService,
-        private val task: () -> V,
+    private open inner class RepeatableScheduledExecutorServiceRunningWithFixedDelay<V>(
+        task: () -> V,
         private val initialDelay: Duration,
         private val period: Duration
-    ) : ScheduledExecutorServiceRunning<V>(scheduledExecutorService, task, initialDelay) {
+    ) : RepeatableScheduledExecutorServiceRunning<V>(task, initialDelay) {
 
         override fun createScheduledFuture(): ScheduledFuture<V> {
             return scheduledExecutorService.scheduleWithFixedDelay(
@@ -184,7 +177,7 @@ open class ScheduledExecutorServiceRunner(
         }
     }
 
-    private class RepeatableRunningTask<V>(private val task: () -> V) : RunningTask<V>(task) {
+    private class RepeatableRunningTask<V>(task: () -> V) : RunningTask<V>(task) {
 
         var result: V? = null
 

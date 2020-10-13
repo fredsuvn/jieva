@@ -47,6 +47,7 @@ fun String.findResources(classLoader: ClassLoader = Current.classLoader): List<U
 
 object BytesClassLoader : ClassLoader() {
 
+    @JvmOverloads
     fun loadClass(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size): Class<*> {
         return super.defineClass(null, bytes, offset, length)
     }

@@ -130,20 +130,20 @@ open class ThreadPoolRunner(
         private fun createThreadPoolExecutor(): ThreadPoolExecutor {
             val keepTime: Long
             val keepUnit: TimeUnit
-            if (keepAliveTime == null) {
+            if (keepAliveTime === null) {
                 keepTime = 0
                 keepUnit = TimeUnit.MILLISECONDS
             } else {
                 keepTime = keepAliveTime.asNotNull().toNanos()
                 keepUnit = TimeUnit.NANOSECONDS
             }
-            if (workQueue == null) {
+            if (workQueue === null) {
                 workQueue = LinkedBlockingQueue(workQueueCapacity)
             }
-            if (threadFactory == null) {
+            if (threadFactory === null) {
                 threadFactory = Executors.defaultThreadFactory()
             }
-            val threadPoolExecutor = if (rejectedExecutionHandler == null) ThreadPoolExecutor(
+            val threadPoolExecutor = if (rejectedExecutionHandler === null) ThreadPoolExecutor(
                 corePoolSize, maximumPoolSize, keepTime, keepUnit, workQueue, threadFactory
             ) else ThreadPoolExecutor(
                 corePoolSize,

@@ -6,7 +6,7 @@ interface StringState<T : StringState<T>> : State<String, String, T> {
 
         @JvmStatic
         fun moreDescription(description: String?, moreDescription: String?): String? {
-            return if (description == null)
+            return if (description === null)
                 moreDescription
             else
                 "$description[$moreDescription]"

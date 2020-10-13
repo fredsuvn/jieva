@@ -44,5 +44,9 @@ fun Any?.elementDeepHash(): Int {
 }
 
 fun hash(vararg args: Any?): Int {
-    return Objects.hash(args)
+    return args.contentHashCode()
+}
+
+fun deepHash(vararg args: Any?): Int {
+    return args.contentDeepHashCode()
 }

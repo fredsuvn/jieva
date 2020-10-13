@@ -19,17 +19,9 @@ interface ScheduledRunner : Runner {
 
     companion object {
 
-        private val scheduledAsyncRunner: ScheduledRunner by lazy {
-            ScheduledThreadPoolRunner.Builder()
-                .corePoolSize(0)
-                .threadFactory { r -> Thread(r) }
-                .keepAliveTime(Duration.ZERO)
-                .build()
-        }
-
         @JvmStatic
         fun asyncRunner(): ScheduledRunner {
-            return scheduledAsyncRunner
+            return NewThreadScheduledRunner
         }
 
         @JvmStatic
@@ -62,12 +54,12 @@ interface ScheduledRunner : Runner {
         }
 
         @JvmStatic
-        fun <V> scheduleAsync(task: () -> V, delay: Duration): ScheduledRunning<V> {
+        fun <V> scheduleNewThread(task: () -> V, delay: Duration): ScheduledRunning<V> {
             return asyncRunner().schedule(task, delay)
         }
 
         @JvmStatic
-        fun <V> scheduleAsyncAtFixedRate(
+        fun <V> scheduleNewThreadAtFixedRate(
             task: () -> V,
             initialDelay: Duration,
             period: Duration
@@ -76,7 +68,7 @@ interface ScheduledRunner : Runner {
         }
 
         @JvmStatic
-        fun <V> scheduleAsyncWithFixedDelay(
+        fun <V> scheduleNewThreadWithFixedDelay(
             task: () -> V,
             initialDelay: Duration,
             period: Duration
@@ -84,4 +76,16 @@ interface ScheduledRunner : Runner {
             return asyncRunner().scheduleWithFixedDelay(task, initialDelay, period)
         }
     }
+}
+
+fun <V> (() -> V).scheduleNewThread(delay: Duration): ScheduledRunning<V> {
+    return ScheduledRunner.scheduleNewThread(this, delay)
+}
+
+fun <V> (() -> V).scheduleNewThreadAtFixedRate(initialDelay: Duration, period: Duration): ScheduledRunning<V> {
+    return ScheduledRunner.scheduleNewThreadAtFixedRate(this, initialDelay, period)
+}
+
+fun <V> (() -> V).scheduleNewThreadWithFixedDelay(initialDelay: Duration, period: Duration): ScheduledRunning<V> {
+    return ScheduledRunner.scheduleNewThreadWithFixedDelay(this, initialDelay, period)
 }
