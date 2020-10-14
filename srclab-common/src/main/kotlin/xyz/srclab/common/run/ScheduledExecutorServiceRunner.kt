@@ -59,13 +59,13 @@ open class ScheduledExecutorServiceRunner(
 
         override val startTime: LocalDateTime
             get() {
-                (runningTask.startTime !== null).checkState("Task was not started.")
+                checkState(runningTask.startTime !== null, "Task was not started.")
                 return runningTask.startTime.asNotNull()
             }
 
         override val endTime: LocalDateTime
             get() {
-                (runningTask.endTime !== null).checkState("Task was not done.")
+                checkState(runningTask.endTime !== null, "Task was not done.")
                 return runningTask.endTime.asNotNull()
             }
 

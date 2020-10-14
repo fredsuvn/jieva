@@ -5,6 +5,11 @@ package xyz.srclab.common.base
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.*
+import java.time.format.DateTimeFormatter
+import java.time.temporal.Temporal
 import java.util.*
 import kotlin.text.toBoolean as stringToBoolean
 import kotlin.text.toByte as stringToByte
@@ -13,12 +18,13 @@ import kotlin.text.toFloat as stringToFloat
 import kotlin.text.toInt as stringToInt
 import kotlin.text.toLong as stringToLong
 import kotlin.text.toShort as stringToShort
+import kotlin.toBigDecimal as bigIntegerToBigDecimal
 import kotlin.toString as defaultToString
 
 fun Any?.toBoolean(): Boolean {
     return when (this) {
-        null, false -> false
-        true -> true
+        null -> false
+        is Boolean -> this
         is Number -> toInt() != 0
         else -> toString().stringToBoolean()
     }
@@ -152,18 +158,21 @@ fun Any?.toDouble(): Double {
 
 fun Number?.toBigInteger(): BigInteger {
     return when (this) {
-        null, 0, 0L, 0f, 0.0 -> BigInteger.ZERO
-        1, 1L, 1f, 1.0 -> BigInteger.ONE
-        10, 10L, 10f, 10.0 -> BigInteger.TEN
+        null -> BigInteger.ZERO
         is BigInteger -> this
         is BigDecimal -> toBigInteger()
-        else -> BigInteger(toString())
+        else -> when (toInt()) {
+            0 -> BigInteger.ZERO
+            1 -> BigInteger.ONE
+            10 -> BigInteger.TEN
+            else -> BigInteger(toString())
+        }
     }
 }
 
 fun CharSequence?.toBigInteger(): BigInteger {
     return when (this) {
-        null, "0" -> BigInteger.ZERO
+        null, "", "0" -> BigInteger.ZERO
         "1" -> BigInteger.ONE
         "10" -> BigInteger.TEN
         else -> BigInteger(toString())
@@ -174,20 +183,29 @@ fun Any?.toBigInteger(): BigInteger {
     return when (this) {
         null, false -> BigInteger.ZERO
         true -> BigInteger.ONE
-        is Number -> toBigInteger()
-        is String -> toBigInteger()
-        else -> toString().toBigInteger()
+        is BigInteger -> this
+        is BigDecimal -> toBigInteger()
+        is Number -> when (toInt()) {
+            0 -> BigInteger.ZERO
+            1 -> BigInteger.ONE
+            10 -> BigInteger.TEN
+            else -> BigInteger(toString())
+        }
+        else -> BigInteger(toString())
     }
 }
 
 fun Number?.toBigDecimal(): BigDecimal {
     return when (this) {
-        null, 0, 0L, 0f, 0.0 -> BigDecimal.ZERO
-        1, 1L, 1f, 1.0 -> BigDecimal.ONE
-        10, 10L, 10f, 10.0 -> BigDecimal.TEN
-        is BigInteger -> BigDecimal(this)
+        null -> BigDecimal.ZERO
         is BigDecimal -> this
-        else -> BigDecimal(toString())
+        is BigInteger -> bigIntegerToBigDecimal()
+        else -> when (toInt()) {
+            0 -> BigDecimal.ZERO
+            1 -> BigDecimal.ONE
+            10 -> BigDecimal.TEN
+            else -> BigDecimal(toString())
+        }
     }
 }
 
@@ -204,9 +222,15 @@ fun Any?.toBigDecimal(): BigDecimal {
     return when (this) {
         null, false -> BigDecimal.ZERO
         true -> BigDecimal.ONE
-        is Number -> toBigDecimal()
-        is String -> toBigDecimal()
-        else -> toString().toBigDecimal()
+        is BigDecimal -> this
+        is BigInteger -> bigIntegerToBigDecimal()
+        is Number -> when (toInt()) {
+            0 -> BigDecimal.ZERO
+            1 -> BigDecimal.ONE
+            10 -> BigDecimal.TEN
+            else -> BigDecimal(toString())
+        }
+        else -> BigDecimal(toString())
     }
 }
 
@@ -259,5 +283,116 @@ fun Any?.elementDeepToString(): String {
         is FloatArray -> Arrays.toString(this)
         is DoubleArray -> Arrays.toString(this)
         else -> toString()
+    }
+}
+
+fun Number?.toInstant(): Instant {
+    return when (this) {
+        null, 0, 0L, 0f, 0.0 -> Instant.MIN
+        else -> Instant.ofEpochMilli(toLong())
+    }
+}
+
+private val MIN_DATE = Date(0)
+private val ISO_DATE_FORMAT = SimpleDateFormat(DateTimeFormatter.ISO_ZONED_DATE_TIME.toString())
+
+fun Any?.toDate(): Date {
+    return toDate(ISO_DATE_FORMAT)
+}
+
+fun Any?.toDate(datePattern: String): Date {
+    return toDate(SimpleDateFormat(datePattern))
+}
+
+fun Any?.toDate(dateFormat: DateFormat): Date {
+    return when (this) {
+        null, false -> MIN_DATE
+        is Date -> this
+        is Instant -> Date.from(this)
+        is Temporal -> Date.from(Instant.from(this))
+        is Number -> when (val value = toLong()) {
+            0L -> MIN_DATE
+            else -> Date(value)
+        }
+        true -> Date()
+        else -> dateFormat.parse(toString())
+    }
+}
+
+fun Any?.toInstant(): Instant {
+    return toInstant(DateTimeFormatter.ISO_INSTANT)
+}
+
+fun Any?.toInstant(dateTimePattern: String): Instant {
+    return toInstant(DateTimeFormatter.ofPattern(dateTimePattern))
+}
+
+fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter): Instant {
+    return when (this) {
+        null, false -> Instant.MIN
+        is Instant -> this
+        is Date -> Instant.ofEpochMilli(time)
+        is Temporal -> Instant.from(this)
+        is Number -> when (val value = toLong()) {
+            0L -> Instant.MIN
+            else -> Instant.ofEpochMilli(value)
+        }
+        true -> Instant.now()
+        else -> {
+            val temporal = dateTimeFormatter.parse(toString())
+            return if (temporal is Instant) temporal else Instant.from(temporal)
+        }
+    }
+}
+
+fun Any?.toTimestamp(): Instant {
+    return toInstant(Defaults.timestampFormatter)
+}
+
+fun Any?.toLocalDateTime(): LocalDateTime {
+    return toLocalDateTime(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+}
+
+fun Any?.toLocalDateTime(dateTimePattern: String): LocalDateTime {
+    return toLocalDateTime(DateTimeFormatter.ofPattern(dateTimePattern))
+}
+
+fun Any?.toLocalDateTime(dateTimeFormatter: DateTimeFormatter): LocalDateTime {
+    return LocalDateTime.ofInstant(toInstant(dateTimeFormatter), ZoneId.systemDefault())
+}
+
+fun Any?.toZonedDateTime(): ZonedDateTime {
+    return toZonedDateTime(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+}
+
+fun Any?.toZonedDateTime(dateTimePattern: String): ZonedDateTime {
+    return toZonedDateTime(DateTimeFormatter.ofPattern(dateTimePattern))
+}
+
+fun Any?.toZonedDateTime(dateTimeFormatter: DateTimeFormatter): ZonedDateTime {
+    return toInstant(dateTimeFormatter).atZone(ZoneId.systemDefault())
+}
+
+fun Any?.toOffsetDateTime(): OffsetDateTime {
+    return toOffsetDateTime(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+}
+
+fun Any?.toOffsetDateTime(dateTimePattern: String): OffsetDateTime {
+    return toOffsetDateTime(DateTimeFormatter.ofPattern(dateTimePattern))
+}
+
+fun Any?.toOffsetDateTime(dateTimeFormatter: DateTimeFormatter): OffsetDateTime {
+    return toZonedDateTime(dateTimeFormatter).toOffsetDateTime()
+}
+
+fun Any?.toDuration(): Duration {
+    return when (this) {
+        null, false -> Duration.ZERO
+        is Duration -> this
+        is Number -> when (val value = toLong()) {
+            0L -> Duration.ZERO
+            else -> Duration.ofMillis(value)
+        }
+        else -> Duration.parse(toString())
     }
 }

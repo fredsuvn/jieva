@@ -78,14 +78,14 @@ interface ScheduledRunner : Runner {
     }
 }
 
-fun <V> (() -> V).scheduleNewThread(delay: Duration): ScheduledRunning<V> {
-    return ScheduledRunner.scheduleNewThread(this, delay)
+fun <V> scheduleNewThread(task: () -> V, delay: Duration): ScheduledRunning<V> {
+    return ScheduledRunner.asyncRunner().schedule(task, delay)
 }
 
-fun <V> (() -> V).scheduleNewThreadAtFixedRate(initialDelay: Duration, period: Duration): ScheduledRunning<V> {
-    return ScheduledRunner.scheduleNewThreadAtFixedRate(this, initialDelay, period)
+fun <V> scheduleNewThreadAtFixedRate(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V> {
+    return ScheduledRunner.asyncRunner().scheduleAtFixedRate(task, initialDelay, period)
 }
 
-fun <V> (() -> V).scheduleNewThreadWithFixedDelay(initialDelay: Duration, period: Duration): ScheduledRunning<V> {
-    return ScheduledRunner.scheduleNewThreadWithFixedDelay(this, initialDelay, period)
+fun <V> scheduleNewThreadWithFixedDelay(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V> {
+    return ScheduledRunner.asyncRunner().scheduleWithFixedDelay(task, initialDelay, period)
 }

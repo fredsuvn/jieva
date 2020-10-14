@@ -3,6 +3,7 @@ package xyz.srclab.common.base
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -39,4 +40,12 @@ object Defaults {
         @JvmName("lineSeparator") get() {
             return System.lineSeparator()
         }
+
+    @JvmStatic
+    @get:JvmName("timestampPattern")
+    val timestampPattern: String = "yyyyMMddHHmmssSSS"
+
+    @JvmStatic
+    @get:JvmName("timestampFormatter")
+    val timestampFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(timestampPattern, locale)
 }

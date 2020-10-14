@@ -71,10 +71,10 @@ interface Runner {
     }
 }
 
-fun <V> (() -> V).runSync(): Running<V> {
-    return Runner.runSync(this)
+fun <V> runSync(task: () -> V): Running<V> {
+    return Runner.syncRunner().run(task)
 }
 
-fun <V> (() -> V).runAsync(): Running<V> {
-    return Runner.runAsync(this)
+fun <V> runAsync(task: () -> V): Running<V> {
+    return Runner.asyncRunner().run(task)
 }

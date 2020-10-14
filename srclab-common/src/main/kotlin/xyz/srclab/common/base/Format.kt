@@ -26,16 +26,16 @@ interface Format {
     }
 }
 
-fun fastFormat(pattern: String, vararg args: Any?): String {
-    return Format.fastFormat(pattern, *args)
+fun String.fastFormat(vararg args: Any?): String {
+    return Format.fastFormat(this, *args)
 }
 
-fun printfFormat(pattern: String, vararg args: Any?): String {
-    return Format.printfFormat(pattern, *args)
+fun String.printfFormat(vararg args: Any?): String {
+    return Format.printfFormat(this, *args)
 }
 
-fun messageFormat(pattern: String, vararg args: Any?): String {
-    return Format.messageFormat(pattern, *args)
+fun String.messageFormat(vararg args: Any?): String {
+    return Format.messageFormat(this, *args)
 }
 
 object FastFormat : Format {

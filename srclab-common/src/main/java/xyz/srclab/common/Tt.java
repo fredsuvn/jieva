@@ -37,7 +37,7 @@ public class Tt {
                 .subList(0)
                 .parentList()
                 .removeAll(new Object[0]);
-        String s = As.asAny(null);
+        String s = As.any(null);
         Running<String> running = null;
         assert running != null;
         String result = running.get();
