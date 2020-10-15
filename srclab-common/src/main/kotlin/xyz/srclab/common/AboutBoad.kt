@@ -16,13 +16,13 @@ fun aboutBoat(major: Int = 0): About {
 }
 
 private object AboutBoatV0 : About by aboutOf(
-    nameOfV0,
-    urlOfV0,
+    nameFromV0,
+    urlFromV0,
     versionOf(
         ZonedDateTime.of(
             2020, 10, 17,
             23, 59, 59, 0,
-            ZoneId.of("Asia/Shanghai")
+            zoneIdFromV0
         ),
         0, 0, 0
     ),
@@ -40,13 +40,13 @@ private object AboutBoatV0 : About by aboutOf(
 )
 
 private object AboutBoatV1 : About by aboutOf(
-    nameOfV0,
-    urlOfV0,
+    nameFromV0,
+    urlFromV0,
     versionOf(
         ZonedDateTime.of(
             2020, 11, 11,
             23, 59, 59, 0,
-            ZoneId.of("Asia/Shanghai")
+            zoneIdFromV0
         ),
         1, 0, 0
     ),
@@ -68,9 +68,11 @@ private object AboutBoatV1 : About by aboutOf(
     """.trimIndent()
 )
 
-private const val nameOfV0 = "Boat"
+private const val nameFromV0 = "Boat"
 
-private const val urlOfV0 = "https://github.com/srclab-projects/boat"
+private const val urlFromV0 = "https://github.com/srclab-projects/boat"
+
+private val zoneIdFromV0 = ZoneId.of("Asia/Shanghai")
 
 private val licenceOfApache2 = licenceOf(
     "Apache 2.0 License",
