@@ -71,7 +71,7 @@ fun Number?.toChar(): Char {
 }
 
 fun CharSequence?.toChar(): Char {
-    return this?.toString()?.stringToInt().toChar()
+    return (this?.toString()?.stringToInt() ?: 0).toChar()
 }
 
 fun Any?.toChar(): Char {

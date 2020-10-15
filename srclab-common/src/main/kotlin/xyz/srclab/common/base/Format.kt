@@ -5,44 +5,44 @@ import java.text.MessageFormat as JavaMessageFormat
 
 interface Format {
 
-    fun format(pattern: String, vararg args: Any?): String
+    fun format(pattern: CharSequence, vararg args: Any?): String
 
     companion object {
 
         @JvmStatic
-        fun fastFormat(pattern: String, vararg args: Any?): String {
+        fun fastFormat(pattern: CharSequence, vararg args: Any?): String {
             return FastFormat.format(pattern, *args)
         }
 
         @JvmStatic
-        fun printfFormat(pattern: String, vararg args: Any?): String {
+        fun printfFormat(pattern: CharSequence, vararg args: Any?): String {
             return PrintfFormat.format(pattern, *args)
         }
 
         @JvmStatic
-        fun messageFormat(pattern: String, vararg args: Any?): String {
+        fun messageFormat(pattern: CharSequence, vararg args: Any?): String {
             return MessageFormat.format(pattern, *args)
         }
     }
 }
 
-fun String.fastFormat(vararg args: Any?): String {
+fun CharSequence.fastFormat(vararg args: Any?): String {
     return Format.fastFormat(this, *args)
 }
 
-fun String.printfFormat(vararg args: Any?): String {
+fun CharSequence.printfFormat(vararg args: Any?): String {
     return Format.printfFormat(this, *args)
 }
 
-fun String.messageFormat(vararg args: Any?): String {
+fun CharSequence.messageFormat(vararg args: Any?): String {
     return Format.messageFormat(this, *args)
 }
 
 object FastFormat : Format {
 
-    override fun format(pattern: String, vararg args: Any?): String {
+    override fun format(pattern: CharSequence, vararg args: Any?): String {
         processArguments(args.asAny())
-        return Slf4jMessageFormatter.arrayFormat(pattern, args, null).message
+        return Slf4jMessageFormatter.arrayFormat(pattern.toString(), args, null).message
     }
 
     private fun processArguments(args: Array<Any?>) {
@@ -61,14 +61,14 @@ object FastFormat : Format {
 
 object PrintfFormat : Format {
 
-    override fun format(pattern: String, vararg args: Any?): String {
-        return String.format(Defaults.locale, pattern, *args)
+    override fun format(pattern: CharSequence, vararg args: Any?): String {
+        return String.format(Defaults.locale, pattern.toString(), *args)
     }
 }
 
 object MessageFormat : Format {
 
-    override fun format(pattern: String, vararg args: Any?): String {
-        return JavaMessageFormat.format(pattern, *args)
+    override fun format(pattern: CharSequence, vararg args: Any?): String {
+        return JavaMessageFormat.format(pattern.toString(), *args)
     }
 }

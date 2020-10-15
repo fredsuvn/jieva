@@ -2,7 +2,7 @@ package xyz.srclab.common.exception
 
 import xyz.srclab.common.state.*
 
-interface ExceptionStatus : StringState<ExceptionStatus> {
+interface ExceptionStatus : State<String, String, ExceptionStatus> {
 
     override fun withNewDescription(newDescription: String?): ExceptionStatus {
         return if (description == newDescription)
@@ -15,20 +15,15 @@ interface ExceptionStatus : StringState<ExceptionStatus> {
         return if (moreDescription === null)
             this
         else
-            of(code, description.moreStateDescription(moreDescription))
+            of(code, description.joinCharsStateDescription(moreDescription))
     }
 
     companion object {
 
         @JvmOverloads
         @JvmStatic
-        fun of(code: String, description: String? = null): ExceptionStatus {
+        fun of(code: CharSequence, description: CharSequence? = null): ExceptionStatus {
             return ExceptionStatusImpl(code, description)
-        }
-
-        @JvmStatic
-        fun of(state: StringState<*>): ExceptionStatus {
-            return of(state.code, state.description)
         }
     }
 }
@@ -37,14 +32,13 @@ fun exceptionStatusOf(code: String, description: String? = null): ExceptionStatu
     return ExceptionStatus.of(code, description)
 }
 
-fun exceptionStatusOf(state: StringState<*>): ExceptionStatus {
-    return ExceptionStatus.of(state)
-}
-
 private class ExceptionStatusImpl(
-    override val code: String,
-    override val description: String?
+    code: CharSequence,
+    description: CharSequence?
 ) : ExceptionStatus {
+
+    override val code = code.toString()
+    override val description = description?.toString()
 
     override fun equals(other: Any?): Boolean {
         return this.stateEquals(other)

@@ -9,9 +9,9 @@ import java.net.URL
 import java.nio.ByteBuffer
 
 @JvmOverloads
-fun <T> String.findClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
+fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
     return try {
-        Class.forName(this, true, classLoader).asAny()
+        Class.forName(this.toString(), true, classLoader).asAny()
     } catch (e: ClassNotFoundException) {
         null
     }
@@ -31,14 +31,14 @@ fun <T> ByteBuffer.loadClass(): Class<T> {
 }
 
 @JvmOverloads
-fun String.findResource(classLoader: ClassLoader = Current.classLoader): URL? {
-    return classLoader.getResource(this)
+fun CharSequence.findResource(classLoader: ClassLoader = Current.classLoader): URL? {
+    return classLoader.getResource(this.toString())
 }
 
 @JvmOverloads
-fun String.findResources(classLoader: ClassLoader = Current.classLoader): List<URL> {
+fun CharSequence.findResources(classLoader: ClassLoader = Current.classLoader): List<URL> {
     return try {
-        val urlEnumeration = classLoader.getResources(this)
+        val urlEnumeration = classLoader.getResources(this.toString())
         urlEnumeration.toList()
     } catch (e: Exception) {
         throw IllegalStateException(e)

@@ -12,8 +12,8 @@ interface Provider<T : Any> {
          * This method will ignore wrong provider specification.
          */
         @JvmStatic
-        fun <T, P : Provider<T>> parseSpec(spec: String): List<P> {
-            return CommonProviderSpecParser.parse(spec)
+        fun <T, P : Provider<T>> parse(spec: CharSequence): List<P> {
+            return CommonProviderParser.parse(spec)
         }
 
         /**
@@ -22,8 +22,8 @@ interface Provider<T : Any> {
          * This method will throw [IllegalArgumentException] when instantiate provider failed.
          */
         @JvmStatic
-        fun <T, P : Provider<T>> parseSpecStrictly(spec: String): List<P> {
-            return StrictProviderSpecParser.parse(spec)
+        fun <T, P : Provider<T>> parseStrictly(spec: CharSequence): List<P> {
+            return StrictProviderParser.parse(spec)
         }
     }
 }
@@ -33,8 +33,8 @@ interface Provider<T : Any> {
  *
  * This method will ignore wrong provider specification.
  */
-fun <T, P : Provider<T>> providerOfSpec(spec: String): List<P> {
-    return CommonProviderSpecParser.parse(spec)
+fun <T, P : Provider<T>> CharSequence.parseProvider(): List<P> {
+    return Provider.parse(this)
 }
 
 /**
@@ -42,18 +42,18 @@ fun <T, P : Provider<T>> providerOfSpec(spec: String): List<P> {
  *
  * This method will throw [IllegalArgumentException] when instantiate provider failed.
  */
-fun <T, P : Provider<T>> providerOfSpecStrictly(spec: String): List<P> {
-    return StrictProviderSpecParser.parse(spec)
+fun <T, P : Provider<T>> CharSequence.parseProviderStrictly(): List<P> {
+    return Provider.parseStrictly(this)
 }
 
-interface ProviderSpecParser {
+interface ProviderParser {
 
-    fun <T, P : Provider<T>> parse(spec: String): List<P>
+    fun <T, P : Provider<T>> parse(spec: CharSequence): List<P>
 }
 
-object CommonProviderSpecParser : ProviderSpecParser {
+object CommonProviderParser : ProviderParser {
 
-    override fun <T, P : Provider<T>> parse(spec: String): List<P> {
+    override fun <T, P : Provider<T>> parse(spec: CharSequence): List<P> {
         val classNames = spec.split(",")
         val result = ArrayList<P>(classNames.size)
         for (className in classNames) {
@@ -73,9 +73,9 @@ object CommonProviderSpecParser : ProviderSpecParser {
     }
 }
 
-object StrictProviderSpecParser : ProviderSpecParser {
+object StrictProviderParser : ProviderParser {
 
-    override fun <T, P : Provider<T>> parse(spec: String): List<P> {
+    override fun <T, P : Provider<T>> parse(spec: CharSequence): List<P> {
         val classNames = spec.split(",")
         val result = ArrayList<P>(classNames.size)
         for (className in classNames) {
