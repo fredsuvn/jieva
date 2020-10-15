@@ -20,8 +20,8 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
 
     companion object {
 
-        @JvmOverloads
         @JvmStatic
+        @JvmOverloads
         fun of(code: CharSequence, description: CharSequence? = null): ExceptionStatus {
             return ExceptionStatusImpl(code, description)
         }

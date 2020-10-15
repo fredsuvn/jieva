@@ -8,6 +8,9 @@ import xyz.srclab.common.exception.CommonException;
 import xyz.srclab.common.exception.ExceptionStatus;
 import xyz.srclab.common.run.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author sunqian
  */
@@ -56,9 +59,6 @@ public class Tt {
 
         System.out.println(Defaults.charset());
 
-        About about = About.current();
-        about.name();
-
         Environment.fileSeparator();
 
         Lazy<String> lazy = LazyKt.lazy(() -> "");
@@ -69,5 +69,9 @@ public class Tt {
         Runner r = Runner.asyncRunner();
 
         Current.milliseconds();
+
+        List<String> stringList = new ArrayList<>();
+
+        AboutBoat.aboutBoat();
     }
 }
