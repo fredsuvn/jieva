@@ -122,8 +122,32 @@ interface Version : Comparable<Version> {
         @JvmName("preRelease") get
 
     @Suppress("INAPPLICABLE_JVM_NAME")
+    val preReleaseToString: String
+        @JvmName("preReleaseToString") get() {
+            return preRelease.joinToString("")
+        }
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
     val buildMetadata: List<String>
         @JvmName("buildMetadata") get
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val buildMetadataToString: String
+        @JvmName("buildMetadataToString") get() {
+            return buildMetadata.joinToString("")
+        }
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val isNormal: Boolean
+        @JvmName("isNormal") get() {
+            return preRelease.isEmpty()
+        }
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    val isPreRelease: Boolean
+        @JvmName("isPreRelease") get() {
+            return preRelease.isNotEmpty()
+        }
 
     interface Identifier {
 

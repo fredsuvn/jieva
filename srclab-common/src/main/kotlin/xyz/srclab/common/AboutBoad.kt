@@ -48,7 +48,7 @@ private object AboutBoatV1 : About by aboutOf(
             23, 59, 59, 0,
             zoneIdFromV0
         ),
-        1, 0, 0
+        1, 0, 0, listOf("pre-plan")
     ),
     licenceOfApache2,
     poweredBySrcLab,
