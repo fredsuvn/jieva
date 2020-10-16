@@ -397,7 +397,7 @@ interface Version : Comparable<Version> {
 
     companion object {
 
-        @JvmStatic
+        @JvmField
         val IDENTIFIER_PATTERN: Pattern = Pattern.compile("[0-9A-Za-z-]+")
 
         @JvmStatic

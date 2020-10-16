@@ -1,7 +1,7 @@
 package test.xyz.srclab.common.exception
 
 import org.testng.annotations.Test
-import xyz.srclab.common.exception.CommonException
+import xyz.srclab.common.exception.StatusException
 import xyz.srclab.common.exception.DefaultExceptionStatus
 import xyz.srclab.common.exception.ExceptionStatus
 import xyz.srclab.common.exception.RuntimeExceptionWrapper
@@ -16,7 +16,7 @@ object ExceptionTest {
     @Test
     fun testBusinessException() {
         val cause = IllegalStateException()
-        val b1 = CommonException(DefaultExceptionStatus.INTERNAL)
+        val b1 = StatusException(DefaultExceptionStatus.INTERNAL)
         doAssertEquals(b1.code, DefaultExceptionStatus.INTERNAL.code)
         doAssertEquals(b1.description, DefaultExceptionStatus.INTERNAL.description)
         doAssertEquals(StateKit.equals(b1, DefaultExceptionStatus.INTERNAL), true)

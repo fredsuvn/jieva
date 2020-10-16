@@ -19,37 +19,29 @@ interface NamingCase {
 
     companion object {
 
-        @JvmStatic
-        val lowerCamel: NamingCase
-            @JvmName("lowerCamel") get() = LowerCamel
+        @JvmField
+        val LOWER_CAMEL: NamingCase = LowerCamel
 
-        @JvmStatic
-        val upperCamel: NamingCase
-            @JvmName("upperCamel") get() = UpperCamel
+        @JvmField
+        val UPPER_CAMEL: NamingCase = UpperCamel
 
-        @JvmStatic
-        val lowerUnderscore: NamingCase
-            @JvmName("lowerUnderscore") get() = LowerUnderscore
+        @JvmField
+        val LOWER_UNDERSCORE: NamingCase = LowerCamel
 
-        @JvmStatic
-        val upperUnderscore: NamingCase
-            @JvmName("upperUnderscore") get() = UpperUnderscore
+        @JvmField
+        val UPPER_UNDERSCORE: NamingCase = UpperUnderscore
 
-        @JvmStatic
-        val capitalizeUnderscore: NamingCase
-            @JvmName("capitalizeUnderscore") get() = CapitalizeUnderscore
+        @JvmField
+        val CAPITALIZE_UNDERSCORE: NamingCase = CapitalizeUnderscore
 
-        @JvmStatic
-        val lowerHyphen: NamingCase
-            @JvmName("lowerHyphen") get() = LowerHyphen
+        @JvmField
+        val LOWER_HYPHEN: NamingCase = LowerHyphen
 
-        @JvmStatic
-        val upperHyphen: NamingCase
-            @JvmName("upperHyphen") get() = UpperHyphen
+        @JvmField
+        val UPPER_HYPHEN: NamingCase = UpperHyphen
 
-        @JvmStatic
-        val capitalizeHyphen: NamingCase
-            @JvmName("capitalizeHyphen") get() = CapitalizeHyphen
+        @JvmField
+        val CAPITALIZE_HYPHEN: NamingCase = CapitalizeHyphen
     }
 }
 

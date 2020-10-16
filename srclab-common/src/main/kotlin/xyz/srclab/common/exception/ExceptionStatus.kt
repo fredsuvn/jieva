@@ -20,6 +20,12 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
 
     companion object {
 
+        @JvmField
+        val INTERNAL = of("000000", "Internal Error")
+
+        @JvmField
+        val UNKNOWN = of("000001", "Unknown Error")
+
         @JvmStatic
         @JvmOverloads
         fun of(code: CharSequence, description: CharSequence? = null): ExceptionStatus {

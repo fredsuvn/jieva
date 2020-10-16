@@ -4,8 +4,8 @@ import kotlin.Lazy;
 import kotlin.LazyKt;
 import xyz.srclab.common.base.*;
 import xyz.srclab.common.collection.ListOps;
-import xyz.srclab.common.exception.CommonException;
 import xyz.srclab.common.exception.ExceptionStatus;
+import xyz.srclab.common.exception.StatusException;
 import xyz.srclab.common.run.*;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class Tt {
 
         new ThreadPoolRunner.Builder().corePoolSize(1).build();
 
-        new CommonException((Throwable) null).code();
+        new StatusException((Throwable) null).code();
 
         ExceptionStatus exceptionStatus = null;
         exceptionStatus.code();
@@ -66,12 +66,14 @@ public class Tt {
 
         Object uv = Parts.UNINITIALIZED_VALUE;
 
-        Runner r = Runner.asyncRunner();
+        Runner r = Runner.SYNC_RUNNER;
 
         Current.milliseconds();
 
         List<String> stringList = new ArrayList<>();
 
         AboutBoat.aboutBoat();
+
+        ExceptionStatus internal = ExceptionStatus.INTERNAL;
     }
 }

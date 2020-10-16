@@ -1,67 +1,69 @@
 package xyz.srclab.common.base
 
-interface Provider<T : Any> {
+interface Provider<S, T : Any> {
 
-    fun provide(): T
+    fun parse(spec: S): List<T>
+
+    fun parseFirst(spec: S): T {
+        return parseFirstOrNull(spec) ?: throw IllegalArgumentException("Illegal provider specification: $spec")
+    }
+
+    fun parseFirstOrNull(spec: S): T?
 
     companion object {
 
-        /**
-         * Specification for provider: className1&#91, className2]...
-         *
-         * This method will ignore wrong provider specification.
-         */
         @JvmStatic
-        fun <T, P : Provider<T>> parse(spec: CharSequence): List<P> {
-            return CommonProviderParser.parse(spec)
+        fun <T : Any> ofChars(): CharsProvider<T> {
+            return CharsProvider.ofType()
         }
 
-        /**
-         * Specification for provider: className1&#91, className2]...
-         *
-         * This method will throw [IllegalArgumentException] when instantiate provider failed.
-         */
         @JvmStatic
-        fun <T, P : Provider<T>> parseStrictly(spec: CharSequence): List<P> {
-            return StrictProviderParser.parse(spec)
+        fun <T : Any> ofStrictChars(): StrictCharsProvider<T> {
+            return StrictCharsProvider.ofType()
         }
     }
 }
 
-/**
- * Specification for provider: className1&#91, className2]...
- *
- * This method will ignore wrong provider specification.
- */
-fun <T, P : Provider<T>> CharSequence.parseProvider(): List<P> {
-    return Provider.parse(this)
+fun <T : Any> providerOfChars(): CharsProvider<T> {
+    return Provider.ofChars()
 }
 
-/**
- * Specification for provider: className1&#91, className2]...
- *
- * This method will throw [IllegalArgumentException] when instantiate provider failed.
- */
-fun <T, P : Provider<T>> CharSequence.parseProviderStrictly(): List<P> {
-    return Provider.parseStrictly(this)
+fun <T : Any> strictProviderOfChars(): StrictCharsProvider<T> {
+    return Provider.ofStrictChars()
 }
 
-interface ProviderParser {
-
-    fun <T, P : Provider<T>> parse(spec: CharSequence): List<P>
+fun <T : Any> CharSequence.parseByCharsProvider(): List<T> {
+    return providerOfChars<T>().parse(this)
 }
 
-object CommonProviderParser : ProviderParser {
+fun <T : Any> CharSequence.parseFirstByCharsProvider(): T {
+    return providerOfChars<T>().parseFirst(this)
+}
 
-    override fun <T, P : Provider<T>> parse(spec: CharSequence): List<P> {
+fun <T : Any> CharSequence.parseFirstOrNullByCharsProvider(): T? {
+    return providerOfChars<T>().parseFirstOrNull(this)
+}
+
+fun <T : Any> CharSequence.parseByCharsProviderStrictly(): List<T> {
+    return strictProviderOfChars<T>().parse(this)
+}
+
+fun <T : Any> CharSequence.parseFirstByCharsProviderStrictly(): T {
+    return strictProviderOfChars<T>().parseFirst(this)
+}
+
+fun <T : Any> CharSequence.parseFirstOrNullByCharsProviderStrictly(): T? {
+    return strictProviderOfChars<T>().parseFirstOrNull(this)
+}
+
+class CharsProvider<T : Any> : Provider<CharSequence, T> {
+
+    override fun parse(spec: CharSequence): List<T> {
         val classNames = spec.split(",")
-        val result = ArrayList<P>(classNames.size)
+        val result = ArrayList<T>(classNames.size)
         for (className in classNames) {
             val trimmedClassName = className.trim()
-            val providerClass = trimmedClassName.findClass<Class<P>>() ?: continue
-            if (!Provider::class.java.isAssignableFrom(providerClass)) {
-                continue
-            }
+            val providerClass = trimmedClassName.findClass<Class<T>>() ?: continue
             val instance = try {
                 providerClass.newInstance()
             } catch (e: Exception) {
@@ -71,27 +73,72 @@ object CommonProviderParser : ProviderParser {
         }
         return result
     }
-}
 
-object StrictProviderParser : ProviderParser {
-
-    override fun <T, P : Provider<T>> parse(spec: CharSequence): List<P> {
+    override fun parseFirstOrNull(spec: CharSequence): T? {
         val classNames = spec.split(",")
-        val result = ArrayList<P>(classNames.size)
+        val result = ArrayList<T>(classNames.size)
         for (className in classNames) {
             val trimmedClassName = className.trim()
-            val providerClass = trimmedClassName.findClass<Class<P>>()
-                ?: throw IllegalArgumentException("Class $trimmedClassName was not found.")
-            if (!Provider::class.java.isAssignableFrom(providerClass)) {
-                throw IllegalArgumentException("Class $trimmedClassName is not type of ${Provider::class.java}.")
-            }
+            val providerClass = trimmedClassName.findClass<Class<T>>() ?: continue
             val instance = try {
                 providerClass.newInstance()
             } catch (e: Exception) {
-                throw IllegalArgumentException(e)
+                continue
             }
-            result.add(instance.asAny())
+            return instance.asAny()
+        }
+        return null
+    }
+
+    companion object {
+
+        private val INSTANCE = CharsProvider<Any>()
+
+        @JvmStatic
+        fun <T : Any> ofType(): CharsProvider<T> {
+            return INSTANCE.asAny()
+        }
+    }
+}
+
+class StrictCharsProvider<T : Any> : Provider<CharSequence, T> {
+
+    override fun parse(spec: CharSequence): List<T> {
+        val classNames = spec.split(",")
+        val result = ArrayList<T>(classNames.size)
+        for (className in classNames) {
+            result.add(createInstance(className))
         }
         return result
+    }
+
+    override fun parseFirstOrNull(spec: CharSequence): T? {
+        val classNames = spec.split(",")
+        for (className in classNames) {
+            return createInstance(className)
+        }
+        return null
+    }
+
+    private fun createInstance(className: CharSequence): T {
+        val trimmedClassName = className.trim()
+        val providerClass = trimmedClassName.findClass<Class<T>>()
+            ?: throw IllegalArgumentException("Class $trimmedClassName was not found.")
+        val instance = try {
+            providerClass.newInstance()
+        } catch (e: Exception) {
+            throw IllegalArgumentException(e)
+        }
+        return instance.asAny()
+    }
+
+    companion object {
+
+        private val INSTANCE = StrictCharsProvider<Any>()
+
+        @JvmStatic
+        fun <T : Any> ofType(): StrictCharsProvider<T> {
+            return INSTANCE.asAny()
+        }
     }
 }

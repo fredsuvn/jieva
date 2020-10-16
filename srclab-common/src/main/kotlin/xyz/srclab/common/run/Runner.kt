@@ -13,15 +13,11 @@ interface Runner {
 
     companion object {
 
-        @JvmStatic
-        fun syncRunner(): Runner {
-            return SyncRunner
-        }
+        @JvmField
+        val SYNC_RUNNER: Runner = SyncRunner
 
-        @JvmStatic
-        fun asyncRunner(): Runner {
-            return AsyncRunner
-        }
+        @JvmField
+        val ASYNC_RUNNER: Runner = AsyncRunner
 
         @JvmStatic
         fun singleThreadRunner(): ExecutorServiceRunner {
@@ -61,20 +57,20 @@ interface Runner {
 
         @JvmStatic
         fun <V> runSync(task: () -> V): Running<V> {
-            return syncRunner().run(task)
+            return SYNC_RUNNER.run(task)
         }
 
         @JvmStatic
         fun <V> runAsync(task: () -> V): Running<V> {
-            return asyncRunner().run(task)
+            return ASYNC_RUNNER.run(task)
         }
     }
 }
 
 fun <V> runSync(task: () -> V): Running<V> {
-    return Runner.syncRunner().run(task)
+    return Runner.SYNC_RUNNER.run(task)
 }
 
 fun <V> runAsync(task: () -> V): Running<V> {
-    return Runner.asyncRunner().run(task)
+    return Runner.ASYNC_RUNNER.run(task)
 }

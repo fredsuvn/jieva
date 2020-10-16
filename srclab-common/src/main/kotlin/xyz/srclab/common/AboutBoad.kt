@@ -9,64 +9,11 @@ import java.time.ZonedDateTime
 @JvmOverloads
 fun aboutBoat(major: Int = 0): About {
     return when (major) {
-        0 -> AboutBoatV0
-        1 -> AboutBoatV1
+        0 -> aboutBoatV0
+        1 -> aboutBoatV1
         else -> throw IllegalArgumentException("Version of major not found: $major")
     }
 }
-
-private object AboutBoatV0 : About by aboutOf(
-    nameFromV0,
-    urlFromV0,
-    versionOf(
-        ZonedDateTime.of(
-            2020, 10, 17,
-            23, 59, 59, 0,
-            zoneIdFromV0
-        ),
-        0, 0, 0
-    ),
-    licenceOfApache2,
-    poweredBySrcLab,
-    """
-        直长多行忽闲将欲拔停玉金
-        挂风歧路复来登渡剑杯盘樽
-        云破路难乘垂太黄四投珍清
-        帆浪，，舟钓行河顾箸羞酒
-        济会今行梦碧雪冰心不直斗
-        沧有安路日溪满塞茫能万十
-        海时在难边上山川然食钱千
-    """.trimIndent()
-)
-
-private object AboutBoatV1 : About by aboutOf(
-    nameFromV0,
-    urlFromV0,
-    versionOf(
-        ZonedDateTime.of(
-            2020, 11, 11,
-            23, 59, 59, 0,
-            zoneIdFromV0
-        ),
-        1, 0, 0, listOf("pre-plan")
-    ),
-    licenceOfApache2,
-    poweredBySrcLab,
-    """
-        君不见，黄河之水天上来，奔流到海不复回。
-        君不见，高堂明镜悲白发，朝如青丝暮成雪。
-        人生得意须尽欢，莫使金樽空对月。
-        天生我材必有用，千金散尽还复来。
-        烹羊宰牛且为乐，会须一饮三百杯。
-        岑夫子，丹丘生，将进酒，杯莫停。
-        与君歌一曲，请君为我倾耳听。
-        钟鼓馔玉不足贵，但愿长醉不愿醒。
-        古来圣贤皆寂寞，惟有饮者留其名。
-        陈王昔时宴平乐，斗酒十千恣欢谑。
-        主人何为言少钱，径须沽取对君酌。
-        五花马、千金裘，呼儿将出换美酒，与尔同销万古愁。
-    """.trimIndent()
-)
 
 private const val nameFromV0 = "Boat"
 
@@ -286,4 +233,57 @@ private val poweredBySrcLab = poweredByOf(
     "SrcLab",
     "https://github.com/srclab-projects",
     "fredsuvn@163.com"
+)
+
+private val aboutBoatV0 = aboutOf(
+    nameFromV0,
+    urlFromV0,
+    versionOf(
+        ZonedDateTime.of(
+            2020, 10, 17,
+            23, 59, 59, 0,
+            zoneIdFromV0
+        ),
+        0, 0, 0
+    ),
+    licenceOfApache2,
+    poweredBySrcLab,
+    """
+        直长多行忽闲将欲拔停玉金
+        挂风歧路复来登渡剑杯盘樽
+        云破路难乘垂太黄四投珍清
+        帆浪，，舟钓行河顾箸羞酒
+        济会今行梦碧雪冰心不直斗
+        沧有安路日溪满塞茫能万十
+        海时在难边上山川然食钱千
+    """.trimIndent()
+)
+
+private val aboutBoatV1 = aboutOf(
+    nameFromV0,
+    urlFromV0,
+    versionOf(
+        ZonedDateTime.of(
+            2020, 11, 11,
+            23, 59, 59, 0,
+            zoneIdFromV0
+        ),
+        1, 0, 0, listOf("pre-plan")
+    ),
+    licenceOfApache2,
+    poweredBySrcLab,
+    """
+        君不见，黄河之水天上来，奔流到海不复回。
+        君不见，高堂明镜悲白发，朝如青丝暮成雪。
+        人生得意须尽欢，莫使金樽空对月。
+        天生我材必有用，千金散尽还复来。
+        烹羊宰牛且为乐，会须一饮三百杯。
+        岑夫子，丹丘生，将进酒，杯莫停。
+        与君歌一曲，请君为我倾耳听。
+        钟鼓馔玉不足贵，但愿长醉不愿醒。
+        古来圣贤皆寂寞，惟有饮者留其名。
+        陈王昔时宴平乐，斗酒十千恣欢谑。
+        主人何为言少钱，径须沽取对君酌。
+        五花马、千金裘，呼儿将出换美酒，与尔同销万古愁。
+    """.trimIndent()
 )
