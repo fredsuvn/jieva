@@ -1,4 +1,4 @@
-@file:JvmName("Boat")
+@file:JvmName("AboutBoat")
 
 package xyz.srclab.common
 
