@@ -19,29 +19,29 @@ interface NamingCase {
 
     companion object {
 
-        @JvmField
-        val LOWER_CAMEL: NamingCase = LowerCamel
+        @JvmStatic
+        fun lowerCamel(): LowerCamel = LowerCamel
 
-        @JvmField
-        val UPPER_CAMEL: NamingCase = UpperCamel
+        @JvmStatic
+        fun upperCamel(): UpperCamel = UpperCamel
 
-        @JvmField
-        val LOWER_UNDERSCORE: NamingCase = LowerCamel
+        @JvmStatic
+        fun lowerUnderscore(): LowerUnderscore = LowerUnderscore
 
-        @JvmField
-        val UPPER_UNDERSCORE: NamingCase = UpperUnderscore
+        @JvmStatic
+        fun upperUnderscore(): UpperUnderscore = UpperUnderscore
 
-        @JvmField
-        val CAPITALIZE_UNDERSCORE: NamingCase = CapitalizeUnderscore
+        @JvmStatic
+        fun capitalizeUnderscore(): CapitalizeUnderscore = CapitalizeUnderscore
 
-        @JvmField
-        val LOWER_HYPHEN: NamingCase = LowerHyphen
+        @JvmStatic
+        fun lowerHyphen(): LowerHyphen = LowerHyphen
 
-        @JvmField
-        val UPPER_HYPHEN: NamingCase = UpperHyphen
+        @JvmStatic
+        fun upperHyphen(): UpperHyphen = UpperHyphen
 
-        @JvmField
-        val CAPITALIZE_HYPHEN: NamingCase = CapitalizeHyphen
+        @JvmStatic
+        fun capitalizeHyphen(): CapitalizeHyphen = CapitalizeHyphen
     }
 }
 

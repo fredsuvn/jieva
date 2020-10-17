@@ -66,7 +66,7 @@ public class Tt {
 
         Object uv = Parts.UNINITIALIZED_VALUE;
 
-        Runner r = Runner.SYNC_RUNNER;
+        Runner r = Runner.syncRunner();
 
         Current.milliseconds();
 
@@ -75,5 +75,7 @@ public class Tt {
         AboutBoat.aboutBoat();
 
         ExceptionStatus internal = ExceptionStatus.INTERNAL;
+
+        String parts = Parts.UNINITIALIZED_VALUE;
     }
 }

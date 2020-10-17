@@ -15,6 +15,10 @@ object SyncRunner : Runner {
         }
     }
 
+    override fun execute(command: Runnable) {
+        command.run()
+    }
+
     private abstract class Result<V>(
         override val startTime: LocalDateTime
     ) : Running<V> {

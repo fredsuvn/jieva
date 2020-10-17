@@ -9,14 +9,14 @@ interface Format {
 
     companion object {
 
-        @JvmField
-        val FAST_FORMAT: Format = FastFormat
+        @JvmStatic
+        fun fastFormat(): FastFormat = FastFormat
 
-        @JvmField
-        val PRINTF_FORMAT: Format = PrintfFormat
+        @JvmStatic
+        fun printfFormat(): PrintfFormat = PrintfFormat
 
-        @JvmField
-        val MESSAGE_FORMAT: Format = MessageFormat
+        @JvmStatic
+        fun messageFormat(): MessageFormat = MessageFormat
 
         @JvmStatic
         fun fastFormat(pattern: CharSequence, vararg args: Any?): String {

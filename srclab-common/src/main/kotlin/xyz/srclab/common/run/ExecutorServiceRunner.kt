@@ -17,6 +17,10 @@ open class ExecutorServiceRunner(
         return ExecutorServiceRunning(task)
     }
 
+    override fun execute(command: Runnable) {
+        executorService.execute(command)
+    }
+
     val isShutdown: Boolean
         @JvmName("isShutdown") get() {
             return executorService.isShutdown

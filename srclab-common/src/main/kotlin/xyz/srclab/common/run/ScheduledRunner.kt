@@ -19,8 +19,8 @@ interface ScheduledRunner : Runner {
 
     companion object {
 
-        @JvmField
-        val ASYNC_RUNNER: ScheduledRunner = NewThreadScheduledRunner
+        @JvmStatic
+        fun asyncRunner(): NewThreadScheduledRunner = NewThreadScheduledRunner
 
         @JvmStatic
         fun singleThreadRunner(): ScheduledExecutorServiceRunner {
@@ -53,7 +53,7 @@ interface ScheduledRunner : Runner {
 
         @JvmStatic
         fun <V> scheduleNewThread(task: () -> V, delay: Duration): ScheduledRunning<V> {
-            return ASYNC_RUNNER.schedule(task, delay)
+            return asyncRunner().schedule(task, delay)
         }
 
         @JvmStatic
@@ -62,7 +62,7 @@ interface ScheduledRunner : Runner {
             initialDelay: Duration,
             period: Duration
         ): ScheduledRunning<V> {
-            return ASYNC_RUNNER.scheduleAtFixedRate(task, initialDelay, period)
+            return asyncRunner().scheduleAtFixedRate(task, initialDelay, period)
         }
 
         @JvmStatic
@@ -71,19 +71,19 @@ interface ScheduledRunner : Runner {
             initialDelay: Duration,
             period: Duration
         ): ScheduledRunning<V> {
-            return ASYNC_RUNNER.scheduleWithFixedDelay(task, initialDelay, period)
+            return asyncRunner().scheduleWithFixedDelay(task, initialDelay, period)
         }
     }
 }
 
 fun <V> scheduleNewThread(task: () -> V, delay: Duration): ScheduledRunning<V> {
-    return ScheduledRunner.ASYNC_RUNNER.schedule(task, delay)
+    return ScheduledRunner.scheduleNewThread(task, delay)
 }
 
 fun <V> scheduleNewThreadAtFixedRate(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V> {
-    return ScheduledRunner.ASYNC_RUNNER.scheduleAtFixedRate(task, initialDelay, period)
+    return ScheduledRunner.scheduleNewThreadAtFixedRate(task, initialDelay, period)
 }
 
 fun <V> scheduleNewThreadWithFixedDelay(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V> {
-    return ScheduledRunner.ASYNC_RUNNER.scheduleWithFixedDelay(task, initialDelay, period)
+    return ScheduledRunner.scheduleNewThreadWithFixedDelay(task, initialDelay, period)
 }

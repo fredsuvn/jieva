@@ -1,23 +1,20 @@
 package xyz.srclab.common.run
 
 import xyz.srclab.common.base.Environment
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.RejectedExecutionException
-import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.*
 
-interface Runner {
+interface Runner : Executor {
 
     @Throws(RejectedExecutionException::class)
     fun <V> run(task: () -> V): Running<V>
 
     companion object {
 
-        @JvmField
-        val SYNC_RUNNER: Runner = SyncRunner
+        @JvmStatic
+        fun syncRunner(): SyncRunner = SyncRunner
 
-        @JvmField
-        val ASYNC_RUNNER: Runner = AsyncRunner
+        @JvmStatic
+        fun asyncRunner(): AsyncRunner = AsyncRunner
 
         @JvmStatic
         fun singleThreadRunner(): ExecutorServiceRunner {
@@ -57,20 +54,20 @@ interface Runner {
 
         @JvmStatic
         fun <V> runSync(task: () -> V): Running<V> {
-            return SYNC_RUNNER.run(task)
+            return syncRunner().run(task)
         }
 
         @JvmStatic
         fun <V> runAsync(task: () -> V): Running<V> {
-            return ASYNC_RUNNER.run(task)
+            return asyncRunner().run(task)
         }
     }
 }
 
 fun <V> runSync(task: () -> V): Running<V> {
-    return Runner.SYNC_RUNNER.run(task)
+    return Runner.runSync(task)
 }
 
 fun <V> runAsync(task: () -> V): Running<V> {
-    return Runner.ASYNC_RUNNER.run(task)
+    return Runner.runAsync(task)
 }

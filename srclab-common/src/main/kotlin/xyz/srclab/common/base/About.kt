@@ -397,8 +397,10 @@ interface Version : Comparable<Version> {
 
     companion object {
 
-        @JvmField
         val IDENTIFIER_PATTERN: Pattern = Pattern.compile("[0-9A-Za-z-]+")
+
+        @JvmStatic
+        fun identifierPattern(): Pattern = IDENTIFIER_PATTERN
 
         @JvmStatic
         @JvmOverloads
@@ -485,23 +487,23 @@ interface Version : Comparable<Version> {
                 }
             }
 
-            val hyphenCount = HYPHEN_MATCHER.countIn(spec)
+            val hyphenCount = Parts.hyphenMatcher().countIn(spec)
             checkArgument(
                 hyphenCount == 0 || hyphenCount == 1,
                 "Illegal version specification, hyphen count should be 0 or 1."
             )
-            val hyphenIndex = HYPHEN_MATCHER.indexIn(spec)
+            val hyphenIndex = Parts.hyphenMatcher().indexIn(spec)
             checkArgument(
                 hyphenIndex < 0 || hyphenIndex in 1..spec.length - 2,
                 "Illegal hyphen position: {}.", hyphenIndex
             )
 
-            val plusSignCount = PLUS_SIGN_MATCHER.countIn(spec)
+            val plusSignCount = Parts.plusSignMatcher().countIn(spec)
             checkArgument(
                 plusSignCount == 0 || plusSignCount == 1,
                 "Illegal version specification, plus sign count should be 0 or 1."
             )
-            val plusSignIndex = PLUS_SIGN_MATCHER.indexIn(spec)
+            val plusSignIndex = Parts.plusSignMatcher().indexIn(spec)
             checkArgument(
                 plusSignIndex < 0 || plusSignIndex in 1..spec.length - 2,
                 "Illegal plus sign position: {}.", plusSignIndex
