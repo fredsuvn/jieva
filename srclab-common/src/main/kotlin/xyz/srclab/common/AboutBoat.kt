@@ -1,4 +1,4 @@
-@file:JvmName("AboutBoat")
+@file:JvmName("Boat")
 
 package xyz.srclab.common
 
@@ -7,13 +7,15 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @JvmOverloads
-fun aboutBoat(major: Int = 0): About {
+fun aboutBoat(major: Int = currentMajor): About {
     return when (major) {
         0 -> aboutBoatV0
         1 -> aboutBoatV1
         else -> throw IllegalArgumentException("Version of major not found: $major")
     }
 }
+
+private const val currentMajor = 0
 
 private const val nameFromV0 = "Boat"
 
@@ -287,3 +289,31 @@ private val aboutBoatV1 = aboutOf(
         五花马、千金裘，呼儿将出换美酒，与尔同销万古愁。
     """.trimIndent()
 )
+
+interface Egg {
+
+    fun start()
+}
+
+class EggNotFoundException : RuntimeException("You asked me for an egg? Now I give you a bullshit!")
+
+@JvmOverloads
+fun giveMeAnEgg(major: Int = currentMajor): Egg {
+    return when (major) {
+        0 -> ALoneBoatWithAStrawDressedOldFisherInTheSnow
+        1 -> Starmon
+        else -> throw EggNotFoundException()
+    }
+}
+
+private object ALoneBoatWithAStrawDressedOldFisherInTheSnow : Egg {
+    override fun start() {
+        TODO("Not yet implemented")
+    }
+}
+
+private object Starmon : Egg {
+    override fun start() {
+        TODO("Not yet implemented")
+    }
+}
