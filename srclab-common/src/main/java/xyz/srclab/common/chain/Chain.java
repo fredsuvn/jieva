@@ -7,7 +7,7 @@ import xyz.srclab.common.base.Require;
 import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.collection.MapOps;
 import xyz.srclab.common.collection.SetOps;
-import xyz.srclab.common.lang.count.Counter;
+import xyz.srclab.common.base.Counter;
 
 import java.util.*;
 import java.util.function.*;

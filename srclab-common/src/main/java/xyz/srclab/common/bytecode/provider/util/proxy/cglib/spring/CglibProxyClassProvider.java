@@ -2,7 +2,7 @@ package xyz.srclab.common.bytecode.provider.util.proxy.cglib.spring;
 
 import org.springframework.cglib.proxy.*;
 import xyz.srclab.common.exception.RuntimeExceptionWrapper;
-import xyz.srclab.common.lang.count.Counter;
+import xyz.srclab.common.base.Counter;
 import xyz.srclab.common.util.proxy.*;
 
 import java.lang.reflect.Method;
