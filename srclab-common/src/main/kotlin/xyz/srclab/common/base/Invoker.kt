@@ -138,10 +138,17 @@ private class ReflectedStaticMethodInvoker(private val method: Method) : StaticI
 private class ReflectedVirtualMethodInvoker(private val method: Method) : VirtualInvoker {
 
     override fun <T> invoke(vararg args: Any?): T {
-        return method.invoke(null, *args).asAny()
+        checkArgument(args.isNotEmpty(), "Arguments of invoking cannot be empty.")
+        val owner = args[0]
+        val arguments = args.copyOfRange(1, args.size)
+        return invoke0(owner, *arguments)
     }
 
     override fun <T> invoke(owner: Any?, vararg args: Any?): T {
+        return invoke0(owner, args)
+    }
+
+    private fun <T> invoke0(owner: Any?, vararg args: Any?): T {
         return method.invoke(owner, *args).asAny()
     }
 }
