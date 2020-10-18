@@ -12,8 +12,13 @@ interface EventBus {
 
     fun unregister(eventHandler: EventHandler<*>)
 
-    @Throws(RejectedExecutionException::class, EventHandlerNotFoundException::class)
-    fun <T : Any> emit(event: T)
+    @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
+    fun <T : Any> emit(event: T) {
+        return emit(event::class.java, event)
+    }
+
+    @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
+    fun <T : Any> emit(eventType: Class<*>, event: T)
 
     companion object {
 
@@ -49,8 +54,7 @@ private class EventBusImpl(private val executor: Executor) : EventBus {
         eventHandlerMap.remove(eventHandler.eventType)
     }
 
-    override fun <T : Any> emit(event: T) {
-        val eventType = event::class.java
+    override fun <T : Any> emit(eventType: Class<*>, event: T) {
         val eventHandler: EventHandler<T>? = eventHandlerMap[eventType].asAny()
         if (eventHandler === null) {
             throw EventHandlerNotFoundException(eventType)
