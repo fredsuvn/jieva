@@ -128,6 +128,9 @@ object MethodHandlerInvokerProvider : InvokerProvider {
     }
 }
 
+private const val CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE =
+    "Arguments of virtual invoking cannot be empty, it contains at least a \"this\" object at first."
+
 private class ReflectedStaticMethodInvoker(private val method: Method) : StaticInvoker {
 
     override fun <T> invoke(vararg args: Any?): T {
@@ -138,7 +141,7 @@ private class ReflectedStaticMethodInvoker(private val method: Method) : StaticI
 private class ReflectedVirtualMethodInvoker(private val method: Method) : VirtualInvoker {
 
     override fun <T> invoke(vararg args: Any?): T {
-        checkArgument(args.isNotEmpty(), "Arguments of virtual invoking cannot be empty.")
+        checkArgument(args.isNotEmpty(), CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE)
         val owner = args[0]
         val arguments = args.copyOfRange(1, args.size)
         return invoke0(owner, *arguments)
@@ -211,7 +214,7 @@ private class VirtualMethodHandlerInvoker(method: Method) : VirtualInvoker {
     private var methodHandle = findMethodHandle(method)
 
     override fun <T> invoke(vararg args: Any?): T {
-        checkArgument(args.isNotEmpty(), "Arguments of virtual invoking cannot be empty.")
+        checkArgument(args.isNotEmpty(), CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE)
         val owner = args[0]
         val arguments = args.copyOfRange(1, args.size)
         return invoke0(owner, *arguments)
