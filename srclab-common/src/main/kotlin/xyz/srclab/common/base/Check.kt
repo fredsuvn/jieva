@@ -19,7 +19,7 @@ fun checkArgument(expression: Boolean, message: String?) {
 
 fun checkArgument(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw IllegalArgumentException(format(messagePattern, messageArgs))
+        throw IllegalArgumentException(format(messagePattern, *messageArgs))
     }
 }
 
@@ -37,7 +37,7 @@ fun checkState(expression: Boolean, message: String?) {
 
 fun checkState(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw IllegalStateException(format(messagePattern, messageArgs))
+        throw IllegalStateException(format(messagePattern, *messageArgs))
     }
 }
 
@@ -55,7 +55,7 @@ fun checkNull(expression: Boolean, message: String?) {
 
 fun checkNull(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw NullPointerException(format(messagePattern, messageArgs))
+        throw NullPointerException(format(messagePattern, *messageArgs))
     }
 }
 
@@ -73,7 +73,7 @@ fun checkSupported(expression: Boolean, message: String?) {
 
 fun checkSupported(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw UnsupportedOperationException(format(messagePattern, messageArgs))
+        throw UnsupportedOperationException(format(messagePattern, *messageArgs))
     }
 }
 
@@ -91,7 +91,7 @@ fun checkElement(expression: Boolean, message: String?) {
 
 fun checkElement(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw NoSuchElementException(format(messagePattern, messageArgs))
+        throw NoSuchElementException(format(messagePattern, *messageArgs))
     }
 }
 
@@ -109,7 +109,7 @@ fun checkBounds(expression: Boolean, message: String?) {
 
 fun checkBounds(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw IndexOutOfBoundsException(format(messagePattern, messageArgs))
+        throw IndexOutOfBoundsException(format(messagePattern, *messageArgs))
     }
 }
 
@@ -117,26 +117,28 @@ fun isIndexInBounds(index: Int, startInclusive: Int, endExclusive: Int): Boolean
     return index in startInclusive until endExclusive
 }
 
-fun isIndexInBounds(index: Int, startInclusive: Long, endExclusive: Long): Boolean {
+fun isIndexInBounds(index: Long, startInclusive: Long, endExclusive: Long): Boolean {
     return index in startInclusive until endExclusive
 }
 
 fun checkIndexInBounds(index: Int, startInclusive: Int, endExclusive: Int) {
-    checkBounds(
-        isIndexInBounds(index, startInclusive, endExclusive),
-        "Index out of bounds[" +
-                "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
-                "]."
-    )
+    if (!isIndexInBounds(index, startInclusive, endExclusive)) {
+        throw IndexOutOfBoundsException(
+            "Index out of bounds[" +
+                    "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
+                    "]."
+        )
+    }
 }
 
-fun checkIndexInBounds(index: Int, startInclusive: Long, endExclusive: Long) {
-    checkBounds(
-        isIndexInBounds(index, startInclusive, endExclusive),
-        "Index out of bounds[" +
-                "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
-                "]."
-    )
+fun checkIndexInBounds(index: Long, startInclusive: Long, endExclusive: Long) {
+    if (!isIndexInBounds(index, startInclusive, endExclusive)) {
+        throw IndexOutOfBoundsException(
+            "Index out of bounds[" +
+                    "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
+                    "]."
+        )
+    }
 }
 
 fun isRangeInLength(startInclusive: Int, endExclusive: Int, length: Int): Boolean {
@@ -164,31 +166,34 @@ fun isRangeInBounds(
 }
 
 fun checkRangeInLength(startInclusive: Int, endExclusive: Int, length: Int) {
-    checkBounds(
-        isRangeInLength(startInclusive, endExclusive, length),
-        "Range out of bounds[" +
-                "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
-                "]."
-    )
+    if (!isRangeInLength(startInclusive, endExclusive, length)) {
+        throw IndexOutOfBoundsException(
+            "Range out of bounds[" +
+                    "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
+                    "]."
+        )
+    }
 }
 
 fun checkRangeInLength(startInclusive: Long, endExclusive: Long, length: Long) {
-    checkBounds(
-        isRangeInLength(startInclusive, endExclusive, length),
-        "Range out of bounds[" +
-                "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
-                "]."
-    )
+    if (!isRangeInLength(startInclusive, endExclusive, length)) {
+        throw IndexOutOfBoundsException(
+            "Range out of bounds[" +
+                    "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
+                    "]."
+        )
+    }
 }
 
 fun checkRangeInBounds(startInclusive: Int, endExclusive: Int, startBoundInclusive: Int, endBoundExclusive: Int) {
-    checkBounds(
-        isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive),
-        "Range out of bounds[" +
-                "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
-                "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +
-                "]."
-    )
+    if (!isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive)) {
+        throw IndexOutOfBoundsException(
+            "Range out of bounds[" +
+                    "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
+                    "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +
+                    "]."
+        )
+    }
 }
 
 fun checkRangeInBounds(
@@ -197,18 +202,19 @@ fun checkRangeInBounds(
     startBoundInclusive: Long,
     endBoundExclusive: Long
 ) {
-    checkBounds(
-        isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive),
-        "Range out of bounds[" +
-                "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
-                "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +
-                "]."
-    )
+    if (!isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive)) {
+        throw IndexOutOfBoundsException(
+            "Range out of bounds[" +
+                    "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
+                    "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +
+                    "]."
+        )
+    }
 }
 
 private fun format(pattern: String?, vararg args: Any?): String? {
     if (pattern === null) {
         return null
     }
-    return pattern.fastFormat(args)
+    return pattern.fastFormat(*args)
 }

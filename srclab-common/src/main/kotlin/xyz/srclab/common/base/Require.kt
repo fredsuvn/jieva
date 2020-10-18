@@ -14,7 +14,7 @@ fun <T : Any> T?.notNull(message: String?): T {
 }
 
 fun <T : Any> T?.notNull(messagePattern: String?, vararg messageArgs: Any?): T {
-    checkNull(this !== null, messagePattern, messageArgs)
+    checkNull(this !== null, messagePattern, *messageArgs)
     return this.asNotNull()
 }
 
@@ -29,7 +29,7 @@ fun <T : Any> T?.notNullElement(message: String?): T {
 }
 
 fun <T : Any> T?.notNullElement(messagePattern: String?, vararg messageArgs: Any?): T {
-    checkElement(this !== null, messagePattern, messageArgs)
+    checkElement(this !== null, messagePattern, *messageArgs)
     return this.asNotNull()
 }
 
