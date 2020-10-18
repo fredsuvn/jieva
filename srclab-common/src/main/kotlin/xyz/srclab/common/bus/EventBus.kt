@@ -12,13 +12,8 @@ interface EventBus {
 
     fun unregister(eventHandler: EventHandler<*>)
 
-    @Throws(RejectedExecutionException::class)
+    @Throws(RejectedExecutionException::class, EventHandlerNotFoundException::class)
     fun <T : Any> emit(event: T)
-
-    /**
-     * @param onError cause may be [RejectedExecutionException], [EventHandlerNotFoundException]
-     */
-    fun <T : Any> emit(event: T, onError: (cause: Exception) -> Unit)
 
     companion object {
 
@@ -55,26 +50,15 @@ private class EventBusImpl(private val executor: Executor) : EventBus {
     }
 
     override fun <T : Any> emit(event: T) {
-        val eventHandler: EventHandler<T>? = eventHandlerMap[event::class.java].asAny()
-        if (eventHandler === null) {
-            return
-        }
-        executor.execute { eventHandler.handle(event) }
-    }
-
-    override fun <T : Any> emit(event: T, onError: (cause: Exception) -> Unit) {
         val eventType = event::class.java
         val eventHandler: EventHandler<T>? = eventHandlerMap[eventType].asAny()
         if (eventHandler === null) {
-            val eventHandlerNotFoundException = EventHandlerNotFoundException(eventType)
-            onError(eventHandlerNotFoundException)
-            return
+            throw EventHandlerNotFoundException(eventType)
         }
         try {
             executor.execute { eventHandler.handle(event) }
         } catch (e: Exception) {
-            onError(e)
-            return
+            throw e
         }
     }
 }
