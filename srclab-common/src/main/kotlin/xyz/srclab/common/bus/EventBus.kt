@@ -34,14 +34,6 @@ interface EventBus {
     }
 }
 
-fun syncEventBus(): EventBus {
-    return EventBus.sync()
-}
-
-fun asyncEventBus(executor: Executor): EventBus {
-    return EventBus.async(executor)
-}
-
 private class EventBusImpl(private val executor: Executor) : EventBus {
 
     private val eventHandlerMap: MutableMap<Class<*>, EventHandler<*>> = ConcurrentHashMap()
