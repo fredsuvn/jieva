@@ -9,6 +9,39 @@ import java.util.stream.StreamSupport
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
+import kotlin.collections.all as allKt
+import kotlin.collections.any as anyKt
+import kotlin.collections.contains as containsKt
+import kotlin.collections.count as countKt
+import kotlin.collections.drop as dropKt
+import kotlin.collections.dropWhile as dropWhileKt
+import kotlin.collections.elementAt as elementAtKt
+import kotlin.collections.elementAtOrElse as elementAtOrElseKt
+import kotlin.collections.elementAtOrNull as elementAtOrNullKt
+import kotlin.collections.filter as filterKt
+import kotlin.collections.filterIndexed as filterIndexedKt
+import kotlin.collections.filterIndexedTo as filterIndexedToKt
+import kotlin.collections.filterNotNull as filterNotNullKt
+import kotlin.collections.filterNotNullTo as filterNotNullToKt
+import kotlin.collections.filterTo as filterToKt
+import kotlin.collections.find as findKt
+import kotlin.collections.first as firstKt
+import kotlin.collections.firstOrNull as firstOrNullKt
+import kotlin.collections.last as lastKt
+import kotlin.collections.lastOrNull as lastOrNullKt
+import kotlin.collections.map as mapKt
+import kotlin.collections.mapIndexed as mapIndexedKt
+import kotlin.collections.mapIndexedNotNull as mapIndexedNotNullKt
+import kotlin.collections.mapIndexedNotNullTo as mapIndexedNotNullToKt
+import kotlin.collections.mapIndexedTo as mapIndexedToKt
+import kotlin.collections.mapNotNull as mapNotNullKt
+import kotlin.collections.mapNotNullTo as mapNotNullToKt
+import kotlin.collections.mapTo as mapToKt
+import kotlin.collections.none as noneKt
+import kotlin.collections.random as randomKt
+import kotlin.collections.randomOrNull as randomOrNullKt
+import kotlin.collections.take as takeKt
+import kotlin.collections.takeWhile as takeWhileKt
 
 abstract class BaseIterableOps<T, I : Iterable<T>, MI : MutableIterable<T>, THIS : BaseIterableOps<T, I, MI, THIS>>
 protected constructor(operated: I) : MutableIterable<T> {
@@ -850,7 +883,7 @@ protected constructor(operated: I) : MutableIterable<T> {
     }
 
     protected fun mutableOperated(): MI {
-        return As.any(operated())
+        return operated().asAny()
     }
 
     protected abstract fun toSelfOps(): THIS
@@ -866,64 +899,290 @@ protected constructor(operated: I) : MutableIterable<T> {
     companion object {
 
         @JvmStatic
-        inline fun <T> forEachIndexed(iterable: Iterable<T>, action: (index: Int, T) -> Unit) {
-            return iterable.forEachIndexed(action)
+        fun <T> Iterable<T>.contains(element: T): Boolean {
+            return this.containsKt(element)
         }
 
         @JvmStatic
-        inline fun <T, R> map(iterable: Iterable<T>, transform: (T) -> R): List<R> {
-            return iterable.map(transform)
+        fun <T> Iterable<T>.containsAll(elements: Array<out T>): Boolean {
+            return this.containsAll(elements.toSet())
         }
 
         @JvmStatic
-        inline fun <T, R> mapIndexed(iterable: Iterable<T>, transform: (index: Int, T) -> R): List<R> {
-            return iterable.mapIndexed(transform)
+        fun <T> Iterable<T>.containsAll(elements: Iterable<T>): Boolean {
+            return this.containsAll(elements.toSet())
         }
 
         @JvmStatic
-        inline fun <T, R : Any> mapNotNull(iterable: Iterable<T>, transform: (T) -> R?): List<R> {
-            return iterable.mapNotNull(transform)
+        fun <T> Iterable<T>.containsAll(elements: Collection<T>): Boolean {
+            return this.toSet().containsAll(elements)
         }
 
         @JvmStatic
-        inline fun <T, R : Any> mapIndexedNotNull(iterable: Iterable<T>, transform: (index: Int, T) -> R?): List<R> {
-            return iterable.mapIndexedNotNull(transform)
+        fun <T> Iterable<T>.count(): Int {
+            return this.countKt()
         }
 
         @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> mapTo(
-            iterable: Iterable<T>,
+        inline fun <T> Iterable<T>.count(predicate: (T) -> Boolean): Int {
+            return this.countKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.isEmpty(): Boolean {
+            var hasElement = false
+            for (t in this) {
+                hasElement = true
+                break
+            }
+            return !hasElement
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.isNotEmpty(): Boolean {
+            return !this.isEmpty()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.any(): Boolean {
+            return this.anyKt()
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.any(predicate: (T) -> Boolean): Boolean {
+            return this.anyKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.none(): Boolean {
+            return this.noneKt()
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.none(predicate: (T) -> Boolean): Boolean {
+            return this.noneKt(predicate)
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.all(predicate: (T) -> Boolean): Boolean {
+            return this.allKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.first(): T {
+            return this.firstKt()
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.first(predicate: (T) -> Boolean): T {
+            return this.firstKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.firstOrNull(): T? {
+            return this.firstOrNullKt()
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.firstOrNull(predicate: (T) -> Boolean): T? {
+            return this.firstOrNullKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.last(): T {
+            return this.lastKt()
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.last(predicate: (T) -> Boolean): T {
+            return this.lastKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.lastOrNull(): T? {
+            return this.lastOrNullKt()
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.lastOrNull(predicate: (T) -> Boolean): T? {
+            return this.lastOrNullKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.random(): T {
+            return this.toList().randomKt()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.random(random: Random): T {
+            return this.toList().randomKt(random)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.randomOrNull(): T? {
+            return this.toList().randomOrNullKt()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.randomOrNull(random: Random): T? {
+            return this.toList().randomOrNullKt(random)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.elementAt(index: Int): T {
+            return this.elementAtKt(index)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.elementAtOrElse(index: Int, defaultValue: (index: Int) -> T): T {
+            return this.elementAtOrElseKt(index, defaultValue)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.elementAtOrNull(index: Int): T? {
+            return this.elementAtOrNullKt(index)
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.find(predicate: (T) -> Boolean): T? {
+            return this.findKt(predicate)
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.findLast(predicate: (T) -> Boolean): T? {
+            return this.firstKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.take(n: Int): List<T> {
+            return this.takeKt(n)
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.takeWhile(predicate: (T) -> Boolean): List<T> {
+            return this.takeWhileKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T, C : MutableCollection<in T>> Iterable<T>.takeTo(n: Int, destination: C): C {
+            destination.addAll(this.take(n))
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T, C : MutableCollection<in T>> Iterable<T>.takeWhileTo(
             destination: C,
-            transform: (T) -> R
+            predicate: (T) -> Boolean
         ): C {
-            return iterable.mapTo(destination, transform)
+            destination.addAll(this.takeWhile(predicate))
+            return destination
         }
 
         @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> mapIndexedTo(
-            iterable: Iterable<T>,
+        fun <T> Iterable<T>.drop(n: Int): List<T> {
+            return this.dropKt(n)
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.dropWhile(predicate: (T) -> Boolean): List<T> {
+            return this.dropWhileKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T, C : MutableCollection<in T>> Iterable<T>.dropTo(n: Int, destination: C): C {
+            destination.addAll(this.drop(n))
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T, C : MutableCollection<in T>> Iterable<T>.dropWhileTo(
+            destination: C,
+            predicate: (T) -> Boolean
+        ): C {
+            destination.addAll(this.dropWhile(predicate))
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.filter(predicate: (T) -> Boolean): List<T> {
+            return this.filterKt(predicate)
+        }
+
+        @JvmStatic
+        inline fun <T> Iterable<T>.filterIndexed(predicate: (index: Int, T) -> Boolean): List<T> {
+            return this.filterIndexedKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T : Any> Iterable<T>.filterNotNull(): List<T> {
+            return this.filterNotNullKt()
+        }
+
+        @JvmStatic
+        inline fun <T, C : MutableCollection<in T>> Iterable<T>.filterTo(destination: C, predicate: (T) -> Boolean): C {
+            return this.filterToKt(destination, predicate)
+        }
+
+        @JvmStatic
+        inline fun <T, C : MutableCollection<in T>> Iterable<T>.filterIndexedTo(
+            destination: C,
+            predicate: (index: Int, T) -> Boolean
+        ): C {
+            return this.filterIndexedToKt(destination, predicate)
+        }
+
+        @JvmStatic
+        fun <C : MutableCollection<in T>, T : Any> Iterable<T>.filterNotNullTo(destination: C): C {
+            return this.filterNotNullToKt(destination)
+        }
+
+        @JvmStatic
+        inline fun <T, R> Iterable<T>.map(transform: (T) -> R): List<R> {
+            return this.mapKt(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R> Iterable<T>.mapIndexed(transform: (index: Int, T) -> R): List<R> {
+            return this.mapIndexedKt(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R : Any> Iterable<T>.mapNotNull(transform: (T) -> R?): List<R> {
+            return this.mapNotNullKt(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R : Any> Iterable<T>.mapIndexedNotNull(transform: (index: Int, T) -> R?): List<R> {
+            return this.mapIndexedNotNullKt(transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapTo(destination: C, transform: (T) -> R): C {
+            return this.mapToKt(destination, transform)
+        }
+
+        @JvmStatic
+        inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapIndexedTo(
             destination: C,
             transform: (index: Int, T) -> R
         ): C {
-            return iterable.mapIndexedTo(destination, transform)
+            return this.mapIndexedToKt(destination, transform)
         }
 
         @JvmStatic
-        inline fun <T, R : Any, C : MutableCollection<in R>> mapNotNullTo(
-            iterable: Iterable<T>,
+        inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapNotNullTo(
             destination: C,
             transform: (T) -> R?
         ): C {
-            return iterable.mapNotNullTo(destination, transform)
+            return this.mapNotNullToKt(destination, transform)
         }
 
         @JvmStatic
-        inline fun <T, R : Any, C : MutableCollection<in R>> mapIndexedNotNullTo(
-            iterable: Iterable<T>,
+        inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapIndexedNotNullTo(
             destination: C,
             transform: (index: Int, T) -> R?
         ): C {
-            return iterable.mapIndexedNotNullTo(destination, transform)
+            return this.mapIndexedNotNullToKt(destination, transform)
         }
 
         @JvmStatic
@@ -1213,72 +1472,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        inline fun <T> filter(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
-            return iterable.filter(predicate)
-        }
-
-        @JvmStatic
-        inline fun <T> filterIndexed(iterable: Iterable<T>, predicate: (index: Int, T) -> Boolean): List<T> {
-            return iterable.filterIndexed(predicate)
-        }
-
-        @JvmStatic
-        fun <T : Any> filterNotNull(iterable: Iterable<T?>): List<T> {
-            return iterable.filterNotNull()
-        }
-
-        @JvmStatic
-        inline fun <T, C : MutableCollection<in T>> filterTo(
-            iterable: Iterable<T>,
-            destination: C,
-            predicate: (T) -> Boolean
-        ): C {
-            return iterable.filterTo(destination, predicate)
-        }
-
-        @JvmStatic
-        inline fun <T, C : MutableCollection<in T>> filterIndexedTo(
-            iterable: Iterable<T>,
-            destination: C,
-            predicate: (index: Int, T) -> Boolean
-        ): C {
-            return iterable.filterIndexedTo(destination, predicate)
-        }
-
-        @JvmStatic
-        fun <C : MutableCollection<in T>, T : Any> filterNotNullTo(
-            iterable: Iterable<T?>,
-            destination: C
-        ): C {
-            return iterable.filterNotNullTo(destination)
-        }
-
-        @JvmStatic
-        fun <T> any(iterable: Iterable<T>): Boolean {
-            return iterable.any()
-        }
-
-        @JvmStatic
-        inline fun <T> any(iterable: Iterable<T>, predicate: (T) -> Boolean): Boolean {
-            return iterable.any(predicate)
-        }
-
-        @JvmStatic
-        fun <T> none(iterable: Iterable<T>): Boolean {
-            return iterable.none()
-        }
-
-        @JvmStatic
-        inline fun <T> none(iterable: Iterable<T>, predicate: (T) -> Boolean): Boolean {
-            return iterable.none(predicate)
-        }
-
-        @JvmStatic
-        inline fun <T> all(iterable: Iterable<T>, predicate: (T) -> Boolean): Boolean {
-            return iterable.all(predicate)
-        }
-
-        @JvmStatic
         fun <T> plus(iterable: Iterable<T>, element: T): List<T> {
             return iterable.plus(element)
         }
@@ -1352,26 +1545,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> take(iterable: Iterable<T>, n: Int): List<T> {
-            return iterable.take(n)
-        }
-
-        @JvmStatic
-        inline fun <T> takeWhile(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
-            return iterable.takeWhile(predicate)
-        }
-
-        @JvmStatic
-        fun <T> drop(iterable: Iterable<T>, n: Int): List<T> {
-            return iterable.drop(n)
-        }
-
-        @JvmStatic
-        inline fun <T> dropWhile(iterable: Iterable<T>, predicate: (T) -> Boolean): List<T> {
-            return iterable.dropWhile(predicate)
-        }
-
-        @JvmStatic
         fun <T> chunked(iterable: Iterable<T>, size: Int): List<List<T>> {
             return iterable.chunked(size)
         }
@@ -1407,112 +1580,8 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> first(iterable: Iterable<T>): T {
-            return iterable.first()
-        }
-
-        @JvmStatic
-        inline fun <T> first(iterable: Iterable<T>, predicate: (T) -> Boolean): T {
-            return iterable.first(predicate)
-        }
-
-        @JvmStatic
-        fun <T> firstOrNull(iterable: Iterable<T>): T? {
-            return iterable.firstOrNull()
-        }
-
-        @JvmStatic
-        inline fun <T> firstOrNull(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
-            return iterable.firstOrNull(predicate)
-        }
-
-        @JvmStatic
-        fun <T> last(iterable: Iterable<T>): T {
-            return iterable.last()
-        }
-
-        @JvmStatic
-        inline fun <T> last(iterable: Iterable<T>, predicate: (T) -> Boolean): T {
-            return iterable.last(predicate)
-        }
-
-        @JvmStatic
-        fun <T> lastOrNull(iterable: Iterable<T>): T? {
-            return iterable.lastOrNull()
-        }
-
-        @JvmStatic
-        inline fun <T> lastOrNull(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
-            return iterable.lastOrNull(predicate)
-        }
-
-        @JvmStatic
-        fun <T> elementAt(iterable: Iterable<T>, index: Int): T {
-            return iterable.elementAt(index)
-        }
-
-        @JvmStatic
-        fun <T> elementAtOrElse(
-            iterable: Iterable<T>,
-            index: Int,
-            defaultValue: (index: Int) -> T
-        ): T {
-            return iterable.elementAtOrElse(index, defaultValue)
-        }
-
-        @JvmStatic
-        fun <T> elementAtOrNull(iterable: Iterable<T>, index: Int): T? {
-            return iterable.elementAtOrNull(index)
-        }
-
-        @JvmStatic
-        inline fun <T> find(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
-            return iterable.find(predicate)
-        }
-
-        @JvmStatic
-        inline fun <T> findLast(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
-            return iterable.findLast(predicate)
-        }
-
-        @JvmStatic
-        fun <T> contains(iterable: Iterable<T>, element: T): Boolean {
-            return iterable.contains(element)
-        }
-
-        @JvmStatic
-        fun <T> containsAll(iterable: Iterable<T>, elements: Array<out T>): Boolean {
-            return containsAll(iterable, elements.toSet())
-        }
-
-        @JvmStatic
-        fun <T> containsAll(iterable: Iterable<T>, elements: Iterable<T>): Boolean {
-            return containsAll(iterable, elements.toSet())
-        }
-
-        @JvmStatic
-        fun <T> containsAll(iterable: Iterable<T>, elements: Collection<T>): Boolean {
-            return iterable.toSet().containsAll(elements)
-        }
-
-        @JvmStatic
-        fun <T> isEmpty(iterable: Iterable<T>): Boolean {
-            var hasElement = false
-            for (t in iterable) {
-                hasElement = true
-                break
-            }
-            return !hasElement
-        }
-
-        @JvmStatic
-        fun <T> isNotEmpty(iterable: Iterable<T>): Boolean {
-            return !isEmpty(iterable)
-        }
-
-        @JvmStatic
         fun <T> sorted(iterable: Iterable<T>): List<T> {
-            return sorted(iterable, Sort.selfComparableComparator())
+            return sorted(iterable, castSelfComparableComparator())
         }
 
         @JvmStatic
@@ -1574,58 +1643,53 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> count(iterable: Iterable<T>): Int {
-            return iterable.count()
+        inline fun <T> Iterable<T>.forEachIndexed(action: (index: Int, T) -> Unit) {
+            return iterable.forEachIndexed(action)
         }
 
         @JvmStatic
-        inline fun <T> count(iterable: Iterable<T>, predicate: (T) -> Boolean): Int {
-            return iterable.count(predicate)
+        fun <T> Iterable<T>.max(): T {
+            return this.maxOrNull().notNull()
         }
 
         @JvmStatic
-        fun <T> max(iterable: Iterable<T>): T {
-            return Require.notNull(maxOrNull(iterable))
+        fun <T> Iterable<T>.max(comparator: Comparator<in T>): T {
+            return this.maxOrNull(comparator).notNull()
         }
 
         @JvmStatic
-        fun <T> max(iterable: Iterable<T>, comparator: Comparator<in T>): T {
-            return Require.notNull(maxOrNull(iterable, comparator))
+        fun <T> Iterable<T>.maxOrNull(): T? {
+            return this.maxOrNull(castSelfComparableComparator())
         }
 
         @JvmStatic
-        fun <T> maxOrNull(iterable: Iterable<T>): T? {
-            return maxOrNull(iterable, Sort.selfComparableComparator())
+        fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T>): T? {
+            return this.kotlinMaxWithOrNull(comparator)
         }
 
         @JvmStatic
-        fun <T> maxOrNull(iterable: Iterable<T>, comparator: Comparator<in T>): T? {
-            return iterable.maxWithOrNull(comparator)
+        fun <T> Iterable<T>.min(): T {
+            return this.minOrNull().notNull()
         }
 
         @JvmStatic
-        fun <T> min(iterable: Iterable<T>): T {
-            return Require.notNull(minOrNull(iterable))
+        fun <T> Iterable<T>.min(comparator: Comparator<in T>): T {
+            return this.minOrNull(comparator).notNull()
         }
 
         @JvmStatic
-        fun <T> min(iterable: Iterable<T>, comparator: Comparator<in T>): T {
-            return Require.notNull(minOrNull(iterable, comparator))
+        fun <T> Iterable<T>.minOrNull(): T? {
+            return this.minOrNull(castSelfComparableComparator())
         }
 
         @JvmStatic
-        fun <T> minOrNull(iterable: Iterable<T>): T? {
-            return minOrNull(iterable, Sort.selfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> minOrNull(iterable: Iterable<T>, comparator: Comparator<in T>): T? {
-            return iterable.minWithOrNull(comparator)
+        fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T>): T? {
+            return this.kotlinMinWithOrNull(comparator)
         }
 
         @JvmStatic
         fun <T> sumInt(iterable: Iterable<T>): Int {
-            return sumInt(iterable) { To.toInt(it) }
+            return sumInt(iterable) { it.toInt() }
         }
 
         @JvmStatic
@@ -1635,7 +1699,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> sumLong(iterable: Iterable<T>): Long {
-            return sumLong(iterable) { To.toLong(it) }
+            return sumLong(iterable) { it.toLong() }
         }
 
         @JvmStatic
@@ -1645,7 +1709,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> sumDouble(iterable: Iterable<T>): Double {
-            return sumDouble(iterable) { To.toDouble(it) }
+            return sumDouble(iterable) { it.toDouble() }
         }
 
         @JvmStatic
@@ -1655,7 +1719,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> sumBigInteger(iterable: Iterable<T>): BigInteger {
-            return sumBigInteger(iterable) { To.toBigInteger(it) }
+            return sumBigInteger(iterable) { it.toBigInteger() }
         }
 
         @JvmStatic
@@ -1665,7 +1729,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> sumBigDecimal(iterable: Iterable<T>): BigDecimal {
-            return sumBigDecimal(iterable) { To.toBigDecimal(it) }
+            return sumBigDecimal(iterable) { it.toBigDecimal() }
         }
 
         @JvmStatic
@@ -1675,7 +1739,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> averageInt(iterable: Iterable<T>): Int {
-            return averageInt(iterable) { To.toInt(it) }
+            return averageInt(iterable) { it.toInt() }
         }
 
         @JvmStatic
@@ -1691,7 +1755,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> averageLong(iterable: Iterable<T>): Long {
-            return averageLong(iterable) { To.toLong(it) }
+            return averageLong(iterable) { it.toLong() }
         }
 
         @JvmStatic
@@ -1707,7 +1771,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> averageDouble(iterable: Iterable<T>): Double {
-            return averageDouble(iterable) { To.toDouble(it) }
+            return averageDouble(iterable) { it.toDouble() }
         }
 
         @JvmStatic
@@ -1723,7 +1787,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> averageBigInteger(iterable: Iterable<T>): BigInteger {
-            return averageBigInteger(iterable) { To.toBigInteger(it) }
+            return averageBigInteger(iterable) { it.toBigInteger() }
         }
 
         @JvmStatic
@@ -1734,12 +1798,12 @@ protected constructor(operated: I) : MutableIterable<T> {
                 sum += selector(t)
                 count++
             }
-            return if (count == 0) BigInteger.ZERO else sum / To.toBigInteger(count)
+            return if (count == 0) BigInteger.ZERO else sum / count.toBigInteger()
         }
 
         @JvmStatic
         fun <T> averageBigDecimal(iterable: Iterable<T>): BigDecimal {
-            return averageBigDecimal(iterable) { To.toBigDecimal(it) }
+            return averageBigDecimal(iterable) { it.toBigDecimal() }
         }
 
         @JvmStatic
@@ -1750,27 +1814,7 @@ protected constructor(operated: I) : MutableIterable<T> {
                 sum += selector(t)
                 count++
             }
-            return if (count == 0) BigDecimal.ZERO else sum / To.toBigDecimal(count)
-        }
-
-        @JvmStatic
-        fun <T> single(iterable: Iterable<T>): T {
-            return iterable.single()
-        }
-
-        @JvmStatic
-        inline fun <T> single(iterable: Iterable<T>, predicate: (T) -> Boolean): T {
-            return iterable.single(predicate)
-        }
-
-        @JvmStatic
-        fun <T> singleOrNull(iterable: Iterable<T>): T? {
-            return iterable.singleOrNull()
-        }
-
-        @JvmStatic
-        inline fun <T> singleOrNull(iterable: Iterable<T>, predicate: (T) -> Boolean): T? {
-            return iterable.singleOrNull(predicate)
+            return if (count == 0) BigDecimal.ZERO else sum / count.toBigDecimal()
         }
 
         @JvmStatic
@@ -1857,7 +1901,7 @@ protected constructor(operated: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> removeFirst(iterable: MutableIterable<T>): T {
             val iterator = iterable.iterator()
-            Check.checkElement(iterator.hasNext(), "Iterable is empty.")
+            checkElement(iterator.hasNext(), "Iterable is empty.")
             val first = iterator.next()
             iterator.remove()
             return first
@@ -1877,7 +1921,7 @@ protected constructor(operated: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> removeLast(iterable: MutableIterable<T>): T {
             val iterator = iterable.iterator()
-            Check.checkElement(iterator.hasNext(), "Iterable is empty.")
+            checkElement(iterator.hasNext(), "Iterable is empty.")
             var last = iterator.next()
             while (iterator.hasNext()) {
                 last = iterator.next()
@@ -1906,32 +1950,6 @@ protected constructor(operated: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> addTo(iterable: Iterable<T>, destination: Array<in T>): Boolean {
-            return addTo(iterable, destination, 0, destination.size)
-        }
-
-        @JvmStatic
-        fun <T> addTo(iterable: Iterable<T>, destination: Array<in T>, fromIndex: Int, toIndex: Int): Boolean {
-            Check.checkRangeInBounds(fromIndex, toIndex, destination.size)
-            var result = false
-            val iterator = iterable.iterator()
-            for (i in fromIndex until toIndex) {
-                if (iterator.hasNext()) {
-                    destination[i] = iterator.next()
-                    result = true
-                } else {
-                    return result
-                }
-            }
-            return result
-        }
-
-        @JvmStatic
-        fun <T> addTo(iterable: Iterable<T>, destination: MutableCollection<T>): Boolean {
-            return destination.addAll(iterable)
-        }
-
-        @JvmStatic
         fun <T, C : MutableCollection<in T>> toCollection(iterable: Iterable<T>, destination: C): C {
             return iterable.toCollection(destination)
         }
@@ -1953,7 +1971,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> toSortedSet(iterable: Iterable<T>): SortedSet<T> {
-            return toSortedSet(iterable, Sort.selfComparableComparator())
+            return toSortedSet(iterable, castSelfComparableComparator())
         }
 
         @JvmStatic
@@ -2006,7 +2024,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> toBooleanArray(iterable: Iterable<T>): BooleanArray {
-            return toBooleanArray(iterable) { To.toBoolean(it) }
+            return toBooleanArray(iterable) { it.toBoolean() }
         }
 
         @JvmStatic
@@ -2019,7 +2037,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> toByteArray(iterable: Iterable<T>): ByteArray {
-            return toByteArray(iterable) { To.toByte(it) }
+            return toByteArray(iterable) { it.toByte() }
         }
 
         @JvmStatic
@@ -2032,7 +2050,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> toShortArray(iterable: Iterable<T>): ShortArray {
-            return toShortArray(iterable) { To.toShort(it) }
+            return toShortArray(iterable) { it.toShort() }
         }
 
         @JvmStatic
@@ -2045,7 +2063,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> toCharArray(iterable: Iterable<T>): CharArray {
-            return toCharArray(iterable) { To.toChar(it) }
+            return toCharArray(iterable) { it.toChar() }
         }
 
         @JvmStatic
@@ -2058,7 +2076,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> toIntArray(iterable: Iterable<T>): IntArray {
-            return toIntArray(iterable) { To.toInt(it) }
+            return toIntArray(iterable) { it.toInt() }
         }
 
         @JvmStatic
@@ -2071,7 +2089,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> toLongArray(iterable: Iterable<T>): LongArray {
-            return toLongArray(iterable) { To.toLong(it) }
+            return toLongArray(iterable) { it.toLong() }
         }
 
         @JvmStatic
@@ -2084,7 +2102,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> toFloatArray(iterable: Iterable<T>): FloatArray {
-            return toFloatArray(iterable) { To.toFloat(it) }
+            return toFloatArray(iterable) { it.toFloat() }
         }
 
         @JvmStatic
@@ -2097,7 +2115,7 @@ protected constructor(operated: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> toDoubleArray(iterable: Iterable<T>): DoubleArray {
-            return toDoubleArray(iterable) { To.toDouble(it) }
+            return toDoubleArray(iterable) { it.toDouble() }
         }
 
         @JvmStatic

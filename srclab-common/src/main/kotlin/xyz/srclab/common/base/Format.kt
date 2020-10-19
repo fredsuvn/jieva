@@ -1,7 +1,7 @@
 package xyz.srclab.common.base
 
-import org.slf4j.helpers.MessageFormatter as Slf4jMessageFormatter
-import java.text.MessageFormat as JavaMessageFormat
+import org.slf4j.helpers.MessageFormatter as MessageFormatterSlf4j
+import java.text.MessageFormat as MessageFormatJava
 
 interface Format {
 
@@ -51,7 +51,7 @@ object FastFormat : Format {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         processArguments(args)
-        return Slf4jMessageFormatter.arrayFormat(pattern.toString(), args, null).message
+        return MessageFormatterSlf4j.arrayFormat(pattern.toString(), args, null).message
     }
 
     private fun processArguments(vararg args: Any?) {
@@ -78,6 +78,6 @@ object PrintfFormat : Format {
 object MessageFormat : Format {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
-        return JavaMessageFormat.format(pattern.toString(), *args)
+        return MessageFormatJava.format(pattern.toString(), *args)
     }
 }

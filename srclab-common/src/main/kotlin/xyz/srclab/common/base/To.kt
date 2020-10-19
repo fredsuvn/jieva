@@ -11,22 +11,22 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
 import java.util.*
-import kotlin.text.toBoolean as stringToBoolean
-import kotlin.text.toByte as stringToByte
-import kotlin.text.toDouble as stringToDouble
-import kotlin.text.toFloat as stringToFloat
-import kotlin.text.toInt as stringToInt
-import kotlin.text.toLong as stringToLong
-import kotlin.text.toShort as stringToShort
-import kotlin.toBigDecimal as bigIntegerToBigDecimal
-import kotlin.toString as defaultToString
+import kotlin.text.toBoolean as toBooleanKt
+import kotlin.text.toByte as toByteKt
+import kotlin.text.toDouble as toDoubleKt
+import kotlin.text.toFloat as toFloatKt
+import kotlin.text.toInt as toIntKt
+import kotlin.text.toLong as toLongKt
+import kotlin.text.toShort as toShortKt
+import kotlin.toBigDecimal as toBigDecimalKt
+import kotlin.toString as toStringKt
 
 fun Any?.toBoolean(): Boolean {
     return when (this) {
         null -> false
         is Boolean -> this
         is Number -> toInt() != 0
-        else -> toString().stringToBoolean()
+        else -> toString().toBooleanKt()
     }
 }
 
@@ -35,7 +35,7 @@ fun Number?.toByte(): Byte {
 }
 
 fun CharSequence?.toByte(): Byte {
-    return this?.toString()?.stringToByte() ?: 0
+    return this?.toString()?.toByteKt() ?: 0
 }
 
 fun Any?.toByte(): Byte {
@@ -43,8 +43,8 @@ fun Any?.toByte(): Byte {
         null, false -> 0
         true -> 1
         is Number -> toByte()
-        is String -> stringToByte()
-        else -> toString().stringToByte()
+        is String -> toByteKt()
+        else -> toString().toByteKt()
     }
 }
 
@@ -53,7 +53,7 @@ fun Number?.toShort(): Short {
 }
 
 fun CharSequence?.toShort(): Short {
-    return this?.toString()?.stringToShort() ?: 0
+    return this?.toString()?.toShortKt() ?: 0
 }
 
 fun Any?.toShort(): Short {
@@ -61,8 +61,8 @@ fun Any?.toShort(): Short {
         null, false -> 0
         true -> 1
         is Number -> toShort()
-        is String -> stringToShort()
-        else -> toString().stringToShort()
+        is String -> toShortKt()
+        else -> toString().toShortKt()
     }
 }
 
@@ -71,7 +71,7 @@ fun Number?.toChar(): Char {
 }
 
 fun CharSequence?.toChar(): Char {
-    return (this?.toString()?.stringToInt() ?: 0).toChar()
+    return (this?.toString()?.toIntKt() ?: 0).toChar()
 }
 
 fun Any?.toChar(): Char {
@@ -79,8 +79,8 @@ fun Any?.toChar(): Char {
         null, false -> 0.toChar()
         true -> 1.toChar()
         is Number -> toChar()
-        is String -> stringToInt().toChar()
-        else -> toString().stringToInt().toChar()
+        is String -> toIntKt().toChar()
+        else -> toString().toIntKt().toChar()
     }
 }
 
@@ -89,7 +89,7 @@ fun Number?.toInt(): Int {
 }
 
 fun CharSequence?.toInt(): Int {
-    return this?.toString()?.stringToInt() ?: 0
+    return this?.toString()?.toIntKt() ?: 0
 }
 
 fun Any?.toInt(): Int {
@@ -97,8 +97,8 @@ fun Any?.toInt(): Int {
         null, false -> 0
         true -> 1
         is Number -> toInt()
-        is String -> stringToInt()
-        else -> toString().stringToInt()
+        is String -> toIntKt()
+        else -> toString().toIntKt()
     }
 }
 
@@ -107,7 +107,7 @@ fun Number?.toLong(): Long {
 }
 
 fun CharSequence?.toLong(): Long {
-    return this?.toString()?.stringToLong() ?: 0
+    return this?.toString()?.toLongKt() ?: 0
 }
 
 fun Any?.toLong(): Long {
@@ -115,8 +115,8 @@ fun Any?.toLong(): Long {
         null, false -> 0L
         true -> 1L
         is Number -> toLong()
-        is String -> stringToLong()
-        else -> toString().stringToLong()
+        is String -> toLongKt()
+        else -> toString().toLongKt()
     }
 }
 
@@ -125,7 +125,7 @@ fun Number?.toFloat(): Float {
 }
 
 fun CharSequence?.toFloat(): Float {
-    return this?.toString()?.stringToFloat() ?: 0f
+    return this?.toString()?.toFloatKt() ?: 0f
 }
 
 fun Any?.toFloat(): Float {
@@ -133,8 +133,8 @@ fun Any?.toFloat(): Float {
         null, false -> 0f
         true -> 1f
         is Number -> toFloat()
-        is String -> stringToFloat()
-        else -> toString().stringToFloat()
+        is String -> toFloatKt()
+        else -> toString().toFloatKt()
     }
 }
 
@@ -143,7 +143,7 @@ fun Number?.toDouble(): Double {
 }
 
 fun CharSequence?.toDouble(): Double {
-    return this?.toString()?.stringToDouble() ?: 0.0
+    return this?.toString()?.toDoubleKt() ?: 0.0
 }
 
 fun Any?.toDouble(): Double {
@@ -151,8 +151,8 @@ fun Any?.toDouble(): Double {
         null, false -> 0.0
         true -> 1.0
         is Number -> toDouble()
-        is String -> stringToDouble()
-        else -> toString().stringToDouble()
+        is String -> toDoubleKt()
+        else -> toString().toDoubleKt()
     }
 }
 
@@ -199,7 +199,7 @@ fun Number?.toBigDecimal(): BigDecimal {
     return when (this) {
         null -> BigDecimal.ZERO
         is BigDecimal -> this
-        is BigInteger -> bigIntegerToBigDecimal()
+        is BigInteger -> toBigDecimalKt()
         else -> when (toInt()) {
             0 -> BigDecimal.ZERO
             1 -> BigDecimal.ONE
@@ -223,7 +223,7 @@ fun Any?.toBigDecimal(): BigDecimal {
         null, false -> BigDecimal.ZERO
         true -> BigDecimal.ONE
         is BigDecimal -> this
-        is BigInteger -> bigIntegerToBigDecimal()
+        is BigInteger -> toBigDecimalKt()
         is Number -> when (toInt()) {
             0 -> BigDecimal.ZERO
             1 -> BigDecimal.ONE
@@ -251,12 +251,12 @@ fun CharSequence.toBytes(): ByteArray {
 }
 
 fun Any?.toString(): String {
-    return defaultToString()
+    return toStringKt()
 }
 
 fun Any?.elementToString(): String {
     return when (this) {
-        null -> defaultToString()
+        null -> toStringKt()
         is Array<*> -> Arrays.toString(this)
         is BooleanArray -> Arrays.toString(this)
         is ByteArray -> Arrays.toString(this)
@@ -272,7 +272,7 @@ fun Any?.elementToString(): String {
 
 fun Any?.elementDeepToString(): String {
     return when (this) {
-        null -> defaultToString()
+        null -> toStringKt()
         is Array<*> -> Arrays.deepToString(this)
         is BooleanArray -> Arrays.toString(this)
         is ByteArray -> Arrays.toString(this)

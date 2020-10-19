@@ -3,7 +3,7 @@ package xyz.srclab.common.base
 import org.apache.commons.lang3.StringUtils
 import java.time.ZonedDateTime
 import java.util.regex.Pattern
-import kotlin.text.toInt as stringToInt
+import kotlin.text.toInt as toIntKt
 
 interface About {
 
@@ -165,7 +165,7 @@ interface Version : Comparable<Version> {
 
             internal fun of(value: CharSequence): Identifier {
                 if (StringUtils.isNumeric(value)) {
-                    return of(value.toString().stringToInt())
+                    return of(value.toString().toIntKt())
                 }
                 checkIdentifierPattern(value)
                 return StringIdentifier(value)
@@ -433,7 +433,7 @@ interface Version : Comparable<Version> {
                 )
                 val major = list[0].let {
                     val result = try {
-                        it.stringToInt()
+                        it.toIntKt()
                     } catch (e: Exception) {
                         throw IllegalArgumentException("Wrong major: $it", e)
                     }
@@ -445,7 +445,7 @@ interface Version : Comparable<Version> {
                 val minor = if (list.size < 2) 0 else {
                     list[1].let {
                         val result = try {
-                            it.stringToInt()
+                            it.toIntKt()
                         } catch (e: Exception) {
                             throw IllegalArgumentException("Wrong minor: $it", e)
                         }
@@ -458,7 +458,7 @@ interface Version : Comparable<Version> {
                 val patch = if (list.size < 3) 0 else {
                     list[2].let {
                         val result = try {
-                            it.stringToInt()
+                            it.toIntKt()
                         } catch (e: Exception) {
                             throw IllegalArgumentException("Wrong patch: $it", e)
                         }
