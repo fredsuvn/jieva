@@ -1,5 +1,7 @@
 package xyz.srclab.common.base
 
+import java.time.ZonedDateTime
+
 /**
  * @author sunqian
  */
@@ -19,6 +21,12 @@ object Current {
     val nanoseconds: Long
         @JvmName("nanoseconds") get() {
             return System.nanoTime()
+        }
+
+    @JvmStatic
+    val timestamp: String
+        @JvmName("timestamp") get() {
+            return Defaults.timestampFormatter.format(ZonedDateTime.now())
         }
 
     @JvmStatic

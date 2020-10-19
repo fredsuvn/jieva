@@ -345,10 +345,6 @@ fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter): Instant {
     }
 }
 
-fun Any?.toTimestamp(): Instant {
-    return toInstant(Defaults.timestampFormatter)
-}
-
 fun Any?.toLocalDateTime(): LocalDateTime {
     return toLocalDateTime(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 }
@@ -395,4 +391,8 @@ fun Any?.toDuration(): Duration {
         }
         else -> Duration.parse(toString())
     }
+}
+
+fun Any?.toTimestamp(): String {
+    return Defaults.timestampFormatter.format(this.toZonedDateTime())
 }
