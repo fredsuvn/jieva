@@ -1,77 +1,62 @@
 package xyz.srclab.common.collection
 
-import xyz.srclab.common.base.As
+import xyz.srclab.common.base.asAny
 
-class IterableOps<T> private constructor(iterable: Iterable<T>) :
+class IterableOps<T>(iterable: Iterable<T>) :
     BaseIterableOps<T, Iterable<T>, MutableIterable<T>, IterableOps<T>>(iterable) {
 
     fun plus(element: T): ListOps<T> {
-        return toListOps(plus(operated(), element))
+        return finalIterable().plus(element).toListOps()
     }
 
     fun plus(elements: Array<out T>): ListOps<T> {
-        return toListOps(plus(operated(), elements))
+        return finalIterable().plus(elements).toListOps()
     }
 
     fun plus(elements: Iterable<T>): ListOps<T> {
-        return toListOps(plus(operated(), elements))
+        return finalIterable().plus(elements).toListOps()
     }
 
     fun plus(elements: Sequence<T>): ListOps<T> {
-        return toListOps(plus(operated(), elements))
+        return finalIterable().plus(elements).toListOps()
     }
 
     fun minus(element: T): ListOps<T> {
-        return toListOps(minus(operated(), element))
+        return finalIterable().minus(element).toListOps()
     }
 
     fun minus(elements: Array<out T>): ListOps<T> {
-        return toListOps(minus(operated(), elements))
+        return finalIterable().minus(elements).toListOps()
     }
 
     fun minus(elements: Iterable<T>): ListOps<T> {
-        return toListOps(minus(operated(), elements))
+        return finalIterable().minus(elements).toListOps()
     }
 
     fun minus(elements: Sequence<T>): ListOps<T> {
-        return toListOps(minus(operated(), elements))
+        return finalIterable().minus(elements).toListOps()
     }
 
-    fun toListOps(): ListOps<T> {
-        return toListOps(operated().toList())
+    override fun Iterable<T>.asThis(): IterableOps<T> {
+        iterable = this
+        return this@IterableOps
     }
 
-    fun toSetOps(): SetOps<T> {
-        return toSetOps(operated().toSet())
+    override fun <T> Iterable<T>.toIterableOps(): IterableOps<T> {
+        iterable = this.asAny()
+        return this@IterableOps.asAny()
     }
 
-    fun finalIterable(): Iterable<T> {
-        return operated()
+    override fun <T> List<T>.toListOps(): ListOps<T> {
+        return ListOps.opsFor(this)
     }
 
-    fun finalMutableIterable(): MutableIterable<T> {
-        return mutableOperated()
+    override fun <T> Set<T>.toSetOps(): SetOps<T> {
+        return SetOps.opsFor(this)
     }
 
-    override fun toSelfOps(): IterableOps<T> {
-        return this
-    }
-
-    override fun <T> toIterableOps(iterable: Iterable<T>): IterableOps<T> {
-        this.operated = As.any(iterable)
-        return As.any(this)
-    }
-
-    override fun <T> toListOps(list: List<T>): ListOps<T> {
-        return ListOps.opsFor(list)
-    }
-
-    override fun <T> toSetOps(set: Set<T>): SetOps<T> {
-        return SetOps.opsFor(set)
-    }
-
-    override fun <K, V> toMapOps(map: Map<K, V>): MapOps<K, V> {
-        return MapOps.opsFor(map)
+    override fun <K, V> Map<K, V>.toMapOps(): MapOps<K, V> {
+        return MapOps.opsFor(this)
     }
 
     companion object {

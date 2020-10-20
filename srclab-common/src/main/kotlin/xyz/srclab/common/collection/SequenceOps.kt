@@ -1,379 +1,432 @@
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.collection.BaseIterableOps.Companion.averageBigDecimal
+import xyz.srclab.common.collection.BaseIterableOps.Companion.averageBigInteger
+import xyz.srclab.common.collection.BaseIterableOps.Companion.averageDouble
+import xyz.srclab.common.collection.BaseIterableOps.Companion.averageInt
+import xyz.srclab.common.collection.BaseIterableOps.Companion.averageLong
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toBooleanArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toByteArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toCharArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toDoubleArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toFloatArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toIntArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toLongArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toSet
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toShortArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import java.util.stream.Stream
-import java.util.stream.StreamSupport
 import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
+import kotlin.sequences.all as allKt
+import kotlin.sequences.any as anyKt
+import kotlin.sequences.asSequence as asSequenceKt
+import kotlin.sequences.associate as associateKt
+import kotlin.sequences.associateBy as associateByKt
+import kotlin.sequences.associateByTo as associateByToKt
+import kotlin.sequences.associateTo as associateToKt
+import kotlin.sequences.associateWith as associateWithKt
+import kotlin.sequences.associateWithTo as associateWithToKt
+import kotlin.sequences.chunked as chunkedKt
+import kotlin.sequences.contains as containsKt
+import kotlin.sequences.count as countKt
+import kotlin.sequences.distinct as distinctKt
+import kotlin.sequences.distinctBy as distinctByKt
+import kotlin.sequences.drop as dropKt
+import kotlin.sequences.dropWhile as dropWhileKt
+import kotlin.sequences.elementAt as elementAtKt
+import kotlin.sequences.elementAtOrElse as elementAtOrElseKt
+import kotlin.sequences.elementAtOrNull as elementAtOrNullKt
+import kotlin.sequences.filter as filterKt
+import kotlin.sequences.filterIndexed as filterIndexedKt
+import kotlin.sequences.filterIndexedTo as filterIndexedToKt
+import kotlin.sequences.filterNotNull as filterNotNullKt
+import kotlin.sequences.filterTo as filterToKt
+import kotlin.sequences.find as findKt
+import kotlin.sequences.first as firstKt
+import kotlin.sequences.firstOrNull as firstOrNullKt
+import kotlin.sequences.flatMap as flatMapKt
+import kotlin.sequences.flatMapIndexed as flatMapIndexedKt
+import kotlin.sequences.flatMapIndexedTo as flatMapIndexedToKt
+import kotlin.sequences.flatMapTo as flatMapToKt
+import kotlin.sequences.fold as foldKt
+import kotlin.sequences.foldIndexed as foldIndexedKt
+import kotlin.sequences.forEachIndexed as forEachIndexedKt
+import kotlin.sequences.groupBy as groupByKt
+import kotlin.sequences.groupByTo as groupByToKt
+import kotlin.sequences.indexOf as indexOfKt
+import kotlin.sequences.indexOfFirst as indexOfFirstKt
+import kotlin.sequences.indexOfLast as indexOfLastKt
+import kotlin.sequences.last as lastKt
+import kotlin.sequences.lastIndexOf as lastIndexOfKt
+import kotlin.sequences.lastOrNull as lastOrNullKt
+import kotlin.sequences.map as mapKt
+import kotlin.sequences.mapIndexed as mapIndexedKt
+import kotlin.sequences.mapIndexedNotNull as mapIndexedNotNullKt
+import kotlin.sequences.mapIndexedNotNullTo as mapIndexedNotNullToKt
+import kotlin.sequences.mapIndexedTo as mapIndexedToKt
+import kotlin.sequences.mapNotNull as mapNotNullKt
+import kotlin.sequences.mapNotNullTo as mapNotNullToKt
+import kotlin.sequences.mapTo as mapToKt
+import kotlin.sequences.maxWithOrNull as maxWithOrNullKt
+import kotlin.sequences.minWithOrNull as minWithOrNullKt
+import kotlin.sequences.minus as minusKt
+import kotlin.sequences.none as noneKt
+import kotlin.sequences.plus as plusKt
+import kotlin.sequences.reduce as reduceKt
+import kotlin.sequences.reduceIndexed as reduceIndexedKt
+import kotlin.sequences.reduceIndexedOrNull as reduceIndexedOrNullKt
+import kotlin.sequences.reduceOrNull as reduceOrNullKt
+import kotlin.sequences.shuffled as shuffledKt
+import kotlin.sequences.sortedWith as sortedWithKt
+import kotlin.sequences.sumOf as sumOfKt
+import kotlin.sequences.take as takeKt
+import kotlin.sequences.takeWhile as takeWhileKt
+import kotlin.sequences.toCollection as toCollectionKt
+import kotlin.sequences.toHashSet as toHashSetKt
+import kotlin.sequences.toList as toListKt
+import kotlin.sequences.toMutableList as toMutableListKt
+import kotlin.sequences.toMutableSet as toMutableSetKt
+import kotlin.sequences.toSet as toSetKt
+import kotlin.sequences.toSortedSet as toSortedSetKt
+import kotlin.sequences.windowed as windowedKt
+import kotlin.sequences.zip as zipKt
+import kotlin.sequences.zipWithNext as zipWithNextKt
 
-class SequenceOps<T> private constructor(sequence: Sequence<T>) {
-
-    private var sequence: Sequence<T>
-
-    init {
-        this.sequence = sequence
-    }
-
-    private constructor(iterable: Iterable<T>) {
-        this.sequence = iterable.asSequence()
-    }
-
-    fun find(predicate: (T) -> Boolean): T? {
-        return find(sequence, predicate)
-    }
-
-    fun findLast(predicate: (T) -> Boolean): T? {
-        return findLast(sequence, predicate)
-    }
-
-    fun first(): T {
-        return first(sequence)
-    }
-
-    fun first(predicate: (T) -> Boolean): T {
-        return first(sequence, predicate)
-    }
-
-    fun firstOrNull(): T? {
-        return firstOrNull(sequence)
-    }
-
-    fun firstOrNull(predicate: (T) -> Boolean): T? {
-        return firstOrNull(sequence, predicate)
-    }
-
-    fun last(): T {
-        return last(sequence)
-    }
-
-    fun last(predicate: (T) -> Boolean): T {
-        return last(sequence, predicate)
-    }
-
-    fun lastOrNull(): T? {
-        return lastOrNull(sequence)
-    }
-
-    fun lastOrNull(predicate: (T) -> Boolean): T? {
-        return lastOrNull(sequence, predicate)
-    }
-
-    fun all(predicate: (T) -> Boolean): Boolean {
-        return all(sequence, predicate)
-    }
-
-    fun any(): Boolean {
-        return any(sequence)
-    }
-
-    fun any(predicate: (T) -> Boolean): Boolean {
-        return any(sequence, predicate)
-    }
-
-    fun none(): Boolean {
-        return none(sequence)
-    }
-
-    fun none(predicate: (T) -> Boolean): Boolean {
-        return none(sequence, predicate)
-    }
-
-    fun single(): T {
-        return single(sequence)
-    }
-
-    fun single(predicate: (T) -> Boolean): T {
-        return single(sequence, predicate)
-    }
-
-    fun singleOrNull(): T? {
-        return singleOrNull(sequence)
-    }
-
-    fun singleOrNull(predicate: (T) -> Boolean): T? {
-        return singleOrNull(sequence, predicate)
-    }
+class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
 
     fun contains(element: T): Boolean {
-        return contains(sequence, element)
+        return finalSequence().contains(element)
+    }
+
+    fun containsAll(elements: Array<out T>): Boolean {
+        return finalSequence().containsAll(elements)
+    }
+
+    fun containsAll(elements: Iterable<T>): Boolean {
+        return finalSequence().containsAll(elements)
+    }
+
+    fun containsAll(elements: Collection<T>): Boolean {
+        return finalSequence().containsAll(elements)
     }
 
     fun count(): Int {
-        return count(sequence)
+        return finalSequence().count()
     }
 
     fun count(predicate: (T) -> Boolean): Int {
-        return count(sequence, predicate)
+        return finalSequence().count(predicate)
+    }
+
+    fun isEmpty(): Boolean {
+        return finalSequence().isEmpty()
+    }
+
+    fun isNotEmpty(): Boolean {
+        return finalSequence().isNotEmpty()
+    }
+
+    fun any(): Boolean {
+        return finalSequence().any()
+    }
+
+    fun any(predicate: (T) -> Boolean): Boolean {
+        return finalSequence().any(predicate)
+    }
+
+    fun none(): Boolean {
+        return finalSequence().none()
+    }
+
+    fun none(predicate: (T) -> Boolean): Boolean {
+        return finalSequence().none(predicate)
+    }
+
+    fun all(predicate: (T) -> Boolean): Boolean {
+        return finalSequence().all(predicate)
+    }
+
+    fun first(): T {
+        return finalSequence().first()
+    }
+
+    fun first(predicate: (T) -> Boolean): T {
+        return finalSequence().first(predicate)
+    }
+
+    fun firstOrNull(): T? {
+        return finalSequence().firstOrNull()
+    }
+
+    fun firstOrNull(predicate: (T) -> Boolean): T? {
+        return finalSequence().firstOrNull(predicate)
+    }
+
+    fun last(): T {
+        return finalSequence().last()
+    }
+
+    fun last(predicate: (T) -> Boolean): T {
+        return finalSequence().last(predicate)
+    }
+
+    fun lastOrNull(): T? {
+        return finalSequence().lastOrNull()
+    }
+
+    fun lastOrNull(predicate: (T) -> Boolean): T? {
+        return finalSequence().lastOrNull(predicate)
     }
 
     fun elementAt(index: Int): T {
-        return elementAt(sequence, index)
+        return finalSequence().elementAt(index)
     }
 
-    fun elementAtOrElse(
-        index: Int,
-        defaultValue: (index: Int) -> T
-    ): T {
-        return elementAtOrElse(sequence, index, defaultValue)
+    fun elementAtOrElse(index: Int, defaultValue: (index: Int) -> T): T {
+        return finalSequence().elementAtOrElse(index, defaultValue)
     }
 
     fun elementAtOrNull(index: Int): T? {
-        return elementAtOrNull(sequence, index)
+        return finalSequence().elementAtOrNull(index)
+    }
+
+    fun find(predicate: (T) -> Boolean): T? {
+        return finalSequence().find(predicate)
+    }
+
+    fun findLast(predicate: (T) -> Boolean): T? {
+        return finalSequence().findLast(predicate)
     }
 
     fun indexOf(element: T): Int {
-        return indexOf(sequence, element)
+        return finalSequence().indexOf(element)
     }
 
     fun indexOf(predicate: (T) -> Boolean): Int {
-        return indexOf(sequence, predicate)
+        return finalSequence().indexOf(predicate)
     }
 
     fun lastIndexOf(element: T): Int {
-        return lastIndexOf(sequence, element)
+        return finalSequence().lastIndexOf(element)
     }
 
     fun lastIndexOf(predicate: (T) -> Boolean): Int {
-        return lastIndexOf(sequence, predicate)
-    }
-
-    fun drop(n: Int): SequenceOps<T> {
-        return toSequenceOps(drop(sequence, n))
-    }
-
-    fun dropWhile(predicate: (T) -> Boolean): SequenceOps<T> {
-        return toSequenceOps(dropWhile(sequence, predicate))
+        return finalSequence().lastIndexOf(predicate)
     }
 
     fun take(n: Int): SequenceOps<T> {
-        return toSequenceOps(take(sequence, n))
+        return finalSequence().take(n).toSequenceOps()
     }
 
     fun takeWhile(predicate: (T) -> Boolean): SequenceOps<T> {
-        return toSequenceOps(takeWhile(sequence, predicate))
+        return finalSequence().takeWhile(predicate).toSequenceOps()
+    }
+
+    fun <C : MutableCollection<in T>> takeTo(n: Int, destination: C): C {
+        return finalSequence().takeTo(n, destination)
+    }
+
+    fun <C : MutableCollection<in T>> takeWhileTo(destination: C, predicate: (T) -> Boolean): C {
+        return finalSequence().takeWhileTo(destination, predicate)
+    }
+
+    fun <C : MutableCollection<in T>> takeAllTo(destination: C): C {
+        return finalSequence().takeAllTo(destination)
+    }
+
+    fun drop(n: Int): SequenceOps<T> {
+        return finalSequence().drop(n).toSequenceOps()
+    }
+
+    fun dropWhile(predicate: (T) -> Boolean): SequenceOps<T> {
+        return finalSequence().dropWhile(predicate).toSequenceOps()
+    }
+
+    fun <C : MutableCollection<in T>> dropTo(n: Int, destination: C): C {
+        return finalSequence().dropTo(n, destination)
+    }
+
+    fun <C : MutableCollection<in T>> dropWhileTo(destination: C, predicate: (T) -> Boolean): C {
+        return finalSequence().dropWhileTo(destination, predicate)
+    }
+
+    fun forEachIndexed(action: (index: Int, T) -> Unit) {
+        return finalSequence().forEachIndexed(action)
     }
 
     fun filter(predicate: (T) -> Boolean): SequenceOps<T> {
-        return toSequenceOps(filter(sequence, predicate))
+        return finalSequence().filter(predicate).toSequenceOps()
     }
 
     fun filterIndexed(predicate: (index: Int, T) -> Boolean): SequenceOps<T> {
-        return toSequenceOps(filterIndexed(sequence, predicate))
+        return finalSequence().filterIndexed(predicate).toSequenceOps()
     }
 
     fun filterNotNull(): SequenceOps<T> {
-        return toSequenceOps(filterNotNull(sequence))
+        return finalSequence().filterNotNull().toSequenceOps()
     }
 
-    fun <C : MutableCollection<in T>> filterTo(
-        destination: C,
-        predicate: (T) -> Boolean
-    ): C {
-        return filterTo(sequence, destination, predicate)
+    fun <C : MutableCollection<in T>> filterTo(destination: C, predicate: (T) -> Boolean): C {
+        return finalSequence().filterTo(destination, predicate)
     }
 
-    fun <C : MutableCollection<in T>> filterIndexedTo(
-        destination: C,
-        predicate: (index: Int, T) -> Boolean
-    ): C {
-        return filterIndexedTo(sequence, destination, predicate)
+    fun <C : MutableCollection<in T>> filterIndexedTo(destination: C, predicate: (index: Int, T) -> Boolean): C {
+        return finalSequence().filterIndexedTo(destination, predicate)
     }
 
-    fun <C : MutableCollection<in T>> filterNotNullTo(
-        destination: C
-    ): C {
-        return filterNotNullTo(As.any(sequence), destination)
+    fun <C : MutableCollection<in T>> filterNotNullTo(destination: C): C {
+        return finalSequence().filterNotNullTo(destination)
     }
 
     fun <R> map(transform: (T) -> R): SequenceOps<R> {
-        return toSequenceOps(map(sequence, transform))
+        return finalSequence().map(transform).toSequenceOps()
     }
 
     fun <R> mapIndexed(transform: (index: Int, T) -> R): SequenceOps<R> {
-        return toSequenceOps(mapIndexed(sequence, transform))
+        return finalSequence().mapIndexed(transform).toSequenceOps()
     }
 
-    fun <R> mapNotNull(transform: (T) -> R): SequenceOps<R> {
-        return toSequenceOps(mapNotNull(sequence, transform))
+    fun <R> mapNotNull(transform: (T) -> R?): SequenceOps<R> {
+        return finalSequence().mapNotNull(transform).toSequenceOps()
     }
 
-    fun <R> mapIndexedNotNull(transform: (index: Int, T) -> R): SequenceOps<R> {
-        return toSequenceOps(mapIndexedNotNull(sequence, transform))
+    fun <R> mapIndexedNotNull(transform: (index: Int, T) -> R?): SequenceOps<R> {
+        return finalSequence().mapIndexedNotNull(transform).toSequenceOps()
     }
 
-    fun <R, C : MutableCollection<in R>> mapTo(
-        destination: C,
-        transform: (T) -> R
-    ): C {
-        return mapTo(sequence, destination, transform)
+    fun <R, C : MutableCollection<in R>> mapTo(destination: C, transform: (T) -> R): C {
+        return finalSequence().mapTo(destination, transform)
     }
 
-    fun <R, C : MutableCollection<in R>> mapIndexedTo(
-        destination: C,
-        transform: (index: Int, T) -> R
-    ): C {
-        return mapIndexedTo(sequence, destination, transform)
+    fun <R, C : MutableCollection<in R>> mapIndexedTo(destination: C, transform: (index: Int, T) -> R): C {
+        return finalSequence().mapIndexedTo(destination, transform)
     }
 
-    fun <R : Any, C : MutableCollection<in R>> mapNotNullTo(
-        destination: C,
-        transform: (T) -> R?
-    ): C {
-        return mapNotNullTo(sequence, destination, transform)
+    fun <R : Any, C : MutableCollection<in R>> mapNotNullTo(destination: C, transform: (T) -> R?): C {
+        return finalSequence().mapNotNullTo(destination, transform)
     }
 
     fun <R : Any, C : MutableCollection<in R>> mapIndexedNotNullTo(
         destination: C,
         transform: (index: Int, T) -> R?
     ): C {
-        return mapIndexedNotNullTo(sequence, destination, transform)
+        return finalSequence().mapIndexedNotNullTo(destination, transform)
     }
 
     fun <R> flatMap(transform: (T) -> Iterable<R>): SequenceOps<R> {
-        return toSequenceOps(flatMap(sequence, transform))
+        return finalSequence().flatMap(transform).toSequenceOps()
     }
 
     fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): SequenceOps<R> {
-        return toSequenceOps(flatMapIndexed(sequence, transform))
+        return finalSequence().flatMapIndexed(transform).toSequenceOps()
     }
 
-    fun <R, C : MutableCollection<in R>> flatMapTo(
-        destination: C,
-        transform: (T) -> Iterable<R>
-    ): C {
-        return flatMapTo(sequence, destination, transform)
+    fun <R, C : MutableCollection<in R>> flatMapTo(destination: C, transform: (T) -> Iterable<R>): C {
+        return finalSequence().flatMapTo(destination, transform)
     }
 
     fun <R, C : MutableCollection<in R>> flatMapIndexedTo(
         destination: C,
         transform: (index: Int, T) -> Iterable<R>
     ): C {
-        return flatMapIndexedTo(sequence, destination, transform)
+        return finalSequence().flatMapIndexedTo(destination, transform)
     }
 
-    fun reduce(operation: (T, T) -> T): T {
-        return reduce(sequence, operation)
-    }
-
-    fun reduceIndexed(operation: (index: Int, T, T) -> T): T {
-        return reduceIndexed(sequence, operation)
-    }
-
-    fun reduceOrNull(operation: (T, T) -> T): T? {
-        return reduceOrNull(sequence, operation)
-    }
-
-    fun reduceIndexedOrNull(operation: (index: Int, T, T) -> T): T? {
-        return reduceIndexedOrNull(sequence, operation)
-    }
-
-    fun <R> reduce(
-        initial: R,
-        operation: (R, T) -> R
-    ): R {
-        return reduce(sequence, initial, operation)
-    }
-
-    fun <R> reduceIndexed(
-        initial: R,
-        operation: (index: Int, R, T) -> R
-    ): R {
-        return reduceIndexed(sequence, initial, operation)
-    }
-
-    fun <K, V> associate(
-        keySelector: (T) -> K,
-        valueTransform: (T) -> V
-    ): MapOps<K, V> {
-        return toMapOps(associate(sequence, keySelector, valueTransform))
+    fun <K, V> associate(keySelector: (T) -> K, valueTransform: (T) -> V): MapOps<K, V> {
+        return finalSequence().associate(keySelector, valueTransform).toMapOps()
     }
 
     fun <K, V> associate(transform: (T) -> Pair<K, V>): MapOps<K, V> {
-        return toMapOps(associate(sequence, transform))
+        return finalSequence().associate(transform).toMapOps()
     }
 
     fun <K> associateKey(keySelector: (T) -> K): MapOps<K, T> {
-        return toMapOps(associateKey(sequence, keySelector))
+        return finalSequence().associateKey(keySelector).toMapOps()
     }
 
     fun <V> associateValue(valueSelector: (T) -> V): MapOps<T, V> {
-        return toMapOps(associateValue(sequence, valueSelector))
+        return finalSequence().associateValue(valueSelector).toMapOps()
     }
 
-    fun <K, V> associateWithNext(
-        keySelector: (T) -> K,
-        valueTransform: (T?) -> V
-    ): MapOps<K, V> {
-        return toMapOps(associateWithNext(sequence, keySelector, valueTransform))
+    fun <K, V> associatePair(keySelector: (T) -> K, valueTransform: (T) -> V): MapOps<K, V> {
+        return finalSequence().associatePair(keySelector, valueTransform).toMapOps()
     }
 
-    fun <K, V> associateWithNext(transform: (T, T?) -> Pair<K, V>): MapOps<K, V> {
-        return toMapOps(associateWithNext(sequence, transform))
+    fun <K, V> associatePair(transform: (T, T) -> Pair<K, V>): MapOps<K, V> {
+        return finalSequence().associatePair(transform).toMapOps()
+    }
+
+    fun <K, V> associatePair(complement: T, keySelector: (T) -> K, valueTransform: (T) -> V): MapOps<K, V> {
+        return finalSequence().associatePair(complement, keySelector, valueTransform).toMapOps()
+    }
+
+    fun <K, V> associatePair(complement: T, transform: (T, T) -> Pair<K, V>): MapOps<K, V> {
+        return finalSequence().associatePairTo(complement, LinkedHashMap(), transform).toMapOps()
     }
 
     fun <K, V, M : MutableMap<in K, in V>> associateTo(
+        destination: M, keySelector: (T) -> K, valueTransform: (T) -> V
+    ): M {
+        return finalSequence().associateTo(destination, keySelector, valueTransform)
+    }
+
+    fun <K, V, M : MutableMap<in K, in V>> associateTo(destination: M, transform: (T) -> Pair<K, V>): M {
+        return finalSequence().associateTo(destination, transform)
+    }
+
+    fun <K, M : MutableMap<in K, in T>> associateKeyTo(destination: M, keySelector: (T) -> K): M {
+        return finalSequence().associateKeyTo(destination, keySelector)
+    }
+
+    fun <V, M : MutableMap<in T, in V>> associateValueTo(destination: M, valueSelector: (T) -> V): M {
+        return finalSequence().associateValueTo(destination, valueSelector)
+    }
+
+    fun <K, V, M : MutableMap<in K, in V>> associatePairTo(
         destination: M,
         keySelector: (T) -> K,
         valueTransform: (T) -> V
     ): M {
-        return associateTo(sequence, destination, keySelector, valueTransform)
+        return finalSequence().associatePairTo(destination, keySelector, valueTransform)
     }
 
-    fun <K, V, M : MutableMap<in K, in V>> associateTo(
-        destination: M,
-        transform: (T) -> Pair<K, V>
-    ): M {
-        return associateTo(sequence, destination, transform)
+    fun <K, V, M : MutableMap<in K, in V>> associatePairTo(destination: M, transform: (T, T) -> Pair<K, V>): M {
+        return finalSequence().associatePairTo(destination, transform)
     }
 
-    fun <K, M : MutableMap<in K, in T>> associateKeyTo(
-        destination: M,
-        keySelector: (T) -> K
-    ): M {
-        return associateKeyTo(sequence, destination, keySelector)
-    }
-
-    fun <V, M : MutableMap<in T, in V>> associateValueTo(
-        destination: M,
-        valueSelector: (T) -> V
-    ): M {
-        return associateValueTo(sequence, destination, valueSelector)
-    }
-
-    fun <K, V, M : MutableMap<in K, in V>> associateWithNextTo(
+    fun <K, V, M : MutableMap<in K, in V>> associatePairTo(
+        complement: T,
         destination: M,
         keySelector: (T) -> K,
-        valueTransform: (T?) -> V
+        valueTransform: (T) -> V
     ): M {
-        return associateWithNextTo(sequence, destination, keySelector, valueTransform)
+        return finalSequence().associatePairTo(complement, destination, keySelector, valueTransform)
     }
 
-    fun <K, V, M : MutableMap<in K, in V>> associateWithNextTo(
+    fun <K, V, M : MutableMap<in K, in V>> associatePairTo(
+        complement: T,
         destination: M,
-        transform: (T, T?) -> Pair<K, V>
+        transform: (T, T) -> Pair<K, V>
     ): M {
-        return associateWithNextTo(sequence, destination, transform)
+        return finalSequence().associatePairTo(complement, destination, transform)
     }
 
     fun <K> groupBy(keySelector: (T) -> K): MapOps<K, List<T>> {
-        return toMapOps(groupBy(sequence, keySelector))
+        return finalSequence().groupBy(keySelector).toMapOps()
     }
 
-    fun <K, V> groupBy(
-        keySelector: (T) -> K,
-        valueTransform: (T) -> V
-    ): MapOps<K, List<V>> {
-        return toMapOps(groupBy(sequence, keySelector, valueTransform))
+    fun <K, V> groupBy(keySelector: (T) -> K, valueTransform: (T) -> V): MapOps<K, List<V>> {
+        return finalSequence().groupBy(keySelector, valueTransform).toMapOps()
     }
 
-    fun <K, M : MutableMap<in K, MutableList<T>>> groupByTo(
-        destination: M,
-        keySelector: (T) -> K
-    ): M {
-        return groupByTo(sequence, destination, keySelector)
+    fun <K, M : MutableMap<in K, MutableList<T>>> groupByTo(destination: M, keySelector: (T) -> K): M {
+        return finalSequence().groupByTo(destination, keySelector)
     }
 
     fun <K, V, M : MutableMap<in K, MutableList<V>>> groupByTo(
@@ -381,26 +434,51 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         keySelector: (T) -> K,
         valueTransform: (T) -> V
     ): M {
-        return groupByTo(sequence, destination, keySelector, valueTransform)
+        return finalSequence().groupByTo(destination, keySelector, valueTransform)
+    }
+
+    fun reduce(operation: (T, T) -> T): T {
+        return finalSequence().reduce(operation)
+    }
+
+    fun reduceIndexed(operation: (index: Int, T, T) -> T): T {
+        return finalSequence().reduceIndexed(operation)
+    }
+
+    fun reduceOrNull(operation: (T, T) -> T): T? {
+        return finalSequence().reduceOrNull(operation)
+    }
+
+    fun reduceIndexedOrNull(operation: (index: Int, T, T) -> T): T? {
+        return finalSequence().reduceIndexedOrNull(operation)
+    }
+
+    fun <R> reduce(initial: R, operation: (R, T) -> R): R {
+        return finalSequence().reduce(initial, operation)
+    }
+
+    fun <R> reduceIndexed(initial: R, operation: (index: Int, R, T) -> R): R {
+        return finalSequence().reduceIndexed(initial, operation)
+    }
+
+    fun <R, V> zip(other: Sequence<out R>, transform: (T, R) -> V): SequenceOps<V> {
+        return finalSequence().zip(other, transform).toSequenceOps()
+    }
+
+    fun <R> zipWithNext(transform: (T, T) -> R): SequenceOps<R> {
+        return finalSequence().zipWithNext(transform).toSequenceOps()
     }
 
     fun chunked(size: Int): SequenceOps<List<T>> {
-        return toSequenceOps(chunked(sequence, size))
+        return finalSequence().chunked(size).toSequenceOps()
     }
 
-    fun <R> chunked(
-        size: Int,
-        transform: (List<T>) -> R
-    ): SequenceOps<R> {
-        return toSequenceOps(chunked(sequence, size, transform))
+    fun <R> chunked(size: Int, transform: (List<T>) -> R): SequenceOps<R> {
+        return finalSequence().chunked(size, transform).toSequenceOps()
     }
 
-    fun windowed(
-        size: Int,
-        step: Int = 1,
-        partialWindows: Boolean = false
-    ): SequenceOps<List<T>> {
-        return toSequenceOps(windowed(sequence, size, step, partialWindows))
+    fun windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): SequenceOps<List<T>> {
+        return finalSequence().windowed(size, step, partialWindows).toSequenceOps()
     }
 
     fun <R> windowed(
@@ -409,315 +487,305 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         partialWindows: Boolean = false,
         transform: (List<T>) -> R
     ): SequenceOps<R> {
-        return toSequenceOps(windowed(sequence, size, step, partialWindows, transform))
-    }
-
-    fun <R, V> zip(
-        other: Sequence<R>,
-        transform: (T, R) -> V
-    ): SequenceOps<V> {
-        return toSequenceOps(zip(sequence, other, transform))
-    }
-
-    fun <R> zipWithNext(transform: (T, T) -> R): SequenceOps<R> {
-        return toSequenceOps(zipWithNext(sequence, transform))
-    }
-
-    fun max(): T {
-        return max(sequence)
-    }
-
-    fun max(comparator: Comparator<in T>): T {
-        return max(sequence, comparator)
-    }
-
-    fun maxOrNull(): T? {
-        return maxOrNull(sequence)
-    }
-
-    fun maxOrNull(comparator: Comparator<in T>): T? {
-        return maxOrNull(sequence, comparator)
-    }
-
-    fun min(): T {
-        return min(sequence)
-    }
-
-    fun min(comparator: Comparator<in T>): T {
-        return min(sequence, comparator)
-    }
-
-    fun minOrNull(): T? {
-        return minOrNull(sequence)
-    }
-
-    fun minOrNull(comparator: Comparator<in T>): T? {
-        return minOrNull(sequence, comparator)
-    }
-
-    fun sumInt(): Int {
-        return sumInt(sequence)
-    }
-
-    fun sumInt(selector: (T) -> Int): Int {
-        return sumInt(sequence, selector)
-    }
-
-    fun sumLong(): Long {
-        return sumLong(sequence)
-    }
-
-    fun sumLong(selector: (T) -> Long): Long {
-        return sumLong(sequence, selector)
-    }
-
-    fun sumDouble(): Double {
-        return sumDouble(sequence)
-    }
-
-    fun sumDouble(selector: (T) -> Double): Double {
-        return sumDouble(sequence, selector)
-    }
-
-    fun sumBigInteger(): BigInteger {
-        return sumBigInteger(sequence)
-    }
-
-    fun sumBigInteger(selector: (T) -> BigInteger): BigInteger {
-        return sumBigInteger(sequence, selector)
-    }
-
-    fun sumBigDecimal(): BigDecimal {
-        return sumBigDecimal(sequence)
-    }
-
-    fun sumBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
-        return sumBigDecimal(sequence, selector)
-    }
-
-    fun sorted(): SequenceOps<T> {
-        return toSequenceOps(sorted(sequence))
-    }
-
-    fun sorted(comparator: Comparator<in T>): SequenceOps<T> {
-        return toSequenceOps(sorted(sequence, comparator))
-    }
-
-    fun shuffled(): SequenceOps<T> {
-        return toSequenceOps(shuffled(sequence))
-    }
-
-    fun shuffled(random: Random): SequenceOps<T> {
-        return toSequenceOps(shuffled(sequence, random))
+        return finalSequence().windowed(size, step, partialWindows, transform).toSequenceOps()
     }
 
     fun distinct(): SequenceOps<T> {
-        return toSequenceOps(distinct(sequence))
+        return finalSequence().distinct().toSequenceOps()
     }
 
     fun <K> distinct(selector: (T) -> K): SequenceOps<T> {
-        return toSequenceOps(distinct(sequence, selector))
+        return finalSequence().distinct(selector).toSequenceOps()
     }
 
-    fun forEachIndexed(action: (index: Int, T) -> Unit): SequenceOps<T> {
-        forEachIndexed(sequence, action)
-        return this
+    fun sorted(): SequenceOps<T> {
+        return finalSequence().sorted().toSequenceOps()
     }
 
-    fun addTo(destination: Array<in T>): SequenceOps<T> {
-        addTo(sequence, destination)
-        return this
+    fun sorted(comparator: Comparator<in T>): SequenceOps<T> {
+        return finalSequence().sorted(comparator).toSequenceOps()
     }
 
-    fun addTo(destination: Array<in T>, fromIndex: Int, toIndex: Int): SequenceOps<T> {
-        addTo(sequence, destination, fromIndex, toIndex)
-        return this
+    fun shuffled(): SequenceOps<T> {
+        return finalSequence().shuffled().toSequenceOps()
     }
 
-    fun addTo(destination: MutableCollection<T>): SequenceOps<T> {
-        addTo(sequence, destination)
-        return this
+    fun shuffled(random: Random): SequenceOps<T> {
+        return finalSequence().shuffled(random).toSequenceOps()
     }
 
-    fun plus(element: T): SequenceOps<T> {
-        return toSequenceOps(plus(sequence, element))
+    fun max(): T {
+        return finalSequence().max()
     }
 
-    fun plus(elements: Array<out T>): SequenceOps<T> {
-        return toSequenceOps(plus(sequence, elements))
+    fun max(comparator: Comparator<in T>): T {
+        return finalSequence().max(comparator)
     }
 
-    fun plus(elements: Iterable<T>): SequenceOps<T> {
-        return toSequenceOps(plus(sequence, elements))
+    fun maxOrNull(): T? {
+        return finalSequence().maxOrNull()
     }
 
-    fun plus(elements: Sequence<T>): SequenceOps<T> {
-        return toSequenceOps(plus(sequence, elements))
+    fun maxOrNull(comparator: Comparator<in T>): T? {
+        return finalSequence().maxOrNull(comparator)
     }
 
-    fun minus(element: T): SequenceOps<T> {
-        return toSequenceOps(minus(sequence, element))
+    fun min(): T {
+        return finalSequence().min()
     }
 
-    fun minus(elements: Array<out T>): SequenceOps<T> {
-        return toSequenceOps(minus(sequence, elements))
+    fun min(comparator: Comparator<in T>): T {
+        return finalSequence().min(comparator)
     }
 
-    fun minus(elements: Iterable<T>): SequenceOps<T> {
-        return toSequenceOps(minus(sequence, elements))
+    fun minOrNull(): T? {
+        return finalSequence().minOrNull()
     }
 
-    fun minus(elements: Sequence<T>): SequenceOps<T> {
-        return toSequenceOps(minus(sequence, elements))
+    fun minOrNull(comparator: Comparator<in T>): T? {
+        return finalSequence().minOrNull(comparator)
+    }
+
+    fun sumInt(): Int {
+        return finalSequence().sumInt()
+    }
+
+    fun sumInt(selector: (T) -> Int): Int {
+        return finalSequence().sumInt(selector)
+    }
+
+    fun sumLong(): Long {
+        return finalSequence().sumLong()
+    }
+
+    fun sumLong(selector: (T) -> Long): Long {
+        return finalSequence().sumLong(selector)
+    }
+
+    fun sumDouble(): Double {
+        return finalSequence().sumDouble()
+    }
+
+    fun sumDouble(selector: (T) -> Double): Double {
+        return finalSequence().sumDouble(selector)
+    }
+
+    fun sumBigInteger(): BigInteger {
+        return finalSequence().sumBigInteger()
+    }
+
+    fun sumBigInteger(selector: (T) -> BigInteger): BigInteger {
+        return finalSequence().sumBigInteger(selector)
+    }
+
+    fun sumBigDecimal(): BigDecimal {
+        return finalSequence().sumBigDecimal()
+    }
+
+    fun sumBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+        return finalSequence().sumBigDecimal(selector)
+    }
+
+    fun averageInt(): Int {
+        return finalSequence().averageInt()
+    }
+
+    fun averageInt(selector: (T) -> Int): Int {
+        return finalSequence().averageInt(selector)
+    }
+
+    fun averageLong(): Long {
+        return finalSequence().averageLong()
+    }
+
+    fun averageLong(selector: (T) -> Long): Long {
+        return finalSequence().averageLong(selector)
+    }
+
+    fun averageDouble(): Double {
+        return finalSequence().averageDouble()
+    }
+
+    fun averageDouble(selector: (T) -> Double): Double {
+        return finalSequence().averageDouble(selector)
+    }
+
+    fun averageBigInteger(): BigInteger {
+        return finalSequence().averageBigInteger()
+    }
+
+    fun averageBigInteger(selector: (T) -> BigInteger): BigInteger {
+        return finalSequence().averageBigInteger(selector)
+    }
+
+    fun averageBigDecimal(): BigDecimal {
+        return finalSequence().averageBigDecimal()
+    }
+
+    fun averageBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+        return finalSequence().averageBigDecimal(selector)
     }
 
     fun <C : MutableCollection<in T>> toCollection(destination: C): C {
-        return toCollection(sequence, destination)
+        return finalSequence().toCollection(destination)
     }
 
     fun toSet(): Set<T> {
-        return toSet(sequence)
+        return finalSequence().toSet()
     }
 
     fun toMutableSet(): MutableSet<T> {
-        return toMutableSet(sequence)
+        return finalSequence().toMutableSet()
     }
 
     fun toHashSet(): HashSet<T> {
-        return toHashSet(sequence)
+        return finalSequence().toHashSet()
     }
 
     fun toSortedSet(): SortedSet<T> {
-        return toSortedSet(sequence, Sort.selfComparableComparator())
+        return finalSequence().toSortedSet()
     }
 
     fun toSortedSet(comparator: Comparator<in T>): SortedSet<T> {
-        return toSortedSet(sequence, comparator)
+        return finalSequence().toSortedSet(comparator)
     }
 
     fun toList(): List<T> {
-        return toList(sequence)
+        return finalSequence().toList()
     }
 
     fun toMutableList(): MutableList<T> {
-        return toMutableList(sequence)
+        return finalSequence().toMutableList()
     }
 
-    fun toStream(): Stream<T> {
-        return toStream(sequence)
+    @JvmOverloads
+    fun toStream(parallel: Boolean = false): Stream<T> {
+        return finalSequence().toStream(parallel)
     }
 
-    fun toStream(parallel: Boolean): Stream<T> {
-        return toStream(sequence, parallel)
+    fun toSequence(): Sequence<T> {
+        return finalSequence().toSequence()
     }
 
     fun toArray(): Array<Any?> {
-        return toArray(sequence)
+        return finalSequence().toArray()
     }
 
     fun toArray(generator: (size: Int) -> Array<T>): Array<T> {
-        return toArray(sequence, generator)
+        return finalSequence().toArray(generator)
     }
 
     fun toBooleanArray(): BooleanArray {
-        return toBooleanArray(sequence)
+        return finalSequence().toBooleanArray()
     }
 
     fun toBooleanArray(selector: (T) -> Boolean): BooleanArray {
-        return toBooleanArray(sequence, selector)
+        return finalSequence().toBooleanArray(selector)
     }
 
     fun toByteArray(): ByteArray {
-        return toByteArray(sequence)
+        return finalSequence().toByteArray()
     }
 
     fun toByteArray(selector: (T) -> Byte): ByteArray {
-        return toByteArray(sequence, selector)
+        return finalSequence().toByteArray(selector)
     }
 
     fun toShortArray(): ShortArray {
-        return toShortArray(sequence)
+        return finalSequence().toShortArray()
     }
 
     fun toShortArray(selector: (T) -> Short): ShortArray {
-        return toShortArray(sequence, selector)
+        return finalSequence().toShortArray(selector)
     }
 
     fun toCharArray(): CharArray {
-        return toCharArray(sequence)
+        return finalSequence().toCharArray()
     }
 
     fun toCharArray(selector: (T) -> Char): CharArray {
-        return toCharArray(sequence, selector)
+        return finalSequence().toCharArray(selector)
     }
 
     fun toIntArray(): IntArray {
-        return toIntArray(sequence)
+        return finalSequence().toIntArray()
     }
 
     fun toIntArray(selector: (T) -> Int): IntArray {
-        return toIntArray(sequence, selector)
+        return finalSequence().toIntArray(selector)
     }
 
     fun toLongArray(): LongArray {
-        return toLongArray(sequence)
+        return finalSequence().toLongArray()
     }
 
     fun toLongArray(selector: (T) -> Long): LongArray {
-        return toLongArray(sequence, selector)
+        return finalSequence().toLongArray(selector)
     }
 
     fun toFloatArray(): FloatArray {
-        return toFloatArray(sequence)
+        return finalSequence().toFloatArray()
     }
 
     fun toFloatArray(selector: (T) -> Float): FloatArray {
-        return toFloatArray(sequence, selector)
+        return finalSequence().toFloatArray(selector)
     }
 
     fun toDoubleArray(): DoubleArray {
-        return toDoubleArray(sequence)
+        return finalSequence().toDoubleArray()
     }
 
     fun toDoubleArray(selector: (T) -> Double): DoubleArray {
-        return toDoubleArray(sequence, selector)
+        return finalSequence().toDoubleArray(selector)
     }
 
-    fun toIterableOps(): IterableOps<T> {
-        return toIterableOps(sequence.asIterable())
+    fun plus(element: T): SequenceOps<T> {
+        return finalSequence().plus(element).toSequenceOps()
     }
 
-    fun toListOps(): ListOps<T> {
-        return toListOps(sequence.toList())
+    fun plus(elements: Array<out T>): SequenceOps<T> {
+        return finalSequence().plus(elements).toSequenceOps()
     }
 
-    fun toSetOps(): SetOps<T> {
-        return toSetOps(sequence.toSet())
+    fun plus(elements: Iterable<T>): SequenceOps<T> {
+        return finalSequence().plus(elements).toSequenceOps()
+    }
+
+    fun plus(elements: Sequence<T>): SequenceOps<T> {
+        return finalSequence().plus(elements).toSequenceOps()
+    }
+
+    fun minus(element: T): SequenceOps<T> {
+        return finalSequence().minus(element).toSequenceOps()
+    }
+
+    fun minus(elements: Array<out T>): SequenceOps<T> {
+        return finalSequence().minus(elements).toSequenceOps()
+    }
+
+    fun minus(elements: Iterable<T>): SequenceOps<T> {
+        return finalSequence().minus(elements).toSequenceOps()
+    }
+
+    fun minus(elements: Sequence<T>): SequenceOps<T> {
+        return finalSequence().minus(elements).toSequenceOps()
+    }
+
+    override fun iterator(): Iterator<T> {
+        return finalSequence().iterator()
     }
 
     fun finalSequence(): Sequence<T> {
         return sequence
     }
 
-    private fun <R> toSequenceOps(sequence: Sequence<R>): SequenceOps<R> {
-        this.sequence = As.any(sequence)
-        return As.any(this)
+    private fun <T> Sequence<T>.toSequenceOps(): SequenceOps<T> {
+        sequence = this.asAny()
+        return this@SequenceOps.asAny()
     }
 
-    private fun <T> toIterableOps(iterable: Iterable<T>): IterableOps<T> {
-        return IterableOps.opsFor(iterable)
-    }
-
-    private fun <T> toListOps(list: List<T>): ListOps<T> {
-        return ListOps.opsFor(list)
-    }
-
-    private fun <T> toSetOps(set: Set<T>): SetOps<T> {
-        return SetOps.opsFor(set)
-    }
-
-    private fun <K, V> toMapOps(map: Map<K, V>): MapOps<K, V> {
-        return MapOps.opsFor(map)
+    private fun <K, V> Map<K, V>.toMapOps(): MapOps<K, V> {
+        return MapOps.opsFor(this)
     }
 
     companion object {
@@ -733,430 +801,430 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         }
 
         @JvmStatic
-        inline fun <T> find(sequence: Sequence<T>, predicate: (T) -> Boolean): T? {
-            return sequence.find(predicate)
+        fun <T> Sequence<T>.contains(element: T): Boolean {
+            return this.containsKt(element)
         }
 
         @JvmStatic
-        inline fun <T> findLast(sequence: Sequence<T>, predicate: (T) -> Boolean): T? {
-            return sequence.findLast(predicate)
+        fun <T> Sequence<T>.containsAll(elements: Array<out T>): Boolean {
+            return this.containsAll(elements.toSet())
         }
 
         @JvmStatic
-        fun <T> first(sequence: Sequence<T>): T {
-            return sequence.first()
+        fun <T> Sequence<T>.containsAll(elements: Iterable<T>): Boolean {
+            return this.containsAll(elements.toSet())
         }
 
         @JvmStatic
-        inline fun <T> first(sequence: Sequence<T>, predicate: (T) -> Boolean): T {
-            return sequence.first(predicate)
+        fun <T> Sequence<T>.containsAll(elements: Collection<T>): Boolean {
+            return this.toSet().containsAll(elements)
         }
 
         @JvmStatic
-        fun <T> firstOrNull(sequence: Sequence<T>): T? {
-            return sequence.firstOrNull()
+        fun <T> Sequence<T>.count(): Int {
+            return this.countKt()
         }
 
         @JvmStatic
-        inline fun <T> firstOrNull(sequence: Sequence<T>, predicate: (T) -> Boolean): T? {
-            return sequence.firstOrNull(predicate)
+        inline fun <T> Sequence<T>.count(predicate: (T) -> Boolean): Int {
+            return this.countKt(predicate)
         }
 
         @JvmStatic
-        fun <T> last(sequence: Sequence<T>): T {
-            return sequence.last()
+        fun <T> Sequence<T>.isEmpty(): Boolean {
+            var hasElement = false
+            for (t in this) {
+                hasElement = true
+                break
+            }
+            return !hasElement
         }
 
         @JvmStatic
-        inline fun <T> last(sequence: Sequence<T>, predicate: (T) -> Boolean): T {
-            return sequence.last(predicate)
+        fun <T> Sequence<T>.isNotEmpty(): Boolean {
+            return !this.isEmpty()
         }
 
         @JvmStatic
-        fun <T> lastOrNull(sequence: Sequence<T>): T? {
-            return sequence.lastOrNull()
+        fun <T> Sequence<T>.any(): Boolean {
+            return this.anyKt()
         }
 
         @JvmStatic
-        inline fun <T> lastOrNull(sequence: Sequence<T>, predicate: (T) -> Boolean): T? {
-            return sequence.lastOrNull(predicate)
+        inline fun <T> Sequence<T>.any(predicate: (T) -> Boolean): Boolean {
+            return this.anyKt(predicate)
         }
 
         @JvmStatic
-        inline fun <T> all(sequence: Sequence<T>, predicate: (T) -> Boolean): Boolean {
-            return sequence.all(predicate)
+        fun <T> Sequence<T>.none(): Boolean {
+            return this.noneKt()
         }
 
         @JvmStatic
-        fun <T> any(sequence: Sequence<T>): Boolean {
-            return sequence.any()
+        inline fun <T> Sequence<T>.none(predicate: (T) -> Boolean): Boolean {
+            return this.noneKt(predicate)
         }
 
         @JvmStatic
-        inline fun <T> any(sequence: Sequence<T>, predicate: (T) -> Boolean): Boolean {
-            return sequence.any(predicate)
+        inline fun <T> Sequence<T>.all(predicate: (T) -> Boolean): Boolean {
+            return this.allKt(predicate)
         }
 
         @JvmStatic
-        fun <T> none(sequence: Sequence<T>): Boolean {
-            return sequence.none()
+        fun <T> Sequence<T>.first(): T {
+            return this.firstKt()
         }
 
         @JvmStatic
-        inline fun <T> none(sequence: Sequence<T>, predicate: (T) -> Boolean): Boolean {
-            return sequence.none(predicate)
+        inline fun <T> Sequence<T>.first(predicate: (T) -> Boolean): T {
+            return this.firstKt(predicate)
         }
 
         @JvmStatic
-        fun <T> single(sequence: Sequence<T>): T {
-            return sequence.single()
+        fun <T> Sequence<T>.firstOrNull(): T? {
+            return this.firstOrNullKt()
         }
 
         @JvmStatic
-        inline fun <T> single(sequence: Sequence<T>, predicate: (T) -> Boolean): T {
-            return sequence.single(predicate)
+        inline fun <T> Sequence<T>.firstOrNull(predicate: (T) -> Boolean): T? {
+            return this.firstOrNullKt(predicate)
         }
 
         @JvmStatic
-        fun <T> singleOrNull(sequence: Sequence<T>): T? {
-            return sequence.singleOrNull()
+        fun <T> Sequence<T>.last(): T {
+            return this.lastKt()
         }
 
         @JvmStatic
-        inline fun <T> singleOrNull(sequence: Sequence<T>, predicate: (T) -> Boolean): T? {
-            return sequence.singleOrNull(predicate)
+        inline fun <T> Sequence<T>.last(predicate: (T) -> Boolean): T {
+            return this.lastKt(predicate)
         }
 
         @JvmStatic
-        fun <T> contains(sequence: Sequence<T>, element: T): Boolean {
-            return sequence.contains(element)
+        fun <T> Sequence<T>.lastOrNull(): T? {
+            return this.lastOrNullKt()
         }
 
         @JvmStatic
-        fun <T> count(sequence: Sequence<T>): Int {
-            return sequence.count()
+        inline fun <T> Sequence<T>.lastOrNull(predicate: (T) -> Boolean): T? {
+            return this.lastOrNullKt(predicate)
         }
 
         @JvmStatic
-        inline fun <T> count(sequence: Sequence<T>, predicate: (T) -> Boolean): Int {
-            return sequence.count(predicate)
+        fun <T> Sequence<T>.elementAt(index: Int): T {
+            return this.elementAtKt(index)
         }
 
         @JvmStatic
-        fun <T> elementAt(sequence: Sequence<T>, index: Int): T {
-            return sequence.elementAt(index)
+        fun <T> Sequence<T>.elementAtOrElse(index: Int, defaultValue: (index: Int) -> T): T {
+            return this.elementAtOrElseKt(index, defaultValue)
         }
 
         @JvmStatic
-        fun <T> elementAtOrElse(
-            sequence: Sequence<T>,
-            index: Int,
-            defaultValue: (index: Int) -> T
-        ): T {
-            return sequence.elementAtOrElse(index, defaultValue)
+        fun <T> Sequence<T>.elementAtOrNull(index: Int): T? {
+            return this.elementAtOrNullKt(index)
         }
 
         @JvmStatic
-        fun <T> elementAtOrNull(sequence: Sequence<T>, index: Int): T? {
-            return sequence.elementAtOrNull(index)
+        inline fun <T> Sequence<T>.find(predicate: (T) -> Boolean): T? {
+            return this.findKt(predicate)
         }
 
         @JvmStatic
-        fun <T> indexOf(sequence: Sequence<T>, element: T): Int {
-            return sequence.indexOf(element)
+        inline fun <T> Sequence<T>.findLast(predicate: (T) -> Boolean): T? {
+            return this.firstKt(predicate)
         }
 
         @JvmStatic
-        inline fun <T> indexOf(sequence: Sequence<T>, predicate: (T) -> Boolean): Int {
-            return sequence.indexOfFirst(predicate)
+        fun <T> Sequence<T>.indexOf(element: T): Int {
+            return this.indexOfKt(element)
         }
 
         @JvmStatic
-        fun <T> lastIndexOf(sequence: Sequence<T>, element: T): Int {
-            return sequence.lastIndexOf(element)
+        inline fun <T> Sequence<T>.indexOf(predicate: (T) -> Boolean): Int {
+            return this.indexOfFirstKt(predicate)
         }
 
         @JvmStatic
-        inline fun <T> lastIndexOf(sequence: Sequence<T>, predicate: (T) -> Boolean): Int {
-            return sequence.indexOfLast(predicate)
+        fun <T> Sequence<T>.lastIndexOf(element: T): Int {
+            return this.lastIndexOfKt(element)
         }
 
         @JvmStatic
-        fun <T> drop(sequence: Sequence<T>, n: Int): Sequence<T> {
-            return sequence.drop(n)
+        inline fun <T> Sequence<T>.lastIndexOf(predicate: (T) -> Boolean): Int {
+            return this.indexOfLastKt(predicate)
         }
 
         @JvmStatic
-        fun <T> dropWhile(sequence: Sequence<T>, predicate: (T) -> Boolean): Sequence<T> {
-            return sequence.dropWhile(predicate)
+        fun <T> Sequence<T>.take(n: Int): Sequence<T> {
+            return this.takeKt(n)
         }
 
         @JvmStatic
-        fun <T> take(sequence: Sequence<T>, n: Int): Sequence<T> {
-            return sequence.take(n)
+        fun <T> Sequence<T>.takeWhile(predicate: (T) -> Boolean): Sequence<T> {
+            return this.takeWhileKt(predicate)
         }
 
         @JvmStatic
-        fun <T> takeWhile(sequence: Sequence<T>, predicate: (T) -> Boolean): Sequence<T> {
-            return sequence.takeWhile(predicate)
+        fun <T, C : MutableCollection<in T>> Sequence<T>.takeTo(n: Int, destination: C): C {
+            destination.addAll(this.take(n))
+            return destination
         }
 
         @JvmStatic
-        fun <T> filter(sequence: Sequence<T>, predicate: (T) -> Boolean): Sequence<T> {
-            return sequence.filter(predicate)
-        }
-
-        @JvmStatic
-        fun <T> filterIndexed(sequence: Sequence<T>, predicate: (index: Int, T) -> Boolean): Sequence<T> {
-            return sequence.filterIndexed(predicate)
-        }
-
-        @JvmStatic
-        fun <T : Any> filterNotNull(sequence: Sequence<T?>): Sequence<T> {
-            return sequence.filterNotNull()
-        }
-
-        @JvmStatic
-        inline fun <T, C : MutableCollection<in T>> filterTo(
-            sequence: Sequence<T>,
+        fun <T, C : MutableCollection<in T>> Sequence<T>.takeWhileTo(
             destination: C,
             predicate: (T) -> Boolean
         ): C {
-            return sequence.filterTo(destination, predicate)
+            destination.addAll(this.takeWhile(predicate))
+            return destination
         }
 
         @JvmStatic
-        inline fun <T, C : MutableCollection<in T>> filterIndexedTo(
-            sequence: Sequence<T>,
+        fun <T, C : MutableCollection<in T>> Sequence<T>.takeAllTo(destination: C): C {
+            destination.addAll(this)
+            return destination
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.drop(n: Int): Sequence<T> {
+            return this.dropKt(n)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.dropWhile(predicate: (T) -> Boolean): Sequence<T> {
+            return this.dropWhileKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T, C : MutableCollection<in T>> Sequence<T>.dropTo(n: Int, destination: C): C {
+            destination.addAll(this.drop(n))
+            return destination
+        }
+
+        @JvmStatic
+        fun <T, C : MutableCollection<in T>> Sequence<T>.dropWhileTo(
+            destination: C,
+            predicate: (T) -> Boolean
+        ): C {
+            destination.addAll(this.dropWhile(predicate))
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T> Sequence<T>.forEachIndexed(action: (index: Int, T) -> Unit) {
+            return this.forEachIndexedKt(action)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.filter(predicate: (T) -> Boolean): Sequence<T> {
+            return this.filterKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.filterIndexed(predicate: (index: Int, T) -> Boolean): Sequence<T> {
+            return this.filterIndexedKt(predicate)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.filterNotNull(): Sequence<T> {
+            return this.filterNotNullKt()
+        }
+
+        @JvmStatic
+        inline fun <T, C : MutableCollection<in T>> Sequence<T>.filterTo(destination: C, predicate: (T) -> Boolean): C {
+            return this.filterToKt(destination, predicate)
+        }
+
+        @JvmStatic
+        inline fun <T, C : MutableCollection<in T>> Sequence<T>.filterIndexedTo(
             destination: C,
             predicate: (index: Int, T) -> Boolean
         ): C {
-            return sequence.filterIndexedTo(destination, predicate)
+            return this.filterIndexedToKt(destination, predicate)
         }
 
         @JvmStatic
-        fun <C : MutableCollection<in T>, T : Any> filterNotNullTo(
-            sequence: Sequence<T?>,
-            destination: C
-        ): C {
-            return sequence.filterNotNullTo(destination)
+        fun <C : MutableCollection<in T>, T> Sequence<T>.filterNotNullTo(destination: C): C {
+            return this.filterTo(destination, { it !== null })
         }
 
         @JvmStatic
-        fun <T, R> map(sequence: Sequence<T>, transform: (T) -> R): Sequence<R> {
-            return sequence.map(transform)
+        fun <T, R> Sequence<T>.map(transform: (T) -> R): Sequence<R> {
+            return this.mapKt(transform)
         }
 
         @JvmStatic
-        fun <T, R> mapIndexed(sequence: Sequence<T>, transform: (index: Int, T) -> R): Sequence<R> {
-            return sequence.mapIndexed(transform)
+        fun <T, R> Sequence<T>.mapIndexed(transform: (index: Int, T) -> R): Sequence<R> {
+            return this.mapIndexedKt(transform)
         }
 
         @JvmStatic
-        fun <T, R> mapNotNull(sequence: Sequence<T>, transform: (T) -> R): Sequence<R> {
-            return sequence.mapNotNull(transform)
+        fun <T, R : Any> Sequence<T>.mapNotNull(transform: (T) -> R?): Sequence<R> {
+            return this.mapNotNullKt(transform)
         }
 
         @JvmStatic
-        fun <T, R> mapIndexedNotNull(sequence: Sequence<T>, transform: (index: Int, T) -> R): Sequence<R> {
-            return sequence.mapIndexedNotNull(transform)
+        fun <T, R : Any> Sequence<T>.mapIndexedNotNull(transform: (index: Int, T) -> R?): Sequence<R> {
+            return this.mapIndexedNotNullKt(transform)
         }
 
         @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> mapTo(
-            sequence: Sequence<T>,
-            destination: C,
-            transform: (T) -> R
-        ): C {
-            return sequence.mapTo(destination, transform)
+        inline fun <T, R, C : MutableCollection<in R>> Sequence<T>.mapTo(destination: C, transform: (T) -> R): C {
+            return this.mapToKt(destination, transform)
         }
 
         @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> mapIndexedTo(
-            sequence: Sequence<T>,
+        inline fun <T, R, C : MutableCollection<in R>> Sequence<T>.mapIndexedTo(
             destination: C,
             transform: (index: Int, T) -> R
         ): C {
-            return sequence.mapIndexedTo(destination, transform)
+            return this.mapIndexedToKt(destination, transform)
         }
 
         @JvmStatic
-        inline fun <T, R : Any, C : MutableCollection<in R>> mapNotNullTo(
-            sequence: Sequence<T>,
+        inline fun <T, R : Any, C : MutableCollection<in R>> Sequence<T>.mapNotNullTo(
             destination: C,
             transform: (T) -> R?
         ): C {
-            return sequence.mapNotNullTo(destination, transform)
+            return this.mapNotNullToKt(destination, transform)
         }
 
         @JvmStatic
-        inline fun <T, R : Any, C : MutableCollection<in R>> mapIndexedNotNullTo(
-            sequence: Sequence<T>,
+        inline fun <T, R : Any, C : MutableCollection<in R>> Sequence<T>.mapIndexedNotNullTo(
             destination: C,
             transform: (index: Int, T) -> R?
         ): C {
-            return sequence.mapIndexedNotNullTo(destination, transform)
+            return this.mapIndexedNotNullToKt(destination, transform)
         }
 
         @JvmStatic
-        fun <T, R> flatMap(sequence: Sequence<T>, transform: (T) -> Iterable<R>): Sequence<R> {
-            return sequence.flatMap(transform)
+        fun <T, R> Sequence<T>.flatMap(transform: (T) -> Iterable<R>): Sequence<R> {
+            return this.flatMapKt(transform)
         }
 
         @JvmStatic
-        fun <T, R> flatMapIndexed(sequence: Sequence<T>, transform: (index: Int, T) -> Iterable<R>): Sequence<R> {
-            return sequence.flatMapIndexed(transform)
+        fun <T, R> Sequence<T>.flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): Sequence<R> {
+            return this.flatMapIndexedKt(transform)
         }
 
         @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> flatMapTo(
-            sequence: Sequence<T>,
+        inline fun <T, R, C : MutableCollection<in R>> Sequence<T>.flatMapTo(
             destination: C,
             transform: (T) -> Iterable<R>
         ): C {
-            return sequence.flatMapTo(destination, transform)
+            return this.flatMapToKt(destination, transform)
         }
 
         @JvmStatic
-        inline fun <T, R, C : MutableCollection<in R>> flatMapIndexedTo(
-            sequence: Sequence<T>,
+        inline fun <T, R, C : MutableCollection<in R>> Sequence<T>.flatMapIndexedTo(
             destination: C,
             transform: (index: Int, T) -> Iterable<R>
         ): C {
-            return sequence.flatMapIndexedTo(destination, transform)
+            return this.flatMapIndexedToKt(destination, transform)
         }
 
         @JvmStatic
-        inline fun <S, T : S> reduce(sequence: Sequence<T>, operation: (S, T) -> S): S {
-            return sequence.reduce(operation)
-        }
-
-        @JvmStatic
-        inline fun <S, T : S> reduceIndexed(sequence: Sequence<T>, operation: (index: Int, S, T) -> S): S {
-            return sequence.reduceIndexed(operation)
-        }
-
-        @JvmStatic
-        inline fun <S, T : S> reduceOrNull(sequence: Sequence<T>, operation: (S, T) -> S): S? {
-            return sequence.reduceOrNull(operation)
-        }
-
-        @JvmStatic
-        inline fun <S, T : S> reduceIndexedOrNull(sequence: Sequence<T>, operation: (index: Int, S, T) -> S): S? {
-            return sequence.reduceIndexedOrNull(operation)
-        }
-
-        @JvmStatic
-        inline fun <T, R> reduce(
-            sequence: Sequence<T>,
-            initial: R,
-            operation: (R, T) -> R
-        ): R {
-            return sequence.fold(initial, operation)
-        }
-
-        @JvmStatic
-        inline fun <T, R> reduceIndexed(
-            sequence: Sequence<T>,
-            initial: R,
-            operation: (index: Int, R, T) -> R
-        ): R {
-            return sequence.foldIndexed(initial, operation)
-        }
-
-        @JvmStatic
-        inline fun <T, K, V> associate(
-            sequence: Sequence<T>,
+        inline fun <T, K, V> Sequence<T>.associate(
             keySelector: (T) -> K,
             valueTransform: (T) -> V
         ): Map<K, V> {
-            return sequence.associateBy(keySelector, valueTransform)
+            return this.associateByKt(keySelector, valueTransform)
         }
 
         @JvmStatic
-        inline fun <T, K, V> associate(sequence: Sequence<T>, transform: (T) -> Pair<K, V>): Map<K, V> {
-            return sequence.associate(transform)
+        inline fun <T, K, V> Sequence<T>.associate(transform: (T) -> Pair<K, V>): Map<K, V> {
+            return this.associateKt(transform)
         }
 
         @JvmStatic
-        inline fun <T, K> associateKey(sequence: Sequence<T>, keySelector: (T) -> K): Map<K, T> {
-            return sequence.associateBy(keySelector)
+        inline fun <T, K> Sequence<T>.associateKey(keySelector: (T) -> K): Map<K, T> {
+            return this.associateByKt(keySelector)
         }
 
         @JvmStatic
-        inline fun <T, V> associateValue(sequence: Sequence<T>, valueSelector: (T) -> V): Map<T, V> {
-            return sequence.associateWith(valueSelector)
+        inline fun <T, V> Sequence<T>.associateValue(valueSelector: (T) -> V): Map<T, V> {
+            return this.associateWithKt(valueSelector)
         }
 
         @JvmStatic
-        inline fun <T, K, V> associateWithNext(
-            sequence: Sequence<T>,
+        inline fun <T, K, V> Sequence<T>.associatePair(
             keySelector: (T) -> K,
-            valueTransform: (T?) -> V
+            valueTransform: (T) -> V
         ): Map<K, V> {
-            return associateWithNextTo(sequence, LinkedHashMap(), keySelector, valueTransform)
+            return this.associatePairTo(LinkedHashMap(), keySelector, valueTransform)
         }
 
         @JvmStatic
-        inline fun <T, K, V> associateWithNext(sequence: Sequence<T>, transform: (T, T?) -> Pair<K, V>): Map<K, V> {
-            return associateWithNextTo(sequence, LinkedHashMap(), transform)
+        inline fun <T, K, V> Sequence<T>.associatePair(transform: (T, T) -> Pair<K, V>): Map<K, V> {
+            return this.associatePairTo(LinkedHashMap(), transform)
         }
 
         @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, in V>> associateTo(
-            sequence: Sequence<T>,
+        inline fun <T, K, V> Sequence<T>.associatePair(
+            complement: T,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): Map<K, V> {
+            return this.associatePairTo(complement, LinkedHashMap(), keySelector, valueTransform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V> Sequence<T>.associatePair(
+            complement: T,
+            transform: (T, T) -> Pair<K, V>
+        ): Map<K, V> {
+            return this.associatePairTo(complement, LinkedHashMap(), transform)
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associateTo(
             destination: M,
             keySelector: (T) -> K,
             valueTransform: (T) -> V
         ): M {
-            return sequence.associateByTo(destination, keySelector, valueTransform)
+            return this.associateByToKt(destination, keySelector, valueTransform)
         }
 
         @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, in V>> associateTo(
-            sequence: Sequence<T>,
+        inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associateTo(
             destination: M,
             transform: (T) -> Pair<K, V>
         ): M {
-            return sequence.associateTo(destination, transform)
+            return this.associateToKt(destination, transform)
         }
 
         @JvmStatic
-        inline fun <T, K, M : MutableMap<in K, in T>> associateKeyTo(
-            sequence: Sequence<T>,
+        inline fun <T, K, M : MutableMap<in K, in T>> Sequence<T>.associateKeyTo(
             destination: M,
             keySelector: (T) -> K
         ): M {
-            return sequence.associateByTo(destination, keySelector)
+            return this.associateByToKt(destination, keySelector)
         }
 
         @JvmStatic
-        inline fun <T, V, M : MutableMap<in T, in V>> associateValueTo(
-            sequence: Sequence<T>,
+        inline fun <T, V, M : MutableMap<in T, in V>> Sequence<T>.associateValueTo(
             destination: M,
             valueSelector: (T) -> V
         ): M {
-            return sequence.associateWithTo(destination, valueSelector)
+            return this.associateWithToKt(destination, valueSelector)
         }
 
         @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, in V>> associateWithNextTo(
-            sequence: Sequence<T>,
+        inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
             destination: M,
             keySelector: (T) -> K,
-            valueTransform: (T?) -> V
+            valueTransform: (T) -> V
         ): M {
-            val iterator = sequence.iterator()
+            val iterator = this.iterator()
             while (iterator.hasNext()) {
-                val tk = iterator.next()
-                val k = keySelector(tk)
+                val ik = iterator.next()
                 if (iterator.hasNext()) {
-                    val tv = iterator.next()
-                    val v = valueTransform(tv)
+                    val iv = iterator.next()
+                    val k = keySelector(ik)
+                    val v = valueTransform(iv)
                     destination.put(k, v)
                 } else {
-                    val v = valueTransform(null)
-                    destination.put(k, v)
                     break
                 }
             }
@@ -1164,20 +1232,64 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         }
 
         @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, in V>> associateWithNextTo(
-            sequence: Sequence<T>,
+        inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
             destination: M,
-            transform: (T, T?) -> Pair<K, V>
+            transform: (T, T) -> Pair<K, V>
         ): M {
-            val iterator = sequence.iterator()
+            val iterator = this.iterator()
             while (iterator.hasNext()) {
-                val tk = iterator.next()
+                val ik = iterator.next()
                 if (iterator.hasNext()) {
-                    val tv = iterator.next()
-                    val pair = transform(tk, tv)
+                    val iv = iterator.next()
+                    val pair = transform(ik, iv)
                     destination.put(pair.first, pair.second)
                 } else {
-                    val pair = transform(tk, null)
+                    break
+                }
+            }
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
+            complement: T,
+            destination: M,
+            keySelector: (T) -> K,
+            valueTransform: (T) -> V
+        ): M {
+            val iterator = this.iterator()
+            while (iterator.hasNext()) {
+                val ik = iterator.next()
+                if (iterator.hasNext()) {
+                    val iv = iterator.next()
+                    val k = keySelector(ik)
+                    val v = valueTransform(iv)
+                    destination.put(k, v)
+                } else {
+                    val k = keySelector(ik)
+                    val v = valueTransform(complement)
+                    destination.put(k, v)
+                    break
+                }
+            }
+            return destination
+        }
+
+        @JvmStatic
+        inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
+            complement: T,
+            destination: M,
+            transform: (T, T) -> Pair<K, V>
+        ): M {
+            val iterator = this.iterator()
+            while (iterator.hasNext()) {
+                val ik = iterator.next()
+                if (iterator.hasNext()) {
+                    val iv = iterator.next()
+                    val pair = transform(ik, iv)
+                    destination.put(pair.first, pair.second)
+                } else {
+                    val pair = transform(ik, complement)
                     destination.put(pair.first, pair.second)
                     break
                 }
@@ -1186,448 +1298,454 @@ class SequenceOps<T> private constructor(sequence: Sequence<T>) {
         }
 
         @JvmStatic
-        inline fun <T, K> groupBy(sequence: Sequence<T>, keySelector: (T) -> K): Map<K, List<T>> {
-            return sequence.groupBy(keySelector)
+        inline fun <T, K> Sequence<T>.groupBy(keySelector: (T) -> K): Map<K, List<T>> {
+            return this.groupByKt(keySelector)
         }
 
         @JvmStatic
-        inline fun <T, K, V> groupBy(
-            sequence: Sequence<T>,
+        inline fun <T, K, V> Sequence<T>.groupBy(
             keySelector: (T) -> K,
             valueTransform: (T) -> V
         ): Map<K, List<V>> {
-            return sequence.groupBy(keySelector, valueTransform)
+            return this.groupByKt(keySelector, valueTransform)
         }
 
         @JvmStatic
-        inline fun <T, K, M : MutableMap<in K, MutableList<T>>> groupByTo(
-            sequence: Sequence<T>,
+        inline fun <T, K, M : MutableMap<in K, MutableList<T>>> Sequence<T>.groupByTo(
             destination: M,
             keySelector: (T) -> K
         ): M {
-            return sequence.groupByTo(destination, keySelector)
+            return this.groupByToKt(destination, keySelector)
         }
 
         @JvmStatic
-        inline fun <T, K, V, M : MutableMap<in K, MutableList<V>>> groupByTo(
-            sequence: Sequence<T>,
+        inline fun <T, K, V, M : MutableMap<in K, MutableList<V>>> Sequence<T>.groupByTo(
             destination: M,
             keySelector: (T) -> K,
             valueTransform: (T) -> V
         ): M {
-            return sequence.groupByTo(destination, keySelector, valueTransform)
+            return this.groupByToKt(destination, keySelector, valueTransform)
         }
 
         @JvmStatic
-        fun <T> chunked(sequence: Sequence<T>, size: Int): Sequence<List<T>> {
-            return sequence.chunked(size)
+        inline fun <S, T : S> Sequence<T>.reduce(operation: (S, T) -> S): S {
+            return this.reduceKt(operation)
         }
 
         @JvmStatic
-        fun <T, R> chunked(
-            sequence: Sequence<T>,
-            size: Int,
-            transform: (List<T>) -> R
-        ): Sequence<R> {
-            return sequence.chunked(size, transform)
+        inline fun <S, T : S> Sequence<T>.reduceIndexed(operation: (index: Int, S, T) -> S): S {
+            return this.reduceIndexedKt(operation)
         }
 
         @JvmStatic
-        fun <T> windowed(
-            sequence: Sequence<T>,
-            size: Int,
-            step: Int = 1,
-            partialWindows: Boolean = false
-        ): Sequence<List<T>> {
-            return sequence.windowed(size, step, partialWindows)
+        inline fun <S, T : S> Sequence<T>.reduceOrNull(operation: (S, T) -> S): S? {
+            return this.reduceOrNullKt(operation)
         }
 
         @JvmStatic
-        fun <T, R> windowed(
-            sequence: Sequence<T>,
+        inline fun <S, T : S> Sequence<T>.reduceIndexedOrNull(operation: (index: Int, S, T) -> S): S? {
+            return this.reduceIndexedOrNullKt(operation)
+        }
+
+        @JvmStatic
+        inline fun <T, R> Sequence<T>.reduce(initial: R, operation: (R, T) -> R): R {
+            return this.foldKt(initial, operation)
+        }
+
+        @JvmStatic
+        inline fun <T, R> Sequence<T>.reduceIndexed(initial: R, operation: (index: Int, R, T) -> R): R {
+            return this.foldIndexedKt(initial, operation)
+        }
+
+        @JvmStatic
+        fun <T, R, V> Sequence<T>.zip(other: Sequence<out R>, transform: (T, R) -> V): Sequence<V> {
+            return this.zipKt(other, transform)
+        }
+
+        @JvmStatic
+        fun <T, R> Sequence<T>.zipWithNext(transform: (T, T) -> R): Sequence<R> {
+            return this.zipWithNextKt(transform)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.chunked(size: Int): Sequence<List<T>> {
+            return this.chunkedKt(size)
+        }
+
+        @JvmStatic
+        fun <T, R> Sequence<T>.chunked(size: Int, transform: (List<T>) -> R): Sequence<R> {
+            return this.chunkedKt(size, transform)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): Sequence<List<T>> {
+            return this.windowedKt(size, step, partialWindows)
+        }
+
+        @JvmStatic
+        fun <T, R> Sequence<T>.windowed(
             size: Int,
             step: Int = 1,
             partialWindows: Boolean = false,
             transform: (List<T>) -> R
         ): Sequence<R> {
-            return sequence.windowed(size, step, partialWindows, transform)
+            return this.windowedKt(size, step, partialWindows, transform)
         }
 
         @JvmStatic
-        fun <T, R, V> zip(
-            sequence: Sequence<T>,
-            other: Sequence<R>,
-            transform: (T, R) -> V
-        ): Sequence<V> {
-            return sequence.zip(other, transform)
+        fun <T> Sequence<T>.distinct(): Sequence<T> {
+            return this.distinctKt()
         }
 
         @JvmStatic
-        fun <T, R> zipWithNext(sequence: Sequence<T>, transform: (T, T) -> R): Sequence<R> {
-            return sequence.zipWithNext(transform)
+        fun <T, K> Sequence<T>.distinct(selector: (T) -> K): Sequence<T> {
+            return this.distinctByKt(selector)
         }
 
         @JvmStatic
-        fun <T> max(sequence: Sequence<T>): T {
-            return Require.notNull(maxOrNull(sequence))
+        fun <T> Sequence<T>.sorted(): Sequence<T> {
+            return this.sorted(castSelfComparableComparator())
         }
 
         @JvmStatic
-        fun <T> max(sequence: Sequence<T>, comparator: Comparator<in T>): T {
-            return Require.notNull(maxOrNull(sequence, comparator))
+        fun <T> Sequence<T>.sorted(comparator: Comparator<in T>): Sequence<T> {
+            return this.sortedWithKt(comparator)
         }
 
         @JvmStatic
-        fun <T> maxOrNull(sequence: Sequence<T>): T? {
-            return maxOrNull(sequence, Sort.selfComparableComparator())
+        fun <T> Sequence<T>.shuffled(): Sequence<T> {
+            return this.shuffledKt()
         }
 
         @JvmStatic
-        fun <T> maxOrNull(sequence: Sequence<T>, comparator: Comparator<in T>): T? {
-            return sequence.maxWithOrNull(comparator)
+        fun <T> Sequence<T>.shuffled(random: Random): Sequence<T> {
+            return this.shuffledKt(random)
         }
 
         @JvmStatic
-        fun <T> min(sequence: Sequence<T>): T {
-            return Require.notNull(minOrNull(sequence))
+        fun <T> Sequence<T>.max(): T {
+            return this.maxOrNull().notNull()
         }
 
         @JvmStatic
-        fun <T> min(sequence: Sequence<T>, comparator: Comparator<in T>): T {
-            return Require.notNull(minOrNull(sequence, comparator))
+        fun <T> Sequence<T>.max(comparator: Comparator<in T>): T {
+            return this.maxOrNull(comparator).notNull()
         }
 
         @JvmStatic
-        fun <T> minOrNull(sequence: Sequence<T>): T? {
-            return minOrNull(sequence, Sort.selfComparableComparator())
+        fun <T> Sequence<T>.maxOrNull(): T? {
+            return this.maxOrNull(castSelfComparableComparator())
         }
 
         @JvmStatic
-        fun <T> minOrNull(sequence: Sequence<T>, comparator: Comparator<in T>): T? {
-            return sequence.minWithOrNull(comparator)
+        fun <T> Sequence<T>.maxOrNull(comparator: Comparator<in T>): T? {
+            return this.maxWithOrNullKt(comparator)
         }
 
         @JvmStatic
-        fun <T> sumInt(sequence: Sequence<T>): Int {
-            return sumInt(sequence) { To.toInt(it) }
+        fun <T> Sequence<T>.min(): T {
+            return this.minOrNull().notNull()
         }
 
         @JvmStatic
-        inline fun <T> sumInt(sequence: Sequence<T>, selector: (T) -> Int): Int {
-            return sequence.sumOf(selector)
+        fun <T> Sequence<T>.min(comparator: Comparator<in T>): T {
+            return this.minOrNull(comparator).notNull()
         }
 
         @JvmStatic
-        fun <T> sumLong(sequence: Sequence<T>): Long {
-            return sumLong(sequence) { To.toLong(it) }
+        fun <T> Sequence<T>.minOrNull(): T? {
+            return this.minOrNull(castSelfComparableComparator())
         }
 
         @JvmStatic
-        inline fun <T> sumLong(sequence: Sequence<T>, selector: (T) -> Long): Long {
-            return sequence.sumOf(selector)
+        fun <T> Sequence<T>.minOrNull(comparator: Comparator<in T>): T? {
+            return this.minWithOrNullKt(comparator)
         }
 
         @JvmStatic
-        fun <T> sumDouble(sequence: Sequence<T>): Double {
-            return sumDouble(sequence) { To.toDouble(it) }
+        fun <T> Sequence<T>.sumInt(): Int {
+            return this.sumInt { it.toInt() }
         }
 
         @JvmStatic
-        fun <T> sumDouble(sequence: Sequence<T>, selector: (T) -> Double): Double {
-            return sequence.sumOf(selector)
+        inline fun <T> Sequence<T>.sumInt(selector: (T) -> Int): Int {
+            return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> sumBigInteger(sequence: Sequence<T>): BigInteger {
-            return sumBigInteger(sequence) { To.toBigInteger(it) }
+        fun <T> Sequence<T>.sumLong(): Long {
+            return this.sumLong { it.toLong() }
         }
 
         @JvmStatic
-        fun <T> sumBigInteger(sequence: Sequence<T>, selector: (T) -> BigInteger): BigInteger {
-            return sequence.sumOf(selector)
+        inline fun <T> Sequence<T>.sumLong(selector: (T) -> Long): Long {
+            return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> sumBigDecimal(sequence: Sequence<T>): BigDecimal {
-            return sumBigDecimal(sequence) { To.toBigDecimal(it) }
+        fun <T> Sequence<T>.sumDouble(): Double {
+            return this.sumDouble { it.toDouble() }
         }
 
         @JvmStatic
-        fun <T> sumBigDecimal(sequence: Sequence<T>, selector: (T) -> BigDecimal): BigDecimal {
-            return sequence.sumOf(selector)
+        fun <T> Sequence<T>.sumDouble(selector: (T) -> Double): Double {
+            return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> sorted(sequence: Sequence<T>): Sequence<T> {
-            return sorted(sequence, Sort.selfComparableComparator())
+        fun <T> Sequence<T>.sumBigInteger(): BigInteger {
+            return this.sumBigInteger { it.toBigInteger() }
         }
 
         @JvmStatic
-        fun <T> sorted(sequence: Sequence<T>, comparator: Comparator<in T>): Sequence<T> {
-            return sequence.sortedWith(comparator)
+        fun <T> Sequence<T>.sumBigInteger(selector: (T) -> BigInteger): BigInteger {
+            return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> shuffled(sequence: Sequence<T>): Sequence<T> {
-            return sequence.shuffled()
+        fun <T> Sequence<T>.sumBigDecimal(): BigDecimal {
+            return this.sumBigDecimal { it.toBigDecimal() }
         }
 
         @JvmStatic
-        fun <T> shuffled(sequence: Sequence<T>, random: Random): Sequence<T> {
-            return sequence.shuffled(random)
+        fun <T> Sequence<T>.sumBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+            return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> distinct(sequence: Sequence<T>): Sequence<T> {
-            return sequence.distinct()
+        fun <T> Sequence<T>.averageInt(): Int {
+            return this.toList().averageInt()
         }
 
         @JvmStatic
-        fun <T, K> distinct(sequence: Sequence<T>, selector: (T) -> K): Sequence<T> {
-            return sequence.distinctBy(selector)
+        inline fun <T> Sequence<T>.averageInt(selector: (T) -> Int): Int {
+            return this.toList().averageInt(selector)
         }
 
         @JvmStatic
-        inline fun <T> forEachIndexed(sequence: Sequence<T>, action: (index: Int, T) -> Unit) {
-            return sequence.forEachIndexed(action)
+        fun <T> Sequence<T>.averageLong(): Long {
+            return this.toList().averageLong()
         }
 
         @JvmStatic
-        fun <T> addTo(sequence: Sequence<T>, destination: Array<in T>): Boolean {
-            return addTo(sequence, destination, 0, destination.size)
+        inline fun <T> Sequence<T>.averageLong(selector: (T) -> Long): Long {
+            return this.toList().averageLong(selector)
         }
 
         @JvmStatic
-        fun <T> addTo(sequence: Sequence<T>, destination: Array<in T>, fromIndex: Int, toIndex: Int): Boolean {
-            Check.checkRangeInBounds(fromIndex, toIndex, destination.size)
-            var result = false
-            val iterator = sequence.iterator()
-            for (i in fromIndex until toIndex) {
-                if (iterator.hasNext()) {
-                    destination[i] = iterator.next()
-                    result = true
-                } else {
-                    return result
-                }
-            }
-            return result
+        fun <T> Sequence<T>.averageDouble(): Double {
+            return this.toList().averageDouble()
         }
 
         @JvmStatic
-        fun <T> addTo(sequence: Sequence<T>, destination: MutableCollection<T>): Boolean {
-            return destination.addAll(sequence)
+        inline fun <T> Sequence<T>.averageDouble(selector: (T) -> Double): Double {
+            return this.toList().averageDouble(selector)
         }
 
         @JvmStatic
-        fun <T> plus(sequence: Sequence<T>, element: T): Sequence<T> {
-            return sequence.plus(element)
+        fun <T> Sequence<T>.averageBigInteger(): BigInteger {
+            return this.toList().averageBigInteger()
         }
 
         @JvmStatic
-        fun <T> plus(sequence: Sequence<T>, elements: Array<out T>): Sequence<T> {
-            return sequence.plus(elements)
+        inline fun <T> Sequence<T>.averageBigInteger(selector: (T) -> BigInteger): BigInteger {
+            return this.toList().averageBigInteger(selector)
         }
 
         @JvmStatic
-        fun <T> plus(sequence: Sequence<T>, elements: Iterable<T>): Sequence<T> {
-            return sequence.plus(elements)
+        fun <T> Sequence<T>.averageBigDecimal(): BigDecimal {
+            return this.toList().averageBigDecimal()
         }
 
         @JvmStatic
-        fun <T> plus(sequence: Sequence<T>, elements: Sequence<T>): Sequence<T> {
-            return sequence.plus(elements)
+        inline fun <T> Sequence<T>.averageBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+            return this.toList().averageBigDecimal(selector)
         }
 
         @JvmStatic
-        fun <T> minus(sequence: Sequence<T>, element: T): Sequence<T> {
-            return sequence.minus(element)
+        fun <T, C : MutableCollection<in T>> Sequence<T>.toCollection(destination: C): C {
+            return this.toCollectionKt(destination)
         }
 
         @JvmStatic
-        fun <T> minus(sequence: Sequence<T>, elements: Array<out T>): Sequence<T> {
-            return sequence.minus(elements)
+        fun <T> Sequence<T>.toSet(): Set<T> {
+            return this.toSetKt()
         }
 
         @JvmStatic
-        fun <T> minus(sequence: Sequence<T>, elements: Iterable<T>): Sequence<T> {
-            return sequence.minus(elements)
+        fun <T> Sequence<T>.toMutableSet(): MutableSet<T> {
+            return this.toMutableSetKt()
         }
 
         @JvmStatic
-        fun <T> minus(sequence: Sequence<T>, elements: Sequence<T>): Sequence<T> {
-            return sequence.minus(elements)
+        fun <T> Sequence<T>.toHashSet(): HashSet<T> {
+            return this.toHashSetKt()
         }
 
         @JvmStatic
-        fun <T, C : MutableCollection<in T>> toCollection(sequence: Sequence<T>, destination: C): C {
-            return sequence.toCollection(destination)
+        fun <T> Sequence<T>.toSortedSet(): SortedSet<T> {
+            return this.toSortedSet(castSelfComparableComparator())
         }
 
         @JvmStatic
-        fun <T> toSet(sequence: Sequence<T>): Set<T> {
-            return sequence.toSet()
+        fun <T> Sequence<T>.toSortedSet(comparator: Comparator<in T>): SortedSet<T> {
+            return this.toSortedSetKt(comparator)
         }
 
         @JvmStatic
-        fun <T> toMutableSet(sequence: Sequence<T>): MutableSet<T> {
-            return sequence.toMutableSet()
+        fun <T> Sequence<T>.toList(): List<T> {
+            return this.toListKt()
         }
 
         @JvmStatic
-        fun <T> toHashSet(sequence: Sequence<T>): HashSet<T> {
-            return sequence.toHashSet()
+        fun <T> Sequence<T>.toMutableList(): MutableList<T> {
+            return this.toMutableListKt()
         }
 
         @JvmStatic
-        fun <T> toSortedSet(sequence: Sequence<T>): SortedSet<T> {
-            return toSortedSet(sequence, Sort.selfComparableComparator())
+        @JvmOverloads
+        fun <T> Sequence<T>.toStream(parallel: Boolean = false): Stream<T> {
+            return this.toList().toStream(parallel)
         }
 
         @JvmStatic
-        fun <T> toSortedSet(sequence: Sequence<T>, comparator: Comparator<in T>): SortedSet<T> {
-            return sequence.toSortedSet(comparator)
+        fun <T> Sequence<T>.toSequence(): Sequence<T> {
+            return this.asSequenceKt()
         }
 
         @JvmStatic
-        fun <T> toList(sequence: Sequence<T>): List<T> {
-            return sequence.toList()
+        fun <T> Sequence<T>.toArray(): Array<Any?> {
+            return this.toList().toArray()
         }
 
         @JvmStatic
-        fun <T> toMutableList(sequence: Sequence<T>): MutableList<T> {
-            return sequence.toMutableList()
+        inline fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
+            return this.toList().toArray(generator)
         }
 
         @JvmStatic
-        fun <T> toStream(sequence: Sequence<T>): Stream<T> {
-            return toStream(sequence, false)
+        inline fun <reified T> Sequence<T>.toTypedArray(): Array<T> {
+            return this.toList().toTypedArray()
         }
 
         @JvmStatic
-        fun <T> toStream(sequence: Sequence<T>, parallel: Boolean): Stream<T> {
-            return StreamSupport.stream(sequence.asIterable().spliterator(), parallel)
+        fun <T> Sequence<T>.toBooleanArray(): BooleanArray {
+            return this.toList().toBooleanArray()
         }
 
         @JvmStatic
-        fun <T> toArray(sequence: Sequence<T>): Array<Any?> {
-            val list = toCollection(sequence, LinkedList())
-            return list.toArray()
+        inline fun <T> Sequence<T>.toBooleanArray(selector: (T) -> Boolean): BooleanArray {
+            return this.toList().toBooleanArray(selector)
         }
 
         @JvmStatic
-        inline fun <T> toArray(sequence: Sequence<T>, generator: (size: Int) -> Array<T>): Array<T> {
-            val list = toCollection(sequence, LinkedList())
-            return list.toArray(generator(list.size))
+        fun <T> Sequence<T>.toByteArray(): ByteArray {
+            return this.toList().toByteArray()
         }
 
         @JvmStatic
-        inline fun <reified T> toTypedArray(sequence: Sequence<T>): Array<T> {
-            val list = toCollection(sequence, LinkedList())
-            return list.toTypedArray()
+        inline fun <T> Sequence<T>.toByteArray(selector: (T) -> Byte): ByteArray {
+            return this.toList().toByteArray(selector)
         }
 
         @JvmStatic
-        fun <T> toBooleanArray(sequence: Sequence<T>): BooleanArray {
-            return toBooleanArray(sequence) { To.toBoolean(it) }
+        fun <T> Sequence<T>.toShortArray(): ShortArray {
+            return this.toList().toShortArray()
         }
 
         @JvmStatic
-        inline fun <T> toBooleanArray(sequence: Sequence<T>, selector: (T) -> Boolean): BooleanArray {
-            val list = toCollection(sequence, LinkedList())
-            val result = BooleanArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
+        inline fun <T> Sequence<T>.toShortArray(selector: (T) -> Short): ShortArray {
+            return this.toList().toShortArray(selector)
         }
 
         @JvmStatic
-        fun <T> toByteArray(sequence: Sequence<T>): ByteArray {
-            return toByteArray(sequence) { To.toByte(it) }
+        fun <T> Sequence<T>.toCharArray(): CharArray {
+            return this.toList().toCharArray()
         }
 
         @JvmStatic
-        inline fun <T> toByteArray(sequence: Sequence<T>, selector: (T) -> Byte): ByteArray {
-            val list = toCollection(sequence, LinkedList())
-            val result = ByteArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
+        inline fun <T> Sequence<T>.toCharArray(selector: (T) -> Char): CharArray {
+            return this.toList().toCharArray(selector)
         }
 
         @JvmStatic
-        fun <T> toShortArray(sequence: Sequence<T>): ShortArray {
-            return toShortArray(sequence) { To.toShort(it) }
+        fun <T> Sequence<T>.toIntArray(): IntArray {
+            return this.toList().toIntArray()
         }
 
         @JvmStatic
-        inline fun <T> toShortArray(sequence: Sequence<T>, selector: (T) -> Short): ShortArray {
-            val list = toCollection(sequence, LinkedList())
-            val result = ShortArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
+        inline fun <T> Sequence<T>.toIntArray(selector: (T) -> Int): IntArray {
+            return this.toList().toIntArray(selector)
         }
 
         @JvmStatic
-        fun <T> toCharArray(sequence: Sequence<T>): CharArray {
-            return toCharArray(sequence) { To.toChar(it) }
+        fun <T> Sequence<T>.toLongArray(): LongArray {
+            return this.toList().toLongArray()
         }
 
         @JvmStatic
-        inline fun <T> toCharArray(sequence: Sequence<T>, selector: (T) -> Char): CharArray {
-            val list = toCollection(sequence, LinkedList())
-            val result = CharArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
+        inline fun <T> Sequence<T>.toLongArray(selector: (T) -> Long): LongArray {
+            return this.toList().toLongArray(selector)
         }
 
         @JvmStatic
-        fun <T> toIntArray(sequence: Sequence<T>): IntArray {
-            return toIntArray(sequence) { To.toInt(it) }
+        fun <T> Sequence<T>.toFloatArray(): FloatArray {
+            return this.toList().toFloatArray()
         }
 
         @JvmStatic
-        inline fun <T> toIntArray(sequence: Sequence<T>, selector: (T) -> Int): IntArray {
-            val list = toCollection(sequence, LinkedList())
-            val result = IntArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
+        inline fun <T> Sequence<T>.toFloatArray(selector: (T) -> Float): FloatArray {
+            return this.toList().toFloatArray(selector)
         }
 
         @JvmStatic
-        fun <T> toLongArray(sequence: Sequence<T>): LongArray {
-            return toLongArray(sequence) { To.toLong(it) }
+        fun <T> Sequence<T>.toDoubleArray(): DoubleArray {
+            return this.toList().toDoubleArray()
         }
 
         @JvmStatic
-        inline fun <T> toLongArray(sequence: Sequence<T>, selector: (T) -> Long): LongArray {
-            val list = toCollection(sequence, LinkedList())
-            val result = LongArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
+        inline fun <T> Sequence<T>.toDoubleArray(selector: (T) -> Double): DoubleArray {
+            return this.toList().toDoubleArray(selector)
         }
 
         @JvmStatic
-        fun <T> toFloatArray(sequence: Sequence<T>): FloatArray {
-            return toFloatArray(sequence) { To.toFloat(it) }
+        fun <T> Sequence<T>.plus(element: T): Sequence<T> {
+            return this.plusKt(element)
         }
 
         @JvmStatic
-        inline fun <T> toFloatArray(sequence: Sequence<T>, selector: (T) -> Float): FloatArray {
-            val list = toCollection(sequence, LinkedList())
-            val result = FloatArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
+        fun <T> Sequence<T>.plus(elements: Array<out T>): Sequence<T> {
+            return this.plusKt(elements)
         }
 
         @JvmStatic
-        fun <T> toDoubleArray(sequence: Sequence<T>): DoubleArray {
-            return toDoubleArray(sequence) { To.toDouble(it) }
+        fun <T> Sequence<T>.plus(elements: Iterable<T>): Sequence<T> {
+            return this.plusKt(elements)
         }
 
         @JvmStatic
-        inline fun <T> toDoubleArray(sequence: Sequence<T>, selector: (T) -> Double): DoubleArray {
-            val list = toCollection(sequence, LinkedList())
-            val result = DoubleArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
+        fun <T> Sequence<T>.plus(elements: Sequence<T>): Sequence<T> {
+            return this.plusKt(elements)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.minus(element: T): Sequence<T> {
+            return this.minusKt(element)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.minus(elements: Array<out T>): Sequence<T> {
+            return this.minusKt(elements)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.minus(elements: Iterable<T>): Sequence<T> {
+            return this.minusKt(elements)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.minus(elements: Sequence<T>): Sequence<T> {
+            return this.minusKt(elements)
         }
     }
 }

@@ -1,157 +1,64 @@
 package xyz.srclab.common.collection
 
-import xyz.srclab.common.base.As
+import xyz.srclab.common.base.asAny
+import kotlin.collections.filter as filterKt
+import kotlin.collections.filterTo as filterToKt
+import kotlin.collections.flatMap as flatMapKt
+import kotlin.collections.flatMapTo as flatMapToKt
+import kotlin.collections.map as mapKt
+import kotlin.collections.mapTo as mapToKt
+import kotlin.collections.minus as minusKt
+import kotlin.collections.plus as plusKt
+import kotlin.collections.toSet as toSetKt
 
-class MapOps<K, V> private constructor(map: Map<K, V>) {
-
-    private var operated: Map<K, V> = map
-
-    fun find(predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-        return find(operated(), predicate)
-    }
-
-    fun findLast(predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-        return findLast(operated(), predicate)
-    }
-
-    fun first(): Map.Entry<K, V> {
-        return first(operated())
-    }
-
-    fun first(predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V> {
-        return first(operated(), predicate)
-    }
-
-    fun firstOrNull(): Map.Entry<K, V>? {
-        return firstOrNull(operated())
-    }
-
-    fun firstOrNull(predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-        return firstOrNull(operated(), predicate)
-    }
-
-    fun last(): Map.Entry<K, V> {
-        return last(operated())
-    }
-
-    fun last(predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V> {
-        return last(operated(), predicate)
-    }
-
-    fun lastOrNull(): Map.Entry<K, V>? {
-        return lastOrNull(operated())
-    }
-
-    fun lastOrNull(predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-        return lastOrNull(operated(), predicate)
-    }
-
-    fun all(predicate: (Map.Entry<K, V>) -> Boolean): Boolean {
-        return all(operated(), predicate)
-    }
-
-    fun any(): Boolean {
-        return any(operated())
-    }
-
-    fun any(predicate: (Map.Entry<K, V>) -> Boolean): Boolean {
-        return any(operated(), predicate)
-    }
-
-    fun none(): Boolean {
-        return none(operated())
-    }
-
-    fun none(predicate: (Map.Entry<K, V>) -> Boolean): Boolean {
-        return none(operated(), predicate)
-    }
-
-    fun single(): Map.Entry<K, V> {
-        return single(operated())
-    }
-
-    fun single(predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V> {
-        return single(operated(), predicate)
-    }
-
-    fun singleOrNull(): Map.Entry<K, V>? {
-        return singleOrNull(operated())
-    }
-
-    fun singleOrNull(predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-        return singleOrNull(operated(), predicate)
-    }
-
-    fun containsKey(key: K): Boolean {
-        return containsKey(operated(), key)
-    }
+class MapOps<K, V>(private var map: Map<K, V>) {
 
     fun containsKeys(keys: Array<out K>): Boolean {
-        return containsKeys(operated(), keys)
+        return finalMap().containsKeys(keys)
     }
 
     fun containsKeys(keys: Iterable<K>): Boolean {
-        return containsKeys(operated(), keys)
+        return finalMap().containsKeys(keys)
     }
 
     fun containsKeys(keys: Collection<K>): Boolean {
-        return containsKeys(operated(), keys)
-    }
-
-    fun containsValue(value: V): Boolean {
-        return containsValue(operated(), value)
+        return finalMap().containsKeys(keys)
     }
 
     fun containsValues(values: Array<out V>): Boolean {
-        return containsValues(operated(), values)
+        return finalMap().containsValues(values)
     }
 
     fun containsValues(values: Iterable<V>): Boolean {
-        return containsValues(operated(), values)
+        return finalMap().containsValues(values)
     }
 
     fun containsValues(values: Collection<V>): Boolean {
-        return containsValues(operated(), values)
-    }
-
-    fun count(): Int {
-        return count(operated())
-    }
-
-    fun count(predicate: (Map.Entry<K, V>) -> Boolean): Int {
-        return count(operated(), predicate)
+        return finalMap().containsValues(values)
     }
 
     fun filter(predicate: (Map.Entry<K, V>) -> Boolean): MapOps<K, V> {
-        return toMapOps(filter(operated(), predicate))
+        return finalMap().filter(predicate).toMapOps()
     }
 
     fun <M : MutableMap<in K, in V>> filterTo(destination: M, predicate: (Map.Entry<K, V>) -> Boolean): M {
-        return filterTo(operated(), destination, predicate)
+        return finalMap().filterTo(destination, predicate)
     }
 
     fun <R> map(transform: (Map.Entry<K, V>) -> R): ListOps<R> {
-        return toListOps(map(operated(), transform))
-    }
-
-    fun <R : Any> mapNotNull(transform: (Map.Entry<K, V>) -> R?): ListOps<R> {
-        return toListOps(mapNotNull(operated(), transform))
+        return finalMap().map(transform).toListOps()
     }
 
     fun <RK, RV> map(keySelector: (K) -> RK, valueTransform: (V) -> RV): MapOps<RK, RV> {
-        return toMapOps(map(operated(), keySelector, valueTransform))
+        return finalMap().mapTo(LinkedHashMap(), keySelector, valueTransform).toMapOps()
     }
 
     fun <RK, RV> map(transform: (K, V) -> Pair<RK, RV>): MapOps<RK, RV> {
-        return toMapOps(map(operated(), transform))
+        return finalMap().mapTo(LinkedHashMap(), transform).toMapOps()
     }
 
     fun <R, C : MutableCollection<in R>> mapTo(destination: C, transform: (Map.Entry<K, V>) -> R): C {
-        return mapTo(operated(), destination, transform)
-    }
-
-    fun <R : Any, C : MutableCollection<in R>> mapNotNullTo(destination: C, transform: (Map.Entry<K, V>) -> R?): C {
-        return mapNotNullTo(operated(), destination, transform)
+        return finalMap().mapTo(destination, transform)
     }
 
     fun <RK, RV, C : MutableMap<in RK, in RV>> mapTo(
@@ -159,116 +66,68 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
         keySelector: (K) -> RK,
         valueTransform: (V) -> RV
     ): C {
-        return mapTo(operated(), destination, keySelector, valueTransform)
+        return finalMap().mapTo(destination, keySelector, valueTransform)
     }
 
     fun <RK, RV, C : MutableMap<in RK, in RV>> mapTo(destination: C, transform: (K, V) -> Pair<RK, RV>): C {
-        return mapTo(operated(), destination, transform)
+        return finalMap().mapTo(destination, transform)
     }
 
     fun <R> flatMap(transform: (Map.Entry<K, V>) -> Iterable<R>): ListOps<R> {
-        return toListOps(flatMap(operated(), transform))
+        return finalMap().flatMap(transform).toListOps()
     }
 
     fun <R, C : MutableCollection<in R>> flatMapTo(destination: C, transform: (Map.Entry<K, V>) -> Iterable<R>): C {
-        return flatMapTo(operated(), destination, transform)
-    }
-
-    fun putAll(elements: Map<out K, V>): MapOps<K, V> {
-        putAll(mutableOperated(), elements)
-        return this
-    }
-
-    fun putAll(elements: Array<out Map.Entry<K, V>>): MapOps<K, V> {
-        putAll(mutableOperated(), elements)
-        return this
-    }
-
-    fun putAll(elements: Iterable<Map.Entry<K, V>>): MapOps<K, V> {
-        putAll(mutableOperated(), elements)
-        return this
-    }
-
-    fun removeAll(keys: Array<out K>): MapOps<K, V> {
-        removeAll(mutableOperated(), keys)
-        return this
-    }
-
-    fun removeAll(keys: Iterable<K>): MapOps<K, V> {
-        removeAll(mutableOperated(), keys)
-        return this
-    }
-
-    fun removeAll(keys: Collection<K>): MapOps<K, V> {
-        removeAll(mutableOperated(), keys)
-        return this
-    }
-
-    fun retainAll(keys: Array<out K>): MapOps<K, V> {
-        retainAll(mutableOperated(), keys)
-        return this
-    }
-
-    fun retainAll(keys: Iterable<K>): MapOps<K, V> {
-        retainAll(mutableOperated(), keys)
-        return this
-    }
-
-    fun retainAll(keys: Collection<K>): MapOps<K, V> {
-        retainAll(mutableOperated(), keys)
-        return this
+        return finalMap().flatMapTo(destination, transform)
     }
 
     fun plus(other: Map<out K, V>): MapOps<K, V> {
-        return toMapOps(plus(operated(), other))
+        return finalMap().plus(other).toMapOps()
     }
 
     fun minus(key: K): MapOps<K, V> {
-        return toMapOps(minus(operated(), key))
+        return finalMap().minus(key).toMapOps()
     }
 
     fun minus(keys: Array<out K>): MapOps<K, V> {
-        return toMapOps(minus(operated(), keys))
+        return finalMap().minus(keys).toMapOps()
     }
 
     fun minus(keys: Iterable<K>): MapOps<K, V> {
-        return toMapOps(minus(operated(), keys))
+        return finalMap().minus(keys).toMapOps()
     }
 
-    fun toSequenceOps(): SequenceOps<Map.Entry<K, V>> {
-        return SequenceOps.opsFor(operated().entries)
+    fun toEntrySetOps(): SetOps<Map.Entry<K, V>> {
+        return finalMap().entries.toSetOps()
     }
 
-    fun entriesOps(): SetOps<MutableMap.MutableEntry<K, V>> {
-        return toSetOps(mutableOperated().entries)
+    fun toMutableEntrySetOps(): SetOps<MutableMap.MutableEntry<K, V>> {
+        return finalMutableMap().entries.toSetOps()
     }
 
     fun finalMap(): Map<K, V> {
-        return operated()
+        return map
     }
 
     fun finalMutableMap(): MutableMap<K, V> {
-        return mutableOperated()
+        return map.asAny()
     }
 
-    private fun operated(): Map<K, V> {
-        return operated
+    private fun <T> Iterable<T>.toIterableOps(): IterableOps<T> {
+        return IterableOps.opsFor(this)
     }
 
-    private fun mutableOperated(): MutableMap<K, V> {
-        return As.any(operated())
+    private fun <T> List<T>.toListOps(): ListOps<T> {
+        return ListOps.opsFor(this)
     }
 
-    private fun <T> toListOps(list: List<T>): ListOps<T> {
-        return ListOps.opsFor(list)
+    private fun <T> Set<T>.toSetOps(): SetOps<T> {
+        return SetOps.opsFor(this)
     }
 
-    private fun <T> toSetOps(set: Set<T>): SetOps<T> {
-        return SetOps.opsFor(set)
-    }
-
-    private fun <K, V> toMapOps(map: Map<K, V>): MapOps<K, V> {
-        return MapOps.opsFor(map)
+    private fun <K, V> Map<K, V>.toMapOps(): MapOps<K, V> {
+        map = this.asAny()
+        return this@MapOps.asAny()
     }
 
     companion object {
@@ -279,220 +138,81 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
         }
 
         @JvmStatic
-        inline fun <K, V> find(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-            return map.entries.find(predicate)
+        fun <K, V> Map<K, V>.containsKeys(keys: Array<out K>): Boolean {
+            return this.keys.containsAll(keys.toSetKt())
         }
 
         @JvmStatic
-        inline fun <K, V> findLast(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-            return map.entries.findLast(predicate)
+        fun <K, V> Map<K, V>.containsKeys(keys: Iterable<K>): Boolean {
+            return this.keys.containsAll(keys.toSetKt())
         }
 
         @JvmStatic
-        fun <K, V> first(map: Map<K, V>): Map.Entry<K, V> {
-            return map.entries.first()
+        fun <K, V> Map<K, V>.containsKeys(keys: Collection<K>): Boolean {
+            return this.keys.containsAll(keys)
         }
 
         @JvmStatic
-        inline fun <K, V> first(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V> {
-            return map.entries.first(predicate)
+        fun <K, V> Map<K, V>.containsValues(values: Array<out V>): Boolean {
+            return this.values.toSetKt().containsAll(values.toSetKt())
         }
 
         @JvmStatic
-        fun <K, V> firstOrNull(map: Map<K, V>): Map.Entry<K, V>? {
-            return map.entries.firstOrNull()
+        fun <K, V> Map<K, V>.containsValues(values: Iterable<V>): Boolean {
+            return this.values.toSetKt().containsAll(values.toSetKt())
         }
 
         @JvmStatic
-        inline fun <K, V> firstOrNull(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-            return map.entries.firstOrNull(predicate)
+        fun <K, V> Map<K, V>.containsValues(values: Collection<V>): Boolean {
+            return this.values.toSetKt().containsAll(values)
         }
 
         @JvmStatic
-        fun <K, V> last(map: Map<K, V>): Map.Entry<K, V> {
-            return map.entries.last()
+        inline fun <K, V> Map<K, V>.filter(predicate: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
+            return this.filterKt(predicate)
         }
 
         @JvmStatic
-        inline fun <K, V> last(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V> {
-            return map.entries.last(predicate)
-        }
-
-        @JvmStatic
-        fun <K, V> lastOrNull(map: Map<K, V>): Map.Entry<K, V>? {
-            return map.entries.lastOrNull()
-        }
-
-        @JvmStatic
-        inline fun <K, V> lastOrNull(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-            return map.entries.lastOrNull(predicate)
-        }
-
-        @JvmStatic
-        inline fun <K, V> all(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Boolean {
-            return map.all(predicate)
-        }
-
-        @JvmStatic
-        fun <K, V> any(map: Map<K, V>): Boolean {
-            return map.any()
-        }
-
-        @JvmStatic
-        inline fun <K, V> any(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Boolean {
-            return map.any(predicate)
-        }
-
-        @JvmStatic
-        fun <K, V> none(map: Map<K, V>): Boolean {
-            return map.none()
-        }
-
-        @JvmStatic
-        inline fun <K, V> none(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Boolean {
-            return map.none(predicate)
-        }
-
-        @JvmStatic
-        fun <K, V> single(map: Map<K, V>): Map.Entry<K, V> {
-            return map.entries.single()
-        }
-
-        @JvmStatic
-        inline fun <K, V> single(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V> {
-            return map.entries.single(predicate)
-        }
-
-        @JvmStatic
-        fun <K, V> singleOrNull(map: Map<K, V>): Map.Entry<K, V>? {
-            return map.entries.singleOrNull()
-        }
-
-        @JvmStatic
-        inline fun <K, V> singleOrNull(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Map.Entry<K, V>? {
-            return map.entries.singleOrNull(predicate)
-        }
-
-        @JvmStatic
-        fun <K, V> containsKey(map: Map<K, V>, key: K): Boolean {
-            return map.containsKey(key)
-        }
-
-        @JvmStatic
-        fun <K, V> containsKeys(map: Map<K, V>, keys: Array<out K>): Boolean {
-            return containsKeys(map, keys.toSet())
-        }
-
-        @JvmStatic
-        fun <K, V> containsKeys(map: Map<K, V>, keys: Iterable<K>): Boolean {
-            return containsKeys(map, keys.toSet())
-        }
-
-        @JvmStatic
-        fun <K, V> containsKeys(map: Map<K, V>, keys: Collection<K>): Boolean {
-            return map.keys.containsAll(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> containsValue(map: Map<K, V>, value: V): Boolean {
-            return map.containsValue(value)
-        }
-
-        @JvmStatic
-        fun <K, V> containsValues(map: Map<K, V>, values: Array<out V>): Boolean {
-            return containsValues(map, values.toSet())
-        }
-
-        @JvmStatic
-        fun <K, V> containsValues(map: Map<K, V>, values: Iterable<V>): Boolean {
-            return containsValues(map, values.toSet())
-        }
-
-        @JvmStatic
-        fun <K, V> containsValues(map: Map<K, V>, values: Collection<V>): Boolean {
-            return map.values.containsAll(values)
-        }
-
-        @JvmStatic
-        fun <K, V> count(map: Map<K, V>): Int {
-            return map.count()
-        }
-
-        @JvmStatic
-        inline fun <K, V> count(map: Map<K, V>, predicate: (Map.Entry<K, V>) -> Boolean): Int {
-            return map.count(predicate)
-        }
-
-        @JvmStatic
-        inline fun <K, V> filter(
-            map: Map<K, V>,
-            predicate: (Map.Entry<K, V>) -> Boolean
-        ): Map<K, V> {
-            return map.filter(predicate)
-        }
-
-        @JvmStatic
-        inline fun <K, V, M : MutableMap<in K, in V>> filterTo(
-            map: Map<K, V>,
+        inline fun <K, V, M : MutableMap<in K, in V>> Map<K, V>.filterTo(
             destination: M,
             predicate: (Map.Entry<K, V>) -> Boolean
         ): M {
-            return map.filterTo(destination, predicate)
+            return this.filterToKt(destination, predicate)
         }
 
         @JvmStatic
-        inline fun <K, V, R> map(map: Map<K, V>, transform: (Map.Entry<K, V>) -> R): List<R> {
-            return map.map(transform)
+        inline fun <K, V, R> Map<K, V>.map(transform: (Map.Entry<K, V>) -> R): List<R> {
+            return this.mapKt(transform)
         }
 
         @JvmStatic
-        inline fun <K, V, R : Any> mapNotNull(map: Map<K, V>, transform: (Map.Entry<K, V>) -> R?): List<R> {
-            return map.mapNotNull(transform)
-        }
-
-        @JvmStatic
-        inline fun <K, V, RK, RV> map(
-            map: Map<K, V>,
+        inline fun <K, V, RK, RV> Map<K, V>.map(
             crossinline keySelector: (K) -> RK,
             crossinline valueTransform: (V) -> RV
         ): Map<RK, RV> {
-            return mapTo(map, LinkedHashMap(), keySelector, valueTransform)
+            return this.mapTo(LinkedHashMap(), keySelector, valueTransform)
         }
 
         @JvmStatic
-        inline fun <K, V, RK, RV> map(
-            map: Map<K, V>,
-            transform: (K, V) -> Pair<RK, RV>
-        ): Map<RK, RV> {
-            return mapTo(map, LinkedHashMap(), transform)
+        inline fun <K, V, RK, RV> Map<K, V>.map(transform: (K, V) -> Pair<RK, RV>): Map<RK, RV> {
+            return this.mapTo(LinkedHashMap(), transform)
         }
 
         @JvmStatic
-        inline fun <K, V, R, C : MutableCollection<in R>> mapTo(
-            map: Map<K, V>,
+        inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.mapTo(
             destination: C,
             transform: (Map.Entry<K, V>) -> R
         ): C {
-            return map.mapTo(destination, transform)
+            return this.mapToKt(destination, transform)
         }
 
         @JvmStatic
-        inline fun <K, V, R : Any, C : MutableCollection<in R>> mapNotNullTo(
-            map: Map<K, V>,
-            destination: C,
-            transform: (Map.Entry<K, V>) -> R?
-        ): C {
-            return map.mapNotNullTo(destination, transform)
-        }
-
-        @JvmStatic
-        inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> mapTo(
-            map: Map<K, V>,
+        inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
             destination: C,
             crossinline keySelector: (K) -> RK,
             crossinline valueTransform: (V) -> RV
         ): C {
-            map.forEach { (k, v) ->
+            this.forEach { (k, v) ->
                 val rk = keySelector(k)
                 val rv = valueTransform(v)
                 destination.put(rk, rv)
@@ -501,12 +221,11 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
         }
 
         @JvmStatic
-        inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> mapTo(
-            map: Map<K, V>,
+        inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
             destination: C,
             transform: (K, V) -> Pair<RK, RV>
         ): C {
-            map.forEach { (k, v) ->
+            this.forEach { (k, v) ->
                 val pair = transform(k, v)
                 destination.put(pair.first, pair.second)
             }
@@ -514,141 +233,36 @@ class MapOps<K, V> private constructor(map: Map<K, V>) {
         }
 
         @JvmStatic
-        inline fun <K, V, R> flatMap(map: Map<K, V>, transform: (Map.Entry<K, V>) -> Iterable<R>): List<R> {
-            return map.flatMap(transform)
+        inline fun <K, V, R> Map<K, V>.flatMap(transform: (Map.Entry<K, V>) -> Iterable<R>): List<R> {
+            return this.flatMapKt(transform)
         }
 
         @JvmStatic
-        inline fun <K, V, R, C : MutableCollection<in R>> flatMapTo(
-            map: Map<K, V>,
+        inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
             destination: C,
             transform: (Map.Entry<K, V>) -> Iterable<R>
         ): C {
-            return map.flatMapTo(destination, transform)
-        }
-
-        //@JvmStatic
-        //fun <K, V> put(map: MutableMap<K, V>, key: K): Boolean {
-        //    return collection.add(element)
-        //}
-
-        @JvmStatic
-        fun <K, V> remove(map: MutableMap<K, V>, key: K): V? {
-             return map.remove(key)
+            return this.flatMapToKt(destination, transform)
         }
 
         @JvmStatic
-        fun <K, V> putAll(map: MutableMap<K, V>, elements: Map<out K, V>) {
-            map.putAll(elements)
+        fun <K, V> Map<K, V>.plus(other: Map<out K, V>): Map<K, V> {
+            return this.plusKt(other)
         }
 
         @JvmStatic
-        fun <K, V> putAll(map: MutableMap<K, V>, elements: Array<out Map.Entry<K, V>>) {
-            for (element in elements) {
-                map[element.key] = element.value
-            }
+        fun <K, V> Map<K, V>.minus(key: K): Map<K, V> {
+            return this.minusKt(key)
         }
 
         @JvmStatic
-        fun <K, V> putAll(map: MutableMap<K, V>, elements: Iterable<Map.Entry<K, V>>) {
-            for (element in elements) {
-                map[element.key] = element.value
-            }
+        fun <K, V> Map<K, V>.minus(keys: Array<out K>): Map<K, V> {
+            return this.minusKt(keys)
         }
 
         @JvmStatic
-        fun <K, V> removeAll(map: MutableMap<K, V>, keys: Array<out K>): Boolean {
-            return map.keys.removeAll(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> removeAll(map: MutableMap<K, V>, keys: Iterable<K>): Boolean {
-            return map.keys.removeAll(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> removeAll(map: MutableMap<K, V>, keys: Collection<K>): Boolean {
-            return map.keys.removeAll(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> retainAll(map: MutableMap<K, V>, keys: Array<out K>): Boolean {
-            return map.keys.retainAll(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> retainAll(map: MutableMap<K, V>, keys: Iterable<K>): Boolean {
-            return map.keys.retainAll(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> retainAll(map: MutableMap<K, V>, keys: Collection<K>): Boolean {
-            return map.keys.retainAll(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> plus(map: Map<K, V>, other: Map<out K, V>): Map<K, V> {
-            return map.plus(other)
-        }
-
-        @JvmStatic
-        fun <K, V> minus(map: Map<K, V>, key: K): Map<K, V> {
-            return map.minus(key)
-        }
-
-        @JvmStatic
-        fun <K, V> minus(map: Map<K, V>, keys: Array<out K>): Map<K, V> {
-            return map.minus(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> minus(map: Map<K, V>, keys: Iterable<K>): Map<K, V> {
-            return map.minus(keys)
-        }
-
-        @JvmStatic
-        fun <K, V> toMap(entries: Set<Map.Entry<K, V>>): Map<K, V> {
-            return toMutableMap(entries, LinkedHashMap())
-        }
-
-        @JvmStatic
-        fun <K, V, M : MutableMap<in K, in V>> toMutableMap(entries: Set<Map.Entry<K, V>>, destination: M): M {
-            for (entry in entries) {
-                destination.put(entry.key, entry.value)
-            }
-            return destination
-        }
-
-        @JvmStatic
-        fun <K, V> entry(key: K, value: V): Map.Entry<K, V> {
-            return object : Map.Entry<K, V> {
-                override val key = key
-                override val value = value
-            }
-        }
-
-        @JvmStatic
-        fun <K, V> mutableEntry(key: K, value: V): MutableMap.MutableEntry<K, V> {
-            return object : MutableMap.MutableEntry<K, V> {
-
-                private var _value: V = value
-
-                override val key: K
-                    get() = key
-                override val value: V
-                    get() = _value
-
-                override fun setValue(newValue: V): V {
-                    val old = value
-                    _value = value
-                    return old
-                }
-            }
-        }
-
-        @JvmStatic
-        fun <K, V> entryToPair(entry: Map.Entry<K, V>): Pair<K, V> {
-            return entry.toPair()
+        fun <K, V> Map<K, V>.minus(keys: Iterable<K>): Map<K, V> {
+            return this.minusKt(keys)
         }
     }
 }

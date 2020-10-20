@@ -1,345 +1,276 @@
 package xyz.srclab.common.collection
 
-import xyz.srclab.common.base.As
-import xyz.srclab.common.base.Sort
+import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.castSelfComparableComparator
 import java.util.*
 import kotlin.random.Random
+import kotlin.collections.binarySearch as binarySearchKt
+import kotlin.collections.dropLast as dropLastKt
+import kotlin.collections.dropLastWhile as dropLastWhileKt
+import kotlin.collections.elementAt as elementAtKt
+import kotlin.collections.elementAtOrElse as elementAtOrElseKt
+import kotlin.collections.elementAtOrNull as elementAtOrNullKt
+import kotlin.collections.findLast as findLastKt
+import kotlin.collections.first as firstKt
+import kotlin.collections.firstOrNull as firstOrNullKt
+import kotlin.collections.foldRight as foldRightKt
+import kotlin.collections.foldRightIndexed as foldRightIndexedKt
+import kotlin.collections.indexOf as indexOfKt
+import kotlin.collections.indexOfFirst as indexOfFirstKt
+import kotlin.collections.indexOfLast as indexOfLastKt
+import kotlin.collections.last as lastKt
+import kotlin.collections.lastIndexOf as lastIndexOfKt
+import kotlin.collections.lastOrNull as lastOrNullKt
+import kotlin.collections.reduceRight as reduceRightKt
+import kotlin.collections.reduceRightIndexed as reduceRightIndexedKt
+import kotlin.collections.reduceRightIndexedOrNull as reduceRightIndexedOrNullKt
+import kotlin.collections.reduceRightOrNull as reduceRightOrNullKt
+import kotlin.collections.removeAll as removeAllKt
+import kotlin.collections.removeFirst as removeFirstKt
+import kotlin.collections.removeFirstOrNull as removeFirstOrNullKt
+import kotlin.collections.removeLast as removeLastKt
+import kotlin.collections.removeLastOrNull as removeLastOrNullKt
+import kotlin.collections.retainAll as retainAllKt
+import kotlin.collections.reverse as reverseKt
+import kotlin.collections.shuffle as shuffleKt
+import kotlin.collections.slice as sliceKt
+import kotlin.collections.sortWith as sortWithKt
+import kotlin.collections.takeLast as takeLastKt
+import kotlin.collections.takeLastWhile as takeLastWhileKt
 
-class ListOps<T> private constructor(list: List<T>) :
-    CollectionOps<T, List<T>, MutableList<T>, ListOps<T>>(list) {
-
-    private var subListStack: MutableList<List<T>>? = null
-
-    override fun findLast(predicate: (T) -> Boolean): T? {
-        return findLast(operated(), predicate)
-    }
+class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, ListOps<T>>(list) {
 
     override fun first(): T {
-        return first(operated())
+        return finalList().first()
     }
 
     override fun firstOrNull(): T? {
-        return firstOrNull(operated())
+        return finalList().firstOrNull()
     }
 
     override fun last(): T {
-        return last(operated())
+        return finalList().last()
     }
 
     override fun last(predicate: (T) -> Boolean): T {
-        return last(operated(), predicate)
+        return finalList().last(predicate)
     }
 
     override fun lastOrNull(): T? {
-        return lastOrNull(operated())
+        return finalList().lastOrNull()
     }
 
     override fun lastOrNull(predicate: (T) -> Boolean): T? {
-        return lastOrNull(operated(), predicate)
-    }
-
-    override fun single(): T {
-        return single(operated())
-    }
-
-    override fun singleOrNull(): T? {
-        return singleOrNull(operated())
+        return finalList().lastOrNull(predicate)
     }
 
     override fun elementAt(index: Int): T {
-        return elementAt(operated(), index)
+        return finalList().elementAt(index)
     }
 
     override fun elementAtOrElse(index: Int, defaultValue: (Int) -> T): T {
-        return elementAtOrElse(operated(), index, defaultValue)
+        return finalList().elementAtOrElse(index, defaultValue)
     }
 
     override fun elementAtOrNull(index: Int): T? {
-        return elementAtOrNull(operated(), index)
+        return finalList().elementAtOrNull(index)
+    }
+
+    override fun findLast(predicate: (T) -> Boolean): T? {
+        return finalList().findLast(predicate)
     }
 
     override fun indexOf(element: T): Int {
-        return indexOf(operated(), element)
+        return finalList().indexOf(element)
     }
 
     override fun indexOf(predicate: (T) -> Boolean): Int {
-        return indexOf(operated(), predicate)
+        return finalList().indexOf(predicate)
     }
 
     override fun lastIndexOf(element: T): Int {
-        return lastIndexOf(operated(), element)
+        return finalList().lastIndexOf(element)
     }
 
     override fun lastIndexOf(predicate: (T) -> Boolean): Int {
-        return lastIndexOf(operated(), predicate)
-    }
-
-    fun dropLast(n: Int): ListOps<T> {
-        return toListOps(dropLast(operated(), n))
-    }
-
-    fun dropLastWhile(predicate: (T) -> Boolean): ListOps<T> {
-        return toListOps(dropLastWhile(operated(), predicate))
+        return finalList().lastIndexOf(predicate)
     }
 
     fun takeLast(n: Int): ListOps<T> {
-        return toListOps(takeLast(operated(), n))
+        return finalList().takeLast(n).toListOps()
     }
 
     fun takeLastWhile(predicate: (T) -> Boolean): ListOps<T> {
-        return toListOps(takeLastWhile(operated(), predicate))
+        return finalList().takeLastWhile(predicate).toListOps()
     }
 
-    @JvmOverloads
-    fun subList(fromIndex: Int, toIndex: Int = count()): ListOps<T> {
-        val stack = subListStack()
-        val operated = operated()
-        stack.add(operated)
-        val subList = operated().subList(fromIndex, toIndex)
-        return toListOps(subList)
+    fun dropLast(n: Int): ListOps<T> {
+        return finalList().dropLast(n).toListOps()
     }
 
-    fun parentList(): ListOps<T> {
-        if (subListStack == null) {
-            return this
-        }
-        val stack = subListStack()
-        return if (stack.isEmpty()) {
-            this
-        } else {
-            val parentList = stack.removeLast()
-            toListOps(parentList)
-        }
-    }
-
-    private fun subListStack(): MutableList<List<T>> {
-        if (subListStack == null) {
-            subListStack = LinkedList()
-        }
-        return subListStack as MutableList<List<T>>
-    }
-
-    fun slice(indices: IntArray): ListOps<T> {
-        return toListOps(slice(operated(), indices))
-    }
-
-    fun slice(indices: Iterable<Int>): ListOps<T> {
-        return toListOps(slice(operated(), indices))
-    }
-
-    fun slice(indices: IntRange): ListOps<T> {
-        return toListOps(slice(operated(), indices))
-    }
-
-    fun binarySearch(element: T): Int {
-        return binarySearch(operated(), element)
-    }
-
-    fun binarySearch(element: T, comparator: Comparator<in T>): Int {
-        return binarySearch(operated(), element, comparator)
+    fun dropLastWhile(predicate: (T) -> Boolean): ListOps<T> {
+        return finalList().dropLastWhile(predicate).toListOps()
     }
 
     fun reduceRight(operation: (T, T) -> T): T {
-        return reduceRight(operated(), operation)
+        return finalList().reduceRight(operation)
     }
 
     fun reduceRightIndexed(operation: (Int, T, T) -> T): T {
-        return reduceRightIndexed(operated(), operation)
+        return finalList().reduceRightIndexed(operation)
     }
 
     fun reduceRightOrNull(operation: (T, T) -> T): T? {
-        return reduceRightOrNull(operated(), operation)
+        return finalList().reduceRightOrNull(operation)
     }
 
     fun reduceRightIndexedOrNull(operation: (Int, T, T) -> T): T? {
-        return reduceRightIndexedOrNull(operated(), operation)
+        return finalList().reduceRightIndexedOrNull(operation)
     }
 
     fun <R> reduceRight(initial: R, operation: (T, R) -> R): R {
-        return reduceRight(operated(), initial, operation)
+        return finalList().reduceRight(initial, operation)
     }
 
     fun <R> reduceRightIndexed(initial: R, operation: (Int, T, R) -> R): R {
-        return reduceRightIndexed(operated(), initial, operation)
+        return finalList().reduceRightIndexed(initial, operation)
+    }
+
+    fun slice(indices: IntArray): ListOps<T> {
+        return finalList().slice(indices.asIterable()).toListOps()
+    }
+
+    fun slice(indices: Iterable<Int>): ListOps<T> {
+        return finalList().slice(indices).toListOps()
+    }
+
+    fun slice(indices: IntRange): ListOps<T> {
+        return finalList().slice(indices).toListOps()
+    }
+
+    fun binarySearch(element: T): Int {
+        return finalList().binarySearch(element, castSelfComparableComparator())
+    }
+
+    fun binarySearch(element: T, comparator: Comparator<in T>): Int {
+        return finalList().binarySearch(element, comparator)
     }
 
     fun reverse(): ListOps<T> {
-        reverse(mutableOperated())
-        return toSelfOps()
+        finalMutableList().reverse()
+        return this.asAny()
     }
 
     fun sort(): ListOps<T> {
-        sort(mutableOperated())
-        return toSelfOps()
+        finalMutableList().sort(castSelfComparableComparator())
+        return this.asAny()
     }
 
     fun sort(comparator: Comparator<in T>): ListOps<T> {
-        sort(mutableOperated(), comparator)
-        return toSelfOps()
+        finalMutableList().sort(comparator)
+        return this.asAny()
     }
 
     fun shuffle(): ListOps<T> {
-        shuffle(mutableOperated())
-        return toSelfOps()
+        finalMutableList().shuffle()
+        return this.asAny()
     }
 
     fun shuffle(random: Random): ListOps<T> {
-        shuffle(mutableOperated(), random)
-        return toSelfOps()
+        finalMutableList().shuffle(random)
+        return this.asAny()
     }
 
-    override fun removeAll(predicate: (T) -> Boolean): ListOps<T> {
-        removeAll(mutableOperated(), predicate)
-        return toSelfOps()
+    fun removeAll(predicate: (T) -> Boolean): ListOps<T> {
+        finalMutableList().removeAll(predicate)
+        return this.asAny()
     }
 
-    override fun removeFirst(): ListOps<T> {
-        removeFirst(mutableOperated())
-        return toSelfOps()
+    fun removeFirst(): ListOps<T> {
+        finalMutableList().removeFirst()
+        return this.asAny()
     }
 
-    override fun removeFirstOrNull(): ListOps<T> {
-        removeFirstOrNull(mutableOperated())
-        return toSelfOps()
+    fun removeFirstOrNull(): ListOps<T> {
+        finalMutableList().removeFirstOrNull()
+        return this.asAny()
     }
 
-    override fun removeLast(): ListOps<T> {
-        removeLast(mutableOperated())
-        return toSelfOps()
+    fun removeLast(): ListOps<T> {
+        finalMutableList().removeLast()
+        return this.asAny()
     }
 
-    override fun removeLastOrNull(): ListOps<T> {
-        removeLastOrNull(mutableOperated())
-        return toSelfOps()
+    fun removeLastOrNull(): ListOps<T> {
+        finalMutableList().removeLastOrNull()
+        return this.asAny()
     }
 
     override fun retainAll(predicate: (T) -> Boolean): ListOps<T> {
-        retainAll(mutableOperated(), predicate)
-        return toSelfOps()
-    }
-
-    fun add(index: Int, element: T): ListOps<T> {
-        add(mutableOperated(), index, element)
-        return toSelfOps()
-    }
-
-    fun removeAt(index: Int, element: T): ListOps<T> {
-        removeAt(mutableOperated(), index)
-        return toSelfOps()
-    }
-
-    fun addAll(index: Int, elements: Array<out T>): ListOps<T> {
-        addAll(mutableOperated(), index, elements)
-        return toSelfOps()
-    }
-
-    fun addAll(index: Int, elements: Iterable<T>): ListOps<T> {
-        addAll(mutableOperated(), index, elements)
-        return toSelfOps()
-    }
-
-    fun addAll(index: Int, elements: Collection<T>): ListOps<T> {
-        addAll(mutableOperated(), index, elements)
-        return toSelfOps()
-    }
-
-    fun removeAll(index: Int, elements: Array<out T>): ListOps<T> {
-        removeAll(mutableOperated(), index, elements)
-        return toSelfOps()
-    }
-
-    fun removeAll(index: Int, elements: Iterable<T>): ListOps<T> {
-        removeAll(mutableOperated(), index, elements)
-        return toSelfOps()
-    }
-
-    fun removeAll(index: Int, elements: Collection<T>): ListOps<T> {
-        removeAll(mutableOperated(), index, elements)
-        return toSelfOps()
-    }
-
-    fun retainAll(index: Int, elements: Array<out T>): ListOps<T> {
-        retainAll(mutableOperated(), index, elements)
-        return toSelfOps()
-    }
-
-    fun retainAll(index: Int, elements: Iterable<T>): ListOps<T> {
-        retainAll(mutableOperated(), index, elements)
-        return toSelfOps()
-    }
-
-    fun retainAll(index: Int, elements: Collection<T>): ListOps<T> {
-        retainAll(mutableOperated(), index, elements)
-        return toSelfOps()
+        finalMutableList().retainAll(predicate)
+        return this.asAny()
     }
 
     fun plus(element: T): ListOps<T> {
-        return toListOps(plus(operated(), element))
+        return finalList().plus(element).toListOps()
     }
 
     fun plus(elements: Array<out T>): ListOps<T> {
-        return toListOps(plus(operated(), elements))
+        return finalList().plus(elements).toListOps()
     }
 
     fun plus(elements: Iterable<T>): ListOps<T> {
-        return toListOps(plus(operated(), elements))
+        return finalList().plus(elements).toListOps()
     }
 
     fun plus(elements: Sequence<T>): ListOps<T> {
-        return toListOps(plus(operated(), elements))
+        return finalList().plus(elements).toListOps()
     }
 
     fun minus(element: T): ListOps<T> {
-        return toListOps(minus(operated(), element))
+        return finalList().minus(element).toListOps()
     }
 
     fun minus(elements: Array<out T>): ListOps<T> {
-        return toListOps(minus(operated(), elements))
+        return finalList().minus(elements).toListOps()
     }
 
     fun minus(elements: Iterable<T>): ListOps<T> {
-        return toListOps(minus(operated(), elements))
+        return finalList().minus(elements).toListOps()
     }
 
     fun minus(elements: Sequence<T>): ListOps<T> {
-        return toListOps(minus(operated(), elements))
-    }
-
-    fun toIterableOps(): IterableOps<T> {
-        return toIterableOps(operated())
-    }
-
-    fun toSetOps(): SetOps<T> {
-        return toSetOps(operated().toSet())
+        return finalList().minus(elements).toListOps()
     }
 
     fun finalList(): List<T> {
-        return operated()
+        return iterable
     }
 
     fun finalMutableList(): MutableList<T> {
-        return mutableOperated()
+        return iterable.asAny()
     }
 
-    override fun toSelfOps(): ListOps<T> {
-        return this
+    override fun List<T>.asThis(): ListOps<T> {
+        iterable = this
+        return this@ListOps
     }
 
-    override fun <T> toIterableOps(iterable: Iterable<T>): IterableOps<T> {
-        return IterableOps.opsFor(iterable)
+    override fun <T> Iterable<T>.toIterableOps(): IterableOps<T> {
+        return IterableOps.opsFor(this)
     }
 
-    override fun <T> toListOps(list: List<T>): ListOps<T> {
-        this.operated = As.any(list)
-        return As.any(this)
+    override fun <T> List<T>.toListOps(): ListOps<T> {
+        iterable = this.asAny()
+        return this@ListOps.asAny()
     }
 
-    override fun <T> toSetOps(set: Set<T>): SetOps<T> {
-        return SetOps.opsFor(set)
+    override fun <T> Set<T>.toSetOps(): SetOps<T> {
+        return SetOps.opsFor(this)
     }
 
-    override fun <K, V> toMapOps(map: Map<K, V>): MapOps<K, V> {
-        return MapOps.opsFor(map)
+    override fun <K, V> Map<K, V>.toMapOps(): MapOps<K, V> {
+        return MapOps.opsFor(this)
     }
 
     companion object {
@@ -350,276 +281,203 @@ class ListOps<T> private constructor(list: List<T>) :
         }
 
         @JvmStatic
-        inline fun <T> findLast(list: List<T>, predicate: (T) -> Boolean): T? {
-            return list.findLast(predicate)
+        fun <T> List<T>.first(): T {
+            return this.firstKt()
         }
 
         @JvmStatic
-        fun <T> first(list: List<T>): T {
-            return list.first()
+        fun <T> List<T>.firstOrNull(): T? {
+            return this.firstOrNullKt()
         }
 
         @JvmStatic
-        fun <T> firstOrNull(list: List<T>): T? {
-            return list.firstOrNull()
+        fun <T> List<T>.last(): T {
+            return this.lastKt()
         }
 
         @JvmStatic
-        fun <T> last(list: List<T>): T {
-            return list.last()
+        inline fun <T> List<T>.last(predicate: (T) -> Boolean): T {
+            return this.lastKt(predicate)
         }
 
         @JvmStatic
-        inline fun <T> last(list: List<T>, predicate: (T) -> Boolean): T {
-            return list.last(predicate)
+        fun <T> List<T>.lastOrNull(): T? {
+            return this.lastOrNullKt()
         }
 
         @JvmStatic
-        fun <T> lastOrNull(list: List<T>): T? {
-            return list.lastOrNull()
+        inline fun <T> List<T>.lastOrNull(predicate: (T) -> Boolean): T? {
+            return this.lastOrNullKt(predicate)
         }
 
         @JvmStatic
-        inline fun <T> lastOrNull(list: List<T>, predicate: (T) -> Boolean): T? {
-            return list.lastOrNull(predicate)
+        fun <T> List<T>.elementAt(index: Int): T {
+            return this.elementAtKt(index)
         }
 
         @JvmStatic
-        fun <T> single(list: List<T>): T {
-            return list.single()
+        inline fun <T> List<T>.elementAtOrElse(index: Int, defaultValue: (Int) -> T): T {
+            return this.elementAtOrElseKt(index, defaultValue)
         }
 
         @JvmStatic
-        fun <T> singleOrNull(list: List<T>): T? {
-            return list.singleOrNull()
+        fun <T> List<T>.elementAtOrNull(index: Int): T? {
+            return this.elementAtOrNullKt(index)
         }
 
         @JvmStatic
-        fun <T> elementAt(list: List<T>, index: Int): T {
-            return list.elementAt(index)
+        inline fun <T> List<T>.findLast(predicate: (T) -> Boolean): T? {
+            return this.findLastKt(predicate)
         }
 
         @JvmStatic
-        inline fun <T> elementAtOrElse(list: List<T>, index: Int, defaultValue: (Int) -> T): T {
-            return list.elementAtOrElse(index, defaultValue)
+        fun <T> List<T>.indexOf(element: T): Int {
+            return this.indexOfKt(element)
         }
 
         @JvmStatic
-        fun <T> elementAtOrNull(list: List<T>, index: Int): T? {
-            return list.elementAtOrNull(index)
+        inline fun <T> List<T>.indexOf(predicate: (T) -> Boolean): Int {
+            return this.indexOfFirstKt(predicate)
         }
 
         @JvmStatic
-        fun <T> indexOf(list: List<T>, element: T): Int {
-            return list.indexOf(element)
+        fun <T> List<T>.lastIndexOf(element: T): Int {
+            return this.lastIndexOfKt(element)
         }
 
         @JvmStatic
-        inline fun <T> indexOf(list: List<T>, predicate: (T) -> Boolean): Int {
-            return list.indexOfFirst(predicate)
+        inline fun <T> List<T>.lastIndexOf(predicate: (T) -> Boolean): Int {
+            return this.indexOfLastKt(predicate)
         }
 
         @JvmStatic
-        fun <T> lastIndexOf(list: List<T>, element: T): Int {
-            return list.lastIndexOf(element)
+        fun <T> List<T>.takeLast(n: Int): List<T> {
+            return this.takeLastKt(n)
         }
 
         @JvmStatic
-        inline fun <T> lastIndexOf(list: List<T>, predicate: (T) -> Boolean): Int {
-            return list.indexOfLast(predicate)
+        inline fun <T> List<T>.takeLastWhile(predicate: (T) -> Boolean): List<T> {
+            return this.takeLastWhileKt(predicate)
         }
 
         @JvmStatic
-        fun <T> dropLast(list: List<T>, n: Int): List<T> {
-            return list.dropLast(n)
+        fun <T> List<T>.dropLast(n: Int): List<T> {
+            return this.dropLastKt(n)
         }
 
         @JvmStatic
-        inline fun <T> dropLastWhile(list: List<T>, predicate: (T) -> Boolean): List<T> {
-            return list.dropLastWhile(predicate)
+        inline fun <T> List<T>.dropLastWhile(predicate: (T) -> Boolean): List<T> {
+            return this.dropLastWhileKt(predicate)
         }
 
         @JvmStatic
-        fun <T> takeLast(list: List<T>, n: Int): List<T> {
-            return list.takeLast(n)
+        inline fun <S, T : S> List<T>.reduceRight(operation: (T, S) -> S): S {
+            return this.reduceRightKt(operation)
         }
 
         @JvmStatic
-        inline fun <T> takeLastWhile(list: List<T>, predicate: (T) -> Boolean): List<T> {
-            return list.takeLastWhile(predicate)
+        inline fun <S, T : S> List<T>.reduceRightIndexed(operation: (Int, T, S) -> S): S {
+            return this.reduceRightIndexedKt(operation)
         }
 
         @JvmStatic
-        fun <T> slice(list: List<T>, indices: IntArray): List<T> {
-            return slice(list, indices.asIterable())
+        inline fun <S, T : S> List<T>.reduceRightOrNull(operation: (T, S) -> S): S? {
+            return this.reduceRightOrNullKt(operation)
         }
 
         @JvmStatic
-        fun <T> slice(list: List<T>, indices: Iterable<Int>): List<T> {
-            return list.slice(indices)
+        inline fun <S, T : S> List<T>.reduceRightIndexedOrNull(operation: (Int, T, S) -> S): S? {
+            return this.reduceRightIndexedOrNullKt(operation)
         }
 
         @JvmStatic
-        fun <T> slice(list: List<T>, indices: IntRange): List<T> {
-            return list.slice(indices)
+        inline fun <T, R> List<T>.reduceRight(initial: R, operation: (T, R) -> R): R {
+            return this.foldRightKt(initial, operation)
         }
 
         @JvmStatic
-        fun <T> binarySearch(list: List<T>, element: T): Int {
-            return list.binarySearch(element, Sort.selfComparableComparator())
+        inline fun <T, R> List<T>.reduceRightIndexed(initial: R, operation: (Int, T, R) -> R): R {
+            return this.foldRightIndexedKt(initial, operation)
         }
 
         @JvmStatic
-        fun <T> binarySearch(list: List<T>, element: T, comparator: Comparator<in T>): Int {
-            return list.binarySearch(element, comparator)
+        fun <T> List<T>.slice(indices: IntArray): List<T> {
+            return this.sliceKt(indices.asIterable())
         }
 
         @JvmStatic
-        inline fun <S, T : S> reduceRight(list: List<T>, operation: (T, S) -> S): S {
-            return list.reduceRight(operation)
+        fun <T> List<T>.slice(indices: Iterable<Int>): List<T> {
+            return this.sliceKt(indices)
         }
 
         @JvmStatic
-        inline fun <S, T : S> reduceRightIndexed(list: List<T>, operation: (Int, T, S) -> S): S {
-            return list.reduceRightIndexed(operation)
+        fun <T> List<T>.slice(indices: IntRange): List<T> {
+            return this.sliceKt(indices)
         }
 
         @JvmStatic
-        inline fun <S, T : S> reduceRightOrNull(list: List<T>, operation: (T, S) -> S): S? {
-            return list.reduceRightOrNull(operation)
+        fun <T> List<T>.binarySearch(element: T): Int {
+            return this.binarySearchKt(element, castSelfComparableComparator())
         }
 
         @JvmStatic
-        inline fun <S, T : S> reduceRightIndexedOrNull(
-            list: List<T>,
-            operation: (Int, T, S) -> S
-        ): S? {
-            return list.reduceRightIndexedOrNull(operation)
+        fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T>): Int {
+            return this.binarySearchKt(element, comparator)
         }
 
         @JvmStatic
-        inline fun <T, R> reduceRight(list: List<T>, initial: R, operation: (T, R) -> R): R {
-            return list.foldRight(initial, operation)
+        fun <T> MutableList<T>.reverse() {
+            this.reverseKt()
         }
 
         @JvmStatic
-        inline fun <T, R> reduceRightIndexed(
-            list: List<T>,
-            initial: R,
-            operation: (Int, T, R) -> R
-        ): R {
-            return list.foldRightIndexed(initial, operation)
+        fun <T> MutableList<T>.sort() {
+            this.sort(castSelfComparableComparator())
         }
 
         @JvmStatic
-        fun <T> reverse(list: MutableList<T>) {
-            list.reverse()
+        fun <T> MutableList<T>.sort(comparator: Comparator<in T>) {
+            this.sortWithKt(comparator)
         }
 
         @JvmStatic
-        fun <T> sort(list: MutableList<T>) {
-            sort(list, Sort.selfComparableComparator())
+        fun <T> MutableList<T>.shuffle() {
+            this.shuffleKt()
         }
 
         @JvmStatic
-        fun <T> sort(list: MutableList<T>, comparator: Comparator<in T>) {
-            list.sortWith(comparator)
+        fun <T> MutableList<T>.shuffle(random: Random) {
+            this.shuffleKt(random)
         }
 
         @JvmStatic
-        fun <T> shuffle(list: MutableList<T>) {
-            list.shuffle()
+        fun <T> MutableList<T>.removeAll(predicate: (T) -> Boolean): Boolean {
+            return this.removeAllKt(predicate)
         }
 
         @JvmStatic
-        fun <T> shuffle(list: MutableList<T>, random: Random) {
-            list.shuffle(random)
+        fun <T> MutableList<T>.removeFirst(): T {
+            return this.removeFirstKt()
         }
 
         @JvmStatic
-        fun <T> removeAll(list: MutableList<T>, predicate: (T) -> Boolean): Boolean {
-            return list.removeAll(predicate)
+        fun <T> MutableList<T>.removeFirstOrNull(): T? {
+            return this.removeFirstOrNullKt()
         }
 
         @JvmStatic
-        fun <T> removeFirst(list: MutableList<T>): T {
-            return list.removeFirst()
+        fun <T> MutableList<T>.removeLast(): T {
+            return this.removeLastKt()
         }
 
         @JvmStatic
-        fun <T> removeFirstOrNull(list: MutableList<T>): T? {
-            return list.removeFirstOrNull()
+        fun <T> MutableList<T>.removeLastOrNull(): T? {
+            return this.removeLastOrNullKt()
         }
 
         @JvmStatic
-        fun <T> removeLast(list: MutableList<T>): T {
-            return list.removeLast()
-        }
-
-        @JvmStatic
-        fun <T> removeLastOrNull(list: MutableList<T>): T? {
-            return list.removeLastOrNull()
-        }
-
-        @JvmStatic
-        fun <T> retainAll(list: MutableList<T>, predicate: (T) -> Boolean): Boolean {
-            return list.retainAll(predicate)
-        }
-
-        @JvmStatic
-        fun <T> add(list: MutableList<T>, index: Int, element: T): Boolean {
-            list.add(index, element)
-            return true
-        }
-
-        @JvmStatic
-        fun <T> removeAt(list: MutableList<T>, index: Int): T {
-            return list.removeAt(index)
-        }
-
-        @JvmStatic
-        fun <T> addAll(list: MutableList<T>, index: Int, elements: Array<out T>): Boolean {
-            return addAll(list, index, elements.toList())
-        }
-
-        @JvmStatic
-        fun <T> addAll(list: MutableList<T>, index: Int, elements: Iterable<T>): Boolean {
-            return addAll(list, index, elements.toList())
-        }
-
-        @JvmStatic
-        fun <T> addAll(list: MutableList<T>, index: Int, elements: Collection<T>): Boolean {
-            return list.addAll(index, elements)
-        }
-
-        @JvmStatic
-        fun <T> removeAll(list: MutableList<T>, index: Int, elements: Array<out T>): Boolean {
-            return list.subList(index, list.size).removeAll(elements)
-        }
-
-        @JvmStatic
-        fun <T> removeAll(list: MutableList<T>, index: Int, elements: Iterable<T>): Boolean {
-            return list.subList(index, list.size).removeAll(elements)
-        }
-
-        @JvmStatic
-        fun <T> removeAll(list: MutableList<T>, index: Int, elements: Collection<T>): Boolean {
-            return list.subList(index, list.size).removeAll(elements)
-        }
-
-        @JvmStatic
-        fun <T> retainAll(list: MutableList<T>, index: Int, elements: Array<out T>): Boolean {
-            return list.subList(index, list.size).retainAll(elements)
-        }
-
-        @JvmStatic
-        fun <T> retainAll(list: MutableList<T>, index: Int, elements: Iterable<T>): Boolean {
-            return list.subList(index, list.size).retainAll(elements)
-        }
-
-        @JvmStatic
-        fun <T> retainAll(list: MutableList<T>, index: Int, elements: Collection<T>): Boolean {
-            return list.subList(index, list.size).retainAll(elements)
+        fun <T> MutableList<T>.retainAll(predicate: (T) -> Boolean): Boolean {
+            return this.retainAllKt(predicate)
         }
     }
 }

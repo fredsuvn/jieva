@@ -1,77 +1,71 @@
 package xyz.srclab.common.collection
 
-import xyz.srclab.common.base.As
+import xyz.srclab.common.base.asAny
+import kotlin.collections.minus as minusKt
+import kotlin.collections.plus as plusKt
 
-class SetOps<T> private constructor(set: Set<T>) :
-    CollectionOps<T, Set<T>, MutableSet<T>, SetOps<T>>(set) {
+class SetOps<T>(set: Set<T>) : CollectionOps<T, Set<T>, MutableSet<T>, SetOps<T>>(set) {
 
     fun plus(element: T): SetOps<T> {
-        return toSetOps(plus(operated(), element))
+        return finalSet().plus(element).toSetOps()
     }
 
     fun plus(elements: Array<out T>): SetOps<T> {
-        return toSetOps(plus(operated(), elements))
+        return finalSet().plus(elements).toSetOps()
     }
 
     fun plus(elements: Iterable<T>): SetOps<T> {
-        return toSetOps(plus(operated(), elements))
+        return finalSet().plus(elements).toSetOps()
     }
 
     fun plus(elements: Sequence<T>): SetOps<T> {
-        return toSetOps(plus(operated(), elements))
+        return finalSet().plus(elements).toSetOps()
     }
 
     fun minus(element: T): SetOps<T> {
-        return toSetOps(minus(operated(), element))
+        return finalSet().minus(element).toSetOps()
     }
 
     fun minus(elements: Array<out T>): SetOps<T> {
-        return toSetOps(minus(operated(), elements))
+        return finalSet().minus(elements).toSetOps()
     }
 
     fun minus(elements: Iterable<T>): SetOps<T> {
-        return toSetOps(minus(operated(), elements))
+        return finalSet().minus(elements).toSetOps()
     }
 
     fun minus(elements: Sequence<T>): SetOps<T> {
-        return toSetOps(minus(operated(), elements))
-    }
-
-    fun toIterableOps(): IterableOps<T> {
-        return toIterableOps(operated())
-    }
-
-    fun toListOps(): ListOps<T> {
-        return toListOps(operated().toList())
+        return finalSet().minus(elements).toSetOps()
     }
 
     fun finalSet(): Set<T> {
-        return operated()
+        return iterable
     }
 
     fun finalMutableSet(): MutableSet<T> {
-        return mutableOperated()
+        return iterable.asAny()
     }
 
-    override fun toSelfOps(): SetOps<T> {
-        return this
+    override fun Set<T>.asThis(): SetOps<T> {
+        iterable = this
+        return this@SetOps
     }
 
-    override fun <T> toIterableOps(iterable: Iterable<T>): IterableOps<T> {
-        return IterableOps.opsFor(iterable)
+    override fun <T> Iterable<T>.toIterableOps(): IterableOps<T> {
+        return IterableOps.opsFor(this)
     }
 
-    override fun <T> toListOps(list: List<T>): ListOps<T> {
-        return ListOps.opsFor(list)
+    override fun <T> List<T>.toListOps(): ListOps<T> {
+        return ListOps.opsFor(this)
     }
 
-    override fun <T> toSetOps(set: Set<T>): SetOps<T> {
-        this.operated = As.any(set)
-        return As.any(this)
+    override fun <T> Set<T>.toSetOps(): SetOps<T> {
+        iterable = this.asAny()
+        return this@SetOps.asAny()
     }
 
-    override fun <K, V> toMapOps(map: Map<K, V>): MapOps<K, V> {
-        return MapOps.opsFor(map)
+    override fun <K, V> Map<K, V>.toMapOps(): MapOps<K, V> {
+        return MapOps.opsFor(this)
     }
 
     companion object {
@@ -82,43 +76,43 @@ class SetOps<T> private constructor(set: Set<T>) :
         }
 
         @JvmStatic
-        fun <T> plus(set: Set<T>, element: T): Set<T> {
-            return set.plus(element)
+        fun <T> Set<T>.plus(element: T): Set<T> {
+            return this.plusKt(element)
         }
 
         @JvmStatic
-        fun <T> plus(set: Set<T>, elements: Array<out T>): Set<T> {
-            return set.plus(elements)
+        fun <T> Set<T>.plus(elements: Array<out T>): Set<T> {
+            return this.plusKt(elements)
         }
 
         @JvmStatic
-        fun <T> plus(set: Set<T>, elements: Iterable<T>): Set<T> {
-            return set.plus(elements)
+        fun <T> Set<T>.plus(elements: Iterable<T>): Set<T> {
+            return this.plusKt(elements)
         }
 
         @JvmStatic
-        fun <T> plus(set: Set<T>, elements: Sequence<T>): Set<T> {
-            return set.plus(elements)
+        fun <T> Set<T>.plus(elements: Sequence<T>): Set<T> {
+            return this.plusKt(elements)
         }
 
         @JvmStatic
-        fun <T> minus(set: Set<T>, element: T): Set<T> {
-            return set.minus(element)
+        fun <T> Set<T>.minus(element: T): Set<T> {
+            return this.minusKt(element)
         }
 
         @JvmStatic
-        fun <T> minus(set: Set<T>, elements: Array<out T>): Set<T> {
-            return set.minus(elements)
+        fun <T> Set<T>.minus(elements: Array<out T>): Set<T> {
+            return this.minusKt(elements)
         }
 
         @JvmStatic
-        fun <T> minus(set: Set<T>, elements: Iterable<T>): Set<T> {
-            return set.minus(elements)
+        fun <T> Set<T>.minus(elements: Iterable<T>): Set<T> {
+            return this.minusKt(elements)
         }
 
         @JvmStatic
-        fun <T> minus(set: Set<T>, elements: Sequence<T>): Set<T> {
-            return set.minus(elements)
+        fun <T> Set<T>.minus(elements: Sequence<T>): Set<T> {
+            return this.minusKt(elements)
         }
     }
 }
