@@ -1,7 +1,7 @@
 package xyz.srclab.common.base
 
 import org.slf4j.helpers.MessageFormatter as MessageFormatterSlf4j
-import java.text.MessageFormat as MessageFormatJava
+import java.text.MessageFormat as MessageFormatKt
 
 interface Format {
 
@@ -78,6 +78,6 @@ object PrintfFormat : Format {
 object MessageFormat : Format {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
-        return MessageFormatJava.format(pattern.toString(), *args)
+        return MessageFormatKt.format(pattern.toString(), *args)
     }
 }

@@ -23,7 +23,7 @@ interface Let<T> {
     companion object {
 
         @JvmStatic
-        fun <T> forAny(any: T): Let<T> {
+        fun <T> any(any: T): Let<T> {
             return LetImpl(any)
         }
     }
