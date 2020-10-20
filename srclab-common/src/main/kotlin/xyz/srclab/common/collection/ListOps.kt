@@ -148,11 +148,8 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
         return finalList().slice(indices).toListOps()
     }
 
-    fun binarySearch(element: T): Int {
-        return finalList().binarySearch(element, castSelfComparableComparator())
-    }
-
-    fun binarySearch(element: T, comparator: Comparator<in T>): Int {
+    @JvmOverloads
+    fun binarySearch(element: T, comparator: Comparator<in T> = castSelfComparableComparator()): Int {
         return finalList().binarySearch(element, comparator)
     }
 
@@ -161,12 +158,8 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
         return this.asAny()
     }
 
-    fun sort(): ListOps<T> {
-        finalMutableList().sort(castSelfComparableComparator())
-        return this.asAny()
-    }
-
-    fun sort(comparator: Comparator<in T>): ListOps<T> {
+    @JvmOverloads
+    fun sort(comparator: Comparator<in T> = castSelfComparableComparator()): ListOps<T> {
         finalMutableList().sort(comparator)
         return this.asAny()
     }
@@ -416,12 +409,8 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
         }
 
         @JvmStatic
-        fun <T> List<T>.binarySearch(element: T): Int {
-            return this.binarySearchKt(element, castSelfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T>): Int {
+        @JvmOverloads
+        fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T> = castSelfComparableComparator()): Int {
             return this.binarySearchKt(element, comparator)
         }
 
@@ -431,12 +420,8 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
         }
 
         @JvmStatic
-        fun <T> MutableList<T>.sort() {
-            this.sort(castSelfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> MutableList<T>.sort(comparator: Comparator<in T>) {
+        @JvmOverloads
+        fun <T> MutableList<T>.sort(comparator: Comparator<in T> = castSelfComparableComparator()) {
             this.sortWithKt(comparator)
         }
 

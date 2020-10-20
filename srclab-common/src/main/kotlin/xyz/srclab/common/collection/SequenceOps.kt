@@ -1,28 +1,17 @@
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.*
-import xyz.srclab.common.collection.BaseIterableOps.Companion.averageBigDecimal
-import xyz.srclab.common.collection.BaseIterableOps.Companion.averageBigInteger
-import xyz.srclab.common.collection.BaseIterableOps.Companion.averageDouble
-import xyz.srclab.common.collection.BaseIterableOps.Companion.averageInt
-import xyz.srclab.common.collection.BaseIterableOps.Companion.averageLong
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toArray
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toBooleanArray
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toByteArray
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toCharArray
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toDoubleArray
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toFloatArray
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toIntArray
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toLongArray
+import xyz.srclab.common.collection.BaseIterableOps.Companion.forEachIndexed
 import xyz.srclab.common.collection.BaseIterableOps.Companion.toSet
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toShortArray
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toStream
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import java.util.stream.Stream
+import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
+import kotlin.collections.LinkedHashSet
 import kotlin.random.Random
+import kotlin.streams.asStream
 import kotlin.sequences.all as allKt
 import kotlin.sequences.any as anyKt
 import kotlin.sequences.asSequence as asSequenceKt
@@ -87,7 +76,6 @@ import kotlin.sequences.sortedWith as sortedWithKt
 import kotlin.sequences.sumOf as sumOfKt
 import kotlin.sequences.take as takeKt
 import kotlin.sequences.takeWhile as takeWhileKt
-import kotlin.sequences.toCollection as toCollectionKt
 import kotlin.sequences.toHashSet as toHashSetKt
 import kotlin.sequences.toList as toListKt
 import kotlin.sequences.toMutableList as toMutableListKt
@@ -498,11 +486,8 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         return finalSequence().distinct(selector).toSequenceOps()
     }
 
-    fun sorted(): SequenceOps<T> {
-        return finalSequence().sorted().toSequenceOps()
-    }
-
-    fun sorted(comparator: Comparator<in T>): SequenceOps<T> {
+    @JvmOverloads
+    fun sorted(comparator: Comparator<in T> = castSelfComparableComparator()): SequenceOps<T> {
         return finalSequence().sorted(comparator).toSequenceOps()
     }
 
@@ -514,120 +499,82 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         return finalSequence().shuffled(random).toSequenceOps()
     }
 
-    fun max(): T {
-        return finalSequence().max()
-    }
-
-    fun max(comparator: Comparator<in T>): T {
+    @JvmOverloads
+    fun max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
         return finalSequence().max(comparator)
     }
 
-    fun maxOrNull(): T? {
-        return finalSequence().maxOrNull()
-    }
-
-    fun maxOrNull(comparator: Comparator<in T>): T? {
+    @JvmOverloads
+    fun maxOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
         return finalSequence().maxOrNull(comparator)
     }
 
-    fun min(): T {
-        return finalSequence().min()
-    }
-
-    fun min(comparator: Comparator<in T>): T {
+    @JvmOverloads
+    fun min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
         return finalSequence().min(comparator)
     }
 
-    fun minOrNull(): T? {
-        return finalSequence().minOrNull()
-    }
-
-    fun minOrNull(comparator: Comparator<in T>): T? {
+    @JvmOverloads
+    fun minOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
         return finalSequence().minOrNull(comparator)
     }
 
-    fun sumInt(): Int {
-        return finalSequence().sumInt()
-    }
-
-    fun sumInt(selector: (T) -> Int): Int {
+    @JvmOverloads
+    fun sumInt(selector: (T) -> Int = { it.toInt() }): Int {
         return finalSequence().sumInt(selector)
     }
 
-    fun sumLong(): Long {
-        return finalSequence().sumLong()
-    }
-
-    fun sumLong(selector: (T) -> Long): Long {
+    @JvmOverloads
+    fun sumLong(selector: (T) -> Long = { it.toLong() }): Long {
         return finalSequence().sumLong(selector)
     }
 
-    fun sumDouble(): Double {
-        return finalSequence().sumDouble()
-    }
-
-    fun sumDouble(selector: (T) -> Double): Double {
+    @JvmOverloads
+    fun sumDouble(selector: (T) -> Double = { it.toDouble() }): Double {
         return finalSequence().sumDouble(selector)
     }
 
-    fun sumBigInteger(): BigInteger {
-        return finalSequence().sumBigInteger()
-    }
-
-    fun sumBigInteger(selector: (T) -> BigInteger): BigInteger {
+    @JvmOverloads
+    fun sumBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
         return finalSequence().sumBigInteger(selector)
     }
 
-    fun sumBigDecimal(): BigDecimal {
-        return finalSequence().sumBigDecimal()
-    }
-
-    fun sumBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+    @JvmOverloads
+    fun sumBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
         return finalSequence().sumBigDecimal(selector)
     }
 
-    fun averageInt(): Int {
-        return finalSequence().averageInt()
-    }
-
-    fun averageInt(selector: (T) -> Int): Int {
+    @JvmOverloads
+    fun averageInt(selector: (T) -> Int = { it.toInt() }): Int {
         return finalSequence().averageInt(selector)
     }
 
-    fun averageLong(): Long {
-        return finalSequence().averageLong()
-    }
-
-    fun averageLong(selector: (T) -> Long): Long {
+    @JvmOverloads
+    fun averageLong(selector: (T) -> Long = { it.toLong() }): Long {
         return finalSequence().averageLong(selector)
     }
 
-    fun averageDouble(): Double {
-        return finalSequence().averageDouble()
-    }
-
-    fun averageDouble(selector: (T) -> Double): Double {
+    @JvmOverloads
+    fun averageDouble(selector: (T) -> Double = { it.toDouble() }): Double {
         return finalSequence().averageDouble(selector)
     }
 
-    fun averageBigInteger(): BigInteger {
-        return finalSequence().averageBigInteger()
-    }
-
-    fun averageBigInteger(selector: (T) -> BigInteger): BigInteger {
+    @JvmOverloads
+    fun averageBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
         return finalSequence().averageBigInteger(selector)
     }
 
-    fun averageBigDecimal(): BigDecimal {
-        return finalSequence().averageBigDecimal()
-    }
-
-    fun averageBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+    @JvmOverloads
+    fun averageBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
         return finalSequence().averageBigDecimal(selector)
     }
 
-    fun <C : MutableCollection<in T>> toCollection(destination: C): C {
-        return finalSequence().toCollection(destination)
+    fun toCollection(): Collection<T> {
+        return finalSequence().toCollection()
+    }
+
+    fun toMutableCollection(): MutableCollection<T> {
+        return finalSequence().toMutableCollection()
     }
 
     fun toSet(): Set<T> {
@@ -642,11 +589,12 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         return finalSequence().toHashSet()
     }
 
-    fun toSortedSet(): SortedSet<T> {
-        return finalSequence().toSortedSet()
+    fun toLinkedHashSet(): LinkedHashSet<T> {
+        return finalSequence().toLinkedHashSet()
     }
 
-    fun toSortedSet(comparator: Comparator<in T>): SortedSet<T> {
+    @JvmOverloads
+    fun toSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
         return finalSequence().toSortedSet(comparator)
     }
 
@@ -656,6 +604,14 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
 
     fun toMutableList(): MutableList<T> {
         return finalSequence().toMutableList()
+    }
+
+    fun toArrayList(): ArrayList<T> {
+        return finalSequence().toArrayList()
+    }
+
+    fun toLinkedList(): LinkedList<T> {
+        return finalSequence().toLinkedList()
     }
 
     @JvmOverloads
@@ -675,67 +631,47 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         return finalSequence().toArray(generator)
     }
 
-    fun toBooleanArray(): BooleanArray {
-        return finalSequence().toBooleanArray()
+    fun toArray(componentType: Class<*>): Array<T> {
+        return finalSequence().toArray(componentType)
     }
 
-    fun toBooleanArray(selector: (T) -> Boolean): BooleanArray {
+    @JvmOverloads
+    fun toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
         return finalSequence().toBooleanArray(selector)
     }
 
-    fun toByteArray(): ByteArray {
-        return finalSequence().toByteArray()
-    }
-
-    fun toByteArray(selector: (T) -> Byte): ByteArray {
+    @JvmOverloads
+    fun toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
         return finalSequence().toByteArray(selector)
     }
 
-    fun toShortArray(): ShortArray {
-        return finalSequence().toShortArray()
-    }
-
-    fun toShortArray(selector: (T) -> Short): ShortArray {
+    @JvmOverloads
+    fun toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
         return finalSequence().toShortArray(selector)
     }
 
-    fun toCharArray(): CharArray {
-        return finalSequence().toCharArray()
-    }
-
-    fun toCharArray(selector: (T) -> Char): CharArray {
+    @JvmOverloads
+    fun toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
         return finalSequence().toCharArray(selector)
     }
 
-    fun toIntArray(): IntArray {
-        return finalSequence().toIntArray()
-    }
-
-    fun toIntArray(selector: (T) -> Int): IntArray {
+    @JvmOverloads
+    fun toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
         return finalSequence().toIntArray(selector)
     }
 
-    fun toLongArray(): LongArray {
-        return finalSequence().toLongArray()
-    }
-
-    fun toLongArray(selector: (T) -> Long): LongArray {
+    @JvmOverloads
+    fun toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
         return finalSequence().toLongArray(selector)
     }
 
-    fun toFloatArray(): FloatArray {
-        return finalSequence().toFloatArray()
-    }
-
-    fun toFloatArray(selector: (T) -> Float): FloatArray {
+    @JvmOverloads
+    fun toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
         return finalSequence().toFloatArray(selector)
     }
 
-    fun toDoubleArray(): DoubleArray {
-        return finalSequence().toDoubleArray()
-    }
-
-    fun toDoubleArray(selector: (T) -> Double): DoubleArray {
+    @JvmOverloads
+    fun toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
         return finalSequence().toDoubleArray(selector)
     }
 
@@ -1403,12 +1339,8 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.sorted(): Sequence<T> {
-            return this.sorted(castSelfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.sorted(comparator: Comparator<in T>): Sequence<T> {
+        @JvmOverloads
+        fun <T> Sequence<T>.sorted(comparator: Comparator<in T> = castSelfComparableComparator()): Sequence<T> {
             return this.sortedWithKt(comparator)
         }
 
@@ -1423,148 +1355,127 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.max(): T {
-            return this.maxOrNull().notNull()
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.max(comparator: Comparator<in T>): T {
+        @JvmOverloads
+        fun <T> Sequence<T>.max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
             return this.maxOrNull(comparator).notNull()
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.maxOrNull(): T? {
-            return this.maxOrNull(castSelfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.maxOrNull(comparator: Comparator<in T>): T? {
+        @JvmOverloads
+        fun <T> Sequence<T>.maxOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
             return this.maxWithOrNullKt(comparator)
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.min(): T {
-            return this.minOrNull().notNull()
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.min(comparator: Comparator<in T>): T {
+        @JvmOverloads
+        fun <T> Sequence<T>.min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
             return this.minOrNull(comparator).notNull()
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.minOrNull(): T? {
-            return this.minOrNull(castSelfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.minOrNull(comparator: Comparator<in T>): T? {
+        @JvmOverloads
+        fun <T> Sequence<T>.minOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
             return this.minWithOrNullKt(comparator)
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.sumInt(): Int {
-            return this.sumInt { it.toInt() }
-        }
-
-        @JvmStatic
-        inline fun <T> Sequence<T>.sumInt(selector: (T) -> Int): Int {
+        @JvmOverloads
+        inline fun <T> Sequence<T>.sumInt(selector: (T) -> Int = { it.toInt() }): Int {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.sumLong(): Long {
-            return this.sumLong { it.toLong() }
-        }
-
-        @JvmStatic
-        inline fun <T> Sequence<T>.sumLong(selector: (T) -> Long): Long {
+        @JvmOverloads
+        inline fun <T> Sequence<T>.sumLong(selector: (T) -> Long = { it.toLong() }): Long {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.sumDouble(): Double {
-            return this.sumDouble { it.toDouble() }
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.sumDouble(selector: (T) -> Double): Double {
+        @JvmOverloads
+        fun <T> Sequence<T>.sumDouble(selector: (T) -> Double = { it.toDouble() }): Double {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.sumBigInteger(): BigInteger {
-            return this.sumBigInteger { it.toBigInteger() }
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.sumBigInteger(selector: (T) -> BigInteger): BigInteger {
+        @JvmOverloads
+        fun <T> Sequence<T>.sumBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.sumBigDecimal(): BigDecimal {
-            return this.sumBigDecimal { it.toBigDecimal() }
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.sumBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+        @JvmOverloads
+        fun <T> Sequence<T>.sumBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.averageInt(): Int {
-            return this.toList().averageInt()
+        @JvmOverloads
+        inline fun <T> Sequence<T>.averageInt(selector: (T) -> Int = { it.toInt() }): Int {
+            var sum = 0
+            var count = 0
+            for (t in this) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) 0 else sum / count
         }
 
         @JvmStatic
-        inline fun <T> Sequence<T>.averageInt(selector: (T) -> Int): Int {
-            return this.toList().averageInt(selector)
+        @JvmOverloads
+        inline fun <T> Sequence<T>.averageLong(selector: (T) -> Long = { it.toLong() }): Long {
+            var sum = 0L
+            var count = 0
+            for (t in this) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) 0 else sum / count
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.averageLong(): Long {
-            return this.toList().averageLong()
+        @JvmOverloads
+        inline fun <T> Sequence<T>.averageDouble(selector: (T) -> Double = { it.toDouble() }): Double {
+            var sum = 0.0
+            var count = 0
+            for (t in this) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) 0.0 else sum / count
         }
 
         @JvmStatic
-        inline fun <T> Sequence<T>.averageLong(selector: (T) -> Long): Long {
-            return this.toList().averageLong(selector)
+        @JvmOverloads
+        inline fun <T> Sequence<T>.averageBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
+            var sum = BigInteger.ZERO
+            var count = 0
+            for (t in this) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) BigInteger.ZERO else sum / count.toBigInteger()
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.averageDouble(): Double {
-            return this.toList().averageDouble()
+        @JvmOverloads
+        inline fun <T> Sequence<T>.averageBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
+            var sum = BigDecimal.ZERO
+            var count = 0
+            for (t in this) {
+                sum += selector(t)
+                count++
+            }
+            return if (count == 0) BigDecimal.ZERO else sum / count.toBigDecimal()
         }
 
         @JvmStatic
-        inline fun <T> Sequence<T>.averageDouble(selector: (T) -> Double): Double {
-            return this.toList().averageDouble(selector)
+        fun <T> Sequence<T>.toCollection(): Collection<T> {
+            return this.toSet()
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.averageBigInteger(): BigInteger {
-            return this.toList().averageBigInteger()
-        }
-
-        @JvmStatic
-        inline fun <T> Sequence<T>.averageBigInteger(selector: (T) -> BigInteger): BigInteger {
-            return this.toList().averageBigInteger(selector)
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.averageBigDecimal(): BigDecimal {
-            return this.toList().averageBigDecimal()
-        }
-
-        @JvmStatic
-        inline fun <T> Sequence<T>.averageBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
-            return this.toList().averageBigDecimal(selector)
-        }
-
-        @JvmStatic
-        fun <T, C : MutableCollection<in T>> Sequence<T>.toCollection(destination: C): C {
-            return this.toCollectionKt(destination)
+        fun <T> Sequence<T>.toMutableCollection(): MutableCollection<T> {
+            return this.toMutableSet()
         }
 
         @JvmStatic
@@ -1583,12 +1494,13 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.toSortedSet(): SortedSet<T> {
-            return this.toSortedSet(castSelfComparableComparator())
+        fun <T> Sequence<T>.toLinkedHashSet(): LinkedHashSet<T> {
+            return this.takeAllTo(LinkedHashSet())
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.toSortedSet(comparator: Comparator<in T>): SortedSet<T> {
+        @JvmOverloads
+        fun <T> Sequence<T>.toSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
             return this.toSortedSetKt(comparator)
         }
 
@@ -1603,9 +1515,19 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         }
 
         @JvmStatic
+        fun <T> Sequence<T>.toArrayList(): ArrayList<T> {
+            return this.takeAllTo(ArrayList())
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.toLinkedList(): LinkedList<T> {
+            return this.takeAllTo(LinkedList())
+        }
+
+        @JvmStatic
         @JvmOverloads
         fun <T> Sequence<T>.toStream(parallel: Boolean = false): Stream<T> {
-            return this.toList().toStream(parallel)
+            return if (parallel) this.asStream().parallel() else this.asStream()
         }
 
         @JvmStatic
@@ -1615,97 +1537,93 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
 
         @JvmStatic
         fun <T> Sequence<T>.toArray(): Array<Any?> {
-            return this.toList().toArray()
+            val list = this.toLinkedList()
+            return list.toArray()
         }
 
         @JvmStatic
         inline fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
-            return this.toList().toArray(generator)
+            val list = this.toLinkedList()
+            return list.toArray(generator(list.size))
         }
 
         @JvmStatic
-        inline fun <reified T> Sequence<T>.toTypedArray(): Array<T> {
-            return this.toList().toTypedArray()
+        fun <T> Sequence<T>.toArray(componentType: Class<*>): Array<T> {
+            val list = this.toLinkedList()
+            val array: Array<T> = java.lang.reflect.Array.newInstance(componentType, 0).asAny()
+            return list.toArray(array)
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.toBooleanArray(): BooleanArray {
-            return this.toList().toBooleanArray()
+        @JvmOverloads
+        inline fun <T> Sequence<T>.toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
+            val list = this.toList()
+            val result = BooleanArray(list.size)
+            list.forEachIndexed { i, t -> result[i] = selector(t) }
+            return result
         }
 
         @JvmStatic
-        inline fun <T> Sequence<T>.toBooleanArray(selector: (T) -> Boolean): BooleanArray {
-            return this.toList().toBooleanArray(selector)
+        @JvmOverloads
+        inline fun <T> Sequence<T>.toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
+            val list = this.toList()
+            val result = ByteArray(list.size)
+            list.forEachIndexed { i, t -> result[i] = selector(t) }
+            return result
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.toByteArray(): ByteArray {
-            return this.toList().toByteArray()
+        @JvmOverloads
+        inline fun <T> Sequence<T>.toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
+            val list = this.toList()
+            val result = ShortArray(list.size)
+            list.forEachIndexed { i, t -> result[i] = selector(t) }
+            return result
         }
 
         @JvmStatic
-        inline fun <T> Sequence<T>.toByteArray(selector: (T) -> Byte): ByteArray {
-            return this.toList().toByteArray(selector)
+        @JvmOverloads
+        inline fun <T> Sequence<T>.toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
+            val list = this.toList()
+            val result = CharArray(list.size)
+            list.forEachIndexed { i, t -> result[i] = selector(t) }
+            return result
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.toShortArray(): ShortArray {
-            return this.toList().toShortArray()
+        @JvmOverloads
+        inline fun <T> Sequence<T>.toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
+            val list = this.toList()
+            val result = IntArray(list.size)
+            list.forEachIndexed { i, t -> result[i] = selector(t) }
+            return result
         }
 
         @JvmStatic
-        inline fun <T> Sequence<T>.toShortArray(selector: (T) -> Short): ShortArray {
-            return this.toList().toShortArray(selector)
+        @JvmOverloads
+        inline fun <T> Sequence<T>.toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
+            val list = this.toList()
+            val result = LongArray(list.size)
+            list.forEachIndexed { i, t -> result[i] = selector(t) }
+            return result
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.toCharArray(): CharArray {
-            return this.toList().toCharArray()
+        @JvmOverloads
+        inline fun <T> Sequence<T>.toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
+            val list = this.toList()
+            val result = FloatArray(list.size)
+            list.forEachIndexed { i, t -> result[i] = selector(t) }
+            return result
         }
 
         @JvmStatic
-        inline fun <T> Sequence<T>.toCharArray(selector: (T) -> Char): CharArray {
-            return this.toList().toCharArray(selector)
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.toIntArray(): IntArray {
-            return this.toList().toIntArray()
-        }
-
-        @JvmStatic
-        inline fun <T> Sequence<T>.toIntArray(selector: (T) -> Int): IntArray {
-            return this.toList().toIntArray(selector)
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.toLongArray(): LongArray {
-            return this.toList().toLongArray()
-        }
-
-        @JvmStatic
-        inline fun <T> Sequence<T>.toLongArray(selector: (T) -> Long): LongArray {
-            return this.toList().toLongArray(selector)
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.toFloatArray(): FloatArray {
-            return this.toList().toFloatArray()
-        }
-
-        @JvmStatic
-        inline fun <T> Sequence<T>.toFloatArray(selector: (T) -> Float): FloatArray {
-            return this.toList().toFloatArray(selector)
-        }
-
-        @JvmStatic
-        fun <T> Sequence<T>.toDoubleArray(): DoubleArray {
-            return this.toList().toDoubleArray()
-        }
-
-        @JvmStatic
-        inline fun <T> Sequence<T>.toDoubleArray(selector: (T) -> Double): DoubleArray {
-            return this.toList().toDoubleArray(selector)
+        @JvmOverloads
+        inline fun <T> Sequence<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
+            val list = this.toList()
+            val result = DoubleArray(list.size)
+            list.forEachIndexed { i, t -> result[i] = selector(t) }
+            return result
         }
 
         @JvmStatic

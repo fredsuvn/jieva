@@ -8,7 +8,9 @@ import java.util.stream.Stream
 import java.util.stream.StreamSupport
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
+import kotlin.collections.LinkedHashSet
 import kotlin.random.Random
+import kotlin.collections.addAll as addAllKt
 import kotlin.collections.all as allKt
 import kotlin.collections.any as anyKt
 import kotlin.collections.asSequence as asSequenceKt
@@ -80,7 +82,6 @@ import kotlin.collections.subtract as subtractKt
 import kotlin.collections.sumOf as sumOfKt
 import kotlin.collections.take as takeKt
 import kotlin.collections.takeWhile as takeWhileKt
-import kotlin.collections.toCollection as toCollectionKt
 import kotlin.collections.toHashSet as toHashSetKt
 import kotlin.collections.toList as toListKt
 import kotlin.collections.toMutableList as toMutableListKt
@@ -534,11 +535,8 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().distinct(selector).toListOps()
     }
 
-    open fun sorted(): ListOps<T> {
-        return finalIterable().sorted().toListOps()
-    }
-
-    open fun sorted(comparator: Comparator<in T>): ListOps<T> {
+    @JvmOverloads
+    open fun sorted(comparator: Comparator<in T> = castSelfComparableComparator()): ListOps<T> {
         return finalIterable().sorted(comparator).toListOps()
     }
 
@@ -554,120 +552,82 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().shuffled(random).toListOps()
     }
 
-    open fun max(): T {
-        return finalIterable().max()
-    }
-
-    open fun max(comparator: Comparator<in T>): T {
+    @JvmOverloads
+    open fun max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
         return finalIterable().max(comparator)
     }
 
-    open fun maxOrNull(): T? {
-        return finalIterable().maxOrNull()
-    }
-
-    open fun maxOrNull(comparator: Comparator<in T>): T? {
+    @JvmOverloads
+    open fun maxOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
         return finalIterable().maxOrNull(comparator)
     }
 
-    open fun min(): T {
-        return finalIterable().min()
-    }
-
-    open fun min(comparator: Comparator<in T>): T {
+    @JvmOverloads
+    open fun min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
         return finalIterable().min(comparator)
     }
 
-    open fun minOrNull(): T? {
-        return finalIterable().minOrNull()
-    }
-
-    open fun minOrNull(comparator: Comparator<in T>): T? {
+    @JvmOverloads
+    open fun minOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
         return finalIterable().minOrNull(comparator)
     }
 
-    open fun sumInt(): Int {
-        return finalIterable().sumInt()
-    }
-
-    open fun sumInt(selector: (T) -> Int): Int {
+    @JvmOverloads
+    open fun sumInt(selector: (T) -> Int = { it.toInt() }): Int {
         return finalIterable().sumInt(selector)
     }
 
-    open fun sumLong(): Long {
-        return finalIterable().sumLong()
-    }
-
-    open fun sumLong(selector: (T) -> Long): Long {
+    @JvmOverloads
+    open fun sumLong(selector: (T) -> Long = { it.toLong() }): Long {
         return finalIterable().sumLong(selector)
     }
 
-    open fun sumDouble(): Double {
-        return finalIterable().sumDouble()
-    }
-
-    open fun sumDouble(selector: (T) -> Double): Double {
+    @JvmOverloads
+    open fun sumDouble(selector: (T) -> Double = { it.toDouble() }): Double {
         return finalIterable().sumDouble(selector)
     }
 
-    open fun sumBigInteger(): BigInteger {
-        return finalIterable().sumBigInteger()
-    }
-
-    open fun sumBigInteger(selector: (T) -> BigInteger): BigInteger {
+    @JvmOverloads
+    open fun sumBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
         return finalIterable().sumBigInteger(selector)
     }
 
-    open fun sumBigDecimal(): BigDecimal {
-        return finalIterable().sumBigDecimal()
-    }
-
-    open fun sumBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+    @JvmOverloads
+    open fun sumBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
         return finalIterable().sumBigDecimal(selector)
     }
 
-    open fun averageInt(): Int {
-        return finalIterable().averageInt()
-    }
-
-    open fun averageInt(selector: (T) -> Int): Int {
+    @JvmOverloads
+    open fun averageInt(selector: (T) -> Int = { it.toInt() }): Int {
         return finalIterable().averageInt(selector)
     }
 
-    open fun averageLong(): Long {
-        return finalIterable().averageLong()
-    }
-
-    open fun averageLong(selector: (T) -> Long): Long {
+    @JvmOverloads
+    open fun averageLong(selector: (T) -> Long = { it.toLong() }): Long {
         return finalIterable().averageLong(selector)
     }
 
-    open fun averageDouble(): Double {
-        return finalIterable().averageDouble()
-    }
-
-    open fun averageDouble(selector: (T) -> Double): Double {
+    @JvmOverloads
+    open fun averageDouble(selector: (T) -> Double = { it.toDouble() }): Double {
         return finalIterable().averageDouble(selector)
     }
 
-    open fun averageBigInteger(): BigInteger {
-        return finalIterable().averageBigInteger()
-    }
-
-    open fun averageBigInteger(selector: (T) -> BigInteger): BigInteger {
+    @JvmOverloads
+    open fun averageBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
         return finalIterable().averageBigInteger(selector)
     }
 
-    open fun averageBigDecimal(): BigDecimal {
-        return finalIterable().averageBigDecimal()
-    }
-
-    open fun averageBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+    @JvmOverloads
+    open fun averageBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
         return finalIterable().averageBigDecimal(selector)
     }
 
-    open fun <C : MutableCollection<in T>> toCollection(destination: C): C {
-        return finalIterable().toCollection(destination)
+    open fun toCollection(): Collection<T> {
+        return finalIterable().toCollection()
+    }
+
+    open fun toMutableCollection(): MutableCollection<T> {
+        return finalIterable().toMutableCollection()
     }
 
     open fun toSet(): Set<T> {
@@ -682,11 +642,12 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().toHashSet()
     }
 
-    open fun toSortedSet(): SortedSet<T> {
-        return finalIterable().toSortedSet()
+    open fun toLinkedHashSet(): LinkedHashSet<T> {
+        return finalIterable().toLinkedHashSet()
     }
 
-    open fun toSortedSet(comparator: Comparator<in T>): SortedSet<T> {
+    @JvmOverloads
+    open fun toSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
         return finalIterable().toSortedSet(comparator)
     }
 
@@ -696,6 +657,58 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
     open fun toMutableList(): MutableList<T> {
         return finalIterable().toMutableList()
+    }
+
+    open fun toArrayList(): ArrayList<T> {
+        return finalIterable().toArrayList()
+    }
+
+    open fun toLinkedList(): LinkedList<T> {
+        return finalIterable().toLinkedList()
+    }
+
+    open fun asToCollection(): Collection<T> {
+        return finalIterable().asToCollection()
+    }
+
+    open fun asToMutableCollection(): MutableCollection<T> {
+        return finalIterable().asToMutableCollection()
+    }
+
+    open fun asToSet(): Set<T> {
+        return finalIterable().asToSet()
+    }
+
+    open fun asToMutableSet(): MutableSet<T> {
+        return finalIterable().asToMutableSet()
+    }
+
+    open fun asToHashSet(): HashSet<T> {
+        return finalIterable().asToHashSet()
+    }
+
+    open fun asToLinkedHashSet(): LinkedHashSet<T> {
+        return finalIterable().asToLinkedHashSet()
+    }
+
+    open fun asToSortedSet(): SortedSet<T> {
+        return finalIterable().asToSortedSet()
+    }
+
+    open fun asToList(): List<T> {
+        return finalIterable().asToList()
+    }
+
+    open fun asToMutableList(): MutableList<T> {
+        return finalIterable().asToMutableList()
+    }
+
+    open fun asToArrayList(): ArrayList<T> {
+        return finalIterable().asToArrayList()
+    }
+
+    open fun asToLinkedList(): LinkedList<T> {
+        return finalIterable().asToLinkedList()
     }
 
     @JvmOverloads
@@ -715,67 +728,47 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().toArray(generator)
     }
 
-    open fun toBooleanArray(): BooleanArray {
-        return finalIterable().toBooleanArray()
+    open fun toArray(componentType: Class<*>): Array<T> {
+        return finalIterable().toArray(componentType)
     }
 
-    open fun toBooleanArray(selector: (T) -> Boolean): BooleanArray {
+    @JvmOverloads
+    open fun toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
         return finalIterable().toBooleanArray(selector)
     }
 
-    open fun toByteArray(): ByteArray {
-        return finalIterable().toByteArray()
-    }
-
-    open fun toByteArray(selector: (T) -> Byte): ByteArray {
+    @JvmOverloads
+    open fun toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
         return finalIterable().toByteArray(selector)
     }
 
-    open fun toShortArray(): ShortArray {
-        return finalIterable().toShortArray()
-    }
-
-    open fun toShortArray(selector: (T) -> Short): ShortArray {
+    @JvmOverloads
+    open fun toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
         return finalIterable().toShortArray(selector)
     }
 
-    open fun toCharArray(): CharArray {
-        return finalIterable().toCharArray()
-    }
-
-    open fun toCharArray(selector: (T) -> Char): CharArray {
+    @JvmOverloads
+    open fun toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
         return finalIterable().toCharArray(selector)
     }
 
-    open fun toIntArray(): IntArray {
-        return finalIterable().toIntArray()
-    }
-
-    open fun toIntArray(selector: (T) -> Int): IntArray {
+    @JvmOverloads
+    open fun toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
         return finalIterable().toIntArray(selector)
     }
 
-    open fun toLongArray(): LongArray {
-        return finalIterable().toLongArray()
-    }
-
-    open fun toLongArray(selector: (T) -> Long): LongArray {
+    @JvmOverloads
+    open fun toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
         return finalIterable().toLongArray(selector)
     }
 
-    open fun toFloatArray(): FloatArray {
-        return finalIterable().toFloatArray()
-    }
-
-    open fun toFloatArray(selector: (T) -> Float): FloatArray {
+    @JvmOverloads
+    open fun toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
         return finalIterable().toFloatArray(selector)
     }
 
-    open fun toDoubleArray(): DoubleArray {
-        return finalIterable().toDoubleArray()
-    }
-
-    open fun toDoubleArray(selector: (T) -> Double): DoubleArray {
+    @JvmOverloads
+    open fun toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
         return finalIterable().toDoubleArray(selector)
     }
 
@@ -1034,7 +1027,7 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T, C : MutableCollection<in T>> Iterable<T>.takeAllTo(destination: C): C {
-            destination.addAll(this)
+            destination.addAllKt(this)
             return destination
         }
 
@@ -1519,12 +1512,8 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.sorted(): List<T> {
-            return this.sorted(castSelfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.sorted(comparator: Comparator<in T>): List<T> {
+        @JvmOverloads
+        fun <T> Iterable<T>.sorted(comparator: Comparator<in T> = castSelfComparableComparator()): List<T> {
             return this.sortedWithKt(comparator)
         }
 
@@ -1544,102 +1533,62 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.max(): T {
-            return this.maxOrNull().notNull()
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.max(comparator: Comparator<in T>): T {
+        @JvmOverloads
+        fun <T> Iterable<T>.max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
             return this.maxOrNull(comparator).notNull()
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.maxOrNull(): T? {
-            return this.maxOrNull(castSelfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T>): T? {
+        @JvmOverloads
+        fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
             return this.maxWithOrNullKt(comparator)
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.min(): T {
-            return this.minOrNull().notNull()
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.min(comparator: Comparator<in T>): T {
+        @JvmOverloads
+        fun <T> Iterable<T>.min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
             return this.minOrNull(comparator).notNull()
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.minOrNull(): T? {
-            return this.minOrNull(castSelfComparableComparator())
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T>): T? {
+        @JvmOverloads
+        fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
             return this.minWithOrNullKt(comparator)
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.sumInt(): Int {
-            return this.sumInt { it.toInt() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.sumInt(selector: (T) -> Int): Int {
+        @JvmOverloads
+        inline fun <T> Iterable<T>.sumInt(selector: (T) -> Int = { it.toInt() }): Int {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.sumLong(): Long {
-            return this.sumLong { it.toLong() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.sumLong(selector: (T) -> Long): Long {
+        @JvmOverloads
+        inline fun <T> Iterable<T>.sumLong(selector: (T) -> Long = { it.toLong() }): Long {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.sumDouble(): Double {
-            return this.sumDouble { it.toDouble() }
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.sumDouble(selector: (T) -> Double): Double {
+        @JvmOverloads
+        fun <T> Iterable<T>.sumDouble(selector: (T) -> Double = { it.toDouble() }): Double {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.sumBigInteger(): BigInteger {
-            return this.sumBigInteger { it.toBigInteger() }
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.sumBigInteger(selector: (T) -> BigInteger): BigInteger {
+        @JvmOverloads
+        fun <T> Iterable<T>.sumBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.sumBigDecimal(): BigDecimal {
-            return this.sumBigDecimal { it.toBigDecimal() }
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.sumBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+        @JvmOverloads
+        fun <T> Iterable<T>.sumBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
             return this.sumOfKt(selector)
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.averageInt(): Int {
-            return averageInt { it.toInt() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.averageInt(selector: (T) -> Int): Int {
+        @JvmOverloads
+        inline fun <T> Iterable<T>.averageInt(selector: (T) -> Int = { it.toInt() }): Int {
             var sum = 0
             var count = 0
             for (t in this) {
@@ -1650,12 +1599,8 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.averageLong(): Long {
-            return this.averageLong { it.toLong() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.averageLong(selector: (T) -> Long): Long {
+        @JvmOverloads
+        inline fun <T> Iterable<T>.averageLong(selector: (T) -> Long = { it.toLong() }): Long {
             var sum = 0L
             var count = 0
             for (t in this) {
@@ -1666,12 +1611,8 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.averageDouble(): Double {
-            return this.averageDouble { it.toDouble() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.averageDouble(selector: (T) -> Double): Double {
+        @JvmOverloads
+        inline fun <T> Iterable<T>.averageDouble(selector: (T) -> Double = { it.toDouble() }): Double {
             var sum = 0.0
             var count = 0
             for (t in this) {
@@ -1682,12 +1623,8 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.averageBigInteger(): BigInteger {
-            return this.averageBigInteger { it.toBigInteger() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.averageBigInteger(selector: (T) -> BigInteger): BigInteger {
+        @JvmOverloads
+        inline fun <T> Iterable<T>.averageBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
             var sum = BigInteger.ZERO
             var count = 0
             for (t in this) {
@@ -1698,12 +1635,8 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.averageBigDecimal(): BigDecimal {
-            return this.averageBigDecimal { it.toBigDecimal() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.averageBigDecimal(selector: (T) -> BigDecimal): BigDecimal {
+        @JvmOverloads
+        inline fun <T> Iterable<T>.averageBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
             var sum = BigDecimal.ZERO
             var count = 0
             for (t in this) {
@@ -1714,8 +1647,13 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T, C : MutableCollection<in T>> Iterable<T>.toCollection(destination: C): C {
-            return this.toCollectionKt(destination)
+        fun <T> Iterable<T>.toCollection(): Collection<T> {
+            return this.toSet()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.toMutableCollection(): MutableCollection<T> {
+            return this.toMutableSet()
         }
 
         @JvmStatic
@@ -1734,12 +1672,13 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toSortedSet(): SortedSet<T> {
-            return this.toSortedSet(castSelfComparableComparator())
+        fun <T> Iterable<T>.toLinkedHashSet(): LinkedHashSet<T> {
+            return this.takeAllTo(LinkedHashSet())
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T>): SortedSet<T> {
+        @JvmOverloads
+        fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
             return this.toSortedSetKt(comparator)
         }
 
@@ -1751,6 +1690,71 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> Iterable<T>.toMutableList(): MutableList<T> {
             return this.toMutableListKt()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.toArrayList(): ArrayList<T> {
+            return this.takeAllTo(ArrayList())
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.toLinkedList(): LinkedList<T> {
+            return this.takeAllTo(LinkedList())
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToCollection(): Collection<T> {
+            return asToSet()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToMutableCollection(): MutableCollection<T> {
+            return this.asToMutableSet()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToSet(): Set<T> {
+            return if (this is Set<T>) this else this.toSetKt()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToMutableSet(): MutableSet<T> {
+            return if (this is MutableSet<T>) this else this.toMutableSetKt()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToHashSet(): HashSet<T> {
+            return if (this is HashSet<T>) this else this.toHashSetKt()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToLinkedHashSet(): LinkedHashSet<T> {
+            return if (this is LinkedHashSet<T>) this else this.toLinkedHashSet()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToSortedSet(): SortedSet<T> {
+            return if (this is SortedSet<T>) this else this.toSortedSet()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToList(): List<T> {
+            return if (this is List<T>) this else this.toListKt()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToMutableList(): MutableList<T> {
+            return if (this is MutableList<T>) this else this.toMutableListKt()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToArrayList(): ArrayList<T> {
+            return if (this is ArrayList<T>) this else this.toArrayList()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToLinkedList(): LinkedList<T> {
+            return if (this is LinkedList<T>) this else this.toLinkedList()
         }
 
         @JvmStatic
@@ -1766,121 +1770,96 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> Iterable<T>.toArray(): Array<Any?> {
-            val list = this.toCollection(LinkedList())
+            val list = this.asToLinkedList()
             return list.toArray()
         }
 
         @JvmStatic
         inline fun <T> Iterable<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
-            val list = this.toCollection(LinkedList())
+            val list = this.asToLinkedList()
             return list.toArray(generator(list.size))
         }
 
         @JvmStatic
+        fun <T> Iterable<T>.toArray(componentType: Class<*>): Array<T> {
+            val list = this.asToLinkedList()
+            val array: Array<T> = java.lang.reflect.Array.newInstance(componentType, 0).asAny()
+            return list.toArray(array)
+        }
+
+        @JvmStatic
         inline fun <reified T> Iterable<T>.toTypedArray(): Array<T> {
-            val list = this.toCollection(LinkedList())
+            val list = this.asToList()
             return list.toTypedArrayKt()
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toBooleanArray(): BooleanArray {
-            return this.toBooleanArray { it.toBoolean() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.toBooleanArray(selector: (T) -> Boolean): BooleanArray {
-            val list = this.toCollection(LinkedList())
+        @JvmOverloads
+        inline fun <T> Iterable<T>.toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
+            val list = this.asToList()
             val result = BooleanArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toByteArray(): ByteArray {
-            return this.toByteArray { it.toByte() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.toByteArray(selector: (T) -> Byte): ByteArray {
-            val list = this.toCollection(LinkedList())
+        @JvmOverloads
+        inline fun <T> Iterable<T>.toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
+            val list = this.asToList()
             val result = ByteArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toShortArray(): ShortArray {
-            return this.toShortArray { it.toShort() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.toShortArray(selector: (T) -> Short): ShortArray {
-            val list = this.toCollection(LinkedList())
+        @JvmOverloads
+        inline fun <T> Iterable<T>.toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
+            val list = this.asToList()
             val result = ShortArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toCharArray(): CharArray {
-            return this.toCharArray { it.toChar() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.toCharArray(selector: (T) -> Char): CharArray {
-            val list = this.toCollection(LinkedList())
+        @JvmOverloads
+        inline fun <T> Iterable<T>.toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
+            val list = this.asToList()
             val result = CharArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toIntArray(): IntArray {
-            return this.toIntArray { it.toInt() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.toIntArray(selector: (T) -> Int): IntArray {
-            val list = this.toCollection(LinkedList())
+        @JvmOverloads
+        inline fun <T> Iterable<T>.toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
+            val list = this.asToList()
             val result = IntArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toLongArray(): LongArray {
-            return this.toLongArray { it.toLong() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.toLongArray(selector: (T) -> Long): LongArray {
-            val list = this.toCollection(LinkedList())
+        @JvmOverloads
+        inline fun <T> Iterable<T>.toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
+            val list = this.asToList()
             val result = LongArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toFloatArray(): FloatArray {
-            return this.toFloatArray { it.toFloat() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.toFloatArray(selector: (T) -> Float): FloatArray {
-            val list = this.toCollection(LinkedList())
+        @JvmOverloads
+        inline fun <T> Iterable<T>.toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
+            val list = this.asToList()
             val result = FloatArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toDoubleArray(): DoubleArray {
-            return this.toDoubleArray { it.toDouble() }
-        }
-
-        @JvmStatic
-        inline fun <T> Iterable<T>.toDoubleArray(selector: (T) -> Double): DoubleArray {
-            val list = this.toCollection(LinkedList())
+        @JvmOverloads
+        inline fun <T> Iterable<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
+            val list = this.asToList()
             val result = DoubleArray(list.size)
             list.forEachIndexed { i, t -> result[i] = selector(t) }
             return result
