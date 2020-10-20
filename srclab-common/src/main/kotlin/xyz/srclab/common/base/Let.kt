@@ -18,7 +18,14 @@ interface Let<T> {
 
     fun <R> then(action: (T) -> R): Let<R>
 
+    /**
+     * If current value is null, return without action.
+     */
+    fun <R> thenOrNull(action: (T) -> R): Let<R>
+
     fun get(): T
+
+    fun getOrNull(): T?
 
     companion object {
 
@@ -36,7 +43,18 @@ private class LetImpl<T>(private var any: T) : Let<T> {
         return this.asAny()
     }
 
+    override fun <R> thenOrNull(action: (T) -> R): Let<R> {
+        if (any === null) {
+            return this.asAny()
+        }
+        return then(action)
+    }
+
     override fun get(): T {
+        return any
+    }
+
+    override fun getOrNull(): T? {
         return any
     }
 }
