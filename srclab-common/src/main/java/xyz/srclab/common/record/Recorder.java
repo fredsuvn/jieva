@@ -104,7 +104,7 @@ public interface Recorder {
     }
 
     default <T> T copy(T record) {
-        T newInstance = ClassKit.newInstance(record.getClass());
+        T newInstance = ClassKit.toInstance(record.getClass());
         copyEntries(record, newInstance);
         return newInstance;
     }

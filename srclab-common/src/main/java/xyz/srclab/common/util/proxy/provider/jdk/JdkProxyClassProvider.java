@@ -40,7 +40,7 @@ public class JdkProxyClassProvider implements ProxyClassProvider {
         @Override
         public T newInstance() {
             if (methodMap.isEmpty()) {
-                return ClassKit.newInstance(type);
+                return ClassKit.toInstance(type);
             }
             Object instance = Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type},
                     (object, method, args) -> {
@@ -57,7 +57,7 @@ public class JdkProxyClassProvider implements ProxyClassProvider {
         @Override
         public T newInstance(Class<?>[] parameterTypes, Object[] arguments) {
             if (methodMap.isEmpty()) {
-                return ClassKit.newInstance(type, parameterTypes, arguments);
+                return ClassKit.toInstance(type, parameterTypes, arguments);
             }
             throw new UnsupportedOperationException("JDK proxy doesn't support this");
         }

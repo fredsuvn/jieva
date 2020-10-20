@@ -26,7 +26,7 @@ final class AsmSupport {
 
     private static void checkCastPrimitive(
             MethodVisitor methodVisitor, Class<?> parameterType, BType primitiveType) {
-        Class<?> wrapperClass = ClassKit.toWrapper(parameterType);
+        Class<?> wrapperClass = ClassKit.toWrapperClass(parameterType);
         BRefType wrapperType = new BRefType(wrapperClass);
         methodVisitor.visitTypeInsn(
                 Opcodes.CHECKCAST,

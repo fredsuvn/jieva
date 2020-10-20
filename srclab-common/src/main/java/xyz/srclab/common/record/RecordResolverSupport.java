@@ -155,7 +155,7 @@ final class RecordResolverSupport {
                 this.genericType = type;
             }
 
-            this.field = FieldKit.getDeclaredField(TypeKit.getRawType(owner), name);
+            this.field = FieldKit.findDeclaredField(TypeKit.getRawType(owner), name);
             this.fieldAnnotations = field == null ? Collections.emptyList() :
                     ListOps.immutable(field.getAnnotations());
         }

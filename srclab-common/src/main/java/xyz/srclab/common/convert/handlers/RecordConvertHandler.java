@@ -79,7 +79,7 @@ public class RecordConvertHandler implements ConvertHandler {
         } else if (type.equals(ConcurrentHashMap.class)) {
             result = new ConcurrentHashMap<>();
         } else {
-            result = ClassKit.newInstance(type);
+            result = ClassKit.toInstance(type);
         }
         return result;
     }
