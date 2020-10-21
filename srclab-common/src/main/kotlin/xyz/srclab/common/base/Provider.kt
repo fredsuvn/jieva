@@ -1,5 +1,7 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.reflect.findClassToInstance
+
 interface Provider<S, T : Any> {
 
     fun parse(spec: S): List<T>
@@ -63,29 +65,30 @@ class CharsProvider<T : Any> : Provider<CharSequence, T> {
         val result = ArrayList<T>(classNames.size)
         for (className in classNames) {
             val trimmedClassName = className.trim()
-            val providerClass = trimmedClassName.findClass<Class<T>>() ?: continue
-            val instance = try {
-                providerClass.newInstance()
+            val product: T? = try {
+                trimmedClassName.findClassToInstance()
             } catch (e: Exception) {
                 continue
             }
-            result.add(instance.asAny())
+            if (product !== null) {
+                result.add(product)
+            }
         }
         return result
     }
 
     override fun parseFirstOrNull(spec: CharSequence): T? {
         val classNames = spec.split(",")
-        val result = ArrayList<T>(classNames.size)
         for (className in classNames) {
             val trimmedClassName = className.trim()
-            val providerClass = trimmedClassName.findClass<Class<T>>() ?: continue
-            val instance = try {
-                providerClass.newInstance()
+            val product: T? = try {
+                trimmedClassName.findClassToInstance()
             } catch (e: Exception) {
                 continue
             }
-            return instance.asAny()
+            if (product !== null) {
+                return product
+            }
         }
         return null
     }
@@ -122,14 +125,15 @@ class StrictCharsProvider<T : Any> : Provider<CharSequence, T> {
 
     private fun createInstance(className: CharSequence): T {
         val trimmedClassName = className.trim()
-        val providerClass = trimmedClassName.findClass<Class<T>>()
-            ?: throw IllegalArgumentException("Class $trimmedClassName was not found.")
-        val instance = try {
-            providerClass.newInstance()
+        val product: T? = try {
+            trimmedClassName.findClassToInstance()
         } catch (e: Exception) {
-            throw IllegalArgumentException(e)
+            throw IllegalArgumentException("Instantiate class $trimmedClassName failed.", e)
         }
-        return instance.asAny()
+        if (product === null) {
+            throw IllegalArgumentException("Class $trimmedClassName was not found.")
+        }
+        return product
     }
 
     companion object {

@@ -1,5 +1,8 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.reflect.invokeStatic
+import xyz.srclab.common.reflect.invokeVirtual
+import xyz.srclab.common.reflect.toInstance
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
@@ -134,7 +137,7 @@ private const val CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE =
 private class ReflectedStaticMethodInvoker(private val method: Method) : StaticInvoker {
 
     override fun <T> invoke(vararg args: Any?): T {
-        return method.invoke(null, *args).asAny()
+        return method.invokeStatic(args = args)
     }
 }
 
@@ -152,14 +155,14 @@ private class ReflectedVirtualMethodInvoker(private val method: Method) : Virtua
     }
 
     private fun <T> invoke0(owner: Any?, vararg args: Any?): T {
-        return method.invoke(owner, *args).asAny()
+        return method.invokeVirtual(owner, args = args)
     }
 }
 
 private class ReflectedConstructorInvoker(private val constructor: Constructor<*>) : StaticInvoker {
 
     override fun <T> invoke(vararg args: Any?): T {
-        return constructor.newInstance(*args).asAny()
+        return constructor.toInstance(*args).asAny()
     }
 }
 

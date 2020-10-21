@@ -6,6 +6,7 @@ import xyz.srclab.common.base.*;
 import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.exception.ExceptionStatus;
 import xyz.srclab.common.exception.StatusException;
+import xyz.srclab.common.reflect.MethodKit;
 import xyz.srclab.common.run.*;
 
 import java.util.ArrayList;
@@ -37,8 +38,7 @@ public class Tt {
         //IterableOps.opsFor(null).filterNotNull().
         ListOps<Object> ops = ListOps.opsFor(null)
                 .addAll(new Object[0])
-                .subList(0)
-                .parentList()
+                .subList(1)
                 .removeAll(new Object[0]);
         String s = As.any(null);
         Running<String> running = null;
@@ -77,5 +77,8 @@ public class Tt {
         ExceptionStatus internal = ExceptionStatus.INTERNAL;
 
         String parts = Parts.UNINITIALIZED_VALUE;
+
+        MethodKit.isPublic(null);
+        MethodKit.invokeVirtual(null);
     }
 }

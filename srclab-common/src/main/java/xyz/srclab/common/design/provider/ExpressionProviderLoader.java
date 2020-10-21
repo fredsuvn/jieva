@@ -174,7 +174,7 @@ public class ExpressionProviderLoader<T> implements ProviderLoader<T> {
     }
 
     private T newProviderInstance(String className) {
-        return ClassKit.classNameToInstance(className, classLoader);
+        return ClassKit.findClassToInstance(className, classLoader);
     }
 
     private static final class ProviderCandidate {

@@ -3,8 +3,8 @@ package xyz.srclab.common.design.provider;
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
 import xyz.srclab.common.base.Check;
-import xyz.srclab.common.base.Loader;
 import xyz.srclab.common.reflect.ClassKit;
+import xyz.srclab.common.reflect.Loader;
 
 import java.util.Map;
 import java.util.NoSuchElementException;

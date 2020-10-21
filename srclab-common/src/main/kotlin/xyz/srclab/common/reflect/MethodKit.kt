@@ -3,6 +3,7 @@
 
 package xyz.srclab.common.reflect
 
+import xyz.srclab.common.base.asAny
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
@@ -131,12 +132,24 @@ fun Class<*>.findDeclaredMethods(): List<Method> {
 }
 
 @JvmOverloads
-fun Method.invoke(owner: Any? = null, force: Boolean = false, vararg args: Any?): Any {
+fun <T> Method.invokeStatic(force: Boolean = false, vararg args: Any?): T {
     return try {
         if (force) {
             this.isAccessible = true
         }
-        this.invoke(owner, *args)
+        this.invoke(null, *args).asAny()
+    } catch (e: Exception) {
+        throw IllegalStateException(e)
+    }
+}
+
+@JvmOverloads
+fun <T> Method.invokeVirtual(owner: Any? = null, force: Boolean = false, vararg args: Any?): T {
+    return try {
+        if (force) {
+            this.isAccessible = true
+        }
+        this.invoke(owner, *args).asAny()
     } catch (e: Exception) {
         throw IllegalStateException(e)
     }

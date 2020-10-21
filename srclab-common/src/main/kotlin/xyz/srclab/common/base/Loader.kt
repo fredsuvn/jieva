@@ -9,15 +9,6 @@ import java.net.URL
 import java.nio.ByteBuffer
 
 @JvmOverloads
-fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
-    return try {
-        Class.forName(this.toString(), true, classLoader).asAny()
-    } catch (e: ClassNotFoundException) {
-        null
-    }
-}
-
-@JvmOverloads
 fun <T> ByteArray.loadClass(offset: Int = 0, length: Int = this.size - offset): Class<T> {
     return BytesClassLoader.loadClass(this, offset, length).asAny()
 }
