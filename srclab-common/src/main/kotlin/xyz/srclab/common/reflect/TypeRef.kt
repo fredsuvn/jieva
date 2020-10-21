@@ -29,6 +29,7 @@ abstract class TypeRef<T> {
 
     companion object {
 
+        @JvmStatic
         fun <T> of(type: Type): TypeRef<T> {
             return object : TypeRef<T>(type) {}
         }

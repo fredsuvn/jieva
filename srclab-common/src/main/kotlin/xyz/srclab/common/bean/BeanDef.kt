@@ -28,6 +28,7 @@ interface BeanDef {
 
     companion object {
 
+        @JvmStatic
         fun resolve(type: Class<*>): BeanDef {
             return BeanDefImpl(type)
         }

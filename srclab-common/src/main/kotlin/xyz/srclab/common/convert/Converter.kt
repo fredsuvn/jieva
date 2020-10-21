@@ -1,12 +1,15 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.HandlersCachingProductBuilder
+import xyz.srclab.common.base.Parts
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.*
+import java.time.format.DateTimeFormatter
+import java.time.temporal.Temporal
 import java.util.*
 
 interface Converter {
@@ -155,14 +158,116 @@ interface Converter {
 
 interface ConvertHandler {
 
+    /**
+     * Return [Parts.NULL_VALUE] if final value is null.
+     */
     fun convert(from: Any?, to: Class<*>, converter: Converter): Any?
 
+    /**
+     * Return [Parts.NULL_VALUE] if final value is null.
+     */
     fun convert(from: Any?, to: Type, converter: Converter): Any?
 
     companion object {
 
         fun defaultHandlers(): List<ConvertHandler?>? {
             return ConvertHandlerSupport.defaultHandlers()
+        }
+    }
+}
+
+object NopConvertHandler : ConvertHandler {
+
+    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
+        if (from === null) {
+            return null
+        }
+        return if (to.isAssignableFrom(from.javaClass)) {
+            from
+        } else null
+    }
+
+    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
+        if (from === null) {
+            return null
+        }
+        return if (to is Class<*>) {
+            convert(from, to, converter)
+        } else null
+    }
+}
+
+open class DateTimeConvertHandler : ConvertHandler {
+
+    private val dateTimeFormatter: DateTimeFormatter
+
+    constructor(dateTimePattern: String) {
+        dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern)
+    }
+
+    @JvmOverloads
+    constructor(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME) {
+        this.dateTimeFormatter = dateTimeFormatter
+    }
+
+    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
+        if (from === null) {
+            return null
+        }
+        return when (from) {
+            is Date -> dateToDateTime(from, to, converter)
+            is String -> stringToDateTime(from, to, converter)
+            is Number -> numberToDateTime(from, to, converter)
+            is Temporal -> temporalToDateTime(from, to, converter)
+            else -> null
+        }
+    }
+
+    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
+        if (from === null) {
+            return null
+        }
+        return if (to is Class<*>) {
+            NopConvertHandler.convert(from, to, converter)
+        } else null
+    }
+
+    private fun dateToDateTime(from: Date, to: Class<*>, converter: Converter): Any? {
+        return when(to){
+            Date::class.java->from
+            Instant::class.java->from
+            LocalDateTime::class.java->from
+            ZonedDateTime::class.java->from
+            OffsetDateTime::class.java->from
+            LocalDate::class.java->from
+            LocalTime::class.java->from
+            else->null
+        }
+    }
+
+    private fun stringToDateTime(from: String, to: Class<*>, converter: Converter): Any? {
+    }
+
+    private fun numberToDateTime(from: Number, to: Class<*>, converter: Converter): Any? {
+    }
+
+    private fun temporalToDateTime(from: Temporal, to: Class<*>, converter: Converter): Any? {
+    }
+
+    private fun dateToDateTime(from: Temporal, to: Class<*>, converter: Converter): Any? {
+    }
+
+    private fun stringToDuration(from: String): Any? {
+    }
+
+    private fun numberToDuration(from: Number): Any? {
+    }
+
+    companion object {
+
+        private val INSTANCE = DateTimeConvertHandler()
+        fun instance(): DateTimeConvertHandler {
+            return INSTANCE
         }
     }
 }
