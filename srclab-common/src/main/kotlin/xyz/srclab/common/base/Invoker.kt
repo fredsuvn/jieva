@@ -153,7 +153,7 @@ private class ReflectedVirtualMethodInvoker(private val method: Method) : Virtua
     }
 
     override fun <T> invokeVirtual(owner: Any?, vararg args: Any?): T {
-        return invoke0(owner, args)
+        return invoke0(owner, *args)
     }
 
     private fun <T> invoke0(owner: Any?, vararg args: Any?): T {

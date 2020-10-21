@@ -1783,7 +1783,7 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> Iterable<T>.toArray(componentType: Class<*>): Array<T> {
             val list = this.asToLinkedList()
-            val array: Array<T> = java.lang.reflect.Array.newInstance(componentType, 0).asAny()
+            val array: Array<T> = componentType.componentTypeToArrayInstance(0)
             return list.toArray(array)
         }
 

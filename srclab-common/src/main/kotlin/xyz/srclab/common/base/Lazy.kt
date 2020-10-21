@@ -55,7 +55,7 @@ private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
 
     override fun get(): T {
         if (hasGet) {
-            return lastValue.asAny()
+            return lastValue.asNotNull()
         }
         return synchronized(this) {
             if (hasGet) {
@@ -63,7 +63,7 @@ private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
             }
             lastValue = supplier()
             hasGet = true
-            lastValue.asAny()
+            lastValue.asNotNull()
         }
     }
 
@@ -77,7 +77,7 @@ private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
         return synchronized(this) {
             lastValue = supplier()
             hasGet = true
-            lastValue.asAny()
+            lastValue.asNotNull()
         }
     }
 }
@@ -92,7 +92,7 @@ private class FixedPeriodRefreshableLazy<T>(private val period: Duration, privat
 
     override fun get(): T {
         if (!needRefresh()) {
-            return lastValue.asAny()
+            return lastValue.asNotNull()
         }
         return synchronized(this) {
             if (!needRefresh()) {
@@ -100,7 +100,7 @@ private class FixedPeriodRefreshableLazy<T>(private val period: Duration, privat
             }
             lastValue = supplier()
             lastGetTime = LocalDateTime.now()
-            lastValue.asAny()
+            lastValue.asNotNull()
         }
     }
 
@@ -118,7 +118,7 @@ private class FixedPeriodRefreshableLazy<T>(private val period: Duration, privat
         return synchronized(this) {
             lastValue = supplier()
             lastGetTime = LocalDateTime.now()
-            lastValue.asAny()
+            lastValue.asNotNull()
         }
     }
 }
@@ -136,7 +136,7 @@ private class DynamicPeriodRefreshableLazy<T>(private val supplier: () -> Pair<T
 
     override fun get(): T {
         if (!needRefresh()) {
-            return lastValue.asAny()
+            return lastValue.asNotNull()
         }
         return synchronized(this) {
             if (!needRefresh()) {
@@ -146,7 +146,7 @@ private class DynamicPeriodRefreshableLazy<T>(private val supplier: () -> Pair<T
             lastValue = result.first
             lastPeriod = result.second
             lastGetTime = LocalDateTime.now()
-            lastValue.asAny()
+            lastValue.asNotNull()
         }
     }
 
@@ -167,7 +167,7 @@ private class DynamicPeriodRefreshableLazy<T>(private val supplier: () -> Pair<T
             lastValue = result.first
             lastPeriod = result.second
             lastGetTime = LocalDateTime.now()
-            lastValue.asAny()
+            lastValue.asNotNull()
         }
     }
 }
