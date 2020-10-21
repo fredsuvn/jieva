@@ -41,7 +41,7 @@ interface Invoker {
 
 interface StaticInvoker : Invoker {
 
-    override fun <T> invoke(vararg args: Any?): T
+    fun <T> invokeStatic(vararg args: Any?): T
 
     companion object {
 
@@ -59,9 +59,7 @@ interface StaticInvoker : Invoker {
 
 interface VirtualInvoker : Invoker {
 
-    override fun <T> invoke(vararg args: Any?): T
-
-    fun <T> invoke(owner: Any?, vararg args: Any?): T
+    fun <T> invokeVirtual(owner: Any?, vararg args: Any?): T
 
     companion object {
 
@@ -136,8 +134,12 @@ private const val CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE =
 
 private class ReflectedStaticMethodInvoker(private val method: Method) : StaticInvoker {
 
-    override fun <T> invoke(vararg args: Any?): T {
+    override fun <T> invokeStatic(vararg args: Any?): T {
         return method.invokeStatic(args = args)
+    }
+
+    override fun <T> invoke(vararg args: Any?): T {
+        return invokeStatic(*args)
     }
 }
 
@@ -150,7 +152,7 @@ private class ReflectedVirtualMethodInvoker(private val method: Method) : Virtua
         return invoke0(owner, *arguments)
     }
 
-    override fun <T> invoke(owner: Any?, vararg args: Any?): T {
+    override fun <T> invokeVirtual(owner: Any?, vararg args: Any?): T {
         return invoke0(owner, args)
     }
 
@@ -161,8 +163,12 @@ private class ReflectedVirtualMethodInvoker(private val method: Method) : Virtua
 
 private class ReflectedConstructorInvoker(private val constructor: Constructor<*>) : StaticInvoker {
 
-    override fun <T> invoke(vararg args: Any?): T {
+    override fun <T> invokeStatic(vararg args: Any?): T {
         return constructor.toInstance(*args).asAny()
+    }
+
+    override fun <T> invoke(vararg args: Any?): T {
+        return invokeStatic(*args)
     }
 }
 
@@ -178,7 +184,7 @@ private class StaticMethodHandlerInvoker private constructor() : StaticInvoker {
         methodHandle = findStaticMethodHandle(constructor)
     }
 
-    override fun <T> invoke(vararg args: Any?): T {
+    override fun <T> invokeStatic(vararg args: Any?): T {
         return when (args.size) {
             0 -> methodHandle.invoke()
             1 -> methodHandle.invoke(args[0])
@@ -191,6 +197,10 @@ private class StaticMethodHandlerInvoker private constructor() : StaticInvoker {
             8 -> methodHandle.invoke(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7])
             else -> methodHandle.invokeWithArguments(*args)
         }.asAny()
+    }
+
+    override fun <T> invoke(vararg args: Any?): T {
+        return invokeStatic(*args)
     }
 
     private fun findStaticMethodHandle(method: Method): MethodHandle {
@@ -223,7 +233,7 @@ private class VirtualMethodHandlerInvoker(method: Method) : VirtualInvoker {
         return invoke0(owner, *arguments)
     }
 
-    override fun <T> invoke(owner: Any?, vararg args: Any?): T {
+    override fun <T> invokeVirtual(owner: Any?, vararg args: Any?): T {
         return invoke0(owner, *args)
     }
 
