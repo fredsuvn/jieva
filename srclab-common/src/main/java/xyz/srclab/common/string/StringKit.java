@@ -1,7 +1,7 @@
 package xyz.srclab.common.string;
 
 import com.google.common.base.CharMatcher;
-import xyz.srclab.common.array.ArrayKit;
+import xyz.srclab.common.collection.ArrayKit;
 
 import java.util.StringJoiner;
 import java.util.function.Function;

@@ -2,7 +2,7 @@ package xyz.srclab.common.record;
 
 import xyz.srclab.annotation.Immutable;
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.array.ArrayKit;
+import xyz.srclab.common.collection.ArrayKit;
 import xyz.srclab.common.base.Check;
 import xyz.srclab.common.design.builder.HandlersProductBuilder;
 import xyz.srclab.common.reflect.FieldKit;

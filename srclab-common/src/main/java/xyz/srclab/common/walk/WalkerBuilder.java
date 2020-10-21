@@ -1,7 +1,7 @@
 package xyz.srclab.common.walk;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.array.ArrayKit;
+import xyz.srclab.common.collection.ArrayKit;
 import xyz.srclab.common.collection.IterableScheme;
 import xyz.srclab.common.collection.MapScheme;
 import xyz.srclab.common.design.builder.BaseProductCachingBuilder;

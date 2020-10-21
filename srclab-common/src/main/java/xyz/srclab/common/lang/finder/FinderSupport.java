@@ -1,7 +1,7 @@
 package xyz.srclab.common.lang.finder;
 
 import xyz.srclab.annotation.Nullable;
-import xyz.srclab.common.array.ArrayKit;
+import xyz.srclab.common.collection.ArrayKit;
 import xyz.srclab.common.base.As;
 import xyz.srclab.common.collection.MapOps;
 import xyz.srclab.common.collection.SetOps;

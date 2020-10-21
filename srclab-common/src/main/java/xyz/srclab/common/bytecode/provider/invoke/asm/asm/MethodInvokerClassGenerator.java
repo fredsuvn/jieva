@@ -4,7 +4,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import xyz.srclab.common.array.ArrayKit;
+import xyz.srclab.common.collection.ArrayKit;
 import xyz.srclab.common.bytecode.*;
 import xyz.srclab.common.bytecode.provider.invoke.asm.AsmInvokerHelper;
 import xyz.srclab.common.invoke.FunctionInvoker;
