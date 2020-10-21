@@ -136,6 +136,11 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
         return finalList().reduceRightIndexed(initial, operation)
     }
 
+    @JvmOverloads
+    fun subList(fromIndex: Int, toIndex: Int = count()): ListOps<T> {
+        return finalList().subList(fromIndex, toIndex).toListOps()
+    }
+
     fun slice(indices: IntArray): ListOps<T> {
         return finalList().slice(indices.asIterable()).toListOps()
     }
