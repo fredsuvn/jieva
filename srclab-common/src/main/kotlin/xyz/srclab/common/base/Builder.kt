@@ -64,10 +64,11 @@ abstract class HandlersCachingProductBuilder<T : Any, H, B : HandlersCachingProd
     }
 
     fun handlers(): List<H> {
-        if (handlers === null) {
+        val hs = handlers
+        if (hs === null) {
             return emptyList()
         }
-        return handlers!!.toList()
+        return hs.toList()
     }
 
     fun build(): T {
