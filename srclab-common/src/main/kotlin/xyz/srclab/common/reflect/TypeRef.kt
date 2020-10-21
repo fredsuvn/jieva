@@ -1,31 +1,41 @@
 package xyz.srclab.common.reflect
 
-import xyz.srclab.annotation.Nullable
+import xyz.srclab.common.aboutBoat
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-class TypeRef<T> {
+abstract class TypeRef<T> {
 
+    @get:JvmName("type")
     val type: Type
 
     protected constructor() {
-        type = genericSuperclass
+        type = reflectGenericSuperclass()
     }
 
-    private constructor(type: Type) {
+    protected constructor(type: Type) {
         this.type = type
     }
 
-    protected val genericSuperclass: Type
-        protected get() {
-            @Nullable val generic = TypeKit.getGenericSuperclass(javaClass, TypeRef::class.java)
-            check(generic is ParameterizedType) { "Generic super class must be a parameterized type" }
-            return generic.actualTypeArguments[0]
+    private fun reflectGenericSuperclass(): Type {
+        val generic = this::class.java.genericSuperClassFor(TypeRef::class.java)
+        if (generic !is ParameterizedType) {
+            throw IllegalStateException(
+                "Reflect to generic superclass failed, it seems a bug, please report to ${aboutBoat().report}"
+            )
         }
+        return generic.actualTypeArguments[0]
+    }
 
     companion object {
+
         fun <T> of(type: Type): TypeRef<T> {
-            return TypeRef(type)
+            return object : TypeRef<T>(type) {}
         }
     }
 }
+
+val <T> T.typeRef: TypeRef<T>
+    get() {
+        return object : TypeRef<T>() {}
+    }

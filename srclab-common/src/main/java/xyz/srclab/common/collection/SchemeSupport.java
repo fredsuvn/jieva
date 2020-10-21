@@ -36,13 +36,13 @@ final class SchemeSupport {
 
         private IterableSchemeImpl(Type iterableType) {
             this.iterableType = iterableType;
-            Type scheme = TypeKit.getGenericInterface(iterableType, Iterable.class);
+            Type scheme = TypeKit.genericInterfaceFor(iterableType, Iterable.class);
             if (scheme instanceof Class) {
-                this.rawIterableType = As.notNull(TypeKit.getRawType(scheme));
+                this.rawIterableType = As.notNull(TypeKit.getRawClass(scheme));
                 this.elementType = Object.class;
             } else if (scheme instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) scheme).getActualTypeArguments();
-                this.rawIterableType = As.notNull(TypeKit.getRawType(scheme));
+                this.rawIterableType = As.notNull(TypeKit.getRawClass(scheme));
                 this.elementType = types[0];
             }
             throw new IllegalArgumentException("Unexpected type: " + scheme);
@@ -101,14 +101,14 @@ final class SchemeSupport {
 
         private MapSchemeImpl(Type mapType) {
             this.mapType = mapType;
-            Type scheme = TypeKit.getGenericInterface(mapType, Map.class);
+            Type scheme = TypeKit.genericInterfaceFor(mapType, Map.class);
             if (scheme instanceof Class) {
-                this.rawMapType = As.notNull(TypeKit.getRawType(scheme));
+                this.rawMapType = As.notNull(TypeKit.getRawClass(scheme));
                 this.keyType = Object.class;
                 this.valueType = Object.class;
             } else if (scheme instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) scheme).getActualTypeArguments();
-                this.rawMapType = As.notNull(TypeKit.getRawType(scheme));
+                this.rawMapType = As.notNull(TypeKit.getRawClass(scheme));
                 this.keyType = types[0];
                 this.valueType = types[1];
             }

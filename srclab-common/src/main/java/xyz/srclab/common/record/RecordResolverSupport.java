@@ -50,7 +50,7 @@ final class RecordResolverSupport {
         private final @Immutable Map<String, RecordEntry> entryMap;
 
         private RecordTypeImpl(Type type, Map<String, RecordEntry> entryMap) {
-            this.type = TypeKit.getRawType(type);
+            this.type = TypeKit.getRawClass(type);
             this.genericType = type;
             this.entryMap = MapOps.immutable(entryMap);
         }
@@ -136,7 +136,7 @@ final class RecordResolverSupport {
         private final List<Annotation> fieldAnnotations;
 
         private EntryOnMethods(Type owner, String name, @Nullable Method readMethod, @Nullable Method writeMethod) {
-            this.ownerType = TypeKit.getRawType(owner);
+            this.ownerType = TypeKit.getRawClass(owner);
             this.owner = owner;
             this.name = name;
             this.readMethod = readMethod;
@@ -144,18 +144,18 @@ final class RecordResolverSupport {
 
             if (readMethod == null) {
                 Check.checkState(writeMethod != null, "Both read and write method are null");
-                Type type = TypeKit.tryActualType(
+                Type type = TypeKit.actualTypeFor(
                         writeMethod.getGenericParameterTypes()[0], owner, writeMethod.getDeclaringClass());
-                this.type = TypeKit.getRawType(type);
+                this.type = TypeKit.getRawClass(type);
                 this.genericType = type;
             } else {
-                Type type = TypeKit.tryActualType(
+                Type type = TypeKit.actualTypeFor(
                         readMethod.getGenericReturnType(), owner, readMethod.getDeclaringClass());
-                this.type = TypeKit.getRawType(type);
+                this.type = TypeKit.getRawClass(type);
                 this.genericType = type;
             }
 
-            this.field = FieldKit.findDeclaredField(TypeKit.getRawType(owner), name);
+            this.field = FieldKit.findDeclaredField(TypeKit.getRawClass(owner), name);
             this.fieldAnnotations = field == null ? Collections.emptyList() :
                     ListOps.immutable(field.getAnnotations());
         }

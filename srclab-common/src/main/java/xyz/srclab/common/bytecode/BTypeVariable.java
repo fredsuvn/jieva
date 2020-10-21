@@ -25,7 +25,7 @@ public class BTypeVariable implements BType {
     }
 
     public BTypeVariable(TypeVariable<?> typeVariable) {
-        this(typeVariable.getName(), TypeKit.getRawType(typeVariable.getBounds()[0]).isInterface());
+        this(typeVariable.getName(), TypeKit.getRawClass(typeVariable.getBounds()[0]).isInterface());
     }
 
     public void addBounds(BType... bounds) {

@@ -89,7 +89,7 @@ public class RecordResolverBuilder extends
             @Override
             public @Immutable List<Field> fields() {
                 if (fields == null) {
-                    fields = FieldKit.findFields(TypeKit.getRawType(recordType));
+                    fields = FieldKit.findFields(TypeKit.getRawClass(recordType));
                 }
                 return fields;
             }
@@ -97,7 +97,7 @@ public class RecordResolverBuilder extends
             @Override
             public @Immutable List<Method> methods() {
                 if (methods == null) {
-                    methods = MethodKit.findMethods(TypeKit.getRawType(recordType));
+                    methods = MethodKit.findMethods(TypeKit.getRawClass(recordType));
                 }
                 return methods;
             }
