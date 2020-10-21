@@ -28,6 +28,12 @@ interface About {
         @JvmName("poweredBy") get
 
     @Suppress("INAPPLICABLE_JVM_NAME")
+    val report: String
+        @JvmName("report") get() {
+            return "${poweredBy.mail} or $url"
+        }
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
     val eggTips: String
         @JvmName("eggTips") get
 
@@ -646,7 +652,7 @@ interface PoweredBy {
             }
 
             override fun toString(): String {
-                return "$name[$url]"
+                return "$name[$mail, $url]"
             }
         }
     }
