@@ -13,11 +13,17 @@ fun Class<*>.findField(name: String, declared: Boolean = false, deep: Boolean = 
     } catch (e: NoSuchFieldException) {
         null
     }
-    if (field === null && !declared) {
+    if (field !== null) {
+        return field
+    }
+    if (!declared) {
         return null
     }
     field = this.findDeclaredField(name)
-    if (field === null && !deep) {
+    if (field !== null) {
+        return field
+    }
+    if (!deep) {
         return null
     }
     var superClass = this.superclass

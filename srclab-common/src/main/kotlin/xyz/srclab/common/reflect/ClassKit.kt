@@ -3,34 +3,46 @@
 
 package xyz.srclab.common.reflect
 
-import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.common.base.Current
 import xyz.srclab.common.base.asAny
-import xyz.srclab.common.base.findClass
 
 @JvmOverloads
-fun <T> CharSequence.classNameToInstance(classLoader: ClassLoader = Current.classLoader): T {
+fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
+    return try {
+        Class.forName(this.toString(), true, classLoader).asAny()
+    } catch (e: ClassNotFoundException) {
+        null
+    }
+}
+
+@JvmOverloads
+fun <T> CharSequence.findClassToInstance(classLoader: ClassLoader = Current.classLoader): T? {
+    return this.findClassToInstance(classLoader, emptyArray(), emptyArray())
+}
+
+@JvmOverloads
+fun <T> CharSequence.findClassToInstance(
+    classLoader: ClassLoader = Current.classLoader,
+    parameterTypes: Array<Class<*>>,
+    args: Array<Any?>
+): T? {
     val cls: Class<T>? = this.findClass(classLoader)
     if (cls === null) {
-        throw IllegalArgumentException("Class not found: $this")
+        return null
     }
-    val constructor = cls.findConstructor()
-    if (constructor === null) {
-        throw IllegalArgumentException("Class constructor() not found: $this")
-    }
-    return constructor.newInstance()
+    return cls.toInstance(parameterTypes, args)
 }
 
 fun <T> Class<*>.toInstance(): T {
-    return this.toInstance(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_OBJECT_ARRAY)
+    return this.toInstance(emptyArray(), emptyArray())
 }
 
-fun <T> Class<*>.toInstance(parameterTypes: Array<Class<*>>, arguments: Array<Any?>): T {
+fun <T> Class<*>.toInstance(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
     val constructor = this.findConstructor(*parameterTypes)
     if (constructor === null) {
         throw IllegalArgumentException("Class constructor(${parameterTypes.contentToString()}) not found: $this")
     }
-    return constructor.newInstance(*arguments).asAny()
+    return constructor.newInstance(*args).asAny()
 }
 
 fun Class<*>.toWrapperClass(): Class<*> {

@@ -29,3 +29,7 @@ fun <T> Class<T>.findDeclaredConstructor(vararg parameterTypes: Class<*>): Const
 fun <T> Class<T>.findDeclaredConstructors(vararg parameterTypes: Class<*>): List<Constructor<T>> {
     return this.declaredConstructors.asList().asAny()
 }
+
+fun <T> Constructor<T>.toInstance(vararg args: Any?): T {
+    return this.newInstance(*args)
+}

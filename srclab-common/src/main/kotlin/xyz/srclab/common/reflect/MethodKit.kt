@@ -6,6 +6,78 @@ package xyz.srclab.common.reflect
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
+val Method.isOpen: Boolean
+    @JvmName("isOpen") get() {
+        val modifiers = this.modifiers
+        if (Modifier.isStatic(modifiers)
+            || Modifier.isPrivate(modifiers)
+            || Modifier.isFinal(modifiers)
+        ) {
+            return false
+        }
+        return Modifier.isPublic(modifiers)
+    }
+
+val Method.isPublic: Boolean
+    @JvmName("isPublic") get() {
+        return Modifier.isPublic(this.modifiers)
+    }
+
+val Method.isPrivate: Boolean
+    @JvmName("isPrivate") get() {
+        return Modifier.isPrivate(this.modifiers)
+    }
+
+val Method.isProtected: Boolean
+    @JvmName("isProtected") get() {
+        return Modifier.isProtected(this.modifiers)
+    }
+
+val Method.isStatic: Boolean
+    @JvmName("isStatic") get() {
+        return Modifier.isStatic(this.modifiers)
+    }
+
+val Method.isFinal: Boolean
+    @JvmName("isFinal") get() {
+        return Modifier.isFinal(this.modifiers)
+    }
+
+val Method.isSynchronized: Boolean
+    @JvmName("isSynchronized") get() {
+        return Modifier.isSynchronized(this.modifiers)
+    }
+
+val Method.isVolatile: Boolean
+    @JvmName("isVolatile") get() {
+        return Modifier.isVolatile(this.modifiers)
+    }
+
+val Method.isTransient: Boolean
+    @JvmName("isTransient") get() {
+        return Modifier.isTransient(this.modifiers)
+    }
+
+val Method.isNative: Boolean
+    @JvmName("isNative") get() {
+        return Modifier.isNative(this.modifiers)
+    }
+
+val Method.isInterface: Boolean
+    @JvmName("isInterface") get() {
+        return Modifier.isInterface(this.modifiers)
+    }
+
+val Method.isAbstract: Boolean
+    @JvmName("isAbstract") get() {
+        return Modifier.isAbstract(this.modifiers)
+    }
+
+val Method.isStrict: Boolean
+    @JvmName("isStrict") get() {
+        return Modifier.isStrict(this.modifiers)
+    }
+
 @JvmOverloads
 fun Class<*>.findMethod(
     name: String,
@@ -18,11 +90,17 @@ fun Class<*>.findMethod(
     } catch (e: NoSuchFieldException) {
         null
     }
-    if (method === null && !declared) {
+    if (method !== null) {
+        return method
+    }
+    if (!declared) {
         return null
     }
     method = this.findDeclaredMethod(name, *parameterTypes)
-    if (method === null && !deep) {
+    if (method !== null) {
+        return method
+    }
+    if (!deep) {
         return null
     }
     var superClass = this.superclass
@@ -64,19 +142,8 @@ fun Method.invoke(owner: Any? = null, force: Boolean = false, vararg args: Any?)
     }
 }
 
-fun Method.isOpen(): Boolean {
-    val modifiers = this.modifiers
-    if (Modifier.isStatic(modifiers)
-        || Modifier.isPrivate(modifiers)
-        || Modifier.isFinal(modifiers)
-    ) {
-        return false
-    }
-    return Modifier.isPublic(modifiers)
-}
-
 fun Method.isOpenFor(cls: Class<*>): Boolean {
-    if (!this.isOpen()) {
+    if (!this.isOpen) {
         return false
     }
     val declaring = this.declaringClass
