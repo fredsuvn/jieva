@@ -1,5 +1,6 @@
 package xyz.srclab.common.run
 
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -7,37 +8,37 @@ import java.util.concurrent.*
 
 interface Running<V> : Future<V> {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val isStart: Boolean
         @JvmName("isStart") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val startTime: LocalDateTime
         @JvmName("startTime") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val endTime: LocalDateTime
         @JvmName("endTime") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val startMilliseconds: Long
         @JvmName("startMilliseconds") get() {
             return startTime.toInstant(ZoneOffset.UTC).toEpochMilli()
         }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val endMilliseconds: Long
         @JvmName("endMilliseconds") get() {
             return endTime.toInstant(ZoneOffset.UTC).toEpochMilli()
         }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val cost: Duration
         @JvmName("cost") get() {
             return Duration.between(startTime, endTime)
         }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val costMillis: Long
         @JvmName("costMillis") get() {
             return cost.toMillis()

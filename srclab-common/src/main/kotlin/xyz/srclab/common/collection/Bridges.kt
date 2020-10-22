@@ -1,5 +1,6 @@
 package xyz.srclab.common.collection
 
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import java.io.Serializable
 import java.util.*
 
@@ -9,7 +10,7 @@ import java.util.*
 
 interface ArrayBridge<T> {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val size: Int
         @JvmName("size") get
 

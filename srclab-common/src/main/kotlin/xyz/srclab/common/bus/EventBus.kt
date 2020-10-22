@@ -1,5 +1,6 @@
 package xyz.srclab.common.bus
 
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.run.Runner
 import java.util.concurrent.ConcurrentHashMap
@@ -61,7 +62,7 @@ private class EventBusImpl(private val executor: Executor) : EventBus {
 
 interface EventHandler<T : Any> {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val eventType: Class<*>
         @JvmName("eventType") get
 

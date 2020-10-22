@@ -1,5 +1,6 @@
 package xyz.srclab.common.state
 
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.hash
 
 /**
@@ -7,11 +8,11 @@ import xyz.srclab.common.base.hash
  */
 interface State<C, DESC, T : State<C, DESC, T>> {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val code: C
         @JvmName("code") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val description: DESC?
         @JvmName("description") get
 
