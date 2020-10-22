@@ -269,8 +269,4 @@ object DefaultEnvironment : Environment {
         properties.forEach { k: Any?, v: Any? -> map[k.toString()] = v.toString() }
         return map
     }
-
-    private fun getPropertyNotNull(key: String): String {
-        return getProperty(key).asNotNull()
-    }
 }

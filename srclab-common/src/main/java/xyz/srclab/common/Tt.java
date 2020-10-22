@@ -66,7 +66,7 @@ public class Tt {
 
         Object uv = Parts.UNINITIALIZED_VALUE;
 
-        Runner r = Runner.syncRunner();
+        Runner r = Runner.SYNC_RUNNER;
 
         List<String> stringList = new ArrayList<>();
 

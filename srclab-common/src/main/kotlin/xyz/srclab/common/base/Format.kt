@@ -20,17 +20,17 @@ interface Format {
 
         @JvmStatic
         fun fastFormat(pattern: CharSequence, vararg args: Any?): String {
-            return FastFormat.format(pattern, args)
+            return FastFormat.format(pattern, *args)
         }
 
         @JvmStatic
         fun printfFormat(pattern: CharSequence, vararg args: Any?): String {
-            return PrintfFormat.format(pattern, args)
+            return PrintfFormat.format(pattern, *args)
         }
 
         @JvmStatic
         fun messageFormat(pattern: CharSequence, vararg args: Any?): String {
-            return MessageFormat.format(pattern, args)
+            return MessageFormat.format(pattern, *args)
         }
     }
 }
@@ -54,8 +54,8 @@ object FastFormat : Format {
         return MessageFormatterSlf4j.arrayFormat(pattern.toString(), args, null).message
     }
 
-    private fun processArguments(vararg args: Any?) {
-        if (args.isEmpty()) {
+    private fun processArguments(array: Array<out Any?>) {
+        if (array.isEmpty()) {
             return
         }
 

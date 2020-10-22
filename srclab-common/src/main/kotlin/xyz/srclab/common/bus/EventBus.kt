@@ -1,7 +1,7 @@
 package xyz.srclab.common.bus
 
 import xyz.srclab.common.base.asAny
-import xyz.srclab.common.run.SyncRunner
+import xyz.srclab.common.run.Runner
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.RejectedExecutionException
@@ -22,10 +22,10 @@ interface EventBus {
 
     companion object {
 
-        private val syncEventBus: EventBus by lazy { EventBusImpl(SyncRunner) }
-
         @JvmStatic
-        fun sync(): EventBus = syncEventBus
+        fun sync(): EventBus {
+            return EventBusImpl(Runner.SYNC_RUNNER)
+        }
 
         @JvmStatic
         fun async(executor: Executor): EventBus {

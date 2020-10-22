@@ -9,10 +9,10 @@ import xyz.srclab.common.base.asAny
 @JvmOverloads
 fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
     return try {
-        Class.forName(this.toString(), true, classLoader).asAny()
+        Class.forName(this.toString(), true, classLoader)
     } catch (e: ClassNotFoundException) {
         null
-    }
+    }.asAny()
 }
 
 @JvmOverloads

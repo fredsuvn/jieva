@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.VirtualInvoker
 import xyz.srclab.common.base.virtualInvoker
 import xyz.srclab.common.reflect.findField
@@ -14,11 +15,11 @@ import java.lang.reflect.Type
  */
 interface BeanDef {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val type: Class<*>
         @JvmName("type") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val properties: Map<String, PropertyDef>
         @JvmName("properties") get
 
@@ -41,47 +42,47 @@ fun Class<*>.resolveBean(): BeanDef {
 
 interface PropertyDef {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
         @JvmName("name") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val type: Class<*>
         @JvmName("type") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val genericType: Type
         @JvmName("genericType") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val owner: Class<*>
         @JvmName("owner") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val isReadable: Boolean
         @JvmName("isReadable") get() {
             return getter !== null
         }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val isWriteable: Boolean
         @JvmName("isWriteable") get() {
             return setter !== null
         }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val getter: VirtualInvoker?
         @JvmName("getter") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val setter: VirtualInvoker?
         @JvmName("setter") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val field: Field?
         @JvmName("field") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val fieldAnnotations: List<Annotation>
         @JvmName("fieldAnnotations") get
 

@@ -3,93 +3,47 @@ package xyz.srclab.common.base
 /**
  * @author sunqian
  */
-interface Current {
+object Current {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    private val localContext: ThreadLocal<MutableMap<Any, Any?>> by lazy {
+        ThreadLocal.withInitial { mutableMapOf() }
+    }
+
+    @JvmStatic
     val thread: Thread
-        @JvmName("thread") get
+        @JvmName("thread") get() {
+            return Thread.currentThread()
+        }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmStatic
     val classLoader: ClassLoader
-        @JvmName("classLoader") get
+        @JvmName("classLoader") get() {
+            return thread.contextClassLoader
+        }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmStatic
     val context: MutableMap<Any, Any?>
-        @JvmName("context") get
+        @JvmName("context") get() {
+            return localContext.get()
+        }
 
-    fun get(key: Any): Any {
-        return context[key]!!
+    @JvmStatic
+    fun <T> get(key: Any): T {
+        return getOrNull(key)!!
     }
 
-    fun getOrNull(key: Any): Any? {
-        return context[key]
+    @JvmStatic
+    fun <T> getOrNull(key: Any): T? {
+        return context[key].asAny()
     }
 
-    fun <T : Any> getAs(key: Any): T {
-        return get(key).asAny()
-    }
-
-    fun <T : Any> getAsOrNull(key: Any): T? {
-        return getOrNull(key).asAny()
-    }
-
+    @JvmStatic
     fun set(key: Any, value: Any?) {
         context[key] = value
     }
 
+    @JvmStatic
     fun clearContext() {
         context.clear()
     }
-
-    companion object {
-
-        @JvmStatic
-        @JvmOverloads
-        fun current(thread: Thread = currentThread()): Current {
-            return CurrentImpl(thread)
-        }
-
-        @JvmStatic
-        fun currentThread(): Thread {
-            return Thread.currentThread()
-        }
-
-        @JvmStatic
-        fun currentClassLoader(): ClassLoader {
-            return Thread.currentThread().contextClassLoader
-        }
-
-        @JvmStatic
-        fun currentContext(): MutableMap<Any, Any?> {
-            return localContext.get()
-        }
-    }
-}
-
-fun current(thread: Thread = currentThread()): Current {
-    return Current.current(thread)
-}
-
-fun currentThread(): Thread {
-    return Current.currentThread()
-}
-
-fun currentClassLoader(): ClassLoader {
-    return Current.currentClassLoader()
-}
-
-fun currentContext(): MutableMap<Any, Any?> {
-    return Current.currentContext()
-}
-
-private val localContext: ThreadLocal<MutableMap<Any, Any?>> by lazy {
-    ThreadLocal.withInitial { mutableMapOf() }
-}
-
-private class CurrentImpl(override val thread: Thread) : Current {
-
-    override val classLoader: ClassLoader = thread.contextClassLoader
-
-    override val context: MutableMap<Any, Any?>
-        get() = localContext.get()
 }

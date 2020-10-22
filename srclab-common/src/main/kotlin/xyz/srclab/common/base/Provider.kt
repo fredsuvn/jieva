@@ -16,14 +16,14 @@ interface Provider<S, T : Any> {
 
         @JvmStatic
         @JvmOverloads
-        fun <T : Any> ofChars(strictly: Boolean = false): CharsProvider<T> {
+        fun <T : Any> charsProvider(strictly: Boolean = false): CharsProvider<T> {
             return if (strictly) StrictCharsProvider.ofType() else CharsProvider.ofType()
         }
     }
 }
 
 fun <T : Any> charsProvider(strictly: Boolean = false): CharsProvider<T> {
-    return Provider.ofChars(strictly)
+    return Provider.charsProvider(strictly)
 }
 
 fun <T : Any> CharSequence.parseByCharsProvider(strictly: Boolean = false): List<T> {

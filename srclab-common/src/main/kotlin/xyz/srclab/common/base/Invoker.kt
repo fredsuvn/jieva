@@ -18,11 +18,7 @@ import java.lang.reflect.Method
  */
 interface Invoker {
 
-    fun invoke(vararg args: Any?): Any?
-
-    fun <T> invokeAs(vararg args: Any?): T {
-        return invoke(*args).asAny()
-    }
+    fun <T> invoke(vararg args: Any?): T
 
     companion object {
 
@@ -45,11 +41,7 @@ interface Invoker {
 
 interface StaticInvoker : Invoker {
 
-    fun invokeStatic(vararg args: Any?): Any?
-
-    fun <T> invokeStaticAs(vararg args: Any?): T {
-        return invokeStatic(*args).asAny()
-    }
+    fun <T> invokeStatic(vararg args: Any?): T
 
     companion object {
 
@@ -67,11 +59,7 @@ interface StaticInvoker : Invoker {
 
 interface VirtualInvoker : Invoker {
 
-    fun invokeVirtual(owner: Any?, vararg args: Any?): Any?
-
-    fun <T> invokeVirtualAs(owner: Any?, vararg args: Any?): T {
-        return invokeVirtual(owner, *args).asAny()
-    }
+    fun <T> invokeVirtual(owner: Any?, vararg args: Any?): T
 
     companion object {
 
@@ -146,40 +134,40 @@ private const val CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE =
 
 private class ReflectedStaticMethodInvoker(private val method: Method) : StaticInvoker {
 
-    override fun invokeStatic(vararg args: Any?): Any? {
+    override fun <T> invokeStatic(vararg args: Any?): T {
         return method.invokeStatic(args = args)
     }
 
-    override fun invoke(vararg args: Any?): Any? {
+    override fun <T> invoke(vararg args: Any?): T {
         return invokeStatic(*args)
     }
 }
 
 private class ReflectedVirtualMethodInvoker(private val method: Method) : VirtualInvoker {
 
-    override fun invoke(vararg args: Any?): Any? {
+    override fun <T> invoke(vararg args: Any?): T {
         checkArgument(args.isNotEmpty(), CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE)
         val owner = args[0]
         val arguments = args.copyOfRange(1, args.size)
         return invoke0(owner, *arguments)
     }
 
-    override fun invokeVirtual(owner: Any?, vararg args: Any?): Any? {
+    override fun <T> invokeVirtual(owner: Any?, vararg args: Any?): T {
         return invoke0(owner, *args)
     }
 
-    private fun invoke0(owner: Any?, vararg args: Any?): Any? {
+    private fun <T> invoke0(owner: Any?, vararg args: Any?): T {
         return method.invokeVirtual(owner, args = args)
     }
 }
 
 private class ReflectedConstructorInvoker(private val constructor: Constructor<*>) : StaticInvoker {
 
-    override fun invokeStatic(vararg args: Any?): Any? {
-        return constructor.toInstance(*args)
+    override fun <T> invokeStatic(vararg args: Any?): T {
+        return constructor.toInstance(*args).asAny()
     }
 
-    override fun invoke(vararg args: Any?): Any? {
+    override fun <T> invoke(vararg args: Any?): T {
         return invokeStatic(*args)
     }
 }
@@ -196,7 +184,7 @@ private class StaticMethodHandlerInvoker private constructor() : StaticInvoker {
         methodHandle = findStaticMethodHandle(constructor)
     }
 
-    override fun invokeStatic(vararg args: Any?): Any? {
+    override fun <T> invokeStatic(vararg args: Any?): T {
         return when (args.size) {
             0 -> methodHandle.invoke()
             1 -> methodHandle.invoke(args[0])
@@ -208,10 +196,10 @@ private class StaticMethodHandlerInvoker private constructor() : StaticInvoker {
             7 -> methodHandle.invoke(args[0], args[1], args[2], args[3], args[4], args[5], args[6])
             8 -> methodHandle.invoke(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7])
             else -> methodHandle.invokeWithArguments(*args)
-        }
+        }.asAny()
     }
 
-    override fun invoke(vararg args: Any?): Any? {
+    override fun <T> invoke(vararg args: Any?): T {
         return invokeStatic(*args)
     }
 
@@ -238,18 +226,18 @@ private class VirtualMethodHandlerInvoker(method: Method) : VirtualInvoker {
 
     private var methodHandle = findMethodHandle(method)
 
-    override fun invoke(vararg args: Any?): Any? {
+    override fun <T> invoke(vararg args: Any?): T {
         checkArgument(args.isNotEmpty(), CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE)
         val owner = args[0]
         val arguments = args.copyOfRange(1, args.size)
         return invoke0(owner, *arguments)
     }
 
-    override fun invokeVirtual(owner: Any?, vararg args: Any?): Any? {
+    override fun <T> invokeVirtual(owner: Any?, vararg args: Any?): T {
         return invoke0(owner, *args)
     }
 
-    private fun invoke0(owner: Any?, vararg args: Any?): Any? {
+    private fun <T> invoke0(owner: Any?, vararg args: Any?): T {
         return when (args.size) {
             0 -> methodHandle.invoke(owner)
             1 -> methodHandle.invoke(owner, args[0])
@@ -261,7 +249,7 @@ private class VirtualMethodHandlerInvoker(method: Method) : VirtualInvoker {
             7 -> methodHandle.invoke(owner, args[0], args[1], args[2], args[3], args[4], args[5], args[6])
             8 -> methodHandle.invoke(owner, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7])
             else -> methodHandle.invokeWithArguments(owner, *args)
-        }
+        }.asAny()
     }
 
     private fun findMethodHandle(method: Method): MethodHandle {
