@@ -27,6 +27,10 @@ abstract class TypeRef<T> {
         return generic.actualTypeArguments[0]
     }
 
+    override fun toString(): String {
+        return "TypeRef($type)"
+    }
+
     companion object {
 
         @JvmStatic
