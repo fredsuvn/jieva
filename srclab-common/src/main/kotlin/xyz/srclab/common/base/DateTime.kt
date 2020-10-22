@@ -25,17 +25,19 @@ fun timestamp(): String {
 val MIN_DATE = Date(0)
 
 @JvmField
-val ISO_ZONED_DATE_TIME_FORMAT: SimpleDateFormat = SimpleDateFormat(DateTimeFormatter.ISO_ZONED_DATE_TIME.toString())
-
-@JvmField
 val MIN_ZONED_DATE_TIME: ZonedDateTime = OffsetDateTime.MIN.toZonedDateTime()
+
+@JvmOverloads
+fun dateFormat(pattern: String = DateTimeFormatter.ISO_ZONED_DATE_TIME.toString()): DateFormat {
+    return SimpleDateFormat(pattern)
+}
 
 fun Any?.toDate(datePattern: String): Date {
     return toDate(SimpleDateFormat(datePattern))
 }
 
 @JvmOverloads
-fun Any?.toDate(dateFormat: DateFormat = ISO_ZONED_DATE_TIME_FORMAT): Date {
+fun Any?.toDate(dateFormat: DateFormat = dateFormat()): Date {
     return when (this) {
         null -> MIN_DATE
         is Date -> this
