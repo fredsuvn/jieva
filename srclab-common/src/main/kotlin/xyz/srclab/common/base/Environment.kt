@@ -5,236 +5,262 @@ import java.util.*
 /**
  * @author sunqian
  */
-object Environment {
+interface Environment {
 
-    const val KEY_OF_JAVA_VERSION = "java.version"
-    const val KEY_OF_JAVA_VENDOR = "java.vendor"
-    const val KEY_OF_JAVA_VENDOR_URL = "java.vendor.url"
-    const val KEY_OF_JAVA_HOME = "java.home"
-    const val KEY_OF_JAVA_VM_SPECIFICATION_VERSION = "java.vm.specification.version"
-    const val KEY_OF_JAVA_VM_SPECIFICATION_VENDOR = "java.vm.specification.vendor"
-    const val KEY_OF_JAVA_VM_SPECIFICATION_NAME = "java.vm.specification.name"
-    const val KEY_OF_JAVA_VM_VERSION = "java.vm.version"
-    const val KEY_OF_JAVA_VM_VENDOR = "java.vm.vendor"
-    const val KEY_OF_JAVA_VM_NAME = "java.vm.name"
-    const val KEY_OF_JAVA_SPECIFICATION_VERSION = "java.specification.version"
-    const val KEY_OF_JAVA_SPECIFICATION_VENDOR = "java.specification.vendor"
-    const val KEY_OF_JAVA_SPECIFICATION_NAME = "java.specification.name"
-    const val KEY_OF_JAVA_CLASS_VERSION = "java.class.version"
-    const val KEY_OF_JAVA_CLASS_PATH = "java.class.path"
-    const val KEY_OF_JAVA_LIBRARY_PATH = "java.library.path"
-    const val KEY_OF_JAVA_IO_TMPDIR = "java.io.tmpdir"
-    const val KEY_OF_JAVA_COMPILER = "java.compiler"
-    const val KEY_OF_JAVA_EXT_DIRS = "java.ext.dirs"
-    const val KEY_OF_OS_NAME = "os.name"
-    const val KEY_OF_OS_ARCH = "os.arch"
-    const val KEY_OF_OS_VERSION = "os.version"
-    const val KEY_OF_FILE_SEPARATOR = "file.separator"
-    const val KEY_OF_PATH_SEPARATOR = "path.separator"
-    const val KEY_OF_LINE_SEPARATOR = "line.separator"
-    const val KEY_OF_USER_NAME = "user.name"
-    const val KEY_OF_USER_HOME = "user.home"
-    const val KEY_OF_USER_DIR = "user.dir"
-
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val properties: Map<String, String>
-        @JvmName("properties") get() {
-            val properties = System.getProperties() ?: return mapOf()
-            return propertiesToMap(properties)
-        }
+        @JvmName("properties") get
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val variables: Map<String, String>
-        @JvmName("variables") get() {
-            return System.getenv()
-        }
+        @JvmName("variables") get
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaVersion: String
         @JvmName("javaVersion") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_VERSION)
+            return getProperty(KEY_OF_JAVA_VERSION).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaVendor: String
         @JvmName("javaVendor") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_VENDOR)
+            return getProperty(KEY_OF_JAVA_VENDOR).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaVendorUrl: String
         @JvmName("javaVendorUrl") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_VENDOR_URL)
+            return getProperty(KEY_OF_JAVA_VENDOR_URL).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaHome: String
         @JvmName("javaHome") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_HOME)
+            return getProperty(KEY_OF_JAVA_HOME).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaVmSpecificationVersion: String
         @JvmName("javaVmSpecificationVersion") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_VM_SPECIFICATION_VERSION)
+            return getProperty(KEY_OF_JAVA_VM_SPECIFICATION_VERSION).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaVmSpecificationVendor: String
         @JvmName("javaVmSpecificationVendor") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_VM_SPECIFICATION_VENDOR)
+            return getProperty(KEY_OF_JAVA_VM_SPECIFICATION_VENDOR).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaVmSpecificationName: String
         @JvmName("javaVmSpecificationName") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_VM_SPECIFICATION_NAME)
+            return getProperty(KEY_OF_JAVA_VM_SPECIFICATION_NAME).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaVmVersion: String
         @JvmName("javaVmVersion") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_VM_VERSION)
+            return getProperty(KEY_OF_JAVA_VM_VERSION).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaVmVendor: String
         @JvmName("javaVmVendor") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_VM_VENDOR)
+            return getProperty(KEY_OF_JAVA_VM_VENDOR).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaVmName: String
         @JvmName("javaVmName") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_VM_NAME)
+            return getProperty(KEY_OF_JAVA_VM_NAME).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaSpecificationVersion: String
         @JvmName("javaSpecificationVersion") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_SPECIFICATION_VERSION)
+            return getProperty(KEY_OF_JAVA_SPECIFICATION_VERSION).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaSpecificationVendor: String
         @JvmName("javaSpecificationVendor") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_SPECIFICATION_VENDOR)
+            return getProperty(KEY_OF_JAVA_SPECIFICATION_VENDOR).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaSpecificationName: String
         @JvmName("javaSpecificationName") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_SPECIFICATION_NAME)
+            return getProperty(KEY_OF_JAVA_SPECIFICATION_NAME).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaClassVersion: String
         @JvmName("javaClassVersion") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_CLASS_VERSION)
+            return getProperty(KEY_OF_JAVA_CLASS_VERSION).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaClassPath: String
         @JvmName("javaClassPath") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_CLASS_PATH)
+            return getProperty(KEY_OF_JAVA_CLASS_PATH).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaLibraryPath: String
         @JvmName("javaLibraryPath") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_LIBRARY_PATH)
+            return getProperty(KEY_OF_JAVA_LIBRARY_PATH).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaIoTmpdir: String
         @JvmName("javaIoTmpdir") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_IO_TMPDIR)
+            return getProperty(KEY_OF_JAVA_IO_TMPDIR).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaCompiler: String
         @JvmName("javaCompiler") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_COMPILER)
+            return getProperty(KEY_OF_JAVA_COMPILER).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val javaExtDirs: String
         @JvmName("javaExtDirs") get() {
-            return getPropertyNotNull(KEY_OF_JAVA_EXT_DIRS)
+            return getProperty(KEY_OF_JAVA_EXT_DIRS).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val osName: String
         @JvmName("osName") get() {
-            return getPropertyNotNull(KEY_OF_OS_NAME)
+            return getProperty(KEY_OF_OS_NAME).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val osArch: String
         @JvmName("osArch") get() {
-            return getPropertyNotNull(KEY_OF_OS_ARCH)
+            return getProperty(KEY_OF_OS_ARCH).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val osVersion: String
         @JvmName("osVersion") get() {
-            return getPropertyNotNull(KEY_OF_OS_VERSION)
+            return getProperty(KEY_OF_OS_VERSION).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val fileSeparator: String
         @JvmName("fileSeparator") get() {
-            return getPropertyNotNull(KEY_OF_FILE_SEPARATOR)
+            return getProperty(KEY_OF_FILE_SEPARATOR).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val pathSeparator: String
         @JvmName("pathSeparator") get() {
-            return getPropertyNotNull(KEY_OF_PATH_SEPARATOR)
+            return getProperty(KEY_OF_PATH_SEPARATOR).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val lineSeparator: String
         @JvmName("lineSeparator") get() {
-            return getPropertyNotNull(KEY_OF_LINE_SEPARATOR)
+            return getProperty(KEY_OF_LINE_SEPARATOR).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val userName: String
         @JvmName("userName") get() {
-            return getPropertyNotNull(KEY_OF_USER_NAME)
+            return getProperty(KEY_OF_USER_NAME).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val userHome: String
         @JvmName("userHome") get() {
-            return getPropertyNotNull(KEY_OF_USER_HOME)
+            return getProperty(KEY_OF_USER_HOME).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val userDir: String
         @JvmName("userDir") get() {
-            return getPropertyNotNull(KEY_OF_USER_DIR)
+            return getProperty(KEY_OF_USER_DIR).asNotNull()
         }
 
-    @JvmStatic
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val availableProcessors: Int
         @JvmName("availableProcessors") get() {
             return Runtime.getRuntime().availableProcessors()
         }
 
-    @JvmStatic
-    fun getProperty(key: String): String? {
+    fun getProperty(key: String): String?
+
+    fun setProperty(key: String, value: String)
+
+    fun getVariable(key: String): String?
+
+    companion object {
+
+        const val KEY_OF_JAVA_VERSION = "java.version"
+        const val KEY_OF_JAVA_VENDOR = "java.vendor"
+        const val KEY_OF_JAVA_VENDOR_URL = "java.vendor.url"
+        const val KEY_OF_JAVA_HOME = "java.home"
+        const val KEY_OF_JAVA_VM_SPECIFICATION_VERSION = "java.vm.specification.version"
+        const val KEY_OF_JAVA_VM_SPECIFICATION_VENDOR = "java.vm.specification.vendor"
+        const val KEY_OF_JAVA_VM_SPECIFICATION_NAME = "java.vm.specification.name"
+        const val KEY_OF_JAVA_VM_VERSION = "java.vm.version"
+        const val KEY_OF_JAVA_VM_VENDOR = "java.vm.vendor"
+        const val KEY_OF_JAVA_VM_NAME = "java.vm.name"
+        const val KEY_OF_JAVA_SPECIFICATION_VERSION = "java.specification.version"
+        const val KEY_OF_JAVA_SPECIFICATION_VENDOR = "java.specification.vendor"
+        const val KEY_OF_JAVA_SPECIFICATION_NAME = "java.specification.name"
+        const val KEY_OF_JAVA_CLASS_VERSION = "java.class.version"
+        const val KEY_OF_JAVA_CLASS_PATH = "java.class.path"
+        const val KEY_OF_JAVA_LIBRARY_PATH = "java.library.path"
+        const val KEY_OF_JAVA_IO_TMPDIR = "java.io.tmpdir"
+        const val KEY_OF_JAVA_COMPILER = "java.compiler"
+        const val KEY_OF_JAVA_EXT_DIRS = "java.ext.dirs"
+        const val KEY_OF_OS_NAME = "os.name"
+        const val KEY_OF_OS_ARCH = "os.arch"
+        const val KEY_OF_OS_VERSION = "os.version"
+        const val KEY_OF_FILE_SEPARATOR = "file.separator"
+        const val KEY_OF_PATH_SEPARATOR = "path.separator"
+        const val KEY_OF_LINE_SEPARATOR = "line.separator"
+        const val KEY_OF_USER_NAME = "user.name"
+        const val KEY_OF_USER_HOME = "user.home"
+        const val KEY_OF_USER_DIR = "user.dir"
+
+        @JvmStatic
+        fun defaultEnvironment(): Environment {
+            return DefaultEnvironment
+        }
+    }
+}
+
+fun defaultEnvironment(): Environment {
+    return Environment.defaultEnvironment()
+}
+
+object DefaultEnvironment : Environment {
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    override val properties: Map<String, String>
+        @JvmName("properties") get() {
+            val properties = System.getProperties() ?: return mapOf()
+            return propertiesToMap(properties)
+        }
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    override val variables: Map<String, String>
+        @JvmName("variables") get() {
+            return System.getenv()
+        }
+
+    override fun getProperty(key: String): String? {
         return System.getProperty(key)
     }
 
-    @JvmStatic
-    fun setProperty(key: String, value: String) {
+    override fun setProperty(key: String, value: String) {
         System.setProperty(key, value)
     }
 
-    @JvmStatic
-    fun getVariable(key: String): String? {
+    override fun getVariable(key: String): String? {
         return System.getenv(key)
     }
 

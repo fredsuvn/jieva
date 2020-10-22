@@ -59,7 +59,7 @@ public class Tt {
 
         System.out.println(Defaults.charset());
 
-        Environment.fileSeparator();
+        Environment.defaultEnvironment();
 
         Lazy<String> lazy = LazyKt.lazy(() -> "");
         lazy.getValue();
@@ -67,8 +67,6 @@ public class Tt {
         Object uv = Parts.UNINITIALIZED_VALUE;
 
         Runner r = Runner.syncRunner();
-
-        Current.milliseconds();
 
         List<String> stringList = new ArrayList<>();
 
@@ -80,5 +78,7 @@ public class Tt {
 
         MethodKit.isPublic(null);
         MethodKit.invokeVirtual(null);
+
+        Format.FAST_FORMAT.format("");
     }
 }

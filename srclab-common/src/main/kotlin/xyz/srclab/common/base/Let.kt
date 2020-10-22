@@ -14,7 +14,7 @@ package xyz.srclab.common.base
  * Date dateValue = DateUtils.stringToDate(stringValue)
  * ```
  */
-interface Let<T> {
+interface Let<T> : SimpleGetter<T> {
 
     fun <R> then(action: (T) -> R): Let<R>
 
@@ -23,17 +23,21 @@ interface Let<T> {
      */
     fun <R> thenOrNull(action: (T) -> R): Let<R>
 
-    fun get(): T
-
-    fun getOrNull(): T?
-
     companion object {
 
         @JvmStatic
-        fun <T> any(any: T): Let<T> {
+        fun <T> startsAt(any: T): Let<T> {
             return LetImpl(any)
         }
     }
+}
+
+fun <T> T.letStarts(): Let<T> {
+    return letStartsAt(this)
+}
+
+fun <T> letStartsAt(any: T): Let<T> {
+    return Let.startsAt(any)
 }
 
 private class LetImpl<T>(private var any: T) : Let<T> {

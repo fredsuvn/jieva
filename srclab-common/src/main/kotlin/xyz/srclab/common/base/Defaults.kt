@@ -48,4 +48,8 @@ object Defaults {
     @JvmStatic
     @get:JvmName("timestampFormatter")
     val timestampFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(timestampPattern, locale)
+
+    @JvmStatic
+    @get:JvmName("radix")
+    val radix: Int = 10
 }

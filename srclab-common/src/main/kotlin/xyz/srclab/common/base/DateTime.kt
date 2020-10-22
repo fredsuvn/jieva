@@ -9,6 +9,18 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
 import java.util.*
 
+fun milliseconds(): Long {
+    return System.currentTimeMillis()
+}
+
+fun nanoseconds(): Long {
+    return System.nanoTime()
+}
+
+fun timestamp(): String {
+    return Defaults.timestampFormatter.format(LocalDateTime.now())
+}
+
 @JvmField
 val MIN_DATE = Date(0)
 
@@ -16,13 +28,7 @@ val MIN_DATE = Date(0)
 val ISO_ZONED_DATE_TIME_FORMAT: SimpleDateFormat = SimpleDateFormat(DateTimeFormatter.ISO_ZONED_DATE_TIME.toString())
 
 @JvmField
-val MIN_UTC_ZONED_DATE_TIME: ZonedDateTime = ZonedDateTime.ofInstant(Instant.MIN, ZoneOffset.UTC)
-
-fun Number.toDate(): Date {
-    return Date(toLong())
-}
-
-fun
+val MIN_ZONED_DATE_TIME: ZonedDateTime = OffsetDateTime.MIN.toZonedDateTime()
 
 fun Any?.toDate(datePattern: String): Date {
     return toDate(SimpleDateFormat(datePattern))
@@ -31,23 +37,22 @@ fun Any?.toDate(datePattern: String): Date {
 @JvmOverloads
 fun Any?.toDate(dateFormat: DateFormat = ISO_ZONED_DATE_TIME_FORMAT): Date {
     return when (this) {
+        null -> MIN_DATE
         is Date -> this
-        null, false -> MIN_DATE
         is Instant -> Date.from(this)
+        is LocalDateTime -> Date.from(toInstant(OffsetDateTime.now().offset))
+        is ZonedDateTime -> Date.from(toInstant())
+        is OffsetDateTime -> Date.from(toInstant())
+        is LocalDate -> Date.from(ZonedDateTime.of(this, LocalTime.MIN, ZoneId.systemDefault()).toInstant())
+        is LocalTime -> Date.from(ZonedDateTime.of(LocalDate.MIN, this, ZoneId.systemDefault()).toInstant())
         is Temporal -> Date.from(Instant.from(this))
         is Number -> when (val value = toLong()) {
             0L -> MIN_DATE
             else -> Date(value)
         }
+        false -> MIN_DATE
         true -> Date()
         else -> dateFormat.parse(toString())
-    }
-}
-
-fun Number?.toInstant(): Instant {
-    return when (val value = toLong()) {
-        0L -> Instant.MIN
-        else -> Instant.ofEpochMilli(value)
     }
 }
 
@@ -58,25 +63,22 @@ fun Any?.toInstant(dateTimePattern: String): Instant {
 @JvmOverloads
 fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_INSTANT): Instant {
     return when (this) {
+        null -> Instant.MIN
         is Instant -> this
-        null, false -> Instant.MIN
-        is Date -> this.toInstant()
+        is Date -> toInstant()
+        is LocalDateTime -> toInstant(ZonedDateTime.now().offset)
+        is ZonedDateTime -> toInstant()
+        is OffsetDateTime -> toInstant()
+        is LocalDate -> ZonedDateTime.of(this, LocalTime.MIN, ZoneId.systemDefault()).toInstant()
+        is LocalTime -> ZonedDateTime.of(LocalDate.MIN, this, ZoneId.systemDefault()).toInstant()
         is Temporal -> Instant.from(this)
         is Number -> when (val value = toLong()) {
             0L -> Instant.MIN
             else -> Instant.ofEpochMilli(value)
         }
+        false -> Instant.MIN
         true -> Instant.now()
-        else -> {
-            val temporal = dateTimeFormatter.parse(toString())
-            return if (temporal is Instant) temporal else Instant.from(temporal)
-        }
-    }
-}
-fun Number?.toLocalDateTime(): LocalDateTime {
-    return when (val value = toLong()) {
-        0L -> LocalDateTime.MIN
-        else -> LocalDateTime.ofEpochSecond(value)
+        else -> return Instant.from(dateTimeFormatter.parse(toString()))
     }
 }
 
@@ -87,20 +89,22 @@ fun Any?.toLocalDateTime(dateTimePattern: String): LocalDateTime {
 @JvmOverloads
 fun Any?.toLocalDateTime(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME): LocalDateTime {
     return when (this) {
+        null -> LocalDateTime.MIN
         is LocalDateTime -> this
-        null, false -> LocalDateTime.MIN
-        is Date -> this.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalDateTime()
+        is Date -> toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+        is Instant -> atZone(ZoneId.systemDefault()).toLocalDateTime()
+        is ZonedDateTime -> toLocalDateTime()
+        is OffsetDateTime -> toLocalDateTime()
+        is LocalDate -> LocalDateTime.of(this, LocalTime.MIN)
+        is LocalTime -> LocalDateTime.of(LocalDate.MIN, this)
         is Temporal -> LocalDateTime.from(this)
         is Number -> when (val value = toLong()) {
             0L -> LocalDateTime.MIN
-            else -> LocalDateTime.ofEpochSecond(value)
+            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDateTime()
         }
+        false -> LocalDateTime.MIN
         true -> LocalDateTime.now()
-        else -> {
-            val temporal = dateTimeFormatter.parse(toString())
-            return if (temporal is LocalDateTime) temporal else LocalDateTime.from(temporal)
-        }
+        else -> return LocalDateTime.from(dateTimeFormatter.parse(toString()))
     }
 }
 
@@ -111,20 +115,22 @@ fun Any?.toZonedDateTime(dateTimePattern: String): ZonedDateTime {
 @JvmOverloads
 fun Any?.toZonedDateTime(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME): ZonedDateTime {
     return when (this) {
+        null -> MIN_ZONED_DATE_TIME
         is ZonedDateTime -> this
-        null, false -> MIN_UTC_ZONED_DATE_TIME
-        is Date -> this.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalDateTime()
-        is Temporal -> LocalDateTime.from(this)
+        is Date -> toInstant().atZone(ZoneId.systemDefault())
+        is Instant -> atZone(ZoneId.systemDefault())
+        is LocalDateTime -> ZonedDateTime.of(this, ZoneId.systemDefault())
+        is OffsetDateTime -> toZonedDateTime()
+        is LocalDate -> ZonedDateTime.of(this, LocalTime.MIN, ZoneId.systemDefault())
+        is LocalTime -> ZonedDateTime.of(LocalDate.MIN, this, ZoneId.systemDefault())
+        is Temporal -> ZonedDateTime.from(this)
         is Number -> when (val value = toLong()) {
-            0L -> ZonedDateTime.
-            else -> LocalDateTime.ofEpochSecond(value)
+            0L -> MIN_ZONED_DATE_TIME
+            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault())
         }
+        false -> MIN_ZONED_DATE_TIME
         true -> ZonedDateTime.now()
-        else -> {
-            val temporal = dateTimeFormatter.parse(toString())
-            return if (temporal is ZonedDateTime) temporal else ZonedDateTime.from(temporal)
-        }
+        else -> return ZonedDateTime.from(dateTimeFormatter.parse(toString()))
     }
 }
 
@@ -133,8 +139,25 @@ fun Any?.toOffsetDateTime(dateTimePattern: String): OffsetDateTime {
 }
 
 @JvmOverloads
-fun Any?.toOffsetDateTime(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME): OffsetDateTime {
-    return toZonedDateTime(dateTimeFormatter).toOffsetDateTime()
+fun Any?.toOffsetDateTime(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME): OffsetDateTime {
+    return when (this) {
+        null -> OffsetDateTime.MIN
+        is OffsetDateTime -> this
+        is Date -> toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime()
+        is Instant -> atZone(ZoneId.systemDefault()).toOffsetDateTime()
+        is LocalDateTime -> ZonedDateTime.of(this, ZoneId.systemDefault()).toOffsetDateTime()
+        is ZonedDateTime -> toOffsetDateTime()
+        is LocalDate -> ZonedDateTime.of(this, LocalTime.MIN, ZoneId.systemDefault()).toOffsetDateTime()
+        is LocalTime -> ZonedDateTime.of(LocalDate.MIN, this, ZoneId.systemDefault()).toOffsetDateTime()
+        is Temporal -> OffsetDateTime.from(this)
+        is Number -> when (val value = toLong()) {
+            0L -> OffsetDateTime.MIN
+            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toOffsetDateTime()
+        }
+        false -> OffsetDateTime.MIN
+        true -> OffsetDateTime.now()
+        else -> return OffsetDateTime.from(dateTimeFormatter.parse(toString()))
+    }
 }
 
 fun Any?.toLocalDate(dateTimePattern: String): LocalDate {
@@ -144,20 +167,22 @@ fun Any?.toLocalDate(dateTimePattern: String): LocalDate {
 @JvmOverloads
 fun Any?.toLocalDate(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE): LocalDate {
     return when (this) {
+        null -> LocalDate.MIN
         is LocalDate -> this
-        null, false -> LocalDate.MIN
-        is Date -> this.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalDate()
+        is Date -> toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        is Instant -> atZone(ZoneId.systemDefault()).toLocalDate()
+        is LocalDateTime -> ZonedDateTime.of(this, ZoneId.systemDefault()).toLocalDate()
+        is ZonedDateTime -> toLocalDate()
+        is OffsetDateTime -> toLocalDate()
+        is LocalTime -> LocalDate.MIN
         is Temporal -> LocalDate.from(this)
         is Number -> when (val value = toLong()) {
             0L -> LocalDate.MIN
-            else -> LocalDate.ofEpochDay(value)
+            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDate()
         }
+        false -> LocalDate.MIN
         true -> LocalDate.now()
-        else -> {
-            val temporal = dateTimeFormatter.parse(toString())
-            return if (temporal is LocalDate) temporal else LocalDate.from(temporal)
-        }
+        else -> return LocalDate.from(dateTimeFormatter.parse(toString()))
     }
 }
 
@@ -168,35 +193,38 @@ fun Any?.toLocalTime(dateTimePattern: String): LocalTime {
 @JvmOverloads
 fun Any?.toLocalTime(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_TIME): LocalTime {
     return when (this) {
+        null -> LocalTime.MIN
         is LocalTime -> this
-        null, false -> LocalTime.MIN
-        is Date -> this.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
-        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalTime()
+        is Date -> toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
+        is Instant -> atZone(ZoneId.systemDefault()).toLocalTime()
+        is LocalDateTime -> ZonedDateTime.of(this, ZoneId.systemDefault()).toLocalTime()
+        is ZonedDateTime -> toLocalTime()
+        is OffsetDateTime -> toLocalTime()
+        is LocalDate -> LocalTime.MIN
         is Temporal -> LocalTime.from(this)
         is Number -> when (val value = toLong()) {
             0L -> LocalTime.MIN
-            else -> LocalTime.ofSecondOfDay(value)
+            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalTime()
         }
+        false -> LocalTime.MIN
         true -> LocalTime.now()
-        else -> {
-            val temporal = dateTimeFormatter.parse(toString())
-            return if (temporal is LocalTime) temporal else LocalTime.from(temporal)
-        }
+        else -> return LocalTime.from(dateTimeFormatter.parse(toString()))
     }
 }
 
 fun Any?.toDuration(): Duration {
     return when (this) {
-        null, false -> Duration.ZERO
+        null -> Duration.ZERO
         is Duration -> this
         is Number -> when (val value = toLong()) {
             0L -> Duration.ZERO
             else -> Duration.ofMillis(value)
         }
+        false -> Duration.ZERO
         else -> Duration.parse(toString())
     }
 }
 
 fun Any?.toTimestamp(): String {
-    return Defaults.timestampFormatter.format(this.toZonedDateTime())
+    return Defaults.timestampFormatter.format(this.toLocalDateTime())
 }

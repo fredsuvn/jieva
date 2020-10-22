@@ -9,11 +9,9 @@ fun Any?.hash(): Int {
     return this.hashCode()
 }
 
-fun Any?.elementHash(): Int {
-    if (this === null) {
-        return this.hashCode()
-    }
+fun Any?.arrayHash(): Int {
     return when (this) {
+        null -> this.hashCode()
         is BooleanArray -> Arrays.hashCode(this)
         is ShortArray -> Arrays.hashCode(this)
         is CharArray -> Arrays.hashCode(this)
@@ -26,11 +24,9 @@ fun Any?.elementHash(): Int {
     }
 }
 
-fun Any?.elementDeepHash(): Int {
-    if (this === null) {
-        return this.hashCode()
-    }
+fun Any?.arrayDeepHash(): Int {
     return when (this) {
+        null -> this.hashCode()
         is BooleanArray -> Arrays.hashCode(this)
         is ShortArray -> Arrays.hashCode(this)
         is CharArray -> Arrays.hashCode(this)

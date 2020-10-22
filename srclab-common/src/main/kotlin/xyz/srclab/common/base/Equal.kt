@@ -9,7 +9,7 @@ fun Any?.equals(other: Any?): Boolean {
     return Objects.equals(this, other)
 }
 
-fun Any?.elementEquals(other: Any?): Boolean {
+fun Any?.arrayEquals(other: Any?): Boolean {
     if (this === other) {
         return true
     }
@@ -29,7 +29,7 @@ fun Any?.elementEquals(other: Any?): Boolean {
     }
 }
 
-fun Any?.elementDeepEquals(other: Any?): Boolean {
+fun Any?.arrayDeepEquals(other: Any?): Boolean {
     if (this === other) {
         return true
     }

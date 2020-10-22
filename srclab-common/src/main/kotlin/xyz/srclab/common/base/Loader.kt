@@ -22,12 +22,12 @@ fun <T> ByteBuffer.loadClass(): Class<T> {
 }
 
 @JvmOverloads
-fun CharSequence.findResource(classLoader: ClassLoader = Current.classLoader): URL? {
+fun CharSequence.findResource(classLoader: ClassLoader = currentClassLoader()): URL? {
     return classLoader.getResource(this.toString())
 }
 
 @JvmOverloads
-fun CharSequence.findResources(classLoader: ClassLoader = Current.classLoader): List<URL> {
+fun CharSequence.findResources(classLoader: ClassLoader = currentClassLoader()): List<URL> {
     return try {
         val urlEnumeration = classLoader.getResources(this.toString())
         urlEnumeration.toList()

@@ -5,7 +5,10 @@ package xyz.srclab.common.base
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.nio.charset.Charset
 import java.util.*
+import kotlin.text.toBigDecimal as toBigDecimalKt
+import kotlin.text.toBigInteger as toBigIntegerKt
 import kotlin.text.toBoolean as toBooleanKt
 import kotlin.text.toByte as toByteKt
 import kotlin.text.toDouble as toDoubleKt
@@ -13,215 +16,190 @@ import kotlin.text.toFloat as toFloatKt
 import kotlin.text.toInt as toIntKt
 import kotlin.text.toLong as toLongKt
 import kotlin.text.toShort as toShortKt
-import kotlin.toBigDecimal as toBigDecimalKt
+import kotlin.toBigDecimal as numberToBigDecimalKt
+import kotlin.toBigInteger as numberToBigIntegerKt
 import kotlin.toString as toStringKt
 
 fun Any?.toBoolean(): Boolean {
     return when (this) {
-        is Boolean -> this
         null -> false
+        is Boolean -> this
         is Number -> toInt() != 0
         else -> toString().toBooleanKt()
     }
 }
 
-fun CharSequence?.toByte(): Byte {
-    return this?.toString()?.toByteKt() ?: 0
+@JvmOverloads
+fun CharSequence.toByte(radix: Int = Defaults.radix): Byte {
+    return this.toString().toByteKt(radix)
 }
 
-fun Any?.toByte(): Byte {
+@JvmOverloads
+fun Any?.toByte(radix: Int = Defaults.radix): Byte {
     return when (this) {
-        null, false -> 0
+        null -> 0
+        is Number -> if (radix == 10) toByte() else toString().toByteKt(radix)
+        false -> 0
         true -> 1
-        is Number -> toByte()
-        is String -> toByteKt()
-        else -> toString().toByteKt()
+        is String -> toByteKt(radix)
+        else -> toString().toByteKt(radix)
     }
 }
 
-fun Number?.toShort(): Short {
-    return this?.toShort() ?: 0
+@JvmOverloads
+fun CharSequence.toShort(radix: Int = Defaults.radix): Short {
+    return this.toString().toShortKt(radix)
 }
 
-fun CharSequence?.toShort(): Short {
-    return this?.toString()?.toShortKt() ?: 0
-}
-
-fun Any?.toShort(): Short {
+@JvmOverloads
+fun Any?.toShort(radix: Int = Defaults.radix): Short {
     return when (this) {
-        null, false -> 0
+        null -> 0
+        is Number -> if (radix == 10) toShort() else toString().toShortKt(radix)
+        false -> 0
         true -> 1
-        is Number -> toShort()
-        is String -> toShortKt()
-        else -> toString().toShortKt()
+        is String -> toShortKt(radix)
+        else -> toString().toShortKt(radix)
     }
 }
 
-fun Number?.toChar(): Char {
-    return this?.toChar() ?: 0.toChar()
+@JvmOverloads
+fun CharSequence.toChar(radix: Int = Defaults.radix): Char {
+    return this.toString().toIntKt(radix).toChar()
 }
 
-fun CharSequence?.toChar(): Char {
-    return (this?.toString()?.toIntKt() ?: 0).toChar()
-}
-
-fun Any?.toChar(): Char {
+@JvmOverloads
+fun Any?.toChar(radix: Int = Defaults.radix): Char {
     return when (this) {
-        null, false -> 0.toChar()
+        null -> 0.toChar()
+        is Number -> if (radix == 10) toChar() else toString().toIntKt(radix).toChar()
+        false -> 0.toChar()
         true -> 1.toChar()
-        is Number -> toChar()
-        is String -> toIntKt().toChar()
-        else -> toString().toIntKt().toChar()
+        is String -> toIntKt(radix).toChar()
+        else -> toString().toIntKt(radix).toChar()
     }
 }
 
-fun Number?.toInt(): Int {
-    return this?.toInt() ?: 0
+@JvmOverloads
+fun CharSequence.toInt(radix: Int = Defaults.radix): Int {
+    return this.toString().toIntKt(radix)
 }
 
-fun CharSequence?.toInt(): Int {
-    return this?.toString()?.toIntKt() ?: 0
-}
-
-fun Any?.toInt(): Int {
+@JvmOverloads
+fun Any?.toInt(radix: Int = Defaults.radix): Int {
     return when (this) {
-        null, false -> 0
+        null -> 0
+        is Number -> if (radix == 10) toInt() else toString().toIntKt(radix)
+        false -> 0
         true -> 1
-        is Number -> toInt()
-        is String -> toIntKt()
-        else -> toString().toIntKt()
+        is String -> toIntKt(radix)
+        else -> toString().toIntKt(radix)
     }
 }
 
-fun Number?.toLong(): Long {
-    return this?.toLong() ?: 0
+@JvmOverloads
+fun CharSequence.toLong(radix: Int = Defaults.radix): Long {
+    return this.toString().toLongKt(radix)
 }
 
-fun CharSequence?.toLong(): Long {
-    return this?.toString()?.toLongKt() ?: 0
-}
-
-fun Any?.toLong(): Long {
+@JvmOverloads
+fun Any?.toLong(radix: Int = Defaults.radix): Long {
     return when (this) {
-        null, false -> 0L
+        null -> 0L
+        is Number -> if (radix == 10) toLong() else toString().toLongKt(radix)
+        false -> 0L
         true -> 1L
-        is Number -> toLong()
-        is String -> toLongKt()
-        else -> toString().toLongKt()
+        is String -> toLongKt(radix)
+        else -> toString().toLongKt(radix)
     }
 }
 
-fun Number?.toFloat(): Float {
-    return this?.toFloat() ?: 0f
-}
-
-fun CharSequence?.toFloat(): Float {
-    return this?.toString()?.toFloatKt() ?: 0f
+fun CharSequence.toFloat(): Float {
+    return this.toString().toFloatKt()
 }
 
 fun Any?.toFloat(): Float {
     return when (this) {
-        null, false -> 0f
-        true -> 1f
+        null -> 0f
         is Number -> toFloat()
+        false -> 0f
+        true -> 1f
         is String -> toFloatKt()
         else -> toString().toFloatKt()
     }
 }
 
-fun Number?.toDouble(): Double {
-    return this?.toDouble() ?: 0.0
-}
-
-fun CharSequence?.toDouble(): Double {
-    return this?.toString()?.toDoubleKt() ?: 0.0
+fun CharSequence.toDouble(): Double {
+    return this.toString().toDoubleKt()
 }
 
 fun Any?.toDouble(): Double {
     return when (this) {
-        null, false -> 0.0
-        true -> 1.0
+        null -> 0.0
         is Number -> toDouble()
+        false -> 0.0
+        true -> 1.0
         is String -> toDoubleKt()
         else -> toString().toDoubleKt()
     }
 }
 
-fun Number?.toBigInteger(): BigInteger {
-    return when (this) {
-        is BigInteger -> this
-        null -> BigInteger.ZERO
-        is BigDecimal -> toBigInteger()
-        else -> when (toInt()) {
-            0 -> BigInteger.ZERO
-            1 -> BigInteger.ONE
-            10 -> BigInteger.TEN
-            else -> BigInteger(toString())
+@JvmOverloads
+fun CharSequence.toBigInteger(radix: Int = Defaults.radix): BigInteger {
+    if (radix == 10) {
+        return when (this) {
+            "", "0" -> BigInteger.ZERO
+            "1" -> BigInteger.ONE
+            "10" -> BigInteger.TEN
+            else -> toString().toBigIntegerKt()
         }
     }
+    return toString().toBigIntegerKt(radix)
 }
 
-fun CharSequence?.toBigInteger(): BigInteger {
-    return when (this) {
-        null, "", "0" -> BigInteger.ZERO
-        "1" -> BigInteger.ONE
-        "10" -> BigInteger.TEN
-        else -> BigInteger(toString())
+@JvmOverloads
+fun Any?.toBigInteger(radix: Int = Defaults.radix): BigInteger {
+    if (radix == 10) {
+        return when (this) {
+            null -> BigInteger.ZERO
+            is BigInteger -> this
+            false -> BigInteger.ZERO
+            true -> BigInteger.ONE
+            is BigDecimal -> toBigInteger()
+            is Number -> toLong().numberToBigIntegerKt()
+            else -> toString().toBigIntegerKt()
+        }
     }
-}
-
-fun Any?.toBigInteger(): BigInteger {
     return when (this) {
+        null -> BigInteger.ZERO
         is BigInteger -> this
-        null, false -> BigInteger.ZERO
+        false -> BigInteger.ZERO
         true -> BigInteger.ONE
         is BigDecimal -> toBigInteger()
-        is Number -> when (toInt()) {
-            0 -> BigInteger.ZERO
-            1 -> BigInteger.ONE
-            10 -> BigInteger.TEN
-            else -> BigInteger(toString())
-        }
-        else -> BigInteger(toString())
+        else -> toString().toBigIntegerKt(radix)
     }
 }
 
-fun Number?.toBigDecimal(): BigDecimal {
+fun CharSequence.toBigDecimal(): BigDecimal {
     return when (this) {
-        is BigDecimal -> this
-        null -> BigDecimal.ZERO
-        is BigInteger -> toBigDecimalKt()
-        else -> when (toInt()) {
-            0 -> BigDecimal.ZERO
-            1 -> BigDecimal.ONE
-            10 -> BigDecimal.TEN
-            else -> BigDecimal(toString())
-        }
-    }
-}
-
-fun CharSequence?.toBigDecimal(): BigDecimal {
-    return when (this) {
-        null, "", "0" -> BigDecimal.ZERO
+        "", "0" -> BigDecimal.ZERO
         "1" -> BigDecimal.ONE
         "10" -> BigDecimal.TEN
-        else -> BigDecimal(toString())
+        else -> toString().toBigDecimalKt()
     }
 }
 
 fun Any?.toBigDecimal(): BigDecimal {
     return when (this) {
+        null -> BigDecimal.ZERO
         is BigDecimal -> this
-        null, false -> BigDecimal.ZERO
+        false -> BigDecimal.ZERO
         true -> BigDecimal.ONE
-        is BigInteger -> toBigDecimalKt()
-        is Number -> when (toInt()) {
-            0 -> BigDecimal.ZERO
-            1 -> BigDecimal.ONE
-            10 -> BigDecimal.TEN
-            else -> BigDecimal(toString())
-        }
-        else -> BigDecimal(toString())
+        is BigInteger -> numberToBigDecimalKt()
+        is Int, Long, Byte, Short -> (this as Number).toLong().numberToBigDecimalKt()
+        is Char -> toLong().numberToBigDecimalKt()
+        is Float, Double -> (this as Number).toDouble().numberToBigDecimalKt()
+        else -> toString().toBigDecimalKt()
     }
 }
 
@@ -229,23 +207,38 @@ fun CharArray.toChars(): String {
     return String(this)
 }
 
-fun ByteArray.toChars(): String {
-    return String(this, Defaults.charset)
+fun ByteArray.toChars(charset: String): String {
+    return toChars(Charset.forName(charset))
 }
 
-fun CharArray.toBytes(): ByteArray {
-    return toChars().toByteArray(Defaults.charset)
+@JvmOverloads
+fun ByteArray.toChars(charset: Charset = Defaults.charset): String {
+    return String(this, charset)
 }
 
-fun CharSequence.toBytes(): ByteArray {
-    return toString().toByteArray(Defaults.charset)
+fun CharArray.toBytes(charset: String): ByteArray {
+    return toBytes(Charset.forName(charset))
+}
+
+@JvmOverloads
+fun CharArray.toBytes(charset: Charset = Defaults.charset): ByteArray {
+    return toChars().toByteArray(charset)
+}
+
+fun CharSequence.toBytes(charset: String): ByteArray {
+    return toBytes(Charset.forName(charset))
+}
+
+@JvmOverloads
+fun CharSequence.toBytes(charset: Charset = Defaults.charset): ByteArray {
+    return toString().toByteArray(charset)
 }
 
 fun Any?.toString(): String {
     return toStringKt()
 }
 
-fun Any?.elementToString(): String {
+fun Any?.arrayToString(): String {
     return when (this) {
         null -> toStringKt()
         is Array<*> -> Arrays.toString(this)
@@ -261,7 +254,7 @@ fun Any?.elementToString(): String {
     }
 }
 
-fun Any?.elementDeepToString(): String {
+fun Any?.arrayDeepToString(): String {
     return when (this) {
         null -> toStringKt()
         is Array<*> -> Arrays.deepToString(this)

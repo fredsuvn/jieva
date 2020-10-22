@@ -1,69 +1,95 @@
 package xyz.srclab.common.base
 
-import java.time.ZonedDateTime
-
 /**
  * @author sunqian
  */
-object Current {
+interface Current {
 
-    private val localContext: ThreadLocal<MutableMap<Any, Any?>> by lazy {
-        ThreadLocal.withInitial { mutableMapOf() }
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val thread: Thread
+        @JvmName("thread") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val classLoader: ClassLoader
+        @JvmName("classLoader") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val context: MutableMap<Any, Any?>
+        @JvmName("context") get
+
+    fun get(key: Any): Any {
+        return context[key]!!
     }
 
-    @JvmStatic
-    val milliseconds: Long
-        @JvmName("milliseconds") get() {
-            return System.currentTimeMillis()
+    fun getOrNull(key: Any): Any? {
+        return context[key]
+    }
+
+    fun <T : Any> getAs(key: Any): T {
+        return get(key).asAny()
+    }
+
+    fun <T : Any> getAsOrNull(key: Any): T? {
+        return getOrNull(key).asAny()
+    }
+
+    fun set(key: Any, value: Any?) {
+        context[key] = value
+    }
+
+    fun clearContext() {
+        context.clear()
+    }
+
+    companion object {
+
+        @JvmStatic
+        @JvmOverloads
+        fun current(thread: Thread = currentThread()): Current {
+            return CurrentImpl(thread)
         }
 
-    @JvmStatic
-    val nanoseconds: Long
-        @JvmName("nanoseconds") get() {
-            return System.nanoTime()
-        }
-
-    @JvmStatic
-    val timestamp: String
-        @JvmName("timestamp") get() {
-            return Defaults.timestampFormatter.format(ZonedDateTime.now())
-        }
-
-    @JvmStatic
-    val thread: Thread
-        @JvmName("thread") get() {
+        @JvmStatic
+        fun currentThread(): Thread {
             return Thread.currentThread()
         }
 
-    @JvmStatic
-    val classLoader: ClassLoader
-        @JvmName("classLoader") get() {
-            return thread.contextClassLoader
+        @JvmStatic
+        fun currentClassLoader(): ClassLoader {
+            return Thread.currentThread().contextClassLoader
         }
 
-    @JvmStatic
-    val context: MutableMap<Any, Any?>
-        @JvmName("context") get() {
+        @JvmStatic
+        fun currentContext(): MutableMap<Any, Any?> {
             return localContext.get()
         }
-
-    @JvmStatic
-    fun <T : Any> get(key: Any): T {
-        return localContext.get()[key].notNull().asAny()
     }
+}
 
-    @JvmStatic
-    fun <T : Any> getOrNull(key: Any): T? {
-        return localContext.get()[key].notNull().asAny()
-    }
+fun current(thread: Thread = currentThread()): Current {
+    return Current.current(thread)
+}
 
-    @JvmStatic
-    fun set(key: Any, value: Any?) {
-        localContext.get()[key] = value
-    }
+fun currentThread(): Thread {
+    return Current.currentThread()
+}
 
-    @JvmStatic
-    fun clearContext() {
-        localContext.get().clear()
-    }
+fun currentClassLoader(): ClassLoader {
+    return Current.currentClassLoader()
+}
+
+fun currentContext(): MutableMap<Any, Any?> {
+    return Current.currentContext()
+}
+
+private val localContext: ThreadLocal<MutableMap<Any, Any?>> by lazy {
+    ThreadLocal.withInitial { mutableMapOf() }
+}
+
+private class CurrentImpl(override val thread: Thread) : Current {
+
+    override val classLoader: ClassLoader = thread.contextClassLoader
+
+    override val context: MutableMap<Any, Any?>
+        get() = localContext.get()
 }

@@ -15,50 +15,30 @@ interface Provider<S, T : Any> {
     companion object {
 
         @JvmStatic
-        fun <T : Any> ofChars(): CharsProvider<T> {
-            return CharsProvider.ofType()
-        }
-
-        @JvmStatic
-        fun <T : Any> ofStrictChars(): StrictCharsProvider<T> {
-            return StrictCharsProvider.ofType()
+        @JvmOverloads
+        fun <T : Any> ofChars(strictly: Boolean = false): CharsProvider<T> {
+            return if (strictly) StrictCharsProvider.ofType() else CharsProvider.ofType()
         }
     }
 }
 
-fun <T : Any> providerOfChars(): CharsProvider<T> {
-    return Provider.ofChars()
+fun <T : Any> charsProvider(strictly: Boolean = false): CharsProvider<T> {
+    return Provider.ofChars(strictly)
 }
 
-fun <T : Any> strictProviderOfChars(): StrictCharsProvider<T> {
-    return Provider.ofStrictChars()
+fun <T : Any> CharSequence.parseByCharsProvider(strictly: Boolean = false): List<T> {
+    return charsProvider<T>(strictly).parse(this)
 }
 
-fun <T : Any> CharSequence.parseByCharsProvider(): List<T> {
-    return providerOfChars<T>().parse(this)
+fun <T : Any> CharSequence.parseFirstByCharsProvider(strictly: Boolean = false): T {
+    return charsProvider<T>(strictly).parseFirst(this)
 }
 
-fun <T : Any> CharSequence.parseFirstByCharsProvider(): T {
-    return providerOfChars<T>().parseFirst(this)
+fun <T : Any> CharSequence.parseFirstOrNullByCharsProvider(strictly: Boolean = false): T? {
+    return charsProvider<T>(strictly).parseFirstOrNull(this)
 }
 
-fun <T : Any> CharSequence.parseFirstOrNullByCharsProvider(): T? {
-    return providerOfChars<T>().parseFirstOrNull(this)
-}
-
-fun <T : Any> CharSequence.parseByCharsProviderStrictly(): List<T> {
-    return strictProviderOfChars<T>().parse(this)
-}
-
-fun <T : Any> CharSequence.parseFirstByCharsProviderStrictly(): T {
-    return strictProviderOfChars<T>().parseFirst(this)
-}
-
-fun <T : Any> CharSequence.parseFirstOrNullByCharsProviderStrictly(): T? {
-    return strictProviderOfChars<T>().parseFirstOrNull(this)
-}
-
-class CharsProvider<T : Any> : Provider<CharSequence, T> {
+open class CharsProvider<T : Any> : Provider<CharSequence, T> {
 
     override fun parse(spec: CharSequence): List<T> {
         val classNames = spec.split(",")
@@ -104,7 +84,7 @@ class CharsProvider<T : Any> : Provider<CharSequence, T> {
     }
 }
 
-class StrictCharsProvider<T : Any> : Provider<CharSequence, T> {
+class StrictCharsProvider<T : Any> : CharsProvider<T>() {
 
     override fun parse(spec: CharSequence): List<T> {
         val classNames = spec.split(",")

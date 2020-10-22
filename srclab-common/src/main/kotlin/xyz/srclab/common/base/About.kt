@@ -7,33 +7,33 @@ import kotlin.text.toInt as toIntKt
 
 interface About {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
         @JvmName("name") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String
         @JvmName("url") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val version: Version
         @JvmName("version") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val licence: Licence
         @JvmName("licence") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val poweredBy: PoweredBy
         @JvmName("poweredBy") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val report: String
         @JvmName("report") get() {
             return "${poweredBy.mail} or $url"
         }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val eggTips: String
         @JvmName("eggTips") get
 
@@ -107,49 +107,49 @@ fun aboutOf(
 
 interface Version : Comparable<Version> {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val releaseDate: ZonedDateTime
         @JvmName("releaseDate") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val major: Int
         @JvmName("major") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val minor: Int
         @JvmName("minor") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val patch: Int
         @JvmName("patch") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val preRelease: List<Identifier>
         @JvmName("preRelease") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val preReleaseToString: String
         @JvmName("preReleaseToString") get() {
             return preRelease.joinToString("")
         }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val buildMetadata: List<String>
         @JvmName("buildMetadata") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val buildMetadataToString: String
         @JvmName("buildMetadataToString") get() {
             return buildMetadata.joinToString("")
         }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val isNormal: Boolean
         @JvmName("isNormal") get() {
             return preRelease.isEmpty()
         }
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val isPreRelease: Boolean
         @JvmName("isPreRelease") get() {
             return preRelease.isNotEmpty()
@@ -493,23 +493,23 @@ interface Version : Comparable<Version> {
                 }
             }
 
-            val hyphenCount = Parts.hyphenMatcher().countIn(spec)
+            val hyphenCount = HYPHEN_MATCHER.countIn(spec)
             checkArgument(
                 hyphenCount == 0 || hyphenCount == 1,
                 "Illegal version specification, hyphen count should be 0 or 1."
             )
-            val hyphenIndex = Parts.hyphenMatcher().indexIn(spec)
+            val hyphenIndex = HYPHEN_MATCHER.indexIn(spec)
             checkArgument(
                 hyphenIndex < 0 || hyphenIndex in 1..spec.length - 2,
                 "Illegal hyphen position: {}.", hyphenIndex
             )
 
-            val plusSignCount = Parts.plusSignMatcher().countIn(spec)
+            val plusSignCount = PLUS_SIGN_MATCHER.countIn(spec)
             checkArgument(
                 plusSignCount == 0 || plusSignCount == 1,
                 "Illegal version specification, plus sign count should be 0 or 1."
             )
-            val plusSignIndex = Parts.plusSignMatcher().indexIn(spec)
+            val plusSignIndex = PLUS_SIGN_MATCHER.indexIn(spec)
             checkArgument(
                 plusSignIndex < 0 || plusSignIndex in 1..spec.length - 2,
                 "Illegal plus sign position: {}.", plusSignIndex
@@ -562,15 +562,15 @@ fun CharSequence.parseVersion(): Version {
 
 interface Licence {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
         @JvmName("name") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String
         @JvmName("url") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val content: String
         @JvmName("content") get
 
@@ -613,15 +613,15 @@ fun licenceOf(name: String, url: String, content: String): Licence {
 
 interface PoweredBy {
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
         @JvmName("name") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String
         @JvmName("url") get
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val mail: String
         @JvmName("mail") get
 
