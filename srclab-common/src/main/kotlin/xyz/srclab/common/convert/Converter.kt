@@ -1,14 +1,16 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.reflect.TypeRef
+import xyz.srclab.common.reflect.toInstance
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.text.DateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.time.temporal.Temporal
 import java.util.*
 
 interface Converter {
@@ -160,12 +162,12 @@ interface ConvertHandler {
     /**
      * Return [NULL_VALUE] if final value is null.
      */
-    fun convert(from: Any?, to: Class<*>, converter: Converter): Any?
+    fun convert(from: Any, to: Class<*>, converter: Converter): Any?
 
     /**
      * Return [NULL_VALUE] if final value is null.
      */
-    fun convert(from: Any?, to: Type, converter: Converter): Any?
+    fun convert(from: Any, to: Type, converter: Converter): Any?
 
     companion object {
 
@@ -177,19 +179,29 @@ interface ConvertHandler {
 
 object NopConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
-        if (from === null) {
-            return null
-        }
+    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
         return if (to.isAssignableFrom(from.javaClass)) {
             from
         } else null
     }
 
-    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
-        if (from === null) {
-            return null
+    override fun convert(from: Any, to: Type, converter: Converter): Any? {
+        return if (to is Class<*>) {
+            convert(from, to, converter)
+        } else null
+    }
+}
+
+object CharsConvertHandler : ConvertHandler {
+
+    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
+        return when (to) {
+            String::class.java, CharSequence::class.java -> from.toString()
+            else -> null
         }
+    }
+
+    override fun convert(from: Any, to: Type, converter: Converter): Any? {
         return if (to is Class<*>) {
             convert(from, to, converter)
         } else null
@@ -216,175 +228,24 @@ open class DateTimeConvertHandler(
         DateTimeFormatter.ISO_LOCAL_TIME
     )
 
-    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
-        if (from === null) {
-            return null
-        }
+    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
         return when (to) {
-            Date::class.java -> toDate(from, converter)
-            Instant::class.java -> toInstant(from, converter)
-            LocalDateTime::class.java -> toLocalDateTime(from, converter)
-            ZonedDateTime::class.java -> toZonedDateTime(from, converter)
-            OffsetDateTime::class.java -> toOffsetDateTime(from, converter)
-            LocalDate::class.java -> toLocalDate(from, converter)
-            LocalTime::class.java -> toLocalTime(from, converter)
-            Duration::class.java -> toDuration(from, converter)
+            Date::class.java -> from.toDate(dateFormat)
+            Instant::class.java -> from.toInstant(instantFormatter)
+            LocalDateTime::class.java -> from.toLocalDateTime(localDateTimeFormatter)
+            ZonedDateTime::class.java -> from.toZonedDateTime(zonedDateTimeFormatter)
+            OffsetDateTime::class.java -> from.toOffsetDateTime(offsetDateTimeFormatter)
+            LocalDate::class.java -> from.toLocalDate(localDateFormatter)
+            LocalTime::class.java -> from.toLocalTime(localTimeFormatter)
+            Duration::class.java -> from.toDuration()
             else -> null
         }
     }
 
-    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
-        if (from === null) {
-            return null
-        }
+    override fun convert(from: Any, to: Type, converter: Converter): Any? {
         return if (to is Class<*>) {
-            NopConvertHandler.convert(from, to, converter)
+            convert(from, to, converter)
         } else null
-    }
-
-    private fun toDate(from: Any, converter: Converter): Date? {
-        return when (from) {
-            is Date -> from
-            is CharSequence -> dateFormat.parse(toString())
-            is Instant -> Date.from(from)
-            is LocalDateTime -> Date.from(from.toInstant(OffsetDateTime.now().offset))
-            is ZonedDateTime -> Date.from(from.toInstant())
-            is OffsetDateTime -> Date.from(from.toInstant())
-            is LocalDate -> Date.from(ZonedDateTime.of(from, LocalTime.MIN, ZoneId.systemDefault()).toInstant())
-            is LocalTime -> Date.from(ZonedDateTime.of(LocalDate.MIN, from, ZoneId.systemDefault()).toInstant())
-            is Temporal -> Date.from(Instant.from(from))
-            is Number -> when (val value = toLong()) {
-                0L -> MIN_DATE
-                else -> Date(value)
-            }
-            else -> null
-        }
-    }
-
-    private fun toInstant(from: Any, converter: Converter): Instant? {
-        return when (from) {
-            is Instant -> from
-            is CharSequence -> Instant.from(instantFormatter.parse(toString()))
-            is Date -> from.toInstant()
-            is LocalDateTime -> from.toInstant(ZonedDateTime.now().offset)
-            is ZonedDateTime -> from.toInstant()
-            is OffsetDateTime -> from.toInstant()
-            is LocalDate -> ZonedDateTime.of(from, LocalTime.MIN, ZoneId.systemDefault()).toInstant()
-            is LocalTime -> ZonedDateTime.of(LocalDate.MIN, from, ZoneId.systemDefault()).toInstant()
-            is Temporal -> Instant.from(from)
-            is Number -> when (val value = toLong()) {
-                0L -> Instant.MIN
-                else -> Instant.ofEpochMilli(value)
-            }
-            else -> null
-        }
-    }
-
-    private fun toLocalDateTime(from: Any, converter: Converter): LocalDateTime? {
-        return when (from) {
-            is LocalDateTime -> from
-            is CharSequence -> return LocalDateTime.from(localDateTimeFormatter.parse(toString()))
-            is Date -> from.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-            is Instant -> from.atZone(ZoneId.systemDefault()).toLocalDateTime()
-            is ZonedDateTime -> from.toLocalDateTime()
-            is OffsetDateTime -> from.toLocalDateTime()
-            is LocalDate -> LocalDateTime.of(from, LocalTime.MIN)
-            is LocalTime -> LocalDateTime.of(LocalDate.MIN, from)
-            is Temporal -> LocalDateTime.from(from)
-            is Number -> when (val value = toLong()) {
-                0L -> LocalDateTime.MIN
-                else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDateTime()
-            }
-            else -> null
-        }
-    }
-
-    private fun toZonedDateTime(from: Any, converter: Converter): ZonedDateTime? {
-        return when (from) {
-            is ZonedDateTime -> from
-            is CharSequence -> return ZonedDateTime.from(zonedDateTimeFormatter.parse(toString()))
-            is Date -> from.toInstant().atZone(ZoneId.systemDefault())
-            is Instant -> from.atZone(ZoneId.systemDefault())
-            is LocalDateTime -> ZonedDateTime.of(from, ZoneId.systemDefault())
-            is OffsetDateTime -> from.toZonedDateTime()
-            is LocalDate -> ZonedDateTime.of(from, LocalTime.MIN, ZoneId.systemDefault())
-            is LocalTime -> ZonedDateTime.of(LocalDate.MIN, from, ZoneId.systemDefault())
-            is Temporal -> ZonedDateTime.from(from)
-            is Number -> when (val value = toLong()) {
-                0L -> MIN_ZONED_DATE_TIME
-                else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault())
-            }
-            else -> null
-        }
-    }
-
-    private fun toOffsetDateTime(from: Any, converter: Converter): OffsetDateTime? {
-        return when (from) {
-            is OffsetDateTime -> from
-            is CharSequence -> return OffsetDateTime.from(offsetDateTimeFormatter.parse(toString()))
-            is Date -> from.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime()
-            is Instant -> from.atZone(ZoneId.systemDefault()).toOffsetDateTime()
-            is LocalDateTime -> ZonedDateTime.of(from, ZoneId.systemDefault()).toOffsetDateTime()
-            is ZonedDateTime -> from.toOffsetDateTime()
-            is LocalDate -> ZonedDateTime.of(from, LocalTime.MIN, ZoneId.systemDefault()).toOffsetDateTime()
-            is LocalTime -> ZonedDateTime.of(LocalDate.MIN, from, ZoneId.systemDefault()).toOffsetDateTime()
-            is Temporal -> OffsetDateTime.from(from)
-            is Number -> when (val value = toLong()) {
-                0L -> OffsetDateTime.MIN
-                else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toOffsetDateTime()
-            }
-            else -> null
-        }
-    }
-
-    private fun toLocalDate(from: Any, converter: Converter): LocalDate? {
-        return when (from) {
-            is LocalDate -> from
-            is CharSequence -> return LocalDate.from(localDateFormatter.parse(toString()))
-            is Date -> from.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-            is Instant -> from.atZone(ZoneId.systemDefault()).toLocalDate()
-            is LocalDateTime -> ZonedDateTime.of(from, ZoneId.systemDefault()).toLocalDate()
-            is ZonedDateTime -> from.toLocalDate()
-            is OffsetDateTime -> from.toLocalDate()
-            is LocalTime -> LocalDate.MIN
-            is Temporal -> LocalDate.from(from)
-            is Number -> when (val value = toLong()) {
-                0L -> LocalDate.MIN
-                else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDate()
-            }
-            else -> null
-        }
-    }
-
-    private fun toLocalTime(from: Any, converter: Converter): LocalTime? {
-        return when (from) {
-            is LocalTime -> from
-            is CharSequence -> return LocalTime.from(localTimeFormatter.parse(toString()))
-            is Date -> from.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
-            is Instant -> from.atZone(ZoneId.systemDefault()).toLocalTime()
-            is LocalDateTime -> ZonedDateTime.of(from, ZoneId.systemDefault()).toLocalTime()
-            is ZonedDateTime -> from.toLocalTime()
-            is OffsetDateTime -> from.toLocalTime()
-            is LocalDate -> LocalTime.MIN
-            is Temporal -> LocalTime.from(from)
-            is Number -> when (val value = toLong()) {
-                0L -> LocalTime.MIN
-                else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalTime()
-            }
-            else -> null
-        }
-    }
-
-    private fun toDuration(from: Any, converter: Converter): Duration? {
-        return when (from) {
-            is Duration -> from
-            is CharSequence -> Duration.parse(toString())
-            is Number -> when (val value = toLong()) {
-                0L -> Duration.ZERO
-                else -> Duration.ofMillis(value)
-            }
-            else -> null
-        }
     }
 
     companion object {
@@ -394,33 +255,44 @@ open class DateTimeConvertHandler(
     }
 }
 
-open class PrivateAndNumberConvertHandler:ConvertHandler{
+object NumberAndPrimitiveConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
-        if (from === null) {
-            return null
-        }
+    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
         return when (to) {
-            Date::class.java -> toDate(from, converter)
-            Instant::class.java -> toInstant(from, converter)
-            LocalDateTime::class.java -> toLocalDateTime(from, converter)
-            ZonedDateTime::class.java -> toZonedDateTime(from, converter)
-            OffsetDateTime::class.java -> toOffsetDateTime(from, converter)
-            LocalDate::class.java -> toLocalDate(from, converter)
-            LocalTime::class.java -> toLocalTime(from, converter)
-            Duration::class.java -> toDuration(from, converter)
+            Boolean::class.javaPrimitiveType, Boolean::class.java -> from.toBoolean()
+            Byte::class.javaPrimitiveType, Byte::class.java -> from.toByte()
+            Short::class.javaPrimitiveType, Short::class.java -> from.toShort()
+            Char::class.javaPrimitiveType, Char::class.java -> from.toChar()
+            Int::class.javaPrimitiveType, Int::class.java -> from.toInt()
+            Long::class.javaPrimitiveType, Long::class.java -> from.toLong()
+            Float::class.javaPrimitiveType, Float::class.java -> from.toFloat()
+            Double::class.javaPrimitiveType, Double::class.java -> from.toDouble()
+            BigInteger::class.java -> from.toBigInteger()
+            BigDecimal::class.java -> from.toBigDecimal()
             else -> null
         }
     }
 
-    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
-        if (from === null) {
-            return null
-        }
+    override fun convert(from: Any, to: Type, converter: Converter): Any? {
         return if (to is Class<*>) {
-            NopConvertHandler.convert(from, to, converter)
+            convert(from, to, converter)
         } else null
     }
+}
 
-    private fun to
+object BeanConvertHandler: ConvertHandler {
+
+    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
+        val result = to.toInstance<Any>()
+        from.copyProperties(result)
+        return result
+    }
+
+    override fun convert(from: Any, to: Type, converter: Converter): Any? {
+        return when (to) {
+            is Class<*>->return convert(from, to, converter)
+            is ParameterizedType->
+            else->null
+        }
+    }
 }
