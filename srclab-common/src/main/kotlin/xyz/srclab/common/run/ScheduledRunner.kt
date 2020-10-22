@@ -19,8 +19,8 @@ interface ScheduledRunner : Runner {
 
     companion object {
 
-        @JvmStatic
-        fun asyncRunner(): NewThreadScheduledRunner = NewThreadScheduledRunner
+        @JvmField
+        val NEW_THREAD_RUNNER: NewThreadScheduledRunner = NewThreadScheduledRunner
 
         @JvmStatic
         fun singleThreadRunner(): ScheduledExecutorServiceRunner {
@@ -53,7 +53,7 @@ interface ScheduledRunner : Runner {
 
         @JvmStatic
         fun <V> scheduleNewThread(task: () -> V, delay: Duration): ScheduledRunning<V> {
-            return asyncRunner().schedule(task, delay)
+            return NEW_THREAD_RUNNER.schedule(task, delay)
         }
 
         @JvmStatic
@@ -62,7 +62,7 @@ interface ScheduledRunner : Runner {
             initialDelay: Duration,
             period: Duration
         ): ScheduledRunning<V> {
-            return asyncRunner().scheduleAtFixedRate(task, initialDelay, period)
+            return NEW_THREAD_RUNNER.scheduleAtFixedRate(task, initialDelay, period)
         }
 
         @JvmStatic
@@ -71,7 +71,7 @@ interface ScheduledRunner : Runner {
             initialDelay: Duration,
             period: Duration
         ): ScheduledRunning<V> {
-            return asyncRunner().scheduleWithFixedDelay(task, initialDelay, period)
+            return NEW_THREAD_RUNNER.scheduleWithFixedDelay(task, initialDelay, period)
         }
     }
 }
