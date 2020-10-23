@@ -15,7 +15,7 @@ interface EventBus {
 
     @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
     fun <T : Any> emit(event: T) {
-        return emit(event::class.java, event)
+        return emit(event.javaClass, event)
     }
 
     @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
