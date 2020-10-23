@@ -4,15 +4,15 @@ import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.VirtualInvoker
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.base.virtualInvoker
+import xyz.srclab.common.collection.MapSchema
+import xyz.srclab.common.collection.resolveMapSchema
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.reflect.findField
-import xyz.srclab.common.reflect.genericTypeFor
 import java.beans.Introspector
 import java.beans.PropertyDescriptor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 /**
@@ -32,11 +32,61 @@ interface BeanDef {
         return properties[name]
     }
 
-    companion object {
+    interface CopyOptions {
 
-        private val permitAllPropertiesFilter: (name: String) -> Boolean = { _ -> true }
-        private val ignoreNullFilter: (name: String, value: Any?) -> Boolean = { _, value -> value !== null }
-        private val permitNullFilter: (name: String, value: Any?) -> Boolean = { _, _ -> true }
+        fun filterSourcePropertyName(name: Any?): Boolean
+
+        fun filterSourceProperty(name: Any?, value: Any?): Boolean
+
+        fun convertPropertyName(name: Any?, value: Any?, targetNameType: Type): Any?
+
+        fun convertPropertyValue(name: Any?, value: Any?, targetValueType: Type): Any?
+
+        companion object {
+
+            @JvmField
+            val DEFAULT = object : CopyOptions {
+
+                override fun filterSourcePropertyName(name: Any?): Boolean {
+                    return true
+                }
+
+                override fun filterSourceProperty(name: Any?, value: Any?): Boolean {
+                    return true
+                }
+
+                override fun convertPropertyName(name: Any?, value: Any?, targetNameType: Type): Any? {
+                    return name
+                }
+
+                override fun convertPropertyValue(name: Any?, value: Any?, targetValueType: Type): Any? {
+                    return value
+                }
+            }
+
+            @JvmField
+            val IGNORE_NULL = object : CopyOptions {
+
+                override fun filterSourcePropertyName(name: Any?): Boolean {
+                    return true
+                }
+
+                override fun filterSourceProperty(name: Any?, value: Any?): Boolean {
+                    return value !== null
+                }
+
+                override fun convertPropertyName(name: Any?, value: Any?, targetNameType: Type): Any? {
+                    return name
+                }
+
+                override fun convertPropertyValue(name: Any?, value: Any?, targetValueType: Type): Any? {
+                    return value
+                }
+            }
+        }
+    }
+
+    companion object {
 
         @JvmStatic
         fun resolve(type: Class<*>): BeanDef {
@@ -46,171 +96,166 @@ interface BeanDef {
         @JvmStatic
         fun toMap(bean: Any): Map<String, Any?> {
             val def = resolve(bean.javaClass)
-            val map = mutableMapOf<String, Any?>()
+            val result = mutableMapOf<String, Any?>()
             for (entry in def.properties) {
                 val property = entry.value
-                if (property.isReadable) {
-                    map[property.name] = property.getValue(bean)
+                if (!property.isReadable) {
+                    continue
                 }
+                result[property.name] = property.getValue(bean)
             }
-            return map.toMap()
+            return result.toMap()
+        }
+
+        @JvmStatic
+        fun <K, V> toMap(bean: Any, type: Type): Map<K, V> {
+            return toMap(bean, type.resolveMapSchema(), CopyOptions.DEFAULT)
         }
 
         @JvmStatic
         fun <K, V> toMap(bean: Any, typeRef: TypeRef<Map<K, V>>): Map<K, V> {
-            return toMap(bean).asAny()
+            return toMap(bean, typeRef.type.resolveMapSchema(), CopyOptions.DEFAULT)
         }
 
         @JvmStatic
-        fun <K, V> toMap(bean: Any, typeRef: TypeRef<Map<K, V>>, converter: Converter): Map<K, V> {
-            val type = typeRef.type
-            val parameterizedType = type.genericTypeFor(Map::class.java)
-            if (parameterizedType !is ParameterizedType) {
-                throw IllegalArgumentException("typeRef must be a parameterized type of Map: $typeRef")
-            }
-            val keyType = parameterizedType.actualTypeArguments[0]
-            val valueType = parameterizedType.actualTypeArguments[1]
+        fun <K, V> toMap(bean: Any, mapSchema: MapSchema, copyOptions: CopyOptions): Map<K, V> {
             val def = resolve(bean.javaClass)
-            val map = mutableMapOf<K, V>()
+            val result = mutableMapOf<K, V>()
             for (entry in def.properties) {
                 val property = entry.value
-                if (property.isReadable) {
-                    val beanValue = property.getValue<Any?>(bean)
-                    val key = converter.convert<K>(property.name, keyType)
-                    val value = converter.convert<V>(beanValue, valueType)
-                    map[key] = value
+                if (!property.isReadable) {
+                    continue
                 }
+                val name = property.name
+                if (!copyOptions.filterSourcePropertyName(name)) {
+                    continue
+                }
+                val value = property.getValue<Any?>(bean)
+                if (!copyOptions.filterSourceProperty(name, value)) {
+                    continue
+                }
+                val mapKey = copyOptions.convertPropertyName(name, value, mapSchema.keyType).asAny<K>()
+                val mapValue = copyOptions.convertPropertyValue(name, value, mapSchema.valueType).asAny<V>()
+                result[mapKey] = mapValue
             }
-            return map.toMap()
+            return result.toMap()
         }
 
         @JvmStatic
         @JvmOverloads
         fun copyProperties(from: Any, to: Any, ignoreNull: Boolean = false) {
-            if (ignoreNull) {
-                copyProperties0(from, to, permitAllPropertiesFilter, permitNullFilter, null)
+            return if (ignoreNull) {
+                copyProperties(from, to, CopyOptions.IGNORE_NULL)
             } else {
-                copyProperties0(from, to, permitAllPropertiesFilter, ignoreNullFilter, null)
+                copyProperties(from, to, CopyOptions.DEFAULT)
             }
         }
 
         @JvmStatic
         @JvmOverloads
-        fun copyProperties(from: Any, to: Any, ignoreNull: Boolean = false, converter: Converter) {
-            if (ignoreNull) {
-                copyProperties0(from, to, permitAllPropertiesFilter, permitNullFilter, converter)
+        fun copyProperties(from: Any, to: MutableMap<String, Any?>, ignoreNull: Boolean = false) {
+            return if (ignoreNull) {
+                copyProperties(from, to, MapSchema.BEAN_PATTERN, CopyOptions.IGNORE_NULL)
             } else {
-                copyProperties0(from, to, permitAllPropertiesFilter, ignoreNullFilter, converter)
+                copyProperties(from, to, MapSchema.BEAN_PATTERN, CopyOptions.DEFAULT)
             }
         }
 
         @JvmStatic
-        fun copyProperties(from: Any, to: Any, propertyNameFilter: (name: String) -> Boolean) {
-            copyProperties0(from, to, propertyNameFilter, permitNullFilter, null)
-        }
-
-        @JvmStatic
-        fun copyProperties(from: Any, to: Any, converter: Converter, propertyNameFilter: (name: String) -> Boolean) {
-            copyProperties0(from, to, propertyNameFilter, permitNullFilter, converter)
-        }
-
-        @JvmStatic
-        fun copyProperties(
-            from: Any,
-            to: Any,
-            propertyNameFilter: (name: String) -> Boolean,
-            propertyValueFilter: (name: String, value: Any?) -> Boolean,
-        ) {
-            copyProperties0(from, to, propertyNameFilter, propertyValueFilter, null)
-        }
-
-        @JvmStatic
-        fun copyProperties(
-            from: Any,
-            to: Any,
-            propertyNameFilter: (name: String) -> Boolean,
-            propertyValueFilter: (name: String, value: Any?) -> Boolean,
-            converter: Converter,
-        ) {
-            copyProperties0(from, to, propertyNameFilter, propertyValueFilter, converter)
-        }
-
-        private fun copyProperties0(
-            from: Any,
-            to: Any,
-            propertyNameFilter: (name: String) -> Boolean,
-            propertyValueFilter: (name: String, value: Any?) -> Boolean,
-            converter: Converter?,
-        ) {
-            when {
-                from is Map<*, *> && to is MutableMap<*, *> -> {
-                    val fromDef = from.asAny<Map<Any?, Any?>>()
-                    val toDef = to.asAny<MutableMap<Any?, Any?>>()
-                    for (propertyEntry in fromDef) {
-                        val name = propertyEntry.key.toString()
-                        val value = propertyEntry.value
-                        if (!propertyNameFilter(name) || !propertyValueFilter(name, value) || !toDef.contains(name)) {
-                            continue
-                        }
-                        toDef[name] = value
-                    }
-                }
-                from is Map<*, *> && to !is MutableMap<*, *> -> {
+        fun copyProperties(from: Any, to: Any, copyOptions: CopyOptions) {
+            when (from) {
+                is Map<*, *> -> {
                     val fromDef = from.asAny<Map<Any?, Any?>>()
                     val toDef = resolve(to.javaClass)
                     for (propertyEntry in fromDef) {
                         val name = propertyEntry.key.toString()
                         val value = propertyEntry.value
-                        if (!propertyNameFilter(name) || !propertyValueFilter(name, value)) {
+                        if (!copyOptions.filterSourcePropertyName(name)
+                            || !copyOptions.filterSourceProperty(name, value)
+                        ) {
                             continue
                         }
                         val toProperty = toDef.getProperty(name)
-                        if (toProperty !== null && toProperty.isWriteable) {
-                            if (converter === null) {
-                                toProperty.setValue(to, value)
-                            } else {
-                                toProperty.setValue(to, value, converter)
-                            }
+                        if (toProperty === null || !toProperty.isWriteable) {
+                            continue
                         }
+                        toProperty.setValue(
+                            to,
+                            copyOptions.convertPropertyValue(name, value, toProperty.genericType)
+                        )
                     }
                 }
-                from !is Map<*, *> && to is MutableMap<*, *> -> {
+                !is Map<*, *> -> {
                     val fromDef = resolve(from.javaClass)
-                    val toDef = to.asAny<MutableMap<Any?, Any?>>()
+                    val toDef = resolve(to.javaClass)
                     for (propertyEntry in fromDef.properties) {
                         val fromProperty = propertyEntry.value
+                        if (!fromProperty.isReadable) {
+                            continue
+                        }
                         val name = fromProperty.name
-                        if (!propertyNameFilter(name) || !fromProperty.isReadable) {
+                        if (!copyOptions.filterSourcePropertyName(name)) {
+                            continue
+                        }
+                        val toProperty = toDef.getProperty(name)
+                        if (toProperty === null || !toProperty.isWriteable) {
                             continue
                         }
                         val value = fromProperty.getValue<Any?>(from)
-                        if (!propertyValueFilter(name, value) || !toDef.contains(name)) {
+                        if (!copyOptions.filterSourceProperty(name, value)) {
                             continue
                         }
-                        toDef[name] = value
+                        toProperty.setValue(
+                            to,
+                            copyOptions.convertPropertyValue(name, value, toProperty.genericType)
+                        )
                     }
                 }
-                from !is Map<*, *> && to !is MutableMap<*, *> -> {
-                    val fromDef = resolve(from.javaClass)
-                    val toDef = resolve(to.javaClass)
-                    for (propertyEntry in fromDef.properties) {
-                        val fromProperty = propertyEntry.value
-                        val name = fromProperty.name
-                        if (!propertyNameFilter(name) || !fromProperty.isReadable) {
+            }
+        }
+
+        @JvmStatic
+        fun <K, V> copyProperties(from: Any, to: MutableMap<K, V>, toSchema: MapSchema, copyOptions: CopyOptions) {
+            when (from) {
+                is Map<*, *> -> {
+                    val fromDef = from.asAny<Map<Any?, Any?>>()
+                    for (propertyEntry in fromDef) {
+                        val name = propertyEntry.key.toString()
+                        val value = propertyEntry.value
+                        if (!copyOptions.filterSourcePropertyName(name)
+                            || !copyOptions.filterSourceProperty(name, value)
+                        ) {
                             continue
                         }
-                        val toProperty = toDef.getProperty(name)
-                        if (toProperty !== null && toProperty.isWriteable) {
-                            val value = fromProperty.getValue<Any?>(from)
-                            if (!propertyValueFilter(name, value)) {
-                                continue
-                            }
-                            if (converter === null) {
-                                toProperty.setValue(to, value)
-                            } else {
-                                toProperty.setValue(to, value, converter)
-                            }
+                        val mapKey = copyOptions.convertPropertyName(name, value, toSchema.keyType).asAny<K>()
+                        if (!to.containsKey(mapKey)) {
+                            continue
                         }
+                        val mapValue = copyOptions.convertPropertyValue(name, value, toSchema.valueType).asAny<V>()
+                        to[mapKey] = mapValue
+                    }
+                }
+                !is Map<*, *> -> {
+                    val fromDef = resolve(from.javaClass)
+                    for (propertyEntry in fromDef.properties) {
+                        val fromProperty = propertyEntry.value
+                        if (!fromProperty.isReadable) {
+                            continue
+                        }
+                        val name = fromProperty.name
+                        if (!copyOptions.filterSourcePropertyName(name)) {
+                            continue
+                        }
+                        val value = fromProperty.getValue<Any?>(from)
+                        if (!copyOptions.filterSourceProperty(name, value)) {
+                            continue
+                        }
+                        val mapKey = copyOptions.convertPropertyName(name, value, toSchema.keyType).asAny<K>()
+                        if (!to.containsKey(mapKey)) {
+                            continue
+                        }
+                        val mapValue = copyOptions.convertPropertyValue(name, value, toSchema.valueType).asAny<V>()
+                        to[mapKey] = mapValue
                     }
                 }
             }
@@ -226,45 +271,32 @@ fun Any.beanToMap(): Map<String, Any?> {
     return BeanDef.toMap(this)
 }
 
+fun <K, V> Any.beanToMap(type: Type): Map<K, V> {
+    return BeanDef.toMap(this, type)
+}
+
 fun <K, V> Any.beanToMap(typeRef: TypeRef<Map<K, V>>): Map<K, V> {
     return BeanDef.toMap(this, typeRef)
 }
 
-fun <K, V> Any.beanToMap(typeRef: TypeRef<Map<K, V>>, converter: Converter): Map<K, V> {
-    return BeanDef.toMap(this, typeRef, converter)
+fun <K, V> Any.beanToMap(mapSchema: MapSchema, copyOptions: BeanDef.CopyOptions): Map<K, V> {
+    return BeanDef.toMap(this, mapSchema, copyOptions)
 }
 
 fun Any.copyProperties(to: Any, ignoreNull: Boolean = false) {
     BeanDef.copyProperties(this, to, ignoreNull)
 }
 
-fun Any.copyProperties(to: Any, ignoreNull: Boolean = false, converter: Converter) {
-    BeanDef.copyProperties(this, to, ignoreNull, converter)
+fun Any.copyProperties(to: MutableMap<String, Any?>, ignoreNull: Boolean = false) {
+    BeanDef.copyProperties(this, to, ignoreNull)
 }
 
-fun Any.copyProperties(to: Any, propertyNameFilter: (name: String) -> Boolean) {
-    BeanDef.copyProperties(this, to, propertyNameFilter)
+fun Any.copyProperties(to: Any, copyOptions: BeanDef.CopyOptions) {
+    BeanDef.copyProperties(this, to, copyOptions)
 }
 
-fun Any.copyProperties(to: Any, converter: Converter, propertyNameFilter: (name: String) -> Boolean) {
-    BeanDef.copyProperties(this, to, converter, propertyNameFilter)
-}
-
-fun Any.copyProperties(
-    to: Any,
-    propertyNameFilter: (name: String) -> Boolean,
-    propertyValueFilter: (name: String, value: Any?) -> Boolean,
-) {
-    BeanDef.copyProperties(this, to, propertyNameFilter, propertyValueFilter)
-}
-
-fun Any.copyProperties(
-    to: Any,
-    propertyNameFilter: (name: String) -> Boolean,
-    propertyValueFilter: (name: String, value: Any?) -> Boolean,
-    converter: Converter,
-) {
-    BeanDef.copyProperties(this, to, propertyNameFilter, propertyValueFilter, converter)
+fun <K, V> Any.copyProperties(to: MutableMap<K, V>, toSchema: MapSchema, copyOptions: BeanDef.CopyOptions) {
+    BeanDef.copyProperties(this, to, copyOptions)
 }
 
 interface PropertyDef {

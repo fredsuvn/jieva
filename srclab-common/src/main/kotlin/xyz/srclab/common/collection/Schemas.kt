@@ -12,6 +12,9 @@ interface IterableSchema {
 
     companion object {
 
+        @JvmField
+        val RAW = of(Any::class.java)
+
         @JvmStatic
         fun of(componentType: Type): IterableSchema {
             return IterableSchemaImpl(componentType)
@@ -20,7 +23,7 @@ interface IterableSchema {
         @JvmStatic
         fun resolve(type: Type): IterableSchema {
             if (type is Class<*>) {
-                return IterableSchemaImpl.RAW_SCHEMA
+                return RAW
             }
             if (type is ParameterizedType) {
                 val actualTypeArguments = type.actualTypeArguments
@@ -61,11 +64,6 @@ private class IterableSchemaImpl(override val componentType: Type) : IterableSch
     override fun toString(): String {
         return "IterableSchemaImpl(componentType=$componentType)"
     }
-
-    companion object {
-
-        val RAW_SCHEMA = IterableSchemaImpl(Any::class.java)
-    }
 }
 
 interface MapSchema {
@@ -80,6 +78,12 @@ interface MapSchema {
 
     companion object {
 
+        @JvmField
+        val RAW = of(Any::class.java, Any::class.java)
+
+        @JvmField
+        val BEAN_PATTERN = of(String::class.java, Any::class.java)
+
         @JvmStatic
         fun of(keyType: Type, valueType: Type): MapSchema {
             return MapSchemaImpl(keyType, valueType)
@@ -88,7 +92,7 @@ interface MapSchema {
         @JvmStatic
         fun resolve(type: Type): MapSchema {
             if (type is Class<*>) {
-                return MapSchemaImpl.RAW_SCHEMA
+                return RAW
             }
             if (type is ParameterizedType) {
                 val actualTypeArguments = type.actualTypeArguments
@@ -131,10 +135,5 @@ private class MapSchemaImpl(override val keyType: Type, override val valueType: 
 
     override fun toString(): String {
         return "MapSchemaImpl(keyType=$keyType, valueType=$valueType)"
-    }
-
-    companion object {
-
-        val RAW_SCHEMA = MapSchemaImpl(Any::class.java, Any::class.java)
     }
 }
