@@ -4,6 +4,70 @@ import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
+interface IterableSchema {
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val componentType: Type
+        @JvmName("componentType") get
+
+    companion object {
+
+        @JvmStatic
+        fun of(componentType: Type): IterableSchema {
+            return IterableSchemaImpl(componentType)
+        }
+
+        @JvmStatic
+        fun resolve(type: Type): IterableSchema {
+            if (type is Class<*>) {
+                return IterableSchemaImpl.RAW_SCHEMA
+            }
+            if (type is ParameterizedType) {
+                val actualTypeArguments = type.actualTypeArguments
+                if (actualTypeArguments.size == 1) {
+                    return of(actualTypeArguments[0])
+                }
+            }
+            throw IllegalArgumentException("$type is not a type of Iterable.")
+        }
+    }
+}
+
+fun iterableSchema(componentType: Type): IterableSchema {
+    return IterableSchema.of(componentType)
+}
+
+fun Type.resolveIterableSchema(): IterableSchema {
+    return IterableSchema.resolve(this)
+}
+
+private class IterableSchemaImpl(override val componentType: Type) : IterableSchema {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as IterableSchemaImpl
+
+        if (componentType != other.componentType) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return componentType.hashCode()
+    }
+
+    override fun toString(): String {
+        return "IterableSchemaImpl(componentType=$componentType)"
+    }
+
+    companion object {
+
+        val RAW_SCHEMA = IterableSchemaImpl(Any::class.java)
+    }
+}
+
 interface MapSchema {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -26,8 +90,11 @@ interface MapSchema {
             if (type is Class<*>) {
                 return MapSchemaImpl.RAW_SCHEMA
             }
-            if (type is ParameterizedType && type.actualTypeArguments.size == 2) {
-                return of(type.actualTypeArguments[0], type.actualTypeArguments[1])
+            if (type is ParameterizedType) {
+                val actualTypeArguments = type.actualTypeArguments
+                if (actualTypeArguments.size == 2) {
+                    return of(actualTypeArguments[0], actualTypeArguments[1])
+                }
             }
             throw IllegalArgumentException("$type is not a type of Map.")
         }
@@ -63,7 +130,7 @@ private class MapSchemaImpl(override val keyType: Type, override val valueType: 
     }
 
     override fun toString(): String {
-        return "MapSchema(keyType=$keyType, valueType=$valueType)"
+        return "MapSchemaImpl(keyType=$keyType, valueType=$valueType)"
     }
 
     companion object {
