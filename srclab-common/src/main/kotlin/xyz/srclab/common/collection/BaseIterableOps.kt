@@ -642,6 +642,10 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().toHashSet()
     }
 
+    open fun toTreeSet(): TreeSet<T> {
+        return finalIterable().toTreeSet()
+    }
+
     open fun toLinkedHashSet(): LinkedHashSet<T> {
         return finalIterable().toLinkedHashSet()
     }
@@ -689,6 +693,10 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
     open fun asToLinkedHashSet(): LinkedHashSet<T> {
         return finalIterable().asToLinkedHashSet()
+    }
+
+    open fun asToTreeSet(): TreeSet<T> {
+        return finalIterable().asToTreeSet()
     }
 
     open fun asToSortedSet(): SortedSet<T> {
@@ -1677,6 +1685,11 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
+        fun <T> Iterable<T>.toTreeSet(): TreeSet<T> {
+            return this.takeAllTo(TreeSet())
+        }
+
+        @JvmStatic
         @JvmOverloads
         fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
             return this.toSortedSetKt(comparator)
@@ -1730,6 +1743,11 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> Iterable<T>.asToLinkedHashSet(): LinkedHashSet<T> {
             return if (this is LinkedHashSet<T>) this else this.toLinkedHashSet()
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.asToTreeSet(): TreeSet<T> {
+            return if (this is TreeSet<T>) this else this.toTreeSet()
         }
 
         @JvmStatic

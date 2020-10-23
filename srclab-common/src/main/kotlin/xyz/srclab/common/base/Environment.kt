@@ -233,10 +233,6 @@ interface Environment {
     }
 }
 
-fun defaultEnvironment(): Environment {
-    return Environment.defaultEnvironment()
-}
-
 object DefaultEnvironment : Environment {
 
     @Suppress(INAPPLICABLE_JVM_NAME)

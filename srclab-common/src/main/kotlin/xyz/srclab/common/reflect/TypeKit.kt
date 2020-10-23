@@ -4,61 +4,23 @@
 package xyz.srclab.common.reflect
 
 import xyz.srclab.annotation.PossibleTypes
+import xyz.srclab.common.base.asAny
 import java.lang.reflect.*
 
-val Type.rawClass: Class<*>
+val ParameterizedType.rawClass: Class<*>
     get() {
-
+        return this.rawType.asAny()
     }
 
-val Type.upperBoundClass: Class<*>
-    get() {
-        if (this is Class<*>) {
-            return this
-        }
-        if (this is ParameterizedType) {
-            return this.rawType.upperBoundClass
-        }
-        if (this is TypeVariable<*>) {
-            val bounds = this.bounds
-            if (!bounds.isNullOrEmpty()) {
-                return bounds[0].upperBoundClass
-            }
-        }
-        if (this is WildcardType) {
-            val upperBounds = this.upperBounds
-            if (!upperBounds.isNullOrEmpty()) {
-                return upperBounds[0].upperBoundClass
-            }
-        }
-        return Any::class.java
-    }
-
-val Type.lowerBoundClass: Class<*>
-    get() {
-        if (this is Class<*>) {
-            return this
-        }
-        if (this is ParameterizedType) {
-            return this.rawType.lowerBoundClass
-        }
-        if (this is WildcardType) {
-            val lowerBounds = this.lowerBounds
-            if (!lowerBounds.isNullOrEmpty()) {
-                return lowerBounds[0].lowerBoundClass
-            }
-        }
-        return Nothing::class.java
-    }
-
-@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
-val Type.upperBound: Type
+val Type.upperClass: Class<*>
     get() {
         return when (this) {
+            is Class<*> -> this
+            is ParameterizedType -> this.rawClass
             is TypeVariable<*> -> {
                 val bounds = this.bounds
                 return if (!bounds.isNullOrEmpty()) {
-                    bounds[0].upperBound
+                    bounds[0].upperClass
                 } else {
                     Any::class.java
                 }
@@ -66,11 +28,80 @@ val Type.upperBound: Type
             is WildcardType -> {
                 val upperBounds = this.upperBounds
                 return if (!upperBounds.isNullOrEmpty()) {
-                    upperBounds[0].upperBound
+                    upperBounds[0].upperClass
                 } else {
                     Any::class.java
                 }
             }
+            else -> Any::class.java
+        }
+    }
+
+val Type.lowerClass: Class<*>
+    get() {
+        return when (this) {
+            is Class<*> -> this
+            is ParameterizedType -> this.rawClass
+            is WildcardType -> {
+                val lowerBounds = this.lowerBounds
+                return if (!lowerBounds.isNullOrEmpty()) {
+                    lowerBounds[0].lowerClass
+                } else {
+                    Nothing::class.java
+                }
+            }
+            else -> Nothing::class.java
+        }
+    }
+
+@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+val TypeVariable<*>.upperBound: Type
+    get() {
+        val bounds = this.bounds
+        return if (!bounds.isNullOrEmpty()) {
+            bounds[0].upperBound
+        } else {
+            Any::class.java
+        }
+    }
+
+@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+val WildcardType.upperBound: Type
+    get() {
+        val upperBounds = this.upperBounds
+        return if (!upperBounds.isNullOrEmpty()) {
+            upperBounds[0].upperBound
+        } else {
+            Any::class.java
+        }
+    }
+
+@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+val Type.upperBound: Type
+    get() {
+        return when (this) {
+            is TypeVariable<*> -> this.upperBound
+            is WildcardType -> this.upperBound
+            else -> this
+        }
+    }
+
+@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+val WildcardType.lowerBound: Type
+    get() {
+        val lowerBounds = this.lowerBounds
+        return if (!lowerBounds.isNullOrEmpty()) {
+            lowerBounds[0].lowerBound
+        } else {
+            Nothing::class.java
+        }
+    }
+
+@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+val Type.lowerBound: Type
+    get() {
+        return when (this) {
+            is WildcardType -> this.lowerBound
             else -> this
         }
     }
@@ -111,7 +142,7 @@ private object GenericTypeFinder {
     @PossibleTypes(Class::class, ParameterizedType::class)
     fun findSuperclass(type: Type, target: Class<*>): Type {
 
-        var rawClass = type.upperBoundClass
+        var rawClass = type.upperClass
         if (rawClass == target) {
             return type
         }
@@ -122,7 +153,7 @@ private object GenericTypeFinder {
 
         var genericType: Type? = rawClass.genericSuperclass
         while (genericType !== null) {
-            rawClass = genericType.upperBoundClass
+            rawClass = genericType.upperClass
             if (rawClass == target) {
                 return genericType
             }
@@ -134,7 +165,7 @@ private object GenericTypeFinder {
     @PossibleTypes(Class::class, ParameterizedType::class)
     fun findInterface(type: Type, target: Class<*>): Type {
 
-        val rawClass = type.upperBoundClass
+        val rawClass = type.upperClass
         if (rawClass == target) {
             return type
         }
@@ -148,12 +179,12 @@ private object GenericTypeFinder {
         fun findInterface(genericTypes: Array<out Type>, target: Class<*>): Type? {
             //Search level first
             for (genericType in genericTypes) {
-                if (genericType.upperBoundClass == target) {
+                if (genericType.upperClass == target) {
                     return genericType
                 }
             }
             for (genericType in genericTypes) {
-                val result = findInterface(genericType.upperBoundClass.genericInterfaces, target)
+                val result = findInterface(genericType.upperClass.genericInterfaces, target)
                 if (result !== null) {
                     return result
                 }
@@ -179,7 +210,6 @@ private object ActualTypeFinder {
                 "Cannot find type variable: type = $type, declaredClass: $declaredClass, target = $target"
             )
         }
-        TypeVariable
         val actualArguments =
             when (val genericTargetType = target.genericTypeFor(declaredClass)) {
                 is Class<*> -> genericTargetType.typeParameters

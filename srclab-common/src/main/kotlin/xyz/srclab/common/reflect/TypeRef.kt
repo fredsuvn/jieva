@@ -1,6 +1,5 @@
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.aboutBoat
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -21,7 +20,7 @@ abstract class TypeRef<T> {
         val generic = this.javaClass.genericSuperClassFor(TypeRef::class.java)
         if (generic !is ParameterizedType) {
             throw IllegalStateException(
-                "Reflect to generic superclass failed, it seems a bug, please report to ${aboutBoat().report}"
+                "Reflect to generic superclass of TypeRef failed."
             )
         }
         return generic.actualTypeArguments[0]

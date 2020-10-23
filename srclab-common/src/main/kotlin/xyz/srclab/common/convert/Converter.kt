@@ -1,7 +1,8 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
-import xyz.srclab.common.bean.copyProperties
+import xyz.srclab.common.bean.propertiesToBean
+import xyz.srclab.common.bean.propertiesToMap
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.reflect.toInstance
 import java.lang.reflect.ParameterizedType
@@ -12,6 +13,9 @@ import java.text.DateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashMap
 
 interface Converter {
 
@@ -105,6 +109,16 @@ interface Converter {
     }
 
     @Throws(UnsupportedOperationException::class)
+    fun toLocalDate(any: Any?): LocalDate {
+        return convert(any, LocalDate::class.java)
+    }
+
+    @Throws(UnsupportedOperationException::class)
+    fun toLocalTime(any: Any?): LocalTime {
+        return convert(any, LocalTime::class.java)
+    }
+
+    @Throws(UnsupportedOperationException::class)
     fun toDuration(any: Any?): Duration {
         return convert(any, Duration::class.java)
     }
@@ -146,7 +160,7 @@ interface Converter {
     companion object {
 
         @JvmStatic
-        fun defaultConverter(): Converter? {
+        fun defaultConverter(): Converter {
             return ConvertSupport.defaultConverter()
         }
 
@@ -154,20 +168,53 @@ interface Converter {
         fun newBuilder(): Builder {
             return Builder()
         }
+
+        @JvmStatic
+        @Throws(UnsupportedOperationException::class)
+        fun <T> convertTo(from: Any?, to: Class<T>): T {
+            return defaultConverter().convert(from, to)
+        }
+
+        @JvmStatic
+        @Throws(UnsupportedOperationException::class)
+        fun <T> convertTo(from: Any?, to: Type): T {
+            return defaultConverter().convert(from, to)
+        }
+
+        @JvmStatic
+        @Throws(UnsupportedOperationException::class)
+        fun <T> convertTo(from: Any?, to: TypeRef<T>): T {
+            return defaultConverter().convert(from, to)
+        }
     }
+}
+
+@Throws(UnsupportedOperationException::class)
+fun <T> Any?.convertTo(to: Class<T>): T {
+    return Converter.convertTo(this, to)
+}
+
+@Throws(UnsupportedOperationException::class)
+fun <T> Any?.convertTo(to: Type): T {
+    return Converter.convertTo(this, to)
+}
+
+@Throws(UnsupportedOperationException::class)
+fun <T> Any?.convertTo(to: TypeRef<T>): T {
+    return Converter.convertTo(this, to)
 }
 
 interface ConvertHandler {
 
     /**
-     * Return [NULL_VALUE] if final value is null.
+     * Return null if [from] cannot be converted, return [NULL_VALUE] if result value is null.
      */
-    fun convert(from: Any, to: Class<*>, converter: Converter): Any?
+    fun convert(from: Any?, to: Class<*>, converter: Converter): Any?
 
     /**
-     * Return [NULL_VALUE] if final value is null.
+     * Return null if [from] cannot be converted, return [NULL_VALUE] if result value is null.
      */
-    fun convert(from: Any, to: Type, converter: Converter): Any?
+    fun convert(from: Any?, to: Type, converter: Converter): Any?
 
     companion object {
 
@@ -179,13 +226,15 @@ interface ConvertHandler {
 
 object NopConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
-        return if (to.isAssignableFrom(from.javaClass)) {
-            from
-        } else null
+    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
+        return when {
+            from === null -> null
+            to.isAssignableFrom(from.javaClass) -> from
+            else -> null
+        }
     }
 
-    override fun convert(from: Any, to: Type, converter: Converter): Any? {
+    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
         return if (to is Class<*>) {
             convert(from, to, converter)
         } else null
@@ -194,14 +243,16 @@ object NopConvertHandler : ConvertHandler {
 
 object CharsConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
+    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
         return when (to) {
             String::class.java, CharSequence::class.java -> from.toString()
+            StringBuilder::class.java -> StringBuilder(from.toString())
+            StringBuffer::class.java -> StringBuffer(from.toString())
             else -> null
         }
     }
 
-    override fun convert(from: Any, to: Type, converter: Converter): Any? {
+    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
         return if (to is Class<*>) {
             convert(from, to, converter)
         } else null
@@ -228,7 +279,7 @@ open class DateTimeConvertHandler(
         DateTimeFormatter.ISO_LOCAL_TIME
     )
 
-    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
+    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
         return when (to) {
             Date::class.java -> from.toDate(dateFormat)
             Instant::class.java -> from.toInstant(instantFormatter)
@@ -242,7 +293,7 @@ open class DateTimeConvertHandler(
         }
     }
 
-    override fun convert(from: Any, to: Type, converter: Converter): Any? {
+    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
         return if (to is Class<*>) {
             convert(from, to, converter)
         } else null
@@ -257,7 +308,7 @@ open class DateTimeConvertHandler(
 
 object NumberAndPrimitiveConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
+    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
         return when (to) {
             Boolean::class.javaPrimitiveType, Boolean::class.java -> from.toBoolean()
             Byte::class.javaPrimitiveType, Byte::class.java -> from.toByte()
@@ -273,26 +324,33 @@ object NumberAndPrimitiveConvertHandler : ConvertHandler {
         }
     }
 
-    override fun convert(from: Any, to: Type, converter: Converter): Any? {
+    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
         return if (to is Class<*>) {
             convert(from, to, converter)
         } else null
     }
 }
 
-object BeanConvertHandler: ConvertHandler {
+object BeanConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any, to: Class<*>, converter: Converter): Any? {
-        val result = to.toInstance<Any>()
-        from.copyProperties(result)
-        return result
+    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
+        if (from === null) {
+            return null
+        }
+        return when (to) {
+            is HashMap<*, *> -> return from.propertiesToMap(HashMap())
+            is LinkedHashMap<*, *> -> return from.propertiesToMap(LinkedHashMap())
+            is TreeMap<*, *> -> return from.propertiesToMap(TreeMap())
+            is ConcurrentHashMap<*, *> -> return from.propertiesToMap(ConcurrentHashMap())
+            else -> from.propertiesToBean(to.toInstance<Any>())
+        }
     }
 
-    override fun convert(from: Any, to: Type, converter: Converter): Any? {
+    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
         return when (to) {
-            is Class<*>->return convert(from, to, converter)
-            is ParameterizedType->
-            else->null
+            is Class<*> -> return convert(from, to, converter)
+            is ParameterizedType ->
+            else -> null
         }
     }
 }

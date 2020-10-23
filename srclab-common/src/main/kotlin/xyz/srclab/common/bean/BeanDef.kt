@@ -7,6 +7,7 @@ import xyz.srclab.common.base.virtualInvoker
 import xyz.srclab.common.collection.MapSchema
 import xyz.srclab.common.collection.resolveMapSchema
 import xyz.srclab.common.convert.Converter
+import xyz.srclab.common.convert.convertTo
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.reflect.findField
 import java.beans.Introspector
@@ -42,9 +43,13 @@ interface BeanDef {
 
         fun filterProperty(name: Any?, value: Any?, targetKeyType: Type, targetValueType: Type): Boolean = true
 
-        fun convertName(name: Any?, value: Any?, targetKeyType: Type): Any? = name
+        fun convertName(name: Any?, value: Any?, targetKeyType: Type): Any? {
+            return name.convertTo(targetKeyType)
+        }
 
-        fun convertValue(name: Any?, value: Any?, targetValueType: Type): Any? = value
+        fun convertValue(name: Any?, value: Any?, targetValueType: Type): Any? {
+            return value.convertTo(targetValueType)
+        }
 
         companion object {
 
@@ -119,26 +124,16 @@ interface BeanDef {
 
         @JvmStatic
         @JvmOverloads
-        fun <T : Any> copyProperties(from: Any, to: T, ignoreNull: Boolean = false): T {
+        fun <T : Any> propertiesToBean(from: Any, to: T, ignoreNull: Boolean = false): T {
             return if (ignoreNull) {
-                copyProperties(from, to, CopyOptions.IGNORE_NULL)
+                propertiesToBean(from, to, CopyOptions.IGNORE_NULL)
             } else {
-                copyProperties(from, to, CopyOptions.DEFAULT)
+                propertiesToBean(from, to, CopyOptions.DEFAULT)
             }
         }
 
         @JvmStatic
-        @JvmOverloads
-        fun <M : MutableMap<String, Any?>> copyProperties(from: Any, to: M, ignoreNull: Boolean = false): M {
-            return if (ignoreNull) {
-                copyProperties(from, to, MapSchema.BEAN_PATTERN, CopyOptions.IGNORE_NULL)
-            } else {
-                copyProperties(from, to, MapSchema.BEAN_PATTERN, CopyOptions.DEFAULT)
-            }
-        }
-
-        @JvmStatic
-        fun <T : Any> copyProperties(from: Any, to: T, copyOptions: CopyOptions): T {
+        fun <T : Any> propertiesToBean(from: Any, to: T, copyOptions: CopyOptions): T {
             when (from) {
                 is Map<*, *> -> {
                     val fromDef = from.asAny<Map<Any?, Any?>>()
@@ -194,7 +189,17 @@ interface BeanDef {
         }
 
         @JvmStatic
-        fun <K, V, M : MutableMap<K, V>> copyProperties(
+        @JvmOverloads
+        fun <M : MutableMap<String, Any?>> propertiesToMap(from: Any, to: M, ignoreNull: Boolean = false): M {
+            return if (ignoreNull) {
+                propertiesToMap(from, to, MapSchema.BEAN_PATTERN, CopyOptions.IGNORE_NULL)
+            } else {
+                propertiesToMap(from, to, MapSchema.BEAN_PATTERN, CopyOptions.DEFAULT)
+            }
+        }
+
+        @JvmStatic
+        fun <K, V, M : MutableMap<K, V>> propertiesToMap(
             from: Any,
             to: M,
             toSchema: MapSchema,
@@ -271,20 +276,20 @@ fun <K, V> Any.beanToMap(mapSchema: MapSchema, copyOptions: BeanDef.CopyOptions)
     return BeanDef.toMap(this, mapSchema, copyOptions)
 }
 
-fun <T : Any> Any.copyProperties(to: T, ignoreNull: Boolean = false): T {
-    return BeanDef.copyProperties(this, to, ignoreNull)
+fun <T : Any> Any.propertiesToBean(to: T, ignoreNull: Boolean = false): T {
+    return BeanDef.propertiesToBean(this, to, ignoreNull)
 }
 
-fun <M : MutableMap<String, Any?>> Any.copyProperties(to: M, ignoreNull: Boolean = false): M {
-    return BeanDef.copyProperties(this, to, ignoreNull)
+fun <T : Any> Any.propertiesToBean(to: T, copyOptions: BeanDef.CopyOptions): T {
+    return BeanDef.propertiesToBean(this, to, copyOptions)
 }
 
-fun <T : Any> Any.copyProperties(to: T, copyOptions: BeanDef.CopyOptions): T {
-    return BeanDef.copyProperties(this, to, copyOptions)
+fun <M : MutableMap<String, Any?>> Any.propertiesToMap(to: M, ignoreNull: Boolean = false): M {
+    return BeanDef.propertiesToMap(this, to, ignoreNull)
 }
 
-fun <K, V, M : MutableMap<K, V>> Any.copyProperties(to: M, toSchema: MapSchema, copyOptions: BeanDef.CopyOptions): M {
-    return BeanDef.copyProperties(this, to, copyOptions)
+fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, toSchema: MapSchema, copyOptions: BeanDef.CopyOptions): M {
+    return BeanDef.propertiesToBean(this, to, copyOptions)
 }
 
 interface PropertyDef {

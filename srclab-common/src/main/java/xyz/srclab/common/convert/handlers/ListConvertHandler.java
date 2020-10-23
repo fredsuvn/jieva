@@ -70,10 +70,10 @@ public class ListConvertHandler implements ConvertHandler {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
                 return iterableToArray(
-                        iterable, TypeKit.getUpperBoundClass(((GenericArrayType) to).getGenericComponentType()), converter);
+                        iterable, TypeKit.getUpperClass(((GenericArrayType) to).getGenericComponentType()), converter);
             } else if (from.getClass().isArray()) {
                 return arrayToArray(from,
-                        TypeKit.getUpperBoundClass(((GenericArrayType) to).getGenericComponentType()), converter);
+                        TypeKit.getUpperClass(((GenericArrayType) to).getGenericComponentType()), converter);
             }
             return null;
         }
@@ -81,7 +81,7 @@ public class ListConvertHandler implements ConvertHandler {
             return null;
         }
         ParameterizedType listType = (ParameterizedType) to;
-        Class<?> rawListType = TypeKit.getUpperBoundClass(listType.getRawType());
+        Class<?> rawListType = TypeKit.getUpperClass(listType.getRawType());
         if (rawListType.equals(List.class) || rawListType.equals(Iterable.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
