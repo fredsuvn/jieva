@@ -62,7 +62,7 @@ fun Type.genericTypeFor(target: Class<*>): Type {
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
 fun Type.genericSuperClassFor(targetSuperclass: Class<*>): Type {
-    return GenericTypeFinder.findForSuperclass(this, targetSuperclass)
+    return GenericTypeFinder.findSuperclass(this, targetSuperclass)
 }
 
 /**
@@ -70,7 +70,7 @@ fun Type.genericSuperClassFor(targetSuperclass: Class<*>): Type {
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
 fun Type.genericInterfaceFor(targetInterface: Class<*>): Type {
-    return GenericTypeFinder.findForInterface(this, targetInterface)
+    return GenericTypeFinder.findInterface(this, targetInterface)
 }
 
 /**
@@ -83,7 +83,7 @@ fun TypeVariable<*>.actualTypeFor(declaredClass: Class<*>, target: Type): Type {
 private object GenericTypeFinder {
 
     @PossibleTypes(Class::class, ParameterizedType::class)
-    fun findForSuperclass(type: Type, target: Class<*>): Type {
+    fun findSuperclass(type: Type, target: Class<*>): Type {
 
         var rawClass = type.rawClass
         if (rawClass == target) {
@@ -106,7 +106,7 @@ private object GenericTypeFinder {
     }
 
     @PossibleTypes(Class::class, ParameterizedType::class)
-    fun findForInterface(type: Type, target: Class<*>): Type {
+    fun findInterface(type: Type, target: Class<*>): Type {
 
         val rawClass = type.rawClass
         if (rawClass == target) {
