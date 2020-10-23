@@ -119,7 +119,7 @@ interface BeanDef {
 
         @JvmStatic
         @JvmOverloads
-        fun copyProperties(from: Any, to: Any, ignoreNull: Boolean = false) {
+        fun <T : Any> copyProperties(from: Any, to: T, ignoreNull: Boolean = false): T {
             return if (ignoreNull) {
                 copyProperties(from, to, CopyOptions.IGNORE_NULL)
             } else {
@@ -129,7 +129,7 @@ interface BeanDef {
 
         @JvmStatic
         @JvmOverloads
-        fun copyProperties(from: Any, to: MutableMap<String, Any?>, ignoreNull: Boolean = false) {
+        fun <M : MutableMap<String, Any?>> copyProperties(from: Any, to: M, ignoreNull: Boolean = false): M {
             return if (ignoreNull) {
                 copyProperties(from, to, MapSchema.BEAN_PATTERN, CopyOptions.IGNORE_NULL)
             } else {
@@ -138,7 +138,7 @@ interface BeanDef {
         }
 
         @JvmStatic
-        fun copyProperties(from: Any, to: Any, copyOptions: CopyOptions) {
+        fun <T : Any> copyProperties(from: Any, to: T, copyOptions: CopyOptions): T {
             when (from) {
                 is Map<*, *> -> {
                     val fromDef = from.asAny<Map<Any?, Any?>>()
@@ -190,10 +190,16 @@ interface BeanDef {
                     }
                 }
             }
+            return to
         }
 
         @JvmStatic
-        fun <K, V> copyProperties(from: Any, to: MutableMap<K, V>, toSchema: MapSchema, copyOptions: CopyOptions) {
+        fun <K, V, M : MutableMap<K, V>> copyProperties(
+            from: Any,
+            to: M,
+            toSchema: MapSchema,
+            copyOptions: CopyOptions
+        ): M {
             when (from) {
                 is Map<*, *> -> {
                     val fromDef = from.asAny<Map<Any?, Any?>>()
@@ -240,6 +246,7 @@ interface BeanDef {
                     }
                 }
             }
+            return to
         }
     }
 }
@@ -264,20 +271,20 @@ fun <K, V> Any.beanToMap(mapSchema: MapSchema, copyOptions: BeanDef.CopyOptions)
     return BeanDef.toMap(this, mapSchema, copyOptions)
 }
 
-fun Any.copyProperties(to: Any, ignoreNull: Boolean = false) {
-    BeanDef.copyProperties(this, to, ignoreNull)
+fun <T : Any> Any.copyProperties(to: T, ignoreNull: Boolean = false): T {
+    return BeanDef.copyProperties(this, to, ignoreNull)
 }
 
-fun Any.copyProperties(to: MutableMap<String, Any?>, ignoreNull: Boolean = false) {
-    BeanDef.copyProperties(this, to, ignoreNull)
+fun <M : MutableMap<String, Any?>> Any.copyProperties(to: M, ignoreNull: Boolean = false): M {
+    return BeanDef.copyProperties(this, to, ignoreNull)
 }
 
-fun Any.copyProperties(to: Any, copyOptions: BeanDef.CopyOptions) {
-    BeanDef.copyProperties(this, to, copyOptions)
+fun <T : Any> Any.copyProperties(to: T, copyOptions: BeanDef.CopyOptions): T {
+    return BeanDef.copyProperties(this, to, copyOptions)
 }
 
-fun <K, V> Any.copyProperties(to: MutableMap<K, V>, toSchema: MapSchema, copyOptions: BeanDef.CopyOptions) {
-    BeanDef.copyProperties(this, to, copyOptions)
+fun <K, V, M : MutableMap<K, V>> Any.copyProperties(to: M, toSchema: MapSchema, copyOptions: BeanDef.CopyOptions): M {
+    return BeanDef.copyProperties(this, to, copyOptions)
 }
 
 interface PropertyDef {
