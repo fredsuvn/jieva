@@ -62,7 +62,7 @@ public class RecordConvertHandler implements ConvertHandler {
             return null;
         }
         ParameterizedType parameterizedType = (ParameterizedType) to;
-        Class<?> rawType = TypeKit.getRawClass(parameterizedType.getRawType());
+        Class<?> rawType = TypeKit.getUpperBoundClass(parameterizedType.getRawType());
         Object result = newInstance(rawType);
         recorder.copyEntries(from, result, to, converter);
         return result;

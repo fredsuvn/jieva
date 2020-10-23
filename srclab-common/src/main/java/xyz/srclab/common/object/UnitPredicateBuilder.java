@@ -128,7 +128,7 @@ public class UnitPredicateBuilder extends BaseProductCachingBuilder<UnitPredicat
     private static final class UnitPredicateImpl implements UnitPredicate {
 
         private static final BiPredicate<Type, Type> DEFAULT_TYPE_PREDICATE =
-                (input, type) -> TypeKit.getRawClass(type).isAssignableFrom(TypeKit.getRawClass(input));
+                (input, type) -> TypeKit.getUpperBoundClass(type).isAssignableFrom(TypeKit.getUpperBoundClass(input));
 
         private final Finder<Type, Type> passTypeFinder;
         private final Finder<Type, Type> failTypeFinder;

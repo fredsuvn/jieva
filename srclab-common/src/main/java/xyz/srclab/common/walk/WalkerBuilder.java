@@ -142,7 +142,7 @@ public class WalkerBuilder<C> extends BaseProductCachingBuilder<Walker<C>> {
                 walkHandler.doUnit(null, type, contextStack);
                 return;
             }
-            Class<?> rawType = TypeKit.getRawClass(type);
+            Class<?> rawType = TypeKit.getUpperBoundClass(type);
             if (Map.class.isAssignableFrom(rawType)) {
                 walkHandler.beforeObject(null, type, contextStack);
                 walkHandler.afterObject(null, type, contextStack);

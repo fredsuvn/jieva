@@ -59,7 +59,7 @@ public class SetConvertHandler implements ConvertHandler {
             return null;
         }
         ParameterizedType setType = (ParameterizedType) to;
-        Class<?> rawSetType = TypeKit.getRawClass(setType.getRawType());
+        Class<?> rawSetType = TypeKit.getUpperBoundClass(setType.getRawType());
         if (rawSetType.equals(Collection.class)
                 || rawSetType.equals(Set.class)
                 || rawSetType.equals(LinkedHashSet.class)) {
