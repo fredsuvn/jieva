@@ -44,3 +44,7 @@ val <T> T.typeRef: TypeRef<T>
     get() {
         return object : TypeRef<T>() {}
     }
+
+fun <T> typeRef(): TypeRef<T> {
+    return object : TypeRef<T>() {}
+}
