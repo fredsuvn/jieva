@@ -34,53 +34,27 @@ interface BeanDef {
 
     interface CopyOptions {
 
-        fun filterSourcePropertyName(name: Any?): Boolean
+        fun filterProperty(name: Any?): Boolean = true
 
-        fun filterSourceProperty(name: Any?, value: Any?): Boolean
+        fun filterProperty(name: Any?, value: Any?): Boolean = true
 
-        fun convertPropertyName(name: Any?, value: Any?, targetNameType: Type): Any?
+        fun filterProperty(name: Any?, value: Any?, targetValueType: Type): Boolean = true
 
-        fun convertPropertyValue(name: Any?, value: Any?, targetValueType: Type): Any?
+        fun filterProperty(name: Any?, value: Any?, targetKeyType: Type, targetValueType: Type): Boolean = true
+
+        fun convertName(name: Any?, value: Any?, targetKeyType: Type): Any? = name
+
+        fun convertValue(name: Any?, value: Any?, targetValueType: Type): Any? = value
 
         companion object {
 
             @JvmField
-            val DEFAULT = object : CopyOptions {
-
-                override fun filterSourcePropertyName(name: Any?): Boolean {
-                    return true
-                }
-
-                override fun filterSourceProperty(name: Any?, value: Any?): Boolean {
-                    return true
-                }
-
-                override fun convertPropertyName(name: Any?, value: Any?, targetNameType: Type): Any? {
-                    return name
-                }
-
-                override fun convertPropertyValue(name: Any?, value: Any?, targetValueType: Type): Any? {
-                    return value
-                }
-            }
+            val DEFAULT = object : CopyOptions {}
 
             @JvmField
             val IGNORE_NULL = object : CopyOptions {
-
-                override fun filterSourcePropertyName(name: Any?): Boolean {
-                    return true
-                }
-
-                override fun filterSourceProperty(name: Any?, value: Any?): Boolean {
+                override fun filterProperty(name: Any?, value: Any?): Boolean {
                     return value !== null
-                }
-
-                override fun convertPropertyName(name: Any?, value: Any?, targetNameType: Type): Any? {
-                    return name
-                }
-
-                override fun convertPropertyValue(name: Any?, value: Any?, targetValueType: Type): Any? {
-                    return value
                 }
             }
         }
@@ -127,15 +101,17 @@ interface BeanDef {
                     continue
                 }
                 val name = property.name
-                if (!copyOptions.filterSourcePropertyName(name)) {
+                if (!copyOptions.filterProperty(name)) {
                     continue
                 }
                 val value = property.getValue<Any?>(bean)
-                if (!copyOptions.filterSourceProperty(name, value)) {
+                if (!copyOptions.filterProperty(name, value)
+                    || !copyOptions.filterProperty(name, value, mapSchema.keyType, mapSchema.valueType)
+                ) {
                     continue
                 }
-                val mapKey = copyOptions.convertPropertyName(name, value, mapSchema.keyType).asAny<K>()
-                val mapValue = copyOptions.convertPropertyValue(name, value, mapSchema.valueType).asAny<V>()
+                val mapKey = copyOptions.convertName(name, value, mapSchema.keyType).asAny<K>()
+                val mapValue = copyOptions.convertValue(name, value, mapSchema.valueType).asAny<V>()
                 result[mapKey] = mapValue
             }
             return result.toMap()
@@ -170,8 +146,8 @@ interface BeanDef {
                     for (propertyEntry in fromDef) {
                         val name = propertyEntry.key.toString()
                         val value = propertyEntry.value
-                        if (!copyOptions.filterSourcePropertyName(name)
-                            || !copyOptions.filterSourceProperty(name, value)
+                        if (!copyOptions.filterProperty(name)
+                            || !copyOptions.filterProperty(name, value)
                         ) {
                             continue
                         }
@@ -179,10 +155,11 @@ interface BeanDef {
                         if (toProperty === null || !toProperty.isWriteable) {
                             continue
                         }
-                        toProperty.setValue(
-                            to,
-                            copyOptions.convertPropertyValue(name, value, toProperty.genericType)
-                        )
+                        val toPropertyType = toProperty.genericType
+                        if (!copyOptions.filterProperty(name, value, toPropertyType)) {
+                            continue
+                        }
+                        toProperty.setValue(to, copyOptions.convertValue(name, value, toPropertyType))
                     }
                 }
                 !is Map<*, *> -> {
@@ -194,7 +171,7 @@ interface BeanDef {
                             continue
                         }
                         val name = fromProperty.name
-                        if (!copyOptions.filterSourcePropertyName(name)) {
+                        if (!copyOptions.filterProperty(name)) {
                             continue
                         }
                         val toProperty = toDef.getProperty(name)
@@ -202,13 +179,14 @@ interface BeanDef {
                             continue
                         }
                         val value = fromProperty.getValue<Any?>(from)
-                        if (!copyOptions.filterSourceProperty(name, value)) {
+                        if (!copyOptions.filterProperty(name, value)) {
                             continue
                         }
-                        toProperty.setValue(
-                            to,
-                            copyOptions.convertPropertyValue(name, value, toProperty.genericType)
-                        )
+                        val toPropertyType = toProperty.genericType
+                        if (!copyOptions.filterProperty(name, value, toPropertyType)) {
+                            continue
+                        }
+                        toProperty.setValue(to, copyOptions.convertValue(name, value, toPropertyType))
                     }
                 }
             }
@@ -222,16 +200,17 @@ interface BeanDef {
                     for (propertyEntry in fromDef) {
                         val name = propertyEntry.key.toString()
                         val value = propertyEntry.value
-                        if (!copyOptions.filterSourcePropertyName(name)
-                            || !copyOptions.filterSourceProperty(name, value)
+                        if (!copyOptions.filterProperty(name)
+                            || !copyOptions.filterProperty(name, value)
+                            || !copyOptions.filterProperty(name, value, toSchema.keyType, toSchema.valueType)
                         ) {
                             continue
                         }
-                        val mapKey = copyOptions.convertPropertyName(name, value, toSchema.keyType).asAny<K>()
+                        val mapKey = copyOptions.convertName(name, value, toSchema.keyType).asAny<K>()
                         if (!to.containsKey(mapKey)) {
                             continue
                         }
-                        val mapValue = copyOptions.convertPropertyValue(name, value, toSchema.valueType).asAny<V>()
+                        val mapValue = copyOptions.convertValue(name, value, toSchema.valueType).asAny<V>()
                         to[mapKey] = mapValue
                     }
                 }
@@ -243,18 +222,20 @@ interface BeanDef {
                             continue
                         }
                         val name = fromProperty.name
-                        if (!copyOptions.filterSourcePropertyName(name)) {
+                        if (!copyOptions.filterProperty(name)) {
                             continue
                         }
                         val value = fromProperty.getValue<Any?>(from)
-                        if (!copyOptions.filterSourceProperty(name, value)) {
+                        if (!copyOptions.filterProperty(name, value)
+                            || !copyOptions.filterProperty(name, value, toSchema.keyType, toSchema.valueType)
+                        ) {
                             continue
                         }
-                        val mapKey = copyOptions.convertPropertyName(name, value, toSchema.keyType).asAny<K>()
+                        val mapKey = copyOptions.convertName(name, value, toSchema.keyType).asAny<K>()
                         if (!to.containsKey(mapKey)) {
                             continue
                         }
-                        val mapValue = copyOptions.convertPropertyValue(name, value, toSchema.valueType).asAny<V>()
+                        val mapValue = copyOptions.convertValue(name, value, toSchema.valueType).asAny<V>()
                         to[mapKey] = mapValue
                     }
                 }
