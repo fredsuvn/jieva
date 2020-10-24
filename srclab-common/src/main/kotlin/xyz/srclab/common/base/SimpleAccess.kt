@@ -17,15 +17,15 @@ interface SimpleGetter<T> {
 
     fun getOrNull(): T?
 
-    fun orElse(value: T): T {
+    fun getOrElse(value: T): T {
         return getOrNull() ?: value
     }
 
-    fun orElseGet(supplier: () -> T): T {
+    fun getOrElse(supplier: () -> T): T {
         return getOrNull() ?: supplier()
     }
 
-    fun orElseThrow(supplier: () -> Throwable): T {
+    fun getOrThrow(supplier: () -> Throwable): T {
         return getOrNull() ?: throw supplier()
     }
 }

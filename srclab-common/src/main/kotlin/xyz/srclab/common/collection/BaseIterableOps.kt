@@ -363,8 +363,16 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().associateKey(keySelector).toMapOps()
     }
 
+    open fun <K> associateKey(keys: Iterable<K>): MapOps<K, T> {
+        return finalIterable().associateKey(keys).toMapOps()
+    }
+
     open fun <V> associateValue(valueSelector: (T) -> V): MapOps<T, V> {
         return finalIterable().associateValue(valueSelector).toMapOps()
+    }
+
+    open fun <V> associateValue(values: Iterable<V>): MapOps<T, V> {
+        return finalIterable().associateValue(values).toMapOps()
     }
 
     open fun <K, V> associatePair(keySelector: (T) -> K, valueTransform: (T) -> V): MapOps<K, V> {
@@ -397,8 +405,16 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().associateKeyTo(destination, keySelector)
     }
 
+    open fun <K, M : MutableMap<in K, in T>> associateKeyTo(destination: M, keys: Iterable<K>): M {
+        return finalIterable().associateKeyTo(destination, keys)
+    }
+
     open fun <V, M : MutableMap<in T, in V>> associateValueTo(destination: M, valueSelector: (T) -> V): M {
         return finalIterable().associateValueTo(destination, valueSelector)
+    }
+
+    open fun <V, M : MutableMap<in T, in V>> associateValueTo(destination: M, values: Iterable<V>): M {
+        return finalIterable().associateValueTo(destination, values)
     }
 
     open fun <K, V, M : MutableMap<in K, in V>> associatePairTo(
@@ -1196,8 +1212,18 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
+        fun <T, K> Iterable<T>.associateKey(keys: Iterable<K>): Map<K, T> {
+            return this.associateKeyTo(LinkedHashMap(), keys)
+        }
+
+        @JvmStatic
         inline fun <T, V> Iterable<T>.associateValue(valueSelector: (T) -> V): Map<T, V> {
             return this.associateWithKt(valueSelector)
+        }
+
+        @JvmStatic
+        fun <T, V> Iterable<T>.associateValue(values: Iterable<V>): Map<T, V> {
+            return this.associateValueTo(LinkedHashMap(), values)
         }
 
         @JvmStatic
@@ -1256,11 +1282,41 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
+        fun <T, K, M : MutableMap<in K, in T>> Iterable<T>.associateKeyTo(
+            destination: M,
+            keys: Iterable<K>
+        ): M {
+            val valueIt = this.iterator()
+            for (key in keys) {
+                if (!valueIt.hasNext()) {
+                    break
+                }
+                destination[key] = valueIt.next()
+            }
+            return destination
+        }
+
+        @JvmStatic
         inline fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValueTo(
             destination: M,
             valueSelector: (T) -> V
         ): M {
             return this.associateWithToKt(destination, valueSelector)
+        }
+
+        @JvmStatic
+        fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValueTo(
+            destination: M,
+            values: Iterable<V>
+        ): M {
+            val valueIt = values.iterator()
+            for (key in this) {
+                if (!valueIt.hasNext()) {
+                    break
+                }
+                destination[key] = valueIt.next()
+            }
+            return destination
         }
 
         @JvmStatic

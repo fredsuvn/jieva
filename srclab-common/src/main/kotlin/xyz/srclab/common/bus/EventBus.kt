@@ -13,13 +13,25 @@ interface EventBus {
 
     fun unregister(eventHandler: EventHandler<*>)
 
-    @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
     fun <T : Any> emit(event: T) {
         return emit(event.javaClass, event)
     }
 
+    fun <T : Any> emit(eventType: Any, event: T) {
+        try {
+            return emitOrThrow(eventType, event)
+        } catch (e: Exception) {
+            //Do nothing
+        }
+    }
+
     @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
-    fun <T : Any> emit(eventType: Any, event: T)
+    fun <T : Any> emitOrThrow(event: T) {
+        return emitOrThrow(event.javaClass, event)
+    }
+
+    @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
+    fun <T : Any> emitOrThrow(eventType: Any, event: T)
 
     companion object {
 
@@ -68,7 +80,7 @@ private abstract class BaseEventBus<M : Map<Any, EventHandler<*>>>(private val e
         throw UnsupportedOperationException()
     }
 
-    override fun <T : Any> emit(eventType: Any, event: T) {
+    override fun <T : Any> emitOrThrow(eventType: Any, event: T) {
         val eventHandler: EventHandler<T>? = eventHandlerMap[eventType].asAny()
         if (eventHandler === null) {
             throw EventHandlerNotFoundException(eventType)

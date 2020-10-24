@@ -97,6 +97,26 @@ class MapOps<K, V>(private var map: Map<K, V>) {
         return finalMap().minus(keys).toMapOps()
     }
 
+    fun put(key: K, value: V): MapOps<K, V> {
+        finalMutableMap()[key] = value
+        return this
+    }
+
+    fun putAll(entries: Map<out K, V>): MapOps<K, V> {
+        finalMutableMap().putAll(entries)
+        return this
+    }
+
+    fun removeAll(keys: Iterable<K>): MapOps<K, V> {
+        finalMutableMap().removeAll(keys)
+        return this
+    }
+
+    fun clear(): MapOps<K, V> {
+        finalMutableMap().clear()
+        return this
+    }
+
     fun toEntrySetOps(): SetOps<Map.Entry<K, V>> {
         return finalMap().entries.toSetOps()
     }
@@ -263,6 +283,13 @@ class MapOps<K, V>(private var map: Map<K, V>) {
         @JvmStatic
         fun <K, V> Map<K, V>.minus(keys: Iterable<K>): Map<K, V> {
             return this.minusKt(keys)
+        }
+
+        @JvmStatic
+        fun <K, V> MutableMap<K, V>.removeAll(keys: Iterable<K>) {
+            for (key in keys) {
+                this.remove(key)
+            }
         }
     }
 }
