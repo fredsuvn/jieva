@@ -3,7 +3,7 @@ package xyz.srclab.common.cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
 import xyz.srclab.common.base.ABSENT_VALUE
-import xyz.srclab.common.base.BaseCachingProductBuilder
+import xyz.srclab.common.base.CachingProductBuilder
 import xyz.srclab.common.base.Defaults
 import xyz.srclab.common.base.asAny
 import java.time.Duration
@@ -97,7 +97,7 @@ interface Cache<K : Any, V> {
 
     fun cleanUp()
 
-    class Builder<K : Any, V> : BaseCachingProductBuilder<Cache<K, V>>() {
+    class Builder<K : Any, V> : CachingProductBuilder<Cache<K, V>>() {
 
         private var initialCapacity: Int = 4
         private var maxSize: Long = Long.MAX_VALUE
