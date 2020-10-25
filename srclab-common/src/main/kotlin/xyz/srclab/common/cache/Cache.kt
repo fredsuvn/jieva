@@ -1,15 +1,14 @@
 package xyz.srclab.common.cache
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.google.common.cache.RemovalListener
 import xyz.srclab.common.base.ABSENT_VALUE
 import xyz.srclab.common.base.BaseCachingProductBuilder
 import xyz.srclab.common.base.Defaults
 import xyz.srclab.common.base.asAny
-import xyz.srclab.common.cache.listener.CacheCreateListener
-import xyz.srclab.common.cache.listener.CacheReadListener
-import xyz.srclab.common.cache.listener.CacheRemoveListener
-import xyz.srclab.common.cache.listener.CacheUpdateListener
 import java.time.Duration
+import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
+import com.google.common.cache.RemovalCause as guavaRemovalCause
 
 interface Cache<K : Any, V> {
 
@@ -100,15 +99,24 @@ interface Cache<K : Any, V> {
 
     class Builder<K : Any, V> : BaseCachingProductBuilder<Cache<K, V>>() {
 
-        private var maxSize = Long.MAX_VALUE
+        private var initialCapacity: Int = 4
+        private var maxSize: Long = Long.MAX_VALUE
         private var concurrencyLevel: Int = Defaults.concurrencyLevel
-        private var expiry: CacheExpiry = CacheExpiry.ZERO
+        private var expireAfterAccess: Duration = Duration.ZERO
+        private var expireAfterWrite: Duration = Duration.ZERO
+        private var refreshAfterWrite: Duration = Duration.ZERO
         private var loader: ((K) -> V)? = null
         private var createListener: CacheCreateListener<in K, in V>? = null
         private var readListener: CacheReadListener<in K, in V>? = null
         private var updateListener: CacheUpdateListener<in K, in V>? = null
         private var removeListener: CacheRemoveListener<in K, in V>? = null
         private var useGuava = false
+
+        fun initialCapacity(initialCapacity: Int): Builder<K, V> {
+            this.initialCapacity = initialCapacity
+            this.commitChange()
+            return this
+        }
 
         fun maxSize(maxSize: Long): Builder<K, V> {
             this.maxSize = maxSize
@@ -122,8 +130,20 @@ interface Cache<K : Any, V> {
             return this
         }
 
-        fun expiry(expiry: CacheExpiry): Builder<K, V> {
-            this.expiry = expiry
+        fun expireAfterAccess(expireAfterAccess: Duration): Builder<K, V> {
+            this.expireAfterAccess = expireAfterAccess
+            this.commitChange()
+            return this
+        }
+
+        fun expireAfterWrite(expireAfterWrite: Duration): Builder<K, V> {
+            this.expireAfterWrite = expireAfterWrite
+            this.commitChange()
+            return this
+        }
+
+        fun refreshAfterWrite(refreshAfterWrite: Duration): Builder<K, V> {
+            this.refreshAfterWrite = refreshAfterWrite
             this.commitChange()
             return this
         }
@@ -166,33 +186,170 @@ interface Cache<K : Any, V> {
 
         override fun buildNew(): Cache<K, V> {
             return if (useGuava) {
-                val guavaBuilder: com.google.common.cache.Builder<K, Any> =
-                    GuavaCacheSupport.toGuavaBuilder(this)
-                if (loader == null) {
-                    val guavaCache: com.google.common.cache.Cache<K, Any> = guavaBuilder.build()
-                    Cache.guavaCache(guavaCache)
+                val guavaBuilder = com.google.common.cache.CacheBuilder.newBuilder()
+                guavaBuilder.maximumSize(maxSize)
+                    .initialCapacity(initialCapacity)
+                    .concurrencyLevel(concurrencyLevel)
+                if (expireAfterAccess != Duration.ZERO) {
+                    guavaBuilder.expireAfterAccess(expireAfterAccess)
+                }
+                if (expireAfterWrite != Duration.ZERO) {
+                    guavaBuilder.expireAfterWrite(expireAfterAccess)
+                }
+                if (refreshAfterWrite != Duration.ZERO) {
+                    guavaBuilder.refreshAfterWrite(refreshAfterWrite)
+                }
+                val listener = removeListener
+                if (listener !== null) {
+                    guavaBuilder.removalListener(RemovalListener<K, V> { notification ->
+                        val removeCause: CacheRemoveListener.Cause = when (notification.cause) {
+                            guavaRemovalCause.EXPLICIT -> CacheRemoveListener.Cause.EXPLICIT
+                            guavaRemovalCause.REPLACED -> CacheRemoveListener.Cause.REPLACED
+                            guavaRemovalCause.COLLECTED -> CacheRemoveListener.Cause.COLLECTED
+                            guavaRemovalCause.EXPIRED -> CacheRemoveListener.Cause.EXPIRED
+                            guavaRemovalCause.SIZE -> CacheRemoveListener.Cause.SIZE
+                        }
+                        listener.afterRemove(notification.key, notification.value, removeCause)
+                    })
+                }
+                val cacheLoader = loader
+                if (cacheLoader === null) {
+                    val guavaCache = guavaBuilder.build<K, V>()
+                    GuavaCache(guavaCache)
                 } else {
-                    val loadingGuavaCache = guavaBuilder.build(GuavaCacheSupport.toGuavaCacheLoader(loader))
-                    Cache.loadingGuavaCache(loadingGuavaCache)
+                    val loadingGuavaCache = guavaBuilder.build(object : com.google.common.cache.CacheLoader<K, V>() {
+                        override fun load(key: K): V {
+                            return cacheLoader(key)
+                        }
+                    })
+                    GuavaLoadingCache(loadingGuavaCache)
                 }
             } else {
-                val caffeine: Caffeine<K, Any> = CaffeineCacheSupport.toCaffeineBuilder(this)
-                if (loader == null) {
-                    val caffeineCache: com.github.benmanes.caffeine.cache.Cache<K, Any> = caffeine.build()
-                    Cache.caffeineCache(caffeineCache)
+                val caffeineBuilder = Caffeine.newBuilder()
+                caffeineBuilder.maximumSize(maxSize)
+                    .initialCapacity(initialCapacity)
+                if (expireAfterAccess != Duration.ZERO) {
+                    caffeineBuilder.expireAfterAccess(expireAfterAccess)
+                }
+                if (expireAfterWrite != Duration.ZERO) {
+                    caffeineBuilder.expireAfterWrite(expireAfterAccess)
+                }
+                if (refreshAfterWrite != Duration.ZERO) {
+                    caffeineBuilder.refreshAfterWrite(refreshAfterWrite)
+                }
+                val listener = removeListener
+                if (listener !== null) {
+                    caffeineBuilder.removalListener<K, V> { key, value, cause ->
+                        val removeCause: CacheRemoveListener.Cause = when (cause) {
+                            caffeineRemovalCause.EXPLICIT -> CacheRemoveListener.Cause.EXPLICIT
+                            caffeineRemovalCause.REPLACED -> CacheRemoveListener.Cause.REPLACED
+                            caffeineRemovalCause.COLLECTED -> CacheRemoveListener.Cause.COLLECTED
+                            caffeineRemovalCause.EXPIRED -> CacheRemoveListener.Cause.EXPIRED
+                            caffeineRemovalCause.SIZE -> CacheRemoveListener.Cause.SIZE
+                        }
+                        listener.afterRemove(key.asAny(), value.asAny(), removeCause)
+                    }
+                }
+                val cacheLoader = loader
+                if (cacheLoader === null) {
+                    val guavaCache = caffeineBuilder.build<K, V>()
+                    CaffeineCache(guavaCache)
                 } else {
-                    val loadingCaffeineCache = caffeine.build(CaffeineCacheSupport.toCaffeineCacheLoader(loader))
-                    Cache.loadingCaffeineCache(loadingCaffeineCache)
+                    val loadingGuavaCache = caffeineBuilder.build<K, V> { k -> cacheLoader(k) }
+                    CaffeineLoadingCache(loadingGuavaCache)
                 }
             }
         }
+    }
 
-        companion object {
+    companion object {
 
-            @JvmStatic
-            fun <K : Any, V> newBuilder(): Builder<K, V> {
-                return Builder()
-            }
+        @JvmStatic
+        fun <K : Any, V> newBuilder(): Builder<K, V> {
+            return Builder()
         }
+    }
+}
+
+interface CacheCreateListener<K, V> {
+    fun beforeCreate(key: K)
+    fun afterCreate(key: K, value: V)
+}
+
+interface CacheReadListener<K, V> {
+    fun beforeRead(key: K)
+    fun onHit(key: K, value: V)
+    fun onMiss(key: K)
+}
+
+interface CacheUpdateListener<K, V> {
+    fun beforeUpdate(key: K, oldValue: V)
+    fun afterUpdate(key: K, oldValue: V, newValue: V)
+}
+
+interface CacheRemoveListener<K, V> {
+    fun beforeRemove(key: K, value: V, cause: Cause)
+    fun afterRemove(key: K, value: V, cause: Cause)
+
+    enum class Cause {
+        /**
+         * The entry was manually removed by the user. This can result from the user invoking any of the
+         * following methods on the cache or map view.
+         */
+        EXPLICIT {
+            override val isEvicted: Boolean
+                get() {
+                    return false
+                }
+        },
+
+        /**
+         * The entry itself was not actually removed, but its value was replaced by the user. This can
+         * result from the user invoking any of the following methods on the cache or map view.
+         */
+        REPLACED {
+            override val isEvicted: Boolean
+                get() {
+                    return false
+                }
+        },
+
+        /**
+         * The entry was removed automatically because its key or value was garbage-collected.
+         */
+        COLLECTED {
+            override val isEvicted: Boolean
+                get() {
+                    return true
+                }
+        },
+
+        /**
+         * The entry's expiration timestamp has passed.
+         */
+        EXPIRED {
+            override val isEvicted: Boolean
+                get() {
+                    return true
+                }
+        },
+
+        /**
+         * The entry was evicted due to size constraints.
+         */
+        SIZE {
+            override val isEvicted: Boolean
+                get() {
+                    return true
+                }
+        };
+
+        /**
+         * Returns `true` if there was an automatic removal due to eviction (the cause is neither
+         * [EXPLICIT] nor [REPLACED]).
+         *
+         * @return if the entry was automatically removed due to eviction
+         */
+        abstract val isEvicted: Boolean
     }
 }

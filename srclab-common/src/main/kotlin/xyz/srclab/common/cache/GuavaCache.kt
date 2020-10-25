@@ -2,7 +2,7 @@ package xyz.srclab.common.cache
 
 import java.time.Duration
 
-class GuavaCache<K : Any, V>(private val guava: com.google.common.cache.Cache<K, V>) : Cache<K, V> {
+open class GuavaCache<K : Any, V>(private val guava: com.google.common.cache.Cache<K, V>) : Cache<K, V> {
 
     override fun getOrNull(key: K): V? {
         return guava.getIfPresent(key)
@@ -77,5 +77,13 @@ class GuavaCache<K : Any, V>(private val guava: com.google.common.cache.Cache<K,
 
     override fun cleanUp() {
         guava.cleanUp()
+    }
+}
+
+class GuavaLoadingCache<K : Any, V>(private val guava: com.google.common.cache.LoadingCache<K, V>) :
+    GuavaCache<K, V>(guava) {
+
+    override fun get(key: K): V {
+        return guava.get(key)
     }
 }

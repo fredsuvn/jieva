@@ -3,7 +3,8 @@ package xyz.srclab.common.cache
 import xyz.srclab.common.base.asAny
 import java.time.Duration
 
-class CaffeineCache<K : Any, V>(private val caffeine: com.github.benmanes.caffeine.cache.Cache<K, V>) : Cache<K, V> {
+open class CaffeineCache<K : Any, V>(private val caffeine: com.github.benmanes.caffeine.cache.Cache<K, V>) :
+    Cache<K, V> {
 
     override fun getOrNull(key: K): V? {
         return caffeine.getIfPresent(key)
@@ -76,5 +77,13 @@ class CaffeineCache<K : Any, V>(private val caffeine: com.github.benmanes.caffei
 
     override fun cleanUp() {
         caffeine.cleanUp()
+    }
+}
+
+class CaffeineLoadingCache<K : Any, V>(private val caffeine: com.github.benmanes.caffeine.cache.LoadingCache<K, V>) :
+    CaffeineCache<K, V>(caffeine) {
+
+    override fun get(key: K): V {
+        return caffeine.get(key)!!
     }
 }
