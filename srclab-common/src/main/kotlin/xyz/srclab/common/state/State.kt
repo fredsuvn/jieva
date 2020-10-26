@@ -46,7 +46,7 @@ interface State<C, DESC, T : State<C, DESC, T>> {
         }
 
         @JvmStatic
-        fun joinCharsDescription(description: CharSequence?, moreDescription: CharSequence?): String? {
+        fun moreDescription(description: CharSequence?, moreDescription: CharSequence?): String? {
             return when {
                 description === null -> moreDescription?.toString()
                 moreDescription === null -> description.toString()
@@ -68,6 +68,6 @@ fun State<*, *, *>.stateToString(): String {
     return State.toString(this)
 }
 
-fun CharSequence?.joinCharsStateDescription(moreDescription: CharSequence?): String? {
-    return State.joinCharsDescription(this, moreDescription)
+fun CharSequence?.stateMoreDescription(moreDescription: CharSequence?): String? {
+    return State.moreDescription(this, moreDescription)
 }

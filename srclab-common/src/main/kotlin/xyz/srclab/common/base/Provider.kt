@@ -19,23 +19,37 @@ interface Provider<S, T : Any> {
         fun <T : Any> charsProvider(strictly: Boolean = false): CharsProvider<T> {
             return if (strictly) StrictCharsProvider.ofType() else CharsProvider.ofType()
         }
+
+        @JvmStatic
+        @JvmOverloads
+        fun <T : Any> parse(spec: CharSequence, strictly: Boolean = false): List<T> {
+            return charsProvider<T>(strictly).parse(spec)
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun <T : Any> parseFirst(spec: CharSequence, strictly: Boolean = false): T {
+            return charsProvider<T>(strictly).parseFirst(spec)
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun <T : Any> parseFirstOrNull(spec: CharSequence, strictly: Boolean = false): T? {
+            return charsProvider<T>(strictly).parseFirstOrNull(spec)
+        }
     }
 }
 
-fun <T : Any> charsProvider(strictly: Boolean = false): CharsProvider<T> {
-    return Provider.charsProvider(strictly)
-}
-
 fun <T : Any> CharSequence.parseByCharsProvider(strictly: Boolean = false): List<T> {
-    return charsProvider<T>(strictly).parse(this)
+    return Provider.parse(this)
 }
 
 fun <T : Any> CharSequence.parseFirstByCharsProvider(strictly: Boolean = false): T {
-    return charsProvider<T>(strictly).parseFirst(this)
+    return Provider.parseFirst(this)
 }
 
 fun <T : Any> CharSequence.parseFirstOrNullByCharsProvider(strictly: Boolean = false): T? {
-    return charsProvider<T>(strictly).parseFirstOrNull(this)
+    return Provider.parseFirstOrNull(this)
 }
 
 open class CharsProvider<T : Any> : Provider<CharSequence, T> {

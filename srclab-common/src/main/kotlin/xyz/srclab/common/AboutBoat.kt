@@ -6,6 +6,15 @@ import xyz.srclab.common.base.*
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
+interface AboutBoat : About {
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val logo: String
+        @JvmName("logo") get
+
+    fun showLogo()
+}
+
 @JvmOverloads
 fun aboutBoat(major: Int = currentMajor): About {
     return when (major) {
@@ -317,3 +326,30 @@ private object Starmon : Egg {
         TODO("Not yet implemented")
     }
 }
+
+/*
+ * __________                            ____________              _____
+ * ___  ____/_____ ____________  __      __  ___/_  /______ _________  /_____________
+ * __  __/  _  __ `/_  ___/_  / / /___________ \_  __/  __ `/_  ___/  __/  _ \_  ___/
+ * _  /___  / /_/ /_(__  )_  /_/ /_/_____/___/ // /_ / /_/ /_  /   / /_ /  __/  /
+ * /_____/  \__,_/ /____/ _\__, /        /____/ \__/ \__,_/ /_/    \__/ \___//_/
+ *                        /____/
+ *                                                                srclab.xyz, sunqian
+ *                                                                   fredsuvn@163.com
+ *
+ * Source: http://www.network-science.de/ascii/
+ * Font: speed
+ */
+private val logo = """
+ __________                            ____________              _____
+ ___  ____/_____ ____________  __      __  ___/_  /______ _________  /_____________
+ __  __/  _  __ `/_  ___/_  / / /___________ \_  __/  __ `/_  ___/  __/  _ \_  ___/
+ _  /___  / /_/ /_(__  )_  /_/ /_/_____/___/ // /_ / /_/ /_  /   / /_ /  __/  /
+ /_____/  \__,_/ /____/ _\__, /        /____/ \__/ \__,_/ /_/    \__/ \___//_/
+                        /____/
+                                                                srclab.xyz, sunqian
+                                                                   fredsuvn@163.com
+ 
+ Source: http://www.network-science.de/ascii/
+ Font: speed
+""".trimIndent()

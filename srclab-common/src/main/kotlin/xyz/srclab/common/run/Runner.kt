@@ -17,38 +17,38 @@ interface Runner : Executor {
         val ASYNC_RUNNER: AsyncRunner = AsyncRunner
 
         @JvmStatic
-        fun singleThreadRunner(): ExecutorServiceRunner {
-            return executorServiceRunner(Executors.newSingleThreadExecutor())
+        fun newSingleThreadRunner(): ExecutorServiceRunner {
+            return newExecutorServiceRunner(Executors.newSingleThreadExecutor())
         }
 
         @JvmStatic
-        fun cachedThreadPoolRunner(): ExecutorServiceRunner {
-            return executorServiceRunner(Executors.newCachedThreadPool())
+        fun newCachedThreadPoolRunner(): ExecutorServiceRunner {
+            return newExecutorServiceRunner(Executors.newCachedThreadPool())
         }
 
         @JvmStatic
-        fun fixedThreadPoolRunner(threadNumber: Int): ExecutorServiceRunner {
-            return executorServiceRunner(Executors.newFixedThreadPool(threadNumber))
+        fun newFixedThreadPoolRunner(threadNumber: Int): ExecutorServiceRunner {
+            return newExecutorServiceRunner(Executors.newFixedThreadPool(threadNumber))
         }
 
         @JvmStatic
         @JvmOverloads
-        fun workStealingPool(parallelism: Int = DefaultEnvironment.availableProcessors): ExecutorServiceRunner {
-            return executorServiceRunner(Executors.newWorkStealingPool(parallelism))
+        fun newWorkStealingPool(parallelism: Int = DefaultEnvironment.availableProcessors): ExecutorServiceRunner {
+            return newExecutorServiceRunner(Executors.newWorkStealingPool(parallelism))
         }
 
         @JvmStatic
-        fun executorServiceRunner(executorService: ExecutorService): ExecutorServiceRunner {
+        fun newExecutorServiceRunner(executorService: ExecutorService): ExecutorServiceRunner {
             return ExecutorServiceRunner(executorService)
         }
 
         @JvmStatic
-        fun threadPoolRunner(threadPoolExecutor: ThreadPoolExecutor): ThreadPoolRunner {
+        fun newThreadPoolRunner(threadPoolExecutor: ThreadPoolExecutor): ThreadPoolRunner {
             return ThreadPoolRunner(threadPoolExecutor)
         }
 
         @JvmStatic
-        fun threadPoolRunnerBuilder(): ThreadPoolRunner.Builder {
+        fun newThreadPoolRunnerBuilder(): ThreadPoolRunner.Builder {
             return ThreadPoolRunner.Builder()
         }
 

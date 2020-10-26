@@ -298,18 +298,18 @@ interface Cache<K : Any, V> {
             }
         }
 
-        data class Params<K, V>(
-            internal val initialCapacity: Int? = null,
-            internal val maxSize: Long? = null,
-            internal val concurrencyLevel: Int? = null,
-            internal val expireAfterAccess: Duration? = null,
-            internal val expireAfterWrite: Duration? = null,
-            internal val refreshAfterWrite: Duration? = null,
-            internal val loader: ((K) -> V)? = null,
-            internal val createListener: CacheCreateListener<in K, in V>? = null,
-            internal val readListener: CacheReadListener<in K, in V>? = null,
-            internal val updateListener: CacheUpdateListener<in K, in V>? = null,
-            internal val removeListener: CacheRemoveListener<in K, in V>? = null,
+        private data class Params<K, V>(
+            val initialCapacity: Int? = null,
+            val maxSize: Long? = null,
+            val concurrencyLevel: Int? = null,
+            val expireAfterAccess: Duration? = null,
+            val expireAfterWrite: Duration? = null,
+            val refreshAfterWrite: Duration? = null,
+            val loader: ((K) -> V)? = null,
+            val createListener: CacheCreateListener<in K, in V>? = null,
+            val readListener: CacheReadListener<in K, in V>? = null,
+            val updateListener: CacheUpdateListener<in K, in V>? = null,
+            val removeListener: CacheRemoveListener<in K, in V>? = null,
         )
     }
 

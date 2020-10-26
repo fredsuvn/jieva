@@ -23,31 +23,31 @@ interface ScheduledRunner : Runner {
         val NEW_THREAD_RUNNER: NewThreadScheduledRunner = NewThreadScheduledRunner
 
         @JvmStatic
-        fun singleThreadRunner(): ScheduledExecutorServiceRunner {
-            return scheduledExecutorServiceRunner(Executors.newSingleThreadScheduledExecutor())
+        fun newSingleThreadRunner(): ScheduledExecutorServiceRunner {
+            return newScheduledExecutorServiceRunner(Executors.newSingleThreadScheduledExecutor())
         }
 
         @JvmStatic
-        fun threadPoolRunner(corePoolSize: Int): ScheduledExecutorServiceRunner {
-            return scheduledExecutorServiceRunner(Executors.newScheduledThreadPool(corePoolSize))
+        fun newThreadPoolRunner(corePoolSize: Int): ScheduledExecutorServiceRunner {
+            return newScheduledExecutorServiceRunner(Executors.newScheduledThreadPool(corePoolSize))
         }
 
         @JvmStatic
-        fun scheduledExecutorServiceRunner(
+        fun newScheduledExecutorServiceRunner(
             scheduledExecutorService: ScheduledExecutorService
         ): ScheduledExecutorServiceRunner {
             return ScheduledExecutorServiceRunner(scheduledExecutorService)
         }
 
         @JvmStatic
-        fun scheduledThreadPoolRunner(
+        fun newScheduledThreadPoolRunner(
             scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor
         ): ScheduledThreadPoolRunner {
             return ScheduledThreadPoolRunner(scheduledThreadPoolExecutor)
         }
 
         @JvmStatic
-        fun scheduledThreadPoolRunnerBuilder(): ScheduledThreadPoolRunner.Builder {
+        fun newScheduledThreadPoolRunnerBuilder(): ScheduledThreadPoolRunner.Builder {
             return ScheduledThreadPoolRunner.Builder()
         }
 

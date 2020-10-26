@@ -15,7 +15,7 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
         return if (moreDescription === null)
             this
         else
-            of(code, description.joinCharsStateDescription(moreDescription))
+            of(code, description.stateMoreDescription(moreDescription))
     }
 
     companion object {

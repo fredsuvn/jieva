@@ -17,14 +17,14 @@ interface Shell {
     companion object {
 
         @JvmStatic
-        fun system(): Shell {
+        fun defaultShell(): Shell {
             return SystemShell
         }
     }
 }
 
-fun systemShell(): Shell {
-    return Shell.system()
+fun defaultShell(): Shell {
+    return Shell.defaultShell()
 }
 
 abstract class StreamShell(input: InputStream, output: PrintStream) : Shell {
