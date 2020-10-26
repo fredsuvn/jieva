@@ -68,7 +68,7 @@ interface BeanDef {
     companion object {
 
         @JvmStatic
-        fun resolve(type: Class<*>): BeanDef {
+        fun resolve(type: Type): BeanDef {
             return BeanDefImpl(type)
         }
 
@@ -256,7 +256,7 @@ interface BeanDef {
     }
 }
 
-fun Class<*>.resolveBean(): BeanDef {
+fun Type.resolveBean(): BeanDef {
     return BeanDef.resolve(this)
 }
 
@@ -280,6 +280,14 @@ fun <T : Any> Any.propertiesToBean(to: T, ignoreNull: Boolean = false): T {
     return BeanDef.propertiesToBean(this, to, ignoreNull)
 }
 
+fun <T : Any> Any.propertiesToBean(to: T, converter: Converter): T {
+    return BeanDef.propertiesToBean(this, to)
+}
+
+fun <T : Any> Any.propertiesToBean(to: T, toSchema:Type, converter: Converter): T {
+    return BeanDef.propertiesToBean(this, to)
+}
+
 fun <T : Any> Any.propertiesToBean(to: T, copyOptions: BeanDef.CopyOptions): T {
     return BeanDef.propertiesToBean(this, to, copyOptions)
 }
@@ -288,7 +296,15 @@ fun <M : MutableMap<String, Any?>> Any.propertiesToMap(to: M, ignoreNull: Boolea
     return BeanDef.propertiesToMap(this, to, ignoreNull)
 }
 
-fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, toSchema: MapSchema, copyOptions: BeanDef.CopyOptions): M {
+fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, toSchema: Type, converter: Converter): M {
+    return BeanDef.propertiesToBean(this, to)
+}
+
+fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(
+    to: M,
+    toSchema: MapSchema,
+    copyOptions: BeanDef.CopyOptions = BeanDef.CopyOptions.DEFAULT
+): M {
     return BeanDef.propertiesToBean(this, to, copyOptions)
 }
 

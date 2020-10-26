@@ -1,12 +1,18 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.bean.beanToMap
 import xyz.srclab.common.bean.propertiesToBean
 import xyz.srclab.common.bean.propertiesToMap
+import xyz.srclab.common.bean.resolveBean
 import xyz.srclab.common.reflect.TypeRef
+import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.reflect.toInstance
+import xyz.srclab.common.reflect.upperClass
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.lang.reflect.TypeVariable
+import java.lang.reflect.WildcardType
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.text.DateFormat
@@ -14,6 +20,7 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
@@ -159,10 +166,8 @@ interface Converter {
 
     companion object {
 
-        @JvmStatic
-        fun defaultConverter(): Converter {
-            return ConvertSupport.defaultConverter()
-        }
+        @JvmField
+        val DEFAULT: Converter = newBuilder().addHandlers(ConvertHandler.DEFAULTS).build()
 
         @JvmStatic
         fun newBuilder(): Builder {
@@ -172,19 +177,19 @@ interface Converter {
         @JvmStatic
         @Throws(UnsupportedOperationException::class)
         fun <T> convertTo(from: Any?, to: Class<T>): T {
-            return defaultConverter().convert(from, to)
+            return DEFAULT.convert(from, to)
         }
 
         @JvmStatic
         @Throws(UnsupportedOperationException::class)
         fun <T> convertTo(from: Any?, to: Type): T {
-            return defaultConverter().convert(from, to)
+            return DEFAULT.convert(from, to)
         }
 
         @JvmStatic
         @Throws(UnsupportedOperationException::class)
         fun <T> convertTo(from: Any?, to: TypeRef<T>): T {
-            return defaultConverter().convert(from, to)
+            return DEFAULT.convert(from, to)
         }
     }
 }
@@ -218,9 +223,8 @@ interface ConvertHandler {
 
     companion object {
 
-        fun defaultHandlers(): List<ConvertHandler?>? {
-            return ConvertHandlerSupport.defaultHandlers()
-        }
+        @JvmField
+        val DEFAULTS: List<ConvertHandler> = ConvertHandlerSupport.defaultHandlers()
     }
 }
 
@@ -338,19 +342,85 @@ object BeanConvertHandler : ConvertHandler {
             return null
         }
         return when (to) {
-            is HashMap<*, *> -> return from.propertiesToMap(HashMap())
-            is LinkedHashMap<*, *> -> return from.propertiesToMap(LinkedHashMap())
-            is TreeMap<*, *> -> return from.propertiesToMap(TreeMap())
-            is ConcurrentHashMap<*, *> -> return from.propertiesToMap(ConcurrentHashMap())
-            else -> from.propertiesToBean(to.toInstance<Any>())
+            Map::class.java -> from.propertiesToMap(HashMap<Any, Any?>(), to, converter).toMap()
+            MutableMap::class.java, HashMap::class.java -> return from.propertiesToMap(
+                HashMap<Any, Any?>(),
+                to,
+                converter
+            )
+            LinkedHashMap::class.java -> return from.propertiesToMap(LinkedHashMap<Any, Any?>(), to, converter)
+            TreeMap::class.java -> return from.propertiesToMap(TreeMap<Any, Any?>(), to, converter)
+            ConcurrentHashMap::class.java -> return from.propertiesToMap(ConcurrentHashMap<Any, Any?>(), to, converter)
+            else -> from.propertiesToBean(to.toInstance<Any>(), converter)
         }
     }
 
     override fun convert(from: Any?, to: Type, converter: Converter): Any? {
+        if (from === null) {
+            return null
+        }
         return when (to) {
             is Class<*> -> return convert(from, to, converter)
-            is ParameterizedType ->
+            is ParameterizedType -> {
+                return when (val rawClass = to.rawClass) {
+                    Map::class.java -> from.propertiesToMap(HashMap<Any, Any?>(), to, converter).toMap()
+                    MutableMap::class.java, HashMap::class.java -> return from.propertiesToMap(
+                        HashMap<Any, Any?>(),
+                        to,
+                        converter
+                    )
+                    LinkedHashMap::class.java -> return from.propertiesToMap(LinkedHashMap<Any, Any?>(), to, converter)
+                    TreeMap::class.java -> return from.propertiesToMap(TreeMap<Any, Any?>(), to, converter)
+                    ConcurrentHashMap::class.java -> return from.propertiesToMap(
+                        ConcurrentHashMap<Any, Any?>(),
+                        to,
+                        converter
+                    )
+                    else -> {
+                        val toInstance = rawClass.toInstance<Any>()
+                        return from.propertiesToBean(toInstance, to, converter)
+                    }
+                }
+            }
+            is TypeVariable<*>, is WildcardType -> return convert(from, to.upperClass, converter)
             else -> null
         }
     }
+}
+
+object ListConvertHandler : ConvertHandler {
+
+    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
+        if (from === null) {
+            return null
+        }
+        return when (to) {
+            List::class.java, ArrayList::class.java->
+        }
+    }
+
+    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
+        if (from === null) {
+            return null
+        }
+        return when (to) {
+            is Class<*> -> return convert(from, to, converter)
+            is TypeVariable<*>, is WildcardType -> return convert(from, to.upperClass, converter)
+            is ParameterizedType -> {
+                val toInstance = to.rawClass.toInstance<Any>()
+                val toSchema = to.resolveBean()
+                from.beanToMap().forEach { (name, value) ->
+                    val toProperty = toSchema.getProperty(name)
+                    if (toProperty === null || !toProperty.isWriteable) {
+                        return@forEach
+                    }
+                    toProperty.setValue(toInstance, value, converter)
+                }
+                return toInstance
+            }
+            else -> null
+        }
+    }
+
+    private fun<L:MutableList> toList()
 }
