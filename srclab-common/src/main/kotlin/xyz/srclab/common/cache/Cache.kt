@@ -4,12 +4,19 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
 import xyz.srclab.common.base.ABSENT_VALUE
 import xyz.srclab.common.base.CachingProductBuilder
-import xyz.srclab.common.base.Defaults
 import xyz.srclab.common.base.asAny
 import java.time.Duration
 import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
 import com.google.common.cache.RemovalCause as guavaRemovalCause
 
+/**
+ * @see GuavaCache
+ * @see GuavaLoadingCache
+ * @see CaffeineCache
+ * @see CaffeineLoadingCache
+ * @see MapCache
+ * @see ThreadLocalCache
+ */
 interface Cache<K : Any, V> {
 
     @Throws(NoSuchElementException::class)
@@ -99,12 +106,12 @@ interface Cache<K : Any, V> {
 
     class Builder<K : Any, V> : CachingProductBuilder<Cache<K, V>>() {
 
-        private var initialCapacity: Int = 4
-        private var maxSize: Long = Long.MAX_VALUE
-        private var concurrencyLevel: Int = Defaults.concurrencyLevel
-        private var expireAfterAccess: Duration = Duration.ZERO
-        private var expireAfterWrite: Duration = Duration.ZERO
-        private var refreshAfterWrite: Duration = Duration.ZERO
+        private var initialCapacity: Int? = null
+        private var maxSize: Long? = null
+        private var concurrencyLevel: Int? = null
+        private var expireAfterAccess: Duration? = null
+        private var expireAfterWrite: Duration? = null
+        private var refreshAfterWrite: Duration? = null
         private var loader: ((K) -> V)? = null
         private var createListener: CacheCreateListener<in K, in V>? = null
         private var readListener: CacheReadListener<in K, in V>? = null
@@ -185,81 +192,125 @@ interface Cache<K : Any, V> {
         }
 
         override fun buildNew(): Cache<K, V> {
+            val params = Params(
+                initialCapacity,
+                maxSize,
+                concurrencyLevel,
+                expireAfterAccess,
+                expireAfterWrite,
+                refreshAfterWrite,
+                loader,
+                createListener,
+                readListener,
+                updateListener,
+                removeListener,
+            )
             return if (useGuava) {
-                val guavaBuilder = com.google.common.cache.CacheBuilder.newBuilder()
-                guavaBuilder.maximumSize(maxSize)
-                    .initialCapacity(initialCapacity)
-                    .concurrencyLevel(concurrencyLevel)
-                if (expireAfterAccess != Duration.ZERO) {
-                    guavaBuilder.expireAfterAccess(expireAfterAccess)
-                }
-                if (expireAfterWrite != Duration.ZERO) {
-                    guavaBuilder.expireAfterWrite(expireAfterAccess)
-                }
-                if (refreshAfterWrite != Duration.ZERO) {
-                    guavaBuilder.refreshAfterWrite(refreshAfterWrite)
-                }
-                val listener = removeListener
-                if (listener !== null) {
-                    guavaBuilder.removalListener(RemovalListener<K, V> { notification ->
-                        val removeCause: CacheRemoveListener.Cause = when (notification.cause) {
-                            guavaRemovalCause.EXPLICIT -> CacheRemoveListener.Cause.EXPLICIT
-                            guavaRemovalCause.REPLACED -> CacheRemoveListener.Cause.REPLACED
-                            guavaRemovalCause.COLLECTED -> CacheRemoveListener.Cause.COLLECTED
-                            guavaRemovalCause.EXPIRED -> CacheRemoveListener.Cause.EXPIRED
-                            guavaRemovalCause.SIZE -> CacheRemoveListener.Cause.SIZE
-                        }
-                        listener.afterRemove(notification.key, notification.value, removeCause)
-                    })
-                }
-                val cacheLoader = loader
-                if (cacheLoader === null) {
-                    val guavaCache = guavaBuilder.build<K, V>()
-                    GuavaCache(guavaCache)
-                } else {
-                    val loadingGuavaCache = guavaBuilder.build(object : com.google.common.cache.CacheLoader<K, V>() {
-                        override fun load(key: K): V {
-                            return cacheLoader(key)
-                        }
-                    })
-                    GuavaLoadingCache(loadingGuavaCache)
-                }
+                buildGuavaCache(params)
             } else {
-                val caffeineBuilder = Caffeine.newBuilder()
-                caffeineBuilder.maximumSize(maxSize)
-                    .initialCapacity(initialCapacity)
-                if (expireAfterAccess != Duration.ZERO) {
-                    caffeineBuilder.expireAfterAccess(expireAfterAccess)
-                }
-                if (expireAfterWrite != Duration.ZERO) {
-                    caffeineBuilder.expireAfterWrite(expireAfterAccess)
-                }
-                if (refreshAfterWrite != Duration.ZERO) {
-                    caffeineBuilder.refreshAfterWrite(refreshAfterWrite)
-                }
-                val listener = removeListener
-                if (listener !== null) {
-                    caffeineBuilder.removalListener<K, V> { key, value, cause ->
-                        val removeCause: CacheRemoveListener.Cause = when (cause) {
-                            caffeineRemovalCause.EXPLICIT -> CacheRemoveListener.Cause.EXPLICIT
-                            caffeineRemovalCause.REPLACED -> CacheRemoveListener.Cause.REPLACED
-                            caffeineRemovalCause.COLLECTED -> CacheRemoveListener.Cause.COLLECTED
-                            caffeineRemovalCause.EXPIRED -> CacheRemoveListener.Cause.EXPIRED
-                            caffeineRemovalCause.SIZE -> CacheRemoveListener.Cause.SIZE
-                        }
-                        listener.afterRemove(key.asAny(), value.asAny(), removeCause)
-                    }
-                }
-                val cacheLoader = loader
-                if (cacheLoader === null) {
-                    val guavaCache = caffeineBuilder.build<K, V>()
-                    CaffeineCache(guavaCache)
-                } else {
-                    val loadingGuavaCache = caffeineBuilder.build<K, V> { k -> cacheLoader(k) }
-                    CaffeineLoadingCache(loadingGuavaCache)
-                }
+                buildCaffeineCache(params)
             }
         }
+
+        private fun buildGuavaCache(params: Params<K, V>): Cache<K, V> {
+            val guavaBuilder = com.google.common.cache.CacheBuilder.newBuilder()
+            if (params.initialCapacity !== null) {
+                guavaBuilder.initialCapacity(params.initialCapacity)
+            }
+            if (params.maxSize !== null) {
+                guavaBuilder.maximumSize(params.maxSize)
+            }
+            if (params.concurrencyLevel !== null) {
+                guavaBuilder.concurrencyLevel(params.concurrencyLevel)
+            }
+            if (params.expireAfterAccess !== null) {
+                guavaBuilder.expireAfterAccess(params.expireAfterAccess)
+            }
+            if (params.expireAfterWrite !== null) {
+                guavaBuilder.expireAfterWrite(params.expireAfterWrite)
+            }
+            if (params.refreshAfterWrite !== null) {
+                guavaBuilder.refreshAfterWrite(params.refreshAfterWrite)
+            }
+            if (params.removeListener !== null) {
+                guavaBuilder.removalListener(RemovalListener<K, V> { notification ->
+                    val removeCause: CacheRemoveListener.Cause = when (notification.cause) {
+                        guavaRemovalCause.EXPLICIT -> CacheRemoveListener.Cause.EXPLICIT
+                        guavaRemovalCause.REPLACED -> CacheRemoveListener.Cause.REPLACED
+                        guavaRemovalCause.COLLECTED -> CacheRemoveListener.Cause.COLLECTED
+                        guavaRemovalCause.EXPIRED -> CacheRemoveListener.Cause.EXPIRED
+                        guavaRemovalCause.SIZE -> CacheRemoveListener.Cause.SIZE
+                    }
+                    params.removeListener.afterRemove(notification.key, notification.value, removeCause)
+                })
+            }
+            val loader = params.loader
+            return if (loader === null) {
+                val guavaCache = guavaBuilder.build<K, V>()
+                GuavaCache(guavaCache)
+            } else {
+                val loadingGuavaCache =
+                    guavaBuilder.build(object : com.google.common.cache.CacheLoader<K, V>() {
+                        override fun load(key: K): V {
+                            return loader(key)
+                        }
+                    })
+                GuavaLoadingCache(loadingGuavaCache)
+            }
+        }
+
+        private fun buildCaffeineCache(params: Params<K, V>): Cache<K, V> {
+            val caffeineBuilder = Caffeine.newBuilder()
+            if (params.initialCapacity !== null) {
+                caffeineBuilder.initialCapacity(params.initialCapacity)
+            }
+            if (params.maxSize !== null) {
+                caffeineBuilder.maximumSize(params.maxSize)
+            }
+            if (params.expireAfterAccess !== null) {
+                caffeineBuilder.expireAfterAccess(params.expireAfterAccess)
+            }
+            if (params.expireAfterWrite !== null) {
+                caffeineBuilder.expireAfterWrite(params.expireAfterWrite)
+            }
+            if (params.refreshAfterWrite !== null) {
+                caffeineBuilder.refreshAfterWrite(params.refreshAfterWrite)
+            }
+            if (params.removeListener !== null) {
+                caffeineBuilder.removalListener<K, V> { key, value, cause ->
+                    val removeCause: CacheRemoveListener.Cause = when (cause) {
+                        caffeineRemovalCause.EXPLICIT -> CacheRemoveListener.Cause.EXPLICIT
+                        caffeineRemovalCause.REPLACED -> CacheRemoveListener.Cause.REPLACED
+                        caffeineRemovalCause.COLLECTED -> CacheRemoveListener.Cause.COLLECTED
+                        caffeineRemovalCause.EXPIRED -> CacheRemoveListener.Cause.EXPIRED
+                        caffeineRemovalCause.SIZE -> CacheRemoveListener.Cause.SIZE
+                    }
+                    params.removeListener.afterRemove(key.asAny(), value.asAny(), removeCause)
+                }
+            }
+            val loader = params.loader
+            return if (loader === null) {
+                val guavaCache = caffeineBuilder.build<K, V>()
+                CaffeineCache(guavaCache)
+            } else {
+                val loadingGuavaCache = caffeineBuilder.build<K, V> { k -> loader(k) }
+                CaffeineLoadingCache(loadingGuavaCache)
+            }
+        }
+
+        data class Params<K, V>(
+            internal val initialCapacity: Int? = null,
+            internal val maxSize: Long? = null,
+            internal val concurrencyLevel: Int? = null,
+            internal val expireAfterAccess: Duration? = null,
+            internal val expireAfterWrite: Duration? = null,
+            internal val refreshAfterWrite: Duration? = null,
+            internal val loader: ((K) -> V)? = null,
+            internal val createListener: CacheCreateListener<in K, in V>? = null,
+            internal val readListener: CacheReadListener<in K, in V>? = null,
+            internal val updateListener: CacheUpdateListener<in K, in V>? = null,
+            internal val removeListener: CacheRemoveListener<in K, in V>? = null,
+        )
     }
 
     companion object {
