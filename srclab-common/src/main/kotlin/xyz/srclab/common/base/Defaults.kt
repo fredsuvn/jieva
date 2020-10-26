@@ -52,4 +52,8 @@ object Defaults {
     @JvmStatic
     @get:JvmName("radix")
     val radix: Int = 10
+
+    @JvmStatic
+    @get:JvmName("shell")
+    val shell: Shell = Shell.DEFAULT
 }

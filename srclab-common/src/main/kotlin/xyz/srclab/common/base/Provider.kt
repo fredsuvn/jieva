@@ -40,15 +40,15 @@ interface Provider<S, T : Any> {
     }
 }
 
-fun <T : Any> CharSequence.parseByCharsProvider(strictly: Boolean = false): List<T> {
+fun <T : Any> CharSequence.charsProviderParse(strictly: Boolean = false): List<T> {
     return Provider.parse(this)
 }
 
-fun <T : Any> CharSequence.parseFirstByCharsProvider(strictly: Boolean = false): T {
+fun <T : Any> CharSequence.charsProviderParseFirst(strictly: Boolean = false): T {
     return Provider.parseFirst(this)
 }
 
-fun <T : Any> CharSequence.parseFirstOrNullByCharsProvider(strictly: Boolean = false): T? {
+fun <T : Any> CharSequence.charsProviderParseFirstOrNull(strictly: Boolean = false): T? {
     return Provider.parseFirstOrNull(this)
 }
 

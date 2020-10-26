@@ -47,12 +47,12 @@ interface StaticInvoker : Invoker {
 
         @JvmStatic
         fun forMethod(method: Method): StaticInvoker {
-            return InvokerProvider.defaultProvider().staticInvoker(method)
+            return InvokerProvider.DEFAULT.staticInvoker(method)
         }
 
         @JvmStatic
         fun forConstructor(constructor: Constructor<*>): StaticInvoker {
-            return InvokerProvider.defaultProvider().staticInvoker(constructor)
+            return InvokerProvider.DEFAULT.staticInvoker(constructor)
         }
     }
 }
@@ -65,7 +65,7 @@ interface VirtualInvoker : Invoker {
 
         @JvmStatic
         fun forMethod(method: Method): VirtualInvoker {
-            return InvokerProvider.defaultProvider().virtualInvoker(method)
+            return InvokerProvider.DEFAULT.virtualInvoker(method)
         }
     }
 }
@@ -92,10 +92,8 @@ interface InvokerProvider {
 
     companion object {
 
-        @JvmStatic
-        fun defaultProvider(): InvokerProvider {
-            return ReflectedInvokerProvider
-        }
+        @JvmField
+        val DEFAULT: InvokerProvider = ReflectedInvokerProvider
     }
 }
 

@@ -16,15 +16,9 @@ interface Shell {
 
     companion object {
 
-        @JvmStatic
-        fun defaultShell(): Shell {
-            return SystemShell
-        }
+        @JvmField
+        val DEFAULT: Shell = DefaultShell
     }
-}
-
-fun defaultShell(): Shell {
-    return Shell.defaultShell()
 }
 
 abstract class StreamShell(input: InputStream, output: PrintStream) : Shell {
@@ -49,4 +43,4 @@ abstract class StreamShell(input: InputStream, output: PrintStream) : Shell {
     }
 }
 
-object SystemShell : StreamShell(System.`in`, System.out)
+object DefaultShell : StreamShell(System.`in`, System.out)

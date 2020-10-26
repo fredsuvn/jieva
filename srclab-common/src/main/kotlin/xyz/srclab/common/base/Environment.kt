@@ -197,39 +197,92 @@ interface Environment {
 
     companion object {
 
-        const val KEY_OF_JAVA_VERSION = "java.version"
-        const val KEY_OF_JAVA_VENDOR = "java.vendor"
-        const val KEY_OF_JAVA_VENDOR_URL = "java.vendor.url"
-        const val KEY_OF_JAVA_HOME = "java.home"
-        const val KEY_OF_JAVA_VM_SPECIFICATION_VERSION = "java.vm.specification.version"
-        const val KEY_OF_JAVA_VM_SPECIFICATION_VENDOR = "java.vm.specification.vendor"
-        const val KEY_OF_JAVA_VM_SPECIFICATION_NAME = "java.vm.specification.name"
-        const val KEY_OF_JAVA_VM_VERSION = "java.vm.version"
-        const val KEY_OF_JAVA_VM_VENDOR = "java.vm.vendor"
-        const val KEY_OF_JAVA_VM_NAME = "java.vm.name"
-        const val KEY_OF_JAVA_SPECIFICATION_VERSION = "java.specification.version"
-        const val KEY_OF_JAVA_SPECIFICATION_VENDOR = "java.specification.vendor"
-        const val KEY_OF_JAVA_SPECIFICATION_NAME = "java.specification.name"
-        const val KEY_OF_JAVA_CLASS_VERSION = "java.class.version"
-        const val KEY_OF_JAVA_CLASS_PATH = "java.class.path"
-        const val KEY_OF_JAVA_LIBRARY_PATH = "java.library.path"
-        const val KEY_OF_JAVA_IO_TMPDIR = "java.io.tmpdir"
-        const val KEY_OF_JAVA_COMPILER = "java.compiler"
-        const val KEY_OF_JAVA_EXT_DIRS = "java.ext.dirs"
-        const val KEY_OF_OS_NAME = "os.name"
-        const val KEY_OF_OS_ARCH = "os.arch"
-        const val KEY_OF_OS_VERSION = "os.version"
-        const val KEY_OF_FILE_SEPARATOR = "file.separator"
-        const val KEY_OF_PATH_SEPARATOR = "path.separator"
-        const val KEY_OF_LINE_SEPARATOR = "line.separator"
-        const val KEY_OF_USER_NAME = "user.name"
-        const val KEY_OF_USER_HOME = "user.home"
-        const val KEY_OF_USER_DIR = "user.dir"
+        @JvmField
+        val KEY_OF_JAVA_VERSION = "java.version"
 
-        @JvmStatic
-        fun defaultEnvironment(): Environment {
-            return DefaultEnvironment
-        }
+        @JvmField
+        val KEY_OF_JAVA_VENDOR = "java.vendor"
+
+        @JvmField
+        val KEY_OF_JAVA_VENDOR_URL = "java.vendor.url"
+
+        @JvmField
+        val KEY_OF_JAVA_HOME = "java.home"
+
+        @JvmField
+        val KEY_OF_JAVA_VM_SPECIFICATION_VERSION = "java.vm.specification.version"
+
+        @JvmField
+        val KEY_OF_JAVA_VM_SPECIFICATION_VENDOR = "java.vm.specification.vendor"
+
+        @JvmField
+        val KEY_OF_JAVA_VM_SPECIFICATION_NAME = "java.vm.specification.name"
+
+        @JvmField
+        val KEY_OF_JAVA_VM_VERSION = "java.vm.version"
+
+        @JvmField
+        val KEY_OF_JAVA_VM_VENDOR = "java.vm.vendor"
+
+        @JvmField
+        val KEY_OF_JAVA_VM_NAME = "java.vm.name"
+
+        @JvmField
+        val KEY_OF_JAVA_SPECIFICATION_VERSION = "java.specification.version"
+
+        @JvmField
+        val KEY_OF_JAVA_SPECIFICATION_VENDOR = "java.specification.vendor"
+
+        @JvmField
+        val KEY_OF_JAVA_SPECIFICATION_NAME = "java.specification.name"
+
+        @JvmField
+        val KEY_OF_JAVA_CLASS_VERSION = "java.class.version"
+
+        @JvmField
+        val KEY_OF_JAVA_CLASS_PATH = "java.class.path"
+
+        @JvmField
+        val KEY_OF_JAVA_LIBRARY_PATH = "java.library.path"
+
+        @JvmField
+        val KEY_OF_JAVA_IO_TMPDIR = "java.io.tmpdir"
+
+        @JvmField
+        val KEY_OF_JAVA_COMPILER = "java.compiler"
+
+        @JvmField
+        val KEY_OF_JAVA_EXT_DIRS = "java.ext.dirs"
+
+        @JvmField
+        val KEY_OF_OS_NAME = "os.name"
+
+        @JvmField
+        val KEY_OF_OS_ARCH = "os.arch"
+
+        @JvmField
+        val KEY_OF_OS_VERSION = "os.version"
+
+        @JvmField
+        val KEY_OF_FILE_SEPARATOR = "file.separator"
+
+        @JvmField
+        val KEY_OF_PATH_SEPARATOR = "path.separator"
+
+        @JvmField
+        val KEY_OF_LINE_SEPARATOR = "line.separator"
+
+        @JvmField
+        val KEY_OF_USER_NAME = "user.name"
+
+        @JvmField
+        val KEY_OF_USER_HOME = "user.home"
+
+        @JvmField
+        val KEY_OF_USER_DIR = "user.dir"
+
+        @JvmField
+        val DEFAULT: Environment = DefaultEnvironment
     }
 }
 

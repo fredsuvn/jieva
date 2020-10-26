@@ -38,6 +38,21 @@ object Current {
     }
 
     @JvmStatic
+    fun <T> getOrElse(key: Any, value: T): T {
+        return getOrNull(key) ?: value
+    }
+
+    @JvmStatic
+    fun <T> getOrElse(key: Any, supplier: (key: Any) -> T): T {
+        return getOrNull(key) ?: supplier(key)
+    }
+
+    @JvmStatic
+    fun <T> getOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
+        return getOrNull(key) ?: throw supplier(key)
+    }
+
+    @JvmStatic
     fun set(key: Any, value: Any?) {
         context[key] = value
     }
