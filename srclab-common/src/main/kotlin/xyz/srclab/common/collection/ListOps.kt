@@ -4,6 +4,7 @@ import xyz.srclab.common.base.asAny
 import xyz.srclab.common.base.castSelfComparableComparator
 import java.util.*
 import kotlin.random.Random
+import xyz.srclab.common.collection.asList as arrayAsList
 import kotlin.collections.binarySearch as binarySearchKt
 import kotlin.collections.dropLast as dropLastKt
 import kotlin.collections.dropLastWhile as dropLastWhileKt
@@ -468,6 +469,34 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
         @JvmStatic
         fun <T> MutableList<T>.retainAll(predicate: (T) -> Boolean): Boolean {
             return this.retainAllKt(predicate)
+        }
+
+        //Other utils:
+
+        @JvmStatic
+        fun <T> Any.asMutableList(): MutableList<T> {
+            val result = this.asMutableListOrNull<T>()
+            if (result === null) {
+                throw IllegalArgumentException("$this cannot convert to MutableList.")
+            }
+            return result
+        }
+
+        @JvmStatic
+        fun <T> Any.asMutableListOrNull(): MutableList<T>? {
+            return when (this) {
+                is MutableList<*> -> this.asAny()
+                is BooleanArray -> this.arrayAsList().asAny()
+                is ByteArray -> this.arrayAsList().asAny()
+                is ShortArray -> this.arrayAsList().asAny()
+                is CharArray -> this.arrayAsList().asAny()
+                is IntArray -> this.arrayAsList().asAny()
+                is LongArray -> this.arrayAsList().asAny()
+                is FloatArray -> this.arrayAsList().asAny()
+                is DoubleArray -> this.arrayAsList().asAny()
+                is Array<*> -> this.arrayAsList().asAny()
+                else -> null
+            }
         }
     }
 }

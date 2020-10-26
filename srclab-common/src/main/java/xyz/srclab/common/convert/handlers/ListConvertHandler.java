@@ -21,17 +21,17 @@ import java.util.function.Supplier;
 public class ListConvertHandler implements ConvertHandler {
 
     @Override
-    public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        if (to.isArray()) {
+    public @Nullable Object convert(Object from, Class<?> toType, Converter converter) {
+        if (toType.isArray()) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
-                return iterableToArray(iterable, to.getComponentType(), converter);
+                return iterableToArray(iterable, toType.getComponentType(), converter);
             } else if (from.getClass().isArray()) {
-                return arrayToArray(from, to.getComponentType(), converter);
+                return arrayToArray(from, toType.getComponentType(), converter);
             }
             return null;
         }
-        if (to.equals(List.class) || to.equals(Iterable.class)) {
+        if (toType.equals(List.class) || toType.equals(Iterable.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
                 return iterableToList(iterable, Object.class, converter, LinkedList::new);
@@ -40,7 +40,7 @@ public class ListConvertHandler implements ConvertHandler {
             }
             return null;
         }
-        if (to.equals(ArrayList.class)) {
+        if (toType.equals(ArrayList.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
                 return iterableToList(iterable, Object.class, converter, ArrayList::new);
@@ -49,7 +49,7 @@ public class ListConvertHandler implements ConvertHandler {
             }
             return null;
         }
-        if (to.equals(LinkedList.class)) {
+        if (toType.equals(LinkedList.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
                 return iterableToList(iterable, Object.class, converter, LinkedList::new);
@@ -62,25 +62,25 @@ public class ListConvertHandler implements ConvertHandler {
     }
 
     @Override
-    public @Nullable Object convert(Object from, Type to, Converter converter) {
-        if (to instanceof Class) {
-            return convert(from, (Class<?>) to, converter);
+    public @Nullable Object convert(Object from, Type toType, Converter converter) {
+        if (toType instanceof Class) {
+            return convert(from, (Class<?>) toType, converter);
         }
-        if (to instanceof GenericArrayType) {
+        if (toType instanceof GenericArrayType) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
                 return iterableToArray(
-                        iterable, TypeKit.getUpperClass(((GenericArrayType) to).getGenericComponentType()), converter);
+                        iterable, TypeKit.getUpperClass(((GenericArrayType) toType).getGenericComponentType()), converter);
             } else if (from.getClass().isArray()) {
                 return arrayToArray(from,
-                        TypeKit.getUpperClass(((GenericArrayType) to).getGenericComponentType()), converter);
+                        TypeKit.getUpperClass(((GenericArrayType) toType).getGenericComponentType()), converter);
             }
             return null;
         }
-        if (!(to instanceof ParameterizedType)) {
+        if (!(toType instanceof ParameterizedType)) {
             return null;
         }
-        ParameterizedType listType = (ParameterizedType) to;
+        ParameterizedType listType = (ParameterizedType) toType;
         Class<?> rawListType = TypeKit.getUpperClass(listType.getRawType());
         if (rawListType.equals(List.class) || rawListType.equals(Iterable.class)) {
             if (from instanceof Iterable) {

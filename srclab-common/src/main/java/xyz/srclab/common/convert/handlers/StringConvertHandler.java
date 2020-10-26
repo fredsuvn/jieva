@@ -11,19 +11,19 @@ import java.lang.reflect.Type;
 public class StringConvertHandler implements ConvertHandler {
 
     @Override
-    public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        if (to.equals(String.class)
-                || to.isAssignableFrom(String.class)
-                || to.isAssignableFrom(CharSequence.class)) {
+    public @Nullable Object convert(Object from, Class<?> toType, Converter converter) {
+        if (toType.equals(String.class)
+                || toType.isAssignableFrom(String.class)
+                || toType.isAssignableFrom(CharSequence.class)) {
             return from.toString();
         }
         return null;
     }
 
     @Override
-    public @Nullable Object convert(Object from, Type to, Converter converter) {
-        if (to instanceof Class) {
-            return convert(from, (Class<?>) to, converter);
+    public @Nullable Object convert(Object from, Type toType, Converter converter) {
+        if (toType instanceof Class) {
+            return convert(from, (Class<?>) toType, converter);
         }
         return null;
     }

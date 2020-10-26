@@ -284,7 +284,11 @@ fun <T : Any> Any.propertiesToBean(to: T, converter: Converter): T {
     return BeanDef.propertiesToBean(this, to)
 }
 
-fun <T : Any> Any.propertiesToBean(to: T, toSchema:Type, converter: Converter): T {
+fun <T : Any> Any.propertiesToBean(to: T, toType: Type, converter: Converter): T {
+    return BeanDef.propertiesToBean(this, to)
+}
+
+fun <T : Any> Any.propertiesToBean(to: T, fromType: Type, toType: Type, converter: Converter): T {
     return BeanDef.propertiesToBean(this, to)
 }
 
@@ -296,7 +300,11 @@ fun <M : MutableMap<String, Any?>> Any.propertiesToMap(to: M, ignoreNull: Boolea
     return BeanDef.propertiesToMap(this, to, ignoreNull)
 }
 
-fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, toSchema: Type, converter: Converter): M {
+fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, toType: Type, converter: Converter): M {
+    return BeanDef.propertiesToBean(this, to)
+}
+
+fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, fromType: Type, toType: Type, converter: Converter): M {
     return BeanDef.propertiesToBean(this, to)
 }
 

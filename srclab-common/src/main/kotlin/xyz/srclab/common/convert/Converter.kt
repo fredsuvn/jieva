@@ -5,10 +5,13 @@ import xyz.srclab.common.bean.beanToMap
 import xyz.srclab.common.bean.propertiesToBean
 import xyz.srclab.common.bean.propertiesToMap
 import xyz.srclab.common.bean.resolveBean
-import xyz.srclab.common.reflect.TypeRef
-import xyz.srclab.common.reflect.rawClass
-import xyz.srclab.common.reflect.toInstance
-import xyz.srclab.common.reflect.upperClass
+import xyz.srclab.common.collection.BaseIterableOps.Companion.asToList
+import xyz.srclab.common.collection.IterableSchema
+import xyz.srclab.common.collection.ListOps.Companion.asMutableList
+import xyz.srclab.common.collection.ListOps.Companion.asMutableListOrNull
+import xyz.srclab.common.collection.isArray
+import xyz.srclab.common.collection.resolveIterableSchemaOrNull
+import xyz.srclab.common.reflect.*
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.TypeVariable
@@ -27,107 +30,22 @@ import kotlin.collections.LinkedHashMap
 interface Converter {
 
     @Throws(UnsupportedOperationException::class)
-    fun <T> convert(from: Any?, to: Class<T>): T
+    fun <T> convert(from: Any?, toType: Class<T>): T
 
     @Throws(UnsupportedOperationException::class)
-    fun <T> convert(from: Any?, to: Type): T
+    fun <T> convert(from: Any?, toType: Type): T
 
     @Throws(UnsupportedOperationException::class)
-    fun <T> convert(from: Any?, to: TypeRef<T>): T
-
-    @Throws(UnsupportedOperationException::class)
-    fun toString(any: Any?): String {
-        return convert(any, String::class.java)
+    fun <T> convert(from: Any?, toTypeRef: TypeRef<T>): T {
+        return convert(from, toTypeRef.type)
     }
 
     @Throws(UnsupportedOperationException::class)
-    fun toBoolean(any: Any?): Boolean {
-        return convert(any, Boolean::class.java)
-    }
+    fun <T> convert(from: Any?, fromType: Type, toType: Type): T
 
     @Throws(UnsupportedOperationException::class)
-    fun toByte(any: Any?): Byte {
-        return convert(any, Byte::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toShort(any: Any?): Short {
-        return convert(any, Short::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toChar(any: Any?): Char {
-        return convert(any, Char::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toInt(any: Any?): Int {
-        return convert(any, Int::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toLong(any: Any?): Long {
-        return convert(any, Long::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toFloat(any: Any?): Float {
-        return convert(any, Float::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toDouble(any: Any?): Double {
-        return convert(any, Double::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toBigInteger(any: Any?): BigInteger {
-        return convert(any, BigInteger::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toBigDecimal(any: Any?): BigDecimal {
-        return convert(any, BigDecimal::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toDate(any: Any?): Date {
-        return convert(any, Date::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toInstant(any: Any?): Instant {
-        return convert(any, Instant::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toLocalDateTime(any: Any?): LocalDateTime {
-        return convert(any, LocalDateTime::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toZonedDateTime(any: Any?): ZonedDateTime {
-        return convert(any, ZonedDateTime::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toOffsetDateTime(any: Any?): OffsetDateTime {
-        return convert(any, OffsetDateTime::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toLocalDate(any: Any?): LocalDate {
-        return convert(any, LocalDate::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toLocalTime(any: Any?): LocalTime {
-        return convert(any, LocalTime::class.java)
-    }
-
-    @Throws(UnsupportedOperationException::class)
-    fun toDuration(any: Any?): Duration {
-        return convert(any, Duration::class.java)
+    fun <T> convert(from: Any?, fromTypeRef: TypeRef<T>, toTypeRef: TypeRef<T>): T {
+        return convert(from, fromTypeRef.type, toTypeRef.type)
     }
 
     class Builder : HandlersCachingProductBuilder<Converter, ConvertHandler, Builder>() {
@@ -138,28 +56,43 @@ interface Converter {
 
         private class ConverterImpl(private val handlers: List<ConvertHandler>) : Converter {
 
-            override fun <T> convert(from: Any?, to: Class<T>): T {
+            override fun <T> convert(from: Any?, toType: Class<T>): T {
                 for (handler in handlers) {
-                    val result = handler.convert(from, to, this)
+                    val result = handler.convert(from, toType, this)
+                    if (result === NULL_VALUE) {
+                        return null as T
+                    }
                     if (result !== null) {
                         return result.asAny()
                     }
                 }
-                throw UnsupportedOperationException("Converting $from to $to doesn't supported.")
+                throw UnsupportedOperationException("Cannot convert $from to $toType.")
             }
 
-            override fun <T> convert(from: Any?, to: Type): T {
+            override fun <T> convert(from: Any?, toType: Type): T {
                 for (handler in handlers) {
-                    val result = handler.convert(from, to, this)
+                    val result = handler.convert(from, toType, this)
+                    if (result === NULL_VALUE) {
+                        return null as T
+                    }
                     if (result !== null) {
                         return result.asAny()
                     }
                 }
-                throw UnsupportedOperationException("Converting $from to $to doesn't supported.")
+                throw UnsupportedOperationException("Cannot convert $from to $toType.")
             }
 
-            override fun <T> convert(from: Any?, to: TypeRef<T>): T {
-                return convert(from, to.type)
+            override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
+                for (handler in handlers) {
+                    val result = handler.convert(from, fromType, toType, this)
+                    if (result === NULL_VALUE) {
+                        return null as T
+                    }
+                    if (result !== null) {
+                        return result.asAny()
+                    }
+                }
+                throw UnsupportedOperationException("Cannot convert $fromType to $toType.")
             }
         }
     }
@@ -176,37 +109,59 @@ interface Converter {
 
         @JvmStatic
         @Throws(UnsupportedOperationException::class)
-        fun <T> convertTo(from: Any?, to: Class<T>): T {
-            return DEFAULT.convert(from, to)
+        fun <T> convertTo(from: Any?, toType: Class<T>): T {
+            return DEFAULT.convert(from, toType)
         }
 
         @JvmStatic
         @Throws(UnsupportedOperationException::class)
-        fun <T> convertTo(from: Any?, to: Type): T {
-            return DEFAULT.convert(from, to)
+        fun <T> convertTo(from: Any?, toType: Type): T {
+            return DEFAULT.convert(from, toType)
         }
 
         @JvmStatic
         @Throws(UnsupportedOperationException::class)
-        fun <T> convertTo(from: Any?, to: TypeRef<T>): T {
-            return DEFAULT.convert(from, to)
+        fun <T> convertTo(from: Any?, toTypeRef: TypeRef<T>): T {
+            return DEFAULT.convert(from, toTypeRef)
+        }
+
+        @JvmStatic
+        @Throws(UnsupportedOperationException::class)
+        fun <T> convertTo(from: Any?, fromType: Type, toType: Type): T {
+            return DEFAULT.convert(from, fromType, toType)
+        }
+
+        @JvmStatic
+        @Throws(UnsupportedOperationException::class)
+        fun <T> convertTo(from: Any?, fromTypeRef: TypeRef<T>, toTypeRef: TypeRef<T>): T {
+            return DEFAULT.convert(from, fromTypeRef, toTypeRef)
         }
     }
 }
 
 @Throws(UnsupportedOperationException::class)
-fun <T> Any?.convertTo(to: Class<T>): T {
-    return Converter.convertTo(this, to)
+fun <T> Any?.convertTo(toType: Class<T>): T {
+    return Converter.convertTo(this, toType)
 }
 
 @Throws(UnsupportedOperationException::class)
-fun <T> Any?.convertTo(to: Type): T {
-    return Converter.convertTo(this, to)
+fun <T> Any?.convertTo(toType: Type): T {
+    return Converter.convertTo(this, toType)
 }
 
 @Throws(UnsupportedOperationException::class)
-fun <T> Any?.convertTo(to: TypeRef<T>): T {
-    return Converter.convertTo(this, to)
+fun <T> Any?.convertTo(toTypeRef: TypeRef<T>): T {
+    return Converter.convertTo(this, toTypeRef)
+}
+
+@Throws(UnsupportedOperationException::class)
+fun <T> Any?.convertTo(fromType: Type, toType: Type): T {
+    return Converter.convertTo(this, fromType, toType)
+}
+
+@Throws(UnsupportedOperationException::class)
+fun <T> Any?.convertTo(fromTypeRef: TypeRef<T>, toTypeRef: TypeRef<T>): T {
+    return Converter.convertTo(this, fromTypeRef, toTypeRef)
 }
 
 interface ConvertHandler {
@@ -214,12 +169,17 @@ interface ConvertHandler {
     /**
      * Return null if [from] cannot be converted, return [NULL_VALUE] if result value is null.
      */
-    fun convert(from: Any?, to: Class<*>, converter: Converter): Any?
+    fun convert(from: Any?, toType: Class<*>, converter: Converter): Any?
 
     /**
      * Return null if [from] cannot be converted, return [NULL_VALUE] if result value is null.
      */
-    fun convert(from: Any?, to: Type, converter: Converter): Any?
+    fun convert(from: Any?, toType: Type, converter: Converter): Any?
+
+    /**
+     * Return null if [from] cannot be converted, return [NULL_VALUE] if result value is null.
+     */
+    fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any?
 
     companion object {
 
@@ -230,25 +190,31 @@ interface ConvertHandler {
 
 object NopConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
         return when {
             from === null -> null
-            to.isAssignableFrom(from.javaClass) -> from
+            toType.isAssignableFrom(from.javaClass) -> from
             else -> null
         }
     }
 
-    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
-        return if (to is Class<*>) {
-            convert(from, to, converter)
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) {
+            convert(from, toType, converter)
+        } else null
+    }
+
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        return if (fromType == toType) {
+            from
         } else null
     }
 }
 
 object CharsConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
-        return when (to) {
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+        return when (toType) {
             String::class.java, CharSequence::class.java -> from.toString()
             StringBuilder::class.java -> StringBuilder(from.toString())
             StringBuffer::class.java -> StringBuffer(from.toString())
@@ -256,9 +222,15 @@ object CharsConvertHandler : ConvertHandler {
         }
     }
 
-    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
-        return if (to is Class<*>) {
-            convert(from, to, converter)
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) {
+            convert(from, toType, converter)
+        } else null
+    }
+
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) {
+            convert(from, toType, converter)
         } else null
     }
 }
@@ -283,8 +255,8 @@ open class DateTimeConvertHandler(
         DateTimeFormatter.ISO_LOCAL_TIME
     )
 
-    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
-        return when (to) {
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+        return when (toType) {
             Date::class.java -> from.toDate(dateFormat)
             Instant::class.java -> from.toInstant(instantFormatter)
             LocalDateTime::class.java -> from.toLocalDateTime(localDateTimeFormatter)
@@ -297,9 +269,15 @@ open class DateTimeConvertHandler(
         }
     }
 
-    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
-        return if (to is Class<*>) {
-            convert(from, to, converter)
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) {
+            convert(from, toType, converter)
+        } else null
+    }
+
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) {
+            convert(from, toType, converter)
         } else null
     }
 
@@ -312,8 +290,8 @@ open class DateTimeConvertHandler(
 
 object NumberAndPrimitiveConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
-        return when (to) {
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+        return when (toType) {
             Boolean::class.javaPrimitiveType, Boolean::class.java -> from.toBoolean()
             Byte::class.javaPrimitiveType, Byte::class.java -> from.toByte()
             Short::class.javaPrimitiveType, Short::class.java -> from.toShort()
@@ -328,99 +306,117 @@ object NumberAndPrimitiveConvertHandler : ConvertHandler {
         }
     }
 
-    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
-        return if (to is Class<*>) {
-            convert(from, to, converter)
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) {
+            convert(from, toType, converter)
+        } else null
+    }
+
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) {
+            convert(from, toType, converter)
         } else null
     }
 }
 
 object BeanConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
         if (from === null) {
             return null
         }
-        return when (to) {
-            Map::class.java -> from.propertiesToMap(HashMap<Any, Any?>(), to, converter).toMap()
-            MutableMap::class.java, HashMap::class.java -> return from.propertiesToMap(
-                HashMap<Any, Any?>(),
-                to,
-                converter
-            )
-            LinkedHashMap::class.java -> return from.propertiesToMap(LinkedHashMap<Any, Any?>(), to, converter)
-            TreeMap::class.java -> return from.propertiesToMap(TreeMap<Any, Any?>(), to, converter)
-            ConcurrentHashMap::class.java -> return from.propertiesToMap(ConcurrentHashMap<Any, Any?>(), to, converter)
-            else -> from.propertiesToBean(to.toInstance<Any>(), converter)
+        return convert0(from, from.javaClass, toType, toType, converter)
+    }
+
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        if (from === null) {
+            return null
+        }
+        val fromType = from.javaClass
+        return when (toType) {
+            is Class<*> -> return convert0(from, from.javaClass, toType, toType, converter)
+            is ParameterizedType -> return convert0(from, fromType, toType.rawClass, toType, converter)
+            is TypeVariable<*>, is WildcardType -> return convert(from, fromType, toType.upperBound, converter)
+            else -> null
         }
     }
 
-    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         if (from === null) {
             return null
         }
-        return when (to) {
-            is Class<*> -> return convert(from, to, converter)
-            is ParameterizedType -> {
-                return when (val rawClass = to.rawClass) {
-                    Map::class.java -> from.propertiesToMap(HashMap<Any, Any?>(), to, converter).toMap()
-                    MutableMap::class.java, HashMap::class.java -> return from.propertiesToMap(
-                        HashMap<Any, Any?>(),
-                        to,
-                        converter
-                    )
-                    LinkedHashMap::class.java -> return from.propertiesToMap(LinkedHashMap<Any, Any?>(), to, converter)
-                    TreeMap::class.java -> return from.propertiesToMap(TreeMap<Any, Any?>(), to, converter)
-                    ConcurrentHashMap::class.java -> return from.propertiesToMap(
-                        ConcurrentHashMap<Any, Any?>(),
-                        to,
-                        converter
-                    )
-                    else -> {
-                        val toInstance = rawClass.toInstance<Any>()
-                        return from.propertiesToBean(toInstance, to, converter)
-                    }
-                }
-            }
-            is TypeVariable<*>, is WildcardType -> return convert(from, to.upperClass, converter)
+        return when (toType) {
+            is Class<*> -> return convert0(from, fromType, toType, toType, converter)
+            is ParameterizedType -> return convert0(from, fromType, toType.rawClass, toType, converter)
+            is TypeVariable<*>, is WildcardType -> return convert(from, fromType, toType.upperBound, converter)
             else -> null
+        }
+    }
+
+    private fun convert0(from: Any, fromType: Type, toRawClass: Class<*>, toType: Type, converter: Converter): Any? {
+        return when (toRawClass) {
+            Map::class.java -> from.propertiesToMap(HashMap<Any, Any?>(), fromType, toType, converter).toMap()
+            MutableMap::class.java, HashMap::class.java -> return from.propertiesToMap(
+                HashMap<Any, Any?>(),
+                fromType,
+                toType,
+                converter
+            )
+            LinkedHashMap::class.java -> return from.propertiesToMap(
+                LinkedHashMap<Any, Any?>(),
+                fromType,
+                toType,
+                converter
+            )
+            TreeMap::class.java -> return from.propertiesToMap(TreeMap<Any, Any?>(), fromType, toType, converter)
+            ConcurrentHashMap::class.java -> return from.propertiesToMap(
+                ConcurrentHashMap<Any, Any?>(),
+                fromType,
+                toType,
+                converter
+            )
+            else -> {
+                val toInstance = toRawClass.toInstance<Any>()
+                return from.propertiesToBean(toInstance, fromType, toType, converter)
+            }
         }
     }
 }
 
 object ListConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, to: Class<*>, converter: Converter): Any? {
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
         if (from === null) {
             return null
-        }
-        return when (to) {
-            List::class.java, ArrayList::class.java->
         }
     }
 
-    override fun convert(from: Any?, to: Type, converter: Converter): Any? {
-        if (from === null) {
-            return null
-        }
-        return when (to) {
-            is Class<*> -> return convert(from, to, converter)
-            is TypeVariable<*>, is WildcardType -> return convert(from, to.upperClass, converter)
-            is ParameterizedType -> {
-                val toInstance = to.rawClass.toInstance<Any>()
-                val toSchema = to.resolveBean()
-                from.beanToMap().forEach { (name, value) ->
-                    val toProperty = toSchema.getProperty(name)
-                    if (toProperty === null || !toProperty.isWriteable) {
-                        return@forEach
-                    }
-                    toProperty.setValue(toInstance, value, converter)
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        TODO("Not yet implemented")
+    }
+
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        TODO("Not yet implemented")
+    }
+
+    private fun convert0(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+        val list:Iterable<Any?>? = when (fromType) {
+            is Class<*> -> {
+                if (fromType.isArray) {
+                    return from.asMutableListOrNull<Any?>()
                 }
-                return toInstance
+                if (Iterable::class.java.isAssignableFrom(fromType)) {
+                    return from as Iterable<Any?>
+                }
+                return null
             }
-            else -> null
+            else -> {
+                val listSchema = fromType.resolveIterableSchemaOrNull()
+                if (listSchema === null) {
+                    return null
+                }
+                return from as Iterable<Any?>
+            }
         }
     }
-
-    private fun<L:MutableList> toList()
 }

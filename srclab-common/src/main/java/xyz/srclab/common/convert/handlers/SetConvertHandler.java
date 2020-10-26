@@ -17,10 +17,10 @@ import java.util.function.Supplier;
 public class SetConvertHandler implements ConvertHandler {
 
     @Override
-    public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        if (to.equals(Collection.class)
-                || to.equals(Set.class)
-                || to.equals(LinkedHashSet.class)) {
+    public @Nullable Object convert(Object from, Class<?> toType, Converter converter) {
+        if (toType.equals(Collection.class)
+                || toType.equals(Set.class)
+                || toType.equals(LinkedHashSet.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
                 return iterableToSet(iterable, Object.class, converter, LinkedHashSet::new);
@@ -29,7 +29,7 @@ public class SetConvertHandler implements ConvertHandler {
             }
             return null;
         }
-        if (to.equals(HashSet.class)) {
+        if (toType.equals(HashSet.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
                 return iterableToSet(iterable, Object.class, converter, HashSet::new);
@@ -38,7 +38,7 @@ public class SetConvertHandler implements ConvertHandler {
             }
             return null;
         }
-        if (to.equals(TreeSet.class)) {
+        if (toType.equals(TreeSet.class)) {
             if (from instanceof Iterable) {
                 Iterable<?> iterable = (Iterable<?>) from;
                 return iterableToSet(iterable, Object.class, converter, TreeSet::new);
@@ -51,14 +51,14 @@ public class SetConvertHandler implements ConvertHandler {
     }
 
     @Override
-    public @Nullable Object convert(Object from, Type to, Converter converter) {
-        if (to instanceof Class) {
-            return convert(from, (Class<?>) to, converter);
+    public @Nullable Object convert(Object from, Type toType, Converter converter) {
+        if (toType instanceof Class) {
+            return convert(from, (Class<?>) toType, converter);
         }
-        if (!(to instanceof ParameterizedType)) {
+        if (!(toType instanceof ParameterizedType)) {
             return null;
         }
-        ParameterizedType setType = (ParameterizedType) to;
+        ParameterizedType setType = (ParameterizedType) toType;
         Class<?> rawSetType = TypeKit.getUpperClass(setType.getRawType());
         if (rawSetType.equals(Collection.class)
                 || rawSetType.equals(Set.class)

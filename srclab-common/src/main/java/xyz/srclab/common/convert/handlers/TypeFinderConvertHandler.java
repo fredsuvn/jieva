@@ -13,8 +13,8 @@ import java.util.function.Function;
 public abstract class TypeFinderConvertHandler implements ConvertHandler {
 
     @Override
-    public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        @Nullable Function<Object, Object> function = getFinder().find(to);
+    public @Nullable Object convert(Object from, Class<?> toType, Converter converter) {
+        @Nullable Function<Object, Object> function = getFinder().find(toType);
         if (function == null) {
             return null;
         }
@@ -22,8 +22,8 @@ public abstract class TypeFinderConvertHandler implements ConvertHandler {
     }
 
     @Override
-    public @Nullable Object convert(Object from, Type to, Converter converter) {
-        @Nullable Function<Object, Object> function = getFinder().find(to);
+    public @Nullable Object convert(Object from, Type toType, Converter converter) {
+        @Nullable Function<Object, Object> function = getFinder().find(toType);
         if (function == null) {
             return null;
         }

@@ -41,30 +41,30 @@ public class RecordConvertHandler implements ConvertHandler {
     }
 
     @Override
-    public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        if (unitPredicate.test(from.getClass()) || unitPredicate.test(to)) {
+    public @Nullable Object convert(Object from, Class<?> toType, Converter converter) {
+        if (unitPredicate.test(from.getClass()) || unitPredicate.test(toType)) {
             return null;
         }
-        Object result = newInstance(to);
+        Object result = newInstance(toType);
         recorder.copyEntries(from, result, converter);
         return result;
     }
 
     @Override
-    public @Nullable Object convert(Object from, Type to, Converter converter) {
-        if (to instanceof Class) {
-            return convert(from, (Class<?>) to, converter);
+    public @Nullable Object convert(Object from, Type toType, Converter converter) {
+        if (toType instanceof Class) {
+            return convert(from, (Class<?>) toType, converter);
         }
-        if (!(to instanceof ParameterizedType)) {
+        if (!(toType instanceof ParameterizedType)) {
             return null;
         }
-        if (unitPredicate.test(from.getClass()) || unitPredicate.test(to)) {
+        if (unitPredicate.test(from.getClass()) || unitPredicate.test(toType)) {
             return null;
         }
-        ParameterizedType parameterizedType = (ParameterizedType) to;
+        ParameterizedType parameterizedType = (ParameterizedType) toType;
         Class<?> rawType = TypeKit.getUpperClass(parameterizedType.getRawType());
         Object result = newInstance(rawType);
-        recorder.copyEntries(from, result, to, converter);
+        recorder.copyEntries(from, result, toType, converter);
         return result;
     }
 

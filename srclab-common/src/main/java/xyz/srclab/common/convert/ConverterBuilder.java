@@ -38,36 +38,36 @@ public class ConverterBuilder extends HandlersProductBuilder<Converter, ConvertH
         }
 
         @Override
-        public <T> T convert(Object from, Class<T> to) throws UnsupportedOperationException {
+        public <T> T convert(Object from, Class<T> toType) throws UnsupportedOperationException {
             for (ConvertHandler handler : handlers) {
-                @Nullable T value = As.nullable(handler.convert(from, to, this));
+                @Nullable T value = As.nullable(handler.convert(from, toType, this));
                 if (value != null) {
                     return value;
                 }
             }
-            throw new UnsupportedOperationException(to.getTypeName());
+            throw new UnsupportedOperationException(toType.getTypeName());
         }
 
         @Override
-        public <T> T convert(Object from, Type to) throws UnsupportedOperationException {
+        public <T> T convert(Object from, Type toType) throws UnsupportedOperationException {
             for (ConvertHandler handler : handlers) {
-                @Nullable T value = As.nullable(handler.convert(from, to, this));
+                @Nullable T value = As.nullable(handler.convert(from, toType, this));
                 if (value != null) {
                     return value;
                 }
             }
-            throw new UnsupportedOperationException(to.getTypeName());
+            throw new UnsupportedOperationException(toType.getTypeName());
         }
 
         @Override
-        public <T> T convert(Object from, TypeRef<T> to) throws UnsupportedOperationException {
+        public <T> T convert(Object from, TypeRef<T> toTypeRef) throws UnsupportedOperationException {
             for (ConvertHandler handler : handlers) {
-                @Nullable T value = As.nullable(handler.convert(from, to.getType(), this));
+                @Nullable T value = As.nullable(handler.convert(from, toTypeRef.getType(), this));
                 if (value != null) {
                     return value;
                 }
             }
-            throw new UnsupportedOperationException(to.getType().getTypeName());
+            throw new UnsupportedOperationException(toTypeRef.getType().getTypeName());
         }
     }
 }

@@ -11,20 +11,20 @@ import java.lang.reflect.Type;
 public class CastConvertHandler implements ConvertHandler {
 
     @Override
-    public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
-        if (to.equals(Object.class) || to.equals(from.getClass())) {
+    public @Nullable Object convert(Object from, Class<?> toType, Converter converter) {
+        if (toType.equals(Object.class) || toType.equals(from.getClass())) {
             return from;
         }
-        if (to.isAssignableFrom(from.getClass())) {
+        if (toType.isAssignableFrom(from.getClass())) {
             return from;
         }
         return null;
     }
 
     @Override
-    public @Nullable Object convert(Object from, Type to, Converter converter) {
-        if (to instanceof Class) {
-            return convert(from, (Class<?>) to, converter);
+    public @Nullable Object convert(Object from, Type toType, Converter converter) {
+        if (toType instanceof Class) {
+            return convert(from, (Class<?>) toType, converter);
         }
         return null;
     }

@@ -12,13 +12,13 @@ import java.lang.reflect.Type;
 public class TypeBoundsConvertHandler implements ConvertHandler {
 
     @Override
-    public @Nullable Object convert(Object from, Class<?> to, Converter converter) {
+    public @Nullable Object convert(Object from, Class<?> toType, Converter converter) {
         return null;
     }
 
     @Override
-    public @Nullable Object convert(Object from, Type to, Converter converter) {
-        Type upperBound = TypeKit.getUpperBound(to);
+    public @Nullable Object convert(Object from, Type toType, Converter converter) {
+        Type upperBound = TypeKit.getUpperBound(toType);
         return converter.convert(from, upperBound);
     }
 }

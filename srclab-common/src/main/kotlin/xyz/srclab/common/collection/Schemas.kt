@@ -1,6 +1,7 @@
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -22,16 +23,29 @@ interface IterableSchema {
 
         @JvmStatic
         fun resolve(type: Type): IterableSchema {
+            val result = resolveOrNull(type)
+            if (result === null) {
+                throw IllegalArgumentException("$type is not a type of Iterable.")
+            }
+            return result
+        }
+
+        @JvmStatic
+        fun resolveOrNull(type: Type): IterableSchema? {
             if (type is Class<*>) {
                 return RAW
             }
             if (type is ParameterizedType) {
+                val rawClass = type.rawClass
+                if (!Iterable::class.java.isAssignableFrom(rawClass)) {
+                    return null
+                }
                 val actualTypeArguments = type.actualTypeArguments
                 if (actualTypeArguments.size == 1) {
                     return of(actualTypeArguments[0])
                 }
             }
-            throw IllegalArgumentException("$type is not a type of Iterable.")
+            return null
         }
     }
 }
@@ -42,6 +56,10 @@ fun iterableSchema(componentType: Type): IterableSchema {
 
 fun Type.resolveIterableSchema(): IterableSchema {
     return IterableSchema.resolve(this)
+}
+
+fun Type.resolveIterableSchemaOrNull(): IterableSchema? {
+    return IterableSchema.resolveOrNull(this)
 }
 
 private class IterableSchemaImpl(override val componentType: Type) : IterableSchema {
@@ -91,16 +109,29 @@ interface MapSchema {
 
         @JvmStatic
         fun resolve(type: Type): MapSchema {
+            val result = resolveOrNull(type)
+            if (result === null) {
+                throw IllegalArgumentException("$type is not a type of Map.")
+            }
+            return result
+        }
+
+        @JvmStatic
+        fun resolveOrNull(type: Type): MapSchema? {
             if (type is Class<*>) {
                 return RAW
             }
             if (type is ParameterizedType) {
+                val rawClass = type.rawClass
+                if (!Map::class.java.isAssignableFrom(rawClass)) {
+                    return null
+                }
                 val actualTypeArguments = type.actualTypeArguments
                 if (actualTypeArguments.size == 2) {
                     return of(actualTypeArguments[0], actualTypeArguments[1])
                 }
             }
-            throw IllegalArgumentException("$type is not a type of Map.")
+            return null
         }
     }
 }
@@ -111,6 +142,10 @@ fun mapSchema(keyType: Type, valueType: Type): MapSchema {
 
 fun Type.resolveMapSchema(): MapSchema {
     return MapSchema.resolve(this)
+}
+
+fun Type.resolveMapSchemaOrNull(): MapSchema? {
+    return MapSchema.resolveOrNull(this)
 }
 
 private class MapSchemaImpl(override val keyType: Type, override val valueType: Type) : MapSchema {
