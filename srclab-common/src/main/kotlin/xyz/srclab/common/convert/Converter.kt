@@ -3,16 +3,14 @@ package xyz.srclab.common.convert
 import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.propertiesToBean
 import xyz.srclab.common.bean.propertiesToMap
-import xyz.srclab.common.collection.ListOps.Companion.asMutableListOrNull
+import xyz.srclab.common.collection.BaseIterableOps.Companion.toAnyArray
+import xyz.srclab.common.collection.IterableSchema
+import xyz.srclab.common.collection.arrayAsList
+import xyz.srclab.common.collection.componentType
 import xyz.srclab.common.collection.resolveIterableSchemaOrNull
-import xyz.srclab.common.reflect.TypeRef
-import xyz.srclab.common.reflect.rawClass
-import xyz.srclab.common.reflect.toInstance
-import xyz.srclab.common.reflect.upperBound
+import xyz.srclab.common.reflect.*
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import java.lang.reflect.TypeVariable
-import java.lang.reflect.WildcardType
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.text.DateFormat
@@ -20,8 +18,11 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 import kotlin.collections.LinkedHashMap
+import kotlin.collections.LinkedHashSet
 
 interface Converter {
 
@@ -180,7 +181,15 @@ interface ConvertHandler {
     companion object {
 
         @JvmField
-        val DEFAULTS: List<ConvertHandler> = ConvertHandlerSupport.defaultHandlers()
+        val DEFAULTS: List<ConvertHandler> = listOf(
+            NopConvertHandler,
+            CharsConvertHandler,
+            NumberAndPrimitiveConvertHandler,
+            DateTimeConvertHandler.DEFAULT,
+            UpperBoundConvertHandler,
+            IterableConvertHandler,
+            BeanConvertHandler,
+        )
     }
 }
 
@@ -228,12 +237,26 @@ object CharsConvertHandler : AbstractConvertHandler() {
             String::class.java, CharSequence::class.java -> from.toString()
             StringBuilder::class.java -> StringBuilder(from.toString())
             StringBuffer::class.java -> StringBuffer(from.toString())
-            CharArray::class.java -> {
-                if (fromType is Class<*> && CharSequence::class.java.isAssignableFrom(fromType)) {
-                    return from.toString().toCharArray()
-                }
-                return null
-            }
+            CharArray::class.java -> from.toString().toCharArray()
+            else -> null
+        }
+    }
+}
+
+object NumberAndPrimitiveConvertHandler : AbstractConvertHandler() {
+
+    override fun convertFromNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+        return when (toType) {
+            Boolean::class.javaPrimitiveType, Boolean::class.java -> from.toBoolean()
+            Byte::class.javaPrimitiveType, Byte::class.java -> from.toByte()
+            Short::class.javaPrimitiveType, Short::class.java -> from.toShort()
+            Char::class.javaPrimitiveType, Char::class.java -> from.toChar()
+            Int::class.javaPrimitiveType, Int::class.java -> from.toInt()
+            Long::class.javaPrimitiveType, Long::class.java -> from.toLong()
+            Float::class.javaPrimitiveType, Float::class.java -> from.toFloat()
+            Double::class.javaPrimitiveType, Double::class.java -> from.toDouble()
+            BigInteger::class.java -> from.toBigInteger()
+            BigDecimal::class.java -> from.toBigDecimal()
             else -> null
         }
     }
@@ -276,24 +299,97 @@ open class DateTimeConvertHandler(
     companion object {
 
         @JvmField
-        val INSTANCE = DateTimeConvertHandler()
+        val DEFAULT = DateTimeConvertHandler()
     }
 }
 
-object NumberAndPrimitiveConvertHandler : AbstractConvertHandler() {
+object UpperBoundConvertHandler : AbstractConvertHandler() {
 
     override fun convertFromNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        return when (toType) {
-            Boolean::class.javaPrimitiveType, Boolean::class.java -> from.toBoolean()
-            Byte::class.javaPrimitiveType, Byte::class.java -> from.toByte()
-            Short::class.javaPrimitiveType, Short::class.java -> from.toShort()
-            Char::class.javaPrimitiveType, Char::class.java -> from.toChar()
-            Int::class.javaPrimitiveType, Int::class.java -> from.toInt()
-            Long::class.javaPrimitiveType, Long::class.java -> from.toLong()
-            Float::class.javaPrimitiveType, Float::class.java -> from.toFloat()
-            Double::class.javaPrimitiveType, Double::class.java -> from.toDouble()
-            BigInteger::class.java -> from.toBigInteger()
-            BigDecimal::class.java -> from.toBigDecimal()
+        return converter.convert(from, fromType.upperBound, toType.upperBound)
+    }
+}
+
+object IterableConvertHandler : AbstractConvertHandler() {
+
+    override fun convertFromNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+        val fromClass = from.javaClass
+        if (fromClass.isArray) {
+            return iterableToType(from.arrayAsList(), toType, converter)
+        }
+        if (from is Iterable<*>) {
+            return iterableToType(from as Iterable<Any?>, toType, converter)
+        }
+        return null
+    }
+
+    private fun iterableToType(iterable: Iterable<Any?>, toType: Type, converter: Converter): Any? {
+        val toComponentType = toType.componentType
+        if (toComponentType !== null) {
+            return iterable
+                .map { converter.convert<Any?>(it, toComponentType) }
+                .toAnyArray(toComponentType.upperClass)
+        }
+        val iterableSchema = toType.resolveIterableSchemaOrNull()
+        if (iterableSchema === null) {
+            return null
+        }
+        return if (iterable is Collection<*>)
+            collectionMapTo(iterable, iterableSchema, converter)
+        else
+            iterableMapTo(iterable, iterableSchema, converter)
+    }
+
+    private fun iterableMapTo(
+        iterable: Iterable<Any?>,
+        iterableSchema: IterableSchema,
+        converter: Converter
+    ): Iterable<Any?>? {
+        return when (iterableSchema.rawClass) {
+            Iterable::class.java, List::class.java, LinkedList::class.java -> iterable.mapTo(LinkedList()) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            ArrayList::class.java -> iterable.mapTo(ArrayList()) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            Collection::class.java, Set::class.java, LinkedHashSet::class.java -> iterable.mapTo(LinkedHashSet()) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            HashSet::class.java -> iterable.mapTo(HashSet()) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            TreeSet::class.java -> iterable.mapTo(TreeSet()) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            else -> null
+        }
+    }
+
+    private fun collectionMapTo(
+        collection: Collection<Any?>,
+        iterableSchema: IterableSchema,
+        converter: Converter
+    ): Iterable<Any?>? {
+        return when (iterableSchema.rawClass) {
+            Iterable::class.java, List::class.java, ArrayList::class.java -> collection.mapTo(ArrayList(collection.size)) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            LinkedList::class.java -> collection.mapTo(LinkedList()) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            Collection::class.java, Set::class.java, LinkedHashSet::class.java -> collection.mapTo(
+                LinkedHashSet(
+                    collection.size
+                )
+            ) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            HashSet::class.java -> collection.mapTo(HashSet(collection.size)) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            TreeSet::class.java -> collection.mapTo(TreeSet()) {
+                converter.convert(it, iterableSchema.componentType)
+            }
             else -> null
         }
     }
@@ -303,59 +399,31 @@ object BeanConvertHandler : AbstractConvertHandler() {
 
     override fun convertFromNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
-            is Class<*> -> return convert0(from, fromType, toType, toType, converter)
-            is ParameterizedType -> return convert0(from, fromType, toType.rawClass, toType, converter)
-            is TypeVariable<*>, is WildcardType -> return convertFromNotNull(
-                from,
-                fromType,
-                toType.upperBound,
-                converter
-            )
+            is Class<*> -> return convert0(from, toType, toType, converter)
+            is ParameterizedType -> return convert0(from, toType.rawClass, toType, converter)
             else -> null
         }
     }
 
-    private fun convert0(from: Any, fromType: Type, toRawClass: Class<*>, toType: Type, converter: Converter): Any? {
+    private fun convert0(from: Any, toRawClass: Class<*>, toType: Type, converter: Converter): Any? {
         return when (toRawClass) {
-            Map::class.java -> from.propertiesToMap(HashMap<Any, Any?>(), fromType, toType, converter).toMap()
+            Map::class.java -> from.propertiesToMap(HashMap<Any, Any?>(), toType, converter).toMap()
             MutableMap::class.java, HashMap::class.java -> return from.propertiesToMap(
                 HashMap<Any, Any?>(),
-                fromType,
                 toType,
                 converter
             )
-            LinkedHashMap::class.java -> return from.propertiesToMap(
-                LinkedHashMap<Any, Any?>(),
-                fromType,
-                toType,
-                converter
-            )
-            TreeMap::class.java -> return from.propertiesToMap(TreeMap<Any, Any?>(), fromType, toType, converter)
+            LinkedHashMap::class.java -> return from.propertiesToMap(LinkedHashMap<Any, Any?>(), toType, converter)
+            TreeMap::class.java -> return from.propertiesToMap(TreeMap<Any, Any?>(), toType, converter)
             ConcurrentHashMap::class.java -> return from.propertiesToMap(
                 ConcurrentHashMap<Any, Any?>(),
-                fromType,
                 toType,
                 converter
             )
             else -> {
                 val toInstance = toRawClass.toInstance<Any>()
-                return from.propertiesToBean(toInstance, fromType, toType, converter)
+                return from.propertiesToBean(toInstance, toType, converter)
             }
         }
-    }
-}
-
-object ListConvertHandler : AbstractConvertHandler() {
-
-    override fun convertFromNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        val fromSchema = fromType.resolveIterableSchemaOrNull()
-        if (fromSchema === null) {
-            return null
-        }
-        val toSchema = toType.resolveIterableSchemaOrNull()
-        if (toSchema === null) {
-            return null
-        }
-
     }
 }
