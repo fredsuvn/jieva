@@ -82,6 +82,7 @@ import kotlin.collections.subtract as subtractKt
 import kotlin.collections.sumOf as sumOfKt
 import kotlin.collections.take as takeKt
 import kotlin.collections.takeWhile as takeWhileKt
+import kotlin.collections.toCollection as toCollectionKt
 import kotlin.collections.toHashSet as toHashSetKt
 import kotlin.collections.toList as toListKt
 import kotlin.collections.toMutableList as toMutableListKt
@@ -638,12 +639,8 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().averageBigDecimal(selector)
     }
 
-    open fun toCollection(): Collection<T> {
-        return finalIterable().toCollection()
-    }
-
-    open fun toMutableCollection(): MutableCollection<T> {
-        return finalIterable().toMutableCollection()
+    open fun <C : MutableCollection<in T>> toCollection(destination: C): C {
+        return finalIterable().toCollection(destination)
     }
 
     open fun toSet(): Set<T> {
@@ -658,12 +655,12 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().toHashSet()
     }
 
-    open fun toTreeSet(): TreeSet<T> {
-        return finalIterable().toTreeSet()
-    }
-
     open fun toLinkedHashSet(): LinkedHashSet<T> {
         return finalIterable().toLinkedHashSet()
+    }
+
+    open fun toTreeSet(): TreeSet<T> {
+        return finalIterable().toTreeSet()
     }
 
     @JvmOverloads
@@ -687,52 +684,42 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().toLinkedList()
     }
 
-    open fun asToCollection(): Collection<T> {
-        return finalIterable().asToCollection()
+    @JvmOverloads
+    open fun asToCollection(supplier: () -> MutableCollection<T> = { LinkedHashSet() }): Collection<T> {
+        return finalIterable().asToCollection(supplier)
     }
 
-    open fun asToMutableCollection(): MutableCollection<T> {
-        return finalIterable().asToMutableCollection()
+    @JvmOverloads
+    open fun asToMutableCollection(supplier: () -> MutableCollection<T> = { LinkedHashSet() }): MutableCollection<T> {
+        return finalIterable().asToMutableCollection(supplier)
     }
 
-    open fun asToSet(): Set<T> {
-        return finalIterable().asToSet()
+    @JvmOverloads
+    open fun asToSet(supplier: () -> MutableSet<T> = { LinkedHashSet() }): Set<T> {
+        return finalIterable().asToSet(supplier)
     }
 
-    open fun asToMutableSet(): MutableSet<T> {
-        return finalIterable().asToMutableSet()
+    @JvmOverloads
+    open fun asToMutableSet(supplier: () -> MutableSet<T> = { LinkedHashSet() }): MutableSet<T> {
+        return finalIterable().asToMutableSet(supplier)
     }
 
-    open fun asToHashSet(): HashSet<T> {
-        return finalIterable().asToHashSet()
+    @JvmOverloads
+    open fun asToSortedSet(
+        comparator: Comparator<in T> = castSelfComparableComparator(),
+        supplier: () -> SortedSet<T> = { TreeSet(comparator) }
+    ): SortedSet<T> {
+        return finalIterable().asToSortedSet(comparator, supplier)
     }
 
-    open fun asToLinkedHashSet(): LinkedHashSet<T> {
-        return finalIterable().asToLinkedHashSet()
+    @JvmOverloads
+    open fun asToList(supplier: () -> MutableList<T> = { LinkedList() }): List<T> {
+        return finalIterable().asToList(supplier)
     }
 
-    open fun asToTreeSet(): TreeSet<T> {
-        return finalIterable().asToTreeSet()
-    }
-
-    open fun asToSortedSet(): SortedSet<T> {
-        return finalIterable().asToSortedSet()
-    }
-
-    open fun asToList(): List<T> {
-        return finalIterable().asToList()
-    }
-
-    open fun asToMutableList(): MutableList<T> {
-        return finalIterable().asToMutableList()
-    }
-
-    open fun asToArrayList(): ArrayList<T> {
-        return finalIterable().asToArrayList()
-    }
-
-    open fun asToLinkedList(): LinkedList<T> {
-        return finalIterable().asToLinkedList()
+    @JvmOverloads
+    open fun asToMutableList(supplier: () -> MutableList<T> = { LinkedList() }): MutableList<T> {
+        return finalIterable().asToMutableList(supplier)
     }
 
     @JvmOverloads
@@ -754,6 +741,10 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
     open fun toArray(componentType: Class<*>): Array<T> {
         return finalIterable().toArray(componentType)
+    }
+
+    open fun toAnyArray(componentType: Class<*>): Any {
+        return finalIterable().toAnyArray(componentType)
     }
 
     @JvmOverloads
@@ -861,12 +852,12 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> Iterable<T>.containsAll(elements: Iterable<T>): Boolean {
-            return this.containsAll(elements.toSet())
+            return this.containsAll(elements.asToSet())
         }
 
         @JvmStatic
         fun <T> Iterable<T>.containsAll(elements: Collection<T>): Boolean {
-            return this.toSet().containsAll(elements)
+            return this.asToSet().containsAll(elements)
         }
 
         @JvmStatic
@@ -961,22 +952,22 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> Iterable<T>.random(): T {
-            return this.toList().randomKt()
+            return this.asToList().randomKt()
         }
 
         @JvmStatic
         fun <T> Iterable<T>.random(random: Random): T {
-            return this.toList().randomKt(random)
+            return this.asToList().randomKt(random)
         }
 
         @JvmStatic
         fun <T> Iterable<T>.randomOrNull(): T? {
-            return this.toList().randomOrNullKt()
+            return this.asToList().randomOrNullKt()
         }
 
         @JvmStatic
         fun <T> Iterable<T>.randomOrNull(random: Random): T? {
-            return this.toList().randomOrNullKt(random)
+            return this.asToList().randomOrNullKt(random)
         }
 
         @JvmStatic
@@ -1711,13 +1702,8 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.toCollection(): Collection<T> {
-            return this.toSet()
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.toMutableCollection(): MutableCollection<T> {
-            return this.toMutableSet()
+        fun <T, C : MutableCollection<in T>> Iterable<T>.toCollection(destination: C): C {
+            return this.toCollectionKt(destination)
         }
 
         @JvmStatic
@@ -1737,12 +1723,12 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> Iterable<T>.toLinkedHashSet(): LinkedHashSet<T> {
-            return this.takeAllTo(LinkedHashSet())
+            return this.toCollection(LinkedHashSet())
         }
 
         @JvmStatic
         fun <T> Iterable<T>.toTreeSet(): TreeSet<T> {
-            return this.takeAllTo(TreeSet())
+            return this.toCollection(TreeSet())
         }
 
         @JvmStatic
@@ -1763,72 +1749,57 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> Iterable<T>.toArrayList(): ArrayList<T> {
-            return this.takeAllTo(ArrayList())
+            return this.toCollection(ArrayList())
         }
 
         @JvmStatic
         fun <T> Iterable<T>.toLinkedList(): LinkedList<T> {
-            return this.takeAllTo(LinkedList())
+            return this.toCollection(LinkedList())
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.asToCollection(): Collection<T> {
-            return asToSet()
+        @JvmOverloads
+        inline fun <T> Iterable<T>.asToCollection(supplier: () -> MutableCollection<T> = { LinkedHashSet() }): Collection<T> {
+            return if (this is Collection<T>) this else toCollection(supplier())
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.asToMutableCollection(): MutableCollection<T> {
-            return this.asToMutableSet()
+        @JvmOverloads
+        inline fun <T> Iterable<T>.asToMutableCollection(supplier: () -> MutableCollection<T> = { LinkedHashSet() }): MutableCollection<T> {
+            return if (this is MutableCollection<T>) this else toCollection(supplier())
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.asToSet(): Set<T> {
-            return if (this is Set<T>) this else this.toSetKt()
+        @JvmOverloads
+        inline fun <T> Iterable<T>.asToSet(supplier: () -> MutableSet<T> = { LinkedHashSet() }): Set<T> {
+            return if (this is Set<T>) this else toCollection(supplier())
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.asToMutableSet(): MutableSet<T> {
-            return if (this is MutableSet<T>) this else this.toMutableSetKt()
+        @JvmOverloads
+        inline fun <T> Iterable<T>.asToMutableSet(supplier: () -> MutableSet<T> = { LinkedHashSet() }): MutableSet<T> {
+            return if (this is MutableSet<T>) this else toCollection(supplier())
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.asToHashSet(): HashSet<T> {
-            return if (this is HashSet<T>) this else this.toHashSetKt()
+        @JvmOverloads
+        inline fun <T> Iterable<T>.asToSortedSet(
+            comparator: Comparator<in T> = castSelfComparableComparator(),
+            supplier: () -> SortedSet<T> = { TreeSet(comparator) }
+        ): SortedSet<T> {
+            return if (this is SortedSet<T>) this else toCollection(supplier())
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.asToLinkedHashSet(): LinkedHashSet<T> {
-            return if (this is LinkedHashSet<T>) this else this.toLinkedHashSet()
+        @JvmOverloads
+        inline fun <T> Iterable<T>.asToList(supplier: () -> MutableList<T> = { LinkedList() }): List<T> {
+            return if (this is List<T>) this else toCollection(supplier())
         }
 
         @JvmStatic
-        fun <T> Iterable<T>.asToTreeSet(): TreeSet<T> {
-            return if (this is TreeSet<T>) this else this.toTreeSet()
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.asToSortedSet(): SortedSet<T> {
-            return if (this is SortedSet<T>) this else this.toSortedSet()
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.asToList(): List<T> {
-            return if (this is List<T>) this else this.toListKt()
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.asToMutableList(): MutableList<T> {
-            return if (this is MutableList<T>) this else this.toMutableListKt()
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.asToArrayList(): ArrayList<T> {
-            return if (this is ArrayList<T>) this else this.toArrayList()
-        }
-
-        @JvmStatic
-        fun <T> Iterable<T>.asToLinkedList(): LinkedList<T> {
-            return if (this is LinkedList<T>) this else this.toLinkedList()
+        @JvmOverloads
+        inline fun <T> Iterable<T>.asToMutableList(supplier: () -> MutableList<T> = { LinkedList() }): MutableList<T> {
+            return if (this is MutableList<T>) this else toCollection(supplier())
         }
 
         @JvmStatic
@@ -1844,21 +1815,36 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
 
         @JvmStatic
         fun <T> Iterable<T>.toArray(): Array<Any?> {
-            val list = this.asToLinkedList()
-            return list.toArray()
+            val list = this.asToList { LinkedList() }
+            return JavaCollectionOps.toArray(list)
         }
 
         @JvmStatic
-        inline fun <T> Iterable<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
-            val list = this.asToLinkedList()
-            return list.toArray(generator(list.size))
+        fun <T> Iterable<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
+            val list = this.asToList { LinkedList() }
+            return JavaCollectionOps.toArray(list, generator(list.size))
         }
 
         @JvmStatic
         fun <T> Iterable<T>.toArray(componentType: Class<*>): Array<T> {
-            val list = this.asToLinkedList()
+            val list = this.asToList { LinkedList() }
             val array: Array<T> = componentType.componentTypeToArray(0)
-            return list.toArray(array)
+            return JavaCollectionOps.toArray(list, array)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.toAnyArray(componentType: Class<*>): Any {
+            return when (componentType) {
+                Boolean::class.javaPrimitiveType -> this.toBooleanArray()
+                Byte::class.javaPrimitiveType -> this.toByteArray()
+                Short::class.javaPrimitiveType -> this.toShortArray()
+                Char::class.javaPrimitiveType -> this.toCharArray()
+                Int::class.javaPrimitiveType -> this.toIntArray()
+                Long::class.javaPrimitiveType -> this.toLongArray()
+                Float::class.javaPrimitiveType -> this.toFloatArray()
+                Double::class.javaPrimitiveType -> this.toDoubleArray()
+                else -> this.toArray(componentType)
+            }
         }
 
         @JvmStatic

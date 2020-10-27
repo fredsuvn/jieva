@@ -1,11 +1,13 @@
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.asAny
+import java.util.*
 import kotlin.collections.addAll as addAllKt
 import kotlin.collections.count as countKt
 import kotlin.collections.plus as plusKt
 import kotlin.collections.removeAll as removeAllKt
 import kotlin.collections.retainAll as retainAllKt
+import kotlin.collections.toMutableList as toMutableListKt
 import kotlin.collections.toSet as toSetKt
 
 /**
@@ -24,6 +26,20 @@ protected constructor(collection: C) : BaseIterableOps<T, C, MC, THIS>(collectio
 
     override fun count(): Int {
         return finalCollection().count()
+    }
+
+    override fun toMutableList(): MutableList<T> {
+        return finalCollection().toMutableList()
+    }
+
+    @JvmOverloads
+    override fun asToList(supplier: () -> MutableList<T> = { ArrayList(count()) }): List<T> {
+        return finalCollection().asToList()
+    }
+
+    @JvmOverloads
+    override fun asToMutableList(supplier: () -> MutableList<T> = { ArrayList(count()) }): MutableList<T> {
+        return finalCollection().asToMutableList()
     }
 
     open fun addAll(elements: Array<out T>): THIS {
@@ -93,12 +109,29 @@ protected constructor(collection: C) : BaseIterableOps<T, C, MC, THIS>(collectio
 
         @JvmStatic
         fun <T> Collection<T>.containsAll(elements: Iterable<T>): Boolean {
-            return this.containsAll(elements.toSet())
+            return this.containsAll(elements.asToSet())
         }
 
         @JvmStatic
         fun <T> Collection<T>.count(): Int {
             return this.countKt()
+        }
+
+        @JvmStatic
+        fun <T> Collection<T>.toMutableList(): MutableList<T> {
+            return this.toMutableListKt()
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        inline fun <T> Collection<T>.asToList(supplier: () -> MutableList<T> = { ArrayList(count()) }): List<T> {
+            return if (this is List<T>) this else toCollection(supplier())
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        inline fun <T> Collection<T>.asToMutableList(supplier: () -> MutableList<T> = { ArrayList(count()) }): MutableList<T> {
+            return if (this is MutableList<T>) this else toCollection(supplier())
         }
 
         @JvmStatic

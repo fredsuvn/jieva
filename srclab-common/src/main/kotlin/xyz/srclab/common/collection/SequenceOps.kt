@@ -76,6 +76,7 @@ import kotlin.sequences.sortedWith as sortedWithKt
 import kotlin.sequences.sumOf as sumOfKt
 import kotlin.sequences.take as takeKt
 import kotlin.sequences.takeWhile as takeWhileKt
+import kotlin.sequences.toCollection as toCollectionKt
 import kotlin.sequences.toHashSet as toHashSetKt
 import kotlin.sequences.toList as toListKt
 import kotlin.sequences.toMutableList as toMutableListKt
@@ -569,8 +570,8 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         return finalSequence().averageBigDecimal(selector)
     }
 
-    fun toCollection(): Collection<T> {
-        return finalSequence().toCollection()
+    fun <C : MutableCollection<in T>> toCollection(destination: C): C {
+        return finalSequence().toCollection(destination)
     }
 
     fun toMutableCollection(): MutableCollection<T> {
@@ -1469,8 +1470,8 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.toCollection(): Collection<T> {
-            return this.toSet()
+        fun <T, C : MutableCollection<in T>> Sequence<T>.toCollection(destination: C): C {
+            return this.toCollectionKt(destination)
         }
 
         @JvmStatic

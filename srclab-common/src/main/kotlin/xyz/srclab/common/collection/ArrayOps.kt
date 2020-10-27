@@ -1,4 +1,4 @@
-@file:JvmName("ArrayKit")
+@file:JvmName("ArrayOps")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.collection
