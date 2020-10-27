@@ -2,6 +2,7 @@ package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.reflect.rawClass
+import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -33,7 +34,11 @@ interface IterableSchema {
         @JvmStatic
         fun resolveOrNull(type: Type): IterableSchema? {
             if (type is Class<*>) {
-                return RAW
+                return when {
+                    Iterable::class.java.isAssignableFrom(type) -> RAW
+                    type.isArray -> of(type.componentType)
+                    else -> null
+                }
             }
             if (type is ParameterizedType) {
                 val rawClass = type.rawClass
@@ -44,6 +49,9 @@ interface IterableSchema {
                 if (actualTypeArguments.size == 1) {
                     return of(actualTypeArguments[0])
                 }
+            }
+            if (type is GenericArrayType) {
+                return of(type.genericComponentType)
             }
             return null
         }
@@ -118,7 +126,7 @@ interface MapSchema {
 
         @JvmStatic
         fun resolveOrNull(type: Type): MapSchema? {
-            if (type is Class<*>) {
+            if (type is Class<*> && Map::class.java.isAssignableFrom(type)) {
                 return RAW
             }
             if (type is ParameterizedType) {

@@ -25,15 +25,38 @@ val Type.componentType: Type?
         }
     }
 
-fun <A> Class<*>.componentTypeToArrayInstance(length: Int): A {
+fun <A> Class<*>.componentTypeToArray(length: Int): A {
     return java.lang.reflect.Array.newInstance(this, length).asAny()
 }
 
-fun <A> Class<*>.arrayTypeToArrayInstance(length: Int): A {
+fun <A> Class<*>.arrayTypeToArray(length: Int): A {
     if (!this.isArray) {
         throw IllegalArgumentException("$this is not an array type.")
     }
-    return this.componentType.componentTypeToArrayInstance(length)
+    return this.componentType.componentTypeToArray(length)
+}
+
+fun <T> Any.arrayAsList(): MutableList<T> {
+    val result = this.arrayAsListOrNull<T>()
+    if (result === null) {
+        throw IllegalArgumentException("Cannot from array to MutableList: $this.")
+    }
+    return result
+}
+
+fun <T> Any.arrayAsListOrNull(): MutableList<T>? {
+    return when (this) {
+        is Array<*> -> this.asList().asAny()
+        is BooleanArray -> this.asList().asAny()
+        is ByteArray -> this.asList().asAny()
+        is ShortArray -> this.asList().asAny()
+        is CharArray -> this.asList().asAny()
+        is IntArray -> this.asList().asAny()
+        is LongArray -> this.asList().asAny()
+        is FloatArray -> this.asList().asAny()
+        is DoubleArray -> this.asList().asAny()
+        else -> null
+    }
 }
 
 fun <T> Array<T>.asList(): MutableList<T> {

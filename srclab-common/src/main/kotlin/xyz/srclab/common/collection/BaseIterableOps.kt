@@ -1857,7 +1857,7 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> Iterable<T>.toArray(componentType: Class<*>): Array<T> {
             val list = this.asToLinkedList()
-            val array: Array<T> = componentType.componentTypeToArrayInstance(0)
+            val array: Array<T> = componentType.componentTypeToArray(0)
             return list.toArray(array)
         }
 
@@ -2021,6 +2021,22 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> MutableIterable<T>.retainAll(predicate: (T) -> Boolean): Boolean {
             return this.retainAllKt(predicate)
+        }
+
+        // Others
+
+        fun <T> Any.anyAsIterable(): Iterable<T> {
+            return this.anyAsIterableOrNull() ?: throw IllegalArgumentException("Cannot from any to Iterable: $this.")
+        }
+
+        fun <T> Any.anyAsIterableOrNull(): Iterable<T>? {
+            if (this is Iterable<*>) {
+                return this.asAny()
+            }
+            if (this.javaClass.isArray) {
+                return this.arrayAsList()
+            }
+            return null
         }
     }
 }

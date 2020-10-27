@@ -4,7 +4,6 @@ import xyz.srclab.common.base.asAny
 import xyz.srclab.common.base.castSelfComparableComparator
 import java.util.*
 import kotlin.random.Random
-import xyz.srclab.common.collection.asList as arrayAsList
 import kotlin.collections.binarySearch as binarySearchKt
 import kotlin.collections.dropLast as dropLastKt
 import kotlin.collections.dropLastWhile as dropLastWhileKt
@@ -471,32 +470,20 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
             return this.retainAllKt(predicate)
         }
 
-        //Other utils:
+        // Others
 
-        @JvmStatic
-        fun <T> Any.asMutableList(): MutableList<T> {
-            val result = this.asMutableListOrNull<T>()
-            if (result === null) {
-                throw IllegalArgumentException("$this cannot convert to MutableList.")
-            }
-            return result
+        fun <T> Any.anyAsList(): Iterable<T> {
+            return this.anyAsListOrNull() ?: throw IllegalArgumentException("Cannot from any to List: $this.")
         }
 
-        @JvmStatic
-        fun <T> Any.asMutableListOrNull(): MutableList<T>? {
-            return when (this) {
-                is MutableList<*> -> this.asAny()
-                is BooleanArray -> this.arrayAsList().asAny()
-                is ByteArray -> this.arrayAsList().asAny()
-                is ShortArray -> this.arrayAsList().asAny()
-                is CharArray -> this.arrayAsList().asAny()
-                is IntArray -> this.arrayAsList().asAny()
-                is LongArray -> this.arrayAsList().asAny()
-                is FloatArray -> this.arrayAsList().asAny()
-                is DoubleArray -> this.arrayAsList().asAny()
-                is Array<*> -> this.arrayAsList().asAny()
-                else -> null
+        fun <T> Any.anyAsListOrNull(): List<T>? {
+            if (this is List<*>) {
+                return this.asAny()
             }
+            if (this.javaClass.isArray) {
+                return this.arrayAsList()
+            }
+            return null
         }
     }
 }

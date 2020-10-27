@@ -1550,7 +1550,7 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         @JvmStatic
         fun <T> Sequence<T>.toArray(componentType: Class<*>): Array<T> {
             val list = this.toLinkedList()
-            val array: Array<T> = componentType.componentTypeToArrayInstance(0)
+            val array: Array<T> = componentType.componentTypeToArray(0)
             return list.toArray(array)
         }
 
