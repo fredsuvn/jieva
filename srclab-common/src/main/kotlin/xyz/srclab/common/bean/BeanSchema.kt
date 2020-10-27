@@ -19,7 +19,7 @@ import java.lang.reflect.Type
 /**
  * @author sunqian
  */
-interface BeanDef {
+interface BeanSchema {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val type: Class<*>
@@ -68,8 +68,13 @@ interface BeanDef {
     companion object {
 
         @JvmStatic
-        fun resolve(type: Type): BeanDef {
-            return BeanDefImpl(type)
+        fun resolve(type: Type): BeanSchema {
+            return BeanSchemaImpl(type)
+        }
+
+        @JvmStatic
+        fun resolveOrNull(type: Type): BeanSchema? {
+            return BeanSchemaImpl(type)
         }
 
         @JvmStatic
@@ -256,64 +261,68 @@ interface BeanDef {
     }
 }
 
-fun Type.resolveBean(): BeanDef {
-    return BeanDef.resolve(this)
+fun Type.resolveBean(): BeanSchema {
+    return BeanSchema.resolve(this)
+}
+
+fun Type.resolveBeanOrNull(): BeanSchema? {
+    return BeanSchema.resolveOrNull(this)
 }
 
 fun Any.beanToMap(): Map<String, Any?> {
-    return BeanDef.toMap(this)
+    return BeanSchema.toMap(this)
 }
 
 fun <K, V> Any.beanToMap(type: Type): Map<K, V> {
-    return BeanDef.toMap(this, type)
+    return BeanSchema.toMap(this, type)
 }
 
 fun <K, V> Any.beanToMap(typeRef: TypeRef<Map<K, V>>): Map<K, V> {
-    return BeanDef.toMap(this, typeRef)
+    return BeanSchema.toMap(this, typeRef)
 }
 
-fun <K, V> Any.beanToMap(mapSchema: MapSchema, copyOptions: BeanDef.CopyOptions): Map<K, V> {
-    return BeanDef.toMap(this, mapSchema, copyOptions)
+fun <K, V> Any.beanToMap(mapSchema: MapSchema, copyOptions: BeanSchema.CopyOptions): Map<K, V> {
+    return BeanSchema.toMap(this, mapSchema, copyOptions)
 }
 
 fun <T : Any> Any.propertiesToBean(to: T, ignoreNull: Boolean = false): T {
-    return BeanDef.propertiesToBean(this, to, ignoreNull)
+    return BeanSchema.propertiesToBean(this, to, ignoreNull)
 }
 
 fun <T : Any> Any.propertiesToBean(to: T, converter: Converter): T {
-    return BeanDef.propertiesToBean(this, to)
+    return BeanSchema.propertiesToBean(this, to)
 }
 
 fun <T : Any> Any.propertiesToBean(to: T, toType: Type, converter: Converter): T {
-    return BeanDef.propertiesToBean(this, to)
+    return BeanSchema.propertiesToBean(this, to)
 }
 
 fun <T : Any> Any.propertiesToBean(to: T, fromType: Type, toType: Type, converter: Converter): T {
-    return BeanDef.propertiesToBean(this, to)
+    return BeanSchema.propertiesToBean(this, to)
 }
 
-fun <T : Any> Any.propertiesToBean(to: T, copyOptions: BeanDef.CopyOptions): T {
-    return BeanDef.propertiesToBean(this, to, copyOptions)
+fun <T : Any> Any.propertiesToBean(to: T, copyOptions: BeanSchema.CopyOptions): T {
+    return BeanSchema.propertiesToBean(this, to, copyOptions)
 }
 
 fun <M : MutableMap<String, Any?>> Any.propertiesToMap(to: M, ignoreNull: Boolean = false): M {
-    return BeanDef.propertiesToMap(this, to, ignoreNull)
+    return BeanSchema.propertiesToMap(this, to, ignoreNull)
 }
 
 fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, toType: Type, converter: Converter): M {
-    return BeanDef.propertiesToBean(this, to)
+    return BeanSchema.propertiesToBean(this, to)
 }
 
 fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, fromType: Type, toType: Type, converter: Converter): M {
-    return BeanDef.propertiesToBean(this, to)
+    return BeanSchema.propertiesToBean(this, to)
 }
 
 fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(
     to: M,
     toSchema: MapSchema,
-    copyOptions: BeanDef.CopyOptions = BeanDef.CopyOptions.DEFAULT
+    copyOptions: BeanSchema.CopyOptions = BeanSchema.CopyOptions.DEFAULT
 ): M {
-    return BeanDef.propertiesToBean(this, to, copyOptions)
+    return BeanSchema.propertiesToBean(this, to, copyOptions)
 }
 
 interface PropertyDef {
@@ -371,7 +380,7 @@ interface PropertyDef {
     }
 }
 
-private class BeanDefImpl(override val type: Class<*>) : BeanDef {
+private class BeanSchemaImpl(override val type: Class<*>) : BeanSchema {
 
     override val properties: Map<String, PropertyDef> by lazy { tryProperties() }
 

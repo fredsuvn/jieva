@@ -1,11 +1,15 @@
-@file:JvmName("ArrayOps")
+@file:JvmName("ArrayKit")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.asAny
+import xyz.srclab.common.reflect.rawClass
+import xyz.srclab.common.reflect.upperClass
 import java.lang.reflect.GenericArrayType
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.lang.reflect.TypeVariable
 
 val Type.isArray: Boolean
     @JvmName("isArray") get() {
@@ -25,11 +29,24 @@ val Type.componentType: Type?
         }
     }
 
-fun <A> Class<*>.componentTypeToArray(length: Int): A {
-    return java.lang.reflect.Array.newInstance(this, length).asAny()
+val Type.arrayType: Class<*>
+    get() {
+        return when (this) {
+            is Class<*> -> componentTypeToArray<Any>(0).javaClass
+            is ParameterizedType -> rawClass.componentTypeToArray<Any>(0).javaClass
+            else -> null
+        }
+    }
+
+fun <A> Type.componentTypeToArray(length: Int): A {
+    return when(this){
+        is Class<*> -> java.lang.reflect.Array.newInstance(this, length).asAny()
+        is ParameterizedType -> java.lang.reflect.Array.newInstance(this.rawClass, length).asAny()
+        is TypeVariable<*> -> java.lang.reflect.Array.newInstance(this.upperClass, length).asAny()
+    }
 }
 
-fun <A> Class<*>.arrayTypeToArray(length: Int): A {
+fun <A> Type.arrayTypeToArray(length: Int): A {
     if (!this.isArray) {
         throw IllegalArgumentException("$this is not an array type.")
     }

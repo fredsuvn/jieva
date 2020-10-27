@@ -1,12 +1,22 @@
 package xyz.srclab.common.collection
 
+import org.checkerframework.checker.units.qual.C
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
+import kotlin.collections.LinkedHashSet
 
 interface IterableSchema {
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val rawClass:Class<*>
+        @JvmName("rawClass") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val componentType: Type
@@ -15,11 +25,62 @@ interface IterableSchema {
     companion object {
 
         @JvmField
-        val RAW = of(Any::class.java)
+        val RAW_ITERABLE = of(Iterable::class.java, Any::class.java)
+
+        @JvmField
+        val RAW_COLLECTION = of(Collection::class.java, Any::class.java)
+
+        @JvmField
+        val RAW_SET = of(Set::class.java, Any::class.java)
+
+        @JvmField
+        val RAW_HASH_SET = of(HashSet::class.java, Any::class.java)
+
+        @JvmField
+        val RAW_LINKED_HASH_SET = of(LinkedHashSet::class.java, Any::class.java)
+
+        @JvmField
+        val RAW_SORTED_SET = of(SortedSet::class.java, Any::class.java)
+
+        @JvmField
+        val RAW_TREE_SET = of(TreeSet::class.java, Any::class.java)
+
+        @JvmField
+        val RAW_LIST = of(List::class.java, Any::class.java)
+
+        @JvmField
+        val RAW_ARRAY_LIST = of(ArrayList::class.java, Any::class.java)
+
+        @JvmField
+        val RAW_LINKED_LIST = of(LinkedList::class.java, Any::class.java)
+
+        @JvmField
+        val BOOLEAN_ARRAY = of(BooleanArray::class.java, Boolean::class.javaPrimitiveType!!)
+
+        @JvmField
+        val BYTE_ARRAY = of(ByteArray::class.java, Byte::class.javaPrimitiveType!!)
+
+        @JvmField
+        val SHORT_ARRAY = of(ShortArray::class.java, Short::class.javaPrimitiveType!!)
+
+        @JvmField
+        val CHAR_ARRAY = of(CharArray::class.java, Char::class.javaPrimitiveType!!)
+
+        @JvmField
+        val INT_ARRAY = of(IntArray::class.java, Int::class.javaPrimitiveType!!)
+
+        @JvmField
+        val LONG_ARRAY = of(LongArray::class.java, Long::class.javaPrimitiveType!!)
+
+        @JvmField
+        val FLOAT_ARRAY = of(FloatArray::class.java, Float::class.javaPrimitiveType!!)
+
+        @JvmField
+        val DOUBLE_ARRAY = of(DoubleArray::class.java, Double::class.javaPrimitiveType!!)
 
         @JvmStatic
-        fun of(componentType: Type): IterableSchema {
-            return IterableSchemaImpl(componentType)
+        fun of(rawClass: Class<*>,componentType: Type): IterableSchema {
+            return IterableSchemaImpl(rawClass,componentType)
         }
 
         @JvmStatic
@@ -34,10 +95,26 @@ interface IterableSchema {
         @JvmStatic
         fun resolveOrNull(type: Type): IterableSchema? {
             if (type is Class<*>) {
-                return when {
-                    Iterable::class.java.isAssignableFrom(type) -> RAW
-                    type.isArray -> of(type.componentType)
-                    else -> null
+                return when(type) {
+                    Iterable::class.java-> RAW_ITERABLE
+                    Collection::class.java-> RAW_COLLECTION
+                    Set::class.java-> RAW_SET
+                    HashSet::class.java-> RAW_HASH_SET
+                    LinkedHashSet::class.java-> RAW_LINKED_HASH_SET
+                    SortedSet::class.java-> RAW_SORTED_SET
+                    TreeSet::class.java-> RAW_TREE_SET
+                    List::class.java-> RAW_LIST
+                    ArrayList::class.java-> RAW_ARRAY_LIST
+                    LinkedList::class.java-> RAW_LINKED_LIST
+                    BooleanArray::class.java-> BOOLEAN_ARRAY
+                    ByteArray::class.java-> BYTE_ARRAY
+                    ShortArray::class.java-> SHORT_ARRAY
+                    CharArray::class.java-> CHAR_ARRAY
+                    IntArray::class.java-> INT_ARRAY
+                    LongArray::class.java-> LONG_ARRAY
+                    FloatArray::class.java-> FLOAT_ARRAY
+                    DoubleArray::class.java-> DOUBLE_ARRAY
+                    else->of(type, Any::class.java)
                 }
             }
             if (type is ParameterizedType) {
@@ -47,11 +124,11 @@ interface IterableSchema {
                 }
                 val actualTypeArguments = type.actualTypeArguments
                 if (actualTypeArguments.size == 1) {
-                    return of(actualTypeArguments[0])
+                    return of(rawClass,actualTypeArguments[0])
                 }
             }
             if (type is GenericArrayType) {
-                return of(type.genericComponentType)
+                return of(rawClass,type.genericComponentType)
             }
             return null
         }
@@ -70,7 +147,7 @@ fun Type.resolveIterableSchemaOrNull(): IterableSchema? {
     return IterableSchema.resolveOrNull(this)
 }
 
-private class IterableSchemaImpl(override val componentType: Type) : IterableSchema {
+private class IterableSchemaImpl(override val rawClass: Class<*>,override val componentType: Type) : IterableSchema {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -95,6 +172,10 @@ private class IterableSchemaImpl(override val componentType: Type) : IterableSch
 interface MapSchema {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    val rawClass:Class<*>
+        @JvmName("rawClass") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val keyType: Type
         @JvmName("keyType") get
 
@@ -111,8 +192,8 @@ interface MapSchema {
         val BEAN_PATTERN = of(String::class.java, Any::class.java)
 
         @JvmStatic
-        fun of(keyType: Type, valueType: Type): MapSchema {
-            return MapSchemaImpl(keyType, valueType)
+        fun of(rawClass: Class<*>,keyType: Type, valueType: Type): MapSchema {
+            return MapSchemaImpl(rawClass,keyType, valueType)
         }
 
         @JvmStatic
@@ -136,7 +217,7 @@ interface MapSchema {
                 }
                 val actualTypeArguments = type.actualTypeArguments
                 if (actualTypeArguments.size == 2) {
-                    return of(actualTypeArguments[0], actualTypeArguments[1])
+                    return of(rawClass,actualTypeArguments[0], actualTypeArguments[1])
                 }
             }
             return null
@@ -144,8 +225,8 @@ interface MapSchema {
     }
 }
 
-fun mapSchema(keyType: Type, valueType: Type): MapSchema {
-    return MapSchema.of(keyType, valueType)
+fun mapSchema(rawClass: Class<*>,keyType: Type, valueType: Type): MapSchema {
+    return MapSchema.of(rawClass,keyType, valueType)
 }
 
 fun Type.resolveMapSchema(): MapSchema {
@@ -156,7 +237,7 @@ fun Type.resolveMapSchemaOrNull(): MapSchema? {
     return MapSchema.resolveOrNull(this)
 }
 
-private class MapSchemaImpl(override val keyType: Type, override val valueType: Type) : MapSchema {
+private class MapSchemaImpl(override val rawClass: Class<*>,override val keyType: Type, override val valueType: Type) : MapSchema {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
