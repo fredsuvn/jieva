@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.propertiesToBean
 import xyz.srclab.common.bean.propertiesToMap
 import xyz.srclab.common.collection.BaseIterableOps.Companion.toAnyArray
@@ -395,7 +396,7 @@ object IterableConvertHandler : AbstractConvertHandler() {
     }
 }
 
-object BeanConvertHandler : AbstractConvertHandler() {
+open class BeanConvertHandler(protected val beanResolver: BeanResolver) : AbstractConvertHandler() {
 
     override fun convertFromNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {

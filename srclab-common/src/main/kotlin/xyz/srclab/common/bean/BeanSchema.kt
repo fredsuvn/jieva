@@ -7,7 +7,6 @@ import xyz.srclab.common.base.virtualInvoker
 import xyz.srclab.common.collection.MapSchema
 import xyz.srclab.common.collection.resolveMapSchema
 import xyz.srclab.common.convert.Converter
-import xyz.srclab.common.convert.convertTo
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.reflect.findField
 import java.beans.Introspector
@@ -31,38 +30,6 @@ interface BeanSchema {
 
     fun getProperty(name: String): PropertyDef? {
         return properties[name]
-    }
-
-    interface CopyOptions {
-
-        fun filterProperty(name: Any?): Boolean = true
-
-        fun filterProperty(name: Any?, value: Any?): Boolean = true
-
-        fun filterProperty(name: Any?, value: Any?, targetValueType: Type): Boolean = true
-
-        fun filterProperty(name: Any?, value: Any?, targetKeyType: Type, targetValueType: Type): Boolean = true
-
-        fun convertName(name: Any?, value: Any?, targetKeyType: Type): Any? {
-            return name.convertTo(targetKeyType)
-        }
-
-        fun convertValue(name: Any?, value: Any?, targetValueType: Type): Any? {
-            return value.convertTo(targetValueType)
-        }
-
-        companion object {
-
-            @JvmField
-            val DEFAULT = object : CopyOptions {}
-
-            @JvmField
-            val IGNORE_NULL = object : CopyOptions {
-                override fun filterProperty(name: Any?, value: Any?): Boolean {
-                    return value !== null
-                }
-            }
-        }
     }
 
     companion object {
@@ -259,70 +226,6 @@ interface BeanSchema {
             return to
         }
     }
-}
-
-fun Type.resolveBean(): BeanSchema {
-    return BeanSchema.resolve(this)
-}
-
-fun Type.resolveBeanOrNull(): BeanSchema? {
-    return BeanSchema.resolveOrNull(this)
-}
-
-fun Any.beanToMap(): Map<String, Any?> {
-    return BeanSchema.toMap(this)
-}
-
-fun <K, V> Any.beanToMap(type: Type): Map<K, V> {
-    return BeanSchema.toMap(this, type)
-}
-
-fun <K, V> Any.beanToMap(typeRef: TypeRef<Map<K, V>>): Map<K, V> {
-    return BeanSchema.toMap(this, typeRef)
-}
-
-fun <K, V> Any.beanToMap(mapSchema: MapSchema, copyOptions: BeanSchema.CopyOptions): Map<K, V> {
-    return BeanSchema.toMap(this, mapSchema, copyOptions)
-}
-
-fun <T : Any> Any.propertiesToBean(to: T, ignoreNull: Boolean = false): T {
-    return BeanSchema.propertiesToBean(this, to, ignoreNull)
-}
-
-fun <T : Any> Any.propertiesToBean(to: T, converter: Converter): T {
-    return BeanSchema.propertiesToBean(this, to)
-}
-
-fun <T : Any> Any.propertiesToBean(to: T, toType: Type, converter: Converter): T {
-    return BeanSchema.propertiesToBean(this, to)
-}
-
-fun <T : Any> Any.propertiesToBean(to: T, fromType: Type, toType: Type, converter: Converter): T {
-    return BeanSchema.propertiesToBean(this, to)
-}
-
-fun <T : Any> Any.propertiesToBean(to: T, copyOptions: BeanSchema.CopyOptions): T {
-    return BeanSchema.propertiesToBean(this, to, copyOptions)
-}
-
-fun <M : MutableMap<String, Any?>> Any.propertiesToMap(to: M, ignoreNull: Boolean = false): M {
-    return BeanSchema.propertiesToMap(this, to, ignoreNull)
-}
-
-fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, toType: Type, converter: Converter): M {
-    return BeanSchema.propertiesToBean(this, to)
-}
-
-fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(to: M, fromType: Type, toType: Type, converter: Converter): M {
-    return BeanSchema.propertiesToBean(this, to)
-}
-
-fun <K, V, M : MutableMap<K, V>> Any.propertiesToMap(
-    to: M,
-    toSchema: MapSchema,
-    copyOptions: BeanSchema.CopyOptions = BeanSchema.CopyOptions.DEFAULT
-): M {
-    return BeanSchema.propertiesToBean(this, to, copyOptions)
 }
 
 interface PropertyDef {
