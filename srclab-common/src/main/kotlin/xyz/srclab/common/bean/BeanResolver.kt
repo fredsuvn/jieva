@@ -60,7 +60,7 @@ interface BeanResolver {
         }
 
         fun with(fromType: Type?, toType: Type?, converter: Converter): CopyOptions {
-            return CopyOptionsWith(this, fromType, toType, converter)
+            return copyOptionsWith(this, fromType, toType, converter)
         }
 
         companion object {
@@ -73,6 +73,17 @@ interface BeanResolver {
                 override fun filterProperty(name: Any?, value: Any?): Boolean {
                     return value !== null
                 }
+            }
+
+            @JvmStatic
+            @JvmOverloads
+            fun copyOptionsWith(
+                baseCopyOptions: CopyOptions = DEFAULT,
+                fromType: Type?,
+                toType: Type?,
+                converter: Converter
+            ): CopyOptions {
+                return CopyOptionsWith(baseCopyOptions, fromType, toType, converter)
             }
 
             private class CopyOptionsWith(
