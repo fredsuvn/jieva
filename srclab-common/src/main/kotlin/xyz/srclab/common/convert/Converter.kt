@@ -4,7 +4,6 @@ import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collection.BaseIterableOps.Companion.toAnyArray
-import xyz.srclab.common.collection.IterableSchema
 import xyz.srclab.common.collection.arrayAsList
 import xyz.srclab.common.collection.componentType
 import xyz.srclab.common.collection.resolveIterableSchemaOrNull
@@ -269,46 +268,48 @@ object IterableConvertHandler : AbstractConvertHandler() {
     private fun iterableToType(iterable: Iterable<Any?>, toType: Type, converter: Converter): Any? {
         val toComponentType = toType.componentType
         if (toComponentType !== null) {
+            val upperComponentType = toComponentType.upperBound
             return iterable
-                .map { converter.convert<Any?>(it, toComponentType) }
-                .toAnyArray(toComponentType.upperClass)
+                .map { converter.convert<Any?>(it, upperComponentType) }
+                .toAnyArray(upperComponentType.upperClass)
         }
         val iterableSchema = toType.resolveIterableSchemaOrNull()
         if (iterableSchema === null) {
             return null
         }
         return if (iterable is Collection<*>)
-            collectionMapTo(iterable, iterableSchema, converter)
+            collectionMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.upperBound, converter)
         else
-            iterableMapTo(iterable, iterableSchema, converter)
+            iterableMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.upperBound, converter)
     }
 
     private fun iterableMapTo(
         iterable: Iterable<Any?>,
-        iterableSchema: IterableSchema,
+        iterableClass: Class<*>,
+        componentType: Type,
         converter: Converter
     ): Iterable<Any?>? {
-        return when (iterableSchema.rawClass) {
+        return when (iterableClass) {
             List::class.java -> iterable.mapTo(LinkedList<Any?>()) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }.toList()
             LinkedList::class.java -> iterable.mapTo(LinkedList()) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             ArrayList::class.java -> iterable.mapTo(ArrayList()) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             Collection::class.java, Set::class.java -> iterable.mapTo(LinkedHashSet<Any?>()) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }.toSet()
             LinkedHashSet::class.java -> iterable.mapTo(LinkedHashSet()) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             HashSet::class.java -> iterable.mapTo(HashSet()) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             TreeSet::class.java -> iterable.mapTo(TreeSet()) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             else -> null
         }
@@ -316,30 +317,31 @@ object IterableConvertHandler : AbstractConvertHandler() {
 
     private fun collectionMapTo(
         collection: Collection<Any?>,
-        iterableSchema: IterableSchema,
+        iterableClass: Class<*>,
+        componentType: Type,
         converter: Converter
     ): Iterable<Any?>? {
-        return when (iterableSchema.rawClass) {
+        return when (iterableClass) {
             List::class.java -> collection.mapTo(ArrayList<Any?>(collection.size)) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }.toList()
             LinkedList::class.java -> collection.mapTo(LinkedList()) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             ArrayList::class.java -> collection.mapTo(ArrayList(collection.size)) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             Collection::class.java, Set::class.java -> collection.mapTo(LinkedHashSet<Any?>(collection.size)) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }.toSet()
             LinkedHashSet::class.java -> collection.mapTo(LinkedHashSet(collection.size)) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             HashSet::class.java -> collection.mapTo(HashSet(collection.size)) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             TreeSet::class.java -> collection.mapTo(TreeSet()) {
-                converter.convert(it, iterableSchema.componentType)
+                converter.convert(it, componentType)
             }
             else -> null
         }
@@ -350,8 +352,8 @@ open class BeanConvertHandler(protected val beanResolver: BeanResolver) : Abstra
 
     override fun doConvert(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
-            is Class<*> -> return doConvert0(from, toType, toType, converter)
-            is ParameterizedType -> return doConvert0(from, toType.rawClass, toType, converter)
+            is Class<*> -> return doConvert0(from, toType, toType.upperBound, converter)
+            is ParameterizedType -> return doConvert0(from, toType.rawClass, toType.upperBound, converter)
             else -> null
         }
     }
