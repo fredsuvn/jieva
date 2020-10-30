@@ -1,6 +1,10 @@
 package xyz.srclab.common.exception
 
-import xyz.srclab.common.state.*
+import xyz.srclab.common.state.State
+import xyz.srclab.common.state.State.Companion.stateEquals
+import xyz.srclab.common.state.State.Companion.stateHashCode
+import xyz.srclab.common.state.State.Companion.stateMoreDescription
+import xyz.srclab.common.state.State.Companion.stateToString
 
 interface ExceptionStatus : State<String, String, ExceptionStatus> {
 
@@ -34,10 +38,6 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
     }
 }
 
-fun exceptionStatusOf(code: String, description: String? = null): ExceptionStatus {
-    return ExceptionStatus.of(code, description)
-}
-
 private class ExceptionStatusImpl(
     code: CharSequence,
     description: CharSequence?
@@ -51,7 +51,7 @@ private class ExceptionStatusImpl(
     }
 
     override fun hashCode(): Int {
-        return this.stateHash()
+        return this.stateHashCode()
     }
 
     override fun toString(): String {

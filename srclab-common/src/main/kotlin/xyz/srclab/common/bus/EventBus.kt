@@ -38,20 +38,20 @@ interface EventBus {
         @JvmStatic
         @JvmOverloads
         fun newEventBus(
-            executor: Executor = Runner.SYNC_RUNNER,
             handlers: Map<Any, EventHandler<*>>,
-            mutable: Boolean = true
+            executor: Executor = Runner.SYNC_RUNNER,
+            mutable: Boolean = true,
         ): EventBus {
             return if (mutable)
                 MutableEventBusImpl(executor, ConcurrentHashMap(handlers))
             else
-                EventBusImpl(executor, handlers.toMap())
+                EventBusImpl(handlers.toMap(), executor)
+        }
+
+        fun Executor.newEventBus(handlers: Map<Any, EventHandler<*>>, mutable: Boolean = true): EventBus {
+            return EventBus.newEventBus(handlers, this, mutable)
         }
     }
-}
-
-fun Executor.newEventBus(handlers: Map<Any, EventHandler<*>>, mutable: Boolean = true): EventBus {
-    return EventBus.newEventBus(this, handlers, mutable)
 }
 
 interface EventHandler<T : Any> {
@@ -66,7 +66,7 @@ interface EventHandler<T : Any> {
 class EventHandlerNotFoundException(eventType: Any) : RuntimeException(eventType.toString())
 
 private abstract class BaseEventBus<M : Map<Any, EventHandler<*>>>(
-    private val executor: Executor, handlers: M
+    handlers: M, private val executor: Executor,
 ) : EventBus {
 
     protected val eventHandlerMap: M = handlers
@@ -93,12 +93,12 @@ private abstract class BaseEventBus<M : Map<Any, EventHandler<*>>>(
 }
 
 private class EventBusImpl(
+    handlers: Map<Any, EventHandler<*>>,
     executor: Executor,
-    handlers: Map<Any, EventHandler<*>>
-) : BaseEventBus<Map<Any, EventHandler<*>>>(executor, handlers)
+) : BaseEventBus<Map<Any, EventHandler<*>>>(handlers, executor)
 
 private class MutableEventBusImpl(executor: Executor, handlers: MutableMap<Any, EventHandler<*>>) :
-    BaseEventBus<MutableMap<Any, EventHandler<*>>>(executor, handlers) {
+    BaseEventBus<MutableMap<Any, EventHandler<*>>>(handlers, executor) {
 
     override fun register(eventHandler: EventHandler<*>) {
         eventHandlerMap[eventHandler.eventType] = eventHandler

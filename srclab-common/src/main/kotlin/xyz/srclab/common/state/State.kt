@@ -23,51 +23,39 @@ interface State<C, DESC, T : State<C, DESC, T>> {
     companion object {
 
         @JvmStatic
-        fun equals(state: State<*, *, *>, other: Any?): Boolean {
-            if (state === other) {
+        @JvmName("equals")
+        fun State<*, *, *>.stateEquals(other: Any?): Boolean {
+            if (this === other) {
                 return true
             }
             if (other !is State<*, *, *>) {
                 return false
             }
-            return (state.code == other.code && state.description == other.description)
+            return (this.code == other.code && this.description == other.description)
         }
 
         @JvmStatic
-        fun hashCode(state: State<*, *, *>): Int {
-            return hash(state.code, state.description)
+        @JvmName("hashCode")
+        fun State<*, *, *>.stateHashCode(): Int {
+            return hash(this.code, this.description)
         }
 
         @JvmStatic
-        fun toString(state: State<*, *, *>): String {
-            val code = state.code
-            val description = state.description
+        @JvmName("toString")
+        fun State<*, *, *>.stateToString(): String {
+            val code = this.code
+            val description = this.description
             return if (description === null) code.toString() else "$code-$description"
         }
 
         @JvmStatic
-        fun moreDescription(description: CharSequence?, moreDescription: CharSequence?): String? {
+        @JvmName("moreDescription")
+        fun CharSequence?.stateMoreDescription(moreDescription: CharSequence?): String? {
             return when {
-                description === null -> moreDescription?.toString()
-                moreDescription === null -> description.toString()
-                else -> "$description[$moreDescription]"
+                this === null -> moreDescription?.toString()
+                moreDescription === null -> this.toString()
+                else -> "$this[$moreDescription]"
             }
         }
     }
-}
-
-fun State<*, *, *>.stateEquals(other: Any?): Boolean {
-    return State.equals(this, other)
-}
-
-fun State<*, *, *>.stateHash(): Int {
-    return State.hashCode(this)
-}
-
-fun State<*, *, *>.stateToString(): String {
-    return State.toString(this)
-}
-
-fun CharSequence?.stateMoreDescription(moreDescription: CharSequence?): String? {
-    return State.moreDescription(this, moreDescription)
 }

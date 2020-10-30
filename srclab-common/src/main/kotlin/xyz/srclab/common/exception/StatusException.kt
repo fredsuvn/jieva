@@ -1,8 +1,8 @@
 package xyz.srclab.common.exception
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.state.stateEquals
-import xyz.srclab.common.state.stateHash
+import xyz.srclab.common.state.State.Companion.stateEquals
+import xyz.srclab.common.state.State.Companion.stateHashCode
 
 open class StatusException @JvmOverloads constructor(
     private val exceptionStatus: ExceptionStatus,
@@ -26,7 +26,7 @@ open class StatusException @JvmOverloads constructor(
     )
 
     constructor(code: String, description: String?, cause: Throwable?) : this(
-        exceptionStatusOf(code, description),
+        ExceptionStatus.of(code, description),
         cause
     )
 
@@ -39,10 +39,10 @@ open class StatusException @JvmOverloads constructor(
         @JvmName("description") get() = exceptionStatus.description
 
     override fun equals(other: Any?): Boolean {
-        return stateEquals(other)
+        return this.stateEquals(other)
     }
 
     override fun hashCode(): Int {
-        return stateHash()
+        return this.stateHashCode()
     }
 }
