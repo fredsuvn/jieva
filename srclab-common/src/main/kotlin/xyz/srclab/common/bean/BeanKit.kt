@@ -28,12 +28,20 @@ fun <T : Any> Any.copyProperties(to: T, converter: Converter): T {
     return defaultResolver.copyProperties(this, to, converter)
 }
 
+fun <T : Any> Any.copyProperties(to: T, fromType: Type, toType: Type, converter: Converter): T {
+    return defaultResolver.copyProperties(this, to, fromType, toType, converter)
+}
+
 fun <T : Any> Any.copyPropertiesIgnoreNull(to: T): T {
     return defaultResolver.copyPropertiesIgnoreNull(this, to)
 }
 
 fun <T : Any> Any.copyPropertiesIgnoreNull(to: T, converter: Converter): T {
     return defaultResolver.copyPropertiesIgnoreNull(this, to, converter)
+}
+
+fun <T : Any> Any.copyPropertiesIgnoreNull(to: T, fromType: Type, toType: Type, converter: Converter): T {
+    return defaultResolver.copyPropertiesIgnoreNull(this, to, fromType, toType, converter)
 }
 
 fun <T : Any> Any.copyProperties(to: T, copyOptions: BeanResolver.CopyOptions): T {

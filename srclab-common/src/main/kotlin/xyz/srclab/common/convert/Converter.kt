@@ -290,13 +290,19 @@ object IterableConvertHandler : AbstractConvertHandler() {
         converter: Converter
     ): Iterable<Any?>? {
         return when (iterableSchema.rawClass) {
-            Iterable::class.java, List::class.java, LinkedList::class.java -> iterable.mapTo(LinkedList()) {
+            List::class.java -> iterable.mapTo(LinkedList<Any?>()) {
+                converter.convert(it, iterableSchema.componentType)
+            }.toList()
+            LinkedList::class.java -> iterable.mapTo(LinkedList()) {
                 converter.convert(it, iterableSchema.componentType)
             }
             ArrayList::class.java -> iterable.mapTo(ArrayList()) {
                 converter.convert(it, iterableSchema.componentType)
             }
-            Collection::class.java, Set::class.java, LinkedHashSet::class.java -> iterable.mapTo(LinkedHashSet()) {
+            Collection::class.java, Set::class.java -> iterable.mapTo(LinkedHashSet<Any?>()) {
+                converter.convert(it, iterableSchema.componentType)
+            }.toSet()
+            LinkedHashSet::class.java -> iterable.mapTo(LinkedHashSet()) {
                 converter.convert(it, iterableSchema.componentType)
             }
             HashSet::class.java -> iterable.mapTo(HashSet()) {
@@ -315,19 +321,19 @@ object IterableConvertHandler : AbstractConvertHandler() {
         converter: Converter
     ): Iterable<Any?>? {
         return when (iterableSchema.rawClass) {
-            Iterable::class.java, List::class.java, ArrayList::class.java -> collection.mapTo(
-                ArrayList(collection.size)
-            ) {
+            List::class.java -> collection.mapTo(ArrayList<Any?>(collection.size)) {
                 converter.convert(it, iterableSchema.componentType)
-            }
+            }.toList()
             LinkedList::class.java -> collection.mapTo(LinkedList()) {
                 converter.convert(it, iterableSchema.componentType)
             }
-            Collection::class.java, Set::class.java, LinkedHashSet::class.java -> collection.mapTo(
-                LinkedHashSet(
-                    collection.size
-                )
-            ) {
+            ArrayList::class.java -> collection.mapTo(ArrayList(collection.size)) {
+                converter.convert(it, iterableSchema.componentType)
+            }
+            Collection::class.java, Set::class.java -> collection.mapTo(LinkedHashSet<Any?>(collection.size)) {
+                converter.convert(it, iterableSchema.componentType)
+            }.toSet()
+            LinkedHashSet::class.java -> collection.mapTo(LinkedHashSet(collection.size)) {
                 converter.convert(it, iterableSchema.componentType)
             }
             HashSet::class.java -> collection.mapTo(HashSet(collection.size)) {
@@ -353,7 +359,10 @@ open class BeanConvertHandler(protected val beanResolver: BeanResolver) : Abstra
 
     private fun doConvert0(from: Any, toRawClass: Class<*>, toType: Type, converter: Converter): Any? {
         return when (toRawClass) {
-            Map::class.java -> from.copyProperties(HashMap<Any, Any?>(), toType,BeanResolver.CopyOptions.DEFAULT.with()).toMap()
+            Map::class.java -> from.copyProperties(
+                HashMap<Any, Any?>(),
+                BeanResolver.CopyOptions.copyOptionsWith()
+            ).toMap()
             MutableMap::class.java, HashMap::class.java -> return from.propertiesToMap(
                 HashMap<Any, Any?>(),
                 toType,

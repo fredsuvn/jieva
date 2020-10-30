@@ -25,12 +25,20 @@ interface BeanResolver {
         return copyProperties(from, to, CopyOptions.DEFAULT.withConverter(converter))
     }
 
+    fun <T : Any> copyProperties(from: Any, to: T, fromType: Type, toType: Type, converter: Converter): T {
+        return copyProperties(from, to, CopyOptions.DEFAULT.with(fromType, toType, converter))
+    }
+
     fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T): T {
         return copyProperties(from, to, CopyOptions.IGNORE_NULL)
     }
 
     fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T, converter: Converter): T {
         return copyProperties(from, to, CopyOptions.IGNORE_NULL.withConverter(converter))
+    }
+
+    fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T, fromType: Type, toType: Type, converter: Converter): T {
+        return copyProperties(from, to, CopyOptions.IGNORE_NULL.with(fromType, toType, converter))
     }
 
     fun <T : Any> copyProperties(from: Any, to: T, copyOptions: CopyOptions): T
