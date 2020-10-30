@@ -65,5 +65,41 @@ class IterableOps<T>(iterable: Iterable<T>) :
         fun <T> opsFor(iterable: Iterable<T>): IterableOps<T> {
             return IterableOps(iterable)
         }
+
+        // Others
+
+        @JvmStatic
+        fun <T> Any.anyAsIterable(): Iterable<T> {
+            return this.anyAsIterableOrNull()
+                ?: throw IllegalArgumentException("Cannot from any to Iterable: $this.")
+        }
+
+        @JvmStatic
+        fun <T> Any.anyAsMutableIterable(): MutableIterable<T> {
+            return this.anyAsMutableIterableOrNull()
+                ?: throw IllegalArgumentException("Cannot from any to MutableIterable: $this.")
+        }
+
+        @JvmStatic
+        fun <T> Any.anyAsIterableOrNull(): Iterable<T>? {
+            if (this is Iterable<*>) {
+                return this.asAny()
+            }
+            if (this.javaClass.isArray) {
+                return this.arrayAsListOrNull()
+            }
+            return null
+        }
+
+        @JvmStatic
+        fun <T> Any.anyAsMutableIterableOrNull(): MutableIterable<T>? {
+            if (this is MutableIterable<*>) {
+                return this.asAny()
+            }
+            if (this.javaClass.isArray) {
+                return this.arrayAsListOrNull()
+            }
+            return null
+        }
     }
 }

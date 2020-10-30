@@ -472,16 +472,36 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
 
         // Others
 
-        fun <T> Any.anyAsList(): Iterable<T> {
-            return this.anyAsListOrNull() ?: throw IllegalArgumentException("Cannot from any to List: $this.")
+        @JvmStatic
+        fun <T> Any.anyAsList(): List<T> {
+            return this.anyAsListOrNull()
+                ?: throw IllegalArgumentException("Cannot from any to List: $this.")
         }
 
+        @JvmStatic
+        fun <T> Any.anyAsMutableList(): MutableList<T> {
+            return this.anyAsMutableListOrNull()
+                ?: throw IllegalArgumentException("Cannot from any to MutableList: $this.")
+        }
+
+        @JvmStatic
         fun <T> Any.anyAsListOrNull(): List<T>? {
             if (this is List<*>) {
                 return this.asAny()
             }
             if (this.javaClass.isArray) {
-                return this.arrayAsList()
+                return this.arrayAsListOrNull()
+            }
+            return null
+        }
+
+        @JvmStatic
+        fun <T> Any.anyAsMutableListOrNull(): MutableList<T>? {
+            if (this is MutableList<*>) {
+                return this.asAny()
+            }
+            if (this.javaClass.isArray) {
+                return this.arrayAsListOrNull()
             }
             return null
         }

@@ -1,6 +1,6 @@
 package xyz.srclab.common.collection
 
-import xyz.srclab.common.base.*
+import xyz.srclab.common.base.asAny
 import kotlin.collections.addAll as addAllKt
 import kotlin.collections.count as countKt
 import kotlin.collections.plus as plusKt
@@ -8,7 +8,6 @@ import kotlin.collections.removeAll as removeAllKt
 import kotlin.collections.retainAll as retainAllKt
 import kotlin.collections.toMutableList as toMutableListKt
 import kotlin.collections.toSet as toSetKt
-import kotlin.collections.toTypedArray as toTypedArrayKt
 
 /**
  * @author sunqian
@@ -30,72 +29,6 @@ protected constructor(collection: C) : BaseIterableOps<T, C, MC, THIS>(collectio
 
     override fun toMutableList(): MutableList<T> {
         return finalCollection().toMutableList()
-    }
-
-    @JvmOverloads
-    override fun asToList(supplier: () -> MutableList<T> = { ArrayList(count()) }): List<T> {
-        return finalCollection().asToList(supplier)
-    }
-
-    @JvmOverloads
-    override fun asToMutableList(supplier: () -> MutableList<T> = { ArrayList(count()) }): MutableList<T> {
-        return finalCollection().asToMutableList(supplier)
-    }
-
-    open fun toArray(): Array<Any?> {
-        return finalCollection().toArray()
-    }
-
-    open fun toArray(generator: (size: Int) -> Array<T>): Array<T> {
-        return finalCollection().toArray(generator)
-    }
-
-    open fun toArray(componentType: Class<*>): Array<T> {
-        return finalCollection().toArray(componentType)
-    }
-
-    open fun toAnyArray(componentType: Class<*>): Any {
-        return finalCollection().toAnyArray(componentType)
-    }
-
-    @JvmOverloads
-    open fun toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
-        return finalCollection().toBooleanArray(selector)
-    }
-
-    @JvmOverloads
-    open fun toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
-        return finalCollection().toByteArray(selector)
-    }
-
-    @JvmOverloads
-    open fun toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
-        return finalCollection().toShortArray(selector)
-    }
-
-    @JvmOverloads
-    open fun toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
-        return finalCollection().toCharArray(selector)
-    }
-
-    @JvmOverloads
-    open fun toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
-        return finalCollection().toIntArray(selector)
-    }
-
-    @JvmOverloads
-    open fun toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
-        return finalCollection().toLongArray(selector)
-    }
-
-    @JvmOverloads
-    open fun toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
-        return finalCollection().toFloatArray(selector)
-    }
-
-    @JvmOverloads
-    open fun toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
-        return finalCollection().toDoubleArray(selector)
     }
 
     open fun addAll(elements: Array<out T>): THIS {
@@ -179,130 +112,6 @@ protected constructor(collection: C) : BaseIterableOps<T, C, MC, THIS>(collectio
         }
 
         @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.asToList(supplier: () -> MutableList<T> = { ArrayList(count()) }): List<T> {
-            return if (this is List<T>) this else toCollection(supplier())
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.asToMutableList(supplier: () -> MutableList<T> = { ArrayList(count()) }): MutableList<T> {
-            return if (this is MutableList<T>) this else toCollection(supplier())
-        }
-
-        @JvmStatic
-        fun <T> Collection<T>.toArray(): Array<Any?> {
-            val list = this.asToList { ArrayList(count()) }
-            return JavaCollectionOps.toArray(list)
-        }
-
-        @JvmStatic
-        fun <T> Collection<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
-            val list = this.asToList { ArrayList(count()) }
-            return JavaCollectionOps.toArray(list, generator(list.size))
-        }
-
-        @JvmStatic
-        fun <T> Collection<T>.toArray(componentType: Class<*>): Array<T> {
-            val list = this.asToList { ArrayList(count()) }
-            val array: Array<T> = componentType.componentTypeToArray(0)
-            return JavaCollectionOps.toArray(list, array)
-        }
-
-        @JvmStatic
-        fun <T> Collection<T>.toAnyArray(componentType: Class<*>): Any {
-            return when (componentType) {
-                Boolean::class.javaPrimitiveType -> this.toBooleanArray()
-                Byte::class.javaPrimitiveType -> this.toByteArray()
-                Short::class.javaPrimitiveType -> this.toShortArray()
-                Char::class.javaPrimitiveType -> this.toCharArray()
-                Int::class.javaPrimitiveType -> this.toIntArray()
-                Long::class.javaPrimitiveType -> this.toLongArray()
-                Float::class.javaPrimitiveType -> this.toFloatArray()
-                Double::class.javaPrimitiveType -> this.toDoubleArray()
-                else -> this.toArray(componentType)
-            }
-        }
-
-        @JvmStatic
-        inline fun <reified T> Collection<T>.toTypedArray(): Array<T> {
-            val list = this.asToList()
-            return list.toTypedArrayKt()
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
-            val list = this.asToList()
-            val result = BooleanArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
-            val list = this.asToList()
-            val result = ByteArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
-            val list = this.asToList()
-            val result = ShortArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
-            val list = this.asToList()
-            val result = CharArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
-            val list = this.asToList()
-            val result = IntArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
-            val list = this.asToList()
-            val result = LongArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
-            val list = this.asToList()
-            val result = FloatArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        inline fun <T> Collection<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
-            val list = this.asToList()
-            val result = DoubleArray(list.size)
-            list.forEachIndexed { i, t -> result[i] = selector(t) }
-            return result
-        }
-
-        @JvmStatic
         fun <T> Collection<T>.plus(element: T): List<T> {
             return this.plusKt(element)
         }
@@ -365,6 +174,42 @@ protected constructor(collection: C) : BaseIterableOps<T, C, MC, THIS>(collectio
         @JvmStatic
         fun <T> MutableCollection<T>.retainAll(elements: Sequence<T>): Boolean {
             return this.retainAllKt(elements)
+        }
+
+        // Others
+
+        @JvmStatic
+        fun <T> Any.anyAsCollection(): Collection<T> {
+            return this.anyAsCollectionOrNull()
+                ?: throw IllegalArgumentException("Cannot from any to Collection: $this.")
+        }
+
+        @JvmStatic
+        fun <T> Any.anyAsMutableCollection(): MutableCollection<T> {
+            return this.anyAsMutableCollectionOrNull()
+                ?: throw IllegalArgumentException("Cannot from any to MutableCollection: $this.")
+        }
+
+        @JvmStatic
+        fun <T> Any.anyAsCollectionOrNull(): Collection<T>? {
+            if (this is Collection<*>) {
+                return this.asAny()
+            }
+            if (this.javaClass.isArray) {
+                return this.arrayAsListOrNull()
+            }
+            return null
+        }
+
+        @JvmStatic
+        fun <T> Any.anyAsMutableCollectionOrNull(): MutableCollection<T>? {
+            if (this is MutableCollection<*>) {
+                return this.asAny()
+            }
+            if (this.javaClass.isArray) {
+                return this.arrayAsListOrNull()
+            }
+            return null
         }
     }
 }

@@ -14,7 +14,6 @@ import kotlin.random.Random
 import kotlin.streams.asStream
 import kotlin.sequences.all as allKt
 import kotlin.sequences.any as anyKt
-import kotlin.sequences.asSequence as asSequenceKt
 import kotlin.sequences.associate as associateKt
 import kotlin.sequences.associateBy as associateByKt
 import kotlin.sequences.associateByTo as associateByToKt
@@ -620,10 +619,6 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         return finalSequence().toStream(parallel)
     }
 
-    fun toSequence(): Sequence<T> {
-        return finalSequence().toSequence()
-    }
-
     fun toArray(): Array<Any?> {
         return finalSequence().toArray()
     }
@@ -634,6 +629,10 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
 
     fun toArray(componentType: Class<*>): Array<T> {
         return finalSequence().toArray(componentType)
+    }
+
+    fun toAnyArray(componentType: Class<*>): Any {
+        return finalSequence().toAnyArray(componentType)
     }
 
     @JvmOverloads
@@ -1532,27 +1531,37 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         }
 
         @JvmStatic
-        fun <T> Sequence<T>.toSequence(): Sequence<T> {
-            return this.asSequenceKt()
-        }
-
-        @JvmStatic
         fun <T> Sequence<T>.toArray(): Array<Any?> {
-            val list = this.toLinkedList()
-            return list.toArray()
+            val list = this.toList()
+            return JavaCollectionOps.toArray(list)
         }
 
         @JvmStatic
-        inline fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
-            val list = this.toLinkedList()
-            return list.toArray(generator(list.size))
+        fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
+            val list = this.toList()
+            return JavaCollectionOps.toArray(list, generator(list.size))
         }
 
         @JvmStatic
         fun <T> Sequence<T>.toArray(componentType: Class<*>): Array<T> {
-            val list = this.toLinkedList()
+            val list = this.toList()
             val array: Array<T> = componentType.componentTypeToArray(0)
-            return list.toArray(array)
+            return JavaCollectionOps.toArray(list, array)
+        }
+
+        @JvmStatic
+        fun <T> Sequence<T>.toAnyArray(componentType: Class<*>): Any {
+            return when (componentType) {
+                Boolean::class.javaPrimitiveType -> this.toBooleanArray()
+                Byte::class.javaPrimitiveType -> this.toByteArray()
+                Short::class.javaPrimitiveType -> this.toShortArray()
+                Char::class.javaPrimitiveType -> this.toCharArray()
+                Int::class.javaPrimitiveType -> this.toIntArray()
+                Long::class.javaPrimitiveType -> this.toLongArray()
+                Float::class.javaPrimitiveType -> this.toFloatArray()
+                Double::class.javaPrimitiveType -> this.toDoubleArray()
+                else -> this.toArray(componentType)
+            }
         }
 
         @JvmStatic
