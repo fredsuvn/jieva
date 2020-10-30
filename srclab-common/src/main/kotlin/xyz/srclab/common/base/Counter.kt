@@ -47,32 +47,18 @@ interface Counter {
 
         @JvmStatic
         @JvmOverloads
-        fun startsAt(initial: Int, atomically: Boolean = false): Counter {
-            return if (atomically) AtomicCounter(AtomicLong(initial.toLong())) else SimpleCounter(initial.toLong())
+        @JvmName("startsAt")
+        fun Int.counterStarts(atomically: Boolean = false): Counter {
+            return if (atomically) AtomicCounter(AtomicLong(this.toLong())) else SimpleCounter(this.toLong())
         }
 
         @JvmStatic
         @JvmOverloads
-        fun startsAt(initial: Long = 0, atomically: Boolean = false): Counter {
-            return if (atomically) AtomicCounter(AtomicLong(initial)) else SimpleCounter(initial)
+        @JvmName("startsAt")
+        fun Long.counterStarts(atomically: Boolean = false): Counter {
+            return if (atomically) AtomicCounter(AtomicLong(this)) else SimpleCounter(this)
         }
     }
-}
-
-fun Int.counterStarts(atomically: Boolean = false): Counter {
-    return counterStartsAt(this, atomically)
-}
-
-fun counterStartsAt(initial: Int, atomically: Boolean = false): Counter {
-    return Counter.startsAt(initial, atomically)
-}
-
-fun Long.counterStarts(atomically: Boolean = false): Counter {
-    return counterStartsAt(this, atomically)
-}
-
-fun counterStartsAt(initial: Long = 0, atomically: Boolean = false): Counter {
-    return Counter.startsAt(initial, atomically)
 }
 
 private class SimpleCounter(private var value: Long) : Counter {

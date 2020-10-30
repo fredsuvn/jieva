@@ -23,18 +23,18 @@ interface Invoker {
     companion object {
 
         @JvmStatic
-        fun staticInvoker(method: Method): StaticInvoker {
-            return StaticInvoker.forMethod(method)
+        fun Method.staticInvoker(): StaticInvoker {
+            return StaticInvoker.forMethod(this)
         }
 
         @JvmStatic
-        fun staticInvoker(constructor: Constructor<*>): StaticInvoker {
-            return StaticInvoker.forConstructor(constructor)
+        fun Constructor<*>.staticInvoker(): StaticInvoker {
+            return StaticInvoker.forConstructor(this)
         }
 
         @JvmStatic
-        fun virtualInvoker(method: Method): VirtualInvoker {
-            return VirtualInvoker.forMethod(method)
+        fun Method.virtualInvoker(): VirtualInvoker {
+            return VirtualInvoker.forMethod(this)
         }
     }
 }
@@ -68,18 +68,6 @@ interface VirtualInvoker : Invoker {
             return InvokerProvider.DEFAULT.virtualInvoker(method)
         }
     }
-}
-
-fun staticInvoker(method: Method): StaticInvoker {
-    return Invoker.staticInvoker(method)
-}
-
-fun staticInvoker(constructor: Constructor<*>): StaticInvoker {
-    return Invoker.staticInvoker(constructor)
-}
-
-fun virtualInvoker(method: Method): VirtualInvoker {
-    return Invoker.virtualInvoker(method)
 }
 
 interface InvokerProvider {

@@ -19,32 +19,20 @@ interface Format {
         val MESSAGE_FORMAT: MessageFormat = MessageFormat
 
         @JvmStatic
-        fun fastFormat(pattern: CharSequence, vararg args: Any?): String {
-            return FastFormat.format(pattern, *args)
+        fun CharSequence.fastFormat(vararg args: Any?): String {
+            return FastFormat.format(this, *args)
         }
 
         @JvmStatic
-        fun printfFormat(pattern: CharSequence, vararg args: Any?): String {
-            return PrintfFormat.format(pattern, *args)
+        fun CharSequence.printfFormat(vararg args: Any?): String {
+            return PrintfFormat.format(this, *args)
         }
 
         @JvmStatic
-        fun messageFormat(pattern: CharSequence, vararg args: Any?): String {
-            return MessageFormat.format(pattern, *args)
+        fun CharSequence.messageFormat(vararg args: Any?): String {
+            return MessageFormat.format(this, *args)
         }
     }
-}
-
-fun CharSequence.fastFormat(vararg args: Any?): String {
-    return Format.fastFormat(this, *args)
-}
-
-fun CharSequence.printfFormat(vararg args: Any?): String {
-    return Format.printfFormat(this, *args)
-}
-
-fun CharSequence.messageFormat(vararg args: Any?): String {
-    return Format.messageFormat(this, *args)
 }
 
 object FastFormat : Format {

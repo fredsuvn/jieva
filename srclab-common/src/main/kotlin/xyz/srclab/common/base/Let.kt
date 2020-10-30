@@ -26,18 +26,11 @@ interface Let<T> : SimpleGetter<T> {
     companion object {
 
         @JvmStatic
-        fun <T> startsAt(any: T): Let<T> {
-            return LetImpl(any)
+        @JvmName("startsAt")
+        fun <T> T.letStarts(): Let<T> {
+            return LetImpl(this)
         }
     }
-}
-
-fun <T> T.letStarts(): Let<T> {
-    return letStartsAt(this)
-}
-
-fun <T> letStartsAt(any: T): Let<T> {
-    return Let.startsAt(any)
 }
 
 private class LetImpl<T>(private var any: T) : Let<T> {

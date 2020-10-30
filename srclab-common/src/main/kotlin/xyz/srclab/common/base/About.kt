@@ -94,17 +94,6 @@ interface About {
     }
 }
 
-fun aboutOf(
-    name: String,
-    url: String,
-    version: Version,
-    licence: Licence,
-    poweredBy: PoweredBy,
-    eggTips: String? = null,
-): About {
-    return About.of(name, url, version, licence, poweredBy, eggTips)
-}
-
 interface Version : Comparable<Version> {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -429,7 +418,8 @@ interface Version : Comparable<Version> {
         }
 
         @JvmStatic
-        fun parse(spec: CharSequence): Version {
+        @JvmName("parse")
+        fun CharSequence.parseToVersion(): Version {
 
             fun parseNormal(subSpec: CharSequence, builder: Builder) {
                 val list = subSpec.split(".")
@@ -493,45 +483,45 @@ interface Version : Comparable<Version> {
                 }
             }
 
-            val hyphenCount = HYPHEN_MATCHER.countIn(spec)
+            val hyphenCount = HYPHEN_MATCHER.countIn(this)
             checkArgument(
                 hyphenCount == 0 || hyphenCount == 1,
                 "Illegal version specification, hyphen count should be 0 or 1."
             )
-            val hyphenIndex = HYPHEN_MATCHER.indexIn(spec)
+            val hyphenIndex = HYPHEN_MATCHER.indexIn(this)
             checkArgument(
-                hyphenIndex < 0 || hyphenIndex in 1..spec.length - 2,
+                hyphenIndex < 0 || hyphenIndex in 1..this.length - 2,
                 "Illegal hyphen position: {}.", hyphenIndex
             )
 
-            val plusSignCount = PLUS_SIGN_MATCHER.countIn(spec)
+            val plusSignCount = PLUS_SIGN_MATCHER.countIn(this)
             checkArgument(
                 plusSignCount == 0 || plusSignCount == 1,
                 "Illegal version specification, plus sign count should be 0 or 1."
             )
-            val plusSignIndex = PLUS_SIGN_MATCHER.indexIn(spec)
+            val plusSignIndex = PLUS_SIGN_MATCHER.indexIn(this)
             checkArgument(
-                plusSignIndex < 0 || plusSignIndex in 1..spec.length - 2,
+                plusSignIndex < 0 || plusSignIndex in 1..this.length - 2,
                 "Illegal plus sign position: {}.", plusSignIndex
             )
 
             val builder = Builder()
             when {
-                hyphenIndex < 0 && plusSignIndex < 0 -> parseNormal(spec, builder)
+                hyphenIndex < 0 && plusSignIndex < 0 -> parseNormal(this, builder)
                 hyphenIndex > 0 && plusSignIndex < 0 -> {
-                    parseNormal(spec.subSequence(0, hyphenIndex), builder)
-                    parsePreVersion(spec.subSequence(hyphenIndex + 1, spec.length), builder)
+                    parseNormal(this.subSequence(0, hyphenIndex), builder)
+                    parsePreVersion(this.subSequence(hyphenIndex + 1, this.length), builder)
                 }
                 hyphenIndex < 0 && plusSignIndex > 0 -> {
-                    parseNormal(spec.subSequence(0, plusSignIndex), builder)
-                    parsePreVersion(spec.subSequence(plusSignIndex + 1, spec.length), builder)
+                    parseNormal(this.subSequence(0, plusSignIndex), builder)
+                    parsePreVersion(this.subSequence(plusSignIndex + 1, this.length), builder)
                 }
                 hyphenIndex > 0 && plusSignIndex > 0 && (plusSignIndex - hyphenIndex > 1) -> {
-                    parseNormal(spec.subSequence(0, hyphenIndex), builder)
-                    parsePreVersion(spec.subSequence(hyphenIndex + 1, plusSignIndex), builder)
-                    parsePreVersion(spec.subSequence(plusSignIndex + 1, spec.length), builder)
+                    parseNormal(this.subSequence(0, hyphenIndex), builder)
+                    parsePreVersion(this.subSequence(hyphenIndex + 1, plusSignIndex), builder)
+                    parsePreVersion(this.subSequence(plusSignIndex + 1, this.length), builder)
                 }
-                else -> throw IllegalArgumentException("Illegal version specification: $spec")
+                else -> throw IllegalArgumentException("Illegal version specification: $this")
             }
             return builder.build()
         }
@@ -543,21 +533,6 @@ interface Version : Comparable<Version> {
             )
         }
     }
-}
-
-fun versionOf(
-    releaseDate: ZonedDateTime = ZonedDateTime.now(),
-    major: Int,
-    minor: Int,
-    patch: Int,
-    preRelease: List<Any> = emptyList(),
-    buildMetadata: List<String> = emptyList(),
-): Version {
-    return Version.of(releaseDate, major, minor, patch, preRelease, buildMetadata)
-}
-
-fun CharSequence.parseVersion(): Version {
-    return Version.parse(this)
 }
 
 interface Licence {
@@ -607,10 +582,6 @@ interface Licence {
     }
 }
 
-fun licenceOf(name: String, url: String, content: String): Licence {
-    return Licence.of(name, url, content)
-}
-
 interface PoweredBy {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -656,8 +627,4 @@ interface PoweredBy {
             }
         }
     }
-}
-
-fun poweredByOf(name: String, url: String, mail: String): PoweredBy {
-    return PoweredBy.of(name, url, mail)
 }
