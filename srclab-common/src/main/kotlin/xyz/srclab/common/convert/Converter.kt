@@ -19,7 +19,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalAdjuster
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -130,7 +129,7 @@ interface ConvertHandler {
             DateTimeConvertHandler.DEFAULT,
             UpperBoundConvertHandler,
             IterableConvertHandler,
-            BeanConvertHandler.,
+            BeanConvertHandler.DEFAULT,
         )
     }
 }
@@ -243,7 +242,7 @@ open class DateTimeConvertHandler(
     companion object {
 
         @JvmField
-        val DEFAULT = DateTimeConvertHandler()
+        val DEFAULT: DateTimeConvertHandler = DateTimeConvertHandler()
     }
 }
 
@@ -361,24 +360,38 @@ open class BeanConvertHandler(protected val beanResolver: BeanResolver) : Abstra
         return when (toRawClass) {
             Map::class.java -> from.copyProperties(
                 HashMap<Any, Any?>(),
-                BeanResolver.CopyOptions.copyOptionsWith()
+                from.javaClass,
+                toType,
+                converter
             ).toMap()
-            MutableMap::class.java, HashMap::class.java -> return from.propertiesToMap(
-                HashMap<Any, Any?>(),
+            MutableMap::class.java, LinkedHashMap::class.java -> from.copyProperties(
+                LinkedHashMap(),
+                from.javaClass,
                 toType,
                 converter
             )
-            LinkedHashMap::class.java -> return from.propertiesToMap(LinkedHashMap<Any, Any?>(), toType, converter)
-            TreeMap::class.java -> return from.propertiesToMap(TreeMap<Any, Any?>(), toType, converter)
-            ConcurrentHashMap::class.java -> return from.propertiesToMap(
-                ConcurrentHashMap<Any, Any?>(),
+            HashMap::class.java -> from.copyProperties(
+                HashMap(),
+                from.javaClass,
+                toType,
+                converter
+            )
+            TreeMap::class.java -> from.copyProperties(
+                TreeMap(),
+                from.javaClass,
                 toType,
                 converter
             )
             else -> {
                 val toInstance = toRawClass.toInstance<Any>()
-                return from.propertiesToBean(toInstance, toType, converter)
+                return from.copyProperties(toInstance, from.javaClass, toType, converter)
             }
         }
+    }
+
+    companion object {
+
+        @JvmField
+        val DEFAULT: BeanConvertHandler = BeanConvertHandler(BeanResolver.DEFAULT)
     }
 }
