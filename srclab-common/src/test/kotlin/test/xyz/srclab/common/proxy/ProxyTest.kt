@@ -6,7 +6,7 @@
 //import xyz.srclab.common.util.proxy.provider.bytecode.ByteCodeClassProxyProvider
 //import xyz.srclab.common.util.proxy.provider.jdk.JdkClassProxyProvider
 //import xyz.srclab.common.invoke.MethodInvoker
-//import xyz.srclab.common.util.proxy.ProxyMethod
+//import xyz.srclab.common.proxy.ProxyMethod
 //import xyz.srclab.test.doAssertEquals
 //import java.lang.reflect.Method
 //
