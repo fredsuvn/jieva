@@ -32,7 +32,7 @@ private const val urlFromV0 = "https://github.com/srclab-projects/boat"
 
 private val zoneIdFromV0 = ZoneId.of("Asia/Shanghai")
 
-private val licenceOfApache2 = licenceOf(
+private val licenceOfApache2 = Licence.of(
     "Apache 2.0 License",
     "https://www.apache.org/licenses/LICENSE-2.0.txt",
     """
@@ -240,16 +240,16 @@ private val licenceOfApache2 = licenceOf(
     """.trimIndent()
 )
 
-private val poweredBySrcLab = poweredByOf(
+private val poweredBySrcLab = PoweredBy.of(
     "SrcLab",
     "https://github.com/srclab-projects",
     "fredsuvn@163.com"
 )
 
-private val aboutBoatV0 = aboutOf(
+private val aboutBoatV0 = About.of(
     nameFromV0,
     urlFromV0,
-    versionOf(
+    Version.of(
         ZonedDateTime.of(
             2020, 10, 17,
             23, 59, 59, 0,
@@ -270,10 +270,10 @@ private val aboutBoatV0 = aboutOf(
     """.trimIndent()
 )
 
-private val aboutBoatV1 = aboutOf(
+private val aboutBoatV1 = About.of(
     nameFromV0,
     urlFromV0,
-    versionOf(
+    Version.of(
         ZonedDateTime.of(
             2020, 11, 11,
             23, 59, 59, 0,
