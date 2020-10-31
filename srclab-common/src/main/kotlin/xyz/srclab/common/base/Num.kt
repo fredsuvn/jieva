@@ -1,15 +1,12 @@
-@file:JvmName("To")
+@file:JvmName("Num")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.base
 
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.nio.charset.Charset
-import java.util.*
 import kotlin.text.toBigDecimal as toBigDecimalKt
 import kotlin.text.toBigInteger as toBigIntegerKt
-import kotlin.text.toBoolean as toBooleanKt
 import kotlin.text.toByte as toByteKt
 import kotlin.text.toDouble as toDoubleKt
 import kotlin.text.toFloat as toFloatKt
@@ -18,16 +15,6 @@ import kotlin.text.toLong as toLongKt
 import kotlin.text.toShort as toShortKt
 import kotlin.toBigDecimal as numberToBigDecimalKt
 import kotlin.toBigInteger as numberToBigIntegerKt
-import kotlin.toString as toStringKt
-
-fun Any?.toBoolean(): Boolean {
-    return when (this) {
-        null -> false
-        is Boolean -> this
-        is Number -> toInt() != 0
-        else -> toString().toBooleanKt()
-    }
-}
 
 @JvmOverloads
 fun CharSequence.toByte(radix: Int = Defaults.radix): Byte {
@@ -200,72 +187,5 @@ fun Any?.toBigDecimal(): BigDecimal {
         is Char -> toLong().numberToBigDecimalKt()
         is Float, Double -> (this as Number).toDouble().numberToBigDecimalKt()
         else -> toString().toBigDecimalKt()
-    }
-}
-
-fun CharArray.toChars(): String {
-    return String(this)
-}
-
-fun ByteArray.toChars(charset: String): String {
-    return toChars(Charset.forName(charset))
-}
-
-@JvmOverloads
-fun ByteArray.toChars(charset: Charset = Defaults.charset): String {
-    return String(this, charset)
-}
-
-fun CharArray.toBytes(charset: String): ByteArray {
-    return toBytes(Charset.forName(charset))
-}
-
-@JvmOverloads
-fun CharArray.toBytes(charset: Charset = Defaults.charset): ByteArray {
-    return toChars().toByteArray(charset)
-}
-
-fun CharSequence.toBytes(charset: String): ByteArray {
-    return toBytes(Charset.forName(charset))
-}
-
-@JvmOverloads
-fun CharSequence.toBytes(charset: Charset = Defaults.charset): ByteArray {
-    return toString().toByteArray(charset)
-}
-
-fun Any?.toString(): String {
-    return toStringKt()
-}
-
-fun Any?.arrayToString(): String {
-    return when (this) {
-        null -> toStringKt()
-        is Array<*> -> Arrays.toString(this)
-        is BooleanArray -> Arrays.toString(this)
-        is ByteArray -> Arrays.toString(this)
-        is ShortArray -> Arrays.toString(this)
-        is CharArray -> Arrays.toString(this)
-        is IntArray -> Arrays.toString(this)
-        is LongArray -> Arrays.toString(this)
-        is FloatArray -> Arrays.toString(this)
-        is DoubleArray -> Arrays.toString(this)
-        else -> toString()
-    }
-}
-
-fun Any?.arrayDeepToString(): String {
-    return when (this) {
-        null -> toStringKt()
-        is Array<*> -> Arrays.deepToString(this)
-        is BooleanArray -> Arrays.toString(this)
-        is ByteArray -> Arrays.toString(this)
-        is ShortArray -> Arrays.toString(this)
-        is CharArray -> Arrays.toString(this)
-        is IntArray -> Arrays.toString(this)
-        is LongArray -> Arrays.toString(this)
-        is FloatArray -> Arrays.toString(this)
-        is DoubleArray -> Arrays.toString(this)
-        else -> toString()
     }
 }
