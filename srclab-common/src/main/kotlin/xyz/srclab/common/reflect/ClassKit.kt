@@ -23,8 +23,8 @@ fun <T> CharSequence.findClassToInstance(classLoader: ClassLoader = Current.clas
 @JvmOverloads
 fun <T> CharSequence.findClassToInstance(
     classLoader: ClassLoader = Current.classLoader,
-    parameterTypes: Array<Class<*>>,
-    args: Array<Any?>
+    parameterTypes: Array<out Class<*>>,
+    args: Array<out Any?>
 ): T? {
     val cls: Class<T>? = this.findClass(classLoader)
     if (cls === null) {
@@ -37,7 +37,7 @@ fun <T> Class<*>.toInstance(): T {
     return this.toInstance(emptyArray(), emptyArray())
 }
 
-fun <T> Class<*>.toInstance(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
+fun <T> Class<*>.toInstance(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
     val constructor = this.findConstructor(*parameterTypes)
     if (constructor === null) {
         throw IllegalArgumentException("Class constructor(${parameterTypes.contentToString()}) not found: $this")
