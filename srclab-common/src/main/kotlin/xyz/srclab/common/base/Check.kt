@@ -3,6 +3,7 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.base.Format.Companion.fastFormat
 import java.util.*
 
 fun checkArgument(expression: Boolean) {

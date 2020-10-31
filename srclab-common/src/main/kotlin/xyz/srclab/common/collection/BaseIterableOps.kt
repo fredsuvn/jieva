@@ -51,6 +51,8 @@ import kotlin.collections.indexOf as indexOfKt
 import kotlin.collections.indexOfFirst as indexOfFirstKt
 import kotlin.collections.indexOfLast as indexOfLastKt
 import kotlin.collections.intersect as intersectKt
+import kotlin.collections.joinTo as joinToKt
+import kotlin.collections.joinToString as joinToStringKt
 import kotlin.collections.last as lastKt
 import kotlin.collections.lastIndexOf as lastIndexOfKt
 import kotlin.collections.lastOrNull as lastOrNullKt
@@ -801,6 +803,65 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
     open fun retainAll(predicate: (T) -> Boolean): THIS {
         finalMutableIterable().retainAll(predicate)
         return this.asAny()
+    }
+
+    @JvmOverloads
+    open fun joinToString(
+        separator: CharSequence = ", ",
+        transform: ((T) -> CharSequence)? = null
+    ): String {
+        return finalIterable().joinToString(separator, transform)
+    }
+
+    open fun joinToString(
+        separator: CharSequence = ", ",
+        limit: Int = -1,
+        truncated: CharSequence = "...",
+        transform: ((T) -> CharSequence)? = null
+    ): String {
+        return finalIterable().joinToString(separator, limit, truncated, transform)
+    }
+
+    open fun joinToString(
+        separator: CharSequence = ", ",
+        prefix: CharSequence = "",
+        postfix: CharSequence = "",
+        limit: Int = -1,
+        truncated: CharSequence = "...",
+        transform: ((T) -> CharSequence)? = null
+    ): String {
+        return finalIterable().joinToString(separator, prefix, postfix, limit, truncated, transform)
+    }
+
+    @JvmOverloads
+    open fun <A : Appendable> joinTo(
+        buffer: A,
+        separator: CharSequence = ", ",
+        transform: ((T) -> CharSequence)? = null
+    ): A {
+        return finalIterable().joinTo(buffer, separator, transform)
+    }
+
+    open fun <A : Appendable> joinTo(
+        buffer: A,
+        separator: CharSequence = ", ",
+        limit: Int = -1,
+        truncated: CharSequence = "...",
+        transform: ((T) -> CharSequence)? = null
+    ): A {
+        return finalIterable().joinTo(buffer, separator, limit, truncated, transform)
+    }
+
+    open fun <A : Appendable> joinTo(
+        buffer: A,
+        separator: CharSequence = ", ",
+        prefix: CharSequence = "",
+        postfix: CharSequence = "",
+        limit: Int = -1,
+        truncated: CharSequence = "...",
+        transform: ((T) -> CharSequence)? = null
+    ): A {
+        return finalIterable().joinTo(buffer, separator, prefix, postfix, limit, truncated, transform)
     }
 
     override fun iterator(): MutableIterator<T> {
@@ -1989,6 +2050,84 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> MutableIterable<T>.retainAll(predicate: (T) -> Boolean): Boolean {
             return this.retainAllKt(predicate)
+        }
+
+        // Others
+
+        @JvmStatic
+        @JvmOverloads
+        fun <T> Iterable<T>.joinToString(
+            separator: CharSequence = ", ",
+            transform: ((T) -> CharSequence)? = null
+        ): String {
+            return this.joinToStringKt(separator = separator, transform = transform)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.joinToString(
+            separator: CharSequence = ", ",
+            limit: Int = -1,
+            truncated: CharSequence = "...",
+            transform: ((T) -> CharSequence)? = null
+        ): String {
+            return this.joinToStringKt(
+                separator = separator,
+                limit = limit,
+                truncated = truncated,
+                transform = transform,
+            )
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.joinToString(
+            separator: CharSequence = ", ",
+            prefix: CharSequence = "",
+            postfix: CharSequence = "",
+            limit: Int = -1,
+            truncated: CharSequence = "...",
+            transform: ((T) -> CharSequence)? = null
+        ): String {
+            return this.joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun <T, A : Appendable> Iterable<T>.joinTo(
+            buffer: A,
+            separator: CharSequence = ", ",
+            transform: ((T) -> CharSequence)? = null
+        ): A {
+            return this.joinToKt(buffer = buffer, separator = separator, transform = transform)
+        }
+
+        @JvmStatic
+        fun <T, A : Appendable> Iterable<T>.joinTo(
+            buffer: A,
+            separator: CharSequence = ", ",
+            limit: Int = -1,
+            truncated: CharSequence = "...",
+            transform: ((T) -> CharSequence)? = null
+        ): A {
+            return this.joinToKt(
+                buffer = buffer,
+                separator = separator,
+                limit = limit,
+                truncated = truncated,
+                transform = transform
+            )
+        }
+
+        @JvmStatic
+        fun <T, A : Appendable> Iterable<T>.joinTo(
+            buffer: A,
+            separator: CharSequence = ", ",
+            prefix: CharSequence = "",
+            postfix: CharSequence = "",
+            limit: Int = -1,
+            truncated: CharSequence = "...",
+            transform: ((T) -> CharSequence)? = null
+        ): A {
+            return this.joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
         }
     }
 }

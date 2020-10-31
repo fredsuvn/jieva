@@ -41,6 +41,7 @@ public class Tt {
                 .subList(1)
                 .removeAll(new Object[0]);
         String s = As.any(null);
+        StringBuilder join = ops.joinTo(new StringBuilder(), ", ");
         Running<String> running = null;
         assert running != null;
         String result = running.get();
@@ -59,7 +60,7 @@ public class Tt {
 
         System.out.println(Defaults.charset());
 
-        Environment.defaultEnvironment();
+        Environment defaultEnvironment = Environment.DEFAULT;
 
         Lazy<String> lazy = LazyKt.lazy(() -> "");
         lazy.getValue();

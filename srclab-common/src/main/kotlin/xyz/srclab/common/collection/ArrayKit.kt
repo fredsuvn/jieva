@@ -9,6 +9,9 @@ import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
+import kotlin.collections.joinTo as joinToKt
+import kotlin.collections.joinToString as joinToStringKt
+
 val Type.isArray: Boolean
     @JvmName("isArray") get() {
         return when (this) {
@@ -199,4 +202,96 @@ fun DoubleArray.asList(): MutableList<Double> {
         }
     }
     return ArrayBridgeList(bridge)
+}
+
+@JvmOverloads
+fun Any.arrayJoinToString(
+    separator: CharSequence = ", ",
+    transform: ((Any?) -> CharSequence)? = null
+): String {
+    return this.arrayJoinToString(separator = separator, transform = transform)
+}
+
+fun Any.arrayJoinToString(
+    separator: CharSequence = ", ",
+    limit: Int = -1,
+    truncated: CharSequence = "...",
+    transform: ((Any?) -> CharSequence)? = null
+): String {
+    return this.arrayJoinToString(
+        separator = separator,
+        limit = limit,
+        truncated = truncated,
+        transform = transform,
+    )
+}
+
+fun Any.arrayJoinToString(
+    separator: CharSequence = ", ",
+    prefix: CharSequence = "",
+    postfix: CharSequence = "",
+    limit: Int = -1,
+    truncated: CharSequence = "...",
+    transform: ((Any?) -> CharSequence)? = null
+): String {
+    return when (this) {
+        is Array<*> -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        is BooleanArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        is ByteArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        is ShortArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        is CharArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        is IntArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        is LongArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        is FloatArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        is DoubleArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        else -> throw IllegalArgumentException("Not an array: $this")
+    }
+}
+
+@JvmOverloads
+fun <A : Appendable> Any.arrayJoinTo(
+    buffer: A,
+    separator: CharSequence = ", ",
+    transform: ((Any?) -> CharSequence)? = null
+): A {
+    return this.arrayJoinTo(buffer = buffer, separator = separator, transform = transform)
+}
+
+fun <A : Appendable> Any.arrayJoinTo(
+    buffer: A,
+    separator: CharSequence = ", ",
+    limit: Int = -1,
+    truncated: CharSequence = "...",
+    transform: ((Any?) -> CharSequence)? = null
+): A {
+    return this.arrayJoinTo(
+        buffer = buffer,
+        separator = separator,
+        limit = limit,
+        truncated = truncated,
+        transform = transform
+    )
+}
+
+fun <A : Appendable> Any.arrayJoinTo(
+    buffer: A,
+    separator: CharSequence = ", ",
+    prefix: CharSequence = "",
+    postfix: CharSequence = "",
+    limit: Int = -1,
+    truncated: CharSequence = "...",
+    transform: ((Any?) -> CharSequence)? = null
+): A {
+    return when (this) {
+        is Array<*> -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        is BooleanArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        is ByteArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        is ShortArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        is CharArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        is IntArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        is LongArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        is FloatArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        is DoubleArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        else -> throw IllegalArgumentException("Not an array: $this")
+    }
 }
