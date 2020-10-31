@@ -40,13 +40,17 @@ interface Converter {
         return convert(from, fromTypeRef.type, toTypeRef.type)
     }
 
-    class Builder : HandlersCachingProductBuilder<Converter, ConvertHandler, Builder>() {
+    companion object {
 
-        override fun buildNew(): Converter {
-            return ConverterImpl(handlers())
+        @JvmField
+        val DEFAULT: Converter = newConverter(ConvertHandler.DEFAULTS)
+
+        @JvmStatic
+        fun newConverter(convertHandlers: Iterable<ConvertHandler>): Converter {
+            return ConverterImpl(convertHandlers)
         }
 
-        private class ConverterImpl(private val handlers: List<ConvertHandler>) : Converter {
+        private class ConverterImpl(private val handlers: Iterable<ConvertHandler>) : Converter {
 
             override fun <T> convert(from: Any?, toType: Class<T>): T {
                 for (handler in handlers) {
@@ -86,17 +90,6 @@ interface Converter {
                 }
                 throw UnsupportedOperationException("Cannot convert $fromType to $toType.")
             }
-        }
-    }
-
-    companion object {
-
-        @JvmField
-        val DEFAULT: Converter = newBuilder().addHandlers(ConvertHandler.DEFAULTS).build()
-
-        @JvmStatic
-        fun newBuilder(): Builder {
-            return Builder()
         }
     }
 }
