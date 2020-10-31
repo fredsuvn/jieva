@@ -6,17 +6,23 @@ import org.springframework.cglib.proxy.MethodInterceptor
 import org.springframework.cglib.proxy.MethodProxy
 import xyz.srclab.common.base.asAny
 import java.lang.reflect.Method
+import java.util.*
 
 object SpringProxyClassGenerator : ProxyClassGenerator {
 
-    override fun <T : Any> generate(proxyClass: Class<T>, proxyMethods: Collection<ProxyMethod<T>>): ProxyClass<T> {
+    override fun <T : Any> generate(
+        classLoader: ClassLoader,
+        proxyClass: Class<T>,
+        proxyMethods: Iterable<ProxyMethod<T>>
+    ): ProxyClass<T> {
         val enhancer = Enhancer()
+        enhancer.classLoader = classLoader
         if (proxyClass.isInterface) {
             enhancer.setInterfaces(arrayOf(proxyClass))
         } else {
             enhancer.setSuperclass(proxyClass)
         }
-        val callbacks = ArrayList<ProxyMethodInterceptor<T>>(proxyMethods.size)
+        val callbacks = LinkedList<ProxyMethodInterceptor<T>>()
         for (proxyMethod in proxyMethods) {
             callbacks.add(ProxyMethodInterceptor(proxyMethod))
         }
