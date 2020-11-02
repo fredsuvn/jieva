@@ -292,7 +292,7 @@ open class DateTimeConvertHandler(
 object UpperBoundConvertHandler : AbstractConvertHandler() {
 
     override fun doConvert(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        return converter.convert(from, fromType.upperBound, toType.upperBound)
+        return converter.convert(from, fromType.deepUpperBound, toType.deepUpperBound)
     }
 }
 
@@ -312,7 +312,7 @@ object IterableConvertHandler : AbstractConvertHandler() {
     private fun iterableToType(iterable: Iterable<Any?>, toType: Type, converter: Converter): Any? {
         val toComponentType = toType.componentType
         if (toComponentType !== null) {
-            val upperComponentType = toComponentType.upperBound
+            val upperComponentType = toComponentType.deepUpperBound
             return iterable
                 .map { converter.convert<Any?>(it, upperComponentType) }
                 .toAnyArray(upperComponentType.upperClass)
@@ -322,9 +322,9 @@ object IterableConvertHandler : AbstractConvertHandler() {
             return null
         }
         return if (iterable is Collection<*>)
-            collectionMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.upperBound, converter)
+            collectionMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.deepUpperBound, converter)
         else
-            iterableMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.upperBound, converter)
+            iterableMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.deepUpperBound, converter)
     }
 
     private fun iterableMapTo(
@@ -396,8 +396,8 @@ open class BeanConvertHandler(protected val beanResolver: BeanResolver) : Abstra
 
     override fun doConvert(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
-            is Class<*> -> return doConvert0(from, toType, toType.upperBound, converter)
-            is ParameterizedType -> return doConvert0(from, toType.rawClass, toType.upperBound, converter)
+            is Class<*> -> return doConvert0(from, toType, toType.deepUpperBound, converter)
+            is ParameterizedType -> return doConvert0(from, toType.rawClass, toType.deepUpperBound, converter)
             else -> null
         }
     }

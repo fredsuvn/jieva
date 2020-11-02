@@ -152,7 +152,7 @@ val Type.deepLowerBound: Type
                 if (!needTransform) {
                     return this
                 }
-                return ParameterizedTypeImpl(this.rawType, this.ownerType, actualTypeArguments)
+                return parameterizedType(this.rawType, this.ownerType, actualTypeArguments)
             }
             is TypeVariable<*> -> this.lowerBound
             is WildcardType -> this.lowerBound
@@ -160,132 +160,17 @@ val Type.deepLowerBound: Type
         }
     }
 
-/**
- * StringFoo(Foo.class) -> Foo<String>
- */
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.genericTypeFor(target: Class<*>): Type {
-    return if (target.isInterface) this.genericInterfaceFor(target) else this.genericSuperClassFor(target)
-}
-
-/**
- * StringFoo(Foo.class) -> Foo<String>
- */
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.genericSuperClassFor(targetSuperclass: Class<*>): Type {
-    return GenericTypeFinder.findSuperclass(this, targetSuperclass)
-}
-
-/**
- * StringFoo(Foo.class) -> Foo<String>
- */
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.genericInterfaceFor(targetInterface: Class<*>): Type {
-    return GenericTypeFinder.findInterface(this, targetInterface)
-}
-
-/**
- * <T>(Foo.class, StringFoo.class) -> String
- */
-fun TypeVariable<*>.actualTypeFor(declaredClass: Class<*>, target: Type): Type {
-    return ActualTypeFinder.findActualType(this, declaredClass, target)
-}
-
-private object GenericTypeFinder {
-
-    @PossibleTypes(Class::class, ParameterizedType::class)
-    fun findSuperclass(type: Type, target: Class<*>): Type {
-
-        var rawClass = type.upperClass
-        if (rawClass == target) {
-            return type
-        }
-
-        if (!target.isAssignableFrom(rawClass)) {
-            throw IllegalArgumentException("$target is not super class of $type")
-        }
-
-        var genericType: Type? = rawClass.genericSuperclass
-        while (genericType !== null) {
-            rawClass = genericType.upperClass
-            if (rawClass == target) {
-                return genericType
-            }
-            genericType = rawClass.genericSuperclass
-        }
-        throw IllegalArgumentException("Cannot find generic super class: type = $type, target = $target")
-    }
-
-    @PossibleTypes(Class::class, ParameterizedType::class)
-    fun findInterface(type: Type, target: Class<*>): Type {
-
-        val rawClass = type.upperClass
-        if (rawClass == target) {
-            return type
-        }
-
-        if (!target.isAssignableFrom(rawClass)) {
-            throw IllegalArgumentException("$target is not interface of $type")
-        }
-
-        val genericInterfaces = rawClass.genericInterfaces
-
-        fun findInterface(genericTypes: Array<out Type>, target: Class<*>): Type? {
-            //Search level first
-            for (genericType in genericTypes) {
-                if (genericType.upperClass == target) {
-                    return genericType
-                }
-            }
-            for (genericType in genericTypes) {
-                val result = findInterface(genericType.upperClass.genericInterfaces, target)
-                if (result !== null) {
-                    return result
-                }
-            }
-            return null
-        }
-
-        val result = findInterface(genericInterfaces, target)
-        if (result !== null) {
-            return result
-        }
-        throw IllegalArgumentException("Cannot find generic interface: type = $type, target = $target")
-    }
-}
-
-private object ActualTypeFinder {
-
-    fun findActualType(type: TypeVariable<*>, declaredClass: Class<*>, target: Type): Type {
-        val typeParameters = declaredClass.typeParameters
-        val index = typeParameters.indexOf(type)
-        if (index < 0) {
-            throw IllegalArgumentException(
-                "Cannot find type variable: type = $type, declaredClass: $declaredClass, target = $target"
-            )
-        }
-        val actualArguments =
-            when (val genericTargetType = target.genericTypeFor(declaredClass)) {
-                is Class<*> -> genericTargetType.typeParameters
-                is ParameterizedType -> genericTargetType.actualTypeArguments
-                else -> throw IllegalArgumentException(
-                    "Cannot find actual type: type = $type, declaredClass: $declaredClass, target = $target"
-                )
-            }
-        if (actualArguments.size != typeParameters.size) {
-            throw IllegalArgumentException(
-                "Cannot find actual type: type = $type, declaredClass: $declaredClass, target = $target"
-            )
-        }
-        return actualArguments[index]
-    }
+fun parameterizedType(rawType: Type, ownerType: Type?, actualTypeArguments: Array<Type>?): ParameterizedType {
+    return ParameterizedTypeImpl(rawType, ownerType, actualTypeArguments)
 }
 
 private class ParameterizedTypeImpl(
     private val rawType: Type,
     private val ownerType: Type?,
-    private val actualTypeArguments: Array<Type>?,
+    actualTypeArguments: Array<Type>?,
 ) : ParameterizedType {
+
+    private val actualTypeArguments: Array<Type>? = getActualTypeArguments0(actualTypeArguments)
 
     override fun getRawType(): Type {
         return rawType
@@ -296,7 +181,7 @@ private class ParameterizedTypeImpl(
     }
 
     override fun getActualTypeArguments(): Array<Type> {
-        return if (actualTypeArguments === null) ArrayUtils.EMPTY_TYPE_ARRAY else actualTypeArguments.clone()
+        return getActualTypeArguments0(actualTypeArguments)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -355,4 +240,133 @@ private class ParameterizedTypeImpl(
 
         return sb.toString()
     }
+
+    fun getActualTypeArguments0(actualTypeArguments: Array<Type>?): Array<Type> {
+        return if (actualTypeArguments === null) ArrayUtils.EMPTY_TYPE_ARRAY else actualTypeArguments.clone()
+    }
 }
+
+/**
+ * StringFoo(Foo.class) -> Foo<String>
+ */
+@PossibleTypes(Class::class, ParameterizedType::class)
+fun Type.genericTypeFor(target: Class<*>): Type {
+    return if (target.isInterface) this.genericInterfaceFor(target) else this.genericSuperClassFor(target)
+}
+
+/**
+ * StringFoo(Foo.class) -> Foo<String>
+ */
+@PossibleTypes(Class::class, ParameterizedType::class)
+fun Type.genericSuperClassFor(targetSuperclass: Class<*>): Type {
+    return GenericTypeFinder.findSuperclass(this, targetSuperclass)
+}
+
+/**
+ * StringFoo(Foo.class) -> Foo<String>
+ */
+@PossibleTypes(Class::class, ParameterizedType::class)
+fun Type.genericInterfaceFor(targetInterface: Class<*>): Type {
+    return GenericTypeFinder.findInterface(this, targetInterface)
+}
+
+private object GenericTypeFinder {
+
+    @PossibleTypes(Class::class, ParameterizedType::class)
+    fun findSuperclass(type: Type, target: Class<*>): Type {
+
+        var rawClass = type.upperClass
+        if (rawClass == target) {
+            return type
+        }
+
+        if (!target.isAssignableFrom(rawClass)) {
+            throw IllegalArgumentException("$target is not super class of $type")
+        }
+
+        var genericType: Type? = rawClass.genericSuperclass
+        while (genericType !== null) {
+            rawClass = genericType.upperClass
+            if (rawClass == target) {
+                return genericType
+            }
+            genericType = rawClass.genericSuperclass
+        }
+        throw IllegalArgumentException("Cannot find generic super class of $target for type $type.")
+    }
+
+    @PossibleTypes(Class::class, ParameterizedType::class)
+    fun findInterface(type: Type, target: Class<*>): Type {
+
+        val rawClass = type.upperClass
+        if (rawClass == target) {
+            return type
+        }
+
+        if (!target.isAssignableFrom(rawClass)) {
+            throw IllegalArgumentException("$target is not interface of $type")
+        }
+
+        val genericInterfaces = rawClass.genericInterfaces
+
+        fun findInterface(genericTypes: Array<out Type>, target: Class<*>): Type? {
+            //Search level first
+            for (genericType in genericTypes) {
+                if (genericType.upperClass == target) {
+                    return genericType
+                }
+            }
+            for (genericType in genericTypes) {
+                val result = findInterface(genericType.upperClass.genericInterfaces, target)
+                if (result !== null) {
+                    return result
+                }
+            }
+            return null
+        }
+
+        val result = findInterface(genericInterfaces, target)
+        if (result !== null) {
+            return result
+        }
+        throw IllegalArgumentException("Cannot find generic interface of $target for type $type.")
+    }
+}
+
+///**
+// * <T>(Foo.class, StringFoo.class) -> String
+// */
+//@Deprecated(
+//    "This function has lots of problems, do not use it just now.",
+//    ReplaceWith("None.")
+//)
+//fun TypeVariable<*>.actualTypeFor(declaredClass: Class<*>, target: Type): Type {
+//    return ActualTypeFinder.findActualType(this, declaredClass, target)
+//}
+//
+//private object ActualTypeFinder {
+//
+//    fun findActualType(type: TypeVariable<*>, declaredClass: Class<*>, target: Type): Type {
+//        val typeParameters = declaredClass.typeParameters
+//        val index = typeParameters.indexOf(type)
+//        if (index < 0) {
+//            throw IllegalArgumentException(
+//                "Cannot find type variable: type = $type, declaredClass: $declaredClass, target = $target"
+//            )
+//        }
+//        val actualArguments =
+//            when (val genericTargetType = target.genericTypeFor(declaredClass)) {
+//                is Class<*> -> genericTargetType.typeParameters
+//                is ParameterizedType -> genericTargetType.actualTypeArguments
+//                else -> throw IllegalArgumentException(
+//                    "Cannot find actual type: type = $type, declaredClass: $declaredClass, target = $target"
+//                )
+//            }
+//        if (actualArguments.size != typeParameters.size) {
+//            throw IllegalArgumentException(
+//                "Cannot find actual type: type = $type, declaredClass: $declaredClass, target = $target"
+//            )
+//        }
+//        return actualArguments[index]
+//    }
+//}
