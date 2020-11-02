@@ -40,6 +40,8 @@ interface Converter {
         return convert(from, fromTypeRef.type, toTypeRef.type)
     }
 
+    fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter
+
     companion object {
 
         @JvmField
@@ -90,6 +92,10 @@ interface Converter {
                 }
                 throw UnsupportedOperationException("Cannot convert $fromType to $toType.")
             }
+
+            override fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
+                return ConverterImpl(listOf(preConvertHandler).plus(handlers))
+            }
         }
     }
 }
@@ -123,6 +129,51 @@ interface ConvertHandler {
             IterableConvertHandler,
             BeanConvertHandler.DEFAULT,
         )
+
+        @JvmStatic
+        fun concat(convertHandlers: Iterable<ConvertHandler>): ConvertHandler {
+            return object : ConvertHandler {
+
+                override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+                    for (convertHandler in convertHandlers) {
+                        val result = convertHandler.convert(from, toType, converter)
+                        if (result === NULL_VALUE) {
+                            return null
+                        }
+                        if (result !== null) {
+                            return result
+                        }
+                    }
+                    return null
+                }
+
+                override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+                    for (convertHandler in convertHandlers) {
+                        val result = convertHandler.convert(from, toType, converter)
+                        if (result === NULL_VALUE) {
+                            return null
+                        }
+                        if (result !== null) {
+                            return result
+                        }
+                    }
+                    return null
+                }
+
+                override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+                    for (convertHandler in convertHandlers) {
+                        val result = convertHandler.convert(from, fromType, toType, converter)
+                        if (result === NULL_VALUE) {
+                            return null
+                        }
+                        if (result !== null) {
+                            return result
+                        }
+                    }
+                    return null
+                }
+            }
+        }
     }
 }
 
