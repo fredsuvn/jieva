@@ -15,7 +15,9 @@ interface BeanResolver {
         return asMap(bean, CopyOptions.DEFAULT)
     }
 
-    fun asMap(bean: Any, copyOptions: CopyOptions): MutableMap<String, Any?>
+    fun asMap(bean: Any, copyOptions: CopyOptions): MutableMap<String, Any?> {
+        return BeanAsMap(bean, resolve(bean.javaClass).properties, copyOptions.converter)
+    }
 
     fun <T : Any> copyProperties(from: Any, to: T): T {
         return copyProperties(from, to, CopyOptions.DEFAULT)
@@ -41,7 +43,9 @@ interface BeanResolver {
         return copyProperties(from, to, CopyOptions.IGNORE_NULL.with(fromType, toType, converter))
     }
 
-    fun <T : Any> copyProperties(from: Any, to: T, copyOptions: CopyOptions): T
+    fun <T : Any> copyProperties(from: Any, to: T, copyOptions: CopyOptions): T {
+
+    }
 
     interface CopyOptions {
 
@@ -107,5 +111,58 @@ interface BeanResolver {
 
         @JvmField
         val DEFAULT: BeanResolver = (null as BeanResolver)
+
+        private class BeanAsMap(
+            private val bean: Any,
+            private val properties: Map<String, PropertySchema>,
+            private val converter: Converter
+        ) : AbstractMutableMap<String, Any?>() {
+
+            override val size: Int
+                get() = properties.size
+
+            override val entries: MutableSet<MutableMap.MutableEntry<String, Any?>> by lazy {
+                properties.entries.mapTo(LinkedHashSet()) {
+                    object : MutableMap.MutableEntry<String, Any?> {
+                        override val key: String = it.key
+                        override val value: Any?
+                            get() = it.value.getValue(bean)
+
+                        override fun setValue(newValue: Any?): Any? {
+                            return it.value.setValue(bean, newValue, converter)
+                        }
+                    }
+                }
+            }
+
+            override fun containsKey(key: String): Boolean {
+                return properties.containsKey(key)
+            }
+
+            override fun get(key: String): Any? {
+                val propertySchema = properties[key]
+                return propertySchema?.getValue(bean)
+            }
+
+            override fun isEmpty(): Boolean {
+                return properties.isEmpty()
+            }
+
+            override fun clear() {
+                throw UnsupportedOperationException()
+            }
+
+            override fun put(key: String, value: Any?): Any? {
+                val propertySchema = properties[key]
+                if (propertySchema === null) {
+                    throw UnsupportedOperationException("Property $key doesn't exist.")
+                }
+                return propertySchema.setValue(bean, value, converter)
+            }
+
+            override fun remove(key: String): Any? {
+                throw UnsupportedOperationException()
+            }
+        }
     }
 }

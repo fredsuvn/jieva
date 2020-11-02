@@ -250,7 +250,7 @@ private class ParameterizedTypeImpl(
  * StringFoo(Foo.class) -> Foo<String>
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.genericTypeFor(target: Class<*>): Type {
+fun Type.genericSignatureFor(target: Class<*>): Type {
     return if (target.isInterface) this.genericInterfaceFor(target) else this.genericSuperClassFor(target)
 }
 
@@ -333,40 +333,36 @@ private object GenericTypeFinder {
     }
 }
 
-///**
-// * <T>(Foo.class, StringFoo.class) -> String
-// */
-//@Deprecated(
-//    "This function has lots of problems, do not use it just now.",
-//    ReplaceWith("None.")
-//)
-//fun TypeVariable<*>.actualTypeFor(declaredClass: Class<*>, target: Type): Type {
-//    return ActualTypeFinder.findActualType(this, declaredClass, target)
-//}
-//
-//private object ActualTypeFinder {
-//
-//    fun findActualType(type: TypeVariable<*>, declaredClass: Class<*>, target: Type): Type {
-//        val typeParameters = declaredClass.typeParameters
-//        val index = typeParameters.indexOf(type)
-//        if (index < 0) {
-//            throw IllegalArgumentException(
-//                "Cannot find type variable: type = $type, declaredClass: $declaredClass, target = $target"
-//            )
-//        }
-//        val actualArguments =
-//            when (val genericTargetType = target.genericTypeFor(declaredClass)) {
-//                is Class<*> -> genericTargetType.typeParameters
-//                is ParameterizedType -> genericTargetType.actualTypeArguments
-//                else -> throw IllegalArgumentException(
-//                    "Cannot find actual type: type = $type, declaredClass: $declaredClass, target = $target"
-//                )
-//            }
-//        if (actualArguments.size != typeParameters.size) {
-//            throw IllegalArgumentException(
-//                "Cannot find actual type: type = $type, declaredClass: $declaredClass, target = $target"
-//            )
-//        }
-//        return actualArguments[index]
-//    }
-//}
+/**
+ * <T>(StringFoo.class) -> String
+ */
+fun TypeVariable<*>.actualTypeIn(type: Type): Type {
+    return ActualTypeFinder.findActualType(this, declaredClass, target)
+}
+
+private object ActualTypeFinder {
+
+    fun findActualType(type: TypeVariable<*>, declaredClass: Class<*>, target: Type): Type {
+        val typeParameters = declaredClass.typeParameters
+        val index = typeParameters.indexOf(type)
+        if (index < 0) {
+            throw IllegalArgumentException(
+                "Cannot find type variable: type = $type, declaredClass: $declaredClass, target = $target"
+            )
+        }
+        val actualArguments =
+            when (val genericTargetType = target.genericTypeFor(declaredClass)) {
+                is Class<*> -> genericTargetType.typeParameters
+                is ParameterizedType -> genericTargetType.actualTypeArguments
+                else -> throw IllegalArgumentException(
+                    "Cannot find actual type: type = $type, declaredClass: $declaredClass, target = $target"
+                )
+            }
+        if (actualArguments.size != typeParameters.size) {
+            throw IllegalArgumentException(
+                "Cannot find actual type: type = $type, declaredClass: $declaredClass, target = $target"
+            )
+        }
+        return actualArguments[index]
+    }
+}

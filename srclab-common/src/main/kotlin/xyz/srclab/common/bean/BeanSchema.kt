@@ -25,10 +25,10 @@ interface BeanSchema {
         @JvmName("type") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val properties: Map<String, PropertyDef>
+    val properties: Map<String, PropertySchema>
         @JvmName("properties") get
 
-    fun getProperty(name: String): PropertyDef? {
+    fun getProperty(name: String): PropertySchema? {
         return properties[name]
     }
 
@@ -228,7 +228,7 @@ interface BeanSchema {
     }
 }
 
-interface PropertyDef {
+interface PropertySchema {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
@@ -276,32 +276,32 @@ interface PropertyDef {
 
     fun <T> getValue(bean: Any): T
 
-    fun setValue(bean: Any, value: Any?)
+    fun <T> setValue(bean: Any, value: Any?): T
 
-    fun setValue(bean: Any, value: Any?, converter: Converter) {
-        setValue(bean, converter.convert(value, genericType))
+    fun <T> setValue(bean: Any, value: Any?, converter: Converter): T {
+        return setValue(bean, converter.convert(value, genericType))
     }
 }
 
 private class BeanSchemaImpl(override val type: Class<*>) : BeanSchema {
 
-    override val properties: Map<String, PropertyDef> by lazy { tryProperties() }
+    override val properties: Map<String, PropertySchema> by lazy { tryProperties() }
 
-    private fun tryProperties(): Map<String, PropertyDef> {
+    private fun tryProperties(): Map<String, PropertySchema> {
         val beanInfo = Introspector.getBeanInfo(type)
-        val properties = LinkedHashMap<String, PropertyDef>()
+        val properties = LinkedHashMap<String, PropertySchema>()
         for (propertyDescriptor in beanInfo.propertyDescriptors) {
-            val propertyDef = PropertyDefImpl(type, propertyDescriptor)
+            val propertyDef = PropertySchemaImpl(type, propertyDescriptor)
             properties[propertyDef.name] = propertyDef
         }
         return properties.toMap()
     }
 }
 
-private class PropertyDefImpl(
+private class PropertySchemaImpl(
     override val owner: Class<*>,
     descriptor: PropertyDescriptor
-) : PropertyDef {
+) : PropertySchema {
 
     override val name: String = descriptor.name
     override val type: Class<*> = descriptor.propertyType
