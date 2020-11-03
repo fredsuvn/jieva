@@ -2,12 +2,11 @@ package xyz.srclab.common.cache
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
+import com.google.common.collect.MapMaker
 import xyz.srclab.common.base.ABSENT_VALUE
 import xyz.srclab.common.base.CachingProductBuilder
 import xyz.srclab.common.base.asAny
 import java.time.Duration
-import java.util.*
-import kotlin.NoSuchElementException
 import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
 import com.google.common.cache.RemovalCause as guavaRemovalCause
 
@@ -329,7 +328,7 @@ interface Cache<K : Any, V> {
          */
         @JvmStatic
         fun <K : Any, V> newFastCache(): Cache<K, V> {
-            return ThreadLocalCache { MapCache(WeakHashMap()) }
+            return MapCache(MapMaker().weakValues().makeMap())
         }
     }
 }
