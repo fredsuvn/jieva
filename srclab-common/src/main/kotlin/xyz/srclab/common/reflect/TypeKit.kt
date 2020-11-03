@@ -8,6 +8,15 @@ import xyz.srclab.annotation.PossibleTypes
 import xyz.srclab.common.base.asAny
 import java.lang.reflect.*
 
+val Type.rawClass: Class<*>
+    get() {
+        return when (this) {
+            is Class<*> -> this
+            is ParameterizedType -> this.rawClass
+            else -> throw IllegalArgumentException("$this has no raw type.")
+        }
+    }
+
 val ParameterizedType.rawClass: Class<*>
     get() {
         return this.rawType.asAny()

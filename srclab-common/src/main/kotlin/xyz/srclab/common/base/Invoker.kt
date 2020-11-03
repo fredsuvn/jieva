@@ -23,17 +23,20 @@ interface Invoker {
     companion object {
 
         @JvmStatic
-        fun Method.staticInvoker(): StaticInvoker {
+        @JvmName("staticInvoker")
+        fun Method.toStaticInvoker(): StaticInvoker {
             return StaticInvoker.forMethod(this)
         }
 
         @JvmStatic
-        fun Constructor<*>.staticInvoker(): StaticInvoker {
+        @JvmName("staticInvoker")
+        fun Constructor<*>.toStaticInvoker(): StaticInvoker {
             return StaticInvoker.forConstructor(this)
         }
 
         @JvmStatic
-        fun Method.virtualInvoker(): VirtualInvoker {
+        @JvmName("virtualInvoker")
+        fun Method.toVirtualInvoker(): VirtualInvoker {
             return VirtualInvoker.forMethod(this)
         }
     }

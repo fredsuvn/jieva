@@ -8,8 +8,8 @@ import java.lang.reflect.Type
 
 private val defaultResolver = BeanResolver.DEFAULT
 
-fun Type.resolveBean(): BeanSchema {
-    return defaultResolver.resolve(this)
+fun Type.resolveBeanSchema(): BeanSchema {
+    return defaultResolver.resolveSchema(this)
 }
 
 fun Any.asMap(): MutableMap<String, Any?> {
