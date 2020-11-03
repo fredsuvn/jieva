@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "SrcLab Common Data"
+description = "Happy Eggy!"
 
 apply from: gradles.compile
 
@@ -15,11 +15,11 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":srclab-common-bom")))
+    implementation(platform(project(":boat-bom")))
 
-    implementation(project(":srclab-common"))
+    implementation(project(":boat-common"))
 
-    testCompile(project(":srclab-test"))
+    testCompile(project(":boat-test"))
 }
 
 test {

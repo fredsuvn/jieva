@@ -2,7 +2,7 @@ plugins {
     id 'java-platform'
 }
 
-description = "SraLab Common BOM"
+description = "Boat Project BOM"
 
 ext {
     libVersions = [
@@ -22,7 +22,7 @@ dependencies {
     api("org.jetbrains.kotlin:kotlin-annotations-jvm:$kotlinVersion")
 
     constraints {
-        file("${rootDir}").eachDirMatch(~/srclab-.*/) { file ->
+        file("${rootDir}").eachDirMatch(~/boat-.*/) { file ->
             api(project(":${file.name}"))
         }
     }

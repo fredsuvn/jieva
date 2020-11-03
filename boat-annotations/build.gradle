@@ -1,0 +1,24 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+}
+
+description = "Boat Annotations"
+
+apply from: gradles.compile
+
+apply from: gradles.repositories
+
+java {
+    registerFeature('optionalSupport') {
+        usingSourceSet(sourceSets.main)
+    }
+}
+
+dependencies {
+    implementation(platform(project(":boat-bom")))
+
+    api("com.google.code.findbugs:jsr305")
+    //api("org.jetbrains:annotations")
+}
+
+apply from: gradles.deployJar

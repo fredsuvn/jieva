@@ -15,13 +15,13 @@ java {
 }
 
 dependencies {
-    implementation(platform(project(":srclab-common-bom")))
+    implementation(platform(project(":boat-bom")))
 
-    implementation(project(":srclab-annotations"))
+    api(project(":boat-annotations"))
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.apache.commons:commons-lang3")
-    implementation("com.google.guava:guava")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    api("org.apache.commons:commons-lang3")
+    api("com.google.guava:guava")
     api("org.testng:testng")
 
     testCompile("org.testng:testng")

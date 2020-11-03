@@ -9,9 +9,9 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'srclab-common-build'
+rootProject.name = 'boat-build'
 
 // SrcLab Common projects
-file("${rootDir}/").eachDirMatch(~/srclab-.*/) { file ->
+file("${rootDir}/").eachDirMatch(~/boat-.*/) { file ->
     include ":${file.name}"
 }

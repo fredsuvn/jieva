@@ -2,7 +2,7 @@ ext {
     versions = [
             snapshot     : "0",
             group        : "xyz.srclab.common",
-            url          : "https://github.com/srclab-projects/srclab-common",
+            url          : "https://github.com/srclab-projects/boat",
             inceptionYear: "2020",
             licenses     : [
                     [
