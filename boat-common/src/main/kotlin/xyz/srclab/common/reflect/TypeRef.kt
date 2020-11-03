@@ -17,7 +17,7 @@ abstract class TypeRef<T> {
     }
 
     private fun reflectGenericSuperclass(): Type {
-        val generic = this.javaClass.genericSuperClassFor(TypeRef::class.java)
+        val generic = this.javaClass.findGenericSuperclass(TypeRef::class.java)
         if (generic !is ParameterizedType) {
             throw IllegalStateException(
                 "Reflect to generic superclass of TypeRef failed."

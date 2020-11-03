@@ -19,10 +19,13 @@ dependencies {
 
     api(project(":boat-annotations"))
 
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    api("org.jetbrains.kotlin:kotlin-test")
+    api("org.jetbrains.kotlin:kotlin-test-common")
+    api("org.jetbrains.kotlin:kotlin-test-testng")
+    //api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("org.apache.commons:commons-lang3")
     api("com.google.guava:guava")
-    api("org.testng:testng")
+//    api("org.testng:testng")
 
     testCompile("org.testng:testng")
 }

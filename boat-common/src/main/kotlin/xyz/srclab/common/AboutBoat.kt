@@ -1,5 +1,3 @@
-@file:JvmName("AboutBoat")
-
 package xyz.srclab.common
 
 import xyz.srclab.common.base.*

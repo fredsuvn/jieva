@@ -18,8 +18,8 @@ dependencies {
     implementation(platform(project(":boat-bom")))
 
     api(project(":boat-annotations"))
-    api("org.jetbrains.kotlin:kotlin-annotations-jvm")
 
+    api("org.jetbrains.kotlin:kotlin-annotations-jvm")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("org.slf4j:slf4j-api")
     api("org.apache.commons:commons-lang3")
@@ -31,11 +31,15 @@ dependencies {
     api("com.github.ben-manes.caffeine:caffeine")
     api("org.yaml:snakeyaml")
 
+    //api("com.squareup.okhttp3:okhttp")
+
     compileOnly("org.springframework:spring-core")
     compileOnly("cglib:cglib")
-    api("com.squareup.okhttp3:okhttp")
 
-    testCompile(project(":boat-test"))
+    //testCompile(project(":boat-test"))
+    testCompile("org.jetbrains.kotlin:kotlin-test-testng")
+    testCompile("org.jetbrains.kotlin:kotlin-test")
+    testCompile("org.jetbrains.kotlin:kotlin-test-common")
     testCompile("org.springframework:spring-core")
     testCompile("cglib:cglib")
 }
