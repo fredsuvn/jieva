@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Test of SrcLab Common"
+description = "Boat Test: basic test tool for boat projects."
 
 apply from: gradles.compile
 
@@ -17,22 +17,20 @@ java {
 dependencies {
     implementation(platform(project(":boat-bom")))
 
+    api(project(":boat-kotlin"))
     api(project(":boat-annotations"))
 
-    api("org.jetbrains.kotlin:kotlin-test")
-    api("org.jetbrains.kotlin:kotlin-test-common")
     api("org.jetbrains.kotlin:kotlin-test-testng")
-    //api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("org.apache.commons:commons-lang3")
     api("com.google.guava:guava")
-//    api("org.testng:testng")
 
-    testCompile("org.testng:testng")
+    //testCompile("org.testng:testng")
+    //testCompile("org.jetbrains.kotlin:kotlin-test-testng")
 }
 
 test {
     useTestNG()
-    include("**/*Test.class")
+    include("**/*Test.class", "**/*TestKt.class")
 }
 
 apply from: gradles.deployJar

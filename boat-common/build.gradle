@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Boat Common"
+description = "Boat Common: common-lang like tools."
 
 apply from: gradles.compile
 
@@ -17,10 +17,9 @@ java {
 dependencies {
     implementation(platform(project(":boat-bom")))
 
+    api(project(":boat-kotlin"))
     api(project(":boat-annotations"))
 
-    api("org.jetbrains.kotlin:kotlin-annotations-jvm")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     api("org.slf4j:slf4j-api")
     api("org.apache.commons:commons-lang3")
     api("org.apache.commons:commons-collections4")
@@ -31,22 +30,20 @@ dependencies {
     api("com.github.ben-manes.caffeine:caffeine")
     api("org.yaml:snakeyaml")
 
+    //api("org.jetbrains.kotlin:kotlin-annotations-jvm")
     //api("com.squareup.okhttp3:okhttp")
 
     compileOnly("org.springframework:spring-core")
     compileOnly("cglib:cglib")
 
-    //testCompile(project(":boat-test"))
-    testCompile("org.jetbrains.kotlin:kotlin-test-testng")
-    testCompile("org.jetbrains.kotlin:kotlin-test")
-    testCompile("org.jetbrains.kotlin:kotlin-test-common")
+    testCompile(project(":boat-test"))
     testCompile("org.springframework:spring-core")
     testCompile("cglib:cglib")
 }
 
 test {
     useTestNG()
-    include("**/*Test.class")
+    include("**/*Test.class", "**/*TestKt.class")
 }
 
 apply from: gradles.deployJar
