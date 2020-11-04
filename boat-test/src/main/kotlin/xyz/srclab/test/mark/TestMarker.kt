@@ -1,12 +1,13 @@
 package xyz.srclab.test.mark
 
+import xyz.srclab.jvm.reflect.findCallerFrame
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 interface TestMarker {
 
     fun mark(value: Any) {
-        val key = createCutPoint()
+        val key = this.javaClass.findCallerFrame() ?: ("AutoMarkKey-${markKeyCounter.getAndIncrement()}")
         mark(key, value)
     }
 
@@ -32,6 +33,10 @@ interface TestMarker {
 
     companion object {
 
+        private val markPool = ConcurrentHashMap<TestMarker, ConcurrentHashMap<Any, Any>>()
+
+        private val markKeyCounter = AtomicLong(0)
+
         @JvmStatic
         fun newTestMarker(): TestMarker {
             return object : TestMarker {
@@ -41,24 +46,8 @@ interface TestMarker {
             }
         }
 
-        private val markPool = ConcurrentHashMap<TestMarker, ConcurrentHashMap<Any, Any>>()
-
-        private val counter = AtomicLong(0)
-
         private fun getMarkMap(testMarker: TestMarker): ConcurrentHashMap<Any, Any> {
             return markPool.computeIfAbsent(testMarker) { ConcurrentHashMap() }
-        }
-
-        private fun createCutPoint(): Any {
-            val throwable = Throwable()
-            val stackTrace = throwable.stackTrace
-            if (stackTrace.isNullOrEmpty()) {
-                return "Failed to get stack trace (${counter.getAndIncrement()})."
-            }
-            return if (stackTrace.size >= 4)
-                stackTrace[4]
-            else
-                "Stack trace is too short (${counter.getAndIncrement()})."
         }
     }
 }

@@ -1,40 +1,40 @@
 package xyz.srclab.common.base
 
 import org.apache.commons.lang3.StringUtils
-import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
+import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
 import java.time.ZonedDateTime
 import java.util.regex.Pattern
 import kotlin.text.toInt as toIntKt
 
 interface About {
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
         @JvmName("name") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String
         @JvmName("url") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val version: Version
         @JvmName("version") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val licence: Licence
         @JvmName("licence") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val poweredBy: PoweredBy
         @JvmName("poweredBy") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val report: String
         @JvmName("report") get() {
             return "${poweredBy.mail} or $url"
         }
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val eggTips: String
         @JvmName("eggTips") get
 
@@ -97,49 +97,49 @@ interface About {
 
 interface Version : Comparable<Version> {
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val releaseDate: ZonedDateTime
         @JvmName("releaseDate") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val major: Int
         @JvmName("major") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val minor: Int
         @JvmName("minor") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val patch: Int
         @JvmName("patch") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val preRelease: List<Identifier>
         @JvmName("preRelease") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val preReleaseToString: String
         @JvmName("preReleaseToString") get() {
             return preRelease.joinToString("")
         }
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val buildMetadata: List<String>
         @JvmName("buildMetadata") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val buildMetadataToString: String
         @JvmName("buildMetadataToString") get() {
             return buildMetadata.joinToString("")
         }
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val isNormal: Boolean
         @JvmName("isNormal") get() {
             return preRelease.isEmpty()
         }
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val isPreRelease: Boolean
         @JvmName("isPreRelease") get() {
             return preRelease.isNotEmpty()
@@ -538,15 +538,15 @@ interface Version : Comparable<Version> {
 
 interface Licence {
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
         @JvmName("name") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String
         @JvmName("url") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val content: String
         @JvmName("content") get
 
@@ -585,15 +585,15 @@ interface Licence {
 
 interface PoweredBy {
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
         @JvmName("name") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String
         @JvmName("url") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val mail: String
         @JvmName("mail") get
 

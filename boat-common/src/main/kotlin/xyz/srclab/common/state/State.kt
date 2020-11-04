@@ -1,18 +1,18 @@
 package xyz.srclab.common.state
 
 import xyz.srclab.common.base.hash
-import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
+import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
 
 /**
  * @author sunqian
  */
 interface State<C, DESC, T : State<C, DESC, T>> {
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val code: C
         @JvmName("code") get
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val description: DESC?
         @JvmName("description") get
 

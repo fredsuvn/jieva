@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
 }
 
-description = "Boat Kotlin: kotlin base support for boat projects."
+description = "Boat JVM: JVM and underlying support for boat projects."
 
 apply from: gradles.compile
 

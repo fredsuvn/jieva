@@ -1,12 +1,12 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
+import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
 
 interface SimpleAccess<T> : SimpleGetter<T>, SimpleSetter<T>
 
 interface SimpleGetter<T> {
 
-    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val isPresent: Boolean
         @JvmName("isPresent") get() {
             return getOrNull() !== null
