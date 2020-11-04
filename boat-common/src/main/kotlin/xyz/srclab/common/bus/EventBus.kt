@@ -1,8 +1,8 @@
 package xyz.srclab.common.bus
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.run.Runner
+import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.RejectedExecutionException
@@ -56,7 +56,7 @@ interface EventBus {
 
 interface EventHandler<T : Any> {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val eventType: Any
         @JvmName("eventType") get
 

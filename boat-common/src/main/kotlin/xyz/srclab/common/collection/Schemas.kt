@@ -1,17 +1,17 @@
 package xyz.srclab.common.collection
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.reflect.rawClass
+import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 interface IterableSchema {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val rawClass: Class<*>
         @JvmName("rawClass") get
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val componentType: Type
         @JvmName("componentType") get
 
@@ -119,15 +119,15 @@ private class IterableSchemaImpl(
 
 interface MapSchema {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val rawClass: Class<*>
         @JvmName("rawClass") get
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val keyType: Type
         @JvmName("keyType") get
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val valueType: Type
         @JvmName("valueType") get
 

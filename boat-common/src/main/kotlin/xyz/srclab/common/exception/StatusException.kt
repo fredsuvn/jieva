@@ -1,8 +1,8 @@
 package xyz.srclab.common.exception
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.state.State.Companion.stateEquals
 import xyz.srclab.common.state.State.Companion.stateHashCode
+import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
 
 open class StatusException @JvmOverloads constructor(
     private val exceptionStatus: ExceptionStatus,
@@ -30,11 +30,11 @@ open class StatusException @JvmOverloads constructor(
         cause
     )
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     override val code: String
         @JvmName("code") get() = exceptionStatus.code
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     override val description: String?
         @JvmName("description") get() = exceptionStatus.description
 

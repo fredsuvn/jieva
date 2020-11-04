@@ -1,5 +1,6 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
 import java.util.*
 
 /**
@@ -7,183 +8,183 @@ import java.util.*
  */
 interface Environment {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val properties: Map<String, String>
         @JvmName("properties") get
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val variables: Map<String, String>
         @JvmName("variables") get
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaVersion: String
         @JvmName("javaVersion") get() {
             return getProperty(KEY_OF_JAVA_VERSION).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaVendor: String
         @JvmName("javaVendor") get() {
             return getProperty(KEY_OF_JAVA_VENDOR).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaVendorUrl: String
         @JvmName("javaVendorUrl") get() {
             return getProperty(KEY_OF_JAVA_VENDOR_URL).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaHome: String
         @JvmName("javaHome") get() {
             return getProperty(KEY_OF_JAVA_HOME).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaVmSpecificationVersion: String
         @JvmName("javaVmSpecificationVersion") get() {
             return getProperty(KEY_OF_JAVA_VM_SPECIFICATION_VERSION).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaVmSpecificationVendor: String
         @JvmName("javaVmSpecificationVendor") get() {
             return getProperty(KEY_OF_JAVA_VM_SPECIFICATION_VENDOR).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaVmSpecificationName: String
         @JvmName("javaVmSpecificationName") get() {
             return getProperty(KEY_OF_JAVA_VM_SPECIFICATION_NAME).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaVmVersion: String
         @JvmName("javaVmVersion") get() {
             return getProperty(KEY_OF_JAVA_VM_VERSION).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaVmVendor: String
         @JvmName("javaVmVendor") get() {
             return getProperty(KEY_OF_JAVA_VM_VENDOR).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaVmName: String
         @JvmName("javaVmName") get() {
             return getProperty(KEY_OF_JAVA_VM_NAME).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaSpecificationVersion: String
         @JvmName("javaSpecificationVersion") get() {
             return getProperty(KEY_OF_JAVA_SPECIFICATION_VERSION).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaSpecificationVendor: String
         @JvmName("javaSpecificationVendor") get() {
             return getProperty(KEY_OF_JAVA_SPECIFICATION_VENDOR).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaSpecificationName: String
         @JvmName("javaSpecificationName") get() {
             return getProperty(KEY_OF_JAVA_SPECIFICATION_NAME).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaClassVersion: String
         @JvmName("javaClassVersion") get() {
             return getProperty(KEY_OF_JAVA_CLASS_VERSION).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaClassPath: String
         @JvmName("javaClassPath") get() {
             return getProperty(KEY_OF_JAVA_CLASS_PATH).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaLibraryPath: String
         @JvmName("javaLibraryPath") get() {
             return getProperty(KEY_OF_JAVA_LIBRARY_PATH).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaIoTmpdir: String
         @JvmName("javaIoTmpdir") get() {
             return getProperty(KEY_OF_JAVA_IO_TMPDIR).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaCompiler: String
         @JvmName("javaCompiler") get() {
             return getProperty(KEY_OF_JAVA_COMPILER).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val javaExtDirs: String
         @JvmName("javaExtDirs") get() {
             return getProperty(KEY_OF_JAVA_EXT_DIRS).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val osName: String
         @JvmName("osName") get() {
             return getProperty(KEY_OF_OS_NAME).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val osArch: String
         @JvmName("osArch") get() {
             return getProperty(KEY_OF_OS_ARCH).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val osVersion: String
         @JvmName("osVersion") get() {
             return getProperty(KEY_OF_OS_VERSION).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val fileSeparator: String
         @JvmName("fileSeparator") get() {
             return getProperty(KEY_OF_FILE_SEPARATOR).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val pathSeparator: String
         @JvmName("pathSeparator") get() {
             return getProperty(KEY_OF_PATH_SEPARATOR).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val lineSeparator: String
         @JvmName("lineSeparator") get() {
             return getProperty(KEY_OF_LINE_SEPARATOR).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val userName: String
         @JvmName("userName") get() {
             return getProperty(KEY_OF_USER_NAME).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val userHome: String
         @JvmName("userHome") get() {
             return getProperty(KEY_OF_USER_HOME).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val userDir: String
         @JvmName("userDir") get() {
             return getProperty(KEY_OF_USER_DIR).asNotNull()
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val availableProcessors: Int
         @JvmName("availableProcessors") get() {
             return Runtime.getRuntime().availableProcessors()
@@ -288,14 +289,14 @@ interface Environment {
 
 object DefaultEnvironment : Environment {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     override val properties: Map<String, String>
         @JvmName("properties") get() {
             val properties = System.getProperties() ?: return mapOf()
             return propertiesToMap(properties)
         }
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     override val variables: Map<String, String>
         @JvmName("variables") get() {
             return System.getenv()

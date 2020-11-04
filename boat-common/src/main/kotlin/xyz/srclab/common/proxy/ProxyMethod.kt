@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
 import java.lang.reflect.Method
 
 /**
@@ -8,11 +8,11 @@ import java.lang.reflect.Method
  */
 interface ProxyMethod<T> {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val name: String
         @JvmName("name") get
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val parametersTypes: Array<Class<*>>?
         @JvmName("parametersTypes") get
 

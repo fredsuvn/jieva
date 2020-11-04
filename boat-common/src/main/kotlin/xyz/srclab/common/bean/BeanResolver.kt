@@ -1,6 +1,5 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.Invoker.Companion.toVirtualInvoker
 import xyz.srclab.common.base.VirtualInvoker
 import xyz.srclab.common.base.asAny
@@ -8,6 +7,7 @@ import xyz.srclab.common.collection.componentTypeToArray
 import xyz.srclab.common.collection.resolveMapSchema
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.*
+import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
 import java.beans.Introspector
 import java.beans.PropertyDescriptor
 import java.lang.reflect.*
@@ -152,15 +152,15 @@ interface BeanResolver {
 
     interface CopyOptions {
 
-        @Suppress(INAPPLICABLE_JVM_NAME)
+        @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
         val fromType: Type?
             @JvmName("fromType") get() = null
 
-        @Suppress(INAPPLICABLE_JVM_NAME)
+        @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
         val toType: Type?
             @JvmName("toType") get() = null
 
-        @Suppress(INAPPLICABLE_JVM_NAME)
+        @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
         val converter: Converter
             @JvmName("converter") get() = Converter.DEFAULT
 
@@ -304,11 +304,11 @@ interface BeanResolveHandler {
 
     interface ResolveContext {
 
-        @Suppress(INAPPLICABLE_JVM_NAME)
+        @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
         val beanType: Type
             @JvmName("beanType") get
 
-        @Suppress(INAPPLICABLE_JVM_NAME)
+        @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
         val beanProperties: MutableMap<String, PropertySchema>
             @JvmName("beanProperties") get
     }

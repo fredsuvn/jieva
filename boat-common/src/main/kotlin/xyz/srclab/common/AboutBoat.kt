@@ -1,12 +1,16 @@
 package xyz.srclab.common
 
-import xyz.srclab.common.base.*
+import xyz.srclab.common.base.About
+import xyz.srclab.common.base.Licence
+import xyz.srclab.common.base.PoweredBy
+import xyz.srclab.common.base.Version
+import xyz.srclab.kotlin.compile.COMPILE_INAPPLICABLE_JVM_NAME
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 interface AboutBoat : About {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
+    @Suppress(COMPILE_INAPPLICABLE_JVM_NAME)
     val logo: String
         @JvmName("logo") get
 
