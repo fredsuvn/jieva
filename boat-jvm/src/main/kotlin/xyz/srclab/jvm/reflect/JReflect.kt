@@ -7,7 +7,7 @@ fun Class<*>.findCallerFrame(): StackTraceElement? {
     if (stackTrace.isNullOrEmpty()) {
         return null
     }
-    val calledClassName = this.javaClass.name
+    val calledClassName = this.name
     var calledIndex = 0
     for (i in stackTrace.indices) {
         if (stackTrace[i].className == calledClassName) {
