@@ -1,9 +1,9 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.VirtualInvoker
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.rawClass
-import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
 import java.lang.reflect.Field
 import java.lang.reflect.Type
 

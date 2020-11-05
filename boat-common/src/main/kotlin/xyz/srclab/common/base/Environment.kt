@@ -1,6 +1,5 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
 import java.util.*
 
 /**

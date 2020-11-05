@@ -17,7 +17,6 @@ java {
 dependencies {
     implementation(platform(project(":boat-bom")))
 
-    api(project(":boat-jvm"))
     api(project(":boat-annotations"))
 
     api("org.jetbrains.kotlin:kotlin-test-testng")

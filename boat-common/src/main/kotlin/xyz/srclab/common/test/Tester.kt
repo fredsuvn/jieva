@@ -1,8 +1,8 @@
 @file:JvmName("Tester")
 
-package xyz.srclab.test.tester
+package xyz.srclab.common.test
 
-import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import java.io.PrintStream
 import java.time.Duration
 import java.time.LocalDateTime

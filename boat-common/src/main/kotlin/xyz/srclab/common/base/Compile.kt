@@ -1,5 +1,5 @@
-@file:JvmName("JCompile")
+@file:JvmName("Compile")
 
-package xyz.srclab.jvm.compile
+package xyz.srclab.common.base
 
 const val INAPPLICABLE_JVM_NAME = "INAPPLICABLE_JVM_NAME"

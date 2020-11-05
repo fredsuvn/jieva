@@ -1,13 +1,13 @@
-package xyz.srclab.test.mark
+package xyz.srclab.common.test
 
-import xyz.srclab.jvm.reflect.findCallerFrame
+import xyz.srclab.common.base.Current.callerFrame
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 interface TestMarker {
 
     fun mark(value: Any) {
-        val key = this.javaClass.findCallerFrame() ?: ("AutoMarkKey-${markKeyCounter.getAndIncrement()}")
+        val key = this.javaClass.callerFrame() ?: ("AutoMarkKey-${markKeyCounter.getAndIncrement()}")
         mark(key, value)
     }
 

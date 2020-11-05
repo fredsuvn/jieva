@@ -1,6 +1,6 @@
-package test.xyz.srclab.test.mark
+package test.xyz.srclab.common.test
 
-import xyz.srclab.test.mark.TestMarker
+import xyz.srclab.common.test.TestMarker
 import kotlin.test.Test
 
 object TestMarkerTestKt {

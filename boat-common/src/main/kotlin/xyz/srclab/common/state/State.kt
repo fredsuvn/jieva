@@ -1,7 +1,7 @@
 package xyz.srclab.common.state
 
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.hash
-import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
 
 /**
  * @author sunqian

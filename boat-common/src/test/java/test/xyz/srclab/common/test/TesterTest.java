@@ -1,10 +1,10 @@
-package test.xyz.srclab.test.tester;
+package test.xyz.srclab.common.test;
 
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
-import xyz.srclab.test.tester.TestListener;
-import xyz.srclab.test.tester.TestTask;
-import xyz.srclab.test.tester.Tester;
+import xyz.srclab.common.test.TestListener;
+import xyz.srclab.common.test.TestTask;
+import xyz.srclab.common.test.Tester;
 
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -30,6 +30,8 @@ public class TesterTest {
 
 class TestTaskImpl implements TestTask {
 
+    private static final Random random = new Random();
+
     private final String name;
 
     TestTaskImpl(String name) {
@@ -45,7 +47,7 @@ class TestTaskImpl implements TestTask {
     @Override
     public void run() {
         try {
-            Thread.sleep(new Random().nextInt(5) * 1000);
+            Thread.sleep(random.nextInt(5) * (random.nextInt(400) + 800));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

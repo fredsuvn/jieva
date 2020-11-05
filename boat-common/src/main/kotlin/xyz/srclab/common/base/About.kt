@@ -1,7 +1,6 @@
 package xyz.srclab.common.base
 
 import org.apache.commons.lang3.StringUtils
-import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
 import java.time.ZonedDateTime
 import java.util.regex.Pattern
 import kotlin.text.toInt as toIntKt

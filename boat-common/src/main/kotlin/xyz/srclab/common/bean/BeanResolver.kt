@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.Invoker.Companion.toVirtualInvoker
 import xyz.srclab.common.base.VirtualInvoker
 import xyz.srclab.common.base.asAny
@@ -7,7 +8,6 @@ import xyz.srclab.common.collection.componentTypeToArray
 import xyz.srclab.common.collection.resolveMapSchema
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.*
-import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
 import java.beans.Introspector
 import java.beans.PropertyDescriptor
 import java.lang.reflect.*

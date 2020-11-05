@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import java.lang.reflect.Method
 
 /**

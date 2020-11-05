@@ -1,7 +1,7 @@
-package test.xyz.srclab.test.mark;
+package test.xyz.srclab.common.test;
 
 import org.testng.annotations.Test;
-import xyz.srclab.test.mark.TestMarker;
+import xyz.srclab.common.test.TestMarker;
 
 /**
  * @author sunqian

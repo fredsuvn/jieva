@@ -1,8 +1,8 @@
 package xyz.srclab.common.exception
 
+import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.state.State.Companion.stateEquals
 import xyz.srclab.common.state.State.Companion.stateHashCode
-import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
 
 open class StatusException @JvmOverloads constructor(
     private val exceptionStatus: ExceptionStatus,

@@ -1,7 +1,5 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.jvm.compile.INAPPLICABLE_JVM_NAME
-
 interface SimpleAccess<T> : SimpleGetter<T>, SimpleSetter<T>
 
 interface SimpleGetter<T> {

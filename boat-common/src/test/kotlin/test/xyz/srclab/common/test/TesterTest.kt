@@ -1,8 +1,8 @@
-package test.xyz.srclab.test.tester
+package test.xyz.srclab.common.test
 
-import xyz.srclab.test.tester.TestListener
-import xyz.srclab.test.tester.TestTask
-import xyz.srclab.test.tester.testTasks
+import xyz.srclab.common.test.TestListener
+import xyz.srclab.common.test.TestTask
+import xyz.srclab.common.test.testTasks
 import java.util.*
 import java.util.concurrent.Executors
 import kotlin.test.Test
@@ -26,11 +26,15 @@ object TesterTestKt {
 
         override fun run() {
             try {
-                Thread.sleep(Random().nextInt(5) * 1000.toLong())
+                Thread.sleep(random.nextInt(5) * (random.nextInt(400) + 800).toLong())
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
         }
+
+        companion object {
+
+            private val random = Random()
+        }
     }
 }
-
