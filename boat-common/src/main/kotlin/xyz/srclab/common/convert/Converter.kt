@@ -65,7 +65,15 @@ interface Converter {
         }
 
         @JvmField
+        val NOP: Converter = newConverter(NopConvertHandler)
+
+        @JvmField
         val DEFAULT: Converter = newConverter(ConvertHandler.DEFAULTS)
+
+        @JvmStatic
+        fun newConverter(convertHandler: ConvertHandler): Converter {
+            return newConverter(listOf(convertHandler))
+        }
 
         @JvmStatic
         fun newConverter(convertHandlers: Iterable<ConvertHandler>): Converter {

@@ -5,6 +5,7 @@ import xyz.srclab.common.base.Invoker.Companion.toVirtualInvoker
 import xyz.srclab.common.base.VirtualInvoker
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.cache.Cache
+import xyz.srclab.common.collection.MapSchema
 import xyz.srclab.common.collection.componentTypeToArray
 import xyz.srclab.common.collection.resolveMapSchema
 import xyz.srclab.common.convert.Converter
@@ -64,6 +65,15 @@ interface BeanResolver {
                     ) {
                         return@forEach
                     }
+                    if (!copyOptions.enableTypeConversion) {
+                        val fromType = copyOptions.fromType ?: Map::class.java
+                        val fromMapSchema = fromType.resolveMapSchema()
+                        if (fromMapSchema.keyType != toMapSchema.keyType
+                            || fromMapSchema.valueType != toMapSchema.valueType
+                        ) {
+                            return@forEach
+                        }
+                    }
                     val toKey = copyOptions.converter.convert<Any>(k, toMapSchema.keyType)
                     if (!to.containsKey(toKey)) {
                         return@forEach
@@ -81,10 +91,25 @@ interface BeanResolver {
                     ) {
                         return@forEach
                     }
+                    var fromMapSchema: MapSchema? = null
+                    if (!copyOptions.enableTypeConversion) {
+                        val fromType = copyOptions.fromType ?: Map::class.java
+                        fromMapSchema = fromMapSchema ?: fromType.resolveMapSchema()
+                        if (fromMapSchema.keyType != String::class.java) {
+                            return@forEach
+                        }
+                    }
                     val toPropertyName = copyOptions.converter.convert(k, String::class.java)
                     val toProperty = toProperties[toPropertyName]
                     if (toProperty === null || !toProperty.isWriteable) {
                         return@forEach
+                    }
+                    if (!copyOptions.enableTypeConversion) {
+                        val fromType = copyOptions.fromType ?: Map::class.java
+                        fromMapSchema = fromMapSchema ?: fromType.resolveMapSchema()
+                        if (fromMapSchema.valueType != toProperty.genericType) {
+                            return@forEach
+                        }
                     }
                     if (!copyOptions.propertyConvertFilter(k, v, String::class.java, toProperty.genericType)) {
                         return@forEach
@@ -154,6 +179,10 @@ interface BeanResolver {
     interface CopyOptions {
 
         @Suppress(INAPPLICABLE_JVM_NAME)
+        val enableTypeConversion: Boolean
+            @JvmName("enableTypeConversion") get() = false
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
         val fromType: Type?
             @JvmName("fromType") get() = null
 
@@ -196,6 +225,18 @@ interface BeanResolver {
 
             @JvmField
             val IGNORE_NULL = object : CopyOptions {
+                override val propertyNameValueFilter: (name: Any?, value: Any?) -> Boolean
+                    get() = { _, value -> value !== null }
+            }
+
+            @JvmField
+            val DEFAULT_WITHOUT_CONVERSION = object : CopyOptions {
+                override val enableTypeConversion: Boolean = false
+            }
+
+            @JvmField
+            val IGNORE_NULL_WITHOUT_CONVERSION = object : CopyOptions {
+                override val enableTypeConversion: Boolean = false
                 override val propertyNameValueFilter: (name: Any?, value: Any?) -> Boolean
                     get() = { _, value -> value !== null }
             }
