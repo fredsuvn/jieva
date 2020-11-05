@@ -2,6 +2,7 @@ package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
+import xyz.srclab.common.collection.BaseIterableOps.Companion.minusAt
 import xyz.srclab.common.collection.BaseIterableOps.Companion.toAnyArray
 import xyz.srclab.common.collection.arrayAsList
 import xyz.srclab.common.collection.componentType
@@ -17,7 +18,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalAdjuster
 import java.util.*
-import java.util.concurrent.atomic.AtomicReferenceArray
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -73,19 +73,13 @@ interface Converter {
         }
 
         private class ConverterImpl(
-            private val handlers: List<ConvertHandler>,
-            private val without: Int = -1,
+            private val handlers: List<ConvertHandler>
         ) : Converter {
-
-            private val converters: AtomicReferenceArray<Converter?> = AtomicReferenceArray(handlers.size)
 
             override fun <T> convert(from: Any?, toType: Class<T>): T {
                 for (i in handlers.indices) {
-                    if (i == without) {
-                        continue
-                    }
                     val handler = handlers[i]
-                    val result = handler.convert(from, toType, getConverterWithoutHandler(i))
+                    val result = handler.convert(from, toType, ConverterImpl(handlers.minusAt(i)))
                     if (result === NULL_VALUE) {
                         return null as T
                     }
@@ -98,11 +92,8 @@ interface Converter {
 
             override fun <T> convert(from: Any?, toType: Type): T {
                 for (i in handlers.indices) {
-                    if (i == without) {
-                        continue
-                    }
                     val handler = handlers[i]
-                    val result = handler.convert(from, toType, getConverterWithoutHandler(i))
+                    val result = handler.convert(from, toType, ConverterImpl(handlers.minusAt(i)))
                     if (result === NULL_VALUE) {
                         return null as T
                     }
@@ -115,11 +106,8 @@ interface Converter {
 
             override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
                 for (i in handlers.indices) {
-                    if (i == without) {
-                        continue
-                    }
                     val handler = handlers[i]
-                    val result = handler.convert(from, fromType, toType, getConverterWithoutHandler(i))
+                    val result = handler.convert(from, fromType, toType, ConverterImpl(handlers.minusAt(i)))
                     if (result === NULL_VALUE) {
                         return null as T
                     }
@@ -132,25 +120,6 @@ interface Converter {
 
             override fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
                 return ConverterImpl(listOf(preConvertHandler).plus(handlers))
-            }
-
-            private fun getConverterWithoutHandler(index: Int): Converter {
-                if (handlers.size == 1) {
-                    return EMPTY
-                }
-                val converter = converters[index]
-                if (converter !== null) {
-                    return converter
-                }
-                synchronized(this) {
-                    val converterInSync = converters[index]
-                    if (converterInSync !== null) {
-                        return converterInSync
-                    }
-                    val newConverter = ConverterImpl(handlers, index)
-                    converters[index] = newConverter
-                    return newConverter
-                }
             }
         }
     }
@@ -310,14 +279,14 @@ object NumberAndPrimitiveConvertHandler : AbstractConvertHandler() {
 
     override fun doConvert(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
-            Boolean::class.javaPrimitiveType, java.lang.Boolean::class.java -> from.toBoolean()
-            Byte::class.javaPrimitiveType, java.lang.Byte::class.java -> from.toByte()
-            Short::class.javaPrimitiveType, java.lang.Short::class.java -> from.toShort()
-            Char::class.javaPrimitiveType, java.lang.Character::class.java -> from.toChar()
-            Int::class.javaPrimitiveType, java.lang.Integer::class.java -> from.toInt()
-            Long::class.javaPrimitiveType, java.lang.Long::class.java -> from.toLong()
-            Float::class.javaPrimitiveType, java.lang.Float::class.java -> from.toFloat()
-            Double::class.javaPrimitiveType, java.lang.Double::class.java -> from.toDouble()
+            Boolean::class.javaPrimitiveType, JavaBoolean::class.java -> from.toBoolean()
+            Byte::class.javaPrimitiveType, JavaByte::class.java -> from.toByte()
+            Short::class.javaPrimitiveType, JavaShort::class.java -> from.toShort()
+            Char::class.javaPrimitiveType, JavaChar::class.java -> from.toChar()
+            Int::class.javaPrimitiveType, JavaInt::class.java -> from.toInt()
+            Long::class.javaPrimitiveType, JavaLong::class.java -> from.toLong()
+            Float::class.javaPrimitiveType, JavaFloat::class.java -> from.toFloat()
+            Double::class.javaPrimitiveType, JavaDouble::class.java -> from.toDouble()
             BigInteger::class.java -> from.toBigInteger()
             BigDecimal::class.java -> from.toBigDecimal()
             Number::class.java -> from.toDouble()

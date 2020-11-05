@@ -3,8 +3,7 @@
 
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.base.Current
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.*
 
 @JvmOverloads
 fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
@@ -47,14 +46,14 @@ fun <T> Class<*>.toInstance(parameterTypes: Array<out Class<*>>, args: Array<out
 
 fun Class<*>.toWrapperClass(): Class<*> {
     return when (this) {
-        Boolean::class.javaPrimitiveType -> java.lang.Boolean::class.java
-        Byte::class.javaPrimitiveType -> java.lang.Byte::class.java
-        Short::class.javaPrimitiveType -> java.lang.Short::class.java
-        Char::class.javaPrimitiveType -> java.lang.Character::class.java
-        Int::class.javaPrimitiveType -> java.lang.Integer::class.java
-        Long::class.javaPrimitiveType -> java.lang.Long::class.java
-        Float::class.javaPrimitiveType -> java.lang.Float::class.java
-        Double::class.javaPrimitiveType -> java.lang.Double::class.java
+        Boolean::class.javaPrimitiveType -> JavaBoolean::class.java
+        Byte::class.javaPrimitiveType -> JavaByte::class.java
+        Short::class.javaPrimitiveType -> JavaShort::class.java
+        Char::class.javaPrimitiveType -> JavaChar::class.java
+        Int::class.javaPrimitiveType -> JavaInt::class.java
+        Long::class.javaPrimitiveType -> JavaLong::class.java
+        Float::class.javaPrimitiveType -> JavaFloat::class.java
+        Double::class.javaPrimitiveType -> JavaDouble::class.java
         Void::class.javaPrimitiveType -> Void::class.java
         else -> this
     }
