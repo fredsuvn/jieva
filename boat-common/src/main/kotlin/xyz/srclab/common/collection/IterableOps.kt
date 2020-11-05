@@ -5,36 +5,36 @@ import xyz.srclab.common.base.asAny
 class IterableOps<T>(iterable: Iterable<T>) :
     BaseIterableOps<T, Iterable<T>, MutableIterable<T>, IterableOps<T>>(iterable) {
 
-    fun plus(element: T): ListOps<T> {
-        return finalIterable().plus(element).toListOps()
+    override fun plus(element: T): IterableOps<T> {
+        return finalIterable().plus(element).toIterableOps()
     }
 
-    fun plus(elements: Array<out T>): ListOps<T> {
-        return finalIterable().plus(elements).toListOps()
+    override fun plus(elements: Array<out T>): IterableOps<T> {
+        return finalIterable().plus(elements).toIterableOps()
     }
 
-    fun plus(elements: Iterable<T>): ListOps<T> {
-        return finalIterable().plus(elements).toListOps()
+    override fun plus(elements: Iterable<T>): IterableOps<T> {
+        return finalIterable().plus(elements).toIterableOps()
     }
 
-    fun plus(elements: Sequence<T>): ListOps<T> {
-        return finalIterable().plus(elements).toListOps()
+    override fun plus(elements: Sequence<T>): IterableOps<T> {
+        return finalIterable().plus(elements).toIterableOps()
     }
 
-    fun minus(element: T): ListOps<T> {
-        return finalIterable().minus(element).toListOps()
+    override fun minus(element: T): IterableOps<T> {
+        return finalIterable().minus(element).toIterableOps()
     }
 
-    fun minus(elements: Array<out T>): ListOps<T> {
-        return finalIterable().minus(elements).toListOps()
+    override fun minus(elements: Array<out T>): IterableOps<T> {
+        return finalIterable().minus(elements).toIterableOps()
     }
 
-    fun minus(elements: Iterable<T>): ListOps<T> {
-        return finalIterable().minus(elements).toListOps()
+    override fun minus(elements: Iterable<T>): IterableOps<T> {
+        return finalIterable().minus(elements).toIterableOps()
     }
 
-    fun minus(elements: Sequence<T>): ListOps<T> {
-        return finalIterable().minus(elements).toListOps()
+    override fun minus(elements: Sequence<T>): IterableOps<T> {
+        return finalIterable().minus(elements).toIterableOps()
     }
 
     override fun Iterable<T>.asThis(): IterableOps<T> {

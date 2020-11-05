@@ -781,6 +781,59 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         return finalIterable().toDoubleArray(selector)
     }
 
+    abstract fun plus(element: T): THIS
+
+    abstract fun plus(elements: Array<out T>): THIS
+
+    abstract fun plus(elements: Iterable<T>): THIS
+
+    abstract fun plus(elements: Sequence<T>): THIS
+
+    abstract fun minus(element: T): THIS
+
+    abstract fun minus(elements: Array<out T>): THIS
+
+    abstract fun minus(elements: Iterable<T>): THIS
+
+    abstract fun minus(elements: Sequence<T>): THIS
+
+    open fun plusBefore(index: Int, element: T): ListOps<T> {
+        return finalIterable().plusBefore(index, element).toListOps()
+    }
+
+    open fun plusBefore(index: Int, elements: Array<out T>): ListOps<T> {
+        return finalIterable().plusBefore(index, elements).toListOps()
+    }
+
+    open fun plusBefore(index: Int, elements: Iterable<T>): ListOps<T> {
+        return finalIterable().plusBefore(index, elements).toListOps()
+    }
+
+    open fun plusBefore(index: Int, elements: Sequence<T>): ListOps<T> {
+        return finalIterable().plusBefore(index, elements).toListOps()
+    }
+
+    open fun plusAfter(index: Int, element: T): ListOps<T> {
+        return finalIterable().plusAfter(index, element).toListOps()
+    }
+
+    open fun plusAfter(index: Int, elements: Array<out T>): ListOps<T> {
+        return finalIterable().plusAfter(index, elements).toListOps()
+    }
+
+    open fun plusAfter(index: Int, elements: Iterable<T>): ListOps<T> {
+        return finalIterable().plusAfter(index, elements).toListOps()
+    }
+
+    open fun plusAfter(index: Int, elements: Sequence<T>): ListOps<T> {
+        return finalIterable().plusAfter(index, elements).toListOps()
+    }
+
+    @JvmOverloads
+    open fun minusAt(index: Int, count: Int = 1): ListOps<T> {
+        return finalIterable().minusAt(index, count).toListOps()
+    }
+
     open fun remove(element: T): THIS {
         finalMutableIterable().remove(element)
         return this.asAny()

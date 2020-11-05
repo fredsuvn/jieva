@@ -6,35 +6,35 @@ import kotlin.collections.plus as plusKt
 
 class SetOps<T>(set: Set<T>) : CollectionOps<T, Set<T>, MutableSet<T>, SetOps<T>>(set) {
 
-    fun plus(element: T): SetOps<T> {
+    override fun plus(element: T): SetOps<T> {
         return finalSet().plus(element).toSetOps()
     }
 
-    fun plus(elements: Array<out T>): SetOps<T> {
+    override fun plus(elements: Array<out T>): SetOps<T> {
         return finalSet().plus(elements).toSetOps()
     }
 
-    fun plus(elements: Iterable<T>): SetOps<T> {
+    override fun plus(elements: Iterable<T>): SetOps<T> {
         return finalSet().plus(elements).toSetOps()
     }
 
-    fun plus(elements: Sequence<T>): SetOps<T> {
+    override fun plus(elements: Sequence<T>): SetOps<T> {
         return finalSet().plus(elements).toSetOps()
     }
 
-    fun minus(element: T): SetOps<T> {
+    override fun minus(element: T): SetOps<T> {
         return finalSet().minus(element).toSetOps()
     }
 
-    fun minus(elements: Array<out T>): SetOps<T> {
+    override fun minus(elements: Array<out T>): SetOps<T> {
         return finalSet().minus(elements).toSetOps()
     }
 
-    fun minus(elements: Iterable<T>): SetOps<T> {
+    override fun minus(elements: Iterable<T>): SetOps<T> {
         return finalSet().minus(elements).toSetOps()
     }
 
-    fun minus(elements: Sequence<T>): SetOps<T> {
+    override fun minus(elements: Sequence<T>): SetOps<T> {
         return finalSet().minus(elements).toSetOps()
     }
 

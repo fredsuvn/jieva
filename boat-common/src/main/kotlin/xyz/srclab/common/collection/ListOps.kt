@@ -136,6 +136,38 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
         return finalList().reduceRightIndexed(initial, operation)
     }
 
+    override fun plus(element: T): ListOps<T> {
+        return finalList().plus(element).toListOps()
+    }
+
+    override fun plus(elements: Array<out T>): ListOps<T> {
+        return finalList().plus(elements).toListOps()
+    }
+
+    override fun plus(elements: Iterable<T>): ListOps<T> {
+        return finalList().plus(elements).toListOps()
+    }
+
+    override fun plus(elements: Sequence<T>): ListOps<T> {
+        return finalList().plus(elements).toListOps()
+    }
+
+    override fun minus(element: T): ListOps<T> {
+        return finalList().minus(element).toListOps()
+    }
+
+    override fun minus(elements: Array<out T>): ListOps<T> {
+        return finalList().minus(elements).toListOps()
+    }
+
+    override fun minus(elements: Iterable<T>): ListOps<T> {
+        return finalList().minus(elements).toListOps()
+    }
+
+    override fun minus(elements: Sequence<T>): ListOps<T> {
+        return finalList().minus(elements).toListOps()
+    }
+
     @JvmOverloads
     fun subList(fromIndex: Int, toIndex: Int = count()): ListOps<T> {
         return finalList().subList(fromIndex, toIndex).toListOps()
@@ -207,38 +239,6 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
     override fun retainAll(predicate: (T) -> Boolean): ListOps<T> {
         finalMutableList().retainAll(predicate)
         return this.asAny()
-    }
-
-    fun plus(element: T): ListOps<T> {
-        return finalList().plus(element).toListOps()
-    }
-
-    fun plus(elements: Array<out T>): ListOps<T> {
-        return finalList().plus(elements).toListOps()
-    }
-
-    fun plus(elements: Iterable<T>): ListOps<T> {
-        return finalList().plus(elements).toListOps()
-    }
-
-    fun plus(elements: Sequence<T>): ListOps<T> {
-        return finalList().plus(elements).toListOps()
-    }
-
-    fun minus(element: T): ListOps<T> {
-        return finalList().minus(element).toListOps()
-    }
-
-    fun minus(elements: Array<out T>): ListOps<T> {
-        return finalList().minus(elements).toListOps()
-    }
-
-    fun minus(elements: Iterable<T>): ListOps<T> {
-        return finalList().minus(elements).toListOps()
-    }
-
-    fun minus(elements: Sequence<T>): ListOps<T> {
-        return finalList().minus(elements).toListOps()
     }
 
     fun finalList(): List<T> {
