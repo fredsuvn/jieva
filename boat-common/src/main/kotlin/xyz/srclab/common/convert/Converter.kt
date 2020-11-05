@@ -2,7 +2,6 @@ package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
-import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collection.BaseIterableOps.Companion.toAnyArray
 import xyz.srclab.common.collection.arrayAsList
 import xyz.srclab.common.collection.componentType
@@ -18,6 +17,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
 import java.time.temporal.TemporalAdjuster
 import java.util.*
+import java.util.concurrent.atomic.AtomicReferenceArray
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
@@ -45,18 +45,47 @@ interface Converter {
     companion object {
 
         @JvmField
+        val EMPTY: Converter = object : Converter {
+
+            override fun <T> convert(from: Any?, toType: Class<T>): T {
+                throw UnsupportedOperationException("This is an empty converter.")
+            }
+
+            override fun <T> convert(from: Any?, toType: Type): T {
+                throw UnsupportedOperationException("This is an empty converter.")
+            }
+
+            override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
+                throw UnsupportedOperationException("This is an empty converter.")
+            }
+
+            override fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
+                return ConverterImpl(listOf(preConvertHandler))
+            }
+        }
+
+        @JvmField
         val DEFAULT: Converter = newConverter(ConvertHandler.DEFAULTS)
 
         @JvmStatic
         fun newConverter(convertHandlers: Iterable<ConvertHandler>): Converter {
-            return ConverterImpl(convertHandlers)
+            return ConverterImpl(convertHandlers.toList())
         }
 
-        private class ConverterImpl(private val handlers: Iterable<ConvertHandler>) : Converter {
+        private class ConverterImpl(
+            private val handlers: List<ConvertHandler>,
+            private val without: Int = -1,
+        ) : Converter {
+
+            private val converters: AtomicReferenceArray<Converter?> = AtomicReferenceArray(handlers.size)
 
             override fun <T> convert(from: Any?, toType: Class<T>): T {
-                for (handler in handlers) {
-                    val result = handler.convert(from, toType, this)
+                for (i in handlers.indices) {
+                    if (i == without) {
+                        continue
+                    }
+                    val handler = handlers[i]
+                    val result = handler.convert(from, toType, getConverterWithoutHandler(i))
                     if (result === NULL_VALUE) {
                         return null as T
                     }
@@ -68,8 +97,12 @@ interface Converter {
             }
 
             override fun <T> convert(from: Any?, toType: Type): T {
-                for (handler in handlers) {
-                    val result = handler.convert(from, toType, this)
+                for (i in handlers.indices) {
+                    if (i == without) {
+                        continue
+                    }
+                    val handler = handlers[i]
+                    val result = handler.convert(from, toType, getConverterWithoutHandler(i))
                     if (result === NULL_VALUE) {
                         return null as T
                     }
@@ -81,8 +114,12 @@ interface Converter {
             }
 
             override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
-                for (handler in handlers) {
-                    val result = handler.convert(from, fromType, toType, this)
+                for (i in handlers.indices) {
+                    if (i == without) {
+                        continue
+                    }
+                    val handler = handlers[i]
+                    val result = handler.convert(from, fromType, toType, getConverterWithoutHandler(i))
                     if (result === NULL_VALUE) {
                         return null as T
                     }
@@ -95,6 +132,25 @@ interface Converter {
 
             override fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
                 return ConverterImpl(listOf(preConvertHandler).plus(handlers))
+            }
+
+            private fun getConverterWithoutHandler(index: Int): Converter {
+                if (handlers.size == 1) {
+                    return EMPTY
+                }
+                val converter = converters[index]
+                if (converter !== null) {
+                    return converter
+                }
+                synchronized(this) {
+                    val converterInSync = converters[index]
+                    if (converterInSync !== null) {
+                        return converterInSync
+                    }
+                    val newConverter = ConverterImpl(handlers, index)
+                    converters[index] = newConverter
+                    return newConverter
+                }
             }
         }
     }
@@ -218,10 +274,33 @@ object CharsConvertHandler : AbstractConvertHandler() {
 
     override fun doConvert(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
-            String::class.java, CharSequence::class.java -> from.toString()
-            StringBuilder::class.java -> StringBuilder(from.toString())
-            StringBuffer::class.java -> StringBuffer(from.toString())
-            CharArray::class.java -> from.toString().toCharArray()
+            String::class.java, CharSequence::class.java -> {
+                if (from is ByteArray) from.toChars() else from.toString()
+            }
+            StringBuilder::class.java -> {
+                if (from is ByteArray)
+                    StringBuilder(from.toChars())
+                else
+                    StringBuilder(from.toString())
+            }
+            StringBuffer::class.java -> {
+                if (from is ByteArray)
+                    StringBuffer(from.toChars())
+                else
+                    StringBuffer(from.toString())
+            }
+            CharArray::class.java -> {
+                if (from is ByteArray)
+                    from.toChars().toCharArray()
+                else
+                    from.toString().toCharArray()
+            }
+            ByteArray::class.java -> {
+                if (from is CharSequence)
+                    from.toBytes()
+                else
+                    null
+            }
             else -> null
         }
     }
@@ -231,14 +310,14 @@ object NumberAndPrimitiveConvertHandler : AbstractConvertHandler() {
 
     override fun doConvert(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
-            Boolean::class.javaPrimitiveType, Boolean::class.java -> from.toBoolean()
-            Byte::class.javaPrimitiveType, Byte::class.java -> from.toByte()
-            Short::class.javaPrimitiveType, Short::class.java -> from.toShort()
-            Char::class.javaPrimitiveType, Char::class.java -> from.toChar()
-            Int::class.javaPrimitiveType, Int::class.java -> from.toInt()
-            Long::class.javaPrimitiveType, Long::class.java -> from.toLong()
-            Float::class.javaPrimitiveType, Float::class.java -> from.toFloat()
-            Double::class.javaPrimitiveType, Double::class.java -> from.toDouble()
+            Boolean::class.javaPrimitiveType, java.lang.Boolean::class.java -> from.toBoolean()
+            Byte::class.javaPrimitiveType, java.lang.Byte::class.java -> from.toByte()
+            Short::class.javaPrimitiveType, java.lang.Short::class.java -> from.toShort()
+            Char::class.javaPrimitiveType, java.lang.Character::class.java -> from.toChar()
+            Int::class.javaPrimitiveType, java.lang.Integer::class.java -> from.toInt()
+            Long::class.javaPrimitiveType, java.lang.Long::class.java -> from.toLong()
+            Float::class.javaPrimitiveType, java.lang.Float::class.java -> from.toFloat()
+            Double::class.javaPrimitiveType, java.lang.Double::class.java -> from.toDouble()
             BigInteger::class.java -> from.toBigInteger()
             BigDecimal::class.java -> from.toBigDecimal()
             Number::class.java -> from.toDouble()
@@ -392,7 +471,9 @@ object IterableConvertHandler : AbstractConvertHandler() {
     }
 }
 
-open class BeanConvertHandler(protected val beanResolver: BeanResolver) : AbstractConvertHandler() {
+open class BeanConvertHandler(
+    private val beanResolver: BeanResolver = BeanResolver.DEFAULT
+) : AbstractConvertHandler() {
 
     override fun doConvert(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
@@ -404,25 +485,29 @@ open class BeanConvertHandler(protected val beanResolver: BeanResolver) : Abstra
 
     private fun doConvert0(from: Any, toRawClass: Class<*>, toType: Type, converter: Converter): Any? {
         return when (toRawClass) {
-            Map::class.java -> from.copyProperties(
+            Map::class.java -> beanResolver.copyProperties(
+                from,
                 HashMap<Any, Any?>(),
                 from.javaClass,
                 toType,
                 converter
             ).toMap()
-            MutableMap::class.java, LinkedHashMap::class.java -> from.copyProperties(
+            MutableMap::class.java, LinkedHashMap::class.java -> beanResolver.copyProperties(
+                from,
                 LinkedHashMap(),
                 from.javaClass,
                 toType,
                 converter
             )
-            HashMap::class.java -> from.copyProperties(
+            HashMap::class.java -> beanResolver.copyProperties(
+                from,
                 HashMap(),
                 from.javaClass,
                 toType,
                 converter
             )
-            TreeMap::class.java -> from.copyProperties(
+            TreeMap::class.java -> beanResolver.copyProperties(
+                from,
                 TreeMap(),
                 from.javaClass,
                 toType,
@@ -430,7 +515,7 @@ open class BeanConvertHandler(protected val beanResolver: BeanResolver) : Abstra
             )
             else -> {
                 val toInstance = toRawClass.toInstance<Any>()
-                return from.copyProperties(toInstance, from.javaClass, toType, converter)
+                return beanResolver.copyProperties(from, toInstance, from.javaClass, toType, converter)
             }
         }
     }
@@ -438,6 +523,6 @@ open class BeanConvertHandler(protected val beanResolver: BeanResolver) : Abstra
     companion object {
 
         @JvmField
-        val DEFAULT: BeanConvertHandler = BeanConvertHandler(BeanResolver.DEFAULT)
+        val DEFAULT: BeanConvertHandler = BeanConvertHandler()
     }
 }

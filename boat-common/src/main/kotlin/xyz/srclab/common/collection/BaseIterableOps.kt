@@ -1,6 +1,7 @@
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.collection.BaseIterableOps.Companion.plusAfter
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -2006,6 +2007,72 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> Iterable<T>.minus(elements: Sequence<T>): List<T> {
             return this.minusKt(elements)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.plusBefore(index: Int, element: T): List<T> {
+            return this.plusBefore(index, listOf(element))
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.plusBefore(index: Int, elements: Array<out T>): List<T> {
+            return this.plusBefore(index, elements.toListKt())
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.plusBefore(index: Int, elements: Iterable<T>): List<T> {
+            if (index == 0) {
+                return elements.plusKt(this)
+            }
+            val list = this.toList()
+            val front = list.subList(0, index)
+            val back = list.subList(index, list.size)
+            return front.plusKt(elements).plusKt(back)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.plusBefore(index: Int, elements: Sequence<T>): List<T> {
+            return this.plusBefore(index, elements.toList())
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.plusAfter(index: Int, element: T): List<T> {
+            return this.plusAfter(index, listOf(element))
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.plusAfter(index: Int, elements: Array<out T>): List<T> {
+            return this.plusAfter(index, elements.toListKt())
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.plusAfter(index: Int, elements: Iterable<T>): List<T> {
+            val list = this.toList()
+            if (index == list.size - 1) {
+                return list.plusKt(this)
+            }
+            val front = list.subList(0, index + 1)
+            val back = list.subList(index + 1, list.size)
+            return front.plusKt(elements).plusKt(back)
+        }
+
+        @JvmStatic
+        fun <T> Iterable<T>.plusAfter(index: Int, elements: Sequence<T>): List<T> {
+            return this.plusAfter(index, elements.toList())
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun <T> Iterable<T>.minusAt(index: Int, count: Int = 1): List<T> {
+            val list = this.toList()
+            if (index == 0) {
+                return if (count < list.size) list.subList(count, list.size) else emptyList()
+            }
+            val front = list.subList(0, index)
+            if (count >= list.size - index) {
+                return front
+            }
+            return front.plusKt(list.subList(index + count, list.size))
         }
 
         @JvmStatic

@@ -49,19 +49,19 @@ private fun testTasks0(
     val tasks = testTasks.toList()
     val counter = CountDownLatch(tasks.size)
 
-    testListener.beforeRun(tasks)
+    testListener.beforeRunAll(tasks)
 
     val costs = mutableListOf<Duration>()
 
     val awaitStartTime = LocalDateTime.now()
     for (testTask in testTasks) {
         executor.execute {
-            testListener.beforeEachRun(testTask)
+            testListener.beforeRunEach(testTask)
             val startTime = LocalDateTime.now()
             testTask.run()
             val endTime = LocalDateTime.now()
             val cost = Duration.between(startTime, endTime)
-            testListener.afterEachRun(testTask, object : TestTaskResult {
+            testListener.afterRunEach(testTask, object : TestTaskResult {
                 override val cost: Duration = cost
             })
             synchronized(counter) {
@@ -75,7 +75,7 @@ private fun testTasks0(
     val awaitCost = Duration.between(awaitStartTime, LocalDateTime.now())
     val totalCost = costs.reduce { d1, d2 -> d1.plus(d2) }
     val averageCost = totalCost.dividedBy(tasks.size.toLong())
-    testListener.afterRun(tasks, object : TestResult {
+    testListener.afterRunAll(tasks, object : TestResult {
         override val awaitCost: Duration = awaitCost
         override val totalCost: Duration = totalCost
         override val averageCost: Duration = averageCost
@@ -89,30 +89,43 @@ interface TestTask {
         @JvmName("name") get
 
     fun run()
+
+    companion object {
+
+        @JvmStatic
+        fun newTask(name: String, task: () -> Unit): TestTask {
+            return object : TestTask {
+                override val name: String = name
+                override fun run() {
+                    task()
+                }
+            }
+        }
+    }
 }
 
 interface TestListener {
 
-    fun beforeRun(testTasks: List<TestTask>)
+    fun beforeRunAll(testTasks: List<TestTask>)
 
-    fun beforeEachRun(testTask: TestTask)
+    fun beforeRunEach(testTask: TestTask)
 
-    fun afterEachRun(testTask: TestTask, testTaskResult: TestTaskResult)
+    fun afterRunEach(testTask: TestTask, testTaskResult: TestTaskResult)
 
-    fun afterRun(testTasks: List<TestTask>, testResult: TestResult)
+    fun afterRunAll(testTasks: List<TestTask>, testResult: TestResult)
 
     companion object {
 
         @JvmField
         val EMPTY: TestListener = object : TestListener {
 
-            override fun beforeRun(testTasks: List<TestTask>) {}
+            override fun beforeRunAll(testTasks: List<TestTask>) {}
 
-            override fun beforeEachRun(testTask: TestTask) {}
+            override fun beforeRunEach(testTask: TestTask) {}
 
-            override fun afterEachRun(testTask: TestTask, testTaskResult: TestTaskResult) {}
+            override fun afterRunEach(testTask: TestTask, testTaskResult: TestTaskResult) {}
 
-            override fun afterRun(testTasks: List<TestTask>, testResult: TestResult) {}
+            override fun afterRunAll(testTasks: List<TestTask>, testResult: TestResult) {}
         }
 
         @JvmField
@@ -122,19 +135,21 @@ interface TestListener {
         fun withPrintStream(printStream: PrintStream): TestListener {
             return object : TestListener {
 
-                override fun beforeRun(testTasks: List<TestTask>) {}
+                override fun beforeRunAll(testTasks: List<TestTask>) {
+                    printStream.println("Prepare to run all tasks...")
+                }
 
-                override fun beforeEachRun(testTask: TestTask) {
+                override fun beforeRunEach(testTask: TestTask) {
                     printStream.println("Run task ${testTask.name}...")
                 }
 
-                override fun afterEachRun(testTask: TestTask, testTaskResult: TestTaskResult) {
-                    printStream.println("Task ${testTask.name} running complete, cost: ${testTaskResult.cost}")
+                override fun afterRunEach(testTask: TestTask, testTaskResult: TestTaskResult) {
+                    printStream.println("Task ${testTask.name} was accomplished, cost: ${testTaskResult.cost}")
                 }
 
-                override fun afterRun(testTasks: List<TestTask>, testResult: TestResult) {
+                override fun afterRunAll(testTasks: List<TestTask>, testResult: TestResult) {
                     printStream.println(
-                        "All tasks running complete, " +
+                        "All tasks were accomplished, " +
                                 "await cost: ${testResult.awaitCost}, " +
                                 "total cost: ${testResult.totalCost}, " +
                                 "average cost: ${testResult.averageCost}"

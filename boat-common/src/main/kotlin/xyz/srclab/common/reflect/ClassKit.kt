@@ -40,21 +40,21 @@ fun <T> Class<*>.toInstance(): T {
 fun <T> Class<*>.toInstance(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
     val constructor = this.findConstructor(*parameterTypes)
     if (constructor === null) {
-        throw IllegalArgumentException("Class constructor(${parameterTypes.contentToString()}) not found: $this")
+        throw IllegalArgumentException("Constructor of $this with parameters (${parameterTypes.contentToString()}) not found: $this")
     }
     return constructor.newInstance(*args).asAny()
 }
 
 fun Class<*>.toWrapperClass(): Class<*> {
     return when (this) {
-        Boolean::class.javaPrimitiveType -> Boolean::class.java
-        Byte::class.javaPrimitiveType -> Byte::class.java
-        Short::class.javaPrimitiveType -> Short::class.java
-        Char::class.javaPrimitiveType -> Char::class.java
-        Int::class.javaPrimitiveType -> Int::class.java
-        Long::class.javaPrimitiveType -> Long::class.java
-        Float::class.javaPrimitiveType -> Float::class.java
-        Double::class.javaPrimitiveType -> Double::class.java
+        Boolean::class.javaPrimitiveType -> java.lang.Boolean::class.java
+        Byte::class.javaPrimitiveType -> java.lang.Byte::class.java
+        Short::class.javaPrimitiveType -> java.lang.Short::class.java
+        Char::class.javaPrimitiveType -> java.lang.Character::class.java
+        Int::class.javaPrimitiveType -> java.lang.Integer::class.java
+        Long::class.javaPrimitiveType -> java.lang.Long::class.java
+        Float::class.javaPrimitiveType -> java.lang.Float::class.java
+        Double::class.javaPrimitiveType -> java.lang.Double::class.java
         Void::class.javaPrimitiveType -> Void::class.java
         else -> this
     }
