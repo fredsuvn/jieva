@@ -1,6 +1,12 @@
 compileKotlin {
-    kotlinOptions.jvmTarget = "${javaVersion}"
+    kotlinOptions {
+        jvmTarget = "${javaVersion}"
+        freeCompilerArgs = ['-Xjvm-default=compatibility']
+    }
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "${javaVersion}"
+    kotlinOptions {
+        jvmTarget = "${javaVersion}"
+        freeCompilerArgs = ['-Xjvm-default=compatibility']
+    }
 }

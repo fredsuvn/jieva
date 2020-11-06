@@ -3,6 +3,7 @@
 package xyz.srclab.common.test
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.run.AsyncRunner
 import java.io.PrintStream
 import java.time.Duration
 import java.time.LocalDateTime
@@ -22,6 +23,22 @@ fun testTasks(testListener: TestListener, vararg testTasks: TestTask) {
 }
 
 fun testTasks(testListener: TestListener, testTasks: Iterable<TestTask>) {
+    testTasks0(AsyncRunner, testListener, testTasks)
+}
+
+fun testTasksParallel(vararg testTasks: TestTask) {
+    testTasksParallel(testTasks.toList())
+}
+
+fun testTasksParallel(testTasks: Iterable<TestTask>) {
+    testTasks0(executor = AsyncRunner, testTasks = testTasks)
+}
+
+fun testTasksParallel(testListener: TestListener, vararg testTasks: TestTask) {
+    testTasksParallel(testListener, testTasks.toList())
+}
+
+fun testTasksParallel(testListener: TestListener, testTasks: Iterable<TestTask>) {
     testTasks0(testListener = testListener, testTasks = testTasks)
 }
 
@@ -43,7 +60,7 @@ fun testTasks(executor: Executor, testListener: TestListener, testTasks: Iterabl
 
 private fun testTasks0(
     executor: Executor = Executor { command -> command.run() },
-    testListener: TestListener = TestListener.EMPTY,
+    testListener: TestListener = TestListener.DEFAULT,
     testTasks: Iterable<TestTask>,
 ) {
     val tasks = testTasks.toList()
@@ -84,13 +101,23 @@ private fun testTasks0(
 
 interface TestTask {
 
+    @JvmDefault
     @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
-        @JvmName("name") get
+        @JvmName("name") get() = this.javaClass.name
 
     fun run()
 
     companion object {
+
+        @JvmStatic
+        fun newTask(task: () -> Unit): TestTask {
+            return object : TestTask {
+                override fun run() {
+                    task()
+                }
+            }
+        }
 
         @JvmStatic
         fun newTask(name: String, task: () -> Unit): TestTask {

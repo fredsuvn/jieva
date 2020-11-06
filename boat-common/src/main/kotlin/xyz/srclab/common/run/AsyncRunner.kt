@@ -1,14 +1,7 @@
 package xyz.srclab.common.run
 
-import java.time.Duration
-import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.Executors
 
-private val asyncRunner = ThreadPoolRunner.Builder()
-    .corePoolSize(0)
-    .maximumPoolSize(Int.MAX_VALUE)
-    .keepAliveTime(Duration.ZERO)
-    .workQueue(SynchronousQueue())
-    .threadFactory { r -> Thread(r) }
-    .build()
+private val asyncRunner = Runner.newExecutorServiceRunner(Executors.newCachedThreadPool())
 
 object AsyncRunner : Runner by asyncRunner

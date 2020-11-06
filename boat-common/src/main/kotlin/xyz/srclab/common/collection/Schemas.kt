@@ -1,6 +1,7 @@
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.reflect.findGenericInterface
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -45,33 +46,42 @@ interface IterableSchema {
 
         @JvmStatic
         fun resolveOrNull(type: Type): IterableSchema? {
+
+            fun dispatchClass(cls: Class<*>): IterableSchema? {
+                return when (cls) {
+                    Iterable::class.java -> RAW_ITERABLE
+                    Collection::class.java -> RAW_COLLECTION
+                    Set::class.java -> RAW_SET
+                    List::class.java -> RAW_LIST
+                    else -> null
+                }
+            }
+
             if (type is Class<*>) {
-                if (type == Iterable::class.java) {
-                    return RAW_ITERABLE
-                }
-                if (type == Collection::class.java) {
-                    return RAW_COLLECTION
-                }
-                if (type == Set::class.java) {
-                    return RAW_SET
-                }
-                if (type == List::class.java) {
-                    return RAW_LIST
+                val schema = dispatchClass(type)
+                if (schema !== null) {
+                    return schema
                 }
                 if (!Iterable::class.java.isAssignableFrom(type)) {
                     return null
                 }
-                return of(type, Any::class.java)
             }
-            if (type is ParameterizedType) {
-                val rawClass = type.rawClass
-                if (!Iterable::class.java.isAssignableFrom(rawClass)) {
-                    return null
-                }
-                val actualTypeArguments = type.actualTypeArguments
+
+            val iterableType = type.findGenericInterface(
+                List::class.java, Set::class.java, Collection::class.java, Iterable::class.java
+            )
+            if (iterableType === null) {
+                return null
+            }
+            if (iterableType is ParameterizedType) {
+                val actualTypeArguments = iterableType.actualTypeArguments
                 if (actualTypeArguments.size == 1) {
-                    return of(rawClass, actualTypeArguments[0])
+                    return of(type.rawClass, actualTypeArguments[0])
                 }
+                return null
+            }
+            if (iterableType is Class<*>) {
+                return dispatchClass(iterableType) ?: of(type.rawClass, Any::class.java)
             }
             return null
         }
@@ -155,24 +165,42 @@ interface MapSchema {
 
         @JvmStatic
         fun resolveOrNull(type: Type): MapSchema? {
-            if (type is Class<*> && Map::class.java.isAssignableFrom(type)) {
+
+            fun dispatchClass(cls: Class<*>): IterableSchema? {
+                return when (cls) {
+                    Iterable::class.java -> IterableSchema.RAW_ITERABLE
+                    Collection::class.java -> IterableSchema.RAW_COLLECTION
+                    Set::class.java -> IterableSchema.RAW_SET
+                    List::class.java -> IterableSchema.RAW_LIST
+                    else -> null
+                }
+            }
+
+            if (type is Class<*>) {
                 if (type == Map::class.java) {
                     return RAW
                 }
                 if (!Map::class.java.isAssignableFrom(type)) {
                     return null
                 }
-                return of(type, Any::class.java, Any::class.java)
             }
-            if (type is ParameterizedType) {
-                val rawClass = type.rawClass
-                if (!Map::class.java.isAssignableFrom(rawClass)) {
-                    return null
-                }
-                val actualTypeArguments = type.actualTypeArguments
+
+            val mapType = type.findGenericInterface(Map::class.java)
+            if (mapType === null) {
+                return null
+            }
+            if (mapType is ParameterizedType) {
+                val actualTypeArguments = mapType.actualTypeArguments
                 if (actualTypeArguments.size == 2) {
-                    return of(rawClass, actualTypeArguments[0], actualTypeArguments[1])
+                    return of(type.rawClass, actualTypeArguments[0], actualTypeArguments[1])
                 }
+                return null
+            }
+            if (mapType is Class<*>) {
+                if (mapType == Map::class.java) {
+                    return RAW
+                }
+                return of(type.rawClass, Any::class.java, Any::class.java)
             }
             return null
         }

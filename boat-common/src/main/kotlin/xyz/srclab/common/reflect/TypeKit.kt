@@ -268,24 +268,33 @@ fun Type.genericSignature(target: Class<*>): Type {
  * StringFoo(Foo.class) -> Foo<String>
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.findGenericSignature(target: Class<*>): Type? {
-    return if (target.isInterface) this.findGenericInterface(target) else this.findGenericSuperclass(target)
+fun Type.findGenericSignature(vararg targets: Class<*>): Type? {
+    for (target in targets) {
+        val result = if (target.isInterface)
+            this.findGenericInterface(target)
+        else
+            this.findGenericSuperclass(target)
+        if (result !== null) {
+            return result
+        }
+    }
+    return null
 }
 
 /**
  * StringFoo(Foo.class) -> Foo<String>
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.findGenericSuperclass(targetSuperclass: Class<*>): Type? {
+fun Type.findGenericSuperclass(vararg targets: Class<*>): Type? {
     var rawClass = this.upperClass
-    if (rawClass == targetSuperclass) {
+    if (targets.contains(rawClass)) {
         return this
     }
 
     var genericType: Type? = rawClass.genericSuperclass
     while (genericType !== null) {
         rawClass = genericType.upperClass
-        if (rawClass == targetSuperclass) {
+        if (targets.contains(rawClass)) {
             return genericType
         }
         genericType = rawClass.genericSuperclass
@@ -297,23 +306,23 @@ fun Type.findGenericSuperclass(targetSuperclass: Class<*>): Type? {
  * StringFoo(Foo.class) -> Foo<String>
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.findGenericInterface(targetInterface: Class<*>): Type? {
+fun Type.findGenericInterface(vararg targets: Class<*>): Type? {
     val rawClass = this.upperClass
-    if (rawClass == targetInterface) {
+    if (targets.contains(rawClass)) {
         return this
     }
 
     val genericInterfaces = rawClass.genericInterfaces
 
-    fun findInterface(genericTypes: Array<out Type>, target: Class<*>): Type? {
+    fun findInterface(genericTypes: Array<out Type>, vararg targets: Class<*>): Type? {
         //Search level first
         for (genericType in genericTypes) {
-            if (genericType.upperClass == target) {
+            if (targets.contains(genericType.upperClass)) {
                 return genericType
             }
         }
         for (genericType in genericTypes) {
-            val result = findInterface(genericType.upperClass.genericInterfaces, target)
+            val result = findInterface(genericType.upperClass.genericInterfaces, *targets)
             if (result !== null) {
                 return result
             }
@@ -321,7 +330,7 @@ fun Type.findGenericInterface(targetInterface: Class<*>): Type? {
         return null
     }
 
-    return findInterface(genericInterfaces, targetInterface)
+    return findInterface(genericInterfaces, *targets)
 }
 
 /**
