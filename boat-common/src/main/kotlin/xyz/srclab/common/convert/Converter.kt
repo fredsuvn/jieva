@@ -2,7 +2,6 @@ package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
-import xyz.srclab.common.collection.BaseIterableOps.Companion.minusAt
 import xyz.srclab.common.collection.BaseIterableOps.Companion.toAnyArray
 import xyz.srclab.common.collection.arrayAsList
 import xyz.srclab.common.collection.componentType
@@ -85,9 +84,8 @@ interface Converter {
         ) : Converter {
 
             override fun <T> convert(from: Any?, toType: Class<T>): T {
-                for (i in handlers.indices) {
-                    val handler = handlers[i]
-                    val result = handler.convert(from, toType, ConverterImpl(handlers.minusAt(i)))
+                for (handler in handlers) {
+                    val result = handler.convert(from, toType, this)
                     if (result === NULL_VALUE) {
                         return null as T
                     }
@@ -99,9 +97,8 @@ interface Converter {
             }
 
             override fun <T> convert(from: Any?, toType: Type): T {
-                for (i in handlers.indices) {
-                    val handler = handlers[i]
-                    val result = handler.convert(from, toType, ConverterImpl(handlers.minusAt(i)))
+                for (handler in handlers) {
+                    val result = handler.convert(from, toType, this)
                     if (result === NULL_VALUE) {
                         return null as T
                     }
@@ -113,9 +110,8 @@ interface Converter {
             }
 
             override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
-                for (i in handlers.indices) {
-                    val handler = handlers[i]
-                    val result = handler.convert(from, fromType, toType, ConverterImpl(handlers.minusAt(i)))
+                for (handler in handlers) {
+                    val result = handler.convert(from, fromType, toType, this)
                     if (result === NULL_VALUE) {
                         return null as T
                     }
@@ -348,7 +344,12 @@ open class DateTimeConvertHandler(
 object UpperBoundConvertHandler : AbstractConvertHandler() {
 
     override fun doConvert(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        return converter.convert(from, fromType.deepUpperBound, toType.deepUpperBound)
+        val upperFromType = fromType.deepUpperBound
+        val upperToType = toType.deepUpperBound
+        if (upperFromType == fromType && upperToType == toType) {
+            return null
+        }
+        return converter.convert(from, upperFromType, upperToType)
     }
 }
 
