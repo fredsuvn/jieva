@@ -6,7 +6,7 @@ description = "Boat Project BOM"
 
 ext {
     libVersions = [
-            dependenciesVersion: "1.0.0",
+            dependenciesVersion: "1.0.1",
     ]
 }
 
