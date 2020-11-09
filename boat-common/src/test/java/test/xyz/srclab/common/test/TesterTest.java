@@ -1,12 +1,12 @@
 package test.xyz.srclab.common.test;
 
 import org.testng.annotations.Test;
+import xyz.srclab.common.run.Runner;
 import xyz.srclab.common.test.TestListener;
 import xyz.srclab.common.test.TestTask;
 import xyz.srclab.common.test.Tester;
 
 import java.util.Random;
-import java.util.concurrent.Executors;
 
 /**
  * @author sunqian
@@ -18,7 +18,7 @@ public class TesterTest {
     @Test
     public void testTester() {
         Tester.testTasks(
-                Executors.newCachedThreadPool(),
+                Runner.ASYNC_RUNNER,
                 TestListener.DEFAULT,
                 newTask("task1"),
                 newTask("task2"),

@@ -28,6 +28,7 @@ interface About {
         @JvmName("poweredBy") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val report: String
         @JvmName("report") get() {
             return "${poweredBy.mail} or $url"
@@ -40,8 +41,29 @@ interface About {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
         fun of(
+            name: String,
+            url: String,
+            version: Version,
+            licence: Licence,
+            poweredBy: PoweredBy,
+        ): About {
+            return newImpl(name, url, version, licence, poweredBy)
+        }
+
+        @JvmStatic
+        fun of(
+            name: String,
+            url: String,
+            version: Version,
+            licence: Licence,
+            poweredBy: PoweredBy,
+            eggTips: String,
+        ): About {
+            return newImpl(name, url, version, licence, poweredBy, eggTips)
+        }
+
+        private fun newImpl(
             name: String,
             url: String,
             version: Version,
@@ -117,6 +139,7 @@ interface Version : Comparable<Version> {
         @JvmName("preRelease") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val preReleaseToString: String
         @JvmName("preReleaseToString") get() {
             return preRelease.joinToString("")
@@ -127,18 +150,21 @@ interface Version : Comparable<Version> {
         @JvmName("buildMetadata") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val buildMetadataToString: String
         @JvmName("buildMetadataToString") get() {
             return buildMetadata.joinToString("")
         }
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val isNormal: Boolean
         @JvmName("isNormal") get() {
             return preRelease.isEmpty()
         }
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val isPreRelease: Boolean
         @JvmName("isPreRelease") get() {
             return preRelease.isNotEmpty()
