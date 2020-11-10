@@ -13,6 +13,7 @@ import java.lang.reflect.Type
 interface BeanSchema {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val type: Class<*>
         @JvmName("type") get() = genericType.rawClass
 
@@ -24,6 +25,7 @@ interface BeanSchema {
     val properties: Map<String, PropertySchema>
         @JvmName("properties") get
 
+    @JvmDefault
     fun getProperty(name: String): PropertySchema? {
         return properties[name]
     }
@@ -36,6 +38,7 @@ interface PropertySchema {
         @JvmName("name") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val type: Class<*>
         @JvmName("type") get() = genericType.rawClass
 
@@ -44,6 +47,7 @@ interface PropertySchema {
         @JvmName("genericType") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val ownerType: Class<*>
         @JvmName("ownerType") get() = genericOwnerType.rawClass
 
@@ -52,12 +56,14 @@ interface PropertySchema {
         @JvmName("genericOwnerType") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val isReadable: Boolean
         @JvmName("isReadable") get() {
             return getter !== null
         }
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val isWriteable: Boolean
         @JvmName("isWriteable") get() {
             return setter !== null
@@ -83,6 +89,7 @@ interface PropertySchema {
 
     fun <T> setValue(bean: Any, value: Any?): T
 
+    @JvmDefault
     fun <T> setValue(bean: Any, value: Any?, converter: Converter): T? {
         return setValue(bean, converter.convert(value, genericType))
     }

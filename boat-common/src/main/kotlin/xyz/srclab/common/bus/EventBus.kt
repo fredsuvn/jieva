@@ -13,10 +13,12 @@ interface EventBus {
 
     fun unregister(eventHandler: EventHandler<*>)
 
+    @JvmDefault
     fun <T : Any> emit(event: T) {
         return emit(event.javaClass, event)
     }
 
+    @JvmDefault
     fun <T : Any> emit(eventType: Any, event: T) {
         try {
             return emitOrThrow(eventType, event)
@@ -26,6 +28,7 @@ interface EventBus {
     }
 
     @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
+    @JvmDefault
     fun <T : Any> emitOrThrow(event: T) {
         return emitOrThrow(event.javaClass, event)
     }
@@ -36,7 +39,16 @@ interface EventBus {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        fun newEventBus(handlers: Map<Any, EventHandler<*>>): EventBus {
+            return newEventBus(handlers, Runner.SYNC_RUNNER)
+        }
+
+        @JvmStatic
+        fun newEventBus(handlers: Map<Any, EventHandler<*>>, executor: Executor = Runner.SYNC_RUNNER): EventBus {
+            return newEventBus(handlers, executor, true)
+        }
+
+        @JvmStatic
         fun newEventBus(
             handlers: Map<Any, EventHandler<*>>,
             executor: Executor = Runner.SYNC_RUNNER,

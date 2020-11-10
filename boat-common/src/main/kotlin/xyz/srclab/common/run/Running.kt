@@ -21,24 +21,28 @@ interface Running<V> : Future<V> {
         @JvmName("endTime") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val startMilliseconds: Long
         @JvmName("startMilliseconds") get() {
             return startTime.toInstant(ZoneOffset.UTC).toEpochMilli()
         }
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val endMilliseconds: Long
         @JvmName("endMilliseconds") get() {
             return endTime.toInstant(ZoneOffset.UTC).toEpochMilli()
         }
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val cost: Duration
         @JvmName("cost") get() {
             return Duration.between(startTime, endTime)
         }
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val costMillis: Long
         @JvmName("costMillis") get() {
             return cost.toMillis()
@@ -70,6 +74,7 @@ interface Running<V> : Future<V> {
      * while waiting
      * @throws TimeoutException if the wait timed out
      */
+    @JvmDefault
     fun get(duration: Duration): V {
         return get(duration.nano.toLong(), TimeUnit.NANOSECONDS)
     }

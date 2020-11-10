@@ -8,6 +8,7 @@ import xyz.srclab.common.state.State.Companion.stateToString
 
 interface ExceptionStatus : State<String, String, ExceptionStatus> {
 
+    @JvmDefault
     override fun withNewDescription(newDescription: String?): ExceptionStatus {
         return if (description == newDescription)
             this
@@ -15,6 +16,7 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
             of(code, newDescription)
     }
 
+    @JvmDefault
     override fun withMoreDescription(moreDescription: String?): ExceptionStatus {
         return if (moreDescription === null)
             this
@@ -31,7 +33,7 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
         val UNKNOWN = of("000001", "Unknown Error")
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun of(code: CharSequence, description: CharSequence? = null): ExceptionStatus {
             return ExceptionStatusImpl(code, description)
         }

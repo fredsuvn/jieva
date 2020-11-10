@@ -25,7 +25,7 @@ object Defaults {
 
     @JvmStatic
     @get:JvmName("concurrencyLevel")
-    val concurrencyLevel: Int = 16
+    val concurrencyLevel: Int = Environment.availableProcessors * 2
 
     @JvmStatic
     @get:JvmName("fileSeparator")

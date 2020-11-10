@@ -20,38 +20,47 @@ interface BeanResolver {
 
     fun resolveSchema(type: Type): BeanSchema
 
+    @JvmDefault
     fun asMap(bean: Any): MutableMap<String, Any?> {
         return asMap(bean, CopyOptions.DEFAULT)
     }
 
+    @JvmDefault
     fun asMap(bean: Any, copyOptions: CopyOptions): MutableMap<String, Any?> {
         return BeanAsMap(bean, resolveSchema(bean.javaClass).properties, copyOptions.converter)
     }
 
+    @JvmDefault
     fun <T : Any> copyProperties(from: Any, to: T): T {
         return copyProperties(from, to, CopyOptions.DEFAULT)
     }
 
+    @JvmDefault
     fun <T : Any> copyProperties(from: Any, to: T, converter: Converter): T {
         return copyProperties(from, to, CopyOptions.DEFAULT.withConverter(converter))
     }
 
+    @JvmDefault
     fun <T : Any> copyProperties(from: Any, to: T, fromType: Type, toType: Type, converter: Converter): T {
         return copyProperties(from, to, CopyOptions.DEFAULT.with(fromType, toType, converter))
     }
 
+    @JvmDefault
     fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T): T {
         return copyProperties(from, to, CopyOptions.IGNORE_NULL)
     }
 
+    @JvmDefault
     fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T, converter: Converter): T {
         return copyProperties(from, to, CopyOptions.IGNORE_NULL.withConverter(converter))
     }
 
+    @JvmDefault
     fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T, fromType: Type, toType: Type, converter: Converter): T {
         return copyProperties(from, to, CopyOptions.IGNORE_NULL.with(fromType, toType, converter))
     }
 
+    @JvmDefault
     fun <T : Any> copyProperties(from: Any, to: T, copyOptions: CopyOptions): T {
         return when {
             from is Map<*, *> && to is MutableMap<*, *> -> {
@@ -188,26 +197,32 @@ interface BeanResolver {
     interface CopyOptions {
 
         @Suppress(INAPPLICABLE_JVM_NAME)
+        @JvmDefault
         val fromType: Type?
             @JvmName("fromType") get() = null
 
         @Suppress(INAPPLICABLE_JVM_NAME)
+        @JvmDefault
         val toType: Type?
             @JvmName("toType") get() = null
 
         @Suppress(INAPPLICABLE_JVM_NAME)
+        @JvmDefault
         val converter: Converter
             @JvmName("converter") get() = Converter.DEFAULT
 
         @Suppress(INAPPLICABLE_JVM_NAME)
+        @JvmDefault
         val propertyTypeFilter: (name: Any?, nameType: Type, valueType: Type) -> Boolean
             @JvmName("propertyTypeFilter") get() = { _, _, _ -> true }
 
         @Suppress(INAPPLICABLE_JVM_NAME)
+        @JvmDefault
         val propertyValueFilter: (name: Any?, value: Any?, nameType: Type, valueType: Type) -> Boolean
             @JvmName("propertyValueFilter") get() = { _, _, _, _ -> true }
 
         @Suppress(INAPPLICABLE_JVM_NAME)
+        @JvmDefault
         val propertyConvertFilter: (
             name: Any?, value: Any?,
             nameType: Type, valueType: Type,
@@ -215,14 +230,17 @@ interface BeanResolver {
         ) -> Boolean
             @JvmName("propertyConvertFilter") get() = { _, _, _, _, _, _ -> true }
 
+        @JvmDefault
         fun withTypes(fromType: Type?, toType: Type?): CopyOptions {
             return with(fromType, toType, this.converter)
         }
 
+        @JvmDefault
         fun withConverter(converter: Converter): CopyOptions {
             return with(this.fromType, this.toType, converter)
         }
 
+        @JvmDefault
         fun with(fromType: Type?, toType: Type?, converter: Converter): CopyOptions {
             return object : CopyOptions by this {
                 override val fromType: Type? = fromType

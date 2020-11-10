@@ -29,12 +29,14 @@ interface Converter {
 
     fun <T> convert(from: Any?, toType: Type): T
 
+    @JvmDefault
     fun <T> convert(from: Any?, toTypeRef: TypeRef<T>): T {
         return convert(from, toTypeRef.type)
     }
 
     fun <T> convert(from: Any?, fromType: Type, toType: Type): T
 
+    @JvmDefault
     fun <T> convert(from: Any?, fromTypeRef: TypeRef<T>, toTypeRef: TypeRef<T>): T {
         return convert(from, fromTypeRef.type, toTypeRef.type)
     }

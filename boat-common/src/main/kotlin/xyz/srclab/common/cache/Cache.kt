@@ -5,6 +5,7 @@ import com.google.common.cache.RemovalListener
 import com.google.common.collect.MapMaker
 import xyz.srclab.common.base.ABSENT_VALUE
 import xyz.srclab.common.base.CachingProductBuilder
+import xyz.srclab.common.base.Defaults
 import xyz.srclab.common.base.asAny
 import java.time.Duration
 import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
@@ -21,6 +22,7 @@ import com.google.common.cache.RemovalCause as guavaRemovalCause
 interface Cache<K : Any, V> {
 
     @Throws(NoSuchElementException::class)
+    @JvmDefault
     fun get(key: K): V {
         val thisAs = this.asAny<Cache<K, Any>>()
         val value = thisAs.getOrElse(key, ABSENT_VALUE)
@@ -30,6 +32,7 @@ interface Cache<K : Any, V> {
         return value.asAny()
     }
 
+    @JvmDefault
     fun getOrNull(key: K): V? {
         val thisAs = this.asAny<Cache<K, Any>>()
         val value = thisAs.getOrElse(key, ABSENT_VALUE)
@@ -41,6 +44,7 @@ interface Cache<K : Any, V> {
 
     fun getOrElse(key: K, defaultValue: V): V
 
+    @JvmDefault
     fun getOrElse(key: K, defaultValue: (K) -> V): V {
         val thisAs = this.asAny<Cache<K, Any>>()
         val value = thisAs.getOrElse(key, ABSENT_VALUE)
@@ -52,6 +56,7 @@ interface Cache<K : Any, V> {
 
     fun getOrLoad(key: K, loader: (K) -> V): V
 
+    @JvmDefault
     fun getPresent(keys: Iterable<K>): Map<K, V> {
         val resultMap = mutableMapOf<K, V>()
         val thisAs = this.asAny<Cache<K, Any>>()
@@ -64,6 +69,7 @@ interface Cache<K : Any, V> {
         return resultMap.toMap()
     }
 
+    @JvmDefault
     fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
         val resultMap = mutableMapOf<K, V>()
         val thisAs = this.asAny<Cache<K, Any>>()
@@ -328,7 +334,7 @@ interface Cache<K : Any, V> {
          */
         @JvmStatic
         fun <K : Any, V> newFastCache(): Cache<K, V> {
-            return MapCache(MapMaker().weakValues().makeMap())
+            return MapCache(MapMaker().concurrencyLevel(Defaults.concurrencyLevel).weakValues().makeMap())
         }
     }
 }

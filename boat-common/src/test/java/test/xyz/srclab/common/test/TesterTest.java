@@ -38,4 +38,12 @@ public class TesterTest {
             return null;
         });
     }
+
+    private class A implements TestTask {
+
+        @Override
+        public void run() {
+
+        }
+    }
 }

@@ -101,8 +101,8 @@ private fun testTasks0(
 
 interface TestTask {
 
-    @JvmDefault
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val name: String
         @JvmName("name") get() = this.javaClass.name
 

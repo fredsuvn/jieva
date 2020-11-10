@@ -16,7 +16,12 @@ interface ProxyClass<T : Any> {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        fun <T : Any> newProxyClass(proxyClass: Class<T>, proxyMethods: Iterable<ProxyMethod<T>>): ProxyClass<T> {
+            return newProxyClass(Current.classLoader, proxyClass, proxyMethods)
+        }
+
+        @JvmStatic
+        //@JvmOverloads
         fun <T : Any> newProxyClass(
             classLoader: ClassLoader = Current.classLoader,
             proxyClass: Class<T>,
