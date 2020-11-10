@@ -5,16 +5,15 @@ interface Ref<T> : SimpleAccess<T> {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun <T> of(initial: T? = null): Ref<T> {
             return RefImpl(initial)
         }
-
-        @JvmStatic
-        fun <T> T.ref(): Ref<T> {
-            return of(this)
-        }
     }
+}
+
+fun <T> T.ref(): Ref<T> {
+    return Ref.of(this)
 }
 
 private class RefImpl<T>(private var value: T?) : Ref<T> {
@@ -37,16 +36,15 @@ interface BooleanRef {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun of(initial: Boolean = false): BooleanRef {
             return BooleanRefImpl(initial)
         }
-
-        @JvmStatic
-        fun Boolean.ref(): BooleanRef {
-            return of(this)
-        }
     }
+}
+
+fun Boolean.ref(): BooleanRef {
+    return BooleanRef.of(this)
 }
 
 private class BooleanRefImpl(private var value: Boolean) : BooleanRef {
@@ -69,16 +67,15 @@ interface ByteRef {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun of(initial: Byte = 0): ByteRef {
             return ByteRefImpl(initial)
         }
-
-        @JvmStatic
-        fun Byte.ref(): ByteRef {
-            return of(this)
-        }
     }
+}
+
+fun Byte.ref(): ByteRef {
+    return ByteRef.of(this)
 }
 
 private class ByteRefImpl(private var value: Byte) : ByteRef {
@@ -101,16 +98,15 @@ interface ShortRef {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun of(initial: Short = 0): ShortRef {
             return ShortRefImpl(initial)
         }
-
-        @JvmStatic
-        fun Short.ref(): ShortRef {
-            return of(this)
-        }
     }
+}
+
+fun Short.ref(): ShortRef {
+    return ShortRef.of(this)
 }
 
 private class ShortRefImpl(private var value: Short) : ShortRef {
@@ -133,16 +129,15 @@ interface CharRef {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun of(initial: Char = 0.toChar()): CharRef {
             return CharRefImpl(initial)
         }
-
-        @JvmStatic
-        fun Char.ref(): CharRef {
-            return of(this)
-        }
     }
+}
+
+fun Char.ref(): CharRef {
+    return CharRef.of(this)
 }
 
 private class CharRefImpl(private var value: Char) : CharRef {
@@ -165,16 +160,15 @@ interface IntRef {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun of(initial: Int = 0): IntRef {
             return IntRefImpl(initial)
         }
-
-        @JvmStatic
-        fun Int.ref(): IntRef {
-            return of(this)
-        }
     }
+}
+
+fun Int.ref(): IntRef {
+    return IntRef.of(this)
 }
 
 private class IntRefImpl(private var value: Int) : IntRef {
@@ -197,16 +191,15 @@ interface LongRef {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun of(initial: Long = 0L): LongRef {
             return LongRefImpl(initial)
         }
-
-        @JvmStatic
-        fun Long.ref(): LongRef {
-            return of(this)
-        }
     }
+}
+
+fun Long.ref(): LongRef {
+    return LongRef.of(this)
 }
 
 private class LongRefImpl(private var value: Long) : LongRef {
@@ -229,16 +222,15 @@ interface FloatRef {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun of(initial: Float = 0f): FloatRef {
             return FloatRefImpl(initial)
         }
-
-        @JvmStatic
-        fun Float.ref(): FloatRef {
-            return of(this)
-        }
     }
+}
+
+fun Float.ref(): FloatRef {
+    return FloatRef.of(this)
 }
 
 private class FloatRefImpl(private var value: Float) : FloatRef {
@@ -261,16 +253,15 @@ interface DoubleRef {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        //@JvmOverloads
         fun of(initial: Double = 0.0): DoubleRef {
             return DoubleRefImpl(initial)
         }
-
-        @JvmStatic
-        fun Double.ref(): DoubleRef {
-            return of(this)
-        }
     }
+}
+
+fun Double.ref(): DoubleRef {
+    return DoubleRef.of(this)
 }
 
 private class DoubleRefImpl(private var value: Double) : DoubleRef {

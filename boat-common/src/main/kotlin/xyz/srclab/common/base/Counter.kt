@@ -7,10 +7,12 @@ import java.util.concurrent.atomic.AtomicLong
  */
 interface Counter {
 
+    @JvmDefault
     fun getInt(): Int {
         return getLong().toInt()
     }
 
+    @JvmDefault
     fun setInt(value: Int) {
         setLong(value.toLong())
     }
@@ -19,24 +21,28 @@ interface Counter {
 
     fun setLong(value: Long)
 
+    @JvmDefault
     fun getAndAddInt(value: Int): Int {
         return getAndAddLong(value.toLong()).toInt()
     }
 
     fun getAndAddLong(value: Long): Long
 
+    @JvmDefault
     fun addAndGetInt(value: Int): Int {
         return addAndGetLong(value.toLong()).toInt()
     }
 
     fun addAndGetLong(value: Long): Long
 
+    @JvmDefault
     fun getAndIncrementInt(): Int {
         return getAndIncrementLong().toInt()
     }
 
     fun getAndIncrementLong(): Long
 
+    @JvmDefault
     fun incrementAndGetInt(): Int {
         return incrementAndGetLong().toInt()
     }
@@ -46,14 +52,24 @@ interface Counter {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
+        @JvmName("startsAt")
+        fun Int.counterStarts(): Counter {
+            return SimpleCounter(this.toLong())
+        }
+
+        @JvmStatic
         @JvmName("startsAt")
         fun Int.counterStarts(atomically: Boolean = false): Counter {
             return if (atomically) AtomicCounter(AtomicLong(this.toLong())) else SimpleCounter(this.toLong())
         }
 
         @JvmStatic
-        @JvmOverloads
+        @JvmName("startsAt")
+        fun Long.counterStarts(): Counter {
+            return SimpleCounter(this)
+        }
+
+        @JvmStatic
         @JvmName("startsAt")
         fun Long.counterStarts(atomically: Boolean = false): Counter {
             return if (atomically) AtomicCounter(AtomicLong(this)) else SimpleCounter(this)

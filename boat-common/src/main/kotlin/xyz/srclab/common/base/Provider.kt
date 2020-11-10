@@ -6,6 +6,7 @@ interface Provider<S, T : Any> {
 
     fun parse(spec: S): List<T>
 
+    @JvmDefault
     fun parseFirst(spec: S): T {
         return parseFirstOrNull(spec) ?: throw IllegalArgumentException("Illegal provider specification: $spec")
     }
@@ -15,27 +16,46 @@ interface Provider<S, T : Any> {
     companion object {
 
         @JvmStatic
-        @JvmOverloads
-        fun <T : Any> charsProvider(strictly: Boolean = false): CharsProvider<T> {
-            return if (strictly) StrictCharsProvider.ofType() else CharsProvider.ofType()
+        fun <T : Any> charsProvider(): CharsProvider<T> {
+            return CharsProvider.ofType()
         }
 
         @JvmStatic
-        @JvmOverloads
+        fun <T : Any> charsProvider(strict: Boolean = false): CharsProvider<T> {
+            return if (strict) StrictCharsProvider.ofType() else CharsProvider.ofType()
+        }
+
+        @JvmStatic
+        @JvmName("parse")
+        fun <T : Any> CharSequence.charsProviderParse(spec: CharSequence): List<T> {
+            return charsProvider<T>().parse(spec)
+        }
+
+        @JvmStatic
         @JvmName("parse")
         fun <T : Any> CharSequence.charsProviderParse(spec: CharSequence, strictly: Boolean = false): List<T> {
             return charsProvider<T>(strictly).parse(spec)
         }
 
         @JvmStatic
-        @JvmOverloads
+        @JvmName("parseFirst")
+        fun <T : Any> CharSequence.charsProviderParseFirst(spec: CharSequence): T {
+            return charsProvider<T>().parseFirst(spec)
+        }
+
+        @JvmStatic
         @JvmName("parseFirst")
         fun <T : Any> CharSequence.charsProviderParseFirst(spec: CharSequence, strictly: Boolean = false): T {
             return charsProvider<T>(strictly).parseFirst(spec)
         }
 
         @JvmStatic
-        @JvmOverloads
+        @JvmName("parseFirstOrNull")
+        fun <T : Any> CharSequence.charsProviderParseFirstOrNull(spec: CharSequence): T? {
+            return charsProvider<T>().parseFirstOrNull(spec)
+        }
+
+        @JvmStatic
         @JvmName("parseFirstOrNull")
         fun <T : Any> CharSequence.charsProviderParseFirstOrNull(spec: CharSequence, strictly: Boolean = false): T? {
             return charsProvider<T>(strictly).parseFirstOrNull(spec)

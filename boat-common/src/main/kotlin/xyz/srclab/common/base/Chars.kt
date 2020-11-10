@@ -3,9 +3,14 @@
 
 package xyz.srclab.common.base
 
+import org.apache.commons.lang3.StringUtils
 import java.nio.charset.Charset
 import java.util.*
 import kotlin.toString as toStringKt
+
+fun CharSequence?.isWhitespace(): Boolean {
+    return StringUtils.isWhitespace(this)
+}
 
 fun CharArray.toChars(): String {
     return String(this)

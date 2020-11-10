@@ -3,6 +3,7 @@
 
 package xyz.srclab.common.base
 
+import org.apache.commons.lang3.StringUtils
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.text.toBigDecimal as toBigDecimalKt
@@ -15,6 +16,14 @@ import kotlin.text.toLong as toLongKt
 import kotlin.text.toShort as toShortKt
 import kotlin.toBigDecimal as numberToBigDecimalKt
 import kotlin.toBigInteger as numberToBigIntegerKt
+
+fun CharSequence?.isNumeric(): Boolean {
+    return StringUtils.isNumeric(this)
+}
+
+fun CharSequence?.isNumericSpace(): Boolean {
+    return StringUtils.isNumericSpace(this)
+}
 
 @JvmOverloads
 fun CharSequence.toByte(radix: Int = Defaults.radix): Byte {

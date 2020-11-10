@@ -1,8 +1,6 @@
 package xyz.srclab.common.base
 
-import org.apache.commons.lang3.StringUtils
 import java.time.ZonedDateTime
-import java.util.regex.Pattern
 import kotlin.text.toInt as toIntKt
 
 interface About {
@@ -28,15 +26,18 @@ interface About {
         @JvmName("poweredBy") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
-    val report: String
-        @JvmName("report") get() {
-            return "${poweredBy.mail} or $url"
-        }
+    val releaseDate: ZonedDateTime
+        @JvmName("releaseDate") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val eggTips: String
-        @JvmName("eggTips") get
+    @JvmDefault
+    val help: String
+        @JvmName("help") get() = "$url/help"
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
+    val report: String
+        @JvmName("report") get() = "$url/report"
 
     companion object {
 
@@ -47,8 +48,9 @@ interface About {
             version: Version,
             licence: Licence,
             poweredBy: PoweredBy,
+            releaseDate: ZonedDateTime,
         ): About {
-            return newImpl(name, url, version, licence, poweredBy)
+            return AboutImpl(name, url, version, licence, poweredBy, releaseDate)
         }
 
         @JvmStatic
@@ -58,20 +60,11 @@ interface About {
             version: Version,
             licence: Licence,
             poweredBy: PoweredBy,
-            eggTips: String,
+            releaseDate: ZonedDateTime,
+            help: String,
+            report: String,
         ): About {
-            return newImpl(name, url, version, licence, poweredBy, eggTips)
-        }
-
-        private fun newImpl(
-            name: String,
-            url: String,
-            version: Version,
-            licence: Licence,
-            poweredBy: PoweredBy,
-            eggTips: String? = null,
-        ): About {
-            return AboutImpl(name, url, version, licence, poweredBy, eggTips ?: "None")
+            return AboutImpl(name, url, version, licence, poweredBy, releaseDate, help, report)
         }
 
         private class AboutImpl(
@@ -80,17 +73,29 @@ interface About {
             override val version: Version,
             override val licence: Licence,
             override val poweredBy: PoweredBy,
-            override val eggTips: String,
+            override val releaseDate: ZonedDateTime,
+            help: String? = null,
+            report: String? = null
         ) : About {
+
+            override val help: String = help ?: super.help
+            override val report: String = report ?: super.report
+
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
-                if (other !is About) return false
+                if (javaClass != other?.javaClass) return false
+
+                other as AboutImpl
+
                 if (name != other.name) return false
                 if (url != other.url) return false
                 if (version != other.version) return false
                 if (licence != other.licence) return false
                 if (poweredBy != other.poweredBy) return false
-                if (eggTips != other.eggTips) return false
+                if (releaseDate != other.releaseDate) return false
+                if (help != other.help) return false
+                if (report != other.report) return false
+
                 return true
             }
 
@@ -100,16 +105,18 @@ interface About {
                 result = 31 * result + version.hashCode()
                 result = 31 * result + licence.hashCode()
                 result = 31 * result + poweredBy.hashCode()
-                result = 31 * result + eggTips.hashCode()
+                result = 31 * result + releaseDate.hashCode()
+                result = 31 * result + help.hashCode()
+                result = 31 * result + report.hashCode()
                 return result
             }
 
             override fun toString(): String {
                 return """
-                    $name $version,release on ${version.releaseDate}
+                    $name $version, release on $releaseDate
                     $url
-                    Under the $licence
-                    Powered by $poweredBy
+                    Under the ${licence.name} licence
+                    Powered by ${poweredBy.name}
                 """.trimIndent()
             }
         }
@@ -117,10 +124,6 @@ interface About {
 }
 
 interface Version : Comparable<Version> {
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val releaseDate: ZonedDateTime
-        @JvmName("releaseDate") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val major: Int
@@ -135,15 +138,13 @@ interface Version : Comparable<Version> {
         @JvmName("patch") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val preRelease: List<Identifier>
+    val preRelease: List<PreReleaseIdentifier>
         @JvmName("preRelease") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
-    val preReleaseToString: String
-        @JvmName("preReleaseToString") get() {
-            return preRelease.joinToString("")
-        }
+    val preReleaseString: String
+        @JvmName("preReleaseString") get() = preRelease.joinToString(".")
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val buildMetadata: List<String>
@@ -151,26 +152,20 @@ interface Version : Comparable<Version> {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
-    val buildMetadataToString: String
-        @JvmName("buildMetadataToString") get() {
-            return buildMetadata.joinToString("")
-        }
+    val buildMetadataString: String
+        @JvmName("buildMetadataString") get() = buildMetadata.joinToString(".")
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val isNormal: Boolean
-        @JvmName("isNormal") get() {
-            return preRelease.isEmpty()
-        }
+        @JvmName("isNormal") get() = preRelease.isEmpty()
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val isPreRelease: Boolean
-        @JvmName("isPreRelease") get() {
-            return preRelease.isNotEmpty()
-        }
+        @JvmName("isPreRelease") get() = preRelease.isNotEmpty()
 
-    interface Identifier {
+    interface PreReleaseIdentifier {
 
         val isNumeric: Boolean
 
@@ -180,19 +175,18 @@ interface Version : Comparable<Version> {
 
         companion object {
 
-            internal fun of(value: Int): Identifier {
+            internal fun of(value: Int): PreReleaseIdentifier {
                 return NumericIdentifier(value)
             }
 
-            internal fun of(value: CharSequence): Identifier {
-                if (StringUtils.isNumeric(value)) {
+            internal fun of(value: CharSequence): PreReleaseIdentifier {
+                if (value.isNumeric()) {
                     return of(value.toString().toIntKt())
                 }
-                checkIdentifierPattern(value)
                 return StringIdentifier(value)
             }
 
-            private class NumericIdentifier(private val value: Int) : Identifier {
+            private class NumericIdentifier(private val value: Int) : PreReleaseIdentifier {
                 override val isNumeric: Boolean = true
                 override fun toNumber(): Int = value
                 override fun toString(): String = value.toString()
@@ -213,9 +207,9 @@ interface Version : Comparable<Version> {
                 }
             }
 
-            private class StringIdentifier(private val value: CharSequence) : Identifier {
+            private class StringIdentifier(private val value: CharSequence) : PreReleaseIdentifier {
                 override val isNumeric: Boolean = false
-                override fun toNumber(): Int = throw IllegalStateException("This Version.Identifier is not numeric.")
+                override fun toNumber(): Int = throw IllegalStateException("Not a numeric pre-release identifier.")
                 override fun toString(): String = value.toString()
 
                 override fun equals(other: Any?): Boolean {
@@ -238,16 +232,11 @@ interface Version : Comparable<Version> {
 
     class Builder {
 
-        private var releaseDate: ZonedDateTime = ZonedDateTime.now()
         private var major = 0
         private var minor = 0
         private var patch = 0
-        private var preRelease: MutableList<Identifier>? = null
+        private var preRelease: MutableList<PreReleaseIdentifier>? = null
         private var buildMetadata: MutableList<String>? = null
-
-        fun releaseDate(value: ZonedDateTime) = apply {
-            releaseDate = value
-        }
 
         fun major(value: Int) = apply {
             checkArgument(value >= 0, "Major value should be non-negative.")
@@ -264,23 +253,7 @@ interface Version : Comparable<Version> {
             patch = value
         }
 
-        fun addPreRelease(value: Int) = apply {
-            val identifier = Identifier.of(value)
-            if (preRelease === null) {
-                preRelease = mutableListOf()
-            }
-            preRelease?.add(identifier)
-        }
-
-        fun addPreRelease(value: CharSequence) = apply {
-            val identifier = Identifier.of(value)
-            if (preRelease === null) {
-                preRelease = mutableListOf()
-            }
-            preRelease?.add(identifier)
-        }
-
-        fun addPreRelease(values: List<Any>) = apply {
+        fun preRelease(values: List<Any>) = apply {
             for (value in values) {
                 if (value is Number) {
                     addPreRelease(value.toInt())
@@ -290,23 +263,42 @@ interface Version : Comparable<Version> {
             }
         }
 
-        fun addBuildMetadata(value: CharSequence) = apply {
-            checkIdentifierPattern(value)
-            if (buildMetadata === null) {
-                buildMetadata = mutableListOf()
-            }
-            buildMetadata?.add(value.toString())
+        fun addPreRelease(value: Int) = apply {
+            val identifier = PreReleaseIdentifier.of(value)
+            val list = preRelease ?: mutableListOf()
+            list.add(identifier)
+            preRelease = list
         }
 
-        fun addBuildMetadata(values: List<CharSequence>) = apply {
+        fun addPreRelease(value: CharSequence) = apply {
+            checkArgument(
+                value.matches(identifierPattern),
+                "Pre-release identifier should be ${identifierPattern.pattern}"
+            )
+            val identifier = PreReleaseIdentifier.of(value)
+            val list = preRelease ?: mutableListOf()
+            list.add(identifier)
+            preRelease = list
+        }
+
+        fun buildMetadata(values: List<CharSequence>) = apply {
             for (value in values) {
                 addBuildMetadata(value)
             }
         }
 
+        fun addBuildMetadata(value: CharSequence) = apply {
+            checkArgument(
+                value.matches(identifierPattern),
+                "Build metadata identifier should be ${identifierPattern.pattern}"
+            )
+            val list = buildMetadata ?: mutableListOf()
+            list.add(value.toString())
+            buildMetadata = list
+        }
+
         fun build(): Version {
             return VersionImpl(
-                releaseDate,
                 major,
                 minor,
                 patch,
@@ -316,11 +308,10 @@ interface Version : Comparable<Version> {
         }
 
         private class VersionImpl(
-            override val releaseDate: ZonedDateTime,
             override val major: Int,
             override val minor: Int,
             override val patch: Int,
-            override val preRelease: List<Identifier>,
+            override val preRelease: List<PreReleaseIdentifier>,
             override val buildMetadata: List<String>,
         ) : Version {
 
@@ -373,11 +364,11 @@ interface Version : Comparable<Version> {
                         if (preV.toNumber() < otherPreV.toNumber()) {
                             return -1
                         }
-                        if (preV.toNumber() == otherPreV.toNumber()) {
-                            return 0
-                        }
                     }
-                    return preV.toString().compareTo(otherPreV.toString())
+                    val stringCompare = preV.toString().compareTo(otherPreV.toString())
+                    if (stringCompare != 0) {
+                        return stringCompare
+                    }
                 }
                 if (otherPreIt.hasNext()) {
                     return -1
@@ -387,11 +378,16 @@ interface Version : Comparable<Version> {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
-                if (other !is Version) return false
+                if (javaClass != other?.javaClass) return false
+
+                other as VersionImpl
+
                 if (major != other.major) return false
                 if (minor != other.minor) return false
                 if (patch != other.patch) return false
                 if (preRelease != other.preRelease) return false
+                if (buildMetadata != other.buildMetadata) return false
+
                 return true
             }
 
@@ -400,46 +396,47 @@ interface Version : Comparable<Version> {
                 result = 31 * result + minor
                 result = 31 * result + patch
                 result = 31 * result + preRelease.hashCode()
+                result = 31 * result + buildMetadata.hashCode()
                 return result
             }
 
             override fun toString(): String {
                 val buffer = StringBuilder("$major.$minor.$patch")
                 if (preRelease.isNotEmpty()) {
-                    buffer.append("-$preRelease")
+                    buffer.append("-$preReleaseString")
                 }
                 if (buildMetadata.isNotEmpty()) {
-                    buffer.append("+$buildMetadata")
+                    buffer.append("+$buildMetadataString")
                 }
                 return buffer.toString()
             }
+        }
+
+        companion object {
+            private val identifierPattern = "[0-9A-Za-z-]".toRegex()
         }
     }
 
     companion object {
 
-        val IDENTIFIER_PATTERN: Pattern = Pattern.compile("[0-9A-Za-z-]+")
+        @JvmStatic
+        fun of(major: Int, minor: Int, patch: Int): Version {
+            return of(major, minor, patch, emptyList())
+        }
 
         @JvmStatic
-        fun identifierPattern(): Pattern = IDENTIFIER_PATTERN
+        fun of(major: Int, minor: Int, patch: Int, preRelease: List<Any>): Version {
+            return of(major, minor, patch, preRelease, emptyList())
+        }
 
         @JvmStatic
-        @JvmOverloads
-        fun of(
-            releaseDate: ZonedDateTime = ZonedDateTime.now(),
-            major: Int,
-            minor: Int,
-            patch: Int,
-            preRelease: List<Any> = emptyList(),
-            buildMetadata: List<String> = emptyList(),
-        ): Version {
+        fun of(major: Int, minor: Int, patch: Int, preRelease: List<Any>, buildMetadata: List<String>): Version {
             return Builder()
-                .releaseDate(releaseDate)
                 .major(major)
                 .minor(minor)
                 .patch(patch)
-                .addPreRelease(preRelease)
-                .addBuildMetadata(buildMetadata)
+                .preRelease(preRelease)
+                .buildMetadata(buildMetadata)
                 .build()
         }
 
@@ -451,43 +448,31 @@ interface Version : Comparable<Version> {
                 val list = subSpec.split(".")
                 checkArgument(
                     list.size in 1..3,
-                    "Semantic version need 1-3 dot separated parts: x[.y[.z]], now is {}.", list.size
+                    "Semantic version need 1-3 dot separated parts: x[.y[.z]]."
                 )
                 val major = list[0].let {
-                    val result = try {
+                    try {
                         it.toIntKt()
                     } catch (e: Exception) {
                         throw IllegalArgumentException("Wrong major: $it", e)
                     }
-                    if (result < 0) {
-                        throw IllegalArgumentException("Major must be non-negative integer: $result")
-                    }
-                    result
                 }
                 val minor = if (list.size < 2) 0 else {
                     list[1].let {
-                        val result = try {
+                        try {
                             it.toIntKt()
                         } catch (e: Exception) {
                             throw IllegalArgumentException("Wrong minor: $it", e)
                         }
-                        if (result < 0) {
-                            throw IllegalArgumentException("Minor must be non-negative integer: $result")
-                        }
-                        result
                     }
                 }
                 val patch = if (list.size < 3) 0 else {
                     list[2].let {
-                        val result = try {
+                        try {
                             it.toIntKt()
                         } catch (e: Exception) {
                             throw IllegalArgumentException("Wrong patch: $it", e)
                         }
-                        if (result < 0) {
-                            throw IllegalArgumentException("Patch must be non-negative integer: $result")
-                        }
-                        result
                     }
                 }
                 builder.major(major)
@@ -497,16 +482,12 @@ interface Version : Comparable<Version> {
 
             fun parsePreVersion(subSpec: CharSequence, builder: Builder) {
                 val list = subSpec.split(".")
-                for (s in list) {
-                    builder.addPreRelease(s)
-                }
+                builder.preRelease(list)
             }
 
             fun parseBuildMetadata(subSpec: CharSequence, builder: Builder) {
                 val list = subSpec.split(".")
-                for (s in list) {
-                    builder.addBuildMetadata(s)
-                }
+                builder.buildMetadata(list)
             }
 
             val hyphenCount = HYPHEN_MATCHER.countIn(this)
@@ -540,23 +521,16 @@ interface Version : Comparable<Version> {
                 }
                 hyphenIndex < 0 && plusSignIndex > 0 -> {
                     parseNormal(this.subSequence(0, plusSignIndex), builder)
-                    parsePreVersion(this.subSequence(plusSignIndex + 1, this.length), builder)
+                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length), builder)
                 }
                 hyphenIndex > 0 && plusSignIndex > 0 && (plusSignIndex - hyphenIndex > 1) -> {
                     parseNormal(this.subSequence(0, hyphenIndex), builder)
                     parsePreVersion(this.subSequence(hyphenIndex + 1, plusSignIndex), builder)
-                    parsePreVersion(this.subSequence(plusSignIndex + 1, this.length), builder)
+                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length), builder)
                 }
                 else -> throw IllegalArgumentException("Illegal version specification: $this")
             }
             return builder.build()
-        }
-
-        private fun checkIdentifierPattern(value: CharSequence) {
-            checkArgument(
-                IDENTIFIER_PATTERN.matcher(value).matches(),
-                "Value of Version.Identifier should be ${IDENTIFIER_PATTERN.pattern()}."
-            )
         }
     }
 }
@@ -572,10 +546,16 @@ interface Licence {
         @JvmName("url") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @JvmDefault
     val content: String
-        @JvmName("content") get
+        @JvmName("content") get() = url
 
     companion object {
+
+        @JvmStatic
+        fun of(name: String, url: String): Licence {
+            return LicenceImpl(name, url)
+        }
 
         @JvmStatic
         fun of(name: String, url: String, content: String): Licence {
@@ -583,8 +563,13 @@ interface Licence {
         }
 
         private class LicenceImpl(
-            override val name: String, override val url: String, override val content: String
+            override val name: String,
+            override val url: String,
+            content: String? = null,
         ) : Licence {
+
+            override val content: String = content ?: super.content
+
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is Licence) return false
@@ -630,8 +615,11 @@ interface PoweredBy {
         }
 
         private class PoweredByImpl(
-            override val name: String, override val url: String, override val mail: String
+            override val name: String,
+            override val url: String,
+            override val mail: String,
         ) : PoweredBy {
+
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is PoweredBy) return false
@@ -649,7 +637,11 @@ interface PoweredBy {
             }
 
             override fun toString(): String {
-                return "$name[$mail, $url]"
+                return """
+                    $name
+                    $mail
+                    $url
+                """.trimIndent()
             }
         }
     }
