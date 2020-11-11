@@ -2,7 +2,7 @@ plugins {
     id 'java-platform'
 }
 
-description = "Boat Project BOM"
+description = "boat-bom: BOM of boat projects."
 
 ext {
     libVersions = [
@@ -18,8 +18,6 @@ javaPlatform {
 
 dependencies {
     api platform("xyz.srclab.bom:srclab-dependencies:${libVersions.dependenciesVersion}")
-
-    api("org.jetbrains.kotlin:kotlin-annotations-jvm:$kotlinVersion")
 
     constraints {
         file("${rootDir}").eachDirMatch(~/boat-.*/) { file ->

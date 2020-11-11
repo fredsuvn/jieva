@@ -1,32 +1,31 @@
-ext {
-    versions = [
-            snapshot     : "0",
-            group        : "xyz.srclab.common",
-            url          : "https://github.com/srclab-projects/boat",
-            inceptionYear: "2020",
-            licenses     : [
-                    [
-                            name: "The Apache License, Version 2.0",
-                            url : "http://www.apache.org/licenses/LICENSE-2.0.txt",
-                    ],
-            ],
-            oss          : [
-                    staging : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
-                    snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
-            ],
-            developers   : [
-                    [
-                            id   : "fredsuvn",
-                            name : "孙谦",
-                            email: "fredsuvn@163.com",
-                            url  : "https://github.com/fredsuvn",
-                    ],
-                    [
-                            id             : "SrcLab",
-                            name           : "SrcLab Team",
-                            organization   : "SrcLab",
-                            organizationUrl: "https://github.com/srclab-projects",
-                    ],
-            ],
-    ]
-}
+ext["versions"] = [
+        snapshot     : "0",
+        group        : "xyz.srclab.common",
+        url          : "https://github.com/srclab-projects/boat",
+        inceptionYear: "2020",
+        licenses     : [
+                [
+                        name: "The Apache License, Version 2.0",
+                        url : "http://www.apache.org/licenses/LICENSE-2.0.txt",
+                ],
+        ],
+        oss          : [
+                staging : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
+                snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
+        ],
+        developers   : [
+                [
+                        id   : "fredsuvn",
+                        name : "孙谦",
+                        email: "fredsuvn@163.com",
+                        url  : "https://github.com/fredsuvn",
+                ],
+                [
+                        id             : "SrcLab",
+                        name           : "SrcLab Team",
+                        email          : "srclab@163.com",
+                        organization   : "SrcLab",
+                        organizationUrl: "https://github.com/srclab-projects",
+                ],
+        ],
+]
