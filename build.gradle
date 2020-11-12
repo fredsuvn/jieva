@@ -1,43 +1,41 @@
-description = "Easy for Common: Build"
+description = "Build for boat projects"
 
 // Gradle files to be applied:
-ext {
-    gradles = [
-            utils         : "${rootProject.rootDir}/buildSrc/utils.gradle",
-            repositories  : "${rootProject.rootDir}/buildSrc/repositories.gradle",
-            deployJar     : "${rootProject.rootDir}/buildSrc/deploy-jar.gradle",
-            deployPlatform: "${rootProject.rootDir}/buildSrc/deploy-platform.gradle",
-            compile       : "${rootProject.rootDir}/buildSrc/compile.gradle",
-            passwords     : "${rootProject.rootDir}/buildSrc/passwords.gradle",
-            versions      : "${rootProject.rootDir}/buildSrc/versions.gradle",
-    ]
-}
+ext["gradles"] = [
+    utils         : "${rootProject.rootDir}/buildSrc/utils.gradle",
+    repositories  : "${rootProject.rootDir}/buildSrc/repositories.gradle",
+    deployJar     : "${rootProject.rootDir}/buildSrc/deploy-jar.gradle",
+    deployPlatform: "${rootProject.rootDir}/buildSrc/deploy-platform.gradle",
+    compile       : "${rootProject.rootDir}/buildSrc/compile.gradle",
+    passwords     : "${rootProject.rootDir}/buildSrc/passwords.gradle",
+    infos         : "${rootProject.rootDir}/buildSrc/infos.gradle",
+]
 
 apply from: gradles.utils
-apply from: gradles.versions
+apply from: gradles.infos
 
-ext {
-    isSnapshot = isEnable(version)
+if (utils.needLoginSigning) {
+  apply from: gradles.passwords
 }
 
-apply from: gradles.passwords
-
 allprojects { p ->
-    processProject(p)
+  //Do for each project
+  processProject(p)
 }
 
 subprojects { p ->
+  //Do for each project
 }
 
 tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+  options.encoding = "UTF-8"
 }
 
-def processProject(Project project) {
-    project.group = versions.group
-    if (project == rootProject) {
-        println("Configure root ${project.group}:${project.name}:${project.version}")
-    } else {
-        println("Configure ${project.group}:${project.name}:${project.version}")
-    }
+def processProject(anyProject) {
+  anyProject.group = infos.group
+  if (anyProject == rootProject) {
+    println("Configure root ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+  } else {
+    println("Configure sub  ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+  }
 }

@@ -1,17 +1,17 @@
 pluginManagement {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    plugins {
-        id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
-    }
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    gradlePluginPortal()
+  }
+  plugins {
+    id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
+  }
 }
 
 rootProject.name = 'boat-build'
 
-// SrcLab Common projects
+//Including boat projects
 file("${rootDir}/").eachDirMatch(~/boat-.*/) { file ->
-    include ":${file.name}"
+  include ":${file.name}"
 }

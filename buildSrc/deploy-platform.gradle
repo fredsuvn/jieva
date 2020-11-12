@@ -2,63 +2,64 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.javaPlatform
+  publications {
+    maven(MavenPublication) {
+      from components.javaPlatform
 
-            pom {
-                name = project.name
-                description = project.description
-                url = versions.url
-                inceptionYear = versions.inceptionYear
-                licenses {
-                    versions.licenses.forEach { each ->
-                        license {
-                            name = each.name
-                            url = each.url
-                        }
-                    }
-                }
-                scm {
-                    connection = "scm:git:${versions.url}.git"
-                    developerConnection = "scm:git:${versions.url}.git"
-                    url = versions.url
-                }
-                developers {
-                    versions.developers.forEach { each ->
-                        developer {
-                            email = each.email
-                        }
-                    }
-                }
+      pom {
+        name = project.name
+        description = project.description
+        url = infos.url
+        inceptionYear = infos.inceptionYear
+        licenses {
+          infos.licenses.forEach { each ->
+            license {
+              name = each.name
+              url = each.url
             }
+          }
         }
-    }
-
-    repositories {
-        mavenLocal()
-
-        maven {
-            name = "sonatype"
-            url = versions.oss.staging
-            credentials {
-                username = "${passwords.sonatype.username}"
-                password = "${passwords.sonatype.password}"
+        scm {
+          connection = "scm:git:${infos.url}.git"
+          developerConnection = "scm:git:${infos.url}.git"
+          url = infos.url
+        }
+        developers {
+          infos.developers.forEach { each ->
+            developer {
+              email = each.email
             }
+          }
         }
-        maven {
-            name = "sonatypeSnapshot"
-            url = versions.oss.snapshot
-            credentials {
-                username = "${passwords.sonatype.username}"
-                password = "${passwords.sonatype.password}"
-            }
-        }
+      }
     }
+  }
 
-    if (!isSnapshot) {
-        signing {
-            sign publishing.publications.maven
+  repositories {
+    mavenLocal()
+    if (infos.needLoginSigning) {
+      maven {
+        name = "sonatype"
+        url = infos.oss.staging
+        credentials {
+          username = "${passwords.sonatype.username}"
+          password = "${passwords.sonatype.password}"
         }
+      }
+      maven {
+        name = "sonatypeSnapshot"
+        url = infos.oss.snapshot
+        credentials {
+          username = "${passwords.sonatype.username}"
+          password = "${passwords.sonatype.password}"
+        }
+      }
     }
+  }
+
+  if (infos.snapshot) {
+    signing {
+      sign publishing.publications.maven
+    }
+  }
 }

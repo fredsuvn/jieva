@@ -1,25 +1,30 @@
 /*
- * Utilities for build.
+ * Build utils.
  */
 
-static def isEnable(String string) {
-	return string != null && (
-			string.equalsIgnoreCase("true")
-					|| string.equalsIgnoreCase("yes")
-					|| string.equalsIgnoreCase("1")
-					|| string.equalsIgnoreCase("t")
-					|| string.equalsIgnoreCase("open")
-					|| string.equalsIgnoreCase("enbale")
-	)
+static boolean isEnable(Object value) {
+  if (value == null) {
+    return false
+  }
+  if (value instanceof Boolean) {
+    return value
+  }
+  String valueToString = value.toString()
+  return valueToString.equalsIgnoreCase("true") ||
+      valueToString.equalsIgnoreCase("yes") ||
+      valueToString.equalsIgnoreCase("1") ||
+      valueToString.equalsIgnoreCase("t") ||
+      valueToString.equalsIgnoreCase("open") ||
+      valueToString.equalsIgnoreCase("enbale")
 }
 
 static def currentGradleDirectoryPath(buildscript) {
-	java.nio.file.Path sourcePath = buildscript.sourceFile.toPath()
-	def parent = sourcePath.getParent()
-	return parent.toString() + File.separator
+  java.nio.file.Path sourcePath = buildscript.sourceFile.toPath()
+  def parent = sourcePath.getParent()
+  return parent.toString() + File.separator
 }
 
-ext {
-	isEnable = this.&isEnable
-	currentGradleDirectoryPath = this.&currentGradleDirectoryPath
-}
+ext["utils"] = [
+    isEnable                  : this.&isEnable,
+    currentGradleDirectoryPath: this.&currentGradleDirectoryPath,
+]

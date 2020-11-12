@@ -1,4 +1,11 @@
 repositories {
-    mavenLocal()
-    mavenCentral()
+
+  //Local
+  mavenLocal()
+
+  //Maven center
+  mavenCentral()
+
+  //Jcenter
+  jcenter()
 }

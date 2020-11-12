@@ -2,86 +2,88 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 task sourceJar(type: Jar) {
-    classifier "sources"
-    from sourceSets.main.allJava
+  classifier "sources"
+  from sourceSets.main.allJava
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier "javadoc"
-    from javadoc.destinationDir
+  classifier "javadoc"
+  from javadoc.destinationDir
 }
 
 artifacts {
-    archives jar
-    archives sourceJar
-    archives javadocJar
+  archives jar
+  archives sourceJar
+  archives javadocJar
 }
 
 publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
+  publications {
+    maven(MavenPublication) {
+      from components.java
 
-            artifact(sourceJar) {
-                classifier = 'sources'
-            }
-            artifact(javadocJar) {
-                classifier = 'javadoc'
-            }
+      artifact(sourceJar) {
+        classifier = 'sources'
+      }
 
-            pom {
-                name = project.name
-                description = project.description
-                url = versions.url
-                inceptionYear = versions.inceptionYear
-                licenses {
-                    versions.licenses.forEach { each ->
-                        license {
-                            name = each.name
-                            url = each.url
-                        }
-                    }
-                }
-                scm {
-                    connection = "scm:git:${versions.url}.git"
-                    developerConnection = "scm:git:${versions.url}.git"
-                    url = versions.url
-                }
-                developers {
-                    versions.developers.forEach { each ->
-                        developer {
-                            email = each.email
-                        }
-                    }
-                }
+      artifact(javadocJar) {
+        classifier = 'javadoc'
+      }
+
+      pom {
+        name = project.name
+        description = project.description
+        url = infos.url
+        inceptionYear = infos.inceptionYear
+        licenses {
+          infos.licenses.forEach { each ->
+            license {
+              name = each.name
+              url = each.url
             }
+          }
         }
+        scm {
+          connection = "scm:git:${infos.url}.git"
+          developerConnection = "scm:git:${infos.url}.git"
+          url = infos.url
+        }
+        developers {
+          infos.developers.forEach { each ->
+            developer {
+              email = each.email
+            }
+          }
+        }
+      }
     }
+  }
 
-    repositories {
-        mavenLocal()
-
-        maven {
-            name = "sonatype"
-            url = versions.oss.staging
-            credentials {
-                username = "${passwords.sonatype.username}"
-                password = "${passwords.sonatype.password}"
-            }
+  repositories {
+    mavenLocal()
+    if (infos.needLoginSigning) {
+      maven {
+        name = "sonatype"
+        url = infos.oss.staging
+        credentials {
+          username = "${passwords.sonatype.username}"
+          password = "${passwords.sonatype.password}"
         }
-        maven {
-            name = "sonatypeSnapshot"
-            url = versions.oss.snapshot
-            credentials {
-                username = "${passwords.sonatype.username}"
-                password = "${passwords.sonatype.password}"
-            }
+      }
+      maven {
+        name = "sonatypeSnapshot"
+        url = infos.oss.snapshot
+        credentials {
+          username = "${passwords.sonatype.username}"
+          password = "${passwords.sonatype.password}"
         }
+      }
     }
+  }
 
-    if (!isSnapshot) {
-        signing {
-            sign publishing.publications.maven
-        }
+  if (infos.snapshot) {
+    signing {
+      sign publishing.publications.maven
     }
+  }
 }

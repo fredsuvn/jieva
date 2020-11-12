@@ -1,12 +1,12 @@
 compileKotlin {
-    kotlinOptions {
-        jvmTarget = "${javaVersion}"
-        freeCompilerArgs = ['-Xjvm-default=enable']
-    }
+  kotlinOptions {
+    jvmTarget = "${javaVersion}"
+    freeCompilerArgs = ['-Xjvm-default=enable']
+  }
 }
 compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "${javaVersion}"
-        freeCompilerArgs = ['-Xjvm-default=enable']
-    }
+  kotlinOptions {
+    jvmTarget = "${javaVersion}"
+    freeCompilerArgs = ['-Xjvm-default=enable']
+  }
 }
