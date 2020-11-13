@@ -1533,20 +1533,20 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         @JvmStatic
         fun <T> Sequence<T>.toArray(): Array<Any?> {
             val list = this.toList()
-            return JavaCollectionOps.toArray(list)
+            return JavaCollectionKit.toArray(list)
         }
 
         @JvmStatic
         fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
             val list = this.toList()
-            return JavaCollectionOps.toArray(list, generator(list.size))
+            return JavaCollectionKit.toArray(list, generator(list.size))
         }
 
         @JvmStatic
         fun <T> Sequence<T>.toArray(componentType: Class<*>): Array<T> {
             val list = this.toList()
             val array: Array<T> = componentType.componentTypeToArray(0)
-            return JavaCollectionOps.toArray(list, array)
+            return JavaCollectionKit.toArray(list, array)
         }
 
         @JvmStatic

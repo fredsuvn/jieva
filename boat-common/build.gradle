@@ -5,7 +5,6 @@ plugins {
 description = "Boat Common: common-lang like tools."
 
 apply from: gradles.compile
-
 apply from: gradles.repositories
 
 java {

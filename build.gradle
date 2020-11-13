@@ -3,12 +3,12 @@ description = "Build for boat projects"
 // Gradle files to be applied:
 ext["gradles"] = [
     utils         : "${rootProject.rootDir}/buildSrc/utils.gradle",
+    infos         : "${rootProject.rootDir}/buildSrc/infos.gradle",
     repositories  : "${rootProject.rootDir}/buildSrc/repositories.gradle",
     deployJar     : "${rootProject.rootDir}/buildSrc/deploy-jar.gradle",
     deployPlatform: "${rootProject.rootDir}/buildSrc/deploy-platform.gradle",
     compile       : "${rootProject.rootDir}/buildSrc/compile.gradle",
     passwords     : "${rootProject.rootDir}/buildSrc/passwords.gradle",
-    infos         : "${rootProject.rootDir}/buildSrc/infos.gradle",
 ]
 
 apply from: gradles.utils
@@ -33,6 +33,7 @@ tasks.withType(JavaCompile) {
 
 def processProject(anyProject) {
   anyProject.group = infos.group
+  anyProject.version = infos.version
   if (anyProject == rootProject) {
     println("Configure root ${anyProject.group}:${anyProject.name}:${anyProject.version}")
   } else {

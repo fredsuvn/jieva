@@ -1,9 +1,11 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
+println ">>>${project.name}"
+
 task sourceJar(type: Jar) {
   classifier "sources"
-  from sourceSets.main.allJava
+  from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -61,7 +63,7 @@ publishing {
 
   repositories {
     mavenLocal()
-    if (infos.needLoginSigning) {
+    if (infos.sonatype) {
       maven {
         name = "sonatype"
         url = infos.oss.staging
@@ -70,18 +72,20 @@ publishing {
           password = "${passwords.sonatype.password}"
         }
       }
-      maven {
-        name = "sonatypeSnapshot"
-        url = infos.oss.snapshot
-        credentials {
-          username = "${passwords.sonatype.username}"
-          password = "${passwords.sonatype.password}"
+      if (infos.snapshot) {
+        maven {
+          name = "sonatypeSnapshot"
+          url = infos.oss.snapshot
+          credentials {
+            username = "${passwords.sonatype.username}"
+            password = "${passwords.sonatype.password}"
+          }
         }
       }
     }
   }
 
-  if (infos.snapshot) {
+  if (infos.signing) {
     signing {
       sign publishing.publications.maven
     }

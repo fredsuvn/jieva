@@ -5,7 +5,7 @@ import java.util.Collection;
 /**
  * @author sunqian
  */
-final class JavaCollectionOps {
+public class JavaCollectionKit {
 
     static Object[] toArray(Collection<?> collection) {
         return collection.toArray();
