@@ -14,7 +14,7 @@ fun <T> Class<T>.findConstructor(vararg parameterTypes: Class<*>): Constructor<T
     }
 }
 
-fun <T> Class<T>.findConstructors(vararg parameterTypes: Class<*>): List<Constructor<T>> {
+fun <T> Class<T>.findConstructors(): List<Constructor<T>> {
     return this.constructors.asList().asAny()
 }
 
@@ -26,7 +26,7 @@ fun <T> Class<T>.findDeclaredConstructor(vararg parameterTypes: Class<*>): Const
     }
 }
 
-fun <T> Class<T>.findDeclaredConstructors(vararg parameterTypes: Class<*>): List<Constructor<T>> {
+fun <T> Class<T>.findDeclaredConstructors(): List<Constructor<T>> {
     return this.declaredConstructors.asList().asAny()
 }
 
