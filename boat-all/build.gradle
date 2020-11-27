@@ -1,33 +1,21 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
+  id 'build.kotlin-publish-jar'
 }
 
-description = "Boat All"
-
-apply from: gradles.compile
-
-apply from: gradles.repositories
+description = "Boat: base and common tools."
 
 java {
-    registerFeature('optionalSupport') {
-        usingSourceSet(sourceSets.main)
-    }
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
 }
 
 dependencies {
-    implementation(platform(project(":boat-bom")))
+  implementation(platform(project(":boat-bom")))
 
-    api(project(":boat-common"))
-    api(project(":boat-codec"))
-    api(project(":boat-jackson"))
-    api(project(":boat-id"))
-
-    testCompile(project(":boat-test"))
+  api(project(":boat-common"))
+  api(project(":boat-codec"))
+  api(project(":boat-data"))
+  api(project(":boat-id"))
+  api(project(":boat-egg"))
 }
-
-test {
-    useTestNG()
-    include("**/*Test.class")
-}
-
-apply from: gradles.deployJar

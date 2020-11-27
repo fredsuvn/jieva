@@ -1,30 +1,24 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm"
+  id 'build.kotlin-publish-jar'
 }
 
-description = "Boat Codec"
-
-apply from: gradles.compile
-
-apply from: gradles.repositories
+description = "Boat Codec: codec processors."
 
 java {
-    registerFeature('optionalSupport') {
-        usingSourceSet(sourceSets.main)
-    }
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
 }
 
 dependencies {
-    implementation(platform(project(":boat-bom")))
+  implementation(platform(project(":boat-bom")))
 
-    api(project(":boat-common"))
+  api(project(":boat-common"))
 
-    testCompile(project(":boat-test"))
+  testCompile(project(":boat-test"))
 }
 
 test {
-    useTestNG()
-    include("**/*Test.class")
+  useTestNG()
+  include("**/*Test.class", "**/*TestKt.class")
 }
-
-apply from: gradles.deployJar

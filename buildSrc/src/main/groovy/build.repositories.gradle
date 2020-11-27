@@ -1,11 +1,5 @@
 repositories {
-
-  //Local
   mavenLocal()
-
-  //Maven center
   mavenCentral()
-
-  //Jcenter
   jcenter()
 }

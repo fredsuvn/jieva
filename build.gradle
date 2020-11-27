@@ -1,31 +1,20 @@
+plugins {
+  id 'build.common'
+}
+
 description = "Build for boat projects"
 
-// Gradle files to be applied:
-ext["gradles"] = [
-    utils         : "${rootProject.rootDir}/buildSrc/utils.gradle",
-    infos         : "${rootProject.rootDir}/buildSrc/infos.gradle",
-    repositories  : "${rootProject.rootDir}/buildSrc/repositories.gradle",
-    deployJar     : "${rootProject.rootDir}/buildSrc/deploy-jar.gradle",
-    deployPlatform: "${rootProject.rootDir}/buildSrc/deploy-platform.gradle",
-    compile       : "${rootProject.rootDir}/buildSrc/compile.gradle",
-    passwords     : "${rootProject.rootDir}/buildSrc/passwords.gradle",
-]
-
-apply from: gradles.utils
-apply from: gradles.infos
-
-if (utils.needLoginSigning) {
-  apply from: gradles.passwords
-}
+println "${infos.logPrefix} Build ${project.name}"
 
 allprojects { p ->
   //Do for each project
   processProject(p)
 }
 
-subprojects { p ->
-  //Do for each project
-}
+//subprojects { p ->
+//  //Do for each project
+//  processProject(p)
+//}
 
 tasks.withType(JavaCompile) {
   options.encoding = "UTF-8"
@@ -35,8 +24,8 @@ def processProject(anyProject) {
   anyProject.group = infos.group
   anyProject.version = infos.version
   if (anyProject == rootProject) {
-    println("Configure root ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+    println("${infos.logPrefix} Configure root project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
   } else {
-    println("Configure sub  ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+    println("${infos.logPrefix} Configure project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
   }
 }

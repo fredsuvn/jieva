@@ -1,36 +1,17 @@
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-
-println ">>>${project.name}"
-
-task sourceJar(type: Jar) {
-  classifier "sources"
-  from sourceSets.main.allSource
+plugins {
+  id 'build.common'
+  //id 'build.kotlin-compile'
+  id 'maven-publish'
+  id 'java-platform'
+  id 'signing'
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier "javadoc"
-  from javadoc.destinationDir
-}
-
-artifacts {
-  archives jar
-  archives sourceJar
-  archives javadocJar
-}
+println "${infos.logPrefix} ${project.name}: import kotlin-publish-platform"
 
 publishing {
   publications {
     maven(MavenPublication) {
-      from components.java
-
-      artifact(sourceJar) {
-        classifier = 'sources'
-      }
-
-      artifact(javadocJar) {
-        classifier = 'javadoc'
-      }
+      from components.javaPlatform
 
       pom {
         name = project.name
@@ -86,6 +67,9 @@ publishing {
   }
 
   if (infos.signing) {
+    ext."signing.keyId" = passwords.signing.keyId
+    ext."signing.password" = passwords.signing.password
+    ext."signing.secretKeyRingFile" = passwords.signing.secretKeyRingFile
     signing {
       sign publishing.publications.maven
     }

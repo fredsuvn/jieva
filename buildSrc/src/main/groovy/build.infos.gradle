@@ -3,6 +3,9 @@
  */
 ext["infos"] = [
 
+    //Log prefix
+    logPrefix    : "boat >>>>>>",
+
     //Whether build to snapshot
     snapshot     : false,
 
@@ -11,9 +14,6 @@ ext["infos"] = [
 
     //Whether signing
     signing      : false,
-
-    //Publish as
-    publishAs    : ["java", "kotlin"],
 
     //Version
     version      : "0.0.0",

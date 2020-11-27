@@ -1,2 +1,11 @@
+plugins {
+  id 'groovy-gradle-plugin'
+}
 
+repositories {
+  gradlePluginPortal()
+}
 
+dependencies {
+  implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+}

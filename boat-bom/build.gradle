@@ -1,29 +1,21 @@
 plugins {
-    id 'java-platform'
+  id 'build.kotlin-publish-platform'
 }
 
 description = "boat-bom: BOM of boat projects."
 
-ext {
-    libVersions = [
-            dependenciesVersion: "1.0.1",
-    ]
-}
-
-apply from: gradles.repositories
+def dependenciesVersion = "1.0.1"
 
 javaPlatform {
-    allowDependencies()
+  allowDependencies()
 }
 
 dependencies {
-    api platform("xyz.srclab.bom:srclab-dependencies:${libVersions.dependenciesVersion}")
+  api platform("xyz.srclab.bom:srclab-dependencies:$dependenciesVersion")
 
-    constraints {
-        file("${rootDir}").eachDirMatch(~/boat-.*/) { file ->
-            api(project(":${file.name}"))
-        }
+  constraints {
+    file("${rootDir}").eachDirMatch(~/boat-.*/) { file ->
+      api(project(":${file.name}"))
     }
+  }
 }
-
-apply from: gradles.deployPlatform

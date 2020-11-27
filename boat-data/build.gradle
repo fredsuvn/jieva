@@ -2,7 +2,7 @@ plugins {
   id 'build.kotlin-publish-jar'
 }
 
-description = "Happy Eggy!"
+description = "Boat Data: data (such as json and xml) processors."
 
 java {
   registerFeature('optionalSupport') {
@@ -13,7 +13,7 @@ java {
 dependencies {
   implementation(platform(project(":boat-bom")))
 
-  implementation(project(":boat-common"))
+  api(project(":boat-common"))
 
   testCompile(project(":boat-test"))
 }
