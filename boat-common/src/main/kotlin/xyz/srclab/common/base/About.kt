@@ -42,13 +42,14 @@ interface About {
     companion object {
 
         @JvmStatic
+        @JvmOverloads
         fun of(
             name: String,
             url: String,
             version: Version,
             licence: Licence,
             poweredBy: PoweredBy,
-            releaseDate: ZonedDateTime,
+            releaseDate: ZonedDateTime = ZonedDateTime.now(),
         ): About {
             return AboutImpl(name, url, version, licence, poweredBy, releaseDate)
         }
@@ -83,9 +84,7 @@ interface About {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
-                if (javaClass != other?.javaClass) return false
-
-                other as AboutImpl
+                if (other !is About) return false
 
                 if (name != other.name) return false
                 if (url != other.url) return false
@@ -193,11 +192,10 @@ interface Version : Comparable<Version> {
 
                 override fun equals(other: Any?): Boolean {
                     if (this === other) return true
-                    if (javaClass != other?.javaClass) return false
+                    if (other !is PreReleaseIdentifier) return false
 
-                    other as NumericIdentifier
-
-                    if (value != other.value) return false
+                    if (!other.isNumeric) return false
+                    if (toNumber() != other.toNumber()) return false
 
                     return true
                 }
@@ -214,11 +212,10 @@ interface Version : Comparable<Version> {
 
                 override fun equals(other: Any?): Boolean {
                     if (this === other) return true
-                    if (javaClass != other?.javaClass) return false
+                    if (other !is PreReleaseIdentifier) return false
 
-                    other as StringIdentifier
-
-                    if (value != other.value) return false
+                    if (other.isNumeric) return false
+                    if (toString() != other.toString()) return false
 
                     return true
                 }
@@ -413,24 +410,21 @@ interface Version : Comparable<Version> {
         }
 
         companion object {
-            private val identifierPattern = "[0-9A-Za-z-]".toRegex()
+            private val identifierPattern = "[0-9A-Za-z-]+".toRegex()
         }
     }
 
     companion object {
 
         @JvmStatic
-        fun of(major: Int, minor: Int, patch: Int): Version {
-            return of(major, minor, patch, emptyList())
-        }
-
-        @JvmStatic
-        fun of(major: Int, minor: Int, patch: Int, preRelease: List<Any>): Version {
-            return of(major, minor, patch, preRelease, emptyList())
-        }
-
-        @JvmStatic
-        fun of(major: Int, minor: Int, patch: Int, preRelease: List<Any>, buildMetadata: List<String>): Version {
+        @JvmOverloads
+        fun of(
+            major: Int,
+            minor: Int,
+            patch: Int,
+            preRelease: List<Any> = emptyList(),
+            buildMetadata: List<String> = emptyList()
+        ): Version {
             return Builder()
                 .major(major)
                 .minor(minor)
@@ -553,12 +547,8 @@ interface Licence {
     companion object {
 
         @JvmStatic
-        fun of(name: String, url: String): Licence {
-            return LicenceImpl(name, url)
-        }
-
-        @JvmStatic
-        fun of(name: String, url: String, content: String): Licence {
+        @JvmOverloads
+        fun of(name: String, url: String, content: String = url): Licence {
             return LicenceImpl(name, url, content)
         }
 
@@ -573,9 +563,11 @@ interface Licence {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is Licence) return false
+
                 if (name != other.name) return false
                 if (url != other.url) return false
                 if (content != other.content) return false
+
                 return true
             }
 
@@ -623,9 +615,11 @@ interface PoweredBy {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is PoweredBy) return false
+
                 if (name != other.name) return false
                 if (url != other.url) return false
                 if (mail != other.mail) return false
+
                 return true
             }
 

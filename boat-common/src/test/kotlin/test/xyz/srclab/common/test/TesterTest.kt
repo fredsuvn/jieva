@@ -1,5 +1,6 @@
 package test.xyz.srclab.common.test
 
+import xyz.srclab.common.run.Runner
 import xyz.srclab.common.test.TestListener
 import xyz.srclab.common.test.TestTask
 import xyz.srclab.common.test.TestTask.Companion.newTask
@@ -15,7 +16,7 @@ object TesterTestKt {
     @Test
     fun testTester() {
         testTasks(
-            Executors.newCachedThreadPool(),
+            Runner.ASYNC_RUNNER,
             TestListener.DEFAULT,
             newTask("task1"),
             newTask("task2"),

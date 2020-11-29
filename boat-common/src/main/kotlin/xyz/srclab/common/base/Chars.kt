@@ -8,6 +8,14 @@ import java.nio.charset.Charset
 import java.util.*
 import kotlin.toString as toStringKt
 
+fun CharSequence?.isNumeric(): Boolean {
+    return StringUtils.isNumeric(this)
+}
+
+fun CharSequence?.isNumericSpace(): Boolean {
+    return StringUtils.isNumericSpace(this)
+}
+
 fun CharSequence?.isWhitespace(): Boolean {
     return StringUtils.isWhitespace(this)
 }
