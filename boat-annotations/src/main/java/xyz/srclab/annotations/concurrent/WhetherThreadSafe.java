@@ -1,6 +1,6 @@
-package xyz.srclab.annotation.concurrent;
+package xyz.srclab.annotations.concurrent;
 
-public enum ThreadSafeWhen {
+public enum WhetherThreadSafe {
 
     /**
      * Means thread-safe.

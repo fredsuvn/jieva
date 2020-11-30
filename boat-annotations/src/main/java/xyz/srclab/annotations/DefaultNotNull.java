@@ -1,4 +1,4 @@
-package xyz.srclab.annotation;
+package xyz.srclab.annotations;
 
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierDefault;
@@ -8,15 +8,15 @@ import java.lang.annotation.*;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Nonnull(when = When.MAYBE)
+@Nonnull(when = When.ALWAYS)
 @TypeQualifierDefault({
         ElementType.TYPE,
-        ElementType.FIELD,
+        //ElementType.FIELD,
         ElementType.METHOD,
-        ElementType.PARAMETER,
+        //ElementType.PARAMETER,
         ElementType.CONSTRUCTOR,
-        ElementType.LOCAL_VARIABLE,
-        ElementType.ANNOTATION_TYPE,
+        //ElementType.LOCAL_VARIABLE,
+        //ElementType.ANNOTATION_TYPE,
         ElementType.PACKAGE,
         ElementType.TYPE_PARAMETER,
         ElementType.TYPE_USE,
@@ -31,8 +31,8 @@ import java.lang.annotation.*;
         //ElementType.LOCAL_VARIABLE,
         //ElementType.ANNOTATION_TYPE,
         ElementType.PACKAGE,
-        //ElementType.TYPE_PARAMETER,
-        //ElementType.TYPE_USE,
+        ElementType.TYPE_PARAMETER,
+        ElementType.TYPE_USE,
 })
-public @interface DefaultNullable {
+public @interface DefaultNotNull {
 }

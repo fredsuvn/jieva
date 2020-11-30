@@ -1,11 +1,12 @@
-package xyz.srclab.annotation.concurrent;
+package xyz.srclab.annotations;
 
-import javax.annotation.meta.TypeQualifier;
+import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@TypeQualifier
+@javax.annotation.concurrent.Immutable
+@TypeQualifierNickname
 @Target({
         ElementType.TYPE,
         ElementType.FIELD,
@@ -18,7 +19,5 @@ import java.lang.annotation.*;
         ElementType.TYPE_PARAMETER,
         //ElementType.TYPE_USE,
 })
-public @interface ThreadSafe {
-
-    ThreadSafeWhen when() default ThreadSafeWhen.TRUE;
+public @interface Immutable {
 }

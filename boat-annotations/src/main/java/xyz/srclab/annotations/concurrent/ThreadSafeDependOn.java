@@ -1,4 +1,4 @@
-package xyz.srclab.annotation.concurrent;
+package xyz.srclab.annotations.concurrent;
 
 import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
@@ -37,14 +37,14 @@ import java.lang.annotation.*;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@ThreadSafe(when = ThreadSafeWhen.DEPEND_ON)
+@ThreadSafe(when = WhetherThreadSafe.DEPEND_ON)
 @TypeQualifierNickname
 @Target({
         ElementType.TYPE,
         ElementType.FIELD,
         ElementType.METHOD,
         ElementType.PARAMETER,
-        //ElementType.CONSTRUCTOR,
+        ElementType.CONSTRUCTOR,
         ElementType.LOCAL_VARIABLE,
         //ElementType.ANNOTATION_TYPE,
         ElementType.PACKAGE,

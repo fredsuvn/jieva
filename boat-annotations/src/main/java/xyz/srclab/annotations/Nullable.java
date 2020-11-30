@@ -1,4 +1,4 @@
-package xyz.srclab.annotation;
+package xyz.srclab.annotations;
 
 import javax.annotation.Nonnull;
 import javax.annotation.meta.TypeQualifierNickname;
@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Nonnull(when = When.ALWAYS)
+@Nonnull(when = When.MAYBE)
 @TypeQualifierNickname
 @Target({
         //ElementType.TYPE,
@@ -21,5 +21,5 @@ import java.lang.annotation.*;
         ElementType.TYPE_PARAMETER,
         //ElementType.TYPE_USE,
 })
-public @interface NotNull {
+public @interface Nullable {
 }

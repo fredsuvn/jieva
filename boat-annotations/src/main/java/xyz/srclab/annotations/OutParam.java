@@ -1,4 +1,4 @@
-package xyz.srclab.annotation;
+package xyz.srclab.annotations;
 
 import java.lang.annotation.*;
 
@@ -10,5 +10,5 @@ import java.lang.annotation.*;
 @Target({
         ElementType.PARAMETER,
 })
-public @interface Out {
+public @interface OutParam {
 }
