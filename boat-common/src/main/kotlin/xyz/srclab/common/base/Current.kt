@@ -1,5 +1,7 @@
 package xyz.srclab.common.base
 
+import java.lang.reflect.Method
+
 /**
  * @author sunqian
  */
@@ -77,8 +79,36 @@ object Current {
                 break
             }
         }
-        for (i in calledIndex until stackTrace.size) {
+        for (i in calledIndex + 1 until stackTrace.size) {
             if (stackTrace[i].className != calledClassName) {
+                return stackTrace[i]
+            }
+        }
+        return null
+    }
+
+    @JvmStatic
+    fun Method.callerFrame(): StackTraceElement? {
+        val calledClassName = this.declaringClass.name
+        val calledMethodName = this.name
+        return callerFrame(calledClassName, calledMethodName)
+    }
+
+    @JvmStatic
+    fun callerFrame(calledClassName: String, calledMethodName: String): StackTraceElement? {
+        val stackTrace = thread.stackTrace
+        if (stackTrace.isNullOrEmpty()) {
+            return null
+        }
+        var calledIndex = 0
+        for (i in stackTrace.indices) {
+            if (stackTrace[i].className == calledClassName && stackTrace[i].methodName == calledMethodName) {
+                calledIndex = i
+                break
+            }
+        }
+        for (i in calledIndex + 1 until stackTrace.size) {
+            if (stackTrace[i].className != calledClassName && stackTrace[i].methodName != calledMethodName) {
                 return stackTrace[i]
             }
         }

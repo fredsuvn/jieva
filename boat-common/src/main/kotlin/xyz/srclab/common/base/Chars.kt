@@ -55,7 +55,7 @@ fun Any?.toString(): String {
     return toStringKt()
 }
 
-fun Any?.arrayToString(): String {
+fun Any?.anyOrArrayToString(): String {
     return when (this) {
         null -> toStringKt()
         is Array<*> -> Arrays.toString(this)
@@ -71,7 +71,7 @@ fun Any?.arrayToString(): String {
     }
 }
 
-fun Any?.arrayDeepToString(): String {
+fun Any?.anyOrArrayDeepToString(): String {
     return when (this) {
         null -> toStringKt()
         is Array<*> -> Arrays.deepToString(this)

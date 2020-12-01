@@ -449,7 +449,7 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         return finalSequence().reduceIndexed(initial, operation)
     }
 
-    fun <R, V> zip(other: Sequence<out R>, transform: (T, R) -> V): SequenceOps<V> {
+    fun <R, V> zip(other: Sequence<R>, transform: (T, R) -> V): SequenceOps<V> {
         return finalSequence().zip(other, transform).toSequenceOps()
     }
 
@@ -1294,7 +1294,7 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         }
 
         @JvmStatic
-        fun <T, R, V> Sequence<T>.zip(other: Sequence<out R>, transform: (T, R) -> V): Sequence<V> {
+        fun <T, R, V> Sequence<T>.zip(other: Sequence<R>, transform: (T, R) -> V): Sequence<V> {
             return this.zipKt(other, transform)
         }
 

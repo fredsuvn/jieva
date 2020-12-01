@@ -1,4 +1,4 @@
 @DefaultNotNull
 package xyz.srclab.common.bytecode;
 
-import xyz.srclab.annotation.DefaultNotNull;
+import xyz.srclab.annotations.DefaultNotNull;

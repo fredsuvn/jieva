@@ -4,7 +4,7 @@
 package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
-import xyz.srclab.annotation.PossibleTypes
+import xyz.srclab.annotations.PossibleTypes
 import xyz.srclab.common.base.asAny
 import java.lang.reflect.*
 

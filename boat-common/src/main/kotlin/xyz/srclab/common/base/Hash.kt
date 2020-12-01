@@ -9,7 +9,7 @@ fun Any?.hash(): Int {
     return this.hashCode()
 }
 
-fun Any?.arrayHash(): Int {
+fun Any?.anyOrArrayHash(): Int {
     return when (this) {
         null -> this.hashCode()
         is BooleanArray -> Arrays.hashCode(this)
@@ -24,7 +24,7 @@ fun Any?.arrayHash(): Int {
     }
 }
 
-fun Any?.arrayDeepHash(): Int {
+fun Any?.anyOrArrayDeepHash(): Int {
     return when (this) {
         null -> this.hashCode()
         is BooleanArray -> Arrays.hashCode(this)
