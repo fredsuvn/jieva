@@ -1,4 +1,4 @@
-package test.xyz.srclab.common.base
+package test.kotlin.xyz.srclab.common.base
 
 import xyz.srclab.common.base.Format.Companion.fastFormat
 import xyz.srclab.common.base.Format.Companion.messageFormat

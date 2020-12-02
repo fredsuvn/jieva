@@ -1,4 +1,4 @@
-package test.xyz.srclab.common.test
+package test.kotlin.xyz.srclab.common.test
 
 import xyz.srclab.common.test.TestMarker
 import kotlin.test.Test

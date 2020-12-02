@@ -1,4 +1,4 @@
-package test.xyz.srclab.common.test;
+package test.java.xyz.srclab.common.test;
 
 import org.testng.annotations.Test;
 import xyz.srclab.common.test.TestMarker;

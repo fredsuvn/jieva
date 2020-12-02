@@ -23,21 +23,24 @@ interface Invoker {
     companion object {
 
         @JvmStatic
+        @JvmOverloads
         @JvmName("staticInvoker")
-        fun Method.toStaticInvoker(): StaticInvoker {
-            return StaticInvoker.forMethod(this)
+        fun Method.toStaticInvoker(force: Boolean = false): StaticInvoker {
+            return StaticInvoker.forMethod(this, force)
         }
 
         @JvmStatic
+        @JvmOverloads
         @JvmName("staticInvoker")
-        fun Constructor<*>.toStaticInvoker(): StaticInvoker {
-            return StaticInvoker.forConstructor(this)
+        fun Constructor<*>.toStaticInvoker(force: Boolean = false): StaticInvoker {
+            return StaticInvoker.forConstructor(this, force)
         }
 
         @JvmStatic
+        @JvmOverloads
         @JvmName("virtualInvoker")
-        fun Method.toVirtualInvoker(): VirtualInvoker {
-            return VirtualInvoker.forMethod(this)
+        fun Method.toVirtualInvoker(force: Boolean = false): VirtualInvoker {
+            return VirtualInvoker.forMethod(this, force)
         }
     }
 }
@@ -47,6 +50,16 @@ interface StaticInvoker : Invoker {
     fun <T> invokeStatic(vararg args: Any?): T
 
     companion object {
+
+        @JvmStatic
+        fun forMethod(classType: Class<*>, methodName: String, vararg parameterTypes: Class<*>): StaticInvoker {
+            return forMethod(classType.getMethod(methodName, *parameterTypes))
+        }
+
+        @JvmStatic
+        fun forConstructor(classType: Class<*>, vararg parameterTypes: Class<*>): StaticInvoker {
+            return forConstructor(classType.getConstructor(*parameterTypes))
+        }
 
         @JvmStatic
         fun forMethod(method: Method): StaticInvoker {
@@ -65,6 +78,11 @@ interface VirtualInvoker : Invoker {
     fun <T> invokeVirtual(owner: Any?, vararg args: Any?): T
 
     companion object {
+
+        @JvmStatic
+        fun forMethod(classType: Class<*>, methodName: String, vararg parameterTypes: Class<*>): StaticInvoker {
+            return StaticInvoker.forMethod(classType.getMethod(methodName, *parameterTypes))
+        }
 
         @JvmStatic
         fun forMethod(method: Method): VirtualInvoker {
@@ -90,38 +108,29 @@ interface InvokerProvider {
 
 object ReflectedInvokerProvider : InvokerProvider {
 
-    override fun staticInvoker(method: Method): StaticInvoker {
-        return ReflectedStaticMethodInvoker(method)
+    override fun staticInvoker(method: Method, force: Boolean): StaticInvoker {
+        return ReflectedStaticMethodInvoker(method, force)
     }
 
-    override fun staticInvoker(constructor: Constructor<*>): StaticInvoker {
-        return ReflectedConstructorInvoker(constructor)
+    override fun staticInvoker(constructor: Constructor<*>, force: Boolean): StaticInvoker {
+        return ReflectedConstructorInvoker(constructor, force)
     }
 
-    override fun virtualInvoker(method: Method): VirtualInvoker {
-        return ReflectedVirtualMethodInvoker(method)
-    }
-}
-
-object MethodHandlerInvokerProvider : InvokerProvider {
-
-    override fun staticInvoker(method: Method): StaticInvoker {
-        return StaticMethodHandlerInvoker(method)
-    }
-
-    override fun staticInvoker(constructor: Constructor<*>): StaticInvoker {
-        return StaticMethodHandlerInvoker(constructor)
-    }
-
-    override fun virtualInvoker(method: Method): VirtualInvoker {
-        return VirtualMethodHandlerInvoker(method)
+    override fun virtualInvoker(method: Method, force: Boolean): VirtualInvoker {
+        return ReflectedVirtualMethodInvoker(method, force)
     }
 }
 
 private const val CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE =
     "Arguments of virtual invoking cannot be empty, it contains at least a \"this\" object at first."
 
-private class ReflectedStaticMethodInvoker(private val method: Method) : StaticInvoker {
+private class ReflectedStaticMethodInvoker(private val method: Method, force: Boolean) : StaticInvoker {
+
+    init {
+        if (force) {
+            method.isAccessible = true
+        }
+    }
 
     override fun <T> invokeStatic(vararg args: Any?): T {
         return method.invokeStatic(args = args)
@@ -132,7 +141,13 @@ private class ReflectedStaticMethodInvoker(private val method: Method) : StaticI
     }
 }
 
-private class ReflectedVirtualMethodInvoker(private val method: Method) : VirtualInvoker {
+private class ReflectedVirtualMethodInvoker(private val method: Method, force: Boolean) : VirtualInvoker {
+
+    init {
+        if (force) {
+            method.isAccessible = true
+        }
+    }
 
     override fun <T> invoke(vararg args: Any?): T {
         checkArgument(args.isNotEmpty(), CHECK_VIRTUAL_ARGUMENTS_EMPTY_MESSAGE)
@@ -150,7 +165,13 @@ private class ReflectedVirtualMethodInvoker(private val method: Method) : Virtua
     }
 }
 
-private class ReflectedConstructorInvoker(private val constructor: Constructor<*>) : StaticInvoker {
+private class ReflectedConstructorInvoker(private val constructor: Constructor<*>, force: Boolean) : StaticInvoker {
+
+    init {
+        if (force) {
+            constructor.isAccessible = true
+        }
+    }
 
     override fun <T> invokeStatic(vararg args: Any?): T {
         return constructor.toInstance(*args).asAny()
@@ -161,7 +182,22 @@ private class ReflectedConstructorInvoker(private val constructor: Constructor<*
     }
 }
 
-private class StaticMethodHandlerInvoker private constructor() : StaticInvoker {
+object MethodHandlerInvokerProvider : InvokerProvider {
+
+    override fun staticInvoker(method: Method, force: Boolean): StaticInvoker {
+        return StaticMethodHandlerInvoker(method)
+    }
+
+    override fun staticInvoker(constructor: Constructor<*>, force: Boolean): StaticInvoker {
+        return StaticMethodHandlerInvoker(constructor)
+    }
+
+    override fun virtualInvoker(method: Method, force: Boolean): VirtualInvoker {
+        return VirtualMethodHandlerInvoker(method)
+    }
+}
+
+private class StaticMethodHandlerInvoker() : StaticInvoker {
 
     private lateinit var methodHandle: MethodHandle
 

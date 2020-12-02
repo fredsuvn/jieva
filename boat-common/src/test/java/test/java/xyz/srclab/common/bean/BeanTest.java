@@ -1,4 +1,4 @@
-package test.xyz.srclab.common.bean;
+package test.java.xyz.srclab.common.bean;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.testng.Assert;
