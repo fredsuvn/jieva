@@ -25,11 +25,11 @@ fun <T> CharSequence.findClassToInstance(
     parameterTypes: Array<out Class<*>>,
     args: Array<out Any?>
 ): T? {
-    val cls: Class<T>? = this.findClass(classLoader)
-    if (cls === null) {
+    val clazz: Class<T>? = this.findClass(classLoader)
+    if (clazz === null) {
         return null
     }
-    return cls.toInstance(parameterTypes, args)
+    return clazz.toInstance(parameterTypes, args)
 }
 
 fun <T> Class<*>.toInstance(): T {

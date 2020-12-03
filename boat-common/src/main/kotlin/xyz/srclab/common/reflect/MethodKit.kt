@@ -155,12 +155,12 @@ fun <T> Method.invokeVirtual(owner: Any? = null, force: Boolean = false, vararg 
     }
 }
 
-fun Method.isOpenFor(cls: Class<*>): Boolean {
+fun Method.isOpenFor(clazz: Class<*>): Boolean {
     if (!this.isOpen) {
         return false
     }
     val declaring = this.declaringClass
     return if (Modifier.isProtected(modifiers)) {
-        declaring.isAssignableFrom(cls)
-    } else declaring.getPackage() == cls.getPackage()
+        declaring.isAssignableFrom(clazz)
+    } else declaring.getPackage() == clazz.getPackage()
 }

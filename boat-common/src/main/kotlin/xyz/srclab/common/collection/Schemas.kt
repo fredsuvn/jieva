@@ -47,8 +47,8 @@ interface IterableSchema {
         @JvmStatic
         fun resolveOrNull(type: Type): IterableSchema? {
 
-            fun dispatchClass(cls: Class<*>): IterableSchema? {
-                return when (cls) {
+            fun dispatchClass(clazz: Class<*>): IterableSchema? {
+                return when (clazz) {
                     Iterable::class.java -> RAW_ITERABLE
                     Collection::class.java -> RAW_COLLECTION
                     Set::class.java -> RAW_SET
@@ -166,8 +166,8 @@ interface MapSchema {
         @JvmStatic
         fun resolveOrNull(type: Type): MapSchema? {
 
-            fun dispatchClass(cls: Class<*>): IterableSchema? {
-                return when (cls) {
+            fun dispatchClass(clazz: Class<*>): IterableSchema? {
+                return when (clazz) {
                     Iterable::class.java -> IterableSchema.RAW_ITERABLE
                     Collection::class.java -> IterableSchema.RAW_COLLECTION
                     Set::class.java -> IterableSchema.RAW_SET
