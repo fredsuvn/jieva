@@ -25,9 +25,9 @@ public class EqualHashTest {
     @Test
     public void testHash() {
         int[] iArray = new int[]{1, 2, 3};
-        Assert.assertEquals(Arrays.hashCode(iArray), Hash.anyOrArrayHash(iArray));
+        Assert.assertEquals(Hash.anyOrArrayHash(iArray), Arrays.hashCode(iArray));
         Object[] oArray = new Object[]{1, new int[]{1, 2, 3}, 3};
-        Assert.assertEquals(Arrays.deepHashCode(oArray), Hash.anyOrArrayDeepHash(oArray));
-        Assert.assertEquals(Objects.hash(1, 2, iArray), Hash.hash(1, 2, iArray));
+        Assert.assertEquals(Hash.anyOrArrayDeepHash(oArray), Arrays.deepHashCode(oArray));
+        Assert.assertEquals(Hash.hash(1, 2, iArray), Objects.hash(1, 2, iArray));
     }
 }

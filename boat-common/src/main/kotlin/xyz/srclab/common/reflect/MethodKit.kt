@@ -88,7 +88,7 @@ fun Class<*>.findMethod(
 ): Method? {
     var method = try {
         this.getMethod(name, *parameterTypes)
-    } catch (e: NoSuchFieldException) {
+    } catch (e: NoSuchMethodException) {
         null
     }
     if (method !== null) {
@@ -97,7 +97,7 @@ fun Class<*>.findMethod(
     if (!declared) {
         return null
     }
-    method = this.findDeclaredMethod(name, *parameterTypes)
+    method = findDeclaredMethod(name, *parameterTypes)
     if (method !== null) {
         return method
     }
@@ -106,7 +106,7 @@ fun Class<*>.findMethod(
     }
     var superClass = this.superclass
     while (superClass !== null) {
-        method = this.findDeclaredMethod(name, *parameterTypes)
+        method = findDeclaredMethod(name, *parameterTypes)
         if (method !== null) {
             return method
         }
@@ -121,6 +121,10 @@ fun Class<*>.findDeclaredMethod(methodName: String, vararg parameterTypes: Class
     } catch (e: NoSuchMethodException) {
         null
     }
+}
+
+fun Class<*>.findOwnerMethod(name: String, vararg parameterTypes: Class<*>): Method? {
+    return findMethod(name, declared = true, deep = false, *parameterTypes)
 }
 
 fun Class<*>.findMethods(): List<Method> {

@@ -1,8 +1,8 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.Invoker.Companion.toVirtualInvoker
-import xyz.srclab.common.base.VirtualInvoker
+import xyz.srclab.common.base.Invoker
+import xyz.srclab.common.base.Invoker.Companion.toInvoker
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collection.componentTypeToArray
@@ -434,9 +434,9 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
         override val name: String = descriptor.name
         override val genericType: Type by lazy { tryGenericType() }
-        override val getter: VirtualInvoker? by lazy { tryGetter() }
+        override val getter: Invoker? by lazy { tryGetter() }
         private val getterMethod: Method? = descriptor.readMethod
-        override val setter: VirtualInvoker? by lazy { trySetter() }
+        override val setter: Invoker? by lazy { trySetter() }
         private val setterMethod: Method? = descriptor.writeMethod
         override val field: Field? by lazy { tryField() }
         override val fieldAnnotations: List<Annotation> by lazy { tryFieldAnnotations() }
@@ -493,12 +493,12 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
             }
         }
 
-        private fun tryGetter(): VirtualInvoker? {
-            return if (getterMethod === null) null else getterMethod.toVirtualInvoker()
+        private fun tryGetter(): Invoker? {
+            return if (getterMethod === null) null else getterMethod.toInvoker()
         }
 
-        private fun trySetter(): VirtualInvoker? {
-            return if (setterMethod === null) null else setterMethod.toVirtualInvoker()
+        private fun trySetter(): Invoker? {
+            return if (setterMethod === null) null else setterMethod.toInvoker()
         }
 
         private fun tryField(): Field? {
@@ -513,7 +513,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
         override fun <T> getValue(bean: Any): T {
             val g = getter
             return if (g !== null) {
-                g.invokeVirtual(bean)
+                g.invoke(bean)
             } else {
                 throw UnsupportedOperationException("This property is not readable: $name")
             }
@@ -527,9 +527,9 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
             var old: T? = null
             val g = getter
             if (g !== null) {
-                old = g.invokeVirtual(bean)
+                old = g.invoke(bean)
             }
-            s.invokeVirtual<Any?>(bean, value)
+            s.invoke<Any?>(bean, value)
             return old.asAny()
         }
     }

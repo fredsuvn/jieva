@@ -1,30 +1,24 @@
 package xyz.srclab.common.test
 
-import xyz.srclab.common.base.Current.callerFrame
+import xyz.srclab.common.base.asAny
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 interface TestMarker {
 
     @JvmDefault
-    fun mark(value: Any) {
-        val key = this.javaClass.callerFrame() ?: ("AutoMarkKey-${markKeyCounter.getAndIncrement()}")
-        mark(key, value)
+    fun <T> mark(key: Any, value: Any): T {
+        return getMarkMap(this).put(key, value).asAny()
     }
 
     @JvmDefault
-    fun mark(key: Any, value: Any): Any? {
-        return getMarkMap(this).put(key, value)
+    fun <T> unmark(key: Any): T {
+        return getMarkMap(this).remove(key).asAny()
     }
 
     @JvmDefault
-    fun unmark(key: Any): Any? {
-        return getMarkMap(this).remove(key)
-    }
-
-    @JvmDefault
-    fun getMark(key: Any): Any? {
-        return getMarkMap(this)
+    fun <T> getMark(key: Any): T {
+        return getMarkMap(this)[key].asAny()
     }
 
     @JvmDefault
@@ -33,8 +27,8 @@ interface TestMarker {
     }
 
     @JvmDefault
-    fun asMap(): MutableMap<Any, Any> {
-        return getMarkMap(this)
+    fun asMap(): MutableMap<Any, Any?> {
+        return getMarkMap(this).asAny()
     }
 
     companion object {

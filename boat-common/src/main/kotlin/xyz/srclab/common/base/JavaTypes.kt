@@ -8,3 +8,4 @@ typealias JavaInt = java.lang.Integer
 typealias JavaLong = java.lang.Long
 typealias JavaFloat = java.lang.Float
 typealias JavaDouble = java.lang.Double
+typealias JavaVoid = java.lang.Void

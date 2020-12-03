@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.VirtualInvoker
+import xyz.srclab.common.base.Invoker
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Field
@@ -70,11 +70,11 @@ interface PropertySchema {
         }
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val getter: VirtualInvoker?
+    val getter: Invoker?
         @JvmName("getter") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val setter: VirtualInvoker?
+    val setter: Invoker?
         @JvmName("setter") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
