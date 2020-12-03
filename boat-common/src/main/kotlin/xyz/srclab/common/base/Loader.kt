@@ -7,6 +7,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 @JvmOverloads
 fun <T> ByteArray.loadClass(offset: Int = 0, length: Int = this.size - offset): Class<T> {
@@ -27,6 +28,18 @@ fun CharSequence.findResource(classLoader: ClassLoader = Current.classLoader): U
 }
 
 @JvmOverloads
+fun CharSequence.findBytesResource(classLoader: ClassLoader = Current.classLoader): ByteArray? {
+    return findResource(classLoader)?.openStream()?.readBytes()
+}
+
+@JvmOverloads
+fun CharSequence.findStringResource(
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
+): String? {
+    return findBytesResource(classLoader)?.toChars(charset)
+}
+
+@JvmOverloads
 fun CharSequence.findResources(classLoader: ClassLoader = Current.classLoader): List<URL> {
     return try {
         val urlEnumeration = classLoader.getResources(this.toString())
@@ -34,6 +47,18 @@ fun CharSequence.findResources(classLoader: ClassLoader = Current.classLoader): 
     } catch (e: Exception) {
         throw IllegalStateException(e)
     }
+}
+
+@JvmOverloads
+fun CharSequence.findBytesResources(classLoader: ClassLoader = Current.classLoader): List<ByteArray> {
+    return findResources(classLoader).map { url -> url.readBytes() }
+}
+
+@JvmOverloads
+fun CharSequence.findStringResources(
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
+): List<String> {
+    return findBytesResources(classLoader).map { bytes -> bytes.toChars(charset) }
 }
 
 object BytesClassLoader : ClassLoader() {
