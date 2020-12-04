@@ -164,6 +164,120 @@ interface Version : Comparable<Version> {
     val isPreRelease: Boolean
         @JvmName("isPreRelease") get() = preRelease.isNotEmpty()
 
+    companion object {
+
+        @JvmStatic
+        @JvmOverloads
+        fun of(
+            major: Int,
+            minor: Int,
+            patch: Int,
+            preRelease: List<Any> = emptyList(),
+            buildMetadata: List<String> = emptyList()
+        ): Version {
+            return Builder()
+                .major(major)
+                .minor(minor)
+                .patch(patch)
+                .preRelease(preRelease)
+                .buildMetadata(buildMetadata)
+                .build()
+        }
+
+        @JvmStatic
+        @JvmName("parse")
+        fun CharSequence.parseToVersion(): Version {
+
+            fun parseNormal(subSpec: CharSequence, builder: Builder) {
+                val list = subSpec.split(".")
+                checkArgument(
+                    list.size in 1..3,
+                    "Semantic version need 1-3 dot separated parts: x[.y[.z]]."
+                )
+                val major = list[0].let {
+                    try {
+                        it.toIntKt()
+                    } catch (e: Exception) {
+                        throw IllegalArgumentException("Wrong major: $it", e)
+                    }
+                }
+                val minor = if (list.size < 2) 0 else {
+                    list[1].let {
+                        try {
+                            it.toIntKt()
+                        } catch (e: Exception) {
+                            throw IllegalArgumentException("Wrong minor: $it", e)
+                        }
+                    }
+                }
+                val patch = if (list.size < 3) 0 else {
+                    list[2].let {
+                        try {
+                            it.toIntKt()
+                        } catch (e: Exception) {
+                            throw IllegalArgumentException("Wrong patch: $it", e)
+                        }
+                    }
+                }
+                builder.major(major)
+                builder.minor(minor)
+                builder.patch(patch)
+            }
+
+            fun parsePreVersion(subSpec: CharSequence, builder: Builder) {
+                val list = subSpec.split(".")
+                builder.preRelease(list)
+            }
+
+            fun parseBuildMetadata(subSpec: CharSequence, builder: Builder) {
+                val list = subSpec.split(".")
+                builder.buildMetadata(list)
+            }
+
+            val hyphenCount = HYPHEN_MATCHER.countIn(this)
+            checkArgument(
+                hyphenCount == 0 || hyphenCount == 1,
+                "Illegal version specification, hyphen count should be 0 or 1."
+            )
+            val hyphenIndex = HYPHEN_MATCHER.indexIn(this)
+            checkArgument(
+                hyphenIndex < 0 || hyphenIndex in 1..this.length - 2,
+                "Illegal hyphen position: {}.", hyphenIndex
+            )
+
+            val plusSignCount = PLUS_SIGN_MATCHER.countIn(this)
+            checkArgument(
+                plusSignCount == 0 || plusSignCount == 1,
+                "Illegal version specification, plus sign count should be 0 or 1."
+            )
+            val plusSignIndex = PLUS_SIGN_MATCHER.indexIn(this)
+            checkArgument(
+                plusSignIndex < 0 || plusSignIndex in 1..this.length - 2,
+                "Illegal plus sign position: {}.", plusSignIndex
+            )
+
+            val builder = Builder()
+            when {
+                hyphenIndex < 0 && plusSignIndex < 0 -> parseNormal(this, builder)
+                hyphenIndex > 0 && plusSignIndex < 0 -> {
+                    parseNormal(this.subSequence(0, hyphenIndex), builder)
+                    parsePreVersion(this.subSequence(hyphenIndex + 1, this.length), builder)
+                }
+                hyphenIndex < 0 && plusSignIndex > 0 -> {
+                    parseNormal(this.subSequence(0, plusSignIndex), builder)
+                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length), builder)
+                }
+                hyphenIndex > 0 && plusSignIndex > 0 && (plusSignIndex - hyphenIndex > 1) -> {
+                    parseNormal(this.subSequence(0, hyphenIndex), builder)
+                    parsePreVersion(this.subSequence(hyphenIndex + 1, plusSignIndex), builder)
+                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length), builder)
+                }
+                else -> throw IllegalArgumentException("Illegal version specification: $this")
+            }
+            return builder.build()
+        }
+    }
+
     interface PreReleaseIdentifier {
 
         val isNumeric: Boolean
@@ -411,120 +525,6 @@ interface Version : Comparable<Version> {
 
         companion object {
             private val identifierPattern = "[0-9A-Za-z-]+".toRegex()
-        }
-    }
-
-    companion object {
-
-        @JvmStatic
-        @JvmOverloads
-        fun of(
-            major: Int,
-            minor: Int,
-            patch: Int,
-            preRelease: List<Any> = emptyList(),
-            buildMetadata: List<String> = emptyList()
-        ): Version {
-            return Builder()
-                .major(major)
-                .minor(minor)
-                .patch(patch)
-                .preRelease(preRelease)
-                .buildMetadata(buildMetadata)
-                .build()
-        }
-
-        @JvmStatic
-        @JvmName("parse")
-        fun CharSequence.parseToVersion(): Version {
-
-            fun parseNormal(subSpec: CharSequence, builder: Builder) {
-                val list = subSpec.split(".")
-                checkArgument(
-                    list.size in 1..3,
-                    "Semantic version need 1-3 dot separated parts: x[.y[.z]]."
-                )
-                val major = list[0].let {
-                    try {
-                        it.toIntKt()
-                    } catch (e: Exception) {
-                        throw IllegalArgumentException("Wrong major: $it", e)
-                    }
-                }
-                val minor = if (list.size < 2) 0 else {
-                    list[1].let {
-                        try {
-                            it.toIntKt()
-                        } catch (e: Exception) {
-                            throw IllegalArgumentException("Wrong minor: $it", e)
-                        }
-                    }
-                }
-                val patch = if (list.size < 3) 0 else {
-                    list[2].let {
-                        try {
-                            it.toIntKt()
-                        } catch (e: Exception) {
-                            throw IllegalArgumentException("Wrong patch: $it", e)
-                        }
-                    }
-                }
-                builder.major(major)
-                builder.minor(minor)
-                builder.patch(patch)
-            }
-
-            fun parsePreVersion(subSpec: CharSequence, builder: Builder) {
-                val list = subSpec.split(".")
-                builder.preRelease(list)
-            }
-
-            fun parseBuildMetadata(subSpec: CharSequence, builder: Builder) {
-                val list = subSpec.split(".")
-                builder.buildMetadata(list)
-            }
-
-            val hyphenCount = HYPHEN_MATCHER.countIn(this)
-            checkArgument(
-                hyphenCount == 0 || hyphenCount == 1,
-                "Illegal version specification, hyphen count should be 0 or 1."
-            )
-            val hyphenIndex = HYPHEN_MATCHER.indexIn(this)
-            checkArgument(
-                hyphenIndex < 0 || hyphenIndex in 1..this.length - 2,
-                "Illegal hyphen position: {}.", hyphenIndex
-            )
-
-            val plusSignCount = PLUS_SIGN_MATCHER.countIn(this)
-            checkArgument(
-                plusSignCount == 0 || plusSignCount == 1,
-                "Illegal version specification, plus sign count should be 0 or 1."
-            )
-            val plusSignIndex = PLUS_SIGN_MATCHER.indexIn(this)
-            checkArgument(
-                plusSignIndex < 0 || plusSignIndex in 1..this.length - 2,
-                "Illegal plus sign position: {}.", plusSignIndex
-            )
-
-            val builder = Builder()
-            when {
-                hyphenIndex < 0 && plusSignIndex < 0 -> parseNormal(this, builder)
-                hyphenIndex > 0 && plusSignIndex < 0 -> {
-                    parseNormal(this.subSequence(0, hyphenIndex), builder)
-                    parsePreVersion(this.subSequence(hyphenIndex + 1, this.length), builder)
-                }
-                hyphenIndex < 0 && plusSignIndex > 0 -> {
-                    parseNormal(this.subSequence(0, plusSignIndex), builder)
-                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length), builder)
-                }
-                hyphenIndex > 0 && plusSignIndex > 0 && (plusSignIndex - hyphenIndex > 1) -> {
-                    parseNormal(this.subSequence(0, hyphenIndex), builder)
-                    parsePreVersion(this.subSequence(hyphenIndex + 1, plusSignIndex), builder)
-                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length), builder)
-                }
-                else -> throw IllegalArgumentException("Illegal version specification: $this")
-            }
-            return builder.build()
         }
     }
 }

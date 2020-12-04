@@ -26,8 +26,8 @@ interface Let<T> : SimpleGetter<T> {
     companion object {
 
         @JvmStatic
-        @JvmName("startsAt")
-        fun <T> T.letStarts(): Let<T> {
+        @JvmName("of")
+        fun <T> T.ofLet(): Let<T> {
             return LetImpl(this)
         }
     }
