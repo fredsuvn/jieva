@@ -47,50 +47,50 @@ interface NamingCase {
 }
 
 object LowerCamel : CamelCase() {
-    override fun doFirst(first: String): String {
-        return first.decapitalize(Defaults.locale)
+    override fun doFirst(first: CharSequence): String {
+        return first.toString().decapitalize(Defaults.locale)
     }
 }
 
 object UpperCamel : CamelCase() {
-    override fun doFirst(first: String): String {
-        return first.capitalize(Defaults.locale)
+    override fun doFirst(first: CharSequence): String {
+        return first.toString().capitalize(Defaults.locale)
     }
 }
 
 object LowerUnderscore : UnderscoreCase() {
-    override fun doWord(word: String): String {
-        return word.toLowerCase(Defaults.locale)
+    override fun doWord(word: CharSequence): String {
+        return word.toString().toLowerCase(Defaults.locale)
     }
 }
 
 object UpperUnderscore : UnderscoreCase() {
-    override fun doWord(word: String): String {
-        return word.toUpperCase(Defaults.locale)
+    override fun doWord(word: CharSequence): String {
+        return word.toString().toUpperCase(Defaults.locale)
     }
 }
 
 object CapitalizeUnderscore : UnderscoreCase() {
-    override fun doWord(word: String): String {
-        return word.toLowerCase(Defaults.locale).capitalize(Defaults.locale)
+    override fun doWord(word: CharSequence): String {
+        return word.toString().toLowerCase(Defaults.locale).capitalize(Defaults.locale)
     }
 }
 
 object LowerHyphen : HyphenCase() {
-    override fun doWord(word: String): String {
-        return word.toLowerCase(Defaults.locale)
+    override fun doWord(word: CharSequence): String {
+        return word.toString().toLowerCase(Defaults.locale)
     }
 }
 
 object UpperHyphen : HyphenCase() {
-    override fun doWord(word: String): String {
-        return word.toUpperCase(Defaults.locale)
+    override fun doWord(word: CharSequence): String {
+        return word.toString().toUpperCase(Defaults.locale)
     }
 }
 
 object CapitalizeHyphen : HyphenCase() {
-    override fun doWord(word: String): String {
-        return word.toLowerCase(Defaults.locale).capitalize(Defaults.locale)
+    override fun doWord(word: CharSequence): String {
+        return word.toString().toLowerCase(Defaults.locale).capitalize(Defaults.locale)
     }
 }
 
@@ -161,7 +161,7 @@ abstract class CamelCase : NamingCase {
                 }
     }
 
-    protected abstract fun doFirst(first: String): String
+    protected abstract fun doFirst(first: CharSequence): String
 }
 
 abstract class UnderscoreCase : NamingCase {
@@ -174,7 +174,7 @@ abstract class UnderscoreCase : NamingCase {
         return words.joinToString("_") { doWord(it.toString()) }
     }
 
-    protected abstract fun doWord(word: String): String
+    protected abstract fun doWord(word: CharSequence): String
 }
 
 abstract class HyphenCase : NamingCase {
@@ -187,5 +187,5 @@ abstract class HyphenCase : NamingCase {
         return words.joinToString("-") { doWord(it.toString()) }
     }
 
-    protected abstract fun doWord(word: String): String
+    protected abstract fun doWord(word: CharSequence): String
 }
