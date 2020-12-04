@@ -22,13 +22,13 @@ interface Lazy<T> {
         }
 
         @JvmStatic
-        fun <T> periodOf(period: Duration, supplier: () -> T): Lazy<T> {
+        fun <T> of(period: Duration, supplier: () -> T): Lazy<T> {
             return FixedPeriodRefreshableLazy(period, supplier)
         }
 
         @JvmStatic
-        fun <T> periodOf(supplier: () -> Pair<T, Duration>): Lazy<T> {
-            return DynamicPeriodRefreshableLazy(supplier)
+        fun <T> of(period: (T) -> Duration, supplier: () -> T): Lazy<T> {
+            return DynamicPeriodRefreshableLazy(period, supplier)
         }
     }
 }
@@ -37,12 +37,12 @@ fun <T> lazyOf(supplier: () -> T): Lazy<T> {
     return Lazy.of(supplier)
 }
 
-fun <T> periodLazyOf(period: Duration, supplier: () -> T): Lazy<T> {
-    return Lazy.periodOf(period, supplier)
+fun <T> lazyOf(period: Duration, supplier: () -> T): Lazy<T> {
+    return Lazy.of(period, supplier)
 }
 
-fun <T> periodLazyOf(supplier: () -> Pair<T, Duration>): Lazy<T> {
-    return Lazy.periodOf(supplier)
+fun <T> lazyOf(period: (T) -> Duration, supplier: () -> T): Lazy<T> {
+    return Lazy.of(period, supplier)
 }
 
 private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
@@ -82,7 +82,10 @@ private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
     }
 }
 
-private class FixedPeriodRefreshableLazy<T>(private val period: Duration, private val supplier: () -> T) : Lazy<T> {
+private class FixedPeriodRefreshableLazy<T>(
+    private val period: Duration,
+    private val supplier: () -> T,
+) : Lazy<T> {
 
     @Volatile
     private var lastGetTime: LocalDateTime = LocalDateTime.MIN
@@ -91,11 +94,12 @@ private class FixedPeriodRefreshableLazy<T>(private val period: Duration, privat
     private var lastValue: T? = null
 
     override fun get(): T {
-        if (!needRefresh()) {
+        val now = LocalDateTime.now()
+        if (!needRefresh(now)) {
             return lastValue.asNotNull()
         }
         return synchronized(this) {
-            if (!needRefresh()) {
+            if (!needRefresh(now)) {
                 lastValue
             }
             lastValue = supplier()
@@ -104,8 +108,8 @@ private class FixedPeriodRefreshableLazy<T>(private val period: Duration, privat
         }
     }
 
-    private fun needRefresh(): Boolean {
-        return period < Duration.between(lastGetTime, LocalDateTime.now())
+    private fun needRefresh(now: LocalDateTime): Boolean {
+        return period < Duration.between(lastGetTime, now)
     }
 
     override fun refresh() {
@@ -123,7 +127,10 @@ private class FixedPeriodRefreshableLazy<T>(private val period: Duration, privat
     }
 }
 
-private class DynamicPeriodRefreshableLazy<T>(private val supplier: () -> Pair<T, Duration>) : Lazy<T> {
+private class DynamicPeriodRefreshableLazy<T>(
+    private val period: (T) -> Duration,
+    private val supplier: () -> T,
+) : Lazy<T> {
 
     @Volatile
     private var lastGetTime: LocalDateTime = LocalDateTime.MIN
@@ -135,23 +142,24 @@ private class DynamicPeriodRefreshableLazy<T>(private val supplier: () -> Pair<T
     private var lastValue: T? = null
 
     override fun get(): T {
-        if (!needRefresh()) {
+        val now = LocalDateTime.now()
+        if (!needRefresh(now)) {
             return lastValue.asNotNull()
         }
         return synchronized(this) {
-            if (!needRefresh()) {
+            if (!needRefresh(now)) {
                 lastValue
             }
             val result = supplier()
-            lastValue = result.first
-            lastPeriod = result.second
+            lastValue = result
+            lastPeriod = period(result)
             lastGetTime = LocalDateTime.now()
             lastValue.asNotNull()
         }
     }
 
-    private fun needRefresh(): Boolean {
-        return lastPeriod < Duration.between(lastGetTime, LocalDateTime.now())
+    private fun needRefresh(now: LocalDateTime): Boolean {
+        return lastPeriod < Duration.between(lastGetTime, now)
     }
 
     override fun refresh() {
@@ -164,8 +172,8 @@ private class DynamicPeriodRefreshableLazy<T>(private val supplier: () -> Pair<T
     override fun refreshAndGet(): T {
         return synchronized(this) {
             val result = supplier()
-            lastValue = result.first
-            lastPeriod = result.second
+            lastValue = result
+            lastPeriod = period(result)
             lastGetTime = LocalDateTime.now()
             lastValue.asNotNull()
         }
