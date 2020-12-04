@@ -16,49 +16,30 @@ interface Provider<S, T : Any> {
     companion object {
 
         @JvmStatic
-        fun <T : Any> charsProvider(): CharsProvider<T> {
-            return CharsProvider.ofType()
-        }
-
-        @JvmStatic
+        @JvmOverloads
         fun <T : Any> charsProvider(strict: Boolean = false): CharsProvider<T> {
             return if (strict) StrictCharsProvider.ofType() else CharsProvider.ofType()
         }
 
         @JvmStatic
-        @JvmName("parse")
-        fun <T : Any> CharSequence.charsProviderParse(spec: CharSequence): List<T> {
-            return charsProvider<T>().parse(spec)
+        @JvmOverloads
+        @JvmName("parseChars")
+        fun <T : Any> CharSequence.parseCharsProviders(strictly: Boolean = false): List<T> {
+            return charsProvider<T>(strictly).parse(this)
         }
 
         @JvmStatic
-        @JvmName("parse")
-        fun <T : Any> CharSequence.charsProviderParse(spec: CharSequence, strictly: Boolean = false): List<T> {
-            return charsProvider<T>(strictly).parse(spec)
+        @JvmOverloads
+        @JvmName("parseCharsFirst")
+        fun <T : Any> CharSequence.parseCharsFirstProvider(strictly: Boolean = false): T {
+            return charsProvider<T>(strictly).parseFirst(this)
         }
 
         @JvmStatic
-        @JvmName("parseFirst")
-        fun <T : Any> CharSequence.charsProviderParseFirst(spec: CharSequence): T {
-            return charsProvider<T>().parseFirst(spec)
-        }
-
-        @JvmStatic
-        @JvmName("parseFirst")
-        fun <T : Any> CharSequence.charsProviderParseFirst(spec: CharSequence, strictly: Boolean = false): T {
-            return charsProvider<T>(strictly).parseFirst(spec)
-        }
-
-        @JvmStatic
-        @JvmName("parseFirstOrNull")
-        fun <T : Any> CharSequence.charsProviderParseFirstOrNull(spec: CharSequence): T? {
-            return charsProvider<T>().parseFirstOrNull(spec)
-        }
-
-        @JvmStatic
-        @JvmName("parseFirstOrNull")
-        fun <T : Any> CharSequence.charsProviderParseFirstOrNull(spec: CharSequence, strictly: Boolean = false): T? {
-            return charsProvider<T>(strictly).parseFirstOrNull(spec)
+        @JvmOverloads
+        @JvmName("parseCharsFirstOrNull")
+        fun <T : Any> CharSequence.parseCharsFirstProviderOrNull(strictly: Boolean = false): T? {
+            return charsProvider<T>(strictly).parseFirstOrNull(this)
         }
     }
 }
@@ -133,10 +114,10 @@ class StrictCharsProvider<T : Any> : CharsProvider<T>() {
         val product: T? = try {
             trimmedClassName.findClassToInstance()
         } catch (e: Exception) {
-            throw IllegalArgumentException("Instantiate class $trimmedClassName failed.", e)
+            throw IllegalStateException("Instantiate class $trimmedClassName failed.", e)
         }
         if (product === null) {
-            throw IllegalArgumentException("Class $trimmedClassName was not found.")
+            throw IllegalStateException("Class $trimmedClassName was not found.")
         }
         return product
     }
