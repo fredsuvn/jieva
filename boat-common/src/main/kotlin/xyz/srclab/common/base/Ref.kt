@@ -5,26 +5,25 @@ interface Ref<T> : SimpleAccess<T> {
     companion object {
 
         @JvmStatic
-        //@JvmOverloads
-        fun <T> of(initial: T? = null): Ref<T> {
+        fun <T> of(initial: T?): Ref<T> {
             return RefImpl(initial)
+        }
+
+        private class RefImpl<T>(private var value: T?) : Ref<T> {
+
+            override fun getOrNull(): T? {
+                return value
+            }
+
+            override fun set(value: T?) {
+                this.value = value
+            }
         }
     }
 }
 
 fun <T> T.ref(): Ref<T> {
     return Ref.of(this)
-}
-
-private class RefImpl<T>(private var value: T?) : Ref<T> {
-
-    override fun getOrNull(): T? {
-        return value
-    }
-
-    override fun set(value: T?) {
-        this.value = value
-    }
 }
 
 interface BooleanRef {
@@ -36,26 +35,25 @@ interface BooleanRef {
     companion object {
 
         @JvmStatic
-        //@JvmOverloads
-        fun of(initial: Boolean = false): BooleanRef {
+        fun of(initial: Boolean): BooleanRef {
             return BooleanRefImpl(initial)
+        }
+
+        private class BooleanRefImpl(private var value: Boolean) : BooleanRef {
+
+            override fun get(): Boolean {
+                return value
+            }
+
+            override fun set(value: Boolean) {
+                this.value = value
+            }
         }
     }
 }
 
 fun Boolean.ref(): BooleanRef {
     return BooleanRef.of(this)
-}
-
-private class BooleanRefImpl(private var value: Boolean) : BooleanRef {
-
-    override fun get(): Boolean {
-        return value
-    }
-
-    override fun set(value: Boolean) {
-        this.value = value
-    }
 }
 
 interface ByteRef {
@@ -67,26 +65,25 @@ interface ByteRef {
     companion object {
 
         @JvmStatic
-        //@JvmOverloads
-        fun of(initial: Byte = 0): ByteRef {
+        fun of(initial: Byte): ByteRef {
             return ByteRefImpl(initial)
+        }
+
+        private class ByteRefImpl(private var value: Byte) : ByteRef {
+
+            override fun get(): Byte {
+                return value
+            }
+
+            override fun set(value: Byte) {
+                this.value = value
+            }
         }
     }
 }
 
 fun Byte.ref(): ByteRef {
     return ByteRef.of(this)
-}
-
-private class ByteRefImpl(private var value: Byte) : ByteRef {
-
-    override fun get(): Byte {
-        return value
-    }
-
-    override fun set(value: Byte) {
-        this.value = value
-    }
 }
 
 interface ShortRef {
@@ -98,26 +95,25 @@ interface ShortRef {
     companion object {
 
         @JvmStatic
-        //@JvmOverloads
-        fun of(initial: Short = 0): ShortRef {
+        fun of(initial: Short): ShortRef {
             return ShortRefImpl(initial)
+        }
+
+        private class ShortRefImpl(private var value: Short) : ShortRef {
+
+            override fun get(): Short {
+                return value
+            }
+
+            override fun set(value: Short) {
+                this.value = value
+            }
         }
     }
 }
 
 fun Short.ref(): ShortRef {
     return ShortRef.of(this)
-}
-
-private class ShortRefImpl(private var value: Short) : ShortRef {
-
-    override fun get(): Short {
-        return value
-    }
-
-    override fun set(value: Short) {
-        this.value = value
-    }
 }
 
 interface CharRef {
@@ -129,26 +125,25 @@ interface CharRef {
     companion object {
 
         @JvmStatic
-        //@JvmOverloads
-        fun of(initial: Char = 0.toChar()): CharRef {
+        fun of(initial: Char): CharRef {
             return CharRefImpl(initial)
+        }
+
+        private class CharRefImpl(private var value: Char) : CharRef {
+
+            override fun get(): Char {
+                return value
+            }
+
+            override fun set(value: Char) {
+                this.value = value
+            }
         }
     }
 }
 
 fun Char.ref(): CharRef {
     return CharRef.of(this)
-}
-
-private class CharRefImpl(private var value: Char) : CharRef {
-
-    override fun get(): Char {
-        return value
-    }
-
-    override fun set(value: Char) {
-        this.value = value
-    }
 }
 
 interface IntRef {
@@ -160,26 +155,25 @@ interface IntRef {
     companion object {
 
         @JvmStatic
-        //@JvmOverloads
-        fun of(initial: Int = 0): IntRef {
+        fun of(initial: Int): IntRef {
             return IntRefImpl(initial)
+        }
+
+        private class IntRefImpl(private var value: Int) : IntRef {
+
+            override fun get(): Int {
+                return value
+            }
+
+            override fun set(value: Int) {
+                this.value = value
+            }
         }
     }
 }
 
 fun Int.ref(): IntRef {
     return IntRef.of(this)
-}
-
-private class IntRefImpl(private var value: Int) : IntRef {
-
-    override fun get(): Int {
-        return value
-    }
-
-    override fun set(value: Int) {
-        this.value = value
-    }
 }
 
 interface LongRef {
@@ -191,26 +185,25 @@ interface LongRef {
     companion object {
 
         @JvmStatic
-        //@JvmOverloads
-        fun of(initial: Long = 0L): LongRef {
+        fun of(initial: Long): LongRef {
             return LongRefImpl(initial)
+        }
+
+        private class LongRefImpl(private var value: Long) : LongRef {
+
+            override fun get(): Long {
+                return value
+            }
+
+            override fun set(value: Long) {
+                this.value = value
+            }
         }
     }
 }
 
 fun Long.ref(): LongRef {
     return LongRef.of(this)
-}
-
-private class LongRefImpl(private var value: Long) : LongRef {
-
-    override fun get(): Long {
-        return value
-    }
-
-    override fun set(value: Long) {
-        this.value = value
-    }
 }
 
 interface FloatRef {
@@ -222,26 +215,25 @@ interface FloatRef {
     companion object {
 
         @JvmStatic
-        //@JvmOverloads
-        fun of(initial: Float = 0f): FloatRef {
+        fun of(initial: Float): FloatRef {
             return FloatRefImpl(initial)
+        }
+
+        private class FloatRefImpl(private var value: Float) : FloatRef {
+
+            override fun get(): Float {
+                return value
+            }
+
+            override fun set(value: Float) {
+                this.value = value
+            }
         }
     }
 }
 
 fun Float.ref(): FloatRef {
     return FloatRef.of(this)
-}
-
-private class FloatRefImpl(private var value: Float) : FloatRef {
-
-    override fun get(): Float {
-        return value
-    }
-
-    override fun set(value: Float) {
-        this.value = value
-    }
 }
 
 interface DoubleRef {
@@ -253,24 +245,23 @@ interface DoubleRef {
     companion object {
 
         @JvmStatic
-        //@JvmOverloads
-        fun of(initial: Double = 0.0): DoubleRef {
+        fun of(initial: Double): DoubleRef {
             return DoubleRefImpl(initial)
+        }
+
+        private class DoubleRefImpl(private var value: Double) : DoubleRef {
+
+            override fun get(): Double {
+                return value
+            }
+
+            override fun set(value: Double) {
+                this.value = value
+            }
         }
     }
 }
 
 fun Double.ref(): DoubleRef {
     return DoubleRef.of(this)
-}
-
-private class DoubleRefImpl(private var value: Double) : DoubleRef {
-
-    override fun get(): Double {
-        return value
-    }
-
-    override fun set(value: Double) {
-        this.value = value
-    }
 }
