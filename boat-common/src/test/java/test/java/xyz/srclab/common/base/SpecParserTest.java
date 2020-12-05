@@ -2,47 +2,47 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Provider;
+import xyz.srclab.common.base.SpecParser;
 
 import java.util.Arrays;
 
 /**
  * @author sunqian
  */
-public class ProviderTest {
+public class SpecParserTest {
 
     @Test
     public void testProvider() {
         Assert.assertEquals(
-                Provider.parseChars(Provider1.class.getName() + ", " + Provider2.class.getName()),
+                SpecParser.specParse(Provider1.class.getName() + ", " + Provider2.class.getName()),
                 Arrays.asList(new Provider1(), new Provider2())
         );
         Assert.assertEquals(
-                Provider.parseChars(
+                SpecParser.specParse(
                         Provider1.class.getName() + ", " + Provider2.class.getName(), true),
                 Arrays.asList(new Provider1(), new Provider2())
         );
         Assert.assertEquals(
-                Provider.parseCharsFirst(Provider1.class.getName() + ", " + Provider2.class.getName()),
+                SpecParser.specParseFirst(Provider1.class.getName() + ", " + Provider2.class.getName()),
                 new Provider1()
         );
         Assert.assertEquals(
-                Provider.parseCharsFirst(
+                SpecParser.specParseFirst(
                         Provider1.class.getName() + ", " + Provider2.class.getName(), true),
                 new Provider1()
         );
         Assert.assertEquals(
-                Provider.parseCharsFirst(Provider3.class.getName() + ", " + Provider2.class.getName()),
+                SpecParser.specParseFirst(Provider3.class.getName() + ", " + Provider2.class.getName()),
                 new Provider2()
         );
-        Assert.assertThrows(IllegalStateException.class, () -> Provider.parseCharsFirst(
+        Assert.assertThrows(IllegalStateException.class, () -> SpecParser.specParseFirst(
                 Provider3.class.getName() + ", " + Provider2.class.getName(), true));
         Assert.assertEquals(
-                Provider.parseCharsFirstOrNull(Provider3.class.getName()),
+                SpecParser.specParseFirstOrNull(Provider3.class.getName()),
                 (Object) null
         );
         Assert.assertEquals(
-                Provider.parseCharsFirstOrNull(
+                SpecParser.specParseFirstOrNull(
                         Provider3.class.getName() + ", " + Provider2.class.getName()),
                 new Provider2()
         );

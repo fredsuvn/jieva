@@ -2,51 +2,49 @@ package xyz.srclab.common.base
 
 import xyz.srclab.common.reflect.findClassToInstance
 
-interface Provider<S, T : Any> {
+interface SpecParser<S> {
 
-    fun parse(spec: S): List<T>
+    fun <T : Any> parse(spec: S): List<T>
 
     @JvmDefault
-    fun parseFirst(spec: S): T {
-        return parseFirstOrNull(spec) ?: throw IllegalArgumentException("Illegal provider specification: $spec")
+    fun <T : Any> parseFirst(spec: S): T {
+        return parseFirstOrNull(spec) ?: throw java.lang.IllegalStateException("Spec parsed failed: $spec.")
     }
 
-    fun parseFirstOrNull(spec: S): T?
+    fun <T : Any> parseFirstOrNull(spec: S): T?
 
     companion object {
 
         @JvmStatic
         @JvmOverloads
-        fun <T : Any> charsProvider(strict: Boolean = false): CharsProvider<T> {
-            return if (strict) StrictCharsProvider.ofType() else CharsProvider.ofType()
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        @JvmName("parseChars")
+        @JvmName("specParse")
         fun <T : Any> CharSequence.parseCharsProviders(strictly: Boolean = false): List<T> {
-            return charsProvider<T>(strictly).parse(this)
+            return getCharsSpecParser(strictly).parse(this)
         }
 
         @JvmStatic
         @JvmOverloads
-        @JvmName("parseCharsFirst")
+        @JvmName("specParseFirst")
         fun <T : Any> CharSequence.parseCharsFirstProvider(strictly: Boolean = false): T {
-            return charsProvider<T>(strictly).parseFirst(this)
+            return getCharsSpecParser(strictly).parseFirst(this)
         }
 
         @JvmStatic
         @JvmOverloads
-        @JvmName("parseCharsFirstOrNull")
+        @JvmName("specParseFirstOrNull")
         fun <T : Any> CharSequence.parseCharsFirstProviderOrNull(strictly: Boolean = false): T? {
-            return charsProvider<T>(strictly).parseFirstOrNull(this)
+            return getCharsSpecParser(strictly).parseFirstOrNull(this)
+        }
+
+        private fun getCharsSpecParser(strictly: Boolean): SpecParser<CharSequence> {
+            return if (strictly) StrictCharsSpecParser else CharsSpecParser
         }
     }
 }
 
-open class CharsProvider<T : Any> : Provider<CharSequence, T> {
+object CharsSpecParser : SpecParser<CharSequence> {
 
-    override fun parse(spec: CharSequence): List<T> {
+    override fun <T : Any> parse(spec: CharSequence): List<T> {
         val classNames = spec.split(",")
         val result = ArrayList<T>(classNames.size)
         for (className in classNames) {
@@ -63,7 +61,7 @@ open class CharsProvider<T : Any> : Provider<CharSequence, T> {
         return result
     }
 
-    override fun parseFirstOrNull(spec: CharSequence): T? {
+    override fun <T : Any> parseFirstOrNull(spec: CharSequence): T? {
         val classNames = spec.split(",")
         for (className in classNames) {
             val trimmedClassName = className.trim()
@@ -78,21 +76,11 @@ open class CharsProvider<T : Any> : Provider<CharSequence, T> {
         }
         return null
     }
-
-    companion object {
-
-        private val INSTANCE = CharsProvider<Any>()
-
-        @JvmStatic
-        fun <T : Any> ofType(): CharsProvider<T> {
-            return INSTANCE.asAny()
-        }
-    }
 }
 
-class StrictCharsProvider<T : Any> : CharsProvider<T>() {
+object StrictCharsSpecParser : SpecParser<CharSequence> {
 
-    override fun parse(spec: CharSequence): List<T> {
+    override fun <T : Any> parse(spec: CharSequence): List<T> {
         val classNames = spec.split(",")
         val result = ArrayList<T>(classNames.size)
         for (className in classNames) {
@@ -101,7 +89,7 @@ class StrictCharsProvider<T : Any> : CharsProvider<T>() {
         return result
     }
 
-    override fun parseFirstOrNull(spec: CharSequence): T? {
+    override fun <T : Any> parseFirstOrNull(spec: CharSequence): T? {
         val classNames = spec.split(",")
         for (className in classNames) {
             return createInstance(className)
@@ -109,7 +97,7 @@ class StrictCharsProvider<T : Any> : CharsProvider<T>() {
         return null
     }
 
-    private fun createInstance(className: CharSequence): T {
+    private fun <T : Any> createInstance(className: CharSequence): T {
         val trimmedClassName = className.trim()
         val product: T? = try {
             trimmedClassName.findClassToInstance()
@@ -120,15 +108,5 @@ class StrictCharsProvider<T : Any> : CharsProvider<T>() {
             throw IllegalStateException("Class $trimmedClassName was not found.")
         }
         return product
-    }
-
-    companion object {
-
-        private val INSTANCE = StrictCharsProvider<Any>()
-
-        @JvmStatic
-        fun <T : Any> ofType(): StrictCharsProvider<T> {
-            return INSTANCE.asAny()
-        }
     }
 }
