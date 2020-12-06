@@ -18,26 +18,26 @@ interface SpecParser<S> {
         @JvmStatic
         @JvmOverloads
         @JvmName("specParse")
-        fun <T : Any> CharSequence.parseCharsProviders(strictly: Boolean = false): List<T> {
-            return getCharsSpecParser(strictly).parse(this)
+        fun <T : Any> CharSequence.parseCharsProviders(strict: Boolean = false): List<T> {
+            return getCharsSpecParser(strict).parse(this)
         }
 
         @JvmStatic
         @JvmOverloads
         @JvmName("specParseFirst")
-        fun <T : Any> CharSequence.parseCharsFirstProvider(strictly: Boolean = false): T {
-            return getCharsSpecParser(strictly).parseFirst(this)
+        fun <T : Any> CharSequence.parseCharsFirstProvider(strict: Boolean = false): T {
+            return getCharsSpecParser(strict).parseFirst(this)
         }
 
         @JvmStatic
         @JvmOverloads
         @JvmName("specParseFirstOrNull")
-        fun <T : Any> CharSequence.parseCharsFirstProviderOrNull(strictly: Boolean = false): T? {
-            return getCharsSpecParser(strictly).parseFirstOrNull(this)
+        fun <T : Any> CharSequence.parseCharsFirstProviderOrNull(strict: Boolean = false): T? {
+            return getCharsSpecParser(strict).parseFirstOrNull(this)
         }
 
-        private fun getCharsSpecParser(strictly: Boolean): SpecParser<CharSequence> {
-            return if (strictly) StrictCharsSpecParser else CharsSpecParser
+        private fun getCharsSpecParser(strict: Boolean): SpecParser<CharSequence> {
+            return if (strict) StrictCharsSpecParser else CharsSpecParser
         }
     }
 }
