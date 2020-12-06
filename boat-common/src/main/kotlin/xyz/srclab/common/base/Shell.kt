@@ -1,133 +1,452 @@
 package xyz.srclab.common.base
 
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.io.PrintStream
+import java.nio.charset.Charset
+import java.time.Duration
 import java.util.*
+import java.util.concurrent.TimeUnit
 
-interface Shell {
+interface Shell : ShellIO {
 
-    fun print(any: Any?)
-
-    fun println(any: Any?)
-
-    @JvmDefault
-    fun plainText(value: CharSequence): ShellText {
-        return plainText(false, value)
-    }
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val errorOutput: PrintStream
+        @JvmName("errorOutput") get
 
     @JvmDefault
-    fun plainText(isControl: Boolean, value: CharSequence): ShellText {
-        return PlainText(isControl, value.toString())
+    fun print(chars: ShellChars) {
+        print(chars.value)
     }
 
     @JvmDefault
-    fun concatText(vararg shellTexts: ShellText): ShellText {
-        return concatText(shellTexts.toList())
+    fun print(vararg chars: ShellChars) {
+        for (c in chars) {
+            print(c)
+        }
     }
 
     @JvmDefault
-    fun concatText(shellTexts: List<ShellText>): ShellText {
-        return MultiText(shellTexts)
+    fun println(chars: ShellChars) {
+        println(chars.value)
     }
-
-    fun resetText(): ShellText
-
-    fun cursorUpText(n: Int = 1): ShellText
-
-    fun cursorDownText(n: Int = 1): ShellText
-
-    fun cursorForwardText(n: Int = 1): ShellText
-
-    fun cursorBackText(n: Int = 1): ShellText
-
-    fun cursorNextLineText(n: Int = 1): ShellText
-
-    fun cursorPreviousLineText(n: Int = 1): ShellText
-
-    fun cursorHorizontalAbsoluteText(n: Int = 1): ShellText
-
-    fun cursorPositionText(n: Int, m: Int): ShellText
-
-    fun eraseText(n: Int = 2): ShellText
-
-    fun eraseLineText(n: Int = 2): ShellText
-
-    fun scrollUpText(n: Int = 1): ShellText
-
-    fun scrollDownText(n: Int = 1): ShellText
-
-    fun reportCursorPositionText(): ShellText
-
-    fun saveCursorPositionText(): ShellText
-
-    fun restoreCursorPositionText(): ShellText
-
-    fun richText(param: CharSequence): ShellText {
-        return richText(listOf(param))
-    }
-
-    fun richText(vararg params: CharSequence): ShellText {
-        return richText(params.toList())
-    }
-
-    fun richText(params: List<CharSequence>): ShellText
-
-    fun read(): String
-
-    fun readLine(): String
 
     @JvmDefault
-    fun echo(text: CharSequence) {
-        val process = Runtime.getRuntime().exec("echo $text")
-        val inputStream = process.inputStream
-        val inputStreamReader = InputStreamReader(inputStream)
-        val inputReader = BufferedReader(inputStreamReader)
-        val input = inputReader.readText()
-        inputReader.close()
-        print(input)
-        val errorStream = process.errorStream
-        val errorStreamReader = InputStreamReader(errorStream)
-        val errorReader = BufferedReader(errorStreamReader)
-        val error = errorReader.readText()
-        errorReader.close()
-        print(error)
+    fun println(vararg chars: ShellChars) {
+        print(*chars)
+        println()
+    }
+
+    @JvmDefault
+    fun print(chars: List<Any>) {
+        for (c in chars) {
+            if (c is ShellChars) {
+                print(c)
+            } else {
+                print(c.toString())
+            }
+        }
+    }
+
+    @JvmDefault
+    fun println(chars: List<Any>) {
+        print(chars)
+        println()
+    }
+
+    @JvmDefault
+    fun run(vararg command: CharSequence): ShellProcess {
+        return ShellProcess.of(
+            ProcessBuilder()
+                .command(*command.toStringArray())
+                .redirectErrorStream(true)
+                .start(),
+            charset
+        )
+    }
+
+    @JvmDefault
+    fun run(command: List<CharSequence>): ShellProcess {
+        return ShellProcess.of(
+            ProcessBuilder()
+                .command(command.map { it.toString() })
+                .redirectErrorStream(true)
+                .start(),
+            charset
+        )
     }
 
     companion object {
 
         @JvmField
-        val DEFAULT: Shell = DefaultShell
-
-        private class PlainText(override val isControl: Boolean, override val value: String) : ShellText
-
-        private class MultiText(shellTexts: List<ShellText>) : ShellText {
-            override val isControl: Boolean = false
-            override val value: String by lazy { shellTexts.joinToString(separator = "") { t -> t.value } }
-        }
+        val DEFAULT: Shell = SystemShell
     }
 }
 
-interface ShellText {
+interface ShellChars {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val isControl: Boolean
         @JvmName("isControl") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    val isEscape: Boolean
+        @JvmName("isEscape") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val value: String
         @JvmName("value") get
+
+    companion object {
+
+        @JvmStatic
+        fun of(isControl: Boolean, isEscape: Boolean, value: CharSequence): ShellChars {
+            return ShellCharsImpl(isControl, isEscape, value.toString())
+        }
+
+        @JvmStatic
+        fun concat(vararg shellChars: ShellChars): ShellChars {
+            return concat(shellChars.toList())
+        }
+
+        @JvmStatic
+        fun concat(shellChars: List<ShellChars>): ShellChars {
+            return ConcatShellChars(shellChars)
+        }
+
+        private class ShellCharsImpl(
+            override val isControl: Boolean,
+            override val isEscape: Boolean,
+            override val value: String
+        ) : ShellChars
+
+        private class ConcatShellChars(shellChars: List<ShellChars>) : ShellChars {
+
+            override val isControl: Boolean
+            override val isEscape: Boolean
+            override val value: String
+
+            init {
+                var ic = false
+                var ie = false
+                for (text in shellChars) {
+                    if (text.isControl) {
+                        ic = true
+                        if (ie) {
+                            break
+                        }
+                    }
+                    if (text.isEscape) {
+                        ie = true
+                        if (ic) {
+                            break
+                        }
+                    }
+                }
+                isControl = ic
+                isEscape = ie
+                value = shellChars.joinToString(separator = "") { text -> text.value }
+            }
+        }
+    }
 }
 
+interface ShellProcess : ShellIO {
 
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val process: Process
+        @JvmName("process") get
 
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val isAlive: Boolean
+        @JvmName("isAlive") get() {
+            return process.isAlive
+        }
 
+    @JvmDefault
+    //@Throws(InterruptedException::class)
+    fun waitFor(): Int {
+        return process.waitFor()
+    }
 
+    @JvmDefault
+    //@Throws(InterruptedException::class)
+    fun waitFor(timeout: Duration): Boolean {
+        return process.waitFor(timeout.toNanos(), TimeUnit.NANOSECONDS)
+    }
 
+    @JvmDefault
+    fun exitValue(): Int {
+        return process.exitValue()
+    }
 
+    @JvmDefault
+    fun destroy() {
+        return process.destroy()
+    }
 
+    @JvmDefault
+    fun destroyForcibly(): ShellProcess {
+        val p = process.destroyForcibly()
+        return if (process === p) this else of(p, charset)
+    }
 
+    companion object {
+
+        @JvmStatic
+        @JvmOverloads
+        fun of(process: Process, charset: Charset = Charset.defaultCharset()): ShellProcess {
+            return ShellProcessImpl(process, charset)
+        }
+
+        private class ShellProcessImpl(
+            override val process: Process,
+            override val charset: Charset,
+        ) : ShellProcess {
+
+            override val input: Scanner by lazy {
+                Scanner(process.inputStream, charset.name())
+            }
+
+            override val output: PrintStream by lazy {
+                PrintStream(process.outputStream, false, charset.name())
+            }
+        }
+    }
+}
+
+interface ShellIO {
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val charset: Charset
+        @JvmName("charset") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val input: Scanner
+        @JvmName("input") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val output: PrintStream
+        @JvmName("output") get
+
+    @JvmDefault
+    fun read(): String {
+        return input.next()
+    }
+
+    @JvmDefault
+    fun readLine(): String {
+        return input.nextLine()
+    }
+
+    @JvmDefault
+    fun print(chars: CharSequence) {
+        output.print(chars)
+    }
+
+    @JvmDefault
+    fun print(vararg chars: CharSequence) {
+        for (c in chars) {
+            output.print(c)
+        }
+    }
+
+    @JvmDefault
+    fun println(chars: CharSequence) {
+        output.println(chars)
+    }
+
+    @JvmDefault
+    fun println(vararg chars: CharSequence) {
+        print(*chars)
+        println()
+    }
+
+    @JvmDefault
+    fun println() {
+        output.println()
+    }
+
+    @JvmDefault
+    fun flushPrint() {
+        output.flush()
+    }
+}
+
+object SystemShell : Shell {
+
+    override val charset: Charset = Charset.defaultCharset()
+
+    override val input: Scanner by lazy {
+        Scanner(System.`in`)
+    }
+
+    override val output: PrintStream by lazy {
+        System.out
+    }
+
+    override val errorOutput: PrintStream by lazy {
+        System.err
+    }
+}
+
+interface ShellTextProvider {
+
+    @JvmDefault
+    fun plain(value: CharSequence): ShellChars {
+        return plain(false, false, value)
+    }
+
+    @JvmDefault
+    fun plain(isControl: Boolean, isEscape: Boolean, value: CharSequence): ShellChars {
+        return ShellChars.of(isControl, isEscape, value.toString())
+    }
+
+    @JvmDefault
+    fun concat(vararg shellChars: ShellChars): ShellChars {
+        return ShellChars.concat(*shellChars)
+    }
+
+    @JvmDefault
+    fun concat(shellChars: List<ShellChars>): ShellChars {
+        return ShellChars.concat(shellChars)
+    }
+
+    /*
+    Control characters:
+
+    BEL (0x07, ^G) beeps;
+
+    BS (0x08, ^H) backspaces one column (but not past the beginning of the line);
+
+    HT  (0x09,  ^I) goes to the next tab stop or to the end of the line if there is no earlier
+    tab stop;
+
+    LF (0x0A, ^J), VT (0x0B, ^K) and FF (0x0C, ^L) all give a linefeed, and if LF/NL (new-line
+    mode) is set also a carriage return;
+
+    CR (0x0D, ^M) gives a carriage return;
+
+    SO (0x0E, ^N) activates the G1 character set;
+
+    SI (0x0F, ^O) activates the G0 character set;
+
+    CAN (0x18, ^X) and SUB (0x1A, ^Z) interrupt escape sequences;
+
+    ESC (0x1B, ^[) starts an escape sequence;
+
+    DEL (0x7F) is ignored;
+
+    CSI (0x9B) is equivalent to ESC [.
+    */
+
+    fun beep()
+
+    fun backspaces()
+
+    fun goNextTab()
+
+    fun linefeed()
+
+    fun carriageReturn()
+
+    fun activateG1Charset()
+
+    fun activateG0Charset()
+
+    fun interruptEscape()
+
+    fun escape(value: CharSequence)
+
+    /*
+    ESC- but not CSI-sequences
+
+    ESC c     RIS      Reset.
+    ESC D     IND      Linefeed.
+    ESC E     NEL      Newline.
+    ESC H     HTS      Set tab stop at current column.
+    ESC M     RI       Reverse linefeed.
+    ESC Z     DECID    DEC private identification. The kernel returns the
+                      string  ESC [ ? 6 c, claiming that it is a VT102.
+    ESC 7     DECSC    Save   current    state    (cursor    coordinates,
+                      attributes, character sets pointed at by G0, G1).
+    ESC 8     DECRC    Restore state most recently saved by ESC 7.
+    ESC [     CSI      Control sequence introducer
+    ESC %              Start sequence selecting character set
+    ESC % @               Select default (ISO 646 / ISO 8859-1)
+    ESC % G               Select UTF-8
+    ESC % 8               Select UTF-8 (obsolete)
+    ESC # 8   DECALN   DEC screen alignment test - fill screen with E's.
+    ESC (              Start sequence defining G0 character set
+    ESC ( B               Select default (ISO 8859-1 mapping)
+    ESC ( 0               Select VT100 graphics mapping
+    ESC ( U               Select null mapping - straight to character ROM
+    ESC ( K               Select user mapping - the map that is loaded by
+                         the utility mapscrn(8).
+    ESC )              Start sequence defining G1
+                      (followed by one of B, 0, U, K, as above).
+    ESC >     DECPNM   Set numeric keypad mode
+    ESC =     DECPAM   Set application keypad mode
+    ESC ]     OSC      (Should  be:  Operating  system  command)  ESC ] P
+                      nrrggbb: set palette, with parameter  given  in  7
+                      hexadecimal  digits after the final P :-(.  Here n
+                      is the color  (0–15),  and  rrggbb  indicates  the
+                      red/green/blue  values  (0–255).   ESC  ] R: reset
+                      palette
+     */
+
+    fun escapeReset(): ShellChars
+
+    fun escapeLinefeed()
+
+    fun escapeNewline()
+
+    fun setTabAtCurrentColumn()
+
+    fun reverseLinefeed()
+
+    fun saveCurrentState()
+
+    fun restoreState()
+
+    fun cursorUp(n: Int = 1): ShellChars
+
+    fun cursorDown(n: Int = 1): ShellChars
+
+    fun cursorForward(n: Int = 1): ShellChars
+
+    fun cursorBack(n: Int = 1): ShellChars
+
+    fun cursorNextLine(n: Int = 1): ShellChars
+
+    fun cursorPreviousLine(n: Int = 1): ShellChars
+
+    fun cursorHorizontalAbsolute(n: Int = 1): ShellChars
+
+    fun cursorPosition(n: Int, m: Int): ShellChars
+
+    fun erase(n: Int = 2): ShellChars
+
+    fun eraseLine(n: Int = 2): ShellChars
+
+    fun scrollUp(n: Int = 1): ShellChars
+
+    fun scrollDown(n: Int = 1): ShellChars
+
+    fun reportCursorPosition(): ShellChars
+
+    fun saveCursorPosition(): ShellChars
+
+    fun restoreCursorPosition(): ShellChars
+
+    fun richText(param: CharSequence): ShellChars {
+        return richText(listOf(param))
+    }
+
+    fun richText(vararg params: CharSequence): ShellChars {
+        return richText(params.toList())
+    }
+
+    fun richText(params: List<CharSequence>): ShellChars
+}
 
 interface UnixRichTextParam {
 
@@ -559,27 +878,3 @@ interface SgrText : CsiText {
 private class SgrTextImpl(params: List<SgrText.Param>) : CsiTextImpl(
     params.joinToString(separator = ";") { p -> p.value } + "m"
 ), SgrText
-
-abstract class StreamShell(input: InputStream, output: PrintStream) : Shell {
-
-    private val scanner = Scanner(input)
-    private val printStream = output
-
-    override fun print(any: Any?) {
-        printStream.print(any)
-    }
-
-    override fun println(any: Any?) {
-        printStream.println(any)
-    }
-
-    override fun read(): String {
-        return scanner.next()
-    }
-
-    override fun readLine(): String {
-        return scanner.nextLine()
-    }
-}
-
-object DefaultShell : StreamShell(System.`in`, System.out)

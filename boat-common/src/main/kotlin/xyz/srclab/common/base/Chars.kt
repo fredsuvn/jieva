@@ -55,6 +55,28 @@ fun CharSequence.toBytes(charset: Charset = Defaults.charset): ByteArray {
     return toString().toByteArray(charset)
 }
 
+fun Array<out Any?>.toStringArray(): Array<String> {
+    if (this.javaClass == Array<String>::class.java) {
+        return this.asAny()
+    }
+    val result = arrayOfNulls<String>(this.size)
+    for (i in this.indices) {
+        result[i] = this[i].toString()
+    }
+    return result.asAny()
+}
+
+fun Array<out Any?>.toStringOrNullArray(): Array<String?> {
+    if (this.javaClass == Array<String>::class.java) {
+        return this.asAny()
+    }
+    val result = arrayOfNulls<String>(this.size)
+    for (i in this.indices) {
+        result[i] = if (this[i] === null) null else this[i].toString()
+    }
+    return result.asAny()
+}
+
 fun Any?.toString(): String {
     return toStringKt()
 }
