@@ -17,7 +17,7 @@ interface Invoker {
 
     fun <T> invoke(`object`: Any?, vararg args: Any?): T
 
-    fun <T> forceInvoke(`object`: Any?, vararg args: Any?): T
+    fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T
 
     companion object {
 
@@ -90,7 +90,7 @@ object ReflectedInvokerProvider : InvokerProvider {
             return method.invoke(`object`, *args).asAny()
         }
 
-        override fun <T> forceInvoke(`object`: Any?, vararg args: Any?): T {
+        override fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T {
             method.isAccessible = true
             return method.invoke(`object`, *args).asAny()
         }
@@ -102,7 +102,7 @@ object ReflectedInvokerProvider : InvokerProvider {
             return constructor.newInstance(*args).asAny()
         }
 
-        override fun <T> forceInvoke(`object`: Any?, vararg args: Any?): T {
+        override fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T {
             constructor.isAccessible = true
             return constructor.newInstance(*args).asAny()
         }
@@ -191,7 +191,7 @@ object MethodHandlerInvokerProvider : InvokerProvider {
             }.asAny()
         }
 
-        override fun <T> forceInvoke(`object`: Any?, vararg args: Any?): T {
+        override fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T {
             return invoke(`object`, *args)
         }
 
@@ -290,7 +290,7 @@ object MethodHandlerInvokerProvider : InvokerProvider {
             }.asAny()
         }
 
-        override fun <T> forceInvoke(`object`: Any?, vararg args: Any?): T {
+        override fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T {
             return invoke(`object`, *args)
         }
 

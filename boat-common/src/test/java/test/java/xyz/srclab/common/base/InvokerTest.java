@@ -20,7 +20,7 @@ public class InvokerTest {
                 a1.getMark("A()"),
                 "A()"
         );
-        A a2 = Invoker.forConstructor(A.class, String.class).forceInvoke(null, "123");
+        A a2 = Invoker.forConstructor(A.class, String.class).invokeForcibly(null, "123");
         Assert.assertEquals(
                 a2.getMark("A(123)"),
                 "A(123)"
@@ -52,7 +52,7 @@ public class InvokerTest {
         Assert.assertThrows(IllegalAccessException.class, () ->
                 Invoker.forMethod(A.class, "a2").invoke(a));
         Assert.assertEquals(
-                Invoker.forMethod(A.class, "a2").forceInvoke(a),
+                Invoker.forMethod(A.class, "a2").invokeForcibly(a),
                 "a2"
         );
         Assert.assertEquals(
@@ -62,7 +62,7 @@ public class InvokerTest {
         Assert.assertThrows(IllegalAccessException.class, () ->
                 Invoker.forMethod(A.class, "a4", String.class).invoke(a, "123"));
         Assert.assertEquals(
-                Invoker.forMethod(A.class, "a4", String.class).forceInvoke(a, "123"),
+                Invoker.forMethod(A.class, "a4", String.class).invokeForcibly(a, "123"),
                 "a4: 123"
         );
 
@@ -99,7 +99,7 @@ public class InvokerTest {
                 a1.getMark("A()"),
                 "A()"
         );
-        A a2 = ip.forConstructor(A.class, String.class).forceInvoke(null, "123");
+        A a2 = ip.forConstructor(A.class, String.class).invokeForcibly(null, "123");
         Assert.assertEquals(
                 a2.getMark("A(123)"),
                 "A(123)"
@@ -131,7 +131,7 @@ public class InvokerTest {
         Assert.assertThrows(IllegalAccessException.class, () ->
                 ip.forMethod(A.class, "a2").invoke(a));
         Assert.assertEquals(
-                ip.forMethod(A.class, "a2").forceInvoke(a),
+                ip.forMethod(A.class, "a2").invokeForcibly(a),
                 "a2"
         );
         Assert.assertEquals(
@@ -141,7 +141,7 @@ public class InvokerTest {
         Assert.assertThrows(IllegalAccessException.class, () ->
                 ip.forMethod(A.class, "a4", String.class).invoke(a, "123"));
         Assert.assertEquals(
-                ip.forMethod(A.class, "a4", String.class).forceInvoke(a, "123"),
+                ip.forMethod(A.class, "a4", String.class).invokeForcibly(a, "123"),
                 "a4: 123"
         );
 
@@ -178,7 +178,7 @@ public class InvokerTest {
                 a1.getMark("A()"),
                 "A()"
         );
-        A a2 = ip.forConstructor(A.class, String.class).forceInvoke(null, "123");
+        A a2 = ip.forConstructor(A.class, String.class).invokeForcibly(null, "123");
         Assert.assertEquals(
                 a2.getMark("A(123)"),
                 "A(123)"
@@ -210,7 +210,7 @@ public class InvokerTest {
         //Assert.assertThrows(IllegalAccessException.class, () ->
         //        ip.forMethod(A.class, "a2").invoke(a));
         Assert.assertEquals(
-                ip.forMethod(A.class, "a2").forceInvoke(a),
+                ip.forMethod(A.class, "a2").invokeForcibly(a),
                 "a2"
         );
         Assert.assertEquals(
@@ -220,7 +220,7 @@ public class InvokerTest {
         //Assert.assertThrows(IllegalAccessException.class, () ->
         //        ip.forMethod(A.class, "a4", String.class).invoke(a, "123"));
         Assert.assertEquals(
-                ip.forMethod(A.class, "a4", String.class).forceInvoke(a, "123"),
+                ip.forMethod(A.class, "a4", String.class).invokeForcibly(a, "123"),
                 "a4: 123"
         );
 
