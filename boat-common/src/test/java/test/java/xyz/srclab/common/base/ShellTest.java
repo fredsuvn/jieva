@@ -3,6 +3,7 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Defaults;
+import xyz.srclab.common.base.Environment;
 import xyz.srclab.common.base.Shell;
 import xyz.srclab.common.base.ShellProcess;
 
@@ -42,8 +43,15 @@ public class ShellTest {
 
     @Test
     public void testShellProcess() {
-        Shell shell = Shell.withCharset(Defaults.charset());
-        //Shell shell = Shell.withCharset(Chars.toCharSet("GBK"));
+        if (Environment.isOsUnix()) {
+            testShellProcessOnUnixLike();
+        } else {
+            testShellProcessOnWindows();
+        }
+    }
+
+    private void testShellProcessOnUnixLike() {
+        Shell shell = Shell.DEFAULT;
         String content = "first line;" + Defaults.lineSeparator() +
                 "第二行;" + Defaults.lineSeparator() +
                 "third line.";
@@ -52,5 +60,12 @@ public class ShellTest {
         System.out.println(output);
         Assert.assertEquals(output, content + Defaults.lineSeparator());
         shellProcess.close();
+    }
+
+    private void testShellProcessOnWindows() {
+        Shell shell = Shell.DEFAULT;
+        ShellProcess shellProcess = shell.run("ping", "127.0.0.1");
+        String output = shellProcess.readAll();
+        System.out.println(output);
     }
 }
