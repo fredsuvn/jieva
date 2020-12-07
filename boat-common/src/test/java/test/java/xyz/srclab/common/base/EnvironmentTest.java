@@ -25,10 +25,21 @@ public class EnvironmentTest {
 
     @Test
     public void testOs() {
+        Assert.assertEquals(Environment.isOsAix(), SystemUtils.IS_OS_AIX);
+        Assert.assertEquals(Environment.isOsHpUx(), SystemUtils.IS_OS_HP_UX);
+        Assert.assertEquals(Environment.isOsOs400(), SystemUtils.IS_OS_400);
+        Assert.assertEquals(Environment.isOsIrix(), SystemUtils.IS_OS_IRIX);
         Assert.assertEquals(Environment.isOsLinux(), SystemUtils.IS_OS_LINUX);
+        Assert.assertEquals(Environment.isOsMac(), SystemUtils.IS_OS_MAC);
+        Assert.assertEquals(Environment.isOsMacOsX(), SystemUtils.IS_OS_MAC_OSX);
+        Assert.assertEquals(Environment.isOsFreeBsd(), SystemUtils.IS_OS_FREE_BSD);
+        Assert.assertEquals(Environment.isOsOpenBsd(), SystemUtils.IS_OS_OPEN_BSD);
+        Assert.assertEquals(Environment.isOsNetBsd(), SystemUtils.IS_OS_NET_BSD);
+        Assert.assertEquals(Environment.isOsOs2(), SystemUtils.IS_OS_OS2);
+        Assert.assertEquals(Environment.isOsSolaris(), SystemUtils.IS_OS_SOLARIS);
+        Assert.assertEquals(Environment.isOsSunOs(), SystemUtils.IS_OS_SUN_OS);
         Assert.assertEquals(Environment.isOsUnix(), SystemUtils.IS_OS_UNIX);
         Assert.assertEquals(Environment.isOsWindows(), SystemUtils.IS_OS_WINDOWS);
-        Assert.assertEquals(Environment.isOsMac(), SystemUtils.IS_OS_MAC);
     }
 
     @Test

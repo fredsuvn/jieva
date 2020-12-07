@@ -280,8 +280,56 @@ object Environment {
         }
 
     @JvmStatic
+    val isOsAix: Boolean
+        @JvmName("isOsAix") get() = SystemUtils.IS_OS_AIX
+
+    @JvmStatic
+    val isOsHpUx: Boolean
+        @JvmName("isOsHpUx") get() = SystemUtils.IS_OS_HP_UX
+
+    @JvmStatic
+    val isOsOs400: Boolean
+        @JvmName("isOsOs400") get() = SystemUtils.IS_OS_400
+
+    @JvmStatic
+    val isOsIrix: Boolean
+        @JvmName("isOsIrix") get() = SystemUtils.IS_OS_IRIX
+
+    @JvmStatic
     val isOsLinux: Boolean
         @JvmName("isOsLinux") get() = SystemUtils.IS_OS_LINUX
+
+    @JvmStatic
+    val isOsMac: Boolean
+        @JvmName("isOsMac") get() = SystemUtils.IS_OS_MAC
+
+    @JvmStatic
+    val isOsMacOsX: Boolean
+        @JvmName("isOsMacOsX") get() = SystemUtils.IS_OS_MAC_OSX
+
+    @JvmStatic
+    val isOsFreeBsd: Boolean
+        @JvmName("isOsFreeBsd") get() = SystemUtils.IS_OS_FREE_BSD
+
+    @JvmStatic
+    val isOsOpenBsd: Boolean
+        @JvmName("isOsOpenBsd") get() = SystemUtils.IS_OS_OPEN_BSD
+
+    @JvmStatic
+    val isOsNetBsd: Boolean
+        @JvmName("isOsNetBsd") get() = SystemUtils.IS_OS_NET_BSD
+
+    @JvmStatic
+    val isOsOs2: Boolean
+        @JvmName("isOsOs2") get() = SystemUtils.IS_OS_OS2
+
+    @JvmStatic
+    val isOsSolaris: Boolean
+        @JvmName("isOsSolaris") get() = SystemUtils.IS_OS_SOLARIS
+
+    @JvmStatic
+    val isOsSunOs: Boolean
+        @JvmName("isOsSunOs") get() = SystemUtils.IS_OS_SUN_OS
 
     @JvmStatic
     val isOsUnix: Boolean
@@ -290,10 +338,6 @@ object Environment {
     @JvmStatic
     val isOsWindows: Boolean
         @JvmName("isOsWindows") get() = SystemUtils.IS_OS_WINDOWS
-
-    @JvmStatic
-    val isOsMac: Boolean
-        @JvmName("isOsMac") get() = SystemUtils.IS_OS_MAC
 
     @JvmStatic
     val javaVersionNumber: Int
@@ -337,5 +381,10 @@ object Environment {
 
     private fun getPropertyAsNotNull(key: String): String {
         return getProperty(key).asNotNull()
+    }
+
+    @JvmStatic
+    fun isOs(name: String): Boolean {
+        return osName.startsWith(name)
     }
 }
