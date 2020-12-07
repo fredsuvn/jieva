@@ -2,7 +2,7 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.Invoker
-import xyz.srclab.common.base.Invoker.Companion.toInvoker
+import xyz.srclab.common.base.Invoker.Companion.asInvoker
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collection.componentTypeToArray
@@ -494,11 +494,11 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
         }
 
         private fun tryGetter(): Invoker? {
-            return if (getterMethod === null) null else getterMethod.toInvoker()
+            return if (getterMethod === null) null else getterMethod.asInvoker()
         }
 
         private fun trySetter(): Invoker? {
-            return if (setterMethod === null) null else setterMethod.toInvoker()
+            return if (setterMethod === null) null else setterMethod.asInvoker()
         }
 
         private fun tryField(): Field? {

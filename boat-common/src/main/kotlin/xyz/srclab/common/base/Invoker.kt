@@ -33,13 +33,13 @@ interface Invoker {
 
         @JvmStatic
         @JvmName("forMethod")
-        fun Method.toInvoker(): Invoker {
+        fun Method.asInvoker(): Invoker {
             return InvokerProvider.DEFAULT.forMethod(this)
         }
 
         @JvmStatic
         @JvmName("forConstructor")
-        fun Constructor<*>.toInvoker(): Invoker {
+        fun Constructor<*>.asInvoker(): Invoker {
             return InvokerProvider.DEFAULT.forConstructor(this)
         }
     }
