@@ -213,36 +213,125 @@ class SystemShell(override val charset: Charset = Charset.defaultCharset()) : Sh
 /**
  * Control characters:
  *
- * BEL (0x07, ^G) beeps;
- *
- * BS (0x08, ^H) backspaces one column (but not past the beginning of the line);
- *
- * HT  (0x09,  ^I) goes to the next tab stop or to the end of the line if there is no earlier
+ * * BEL (0x07, ^G) beeps;
+ * * BS (0x08, ^H) backspaces one column (but not past the beginning of the line);
+ * * HT  (0x09,  ^I) goes to the next tab stop or to the end of the line if there is no earlier
  * tab stop;
- *
- * LF (0x0A, ^J), VT (0x0B, ^K) and FF (0x0C, ^L) all give a linefeed, and if LF/NL (new-line
+ * * LF (0x0A, ^J), VT (0x0B, ^K) and FF (0x0C, ^L) all give a linefeed, and if LF/NL (new-line
  * mode) is set also a carriage return;
- *
- * CR (0x0D, ^M) gives a carriage return;
- *
- * SO (0x0E, ^N) activates the G1 character set;
- *
- * SI (0x0F, ^O) activates the G0 character set;
- *
- * CAN (0x18, ^X) and SUB (0x1A, ^Z) interrupt escape sequences;
- *
- * ESC (0x1B, ^[) starts an escape sequence;
- *
- * DEL (0x7F) is ignored;
- *
- * CSI (0x9B) is equivalent to ESC [.
+ * * CR (0x0D, ^M) gives a carriage return;
+ * * SO (0x0E, ^N) activates the G1 character set;
+ * * SI (0x0F, ^O) activates the G0 character set;
+ * * CAN (0x18, ^X) and SUB (0x1A, ^Z) interrupt escape sequences;
+ * * ESC (0x1B, ^[) starts an escape sequence;
+ * * DEL (0x7F) is ignored;
+ * * CSI (0x9B) is equivalent to ESC [.
  */
-class CtrlChars {
+object CtrlChars {
 
+    @JvmStatic
+    @get:JvmName("beep")
+    val beep: String = "\u0007"
+
+    @JvmStatic
+    @get:JvmName("backspaces")
+    val backspaces: String = "\u0008"
+
+    @JvmStatic
+    @get:JvmName("goNextTab")
+    val goNextTab: String = "\u0009"
+
+    @JvmStatic
+    @get:JvmName("linefeed")
+    val linefeed: String = "\u000A"
+
+    @JvmStatic
+    @get:JvmName("carriageReturn")
+    val carriageReturn: String = "\u000D"
+
+    @JvmStatic
+    @get:JvmName("activateG1Charset")
+    val activateG1Charset: String = "\u000E"
+
+    @JvmStatic
+    @get:JvmName("activateG0Charset")
+    val activateG0Charset: String = "\u000F"
+
+    @JvmStatic
+    @get:JvmName("interruptEscape")
+    val interruptEscape: String = "\u0018"
+
+    @JvmStatic
+    fun escape(value: CharSequence): String {
+        return "\u001b$value"
+    }
 }
 
-class EscChars {
+/**
+ * ESC- but not CSI-sequences:
+ *
+ * * ESC c     RIS      Reset.
+ * * ESC D     IND      Linefeed.
+ * * ESC E     NEL      Newline.
+ * * ESC H     HTS      Set tab stop at current column.
+ * * ESC M     RI       Reverse linefeed.
+ * * ESC Z     DECID    DEC private identification. The kernel returns the
+ * string  ESC [ ? 6 c, claiming that it is a VT102.
+ * * ESC 7     DECSC    Save   current    state    (cursor    coordinates,
+ * attributes, character sets pointed at by G0, G1).
+ * * ESC 8     DECRC    Restore state most recently saved by ESC 7.
+ * * ESC [     CSI      Control sequence introducer
+ * * ESC %              Start sequence selecting character set
+ * * ESC % @               Select default (ISO 646 / ISO 8859-1)
+ * * ESC % G               Select UTF-8
+ * * ESC % 8               Select UTF-8 (obsolete)
+ * * ESC # 8   DECALN   DEC screen alignment test - fill screen with E's.
+ * * ESC (              Start sequence defining G0 character set
+ * * ESC ( B               Select default (ISO 8859-1 mapping)
+ * * ESC ( 0               Select VT100 graphics mapping
+ * * ESC ( U               Select null mapping - straight to character ROM
+ * * ESC ( K               Select user mapping - the map that is loaded by
+ * the utility mapscrn(8).
+ * * ESC )              Start sequence defining G1
+ * (followed by one of B, 0, U, K, as above).
+ * * ESC >     DECPNM   Set numeric keypad mode
+ * * ESC =     DECPAM   Set application keypad mode
+ * * ESC ]     OSC      (Should  be:  Operating  system  command)  ESC ] P
+ * nrrggbb: set palette, with parameter  given  in  7
+ * hexadecimal  digits after the final P :-(.  Here n
+ * is the color  (0–15),  and  rrggbb  indicates  the
+ * red/green/blue  values  (0–255).   ESC  ] R: reset
+ * palette
+ */
+object EscChars {
 
+    @JvmStatic
+    @get:JvmName("reset")
+    val reset: String = CtrlChars.escape("c")
+
+    @JvmStatic
+    @get:JvmName("linefeed")
+    val linefeed: String = CtrlChars.escape("D")
+
+    @JvmStatic
+    @get:JvmName("newline")
+    val newline: String = CtrlChars.escape("E")
+
+    @JvmStatic
+    @get:JvmName("setTabAtCurrentColumn")
+    val setTabAtCurrentColumn: String = CtrlChars.escape("H")
+
+    @JvmStatic
+    @get:JvmName("reverseLinefeed")
+    val reverseLinefeed: String = CtrlChars.escape("M")
+
+    @JvmStatic
+    @get:JvmName("saveState")
+    val saveState: String = CtrlChars.escape("7")
+
+    @JvmStatic
+    @get:JvmName("restoreState")
+    val restoreState: String = CtrlChars.escape("8")
 }
 
 class CsiChars {
@@ -299,56 +388,9 @@ class SgiChars {
 //
 //    fun escape(value: CharSequence)
 //
-//    /*
-//    ESC- but not CSI-sequences
+
 //
-//    ESC c     RIS      Reset.
-//    ESC D     IND      Linefeed.
-//    ESC E     NEL      Newline.
-//    ESC H     HTS      Set tab stop at current column.
-//    ESC M     RI       Reverse linefeed.
-//    ESC Z     DECID    DEC private identification. The kernel returns the
-//                      string  ESC [ ? 6 c, claiming that it is a VT102.
-//    ESC 7     DECSC    Save   current    state    (cursor    coordinates,
-//                      attributes, character sets pointed at by G0, G1).
-//    ESC 8     DECRC    Restore state most recently saved by ESC 7.
-//    ESC [     CSI      Control sequence introducer
-//    ESC %              Start sequence selecting character set
-//    ESC % @               Select default (ISO 646 / ISO 8859-1)
-//    ESC % G               Select UTF-8
-//    ESC % 8               Select UTF-8 (obsolete)
-//    ESC # 8   DECALN   DEC screen alignment test - fill screen with E's.
-//    ESC (              Start sequence defining G0 character set
-//    ESC ( B               Select default (ISO 8859-1 mapping)
-//    ESC ( 0               Select VT100 graphics mapping
-//    ESC ( U               Select null mapping - straight to character ROM
-//    ESC ( K               Select user mapping - the map that is loaded by
-//                         the utility mapscrn(8).
-//    ESC )              Start sequence defining G1
-//                      (followed by one of B, 0, U, K, as above).
-//    ESC >     DECPNM   Set numeric keypad mode
-//    ESC =     DECPAM   Set application keypad mode
-//    ESC ]     OSC      (Should  be:  Operating  system  command)  ESC ] P
-//                      nrrggbb: set palette, with parameter  given  in  7
-//                      hexadecimal  digits after the final P :-(.  Here n
-//                      is the color  (0–15),  and  rrggbb  indicates  the
-//                      red/green/blue  values  (0–255).   ESC  ] R: reset
-//                      palette
-//     */
-//
-//    fun escapeReset(): ShellChars
-//
-//    fun escapeLinefeed()
-//
-//    fun escapeNewline()
-//
-//    fun setTabAtCurrentColumn()
-//
-//    fun reverseLinefeed()
-//
-//    fun saveCurrentState()
-//
-//    fun restoreState()
+
 //
 //    fun cursorUp(n: Int = 1): ShellChars
 //
