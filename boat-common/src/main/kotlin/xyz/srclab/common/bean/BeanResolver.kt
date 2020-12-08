@@ -69,7 +69,8 @@ interface BeanResolver {
                 val toType = copyOptions.toType ?: Map::class.java
                 val toMapSchema = toType.resolveMapSchema()
                 from.forEach { (k, v) ->
-                    if (!copyOptions.propertyTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
+                    if (!copyOptions.propertyNameFilter(k)
+                        || !copyOptions.propertyTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
                         || !copyOptions.propertyValueFilter(k, v, fromMapSchema.keyType, fromMapSchema.valueType)
                         || !copyOptions.propertyConvertFilter(
                             k,
@@ -97,7 +98,8 @@ interface BeanResolver {
                 val toSchema = resolveSchema(to.javaClass)
                 val toProperties = toSchema.properties
                 from.forEach { (k, v) ->
-                    if (!copyOptions.propertyTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
+                    if (!copyOptions.propertyNameFilter(k)
+                        || !copyOptions.propertyTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
                         || !copyOptions.propertyValueFilter(k, v, fromMapSchema.keyType, fromMapSchema.valueType)
                     ) {
                         return@forEach
@@ -119,7 +121,9 @@ interface BeanResolver {
                     ) {
                         return@forEach
                     }
-                    toProperty.setValue<Any?>(to, v, copyOptions.converter)
+                    toProperty.setValue<Any?>(
+                        to, copyOptions.converter.convert(v, fromMapSchema.valueType, toProperty.genericType)
+                    )
                 }
                 to
             }
@@ -129,7 +133,8 @@ interface BeanResolver {
                 val toMapSchema = toType.resolveMapSchema()
                 val fromProperties = fromSchema.properties
                 fromProperties.forEach { (name, property) ->
-                    if (!property.isReadable
+                    if (!copyOptions.propertyNameFilter(name)
+                        || !property.isReadable
                         || !copyOptions.propertyTypeFilter(name, String::class.java, property.genericType)
                     ) {
                         return@forEach
@@ -162,7 +167,8 @@ interface BeanResolver {
                 val fromProperties = fromSchema.properties
                 val toProperties = toSchema.properties
                 fromProperties.forEach { (name, property) ->
-                    if (!property.isReadable
+                    if (!copyOptions.propertyNameFilter(name)
+                        || !property.isReadable
                         || !copyOptions.propertyTypeFilter(name, String::class.java, property.genericType)
                     ) {
                         return@forEach
@@ -184,7 +190,9 @@ interface BeanResolver {
                     ) {
                         return@forEach
                     }
-                    toProperty.setValue<Any?>(to, value, copyOptions.converter)
+                    toProperty.setValue<Any?>(
+                        to, copyOptions.converter.convert(value, property.genericType, toProperty.genericType)
+                    )
                 }
                 to
             }
@@ -210,6 +218,11 @@ interface BeanResolver {
         @JvmDefault
         val converter: Converter
             @JvmName("converter") get() = Converter.DEFAULT
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        @JvmDefault
+        val propertyNameFilter: (name: Any?) -> Boolean
+            @JvmName("propertyNameFilter") get() = { _ -> true }
 
         @Suppress(INAPPLICABLE_JVM_NAME)
         @JvmDefault
@@ -461,7 +474,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
                         val newType = when (oldType) {
                             is ParameterizedType -> findActualType(oldType)
                             is TypeVariable<*> -> findActualType(oldType)
-                            is WildcardType -> findActualType(oldType.upperBound)
+                            //is WildcardType -> findActualType(oldType.upperBound)
                             is GenericArrayType -> {
                                 if (oldType.genericComponentType is TypeVariable<*>) {
                                     oldType.genericComponentType.componentTypeToArray<Any>(0).javaClass

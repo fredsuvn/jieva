@@ -111,20 +111,25 @@ interface TestTask {
     companion object {
 
         @JvmStatic
-        fun newTask(task: () -> Unit): TestTask {
+        fun newTask(times: Long, task: () -> Unit): TestTask {
             return object : TestTask {
                 override fun run() {
-                    task()
+                    for (i in 1..times) {
+                        task()
+                    }
                 }
             }
         }
 
         @JvmStatic
-        fun newTask(name: String, task: () -> Unit): TestTask {
+        @JvmOverloads
+        fun newTask(name: String? = null, times: Long = 1, task: () -> Unit): TestTask {
             return object : TestTask {
-                override val name: String = name
+                override val name: String = name ?: this.javaClass.name
                 override fun run() {
-                    task()
+                    for (i in 1..times) {
+                        task()
+                    }
                 }
             }
         }
