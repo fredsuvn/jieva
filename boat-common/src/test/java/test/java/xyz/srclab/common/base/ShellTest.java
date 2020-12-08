@@ -13,8 +13,25 @@ public class ShellTest {
         Shell shell = Shell.DEFAULT;
         shell.println("Hello", ",", "World", "!");
         shell.println(Arrays.asList("Hello", ",", "World", "!"));
-
-        shell.println("123", EscChars.linefeed(), "456", EscChars.newline());
+        shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
+        shell.println(
+                SgiChars.foregroundRed("red"),
+                SgiChars.backgroundCyan(" "),
+                SgiChars.foregroundGreen("green")
+        );
+        shell.println(
+                SgiChars.withParam("bright red", SgiParam.FOREGROUND_BRIGHT_RED),
+                SgiChars.backgroundCyan(" "),
+                SgiChars.withParam("bright green", SgiParam.FOREGROUND_BRIGHT_GREEN)
+        );
+        shell.println(
+                SgiChars.withParam("color 8", SgiParam.foregroundColor(8)),
+                SgiChars.backgroundCyan(" "),
+                SgiChars.withParam("rgb(100, 100, 50)", SgiParam.foregroundColor(100, 100, 50))
+        );
+        shell.println(ControlChars.beep());
+        System.out.println("123\010456\007");
+        shell.println("123", ControlChars.backspaces(), "456", ControlChars.beep());
     }
 
     @Test
