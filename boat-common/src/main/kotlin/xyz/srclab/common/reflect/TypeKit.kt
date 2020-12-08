@@ -4,12 +4,13 @@
 package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
+import org.apache.commons.lang3.reflect.TypeUtils
 import xyz.srclab.annotations.PossibleTypes
 import xyz.srclab.common.base.asAny
 import java.lang.reflect.*
 
 val Type.rawClass: Class<*>
-    get() {
+    @JvmName("rawClass") get() {
         return when (this) {
             is Class<*> -> this
             is ParameterizedType -> this.rawClass
@@ -18,12 +19,12 @@ val Type.rawClass: Class<*>
     }
 
 val ParameterizedType.rawClass: Class<*>
-    get() {
+    @JvmName("rawClass") get() {
         return this.rawType.asAny()
     }
 
 val Type.upperClass: Class<*>
-    get() {
+    @JvmName("upperClass") get() {
         return when (this) {
             is Class<*> -> this
             is ParameterizedType -> this.rawClass
@@ -48,7 +49,7 @@ val Type.upperClass: Class<*>
     }
 
 val Type.lowerClass: Class<*>
-    get() {
+    @JvmName("lowerClass") get() {
         return when (this) {
             is Class<*> -> this
             is ParameterizedType -> this.rawClass
@@ -64,8 +65,9 @@ val Type.lowerClass: Class<*>
         }
     }
 
-@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
 val TypeVariable<*>.upperBound: Type
+    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+    @JvmName("upperBound")
     get() {
         val bounds = this.bounds
         return if (!bounds.isNullOrEmpty()) {
@@ -75,8 +77,9 @@ val TypeVariable<*>.upperBound: Type
         }
     }
 
-@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
 val WildcardType.upperBound: Type
+    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+    @JvmName("upperBound")
     get() {
         val upperBounds = this.upperBounds
         return if (!upperBounds.isNullOrEmpty()) {
@@ -86,8 +89,9 @@ val WildcardType.upperBound: Type
         }
     }
 
-@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
 val Type.upperBound: Type
+    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+    @JvmName("upperBound")
     get() {
         return when (this) {
             is TypeVariable<*> -> this.upperBound
@@ -96,8 +100,9 @@ val Type.upperBound: Type
         }
     }
 
-@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
 val WildcardType.lowerBound: Type
+    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+    @JvmName("lowerBound")
     get() {
         val lowerBounds = this.lowerBounds
         return if (!lowerBounds.isNullOrEmpty()) {
@@ -107,8 +112,9 @@ val WildcardType.lowerBound: Type
         }
     }
 
-@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
 val Type.lowerBound: Type
+    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+    @JvmName("lowerBound")
     get() {
         return when (this) {
             is TypeVariable<*> -> Nothing::class.java
@@ -117,8 +123,9 @@ val Type.lowerBound: Type
         }
     }
 
-@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
 val Type.deepUpperBound: Type
+    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+    @JvmName("deepUpperBound")
     get() {
         return when (this) {
             is ParameterizedType -> {
@@ -135,7 +142,7 @@ val Type.deepUpperBound: Type
                 if (!needTransform) {
                     return this
                 }
-                return ParameterizedTypeImpl(this.rawType, this.ownerType, actualTypeArguments)
+                return parameterizedType(this.rawType, actualTypeArguments, this.ownerType)
             }
             is TypeVariable<*> -> this.upperBound
             is WildcardType -> this.upperBound
@@ -143,8 +150,9 @@ val Type.deepUpperBound: Type
         }
     }
 
-@get:PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
 val Type.deepLowerBound: Type
+    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+    @JvmName("deepLowerBound")
     get() {
         return when (this) {
             is ParameterizedType -> {
@@ -161,7 +169,7 @@ val Type.deepLowerBound: Type
                 if (!needTransform) {
                     return this
                 }
-                return parameterizedType(this.rawType, this.ownerType, actualTypeArguments)
+                return parameterizedType(this.rawType, actualTypeArguments, this.ownerType)
             }
             is TypeVariable<*> -> this.lowerBound
             is WildcardType -> this.lowerBound
@@ -169,90 +177,38 @@ val Type.deepLowerBound: Type
         }
     }
 
-fun parameterizedType(rawType: Type, ownerType: Type?, actualTypeArguments: Array<Type>?): ParameterizedType {
-    return ParameterizedTypeImpl(rawType, ownerType, actualTypeArguments)
+val WildcardType.isUnbounded: Boolean
+    @JvmName("isUnbounded") get() {
+        return this.upperBounds.isEmpty() && this.lowerBounds.isEmpty()
+    }
+
+@JvmOverloads
+fun parameterizedType(
+    rawType: Type,
+    actualTypeArguments: Array<out Type>? = null,
+    ownerType: Type? = null,
+): ParameterizedType {
+    return if (ownerType === null) {
+        TypeUtils.parameterize(rawType.rawClass, *(actualTypeArguments ?: ArrayUtils.EMPTY_TYPE_ARRAY))
+    } else {
+        TypeUtils.parameterizeWithOwner(
+            ownerType,
+            rawType.rawClass,
+            *(actualTypeArguments ?: ArrayUtils.EMPTY_TYPE_ARRAY)
+        )
+    }
 }
 
-private class ParameterizedTypeImpl(
-    private val rawType: Type,
-    private val ownerType: Type?,
-    actualTypeArguments: Array<Type>?,
-) : ParameterizedType {
+fun wildcardTypeWithUpperBounds(upperBounds: Array<out Type>): WildcardType {
+    return TypeUtils.wildcardType().withUpperBounds(*upperBounds).build()
+}
 
-    private val actualTypeArguments: Array<Type>? = getActualTypeArguments0(actualTypeArguments)
+fun wildcardTypeWithLowerBounds(lowerBounds: Array<out Type>): WildcardType {
+    return TypeUtils.wildcardType().withLowerBounds(*lowerBounds).build()
+}
 
-    override fun getRawType(): Type {
-        return rawType
-    }
-
-    override fun getOwnerType(): Type? {
-        return ownerType
-    }
-
-    override fun getActualTypeArguments(): Array<Type> {
-        return getActualTypeArguments0(actualTypeArguments)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ParameterizedTypeImpl
-
-        if (rawType != other.rawType) return false
-        if (ownerType != other.ownerType) return false
-        if (!actualTypeArguments.contentEquals(other.actualTypeArguments)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = rawType.hashCode()
-        result = 31 * result + ownerType.hashCode()
-        result = 31 * result + actualTypeArguments.contentHashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        val sb = StringBuilder()
-        if (ownerType !== null) {
-            if (ownerType is Class<*>) {
-                sb.append(ownerType.name)
-            } else {
-                sb.append(ownerType.toString())
-            }
-            sb.append(".")
-            sb.append(rawType.typeName)
-        } else {
-            sb.append(rawType.typeName)
-        }
-
-        if (actualTypeArguments !== null && actualTypeArguments.isNotEmpty()) {
-            sb.append("<")
-            var first = true
-            val var3 = actualTypeArguments
-            val var4 = var3.size
-            for (var5 in 0 until var4) {
-                val t = var3[var5]
-                if (!first) {
-                    sb.append(", ")
-                }
-                if (t is Class<*>) {
-                    sb.append(t.name)
-                } else {
-                    sb.append(t.toString())
-                }
-                first = false
-            }
-            sb.append(">")
-        }
-
-        return sb.toString()
-    }
-
-    fun getActualTypeArguments0(actualTypeArguments: Array<Type>?): Array<Type> {
-        return if (actualTypeArguments === null) ArrayUtils.EMPTY_TYPE_ARRAY else actualTypeArguments.clone()
-    }
+fun Type.genericArrayType(): GenericArrayType {
+    return TypeUtils.genericArrayType(this)
 }
 
 /**

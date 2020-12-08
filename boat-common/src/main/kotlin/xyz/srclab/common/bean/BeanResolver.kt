@@ -1,11 +1,11 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.annotations.OutParam
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.Invoker
 import xyz.srclab.common.base.Invoker.Companion.asInvoker
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.cache.Cache
-import xyz.srclab.common.collection.componentTypeToArray
 import xyz.srclab.common.collection.resolveMapSchema
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.*
@@ -464,43 +464,53 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
         }
 
         private fun findActualType(type: Type): Type {
+
+            fun needTransform(@OutParam array: Array<Type>): Boolean {
+                var needTransform = false
+                for (i in array.indices) {
+                    val oldType = array[i]
+                    val newType = findActualType(oldType)
+                    if (oldType != newType) {
+                        needTransform = true
+                        array[i] = newType
+                    }
+                }
+                return needTransform
+            }
+
             return when (type) {
                 is TypeVariable<*> -> type.findActualType(genericOwnerType) ?: type
                 is ParameterizedType -> {
                     val actualTypeArguments = type.actualTypeArguments
-                    var needTransform = false
-                    for (i in actualTypeArguments.indices) {
-                        val oldType = actualTypeArguments[i]
-                        val newType = when (oldType) {
-                            is ParameterizedType -> findActualType(oldType)
-                            is TypeVariable<*> -> findActualType(oldType)
-                            //is WildcardType -> findActualType(oldType.upperBound)
-                            is GenericArrayType -> {
-                                if (oldType.genericComponentType is TypeVariable<*>) {
-                                    oldType.genericComponentType.componentTypeToArray<Any>(0).javaClass
-                                } else {
-                                    oldType
-                                }
-                            }
-                            else -> oldType
-                        }
-                        if (oldType !== newType) {
-                            needTransform = true
-                            actualTypeArguments[i] = newType
-                        }
-                    }
-                    if (!needTransform) {
+                    if (!needTransform(actualTypeArguments)) {
                         return type
                     }
-                    return parameterizedType(type.rawType, this.ownerType, actualTypeArguments)
+                    return parameterizedType(type.rawType, actualTypeArguments, this.ownerType)
                 }
-                is WildcardType -> findActualType(type.upperBound)
-                is GenericArrayType -> {
-                    if (type.genericComponentType is TypeVariable<*>) {
-                        type.genericComponentType.componentTypeToArray<Any>(0).javaClass
-                    } else {
-                        type
+                is WildcardType -> {
+                    val upperBounds = type.upperBounds
+                    if (upperBounds.isNotEmpty()) {
+                        if (!needTransform(upperBounds)) {
+                            return type
+                        }
+                        return wildcardTypeWithUpperBounds(upperBounds)
                     }
+                    val lowerBounds = type.lowerBounds
+                    if (lowerBounds.isNotEmpty()) {
+                        if (!needTransform(lowerBounds)) {
+                            return type
+                        }
+                        return wildcardTypeWithLowerBounds(lowerBounds)
+                    }
+                    return type
+                }
+                is GenericArrayType -> {
+                    val componentType = type.genericComponentType
+                    val newType = findActualType(componentType)
+                    if (componentType == newType) {
+                        return type
+                    }
+                    return type.genericArrayType()
                 }
                 else -> type
             }

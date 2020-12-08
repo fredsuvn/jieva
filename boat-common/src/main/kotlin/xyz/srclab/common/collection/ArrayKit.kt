@@ -30,6 +30,10 @@ val Type.componentType: Type?
         }
     }
 
+fun <A> newArray(vararg elements: A): Array<A> {
+    return elements.asAny()
+}
+
 fun <A> Type.componentTypeToArray(length: Int): A {
     return when (this) {
         is Class<*> -> java.lang.reflect.Array.newInstance(this, length).asAny()
