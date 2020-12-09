@@ -18,7 +18,7 @@ import java.lang.reflect.*
  */
 interface BeanResolver {
 
-    fun resolveSchema(type: Type): BeanSchema
+    fun resolve(type: Type): BeanSchema
 
     @JvmDefault
     fun asMap(bean: Any): MutableMap<String, Any?> {
@@ -27,7 +27,7 @@ interface BeanResolver {
 
     @JvmDefault
     fun asMap(bean: Any, copyOptions: CopyOptions): MutableMap<String, Any?> {
-        return BeanAsMap(bean, resolveSchema(bean.javaClass).properties, copyOptions.converter)
+        return BeanAsMap(bean, resolve(bean.javaClass).properties, copyOptions.converter)
     }
 
     @JvmDefault
@@ -95,7 +95,7 @@ interface BeanResolver {
             from is Map<*, *> && to !is Map<*, *> -> {
                 val fromType = copyOptions.fromType ?: Map::class.java
                 val fromMapSchema = fromType.resolveMapSchema()
-                val toSchema = resolveSchema(to.javaClass)
+                val toSchema = resolve(to.javaClass)
                 val toProperties = toSchema.properties
                 from.forEach { (k, v) ->
                     if (!copyOptions.propertyNameFilter(k)
@@ -128,7 +128,7 @@ interface BeanResolver {
                 to
             }
             from !is Map<*, *> && to is Map<*, *> -> {
-                val fromSchema = resolveSchema(from.javaClass)
+                val fromSchema = resolve(from.javaClass)
                 val toType = copyOptions.toType ?: Map::class.java
                 val toMapSchema = toType.resolveMapSchema()
                 val fromProperties = fromSchema.properties
@@ -162,8 +162,8 @@ interface BeanResolver {
                 to
             }
             from !is Map<*, *> && to !is Map<*, *> -> {
-                val fromSchema = resolveSchema(from.javaClass)
-                val toSchema = resolveSchema(to.javaClass)
+                val fromSchema = resolve(from.javaClass)
+                val toSchema = resolve(to.javaClass)
                 val fromProperties = fromSchema.properties
                 val toProperties = toSchema.properties
                 fromProperties.forEach { (name, property) ->
@@ -317,16 +317,13 @@ interface BeanResolver {
 
             private val cache = Cache.newFastCache<Type, BeanSchema>()
 
-            override fun resolveSchema(type: Type): BeanSchema {
+            override fun resolve(type: Type): BeanSchema {
                 return cache.getOrLoad(type) {
                     val context = Context(type, LinkedHashMap())
                     for (handler in handlers) {
-                        handler.resolveSchema(context)
+                        handler.resolve(context)
                     }
-                    object : BeanSchema {
-                        override val genericType: Type = type
-                        override val properties: Map<String, PropertySchema> = context.beanProperties.toMap()
-                    }
+                    BeanSchemaImpl(type, context.beanProperties.toMap())
                 }
             }
 
@@ -338,6 +335,30 @@ interface BeanResolver {
                 override val beanType: Type,
                 override val beanProperties: MutableMap<String, PropertySchema>
             ) : BeanResolveHandler.ResolveContext
+
+            private class BeanSchemaImpl(
+                override val genericType: Type,
+                override val properties: Map<String, PropertySchema>,
+            ) : BeanSchema {
+
+                override fun equals(other: Any?): Boolean {
+                    if (this === other) return true
+                    if (other !is BeanSchema) return false
+                    if (genericType != other.genericType) return false
+                    if (properties != other.properties) return false
+                    return true
+                }
+
+                override fun hashCode(): Int {
+                    var result = genericType.hashCode()
+                    result = 31 * result + properties.hashCode()
+                    return result
+                }
+
+                override fun toString(): String {
+                    return genericType.typeName
+                }
+            }
         }
 
         private class BeanAsMap(
@@ -397,7 +418,7 @@ interface BeanResolver {
 
 interface BeanResolveHandler {
 
-    fun resolveSchema(context: ResolveContext)
+    fun resolve(context: ResolveContext)
 
     interface ResolveContext {
 
@@ -423,7 +444,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
     private val cache = Cache.newFastCache<Pair<Type, PropertyDescriptor>, PropertySchema>()
 
-    override fun resolveSchema(context: BeanResolveHandler.ResolveContext) {
+    override fun resolve(context: BeanResolveHandler.ResolveContext) {
         val beanInfo = Introspector.getBeanInfo(context.beanType.rawClass)
         val beanProperties = context.beanProperties
         for (propertyDescriptor in beanInfo.propertyDescriptors) {
@@ -448,11 +469,12 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
         override val name: String = descriptor.name
         override val genericType: Type by lazy { tryGenericType() }
         override val getter: Invoker? by lazy { tryGetter() }
-        private val getterMethod: Method? = descriptor.readMethod
         override val setter: Invoker? by lazy { trySetter() }
-        private val setterMethod: Method? = descriptor.writeMethod
         override val field: Field? by lazy { tryField() }
         override val fieldAnnotations: List<Annotation> by lazy { tryFieldAnnotations() }
+
+        private val getterMethod: Method? = descriptor.readMethod
+        private val setterMethod: Method? = descriptor.writeMethod
 
         private fun tryGenericType(): Type {
             val type = if (getterMethod !== null) {
@@ -479,17 +501,23 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
             }
 
             return when (type) {
-                is TypeVariable<*> -> type.findActualType(genericOwnerType) ?: type
+                is TypeVariable<*> -> {
+                    val result = type.findActualType(genericOwnerType) ?: type
+                    if (result is TypeVariable<*>) {
+                        return result
+                    }
+                    return findActualType(result)
+                }
                 is ParameterizedType -> {
                     val actualTypeArguments = type.actualTypeArguments
                     if (!needTransform(actualTypeArguments)) {
                         return type
                     }
-                    return parameterizedType(type.rawType, actualTypeArguments, this.ownerType)
+                    return parameterizedType(type.rawType, actualTypeArguments, type.ownerType)
                 }
                 is WildcardType -> {
                     val upperBounds = type.upperBounds
-                    if (upperBounds.isNotEmpty()) {
+                    if (!upperBounds.isObjectUpperBound) {
                         if (!needTransform(upperBounds)) {
                             return type
                         }
@@ -554,6 +582,26 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
             }
             s.invoke<Any?>(bean, value)
             return old.asAny()
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is PropertySchema) return false
+            if (genericOwnerType != other.genericOwnerType) return false
+            if (name != other.name) return false
+            if (genericType != other.genericType) return false
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = genericOwnerType.hashCode()
+            result = 31 * result + name.hashCode()
+            result = 31 * result + genericType.hashCode()
+            return result
+        }
+
+        override fun toString(): String {
+            return "$name: ${genericType.typeName}"
         }
     }
 }
