@@ -1,6 +1,6 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.common.reflect.findClassToInstance
+import xyz.srclab.common.reflect.toInstance
 
 interface SpecParser<S> {
 
@@ -50,7 +50,7 @@ object CharsSpecParser : SpecParser<CharSequence> {
         for (className in classNames) {
             val trimmedClassName = className.trim()
             val product: T? = try {
-                trimmedClassName.findClassToInstance()
+                trimmedClassName.toInstance()
             } catch (e: Exception) {
                 continue
             }
@@ -66,7 +66,7 @@ object CharsSpecParser : SpecParser<CharSequence> {
         for (className in classNames) {
             val trimmedClassName = className.trim()
             val product: T? = try {
-                trimmedClassName.findClassToInstance()
+                trimmedClassName.toInstance()
             } catch (e: Exception) {
                 continue
             }
@@ -100,7 +100,7 @@ object StrictCharsSpecParser : SpecParser<CharSequence> {
     private fun <T : Any> createInstance(className: CharSequence): T {
         val trimmedClassName = className.trim()
         val product: T? = try {
-            trimmedClassName.findClassToInstance()
+            trimmedClassName.toInstance()
         } catch (e: Exception) {
             throw IllegalStateException("Instantiate class $trimmedClassName failed.", e)
         }

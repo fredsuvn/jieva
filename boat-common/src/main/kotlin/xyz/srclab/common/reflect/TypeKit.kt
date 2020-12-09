@@ -152,7 +152,7 @@ val Type.deepUpperBound: Type
             }
             is WildcardType -> {
                 val upperBounds = this.upperBounds
-                return if (upperBounds.isEmpty())  Any::class.java else upperBounds[0].deepUpperBound
+                return if (upperBounds.isEmpty()) Any::class.java else upperBounds[0].deepUpperBound
             }
             else -> this
         }
@@ -224,15 +224,13 @@ fun Type.genericArrayType(): GenericArrayType {
     return TypeUtils.genericArrayType(this)
 }
 
-
 @PossibleTypes(Class::class, ParameterizedType::class, WildcardType::class, GenericArrayType::class)
-fun Type.eraseTypeVariable():Type {
+fun Type.eraseTypeVariable(): Type {
     if (this is Class<*>) {
         return this
     }
     TODO()
 }
-
 
 /**
  * StringFoo(Foo.class) -> Foo<String>

@@ -88,12 +88,12 @@ fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): 
 }
 
 @JvmOverloads
-fun <T> CharSequence.findClassToInstance(classLoader: ClassLoader = Current.classLoader): T? {
-    return this.findClassToInstance(classLoader, emptyArray(), emptyArray())
+fun <T> CharSequence.toInstance(classLoader: ClassLoader = Current.classLoader): T? {
+    return this.toInstance(classLoader, emptyArray(), emptyArray())
 }
 
 @JvmOverloads
-fun <T> CharSequence.findClassToInstance(
+fun <T> CharSequence.toInstance(
     classLoader: ClassLoader = Current.classLoader,
     parameterTypes: Array<out Class<*>>,
     args: Array<out Any?>
@@ -112,7 +112,7 @@ fun <T> Class<*>.toInstance(): T {
 fun <T> Class<*>.toInstance(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
     val constructor = this.findConstructor(*parameterTypes)
     if (constructor === null) {
-        throw IllegalArgumentException("Constructor of $this with parameters (${parameterTypes.contentToString()}) not found: $this")
+        throw IllegalArgumentException("Constructor not found: ${toSignatureString(this.name, parameterTypes)}")
     }
     return constructor.newInstance(*args).asAny()
 }
