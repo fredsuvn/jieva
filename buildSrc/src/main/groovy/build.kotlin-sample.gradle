@@ -1,0 +1,6 @@
+plugins {
+  id 'build.common'
+  id 'build.kotlin-compile'
+}
+
+println "${infos.logPrefix} ${project.name}: import kotlin-sample"
