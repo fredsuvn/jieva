@@ -4,7 +4,6 @@ package xyz.srclab.common.test
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.run.AsyncRunner
-import java.io.PrintStream
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.CountDownLatch
@@ -161,26 +160,26 @@ interface TestListener {
         }
 
         @JvmField
-        val DEFAULT: TestListener = withPrintStream(System.out)
+        val DEFAULT: TestListener = withTestLogger(TestLogger.DEFAULT)
 
         @JvmStatic
-        fun withPrintStream(printStream: PrintStream): TestListener {
+        fun withTestLogger(testLogger: TestLogger): TestListener {
             return object : TestListener {
 
                 override fun beforeRunAll(testTasks: List<TestTask>) {
-                    printStream.println("Prepare to run all tasks...")
+                    testLogger.log("Prepare to run all tasks...")
                 }
 
                 override fun beforeRunEach(testTask: TestTask) {
-                    printStream.println("Run task ${testTask.name}...")
+                    testLogger.log("Run task ${testTask.name}...")
                 }
 
                 override fun afterRunEach(testTask: TestTask, testTaskResult: TestTaskResult) {
-                    printStream.println("Task ${testTask.name} was accomplished, cost: ${testTaskResult.cost}")
+                    testLogger.log("Task ${testTask.name} was accomplished, cost: ${testTaskResult.cost}")
                 }
 
                 override fun afterRunAll(testTasks: List<TestTask>, testResult: TestResult) {
-                    printStream.println(
+                    testLogger.log(
                         "All tasks were accomplished, " +
                                 "await cost: ${testResult.awaitCost}, " +
                                 "total cost: ${testResult.totalCost}, " +
