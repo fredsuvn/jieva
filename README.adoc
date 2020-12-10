@@ -3,7 +3,9 @@ Sun Qian <fredsuvn@163.com>
 v1.0.0, 2020-12-10
 :encoding: UTF-8
 
-Choose your language:
-
+- AsciiDoc:
+* link:guide/README_en.adoc[English]
+* link:guide/README_zh.adoc[简体中文]
+- Markdown:
 * link:guide/README_en.adoc[English]
 * link:guide/README_zh.adoc[简体中文]
