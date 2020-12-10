@@ -6,18 +6,6 @@ package xyz.srclab.common.reflect
 import xyz.srclab.common.base.*
 import java.lang.reflect.Modifier
 
-val Class<*>.isOpen: Boolean
-    @JvmName("isOpen") get() {
-        val modifiers = this.modifiers
-        if (Modifier.isStatic(modifiers)
-            || Modifier.isPrivate(modifiers)
-            || Modifier.isFinal(modifiers)
-        ) {
-            return false
-        }
-        return Modifier.isPublic(modifiers)
-    }
-
 val Class<*>.isPublic: Boolean
     @JvmName("isPublic") get() {
         return Modifier.isPublic(this.modifiers)
@@ -65,7 +53,7 @@ val Class<*>.isNative: Boolean
 
 val Class<*>.isInterface: Boolean
     @JvmName("isInterface") get() {
-        return Modifier.isInterface(this.modifiers)
+        return this.isInterface
     }
 
 val Class<*>.isAbstract: Boolean
@@ -78,41 +66,45 @@ val Class<*>.isStrict: Boolean
         return Modifier.isStrict(this.modifiers)
     }
 
+/**
+ * @throws ClassNotFoundException
+ */
 @JvmOverloads
-fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
-    return try {
-        Class.forName(this.toString(), true, classLoader)
-    } catch (e: ClassNotFoundException) {
-        null
-    }.asAny()
+fun <T> CharSequence.toClass(classLoader: ClassLoader = Current.classLoader): Class<T> {
+    return this.loadClass(classLoader)
 }
 
+/**
+ * @throws ClassNotFoundException
+ * @throws NoSuchMethodException
+ */
 @JvmOverloads
-fun <T> CharSequence.toInstance(classLoader: ClassLoader = Current.classLoader): T? {
+fun <T> CharSequence.toInstance(classLoader: ClassLoader = Current.classLoader): T {
     return this.toInstance(classLoader, emptyArray(), emptyArray())
 }
 
+/**
+ * @throws ClassNotFoundException
+ * @throws NoSuchMethodException
+ */
 @JvmOverloads
 fun <T> CharSequence.toInstance(
     classLoader: ClassLoader = Current.classLoader,
     parameterTypes: Array<out Class<*>>,
     args: Array<out Any?>
-): T? {
-    val clazz: Class<T>? = this.findClass(classLoader)
-    if (clazz === null) {
-        return null
-    }
+): T {
+    val clazz: Class<T> = this.loadClass(classLoader)
     return clazz.toInstance(parameterTypes, args)
 }
 
-fun <T> Class<*>.toInstance(): T {
-    return this.toInstance(emptyArray(), emptyArray())
-}
-
+/**
+ * @throws NoSuchMethodException
+ */
 fun <T> Class<*>.toInstance(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
-    val constructor = this.findConstructor(*parameterTypes)
-    if (constructor === null) {
-        throw IllegalArgumentException("Constructor not found: ${toSignatureString(this.name, parameterTypes)}")
+    val constructor = try {
+        this.getConstructor(*parameterTypes)
+    } catch (e: NoSuchMethodException) {
+        throw e
     }
     return constructor.newInstance(*args).asAny()
 }

@@ -9,6 +9,7 @@ import xyz.srclab.common.bean.BeanKit;
 import xyz.srclab.common.bean.BeanResolver;
 import xyz.srclab.common.bean.BeanSchema;
 import xyz.srclab.common.bean.PropertySchema;
+import xyz.srclab.common.reflect.TypeKit;
 import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.test.TestTask;
 import xyz.srclab.common.test.Tester;
@@ -158,5 +159,7 @@ public class BeanTest {
         BeanSchema sSchema = BeanKit.resolve(s.getClass());
         Map<String, PropertySchema> sPropertySchemas = sSchema.properties();
         System.out.println(sPropertySchemas);
+
+        TypeKit.rawClass(String.class);
     }
 }

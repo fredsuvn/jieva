@@ -1,5 +1,6 @@
 package xyz.srclab.common.reflect
 
+import xyz.srclab.common.exception.ShouldNotException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -19,9 +20,7 @@ abstract class TypeRef<T> {
     private fun reflectGenericSuperclass(): Type {
         val generic = this.javaClass.findGenericSuperclass(TypeRef::class.java)
         if (generic !is ParameterizedType) {
-            throw IllegalStateException(
-                "Reflect to generic superclass of TypeRef failed."
-            )
+            throw ShouldNotException()
         }
         return generic.actualTypeArguments[0]
     }

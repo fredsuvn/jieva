@@ -10,16 +10,12 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 @JvmOverloads
-fun <T> ByteArray.loadClass(offset: Int = 0, length: Int = this.size - offset): Class<T> {
-    return BytesClassLoader.loadClass(this, offset, length).asAny()
-}
-
-fun <T> InputStream.loadClass(): Class<T> {
-    return BytesClassLoader.loadClass(this).asAny()
-}
-
-fun <T> ByteBuffer.loadClass(): Class<T> {
-    return BytesClassLoader.loadClass(this).asAny()
+fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
+    return try {
+        Class.forName(this.toString(), true, classLoader)
+    } catch (e: ClassNotFoundException) {
+        null
+    }.asAny()
 }
 
 @JvmOverloads
@@ -59,6 +55,31 @@ fun CharSequence.findStringResources(
     classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): List<String> {
     return findBytesResources(classLoader).map { bytes -> bytes.toChars(charset) }
+}
+
+@JvmOverloads
+fun <T> ByteArray.loadClass(offset: Int = 0, length: Int = this.size - offset): Class<T> {
+    return BytesClassLoader.loadClass(this, offset, length).asAny()
+}
+
+fun <T> InputStream.loadClass(): Class<T> {
+    return BytesClassLoader.loadClass(this).asAny()
+}
+
+fun <T> ByteBuffer.loadClass(): Class<T> {
+    return BytesClassLoader.loadClass(this).asAny()
+}
+
+/**
+ * @throws ClassNotFoundException
+ */
+@JvmOverloads
+fun <T> CharSequence.loadClass(classLoader: ClassLoader = Current.classLoader): Class<T> {
+    return try {
+        Class.forName(this.toString(), true, classLoader)
+    } catch (e: ClassNotFoundException) {
+        throw e
+    }.asAny()
 }
 
 object BytesClassLoader : ClassLoader() {

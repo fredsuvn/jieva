@@ -32,8 +32,11 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
         @JvmField
         val UNKNOWN = of("000001", "Unknown Error")
 
+        @JvmField
+        val SHOULD_NOT = of("000002", "It should not be an exception")
+
         @JvmStatic
-        //@JvmOverloads
+        @JvmOverloads
         fun of(code: CharSequence, description: CharSequence? = null): ExceptionStatus {
             return ExceptionStatusImpl(code, description)
         }

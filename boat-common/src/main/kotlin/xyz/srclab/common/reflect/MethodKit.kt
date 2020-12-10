@@ -5,8 +5,6 @@ package xyz.srclab.common.reflect
 
 import xyz.srclab.common.base.asAny
 import java.lang.reflect.Method
-import java.lang.reflect.Modifier
-import java.lang.reflect.Type
 
 @JvmOverloads
 fun Class<*>.findMethod(
@@ -52,7 +50,7 @@ fun Class<*>.findDeclaredMethod(methodName: String, vararg parameterTypes: Class
     }
 }
 
-fun Class<*>.findOwnerMethod(name: String, vararg parameterTypes: Class<*>): Method? {
+fun Class<*>.findOwnedMethod(name: String, vararg parameterTypes: Class<*>): Method? {
     return findMethod(name, declared = true, deep = false, *parameterTypes)
 }
 
@@ -64,20 +62,38 @@ fun Class<*>.findDeclaredMethods(): List<Method> {
     return this.declaredMethods.asList()
 }
 
+fun Method.canOverrideBy(clazz: Class<*>): Boolean {
+    if (this.isPrivate) {
+        return false
+    }
+    if (!this.declaringClass.isAssignableFrom(clazz)) {
+        return false
+    }
+    return true
+}
+
+/**
+ * @throws  IllegalAccessException
+ * @throws  IllegalArgumentException
+ * @throws  ReflectiveOperationException
+ */
 fun <T> Method.invoke(owner: Any?, vararg args: Any?): T {
+    return try {
+        this.invoke(owner, *args).asAny()
+    } catch (e: Exception) {
+        throw e
+    }
+}
+
+/**
+ * @throws  IllegalArgumentException
+ * @throws  ReflectiveOperationException
+ */
+fun <T> Method.invokeForcible(owner: Any?, vararg args: Any?): T {
+    this.isAccessible = true
     return try {
         this.invoke(owner, *args).asAny()
     } catch (e: Exception) {
         throw IllegalStateException(e)
     }
-}
-
-fun Method.isOpenFor(clazz: Class<*>): Boolean {
-    if (!this.isOpen) {
-        return false
-    }
-    val declaring = this.declaringClass
-    return if (this.isProtected) {
-        declaring.isAssignableFrom(clazz)
-    } else declaring.getPackage() == clazz.getPackage()
 }

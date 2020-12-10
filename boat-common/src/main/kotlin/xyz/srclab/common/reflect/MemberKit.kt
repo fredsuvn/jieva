@@ -6,18 +6,6 @@ package xyz.srclab.common.reflect
 import java.lang.reflect.Member
 import java.lang.reflect.Modifier
 
-val Member.isOpen: Boolean
-    @JvmName("isOpen") get() {
-        val modifiers = this.modifiers
-        if (Modifier.isStatic(modifiers)
-            || Modifier.isPrivate(modifiers)
-            || Modifier.isFinal(modifiers)
-        ) {
-            return false
-        }
-        return Modifier.isPublic(modifiers)
-    }
-
 val Member.isPublic: Boolean
     @JvmName("isPublic") get() {
         return Modifier.isPublic(this.modifiers)
@@ -77,3 +65,23 @@ val Member.isStrict: Boolean
     @JvmName("isStrict") get() {
         return Modifier.isStrict(this.modifiers)
     }
+
+/**
+ * Returns whether [clazz] can use [this]
+ */
+fun Member.isAccessibleFor(clazz: Class<*>): Boolean {
+    if (this.isPublic) {
+        return true
+    }
+    if (this.isPrivate) {
+        return this.declaringClass == clazz
+    }
+    val declaringPackage = this.declaringClass.`package`
+    if (declaringPackage == clazz.`package`) {
+        return true
+    }
+    if (this.isProtected) {
+        return this.declaringClass.isAssignableFrom(clazz)
+    }
+    return false
+}

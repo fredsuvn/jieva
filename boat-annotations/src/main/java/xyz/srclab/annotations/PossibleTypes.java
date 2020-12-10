@@ -19,7 +19,7 @@ import java.lang.annotation.*;
         //ElementType.ANNOTATION_TYPE,
         //ElementType.PACKAGE,
         ElementType.TYPE_PARAMETER,
-        //ElementType.TYPE_USE,
+        ElementType.TYPE_USE,
 })
 public @interface PossibleTypes {
 

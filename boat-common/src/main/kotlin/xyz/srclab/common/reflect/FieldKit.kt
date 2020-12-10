@@ -45,6 +45,10 @@ fun Class<*>.findDeclaredField(name: String): Field? {
     }
 }
 
+fun Class<*>.findOwnedField(name: String): Field? {
+    return this.findField(name, declared = true, deep = false)
+}
+
 fun Class<*>.findFields(): List<Field> {
     return this.fields.asList()
 }
@@ -53,39 +57,53 @@ fun Class<*>.findDeclaredFields(): List<Field> {
     return this.declaredFields.asList()
 }
 
+/**
+ * @throws IllegalAccessException
+ */
 @JvmOverloads
-fun <T> Field.getValue(owner: Any? = null, force: Boolean = false): T {
+fun <T> Field.getValue(owner: Any?, force: Boolean = false): T {
     return try {
         if (force) {
             this.isAccessible = true
         }
         this.get(owner).asAny()
     } catch (e: IllegalAccessException) {
-        throw IllegalStateException(e)
+        throw e
     }
 }
 
+/**
+ * @throws IllegalAccessException
+ */
 @JvmOverloads
-fun Field.setValue(value: Any?, owner: Any? = null, force: Boolean = false) {
+fun Field.setValue(owner: Any?, value: Any?, force: Boolean = false) {
     try {
         if (force) {
             this.isAccessible = true
         }
         this.set(owner, value)
     } catch (e: IllegalAccessException) {
-        throw IllegalStateException(e)
+        throw e
     }
 }
 
+/**
+ * @throws NoSuchFieldException
+ * @throws IllegalAccessException
+ */
 @JvmOverloads
-fun <T> Class<*>.getFieldValue(name: String, owner: Any? = null, force: Boolean = false, deep: Boolean = false): T {
+fun <T> Class<*>.getFieldValue(name: String, owner: Any?, force: Boolean = false, deep: Boolean = false): T {
     val field = this.findField(name, force, deep)
     if (field === null) {
-        throw IllegalArgumentException("Field not found: ${this}.${name}")
+        throw NoSuchFieldException(name)
     }
     return field.getValue(owner, force)
 }
 
+/**
+ * @throws NoSuchFieldException
+ * @throws IllegalAccessException
+ */
 @JvmOverloads
 fun Class<*>.setFieldValue(
     name: String,
@@ -96,7 +114,7 @@ fun Class<*>.setFieldValue(
 ) {
     val field = this.findField(name, force, deep)
     if (field === null) {
-        throw IllegalArgumentException("Field not found: ${this}.${name}")
+        throw NoSuchFieldException(name)
     }
     return field.setValue(value, owner, force)
 }

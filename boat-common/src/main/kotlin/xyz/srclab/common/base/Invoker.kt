@@ -1,7 +1,7 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.reflect.findOwnerConstructor
-import xyz.srclab.common.reflect.findOwnerMethod
+import xyz.srclab.common.reflect.findOwnedMethod
 import xyz.srclab.common.reflect.isStatic
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
@@ -49,7 +49,7 @@ interface InvokerProvider {
 
     @JvmDefault
     fun forMethod(clazz: Class<*>, methodName: String, vararg parameterTypes: Class<*>): Invoker {
-        val method = clazz.findOwnerMethod(methodName, *parameterTypes)
+        val method = clazz.findOwnedMethod(methodName, *parameterTypes)
         return forMethod(
             method ?: throw NoSuchMethodException("$clazz.$methodName(${parameterTypes.contentToString()})")
         )
