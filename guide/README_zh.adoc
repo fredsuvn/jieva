@@ -1,0 +1,485 @@
+= Easy Starter: Base Integration Libraries for Java
+Sun Qian <fredsuvn@163.com>
+// v0.0.0, 2020-03-26
+v1.0.0, 2020-04-12
+:encoding: UTF-8
+:easy-starter-version: 1.0.0
+
+Easy Starter is a base integration library for java, it consists of a set of core easy-components and selected third
+base libraries of appropriate versions.
+
+Core easy-components includes:
+
+* easy-annotations: defines core annotations, some of them are optimized from jsr305;
+* easy-common: base component for easy-starter. It encapsulates common operation for array, bean, builder, bytecode,
+cache, collection, exception, lang, provider, proxy, reflect, shell, state, string, time, etc.;
+* easy-jni: provides jni operation;
+* easy-test: provides assistant tools for testing.
+
+We do not recommend that use those components directly, instead, by starters:
+
+* easy-starter: include core functionalities, in most cases just only import it to meeting requirements.
+* easy-starter-parent: it is a bom, used for dependencies management of easy projects. If you need more than one
+easy-components, use it.
+* easy-starter-test: provides convenient functionalities for testing, adds support for kotlin.
+
+There are also selected third base libraries in it to directly use:
+
+* https://kotlinlang.org/[kotlin]；
+* https://commons.apache.org/proper/commons-lang/[commons-lang3]；
+* https://commons.apache.org/proper/commons-beanutils/[commons-beanutils]；
+* https://commons.apache.org/proper/commons-collections/[commons-collections]；
+* https://github.com/google/guava[Guava].
+
+== Getting Started
+
+Source code: https://github.com/srclab-projects/easy-starter
+
+Simply directly to use from maven or gradle:
+
+[source,subs="attributes+"]
+----
+<dependency>
+    <groupId>xyz.srclab.starter</groupId>
+    <artifactId>easy-starter</artifactId>
+    <version>{easy-starter-version}</version>
+</dependency>
+----
+
+[source,subs="attributes+"]
+----
+implementation("xyz.srclab.starter:easy-starter:{easy-starter-version}")
+----
+
+Typically, we use easy-bom as dependency manager:
+
+[source,subs="attributes+"]
+----
+<project>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>xyz.srclab.starter</groupId>
+        <artifactId>easy-starter-parent</artifactId>
+        <version>{easy-starter-version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>xyz.srclab.starter</groupId>
+      <artifactId>easy-starter</artifactId>
+    </dependency>
+  </dependencies>
+</project>
+----
+
+[source,subs="attributes+"]
+----
+implementation(platform("xyz.srclab.starter:easy-starter-parent:{easy-starter-version}"))
+implementation("xyz.srclab.starter:easy-starter")
+----
+
+== User Guide
+
+Futures of easy-starter:
+
+* <<user_guide_annotations>>
+* <<user_guide_bean>>
+* <<user_guide_reflect>>
+* <<user_guide_array>>
+* <<user_guide_string>>
+* <<user_guide_lang>>
+* <<user_guide_state_and_exception>>
+* <<user_guide_proxy>>
+* <<user_guide_bytecode>>
+* <<user_guide_other>>
+
+[#user_guide_annotations]
+=== Annotations
+
+There are a set of annotations to help us build a well-convention project:
+
+* DefaultNonNull / DefaultNullable: indicates all parameters, variables, fields or other type or objects are
+non-null/null default, usually used in package-info.java.
+This annotation extends Nonnull of jsr305, and IDE such as IDEA can recognize it;
+* NonNull / Nullable: indicates a parameter, variable, field or other type or object is non-null/null.
+This annotation extends Nonnull of jsr305, and IDE such as IDEA can recognize it;
+* Written / WrittenReturn: indicates the parameter may be written (and as return value for *Return*);
+* Immutable: indicates the class annotated is immutable and thread-safe;
+* ThreadSafe: indicates the class annotated is thread-safe;
+* ThreadSafeDependOn: indicates whether annotated class is thread-safe depends on its dependent class, code of annotated
+class itself is thread-safe;
+* ReturnTreadSafe / ReturnTreadSafeDependOn: indicates return value of annotated method is thread-safe or
+tread-safe-depend-on;
+* StaticThreadSafe / StaticThreadSafeDependOn: indicates static methods of annotated class are thread-safe
+or tread-safe-depend-on.
+Note this is default.
+
+[#user_guide_bean]
+=== Bean
+
+Bean package provides powerful bean operation ability. For a quick example, assume three class like:
+
+[source]
+----
+public static class A {
+    private String stringProperty;
+    private int intProperty;
+    private String dateProperty;
+    private Map<? super Integer, List<? extends String>> map;
+    private C<String> c;
+
+    // getters and setterd...
+}
+
+public static class B {
+    private int stringProperty;
+    private String intProperty;
+    private LocalDateTime dateProperty;
+    private Map<? extends String, List<? extends Integer>> map;
+    private C<Integer> c;
+
+    // getters and setterd...
+}
+
+public static class C<T> {
+    private T t;
+
+    // getters and setterd...
+}
+----
+
+If we want to copy properties from *A* to *B*, *BeanUtils.copyProperties* is invalid because types (include generic
+types) are different between same-name-properties. However, use *BeanHelper*, we can pass it:
+
+[source]
+----
+    A a = new A();
+    a.setStringProperty("123");
+    a.setIntProperty(456);
+    a.setDateProperty("2020-02-02T02:02:22");
+    Map<? super Integer, List<? extends String>> map = new HashMap<>();
+    map.put(8, Arrays.asList("8", "9", "10"));
+    a.setMap(map);
+    C<String> c = new C<>();
+    c.setT("666");
+    a.setC(c);
+
+    B b = new B();
+    // BeanUtils.copyProperties(a, b) is invalid!
+    BeanHelper.copyProperties(a, b);
+    System.out.println(b.getMap().get("8").get(1));
+    System.out.println(b.getC().getT());
+----
+
+*BeanHelper* use default implementation of *BeanOperator*, so above codes are equivalent to:
+
+[source]
+----
+    // Same with BeanHelper.copyProperties(a, b);
+    BeanOperator.DEFAULT.copyProperties(a, b);
+----
+
+Note, generic type will be erased so this still be invalid:
+
+[source]
+----
+    C<String> c1 = ...
+    C<Integer> c2 = ...
+    BeanHelper.copyProperties(c1, c2);
+----
+
+For the effect, we can use *convert* :
+
+[source]
+----
+    C<String> c1 = ...
+    C<Integer> c2 = BeanHelper.convert(c1, new TypeRef<C<Integer>>(){});
+----
+
+If *TypeRef<C<Integer>>* is frequently used, we can make it const:
+
+[source]
+----
+    private static final TypeRef<C<Integer>> type = new TypeRef<C<Integer>>(){};
+
+    //...
+
+    C<String> c1 = ...
+    C<Integer> c2 = BeanHelper.convert(c1, type);
+----
+
+*BeanOperator* consists of *BeanResolver* and *BeanConverter*, the former is used to resolve bean, the later as its name
+is used to convert type. We can customize *BeanOperator* by BeanOperator.Builder:
+
+[source]
+----
+    BeanOperator myBeanOperator = BeanOperator.newBuilder()
+        .setBeanResolver(
+            //...
+        )
+        .setBeanConverter(
+            //...
+        )
+        .build();
+----
+
+The interface *BeanResolver*, *BeanConverter* or its needed interfaces, has a *DEFAULT* implementation and *Builder* to
+help to implement.
+
+[#user_guide_reflect]
+=== Reflect
+
+Reflect provides a way to invoke method called *MethodInvoker* (and *ConstructorInvoker*):
+
+[source]
+----
+public class ReflectSample {
+
+    public static void main(String[] args) {
+        MethodInvoker invoker = InvokerHelper.getMethodInvoker(A.class, "hello");
+        System.out.println(invoker.invoke(new A()));
+    }
+
+    public static class A {
+        public String hello() {
+            return "hello";
+        }
+    }
+}
+----
+
+Provides signature helper:
+
+[source]
+----
+    System.out.println(SignatureHelper.signClass(A.class));
+----
+
+There are also *TypeHelper*, *MethodHelper*, *InvokerHelper*, *InstanceHelper* , etc. in the reflect package.
+
+[#user_guide_array]
+=== Array
+
+Array package provides some practical method for Array. For example, try to quickly create an array of which elements
+are from 1 to 100:
+
+[source]
+----
+public class ArraySample {
+
+    public static void main(String[] args) {
+        int[] array = ArrayHelper.newArray(new int[100], i -> i + 1);
+        System.out.println(Arrays.toString(array));
+    }
+}
+----
+
+[#user_guide_string]
+=== String
+
+String package provides *FastFormat* to provide a fast, slf4j-style formatting:
+
+[source]
+----
+    System.out.println(FastFormat.format("This is {} style!", "slf4j"));
+----
+
+Provides *ToString* and *ToStringStyle* to conveniently build string for an object:
+
+[source]
+----
+public class ToStringSample {
+
+    public static void main(String[] args) {
+        System.out.println(ToString.buildToString(new A()));
+        System.out.println(ToString.buildToString(new A(), ToStringStyle.HUMAN_READABLE));
+    }
+
+    public static class A {
+        private String string = "string";
+        private List<String> list = Arrays.asList("string1", "string2");
+        private B b = new B();
+
+        // getters and setters...
+    }
+
+    public static class B {
+        private String string = "string";
+        private List<String> list = Arrays.asList("string1", "string2");
+
+        // getters and setters...
+    }
+}
+----
+
+Above source will output:
+
+----
+{b={class=xyz.srclab.sample.string.ToStringSample$B,list=[string1,string2],string=string},class=xyz.srclab.sample.\\
+string.ToStringSample$A,list=[string1,string2],string=string}
+{
+    b = {
+        class = xyz.srclab.sample.string.ToStringSample$B,
+        list = [
+            string1,
+            string2
+        ],
+        string = string
+    },
+    class = xyz.srclab.sample.string.ToStringSample$A,
+    list = [
+        string1,
+        string2
+    ],
+    string = string
+}
+----
+
+[#user_guide_lang]
+=== Lang
+
+Lang package provides some additional class:
+
+[source]
+----
+    Computed<String> computed = Computed.with(() -> "complex build string");
+    System.out.println(computed.get());
+
+    Ref<String> ref = Ref.with("123");
+    System.out.println(ref.get());
+
+    Pair<String, Integer> pair = Pair.of("0", 1);
+    System.out.println(pair.get0());
+    System.out.println(pair.get1());
+
+    Tuple<String, Integer, Long> tuple = Tuple.of("0", 1, 2L);
+    System.out.println(tuple.get0());
+    System.out.println(tuple.get1());
+    System.out.println(tuple.get2());
+
+    TypeRef<List<String>> listTypeRef = new TypeRef<List<String>>() {};
+    System.out.println(listTypeRef.getType());
+----
+
+For these classes：
+
+* Computed: used to delayed get, and supports refresh on time;
+* Ref: as a container to solve the problem that variable must be final in some cases, such as accessing out-scope
+variable from lam expression;
+* Pair: represents a tuple with 2 components;
+* Triple: represents a tuple with 3 components;
+* TypeRef: help create a generic type, it is widely used in base libraries.
+
+[#user_guide_state_and_exception]
+=== State and Exception
+
+State package defines some common *State* interfaces and supporting classes such as *StateHelper* to replace simple
+string or int. *BusinessException* also be a *State*, that means a *BusinessException* can be easier incorporated into
+an exception handling system based on *State*.
+
+See:
+
+----
+xyz.srclab.common.state;
+xyz.srclab.common.exception;
+----
+
+[#user_guide_proxy]
+=== Proxy
+
+Proxy package supports class dynamic proxy:
+
+[source]
+----
+public class ProxySample {
+
+    public static void main(String[] args) {
+        ClassProxy<A> classProxy = ClassProxy.newBuilder(A.class)
+                .proxyMethod("someMethod", new Class<?>[0], (o, objects, method, methodInvoker) -> {
+                    String result = "proxy method";
+                    System.out.println(result);
+                    return result;
+                })
+                .build();
+        System.out.println(classProxy.newInstance().someMethod());
+    }
+
+    public static class A {
+
+        public String someMethod() {
+            System.out.println("someMethod");
+            return "someMethod";
+        }
+    }
+}
+----
+
+Proxy package use *ClassProxyProviderManager* to manage implementation of proxy. By default, the manager use
+*ByteCodeClassProxyProvider* to implement proxy functionality, we can use *JdkClassProxyProvider* to implement by JDK
+dynamic proxy.
+
+[#user_guide_bytecode]
+=== Byte Code
+
+Bytecode package provide uniform interfaces to easier handle bytecodes:
+
+[source]
+----
+public class ByteCodeSample {
+
+    public static void main(String[] args) {
+        BeanClass<A> beanClass = BeanClass.newBuilder(A.class)
+                .addProperty("b", String.class)
+                .build();
+        A a1 = beanClass.newInstance();
+        BeanHelper.setPropertyValue(a1, "b", "bbb");
+        System.out.println(BeanHelper.getPropertyValue(a1, "b"));
+
+        EnhancedClass<A> enhancedClass = EnhancedClass.newBuilder(A.class)
+                .overrideMethod("someMethod", ArrayUtils.EMPTY_CLASS_ARRAY, new ProxyMethod() {
+                    @Override
+                    public Object invoke(Object o, Object[] objects, Method method, MethodInvoker methodInvoker) {
+                        return "proxy: " + methodInvoker.invoke(o, objects);
+                    }
+                })
+                .build();
+        A a2 = enhancedClass.newInstance();
+        System.out.println(a2.someMethod());
+    }
+
+    public static class A {
+
+        private String a;
+
+        public String getA() {
+            return a;
+        }
+
+        public void setA(String a) {
+            this.a = a;
+        }
+
+        public String someMethod() {
+            System.out.println("someMethod");
+            return "someMethod";
+        }
+    }
+}
+----
+
+Bytecode package use *ByteCodeProviderManager* to manage implementation of proxy. By default, the manager use
+*CglibByteCodeProvider* to implement bytecode functionality, we can use *SpringCglibByteCodeProvider* to implement by
+spring-cglib.
+
+[#user_guide_other]
+=== Others
+
+Beside above features, there are also many useful tools such as *CacheStateBuilder*, *ProcessByHandlersBuilder*,
+*AbstractProviderManager* and lots of **XxxHelper**s.
+
+== License
+
+Easy for Common is Open Source software released under the
+https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].
