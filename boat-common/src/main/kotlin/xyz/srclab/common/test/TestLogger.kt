@@ -23,7 +23,7 @@ interface TestLogger {
             override fun log(message: Any?) {
                 val callFrame = Current.callerFrame(javaClass.name, "log")
                 printStream.println(
-                    "%${CLASS_NAME_MAX_LENGTH}s(%4d): %s".printFormat(
+                    "%${CLASS_NAME_MAX_LENGTH}s(%-${LINE_NUMBER_MAX_LENGTH}d): %s".printFormat(
                         callFrame?.className?.contractSignatureName(CLASS_NAME_MAX_LENGTH),
                         callFrame?.lineNumber,
                         message
@@ -32,7 +32,10 @@ interface TestLogger {
             }
 
             companion object {
+
                 private const val CLASS_NAME_MAX_LENGTH = 50
+
+                private const val LINE_NUMBER_MAX_LENGTH = 4
             }
         }
     }
