@@ -15,14 +15,27 @@ public class ClassKitTest {
     @Test
     public void testToClass() {
         Class<NewClass> newClass = ClassKit.toClass(
-                "test.java.xyz.srclab.common.reflect.ClassKitTest$NewClass");
+                "test.java.xyz.srclab.common.reflect.NewClass");
         Assert.assertEquals(newClass, NewClass.class);
     }
 
-    public static class NewClass {
+    @Test
+    public void testToInstance() {
+        NewClass newClass = ClassKit.toInstance(
+                "test.java.xyz.srclab.common.reflect.NewClass");
+        Assert.assertEquals(newClass, new NewClass());
+    }
 
-        static {
-            testLogger.log("Create: " + NewClass.class);
-        }
+    @Test
+    public void testToWrapper() {
+        Assert.assertEquals(ClassKit.toWrapperClass(boolean.class), Boolean.class);
+        Assert.assertEquals(ClassKit.toWrapperClass(byte.class), Byte.class);
+        Assert.assertEquals(ClassKit.toWrapperClass(short.class), Short.class);
+        Assert.assertEquals(ClassKit.toWrapperClass(char.class), Character.class);
+        Assert.assertEquals(ClassKit.toWrapperClass(int.class), Integer.class);
+        Assert.assertEquals(ClassKit.toWrapperClass(long.class), Long.class);
+        Assert.assertEquals(ClassKit.toWrapperClass(float.class), Float.class);
+        Assert.assertEquals(ClassKit.toWrapperClass(double.class), Double.class);
+        Assert.assertEquals(ClassKit.toWrapperClass(void.class), Void.class);
     }
 }

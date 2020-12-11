@@ -26,15 +26,27 @@ fun <T> Class<T>.findDeclaredConstructor(vararg parameterTypes: Class<*>): Const
     }
 }
 
-fun <T> Class<T>.findOwnerConstructor(vararg parameterTypes: Class<*>): Constructor<T>? {
-    val tryPublic = findConstructor(*parameterTypes)
-    return tryPublic ?: findDeclaredConstructor(*parameterTypes)
-}
-
 fun <T> Class<T>.findDeclaredConstructors(): List<Constructor<T>> {
     return this.declaredConstructors.asList().asAny()
 }
 
+fun <T> Class<T>.findOwnedConstructor(vararg parameterTypes: Class<*>): Constructor<T>? {
+    val tryPublic = this.findConstructor(*parameterTypes)
+    return tryPublic ?: this.findDeclaredConstructor(*parameterTypes)
+}
+
+fun <T> Class<T>.findOwnedConstructors(): List<Constructor<T>> {
+    val set = LinkedHashSet<Constructor<T>>()
+    set.addAll(this.findConstructors())
+    set.addAll(this.findDeclaredConstructors())
+    return set.toList()
+}
+
 fun <T> Constructor<T>.invoke(vararg args: Any?): T {
+    return this.newInstance(*args)
+}
+
+fun <T> Constructor<T>.invokeForcibly(vararg args: Any?): T {
+    this.isAccessible = true
     return this.newInstance(*args)
 }

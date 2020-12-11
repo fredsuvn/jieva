@@ -1,6 +1,6 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.common.reflect.findOwnerConstructor
+import xyz.srclab.common.reflect.findOwnedConstructor
 import xyz.srclab.common.reflect.findOwnedMethod
 import xyz.srclab.common.reflect.isStatic
 import java.lang.invoke.MethodHandle
@@ -57,7 +57,7 @@ interface InvokerProvider {
 
     @JvmDefault
     fun forConstructor(clazz: Class<*>, vararg parameterTypes: Class<*>): Invoker {
-        val constructor = clazz.findOwnerConstructor(*parameterTypes)
+        val constructor = clazz.findOwnedConstructor(*parameterTypes)
         return forConstructor(
             constructor ?: throw NoSuchMethodException("$clazz(${parameterTypes.contentToString()})")
         )
