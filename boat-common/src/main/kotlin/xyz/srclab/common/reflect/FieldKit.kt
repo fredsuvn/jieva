@@ -37,6 +37,10 @@ fun Class<*>.findField(name: String, declared: Boolean = false, deep: Boolean = 
     return null
 }
 
+fun Class<*>.findFields(): List<Field> {
+    return this.fields.asList()
+}
+
 fun Class<*>.findDeclaredField(name: String): Field? {
     return try {
         this.getDeclaredField(name)
@@ -45,16 +49,16 @@ fun Class<*>.findDeclaredField(name: String): Field? {
     }
 }
 
+fun Class<*>.findDeclaredFields(): List<Field> {
+    return this.declaredFields.asList()
+}
+
 fun Class<*>.findOwnedField(name: String): Field? {
     return this.findField(name, declared = true, deep = false)
 }
 
-fun Class<*>.findFields(): List<Field> {
-    return this.fields.asList()
-}
-
-fun Class<*>.findDeclaredFields(): List<Field> {
-    return this.declaredFields.asList()
+fun Class<*>.findOwnedFields(): List<Field> {
+    return this.findFields().plus(this.findDeclaredFields()).distinct()
 }
 
 /**
@@ -91,9 +95,25 @@ fun Field.setValue(owner: Any?, value: Any?, force: Boolean = false) {
  * @throws NoSuchFieldException
  * @throws IllegalAccessException
  */
-@JvmOverloads
-fun <T> Class<*>.getFieldValue(name: String, owner: Any?, force: Boolean = false, deep: Boolean = false): T {
-    val field = this.findField(name, force, deep)
+fun <T> Class<*>.getFieldValue(name: String, owner: Any?): T {
+    val field = this.findField(name)
+    if (field === null) {
+        throw NoSuchFieldException(name)
+    }
+    return field.getValue(owner)
+}
+
+/**
+ * @throws NoSuchFieldException
+ */
+fun <T> Class<*>.getFieldValue(
+    name: String,
+    owner: Any?,
+    declared: Boolean = false,
+    deep: Boolean = false,
+    force: Boolean = false
+): T {
+    val field = this.findField(name, declared, deep)
     if (field === null) {
         throw NoSuchFieldException(name)
     }
@@ -104,17 +124,29 @@ fun <T> Class<*>.getFieldValue(name: String, owner: Any?, force: Boolean = false
  * @throws NoSuchFieldException
  * @throws IllegalAccessException
  */
-@JvmOverloads
-fun Class<*>.setFieldValue(
-    name: String,
-    value: Any?,
-    owner: Any? = null,
-    force: Boolean = false,
-    deep: Boolean = false
-) {
-    val field = this.findField(name, force, deep)
+fun Class<*>.setFieldValue(name: String, owner: Any?, value: Any?) {
+    val field = this.findField(name)
     if (field === null) {
         throw NoSuchFieldException(name)
     }
-    return field.setValue(value, owner, force)
+    return field.setValue(value, owner)
+}
+
+/**
+ * @throws NoSuchFieldException
+ * @throws IllegalAccessException
+ */
+fun Class<*>.setFieldValue(
+    name: String,
+    owner: Any?,
+    value: Any?,
+    declared: Boolean = false,
+    deep: Boolean = false,
+    force: Boolean = false,
+) {
+    val field = this.findField(name, declared, deep)
+    if (field === null) {
+        throw NoSuchFieldException(name)
+    }
+    return field.setValue(owner, value, force)
 }

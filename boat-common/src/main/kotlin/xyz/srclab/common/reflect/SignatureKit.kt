@@ -36,20 +36,37 @@ fun Array<out Type>.toParameterTypesString(): String {
  * * abc.xyz.Foo -> a.x.Foo
  */
 fun CharSequence.contractSignatureName(maxLength: Int): String {
+
     val split = this.split(".")
-    val length = split.size
-    val buffer = StringBuilder(split[length - 1])
-    for (i in (0..length - 2).reversed()) {
-        if (buffer.length >= maxLength) {
-            break
+    val wordCount = split.size
+    val tailIndex = split.size - 1
+
+    fun concatWords(split: List<String>, separatorIndex: Int): String {
+        val buffer = StringBuilder(split[tailIndex])
+        for (i in (0 until tailIndex).reversed()) {
+            buffer.insert(0, ".")
+            if (i < separatorIndex) {
+                buffer.insert(0, split[i][0])
+            } else {
+                buffer.insert(0, split[i])
+            }
         }
-        if (split[i].length + 1 + buffer.length <= maxLength) {
-            buffer.insert(0, ".")
-            buffer.insert(0, split[i])
-        } else {
-            buffer.insert(0, ".")
-            buffer.insert(0, split[i][0])
+        return buffer.toString()
+    }
+
+    val minLength = (wordCount - 1) * 2 + split[wordCount - 1].length
+    if (minLength >= maxLength) {
+        return concatWords(split, tailIndex)
+    }
+    var newLength = minLength
+    for (i in tailIndex - 1 downTo 0) {
+        newLength += split[i].length - 1
+        if (newLength > maxLength) {
+            return concatWords(split, i + 1)
+        }
+        if (newLength == maxLength) {
+            return concatWords(split, i)
         }
     }
-    return buffer.toString()
+    return concatWords(split, 0)
 }

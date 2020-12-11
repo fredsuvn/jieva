@@ -12,6 +12,10 @@ public class NewClass {
         testLogger.log("Load class: " + NewClass.class);
     }
 
+    public final String publicParam = "publicParam";
+    protected final String protectedParam = "protectedParam";
+    private String privateParam = "privateParam";
+
     private final String param;
 
     public NewClass() {

@@ -15,7 +15,7 @@ public class ConstructorKitTest {
     private static final TestLogger testLogger = TestLogger.DEFAULT;
 
     @Test
-    public void testFindConstructor() throws Exception {
+    public void testFind() throws Exception {
         Assert.assertEquals(
                 ConstructorKit.findConstructors(NewClass.class),
                 Arrays.asList(NewClass.class.getConstructors())
