@@ -1,7 +1,7 @@
 package xyz.srclab.common.test
 
 import xyz.srclab.common.base.Current
-import xyz.srclab.common.base.Format.Companion.printfFormat
+import xyz.srclab.common.base.Format.Companion.printFormat
 import xyz.srclab.common.reflect.contractSignatureName
 import java.io.PrintStream
 
@@ -19,10 +19,11 @@ interface TestLogger {
         }
 
         private class TestLoggerImpl(private val printStream: PrintStream) : TestLogger {
+
             override fun log(message: Any?) {
                 val callFrame = Current.callerFrame(javaClass.name, "log")
                 printStream.println(
-                    "%${CLASS_NAME_MAX_LENGTH}s(%4d): %s".printfFormat(
+                    "%${CLASS_NAME_MAX_LENGTH}s(%4d): %s".printFormat(
                         callFrame?.className?.contractSignatureName(CLASS_NAME_MAX_LENGTH),
                         callFrame?.lineNumber,
                         message
