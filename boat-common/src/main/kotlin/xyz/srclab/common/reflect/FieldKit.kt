@@ -6,8 +6,57 @@ package xyz.srclab.common.reflect
 import xyz.srclab.common.base.asAny
 import java.lang.reflect.Field
 
-@JvmOverloads
-fun Class<*>.findField(name: String, declared: Boolean = false, deep: Boolean = false): Field? {
+fun Class<*>.findField(name: String): Field? {
+    return try {
+        this.getField(name)
+    } catch (e: NoSuchFieldException) {
+        null
+    }
+}
+
+fun Class<*>.findFields(): List<Field> {
+    return this.fields.asList()
+}
+
+fun Class<*>.findDeclaredField(name: String): Field? {
+    return try {
+        this.getDeclaredField(name)
+    } catch (e: NoSuchFieldException) {
+        null
+    }
+}
+
+fun Class<*>.findDeclaredFields(): List<Field> {
+    return this.declaredFields.asList()
+}
+
+fun Class<*>.findOwnedField(name: String): Field? {
+    return this.searchField(name, declared = true, deep = false)
+}
+
+fun Class<*>.findOwnedFields(): List<Field> {
+    val set = LinkedHashSet<Field>()
+    set.addAll(this.findFields())
+    val declared = this.findDeclaredFields()
+    for (field in declared) {
+        if (!set.contains(field)) {
+            set.add(field)
+        }
+    }
+    var superClass = this.superclass
+    while (superClass !== null) {
+        val superFields = superClass.findDeclaredFields()
+        for (superField in superFields) {
+            if (superField.isProtected && !set.contains(superField)) {
+                set.add(superField)
+            }
+        }
+        superClass = superClass.superclass
+    }
+    return set.toList()
+}
+
+fun Class<*>.searchField(name: String, declared: Boolean, deep: Boolean): Field? {
     var field = try {
         this.getField(name)
     } catch (e: NoSuchFieldException) {
@@ -28,37 +77,13 @@ fun Class<*>.findField(name: String, declared: Boolean = false, deep: Boolean = 
     }
     var superClass = this.superclass
     while (superClass !== null) {
-        field = this.findDeclaredField(name)
+        field = superClass.findDeclaredField(name)
         if (field !== null) {
             return field
         }
-        superClass = superclass.superclass
+        superClass = superClass.superclass
     }
     return null
-}
-
-fun Class<*>.findFields(): List<Field> {
-    return this.fields.asList()
-}
-
-fun Class<*>.findDeclaredField(name: String): Field? {
-    return try {
-        this.getDeclaredField(name)
-    } catch (e: NoSuchFieldException) {
-        null
-    }
-}
-
-fun Class<*>.findDeclaredFields(): List<Field> {
-    return this.declaredFields.asList()
-}
-
-fun Class<*>.findOwnedField(name: String): Field? {
-    return this.findField(name, declared = true, deep = false)
-}
-
-fun Class<*>.findOwnedFields(): List<Field> {
-    return this.findFields().plus(this.findDeclaredFields()).distinct()
 }
 
 /**
@@ -109,11 +134,11 @@ fun <T> Class<*>.getFieldValue(name: String, owner: Any?): T {
 fun <T> Class<*>.getFieldValue(
     name: String,
     owner: Any?,
-    declared: Boolean = false,
-    deep: Boolean = false,
-    force: Boolean = false
+    declared: Boolean,
+    deep: Boolean,
+    force: Boolean
 ): T {
-    val field = this.findField(name, declared, deep)
+    val field = this.searchField(name, declared, deep)
     if (field === null) {
         throw NoSuchFieldException(name)
     }
@@ -140,11 +165,11 @@ fun Class<*>.setFieldValue(
     name: String,
     owner: Any?,
     value: Any?,
-    declared: Boolean = false,
-    deep: Boolean = false,
-    force: Boolean = false,
+    declared: Boolean,
+    deep: Boolean,
+    force: Boolean,
 ) {
-    val field = this.findField(name, declared, deep)
+    val field = this.searchField(name, declared, deep)
     if (field === null) {
         throw NoSuchFieldException(name)
     }

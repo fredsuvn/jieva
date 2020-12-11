@@ -2,13 +2,11 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.reflect.ConstructorKit;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class ConstructorKitTest {
 
@@ -25,28 +23,18 @@ public class ConstructorKitTest {
                 Arrays.asList(NewClass.class.getDeclaredConstructors())
         );
         Assert.assertEquals(
-                ListOps.sorted(
-                        ConstructorKit.findOwnedConstructors(NewClass.class),
-                        Comparator.comparing(Constructor::toString)
-                ),
-                ListOps.sorted(
-                        Arrays.asList(NewClass.class.getDeclaredConstructors()),
-                        Comparator.comparing(Constructor::toString)
-                )
-        );
-        Assert.assertEquals(
-                ConstructorKit.findOwnedConstructor(NewClass.class, String.class),
+                ConstructorKit.findDeclaredConstructor(NewClass.class, String.class),
                 NewClass.class.getDeclaredConstructor(String.class)
         );
         Assert.assertEquals(
-                ConstructorKit.findOwnedConstructor(NewClass.class, String.class, String.class),
+                ConstructorKit.findDeclaredConstructor(NewClass.class, String.class, String.class),
                 NewClass.class.getDeclaredConstructor(String.class, String.class)
         );
     }
 
     @Test
     public void testInvoke() {
-        Constructor<NewClass> classConstructor = ConstructorKit.findOwnedConstructor(
+        Constructor<NewClass> classConstructor = ConstructorKit.findDeclaredConstructor(
                 NewClass.class, String.class, String.class);
         Assert.assertNotNull(classConstructor);
         NewClass result = ConstructorKit.invokeForcibly(classConstructor, "1", "2");

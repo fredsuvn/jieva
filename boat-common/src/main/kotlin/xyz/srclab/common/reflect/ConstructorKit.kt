@@ -30,15 +30,6 @@ fun <T> Class<T>.findDeclaredConstructors(): List<Constructor<T>> {
     return this.declaredConstructors.asList().asAny()
 }
 
-fun <T> Class<T>.findOwnedConstructor(vararg parameterTypes: Class<*>): Constructor<T>? {
-    val tryPublic = this.findConstructor(*parameterTypes)
-    return tryPublic ?: this.findDeclaredConstructor(*parameterTypes)
-}
-
-fun <T> Class<T>.findOwnedConstructors(): List<Constructor<T>> {
-    return this.findConstructors().plus(this.findDeclaredConstructors()).distinct()
-}
-
 fun <T> Constructor<T>.invoke(vararg args: Any?): T {
     return this.newInstance(*args)
 }

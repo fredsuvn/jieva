@@ -3,6 +3,7 @@
 
 package xyz.srclab.common.reflect
 
+import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.common.base.*
 import java.lang.reflect.Modifier
 
@@ -80,7 +81,7 @@ fun <T> CharSequence.toClass(classLoader: ClassLoader = Current.classLoader): Cl
  */
 @JvmOverloads
 fun <T> CharSequence.toInstance(classLoader: ClassLoader = Current.classLoader): T {
-    return this.toInstance(classLoader, emptyArray(), emptyArray())
+    return this.toInstance(classLoader, ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
 }
 
 /**
@@ -101,7 +102,7 @@ fun <T> CharSequence.toInstance(
  * @throws NoSuchMethodException
  */
 fun <T> Class<*>.toInstance(): T {
-    return this.toInstance(emptyArray(), emptyArray())
+    return this.toInstance(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
 }
 
 /**

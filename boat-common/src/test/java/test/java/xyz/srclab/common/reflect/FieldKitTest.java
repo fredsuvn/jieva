@@ -26,11 +26,14 @@ public class FieldKitTest {
         );
         Assert.assertEquals(
                 ListOps.sorted(
-                        FieldKit.findOwnedFields(NewClass.class),
+                        FieldKit.findOwnedFields(SubNewClass.class),
                         Comparator.comparing(Field::toString)
                 ),
                 ListOps.sorted(
-                        Arrays.asList(NewClass.class.getDeclaredFields()),
+                        Arrays.asList(
+                                NewClass.class.getDeclaredField("publicParam"),
+                                NewClass.class.getDeclaredField("protectedParam")
+                        ),
                         Comparator.comparing(Field::toString)
                 )
         );

@@ -6,12 +6,61 @@ package xyz.srclab.common.reflect
 import xyz.srclab.common.base.asAny
 import java.lang.reflect.Method
 
-@JvmOverloads
-fun Class<*>.findMethod(
+fun Class<*>.findMethod(name: String, vararg parameterTypes: Class<*>): Method? {
+    return try {
+        this.getMethod(name, *parameterTypes)
+    } catch (e: NoSuchMethodException) {
+        null
+    }
+}
+
+fun Class<*>.findMethods(): List<Method> {
+    return this.methods.asList()
+}
+
+fun Class<*>.findDeclaredMethod(name: String, vararg parameterTypes: Class<*>): Method? {
+    return try {
+        this.getDeclaredMethod(name, *parameterTypes)
+    } catch (e: NoSuchMethodException) {
+        null
+    }
+}
+
+fun Class<*>.findDeclaredMethods(): List<Method> {
+    return this.declaredMethods.asList()
+}
+
+fun Class<*>.findOwnedMethod(name: String, vararg parameterTypes: Class<*>): Method? {
+    return searchMethod(name, parameterTypes, declared = true, deep = false)
+}
+
+fun Class<*>.findOwnedMethods(): List<Method> {
+    val set = LinkedHashSet<Method>()
+    set.addAll(this.findMethods())
+    val declared = this.findDeclaredMethods()
+    for (method in declared) {
+        if (!set.contains(method)) {
+            set.add(method)
+        }
+    }
+    var superClass = this.superclass
+    while (superClass !== null) {
+        val superMethods = superClass.findDeclaredMethods()
+        for (superMethod in superMethods) {
+            if (superMethod.isProtected && !set.contains(superMethod)) {
+                set.add(superMethod)
+            }
+        }
+        superClass = superClass.superclass
+    }
+    return set.toList()
+}
+
+fun Class<*>.searchMethod(
     name: String,
-    declared: Boolean = false,
-    deep: Boolean = false,
-    vararg parameterTypes: Class<*>
+    parameterTypes: Array<out Class<*>>,
+    declared: Boolean,
+    deep: Boolean,
 ): Method? {
     var method = try {
         this.getMethod(name, *parameterTypes)
@@ -33,33 +82,13 @@ fun Class<*>.findMethod(
     }
     var superClass = this.superclass
     while (superClass !== null) {
-        method = findDeclaredMethod(name, *parameterTypes)
+        method = superClass.findDeclaredMethod(name, *parameterTypes)
         if (method !== null) {
             return method
         }
-        superClass = superclass.superclass
+        superClass = superClass.superclass
     }
     return null
-}
-
-fun Class<*>.findDeclaredMethod(methodName: String, vararg parameterTypes: Class<*>): Method? {
-    return try {
-        this.getDeclaredMethod(methodName, *parameterTypes)
-    } catch (e: NoSuchMethodException) {
-        null
-    }
-}
-
-fun Class<*>.findOwnedMethod(name: String, vararg parameterTypes: Class<*>): Method? {
-    return findMethod(name, declared = true, deep = false, *parameterTypes)
-}
-
-fun Class<*>.findMethods(): List<Method> {
-    return this.methods.asList()
-}
-
-fun Class<*>.findDeclaredMethods(): List<Method> {
-    return this.declaredMethods.asList()
 }
 
 fun Method.canOverrideBy(clazz: Class<*>): Boolean {
