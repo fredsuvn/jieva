@@ -3,9 +3,11 @@
 package xyz.srclab.common.test
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.base.toTimestamp
 import xyz.srclab.common.run.AsyncRunner
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executor
 
@@ -167,7 +169,7 @@ interface TestListener {
             return object : TestListener {
 
                 override fun beforeRunAll(testTasks: List<TestTask>) {
-                    testLogger.log("Prepare to run all tasks...")
+                    testLogger.log("At ${ZonedDateTime.now().toTimestamp()} prepare to run all tasks...")
                 }
 
                 override fun beforeRunEach(testTask: TestTask) {

@@ -178,8 +178,34 @@ fun Type.genericArrayType(): GenericArrayType {
     return TypeUtils.genericArrayType(this)
 }
 
+/**
+ * @throws IllegalArgumentException
+ */
+fun @PossibleTypes(Class::class, ParameterizedType::class) Type.mapTypeVariables(): Map<TypeVariable<*>, Type> {
+    val rawClass = this.rawClass
+    val superclass = rawClass.genericSuperclass
+    val interfaces = rawClass.genericInterfaces
+    val actual = mutableListOf<Type>()
+    val params = mutableListOf<TypeVariable<*>>()
+    if (superclass is ParameterizedType) {
+        actual.addAll(superclass.actualTypeArguments)
+        params.addAll(superclass.rawClass.typeParameters)
+    }
+    for (inter in interfaces) {
+        if (inter is ParameterizedType) {
+            actual.addAll(inter.actualTypeArguments)
+            params.addAll(inter.rawClass.typeParameters)
+        }
+    }
+    if (this is ParameterizedType) {
+        actual.addAll(this.actualTypeArguments)
+        params.addAll(rawClass.typeParameters)
+    }
+    return params.zip(actual).toMap()
+}
+
 @PossibleTypes(Class::class, ParameterizedType::class, WildcardType::class, GenericArrayType::class)
-fun Type.eraseTypeVariable(table: Map<TypeVariable<*>, Type>): Type {
+fun Type.eraseTypeVariables(table: Map<TypeVariable<*>, Type>): Type {
 
     fun replaceArray(@OutParam array: Array<Type>): Boolean {
         var result = false
@@ -220,7 +246,7 @@ fun Type.eraseTypeVariable(table: Map<TypeVariable<*>, Type>): Type {
             return this
         }
         is GenericArrayType -> {
-            val componentType = this.genericComponentType.eraseTypeVariable(table)
+            val componentType = this.genericComponentType.eraseTypeVariables(table)
             if (componentType === this.genericComponentType) {
                 return this
             }
@@ -239,10 +265,11 @@ fun Type.eraseTypeVariable(table: Map<TypeVariable<*>, Type>): Type {
  * ```
  * Let [this] be `StringFoo`, [targets] be `Foo.class`, this method will return `Foo<String>`.
  *
+ * @throws IllegalArgumentException
  * @throws SignatureNotFoundException
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.genericSignature(vararg targets: Class<*>): Type {
+fun @PossibleTypes(Class::class, ParameterizedType::class) Type.genericSignature(vararg targets: Class<*>): Type {
     return this.findGenericSignature(*targets)
         ?: throw SignatureNotFoundException("$this for ${targets.toParameterTypesString()}")
 }
@@ -255,9 +282,11 @@ fun Type.genericSignature(vararg targets: Class<*>): Type {
  * class StringFoo : Foo<String>
  * ```
  * Let [this] be `StringFoo`, [targets] be `Foo.class`, this method will return `Foo<String>`.
+ *
+ * @throws IllegalArgumentException
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.findGenericSignature(vararg targets: Class<*>): Type? {
+fun @PossibleTypes(Class::class, ParameterizedType::class) Type.findGenericSignature(vararg targets: Class<*>): Type? {
     for (target in targets) {
         val result = if (target.isInterface)
             this.findGenericInterface(target)
@@ -278,17 +307,19 @@ fun Type.findGenericSignature(vararg targets: Class<*>): Type? {
  * class StringFoo : Foo<String>
  * ```
  * Let [this] be `StringFoo`, [targets] be `Foo.class`, this method will return `Foo<String>`.
+ *
+ * @throws IllegalArgumentException
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.findGenericSuperclass(vararg targets: Class<*>): Type? {
-    var rawClass = this.upperClass
+fun @PossibleTypes(Class::class, ParameterizedType::class) Type.findGenericSuperclass(vararg targets: Class<*>): Type? {
+    var rawClass = this.rawClass
     if (targets.contains(rawClass)) {
         return this
     }
 
     var genericType: Type? = rawClass.genericSuperclass
     while (genericType !== null) {
-        rawClass = genericType.upperClass
+        rawClass = genericType.rawClass
         if (targets.contains(rawClass)) {
             return genericType
         }
@@ -305,72 +336,121 @@ fun Type.findGenericSuperclass(vararg targets: Class<*>): Type? {
  * class StringFoo : Foo<String>
  * ```
  * Let [this] be `StringFoo`, [targets] be `Foo.class`, this method will return `Foo<String>`.
+ *
+ * @throws IllegalArgumentException
  */
 @PossibleTypes(Class::class, ParameterizedType::class)
-fun Type.findGenericInterface(vararg targets: Class<*>): Type? {
+fun @PossibleTypes(Class::class, ParameterizedType::class) Type.findGenericInterface(vararg targets: Class<*>): Type? {
 
-    fun findInterface(genericTypes: Array<out Type>, vararg targets: Class<*>): Type? {
-        //Search level first
+    //Level searching
+    fun findInterface(genericTypes: List<Type>, vararg targets: Class<*>): Type? {
         for (genericType in genericTypes) {
-            val genericClass = genericType.upperClass
+            val genericClass = genericType.rawClass
             if (targets.contains(genericClass)) {
                 return genericType
             }
         }
+        val nextLevel = mutableListOf<Type>()
         for (genericType in genericTypes) {
-            val genericClass = genericType.upperClass
-            val result = findInterface(genericClass.genericInterfaces, *targets)
-            if (result !== null) {
-                return result
-            }
+            val genericClass = genericType.rawClass
+            nextLevel.addAll(genericClass.genericInterfaces)
         }
-        return null
+        return findInterface(nextLevel, *targets)
     }
 
-    val rawClass = this.upperClass
+    val rawClass = this.rawClass
     if (targets.contains(rawClass)) {
         return this
     }
+    val tryInterfaces = findInterface(rawClass.genericInterfaces.asList(), *targets)
+    if (tryInterfaces !== null) {
+        return tryInterfaces
+    }
 
-    val genericInterfaces = rawClass.genericInterfaces
-
-    return findInterface(genericInterfaces, *targets)
+    // Try interfaces of superclasses
+    var superclass = rawClass.superclass
+    var trySuperclass: Type? = null
+    while (superclass !== null) {
+        trySuperclass = findInterface(superclass.genericInterfaces.asList(), *targets)
+        if (trySuperclass !== null) {
+            return trySuperclass
+        }
+        superclass = superclass.superclass
+    }
+    return trySuperclass
 }
 
 /**
- * <T>(StringFoo.class) -> String
+ * Returns actual type of [this] as possible, may failed to return non-actual type.
+ *
+ * For example:
+ * ```
+ * class Foo<T>
+ * class StringFoo : Foo<String>
+ * ```
+ * Let [this] be `T`, [lowerType] be `StringFoo.class`, this method will return `String.class`.
  */
-fun TypeVariable<*>.actualType(lowerType: Type): Type {
-    return this.findActualType(lowerType)
+@JvmOverloads
+fun TypeVariable<*>.actualType(lowerType: Type, typeVariableTable: Map<TypeVariable<*>, Type> = emptyMap()): Type {
+    return this.findActualType(lowerType, typeVariableTable)
         ?: throw IllegalArgumentException("Actual type of $this on $lowerType was not found.")
 }
 
 /**
- * <T>(StringFoo.class) -> String
+ * Returns actual type of [this] as possible.
+ *
+ * For example:
+ * ```
+ * class Foo<T>
+ * class StringFoo : Foo<String>
+ * ```
+ * Let [this] be `T`, [lowerType] be `StringFoo.class`, this method will return `String.class`.
  */
-fun TypeVariable<*>.findActualType(lowerType: Type): Type? {
+@JvmOverloads
+fun TypeVariable<*>.findActualType(lowerType: Type, typeVariableTable: Map<TypeVariable<*>, Type> = emptyMap()): Type? {
     return when (lowerType) {
-        is Class<*> -> this.findActualType(lowerType)
-        is ParameterizedType -> this.findActualType(lowerType)
+        is Class<*> -> this.findActualType(lowerType, typeVariableTable)
+        is ParameterizedType -> this.findActualType(lowerType, typeVariableTable)
         else -> this.findActualType(lowerType.rawClass)
     }
 }
 
 /**
- * <T>(StringFoo.class) -> String
+ * Returns actual type of [this] as possible.
+ *
+ * For example:
+ * ```
+ * class Foo<T>
+ * class StringFoo : Foo<String>
+ * ```
+ * Let [this] be `T`, [lowerType] be `StringFoo.class`, this method will return `String.class`.
  */
-fun TypeVariable<*>.findActualType(lowerType: Class<*>): Type? {
+@JvmOverloads
+fun TypeVariable<*>.findActualType(
+    lowerType: Class<*>,
+    typeVariableTable: Map<TypeVariable<*>, Type> = emptyMap()
+): Type? {
     val declaredType = this.genericDeclaration
     if (declaredType !is Class<*>) {
         return null
     }
-    return this.findActualType(lowerType, declaredType)
+    return this.findActualType(lowerType, declaredType)?.eraseTypeVariables(typeVariableTable)
 }
 
 /**
- * <T>(StringFoo.class) -> String
+ * Returns actual type of [this] as possible.
+ *
+ * For example:
+ * ```
+ * class Foo<T>
+ * class StringFoo : Foo<String>
+ * ```
+ * Let [this] be `T`, [lowerType] be `Foo<String>`, this method will return `String.class`.
  */
-fun TypeVariable<*>.findActualType(lowerType: ParameterizedType): Type? {
+@JvmOverloads
+fun TypeVariable<*>.findActualType(
+    lowerType: ParameterizedType, typeVariableTable: Map<TypeVariable<*>, Type> = emptyMap()
+): Type? {
     val declaredType = this.genericDeclaration
     if (declaredType !is Class<*>) {
         return null
@@ -396,16 +476,13 @@ fun TypeVariable<*>.findActualType(lowerType: ParameterizedType): Type? {
         val actualTypeArguments = lowerType.actualTypeArguments
         val index = typeParameters.indexOf(tryActualType)
         if (index < 0) {
-            return tryActualType
+            return tryActualType.eraseTypeVariables(typeVariableTable)
         }
-        return actualTypeArguments[index]
+        return actualTypeArguments[index]?.eraseTypeVariables(typeVariableTable)
     }
 }
 
-/**
- * <T>(StringFoo.class) -> String
- */
-fun TypeVariable<*>.findActualType(lowerType: Type, declaredType: Class<*>): Type? {
+private fun TypeVariable<*>.findActualType(lowerType: Type, declaredType: Class<*>): Type? {
     val genericSignature = lowerType.findGenericSignature(declaredType)
     if (genericSignature === null || genericSignature !is ParameterizedType) {
         return null

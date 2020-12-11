@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.reflect.findClass
+import xyz.srclab.common.base.findClass
 
 interface ProxyClassGenerator {
 

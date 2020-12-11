@@ -446,6 +446,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
     override fun resolve(context: BeanResolveHandler.ResolveContext) {
         val beanInfo = Introspector.getBeanInfo(context.beanType.rawClass)
+        val typeVariableTable = context.beanType.mapTypeVariables()
         val beanProperties = context.beanProperties
         for (propertyDescriptor in beanInfo.propertyDescriptors) {
             if (beanProperties.containsKey(propertyDescriptor.name)) {
@@ -454,7 +455,8 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
             val property = cache.getOrLoad(context.beanType to propertyDescriptor) {
                 PropertySchemaImpl(
                     context.beanType,
-                    propertyDescriptor
+                    propertyDescriptor,
+                    typeVariableTable,
                 )
             }
             beanProperties[propertyDescriptor.name] = property
@@ -463,7 +465,8 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
     private class PropertySchemaImpl(
         override val genericOwnerType: Type,
-        descriptor: PropertyDescriptor
+        descriptor: PropertyDescriptor,
+        private val typeVariableTable: Map<TypeVariable<*>, Type>,
     ) : PropertySchema {
 
         override val name: String = descriptor.name
@@ -502,7 +505,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
             return when (type) {
                 is TypeVariable<*> -> {
-                    val result = type.findActualType(genericOwnerType) ?: type
+                    val result = type.findActualType(genericOwnerType, typeVariableTable) ?: type
                     if (result is TypeVariable<*>) {
                         return result
                     }

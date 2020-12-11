@@ -81,8 +81,12 @@ public class BeanTest {
      * Task BeanKit was accomplished, cost: PT1M59.624S
      * Task Beanutils was accomplished, cost: PT13M2.245S
      * All tasks were accomplished, await cost: PT13M2.248S, total cost: PT15M1.869S, average cost: PT7M30.9345S
+     *
+     * At 20201211165234499 prepare to run all tasks...
+     * Task BeanKit was accomplished, cost: PT56.024S
+     * Task Beanutils was accomplished, cost: PT12M13.491S
      */
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void testPerformance() {
         PerformanceBean a = new PerformanceBean();
         a.setS1("s1");

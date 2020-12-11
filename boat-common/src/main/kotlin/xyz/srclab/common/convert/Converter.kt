@@ -387,20 +387,11 @@ open class DateTimeConvertHandler(
 object UpperBoundConvertHandler : AbstractConvertHandler() {
 
     override fun doConvertNull(toType: Type, converter: Converter): Any? {
-        val upperToType = toType.deepUpperBound
-        if (upperToType == toType) {
-            return null
-        }
-        return converter.convert(null, upperToType)
+        return converter.convert(null, toType.upperBound)
     }
 
     override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        val upperFromType = fromType.deepUpperBound
-        val upperToType = toType.deepUpperBound
-        if (upperFromType == fromType && upperToType == toType) {
-            return null
-        }
-        return converter.convert(from, upperFromType, upperToType)
+        return converter.convert(from, fromType.upperBound, toType.upperBound)
     }
 }
 
@@ -424,7 +415,7 @@ object IterableConvertHandler : AbstractConvertHandler() {
     private fun iterableToType(iterable: Iterable<Any?>, toType: Type, converter: Converter): Any? {
         val toComponentType = toType.componentType
         if (toComponentType !== null) {
-            val upperComponentType = toComponentType.deepUpperBound
+            val upperComponentType = toComponentType.upperBound
             return iterable
                 .map { converter.convert<Any?>(it, upperComponentType) }
                 .toAnyArray(upperComponentType.upperClass)
@@ -434,9 +425,9 @@ object IterableConvertHandler : AbstractConvertHandler() {
             return null
         }
         return if (iterable is Collection<*>)
-            collectionMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.deepUpperBound, converter)
+            collectionMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.upperBound, converter)
         else
-            iterableMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.deepUpperBound, converter)
+            iterableMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.upperBound, converter)
     }
 
     private fun iterableMapTo(
@@ -514,8 +505,8 @@ open class BeanConvertHandler(
 
     override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
-            is Class<*> -> return doConvert0(from, toType, toType.deepUpperBound, converter)
-            is ParameterizedType -> return doConvert0(from, toType.rawClass, toType.deepUpperBound, converter)
+            is Class<*> -> return doConvert0(from, toType, toType.upperBound, converter)
+            is ParameterizedType -> return doConvert0(from, toType.rawClass, toType.upperBound, converter)
             else -> null
         }
     }

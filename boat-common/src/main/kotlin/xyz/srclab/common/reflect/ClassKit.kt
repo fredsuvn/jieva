@@ -100,6 +100,13 @@ fun <T> CharSequence.toInstance(
 /**
  * @throws NoSuchMethodException
  */
+fun <T> Class<*>.toInstance(): T {
+    return this.toInstance(emptyArray(), emptyArray())
+}
+
+/**
+ * @throws NoSuchMethodException
+ */
 fun <T> Class<*>.toInstance(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
     val constructor = try {
         this.getConstructor(*parameterTypes)
