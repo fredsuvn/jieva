@@ -36,10 +36,7 @@ fun <T> Class<T>.findOwnedConstructor(vararg parameterTypes: Class<*>): Construc
 }
 
 fun <T> Class<T>.findOwnedConstructors(): List<Constructor<T>> {
-    val set = LinkedHashSet<Constructor<T>>()
-    set.addAll(this.findConstructors())
-    set.addAll(this.findDeclaredConstructors())
-    return set.toList()
+    return this.findConstructors().plus(this.findDeclaredConstructors()).distinct()
 }
 
 fun <T> Constructor<T>.invoke(vararg args: Any?): T {
