@@ -31,32 +31,22 @@ fun Class<*>.findDeclaredFields(): List<Field> {
 }
 
 fun Class<*>.findOwnedField(name: String): Field? {
-    return this.searchField(name, declared = true, deep = false)
+    return this.searchField(name, false)
 }
 
 fun Class<*>.findOwnedFields(): List<Field> {
     val set = LinkedHashSet<Field>()
     set.addAll(this.findFields())
-    val declared = this.findDeclaredFields()
-    for (field in declared) {
-        if (!set.contains(field)) {
-            set.add(field)
+    for (declaredField in this.findDeclaredFields()) {
+        if (!set.contains(declaredField)) {
+            set.add(declaredField)
         }
-    }
-    var superClass = this.superclass
-    while (superClass !== null) {
-        val superFields = superClass.findDeclaredFields()
-        for (superField in superFields) {
-            if (superField.isProtected && !set.contains(superField)) {
-                set.add(superField)
-            }
-        }
-        superClass = superClass.superclass
     }
     return set.toList()
 }
 
-fun Class<*>.searchField(name: String, declared: Boolean, deep: Boolean): Field? {
+@JvmOverloads
+fun Class<*>.searchField(name: String, deep: Boolean = true): Field? {
     var field = try {
         this.getField(name)
     } catch (e: NoSuchFieldException) {
@@ -64,9 +54,6 @@ fun Class<*>.searchField(name: String, declared: Boolean, deep: Boolean): Field?
     }
     if (field !== null) {
         return field
-    }
-    if (!declared) {
-        return null
     }
     field = this.findDeclaredField(name)
     if (field !== null) {
@@ -84,6 +71,34 @@ fun Class<*>.searchField(name: String, declared: Boolean, deep: Boolean): Field?
         superClass = superClass.superclass
     }
     return null
+}
+
+@JvmOverloads
+fun Class<*>.searchFields(deep: Boolean = true, predicate: (Field) -> Boolean): List<Field> {
+    val result = mutableListOf<Field>()
+    for (field in this.fields) {
+        if (predicate(field)) {
+            result.add(field)
+        }
+    }
+    for (field in this.declaredFields) {
+        if (predicate(field)) {
+            result.add(field)
+        }
+    }
+    if (!deep) {
+        return result
+    }
+    var superClass = this.superclass
+    while (superClass !== null) {
+        for (field in superClass.declaredFields) {
+            if (predicate(field)) {
+                result.add(field)
+            }
+        }
+        superClass = superClass.superclass
+    }
+    return result
 }
 
 /**
@@ -134,11 +149,10 @@ fun <T> Class<*>.getFieldValue(name: String, owner: Any?): T {
 fun <T> Class<*>.getFieldValue(
     name: String,
     owner: Any?,
-    declared: Boolean,
     deep: Boolean,
     force: Boolean
 ): T {
-    val field = this.searchField(name, declared, deep)
+    val field = this.searchField(name, deep)
     if (field === null) {
         throw NoSuchFieldException(name)
     }
@@ -165,11 +179,10 @@ fun Class<*>.setFieldValue(
     name: String,
     owner: Any?,
     value: Any?,
-    declared: Boolean,
     deep: Boolean,
     force: Boolean,
 ) {
-    val field = this.searchField(name, declared, deep)
+    val field = this.searchField(name, deep)
     if (field === null) {
         throw NoSuchFieldException(name)
     }

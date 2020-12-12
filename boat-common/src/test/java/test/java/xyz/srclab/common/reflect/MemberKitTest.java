@@ -9,7 +9,7 @@ public class MemberKitTest {
     @Test
     public void testAccessibleFor() throws Exception {
         Assert.assertTrue(MemberKit.isAccessibleFor(
-                NewClass.class.getDeclaredField("protectedParam"),
+                NewClass.class.getDeclaredField("protectedField"),
                 SubNewClass.class
         ));
         Assert.assertFalse(MemberKit.isAccessibleFor(

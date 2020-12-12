@@ -4,7 +4,7 @@ import xyz.srclab.common.test.TestLogger;
 
 import java.util.Objects;
 
-public class NewClass {
+public class NewClass extends SuperNewClass {
 
     private static final TestLogger testLogger = TestLogger.DEFAULT;
 
@@ -12,9 +12,10 @@ public class NewClass {
         testLogger.log("Load class: " + NewClass.class);
     }
 
-    public final String publicParam = "publicParam";
-    protected final String protectedParam = "protectedParam";
-    private String privateParam = "privateParam";
+    public final String publicField = "publicField";
+    protected final String protectedField = "protectedField";
+    private String privateField = "privateField";
+    String packageField = "packageField";
 
     private final String param;
 
@@ -29,6 +30,22 @@ public class NewClass {
 
     private NewClass(String param0, String param1) {
         this(param0 + " : " + param1);
+    }
+
+    public String publicMethod() {
+        return publicField;
+    }
+
+    protected String protectedMethod() {
+        return protectedField;
+    }
+
+    private String privateMethod() {
+        return privateField;
+    }
+
+    String packageMethod() {
+        return packageField;
     }
 
     @Override

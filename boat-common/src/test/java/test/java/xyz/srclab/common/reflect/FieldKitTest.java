@@ -2,13 +2,11 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.collection.ListOps;
 import xyz.srclab.common.reflect.FieldKit;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class FieldKitTest {
 
@@ -16,6 +14,20 @@ public class FieldKitTest {
 
     @Test
     public void testFind() throws Exception {
+        Field superPublicField = SuperNewClass.class.getDeclaredField("superPublicField");
+        Field superProtectedField = SuperNewClass.class.getDeclaredField("superProtectedField");
+        Field superPrivateField = SuperNewClass.class.getDeclaredField("superPrivateField");
+        Field superPackageField = SuperNewClass.class.getDeclaredField("superPackageField");
+        Field publicField = NewClass.class.getDeclaredField("publicField");
+        Field protectedField = NewClass.class.getDeclaredField("protectedField");
+        Field privateField = NewClass.class.getDeclaredField("privateField");
+        Field packageField = NewClass.class.getDeclaredField("packageField");
+        Field subPublicField = SubNewClass.class.getDeclaredField("subPublicField");
+        Field subProtectedField = SubNewClass.class.getDeclaredField("subProtectedField");
+        Field subPrivateField = SubNewClass.class.getDeclaredField("subPrivateField");
+        Field subPackageField = SubNewClass.class.getDeclaredField("subPackageField");
+
+
         Assert.assertEquals(
                 FieldKit.findFields(NewClass.class),
                 Arrays.asList(NewClass.class.getFields())
@@ -25,48 +37,45 @@ public class FieldKitTest {
                 Arrays.asList(NewClass.class.getDeclaredFields())
         );
         Assert.assertEquals(
-                ListOps.sorted(
-                        FieldKit.findOwnedFields(SubNewClass.class),
-                        Comparator.comparing(Field::toString)
-                ),
-                ListOps.sorted(
-                        Arrays.asList(
-                                NewClass.class.getDeclaredField("publicParam"),
-                                NewClass.class.getDeclaredField("protectedParam")
-                        ),
-                        Comparator.comparing(Field::toString)
+                FieldKit.findOwnedFields(SubNewClass.class),
+                Arrays.asList(
+                        subPublicField, publicField, superPublicField,
+                        subProtectedField, subPrivateField, subPackageField
                 )
         );
+
         Assert.assertEquals(
-                FieldKit.findOwnedField(NewClass.class, "protectedParam"),
-                NewClass.class.getDeclaredField("protectedParam")
+                FieldKit.findOwnedField(NewClass.class, "protectedField"),
+                NewClass.class.getDeclaredField("protectedField")
         );
-        Assert.assertEquals(
-                FieldKit.findOwnedField(NewClass.class, "privateParam"),
-                NewClass.class.getDeclaredField("privateParam")
-        );
+        Assert.assertNull(FieldKit.findOwnedField(NewClass.class, "superProtectedField"));
     }
 
     @Test
     public void testInvoke() {
         NewClass newClass = new NewClass();
+
         Assert.assertEquals(
                 FieldKit.getFieldValue(
-                        NewClass.class, "privateParam", newClass, true, false, true),
-                "privateParam"
+                        NewClass.class, "superPrivateField", newClass, true, true),
+                "superPrivateField"
         );
         FieldKit.setFieldValue(
                 NewClass.class,
-                "privateParam",
+                "superPrivateField",
                 newClass,
-                "FieldKit.setFieldValue",
+                "superPrivateField2",
                 true,
-                false,
                 true);
         Assert.assertEquals(
                 FieldKit.getFieldValue(
-                        NewClass.class, "privateParam", newClass, true, false, true),
-                "FieldKit.setFieldValue"
+                        NewClass.class, "superPrivateField", newClass, true, true),
+                "superPrivateField2"
+        );
+
+        Assert.expectThrows(NoSuchFieldException.class, () ->
+                FieldKit.getFieldValue(
+                        NewClass.class, "superPrivateField", newClass, false, true)
         );
     }
 }

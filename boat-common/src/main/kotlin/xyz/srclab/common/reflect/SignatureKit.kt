@@ -35,7 +35,8 @@ fun Array<out Type>.toParameterTypesString(): String {
  * Contracts full signature name:
  * * abc.xyz.Foo -> a.x.Foo
  */
-fun CharSequence.contractSignatureName(maxLength: Int): String {
+@JvmOverloads
+fun CharSequence.contractSignatureName(maxLength: Int = 0): String {
 
     val split = this.split(".")
     val wordCount = split.size

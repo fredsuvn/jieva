@@ -556,7 +556,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
         }
 
         private fun tryField(): Field? {
-            return ownerType.searchField(name, declared = true, deep = true)
+            return ownerType.searchField(name, deep = true)
         }
 
         private fun tryFieldAnnotations(): List<Annotation> {
