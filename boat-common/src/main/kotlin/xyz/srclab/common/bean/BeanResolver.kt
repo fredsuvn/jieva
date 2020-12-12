@@ -446,7 +446,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
     override fun resolve(context: BeanResolveHandler.ResolveContext) {
         val beanInfo = Introspector.getBeanInfo(context.beanType.rawClass)
-        val typeVariableTable = context.beanType.mapTypeVariables()
+        val typeVariableTable = context.beanType.getTypeArguments()
         val beanProperties = context.beanProperties
         for (propertyDescriptor in beanInfo.propertyDescriptors) {
             if (beanProperties.containsKey(propertyDescriptor.name)) {
@@ -516,7 +516,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
                     if (!needTransform(actualTypeArguments)) {
                         return type
                     }
-                    return parameterizedType(type.rawType, actualTypeArguments, type.ownerType)
+                    return parameterizedType(type.rawType, type.ownerType, actualTypeArguments)
                 }
                 is WildcardType -> {
                     val upperBounds = type.upperBounds
@@ -524,14 +524,14 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
                         if (!needTransform(upperBounds)) {
                             return type
                         }
-                        return wildcardTypeWithUpperBounds(upperBounds)
+                        return wildcardType(upperBounds, null)
                     }
                     val lowerBounds = type.lowerBounds
                     if (lowerBounds.isNotEmpty()) {
                         if (!needTransform(lowerBounds)) {
                             return type
                         }
-                        return wildcardTypeWithLowerBounds(lowerBounds)
+                        return wildcardType(null, lowerBounds)
                     }
                     return type
                 }

@@ -58,6 +58,12 @@ val Type.upperClass: Class<*>
         }
     }
 
+val TypeVariable<*>.lowerClass: Class<*>?
+    @JvmName("lowerClass") get() {
+        val upperClass = this.upperClass
+        return if (upperClass.isFinal) upperClass else null
+    }
+
 val WildcardType.lowerClass: Class<*>?
     @JvmName("lowerClass") get() {
         val lowerBounds = this.lowerBounds
@@ -68,13 +74,17 @@ val WildcardType.lowerClass: Class<*>?
         }
     }
 
+/**
+ * @throws IllegalArgumentException
+ */
 val Type.lowerClass: Class<*>?
     @JvmName("lowerClass") get() {
         return when (this) {
             is Class<*> -> this
             is ParameterizedType -> this.rawClass
+            is TypeVariable<*> -> this.lowerClass
             is WildcardType -> this.lowerClass
-            else -> null
+            else -> throw IllegalArgumentException()
         }
     }
 
@@ -113,6 +123,14 @@ val Type.upperBound: Type
         }
     }
 
+val TypeVariable<*>.lowerBound: Type?
+    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
+    @JvmName("lowerBound")
+    get() {
+        val upperBound = this.upperBound
+        return if (upperBound is Class<*> && upperBound.isFinal) upperBound else null
+    }
+
 val WildcardType.lowerBound: Type?
     @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
     @JvmName("lowerBound")
@@ -130,8 +148,9 @@ val Type.lowerBound: Type?
     @JvmName("lowerBound")
     get() {
         return when (this) {
+            is TypeVariable<*> -> this.lowerBound
             is WildcardType -> this.lowerBound
-            else -> null
+            else -> this
         }
     }
 
@@ -148,30 +167,20 @@ val Array<out Type>.isObjectUpperBound: Boolean
 @JvmOverloads
 fun parameterizedType(
     rawType: Type,
-    actualTypeArguments: Array<out Type>? = null,
     ownerType: Type? = null,
+    actualTypeArguments: Array<out Type>,
 ): ParameterizedType {
     return if (ownerType === null) {
-        TypeUtils.parameterize(rawType.rawClass, *(actualTypeArguments ?: ArrayUtils.EMPTY_TYPE_ARRAY))
+        TypeUtils.parameterize(rawType.rawClass, *actualTypeArguments)
     } else {
-        TypeUtils.parameterizeWithOwner(
-            ownerType,
-            rawType.rawClass,
-            *(actualTypeArguments ?: ArrayUtils.EMPTY_TYPE_ARRAY)
-        )
+        TypeUtils.parameterizeWithOwner(ownerType, rawType.rawClass, *actualTypeArguments)
     }
 }
 
-fun wildcardTypeWithUpperBounds(upperBounds: Array<out Type>): WildcardType {
-    return TypeUtils.wildcardType().withUpperBounds(*upperBounds).build()
-}
-
-fun wildcardTypeWithLowerBounds(lowerBounds: Array<out Type>): WildcardType {
-    return TypeUtils.wildcardType().withLowerBounds(*lowerBounds).build()
-}
-
-fun wildcardType(upperBounds: Array<out Type>, lowerBounds: Array<out Type>): WildcardType {
-    return TypeUtils.wildcardType().withUpperBounds(*upperBounds).withLowerBounds(*lowerBounds).build()
+fun wildcardType(upperBounds: Array<out Type>?, lowerBounds: Array<out Type>?): WildcardType {
+    val uppers = upperBounds ?: arrayOf(Any::class.java)
+    val lowers = lowerBounds ?: ArrayUtils.EMPTY_TYPE_ARRAY
+    return TypeUtils.wildcardType().withUpperBounds(*uppers).withLowerBounds(*lowers).build()
 }
 
 fun Type.genericArrayType(): GenericArrayType {
@@ -181,7 +190,7 @@ fun Type.genericArrayType(): GenericArrayType {
 /**
  * @throws IllegalArgumentException
  */
-fun @PossibleTypes(Class::class, ParameterizedType::class) Type.mapTypeVariables(): Map<TypeVariable<*>, Type> {
+fun @PossibleTypes(Class::class, ParameterizedType::class) Type.getTypeArguments(): Map<TypeVariable<*>, Type> {
     val rawClass = this.rawClass
     val superclass = rawClass.genericSuperclass
     val interfaces = rawClass.genericInterfaces
@@ -205,14 +214,14 @@ fun @PossibleTypes(Class::class, ParameterizedType::class) Type.mapTypeVariables
 }
 
 @PossibleTypes(Class::class, ParameterizedType::class, WildcardType::class, GenericArrayType::class)
-fun Type.eraseTypeVariables(table: Map<TypeVariable<*>, Type>): Type {
+fun Type.eraseTypeVariables(typeArguments: Map<TypeVariable<*>, Type>): Type {
 
     fun replaceArray(@OutParam array: Array<Type>): Boolean {
         var result = false
         for (i in array.indices) {
             val oldType = array[i]
             if (oldType is TypeVariable<*>) {
-                val newType = table[oldType]
+                val newType = typeArguments[oldType]
                 if (newType !== null) {
                     array[i] = newType
                     result = true
@@ -227,12 +236,12 @@ fun Type.eraseTypeVariables(table: Map<TypeVariable<*>, Type>): Type {
         is ParameterizedType -> {
             val actualTypeArguments = this.actualTypeArguments
             if (replaceArray(actualTypeArguments)) {
-                return parameterizedType(this.rawType, actualTypeArguments, this.ownerType)
+                return parameterizedType(this.rawType, this.ownerType, actualTypeArguments)
             }
             return this
         }
         is TypeVariable<*> -> {
-            val actual = table[this]
+            val actual = typeArguments[this]
             return actual ?: this
         }
         is WildcardType -> {
@@ -246,7 +255,7 @@ fun Type.eraseTypeVariables(table: Map<TypeVariable<*>, Type>): Type {
             return this
         }
         is GenericArrayType -> {
-            val componentType = this.genericComponentType.eraseTypeVariables(table)
+            val componentType = this.genericComponentType.eraseTypeVariables(typeArguments)
             if (componentType === this.genericComponentType) {
                 return this
             }
@@ -391,8 +400,8 @@ fun @PossibleTypes(Class::class, ParameterizedType::class) Type.findGenericInter
  * Let [this] be `T`, [lowerType] be `StringFoo.class`, this method will return `String.class`.
  */
 @JvmOverloads
-fun TypeVariable<*>.actualType(lowerType: Type, typeVariableTable: Map<TypeVariable<*>, Type> = emptyMap()): Type {
-    return this.findActualType(lowerType, typeVariableTable)
+fun TypeVariable<*>.actualType(lowerType: Type, typeArguments: Map<TypeVariable<*>, Type> = emptyMap()): Type {
+    return this.findActualType(lowerType, typeArguments)
         ?: throw IllegalArgumentException("Actual type of $this on $lowerType was not found.")
 }
 
@@ -407,10 +416,10 @@ fun TypeVariable<*>.actualType(lowerType: Type, typeVariableTable: Map<TypeVaria
  * Let [this] be `T`, [lowerType] be `StringFoo.class`, this method will return `String.class`.
  */
 @JvmOverloads
-fun TypeVariable<*>.findActualType(lowerType: Type, typeVariableTable: Map<TypeVariable<*>, Type> = emptyMap()): Type? {
+fun TypeVariable<*>.findActualType(lowerType: Type, typeArguments: Map<TypeVariable<*>, Type> = emptyMap()): Type? {
     return when (lowerType) {
-        is Class<*> -> this.findActualType(lowerType, typeVariableTable)
-        is ParameterizedType -> this.findActualType(lowerType, typeVariableTable)
+        is Class<*> -> this.findActualType(lowerType, typeArguments)
+        is ParameterizedType -> this.findActualType(lowerType, typeArguments)
         else -> this.findActualType(lowerType.rawClass)
     }
 }
@@ -428,13 +437,13 @@ fun TypeVariable<*>.findActualType(lowerType: Type, typeVariableTable: Map<TypeV
 @JvmOverloads
 fun TypeVariable<*>.findActualType(
     lowerType: Class<*>,
-    typeVariableTable: Map<TypeVariable<*>, Type> = emptyMap()
+    typeArguments: Map<TypeVariable<*>, Type> = emptyMap()
 ): Type? {
     val declaredType = this.genericDeclaration
     if (declaredType !is Class<*>) {
         return null
     }
-    return this.findActualType(lowerType, declaredType)?.eraseTypeVariables(typeVariableTable)
+    return this.findActualType(lowerType, declaredType)?.eraseTypeVariables(typeArguments)
 }
 
 /**
@@ -449,7 +458,7 @@ fun TypeVariable<*>.findActualType(
  */
 @JvmOverloads
 fun TypeVariable<*>.findActualType(
-    lowerType: ParameterizedType, typeVariableTable: Map<TypeVariable<*>, Type> = emptyMap()
+    lowerType: ParameterizedType, typeArguments: Map<TypeVariable<*>, Type> = emptyMap()
 ): Type? {
     val declaredType = this.genericDeclaration
     if (declaredType !is Class<*>) {
@@ -476,9 +485,9 @@ fun TypeVariable<*>.findActualType(
         val actualTypeArguments = lowerType.actualTypeArguments
         val index = typeParameters.indexOf(tryActualType)
         if (index < 0) {
-            return tryActualType.eraseTypeVariables(typeVariableTable)
+            return tryActualType.eraseTypeVariables(typeArguments)
         }
-        return actualTypeArguments[index]?.eraseTypeVariables(typeVariableTable)
+        return actualTypeArguments[index]?.eraseTypeVariables(typeArguments)
     }
 }
 
