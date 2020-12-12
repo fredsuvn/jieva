@@ -13,7 +13,7 @@ public class MemberKitTest {
                 SubNewClass.class
         ));
         Assert.assertFalse(MemberKit.isAccessibleFor(
-                NewClass.class.getDeclaredField("privateParam"),
+                NewClass.class.getDeclaredField("privateField"),
                 SubNewClass.class
         ));
     }

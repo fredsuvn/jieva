@@ -12,22 +12,24 @@ public class FieldKitTest {
 
     private static final TestLogger testLogger = TestLogger.DEFAULT;
 
+    Field superPublicField = SuperNewClass.class.getDeclaredField("superPublicField");
+    Field superProtectedField = SuperNewClass.class.getDeclaredField("superProtectedField");
+    Field superPrivateField = SuperNewClass.class.getDeclaredField("superPrivateField");
+    Field superPackageField = SuperNewClass.class.getDeclaredField("superPackageField");
+    Field publicField = NewClass.class.getDeclaredField("publicField");
+    Field protectedField = NewClass.class.getDeclaredField("protectedField");
+    Field privateField = NewClass.class.getDeclaredField("privateField");
+    Field packageField = NewClass.class.getDeclaredField("packageField");
+    Field subPublicField = SubNewClass.class.getDeclaredField("subPublicField");
+    Field subProtectedField = SubNewClass.class.getDeclaredField("subProtectedField");
+    Field subPrivateField = SubNewClass.class.getDeclaredField("subPrivateField");
+    Field subPackageField = SubNewClass.class.getDeclaredField("subPackageField");
+
+    public FieldKitTest() throws NoSuchFieldException {
+    }
+
     @Test
     public void testFind() throws Exception {
-        Field superPublicField = SuperNewClass.class.getDeclaredField("superPublicField");
-        Field superProtectedField = SuperNewClass.class.getDeclaredField("superProtectedField");
-        Field superPrivateField = SuperNewClass.class.getDeclaredField("superPrivateField");
-        Field superPackageField = SuperNewClass.class.getDeclaredField("superPackageField");
-        Field publicField = NewClass.class.getDeclaredField("publicField");
-        Field protectedField = NewClass.class.getDeclaredField("protectedField");
-        Field privateField = NewClass.class.getDeclaredField("privateField");
-        Field packageField = NewClass.class.getDeclaredField("packageField");
-        Field subPublicField = SubNewClass.class.getDeclaredField("subPublicField");
-        Field subProtectedField = SubNewClass.class.getDeclaredField("subProtectedField");
-        Field subPrivateField = SubNewClass.class.getDeclaredField("subPrivateField");
-        Field subPackageField = SubNewClass.class.getDeclaredField("subPackageField");
-
-
         Assert.assertEquals(
                 FieldKit.findFields(NewClass.class),
                 Arrays.asList(NewClass.class.getFields())
@@ -49,6 +51,11 @@ public class FieldKitTest {
                 NewClass.class.getDeclaredField("protectedField")
         );
         Assert.assertNull(FieldKit.findOwnedField(NewClass.class, "superProtectedField"));
+
+        Assert.assertEquals(
+                FieldKit.searchFields(SubNewClass.class, f -> f.getName().contains("ackage")),
+                Arrays.asList(subPackageField, packageField, superPackageField)
+        );
     }
 
     @Test

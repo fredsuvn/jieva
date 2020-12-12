@@ -31,36 +31,25 @@ fun Class<*>.findDeclaredMethods(): List<Method> {
 }
 
 fun Class<*>.findOwnedMethod(name: String, vararg parameterTypes: Class<*>): Method? {
-    return searchMethod(name, parameterTypes, declared = true, deep = false)
+    return this.searchMethod(name, parameterTypes, false)
 }
 
 fun Class<*>.findOwnedMethods(): List<Method> {
     val set = LinkedHashSet<Method>()
     set.addAll(this.findMethods())
-    val declared = this.findDeclaredMethods()
-    for (method in declared) {
-        if (!set.contains(method)) {
-            set.add(method)
+    for (declaredMethod in this.findDeclaredMethods()) {
+        if (!set.contains(declaredMethod)) {
+            set.add(declaredMethod)
         }
-    }
-    var superClass = this.superclass
-    while (superClass !== null) {
-        val superMethods = superClass.findDeclaredMethods()
-        for (superMethod in superMethods) {
-            if (superMethod.isProtected && !set.contains(superMethod)) {
-                set.add(superMethod)
-            }
-        }
-        superClass = superClass.superclass
     }
     return set.toList()
 }
 
+@JvmOverloads
 fun Class<*>.searchMethod(
     name: String,
     parameterTypes: Array<out Class<*>>,
-    declared: Boolean,
-    deep: Boolean,
+    deep: Boolean = true,
 ): Method? {
     var method = try {
         this.getMethod(name, *parameterTypes)
@@ -69,9 +58,6 @@ fun Class<*>.searchMethod(
     }
     if (method !== null) {
         return method
-    }
-    if (!declared) {
-        return null
     }
     method = findDeclaredMethod(name, *parameterTypes)
     if (method !== null) {
@@ -91,14 +77,32 @@ fun Class<*>.searchMethod(
     return null
 }
 
-fun Method.canOverrideBy(clazz: Class<*>): Boolean {
-    if (this.isPrivate) {
-        return false
+@JvmOverloads
+fun Class<*>.searchMethods(deep: Boolean = true, predicate: (Method) -> Boolean): List<Method> {
+    val result = mutableListOf<Method>()
+    for (method in this.methods) {
+        if (predicate(method)) {
+            result.add(method)
+        }
     }
-    if (!this.declaringClass.isAssignableFrom(clazz)) {
-        return false
+    for (method in this.declaredMethods) {
+        if (predicate(method)) {
+            result.add(method)
+        }
     }
-    return true
+    if (!deep) {
+        return result
+    }
+    var superClass = this.superclass
+    while (superClass !== null) {
+        for (method in superClass.declaredMethods) {
+            if (predicate(method)) {
+                result.add(method)
+            }
+        }
+        superClass = superClass.superclass
+    }
+    return result
 }
 
 /**
@@ -125,4 +129,14 @@ fun <T> Method.invokeForcible(owner: Any?, vararg args: Any?): T {
     } catch (e: Exception) {
         throw IllegalStateException(e)
     }
+}
+
+fun Method.canOverrideBy(clazz: Class<*>): Boolean {
+    if (this.isPrivate) {
+        return false
+    }
+    if (!this.declaringClass.isAssignableFrom(clazz)) {
+        return false
+    }
+    return true
 }
