@@ -5,6 +5,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.reflect.TypeKit;
 import xyz.srclab.common.reflect.TypeRef;
+import xyz.srclab.common.test.TestLogger;
 
 import java.util.List;
 
@@ -12,6 +13,8 @@ import java.util.List;
  * @author sunqian
  */
 public class TypeKitTest {
+
+    private static final TestLogger testLogger = TestLogger.DEFAULT;
 
     @Test
     public void testBoundClass() {
@@ -61,6 +64,8 @@ public class TypeKitTest {
                 TypeKit.upperBound(TypeUtils.genericArrayType(String.class)),
                 TypeUtils.genericArrayType(String.class)
         );
+
+        testLogger.log(TypeUtils.getTypeArguments(TypeUtils.parameterize(C1.class, String.class, String.class, String.class)));
     }
 
     public class C1<CT1, CT2 extends String, CT3 extends CT2> {
