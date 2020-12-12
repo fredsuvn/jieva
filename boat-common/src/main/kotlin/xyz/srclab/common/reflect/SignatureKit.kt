@@ -34,6 +34,8 @@ fun Array<out Type>.toParameterTypesString(): String {
 /**
  * Contracts full signature name:
  * * abc.xyz.Foo -> a.x.Foo
+ *
+ * If given [this] has an illegal format, the result will be undefined.
  */
 @JvmOverloads
 fun CharSequence.contractSignatureName(maxLength: Int = 0): String {
