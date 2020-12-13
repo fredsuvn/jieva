@@ -17,8 +17,7 @@ public class TypeRefTest {
 
     @Test
     public void testTypeRef() {
-        TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<Map<String, List<? extends String>>>() {
-        };
+        TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<Map<String, List<? extends String>>>() {};
         Type type = typeRef.type();
         Assert.assertTrue(type instanceof ParameterizedType);
         ParameterizedType mapType = (ParameterizedType) type;
@@ -34,5 +33,8 @@ public class TypeRefTest {
         Assert.assertTrue(listActualTypeArguments[0] instanceof WildcardType);
         WildcardType stringWildcardType = (WildcardType) listActualTypeArguments[0];
         Assert.assertEquals(stringWildcardType.getUpperBounds()[0], String.class);
+
+        TypeRef<String> stringTypeRef = new TypeRef<String>() {};
+        Assert.assertEquals(stringTypeRef.type(), String.class);
     }
 }
