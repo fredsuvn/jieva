@@ -177,10 +177,25 @@ fun parameterizedType(
     }
 }
 
+@JvmOverloads
+fun parameterizedType(
+    rawType: Type,
+    ownerType: Type? = null,
+    actualTypeArguments: List<Type>,
+): ParameterizedType {
+    return parameterizedType(rawType, ownerType, actualTypeArguments.toTypedArray())
+}
+
 fun wildcardType(upperBounds: Array<out Type>?, lowerBounds: Array<out Type>?): WildcardType {
     val uppers = upperBounds ?: arrayOf(Any::class.java)
     val lowers = lowerBounds ?: ArrayUtils.EMPTY_TYPE_ARRAY
     return TypeUtils.wildcardType().withUpperBounds(*uppers).withLowerBounds(*lowers).build()
+}
+
+fun wildcardType(upperBounds: List<Type>?, lowerBounds: List<Type>?): WildcardType {
+    val uppers = upperBounds ?: emptyList()
+    val lowers = lowerBounds ?: emptyList()
+    return wildcardType(uppers.toTypedArray(), lowers.toTypedArray())
 }
 
 fun Type.genericArrayType(): GenericArrayType {
@@ -190,27 +205,95 @@ fun Type.genericArrayType(): GenericArrayType {
 /**
  * @throws IllegalArgumentException
  */
-fun @PossibleTypes(Class::class, ParameterizedType::class) Type.getTypeArguments(): Map<TypeVariable<*>, Type> {
-    val rawClass = this.rawClass
-    val superclass = rawClass.genericSuperclass
-    val interfaces = rawClass.genericInterfaces
-    val actual = mutableListOf<Type>()
-    val params = mutableListOf<TypeVariable<*>>()
-    if (superclass is ParameterizedType) {
-        actual.addAll(superclass.actualTypeArguments)
-        params.addAll(superclass.rawClass.typeParameters)
-    }
-    for (inter in interfaces) {
-        if (inter is ParameterizedType) {
-            actual.addAll(inter.actualTypeArguments)
-            params.addAll(inter.rawClass.typeParameters)
+fun @PossibleTypes(
+    Class::class,
+    ParameterizedType::class
+) Type.findTypeArguments(vararg to: Class<*>): Map<TypeVariable<*>, Type> {
+    return this.findTypeArguments(to.toList())
+}
+
+/**
+ * @throws IllegalArgumentException
+ */
+@JvmOverloads
+fun @PossibleTypes(
+    Class::class,
+    ParameterizedType::class
+) Type.findTypeArguments(to: List<Class<*>>? = null): Map<TypeVariable<*>, Type> {
+
+    fun findTypeArguments(
+        type: ParameterizedType,
+        @OutParam typeArguments: MutableMap<TypeVariable<*>, Type>
+    ): MutableMap<TypeVariable<*>, Type> {
+        val arguments = type.actualTypeArguments
+        val parameters = type.rawClass.typeParameters
+        for (i in parameters.indices) {
+            val parameter = parameters[i]
+            val argument = arguments[i]
+            typeArguments[parameter] = typeArguments.getOrDefault(argument, argument)
         }
+        return typeArguments
     }
-    if (this is ParameterizedType) {
-        actual.addAll(this.actualTypeArguments)
-        params.addAll(rawClass.typeParameters)
+
+    fun findTypeArguments(
+        type: Type,
+        typeArguments: MutableMap<TypeVariable<*>, Type>
+    ): MutableMap<TypeVariable<*>, Type> {
+        if (type is ParameterizedType) {
+            val ownerType = type.ownerType;
+            if (ownerType !== null) {
+                findTypeArguments(ownerType, typeArguments)
+            }
+            findTypeArguments(type, typeArguments)
+        }
+        val rawClass = type.rawClass
+        val genericSuperclass = rawClass.genericSuperclass
+        if (genericSuperclass !== null) {
+            findTypeArguments(genericSuperclass, typeArguments)
+        }
+        val genericInterfaces = rawClass.genericInterfaces
+        for (genericInterface in genericInterfaces) {
+            findTypeArguments(genericInterface, typeArguments)
+        }
+        return typeArguments
     }
-    return params.zip(actual).toMap()
+
+    fun findTypeArguments(
+        type: Type,
+        to: MutableCollection<Class<*>>,
+        typeArguments: MutableMap<TypeVariable<*>, Type>
+    ): MutableMap<TypeVariable<*>, Type> {
+        if (to.isEmpty()) {
+            return typeArguments
+        }
+        if (type is ParameterizedType) {
+            val ownerType = type.ownerType;
+            if (ownerType !== null) {
+                findTypeArguments(ownerType, typeArguments)
+            }
+            findTypeArguments(type, typeArguments)
+        }
+        val rawClass = type.rawClass
+        to.remove(rawClass)
+        if (to.isEmpty()) {
+            return typeArguments
+        }
+        val genericSuperclass = rawClass.genericSuperclass
+        if (genericSuperclass !== null) {
+            findTypeArguments(genericSuperclass, to, typeArguments)
+        }
+        val genericInterfaces = rawClass.genericInterfaces
+        for (genericInterface in genericInterfaces) {
+            findTypeArguments(genericInterface, to, typeArguments)
+        }
+        return typeArguments
+    }
+
+    return if (to === null || to.isEmpty()) {
+        findTypeArguments(this, mutableMapOf())
+    } else {
+        findTypeArguments(this, to.toMutableList(), mutableMapOf())
+    }
 }
 
 @PossibleTypes(Class::class, ParameterizedType::class, WildcardType::class, GenericArrayType::class)

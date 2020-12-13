@@ -446,7 +446,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
     override fun resolve(context: BeanResolveHandler.ResolveContext) {
         val beanInfo = Introspector.getBeanInfo(context.beanType.rawClass)
-        val typeVariableTable = context.beanType.getTypeArguments()
+        val typeVariableTable = context.beanType.findTypeArguments()
         val beanProperties = context.beanProperties
         for (propertyDescriptor in beanInfo.propertyDescriptors) {
             if (beanProperties.containsKey(propertyDescriptor.name)) {

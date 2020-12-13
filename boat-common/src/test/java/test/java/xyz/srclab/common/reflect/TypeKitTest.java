@@ -8,6 +8,7 @@ import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -80,19 +81,19 @@ public class TypeKitTest {
                 List.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(C1.class.getTypeParameters()[0]),
+                TypeKit.upperClass(BoundClass.class.getTypeParameters()[0]),
                 Object.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(C1.class.getTypeParameters()[1]),
+                TypeKit.upperClass(BoundClass.class.getTypeParameters()[1]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(C1.class.getTypeParameters()[2]),
+                TypeKit.upperClass(BoundClass.class.getTypeParameters()[2]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(C1.class.getTypeParameters()[3]),
+                TypeKit.upperClass(BoundClass.class.getTypeParameters()[3]),
                 List.class
         );
         Assert.assertEquals(
@@ -129,16 +130,16 @@ public class TypeKitTest {
                 ),
                 List.class
         );
-        Assert.assertNull(TypeKit.lowerClass(C1.class.getTypeParameters()[0]));
+        Assert.assertNull(TypeKit.lowerClass(BoundClass.class.getTypeParameters()[0]));
         Assert.assertEquals(
-                TypeKit.lowerClass(C1.class.getTypeParameters()[1]),
+                TypeKit.lowerClass(BoundClass.class.getTypeParameters()[1]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerClass(C1.class.getTypeParameters()[2]),
+                TypeKit.lowerClass(BoundClass.class.getTypeParameters()[2]),
                 String.class
         );
-        Assert.assertNull(TypeKit.lowerClass(C1.class.getTypeParameters()[3]));
+        Assert.assertNull(TypeKit.lowerClass(BoundClass.class.getTypeParameters()[3]));
         Assert.expectThrows(IllegalArgumentException.class, () ->
                 TypeKit.lowerClass(TypeUtils.genericArrayType(String.class)));
     }
@@ -177,20 +178,20 @@ public class TypeKitTest {
                 }.type()
         );
         Assert.assertEquals(
-                TypeKit.upperBound(C1.class.getTypeParameters()[0]),
+                TypeKit.upperBound(BoundClass.class.getTypeParameters()[0]),
                 Object.class
         );
         Assert.assertEquals(
-                TypeKit.upperBound(C1.class.getTypeParameters()[1]),
+                TypeKit.upperBound(BoundClass.class.getTypeParameters()[1]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperBound(C1.class.getTypeParameters()[2]),
+                TypeKit.upperBound(BoundClass.class.getTypeParameters()[2]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperBound(C1.class.getTypeParameters()[3]).toString(),
-                "java.util.List<? extends CT1>"
+                TypeKit.upperBound(BoundClass.class.getTypeParameters()[3]).toString(),
+                "java.util.List<? extends T1>"
         );
         Assert.assertEquals(
                 TypeKit.upperBound(TypeUtils.genericArrayType(String.class)),
@@ -228,27 +229,61 @@ public class TypeKitTest {
                 new TypeRef<List<String>>() {
                 }.type()
         );
-        Assert.assertNull(TypeKit.lowerBound(C1.class.getTypeParameters()[0]));
+        Assert.assertNull(TypeKit.lowerBound(BoundClass.class.getTypeParameters()[0]));
         Assert.assertEquals(
-                TypeKit.lowerBound(C1.class.getTypeParameters()[1]),
+                TypeKit.lowerBound(BoundClass.class.getTypeParameters()[1]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerBound(C1.class.getTypeParameters()[2]),
+                TypeKit.lowerBound(BoundClass.class.getTypeParameters()[2]),
                 String.class
         );
-        Assert.assertNull(TypeKit.lowerBound(C1.class.getTypeParameters()[3]));
+        Assert.assertNull(TypeKit.lowerBound(BoundClass.class.getTypeParameters()[3]));
         Assert.assertEquals(
                 TypeKit.lowerBound(TypeUtils.genericArrayType(String.class)),
                 TypeUtils.genericArrayType(String.class)
         );
     }
 
-    public class C1<
-            CT1,
-            CT2 extends String,
-            CT3 extends CT2,
-            CT4 extends List<? extends CT1>
+    @Test
+    public void testTypeArguments() {
+        testLogger.log(TypeKit.findTypeArguments(F.class));
+        Type sscType = new TypeRef<SSC<BigDecimal>>() {}.type();
+        testLogger.log(TypeKit.findTypeArguments(sscType));
+        testLogger.log(TypeUtils.getTypeArguments(sscType, Object.class));
+        testLogger.log(TypeKit.findTypeArguments(G.class));
+        testLogger.log(TypeKit.findTypeArguments(G.class, F.FI.class));
+        testLogger.log(TypeUtils.getTypeArguments(G.class, F.FI.class));
+
+        Type sscs = new TypeRef<SSC<? extends String>.S>() {}.type();
+        testLogger.log(TypeKit.findTypeArguments(sscs, I1.class));
+        testLogger.log(TypeUtils.getTypeArguments(sscs, I1.class));
+    }
+
+    public static class BoundClass<
+            T1,
+            T2 extends String,
+            T3 extends T2,
+            T4 extends List<? extends T1>
             > {
     }
+
+    public interface I1<I1T1> {}
+
+    public interface I2<I2T1> {}
+
+    public static class C<CT1, CT2> implements I1<CT2>, I2<String> {}
+
+    public static class SC<SCT1, SCT2> extends C<Long, SCT2> implements I1<SCT2>, I2<String> {}
+
+    public static class SSC<SSCT2> extends SC<SSCT2, Long> {
+
+        class S implements I1<SSCT2> {}
+    }
+
+    public static class F extends SSC<BigDecimal> {
+        interface FI<FI> {}
+    }
+
+    public static class G implements F.FI<String> {}
 }
