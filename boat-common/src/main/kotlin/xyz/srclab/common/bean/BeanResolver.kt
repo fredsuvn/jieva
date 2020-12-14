@@ -1,6 +1,5 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.annotations.OutParam
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.Invoker
 import xyz.srclab.common.base.Invoker.Companion.asInvoker
@@ -485,66 +484,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
             } else {
                 setterMethod!!.genericParameterTypes[0]
             }
-            return findActualType(type)
-        }
-
-        private fun findActualType(type: Type): Type {
-
-            fun needTransform(@OutParam array: Array<Type>): Boolean {
-                var needTransform = false
-                for (i in array.indices) {
-                    val oldType = array[i]
-                    val newType = findActualType(oldType)
-                    if (oldType != newType) {
-                        needTransform = true
-                        array[i] = newType
-                    }
-                }
-                return needTransform
-            }
-
-            return when (type) {
-                is TypeVariable<*> -> {
-                    val result = type.findActualType(genericOwnerType, typeVariableTable) ?: type
-                    if (result is TypeVariable<*>) {
-                        return result
-                    }
-                    return findActualType(result)
-                }
-                is ParameterizedType -> {
-                    val actualTypeArguments = type.actualTypeArguments
-                    if (!needTransform(actualTypeArguments)) {
-                        return type
-                    }
-                    return parameterizedType(type.rawType, type.ownerType, actualTypeArguments)
-                }
-                is WildcardType -> {
-                    val upperBounds = type.upperBounds
-                    if (!upperBounds.isObjectUpperBound) {
-                        if (!needTransform(upperBounds)) {
-                            return type
-                        }
-                        return wildcardType(upperBounds, null)
-                    }
-                    val lowerBounds = type.lowerBounds
-                    if (lowerBounds.isNotEmpty()) {
-                        if (!needTransform(lowerBounds)) {
-                            return type
-                        }
-                        return wildcardType(null, lowerBounds)
-                    }
-                    return type
-                }
-                is GenericArrayType -> {
-                    val componentType = type.genericComponentType
-                    val newType = findActualType(componentType)
-                    if (componentType == newType) {
-                        return type
-                    }
-                    return type.genericArrayType()
-                }
-                else -> type
-            }
+            return type.eraseTypeVariables(typeVariableTable)
         }
 
         private fun tryGetter(): Invoker? {

@@ -24,10 +24,26 @@ fun toSignatureString(name: CharSequence, parameterTypes: Array<out Type>): Stri
 }
 
 /**
+ * Returns method signature string like:
+ * * name(a.b.C, x.y.Z<T>)
+ */
+fun toSignatureString(name: CharSequence, parameterTypes: Iterable<Type>): String {
+    return "$name(${parameterTypes.toParameterTypesString()})"
+}
+
+/**
  * Returns parameter types string like:
  * * a.b.C, x.y.Z<T>
  */
 fun Array<out Type>.toParameterTypesString(): String {
+    return this.joinToString { p -> p.typeName }
+}
+
+/**
+ * Returns parameter types string like:
+ * * a.b.C, x.y.Z<T>
+ */
+fun Iterable<Type>.toParameterTypesString(): String {
     return this.joinToString { p -> p.typeName }
 }
 

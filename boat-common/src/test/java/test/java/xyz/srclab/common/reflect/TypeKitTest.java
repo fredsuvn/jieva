@@ -8,8 +8,9 @@ import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
+import java.lang.reflect.TypeVariable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author sunqian
@@ -247,17 +248,67 @@ public class TypeKitTest {
 
     @Test
     public void testTypeArguments() {
-        testLogger.log(TypeKit.findTypeArguments(F.class));
-        Type sscType = new TypeRef<SSC<BigDecimal>>() {}.type();
-        testLogger.log(TypeKit.findTypeArguments(sscType));
-        testLogger.log(TypeUtils.getTypeArguments(sscType, Object.class));
-        testLogger.log(TypeKit.findTypeArguments(G.class));
-        testLogger.log(TypeKit.findTypeArguments(G.class, F.FI.class));
-        testLogger.log(TypeUtils.getTypeArguments(G.class, F.FI.class));
+        Map<TypeVariable<?>, Type> f1Map = TypeKit.findTypeArguments(F1.class);
+        testLogger.log("f1Map: " + f1Map);
+        Assert.assertEquals(
+                f1Map.toString(),
+                "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
+        );
 
-        Type sscs = new TypeRef<SSC<? extends String>.S>() {}.type();
-        testLogger.log(TypeKit.findTypeArguments(sscs, I1.class));
-        testLogger.log(TypeUtils.getTypeArguments(sscs, I1.class));
+
+        Map<TypeVariable<?>, Type> f1c1Map = TypeKit.findTypeArguments(F1.class, C1.class);
+        testLogger.log("f1c1Map: " + f1c1Map);
+        Assert.assertEquals(
+                f1c1Map.toString(),
+                "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>}"
+        );
+
+
+        Map<TypeVariable<?>, Type> f2Map = TypeKit.findTypeArguments(F2.class);
+        testLogger.log("f2Map: " + f2Map);
+        Assert.assertEquals(
+                f2Map.toString(),
+                "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
+        );
+
+        Map<TypeVariable<?>, Type> f2i3Map = TypeKit.findTypeArguments(F2.class, I3.class);
+        testLogger.log("f2i3Map: " + f2i3Map);
+        Assert.assertEquals(
+                f2i3Map.toString(),
+                "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String}"
+        );
+
+
+        Map<TypeVariable<?>, Type> s1GenericMap = TypeKit.findTypeArguments(
+                TypeKit.parameterizedType(S1.class, new Type[]{S1.class.getTypeParameters()[0]}));
+        testLogger.log("s1GenericMap: " + s1GenericMap);
+        Assert.assertEquals(
+                s1GenericMap.toString(),
+                "{S1T1=S1T1, C1T1=S1T1, C1T2=java.util.List<? extends S1T1>, I1T1=S1T1, I2T1=java.util.List<? extends S1T1>, I3T1=S1T1, I4T1=java.util.List<? extends S1T1>}"
+        );
+
+        Map<TypeVariable<?>, Type> s1i1GenericMap = TypeKit.findTypeArguments(
+                TypeKit.parameterizedType(S1.class, new Type[]{S1.class.getTypeParameters()[0]}),
+                I2.class
+        );
+        testLogger.log("s1i1GenericMap: " + s1i1GenericMap);
+        Assert.assertEquals(
+                s1i1GenericMap.toString(),
+                "{S1T1=S1T1, C1T1=S1T1, C1T2=java.util.List<? extends S1T1>, I1T1=S1T1, I2T1=java.util.List<? extends S1T1>}"
+        );
+
+        Map<TypeVariable<?>, Type> s1Map = TypeKit.findTypeArguments(
+                TypeKit.parameterizedType(S1.class, new Type[]{String.class}));
+        testLogger.log("s1Map: " + s1Map);
+        Assert.assertEquals(
+                s1i1GenericMap.toString(),
+                "s1Map: {S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
+        );
+    }
+
+    @Test
+    public void testGenericSignature() {
+        testLogger.log(TypeKit.genericSignature(F2.class, I4.class));
     }
 
     public static class BoundClass<
@@ -268,22 +319,27 @@ public class TypeKitTest {
             > {
     }
 
-    public interface I1<I1T1> {}
-
-    public interface I2<I2T1> {}
-
-    public static class C<CT1, CT2> implements I1<CT2>, I2<String> {}
-
-    public static class SC<SCT1, SCT2> extends C<Long, SCT2> implements I1<SCT2>, I2<String> {}
-
-    public static class SSC<SSCT2> extends SC<SSCT2, Long> {
-
-        class S implements I1<SSCT2> {}
+    public interface I1<I1T1> {
     }
 
-    public static class F extends SSC<BigDecimal> {
-        interface FI<FI> {}
+    public interface I2<I2T1> {
     }
 
-    public static class G implements F.FI<String> {}
+    public interface I3<I3T1> {
+    }
+
+    public interface I4<I4T1> {
+    }
+
+    public static class C1<C1T1, C1T2> implements I1<C1T1>, I2<List<? extends C1T1>> {
+    }
+
+    public static class S1<S1T1> extends C1<S1T1, List<? extends S1T1>> implements I3<S1T1>, I4<List<? extends S1T1>> {
+    }
+
+    public static class F1 extends S1<String> {
+    }
+
+    public static class F2 extends S1<String> implements I2<List<? extends String>>, I3<String> {
+    }
 }
