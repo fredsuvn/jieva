@@ -2,6 +2,7 @@ package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.reflect.findGenericInterface
+import xyz.srclab.common.reflect.parameterizedType
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -68,7 +69,7 @@ interface IterableSchema {
             }
 
             val iterableType = type.findGenericInterface(
-                List::class.java, Set::class.java, Collection::class.java, Iterable::class.java
+                 List::class.java, Set::class.java, Collection::class.java, Iterable::class.java
             )
             if (iterableType === null) {
                 return null
@@ -185,7 +186,7 @@ interface MapSchema {
                 }
             }
 
-            val mapType = type.findGenericInterface(Map::class.java)
+            val mapType = type.findGenericInterface( Map::class.java)
             if (mapType === null) {
                 return null
             }

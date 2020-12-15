@@ -301,14 +301,25 @@ public class TypeKitTest {
                 TypeKit.parameterizedType(S1.class, new Type[]{String.class}));
         testLogger.log("s1Map: " + s1Map);
         Assert.assertEquals(
-                s1i1GenericMap.toString(),
-                "s1Map: {S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
+                s1Map.toString(),
+                "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
+        );
+
+        Type c1c1GenericTypeRef = new TypeRef<C1<Long, Double>.C1C1<String>>() {
+        }.type();
+        Map<TypeVariable<?>, Type> c1c1GenericMap = TypeKit.findTypeArguments(c1c1GenericTypeRef);
+        testLogger.log("c1c1GenericMap: " + c1c1GenericMap);
+        Assert.assertEquals(
+                c1c1GenericMap.toString(),
+                "{C1T1=class java.lang.Long, C1T2=class java.lang.Double, I1T1=class java.lang.Long, I2T1=java.util.List<? extends java.lang.Long>, C1C1T1=class java.lang.String, I3T1=class java.lang.Double}"
         );
     }
 
     @Test
     public void testGenericSignature() {
         testLogger.log(TypeKit.genericSignature(F2.class, I4.class));
+
+        TypeKit.findGenericInterface(String.class);
     }
 
     public static class BoundClass<
@@ -332,6 +343,8 @@ public class TypeKitTest {
     }
 
     public static class C1<C1T1, C1T2> implements I1<C1T1>, I2<List<? extends C1T1>> {
+        class C1C1<C1C1T1> implements I3<C1T2> {
+        }
     }
 
     public static class S1<S1T1> extends C1<S1T1, List<? extends S1T1>> implements I3<S1T1>, I4<List<? extends S1T1>> {
