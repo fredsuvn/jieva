@@ -181,7 +181,7 @@ fun parameterizedType(
 
 fun parameterizedTypeWithOwner(
     rawType: Type,
-    ownerType: Type,
+    ownerType: Type?,
     vararg actualTypeArguments: Type,
 ): ParameterizedType {
     return TypeUtils.parameterizeWithOwner(ownerType, rawType.rawClass, *actualTypeArguments)
@@ -189,7 +189,7 @@ fun parameterizedTypeWithOwner(
 
 fun parameterizedTypeWithOwner(
     rawType: Type,
-    ownerType: Type,
+    ownerType: Type?,
     actualTypeArguments: Iterable<Type>,
 ): ParameterizedType {
     return parameterizedTypeWithOwner(rawType, ownerType, *actualTypeArguments.toTypedArray())
@@ -258,10 +258,15 @@ fun @PossibleTypes(
 
     val typeArguments = mutableMapOf<TypeVariable<*>, Type>()
     findTypeArguments0(this, typeArguments)
+    eraseTypeVariablesSelves(typeArguments)
     return typeArguments
 }
 
 /**
+ * Returns type arguments of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [to].
+ *
  * @throws IllegalArgumentException
  */
 fun @PossibleTypes(
@@ -272,6 +277,10 @@ fun @PossibleTypes(
 }
 
 /**
+ * Returns type arguments of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [to].
+ *
  * @throws IllegalArgumentException
  */
 fun @PossibleTypes(
@@ -279,59 +288,39 @@ fun @PossibleTypes(
     ParameterizedType::class
 ) Type.findTypeArguments(to: Iterable<Class<*>>): Map<TypeVariable<*>, Type> {
 
-    fun findTypeArguments(
-        type: Type,
-        typeArguments: MutableMap<TypeVariable<*>, Type>
-    ): MutableMap<TypeVariable<*>, Type> {
-
-    }
-
-    fun findTypeArguments(
+    fun findTypeArguments0(
         type: Type,
         to: MutableCollection<Class<*>>,
         typeArguments: MutableMap<TypeVariable<*>, Type>
-    ): MutableMap<TypeVariable<*>, Type> {
+    ) {
         if (to.isEmpty()) {
-            return typeArguments
+            return
         }
         if (type is ParameterizedType) {
             val ownerType = type.ownerType;
             if (ownerType !== null) {
-                findTypeArguments(ownerType, typeArguments)
+                findTypeArguments0(ownerType, to, typeArguments)
             }
             findTypeArguments(type, typeArguments)
         }
         val rawClass = type.rawClass
         to.remove(rawClass)
         if (to.isEmpty()) {
-            return typeArguments
+            return
         }
         val genericSuperclass = rawClass.genericSuperclass
         if (genericSuperclass !== null) {
-            findTypeArguments(genericSuperclass, to, typeArguments)
+            findTypeArguments0(genericSuperclass, to, typeArguments)
         }
         val genericInterfaces = rawClass.genericInterfaces
         for (genericInterface in genericInterfaces) {
-            findTypeArguments(genericInterface, to, typeArguments)
-        }
-        return typeArguments
-    }
-
-    val typeArguments = if (to === null) {
-        findTypeArguments(this, mutableMapOf())
-    } else {
-        findTypeArguments(this, to.toMutableList(), mutableMapOf())
-    }
-
-    fun eraseTypeVariables(@OutParam typeArguments: MutableMap<TypeVariable<*>, Type>) {
-        for (entry in typeArguments.entries) {
-            val param = entry.key
-            val type = entry.value
-            typeArguments[param] = type.eraseTypeVariables(typeArguments)
+            findTypeArguments0(genericInterface, to, typeArguments)
         }
     }
 
-    eraseTypeVariables(typeArguments)
+    val typeArguments = mutableMapOf<TypeVariable<*>, Type>()
+    findTypeArguments0(this, to.toMutableList(), typeArguments)
+    eraseTypeVariablesSelves(typeArguments)
     return typeArguments
 }
 
@@ -349,28 +338,15 @@ private fun findTypeArguments(
     return typeArguments
 }
 
-fun Type.eraseTypeVariables(typeArgumentsGenerator: (Type) -> Map<TypeVariable<*>, Type>): Type {
-
-    fun replaceArray(@OutParam array: Array<Type>, typeArguments: Map<TypeVariable<*>, Type>): Boolean {
-        var result = false
-        for (i in array.indices) {
-            val oldType = array[i]
-            if (oldType is TypeVariable<*>) {
-                val newType = typeArguments[oldType]
-                if (newType !== null) {
-                    array[i] = newType
-                    result = true
-                }
-            } else {
-                val newType = oldType.eraseTypeVariables(typeArguments)
-                if (oldType !== newType) {
-                    array[i] = newType
-                    result = true
-                }
-            }
-        }
-        return result
+private fun eraseTypeVariablesSelves(@OutParam typeArguments: MutableMap<TypeVariable<*>, Type>) {
+    for (entry in typeArguments.entries) {
+        val param = entry.key
+        val type = entry.value
+        typeArguments[param] = type.eraseTypeVariables(typeArguments)
     }
+}
+
+fun Type.eraseTypeVariables(typeArgumentsGenerator: (Type) -> Map<TypeVariable<*>, Type>): Type {
 
     var typeArgumentsTemp: Map<TypeVariable<*>, Type>? = null
 
@@ -389,8 +365,8 @@ fun Type.eraseTypeVariables(typeArgumentsGenerator: (Type) -> Map<TypeVariable<*
         is Class<*> -> this
         is ParameterizedType -> {
             val actualTypeArguments = this.actualTypeArguments
-            if (replaceArray(actualTypeArguments, getTypeArguments())) {
-                return parameterizedType(this.rawType, this.ownerType, actualTypeArguments)
+            if (replaceTypeVariable(actualTypeArguments, getTypeArguments())) {
+                return parameterizedTypeWithOwner(this.rawType, this.ownerType, *actualTypeArguments)
             }
             return this
         }
@@ -406,9 +382,9 @@ fun Type.eraseTypeVariables(typeArgumentsGenerator: (Type) -> Map<TypeVariable<*
         }
         is WildcardType -> {
             val upperBounds = this.upperBounds
-            val replaceUppers = replaceArray(upperBounds, getTypeArguments())
+            val replaceUppers = replaceTypeVariable(upperBounds, getTypeArguments())
             val lowerBounds = this.lowerBounds
-            val replaceLowers = replaceArray(lowerBounds, getTypeArguments())
+            val replaceLowers = replaceTypeVariable(lowerBounds, getTypeArguments())
             if (replaceUppers || replaceLowers) {
                 return wildcardType(upperBounds, lowerBounds)
             }
@@ -423,39 +399,16 @@ fun Type.eraseTypeVariables(typeArgumentsGenerator: (Type) -> Map<TypeVariable<*
         }
         else -> this
     }
-
 }
 
 @JvmOverloads
 fun Type.eraseTypeVariables(typeArguments: Map<TypeVariable<*>, Type> = this.findTypeArguments()): Type {
-
-    fun replaceArray(@OutParam array: Array<Type>): Boolean {
-        var result = false
-        for (i in array.indices) {
-            val oldType = array[i]
-            if (oldType is TypeVariable<*>) {
-                val newType = typeArguments[oldType]
-                if (newType !== null) {
-                    array[i] = newType
-                    result = true
-                }
-            } else {
-                val newType = oldType.eraseTypeVariables(typeArguments)
-                if (oldType !== newType) {
-                    array[i] = newType
-                    result = true
-                }
-            }
-        }
-        return result
-    }
-
     return when (this) {
         is Class<*> -> this
         is ParameterizedType -> {
             val actualTypeArguments = this.actualTypeArguments
-            if (replaceArray(actualTypeArguments)) {
-                return parameterizedType(this.rawType, this.ownerType, actualTypeArguments)
+            if (replaceTypeVariable(actualTypeArguments, typeArguments)) {
+                return parameterizedTypeWithOwner(this.rawType, this.ownerType, *actualTypeArguments)
             }
             return this
         }
@@ -471,9 +424,9 @@ fun Type.eraseTypeVariables(typeArguments: Map<TypeVariable<*>, Type> = this.fin
         }
         is WildcardType -> {
             val upperBounds = this.upperBounds
-            val replaceUppers = replaceArray(upperBounds)
+            val replaceUppers = replaceTypeVariable(upperBounds, typeArguments)
             val lowerBounds = this.lowerBounds
-            val replaceLowers = replaceArray(lowerBounds)
+            val replaceLowers = replaceTypeVariable(lowerBounds, typeArguments)
             if (replaceUppers || replaceLowers) {
                 return wildcardType(upperBounds, lowerBounds)
             }
@@ -490,9 +443,31 @@ fun Type.eraseTypeVariables(typeArguments: Map<TypeVariable<*>, Type> = this.fin
     }
 }
 
+private fun replaceTypeVariable(@OutParam array: Array<Type>, typeArguments: Map<TypeVariable<*>, Type>): Boolean {
+    var result = false
+    for (i in array.indices) {
+        val oldType = array[i]
+        if (oldType is TypeVariable<*>) {
+            val newType = typeArguments[oldType]
+            if (newType !== null) {
+                array[i] = newType
+                result = true
+            }
+        } else {
+            val newType = oldType.eraseTypeVariables(typeArguments)
+            if (oldType !== newType) {
+                array[i] = newType
+                result = true
+            }
+        }
+    }
+    return result
+}
+
 /**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * Returns generic signature of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
  *
  * For example:
  * ```
@@ -508,12 +483,36 @@ fun @PossibleTypes(
     Class::class,
     ParameterizedType::class
 ) Type.genericSignature(vararg targets: Class<*>): Type {
-    return this.genericSignature(null, targets.toList())
+    return this.genericSignature(targets.toList())
 }
 
 /**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * Returns generic signature of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
+ *
+ * For example:
+ * ```
+ * class StringFoo : Foo<String>
+ * ```
+ * Let [this] be `StringFoo`, [targets] contains only `Foo.class`, this method will return `Foo<String>`.
+ *
+ * @throws IllegalArgumentException
+ * @throws SignatureNotFoundException
+ */
+@PossibleTypes(Class::class, ParameterizedType::class)
+fun @PossibleTypes(
+    Class::class,
+    ParameterizedType::class
+) Type.genericSignature(targets: Iterable<Class<*>>): Type {
+    return this.findGenericSignature(null, targets)
+        ?: throw SignatureNotFoundException("$this for ${targets.toParameterTypesString()}")
+}
+
+/**
+ * Returns generic signature of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
  *
  * For example:
  * ```
@@ -533,29 +532,9 @@ fun @PossibleTypes(
 }
 
 /**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * Returns generic signature of [this].
  *
- * For example:
- * ```
- * class StringFoo : Foo<String>
- * ```
- * Let [this] be `StringFoo`, [targets] contains only `Foo.class`, this method will return `Foo<String>`.
- *
- * @throws IllegalArgumentException
- * @throws SignatureNotFoundException
- */
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class
-) Type.genericSignature(targets: Iterable<Class<*>>): Type {
-    return this.genericSignature(null, targets)
-}
-
-/**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
  *
  * For example:
  * ```
@@ -576,8 +555,9 @@ fun @PossibleTypes(
 }
 
 /**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * Returns generic signature of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
  *
  * For example:
  * ```
@@ -597,29 +577,9 @@ fun @PossibleTypes(
 }
 
 /**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * Returns generic signature of [this].
  *
- * For example:
- * ```
- * class StringFoo : Foo<String>
- * ```
- * Let [this] be `StringFoo`, [targets] contains only `Foo.class`, this method will return `Foo<String>`.
- *
- * @throws IllegalArgumentException
- */
-@JvmOverloads
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class
-) Type.findGenericSignature(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>): Type? {
-    return this.findGenericSignature(typeArguments, targets.asList())
-}
-
-/**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
  *
  * For example:
  * ```
@@ -648,8 +608,9 @@ fun @PossibleTypes(
 }
 
 /**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * Returns generic signature of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
  *
  * For example:
  * ```
@@ -669,8 +630,9 @@ fun @PossibleTypes(
 }
 
 /**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * Returns generic signature of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
  *
  * For example:
  * ```
@@ -711,8 +673,9 @@ fun @PossibleTypes(
 }
 
 /**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * Returns generic signature of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
  *
  * For example:
  * ```
@@ -731,17 +694,10 @@ fun @PossibleTypes(
     return this.findGenericInterface(typeArguments, targets.asList())
 }
 
-//@PossibleTypes(Class::class, ParameterizedType::class)
-//fun @PossibleTypes(
-//    Class::class,
-//    ParameterizedType::class
-//) Type.findGenericInterface(vararg targets: Class<*>): Type? {
-//    return this.findGenericInterface(null, targets.asList())
-//}
-
 /**
- * Returns generic signature of [this]. Generic signature class is pointed by [targets],
- * this method returns first class met on the inheritance tree if the class also be contained in [targets].
+ * Returns generic signature of [this].
+ *
+ * This method will iterate on the inheritance tree util anyone (included) contained by [targets].
  *
  * For example:
  * ```

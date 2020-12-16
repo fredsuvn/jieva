@@ -22,7 +22,7 @@ public class TypeKitTest {
     @Test
     public void testTypeGenerator() {
         Assert.assertEquals(
-                TypeKit.parameterizedType(List.class, new Type[]{String.class}),
+                TypeKit.parameterizedType(List.class, String.class),
                 TypeUtils.parameterize(List.class, String.class)
         );
         Assert.assertEquals(
@@ -280,7 +280,7 @@ public class TypeKitTest {
 
 
         Map<TypeVariable<?>, Type> s1GenericMap = TypeKit.findTypeArguments(
-                TypeKit.parameterizedType(S1.class, new Type[]{S1.class.getTypeParameters()[0]}));
+                TypeKit.parameterizedType(S1.class, S1.class.getTypeParameters()[0]));
         testLogger.log("s1GenericMap: " + s1GenericMap);
         Assert.assertEquals(
                 s1GenericMap.toString(),
@@ -288,7 +288,7 @@ public class TypeKitTest {
         );
 
         Map<TypeVariable<?>, Type> s1i1GenericMap = TypeKit.findTypeArguments(
-                TypeKit.parameterizedType(S1.class, new Type[]{S1.class.getTypeParameters()[0]}),
+                TypeKit.parameterizedType(S1.class, S1.class.getTypeParameters()[0]),
                 I2.class
         );
         testLogger.log("s1i1GenericMap: " + s1i1GenericMap);
@@ -298,7 +298,7 @@ public class TypeKitTest {
         );
 
         Map<TypeVariable<?>, Type> s1Map = TypeKit.findTypeArguments(
-                TypeKit.parameterizedType(S1.class, new Type[]{String.class}));
+                TypeKit.parameterizedType(S1.class, String.class));
         testLogger.log("s1Map: " + s1Map);
         Assert.assertEquals(
                 s1Map.toString(),
