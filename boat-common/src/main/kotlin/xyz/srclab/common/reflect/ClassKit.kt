@@ -81,7 +81,7 @@ fun <T> CharSequence.toClass(classLoader: ClassLoader = Current.classLoader): Cl
  */
 @JvmOverloads
 fun <T> CharSequence.toInstance(classLoader: ClassLoader = Current.classLoader): T {
-    return this.toInstance(classLoader, ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
+    return this.toInstance(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY, classLoader)
 }
 
 /**
@@ -90,9 +90,9 @@ fun <T> CharSequence.toInstance(classLoader: ClassLoader = Current.classLoader):
  */
 @JvmOverloads
 fun <T> CharSequence.toInstance(
-    classLoader: ClassLoader = Current.classLoader,
     parameterTypes: Array<out Class<*>>,
-    args: Array<out Any?>
+    args: Array<out Any?>,
+    classLoader: ClassLoader = Current.classLoader,
 ): T {
     val clazz: Class<T> = this.loadClass(classLoader)
     return clazz.toInstance(parameterTypes, args)
