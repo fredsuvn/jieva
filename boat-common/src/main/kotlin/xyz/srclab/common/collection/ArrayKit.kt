@@ -213,7 +213,7 @@ fun Any.arrayJoinToString(
     separator: CharSequence = ", ",
     transform: ((Any?) -> CharSequence)? = null
 ): String {
-    return this.arrayJoinToString(separator = separator, transform = transform)
+    return this.arrayJoinToString0(separator = separator, transform = transform)
 }
 
 fun Any.arrayJoinToString(
@@ -222,7 +222,7 @@ fun Any.arrayJoinToString(
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): String {
-    return this.arrayJoinToString(
+    return this.arrayJoinToString0(
         separator = separator,
         limit = limit,
         truncated = truncated,
@@ -231,6 +231,17 @@ fun Any.arrayJoinToString(
 }
 
 fun Any.arrayJoinToString(
+    separator: CharSequence = ", ",
+    prefix: CharSequence = "",
+    postfix: CharSequence = "",
+    limit: Int = -1,
+    truncated: CharSequence = "...",
+    transform: ((Any?) -> CharSequence)? = null
+): String {
+    return this.arrayJoinToString0(separator, prefix, postfix, limit, truncated, transform)
+}
+
+private fun Any.arrayJoinToString0(
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
     postfix: CharSequence = "",
@@ -258,7 +269,7 @@ fun <A : Appendable> Any.arrayJoinTo(
     separator: CharSequence = ", ",
     transform: ((Any?) -> CharSequence)? = null
 ): A {
-    return this.arrayJoinTo(buffer = buffer, separator = separator, transform = transform)
+    return this.arrayJoinTo0(buffer = buffer, separator = separator, transform = transform)
 }
 
 fun <A : Appendable> Any.arrayJoinTo(
@@ -268,7 +279,7 @@ fun <A : Appendable> Any.arrayJoinTo(
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): A {
-    return this.arrayJoinTo(
+    return this.arrayJoinTo0(
         buffer = buffer,
         separator = separator,
         limit = limit,
@@ -278,6 +289,18 @@ fun <A : Appendable> Any.arrayJoinTo(
 }
 
 fun <A : Appendable> Any.arrayJoinTo(
+    buffer: A,
+    separator: CharSequence = ", ",
+    prefix: CharSequence = "",
+    postfix: CharSequence = "",
+    limit: Int = -1,
+    truncated: CharSequence = "...",
+    transform: ((Any?) -> CharSequence)? = null
+): A {
+    return this.arrayJoinTo0(buffer, separator, prefix, postfix, limit, truncated, transform)
+}
+
+fun <A : Appendable> Any.arrayJoinTo0(
     buffer: A,
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
