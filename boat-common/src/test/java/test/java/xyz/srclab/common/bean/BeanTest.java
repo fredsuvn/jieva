@@ -85,6 +85,10 @@ public class BeanTest {
      * At 20201211165234499 prepare to run all tasks...
      * Task BeanKit was accomplished, cost: PT56.024S
      * Task Beanutils was accomplished, cost: PT12M13.491S
+     *
+     * At 20201216155802946 prepare to run all tasks...
+     * Task BeanKit was accomplished, cost: PT54.811S
+     * Task Beanutils was accomplished, cost: PT13M49.168S
      */
     @Test(enabled = true)
     public void testPerformance() {
