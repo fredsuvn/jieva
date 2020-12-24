@@ -9,6 +9,18 @@ import java.util.concurrent.TimeUnit
 
 object Defaults {
 
+    /**
+     * Represents null value.
+     */
+    @JvmField
+    val NULL: Any = "NULL_VALUE"
+
+    /**
+     * Represents absent value.
+     */
+    @JvmField
+    val ABSENT: Any = "ABSENT_VALUE"
+
     @JvmStatic
     @get:JvmName("charset")
     val charset: Charset = StandardCharsets.UTF_8

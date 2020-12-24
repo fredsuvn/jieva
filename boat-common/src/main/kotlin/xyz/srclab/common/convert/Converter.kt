@@ -25,107 +25,82 @@ import kotlin.collections.LinkedHashSet
 
 interface Converter {
 
-    fun <T> convert(from: Any?, toType: Class<T>): T
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val convertHandlers: List<ConvertHandler>
+        @JvmName("convertHandlers") get
 
-    fun <T> convert(from: Any?, toType: Type): T
+    @JvmDefault
+    fun <T> convert(from: Any?, toType: Class<T>): T {
+        for (handler in convertHandlers) {
+            val result = handler.convert(from, toType, this)
+            if (result === Defaults.NULL) {
+                return null.nullAs()
+            }
+            if (result !== null) {
+                return result.asAny()
+            }
+        }
+        throw UnsupportedOperationException("Cannot convert $from to $toType.")
+    }
+
+    @JvmDefault
+    fun <T> convert(from: Any?, toType: Type): T {
+        for (handler in convertHandlers) {
+            val result = handler.convert(from, toType, this)
+            if (result === Defaults.NULL) {
+                return null.nullAs()
+            }
+            if (result !== null) {
+                return result.asAny()
+            }
+        }
+        throw UnsupportedOperationException("Cannot convert $from to $toType.")
+    }
 
     @JvmDefault
     fun <T> convert(from: Any?, toTypeRef: TypeRef<T>): T {
         return convert(from, toTypeRef.type)
     }
 
-    fun <T> convert(from: Any?, fromType: Type, toType: Type): T
+    @JvmDefault
+    fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
+        for (handler in convertHandlers) {
+            val result = handler.convert(from, fromType, toType, this)
+            if (result === Defaults.NULL) {
+                return null.nullAs()
+            }
+            if (result !== null) {
+                return result.asAny()
+            }
+        }
+        throw UnsupportedOperationException("Cannot convert $fromType to $toType.")
+    }
 
     @JvmDefault
     fun <T> convert(from: Any?, fromTypeRef: TypeRef<T>, toTypeRef: TypeRef<T>): T {
         return convert(from, fromTypeRef.type, toTypeRef.type)
     }
 
-    fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter
+    @JvmDefault
+    fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
+        return newConverter(listOf(preConvertHandler).plus(convertHandlers))
+    }
 
     companion object {
 
         @JvmField
-        val EMPTY: Converter = object : Converter {
-
-            override fun <T> convert(from: Any?, toType: Class<T>): T {
-                throw UnsupportedOperationException("This is an empty converter.")
-            }
-
-            override fun <T> convert(from: Any?, toType: Type): T {
-                throw UnsupportedOperationException("This is an empty converter.")
-            }
-
-            override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
-                throw UnsupportedOperationException("This is an empty converter.")
-            }
-
-            override fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
-                return ConverterImpl(listOf(preConvertHandler))
-            }
-        }
-
-        @JvmField
-        val NOP: Converter = newConverter(NopConvertHandler)
-
-        @JvmField
         val DEFAULT: Converter = newConverter(ConvertHandler.DEFAULTS)
 
-        @JvmStatic
-        fun newConverter(convertHandler: ConvertHandler): Converter {
-            return newConverter(listOf(convertHandler))
-        }
+        @JvmField
+        val EMPTY: Converter = newConverter(emptyList())
+
+        @JvmField
+        val NOP: Converter = newConverter(listOf(NopConvertHandler))
 
         @JvmStatic
         fun newConverter(convertHandlers: Iterable<ConvertHandler>): Converter {
-            return ConverterImpl(convertHandlers.toList())
-        }
-
-        private class ConverterImpl(
-            private val handlers: List<ConvertHandler>
-        ) : Converter {
-
-            override fun <T> convert(from: Any?, toType: Class<T>): T {
-                for (handler in handlers) {
-                    val result = handler.convert(from, toType, this)
-                    if (result === NULL_VALUE) {
-                        return null as T
-                    }
-                    if (result !== null) {
-                        return result.asAny()
-                    }
-                }
-                throw UnsupportedOperationException("Cannot convert $from to $toType.")
-            }
-
-            override fun <T> convert(from: Any?, toType: Type): T {
-                for (handler in handlers) {
-                    val result = handler.convert(from, toType, this)
-                    if (result === NULL_VALUE) {
-                        return null as T
-                    }
-                    if (result !== null) {
-                        return result.asAny()
-                    }
-                }
-                throw UnsupportedOperationException("Cannot convert $from to $toType.")
-            }
-
-            override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
-                for (handler in handlers) {
-                    val result = handler.convert(from, fromType, toType, this)
-                    if (result === NULL_VALUE) {
-                        return null as T
-                    }
-                    if (result !== null) {
-                        return result.asAny()
-                    }
-                }
-                throw UnsupportedOperationException("Cannot convert $fromType to $toType.")
-            }
-
-            override fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
-                return ConverterImpl(listOf(preConvertHandler).plus(handlers))
+            return object : Converter {
+                override val convertHandlers = convertHandlers.toList()
             }
         }
     }
@@ -134,17 +109,17 @@ interface Converter {
 interface ConvertHandler {
 
     /**
-     * Return null if [from] cannot be converted, return [NULL_VALUE] if result value is null.
+     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
      */
     fun convert(from: Any?, toType: Class<*>, converter: Converter): Any?
 
     /**
-     * Return null if [from] cannot be converted, return [NULL_VALUE] if result value is null.
+     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
      */
     fun convert(from: Any?, toType: Type, converter: Converter): Any?
 
     /**
-     * Return null if [from] cannot be converted, return [NULL_VALUE] if result value is null.
+     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
      */
     fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any?
 
@@ -160,51 +135,37 @@ interface ConvertHandler {
             IterableConvertHandler,
             BeanConvertHandler.DEFAULT,
         )
+    }
+}
 
-        @JvmStatic
-        fun concat(convertHandlers: Iterable<ConvertHandler>): ConvertHandler {
-            return object : ConvertHandler {
+object NopConvertHandler : ConvertHandler {
 
-                override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
-                    for (convertHandler in convertHandlers) {
-                        val result = convertHandler.convert(from, toType, converter)
-                        if (result === NULL_VALUE) {
-                            return null
-                        }
-                        if (result !== null) {
-                            return result
-                        }
-                    }
-                    return null
-                }
-
-                override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
-                    for (convertHandler in convertHandlers) {
-                        val result = convertHandler.convert(from, toType, converter)
-                        if (result === NULL_VALUE) {
-                            return null
-                        }
-                        if (result !== null) {
-                            return result
-                        }
-                    }
-                    return null
-                }
-
-                override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
-                    for (convertHandler in convertHandlers) {
-                        val result = convertHandler.convert(from, fromType, toType, converter)
-                        if (result === NULL_VALUE) {
-                            return null
-                        }
-                        if (result !== null) {
-                            return result
-                        }
-                    }
-                    return null
-                }
-            }
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+        if (toType == Any::class.java) {
+            return from
         }
+        if (from === null) {
+            return from
+        }
+        val fromClass = from.javaClass
+        if (toType.isAssignableFrom(fromClass)) {
+            return from
+        }
+        return null
+    }
+
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) convert(from, toType, converter) else null
+    }
+
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        if (fromType == toType) {
+            return from
+        }
+        if (from !== null && from.javaClass == fromType && toType is Class<*>) {
+            return convert(from, toType, converter)
+        }
+        return null
     }
 }
 
@@ -235,25 +196,10 @@ abstract class AbstractConvertHandler : ConvertHandler {
     protected abstract fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any?
 }
 
-object NopConvertHandler : AbstractConvertHandler() {
-
-    override fun doConvertNull(toType: Type, converter: Converter): Any? {
-        return null
-    }
-
-    override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        return when {
-            fromType == toType -> from
-            fromType is Class<*> && toType is Class<*> && toType.isAssignableFrom(fromType) -> from
-            else -> null
-        }
-    }
-}
-
 object CharsConvertHandler : AbstractConvertHandler() {
 
     override fun doConvertNull(toType: Type, converter: Converter): Any? {
-        return NULL_VALUE
+        return Defaults.NULL
     }
 
     override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
@@ -398,7 +344,7 @@ object UpperBoundConvertHandler : AbstractConvertHandler() {
 object IterableConvertHandler : AbstractConvertHandler() {
 
     override fun doConvertNull(toType: Type, converter: Converter): Any? {
-        return NULL_VALUE
+        return Defaults.NULL
     }
 
     override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
@@ -500,7 +446,7 @@ open class BeanConvertHandler(
 ) : AbstractConvertHandler() {
 
     override fun doConvertNull(toType: Type, converter: Converter): Any? {
-        return NULL_VALUE
+        return Defaults.NULL
     }
 
     override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {

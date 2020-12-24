@@ -3,7 +3,6 @@ package xyz.srclab.common.cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
 import com.google.common.collect.MapMaker
-import xyz.srclab.common.base.ABSENT_VALUE
 import xyz.srclab.common.base.CachingProductBuilder
 import xyz.srclab.common.base.Defaults
 import xyz.srclab.common.base.asAny
@@ -25,8 +24,8 @@ interface Cache<K : Any, V> {
     @JvmDefault
     fun get(key: K): V {
         val thisAs = this.asAny<Cache<K, Any>>()
-        val value = thisAs.getOrElse(key, ABSENT_VALUE)
-        if (value === ABSENT_VALUE) {
+        val value = thisAs.getOrElse(key, Defaults.ABSENT)
+        if (value === Defaults.ABSENT) {
             throw NoSuchElementException(key.toString())
         }
         return value.asAny()
@@ -35,8 +34,8 @@ interface Cache<K : Any, V> {
     @JvmDefault
     fun getOrNull(key: K): V? {
         val thisAs = this.asAny<Cache<K, Any>>()
-        val value = thisAs.getOrElse(key, ABSENT_VALUE)
-        if (value === ABSENT_VALUE) {
+        val value = thisAs.getOrElse(key, Defaults.ABSENT)
+        if (value === Defaults.ABSENT) {
             return null
         }
         return value.asAny()
@@ -47,8 +46,8 @@ interface Cache<K : Any, V> {
     @JvmDefault
     fun getOrElse(key: K, defaultValue: (K) -> V): V {
         val thisAs = this.asAny<Cache<K, Any>>()
-        val value = thisAs.getOrElse(key, ABSENT_VALUE)
-        if (value === ABSENT_VALUE) {
+        val value = thisAs.getOrElse(key, Defaults.ABSENT)
+        if (value === Defaults.ABSENT) {
             return defaultValue(key)
         }
         return value.asAny()
@@ -61,8 +60,8 @@ interface Cache<K : Any, V> {
         val resultMap = mutableMapOf<K, V>()
         val thisAs = this.asAny<Cache<K, Any>>()
         for (key in keys) {
-            val value = thisAs.getOrElse(key, ABSENT_VALUE)
-            if (value !== ABSENT_VALUE) {
+            val value = thisAs.getOrElse(key, Defaults.ABSENT)
+            if (value !== Defaults.ABSENT) {
                 resultMap[key] = value.asAny()
             }
         }
@@ -74,8 +73,8 @@ interface Cache<K : Any, V> {
         val resultMap = mutableMapOf<K, V>()
         val thisAs = this.asAny<Cache<K, Any>>()
         for (key in keys) {
-            val value = thisAs.getOrElse(key, ABSENT_VALUE)
-            if (value !== ABSENT_VALUE) {
+            val value = thisAs.getOrElse(key, Defaults.ABSENT)
+            if (value !== Defaults.ABSENT) {
                 resultMap[key] = value.asAny()
             }
         }
