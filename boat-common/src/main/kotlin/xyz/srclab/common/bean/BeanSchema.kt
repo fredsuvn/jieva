@@ -2,7 +2,6 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.Invoker
-import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Field
 import java.lang.reflect.Type
@@ -88,9 +87,4 @@ interface PropertySchema {
     fun <T> getValue(bean: Any): T
 
     fun <T> setValue(bean: Any, value: Any?): T
-
-    @JvmDefault
-    fun <T> setValue(bean: Any, value: Any?, converter: Converter): T? {
-        return setValue(bean, converter.convert(value, genericType))
-    }
 }

@@ -1,13 +1,20 @@
 package xyz.srclab.common.test
 
 import xyz.srclab.common.base.Current
+import xyz.srclab.common.base.Format.Companion.fastFormat
 import xyz.srclab.common.base.Format.Companion.printFormat
+import xyz.srclab.common.base.asAny
 import xyz.srclab.common.reflect.contractSignatureName
 import java.io.PrintStream
 
 interface TestLogger {
 
     fun log(message: Any?)
+
+    @JvmDefault
+    fun log(pattern: CharSequence, vararg args: Any?) {
+        log(pattern.fastFormat(*args).asAny<Any?>())
+    }
 
     companion object {
 

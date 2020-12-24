@@ -1,29 +1,69 @@
 package test.java.xyz.srclab.common.bean;
 
 import kotlin.jvm.functions.Function1;
-import org.apache.commons.beanutils.BeanUtils;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.As;
 import xyz.srclab.common.bean.BeanKit;
 import xyz.srclab.common.bean.BeanResolver;
 import xyz.srclab.common.bean.BeanSchema;
 import xyz.srclab.common.bean.PropertySchema;
 import xyz.srclab.common.reflect.TypeKit;
 import xyz.srclab.common.reflect.TypeRef;
-import xyz.srclab.common.test.TestTask;
-import xyz.srclab.common.test.Tester;
+import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author sunqian
  */
 public class BeanTest {
+
+    private static final TestLogger testLogger = TestLogger.DEFAULT;
+
+    @Test
+    public void testMap() {
+        SimpleBean simpleBean = new SimpleBean();
+        simpleBean.setP1("123");
+        simpleBean.setP2(6);
+        simpleBean.setP3(Arrays.asList("1", "2", "3"));
+        Map<String, Object> simpleMap = BeanKit.asMap(simpleBean);
+        Assert.assertEquals(simpleMap.get("p1"), "123");
+        Assert.assertEquals(simpleMap.get("p2"), 6);
+        Assert.assertEquals(simpleMap.get("p3"), Arrays.asList("1", "2", "3"));
+        simpleMap.put("p1", "555");
+        Assert.assertEquals(simpleBean.getP1(), "555");
+        Assert.expectThrows(UnsupportedOperationException.class, () -> simpleMap.put("p4", "p4"));
+
+        BeanResolver.CopyOptions copyOptions = BeanResolver.CopyOptions.DEFAULT
+                .withTypes(SimpleBean.class, TypeKit.parameterizedType(Map.class, String.class, int.class))
+                .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
+        Map<String, Integer> siMap = As.any(BeanKit.asMap(simpleBean, copyOptions));
+        testLogger.log("siMap: {}", siMap);
+        Assert.assertEquals(siMap.get("p1"), (Integer) 555);
+        Assert.assertEquals(siMap.get("p2"), (Integer) 6);
+        Assert.assertEquals(siMap.size(), 2);
+    }
+
+    @Test
+    public void testCopyProperties() {
+        SimpleBean simpleBean = new SimpleBean();
+        simpleBean.setP1("123");
+        simpleBean.setP2(6);
+        simpleBean.setP3(Arrays.asList("1", "2", "3"));
+        Map<String, Object> simpleMap = new HashMap<>();
+        simpleMap.put("p1", null);
+        simpleMap.put("p2", null);
+        simpleMap.put("p3", null);
+        BeanKit.copyProperties(simpleBean, simpleMap);
+        Assert.assertEquals(simpleMap.get("p1"), "123");
+        Assert.assertEquals(simpleMap.get("p2"), 6);
+        Assert.assertEquals(simpleMap.get("p3"), Arrays.asList("1", "2", "3"));
+        Assert.assertEquals(simpleMap.size(), 3);
+
+    }
 
     @Test
     public void testSimpleBean() {
@@ -55,8 +95,7 @@ public class BeanTest {
         b.setP1("567");
         BeanKit.copyProperties(a, b, new BeanResolver.CopyOptions() {
             @NotNull
-            @Override
-            public Function1<Object, Boolean> propertyNameFilter() {
+            public Function1<Object, Boolean> getNameFilter() {
                 return name -> !name.equals("p1");
             }
         });
@@ -70,62 +109,6 @@ public class BeanTest {
         map.put("p3", Arrays.asList("1", "2", "3"));
         map.put("class", SimpleBean.class);
         a.setP1("123");
-        Map<String, Object> aMap = BeanKit.asMap(a);
-        Assert.assertEquals(aMap, map);
-        aMap.put("p1", "555");
-        Assert.assertEquals(a.getP1(), "555");
-        Assert.expectThrows(UnsupportedOperationException.class, () -> aMap.put("p4", "p4"));
-    }
-
-    /*
-     * Task BeanKit was accomplished, cost: PT1M59.624S
-     * Task Beanutils was accomplished, cost: PT13M2.245S
-     * All tasks were accomplished, await cost: PT13M2.248S, total cost: PT15M1.869S, average cost: PT7M30.9345S
-     *
-     * At 20201211165234499 prepare to run all tasks...
-     * Task BeanKit was accomplished, cost: PT56.024S
-     * Task Beanutils was accomplished, cost: PT12M13.491S
-     *
-     * At 20201216155802946 prepare to run all tasks...
-     * Task BeanKit was accomplished, cost: PT54.811S
-     * Task Beanutils was accomplished, cost: PT13M49.168S
-     */
-    @Test(enabled = true)
-    public void testPerformance() {
-        PerformanceBean a = new PerformanceBean();
-        a.setS1("s1");
-        a.setS2("s2");
-        a.setS3("s3");
-        a.setS4("s4");
-        a.setS5("s5");
-        a.setS6("s6");
-        a.setS7("s7");
-        a.setS8("s8");
-        a.setI1(1);
-        a.setI2(2);
-        a.setI3(3);
-        a.setI4(4);
-        a.setI5(5);
-        a.setI6(6);
-        a.setI7(7);
-        a.setI8(8);
-        long times = 50000000;
-        Tester.testTasksParallel(
-                TestTask.newTask("BeanKit", times, () -> {
-                    PerformanceBean b = new PerformanceBean();
-                    BeanKit.copyProperties(a, b);
-                    return null;
-                }),
-                TestTask.newTask("Beanutils", times, () -> {
-                    PerformanceBean b = new PerformanceBean();
-                    try {
-                        BeanUtils.copyProperties(b, a);
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
-                    }
-                    return null;
-                })
-        );
     }
 
     @Test

@@ -5,6 +5,7 @@ import xyz.srclab.common.base.Invoker
 import xyz.srclab.common.base.Invoker.Companion.asInvoker
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.cache.Cache
+import xyz.srclab.common.collection.MapSchema
 import xyz.srclab.common.collection.resolveMapSchema
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.*
@@ -26,7 +27,7 @@ interface BeanResolver {
 
     @JvmDefault
     fun asMap(bean: Any, copyOptions: CopyOptions): MutableMap<String, Any?> {
-        return BeanAsMap(bean, resolve(bean.javaClass).properties, copyOptions.converter)
+        return BeanAsMap(bean, resolve(bean.javaClass).properties, copyOptions)
     }
 
     @JvmDefault
@@ -41,7 +42,7 @@ interface BeanResolver {
 
     @JvmDefault
     fun <T : Any> copyProperties(from: Any, to: T, fromType: Type, toType: Type, converter: Converter): T {
-        return copyProperties(from, to, CopyOptions.DEFAULT.with(fromType, toType, converter))
+        return copyProperties(from, to, CopyOptions.DEFAULT.withTypesConverter(fromType, toType, converter))
     }
 
     @JvmDefault
@@ -56,7 +57,7 @@ interface BeanResolver {
 
     @JvmDefault
     fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T, fromType: Type, toType: Type, converter: Converter): T {
-        return copyProperties(from, to, CopyOptions.IGNORE_NULL.with(fromType, toType, converter))
+        return copyProperties(from, to, CopyOptions.IGNORE_NULL.withTypesConverter(fromType, toType, converter))
     }
 
     @JvmDefault
@@ -68,14 +69,14 @@ interface BeanResolver {
                 val toType = copyOptions.toType ?: Map::class.java
                 val toMapSchema = toType.resolveMapSchema()
                 from.forEach { (k, v) ->
-                    if (!copyOptions.propertyNameFilter(k)
-                        || !copyOptions.propertyTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
-                        || !copyOptions.propertyValueFilter(k, v, fromMapSchema.keyType, fromMapSchema.valueType)
-                        || !copyOptions.propertyConvertFilter(
+                    if (!copyOptions.nameFilter(k)
+                        || !copyOptions.fromTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
+                        || !copyOptions.fromValueFilter(k, fromMapSchema.keyType, fromMapSchema.valueType, v)
+                        || !copyOptions.convertFilter(
                             k,
-                            v,
                             fromMapSchema.keyType,
                             fromMapSchema.valueType,
+                            v,
                             toMapSchema.keyType,
                             toMapSchema.valueType
                         )
@@ -86,7 +87,7 @@ interface BeanResolver {
                     if (!to.containsKey(toKey)) {
                         return@forEach
                     }
-                    (to as MutableMap<Any, Any?>)[toKey] =
+                    (to.asAny<MutableMap<Any, Any?>>())[toKey] =
                         copyOptions.converter.convert(v, fromMapSchema.valueType, toMapSchema.valueType)
                 }
                 to
@@ -97,9 +98,9 @@ interface BeanResolver {
                 val toSchema = resolve(to.javaClass)
                 val toProperties = toSchema.properties
                 from.forEach { (k, v) ->
-                    if (!copyOptions.propertyNameFilter(k)
-                        || !copyOptions.propertyTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
-                        || !copyOptions.propertyValueFilter(k, v, fromMapSchema.keyType, fromMapSchema.valueType)
+                    if (!copyOptions.nameFilter(k)
+                        || !copyOptions.fromTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
+                        || !copyOptions.fromValueFilter(k, fromMapSchema.keyType, fromMapSchema.valueType, v)
                     ) {
                         return@forEach
                     }
@@ -109,11 +110,11 @@ interface BeanResolver {
                     if (toProperty === null || !toProperty.isWriteable) {
                         return@forEach
                     }
-                    if (!copyOptions.propertyConvertFilter(
+                    if (!copyOptions.convertFilter(
                             k,
-                            v,
                             fromMapSchema.keyType,
                             fromMapSchema.valueType,
+                            v,
                             String::class.java,
                             toProperty.genericType
                         )
@@ -131,20 +132,20 @@ interface BeanResolver {
                 val toType = copyOptions.toType ?: Map::class.java
                 val toMapSchema = toType.resolveMapSchema()
                 val fromProperties = fromSchema.properties
-                fromProperties.forEach { (name, property) ->
-                    if (!copyOptions.propertyNameFilter(name)
-                        || !property.isReadable
-                        || !copyOptions.propertyTypeFilter(name, String::class.java, property.genericType)
+                fromProperties.forEach { (name, fromProperty) ->
+                    if (!copyOptions.nameFilter(name)
+                        || !fromProperty.isReadable
+                        || !copyOptions.fromTypeFilter(name, String::class.java, fromProperty.genericType)
                     ) {
                         return@forEach
                     }
-                    val value = property.getValue<Any?>(from)
-                    if (!copyOptions.propertyValueFilter(name, value, String::class.java, property.genericType)
-                        || !copyOptions.propertyConvertFilter(
+                    val value = fromProperty.getValue<Any?>(from)
+                    if (!copyOptions.fromValueFilter(name, String::class.java, fromProperty.genericType, value)
+                        || !copyOptions.convertFilter(
                             name,
-                            value,
                             String::class.java,
-                            toMapSchema.valueType,
+                            fromProperty.genericType,
+                            value,
                             toMapSchema.keyType,
                             toMapSchema.valueType
                         )
@@ -155,8 +156,8 @@ interface BeanResolver {
                     if (!to.containsKey(toKey)) {
                         return@forEach
                     }
-                    (to as MutableMap<Any, Any?>)[toKey] =
-                        copyOptions.converter.convert(value, property.genericType, toMapSchema.valueType)
+                    (to.asAny<MutableMap<Any, Any?>>())[toKey] =
+                        copyOptions.converter.convert(value, fromProperty.genericType, toMapSchema.valueType)
                 }
                 to
             }
@@ -165,10 +166,10 @@ interface BeanResolver {
                 val toSchema = resolve(to.javaClass)
                 val fromProperties = fromSchema.properties
                 val toProperties = toSchema.properties
-                fromProperties.forEach { (name, property) ->
-                    if (!copyOptions.propertyNameFilter(name)
-                        || !property.isReadable
-                        || !copyOptions.propertyTypeFilter(name, String::class.java, property.genericType)
+                fromProperties.forEach { (name, fromProperty) ->
+                    if (!copyOptions.nameFilter(name)
+                        || !fromProperty.isReadable
+                        || !copyOptions.fromTypeFilter(name, String::class.java, fromProperty.genericType)
                     ) {
                         return@forEach
                     }
@@ -176,13 +177,13 @@ interface BeanResolver {
                     if (toProperty === null || !toProperty.isWriteable) {
                         return@forEach
                     }
-                    val value = property.getValue<Any?>(from)
-                    if (!copyOptions.propertyValueFilter(name, value, String::class.java, property.genericType)
-                        || !copyOptions.propertyConvertFilter(
+                    val value = fromProperty.getValue<Any?>(from)
+                    if (!copyOptions.fromValueFilter(name, String::class.java, fromProperty.genericType, value)
+                        || !copyOptions.convertFilter(
                             name,
-                            value,
                             String::class.java,
-                            property.genericType,
+                            fromProperty.genericType,
+                            value,
                             String::class.java,
                             toProperty.genericType
                         )
@@ -190,7 +191,7 @@ interface BeanResolver {
                         return@forEach
                     }
                     toProperty.setValue<Any?>(
-                        to, copyOptions.converter.convert(value, property.genericType, toProperty.genericType)
+                        to, copyOptions.converter.convert(value, fromProperty.genericType, toProperty.genericType)
                     )
                 }
                 to
@@ -220,45 +221,89 @@ interface BeanResolver {
 
         @Suppress(INAPPLICABLE_JVM_NAME)
         @JvmDefault
-        val propertyNameFilter: (name: Any?) -> Boolean
-            @JvmName("propertyNameFilter") get() = { _ -> true }
+        val nameFilter: (name: Any?) -> Boolean
+            @JvmName("nameFilter") get() = { _ -> true }
 
         @Suppress(INAPPLICABLE_JVM_NAME)
         @JvmDefault
-        val propertyTypeFilter: (name: Any?, nameType: Type, valueType: Type) -> Boolean
-            @JvmName("propertyTypeFilter") get() = { _, _, _ -> true }
+        val fromTypeFilter: (name: Any?, fromNameType: Type, fromValueType: Type) -> Boolean
+            @JvmName("fromTypeFilter") get() = { _, _, _ -> true }
 
         @Suppress(INAPPLICABLE_JVM_NAME)
         @JvmDefault
-        val propertyValueFilter: (name: Any?, value: Any?, nameType: Type, valueType: Type) -> Boolean
-            @JvmName("propertyValueFilter") get() = { _, _, _, _ -> true }
+        val fromValueFilter: (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean
+            @JvmName("fromValueFilter") get() = { _, _, _, _ -> true }
 
         @Suppress(INAPPLICABLE_JVM_NAME)
         @JvmDefault
-        val propertyConvertFilter: (
-            name: Any?, value: Any?,
-            nameType: Type, valueType: Type,
-            targetNameType: Type, targetValueType: Type
+        val convertFilter: (
+            name: Any?,
+            fromNameType: Type,
+            fromValueType: Type,
+            value: Any?,
+            toNameType: Type,
+            toValueType: Type,
         ) -> Boolean
-            @JvmName("propertyConvertFilter") get() = { _, _, _, _, _, _ -> true }
+            @JvmName("convertFilter") get() = { _, _, _, _, _, _ -> true }
+
+        @JvmDefault
+        fun withFromType(fromType: Type?): CopyOptions {
+            return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
+        }
+
+        @JvmDefault
+        fun withToType(toType: Type?): CopyOptions {
+            return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
+        }
 
         @JvmDefault
         fun withTypes(fromType: Type?, toType: Type?): CopyOptions {
-            return with(fromType, toType, this.converter)
+            return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
         }
 
         @JvmDefault
         fun withConverter(converter: Converter): CopyOptions {
-            return with(this.fromType, this.toType, converter)
+            return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
         }
 
         @JvmDefault
-        fun with(fromType: Type?, toType: Type?, converter: Converter): CopyOptions {
-            return object : CopyOptions by this {
-                override val fromType: Type? = fromType
-                override val toType: Type? = toType
-                override val converter: Converter = converter
-            }
+        fun withTypesConverter(fromType: Type?, toType: Type?, converter: Converter): CopyOptions {
+            return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
+        }
+
+        @JvmDefault
+        fun withNameFilter(
+            nameFilter: (name: Any?) -> Boolean
+        ): CopyOptions {
+            return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
+        }
+
+        @JvmDefault
+        fun withFromTypeFilter(
+            fromTypeFilter: (name: Any?, fromNameType: Type, fromValueType: Type) -> Boolean
+        ): CopyOptions {
+            return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
+        }
+
+        @JvmDefault
+        fun withFromValueFilter(
+            fromValueFilter: (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean
+        ): CopyOptions {
+            return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
+        }
+
+        @JvmDefault
+        fun withConvertFilter(
+            convertFilter: (
+                name: Any?,
+                fromNameType: Type,
+                fromValueType: Type,
+                value: Any?,
+                toNameType: Type,
+                toValueType: Type,
+            ) -> Boolean
+        ): CopyOptions {
+            return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
         }
 
         companion object {
@@ -268,36 +313,78 @@ interface BeanResolver {
 
             @JvmField
             val IGNORE_NULL = object : CopyOptions {
-                override val propertyValueFilter:
-                            (name: Any?, value: Any?, nameType: Type, valueType: Type) -> Boolean =
-                    { _, value, _, _ -> value !== null }
+                override val fromValueFilter:
+                            (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean =
+                    { _, _, _, fromValue -> fromValue !== null }
             }
 
             @JvmField
             val DEFAULT_WITHOUT_CONVERSION = object : CopyOptions {
-                override val propertyConvertFilter: (
-                    name: Any?, value: Any?,
-                    nameType: Type, valueType: Type,
-                    targetNameType: Type, targetValueType: Type
+                override val convertFilter: (
+                    name: Any?,
+                    fromNameType: Type, fromValueType: Type, fromValue: Any?,
+                    toNameType: Type, toValueType: Type
                 ) -> Boolean =
-                    { _, _, nameType, valueType, targetNameType, targetValueType ->
-                        nameType == targetNameType && valueType == targetValueType
+                    { _, fromNameType, fromValueType, _, toNameType, toValueType ->
+                        fromNameType == toNameType && fromValueType == toValueType
                     }
             }
 
             @JvmField
             val IGNORE_NULL_WITHOUT_CONVERSION = object : CopyOptions {
-                override val propertyValueFilter:
-                            (name: Any?, value: Any?, nameType: Type, valueType: Type) -> Boolean =
-                    { _, value, _, _ -> value !== null }
-                override val propertyConvertFilter: (
-                    name: Any?, value: Any?,
-                    nameType: Type, valueType: Type,
-                    targetNameType: Type, targetValueType: Type
+                override val fromValueFilter:
+                            (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean =
+                    { _, _, _, fromValue -> fromValue !== null }
+                override val convertFilter: (
+                    name: Any?,
+                    fromNameType: Type, fromValueType: Type, fromValue: Any?,
+                    toNameType: Type, toValueType: Type
                 ) -> Boolean =
-                    { _, _, nameType, valueType, targetNameType, targetValueType ->
-                        nameType == targetNameType && valueType == targetValueType
+                    { _, fromNameType, fromValueType, _, toNameType, toValueType ->
+                        fromNameType == toNameType && fromValueType == toValueType
                     }
+            }
+
+            @JvmStatic
+            fun with(
+                fromType: Type?,
+                toType: Type?,
+                converter: Converter,
+                nameFilter: (name: Any?) -> Boolean,
+                fromTypeFilter: (name: Any?, fromNameType: Type, fromValueType: Type) -> Boolean,
+                fromValueFilter: (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean,
+                convertFilter: (
+                    name: Any?,
+                    fromNameType: Type,
+                    fromValueType: Type,
+                    value: Any?,
+                    toNameType: Type,
+                    toValueType: Type,
+                ) -> Boolean,
+            ): CopyOptions {
+                return object : CopyOptions {
+                    override val fromType: Type? = fromType
+                    override val toType: Type? = toType
+                    override val converter: Converter = converter
+                    override val nameFilter: (name: Any?) -> Boolean = nameFilter
+                    override val fromTypeFilter: (
+                        name: Any?, fromNameType: Type, fromValueType: Type
+                    ) -> Boolean =
+                        fromTypeFilter
+                    override val fromValueFilter: (
+                        name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?
+                    ) -> Boolean =
+                        fromValueFilter
+                    override val convertFilter: (
+                        name: Any?,
+                        fromNameType: Type,
+                        fromValueType: Type,
+                        value: Any?,
+                        toNameType: Type,
+                        toValueType: Type
+                    ) -> Boolean =
+                        convertFilter
+                }
             }
         }
     }
@@ -363,24 +450,53 @@ interface BeanResolver {
         private class BeanAsMap(
             private val bean: Any,
             private val properties: Map<String, PropertySchema>,
-            private val converter: Converter
+            private val copyOptions: CopyOptions
         ) : AbstractMutableMap<String, Any?>() {
 
+            private val mapSchema = copyOptions.toType?.resolveMapSchema() ?: MapSchema.RAW
+
             override val size: Int
-                get() = properties.size
+                get() = entries.size
 
             override val entries: MutableSet<MutableMap.MutableEntry<String, Any?>> by lazy {
-                properties.entries.mapTo(LinkedHashSet()) {
-                    object : MutableMap.MutableEntry<String, Any?> {
-                        override val key: String = it.key
-                        override val value: Any?
-                            get() = it.value.getValue(bean)
+                properties.entries
+                    .filter {
+                        val flag = it.value.isReadable
+                                && copyOptions.nameFilter(it.key)
+                                && copyOptions.fromTypeFilter(it.key, String::class.java, it.value.genericType)
+                        if (!flag) {
+                            return@filter false
+                        }
+                        val value = it.value.getValue<Any?>(bean)
+                        copyOptions.fromValueFilter(
+                            it.key,
+                            String::class.java,
+                            it.value.genericType,
+                            value
+                        )
+                                && copyOptions.convertFilter(
+                            it.key,
+                            String::class.java,
+                            it.value.genericType,
+                            value,
+                            mapSchema.keyType,
+                            mapSchema.valueType
+                        )
+                    }
+                    .mapTo(LinkedHashSet()) {
+                        object : MutableMap.MutableEntry<String, Any?> {
+                            override val key: String = it.key
+                            override val value: Any?
+                                get() = copyOptions.converter.convert(it.value.getValue(bean), mapSchema.valueType)
 
-                        override fun setValue(newValue: Any?): Any? {
-                            return it.value.setValue(bean, newValue, converter)
+                            override fun setValue(newValue: Any?): Any? {
+                                return it.value.setValue(
+                                    bean,
+                                    copyOptions.converter.convert(newValue, mapSchema.valueType)
+                                )
+                            }
                         }
                     }
-                }
             }
 
             override fun containsKey(key: String): Boolean {
@@ -389,7 +505,10 @@ interface BeanResolver {
 
             override fun get(key: String): Any? {
                 val propertySchema = properties[key]
-                return propertySchema?.getValue(bean)
+                if (propertySchema === null) {
+                    return null
+                }
+                return copyOptions.converter.convert(propertySchema.getValue(bean), mapSchema.valueType)
             }
 
             override fun isEmpty(): Boolean {
@@ -405,7 +524,7 @@ interface BeanResolver {
                 if (propertySchema === null) {
                     throw UnsupportedOperationException("Property $key doesn't exist.")
                 }
-                return propertySchema.setValue(bean, value, converter)
+                return propertySchema.setValue(bean, value)
             }
 
             override fun remove(key: String): Any? {
