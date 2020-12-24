@@ -28,6 +28,38 @@ interface BeanSchema {
     fun getProperty(name: String): PropertySchema? {
         return properties[name]
     }
+
+    companion object {
+
+        @JvmStatic
+        fun newBeanSchema(genericType: Type, properties: Map<String, PropertySchema>): BeanSchema {
+            return BeanSchemaImpl(genericType, properties)
+        }
+
+        private class BeanSchemaImpl(
+            override val genericType: Type,
+            override val properties: Map<String, PropertySchema>,
+        ) : BeanSchema {
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (other !is BeanSchema) return false
+                if (genericType != other.genericType) return false
+                if (properties != other.properties) return false
+                return true
+            }
+
+            override fun hashCode(): Int {
+                var result = genericType.hashCode()
+                result = 31 * result + properties.hashCode()
+                return result
+            }
+
+            override fun toString(): String {
+                return genericType.typeName
+            }
+        }
+    }
 }
 
 interface PropertySchema {

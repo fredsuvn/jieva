@@ -18,7 +18,14 @@ import java.lang.reflect.*
  */
 interface BeanResolver {
 
-    fun resolve(type: Type): BeanSchema
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val resolveHandlers: List<BeanResolveHandler>
+        @JvmName("resolveHandlers") get
+
+    @JvmDefault
+    fun resolve(type: Type): BeanSchema {
+        return resolveBean(type, resolveHandlers)
+    }
 
     @JvmDefault
     fun asMap(bean: Any): MutableMap<String, Any?> {
@@ -200,7 +207,10 @@ interface BeanResolver {
         }
     }
 
-    fun withPreResolveHandler(preResolveHandler: BeanResolveHandler): BeanResolver
+    @JvmDefault
+    fun withPreResolveHandler(preResolveHandler: BeanResolveHandler): BeanResolver {
+        return newBeanResolver(listOf(preResolveHandler).plus(resolveHandlers))
+    }
 
     interface CopyOptions {
 
@@ -396,54 +406,8 @@ interface BeanResolver {
 
         @JvmStatic
         fun newBeanResolver(resolveHandlers: Iterable<BeanResolveHandler>): BeanResolver {
-            return BeanResolverImpl(resolveHandlers)
-        }
-
-        private class BeanResolverImpl(private val handlers: Iterable<BeanResolveHandler>) : BeanResolver {
-
-            private val cache = Cache.newFastCache<Type, BeanSchema>()
-
-            override fun resolve(type: Type): BeanSchema {
-                return cache.getOrLoad(type) {
-                    val context = Context(type, LinkedHashMap())
-                    for (handler in handlers) {
-                        handler.resolve(context)
-                    }
-                    BeanSchemaImpl(type, context.beanProperties.toMap())
-                }
-            }
-
-            override fun withPreResolveHandler(preResolveHandler: BeanResolveHandler): BeanResolver {
-                return BeanResolverImpl(listOf(preResolveHandler).plus(handlers))
-            }
-
-            private class Context(
-                override val beanType: Type,
-                override val beanProperties: MutableMap<String, PropertySchema>
-            ) : BeanResolveHandler.ResolveContext
-
-            private class BeanSchemaImpl(
-                override val genericType: Type,
-                override val properties: Map<String, PropertySchema>,
-            ) : BeanSchema {
-
-                override fun equals(other: Any?): Boolean {
-                    if (this === other) return true
-                    if (other !is BeanSchema) return false
-                    if (genericType != other.genericType) return false
-                    if (properties != other.properties) return false
-                    return true
-                }
-
-                override fun hashCode(): Int {
-                    var result = genericType.hashCode()
-                    result = 31 * result + properties.hashCode()
-                    return result
-                }
-
-                override fun toString(): String {
-                    return genericType.typeName
-                }
+            return object : BeanResolver {
+                override val resolveHandlers = resolveHandlers.toList()
             }
         }
 
@@ -534,11 +498,23 @@ interface BeanResolver {
     }
 }
 
+private val cache = Cache.newFastCache<Type, BeanSchema>()
+
+private fun resolveBean(type: Type, resolveHandlers: List<BeanResolveHandler>): BeanSchema {
+    return cache.getOrLoad(type) {
+        val context = BeanResolveHandler.newContext(type)
+        for (handler in resolveHandlers) {
+            handler.resolve(context)
+        }
+        BeanSchema.newBeanSchema(type, context.beanProperties.toMap())
+    }
+}
+
 interface BeanResolveHandler {
 
-    fun resolve(context: ResolveContext)
+    fun resolve(context: Context)
 
-    interface ResolveContext {
+    interface Context {
 
         @Suppress(INAPPLICABLE_JVM_NAME)
         val beanType: Type
@@ -555,6 +531,14 @@ interface BeanResolveHandler {
         val DEFAULTS: List<BeanResolveHandler> = listOf(
             BeanAccessorMethodResolveHandler
         )
+
+        @JvmStatic
+        fun newContext(beanType: Type): Context {
+            return object : Context {
+                override val beanType = beanType
+                override val beanProperties = mutableMapOf<String, PropertySchema>()
+            }
+        }
     }
 }
 
@@ -562,7 +546,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
     private val cache = Cache.newFastCache<Pair<Type, PropertyDescriptor>, PropertySchema>()
 
-    override fun resolve(context: BeanResolveHandler.ResolveContext) {
+    override fun resolve(context: BeanResolveHandler.Context) {
         val beanInfo = Introspector.getBeanInfo(context.beanType.rawClass)
         val typeVariableTable by lazy { context.beanType.findTypeArguments() }
         val beanProperties = context.beanProperties
