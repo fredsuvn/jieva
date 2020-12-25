@@ -4,7 +4,9 @@
 package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
-import xyz.srclab.common.base.*
+import xyz.srclab.common.base.Current
+import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.loadClass
 import java.lang.reflect.Modifier
 
 val Class<*>.isPublic: Boolean
@@ -119,14 +121,14 @@ fun <T> Class<*>.toInstance(parameterTypes: Array<out Class<*>>, args: Array<out
 
 fun Class<*>.toWrapperClass(): Class<*> {
     return when (this) {
-        Boolean::class.javaPrimitiveType -> JavaBoolean::class.java
-        Byte::class.javaPrimitiveType -> JavaByte::class.java
-        Short::class.javaPrimitiveType -> JavaShort::class.java
-        Char::class.javaPrimitiveType -> JavaChar::class.java
-        Int::class.javaPrimitiveType -> JavaInt::class.java
-        Long::class.javaPrimitiveType -> JavaLong::class.java
-        Float::class.javaPrimitiveType -> JavaFloat::class.java
-        Double::class.javaPrimitiveType -> JavaDouble::class.java
+        Boolean::class.javaPrimitiveType -> Boolean::class.java
+        Byte::class.javaPrimitiveType -> Byte::class.java
+        Short::class.javaPrimitiveType -> Short::class.java
+        Char::class.javaPrimitiveType -> Char::class.java
+        Int::class.javaPrimitiveType -> Int::class.java
+        Long::class.javaPrimitiveType -> Long::class.java
+        Float::class.javaPrimitiveType -> Float::class.java
+        Double::class.javaPrimitiveType -> Double::class.java
         Void::class.javaPrimitiveType -> Void::class.java
         else -> this
     }

@@ -189,3 +189,10 @@ fun Any?.toBigDecimal(): BigDecimal {
         else -> toString().toBigDecimalKt()
     }
 }
+
+fun Any?.toNumber(): Number {
+    return when (this) {
+        is Number -> this
+        else -> toBigDecimal()
+    }
+}

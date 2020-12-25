@@ -4,11 +4,14 @@ import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.collection.BaseIterableOps.Companion.toAnyArray
 import xyz.srclab.common.collection.arrayAsList
+import xyz.srclab.common.collection.arrayTypeToArray
 import xyz.srclab.common.collection.componentType
 import xyz.srclab.common.collection.resolveIterableSchemaOrNull
 import xyz.srclab.common.reflect.*
+import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import java.lang.reflect.WildcardType
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.text.DateFormat
@@ -128,10 +131,10 @@ interface ConvertHandler {
         @JvmField
         val DEFAULTS: List<ConvertHandler> = listOf(
             NopConvertHandler,
+            WildcardTypeConvertHandler,
             CharsConvertHandler,
             NumberAndPrimitiveConvertHandler,
             DateTimeConvertHandler.DEFAULT,
-            UpperBoundConvertHandler,
             IterableConvertHandler,
             BeanConvertHandler.DEFAULT,
         )
@@ -145,10 +148,10 @@ object NopConvertHandler : ConvertHandler {
             return from
         }
         if (from === null) {
-            return from
+            return Defaults.NULL
         }
         val fromClass = from.javaClass
-        if (toType.isAssignableFrom(fromClass)) {
+        if (fromClass == toType || toType.isAssignableFrom(fromClass)) {
             return from
         }
         return null
@@ -169,40 +172,41 @@ object NopConvertHandler : ConvertHandler {
     }
 }
 
-abstract class AbstractConvertHandler : ConvertHandler {
+object WildcardTypeConvertHandler : ConvertHandler {
 
     override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
-        if (from === null) {
-            return doConvertNull(toType, converter)
-        }
-        return doConvertNotNull(from, from.javaClass, toType, converter)
+        return null
     }
 
     override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
-        if (from === null) {
-            return doConvertNull(toType, converter)
+        if (toType is WildcardType) {
+            return converter.convert(from, toType.upperBound)
         }
-        return doConvertNotNull(from, from.javaClass, toType, converter)
+        return null
     }
 
     override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
-        if (from === null) {
-            return doConvertNull(toType, converter)
+        if (toType is WildcardType) {
+            return converter.convert(from, toType.upperBound)
         }
-        return doConvertNotNull(from, fromType, toType, converter)
+        return null
     }
-
-    protected abstract fun doConvertNull(toType: Type, converter: Converter): Any?
-    protected abstract fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any?
 }
 
-object CharsConvertHandler : AbstractConvertHandler() {
+abstract class AbstractClassConvertHandler : ConvertHandler {
 
-    override fun doConvertNull(toType: Type, converter: Converter): Any? {
-        return Defaults.NULL
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) convert(from, toType, converter) else null
     }
 
-    override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        return if (toType is Class<*>) convert(from, toType, converter) else null
+    }
+}
+
+object CharsConvertHandler : AbstractClassConvertHandler() {
+
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
         return when (toType) {
             String::class.java, CharSequence::class.java -> {
                 if (from is ByteArray) from.toChars() else from.toString()
@@ -236,52 +240,35 @@ object CharsConvertHandler : AbstractConvertHandler() {
     }
 }
 
-object NumberAndPrimitiveConvertHandler : AbstractConvertHandler() {
+object NumberAndPrimitiveConvertHandler : AbstractClassConvertHandler() {
 
-    override fun doConvertNull(toType: Type, converter: Converter): Any? {
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
         return when (toType) {
-            Boolean::class.javaPrimitiveType, JavaBoolean::class.java -> null.toBoolean()
-            Byte::class.javaPrimitiveType, JavaByte::class.java -> null.toByte()
-            Short::class.javaPrimitiveType, JavaShort::class.java -> null.toShort()
-            Char::class.javaPrimitiveType, JavaChar::class.java -> null.toChar()
-            Int::class.javaPrimitiveType, JavaInt::class.java -> null.toInt()
-            Long::class.javaPrimitiveType, JavaLong::class.java -> null.toLong()
-            Float::class.javaPrimitiveType, JavaFloat::class.java -> null.toFloat()
-            Double::class.javaPrimitiveType, JavaDouble::class.java -> null.toDouble()
-            BigInteger::class.java -> null.toBigInteger()
-            BigDecimal::class.java -> null.toBigDecimal()
-            Number::class.java -> null.toDouble()
-            else -> null
-        }
-    }
-
-    override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        return when (toType) {
-            Boolean::class.javaPrimitiveType, JavaBoolean::class.java -> from.toBoolean()
-            Byte::class.javaPrimitiveType, JavaByte::class.java -> from.toByte()
-            Short::class.javaPrimitiveType, JavaShort::class.java -> from.toShort()
-            Char::class.javaPrimitiveType, JavaChar::class.java -> from.toChar()
-            Int::class.javaPrimitiveType, JavaInt::class.java -> from.toInt()
-            Long::class.javaPrimitiveType, JavaLong::class.java -> from.toLong()
-            Float::class.javaPrimitiveType, JavaFloat::class.java -> from.toFloat()
-            Double::class.javaPrimitiveType, JavaDouble::class.java -> from.toDouble()
+            Boolean::class.javaPrimitiveType, Boolean::class.java -> from.toBoolean()
+            Byte::class.javaPrimitiveType, Byte::class.java -> from.toByte()
+            Short::class.javaPrimitiveType, Short::class.java -> from.toShort()
+            Char::class.javaPrimitiveType, Char::class.java -> from.toChar()
+            Int::class.javaPrimitiveType, Int::class.java -> from.toInt()
+            Long::class.javaPrimitiveType, Long::class.java -> from.toLong()
+            Float::class.javaPrimitiveType, Float::class.java -> from.toFloat()
+            Double::class.javaPrimitiveType, Double::class.java -> from.toDouble()
             BigInteger::class.java -> from.toBigInteger()
             BigDecimal::class.java -> from.toBigDecimal()
-            Number::class.java -> from.toDouble()
+            Number::class.java -> from.toNumber()
             else -> null
         }
     }
 }
 
-open class DateTimeConvertHandler(
-    protected val dateFormat: DateFormat,
-    protected val instantFormatter: DateTimeFormatter,
-    protected val localDateTimeFormatter: DateTimeFormatter,
-    protected val zonedDateTimeFormatter: DateTimeFormatter,
-    protected val offsetDateTimeFormatter: DateTimeFormatter,
-    protected val localDateFormatter: DateTimeFormatter,
-    protected val localTimeFormatter: DateTimeFormatter,
-) : AbstractConvertHandler() {
+class DateTimeConvertHandler(
+    private val dateFormat: DateFormat,
+    private val instantFormatter: DateTimeFormatter,
+    private val localDateTimeFormatter: DateTimeFormatter,
+    private val zonedDateTimeFormatter: DateTimeFormatter,
+    private val offsetDateTimeFormatter: DateTimeFormatter,
+    private val localDateFormatter: DateTimeFormatter,
+    private val localTimeFormatter: DateTimeFormatter,
+) : AbstractClassConvertHandler() {
 
     constructor() : this(
         dateFormat(),
@@ -293,22 +280,7 @@ open class DateTimeConvertHandler(
         DateTimeFormatter.ISO_LOCAL_TIME
     )
 
-    override fun doConvertNull(toType: Type, converter: Converter): Any? {
-        return when (toType) {
-            Date::class.java -> null.toDate(dateFormat)
-            Instant::class.java -> null.toInstant(instantFormatter)
-            LocalDateTime::class.java -> null.toLocalDateTime(localDateTimeFormatter)
-            ZonedDateTime::class.java -> null.toZonedDateTime(zonedDateTimeFormatter)
-            OffsetDateTime::class.java -> null.toOffsetDateTime(offsetDateTimeFormatter)
-            LocalDate::class.java -> null.toLocalDate(localDateFormatter)
-            LocalTime::class.java -> null.toLocalTime(localTimeFormatter)
-            Duration::class.java -> null.toDuration()
-            Temporal::class.java, TemporalAdjuster::class.java -> null.toLocalDateTime(localDateTimeFormatter)
-            else -> null
-        }
-    }
-
-    override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
         return when (toType) {
             Date::class.java -> from.toDate(dateFormat)
             Instant::class.java -> from.toInstant(instantFormatter)
@@ -330,32 +302,85 @@ open class DateTimeConvertHandler(
     }
 }
 
-object UpperBoundConvertHandler : AbstractConvertHandler() {
+abstract class AbstractTypeConvertHandler : ConvertHandler {
 
-    override fun doConvertNull(toType: Type, converter: Converter): Any? {
-        return converter.convert(null, toType.upperBound)
+    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+        return convert(from, toType as Type, converter)
     }
 
-    override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        return converter.convert(from, fromType.upperBound, toType.upperBound)
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        if (from === null) {
+            return convertNull(toType, converter)
+        }
+        return convertNotNull(from, from.javaClass, toType, converter)
     }
+
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        if (from === null) {
+            return convertNull(toType, converter)
+        }
+        return convertNotNull(from, fromType, toType, converter)
+    }
+
+    abstract fun convertNull(toType: Type, converter: Converter): Any?
+
+    abstract fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any?
 }
 
-object IterableConvertHandler : AbstractConvertHandler() {
+object IterableConvertHandler : AbstractTypeConvertHandler() {
 
-    override fun doConvertNull(toType: Type, converter: Converter): Any? {
+    override fun convertNull(toType: Type, converter: Converter): Any? {
         return Defaults.NULL
     }
 
-    override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        if (from is Iterable<*>) {
-            return iterableToType(from as Iterable<Any?>, toType, converter)
+    override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+        return when (toType) {
+            is Class<*> -> {
+                val fromIterable = fromIterable(from)
+                if (fromIterable === null) {
+                    return null
+                }
+                toIterable(fromIterable, toType, converter)
+            }
+            is ParameterizedType -> {
+                val fromIterable = fromIterable(from)
+                if (fromIterable === null) {
+                    return null
+                }
+                toIterable(fromIterable, toType, converter)
+            }
+            is GenericArrayType -> {
+                val fromIterable = fromIterable(from)
+                if (fromIterable === null) {
+                    return null
+                }
+                toIterable(fromIterable, toType, converter)
+            }
+            else -> null
         }
-        val fromClass = from.javaClass
-        if (fromClass.isArray) {
-            return iterableToType(from.arrayAsList(), toType, converter)
+    }
+
+    private fun fromIterable(from: Any): Iterable<Any?>? {
+        if (from is Iterable<*>) {
+            return from
+        }
+        if (from.javaClass.isArray) {
+            return from.arrayAsList<Any?>()
         }
         return null
+    }
+
+    private fun toIterable(iterable: Iterable<Any?>, toType: Class<*>, converter: Converter): Any? {
+        if (toType.isArray) {
+            val array = toType.arrayTypeToArray<Any?>(iterable.count())
+
+        }
+    }
+
+    private fun toIterable(iterable: Iterable<Any?>, toType: ParameterizedType, converter: Converter): Any? {
+    }
+
+    private fun toIterable(iterable: Iterable<Any?>, toType: GenericArrayType, converter: Converter): Any? {
     }
 
     private fun iterableToType(iterable: Iterable<Any?>, toType: Type, converter: Converter): Any? {
@@ -443,7 +468,7 @@ object IterableConvertHandler : AbstractConvertHandler() {
 
 open class BeanConvertHandler(
     private val beanResolver: BeanResolver = BeanResolver.DEFAULT
-) : AbstractConvertHandler() {
+) : AbstractTypeConvertHandler() {
 
     override fun doConvertNull(toType: Type, converter: Converter): Any? {
         return Defaults.NULL
@@ -497,6 +522,6 @@ open class BeanConvertHandler(
     companion object {
 
         @JvmField
-        val DEFAULT: BeanConvertHandler = BeanConvertHandler()
+        val DEFAULT: BeanTypeConvertHandler = BeanTypeConvertHandler()
     }
 }

@@ -40,7 +40,7 @@ public class BeanTest {
         BeanResolver.CopyOptions copyOptions = BeanResolver.CopyOptions.DEFAULT
                 .withTypes(SimpleBean.class, TypeKit.parameterizedType(Map.class, String.class, int.class))
                 .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
-        Map<String, Integer> siMap = As.any(BeanKit.asMap(simpleBean, copyOptions));
+        Map<String, Integer> siMap = As.asAny(BeanKit.asMap(simpleBean, copyOptions));
         testLogger.log("siMap: {}", siMap);
         Assert.assertEquals(siMap.get("p1"), (Integer) 555);
         Assert.assertEquals(siMap.get("p2"), (Integer) 6);

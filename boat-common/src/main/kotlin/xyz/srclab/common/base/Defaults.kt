@@ -1,5 +1,6 @@
 package xyz.srclab.common.base
 
+import com.google.common.base.CharMatcher
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
@@ -20,6 +21,15 @@ object Defaults {
      */
     @JvmField
     val ABSENT: Any = "ABSENT_VALUE"
+
+    @JvmField
+    val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
+
+    @JvmField
+    val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
+
+    @JvmField
+    val PLUS_SIGN_MATCHER: CharMatcher = CharMatcher.`is`('+')
 
     @JvmStatic
     @get:JvmName("charset")

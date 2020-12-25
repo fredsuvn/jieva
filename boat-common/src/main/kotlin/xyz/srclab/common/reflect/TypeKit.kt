@@ -11,16 +11,21 @@ import xyz.srclab.common.base.asAny
 import xyz.srclab.common.collection.BaseIterableOps.Companion.toTypedArray
 import java.lang.reflect.*
 
-/**
- * @throws IllegalArgumentException
- */
-val @PossibleTypes(Class::class, ParameterizedType::class) Type.rawClass: Class<*>
+val Type.rawClass: Class<*>?
     @JvmName("rawClass") get() {
         return when (this) {
             is Class<*> -> this
             is ParameterizedType -> this.rawClass
-            else -> throw IllegalArgumentException("Only Class and ParameterizedType has rawClass.")
+            else -> null
         }
+    }
+
+/**
+ * @throws IllegalArgumentException
+ */
+val @PossibleTypes(Class::class, ParameterizedType::class) Type.rawClassOrThrow: Class<*>
+    @JvmName("rawClassOrThrow") get() {
+        return this.rawClass ?: throw IllegalArgumentException("Only Class or ParameterizedType has raw class.")
     }
 
 val ParameterizedType.rawClass: Class<*>
@@ -245,7 +250,7 @@ fun @PossibleTypes(
             }
             findTypeArguments(type, typeArguments)
         }
-        val rawClass = type.rawClass
+        val rawClass = type.rawClassOrThrow
         val genericSuperclass = rawClass.genericSuperclass
         if (genericSuperclass !== null) {
             findTypeArguments0(genericSuperclass, typeArguments)
@@ -303,7 +308,7 @@ fun @PossibleTypes(
             }
             findTypeArguments(type, typeArguments)
         }
-        val rawClass = type.rawClass
+        val rawClass = type.rawClassOrThrow
         to.remove(rawClass)
         if (to.isEmpty()) {
             return
@@ -648,7 +653,7 @@ fun @PossibleTypes(
     Class::class,
     ParameterizedType::class
 ) Type.findGenericSuperclass(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>): Type? {
-    var rawClass = this.rawClass
+    var rawClass = this.rawClassOrThrow
     if (targets.contains(rawClass)) {
         return if (typeArguments === null) {
             this.eraseTypeVariables { it.findTypeArguments(rawClass) }
@@ -659,7 +664,7 @@ fun @PossibleTypes(
 
     var genericType: Type? = rawClass.genericSuperclass
     while (genericType !== null) {
-        rawClass = genericType.rawClass
+        rawClass = genericType.rawClassOrThrow
         if (targets.contains(rawClass)) {
             return if (typeArguments === null) {
                 genericType.eraseTypeVariables { it.findTypeArguments(rawClass) }
@@ -717,7 +722,7 @@ fun @PossibleTypes(
     //Level searching
     fun findInterface(genericTypes: List<Type>, targets: Iterable<Class<*>>): Type? {
         for (genericType in genericTypes) {
-            val genericClass = genericType.rawClass
+            val genericClass = genericType.rawClassOrThrow
             if (targets.contains(genericClass)) {
                 return if (typeArguments === null) {
                     genericType.eraseTypeVariables { it.findTypeArguments(genericClass) }
@@ -728,7 +733,7 @@ fun @PossibleTypes(
         }
         val nextLevel = mutableListOf<Type>()
         for (genericType in genericTypes) {
-            val genericClass = genericType.rawClass
+            val genericClass = genericType.rawClassOrThrow
             nextLevel.addAll(genericClass.genericInterfaces)
         }
         if (nextLevel.isEmpty()) {
@@ -738,7 +743,7 @@ fun @PossibleTypes(
 
     }
 
-    val rawClass = this.rawClass
+    val rawClass = this.rawClassOrThrow
     if (targets.contains(rawClass)) {
         return if (typeArguments === null) {
             this.eraseTypeVariables { it.findTypeArguments(rawClass) }
@@ -749,7 +754,7 @@ fun @PossibleTypes(
     val tryInterfaces = findInterface(rawClass.genericInterfaces.asList(), targets)
     if (tryInterfaces !== null) {
         return if (typeArguments === null) {
-            tryInterfaces.eraseTypeVariables { it.findTypeArguments(tryInterfaces.rawClass) }
+            tryInterfaces.eraseTypeVariables { it.findTypeArguments(tryInterfaces.rawClassOrThrow) }
         } else {
             tryInterfaces.eraseTypeVariables(typeArguments)
         }
@@ -762,7 +767,7 @@ fun @PossibleTypes(
         trySuperInterface = findInterface(superclass.genericInterfaces.asList(), targets)
         if (trySuperInterface !== null) {
             return if (typeArguments === null) {
-                trySuperInterface.eraseTypeVariables { it.findTypeArguments(trySuperInterface.rawClass) }
+                trySuperInterface.eraseTypeVariables { it.findTypeArguments(trySuperInterface.rawClassOrThrow) }
             } else {
                 trySuperInterface.eraseTypeVariables(typeArguments)
             }

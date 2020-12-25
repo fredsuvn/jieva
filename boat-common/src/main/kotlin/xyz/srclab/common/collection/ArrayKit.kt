@@ -5,10 +5,8 @@ package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.reflect.rawClass
-import java.lang.reflect.GenericArrayType
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
-
+import xyz.srclab.common.reflect.upperClass
+import java.lang.reflect.*
 import kotlin.collections.joinTo as joinToKt
 import kotlin.collections.joinToString as joinToStringKt
 
@@ -34,20 +32,24 @@ fun <A> newArray(vararg elements: A): Array<A> {
     return elements.asAny()
 }
 
-fun <A> Type.componentTypeToArray(length: Int): A {
-    return when (this) {
-        is Class<*> -> java.lang.reflect.Array.newInstance(this, length).asAny()
-        is ParameterizedType -> java.lang.reflect.Array.newInstance(this.rawClass, length).asAny()
-        else -> throw java.lang.IllegalArgumentException("Array's component type cannot be $this")
+fun <T> GenericArrayType.rawComponentType(): Class<T> {
+    val componentType = when (val genericComponentType = this.genericComponentType) {
+        is Class<*> -> genericComponentType
+        is ParameterizedType -> genericComponentType.rawClass
+        is GenericArrayType -> genericComponentType.rawComponentType()
+        is TypeVariable<*> -> genericComponentType.upperClass
+        is WildcardType -> genericComponentType.upperClass
+        else -> throw IllegalArgumentException("Unknown generic component type: $genericComponentType")
     }
+    return componentType.asAny()
 }
 
-fun <A> Type.arrayTypeToArray(length: Int): A {
-    val componentType = this.componentType
-    if (componentType === null) {
-        throw IllegalArgumentException("$this is not an array type.")
-    }
-    return componentType.componentTypeToArray(length)
+fun <A> Class<*>.componentTypeToArray(length: Int): A {
+    return java.lang.reflect.Array.newInstance(this, length).asAny()
+}
+
+fun <A> Class<*>.arrayTypeToArray(length: Int): A {
+    return java.lang.reflect.Array.newInstance(this.componentType, length).asAny()
 }
 
 fun <T> Any.arrayAsList(): MutableList<T> {
