@@ -4,6 +4,8 @@
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.loadClass
+import xyz.srclab.common.jvm.toJvmDescriptor
 import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.reflect.upperClass
 import java.lang.reflect.*
@@ -30,6 +32,11 @@ val Type.componentType: Type?
 
 fun <A> newArray(vararg elements: A): Array<A> {
     return elements.asAny()
+}
+
+fun Class<*>.arrayClass(): Class<*> {
+    val jvmName = this.toJvmDescriptor()
+    return "[${jvmName.replace("/", ".")}".loadClass<Any?>()
 }
 
 fun <T> GenericArrayType.rawComponentType(): Class<T> {

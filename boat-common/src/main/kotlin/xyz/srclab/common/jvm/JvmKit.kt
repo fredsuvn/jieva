@@ -5,7 +5,7 @@ package xyz.srclab.common.jvm
 
 import java.lang.reflect.Method
 
-fun Class<*>.toDescriptor(): String {
+fun Class<*>.toJvmDescriptor(): String {
     if (this.isArray) {
         return this.name.replace('.', '/')
     }
@@ -23,6 +23,7 @@ fun Class<*>.toDescriptor(): String {
     }
 }
 
-fun Method.toDescriptor(): String {
-    return "(${this.parameterTypes.joinToString("") { it.toDescriptor() }})${this.returnType.toDescriptor()}"
+fun Method.toJvmDescriptor(): String {
+    return "(${this.parameterTypes.joinToString("") { it.toJvmDescriptor() }})" +
+            this.returnType.toJvmDescriptor()
 }
