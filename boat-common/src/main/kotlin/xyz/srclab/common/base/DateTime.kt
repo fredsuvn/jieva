@@ -10,6 +10,15 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
 import java.util.*
 
+@JvmField
+val MIN_DATE = Date(0)
+
+@JvmField
+val MIN_ZONED_DATE_TIME: ZonedDateTime = OffsetDateTime.MIN.toZonedDateTime()
+
+@JvmField
+val ISO_DATE_FORMAT: String = DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.pattern
+
 fun milliseconds(): Long {
     return System.currentTimeMillis()
 }
@@ -21,15 +30,6 @@ fun nanoseconds(): Long {
 fun timestamp(): String {
     return Defaults.timestampFormatter.format(LocalDateTime.now())
 }
-
-@JvmField
-val MIN_DATE = Date(0)
-
-@JvmField
-val MIN_ZONED_DATE_TIME: ZonedDateTime = OffsetDateTime.MIN.toZonedDateTime()
-
-@JvmField
-val ISO_DATE_FORMAT = DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.pattern
 
 @JvmOverloads
 fun dateFormat(pattern: String = ISO_DATE_FORMAT): DateFormat {

@@ -1,6 +1,6 @@
 package xyz.srclab.common.base
 
-interface Ref<T> : SimpleAccess<T> {
+interface Ref<T> : SimpleAccessor<T> {
 
     companion object {
 

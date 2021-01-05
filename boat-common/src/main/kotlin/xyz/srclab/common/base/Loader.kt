@@ -10,7 +10,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 @JvmOverloads
-fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
+fun <T> CharSequence.loadClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
     return try {
         Class.forName(this.toString(), true, classLoader)
     } catch (e: ClassNotFoundException) {
@@ -18,25 +18,63 @@ fun <T> CharSequence.findClass(classLoader: ClassLoader = Current.classLoader): 
     }.asAny()
 }
 
+/**
+ * @throws ClassNotFoundException
+ */
 @JvmOverloads
-fun CharSequence.findResource(classLoader: ClassLoader = Current.classLoader): URL? {
+fun <T> CharSequence.loadClassOrThrow(classLoader: ClassLoader = Current.classLoader): Class<T> {
+    return try {
+        Class.forName(this.toString(), true, classLoader)
+    } catch (e: ClassNotFoundException) {
+        throw e
+    }.asAny()
+}
+
+@JvmOverloads
+fun CharSequence.loadResource(classLoader: ClassLoader = Current.classLoader): URL? {
     return classLoader.getResource(this.toString())
 }
 
+/**
+ * @throws ResourceNotFoundException
+ */
 @JvmOverloads
-fun CharSequence.findBytesResource(classLoader: ClassLoader = Current.classLoader): ByteArray? {
-    return findResource(classLoader)?.openStream()?.readBytes()
+fun CharSequence.loadResourceOrThrow(classLoader: ClassLoader = Current.classLoader): URL {
+    return this.loadResource(classLoader) ?: throw ResourceNotFoundException(this)
 }
 
 @JvmOverloads
-fun CharSequence.findStringResource(
+fun CharSequence.loadBytesResource(classLoader: ClassLoader = Current.classLoader): ByteArray? {
+    return loadResource(classLoader)?.openStream()?.readBytes()
+}
+
+/**
+ * @throws ResourceNotFoundException
+ */
+@JvmOverloads
+fun CharSequence.loadBytesResourceOrThrow(classLoader: ClassLoader = Current.classLoader): ByteArray {
+    return this.loadBytesResource(classLoader) ?: throw ResourceNotFoundException(this)
+}
+
+@JvmOverloads
+fun CharSequence.loadStringResource(
     classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): String? {
-    return findBytesResource(classLoader)?.toChars(charset)
+    return loadBytesResource(classLoader)?.toChars(charset)
+}
+
+/**
+ * @throws ResourceNotFoundException
+ */
+@JvmOverloads
+fun CharSequence.loadStringResourceOrThrow(
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
+): String {
+    return this.loadStringResource(classLoader, charset) ?: throw ResourceNotFoundException(this)
 }
 
 @JvmOverloads
-fun CharSequence.findResources(classLoader: ClassLoader = Current.classLoader): List<URL> {
+fun CharSequence.loadResources(classLoader: ClassLoader = Current.classLoader): List<URL> {
     return try {
         val urlEnumeration = classLoader.getResources(this.toString())
         urlEnumeration.toList()
@@ -46,15 +84,15 @@ fun CharSequence.findResources(classLoader: ClassLoader = Current.classLoader): 
 }
 
 @JvmOverloads
-fun CharSequence.findBytesResources(classLoader: ClassLoader = Current.classLoader): List<ByteArray> {
-    return findResources(classLoader).map { url -> url.readBytes() }
+fun CharSequence.loadBytesResources(classLoader: ClassLoader = Current.classLoader): List<ByteArray> {
+    return loadResources(classLoader).map { url -> url.readBytes() }
 }
 
 @JvmOverloads
-fun CharSequence.findStringResources(
+fun CharSequence.loadStringResources(
     classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): List<String> {
-    return findBytesResources(classLoader).map { bytes -> bytes.toChars(charset) }
+    return loadBytesResources(classLoader).map { bytes -> bytes.toChars(charset) }
 }
 
 @JvmOverloads
@@ -68,18 +106,6 @@ fun <T> InputStream.loadClass(): Class<T> {
 
 fun <T> ByteBuffer.loadClass(): Class<T> {
     return BytesClassLoader.loadClass(this).asAny()
-}
-
-/**
- * @throws ClassNotFoundException
- */
-@JvmOverloads
-fun <T> CharSequence.loadClass(classLoader: ClassLoader = Current.classLoader): Class<T> {
-    return try {
-        Class.forName(this.toString(), true, classLoader)
-    } catch (e: ClassNotFoundException) {
-        throw e
-    }.asAny()
 }
 
 object BytesClassLoader : ClassLoader() {
@@ -100,4 +126,11 @@ object BytesClassLoader : ClassLoader() {
     fun loadClass(byteBuffer: ByteBuffer): Class<*> {
         return super.defineClass(null, byteBuffer, null)
     }
+}
+
+open class ResourceNotFoundException : RuntimeException {
+    constructor() : super()
+    constructor(message: CharSequence?) : super(message?.toString())
+    constructor(message: CharSequence?, cause: Throwable?) : super(message?.toString(), cause)
+    constructor(cause: Throwable?) : super(cause)
 }

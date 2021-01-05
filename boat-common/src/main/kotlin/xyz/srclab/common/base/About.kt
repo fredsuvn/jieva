@@ -234,23 +234,23 @@ interface Version : Comparable<Version> {
                 builder.buildMetadata(list)
             }
 
-            val hyphenCount = HYPHEN_MATCHER.countIn(this)
+            val hyphenCount = Defaults.HYPHEN_MATCHER.countIn(this)
             checkArgument(
                 hyphenCount == 0 || hyphenCount == 1,
                 "Illegal version specification, hyphen count should be 0 or 1."
             )
-            val hyphenIndex = HYPHEN_MATCHER.indexIn(this)
+            val hyphenIndex = Defaults.HYPHEN_MATCHER.indexIn(this)
             checkArgument(
                 hyphenIndex < 0 || hyphenIndex in 1..this.length - 2,
                 "Illegal hyphen position: {}.", hyphenIndex
             )
 
-            val plusSignCount = PLUS_SIGN_MATCHER.countIn(this)
+            val plusSignCount = Defaults.PLUS_SIGN_MATCHER.countIn(this)
             checkArgument(
                 plusSignCount == 0 || plusSignCount == 1,
                 "Illegal version specification, plus sign count should be 0 or 1."
             )
-            val plusSignIndex = PLUS_SIGN_MATCHER.indexIn(this)
+            val plusSignIndex = Defaults.PLUS_SIGN_MATCHER.indexIn(this)
             checkArgument(
                 plusSignIndex < 0 || plusSignIndex in 1..this.length - 2,
                 "Illegal plus sign position: {}.", plusSignIndex

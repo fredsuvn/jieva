@@ -37,7 +37,7 @@ interface Converter {
         for (handler in convertHandlers) {
             val result = handler.convert(from, toType, this)
             if (result === Defaults.NULL) {
-                return null.nullAs()
+                return null.asAny()
             }
             if (result !== null) {
                 return result.asAny()
@@ -51,7 +51,7 @@ interface Converter {
         for (handler in convertHandlers) {
             val result = handler.convert(from, toType, this)
             if (result === Defaults.NULL) {
-                return null.nullAs()
+                return null.asAny()
             }
             if (result !== null) {
                 return result.asAny()
@@ -70,7 +70,7 @@ interface Converter {
         for (handler in convertHandlers) {
             val result = handler.convert(from, fromType, toType, this)
             if (result === Defaults.NULL) {
-                return null.nullAs()
+                return null.asAny()
             }
             if (result !== null) {
                 return result.asAny()

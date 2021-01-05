@@ -2,6 +2,7 @@ package xyz.srclab.common.base
 
 import org.apache.commons.io.IOUtils
 import xyz.srclab.common.base.ShellProcess.Companion.asShellProcess
+import xyz.srclab.common.collection.toStringArray
 import java.io.InputStream
 import java.io.PrintStream
 import java.nio.charset.Charset

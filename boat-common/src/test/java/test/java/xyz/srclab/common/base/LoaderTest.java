@@ -14,7 +14,7 @@ public class LoaderTest {
     @Test
     public void testLoader() {
         Assert.assertEquals(
-                Loader.findStringResources("META-INF/test.info"),
+                Loader.loadStringResources("META-INF/test.info"),
                 Collections.singletonList("test.info")
         );
 

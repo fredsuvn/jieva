@@ -18,10 +18,7 @@ interface Let<T> : SimpleGetter<T> {
 
     fun <R> then(action: (T) -> R): Let<R>
 
-    /**
-     * If current value is null, return without action.
-     */
-    fun <R> thenOrNull(action: (T) -> R): Let<R>
+    fun thenDo(action: (T) -> Unit): Let<T>
 
     companion object {
 
@@ -40,11 +37,9 @@ private class LetImpl<T>(private var any: T) : Let<T> {
         return this.asAny()
     }
 
-    override fun <R> thenOrNull(action: (T) -> R): Let<R> {
-        if (any === null) {
-            return this.asAny()
-        }
-        return then(action)
+    override fun thenDo(action: (T) -> Unit): Let<T> {
+        action(any)
+        return this
     }
 
     override fun get(): T {

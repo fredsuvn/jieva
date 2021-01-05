@@ -1,6 +1,6 @@
 package xyz.srclab.common.base
 
-interface SimpleAccess<T> : SimpleGetter<T>, SimpleSetter<T>
+interface SimpleAccessor<T> : SimpleGetter<T>, SimpleSetter<T>
 
 interface SimpleGetter<T> {
 

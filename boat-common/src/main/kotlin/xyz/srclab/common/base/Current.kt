@@ -41,7 +41,7 @@ object Current {
 
     @JvmStatic
     fun <T> getOrElse(key: Any, value: T): T {
-        return getOrNull(key) ?: value
+        return context.getOrDefault(key, value).asAny()
     }
 
     @JvmStatic
@@ -60,7 +60,7 @@ object Current {
     }
 
     @JvmStatic
-    fun clearContext() {
+    fun clear() {
         context.clear()
     }
 

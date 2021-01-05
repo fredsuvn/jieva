@@ -7,10 +7,10 @@ fun <T> Any?.asAny(): T {
     return this as T
 }
 
-fun <T : Any> T?.asNotNull(): T {
+fun <T> Nothing?.asAny(): T {
     return this as T
 }
 
-fun <T> Nothing?.nullAs(): T {
+fun <T : Any> T?.asNotNull(): T {
     return this as T
 }

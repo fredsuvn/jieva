@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.base.findClass
+import xyz.srclab.common.base.loadClass
 
 interface ProxyClassGenerator {
 
@@ -20,11 +20,11 @@ interface ProxyClassGenerator {
             private val bytecodeProxyClassGenerator: ProxyClassGenerator? = findBytecodeProxyClassGenerator()
 
             private fun findBytecodeProxyClassGenerator(): ProxyClassGenerator? {
-                val springLib = "org.springframework.cglib.proxy.Enhancer".findClass<Any>()
+                val springLib = "org.springframework.cglib.proxy.Enhancer".loadClass<Any>()
                 if (springLib !== null) {
                     return SpringProxyClassGenerator
                 }
-                val cgLib = "net.sf.cglib.proxy.Enhancer".findClass<Any>()
+                val cgLib = "net.sf.cglib.proxy.Enhancer".loadClass<Any>()
                 if (cgLib !== null) {
                     return CglibProxyClassGenerator
                 }

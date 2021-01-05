@@ -1,5 +1,6 @@
-package xyz.srclab.common.base
+package xyz.srclab.common.invoke
 
+import xyz.srclab.common.base.asAny
 import xyz.srclab.common.reflect.findDeclaredConstructor
 import xyz.srclab.common.reflect.findOwnedMethod
 import xyz.srclab.common.reflect.isStatic

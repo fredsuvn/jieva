@@ -1,35 +1,50 @@
 package xyz.srclab.common.base
 
-abstract class BaseCachingProductBuilder<T : Any> {
+abstract class CachingProductBuilder<T : Any> {
 
     private var cache: T? = null
     private var version: Int = 0
     private var buildVersion: Int = 0
 
-    protected fun buildCaching(): T {
-        if (cache === null || version != buildVersion) {
-            cache = buildNew()
-            buildVersion = version
-        }
-        return cache.asNotNull()
-    }
+    protected abstract fun buildNew(): T
 
     /**
      * Called after any change which leads to refresh cache.
      */
-    protected fun commitChange() {
+    protected open fun commitChange() {
         version++
         if (version == buildVersion) {
             version++
         }
     }
 
-    protected abstract fun buildNew(): T
+    open fun build(): T {
+        if (cache === null || version != buildVersion) {
+            cache = buildNew()
+            buildVersion = version
+        }
+        return cache.asNotNull()
+    }
 }
 
-abstract class CachingProductBuilder<T : Any> : BaseCachingProductBuilder<T>() {
+abstract class SyncCachingProductBuilder<T : Any> : CachingProductBuilder<T>() {
 
-    fun build(): T {
-        return buildCaching()
+    private var cache: T? = null
+    private var version: Int = 0
+    private var buildVersion: Int = 0
+
+    /**
+     * Called after any change which leads to refresh cache.
+     */
+    override fun commitChange() {
+        synchronized(this) {
+            super.commitChange()
+        }
+    }
+
+    override fun build(): T {
+        synchronized(this) {
+            return super.build()
+        }
     }
 }

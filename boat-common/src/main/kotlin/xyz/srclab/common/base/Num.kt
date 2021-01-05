@@ -28,7 +28,6 @@ fun Any?.toByte(radix: Int = Defaults.radix): Byte {
         is Number -> if (radix == 10) toByte() else toString().toByteKt(radix)
         false -> 0
         true -> 1
-        is String -> toByteKt(radix)
         else -> toString().toByteKt(radix)
     }
 }
@@ -45,7 +44,6 @@ fun Any?.toShort(radix: Int = Defaults.radix): Short {
         is Number -> if (radix == 10) toShort() else toString().toShortKt(radix)
         false -> 0
         true -> 1
-        is String -> toShortKt(radix)
         else -> toString().toShortKt(radix)
     }
 }
@@ -62,7 +60,6 @@ fun Any?.toChar(radix: Int = Defaults.radix): Char {
         is Number -> if (radix == 10) toChar() else toString().toIntKt(radix).toChar()
         false -> 0.toChar()
         true -> 1.toChar()
-        is String -> toIntKt(radix).toChar()
         else -> toString().toIntKt(radix).toChar()
     }
 }
@@ -79,7 +76,6 @@ fun Any?.toInt(radix: Int = Defaults.radix): Int {
         is Number -> if (radix == 10) toInt() else toString().toIntKt(radix)
         false -> 0
         true -> 1
-        is String -> toIntKt(radix)
         else -> toString().toIntKt(radix)
     }
 }
@@ -96,7 +92,6 @@ fun Any?.toLong(radix: Int = Defaults.radix): Long {
         is Number -> if (radix == 10) toLong() else toString().toLongKt(radix)
         false -> 0L
         true -> 1L
-        is String -> toLongKt(radix)
         else -> toString().toLongKt(radix)
     }
 }
@@ -111,7 +106,6 @@ fun Any?.toFloat(): Float {
         is Number -> toFloat()
         false -> 0f
         true -> 1f
-        is String -> toFloatKt()
         else -> toString().toFloatKt()
     }
 }
@@ -126,7 +120,6 @@ fun Any?.toDouble(): Double {
         is Number -> toDouble()
         false -> 0.0
         true -> 1.0
-        is String -> toDoubleKt()
         else -> toString().toDoubleKt()
     }
 }
