@@ -18,8 +18,6 @@ interface Let<T> : SimpleGetter<T> {
 
     fun <R> then(action: (T) -> R): Let<R>
 
-    fun thenDo(action: (T) -> Unit): Let<T>
-
     companion object {
 
         @JvmStatic
@@ -35,11 +33,6 @@ private class LetImpl<T>(private var any: T) : Let<T> {
     override fun <R> then(action: (T) -> R): Let<R> {
         any = action(any).asAny()
         return this.asAny()
-    }
-
-    override fun thenDo(action: (T) -> Unit): Let<T> {
-        action(any)
-        return this
     }
 
     override fun get(): T {
