@@ -1,4 +1,4 @@
-package xyz.srclab.common.collection
+package xyz.srclab.common.collect
 
 /**
  * @author sunqian
