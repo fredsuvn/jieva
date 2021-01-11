@@ -1,6 +1,7 @@
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.collect.JavaCollect
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -1912,20 +1913,20 @@ protected constructor(protected var iterable: I) : MutableIterable<T> {
         @JvmStatic
         fun <T> Iterable<T>.toArray(): Array<Any?> {
             val list = this.asToList()
-            return JavaCollectionKit.toArray(list)
+            return JavaCollect.toArray(list)
         }
 
         @JvmStatic
         fun <T> Iterable<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
             val list = this.asToList()
-            return JavaCollectionKit.toArray(list, generator(list.size))
+            return JavaCollect.toArray(list, generator(list.size))
         }
 
         @JvmStatic
         fun <T> Iterable<T>.toArray(componentType: Class<*>): Array<T> {
             val list = this.asToList()
             val array: Array<T> = componentType.componentTypeToArray(0)
-            return JavaCollectionKit.toArray(list, array)
+            return JavaCollect.toArray(list, array)
         }
 
         @JvmStatic

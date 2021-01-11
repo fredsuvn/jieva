@@ -1,6 +1,7 @@
 package xyz.srclab.common.collection
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.collect.JavaCollect
 import xyz.srclab.common.collection.BaseIterableOps.Companion.forEachIndexed
 import xyz.srclab.common.collection.BaseIterableOps.Companion.toSet
 import java.math.BigDecimal
@@ -1533,20 +1534,20 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Iterable<T> {
         @JvmStatic
         fun <T> Sequence<T>.toArray(): Array<Any?> {
             val list = this.toList()
-            return JavaCollectionKit.toArray(list)
+            return JavaCollect.toArray(list)
         }
 
         @JvmStatic
         fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
             val list = this.toList()
-            return JavaCollectionKit.toArray(list, generator(list.size))
+            return JavaCollect.toArray(list, generator(list.size))
         }
 
         @JvmStatic
         fun <T> Sequence<T>.toArray(componentType: Class<*>): Array<T> {
             val list = this.toList()
             val array: Array<T> = componentType.componentTypeToArray(0)
-            return JavaCollectionKit.toArray(list, array)
+            return JavaCollect.toArray(list, array)
         }
 
         @JvmStatic

@@ -1,11 +1,11 @@
-package xyz.srclab.common.collection;
+package xyz.srclab.common.collect;
 
 import java.util.Collection;
 
 /**
  * @author sunqian
  */
-public class JavaCollectionKit {
+class JavaCollect {
 
     static Object[] toArray(Collection<?> collection) {
         return collection.toArray();
