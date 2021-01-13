@@ -4,11 +4,6 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.*
-import xyz.srclab.common.collection.BaseIterableOps.Companion.asToSet
-import xyz.srclab.common.collection.BaseIterableOps.Companion.forEachIndexed
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toSet
-import xyz.srclab.common.collection.arrayAsListOrNull
-import xyz.srclab.common.collection.componentTypeToArray
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -188,15 +183,15 @@ fun <T> Iterable<T>.contains(element: T): Boolean {
 }
 
 fun <T> Iterable<T>.containsAll(elements: Array<out T>): Boolean {
-    return this.containsAll(elements.toSetKt())
+    return containsAll(elements.toListKt())
 }
 
 fun <T> Iterable<T>.containsAll(elements: Iterable<T>): Boolean {
-    return this.containsAll(elements.asToSet())
+    return containsAll(elements.asToList())
 }
 
 fun <T> Iterable<T>.containsAll(elements: Collection<T>): Boolean {
-    return this.asToSet().containsAll(elements)
+    return asToCollection().containsAll(elements)
 }
 
 fun <T> Iterable<T>.count(): Int {
@@ -208,16 +203,14 @@ inline fun <T> Iterable<T>.count(predicate: (T) -> Boolean): Int {
 }
 
 fun <T> Iterable<T>.isEmpty(): Boolean {
-    var hasElement = false
-    for (t in this) {
-        hasElement = true
-        break
+    for (it in this) {
+        return false
     }
-    return !hasElement
+    return true
 }
 
 fun <T> Iterable<T>.isNotEmpty(): Boolean {
-    return !this.isEmpty()
+    return !isEmpty()
 }
 
 fun <T> Iterable<T>.any(): Boolean {
@@ -273,19 +266,19 @@ inline fun <T> Iterable<T>.lastOrNull(predicate: (T) -> Boolean): T? {
 }
 
 fun <T> Iterable<T>.random(): T {
-    return this.asToList().randomKt()
+    return asToList().randomKt()
 }
 
 fun <T> Iterable<T>.random(random: Random): T {
-    return this.asToList().randomKt(random)
+    return asToList().randomKt(random)
 }
 
 fun <T> Iterable<T>.randomOrNull(): T? {
-    return this.asToList().randomOrNullKt()
+    return asToList().randomOrNullKt()
 }
 
 fun <T> Iterable<T>.randomOrNull(random: Random): T? {
-    return this.asToList().randomOrNullKt(random)
+    return asToList().randomOrNullKt(random)
 }
 
 fun <T> Iterable<T>.elementAt(index: Int): T {
@@ -333,7 +326,7 @@ inline fun <T> Iterable<T>.takeWhile(predicate: (T) -> Boolean): List<T> {
 }
 
 fun <T, C : MutableCollection<in T>> Iterable<T>.takeTo(n: Int, destination: C): C {
-    destination.addAll(this.take(n))
+    destination.addAll(take(n))
     return destination
 }
 
@@ -341,7 +334,7 @@ inline fun <T, C : MutableCollection<in T>> Iterable<T>.takeWhileTo(
     destination: C,
     predicate: (T) -> Boolean
 ): C {
-    destination.addAll(this.takeWhile(predicate))
+    destination.addAll(takeWhile(predicate))
     return destination
 }
 
@@ -359,7 +352,7 @@ inline fun <T> Iterable<T>.dropWhile(predicate: (T) -> Boolean): List<T> {
 }
 
 fun <T, C : MutableCollection<in T>> Iterable<T>.dropTo(n: Int, destination: C): C {
-    destination.addAll(this.drop(n))
+    destination.addAll(drop(n))
     return destination
 }
 
@@ -367,7 +360,7 @@ inline fun <T, C : MutableCollection<in T>> Iterable<T>.dropWhileTo(
     destination: C,
     predicate: (T) -> Boolean
 ): C {
-    destination.addAll(this.dropWhile(predicate))
+    destination.addAll(dropWhile(predicate))
     return destination
 }
 
@@ -481,7 +474,7 @@ inline fun <T, K> Iterable<T>.associateKey(keySelector: (T) -> K): Map<K, T> {
 }
 
 fun <T, K> Iterable<T>.associateKey(keys: Iterable<K>): Map<K, T> {
-    return this.associateKeyTo(LinkedHashMap(), keys)
+    return associateKeyTo(LinkedHashMap(), keys)
 }
 
 inline fun <T, V> Iterable<T>.associateValue(valueSelector: (T) -> V): Map<T, V> {
@@ -489,33 +482,33 @@ inline fun <T, V> Iterable<T>.associateValue(valueSelector: (T) -> V): Map<T, V>
 }
 
 fun <T, V> Iterable<T>.associateValue(values: Iterable<V>): Map<T, V> {
-    return this.associateValueTo(LinkedHashMap(), values)
+    return associateValueTo(LinkedHashMap(), values)
 }
 
-inline fun <T, K, V> Iterable<T>.associatePair(
+inline fun <T, K, V> Iterable<T>.associateWithNext(
     keySelector: (T) -> K,
     valueTransform: (T) -> V
 ): Map<K, V> {
-    return this.associatePairTo(LinkedHashMap(), keySelector, valueTransform)
+    return associateWithNextTo(LinkedHashMap(), keySelector, valueTransform)
 }
 
-inline fun <T, K, V> Iterable<T>.associatePair(transform: (T, T) -> Pair<K, V>): Map<K, V> {
-    return this.associatePairTo(LinkedHashMap(), transform)
+inline fun <T, K, V> Iterable<T>.associateWithNext(transform: (T, T) -> Pair<K, V>): Map<K, V> {
+    return associateWithNextTo(LinkedHashMap(), transform)
 }
 
-inline fun <T, K, V> Iterable<T>.associatePair(
+inline fun <T, K, V> Iterable<T>.associateWithNext(
     complement: T,
     keySelector: (T) -> K,
     valueTransform: (T) -> V
 ): Map<K, V> {
-    return this.associatePairTo(complement, LinkedHashMap(), keySelector, valueTransform)
+    return associateWithNextTo(LinkedHashMap(),complement,  keySelector, valueTransform)
 }
 
-inline fun <T, K, V> Iterable<T>.associatePair(
+inline fun <T, K, V> Iterable<T>.associateWithNext(
     complement: T,
     transform: (T, T) -> Pair<K, V>
 ): Map<K, V> {
-    return this.associatePairTo(complement, LinkedHashMap(), transform)
+    return associateWithNextTo( LinkedHashMap(),complement, transform)
 }
 
 inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateTo(
@@ -544,12 +537,12 @@ fun <T, K, M : MutableMap<in K, in T>> Iterable<T>.associateKeyTo(
     destination: M,
     keys: Iterable<K>
 ): M {
-    val valueIt = this.iterator()
+    val values = this.iterator()
     for (key in keys) {
-        if (!valueIt.hasNext()) {
+        if (!values.hasNext()) {
             break
         }
-        destination[key] = valueIt.next()
+        destination[key] = values.next()
     }
     return destination
 }
@@ -565,17 +558,17 @@ fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValueTo(
     destination: M,
     values: Iterable<V>
 ): M {
-    val valueIt = values.iterator()
+    val valueIterator = values.iterator()
     for (key in this) {
-        if (!valueIt.hasNext()) {
+        if (!valueIterator.hasNext()) {
             break
         }
-        destination[key] = valueIt.next()
+        destination[key] = valueIterator.next()
     }
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairTo(
+inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
     destination: M,
     keySelector: (T) -> K,
     valueTransform: (T) -> V
@@ -595,7 +588,7 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairTo(
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairTo(
+inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
     destination: M,
     transform: (T, T) -> Pair<K, V>
 ): M {
@@ -613,9 +606,9 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairTo(
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairTo(
-    complement: T,
+inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
     destination: M,
+    complement: T,
     keySelector: (T) -> K,
     valueTransform: (T) -> V
 ): M {
@@ -637,9 +630,9 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairTo(
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairTo(
-    complement: T,
+inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
     destination: M,
+    complement: T,
     transform: (T, T) -> Pair<K, V>
 ): M {
     val iterator = this.iterator()
