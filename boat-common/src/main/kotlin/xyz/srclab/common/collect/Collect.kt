@@ -9,6 +9,7 @@ import java.math.BigInteger
 import java.util.*
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
+import kotlin.NoSuchElementException
 import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 import kotlin.collections.LinkedHashSet
@@ -16,7 +17,6 @@ import kotlin.random.Random
 import kotlin.streams.asStream
 import kotlin.toBigDecimal
 import kotlin.toBigInteger
-
 import kotlin.collections.addAll as addAllKt
 import kotlin.collections.all as allKt
 import kotlin.collections.any as anyKt
@@ -27,12 +27,15 @@ import kotlin.collections.associateByTo as associateByToKt
 import kotlin.collections.associateTo as associateToKt
 import kotlin.collections.associateWith as associateWithKt
 import kotlin.collections.associateWithTo as associateWithToKt
+import kotlin.collections.binarySearch as binarySearchKt
 import kotlin.collections.chunked as chunkedKt
 import kotlin.collections.contains as containsKt
 import kotlin.collections.count as countKt
 import kotlin.collections.distinct as distinctKt
 import kotlin.collections.distinctBy as distinctByKt
 import kotlin.collections.drop as dropKt
+import kotlin.collections.dropLast as dropLastKt
+import kotlin.collections.dropLastWhile as dropLastWhileKt
 import kotlin.collections.dropWhile as dropWhileKt
 import kotlin.collections.elementAt as elementAtKt
 import kotlin.collections.elementAtOrElse as elementAtOrElseKt
@@ -43,6 +46,7 @@ import kotlin.collections.filterIndexedTo as filterIndexedToKt
 import kotlin.collections.filterNotNull as filterNotNullKt
 import kotlin.collections.filterTo as filterToKt
 import kotlin.collections.find as findKt
+import kotlin.collections.findLast as findLastKt
 import kotlin.collections.first as firstKt
 import kotlin.collections.firstOrNull as firstOrNullKt
 import kotlin.collections.flatMap as flatMapKt
@@ -51,6 +55,8 @@ import kotlin.collections.flatMapIndexedTo as flatMapIndexedToKt
 import kotlin.collections.flatMapTo as flatMapToKt
 import kotlin.collections.fold as foldKt
 import kotlin.collections.foldIndexed as foldIndexedKt
+import kotlin.collections.foldRight as foldRightKt
+import kotlin.collections.foldRightIndexed as foldRightIndexedKt
 import kotlin.collections.forEachIndexed as forEachIndexedKt
 import kotlin.collections.groupBy as groupByKt
 import kotlin.collections.groupByTo as groupByToKt
@@ -82,14 +88,28 @@ import kotlin.collections.reduce as reduceKt
 import kotlin.collections.reduceIndexed as reduceIndexedKt
 import kotlin.collections.reduceIndexedOrNull as reduceIndexedOrNullKt
 import kotlin.collections.reduceOrNull as reduceOrNullKt
+import kotlin.collections.reduceRight as reduceRightKt
+import kotlin.collections.reduceRightIndexed as reduceRightIndexedKt
+import kotlin.collections.reduceRightIndexedOrNull as reduceRightIndexedOrNullKt
+import kotlin.collections.reduceRightOrNull as reduceRightOrNullKt
 import kotlin.collections.removeAll as removeAllKt
+import kotlin.collections.removeFirst as removeFirstKt
+import kotlin.collections.removeFirstOrNull as removeFirstOrNullKt
+import kotlin.collections.removeLast as removeLastKt
+import kotlin.collections.removeLastOrNull as removeLastOrNullKt
 import kotlin.collections.retainAll as retainAllKt
+import kotlin.collections.reverse as reverseKt
 import kotlin.collections.reversed as reversedKt
+import kotlin.collections.shuffle as shuffleKt
 import kotlin.collections.shuffled as shuffledKt
+import kotlin.collections.slice as sliceKt
+import kotlin.collections.sortWith as sortWithKt
 import kotlin.collections.sortedWith as sortedWithKt
 import kotlin.collections.subtract as subtractKt
 import kotlin.collections.sumOf as sumOfKt
 import kotlin.collections.take as takeKt
+import kotlin.collections.takeLast as takeLastKt
+import kotlin.collections.takeLastWhile as takeLastWhileKt
 import kotlin.collections.takeWhile as takeWhileKt
 import kotlin.collections.toCollection as toCollectionKt
 import kotlin.collections.toHashSet as toHashSetKt
@@ -103,7 +123,6 @@ import kotlin.collections.union as unionKt
 import kotlin.collections.windowed as windowedKt
 import kotlin.collections.zip as zipKt
 import kotlin.collections.zipWithNext as zipWithNextKt
-
 import kotlin.sequences.all as allKt
 import kotlin.sequences.any as anyKt
 import kotlin.sequences.associate as associateKt
@@ -177,6 +196,8 @@ import kotlin.sequences.toSortedSet as toSortedSetKt
 import kotlin.sequences.windowed as windowedKt
 import kotlin.sequences.zip as zipKt
 import kotlin.sequences.zipWithNext as zipWithNextKt
+
+//For iterable:
 
 fun <T> Iterable<T>.contains(element: T): Boolean {
     return this.containsKt(element)
@@ -469,20 +490,20 @@ inline fun <T, K, V> Iterable<T>.associate(transform: (T) -> Pair<K, V>): Map<K,
     return this.associateKt(transform)
 }
 
-inline fun <T, K> Iterable<T>.associateKey(keySelector: (T) -> K): Map<K, T> {
+inline fun <T, K> Iterable<T>.associateKeys(keySelector: (T) -> K): Map<K, T> {
     return this.associateByKt(keySelector)
 }
 
-fun <T, K> Iterable<T>.associateKey(keys: Iterable<K>): Map<K, T> {
-    return associateKeyTo(LinkedHashMap(), keys)
+fun <T, K> Iterable<T>.associateKeys(keys: Iterable<K>): Map<K, T> {
+    return associateKeysTo(LinkedHashMap(), keys)
 }
 
-inline fun <T, V> Iterable<T>.associateValue(valueSelector: (T) -> V): Map<T, V> {
+inline fun <T, V> Iterable<T>.associateValues(valueSelector: (T) -> V): Map<T, V> {
     return this.associateWithKt(valueSelector)
 }
 
-fun <T, V> Iterable<T>.associateValue(values: Iterable<V>): Map<T, V> {
-    return associateValueTo(LinkedHashMap(), values)
+fun <T, V> Iterable<T>.associateValues(values: Iterable<V>): Map<T, V> {
+    return associateValuesTo(LinkedHashMap(), values)
 }
 
 inline fun <T, K, V> Iterable<T>.associateWithNext(
@@ -496,19 +517,30 @@ inline fun <T, K, V> Iterable<T>.associateWithNext(transform: (T, T) -> Pair<K, 
     return associateWithNextTo(LinkedHashMap(), transform)
 }
 
-inline fun <T, K, V> Iterable<T>.associateWithNext(
+inline fun <T, K, V> Iterable<T>.associatePairs(
+    keySelector: (T) -> K,
+    valueTransform: (T) -> V
+): Map<K, V> {
+    return associatePairsTo(LinkedHashMap(), keySelector, valueTransform)
+}
+
+inline fun <T, K, V> Iterable<T>.associatePairs(transform: (T, T) -> Pair<K, V>): Map<K, V> {
+    return associatePairsTo(LinkedHashMap(), transform)
+}
+
+inline fun <T, K, V> Iterable<T>.associatePairs(
     complement: T,
     keySelector: (T) -> K,
     valueTransform: (T) -> V
 ): Map<K, V> {
-    return associateWithNextTo(LinkedHashMap(),complement,  keySelector, valueTransform)
+    return associatePairsTo(LinkedHashMap(), complement, keySelector, valueTransform)
 }
 
-inline fun <T, K, V> Iterable<T>.associateWithNext(
+inline fun <T, K, V> Iterable<T>.associatePairs(
     complement: T,
     transform: (T, T) -> Pair<K, V>
 ): Map<K, V> {
-    return associateWithNextTo( LinkedHashMap(),complement, transform)
+    return associatePairsTo(LinkedHashMap(), complement, transform)
 }
 
 inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateTo(
@@ -526,14 +558,14 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateTo(
     return this.associateToKt(destination, transform)
 }
 
-inline fun <T, K, M : MutableMap<in K, in T>> Iterable<T>.associateKeyTo(
+inline fun <T, K, M : MutableMap<in K, in T>> Iterable<T>.associateKeysTo(
     destination: M,
     keySelector: (T) -> K
 ): M {
     return this.associateByToKt(destination, keySelector)
 }
 
-fun <T, K, M : MutableMap<in K, in T>> Iterable<T>.associateKeyTo(
+fun <T, K, M : MutableMap<in K, in T>> Iterable<T>.associateKeysTo(
     destination: M,
     keys: Iterable<K>
 ): M {
@@ -547,14 +579,14 @@ fun <T, K, M : MutableMap<in K, in T>> Iterable<T>.associateKeyTo(
     return destination
 }
 
-inline fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValueTo(
+inline fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValuesTo(
     destination: M,
     valueSelector: (T) -> V
 ): M {
     return this.associateWithToKt(destination, valueSelector)
 }
 
-fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValueTo(
+fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValuesTo(
     destination: M,
     values: Iterable<V>
 ): M {
@@ -569,6 +601,40 @@ fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValueTo(
 }
 
 inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
+    destination: M,
+    keySelector: (T) -> K,
+    valueTransform: (T) -> V
+): M {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return destination
+    var current = iterator.next()
+    while (iterator.hasNext()) {
+        val next = iterator.next()
+        val k = keySelector(current)
+        val v = valueTransform(next)
+        destination.put(k, v)
+        current = next
+    }
+    return destination
+}
+
+inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
+    destination: M,
+    transform: (T, T) -> Pair<K, V>
+): M {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return destination
+    var current = iterator.next()
+    while (iterator.hasNext()) {
+        val next = iterator.next()
+        val pair = transform(current, next)
+        destination.put(pair.first, pair.second)
+        current = next
+    }
+    return destination
+}
+
+inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairsTo(
     destination: M,
     keySelector: (T) -> K,
     valueTransform: (T) -> V
@@ -588,7 +654,7 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
+inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairsTo(
     destination: M,
     transform: (T, T) -> Pair<K, V>
 ): M {
@@ -606,7 +672,7 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
+inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairsTo(
     destination: M,
     complement: T,
     keySelector: (T) -> K,
@@ -630,7 +696,7 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
+inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairsTo(
     destination: M,
     complement: T,
     transform: (T, T) -> Pair<K, V>
@@ -713,48 +779,6 @@ inline fun <T, R> Iterable<T>.zipWithNext(transform: (T, T) -> R): List<R> {
     return this.zipWithNextKt(transform)
 }
 
-inline fun <T, R, V> Iterable<V>.unzip(transform: (V) -> Pair<T, R>): Pair<List<T>, List<R>> {
-    if (this is Collection<V>) {
-        val listT = ArrayList<T>(this.size)
-        val listR = ArrayList<R>(this.size)
-        for (e in this) {
-            val pair = transform(e)
-            listT.add(pair.first)
-            listR.add(pair.second)
-        }
-        return listT to listR
-    } else {
-        val listT = LinkedList<T>()
-        val listR = LinkedList<R>()
-        for (e in this) {
-            val pair = transform(e)
-            listT.add(pair.first)
-            listR.add(pair.second)
-        }
-        return ArrayList(listT) to ArrayList(listR)
-    }
-}
-
-inline fun <T, R> Iterable<R>.unzipWithNext(transform: (R) -> Pair<T, T>): List<T> {
-    if (this is Collection<R>) {
-        val listT = ArrayList<T>(this.size)
-        for (e in this) {
-            val pair = transform(e)
-            listT.add(pair.first)
-            listT.add(pair.second)
-        }
-        return listT
-    } else {
-        val listT = LinkedList<T>()
-        for (e in this) {
-            val pair = transform(e)
-            listT.add(pair.first)
-            listT.add(pair.second)
-        }
-        return ArrayList(listT)
-    }
-}
-
 fun <T> Iterable<T>.chunked(size: Int): List<List<T>> {
     return this.chunkedKt(size)
 }
@@ -815,7 +839,7 @@ fun <T> Iterable<T>.shuffled(random: Random): List<T> {
 
 @JvmOverloads
 fun <T> Iterable<T>.max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
-    return this.maxOrNull(comparator).notNull()
+    return maxOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
@@ -825,7 +849,7 @@ fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T> = castSelfComparableC
 
 @JvmOverloads
 fun <T> Iterable<T>.min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
-    return this.minOrNull(comparator).notNull()
+    return minOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
@@ -996,6 +1020,11 @@ fun <T> Iterable<T>.toSequence(): Sequence<T> {
     return this.asSequenceKt()
 }
 
+inline fun <reified T> Iterable<T>.toTypedArray(): Array<T> {
+    val list = this.asToList()
+    return list.toTypedArrayKt()
+}
+
 fun <T> Iterable<T>.toArray(): Array<Any?> {
     val list = this.asToList()
     return JavaCollect.toArray(list)
@@ -1012,23 +1041,11 @@ fun <T> Iterable<T>.toArray(componentType: Class<*>): Array<T> {
     return JavaCollect.toArray(list, array)
 }
 
-fun <T> Iterable<T>.toAnyArray(componentType: Class<*>): Any {
-    return when (componentType) {
-        Boolean::class.javaPrimitiveType -> this.toBooleanArray()
-        Byte::class.javaPrimitiveType -> this.toByteArray()
-        Short::class.javaPrimitiveType -> this.toShortArray()
-        Char::class.javaPrimitiveType -> this.toCharArray()
-        Int::class.javaPrimitiveType -> this.toIntArray()
-        Long::class.javaPrimitiveType -> this.toLongArray()
-        Float::class.javaPrimitiveType -> this.toFloatArray()
-        Double::class.javaPrimitiveType -> this.toDoubleArray()
-        else -> this.toArray(componentType)
-    }
-}
-
-inline fun <reified T> Iterable<T>.toTypedArray(): Array<T> {
+fun <T, R> Iterable<T>.toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
     val list = this.asToList()
-    return list.toTypedArrayKt()
+    val result = componentType.componentTypeToArray<Array<R>>(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
 }
 
 @JvmOverloads
@@ -1095,6 +1112,20 @@ inline fun <T> Iterable<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble
     return result
 }
 
+fun <T, A> Iterable<T>.toAnyArray(componentType: Class<*>): A {
+    return when (componentType) {
+        Boolean::class.javaPrimitiveType -> this.toBooleanArray()
+        Byte::class.javaPrimitiveType -> this.toByteArray()
+        Short::class.javaPrimitiveType -> this.toShortArray()
+        Char::class.javaPrimitiveType -> this.toCharArray()
+        Int::class.javaPrimitiveType -> this.toIntArray()
+        Long::class.javaPrimitiveType -> this.toLongArray()
+        Float::class.javaPrimitiveType -> this.toFloatArray()
+        Double::class.javaPrimitiveType -> this.toDoubleArray()
+        else -> this.toArray(componentType)
+    }.asAny()
+}
+
 fun <T> Iterable<T>.plus(element: T): List<T> {
     return this.plusKt(element)
 }
@@ -1128,11 +1159,11 @@ fun <T> Iterable<T>.minus(elements: Sequence<T>): List<T> {
 }
 
 fun <T> Iterable<T>.plusBefore(index: Int, element: T): List<T> {
-    return this.plusBefore(index, listOf(element))
+    return plusBefore(index, listOf(element))
 }
 
 fun <T> Iterable<T>.plusBefore(index: Int, elements: Array<out T>): List<T> {
-    return this.plusBefore(index, elements.toListKt())
+    return plusBefore(index, elements.toListKt())
 }
 
 fun <T> Iterable<T>.plusBefore(index: Int, elements: Iterable<T>): List<T> {
@@ -1146,15 +1177,15 @@ fun <T> Iterable<T>.plusBefore(index: Int, elements: Iterable<T>): List<T> {
 }
 
 fun <T> Iterable<T>.plusBefore(index: Int, elements: Sequence<T>): List<T> {
-    return this.plusBefore(index, elements.toList())
+    return plusBefore(index, elements.toList())
 }
 
 fun <T> Iterable<T>.plusAfter(index: Int, element: T): List<T> {
-    return this.plusAfter(index, listOf(element))
+    return plusAfter(index, listOf(element))
 }
 
 fun <T> Iterable<T>.plusAfter(index: Int, elements: Array<out T>): List<T> {
-    return this.plusAfter(index, elements.toListKt())
+    return plusAfter(index, elements.toListKt())
 }
 
 fun <T> Iterable<T>.plusAfter(index: Int, elements: Iterable<T>): List<T> {
@@ -1168,7 +1199,7 @@ fun <T> Iterable<T>.plusAfter(index: Int, elements: Iterable<T>): List<T> {
 }
 
 fun <T> Iterable<T>.plusAfter(index: Int, elements: Sequence<T>): List<T> {
-    return this.plusAfter(index, elements.toList())
+    return plusAfter(index, elements.toList())
 }
 
 @JvmOverloads
@@ -1222,8 +1253,6 @@ fun <T> MutableIterable<T>.removeAll(): Boolean {
 fun <T> MutableIterable<T>.retainAll(predicate: (T) -> Boolean): Boolean {
     return this.retainAllKt(predicate)
 }
-
-// Others
 
 @JvmOverloads
 fun <T> Iterable<T>.joinToString(
@@ -1296,12 +1325,12 @@ fun <T, A : Appendable> Iterable<T>.joinTo(
 }
 
 fun <T> Any.anyAsIterable(): Iterable<T> {
-    return this.anyAsIterableOrNull()
+    return anyAsIterableOrNull()
         ?: throw IllegalArgumentException("Cannot from any to Iterable: $this.")
 }
 
 fun <T> Any.anyAsMutableIterable(): MutableIterable<T> {
-    return this.anyAsMutableIterableOrNull()
+    return anyAsMutableIterableOrNull()
         ?: throw IllegalArgumentException("Cannot from any to MutableIterable: $this.")
 }
 
@@ -1325,12 +1354,14 @@ fun <T> Any.anyAsMutableIterableOrNull(): MutableIterable<T>? {
     return null
 }
 
+//For collection:
+
 fun <T> Collection<T>.containsAll(elements: Array<out T>): Boolean {
-    return this.containsAll(elements.toSetKt())
+    return this.containsAll(elements.toListKt())
 }
 
 fun <T> Collection<T>.containsAll(elements: Iterable<T>): Boolean {
-    return this.containsAll(elements.asToSet())
+    return this.containsAll(elements.asToList())
 }
 
 fun <T> Collection<T>.count(): Int {
@@ -1393,15 +1424,13 @@ fun <T> MutableCollection<T>.retainAll(elements: Sequence<T>): Boolean {
     return this.retainAllKt(elements)
 }
 
-// Others
-
 fun <T> Any.anyAsCollection(): Collection<T> {
-    return this.anyAsCollectionOrNull()
+    return anyAsCollectionOrNull()
         ?: throw IllegalArgumentException("Cannot from any to Collection: $this.")
 }
 
 fun <T> Any.anyAsMutableCollection(): MutableCollection<T> {
-    return this.anyAsMutableCollectionOrNull()
+    return anyAsMutableCollectionOrNull()
         ?: throw IllegalArgumentException("Cannot from any to MutableCollection: $this.")
 }
 
@@ -1424,6 +1453,8 @@ fun <T> Any.anyAsMutableCollectionOrNull(): MutableCollection<T>? {
     }
     return null
 }
+
+//For list:
 
 fun <T> List<T>.first(): T {
     return this.firstKt()
@@ -1579,15 +1610,13 @@ fun <T> MutableList<T>.retainAll(predicate: (T) -> Boolean): Boolean {
     return this.retainAllKt(predicate)
 }
 
-// Others
-
 fun <T> Any.anyAsList(): List<T> {
-    return this.anyAsListOrNull()
+    return anyAsListOrNull()
         ?: throw IllegalArgumentException("Cannot from any to List: $this.")
 }
 
 fun <T> Any.anyAsMutableList(): MutableList<T> {
-    return this.anyAsMutableListOrNull()
+    return anyAsMutableListOrNull()
         ?: throw IllegalArgumentException("Cannot from any to MutableList: $this.")
 }
 
@@ -1610,6 +1639,8 @@ fun <T> Any.anyAsMutableListOrNull(): MutableList<T>? {
     }
     return null
 }
+
+//For set:
 
 fun <T> Set<T>.plus(element: T): Set<T> {
     return this.plusKt(element)
@@ -1642,6 +1673,8 @@ fun <T> Set<T>.minus(elements: Iterable<T>): Set<T> {
 fun <T> Set<T>.minus(elements: Sequence<T>): Set<T> {
     return this.minusKt(elements)
 }
+
+//For map:
 
 fun <K, V> Map<K, V>.containsKeys(keys: Array<out K>): Boolean {
     return this.keys.containsAll(keys.toSetKt())
@@ -1686,11 +1719,11 @@ inline fun <K, V, RK, RV> Map<K, V>.map(
     crossinline keySelector: (K) -> RK,
     crossinline valueTransform: (V) -> RV
 ): Map<RK, RV> {
-    return this.mapTo(LinkedHashMap(), keySelector, valueTransform)
+    return mapTo(LinkedHashMap(), keySelector, valueTransform)
 }
 
 inline fun <K, V, RK, RV> Map<K, V>.map(transform: (K, V) -> Pair<RK, RV>): Map<RK, RV> {
-    return this.mapTo(LinkedHashMap(), transform)
+    return mapTo(LinkedHashMap(), transform)
 }
 
 inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.mapTo(
@@ -1757,20 +1790,22 @@ fun <K, V> MutableMap<K, V>.removeAll(keys: Iterable<K>) {
     }
 }
 
+//For sequence:
+
 fun <T> Sequence<T>.contains(element: T): Boolean {
     return this.containsKt(element)
 }
 
 fun <T> Sequence<T>.containsAll(elements: Array<out T>): Boolean {
-    return this.containsAll(elements.toSet())
+    return containsAll(elements.toListKt())
 }
 
 fun <T> Sequence<T>.containsAll(elements: Iterable<T>): Boolean {
-    return this.containsAll(elements.toSet())
+    return containsAll(elements.asToList())
 }
 
 fun <T> Sequence<T>.containsAll(elements: Collection<T>): Boolean {
-    return this.toSet().containsAll(elements)
+    return this.toHashSetKt().containsAll(elements)
 }
 
 fun <T> Sequence<T>.count(): Int {
@@ -1782,16 +1817,14 @@ inline fun <T> Sequence<T>.count(predicate: (T) -> Boolean): Int {
 }
 
 fun <T> Sequence<T>.isEmpty(): Boolean {
-    var hasElement = false
-    for (t in this) {
-        hasElement = true
-        break
+    for (it in this) {
+        return false
     }
-    return !hasElement
+    return true
 }
 
 fun <T> Sequence<T>.isNotEmpty(): Boolean {
-    return !this.isEmpty()
+    return !isEmpty()
 }
 
 fun <T> Sequence<T>.any(): Boolean {
@@ -2034,38 +2067,57 @@ inline fun <T, K, V> Sequence<T>.associate(transform: (T) -> Pair<K, V>): Map<K,
     return this.associateKt(transform)
 }
 
-inline fun <T, K> Sequence<T>.associateKey(keySelector: (T) -> K): Map<K, T> {
+inline fun <T, K> Sequence<T>.associateKeys(keySelector: (T) -> K): Map<K, T> {
     return this.associateByKt(keySelector)
 }
 
-inline fun <T, V> Sequence<T>.associateValue(valueSelector: (T) -> V): Map<T, V> {
+fun <T, K> Sequence<T>.associateKeys(keys: Iterable<K>): Map<K, T> {
+    return associateKeysTo(LinkedHashMap(), keys)
+}
+
+inline fun <T, V> Sequence<T>.associateValues(valueSelector: (T) -> V): Map<T, V> {
     return this.associateWithKt(valueSelector)
 }
 
-inline fun <T, K, V> Sequence<T>.associatePair(
+fun <T, V> Sequence<T>.associateValues(values: Iterable<V>): Map<T, V> {
+    return associateValuesTo(LinkedHashMap(), values)
+}
+
+inline fun <T, K, V> Sequence<T>.associateWithNext(
     keySelector: (T) -> K,
     valueTransform: (T) -> V
 ): Map<K, V> {
-    return this.associatePairTo(LinkedHashMap(), keySelector, valueTransform)
+    return associateWithNextTo(LinkedHashMap(), keySelector, valueTransform)
 }
 
-inline fun <T, K, V> Sequence<T>.associatePair(transform: (T, T) -> Pair<K, V>): Map<K, V> {
-    return this.associatePairTo(LinkedHashMap(), transform)
+inline fun <T, K, V> Sequence<T>.associateWithNext(transform: (T, T) -> Pair<K, V>): Map<K, V> {
+    return associateWithNextTo(LinkedHashMap(), transform)
 }
 
-inline fun <T, K, V> Sequence<T>.associatePair(
+inline fun <T, K, V> Sequence<T>.associatePairs(
+    keySelector: (T) -> K,
+    valueTransform: (T) -> V
+): Map<K, V> {
+    return associatePairsTo(LinkedHashMap(), keySelector, valueTransform)
+}
+
+inline fun <T, K, V> Sequence<T>.associatePairs(transform: (T, T) -> Pair<K, V>): Map<K, V> {
+    return associatePairsTo(LinkedHashMap(), transform)
+}
+
+inline fun <T, K, V> Sequence<T>.associatePairs(
     complement: T,
     keySelector: (T) -> K,
     valueTransform: (T) -> V
 ): Map<K, V> {
-    return this.associatePairTo(complement, LinkedHashMap(), keySelector, valueTransform)
+    return associatePairsTo(LinkedHashMap(), complement, keySelector, valueTransform)
 }
 
-inline fun <T, K, V> Sequence<T>.associatePair(
+inline fun <T, K, V> Sequence<T>.associatePairs(
     complement: T,
     transform: (T, T) -> Pair<K, V>
 ): Map<K, V> {
-    return this.associatePairTo(complement, LinkedHashMap(), transform)
+    return associatePairsTo(LinkedHashMap(), complement, transform)
 }
 
 inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associateTo(
@@ -2083,21 +2135,83 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associateTo(
     return this.associateToKt(destination, transform)
 }
 
-inline fun <T, K, M : MutableMap<in K, in T>> Sequence<T>.associateKeyTo(
+inline fun <T, K, M : MutableMap<in K, in T>> Sequence<T>.associateKeysTo(
     destination: M,
     keySelector: (T) -> K
 ): M {
     return this.associateByToKt(destination, keySelector)
 }
 
-inline fun <T, V, M : MutableMap<in T, in V>> Sequence<T>.associateValueTo(
+fun <T, K, M : MutableMap<in K, in T>> Sequence<T>.associateKeysTo(
+    destination: M,
+    keys: Iterable<K>
+): M {
+    val values = this.iterator()
+    for (key in keys) {
+        if (!values.hasNext()) {
+            break
+        }
+        destination[key] = values.next()
+    }
+    return destination
+}
+
+inline fun <T, V, M : MutableMap<in T, in V>> Sequence<T>.associateValuesTo(
     destination: M,
     valueSelector: (T) -> V
 ): M {
     return this.associateWithToKt(destination, valueSelector)
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
+fun <T, V, M : MutableMap<in T, in V>> Sequence<T>.associateValuesTo(
+    destination: M,
+    values: Iterable<V>
+): M {
+    val valueIterator = values.iterator()
+    for (key in this) {
+        if (!valueIterator.hasNext()) {
+            break
+        }
+        destination[key] = valueIterator.next()
+    }
+    return destination
+}
+
+inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associateWithNextTo(
+    destination: M,
+    keySelector: (T) -> K,
+    valueTransform: (T) -> V
+): M {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return destination
+    var current = iterator.next()
+    while (iterator.hasNext()) {
+        val next = iterator.next()
+        val k = keySelector(current)
+        val v = valueTransform(next)
+        destination.put(k, v)
+        current = next
+    }
+    return destination
+}
+
+inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associateWithNextTo(
+    destination: M,
+    transform: (T, T) -> Pair<K, V>
+): M {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return destination
+    var current = iterator.next()
+    while (iterator.hasNext()) {
+        val next = iterator.next()
+        val pair = transform(current, next)
+        destination.put(pair.first, pair.second)
+        current = next
+    }
+    return destination
+}
+
+inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairsTo(
     destination: M,
     keySelector: (T) -> K,
     valueTransform: (T) -> V
@@ -2117,7 +2231,7 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
+inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairsTo(
     destination: M,
     transform: (T, T) -> Pair<K, V>
 ): M {
@@ -2135,9 +2249,9 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
-    complement: T,
+inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairsTo(
     destination: M,
+    complement: T,
     keySelector: (T) -> K,
     valueTransform: (T) -> V
 ): M {
@@ -2159,9 +2273,9 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairTo(
-    complement: T,
+inline fun <T, K, V, M : MutableMap<in K, in V>> Sequence<T>.associatePairsTo(
     destination: M,
+    complement: T,
     transform: (T, T) -> Pair<K, V>
 ): M {
     val iterator = this.iterator()
@@ -2282,7 +2396,7 @@ fun <T> Sequence<T>.shuffled(random: Random): Sequence<T> {
 
 @JvmOverloads
 fun <T> Sequence<T>.max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
-    return this.maxOrNull(comparator).notNull()
+    return maxOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
@@ -2292,7 +2406,7 @@ fun <T> Sequence<T>.maxOrNull(comparator: Comparator<in T> = castSelfComparableC
 
 @JvmOverloads
 fun <T> Sequence<T>.min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
-    return this.minOrNull(comparator).notNull()
+    return minOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
@@ -2430,23 +2544,99 @@ fun <T> Sequence<T>.toStream(parallel: Boolean = false): Stream<T> {
     return if (parallel) this.asStream().parallel() else this.asStream()
 }
 
+inline fun <reified T> Sequence<T>.toTypedArray(): Array<T> {
+    val list = this.toListKt()
+    return list.toTypedArrayKt()
+}
+
 fun <T> Sequence<T>.toArray(): Array<Any?> {
-    val list = this.toList()
+    val list = this.toListKt()
     return JavaCollect.toArray(list)
 }
 
 fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
-    val list = this.toList()
+    val list = this.toListKt()
     return JavaCollect.toArray(list, generator(list.size))
 }
 
 fun <T> Sequence<T>.toArray(componentType: Class<*>): Array<T> {
-    val list = this.toList()
+    val list = this.toListKt()
     val array: Array<T> = componentType.componentTypeToArray(0)
     return JavaCollect.toArray(list, array)
 }
 
-fun <T> Sequence<T>.toAnyArray(componentType: Class<*>): Any {
+fun <T, R> Sequence<T>.toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
+    val list = this.toListKt()
+    val result = componentType.componentTypeToArray<Array<R>>(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
+}
+
+@JvmOverloads
+inline fun <T> Sequence<T>.toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
+    val list = this.toListKt()
+    val result = BooleanArray(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
+}
+
+@JvmOverloads
+inline fun <T> Sequence<T>.toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
+    val list = this.toListKt()
+    val result = ByteArray(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
+}
+
+@JvmOverloads
+inline fun <T> Sequence<T>.toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
+    val list = this.toListKt()
+    val result = ShortArray(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
+}
+
+@JvmOverloads
+inline fun <T> Sequence<T>.toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
+    val list = this.toListKt()
+    val result = CharArray(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
+}
+
+@JvmOverloads
+inline fun <T> Sequence<T>.toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
+    val list = this.toListKt()
+    val result = IntArray(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
+}
+
+@JvmOverloads
+inline fun <T> Sequence<T>.toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
+    val list = this.toListKt()
+    val result = LongArray(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
+}
+
+@JvmOverloads
+inline fun <T> Sequence<T>.toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
+    val list = this.toListKt()
+    val result = FloatArray(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
+}
+
+@JvmOverloads
+inline fun <T> Sequence<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
+    val list = this.toListKt()
+    val result = DoubleArray(list.size)
+    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    return result
+}
+
+fun <T, A> Sequence<T>.toAnyArray(componentType: Class<*>): A {
     return when (componentType) {
         Boolean::class.javaPrimitiveType -> this.toBooleanArray()
         Byte::class.javaPrimitiveType -> this.toByteArray()
@@ -2457,71 +2647,7 @@ fun <T> Sequence<T>.toAnyArray(componentType: Class<*>): Any {
         Float::class.javaPrimitiveType -> this.toFloatArray()
         Double::class.javaPrimitiveType -> this.toDoubleArray()
         else -> this.toArray(componentType)
-    }
-}
-
-@JvmOverloads
-inline fun <T> Sequence<T>.toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
-    val list = this.toList()
-    val result = BooleanArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Sequence<T>.toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
-    val list = this.toList()
-    val result = ByteArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Sequence<T>.toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
-    val list = this.toList()
-    val result = ShortArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Sequence<T>.toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
-    val list = this.toList()
-    val result = CharArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Sequence<T>.toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
-    val list = this.toList()
-    val result = IntArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Sequence<T>.toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
-    val list = this.toList()
-    val result = LongArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Sequence<T>.toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
-    val list = this.toList()
-    val result = FloatArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Sequence<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
-    val list = this.toList()
-    val result = DoubleArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
-    return result
+    }.asAny()
 }
 
 fun <T> Sequence<T>.plus(element: T): Sequence<T> {

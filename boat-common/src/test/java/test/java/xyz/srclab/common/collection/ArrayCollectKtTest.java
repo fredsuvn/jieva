@@ -9,7 +9,7 @@ import xyz.srclab.common.test.TestLogger;
 /**
  * @author sunqian
  */
-public class ArrayKitTest {
+public class ArrayCollectKtTest {
 
     private static final TestLogger testLogger = TestLogger.DEFAULT;
 

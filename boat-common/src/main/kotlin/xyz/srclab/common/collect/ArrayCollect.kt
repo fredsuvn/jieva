@@ -1,7 +1,7 @@
-@file:JvmName("ArrayKit")
+@file:JvmName("ArrayCollect")
 @file:JvmMultifileClass
 
-package xyz.srclab.common.collection
+package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.base.loadClassOrThrow
