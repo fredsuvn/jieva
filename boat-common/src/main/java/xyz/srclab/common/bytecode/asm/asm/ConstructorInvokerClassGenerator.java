@@ -7,7 +7,7 @@
 //import xyz.srclab.common.collection.ArrayKit;
 //import xyz.srclab.common.bytecode.*;
 //import xyz.srclab.common.bytecode.asm.AsmInvokerHelper;
-//import xyz.srclab.common.collection.ListOps;
+//import xyz.srclab.common.collect.ListOps;
 //import xyz.srclab.common.invoke.ConstructorInvoker;
 //
 //import java.lang.reflect.Constructor;

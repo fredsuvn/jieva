@@ -2,7 +2,7 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.collection.ListOps;
+import xyz.srclab.common.collect.ListOps;
 import xyz.srclab.common.reflect.MethodKit;
 import xyz.srclab.common.test.TestLogger;
 

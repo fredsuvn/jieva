@@ -5,8 +5,8 @@ import xyz.srclab.common.base.Invoker
 import xyz.srclab.common.base.Invoker.Companion.asInvoker
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.cache.Cache
-import xyz.srclab.common.collection.MapSchema
-import xyz.srclab.common.collection.resolveMapSchema
+import xyz.srclab.common.collect.MapSchema
+import xyz.srclab.common.collect.resolveMapSchema
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.*
 import java.beans.Introspector

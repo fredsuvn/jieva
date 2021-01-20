@@ -2,11 +2,11 @@ package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toAnyArray
+import xyz.srclab.common.collect.BaseIterableOps.Companion.toAnyArray
 import xyz.srclab.common.collection.arrayAsList
 import xyz.srclab.common.collection.arrayTypeToArray
 import xyz.srclab.common.collection.componentType
-import xyz.srclab.common.collection.resolveIterableSchemaOrNull
+import xyz.srclab.common.collect.resolveIterableSchemaOrNull
 import xyz.srclab.common.reflect.*
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType

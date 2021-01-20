@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.test
 
-import xyz.srclab.common.collection.BaseIterableOps.Companion.asToList
+import xyz.srclab.common.collect.BaseIterableOps.Companion.asToList
 
 fun equalsIgnoreOrder(a: Iterable<*>, b: Iterable<*>): Boolean {
     val ca = a.asToList()

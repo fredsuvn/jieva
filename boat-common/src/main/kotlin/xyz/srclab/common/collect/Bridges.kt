@@ -1,4 +1,4 @@
-package xyz.srclab.common.collection
+package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import java.io.Serializable

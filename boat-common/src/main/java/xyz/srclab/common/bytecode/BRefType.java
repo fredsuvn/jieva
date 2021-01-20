@@ -2,7 +2,7 @@
 //
 //import org.apache.commons.collections4.CollectionUtils;
 //import xyz.srclab.annotation.Nullable;
-//import xyz.srclab.common.collection.IterableOps;
+//import xyz.srclab.common.collect.IterableOps;
 //import xyz.srclab.common.string.StringKit;
 //
 //import java.util.Arrays;

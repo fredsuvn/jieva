@@ -8,7 +8,7 @@ import org.apache.commons.lang3.reflect.TypeUtils
 import xyz.srclab.annotations.OutParam
 import xyz.srclab.annotations.PossibleTypes
 import xyz.srclab.common.base.asAny
-import xyz.srclab.common.collection.BaseIterableOps.Companion.toTypedArray
+import xyz.srclab.common.collect.BaseIterableOps.Companion.toTypedArray
 import java.lang.reflect.*
 
 val Type.rawClass: Class<*>?
