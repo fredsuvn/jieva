@@ -1,3 +1,6 @@
+@file:JvmName("Anys")
+@file:JvmMultifileClass
+
 package xyz.srclab.common.base
 
 import java.util.*

@@ -1,4 +1,4 @@
-@file:JvmName("DateTime")
+@file:JvmName("Dates")
 
 package xyz.srclab.common.base
 
