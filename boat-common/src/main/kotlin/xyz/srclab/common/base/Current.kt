@@ -65,7 +65,7 @@ object Current {
     }
 
     @JvmStatic
-    fun Class<*>.callerFrame(): StackTraceElement? {
+    fun Class<*>.callerFrameOrNull(): StackTraceElement? {
         //Throwable().stackTrace
         val stackTrace = thread.stackTrace
         if (stackTrace.isNullOrEmpty()) {
@@ -88,14 +88,14 @@ object Current {
     }
 
     @JvmStatic
-    fun Method.callerFrame(): StackTraceElement? {
+    fun Method.callerFrameOrNull(): StackTraceElement? {
         val calledClassName = this.declaringClass.name
         val calledMethodName = this.name
-        return callerFrame(calledClassName, calledMethodName)
+        return callerFrameOrNull(calledClassName, calledMethodName)
     }
 
     @JvmStatic
-    fun callerFrame(calledClassName: String, calledMethodName: String): StackTraceElement? {
+    fun callerFrameOrNull(calledClassName: String, calledMethodName: String): StackTraceElement? {
         val stackTrace = thread.stackTrace
         if (stackTrace.isNullOrEmpty()) {
             return null

@@ -10,7 +10,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 @JvmOverloads
-fun <T> CharSequence.loadClass(classLoader: ClassLoader = Current.classLoader): Class<T>? {
+fun <T> CharSequence.loadClassOrNull(classLoader: ClassLoader = Current.classLoader): Class<T>? {
     return try {
         Class.forName(this.toString(), true, classLoader)
     } catch (e: ClassNotFoundException) {
@@ -22,7 +22,7 @@ fun <T> CharSequence.loadClass(classLoader: ClassLoader = Current.classLoader): 
  * @throws ClassNotFoundException
  */
 @JvmOverloads
-fun <T> CharSequence.loadClassOrThrow(classLoader: ClassLoader = Current.classLoader): Class<T> {
+fun <T> CharSequence.loadClass(classLoader: ClassLoader = Current.classLoader): Class<T> {
     return try {
         Class.forName(this.toString(), true, classLoader)
     } catch (e: ClassNotFoundException) {
@@ -31,7 +31,7 @@ fun <T> CharSequence.loadClassOrThrow(classLoader: ClassLoader = Current.classLo
 }
 
 @JvmOverloads
-fun CharSequence.loadResource(classLoader: ClassLoader = Current.classLoader): URL? {
+fun CharSequence.loadResourceOrNull(classLoader: ClassLoader = Current.classLoader): URL? {
     return classLoader.getResource(this.toString())
 }
 
@@ -39,38 +39,38 @@ fun CharSequence.loadResource(classLoader: ClassLoader = Current.classLoader): U
  * @throws ResourceNotFoundException
  */
 @JvmOverloads
-fun CharSequence.loadResourceOrThrow(classLoader: ClassLoader = Current.classLoader): URL {
-    return this.loadResource(classLoader) ?: throw ResourceNotFoundException(this)
+fun CharSequence.loadResource(classLoader: ClassLoader = Current.classLoader): URL {
+    return this.loadResourceOrNull(classLoader) ?: throw ResourceNotFoundException(this)
 }
 
 @JvmOverloads
-fun CharSequence.loadBytesResource(classLoader: ClassLoader = Current.classLoader): ByteArray? {
-    return loadResource(classLoader)?.openStream()?.readBytes()
+fun CharSequence.loadBytesResourceOrNull(classLoader: ClassLoader = Current.classLoader): ByteArray? {
+    return loadResourceOrNull(classLoader)?.openStream()?.readBytes()
 }
 
 /**
  * @throws ResourceNotFoundException
  */
 @JvmOverloads
-fun CharSequence.loadBytesResourceOrThrow(classLoader: ClassLoader = Current.classLoader): ByteArray {
-    return this.loadBytesResource(classLoader) ?: throw ResourceNotFoundException(this)
+fun CharSequence.loadBytesResource(classLoader: ClassLoader = Current.classLoader): ByteArray {
+    return this.loadBytesResourceOrNull(classLoader) ?: throw ResourceNotFoundException(this)
 }
 
+@JvmOverloads
+fun CharSequence.loadStringResourceOrNull(
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
+): String? {
+    return loadBytesResourceOrNull(classLoader)?.toChars(charset)
+}
+
+/**
+ * @throws ResourceNotFoundException
+ */
 @JvmOverloads
 fun CharSequence.loadStringResource(
     classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
-): String? {
-    return loadBytesResource(classLoader)?.toChars(charset)
-}
-
-/**
- * @throws ResourceNotFoundException
- */
-@JvmOverloads
-fun CharSequence.loadStringResourceOrThrow(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): String {
-    return this.loadStringResource(classLoader, charset) ?: throw ResourceNotFoundException(this)
+    return this.loadStringResourceOrNull(classLoader, charset) ?: throw ResourceNotFoundException(this)
 }
 
 @JvmOverloads

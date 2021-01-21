@@ -8,7 +8,7 @@ interface SpecParser<S> {
 
     @JvmDefault
     fun <T : Any> parseFirst(spec: S): T {
-        return parseFirstOrNull(spec) ?: throw java.lang.IllegalStateException("Spec parsed failed: $spec.")
+        return parseFirstOrNull(spec) ?: throw java.lang.IllegalStateException("Spec parsed failed: $spec")
     }
 
     fun <T : Any> parseFirstOrNull(spec: S): T?
