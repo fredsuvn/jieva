@@ -28,7 +28,7 @@ interface TestLogger {
         private class TestLoggerImpl(private val printStream: PrintStream) : TestLogger {
 
             override fun log(message: Any?) {
-                val callFrame = Current.callerFrame(javaClass.name, "log")
+                val callFrame = Current.callerFrameOrNull(javaClass.name, "log")
                 printStream.println(
                     "%-${CLASS_NAME_MAX_LENGTH}s(%-${LINE_NUMBER_MAX_LENGTH}d): %s".printFormat(
                         callFrame?.className?.contractSignatureName(CLASS_NAME_MAX_LENGTH),

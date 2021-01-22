@@ -4,7 +4,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.asAny
-import xyz.srclab.common.base.loadClassOrThrow
+import xyz.srclab.common.base.loadClass
 import xyz.srclab.common.jvm.toJvmDescriptor
 import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.reflect.upperClass
@@ -12,6 +12,8 @@ import java.lang.reflect.*
 import java.util.*
 import kotlin.collections.joinTo as joinToKt
 import kotlin.collections.joinToString as joinToStringKt
+
+private const val NOT_ARRAY_TYPE_PREFIX = "Not a array type"
 
 val Type.isArray: Boolean
     @JvmName("isArray") get() {
@@ -22,8 +24,16 @@ val Type.isArray: Boolean
         }
     }
 
-val Type.componentType: Type?
-    get() {
+/**
+ * @throws IllegalArgumentException
+ */
+val Type.componentType: Type
+    @JvmName("componentType") get() {
+        return this.componentTypeOrNull ?: throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: $this")
+    }
+
+val Type.componentTypeOrNull: Type?
+    @JvmName("componentTypeOrNull") get() {
         return when (this) {
             is Class<*> -> this.componentType
             is GenericArrayType -> this.genericComponentType
@@ -31,71 +41,13 @@ val Type.componentType: Type?
         }
     }
 
-fun Array<out Any?>.toStringArray(): Array<String> {
-    if (this.javaClass == Array<String>::class.java) {
-        return this.asAny()
-    }
-    val result = arrayOfNulls<String>(this.size)
-    for (i in this.indices) {
-        result[i] = this[i].toString()
-    }
-    return result.asAny()
-}
-
-fun Array<out Any?>.toStringOrNullArray(): Array<String?> {
-    if (this.javaClass == Array<String>::class.java) {
-        return this.asAny()
-    }
-    val result = arrayOfNulls<String>(this.size)
-    for (i in this.indices) {
-        result[i] = if (this[i] === null) null else this[i].toString()
-    }
-    return result.asAny()
-}
-
-fun Any?.toString(): String {
-    return toStringKt()
-}
-
-fun Any?.anyOrArrayToString(): String {
-    return when (this) {
-        null -> toStringKt()
-        is Array<*> -> Arrays.toString(this)
-        is BooleanArray -> Arrays.toString(this)
-        is ByteArray -> Arrays.toString(this)
-        is ShortArray -> Arrays.toString(this)
-        is CharArray -> Arrays.toString(this)
-        is IntArray -> Arrays.toString(this)
-        is LongArray -> Arrays.toString(this)
-        is FloatArray -> Arrays.toString(this)
-        is DoubleArray -> Arrays.toString(this)
-        else -> toString()
-    }
-}
-
-fun Any?.anyOrArrayDeepToString(): String {
-    return when (this) {
-        null -> toStringKt()
-        is Array<*> -> Arrays.deepToString(this)
-        is BooleanArray -> Arrays.toString(this)
-        is ByteArray -> Arrays.toString(this)
-        is ShortArray -> Arrays.toString(this)
-        is CharArray -> Arrays.toString(this)
-        is IntArray -> Arrays.toString(this)
-        is LongArray -> Arrays.toString(this)
-        is FloatArray -> Arrays.toString(this)
-        is DoubleArray -> Arrays.toString(this)
-        else -> toString()
-    }
-}
-
-fun <A> newArray(vararg elements: A): Array<A> {
+fun <T> newArray(vararg elements: T): Array<T> {
     return elements.asAny()
 }
 
 fun Class<*>.arrayClass(): Class<*> {
     val jvmName = this.toJvmDescriptor()
-    return "[${jvmName.replace("/", ".")}".loadClassOrThrow<Any?>()
+    return "[${jvmName.replace("/", ".")}".loadClass<Any?>()
 }
 
 fun <T> GenericArrayType.rawComponentType(): Class<T> {
@@ -277,20 +229,20 @@ fun DoubleArray.asList(): MutableList<Double> {
 }
 
 @JvmOverloads
-fun Any.arrayJoinToString(
+fun Array<*>.joinToString(
     separator: CharSequence = ", ",
     transform: ((Any?) -> CharSequence)? = null
 ): String {
-    return this.arrayJoinToString0(separator = separator, transform = transform)
+    return this.joinToString0(separator = separator, transform = transform)
 }
 
-fun Any.arrayJoinToString(
+fun Array<*>.joinToString(
     separator: CharSequence = ", ",
     limit: Int = -1,
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): String {
-    return this.arrayJoinToString0(
+    return this.joinToString0(
         separator = separator,
         limit = limit,
         truncated = truncated,
@@ -298,7 +250,7 @@ fun Any.arrayJoinToString(
     )
 }
 
-fun Any.arrayJoinToString(
+fun Array<*>.joinToString(
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
     postfix: CharSequence = "",
@@ -306,10 +258,10 @@ fun Any.arrayJoinToString(
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): String {
-    return this.arrayJoinToString0(separator, prefix, postfix, limit, truncated, transform)
+    return this.joinToString0(separator, prefix, postfix, limit, truncated, transform)
 }
 
-private fun Any.arrayJoinToString0(
+private fun Array<*>.joinToString0(
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
     postfix: CharSequence = "",
@@ -317,37 +269,26 @@ private fun Any.arrayJoinToString0(
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): String {
-    return when (this) {
-        is Array<*> -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is BooleanArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is ByteArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is ShortArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is CharArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is IntArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is LongArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is FloatArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is DoubleArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        else -> throw IllegalArgumentException("Not an array: $this")
-    }
+    return joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
 }
 
 @JvmOverloads
-fun <A : Appendable> Any.arrayJoinTo(
+fun <A : Appendable> Array<*>.joinTo(
     buffer: A,
     separator: CharSequence = ", ",
     transform: ((Any?) -> CharSequence)? = null
 ): A {
-    return this.arrayJoinTo0(buffer = buffer, separator = separator, transform = transform)
+    return this.joinTo0(buffer = buffer, separator = separator, transform = transform)
 }
 
-fun <A : Appendable> Any.arrayJoinTo(
+fun <A : Appendable> Array<*>.joinTo(
     buffer: A,
     separator: CharSequence = ", ",
     limit: Int = -1,
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): A {
-    return this.arrayJoinTo0(
+    return this.joinTo0(
         buffer = buffer,
         separator = separator,
         limit = limit,
@@ -356,7 +297,7 @@ fun <A : Appendable> Any.arrayJoinTo(
     )
 }
 
-fun <A : Appendable> Any.arrayJoinTo(
+fun <A : Appendable> Array<*>.joinTo(
     buffer: A,
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
@@ -365,10 +306,10 @@ fun <A : Appendable> Any.arrayJoinTo(
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): A {
-    return this.arrayJoinTo0(buffer, separator, prefix, postfix, limit, truncated, transform)
+    return this.joinTo0(buffer, separator, prefix, postfix, limit, truncated, transform)
 }
 
-fun <A : Appendable> Any.arrayJoinTo0(
+fun <A : Appendable> Array<*>.joinTo0(
     buffer: A,
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
@@ -377,16 +318,27 @@ fun <A : Appendable> Any.arrayJoinTo0(
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): A {
-    return when (this) {
-        is Array<*> -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is BooleanArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is ByteArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is ShortArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is CharArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is IntArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is LongArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is FloatArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is DoubleArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        else -> throw IllegalArgumentException("Not an array: $this")
+    return joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+}
+
+fun Array<*>.toStringArray(): Array<String> {
+    if (this.javaClass == Array<String>::class.java) {
+        return this.asAny()
     }
+    val result = arrayOfNulls<String>(this.size)
+    for (i in this.indices) {
+        result[i] = this[i].toString()
+    }
+    return result.asAny()
+}
+
+fun Array<*>.toStringOrNullArray(): Array<String?> {
+    if (this.javaClass == Array<String>::class.java) {
+        return this.asAny()
+    }
+    val result = arrayOfNulls<String>(this.size)
+    for (i in this.indices) {
+        result[i] = if (this[i] === null) null else this[i].toString()
+    }
+    return result.asAny()
 }

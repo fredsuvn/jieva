@@ -6,7 +6,7 @@ package xyz.srclab.common.reflect
 import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.common.base.Current
 import xyz.srclab.common.base.asAny
-import xyz.srclab.common.base.loadClassOrThrow
+import xyz.srclab.common.base.loadClass
 import java.lang.reflect.Modifier
 
 val Class<*>.isPublic: Boolean
@@ -74,7 +74,7 @@ val Class<*>.isStrict: Boolean
  */
 @JvmOverloads
 fun <T> CharSequence.toClass(classLoader: ClassLoader = Current.classLoader): Class<T> {
-    return this.loadClassOrThrow(classLoader)
+    return this.loadClass(classLoader)
 }
 
 /**
@@ -96,7 +96,7 @@ fun <T> CharSequence.toInstance(
     args: Array<out Any?>,
     classLoader: ClassLoader = Current.classLoader,
 ): T {
-    val clazz: Class<T> = this.loadClassOrThrow(classLoader)
+    val clazz: Class<T> = this.loadClass(classLoader)
     return clazz.toInstance(parameterTypes, args)
 }
 

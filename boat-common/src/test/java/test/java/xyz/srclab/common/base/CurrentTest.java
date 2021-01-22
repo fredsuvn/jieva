@@ -33,14 +33,14 @@ public class CurrentTest {
 
         @Nullable
         public StackTraceElement call() {
-            return Current.callerFrame(getClass());
+            return Current.callerFrameOrNull(getClass());
         }
 
         @Nullable
         public StackTraceElement call2() {
             try {
                 Method callMethod = Caller.class.getMethod("call2");
-                return Current.callerFrame(callMethod);
+                return Current.callerFrameOrNull(callMethod);
             } catch (NoSuchMethodException e) {
                 throw new IllegalStateException(e);
             }
