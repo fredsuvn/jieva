@@ -1,4 +1,4 @@
-@file:JvmName("Require")
+@file:JvmName("Requires")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.base

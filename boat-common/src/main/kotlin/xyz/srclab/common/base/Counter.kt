@@ -59,8 +59,8 @@ interface Counter {
 
         @JvmStatic
         @JvmName("startsAt")
-        fun Int.counterStarts(atomically: Boolean = false): Counter {
-            return if (atomically) AtomicCounter(AtomicLong(this.toLong())) else SimpleCounter(this.toLong())
+        fun Int.counterStarts(atomic: Boolean = false): Counter {
+            return if (atomic) AtomicCounter(AtomicLong(this.toLong())) else SimpleCounter(this.toLong())
         }
 
         @JvmStatic
@@ -71,8 +71,8 @@ interface Counter {
 
         @JvmStatic
         @JvmName("startsAt")
-        fun Long.counterStarts(atomically: Boolean = false): Counter {
-            return if (atomically) AtomicCounter(AtomicLong(this)) else SimpleCounter(this)
+        fun Long.counterStarts(atomic: Boolean = false): Counter {
+            return if (atomic) AtomicCounter(AtomicLong(this)) else SimpleCounter(this)
         }
     }
 }

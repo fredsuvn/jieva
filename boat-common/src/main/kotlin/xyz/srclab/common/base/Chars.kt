@@ -31,7 +31,7 @@ fun ByteArray.toChars(charset: CharSequence): String {
 }
 
 @JvmOverloads
-fun ByteArray.toChars(charset: Charset = Defaults.charset): String {
+fun ByteArray.toChars(charset: Charset = Default.charset): String {
     return String(this, charset)
 }
 
@@ -40,7 +40,7 @@ fun CharArray.toBytes(charset: CharSequence): ByteArray {
 }
 
 @JvmOverloads
-fun CharArray.toBytes(charset: Charset = Defaults.charset): ByteArray {
+fun CharArray.toBytes(charset: Charset = Default.charset): ByteArray {
     return toChars().toByteArray(charset)
 }
 
@@ -49,6 +49,6 @@ fun CharSequence.toBytes(charset: CharSequence): ByteArray {
 }
 
 @JvmOverloads
-fun CharSequence.toBytes(charset: Charset = Defaults.charset): ByteArray {
+fun CharSequence.toBytes(charset: Charset = Default.charset): ByteArray {
     return toString().toByteArray(charset)
 }

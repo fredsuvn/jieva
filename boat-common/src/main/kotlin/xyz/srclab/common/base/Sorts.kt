@@ -1,4 +1,4 @@
-@file:JvmName("Sort")
+@file:JvmName("Sorts")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.base

@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-object Defaults {
+object Default {
 
     /**
      * Represents null value.

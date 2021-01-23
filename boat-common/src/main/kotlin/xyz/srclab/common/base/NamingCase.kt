@@ -48,49 +48,49 @@ interface NamingCase {
 
 object LowerCamel : CamelCase() {
     override fun doFirst(first: CharSequence): String {
-        return first.toString().decapitalize(Defaults.locale)
+        return first.toString().decapitalize(Default.locale)
     }
 }
 
 object UpperCamel : CamelCase() {
     override fun doFirst(first: CharSequence): String {
-        return first.toString().capitalize(Defaults.locale)
+        return first.toString().capitalize(Default.locale)
     }
 }
 
 object LowerUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Defaults.locale)
+        return word.toString().toLowerCase(Default.locale)
     }
 }
 
 object UpperUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toUpperCase(Defaults.locale)
+        return word.toString().toUpperCase(Default.locale)
     }
 }
 
 object CapitalizeUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Defaults.locale).capitalize(Defaults.locale)
+        return word.toString().toLowerCase(Default.locale).capitalize(Default.locale)
     }
 }
 
 object LowerHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Defaults.locale)
+        return word.toString().toLowerCase(Default.locale)
     }
 }
 
 object UpperHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toUpperCase(Defaults.locale)
+        return word.toString().toUpperCase(Default.locale)
     }
 }
 
 object CapitalizeHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Defaults.locale).capitalize(Defaults.locale)
+        return word.toString().toLowerCase(Default.locale).capitalize(Default.locale)
     }
 }
 
@@ -153,11 +153,11 @@ abstract class CamelCase : NamingCase {
             throw IllegalArgumentException("Word of given first joined word should have at least 1 char.")
         }
         if (first.length > 1 && StringUtils.isAllUpperCase(first)) {
-            return words.joinToString("") { it.toString().capitalize(Defaults.locale) }
+            return words.joinToString("") { it.toString().capitalize(Default.locale) }
         }
         return doFirst(first) +
                 words.subList(1, words.size).joinToString("") {
-                    it.toString().capitalize(Defaults.locale)
+                    it.toString().capitalize(Default.locale)
                 }
     }
 

@@ -5,6 +5,18 @@ package xyz.srclab.common.base
 
 import java.util.*
 
+fun <T> Any?.asAny(): T {
+    return this as T
+}
+
+fun <T> Nothing?.asAny(): T {
+    return this as T
+}
+
+fun <T : Any> T?.asNotNull(): T {
+    return this as T
+}
+
 fun Any?.equals(other: Any?): Boolean {
     return Objects.equals(this, other)
 }

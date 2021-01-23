@@ -1,4 +1,4 @@
-@file:JvmName("Loader")
+@file:JvmName("Loaders")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.base
@@ -58,7 +58,7 @@ fun CharSequence.loadBytesResource(classLoader: ClassLoader = Current.classLoade
 
 @JvmOverloads
 fun CharSequence.loadStringResourceOrNull(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
 ): String? {
     return loadBytesResourceOrNull(classLoader)?.toChars(charset)
 }
@@ -68,7 +68,7 @@ fun CharSequence.loadStringResourceOrNull(
  */
 @JvmOverloads
 fun CharSequence.loadStringResource(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
 ): String {
     return this.loadStringResourceOrNull(classLoader, charset) ?: throw ResourceNotFoundException(this)
 }
@@ -90,7 +90,7 @@ fun CharSequence.loadBytesResources(classLoader: ClassLoader = Current.classLoad
 
 @JvmOverloads
 fun CharSequence.loadStringResources(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
 ): List<String> {
     return loadBytesResources(classLoader).map { bytes -> bytes.toChars(charset) }
 }

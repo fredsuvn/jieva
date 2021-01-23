@@ -17,12 +17,12 @@ import kotlin.toBigDecimal as numberToBigDecimalKt
 import kotlin.toBigInteger as numberToBigIntegerKt
 
 @JvmOverloads
-fun CharSequence.toByte(radix: Int = Defaults.radix): Byte {
+fun CharSequence.toByte(radix: Int = Default.radix): Byte {
     return this.toString().toByteKt(radix)
 }
 
 @JvmOverloads
-fun Any?.toByte(radix: Int = Defaults.radix): Byte {
+fun Any?.toByte(radix: Int = Default.radix): Byte {
     return when (this) {
         null -> 0
         is Number -> if (radix == 10) toByte() else toString().toByteKt(radix)
@@ -33,12 +33,12 @@ fun Any?.toByte(radix: Int = Defaults.radix): Byte {
 }
 
 @JvmOverloads
-fun CharSequence.toShort(radix: Int = Defaults.radix): Short {
+fun CharSequence.toShort(radix: Int = Default.radix): Short {
     return this.toString().toShortKt(radix)
 }
 
 @JvmOverloads
-fun Any?.toShort(radix: Int = Defaults.radix): Short {
+fun Any?.toShort(radix: Int = Default.radix): Short {
     return when (this) {
         null -> 0
         is Number -> if (radix == 10) toShort() else toString().toShortKt(radix)
@@ -49,12 +49,12 @@ fun Any?.toShort(radix: Int = Defaults.radix): Short {
 }
 
 @JvmOverloads
-fun CharSequence.toChar(radix: Int = Defaults.radix): Char {
+fun CharSequence.toChar(radix: Int = Default.radix): Char {
     return this.toString().toIntKt(radix).toChar()
 }
 
 @JvmOverloads
-fun Any?.toChar(radix: Int = Defaults.radix): Char {
+fun Any?.toChar(radix: Int = Default.radix): Char {
     return when (this) {
         null -> 0.toChar()
         is Number -> if (radix == 10) toChar() else toString().toIntKt(radix).toChar()
@@ -65,12 +65,12 @@ fun Any?.toChar(radix: Int = Defaults.radix): Char {
 }
 
 @JvmOverloads
-fun CharSequence.toInt(radix: Int = Defaults.radix): Int {
+fun CharSequence.toInt(radix: Int = Default.radix): Int {
     return this.toString().toIntKt(radix)
 }
 
 @JvmOverloads
-fun Any?.toInt(radix: Int = Defaults.radix): Int {
+fun Any?.toInt(radix: Int = Default.radix): Int {
     return when (this) {
         null -> 0
         is Number -> if (radix == 10) toInt() else toString().toIntKt(radix)
@@ -81,12 +81,12 @@ fun Any?.toInt(radix: Int = Defaults.radix): Int {
 }
 
 @JvmOverloads
-fun CharSequence.toLong(radix: Int = Defaults.radix): Long {
+fun CharSequence.toLong(radix: Int = Default.radix): Long {
     return this.toString().toLongKt(radix)
 }
 
 @JvmOverloads
-fun Any?.toLong(radix: Int = Defaults.radix): Long {
+fun Any?.toLong(radix: Int = Default.radix): Long {
     return when (this) {
         null -> 0L
         is Number -> if (radix == 10) toLong() else toString().toLongKt(radix)
@@ -125,7 +125,7 @@ fun Any?.toDouble(): Double {
 }
 
 @JvmOverloads
-fun CharSequence.toBigInteger(radix: Int = Defaults.radix): BigInteger {
+fun CharSequence.toBigInteger(radix: Int = Default.radix): BigInteger {
     if (radix == 10) {
         return when (this) {
             "", "0" -> BigInteger.ZERO
@@ -138,7 +138,7 @@ fun CharSequence.toBigInteger(radix: Int = Defaults.radix): BigInteger {
 }
 
 @JvmOverloads
-fun Any?.toBigInteger(radix: Int = Defaults.radix): BigInteger {
+fun Any?.toBigInteger(radix: Int = Default.radix): BigInteger {
     if (radix == 10) {
         return when (this) {
             null -> BigInteger.ZERO
