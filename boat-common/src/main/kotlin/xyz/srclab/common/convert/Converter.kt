@@ -36,7 +36,7 @@ interface Converter {
     fun <T> convert(from: Any?, toType: Class<T>): T {
         for (handler in convertHandlers) {
             val result = handler.convert(from, toType, this)
-            if (result === Defaults.NULL) {
+            if (result === Default.NULL) {
                 return null.asAny()
             }
             if (result !== null) {
@@ -50,7 +50,7 @@ interface Converter {
     fun <T> convert(from: Any?, toType: Type): T {
         for (handler in convertHandlers) {
             val result = handler.convert(from, toType, this)
-            if (result === Defaults.NULL) {
+            if (result === Default.NULL) {
                 return null.asAny()
             }
             if (result !== null) {
@@ -69,7 +69,7 @@ interface Converter {
     fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
         for (handler in convertHandlers) {
             val result = handler.convert(from, fromType, toType, this)
-            if (result === Defaults.NULL) {
+            if (result === Default.NULL) {
                 return null.asAny()
             }
             if (result !== null) {
@@ -112,17 +112,17 @@ interface Converter {
 interface ConvertHandler {
 
     /**
-     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
+     * Return null if [from] cannot be converted, return [Default.NULL] if result value is null.
      */
     fun convert(from: Any?, toType: Class<*>, converter: Converter): Any?
 
     /**
-     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
+     * Return null if [from] cannot be converted, return [Default.NULL] if result value is null.
      */
     fun convert(from: Any?, toType: Type, converter: Converter): Any?
 
     /**
-     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
+     * Return null if [from] cannot be converted, return [Default.NULL] if result value is null.
      */
     fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any?
 
@@ -148,7 +148,7 @@ object NopConvertHandler : ConvertHandler {
             return from
         }
         if (from === null) {
-            return Defaults.NULL
+            return Default.NULL
         }
         val fromClass = from.javaClass
         if (fromClass == toType || toType.isAssignableFrom(fromClass)) {
@@ -330,7 +330,7 @@ abstract class AbstractTypeConvertHandler : ConvertHandler {
 object IterableConvertHandler : AbstractTypeConvertHandler() {
 
     override fun convertNull(toType: Type, converter: Converter): Any? {
-        return Defaults.NULL
+        return Default.NULL
     }
 
     override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
@@ -471,7 +471,7 @@ open class BeanConvertHandler(
 ) : AbstractTypeConvertHandler() {
 
     override fun doConvertNull(toType: Type, converter: Converter): Any? {
-        return Defaults.NULL
+        return Default.NULL
     }
 
     override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {

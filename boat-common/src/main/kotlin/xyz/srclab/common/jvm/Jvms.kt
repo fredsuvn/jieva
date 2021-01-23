@@ -3,12 +3,13 @@
 
 package xyz.srclab.common.jvm
 
-import xyz.srclab.common.base.Defaults
-import java.lang.reflect.*
+import xyz.srclab.common.base.Default
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 
-const val CONSTRUCTOR_METHOD_NAME = "<init>"
-
-private const val WRONG_TYPE_PREFIX = "Wrong type"
+//const val CONSTRUCTOR_METHOD_NAME = "<init>"
+//
+//private const val WRONG_TYPE_PREFIX = "Wrong type"
 
 val Class<*>.jvmName: String
     @JvmName("jvmName") get() {
@@ -47,75 +48,76 @@ val Method.jvmDescriptor: String
         return "($parameterTypesDescriptors)$returnDescriptor"
     }
 
-val Type.jvmJavaTypeSignature: String
-    @JvmName("jvmJavaTypeSignature") get() {
-        return when (this) {
-            is Class<*> -> this.jvmDescriptor
-            is GenericArrayType -> "[${this.genericComponentType.jvmJavaTypeSignature}"
-            is TypeVariable<*> -> "T${this.name};"
-            is WildcardType -> {
-                if (this.upperBounds)
-            }
-            is ParameterizedType -> {
-
-            }
-            else -> throw IllegalArgumentException("$WRONG_TYPE_PREFIX: $this")
-        }
-    }
-
-val Field.jvmJavaTypeSignature: String
-    @JvmName("jvmJavaTypeSignature") get() {
-        return this.genericType.jvmJavaTypeSignature
-    }
-
-val Type.jvmClassSignature: String
-    @JvmName("jvmClassSignature") get() {
-        return when (this) {
-            is Class<*> -> {
-
-                val typeParameters = this.typeParameters
-                if (typeParameters.isNullOrEmpty()) {
-                    this.jvmDescriptor
-                }
-                ""
-            }
-            else -> throw IllegalArgumentException("$WRONG_TYPE_PREFIX: $this")
-        }
-    }
-
-val Field.jvmClassSignature: String
-    @JvmName("jvmClassSignature") get() {
-        return this.genericType.jvmClassSignature
-    }
-
-val Method.jvmSignature: String
-    @JvmName("jvmSignature") get() {
-        val buf = StringBuilder()
-        val typeParameters = this.typeParameters
-        if (!typeParameters.isNullOrEmpty()) {
-            buf.append(typeParameters.joinToString(separator = "") { it.jvmTypeParameterSignature })
-        }
-        buf.append('{')
-            .append(this.genericParameterTypes.joinToString(separator = "") { it.jvmJavaTypeSignature })
-            .append('}')
-            .append(this.genericReturnType.jvmJavaTypeSignature)
-        val exceptionTypes = this.exceptionTypes
-        if (!exceptionTypes.isNullOrEmpty()) {
-            buf.append(exceptionTypes.joinToString(separator = "") { it.jvmJavaTypeSignature })
-        }
-        return buf.toString()
-    }
-
-val TypeVariable<*>.jvmTypeArgumentSignature: String
-    @JvmName("jvmTypeArgumentSignature") get() {
-        return ""
-    }
-
-val TypeVariable<*>.jvmTypeParameterSignature: String
-    @JvmName("jvmTypeParameterSignature") get() {
-        return ""
-    }
+//val Type.jvmJavaTypeSignature: String
+//    @JvmName("jvmJavaTypeSignature") get() {
+//        return when (this) {
+//            is Class<*> -> this.jvmDescriptor
+//            is GenericArrayType -> "[${this.genericComponentType.jvmJavaTypeSignature}"
+//            is TypeVariable<*> -> "T${this.name};"
+//            is WildcardType -> {
+//                if (this.upperBounds)
+//            }
+//            is ParameterizedType -> {
+//
+//            }
+//            else -> throw IllegalArgumentException("$WRONG_TYPE_PREFIX: $this")
+//        }
+//    }
+//
+//val Field.jvmJavaTypeSignature: String
+//    @JvmName("jvmJavaTypeSignature") get() {
+//        return this.genericType.jvmJavaTypeSignature
+//    }
+//
+//val Type.jvmClassSignature: String
+//    @JvmName("jvmClassSignature") get() {
+//        return when (this) {
+//            is Class<*> -> {
+//
+//                val typeParameters = this.typeParameters
+//                if (typeParameters.isNullOrEmpty()) {
+//                    this.jvmDescriptor
+//                }
+//                ""
+//            }
+//            else -> throw IllegalArgumentException("$WRONG_TYPE_PREFIX: $this")
+//        }
+//    }
+//
+//val Field.jvmClassSignature: String
+//    @JvmName("jvmClassSignature") get() {
+//        return this.genericType.jvmClassSignature
+//    }
+//
+//val Method.jvmSignature: String
+//    @JvmName("jvmSignature") get() {
+//        val buf = StringBuilder()
+//        val typeParameters = this.typeParameters
+//        if (!typeParameters.isNullOrEmpty()) {
+//            buf.append(typeParameters.joinToString(separator = "") { it.jvmTypeParameterSignature })
+//        }
+//        buf.append('{')
+//            .append(this.genericParameterTypes.joinToString(separator = "") { it.jvmJavaTypeSignature })
+//            .append('}')
+//            .append(this.genericReturnType.jvmJavaTypeSignature)
+//        val exceptionTypes = this.exceptionTypes
+//        if (!exceptionTypes.isNullOrEmpty()) {
+//            buf.append(exceptionTypes.joinToString(separator = "") { it.jvmJavaTypeSignature })
+//        }
+//        return buf.toString()
+//    }
+//
+//val TypeVariable<*>.jvmTypeArgumentSignature: String
+//    @JvmName("jvmTypeArgumentSignature") get() {
+//        return ""
+//    }
+//
+//val TypeVariable<*>.jvmTypeParameterSignature: String
+//    @JvmName("jvmTypeParameterSignature") get() {
+//        return ""
+//    }
+//
 
 fun CharSequence.toJvmClassName(): String {
-    return Defaults.DOT_MATCHER.replaceFrom(this, '/')
+    return Default.DOT_MATCHER.replaceFrom(this, '/')
 }

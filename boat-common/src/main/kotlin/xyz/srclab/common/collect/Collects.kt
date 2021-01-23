@@ -1,4 +1,4 @@
-@file:JvmName("Collect")
+@file:JvmName("Collects")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.collect

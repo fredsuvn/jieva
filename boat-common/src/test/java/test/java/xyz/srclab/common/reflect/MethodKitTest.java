@@ -36,15 +36,15 @@ public class MethodKitTest {
     @Test
     public void testFind() throws Exception {
         Assert.assertEquals(
-                MethodKit.findMethods(NewClass.class),
+                MethodKit.methods(NewClass.class),
                 Arrays.asList(NewClass.class.getMethods())
         );
         Assert.assertEquals(
-                MethodKit.findDeclaredMethods(NewClass.class),
+                MethodKit.declaredMethods(NewClass.class),
                 Arrays.asList(NewClass.class.getDeclaredMethods())
         );
         Assert.assertEquals(
-                ListOps.sorted(MethodKit.findOwnedMethods(SubNewClass.class), Comparator.comparing(Method::toString)),
+                ListOps.sorted(MethodKit.ownedMethods(SubNewClass.class), Comparator.comparing(Method::toString)),
                 ListOps.sorted(Arrays.asList(
                         subPublicMethod,
                         publicMethod,
@@ -65,10 +65,10 @@ public class MethodKitTest {
         );
 
         Assert.assertEquals(
-                MethodKit.findOwnedMethod(NewClass.class, "protectedMethod"),
+                MethodKit.ownedMethodOrNull(NewClass.class, "protectedMethod"),
                 NewClass.class.getDeclaredMethod("protectedMethod")
         );
-        Assert.assertNull(MethodKit.findOwnedMethod(NewClass.class, "superProtectedMethod"));
+        Assert.assertNull(MethodKit.ownedMethodOrNull(NewClass.class, "superProtectedMethod"));
 
         Assert.assertEquals(
                 MethodKit.searchMethods(SubNewClass.class, m -> m.getName().contains("ackage")),

@@ -9,7 +9,7 @@ import xyz.srclab.common.base.Loader;
 
 import java.util.Collections;
 
-public class LoaderTest {
+public class LoadersKtTest {
 
     @Test
     public void testLoader() {

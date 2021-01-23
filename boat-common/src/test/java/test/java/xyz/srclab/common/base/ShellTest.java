@@ -15,19 +15,19 @@ public class ShellTest {
         shell.println(Arrays.asList("Hello", ",", "World", "!"));
         shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
         shell.println(
-                SgiChars.foregroundRed("red"),
-                SgiChars.backgroundCyan(" "),
-                SgiChars.foregroundGreen("green")
+                SgrChars.foregroundRed("red"),
+                SgrChars.backgroundCyan(" "),
+                SgrChars.foregroundGreen("green")
         );
         shell.println(
-                SgiChars.withParam("bright red", SgiParam.FOREGROUND_BRIGHT_RED),
-                SgiChars.backgroundCyan(" "),
-                SgiChars.withParam("bright green", SgiParam.FOREGROUND_BRIGHT_GREEN)
+                SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
+                SgrChars.backgroundCyan(" "),
+                SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
         );
         shell.println(
-                SgiChars.withParam("color 8", SgiParam.foregroundColor(8)),
-                SgiChars.backgroundCyan(" "),
-                SgiChars.withParam("rgb(100, 100, 50)", SgiParam.foregroundColor(100, 100, 50))
+                SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
+                SgrChars.backgroundCyan(" "),
+                SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
         );
         shell.println(ControlChars.beep());
         System.out.println("123\010456\007");
@@ -45,13 +45,13 @@ public class ShellTest {
 
     private void testShellProcessOnUnixLike() {
         Shell shell = Shell.DEFAULT;
-        String content = "first line;" + Defaults.lineSeparator() +
-                "第二行;" + Defaults.lineSeparator() +
+        String content = "first line;" + Default.lineSeparator() +
+                "第二行;" + Default.lineSeparator() +
                 "third line.";
         ShellProcess shellProcess = shell.run("echo", content);
         String output = shellProcess.readAll();
         System.out.println(output);
-        Assert.assertEquals(output, content + Defaults.lineSeparator());
+        Assert.assertEquals(output, content + Default.lineSeparator());
         shellProcess.close();
     }
 
