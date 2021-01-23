@@ -68,12 +68,18 @@ interface ShellProcess : ShellIO {
             return process.isAlive
         }
 
+    /**
+     * @throws InterruptedException
+     */
     @JvmDefault
     //@Throws(InterruptedException::class)
     fun waitFor(): Int {
         return process.waitFor()
     }
 
+    /**
+     * @throws InterruptedException
+     */
     @JvmDefault
     //@Throws(InterruptedException::class)
     fun waitFor(timeout: Duration): Boolean {
@@ -417,6 +423,8 @@ object EscapeChars {
 }
 
 /**
+ * ECMA-48 CSI sequences:
+ *
  * CSI (or ESC [) is followed by a sequence of  parameters,  at  most  NPAR  (16),  that  are
  * decimal  numbers  separated by semicolons.  An empty or absent parameter is taken to be 0.
  * The sequence of parameters may be preceded by a single question mark.
@@ -636,119 +644,129 @@ object CsiChars {
     }
 }
 
-object SgiChars {
+/**
+ * ECMA-48 Set Graphics Rendition:
+ *
+ * The  ECMA-48  SGR sequence ESC [ parameters m sets display attributes.  Several attributes
+ * can be set in the same sequence, separated by semicolons.   An  empty  parameter  (between
+ * semicolons or string initiator or terminator) is interpreted as a zero.
+ */
+object SgrChars {
 
     @JvmStatic
     val reset: String
-        @JvmName("reset") get() = EscapeChars.csiChars("${SgiParam.RESET.value}m")
+        @JvmName("reset") get() = EscapeChars.csiChars("${SgrParam.RESET.value}m")
 
     @JvmStatic
     fun foregroundBlack(content: Any?): String {
-        return withParam(content, SgiParam.FOREGROUND_BLACK)
+        return withParam(content, SgrParam.FOREGROUND_BLACK)
     }
 
     @JvmStatic
     fun foregroundRed(content: Any?): String {
-        return withParam(content, SgiParam.FOREGROUND_RED)
+        return withParam(content, SgrParam.FOREGROUND_RED)
     }
 
     @JvmStatic
     fun foregroundGreen(content: Any?): String {
-        return withParam(content, SgiParam.FOREGROUND_GREEN)
+        return withParam(content, SgrParam.FOREGROUND_GREEN)
     }
 
     @JvmStatic
     fun foregroundBrown(content: Any?): String {
-        return withParam(content, SgiParam.FOREGROUND_BROWN)
+        return withParam(content, SgrParam.FOREGROUND_BROWN)
     }
 
     @JvmStatic
     fun foregroundBlue(content: Any?): String {
-        return withParam(content, SgiParam.FOREGROUND_BLUE)
+        return withParam(content, SgrParam.FOREGROUND_BLUE)
     }
 
     @JvmStatic
     fun foregroundMagenta(content: Any?): String {
-        return withParam(content, SgiParam.FOREGROUND_MAGENTA)
+        return withParam(content, SgrParam.FOREGROUND_MAGENTA)
     }
 
     @JvmStatic
     fun foregroundCyan(content: Any?): String {
-        return withParam(content, SgiParam.FOREGROUND_CYAN)
+        return withParam(content, SgrParam.FOREGROUND_CYAN)
     }
 
     @JvmStatic
     fun foregroundWhite(content: Any?): String {
-        return withParam(content, SgiParam.FOREGROUND_WHITE)
+        return withParam(content, SgrParam.FOREGROUND_WHITE)
     }
 
     @JvmStatic
     fun foregroundDefault(content: Any?): String {
-        return withParam(content, SgiParam.FOREGROUND_DEFAULT)
+        return withParam(content, SgrParam.FOREGROUND_DEFAULT)
     }
 
     @JvmStatic
     fun backgroundBlack(content: Any?): String {
-        return withParam(content, SgiParam.BACKGROUND_BLACK)
+        return withParam(content, SgrParam.BACKGROUND_BLACK)
     }
 
     @JvmStatic
     fun backgroundRed(content: Any?): String {
-        return withParam(content, SgiParam.BACKGROUND_RED)
+        return withParam(content, SgrParam.BACKGROUND_RED)
     }
 
     @JvmStatic
     fun backgroundGreen(content: Any?): String {
-        return withParam(content, SgiParam.BACKGROUND_GREEN)
+        return withParam(content, SgrParam.BACKGROUND_GREEN)
     }
 
     @JvmStatic
     fun backgroundBrown(content: Any?): String {
-        return withParam(content, SgiParam.BACKGROUND_BROWN)
+        return withParam(content, SgrParam.BACKGROUND_BROWN)
     }
 
     @JvmStatic
     fun backgroundBlue(content: Any?): String {
-        return withParam(content, SgiParam.BACKGROUND_BLUE)
+        return withParam(content, SgrParam.BACKGROUND_BLUE)
     }
 
     @JvmStatic
     fun backgroundMagenta(content: Any?): String {
-        return withParam(content, SgiParam.BACKGROUND_MAGENTA)
+        return withParam(content, SgrParam.BACKGROUND_MAGENTA)
     }
 
     @JvmStatic
     fun backgroundCyan(content: Any?): String {
-        return withParam(content, SgiParam.BACKGROUND_CYAN)
+        return withParam(content, SgrParam.BACKGROUND_CYAN)
     }
 
     @JvmStatic
     fun backgroundWhite(content: Any?): String {
-        return withParam(content, SgiParam.BACKGROUND_WHITE)
+        return withParam(content, SgrParam.BACKGROUND_WHITE)
     }
 
     @JvmStatic
     fun backgroundDefault(content: Any?): String {
-        return withParam(content, SgiParam.BACKGROUND_DEFAULT)
+        return withParam(content, SgrParam.BACKGROUND_DEFAULT)
     }
 
     @JvmStatic
-    fun withParam(content: Any?, sgiParams: SgiParam): String {
-        return EscapeChars.csiChars("${sgiParams.value}m${content}") + reset
+    fun withParam(content: Any?, sgrParams: SgrParam): String {
+        return EscapeChars.csiChars("${sgrParams.value}m${content}") + reset
     }
 
     @JvmStatic
-    fun withParams(content: Any?, vararg sgiParams: SgiParam): String {
-        return withParam(content, SgiParam.concat(*sgiParams))
+    fun withParams(content: Any?, vararg sgrParams: SgrParam): String {
+        return withParam(content, SgrParam.concat(*sgrParams))
     }
 
     @JvmStatic
-    fun withParams(content: Any?, sgiParams: List<SgiParam>): String {
-        return withParam(content, SgiParam.concat(sgiParams))
+    fun withParams(content: Any?, sgrParams: List<SgrParam>): String {
+        return withParam(content, SgrParam.concat(sgrParams))
     }
 }
 
-interface SgiParam {
+/**
+ * Parameters for [SgrChars].
+ */
+interface SgrParam {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val value: String
@@ -757,226 +775,226 @@ interface SgiParam {
     companion object {
 
         @JvmField
-        val RESET: SgiParam = SgiParam.of("0")
+        val RESET: SgrParam = SgrParam.of("0")
 
         @JvmField
-        val BOLD: SgiParam = SgiParam.of("1")
+        val BOLD: SgrParam = SgrParam.of("1")
 
         @JvmField
-        val HALF_BRIGHT: SgiParam = SgiParam.of("2")
+        val HALF_BRIGHT: SgrParam = SgrParam.of("2")
 
         @JvmField
-        val ITALIC: SgiParam = SgiParam.of("3")
+        val ITALIC: SgrParam = SgrParam.of("3")
 
         @JvmField
-        val UNDERSCORE: SgiParam = SgiParam.of("4")
+        val UNDERSCORE: SgrParam = SgrParam.of("4")
 
         @JvmField
-        val BLINK: SgiParam = SgiParam.of("5")
+        val BLINK: SgrParam = SgrParam.of("5")
 
         @JvmField
-        val FAST_BLINK: SgiParam = SgiParam.of("6")
+        val FAST_BLINK: SgrParam = SgrParam.of("6")
 
         @JvmField
-        val INVERSE: SgiParam = SgiParam.of("7")
+        val INVERSE: SgrParam = SgrParam.of("7")
 
         @JvmField
-        val INVISIBLE: SgiParam = SgiParam.of("8")
+        val INVISIBLE: SgrParam = SgrParam.of("8")
 
         @JvmField
-        val STRIKETHROUGH: SgiParam = SgiParam.of("9")
+        val STRIKETHROUGH: SgrParam = SgrParam.of("9")
 
         @JvmField
-        val PRIMARY_FONT: SgiParam = SgiParam.of("10")
+        val PRIMARY_FONT: SgrParam = SgrParam.of("10")
 
         @JvmField
-        val ALTERNATE_FONT_1: SgiParam = SgiParam.of("11")
+        val ALTERNATE_FONT_1: SgrParam = SgrParam.of("11")
 
         @JvmField
-        val ALTERNATE_FONT_2: SgiParam = SgiParam.of("12")
+        val ALTERNATE_FONT_2: SgrParam = SgrParam.of("12")
 
         @JvmField
-        val ALTERNATE_FONT_3: SgiParam = SgiParam.of("13")
+        val ALTERNATE_FONT_3: SgrParam = SgrParam.of("13")
 
         @JvmField
-        val ALTERNATE_FONT_4: SgiParam = SgiParam.of("14")
+        val ALTERNATE_FONT_4: SgrParam = SgrParam.of("14")
 
         @JvmField
-        val ALTERNATE_FONT_5: SgiParam = SgiParam.of("15")
+        val ALTERNATE_FONT_5: SgrParam = SgrParam.of("15")
 
         @JvmField
-        val ALTERNATE_FONT_6: SgiParam = SgiParam.of("16")
+        val ALTERNATE_FONT_6: SgrParam = SgrParam.of("16")
 
         @JvmField
-        val ALTERNATE_FONT_7: SgiParam = SgiParam.of("17")
+        val ALTERNATE_FONT_7: SgrParam = SgrParam.of("17")
 
         @JvmField
-        val ALTERNATE_FONT_8: SgiParam = SgiParam.of("18")
+        val ALTERNATE_FONT_8: SgrParam = SgrParam.of("18")
 
         @JvmField
-        val ALTERNATE_FONT_9: SgiParam = SgiParam.of("19")
+        val ALTERNATE_FONT_9: SgrParam = SgrParam.of("19")
 
         @JvmField
-        val BOLD_OFF: SgiParam = SgiParam.of("21")
+        val BOLD_OFF: SgrParam = SgrParam.of("21")
 
         @JvmField
-        val HALF_BRIGHT_OFF: SgiParam = SgiParam.of("22")
+        val HALF_BRIGHT_OFF: SgrParam = SgrParam.of("22")
 
         @JvmField
-        val ITALIC_OFF: SgiParam = SgiParam.of("23")
+        val ITALIC_OFF: SgrParam = SgrParam.of("23")
 
         @JvmField
-        val UNDERSCORE_OFF: SgiParam = SgiParam.of("24")
+        val UNDERSCORE_OFF: SgrParam = SgrParam.of("24")
 
         @JvmField
-        val BLINK_OFF: SgiParam = SgiParam.of("25")
+        val BLINK_OFF: SgrParam = SgrParam.of("25")
 
         @JvmField
-        val FAST_BLINK_OFF: SgiParam = SgiParam.of("26")
+        val FAST_BLINK_OFF: SgrParam = SgrParam.of("26")
 
         @JvmField
-        val INVERSE_OFF: SgiParam = SgiParam.of("27")
+        val INVERSE_OFF: SgrParam = SgrParam.of("27")
 
         @JvmField
-        val INVISIBLE_OFF: SgiParam = SgiParam.of("28")
+        val INVISIBLE_OFF: SgrParam = SgrParam.of("28")
 
         @JvmField
-        val STRIKETHROUGH_OFF: SgiParam = SgiParam.of("29")
+        val STRIKETHROUGH_OFF: SgrParam = SgrParam.of("29")
 
         @JvmField
-        val FOREGROUND_BLACK: SgiParam = SgiParam.of("30")
+        val FOREGROUND_BLACK: SgrParam = SgrParam.of("30")
 
         @JvmField
-        val FOREGROUND_RED: SgiParam = SgiParam.of("31")
+        val FOREGROUND_RED: SgrParam = SgrParam.of("31")
 
         @JvmField
-        val FOREGROUND_GREEN: SgiParam = SgiParam.of("32")
+        val FOREGROUND_GREEN: SgrParam = SgrParam.of("32")
 
         @JvmField
-        val FOREGROUND_BROWN: SgiParam = SgiParam.of("33")
+        val FOREGROUND_BROWN: SgrParam = SgrParam.of("33")
 
         @JvmField
-        val FOREGROUND_BLUE: SgiParam = SgiParam.of("34")
+        val FOREGROUND_BLUE: SgrParam = SgrParam.of("34")
 
         @JvmField
-        val FOREGROUND_MAGENTA: SgiParam = SgiParam.of("35")
+        val FOREGROUND_MAGENTA: SgrParam = SgrParam.of("35")
 
         @JvmField
-        val FOREGROUND_CYAN: SgiParam = SgiParam.of("36")
+        val FOREGROUND_CYAN: SgrParam = SgrParam.of("36")
 
         @JvmField
-        val FOREGROUND_WHITE: SgiParam = SgiParam.of("37")
+        val FOREGROUND_WHITE: SgrParam = SgrParam.of("37")
 
         @JvmField
-        val FOREGROUND_DEFAULT: SgiParam = SgiParam.of("39")
+        val FOREGROUND_DEFAULT: SgrParam = SgrParam.of("39")
 
         @JvmField
-        val BACKGROUND_BLACK: SgiParam = SgiParam.of("40")
+        val BACKGROUND_BLACK: SgrParam = SgrParam.of("40")
 
         @JvmField
-        val BACKGROUND_RED: SgiParam = SgiParam.of("41")
+        val BACKGROUND_RED: SgrParam = SgrParam.of("41")
 
         @JvmField
-        val BACKGROUND_GREEN: SgiParam = SgiParam.of("42")
+        val BACKGROUND_GREEN: SgrParam = SgrParam.of("42")
 
         @JvmField
-        val BACKGROUND_BROWN: SgiParam = SgiParam.of("43")
+        val BACKGROUND_BROWN: SgrParam = SgrParam.of("43")
 
         @JvmField
-        val BACKGROUND_BLUE: SgiParam = SgiParam.of("44")
+        val BACKGROUND_BLUE: SgrParam = SgrParam.of("44")
 
         @JvmField
-        val BACKGROUND_MAGENTA: SgiParam = SgiParam.of("45")
+        val BACKGROUND_MAGENTA: SgrParam = SgrParam.of("45")
 
         @JvmField
-        val BACKGROUND_CYAN: SgiParam = SgiParam.of("46")
+        val BACKGROUND_CYAN: SgrParam = SgrParam.of("46")
 
         @JvmField
-        val BACKGROUND_WHITE: SgiParam = SgiParam.of("47")
+        val BACKGROUND_WHITE: SgrParam = SgrParam.of("47")
 
         @JvmField
-        val BACKGROUND_DEFAULT: SgiParam = SgiParam.of("49")
+        val BACKGROUND_DEFAULT: SgrParam = SgrParam.of("49")
 
         @JvmField
-        val FRAMED: SgiParam = SgiParam.of("51")
+        val FRAMED: SgrParam = SgrParam.of("51")
 
         @JvmField
-        val ENCIRCLED: SgiParam = SgiParam.of("52")
+        val ENCIRCLED: SgrParam = SgrParam.of("52")
 
         @JvmField
-        val OVERLINE: SgiParam = SgiParam.of("53")
+        val OVERLINE: SgrParam = SgrParam.of("53")
 
         @JvmField
-        val FRAMED_ENCIRCLED_OFF: SgiParam = SgiParam.of("54")
+        val FRAMED_ENCIRCLED_OFF: SgrParam = SgrParam.of("54")
 
         @JvmField
-        val OVERLINE_OFF: SgiParam = SgiParam.of("55")
+        val OVERLINE_OFF: SgrParam = SgrParam.of("55")
 
         @JvmField
-        val FOREGROUND_BRIGHT_BLACK: SgiParam = SgiParam.of("90")
+        val FOREGROUND_BRIGHT_BLACK: SgrParam = SgrParam.of("90")
 
         @JvmField
-        val FOREGROUND_BRIGHT_RED: SgiParam = SgiParam.of("91")
+        val FOREGROUND_BRIGHT_RED: SgrParam = SgrParam.of("91")
 
         @JvmField
-        val FOREGROUND_BRIGHT_GREEN: SgiParam = SgiParam.of("92")
+        val FOREGROUND_BRIGHT_GREEN: SgrParam = SgrParam.of("92")
 
         @JvmField
-        val FOREGROUND_BRIGHT_BROWN: SgiParam = SgiParam.of("93")
+        val FOREGROUND_BRIGHT_BROWN: SgrParam = SgrParam.of("93")
 
         @JvmField
-        val FOREGROUND_BRIGHT_BLUE: SgiParam = SgiParam.of("94")
+        val FOREGROUND_BRIGHT_BLUE: SgrParam = SgrParam.of("94")
 
         @JvmField
-        val FOREGROUND_BRIGHT_MAGENTA: SgiParam = SgiParam.of("95")
+        val FOREGROUND_BRIGHT_MAGENTA: SgrParam = SgrParam.of("95")
 
         @JvmField
-        val FOREGROUND_BRIGHT_CYAN: SgiParam = SgiParam.of("96")
+        val FOREGROUND_BRIGHT_CYAN: SgrParam = SgrParam.of("96")
 
         @JvmField
-        val FOREGROUND_BRIGHT_WHITE: SgiParam = SgiParam.of("97")
+        val FOREGROUND_BRIGHT_WHITE: SgrParam = SgrParam.of("97")
 
         @JvmField
-        val BACKGROUND_BRIGHT_BLACK: SgiParam = SgiParam.of("100")
+        val BACKGROUND_BRIGHT_BLACK: SgrParam = SgrParam.of("100")
 
         @JvmField
-        val BACKGROUND_BRIGHT_RED: SgiParam = SgiParam.of("101")
+        val BACKGROUND_BRIGHT_RED: SgrParam = SgrParam.of("101")
 
         @JvmField
-        val BACKGROUND_BRIGHT_GREEN: SgiParam = SgiParam.of("102")
+        val BACKGROUND_BRIGHT_GREEN: SgrParam = SgrParam.of("102")
 
         @JvmField
-        val BACKGROUND_BRIGHT_BROWN: SgiParam = SgiParam.of("103")
+        val BACKGROUND_BRIGHT_BROWN: SgrParam = SgrParam.of("103")
 
         @JvmField
-        val BACKGROUND_BRIGHT_BLUE: SgiParam = SgiParam.of("104")
+        val BACKGROUND_BRIGHT_BLUE: SgrParam = SgrParam.of("104")
 
         @JvmField
-        val BACKGROUND_BRIGHT_MAGENTA: SgiParam = SgiParam.of("105")
+        val BACKGROUND_BRIGHT_MAGENTA: SgrParam = SgrParam.of("105")
 
         @JvmField
-        val BACKGROUND_BRIGHT_CYAN: SgiParam = SgiParam.of("106")
+        val BACKGROUND_BRIGHT_CYAN: SgrParam = SgrParam.of("106")
 
         @JvmField
-        val BACKGROUND_BRIGHT_WHITE: SgiParam = SgiParam.of("107")
+        val BACKGROUND_BRIGHT_WHITE: SgrParam = SgrParam.of("107")
 
         @JvmStatic
-        fun of(value: CharSequence): SgiParam {
-            return SgiParamImpl(value.toString())
+        fun of(value: CharSequence): SgrParam {
+            return SgrParamImpl(value.toString())
         }
 
         @JvmStatic
-        fun concat(vararg params: SgiParam): SgiParam {
+        fun concat(vararg params: SgrParam): SgrParam {
             return concat(params.toList())
         }
 
         @JvmStatic
-        fun concat(params: List<SgiParam>): SgiParam {
-            return SgiParamImpl(params.joinToString(separator = ";") { r -> r.value })
+        fun concat(params: List<SgrParam>): SgrParam {
+            return SgrParamImpl(params.joinToString(separator = ";") { r -> r.value })
         }
 
         @JvmStatic
-        fun alternateFont(n: Int): SgiParam {
+        fun alternateFont(n: Int): SgrParam {
             return when (n) {
                 1 -> ALTERNATE_FONT_1
                 2 -> ALTERNATE_FONT_2
@@ -992,25 +1010,25 @@ interface SgiParam {
         }
 
         @JvmStatic
-        fun foregroundColor(n: Int): SgiParam {
-            return SgiParamImpl("38;5;$n")
+        fun foregroundColor(n: Int): SgrParam {
+            return SgrParamImpl("38;5;$n")
         }
 
         @JvmStatic
-        fun foregroundColor(r: Int, g: Int, b: Int): SgiParam {
-            return SgiParamImpl("38;2;$r;$g;$b")
+        fun foregroundColor(r: Int, g: Int, b: Int): SgrParam {
+            return SgrParamImpl("38;2;$r;$g;$b")
         }
 
         @JvmStatic
-        fun backgroundColor(n: Int): SgiParam {
-            return SgiParamImpl("48;5;$n")
+        fun backgroundColor(n: Int): SgrParam {
+            return SgrParamImpl("48;5;$n")
         }
 
         @JvmStatic
-        fun backgroundColor(r: Int, g: Int, b: Int): SgiParam {
-            return SgiParamImpl("48;2;$r;$g;$b")
+        fun backgroundColor(r: Int, g: Int, b: Int): SgrParam {
+            return SgrParamImpl("48;2;$r;$g;$b")
         }
 
-        private class SgiParamImpl(override val value: String) : SgiParam
+        private class SgrParamImpl(override val value: String) : SgrParam
     }
 }

@@ -34,5 +34,5 @@ fun <T : Any> T?.notNullElement(messagePattern: String?, vararg messageArgs: Any
 }
 
 fun <T : Any> T?.notNullElementByKey(key: Any?): T {
-    return this.notNullElement("Key: {}.", key)
+    return notNullElement("Key: {}.", key)
 }
