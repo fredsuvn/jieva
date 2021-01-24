@@ -45,11 +45,6 @@ fun <T> newArray(vararg elements: T): Array<T> {
     return elements.asAny()
 }
 
-fun Class<*>.arrayClass(): Class<*> {
-    val jvmName = this.toJvmDescriptor()
-    return "[${jvmName.replace("/", ".")}".loadClass<Any?>()
-}
-
 fun <T> GenericArrayType.rawComponentType(): Class<T> {
     val componentType = when (val genericComponentType = this.genericComponentType) {
         is Class<*> -> genericComponentType
