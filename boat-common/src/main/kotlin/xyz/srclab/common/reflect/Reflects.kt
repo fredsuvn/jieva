@@ -133,15 +133,6 @@ val Class<*>.isStrict: Boolean
         return Modifier.isStrict(this.modifiers)
     }
 
-val <T> Class<T>.arrayClass: Class<Array<T>>
-    @JvmName("arrayClass") get() {
-        if (this.isArray) {
-            return "[${this.canonicalName}".loadClass()
-        }
-        val arrayClassName = "[L" + this.canonicalName + ";"
-        return arrayClassName.loadClass()
-    }
-
 val Type.rawClassOrNull: Class<*>?
     @JvmName("rawClassOrNull") get() {
         return when (this) {
@@ -155,9 +146,11 @@ val Type.rawClassOrNull: Class<*>?
 /**
  * @throws IllegalArgumentException
  */
-val @PossibleTypes(Class::class, ParameterizedType::class) Type.rawClass: Class<*>
+val @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class) Type.rawClass: Class<*>
     @JvmName("rawClass") get() {
-        return this.rawClassOrNull ?: throw IllegalArgumentException("Only Class or ParameterizedType has raw class.")
+        return this.rawClassOrNull ?: throw IllegalArgumentException(
+            "Only Class, ParameterizedType or GenericArrayType has raw class."
+        )
     }
 
 val ParameterizedType.rawClass: Class<*>
@@ -168,6 +161,18 @@ val ParameterizedType.rawClass: Class<*>
 val GenericArrayType.rawClass: Class<*>
     @JvmName("rawClass") get() {
         return this.genericComponentType.rawClass.arrayClass
+    }
+
+val Type.upperClass: Class<*>
+    @JvmName("upperClass") get() {
+        return when (this) {
+            is Class<*> -> this
+            is ParameterizedType -> this.rawClass
+            is GenericArrayType -> this.rawClass
+            is TypeVariable<*> -> this.upperClass
+            is WildcardType -> this.upperClass
+            else -> Any::class.java
+        }
     }
 
 val TypeVariable<*>.upperClass: Class<*>
@@ -190,15 +195,20 @@ val WildcardType.upperClass: Class<*>
         }
     }
 
-val Type.upperClass: Class<*>
-    @JvmName("upperClass") get() {
+val Type.lowerClass: Class<*>?
+    @JvmName("lowerClass") get() {
         return when (this) {
-            is Class<*> -> this
-            is ParameterizedType -> this.rawClass
-            is TypeVariable<*> -> this.upperClass
-            is WildcardType -> this.upperClass
-            else -> Any::class.java
+            is Class<*> -> this.lowerClass
+            is ParameterizedType -> this.rawClass.lowerClass
+            is TypeVariable<*> -> this.lowerClass
+            is WildcardType -> this.lowerClass
+            else -> null
         }
+    }
+
+val Class<*>.lowerClass: Class<*>?
+    @JvmName("lowerClass") get() {
+        return if (this.isFinal) this else null
     }
 
 val TypeVariable<*>.lowerClass: Class<*>?
@@ -217,22 +227,17 @@ val WildcardType.lowerClass: Class<*>?
         }
     }
 
-/**
- * @throws IllegalArgumentException
- */
-val Type.lowerClass: Class<*>?
-    @JvmName("lowerClass") get() {
+val @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class) Type.upperBound: Type
+    @JvmName("upperBound")
+    get() {
         return when (this) {
-            is Class<*> -> this
-            is ParameterizedType -> this.rawClass
-            is TypeVariable<*> -> this.lowerClass
-            is WildcardType -> this.lowerClass
-            else -> throw IllegalArgumentException()
+            is TypeVariable<*> -> this.upperBound
+            is WildcardType -> this.upperBound
+            else -> this
         }
     }
 
 val TypeVariable<*>.upperBound: Type
-    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
     @JvmName("upperBound")
     get() {
         val bounds = this.bounds
@@ -244,7 +249,6 @@ val TypeVariable<*>.upperBound: Type
     }
 
 val WildcardType.upperBound: Type
-    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
     @JvmName("upperBound")
     get() {
         val upperBounds = this.upperBounds
@@ -252,17 +256,6 @@ val WildcardType.upperBound: Type
             Any::class.java
         } else {
             upperBounds[0].upperBound
-        }
-    }
-
-val Type.upperBound: Type
-    @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class)
-    @JvmName("upperBound")
-    get() {
-        return when (this) {
-            is TypeVariable<*> -> this.upperBound
-            is WildcardType -> this.upperBound
-            else -> this
         }
     }
 
@@ -305,6 +298,28 @@ val WildcardType.isUnbounded: Boolean
 val Array<out Type>.isObjectUpperBound: Boolean
     @JvmName("isObjectUpperBound") get() {
         return this.isEmpty() || (this.size == 1 && this[0] == Any::class.java)
+    }
+
+val <T> Class<T>.arrayClass: Class<Array<T>>
+    @JvmName("arrayClass") get() {
+        if (this.isArray) {
+            return "[${this.name}".loadClass()
+        }
+        val arrayClassName = when (this) {
+            Boolean::class.javaPrimitiveType -> "[Z"
+            Byte::class.javaPrimitiveType -> "[B"
+            Short::class.javaPrimitiveType -> "[S"
+            Char::class.javaPrimitiveType -> "[C"
+            Int::class.javaPrimitiveType -> "[I"
+            Long::class.javaPrimitiveType -> "[J"
+            Float::class.javaPrimitiveType -> "[F"
+            Double::class.javaPrimitiveType -> "[D"
+            Void::class.javaPrimitiveType -> "[V"
+            else -> {
+                "[L" + this.canonicalName + ";"
+            }
+        }
+        return arrayClassName.loadClass()
     }
 
 /**
