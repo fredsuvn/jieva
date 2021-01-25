@@ -547,7 +547,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
     private val cache = Cache.newFastCache<Pair<Type, PropertyDescriptor>, PropertySchema>()
 
     override fun resolve(context: BeanResolveHandler.Context) {
-        val beanInfo = Introspector.getBeanInfo(context.beanType.rawClass)
+        val beanInfo = Introspector.getBeanInfo(context.beanType.rawClassOrNull)
         val typeVariableTable by lazy { context.beanType.findTypeArguments() }
         val beanProperties = context.beanProperties
         for (propertyDescriptor in beanInfo.propertyDescriptors) {

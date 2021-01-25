@@ -5,10 +5,12 @@ package xyz.srclab.common.base
 
 import java.util.*
 
+@JvmName("as")
 fun <T> Any?.asAny(): T {
     return this as T
 }
 
+@JvmName("as")
 fun <T> Nothing?.asAny(): T {
     return this as T
 }

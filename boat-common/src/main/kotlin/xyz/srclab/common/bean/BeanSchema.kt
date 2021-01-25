@@ -2,7 +2,7 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.Invoker
-import xyz.srclab.common.reflect.rawClass
+import xyz.srclab.common.reflect.rawClassOrNull
 import java.lang.reflect.Field
 import java.lang.reflect.Type
 
@@ -14,7 +14,7 @@ interface BeanSchema {
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val type: Class<*>
-        @JvmName("type") get() = genericType.rawClass
+        @JvmName("type") get() = genericType.rawClassOrNull
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val genericType: Type
@@ -71,7 +71,7 @@ interface PropertySchema {
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val type: Class<*>
-        @JvmName("type") get() = genericType.rawClass
+        @JvmName("type") get() = genericType.rawClassOrNull
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val genericType: Type
@@ -80,7 +80,7 @@ interface PropertySchema {
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val ownerType: Class<*>
-        @JvmName("ownerType") get() = genericOwnerType.rawClass
+        @JvmName("ownerType") get() = genericOwnerType.rawClassOrNull
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val genericOwnerType: Type

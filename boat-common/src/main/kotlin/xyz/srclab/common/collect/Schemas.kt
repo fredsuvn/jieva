@@ -2,7 +2,7 @@ package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.reflect.findGenericInterface
-import xyz.srclab.common.reflect.rawClass
+import xyz.srclab.common.reflect.rawClassOrNull
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -76,12 +76,12 @@ interface IterableSchema {
             if (iterableType is ParameterizedType) {
                 val actualTypeArguments = iterableType.actualTypeArguments
                 if (actualTypeArguments.size == 1) {
-                    return of(type.rawClass, actualTypeArguments[0])
+                    return of(type.rawClassOrNull, actualTypeArguments[0])
                 }
                 return null
             }
             if (iterableType is Class<*>) {
-                return dispatchClass(iterableType) ?: of(type.rawClass, Any::class.java)
+                return dispatchClass(iterableType) ?: of(type.rawClassOrNull, Any::class.java)
             }
             return null
         }
@@ -192,7 +192,7 @@ interface MapSchema {
             if (mapType is ParameterizedType) {
                 val actualTypeArguments = mapType.actualTypeArguments
                 if (actualTypeArguments.size == 2) {
-                    return of(type.rawClass, actualTypeArguments[0], actualTypeArguments[1])
+                    return of(type.rawClassOrNull, actualTypeArguments[0], actualTypeArguments[1])
                 }
                 return null
             }
@@ -200,7 +200,7 @@ interface MapSchema {
                 if (mapType == Map::class.java) {
                     return RAW
                 }
-                return of(type.rawClass, Any::class.java, Any::class.java)
+                return of(type.rawClassOrNull, Any::class.java, Any::class.java)
             }
             return null
         }
