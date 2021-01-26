@@ -8,7 +8,7 @@ import java.lang.reflect.Type
 
 private val defaultResolver = BeanResolver.DEFAULT
 
-fun Type.resolve(): BeanSchema {
+fun Type.resolve(): BeanType {
     return defaultResolver.resolve(this)
 }
 

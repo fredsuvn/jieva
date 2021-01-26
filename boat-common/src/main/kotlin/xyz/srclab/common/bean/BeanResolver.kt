@@ -1,13 +1,13 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.Invoker
-import xyz.srclab.common.base.Invoker.Companion.asInvoker
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.cache.Cache
-import xyz.srclab.common.collect.MapSchema
-import xyz.srclab.common.collect.resolveMapSchema
+import xyz.srclab.common.collect.MapType
+import xyz.srclab.common.collect.MapType.Companion.toMapType
 import xyz.srclab.common.convert.Converter
+import xyz.srclab.common.invoke.Invoker
+import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.reflect.*
 import java.beans.Introspector
 import java.beans.PropertyDescriptor
@@ -23,7 +23,7 @@ interface BeanResolver {
         @JvmName("resolveHandlers") get
 
     @JvmDefault
-    fun resolve(type: Type): BeanSchema {
+    fun resolve(type: Type): BeanType {
         return resolveBean(type, resolveHandlers)
     }
 
@@ -72,55 +72,55 @@ interface BeanResolver {
         return when {
             from is Map<*, *> && to is MutableMap<*, *> -> {
                 val fromType = copyOptions.fromType ?: Map::class.java
-                val fromMapSchema = fromType.resolveMapSchema()
+                val fromMapType = fromType.toMapType()
                 val toType = copyOptions.toType ?: Map::class.java
-                val toMapSchema = toType.resolveMapSchema()
+                val toMapType = toType.toMapType()
                 from.forEach { (k, v) ->
                     if (!copyOptions.nameFilter(k)
-                        || !copyOptions.fromTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
-                        || !copyOptions.fromValueFilter(k, fromMapSchema.keyType, fromMapSchema.valueType, v)
+                        || !copyOptions.fromTypeFilter(k, fromMapType.keyType, fromMapType.valueType)
+                        || !copyOptions.fromValueFilter(k, fromMapType.keyType, fromMapType.valueType, v)
                         || !copyOptions.convertFilter(
                             k,
-                            fromMapSchema.keyType,
-                            fromMapSchema.valueType,
+                            fromMapType.keyType,
+                            fromMapType.valueType,
                             v,
-                            toMapSchema.keyType,
-                            toMapSchema.valueType
+                            toMapType.keyType,
+                            toMapType.valueType
                         )
                     ) {
                         return@forEach
                     }
-                    val toKey = copyOptions.converter.convert<Any>(k, fromMapSchema.keyType, toMapSchema.keyType)
+                    val toKey = copyOptions.converter.convert<Any>(k, fromMapType.keyType, toMapType.keyType)
                     if (!to.containsKey(toKey)) {
                         return@forEach
                     }
                     (to.asAny<MutableMap<Any, Any?>>())[toKey] =
-                        copyOptions.converter.convert(v, fromMapSchema.valueType, toMapSchema.valueType)
+                        copyOptions.converter.convert(v, fromMapType.valueType, toMapType.valueType)
                 }
                 to
             }
             from is Map<*, *> && to !is Map<*, *> -> {
                 val fromType = copyOptions.fromType ?: Map::class.java
-                val fromMapSchema = fromType.resolveMapSchema()
+                val fromMapType = fromType.toMapType()
                 val toSchema = resolve(to.javaClass)
                 val toProperties = toSchema.properties
                 from.forEach { (k, v) ->
                     if (!copyOptions.nameFilter(k)
-                        || !copyOptions.fromTypeFilter(k, fromMapSchema.keyType, fromMapSchema.valueType)
-                        || !copyOptions.fromValueFilter(k, fromMapSchema.keyType, fromMapSchema.valueType, v)
+                        || !copyOptions.fromTypeFilter(k, fromMapType.keyType, fromMapType.valueType)
+                        || !copyOptions.fromValueFilter(k, fromMapType.keyType, fromMapType.valueType, v)
                     ) {
                         return@forEach
                     }
                     val toPropertyName =
-                        copyOptions.converter.convert<String>(k, fromMapSchema.keyType, String::class.java)
+                        copyOptions.converter.convert<String>(k, fromMapType.keyType, String::class.java)
                     val toProperty = toProperties[toPropertyName]
                     if (toProperty === null || !toProperty.isWriteable) {
                         return@forEach
                     }
                     if (!copyOptions.convertFilter(
                             k,
-                            fromMapSchema.keyType,
-                            fromMapSchema.valueType,
+                            fromMapType.keyType,
+                            fromMapType.valueType,
                             v,
                             String::class.java,
                             toProperty.genericType
@@ -129,7 +129,7 @@ interface BeanResolver {
                         return@forEach
                     }
                     toProperty.setValue<Any?>(
-                        to, copyOptions.converter.convert(v, fromMapSchema.valueType, toProperty.genericType)
+                        to, copyOptions.converter.convert(v, fromMapType.valueType, toProperty.genericType)
                     )
                 }
                 to
@@ -137,7 +137,7 @@ interface BeanResolver {
             from !is Map<*, *> && to is Map<*, *> -> {
                 val fromSchema = resolve(from.javaClass)
                 val toType = copyOptions.toType ?: Map::class.java
-                val toMapSchema = toType.resolveMapSchema()
+                val toMapType = toType.toMapType()
                 val fromProperties = fromSchema.properties
                 fromProperties.forEach { (name, fromProperty) ->
                     if (!copyOptions.nameFilter(name)
@@ -153,18 +153,18 @@ interface BeanResolver {
                             String::class.java,
                             fromProperty.genericType,
                             value,
-                            toMapSchema.keyType,
-                            toMapSchema.valueType
+                            toMapType.keyType,
+                            toMapType.valueType
                         )
                     ) {
                         return@forEach
                     }
-                    val toKey = copyOptions.converter.convert<Any>(name, String::class.java, toMapSchema.keyType)
+                    val toKey = copyOptions.converter.convert<Any>(name, String::class.java, toMapType.keyType)
                     if (!to.containsKey(toKey)) {
                         return@forEach
                     }
                     (to.asAny<MutableMap<Any, Any?>>())[toKey] =
-                        copyOptions.converter.convert(value, fromProperty.genericType, toMapSchema.valueType)
+                        copyOptions.converter.convert(value, fromProperty.genericType, toMapType.valueType)
                 }
                 to
             }
@@ -413,11 +413,11 @@ interface BeanResolver {
 
         private class BeanAsMap(
             private val bean: Any,
-            private val properties: Map<String, PropertySchema>,
+            private val properties: Map<String, PropertyType>,
             private val copyOptions: CopyOptions
         ) : AbstractMutableMap<String, Any?>() {
 
-            private val mapSchema = copyOptions.toType?.resolveMapSchema() ?: MapSchema.RAW
+            private val mapSchema = copyOptions.toType?.toMapType() ?: MapType.RAW
 
             override val size: Int
                 get() = entries.size
@@ -498,15 +498,15 @@ interface BeanResolver {
     }
 }
 
-private val cache = Cache.newFastCache<Type, BeanSchema>()
+private val cache = Cache.newFastCache<Type, BeanType>()
 
-private fun resolveBean(type: Type, resolveHandlers: List<BeanResolveHandler>): BeanSchema {
+private fun resolveBean(type: Type, resolveHandlers: List<BeanResolveHandler>): BeanType {
     return cache.getOrLoad(type) {
         val context = BeanResolveHandler.newContext(type)
         for (handler in resolveHandlers) {
             handler.resolve(context)
         }
-        BeanSchema.newBeanSchema(type, context.beanProperties.toMap())
+        BeanType.newBeanSchema(type, context.beanProperties.toMap())
     }
 }
 
@@ -521,7 +521,7 @@ interface BeanResolveHandler {
             @JvmName("beanType") get
 
         @Suppress(INAPPLICABLE_JVM_NAME)
-        val beanProperties: MutableMap<String, PropertySchema>
+        val beanProperties: MutableMap<String, PropertyType>
             @JvmName("beanProperties") get
     }
 
@@ -536,7 +536,7 @@ interface BeanResolveHandler {
         fun newContext(beanType: Type): Context {
             return object : Context {
                 override val beanType = beanType
-                override val beanProperties = mutableMapOf<String, PropertySchema>()
+                override val beanProperties = mutableMapOf<String, PropertyType>()
             }
         }
     }
@@ -544,7 +544,7 @@ interface BeanResolveHandler {
 
 object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
-    private val cache = Cache.newFastCache<Pair<Type, PropertyDescriptor>, PropertySchema>()
+    private val cache = Cache.newFastCache<Pair<Type, PropertyDescriptor>, PropertyType>()
 
     override fun resolve(context: BeanResolveHandler.Context) {
         val beanInfo = Introspector.getBeanInfo(context.beanType.rawClassOrNull)
@@ -555,7 +555,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
                 continue
             }
             val property = cache.getOrLoad(context.beanType to propertyDescriptor) {
-                PropertySchemaImpl(
+                PropertyTypeImpl(
                     context.beanType,
                     propertyDescriptor,
                     typeVariableTable,
@@ -565,11 +565,11 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
         }
     }
 
-    private class PropertySchemaImpl(
+    private class PropertyTypeImpl(
         override val genericOwnerType: Type,
         descriptor: PropertyDescriptor,
         private val typeVariableTable: Map<TypeVariable<*>, Type>,
-    ) : PropertySchema {
+    ) : PropertyType {
 
         override val name: String = descriptor.name
         override val genericType: Type by lazy { tryGenericType() }
@@ -591,11 +591,11 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
         }
 
         private fun tryGetter(): Invoker? {
-            return if (getterMethod === null) null else getterMethod.asInvoker()
+            return if (getterMethod === null) null else getterMethod.toInvoker()
         }
 
         private fun trySetter(): Invoker? {
-            return if (setterMethod === null) null else setterMethod.asInvoker()
+            return if (setterMethod === null) null else setterMethod.toInvoker()
         }
 
         private fun tryField(): Field? {
@@ -632,7 +632,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            if (other !is PropertySchema) return false
+            if (other !is PropertyType) return false
             if (genericOwnerType != other.genericOwnerType) return false
             if (name != other.name) return false
             if (genericType != other.genericType) return false

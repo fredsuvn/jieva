@@ -1,49 +1,49 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.Invoker
-import xyz.srclab.common.reflect.rawClassOrNull
+import xyz.srclab.common.invoke.Invoker
+import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Field
 import java.lang.reflect.Type
 
 /**
  * @author sunqian
  */
-interface BeanSchema {
+interface BeanType {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val type: Class<*>
-        @JvmName("type") get() = genericType.rawClassOrNull
+        @JvmName("type") get() = genericType.rawClass
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val genericType: Type
         @JvmName("genericType") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val properties: Map<String, PropertySchema>
+    val properties: Map<String, PropertyType>
         @JvmName("properties") get
 
     @JvmDefault
-    fun getProperty(name: String): PropertySchema? {
+    fun getProperty(name: String): PropertyType? {
         return properties[name]
     }
 
     companion object {
 
         @JvmStatic
-        fun newBeanSchema(genericType: Type, properties: Map<String, PropertySchema>): BeanSchema {
-            return BeanSchemaImpl(genericType, properties)
+        fun newBeanSchema(genericType: Type, properties: Map<String, PropertyType>): BeanType {
+            return BeanTypeImpl(genericType, properties)
         }
 
-        private class BeanSchemaImpl(
+        private class BeanTypeImpl(
             override val genericType: Type,
-            override val properties: Map<String, PropertySchema>,
-        ) : BeanSchema {
+            override val properties: Map<String, PropertyType>,
+        ) : BeanType {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
-                if (other !is BeanSchema) return false
+                if (other !is BeanType) return false
                 if (genericType != other.genericType) return false
                 if (properties != other.properties) return false
                 return true
@@ -62,7 +62,7 @@ interface BeanSchema {
     }
 }
 
-interface PropertySchema {
+interface PropertyType {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
@@ -71,7 +71,7 @@ interface PropertySchema {
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val type: Class<*>
-        @JvmName("type") get() = genericType.rawClassOrNull
+        @JvmName("type") get() = genericType.rawClass
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val genericType: Type
@@ -80,7 +80,7 @@ interface PropertySchema {
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val ownerType: Class<*>
-        @JvmName("ownerType") get() = genericOwnerType.rawClassOrNull
+        @JvmName("ownerType") get() = genericOwnerType.rawClass
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val genericOwnerType: Type

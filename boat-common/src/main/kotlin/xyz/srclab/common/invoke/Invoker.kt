@@ -2,8 +2,8 @@ package xyz.srclab.common.invoke
 
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.reflect.declaredConstructorOrNull
-import xyz.srclab.common.reflect.ownedMethodOrNull
 import xyz.srclab.common.reflect.isStatic
+import xyz.srclab.common.reflect.ownedMethodOrNull
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.reflect.Constructor
@@ -34,13 +34,13 @@ interface Invoker {
 
         @JvmStatic
         @JvmName("forMethod")
-        fun Method.asInvoker(): Invoker {
+        fun Method.toInvoker(): Invoker {
             return InvokerProvider.DEFAULT.forMethod(this)
         }
 
         @JvmStatic
         @JvmName("forConstructor")
-        fun Constructor<*>.asInvoker(): Invoker {
+        fun Constructor<*>.toInvoker(): Invoker {
             return InvokerProvider.DEFAULT.forConstructor(this)
         }
     }

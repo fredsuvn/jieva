@@ -7,8 +7,8 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.As;
 import xyz.srclab.common.bean.BeanKit;
 import xyz.srclab.common.bean.BeanResolver;
-import xyz.srclab.common.bean.BeanSchema;
-import xyz.srclab.common.bean.PropertySchema;
+import xyz.srclab.common.bean.BeanType;
+import xyz.srclab.common.bean.PropertyType;
 import xyz.srclab.common.reflect.TypeKit;
 import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.test.TestLogger;
@@ -114,8 +114,8 @@ public class BeanTest {
     @Test
     public void testGenericBeanASchema() {
         GenericBeanA a = new GenericBeanA();
-        BeanSchema aSchema = BeanKit.resolve(a.getClass());
-        Map<String, PropertySchema> aPropertySchemas = aSchema.properties();
+        BeanType aSchema = BeanKit.resolve(a.getClass());
+        Map<String, PropertyType> aPropertySchemas = aSchema.properties();
         System.out.println(aPropertySchemas);
         Assert.assertEquals(aPropertySchemas.get("a1").genericType(), String.class);
         Assert.assertEquals(aPropertySchemas.get("a2").genericType(), new TypeRef<List<String>>() {
@@ -131,8 +131,8 @@ public class BeanTest {
     public void testGenericBeanSchema() {
         Type gType = new TypeRef<GenericBean<String, ?, Iterable<? extends String>>>() {
         }.type();
-        BeanSchema gSchema = BeanKit.resolve(gType);
-        Map<String, PropertySchema> gPropertySchemas = gSchema.properties();
+        BeanType gSchema = BeanKit.resolve(gType);
+        Map<String, PropertyType> gPropertySchemas = gSchema.properties();
         System.out.println(gPropertySchemas);
         //Assert.assertEquals(gPropertySchemas.get("a1").genericType(), String.class);
         //Assert.assertEquals(gPropertySchemas.get("a2").genericType(), new TypeRef<List<? extends ?>>() {
@@ -147,8 +147,8 @@ public class BeanTest {
     @Test
     public void testSubGenericBeanSchema() {
         SubGenericBean s = new SubGenericBean();
-        BeanSchema sSchema = BeanKit.resolve(s.getClass());
-        Map<String, PropertySchema> sPropertySchemas = sSchema.properties();
+        BeanType sSchema = BeanKit.resolve(s.getClass());
+        Map<String, PropertyType> sPropertySchemas = sSchema.properties();
         System.out.println(sPropertySchemas);
 
         TypeKit.rawClass(String.class);
