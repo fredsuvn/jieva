@@ -123,13 +123,13 @@ interface BeanResolver {
                             fromMapType.valueType,
                             v,
                             String::class.java,
-                            toProperty.genericType
+                            toProperty.type
                         )
                     ) {
                         return@forEach
                     }
                     toProperty.setValue<Any?>(
-                        to, copyOptions.converter.convert(v, fromMapType.valueType, toProperty.genericType)
+                        to, copyOptions.converter.convert(v, fromMapType.valueType, toProperty.type)
                     )
                 }
                 to
@@ -142,16 +142,16 @@ interface BeanResolver {
                 fromProperties.forEach { (name, fromProperty) ->
                     if (!copyOptions.nameFilter(name)
                         || !fromProperty.isReadable
-                        || !copyOptions.fromTypeFilter(name, String::class.java, fromProperty.genericType)
+                        || !copyOptions.fromTypeFilter(name, String::class.java, fromProperty.type)
                     ) {
                         return@forEach
                     }
                     val value = fromProperty.getValue<Any?>(from)
-                    if (!copyOptions.fromValueFilter(name, String::class.java, fromProperty.genericType, value)
+                    if (!copyOptions.fromValueFilter(name, String::class.java, fromProperty.type, value)
                         || !copyOptions.convertFilter(
                             name,
                             String::class.java,
-                            fromProperty.genericType,
+                            fromProperty.type,
                             value,
                             toMapType.keyType,
                             toMapType.valueType
@@ -164,7 +164,7 @@ interface BeanResolver {
                         return@forEach
                     }
                     (to.asAny<MutableMap<Any, Any?>>())[toKey] =
-                        copyOptions.converter.convert(value, fromProperty.genericType, toMapType.valueType)
+                        copyOptions.converter.convert(value, fromProperty.type, toMapType.valueType)
                 }
                 to
             }
@@ -176,7 +176,7 @@ interface BeanResolver {
                 fromProperties.forEach { (name, fromProperty) ->
                     if (!copyOptions.nameFilter(name)
                         || !fromProperty.isReadable
-                        || !copyOptions.fromTypeFilter(name, String::class.java, fromProperty.genericType)
+                        || !copyOptions.fromTypeFilter(name, String::class.java, fromProperty.type)
                     ) {
                         return@forEach
                     }
@@ -185,20 +185,20 @@ interface BeanResolver {
                         return@forEach
                     }
                     val value = fromProperty.getValue<Any?>(from)
-                    if (!copyOptions.fromValueFilter(name, String::class.java, fromProperty.genericType, value)
+                    if (!copyOptions.fromValueFilter(name, String::class.java, fromProperty.type, value)
                         || !copyOptions.convertFilter(
                             name,
                             String::class.java,
-                            fromProperty.genericType,
+                            fromProperty.type,
                             value,
                             String::class.java,
-                            toProperty.genericType
+                            toProperty.type
                         )
                     ) {
                         return@forEach
                     }
                     toProperty.setValue<Any?>(
-                        to, copyOptions.converter.convert(value, fromProperty.genericType, toProperty.genericType)
+                        to, copyOptions.converter.convert(value, fromProperty.type, toProperty.type)
                     )
                 }
                 to
@@ -427,7 +427,7 @@ interface BeanResolver {
                     .filter {
                         val flag = it.value.isReadable
                                 && copyOptions.nameFilter(it.key)
-                                && copyOptions.fromTypeFilter(it.key, String::class.java, it.value.genericType)
+                                && copyOptions.fromTypeFilter(it.key, String::class.java, it.value.type)
                         if (!flag) {
                             return@filter false
                         }
@@ -435,13 +435,13 @@ interface BeanResolver {
                         copyOptions.fromValueFilter(
                             it.key,
                             String::class.java,
-                            it.value.genericType,
+                            it.value.type,
                             value
                         )
                                 && copyOptions.convertFilter(
                             it.key,
                             String::class.java,
-                            it.value.genericType,
+                            it.value.type,
                             value,
                             mapSchema.keyType,
                             mapSchema.valueType
@@ -635,7 +635,7 @@ object BeanAccessorMethodResolveHandler : BeanResolveHandler {
             if (other !is PropertyType) return false
             if (genericOwnerType != other.genericOwnerType) return false
             if (name != other.name) return false
-            if (genericType != other.genericType) return false
+            if (genericType != other.type) return false
             return true
         }
 
