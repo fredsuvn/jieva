@@ -4,7 +4,6 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.asAny
-import xyz.srclab.common.reflect.upperClass
 import java.lang.reflect.*
 import java.util.*
 import kotlin.collections.joinTo as joinToKt
@@ -12,62 +11,16 @@ import kotlin.collections.joinToString as joinToStringKt
 
 private const val NOT_ARRAY_TYPE_PREFIX = "Not a array type"
 
-val Type.isArray: Boolean
-    @JvmName("isArray") get() {
-        return when (this) {
-            is Class<*> -> this.isArray
-            is GenericArrayType -> true
-            else -> false
-        }
-    }
-
-/**
- * @throws IllegalArgumentException
- */
-val Type.componentType: Type
-    @JvmName("componentType") get() {
-        return this.componentTypeOrNull ?: throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: $this")
-    }
-
-val Type.componentTypeOrNull: Type?
-    @JvmName("componentTypeOrNull") get() {
-        return when (this) {
-            is Class<*> -> this.componentType
-            is GenericArrayType -> this.genericComponentType
-            else -> null
-        }
-    }
-
 fun <T> newArray(vararg elements: T): Array<T> {
     return elements.asAny()
 }
 
-fun <T> GenericArrayType.rawComponentType(): Class<T> {
-    val componentType = when (val genericComponentType = this.genericComponentType) {
-        is Class<*> -> genericComponentType
-        is ParameterizedType -> genericComponentType.rawClass
-        is GenericArrayType -> genericComponentType.rawComponentType()
-        is TypeVariable<*> -> genericComponentType.upperClass
-        is WildcardType -> genericComponentType.upperClass
-        else -> throw IllegalArgumentException("Unknown generic component type: $genericComponentType")
-    }
-    return componentType.asAny()
-}
-
-fun <A> Class<*>.componentTypeToArray(length: Int): A {
+fun <T> Class<T>.newArray(length: Int): Array<T> {
     return java.lang.reflect.Array.newInstance(this, length).asAny()
 }
 
-fun <A> Class<*>.arrayTypeToArray(length: Int): A {
-    return java.lang.reflect.Array.newInstance(this.componentType, length).asAny()
-}
-
-fun <T> Any.arrayAsList(): MutableList<T> {
-    val result = this.arrayAsListOrNull<T>()
-    if (result === null) {
-        throw IllegalArgumentException("Cannot from array to MutableList: $this.")
-    }
-    return result
+fun <A> Class<*>.newArray(vararg dimensions: Int): A {
+    return java.lang.reflect.Array.newInstance(this, *dimensions).asAny()
 }
 
 fun <T> Any.arrayAsListOrNull(): MutableList<T>? {
@@ -83,6 +36,14 @@ fun <T> Any.arrayAsListOrNull(): MutableList<T>? {
         is DoubleArray -> this.asList().asAny()
         else -> null
     }
+}
+
+fun <T> Any.arrayAsList(): MutableList<T> {
+    val result = this.arrayAsListOrNull<T>()
+    if (result === null) {
+        throw IllegalArgumentException("Cannot from array to MutableList: $this.")
+    }
+    return result
 }
 
 fun <T> Array<T>.asList(): MutableList<T> {

@@ -1,10 +1,28 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.reflect.findGenericInterface
+import xyz.srclab.common.reflect.genericInterface
 import xyz.srclab.common.reflect.rawClassOrNull
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+
+interface TypeSchema1 {
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val rawClass: Class<*>
+        @JvmName("rawClass") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val genericType: Type
+        @JvmName("genericType") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val genericType: Type
+        @JvmName("genericType") get
+}
+
+
+
 
 interface IterableSchema {
 
@@ -67,7 +85,7 @@ interface IterableSchema {
                 }
             }
 
-            val iterableType = type.findGenericInterface(
+            val iterableType = type.genericInterface(
                 null, List::class.java, Set::class.java, Collection::class.java, Iterable::class.java
             )
             if (iterableType === null) {
@@ -85,6 +103,33 @@ interface IterableSchema {
             }
             return null
         }
+
+        private class IterableSchemaImpl(
+            override val rawClass: Class<*>,
+            override val componentType: Type
+        ) : IterableSchema {
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as IterableSchemaImpl
+
+                if (rawClass != other.rawClass) return false
+                if (componentType != other.componentType) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                var result = rawClass.hashCode()
+                result = 31 * result + componentType.hashCode()
+                return result
+            }
+
+            override fun toString(): String {
+                return "IterableSchemaImpl(rawClass=$rawClass, componentType=$componentType)"
+            }
+        }
     }
 }
 
@@ -98,33 +143,6 @@ fun Type.resolveIterableSchema(): IterableSchema {
 
 fun Type.resolveIterableSchemaOrNull(): IterableSchema? {
     return IterableSchema.resolveOrNull(this)
-}
-
-private class IterableSchemaImpl(
-    override val rawClass: Class<*>,
-    override val componentType: Type
-) : IterableSchema {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as IterableSchemaImpl
-
-        if (rawClass != other.rawClass) return false
-        if (componentType != other.componentType) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = rawClass.hashCode()
-        result = 31 * result + componentType.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        return "IterableSchemaImpl(rawClass=$rawClass, componentType=$componentType)"
-    }
 }
 
 interface MapSchema {
@@ -185,7 +203,7 @@ interface MapSchema {
                 }
             }
 
-            val mapType = type.findGenericInterface(null, Map::class.java)
+            val mapType = type.genericInterface(null, Map::class.java)
             if (mapType === null) {
                 return null
             }
