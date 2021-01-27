@@ -1,6 +1,8 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.annotations.OutParam
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.base.NamingCase
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.MapType
@@ -9,8 +11,6 @@ import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.reflect.*
-import java.beans.Introspector
-import java.beans.PropertyDescriptor
 import java.lang.reflect.*
 
 /**
@@ -24,7 +24,7 @@ interface BeanResolver {
 
     @JvmDefault
     fun resolve(type: Type): BeanType {
-        return resolveBean(type, resolveHandlers)
+        return DefaultBeanResolver.resolve(type)
     }
 
     @JvmDefault
@@ -498,156 +498,302 @@ interface BeanResolver {
     }
 }
 
-private val cache = Cache.newFastCache<Type, BeanType>()
+object DefaultBeanResolver : BeanResolver {
 
-private fun resolveBean(type: Type, resolveHandlers: List<BeanResolveHandler>): BeanType {
-    return cache.getOrLoad(type) {
-        val context = BeanResolveHandler.newContext(type)
-        for (handler in resolveHandlers) {
-            handler.resolve(context)
+    private val cache = Cache.newFastCache<Type, BeanType>()
+
+    override val resolveHandlers: List<BeanResolveHandler> = BeanResolveHandler.DEFAULTS
+
+    override fun resolve(type: Type): BeanType {
+        return cache.getOrLoad(type) {
+            val beanType = BeanTypeImpl(it, emptyMap())
+            val context = BeanResolveHandler.newContext(beanType, it.typeArguments())
+            for (handler in resolveHandlers) {
+                handler.resolve(context)
+            }
+            beanType.properties = context.properties.toMap()
+            beanType
         }
-        BeanType.newBeanSchema(type, context.beanProperties.toMap())
+    }
+}
+
+private class BeanTypeImpl(
+    override val type: Type,
+    override var properties: Map<String, PropertyType>
+) : BeanType {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BeanType) return false
+
+        if (type != other.type) return false
+        if (properties != other.properties) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + properties.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "bean ${type.typeName}"
     }
 }
 
 interface BeanResolveHandler {
 
-    fun resolve(context: Context)
+    fun resolve(@OutParam context: Context)
 
     interface Context {
 
         @Suppress(INAPPLICABLE_JVM_NAME)
-        val beanType: Type
-            @JvmName("beanType") get
+        val type: BeanType
+            @JvmName("type") get
 
         @Suppress(INAPPLICABLE_JVM_NAME)
-        val beanProperties: MutableMap<String, PropertyType>
-            @JvmName("beanProperties") get
+        val properties: MutableMap<String, PropertyType>
+            @JvmName("properties") get
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val methods: List<Method>
+            @JvmName("methods") get
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+
+        val typeArguments: Map<TypeVariable<*>, Type>
+            @JvmName("typeArguments") get
     }
 
     companion object {
 
         @JvmField
         val DEFAULTS: List<BeanResolveHandler> = listOf(
-            BeanAccessorMethodResolveHandler
+            BeanStyleBeanResolveHandler
         )
 
         @JvmStatic
-        fun newContext(beanType: Type): Context {
-            return object : Context {
-                override val beanType = beanType
-                override val beanProperties = mutableMapOf<String, PropertyType>()
+        fun newContext(beanType: BeanType, typeArguments: Map<TypeVariable<*>, Type>): Context {
+            return ContextImpl(beanType, typeArguments)
+        }
+
+        private class ContextImpl(
+            override val type: BeanType,
+            override val typeArguments: Map<TypeVariable<*>, Type>
+        ) : Context {
+
+            override val properties: MutableMap<String, PropertyType> by lazy {
+                LinkedHashMap()
+            }
+
+            override val methods: List<Method> by lazy {
+                type.rawClass.methods.asList()
             }
         }
     }
 }
 
-object BeanAccessorMethodResolveHandler : BeanResolveHandler {
+/**
+ * Bean style:
+ * * getter: getXxx()
+ * * setter: setXxx(Xxx)
+ */
+object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
-    private val cache = Cache.newFastCache<Pair<Type, PropertyDescriptor>, PropertyType>()
-
-    override fun resolve(context: BeanResolveHandler.Context) {
-        val beanInfo = Introspector.getBeanInfo(context.beanType.rawClassOrNull)
-        val typeVariableTable by lazy { context.beanType.findTypeArguments() }
-        val beanProperties = context.beanProperties
-        for (propertyDescriptor in beanInfo.propertyDescriptors) {
-            if (beanProperties.containsKey(propertyDescriptor.name)) {
+    override fun resolveAccessors(
+        context: BeanResolveHandler.Context,
+        getters: MutableMap<String, Method>,
+        setters: MutableMap<String, Method>
+    ) {
+        val methods = context.methods
+        for (method in methods) {
+            if (method.isBridge) {
                 continue
             }
-            val property = cache.getOrLoad(context.beanType to propertyDescriptor) {
-                PropertyTypeImpl(
-                    context.beanType,
-                    propertyDescriptor,
-                    typeVariableTable,
-                )
+            val name = method.name
+            if (name.length <= 3) {
+                continue
             }
-            beanProperties[propertyDescriptor.name] = property
+            if (name.startsWith("get") && method.parameterCount == 0) {
+                val propertyName =
+                    NamingCase.UPPER_CAMEL.convertTo(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
+                getters[propertyName] = method
+                continue
+            }
+            if (name.startsWith("set") && method.parameterCount == 1) {
+                val propertyName =
+                    NamingCase.UPPER_CAMEL.convertTo(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
+                setters[propertyName] = method
+                continue
+            }
+        }
+    }
+}
+
+/**
+ * Naming style:
+ * * getter: xxx()
+ * * setter: xxx(xxx)
+ */
+object NamingStyleBeanResolveHandler : AbstractBeanResolveHandler() {
+
+    override fun resolveAccessors(
+        context: BeanResolveHandler.Context,
+        getters: MutableMap<String, Method>,
+        setters: MutableMap<String, Method>
+    ) {
+        val methods = context.methods
+        for (method in methods) {
+            if (method.isBridge) {
+                continue
+            }
+            val name = method.name
+            if (name.length <= 3) {
+                continue
+            }
+            if (method.parameterCount == 0) {
+                getters[name] = method
+                continue
+            }
+            if (method.parameterCount == 1) {
+                setters[name] = method
+                continue
+            }
+        }
+    }
+}
+
+abstract class AbstractBeanResolveHandler : BeanResolveHandler {
+
+    private val cache = Cache.newFastCache<Pair<BeanType, String>, PropertyType>()
+
+    protected abstract fun resolveAccessors(
+        @OutParam context: BeanResolveHandler.Context,
+        getters: MutableMap<String, Method>,
+        setters: MutableMap<String, Method>
+    )
+
+    override fun resolve(context: BeanResolveHandler.Context) {
+        val getters = LinkedHashMap<String, Method>()
+        val setters = LinkedHashMap<String, Method>()
+        resolveAccessors(context, getters, setters)
+        val properties = context.properties
+        for (getter in getters) {
+            val propertyName = getter.key
+            val getterMethod = getter.value
+            val setterMethod = setters[propertyName]
+            if (setterMethod === null) {
+                properties[propertyName] = createProperty(context, propertyName, getterMethod, null)
+                continue
+            }
+            if (getterMethod.genericReturnType == setterMethod.genericParameterTypes[0]) {
+                properties[propertyName] = createProperty(context, propertyName, getterMethod, setterMethod)
+                continue
+            }
+            setters.remove(propertyName)
+        }
+        for (setter in setters) {
+            val propertyName = setter.key
+            val setterMethod = setter.value
+            properties[propertyName] = createProperty(context, propertyName, null, setterMethod)
         }
     }
 
-    private class PropertyTypeImpl(
-        override val genericOwnerType: Type,
-        descriptor: PropertyDescriptor,
-        private val typeVariableTable: Map<TypeVariable<*>, Type>,
-    ) : PropertyType {
-
-        override val name: String = descriptor.name
-        override val genericType: Type by lazy { tryGenericType() }
-        override val getter: Invoker? by lazy { tryGetter() }
-        override val setter: Invoker? by lazy { trySetter() }
-        override val field: Field? by lazy { tryField() }
-        override val fieldAnnotations: List<Annotation> by lazy { tryFieldAnnotations() }
-
-        private val getterMethod: Method? = descriptor.readMethod
-        private val setterMethod: Method? = descriptor.writeMethod
-
-        private fun tryGenericType(): Type {
-            val type = if (getterMethod !== null) {
-                getterMethod.genericReturnType
-            } else {
-                setterMethod!!.genericParameterTypes[0]
-            }
-            return type.eraseTypeVariables(typeVariableTable)
+    private fun createProperty(
+        context: BeanResolveHandler.Context,
+        name: String,
+        getterMethod: Method?,
+        setterMethod: Method?
+    ): PropertyType {
+        return cache.getOrLoad(context.type to name) {
+            PropertyTypeImpl(context.type, name, getterMethod, setterMethod, context.typeArguments)
         }
+    }
+}
 
-        private fun tryGetter(): Invoker? {
-            return if (getterMethod === null) null else getterMethod.toInvoker()
-        }
+private class PropertyTypeImpl(
+    override val ownerType: BeanType,
+    override val name: String,
+    private val getterMethod: Method?,
+    private val setterMethod: Method?,
+    private val typeArguments: Map<TypeVariable<*>, Type>,
+) : PropertyType {
 
-        private fun trySetter(): Invoker? {
-            return if (setterMethod === null) null else setterMethod.toInvoker()
-        }
+    override val type: Type by lazy { tryType() }
+    override val getter: Invoker? by lazy { tryGetter() }
+    override val setter: Invoker? by lazy { trySetter() }
+    override val backingField: Field? by lazy { tryBackingField() }
+    override val backingFieldAnnotations: List<Annotation> by lazy { tryBackingFieldAnnotations() }
 
-        private fun tryField(): Field? {
-            return ownerType.searchFieldOrNull(name, deep = true)
+    private fun tryType(): Type {
+        val type = if (getterMethod !== null) {
+            getterMethod.genericReturnType
+        } else {
+            setterMethod!!.genericParameterTypes[0]
         }
+        return type.eraseTypeVariables(typeArguments)
+    }
 
-        private fun tryFieldAnnotations(): List<Annotation> {
-            val f = field
-            return if (f === null) emptyList() else f.annotations.asList()
-        }
+    private fun tryGetter(): Invoker? {
+        return if (getterMethod === null) null else getterMethod.toInvoker()
+    }
 
-        override fun <T> getValue(bean: Any): T {
-            val g = getter
-            return if (g !== null) {
-                g.invoke(bean)
-            } else {
-                throw UnsupportedOperationException("This property is not readable: $name")
-            }
-        }
+    private fun trySetter(): Invoker? {
+        return if (setterMethod === null) null else setterMethod.toInvoker()
+    }
 
-        override fun <T> setValue(bean: Any, value: Any?): T {
-            val s = setter
-            if (s === null) {
-                throw UnsupportedOperationException("This property is not writeable: $name")
-            }
-            var old: T? = null
-            val g = getter
-            if (g !== null) {
-                old = g.invoke(bean)
-            }
-            s.invoke<Any?>(bean, value)
-            return old.asAny()
-        }
+    private fun tryBackingField(): Field? {
+        return ownerType.rawClass.searchFieldOrNull(name, deep = true)
+    }
 
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other !is PropertyType) return false
-            if (genericOwnerType != other.genericOwnerType) return false
-            if (name != other.name) return false
-            if (genericType != other.type) return false
-            return true
-        }
+    private fun tryBackingFieldAnnotations(): List<Annotation> {
+        val f = backingField
+        return if (f === null) emptyList() else f.annotations.asList()
+    }
 
-        override fun hashCode(): Int {
-            var result = genericOwnerType.hashCode()
-            result = 31 * result + name.hashCode()
-            result = 31 * result + genericType.hashCode()
-            return result
+    override fun <T> getValue(bean: Any): T {
+        val g = getter
+        return if (g !== null) {
+            g.invoke(bean)
+        } else {
+            throw UnsupportedOperationException("This property is not readable: $name")
         }
+    }
 
-        override fun toString(): String {
-            return "$name: ${genericType.typeName}"
+    override fun <T> setValue(bean: Any, value: Any?): T {
+        val s = setter
+        if (s === null) {
+            throw UnsupportedOperationException("This property is not writeable: $name")
         }
+        var old: T? = null
+        val g = getter
+        if (g !== null) {
+            old = g.invoke(bean)
+        }
+        s.invoke<Any?>(bean, value)
+        return old.asAny()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PropertyType) return false
+
+        if (ownerType != other.ownerType) return false
+        if (name != other.name) return false
+        if (type != other.type) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = ownerType.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "$name: ${ownerType.type.typeName}.${type.typeName}"
     }
 }

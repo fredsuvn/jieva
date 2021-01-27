@@ -13,9 +13,14 @@ interface NamingCase {
     fun join(words: List<CharSequence>): String
 
     @JvmDefault
-    fun convert(name: CharSequence, namingCase: NamingCase): String {
+    fun convertTo(name: CharSequence, toCase: NamingCase): String {
         val words = segment(name)
-        return namingCase.join(words)
+        return toCase.join(words)
+    }
+
+    @JvmDefault
+    fun convertFrom(name: CharSequence, fromCase: NamingCase): String {
+        return fromCase.convertTo(name, this)
     }
 
     companion object {

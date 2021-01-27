@@ -23,39 +23,7 @@ interface BeanType {
         @JvmName("properties") get
 
     @JvmDefault
-    fun property(name: String): PropertyType? {
+    fun getProperty(name: String): PropertyType? {
         return properties[name]
-    }
-
-    companion object {
-
-        @JvmStatic
-        fun newBeanSchema(genericType: Type, properties: Map<String, PropertyType>): BeanType {
-            return BeanTypeImpl(genericType, properties)
-        }
-
-        private class BeanTypeImpl(
-            override val type: Type,
-            override val properties: Map<String, PropertyType>,
-        ) : BeanType {
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other !is BeanType) return false
-                if (type != other.type) return false
-                if (properties != other.properties) return false
-                return true
-            }
-
-            override fun hashCode(): Int {
-                var result = type.hashCode()
-                result = 31 * result + properties.hashCode()
-                return result
-            }
-
-            override fun toString(): String {
-                return "bean ${type.typeName}"
-            }
-        }
     }
 }

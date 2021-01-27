@@ -918,33 +918,33 @@ fun @PossibleTypes(
     Class::class,
     ParameterizedType::class,
     GenericArrayType::class,
-) Type.findTypeArguments(): Map<TypeVariable<*>, Type> {
+) Type.typeArguments(): Map<TypeVariable<*>, Type> {
 
     if (this.isArray) {
-        return this.componentType!!.findTypeArguments()
+        return this.componentType!!.typeArguments()
     }
 
-    fun findTypeArgumentsTo0(@OutParam typeArguments: MutableMap<TypeVariable<*>, Type>, type: Type) {
+    fun getTypeArgumentsTo0(@OutParam typeArguments: MutableMap<TypeVariable<*>, Type>, type: Type) {
         if (type is ParameterizedType) {
             val ownerType = type.ownerType;
             if (ownerType !== null) {
-                findTypeArgumentsTo0(typeArguments, ownerType)
+                getTypeArgumentsTo0(typeArguments, ownerType)
             }
-            findTypeArgumentsTo(typeArguments, type)
+            getTypeArgumentsTo(typeArguments, type)
         }
         val rawClass = type.rawClass
         val genericSuperclass = rawClass.genericSuperclass
         if (genericSuperclass !== null) {
-            findTypeArgumentsTo0(typeArguments, genericSuperclass)
+            getTypeArgumentsTo0(typeArguments, genericSuperclass)
         }
         val genericInterfaces = rawClass.genericInterfaces
         for (genericInterface in genericInterfaces) {
-            findTypeArgumentsTo0(typeArguments, genericInterface)
+            getTypeArgumentsTo0(typeArguments, genericInterface)
         }
     }
 
     val typeArguments = mutableMapOf<TypeVariable<*>, Type>()
-    findTypeArgumentsTo0(typeArguments, this)
+    getTypeArgumentsTo0(typeArguments, this)
     eraseTypeVariablesSelves(typeArguments)
     return typeArguments
 }
@@ -960,8 +960,8 @@ fun @PossibleTypes(
     Class::class,
     ParameterizedType::class,
     GenericArrayType::class,
-) Type.findTypeArguments(vararg to: Class<*>): Map<TypeVariable<*>, Type> {
-    return this.findTypeArguments(to.toList())
+) Type.typeArguments(vararg to: Class<*>): Map<TypeVariable<*>, Type> {
+    return this.typeArguments(to.toList())
 }
 
 /**
@@ -975,13 +975,13 @@ fun @PossibleTypes(
     Class::class,
     ParameterizedType::class,
     GenericArrayType::class,
-) Type.findTypeArguments(to: Iterable<Class<*>>): Map<TypeVariable<*>, Type> {
+) Type.typeArguments(to: Iterable<Class<*>>): Map<TypeVariable<*>, Type> {
 
     if (this.isArray) {
-        return this.componentType!!.findTypeArguments()
+        return this.componentType!!.typeArguments()
     }
 
-    fun findTypeArgumentsTo0(
+    fun getTypeArgumentsTo0(
         @OutParam typeArguments: MutableMap<TypeVariable<*>, Type>,
         type: Type,
         to: MutableCollection<Class<*>>,
@@ -992,9 +992,9 @@ fun @PossibleTypes(
         if (type is ParameterizedType) {
             val ownerType = type.ownerType;
             if (ownerType !== null) {
-                findTypeArgumentsTo0(typeArguments, ownerType, to)
+                getTypeArgumentsTo0(typeArguments, ownerType, to)
             }
-            findTypeArgumentsTo(typeArguments, type)
+            getTypeArgumentsTo(typeArguments, type)
         }
         val rawClass = type.rawClass
         to.remove(rawClass)
@@ -1003,21 +1003,21 @@ fun @PossibleTypes(
         }
         val genericSuperclass = rawClass.genericSuperclass
         if (genericSuperclass !== null) {
-            findTypeArgumentsTo0(typeArguments, genericSuperclass, to)
+            getTypeArgumentsTo0(typeArguments, genericSuperclass, to)
         }
         val genericInterfaces = rawClass.genericInterfaces
         for (genericInterface in genericInterfaces) {
-            findTypeArgumentsTo0(typeArguments, genericInterface, to)
+            getTypeArgumentsTo0(typeArguments, genericInterface, to)
         }
     }
 
     val typeArguments = mutableMapOf<TypeVariable<*>, Type>()
-    findTypeArgumentsTo0(typeArguments, this, to.toMutableList())
+    getTypeArgumentsTo0(typeArguments, this, to.toMutableList())
     eraseTypeVariablesSelves(typeArguments)
     return typeArguments
 }
 
-private fun findTypeArgumentsTo(@OutParam typeArguments: MutableMap<TypeVariable<*>, Type>, type: ParameterizedType) {
+private fun getTypeArgumentsTo(@OutParam typeArguments: MutableMap<TypeVariable<*>, Type>, type: ParameterizedType) {
     val arguments = type.actualTypeArguments
     val parameters = type.rawClass.typeParameters
     for (i in parameters.indices) {
@@ -1036,7 +1036,7 @@ private fun eraseTypeVariablesSelves(@OutParam typeArguments: MutableMap<TypeVar
 }
 
 @JvmOverloads
-fun Type.eraseTypeVariables(typeArguments: Map<TypeVariable<*>, Type> = this.findTypeArguments()): Type {
+fun Type.eraseTypeVariables(typeArguments: Map<TypeVariable<*>, Type> = this.typeArguments()): Type {
     return when (this) {
         is Class<*> -> this
         is ParameterizedType -> {
@@ -1262,7 +1262,7 @@ fun @PossibleTypes(
     var rawClass = this.rawClass
     if (targets.contains(rawClass)) {
         return if (typeArguments === null) {
-            this.eraseTypeVariables { it.findTypeArguments(rawClass) }
+            this.eraseTypeVariables { it.typeArguments(rawClass) }
         } else {
             this.eraseTypeVariables(typeArguments)
         }
@@ -1273,7 +1273,7 @@ fun @PossibleTypes(
         rawClass = genericType.rawClass
         if (targets.contains(rawClass)) {
             return if (typeArguments === null) {
-                genericType.eraseTypeVariables { it.findTypeArguments(rawClass) }
+                genericType.eraseTypeVariables { it.typeArguments(rawClass) }
             } else {
                 genericType.eraseTypeVariables(typeArguments)
             }
@@ -1331,7 +1331,7 @@ fun @PossibleTypes(
             val genericClass = genericType.rawClass
             if (targets.contains(genericClass)) {
                 return if (typeArguments === null) {
-                    genericType.eraseTypeVariables { it.findTypeArguments(genericClass) }
+                    genericType.eraseTypeVariables { it.typeArguments(genericClass) }
                 } else {
                     genericType.eraseTypeVariables(typeArguments)
                 }
@@ -1351,7 +1351,7 @@ fun @PossibleTypes(
     val rawClass = this.rawClass
     if (targets.contains(rawClass)) {
         return if (typeArguments === null) {
-            this.eraseTypeVariables { it.findTypeArguments(rawClass) }
+            this.eraseTypeVariables { it.typeArguments(rawClass) }
         } else {
             this.eraseTypeVariables(typeArguments)
         }
@@ -1359,7 +1359,7 @@ fun @PossibleTypes(
     val tryInterfaces = findInterface(rawClass.genericInterfaces.asList(), targets)
     if (tryInterfaces !== null) {
         return if (typeArguments === null) {
-            tryInterfaces.eraseTypeVariables { it.findTypeArguments(tryInterfaces.rawClass) }
+            tryInterfaces.eraseTypeVariables { it.typeArguments(tryInterfaces.rawClass) }
         } else {
             tryInterfaces.eraseTypeVariables(typeArguments)
         }
@@ -1372,7 +1372,7 @@ fun @PossibleTypes(
         trySuperInterface = findInterface(superclass.genericInterfaces.asList(), targets)
         if (trySuperInterface !== null) {
             return if (typeArguments === null) {
-                trySuperInterface.eraseTypeVariables { it.findTypeArguments(trySuperInterface.rawClass) }
+                trySuperInterface.eraseTypeVariables { it.typeArguments(trySuperInterface.rawClass) }
             } else {
                 trySuperInterface.eraseTypeVariables(typeArguments)
             }
