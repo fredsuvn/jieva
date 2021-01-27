@@ -1037,13 +1037,13 @@ fun <T> Iterable<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
 
 fun <T> Iterable<T>.toArray(componentType: Class<*>): Array<T> {
     val list = this.asToList()
-    val array: Array<T> = componentType.componentTypeToArray(0)
+    val array: Array<T> = componentType.newArray(list.size).asAny()
     return JavaCollect.toArray(list, array)
 }
 
 fun <T, R> Iterable<T>.toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
     val list = this.asToList()
-    val result = componentType.componentTypeToArray<Array<R>>(list.size)
+    val result = componentType.newArray<Array<R>>(list.size)
     list.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }

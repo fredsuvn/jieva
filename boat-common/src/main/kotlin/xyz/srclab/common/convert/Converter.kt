@@ -2,7 +2,12 @@ package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
-import xyz.srclab.common.reflect.*
+import xyz.srclab.common.collect.*
+import xyz.srclab.common.collect.IterableType.Companion.toIterableType
+import xyz.srclab.common.reflect.TypeRef
+import xyz.srclab.common.reflect.rawClass
+import xyz.srclab.common.reflect.toInstance
+import xyz.srclab.common.reflect.upperBound
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -20,6 +25,8 @@ import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.collections.LinkedHashMap
 import kotlin.collections.LinkedHashSet
+import kotlin.collections.plus
+import kotlin.collections.toList
 
 interface Converter {
 
@@ -324,140 +331,122 @@ abstract class AbstractTypeConvertHandler : ConvertHandler {
 
 object IterableConvertHandler : AbstractTypeConvertHandler() {
 
-    override fun convertNull(toType: Type, converter: Converter): Any? {
+    override fun convertNull(toType: Type, converter: Converter): Any {
         return Default.NULL
     }
 
     override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
             is Class<*> -> {
-                val fromIterable = fromIterable(from)
-                if (fromIterable === null) {
-                    return null
+                if (toType.isArray) {
+                    val iterable = fromToIterable(from)
+                    return if (iterable === null) {
+                        null
+                    } else {
+                        toArray(iterable, toType, converter)
+                    }
                 }
-                toIterable(fromIterable, toType, converter)
+                if (Iterable::class.java.isAssignableFrom(toType)) {
+                    return toIterableType(from, toType.toIterableType(), converter)
+                }
+                null
             }
+            is GenericArrayType -> convertNotNull(from, fromType, toType.rawClass, converter)
             is ParameterizedType -> {
-                val fromIterable = fromIterable(from)
-                if (fromIterable === null) {
-                    return null
+                val rawClass = toType.rawClass
+                if (Iterable::class.java.isAssignableFrom(rawClass)) {
+                    return toIterableType(from, toType.toIterableType(), converter)
                 }
-                toIterable(fromIterable, toType, converter)
-            }
-            is GenericArrayType -> {
-                val fromIterable = fromIterable(from)
-                if (fromIterable === null) {
-                    return null
-                }
-                toIterable(fromIterable, toType, converter)
+                null
             }
             else -> null
         }
     }
 
-    private fun fromIterable(from: Any): Iterable<Any?>? {
+    private fun toArray(iterable: Iterable<Any?>, arrayClass: Class<*>, converter: Converter): Any {
+        return when (val componentType = arrayClass.componentType) {
+            Boolean::class.javaPrimitiveType -> iterable.toBooleanArray()
+            Byte::class.javaPrimitiveType -> iterable.toByteArray()
+            Short::class.javaPrimitiveType -> iterable.toShortArray()
+            Char::class.javaPrimitiveType -> iterable.toCharArray()
+            Int::class.javaPrimitiveType -> iterable.toIntArray()
+            Long::class.javaPrimitiveType -> iterable.toLongArray()
+            Float::class.javaPrimitiveType -> iterable.toFloatArray()
+            Double::class.javaPrimitiveType -> iterable.toDoubleArray()
+            else -> iterable.toArray(componentType) { converter.convert(it, componentType) }
+        }
+    }
+
+    private fun toIterableType(from: Any, iterableType: IterableType, converter: Converter): Any? {
+        return when (iterableType.rawClass) {
+            List::class.java, ArrayList::class.java -> toArrayList(from, iterableType.componentType, converter)
+            LinkedList::class.java -> toLinkedList(from, iterableType.componentType, converter)
+            Collection::class.java, Set::class.java, LinkedHashSet::class.java ->
+                toLinkedHashSet(from, iterableType.componentType, converter)
+            HashSet::class.java -> toHashSet(from, iterableType.componentType, converter)
+            TreeSet::class.java -> toTreeSet(from, iterableType.componentType, converter)
+            else -> null
+        }
+    }
+
+    private fun toArrayList(from: Any, componentType: Type, converter: Converter): Any? {
+        val iterable = fromToIterable(from)
+        if (iterable === null) {
+            return null
+        }
+        return iterable.mapTo(ArrayList<Any?>(iterable.count())) {
+            converter.convert(it, componentType)
+        }.toList()
+    }
+
+    private fun toLinkedList(from: Any, componentType: Type, converter: Converter): Any? {
+        val iterable = fromToIterable(from)
+        if (iterable === null) {
+            return null
+        }
+        return iterable.mapTo(LinkedList<Any?>()) {
+            converter.convert(it, componentType)
+        }.toList()
+    }
+
+    private fun toLinkedHashSet(from: Any, componentType: Type, converter: Converter): Any? {
+        val iterable = fromToIterable(from)
+        if (iterable === null) {
+            return null
+        }
+        return iterable.mapTo(LinkedHashSet<Any?>()) {
+            converter.convert(it, componentType)
+        }.toList()
+    }
+
+    private fun toHashSet(from: Any, componentType: Type, converter: Converter): Any? {
+        val iterable = fromToIterable(from)
+        if (iterable === null) {
+            return null
+        }
+        return iterable.mapTo(HashSet<Any?>()) {
+            converter.convert(it, componentType)
+        }.toList()
+    }
+
+    private fun toTreeSet(from: Any, componentType: Type, converter: Converter): Any? {
+        val iterable = fromToIterable(from)
+        if (iterable === null) {
+            return null
+        }
+        return iterable.mapTo(TreeSet<Any?>()) {
+            converter.convert(it, componentType)
+        }.toList()
+    }
+
+    private fun fromToIterable(from: Any): Iterable<Any?>? {
         if (from is Iterable<*>) {
             return from
         }
         if (from.javaClass.isArray) {
-            return from.arrayAsList<Any?>()
+            return from.arrayAsList()
         }
         return null
-    }
-
-    private fun toIterable(iterable: Iterable<Any?>, toType: Class<*>, converter: Converter): Any? {
-        if (toType.isArray) {
-            val array = toType.arrayTypeToArray<Any?>(iterable.count())
-
-        }
-    }
-
-    private fun toIterable(iterable: Iterable<Any?>, toType: ParameterizedType, converter: Converter): Any? {
-    }
-
-    private fun toIterable(iterable: Iterable<Any?>, toType: GenericArrayType, converter: Converter): Any? {
-    }
-
-    private fun iterableToType(iterable: Iterable<Any?>, toType: Type, converter: Converter): Any? {
-        val toComponentType = toType.componentType
-        if (toComponentType !== null) {
-            val upperComponentType = toComponentType.upperBound
-            return iterable
-                .map { converter.convert<Any?>(it, upperComponentType) }
-                .toAnyArray(upperComponentType.upperClass)
-        }
-        val iterableSchema = toType.resolveIterableSchemaOrNull()
-        if (iterableSchema === null) {
-            return null
-        }
-        return if (iterable is Collection<*>)
-            collectionMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.upperBound, converter)
-        else
-            iterableMapTo(iterable, iterableSchema.rawClass, iterableSchema.componentType.upperBound, converter)
-    }
-
-    private fun iterableMapTo(
-        iterable: Iterable<Any?>,
-        iterableClass: Class<*>,
-        componentType: Type,
-        converter: Converter
-    ): Iterable<Any?>? {
-        return when (iterableClass) {
-            List::class.java -> iterable.mapTo(LinkedList<Any?>()) {
-                converter.convert(it, componentType)
-            }.toList()
-            LinkedList::class.java -> iterable.mapTo(LinkedList()) {
-                converter.convert(it, componentType)
-            }
-            ArrayList::class.java -> iterable.mapTo(ArrayList()) {
-                converter.convert(it, componentType)
-            }
-            Collection::class.java, Set::class.java -> iterable.mapTo(LinkedHashSet<Any?>()) {
-                converter.convert(it, componentType)
-            }.toSet()
-            LinkedHashSet::class.java -> iterable.mapTo(LinkedHashSet()) {
-                converter.convert(it, componentType)
-            }
-            HashSet::class.java -> iterable.mapTo(HashSet()) {
-                converter.convert(it, componentType)
-            }
-            TreeSet::class.java -> iterable.mapTo(TreeSet()) {
-                converter.convert(it, componentType)
-            }
-            else -> null
-        }
-    }
-
-    private fun collectionMapTo(
-        collection: Collection<Any?>,
-        iterableClass: Class<*>,
-        componentType: Type,
-        converter: Converter
-    ): Iterable<Any?>? {
-        return when (iterableClass) {
-            List::class.java -> collection.mapTo(ArrayList<Any?>(collection.size)) {
-                converter.convert(it, componentType)
-            }.toList()
-            LinkedList::class.java -> collection.mapTo(LinkedList()) {
-                converter.convert(it, componentType)
-            }
-            ArrayList::class.java -> collection.mapTo(ArrayList(collection.size)) {
-                converter.convert(it, componentType)
-            }
-            Collection::class.java, Set::class.java -> collection.mapTo(LinkedHashSet<Any?>(collection.size)) {
-                converter.convert(it, componentType)
-            }.toSet()
-            LinkedHashSet::class.java -> collection.mapTo(LinkedHashSet(collection.size)) {
-                converter.convert(it, componentType)
-            }
-            HashSet::class.java -> collection.mapTo(HashSet(collection.size)) {
-                converter.convert(it, componentType)
-            }
-            TreeSet::class.java -> collection.mapTo(TreeSet()) {
-                converter.convert(it, componentType)
-            }
-            else -> null
-        }
     }
 }
 
@@ -465,58 +454,66 @@ open class BeanConvertHandler(
     private val beanResolver: BeanResolver = BeanResolver.DEFAULT
 ) : AbstractTypeConvertHandler() {
 
-    override fun doConvertNull(toType: Type, converter: Converter): Any? {
+    override fun convertNull(toType: Type, converter: Converter): Any {
         return Default.NULL
     }
 
-    override fun doConvertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+    override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
         return when (toType) {
-            is Class<*> -> return doConvert0(from, toType, toType.upperBound, converter)
-            is ParameterizedType -> return doConvert0(from, toType.rawClass, toType.upperBound, converter)
+            Map::class.java, LinkedHashMap::class.java -> toLinkedHashMap(from, fromType, toType, converter)
+            HashMap::class.java -> toHashMap(from, fromType, toType, converter)
+            TreeMap::class.java -> toTreeMap(from, fromType, toType, converter)
+            is Class<*> -> {
+                if (toType.isArray) {
+                    return null
+                }
+                return beanResolver.copyProperties(from, toType.toInstance(), fromType, toType, converter)
+            }
+            is ParameterizedType -> {
+                return when (val rawClass = toType.rawClass) {
+                    Map::class.java, LinkedHashMap::class.java -> toLinkedHashMap(from, fromType, toType, converter)
+                    HashMap::class.java -> toHashMap(from, fromType, toType, converter)
+                    TreeMap::class.java -> toTreeMap(from, fromType, toType, converter)
+                    else -> beanResolver.copyProperties(from, rawClass.toInstance(), fromType, toType, converter)
+                }
+            }
             else -> null
         }
     }
 
-    private fun doConvert0(from: Any, toRawClass: Class<*>, toType: Type, converter: Converter): Any? {
-        return when (toRawClass) {
-            Map::class.java -> beanResolver.copyProperties(
-                from,
-                HashMap<Any, Any?>(),
-                from.javaClass,
-                toType,
-                converter
-            ).toMap()
-            MutableMap::class.java, LinkedHashMap::class.java -> beanResolver.copyProperties(
-                from,
-                LinkedHashMap(),
-                from.javaClass,
-                toType,
-                converter
-            )
-            HashMap::class.java -> beanResolver.copyProperties(
-                from,
-                HashMap(),
-                from.javaClass,
-                toType,
-                converter
-            )
-            TreeMap::class.java -> beanResolver.copyProperties(
-                from,
-                TreeMap(),
-                from.javaClass,
-                toType,
-                converter
-            )
-            else -> {
-                val toInstance = toRawClass.toInstance<Any>()
-                return beanResolver.copyProperties(from, toInstance, from.javaClass, toType, converter)
-            }
-        }
+    private fun toLinkedHashMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+        return beanResolver.copyProperties<Any>(
+            from,
+            LinkedHashMap<Any?, Any?>(),
+            fromType,
+            toType,
+            converter
+        )
+    }
+
+    private fun toHashMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+        return beanResolver.copyProperties<Any>(
+            from,
+            HashMap<Any?, Any?>(),
+            fromType,
+            toType,
+            converter
+        )
+    }
+
+    private fun toTreeMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+        return beanResolver.copyProperties<Any>(
+            from,
+            TreeMap<Any?, Any?>(),
+            fromType,
+            toType,
+            converter
+        )
     }
 
     companion object {
 
         @JvmField
-        val DEFAULT: BeanTypeConvertHandler = BeanTypeConvertHandler()
+        val DEFAULT: BeanConvertHandler = BeanConvertHandler()
     }
 }
