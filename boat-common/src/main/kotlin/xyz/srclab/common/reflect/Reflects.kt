@@ -1,4 +1,4 @@
-@file:JvmName("ReflectKit")
+@file:JvmName("Reflects")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.reflect
@@ -198,7 +198,11 @@ val Type.rawOrUpperClass: Class<*>
 val TypeVariable<*>.lowerClass: Class<*>?
     @JvmName("lowerClass") get() {
         val bounds = this.bounds
-        return if (bounds is Class<*> && bounds.isFinal) bounds else null
+        return if (bounds.isEmpty()) {
+            null
+        } else {
+            bounds[0].rawOrLowerClass
+        }
     }
 
 val WildcardType.lowerClass: Class<*>?
@@ -258,7 +262,12 @@ val Type.thisOrUpperBound: Type
 val TypeVariable<*>.lowerBound: Type?
     @JvmName("lowerBound")
     get() {
-        return this.lowerClass
+        val bounds = this.bounds
+        return if (bounds.isEmpty()) {
+            null
+        } else {
+            bounds[0].thisOrLowerBound
+        }
     }
 
 val WildcardType.lowerBound: Type?
@@ -401,15 +410,15 @@ fun <T> Class<*>.toInstance(parameterTypes: Array<out Class<*>>, args: Array<out
 
 fun Class<*>.toWrapperClass(): Class<*> {
     return when (this) {
-        Boolean::class.javaPrimitiveType -> Boolean::class.java
-        Byte::class.javaPrimitiveType -> Byte::class.java
-        Short::class.javaPrimitiveType -> Short::class.java
-        Char::class.javaPrimitiveType -> Char::class.java
-        Int::class.javaPrimitiveType -> Int::class.java
-        Long::class.javaPrimitiveType -> Long::class.java
-        Float::class.javaPrimitiveType -> Float::class.java
-        Double::class.javaPrimitiveType -> Double::class.java
-        Void::class.javaPrimitiveType -> Void::class.java
+        Boolean::class.javaPrimitiveType -> Boolean::class.javaObjectType
+        Byte::class.javaPrimitiveType -> Byte::class.javaObjectType
+        Short::class.javaPrimitiveType -> Short::class.javaObjectType
+        Char::class.javaPrimitiveType -> Char::class.javaObjectType
+        Int::class.javaPrimitiveType -> Int::class.javaObjectType
+        Long::class.javaPrimitiveType -> Long::class.javaObjectType
+        Float::class.javaPrimitiveType -> Float::class.javaObjectType
+        Double::class.javaPrimitiveType -> Double::class.javaObjectType
+        Void::class.javaPrimitiveType -> Void::class.javaObjectType
         else -> this
     }
 }

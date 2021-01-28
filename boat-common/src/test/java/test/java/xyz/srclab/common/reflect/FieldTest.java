@@ -2,13 +2,13 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.reflect.FieldKit;
+import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-public class FieldKitTest {
+public class FieldTest {
 
     private static final TestLogger testLogger = TestLogger.DEFAULT;
 
@@ -25,21 +25,21 @@ public class FieldKitTest {
     Field subPrivateField = SubNewClass.class.getDeclaredField("subPrivateField");
     Field subPackageField = SubNewClass.class.getDeclaredField("subPackageField");
 
-    public FieldKitTest() throws NoSuchFieldException {
+    public FieldTest() throws NoSuchFieldException {
     }
 
     @Test
     public void testFind() throws Exception {
         Assert.assertEquals(
-                FieldKit.findFields(NewClass.class),
+                Reflects.fields(NewClass.class),
                 Arrays.asList(NewClass.class.getFields())
         );
         Assert.assertEquals(
-                FieldKit.findDeclaredFields(NewClass.class),
+                Reflects.declaredFields(NewClass.class),
                 Arrays.asList(NewClass.class.getDeclaredFields())
         );
         Assert.assertEquals(
-                FieldKit.findOwnedFields(SubNewClass.class),
+                Reflects.ownedFields(SubNewClass.class),
                 Arrays.asList(
                         subPublicField, publicField, superPublicField,
                         subProtectedField, subPrivateField, subPackageField
@@ -47,13 +47,13 @@ public class FieldKitTest {
         );
 
         Assert.assertEquals(
-                FieldKit.findOwnedField(NewClass.class, "protectedField"),
+                Reflects.ownedField(NewClass.class, "protectedField"),
                 NewClass.class.getDeclaredField("protectedField")
         );
-        Assert.assertNull(FieldKit.findOwnedField(NewClass.class, "superProtectedField"));
+        Assert.assertNull(Reflects.ownedFieldOrNull(NewClass.class, "superProtectedField"));
 
         Assert.assertEquals(
-                FieldKit.searchFields(SubNewClass.class, f -> f.getName().contains("ackage")),
+                Reflects.searchFields(SubNewClass.class, f -> f.getName().contains("ackage")),
                 Arrays.asList(subPackageField, packageField, superPackageField)
         );
     }
@@ -63,11 +63,11 @@ public class FieldKitTest {
         NewClass newClass = new NewClass();
 
         Assert.assertEquals(
-                FieldKit.getFieldValue(
+                Reflects.getFieldValue(
                         NewClass.class, "superPrivateField", newClass, true, true),
                 "superPrivateField"
         );
-        FieldKit.setFieldValue(
+        Reflects.setFieldValue(
                 NewClass.class,
                 "superPrivateField",
                 newClass,
@@ -75,13 +75,13 @@ public class FieldKitTest {
                 true,
                 true);
         Assert.assertEquals(
-                FieldKit.getFieldValue(
+                Reflects.getFieldValue(
                         NewClass.class, "superPrivateField", newClass, true, true),
                 "superPrivateField2"
         );
 
         Assert.expectThrows(NoSuchFieldException.class, () ->
-                FieldKit.getFieldValue(
+                Reflects.getFieldValue(
                         NewClass.class, "superPrivateField", newClass, false, true)
         );
     }

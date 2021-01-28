@@ -1,11 +1,11 @@
-package test.java.xyz.srclab.common.base;
+package test.java.xyz.srclab.common.invoke;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Invoker;
-import xyz.srclab.common.base.InvokerProvider;
-import xyz.srclab.common.base.MethodHandlerInvokerProvider;
-import xyz.srclab.common.base.ReflectedInvokerProvider;
+import xyz.srclab.common.invoke.Invoker;
+import xyz.srclab.common.invoke.InvokerProvider;
+import xyz.srclab.common.invoke.MethodHandlerInvokerProvider;
+import xyz.srclab.common.invoke.ReflectedInvokerProvider;
 import xyz.srclab.common.test.TestMarker;
 
 /**

@@ -2,7 +2,7 @@ package test.java.xyz.srclab.common.bean;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.testng.annotations.Test;
-import xyz.srclab.common.bean.BeanKit;
+import xyz.srclab.common.bean.Beans;
 import xyz.srclab.common.test.TestLogger;
 import xyz.srclab.common.test.TestTask;
 import xyz.srclab.common.test.Tester;
@@ -50,7 +50,7 @@ public class BeanPerformanceTest {
         Tester.testTasksParallel(
                 TestTask.newTask("BeanKit", times, () -> {
                     PerformanceBean b = new PerformanceBean();
-                    BeanKit.copyProperties(a, b);
+                    Beans.copyProperties(a, b);
                     return null;
                 }),
                 TestTask.newTask("Beanutils", times, () -> {

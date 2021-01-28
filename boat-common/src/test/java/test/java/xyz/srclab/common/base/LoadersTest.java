@@ -5,21 +5,21 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Loader;
+import xyz.srclab.common.base.Loaders;
 
 import java.util.Collections;
 
-public class LoadersKtTest {
+public class LoadersTest {
 
     @Test
     public void testLoader() {
         Assert.assertEquals(
-                Loader.loadStringResources("META-INF/test.info"),
+                Loaders.loadStringResources("META-INF/test.info"),
                 Collections.singletonList("test.info")
         );
 
         String newClassName = "test.xyz.srclab.A";
-        Class<?> clazz = Loader.loadClass(createClass(newClassName));
+        Class<?> clazz = Loaders.loadClass(createClass(newClassName));
         System.out.println(clazz);
         System.out.println(clazz.getClassLoader());
         Assert.assertEquals(clazz.getName(), newClassName);

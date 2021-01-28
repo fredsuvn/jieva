@@ -2,8 +2,8 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.collect.ListOps;
-import xyz.srclab.common.reflect.MethodKit;
+import xyz.srclab.common.collect.Collects;
+import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Method;
@@ -13,7 +13,7 @@ import java.util.Comparator;
 /**
  * @author sunqian
  */
-public class MethodKitTest {
+public class MethodTest {
 
     private static final TestLogger testLogger = TestLogger.DEFAULT;
 
@@ -30,22 +30,22 @@ public class MethodKitTest {
     Method subPrivateMethod = SubNewClass.class.getDeclaredMethod("subPrivateMethod");
     Method subPackageMethod = SubNewClass.class.getDeclaredMethod("subPackageMethod");
 
-    public MethodKitTest() throws NoSuchMethodException {
+    public MethodTest() throws NoSuchMethodException {
     }
 
     @Test
     public void testFind() throws Exception {
         Assert.assertEquals(
-                MethodKit.methods(NewClass.class),
+                Reflects.methods(NewClass.class),
                 Arrays.asList(NewClass.class.getMethods())
         );
         Assert.assertEquals(
-                MethodKit.declaredMethods(NewClass.class),
+                Reflects.declaredMethods(NewClass.class),
                 Arrays.asList(NewClass.class.getDeclaredMethods())
         );
         Assert.assertEquals(
-                ListOps.sorted(MethodKit.ownedMethods(SubNewClass.class), Comparator.comparing(Method::toString)),
-                ListOps.sorted(Arrays.asList(
+                Collects.sorted(Reflects.ownedMethods(SubNewClass.class), Comparator.comparing(Method::toString)),
+                Collects.sorted(Arrays.asList(
                         subPublicMethod,
                         publicMethod,
                         NewClass.class.getMethod("equals", Object.class),
@@ -65,13 +65,13 @@ public class MethodKitTest {
         );
 
         Assert.assertEquals(
-                MethodKit.ownedMethodOrNull(NewClass.class, "protectedMethod"),
+                Reflects.ownedMethodOrNull(NewClass.class, "protectedMethod"),
                 NewClass.class.getDeclaredMethod("protectedMethod")
         );
-        Assert.assertNull(MethodKit.ownedMethodOrNull(NewClass.class, "superProtectedMethod"));
+        Assert.assertNull(Reflects.ownedMethodOrNull(NewClass.class, "superProtectedMethod"));
 
         Assert.assertEquals(
-                MethodKit.searchMethods(SubNewClass.class, m -> m.getName().contains("ackage")),
+                Reflects.searchMethods(SubNewClass.class, m -> m.getName().contains("ackage")),
                 Arrays.asList(subPackageMethod, packageMethod, superPackageMethod)
         );
     }
@@ -80,18 +80,18 @@ public class MethodKitTest {
     public void testInvoke() {
         NewClass newClass = new NewClass();
         Assert.assertEquals(
-                MethodKit.invoke(superPublicMethod, newClass),
+                Reflects.invoke(superPublicMethod, newClass),
                 "superPublicField"
         );
         Assert.assertEquals(
-                MethodKit.invokeForcible(privateMethod, newClass),
+                Reflects.invokeForcible(privateMethod, newClass),
                 "privateField"
         );
         Assert.expectThrows(IllegalAccessException.class, () ->
-                MethodKit.invoke(superPrivateMethod, newClass)
+                Reflects.invoke(superPrivateMethod, newClass)
         );
         Assert.assertEquals(
-                MethodKit.invokeForcible(superPrivateMethod, newClass),
+                Reflects.invokeForcible(superPrivateMethod, newClass),
                 "superPrivateField"
         );
     }

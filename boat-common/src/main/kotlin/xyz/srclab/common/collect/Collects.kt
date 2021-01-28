@@ -2561,13 +2561,13 @@ fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
 
 fun <T> Sequence<T>.toArray(componentType: Class<*>): Array<T> {
     val list = this.toListKt()
-    val array: Array<T> = componentType.componentTypeToArray(0)
+    val array: Array<T> = componentType.newArray(0).asAny()
     return JavaCollect.toArray(list, array)
 }
 
 fun <T, R> Sequence<T>.toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
     val list = this.toListKt()
-    val result = componentType.componentTypeToArray<Array<R>>(list.size)
+    val result = componentType.newArray<Array<R>>(list.size)
     list.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }

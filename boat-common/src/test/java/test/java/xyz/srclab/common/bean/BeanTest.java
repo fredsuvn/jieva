@@ -4,12 +4,12 @@ import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.As;
-import xyz.srclab.common.bean.BeanKit;
+import xyz.srclab.common.base.Anys;
 import xyz.srclab.common.bean.BeanResolver;
 import xyz.srclab.common.bean.BeanType;
+import xyz.srclab.common.bean.Beans;
 import xyz.srclab.common.bean.PropertyType;
-import xyz.srclab.common.reflect.TypeKit;
+import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.test.TestLogger;
 
@@ -29,7 +29,7 @@ public class BeanTest {
         simpleBean.setP1("123");
         simpleBean.setP2(6);
         simpleBean.setP3(Arrays.asList("1", "2", "3"));
-        Map<String, Object> simpleMap = BeanKit.asMap(simpleBean);
+        Map<String, Object> simpleMap = Beans.asMap(simpleBean);
         Assert.assertEquals(simpleMap.get("p1"), "123");
         Assert.assertEquals(simpleMap.get("p2"), 6);
         Assert.assertEquals(simpleMap.get("p3"), Arrays.asList("1", "2", "3"));
@@ -38,9 +38,9 @@ public class BeanTest {
         Assert.expectThrows(UnsupportedOperationException.class, () -> simpleMap.put("p4", "p4"));
 
         BeanResolver.CopyOptions copyOptions = BeanResolver.CopyOptions.DEFAULT
-                .withTypes(SimpleBean.class, TypeKit.parameterizedType(Map.class, String.class, int.class))
+                .withTypes(SimpleBean.class, Reflects.parameterizedType(Map.class, String.class, int.class))
                 .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
-        Map<String, Integer> siMap = As.asAny(BeanKit.asMap(simpleBean, copyOptions));
+        Map<String, Integer> siMap = Anys.as(Beans.asMap(simpleBean, copyOptions));
         testLogger.log("siMap: {}", siMap);
         Assert.assertEquals(siMap.get("p1"), (Integer) 555);
         Assert.assertEquals(siMap.get("p2"), (Integer) 6);
@@ -57,7 +57,7 @@ public class BeanTest {
         simpleMap.put("p1", null);
         simpleMap.put("p2", null);
         simpleMap.put("p3", null);
-        BeanKit.copyProperties(simpleBean, simpleMap);
+        Beans.copyProperties(simpleBean, simpleMap);
         Assert.assertEquals(simpleMap.get("p1"), "123");
         Assert.assertEquals(simpleMap.get("p2"), 6);
         Assert.assertEquals(simpleMap.get("p3"), Arrays.asList("1", "2", "3"));
@@ -73,27 +73,27 @@ public class BeanTest {
         a.setP3(Arrays.asList("1", "2", "3"));
 
         SimpleBean b = new SimpleBean();
-        BeanKit.copyProperties(a, b);
+        Beans.copyProperties(a, b);
         Assert.assertEquals(b.getP1(), a.getP1());
         Assert.assertEquals(b.getP2(), a.getP2());
         Assert.assertEquals(b.getP3(), a.getP3());
 
         a.setP1(null);
-        BeanKit.copyProperties(a, b);
+        Beans.copyProperties(a, b);
         Assert.assertEquals(b.getP1(), a.getP1());
         Assert.assertEquals(b.getP2(), a.getP2());
         Assert.assertEquals(b.getP3(), a.getP3());
 
         a.setP1(null);
         b.setP1("234");
-        BeanKit.copyPropertiesIgnoreNull(a, b);
+        Beans.copyPropertiesIgnoreNull(a, b);
         Assert.assertEquals(b.getP1(), "234");
         Assert.assertEquals(b.getP2(), a.getP2());
         Assert.assertEquals(b.getP3(), a.getP3());
 
         a.setP1("111");
         b.setP1("567");
-        BeanKit.copyProperties(a, b, new BeanResolver.CopyOptions() {
+        Beans.copyProperties(a, b, new BeanResolver.CopyOptions() {
             @NotNull
             public Function1<Object, Boolean> getNameFilter() {
                 return name -> !name.equals("p1");
@@ -114,16 +114,16 @@ public class BeanTest {
     @Test
     public void testGenericBeanASchema() {
         GenericBeanA a = new GenericBeanA();
-        BeanType aSchema = BeanKit.resolve(a.getClass());
+        BeanType aSchema = Beans.resolve(a.getClass());
         Map<String, PropertyType> aPropertySchemas = aSchema.properties();
         System.out.println(aPropertySchemas);
-        Assert.assertEquals(aPropertySchemas.get("a1").genericType(), String.class);
-        Assert.assertEquals(aPropertySchemas.get("a2").genericType(), new TypeRef<List<String>>() {
+        Assert.assertEquals(aPropertySchemas.get("a1").type(), String.class);
+        Assert.assertEquals(aPropertySchemas.get("a2").type(), new TypeRef<List<String>>() {
         }.type());
-        Assert.assertEquals(aPropertySchemas.get("i1").genericType(), Integer.class);
-        Assert.assertEquals(aPropertySchemas.get("i2").genericType(), new TypeRef<List<Integer>>() {
+        Assert.assertEquals(aPropertySchemas.get("i1").type(), Integer.class);
+        Assert.assertEquals(aPropertySchemas.get("i2").type(), new TypeRef<List<Integer>>() {
         }.type());
-        Assert.assertEquals(aPropertySchemas.get("class").genericType(), new TypeRef<Class<?>>() {
+        Assert.assertEquals(aPropertySchemas.get("class").type(), new TypeRef<Class<?>>() {
         }.type());
     }
 
@@ -131,7 +131,7 @@ public class BeanTest {
     public void testGenericBeanSchema() {
         Type gType = new TypeRef<GenericBean<String, ?, Iterable<? extends String>>>() {
         }.type();
-        BeanType gSchema = BeanKit.resolve(gType);
+        BeanType gSchema = Beans.resolve(gType);
         Map<String, PropertyType> gPropertySchemas = gSchema.properties();
         System.out.println(gPropertySchemas);
         //Assert.assertEquals(gPropertySchemas.get("a1").genericType(), String.class);
@@ -147,10 +147,10 @@ public class BeanTest {
     @Test
     public void testSubGenericBeanSchema() {
         SubGenericBean s = new SubGenericBean();
-        BeanType sSchema = BeanKit.resolve(s.getClass());
+        BeanType sSchema = Beans.resolve(s.getClass());
         Map<String, PropertyType> sPropertySchemas = sSchema.properties();
         System.out.println(sPropertySchemas);
 
-        TypeKit.rawClass(String.class);
+        Reflects.rawClass(String.class);
     }
 }

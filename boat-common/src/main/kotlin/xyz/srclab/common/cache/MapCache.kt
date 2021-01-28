@@ -1,6 +1,6 @@
 package xyz.srclab.common.cache
 
-import xyz.srclab.common.collect.MapOps.Companion.removeAll
+import xyz.srclab.common.collect.removeAll
 import java.time.Duration
 
 class MapCache<K : Any, V>(private val map: MutableMap<K, V>) : Cache<K, V> {

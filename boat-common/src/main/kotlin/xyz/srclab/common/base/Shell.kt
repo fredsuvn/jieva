@@ -2,7 +2,7 @@ package xyz.srclab.common.base
 
 import org.apache.commons.io.IOUtils
 import xyz.srclab.common.base.ShellProcess.Companion.asShellProcess
-import xyz.srclab.common.collect.toStringArray
+import xyz.srclab.common.collect.arrayToStringArray
 import java.io.InputStream
 import java.io.PrintStream
 import java.nio.charset.Charset
@@ -29,7 +29,7 @@ interface Shell : ShellIO {
     @JvmDefault
     fun run(charset: Charset, vararg command: CharSequence): ShellProcess {
         return ProcessBuilder()
-            .command(*command.toStringArray())
+            .command(*command.arrayToStringArray())
             .redirectErrorStream(true)
             .start()
             .asShellProcess(charset)

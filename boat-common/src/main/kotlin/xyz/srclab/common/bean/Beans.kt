@@ -1,4 +1,4 @@
-@file:JvmName("BeanKit")
+@file:JvmName("Beans")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.bean

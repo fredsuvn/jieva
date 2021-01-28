@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.reflect;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.reflect.TypeKit;
+import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.test.TestLogger;
 
@@ -15,22 +15,22 @@ import java.util.Map;
 /**
  * @author sunqian
  */
-public class TypeKitTest {
+public class TypeTest {
 
     private static final TestLogger testLogger = TestLogger.DEFAULT;
 
     @Test
     public void testTypeGenerator() {
         Assert.assertEquals(
-                TypeKit.parameterizedType(List.class, String.class),
+                Reflects.parameterizedType(List.class, String.class),
                 TypeUtils.parameterize(List.class, String.class)
         );
         Assert.assertEquals(
-                TypeKit.wildcardType(new Type[]{String.class}, new Type[]{String.class}),
+                Reflects.wildcardType(new Type[]{String.class}, new Type[]{String.class}),
                 TypeUtils.wildcardType().withUpperBounds(String.class).withLowerBounds(String.class).build()
         );
         Assert.assertEquals(
-                TypeKit.genericArrayType(String.class),
+                Reflects.genericArrayType(String.class),
                 TypeUtils.genericArrayType(String.class)
         );
     }
@@ -38,42 +38,42 @@ public class TypeKitTest {
     @Test
     public void testRawClass() {
         Assert.assertEquals(
-                TypeKit.rawClass(new TypeRef<String>() {
+                Reflects.rawClass(new TypeRef<String>() {
                 }.type()),
                 String.class);
         Assert.assertEquals(
-                TypeKit.rawClass(new TypeRef<List<String>>() {
+                Reflects.rawClass(new TypeRef<List<String>>() {
                 }.type()),
                 List.class
         );
         Assert.expectThrows(IllegalArgumentException.class, () ->
-                TypeKit.rawClass(TypeUtils.wildcardType().withUpperBounds(Object.class).build()));
+                Reflects.rawClass(TypeUtils.wildcardType().withUpperBounds(Object.class).build()));
     }
 
     @Test
     public void testBoundClass() {
         Assert.assertEquals(
-                TypeKit.upperClass(String.class),
+                Reflects.rawOrUpperClass(String.class),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(new TypeRef<List<String>>() {
+                Reflects.rawOrUpperClass(new TypeRef<List<String>>() {
                 }.type()),
                 List.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(TypeKit.wildcardType(new Type[]{String.class}, null)),
+                Reflects.upperClass(Reflects.wildcardType(new Type[]{String.class}, null)),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(TypeKit.wildcardType(new Type[]{
-                        TypeKit.wildcardType(new Type[]{String.class}, null)
+                Reflects.upperClass(Reflects.wildcardType(new Type[]{
+                        Reflects.wildcardType(new Type[]{String.class}, null)
                 }, null)),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(TypeKit.wildcardType(new Type[]{
-                                TypeKit.wildcardType(new Type[]{
+                Reflects.upperClass(Reflects.wildcardType(new Type[]{
+                                Reflects.wildcardType(new Type[]{
                                         new TypeRef<List<String>>() {
                                         }.type()
                                 }, null)
@@ -82,48 +82,48 @@ public class TypeKitTest {
                 List.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(BoundClass.class.getTypeParameters()[0]),
+                Reflects.upperClass(BoundClass.class.getTypeParameters()[0]),
                 Object.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(BoundClass.class.getTypeParameters()[1]),
+                Reflects.upperClass(BoundClass.class.getTypeParameters()[1]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(BoundClass.class.getTypeParameters()[2]),
+                Reflects.upperClass(BoundClass.class.getTypeParameters()[2]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(BoundClass.class.getTypeParameters()[3]),
+                Reflects.upperClass(BoundClass.class.getTypeParameters()[3]),
                 List.class
         );
         Assert.assertEquals(
-                TypeKit.upperClass(TypeUtils.genericArrayType(String.class)),
-                Object.class
+                Reflects.rawOrUpperClass(TypeUtils.genericArrayType(String.class)),
+                String[].class
         );
 
         Assert.assertEquals(
-                TypeKit.lowerClass(String.class),
+                Reflects.rawOrLowerClass(String.class),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerClass(new TypeRef<List<String>>() {
+                Reflects.rawOrLowerClass(new TypeRef<List<String>>() {
                 }.type()),
                 List.class
         );
         Assert.assertEquals(
-                TypeKit.lowerClass(TypeKit.wildcardType(null, new Type[]{String.class})),
+                Reflects.lowerClass(Reflects.wildcardType(null, new Type[]{String.class})),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerClass(TypeKit.wildcardType(null, new Type[]{
-                        TypeKit.wildcardType(null, new Type[]{String.class})
+                Reflects.lowerClass(Reflects.wildcardType(null, new Type[]{
+                        Reflects.wildcardType(null, new Type[]{String.class})
                 })),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerClass(TypeKit.wildcardType(null, new Type[]{
-                                TypeKit.wildcardType(null, new Type[]{
+                Reflects.lowerClass(Reflects.wildcardType(null, new Type[]{
+                                Reflects.wildcardType(null, new Type[]{
                                         new TypeRef<List<String>>() {
                                         }.type()
                                 })
@@ -131,45 +131,45 @@ public class TypeKitTest {
                 ),
                 List.class
         );
-        Assert.assertNull(TypeKit.lowerClass(BoundClass.class.getTypeParameters()[0]));
+        Assert.assertNull(Reflects.lowerClass(BoundClass.class.getTypeParameters()[0]));
         Assert.assertEquals(
-                TypeKit.lowerClass(BoundClass.class.getTypeParameters()[1]),
+                Reflects.lowerClass(BoundClass.class.getTypeParameters()[1]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerClass(BoundClass.class.getTypeParameters()[2]),
+                Reflects.lowerClass(BoundClass.class.getTypeParameters()[2]),
                 String.class
         );
-        Assert.assertNull(TypeKit.lowerClass(BoundClass.class.getTypeParameters()[3]));
+        Assert.assertNull(Reflects.lowerClass(BoundClass.class.getTypeParameters()[3]));
         Assert.expectThrows(IllegalArgumentException.class, () ->
-                TypeKit.lowerClass(TypeUtils.genericArrayType(String.class)));
+                Reflects.rawOrLowerClass(TypeUtils.genericArrayType(String.class)));
     }
 
     @Test
     public void testBoundType() {
         Assert.assertEquals(
-                TypeKit.upperBound(String.class),
+                Reflects.thisOrUpperBound(String.class),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperBound(new TypeRef<List<String>>() {
+                Reflects.thisOrUpperBound(new TypeRef<List<String>>() {
                 }.type()),
                 new TypeRef<List<String>>() {
                 }.type()
         );
         Assert.assertEquals(
-                TypeKit.upperBound(TypeKit.wildcardType(new Type[]{String.class}, null)),
+                Reflects.upperBound(Reflects.wildcardType(new Type[]{String.class}, null)),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperBound(TypeKit.wildcardType(new Type[]{
-                        TypeKit.wildcardType(new Type[]{String.class}, null)
+                Reflects.upperBound(Reflects.wildcardType(new Type[]{
+                        Reflects.wildcardType(new Type[]{String.class}, null)
                 }, null)),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperBound(TypeKit.wildcardType(new Type[]{
-                                TypeKit.wildcardType(new Type[]{
+                Reflects.upperBound(Reflects.wildcardType(new Type[]{
+                                Reflects.wildcardType(new Type[]{
                                         new TypeRef<List<String>>() {
                                         }.type()
                                 }, null)
@@ -179,49 +179,49 @@ public class TypeKitTest {
                 }.type()
         );
         Assert.assertEquals(
-                TypeKit.upperBound(BoundClass.class.getTypeParameters()[0]),
+                Reflects.upperBound(BoundClass.class.getTypeParameters()[0]),
                 Object.class
         );
         Assert.assertEquals(
-                TypeKit.upperBound(BoundClass.class.getTypeParameters()[1]),
+                Reflects.upperBound(BoundClass.class.getTypeParameters()[1]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperBound(BoundClass.class.getTypeParameters()[2]),
+                Reflects.upperBound(BoundClass.class.getTypeParameters()[2]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.upperBound(BoundClass.class.getTypeParameters()[3]).toString(),
+                Reflects.upperBound(BoundClass.class.getTypeParameters()[3]).toString(),
                 "java.util.List<? extends T1>"
         );
         Assert.assertEquals(
-                TypeKit.upperBound(TypeUtils.genericArrayType(String.class)),
+                Reflects.thisOrUpperBound(TypeUtils.genericArrayType(String.class)),
                 TypeUtils.genericArrayType(String.class)
         );
 
         Assert.assertEquals(
-                TypeKit.lowerBound(String.class),
+                Reflects.thisOrLowerBound(String.class),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerBound(new TypeRef<List<String>>() {
+                Reflects.thisOrLowerBound(new TypeRef<List<String>>() {
                 }.type()),
                 new TypeRef<List<String>>() {
                 }.type()
         );
         Assert.assertEquals(
-                TypeKit.lowerBound(TypeKit.wildcardType(null, new Type[]{String.class})),
+                Reflects.lowerBound(Reflects.wildcardType(null, new Type[]{String.class})),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerBound(TypeKit.wildcardType(null, new Type[]{
-                        TypeKit.wildcardType(null, new Type[]{String.class})
+                Reflects.lowerBound(Reflects.wildcardType(null, new Type[]{
+                        Reflects.wildcardType(null, new Type[]{String.class})
                 })),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerBound(TypeKit.wildcardType(null, new Type[]{
-                                TypeKit.wildcardType(null, new Type[]{
+                Reflects.lowerBound(Reflects.wildcardType(null, new Type[]{
+                                Reflects.wildcardType(null, new Type[]{
                                         new TypeRef<List<String>>() {
                                         }.type()
                                 })
@@ -230,25 +230,25 @@ public class TypeKitTest {
                 new TypeRef<List<String>>() {
                 }.type()
         );
-        Assert.assertNull(TypeKit.lowerBound(BoundClass.class.getTypeParameters()[0]));
+        Assert.assertNull(Reflects.lowerBound(BoundClass.class.getTypeParameters()[0]));
         Assert.assertEquals(
-                TypeKit.lowerBound(BoundClass.class.getTypeParameters()[1]),
+                Reflects.lowerBound(BoundClass.class.getTypeParameters()[1]),
                 String.class
         );
         Assert.assertEquals(
-                TypeKit.lowerBound(BoundClass.class.getTypeParameters()[2]),
+                Reflects.lowerBound(BoundClass.class.getTypeParameters()[2]),
                 String.class
         );
-        Assert.assertNull(TypeKit.lowerBound(BoundClass.class.getTypeParameters()[3]));
+        Assert.assertNull(Reflects.lowerBound(BoundClass.class.getTypeParameters()[3]));
         Assert.assertEquals(
-                TypeKit.lowerBound(TypeUtils.genericArrayType(String.class)),
+                Reflects.thisOrLowerBound(TypeUtils.genericArrayType(String.class)),
                 TypeUtils.genericArrayType(String.class)
         );
     }
 
     @Test
     public void testTypeArguments() {
-        Map<TypeVariable<?>, Type> f1Map = TypeKit.findTypeArguments(F1.class);
+        Map<TypeVariable<?>, Type> f1Map = Reflects.typeArguments(F1.class);
         testLogger.log("f1Map: " + f1Map);
         Assert.assertEquals(
                 f1Map.toString(),
@@ -256,7 +256,7 @@ public class TypeKitTest {
         );
 
 
-        Map<TypeVariable<?>, Type> f1c1Map = TypeKit.findTypeArguments(F1.class, C1.class);
+        Map<TypeVariable<?>, Type> f1c1Map = Reflects.typeArguments(F1.class, C1.class);
         testLogger.log("f1c1Map: " + f1c1Map);
         Assert.assertEquals(
                 f1c1Map.toString(),
@@ -264,14 +264,14 @@ public class TypeKitTest {
         );
 
 
-        Map<TypeVariable<?>, Type> f2Map = TypeKit.findTypeArguments(F2.class);
+        Map<TypeVariable<?>, Type> f2Map = Reflects.typeArguments(F2.class);
         testLogger.log("f2Map: " + f2Map);
         Assert.assertEquals(
                 f2Map.toString(),
                 "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
         );
 
-        Map<TypeVariable<?>, Type> f2i3Map = TypeKit.findTypeArguments(F2.class, I3.class);
+        Map<TypeVariable<?>, Type> f2i3Map = Reflects.typeArguments(F2.class, I3.class);
         testLogger.log("f2i3Map: " + f2i3Map);
         Assert.assertEquals(
                 f2i3Map.toString(),
@@ -279,16 +279,16 @@ public class TypeKitTest {
         );
 
 
-        Map<TypeVariable<?>, Type> s1GenericMap = TypeKit.findTypeArguments(
-                TypeKit.parameterizedType(S1.class, S1.class.getTypeParameters()[0]));
+        Map<TypeVariable<?>, Type> s1GenericMap = Reflects.typeArguments(
+                Reflects.parameterizedType(S1.class, S1.class.getTypeParameters()[0]));
         testLogger.log("s1GenericMap: " + s1GenericMap);
         Assert.assertEquals(
                 s1GenericMap.toString(),
                 "{S1T1=S1T1, C1T1=S1T1, C1T2=java.util.List<? extends S1T1>, I1T1=S1T1, I2T1=java.util.List<? extends S1T1>, I3T1=S1T1, I4T1=java.util.List<? extends S1T1>}"
         );
 
-        Map<TypeVariable<?>, Type> s1i1GenericMap = TypeKit.findTypeArguments(
-                TypeKit.parameterizedType(S1.class, S1.class.getTypeParameters()[0]),
+        Map<TypeVariable<?>, Type> s1i1GenericMap = Reflects.typeArguments(
+                Reflects.parameterizedType(S1.class, S1.class.getTypeParameters()[0]),
                 I2.class
         );
         testLogger.log("s1i1GenericMap: " + s1i1GenericMap);
@@ -297,8 +297,8 @@ public class TypeKitTest {
                 "{S1T1=S1T1, C1T1=S1T1, C1T2=java.util.List<? extends S1T1>, I1T1=S1T1, I2T1=java.util.List<? extends S1T1>}"
         );
 
-        Map<TypeVariable<?>, Type> s1Map = TypeKit.findTypeArguments(
-                TypeKit.parameterizedType(S1.class, String.class));
+        Map<TypeVariable<?>, Type> s1Map = Reflects.typeArguments(
+                Reflects.parameterizedType(S1.class, String.class));
         testLogger.log("s1Map: " + s1Map);
         Assert.assertEquals(
                 s1Map.toString(),
@@ -307,7 +307,7 @@ public class TypeKitTest {
 
         Type c1c1GenericTypeRef = new TypeRef<C1<Long, Double>.C1C1<String>>() {
         }.type();
-        Map<TypeVariable<?>, Type> c1c1GenericMap = TypeKit.findTypeArguments(c1c1GenericTypeRef);
+        Map<TypeVariable<?>, Type> c1c1GenericMap = Reflects.typeArguments(c1c1GenericTypeRef);
         testLogger.log("c1c1GenericMap: " + c1c1GenericMap);
         Assert.assertEquals(
                 c1c1GenericMap.toString(),
@@ -317,9 +317,9 @@ public class TypeKitTest {
 
     @Test
     public void testGenericSignature() {
-        testLogger.log(TypeKit.genericSignature(F2.class, I4.class));
+        testLogger.log(Reflects.generalize(F2.class, I4.class));
 
-        TypeKit.findGenericInterface(String.class);
+        Reflects.genericInterface(String.class);
     }
 
     public static class BoundClass<
