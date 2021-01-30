@@ -102,6 +102,11 @@ object CapitalizeHyphen : HyphenCase() {
 abstract class CamelCase : NamingCase {
 
     override fun segment(name: CharSequence): List<String> {
+
+        fun Char.isLowerCaseOrDigit(): Boolean {
+            return this.isLowerCase() || (this in '0'..'9')
+        }
+
         val length = name.length
         if (length <= 1) {
             return listOf(name.toString())
@@ -111,11 +116,11 @@ abstract class CamelCase : NamingCase {
         var lastLower = true
         for (c in name) {
             if (buffer.isEmpty()) {
-                lastLower = c.isLowerCase()
+                lastLower = c.isLowerCaseOrDigit()
                 buffer.append(c)
                 continue
             }
-            if (lastLower && c.isLowerCase()) {
+            if (lastLower && c.isLowerCaseOrDigit()) {
                 buffer.append(c)
                 continue
             }
@@ -130,7 +135,7 @@ abstract class CamelCase : NamingCase {
                 lastLower = false
                 continue
             }
-            if (!lastLower && c.isLowerCase()) {
+            if (!lastLower && c.isLowerCaseOrDigit()) {
                 val bufferLength = buffer.length
                 if (bufferLength == 1) {
                     buffer.append(c)

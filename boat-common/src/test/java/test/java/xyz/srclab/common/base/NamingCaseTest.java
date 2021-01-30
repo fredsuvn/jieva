@@ -44,5 +44,9 @@ public class NamingCaseTest {
                 NamingCase.UPPER_CAMEL.convertTo("upperCamel", NamingCase.LOWER_UNDERSCORE),
                 "upper_camel"
         );
+        Assert.assertEquals(
+                NamingCase.UPPER_CAMEL.convertTo("upper2Camel", NamingCase.LOWER_UNDERSCORE),
+                "upper2_camel"
+        );
     }
 }

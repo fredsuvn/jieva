@@ -28,6 +28,8 @@ import kotlin.collections.LinkedHashSet
 import kotlin.collections.plus
 import kotlin.collections.toList
 
+private const val NULL = "I am null!"
+
 interface Converter {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -147,14 +149,14 @@ object NopConvertHandler : ConvertHandler {
 
     override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
         if (toType == Any::class.java) {
-            return from
+            return from.replaceNull()
         }
         if (from === null) {
             return Default.NULL
         }
         val fromClass = from.javaClass
         if (fromClass == toType || toType.isAssignableFrom(fromClass)) {
-            return from
+            return from.replaceNull()
         }
         return null
     }
@@ -165,7 +167,7 @@ object NopConvertHandler : ConvertHandler {
 
     override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
         if (fromType == toType) {
-            return from
+            return from.replaceNull()
         }
         if (from !== null && from.javaClass == fromType && toType is Class<*>) {
             return convert(from, toType, converter)
@@ -441,10 +443,10 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
 
     private fun fromToIterable(from: Any): Iterable<Any?>? {
         if (from is Iterable<*>) {
-            return from
+            return from.replaceNull().asAny()
         }
         if (from.javaClass.isArray) {
-            return from.arrayAsList()
+            return from.replaceNull()?.arrayAsList()
         }
         return null
     }
@@ -516,4 +518,8 @@ open class BeanConvertHandler(
         @JvmField
         val DEFAULT: BeanConvertHandler = BeanConvertHandler()
     }
+}
+
+private fun Any?.replaceNull(): Any? {
+    return if (this === null) Default.NULL else this
 }

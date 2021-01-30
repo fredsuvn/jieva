@@ -102,8 +102,8 @@ interface BeanResolver {
             from is Map<*, *> && to !is Map<*, *> -> {
                 val fromType = copyOptions.fromType ?: Map::class.java
                 val fromMapType = fromType.toMapType()
-                val toSchema = resolve(to.javaClass)
-                val toProperties = toSchema.properties
+                val toType = resolve(to.javaClass)
+                val toProperties = toType.properties
                 from.forEach { (k, v) ->
                     if (!copyOptions.nameFilter(k)
                         || !copyOptions.fromTypeFilter(k, fromMapType.keyType, fromMapType.valueType)
@@ -135,10 +135,10 @@ interface BeanResolver {
                 to
             }
             from !is Map<*, *> && to is Map<*, *> -> {
-                val fromSchema = resolve(from.javaClass)
+                val fromType = resolve(from.javaClass)
                 val toType = copyOptions.toType ?: Map::class.java
                 val toMapType = toType.toMapType()
-                val fromProperties = fromSchema.properties
+                val fromProperties = fromType.properties
                 fromProperties.forEach { (name, fromProperty) ->
                     if (!copyOptions.nameFilter(name)
                         || !fromProperty.isReadable
@@ -169,10 +169,10 @@ interface BeanResolver {
                 to
             }
             from !is Map<*, *> && to !is Map<*, *> -> {
-                val fromSchema = resolve(from.javaClass)
-                val toSchema = resolve(to.javaClass)
-                val fromProperties = fromSchema.properties
-                val toProperties = toSchema.properties
+                val fromType = resolve(from.javaClass)
+                val toType = resolve(to.javaClass)
+                val fromProperties = fromType.properties
+                val toProperties = toType.properties
                 fromProperties.forEach { (name, fromProperty) ->
                     if (!copyOptions.nameFilter(name)
                         || !fromProperty.isReadable
@@ -417,7 +417,7 @@ interface BeanResolver {
             private val copyOptions: CopyOptions
         ) : AbstractMutableMap<String, Any?>() {
 
-            private val mapSchema = copyOptions.toType?.toMapType() ?: MapType.RAW
+            private val mapType = copyOptions.toType?.toMapType() ?: MapType.RAW
 
             override val size: Int
                 get() = entries.size
@@ -443,20 +443,20 @@ interface BeanResolver {
                             String::class.java,
                             it.value.type,
                             value,
-                            mapSchema.keyType,
-                            mapSchema.valueType
+                            mapType.keyType,
+                            mapType.valueType
                         )
                     }
                     .mapTo(LinkedHashSet()) {
                         object : MutableMap.MutableEntry<String, Any?> {
                             override val key: String = it.key
                             override val value: Any?
-                                get() = copyOptions.converter.convert(it.value.getValue(bean), mapSchema.valueType)
+                                get() = copyOptions.converter.convert(it.value.getValue(bean), mapType.valueType)
 
                             override fun setValue(newValue: Any?): Any? {
                                 return it.value.setValue(
                                     bean,
-                                    copyOptions.converter.convert(newValue, mapSchema.valueType)
+                                    copyOptions.converter.convert(newValue, mapType.valueType)
                                 )
                             }
                         }
@@ -468,11 +468,11 @@ interface BeanResolver {
             }
 
             override fun get(key: String): Any? {
-                val propertySchema = properties[key]
-                if (propertySchema === null) {
+                val propertyType = properties[key]
+                if (propertyType === null) {
                     return null
                 }
-                return copyOptions.converter.convert(propertySchema.getValue(bean), mapSchema.valueType)
+                return copyOptions.converter.convert(propertyType.getValue(bean), mapType.valueType)
             }
 
             override fun isEmpty(): Boolean {
@@ -484,11 +484,11 @@ interface BeanResolver {
             }
 
             override fun put(key: String, value: Any?): Any? {
-                val propertySchema = properties[key]
-                if (propertySchema === null) {
+                val propertyType = properties[key]
+                if (propertyType === null) {
                     throw UnsupportedOperationException("Property $key doesn't exist.")
                 }
-                return propertySchema.setValue(bean, value)
+                return propertyType.setValue(bean, value)
             }
 
             override fun remove(key: String): Any? {

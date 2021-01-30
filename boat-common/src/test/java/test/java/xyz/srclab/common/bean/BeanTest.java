@@ -25,6 +25,54 @@ public class BeanTest {
     private static final TestLogger testLogger = TestLogger.DEFAULT;
 
     @Test
+    public void testSimpleBean() {
+        SimpleBean a = new SimpleBean();
+        a.setP1("123");
+        a.setP2(6);
+        a.setP3(Arrays.asList("1", "2", "3"));
+
+        SimpleBean b = new SimpleBean();
+        Beans.copyProperties(a, b);
+        Assert.assertEquals(b.getP1(), a.getP1());
+        Assert.assertEquals(b.getP2(), a.getP2());
+        Assert.assertEquals(b.getP3(), a.getP3());
+
+        a.setP1(null);
+        Beans.copyProperties(a, b);
+        Assert.assertEquals(b.getP1(), a.getP1());
+        Assert.assertEquals(b.getP2(), a.getP2());
+        Assert.assertEquals(b.getP3(), a.getP3());
+
+        a.setP1(null);
+        b.setP1("234");
+        Beans.copyPropertiesIgnoreNull(a, b);
+        Assert.assertEquals(b.getP1(), "234");
+        Assert.assertEquals(b.getP2(), a.getP2());
+        Assert.assertEquals(b.getP3(), a.getP3());
+
+        a.setP1("111");
+        b.setP1("567");
+        Beans.copyProperties(a, b, new BeanResolver.CopyOptions() {
+            @NotNull
+            @Override
+            public Function1<Object, Boolean> nameFilter() {
+                System.out.println("sssss");
+                return name -> !name.equals("p1");
+            }
+        });
+        Assert.assertEquals(b.getP1(), "567");
+        Assert.assertEquals(b.getP2(), a.getP2());
+        Assert.assertEquals(b.getP3(), a.getP3());
+
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("p1", "123");
+        map.put("p2", 6);
+        map.put("p3", Arrays.asList("1", "2", "3"));
+        map.put("class", SimpleBean.class);
+        a.setP1("123");
+    }
+
+    @Test
     public void testMap() {
         SimpleBean simpleBean = new SimpleBean();
         simpleBean.setP1("123");
@@ -64,52 +112,6 @@ public class BeanTest {
         Assert.assertEquals(simpleMap.get("p3"), Arrays.asList("1", "2", "3"));
         Assert.assertEquals(simpleMap.size(), 3);
 
-    }
-
-    @Test
-    public void testSimpleBean() {
-        SimpleBean a = new SimpleBean();
-        a.setP1("123");
-        a.setP2(6);
-        a.setP3(Arrays.asList("1", "2", "3"));
-
-        SimpleBean b = new SimpleBean();
-        Beans.copyProperties(a, b);
-        Assert.assertEquals(b.getP1(), a.getP1());
-        Assert.assertEquals(b.getP2(), a.getP2());
-        Assert.assertEquals(b.getP3(), a.getP3());
-
-        a.setP1(null);
-        Beans.copyProperties(a, b);
-        Assert.assertEquals(b.getP1(), a.getP1());
-        Assert.assertEquals(b.getP2(), a.getP2());
-        Assert.assertEquals(b.getP3(), a.getP3());
-
-        a.setP1(null);
-        b.setP1("234");
-        Beans.copyPropertiesIgnoreNull(a, b);
-        Assert.assertEquals(b.getP1(), "234");
-        Assert.assertEquals(b.getP2(), a.getP2());
-        Assert.assertEquals(b.getP3(), a.getP3());
-
-        a.setP1("111");
-        b.setP1("567");
-        Beans.copyProperties(a, b, new BeanResolver.CopyOptions() {
-            @NotNull
-            public Function1<Object, Boolean> getNameFilter() {
-                return name -> !name.equals("p1");
-            }
-        });
-        Assert.assertEquals(b.getP1(), "567");
-        Assert.assertEquals(b.getP2(), a.getP2());
-        Assert.assertEquals(b.getP3(), a.getP3());
-
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("p1", "123");
-        map.put("p2", 6);
-        map.put("p3", Arrays.asList("1", "2", "3"));
-        map.put("class", SimpleBean.class);
-        a.setP1("123");
     }
 
     @Test
