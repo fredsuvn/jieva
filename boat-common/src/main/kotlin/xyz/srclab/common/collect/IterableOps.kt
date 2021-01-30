@@ -48,5 +48,10 @@ class IterableOps<T>(iterable: Iterable<T>) :
         fun <T> opsFor(iterable: Iterable<T>): IterableOps<T> {
             return IterableOps(iterable)
         }
+
+        @JvmStatic
+        fun <T> opsFor(array: Array<T>): IterableOps<T> {
+            return opsFor(array.asList())
+        }
     }
 }

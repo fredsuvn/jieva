@@ -224,8 +224,13 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
     companion object {
 
         @JvmStatic
-        fun <T> opsFor(list: List<T>): ListOps<T> {
-            return ListOps(list)
+        fun <T> opsFor(iterable: Iterable<T>): ListOps<T> {
+            return ListOps(iterable.asToList())
+        }
+
+        @JvmStatic
+        fun <T> opsFor(array: Array<T>): ListOps<T> {
+            return opsFor(array.asList())
         }
     }
 }

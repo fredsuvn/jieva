@@ -52,8 +52,8 @@ class SetOps<T>(set: Set<T>) : CollectionOps<T, Set<T>, MutableSet<T>, SetOps<T>
     companion object {
 
         @JvmStatic
-        fun <T> opsFor(set: Set<T>): SetOps<T> {
-            return SetOps(set)
+        fun <T> opsFor(iterable: Iterable<T>): SetOps<T> {
+            return SetOps(iterable.asToSet())
         }
     }
 }
