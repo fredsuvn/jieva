@@ -11,6 +11,7 @@ import xyz.srclab.common.bean.Beans;
 import xyz.srclab.common.bean.PropertyType;
 import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.reflect.TypeRef;
+import xyz.srclab.common.reflect.Types;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Type;
@@ -38,7 +39,7 @@ public class BeanTest {
         Assert.expectThrows(UnsupportedOperationException.class, () -> simpleMap.put("p4", "p4"));
 
         BeanResolver.CopyOptions copyOptions = BeanResolver.CopyOptions.DEFAULT
-                .withTypes(SimpleBean.class, Reflects.parameterizedType(Map.class, String.class, int.class))
+                .withTypes(SimpleBean.class, Types.parameterizedType(Map.class, String.class, int.class))
                 .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
         Map<String, Integer> siMap = Anys.as(Beans.asMap(simpleBean, copyOptions));
         testLogger.log("siMap: {}", siMap);

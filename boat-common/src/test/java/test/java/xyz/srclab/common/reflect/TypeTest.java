@@ -5,6 +5,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.reflect.TypeRef;
+import xyz.srclab.common.reflect.Types;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Type;
@@ -22,15 +23,15 @@ public class TypeTest {
     @Test
     public void testTypeGenerator() {
         Assert.assertEquals(
-                Reflects.parameterizedType(List.class, String.class),
+                Types.parameterizedType(List.class, String.class),
                 TypeUtils.parameterize(List.class, String.class)
         );
         Assert.assertEquals(
-                Reflects.wildcardType(new Type[]{String.class}, new Type[]{String.class}),
+                Types.wildcardType(new Type[]{String.class}, new Type[]{String.class}),
                 TypeUtils.wildcardType().withUpperBounds(String.class).withLowerBounds(String.class).build()
         );
         Assert.assertEquals(
-                Reflects.genericArrayType(String.class),
+                Types.genericArrayType(String.class),
                 TypeUtils.genericArrayType(String.class)
         );
     }
@@ -62,18 +63,18 @@ public class TypeTest {
                 List.class
         );
         Assert.assertEquals(
-                Reflects.upperClass(Reflects.wildcardType(new Type[]{String.class}, null)),
+                Reflects.upperClass(Types.wildcardType(new Type[]{String.class}, null)),
                 String.class
         );
         Assert.assertEquals(
-                Reflects.upperClass(Reflects.wildcardType(new Type[]{
-                        Reflects.wildcardType(new Type[]{String.class}, null)
+                Reflects.upperClass(Types.wildcardType(new Type[]{
+                        Types.wildcardType(new Type[]{String.class}, null)
                 }, null)),
                 String.class
         );
         Assert.assertEquals(
-                Reflects.upperClass(Reflects.wildcardType(new Type[]{
-                                Reflects.wildcardType(new Type[]{
+                Reflects.upperClass(Types.wildcardType(new Type[]{
+                                Types.wildcardType(new Type[]{
                                         new TypeRef<List<String>>() {
                                         }.type()
                                 }, null)
@@ -112,18 +113,18 @@ public class TypeTest {
                 List.class
         );
         Assert.assertEquals(
-                Reflects.lowerClass(Reflects.wildcardType(null, new Type[]{String.class})),
+                Reflects.lowerClass(Types.wildcardType(null, new Type[]{String.class})),
                 String.class
         );
         Assert.assertEquals(
-                Reflects.lowerClass(Reflects.wildcardType(null, new Type[]{
-                        Reflects.wildcardType(null, new Type[]{String.class})
+                Reflects.lowerClass(Types.wildcardType(null, new Type[]{
+                        Types.wildcardType(null, new Type[]{String.class})
                 })),
                 String.class
         );
         Assert.assertEquals(
-                Reflects.lowerClass(Reflects.wildcardType(null, new Type[]{
-                                Reflects.wildcardType(null, new Type[]{
+                Reflects.lowerClass(Types.wildcardType(null, new Type[]{
+                                Types.wildcardType(null, new Type[]{
                                         new TypeRef<List<String>>() {
                                         }.type()
                                 })
@@ -141,8 +142,10 @@ public class TypeTest {
                 String.class
         );
         Assert.assertNull(Reflects.lowerClass(BoundClass.class.getTypeParameters()[3]));
-        Assert.expectThrows(IllegalArgumentException.class, () ->
-                Reflects.rawOrLowerClass(TypeUtils.genericArrayType(String.class)));
+        Assert.assertEquals(
+                Reflects.rawOrLowerClass(TypeUtils.genericArrayType(String.class)),
+                String[].class
+        );
     }
 
     @Test
@@ -158,18 +161,18 @@ public class TypeTest {
                 }.type()
         );
         Assert.assertEquals(
-                Reflects.upperBound(Reflects.wildcardType(new Type[]{String.class}, null)),
+                Reflects.upperBound(Types.wildcardType(new Type[]{String.class}, null)),
                 String.class
         );
         Assert.assertEquals(
-                Reflects.upperBound(Reflects.wildcardType(new Type[]{
-                        Reflects.wildcardType(new Type[]{String.class}, null)
+                Reflects.upperBound(Types.wildcardType(new Type[]{
+                        Types.wildcardType(new Type[]{String.class}, null)
                 }, null)),
                 String.class
         );
         Assert.assertEquals(
-                Reflects.upperBound(Reflects.wildcardType(new Type[]{
-                                Reflects.wildcardType(new Type[]{
+                Reflects.upperBound(Types.wildcardType(new Type[]{
+                                Types.wildcardType(new Type[]{
                                         new TypeRef<List<String>>() {
                                         }.type()
                                 }, null)
@@ -210,18 +213,18 @@ public class TypeTest {
                 }.type()
         );
         Assert.assertEquals(
-                Reflects.lowerBound(Reflects.wildcardType(null, new Type[]{String.class})),
+                Reflects.lowerBound(Types.wildcardType(null, new Type[]{String.class})),
                 String.class
         );
         Assert.assertEquals(
-                Reflects.lowerBound(Reflects.wildcardType(null, new Type[]{
-                        Reflects.wildcardType(null, new Type[]{String.class})
+                Reflects.lowerBound(Types.wildcardType(null, new Type[]{
+                        Types.wildcardType(null, new Type[]{String.class})
                 })),
                 String.class
         );
         Assert.assertEquals(
-                Reflects.lowerBound(Reflects.wildcardType(null, new Type[]{
-                                Reflects.wildcardType(null, new Type[]{
+                Reflects.lowerBound(Types.wildcardType(null, new Type[]{
+                                Types.wildcardType(null, new Type[]{
                                         new TypeRef<List<String>>() {
                                         }.type()
                                 })
@@ -280,7 +283,7 @@ public class TypeTest {
 
 
         Map<TypeVariable<?>, Type> s1GenericMap = Reflects.typeArguments(
-                Reflects.parameterizedType(S1.class, S1.class.getTypeParameters()[0]));
+                Types.parameterizedType(S1.class, S1.class.getTypeParameters()[0]));
         testLogger.log("s1GenericMap: " + s1GenericMap);
         Assert.assertEquals(
                 s1GenericMap.toString(),
@@ -288,7 +291,7 @@ public class TypeTest {
         );
 
         Map<TypeVariable<?>, Type> s1i1GenericMap = Reflects.typeArguments(
-                Reflects.parameterizedType(S1.class, S1.class.getTypeParameters()[0]),
+                Types.parameterizedType(S1.class, S1.class.getTypeParameters()[0]),
                 I2.class
         );
         testLogger.log("s1i1GenericMap: " + s1i1GenericMap);
@@ -298,7 +301,7 @@ public class TypeTest {
         );
 
         Map<TypeVariable<?>, Type> s1Map = Reflects.typeArguments(
-                Reflects.parameterizedType(S1.class, String.class));
+                Types.parameterizedType(S1.class, String.class));
         testLogger.log("s1Map: " + s1Map);
         Assert.assertEquals(
                 s1Map.toString(),
