@@ -146,6 +146,10 @@ public class TypeTest {
                 Reflects.rawOrLowerClass(TypeUtils.genericArrayType(String.class)),
                 String[].class
         );
+        Assert.assertEquals(
+                Reflects.rawOrLowerClass(TypeUtils.genericArrayType(TypeUtils.genericArrayType(String.class))),
+                String[][].class
+        );
     }
 
     @Test
