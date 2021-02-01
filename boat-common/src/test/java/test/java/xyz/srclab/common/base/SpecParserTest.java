@@ -14,35 +14,38 @@ public class SpecParserTest {
     @Test
     public void testProvider() {
         Assert.assertEquals(
-                SpecParser.specParse(Provider1.class.getName() + ", " + Provider2.class.getName()),
+                SpecParser.parseClassNameToInstance(
+                        Provider1.class.getName() + ", " + Provider2.class.getName()),
                 Arrays.asList(new Provider1(), new Provider2())
         );
         Assert.assertEquals(
-                SpecParser.specParse(
+                SpecParser.parseClassNameToInstance(
                         Provider1.class.getName() + ", " + Provider2.class.getName(), true),
                 Arrays.asList(new Provider1(), new Provider2())
         );
         Assert.assertEquals(
-                SpecParser.specParseFirst(Provider1.class.getName() + ", " + Provider2.class.getName()),
+                SpecParser.parseFirstClassNameToInstance(
+                        Provider1.class.getName() + ", " + Provider2.class.getName()),
                 new Provider1()
         );
         Assert.assertEquals(
-                SpecParser.specParseFirst(
+                SpecParser.parseFirstClassNameToInstance(
                         Provider1.class.getName() + ", " + Provider2.class.getName(), true),
                 new Provider1()
         );
         Assert.assertEquals(
-                SpecParser.specParseFirst(Provider3.class.getName() + ", " + Provider2.class.getName()),
+                SpecParser.parseFirstClassNameToInstance(
+                        Provider3.class.getName() + ", " + Provider2.class.getName()),
                 new Provider2()
         );
-        Assert.assertThrows(IllegalStateException.class, () -> SpecParser.specParseFirst(
+        Assert.assertThrows(IllegalStateException.class, () -> SpecParser.parseFirstClassNameToInstance(
                 Provider3.class.getName() + ", " + Provider2.class.getName(), true));
         Assert.assertEquals(
-                SpecParser.specParseFirstOrNull(Provider3.class.getName()),
+                SpecParser.parseFirstClassNameToInstanceOrNull(Provider3.class.getName()),
                 (Object) null
         );
         Assert.assertEquals(
-                SpecParser.specParseFirstOrNull(
+                SpecParser.parseFirstClassNameToInstanceOrNull(
                         Provider3.class.getName() + ", " + Provider2.class.getName()),
                 new Provider2()
         );

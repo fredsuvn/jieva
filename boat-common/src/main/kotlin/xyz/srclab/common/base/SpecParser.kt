@@ -17,32 +17,29 @@ interface SpecParser<S> {
 
         @JvmStatic
         @JvmOverloads
-        @JvmName("specParse")
-        fun <T : Any> CharSequence.parseCharsProviders(strict: Boolean = false): List<T> {
-            return getCharsSpecParser(strict).parse(this)
+        fun <T : Any> CharSequence.parseClassNameToInstance(strict: Boolean = false): List<T> {
+            return getClassNameSpecParser(strict).parse(this)
         }
 
         @JvmStatic
         @JvmOverloads
-        @JvmName("specParseFirst")
-        fun <T : Any> CharSequence.parseCharsFirstProvider(strict: Boolean = false): T {
-            return getCharsSpecParser(strict).parseFirst(this)
+        fun <T : Any> CharSequence.parseFirstClassNameToInstance(strict: Boolean = false): T {
+            return getClassNameSpecParser(strict).parseFirst(this)
         }
 
         @JvmStatic
         @JvmOverloads
-        @JvmName("specParseFirstOrNull")
-        fun <T : Any> CharSequence.parseCharsFirstProviderOrNull(strict: Boolean = false): T? {
-            return getCharsSpecParser(strict).parseFirstOrNull(this)
+        fun <T : Any> CharSequence.parseFirstClassNameToInstanceOrNull(strict: Boolean = false): T? {
+            return getClassNameSpecParser(strict).parseFirstOrNull(this)
         }
 
-        private fun getCharsSpecParser(strict: Boolean): SpecParser<CharSequence> {
-            return if (strict) StrictCharsSpecParser else CharsSpecParser
+        private fun getClassNameSpecParser(strict: Boolean): SpecParser<CharSequence> {
+            return if (strict) StrictClassNameSpecParser else ClassNameSpecParser
         }
     }
 }
 
-object CharsSpecParser : SpecParser<CharSequence> {
+object ClassNameSpecParser : SpecParser<CharSequence> {
 
     override fun <T : Any> parse(spec: CharSequence): List<T> {
         val classNames = spec.split(",")
@@ -78,7 +75,7 @@ object CharsSpecParser : SpecParser<CharSequence> {
     }
 }
 
-object StrictCharsSpecParser : SpecParser<CharSequence> {
+object StrictClassNameSpecParser : SpecParser<CharSequence> {
 
     override fun <T : Any> parse(spec: CharSequence): List<T> {
         val classNames = spec.split(",")
