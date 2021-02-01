@@ -39,29 +39,16 @@ interface EventBus {
     companion object {
 
         @JvmStatic
-        fun newEventBus(handlers: Map<Any, EventHandler<*>>): EventBus {
-            return newEventBus(handlers, Runner.SYNC_RUNNER)
-        }
-
-        @JvmStatic
-        fun newEventBus(handlers: Map<Any, EventHandler<*>>, executor: Executor = Runner.SYNC_RUNNER): EventBus {
-            return newEventBus(handlers, executor, true)
-        }
-
-        @JvmStatic
+        @JvmOverloads
         fun newEventBus(
-            handlers: Map<Any, EventHandler<*>>,
+            handlers: Iterable<EventHandler<*>>,
             executor: Executor = Runner.SYNC_RUNNER,
             mutable: Boolean = true,
         ): EventBus {
             return if (mutable)
-                MutableEventBusImpl(executor, ConcurrentHashMap(handlers))
+                MutableEventBusImpl(handlers, executor)
             else
-                EventBusImpl(handlers.toMap(), executor)
-        }
-
-        fun Executor.newEventBus(handlers: Map<Any, EventHandler<*>>, mutable: Boolean = true): EventBus {
-            return EventBus.newEventBus(handlers, this, mutable)
+                EventBusImpl(handlers, executor)
         }
     }
 }
@@ -77,11 +64,9 @@ interface EventHandler<T : Any> {
 
 class EventHandlerNotFoundException(eventType: Any) : RuntimeException(eventType.toString())
 
-private abstract class BaseEventBus<M : Map<Any, EventHandler<*>>>(
-    handlers: M, private val executor: Executor,
-) : EventBus {
+abstract class AbstractEventBus(private val executor: Executor) : EventBus {
 
-    protected val eventHandlerMap: M = handlers
+    protected abstract val handlersMapper: Map<Any, EventHandler<*>>
 
     override fun register(eventHandler: EventHandler<*>) {
         throw UnsupportedOperationException()
@@ -92,7 +77,7 @@ private abstract class BaseEventBus<M : Map<Any, EventHandler<*>>>(
     }
 
     override fun <T : Any> emitOrThrow(eventType: Any, event: T) {
-        val eventHandler: EventHandler<T>? = eventHandlerMap[eventType].asAny()
+        val eventHandler: EventHandler<T>? = handlersMapper[eventType].asAny()
         if (eventHandler === null) {
             throw EventHandlerNotFoundException(eventType)
         }
@@ -105,18 +90,40 @@ private abstract class BaseEventBus<M : Map<Any, EventHandler<*>>>(
 }
 
 private class EventBusImpl(
-    handlers: Map<Any, EventHandler<*>>,
+    handlers: Iterable<EventHandler<*>>,
     executor: Executor,
-) : BaseEventBus<Map<Any, EventHandler<*>>>(handlers, executor)
+    override val handlersMapper: Map<Any, EventHandler<*>> = handlers.toMap()
+) : AbstractEventBus(executor)
 
-private class MutableEventBusImpl(executor: Executor, handlers: MutableMap<Any, EventHandler<*>>) :
-    BaseEventBus<MutableMap<Any, EventHandler<*>>>(handlers, executor) {
+private class MutableEventBusImpl(
+    handlers: Iterable<EventHandler<*>>,
+    executor: Executor,
+    override val handlersMapper: MutableMap<Any, EventHandler<*>> = handlers.toMutableMap()
+) : AbstractEventBus(executor) {
 
     override fun register(eventHandler: EventHandler<*>) {
-        eventHandlerMap[eventHandler.eventType] = eventHandler
+        handlersMapper[eventHandler.eventType] = eventHandler
     }
 
     override fun unregister(eventHandler: EventHandler<*>) {
-        eventHandlerMap.remove(eventHandler.eventType)
+        handlersMapper.remove(eventHandler.eventType)
+    }
+}
+
+private fun Iterable<EventHandler<*>>.toMap(): Map<Any, EventHandler<*>> {
+    val map = HashMap<Any, EventHandler<*>>()
+    map.putAllHandlers(this)
+    return map
+}
+
+private fun Iterable<EventHandler<*>>.toMutableMap(): MutableMap<Any, EventHandler<*>> {
+    val map = ConcurrentHashMap<Any, EventHandler<*>>()
+    map.putAllHandlers(this)
+    return map
+}
+
+private fun MutableMap<Any, EventHandler<*>>.putAllHandlers(handlers: Iterable<EventHandler<*>>) = apply {
+    for (handler in handlers) {
+        this[handler.eventType] = handler
     }
 }
