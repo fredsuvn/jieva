@@ -7,6 +7,7 @@ import xyz.srclab.common.base.asAny
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.MapType
 import xyz.srclab.common.collect.MapType.Companion.toMapType
+import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
@@ -24,7 +25,7 @@ interface BeanResolver {
 
     @JvmDefault
     fun resolve(type: Type): BeanType {
-        return DefaultBeanResolver.resolve(type)
+        return DEFAULT.resolve(type)
     }
 
     @JvmDefault
@@ -428,9 +429,7 @@ interface BeanResolver {
 
         @JvmStatic
         fun newBeanResolver(resolveHandlers: Iterable<BeanResolveHandler>): BeanResolver {
-            return object : BeanResolver {
-                override val resolveHandlers = resolveHandlers.toList()
-            }
+            return BeanResolverImpl(resolveHandlers.asToList())
         }
 
         private class BeanAsMap(
@@ -520,11 +519,9 @@ interface BeanResolver {
     }
 }
 
-object DefaultBeanResolver : BeanResolver {
+private class BeanResolverImpl(override val resolveHandlers: List<BeanResolveHandler>) : BeanResolver {
 
     private val cache = Cache.newFastCache<Type, BeanType>()
-
-    override val resolveHandlers: List<BeanResolveHandler> = BeanResolveHandler.DEFAULTS
 
     override fun resolve(type: Type): BeanType {
         return cache.getOrLoad(type) {
@@ -668,13 +665,10 @@ object NamingStyleBeanResolveHandler : AbstractBeanResolveHandler() {
     ) {
         val methods = context.methods
         for (method in methods) {
-            if (method.isBridge) {
+            if (method.isBridge || method.declaringClass == Any::class.java) {
                 continue
             }
             val name = method.name
-            if (name.length <= 3) {
-                continue
-            }
             if (method.parameterCount == 0) {
                 getters[name] = method
                 continue
