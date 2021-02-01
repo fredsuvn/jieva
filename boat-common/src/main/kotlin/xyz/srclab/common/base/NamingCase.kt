@@ -103,7 +103,11 @@ abstract class CamelCase : NamingCase {
 
     override fun segment(name: CharSequence): List<String> {
 
-        fun Char.isLowerCaseOrDigit(): Boolean {
+        fun Char.asUpperCase(): Boolean {
+            return this.isUpperCase()
+        }
+
+        fun Char.asLowerCase(): Boolean {
             return this.isLowerCase() || (this in '0'..'9')
         }
 
@@ -116,26 +120,26 @@ abstract class CamelCase : NamingCase {
         var lastLower = true
         for (c in name) {
             if (buffer.isEmpty()) {
-                lastLower = c.isLowerCaseOrDigit()
+                lastLower = c.asLowerCase()
                 buffer.append(c)
                 continue
             }
-            if (lastLower && c.isLowerCaseOrDigit()) {
+            if (lastLower && c.asLowerCase()) {
                 buffer.append(c)
                 continue
             }
-            if (!lastLower && c.isUpperCase()) {
+            if (!lastLower && c.asUpperCase()) {
                 buffer.append(c)
                 continue
             }
-            if (lastLower && c.isUpperCase()) {
+            if (lastLower && c.asUpperCase()) {
                 result.add(buffer.toString())
                 buffer.clear()
                 buffer.append(c)
                 lastLower = false
                 continue
             }
-            if (!lastLower && c.isLowerCaseOrDigit()) {
+            if (!lastLower && c.asLowerCase()) {
                 val bufferLength = buffer.length
                 if (bufferLength == 1) {
                     buffer.append(c)
