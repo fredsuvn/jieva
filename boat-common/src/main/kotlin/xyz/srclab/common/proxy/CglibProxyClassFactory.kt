@@ -1,19 +1,19 @@
 package xyz.srclab.common.proxy
 
-import org.springframework.cglib.proxy.CallbackFilter
-import org.springframework.cglib.proxy.Enhancer
-import org.springframework.cglib.proxy.MethodInterceptor
-import org.springframework.cglib.proxy.MethodProxy
+import net.sf.cglib.proxy.CallbackFilter
+import net.sf.cglib.proxy.Enhancer
+import net.sf.cglib.proxy.MethodInterceptor
+import net.sf.cglib.proxy.MethodProxy
 import xyz.srclab.common.base.asAny
 import java.lang.reflect.Method
 import java.util.*
 
-object SpringProxyClassGenerator : ProxyClassGenerator {
+object CglibProxyClassFactory : ProxyClassFactory {
 
-    override fun <T : Any> generate(
-        classLoader: ClassLoader,
+    override fun <T : Any> create(
         proxyClass: Class<T>,
-        proxyMethods: Iterable<ProxyMethod<T>>
+        proxyMethods: Iterable<ProxyMethod<T>>,
+        classLoader: ClassLoader
     ): ProxyClass<T> {
         val enhancer = Enhancer()
         enhancer.classLoader = classLoader

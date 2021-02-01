@@ -16,18 +16,14 @@ interface ProxyClass<T : Any> {
     companion object {
 
         @JvmStatic
-        fun <T : Any> newProxyClass(proxyClass: Class<T>, proxyMethods: Iterable<ProxyMethod<T>>): ProxyClass<T> {
-            return newProxyClass(Current.classLoader, proxyClass, proxyMethods)
-        }
-
-        @JvmStatic
-        //@JvmOverloads
+        @JvmOverloads
         fun <T : Any> newProxyClass(
-            classLoader: ClassLoader = Current.classLoader,
             proxyClass: Class<T>,
-            proxyMethods: Iterable<ProxyMethod<T>>
+            proxyMethods: Iterable<ProxyMethod<T>>,
+            classLoader: ClassLoader = Current.classLoader,
+            proxyClassFactory: ProxyClassFactory = ProxyClassFactory.DEFAULT,
         ): ProxyClass<T> {
-            return ProxyClassGenerator.DEFAULT.generate(classLoader, proxyClass, proxyMethods)
+            return proxyClassFactory.create(proxyClass, proxyMethods, classLoader)
         }
     }
 }

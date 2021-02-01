@@ -5,12 +5,12 @@ import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
-object JdkProxyClassGenerator : ProxyClassGenerator {
+object JdkProxyClassFactory : ProxyClassFactory {
 
-    override fun <T : Any> generate(
-        classLoader: ClassLoader,
+    override fun <T : Any> create(
         proxyClass: Class<T>,
-        proxyMethods: Iterable<ProxyMethod<T>>
+        proxyMethods: Iterable<ProxyMethod<T>>,
+        classLoader: ClassLoader
     ): ProxyClass<T> {
         return Proxy.newProxyInstance(classLoader, arrayOf(proxyClass), ProxyMethodInterceptor(proxyMethods)).asAny()
     }
