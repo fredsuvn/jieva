@@ -12,6 +12,51 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.WildcardType
 
+val Type.isBooleanType: Boolean
+    @JvmName("isBooleanType") get() {
+        return this == Boolean::class.javaPrimitiveType || this == Boolean::class.javaObjectType
+    }
+
+val Type.isByteType: Boolean
+    @JvmName("isByteType") get() {
+        return this == Byte::class.javaPrimitiveType || this == Byte::class.javaObjectType
+    }
+
+val Type.isShortType: Boolean
+    @JvmName("isShortType") get() {
+        return this == Short::class.javaPrimitiveType || this == Short::class.javaObjectType
+    }
+
+val Type.isCharType: Boolean
+    @JvmName("isCharType") get() {
+        return this == Char::class.javaPrimitiveType || this == Char::class.javaObjectType
+    }
+
+val Type.isIntType: Boolean
+    @JvmName("isIntType") get() {
+        return this == Int::class.javaPrimitiveType || this == Int::class.javaObjectType
+    }
+
+val Type.isLongType: Boolean
+    @JvmName("isLongType") get() {
+        return this == Long::class.javaPrimitiveType || this == Long::class.javaObjectType
+    }
+
+val Type.isFloatType: Boolean
+    @JvmName("isFloatType") get() {
+        return this == Float::class.javaPrimitiveType || this == Float::class.javaObjectType
+    }
+
+val Type.isDoubleType: Boolean
+    @JvmName("isDoubleType") get() {
+        return this == Double::class.javaPrimitiveType || this == Double::class.javaObjectType
+    }
+
+val Type.isVoidType: Boolean
+    @JvmName("isVoidType") get() {
+        return this == Void::class.javaPrimitiveType || this == Void::class.javaObjectType
+    }
+
 fun parameterizedType(
     rawType: Type,
     vararg actualTypeArguments: Type,

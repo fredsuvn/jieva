@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * @author sunqian
  */
-public class DatasTest {
+public class DatesTest {
 
     @Test
     public void testDateTime() {

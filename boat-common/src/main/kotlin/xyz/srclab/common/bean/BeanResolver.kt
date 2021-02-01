@@ -91,7 +91,7 @@ interface BeanResolver {
                         return@forEach
                     }
                     val toKey = copyOptions.converter.convert<Any>(k, fromMapType.keyType, toMapType.keyType)
-                    if (!to.containsKey(toKey)) {
+                    if (!copyOptions.putPropertyForMap && !to.containsKey(toKey)) {
                         return@forEach
                     }
                     (to.asAny<MutableMap<Any, Any?>>())[toKey] =
@@ -102,7 +102,7 @@ interface BeanResolver {
             from is Map<*, *> && to !is Map<*, *> -> {
                 val fromType = copyOptions.fromType ?: Map::class.java
                 val fromMapType = fromType.toMapType()
-                val toType = resolve(to.javaClass)
+                val toType = resolve(copyOptions.toType ?: to.javaClass)
                 val toProperties = toType.properties
                 from.forEach { (k, v) ->
                     if (!copyOptions.nameFilter(k)
@@ -135,11 +135,14 @@ interface BeanResolver {
                 to
             }
             from !is Map<*, *> && to is Map<*, *> -> {
-                val fromType = resolve(from.javaClass)
+                val fromType = resolve(copyOptions.fromType ?: from.javaClass)
                 val toType = copyOptions.toType ?: Map::class.java
                 val toMapType = toType.toMapType()
                 val fromProperties = fromType.properties
                 fromProperties.forEach { (name, fromProperty) ->
+                    if (!copyOptions.includeClassProperty && name == "class") {
+                        return@forEach
+                    }
                     if (!copyOptions.nameFilter(name)
                         || !fromProperty.isReadable
                         || !copyOptions.fromTypeFilter(name, String::class.java, fromProperty.type)
@@ -160,7 +163,7 @@ interface BeanResolver {
                         return@forEach
                     }
                     val toKey = copyOptions.converter.convert<Any>(name, String::class.java, toMapType.keyType)
-                    if (!to.containsKey(toKey)) {
+                    if (!copyOptions.putPropertyForMap && !to.containsKey(toKey)) {
                         return@forEach
                     }
                     (to.asAny<MutableMap<Any, Any?>>())[toKey] =
@@ -169,11 +172,14 @@ interface BeanResolver {
                 to
             }
             from !is Map<*, *> && to !is Map<*, *> -> {
-                val fromType = resolve(from.javaClass)
-                val toType = resolve(to.javaClass)
+                val fromType = resolve(copyOptions.fromType ?: from.javaClass)
+                val toType = resolve(copyOptions.toType ?: to.javaClass)
                 val fromProperties = fromType.properties
                 val toProperties = toType.properties
                 fromProperties.forEach { (name, fromProperty) ->
+                    if (!copyOptions.includeClassProperty && name == "class") {
+                        return@forEach
+                    }
                     if (!copyOptions.nameFilter(name)
                         || !fromProperty.isReadable
                         || !copyOptions.fromTypeFilter(name, String::class.java, fromProperty.type)
@@ -213,6 +219,22 @@ interface BeanResolver {
     }
 
     interface CopyOptions {
+
+        /**
+         * Default: false.
+         */
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        @JvmDefault
+        val includeClassProperty: Boolean
+            @JvmName("includeClassProperty") get() = false
+
+        /**
+         * Default: true.
+         */
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        @JvmDefault
+        val putPropertyForMap: Boolean
+            @JvmName("putPropertyForMap") get() = true
 
         @Suppress(INAPPLICABLE_JVM_NAME)
         @JvmDefault

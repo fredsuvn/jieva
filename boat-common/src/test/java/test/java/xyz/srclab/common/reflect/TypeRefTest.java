@@ -3,6 +3,7 @@ package test.java.xyz.srclab.common.reflect;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.reflect.TypeRef;
+import xyz.srclab.common.reflect.Types;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -17,7 +18,8 @@ public class TypeRefTest {
 
     @Test
     public void testTypeRef() {
-        TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<Map<String, List<? extends String>>>() {};
+        TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<Map<String, List<? extends String>>>() {
+        };
         Type type = typeRef.type();
         Assert.assertTrue(type instanceof ParameterizedType);
         ParameterizedType mapType = (ParameterizedType) type;
@@ -34,7 +36,14 @@ public class TypeRefTest {
         WildcardType stringWildcardType = (WildcardType) listActualTypeArguments[0];
         Assert.assertEquals(stringWildcardType.getUpperBounds()[0], String.class);
 
-        TypeRef<String> stringTypeRef = new TypeRef<String>() {};
+        TypeRef<String> stringTypeRef = new TypeRef<String>() {
+        };
         Assert.assertEquals(stringTypeRef.type(), String.class);
+
+        Assert.assertEquals(
+                Types.parameterizedType(List.class, String.class),
+                new TypeRef<List<String>>() {
+                }.type()
+        );
     }
 }

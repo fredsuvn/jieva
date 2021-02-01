@@ -26,8 +26,12 @@ public class BeanPerformanceTest {
      * At 20201216155802946 prepare to run all tasks...
      * Task BeanKit was accomplished, cost: PT54.811S
      * Task Beanutils was accomplished, cost: PT13M49.168S
+     *
+     * x.s.c.t.TestListener$Companion$withTestLogger$1(172 ): At 20210201151349655 prepare to run all tasks...
+     * x.s.c.t.TestListener$Companion$withTestLogger$1(180 ): Task BeanKit was accomplished, cost: PT48.247S
+     * x.s.c.t.TestListener$Companion$withTestLogger$1(180 ): Task Beanutils was accomplished, cost: PT11M19.115S
      */
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void testPerformance() {
         PerformanceBean a = new PerformanceBean();
         a.setS1("s1");

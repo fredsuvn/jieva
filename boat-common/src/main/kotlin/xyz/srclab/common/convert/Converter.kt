@@ -4,10 +4,7 @@ import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.collect.*
 import xyz.srclab.common.collect.IterableType.Companion.toIterableType
-import xyz.srclab.common.reflect.TypeRef
-import xyz.srclab.common.reflect.rawClass
-import xyz.srclab.common.reflect.toInstance
-import xyz.srclab.common.reflect.upperBound
+import xyz.srclab.common.reflect.*
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -166,7 +163,7 @@ object NopConvertHandler : ConvertHandler {
     }
 
     override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
-        if (fromType == toType) {
+        if (toType == Any::class.java || fromType == toType) {
             return from.replaceNull()
         }
         if (from !== null && from.javaClass == fromType && toType is Class<*>) {
@@ -212,20 +209,20 @@ object CharsConvertHandler : AbstractClassConvertHandler() {
 
     override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
         return when (toType) {
-            String::class.java, CharSequence::class.java -> {
-                if (from is ByteArray) from.toChars() else from.toString()
+            String::class.java, CharSequence::class.java -> when (from) {
+                is ByteArray -> from.toChars()
+                is CharArray -> from.toChars()
+                else -> from.toString()
             }
-            StringBuilder::class.java -> {
-                if (from is ByteArray)
-                    StringBuilder(from.toChars())
-                else
-                    StringBuilder(from.toString())
+            StringBuilder::class.java -> when (from) {
+                is ByteArray -> StringBuilder(from.toChars())
+                is CharArray -> StringBuilder(from.toChars())
+                else -> StringBuilder(from.toString())
             }
-            StringBuffer::class.java -> {
-                if (from is ByteArray)
-                    StringBuffer(from.toChars())
-                else
-                    StringBuffer(from.toString())
+            StringBuffer::class.java -> when (from) {
+                is ByteArray -> StringBuffer(from.toChars())
+                is CharArray -> StringBuffer(from.toChars())
+                else -> StringBuffer(from.toString())
             }
             CharArray::class.java -> {
                 if (from is ByteArray)
@@ -233,11 +230,10 @@ object CharsConvertHandler : AbstractClassConvertHandler() {
                 else
                     from.toString().toCharArray()
             }
-            ByteArray::class.java -> {
-                if (from is CharSequence)
-                    from.toBytes()
-                else
-                    null
+            ByteArray::class.java -> when (from) {
+                is CharSequence -> from.toBytes()
+                is CharArray -> from.toBytes()
+                else -> from.toString()
             }
             else -> null
         }
@@ -247,18 +243,18 @@ object CharsConvertHandler : AbstractClassConvertHandler() {
 object NumberAndPrimitiveConvertHandler : AbstractClassConvertHandler() {
 
     override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
-        return when (toType) {
-            Boolean::class.javaPrimitiveType, Boolean::class.java -> from.toBoolean()
-            Byte::class.javaPrimitiveType, Byte::class.java -> from.toByte()
-            Short::class.javaPrimitiveType, Short::class.java -> from.toShort()
-            Char::class.javaPrimitiveType, Char::class.java -> from.toChar()
-            Int::class.javaPrimitiveType, Int::class.java -> from.toInt()
-            Long::class.javaPrimitiveType, Long::class.java -> from.toLong()
-            Float::class.javaPrimitiveType, Float::class.java -> from.toFloat()
-            Double::class.javaPrimitiveType, Double::class.java -> from.toDouble()
-            BigInteger::class.java -> from.toBigInteger()
-            BigDecimal::class.java -> from.toBigDecimal()
-            Number::class.java -> from.toNumber()
+        return when {
+            toType.isBooleanType -> from.toBoolean()
+            toType.isByteType -> from.toByte()
+            toType.isShortType -> from.toShort()
+            toType.isCharType -> from.toChar()
+            toType.isIntType -> from.toInt()
+            toType.isLongType -> from.toLong()
+            toType.isFloatType -> from.toFloat()
+            toType.isDoubleType -> from.toDouble()
+            toType == BigInteger::class.java -> from.toBigInteger()
+            toType == BigDecimal::class.java -> from.toBigDecimal()
+            toType == Number::class.java -> from.toNumber()
             else -> null
         }
     }
@@ -366,15 +362,16 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
     }
 
     private fun toArray(iterable: Iterable<Any?>, arrayClass: Class<*>, converter: Converter): Any {
-        return when (val componentType = arrayClass.componentType) {
-            Boolean::class.javaPrimitiveType -> iterable.toBooleanArray()
-            Byte::class.javaPrimitiveType -> iterable.toByteArray()
-            Short::class.javaPrimitiveType -> iterable.toShortArray()
-            Char::class.javaPrimitiveType -> iterable.toCharArray()
-            Int::class.javaPrimitiveType -> iterable.toIntArray()
-            Long::class.javaPrimitiveType -> iterable.toLongArray()
-            Float::class.javaPrimitiveType -> iterable.toFloatArray()
-            Double::class.javaPrimitiveType -> iterable.toDoubleArray()
+        val componentType = arrayClass.componentType
+        return when {
+            componentType.isByteType -> iterable.toBooleanArray()
+            componentType.isByteType -> iterable.toByteArray()
+            componentType.isShortType -> iterable.toShortArray()
+            componentType.isCharType -> iterable.toCharArray()
+            componentType.isIntType -> iterable.toIntArray()
+            componentType.isLongType -> iterable.toLongArray()
+            componentType.isFloatType -> iterable.toFloatArray()
+            componentType.isDoubleType -> iterable.toDoubleArray()
             else -> iterable.toArray(componentType) { converter.convert(it, componentType) }
         }
     }
@@ -398,7 +395,7 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
         }
         return iterable.mapTo(ArrayList<Any?>(iterable.count())) {
             converter.convert(it, componentType)
-        }.toList()
+        }
     }
 
     private fun toLinkedList(from: Any, componentType: Type, converter: Converter): Any? {
@@ -408,7 +405,7 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
         }
         return iterable.mapTo(LinkedList<Any?>()) {
             converter.convert(it, componentType)
-        }.toList()
+        }
     }
 
     private fun toLinkedHashSet(from: Any, componentType: Type, converter: Converter): Any? {
@@ -418,7 +415,7 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
         }
         return iterable.mapTo(LinkedHashSet<Any?>()) {
             converter.convert(it, componentType)
-        }.toList()
+        }
     }
 
     private fun toHashSet(from: Any, componentType: Type, converter: Converter): Any? {
@@ -428,7 +425,7 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
         }
         return iterable.mapTo(HashSet<Any?>()) {
             converter.convert(it, componentType)
-        }.toList()
+        }
     }
 
     private fun toTreeSet(from: Any, componentType: Type, converter: Converter): Any? {
@@ -438,7 +435,7 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
         }
         return iterable.mapTo(TreeSet<Any?>()) {
             converter.convert(it, componentType)
-        }.toList()
+        }
     }
 
     private fun fromToIterable(from: Any): Iterable<Any?>? {
