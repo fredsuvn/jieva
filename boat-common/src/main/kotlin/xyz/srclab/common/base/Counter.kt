@@ -49,6 +49,8 @@ interface Counter {
 
     fun incrementAndGetLong(): Long
 
+    fun reset()
+
     companion object {
 
         @JvmStatic
@@ -77,7 +79,7 @@ interface Counter {
     }
 }
 
-private class SimpleCounter(private var value: Long) : Counter {
+private class SimpleCounter(private var value: Long, private val initValue: Long = value) : Counter {
 
     override fun getLong(): Long {
         return value
@@ -105,9 +107,14 @@ private class SimpleCounter(private var value: Long) : Counter {
     override fun incrementAndGetLong(): Long {
         return ++this.value
     }
+
+    override fun reset() {
+        value = initValue
+    }
 }
 
-private class AtomicCounter(private val atomicLong: AtomicLong) : Counter {
+private class AtomicCounter(private val atomicLong: AtomicLong, private val initValue: Long = atomicLong.get()) :
+    Counter {
 
     override fun getLong(): Long {
         return atomicLong.get()
@@ -131,5 +138,9 @@ private class AtomicCounter(private val atomicLong: AtomicLong) : Counter {
 
     override fun incrementAndGetLong(): Long {
         return atomicLong.incrementAndGet()
+    }
+
+    override fun reset() {
+        atomicLong.set(initValue)
     }
 }
