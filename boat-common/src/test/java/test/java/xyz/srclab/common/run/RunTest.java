@@ -78,7 +78,9 @@ public class RunTest {
         Assert.assertFalse(running.isEnd());
         Current.sleep(2500);
         Assert.assertTrue(running.isEnd());
+        Assert.assertEquals(counter.getInt(), 1);
 
+        counter.reset();
         running = runner.scheduleAtFixedRate(Duration.ZERO, Duration.ofMillis(1000), () -> {
             Current.sleep(1000);
             logger.log(counter.incrementAndGetInt());
@@ -86,6 +88,18 @@ public class RunTest {
         });
         Assert.assertFalse(running.isEnd());
         Current.sleep(2500);
+        Assert.assertFalse(running.isEnd());
+        running.cancel(false);
+        Assert.assertTrue(running.isEnd());
+
+        counter.reset();
+        running = runner.scheduleWithFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
+            Current.sleep(1000);
+            logger.log(counter.incrementAndGetInt());
+            return null;
+        });
+        Assert.assertFalse(running.isEnd());
+        Current.sleep(3000);
         Assert.assertFalse(running.isEnd());
         running.cancel(false);
         Assert.assertTrue(running.isEnd());
