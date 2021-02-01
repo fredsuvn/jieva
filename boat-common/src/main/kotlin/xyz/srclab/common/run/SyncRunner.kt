@@ -24,6 +24,7 @@ object SyncRunner : Runner {
     ) : Running<V> {
 
         override val isStart: Boolean = true
+        override val isEnd: Boolean = true
         override val endTime: LocalDateTime = LocalDateTime.now()
 
         override fun get(timeout: Long, unit: TimeUnit): V {

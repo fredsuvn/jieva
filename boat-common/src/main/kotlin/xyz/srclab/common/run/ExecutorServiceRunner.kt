@@ -66,6 +66,11 @@ open class ExecutorServiceRunner(
                 return runningTask.startTime !== null
             }
 
+        override val isEnd: Boolean
+            get() {
+                return runningTask.endTime !== null
+            }
+
         override val startTime: LocalDateTime
             get() {
                 checkState(runningTask.startTime !== null, "Task was not started.")

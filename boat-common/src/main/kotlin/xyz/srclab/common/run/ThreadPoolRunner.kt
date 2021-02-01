@@ -1,5 +1,6 @@
 package xyz.srclab.common.run
 
+import xyz.srclab.common.base.Environment
 import xyz.srclab.common.base.asNotNull
 import java.time.Duration
 import java.util.concurrent.*
@@ -80,9 +81,9 @@ open class ThreadPoolRunner(
 
     class Builder {
 
-        private var corePoolSize = 1
-        private var maximumPoolSize = 1
-        private var workQueueCapacity = Int.MAX_VALUE
+        private var corePoolSize = Environment.availableProcessors * 2
+        private var maximumPoolSize = Environment.availableProcessors * 8
+        private var workQueueCapacity = maximumPoolSize * 32
         private var keepAliveTime: Duration? = null
         private var workQueue: BlockingQueue<Runnable>? = null
         private var threadFactory: ThreadFactory? = null
@@ -156,6 +157,14 @@ open class ThreadPoolRunner(
             )
             threadPoolExecutor.allowCoreThreadTimeOut(allowCoreThreadTimeOut)
             return threadPoolExecutor
+        }
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun newBuilder(): Builder {
+            return Builder()
         }
     }
 }

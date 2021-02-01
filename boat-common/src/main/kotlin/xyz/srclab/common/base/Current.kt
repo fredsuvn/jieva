@@ -1,6 +1,7 @@
 package xyz.srclab.common.base
 
 import java.lang.reflect.Method
+import java.time.Duration
 
 /**
  * @author sunqian
@@ -28,6 +29,17 @@ object Current {
         @JvmName("context") get() {
             return localContext.get()
         }
+
+    @JvmStatic
+    @JvmOverloads
+    fun sleep(millis: Long, nanos: Int = 0) {
+        Thread.sleep(millis, nanos)
+    }
+
+    @JvmStatic
+    fun sleep(duration: Duration) {
+        sleep(duration.toMillis(), duration.nano)
+    }
 
     @JvmStatic
     fun <T> get(key: Any): T {

@@ -13,6 +13,10 @@ interface Running<V> : Future<V> {
         @JvmName("isStart") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    val isEnd: Boolean
+        @JvmName("isEnd") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
     val startTime: LocalDateTime
         @JvmName("startTime") get
 

@@ -11,14 +11,14 @@ open class ScheduledExecutorServiceRunner(
     private val scheduledExecutorService: ScheduledExecutorService
 ) : ExecutorServiceRunner(scheduledExecutorService), ScheduledRunner {
 
-    override fun <V> schedule(task: () -> V, delay: Duration): ScheduledRunning<V> {
+    override fun <V> schedule(delay: Duration, task: () -> V): ScheduledRunning<V> {
         return ScheduledExecutorServiceRunning(task, delay)
     }
 
     override fun <V> scheduleAtFixedRate(
-        task: () -> V,
         initialDelay: Duration,
-        period: Duration
+        period: Duration,
+        task: () -> V
     ): ScheduledRunning<V> {
         return RepeatableScheduledExecutorServiceRunningAtFixedRate(
             task,
@@ -28,9 +28,9 @@ open class ScheduledExecutorServiceRunner(
     }
 
     override fun <V> scheduleWithFixedDelay(
-        task: () -> V,
         initialDelay: Duration,
-        period: Duration
+        period: Duration,
+        task: () -> V,
     ): ScheduledRunning<V> {
         return RepeatableScheduledExecutorServiceRunningWithFixedDelay(
             task,
@@ -55,6 +55,11 @@ open class ScheduledExecutorServiceRunner(
         override val isStart: Boolean
             get() {
                 return runningTask.startTime !== null
+            }
+
+        override val isEnd: Boolean
+            get() {
+                return runningTask.endTime !== null
             }
 
         override val startTime: LocalDateTime

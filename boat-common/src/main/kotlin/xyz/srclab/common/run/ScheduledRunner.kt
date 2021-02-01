@@ -9,13 +9,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor
 interface ScheduledRunner : Runner {
 
     @Throws(RejectedExecutionException::class)
-    fun <V> schedule(task: () -> V, delay: Duration): ScheduledRunning<V>
+    fun <V> schedule(delay: Duration, task: () -> V): ScheduledRunning<V>
 
     @Throws(RejectedExecutionException::class)
-    fun <V> scheduleAtFixedRate(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V>
+    fun <V> scheduleAtFixedRate(initialDelay: Duration, period: Duration, task: () -> V): ScheduledRunning<V>
 
     @Throws(RejectedExecutionException::class)
-    fun <V> scheduleWithFixedDelay(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V>
+    fun <V> scheduleWithFixedDelay(initialDelay: Duration, period: Duration, task: () -> V): ScheduledRunning<V>
 
     companion object {
 
@@ -52,38 +52,42 @@ interface ScheduledRunner : Runner {
         }
 
         @JvmStatic
-        fun <V> scheduleNewThread(task: () -> V, delay: Duration): ScheduledRunning<V> {
-            return NEW_THREAD_RUNNER.schedule(task, delay)
+        fun <V> scheduleNewThread(delay: Duration, task: () -> V): ScheduledRunning<V> {
+            return NEW_THREAD_RUNNER.schedule(delay, task)
         }
 
         @JvmStatic
         fun <V> scheduleNewThreadAtFixedRate(
-            task: () -> V,
             initialDelay: Duration,
-            period: Duration
+            period: Duration,
+            task: () -> V,
         ): ScheduledRunning<V> {
-            return NEW_THREAD_RUNNER.scheduleAtFixedRate(task, initialDelay, period)
+            return NEW_THREAD_RUNNER.scheduleAtFixedRate(initialDelay, period, task)
         }
 
         @JvmStatic
         fun <V> scheduleNewThreadWithFixedDelay(
-            task: () -> V,
             initialDelay: Duration,
-            period: Duration
+            period: Duration,
+            task: () -> V
         ): ScheduledRunning<V> {
-            return NEW_THREAD_RUNNER.scheduleWithFixedDelay(task, initialDelay, period)
+            return NEW_THREAD_RUNNER.scheduleWithFixedDelay(initialDelay, period, task)
         }
     }
 }
 
-fun <V> scheduleNewThread(task: () -> V, delay: Duration): ScheduledRunning<V> {
-    return ScheduledRunner.scheduleNewThread(task, delay)
+fun <V> scheduleNewThread(delay: Duration, task: () -> V): ScheduledRunning<V> {
+    return ScheduledRunner.scheduleNewThread(delay, task)
 }
 
-fun <V> scheduleNewThreadAtFixedRate(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V> {
-    return ScheduledRunner.scheduleNewThreadAtFixedRate(task, initialDelay, period)
+fun <V> scheduleNewThreadAtFixedRate(initialDelay: Duration, period: Duration, task: () -> V): ScheduledRunning<V> {
+    return ScheduledRunner.scheduleNewThreadAtFixedRate(initialDelay, period, task)
 }
 
-fun <V> scheduleNewThreadWithFixedDelay(task: () -> V, initialDelay: Duration, period: Duration): ScheduledRunning<V> {
-    return ScheduledRunner.scheduleNewThreadWithFixedDelay(task, initialDelay, period)
+fun <V> scheduleNewThreadWithFixedDelay(
+    initialDelay: Duration,
+    period: Duration,
+    task: () -> V,
+): ScheduledRunning<V> {
+    return ScheduledRunner.scheduleNewThreadWithFixedDelay(initialDelay, period, task)
 }
