@@ -12,7 +12,7 @@ import java.net.URL
 import java.nio.ByteBuffer
 
 /**
- * Encapsulation of [ObjectMapper], core class of fastjackson.
+ * Json serialization of [Serializer].
  *
  * @author sunqian
  */
