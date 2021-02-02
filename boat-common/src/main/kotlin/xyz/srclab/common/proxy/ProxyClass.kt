@@ -18,12 +18,12 @@ interface ProxyClass<T : Any> {
         @JvmStatic
         @JvmOverloads
         fun <T : Any> newProxyClass(
-            proxyClass: Class<T>,
-            proxyMethods: Iterable<ProxyMethod<T>>,
+            proxiedClass: Class<T>,
+            proxiedMethods: Iterable<ProxyMethod<T>>,
             classLoader: ClassLoader = Current.classLoader,
             proxyClassFactory: ProxyClassFactory = ProxyClassFactory.DEFAULT,
         ): ProxyClass<T> {
-            return proxyClassFactory.create(proxyClass, proxyMethods, classLoader)
+            return proxyClassFactory.create(proxiedClass, proxiedMethods, classLoader)
         }
     }
 }

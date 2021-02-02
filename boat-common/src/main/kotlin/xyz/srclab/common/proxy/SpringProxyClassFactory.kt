@@ -1,9 +1,6 @@
 package xyz.srclab.common.proxy
 
-import org.springframework.cglib.proxy.CallbackFilter
-import org.springframework.cglib.proxy.Enhancer
-import org.springframework.cglib.proxy.MethodInterceptor
-import org.springframework.cglib.proxy.MethodProxy
+import org.springframework.cglib.proxy.*
 import xyz.srclab.common.base.asAny
 import java.lang.reflect.Method
 import java.util.*
@@ -22,15 +19,25 @@ object SpringProxyClassFactory : ProxyClassFactory {
         } else {
             enhancer.setSuperclass(proxyClass)
         }
-        val callbacks = LinkedList<ProxyMethodInterceptor<T>>()
+        val callbacks = LinkedList<Callback>()
+        callbacks.add(NoOp.INSTANCE)
         for (proxyMethod in proxyMethods) {
             callbacks.add(ProxyMethodInterceptor(proxyMethod))
         }
         val callbackFilter = CallbackFilter { method ->
-            callbacks.indexOfFirst { mi ->
-                method.name == mi.proxyMethod.name
-                        && method.parameterTypes.contentEquals(mi.proxyMethod.parametersTypes)
+            for (i in callbacks.indices) {
+                val callback = callbacks[i]
+                if (callback is ProxyMethodInterceptor<*>) {
+                    if (method.name == callback.proxyMethod.name
+                        && method.parameterTypes.contentEquals(callback.proxyMethod.parameterTypes)
+                    ) {
+                        return@CallbackFilter i
+                    } else {
+                        return@CallbackFilter 0
+                    }
+                }
             }
+            0
         }
         enhancer.setCallbacks(callbacks.toTypedArray())
         enhancer.setCallbackFilter(callbackFilter)

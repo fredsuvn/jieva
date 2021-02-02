@@ -13,10 +13,10 @@ interface ProxyMethod<T> {
         @JvmName("name") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val parametersTypes: Array<Class<*>>?
-        @JvmName("parametersTypes") get
+    val parameterTypes: Array<Class<*>>
+        @JvmName("parameterTypes") get
 
-    fun invoke(proxy: T, method: Method, args: Array<out Any?>?, superInvoker: SuperInvoker): Any?
+    fun invoke(proxied: T, proxiedMethod: Method, args: Array<out Any?>?, superInvoker: SuperInvoker): Any?
 }
 
 interface SuperInvoker {

@@ -43,9 +43,15 @@ val Field.jvmDescriptor: String
 
 val Method.jvmDescriptor: String
     @JvmName("jvmDescriptor") get() {
-        val parameterTypesDescriptors = this.parameterTypes.joinToString("") { it.jvmDescriptor }
+        val parameterTypesDescriptors = this.parameterTypes.jvmDescriptor
         val returnDescriptor = this.returnType.jvmDescriptor
         return "($parameterTypesDescriptors)$returnDescriptor"
+    }
+
+val Array<out Class<*>>.jvmDescriptor: String
+    @JvmName("jvmDescriptor") get() {
+        val parameterTypesDescriptors = this.joinToString("") { it.jvmDescriptor }
+        return "($parameterTypesDescriptors)"
     }
 
 //val Type.jvmJavaTypeSignature: String

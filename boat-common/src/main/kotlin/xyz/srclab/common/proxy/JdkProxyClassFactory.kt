@@ -1,6 +1,7 @@
 package xyz.srclab.common.proxy
 
 import xyz.srclab.common.base.asAny
+import xyz.srclab.common.jvm.jvmDescriptor
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
@@ -12,54 +13,41 @@ object JdkProxyClassFactory : ProxyClassFactory {
         proxyMethods: Iterable<ProxyMethod<T>>,
         classLoader: ClassLoader
     ): ProxyClass<T> {
-        return Proxy.newProxyInstance(classLoader, arrayOf(proxyClass), ProxyMethodInterceptor(proxyMethods)).asAny()
+        return ProxyClassImpl(proxyClass, proxyMethods, classLoader)
+    }
+
+    private class ProxyClassImpl<T : Any>(
+        private val proxyClass: Class<T>,
+        private val proxyMethods: Iterable<ProxyMethod<T>>,
+        private val classLoader: ClassLoader
+    ) : ProxyClass<T> {
+
+        override fun newInstance(): T {
+            return Proxy.newProxyInstance(classLoader, arrayOf(proxyClass), ProxyMethodInterceptor(proxyMethods))
+                .asAny()
+        }
+
+        override fun newInstance(parameterTypes: Array<Class<*>>?, args: Array<Any?>?): T {
+            throw IllegalArgumentException("JDK proxy only support interface proxy.")
+        }
     }
 
     private class ProxyMethodInterceptor<T : Any>(val proxyMethods: Iterable<ProxyMethod<T>>) : InvocationHandler {
 
-        private var methodMap: MutableMap<Method, ProxyMethod<T>>? = null
+        private val methodMap: Map<String, ProxyMethod<T>> by lazy {
+            val map = HashMap<String, ProxyMethod<T>>()
+            for (proxyMethod in proxyMethods) {
+                map["${proxyMethod.name}${proxyMethod.parameterTypes.jvmDescriptor}"] = proxyMethod
+            }
+            map
+        }
 
         override fun invoke(proxy: Any, method: Method, args: Array<out Any>?): Any? {
-            val proxyMethod = findProxyMethod(method)
+            val proxyMethod = methodMap["${method.name}${method.parameterTypes.jvmDescriptor}"]
+            if (proxyMethod === null) {
+                throw IllegalStateException("Proxy method not found: $method")
+            }
             return callProxyMethod(proxyMethod, proxy, method, args)
-        }
-
-        private fun findProxyMethod(method: Method): ProxyMethod<T> {
-            val tryFind = findFromMethodMap(method)
-            if (tryFind !== null) {
-                return tryFind
-            }
-
-            synchronized(this) {
-                val proxyMethodFromMapSync = findFromMethodMap(method)
-                if (proxyMethodFromMapSync !== null) {
-                    return proxyMethodFromMapSync
-                }
-                val proxyMethodFromIterable = proxyMethods.find { pm ->
-                    method.name == pm.name && method.parameterTypes.contentEquals(pm.parametersTypes)
-                }
-                if (proxyMethodFromIterable === null) {
-                    throw IllegalStateException("Proxy method not found: $method")
-                }
-
-                //Using copy-on-write-way to update method map.
-                val oldMap = methodMap
-                val newMap = if (oldMap === null) HashMap() else HashMap(oldMap)
-                newMap[method] = proxyMethodFromIterable
-                methodMap = newMap
-                return proxyMethodFromIterable
-            }
-        }
-
-        private fun findFromMethodMap(method: Method): ProxyMethod<T>? {
-            val methods = methodMap
-            if (methods !== null) {
-                val proxyMethodFromMap = methods[method]
-                if (proxyMethodFromMap !== null) {
-                    return proxyMethodFromMap
-                }
-            }
-            return null
         }
 
         private fun callProxyMethod(
@@ -70,7 +58,7 @@ object JdkProxyClassFactory : ProxyClassFactory {
         ): Any? {
             return proxyMethod.invoke(proxy.asAny(), method, args, object : SuperInvoker {
                 override fun invoke(args: Array<out Any?>?): Any? {
-                    throw IllegalStateException("Illegal method calling: $method")
+                    throw IllegalStateException("Cannot call a interface method: $method")
                 }
             })
         }
