@@ -15,7 +15,7 @@ dependencies {
 
   api(project(":boat-common"))
   api(project(":boat-codec"))
-  api(project(":boat-data"))
+  api(project(":boat-serialize"))
   api(project(":boat-id"))
   api(project(":boat-egg"))
 }
