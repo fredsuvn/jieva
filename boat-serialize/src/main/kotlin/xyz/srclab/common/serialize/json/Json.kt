@@ -1,5 +1,6 @@
 package xyz.srclab.common.serialize.json
 
+import com.fasterxml.jackson.databind.node.NullNode
 import xyz.srclab.common.base.Default
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.reflect.TypeRef
@@ -250,7 +251,13 @@ interface Json {
      * @return [Map]
      */
     @JvmDefault
-    fun toJavaMap(): Map<String?, Any?> {
-        return toJavaObject(object : TypeRef<Map<String?, Any?>>() {})
+    fun toJavaMap(): Map<String, Any?> {
+        return toJavaObject(object : TypeRef<Map<String, Any?>>() {})
+    }
+
+    companion object {
+
+        @JvmField
+        val NULL: Json = JsonImpl(DEFAULT_OBJECT_MAPPER, NullNode.getInstance())
     }
 }

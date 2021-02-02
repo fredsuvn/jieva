@@ -7,8 +7,6 @@ interface Serializer<S> {
 
     fun serialize(any: Any?): S
 
-    fun deserialize(serial: S): Any?
-
     @JvmDefault
     fun <T> deserialize(serial: S, type: Class<T>): T? {
         return deserialize(serial, type as Type)

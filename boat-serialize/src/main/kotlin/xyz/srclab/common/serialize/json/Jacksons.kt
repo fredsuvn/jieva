@@ -103,7 +103,7 @@ internal class JsonSerializerImpl(private val objectMapper: ObjectMapper) : Json
         return try {
             JsonImpl(
                 objectMapper,
-                objectMapper.readTree(Utils.bufferToBytes(jsonBuffer))
+                objectMapper.readTree(bufferToBytes(jsonBuffer))
             )
         } catch (e: Exception) {
             throw IllegalStateException(e)
@@ -149,9 +149,15 @@ internal class JsonSerializerImpl(private val objectMapper: ObjectMapper) : Json
             throw IllegalStateException(e)
         }
     }
+
+    private fun bufferToBytes(buffer: ByteBuffer): ByteArray {
+        val bytesArray = ByteArray(buffer.remaining())
+        buffer[bytesArray, 0, bytesArray.size]
+        return bytesArray
+    }
 }
 
-private class JsonImpl(private val objectMapper: ObjectMapper, private val jsonNode: JsonNode) : Json {
+internal class JsonImpl(private val objectMapper: ObjectMapper, private val jsonNode: JsonNode) : Json {
 
     override val type: JsonType = jsonNode.nodeType.toJsonType()
 

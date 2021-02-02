@@ -2,6 +2,7 @@ package xyz.srclab.common.serialize.json
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import xyz.srclab.common.reflect.TypeRef
+import xyz.srclab.common.serialize.Serializer
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.Reader
@@ -15,7 +16,17 @@ import java.nio.ByteBuffer
  *
  * @author sunqian
  */
-interface JsonSerializer {
+interface JsonSerializer : Serializer<Json> {
+
+    @JvmDefault
+    override fun serialize(any: Any?): Json {
+        return if (any === null) Json.NULL else toJson(any)
+    }
+
+    @JvmDefault
+    override fun <T> deserialize(serial: Json, type: Type): T {
+        return serial.toJavaObject(type)
+    }
 
     /**
      * java object -> json string
