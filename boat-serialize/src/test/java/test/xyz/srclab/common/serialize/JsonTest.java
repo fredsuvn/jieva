@@ -121,7 +121,6 @@ public class JsonTest {
         //Test null
         Json nullJson = Json.NULL;
         Assert.assertEquals(nullJson.toJsonString(), "null");
-        Assert.assertEquals(nullJson.toJavaString(), "null");
     }
 
     private <K, V> Map<K, V> newMap(K key, V value) {
