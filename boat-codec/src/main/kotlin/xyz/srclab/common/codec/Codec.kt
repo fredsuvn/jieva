@@ -284,12 +284,12 @@ interface Codec {
 
         @JvmStatic
         fun ByteArray.decodeBase64String(): String {
-            return CodecBytes.toString(decodeBase64(this))
+            return decodeBase64().toChars()
         }
 
         @JvmStatic
         fun String.decodeBase64String(): String {
-            return CodecBytes.toString(decodeBase64(this))
+            return decodeBase64().toChars()
         }
 
         @JvmStatic

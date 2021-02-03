@@ -47,7 +47,7 @@ public class Sm2Cipher implements AsymmetricCipher<ECPoint, BigInteger> {
     public Sm2KeyPair generateKeyPair() {
         BigInteger d = random(sm2Params.n().subtract(new BigInteger("1")));
         Sm2KeyPair keyPair = new Sm2KeyPair(G.multiply(d).normalize(), d);
-        if (isLegal(keyPair.getPublicKey())) {
+        if (isLegal(keyPair.getEncryptKey())) {
             return keyPair;
         } else {
             throw new IllegalStateException("Failed to generate SM2 key pair.");

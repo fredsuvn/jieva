@@ -3,30 +3,31 @@ package xyz.srclab.common.codec
 /**
  * Key pair of codec.
  *
- * @param <PUB> type of public key
- * @param <PRI> type of private key
-</PRI></PUB> */
-interface CodecKeyPair<PUB, PRI> {
+ * @param [EK] encrypt key
+ * @param [DK] decrypt key
+ */
+interface CodecKeyPair<EK, DK> {
+
     /**
      * Returns public key.
      *
      * @return public key
      */
-    val publicKey: PUB
+    val encryptKey: EK
 
     /**
      * Returns private key.
      *
      * @return private key
      */
-    val privateKey: PRI
+    val privateKey: DK
 
     /**
      * Returns public key as bytes.
      *
      * @return public key as bytes
      */
-    val publicKeyBytes: ByteArray?
+    val encryptKeyBytes: ByteArray?
 
     /**
      * Returns private key as bytes.

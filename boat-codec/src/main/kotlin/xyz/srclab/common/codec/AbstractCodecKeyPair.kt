@@ -11,15 +11,15 @@ import cn.com.essence.galaxy.annotation.Nullable
  * @author sunqian
 </PRI></PUB> */
 abstract class AbstractCodecKeyPair<PUB, PRI> protected constructor(
-    override val publicKey: PUB,
+    override val encryptKey: PUB,
     override val privateKey: PRI
 ) : CodecKeyPair<PUB, PRI> {
 
     @Nullable
-    override var publicKeyBytes: ByteArray?
+    override var encryptKeyBytes: ByteArray?
         get() {
             if (field == null) {
-                field = publicKeyToBytes(publicKey)
+                field = publicKeyToBytes(encryptKey)
             }
             return field
         }
@@ -39,7 +39,7 @@ abstract class AbstractCodecKeyPair<PUB, PRI> protected constructor(
     override var publicKeyString: String? = null
         get() {
             if (field == null) {
-                field = CodecBytes.toString(publicKeyBytes)
+                field = CodecBytes.toString(encryptKeyBytes)
             }
             return field
         }
@@ -59,7 +59,7 @@ abstract class AbstractCodecKeyPair<PUB, PRI> protected constructor(
     override var publicKeyHexString: String? = null
         get() {
             if (field == null) {
-                field = Codec.Companion.encodeHexString(publicKeyBytes)
+                field = Codec.Companion.encodeHexString(encryptKeyBytes)
             }
             return field
         }
@@ -79,7 +79,7 @@ abstract class AbstractCodecKeyPair<PUB, PRI> protected constructor(
     override var publicKeyBase64String: String? = null
         get() {
             if (field == null) {
-                field = Codec.Companion.encodeBase64String(publicKeyBytes)
+                field = Codec.Companion.encodeBase64String(encryptKeyBytes)
             }
             return field
         }

@@ -1,35 +1,9 @@
 package xyz.srclab.common.codec
 
-import javax.crypto.SecretKey
-import xyz.srclab.common.codec.CodecBytes
-import javax.crypto.spec.SecretKeySpec
-import xyz.srclab.common.codec.CodecAlgorithmConstants
-import java.lang.IllegalStateException
-import xyz.srclab.common.codec.AsymmetricCipher
-import java.security.KeyPairGenerator
-import java.security.spec.X509EncodedKeySpec
-import java.security.spec.PKCS8EncodedKeySpec
-import javax.crypto.NoSuchPaddingException
-import java.security.NoSuchAlgorithmException
-import xyz.srclab.common.codec.CodecAlgorithm
-import java.io.IOException
-import javax.crypto.IllegalBlockSizeException
-import javax.crypto.BadPaddingException
-import xyz.srclab.common.codec.AbstractCodecKeyPair
-import xyz.srclab.common.codec.CodecKeyPair
-import xyz.srclab.common.codec.ReversibleCipher
-import xyz.srclab.common.codec.CodecImpl
-import xyz.srclab.common.codec.CodecKeySupport
-import xyz.srclab.common.codec.SymmetricCipherImpl
-import xyz.srclab.common.codec.DigestCipher
-import xyz.srclab.common.codec.DigestCipherImpl
-import xyz.srclab.common.codec.HmacDigestCipher
-import xyz.srclab.common.codec.HmacDigestCipherImpl
-import xyz.srclab.common.codec.CodecAlgorithmSupport
-import java.util.NoSuchElementException
-import xyz.srclab.common.codec.CodecAlgorithmSupport.CodecAlgorithmImpl
-import xyz.srclab.common.codec.CodecCipher
-import java.security.MessageDigest
+import xyz.srclab.common.base.toBytes
+import xyz.srclab.common.base.toChars
+import xyz.srclab.common.codec.Codec.Companion.encodeBase64String
+import xyz.srclab.common.codec.Codec.Companion.encodeHexString
 
 /**
  * Reversible cipher.
@@ -37,7 +11,7 @@ import java.security.MessageDigest
  * @param [EK] encrypt key
  * @param [DK] decrypt key
  * @author sunqian
-*/
+ */
 interface ReversibleCipher<EK, DK> : CodecCipher {
 
     /**
@@ -65,8 +39,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data      data
      * @return encrypted data
      */
+    @JvmDefault
     fun encrypt(encryptKey: EK, data: String): ByteArray {
-        return encrypt(encryptKey, CodecBytes.toBytes(data))
+        return encrypt(encryptKey, data.toBytes())
     }
 
     /**
@@ -76,8 +51,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data           data
      * @return encrypted data
      */
+    @JvmDefault
     fun encrypt(encryptKeyBytes: ByteArray, data: String): ByteArray {
-        return encrypt(encryptKeyBytes, CodecBytes.toBytes(data))
+        return encrypt(encryptKeyBytes, data.toBytes())
     }
 
     /**
@@ -87,8 +63,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data      data
      * @return encrypted data as string
      */
+    @JvmDefault
     fun encryptString(encryptKey: EK, data: ByteArray): String {
-        return CodecBytes.toString(encrypt(encryptKey, data))
+        return encrypt(encryptKey, data).toChars()
     }
 
     /**
@@ -98,8 +75,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data           data
      * @return encrypted data as string
      */
+    @JvmDefault
     fun encryptString(encryptKeyBytes: ByteArray, data: ByteArray): String {
-        return CodecBytes.toString(encrypt(encryptKeyBytes, data))
+        return encrypt(encryptKeyBytes, data).toChars()
     }
 
     /**
@@ -109,8 +87,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data      data
      * @return encrypted data as string
      */
+    @JvmDefault
     fun encryptString(encryptKey: EK, data: String): String {
-        return CodecBytes.toString(encrypt(encryptKey, data))
+        return encrypt(encryptKey, data).toChars()
     }
 
     /**
@@ -120,8 +99,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data           data
      * @return encrypted data as string
      */
+    @JvmDefault
     fun encryptString(encryptKeyBytes: ByteArray, data: String): String {
-        return CodecBytes.toString(encrypt(encryptKeyBytes, data))
+        return encrypt(encryptKeyBytes, data).toChars()
     }
 
     /**
@@ -131,8 +111,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data      data
      * @return hex string encoded by encrypted data
      */
+    @JvmDefault
     fun encryptHexString(encryptKey: EK, data: ByteArray): String {
-        return Codec.Companion.encodeHexString(encrypt(encryptKey, data))
+        return encrypt(encryptKey, data).toChars().encodeHexString()
     }
 
     /**
@@ -142,8 +123,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data           data
      * @return hex string encoded by encrypted data
      */
+    @JvmDefault
     fun encryptHexString(encryptKeyBytes: ByteArray, data: ByteArray): String {
-        return Codec.Companion.encodeHexString(encrypt(encryptKeyBytes, data))
+        return encrypt(encryptKeyBytes, data).toChars().encodeHexString()
     }
 
     /**
@@ -153,8 +135,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data      data
      * @return hex string encoded by encrypted data
      */
+    @JvmDefault
     fun encryptHexString(encryptKey: EK, data: String): String {
-        return Codec.Companion.encodeHexString(encrypt(encryptKey, data))
+        return encrypt(encryptKey, data).toChars().encodeHexString()
     }
 
     /**
@@ -164,8 +147,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data           data
      * @return hex string encoded by encrypted data
      */
+    @JvmDefault
     fun encryptHexString(encryptKeyBytes: ByteArray, data: String): String {
-        return Codec.Companion.encodeHexString(encrypt(encryptKeyBytes, data))
+        return encrypt(encryptKeyBytes, data).toChars().encodeHexString()
     }
 
     /**
@@ -175,8 +159,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data      data
      * @return base64 string encoded by encrypted data
      */
+    @JvmDefault
     fun encryptBase64String(encryptKey: EK, data: ByteArray): String {
-        return Codec.Companion.encodeBase64String(encrypt(encryptKey, data))
+        return encrypt(encryptKey, data).toChars().encodeBase64String()
     }
 
     /**
@@ -186,8 +171,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data           data
      * @return base64 string encoded by encrypted data
      */
+    @JvmDefault
     fun encryptBase64String(encryptKeyBytes: ByteArray, data: ByteArray): String {
-        return Codec.Companion.encodeBase64String(encrypt(encryptKeyBytes, data))
+        return encrypt(encryptKeyBytes, data).toChars().encodeBase64String()
     }
 
     /**
@@ -197,8 +183,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data      data
      * @return base64 string encoded by encrypted data
      */
+    @JvmDefault
     fun encryptBase64String(encryptKey: EK, data: String): String {
-        return Codec.Companion.encodeBase64String(encrypt(encryptKey, data))
+        return encrypt(encryptKey, data).toChars().encodeBase64String()
     }
 
     /**
@@ -208,8 +195,9 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param data           data
      * @return base64 string encoded by encrypted data
      */
+    @JvmDefault
     fun encryptBase64String(encryptKeyBytes: ByteArray, data: String): String {
-        return Codec.Companion.encodeBase64String(encrypt(encryptKeyBytes, data))
+        return encrypt(encryptKeyBytes, data).toChars().encodeBase64String()
     }
 
     /**
@@ -219,16 +207,18 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param encrypted  encrypted data
      * @return decrypted data
      */
+    @JvmDefault
     fun decrypt(decryptKey: DK, encrypted: ByteArray): ByteArray
 
     /**
      * Decrypts data by given decrypt key bytes.
      *
-     * @param decryptKeyBytes decrypt key bytes
+     * @param decryptKey decrypt key bytes
      * @param encrypted       encrypted data
      * @return decrypted data
      */
-    fun decrypt(decryptKeyBytes: ByteArray, encrypted: ByteArray): ByteArray
+    @JvmDefault
+    fun decrypt(decryptKey: ByteArray, encrypted: ByteArray): ByteArray
 
     /**
      * Decrypts data by given decrypt key.
@@ -237,19 +227,21 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param encrypted  encrypted data
      * @return decrypted data
      */
+    @JvmDefault
     fun decrypt(decryptKey: DK, encrypted: String): ByteArray {
-        return decrypt(decryptKey, CodecBytes.toBytes(encrypted))
+        return decrypt(decryptKey, encrypted.toBytes())
     }
 
     /**
      * Decrypts data by given decrypt key bytes.
      *
-     * @param decryptKeyBytes decrypt key bytes
+     * @param decryptKey decrypt key bytes
      * @param encrypted       encrypted data
      * @return decrypted data
      */
-    fun decrypt(decryptKeyBytes: ByteArray, encrypted: String): ByteArray {
-        return decrypt(decryptKeyBytes, CodecBytes.toBytes(encrypted))
+    @JvmDefault
+    fun decrypt(decryptKey: ByteArray, encrypted: String): ByteArray {
+        return decrypt(decryptKey, encrypted.toBytes())
     }
 
     /**
@@ -259,19 +251,21 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param encrypted  encrypted data
      * @return decrypted data as string
      */
+    @JvmDefault
     fun decryptString(decryptKey: DK, encrypted: ByteArray): String {
-        return CodecBytes.toString(decrypt(decryptKey, encrypted))
+        return decrypt(decryptKey, encrypted).toChars()
     }
 
     /**
      * Decrypts data by given decrypt key bytes.
      *
-     * @param decryptKeyBytes decrypt key bytes
+     * @param decryptKey decrypt key bytes
      * @param encrypted       encrypted data
      * @return decrypted data as string
      */
-    fun decryptString(decryptKeyBytes: ByteArray, encrypted: ByteArray): String {
-        return CodecBytes.toString(decrypt(decryptKeyBytes, encrypted))
+    @JvmDefault
+    fun decryptString(decryptKey: ByteArray, encrypted: ByteArray): String {
+        return decrypt(decryptKey, encrypted).toChars()
     }
 
     /**
@@ -281,19 +275,21 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param encrypted  encrypted data
      * @return decrypted data as string
      */
+    @JvmDefault
     fun decryptString(decryptKey: DK, encrypted: String): String {
-        return CodecBytes.toString(decrypt(decryptKey, encrypted))
+        return decrypt(decryptKey, encrypted).toChars()
     }
 
     /**
      * Decrypts data by given decrypt key bytes.
      *
-     * @param decryptKeyBytes decrypt key bytes
+     * @param decryptKey decrypt key bytes
      * @param encrypted       encrypted data
      * @return decrypted data as string
      */
-    fun decryptString(decryptKeyBytes: ByteArray, encrypted: String): String {
-        return CodecBytes.toString(decrypt(decryptKeyBytes, encrypted))
+    @JvmDefault
+    fun decryptString(decryptKey: ByteArray, encrypted: String): String {
+        return decrypt(decryptKey, encrypted).toChars()
     }
 
     /**
@@ -303,19 +299,21 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param encrypted  encrypted data
      * @return hex string encoded by decrypted data
      */
+    @JvmDefault
     fun decryptHexString(decryptKey: DK, encrypted: ByteArray): String {
-        return Codec.Companion.encodeHexString(decrypt(decryptKey, encrypted))
+        return decrypt(decryptKey, encrypted).toChars().encodeHexString()
     }
 
     /**
      * Decrypts data by given decrypt key bytes.
      *
-     * @param decryptKeyBytes decrypt key bytes
+     * @param decryptKey decrypt key bytes
      * @param encrypted       encrypted data
      * @return hex string encoded by decrypted data
      */
-    fun decryptHexString(decryptKeyBytes: ByteArray, encrypted: ByteArray): String {
-        return Codec.Companion.encodeHexString(decrypt(decryptKeyBytes, encrypted))
+    @JvmDefault
+    fun decryptHexString(decryptKey: ByteArray, encrypted: ByteArray): String {
+        return decrypt(decryptKey, encrypted).toChars().encodeHexString()
     }
 
     /**
@@ -325,19 +323,21 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param encrypted  encrypted data
      * @return hex string encoded by decrypted data
      */
+    @JvmDefault
     fun decryptHexString(decryptKey: DK, encrypted: String): String {
-        return Codec.Companion.encodeHexString(decrypt(decryptKey, encrypted))
+        return decrypt(decryptKey, encrypted).toChars().encodeHexString()
     }
 
     /**
      * Decrypts data by given decrypt key bytes.
      *
-     * @param decryptKeyBytes decrypt key bytes
+     * @param decryptKey decrypt key bytes
      * @param encrypted       encrypted data
      * @return hex string encoded by decrypted data
      */
-    fun decryptHexString(decryptKeyBytes: ByteArray, encrypted: String): String {
-        return Codec.Companion.encodeHexString(decrypt(decryptKeyBytes, encrypted))
+    @JvmDefault
+    fun decryptHexString(decryptKey: ByteArray, encrypted: String): String {
+        return decrypt(decryptKey, encrypted).toChars().encodeHexString()
     }
 
     /**
@@ -347,19 +347,21 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param encrypted  encrypted data
      * @return base64 string encoded by decrypted data
      */
+    @JvmDefault
     fun decryptBase64String(decryptKey: DK, encrypted: ByteArray): String {
-        return Codec.Companion.encodeBase64String(decrypt(decryptKey, encrypted))
+        return decrypt(decryptKey, encrypted).toChars().encodeBase64String()
     }
 
     /**
      * Decrypts data by given decrypt key bytes.
      *
-     * @param decryptKeyBytes decrypt key bytes
+     * @param decryptKey decrypt key bytes
      * @param encrypted       encrypted data
      * @return base64 string encoded by decrypted data
      */
-    fun decryptBase64String(decryptKeyBytes: ByteArray, encrypted: ByteArray): String {
-        return Codec.Companion.encodeBase64String(decrypt(decryptKeyBytes, encrypted))
+    @JvmDefault
+    fun decryptBase64String(decryptKey: ByteArray, encrypted: ByteArray): String {
+        return decrypt(decryptKey, encrypted).toChars().encodeBase64String()
     }
 
     /**
@@ -369,18 +371,20 @@ interface ReversibleCipher<EK, DK> : CodecCipher {
      * @param encrypted  encrypted data
      * @return base64 string encoded by decrypted data
      */
+    @JvmDefault
     fun decryptBase64String(decryptKey: DK, encrypted: String): String {
-        return Codec.Companion.encodeBase64String(decrypt(decryptKey, encrypted))
+        return decrypt(decryptKey, encrypted).toChars().encodeBase64String()
     }
 
     /**
      * Decrypts data by given decrypt key bytes.
      *
-     * @param decryptKeyBytes decrypt key bytes
+     * @param decryptKey decrypt key bytes
      * @param encrypted       encrypted data
      * @return base64 string encoded by decrypted data
      */
-    fun decryptBase64String(decryptKeyBytes: ByteArray, encrypted: String): String {
-        return Codec.Companion.encodeBase64String(decrypt(decryptKeyBytes, encrypted))
+    @JvmDefault
+    fun decryptBase64String(decryptKey: ByteArray, encrypted: String): String {
+        return decrypt(decryptKey, encrypted).toChars().encodeBase64String()
     }
 }
