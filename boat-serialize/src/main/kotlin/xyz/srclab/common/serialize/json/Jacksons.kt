@@ -193,7 +193,7 @@ internal class JsonImpl(private val objectMapper: ObjectMapper, private val json
         buffer.put(toJsonBytes())
     }
 
-    override fun <T> toJavaObject(type: Type): T {
+    override fun <T> toJavaObjectOrNull(type: Type): T? {
         return try {
             objectMapper.readValue(jsonNode.traverse(), object : TypeReference<T>() {
                 override fun getType(): Type {

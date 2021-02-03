@@ -117,10 +117,15 @@ public class JsonTest {
         logger.log(mapJson.toJsonString());
         Assert.assertEquals(mapJson.toJsonString(), toJsonString);
         Assert.assertEquals(mapJson.toJsonBytes(), toJsonString.getBytes(StandardCharsets.UTF_8));
+    }
 
+    @Test
+    public void testNull() {
         //Test null
         Json nullJson = Json.NULL;
         Assert.assertEquals(nullJson.toJsonString(), "null");
+        Assert.assertNull(nullJson.toJavaStringOrNull());
+        Assert.expectThrows(IllegalStateException.class, nullJson::toJavaString);
     }
 
     private <K, V> Map<K, V> newMap(K key, V value) {

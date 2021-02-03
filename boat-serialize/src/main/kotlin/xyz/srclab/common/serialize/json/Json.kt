@@ -111,7 +111,7 @@ interface Json {
      */
     @JvmDefault
     fun <T> toJavaObject(type: Class<T>): T {
-        return toJavaObject(type as Type)
+        return toJavaObjectOrNull(type).orThrow()
     }
 
     /**
@@ -121,18 +121,54 @@ interface Json {
      * @param [T]  java type
      * @return [T]
      */
-    fun <T> toJavaObject(type: Type): T
+    @JvmDefault
+    fun <T> toJavaObject(type: Type): T {
+        return toJavaObjectOrNull<T>(type).orThrow()
+    }
 
     /**
      * to T
      *
-     * @param typeReference type reference of T
+     * @param typeRef type reference of T
      * @param [T]           java type
      * @return [T]
      */
     @JvmDefault
     fun <T> toJavaObject(typeRef: TypeRef<T>): T {
-        return toJavaObject(typeRef.type)
+        return toJavaObjectOrNull(typeRef).orThrow()
+    }
+
+    /**
+     * to T
+     *
+     * @param type class of T
+     * @param [T]  java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toJavaObjectOrNull(type: Class<T>): T? {
+        return toJavaObjectOrNull(type as Type)
+    }
+
+    /**
+     * to T
+     *
+     * @param type type of T
+     * @param [T]  java type
+     * @return [T]
+     */
+    fun <T> toJavaObjectOrNull(type: Type): T?
+
+    /**
+     * to T
+     *
+     * @param typeRef type reference of T
+     * @param [T]           java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toJavaObjectOrNull(typeRef: TypeRef<T>): T? {
+        return toJavaObjectOrNull(typeRef.type)
     }
 
     /**
@@ -143,6 +179,16 @@ interface Json {
     @JvmDefault
     fun toJavaString(): String {
         return toJavaObject(String::class.java)
+    }
+
+    /**
+     * to [String]
+     *
+     * @return [String]
+     */
+    @JvmDefault
+    fun toJavaStringOrNull(): String? {
+        return toJavaObjectOrNull(String::class.java)
     }
 
     /**
@@ -259,5 +305,9 @@ interface Json {
 
         @JvmField
         val NULL: Json = JsonImpl(DEFAULT_OBJECT_MAPPER, NullNode.getInstance())
+
+        private fun <T> T?.orThrow(): T {
+            return this ?: throw IllegalStateException("Null json node.")
+        }
     }
 }
