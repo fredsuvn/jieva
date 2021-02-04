@@ -16,11 +16,6 @@ dependencies {
   api(project(":boat-annotations"))
 
   api("org.jetbrains.kotlin:kotlin-test-testng")
-  api("org.apache.commons:commons-lang3")
-  api("com.google.guava:guava")
-
-  //testCompile("org.testng:testng")
-  //testCompile("org.jetbrains.kotlin:kotlin-test-testng")
 }
 
 test {
