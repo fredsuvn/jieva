@@ -1,7 +1,7 @@
 /**
  * @author sunqian
  */
-@DefaultNonNull
+@DefaultNotNull
 package xyz.srclab.common.codec.sm2;
 
-import cn.com.essence.galaxy.annotation.DefaultNonNull;
+import xyz.srclab.annotations.DefaultNotNull;

@@ -3,18 +3,25 @@ package xyz.srclab.common.codec
 /**
  * Asymmetric cipher.
  *
- * @param [EK] encrypt key
- * @param [DK] decrypt key
+ * @param [PUB] public key
+ * @param [PRI] private key
  * @author sunqian
  * @see xyz.srclab.common.codec.rsa.RsaCipher
- * @see xyz.srclab.common.codec.sm2.Sm2Cipher
+ * @see xyz.srclab.common.codec.sm2.Sm2CipherJavaImpl
  */
-interface AsymmetricCipher<EK, DK> : ReversibleCipher<EK, DK> {
+interface AsymmetricCipher<PUB, PRI> : ReversibleCipher<PUB, PRI> {
 
     /**
      * Generates key pair.
      *
      * @return key pair
      */
-    fun generateKeyPair(): CodecKeyPair<EK, DK>
+    fun generateKeyPair(): CodecKeyPair<PUB, PRI>
+
+    /**
+     * Generates key pair.
+     *
+     * @return key pair
+     */
+    fun generateKeyPair(size: Int): CodecKeyPair<PUB, PRI>
 }

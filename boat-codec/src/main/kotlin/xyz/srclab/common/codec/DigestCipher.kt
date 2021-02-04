@@ -1,35 +1,11 @@
 package xyz.srclab.common.codec
 
-import javax.crypto.SecretKey
-import xyz.srclab.common.codec.CodecBytes
-import javax.crypto.spec.SecretKeySpec
-import xyz.srclab.common.codec.CodecAlgorithmConstants
-import java.lang.IllegalStateException
-import xyz.srclab.common.codec.AsymmetricCipher
-import java.security.KeyPairGenerator
-import java.security.spec.X509EncodedKeySpec
-import java.security.spec.PKCS8EncodedKeySpec
-import javax.crypto.NoSuchPaddingException
-import java.security.NoSuchAlgorithmException
-import xyz.srclab.common.codec.CodecAlgorithm
-import java.io.IOException
-import javax.crypto.IllegalBlockSizeException
-import javax.crypto.BadPaddingException
-import xyz.srclab.common.codec.AbstractCodecKeyPair
-import xyz.srclab.common.codec.CodecKeyPair
-import xyz.srclab.common.codec.ReversibleCipher
-import xyz.srclab.common.codec.CodecImpl
-import xyz.srclab.common.codec.CodecKeySupport
-import xyz.srclab.common.codec.SymmetricCipherImpl
-import xyz.srclab.common.codec.DigestCipher
-import xyz.srclab.common.codec.DigestCipherImpl
-import xyz.srclab.common.codec.HmacDigestCipher
-import xyz.srclab.common.codec.HmacDigestCipherImpl
-import xyz.srclab.common.codec.CodecAlgorithmSupport
-import java.util.NoSuchElementException
-import xyz.srclab.common.codec.CodecAlgorithmSupport.CodecAlgorithmImpl
-import xyz.srclab.common.codec.CodecCipher
+import xyz.srclab.common.base.toBytes
+import xyz.srclab.common.base.toChars
+import xyz.srclab.common.codec.Codec.Companion.encodeBase64String
+import xyz.srclab.common.codec.Codec.Companion.encodeHexString
 import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 /**
  * Digest cipher.
@@ -37,13 +13,6 @@ import java.security.MessageDigest
  * @author sunqian
  */
 interface DigestCipher : CodecCipher {
-    /**
-     * Digests data.
-     *
-     * @param data data
-     * @return digested data
-     */
-    fun digest(data: ByteArray?): ByteArray?
 
     /**
      * Digests data.
@@ -51,8 +20,17 @@ interface DigestCipher : CodecCipher {
      * @param data data
      * @return digested data
      */
-    fun digest(data: String): ByteArray? {
-        return digest(CodecBytes.toBytes(data))
+    fun digest(data: ByteArray): ByteArray
+
+    /**
+     * Digests data.
+     *
+     * @param data data
+     * @return digested data
+     */
+    @JvmDefault
+    fun digest(data: CharSequence): ByteArray {
+        return digest(data.toBytes())
     }
 
     /**
@@ -61,8 +39,9 @@ interface DigestCipher : CodecCipher {
      * @param data data
      * @return digested data as string
      */
-    fun digestString(data: ByteArray?): String? {
-        return CodecBytes.toString(digest(data))
+    @JvmDefault
+    fun digestToString(data: ByteArray): String {
+        return digest(data).toChars()
     }
 
     /**
@@ -71,8 +50,9 @@ interface DigestCipher : CodecCipher {
      * @param data data
      * @return digested data as string
      */
-    fun digestString(data: String): String? {
-        return CodecBytes.toString(digest(data))
+    @JvmDefault
+    fun digestToString(data: CharSequence): String {
+        return digest(data).toChars()
     }
 
     /**
@@ -81,8 +61,9 @@ interface DigestCipher : CodecCipher {
      * @param data data
      * @return hex string encoded by digested data
      */
-    fun digestHexString(data: ByteArray?): String? {
-        return Codec.Companion.encodeHexString(digest(data))
+    @JvmDefault
+    fun digestToHexString(data: ByteArray): String {
+        return digest(data).encodeHexString()
     }
 
     /**
@@ -91,8 +72,9 @@ interface DigestCipher : CodecCipher {
      * @param data data
      * @return hex string encoded by digested data
      */
-    fun digestHexString(data: String): String? {
-        return Codec.Companion.encodeHexString(digest(data))
+    @JvmDefault
+    fun digestToHexString(data: CharSequence): String {
+        return digest(data).encodeHexString()
     }
 
     /**
@@ -101,8 +83,9 @@ interface DigestCipher : CodecCipher {
      * @param data data
      * @return base64 string encoded by digested data
      */
-    fun digestBase64String(data: ByteArray?): String? {
-        return Codec.Companion.encodeBase64String(digest(data))
+    @JvmDefault
+    fun digestToBase64String(data: ByteArray): String {
+        return digest(data).encodeBase64String()
     }
 
     /**
@@ -111,7 +94,34 @@ interface DigestCipher : CodecCipher {
      * @param data data
      * @return base64 string encoded by digested data
      */
-    fun digestBase64String(data: String): String? {
-        return Codec.Companion.encodeBase64String(digest(data))
+    @JvmDefault
+    fun digestToBase64String(data: CharSequence): String {
+        return digest(data).encodeBase64String()
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun forAlgorithm(algorithm: String): DigestCipher {
+            return DigestCipherImpl(algorithm)
+        }
+
+        @JvmStatic
+        fun forAlgorithm(algorithm: CodecAlgorithm): DigestCipher {
+            return DigestCipherImpl(algorithm.name)
+        }
+    }
+}
+
+private class DigestCipherImpl(private val algorithm: String) : DigestCipher {
+
+    override val name = algorithm
+
+    override fun digest(data: ByteArray): ByteArray {
+        return try {
+            MessageDigest.getInstance(algorithm).digest(data)
+        } catch (e: NoSuchAlgorithmException) {
+            throw IllegalStateException(e)
+        }
     }
 }

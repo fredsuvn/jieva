@@ -1,14 +1,16 @@
 package xyz.srclab.common.codec
 
+import xyz.srclab.annotations.concurrent.ThreadSafe
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 
 /**
  * Codec cipher.
  *
- * Note cipher may not thread-safe, do not share it.
+ * Cipher is thread-safe.
  *
  * @author sunqian
  */
+@ThreadSafe
 interface CodecCipher {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
