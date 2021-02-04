@@ -164,9 +164,30 @@ interface CodecAlgorithm {
 
         @JvmStatic
         fun newAlgorithm(name: String, type: CodecAlgorithmType): CodecAlgorithm {
-            return object : CodecAlgorithm {
-                override val name: String = name
-                override val type: CodecAlgorithmType = type
+            return CodecAlgorithmImpl(name, type)
+        }
+
+        private class CodecAlgorithmImpl(
+            override val name: String,
+            override val type: CodecAlgorithmType
+        ) : CodecAlgorithm {
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (other !is CodecAlgorithm) return false
+                if (name != other.name) return false
+                if (type != other.type) return false
+                return true
+            }
+
+            override fun hashCode(): Int {
+                var result = name.hashCode()
+                result = 31 * result + type.hashCode()
+                return result
+            }
+
+            override fun toString(): String {
+                return "Algorithm: $name"
             }
         }
     }

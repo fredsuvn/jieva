@@ -204,18 +204,18 @@ interface HmacDigestCipher<K> : CodecCipher {
     companion object {
 
         @JvmStatic
-        fun forAlgorithm(algorithm: String): HmacDigestCipher<SecretKey> {
-            return HmacDigestCipherImpl(algorithm)
+        fun forAlgorithm(algorithm: String): SecretKeyHmacDigestCipher {
+            return SecretKeyHmacDigestCipher(algorithm)
         }
 
         @JvmStatic
-        fun forAlgorithm(algorithm: CodecAlgorithm): HmacDigestCipher<SecretKey> {
-            return HmacDigestCipherImpl(algorithm.name)
+        fun forAlgorithm(algorithm: CodecAlgorithm): SecretKeyHmacDigestCipher {
+            return SecretKeyHmacDigestCipher(algorithm.name)
         }
     }
 }
 
-private class HmacDigestCipherImpl(private val algorithm: String) : HmacDigestCipher<SecretKey> {
+class SecretKeyHmacDigestCipher(private val algorithm: String) : HmacDigestCipher<SecretKey> {
 
     override val name = algorithm
 
@@ -229,7 +229,7 @@ private class HmacDigestCipherImpl(private val algorithm: String) : HmacDigestCi
         }
     }
 
-    override fun digest(keyBytes: ByteArray, data: ByteArray): ByteArray {
-        return digest(Codec.Companion.secretKey(keyBytes, algorithm), data)
+    override fun digest(key: ByteArray, data: ByteArray): ByteArray {
+        return digest(Codec.secretKey(key, algorithm), data)
     }
 }

@@ -14,18 +14,18 @@ interface SymmetricCipher<K> : ReversibleCipher<K, K> {
     companion object {
 
         @JvmStatic
-        fun forAlgorithm(algorithm: String): SymmetricCipher<SecretKey> {
-            return SymmetricCipherImpl(algorithm)
+        fun forAlgorithm(algorithm: String): SecretKeySymmetricCipher {
+            return SecretKeySymmetricCipher(algorithm)
         }
 
         @JvmStatic
-        fun forAlgorithm(algorithm: CodecAlgorithm): SymmetricCipher<SecretKey> {
-            return SymmetricCipherImpl(algorithm.name)
+        fun forAlgorithm(algorithm: CodecAlgorithm): SecretKeySymmetricCipher {
+            return SecretKeySymmetricCipher(algorithm.name)
         }
     }
 }
 
-private class SymmetricCipherImpl(private val algorithm: String) : SymmetricCipher<SecretKey> {
+class SecretKeySymmetricCipher(private val algorithm: String) : SymmetricCipher<SecretKey> {
 
     override val name = algorithm
 

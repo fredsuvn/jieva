@@ -6,7 +6,6 @@ import org.bouncycastle.math.ec.ECPoint;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.codec.AsymmetricCipher;
 import xyz.srclab.common.codec.CodecAlgorithm;
-import xyz.srclab.common.codec.CodecKeyPair;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,6 +28,10 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
     private final ECCurve.Fp curve;
     private final ECPoint G;
 
+    public Sm2CipherJavaImpl() {
+        this(Sm2Params.defaultParams());
+    }
+
     public Sm2CipherJavaImpl(Sm2Params sm2Params) {
         this.sm2Params = sm2Params;
         //int w = (int) Math.ceil(sm2Params.n().bitLength() * 1.0 / 2) - 1;
@@ -41,7 +44,7 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
     }
 
     @Override
-    public Sm2KeyPair generateKeyPair() {
+    public Sm2KeyPair newKeyPair() {
         BigInteger d = random(sm2Params.n().subtract(new BigInteger("1")));
         Sm2KeyPair keyPair = new Sm2KeyPair(G.multiply(d).normalize(), d);
         if (isLegal(keyPair.publicKey())) {
@@ -52,8 +55,8 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
     }
 
     @Override
-    public CodecKeyPair<ECPoint, BigInteger> generateKeyPair(int size) {
-        return generateKeyPair();
+    public Sm2KeyPair newKeyPair(int size) {
+        return newKeyPair();
     }
 
     @Override
@@ -79,6 +82,10 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
     @Override
     public String name() {
         return CodecAlgorithm.RSA_NAME;
+    }
+
+    public String getName() {
+        return name();
     }
 
     /**

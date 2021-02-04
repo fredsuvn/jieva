@@ -2,7 +2,6 @@ package xyz.srclab.common.codec.rsa
 
 import xyz.srclab.common.codec.AsymmetricCipher
 import xyz.srclab.common.codec.CodecAlgorithm
-import xyz.srclab.common.codec.CodecKeyPair
 import java.io.ByteArrayOutputStream
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
@@ -20,16 +19,13 @@ import javax.crypto.Cipher
  */
 class RsaCipher : AsymmetricCipher<RSAPublicKey, RSAPrivateKey> {
 
-    private val keyPairGen: KeyPairGenerator = KeyPairGenerator.getInstance(CodecAlgorithm.RSA.name)
-    private val keyFactory: KeyFactory = KeyFactory.getInstance(CodecAlgorithm.RSA.name)
-
     override val name = CodecAlgorithm.RSA_NAME
 
-    override fun generateKeyPair(): CodecKeyPair<RSAPublicKey, RSAPrivateKey> {
-        return generateKeyPair(DEFAULT_KEY_SIZE)
+    override fun newKeyPair(): RsaKeyPair {
+        return newKeyPair(DEFAULT_KEY_SIZE)
     }
 
-    override fun generateKeyPair(size: Int): CodecKeyPair<RSAPublicKey, RSAPrivateKey> {
+    override fun newKeyPair(size: Int): RsaKeyPair {
         // 初始化密钥对生成器，密钥大小为96-1024位
         val random = SecureRandom.getInstance(CodecAlgorithm.SHA1PRNG_NAME)
         keyPairGen.initialize(size, random)
@@ -100,5 +96,8 @@ class RsaCipher : AsymmetricCipher<RSAPublicKey, RSAPrivateKey> {
         const val DEFAULT_KEY_SIZE = 2048
         const val DEFAULT_MAX_DECRYPT_BLOCK = 256
         const val DEFAULT_MAX_ENCRYPT_BLOCK = 245
+
+        private val keyPairGen: KeyPairGenerator = KeyPairGenerator.getInstance(CodecAlgorithm.RSA.name)
+        private val keyFactory: KeyFactory = KeyFactory.getInstance(CodecAlgorithm.RSA.name)
     }
 }

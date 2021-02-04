@@ -1,7 +1,6 @@
 package xyz.srclab.common.codec
 
-import org.apache.commons.codec.binary.Base64
-import org.apache.commons.codec.binary.Hex
+import org.bouncycastle.math.ec.ECPoint
 import xyz.srclab.common.base.toBytes
 import xyz.srclab.common.base.toChars
 import xyz.srclab.common.codec.rsa.RsaCipher
@@ -32,161 +31,315 @@ import javax.crypto.SecretKey
  */
 interface Codec {
 
-    fun encodeHex(): Codec
-
-    fun decodeHex(): Codec
-
-    fun encodeBase64(): Codec
-
-    fun decodeBase64(): Codec
-
-    fun encryptAes(secretKey: SecretKey): Codec {
-        return encrypt(secretKey, CodecAlgorithm.AES!!)
-    }
-
-    fun encryptAes(secretKey: ByteArray): Codec {
-        return encrypt(secretKey, CodecAlgorithm.AES!!)
-    }
-
-    fun decryptAes(secretKey: SecretKey): Codec {
-        return decrypt(secretKey, CodecAlgorithm.AES!!)
-    }
-
-    fun decryptAes(secretKey: ByteArray): Codec {
-        return decrypt(secretKey, CodecAlgorithm.AES!!)
-    }
-
-    fun encryptRsa(publicKey: SecretKey): Codec {
-        return encrypt(publicKey, CodecAlgorithm.RSA!!)
-    }
-
-    fun encryptRsa(publicKey: ByteArray): Codec {
-        return encrypt(publicKey, CodecAlgorithm.RSA!!)
-    }
-
-    fun encryptRsa(publicKey: RSAPublicKey): Codec {
-        return encrypt(publicKey, CodecAlgorithm.RSA)
-    }
-
-    fun decryptRsa(privateKey: SecretKey): Codec {
-        return decrypt(privateKey, CodecAlgorithm.RSA!!)
-    }
-
-    fun decryptRsa(privateKey: ByteArray): Codec {
-        return decrypt(privateKey, CodecAlgorithm.RSA!!)
-    }
-
-    fun decryptRsa(privateKey: RSAPrivateKey): Codec {
-        return decrypt(privateKey, CodecAlgorithm.RSA)
-    }
-
-    fun encryptSm2(publicKey: SecretKey): Codec {
-        return encrypt(publicKey, CodecAlgorithm.SM2!!)
-    }
-
-    fun encryptSm2(publicKey: ByteArray): Codec {
-        return encrypt(publicKey, CodecAlgorithm.SM2!!)
-    }
-
-    fun encryptSm2(publicKey: ECPoint): Codec {
-        return encrypt(publicKey, CodecAlgorithm.SM2!!)
-    }
-
-    fun decryptSm2(privateKey: SecretKey): Codec {
-        return decrypt(privateKey, CodecAlgorithm.SM2!!)
-    }
-
-    fun decryptSm2(privateKey: ByteArray): Codec {
-        return decrypt(privateKey, CodecAlgorithm.SM2!!)
-    }
-
-    fun decryptSm2(privateKey: BigInteger): Codec {
-        return decrypt(privateKey, CodecAlgorithm.SM2)
-    }
-
-    fun digestMd5(): Codec {
-        return digest(CodecAlgorithm.MD5)
-    }
-
-    fun hmacDigestSha1(secretKey: SecretKey): Codec {
-        return hmacDigest(secretKey, CodecAlgorithm.HMAC_SHA1)
-    }
-
-    fun hmacDigestSha1(secretKey: ByteArray): Codec {
-        return hmacDigest(secretKey, CodecAlgorithm.HMAC_SHA1)
-    }
-
+    @JvmDefault
     fun encode(algorithm: String): Codec {
-        return encode(CodecAlgorithm.forName(algorithm))
+        return encode(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.ENCODE))
     }
 
     fun encode(algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
     fun decode(algorithm: String): Codec {
-        return decode(CodecAlgorithm.forName(algorithm))
+        return decode(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.ENCODE))
     }
 
     fun decode(algorithm: CodecAlgorithm): Codec
-    fun encrypt(secretKey: SecretKey, algorithm: String): Codec {
-        return encrypt(secretKey, CodecAlgorithm.forName(algorithm))
+
+    @JvmDefault
+    fun encrypt(key: SecretKey, algorithm: String): Codec {
+        return encrypt(key, CodecAlgorithm.forName(algorithm))
     }
 
-    fun encrypt(secretKey: SecretKey, algorithm: CodecAlgorithm): Codec
-    fun encrypt(secretKey: ByteArray, algorithm: String): Codec {
-        return encrypt(secretKey, CodecAlgorithm.forName(algorithm))
+    @JvmDefault
+    fun encrypt(key: SecretKey, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return encrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
     }
 
-    fun encrypt(secretKey: ByteArray, algorithm: CodecAlgorithm): Codec
-    fun encrypt(secretKey: Any, algorithm: String): Codec {
-        return encrypt(secretKey, CodecAlgorithm.forName(algorithm))
+    fun encrypt(key: SecretKey, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
+    fun encrypt(key: ByteArray, algorithm: String): Codec {
+        return encrypt(key, CodecAlgorithm.forName(algorithm))
     }
 
-    fun encrypt(secretKey: Any, algorithm: CodecAlgorithm): Codec
-    fun decrypt(secretKey: SecretKey, algorithm: String): Codec {
-        return decrypt(secretKey, CodecAlgorithm.forName(algorithm))
+    @JvmDefault
+    fun encrypt(key: ByteArray, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return encrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
     }
 
-    fun decrypt(secretKey: SecretKey, algorithm: CodecAlgorithm): Codec
-    fun decrypt(secretKey: ByteArray, algorithm: String): Codec {
-        return decrypt(secretKey, CodecAlgorithm.forName(algorithm))
+    fun encrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
+    fun encrypt(key: Any, algorithm: String): Codec {
+        return encrypt(key, CodecAlgorithm.forName(algorithm))
     }
 
-    fun decrypt(secretKey: ByteArray, algorithm: CodecAlgorithm): Codec
-    fun decrypt(secretKey: Any, algorithm: String): Codec {
-        return decrypt(secretKey, CodecAlgorithm.forName(algorithm))
+    @JvmDefault
+    fun encrypt(key: Any, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return encrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
     }
 
-    fun decrypt(secretKey: Any, algorithm: CodecAlgorithm): Codec
+    fun encrypt(key: Any, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
+    fun decrypt(key: SecretKey, algorithm: String): Codec {
+        return decrypt(key, CodecAlgorithm.forName(algorithm))
+    }
+
+    @JvmDefault
+    fun decrypt(key: SecretKey, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return decrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+    }
+
+    fun decrypt(key: SecretKey, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
+    fun decrypt(key: ByteArray, algorithm: String): Codec {
+        return decrypt(key, CodecAlgorithm.forName(algorithm))
+    }
+
+    @JvmDefault
+    fun decrypt(key: ByteArray, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return decrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+    }
+
+    fun decrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
+    fun decrypt(key: Any, algorithm: String): Codec {
+        return decrypt(key, CodecAlgorithm.forName(algorithm))
+    }
+
+    @JvmDefault
+    fun decrypt(key: Any, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return decrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+    }
+
+    fun decrypt(key: Any, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
     fun digest(algorithm: String): Codec {
         return digest(CodecAlgorithm.forName(algorithm))
     }
 
+    @JvmDefault
+    fun digest(algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return digest(CodecAlgorithm.forName(algorithm, algorithmType))
+    }
+
     fun digest(algorithm: CodecAlgorithm): Codec
-    fun hmacDigest(secretKey: SecretKey, algorithm: String): Codec {
-        return hmacDigest(secretKey, CodecAlgorithm.forName(algorithm))
+
+    @JvmDefault
+    fun hmacDigest(key: SecretKey, algorithm: String): Codec {
+        return hmacDigest(key, CodecAlgorithm.forName(algorithm))
     }
 
-    fun hmacDigest(secretKey: SecretKey, algorithm: CodecAlgorithm): Codec
-    fun hmacDigest(secretKey: ByteArray, algorithm: String): Codec {
-        return hmacDigest(secretKey, CodecAlgorithm.forName(algorithm))
+    @JvmDefault
+    fun hmacDigest(key: SecretKey, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return hmacDigest(key, CodecAlgorithm.forName(algorithm, algorithmType))
     }
 
-    fun hmacDigest(secretKey: ByteArray, algorithm: CodecAlgorithm): Codec
-    fun hmacDigest(secretKey: Any, algorithm: String): Codec {
-        return hmacDigest(secretKey, CodecAlgorithm.forName(algorithm))
+    fun hmacDigest(key: SecretKey, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
+    fun hmacDigest(key: ByteArray, algorithm: String): Codec {
+        return hmacDigest(key, CodecAlgorithm.forName(algorithm))
     }
 
-    fun hmacDigest(secretKey: Any, algorithm: CodecAlgorithm): Codec
+    @JvmDefault
+    fun hmacDigest(key: ByteArray, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return hmacDigest(key, CodecAlgorithm.forName(algorithm, algorithmType))
+    }
+
+    fun hmacDigest(key: ByteArray, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
+    fun hmacDigest(key: Any, algorithm: String): Codec {
+        return hmacDigest(key, CodecAlgorithm.forName(algorithm))
+    }
+
+    @JvmDefault
+    fun hmacDigest(key: Any, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return hmacDigest(key, CodecAlgorithm.forName(algorithm, algorithmType))
+    }
+
+    fun hmacDigest(key: Any, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
+    fun encodeHex(): Codec {
+        return encode(CodecAlgorithm.HEX)
+    }
+
+    @JvmDefault
+    fun decodeHex(): Codec {
+        return decode(CodecAlgorithm.HEX)
+    }
+
+    @JvmDefault
+    fun encodeBase64(): Codec {
+        return encode(CodecAlgorithm.BASE64)
+    }
+
+    @JvmDefault
+    fun decodeBase64(): Codec {
+        return decode(CodecAlgorithm.BASE64)
+    }
+
+    @JvmDefault
+    fun encryptAes(key: SecretKey): Codec {
+        return encrypt(key, CodecAlgorithm.AES)
+    }
+
+    @JvmDefault
+    fun encryptAes(key: ByteArray): Codec {
+        return encrypt(key, CodecAlgorithm.AES)
+    }
+
+    @JvmDefault
+    fun decryptAes(key: SecretKey): Codec {
+        return decrypt(key, CodecAlgorithm.AES)
+    }
+
+    @JvmDefault
+    fun decryptAes(key: ByteArray): Codec {
+        return decrypt(key, CodecAlgorithm.AES)
+    }
+
+    @JvmDefault
+    fun digestMd2(): Codec {
+        return digest(CodecAlgorithm.MD2)
+    }
+
+    @JvmDefault
+    fun digestMd5(): Codec {
+        return digest(CodecAlgorithm.MD5)
+    }
+
+    @JvmDefault
+    fun digestSha1(): Codec {
+        return digest(CodecAlgorithm.SHA1)
+    }
+
+    @JvmDefault
+    fun digestSha256(): Codec {
+        return digest(CodecAlgorithm.SHA256)
+    }
+
+    @JvmDefault
+    fun digestSha384(): Codec {
+        return digest(CodecAlgorithm.SHA384)
+    }
+
+    @JvmDefault
+    fun digestSha512(): Codec {
+        return digest(CodecAlgorithm.SHA512)
+    }
+
+    @JvmDefault
+    fun hmacDigestMd5(key: SecretKey): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_MD5)
+    }
+
+    @JvmDefault
+    fun hmacDigestMd5(key: ByteArray): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_MD5)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha1(key: SecretKey): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA1)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha1(key: ByteArray): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA1)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha256(key: SecretKey): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA256)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha256(key: ByteArray): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA256)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha384(key: SecretKey): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA384)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha384(key: ByteArray): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA384)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha512(key: SecretKey): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA512)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha512(key: ByteArray): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA512)
+    }
+
+    @JvmDefault
+    fun encryptRsa(publicKey: RSAPublicKey): Codec {
+        return encrypt(publicKey, CodecAlgorithm.RSA)
+    }
+
+    @JvmDefault
+    fun encryptRsa(publicKey: ByteArray): Codec {
+        return encrypt(publicKey, CodecAlgorithm.RSA)
+    }
+
+    @JvmDefault
+    fun decryptRsa(privateKey: RSAPrivateKey): Codec {
+        return decrypt(privateKey, CodecAlgorithm.RSA)
+    }
+
+    @JvmDefault
+    fun decryptRsa(privateKey: ByteArray): Codec {
+        return decrypt(privateKey, CodecAlgorithm.RSA)
+    }
+
+    @JvmDefault
+    fun encryptSm2(publicKey: ECPoint): Codec {
+        return encrypt(publicKey, CodecAlgorithm.SM2)
+    }
+
+    @JvmDefault
+    fun encryptSm2(publicKey: ByteArray): Codec {
+        return encrypt(publicKey, CodecAlgorithm.SM2)
+    }
+
+    @JvmDefault
+    fun decryptSm2(privateKey: BigInteger): Codec {
+        return decrypt(privateKey, CodecAlgorithm.SM2)
+    }
+
+    @JvmDefault
+    fun decryptSm2(privateKey: ByteArray): Codec {
+        return decrypt(privateKey, CodecAlgorithm.SM2)
+    }
+
     fun doFinal(): ByteArray
-    fun doFinalString(): String {
-        return CodecBytes.toString(doFinal())
+
+    @JvmDefault
+    fun doFinalToString(): String {
+        return doFinal().toChars()
     }
 
-    fun doFinalHexString(): String {
-        return encodeHexString(doFinal())
+    @JvmDefault
+    fun doFinalToHexString(): String {
+        return doFinal().encodeHexString()
     }
 
-    fun doFinalBase64String(): String {
-        return encodeBase64String(doFinal())
+    @JvmDefault
+    fun doFinalToBase64String(): String {
+        return doFinal().encodeBase64String()
     }
 
     companion object {
@@ -197,8 +350,8 @@ interface Codec {
         }
 
         @JvmStatic
-        fun forData(data: String): Codec {
-            return CodecImpl(CodecBytes.toBytes(data))
+        fun forData(data: CharSequence): Codec {
+            return CodecImpl(data.toBytes())
         }
 
         @JvmStatic
@@ -207,148 +360,158 @@ interface Codec {
         }
 
         @JvmStatic
-        fun secretKey(key: String, algorithm: String): SecretKey {
-            return secretKey(key.toBytes(), algorithm)
+        fun secretKey(key: CharSequence, algorithm: String): SecretKey {
+            return key.toSecretKey(algorithm)
         }
 
         @JvmStatic
         fun secretKey(key: ByteArray, algorithm: CodecAlgorithm): SecretKey {
-            return key.toSecretKey(algorithm.name())
+            return key.toSecretKey(algorithm.name)
         }
 
         @JvmStatic
-        fun secretKey(key: String, algorithm: CodecAlgorithm): SecretKey {
-            return secretKey(key.toBytes(), algorithm)
+        fun secretKey(key: CharSequence, algorithm: CodecAlgorithm): SecretKey {
+            return key.toSecretKey(algorithm.name)
         }
 
         @JvmStatic
         fun ByteArray.encodeHex(): ByteArray {
-            val chars = Hex.encodeHex(this)
-            return chars.toBytes()
+            return HexEncodeCipher.encode(this)
         }
 
         @JvmStatic
-        fun String.encodeHex(): ByteArray {
-            val chars = Hex.encodeHex(this.toBytes())
-            return chars.toBytes()
+        fun CharSequence.encodeHex(): ByteArray {
+            return HexEncodeCipher.encode(this)
         }
 
         @JvmStatic
         fun ByteArray.encodeHexString(): String {
-            return encodeHex().toChars()
+            return HexEncodeCipher.encodeToString(this)
         }
 
         @JvmStatic
-        fun String.encodeHexString(): String {
-            return encodeHex().toChars()
+        fun CharSequence.encodeHexString(): String {
+            return HexEncodeCipher.encodeToString(this)
         }
 
         @JvmStatic
         fun ByteArray.decodeHex(): ByteArray {
-            return try {
-                Hex.decodeHex(this.toChars())
-            } catch (e: Exception) {
-                throw e
-            }
+            return HexEncodeCipher.decode(this)
         }
 
         @JvmStatic
-        fun String.decodeHex(): ByteArray {
-            return try {
-                Hex.decodeHex(this)
-            } catch (e: Exception) {
-                throw e
-            }
+        fun CharSequence.decodeHex(): ByteArray {
+            return HexEncodeCipher.decode(this)
         }
 
         @JvmStatic
         fun ByteArray.decodeHexString(): String {
-            return decodeHex().toChars()
+            return HexEncodeCipher.decodeToString(this)
         }
 
         @JvmStatic
-        fun String.decodeHexString(): String {
-            return decodeHex().toChars()
+        fun CharSequence.decodeHexString(): String {
+            return HexEncodeCipher.decodeToString(this)
         }
 
         @JvmStatic
         fun ByteArray.encodeBase64(): ByteArray {
-            return Base64.encodeBase64(this)
+            return Base64EncodeCipher.encode(this)
         }
 
         @JvmStatic
-        fun String.encodeBase64(): ByteArray {
-            return Base64.encodeBase64(this.toBytes())
+        fun CharSequence.encodeBase64(): ByteArray {
+            return Base64EncodeCipher.encode(this)
         }
 
         @JvmStatic
         fun ByteArray.encodeBase64String(): String {
-            return encodeBase64().toChars()
+            return Base64EncodeCipher.encodeToString(this)
         }
 
         @JvmStatic
-        fun String.encodeBase64String(): String {
-            return encodeBase64().toChars()
+        fun CharSequence.encodeBase64String(): String {
+            return Base64EncodeCipher.encodeToString(this)
         }
 
         @JvmStatic
         fun ByteArray.decodeBase64(): ByteArray {
-            return Base64.decodeBase64(this)
+            return Base64EncodeCipher.decode(this)
         }
 
         @JvmStatic
-        fun String.decodeBase64(): ByteArray {
-            return Base64.decodeBase64(this)
+        fun CharSequence.decodeBase64(): ByteArray {
+            return Base64EncodeCipher.decode(this)
         }
 
         @JvmStatic
         fun ByteArray.decodeBase64String(): String {
-            return decodeBase64().toChars()
+            return Base64EncodeCipher.decodeToString(this)
         }
 
         @JvmStatic
-        fun String.decodeBase64String(): String {
-            return decodeBase64().toChars()
+        fun CharSequence.decodeBase64String(): String {
+            return Base64EncodeCipher.decodeToString(this)
         }
 
         @JvmStatic
-        fun encryptAes(secretKey: SecretKey, data: ByteArray): ByteArray {
-            return symmetricCipher(CodecAlgorithm.AES).encrypt(secretKey, data)
+        fun aesCipher(): SecretKeySymmetricCipher {
+            return symmetricCipher(CodecAlgorithm.AES)
         }
 
         @JvmStatic
-        fun encryptAes(secretKey: ByteArray, data: ByteArray): ByteArray {
-            return symmetricCipher(CodecAlgorithm.AES).encrypt(secretKey, data)
+        fun md2Cipher(): DigestCipher {
+            return digestCipher(CodecAlgorithm.MD2)
         }
 
         @JvmStatic
-        fun decryptAes(secretKey: SecretKey, encrypted: ByteArray): ByteArray {
-            return symmetricCipher(CodecAlgorithm.AES).decrypt(secretKey, encrypted)
+        fun md5Cipher(): DigestCipher {
+            return digestCipher(CodecAlgorithm.MD5)
         }
 
         @JvmStatic
-        fun decryptAes(secretKey: ByteArray, encrypted: ByteArray): ByteArray {
-            return symmetricCipher(CodecAlgorithm.AES).decrypt(secretKey, encrypted)
+        fun sha1Cipher(): DigestCipher {
+            return digestCipher(CodecAlgorithm.SHA1)
         }
 
         @JvmStatic
-        fun md5(data: ByteArray): ByteArray {
-            return digestCipher(CodecAlgorithm.MD5).digest(data)
+        fun sha256Cipher(): DigestCipher {
+            return digestCipher(CodecAlgorithm.SHA256)
         }
 
         @JvmStatic
-        fun hmacSha1(secretKey: SecretKey, data: ByteArray): ByteArray {
-            return hmacDigestCipher(CodecAlgorithm.HMAC_SHA1).digest(secretKey, data)
+        fun sha384Cipher(): DigestCipher {
+            return digestCipher(CodecAlgorithm.SHA384)
         }
 
         @JvmStatic
-        fun hmacSha1(secretKey: ByteArray, data: ByteArray): ByteArray {
-            return hmacDigestCipher(CodecAlgorithm.HMAC_SHA1).digest(secretKey, data)
+        fun sha512Cipher(): DigestCipher {
+            return digestCipher(CodecAlgorithm.SHA512)
         }
 
         @JvmStatic
-        fun aesCipher(): RsaCipher {
-            return RsaCipher()
+        fun hmacMd5Cipher(): SecretKeyHmacDigestCipher {
+            return hmacDigestCipher(CodecAlgorithm.HMAC_MD5)
+        }
+
+        @JvmStatic
+        fun hmacSha1Cipher(): SecretKeyHmacDigestCipher {
+            return hmacDigestCipher(CodecAlgorithm.HMAC_SHA1)
+        }
+
+        @JvmStatic
+        fun hmacSha256Cipher(): SecretKeyHmacDigestCipher {
+            return hmacDigestCipher(CodecAlgorithm.HMAC_SHA256)
+        }
+
+        @JvmStatic
+        fun hmacSha384Cipher(): SecretKeyHmacDigestCipher {
+            return hmacDigestCipher(CodecAlgorithm.HMAC_SHA384)
+        }
+
+        @JvmStatic
+        fun hmacSha512Cipher(): SecretKeyHmacDigestCipher {
+            return hmacDigestCipher(CodecAlgorithm.HMAC_SHA512)
         }
 
         @JvmStatic
@@ -362,18 +525,18 @@ interface Codec {
         }
 
         @JvmStatic
-        fun symmetricCipher(algorithm: String): SymmetricCipher<SecretKey> {
+        fun symmetricCipher(algorithm: String): SecretKeySymmetricCipher {
             return symmetricCipher(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.SYMMETRIC))
         }
 
         @JvmStatic
-        fun symmetricCipher(algorithm: CodecAlgorithm): SymmetricCipher<SecretKey> {
+        fun symmetricCipher(algorithm: CodecAlgorithm): SecretKeySymmetricCipher {
             return SymmetricCipher.forAlgorithm(algorithm)
         }
 
         @JvmStatic
         fun digestCipher(algorithm: String): DigestCipher {
-            return digestCipher(CodecAlgorithm.forName(algorithm,CodecAlgorithmType.DIGEST))
+            return digestCipher(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.DIGEST))
         }
 
         @JvmStatic
@@ -382,13 +545,198 @@ interface Codec {
         }
 
         @JvmStatic
-        fun hmacDigestCipher(algorithm: String): HmacDigestCipher<SecretKey> {
-            return hmacDigestCipher(CodecAlgorithm.forName(algorithm,CodecAlgorithmType.HMAC))
+        fun hmacDigestCipher(algorithm: String): SecretKeyHmacDigestCipher {
+            return hmacDigestCipher(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.HMAC))
         }
 
         @JvmStatic
-        fun hmacDigestCipher(algorithm: CodecAlgorithm): HmacDigestCipher<SecretKey> {
+        fun hmacDigestCipher(algorithm: CodecAlgorithm): SecretKeyHmacDigestCipher {
             return HmacDigestCipher.forAlgorithm(algorithm)
         }
     }
 }
+
+class CodecImpl(private var data: ByteArray) : Codec {
+
+    override fun encode(algorithm: CodecAlgorithm): Codec {
+        data = getEncoder(algorithm).encode(data)
+        return this
+    }
+
+    override fun decode(algorithm: CodecAlgorithm): Codec {
+        data = getEncoder(algorithm).decode(data)
+        return this
+    }
+
+    private fun getEncoder(algorithm: CodecAlgorithm): EncodeCipher {
+        return when (algorithm) {
+            CodecAlgorithm.HEX -> HexEncodeCipher
+            CodecAlgorithm.BASE64 -> Base64EncodeCipher
+            else -> throw CodecAlgorithmNotFound(algorithm)
+        }
+    }
+
+    override fun encrypt(key: SecretKey, algorithm: CodecAlgorithm): Codec {
+        data = when (algorithm) {
+            CodecAlgorithm.RSA -> Codec.rsaCipher().encrypt(key.encoded, data)
+            CodecAlgorithm.SM2 -> Codec.sm2Cipher().encrypt(key.encoded, data)
+            else -> {
+                if (algorithm.type == CodecAlgorithmType.SYMMETRIC) {
+                    Codec.symmetricCipher(algorithm).encrypt(key, data)
+                } else {
+                    throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+        }
+        return this
+    }
+
+    override fun encrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec {
+        data = when (algorithm) {
+            CodecAlgorithm.RSA -> Codec.rsaCipher().encrypt(key, data)
+            CodecAlgorithm.SM2 -> Codec.sm2Cipher().encrypt(key, data)
+            else -> {
+                if (algorithm.type == CodecAlgorithmType.SYMMETRIC) {
+                    Codec.symmetricCipher(algorithm).encrypt(key, data)
+                } else {
+                    throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+        }
+        return this
+    }
+
+    override fun encrypt(key: Any, algorithm: CodecAlgorithm): Codec {
+        data = when (algorithm) {
+            CodecAlgorithm.RSA -> {
+                when (key) {
+                    is RSAPublicKey -> Codec.rsaCipher().encrypt(key, data)
+                    is ByteArray -> Codec.rsaCipher().encrypt(key, data)
+                    else -> throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+            CodecAlgorithm.SM2 -> {
+                when (key) {
+                    is ECPoint -> Codec.sm2Cipher().encrypt(key, data)
+                    is ByteArray -> Codec.sm2Cipher().encrypt(key, data)
+                    else -> throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+            else -> {
+                if (algorithm.type != CodecAlgorithmType.SYMMETRIC) {
+                    throw CodecAlgorithmNotFound(algorithm)
+                }
+                when (key) {
+                    is SecretKey -> {
+                        Codec.symmetricCipher(algorithm).encrypt(key, data)
+                    }
+                    is ByteArray -> {
+                        Codec.symmetricCipher(algorithm).encrypt(key, data)
+                    }
+                    else -> throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+        }
+        return this
+    }
+
+    override fun decrypt(key: SecretKey, algorithm: CodecAlgorithm): Codec {
+        data = when (algorithm) {
+            CodecAlgorithm.RSA -> Codec.rsaCipher().decrypt(key.encoded, data)
+            CodecAlgorithm.SM2 -> Codec.sm2Cipher().decrypt(key.encoded, data)
+            else -> {
+                if (algorithm.type == CodecAlgorithmType.SYMMETRIC) {
+                    Codec.symmetricCipher(algorithm).decrypt(key, data)
+                } else {
+                    throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+        }
+        return this
+    }
+
+    override fun decrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec {
+        data = when (algorithm) {
+            CodecAlgorithm.RSA -> Codec.rsaCipher().decrypt(key, data)
+            CodecAlgorithm.SM2 -> Codec.sm2Cipher().decrypt(key, data)
+            else -> {
+                if (algorithm.type == CodecAlgorithmType.SYMMETRIC) {
+                    Codec.symmetricCipher(algorithm).decrypt(key, data)
+                } else {
+                    throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+        }
+        return this
+    }
+
+    override fun decrypt(key: Any, algorithm: CodecAlgorithm): Codec {
+        data = when (algorithm) {
+            CodecAlgorithm.RSA -> {
+                when (key) {
+                    is RSAPrivateKey -> Codec.rsaCipher().decrypt(key, data)
+                    is ByteArray -> Codec.rsaCipher().decrypt(key, data)
+                    else -> throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+            CodecAlgorithm.SM2 -> {
+                when (key) {
+                    is BigInteger -> Codec.sm2Cipher().decrypt(key, data)
+                    is ByteArray -> Codec.sm2Cipher().decrypt(key, data)
+                    else -> throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+            else -> {
+                if (algorithm.type != CodecAlgorithmType.SYMMETRIC) {
+                    throw CodecAlgorithmNotFound(algorithm)
+                }
+                when (key) {
+                    is SecretKey -> {
+                        Codec.symmetricCipher(algorithm).decrypt(key, data)
+                    }
+                    is ByteArray -> {
+                        Codec.symmetricCipher(algorithm).decrypt(key, data)
+                    }
+                    else -> throw CodecAlgorithmNotFound(algorithm)
+                }
+            }
+        }
+        return this
+    }
+
+    override fun digest(algorithm: CodecAlgorithm): Codec {
+        data = Codec.digestCipher(algorithm).digest(data)
+        return this
+    }
+
+    override fun hmacDigest(key: SecretKey, algorithm: CodecAlgorithm): Codec {
+        data = Codec.hmacDigestCipher(algorithm).digest(key, data)
+        return this
+    }
+
+    override fun hmacDigest(key: ByteArray, algorithm: CodecAlgorithm): Codec {
+        data = Codec.hmacDigestCipher(algorithm).digest(key, data)
+        return this
+    }
+
+    override fun hmacDigest(key: Any, algorithm: CodecAlgorithm): Codec {
+        data = when (key) {
+            is SecretKey -> {
+                Codec.hmacDigestCipher(algorithm).digest(key, data)
+            }
+            is ByteArray -> {
+                Codec.hmacDigestCipher(algorithm).digest(key, data)
+            }
+            else -> throw CodecAlgorithmNotFound(algorithm)
+        }
+        return this
+    }
+
+    override fun doFinal(): ByteArray {
+        return data.clone()
+    }
+}
+
+private class CodecAlgorithmNotFound(
+    algorithm: CodecAlgorithm
+) : RuntimeException("${algorithm.name}: ${algorithm.type}")
