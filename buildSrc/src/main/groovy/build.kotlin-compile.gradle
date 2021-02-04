@@ -4,12 +4,12 @@ plugins {
 
 println "${infos.logPrefix} ${project.name}: import kotlin-compile"
 
-sourceSets {
-  main.kotlin.srcDirs += ['src/main/kotlin', 'src/main/java']
-  main.java.srcDirs += ['src/main/kotlin', 'src/main/java']
-  test.kotlin.srcDirs += ['src/test/kotlin', 'src/test/java']
-  test.java.srcDirs += ['src/test/kotlin', 'src/test/java']
-}
+//sourceSets {
+//  main.kotlin.srcDirs += ['src/main/kotlin', 'src/main/java']
+//  main.java.srcDirs += ['src/main/kotlin', 'src/main/java']
+//  test.kotlin.srcDirs += ['src/test/kotlin', 'src/test/java']
+//  test.java.srcDirs += ['src/test/kotlin', 'src/test/java']
+//}
 
 compileKotlin {
   kotlinOptions {

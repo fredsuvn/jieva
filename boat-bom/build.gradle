@@ -4,7 +4,7 @@ plugins {
 
 description = "boat-bom: BOM of boat projects."
 
-def dependenciesVersion = "1.1.0"
+def dependenciesVersion = "1.1.1"
 
 javaPlatform {
   allowDependencies()

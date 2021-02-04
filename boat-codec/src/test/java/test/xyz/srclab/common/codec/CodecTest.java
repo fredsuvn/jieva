@@ -13,7 +13,6 @@ import xyz.srclab.common.codec.sm2.Sm2KeyPair;
 import xyz.srclab.common.test.TestLogger;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 /**
@@ -31,20 +30,20 @@ public class CodecTest {
         RsaKeyPair rsaKeyPair = rsaCipher.newKeyPair();
         String data = random(512);
         byte[] dataBytes = Chars.toBytes(data);
-        byte[] encrypt1 = rsaCipher.encrypt(rsaKeyPair.getPublicKey(), dataBytes);
-        byte[] decrypt1 = rsaCipher.decrypt(rsaKeyPair.getPrivateKey(), encrypt1);
-        byte[] encrypt2 = Codec.forData(data).encryptRsa(rsaKeyPair.getPublicKey()).doFinal();
-        byte[] decrypt2 = Codec.forData(encrypt2).decryptRsa(rsaKeyPair.getPrivateKey()).doFinal();
+        byte[] encrypt1 = rsaCipher.encrypt(rsaKeyPair.publicKey(), dataBytes);
+        byte[] decrypt1 = rsaCipher.decrypt(rsaKeyPair.privateKey(), encrypt1);
+        byte[] encrypt2 = Codec.forData(data).encryptRsa(rsaKeyPair.publicKey()).doFinal();
+        byte[] decrypt2 = Codec.forData(encrypt2).decryptRsa(rsaKeyPair.privateKey()).doFinal();
         Assert.assertEquals(decrypt1, dataBytes);
         Assert.assertEquals(decrypt2, dataBytes);
 
-        String decryptData = Codec.forData(encrypt1).decryptRsa(rsaKeyPair.getPrivateKeyBytes()).doFinalToString();
+        String decryptData = Codec.forData(encrypt1).decryptRsa(rsaKeyPair.privateKeyBytes()).doFinalToString();
         Assert.assertEquals(decryptData, data);
 
         //Test empty string
         String emptyData = "";
-        byte[] encryptEmpty = Codec.forData(emptyData).encryptRsa(rsaKeyPair.getPublicKey()).doFinal();
-        String decryptEmptyString = Codec.forData(encryptEmpty).decryptRsa(rsaKeyPair.getPrivateKey()).doFinalToString();
+        byte[] encryptEmpty = Codec.forData(emptyData).encryptRsa(rsaKeyPair.publicKey()).doFinal();
+        String decryptEmptyString = Codec.forData(encryptEmpty).decryptRsa(rsaKeyPair.privateKey()).doFinalToString();
         Assert.assertEquals(decryptEmptyString, emptyData);
     }
 
@@ -54,20 +53,20 @@ public class CodecTest {
         Sm2KeyPair sm2KeyPair = sm2Cipher.newKeyPair();
         String data = random(512);
         byte[] dataBytes = Chars.toBytes(data);
-        byte[] encrypt1 = sm2Cipher.encrypt(sm2KeyPair.getPublicKey(), dataBytes);
-        byte[] decrypt1 = sm2Cipher.decrypt(sm2KeyPair.getPrivateKey(), encrypt1);
-        byte[] encrypt2 = Codec.forData(data).encryptSm2(sm2KeyPair.getPublicKey()).doFinal();
-        byte[] decrypt2 = Codec.forData(encrypt2).decryptSm2(sm2KeyPair.getPrivateKey()).doFinal();
+        byte[] encrypt1 = sm2Cipher.encrypt(sm2KeyPair.publicKey(), dataBytes);
+        byte[] decrypt1 = sm2Cipher.decrypt(sm2KeyPair.privateKey(), encrypt1);
+        byte[] encrypt2 = Codec.forData(data).encryptSm2(sm2KeyPair.publicKey()).doFinal();
+        byte[] decrypt2 = Codec.forData(encrypt2).decryptSm2(sm2KeyPair.privateKey()).doFinal();
         Assert.assertEquals(decrypt1, dataBytes);
         Assert.assertEquals(decrypt2, dataBytes);
 
-        String decryptData = Codec.forData(encrypt1).decryptSm2(sm2KeyPair.getPrivateKeyBytes()).doFinalToString();
+        String decryptData = Codec.forData(encrypt1).decryptSm2(sm2KeyPair.privateKeyBytes()).doFinalToString();
         Assert.assertEquals(decryptData, data);
 
         //Test empty string
         String emptyData = "";
-        byte[] encryptEmpty = Codec.forData(emptyData).encryptSm2(sm2KeyPair.getPublicKey()).doFinal();
-        String decryptEmptyString = Codec.forData(encryptEmpty).decryptSm2(sm2KeyPair.getPrivateKey()).doFinalToString();
+        byte[] encryptEmpty = Codec.forData(emptyData).encryptSm2(sm2KeyPair.publicKey()).doFinal();
+        String decryptEmptyString = Codec.forData(encryptEmpty).decryptSm2(sm2KeyPair.privateKey()).doFinalToString();
         Assert.assertEquals(decryptEmptyString, emptyData);
     }
 
@@ -102,16 +101,16 @@ public class CodecTest {
         SecretKey aesKey = Codec.secretKey("0123456789012345", CodecAlgorithm.AES);
 
         //加密
-        byte[] encrypt = Codec.aesCipher().encrypt(aesKey.getEncoded(), data.getBytes(StandardCharsets.UTF_8));
-        encrypt = rsaCipher.encrypt(rsaKeyPair.getPublicKey(), encrypt);
-        encrypt = sm2Cipher.encrypt(sm2KeyPair.getPublicKey(), encrypt);
+        byte[] encrypt = Codec.aesCipher().encrypt(aesKey.getEncoded(), Chars.toBytes(data));
+        encrypt = rsaCipher.encrypt(rsaKeyPair.publicKey(), encrypt);
+        encrypt = sm2Cipher.encrypt(sm2KeyPair.publicKey(), encrypt);
         encrypt = Codec.encodeBase64(encrypt);
 
         //解密
         String origin = Codec.forData(encrypt)
                 .decodeBase64()
-                .decryptSm2(sm2KeyPair.getPrivateKeyBytes())
-                .decryptRsa(rsaKeyPair.getPrivateKeyBytes())
+                .decryptSm2(sm2KeyPair.privateKeyBytes())
+                .decryptRsa(rsaKeyPair.privateKeyBytes())
                 .decryptAes(aesKey)
                 .doFinalToString();
         logger.log("origin: " + origin);
