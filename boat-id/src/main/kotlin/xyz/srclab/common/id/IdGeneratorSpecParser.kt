@@ -1,6 +1,5 @@
 package xyz.srclab.common.id
 
-import cn.com.essence.galaxy.annotation.Nullable
 import java.lang.IllegalArgumentException
 import java.util.function.BiFunction
 
