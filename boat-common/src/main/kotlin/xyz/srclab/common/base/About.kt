@@ -85,7 +85,6 @@ interface About {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is About) return false
-
                 if (name != other.name) return false
                 if (url != other.url) return false
                 if (version != other.version) return false
@@ -94,7 +93,6 @@ interface About {
                 if (releaseDate != other.releaseDate) return false
                 if (help != other.help) return false
                 if (report != other.report) return false
-
                 return true
             }
 
@@ -307,10 +305,8 @@ interface Version : Comparable<Version> {
                 override fun equals(other: Any?): Boolean {
                     if (this === other) return true
                     if (other !is PreReleaseIdentifier) return false
-
                     if (!other.isNumeric) return false
                     if (toNumber() != other.toNumber()) return false
-
                     return true
                 }
 
@@ -327,10 +323,8 @@ interface Version : Comparable<Version> {
                 override fun equals(other: Any?): Boolean {
                     if (this === other) return true
                     if (other !is PreReleaseIdentifier) return false
-
                     if (other.isNumeric) return false
                     if (toString() != other.toString()) return false
-
                     return true
                 }
 
@@ -489,16 +483,12 @@ interface Version : Comparable<Version> {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
-                if (javaClass != other?.javaClass) return false
-
-                other as VersionImpl
-
+                if (other !is Version) return false
                 if (major != other.major) return false
                 if (minor != other.minor) return false
                 if (patch != other.patch) return false
                 if (preRelease != other.preRelease) return false
                 if (buildMetadata != other.buildMetadata) return false
-
                 return true
             }
 
@@ -563,11 +553,9 @@ interface Licence {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is Licence) return false
-
                 if (name != other.name) return false
                 if (url != other.url) return false
                 if (content != other.content) return false
-
                 return true
             }
 
@@ -615,11 +603,9 @@ interface PoweredBy {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is PoweredBy) return false
-
                 if (name != other.name) return false
                 if (url != other.url) return false
                 if (mail != other.mail) return false
-
                 return true
             }
 

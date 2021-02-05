@@ -15,7 +15,7 @@ dependencies {
 
   api(project(":boat-common"))
   api("commons-codec:commons-codec")
-  api("org.bouncycastle:bcprov-jdk15on:1.65.01")
+  api("org.bouncycastle:bcprov-jdk15on")
 
   testCompile(project(":boat-test"))
 }

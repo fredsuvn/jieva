@@ -13,6 +13,24 @@ object Current {
     }
 
     @JvmStatic
+    val millis: Long
+        @JvmName("millis") get() {
+            return milliseconds()
+        }
+
+    @JvmStatic
+    val nanos: Long
+        @JvmName("nanos") get() {
+            return nanoseconds()
+        }
+
+    @JvmStatic
+    val timestamp: String
+        @JvmName("timestamp") get() {
+            return timestamp()
+        }
+
+    @JvmStatic
     val thread: Thread
         @JvmName("thread") get() {
             return Thread.currentThread()
