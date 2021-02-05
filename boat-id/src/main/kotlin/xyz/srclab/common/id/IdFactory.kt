@@ -3,7 +3,7 @@ package xyz.srclab.common.id
 import xyz.srclab.common.base.asAny
 
 /**
- * Core id generator for boat-id.
+ * Factory for create new Id.
  *
  * @author sunqian
  *
@@ -16,7 +16,7 @@ interface IdFactory<T> {
      *
      * @return new id
      */
-    fun create(): T
+    fun newId(): T
 
     companion object {
 
@@ -29,33 +29,23 @@ interface IdFactory<T> {
         @JvmOverloads
         fun newStringIdSpec(
             spec: String,
-            specFunction: (args: List<Any?>) -> IdComponentGenerator<*> = DEFAULT_SPEC_FUNCTION
+            factoryGenerator: StringIdFactoryGenerator = StringIdFactoryGenerator.DEFAULT
         ): StringIdSpec {
-            return StringIdSpec(spec, specFunction)
+            return StringIdSpec(spec, factoryGenerator)
         }
     }
 }
 
-/**
- * Help defining an [IdFactory], which consists of [IdComponentGenerator].
- *
- * Note name of [IdComponentGenerator] should be different.
- */
 abstract class AbstractIdFactory<T>(
     private val generators: Iterable<IdComponentGenerator<*>>
 ) : IdFactory<T> {
 
-    override fun create(): T {
+    override fun newId(): T {
         val components = ArrayList<IdComponent<*>>(generators.count())
-        val componentMap = HashMap<String, IdComponent<*>>(components.size)
-        val context = Context(componentMap)
+        val context = Context(components)
         for (generator in generators) {
             val component = IdComponent.newIdComponent(generator, context)
             components.add(component)
-            if (componentMap.contains(generator.name)) {
-                throw IllegalArgumentException("Conflict with Id component generator name: ${generator.name}")
-            }
-            componentMap[generator.name] = component
         }
         val values = ArrayList<Any>(components.size)
         for (component in components) {
@@ -64,11 +54,11 @@ abstract class AbstractIdFactory<T>(
         return concat(values)
     }
 
-    protected abstract fun concat(components: Iterable<Any>): T
+    protected abstract fun concat(components: List<Any>): T
 
-    private class Context(private val componentMap: Map<String, IdComponent<*>>) : IdGenerationContext {
-        override fun <T> getComponent(name: String): IdComponent<T>? {
-            return componentMap[name].asAny()
+    private class Context(private val components: List<IdComponent<*>>) : IdGenerationContext {
+        override fun <T> components(): List<IdComponent<T>> {
+            return components()
         }
     }
 }
@@ -76,7 +66,7 @@ abstract class AbstractIdFactory<T>(
 open class StringIdFactory(
     generators: Iterable<IdComponentGenerator<*>>
 ) : AbstractIdFactory<String>(generators) {
-    override fun concat(components: Iterable<Any>): String {
+    override fun concat(components: List<Any>): String {
         return components.joinToString(separator = "") { it.toString() }
     }
 }

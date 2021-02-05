@@ -3,24 +3,25 @@ package xyz.srclab.common.id
 import xyz.srclab.common.base.Current
 import xyz.srclab.common.base.Format.Companion.printFormat
 import java.time.Instant
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 /**
  * @author sunqian
  */
-class TimestampCountComponentGenerator(
-    override val name: String,
+class TimeCountComponentGenerator(
     dateTimePattern: String?,
     private val maxCount: Long,
     private val toStringPattern: String?,
 ) : IdComponentGenerator<TimestampCount> {
 
-    private val dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern)
+    private val dateTimeFormatter =
+        if (dateTimePattern.isNullOrBlank()) null else DateTimeFormatter.ofPattern(dateTimePattern)
 
     private var lastTime: Long = -1
     private var sequence: Long = 0
 
-    override val type = TYPE
+    override val name = NAME
 
     override fun generate(context: IdGenerationContext): TimestampCount {
         return synchronized(this) {
@@ -45,12 +46,12 @@ class TimestampCountComponentGenerator(
         }
         sequence = 0
         lastTime = now
-        return TimestampCount(now, sequence, dateTimeFormatter, toStringPattern)
+        return TimestampCount(now, sequence++, dateTimeFormatter, toStringPattern)
     }
 
     companion object {
 
-        const val TYPE = "TimestampCount"
+        const val NAME = "TimeCount"
     }
 }
 
@@ -84,7 +85,7 @@ class TimestampCount(
         val time = if (dateTimeFormatter === null) {
             timestamp
         } else {
-            dateTimeFormatter.format(Instant.ofEpochMilli(timestamp))
+            dateTimeFormatter.format(Instant.ofEpochMilli(timestamp).atZone(ZoneOffset.UTC))
         }
         return if (toStringPattern === null) {
             "$time$count"

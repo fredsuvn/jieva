@@ -14,10 +14,6 @@ interface IdComponent<E> {
     val name: String
         @JvmName("name") get
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val type: String
-        @JvmName("type") get
-
     fun get(): E
 
     companion object {
@@ -37,7 +33,6 @@ private class IdComponentImpl<E>(
     private var cache: E? = null
 
     override val name = generator.name
-    override val type = generator.type
 
     override fun get(): E {
         val c = cache

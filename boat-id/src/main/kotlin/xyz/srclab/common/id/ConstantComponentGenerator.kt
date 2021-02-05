@@ -6,11 +6,10 @@ package xyz.srclab.common.id
  * @author sunqian
  */
 class ConstantComponentGenerator<E>(
-    override val name: String,
     private val value: E,
 ) : IdComponentGenerator<E> {
 
-    override val type = TYPE
+    override val name = NAME
 
     override fun generate(context: IdGenerationContext): E {
         return value
@@ -18,6 +17,6 @@ class ConstantComponentGenerator<E>(
 
     companion object {
 
-        const val TYPE = "Constant"
+        const val NAME = "Constant"
     }
 }

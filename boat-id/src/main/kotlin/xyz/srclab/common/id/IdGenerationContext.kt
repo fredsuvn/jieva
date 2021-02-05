@@ -7,5 +7,5 @@ package xyz.srclab.common.id
  */
 interface IdGenerationContext {
 
-    fun <T> getComponent(name: String): IdComponent<T>?
+    fun <T> components(): List<IdComponent<T>>
 }

@@ -14,9 +14,5 @@ interface IdComponentGenerator<E> {
     val name: String
         @JvmName("name") get
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val type: String
-        @JvmName("type") get
-
     fun generate(context: IdGenerationContext): E
 }
