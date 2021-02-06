@@ -34,6 +34,8 @@ import xyz.srclab.common.base.toLong
  * There are default name of [IdComponentGenerator]:
  * * [ConstantComponentGenerator.NAME]
  * * [TimeCountComponentGenerator.NAME]
+ * Using [StringIdFactoryGenerator] can extend, note generation arguments of [StringIdFactoryGenerator]
+ * only support [String] type.
  *
  * @author sunqian
  *
