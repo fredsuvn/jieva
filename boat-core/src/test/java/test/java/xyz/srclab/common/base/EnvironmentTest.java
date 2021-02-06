@@ -4,6 +4,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Environment;
+import xyz.srclab.common.test.TestLogger;
 
 import java.util.Map;
 
@@ -12,12 +13,14 @@ import java.util.Map;
  */
 public class EnvironmentTest {
 
+    private static final TestLogger logger = TestLogger.DEFAULT;
+
     @Test
     public void testEnvironment() {
         int availableProcessors = Environment.availableProcessors();
-        System.out.println("availableProcessors: " + availableProcessors);
+        logger.log("availableProcessors: " + availableProcessors);
         Assert.assertEquals(Runtime.getRuntime().availableProcessors(), availableProcessors);
-        System.out.println("Environment.properties():");
+        logger.log("Environment.properties():");
         Map<String, String> properties = Environment.properties();
         properties.keySet().stream().sorted().forEach(k ->
                 System.out.printf("%-60s: %s%n", k, properties.get(k)));

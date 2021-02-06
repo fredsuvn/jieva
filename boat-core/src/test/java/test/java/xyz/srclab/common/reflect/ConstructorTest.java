@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class ConstructorTest {
 
-    private static final TestLogger testLogger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testFind() throws Exception {

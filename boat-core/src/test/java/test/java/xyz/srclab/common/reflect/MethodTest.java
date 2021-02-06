@@ -15,7 +15,7 @@ import java.util.Comparator;
  */
 public class MethodTest {
 
-    private static final TestLogger testLogger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     Method superPublicMethod = SuperNewClass.class.getDeclaredMethod("superPublicMethod");
     Method superProtectedMethod = SuperNewClass.class.getDeclaredMethod("superProtectedMethod");

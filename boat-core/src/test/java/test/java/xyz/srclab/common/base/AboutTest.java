@@ -6,8 +6,11 @@ import xyz.srclab.common.base.About;
 import xyz.srclab.common.base.Licence;
 import xyz.srclab.common.base.PoweredBy;
 import xyz.srclab.common.base.Version;
+import xyz.srclab.common.test.TestLogger;
 
 public class AboutTest {
+
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testVersion() {
@@ -21,11 +24,11 @@ public class AboutTest {
         Version v3 = Version.parse(verString3);
         Version v4 = Version.parse(verString4);
         Version v5 = Version.parse(verString5);
-        System.out.println(v1);
-        System.out.println(v2);
-        System.out.println(v3);
-        System.out.println(v4);
-        System.out.println(v5);
+        logger.log(v1);
+        logger.log(v2);
+        logger.log(v3);
+        logger.log(v4);
+        logger.log(v5);
         Assert.assertTrue(v1.compareTo(v2) > 0);
         Assert.assertTrue(v3.compareTo(v1) > 0);
         Assert.assertTrue(v3.compareTo(v2) > 0);
@@ -42,6 +45,6 @@ public class AboutTest {
                 Licence.of("licence", "url"),
                 PoweredBy.of("poweredBy", "url", "mail")
         );
-        System.out.println(about);
+        logger.log(about);
     }
 }

@@ -6,10 +6,10 @@ import java.util.Objects;
 
 public class NewClass extends SuperNewClass {
 
-    private static final TestLogger testLogger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     static {
-        testLogger.log("Load class: " + NewClass.class);
+        logger.log("Load class: " + NewClass.class);
     }
 
     public final String publicField = "publicField";
@@ -25,7 +25,7 @@ public class NewClass extends SuperNewClass {
 
     protected NewClass(String param) {
         this.param = param;
-        testLogger.log("New instance: " + param);
+        logger.log("New instance: " + param);
     }
 
     private NewClass(String param0, String param1) {

@@ -17,12 +17,12 @@ import java.util.List;
  */
 public class CollectsTest {
 
-    private static final TestLogger testLogger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testArray() {
         String[] stringArray = ArrayCollects.newArray("1", "2", "3");
-        testLogger.log(ArrayCollects.joinToString(stringArray));
+        logger.log(ArrayCollects.joinToString(stringArray));
         Assert.assertEquals(
                 ArrayCollects.joinToString(stringArray),
                 "1, 2, 3"

@@ -3,10 +3,13 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.*;
+import xyz.srclab.common.test.TestLogger;
 
 import java.util.Arrays;
 
 public class ShellTest {
+
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testShell() {
@@ -30,7 +33,7 @@ public class ShellTest {
                 SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
         );
         shell.println(ControlChars.beep());
-        System.out.println("123\010456\007");
+        logger.log("123\010456\007");
         shell.println("123", ControlChars.backspaces(), "456", ControlChars.beep());
     }
 
@@ -50,7 +53,7 @@ public class ShellTest {
                 "third line.";
         ShellProcess shellProcess = shell.run("echo", content);
         String output = shellProcess.readAll();
-        System.out.println(output);
+        logger.log(output);
         Assert.assertEquals(output, content + Default.lineSeparator());
         shellProcess.close();
     }
@@ -59,6 +62,6 @@ public class ShellTest {
         Shell shell = Shell.DEFAULT;
         ShellProcess shellProcess = shell.run("ping", "127.0.0.1");
         String output = shellProcess.readAll();
-        System.out.println(output);
+        logger.log(output);
     }
 }

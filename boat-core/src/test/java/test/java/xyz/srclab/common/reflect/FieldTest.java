@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class FieldTest {
 
-    private static final TestLogger testLogger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     Field superPublicField = SuperNewClass.class.getDeclaredField("superPublicField");
     Field superProtectedField = SuperNewClass.class.getDeclaredField("superProtectedField");

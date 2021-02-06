@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class TypeTest {
 
-    private static final TestLogger testLogger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testTypeGenerator() {
@@ -256,7 +256,7 @@ public class TypeTest {
     @Test
     public void testTypeArguments() {
         Map<TypeVariable<?>, Type> f1Map = Reflects.typeArguments(F1.class);
-        testLogger.log("f1Map: " + f1Map);
+        logger.log("f1Map: " + f1Map);
         Assert.assertEquals(
                 f1Map.toString(),
                 "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
@@ -264,7 +264,7 @@ public class TypeTest {
 
 
         Map<TypeVariable<?>, Type> f1c1Map = Reflects.typeArguments(F1.class, C1.class);
-        testLogger.log("f1c1Map: " + f1c1Map);
+        logger.log("f1c1Map: " + f1c1Map);
         Assert.assertEquals(
                 f1c1Map.toString(),
                 "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>}"
@@ -272,14 +272,14 @@ public class TypeTest {
 
 
         Map<TypeVariable<?>, Type> f2Map = Reflects.typeArguments(F2.class);
-        testLogger.log("f2Map: " + f2Map);
+        logger.log("f2Map: " + f2Map);
         Assert.assertEquals(
                 f2Map.toString(),
                 "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
         );
 
         Map<TypeVariable<?>, Type> f2i3Map = Reflects.typeArguments(F2.class, I3.class);
-        testLogger.log("f2i3Map: " + f2i3Map);
+        logger.log("f2i3Map: " + f2i3Map);
         Assert.assertEquals(
                 f2i3Map.toString(),
                 "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String}"
@@ -288,7 +288,7 @@ public class TypeTest {
 
         Map<TypeVariable<?>, Type> s1GenericMap = Reflects.typeArguments(
                 Types.parameterizedType(S1.class, S1.class.getTypeParameters()[0]));
-        testLogger.log("s1GenericMap: " + s1GenericMap);
+        logger.log("s1GenericMap: " + s1GenericMap);
         Assert.assertEquals(
                 s1GenericMap.toString(),
                 "{S1T1=S1T1, C1T1=S1T1, C1T2=java.util.List<? extends S1T1>, I1T1=S1T1, I2T1=java.util.List<? extends S1T1>, I3T1=S1T1, I4T1=java.util.List<? extends S1T1>}"
@@ -298,7 +298,7 @@ public class TypeTest {
                 Types.parameterizedType(S1.class, S1.class.getTypeParameters()[0]),
                 I2.class
         );
-        testLogger.log("s1i1GenericMap: " + s1i1GenericMap);
+        logger.log("s1i1GenericMap: " + s1i1GenericMap);
         Assert.assertEquals(
                 s1i1GenericMap.toString(),
                 "{S1T1=S1T1, C1T1=S1T1, C1T2=java.util.List<? extends S1T1>, I1T1=S1T1, I2T1=java.util.List<? extends S1T1>}"
@@ -306,7 +306,7 @@ public class TypeTest {
 
         Map<TypeVariable<?>, Type> s1Map = Reflects.typeArguments(
                 Types.parameterizedType(S1.class, String.class));
-        testLogger.log("s1Map: " + s1Map);
+        logger.log("s1Map: " + s1Map);
         Assert.assertEquals(
                 s1Map.toString(),
                 "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
@@ -315,7 +315,7 @@ public class TypeTest {
         Type c1c1GenericTypeRef = new TypeRef<C1<Long, Double>.C1C1<String>>() {
         }.type();
         Map<TypeVariable<?>, Type> c1c1GenericMap = Reflects.typeArguments(c1c1GenericTypeRef);
-        testLogger.log("c1c1GenericMap: " + c1c1GenericMap);
+        logger.log("c1c1GenericMap: " + c1c1GenericMap);
         Assert.assertEquals(
                 c1c1GenericMap.toString(),
                 "{C1T1=class java.lang.Long, C1T2=class java.lang.Double, I1T1=class java.lang.Long, I2T1=java.util.List<? extends java.lang.Long>, C1C1T1=class java.lang.String, I3T1=class java.lang.Double}"
@@ -324,7 +324,7 @@ public class TypeTest {
 
     @Test
     public void testGenericSignature() {
-        testLogger.log(Reflects.generalize(F2.class, I4.class));
+        logger.log(Reflects.generalize(F2.class, I4.class));
 
         Reflects.genericInterface(String.class);
     }

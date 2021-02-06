@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class BeanTest {
 
-    private static final TestLogger testLogger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testBeanResolve() {
@@ -36,7 +36,7 @@ public class BeanTest {
         Assert.assertEquals(beanType2.getProperty("p2").type(), int.class);
         Assert.assertEquals(beanType2.getProperty("p3").type(), Types.parameterizedType(List.class, String.class));
 
-        Assert.assertFalse(beanType == beanType2);
+        Assert.assertNotSame(beanType, beanType2);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class BeanTest {
                 .withTypes(SimpleBean.class, Types.parameterizedType(Map.class, String.class, int.class))
                 .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
         Map<String, Integer> siMap = Anys.as(Beans.asMap(simpleBean, copyOptions));
-        testLogger.log("siMap: {}", siMap);
+        logger.log("siMap: {}", siMap);
         Assert.assertEquals(siMap.get("p1"), (Integer) 555);
         Assert.assertEquals(siMap.get("p2"), (Integer) 888);
         Assert.assertEquals(siMap.size(), 2);

@@ -6,10 +6,13 @@ import org.objectweb.asm.Opcodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Loaders;
+import xyz.srclab.common.test.TestLogger;
 
 import java.util.Collections;
 
 public class LoadersTest {
+
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testLoader() {
@@ -20,8 +23,8 @@ public class LoadersTest {
 
         String newClassName = "test.xyz.srclab.A";
         Class<?> clazz = Loaders.loadClass(createClass(newClassName));
-        System.out.println(clazz);
-        System.out.println(clazz.getClassLoader());
+        logger.log(clazz);
+        logger.log(clazz.getClassLoader());
         Assert.assertEquals(clazz.getName(), newClassName);
     }
 

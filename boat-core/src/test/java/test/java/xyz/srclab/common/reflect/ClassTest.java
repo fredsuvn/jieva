@@ -10,7 +10,7 @@ import xyz.srclab.common.test.TestLogger;
  */
 public class ClassTest {
 
-    private static final TestLogger testLogger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testToClass() {

@@ -12,7 +12,7 @@ import xyz.srclab.common.test.Tester;
  */
 public class BeanPerformanceTest {
 
-    private static final TestLogger testLogger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     /*
      * Task BeanKit was accomplished, cost: PT1M59.624S
