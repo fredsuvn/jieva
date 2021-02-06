@@ -6,6 +6,9 @@ import xyz.srclab.common.state.State.Companion.stateHashCode
 import xyz.srclab.common.state.State.Companion.stateMoreDescription
 import xyz.srclab.common.state.State.Companion.stateToString
 
+/**
+ * [State] for exception.
+ */
 interface ExceptionStatus : State<String, String, ExceptionStatus> {
 
     @JvmDefault

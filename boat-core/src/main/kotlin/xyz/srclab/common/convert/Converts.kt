@@ -1,4 +1,4 @@
-@file:JvmName("ConvertKit")
+@file:JvmName("Converts")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.convert

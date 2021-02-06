@@ -7,6 +7,11 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import java.util.concurrent.RejectedExecutionException
 
+/**
+ * Event bus.
+ *
+ * @see EventHandler
+ */
 interface EventBus {
 
     fun register(eventHandler: EventHandler<*>)

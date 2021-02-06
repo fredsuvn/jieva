@@ -27,6 +27,18 @@ import kotlin.collections.toList
 
 private const val NULL = "I am null!"
 
+/**
+ * Converter.
+ *
+ * @see ConvertHandler
+ * @see NopConvertHandler
+ * @see WildcardTypeConvertHandler
+ * @see CharsConvertHandler
+ * @see NumberAndPrimitiveConvertHandler
+ * @see DateTimeConvertHandler
+ * @see IterableConvertHandler
+ * @see BeanConvertHandler
+ */
 interface Converter {
 
     @Suppress(INAPPLICABLE_JVM_NAME)

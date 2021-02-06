@@ -16,6 +16,10 @@ import java.lang.reflect.*
 
 /**
  * @author sunqian
+ *
+ * @see BeanResolveHandler
+ * @see BeanStyleBeanResolveHandler
+ * @see NamingStyleBeanResolveHandler
  */
 interface BeanResolver {
 
@@ -562,6 +566,10 @@ private class BeanTypeImpl(
     }
 }
 
+/**
+ * @see BeanStyleBeanResolveHandler
+ * @see NamingStyleBeanResolveHandler
+ */
 interface BeanResolveHandler {
 
     fun resolve(@OutParam context: Context)

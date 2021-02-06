@@ -1,9 +1,16 @@
 package xyz.srclab.common.exception
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.state.State
 import xyz.srclab.common.state.State.Companion.stateEquals
 import xyz.srclab.common.state.State.Companion.stateHashCode
 
+/**
+ * Exception implements [ExceptionStatus].
+ *
+ * @see ExceptionStatus
+ * @see State
+ */
 open class StatusException @JvmOverloads constructor(
     private val exceptionStatus: ExceptionStatus,
     cause: Throwable? = null
