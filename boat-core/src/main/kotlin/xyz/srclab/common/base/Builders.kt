@@ -1,5 +1,12 @@
 package xyz.srclab.common.base
 
+/**
+ * Help cache last build value if no more modification.
+ *
+ * Synchronized version is [SyncCachingProductBuilder]
+ *
+ * @see SyncCachingProductBuilder
+ */
 abstract class CachingProductBuilder<T : Any> {
 
     private var cache: T? = null
@@ -27,6 +34,13 @@ abstract class CachingProductBuilder<T : Any> {
     }
 }
 
+/**
+ * Help cache last build value if no more modification.
+ *
+ * This is synchronized version, non-synchronized version is [CachingProductBuilder]
+ *
+ * @see CachingProductBuilder
+ */
 abstract class SyncCachingProductBuilder<T : Any> : CachingProductBuilder<T>() {
 
     private var cache: T? = null

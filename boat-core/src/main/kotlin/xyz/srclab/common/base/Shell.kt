@@ -10,6 +10,9 @@ import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * Shell to run commands.
+ */
 interface Shell : ShellIO {
 
     @Suppress(INAPPLICABLE_JVM_NAME)

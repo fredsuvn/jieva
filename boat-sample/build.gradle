@@ -20,5 +20,5 @@ dependencies {
 
 test {
   useTestNG()
-  include("**/*Test.class", "**/*TestKt.class")
+  include("**/*Sample.class", "**/*SampleKt.class")
 }

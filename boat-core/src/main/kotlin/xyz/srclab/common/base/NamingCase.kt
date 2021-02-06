@@ -18,11 +18,6 @@ interface NamingCase {
         return toCase.join(words)
     }
 
-    @JvmDefault
-    fun convertFrom(name: CharSequence, fromCase: NamingCase): String {
-        return fromCase.convertTo(name, this)
-    }
-
     companion object {
 
         @JvmField

@@ -2,6 +2,9 @@ package xyz.srclab.common.base
 
 import xyz.srclab.common.reflect.toInstance
 
+/**
+ * Help parse object by spec of type [S].
+ */
 interface SpecParser<S> {
 
     fun <T : Any> parse(spec: S): List<T>

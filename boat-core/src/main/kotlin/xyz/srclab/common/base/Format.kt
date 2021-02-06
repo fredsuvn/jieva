@@ -13,7 +13,7 @@ interface Format {
         val FAST_FORMAT: FastFormat = FastFormat
 
         @JvmField
-        val PRINT_FORMAT: PrintFormat = PrintFormat
+        val PRINT_FORMAT: PrintfFormat = PrintfFormat
 
         @JvmField
         val MESSAGE_FORMAT: MessageFormat = MessageFormat
@@ -24,8 +24,8 @@ interface Format {
         }
 
         @JvmStatic
-        fun CharSequence.printFormat(vararg args: Any?): String {
-            return PrintFormat.format(this, *args)
+        fun CharSequence.printfFormat(vararg args: Any?): String {
+            return PrintfFormat.format(this, *args)
         }
 
         @JvmStatic
@@ -56,7 +56,7 @@ object FastFormat : Format {
     }
 }
 
-object PrintFormat : Format {
+object PrintfFormat : Format {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         return String.format(Default.locale, pattern.toString(), *args)

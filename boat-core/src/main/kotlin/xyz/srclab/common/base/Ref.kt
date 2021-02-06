@@ -1,5 +1,15 @@
 package xyz.srclab.common.base
 
+/**
+ * Help solve the problem that: in java language, a variable should be final if it will be used in lambda expression:
+ * ```
+ * Ref<String> ref = Ref.of("1");
+ * List<String> list = Arrays.asList("-1", "-2", "-3");
+ *
+ * //here <String> should be final without Ref
+ * list.forEach(i -> ref.set(ref.get() + i));
+ * ```
+ */
 interface Ref<T> : SimpleAccessor<T> {
 
     companion object {

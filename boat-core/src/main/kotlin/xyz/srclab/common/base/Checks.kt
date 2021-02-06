@@ -1,4 +1,4 @@
-@file:JvmName("Check")
+@file:JvmName("Checks")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.base
@@ -6,122 +6,143 @@ package xyz.srclab.common.base
 import xyz.srclab.common.base.Format.Companion.fastFormat
 import java.util.*
 
+@Throws(IllegalArgumentException::class)
 fun checkArgument(expression: Boolean) {
     if (!expression) {
         throw IllegalArgumentException()
     }
 }
 
+@Throws(IllegalArgumentException::class)
 fun checkArgument(expression: Boolean, message: String?) {
     if (!expression) {
         throw IllegalArgumentException(message)
     }
 }
 
+@Throws(IllegalArgumentException::class)
 fun checkArgument(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
         throw IllegalArgumentException(format(messagePattern, *messageArgs))
     }
 }
 
+@Throws(IllegalStateException::class)
 fun checkState(expression: Boolean) {
     if (!expression) {
         throw IllegalStateException()
     }
 }
 
+@Throws(IllegalStateException::class)
 fun checkState(expression: Boolean, message: String?) {
     if (!expression) {
         throw IllegalStateException(message)
     }
 }
 
+@Throws(IllegalStateException::class)
 fun checkState(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
         throw IllegalStateException(format(messagePattern, *messageArgs))
     }
 }
 
+@Throws(NullPointerException::class)
 fun checkNull(expression: Boolean) {
     if (!expression) {
         throw NullPointerException()
     }
 }
 
+@Throws(NullPointerException::class)
 fun checkNull(expression: Boolean, message: String?) {
     if (!expression) {
         throw NullPointerException(message)
     }
 }
 
+@Throws(NullPointerException::class)
 fun checkNull(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
         throw NullPointerException(format(messagePattern, *messageArgs))
     }
 }
 
+@Throws(UnsupportedOperationException::class)
 fun checkSupported(expression: Boolean) {
     if (!expression) {
         throw UnsupportedOperationException()
     }
 }
 
+@Throws(UnsupportedOperationException::class)
 fun checkSupported(expression: Boolean, message: String?) {
     if (!expression) {
         throw UnsupportedOperationException(message)
     }
 }
 
+@Throws(UnsupportedOperationException::class)
 fun checkSupported(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
         throw UnsupportedOperationException(format(messagePattern, *messageArgs))
     }
 }
 
+@Throws(NoSuchElementException::class)
 fun checkElement(expression: Boolean) {
     if (!expression) {
         throw NoSuchElementException()
     }
 }
 
+@Throws(NoSuchElementException::class)
 fun checkElement(expression: Boolean, message: String?) {
     if (!expression) {
         throw NoSuchElementException(message)
     }
 }
 
+@Throws(NoSuchElementException::class)
 fun checkElement(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
         throw NoSuchElementException(format(messagePattern, *messageArgs))
     }
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun checkBounds(expression: Boolean) {
     if (!expression) {
         throw IndexOutOfBoundsException()
     }
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun checkBounds(expression: Boolean, message: String?) {
     if (!expression) {
         throw IndexOutOfBoundsException(message)
     }
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun checkBounds(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
         throw IndexOutOfBoundsException(format(messagePattern, *messageArgs))
     }
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun isIndexInBounds(index: Int, startInclusive: Int, endExclusive: Int): Boolean {
     return index in startInclusive until endExclusive
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun isIndexInBounds(index: Long, startInclusive: Long, endExclusive: Long): Boolean {
     return index in startInclusive until endExclusive
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun checkIndexInBounds(index: Int, startInclusive: Int, endExclusive: Int) {
     if (!isIndexInBounds(index, startInclusive, endExclusive)) {
         throw IndexOutOfBoundsException(
@@ -132,6 +153,7 @@ fun checkIndexInBounds(index: Int, startInclusive: Int, endExclusive: Int) {
     }
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun checkIndexInBounds(index: Long, startInclusive: Long, endExclusive: Long) {
     if (!isIndexInBounds(index, startInclusive, endExclusive)) {
         throw IndexOutOfBoundsException(
@@ -142,14 +164,17 @@ fun checkIndexInBounds(index: Long, startInclusive: Long, endExclusive: Long) {
     }
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun isRangeInLength(startInclusive: Int, endExclusive: Int, length: Int): Boolean {
     return startInclusive >= 0 && endExclusive <= length && startInclusive <= endExclusive
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun isRangeInLength(startInclusive: Long, endExclusive: Long, length: Long): Boolean {
     return startInclusive >= 0 && endExclusive <= length && startInclusive <= endExclusive
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun isRangeInBounds(
     startInclusive: Int, endExclusive: Int, startBoundInclusive: Int, endBoundExclusive: Int
 ): Boolean {
@@ -158,6 +183,7 @@ fun isRangeInBounds(
             && startInclusive <= endExclusive
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun isRangeInBounds(
     startInclusive: Long, endExclusive: Long, startBoundInclusive: Long, endBoundExclusive: Long
 ): Boolean {
@@ -166,6 +192,7 @@ fun isRangeInBounds(
             && startInclusive <= endExclusive
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun checkRangeInLength(startInclusive: Int, endExclusive: Int, length: Int) {
     if (!isRangeInLength(startInclusive, endExclusive, length)) {
         throw IndexOutOfBoundsException(
@@ -176,6 +203,7 @@ fun checkRangeInLength(startInclusive: Int, endExclusive: Int, length: Int) {
     }
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun checkRangeInLength(startInclusive: Long, endExclusive: Long, length: Long) {
     if (!isRangeInLength(startInclusive, endExclusive, length)) {
         throw IndexOutOfBoundsException(
@@ -186,6 +214,7 @@ fun checkRangeInLength(startInclusive: Long, endExclusive: Long, length: Long) {
     }
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun checkRangeInBounds(startInclusive: Int, endExclusive: Int, startBoundInclusive: Int, endBoundExclusive: Int) {
     if (!isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive)) {
         throw IndexOutOfBoundsException(
@@ -197,6 +226,7 @@ fun checkRangeInBounds(startInclusive: Int, endExclusive: Int, startBoundInclusi
     }
 }
 
+@Throws(IndexOutOfBoundsException::class)
 fun checkRangeInBounds(
     startInclusive: Long,
     endExclusive: Long,

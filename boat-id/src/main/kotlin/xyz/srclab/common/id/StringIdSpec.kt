@@ -47,7 +47,7 @@ class StringIdSpec @JvmOverloads constructor(
 ) : StringIdFactory(parseIdSpec(spec, factoryGenerator))
 
 /**
- * Help generating [StringIdFactory] by name and arguments.
+ * Help generate [StringIdFactory] by name and arguments.
  */
 interface StringIdFactoryGenerator {
 

@@ -1,8 +1,9 @@
 package xyz.srclab.common.test
 
 import xyz.srclab.common.base.Current
+import xyz.srclab.common.base.Format
 import xyz.srclab.common.base.Format.Companion.fastFormat
-import xyz.srclab.common.base.Format.Companion.printFormat
+import xyz.srclab.common.base.Format.Companion.printfFormat
 import xyz.srclab.common.base.asAny
 import java.io.PrintStream
 
@@ -10,6 +11,9 @@ interface TestLogger {
 
     fun log(message: Any?)
 
+    /**
+     * Using [Format.fastFormat] to format.
+     */
     @JvmDefault
     fun log(pattern: CharSequence, vararg args: Any?) {
         log(pattern.fastFormat(*args).asAny<Any?>())
@@ -29,7 +33,7 @@ interface TestLogger {
             override fun log(message: Any?) {
                 val callFrame = Current.callerFrameOrNull(javaClass.name, "log")
                 printStream.println(
-                    "%-${CLASS_NAME_MAX_LENGTH}s(%-${LINE_NUMBER_MAX_LENGTH}d): %s".printFormat(
+                    "%-${CLASS_NAME_MAX_LENGTH}s(%-${LINE_NUMBER_MAX_LENGTH}d): %s".printfFormat(
                         callFrame?.className?.abridgeName(CLASS_NAME_MAX_LENGTH),
                         callFrame?.lineNumber,
                         message
