@@ -1,6 +1,7 @@
 plugins {
   id 'build.common'
   id 'build.kotlin-compile'
+  id 'org.jetbrains.dokka'// version '1.4.30'
   id 'maven-publish'
   id 'signing'
 }
