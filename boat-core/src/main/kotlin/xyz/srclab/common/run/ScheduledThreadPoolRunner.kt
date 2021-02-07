@@ -4,6 +4,9 @@ import xyz.srclab.common.base.asNotNull
 import java.time.Duration
 import java.util.concurrent.*
 
+/**
+ * A type of [ScheduledRunner] use [ScheduledThreadPoolExecutor].
+ */
 class ScheduledThreadPoolRunner(
     private val scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor
 ) : ScheduledExecutorServiceRunner(scheduledThreadPoolExecutor) {

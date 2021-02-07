@@ -3,6 +3,16 @@ package xyz.srclab.common.run
 import xyz.srclab.common.base.Environment
 import java.util.concurrent.*
 
+/**
+ * For run a processing, may based on a thread, a coroutine, or others.
+ *
+ * @see Running
+ * @see SyncRunner
+ * @see AsyncRunner
+ * @see ExecutorServiceRunner
+ * @see ThreadPoolRunner
+ * @see ScheduledRunner
+ */
 interface Runner : Executor {
 
     @Throws(RejectedExecutionException::class)

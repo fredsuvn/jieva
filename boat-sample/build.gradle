@@ -14,6 +14,7 @@ dependencies {
   implementation(platform(project(":boat-bom")))
 
   api(project(":boat-all"))
+  testCompile("cglib:cglib")
 
   testCompile(project(":boat-test"))
 }

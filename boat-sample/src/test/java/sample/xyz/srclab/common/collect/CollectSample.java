@@ -17,6 +17,7 @@ public class CollectSample {
     public void testArray() {
         String[] strings = ArrayCollects.newArray("1", "2", "3");
         ArrayCollects.asList(strings).set(0, "111");
+        //111
         logger.log("string[0]: {}", strings[0]);
     }
 
@@ -32,6 +33,7 @@ public class CollectSample {
                 .map(it -> it + "0")
                 .map(Nums::toInt)
                 .reduce(Integer::sum);
+        //200
         logger.log("sum: {}", sum);
     }
 }

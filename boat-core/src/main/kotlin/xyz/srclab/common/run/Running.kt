@@ -6,6 +6,11 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.concurrent.*
 
+/**
+ * Run processing.
+ *
+ * @see Runner
+ */
 interface Running<V> : Future<V> {
 
     @Suppress(INAPPLICABLE_JVM_NAME)

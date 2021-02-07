@@ -41,12 +41,16 @@ public class EventBusSample {
                     }
                 }
         ));
+        //1
         eventBus.emit(1);
+        //2
         eventBus.emit("2");
+        //No output
         eventBus.emit(new Object());
         try {
             eventBus.emitOrThrow(new Object());
         } catch (EventHandlerNotFoundException e) {
+            //xyz.srclab.common.bus.EventHandlerNotFoundException: class java.lang.Object
             logger.log(e);
         }
     }

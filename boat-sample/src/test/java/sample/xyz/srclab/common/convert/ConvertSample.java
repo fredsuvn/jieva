@@ -12,13 +12,16 @@ public class ConvertSample {
     @Test
     public void testConvert() {
         String s = Converts.convert(123, String.class);
+        //123
         logger.log("s: {}", s);
 
         BeanSample.A a = new BeanSample.A();
         a.setP1("1");
         a.setP2("2");
         B b = Converts.convert(a, B.class);
+        //1
         logger.log("b1: {}", b.getP1());
+        //2
         logger.log("b1: {}", b.getP2());
     }
 

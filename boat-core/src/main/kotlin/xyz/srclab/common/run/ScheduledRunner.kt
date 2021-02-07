@@ -6,6 +6,14 @@ import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
+/**
+ * For run a scheduled processing, may based on a thread, a coroutine, or others.
+ *
+ * @see ScheduledRunning
+ * @see ScheduledExecutorServiceRunner
+ * @see ScheduledThreadPoolRunner
+ * @see Runner
+ */
 interface ScheduledRunner : Runner {
 
     @Throws(RejectedExecutionException::class)
@@ -20,7 +28,7 @@ interface ScheduledRunner : Runner {
     companion object {
 
         @JvmField
-        val NEW_THREAD_RUNNER: NewThreadScheduledRunner = NewThreadScheduledRunner
+        val SINGLE_THREAD_RUNNER: ScheduledRunner = newSingleThreadRunner()
 
         @JvmStatic
         fun newSingleThreadRunner(): ScheduledExecutorServiceRunner {
@@ -53,7 +61,7 @@ interface ScheduledRunner : Runner {
 
         @JvmStatic
         fun <V> scheduleNewThread(delay: Duration, task: () -> V): ScheduledRunning<V> {
-            return NEW_THREAD_RUNNER.schedule(delay, task)
+            return SINGLE_THREAD_RUNNER.schedule(delay, task)
         }
 
         @JvmStatic
@@ -62,7 +70,7 @@ interface ScheduledRunner : Runner {
             period: Duration,
             task: () -> V,
         ): ScheduledRunning<V> {
-            return NEW_THREAD_RUNNER.scheduleAtFixedRate(initialDelay, period, task)
+            return SINGLE_THREAD_RUNNER.scheduleAtFixedRate(initialDelay, period, task)
         }
 
         @JvmStatic
@@ -71,7 +79,7 @@ interface ScheduledRunner : Runner {
             period: Duration,
             task: () -> V
         ): ScheduledRunning<V> {
-            return NEW_THREAD_RUNNER.scheduleWithFixedDelay(initialDelay, period, task)
+            return SINGLE_THREAD_RUNNER.scheduleWithFixedDelay(initialDelay, period, task)
         }
     }
 }

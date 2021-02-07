@@ -16,7 +16,9 @@ public class BeanSample {
         B b = Beans.copyProperties(a, new B());
         int b1 = b.getP1();
         int b2 = b.getP2();
+        //1
         logger.log("b1: {}", b1);
+        //2
         logger.log("b1: {}", b2);
     }
 

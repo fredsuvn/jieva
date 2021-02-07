@@ -24,6 +24,7 @@ public class BaseSample {
                 .then(l -> l.stream().mapToInt(Integer::parseInt))
                 .then(IntStream::sum)
                 .get();
+        //55
         logger.log("sum: {}", sum);
     }
 
@@ -34,19 +35,24 @@ public class BaseSample {
 
         //here <String> should be final without Ref
         list.forEach(i -> ref.set(ref.get() + i));
+        //1-1-2-3
         logger.log("result: {}", ref.get());
     }
 
     @Test
     public void testCurrent() {
         Current.set("1", "2");
+        //2
         logger.log(Current.get("1"));
+        //System.currentTimeMillis();
         logger.log(Current.millis());
     }
 
     @Test
     public void testDefault() {
+        //UTF-8
         logger.log(Default.charset());
+        //Locale.getDefault();
         logger.log(Default.locale());
     }
 
@@ -63,6 +69,7 @@ public class BaseSample {
         String byFast = Format.fastFormat("1, 2, {}", 3);
         String byMessage = Format.messageFormat("1, 2, {0}", 3);
         String byPrintf = Format.printfFormat("1, 2, %d", 3);
+        //1, 2, 3
         logger.log("byFast: {}", byFast);
         logger.log("byMessage: {}", byMessage);
         logger.log("byPrintf: {}", byPrintf);
@@ -72,6 +79,7 @@ public class BaseSample {
     public void testNamingCase() {
         String upperCamel = "UpperCamel";
         String lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL);
+        //upperCamel
         logger.log("lowerCamel: {}", lowerCamel);
     }
 
@@ -92,6 +100,8 @@ public class BaseSample {
         String value2 = lazy.get();
         lazy.refresh();
         String value3 = lazy.get();
+        //value1 == value2
+        //value2 != value3
         logger.log("value1: {}", value1);
         logger.log("value2: {}", value2);
         logger.log("value3: {}", value3);
@@ -100,12 +110,14 @@ public class BaseSample {
     @Test
     public void testLoaders() {
         Class<String[][][]> cls = Loaders.loadClass("[[[Ljava.lang.String;");
+        //class [[[Ljava.lang.String;
         logger.log("cls: {}", cls);
     }
 
     @Test
     public void testSpecParser() {
         String s = SpecParser.parseFirstClassNameToInstance("java.lang.String");
+        //an empty String
         logger.log("s: {}", s);
     }
 
@@ -121,29 +133,37 @@ public class BaseSample {
         byte[] bytes = "message10086".getBytes();
         String toChars = Chars.toChars(bytes);
         byte[] toBytes = Chars.toBytes(toChars);
+        //message10086
         logger.log("toChars: {}", toChars);
+        //[109, 101, 115, 115, 97, 103, 101, 49, 48, 48, 56, 54]
         logger.log("toBytes: {}", toBytes);
 
         //Nums examples:
         BigDecimal n = Nums.toBigDecimal("110");
         int i = Nums.toInt(new BigDecimal("2333"));
+        //110
         logger.log("n: {}", n);
+        //2333
         logger.log("i: {}", i);
 
         //Bools examples:
         boolean b = Bools.toBoolean("true");
+        //true
         logger.log("b: {}", b);
 
         //Dates examples:
         String timestamp = Dates.timestamp();
         LocalDateTime localDateTime = Dates.toLocalDateTime("2011-12-03T10:15:30");
+        //20210207144816045
         logger.log("timestamp: {}", timestamp);
+        //2011-12-03T10:15:30
         logger.log("localDateTime: {}", localDateTime);
 
         //Checks examples:
         try {
             Checks.checkArgument(1 == 2, "1 != 2");
         } catch (IllegalArgumentException e) {
+            //java.lang.IllegalArgumentException: 1 != 2
             logger.log("e: {}", e);
         }
 
@@ -151,6 +171,7 @@ public class BaseSample {
         try {
             Object notNull = Requires.notNull(null, "null");
         } catch (NullPointerException e) {
+            //java.lang.NullPointerException: null
             logger.log("e: {}", e);
         }
     }
@@ -180,8 +201,11 @@ public class BaseSample {
         String value2 = cachingBuilderSample.build();
         cachingBuilderSample.setValue("2");
         String value3 = cachingBuilderSample.build();
+        //10c66dae9-c056-464e-8117-4787914c3af8
         logger.log("value1: {}", value1);
+        //10c66dae9-c056-464e-8117-4787914c3af8
         logger.log("value2: {}", value2);
+        //2c7c2e230-50b0-4a0f-8530-151723297fb8
         logger.log("value3: {}", value3);
     }
 
@@ -221,6 +245,10 @@ public class BaseSample {
                 Licence.of("lName", "lUrl"),
                 PoweredBy.of("pName", "pUrl", "pMail")
         );
+        //name 1.2.3-beta.2.3+123, release on 2021-02-07T14:49:36.787+08:00[Asia/Shanghai]
+        //url
+        //Under the lName licence
+        //Powered by pName
         logger.log("About: {}", about);
     }
 }

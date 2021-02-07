@@ -7,6 +7,9 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.*
 
+/**
+ * A type of [ScheduledRunner] use [ScheduledExecutorService].
+ */
 open class ScheduledExecutorServiceRunner(
     private val scheduledExecutorService: ScheduledExecutorService
 ) : ExecutorServiceRunner(scheduledExecutorService), ScheduledRunner {

@@ -4,6 +4,9 @@ import java.time.LocalDateTime
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
+/**
+ * A type of [Runner] always use new thread.
+ */
 object SyncRunner : Runner {
 
     override fun <V> run(task: () -> V): Running<V> {

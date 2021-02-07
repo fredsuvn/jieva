@@ -5,6 +5,9 @@ import xyz.srclab.common.base.asNotNull
 import java.time.Duration
 import java.util.concurrent.*
 
+/**
+ * A type of [Runner] use [ThreadPoolExecutor].
+ */
 open class ThreadPoolRunner(
     private val threadPoolExecutor: ThreadPoolExecutor
 ) : ExecutorServiceRunner(threadPoolExecutor) {

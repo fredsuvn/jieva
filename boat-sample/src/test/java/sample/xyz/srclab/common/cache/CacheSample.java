@@ -12,7 +12,9 @@ public class CacheSample {
     public void testCache() {
         Cache<String, String> cache = Cache.newFastCache();
         cache.getOrLoad("1", k -> k);
+        //1
         logger.log("1: {}", cache.get("1"));
+        //null
         logger.log("2: {}", cache.getOrNull("2"));
     }
 }

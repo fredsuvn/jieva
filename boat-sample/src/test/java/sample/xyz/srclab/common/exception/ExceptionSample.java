@@ -12,6 +12,7 @@ public class ExceptionSample {
     @Test
     public void testStatusException() {
         SampleException sampleException = new SampleException();
+        //000001-Unknown Error[for sample]
         logger.log("Status: {}", sampleException.withMoreDescription("for sample"));
     }
 
