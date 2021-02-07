@@ -31,6 +31,11 @@ interface TestTask {
         }
 
         @JvmStatic
+        fun newTask(times: Long, task: Runnable): TestTask {
+            return newTask(times) { task.run() }
+        }
+
+        @JvmStatic
         @JvmOverloads
         fun newTask(name: String? = null, times: Long = 1, task: () -> Unit): TestTask {
             return object : TestTask {
@@ -41,6 +46,12 @@ interface TestTask {
                     }
                 }
             }
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun newTask(name: String? = null, times: Long = 1, task: Runnable): TestTask {
+            return newTask(name, times) { task.run() }
         }
     }
 }

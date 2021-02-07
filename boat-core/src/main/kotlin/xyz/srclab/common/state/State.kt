@@ -3,22 +3,32 @@ package xyz.srclab.common.state
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.hash
 
+import xyz.srclab.common.exception.ExceptionStatus
+import xyz.srclab.common.exception.StatusException
+
 /**
+ * @param C code type
+ * @param D description type
+ * @param T state type
+ *
  * @author sunqian
+ *
+ * @see ExceptionStatus
+ * @see StatusException
  */
-interface State<C, DESC, T : State<C, DESC, T>> {
+interface State<C, D, T : State<C, D, T>> {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val code: C
         @JvmName("code") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val description: DESC?
+    val description: D?
         @JvmName("description") get
 
-    fun withNewDescription(newDescription: DESC?): T
+    fun withNewDescription(newDescription: D?): T
 
-    fun withMoreDescription(moreDescription: DESC?): T
+    fun withMoreDescription(moreDescription: D?): T
 
     companion object {
 
