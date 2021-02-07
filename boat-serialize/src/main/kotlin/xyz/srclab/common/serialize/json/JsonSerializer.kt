@@ -15,6 +15,9 @@ import java.nio.ByteBuffer
  * Json serialization of [Serializer].
  *
  * @author sunqian
+ *
+ * @see Json
+ * @see JsonSerials
  */
 interface JsonSerializer : Serializer<Json> {
 
