@@ -11,6 +11,8 @@ import java.security.NoSuchAlgorithmException
  * Digest cipher.
  *
  * @author sunqian
+ *
+ * @see CommonDigestCipher
  */
 interface DigestCipher : CodecCipher {
 
@@ -103,17 +105,17 @@ interface DigestCipher : CodecCipher {
 
         @JvmStatic
         fun forAlgorithm(algorithm: String): DigestCipher {
-            return DigestCipherImpl(algorithm)
+            return CommonDigestCipher(algorithm)
         }
 
         @JvmStatic
         fun forAlgorithm(algorithm: CodecAlgorithm): DigestCipher {
-            return DigestCipherImpl(algorithm.name)
+            return CommonDigestCipher(algorithm.name)
         }
     }
 }
 
-private class DigestCipherImpl(private val algorithm: String) : DigestCipher {
+open class CommonDigestCipher(private val algorithm: String) : DigestCipher {
 
     override val name = algorithm
 

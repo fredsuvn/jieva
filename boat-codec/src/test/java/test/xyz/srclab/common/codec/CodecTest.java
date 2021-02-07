@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.Chars;
 import xyz.srclab.common.codec.Codec;
 import xyz.srclab.common.codec.CodecAlgorithm;
+import xyz.srclab.common.codec.CodecKeys;
 import xyz.srclab.common.codec.aes.AesKeys;
 import xyz.srclab.common.codec.rsa.RsaCipher;
 import xyz.srclab.common.codec.rsa.RsaKeyPair;
@@ -98,7 +99,7 @@ public class CodecTest {
         Sm2KeyPair sm2KeyPair = sm2Cipher.newKeyPair();
         RsaCipher rsaCipher = Codec.rsaCipher();
         RsaKeyPair rsaKeyPair = rsaCipher.newKeyPair();
-        SecretKey aesKey = Codec.secretKey("0123456789012345", CodecAlgorithm.AES);
+        SecretKey aesKey = CodecKeys.newKey("0123456789012345", CodecAlgorithm.AES_NAME);
 
         //加密
         byte[] encrypt = Codec.aesCipher().encrypt(aesKey.getEncoded(), Chars.toBytes(data));

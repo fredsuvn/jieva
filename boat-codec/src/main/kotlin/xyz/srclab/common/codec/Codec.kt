@@ -27,7 +27,15 @@ import javax.crypto.SecretKey
  * ```
  *
  * @author sunqian
+ *
+ * @see CodecKeys
+ * @see CommonCodec
  * @see CodecAlgorithm
+ * @see ReversibleCipher
+ * @see SymmetricCipher
+ * @see AsymmetricCipher
+ * @see DigestCipher
+ * @see HmacDigestCipher
  */
 interface Codec {
 
@@ -70,6 +78,21 @@ interface Codec {
     fun encrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
+    fun encrypt(key: CharSequence, algorithm: String): Codec {
+        return encrypt(key, CodecAlgorithm.forName(algorithm))
+    }
+
+    @JvmDefault
+    fun encrypt(key: CharSequence, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return encrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+    }
+
+    @JvmDefault
+    fun encrypt(key: CharSequence, algorithm: CodecAlgorithm): Codec {
+        return encrypt(key.toBytes(), algorithm)
+    }
+
+    @JvmDefault
     fun encrypt(key: Any, algorithm: String): Codec {
         return encrypt(key, CodecAlgorithm.forName(algorithm))
     }
@@ -104,6 +127,21 @@ interface Codec {
     }
 
     fun decrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec
+
+    @JvmDefault
+    fun decrypt(key: CharSequence, algorithm: String): Codec {
+        return decrypt(key, CodecAlgorithm.forName(algorithm))
+    }
+
+    @JvmDefault
+    fun decrypt(key: CharSequence, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return decrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+    }
+
+    @JvmDefault
+    fun decrypt(key: CharSequence, algorithm: CodecAlgorithm): Codec {
+        return decrypt(key.toBytes(), algorithm)
+    }
 
     @JvmDefault
     fun decrypt(key: Any, algorithm: String): Codec {
@@ -154,6 +192,21 @@ interface Codec {
     fun hmacDigest(key: ByteArray, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
+    fun hmacDigest(key: CharSequence, algorithm: String): Codec {
+        return hmacDigest(key, CodecAlgorithm.forName(algorithm))
+    }
+
+    @JvmDefault
+    fun hmacDigest(key: CharSequence, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
+        return hmacDigest(key, CodecAlgorithm.forName(algorithm, algorithmType))
+    }
+
+    @JvmDefault
+    fun hmacDigest(key: CharSequence, algorithm: CodecAlgorithm): Codec {
+        return hmacDigest(key.toBytes(), algorithm)
+    }
+
+    @JvmDefault
     fun hmacDigest(key: Any, algorithm: String): Codec {
         return hmacDigest(key, CodecAlgorithm.forName(algorithm))
     }
@@ -196,12 +249,22 @@ interface Codec {
     }
 
     @JvmDefault
+    fun encryptAes(key: CharSequence): Codec {
+        return encrypt(key, CodecAlgorithm.AES)
+    }
+
+    @JvmDefault
     fun decryptAes(key: SecretKey): Codec {
         return decrypt(key, CodecAlgorithm.AES)
     }
 
     @JvmDefault
     fun decryptAes(key: ByteArray): Codec {
+        return decrypt(key, CodecAlgorithm.AES)
+    }
+
+    @JvmDefault
+    fun decryptAes(key: CharSequence): Codec {
         return decrypt(key, CodecAlgorithm.AES)
     }
 
@@ -246,12 +309,22 @@ interface Codec {
     }
 
     @JvmDefault
+    fun hmacDigestMd5(key: CharSequence): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_MD5)
+    }
+
+    @JvmDefault
     fun hmacDigestSha1(key: SecretKey): Codec {
         return hmacDigest(key, CodecAlgorithm.HMAC_SHA1)
     }
 
     @JvmDefault
     fun hmacDigestSha1(key: ByteArray): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA1)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha1(key: CharSequence): Codec {
         return hmacDigest(key, CodecAlgorithm.HMAC_SHA1)
     }
 
@@ -266,12 +339,22 @@ interface Codec {
     }
 
     @JvmDefault
+    fun hmacDigestSha256(key: CharSequence): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA256)
+    }
+
+    @JvmDefault
     fun hmacDigestSha384(key: SecretKey): Codec {
         return hmacDigest(key, CodecAlgorithm.HMAC_SHA384)
     }
 
     @JvmDefault
     fun hmacDigestSha384(key: ByteArray): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA384)
+    }
+
+    @JvmDefault
+    fun hmacDigestSha384(key: CharSequence): Codec {
         return hmacDigest(key, CodecAlgorithm.HMAC_SHA384)
     }
 
@@ -286,12 +369,22 @@ interface Codec {
     }
 
     @JvmDefault
+    fun hmacDigestSha512(key: CharSequence): Codec {
+        return hmacDigest(key, CodecAlgorithm.HMAC_SHA512)
+    }
+
+    @JvmDefault
     fun encryptRsa(publicKey: RSAPublicKey): Codec {
         return encrypt(publicKey, CodecAlgorithm.RSA)
     }
 
     @JvmDefault
     fun encryptRsa(publicKey: ByteArray): Codec {
+        return encrypt(publicKey, CodecAlgorithm.RSA)
+    }
+
+    @JvmDefault
+    fun encryptRsa(publicKey: CharSequence): Codec {
         return encrypt(publicKey, CodecAlgorithm.RSA)
     }
 
@@ -306,6 +399,11 @@ interface Codec {
     }
 
     @JvmDefault
+    fun decryptRsa(privateKey: CharSequence): Codec {
+        return decrypt(privateKey, CodecAlgorithm.RSA)
+    }
+
+    @JvmDefault
     fun encryptSm2(publicKey: ECPoint): Codec {
         return encrypt(publicKey, CodecAlgorithm.SM2)
     }
@@ -316,12 +414,22 @@ interface Codec {
     }
 
     @JvmDefault
+    fun encryptSm2(publicKey: CharSequence): Codec {
+        return encrypt(publicKey, CodecAlgorithm.SM2)
+    }
+
+    @JvmDefault
     fun decryptSm2(privateKey: BigInteger): Codec {
         return decrypt(privateKey, CodecAlgorithm.SM2)
     }
 
     @JvmDefault
     fun decryptSm2(privateKey: ByteArray): Codec {
+        return decrypt(privateKey, CodecAlgorithm.SM2)
+    }
+
+    @JvmDefault
+    fun decryptSm2(privateKey: CharSequence): Codec {
         return decrypt(privateKey, CodecAlgorithm.SM2)
     }
 
@@ -346,32 +454,12 @@ interface Codec {
 
         @JvmStatic
         fun forData(data: ByteArray): Codec {
-            return CodecImpl(data)
+            return CommonCodec(data)
         }
 
         @JvmStatic
         fun forData(data: CharSequence): Codec {
-            return CodecImpl(data.toBytes())
-        }
-
-        @JvmStatic
-        fun secretKey(key: ByteArray, algorithm: String): SecretKey {
-            return key.toSecretKey(algorithm)
-        }
-
-        @JvmStatic
-        fun secretKey(key: CharSequence, algorithm: String): SecretKey {
-            return key.toSecretKey(algorithm)
-        }
-
-        @JvmStatic
-        fun secretKey(key: ByteArray, algorithm: CodecAlgorithm): SecretKey {
-            return key.toSecretKey(algorithm.name)
-        }
-
-        @JvmStatic
-        fun secretKey(key: CharSequence, algorithm: CodecAlgorithm): SecretKey {
-            return key.toSecretKey(algorithm.name)
+            return CommonCodec(data.toBytes())
         }
 
         @JvmStatic
@@ -455,7 +543,7 @@ interface Codec {
         }
 
         @JvmStatic
-        fun aesCipher(): SecretKeySymmetricCipher {
+        fun aesCipher(): SymmetricCipher<SecretKey> {
             return symmetricCipher(CodecAlgorithm.AES)
         }
 
@@ -556,7 +644,7 @@ interface Codec {
     }
 }
 
-class CodecImpl(private var data: ByteArray) : Codec {
+open class CommonCodec(private var data: ByteArray) : Codec {
 
     override fun encode(algorithm: CodecAlgorithm): Codec {
         data = getEncoder(algorithm).encode(data)
@@ -612,6 +700,7 @@ class CodecImpl(private var data: ByteArray) : Codec {
                 when (key) {
                     is RSAPublicKey -> Codec.rsaCipher().encrypt(key, data)
                     is ByteArray -> Codec.rsaCipher().encrypt(key, data)
+                    is CharSequence -> Codec.rsaCipher().encrypt(key, data)
                     else -> throw CodecAlgorithmNotFound(algorithm)
                 }
             }
@@ -619,6 +708,7 @@ class CodecImpl(private var data: ByteArray) : Codec {
                 when (key) {
                     is ECPoint -> Codec.sm2Cipher().encrypt(key, data)
                     is ByteArray -> Codec.sm2Cipher().encrypt(key, data)
+                    is CharSequence -> Codec.sm2Cipher().encrypt(key, data)
                     else -> throw CodecAlgorithmNotFound(algorithm)
                 }
             }
@@ -631,6 +721,9 @@ class CodecImpl(private var data: ByteArray) : Codec {
                         Codec.symmetricCipher(algorithm).encrypt(key, data)
                     }
                     is ByteArray -> {
+                        Codec.symmetricCipher(algorithm).encrypt(key, data)
+                    }
+                    is CharSequence -> {
                         Codec.symmetricCipher(algorithm).encrypt(key, data)
                     }
                     else -> throw CodecAlgorithmNotFound(algorithm)
@@ -676,6 +769,7 @@ class CodecImpl(private var data: ByteArray) : Codec {
                 when (key) {
                     is RSAPrivateKey -> Codec.rsaCipher().decrypt(key, data)
                     is ByteArray -> Codec.rsaCipher().decrypt(key, data)
+                    is CharSequence -> Codec.rsaCipher().decrypt(key, data)
                     else -> throw CodecAlgorithmNotFound(algorithm)
                 }
             }
@@ -683,6 +777,7 @@ class CodecImpl(private var data: ByteArray) : Codec {
                 when (key) {
                     is BigInteger -> Codec.sm2Cipher().decrypt(key, data)
                     is ByteArray -> Codec.sm2Cipher().decrypt(key, data)
+                    is CharSequence -> Codec.sm2Cipher().decrypt(key, data)
                     else -> throw CodecAlgorithmNotFound(algorithm)
                 }
             }
@@ -695,6 +790,9 @@ class CodecImpl(private var data: ByteArray) : Codec {
                         Codec.symmetricCipher(algorithm).decrypt(key, data)
                     }
                     is ByteArray -> {
+                        Codec.symmetricCipher(algorithm).decrypt(key, data)
+                    }
+                    is CharSequence -> {
                         Codec.symmetricCipher(algorithm).decrypt(key, data)
                     }
                     else -> throw CodecAlgorithmNotFound(algorithm)
@@ -725,6 +823,9 @@ class CodecImpl(private var data: ByteArray) : Codec {
                 Codec.hmacDigestCipher(algorithm).digest(key, data)
             }
             is ByteArray -> {
+                Codec.hmacDigestCipher(algorithm).digest(key, data)
+            }
+            is CharSequence -> {
                 Codec.hmacDigestCipher(algorithm).digest(key, data)
             }
             else -> throw CodecAlgorithmNotFound(algorithm)

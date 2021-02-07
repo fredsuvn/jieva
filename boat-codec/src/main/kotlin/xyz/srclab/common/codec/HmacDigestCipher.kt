@@ -12,6 +12,8 @@ import javax.crypto.SecretKey
  *
  * @param [K] secret key
  * @author sunqian
+ *
+ * @see SecretKeyHmacDigestCipher
  */
 interface HmacDigestCipher<K> : CodecCipher {
 
@@ -25,13 +27,25 @@ interface HmacDigestCipher<K> : CodecCipher {
     fun digest(key: K, data: ByteArray): ByteArray
 
     /**
-     * Digests data by given secret key bytes.
+     * Digests data by given secret key.
      *
-     * @param key given secret key bytes
+     * @param key given secret key
      * @param data     data
      * @return digested data
      */
     fun digest(key: ByteArray, data: ByteArray): ByteArray
+
+    /**
+     * Digests data by given secret key.
+     *
+     * @param key given secret key
+     * @param data     data
+     * @return digested data
+     */
+    @JvmDefault
+    fun digest(key: CharSequence, data: ByteArray): ByteArray {
+        return digest(key.toBytes(), data)
+    }
 
     /**
      * Digests data by given secret key.
@@ -46,14 +60,26 @@ interface HmacDigestCipher<K> : CodecCipher {
     }
 
     /**
-     * Digests data by given secret key bytes.
+     * Digests data by given secret key.
      *
-     * @param key given secret key bytes
+     * @param key given secret key
      * @param data     data
      * @return digested data
      */
     @JvmDefault
     fun digest(key: ByteArray, data: CharSequence): ByteArray {
+        return digest(key, data.toBytes())
+    }
+
+    /**
+     * Digests data by given secret key.
+     *
+     * @param key given secret key
+     * @param data     data
+     * @return digested data
+     */
+    @JvmDefault
+    fun digest(key: CharSequence, data: CharSequence): ByteArray {
         return digest(key, data.toBytes())
     }
 
@@ -70,9 +96,33 @@ interface HmacDigestCipher<K> : CodecCipher {
     }
 
     /**
-     * Digests data by given secret key bytes.
+     * Digests data by given secret key.
      *
-     * @param key given secret key bytes
+     * @param key given secret key
+     * @param data     data
+     * @return digested data as string
+     */
+    @JvmDefault
+    fun digestToString(key: ByteArray, data: ByteArray): String {
+        return digest(key, data).toChars()
+    }
+
+    /**
+     * Digests data by given secret key.
+     *
+     * @param key given secret key
+     * @param data     data
+     * @return digested data as string
+     */
+    @JvmDefault
+    fun digestToString(key: CharSequence, data: ByteArray): String {
+        return digest(key, data).toChars()
+    }
+
+    /**
+     * Digests data by given secret key.
+     *
+     * @param key given secret key
      * @param data     data
      * @return digested data as string
      */
@@ -94,14 +144,14 @@ interface HmacDigestCipher<K> : CodecCipher {
     }
 
     /**
-     * Digests data by given secret key bytes.
+     * Digests data by given secret key.
      *
-     * @param key given secret key bytes
-     * @param data     data
+     * @param key  given secret key
+     * @param data data
      * @return digested data as string
      */
     @JvmDefault
-    fun digestToString(key: ByteArray, data: ByteArray): String {
+    fun digestToString(key: CharSequence, data: CharSequence): String {
         return digest(key, data).toChars()
     }
 
@@ -118,14 +168,26 @@ interface HmacDigestCipher<K> : CodecCipher {
     }
 
     /**
-     * Digests data by given secret key bytes.
+     * Digests data by given secret key.
      *
-     * @param key given secret key bytes
+     * @param key given secret key
      * @param data     data
      * @return hex string encoded by digested data
      */
     @JvmDefault
     fun digestToHexString(key: ByteArray, data: ByteArray): String {
+        return digest(key, data).encodeHexString()
+    }
+
+    /**
+     * Digests data by given secret key.
+     *
+     * @param key given secret key
+     * @param data     data
+     * @return hex string encoded by digested data
+     */
+    @JvmDefault
+    fun digestToHexString(key: CharSequence, data: ByteArray): String {
         return digest(key, data).encodeHexString()
     }
 
@@ -142,14 +204,26 @@ interface HmacDigestCipher<K> : CodecCipher {
     }
 
     /**
-     * Digests data by given secret key bytes.
+     * Digests data by given secret key.
      *
-     * @param key given secret key bytes
+     * @param key given secret key
      * @param data     data
      * @return hex string encoded by digested data
      */
     @JvmDefault
     fun digestToHexString(key: ByteArray, data: CharSequence): String {
+        return digest(key, data).encodeHexString()
+    }
+
+    /**
+     * Digests data by given secret key.
+     *
+     * @param key given secret key
+     * @param data     data
+     * @return hex string encoded by digested data
+     */
+    @JvmDefault
+    fun digestToHexString(key: CharSequence, data: CharSequence): String {
         return digest(key, data).encodeHexString()
     }
 
@@ -166,14 +240,26 @@ interface HmacDigestCipher<K> : CodecCipher {
     }
 
     /**
-     * Digests data by given secret key bytes.
+     * Digests data by given secret key.
      *
-     * @param key given secret key bytes
+     * @param key given secret key
      * @param data     data
      * @return base64 string encoded by digested data
      */
     @JvmDefault
     fun digestToBase64String(key: ByteArray, data: ByteArray): String {
+        return digest(key, data).encodeBase64String()
+    }
+
+    /**
+     * Digests data by given secret key.
+     *
+     * @param key given secret key
+     * @param data     data
+     * @return base64 string encoded by digested data
+     */
+    @JvmDefault
+    fun digestToBase64String(key: CharSequence, data: ByteArray): String {
         return digest(key, data).encodeBase64String()
     }
 
@@ -190,14 +276,26 @@ interface HmacDigestCipher<K> : CodecCipher {
     }
 
     /**
-     * Digests data by given secret key bytes.
+     * Digests data by given secret key.
      *
-     * @param key given secret key bytes
+     * @param key given secret key
      * @param data     data
      * @return base64 string encoded by digested data
      */
     @JvmDefault
     fun digestToBase64String(key: ByteArray, data: CharSequence): String {
+        return digest(key, data).encodeBase64String()
+    }
+
+    /**
+     * Digests data by given secret key.
+     *
+     * @param key given secret key
+     * @param data     data
+     * @return base64 string encoded by digested data
+     */
+    @JvmDefault
+    fun digestToBase64String(key: CharSequence, data: CharSequence): String {
         return digest(key, data).encodeBase64String()
     }
 
@@ -215,7 +313,7 @@ interface HmacDigestCipher<K> : CodecCipher {
     }
 }
 
-class SecretKeyHmacDigestCipher(private val algorithm: String) : HmacDigestCipher<SecretKey> {
+open class SecretKeyHmacDigestCipher(private val algorithm: String) : HmacDigestCipher<SecretKey> {
 
     override val name = algorithm
 
@@ -230,6 +328,6 @@ class SecretKeyHmacDigestCipher(private val algorithm: String) : HmacDigestCiphe
     }
 
     override fun digest(key: ByteArray, data: ByteArray): ByteArray {
-        return digest(Codec.secretKey(key, algorithm), data)
+        return digest(key.toSecretKey(algorithm), data)
     }
 }

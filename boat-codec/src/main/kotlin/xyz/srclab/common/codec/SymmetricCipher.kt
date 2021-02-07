@@ -8,6 +8,8 @@ import javax.crypto.SecretKey
  *
  * @param [K] secret key
  * @author sunqian
+ *
+ * @see SecretKeySymmetricCipher
  */
 interface SymmetricCipher<K> : ReversibleCipher<K, K> {
 
@@ -25,7 +27,7 @@ interface SymmetricCipher<K> : ReversibleCipher<K, K> {
     }
 }
 
-class SecretKeySymmetricCipher(private val algorithm: String) : SymmetricCipher<SecretKey> {
+open class SecretKeySymmetricCipher(private val algorithm: String) : SymmetricCipher<SecretKey> {
 
     override val name = algorithm
 
@@ -40,7 +42,7 @@ class SecretKeySymmetricCipher(private val algorithm: String) : SymmetricCipher<
     }
 
     override fun encrypt(encryptKey: ByteArray, data: ByteArray): ByteArray {
-        return encrypt(Codec.secretKey(encryptKey, algorithm), data)
+        return encrypt(encryptKey.toSecretKey(algorithm), data)
     }
 
     override fun decrypt(decryptKey: SecretKey, encrypted: ByteArray): ByteArray {
@@ -54,6 +56,6 @@ class SecretKeySymmetricCipher(private val algorithm: String) : SymmetricCipher<
     }
 
     override fun decrypt(decryptKey: ByteArray, encrypted: ByteArray): ByteArray {
-        return decrypt(Codec.secretKey(decryptKey, algorithm), encrypted)
+        return decrypt(decryptKey.toSecretKey(algorithm), encrypted)
     }
 }

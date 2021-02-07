@@ -6,6 +6,7 @@ package xyz.srclab.common.codec
  * @param [PUB] public key
  * @param [PRI] private key
  * @author sunqian
+ *
  * @see xyz.srclab.common.codec.rsa.RsaCipher
  * @see xyz.srclab.common.codec.sm2.Sm2Cipher
  */

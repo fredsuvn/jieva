@@ -7,6 +7,10 @@ import xyz.srclab.common.base.toChars
 import xyz.srclab.common.codec.Codec.Companion.encodeBase64String
 import xyz.srclab.common.codec.Codec.Companion.encodeHexString
 
+/**
+ * @see HexEncodeCipher
+ * @see Base64EncodeCipher
+ */
 interface EncodeCipher : CodecCipher {
 
     fun encode(data: ByteArray): ByteArray
