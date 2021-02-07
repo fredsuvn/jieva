@@ -1,7 +1,6 @@
 package sample.xyz.srclab.common.convert;
 
 import org.testng.annotations.Test;
-import sample.xyz.srclab.common.bean.BeanSample;
 import xyz.srclab.common.convert.Converts;
 import xyz.srclab.common.test.TestLogger;
 
@@ -15,7 +14,7 @@ public class ConvertSample {
         //123
         logger.log("s: {}", s);
 
-        BeanSample.A a = new BeanSample.A();
+        A a = new A();
         a.setP1("1");
         a.setP2("2");
         B b = Converts.convert(a, B.class);
