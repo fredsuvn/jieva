@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.run.Runner;
 import xyz.srclab.common.test.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -18,10 +19,23 @@ public class TesterTest {
     private static final Random random = new Random();
 
     @Test
+    public void testTests() {
+        Assert.assertTrue(Tests.equalsIgnoreOrder(Arrays.asList(1, 2, 3), Arrays.asList(3, 2, 1)));
+        Assert.assertFalse(Tests.equalsIgnoreOrder(Arrays.asList(1, 2, 3), Arrays.asList(3, 2, 1, 0)));
+    }
+
+    @Test
     public void testTester() {
         TestMarker testMarker = TestMarker.newTestMarker();
-        Tester.testTasks(
+        Tests.testTasks(
                 Runner.ASYNC_RUNNER,
+                Arrays.asList(
+                        newTask("task1", testMarker),
+                        newTask("task2", testMarker),
+                        newTask("task3", testMarker),
+                        newTask("task4", testMarker),
+                        newTask("task5", testMarker)
+                ),
                 new TestListener() {
 
                     @Override
@@ -54,12 +68,7 @@ public class TesterTest {
                         Assert.assertTrue(testResult.averageCost().toMillis() >= average);
                         Assert.assertTrue(testResult.awaitCost().toMillis() >= max);
                     }
-                },
-                newTask("task1", testMarker),
-                newTask("task2", testMarker),
-                newTask("task3", testMarker),
-                newTask("task4", testMarker),
-                newTask("task5", testMarker)
+                }
         );
     }
 

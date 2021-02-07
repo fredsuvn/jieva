@@ -4,6 +4,9 @@ import xyz.srclab.common.base.asAny
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
+/**
+ * To mark values into third party.
+ */
 interface TestMarker {
 
     @JvmDefault

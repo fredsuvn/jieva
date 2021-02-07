@@ -7,6 +7,9 @@ import xyz.srclab.common.base.Format.Companion.printfFormat
 import xyz.srclab.common.base.asAny
 import java.io.PrintStream
 
+/**
+ * Logger for test.
+ */
 interface TestLogger {
 
     fun log(message: Any?)

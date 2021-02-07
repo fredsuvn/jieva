@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.bean.Beans;
 import xyz.srclab.common.test.TestLogger;
 import xyz.srclab.common.test.TestTask;
-import xyz.srclab.common.test.Tester;
+import xyz.srclab.common.test.Tests;
 
 /**
  * @author sunqian
@@ -51,7 +51,7 @@ public class BeanPerformanceTest {
         a.setI7(7);
         a.setI8(8);
         long times = 50000000;
-        Tester.testTasksParallel(
+        Tests.testTasksParallel(
                 TestTask.newTask("BeanKit", times, () -> {
                     PerformanceBean b = new PerformanceBean();
                     Beans.copyProperties(a, b);

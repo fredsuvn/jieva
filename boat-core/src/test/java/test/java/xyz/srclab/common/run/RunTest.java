@@ -58,7 +58,7 @@ public class RunTest {
 
     @Test
     public void testScheduledRunSync() {
-        ScheduledRunner runner = ScheduledRunner.NEW_THREAD_RUNNER;
+        ScheduledRunner runner = ScheduledRunner.SINGLE_THREAD_RUNNER;
         doTestScheduledRunSync(runner);
     }
 
