@@ -8,6 +8,8 @@ import xyz.srclab.common.base.asAny
  * @author sunqian
  *
  * @see StringIdSpec
+ * @see AbstractIdFactory
+ * @see StringIdFactory
  */
 interface IdFactory<T> {
 

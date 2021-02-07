@@ -7,6 +7,9 @@ import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
  *
  * @param [E] component type
  * @author sunqian
+ *
+ * @see ConstantComponentGenerator
+ * @see TimeCountComponentGenerator
  */
 interface IdComponentGenerator<E> {
 
