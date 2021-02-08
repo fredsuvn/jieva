@@ -14,7 +14,7 @@ v1.0.0, 2020-04-12
 |2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|重构
 |===
 
-Boat是一组Java/Kotlin核心库集合（JDK 1.8+），主要由Kotlin编写，广泛应用于SrcLab里的项目，当然，也可以在其他项目中使用。
+Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于SrcLab里的项目, 当然, 也可以在其他项目中使用.
 
 Boat包括:
 
@@ -25,9 +25,9 @@ Boat包括:
 * *boat-id*: 一个轻量级id生成框架;
 * *boat-test*: 辅助引入测试库.
 
-If you want to import all above modules, just import:
+如果你需要引入以上全部, 只需要:
 
-* *boat-all*: import all above modules.
+* *boat-all*: 引入以上所有模块.
 
 == 获取
 
@@ -87,7 +87,7 @@ https://github.com/srclab-projects/boat
 * *OutParam*/*OutReturn*: 指定参数可以被修改并返回;
 * *Immutable*: 指定被注释的对象是不可变并且线程安全的;
 * *ThreadSafe*: 指定被注释的对象是线程安全的;
-* *ThreadSafeDependOn*: 指定被注释的对象本身是线程安全的，但是其依赖了第三方对象，最终是否线程安全需要看被依赖的对象;
+* *ThreadSafeDependOn*: 指定被注释的对象本身是线程安全的, 但是其依赖了第三方对象, 最终是否线程安全需要看被依赖的对象;
 * *PossibleTypes*: 指定实际类型在PossibleTypes所指定的类型范围内.
 
 [#usage-core]
@@ -563,7 +563,7 @@ class BaseSampleKt {
 Bean包提供强大的bean操作能力:
 
 * Beans: bean操作工具类;
-* BeanResolver: bean解析接口，Beans使用其默认实现;
+* BeanResolver: bean解析接口, Beans使用其默认实现;
 
 ===== Java Examples
 
@@ -996,7 +996,7 @@ class ConvertSampleKt {
 [#usage-core-exception]
 ==== Exception
 
-Exception包提供StatusException和ExceptionStatus，继承自State (参考 <<usage-core-state>>), 还有一个ShouldNotException.
+Exception包提供StatusException和ExceptionStatus, 继承自State (参考 <<usage-core-state>>), 还有一个ShouldNotException.
 
 ===== Java Examples
 
@@ -1130,7 +1130,7 @@ class JvmSampleKt {
 [#usage-core-proxy]
 ==== Proxy
 
-Proxy提供类代理功能，底层使用spring-cglib, cglib或者JDK proxy.
+Proxy提供类代理功能, 底层使用spring-cglib, cglib或者JDK proxy.
 
 ===== Java Examples
 
@@ -1286,7 +1286,7 @@ class ReflectSampleKt {
 [#usage-core-run]
 ==== Run
 
-Run包提供Runner和ScheduledRunner接口来运行一段代码，可以在一个线程或者协程里.
+Run包提供Runner和ScheduledRunner接口来运行一段代码, 可以在一个线程或者协程里.
 
 ===== Java Examples
 
