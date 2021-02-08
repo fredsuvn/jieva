@@ -1,0 +1,21 @@
+plugins {
+  id 'build.kotlin-publish-platform'
+}
+
+description = "boat-bom: BOM of boat projects."
+
+def dependenciesVersion = "1.1.1"
+
+javaPlatform {
+  allowDependencies()
+}
+
+dependencies {
+  api platform("xyz.srclab.bom:srclab-dependencies:$dependenciesVersion")
+
+  constraints {
+    file("${rootDir}").eachDirMatch(~/boat-.*/) { file ->
+      api(project(":${file.name}"))
+    }
+  }
+}

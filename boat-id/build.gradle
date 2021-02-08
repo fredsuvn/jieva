@@ -1,0 +1,24 @@
+plugins {
+  id 'build.kotlin-publish-jar'
+}
+
+description = "Boat Id: id generators."
+
+java {
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
+}
+
+dependencies {
+  implementation(platform(project(":boat-bom")))
+
+  api(project(":boat-core"))
+
+  testCompile(project(":boat-test"))
+}
+
+test {
+  useTestNG()
+  include("**/*Test.class", "**/*TestKt.class")
+}

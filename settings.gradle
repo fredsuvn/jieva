@@ -1,27 +1,16 @@
 pluginManagement {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    plugins {
-        id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
-    }
+  repositories {
+    gradlePluginPortal()
+    jcenter()
+  }
+  plugins {
+    id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
+  }
 }
 
-rootProject.name = 'easy-starter-build'
+rootProject.name = 'boat-build'
 
-// bom file
-include ":easy-bom"
-// easy-projects
-file("${rootDir}/easy-projects").eachDirMatch(~/easy-.*/) { file ->
-    include ":easy-projects:${file.name}"
-}
-// easy-starters
-file("${rootDir}/easy-starters").eachDirMatch(~/easy-.*/) { file ->
-    include ":easy-starters:${file.name}"
-}
-// samples
-file("${rootDir}/easy-samples").eachDirMatch(~/easy-.*/) { file ->
-    include ":easy-samples:${file.name}"
+//Including boat projects
+file("${rootDir}/").eachDirMatch(~/boat-.*/) { file ->
+  include ":${file.name}"
 }

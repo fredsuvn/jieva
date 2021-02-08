@@ -1,0 +1,25 @@
+plugins {
+  id 'org.jetbrains.kotlin.jvm'
+}
+
+println "${infos.logPrefix} ${project.name}: import kotlin-compile"
+
+//sourceSets {
+//  main.kotlin.srcDirs += ['src/main/kotlin', 'src/main/java']
+//  main.java.srcDirs += ['src/main/kotlin', 'src/main/java']
+//  test.kotlin.srcDirs += ['src/test/kotlin', 'src/test/java']
+//  test.java.srcDirs += ['src/test/kotlin', 'src/test/java']
+//}
+
+compileKotlin {
+  kotlinOptions {
+    jvmTarget = "${javaVersion}"
+    freeCompilerArgs = ['-Xjvm-default=enable']
+  }
+}
+compileTestKotlin {
+  kotlinOptions {
+    jvmTarget = "${javaVersion}"
+    freeCompilerArgs = ['-Xjvm-default=enable']
+  }
+}

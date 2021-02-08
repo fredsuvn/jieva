@@ -1,0 +1,6 @@
+plugins {
+  id 'build.utils'
+  id 'build.infos'
+  id 'build.repositories'
+  id 'build.passwords'
+}

@@ -1,0 +1,107 @@
+plugins {
+  id 'build.common'
+  id 'build.kotlin-compile'
+  id 'org.jetbrains.dokka'
+  id 'maven-publish'
+  id 'signing'
+}
+
+println "${infos.logPrefix} ${project.name}: import kotlin-publish-jar"
+
+task sourceJar(type: Jar) {
+  classifier "sources"
+  from sourceSets.main.allSource
+}
+
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//  classifier "javadoc"
+//  from javadoc.destinationDir
+//}
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc {
+  outputDirectory = javadoc.destinationDir
+}) {
+  classifier "javadoc"
+  from javadoc.destinationDir
+}
+
+artifacts {
+  archives jar
+  archives sourceJar
+  archives javadocJar
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      from components.java
+
+      artifact(sourceJar) {
+        classifier = 'sources'
+      }
+
+      artifact(javadocJar) {
+        classifier = 'javadoc'
+      }
+
+      pom {
+        name = project.name
+        description = project.description
+        url = infos.url
+        inceptionYear = infos.inceptionYear
+        licenses {
+          infos.licenses.forEach { each ->
+            license {
+              name = each.name
+              url = each.url
+            }
+          }
+        }
+        scm {
+          connection = "scm:git:${infos.url}.git"
+          developerConnection = "scm:git:${infos.url}.git"
+          url = infos.url
+        }
+        developers {
+          infos.developers.forEach { each ->
+            developer {
+              email = each.email
+            }
+          }
+        }
+      }
+    }
+  }
+
+  repositories {
+    mavenLocal()
+    if (infos.sonatype) {
+      maven {
+        name = "sonatype"
+        url = infos.oss.staging
+        credentials {
+          username = "${passwords.sonatype.username}"
+          password = "${passwords.sonatype.password}"
+        }
+      }
+      if (infos.snapshot) {
+        maven {
+          name = "sonatypeSnapshot"
+          url = infos.oss.snapshot
+          credentials {
+            username = "${passwords.sonatype.username}"
+            password = "${passwords.sonatype.password}"
+          }
+        }
+      }
+    }
+  }
+
+  if (infos.signing) {
+    ext."signing.keyId" = passwords.signing.keyId
+    ext."signing.password" = passwords.signing.password
+    ext."signing.secretKeyRingFile" = passwords.signing.secretKeyRingFile
+    signing {
+      sign publishing.publications.maven
+    }
+  }
+}

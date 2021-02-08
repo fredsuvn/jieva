@@ -1,6 +1,0 @@
-compileKotlin {
-    kotlinOptions.jvmTarget = "${javaVersion}"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "${javaVersion}"
-}

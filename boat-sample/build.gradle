@@ -1,0 +1,25 @@
+plugins {
+  id 'build.kotlin-sample'
+}
+
+description = "Boat Sample: boat projects' samples."
+
+java {
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
+}
+
+dependencies {
+  implementation(platform(project(":boat-bom")))
+
+  api(project(":boat-all"))
+  testCompile("cglib:cglib")
+
+  testCompile(project(":boat-test"))
+}
+
+test {
+  useTestNG()
+  include("**/*Sample.class", "**/*SampleKt.class")
+}

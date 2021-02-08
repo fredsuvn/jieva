@@ -1,0 +1,27 @@
+plugins {
+  id 'build.kotlin-publish-jar'
+}
+
+description = "Happy Eggy!"
+
+java {
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
+}
+
+dependencies {
+  implementation(platform(project(":boat-bom")))
+
+  implementation(project(":boat-core"))
+  implementation(project(":boat-codec"))
+  implementation(project(":boat-serialize"))
+  implementation(project(":boat-id"))
+
+  testCompile(project(":boat-test"))
+}
+
+test {
+  useTestNG()
+  include("**/*Test.class", "**/*TestKt.class")
+}

@@ -1,0 +1,77 @@
+plugins {
+  id 'build.common'
+  //id 'build.kotlin-compile'
+  id 'maven-publish'
+  id 'java-platform'
+  id 'signing'
+}
+
+println "${infos.logPrefix} ${project.name}: import kotlin-publish-platform"
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      from components.javaPlatform
+
+      pom {
+        name = project.name
+        description = project.description
+        url = infos.url
+        inceptionYear = infos.inceptionYear
+        licenses {
+          infos.licenses.forEach { each ->
+            license {
+              name = each.name
+              url = each.url
+            }
+          }
+        }
+        scm {
+          connection = "scm:git:${infos.url}.git"
+          developerConnection = "scm:git:${infos.url}.git"
+          url = infos.url
+        }
+        developers {
+          infos.developers.forEach { each ->
+            developer {
+              email = each.email
+            }
+          }
+        }
+      }
+    }
+  }
+
+  repositories {
+    mavenLocal()
+    if (infos.sonatype) {
+      maven {
+        name = "sonatype"
+        url = infos.oss.staging
+        credentials {
+          username = "${passwords.sonatype.username}"
+          password = "${passwords.sonatype.password}"
+        }
+      }
+      if (infos.snapshot) {
+        maven {
+          name = "sonatypeSnapshot"
+          url = infos.oss.snapshot
+          credentials {
+            username = "${passwords.sonatype.username}"
+            password = "${passwords.sonatype.password}"
+          }
+        }
+      }
+    }
+  }
+
+  if (infos.signing) {
+    ext."signing.keyId" = passwords.signing.keyId
+    ext."signing.password" = passwords.signing.password
+    ext."signing.secretKeyRingFile" = passwords.signing.secretKeyRingFile
+    signing {
+      sign publishing.publications.maven
+    }
+  }
+}

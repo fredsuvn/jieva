@@ -1,0 +1,26 @@
+plugins {
+  id 'build.kotlin-publish-jar'
+}
+
+description = "Boat Codec: codec processors."
+
+java {
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
+}
+
+dependencies {
+  implementation(platform(project(":boat-bom")))
+
+  api(project(":boat-core"))
+  api("commons-codec:commons-codec")
+  api("org.bouncycastle:bcprov-jdk15on")
+
+  testCompile(project(":boat-test"))
+}
+
+test {
+  useTestNG()
+  include("**/*Test.class", "**/*TestKt.class")
+}

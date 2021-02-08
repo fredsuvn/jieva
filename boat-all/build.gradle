@@ -1,0 +1,21 @@
+plugins {
+  id 'build.kotlin-publish-jar'
+}
+
+description = "Boat: base and common tools."
+
+java {
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
+}
+
+dependencies {
+  implementation(platform(project(":boat-bom")))
+
+  api(project(":boat-core"))
+  api(project(":boat-codec"))
+  api(project(":boat-serialize"))
+  api(project(":boat-id"))
+  api(project(":boat-egg"))
+}

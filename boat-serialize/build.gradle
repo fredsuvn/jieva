@@ -1,0 +1,28 @@
+plugins {
+  id 'build.kotlin-publish-jar'
+}
+
+description = "Boat Serialize: serialization and deserialization."
+
+java {
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
+}
+
+dependencies {
+  implementation(platform(project(":boat-bom")))
+
+  api(project(":boat-core"))
+  api("com.fasterxml.jackson.core:jackson-core")
+  api("com.fasterxml.jackson.core:jackson-databind")
+  api("com.fasterxml.jackson.core:jackson-annotations")
+  api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+  testCompile(project(":boat-test"))
+}
+
+test {
+  useTestNG()
+  include("**/*Test.class", "**/*TestKt.class")
+}

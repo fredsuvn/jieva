@@ -1,61 +1,31 @@
-description = "Easy for Common: Build"
-
-// Gradle files to be applied:
-ext {
-    gradles = [
-            repositories  : "${rootProject.rootDir}/buildSrc/repositories.gradle",
-            deployJar     : "${rootProject.rootDir}/buildSrc/deploy-jar.gradle",
-            deployPlatform: "${rootProject.rootDir}/buildSrc/deploy-platform.gradle",
-            compile       : "${rootProject.rootDir}/buildSrc/compile.gradle",
-            auth          : "${rootProject.rootDir}/buildSrc/auth.gradle",
-            config        : "${rootProject.rootDir}/buildSrc/config.gradle",
-    ]
+plugins {
+  id 'build.common'
 }
 
-apply from: gradles.config
+description = "Build for boat projects"
 
-ext {
-    isSnapshot = isTrue(config.snapshot)
+println "${infos.logPrefix} Build ${project.name}"
+
+allprojects { p ->
+  //Do for each project
+  processProject(p)
 }
 
-config.version = (isSnapshot ? "${version}-SNAPSHOT" : version)
-config.sampleVersion = (isSnapshot ? "${version}-SNAPSHOT" : version)
-version = config.version
-
-// Note in gradles.auth some personal setting should be implemented.
-apply from: gradles.auth
-
-allprojects { project ->
-    processProjectInfo(project)
-}
-
-subprojects { project ->
-}
+//subprojects { p ->
+//  //Do for each project
+//  processProject(p)
+//}
 
 tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+  options.encoding = "UTF-8"
 }
 
-def processProjectInfo(Project project) {
-    if (project == rootProject) {
-        // NOP
-    } else if (project.group.toString().startsWith("easy-starter-build.easy-starters")) {
-        project.group = config.starterGroup
-        project.version = config.version
-    } else if (project.group.toString().startsWith("easy-starter-build.easy-samples")) {
-        project.group = config.sampleGroup
-        project.version = config.sampleVersion
-    } else {
-        project.group = config.group
-        project.version = config.version
-    }
-    println("Configure ${project.group}:${project.name}:${project.version}")
-}
-
-static def isTrue(String string) {
-    return string != null && (
-            Boolean.parseBoolean(string)
-                    || string.equalsIgnoreCase("yes")
-                    || string.equalsIgnoreCase("1")
-    )
+def processProject(anyProject) {
+  anyProject.group = infos.group
+  anyProject.version = infos.version
+  if (anyProject == rootProject) {
+    println("${infos.logPrefix} Configure root project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+  } else {
+    println("${infos.logPrefix} Configure project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+  }
 }
