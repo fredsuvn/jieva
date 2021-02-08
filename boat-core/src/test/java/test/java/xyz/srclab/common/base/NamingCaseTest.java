@@ -52,5 +52,9 @@ public class NamingCaseTest {
                 NamingCase.UPPER_CAMEL.convertTo("upper@#$%Camel", NamingCase.LOWER_UNDERSCORE),
                 "upper_camel"
         );
+        Assert.assertEquals(
+                NamingCase.UPPER_CAMEL.convertTo("UpperCamel", NamingCase.CAPITALIZE_UNDERSCORE),
+                "Upper_Camel"
+        );
     }
 }

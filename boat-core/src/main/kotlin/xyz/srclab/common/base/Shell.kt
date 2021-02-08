@@ -12,6 +12,16 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Shell to run commands.
+ *
+ * @see SystemShell
+ * @see ShellProcess
+ * @see ShellIO
+ *
+ * @see ControlChars
+ * @see EscapeChars
+ * @see CsiChars
+ * @see SgrChars
+ * @see SgrParam
  */
 interface Shell : ShellIO {
 
@@ -59,6 +69,9 @@ interface Shell : ShellIO {
     }
 }
 
+/**
+ * Represents process called by [Shell]
+ */
 interface ShellProcess : ShellIO {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -128,6 +141,12 @@ interface ShellProcess : ShellIO {
     }
 }
 
+/**
+ * IO for shell operation.
+ *
+ * @see Shell
+ * @see ShellProcess
+ */
 interface ShellIO {
 
     @Suppress(INAPPLICABLE_JVM_NAME)

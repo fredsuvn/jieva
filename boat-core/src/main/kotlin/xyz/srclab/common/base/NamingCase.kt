@@ -4,7 +4,17 @@ import org.apache.commons.lang3.StringUtils
 import java.util.*
 
 /**
+ * Naming case.
  * @author sunqian
+ *
+ * @see LowerCamel
+ * @see UpperCamel
+ * @see LowerUnderscore
+ * @see UpperUnderscore
+ * @see CapitalizeUnderscore
+ * @see LowerHyphen
+ * @see UpperHyphen
+ * @see CapitalizeHyphen
  */
 interface NamingCase {
 
@@ -46,48 +56,72 @@ interface NamingCase {
     }
 }
 
+/**
+ * [NamingCase] with `lowerCamel` style.
+ */
 object LowerCamel : CamelCase() {
     override fun doFirst(first: CharSequence): String {
         return first.toString().decapitalize(Default.locale)
     }
 }
 
+/**
+ * [NamingCase] with `UpperCamel` style.
+ */
 object UpperCamel : CamelCase() {
     override fun doFirst(first: CharSequence): String {
         return first.toString().capitalize(Default.locale)
     }
 }
 
+/**
+ * [NamingCase] with `lower_underscore` style.
+ */
 object LowerUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
         return word.toString().toLowerCase(Default.locale)
     }
 }
 
+/**
+ * [NamingCase] with `UPPER_UNDERSCORE` style.
+ */
 object UpperUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
         return word.toString().toUpperCase(Default.locale)
     }
 }
 
+/**
+ * [NamingCase] with `Capitalize_Underscore` style.
+ */
 object CapitalizeUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
         return word.toString().toLowerCase(Default.locale).capitalize(Default.locale)
     }
 }
 
+/**
+ * [NamingCase] with `lower-hyphen` style.
+ */
 object LowerHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
         return word.toString().toLowerCase(Default.locale)
     }
 }
 
+/**
+ * [NamingCase] with `UPPER-HYPHEN` style.
+ */
 object UpperHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
         return word.toString().toUpperCase(Default.locale)
     }
 }
 
+/**
+ * [NamingCase] with `Capitalize-Hyphen` style.
+ */
 object CapitalizeHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
         return word.toString().toLowerCase(Default.locale).capitalize(Default.locale)

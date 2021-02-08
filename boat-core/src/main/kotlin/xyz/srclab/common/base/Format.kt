@@ -3,6 +3,13 @@ package xyz.srclab.common.base
 import org.slf4j.helpers.MessageFormatter as MessageFormatterSlf4j
 import java.text.MessageFormat as MessageFormatKt
 
+/**
+ * Format chars.
+ *
+ * @see FastFormat
+ * @see PrintfFormat
+ * @see MessageFormat
+ */
 interface Format {
 
     fun format(pattern: CharSequence, vararg args: Any?): String
@@ -35,6 +42,9 @@ interface Format {
     }
 }
 
+/**
+ * [Format] with slf4j style.
+ */
 object FastFormat : Format {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
@@ -56,6 +66,9 @@ object FastFormat : Format {
     }
 }
 
+/**
+ * [Format] with `System.out.printf` style.
+ */
 object PrintfFormat : Format {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
@@ -63,6 +76,9 @@ object PrintfFormat : Format {
     }
 }
 
+/**
+ * [Format] with `String.format` style.
+ */
 object MessageFormat : Format {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {

@@ -3,6 +3,13 @@ package xyz.srclab.common.base
 import java.time.ZonedDateTime
 import kotlin.text.toInt as toIntKt
 
+/**
+ * About info.
+ *
+ * @see Version
+ * @see Licence
+ * @see PoweredBy
+ */
 interface About {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -120,6 +127,13 @@ interface About {
     }
 }
 
+/**
+ * Version info.
+ *
+ * @see About
+ * @see Licence
+ * @see PoweredBy
+ */
 interface Version : Comparable<Version> {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -519,6 +533,13 @@ interface Version : Comparable<Version> {
     }
 }
 
+/**
+ * Licence info.
+ *
+ * @see About
+ * @see Version
+ * @see PoweredBy
+ */
 interface Licence {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -573,6 +594,13 @@ interface Licence {
     }
 }
 
+/**
+ * Powered by info.
+ *
+ * @see About
+ * @see Version
+ * @see Licence
+ */
 interface PoweredBy {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
