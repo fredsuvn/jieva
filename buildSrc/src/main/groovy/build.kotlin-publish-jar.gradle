@@ -1,7 +1,7 @@
 plugins {
   id 'build.common'
   id 'build.kotlin-compile'
-  id 'org.jetbrains.dokka'// version '1.4.30'
+  id 'org.jetbrains.dokka'
   id 'maven-publish'
   id 'signing'
 }
@@ -13,7 +13,13 @@ task sourceJar(type: Jar) {
   from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//  classifier "javadoc"
+//  from javadoc.destinationDir
+//}
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc {
+  outputDirectory = javadoc.destinationDir
+}) {
   classifier "javadoc"
   from javadoc.destinationDir
 }

@@ -1027,18 +1027,18 @@ inline fun <reified T> Iterable<T>.toTypedArray(): Array<T> {
 
 fun <T> Iterable<T>.toArray(): Array<Any?> {
     val list = this.asToList()
-    return JavaCollect.toArray(list)
+    return JavaCollects.toArray(list)
 }
 
 fun <T> Iterable<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
     val list = this.asToList()
-    return JavaCollect.toArray(list, generator(list.size))
+    return JavaCollects.toArray(list, generator(list.size))
 }
 
 fun <T> Iterable<T>.toArray(componentType: Class<*>): Array<T> {
     val list = this.asToList()
     val array: Array<T> = componentType.newArray(list.size).asAny()
-    return JavaCollect.toArray(list, array)
+    return JavaCollects.toArray(list, array)
 }
 
 fun <T, R> Iterable<T>.toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
@@ -2551,18 +2551,18 @@ inline fun <reified T> Sequence<T>.toTypedArray(): Array<T> {
 
 fun <T> Sequence<T>.toArray(): Array<Any?> {
     val list = this.toListKt()
-    return JavaCollect.toArray(list)
+    return JavaCollects.toArray(list)
 }
 
 fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
     val list = this.toListKt()
-    return JavaCollect.toArray(list, generator(list.size))
+    return JavaCollects.toArray(list, generator(list.size))
 }
 
 fun <T> Sequence<T>.toArray(componentType: Class<*>): Array<T> {
     val list = this.toListKt()
     val array: Array<T> = componentType.newArray(0).asAny()
-    return JavaCollect.toArray(list, array)
+    return JavaCollects.toArray(list, array)
 }
 
 fun <T, R> Sequence<T>.toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
