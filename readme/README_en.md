@@ -8,8 +8,8 @@
 
 |Date|Revision|Author|Content|
 |---|---|---|---|
-|2020-12-10|1.0.0|Sun Qian <fredsuvn@163.com>|New|
-|2020-12-10|{boat-version}|Sun Qian <fredsuvn@163.com>|Refactoring
+|2020-12-10|1.0.0|Sun Qian fredsuvn@163.com|New|
+|2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|Refactoring
 
 ## Introduction
 
@@ -1609,7 +1609,7 @@ class IdSampleKt {
 
 ## Contribution and Contact
 
-* <fredsuvn@163.com>
+* fredsuvn@163.com
 * https://github.com/srclab-projects/boat
 * QQ group: 1037555759
 
