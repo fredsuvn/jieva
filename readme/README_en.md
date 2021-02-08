@@ -31,15 +31,13 @@ If you want to import all above modules, just import:
 
 ### Gradle
 
-[source,subs="attributes+"]
-```
+```groovy
 implementation("xyz.srclab.common:boat-all:{boat-version}")
 ```
 
 ### Maven
 
-[source,subs="attributes+"]
-```
+```xml
 <dependency>
     <groupId>xyz.srclab.common</groupId>
     <artifactId>boat-all</artifactId>
@@ -53,7 +51,7 @@ https://github.com/srclab-projects/boat
 
 ## Usage
 
-- <<usage-annotations>>
+- [ssss](#usage-annotations)
 - <<usage-core>>
 * <<usage-core-base>>
 * <<usage-core-bean>>
@@ -73,8 +71,8 @@ https://github.com/srclab-projects/boat
 - <<usage-codec>>
 - <<usage-id>>
 
-[#usage-annotations]
-### Boat Annotations (boat-annotations)
+
+### <a name="usage-annotations"/>Boat Annotations (boat-annotations)
 
 Appropriate annotations can make codes clear and clean:
 
@@ -104,8 +102,7 @@ Base package provides base common utilities including:
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class BaseSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -350,8 +347,7 @@ public class BaseSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class BaseSampleKt {
 
     @Test
@@ -565,8 +561,7 @@ Bean package provides powerful bean operation ability:
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class BeanSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -631,8 +626,7 @@ public class BeanSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class BeanSampleKt {
 
     @Test
@@ -672,8 +666,7 @@ Bus package provide EventBus.
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class EventBusSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -722,19 +715,9 @@ public class EventBusSample {
 }
 ```
 
-Provides signature helper:
-
-[source]
-```
-    System.out.println(SignatureHelper.signClass(A.class));
-```
-
-There are also *TypeHelper*, *MethodHelper*, *InvokerHelper*, *InstanceHelper* , etc. in the reflect package.
-
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class EventBusSampleKt {
 
     @Test
@@ -797,8 +780,7 @@ Boat provides a Cache interface and several implementations:
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class CacheSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -817,8 +799,7 @@ public class CacheSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class CacheSampleKt {
 
     @Test
@@ -844,8 +825,7 @@ Collect package provides utilities classes Collects for Iterable types and Array
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class CollectSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -886,8 +866,7 @@ Convert package provides type-conversion function：
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class ConvertSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -954,8 +933,7 @@ public class ConvertSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class ConvertSampleKt {
 
     @Test
@@ -998,8 +976,7 @@ Exception package provides StatusException and ExceptionStatus extended from Sta
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class ExceptionSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1022,8 +999,7 @@ public class ExceptionSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class ExceptionSampleKt {
 
     @Test
@@ -1048,8 +1024,7 @@ Invoke package provides Invoker interface to call methods (for Java) and functio
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class InvokeSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1066,8 +1041,7 @@ public class InvokeSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class InvokeSampleKt {
 
     @Test
@@ -1091,8 +1065,7 @@ Jvm package provides Jvms utilities classes to get JVM infos.
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class JvmSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1108,8 +1081,7 @@ public class JvmSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class JvmSampleKt {
 
     @Test
@@ -1132,8 +1104,7 @@ Proxy package provides Class proxy function with spring-cglib, cglib or JDK prox
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class ProxySample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1177,8 +1148,7 @@ public class ProxySample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class ProxySampleKt {
 
     @Test
@@ -1229,8 +1199,7 @@ Reflect package provides utilities classes:
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class ReflectSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1255,8 +1224,7 @@ public class ReflectSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class ReflectSampleKt {
 
     @Test
@@ -1288,8 +1256,7 @@ Run package provides Runner and ScheduledRunner interfaces to run codes in threa
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class RunSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1325,8 +1292,7 @@ public class RunSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class RunSampleKt {
 
     @Test
@@ -1369,8 +1335,7 @@ State package provides State interface to help build custom state or status type
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class StateSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1421,8 +1386,7 @@ public class StateSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class StateSampleKt {
 
     @Test
@@ -1463,8 +1427,7 @@ Test package provides simple test tools:
 
 ##### Java Examples
 
-[source,java]
-```
+```java
 public class TestSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1482,8 +1445,7 @@ public class TestSample {
 
 ##### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class TestSampleKt {
 
     @Test
@@ -1509,8 +1471,7 @@ In current version, boat-serialize provides JsonSerializer.
 
 #### Java Examples
 
-[source,java]
-```
+```java
 public class SerializeSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1527,8 +1488,7 @@ public class SerializeSample {
 
 #### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class SerializeSampleKt {
 
     @Test
@@ -1552,8 +1512,7 @@ Boat codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and oth
 
 #### Java Examples
 
-[source,java]
-```
+```java
 public class CodecSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1582,8 +1541,7 @@ public class CodecSample {
 
 #### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class CodecSampleKt {
 
     @Test
@@ -1620,8 +1578,7 @@ Provides IdFactory to build any type of Id, and StringIdSpec to quickly build St
 
 #### Java Examples
 
-[source,java]
-```
+```java
 public class IdSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1640,8 +1597,7 @@ public class IdSample {
 
 #### Kotlin Examples
 
-[source,kotlin]
-```
+```kotlin
 class IdSampleKt {
 
     @Test
