@@ -1609,7 +1609,7 @@ class IdSampleKt {
 
 ## Contribution and Contact
 
-* fredsuvn@163.com
+* <fredsuvn@163.com>
 * https://github.com/srclab-projects/boat
 * QQ group: 1037555759
 
