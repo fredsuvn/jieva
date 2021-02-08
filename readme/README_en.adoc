@@ -14,13 +14,13 @@ v1.0.0, 2020-04-12
 |2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|Refactoring
 |===
 
-Boat is a set of core Java/Kotlin libraries (JDK 1.8+), written by kotlin (mostly) and java, widely used on Java/Kotlin projects within SrcLab, and also can be used by other organizations' Java/Kotlin projects.
+Boat is a set of core Java/Kotlin libraries (JDK 1.8+), written by kotlin (mostly) and java, widely used on Java/Kotlin projects within SrcLab, and also can be used by other Java/Kotlin projects.
 
 Boat includes:
 
 * *boat-annotations*: core annotations, such as @Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
 * *boat-core*: core and basic utilities and interface, including base, bean, bus, cache, collect, convert, exception, invoke, jvm, proxy, reflect, run, state and test;
-* *boat-serialize*: serialization function, including json;
+* *boat-serialize*: serialization function, including json serialization;
 * *boat-codec*: codec function, supporting Hex, Base64, AES, RSA, SM2 and more other algorithms;
 * *boat-id*: a light and easy id generation framework;
 * *boat-test*: help import common test libraries.
@@ -76,13 +76,13 @@ https://github.com/srclab-projects/boat
 - <<usage-id>>
 
 [#usage-annotations]
-=== boat-annotations
+=== Boat Annotations (boat-annotations)
 
 Appropriate annotations can make codes clear and clean:
 
-* *DefaultNonNull*/*DefaultNullable*: indicates all parameters, variables, fields or other types are non-null/null by default, usually used in package-info.java.
+* *DefaultNotNull*/*DefaultNullable*: indicates all parameters, variables, fields or other types are non-null/null by default, usually used in package-info.java.
 These annotations extend Nonnull of jsr305, and IDE such as IDEA can recognize them;
-* *NonNull*/*Nullable*: indicates a parameter, variable, field or other type is non-null/null.
+* *NotNull*/*Nullable*: indicates a parameter, variable, field or other type is non-null/null.
 These annotations extend Nonnull of jsr305, and IDE such as IDEA can recognize it;
 * *OutParam*/*OutReturn*: indicates the parameter may be written and return;
 * *Immutable*: indicates the annotated parameter, variable, field or other type is immutable and thread-safe;
@@ -91,7 +91,7 @@ These annotations extend Nonnull of jsr305, and IDE such as IDEA can recognize i
 * *PossibleTypes*: indicates the actual type of annotated parameter, variable, field or other type is in range of PossibleTypes specifying.
 
 [#usage-core]
-=== boat-core
+=== Boat Core (boat-core)
 
 [#usage-core-base]
 ==== Base
@@ -102,7 +102,7 @@ Base package provides base common utilities including:
 * Base utilities: Anys, Bools, Chars, Nums, Dates, Checks, Requires, Loaders, Sorts;
 * Grammar enhancement: Let, Ref, Lazy;
 * Basic tools: Counter, Format, NamingCase, Shell, SpecParser;
-* Helper types: SimpleAccessor, CachingProductBuilder.
+* Base helper types: SimpleAccessor, CachingProductBuilder.
 
 ===== Java Examples
 
@@ -563,7 +563,7 @@ class BaseSampleKt {
 Bean package provides powerful bean operation ability:
 
 * Beans: utilities for bean operation;
-* BeanResolver: interface to resolver bean, actually Beans use a default BeanResolver to do its works;
+* BeanResolver: interface to resolver bean, Beans use its default implementation;
 
 ===== Java Examples
 
@@ -881,7 +881,10 @@ public class CollectSample {
 [#usage-core-convert]
 ==== Convert
 
-Convert package provides type-conversion function, with Converts by default or Converter to custom.
+Convert package provides type-conversion function：
+
+* Converts: utilities class for conversion;
+* Converter: interface for type-conversion, Converts use its default implementation.
 
 ===== Java Examples
 
@@ -1043,7 +1046,7 @@ class ExceptionSampleKt {
 [#usage-core-invoke]
 ==== Invoke
 
-Invoke package provides Invoker to call methods (for Java) and functions (for Kotlin).
+Invoke package provides Invoker interface to call methods (for Java) and functions (for Kotlin).
 
 ===== Java Examples
 
@@ -1283,7 +1286,7 @@ class ReflectSampleKt {
 [#usage-core-run]
 ==== Run
 
-Run package provides Runner and ScheduledRunner interfaces to execute tasks in threads or coroutines.
+Run package provides Runner and ScheduledRunner interfaces to run codes in threads or coroutines.
 
 ===== Java Examples
 
@@ -1501,7 +1504,7 @@ class TestSampleKt {
 ----
 
 [#usage-serialize]
-=== Boat Serialize
+=== Boat Serialize (boat-serialize)
 
 Boat serialize (should import boat-serialize) provides common Serializer interface for serialization.
 In current version, boat-serialize provides JsonSerializer.
@@ -1545,7 +1548,7 @@ class SerializeSampleKt {
 ----
 
 [#usage-codec]
-=== Boat Codec
+=== Boat Codec (boat-codec)
 
 Boat codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and other interfaces to do with codec functions, supports hex, base64, AES, RSA, SM2 and more algorithms.
 
@@ -1612,7 +1615,7 @@ class CodecSampleKt {
 ----
 
 [#usage-id]
-=== Boat Id
+=== Boat Id (boat-id)
 
 Boat id (should import boat-id) is a light and easy id generation framework.
 Provides IdFactory to build any type of Id, and StringIdSpec to quickly build String type id.
@@ -1662,7 +1665,7 @@ class IdSampleKt {
 == Contribution and Contact
 
 * fredsuvn@163.com
-* https://github.com/srclab-projects
+* https://github.com/srclab-projects/boat
 * QQ group: 1037555759
 
 == License

@@ -11,5 +11,5 @@
 ## _Contact_
 
 * fredsuvn@163.com
-* https://github.com/srclab-projects
+* https://github.com/srclab-projects/boat
 * QQ group: 1037555759
