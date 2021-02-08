@@ -1,7 +1,14 @@
 package xyz.srclab.common.base
 
+/**
+ * @see SimpleGetter
+ * @see SimpleSetter
+ */
 interface SimpleAccessor<T> : SimpleGetter<T>, SimpleSetter<T>
 
+/**
+ * @see SimpleAccessor
+ */
 interface SimpleGetter<T> {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -35,6 +42,9 @@ interface SimpleGetter<T> {
     }
 }
 
+/**
+ * @see SimpleAccessor
+ */
 interface SimpleSetter<T> {
 
     fun set(value: T?)

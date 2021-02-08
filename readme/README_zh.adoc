@@ -2,6 +2,15 @@
 Sun Qian <fredsuvn@163.com>
 // v0.0.0, 2020-03-26
 v1.0.0, 2020-04-12
+
+== Revision
+
+[options="header"]
+|===
+|Date|Revision|Author|Content
+|2020-12-10|1.0.0|Sun Qian <fredsuvn@163.com>|New
+|===
+
 :encoding: UTF-8
 :easy-starter-version: 1.0.0
 

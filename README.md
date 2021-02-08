@@ -1,17 +1,15 @@
-# Boat: Base and common lib, widely used in SrcLab projects
-
-## Choose your document type and language:
+# _Welcome to Boat_
 
 - Markdown:
-    * [English](readme/README_en.adoc)
-    * [简体中文](readme/README_zh.adoc)
+    * [English](readme/README_en.md)
+    * [简体中文](readme/README_zh.md)
 
 - AsciiDoc:
     * [English](readme/README_en.adoc)
     * [简体中文](readme/README_zh.adoc)
 
-## Revision
+## _Contact_
 
-|Date|Revision|Author|Content
-|---|---|---|---|
-|2020-12-10|1.0.0|Sun Qian <fredsuvn@163.com>|New|
+* fredsuvn@163.com
+* https://github.com/srclab-projects
+* QQ group: 1037555759

@@ -40,6 +40,7 @@ import xyz.srclab.common.base.toLong
  * @author sunqian
  *
  * @see StringIdFactoryGenerator
+ * @see IdFactory
  */
 class StringIdSpec @JvmOverloads constructor(
     spec: String,
