@@ -1,6 +1,7 @@
 # Boat: SrcLab的基础Java/kotlin库
 
 ## Variables
+
 * boat-version: 1.0.0
 
 ## 修订
@@ -18,7 +19,8 @@ Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, �
 Boat包括:
 
 * *boat-annotations*: 核心注释, 如@Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
-* *boat-core*: 基础工具和接口, 包括base, bean, bus, cache, collect, convert, exception, invoke, jvm, proxy, reflect, run, state and test;
+* *boat-core*: 基础工具和接口, 包括base, bean, bus, cache, collect, convert, exception, invoke, jvm, proxy, reflect, run, state
+  and test;
 * *boat-serialize*: 序列化工具, 包括json序列化;
 * *boat-codec*: 编码功能, 支持Hex, Base64, AES, RSA, SM2 and more other algorithms;
 * *boat-id*: 一个轻量级id生成框架;
@@ -39,6 +41,7 @@ implementation("xyz.srclab.common:boat-all:{boat-version}")
 ### Maven
 
 ```xml
+
 <dependency>
     <groupId>xyz.srclab.common</groupId>
     <artifactId>boat-all</artifactId>
@@ -54,20 +57,20 @@ https://github.com/srclab-projects/boat
 
 - [Boat Annotation](#usage-annotations)
 - [Boat Core](#usage-core)
-  * [Base](#usage-core-base)
-  * [Bean](#usage-core-bean)
-  * [Bus](#usage-core-bus)
-  * [Cache](#usage-core-cache)
-  * [Collect](#usage-core-collect)
-  * [Convert](#usage-core-convert)
-  * [Exception](#usage-core-exception)
-  * [Invoke](#usage-core-invoke)
-  * [Jvm](#usage-core-jvm)
-  * [Proxy](#usage-core-proxy)
-  * [Reflect](#usage-core-reflect)
-  * [Run](#usage-core-run)
-  * [State](#usage-core-state)
-  * [Test](#usage-core-test)
+    * [Base](#usage-core-base)
+    * [Bean](#usage-core-bean)
+    * [Bus](#usage-core-bus)
+    * [Cache](#usage-core-cache)
+    * [Collect](#usage-core-collect)
+    * [Convert](#usage-core-convert)
+    * [Exception](#usage-core-exception)
+    * [Invoke](#usage-core-invoke)
+    * [Jvm](#usage-core-jvm)
+    * [Proxy](#usage-core-proxy)
+    * [Reflect](#usage-core-reflect)
+    * [Run](#usage-core-run)
+    * [State](#usage-core-state)
+    * [Test](#usage-core-test)
 - [Boat Serialize](#usage-serialize)
 - [Boat Codec](#usage-codec)
 - [Boat Id](#usage-id)
@@ -76,10 +79,9 @@ https://github.com/srclab-projects/boat
 
 适当的注释可以让代码清晰整洁
 
-* *DefaultNotNull*/*DefaultNullable*: 指定被注释的对象默认不为空或可以为空, 通常用在package-info.java里.
-这些注释继承自jsr305的Nonnull, IDE比如IDEA可以识别他们;
-* *NonNull*/*Nullable*: 指定被注释的对象不为空或可以为空.
-这些注释继承自jsr305的Nonnull, IDE比如IDEA可以识别他们;
+* *DefaultNotNull*/*DefaultNullable*: 指定被注释的对象默认不为空或可以为空, 通常用在package-info.java里. 这些注释继承自jsr305的Nonnull,
+  IDE比如IDEA可以识别他们;
+* *NonNull*/*Nullable*: 指定被注释的对象不为空或可以为空. 这些注释继承自jsr305的Nonnull, IDE比如IDEA可以识别他们;
 * *OutParam*/*OutReturn*: 指定参数可以被修改并返回;
 * *Immutable*: 指定被注释的对象是不可变并且线程安全的;
 * *ThreadSafe*: 指定被注释的对象是线程安全的;
@@ -1450,8 +1452,7 @@ class TestSampleKt {
 
 ### <a id="usage-serialize"/>Boat Serialize (boat-serialize)
 
-Boat serialize (需要引入boat-serialize)提供通用序列化接口.
-在当前版本, boat-serialize提供JsonSerializer.
+Boat serialize (需要引入boat-serialize)提供通用序列化接口. 在当前版本, boat-serialize提供JsonSerializer.
 
 #### Java Examples
 
@@ -1555,8 +1556,7 @@ class CodecSampleKt {
 
 ### <a id="usage-id"/>Boat Id (boat-id)
 
-Boat id (需要引入boat-id)是一个轻量级的id生成框架.
-提供IdFactory接口来构造任意类型的id, 以及StringIdSpec 来快速构造String类型的id.
+Boat id (需要引入boat-id)是一个轻量级的id生成框架. 提供IdFactory接口来构造任意类型的id, 以及StringIdSpec 来快速构造String类型的id.
 
 #### Java Examples
 
@@ -1606,5 +1606,4 @@ class IdSampleKt {
 
 ## License
 
-Boat开源，使用
-https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].
+[Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html)

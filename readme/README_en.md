@@ -1,6 +1,7 @@
 # Boat: SrcLab Core Libraries for Java/kotlin
 
 ## Variables
+
 * boat-version: 1.0.0
 
 ## Revision
@@ -12,12 +13,14 @@
 
 ## Introduction
 
-Boat is a set of core Java/Kotlin libraries (JDK 1.8+), written by kotlin (mostly) and java, widely used on Java/Kotlin projects within SrcLab, and also can be used by other Java/Kotlin projects.
+Boat is a set of core Java/Kotlin libraries (JDK 1.8+), written by kotlin (mostly) and java, widely used on Java/Kotlin
+projects within SrcLab, and also can be used by other Java/Kotlin projects.
 
 Boat includes:
 
 * *boat-annotations*: core annotations, such as @Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
-* *boat-core*: core and basic utilities and interface, including base, bean, bus, cache, collect, convert, exception, invoke, jvm, proxy, reflect, run, state and test;
+* *boat-core*: core and basic utilities and interface, including base, bean, bus, cache, collect, convert, exception,
+  invoke, jvm, proxy, reflect, run, state and test;
 * *boat-serialize*: serialization function, including json serialization;
 * *boat-codec*: codec function, supporting Hex, Base64, AES, RSA, SM2 and more other algorithms;
 * *boat-id*: a light and easy id generation framework;
@@ -38,6 +41,7 @@ implementation("xyz.srclab.common:boat-all:{boat-version}")
 ### Maven
 
 ```xml
+
 <dependency>
     <groupId>xyz.srclab.common</groupId>
     <artifactId>boat-all</artifactId>
@@ -53,20 +57,20 @@ https://github.com/srclab-projects/boat
 
 - [Boat Annotation](#usage-annotations)
 - [Boat Core](#usage-core)
-  * [Base](#usage-core-base)
-  * [Bean](#usage-core-bean)
-  * [Bus](#usage-core-bus)
-  * [Cache](#usage-core-cache)
-  * [Collect](#usage-core-collect)
-  * [Convert](#usage-core-convert)
-  * [Exception](#usage-core-exception)
-  * [Invoke](#usage-core-invoke)
-  * [Jvm](#usage-core-jvm)
-  * [Proxy](#usage-core-proxy)
-  * [Reflect](#usage-core-reflect)
-  * [Run](#usage-core-run)
-  * [State](#usage-core-state)
-  * [Test](#usage-core-test)
+    * [Base](#usage-core-base)
+    * [Bean](#usage-core-bean)
+    * [Bus](#usage-core-bus)
+    * [Cache](#usage-core-cache)
+    * [Collect](#usage-core-collect)
+    * [Convert](#usage-core-convert)
+    * [Exception](#usage-core-exception)
+    * [Invoke](#usage-core-invoke)
+    * [Jvm](#usage-core-jvm)
+    * [Proxy](#usage-core-proxy)
+    * [Reflect](#usage-core-reflect)
+    * [Run](#usage-core-run)
+    * [State](#usage-core-state)
+    * [Test](#usage-core-test)
 - [Boat Serialize](#usage-serialize)
 - [Boat Codec](#usage-codec)
 - [Boat Id](#usage-id)
@@ -75,15 +79,18 @@ https://github.com/srclab-projects/boat
 
 Appropriate annotations can make codes clear and clean:
 
-* *DefaultNotNull*/*DefaultNullable*: indicates all parameters, variables, fields or other types are non-null/null by default, usually used in package-info.java.
-These annotations extend Nonnull of jsr305, and IDE such as IDEA can recognize them;
-* *NotNull*/*Nullable*: indicates a parameter, variable, field or other type is non-null/null.
-These annotations extend Nonnull of jsr305, and IDE such as IDEA can recognize it;
+* *DefaultNotNull*/*DefaultNullable*: indicates all parameters, variables, fields or other types are non-null/null by
+  default, usually used in package-info.java. These annotations extend Nonnull of jsr305, and IDE such as IDEA can
+  recognize them;
+* *NotNull*/*Nullable*: indicates a parameter, variable, field or other type is non-null/null. These annotations extend
+  Nonnull of jsr305, and IDE such as IDEA can recognize it;
 * *OutParam*/*OutReturn*: indicates the parameter may be written and return;
 * *Immutable*: indicates the annotated parameter, variable, field or other type is immutable and thread-safe;
 * *ThreadSafe*: indicates the annotated parameter, variable, field or other type annotated is thread-safe;
-* *ThreadSafeDependOn*: indicates whether annotated parameter, variable, field or other type is thread-safe depends on its dependent type or object (itself is thread-safe);
-* *PossibleTypes*: indicates the actual type of annotated parameter, variable, field or other type is in range of PossibleTypes specifying.
+* *ThreadSafeDependOn*: indicates whether annotated parameter, variable, field or other type is thread-safe depends on
+  its dependent type or object (itself is thread-safe);
+* *PossibleTypes*: indicates the actual type of annotated parameter, variable, field or other type is in range of
+  PossibleTypes specifying.
 
 ### <a id="usage-core"/>Boat Core (boat-core)
 
@@ -814,7 +821,8 @@ class CacheSampleKt {
 
 #### <a id="usage-core-collect"/>Collect
 
-Collect package provides utilities classes Collects for Iterable types and ArrayCollects for array types, and provides Ops interface to do with chain operation.
+Collect package provides utilities classes Collects for Iterable types and ArrayCollects for array types, and provides
+Ops interface to do with chain operation.
 
 ##### Java Examples
 
@@ -963,7 +971,8 @@ class ConvertSampleKt {
 
 #### <a id="usage-core-exception"/>Exception
 
-Exception package provides StatusException and ExceptionStatus extended from State (see [State](#usage-core-state)), and a ShouldNotException.
+Exception package provides StatusException and ExceptionStatus extended from State (see [State](#usage-core-state)), and
+a ShouldNotException.
 
 ##### Java Examples
 
@@ -1449,8 +1458,8 @@ class TestSampleKt {
 
 ### <a id="usage-serialize"/>Boat Serialize (boat-serialize)
 
-Boat serialize (should import boat-serialize) provides common Serializer interface for serialization.
-In current version, boat-serialize provides JsonSerializer.
+Boat serialize (should import boat-serialize) provides common Serializer interface for serialization. In current
+version, boat-serialize provides JsonSerializer.
 
 #### Java Examples
 
@@ -1490,7 +1499,8 @@ class SerializeSampleKt {
 
 ### <a id="usage-codec"/>Boat Codec (boat-codec)
 
-Boat codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and other interfaces to do with codec functions, supports hex, base64, AES, RSA, SM2 and more algorithms.
+Boat codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and other interfaces to do with codec
+functions, supports hex, base64, AES, RSA, SM2 and more algorithms.
 
 #### Java Examples
 
@@ -1554,8 +1564,8 @@ class CodecSampleKt {
 
 ### <a id="usage-id"/>Boat Id (boat-id)
 
-Boat id (should import boat-id) is a light and easy id generation framework.
-Provides IdFactory to build any type of Id, and StringIdSpec to quickly build String type id.
+Boat id (should import boat-id) is a light and easy id generation framework. Provides IdFactory to build any type of Id,
+and StringIdSpec to quickly build String type id.
 
 #### Java Examples
 
@@ -1605,5 +1615,4 @@ class IdSampleKt {
 
 ## License
 
-Boat is Open Source software released under the
-https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].
+[Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html)
