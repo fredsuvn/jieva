@@ -14,6 +14,8 @@ v1.0.0, 2020-04-12
 |2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|重构
 |===
 
+== 简介
+
 Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于SrcLab里的项目, 当然, 也可以在其他项目中使用.
 
 Boat包括:
