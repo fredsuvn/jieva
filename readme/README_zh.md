@@ -98,7 +98,7 @@ Base包提供基础工具包括:
 * 基础静态工具类: Anys, Bools, Chars, Nums, Dates, Checks, Requires, Loaders, Sorts;
 * 语法增强工具: Let, Ref, Lazy;
 * 基础对象工具: Counter, Format, NamingCase, Shell, SpecParser;
-* 辅助类基类: SimpleAccessor, CachingProductBuilder.
+* 辅助类基类: Accessor, Serial CachingProductBuilder.
 
 ##### Java Examples
 
@@ -1464,7 +1464,7 @@ public class SerializeSample {
     @Test
     public void testJsonSerialize() {
         Json json = JsonSerials.toJson("{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}");
-        Map<String, String> map = json.toJavaObject(new TypeRef<Map<String, String>>() {});
+        Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {});
         //{p1=p1 value, p2=p2 value}
         logger.log(map);
     }
@@ -1479,7 +1479,7 @@ class SerializeSampleKt {
     @Test
     fun testJsonSerialize() {
         val json = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}".toJson()
-        val map: Map<String, String> = json.toJavaObject(object : TypeRef<Map<String, String>>() {})
+        val map: Map<String, String> = json.toObject(object : TypeRef<Map<String, String>>() {})
         //{p1=p1 value, p2=p2 value}
         logger.log(map)
     }

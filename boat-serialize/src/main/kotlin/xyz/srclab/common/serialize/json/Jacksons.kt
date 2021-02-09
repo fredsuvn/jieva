@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.node.JsonNodeType
+import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import java.io.*
 import java.lang.reflect.Type
@@ -23,7 +24,7 @@ internal val DEFAULT_OBJECT_MAPPER by lazy {
 
 internal class JsonSerializerImpl(private val objectMapper: ObjectMapper) : JsonSerializer {
 
-    override fun toJsonString(javaObject: Any): String {
+    override fun toJsonString(javaObject: Any?): String {
         return try {
             objectMapper.writeValueAsString(javaObject)
         } catch (e: Exception) {
@@ -31,7 +32,7 @@ internal class JsonSerializerImpl(private val objectMapper: ObjectMapper) : Json
         }
     }
 
-    override fun toJsonBytes(javaObject: Any): ByteArray {
+    override fun toJsonBytes(javaObject: Any?): ByteArray {
         return try {
             objectMapper.writeValueAsBytes(javaObject)
         } catch (e: Exception) {
@@ -39,17 +40,19 @@ internal class JsonSerializerImpl(private val objectMapper: ObjectMapper) : Json
         }
     }
 
-    override fun writeJson(javaObject: Any, outputStream: OutputStream) {
+    override fun <T : OutputStream> writeJson(javaObject: Any?, outputStream: T): T {
         try {
             objectMapper.writeValue(outputStream, javaObject)
+            return outputStream
         } catch (e: Exception) {
             throw IllegalStateException(e)
         }
     }
 
-    override fun writeJson(javaObject: Any, writer: Writer) {
+    override fun <T : Writer> writeJson(javaObject: Any?, writer: T): T {
         try {
             objectMapper.writeValue(writer, javaObject)
+            return writer
         } catch (e: Exception) {
             throw IllegalStateException(e)
         }
@@ -121,7 +124,13 @@ internal class JsonSerializerImpl(private val objectMapper: ObjectMapper) : Json
         }
     }
 
-    override fun toJson(javaObject: Any): Json {
+    override fun toJson(javaObject: Any?): Json {
+        if (javaObject === null) {
+            return JsonImpl(
+                objectMapper,
+                NullNode.getInstance()
+            )
+        }
         if (javaObject is CharSequence) {
             return toJson(javaObject.toString())
         }
@@ -161,11 +170,29 @@ internal class JsonImpl(private val objectMapper: ObjectMapper, private val json
 
     override val type: JsonType = jsonNode.nodeType.toJsonType()
 
-    override fun toJsonString(): String {
+    override fun toString(): String {
         return jsonNode.toString()
     }
 
-    override fun toJsonBytes(): ByteArray {
+    override fun <T : OutputStream> writeOutputStream(outputStream: T): T {
+        try {
+            objectMapper.writeValue(outputStream as OutputStream, jsonNode)
+            return outputStream
+        } catch (e: IOException) {
+            throw IllegalStateException(e)
+        }
+    }
+
+    override fun <T : Writer> writeWriter(writer: T): T {
+        try {
+            objectMapper.writeValue(writer, jsonNode)
+            return writer
+        } catch (e: IOException) {
+            throw IllegalStateException(e)
+        }
+    }
+
+    override fun toBytes(): ByteArray {
         return try {
             objectMapper.writeValueAsBytes(jsonNode)
         } catch (e: JsonProcessingException) {
@@ -173,27 +200,11 @@ internal class JsonImpl(private val objectMapper: ObjectMapper, private val json
         }
     }
 
-    override fun writeJson(outputStream: OutputStream) {
-        try {
-            objectMapper.writeValue(outputStream, jsonNode)
-        } catch (e: IOException) {
-            throw IllegalStateException(e)
-        }
+    override fun toInputStream(): InputStream {
+        return ByteArrayInputStream(toBytes())
     }
 
-    override fun writeJson(writer: Writer) {
-        try {
-            objectMapper.writeValue(writer, jsonNode)
-        } catch (e: IOException) {
-            throw IllegalStateException(e)
-        }
-    }
-
-    override fun writeJson(buffer: ByteBuffer) {
-        buffer.put(toJsonBytes())
-    }
-
-    override fun <T> toJavaObjectOrNull(type: Type): T? {
+    override fun <T> toObjectOrNull(type: Type): T? {
         return try {
             objectMapper.readValue(jsonNode.traverse(), object : TypeReference<T>() {
                 override fun getType(): Type {

@@ -14,7 +14,7 @@ package xyz.srclab.common.base
  * Date dateValue = DateUtils.stringToDate(stringValue)
  * ```
  */
-interface Let<T> : SimpleGetter<T> {
+interface Let<T> : Getter<T> {
 
     fun <R> then(action: (T) -> R): Let<R>
 

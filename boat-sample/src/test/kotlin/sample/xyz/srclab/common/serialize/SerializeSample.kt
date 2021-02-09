@@ -10,7 +10,7 @@ class SerializeSampleKt {
     @Test
     fun testJsonSerialize() {
         val json = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}".toJson()
-        val map: Map<String, String> = json.toJavaObject(object : TypeRef<Map<String, String>>() {})
+        val map: Map<String, String> = json.toObject(object : TypeRef<Map<String, String>>() {})
         //{p1=p1 value, p2=p2 value}
         logger.log(map)
     }

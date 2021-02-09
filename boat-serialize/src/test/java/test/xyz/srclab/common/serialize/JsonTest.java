@@ -5,6 +5,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.serialize.json.Json;
 import xyz.srclab.common.serialize.json.JsonSerializer;
+import xyz.srclab.common.serialize.json.JsonSerials;
 import xyz.srclab.common.serialize.json.JsonType;
 import xyz.srclab.common.test.TestLogger;
 
@@ -40,15 +41,15 @@ public class JsonTest {
 
         //测试toJson(Object)
         Object jsonStringAsObject = jsonString;
-        logger.log(jsonSerializer.toJson(jsonStringAsObject).toJsonString());
+        logger.log(jsonSerializer.toJson(jsonStringAsObject).toString());
         Assert.assertEquals(
-                jsonSerializer.toJson(jsonStringAsObject).toJavaObject(TestObject.class),
+                jsonSerializer.toJson(jsonStringAsObject).toObject(TestObject.class),
                 testObject
         );
 
         //测试从json string还原java对象
         Json json = jsonSerializer.toJson(jsonString);
-        TestObject fromJson = json.toJavaObject(TestObject.class);
+        TestObject fromJson = json.toObject(TestObject.class);
         boolean equals = testObject.equals(fromJson);
         logger.log("testObject == fromJson: " + equals);
         Assert.assertTrue(equals);
@@ -60,26 +61,26 @@ public class JsonTest {
                 newMap(new BigDecimal(2), "2"),
                 newMap(new BigDecimal(3), "3")
         ));
-        TestObject2 fromJson2 = json.toJavaObject(TestObject2.class);
+        TestObject2 fromJson2 = json.toObject(TestObject2.class);
         boolean equals2 = testObject2.equals(fromJson2);
         logger.log("testObject2 == fromJson2: " + equals2);
         Assert.assertTrue(equals2);
 
         //测试java对象转java对象
         Json jsonTest = jsonSerializer.toJson(testObject);
-        logger.log("jsonTest: " + jsonTest.toJsonString());
-        Assert.assertEquals(jsonTest.toJavaObject(TestObject2.class), testObject2);
+        logger.log("jsonTest: " + jsonTest.toString());
+        Assert.assertEquals(jsonTest.toObject(TestObject2.class), testObject2);
 
         //测试时间类型
         long now = System.currentTimeMillis();
         logger.log("now: " + now);
         String nowJson = jsonSerializer.toJsonString(now);
         logger.log("nowJson: " + nowJson);
-        Date date = jsonSerializer.toJson(nowJson).toJavaObject(Date.class);
+        Date date = jsonSerializer.toJson(nowJson).toObject(Date.class);
         logger.log("date: " + date);
         Assert.assertEquals(date.getTime(), now);
         //这里实际是按照“秒”这个单位来create的，所以下面的now要乘以1000
-        Instant instant = jsonSerializer.toJson(nowJson).toJavaObject(Instant.class);
+        Instant instant = jsonSerializer.toJson(nowJson).toObject(Instant.class);
         logger.log("instant: " + instant);
         Assert.assertEquals(instant.toEpochMilli(), now * 1000);
 
@@ -114,18 +115,18 @@ public class JsonTest {
         map.put("key2", "2");
         Json mapJson = jsonSerializer.toJson(map);
         String toJsonString = "{\"key1\":\"1\",\"key2\":\"2\"}";
-        logger.log(mapJson.toJsonString());
-        Assert.assertEquals(mapJson.toJsonString(), toJsonString);
-        Assert.assertEquals(mapJson.toJsonBytes(), toJsonString.getBytes(StandardCharsets.UTF_8));
+        logger.log(mapJson.toString());
+        Assert.assertEquals(mapJson.toString(), toJsonString);
+        Assert.assertEquals(mapJson.toBytes(), toJsonString.getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
     public void testNull() {
         //Test null
-        Json nullJson = Json.NULL;
-        Assert.assertEquals(nullJson.toJsonString(), "null");
-        Assert.assertNull(nullJson.toJavaStringOrNull());
-        Assert.expectThrows(IllegalStateException.class, nullJson::toJavaString);
+        Json nullJson = JsonSerials.toJson((Object) null);
+        Assert.assertEquals(nullJson.toString(), "null");
+        Assert.assertNull(nullJson.toStringOrNull());
+        Assert.expectThrows(IllegalStateException.class, () -> nullJson.toObject(String.class));
     }
 
     private <K, V> Map<K, V> newMap(K key, V value) {

@@ -15,7 +15,7 @@ public class SerializeSample {
     @Test
     public void testJsonSerialize() {
         Json json = JsonSerials.toJson("{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}");
-        Map<String, String> map = json.toJavaObject(new TypeRef<Map<String, String>>() {});
+        Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {});
         //{p1=p1 value, p2=p2 value}
         logger.log(map);
     }

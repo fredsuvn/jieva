@@ -23,12 +23,12 @@ interface JsonSerializer : Serializer<Json> {
 
     @JvmDefault
     override fun serialize(any: Any?): Json {
-        return if (any === null) Json.NULL else toJson(any)
+        return toJson(any)
     }
 
     @JvmDefault
     override fun <T> deserialize(serial: Json, type: Type): T {
-        return serial.toJavaObject(type)
+        return serial.toObject(type)
     }
 
     /**
@@ -38,8 +38,8 @@ interface JsonSerializer : Serializer<Json> {
      * @return json string
      */
     @JvmDefault
-    fun toJsonString(javaObject: Any): String {
-        return toJson(javaObject).toJsonString()
+    fun toJsonString(javaObject: Any?): String {
+        return toJson(javaObject).toString()
     }
 
     /**
@@ -49,8 +49,8 @@ interface JsonSerializer : Serializer<Json> {
      * @return json bytes
      */
     @JvmDefault
-    fun toJsonBytes(javaObject: Any): ByteArray {
-        return toJson(javaObject).toJsonBytes()
+    fun toJsonBytes(javaObject: Any?): ByteArray {
+        return toJson(javaObject).toBytes()
     }
 
     /**
@@ -60,8 +60,8 @@ interface JsonSerializer : Serializer<Json> {
      * @return json bytes
      */
     @JvmDefault
-    fun toJsonStream(javaObject: Any): InputStream {
-        return toJson(javaObject).toJsonStream()
+    fun toJsonStream(javaObject: Any?): InputStream {
+        return toJson(javaObject).toInputStream()
     }
 
     /**
@@ -71,8 +71,8 @@ interface JsonSerializer : Serializer<Json> {
      * @return json bytes
      */
     @JvmDefault
-    fun toJsonReader(javaObject: Any): Reader {
-        return toJson(javaObject).toJsonReader()
+    fun toJsonReader(javaObject: Any?): Reader {
+        return toJson(javaObject).toReader()
     }
 
     /**
@@ -82,8 +82,8 @@ interface JsonSerializer : Serializer<Json> {
      * @return json bytes
      */
     @JvmDefault
-    fun toJsonBuffer(javaObject: Any): ByteBuffer {
-        return toJson(javaObject).toJsonBuffer()
+    fun toJsonBuffer(javaObject: Any?): ByteBuffer {
+        return toJson(javaObject).toByteBuffer()
     }
 
     /**
@@ -93,8 +93,8 @@ interface JsonSerializer : Serializer<Json> {
      * @param outputStream given [OutputStream].
      */
     @JvmDefault
-    fun writeJson(javaObject: Any, outputStream: OutputStream) {
-        toJson(javaObject).writeJson(outputStream)
+    fun <T : OutputStream> writeJson(javaObject: Any?, outputStream: T): T {
+        return toJson(javaObject).writeOutputStream(outputStream)
     }
 
     /**
@@ -104,8 +104,8 @@ interface JsonSerializer : Serializer<Json> {
      * @param writer     given [Writer].
      */
     @JvmDefault
-    fun writeJson(javaObject: Any, writer: Writer) {
-        toJson(javaObject).writeJson(writer)
+    fun <T : Writer> writeJson(javaObject: Any?, writer: T): T {
+        return toJson(javaObject).writeWriter(writer)
     }
 
     /**
@@ -115,287 +115,8 @@ interface JsonSerializer : Serializer<Json> {
      * @param buffer     given [ByteBuffer].
      */
     @JvmDefault
-    fun writeJson(javaObject: Any, buffer: ByteBuffer) {
-        toJson(javaObject).writeJson(buffer)
-    }
-
-    /**
-     * json string -> T
-     *
-     * @param jsonString json string
-     * @param type       class of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonString: CharSequence, type: Class<T>): T {
-        return toJson(jsonString).toJavaObject(type)
-    }
-
-    /**
-     * json string -> T
-     *
-     * @param jsonString json string
-     * @param type       type of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonString: CharSequence, type: Type): T {
-        return toJson(jsonString).toJavaObject(type)
-    }
-
-    /**
-     * json string -> T
-     *
-     * @param jsonString    json string
-     * @param typeRef type reference of T
-     * @param [T]           java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonString: CharSequence, typeRef: TypeRef<T>): T {
-        return toJson(jsonString).toJavaObject(typeRef)
-    }
-
-    /**
-     * json bytes -> T
-     *
-     * @param jsonBytes json bytes
-     * @param type      class of T
-     * @param [T]       java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonBytes: ByteArray, type: Class<T>): T {
-        return toJson(jsonBytes).toJavaObject(type)
-    }
-
-    /**
-     * json bytes -> T
-     *
-     * @param jsonBytes json bytes
-     * @param type      type of T
-     * @param [T]       java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonBytes: ByteArray, type: Type): T {
-        return toJson(jsonBytes).toJavaObject(type)
-    }
-
-    /**
-     * json bytes -> T
-     *
-     * @param jsonBytes     json bytes
-     * @param typeRef type reference of T
-     * @param [T]           java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonBytes: ByteArray, typeRef: TypeRef<T>): T {
-        return toJson(jsonBytes).toJavaObject(typeRef)
-    }
-
-    /**
-     * json bytes -> T
-     *
-     * @param jsonBytes json bytes
-     * @param offset    offset of bytes to be parsed
-     * @param length    length of bytes to be parsed
-     * @param type      class of T
-     * @param [T]       java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonBytes: ByteArray, offset: Int, length: Int, type: Class<T>): T {
-        return toJson(jsonBytes, offset, length).toJavaObject(type)
-    }
-
-    /**
-     * json bytes -> T
-     *
-     * @param jsonBytes json bytes
-     * @param offset    offset of bytes to be parsed
-     * @param length    length of bytes to be parsed
-     * @param type      type of T
-     * @param [T]       java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonBytes: ByteArray, offset: Int, length: Int, type: Type): T {
-        return toJson(jsonBytes, offset, length).toJavaObject(type)
-    }
-
-    /**
-     * json bytes -> T
-     *
-     * @param jsonBytes     json bytes
-     * @param offset        offset of bytes to be parsed
-     * @param length        length of bytes to be parsed
-     * @param typeRef type reference of T
-     * @param [T]           java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonBytes: ByteArray, offset: Int, length: Int, typeRef: TypeRef<T>): T {
-        return toJson(jsonBytes, offset, length).toJavaObject(typeRef)
-    }
-
-    /**
-     * json stream -> T
-     *
-     * @param jsonStream json stream
-     * @param type       class of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonStream: InputStream, type: Class<T>): T {
-        return toJson(jsonStream).toJavaObject(type)
-    }
-
-    /**
-     * json stream -> T
-     *
-     * @param jsonStream json stream
-     * @param type       type of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonStream: InputStream, type: Type): T {
-        return toJson(jsonStream).toJavaObject(type)
-    }
-
-    /**
-     * json stream -> T
-     *
-     * @param jsonStream    json stream
-     * @param typeRef type reference of T
-     * @param [T]           java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonStream: InputStream, typeRef: TypeRef<T>): T {
-        return toJson(jsonStream).toJavaObject(typeRef)
-    }
-
-    /**
-     * json reader -> T
-     *
-     * @param jsonReader json reader
-     * @param type       class of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonReader: Reader, type: Class<T>): T {
-        return toJson(jsonReader).toJavaObject(type)
-    }
-
-    /**
-     * json reader -> T
-     *
-     * @param jsonReader json reader
-     * @param type       type of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonReader: Reader, type: Type): T {
-        return toJson(jsonReader).toJavaObject(type)
-    }
-
-    /**
-     * json reader -> T
-     *
-     * @param jsonReader    json reader
-     * @param typeRef type reference of T
-     * @param [T]           java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonReader: Reader, typeRef: TypeRef<T>): T {
-        return toJson(jsonReader).toJavaObject(typeRef)
-    }
-
-    /**
-     * json buffer -> T
-     *
-     * @param jsonBuffer json buffer
-     * @param type       class of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonBuffer: ByteBuffer, type: Class<T>): T {
-        return toJson(jsonBuffer).toJavaObject(type)
-    }
-
-    /**
-     * json buffer -> T
-     *
-     * @param jsonBuffer json buffer
-     * @param type       type of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonBuffer: ByteBuffer, type: Type): T {
-        return toJson(jsonBuffer).toJavaObject(type)
-    }
-
-    /**
-     * json buffer -> T
-     *
-     * @param jsonBuffer    json buffer
-     * @param typeRef type reference of T
-     * @param [T]           java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonBuffer: ByteBuffer, typeRef: TypeRef<T>): T {
-        return toJson(jsonBuffer).toJavaObject(typeRef)
-    }
-
-    /**
-     * json source -> T
-     *
-     * @param jsonSource json source
-     * @param type       class of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonSource: URL, type: Class<T>): T {
-        return toJson(jsonSource).toJavaObject(type)
-    }
-
-    /**
-     * json source -> T
-     *
-     * @param jsonSource json source
-     * @param type       type of T
-     * @param [T]        java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonSource: URL, type: Type): T {
-        return toJson(jsonSource).toJavaObject(type)
-    }
-
-    /**
-     * json source -> T
-     *
-     * @param jsonSource    json source
-     * @param typeRef type reference of T
-     * @param [T]           java type
-     * @return [T]
-     */
-    @JvmDefault
-    fun <T> toJavaObject(jsonSource: URL, typeRef: TypeRef<T>): T {
-        return toJson(jsonSource).toJavaObject(typeRef)
+    fun <T : ByteBuffer> writeJson(javaObject: Any?, buffer: T): T {
+        return toJson(javaObject).writeByteBuffer(buffer)
     }
 
     /**
@@ -414,7 +135,19 @@ interface JsonSerializer : Serializer<Json> {
      */
     @JvmDefault
     fun toJson(jsonBytes: ByteArray): Json {
-        return toJson(jsonBytes, 0, jsonBytes.size)
+        return toJson(jsonBytes, 0)
+    }
+
+    /**
+     * json bytes -> [Json]
+     *
+     * @param jsonBytes json bytes
+     * @param offset    offset of bytes to be parsed
+     * @return [Json]
+     */
+    @JvmDefault
+    fun toJson(jsonBytes: ByteArray, offset: Int): Json {
+        return toJson(jsonBytes, offset, jsonBytes.size - offset)
     }
 
     /**
@@ -462,10 +195,334 @@ interface JsonSerializer : Serializer<Json> {
     /**
      * json object -> [Json]
      *
-     * @param javaObject json object
+     * @param anyObject any object
      * @return [Json]
      */
-    fun toJson(javaObject: Any): Json
+    fun toJson(anyObject: Any?): Json
+
+    /**
+     * json string -> T
+     *
+     * @param jsonString json string
+     * @param type       class of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonString: CharSequence, type: Class<T>): T {
+        return toJson(jsonString).toObject(type)
+    }
+
+    /**
+     * json string -> T
+     *
+     * @param jsonString json string
+     * @param type       type of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonString: CharSequence, type: Type): T {
+        return toJson(jsonString).toObject(type)
+    }
+
+    /**
+     * json string -> T
+     *
+     * @param jsonString    json string
+     * @param typeRef type reference of T
+     * @param [T]           java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonString: CharSequence, typeRef: TypeRef<T>): T {
+        return toJson(jsonString).toObject(typeRef)
+    }
+
+    /**
+     * json bytes -> T
+     *
+     * @param jsonBytes json bytes
+     * @param type      class of T
+     * @param [T]       java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBytes: ByteArray, type: Class<T>): T {
+        return toJson(jsonBytes).toObject(type)
+    }
+
+    /**
+     * json bytes -> T
+     *
+     * @param jsonBytes json bytes
+     * @param type      type of T
+     * @param [T]       java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBytes: ByteArray, type: Type): T {
+        return toJson(jsonBytes).toObject(type)
+    }
+
+    /**
+     * json bytes -> T
+     *
+     * @param jsonBytes     json bytes
+     * @param typeRef type reference of T
+     * @param [T]           java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBytes: ByteArray, typeRef: TypeRef<T>): T {
+        return toJson(jsonBytes).toObject(typeRef)
+    }
+
+    /**
+     * json bytes -> T
+     *
+     * @param jsonBytes json bytes
+     * @param offset    offset of bytes to be parsed
+     * @param length    length of bytes to be parsed
+     * @param type      class of T
+     * @param [T]       java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBytes: ByteArray, offset: Int, type: Class<T>): T {
+        return toJson(jsonBytes, offset).toObject(type)
+    }
+
+    /**
+     * json bytes -> T
+     *
+     * @param jsonBytes json bytes
+     * @param offset    offset of bytes to be parsed
+     * @param length    length of bytes to be parsed
+     * @param type      type of T
+     * @param [T]       java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBytes: ByteArray, offset: Int, type: Type): T {
+        return toJson(jsonBytes, offset).toObject(type)
+    }
+
+    /**
+     * json bytes -> T
+     *
+     * @param jsonBytes     json bytes
+     * @param offset        offset of bytes to be parsed
+     * @param length        length of bytes to be parsed
+     * @param typeRef type reference of T
+     * @param [T]           java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBytes: ByteArray, offset: Int, typeRef: TypeRef<T>): T {
+        return toJson(jsonBytes, offset).toObject(typeRef)
+    }
+
+    /**
+     * json bytes -> T
+     *
+     * @param jsonBytes json bytes
+     * @param offset    offset of bytes to be parsed
+     * @param length    length of bytes to be parsed
+     * @param type      class of T
+     * @param [T]       java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBytes: ByteArray, offset: Int, length: Int, type: Class<T>): T {
+        return toJson(jsonBytes, offset, length).toObject(type)
+    }
+
+    /**
+     * json bytes -> T
+     *
+     * @param jsonBytes json bytes
+     * @param offset    offset of bytes to be parsed
+     * @param length    length of bytes to be parsed
+     * @param type      type of T
+     * @param [T]       java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBytes: ByteArray, offset: Int, length: Int, type: Type): T {
+        return toJson(jsonBytes, offset, length).toObject(type)
+    }
+
+    /**
+     * json bytes -> T
+     *
+     * @param jsonBytes     json bytes
+     * @param offset        offset of bytes to be parsed
+     * @param length        length of bytes to be parsed
+     * @param typeRef type reference of T
+     * @param [T]           java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBytes: ByteArray, offset: Int, length: Int, typeRef: TypeRef<T>): T {
+        return toJson(jsonBytes, offset, length).toObject(typeRef)
+    }
+
+    /**
+     * json stream -> T
+     *
+     * @param jsonStream json stream
+     * @param type       class of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonStream: InputStream, type: Class<T>): T {
+        return toJson(jsonStream).toObject(type)
+    }
+
+    /**
+     * json stream -> T
+     *
+     * @param jsonStream json stream
+     * @param type       type of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonStream: InputStream, type: Type): T {
+        return toJson(jsonStream).toObject(type)
+    }
+
+    /**
+     * json stream -> T
+     *
+     * @param jsonStream    json stream
+     * @param typeRef type reference of T
+     * @param [T]           java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonStream: InputStream, typeRef: TypeRef<T>): T {
+        return toJson(jsonStream).toObject(typeRef)
+    }
+
+    /**
+     * json reader -> T
+     *
+     * @param jsonReader json reader
+     * @param type       class of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonReader: Reader, type: Class<T>): T {
+        return toJson(jsonReader).toObject(type)
+    }
+
+    /**
+     * json reader -> T
+     *
+     * @param jsonReader json reader
+     * @param type       type of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonReader: Reader, type: Type): T {
+        return toJson(jsonReader).toObject(type)
+    }
+
+    /**
+     * json reader -> T
+     *
+     * @param jsonReader    json reader
+     * @param typeRef type reference of T
+     * @param [T]           java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonReader: Reader, typeRef: TypeRef<T>): T {
+        return toJson(jsonReader).toObject(typeRef)
+    }
+
+    /**
+     * json buffer -> T
+     *
+     * @param jsonBuffer json buffer
+     * @param type       class of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBuffer: ByteBuffer, type: Class<T>): T {
+        return toJson(jsonBuffer).toObject(type)
+    }
+
+    /**
+     * json buffer -> T
+     *
+     * @param jsonBuffer json buffer
+     * @param type       type of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBuffer: ByteBuffer, type: Type): T {
+        return toJson(jsonBuffer).toObject(type)
+    }
+
+    /**
+     * json buffer -> T
+     *
+     * @param jsonBuffer    json buffer
+     * @param typeRef type reference of T
+     * @param [T]           java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonBuffer: ByteBuffer, typeRef: TypeRef<T>): T {
+        return toJson(jsonBuffer).toObject(typeRef)
+    }
+
+    /**
+     * json source -> T
+     *
+     * @param jsonSource json source
+     * @param type       class of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonSource: URL, type: Class<T>): T {
+        return toJson(jsonSource).toObject(type)
+    }
+
+    /**
+     * json source -> T
+     *
+     * @param jsonSource json source
+     * @param type       type of T
+     * @param [T]        java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonSource: URL, type: Type): T {
+        return toJson(jsonSource).toObject(type)
+    }
+
+    /**
+     * json source -> T
+     *
+     * @param jsonSource    json source
+     * @param typeRef type reference of T
+     * @param [T]           java type
+     * @return [T]
+     */
+    @JvmDefault
+    fun <T> toObject(jsonSource: URL, typeRef: TypeRef<T>): T {
+        return toJson(jsonSource).toObject(typeRef)
+    }
 
     companion object {
 

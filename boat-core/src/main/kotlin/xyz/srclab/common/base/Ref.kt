@@ -10,7 +10,7 @@ package xyz.srclab.common.base
  * list.forEach(i -> ref.set(ref.get() + i));
  * ```
  */
-interface Ref<T> : SimpleAccessor<T> {
+interface Ref<T> : Accessor<T> {
 
     companion object {
 
