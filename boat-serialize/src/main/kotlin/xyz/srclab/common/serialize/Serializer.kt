@@ -1,5 +1,6 @@
 package xyz.srclab.common.serialize
 
+import xyz.srclab.common.base.Serial
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.serialize.json.JsonSerializer
 import java.lang.reflect.Type
@@ -7,7 +8,7 @@ import java.lang.reflect.Type
 /**
  * @see JsonSerializer
  */
-interface Serializer<S> {
+interface Serializer<S : Serial> {
 
     fun serialize(any: Any?): S
 

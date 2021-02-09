@@ -5,12 +5,14 @@ package xyz.srclab.common.serialize.json
 
 import xyz.srclab.common.reflect.TypeRef
 import java.io.InputStream
+import java.io.OutputStream
 import java.io.Reader
+import java.io.Writer
 import java.lang.reflect.Type
 import java.net.URL
 import java.nio.ByteBuffer
 
-private val jackson: JsonSerializer = JsonSerializer.DEFAULT
+private val defaultJsonSerializer: JsonSerializer = JsonSerializer.DEFAULT
 
 /**
  * java object -> json string
@@ -18,8 +20,8 @@ private val jackson: JsonSerializer = JsonSerializer.DEFAULT
  * @receiver java object
  * @return json string
  */
-fun Any.toJsonString(): String {
-    return jackson.toJsonString(this)
+fun Any?.toJsonString(): String {
+    return defaultJsonSerializer.toJsonString(this)
 }
 
 /**
@@ -28,8 +30,8 @@ fun Any.toJsonString(): String {
  * @receiver java object
  * @return json bytes
  */
-fun Any.toJsonBytes(): ByteArray {
-    return jackson.toJsonBytes(this)
+fun Any?.toJsonBytes(): ByteArray {
+    return defaultJsonSerializer.toJsonBytes(this)
 }
 
 /**
@@ -38,8 +40,8 @@ fun Any.toJsonBytes(): ByteArray {
  * @receiver java stream
  * @return json bytes
  */
-fun Any.toJsonStream(): InputStream {
-    return jackson.toJsonStream(this)
+fun Any?.toJsonStream(): InputStream {
+    return defaultJsonSerializer.toJsonStream(this)
 }
 
 /**
@@ -48,8 +50,8 @@ fun Any.toJsonStream(): InputStream {
  * @receiver java reader
  * @return json bytes
  */
-fun Any.toJsonReader(): Reader {
-    return jackson.toJsonReader(this)
+fun Any?.toJsonReader(): Reader {
+    return defaultJsonSerializer.toJsonReader(this)
 }
 
 /**
@@ -58,8 +60,123 @@ fun Any.toJsonReader(): Reader {
  * @receiver java buffer
  * @return json bytes
  */
-fun Any.toJsonBuffer(): ByteBuffer {
-    return jackson.toJsonBuffer(this)
+fun Any?.toJsonBuffer(): ByteBuffer {
+    return defaultJsonSerializer.toJsonBuffer(this)
+}
+
+/**
+ * Writes json from java object into given [OutputStream].
+ *
+ * @receiver    java object
+ * @param outputStream given [OutputStream].
+ */
+
+fun <T : OutputStream> Any?.writeJson(outputStream: T): T {
+    return this.toJson().writeOutputStream(outputStream)
+}
+
+/**
+ * Writes json from java object into given [Writer].
+ *
+ * @receiver  java object
+ * @param writer     given [Writer].
+ */
+
+fun <T : Writer> Any?.writeJson(writer: T): T {
+    return this.toJson().writeWriter(writer)
+}
+
+/**
+ * Writes json from java object into given [ByteBuffer].
+ *
+ * @receiver  java object
+ * @param buffer     given [ByteBuffer].
+ */
+
+fun <T : ByteBuffer> Any?.writeJson(buffer: T): T {
+    return this.toJson().writeByteBuffer(buffer)
+}
+
+/**
+ * json string -> [Json]
+ *
+ * @receiver json string
+ * @return [Json]
+ */
+fun CharSequence.toJson(): Json {
+    return defaultJsonSerializer.toJson(this)
+}
+
+/**
+ * json bytes -> [Json]
+ *
+ * @receiver json bytes
+ * @return [Json]
+ */
+fun ByteArray.toJson(): Json {
+    return defaultJsonSerializer.toJson(this)
+}
+
+/**
+ * json bytes -> [Json]
+ *
+ * @receiver json bytes
+ * @param offset    offset of bytes to be parsed
+ * @param length    length of bytes to be parsed
+ * @return [Json]
+ */
+fun ByteArray.toJson(offset: Int, length: Int): Json {
+    return defaultJsonSerializer.toJson(this, offset, length)
+}
+
+/**
+ * json stream -> [Json]
+ *
+ * @receiver json stream
+ * @return [Json]
+ */
+fun InputStream.toJson(): Json {
+    return defaultJsonSerializer.toJson(this)
+}
+
+/**
+ * json reader -> [Json]
+ *
+ * @receiver json reader
+ * @return [Json]
+ */
+fun Reader.toJson(): Json {
+    return defaultJsonSerializer.toJson(this)
+}
+
+/**
+ * json buffer -> [Json]
+ *
+ * @receiver json buffer
+ * @return [Json]
+ */
+fun ByteBuffer.toJson(): Json {
+    return defaultJsonSerializer.toJson(this)
+}
+
+/**
+ * json source -> [Json]
+ *
+ * @receiver json source
+ * @return [Json]
+ */
+fun URL.toJson(): Json {
+    return defaultJsonSerializer.toJson(this)
+}
+
+/**
+ * json object -> [Json]
+ *
+ * @receiver json object
+ * @return [Json]
+ */
+fun Any?.toJson(): Json {
+    return defaultJsonSerializer.toJson(this)
 }
 
 /**
@@ -70,9 +187,9 @@ fun Any.toJsonBuffer(): ByteBuffer {
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> CharSequence.jsonToJavaObject(type: Class<T>): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> CharSequence.jsonToObject(type: Class<T>): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -83,9 +200,9 @@ fun <T> CharSequence.jsonToJavaObject(type: Class<T>): T {
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> CharSequence.jsonToJavaObject(type: Type): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> CharSequence.jsonToObject(type: Type): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -96,9 +213,9 @@ fun <T> CharSequence.jsonToJavaObject(type: Type): T {
  * @param [T]           java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> CharSequence.jsonToJavaObject(typeRef: TypeRef<T>): T {
-    return jackson.toJavaObject(this, typeRef)
+@JvmName("toObject")
+fun <T> CharSequence.jsonToObject(typeRef: TypeRef<T>): T {
+    return defaultJsonSerializer.toObject(this, typeRef)
 }
 
 /**
@@ -109,9 +226,9 @@ fun <T> CharSequence.jsonToJavaObject(typeRef: TypeRef<T>): T {
  * @param [T]       java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> ByteArray.jsonToJavaObject(type: Class<T>): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> ByteArray.jsonToObject(type: Class<T>): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -122,9 +239,9 @@ fun <T> ByteArray.jsonToJavaObject(type: Class<T>): T {
  * @param [T]       java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> ByteArray.jsonToJavaObject(type: Type): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> ByteArray.jsonToObject(type: Type): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -135,9 +252,51 @@ fun <T> ByteArray.jsonToJavaObject(type: Type): T {
  * @param [T]           java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> ByteArray.jsonToJavaObject(typeRef: TypeRef<T>): T {
-    return jackson.toJavaObject(this, typeRef)
+@JvmName("toObject")
+fun <T> ByteArray.jsonToObject(typeRef: TypeRef<T>): T {
+    return defaultJsonSerializer.toObject(this, typeRef)
+}
+
+/**
+ * json bytes -> T
+ *
+ * @receiver json bytes
+ * @param offset    offset of bytes to be parsed
+ * @param type      class of T
+ * @param [T]       java type
+ * @return [T]
+ */
+@JvmName("toObject")
+fun <T> ByteArray.jsonToObject(offset: Int, type: Class<T>): T {
+    return defaultJsonSerializer.toObject(this, offset, type)
+}
+
+/**
+ * json bytes -> T
+ *
+ * @receiver json bytes
+ * @param offset    offset of bytes to be parsed
+ * @param type      type of T
+ * @param [T]       java type
+ * @return [T]
+ */
+@JvmName("toObject")
+fun <T> ByteArray.jsonToObject(offset: Int, type: Type): T {
+    return defaultJsonSerializer.toObject(this, offset, type)
+}
+
+/**
+ * json bytes -> T
+ *
+ * @receiver     json bytes
+ * @param offset    offset of bytes to be parsed
+ * @param typeRef type reference of T
+ * @param [T]           java type
+ * @return [T]
+ */
+@JvmName("toObject")
+fun <T> ByteArray.jsonToObject(offset: Int, typeRef: TypeRef<T>): T {
+    return defaultJsonSerializer.toObject(this, offset, typeRef)
 }
 
 /**
@@ -150,9 +309,9 @@ fun <T> ByteArray.jsonToJavaObject(typeRef: TypeRef<T>): T {
  * @param [T]       java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> ByteArray.jsonToJavaObject(offset: Int, length: Int, type: Class<T>): T {
-    return jackson.toJavaObject(this, offset, length, type)
+@JvmName("toObject")
+fun <T> ByteArray.jsonToObject(offset: Int, length: Int, type: Class<T>): T {
+    return defaultJsonSerializer.toObject(this, offset, length, type)
 }
 
 /**
@@ -165,9 +324,9 @@ fun <T> ByteArray.jsonToJavaObject(offset: Int, length: Int, type: Class<T>): T 
  * @param [T]       java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> ByteArray.jsonToJavaObject(offset: Int, length: Int, type: Type): T {
-    return jackson.toJavaObject(this, offset, length, type)
+@JvmName("toObject")
+fun <T> ByteArray.jsonToObject(offset: Int, length: Int, type: Type): T {
+    return defaultJsonSerializer.toObject(this, offset, length, type)
 }
 
 /**
@@ -180,9 +339,9 @@ fun <T> ByteArray.jsonToJavaObject(offset: Int, length: Int, type: Type): T {
  * @param [T]           java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> ByteArray.jsonToJavaObject(offset: Int, length: Int, typeRef: TypeRef<T>): T {
-    return jackson.toJavaObject(this, offset, length, typeRef)
+@JvmName("toObject")
+fun <T> ByteArray.jsonToObject(offset: Int, length: Int, typeRef: TypeRef<T>): T {
+    return defaultJsonSerializer.toObject(this, offset, length, typeRef)
 }
 
 /**
@@ -193,9 +352,9 @@ fun <T> ByteArray.jsonToJavaObject(offset: Int, length: Int, typeRef: TypeRef<T>
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> InputStream.jsonToJavaObject(type: Class<T>): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> InputStream.jsonToObject(type: Class<T>): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -206,9 +365,9 @@ fun <T> InputStream.jsonToJavaObject(type: Class<T>): T {
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> InputStream.jsonToJavaObject(type: Type): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> InputStream.jsonToObject(type: Type): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -219,9 +378,9 @@ fun <T> InputStream.jsonToJavaObject(type: Type): T {
  * @param [T]           java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> InputStream.jsonToJavaObject(typeRef: TypeRef<T>): T {
-    return jackson.toJavaObject(this, typeRef)
+@JvmName("toObject")
+fun <T> InputStream.jsonToObject(typeRef: TypeRef<T>): T {
+    return defaultJsonSerializer.toObject(this, typeRef)
 }
 
 /**
@@ -232,9 +391,9 @@ fun <T> InputStream.jsonToJavaObject(typeRef: TypeRef<T>): T {
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> Reader.jsonToJavaObject(type: Class<T>): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> Reader.jsonToObject(type: Class<T>): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -245,9 +404,9 @@ fun <T> Reader.jsonToJavaObject(type: Class<T>): T {
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> Reader.jsonToJavaObject(type: Type): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> Reader.jsonToObject(type: Type): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -258,9 +417,9 @@ fun <T> Reader.jsonToJavaObject(type: Type): T {
  * @param [T]           java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> Reader.jsonToJavaObject(typeRef: TypeRef<T>): T {
-    return jackson.toJavaObject(this, typeRef)
+@JvmName("toObject")
+fun <T> Reader.jsonToObject(typeRef: TypeRef<T>): T {
+    return defaultJsonSerializer.toObject(this, typeRef)
 }
 
 /**
@@ -271,9 +430,9 @@ fun <T> Reader.jsonToJavaObject(typeRef: TypeRef<T>): T {
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> ByteBuffer.jsonToJavaObject(type: Class<T>): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> ByteBuffer.jsonToObject(type: Class<T>): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -284,9 +443,9 @@ fun <T> ByteBuffer.jsonToJavaObject(type: Class<T>): T {
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> ByteBuffer.jsonToJavaObject(type: Type): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> ByteBuffer.jsonToObject(type: Type): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -297,9 +456,9 @@ fun <T> ByteBuffer.jsonToJavaObject(type: Type): T {
  * @param [T]           java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> ByteBuffer.jsonToJavaObject(typeRef: TypeRef<T>): T {
-    return jackson.toJavaObject(this, typeRef)
+@JvmName("toObject")
+fun <T> ByteBuffer.jsonToObject(typeRef: TypeRef<T>): T {
+    return defaultJsonSerializer.toObject(this, typeRef)
 }
 
 /**
@@ -310,9 +469,9 @@ fun <T> ByteBuffer.jsonToJavaObject(typeRef: TypeRef<T>): T {
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> URL.jsonToJavaObject(type: Class<T>): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> URL.jsonToObject(type: Class<T>): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -323,9 +482,9 @@ fun <T> URL.jsonToJavaObject(type: Class<T>): T {
  * @param [T]        java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> URL.jsonToJavaObject(type: Type): T {
-    return jackson.toJavaObject(this, type)
+@JvmName("toObject")
+fun <T> URL.jsonToObject(type: Type): T {
+    return defaultJsonSerializer.toObject(this, type)
 }
 
 /**
@@ -336,89 +495,7 @@ fun <T> URL.jsonToJavaObject(type: Type): T {
  * @param [T]           java type
  * @return [T]
  */
-@JvmName("toJavaObject")
-fun <T> URL.jsonToJavaObject(typeRef: TypeRef<T>): T {
-    return jackson.toJavaObject(this, typeRef)
-}
-
-/**
- * json string -> [Json]
- *
- * @receiver json string
- * @return [Json]
- */
-fun CharSequence.toJson(): Json {
-    return jackson.toJson(this)
-}
-
-/**
- * json bytes -> [Json]
- *
- * @receiver json bytes
- * @return [Json]
- */
-fun ByteArray.toJson(): Json {
-    return jackson.toJson(this)
-}
-
-/**
- * json bytes -> [Json]
- *
- * @receiver json bytes
- * @param offset    offset of bytes to be parsed
- * @param length    length of bytes to be parsed
- * @return [Json]
- */
-fun ByteArray.toJson(offset: Int, length: Int): Json {
-    return jackson.toJson(this, offset, length)
-}
-
-/**
- * json stream -> [Json]
- *
- * @receiver json stream
- * @return [Json]
- */
-fun InputStream.toJson(): Json {
-    return jackson.toJson(this)
-}
-
-/**
- * json reader -> [Json]
- *
- * @receiver json reader
- * @return [Json]
- */
-fun Reader.toJson(): Json {
-    return jackson.toJson(this)
-}
-
-/**
- * json buffer -> [Json]
- *
- * @receiver json buffer
- * @return [Json]
- */
-fun ByteBuffer.toJson(): Json {
-    return jackson.toJson(this)
-}
-
-/**
- * json source -> [Json]
- *
- * @receiver json source
- * @return [Json]
- */
-fun URL.toJson(): Json {
-    return jackson.toJson(this)
-}
-
-/**
- * json object -> [Json]
- *
- * @receiver json object
- * @return [Json]
- */
-fun Any.toJson(): Json {
-    return jackson.toJson(this)
+@JvmName("toObject")
+fun <T> URL.jsonToObject(typeRef: TypeRef<T>): T {
+    return defaultJsonSerializer.toObject(this, typeRef)
 }
