@@ -10,7 +10,7 @@ public class EggTest {
 
     @Test
     public void testEggV0() {
-        Egg egg = Egg.pick("xyz.srclab.common.egg.v0.V0Egg");
+        Egg egg = Egg.pick("xyz.srclab.common.egg.v0.OSpaceEgg");
         egg.hatchOut("5b+r6LeR77yB6L+Z6YeM5rKh5pyJ5Yqg54+t6LS577yB");
     }
 }

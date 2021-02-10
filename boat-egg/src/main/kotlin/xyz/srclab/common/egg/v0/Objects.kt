@@ -1,32 +1,93 @@
 package xyz.srclab.common.egg.v0
 
 import java.awt.Graphics
+import java.awt.Rectangle
 
-interface Living {
+interface Player : Living {
+
+    var hit: Long
+
+    var score: Long
+}
+
+interface Enemy : Living, AutoMovable {
+
+    var score: Long
+}
+
+interface Living : Movable {
 
     var hp: Int
 
-    var speed: Int
+    var defense: Int
 
     val weapons: List<Weapon>
-
-    var deadTime: Long
-
-    fun showLiving(graphics: Graphics, x: Int, y: Int)
-
-    fun showDead(graphics: Graphics, x: Int, y: Int)
 }
 
-interface Weapon {
+interface Weapon : OObject {
 
     var damage: Int
 
-    var speed: Int
+    var lastFireTime: Long
 
     var coolDownTime: Long
+
+    val owner: Living
+
+    fun attack(): Ammo
 }
 
-interface Ammo {
+interface Ammo : AutoMovable {
 
-    fun show(graphics: Graphics, x: Int, y: Int)
+    var damage: Int
+
+    val weapon: Weapon
+}
+
+interface AutoMovable : Movable {
+
+    var stepX: Double
+
+    var stepY: Double
+}
+
+interface Movable : TangibleObject {
+
+    var speed: Int
+
+    var lastMoveTime: Long
+
+    val moveCoolDownTime: Long
+        get() = (100 - speed).toLong()
+}
+
+interface TangibleObject : OObject {
+
+    var x: Double
+
+    var y: Double
+
+    val radius: Int
+
+    var force: Int
+
+    var deadTime: Long
+
+    val deadKeepTime: Long
+
+    val isDead: Boolean
+        get() = deadTime > 0
+
+    fun isDisappeared(now: Long): Boolean {
+        return isDead && (now - deadTime) > deadKeepTime
+    }
+
+    fun show(graphics: Graphics, x: Int, y: Int): Rectangle
+}
+
+interface OObject {
+
+    val type: String
+
+    var name: String
 }

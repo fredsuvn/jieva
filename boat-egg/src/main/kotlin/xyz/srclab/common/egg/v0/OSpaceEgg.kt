@@ -7,7 +7,7 @@ import xyz.srclab.common.egg.Egg
 /**
  * @author sunqian
  */
-class V0Egg : Egg {
+class OSpaceEgg : Egg {
 
     override fun hatchOut(spell: CharSequence) {
         checkSpell(spell)
@@ -16,6 +16,6 @@ class V0Egg : Egg {
     }
 
     private fun checkSpell(spell: CharSequence) {
-        checkArgument(spell.decodeBase64String() == "快跑！这里没有加班费！")
+        checkArgument(spell.decodeBase64String() == "快跑！这里没有加班费！", "Wrong Spell!")
     }
 }

@@ -1,24 +1,25 @@
 package xyz.srclab.common.egg.v0
 
 import java.awt.Color
+import java.awt.Rectangle
 import java.util.*
 import javax.swing.JPanel
 
 /**
  * @author sunqian
  */
-class SpacePanel : JPanel() {
+class SpacePanel(
+    val scenario: Scenario,
+    val fps: Int,
+) : JPanel() {
 
-    private val livings: List<Living> = LinkedList()
-    private val ammos: List<Ammo> = LinkedList()
+    private val rectangles: MutableCollection<Rectangle> = LinkedList()
 
     init {
         background = Color.BLACK
     }
 
-    private fun refresh() {
-        for (living in livings) {
+    private fun startScenario() {
 
-        }
     }
 }
