@@ -2,7 +2,7 @@ plugins {
   id 'build.kotlin-publish-jar'
 }
 
-description = "Boat Serialize: serialization and deserialization."
+description = "Boat Serialize: Serialization and deserialization (json, etc.)."
 
 java {
   registerFeature('optionalSupport') {

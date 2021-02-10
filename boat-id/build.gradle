@@ -2,7 +2,7 @@ plugins {
   id 'build.kotlin-publish-jar'
 }
 
-description = "Boat Id: id generators."
+description = "Boat ID: Lightweight ID generation framework."
 
 java {
   registerFeature('optionalSupport') {

@@ -2,16 +2,14 @@ plugins {
   id 'build.kotlin-publish-platform'
 }
 
-description = "boat-bom: BOM of boat projects."
-
-def dependenciesVersion = "1.1.1"
+description = "Boat BOM: Boat projects BOM."
 
 javaPlatform {
   allowDependencies()
 }
 
 dependencies {
-  api platform("xyz.srclab.bom:srclab-dependencies:$dependenciesVersion")
+  api platform("xyz.srclab.bom:srclab-dependencies:${infos.dependenciesVersion}")
 
   constraints {
     file("${rootDir}").eachDirMatch(~/boat-.*/) { file ->

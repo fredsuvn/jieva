@@ -4,31 +4,34 @@
 ext["infos"] = [
 
     //Log prefix
-    logPrefix    : "boat >>>>>>",
+    logPrefix          : "boat >>>>>>",
 
     //Whether build to snapshot
-    snapshot     : false,
+    snapshot           : false,
 
     //Whether publish to sonatype
-    sonatype     : false,
+    sonatype           : false,
 
     //Whether signing
-    signing      : false,
+    signing            : false,
 
     //Version
-    version      : "0.1.0",
+    version            : "0.1.0",
+
+    //Dependencies version
+    dependenciesVersion: "1.1.1",
 
     //Group
-    group        : "xyz.srclab.common",
+    group              : "xyz.srclab.common",
 
     //Project url
-    url          : "https://github.com/srclab-projects/boat",
+    url                : "https://github.com/srclab-projects/boat",
 
     //Project inception year
-    inceptionYear: "2020",
+    inceptionYear      : "2020",
 
     //Licenses
-    licenses     : [
+    licenses           : [
         [
             name: "The Apache License, Version 2.0",
             url : "http://www.apache.org/licenses/LICENSE-2.0.txt",
@@ -36,7 +39,7 @@ ext["infos"] = [
     ],
 
     //Developers
-    developers   : [
+    developers         : [
         [
             id   : "fredsuvn",
             name : "孙谦",
@@ -53,7 +56,7 @@ ext["infos"] = [
     ],
 
     //Oss urls
-    oss          : [
+    oss                : [
         staging : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
         snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
     ],

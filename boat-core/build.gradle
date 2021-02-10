@@ -2,7 +2,7 @@ plugins {
   id 'build.kotlin-publish-jar'
 }
 
-description = "Boat Core: core common tools."
+description = "Boat Core: Basic core utilities and interfaces."
 
 java {
   registerFeature('optionalSupport') {
