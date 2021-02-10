@@ -16,7 +16,7 @@ fun main() {
     egg.setSize(800, 500)
     egg.title = "egg"
 
-    egg.add(SpacePanel())
+    //egg.add(SpacePanel())
 
     egg.addWindowListener(object : WindowAdapter() {
 
@@ -31,7 +31,6 @@ fun main() {
         override fun mouseClicked(e: MouseEvent) {
             egg.graphics.drawOval(e.x - 25, e.y - 25, 50, 50)
         }
-
     })
 
     egg.isVisible = true

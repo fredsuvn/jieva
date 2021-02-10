@@ -1,0 +1,13 @@
+plugins {
+  id 'build.kotlin-publish-platform'
+}
+
+description = "Boat Dependencies: Boat projects dependencies management."
+
+javaPlatform {
+  allowDependencies()
+}
+
+dependencies {
+  api platform("xyz.srclab.bom:srclab-dependencies:${infos.dependenciesVersion}")
+}

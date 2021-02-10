@@ -9,8 +9,6 @@ javaPlatform {
 }
 
 dependencies {
-  api platform("xyz.srclab.bom:srclab-dependencies:${infos.dependenciesVersion}")
-
   constraints {
     file("${rootDir}").eachDirMatch(~/boat-.*/) { file ->
       api(project(":${file.name}"))
