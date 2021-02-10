@@ -2,7 +2,7 @@ plugins {
   id 'build.kotlin-publish-jar'
 }
 
-description = "Boat Serialize: serialization and deserialization."
+description = "Boat Serialize: Serialization and deserialization (json, etc.)."
 
 java {
   registerFeature('optionalSupport') {
@@ -11,7 +11,7 @@ java {
 }
 
 dependencies {
-  implementation(platform(project(":boat-bom")))
+  implementation(platform(project(":boat-dependencies")))
 
   api(project(":boat-core"))
   api("com.fasterxml.jackson.core:jackson-core")
