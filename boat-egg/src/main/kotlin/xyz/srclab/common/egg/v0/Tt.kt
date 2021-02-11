@@ -29,6 +29,7 @@ fun main() {
     egg.addMouseListener(object : MouseAdapter() {
 
         override fun mouseClicked(e: MouseEvent) {
+            egg.repaint()
             egg.graphics.drawOval(e.x - 25, e.y - 25, 50, 50)
         }
     })

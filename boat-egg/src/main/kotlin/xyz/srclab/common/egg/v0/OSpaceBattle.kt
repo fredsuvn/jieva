@@ -7,12 +7,12 @@ import xyz.srclab.common.egg.Egg
 /**
  * @author sunqian
  */
-class OSpaceEgg : Egg {
+class OSpaceBattle : Egg {
 
     override fun hatchOut(spell: CharSequence) {
         checkSpell(spell)
 
-        println("sssss")
+        println("Welcome to O Space Battle!")
     }
 
     private fun checkSpell(spell: CharSequence) {

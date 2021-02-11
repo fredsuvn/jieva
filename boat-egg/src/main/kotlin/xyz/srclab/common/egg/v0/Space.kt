@@ -124,13 +124,16 @@ class Space(
         _enemies.addAll(enemies)
     }
 
-    private fun move(@OutParam movable: Movable, now: Long, stepX: Double, stepY: Double) {
+    fun move(@OutParam movable: Movable, now: Long, stepX: Double, stepY: Double) {
         if (now - movable.lastMoveTime < movable.moveCoolDownTime) {
             return
         }
         movable.x += stepX
         movable.y += stepY
+        movable.lastMoveTime = now
     }
+
+    //fun attack(@OutParam )
 
     private fun computeStep(@OutParam movable: AutoMovable, targetX: Double, targetY: Double) {
         val distance = distance(movable.x, movable.y, targetX, targetY)

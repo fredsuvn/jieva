@@ -25,7 +25,8 @@ Boat includes:
 * *boat-serialize*: serialization function, including json serialization;
 * *boat-codec*: codec function, supporting Hex, Base64, AES, RSA, SM2 and more other algorithms;
 * *boat-id*: a light and easy id generation framework;
-* *boat-test*: help import common test libraries.
+* *boat-test*: help import common test libraries;
+* *boat-bom*: BOM of boat.
 
 If you want to import all above modules, just import:
 

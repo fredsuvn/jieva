@@ -25,7 +25,8 @@ Boat包括:
 * *boat-serialize*: 序列化工具, 包括json序列化;
 * *boat-codec*: 编码功能, 支持Hex, Base64, AES, RSA, SM2 and more other algorithms;
 * *boat-id*: 一个轻量级id生成框架;
-* *boat-test*: 辅助引入测试库.
+* *boat-test*: 辅助引入测试库;
+* *boat-bom*: boat的BOM.
 
 如果你需要引入以上全部, 只需要:
 

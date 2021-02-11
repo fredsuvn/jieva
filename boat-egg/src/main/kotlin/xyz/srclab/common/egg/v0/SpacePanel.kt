@@ -1,5 +1,6 @@
 package xyz.srclab.common.egg.v0
 
+import xyz.srclab.common.egg.Scenario
 import java.awt.Color
 import java.awt.Rectangle
 import java.util.*
