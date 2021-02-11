@@ -3,7 +3,7 @@ package xyz.srclab.common.egg
 /**
  * Help design the engine of [Egg].
  */
-interface Engine {
+interface Engine<S : Scenario, P : Playing> {
 
-    fun start(scenario: Scenario): Playing
+    fun start(scenario: S): P
 }

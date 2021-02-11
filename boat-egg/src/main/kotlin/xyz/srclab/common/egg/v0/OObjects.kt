@@ -58,7 +58,7 @@ interface Movable : TangibleObject {
     var lastMoveTime: Long
 
     val moveCoolDownTime: Long
-        get() = (100 - speed).toLong()
+        get() = if (speed > 100) 0L else (100 - speed).toLong()
 }
 
 interface TangibleObject : OObject {
@@ -68,8 +68,6 @@ interface TangibleObject : OObject {
     var y: Double
 
     val radius: Int
-
-    var force: Int
 
     var deadTime: Long
 
@@ -90,4 +88,10 @@ interface OObject {
     val type: String
 
     var name: String
+
+    var force: Force
+}
+
+enum class Force {
+    PLAYER, ENEMY, NEUTRAL
 }

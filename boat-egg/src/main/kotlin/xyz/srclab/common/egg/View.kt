@@ -3,7 +3,7 @@ package xyz.srclab.common.egg
 /**
  * Help design the view of [Egg].
  */
-interface View {
+interface View<E : Engine<S, P>, S : Scenario, P : Playing> {
 
-    fun start(fps: Int, engine: Engine, scenario: Scenario)
+    fun start(fps: Int, engine: E, scenario: S)
 }
