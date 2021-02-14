@@ -7,6 +7,7 @@ import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.annotations.OutParam
 import xyz.srclab.annotations.PossibleTypes
 import xyz.srclab.common.base.Current
+import xyz.srclab.common.base.Default
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.base.loadClass
 import java.lang.reflect.*
@@ -129,6 +130,13 @@ val Class<*>.isAbstract: Boolean
 val Class<*>.isStrict: Boolean
     @JvmName("isStrict") get() {
         return Modifier.isStrict(this.modifiers)
+    }
+
+val Class<*>.shortName: String
+    @JvmName("shortName") get() {
+        val name = this.name
+        val lastDotIndex = Default.DOT_MATCHER.lastIndexIn(name)
+        return if (lastDotIndex < 0) name else name.substring(lastDotIndex + 1, name.length)
     }
 
 val ParameterizedType.rawClass: Class<*>
