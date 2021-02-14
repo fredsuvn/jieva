@@ -1,9 +1,9 @@
 package xyz.srclab.common.egg
 
 /**
- * Pre-infos about current [Egg].
+ * Metadata about current [Egg].
  */
-interface PreEgg {
+interface EggMeta {
 
     val eggName: String
 

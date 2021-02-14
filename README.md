@@ -22,12 +22,24 @@
 ## _Here is an egg -> boat-egg !_
 
 ```java
-public class EggTest {
+public class EggSample {
 
     @Test
     public void testEgg() {
-        Egg egg = Egg.pickOne("Hello Egg");
-        egg.hatchOut("5b+r6LeR77yB6L+Z6YeM5rKh5pyJ5Yqg54+t6LS577yB");
+        EggManager eggManager = BoatEggManager.INSTANCE;
+        Egg egg = eggManager.pick("Hello, Boat Egg!");
+        egg.hatchOut("出来吧，神龙！");
+    }
+}
+```
+
+```kotlin
+class EggSampleKt {
+
+    @Test
+    fun testEgg() {
+        val egg = BoatEggManager.pick("Hello, Boat Egg!")
+        egg.hatchOut("出来吧，神龙！")
     }
 }
 ```
