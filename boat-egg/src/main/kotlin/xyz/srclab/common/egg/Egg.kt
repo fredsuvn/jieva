@@ -1,13 +1,18 @@
 package xyz.srclab.common.egg
 
 import xyz.srclab.common.base.checkArgument
+import xyz.srclab.common.base.loadStringResource
 import xyz.srclab.common.codec.Codec.Companion.decodeBase64String
-import xyz.srclab.common.egg.v0.OSpaceBattle
+import xyz.srclab.common.reflect.toInstance
 
 /**
  * @author sunqian
  */
 interface Egg {
+
+    val readmeMd: String
+
+    val readMeAdoc: String
 
     fun hatchOut(spell: CharSequence)
 
@@ -19,6 +24,11 @@ interface Egg {
             return func()
         }
 
+        /*
+         * Egg management:
+         * Loads SampleEgg;
+         * Scans package v0 - vx, find xyz.srclab.common.egg.vx.VxPreEgg, to load all egg infos.
+         */
         private val eggMap = HashMap<String, () -> Egg>()
 
         /*
@@ -28,25 +38,31 @@ interface Egg {
             eggMap["Hello Egg"] = {
                 SampleEgg()
             }
-            eggMap["O Space Battle"] = {
-                OSpaceBattle()
+            var i = 0
+            while (true) {
+                try {
+                    val preEgg = "xyz.srclab.common.egg.v$i.V${i}PreEgg".toInstance<PreEgg>()
+                    eggMap[preEgg.eggName] = {
+                        preEgg.eggClassName.toInstance()
+                    }
+                    i++
+                } catch (e: Exception) {
+                    break
+                }
             }
         }
 
         private class SampleEgg : Egg {
 
+            private val tip = "eggs/sample.readme".loadStringResource()
+
+            override val readmeMd: String = tip
+            override val readMeAdoc: String = tip
+
             override fun hatchOut(spell: CharSequence) {
                 checkSpell(spell)
 
-                println(
-                    """
-                    Well well ~
-                    this is just a sample egg,
-                    if you really want to a true egg,
-                    please pick by a true name,
-                    and hatch out with a true spell ~
-                """.trimIndent()
-                )
+                println(tip)
             }
 
             private fun checkSpell(spell: CharSequence) {

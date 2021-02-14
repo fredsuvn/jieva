@@ -9,6 +9,9 @@ import xyz.srclab.common.egg.Egg
  */
 class OSpaceBattle : Egg {
 
+    override val readmeMd: String = "eggs/v0/readme.md"
+    override val readMeAdoc: String = "eggs/v0/readme.adoc"
+
     override fun hatchOut(spell: CharSequence) {
         val config = parseSpell(spell)
 
