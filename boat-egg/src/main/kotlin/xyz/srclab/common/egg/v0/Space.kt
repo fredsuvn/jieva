@@ -52,7 +52,7 @@ class Space(
             if (living.isDead) {
                 return true
             }
-            if (ammo.force != living.force && distance(ammo, living) < (ammo.radius + living.radius)) {
+            if (ammo.force != living.force && distance(ammo, living) < (ammo.size + living.size)) {
                 val damage = (ammo.damage - living.defense).atLeastZero()
                 living.hp -= damage
                 if (living.hp <= 0) {
@@ -96,7 +96,7 @@ class Space(
                     continue
                 }
                 for (weapon in enemy.weapons) {
-                    if (now - weapon.lastFireTime > weapon.coolDownTime) {
+                    if (now - weapon.lastFireTime > weapon.FireCoolDownTime) {
                         val ammo = weapon.attack()
                         _ammos.add(ammo)
                         weapon.lastFireTime = now
@@ -124,25 +124,25 @@ class Space(
         _enemies.addAll(enemies)
     }
 
-    fun move(@OutParam movable: Movable, now: Long, stepX: Double, stepY: Double) {
-        if (now - movable.lastMoveTime < movable.moveCoolDownTime) {
+    fun move(@OutParam movableUnit: MovableUnit, now: Long, stepX: Double, stepY: Double) {
+        if (now - movableUnit.lastMoveTime < movableUnit.moveCoolDownTime) {
             return
         }
-        movable.x += stepX
-        movable.y += stepY
-        movable.lastMoveTime = now
+        movableUnit.x += stepX
+        movableUnit.y += stepY
+        movableUnit.lastMoveTime = now
     }
 
     //fun attack(@OutParam )
 
-    private fun computeStep(@OutParam movable: AutoMovable, targetX: Double, targetY: Double) {
+    private fun computeStep(@OutParam movable: AutoMovableUnit, targetX: Double, targetY: Double) {
         val distance = distance(movable.x, movable.y, targetX, targetY)
         val per = 1 / distance
         movable.stepX += (targetX - movable.x) * per
         movable.stepY += (targetY - movable.y) * per
     }
 
-    private fun distance(a: TangibleObject, b: TangibleObject): Double {
+    private fun distance(a: SizeUnit, b: SizeUnit): Double {
         return distance(a.x, a.y, b.x, b.y)
     }
 
@@ -155,7 +155,7 @@ class Space(
         return if (r) p1 else p2
     }
 
-    private fun TangibleObject.isOutOfSpace(weight: Double, height: Double): Boolean {
+    private fun SizeUnit.isOutOfSpace(weight: Double, height: Double): Boolean {
         return x < 0 || x > weight || y < -preparedHeight || y > height
     }
 }

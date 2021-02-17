@@ -5,5 +5,5 @@ package xyz.srclab.common.egg
  */
 interface Engine<S : Scenario, P : Playing> {
 
-    fun start(scenario: S): P
+    fun load(scenario: S): P
 }

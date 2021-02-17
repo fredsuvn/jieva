@@ -46,7 +46,7 @@ object BoatEggManager : EggManager {
 
             Of course,
             you don't know name and spell,
-            but I hear there are a lot of secrets in that maze.
+            but I hear there are a lot of secrets in that maze[https://github.com/srclab-projects/maze?].
             Maybe you can find out there~
         """.trimIndent()
 
