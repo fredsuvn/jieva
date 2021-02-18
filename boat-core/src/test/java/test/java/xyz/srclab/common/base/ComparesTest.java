@@ -1,0 +1,18 @@
+package test.java.xyz.srclab.common.base;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import xyz.srclab.common.base.Compares;
+import xyz.srclab.common.test.TestLogger;
+
+public class ComparesTest {
+
+    private static final TestLogger logger = TestLogger.DEFAULT;
+
+    @Test
+    public void testCompares() {
+        Assert.assertEquals(Compares.inBounds(100, 101, 666), Integer.valueOf(101));
+        Assert.assertEquals(Compares.inBounds(100, 0, 99), Integer.valueOf(99));
+        Assert.assertEquals(Compares.inBounds(100, 0, 666), Integer.valueOf(100));
+    }
+}
