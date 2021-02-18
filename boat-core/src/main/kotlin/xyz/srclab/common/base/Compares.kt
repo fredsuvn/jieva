@@ -1,9 +1,19 @@
-@file:JvmName("Sorts")
+@file:JvmName("Compares")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.base
 
 import java.util.*
+
+fun <T : Comparable<T>> T.inBounds(min: T, max: T): T {
+    if (this < min) {
+        return min
+    }
+    if (this > max) {
+        return max
+    }
+    return this
+}
 
 fun <T> castSelfComparableComparator(): Comparator<T> {
     return CAST_SELF_COMPARABLE_COMPARATOR.asAny()

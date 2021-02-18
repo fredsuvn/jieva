@@ -1,3 +1,6 @@
 package xyz.srclab.common.egg.v0
 
-interface OSpaceView : View<OSpaceEngine, OSpaceScenario, OSpacePlaying>
+interface OSpaceView {
+
+    fun log(pattern: CharSequence, vararg args: Any?)
+}

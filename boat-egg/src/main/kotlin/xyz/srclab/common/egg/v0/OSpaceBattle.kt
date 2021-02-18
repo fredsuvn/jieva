@@ -30,7 +30,7 @@ class OSpaceBattle : Egg {
 
     private fun createEngine(config: OSpaceConfig): OSpaceEngine {
         return object : OSpaceEngine {
-            override fun start(scenario: OSpaceScenario): OSpacePlaying {
+            override fun start(scenario: OSpaceScenario): OSpaceController {
                 TODO("Not yet implemented")
             }
         }

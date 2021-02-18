@@ -3,7 +3,9 @@ package xyz.srclab.common.egg
 /**
  * The staring [Engine].
  */
-interface Playing {
+interface Controller<D : Data> {
+
+    fun startNew()
 
     fun go()
 
@@ -11,7 +13,7 @@ interface Playing {
 
     fun stop()
 
-    fun save(path: CharSequence)
+    fun save(): D
 
-    fun load(path: CharSequence)
+    fun load(data: D)
 }

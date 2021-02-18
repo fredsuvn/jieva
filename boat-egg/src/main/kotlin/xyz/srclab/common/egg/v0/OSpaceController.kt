@@ -1,8 +1,8 @@
 package xyz.srclab.common.egg.v0
 
-import xyz.srclab.common.egg.Playing
+import xyz.srclab.common.egg.Controller
 
-interface OSpacePlaying : Playing {
+interface OSpaceController : Controller<OSpaceData> {
 
     fun moveLeft(player: Int)
 

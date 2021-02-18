@@ -6,26 +6,66 @@ import xyz.srclab.common.egg.Engine
 import java.util.concurrent.CountDownLatch
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.random.Random
 
-class OSpaceEngine(private val config: OSpaceConfig) : Engine<OSpaceScenario, OSpacePlaying> {
+class OSpaceEngine(private val config: OSpaceConfig) : Engine<OSpaceScenario, OSpaceController, OSpaceData> {
 
-    override fun load(scenario: OSpaceScenario): OSpacePlaying {
-        return OSpacePlayingImpl(scenario, config)
+    override fun load(scenario: OSpaceScenario): OSpaceController {
+        return OSpaceControllerImpl(scenario, config)
     }
 }
 
-private class OSpacePlayingImpl(
+private class OSpaceControllerImpl(
     val scenario: OSpaceScenario,
     val config: OSpaceConfig
-) : OSpacePlaying {
+) : OSpaceController {
 
     private val tick = OSpaceTick(config)
-    private val countDownRef = CountDownRef(Ref.of<CountDownLatch>(null))
+    private val countDownRef = CountDownRef(Ref.of(null))
     private val playingThread = PlayingThread(config, scenario, countDownRef)
 
     init {
         countDownRef.reset()
         playingThread.start()
+    }
+
+    override fun startNew() {
+        scenario.loadNew()
+    }
+
+    override fun go() {
+        if (tick.isStop) {
+            throw IllegalStateException("Game has been over!")
+        }
+        tick.go()
+        if (playingThread.isAlive) {
+            countDownRef.get().countDown()
+        } else {
+            playingThread.start()
+        }
+    }
+
+    override fun pause() {
+        if (tick.isStop) {
+            throw IllegalStateException("Game has been over!")
+        }
+        countDownRef.reset()
+        tick.pause()
+    }
+
+    override fun stop() {
+        if (tick.isStop) {
+            throw IllegalStateException("Game has been over!")
+        }
+        tick.stop()
+    }
+
+    override fun save(): OSpaceData {
+        return scenario.data
+    }
+
+    override fun load(data: OSpaceData) {
+        scenario.load(data)
     }
 
     override fun moveLeft(player: Int) {
@@ -84,38 +124,14 @@ private class OSpacePlayingImpl(
     }
 
     private fun getPlayer(player: Int): Player {
-        return if (player == 1) scenario.player1 else scenario.player2
+        return if (player == 1) scenario.data.player1!! else scenario.data.player2!!
     }
 
-    override fun go() {
-        if (tick.isStop) {
-            throw IllegalStateException("Game has been over!")
+    private fun Player.move(currentTime: Long, stepX: Double, stepY: Double) {
+        if (this.x < 0 || this.x > config.width || this.y < 0 || this.y > config.height) {
+            return
         }
-        tick.go()
-        countDownRef.get().countDown()
-    }
-
-    override fun pause() {
-        if (tick.isStop) {
-            throw IllegalStateException("Game has been over!")
-        }
-        countDownRef.reset()
-        tick.pause()
-    }
-
-    override fun stop() {
-        if (tick.isStop) {
-            throw IllegalStateException("Game has been over!")
-        }
-        tick.stop()
-    }
-
-    override fun save(path: CharSequence) {
-
-    }
-
-    override fun load(path: CharSequence) {
-        TODO("Not yet implemented")
+        (this as MovableUnit).move(currentTime, stepX, stepY)
     }
 
     private fun MovableUnit.move(currentTime: Long, stepX: Double, stepY: Double) {
@@ -129,7 +145,7 @@ private class OSpacePlayingImpl(
         this.lastMoveTime = currentTime
     }
 
-    private fun Weapon.attack(currentTime: Long, targetX: Double, targetY: Double): Ammo? {
+    private fun Weapon.attack(currentTime: Long, targetX: Double, targetY: Double) {
 
         fun AutoMovableUnit.computeStep(targetX: Double, targetY: Double) {
             if (this.x == targetX) {
@@ -148,12 +164,17 @@ private class OSpacePlayingImpl(
         }
 
         if (currentTime - this.lastFireTime < this.fireSpeed.fireSpeedToCoolDown()) {
-            return null
+            return
         }
-        val ammo = this.ammoManager.newAmmo()
-        ammo.computeStep(targetX, targetY)
-        this.ammoManager.ammos.add(ammo)
-        return ammo
+        val ammos = this.ammoManager.newAmmos()
+        for (ammo in ammos) {
+            ammo.x = this.owner.x
+            ammo.y = this.owner.y
+            ammo.lastX = ammo.x
+            ammo.lastY = ammo.y
+            ammo.computeStep(targetX, targetY)
+            this.ammoManager.ammos.add(ammo)
+        }
     }
 
     private fun distance(a: SizeUnit, b: SizeUnit): Double {
@@ -171,7 +192,7 @@ private class OSpacePlayingImpl(
     }
 
     private inner class PlayingThread(
-        private val config: OSpaceConfig,
+        config: OSpaceConfig,
         private val scenario: OSpaceScenario,
         private val countDownRef: CountDownRef
     ) : Thread("PlayingThread") {
@@ -180,33 +201,82 @@ private class OSpacePlayingImpl(
 
         override fun run() {
 
-            fun doPlayerAmmos(player: Player) {
-                for (weapon in player.weapons) {
-                    for (ammo in weapon.ammoManager.ammos) {
-                        if (ammo.isDead) {
-                            continue
-                        }
-                        for (enemy in scenario.enemies) {
-                            if (!enemy.isDead && distance(ammo, enemy) < ammo.size + enemy.size) {
-                                scenario.onHitEnemy(ammo, weapon.ammoManager, enemy)
-                            }
-                        }
-                        if (!ammo.isDead) {
-                            ammo.move(tick.time, ammo.stepX, ammo.stepY)
-                        }
-                    }
+            fun doWait() {
+                if (!tick.isGoing) {
+                    val countDown = countDownRef.get()
+                    countDown.await()
+                } else {
+                    Current.sleep(tick.tickDuration)
                 }
             }
 
-            fun doEnemyAmmos() {
-                for (enemy in scenario.enemies) {
+            fun doClean(data: OSpaceData) {
+
+                fun doClean0(iterable: MutableIterable<BodyUnit>) {
+                    val iterator = iterable.iterator()
+                    while (iterator.hasNext()) {
+                        val it = iterator.next()
+                        if (it.isDisappeared(tick.time, config)) {
+                            iterator.remove()
+                        }
+                    }
+                }
+
+                for (weapon in data.player1!!.weapons) {
+                    doClean0(weapon.ammoManager.ammos)
+                }
+                for (weapon in data.player2!!.weapons) {
+                    doClean0(weapon.ammoManager.ammos)
+                }
+                for (enemy in data.enemies!!) {
+                    for (weapon in enemy.weapons) {
+                        doClean0(weapon.ammoManager.ammos)
+                    }
+                }
+                doClean0(data.enemies!!)
+            }
+
+            fun doPlayerAmmos(data: OSpaceData) {
+
+                fun doPlayerAmmos0(player: Player) {
+                    for (weapon in player.weapons) {
+                        for (ammo in weapon.ammoManager.ammos) {
+                            if (ammo.isDead) {
+                                continue
+                            }
+                            for (enemy in data.enemies!!) {
+                                if (!enemy.isDead && distance(ammo, enemy) < ammo.radius + enemy.radius) {
+                                    scenario.onHitEnemy(ammo, weapon.ammoManager, enemy, tick)
+                                }
+                            }
+                            if (!ammo.isDead) {
+                                ammo.move(tick.time, ammo.stepX, ammo.stepY)
+                            }
+                        }
+                    }
+                }
+
+                doPlayerAmmos0(data.player1!!)
+                doPlayerAmmos0(data.player2!!)
+            }
+
+            fun doEnemiesAmmos(data: OSpaceData) {
+                for (enemy in data.enemies!!) {
                     for (weapon in enemy.weapons) {
                         for (ammo in weapon.ammoManager.ammos) {
-                            if (!ammo.isDead && distance(ammo, scenario.player1) < ammo.size + scenario.player1.size) {
-                                scenario.onHitPlayer(ammo, weapon.ammoManager, scenario.player1)
+                            if (!ammo.isDead && distance(
+                                    ammo,
+                                    data.player1!!
+                                ) < ammo.radius + data.player1!!.radius
+                            ) {
+                                scenario.onHitPlayer(ammo, weapon.ammoManager, data.player1!!, tick)
                             }
-                            if (!ammo.isDead && distance(ammo, scenario.player2) < ammo.size + scenario.player2.size) {
-                                scenario.onHitPlayer(ammo, weapon.ammoManager, scenario.player2)
+                            if (!ammo.isDead && distance(
+                                    ammo,
+                                    data.player2!!
+                                ) < ammo.radius + data.player2!!.radius
+                            ) {
+                                scenario.onHitPlayer(ammo, weapon.ammoManager, data.player2!!, tick)
                             }
                             if (!ammo.isDead) {
                                 ammo.move(tick.time, ammo.stepX, ammo.stepY)
@@ -216,25 +286,53 @@ private class OSpacePlayingImpl(
                 }
             }
 
-            while (!tick.isStop) {
-                //Wait if pause
-                if (!tick.isGoing) {
-                    val countDown = countDownRef.get()
-                    countDown.await()
-                } else {
-                    Current.sleep(config.tickUnit)
+            fun doEnemiesFire(data: OSpaceData) {
+
+                fun pickPlayer(): Player {
+                    if (data.player1!!.isDead && !data.player2!!.isDead) {
+                        return data.player2!!
+                    }
+                    if (data.player2!!.isDead && !data.player1!!.isDead) {
+                        return data.player1!!
+                    }
+                    return if (Random.nextBoolean()) data.player1!! else data.player2!!
                 }
 
-                //Do ammos
-                doPlayerAmmos(scenario.player1)
-                doPlayerAmmos(scenario.player2)
-                doEnemyAmmos()
+                for (enemy in data.enemies!!) {
+                    for (weapon in enemy.weapons) {
+                        val player = pickPlayer()
+                        weapon.attack(tick.time, player.x, player.y)
+                    }
+                }
+            }
 
-                //Do enemy-move
-                for (enemy in scenario.enemies) {
+            fun doEnemiesMoving(data: OSpaceData) {
+                for (enemy in data.enemies!!) {
                     enemy.move(tick.time, enemy.stepX, enemy.stepY)
                 }
+            }
 
+            while (!tick.isStop) {
+                //Wait if pause
+                doWait()
+
+                val data = scenario.data
+
+                //Clean
+                doClean(data)
+
+                //Do ammos
+                doPlayerAmmos(data)
+                doEnemiesAmmos(data)
+
+                //Do enemies fire
+                doEnemiesFire(data)
+
+                //Do enemies moving
+                doEnemiesMoving(data)
+
+                //Tick
+                scenario.onTick(tick)
                 tick.tick()
             }
         }

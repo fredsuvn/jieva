@@ -7,6 +7,7 @@ class OSpaceTick(private val config: OSpaceConfig) {
     private var _isStop: Boolean = false
 
     val time: Long = _time
+    val tickDuration: Long = config.tickDuration
     val isGoing: Boolean = _going
     val isStop: Boolean = _isStop
 
@@ -23,6 +24,6 @@ class OSpaceTick(private val config: OSpaceConfig) {
     }
 
     fun tick() {
-        _time += config.tickUnit
+        _time += tickDuration
     }
 }
