@@ -3,6 +3,7 @@ package test.xyz.srclab.common.serialize;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.Default;
 import xyz.srclab.common.serialize.json.Json;
 import xyz.srclab.common.serialize.json.JsonSerializer;
 import xyz.srclab.common.serialize.json.JsonSerials;
@@ -10,7 +11,11 @@ import xyz.srclab.common.serialize.json.JsonType;
 import xyz.srclab.common.test.TestLogger;
 
 import java.math.BigDecimal;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 
@@ -127,6 +132,18 @@ public class JsonTest {
         Assert.assertEquals(nullJson.toString(), "null");
         Assert.assertNull(nullJson.toStringOrNull());
         Assert.expectThrows(IllegalStateException.class, () -> nullJson.toObject(String.class));
+    }
+
+    @Test
+    public void testUrl() throws Exception {
+        Path path = Paths.get("json.txt");
+        Files.write(path, "{\"key1\":\"value1\"}".getBytes(Default.charset()));
+        URL url = new URL("file:json.txt");
+        Json json = JsonSerials.toJson(url);
+        logger.log(json);
+        String value1 = json.toMap().get("key1").toString();
+        Assert.assertEquals(value1, "value1");
+        Files.delete(path);
     }
 
     private <K, V> Map<K, V> newMap(K key, V value) {
