@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.v0
 
-import xyz.srclab.common.egg.Data
+import xyz.srclab.common.egg.sample.Data
 import xyz.srclab.common.serialize.json.toJson
 import xyz.srclab.common.serialize.json.toJsonBytes
 import java.net.URL

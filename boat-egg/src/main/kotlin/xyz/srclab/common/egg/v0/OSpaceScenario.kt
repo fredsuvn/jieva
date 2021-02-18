@@ -1,7 +1,8 @@
 package xyz.srclab.common.egg.v0
 
 import xyz.srclab.common.base.inBounds
-import xyz.srclab.common.egg.Scenario
+import xyz.srclab.common.base.randomBetween
+import xyz.srclab.common.egg.sample.Scenario
 import xyz.srclab.common.reflect.shortName
 import java.awt.Color
 import java.awt.Component
@@ -9,6 +10,7 @@ import java.awt.Graphics
 import java.util.*
 
 class OSpaceScenario(
+    private val config: OSpaceConfig,
     private val logger: OSpaceLogger,
 ) : Scenario {
 
@@ -21,8 +23,18 @@ class OSpaceScenario(
 
     fun loadNew() {
         val newData = OSpaceData()
-        newData.player1 = CommonPlayer(1)
-        newData.player2 = CommonPlayer(2)
+        val p1 = CommonPlayer(1)
+        p1.x = config.width * 0.25
+        p1.y = config.height - p1.radius
+        p1.lastX = p1.x
+        p1.lastY = p1.y
+        val p2 = CommonPlayer(2)
+        p2.x = config.width * 0.75
+        p2.y = config.height - p2.radius
+        p2.lastX = p2.x
+        p2.lastY = p2.y
+        newData.player1 = p1
+        newData.player2 = p2
         newData.enemies = LinkedList()
         _data = newData
     }
@@ -67,10 +79,17 @@ class OSpaceScenario(
 
     private fun refreshEnemies() {
         val score = data.player1!!.score + data.player2!!.score / 10
-        val number = score.inBounds(3, 8)
+        val number = score.inBounds(3, 10)
         val random = Random()
         for (i in 1..number) {
-            val x = Random.
+            val x = randomBetween(config.preparedPadding, config.width - config.preparedPadding, random)
+            val y = randomBetween(-config.preparedHeight, 0 - config.preparedPadding, random)
+            val enemy = CommonEnemy()
+            enemy.x = x.toDouble()
+            enemy.y = y.toDouble()
+            enemy.lastX = enemy.x
+            enemy.lastX = enemy.y
+            data.enemies!!.add(enemy)
         }
     }
 }

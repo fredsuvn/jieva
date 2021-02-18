@@ -1,4 +1,4 @@
-package xyz.srclab.common.egg
+package xyz.srclab.common.egg.sample
 
 /**
  * Saving file of current [Egg]

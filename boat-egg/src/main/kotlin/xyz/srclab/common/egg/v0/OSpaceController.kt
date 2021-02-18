@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.v0
 
-import xyz.srclab.common.egg.Controller
+import xyz.srclab.common.egg.sample.Controller
 
 interface OSpaceController : Controller<OSpaceData> {
 

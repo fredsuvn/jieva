@@ -2,7 +2,7 @@ package xyz.srclab.common.egg.v0
 
 import xyz.srclab.common.base.Current
 import xyz.srclab.common.base.Ref
-import xyz.srclab.common.egg.Engine
+import xyz.srclab.common.egg.sample.Engine
 import java.util.concurrent.CountDownLatch
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -335,13 +335,6 @@ private class OSpaceControllerImpl(
                 scenario.onTick(tick)
                 tick.tick()
             }
-        }
-    }
-
-    private class CountDownRef(private val ref: Ref<CountDownLatch>) : Ref<CountDownLatch> by ref {
-
-        fun reset() {
-            ref.set(CountDownLatch(1))
         }
     }
 
