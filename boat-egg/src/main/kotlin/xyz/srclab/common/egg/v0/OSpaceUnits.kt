@@ -1,125 +1,132 @@
 package xyz.srclab.common.egg.v0
 
-import java.awt.Component
+import xyz.srclab.common.reflect.shortName
 
-interface Player : Living {
+const val FORCE_PLAYER = 1
+const val FORCE_ENEMY = 2
+const val FORCE_NEUTRAL = 3
 
-    val number: Int
+interface OUnit {
 
-    var hit: Long
+    var id: Int
 
-    var score: Long
+    var type: String
+
+    var name: String
 }
 
-interface Enemy : Living, AutoMovableUnit {
+interface SubjectUnit : OUnit {
 
-    var score: Long
+    var x: Double
+
+    var y: Double
+
+    var radius: Double
+
+    var lastX: Double
+
+    var lastY: Double
+
+    var moveSpeed: Int
+
+    var lastMoveTime: Long
+
+    var force: Int
+
+    var deathTime: Long
+
+    var deathDuration: Long
+
+    var graphicsId: Int
 }
 
-interface Living : OUnit, ForceUnit, BodyUnit, MovableUnit {
-
-    var hp: Int
-
-    var defense: Int
-
-    val weapons: List<Weapon>
-}
-
-interface Weapon : OUnit {
-
-    val damage: Int
-
-    val fireSpeed: Int
-
-    var lastFireTime: Long
-
-    val owner: Living
-
-    val ammoManager: AmmoManager
-}
-
-interface AmmoManager : ForceUnit {
-
-    val weapon: Weapon
-
-    val ammos: MutableList<Ammo>
-
-    fun newAmmos(): List<Ammo>
-}
-
-interface Ammo : BodyUnit, AutoMovableUnit
-
-interface BodyUnit : CanDieUnit, SizeUnit, DisplayableUnit {
-
-    fun isOutOfBounds(config: OSpaceConfig): Boolean {
-        return this.x < -this.radius
-                || this.x > config.width + this.radius
-                || this.y > config.height + this.radius
-                || this.y < -config.preparedHeight - this.radius
-    }
-
-    fun isDisappeared(currentTime: Long, config: OSpaceConfig): Boolean {
-        return (isDead && (currentTime - deathTime) > deathDuration)
-                || isOutOfBounds(config)
-    }
-}
-
-interface DisplayableUnit {
-
-    fun display(component: Component, time: Long, faceX: Int, faceY: Int)
-}
-
-interface AutoMovableUnit : MovableUnit {
+interface AutoMovable {
 
     var stepX: Double
 
     var stepY: Double
 }
 
-interface MovableUnit : PointUnit {
+interface Living : SubjectUnit {
 
-    val speed: Int
+    var hp: Int
 
-    var lastMoveTime: Long
+    var defense: Int
 
-    var lastX: Double
-
-    var lastY: Double
+    var weaponsId: List<Int>
 }
 
-interface SizeUnit : PointUnit {
+open class BaseUnit : OUnit {
 
-    val radius: Double
+    override var id: Int = unitIdSeq++
+    override var type: String = this.javaClass.shortName
+    override var name: String = "$type-$id"
+
+    companion object {
+        private var unitIdSeq = 0
+    }
 }
 
-interface PointUnit {
-
-    var x: Double
-
-    var y: Double
+class Weapon : BaseUnit() {
+    var damage: Int = 0
+    var fireSpeed: Int = 0
+    var lastFireTime: Long = 0
+    var ownerId: Long = 0
 }
 
-interface CanDieUnit {
-
-    var deathTime: Long
-
-    val deathDuration: Long
-
-    val isDead: Boolean
-        get() = deathTime > 0
+class Ammo : BaseUnit(), SubjectUnit, AutoMovable {
+    var weaponId: Int = 0
+    override var x: Double = 0.0
+    override var y: Double = 0.0
+    override var radius: Double = 0.0
+    override var lastX: Double = 0.0
+    override var lastY: Double = 0.0
+    override var moveSpeed: Int = 0
+    override var lastMoveTime: Long = 0
+    override var force: Int = 0
+    override var deathTime: Long = 0
+    override var deathDuration: Long = 0
+    override var graphicsId: Int = 0
+    override var stepX: Double = 0.0
+    override var stepY: Double = 0.0
 }
 
-interface ForceUnit {
-
-    val force: Int
+class Enemy : BaseUnit(), Living, AutoMovable {
+    var score: Long = 0
+    override var hp: Int = 0
+    override var defense: Int = 0
+    override var weaponsId: List<Int> = emptyList()
+    override var x: Double = 0.0
+    override var y: Double = 0.0
+    override var radius: Double = 0.0
+    override var lastX: Double = 0.0
+    override var lastY: Double = 0.0
+    override var moveSpeed: Int = 0
+    override var lastMoveTime: Long = 0
+    override var force: Int = 0
+    override var deathTime: Long = 0
+    override var deathDuration: Long = 0
+    override var graphicsId: Int = 0
+    override var stepX: Double = 0.0
+    override var stepY: Double = 0.0
 }
 
-interface OUnit {
-
-    val type: String
-
-    val name: String
+class Player : BaseUnit(), Living {
+    var number: Int = 0
+    var hit: Long = 0
+    var score: Long = 0
+    override var hp: Int = 0
+    override var defense: Int = 0
+    override var weaponsId: List<Int> = emptyList()
+    override var x: Double = 0.0
+    override var y: Double = 0.0
+    override var radius: Double = 0.0
+    override var lastX: Double = 0.0
+    override var lastY: Double = 0.0
+    override var moveSpeed: Int = 0
+    override var lastMoveTime: Long = 0
+    override var force: Int = 0
+    override var deathTime: Long = 0
+    override var deathDuration: Long = 0
+    override var graphicsId: Int = 0
 }
-
-const val FORCE_PLAYER = 1
-const val FORCE_ENEMY = 2

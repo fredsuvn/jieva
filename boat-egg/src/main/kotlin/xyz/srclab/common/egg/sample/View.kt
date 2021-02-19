@@ -3,4 +3,4 @@ package xyz.srclab.common.egg.sample
 /**
  * @author sunqian
  */
-interface View<E : Engine<S, P, D>, S : Scenario, P : Controller<D>, D : Data>
+interface View<E : Engine<C, D, S>, C : Controller<D, S>, D : Data<S>, S : Scenario>

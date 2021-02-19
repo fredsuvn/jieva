@@ -1,6 +1,8 @@
 package xyz.srclab.common.egg.sample
 
+import xyz.srclab.common.egg.Egg
+
 /**
- * Help design the scenario of [Egg].
+ * Scenario of [Egg].
  */
 interface Scenario

@@ -1,17 +1,27 @@
 package xyz.srclab.common.egg.v0
 
 import xyz.srclab.common.base.Current
-import xyz.srclab.common.base.Ref
 import xyz.srclab.common.egg.sample.Engine
-import java.util.concurrent.CountDownLatch
-import kotlin.math.pow
-import kotlin.math.sqrt
+import java.awt.Rectangle
+import java.util.*
 import kotlin.random.Random
 
-class OSpaceEngine(private val config: OSpaceConfig) : Engine<OSpaceScenario, OSpaceController, OSpaceData> {
+class OSpaceEngine(private val config: OSpaceConfig) : Engine< OSpaceController, OSpaceData,OSpaceScenario> {
 
     override fun load(scenario: OSpaceScenario): OSpaceController {
         return OSpaceControllerImpl(scenario, config)
+    }
+
+    override fun loadNew(): OSpaceController {
+        return load(newOSpaceData())
+    }
+
+    override fun load(data: OSpaceData): OSpaceController {
+        TODO("Not yet implemented")
+    }
+
+    private fun newOSpaceData():OSpaceData{
+
     }
 }
 
@@ -20,17 +30,66 @@ private class OSpaceControllerImpl(
     val config: OSpaceConfig
 ) : OSpaceController {
 
-    private val tick = OSpaceTick(config)
-    private val countDownRef = CountDownRef(Ref.of(null))
-    private val playingThread = PlayingThread(config, scenario, countDownRef)
+    override val tick = OSpaceTick(config)
+
+    private val playingThread = PlayingThread(config, scenario, tick)
 
     init {
-        countDownRef.reset()
         playingThread.start()
     }
 
+    override val drawRectangles: List<Rectangle>
+        get() {
+            val result = LinkedList<Rectangle>()
+
+            fun BodyUnit.addIntoResult() {
+                result.add(
+                    Rectangle(
+                        (this.x - this.radius).toInt(),
+                        (this.y - this.radius).toInt(),
+                        this.radius.toInt(),
+                        this.radius.toInt(),
+                    )
+                )
+                result.add(
+                    Rectangle(
+                        (this.lastX - this.radius).toInt(),
+                        (this.lastY - this.radius).toInt(),
+                        this.radius.toInt(),
+                        this.radius.toInt(),
+                    )
+                )
+            }
+
+            val data = scenario.data
+            synchronized(data) {
+                data.player1!!.addIntoResult()
+                data.player2!!.addIntoResult()
+                for (weapon in data.player1!!.weapons) {
+                    for (ammo in weapon.ammoManager.ammos) {
+                        ammo.addIntoResult()
+                    }
+                }
+                for (weapon in data.player2!!.weapons) {
+                    for (ammo in weapon.ammoManager.ammos) {
+                        ammo.addIntoResult()
+                    }
+                }
+                for (enemy in data.enemies!!) {
+                    for (weapon in enemy.weapons) {
+                        for (ammo in weapon.ammoManager.ammos) {
+                            ammo.addIntoResult()
+                        }
+                    }
+                    enemy.addIntoResult()
+                }
+            }
+            return result
+        }
+
     override fun startNew() {
         scenario.loadNew()
+        go()
     }
 
     override fun go() {
@@ -38,9 +97,7 @@ private class OSpaceControllerImpl(
             throw IllegalStateException("Game has been over!")
         }
         tick.go()
-        if (playingThread.isAlive) {
-            countDownRef.get().countDown()
-        } else {
+        if (!playingThread.isAlive) {
             playingThread.start()
         }
     }
@@ -49,7 +106,6 @@ private class OSpaceControllerImpl(
         if (tick.isStop) {
             throw IllegalStateException("Game has been over!")
         }
-        countDownRef.reset()
         tick.pause()
     }
 
@@ -147,7 +203,7 @@ private class OSpaceControllerImpl(
 
     private fun Weapon.attack(currentTime: Long, targetX: Double, targetY: Double) {
 
-        fun AutoMovableUnit.computeStep(targetX: Double, targetY: Double) {
+        fun AutoMovable.computeStep(targetX: Double, targetY: Double) {
             if (this.x == targetX) {
                 this.stepX = 0.0
                 this.stepY = if (targetY > this.y) config.yUnit else if (targetY < this.y) -config.yUnit else 0.0
@@ -175,36 +231,26 @@ private class OSpaceControllerImpl(
             ammo.computeStep(targetX, targetY)
             this.ammoManager.ammos.add(ammo)
         }
+        this.lastFireTime = tick.time
     }
 
     private fun distance(a: SizeUnit, b: SizeUnit): Double {
         return distance(a.x, a.y, b.x, b.y)
     }
 
-    private fun distance(x1: Double, y1: Double, x2: Double, y2: Double): Double {
-        if (x1 == x2) {
-            return y2 - y1
-        }
-        if (y1 == y2) {
-            return x2 - x1
-        }
-        return sqrt((x2 - x1).pow(2.0) + (y2 - y1).pow(2.0))
-    }
+
 
     private inner class PlayingThread(
         config: OSpaceConfig,
         private val scenario: OSpaceScenario,
-        private val countDownRef: CountDownRef
+        private val tick: OSpaceTick,
     ) : Thread("PlayingThread") {
-
-        private val tick = OSpaceTick(config)
 
         override fun run() {
 
             fun doWait() {
                 if (!tick.isGoing) {
-                    val countDown = countDownRef.get()
-                    countDown.await()
+                    tick.awaitToGo()
                 } else {
                     Current.sleep(tick.tickDuration)
                 }
@@ -318,18 +364,20 @@ private class OSpaceControllerImpl(
 
                 val data = scenario.data
 
-                //Clean
-                doClean(data)
+                synchronized(data) {
+                    //Clean
+                    doClean(data)
 
-                //Do ammos
-                doPlayerAmmos(data)
-                doEnemiesAmmos(data)
+                    //Do ammos
+                    doPlayerAmmos(data)
+                    doEnemiesAmmos(data)
 
-                //Do enemies fire
-                doEnemiesFire(data)
+                    //Do enemies fire
+                    doEnemiesFire(data)
 
-                //Do enemies moving
-                doEnemiesMoving(data)
+                    //Do enemies moving
+                    doEnemiesMoving(data)
+                }
 
                 //Tick
                 scenario.onTick(tick)

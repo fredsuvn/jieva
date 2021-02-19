@@ -1,9 +1,13 @@
 package xyz.srclab.common.egg.sample
 
-/**
- * Help design the engine of [Egg].
- */
-interface Engine<S : Scenario, C : Controller<D>, D : Data> {
+import xyz.srclab.common.egg.Egg
 
-    fun load(scenario: S): C
+/**
+ * Engine of [Egg].
+ */
+interface Engine<C : Controller<D, S>, D : Data<S>, S : Scenario> {
+
+    fun loadNew(): C
+
+    fun load(data: D): C
 }
