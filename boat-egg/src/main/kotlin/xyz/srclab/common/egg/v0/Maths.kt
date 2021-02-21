@@ -31,4 +31,4 @@ internal fun step(x: Double, y: Double, targetX: Double, targetY: Double): Point
     return Point(stepX, stepY)
 }
 
-data class Point(val x: Double, val y: Double)
+internal data class Point(val x: Double, val y: Double)

@@ -7,15 +7,13 @@ import xyz.srclab.common.egg.Egg
  */
 interface Controller<D : Data<S>, S : Scenario> {
 
-    fun startNew()
+    val data: D
+
+    fun start()
+
+    fun stop()
 
     fun go()
 
     fun pause()
-
-    fun stop()
-
-    fun save(): D
-
-    fun load(data: D)
 }

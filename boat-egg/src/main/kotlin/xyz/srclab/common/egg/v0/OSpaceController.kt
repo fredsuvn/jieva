@@ -2,7 +2,9 @@ package xyz.srclab.common.egg.v0
 
 import xyz.srclab.common.egg.sample.Controller
 
-interface OSpaceController : Controller<OSpaceData, OSpaceScenario> {
+internal interface OSpaceController : Controller<OSpaceData, OSpaceScenario> {
+
+    val config: OSpaceConfig
 
     val tick: OSpaceTick
 

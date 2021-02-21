@@ -2,94 +2,46 @@ package xyz.srclab.common.egg.v0
 
 import xyz.srclab.common.base.Current
 import xyz.srclab.common.egg.sample.Engine
-import java.awt.Rectangle
 import java.util.*
 import kotlin.random.Random
 
-class OSpaceEngine(private val config: OSpaceConfig) : Engine< OSpaceController, OSpaceData,OSpaceScenario> {
-
-    override fun load(scenario: OSpaceScenario): OSpaceController {
-        return OSpaceControllerImpl(scenario, config)
-    }
+internal class OSpaceEngine(private val config: OSpaceConfig) : Engine<OSpaceController, OSpaceData, OSpaceScenario> {
 
     override fun loadNew(): OSpaceController {
         return load(newOSpaceData())
     }
 
     override fun load(data: OSpaceData): OSpaceController {
-        TODO("Not yet implemented")
+        return OSpaceControllerImpl(data, config)
     }
 
-    private fun newOSpaceData():OSpaceData{
-
+    private fun newOSpaceData(): OSpaceData {
+        return OSpaceData()
     }
 }
 
 private class OSpaceControllerImpl(
-    val scenario: OSpaceScenario,
-    val config: OSpaceConfig
+    override val data: OSpaceData,
+    override val config: OSpaceConfig
 ) : OSpaceController {
 
     override val tick = OSpaceTick(config)
 
-    private val playingThread = PlayingThread(config, scenario, tick)
+    private val scenario: OSpaceScenario = data.scenario
+    private val playingThread = PlayingThread()
 
-    init {
+    override fun start() {
         playingThread.start()
+        go()
+        scenario.onStart(data, this)
     }
 
-    override val drawRectangles: List<Rectangle>
-        get() {
-            val result = LinkedList<Rectangle>()
-
-            fun BodyUnit.addIntoResult() {
-                result.add(
-                    Rectangle(
-                        (this.x - this.radius).toInt(),
-                        (this.y - this.radius).toInt(),
-                        this.radius.toInt(),
-                        this.radius.toInt(),
-                    )
-                )
-                result.add(
-                    Rectangle(
-                        (this.lastX - this.radius).toInt(),
-                        (this.lastY - this.radius).toInt(),
-                        this.radius.toInt(),
-                        this.radius.toInt(),
-                    )
-                )
-            }
-
-            val data = scenario.data
-            synchronized(data) {
-                data.player1!!.addIntoResult()
-                data.player2!!.addIntoResult()
-                for (weapon in data.player1!!.weapons) {
-                    for (ammo in weapon.ammoManager.ammos) {
-                        ammo.addIntoResult()
-                    }
-                }
-                for (weapon in data.player2!!.weapons) {
-                    for (ammo in weapon.ammoManager.ammos) {
-                        ammo.addIntoResult()
-                    }
-                }
-                for (enemy in data.enemies!!) {
-                    for (weapon in enemy.weapons) {
-                        for (ammo in weapon.ammoManager.ammos) {
-                            ammo.addIntoResult()
-                        }
-                    }
-                    enemy.addIntoResult()
-                }
-            }
-            return result
+    override fun stop() {
+        if (tick.isStop) {
+            throw IllegalStateException("Game has been over!")
         }
-
-    override fun startNew() {
-        scenario.loadNew()
-        go()
+        tick.stop()
+        scenario.onEnd(data, this)
     }
 
     override fun go() {
@@ -107,21 +59,6 @@ private class OSpaceControllerImpl(
             throw IllegalStateException("Game has been over!")
         }
         tick.pause()
-    }
-
-    override fun stop() {
-        if (tick.isStop) {
-            throw IllegalStateException("Game has been over!")
-        }
-        tick.stop()
-    }
-
-    override fun save(): OSpaceData {
-        return scenario.data
-    }
-
-    override fun load(data: OSpaceData) {
-        scenario.load(data)
     }
 
     override fun moveLeft(player: Int) {
@@ -143,108 +80,142 @@ private class OSpaceControllerImpl(
     override fun moveLeftUp(player: Int) {
         getPlayer(player).move(
             tick.time,
-            -config.xUnit * RIGHT_ANGLE_COEFFICIENT,
-            -config.yUnit * RIGHT_ANGLE_COEFFICIENT
+            -config.xUnit * STEP_45_DEGREE_ANGLE,
+            -config.yUnit * STEP_45_DEGREE_ANGLE
         )
     }
 
     override fun moveRightUp(player: Int) {
         getPlayer(player).move(
             tick.time,
-            config.xUnit * RIGHT_ANGLE_COEFFICIENT,
-            -config.yUnit * RIGHT_ANGLE_COEFFICIENT
+            config.xUnit * STEP_45_DEGREE_ANGLE,
+            -config.yUnit * STEP_45_DEGREE_ANGLE
         )
     }
 
     override fun moveLeftDown(player: Int) {
         getPlayer(player).move(
             tick.time,
-            -config.xUnit * RIGHT_ANGLE_COEFFICIENT,
-            config.yUnit * RIGHT_ANGLE_COEFFICIENT
+            -config.xUnit * STEP_45_DEGREE_ANGLE,
+            config.yUnit * STEP_45_DEGREE_ANGLE
         )
     }
 
     override fun moveRightDown(player: Int) {
         getPlayer(player).move(
             tick.time,
-            config.xUnit * RIGHT_ANGLE_COEFFICIENT,
-            config.yUnit * RIGHT_ANGLE_COEFFICIENT
+            config.xUnit * STEP_45_DEGREE_ANGLE,
+            config.yUnit * STEP_45_DEGREE_ANGLE
         )
     }
 
     override fun fire(player: Int) {
         val p = getPlayer(player)
-        for (weapon in p.weapons) {
-            weapon.attack(tick.time, p.x, 0.0)
-        }
-    }
-
-    private fun getPlayer(player: Int): Player {
-        return if (player == 1) scenario.data.player1!! else scenario.data.player2!!
+        p.attack(tick.time, p.x, 0.0)
     }
 
     private fun Player.move(currentTime: Long, stepX: Double, stepY: Double) {
         if (this.x < 0 || this.x > config.width || this.y < 0 || this.y > config.height) {
             return
         }
-        (this as MovableUnit).move(currentTime, stepX, stepY)
+        (this as SubjectUnit).move(currentTime, stepX, stepY)
     }
 
-    private fun MovableUnit.move(currentTime: Long, stepX: Double, stepY: Double) {
-        if (currentTime - this.lastMoveTime < this.speed.moveSpeedToCoolDown()) {
+    private fun SubjectUnit.move(tickTime: Long, stepX: Double, stepY: Double) {
+        if (tickTime - this.lastMoveTime < this.moveSpeed.moveSpeedToCoolDown()) {
             return
         }
         this.lastX = this.x
         this.lastY = this.y
         this.x += stepX
         this.y += stepY
-        this.lastMoveTime = currentTime
+        this.lastMoveTime = tickTime
     }
 
-    private fun Weapon.attack(currentTime: Long, targetX: Double, targetY: Double) {
-
-        fun AutoMovable.computeStep(targetX: Double, targetY: Double) {
-            if (this.x == targetX) {
-                this.stepX = 0.0
-                this.stepY = if (targetY > this.y) config.yUnit else if (targetY < this.y) -config.yUnit else 0.0
-                return
-            }
-            if (this.y == targetY) {
-                this.stepX = if (targetX > this.x) config.xUnit else if (targetX < this.x) -config.xUnit else 0.0
-                this.stepY = 0.0
-                return
-            }
-            val distance = distance(this.x, this.y, targetX, targetY)
-            this.stepX = (targetX - this.x) * config.xUnit / distance
-            this.stepY = (targetY - this.y) * config.yUnit / distance
+    private fun Living.attack(target: Living, tickTime: Long) {
+        for (weapon in this.weapons) {
+            weapon.attack(this, target, tickTime)
         }
+    }
 
-        if (currentTime - this.lastFireTime < this.fireSpeed.fireSpeedToCoolDown()) {
+    private fun Weapon.attack(attacker: Living, target: Living, tickTime: Long) {
+        attack(attacker, tickTime, target.x, target.y)
+    }
+
+    private fun Living.attack(tickTime: Long, targetX: Double, targetY: Double) {
+        for (weapon in this.weapons) {
+            weapon.attack(this, tickTime, targetX, targetY)
+        }
+    }
+
+    private fun Weapon.attack(attacker: Living, tickTime: Long, targetX: Double, targetY: Double) {
+        if (tickTime - this.lastFireTime < this.fireSpeed.fireSpeedToCoolDown()) {
             return
         }
-        val ammos = this.ammoManager.newAmmos()
-        for (ammo in ammos) {
-            ammo.x = this.owner.x
-            ammo.y = this.owner.y
-            ammo.lastX = ammo.x
-            ammo.lastY = ammo.y
-            ammo.computeStep(targetX, targetY)
-            this.ammoManager.ammos.add(ammo)
+        val ammoMetas = scenario.onWeaponAct(this, targetX, targetY).fire(attacker, tickTime, targetX, targetY)
+        for (ammoMeta in ammoMetas) {
+            val ammo = Ammo(
+                this,
+                attacker.x,
+                attacker.y,
+                attacker.x,
+                attacker.y,
+                ammoMeta.xStepUnit * config.xUnit,
+                ammoMeta.yStepUnit * config.yUnit,
+                ammoMeta.radius,
+                ammoMeta.moveSpeed,
+                0,
+                0,
+                ammoMeta.deathDuration,
+                this.holder.force,
+                ammoMeta.drawerId
+            )
+            if (attacker.force == PLAYER_FORCE) {
+                data.playersAmmos.add(ammo)
+            }
+            if (attacker.force == ENEMY_FORCE) {
+                data.enemiesAmmos.add(ammo)
+            }
         }
         this.lastFireTime = tick.time
     }
 
-    private fun distance(a: SizeUnit, b: SizeUnit): Double {
-        return distance(a.x, a.y, b.x, b.y)
+    private fun Ammo.hit(living: Living) {
+        val damage = this.weapon.damage - living.defense
+        living.hp -= damage
+        if (living.hp <= 0) {
+            living.deathTime = tick.time
+        }
+        this.deathTime = tick.time
     }
 
+    private fun SubjectUnit.isOutOfBounds(): Boolean {
+        val length = this.radius * 2
+        return this.x < -length
+                || this.x > config.width + length
+                || this.y < -config.preparedHeight
+                || this.y > config.height + length
+    }
 
+    private fun SubjectUnit.distance(other: SubjectUnit): Double {
+        return distance(this.x, this.y, other.x, other.y)
+    }
 
-    private inner class PlayingThread(
-        config: OSpaceConfig,
-        private val scenario: OSpaceScenario,
-        private val tick: OSpaceTick,
-    ) : Thread("PlayingThread") {
+    private fun getPlayer(player: Int): Player {
+        return if (player == 1) data.player1 else data.player2
+    }
+
+    private fun pickPlayer(): Player {
+        if (data.player1.isDead && !data.player2.isDead) {
+            return data.player2
+        }
+        if (data.player2.isDead && !data.player1.isDead) {
+            return data.player1
+        }
+        return if (Random.nextBoolean()) data.player1 else data.player2
+    }
+
+    private inner class PlayingThread : Thread("PlayingThread") {
 
         override fun run() {
 
@@ -256,138 +227,97 @@ private class OSpaceControllerImpl(
                 }
             }
 
-            fun doClean(data: OSpaceData) {
+            fun doClean() {
 
-                fun doClean0(iterable: MutableIterable<BodyUnit>) {
-                    val iterator = iterable.iterator()
+                fun MutableIterable<Ammo>.cleanAmmos() {
+                    val iterator = this.iterator()
                     while (iterator.hasNext()) {
-                        val it = iterator.next()
-                        if (it.isDisappeared(tick.time, config)) {
+                        val ammo = iterator.next()
+                        if (ammo.isOutOfBounds() || ammo.isDisappeared(tick.time)) {
+                            OSpaceLogger.debug("Ammo cleaned: {}", ammo.id)
                             iterator.remove()
                         }
                     }
                 }
 
-                for (weapon in data.player1!!.weapons) {
-                    doClean0(weapon.ammoManager.ammos)
-                }
-                for (weapon in data.player2!!.weapons) {
-                    doClean0(weapon.ammoManager.ammos)
-                }
-                for (enemy in data.enemies!!) {
-                    for (weapon in enemy.weapons) {
-                        doClean0(weapon.ammoManager.ammos)
-                    }
-                }
-                doClean0(data.enemies!!)
-            }
-
-            fun doPlayerAmmos(data: OSpaceData) {
-
-                fun doPlayerAmmos0(player: Player) {
-                    for (weapon in player.weapons) {
-                        for (ammo in weapon.ammoManager.ammos) {
-                            if (ammo.isDead) {
-                                continue
-                            }
-                            for (enemy in data.enemies!!) {
-                                if (!enemy.isDead && distance(ammo, enemy) < ammo.radius + enemy.radius) {
-                                    scenario.onHitEnemy(ammo, weapon.ammoManager, enemy, tick)
-                                }
-                            }
-                            if (!ammo.isDead) {
-                                ammo.move(tick.time, ammo.stepX, ammo.stepY)
-                            }
+                fun MutableIterable<Living>.cleanLivings() {
+                    val iterator = this.iterator()
+                    while (iterator.hasNext()) {
+                        val living = iterator.next()
+                        if (living.isOutOfBounds() || living.isDisappeared(tick.time)) {
+                            OSpaceLogger.debug("Living cleaned: {}-{}", living.javaClass.typeName, living.id)
+                            iterator.remove()
                         }
                     }
                 }
 
-                doPlayerAmmos0(data.player1!!)
-                doPlayerAmmos0(data.player2!!)
+                data.enemiesAmmos.cleanAmmos()
+                data.playersAmmos.cleanAmmos()
+                data.enemies.cleanLivings()
+                //data.players.cleanLivings()
             }
 
-            fun doEnemiesAmmos(data: OSpaceData) {
-                for (enemy in data.enemies!!) {
-                    for (weapon in enemy.weapons) {
-                        for (ammo in weapon.ammoManager.ammos) {
-                            if (!ammo.isDead && distance(
-                                    ammo,
-                                    data.player1!!
-                                ) < ammo.radius + data.player1!!.radius
-                            ) {
-                                scenario.onHitPlayer(ammo, weapon.ammoManager, data.player1!!, tick)
-                            }
-                            if (!ammo.isDead && distance(
-                                    ammo,
-                                    data.player2!!
-                                ) < ammo.radius + data.player2!!.radius
-                            ) {
-                                scenario.onHitPlayer(ammo, weapon.ammoManager, data.player2!!, tick)
-                            }
-                            if (!ammo.isDead) {
-                                ammo.move(tick.time, ammo.stepX, ammo.stepY)
-                            }
+            fun doHit() {
+                for (playersAmmo in data.playersAmmos) {
+                    if (playersAmmo.isDead) {
+                        continue
+                    }
+                    for (enemy in data.enemies) {
+                        if (enemy.isDead) {
+                            continue
+                        }
+                        if (playersAmmo.distance(enemy) < playersAmmo.radius + enemy.radius) {
+                            playersAmmo.hit(enemy)
+                            scenario.onHitEnemy(playersAmmo, enemy, data, this@OSpaceControllerImpl)
+                        }
+                    }
+                }
+                for (enemiesAmmo in data.enemiesAmmos) {
+                    if (enemiesAmmo.isDead) {
+                        continue
+                    }
+                    for (player in data.players) {
+                        if (player.isDead) {
+                            continue
+                        }
+                        if (enemiesAmmo.distance(player) < enemiesAmmo.radius + player.radius) {
+                            enemiesAmmo.hit(player)
+                            scenario.onHitPlayer(enemiesAmmo, player, data, this@OSpaceControllerImpl)
                         }
                     }
                 }
             }
 
-            fun doEnemiesFire(data: OSpaceData) {
-
-                fun pickPlayer(): Player {
-                    if (data.player1!!.isDead && !data.player2!!.isDead) {
-                        return data.player2!!
-                    }
-                    if (data.player2!!.isDead && !data.player1!!.isDead) {
-                        return data.player1!!
-                    }
-                    return if (Random.nextBoolean()) data.player1!! else data.player2!!
-                }
-
-                for (enemy in data.enemies!!) {
-                    for (weapon in enemy.weapons) {
-                        val player = pickPlayer()
-                        weapon.attack(tick.time, player.x, player.y)
-                    }
+            fun doFire() {
+                for (enemy in data.enemies) {
+                    enemy.attack(pickPlayer(), tick.time)
                 }
             }
 
-            fun doEnemiesMoving(data: OSpaceData) {
-                for (enemy in data.enemies!!) {
+            fun doAutoMove() {
+                for (enemiesAmmo in data.enemiesAmmos) {
+                    enemiesAmmo.move(tick.time, enemiesAmmo.stepX, enemiesAmmo.stepY)
+                }
+                for (playerAmmo in data.playersAmmos) {
+                    playerAmmo.move(tick.time, playerAmmo.stepX, playerAmmo.stepY)
+                }
+                for (enemy in data.enemies) {
                     enemy.move(tick.time, enemy.stepX, enemy.stepY)
                 }
             }
 
             while (!tick.isStop) {
-                //Wait if pause
                 doWait()
-
-                val data = scenario.data
-
                 synchronized(data) {
-                    //Clean
-                    doClean(data)
-
-                    //Do ammos
-                    doPlayerAmmos(data)
-                    doEnemiesAmmos(data)
-
-                    //Do enemies fire
-                    doEnemiesFire(data)
-
-                    //Do enemies moving
-                    doEnemiesMoving(data)
+                    doClean()
+                    doHit()
+                    doFire()
+                    doAutoMove()
                 }
-
-                //Tick
-                scenario.onTick(tick)
+                scenario.onTick(data, this@OSpaceControllerImpl)
                 tick.tick()
             }
+            scenario.onEnd(data, this@OSpaceControllerImpl)
         }
-    }
-
-    companion object {
-
-        private const val RIGHT_ANGLE_COEFFICIENT = 0.70711
     }
 }

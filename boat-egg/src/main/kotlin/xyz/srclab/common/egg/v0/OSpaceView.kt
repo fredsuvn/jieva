@@ -9,10 +9,9 @@ import java.awt.event.KeyEvent
 import javax.swing.JFrame
 import javax.swing.JPanel
 
-class OSpaceView(
+internal class OSpaceView(
     private val config: OSpaceConfig,
-    private val logger: OSpaceLogger,
-) : JFrame("O Space Battle"), View<OSpaceEngine, OSpaceScenario, OSpaceController, OSpaceData> {
+) : JFrame("O Space Battle"), View<OSpaceEngine, OSpaceController, OSpaceData, OSpaceScenario> {
 
     init {
         isResizable = false
@@ -20,7 +19,7 @@ class OSpaceView(
         setSize(config.width, config.height)
         setLocationRelativeTo(null)
         isVisible = true
-        val gamePanel = GamePanel(config, OSpaceEngine(config), OSpaceScenario(config, logger), logger)
+        val gamePanel = GamePanel(config, OSpaceEngine(config))
         add(gamePanel)
         gamePanel.requestFocus()
     }
@@ -29,11 +28,9 @@ class OSpaceView(
 private class GamePanel(
     private val config: OSpaceConfig,
     engine: OSpaceEngine,
-    private val scenario: OSpaceScenario,
-    private val logger: OSpaceLogger
 ) : JPanel() {
 
-    private val controller = engine.load(scenario)
+    private val controller = engine.loadNew()
 
     init {
         background = Color.BLACK
@@ -41,7 +38,7 @@ private class GamePanel(
         PaintThread().start()
         addKeyListener(KeyHandler())
 
-        controller.startNew()
+        controller.start()
         //controller.go()
     }
 
@@ -52,33 +49,20 @@ private class GamePanel(
 
     private fun draw(g: Graphics) {
         val tick = controller.tick
+        val data = controller.data
+        val scenario = data.scenario
 
-        fun List<Enemy>.display() {
-            for (enemy in this) {
-                for (weapon in enemy.weapons) {
-                    for (ammo in weapon.ammoManager.ammos) {
-                        ammo.display(g, tick.time, ammo.stepX.toInt(), ammo.stepY.toInt())
-                    }
-                }
-                enemy.display(g, tick.time, enemy.stepX.toInt(), enemy.stepY.toInt())
+        fun List<SubjectUnit>.draw() {
+            for (subjectUnit in this) {
+                scenario.onDraw(subjectUnit, tick.time, g)
             }
         }
-
-        fun Player.display() {
-            for (weapon in this.weapons) {
-                for (ammo in weapon.ammoManager.ammos) {
-                    ammo.display(g, tick.time, ammo.stepX.toInt(), ammo.stepY.toInt())
-                }
-            }
-            this.display(g, tick.time, this.x.toInt(), 0)
-        }
-
-        val data = scenario.data
 
         synchronized(data) {
-            data.enemies!!.display()
-            data.player1!!.display()
-            data.player2!!.display()
+            data.enemiesAmmos.draw()
+            data.playersAmmos.draw()
+            data.players.draw()
+            data.enemies.draw()
         }
     }
 
@@ -102,7 +86,7 @@ private class GamePanel(
                 this@GamePanel.repaint()
                 Current.sleep(interval)
             }
-            logger.info("Game over...")
+            //OSpaceLogger.info("Game over...")
         }
     }
 

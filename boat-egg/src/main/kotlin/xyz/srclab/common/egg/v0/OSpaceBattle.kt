@@ -8,7 +8,7 @@ import xyz.srclab.common.egg.Egg
 class OSpaceBattle : Egg {
 
     override fun hatchOut(spell: CharSequence) {
-        val view = OSpaceView(OSpaceConfig(), OSpaceLogger())
+        val view = OSpaceView(OSpaceConfig())
         view.isVisible = true
         //view.paint(view.graphics)
 //        view.background = Color.GREEN

@@ -7,7 +7,7 @@ import xyz.srclab.common.egg.sample.Logger
 /**
  * @author sunqian
  */
-object OSpaceLogger : Logger {
+internal object OSpaceLogger : Logger {
 
     override fun info(pattern: String, vararg args: Any?) {
         println("${Current.timestamp}-info: " + pattern.fastFormat(*args))

@@ -3,7 +3,7 @@ package xyz.srclab.common.egg.v0
 import xyz.srclab.common.base.Ref
 import java.util.concurrent.CountDownLatch
 
-class OSpaceTick(config: OSpaceConfig) {
+internal class OSpaceTick(config: OSpaceConfig) {
 
     private var _time: Long = 0
     private var _going: Boolean = false

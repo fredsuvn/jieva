@@ -2,131 +2,117 @@ package xyz.srclab.common.egg.v0
 
 import xyz.srclab.common.reflect.shortName
 
-const val FORCE_PLAYER = 1
-const val FORCE_ENEMY = 2
-const val FORCE_NEUTRAL = 3
+internal const val NEUTRAL_FORCE = 0
+internal const val PLAYER_FORCE = 1
+internal const val ENEMY_FORCE = 2
 
-interface OUnit {
+internal const val STEP_UNIT = 1.0
+internal const val STEP_45_DEGREE_ANGLE = STEP_UNIT * 0.7071067812
 
-    var id: Int
+private var idSequence: Long = 100000L
 
-    var type: String
-
+internal interface OUnit {
+    var id: Long
     var name: String
 }
 
-interface SubjectUnit : OUnit {
-
+internal interface SubjectUnit : OUnit {
     var x: Double
-
     var y: Double
-
-    var radius: Double
-
     var lastX: Double
-
     var lastY: Double
-
-    var moveSpeed: Int
-
-    var lastMoveTime: Long
-
-    var force: Int
-
-    var deathTime: Long
-
-    var deathDuration: Long
-
-    var graphicsId: Int
-}
-
-interface AutoMovable {
-
     var stepX: Double
-
     var stepY: Double
-}
+    var radius: Double
+    var moveSpeed: Int
+    var lastMoveTime: Long
+    var deathTime: Long
+    var deathDuration: Long
+    var force: Int
+    var drawerId: Int
 
-interface Living : SubjectUnit {
+    val isDead: Boolean
+        get() = deathTime > 0
 
-    var hp: Int
-
-    var defense: Int
-
-    var weaponsId: List<Int>
-}
-
-open class BaseUnit : OUnit {
-
-    override var id: Int = unitIdSeq++
-    override var type: String = this.javaClass.shortName
-    override var name: String = "$type-$id"
-
-    companion object {
-        private var unitIdSeq = 0
+    fun isDisappeared(tickTime: Long): Boolean {
+        return isDead && tickTime - deathTime > deathDuration
     }
 }
 
-class Weapon : BaseUnit() {
-    var damage: Int = 0
-    var fireSpeed: Int = 0
-    var lastFireTime: Long = 0
-    var ownerId: Long = 0
+internal interface Living : SubjectUnit {
+    var hp: Int
+    var defense: Int
+    var weapons: List<Weapon>
 }
 
-class Ammo : BaseUnit(), SubjectUnit, AutoMovable {
-    var weaponId: Int = 0
-    override var x: Double = 0.0
-    override var y: Double = 0.0
-    override var radius: Double = 0.0
-    override var lastX: Double = 0.0
-    override var lastY: Double = 0.0
-    override var moveSpeed: Int = 0
-    override var lastMoveTime: Long = 0
-    override var force: Int = 0
-    override var deathTime: Long = 0
-    override var deathDuration: Long = 0
-    override var graphicsId: Int = 0
-    override var stepX: Double = 0.0
-    override var stepY: Double = 0.0
+internal open class BaseUnit : OUnit {
+    override var id: Long = idSequence++
+    override var name: String = "$${javaClass.shortName}-$id"
 }
 
-class Enemy : BaseUnit(), Living, AutoMovable {
-    var score: Long = 0
-    override var hp: Int = 0
-    override var defense: Int = 0
-    override var weaponsId: List<Int> = emptyList()
-    override var x: Double = 0.0
-    override var y: Double = 0.0
-    override var radius: Double = 0.0
-    override var lastX: Double = 0.0
-    override var lastY: Double = 0.0
-    override var moveSpeed: Int = 0
-    override var lastMoveTime: Long = 0
-    override var force: Int = 0
-    override var deathTime: Long = 0
-    override var deathDuration: Long = 0
-    override var graphicsId: Int = 0
-    override var stepX: Double = 0.0
-    override var stepY: Double = 0.0
-}
+internal data class Weapon(
+    var holder: Living,
+    var damage: Int = 50,
+    var fireSpeed: Int = 50,
+    var lastFireTime: Long = 0,
+    var actorId: Int = 0,
+) : BaseUnit()
 
-class Player : BaseUnit(), Living {
-    var number: Int = 0
-    var hit: Long = 0
-    var score: Long = 0
-    override var hp: Int = 0
-    override var defense: Int = 0
-    override var weaponsId: List<Int> = emptyList()
-    override var x: Double = 0.0
-    override var y: Double = 0.0
-    override var radius: Double = 0.0
-    override var lastX: Double = 0.0
-    override var lastY: Double = 0.0
-    override var moveSpeed: Int = 0
-    override var lastMoveTime: Long = 0
-    override var force: Int = 0
-    override var deathTime: Long = 0
-    override var deathDuration: Long = 0
-    override var graphicsId: Int = 0
-}
+internal data class Ammo(
+    var weapon: Weapon,
+    override var x: Double = 0.0,
+    override var y: Double = 0.0,
+    override var lastX: Double = x,
+    override var lastY: Double = y,
+    override var stepX: Double = 0.0,
+    override var stepY: Double = 0.0,
+    override var radius: Double = 12.0,
+    override var moveSpeed: Int = 80,
+    override var lastMoveTime: Long = 0,
+    override var deathTime: Long = 0,
+    override var deathDuration: Long = 5000,
+    override var force: Int = NEUTRAL_FORCE,
+    override var drawerId: Int = 0,
+) : BaseUnit(), SubjectUnit
+
+internal data class Enemy(
+    var score: Long = 10,
+    override var x: Double = 0.0,
+    override var y: Double = 0.0,
+    override var lastX: Double = x,
+    override var lastY: Double = y,
+    override var stepX: Double = 0.0,
+    override var stepY: Double = 0.0,
+    override var radius: Double = 18.0,
+    override var moveSpeed: Int = 50,
+    override var lastMoveTime: Long = 0,
+    override var deathTime: Long = 0,
+    override var deathDuration: Long = 5000,
+    override var force: Int = ENEMY_FORCE,
+    override var drawerId: Int = 0,
+    override var hp: Int = 50,
+    override var defense: Int = 0,
+    override var weapons: List<Weapon>,
+) : BaseUnit(), Living
+
+internal data class Player(
+    var number: Int = 0,
+    var hit: Long = 0,
+    var score: Long = 10,
+    override var x: Double = 0.0,
+    override var y: Double = 0.0,
+    override var lastX: Double = x,
+    override var lastY: Double = y,
+    override var stepX: Double = 0.0,
+    override var stepY: Double = 0.0,
+    override var radius: Double = 18.0,
+    override var moveSpeed: Int = 90,
+    override var lastMoveTime: Long = 0,
+    override var deathTime: Long = 0,
+    override var deathDuration: Long = 5000,
+    override var force: Int = PLAYER_FORCE,
+    override var drawerId: Int = 0,
+    override var hp: Int = 100,
+    override var defense: Int = 0,
+    override var weapons: List<Weapon>,
+) : BaseUnit(), Living
