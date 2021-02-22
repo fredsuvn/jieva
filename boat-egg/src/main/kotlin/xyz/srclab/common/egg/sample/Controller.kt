@@ -16,4 +16,6 @@ interface Controller<D : Data<S>, S : Scenario> {
     fun go()
 
     fun pause()
+
+    fun toggle()
 }

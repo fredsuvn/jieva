@@ -34,8 +34,9 @@ public class EggSample {
     @Test
     public void testEgg() {
         EggManager eggManager = BoatEggManager.INSTANCE;
-        Egg egg = eggManager.pick("Hello, Boat Egg!");
-        egg.hatchOut("出来吧，神龙！");
+        Egg egg = eggManager.pick("O Space Battle");
+        //egg.hatchOut("Thank you, Taro.");
+        egg.hatchOut("谢谢你，泰罗。");
     }
 }
 ```
@@ -45,8 +46,9 @@ class EggSampleKt {
 
     @Test
     fun testEgg() {
-        val egg = BoatEggManager.pick("Hello, Boat Egg!")
-        egg.hatchOut("出来吧，神龙！")
+        val egg = BoatEggManager.pick("O Space Battle")
+        //egg.hatchOut("Thank you, Taro.")
+        egg.hatchOut("谢谢你，泰罗。")
     }
 }
 ```

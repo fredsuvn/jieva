@@ -28,6 +28,7 @@ internal interface SubjectUnit : OUnit {
     var lastMoveTime: Long
     var deathTime: Long
     var deathDuration: Long
+    var keepBody: Boolean
     var force: Int
     var drawerId: Int
 
@@ -36,6 +37,10 @@ internal interface SubjectUnit : OUnit {
 
     fun isDisappeared(tickTime: Long): Boolean {
         return isDead && tickTime - deathTime > deathDuration
+    }
+
+    fun isBody(tickTime: Long): Boolean {
+        return keepBody && isDisappeared(tickTime)
     }
 }
 
@@ -71,9 +76,11 @@ internal data class Ammo(
     override var lastMoveTime: Long = 0,
     override var deathTime: Long = 0,
     override var deathDuration: Long = 5000,
+    override var keepBody: Boolean = false,
     override var force: Int = NEUTRAL_FORCE,
     override var drawerId: Int = 0,
-) : BaseUnit(), SubjectUnit
+) : BaseUnit(), SubjectUnit {
+}
 
 internal data class Enemy(
     var score: Long = 10,
@@ -88,6 +95,7 @@ internal data class Enemy(
     override var lastMoveTime: Long = 0,
     override var deathTime: Long = 0,
     override var deathDuration: Long = 5000,
+    override var keepBody: Boolean = false,
     override var force: Int = ENEMY_FORCE,
     override var drawerId: Int = 0,
     override var hp: Int = 50,
@@ -110,6 +118,7 @@ internal data class Player(
     override var lastMoveTime: Long = 0,
     override var deathTime: Long = 0,
     override var deathDuration: Long = 5000,
+    override var keepBody: Boolean = true,
     override var force: Int = PLAYER_FORCE,
     override var drawerId: Int = 0,
     override var hp: Int = 100,

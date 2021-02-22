@@ -35,7 +35,8 @@ public class EggTest {
     public void testOSpaceBattle() {
         BoatEggManager eggManager = BoatEggManager.INSTANCE;
         Egg egg = eggManager.pick("O Space Battle");
-        egg.hatchOut("5b+r6LeR77yB6L+Z6YeM5rKh5pyJ5Yqg54+t6LS577yB");
+        //egg.hatchOut("Thank you, Taro.");
+        egg.hatchOut("谢谢你，泰罗。");
     }
 
     public static void main(String[] args) {

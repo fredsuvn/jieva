@@ -8,11 +8,31 @@ import xyz.srclab.common.egg.Egg
 class OSpaceBattle : Egg {
 
     override fun hatchOut(spell: CharSequence) {
-        val view = OSpaceView(OSpaceConfig())
-        view.isVisible = true
-        //view.paint(view.graphics)
-//        view.background = Color.GREEN
-//        view.graphics.color = Color.GREEN
-//        view.graphics.drawOval(0, 0, 10, 10)
+        when (spell.toString()) {
+            "Thank you, Taro.",
+            "谢谢你，泰罗。",
+            -> run()
+            else -> throw ImSevenNotTaro()
+        }
     }
+
+    private fun run() {
+        OSpaceView(OSpaceConfig()).isVisible = true
+    }
+
+    private class ImSevenNotTaro : RuntimeException(
+        """
+        I AM ULTRA SEVEN, NOT ULTRAMAN TARO, YOU SHOULD THANK FOR SEVEN NOT TARO, FUCK YOU!
+              fﾆヽ
+        　　　 |_||
+        　　　 |= |
+        　　　 |_ |
+        　　/⌒|~ |⌒i-、
+        　 /|　|　|　| ｜
+        　｜(　(　(　( ｜
+        　｜　　　　　 ｜ 　
+        　 ＼　　　　　/
+        　　 ＼　　　 　
+        """.trimIndent()
+    )
 }

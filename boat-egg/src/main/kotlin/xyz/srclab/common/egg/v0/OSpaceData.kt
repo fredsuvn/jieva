@@ -1,17 +1,7 @@
 package xyz.srclab.common.egg.v0
 
 import xyz.srclab.common.egg.sample.Data
-import xyz.srclab.common.reflect.TypeRef
-import xyz.srclab.common.reflect.toInstance
-import xyz.srclab.common.serialize.json.jsonToObject
-import xyz.srclab.common.serialize.json.toJson
-import xyz.srclab.common.serialize.json.toJsonBytes
-import xyz.srclab.common.serialize.json.toJsonString
-import java.net.URL
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * @author sunqian
@@ -71,25 +61,13 @@ internal class OSpaceData(
     constructor() : this(OSpaceScenario())
 
     override fun save(path: CharSequence) {
-        val map = HashMap<String, String>()
-        map["_players"] = this.players.toJsonString()
-        map["_enemies"] = this.enemies.toJsonString()
-        map["_playersAmmos"] = this.playersAmmos.toJsonString()
-        map["_enemiesAmmos"] = this.enemiesAmmos.toJsonString()
-        map["_scenario"] = this.scenario.javaClass.name
-        Files.write(Paths.get(path.toString()), map.toJsonBytes())
+        TODO()
     }
 
     companion object {
 
         fun CharSequence.fromOSpaceSavingFile(): OSpaceData {
-            val map = URL("file:$this").toJson().toObject(object : TypeRef<HashMap<String, String>>() {})
-            val data = OSpaceData(map["_scenario"]!!.toInstance())
-            data._players = map["_players"]!!.jsonToObject(object : TypeRef<MutableList<Player>>() {})
-            data._enemies = map["_enemies"]!!.jsonToObject(object : TypeRef<MutableList<Enemy>>() {})
-            data._playersAmmos = map["_playersAmmos"]!!.jsonToObject(object : TypeRef<MutableList<Ammo>>() {})
-            data._enemiesAmmos = map["_enemiesAmmos"]!!.jsonToObject(object : TypeRef<MutableList<Ammo>>() {})
-            return data
+            TODO()
         }
     }
 }

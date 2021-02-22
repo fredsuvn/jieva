@@ -2,7 +2,9 @@ package xyz.srclab.common.egg.v0
 
 import xyz.srclab.common.base.Current
 import xyz.srclab.common.egg.sample.Engine
+import java.awt.event.KeyEvent
 import java.util.*
+import kotlin.collections.HashSet
 import kotlin.random.Random
 
 internal class OSpaceEngine(private val config: OSpaceConfig) : Engine<OSpaceController, OSpaceData, OSpaceScenario> {
@@ -29,11 +31,12 @@ private class OSpaceControllerImpl(
 
     private val scenario: OSpaceScenario = data.scenario
     private val playingThread = PlayingThread()
+    private val keySet: MutableSet<Int> = HashSet()
 
     override fun start() {
+        scenario.onStart(data, this)
         playingThread.start()
         go()
-        scenario.onStart(data, this)
     }
 
     override fun stop() {
@@ -41,7 +44,7 @@ private class OSpaceControllerImpl(
             throw IllegalStateException("Game has been over!")
         }
         tick.stop()
-        scenario.onEnd(data, this)
+        scenario.onStop(data, this)
     }
 
     override fun go() {
@@ -59,6 +62,17 @@ private class OSpaceControllerImpl(
             throw IllegalStateException("Game has been over!")
         }
         tick.pause()
+    }
+
+    override fun toggle() {
+        if (tick.isStop) {
+            throw IllegalStateException("Game has been over!")
+        }
+        if (tick.isGoing) {
+            tick.pause()
+        } else {
+            tick.go()
+        }
     }
 
     override fun moveLeft(player: Int) {
@@ -111,11 +125,31 @@ private class OSpaceControllerImpl(
 
     override fun fire(player: Int) {
         val p = getPlayer(player)
+        if (p.isDead) {
+            return
+        }
         p.attack(tick.time, p.x, 0.0)
     }
 
+    override fun pressKey(vk: Int) {
+        synchronized(keySet) {
+            keySet.add(vk)
+        }
+    }
+
+    override fun releaseKey(vk: Int) {
+        synchronized(keySet) {
+            keySet.remove(vk)
+        }
+    }
+
     private fun Player.move(currentTime: Long, stepX: Double, stepY: Double) {
-        if (this.x < 0 || this.x > config.width || this.y < 0 || this.y > config.height) {
+        if (this.isDead) {
+            return
+        }
+        if (this.x + stepX < 0 || this.x + stepX > config.width
+            || this.y + stepY < 0 || this.y + stepY > config.height
+        ) {
             return
         }
         (this as SubjectUnit).move(currentTime, stepX, stepY)
@@ -167,6 +201,7 @@ private class OSpaceControllerImpl(
                 0,
                 0,
                 ammoMeta.deathDuration,
+                false,
                 this.holder.force,
                 ammoMeta.drawerId
             )
@@ -233,6 +268,9 @@ private class OSpaceControllerImpl(
                     val iterator = this.iterator()
                     while (iterator.hasNext()) {
                         val ammo = iterator.next()
+                        if (ammo.stepX == 0.0 && ammo.stepY == 0.0) {
+                            ammo.deathTime = tick.time
+                        }
                         if (ammo.isOutOfBounds() || ammo.isDisappeared(tick.time)) {
                             OSpaceLogger.debug("Ammo cleaned: {}", ammo.id)
                             iterator.remove()
@@ -255,6 +293,35 @@ private class OSpaceControllerImpl(
                 data.playersAmmos.cleanAmmos()
                 data.enemies.cleanLivings()
                 //data.players.cleanLivings()
+            }
+
+            fun doControl() {
+                if (keySet.contains(KeyEvent.VK_SPACE)) {
+                    fire(1)
+                }
+                if (keySet.contains(KeyEvent.VK_ENTER)) {
+                    fire(2)
+                }
+                when {
+                    keySet.contains(KeyEvent.VK_A) && keySet.contains(KeyEvent.VK_W) -> moveLeftUp(1)
+                    keySet.contains(KeyEvent.VK_D) && keySet.contains(KeyEvent.VK_W) -> moveRightUp(1)
+                    keySet.contains(KeyEvent.VK_A) && keySet.contains(KeyEvent.VK_S) -> moveLeftDown(1)
+                    keySet.contains(KeyEvent.VK_D) && keySet.contains(KeyEvent.VK_S) -> moveRightDown(1)
+                    keySet.contains(KeyEvent.VK_W) -> moveUp(1)
+                    keySet.contains(KeyEvent.VK_S) -> moveDown(1)
+                    keySet.contains(KeyEvent.VK_A) -> moveLeft(1)
+                    keySet.contains(KeyEvent.VK_D) -> moveRight(1)
+                }
+                when {
+                    keySet.contains(KeyEvent.VK_LEFT) && keySet.contains(KeyEvent.VK_UP) -> moveLeftUp(2)
+                    keySet.contains(KeyEvent.VK_RIGHT) && keySet.contains(KeyEvent.VK_UP) -> moveRightUp(2)
+                    keySet.contains(KeyEvent.VK_LEFT) && keySet.contains(KeyEvent.VK_DOWN) -> moveLeftDown(2)
+                    keySet.contains(KeyEvent.VK_RIGHT) && keySet.contains(KeyEvent.VK_DOWN) -> moveRightDown(2)
+                    keySet.contains(KeyEvent.VK_UP) -> moveUp(2)
+                    keySet.contains(KeyEvent.VK_DOWN) -> moveDown(2)
+                    keySet.contains(KeyEvent.VK_LEFT) -> moveLeft(2)
+                    keySet.contains(KeyEvent.VK_RIGHT) -> moveRight(2)
+                }
             }
 
             fun doHit() {
@@ -290,18 +357,30 @@ private class OSpaceControllerImpl(
 
             fun doFire() {
                 for (enemy in data.enemies) {
+                    if (enemy.isDead) {
+                        continue
+                    }
                     enemy.attack(pickPlayer(), tick.time)
                 }
             }
 
             fun doAutoMove() {
                 for (enemiesAmmo in data.enemiesAmmos) {
+                    if (enemiesAmmo.isDead) {
+                        continue
+                    }
                     enemiesAmmo.move(tick.time, enemiesAmmo.stepX, enemiesAmmo.stepY)
                 }
                 for (playerAmmo in data.playersAmmos) {
+                    if (playerAmmo.isDead) {
+                        continue
+                    }
                     playerAmmo.move(tick.time, playerAmmo.stepX, playerAmmo.stepY)
                 }
                 for (enemy in data.enemies) {
+                    if (enemy.isDead) {
+                        continue
+                    }
                     enemy.move(tick.time, enemy.stepX, enemy.stepY)
                 }
             }
@@ -310,6 +389,7 @@ private class OSpaceControllerImpl(
                 doWait()
                 synchronized(data) {
                     doClean()
+                    doControl()
                     doHit()
                     doFire()
                     doAutoMove()

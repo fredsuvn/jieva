@@ -25,4 +25,8 @@ internal interface OSpaceController : Controller<OSpaceData, OSpaceScenario> {
     fun moveRightDown(player: Int)
 
     fun fire(player: Int)
+
+    fun pressKey(vk: Int)
+
+    fun releaseKey(vk: Int)
 }

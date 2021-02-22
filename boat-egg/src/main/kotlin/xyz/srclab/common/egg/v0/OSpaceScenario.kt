@@ -16,7 +16,15 @@ internal class OSpaceScenario : Scenario {
         Refresher.refresh(data, controller)
     }
 
+    fun onStop(data: OSpaceData, controller: OSpaceController) {
+        OSpaceLogger.info("Game stopped...")
+    }
+
     fun onTick(data: OSpaceData, controller: OSpaceController) {
+        if (data.player1.isBody(controller.tick.time) && data.player2.isBody(controller.tick.time)) {
+            controller.stop()
+            return
+        }
         Refresher.refresh(data, controller)
     }
 
@@ -25,6 +33,9 @@ internal class OSpaceScenario : Scenario {
     }
 
     fun onHitEnemy(ammo: Ammo, enemy: Enemy, data: OSpaceData, controller: OSpaceController) {
+        val player = ammo.weapon.holder as Player
+        player.hit++
+        player.score += enemy.score
         if (enemy.isDead) {
             val p = ammo.weapon.holder as Player
             OSpaceLogger.info("Player-{} killed enemy-{} at {}", p.number, enemy.id, controller.tick.time)
@@ -91,19 +102,19 @@ internal class OSpaceScenario : Scenario {
 
 //Arguments:
 
-private const val PLAYER_RADIUS = 16.0
-private const val ENEMY_RADIUS = 16.0
-private const val AMMO_RADIUS = 10.0
+private const val PLAYER_RADIUS = 14.0
+private const val ENEMY_RADIUS = 14.0
+private const val AMMO_RADIUS = 6.0
 
 private const val PLAYER_MOVE_SPEED = 90
 private const val ENEMY_MOVE_SPEED = 50
 private const val AMMO_MOVE_SPEED = 80
-private const val DEATH_DURATION = 4000L
+private const val DEATH_DURATION = 1000L
 
 private const val PLAYER_WEAPON_DAMAGE = 100
 private const val ENEMY_WEAPON_DAMAGE = 50
 
-private const val PLAYER_WEAPON_FIRE_SPEED = 90
+private const val PLAYER_WEAPON_FIRE_SPEED = 95
 private const val ENEMY_WEAPON_FIRE_SPEED = 50
 private const val ENEMY_CRAZY_WEAPON_FIRE_SPEED = 60
 
@@ -121,17 +132,35 @@ private open class BaseDrawer(
 ) : OSpaceDrawer {
 
     override fun draw(unit: SubjectUnit, tickTime: Long, graphics: Graphics) {
+        val leftUpX = (unit.x - unit.radius).toInt()
+        val leftUpY = (unit.y - unit.radius).toInt()
+        val width = (unit.radius * 2).toInt()
 
-        fun Graphics.withColor(color: Color, action: (Graphics) -> Unit) {
-            val oldColor = this.color
-            this.color = color
-            action(this)
-            this.color = oldColor
+        fun drawBody() {
+            graphics.withColor(color) {
+                it.fillOval(leftUpX, leftUpY, width, width)
+            }
         }
 
         fun drawDead() {
             val elapsedTime = tickTime - unit.deathTime
             if (elapsedTime > unit.deathDuration) {
+                if (!unit.keepBody) {
+                    return
+                }
+                drawBody()
+                val rightDownX = (unit.x + unit.radius).toInt()
+                val rightDownY = (unit.y + unit.radius).toInt()
+                val rightUpX = (unit.x + unit.radius).toInt()
+                val rightUpY = (unit.y - unit.radius).toInt()
+                val leftDownX = (unit.x - unit.radius).toInt()
+                val leftDownY = (unit.y + unit.radius).toInt()
+                graphics.withColor(Color.RED) {
+                    it.drawLine(leftUpX, leftUpY, rightDownX, rightDownY)
+                }
+                graphics.withColor(Color.RED) {
+                    it.drawLine(rightUpX, rightUpY, leftDownX, leftDownY)
+                }
                 return
             }
             val halfDeathDuration = unit.deathDuration / 2
@@ -170,24 +199,18 @@ private open class BaseDrawer(
 
         if (unit.isDead) {
             drawDead()
+            return
         }
 
-        graphics.withColor(color) {
-            it.fillOval(
-                (unit.x - unit.radius).toInt(),
-                (unit.y - unit.radius).toInt(),
-                (unit.radius * 2).toInt(),
-                (unit.radius * 2).toInt(),
-            )
-        }
+        drawBody()
     }
 }
 
 private object Player1Drawer : BaseDrawer(PLAYER_1_DRAWER_ID, Color.BLUE)
 private object Player2Drawer : BaseDrawer(PLAYER_2_DRAWER_ID, Color.GREEN)
-private object PlayerAmmoDrawer : BaseDrawer(PLAYER_AMMO_DRAWER_ID, Color.PINK)
-private object EnemyDrawer : BaseDrawer(ENEMY_DRAWER_ID, Color.YELLOW)
-private object EnemyAmmoDrawer : BaseDrawer(ENEMY_AMMO_DRAWER_ID, Color.ORANGE)
+private object PlayerAmmoDrawer : BaseDrawer(PLAYER_AMMO_DRAWER_ID, Color.YELLOW)
+private object EnemyDrawer : BaseDrawer(ENEMY_DRAWER_ID, Color.GRAY)
+private object EnemyAmmoDrawer : BaseDrawer(ENEMY_AMMO_DRAWER_ID, Color.GRAY)
 
 //Weapons:
 
@@ -257,7 +280,7 @@ private object EnemyWeaponActor : OSpaceWeaponActor {
                 DEATH_DURATION,
                 AMMO_RADIUS,
                 AMMO_MOVE_SPEED,
-                ENEMY_DRAWER_ID
+                ENEMY_AMMO_DRAWER_ID
             )
         )
     }
@@ -274,7 +297,7 @@ private object CrazyWeaponActor : OSpaceWeaponActor {
             DEATH_DURATION,
             AMMO_RADIUS,
             AMMO_MOVE_SPEED,
-            ENEMY_DRAWER_ID
+            ENEMY_AMMO_DRAWER_ID
         )
         val ammo2 = ammo1.copy(-1.0 * STEP_45_DEGREE_ANGLE, -1.0 * STEP_45_DEGREE_ANGLE)
         val ammo3 = ammo1.copy(0.0, -1.0)
@@ -294,7 +317,7 @@ private fun createPlayer1(config: OSpaceConfig): Player {
         0,
         0,
         config.width * 0.25,
-        config.height - 2 * PLAYER_RADIUS,
+        config.height - PLAYER_RADIUS,
         0.0,
         0.0,
         0.0,
@@ -304,6 +327,7 @@ private fun createPlayer1(config: OSpaceConfig): Player {
         0,
         0,
         DEATH_DURATION,
+        true,
         PLAYER_FORCE,
         PLAYER_1_DRAWER_ID,
         100,
@@ -313,6 +337,7 @@ private fun createPlayer1(config: OSpaceConfig): Player {
     player.lastX = player.x
     player.lastY = player.y
     player.weapons = listOf(createPlayerWeapon(player))
+    //player.hp = 100000000
     return player
 }
 
@@ -323,6 +348,7 @@ private fun createPlayer2(config: OSpaceConfig): Player {
     player.drawerId = PLAYER_2_DRAWER_ID
     player.lastX = player.x
     player.lastY = player.y
+    //player.hp = 1
     return player
 }
 
@@ -355,6 +381,7 @@ private fun createBaseEnemy(config: OSpaceConfig): Enemy {
         0,
         0,
         DEATH_DURATION,
+        false,
         ENEMY_FORCE,
         ENEMY_DRAWER_ID,
         50,
