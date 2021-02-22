@@ -65,6 +65,8 @@ internal data class Weapon(
 
 internal data class Ammo(
     var weapon: Weapon,
+    var createTime: Long = 0,
+    var preparedTime: Long = 0,
     override var x: Double = 0.0,
     override var y: Double = 0.0,
     override var lastX: Double = x,

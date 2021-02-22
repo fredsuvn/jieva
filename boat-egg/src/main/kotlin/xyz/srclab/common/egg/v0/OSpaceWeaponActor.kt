@@ -8,6 +8,8 @@ internal interface OSpaceWeaponActor {
 }
 
 internal data class AmmoMeta(
+    var createTime: Long = 0,
+    var preparedTime: Long = 0,
     var xStepUnit: Double,
     var yStepUnit: Double,
     var deathDuration: Long = 5000,

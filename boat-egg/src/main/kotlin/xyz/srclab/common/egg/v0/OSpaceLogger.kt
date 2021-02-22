@@ -24,7 +24,7 @@ internal object OSpaceLogger : Logger {
     }
 
     override fun debug(pattern: String, vararg args: Any?) {
-        //println("${Current.timestamp}-debug: " + pattern.fastFormat(*args))
+        println("${Current.timestamp}-debug: " + pattern.fastFormat(*args))
     }
 }
 
