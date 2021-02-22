@@ -30,11 +30,11 @@ internal class OSpaceView(
 
 private class GamePanel(
     private val config: OSpaceConfig,
-    engine: OSpaceEngine,
+    private val engine: OSpaceEngine,
     private val view: OSpaceView,
 ) : JPanel() {
 
-    private val controller = engine.loadNew()
+    private var controller = engine.loadNew()
     private val boardColor = Color.WHITE
     private var endFont: Font? = null
 
@@ -97,7 +97,7 @@ private class GamePanel(
 
         fun drawEndBoard() {
             val x = config.width / 2 - config.endBoardWidth / 2
-            val y = config.height / 2 - config.endBoardHeight * 3 / 2
+            val y = config.height / 2 - config.endBoardHeight * 4 / 2
             g.withColor(boardColor) {
                 val oldFont = it.font
 
@@ -106,7 +106,7 @@ private class GamePanel(
                     if (font !== null) {
                         return font
                     }
-                    val newFont = Font(oldFont.name, oldFont.style, 50)
+                    val newFont = Font(oldFont.name, oldFont.style, config.endBoardFontSize)
                     endFont = newFont
                     return newFont
                 }
@@ -115,6 +115,7 @@ private class GamePanel(
                 it.drawString("Game Over! ", x, y)
                 it.drawString("Player 1: " + data.player1.score, x, y + config.endBoardHeight)
                 it.drawString("Player 2: " + data.player2.score, x, y + config.endBoardHeight * 2)
+                it.drawString("Renew: G", x, y + config.endBoardHeight * 3)
                 it.font = oldFont
             }
         }
@@ -134,20 +135,11 @@ private class GamePanel(
     private inner class PaintThread : Thread("PaintThread") {
 
         override fun run() {
-            val tick = controller.tick
-
             val interval = 1000L / config.fps
             while (true) {
-                if (tick.isStop) {
-                    break
-                }
-                if (!tick.isGoing) {
-                    tick.awaitToGo()
-                }
                 this@GamePanel.repaint()
                 Current.sleep(interval)
             }
-            this@GamePanel.repaint()
         }
     }
 
@@ -155,6 +147,11 @@ private class GamePanel(
 
         override fun keyPressed(e: KeyEvent) {
             if (controller.tick.isStop) {
+                if (e.keyCode == KeyEvent.VK_G) {
+                    controller = engine.loadNew()
+                    controller.start()
+                    return
+                }
                 return
             }
             if (e.keyCode == KeyEvent.VK_ESCAPE) {

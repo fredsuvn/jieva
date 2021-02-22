@@ -14,7 +14,8 @@ internal data class OSpaceConfig(
     val scoreboardWidth: Int = 80,
     val scoreboardHeight: Int = 25,
     val endBoardWidth: Int = 300,
-    val endBoardHeight: Int = 100,
+    val endBoardHeight: Int = 75,
+    val endBoardFontSize: Int = 40,
     val infoDisplayBoardWidth: Int = 400,
     val infoDisplayBoardHeight: Int = 25,
 )

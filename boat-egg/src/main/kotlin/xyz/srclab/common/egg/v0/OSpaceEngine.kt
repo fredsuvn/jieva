@@ -29,8 +29,8 @@ private class OSpaceControllerImpl(
 
     override val tick = OSpaceTick(config)
 
-    private val scenario: OSpaceScenario = data.scenario
     private val playingThread = PlayingThread()
+    private val scenario: OSpaceScenario = data.scenario
     private val keySet: MutableSet<Int> = HashSet()
 
     override fun start() {
@@ -155,6 +155,18 @@ private class OSpaceControllerImpl(
         (this as SubjectUnit).move(currentTime, stepX, stepY)
     }
 
+    private fun Ammo.move(tickTime: Long, stepX: Double, stepY: Double) {
+        if (this.preparedTime > 0 && tickTime - this.createTime < preparedTime) {
+            return
+        }
+        if (this.preparedTime > 0 && this.createTime > 0) {
+            this.preparedTime = 0
+            this.x = this.weapon.holder.x
+            this.y = this.weapon.holder.y
+        }
+        (this as SubjectUnit).move(tickTime, stepX, stepY)
+    }
+
     private fun SubjectUnit.move(tickTime: Long, stepX: Double, stepY: Double) {
         if (tickTime - this.lastMoveTime < this.moveSpeed.moveSpeedToCoolDown()) {
             return
@@ -190,6 +202,8 @@ private class OSpaceControllerImpl(
         for (ammoMeta in ammoMetas) {
             val ammo = Ammo(
                 this,
+                ammoMeta.createTime,
+                ammoMeta.preparedTime,
                 attacker.x,
                 attacker.y,
                 attacker.x,
@@ -250,7 +264,7 @@ private class OSpaceControllerImpl(
         return if (Random.nextBoolean()) data.player1 else data.player2
     }
 
-    private inner class PlayingThread : Thread("PlayingThread") {
+    private inner class PlayingThread : Thread("PlayingThread-${threadSequence++}") {
 
         override fun run() {
 
@@ -393,11 +407,18 @@ private class OSpaceControllerImpl(
                     doHit()
                     doFire()
                     doAutoMove()
+                    scenario.onTick(data, this@OSpaceControllerImpl)
                 }
-                scenario.onTick(data, this@OSpaceControllerImpl)
                 tick.tick()
             }
-            scenario.onEnd(data, this@OSpaceControllerImpl)
+            synchronized(data) {
+                scenario.onEnd(data, this@OSpaceControllerImpl)
+            }
+            OSpaceLogger.debug("Play thread $name over")
         }
+    }
+
+    companion object {
+        private var threadSequence: Long = 0L
     }
 }
