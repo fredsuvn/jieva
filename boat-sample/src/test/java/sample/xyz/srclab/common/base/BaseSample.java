@@ -159,6 +159,16 @@ public class BaseSample {
         //2011-12-03T10:15:30
         logger.log("localDateTime: {}", localDateTime);
 
+        //Randoms examples:
+        //[10, 20]
+        for (int j = 0; j < 10; j++) {
+            logger.log("random[10, 20]: {}", Randoms.between(10, 21));
+        }
+
+        //Compares example:
+        //99
+        logger.log("inBounds: {}", Compares.inBounds(100, 0, 99));
+
         //Checks examples:
         try {
             Checks.checkArgument(1 == 2, "1 != 2");

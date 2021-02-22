@@ -24,7 +24,8 @@ Boat includes:
 * *boat-serialize*: serialization function, including json serialization;
 * *boat-codec*: codec function, supporting Hex, Base64, AES, RSA, SM2 and more other algorithms;
 * *boat-id*: a light and easy id generation framework;
-* *boat-test*: help import common test libraries.
+* *boat-test*: help import common test libraries;
+* *boat-bom*: BOM of boat.
 
 If you want to import all above modules, just import:
 
@@ -99,7 +100,7 @@ Appropriate annotations can make codes clear and clean:
 Base package provides base common utilities including:
 
 * Shortcut objects: Current, Default, Environment;
-* Base utilities: Anys, Bools, Chars, Nums, Dates, Checks, Requires, Loaders, Sorts;
+* Base utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Loaders;
 * Grammar enhancement: Let, Ref, Lazy;
 * Basic tools: Counter, Format, NamingCase, Shell, SpecParser;
 * Base helper types: Accessor, Serial, CachingProductBuilder.
@@ -253,6 +254,16 @@ public class BaseSample {
         logger.log("timestamp: {}", timestamp);
         //2011-12-03T10:15:30
         logger.log("localDateTime: {}", localDateTime);
+
+        //Randoms examples:
+        //[10, 20]
+        for (int j = 0; j < 10; j++) {
+            logger.log("random[10, 20]: {}", Randoms.between(10, 21));
+        }
+
+        //Compares example:
+        //99
+        logger.log("inBounds: {}", Compares.inBounds(100, 0, 99));
 
         //Checks examples:
         try {
@@ -459,6 +470,16 @@ class BaseSampleKt {
         logger.log("timestamp: {}", timestamp)
         //2011-12-03T10:15:30
         logger.log("localDateTime: {}", localDateTime)
+
+        //Randoms examples:
+        //[10, 20]
+        for (j in 0..9) {
+            logger.log("random[10, 20]: {}", randomBetween(10, 21))
+        }
+
+        //Compares example:
+        //99
+        logger.log("inBounds: {}", 100.inBounds(0, 99))
 
         //Checks examples:
         try {

@@ -13,7 +13,8 @@ java {
 dependencies {
   implementation(platform(project(":boat-dependencies")))
 
-  api(project(":boat-all"))
+  implementation(project(":boat-all"))
+  implementation(project(":boat-egg"))
 
   testCompile(project(":boat-test"))
   testCompile("cglib:cglib")

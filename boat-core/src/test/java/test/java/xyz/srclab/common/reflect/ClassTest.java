@@ -38,4 +38,9 @@ public class ClassTest {
         Assert.assertEquals(Reflects.toWrapperClass(double.class), Double.class);
         Assert.assertEquals(Reflects.toWrapperClass(void.class), Void.class);
     }
+
+    @Test
+    public void testShortName() {
+        Assert.assertEquals(Reflects.shortName(getClass()), "ClassTest");
+    }
 }

@@ -122,6 +122,16 @@ class BaseSampleKt {
         //2011-12-03T10:15:30
         logger.log("localDateTime: {}", localDateTime)
 
+        //Randoms examples:
+        //[10, 20]
+        for (j in 0..9) {
+            logger.log("random[10, 20]: {}", randomBetween(10, 21))
+        }
+
+        //Compares example:
+        //99
+        logger.log("inBounds: {}", 100.inBounds(0, 99))
+
         //Checks examples:
         try {
             checkArgument(1 == 2, "1 != 2")
