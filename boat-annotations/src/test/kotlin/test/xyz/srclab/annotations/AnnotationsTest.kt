@@ -10,7 +10,7 @@ class AnnotationsTestKt {
     }
 }
 
-fun @OutParam @Rejectable(
+fun @Modifiable @Rejectable(
     Rejected(String::class),
     Rejected(String::class),
 ) Array<String>.testOutParam():
