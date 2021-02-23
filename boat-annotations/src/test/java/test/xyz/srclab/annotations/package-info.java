@@ -2,6 +2,6 @@
  * @author sunqian
  */
 @DefaultNonNull
-package xyz.srclab.common.codec.sm2;
+package test.xyz.srclab.annotations;
 
 import xyz.srclab.annotations.DefaultNonNull;
