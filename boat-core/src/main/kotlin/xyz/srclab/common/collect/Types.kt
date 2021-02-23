@@ -1,6 +1,7 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.annotations.PossibleTypes
+import xyz.srclab.annotations.Acceptable
+import xyz.srclab.annotations.Accepted
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.reflect.parameterizedType
 import java.lang.reflect.ParameterizedType
@@ -31,7 +32,10 @@ interface IterableType : ParameterizedType {
          */
         @JvmStatic
         @JvmName("from")
-        fun @PossibleTypes(Class::class, ParameterizedType::class) Type.toIterableType(): IterableType {
+        fun @Acceptable(
+            Accepted(Class::class),
+            Accepted(ParameterizedType::class),
+        ) Type.toIterableType(): IterableType {
             return when (this) {
                 is Class<*> -> this.toIterableType()
                 is ParameterizedType -> this.toIterableType()
@@ -100,7 +104,10 @@ interface MapType : ParameterizedType {
          */
         @JvmStatic
         @JvmName("from")
-        fun @PossibleTypes(Class::class, ParameterizedType::class) Type.toMapType(): MapType {
+        fun @Acceptable(
+            Accepted(Class::class),
+            Accepted(ParameterizedType::class),
+        ) Type.toMapType(): MapType {
             return when (this) {
                 is Class<*> -> this.toMapType()
                 is ParameterizedType -> this.toMapType()

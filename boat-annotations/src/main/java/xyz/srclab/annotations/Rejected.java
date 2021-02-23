@@ -1,12 +1,15 @@
 package xyz.srclab.annotations;
 
-import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
 
+/**
+ * To specify a rejected type.
+ *
+ * @author sunqian
+ * @see Rejectable
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@javax.annotation.concurrent.Immutable
-@TypeQualifierNickname
 @Target({
         ElementType.METHOD,
         ElementType.FIELD,
@@ -15,5 +18,8 @@ import java.lang.annotation.*;
         ElementType.TYPE_PARAMETER,
         ElementType.TYPE_USE,
 })
-public @interface Immutable {
+@Repeatable(Rejectable.class)
+public @interface Rejected {
+
+    Class<?> value();
 }

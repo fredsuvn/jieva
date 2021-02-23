@@ -1,7 +1,6 @@
 package test.xyz.srclab.annotations;
 
 import org.testng.annotations.Test;
-import test.xyz.srclab.annotations.sub.Bean2;
 import xyz.srclab.annotations.Nullable;
 
 /**
@@ -19,10 +18,5 @@ public class AnnotationsTest {
         String p2 = bean1.getP2();
         System.out.println(p1.substring(1));
         System.out.println(p2.substring(1));
-
-
-        Bean2 bean2 = new Bean2();
-        //bean2.setP1("123");
-        System.out.println(bean2.getP1().substring(1));
     }
 }

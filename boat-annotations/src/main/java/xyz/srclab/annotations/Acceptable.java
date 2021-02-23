@@ -1,12 +1,15 @@
 package xyz.srclab.annotations;
 
-import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
 
+/**
+ * To specify accepted types.
+ *
+ * @author sunqian
+ * @see Accepted
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@javax.annotation.concurrent.Immutable
-@TypeQualifierNickname
 @Target({
         ElementType.METHOD,
         ElementType.FIELD,
@@ -15,5 +18,7 @@ import java.lang.annotation.*;
         ElementType.TYPE_PARAMETER,
         ElementType.TYPE_USE,
 })
-public @interface Immutable {
+public @interface Acceptable {
+
+    Accepted[] value();
 }
