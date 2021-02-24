@@ -17,6 +17,7 @@ dependencies {
   api("org.jetbrains:annotations")
 
   testCompile(project(":boat-test"))
+  testImplementation "org.jetbrains.kotlin:kotlin-reflect"
 }
 
 test {
