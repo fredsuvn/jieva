@@ -5,7 +5,7 @@ import kotlin.text.toInt as toIntKt
 /**
  * Project about info.
  *
- * @see PoweredBy
+ * @see Author
  * @see SemVer
  */
 interface About {
@@ -19,19 +19,23 @@ interface About {
         @JvmName("version") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val author: String?
+    val authors: List<Author>
         @JvmName("author") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val mail: String?
+        @JvmName("mail") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String?
         @JvmName("url") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val licence: String?
+    val licences: List<String>
         @JvmName("licence") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val poweredBy: PoweredBy?
+    val poweredBys: List<About>
         @JvmName("poweredBy") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
@@ -44,22 +48,24 @@ interface About {
         fun of(
             name: String,
             version: String?,
-            author: String?,
+            author: List<Author>,
+            mail: String?,
             url: String?,
-            licence: String?,
-            poweredBy: PoweredBy?,
+            licence: List<String>,
+            poweredBy: List<About>,
             copyright: String?,
         ): About {
-            return AboutImpl(name, version, author, url, licence, poweredBy, copyright)
+            return AboutImpl(name, version, author, mail, url, licence, poweredBy, copyright)
         }
 
         private class AboutImpl(
             override val name: String,
             override val version: String?,
-            override val author: String?,
+            override val authors: List<Author>,
+            override val mail: String?,
             override val url: String?,
-            override val licence: String?,
-            override val poweredBy: PoweredBy?,
+            override val licences: List<String>,
+            override val poweredBys: List<About>,
             override val copyright: String?,
         ) : About {
 
@@ -68,10 +74,11 @@ interface About {
                 if (other !is About) return false
                 if (name != other.name) return false
                 if (version != other.version) return false
-                if (author != other.author) return false
+                if (authors != other.authors) return false
+                if (mail != other.mail) return false
                 if (url != other.url) return false
-                if (licence != other.licence) return false
-                if (poweredBy != other.poweredBy) return false
+                if (licences != other.licences) return false
+                if (poweredBys != other.poweredBys) return false
                 if (copyright != other.copyright) return false
                 return true
             }
@@ -79,10 +86,11 @@ interface About {
             override fun hashCode(): Int {
                 var result = name.hashCode()
                 result = 31 * result + version.hashCode()
-                result = 31 * result + author.hashCode()
+                result = 31 * result + authors.hashCode()
+                result = 31 * result + mail.hashCode()
                 result = 31 * result + url.hashCode()
-                result = 31 * result + licence.hashCode()
-                result = 31 * result + poweredBy.hashCode()
+                result = 31 * result + licences.hashCode()
+                result = 31 * result + poweredBys.hashCode()
                 result = 31 * result + copyright.hashCode()
                 return result
             }
@@ -91,10 +99,11 @@ interface About {
                 return """
                     $name
                     Version: $version
-                    Author: $author
+                    Author: ${authors.joinToString()}
+                    Mail: $mail
                     Url: $url
-                    Licence: $licence
-                    Powered by: ${poweredBy?.title}
+                    Licence: ${licences.joinToString()}
+                    Powered by: ${poweredBys.joinToString { it.name }}
                     $copyright
                 """.trimIndent()
             }
@@ -103,54 +112,64 @@ interface About {
 }
 
 /**
- * Project powered by info.
+ * Author info.
  *
  * @see About
- * @see SemVer
  */
-interface PoweredBy {
+interface Author {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val title: String
-        @JvmName("title") get
+    val name: String
+        @JvmName("name") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val list: List<About>
-        @JvmName("list") get
+    val mail: String?
+        @JvmName("mail") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val url: String?
+        @JvmName("url") get
 
     companion object {
 
         @JvmStatic
-        fun of(title: String, list: List<About>): PoweredBy {
-            return PoweredByImpl(title, list)
+        fun of(name: String, mail: String?, url: String?): Author {
+            return AuthorImpl(name, mail, url)
         }
 
-        @JvmStatic
-        fun of(about: About): PoweredBy {
-            return PoweredByImpl(about.name, listOf(about))
-        }
-
-        private class PoweredByImpl(
-            override val title: String,
-            override val list: List<About>
-        ) : PoweredBy {
+        private class AuthorImpl(
+            override val name: String,
+            override val mail: String?,
+            override val url: String?,
+        ) : Author {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
-                if (other !is PoweredBy) return false
-                if (title != other.title) return false
-                if (list != other.list) return false
+                if (other !is Author) return false
+                if (name != other.name) return false
+                if (mail != other.mail) return false
+                if (url != other.url) return false
                 return true
             }
 
             override fun hashCode(): Int {
-                var result = title.hashCode()
-                result = 31 * result + list.hashCode()
+                var result = name.hashCode()
+                result = 31 * result + (mail?.hashCode() ?: 0)
+                result = 31 * result + (url?.hashCode() ?: 0)
                 return result
             }
 
             override fun toString(): String {
-                return title
+                if (mail === null && url === null) {
+                    return name
+                }
+                if (mail === null && url !== null) {
+                    return "$name($url)"
+                }
+                if (mail !== null && url === null) {
+                    return "$name($mail)"
+                }
+                return "$name($mail, $url)"
             }
         }
     }
@@ -159,6 +178,8 @@ interface PoweredBy {
 /**
  * Semantic version info, See: [SemVer](https://semver.org/).
  * The difference is this interface supports more than 3 version numbers.
+ *
+ * @see About
  */
 interface SemVer : Comparable<SemVer> {
 

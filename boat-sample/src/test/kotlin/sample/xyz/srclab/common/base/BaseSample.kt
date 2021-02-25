@@ -210,19 +210,28 @@ class BaseSampleKt {
         val about = About.of(
             "name",
             semVer.normalString,
-            "author",
+            listOf(Author.of("name", "author@mail.com", null)),
+            "123@123.com",
             "url",
-            "licence",
-            PoweredBy.of(
+            listOf("licence"),
+            listOf(
                 About.of(
-                    "poweredBy", null, null, null, null, null, null
+                    "poweredBy",
+                    null,
+                    emptyList(),
+                    null,
+                    null,
+                    emptyList(),
+                    emptyList(),
+                    null
                 )
             ),
             "© 2021 SrcLab"
         )
         //name
         //Version: 1.2.3
-        //Author: author
+        //Author: name(author@mail.com)
+        //Mail: 123@123.com
         //Url: url
         //Licence: licence
         //Powered by: poweredBy

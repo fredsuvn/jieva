@@ -8,6 +8,7 @@ import xyz.srclab.common.test.TestLogger;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -251,17 +252,26 @@ public class BaseSample {
         About about = About.of(
                 "name",
                 semVer.normalString(),
-                "author",
+                Collections.singletonList(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
                 "url",
-                "licence",
-                PoweredBy.of(About.of(
-                        "poweredBy", null, null, null, null, null, null
+                Collections.singletonList("licence"),
+                Collections.singletonList(About.of(
+                        "poweredBy",
+                        null,
+                        Collections.emptyList(),
+                        null,
+                        null,
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        null
                 )),
                 "© 2021 SrcLab"
         );
         //name
         //Version: 1.2.3
-        //Author: author
+        //Author: name(author@mail.com)
+        //Mail: 123@123.com
         //Url: url
         //Licence: licence
         //Powered by: poweredBy

@@ -3,9 +3,11 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.About;
-import xyz.srclab.common.base.PoweredBy;
+import xyz.srclab.common.base.Author;
 import xyz.srclab.common.base.SemVer;
 import xyz.srclab.common.test.TestLogger;
+
+import java.util.Collections;
 
 public class AboutTest {
 
@@ -40,11 +42,19 @@ public class AboutTest {
         About about = About.of(
                 "name",
                 "1.2.3",
-                "author",
+                Collections.singletonList(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
                 "url",
-                "licence",
-                PoweredBy.of(About.of(
-                        "poweredBy", null, null, null, null, null, null
+                Collections.singletonList("licence"),
+                Collections.singletonList(About.of(
+                        "poweredBy",
+                        null,
+                        Collections.emptyList(),
+                        null,
+                        null,
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        null
                 )),
                 "© 2021 SrcLab"
         );
