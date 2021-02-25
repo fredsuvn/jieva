@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.annotations.Modifiable
+import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.NamingCase
 import xyz.srclab.common.base.asAny
@@ -572,7 +572,7 @@ private class BeanTypeImpl(
  */
 interface BeanResolveHandler {
 
-    fun resolve(@Modifiable context: Context)
+    fun resolve(@Written context: Context)
 
     interface Context {
 
@@ -694,7 +694,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     private val cache = Cache.newFastCache<Pair<BeanType, String>, PropertyType>()
 
     protected abstract fun resolveAccessors(
-        @Modifiable context: BeanResolveHandler.Context,
+        @Written context: BeanResolveHandler.Context,
         getters: MutableMap<String, Method>,
         setters: MutableMap<String, Method>
     )

@@ -247,11 +247,11 @@ public class BaseSample {
     @Test
     public void testAbout() {
         String verString = "1.2.3-beta.2.3+123";
-        Version version = Version.parse(verString);
+        SemVer semVer = SemVer.parse(verString);
         About about = About.of(
                 "name",
                 "url",
-                version,
+                semVer,
                 Licence.of("lName", "lUrl"),
                 PoweredBy.of("pName", "pUrl", "pMail")
         );

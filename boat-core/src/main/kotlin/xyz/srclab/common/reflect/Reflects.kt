@@ -6,7 +6,7 @@ package xyz.srclab.common.reflect
 import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
-import xyz.srclab.annotations.Modifiable
+import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.Current
 import xyz.srclab.common.base.Default
 import xyz.srclab.common.base.asAny
@@ -909,7 +909,7 @@ fun @Acceptable(
         return this.componentType!!.typeArguments()
     }
 
-    fun getTypeArgumentsTo0(@Modifiable typeArguments: MutableMap<TypeVariable<*>, Type>, type: Type) {
+    fun getTypeArgumentsTo0(@Written typeArguments: MutableMap<TypeVariable<*>, Type>, type: Type) {
         if (type is ParameterizedType) {
             val ownerType = type.ownerType;
             if (ownerType !== null) {
@@ -967,7 +967,7 @@ fun @Acceptable(
     }
 
     fun getTypeArgumentsTo0(
-        @Modifiable typeArguments: MutableMap<TypeVariable<*>, Type>,
+        @Written typeArguments: MutableMap<TypeVariable<*>, Type>,
         type: Type,
         to: MutableCollection<Class<*>>,
     ) {
@@ -1002,7 +1002,7 @@ fun @Acceptable(
     return typeArguments
 }
 
-private fun getTypeArgumentsTo(@Modifiable typeArguments: MutableMap<TypeVariable<*>, Type>, type: ParameterizedType) {
+private fun getTypeArgumentsTo(@Written typeArguments: MutableMap<TypeVariable<*>, Type>, type: ParameterizedType) {
     val arguments = type.actualTypeArguments
     val parameters = type.rawClass.typeParameters
     for (i in parameters.indices) {
@@ -1012,7 +1012,7 @@ private fun getTypeArgumentsTo(@Modifiable typeArguments: MutableMap<TypeVariabl
     }
 }
 
-private fun eraseTypeVariablesSelves(@Modifiable typeArguments: MutableMap<TypeVariable<*>, Type>) {
+private fun eraseTypeVariablesSelves(@Written typeArguments: MutableMap<TypeVariable<*>, Type>) {
     for (entry in typeArguments.entries) {
         val param = entry.key
         val type = entry.value
@@ -1103,7 +1103,7 @@ fun Type.eraseTypeVariables(typeArgumentsGenerator: (Type) -> Map<TypeVariable<*
     }
 }
 
-private fun replaceTypeVariable(@Modifiable array: Array<Type>, typeArguments: Map<TypeVariable<*>, Type>): Boolean {
+private fun replaceTypeVariable(@Written array: Array<Type>, typeArguments: Map<TypeVariable<*>, Type>): Boolean {
     var result = false
     for (i in array.indices) {
         val oldType = array[i]
