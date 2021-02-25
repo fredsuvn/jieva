@@ -6,8 +6,8 @@ import xyz.srclab.common.base.Counter.Companion.counterStarts
 import xyz.srclab.common.base.Format.Companion.fastFormat
 import xyz.srclab.common.base.Format.Companion.messageFormat
 import xyz.srclab.common.base.Format.Companion.printfFormat
-import xyz.srclab.common.base.SpecParser.Companion.parseFirstClassNameToInstance
 import xyz.srclab.common.base.SemVer.Companion.parseSemVer
+import xyz.srclab.common.base.SpecParser.Companion.parseFirstClassNameToInstance
 import xyz.srclab.common.test.TestLogger
 import java.math.BigDecimal
 import java.util.*
@@ -209,15 +209,24 @@ class BaseSampleKt {
         val semVer: SemVer = verString.parseSemVer()
         val about = About.of(
             "name",
+            semVer.normalString,
+            "author",
             "url",
-            semVer,
-            Licence.of("lName", "lUrl"),
-            PoweredBy.of("pName", "pUrl", "pMail")
+            "licence",
+            PoweredBy.of(
+                About.of(
+                    "poweredBy", null, null, null, null, null, null
+                )
+            ),
+            "© 2021 SrcLab"
         )
-        //name 1.2.3-beta.2.3+123, release on 2021-02-07T14:49:36.787+08:00[Asia/Shanghai]
-        //url
-        //Under the lName licence
-        //Powered by pName
+        //name
+        //Version: 1.2.3
+        //Author: author
+        //Url: url
+        //Licence: licence
+        //Powered by: poweredBy
+        //© 2021 SrcLab
         logger.log("About: {}", about)
     }
 

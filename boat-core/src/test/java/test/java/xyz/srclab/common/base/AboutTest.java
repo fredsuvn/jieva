@@ -3,7 +3,6 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.About;
-import xyz.srclab.common.base.Licence;
 import xyz.srclab.common.base.PoweredBy;
 import xyz.srclab.common.base.SemVer;
 import xyz.srclab.common.test.TestLogger;
@@ -40,10 +39,14 @@ public class AboutTest {
     public void testAbout() {
         About about = About.of(
                 "name",
+                "1.2.3",
+                "author",
                 "url",
-                SemVer.parse("1.0.0"),
-                Licence.of("licence", "url"),
-                PoweredBy.of("poweredBy", "url", "mail")
+                "licence",
+                PoweredBy.of(About.of(
+                        "poweredBy", null, null, null, null, null, null
+                )),
+                "© 2021 SrcLab"
         );
         logger.log(about);
     }

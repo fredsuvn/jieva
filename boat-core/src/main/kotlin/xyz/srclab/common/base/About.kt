@@ -15,27 +15,27 @@ interface About {
         @JvmName("name") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val version: String
+    val version: String?
         @JvmName("version") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val author: String
+    val author: String?
         @JvmName("author") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val url: String
+    val url: String?
         @JvmName("url") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val licence: String
+    val licence: String?
         @JvmName("licence") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val poweredBy: PoweredBy
+    val poweredBy: PoweredBy?
         @JvmName("poweredBy") get
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val copyright: String
+    val copyright: String?
         @JvmName("copyright") get
 
     companion object {
@@ -43,24 +43,24 @@ interface About {
         @JvmStatic
         fun of(
             name: String,
-            version: String,
-            author: String,
-            url: String,
-            licence: String,
-            poweredBy: PoweredBy,
-            copyright: String,
+            version: String?,
+            author: String?,
+            url: String?,
+            licence: String?,
+            poweredBy: PoweredBy?,
+            copyright: String?,
         ): About {
             return AboutImpl(name, version, author, url, licence, poweredBy, copyright)
         }
 
         private class AboutImpl(
             override val name: String,
-            override val version: String,
-            override val author: String,
-            override val url: String,
-            override val licence: String,
-            override val poweredBy: PoweredBy,
-            override val copyright: String,
+            override val version: String?,
+            override val author: String?,
+            override val url: String?,
+            override val licence: String?,
+            override val poweredBy: PoweredBy?,
+            override val copyright: String?,
         ) : About {
 
             override fun equals(other: Any?): Boolean {
@@ -94,7 +94,7 @@ interface About {
                     Author: $author
                     Url: $url
                     Licence: $licence
-                    Powered by: ${poweredBy.title}
+                    Powered by: ${poweredBy?.title}
                     $copyright
                 """.trimIndent()
             }
@@ -239,7 +239,7 @@ interface SemVer : Comparable<SemVer> {
                     return StringIdentifier(value)
                 }
                 throw IllegalArgumentException(
-                    "SemVer pre-release identifier should be in ${IDENTIFIER_PATTERN.pattern}"
+                    "SemVer pre-release identifier should be in ${IDENTIFIER_PATTERN.pattern}: $value"
                 )
             }
 
@@ -369,7 +369,7 @@ interface SemVer : Comparable<SemVer> {
 
     companion object {
 
-        private val IDENTIFIER_PATTERN = "[0-9A-Za-z-]".toRegex()
+        private val IDENTIFIER_PATTERN = "[0-9A-Za-z-]+".toRegex()
 
         @JvmStatic
         @JvmOverloads
@@ -442,7 +442,7 @@ interface SemVer : Comparable<SemVer> {
             if (hyphenIndex > 0 && plusSignIndex < 0) {
                 return newSemVer(
                     parseNormalNumbers(this.subSequence(0, hyphenIndex)),
-                    parsePreVersion(this.subSequence(hyphenIndex, this.length)),
+                    parsePreVersion(this.subSequence(hyphenIndex + 1, this.length)),
                     emptyList()
                 )
             }
@@ -450,20 +450,20 @@ interface SemVer : Comparable<SemVer> {
                 return newSemVer(
                     parseNormalNumbers(this.subSequence(0, plusSignIndex)),
                     emptyList(),
-                    parseBuildMetadata(this.subSequence(plusSignIndex, this.length))
+                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length))
                 )
             }
             if (plusSignIndex < hyphenIndex) {
                 return newSemVer(
                     parseNormalNumbers(this.subSequence(0, plusSignIndex)),
                     emptyList(),
-                    parseBuildMetadata(this.subSequence(plusSignIndex, this.length))
+                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length))
                 )
             }
             return newSemVer(
                 parseNormalNumbers(this.subSequence(0, hyphenIndex)),
-                parsePreVersion(this.subSequence(hyphenIndex, plusSignIndex)),
-                parseBuildMetadata(this.subSequence(plusSignIndex, this.length))
+                parsePreVersion(this.subSequence(hyphenIndex + 1, plusSignIndex)),
+                parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length))
             )
         }
 
@@ -482,7 +482,7 @@ interface SemVer : Comparable<SemVer> {
                 val string = it.toString()
                 if (!string.matches(IDENTIFIER_PATTERN)) {
                     throw IllegalArgumentException(
-                        "SemVer build metadata identifier should be in ${IDENTIFIER_PATTERN.pattern}"
+                        "SemVer build metadata identifier should be in ${IDENTIFIER_PATTERN.pattern}: $string"
                     )
                 }
                 string
