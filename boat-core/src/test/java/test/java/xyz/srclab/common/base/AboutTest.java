@@ -3,10 +3,11 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.About;
-import xyz.srclab.common.base.Licence;
-import xyz.srclab.common.base.PoweredBy;
-import xyz.srclab.common.base.Version;
+import xyz.srclab.common.base.Author;
+import xyz.srclab.common.base.SemVer;
 import xyz.srclab.common.test.TestLogger;
+
+import java.util.Collections;
 
 public class AboutTest {
 
@@ -19,11 +20,11 @@ public class AboutTest {
         String verString3 = "1.2.3+123";
         String verString4 = "1.2.3+erfsafsafs";
         String verString5 = "1.2.4";
-        Version v1 = Version.parse(verString1);
-        Version v2 = Version.parse(verString2);
-        Version v3 = Version.parse(verString3);
-        Version v4 = Version.parse(verString4);
-        Version v5 = Version.parse(verString5);
+        SemVer v1 = SemVer.parse(verString1);
+        SemVer v2 = SemVer.parse(verString2);
+        SemVer v3 = SemVer.parse(verString3);
+        SemVer v4 = SemVer.parse(verString4);
+        SemVer v5 = SemVer.parse(verString5);
         logger.log(v1);
         logger.log(v2);
         logger.log(v3);
@@ -40,10 +41,22 @@ public class AboutTest {
     public void testAbout() {
         About about = About.of(
                 "name",
+                "1.2.3",
+                Collections.singletonList(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
                 "url",
-                Version.parse("1.0.0"),
-                Licence.of("licence", "url"),
-                PoweredBy.of("poweredBy", "url", "mail")
+                Collections.singletonList("licence"),
+                Collections.singletonList(About.of(
+                        "poweredBy",
+                        null,
+                        Collections.emptyList(),
+                        null,
+                        null,
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        null
+                )),
+                "© 2021 SrcLab"
         );
         logger.log(about);
     }

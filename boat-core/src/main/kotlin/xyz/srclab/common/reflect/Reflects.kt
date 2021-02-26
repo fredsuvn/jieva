@@ -4,8 +4,9 @@
 package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
-import xyz.srclab.annotations.OutParam
-import xyz.srclab.annotations.PossibleTypes
+import xyz.srclab.annotations.Acceptable
+import xyz.srclab.annotations.Accepted
+import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.Current
 import xyz.srclab.common.base.Default
 import xyz.srclab.common.base.asAny
@@ -152,7 +153,11 @@ val GenericArrayType.rawClass: Class<*>
 /**
  * @throws IllegalArgumentException
  */
-val @PossibleTypes(Class::class, ParameterizedType::class, GenericArrayType::class) Type.rawClass: Class<*>
+val @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+    Accepted(GenericArrayType::class),
+) Type.rawClass: Class<*>
     @JvmName("rawClass") get() {
         return this.rawClassOrNull ?: throw IllegalArgumentException(
             "Only Class, ParameterizedType or GenericArrayType has raw class."
@@ -894,17 +899,17 @@ fun Method.canOverrideBy(clazz: Class<*>): Boolean {
  *
  * @throws IllegalArgumentException
  */
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class,
-    GenericArrayType::class,
+fun @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+    Accepted(GenericArrayType::class),
 ) Type.typeArguments(): Map<TypeVariable<*>, Type> {
 
     if (this.isArray) {
         return this.componentType!!.typeArguments()
     }
 
-    fun getTypeArgumentsTo0(@OutParam typeArguments: MutableMap<TypeVariable<*>, Type>, type: Type) {
+    fun getTypeArgumentsTo0(@Written typeArguments: MutableMap<TypeVariable<*>, Type>, type: Type) {
         if (type is ParameterizedType) {
             val ownerType = type.ownerType;
             if (ownerType !== null) {
@@ -936,10 +941,10 @@ fun @PossibleTypes(
  *
  * @throws IllegalArgumentException
  */
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class,
-    GenericArrayType::class,
+fun @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+    Accepted(GenericArrayType::class),
 ) Type.typeArguments(vararg to: Class<*>): Map<TypeVariable<*>, Type> {
     return this.typeArguments(to.toList())
 }
@@ -951,10 +956,10 @@ fun @PossibleTypes(
  *
  * @throws IllegalArgumentException
  */
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class,
-    GenericArrayType::class,
+fun @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+    Accepted(GenericArrayType::class),
 ) Type.typeArguments(to: Iterable<Class<*>>): Map<TypeVariable<*>, Type> {
 
     if (this.isArray) {
@@ -962,7 +967,7 @@ fun @PossibleTypes(
     }
 
     fun getTypeArgumentsTo0(
-        @OutParam typeArguments: MutableMap<TypeVariable<*>, Type>,
+        @Written typeArguments: MutableMap<TypeVariable<*>, Type>,
         type: Type,
         to: MutableCollection<Class<*>>,
     ) {
@@ -997,7 +1002,7 @@ fun @PossibleTypes(
     return typeArguments
 }
 
-private fun getTypeArgumentsTo(@OutParam typeArguments: MutableMap<TypeVariable<*>, Type>, type: ParameterizedType) {
+private fun getTypeArgumentsTo(@Written typeArguments: MutableMap<TypeVariable<*>, Type>, type: ParameterizedType) {
     val arguments = type.actualTypeArguments
     val parameters = type.rawClass.typeParameters
     for (i in parameters.indices) {
@@ -1007,7 +1012,7 @@ private fun getTypeArgumentsTo(@OutParam typeArguments: MutableMap<TypeVariable<
     }
 }
 
-private fun eraseTypeVariablesSelves(@OutParam typeArguments: MutableMap<TypeVariable<*>, Type>) {
+private fun eraseTypeVariablesSelves(@Written typeArguments: MutableMap<TypeVariable<*>, Type>) {
     for (entry in typeArguments.entries) {
         val param = entry.key
         val type = entry.value
@@ -1098,7 +1103,7 @@ fun Type.eraseTypeVariables(typeArgumentsGenerator: (Type) -> Map<TypeVariable<*
     }
 }
 
-private fun replaceTypeVariable(@OutParam array: Array<Type>, typeArguments: Map<TypeVariable<*>, Type>): Boolean {
+private fun replaceTypeVariable(@Written array: Array<Type>, typeArguments: Map<TypeVariable<*>, Type>): Boolean {
     var result = false
     for (i in array.indices) {
         val oldType = array[i]
@@ -1159,11 +1164,14 @@ private fun deepSearchTypeVariable(
  * @throws IllegalArgumentException
  */
 @JvmOverloads
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class
-) Type.generalize(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>): Type? {
+fun @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+) Type.generalize(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>):
+        @Acceptable(
+            Accepted(Class::class),
+            Accepted(ParameterizedType::class),
+        ) Type? {
     return this.generalize(typeArguments, targets.asList())
 }
 
@@ -1181,11 +1189,14 @@ fun @PossibleTypes(
  * @throws IllegalArgumentException
  */
 @JvmOverloads
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class
-) Type.generalize(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>): Type? {
+fun @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+) Type.generalize(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>):
+        @Acceptable(
+            Accepted(Class::class),
+            Accepted(ParameterizedType::class),
+        ) Type? {
     for (target in targets) {
         val result = if (target.isInterface)
             this.genericInterface(typeArguments, target)
@@ -1212,11 +1223,14 @@ fun @PossibleTypes(
  * @throws IllegalArgumentException
  */
 @JvmOverloads
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class
-) Type.genericSuperclass(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>): Type? {
+fun @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+) Type.genericSuperclass(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>):
+        @Acceptable(
+            Accepted(Class::class),
+            Accepted(ParameterizedType::class),
+        ) Type? {
     return this.genericSuperclass(typeArguments, targets.asList())
 }
 
@@ -1234,11 +1248,14 @@ fun @PossibleTypes(
  * @throws IllegalArgumentException
  */
 @JvmOverloads
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class
-) Type.genericSuperclass(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>): Type? {
+fun @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+) Type.genericSuperclass(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>):
+        @Acceptable(
+            Accepted(Class::class),
+            Accepted(ParameterizedType::class),
+        ) Type? {
     var rawClass = this.rawClass
     if (targets.contains(rawClass)) {
         return if (typeArguments === null) {
@@ -1277,11 +1294,14 @@ fun @PossibleTypes(
  * @throws IllegalArgumentException
  */
 @JvmOverloads
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class
-) Type.genericInterface(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>): Type? {
+fun @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+) Type.genericInterface(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>):
+        @Acceptable(
+            Accepted(Class::class),
+            Accepted(ParameterizedType::class),
+        ) Type? {
     return this.genericInterface(typeArguments, targets.asList())
 }
 
@@ -1299,11 +1319,14 @@ fun @PossibleTypes(
  * @throws IllegalArgumentException
  */
 @JvmOverloads
-@PossibleTypes(Class::class, ParameterizedType::class)
-fun @PossibleTypes(
-    Class::class,
-    ParameterizedType::class
-) Type.genericInterface(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>): Type? {
+fun @Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+) Type.genericInterface(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>):
+        @Acceptable(
+            Accepted(Class::class),
+            Accepted(ParameterizedType::class),
+        ) Type? {
 
     //Level searching
     fun findInterface(genericTypes: List<Type>, targets: Iterable<Class<*>>): Type? {

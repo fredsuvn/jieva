@@ -8,16 +8,12 @@ import java.lang.annotation.*;
 @javax.annotation.concurrent.Immutable
 @TypeQualifierNickname
 @Target({
-        ElementType.TYPE,
-        ElementType.FIELD,
         ElementType.METHOD,
+        ElementType.FIELD,
         ElementType.PARAMETER,
-        //ElementType.CONSTRUCTOR,
         ElementType.LOCAL_VARIABLE,
-        //ElementType.ANNOTATION_TYPE,
-        ElementType.PACKAGE,
         ElementType.TYPE_PARAMETER,
-        //ElementType.TYPE_USE,
+        ElementType.TYPE_USE,
 })
 public @interface Immutable {
 }

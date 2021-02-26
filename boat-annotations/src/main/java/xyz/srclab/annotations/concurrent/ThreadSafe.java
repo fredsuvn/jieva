@@ -1,24 +1,21 @@
 package xyz.srclab.annotations.concurrent;
 
-import javax.annotation.meta.TypeQualifier;
+import javax.annotation.meta.TypeQualifierNickname;
 import java.lang.annotation.*;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@TypeQualifier
+@javax.annotation.concurrent.ThreadSafe
+@TypeQualifierNickname
 @Target({
         ElementType.TYPE,
-        ElementType.FIELD,
         ElementType.METHOD,
-        ElementType.PARAMETER,
         ElementType.CONSTRUCTOR,
+        ElementType.FIELD,
+        ElementType.PARAMETER,
         ElementType.LOCAL_VARIABLE,
-        //ElementType.ANNOTATION_TYPE,
-        ElementType.PACKAGE,
         ElementType.TYPE_PARAMETER,
-        //ElementType.TYPE_USE,
+        ElementType.TYPE_USE,
 })
 public @interface ThreadSafe {
-
-    WhetherThreadSafe when() default WhetherThreadSafe.TRUE;
 }

@@ -1,5 +1,7 @@
 # _Welcome to Boat_
 
+![Boat](logo.svg)
+
 - Markdown:
     * [English](readme/README_en.md)
     * [简体中文](readme/README_zh.md)

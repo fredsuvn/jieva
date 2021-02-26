@@ -8,6 +8,7 @@ import xyz.srclab.common.test.TestLogger;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -247,18 +248,34 @@ public class BaseSample {
     @Test
     public void testAbout() {
         String verString = "1.2.3-beta.2.3+123";
-        Version version = Version.parse(verString);
+        SemVer semVer = SemVer.parse(verString);
         About about = About.of(
                 "name",
+                semVer.normalString(),
+                Collections.singletonList(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
                 "url",
-                version,
-                Licence.of("lName", "lUrl"),
-                PoweredBy.of("pName", "pUrl", "pMail")
+                Collections.singletonList("licence"),
+                Collections.singletonList(About.of(
+                        "poweredBy",
+                        null,
+                        Collections.emptyList(),
+                        null,
+                        null,
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        null
+                )),
+                "© 2021 SrcLab"
         );
-        //name 1.2.3-beta.2.3+123, release on 2021-02-07T14:49:36.787+08:00[Asia/Shanghai]
-        //url
-        //Under the lName licence
-        //Powered by pName
+        //name
+        //Version: 1.2.3
+        //Author: name(author@mail.com)
+        //Mail: 123@123.com
+        //Url: url
+        //Licence: licence
+        //Powered by: poweredBy
+        //© 2021 SrcLab
         logger.log("About: {}", about);
     }
 }

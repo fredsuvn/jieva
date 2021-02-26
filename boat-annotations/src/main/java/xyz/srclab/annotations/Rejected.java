@@ -1,14 +1,15 @@
 package xyz.srclab.annotations;
 
-import javax.annotation.Nonnull;
-import javax.annotation.meta.TypeQualifierNickname;
-import javax.annotation.meta.When;
 import java.lang.annotation.*;
 
+/**
+ * To specify a rejected type.
+ *
+ * @author sunqian
+ * @see Rejectable
+ */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Nonnull(when = When.MAYBE)
-@TypeQualifierNickname
 @Target({
         ElementType.METHOD,
         ElementType.FIELD,
@@ -17,5 +18,8 @@ import java.lang.annotation.*;
         ElementType.TYPE_PARAMETER,
         ElementType.TYPE_USE,
 })
-public @interface Nullable {
+@Repeatable(Rejectable.class)
+public @interface Rejected {
+
+    Class<?> value();
 }

@@ -10,29 +10,19 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Nonnull(when = When.MAYBE)
 @TypeQualifierDefault({
-        ElementType.TYPE,
-        ElementType.FIELD,
         ElementType.METHOD,
+        ElementType.FIELD,
         ElementType.PARAMETER,
-        ElementType.CONSTRUCTOR,
         ElementType.LOCAL_VARIABLE,
-        ElementType.ANNOTATION_TYPE,
-        ElementType.PACKAGE,
         ElementType.TYPE_PARAMETER,
         ElementType.TYPE_USE,
 })
 @TypeQualifierNickname
 @Target({
         ElementType.TYPE,
-        //ElementType.FIELD,
         ElementType.METHOD,
-        //ElementType.PARAMETER,
         ElementType.CONSTRUCTOR,
-        //ElementType.LOCAL_VARIABLE,
-        //ElementType.ANNOTATION_TYPE,
         ElementType.PACKAGE,
-        ElementType.TYPE_PARAMETER,
-        ElementType.TYPE_USE,
 })
 public @interface DefaultNullable {
 }

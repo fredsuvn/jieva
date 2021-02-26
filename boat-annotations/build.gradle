@@ -14,5 +14,12 @@ dependencies {
   implementation(platform(project(":boat-dependencies")))
 
   api("com.google.code.findbugs:jsr305")
-  //api("org.jetbrains:annotations")
+  api("org.jetbrains:annotations")
+
+  testCompile(project(":boat-test"))
+}
+
+test {
+  useTestNG()
+  include("**/*Test.class", "**/*TestKt.class")
 }
