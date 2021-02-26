@@ -3,6 +3,7 @@ package xyz.srclab.common
 import xyz.srclab.common.base.About
 import xyz.srclab.common.base.Author
 import xyz.srclab.common.base.SemVer
+import xyz.srclab.common.base.loadStringResource
 
 object Boat {
 
@@ -38,15 +39,5 @@ object Boat {
      */
     @JvmStatic
     @get:JvmName("logo")
-    val logo = """
-        _______                                      _____________________________
-         _________________________________________________________________
-          _____  ________                _____     ________________
-           ____  ___  __ )______ ______ ___  /_   ___________
-            ___  __  __  |_  __ \_  __ `/_  __/  _______
-             __  _  /_/ / / /_/ // /_/ / / /_   ____
-              _  /_____/  \____/ \__,_/  \__/  __
-               ________________________________
-        :: Boat ::                                        v$version
-    """.trimIndent()
+    val logo = "META-INF/logo.txt".loadStringResource().replace("\$version", about.version!!)
 }
