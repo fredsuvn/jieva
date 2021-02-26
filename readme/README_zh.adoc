@@ -1,17 +1,20 @@
 = Boat: SrcLab的基础Java/kotlin库
 Sun Qian <fredsuvn@163.com>
-// v0.0.0, 2020-03-26
-v1.0.0, 2020-04-12
+:author: Sun Qian
 :encoding: UTF-8
 :boat-version: 1.0.0
+
+image::../logo.svg[Boat]
 
 == 修订
 
 [options="header"]
 |===
 |日期|修订版|作者|内容
-|2020-12-10|0.0.0|Sun Qian fredsuvn@163.com|New
-|2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|重构
+|2020-03-26|0.0.0|Sun Qian fredsuvn@163.com|旧项目
+|2020-04-12|1.0.0|Sun Qian fredsuvn@163.com|旧项目更新
+|2020-12-10|0.0.0|Sun Qian fredsuvn@163.com|新项目
+|2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|新项目重构
 |===
 
 == 简介

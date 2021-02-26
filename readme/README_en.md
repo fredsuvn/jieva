@@ -1,5 +1,7 @@
 # Boat: SrcLab Core Libraries for Java/kotlin
 
+![Boat](../logo.svg)
+
 ## Variables
 
 * boat-version: 1.0.0
@@ -8,8 +10,10 @@
 
 |Date|Revision|Author|Content|
 |---|---|---|---|
+|2020-03-26|0.0.0|Sun Qian fredsuvn@163.com|Old
+|2020-04-12|1.0.0|Sun Qian fredsuvn@163.com|Old update
 |2020-12-10|1.0.0|Sun Qian fredsuvn@163.com|New|
-|2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|Refactoring
+|2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|New refactoring
 
 ## Introduction
 
@@ -1492,7 +1496,8 @@ public class SerializeSample {
     @Test
     public void testJsonSerialize() {
         Json json = JsonSerials.toJson("{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}");
-        Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {});
+        Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {
+        });
         //{p1=p1 value, p2=p2 value}
         logger.log(map);
     }

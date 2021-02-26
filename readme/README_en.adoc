@@ -1,17 +1,20 @@
 = Boat: SrcLab Core Libraries for Java/kotlin
 Sun Qian <fredsuvn@163.com>
-// v0.0.0, 2020-03-26
-v1.0.0, 2020-04-12
+:author: Sun Qian
 :encoding: UTF-8
 :boat-version: 1.0.0
+
+image::../logo.svg[Boat]
 
 == Revision
 
 [options="header"]
 |===
 |Date|Revision|Author|Content
+|2020-03-26|0.0.0|Sun Qian fredsuvn@163.com|Old
+|2020-04-12|1.0.0|Sun Qian fredsuvn@163.com|Old update
 |2020-12-10|0.0.0|Sun Qian fredsuvn@163.com|New
-|2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|Refactoring
+|2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|New refactoring
 |===
 
 == Introduction
