@@ -7,6 +7,6 @@ public class BoatTest {
 
     @Test
     public void testBoat() {
-        System.out.println(Boat.logo());
+        System.out.println(Boat.charsLogo());
     }
 }
