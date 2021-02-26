@@ -38,6 +38,6 @@ object Boat {
      * Font: speed
      */
     @JvmStatic
-    @get:JvmName("logo")
-    val logo = "META-INF/logo.txt".loadStringResource().replace("\$version", about.version!!)
+    @get:JvmName("charsLogo")
+    val charsLogo = "META-INF/logo.txt".loadStringResource().replace("\$version", about.version!!)
 }
