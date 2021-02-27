@@ -4,38 +4,46 @@
 
 ## Variables
 
+* author: Sun Qian
 * boat-version: 1.0.0
 
 ## Revision
 
 |Date|Revision|Author|Content|
 |---|---|---|---|
-|2020-03-26|0.0.0|Sun Qian fredsuvn@163.com|Old
-|2020-04-12|1.0.0|Sun Qian fredsuvn@163.com|Old update
-|2020-12-10|1.0.0|Sun Qian fredsuvn@163.com|New|
-|2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|New refactoring
+|2020-03-26|0.0.0|{author}|Old
+|2020-04-12|1.0.0|{author}|Old update
+|2020-12-10|0.0.0|{author}|New
+|2020-12-10|{boat-version}|{author}|New refactoring
 
-## Introduction
+## Toc
 
-Boat is a set of core Java/Kotlin libraries (JDK 1.8+), written by kotlin (mostly) and java, widely used on Java/Kotlin
-projects within SrcLab, and also can be used by other Java/Kotlin projects.
+- [Introduction](#introduction)
+- [Getting](#getting)
+- [Usage](#usage)
+- [Contribution and Contact](#contact)
+- [License](#license)
+
+## <a id="introduction"/>Introduction
+
+Boat is a set of core Java/Kotlin libraries (JDK 1.8+), mostly written by kotlin, widely used on JVM projects within
+SrcLab. It provides many fast and convenient interfaces, functions and utilities.
 
 Boat includes:
 
-* *boat-annotations*: core annotations, such as @Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
-* *boat-core*: core and basic utilities and interface, including base, bean, bus, cache, collect, convert, exception,
-  invoke, jvm, proxy, reflect, run, state and test;
-* *boat-serialize*: serialization function, including json serialization;
-* *boat-codec*: codec function, supporting Hex, Base64, AES, RSA, SM2 and more other algorithms;
-* *boat-id*: a light and easy id generation framework;
-* *boat-test*: help import common test libraries;
-* *boat-bom*: BOM of boat.
+* *boat-annotations*: Core annotations, such as @Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
+* *boat-core*: Core and basic interfaces, functions and utilities;
+* *boat-serialize*: Serialization and deserialization interfaces and utilities (for json and more);
+* *boat-codec*: Codec interfaces and utilities (supports hex, base64, SHA, MD, HMAC, AES, RSA, SM2, etc.);
+* *boat-id*: A lightweight ID generation framework;
+* *boat-test*: Test dependencies management, to import common test libraries in test scope;
+* *boat-bom*: Boat Bom.
 
-If you want to import all above modules, just import:
+If you want to import all above modules (boat-test and boat-bom are exclusive), just import:
 
-* *boat-all*: import all above modules.
+* *boat-all*: To import all Boat modules.
 
-## Getting
+## <a id="getting"/>Getting
 
 ### Gradle
 
@@ -58,7 +66,7 @@ implementation("xyz.srclab.common:boat-all:{boat-version}")
 
 https://github.com/srclab-projects/boat
 
-## Usage
+## <a id="usage"/>Usage
 
 - [Boat Annotation](#usage-annotations)
 - [Boat Core](#usage-core)
@@ -82,32 +90,125 @@ https://github.com/srclab-projects/boat
 
 ### <a id="usage-annotations"/>Boat Annotations (boat-annotations)
 
-Appropriate annotations can make codes clear and clean:
+Boat Annotations provides a set of annotations to make codes clear and clean:
 
-* *DefaultNotNull*/*DefaultNullable*: indicates all parameters, variables, fields or other types are non-null/null by
-  default, usually used in package-info.java. These annotations extend Nonnull of jsr305, and IDE such as IDEA can
-  recognize them;
-* *NotNull*/*Nullable*: indicates a parameter, variable, field or other type is non-null/null. These annotations extend
-  Nonnull of jsr305, and IDE such as IDEA can recognize it;
-* *OutParam*/*OutReturn*: indicates the parameter may be written and return;
-* *Immutable*: indicates the annotated parameter, variable, field or other type is immutable and thread-safe;
-* *ThreadSafe*: indicates the annotated parameter, variable, field or other type annotated is thread-safe;
-* *ThreadSafeDependOn*: indicates whether annotated parameter, variable, field or other type is thread-safe depends on
-  its dependent type or object (itself is thread-safe);
-* *PossibleTypes*: indicates the actual type of annotated parameter, variable, field or other type is in range of
-  PossibleTypes specifying.
+* *DefaultNonNull*/*DefaultNullable*: It tells that all variables, fields, parameters, and other use of type are
+  non-null/nullable by default in annotated scope, usually used in package-info.java;
+* *NotNull*/*Nullable*: It tells that annotated variable, field, parameter, and other use of type is non-null/nullable;
+* *JavaBean*: It tells that annotated type is a java-bean, which all properties are nullable by default;
+* *Acceptable*/*Accepted*: It tells that annotated parameter only accepts specified types.
+* *Rejectable*/*Rejected*: It tells that annotated parameter will reject specified types.
+* *Written*: It tells that the parameter may be written;
+* *Immutable*: It tells that annotated variable, field, parameter, and other use of type is immutable and thread-safe;
+* *ThreadSafe*: It tells that annotated variable, field, parameter, and other use of type is thread-safe;
+* *ThreadSafeIf*: It tells that annotated variable, field, parameter, and other use of type is thread-safe if specified
+  conditions were met;
 
-### <a id="usage-core"/>Boat Core (boat-core)
+#### Java Examples
 
-#### <a id="usage-core-base"/>Base
+```java
+public class AnnotationSample {
 
-Base package provides base common utilities including:
+    @Test
+    public void testAnnotations() {
+        TestBean testBean = new TestBean();
+        Assert.assertEquals(testBean.getP2().substring(1), "2");
+        Assert.expectThrows(NullPointerException.class, () -> testBean.getP1().substring(1));
 
-* Shortcut objects: Current, Default, Environment;
-* Base utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Loaders;
-* Grammar enhancement: Let, Ref, Lazy;
-* Basic tools: Counter, Format, NamingCase, Shell, SpecParser;
-* Base helper types: Accessor, Serial, CachingProductBuilder.
+        StringBuilder buffer = new StringBuilder();
+        writeBuffer(buffer, "123");
+        Assert.assertEquals(buffer.toString(), "123");
+    }
+
+    private void writeBuffer(
+            @Written StringBuilder buffer,
+            @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
+    ) {
+        buffer.append(readOnly);
+    }
+
+    @JavaBean
+    public static class TestBean {
+
+        private String p1;
+        @NonNull
+        private String p2 = "p2";
+
+        public String getP1() {
+            return p1;
+        }
+
+        public void setP1(String p1) {
+            this.p1 = p1;
+        }
+
+        @NonNull
+        public String getP2() {
+            return p2;
+        }
+
+        public void setP2(@NonNull String p2) {
+            this.p2 = p2;
+        }
+    }
+}
+```
+
+#### Kotlin Examples
+
+```kotlin
+class AnnotationSampleKt {
+
+    @Test
+    fun testAnnotations() {
+        val buffer = StringBuilder()
+        buffer.writeBuffer("123")
+        Assert.assertEquals(buffer.toString(), "123")
+    }
+
+    private fun @receiver:Written StringBuilder.writeBuffer(
+        @Acceptable(
+            Accepted(String::class),
+            Accepted(StringBuffer::class),
+        )
+        readOnly: String
+    ) {
+        this.append(readOnly)
+    }
+}
+class AnnotationSampleKt {
+
+    @Test
+    fun testAnnotations() {
+        val buffer = StringBuilder()
+        buffer.writeBuffer("123")
+        Assert.assertEquals(buffer.toString(), "123")
+    }
+
+    private fun @receiver:Written StringBuilder.writeBuffer(
+        @Acceptable(
+            Accepted(String::class),
+            Accepted(StringBuffer::class),
+        )
+        readOnly: String
+    ) {
+        this.append(readOnly)
+    }
+}
+```
+
+### <a id ="usage-core"/> Boat Core(boat - core)
+
+#### <a id ="usage-core-base"/> Base
+
+Base package provides base core and basic interfaces, functions and utilities:
+
+* Global shortcut objects: Current, Default, Environment;
+* Syntax enhancement (mainly for Java): Let, Ref, Lazy;
+* String functions: Format, NamingCase;
+* Core and basic interfaces: Accessor, Serial, SpecParser, CachingProductBuilder
+* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Loaders;
+* Other tools: About, Counter, Shell.
 
 ##### Java Examples
 
@@ -347,18 +448,34 @@ public class BaseSample {
     @Test
     public void testAbout() {
         String verString = "1.2.3-beta.2.3+123";
-        Version version = Version.parse(verString);
+        SemVer semVer = SemVer.parse(verString);
         About about = About.of(
                 "name",
+                semVer.normalString(),
+                Collections.singletonList(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
                 "url",
-                version,
-                Licence.of("lName", "lUrl"),
-                PoweredBy.of("pName", "pUrl", "pMail")
+                Collections.singletonList("licence"),
+                Collections.singletonList(About.of(
+                        "poweredBy",
+                        null,
+                        Collections.emptyList(),
+                        null,
+                        null,
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        null
+                )),
+                "© 2021 SrcLab"
         );
-        //name 1.2.3-beta.2.3+123, release on 2021-02-07T14:49:36.787+08:00[Asia/Shanghai]
-        //url
-        //Under the lName licence
-        //Powered by pName
+        //name
+        //Version: 1.2.3
+        //Author: name(author@mail.com)
+        //Mail: 123@123.com
+        //Url: url
+        //Licence: licence
+        //Powered by: poweredBy
+        //© 2021 SrcLab
         logger.log("About: {}", about);
     }
 }
@@ -559,18 +676,36 @@ class BaseSampleKt {
     @Test
     fun testAbout() {
         val verString = "1.2.3-beta.2.3+123"
-        val version: Version = verString.parseToVersion()
+        val semVer: SemVer = verString.parseSemVer()
         val about = About.of(
             "name",
+            semVer.normalString,
+            listOf(Author.of("name", "author@mail.com", null)),
+            "123@123.com",
             "url",
-            version,
-            Licence.of("lName", "lUrl"),
-            PoweredBy.of("pName", "pUrl", "pMail")
+            listOf("licence"),
+            listOf(
+                About.of(
+                    "poweredBy",
+                    null,
+                    emptyList(),
+                    null,
+                    null,
+                    emptyList(),
+                    emptyList(),
+                    null
+                )
+            ),
+            "© 2021 SrcLab"
         )
-        //name 1.2.3-beta.2.3+123, release on 2021-02-07T14:49:36.787+08:00[Asia/Shanghai]
-        //url
-        //Under the lName licence
-        //Powered by pName
+        //name
+        //Version: 1.2.3
+        //Author: name(author@mail.com)
+        //Mail: 123@123.com
+        //Url: url
+        //Licence: licence
+        //Powered by: poweredBy
+        //© 2021 SrcLab
         logger.log("About: {}", about)
     }
 
@@ -584,8 +719,10 @@ class BaseSampleKt {
 
 Bean package provides powerful bean operation ability:
 
-* Beans: utilities for bean operation;
-* BeanResolver: interface to resolver bean, Beans use its default implementation;
+* Beans: Default utilities for bean operation;
+* BeanResolver: Core Interface to resolver bean, Beans use its default implementation;
+
+> In copy-properties function, It is more than 10 times faster than Apache BeanUtils.
 
 ##### Java Examples
 
@@ -798,11 +935,12 @@ class EventBusSampleKt {
 
 Boat provides a Cache interface and several implementations:
 
-* FastCache
-* CaffeineCache
-* GuavaCache
-* MapCache
-* ThreadLocalCache
+* Cache: Cache core interface;
+* FastCache: Implemented by WeakHashMap and ThreadLocal;
+* CaffeineCache: Implemented by Caffeine;
+* GuavaCache: Implemented by Guava;
+* MapCache: Map as Cache;
+* ThreadLocalCache: ThreadLocalMap as Cache.
 
 ##### Java Examples
 
@@ -846,8 +984,13 @@ class CacheSampleKt {
 
 #### <a id="usage-core-collect"/>Collect
 
-Collect package provides utilities classes Collects for Iterable types and ArrayCollects for array types, and provides
-Ops interface to do with chain operation.
+Collect package provides interfaces, utilities and Ops operation for collection and array:
+
+* Collects: Utilities for Collection;
+* ArrayCollects: Utilities for Array;
+* IterableOps, ListOps, SetOps, MapOps: Ops interfaces, provide chain operation, mainly for Java;
+* SequenceOps: Ops for Sequence;
+* IterableType, MapType: Meta type interfaces for generic Collection types.
 
 ##### Java Examples
 
@@ -886,8 +1029,8 @@ public class CollectSample {
 
 Convert package provides type-conversion function：
 
-* Converts: utilities class for conversion;
-* Converter: interface for type-conversion, Converts use its default implementation.
+* Converts: Utilities for conversion;
+* Converter: Core interfaces for type-conversion, Converts use its default implementation.
 
 ##### Java Examples
 
@@ -1214,9 +1357,9 @@ class ProxySampleKt {
 
 Reflect package provides utilities classes:
 
-* Reflects: provides reflect operations;
-* Types: to build generic types;
-* TypeRef: to build a type reference.
+* Reflects: Provides reflect operations;
+* Types: To build generic types;
+* TypeRef: To build a type reference.
 
 ##### Java Examples
 
@@ -1483,8 +1626,12 @@ class TestSampleKt {
 
 ### <a id="usage-serialize"/>Boat Serialize (boat-serialize)
 
-Boat serialize (should import boat-serialize) provides common Serializer interface for serialization. In current
-version, boat-serialize provides JsonSerializer.
+Boat Serialize (should import boat-serialize) provides core Serializer interface for serialization:
+
+* Serializer: Core interface for serialization;
+* JsonSerials: JSON serialization utilities;
+* JsonSerial: Core interface for JSON serialization, JsonSerials use its default implementation (Jackson);
+* Json: Core interface denote a JSON object.
 
 #### Java Examples
 
@@ -1525,8 +1672,12 @@ class SerializeSampleKt {
 
 ### <a id="usage-codec"/>Boat Codec (boat-codec)
 
-Boat codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and other interfaces to do with codec
-functions, supports hex, base64, AES, RSA, SM2 and more algorithms.
+Boat Codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and other interfaces to do with codec
+functions, supports hex, base64, AES, RSA, SM2 and more algorithms:
+
+* Codec: Core interface and utilities for codec function;
+* CodecKeys: Utilities for codec keys;
+* AesKeys: Utilities for AES keys.
 
 #### Java Examples
 
@@ -1590,8 +1741,16 @@ class CodecSampleKt {
 
 ### <a id="usage-id"/>Boat Id (boat-id)
 
-Boat id (should import boat-id) is a light and easy id generation framework. Provides IdFactory to build any type of Id,
-and StringIdSpec to quickly build String type id.
+Boat ID (should import boat-id) is a lightweight and fast id generation framework. It provides IdFactory and a set of
+interface to generate id:
+
+* IdFactory: Core interface to generate new id;
+* IdComponentGenerator: Core interface to generator component of an id;
+* AbstractIdFactory: Skeletal IdFactory to help implement full IdFactory;
+* StringIdFactory: Skeletal IdFactory to help implement String-id-type IdFactory;
+
+Boat ID also provides StringIdSpec, a String-type IdFactory, can build new id from a specification string, see its
+javadoc.
 
 #### Java Examples
 
@@ -1633,12 +1792,12 @@ class IdSampleKt {
 }
 ```
 
-## Contribution and Contact
+## <a id="contact"/>Contribution and Contact
 
 * fredsuvn@163.com
 * https://github.com/srclab-projects/boat
 * QQ group: 1037555759
 
-## License
+## <a id="license"/>License
 
 [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html)
