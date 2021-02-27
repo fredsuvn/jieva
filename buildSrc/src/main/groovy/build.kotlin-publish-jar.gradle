@@ -1,12 +1,12 @@
 plugins {
-  id 'build.common'
+  id 'build.core'
   id 'build.kotlin-compile'
   id 'org.jetbrains.dokka'
   id 'maven-publish'
   id 'signing'
 }
 
-println "${infos.logPrefix} ${project.name}: import kotlin-publish-jar"
+printer.info("${project.name}: import kotlin-publish-jar")
 
 task sourceJar(type: Jar) {
   classifier "sources"
@@ -30,78 +30,80 @@ artifacts {
   archives javadocJar
 }
 
-publishing {
-  publications {
-    maven(MavenPublication) {
-      from components.java
+if (infos.publish.isPublish) {
+  publishing {
+    publications {
+      maven(MavenPublication) {
+        from components.java
 
-      artifact(sourceJar) {
-        classifier = 'sources'
-      }
-
-      artifact(javadocJar) {
-        classifier = 'javadoc'
-      }
-
-      pom {
-        name = project.name
-        description = project.description
-        url = infos.url
-        inceptionYear = infos.inceptionYear
-        licenses {
-          infos.licenses.forEach { each ->
-            license {
-              name = each.name
-              url = each.url
-            }
-          }
+        artifact(sourceJar) {
+          classifier = 'sources'
         }
-        scm {
-          connection = "scm:git:${infos.url}.git"
-          developerConnection = "scm:git:${infos.url}.git"
+
+        artifact(javadocJar) {
+          classifier = 'javadoc'
+        }
+
+        pom {
+          name = project.name
+          description = project.description
           url = infos.url
-        }
-        developers {
-          infos.developers.forEach { each ->
-            developer {
-              email = each.email
+          inceptionYear = infos.inceptionYear
+          licenses {
+            infos.licenses.forEach { each ->
+              license {
+                name = each.name
+                url = each.url
+              }
+            }
+          }
+          scm {
+            connection = "scm:git:${infos.url}.git"
+            developerConnection = "scm:git:${infos.url}.git"
+            url = infos.url
+          }
+          developers {
+            infos.developers.forEach { each ->
+              developer {
+                email = each.email
+              }
             }
           }
         }
       }
     }
-  }
 
-  repositories {
-    mavenLocal()
-    if (infos.sonatype) {
-      maven {
-        name = "sonatype"
-        url = infos.oss.staging
-        credentials {
-          username = "${passwords.sonatype.username}"
-          password = "${passwords.sonatype.password}"
+    repositories {
+      mavenLocal()
+      if (infos.publish.isSnapshot) {
+        maven {
+          name = "${infos.publish.snapshotId}Snapshot"
+          url = infos.publish.urls.snapshot
+          credentials {
+            username = "${passwords."${infos.publish.snapshotId}".username}"
+            password = "${passwords."${infos.publish.snapshotId}".password}"
+          }
         }
       }
-      if (infos.snapshot) {
+      if (infos.publish.isOfficial) {
         maven {
-          name = "sonatypeSnapshot"
-          url = infos.oss.snapshot
+          name = "${infos.publish.officialId}"
+          url = infos.publish.urls.staging
           credentials {
-            username = "${passwords.sonatype.username}"
-            password = "${passwords.sonatype.password}"
+            username = "${passwords."${infos.publish.officialId}".username}"
+            password = "${passwords."${infos.publish.officialId}".password}"
           }
         }
       }
     }
-  }
 
-  if (infos.signing) {
-    ext."signing.keyId" = passwords.signing.keyId
-    ext."signing.password" = passwords.signing.password
-    ext."signing.secretKeyRingFile" = passwords.signing.secretKeyRingFile
-    signing {
-      sign publishing.publications.maven
+    if (infos.publish.isSigning) {
+      ext."signing.keyId" = passwords."${infos.publish.signingId}".keyId
+      ext."signing.password" = passwords."${infos.publish.signingId}".password
+      ext."signing.secretKeyRingFile" = passwords."${infos.publish.signingId}".secretKeyRingFile
+      signing {
+        sign publishing.publications.maven
+      }
     }
   }
 }

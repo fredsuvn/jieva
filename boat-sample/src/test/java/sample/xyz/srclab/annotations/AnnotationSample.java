@@ -2,6 +2,7 @@ package sample.xyz.srclab.annotations;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.annotations.Accepted;
 import xyz.srclab.annotations.JavaBean;
 import xyz.srclab.annotations.NonNull;
 import xyz.srclab.annotations.Written;
@@ -19,7 +20,10 @@ public class AnnotationSample {
         Assert.assertEquals(buffer.toString(), "123");
     }
 
-    private void writeBuffer(@Written StringBuilder buffer, String readOnly) {
+    private void writeBuffer(
+            @Written StringBuilder buffer,
+            @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
+    ) {
         buffer.append(readOnly);
     }
 

@@ -3,7 +3,7 @@ package xyz.srclab.common.id
 import xyz.srclab.common.base.asAny
 
 /**
- * Factory for create new Id.
+ * Core factory for create new id.
  *
  * @author sunqian
  *
@@ -38,6 +38,9 @@ interface IdFactory<T> {
     }
 }
 
+/**
+ * Skeletal [IdFactory] with an [IdComponentGenerator] iterable.
+ */
 abstract class AbstractIdFactory<T>(
     private val generators: Iterable<IdComponentGenerator<*>>
 ) : IdFactory<T> {
@@ -65,6 +68,9 @@ abstract class AbstractIdFactory<T>(
     }
 }
 
+/**
+ * Skeletal [IdFactory] with an [IdComponentGenerator] iterable, build [String] type id.
+ */
 open class StringIdFactory(
     generators: Iterable<IdComponentGenerator<*>>
 ) : AbstractIdFactory<String>(generators) {

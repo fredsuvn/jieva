@@ -1,10 +1,10 @@
 plugins {
-  id 'build.common'
+  id 'build.core'
 }
 
-description = "Build for boat projects"
+description = "Build for Boat projects"
 
-println "${infos.logPrefix} Build ${project.name}"
+printer.info("Build $project.name")
 
 allprojects { p ->
   //Do for each project
@@ -24,8 +24,8 @@ def processProject(anyProject) {
   anyProject.group = infos.group
   anyProject.version = infos.version
   if (anyProject == rootProject) {
-    println("${infos.logPrefix} Configure root project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+    printer.info("Configure root project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
   } else {
-    println("${infos.logPrefix} Configure project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+    printer.info("Configure project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
   }
 }

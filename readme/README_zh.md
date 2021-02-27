@@ -4,6 +4,7 @@
 
 ## Variables
 
+* author: Sun Qian
 * boat-version: 1.0.0
 
 ## 修订
@@ -11,31 +12,38 @@
 |Date|Revision|Author|Content|
 |---|---|---|---|
 |日期|修订版|作者|内容
-|2020-03-26|0.0.0|Sun Qian fredsuvn@163.com|旧项目
-|2020-04-12|1.0.0|Sun Qian fredsuvn@163.com|旧项目更新
-|2020-12-10|0.0.0|Sun Qian fredsuvn@163.com|新项目
-|2020-12-10|{boat-version}|Sun Qian fredsuvn@163.com|新项目重构
+|2020-03-26|0.0.0|{author}|旧项目
+|2020-04-12|1.0.0|{author}|旧项目更新
+|2020-12-10|0.0.0|{author}|新项目
+|2020-12-10|{boat-version}|{author}|新项目重构
 
-## 简介
+## 目录
 
-Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于SrcLab里的项目, 当然, 也可以在其他项目中使用.
+- [简介](#introduction)
+- [获取](#getting)
+- [使用](#usage)
+- [贡献和联系方式](#contact)
+- [License](#license)
+
+## <a id="introduction"/>简介
+
+Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于SrcLab里的项目. 它提供了许多方便快捷的接口, 函数和工具.
 
 Boat包括:
 
-* *boat-annotations*: 核心注释, 如@Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
-* *boat-core*: 基础工具和接口, 包括base, bean, bus, cache, collect, convert, exception, invoke, jvm, proxy, reflect, run, state
-  and test;
-* *boat-serialize*: 序列化工具, 包括json序列化;
-* *boat-codec*: 编码功能, 支持Hex, Base64, AES, RSA, SM2 and more other algorithms;
-* *boat-id*: 一个轻量级id生成框架;
-* *boat-test*: 辅助引入测试库;
-* *boat-bom*: boat的BOM.
+* *boat-annotations*: 核心注解, 如@Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
+* *boat-core*: 核心和基础的接口, 功能, 和工具;
+* *boat-serialize*: 序列化和反序列化的接口和工具 (支持json等);
+* *boat-codec*: 编码接口和工具 (支持hex, base64, SHA, MD, HMAC, AES, RSA, SM2等);
+* *boat-id*: 一个轻量级的ID生成框架;
+* *boat-test*: 测试依赖管理, 用来在测试编译和运行范围下引入测试框架;
+* *boat-bom*: Boat Bom.
 
-如果你需要引入以上全部, 只需要:
+如果你需要引入以上所有模块 (不包括boat-test和boat-bom), 只需要:
 
-* *boat-all*: 引入以上所有模块.
+* *boat-all*: 引入所有Boat模块.
 
-## 获取
+## <a id="getting"/>获取
 
 ### Gradle
 
@@ -58,7 +66,7 @@ implementation("xyz.srclab.common:boat-all:{boat-version}")
 
 https://github.com/srclab-projects/boat
 
-## 使用
+## <a id="usage"/>使用
 
 - [Boat Annotation](#usage-annotations)
 - [Boat Core](#usage-core)
@@ -82,28 +90,123 @@ https://github.com/srclab-projects/boat
 
 ### <a id="usage-annotations"/>BoatAnnotations (boat-annotations)
 
-适当的注释可以让代码清晰整洁
+Boat Annotations提供了许多可以让代码整洁又干净的注解:
 
-* *DefaultNotNull*/*DefaultNullable*: 指定被注释的对象默认不为空或可以为空, 通常用在package-info.java里. 这些注释继承自jsr305的Nonnull,
-  IDE比如IDEA可以识别他们;
-* *NonNull*/*Nullable*: 指定被注释的对象不为空或可以为空. 这些注释继承自jsr305的Nonnull, IDE比如IDEA可以识别他们;
-* *OutParam*/*OutReturn*: 指定参数可以被修改并返回;
-* *Immutable*: 指定被注释的对象是不可变并且线程安全的;
-* *ThreadSafe*: 指定被注释的对象是线程安全的;
-* *ThreadSafeDependOn*: 指定被注释的对象本身是线程安全的, 但是其依赖了第三方对象, 最终是否线程安全需要看被依赖的对象;
-* *PossibleTypes*: 指定实际类型在PossibleTypes所指定的类型范围内.
+* *DefaultNonNull*/*DefaultNullable*: 它说明注解范围内所有的变量, 属性, 参数和类型使用默认都是non-null/nullable的, 通常用在package-info.java中;
+* *NotNull*/*Nullable*: 它说明被注解的变量, 属性, 参数和类型使用是non-null/nullable的;
+* *JavaBean*: 它说明被注解的类型是一个javabean, 所有的属性默认都是nullable的;
+* *Acceptable*/*Accepted*: 它说明参数只能接受指定的几个类型.
+* *Rejectable*/*Rejected*: 它说明参数不接受指定的几个类型.
+* *Written*: 它说明参数可能被进行写操作;
+* *Immutable*: 它说明被注解的变量, 属性, 参数和类型使用是不可变和线程安全的;
+* *ThreadSafe*: 它说明被注解的变量, 属性, 参数和类型使用是线程安全的;
+* *ThreadSafeIf*: 它说明被注解的变量, 属性, 参数和类型使用在满足指定条件的情况下是线程安全的;
+
+#### Java Examples
+
+```java
+public class AnnotationSample {
+
+    @Test
+    public void testAnnotations() {
+        TestBean testBean = new TestBean();
+        Assert.assertEquals(testBean.getP2().substring(1), "2");
+        Assert.expectThrows(NullPointerException.class, () -> testBean.getP1().substring(1));
+
+        StringBuilder buffer = new StringBuilder();
+        writeBuffer(buffer, "123");
+        Assert.assertEquals(buffer.toString(), "123");
+    }
+
+    private void writeBuffer(
+            @Written StringBuilder buffer,
+            @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
+    ) {
+        buffer.append(readOnly);
+    }
+
+    @JavaBean
+    public static class TestBean {
+
+        private String p1;
+        @NonNull
+        private String p2 = "p2";
+
+        public String getP1() {
+            return p1;
+        }
+
+        public void setP1(String p1) {
+            this.p1 = p1;
+        }
+
+        @NonNull
+        public String getP2() {
+            return p2;
+        }
+
+        public void setP2(@NonNull String p2) {
+            this.p2 = p2;
+        }
+    }
+}
+```
+
+#### Kotlin Examples
+
+```kotlin
+class AnnotationSampleKt {
+
+    @Test
+    fun testAnnotations() {
+        val buffer = StringBuilder()
+        buffer.writeBuffer("123")
+        Assert.assertEquals(buffer.toString(), "123")
+    }
+
+    private fun @receiver:Written StringBuilder.writeBuffer(
+        @Acceptable(
+            Accepted(String::class),
+            Accepted(StringBuffer::class),
+        )
+        readOnly: String
+    ) {
+        this.append(readOnly)
+    }
+}
+class AnnotationSampleKt {
+
+    @Test
+    fun testAnnotations() {
+        val buffer = StringBuilder()
+        buffer.writeBuffer("123")
+        Assert.assertEquals(buffer.toString(), "123")
+    }
+
+    private fun @receiver:Written StringBuilder.writeBuffer(
+        @Acceptable(
+            Accepted(String::class),
+            Accepted(StringBuffer::class),
+        )
+        readOnly: String
+    ) {
+        this.append(readOnly)
+    }
+}
+```
 
 ### <a id="usage-core"/>Boat Core (boat-core)
 
 #### <a id="usage-core-base"/>Base
 
-Base包提供基础工具包括:
+Base包提供基本的核心基础接口, 功能和工具:
 
-* 快捷对象: Current, Default, Environment;
-* 基础静态工具类: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Loaders;
-* 语法增强工具: Let, Ref, Lazy;
-* 基础对象工具: Counter, Format, NamingCase, Shell, SpecParser;
-* 辅助类基类: Accessor, Serial CachingProductBuilder.
+* 全局快捷对象: Current, Default, Environment;
+* 语法增强(主要针对java): Let, Ref, Lazy;
+* 字符串功能: Format, NamingCase;
+* 核心基础接口: Accessor, Serial, SpecParser, CachingProductBuilder
+* 常用工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Loaders;
+* 其他工具: About, Counter, Shell.
 
 ##### Java Examples
 
@@ -343,18 +446,34 @@ public class BaseSample {
     @Test
     public void testAbout() {
         String verString = "1.2.3-beta.2.3+123";
-        Version version = Version.parse(verString);
+        SemVer semVer = SemVer.parse(verString);
         About about = About.of(
                 "name",
+                semVer.normalString(),
+                Collections.singletonList(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
                 "url",
-                version,
-                Licence.of("lName", "lUrl"),
-                PoweredBy.of("pName", "pUrl", "pMail")
+                Collections.singletonList("licence"),
+                Collections.singletonList(About.of(
+                        "poweredBy",
+                        null,
+                        Collections.emptyList(),
+                        null,
+                        null,
+                        Collections.emptyList(),
+                        Collections.emptyList(),
+                        null
+                )),
+                "© 2021 SrcLab"
         );
-        //name 1.2.3-beta.2.3+123, release on 2021-02-07T14:49:36.787+08:00[Asia/Shanghai]
-        //url
-        //Under the lName licence
-        //Powered by pName
+        //name
+        //Version: 1.2.3
+        //Author: name(author@mail.com)
+        //Mail: 123@123.com
+        //Url: url
+        //Licence: licence
+        //Powered by: poweredBy
+        //© 2021 SrcLab
         logger.log("About: {}", about);
     }
 }
@@ -555,18 +674,36 @@ class BaseSampleKt {
     @Test
     fun testAbout() {
         val verString = "1.2.3-beta.2.3+123"
-        val version: Version = verString.parseToVersion()
+        val semVer: SemVer = verString.parseSemVer()
         val about = About.of(
             "name",
+            semVer.normalString,
+            listOf(Author.of("name", "author@mail.com", null)),
+            "123@123.com",
             "url",
-            version,
-            Licence.of("lName", "lUrl"),
-            PoweredBy.of("pName", "pUrl", "pMail")
+            listOf("licence"),
+            listOf(
+                About.of(
+                    "poweredBy",
+                    null,
+                    emptyList(),
+                    null,
+                    null,
+                    emptyList(),
+                    emptyList(),
+                    null
+                )
+            ),
+            "© 2021 SrcLab"
         )
-        //name 1.2.3-beta.2.3+123, release on 2021-02-07T14:49:36.787+08:00[Asia/Shanghai]
-        //url
-        //Under the lName licence
-        //Powered by pName
+        //name
+        //Version: 1.2.3
+        //Author: name(author@mail.com)
+        //Mail: 123@123.com
+        //Url: url
+        //Licence: licence
+        //Powered by: poweredBy
+        //© 2021 SrcLab
         logger.log("About: {}", about)
     }
 
@@ -578,10 +715,12 @@ class BaseSampleKt {
 
 #### <a id="usage-core-bean"/>Bean
 
-Bean包提供强大的bean操作能力:
+Bean包提供了强大的bean操作功能:
 
-* Beans: bean操作工具类;
-* BeanResolver: bean解析接口, Beans使用其默认实现;
+* Beans: 默认的bean工具;
+* BeanResolver: Bean操作的核心接口, Beans使用它的默认实现;
+
+> 在复制属性(copy-properties)功能上, 它比Apache的BeanUtils快十倍以上.
 
 ##### Java Examples
 
@@ -792,13 +931,14 @@ class EventBusSampleKt {
 
 #### <a id="usage-core-cache"/>Cache
 
-Boat提供一个Cache接口和若干实现:
+Boat提供一个缓存接口和若干实现:
 
-* FastCache
-* CaffeineCache
-* GuavaCache
-* MapCache
-* ThreadLocalCache
+* Cache: 缓存核心接口;
+* FastCache: 使用WeakHashMap和ThreadLocal的实现;
+* CaffeineCache: 使用Caffeine的实现;
+* GuavaCache: 使用Guava的实现;
+* MapCache: 将Map作为缓存的实现;
+* ThreadLocalCache: 将ThreadLocalMap作为缓存的实现.
 
 ##### Java Examples
 
@@ -842,7 +982,13 @@ class CacheSampleKt {
 
 #### <a id="usage-core-collect"/>Collect
 
-Collect包提供工具类Collects和ArrayCollects, 提供Ops接口来实现链式调用.
+Collect包提供集合和数组的接口, 工具和Ops操作:
+
+* Collects: Collection工具;
+* ArrayCollects: 数组工具;
+* IterableOps, ListOps, SetOps, MapOps: Ops接口, 提供链式操作, 主要用于Java;
+* SequenceOps: Sequence的Ops接口;
+* IterableType, MapType: 泛型集合的元类型接口.
 
 ##### Java Examples
 
@@ -881,8 +1027,8 @@ public class CollectSample {
 
 Convert包提供类型转换功能:
 
-* Converts: 转换工具类;
-* Converter: 转换接口, Converts使用其默认实现.
+* Converts: 转换工具;
+* Converter: 类型转换的核心接口, Converts使用它的默认实现.
 
 ##### Java Examples
 
@@ -1477,7 +1623,12 @@ class TestSampleKt {
 
 ### <a id="usage-serialize"/>Boat Serialize (boat-serialize)
 
-Boat serialize (需要引入boat-serialize)提供通用序列化接口. 在当前版本, boat-serialize提供JsonSerializer.
+Boat Serializer(需要导入boat-serialize)提供序列化核心接口:
+
+* Serializer: 序列化核心接口;
+* JsonSerials: JSON序列化工具;
+* JsonSerial: JSON序列化核心接口, JsonSerials使用它的默认实现(Jackson);
+* Json: JSON的核心接口, 代表一个JSON对象.
 
 #### Java Examples
 
@@ -1518,7 +1669,11 @@ class SerializeSampleKt {
 
 ### <a id="usage-codec"/>Boat Codec (boat-codec)
 
-Boat codec (需要引入boat-codec)提供Codec, CodecKeys, AesKeys 以及 其他接口来实现编码功能, 支持hex, base64, AES, RSA, SM2以及更多算法.
+Boat Codec (需要引入boat-codec)提供Codec, CodecKeys, AesKeys 以及 其他接口来实现编码功能, 支持hex, base64, AES, RSA, SM2以及更多算法:
+
+* Codec: 编码功能的核心接口;
+* CodecKeys: 编码秘钥工具;
+* AesKeys: AES秘钥工具.
 
 #### Java Examples
 
@@ -1582,7 +1737,14 @@ class CodecSampleKt {
 
 ### <a id="usage-id"/>Boat Id (boat-id)
 
-Boat id (需要引入boat-id)是一个轻量级的id生成框架. 提供IdFactory接口来构造任意类型的id, 以及StringIdSpec 来快速构造String类型的id.
+Boat Id (需要引入boat-id)是一个轻量级id生成框架. 它提供IdFactory和一套接口来生成id:
+
+* IdFactory: 核心接口, 用来生成新id;
+* IdComponentGenerator: 核心接口, 用来生成新id的一部分;
+* AbstractIdFactory: IdFactory骨架实现, 用来辅助实现完整的IdFactory;
+* StringIdFactory: IdFactory骨架实现, 用来辅助实现String类型id的IdFactory;
+
+Boat ID同时提供StringIdSpec类, 一个String类型id的IdFactory, 可以从给定的字符串说明中生成新id, 请去看它的javadoc.
 
 #### Java Examples
 
@@ -1624,12 +1786,12 @@ class IdSampleKt {
 }
 ```
 
-## 贡献和联系方式
+## <a id="contact"/>贡献和联系方式
 
 * fredsuvn@163.com
 * https://github.com/srclab-projects/boat
 * QQ群: 1037555759
 
-## License
+## <a id="license"/>License
 
 [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html)

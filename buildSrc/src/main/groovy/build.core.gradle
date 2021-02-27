@@ -1,6 +1,7 @@
-/*
- * Build utils.
- */
+plugins {
+  id 'build.infos'
+  id 'build.repositories'
+}
 
 static boolean isEnable(Object value) {
   if (value == null) {
@@ -28,3 +29,14 @@ ext["utils"] = [
     isEnable                  : this.&isEnable,
     currentGradleDirectoryPath: this.&currentGradleDirectoryPath,
 ]
+
+class Printer {
+
+  private static final PREFIX = ">> Boat: "
+
+  def info(message) {
+    println("$PREFIX$message")
+  }
+}
+
+ext["printer"] = new Printer()
