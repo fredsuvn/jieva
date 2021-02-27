@@ -3,12 +3,14 @@
 ![Boat](logo.svg)
 
 - Markdown:
-    * [English](readme/README_en.md)
-    * [简体中文](readme/README_zh.md)
+    * [English](docs/README_en.md)
+    * [简体中文](docs/README_zh.md)
 
 - AsciiDoc:
-    * [English](readme/README_en.adoc)
-    * [简体中文](readme/README_zh.adoc)
+    * [English](docs/README_en.adoc)
+    * [简体中文](docs/README_zh.adoc)
+
+More see [docs/](docs/)
 
 ## _Contact_
 
