@@ -10,7 +10,7 @@ pluginManagement {
 
 rootProject.name = 'boat-build'
 
-//Including boat projects
+//Including Boat projects
 file("${rootDir}/").eachDirMatch(~/boat-.*/) { file ->
   include ":${file.name}"
 }

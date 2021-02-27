@@ -1,8 +1,9 @@
 plugins {
+  id 'build.core'
   id 'org.jetbrains.kotlin.jvm'
 }
 
-println "${infos.logPrefix} ${project.name}: import kotlin-compile"
+printer.info("${project.name}: import kotlin-compile")
 
 //sourceSets {
 //  main.kotlin.srcDirs += ['src/main/kotlin', 'src/main/java']

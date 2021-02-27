@@ -2,7 +2,7 @@ plugins {
   id 'build.kotlin-sample'
 }
 
-description = "Boat Sample: Boat projects' samples."
+description = "Boat Samples"
 
 java {
   registerFeature('optionalSupport') {

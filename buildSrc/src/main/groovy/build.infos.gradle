@@ -3,18 +3,6 @@
  */
 ext["infos"] = [
 
-    //Log prefix
-    logPrefix          : "boat >>>>>>",
-
-    //Whether build to snapshot
-    snapshot           : false,
-
-    //Whether publish to sonatype
-    sonatype           : false,
-
-    //Whether signing
-    signing            : false,
-
     //Version
     version            : "0.1.0",
 
@@ -55,9 +43,33 @@ ext["infos"] = [
         ],
     ],
 
-    //Oss urls
-    oss                : [
-        staging : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
-        snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
+    //Publish info
+    publish            : [
+        //Whether publish
+        isPublish : false,
+
+        //Whether publish as snapshot
+        isSnapshot: false,
+
+        //Snapshot id
+        snapshotId: "sonatype",
+
+        //Whether publish as Official
+        isOfficial: true,
+
+        //Publish id
+        officialId: "sonatype",
+
+        //Whether signing
+        isSigning : true,
+
+        //Signing id
+        signingId : "gpg",
+
+        //Publish urls
+        urls      : [
+            staging : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
+            snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
+        ],
     ],
 ]
