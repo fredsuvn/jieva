@@ -2,6 +2,8 @@ package sample.xyz.srclab.annotations
 
 import org.testng.Assert
 import org.testng.annotations.Test
+import xyz.srclab.annotations.Acceptable
+import xyz.srclab.annotations.Accepted
 import xyz.srclab.annotations.Written
 
 class AnnotationSampleKt {
@@ -13,7 +15,13 @@ class AnnotationSampleKt {
         Assert.assertEquals(buffer.toString(), "123")
     }
 
-    private fun @receiver:Written StringBuilder.writeBuffer(readOnly: String) {
+    private fun @receiver:Written StringBuilder.writeBuffer(
+        @Acceptable(
+            Accepted(String::class),
+            Accepted(StringBuffer::class),
+        )
+        readOnly: String
+    ) {
         this.append(readOnly)
     }
 }
