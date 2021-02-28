@@ -1,22 +1,39 @@
 <svg width="360" height="120" xmlns="http://www.w3.org/2000/svg">
   <g>
     <title>Boat</title>
-    <path id="boat" d="m39.5,45.453125l281.5,-26.453125l-117,64l-90,8l-74.5,-45.546875z" fill-opacity="null"
-          stroke-opacity="null" stroke-width="5" stroke="orange" fill="#55AF7B"/>
-    <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="36" id="svg_7"
-          y="72.453125" x="115" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000"
-          fill="#4286F3">B</text>
-    <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="36" id="svg_7"
-          y="72.453125" x="143" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000"
-          fill="#EB4537">o</text>
-    <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="36" id="svg_7"
-          y="72.453125" x="170" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000"
-          fill="#FAC230">a</text>
-    <text xml:space="preserve" text-anchor="start" font-family="Helvetica, Arial, sans-serif" font-size="36" id="svg_7"
-          y="72.453125" x="195" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000"
-          fill="#4286F3">t</text>
-    <text transform="rotate(35 96.00000000000001,87.453125) " xml:space="preserve" text-anchor="start"
-          font-family="Helvetica, Arial, sans-serif" font-size="50" id="svg_8" y="105.453125" x="83.5"
-          fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#EE50F3">J</text>
+    <path id="svg-boat"
+          d="M40,45 L320,20 L195,85 L115,93 Z"
+          stroke="orange" stroke-width="5" stroke-miterlimit="100"
+          fill="#55AF7B"/>
+    <text id="svg-B"
+          x="115" y="72"
+          font-family="Helvetica, Arial, sans-serif" font-size="36"
+          fill="#4286F3">
+      B
+    </text>
+    <text id="svg-o"
+          x="143" y="72"
+          font-family="Helvetica, Arial, sans-serif" font-size="36"
+          fill="#EB4537">
+      o
+    </text>
+    <text id="svg-a"
+          x="170" y="72"
+          font-family="Helvetica, Arial, sans-serif" font-size="36"
+          fill="#FAC230">
+      a
+    </text>
+    <text id="svg-t"
+          x="195" y="72"
+          font-family="Helvetica, Arial, sans-serif" font-size="36"
+          fill="#4286F3">
+      t
+    </text>
+    <text id="svg-J"
+          x="75" y="100" transform="rotate(40 85,90)"
+          font-family="Helvetica, Arial, sans-serif" font-size="50"
+          fill="#EE50F3">
+      J
+    </text>
   </g>
 </svg>
