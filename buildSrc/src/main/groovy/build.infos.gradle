@@ -46,7 +46,7 @@ ext["infos"] = [
     //Publish info
     publish            : [
         //Whether publish
-        isPublish : false,
+        isPublish : true,
 
         //Whether publish as snapshot
         isSnapshot: false,
@@ -61,7 +61,7 @@ ext["infos"] = [
         officialId: "sonatype",
 
         //Whether signing
-        isSigning : true,
+        isSigning : false,
 
         //Signing id
         signingId : "gpg",
