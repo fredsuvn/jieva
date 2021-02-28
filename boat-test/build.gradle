@@ -2,7 +2,7 @@ plugins {
   id 'build.kotlin-publish-jar'
 }
 
-description = "Boat Test: Test dependencies management."
+description = "Boat Test Dependencies Management"
 
 java {
   registerFeature('optionalSupport') {
