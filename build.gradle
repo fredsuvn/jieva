@@ -24,7 +24,7 @@ def processProject(anyProject) {
   anyProject.group = infos.group
   anyProject.version = infos.version
   if (anyProject == rootProject) {
-    printer.info("Configure root project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+    printer.info("Configure project ${anyProject.group}:${anyProject.name}:${anyProject.version} (root)")
   } else {
     printer.info("Configure project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
   }
