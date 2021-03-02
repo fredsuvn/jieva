@@ -32,7 +32,7 @@ artifacts {
 }
 
 //compileKotlin.inputs.files(processResources)
-compileJava.inputs.files(processResources)
+//compileJava.inputs.files(processResources)
 
 if (infos.publish.isPublish) {
   publishing {
