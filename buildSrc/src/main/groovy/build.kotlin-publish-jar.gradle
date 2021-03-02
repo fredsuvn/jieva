@@ -2,6 +2,7 @@ plugins {
   id 'build.core'
   id 'build.kotlin-compile'
   id 'org.jetbrains.dokka'
+  //id "org.jetbrains.kotlin.kapt"
   id 'maven-publish'
   id 'signing'
 }
@@ -29,6 +30,9 @@ artifacts {
   archives sourceJar
   archives javadocJar
 }
+
+//compileKotlin.inputs.files(processResources)
+compileJava.inputs.files(processResources)
 
 if (infos.publish.isPublish) {
   publishing {
