@@ -17,5 +17,8 @@ public class FormatTest {
         Assert.assertEquals(printfFormat, "This is printf format.");
         String messageFormat = Format.messageFormat("This is {0} {1}.", "message", "format");
         Assert.assertEquals(messageFormat, "This is message format.");
+
+        String escapeFormat = Format.fastFormat("{}, {}, \\{}, \\\\", 1, 2, 3);
+        Assert.assertEquals(escapeFormat, "1, 2, {}, \\\\");
     }
 }
