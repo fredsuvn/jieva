@@ -1,388 +1,392 @@
-//package xyz.srclab.common.base
-//
-//import xyz.srclab.annotations.Acceptable
-//import xyz.srclab.annotations.Accepted
-//import xyz.srclab.common.collect.reduce
-//import java.util.*
-//
-///**
-// * To resolve placeholder of a string:
-// * ```
-// * "This is a {name1}, that is a {name2}"
-// * ```
-// */
-//interface CharsTemplate {
-//
-//    @Suppress(INAPPLICABLE_JVM_NAME)
-//    val nodes: List<Node>
-//        @JvmName("nodes") get
-//
-//    @JvmDefault
-//    fun resolve(chars: CharSequence): List<Token> {
-//        if (chars.isEmpty()) {
-//            return emptyList()
-//        }
-//        val esc = escape
-//
-//        fun resolveWithEscape(esc: String): List<Token> {
-//
-//            fun Char.isToken(index: Int, token: String): Boolean {
-//                if (this != token[0] || index > chars.length - token.length) {
-//                    return false
-//                }
-//                var i = 1
-//                while (i < token.length) {
-//                    if (chars[index + i] != token[i]) {
-//                        return false
-//                    }
-//                    i++
-//                }
-//                return true
-//            }
-//
-//            val result = LinkedList<Token>()
-//            var p = 0
-//            var i = 0
-//            var inPlaceholder = false
-//            var argIndex = 0
-//            while (i < chars.length) {
-//                val char = chars[i]
-//                if (char.isToken(i, esc)) {
-//                    val nextIndex = i + esc.length
-//                    if (nextIndex >= chars.length) {
-//                        break
-//                    }
-//                    val nextChar = chars[nextIndex]
-//                    if (inPlaceholder && nextChar.isToken(nextIndex, suffix)) {
-//                        result.add(object : Token {
-//                            override val startIndex: Int = p
-//                            override val endIndex: Int = i
-//                            override val type: Token.Type = Token.Type.TEXT
-//                            override val argIndex: Int = argIndex
-//                        })
-//                        p = nextIndex
-//                        i = nextIndex + suffix.length
-//                        continue
-//                    }
-//                    if (!inPlaceholder && nextChar.isToken(nextIndex, prefix)) {
-//                        result.add(object : Token {
-//                            override val startIndex: Int = p
-//                            override val endIndex: Int = i
-//                            override val type: Token.Type = Token.Type.TEXT
-//                        })
-//                        p = nextIndex
-//                        i = nextIndex + prefix.length
-//                        continue
-//                    }
-//                }
-//                if (char.isToken(i, prefix)) {
-//                    if (inPlaceholder) {
-//                        throw IllegalArgumentException(
-//                            "Wrong token $prefix at index $i (${
-//                                chars.subSequence(i, chars.lastIndex).ellipses(
-//                                    ELLIPSES_NUMBER
-//                                )
-//                            })."
-//                        )
-//                    }
-//                    result.add(object : Token {
-//                        override val startIndex: Int = p
-//                        override val endIndex: Int = i
-//                        override val type: Token.Type = Token.Type.TEXT
-//                    })
-//                    result.add(object : Token {
-//                        override val startIndex: Int = i
-//                        override val endIndex: Int = i + prefix.length
-//                        override val type: Token.Type = Token.Type.PREFIX
-//                        override val argIndex: Int = argIndex++
-//                    })
-//                    inPlaceholder = true
-//                    i += prefix.length
-//                    p = i
-//                    continue
-//                }
-//                if (char.isToken(i, suffix) && inPlaceholder) {
-//                    result.add(object : Token {
-//                        override val startIndex: Int = p
-//                        override val endIndex: Int = i
-//                        override val type: Token.Type = Token.Type.TEXT
-//                        override val argIndex: Int = argIndex
-//                    })
-//                    result.add(object : Token {
-//                        override val startIndex: Int = i
-//                        override val endIndex: Int = i + suffix.length
-//                        override val type: Token.Type = Token.Type.SUFFIX
-//                        override val argIndex: Int = argIndex
-//                    })
-//                    inPlaceholder = false
-//                    i += suffix.length
-//                    p = i
-//                    continue
-//                }
-//            }
-//            if (inPlaceholder) {
-//                throw IllegalArgumentException(
-//                    "Suffix not found since index $p (${
-//                        chars.subSequence(p, chars.length).ellipses(
-//                            ELLIPSES_NUMBER
-//                        )
-//                    })."
-//                )
-//            }
-//            if (p < chars.length) {
-//                result.add(object : Token {
-//                    override val startIndex: Int = p
-//                    override val endIndex: Int = chars.length
-//                    override val type: Token.Type = Token.Type.TEXT
-//                })
-//            }
-//            return result.toList()
-//        }
-//
-//
-//
-//        if (esc === null) {
-//            return resolveWithoutEscape()
-//        }
-//        return resolveWithEscape(esc)
-//    }
-//
-//    @JvmDefault
-//    fun resolve(chars: CharSequence, nodes: List<Token>, args: Map<Any, Any?>): String {
-//
-//        fun List<Token>.getArgs(): Any? {
-//            val key = this.reduce("") { s, it -> s + chars.subSequence(it.startIndex, it.endIndex) }
-//            if (args.containsKey(key)) {
-//                return args[key]
-//            }
-//            val index = this[0].argIndex
-//            if (args.containsKey(index)) {
-//                return args[index]
-//            }
-//            return key
-//        }
-//
-//        if (nodes.isEmpty()) {
-//            throw IllegalArgumentException("Resolved nodes must not empty.")
-//        }
-//        if (nodes.size == 1) {
-//            return chars.toString()
-//        }
-//        val buf = StringBuilder()
-//        var i = 0
-//        while (i < nodes.size) {
-//            val node = nodes[i]
-//            if (node.type == Token.Type.TEXT) {
-//                buf.append(chars.subSequence(node.startIndex, node.endIndex))
-//                i++
-//                continue
-//            }
-//            //            if (node.type == Node.Type.PREFIX) {
-//            //                while ()
-//            //            }
-//        }
-//        return buf.toString()
-//    }
-//
-//    @JvmDefault
-//    fun resolve(chars: CharSequence, args: Map<Any, Any?>): String {
-//        return resolve(chars, resolve(chars), args)
-//    }
-//
-//    interface Node {
-//
-//        @Suppress(INAPPLICABLE_JVM_NAME)
-//        val tokens: List<Token>
-//            @JvmName("tokens") get
-//
-//        @Suppress(INAPPLICABLE_JVM_NAME)
-//        val type: Type
-//            @JvmName("type") get
-//
-//        @JvmDefault
-//        fun toText(chars: CharSequence): String {
-//            if (tokens.isEmpty()) {
-//                return ""
-//            }
-//            if (tokens.size == 1) {
-//                return chars.toString()
-//            }
-//            val buf = StringBuilder()
-//            for (token in tokens) {
-//                buf.append(chars.subSequence(token.startIndex, token.endIndex))
-//            }
-//            return buf.toString()
-//        }
-//
-//        @Acceptable(
-//            Accepted(String::class),
-//            Accepted(Integer::class),
-//        )
-//        @JvmDefault
-//        fun toPlaceholderKey(chars: CharSequence): Any {
-//            if (tokens.size < 3) {
-//                throw IllegalArgumentException("A placeholder node has at least 3 tokens.")
-//            }
-//            if (tokens.first().type != Token.Type.PREFIX || tokens.last().type != Token.Type.SUFFIX) {
-//                throw IllegalArgumentException(
-//                    "A placeholder node must start with a prefix token and end with a suffix token."
-//                )
-//            }
-//            if (tokens.size == 3) {
-//                return chars.substring(tokens[1].startIndex, tokens[1].endIndex)
-//            }
-//            val buf = StringBuilder()
-//            var i = 1
-//            while (i < tokens.size - 1) {
-//                buf.append(chars.substring(tokens[i].startIndex, tokens[i].endIndex))
-//                i++
-//            }
-//            return buf.toString()
-//        }
-//
-//        enum class Type {
-//            TEXT, PLACEHOLDER
-//        }
-//
-//        companion object {
-//
-//            @JvmStatic
-//            fun newNode(tokens: List<Token>, type: Type): Node {
-//                return object : Node {
-//                    override val tokens: List<Token> = tokens
-//                    override val type: Type = type
-//                }
-//            }
-//        }
-//    }
-//
-//    interface Token {
-//
-//        @Suppress(INAPPLICABLE_JVM_NAME)
-//        val startIndex: Int
-//            @JvmName("startIndex") get
-//
-//        @Suppress(INAPPLICABLE_JVM_NAME)
-//        val endIndex: Int
-//            @JvmName("endIndex") get
-//
-//        @Suppress(INAPPLICABLE_JVM_NAME)
-//        val type: Type
-//            @JvmName("type") get
-//
-//        @Suppress(INAPPLICABLE_JVM_NAME)
-//        val argIndex: Int
-//            @JvmName("argIndex") get() = DEFAULT_ARG_INDEX
-//
-//        enum class Type {
-//            TEXT, PREFIX, SUFFIX
-//        }
-//
-//        companion object {
-//
-//            private const val DEFAULT_ARG_INDEX = -1
-//
-//            @JvmStatic
-//            @JvmOverloads
-//            fun newToken(startIndex: Int, endIndex: Int, type: Type, argIndex: Int = DEFAULT_ARG_INDEX): Token {
-//                return object : Token {
-//                    override val startIndex: Int = startIndex
-//                    override val endIndex: Int = endIndex
-//                    override val type: Type = type
-//                    override val argIndex: Int = argIndex
-//                }
-//            }
-//        }
-//    }
-//
-//    companion object {
-//
-//        private const val ELLIPSES_NUMBER = 10
-//
-//        @JvmStatic
-//        @JvmName("resolve")
-//        fun CharSequence.resolveCharsTemplate(placeholderPrefix: String, placeholderSuffix: String): CharsTemplate {
-//            var prefixIndex = this.indexOf(placeholderPrefix)
-//            if (prefixIndex < 0) {
-//                return newCharsTemplate(
-//                    listOf(
-//                        Node.newNode(
-//                            listOf(Token.newToken(0, this.length, Token.Type.TEXT)),
-//                            Node.Type.TEXT
-//                        )
-//                    )
-//                )
-//            }
-//            var p = 0
-//            val result = LinkedList<Token>()
-//            var argIndex = 0
-//            while (prefixIndex >= 0) {
-//                val suffixIndex = chars.indexOf(suffix, prefixIndex + prefix.length)
-//                if (suffixIndex < 0) {
-//                    throw IllegalArgumentException(
-//                        "Cannot find suffix after prefix at index: $prefixIndex (${
-//                            chars.subSequence(prefixIndex, chars.length).ellipses(
-//                                ELLIPSES_NUMBER
-//                            )
-//                        })"
-//                    )
-//                }
-//                result.add(object : Token {
-//                    override val startIndex: Int = p
-//                    override val endIndex: Int = prefixIndex
-//                    override val type: Token.Type = Token.Type.TEXT
-//                })
-//                result.add(object : Token {
-//                    override val startIndex: Int = prefixIndex
-//                    override val endIndex: Int = prefixIndex + prefix.length
-//                    override val type: Token.Type = Token.Type.PREFIX
-//                    override val argIndex: Int = argIndex++
-//                })
-//                result.add(object : Token {
-//                    override val startIndex: Int = prefixIndex + prefix.length
-//                    override val endIndex: Int = suffixIndex
-//                    override val type: Token.Type = Token.Type.TEXT
-//                    override val argIndex: Int = argIndex
-//                })
-//                result.add(object : Token {
-//                    override val startIndex: Int = suffixIndex
-//                    override val endIndex: Int = suffixIndex + suffix.length
-//                    override val type: Token.Type = Token.Type.SUFFIX
-//                    override val argIndex: Int = argIndex
-//                })
-//                p = suffixIndex + suffix.length
-//                prefixIndex = chars.indexOf(prefix, p)
-//            }
-//            if (p < chars.length) {
-//                result.add(object : Token {
-//                    override val startIndex: Int = p
-//                    override val endIndex: Int = chars.length
-//                    override val type: Token.Type = Token.Type.TEXT
-//                })
-//            }
-//            return result.toList()
-//        }
-//
-//        @JvmStatic
-//        fun newCharsTemplate(nodes: List<Node>): CharsTemplate {
-//            return object : CharsTemplate {
-//                override val nodes: List<Node> = nodes.toList()
-//            }
-//        }
-//
-//        @JvmStatic
-//        fun newCharsTemplateByTokens(tokens: List<Token>): CharsTemplate {
-//            if (tokens.isEmpty()) {
-//                return newCharsTemplate(emptyList())
-//            }
-//            val nodes = LinkedList<Node>()
-//            var i = 0
-//            while (i < tokens.size) {
-//                val token = tokens[i]
-//                if (token.type == Token.Type.TEXT){
-//                    nodes.toList()
-//                }
-//            }
-//        }
-//    }
-//}
+package xyz.srclab.common.base
+
+import xyz.srclab.annotations.Acceptable
+import xyz.srclab.annotations.Accepted
+import java.io.StringWriter
+import java.io.Writer
+import java.util.*
+
+/**
+ * To resolve placeholder of a string:
+ * ```
+ * "This is a {name1}, that is a {name2}"
+ * ```
+ */
+interface CharsTemplate {
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val chars: CharSequence
+        @JvmName("chars") get
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val nodes: List<Node>
+        @JvmName("nodes") get
+
+    @JvmDefault
+    fun process(
+        args: Map<@Acceptable(
+            Accepted(String::class),
+            Accepted(Integer::class),
+        ) Any, Any?>
+    ): String {
+        val writer = StringWriter()
+        process(writer, args)
+        return writer.toString()
+    }
+
+    @JvmDefault
+    fun process(
+        dest: Writer,
+        args: Map<@Acceptable(
+            Accepted(String::class),
+            Accepted(Integer::class),
+        ) Any, Any?>,
+    ) {
+        for (node in nodes) {
+            if (node.isText) {
+                dest.write(node.toText(chars))
+                continue
+            }
+            val key = node.toPlaceholderKey(chars)
+            dest.write(args[key].toString())
+        }
+    }
+
+    interface Node {
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val tokens: List<Token>
+            @JvmName("tokens") get
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val type: Type
+            @JvmName("type") get
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val isText: Boolean
+            @JvmName("isText") get() = (type == Type.TEXT)
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val isPlaceholder: Boolean
+            @JvmName("isPlaceholder") get() = (type == Type.PLACEHOLDER)
+
+        @JvmDefault
+        fun toText(chars: CharSequence): String {
+            if (tokens.isEmpty()) {
+                return ""
+            }
+            if (tokens.size == 1) {
+                return chars.toString()
+            }
+            val buf = StringBuilder()
+            for (token in tokens) {
+                buf.append(chars.subSequence(token.startIndex, token.endIndex))
+            }
+            return buf.toString()
+        }
+
+        @Acceptable(
+            Accepted(String::class),
+            Accepted(Integer::class),
+        )
+        @JvmDefault
+        fun toPlaceholderKey(chars: CharSequence): Any {
+            if (tokens.size < 2) {
+                throw IllegalArgumentException("A placeholder node has at least 2 tokens.")
+            }
+            if (!tokens.first().isPrefix || !tokens.last().isSuffix) {
+                throw IllegalArgumentException(
+                    "A placeholder node must start with a prefix token and end with a suffix token."
+                )
+            }
+            if (tokens.size == 2) {
+                return tokens[0].argIndex
+            }
+            if (tokens.size == 3) {
+                return tokens[1].toText(chars)
+            }
+            val buf = StringBuilder()
+            var i = 1
+            while (i < tokens.size - 1) {
+                buf.append(tokens[i].toText(chars))
+                i++
+            }
+            return buf.toString()
+        }
+
+        enum class Type {
+            TEXT, PLACEHOLDER
+        }
+
+        companion object {
+
+            @JvmStatic
+            fun newNode(tokens: List<Token>, type: Type): Node {
+                return object : Node {
+                    override val tokens: List<Token> = tokens
+                    override val type: Type = type
+                }
+            }
+        }
+    }
+
+    interface Token {
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val startIndex: Int
+            @JvmName("startIndex") get
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val endIndex: Int
+            @JvmName("endIndex") get
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val type: Type
+            @JvmName("type") get
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val argIndex: Int
+            @JvmName("argIndex") get() = DEFAULT_ARG_INDEX
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val isText: Boolean
+            @JvmName("isText") get() = (type == Type.TEXT)
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val isPrefix: Boolean
+            @JvmName("isPrefix") get() = (type == Type.PREFIX)
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val isSuffix: Boolean
+            @JvmName("isSuffix") get() = (type == Type.SUFFIX)
+
+        @JvmDefault
+        fun toText(chars: CharSequence): String {
+            return chars.substring(startIndex, endIndex)
+        }
+
+        enum class Type {
+            TEXT, PREFIX, SUFFIX
+        }
+
+        companion object {
+
+            private const val DEFAULT_ARG_INDEX = -1
+
+            @JvmStatic
+            @JvmOverloads
+            fun newToken(startIndex: Int, endIndex: Int, type: Type, argIndex: Int = DEFAULT_ARG_INDEX): Token {
+                return object : Token {
+                    override val startIndex: Int = startIndex
+                    override val endIndex: Int = endIndex
+                    override val type: Type = type
+                    override val argIndex: Int = argIndex
+                }
+            }
+        }
+    }
+
+    companion object {
+
+        private const val ELLIPSES_NUMBER = 10
+
+        @JvmStatic
+        fun newCharsTemplate(chars: CharSequence, nodes: List<Node>): CharsTemplate {
+            return object : CharsTemplate {
+                override val chars: CharSequence = chars
+                override val nodes: List<Node> = nodes
+            }
+        }
+
+        @JvmStatic
+        fun newCharsTemplateByTokens(chars: CharSequence, tokens: List<Token>): CharsTemplate {
+            if (tokens.isEmpty()) {
+                return newCharsTemplate(chars, emptyList())
+            }
+            val nodes = LinkedList<Node>()
+            val subTokens = LinkedList<Token>()
+            var i = 0
+            loop@ while (i < tokens.size) {
+                val token = tokens[i]
+                if (token.isText) {
+                    subTokens.add(token)
+                    i++
+                    while (i < tokens.size) {
+                        if (tokens[i].isText) {
+                            subTokens.add(tokens[i])
+                            i++
+                        } else {
+                            nodes.add(Node.newNode(subTokens.toList(), Node.Type.TEXT))
+                            subTokens.clear()
+                            continue@loop
+                        }
+                    }
+                    break
+                }
+                if (token.isPrefix) {
+                    subTokens.add(token)
+                    i++
+                    while (i < tokens.size) {
+                        if (tokens[i].isText) {
+                            subTokens.add(tokens[i])
+                            i++
+                        } else if (tokens[i].isSuffix) {
+                            subTokens.add(tokens[i])
+                            nodes.add(Node.newNode(subTokens.toList(), Node.Type.PLACEHOLDER))
+                            subTokens.clear()
+                            i++
+                            continue@loop
+                        } else {
+                            throw IllegalArgumentException(
+                                "Only text or suffix token is permitted after a prefix token."
+                            )
+                        }
+                    }
+                    break
+                }
+                throw IllegalArgumentException("Suffix token must after a prefix token.")
+            }
+            return newCharsTemplate(chars, nodes.toList())
+        }
+
+        @JvmStatic
+        @JvmName("resolve")
+        fun CharSequence.resolveCharsTemplate(placeholderPrefix: String, placeholderSuffix: String): CharsTemplate {
+            var prefixIndex = this.indexOf(placeholderPrefix)
+            if (prefixIndex < 0) {
+                return newCharsTemplateByTokens(this, listOf(Token.newToken(0, this.length, Token.Type.TEXT)))
+            }
+            var p = 0
+            val tokens = LinkedList<Token>()
+            var argIndex = 0
+            while (prefixIndex >= 0) {
+                val suffixIndex = this.indexOf(placeholderSuffix, prefixIndex + placeholderPrefix.length)
+                if (suffixIndex < 0) {
+                    throw IllegalArgumentException(
+                        "Cannot find suffix after prefix at index: $prefixIndex (${
+                            this.subSequence(prefixIndex, this.length).ellipses(
+                                ELLIPSES_NUMBER
+                            )
+                        })"
+                    )
+                }
+                tokens.add(Token.newToken(p, prefixIndex, Token.Type.TEXT))
+                tokens.add(
+                    Token.newToken(
+                        prefixIndex,
+                        prefixIndex + placeholderPrefix.length,
+                        Token.Type.PREFIX,
+                        argIndex++
+                    )
+                )
+                tokens.add(
+                    Token.newToken(
+                        prefixIndex + placeholderPrefix.length,
+                        suffixIndex,
+                        Token.Type.TEXT,
+                        argIndex
+                    )
+                )
+                tokens.add(
+                    Token.newToken(
+                        suffixIndex,
+                        suffixIndex + placeholderSuffix.length,
+                        Token.Type.SUFFIX,
+                        argIndex
+                    )
+                )
+                p = suffixIndex + placeholderSuffix.length
+                prefixIndex = this.indexOf(placeholderPrefix, p)
+            }
+            if (p < this.length) {
+                tokens.add(Token.newToken(p, this.length, Token.Type.TEXT))
+            }
+            return newCharsTemplateByTokens(this, tokens)
+        }
+
+        @JvmStatic
+        @JvmName("resolve")
+        fun CharSequence.resolveCharsTemplate(
+            placeholderPrefix: String,
+            placeholderSuffix: String,
+            escape: String
+        ): CharsTemplate {
+
+            fun Char.isToken(index: Int, token: String): Boolean {
+                if (this != token[0] || index > this@resolveCharsTemplate.length - token.length) {
+                    return false
+                }
+                var i = 1
+                while (i < token.length) {
+                    if (this@resolveCharsTemplate[index + i] != token[i]) {
+                        return false
+                    }
+                    i++
+                }
+                return true
+            }
+
+            val tokens = LinkedList<Token>()
+            var p = 0
+            var i = 0
+            var inPlaceholder = false
+            var argIndex = 0
+            while (i < this.length) {
+                val char = this[i]
+                if (char.isToken(i, escape)) {
+                    val nextIndex = i + escape.length
+                    if (nextIndex >= this.length) {
+                        break
+                    }
+                    val nextChar = this[nextIndex]
+                    if (inPlaceholder && nextChar.isToken(nextIndex, placeholderSuffix)) {
+                        tokens.add(Token.newToken(p, i, Token.Type.TEXT, argIndex))
+                        p = nextIndex
+                        i = nextIndex + placeholderSuffix.length
+                        continue
+                    }
+                    if (!inPlaceholder && nextChar.isToken(nextIndex, placeholderPrefix)) {
+                        tokens.add(Token.newToken(p, i, Token.Type.TEXT))
+                        p = nextIndex
+                        i = nextIndex + placeholderPrefix.length
+                        continue
+                    }
+                }
+                if (char.isToken(i, placeholderPrefix)) {
+                    if (inPlaceholder) {
+                        throw IllegalArgumentException(
+                            "Wrong token $placeholderPrefix at index $i (${
+                                this.subSequence(i, this.length).ellipses(ELLIPSES_NUMBER)
+                            })."
+                        )
+                    }
+                    tokens.add(Token.newToken(p, i, Token.Type.TEXT))
+                    tokens.add(Token.newToken(i, i + placeholderPrefix.length, Token.Type.PREFIX, argIndex++))
+                    inPlaceholder = true
+                    i += placeholderPrefix.length
+                    p = i
+                    continue
+                }
+                if (char.isToken(i, placeholderSuffix) && inPlaceholder) {
+                    tokens.add(Token.newToken(p, i, Token.Type.TEXT, argIndex))
+                    tokens.add(Token.newToken(i, i + placeholderSuffix.length, Token.Type.SUFFIX, argIndex))
+                    inPlaceholder = false
+                    i += placeholderSuffix.length
+                    p = i
+                    continue
+                }
+            }
+            if (inPlaceholder) {
+                throw IllegalArgumentException(
+                    "Suffix not found since index $p (${
+                        this.subSequence(p, this.length).ellipses(ELLIPSES_NUMBER)
+                    })."
+                )
+            }
+            if (p < this.length) {
+                tokens.add(Token.newToken(p, this.length, Token.Type.TEXT))
+            }
+            return newCharsTemplateByTokens(this, tokens)
+        }
+    }
+}
