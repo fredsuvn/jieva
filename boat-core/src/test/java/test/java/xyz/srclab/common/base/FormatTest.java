@@ -2,7 +2,7 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Format;
+import xyz.srclab.common.base.CharsFormat;
 
 /**
  * @author sunqian
@@ -11,14 +11,14 @@ public class FormatTest {
 
     @Test
     public void testFormat() {
-        String fastFormat = Format.fastFormat("This is {} {}.", "fast", "format");
+        String fastFormat = CharsFormat.fastFormat("This is {} {}.", "fast", "format");
         Assert.assertEquals(fastFormat, "This is fast format.");
-        String printfFormat = Format.printfFormat("This is %s %s.", "printf", "format");
+        String printfFormat = CharsFormat.printfFormat("This is %s %s.", "printf", "format");
         Assert.assertEquals(printfFormat, "This is printf format.");
-        String messageFormat = Format.messageFormat("This is {0} {1}.", "message", "format");
+        String messageFormat = CharsFormat.messageFormat("This is {0} {1}.", "message", "format");
         Assert.assertEquals(messageFormat, "This is message format.");
 
-        String escapeFormat = Format.fastFormat("{}, {}, \\{}, \\\\", 1, 2, 3);
+        String escapeFormat = CharsFormat.fastFormat("{}, {}, \\{}, \\\\", 1, 2, 3);
         Assert.assertEquals(escapeFormat, "1, 2, {}, \\\\");
     }
 }

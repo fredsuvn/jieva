@@ -2,10 +2,10 @@ package sample.xyz.srclab.common.base
 
 import org.testng.annotations.Test
 import xyz.srclab.common.base.*
+import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
+import xyz.srclab.common.base.CharsFormat.Companion.messageFormat
+import xyz.srclab.common.base.CharsFormat.Companion.printfFormat
 import xyz.srclab.common.base.Counter.Companion.counterStarts
-import xyz.srclab.common.base.Format.Companion.fastFormat
-import xyz.srclab.common.base.Format.Companion.messageFormat
-import xyz.srclab.common.base.Format.Companion.printfFormat
 import xyz.srclab.common.base.SemVer.Companion.parseSemVer
 import xyz.srclab.common.base.SpecParser.Companion.parseFirstClassNameToInstance
 import xyz.srclab.common.test.TestLogger

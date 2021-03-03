@@ -1,7 +1,7 @@
 package xyz.srclab.common.egg.v0
 
+import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
 import xyz.srclab.common.base.Current
-import xyz.srclab.common.base.Format.Companion.fastFormat
 import xyz.srclab.common.egg.sample.Logger
 
 /**
