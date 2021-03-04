@@ -638,10 +638,6 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().toCollection(destination)
     }
 
-    open fun toImmutableCollection(): ImmutableCollection<T> {
-        return finalIterable().toImmutableCollection()
-    }
-
     open fun toSet(): Set<T> {
         return finalIterable().toSet()
     }
