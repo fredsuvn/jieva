@@ -2,7 +2,7 @@
 
 ![Boat](../logo.svg)
 
-## Variables
+## 变量
 
 * author: Sun Qian
 * boat-version: 1.0.0
