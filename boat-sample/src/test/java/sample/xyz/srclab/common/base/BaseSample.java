@@ -7,10 +7,7 @@ import xyz.srclab.common.test.TestLogger;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class BaseSample {
@@ -74,6 +71,27 @@ public class BaseSample {
         logger.log("byFast: {}", byFast);
         logger.log("byMessage: {}", byMessage);
         logger.log("byPrintf: {}", byPrintf);
+    }
+
+    @Test
+    public void testTemplate() {
+        Map<Object, Object> args = new HashMap<>();
+        args.put("name", "Dog");
+        args.put("name}", "DogX");
+        args.put(1, "Cat");
+        args.put(2, "Bird");
+        CharsTemplate template1 = CharsTemplate.resolve(
+                "This is a {name}, that is a {}", "{", "}");
+        //This is a Dog, that is a Cat
+        logger.log(template1.process(args));
+        CharsTemplate template2 = CharsTemplate.resolve(
+                "This is a } {name}, that is a {}}", "{", "}");
+        //This is a } Dog, that is a Cat}
+        logger.log(template2.process(args));
+        CharsTemplate template3 = CharsTemplate.resolve(
+                "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
+        //This is a } {DogX (Dog), that is a Bird\\{\
+        logger.log(template3.process(args));
     }
 
     @Test

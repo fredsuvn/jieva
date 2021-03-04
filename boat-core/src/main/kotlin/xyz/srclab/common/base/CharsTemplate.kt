@@ -7,9 +7,23 @@ import java.io.Writer
 import java.util.*
 
 /**
- * To resolve placeholder of a string:
+ * Chars template, to build a template with custom placeholders, then process with given arguments:
  * ```
- * "This is a {name1}, that is a {name2}"
+ * Map<Object, Object> args = new HashMap<>();
+ * args.put("name", "Dog");
+ * args.put("name}", "DogX");
+ * args.put(1, "Cat");
+ * args.put(2, "Bird");
+ * CharsTemplate template1 = CharsTemplate.resolve(
+ * "This is a {name}, that is a {}", "{", "}");
+ * Assert.assertEquals(template1.process(args), "This is a Dog, that is a Cat");
+ * CharsTemplate template2 = CharsTemplate.resolve(
+ * "This is a } {name}, that is a {}}", "{", "}");
+ * Assert.assertEquals(template2.process(args), "This is a } Dog, that is a Cat}");
+ * CharsTemplate template3 = CharsTemplate.resolve(
+ * "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
+ * //logger.log(template3.process(args));
+ * Assert.assertEquals(template3.process(args), "This is a } {DogX (Dog), that is a Bird\\\\{\\");
  * ```
  */
 interface CharsTemplate {
@@ -52,6 +66,9 @@ interface CharsTemplate {
         }
     }
 
+    /**
+     * Node of [CharsTemplate], each one denotes a text or placeholder variable.
+     */
     interface Node {
 
         @Suppress(INAPPLICABLE_JVM_NAME)
@@ -76,11 +93,11 @@ interface CharsTemplate {
                 return ""
             }
             if (tokens.size == 1) {
-                return chars.toString()
+                return tokens[0].toText(chars)
             }
             val buf = StringBuilder()
             for (token in tokens) {
-                buf.append(chars.subSequence(token.startIndex, token.endIndex))
+                buf.append(token.toText(chars))
             }
             return buf.toString()
         }
@@ -103,7 +120,8 @@ interface CharsTemplate {
                 return tokens[0].argIndex
             }
             if (tokens.size == 3) {
-                return tokens[1].toText(chars)
+                val key = tokens[1].toText(chars)
+                return if (key.isEmpty()) tokens[1].argIndex else key
             }
             val buf = StringBuilder()
             var i = 1
@@ -130,6 +148,9 @@ interface CharsTemplate {
         }
     }
 
+    /**
+     * Token of [CharsTemplate], each one denotes a text or placeholder prefix or placeholder suffix.
+     */
     interface Token {
 
         @Suppress(INAPPLICABLE_JVM_NAME)
@@ -246,12 +267,15 @@ interface CharsTemplate {
                 }
                 throw IllegalArgumentException("Suffix token must after a prefix token.")
             }
+            if (subTokens.isNotEmpty()) {
+                nodes.add(Node.newNode(subTokens.toList(), Node.Type.TEXT))
+            }
             return newCharsTemplate(chars, nodes.toList())
         }
 
         @JvmStatic
         @JvmName("resolve")
-        fun CharSequence.resolveCharsTemplate(placeholderPrefix: String, placeholderSuffix: String): CharsTemplate {
+        fun CharSequence.resolveTemplate(placeholderPrefix: String, placeholderSuffix: String): CharsTemplate {
             var prefixIndex = this.indexOf(placeholderPrefix)
             if (prefixIndex < 0) {
                 return newCharsTemplateByTokens(this, listOf(Token.newToken(0, this.length, Token.Type.TEXT)))
@@ -279,14 +303,16 @@ interface CharsTemplate {
                         argIndex++
                     )
                 )
-                tokens.add(
-                    Token.newToken(
-                        prefixIndex + placeholderPrefix.length,
-                        suffixIndex,
-                        Token.Type.TEXT,
-                        argIndex
+                if (prefixIndex + placeholderPrefix.length < suffixIndex) {
+                    tokens.add(
+                        Token.newToken(
+                            prefixIndex + placeholderPrefix.length,
+                            suffixIndex,
+                            Token.Type.TEXT,
+                            argIndex
+                        )
                     )
-                )
+                }
                 tokens.add(
                     Token.newToken(
                         suffixIndex,
@@ -306,19 +332,19 @@ interface CharsTemplate {
 
         @JvmStatic
         @JvmName("resolve")
-        fun CharSequence.resolveCharsTemplate(
+        fun CharSequence.resolveTemplate(
             placeholderPrefix: String,
             placeholderSuffix: String,
             escape: String
         ): CharsTemplate {
 
             fun Char.isToken(index: Int, token: String): Boolean {
-                if (this != token[0] || index > this@resolveCharsTemplate.length - token.length) {
+                if (this != token[0] || index > this@resolveTemplate.length - token.length) {
                     return false
                 }
                 var i = 1
                 while (i < token.length) {
-                    if (this@resolveCharsTemplate[index + i] != token[i]) {
+                    if (this@resolveTemplate[index + i] != token[i]) {
                         return false
                     }
                     i++
@@ -340,7 +366,9 @@ interface CharsTemplate {
                     }
                     val nextChar = this[nextIndex]
                     if (inPlaceholder && nextChar.isToken(nextIndex, placeholderSuffix)) {
-                        tokens.add(Token.newToken(p, i, Token.Type.TEXT, argIndex))
+                        if (i > p) {
+                            tokens.add(Token.newToken(p, i, Token.Type.TEXT, argIndex))
+                        }
                         p = nextIndex
                         i = nextIndex + placeholderSuffix.length
                         continue
@@ -368,13 +396,16 @@ interface CharsTemplate {
                     continue
                 }
                 if (char.isToken(i, placeholderSuffix) && inPlaceholder) {
-                    tokens.add(Token.newToken(p, i, Token.Type.TEXT, argIndex))
+                    if (i > p) {
+                        tokens.add(Token.newToken(p, i, Token.Type.TEXT, argIndex))
+                    }
                     tokens.add(Token.newToken(i, i + placeholderSuffix.length, Token.Type.SUFFIX, argIndex))
                     inPlaceholder = false
                     i += placeholderSuffix.length
                     p = i
                     continue
                 }
+                i++
             }
             if (inPlaceholder) {
                 throw IllegalArgumentException(
