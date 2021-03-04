@@ -4,48 +4,48 @@ import org.slf4j.helpers.MessageFormatter as MessageFormatterSlf4j
 import java.text.MessageFormat as MessageFormatKt
 
 /**
- * Format chars.
+ * Chars format.
  *
- * @see FastFormat
- * @see PrintfFormat
- * @see MessageFormat
+ * @see FastCharsFormat
+ * @see PrintfCharsFormat
+ * @see MessageCharsFormat
  */
-interface Format {
+interface CharsFormat {
 
     fun format(pattern: CharSequence, vararg args: Any?): String
 
     companion object {
 
         @JvmField
-        val FAST_FORMAT: FastFormat = FastFormat
+        val FAST_FORMAT: FastCharsFormat = FastCharsFormat
 
         @JvmField
-        val PRINT_FORMAT: PrintfFormat = PrintfFormat
+        val PRINT_FORMAT: PrintfCharsFormat = PrintfCharsFormat
 
         @JvmField
-        val MESSAGE_FORMAT: MessageFormat = MessageFormat
+        val MESSAGE_FORMAT: MessageCharsFormat = MessageCharsFormat
 
         @JvmStatic
         fun CharSequence.fastFormat(vararg args: Any?): String {
-            return FastFormat.format(this, *args)
+            return FastCharsFormat.format(this, *args)
         }
 
         @JvmStatic
         fun CharSequence.printfFormat(vararg args: Any?): String {
-            return PrintfFormat.format(this, *args)
+            return PrintfCharsFormat.format(this, *args)
         }
 
         @JvmStatic
         fun CharSequence.messageFormat(vararg args: Any?): String {
-            return MessageFormat.format(this, *args)
+            return MessageCharsFormat.format(this, *args)
         }
     }
 }
 
 /**
- * [Format] with slf4j style.
+ * [CharsFormat] with `slf4j` style.
  */
-object FastFormat : Format {
+object FastCharsFormat : CharsFormat {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         processArguments(args)
@@ -67,9 +67,9 @@ object FastFormat : Format {
 }
 
 /**
- * [Format] with `System.out.printf` style.
+ * [CharsFormat] with `System.out.printf` style.
  */
-object PrintfFormat : Format {
+object PrintfCharsFormat : CharsFormat {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         return String.format(Default.locale, pattern.toString(), *args)
@@ -77,9 +77,9 @@ object PrintfFormat : Format {
 }
 
 /**
- * [Format] with `String.format` style.
+ * [CharsFormat] with `String.format` style.
  */
-object MessageFormat : Format {
+object MessageCharsFormat : CharsFormat {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         return MessageFormatKt.format(pattern.toString(), *args)

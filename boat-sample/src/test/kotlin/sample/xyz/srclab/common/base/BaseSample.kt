@@ -2,10 +2,11 @@ package sample.xyz.srclab.common.base
 
 import org.testng.annotations.Test
 import xyz.srclab.common.base.*
+import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
+import xyz.srclab.common.base.CharsFormat.Companion.messageFormat
+import xyz.srclab.common.base.CharsFormat.Companion.printfFormat
+import xyz.srclab.common.base.CharsTemplate.Companion.resolveTemplate
 import xyz.srclab.common.base.Counter.Companion.counterStarts
-import xyz.srclab.common.base.Format.Companion.fastFormat
-import xyz.srclab.common.base.Format.Companion.messageFormat
-import xyz.srclab.common.base.Format.Companion.printfFormat
 import xyz.srclab.common.base.SemVer.Companion.parseSemVer
 import xyz.srclab.common.base.SpecParser.Companion.parseFirstClassNameToInstance
 import xyz.srclab.common.test.TestLogger
@@ -50,6 +51,24 @@ class BaseSampleKt {
         logger.log("byFast: {}", byFast)
         logger.log("byMessage: {}", byMessage)
         logger.log("byPrintf: {}", byPrintf)
+    }
+
+    @Test
+    fun testTemplate() {
+        val args: MutableMap<Any, Any?> = HashMap()
+        args["name"] = "Dog"
+        args["name}"] = "DogX"
+        args[1] = "Cat"
+        args[2] = "Bird"
+        val template1 = "This is a {name}, that is a {}".resolveTemplate("{", "}")
+        //This is a Dog, that is a Cat
+        logger.log(template1.process(args))
+        val template2 = "This is a } {name}, that is a {}}".resolveTemplate("{", "}")
+        //This is a } Dog, that is a Cat}
+        logger.log(template2.process(args))
+        val template3 = "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\".resolveTemplate("{", "}", "\\")
+        //This is a } {DogX (Dog), that is a Bird\\{\
+        logger.log(template3.process(args))
     }
 
     @Test

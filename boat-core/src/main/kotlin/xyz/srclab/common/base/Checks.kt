@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.Format.Companion.fastFormat
+import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
 import java.util.*
 
 @Throws(IllegalArgumentException::class)

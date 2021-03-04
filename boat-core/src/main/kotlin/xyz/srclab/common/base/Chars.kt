@@ -18,6 +18,14 @@ fun CharSequence?.isWhitespace(): Boolean {
     return StringUtils.isWhitespace(this)
 }
 
+/**
+ * Note Minimum abbreviation width is 4.
+ */
+@JvmOverloads
+fun CharSequence?.ellipses(maxLength: Int, offset: Int = 0): String {
+    return StringUtils.abbreviate(this.toString(), offset, maxLength)
+}
+
 fun CharSequence.toCharSet(): Charset {
     return Charset.forName(this.toString())
 }

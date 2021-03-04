@@ -941,8 +941,16 @@ fun <T, C : MutableCollection<in T>> Iterable<T>.toCollection(destination: C): C
     return this.toCollectionKt(destination)
 }
 
+fun <T> Iterable<T>.toImmutableCollection(): ImmutableCollection<T> {
+    return if (this is ImmutableCollection) this else ImmutableCollection(this)
+}
+
 fun <T> Iterable<T>.toSet(): Set<T> {
     return this.toSetKt()
+}
+
+fun <T> Iterable<T>.toImmutableSet(): ImmutableSet<T> {
+    return if (this is ImmutableSet) this else ImmutableSet(this)
 }
 
 fun <T> Iterable<T>.toMutableSet(): MutableSet<T> {
@@ -968,6 +976,10 @@ fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T> = castSelfComparabl
 
 fun <T> Iterable<T>.toList(): List<T> {
     return this.toListKt()
+}
+
+fun <T> Iterable<T>.toImmutableList(): ImmutableList<T> {
+    return if (this is ImmutableList) this else ImmutableList(this)
 }
 
 fun <T> Iterable<T>.toMutableList(): MutableList<T> {
@@ -1768,6 +1780,10 @@ inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
     return this.flatMapToKt(destination, transform)
 }
 
+fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> {
+    return if (this is ImmutableMap) this else ImmutableMap(this)
+}
+
 fun <K, V> Map<K, V>.plus(other: Map<out K, V>): Map<K, V> {
     return this.plusKt(other)
 }
@@ -2498,12 +2514,16 @@ fun <T, C : MutableCollection<in T>> Sequence<T>.toCollection(destination: C): C
     return this.toCollectionKt(destination)
 }
 
-fun <T> Sequence<T>.toMutableCollection(): MutableCollection<T> {
-    return this.toMutableSet()
+fun <T> Sequence<T>.toImmutableCollection(): ImmutableCollection<T> {
+    return toSet().toImmutableCollection()
 }
 
 fun <T> Sequence<T>.toSet(): Set<T> {
     return this.toSetKt()
+}
+
+fun <T> Sequence<T>.toImmutableSet(): ImmutableSet<T> {
+    return toSet().toImmutableSet()
 }
 
 fun <T> Sequence<T>.toMutableSet(): MutableSet<T> {
@@ -2525,6 +2545,10 @@ fun <T> Sequence<T>.toSortedSet(comparator: Comparator<in T> = castSelfComparabl
 
 fun <T> Sequence<T>.toList(): List<T> {
     return this.toListKt()
+}
+
+fun <T> Sequence<T>.toImmutableList(): ImmutableList<T> {
+    return toList().toImmutableList()
 }
 
 fun <T> Sequence<T>.toMutableList(): MutableList<T> {

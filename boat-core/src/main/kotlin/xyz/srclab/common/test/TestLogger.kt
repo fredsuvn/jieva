@@ -1,9 +1,9 @@
 package xyz.srclab.common.test
 
+import xyz.srclab.common.base.CharsFormat
+import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
+import xyz.srclab.common.base.CharsFormat.Companion.printfFormat
 import xyz.srclab.common.base.Current
-import xyz.srclab.common.base.Format
-import xyz.srclab.common.base.Format.Companion.fastFormat
-import xyz.srclab.common.base.Format.Companion.printfFormat
 import xyz.srclab.common.base.asAny
 import java.io.PrintStream
 
@@ -15,7 +15,7 @@ interface TestLogger {
     fun log(message: Any?)
 
     /**
-     * Using [Format.fastFormat] to format.
+     * Using [CharsFormat.fastFormat] to format.
      */
     @JvmDefault
     fun log(pattern: CharSequence, vararg args: Any?) {

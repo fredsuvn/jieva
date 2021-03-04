@@ -577,12 +577,16 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Sequence<T> {
         return finalSequence().toCollection(destination)
     }
 
-    fun toMutableCollection(): MutableCollection<T> {
-        return finalSequence().toMutableCollection()
+    fun toImmutableCollection(): ImmutableCollection<T> {
+        return finalSequence().toImmutableCollection()
     }
 
     fun toSet(): Set<T> {
         return finalSequence().toSet()
+    }
+
+    fun toImmutableSet(): ImmutableSet<T> {
+        return finalSequence().toImmutableSet()
     }
 
     fun toMutableSet(): MutableSet<T> {
@@ -604,6 +608,10 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Sequence<T> {
 
     fun toList(): List<T> {
         return finalSequence().toList()
+    }
+
+    fun toImmutableList(): ImmutableList<T> {
+        return finalSequence().toImmutableList()
     }
 
     fun toMutableList(): MutableList<T> {

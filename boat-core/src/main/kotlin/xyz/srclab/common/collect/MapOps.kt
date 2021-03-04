@@ -80,6 +80,10 @@ class MapOps<K, V>(private var map: Map<K, V>) {
         return finalMap().flatMapTo(destination, transform)
     }
 
+    fun toImmutableMap(): ImmutableMap<K, V> {
+        return finalMap().toImmutableMap()
+    }
+
     fun plus(other: Map<out K, V>): MapOps<K, V> {
         return finalMap().plus(other).toMapOps()
     }

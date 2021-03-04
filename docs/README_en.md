@@ -205,7 +205,7 @@ Base package provides base core and basic interfaces, functions and utilities:
 
 * Global shortcut objects: Current, Default, Environment;
 * Syntax enhancement (mainly for Java): Let, Ref, Lazy;
-* String functions: Format, NamingCase;
+* String functions: CharsFormat, CharsTemplate, NamingCase;
 * Core and basic interfaces: Accessor, Serial, SpecParser, CachingProductBuilder
 * Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Loaders;
 * Other tools: About, Counter, Shell.
@@ -267,13 +267,34 @@ public class BaseSample {
 
     @Test
     public void testFormat() {
-        String byFast = Format.fastFormat("1, 2, {}", 3);
-        String byMessage = Format.messageFormat("1, 2, {0}", 3);
-        String byPrintf = Format.printfFormat("1, 2, %d", 3);
+        String byFast = CharsFormat.fastFormat("1, 2, {}", 3);
+        String byMessage = CharsFormat.messageFormat("1, 2, {0}", 3);
+        String byPrintf = CharsFormat.printfFormat("1, 2, %d", 3);
         //1, 2, 3
         logger.log("byFast: {}", byFast);
         logger.log("byMessage: {}", byMessage);
         logger.log("byPrintf: {}", byPrintf);
+    }
+
+    @Test
+    public void testTemplate() {
+        Map<Object, Object> args = new HashMap<>();
+        args.put("name", "Dog");
+        args.put("name}", "DogX");
+        args.put(1, "Cat");
+        args.put(2, "Bird");
+        CharsTemplate template1 = CharsTemplate.resolve(
+                "This is a {name}, that is a {}", "{", "}");
+        //This is a Dog, that is a Cat
+        logger.log(template1.process(args));
+        CharsTemplate template2 = CharsTemplate.resolve(
+                "This is a } {name}, that is a {}}", "{", "}");
+        //This is a } Dog, that is a Cat}
+        logger.log(template2.process(args));
+        CharsTemplate template3 = CharsTemplate.resolve(
+                "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
+        //This is a } {DogX (Dog), that is a Bird\\{\
+        logger.log(template3.process(args));
     }
 
     @Test
@@ -520,6 +541,24 @@ class BaseSampleKt {
         logger.log("byFast: {}", byFast)
         logger.log("byMessage: {}", byMessage)
         logger.log("byPrintf: {}", byPrintf)
+    }
+
+    @Test
+    fun testTemplate() {
+        val args: MutableMap<Any, Any?> = HashMap()
+        args["name"] = "Dog"
+        args["name}"] = "DogX"
+        args[1] = "Cat"
+        args[2] = "Bird"
+        val template1 = "This is a {name}, that is a {}".resolveTemplate("{", "}")
+        //This is a Dog, that is a Cat
+        logger.log(template1.process(args))
+        val template2 = "This is a } {name}, that is a {}}".resolveTemplate("{", "}")
+        //This is a } Dog, that is a Cat}
+        logger.log(template2.process(args))
+        val template3 = "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\".resolveTemplate("{", "}", "\\")
+        //This is a } {DogX (Dog), that is a Bird\\{\
+        logger.log(template3.process(args))
     }
 
     @Test
