@@ -1779,7 +1779,7 @@ class CodecSampleKt {
 Boat Id (需要引入boat-id)是一个轻量级id生成框架. 它提供IdFactory和一套接口来生成id:
 
 * IdFactory: 核心接口, 用来生成新id;
-* IdComponentGenerator: 核心接口, 用来生成新id的一部分;
+* IdComponentFactory: 核心接口, 用来生成新id的一部分;
 * AbstractIdFactory: IdFactory骨架实现, 用来辅助实现完整的IdFactory;
 * StringIdFactory: IdFactory骨架实现, 用来辅助实现String类型id的IdFactory;
 
@@ -1794,11 +1794,11 @@ public class IdSample {
 
     @Test
     public void testId() {
-        String spec = "seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}";
+        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
         StringIdSpec stringIdSpec = new StringIdSpec(spec);
         //seq-202102071449568890000-tail
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec.newId());
+            logger.log(stringIdSpec.create());
         }
     }
 }
@@ -1811,11 +1811,11 @@ class IdSampleKt {
 
     @Test
     fun testId() {
-        val spec = "seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}"
+        val spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail"
         val stringIdSpec = StringIdSpec(spec)
         //seq-202102071449568890000-tail
         for (i in 0..9) {
-            logger.log(stringIdSpec.newId())
+            logger.log(stringIdSpec.create())
         }
     }
 

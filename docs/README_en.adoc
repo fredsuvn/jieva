@@ -1835,7 +1835,7 @@ Boat ID (should import boat-id) is a lightweight and fast id generation framewor
 It provides IdFactory and a set of interface to generate id:
 
 * IdFactory: Core interface to generate new id;
-* IdComponentGenerator: Core interface to generator component of an id;
+* IdComponentFactory: Core interface to generator component of an id;
 * AbstractIdFactory: Skeletal IdFactory to help implement full IdFactory;
 * StringIdFactory: Skeletal IdFactory to help implement String-id-type IdFactory;
 
@@ -1851,11 +1851,11 @@ public class IdSample {
 
     @Test
     public void testId() {
-        String spec = "seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}";
+        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";;
         StringIdSpec stringIdSpec = new StringIdSpec(spec);
         //seq-202102071449568890000-tail
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec.newId());
+            logger.log(stringIdSpec.create());
         }
     }
 }
@@ -1869,11 +1869,11 @@ class IdSampleKt {
 
     @Test
     fun testId() {
-        val spec = "seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}"
+        val spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail"
         val stringIdSpec = StringIdSpec(spec)
         //seq-202102071449568890000-tail
         for (i in 0..9) {
-            logger.log(stringIdSpec.newId())
+            logger.log(stringIdSpec.create())
         }
     }
 

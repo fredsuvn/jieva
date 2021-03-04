@@ -18,38 +18,29 @@ interface IdFactory<T> {
      *
      * @return new id
      */
-    fun newId(): T
+    fun create(): T
 
     companion object {
 
         @JvmStatic
-        fun newStringIdFactory(generators: Iterable<IdComponentGenerator<*>>): StringIdFactory {
-            return StringIdFactory(generators)
-        }
-
-        @JvmStatic
-        @JvmOverloads
-        fun newStringIdSpec(
-            spec: String,
-            factoryGenerator: StringIdFactoryGenerator = StringIdFactoryGenerator.DEFAULT
-        ): StringIdSpec {
-            return StringIdSpec(spec, factoryGenerator)
+        fun newStringIdFactory(componentFactories: Iterable<IdComponentFactory<*>>): StringIdFactory {
+            return StringIdFactory(componentFactories)
         }
     }
 }
 
 /**
- * Skeletal [IdFactory] with an [IdComponentGenerator] iterable.
+ * Skeletal [IdFactory] with an [IdComponentFactory] iterable.
  */
 abstract class AbstractIdFactory<T>(
-    private val generators: Iterable<IdComponentGenerator<*>>
+    private val componentFactories: Iterable<IdComponentFactory<*>>
 ) : IdFactory<T> {
 
-    override fun newId(): T {
-        val components = ArrayList<IdComponent<*>>(generators.count())
-        val context = Context(components)
-        for (generator in generators) {
-            val component = IdComponent.newIdComponent(generator, context)
+    override fun create(): T {
+        val components = ArrayList<IdComponentHolder<*>>(componentFactories.count())
+        val context = IdContext.newContext(components)
+        for (factory in componentFactories) {
+            val component = IdComponentHolder.newIdComponent(factory, context)
             components.add(component)
         }
         val values = ArrayList<Any>(components.size)
@@ -60,19 +51,13 @@ abstract class AbstractIdFactory<T>(
     }
 
     protected abstract fun concat(components: List<Any>): T
-
-    private class Context(private val components: List<IdComponent<*>>) : IdGenerationContext {
-        override fun <T> components(): List<IdComponent<T>> {
-            return components()
-        }
-    }
 }
 
 /**
- * Skeletal [IdFactory] with an [IdComponentGenerator] iterable, build [String] type id.
+ * Skeletal [IdFactory] with an [IdComponentFactory] iterable, build [String] type id.
  */
 open class StringIdFactory(
-    generators: Iterable<IdComponentGenerator<*>>
+    generators: Iterable<IdComponentFactory<*>>
 ) : AbstractIdFactory<String>(generators) {
     override fun concat(components: List<Any>): String {
         return components.joinToString(separator = "") { it.toString() }

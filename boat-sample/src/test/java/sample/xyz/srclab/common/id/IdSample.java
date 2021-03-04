@@ -10,11 +10,11 @@ public class IdSample {
 
     @Test
     public void testId() {
-        String spec = "seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}";
+        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
         StringIdSpec stringIdSpec = new StringIdSpec(spec);
         //seq-202102071449568890000-tail
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec.newId());
+            logger.log(stringIdSpec.create());
         }
     }
 }

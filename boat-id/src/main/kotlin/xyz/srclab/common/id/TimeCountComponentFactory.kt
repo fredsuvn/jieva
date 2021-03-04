@@ -9,11 +9,11 @@ import java.time.format.DateTimeFormatter
 /**
  * @author sunqian
  */
-class TimeCountComponentGenerator(
+class TimeCountComponentFactory(
     dateTimePattern: String?,
     private val maxCount: Long,
     private val toStringPattern: String?,
-) : IdComponentGenerator<TimestampCount> {
+) : IdComponentFactory<TimestampCount> {
 
     private val dateTimeFormatter =
         if (dateTimePattern.isNullOrBlank()) null else DateTimeFormatter.ofPattern(dateTimePattern)
@@ -21,9 +21,9 @@ class TimeCountComponentGenerator(
     private var lastTime: Long = -1
     private var sequence: Long = 0
 
-    override val name = NAME
+    constructor(args: Array<String>) : this(args[0], args[1].toLong(), args[2])
 
-    override fun generate(context: IdGenerationContext): TimestampCount {
+    override fun create(context: IdContext): TimestampCount {
         return synchronized(this) {
             generate0()
         }
