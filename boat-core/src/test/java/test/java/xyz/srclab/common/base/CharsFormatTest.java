@@ -7,7 +7,7 @@ import xyz.srclab.common.base.CharsFormat;
 /**
  * @author sunqian
  */
-public class FormatTest {
+public class CharsFormatTest {
 
     @Test
     public void testFormat() {
