@@ -43,4 +43,45 @@ public class ClassTest {
     public void testShortName() {
         Assert.assertEquals(Reflects.shortName(getClass()), "ClassTest");
     }
+
+    @Test
+    public void testProperty() {
+        Child child = new Child();
+        Reflects.setProperty(child, "child", "123456");
+        Assert.assertEquals(Reflects.getProperty(child, "child"), "123456");
+        Reflects.setProperty(child, "child2", "234567");
+        Assert.assertEquals(Reflects.getProperty(child, "child2"), "234567");
+        Reflects.setProperty(child, "parent", "345678");
+        Assert.assertEquals(Reflects.getProperty(child, "parent"), "345678");
+        Reflects.setProperty(child, "parent2", "456789");
+        Assert.assertEquals(Reflects.getProperty(child, "parent2"), "456789");
+    }
+
+    public static class Child extends Parent {
+
+        private String child;
+        private String child2;
+
+        public String getChild() {
+            return child;
+        }
+
+        public void setChild(String child) {
+            this.child = child;
+        }
+    }
+
+    public static class Parent {
+
+        private String parent;
+        private String parent2;
+
+        public String getParent() {
+            return parent;
+        }
+
+        public void setParent(String parent) {
+            this.parent = parent;
+        }
+    }
 }
