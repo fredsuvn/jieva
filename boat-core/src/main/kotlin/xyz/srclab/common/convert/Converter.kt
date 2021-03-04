@@ -529,6 +529,6 @@ open class BeanConvertHandler(
     }
 }
 
-private fun Any?.replaceNull(): Any? {
+private fun Any?.replaceNull(): Any {
     return if (this === null) Default.NULL else this
 }
