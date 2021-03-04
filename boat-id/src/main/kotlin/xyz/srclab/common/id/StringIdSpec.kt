@@ -1,11 +1,15 @@
 package xyz.srclab.common.id
 
-import xyz.srclab.common.base.toLong
+import xyz.srclab.common.base.CharsTemplate
+import xyz.srclab.common.base.CharsTemplate.Companion.resolveTemplate
+import xyz.srclab.common.id.StringIdSpec.Companion.DEFAULT_COMPONENT_FACTORY_GENERATORS
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Specification implementation of [IdFactory]. For example:
  * ```
- * String spec = "seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}";
+ * String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
  * StringIdSpec idFactory = new StringIdSpec(spec);
  * ```
  * The result may be:
@@ -15,125 +19,93 @@ import xyz.srclab.common.base.toLong
  * seq-202007311734474140000-tail
  * seq-202007311734474140001-tail
  * ```
- * An [StringIdSpec] consists of literals and [IdComponentGenerator]s,
- * [IdComponentGenerator]s are wrapped between {}, format is {name[,param]+}.
+ * An [StringIdSpec] consists of literals and [IdComponentFactory]s,
+ * [IdComponentFactory]s are wrapped between {}, format is {name[, param]+} (**a comma following a space**).
  *
- * Using `\` to escape:
+ * Using `\` to escape `{` out of parameter scope, and escape `}` in parameter scope:
  * ```
- * seq\{\}-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d\\}-{Constant,tail}
+ * seq\{}-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail
  * will output:
- * seq{}-202007311734474130000\-tail
+ * seq{}-202007311734474130000-tail
+ *
+ * seq\{\}-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}\-tail
+ * will output:
+ * seq{\}-202007311734474130000\-tail
  * ```
  *
- * Note literal parts will be seem as [ConstantComponentGenerator]s, these two spec are same:
- * ```
- * seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}
- * seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-tail
- * ```
+ * There are default name of [IdComponentFactory]:
+ * * [DEFAULT_COMPONENT_FACTORY_GENERATORS]
  *
- * There are default name of [IdComponentGenerator]:
- * * [ConstantComponentGenerator.NAME]
- * * [TimeCountComponentGenerator.NAME]
- * Using [StringIdFactoryGenerator] can extend, note generation arguments of [StringIdFactoryGenerator]
- * only support [String] type.
+ * Note arguments type of those [IdComponentFactory]s only support [String] type.
  *
  * @author sunqian
  *
- * @see StringIdFactoryGenerator
  * @see IdFactory
  */
 class StringIdSpec @JvmOverloads constructor(
     spec: String,
-    factoryGenerator: StringIdFactoryGenerator = StringIdFactoryGenerator.DEFAULT
-) : StringIdFactory(parseIdSpec(spec, factoryGenerator))
+    componentFactoryGenerators: Map<String, (args: Array<String>) -> IdComponentFactory<*>> =
+        DEFAULT_COMPONENT_FACTORY_GENERATORS,
+) : IdFactory<String> {
 
-/**
- * Help generate [StringIdFactory] by name and arguments.
- */
-interface StringIdFactoryGenerator {
+    private val template: CharsTemplate
+    private val parameters: Map<String, IdComponentFactory<*>>
 
-    fun generate(name: String, args: List<String>): IdComponentGenerator<*>
+    init {
+
+        fun findIdComponentFactory(name: String, args: Array<String>): IdComponentFactory<*> {
+            val func = componentFactoryGenerators[name]
+            if (func === null) {
+                throw IllegalArgumentException("Cannot find IdComponentFactory: $name.")
+            }
+            return func(args)
+        }
+
+        template = spec.resolveTemplate("{", "}", "\\")
+        parameters = HashMap()
+
+        for (parameter in template.parameters) {
+            val parameterValue = parameter.toString()
+            val split = parameterValue.split(", ")
+            if (split.size <= 1) {
+                parameters[parameterValue] = findIdComponentFactory(parameterValue, emptyArray())
+            } else {
+                val name = split[0]
+                val args = split.subList(1, split.size).toTypedArray()
+                parameters[parameterValue] = findIdComponentFactory(name, args)
+            }
+        }
+    }
+
+    override fun create(): String {
+        val components = ArrayList<IdComponentHolder<*>>(parameters.size)
+        val context = IdContext.newContext(components)
+        val args = HashMap<String, Any?>()
+        for (parameter in parameters) {
+            val component = IdComponentHolder.newIdComponent(parameter.value, context)
+            components.add(component)
+            args[parameter.key] = LazyToString(parameter.value, context)
+        }
+        return template.process(args)
+    }
+
+    private class LazyToString(private val componentFactory: IdComponentFactory<*>, private val context: IdContext) {
+        override fun toString(): String {
+            return componentFactory.create(context).toString()
+        }
+    }
 
     companion object {
 
+        const val TIME_COUNT_COMPONENT_FACTORY_KEY = "timeCount"
+
         @JvmField
-        val DEFAULT = object : StringIdFactoryGenerator {
-            override fun generate(name: String, args: List<String>): IdComponentGenerator<*> {
-                return when (name) {
-                    ConstantComponentGenerator.NAME -> ConstantComponentGenerator(
-                        args[0]
-                    )
-                    TimeCountComponentGenerator.NAME -> TimeCountComponentGenerator(
-                        args[0],
-                        args[1].toLong(),
-                        args[2]
-                    )
-                    else -> throw IllegalArgumentException("Id component not found: $name")
-                }
-            }
-        }
-    }
-}
+        val DEFAULT_COMPONENT_FACTORY_GENERATORS: Map<String, (args: Array<String>) -> IdComponentFactory<*>>
 
-private fun parseIdSpec(spec: String, factoryGenerator: StringIdFactoryGenerator): List<IdComponentGenerator<*>> {
-
-    fun doEscape(index: Int, spec: String, buffer: StringBuilder): Int {
-        if (index + 1 >= spec.length) {
-            throw IllegalArgumentException("Lack of escape character at index: $index")
+        init {
+            val map = HashMap<String, (args: Array<String>) -> IdComponentFactory<*>>()
+            map[TIME_COUNT_COMPONENT_FACTORY_KEY] = { TimeCountComponentFactory(it) }
+            DEFAULT_COMPONENT_FACTORY_GENERATORS = Collections.unmodifiableMap(map)
         }
-        buffer.append(spec[index + 1])
-        return index + 2
     }
-
-    fun parseGenerator(index: Int, spec: String, args: MutableList<String>): Int {
-        var i = index
-        val buffer = StringBuilder()
-        while (i < spec.length) {
-            val c = spec[i]
-            if (c == '\\') {
-                i = doEscape(i, spec, buffer)
-                continue
-            }
-            if (c == ',') {
-                args.add(buffer.toString())
-                buffer.clear()
-                i++
-                continue
-            }
-            if (c == '}') {
-                args.add(buffer.toString())
-                return i + 1
-            }
-            buffer.append(c)
-            i++
-        }
-        throw IllegalArgumentException("Not paired {} at index: $i")
-    }
-
-    val result = ArrayList<IdComponentGenerator<*>>()
-    var index = 0
-    val buffer = StringBuilder()
-    while (index < spec.length) {
-        val c = spec[index]
-        if (c == '\\') {
-            index = doEscape(index, spec, buffer)
-            continue
-        }
-        if (c == '{') {
-            if (buffer.isNotEmpty()) {
-                result.add(factoryGenerator.generate(ConstantComponentGenerator.NAME, listOf(buffer.toString())))
-                buffer.clear()
-            }
-            val args = ArrayList<String>()
-            index = parseGenerator(index + 1, spec, args)
-            result.add(factoryGenerator.generate(args[0], args.subList(1, args.size)))
-            continue
-        }
-        buffer.append(c)
-        index++
-    }
-    if (buffer.isNotEmpty()) {
-        result.add(factoryGenerator.generate(ConstantComponentGenerator.NAME, listOf(buffer.toString())))
-    }
-    return result
 }

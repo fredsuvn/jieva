@@ -8,11 +8,11 @@ class IdSampleKt {
 
     @Test
     fun testId() {
-        val spec = "seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}"
+        val spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
         val stringIdSpec = StringIdSpec(spec)
         //seq-202102071449568890000-tail
         for (i in 0..9) {
-            logger.log(stringIdSpec.newId())
+            logger.log(stringIdSpec.create())
         }
     }
 

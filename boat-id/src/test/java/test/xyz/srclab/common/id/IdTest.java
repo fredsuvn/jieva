@@ -1,10 +1,14 @@
 package test.xyz.srclab.common.id;
 
+import kotlin.jvm.functions.Function1;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.id.StringIdFactoryGenerator;
+import xyz.srclab.common.id.IdComponentFactory;
 import xyz.srclab.common.id.StringIdSpec;
 import xyz.srclab.common.test.TestLogger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author sunqian
@@ -15,39 +19,34 @@ public class IdTest {
 
     @Test
     public void testId() {
-        String spec = "seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}";
+        //seq-202103040448046580000-tail
+        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
         StringIdSpec stringIdSpec = new StringIdSpec(spec);
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec.newId());
+            logger.log(stringIdSpec.create());
         }
 
-        String spec2 = "seq\\{\\}-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d\\\\}-{Constant,tail}";
+        //seq{}-202103040448046750000\\\}-tail
+        String spec2 = "seq\\{}-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d\\\\\\\\}}-tail";
         StringIdSpec stringIdSpec2 = new StringIdSpec(spec2);
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec2.newId());
+            logger.log(stringIdSpec2.create());
         }
 
-        String spec3 = "seq\\{\\}-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d";
+        String spec3 = "seq\\{\\}-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d";
         Assert.expectThrows(IllegalArgumentException.class, () -> new StringIdSpec(spec3));
         //new StringIdSpec(spec3);
-
-        String spec4 = "seq\\";
-        Assert.expectThrows(IllegalArgumentException.class, () -> new StringIdSpec(spec4));
-        // StringIdSpec(spec4);
     }
 
     @Test
     public void testCustomId() {
-        StringIdFactoryGenerator stringIdFactoryGenerator = (name, args) -> {
-            if (name.equals("my")) {
-                return new MyIdComponentGenerator(args.get(0));
-            }
-            return StringIdFactoryGenerator.DEFAULT.generate(name, args);
-        };
-        String spec = "seq-{TimeCount,yyyyMMddHHmmssSSS,1023,%17s%04d}-{Constant,tail}-{my,value}";
-        StringIdSpec stringIdSpec = new StringIdSpec(spec, stringIdFactoryGenerator);
+        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-{my, value}";
+        Map<String, Function1<String[], IdComponentFactory<?>>> generators =
+                new HashMap<>(StringIdSpec.DEFAULT_COMPONENT_FACTORY_GENERATORS);
+        generators.put("my", (args) -> new MyIdComponentFactory(args[0]));
+        StringIdSpec stringIdSpec = new StringIdSpec(spec, generators);
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec.newId());
+            logger.log(stringIdSpec.create());
         }
     }
 }

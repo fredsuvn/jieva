@@ -8,6 +8,7 @@ import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.MapType
 import xyz.srclab.common.collect.MapType.Companion.toMapType
 import xyz.srclab.common.collect.asToList
+import xyz.srclab.common.collect.toImmutableMap
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
@@ -534,7 +535,7 @@ private class BeanResolverImpl(override val resolveHandlers: List<BeanResolveHan
             for (handler in resolveHandlers) {
                 handler.resolve(context)
             }
-            beanType.properties = context.properties.toMap()
+            beanType.properties = context.properties.toImmutableMap()
             beanType
         }
     }

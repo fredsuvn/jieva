@@ -941,10 +941,6 @@ fun <T, C : MutableCollection<in T>> Iterable<T>.toCollection(destination: C): C
     return this.toCollectionKt(destination)
 }
 
-fun <T> Iterable<T>.toImmutableCollection(): ImmutableCollection<T> {
-    return if (this is ImmutableCollection) this else ImmutableCollection(this)
-}
-
 fun <T> Iterable<T>.toSet(): Set<T> {
     return this.toSetKt()
 }
@@ -2512,10 +2508,6 @@ inline fun <T> Sequence<T>.averageBigDecimal(selector: (T) -> BigDecimal = { it.
 
 fun <T, C : MutableCollection<in T>> Sequence<T>.toCollection(destination: C): C {
     return this.toCollectionKt(destination)
-}
-
-fun <T> Sequence<T>.toImmutableCollection(): ImmutableCollection<T> {
-    return toSet().toImmutableCollection()
 }
 
 fun <T> Sequence<T>.toSet(): Set<T> {
