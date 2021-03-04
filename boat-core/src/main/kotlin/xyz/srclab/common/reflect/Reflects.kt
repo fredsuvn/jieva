@@ -644,6 +644,7 @@ fun Class<*>.searchFields(deep: Boolean = true, predicate: (Field) -> Boolean): 
  * @throws IllegalAccessException
  */
 @JvmOverloads
+@JvmName("getFieldValue")
 fun <T> Field.getValue(owner: Any?, force: Boolean = false): T {
     return try {
         if (force) {
@@ -659,6 +660,7 @@ fun <T> Field.getValue(owner: Any?, force: Boolean = false): T {
  * @throws IllegalAccessException
  */
 @JvmOverloads
+@JvmName("setFieldValue")
 fun Field.setValue(owner: Any?, value: Any?, force: Boolean = false) {
     try {
         if (force) {
@@ -892,6 +894,47 @@ fun Method.canOverrideBy(clazz: Class<*>): Boolean {
         return false
     }
     return true
+}
+
+@JvmOverloads
+fun <T> Any.getProperty(name: String, tryField: Boolean = true, deepField: Boolean = true): T {
+    val method = this.javaClass.methodOrNull("get${name.capitalize()}")
+    if (method !== null) {
+        return method(this).asAny()
+    }
+    if (!tryField) {
+        throw NoSuchPropertyException(name)
+    }
+    val field = this.javaClass.searchFieldOrNull(name, deepField)
+    if (field !== null) {
+        return field.getValue(this, true)
+    }
+    throw NoSuchPropertyException(name)
+}
+
+@JvmOverloads
+fun Any.setProperty(
+    name: String,
+    value: Any?,
+    type: Class<*> = this.javaClass,
+    tryField: Boolean = true,
+    deepField: Boolean = true
+) {
+    val method = this.javaClass.methodOrNull("set${name.capitalize()}", type)
+    if (method !== null) {
+        method(this, value)
+        return
+    }
+
+    if (!tryField) {
+        throw NoSuchPropertyException(name)
+    }
+    val field = this.javaClass.searchFieldOrNull(name, deepField)
+    if (field !== null) {
+        field.setValue(this, value, true)
+        return
+    }
+    throw NoSuchPropertyException(name)
 }
 
 /**
@@ -1384,3 +1427,5 @@ fun @Acceptable(
     }
     return null
 }
+
+class NoSuchPropertyException(name: String) : RuntimeException(name)
