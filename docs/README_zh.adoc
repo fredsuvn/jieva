@@ -5,7 +5,7 @@
 :emaill: fredsuvn@163.com
 :url: https://github.com/srclab-projects/boat
 :qq: 1037555759
-:boat-version: 1.0.0
+:boat-version: 0.1.0
 
 image::../logo.svg[Boat]
 

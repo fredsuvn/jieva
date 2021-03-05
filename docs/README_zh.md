@@ -5,7 +5,7 @@
 ## 变量
 
 * author: Sun Qian
-* boat-version: 1.0.0
+* boat-version: 0.1.0
 
 ## 修订
 
