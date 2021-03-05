@@ -18,6 +18,12 @@ More see [docs/](docs/)
 * https://github.com/srclab-projects/boat
 * QQ group: 1037555759
 
+## _License_
+
+[Apache 2.0 license][license]
+
+[license]: https://www.apache.org/licenses/LICENSE-2.0.html
+
 ---
 There seems to be something below...
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
