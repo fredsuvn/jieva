@@ -1839,4 +1839,6 @@ class IdSampleKt {
 
 ## <a id="license"/>License
 
-[Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html)
+[Apache 2.0 license][license]
+
+[license]: https://www.apache.org/licenses/LICENSE-2.0.html

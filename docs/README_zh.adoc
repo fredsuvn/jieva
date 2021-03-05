@@ -1,6 +1,10 @@
 = Boat: SrcLab的基础Java/kotlin库
 孙谦 <fredsuvn@163.com>
 :encoding: UTF-8
+:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
+:emaill: fredsuvn@163.com
+:url: https://github.com/srclab-projects/boat
+:qq: 1037555759
 :boat-version: 1.0.0
 
 image::../logo.svg[Boat]
@@ -18,11 +22,11 @@ image::../logo.svg[Boat]
 
 == 目录
 
-- <<introduction>>
-- <<getting>>
-- <<usage>>
-- <<contact>>
-- <<license>>
+* <<introduction>>
+* <<getting>>
+* <<usage>>
+* <<contact>>
+* <<license>>
 
 [#introduction]
 == 简介
@@ -72,25 +76,25 @@ https://github.com/srclab-projects/boat
 [#usage]
 == 使用
 
-- <<usage-annotations>>
-- <<usage-core>>
-* <<usage-core-base>>
-* <<usage-core-bean>>
-* <<usage-core-bus>>
-* <<usage-core-cache>>
-* <<usage-core-collect>>
-* <<usage-core-convert>>
-* <<usage-core-exception>>
-* <<usage-core-invoke>>
-* <<usage-core-jvm>>
-* <<usage-core-proxy>>
-* <<usage-core-reflect>>
-* <<usage-core-run>>
-* <<usage-core-state>>
-* <<usage-core-test>>
-- <<usage-serialize>>
-- <<usage-codec>>
-- <<usage-id>>
+* <<usage-annotations>>
+* <<usage-core>>
+** <<usage-core-base>>
+** <<usage-core-bean>>
+** <<usage-core-bus>>
+** <<usage-core-cache>>
+** <<usage-core-collect>>
+** <<usage-core-convert>>
+** <<usage-core-exception>>
+** <<usage-core-invoke>>
+** <<usage-core-jvm>>
+** <<usage-core-proxy>>
+** <<usage-core-reflect>>
+** <<usage-core-run>>
+** <<usage-core-state>>
+** <<usage-core-test>>
+* <<usage-serialize>>
+* <<usage-codec>>
+* <<usage-id>>
 
 [#usage-annotations]
 === BoatAnnotations (boat-annotations)
@@ -1886,11 +1890,11 @@ class IdSampleKt {
 [#contact]
 == 贡献和联系方式
 
-* fredsuvn@163.com
-* https://github.com/srclab-projects/boat
-* QQ群: 1037555759
+* {emaill}
+* {url}
+* QQ group: 1037555759
 
 [#license]
 == License
 
-https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
+{license}
