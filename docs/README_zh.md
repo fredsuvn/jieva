@@ -1,4 +1,4 @@
-# Boat: SrcLab的基础Java/kotlin库
+# Boat: SrcLab的核心基础Java/kotlin库
 
 ![Boat](../logo.svg)
 

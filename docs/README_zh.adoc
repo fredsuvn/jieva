@@ -1,4 +1,4 @@
-= Boat: SrcLab的基础Java/kotlin库
+= Boat: SrcLab的核心基础Java/kotlin库
 孙谦 <fredsuvn@163.com>
 :encoding: UTF-8
 :license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
