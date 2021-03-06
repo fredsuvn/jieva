@@ -18,4 +18,11 @@ internal data class OSpaceConfig(
     val endBoardFontSize: Int = 40,
     val infoDisplayBoardWidth: Int = 400,
     val infoDisplayBoardHeight: Int = 25,
+    val infoListSize: Int = 2,
+
+    //Debug
+    val isDebug: Boolean = false,
+
+    //Version
+    val version: String = "0.0.0",
 )

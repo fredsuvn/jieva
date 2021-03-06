@@ -8,6 +8,8 @@ internal interface OSpaceController : Controller<OSpaceData, OSpaceScenario> {
 
     val tick: OSpaceTick
 
+    val logger: OSpaceLogger
+
     fun moveLeft(player: Int)
 
     fun moveRight(player: Int)
