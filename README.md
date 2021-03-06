@@ -1,14 +1,16 @@
-# _Welcome to Boat_
+# Boat: SrcLab Core Libraries for Java/kotlin
 
 ![Boat](logo.svg)
 
+## _Choose the doc style and language you like_:
+
 - Markdown:
-    * [English](docs/README_en.md)
-    * [简体中文](docs/README_zh.md)
+  * [English](docs/README_en.md)
+  * [简体中文](docs/README_zh.md)
 
 - AsciiDoc:
-    * [English](docs/README_en.adoc)
-    * [简体中文](docs/README_zh.adoc)
+  * [English](docs/README_en.adoc)
+  * [简体中文](docs/README_zh.adoc)
 
 More see [docs/](docs/)
 
@@ -41,24 +43,24 @@ There seems to be something below...
 ```java
 public class EggSample {
 
-    @Test
-    public void testEgg() {
-        EggManager eggManager = BoatEggManager.INSTANCE;
-        Egg egg = eggManager.pick("O Space Battle");
-        //egg.hatchOut("Thank you, Taro.");
-        egg.hatchOut("谢谢你，泰罗。");
-    }
+  @Test
+  public void testEgg() {
+    EggManager eggManager = BoatEggManager.INSTANCE;
+    Egg egg = eggManager.pick("O Space Battle");
+    //egg.hatchOut("Thank you, Taro.");
+    egg.hatchOut("谢谢你，泰罗。");
+  }
 }
 ```
 
 ```kotlin
 class EggSampleKt {
 
-    @Test
-    fun testEgg() {
-        val egg = BoatEggManager.pick("O Space Battle")
-        //egg.hatchOut("Thank you, Taro.")
-        egg.hatchOut("谢谢你，泰罗。")
-    }
+  @Test
+  fun testEgg() {
+    val egg = BoatEggManager.pick("O Space Battle")
+    //egg.hatchOut("Thank you, Taro.")
+    egg.hatchOut("谢谢你，泰罗。")
+  }
 }
 ```
