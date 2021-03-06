@@ -28,6 +28,7 @@ private class OSpaceControllerImpl(
 ) : OSpaceController {
 
     override val tick = OSpaceTick(config)
+    override val logger: OSpaceLogger = OSpaceLogger(config)
 
     private val playingThread = PlayingThread()
     private val scenario: OSpaceScenario = data.scenario
@@ -286,7 +287,7 @@ private class OSpaceControllerImpl(
                             ammo.deathTime = tick.time
                         }
                         if (ammo.isOutOfBounds() || ammo.isDisappeared(tick.time)) {
-                            OSpaceLogger.debug("Ammo cleaned: {}", ammo.id)
+                            logger.debug("Ammo cleaned: {}", ammo.id)
                             iterator.remove()
                         }
                     }
@@ -297,7 +298,7 @@ private class OSpaceControllerImpl(
                     while (iterator.hasNext()) {
                         val living = iterator.next()
                         if (living.isOutOfBounds() || living.isDisappeared(tick.time)) {
-                            OSpaceLogger.debug("Living cleaned: {}-{}", living.javaClass.typeName, living.id)
+                            logger.debug("Living cleaned: {}-{}", living.javaClass.typeName, living.id)
                             iterator.remove()
                         }
                     }
@@ -414,7 +415,7 @@ private class OSpaceControllerImpl(
             synchronized(data) {
                 scenario.onEnd(data, this@OSpaceControllerImpl)
             }
-            OSpaceLogger.debug("Play thread $name over")
+            logger.debug("Play thread $name over")
         }
     }
 

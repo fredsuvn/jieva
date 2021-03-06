@@ -12,7 +12,7 @@ class OSpaceBattle : Egg {
             "Thank you, Taro.",
             "谢谢你，泰罗。",
             -> run()
-            else -> throw ImSevenNotTaro()
+            else -> throw IAmSevenNotTaro()
         }
     }
 
@@ -20,7 +20,7 @@ class OSpaceBattle : Egg {
         OSpaceView(OSpaceConfig()).isVisible = true
     }
 
-    private class ImSevenNotTaro : RuntimeException(
+    private class IAmSevenNotTaro : RuntimeException(
         """
         I AM ULTRA SEVEN, NOT ULTRAMAN TARO, YOU SHOULD THANK FOR SEVEN NOT TARO, FUCK YOU!
               fﾆヽ

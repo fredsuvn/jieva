@@ -4,7 +4,6 @@ import xyz.srclab.common.base.Current
 import xyz.srclab.common.egg.sample.View
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Font
 import java.awt.Graphics
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
@@ -36,7 +35,6 @@ private class GamePanel(
 
     private var controller = engine.loadNew()
     private val boardColor = Color.WHITE
-    private var endFont: Font? = null
 
     init {
         background = Color.BLACK
@@ -58,6 +56,12 @@ private class GamePanel(
         val data = controller.data
         val scenario = data.scenario
 
+        fun drawVersion() {
+            g.withColor(boardColor) {
+                it.drawString("v${config.version} ", x, view.insets.top)
+            }
+        }
+
         fun List<SubjectUnit>.draw() {
             for (subjectUnit in this) {
                 scenario.onDraw(subjectUnit, tick.time, g)
@@ -67,9 +71,9 @@ private class GamePanel(
         fun Player.drawScoreboard() {
             val x = if (this.number == 1) 0 else config.width - config.scoreboardWidth
             g.withColor(boardColor) {
-                it.drawString("Player " + this.number, x, view.insets.top)
-                it.drawString("Hit: " + this.hit, x, view.insets.top + config.scoreboardHeight)
-                it.drawString("Score: " + this.score, x, view.insets.top + config.scoreboardHeight * 2)
+                it.drawString("Player ${this.number}", x, view.insets.top + config.scoreboardHeight)
+                it.drawString("Hit: ${this.hit}", x, view.insets.top + config.scoreboardHeight * 2)
+                it.drawString("Score: ${this.score}", x, view.insets.top + config.scoreboardHeight * 3)
             }
         }
 
@@ -84,13 +88,10 @@ private class GamePanel(
             val x = config.width / 2 - config.infoDisplayBoardWidth / 2
             val y = config.height - config.infoDisplayBoardHeight * 4
             g.withColor(boardColor) {
-                val info1 = OSpaceLogger.info1
-                if (info1 !== null) {
-                    it.drawString("${info1.timestamp}: ${info1.message} ", x, y)
-                }
-                val info2 = OSpaceLogger.info2
-                if (info2 !== null) {
-                    it.drawString("${info2.timestamp}: ${info2.message} ", x, y + config.infoDisplayBoardHeight)
+                var height = 0
+                for (info in controller.logger.infos) {
+                    it.drawString("${info.timestamp}: ${info.message} ", x, y + height)
+                    height += config.infoDisplayBoardHeight
                 }
             }
         }
@@ -98,29 +99,18 @@ private class GamePanel(
         fun drawEndBoard() {
             val x = config.width / 2 - config.endBoardWidth / 2
             val y = config.height / 2 - config.endBoardHeight * 4 / 2
-            g.withColor(boardColor) {
-                val oldFont = it.font
-
-                fun getFont(): Font {
-                    val font = endFont
-                    if (font !== null) {
-                        return font
-                    }
-                    val newFont = Font(oldFont.name, oldFont.style, config.endBoardFontSize)
-                    endFont = newFont
-                    return newFont
+            g.withColor(boardColor) { graphics ->
+                graphics.withFontSize(config.endBoardFontSize) {
+                    it.drawString("Game Over! ", x, y)
+                    it.drawString("Player 1: ${data.player1.score}", x, y + config.endBoardHeight)
+                    it.drawString("Player 2: ${data.player2.score}", x, y + config.endBoardHeight * 2)
+                    it.drawString("Press G to Again!", x, y + config.endBoardHeight * 3)
                 }
-
-                it.font = getFont()
-                it.drawString("Game Over! ", x, y)
-                it.drawString("Player 1: " + data.player1.score, x, y + config.endBoardHeight)
-                it.drawString("Player 2: " + data.player2.score, x, y + config.endBoardHeight * 2)
-                it.drawString("Renew: G", x, y + config.endBoardHeight * 3)
-                it.font = oldFont
             }
         }
 
         synchronized(data) {
+            drawVersion()
             data.enemiesAmmos.draw()
             data.playersAmmos.draw()
             data.players.draw()

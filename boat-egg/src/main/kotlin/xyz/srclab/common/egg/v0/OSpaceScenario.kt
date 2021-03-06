@@ -16,11 +16,11 @@ internal class OSpaceScenario : Scenario {
         data.players.add(createPlayer1(config))
         data.players.add(createPlayer2(config))
         refresher.refresh(data, controller)
-        OSpaceLogger.info("Game start...")
+        controller.logger.info("Game start...")
     }
 
     fun onStop(data: OSpaceData, controller: OSpaceController) {
-        OSpaceLogger.info("Game stop...")
+        controller.logger.info("Game stop...")
     }
 
     fun onTick(data: OSpaceData, controller: OSpaceController) {
@@ -32,7 +32,7 @@ internal class OSpaceScenario : Scenario {
     }
 
     fun onEnd(data: OSpaceData, controller: OSpaceController) {
-        OSpaceLogger.info("Game over!")
+        controller.logger.info("Game over!")
     }
 
     fun onHitEnemy(ammo: Ammo, enemy: Enemy, data: OSpaceData, controller: OSpaceController) {
@@ -41,14 +41,14 @@ internal class OSpaceScenario : Scenario {
         player.score += enemy.score
         if (enemy.isDead) {
             val p = ammo.weapon.holder as Player
-            OSpaceLogger.info("Player-{} killed enemy-{} at {}", p.number, enemy.id, controller.tick.time)
+            controller.logger.info("Player-{} killed enemy-{} at {}", p.number, enemy.id, controller.tick.time)
         }
     }
 
     fun onHitPlayer(ammo: Ammo, player: Player, data: OSpaceData, controller: OSpaceController) {
         if (player.isDead) {
             val e = ammo.weapon.holder as Enemy
-            OSpaceLogger.info("Enemy-{} killed player-{} at {}", e.id, player.number, controller.tick.time)
+            controller.logger.info("Enemy-{} killed player-{} at {}", e.id, player.number, controller.tick.time)
         }
     }
 
@@ -137,6 +137,7 @@ private const val ENEMY_AMMO_DRAWER_ID = 130
 private open class BaseDrawer(
     override val id: Int,
     private val color: Color,
+    private val text: String? = null,
 ) : OSpaceDrawer {
 
     override fun draw(unit: SubjectUnit, tickTime: Long, graphics: Graphics) {
@@ -145,8 +146,14 @@ private open class BaseDrawer(
         val width = (unit.radius * 2).toInt()
 
         fun drawBody() {
-            graphics.withColor(color) {
-                it.fillOval(leftUpX, leftUpY, width, width)
+            graphics.withColor(color) { g ->
+                if (text === null) {
+                    g.fillOval(leftUpX, leftUpY, width, width)
+                } else {
+                    g.withFontSize(width) {
+                        it.drawString(text, leftUpX, leftUpY)
+                    }
+                }
             }
         }
 
@@ -216,8 +223,8 @@ private open class BaseDrawer(
 
 private object Player1Drawer : BaseDrawer(PLAYER_1_DRAWER_ID, Color.BLUE)
 private object Player2Drawer : BaseDrawer(PLAYER_2_DRAWER_ID, Color.GREEN)
-private object Player1AmmoDrawer : BaseDrawer(PLAYER_1_AMMO_DRAWER_ID, Color.MAGENTA)
-private object Player2AmmoDrawer : BaseDrawer(PLAYER_2_AMMO_DRAWER_ID, Color.YELLOW)
+private object Player1AmmoDrawer : BaseDrawer(PLAYER_1_AMMO_DRAWER_ID, Color.MAGENTA, "安")
+private object Player2AmmoDrawer : BaseDrawer(PLAYER_2_AMMO_DRAWER_ID, Color.YELLOW, "信")
 private object EnemyDrawer : BaseDrawer(ENEMY_DRAWER_ID, Color.GRAY)
 private object EnemyAmmoDrawer : BaseDrawer(ENEMY_AMMO_DRAWER_ID, Color.GRAY)
 
