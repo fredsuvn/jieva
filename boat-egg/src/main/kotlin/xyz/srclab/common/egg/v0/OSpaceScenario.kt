@@ -223,8 +223,8 @@ private open class BaseDrawer(
 
 private object Player1Drawer : BaseDrawer(PLAYER_1_DRAWER_ID, Color.BLUE)
 private object Player2Drawer : BaseDrawer(PLAYER_2_DRAWER_ID, Color.GREEN)
-private object Player1AmmoDrawer : BaseDrawer(PLAYER_1_AMMO_DRAWER_ID, Color.MAGENTA, "安")
-private object Player2AmmoDrawer : BaseDrawer(PLAYER_2_AMMO_DRAWER_ID, Color.YELLOW, "信")
+private object Player1AmmoDrawer : BaseDrawer(PLAYER_1_AMMO_DRAWER_ID, Color.MAGENTA)
+private object Player2AmmoDrawer : BaseDrawer(PLAYER_2_AMMO_DRAWER_ID, Color.YELLOW)
 private object EnemyDrawer : BaseDrawer(ENEMY_DRAWER_ID, Color.GRAY)
 private object EnemyAmmoDrawer : BaseDrawer(ENEMY_AMMO_DRAWER_ID, Color.GRAY)
 
