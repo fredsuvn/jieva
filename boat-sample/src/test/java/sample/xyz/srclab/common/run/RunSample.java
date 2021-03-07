@@ -5,8 +5,8 @@ import xyz.srclab.common.base.Current;
 import xyz.srclab.common.base.IntRef;
 import xyz.srclab.common.run.Runner;
 import xyz.srclab.common.run.Running;
-import xyz.srclab.common.run.ScheduledRunner;
-import xyz.srclab.common.run.ScheduledRunning;
+import xyz.srclab.common.run.Scheduler;
+import xyz.srclab.common.run.Scheduling;
 import xyz.srclab.common.test.TestLogger;
 
 import java.time.Duration;
@@ -30,14 +30,14 @@ public class RunSample {
 
     @Test
     public void testScheduledRunner() {
-        ScheduledRunner runner = ScheduledRunner.SINGLE_THREAD_RUNNER;
+        Scheduler scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER;
         IntRef intRef = IntRef.of(0);
-        ScheduledRunning<?> running = runner.scheduleWithFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
+        Scheduling<?> scheduling = scheduler.scheduleFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
             intRef.set(intRef.get() + 100);
             return null;
         });
         Current.sleep(2500);
-        running.cancel(false);
+        scheduling.cancel(false);
         //300
         logger.log("int: {}", intRef.get());
     }

@@ -11,7 +11,7 @@ import java.util.concurrent.*
  * @see AsyncRunner
  * @see ExecutorServiceRunner
  * @see ThreadPoolRunner
- * @see ScheduledRunner
+ * @see Scheduler
  */
 interface Runner : Executor {
 

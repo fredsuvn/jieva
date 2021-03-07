@@ -5,11 +5,11 @@ import java.time.Duration
 import java.util.concurrent.*
 
 /**
- * A type of [ScheduledRunner] use [ScheduledThreadPoolExecutor].
+ * A type of [Scheduler] use [ScheduledThreadPoolExecutor].
  */
-class ScheduledThreadPoolRunner(
+class ScheduledThreadPoolScheduler(
     private val scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor
-) : ScheduledExecutorServiceRunner(scheduledThreadPoolExecutor) {
+) : ScheduledExecutorServiceScheduler(scheduledThreadPoolExecutor) {
 
     val corePoolSize: Int
         @JvmName("corePoolSize") get() {
@@ -145,8 +145,8 @@ class ScheduledThreadPoolRunner(
             this.removeOnCancelPolicy = removeOnCancelPolicy
         }
 
-        fun build(): ScheduledThreadPoolRunner {
-            return ScheduledThreadPoolRunner(createScheduledExecutorService())
+        fun build(): ScheduledThreadPoolScheduler {
+            return ScheduledThreadPoolScheduler(createScheduledExecutorService())
         }
 
         private fun createScheduledExecutorService(): ScheduledThreadPoolExecutor {
