@@ -166,7 +166,7 @@ public class AnnotationSample {
 
 [source,kotlin]
 ----
-class AnnotationSampleKt {
+class AnnotationSample {
 
     @Test
     fun testAnnotations() {
@@ -185,7 +185,7 @@ class AnnotationSampleKt {
         this.append(readOnly)
     }
 }
-class AnnotationSampleKt {
+class AnnotationSample {
 
     @Test
     fun testAnnotations() {
@@ -518,7 +518,7 @@ public class BaseSample {
 
 [source,kotlin]
 ----
-class BaseSampleKt {
+class BaseSample {
 
     @Test
     fun testCurrent() {
@@ -847,7 +847,7 @@ public class BeanSample {
 
 [source,kotlin]
 ----
-class BeanSampleKt {
+class BeanSample {
 
     @Test
     fun testBean() {
@@ -940,7 +940,7 @@ public class EventBusSample {
 
 [source,kotlin]
 ----
-class EventBusSampleKt {
+class EventBusSample {
 
     @Test
     fun testEventBus() {
@@ -1025,7 +1025,7 @@ public class CacheSample {
 
 [source,kotlin]
 ----
-class CacheSampleKt {
+class CacheSample {
 
     @Test
     fun testCache() {
@@ -1168,7 +1168,7 @@ public class ConvertSample {
 
 [source,kotlin]
 ----
-class ConvertSampleKt {
+class ConvertSample {
 
     @Test
     fun testConvert() {
@@ -1236,7 +1236,7 @@ public class ExceptionSample {
 
 [source,kotlin]
 ----
-class ExceptionSampleKt {
+class ExceptionSample {
 
     @Test
     fun testStatusException() {
@@ -1280,7 +1280,7 @@ public class InvokeSample {
 
 [source,kotlin]
 ----
-class InvokeSampleKt {
+class InvokeSample {
 
     @Test
     fun testInvoke() {
@@ -1322,7 +1322,7 @@ public class JvmSample {
 
 [source,kotlin]
 ----
-class JvmSampleKt {
+class JvmSample {
 
     @Test
     fun testJvms() {
@@ -1391,7 +1391,7 @@ public class ProxySample {
 
 [source,kotlin]
 ----
-class ProxySampleKt {
+class ProxySample {
 
     @Test
     fun testProxy() {
@@ -1469,7 +1469,7 @@ public class ReflectSample {
 
 [source,kotlin]
 ----
-class ReflectSampleKt {
+class ReflectSample {
 
     @Test
     fun testReflects() {
@@ -1539,7 +1539,7 @@ public class RunSample {
 
 [source,kotlin]
 ----
-class RunSampleKt {
+class RunSample {
 
     @Test
     fun testRunner() {
@@ -1635,7 +1635,7 @@ public class StateSample {
 
 [source,kotlin]
 ----
-class StateSampleKt {
+class StateSample {
 
     @Test
     fun testState() {
@@ -1696,7 +1696,7 @@ public class TestSample {
 
 [source,kotlin]
 ----
-class TestSampleKt {
+class TestSample {
 
     @Test
     fun testTests() {
@@ -1745,7 +1745,7 @@ public class SerializeSample {
 
 [source,kotlin]
 ----
-class SerializeSampleKt {
+class SerializeSample {
 
     @Test
     fun testJsonSerialize() {
@@ -1804,7 +1804,7 @@ public class CodecSample {
 
 [source,kotlin]
 ----
-class CodecSampleKt {
+class CodecSample {
 
     @Test
     fun testCodec() {
@@ -1869,7 +1869,7 @@ public class IdSample {
 
 [source,kotlin]
 ----
-class IdSampleKt {
+class IdSample {
 
     @Test
     fun testId() {

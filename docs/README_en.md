@@ -157,7 +157,7 @@ public class AnnotationSample {
 #### Kotlin Examples
 
 ```kotlin
-class AnnotationSampleKt {
+class AnnotationSample {
 
   @Test
   fun testAnnotations() {
@@ -176,7 +176,7 @@ class AnnotationSampleKt {
     this.append(readOnly)
   }
 }
-class AnnotationSampleKt {
+class AnnotationSample {
 
   @Test
   fun testAnnotations() {
@@ -505,7 +505,7 @@ public class BaseSample {
 ##### Kotlin Examples
 
 ```kotlin
-class BaseSampleKt {
+class BaseSample {
 
   @Test
   fun testCurrent() {
@@ -831,7 +831,7 @@ public class BeanSample {
 ##### Kotlin Examples
 
 ```kotlin
-class BeanSampleKt {
+class BeanSample {
 
   @Test
   fun testBean() {
@@ -921,7 +921,7 @@ public class EventBusSample {
 ##### Kotlin Examples
 
 ```kotlin
-class EventBusSampleKt {
+class EventBusSample {
 
   @Test
   fun testEventBus() {
@@ -1003,7 +1003,7 @@ public class CacheSample {
 ##### Kotlin Examples
 
 ```kotlin
-class CacheSampleKt {
+class CacheSample {
 
   @Test
   fun testCache() {
@@ -1141,7 +1141,7 @@ public class ConvertSample {
 ##### Kotlin Examples
 
 ```kotlin
-class ConvertSampleKt {
+class ConvertSample {
 
   @Test
   fun testConvert() {
@@ -1207,7 +1207,7 @@ public class ExceptionSample {
 ##### Kotlin Examples
 
 ```kotlin
-class ExceptionSampleKt {
+class ExceptionSample {
 
   @Test
   fun testStatusException() {
@@ -1248,7 +1248,7 @@ public class InvokeSample {
 ##### Kotlin Examples
 
 ```kotlin
-class InvokeSampleKt {
+class InvokeSample {
 
   @Test
   fun testInvoke() {
@@ -1287,7 +1287,7 @@ public class JvmSample {
 ##### Kotlin Examples
 
 ```kotlin
-class JvmSampleKt {
+class JvmSample {
 
   @Test
   fun testJvms() {
@@ -1353,7 +1353,7 @@ public class ProxySample {
 ##### Kotlin Examples
 
 ```kotlin
-class ProxySampleKt {
+class ProxySample {
 
   @Test
   fun testProxy() {
@@ -1428,7 +1428,7 @@ public class ReflectSample {
 ##### Kotlin Examples
 
 ```kotlin
-class ReflectSampleKt {
+class ReflectSample {
 
   @Test
   fun testReflects() {
@@ -1495,7 +1495,7 @@ public class RunSample {
 ##### Kotlin Examples
 
 ```kotlin
-class RunSampleKt {
+class RunSample {
 
   @Test
   fun testRunner() {
@@ -1588,7 +1588,7 @@ public class StateSample {
 ##### Kotlin Examples
 
 ```kotlin
-class StateSampleKt {
+class StateSample {
 
   @Test
   fun testState() {
@@ -1646,7 +1646,7 @@ public class TestSample {
 ##### Kotlin Examples
 
 ```kotlin
-class TestSampleKt {
+class TestSample {
 
   @Test
   fun testTests() {
@@ -1693,7 +1693,7 @@ public class SerializeSample {
 #### Kotlin Examples
 
 ```kotlin
-class SerializeSampleKt {
+class SerializeSample {
 
   @Test
   fun testJsonSerialize() {
@@ -1750,7 +1750,7 @@ public class CodecSample {
 #### Kotlin Examples
 
 ```kotlin
-class CodecSampleKt {
+class CodecSample {
 
   @Test
   fun testCodec() {
@@ -1813,7 +1813,7 @@ public class IdSample {
 #### Kotlin Examples
 
 ```kotlin
-class IdSampleKt {
+class IdSample {
 
   @Test
   fun testId() {
