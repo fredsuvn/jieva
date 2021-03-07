@@ -54,7 +54,7 @@ public class EggSample {
 ```
 
 ```kotlin
-class EggSampleKt {
+class EggSample {
 
   @Test
   fun testEgg() {
