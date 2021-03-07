@@ -58,11 +58,7 @@ open class ExecutorServiceRunner(
     ) : Running<V> {
 
         private val runningTask = RunningTask(task)
-        private val future: Future<V>
-
-        init {
-            future = executorService.submit(runningTask)
-        }
+        private val future: Future<V> = executorService.submit(runningTask)
 
         override val isStart: Boolean
             get() {

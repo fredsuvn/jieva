@@ -1451,7 +1451,7 @@ class ReflectSampleKt {
 
 #### <a id="usage-core-run"/>Run
 
-Run包提供Runner和ScheduledRunner接口来运行一段代码, 可以在一个线程或者协程里.
+Run包提供Runner和Scheduler接口来运行一段代码, 可以在一个线程或者协程里.
 
 ##### Java Examples
 
@@ -1475,14 +1475,14 @@ public class RunSample {
 
   @Test
   public void testScheduledRunner() {
-    ScheduledRunner runner = ScheduledRunner.SINGLE_THREAD_RUNNER;
+    Scheduler scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER;
     IntRef intRef = IntRef.of(0);
-    ScheduledRunning<?> running = runner.scheduleWithFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
+    Scheduling<?> scheduling = scheduler.scheduleFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
       intRef.set(intRef.get() + 100);
       return null;
     });
     Current.sleep(2500);
-    running.cancel(false);
+    scheduling.cancel(false);
     //300
     logger.log("int: {}", intRef.get());
   }
@@ -1509,14 +1509,14 @@ class RunSampleKt {
 
   @Test
   fun testScheduledRunner() {
-    val runner = ScheduledRunner.SINGLE_THREAD_RUNNER
+    val scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER
     val intRef = of(0)
-    val running: ScheduledRunning<*> = runner.scheduleWithFixedDelay<Any?>(Duration.ZERO, Duration.ofMillis(1000)) {
+    val scheduling: Scheduling<*> = scheduler.scheduleFixedDelay<Any?>(Duration.ZERO, Duration.ofMillis(1000)) {
       intRef.set(intRef.get() + 100)
       null
     }
     sleep(2500)
-    running.cancel(false)
+    scheduling.cancel(false)
     //300
     logger.log("int: {}", intRef.get())
   }

@@ -58,50 +58,50 @@ public class RunTest {
 
     @Test
     public void testScheduledRunSync() {
-        ScheduledRunner runner = ScheduledRunner.SINGLE_THREAD_RUNNER;
-        doTestScheduledRunSync(runner);
+        Scheduler scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER;
+        doTestScheduledRunSync(scheduler);
     }
 
     @Test
     public void testScheduledThreadPoolRunSync() {
-        ScheduledRunner runner = ScheduledThreadPoolRunner.newBuilder().build();
-        doTestScheduledRunSync(runner);
+        Scheduler scheduler = ScheduledThreadPoolScheduler.newBuilder().build();
+        doTestScheduledRunSync(scheduler);
     }
 
-    private void doTestScheduledRunSync(ScheduledRunner runner) {
+    private void doTestScheduledRunSync(Scheduler scheduler) {
         Counter counter = Counter.startsAt(0);
-        ScheduledRunning<?> running = runner.schedule(Duration.ofMillis(1000), () -> {
+        Scheduling<?> scheduling = scheduler.schedule(Duration.ofMillis(1000), () -> {
             Current.sleep(1000);
             logger.log(counter.incrementAndGetInt());
             return null;
         });
-        Assert.assertFalse(running.isEnd());
+        Assert.assertFalse(scheduling.isEnd());
         Current.sleep(2500);
-        Assert.assertTrue(running.isEnd());
+        Assert.assertTrue(scheduling.isEnd());
         Assert.assertEquals(counter.getInt(), 1);
 
         counter.reset();
-        running = runner.scheduleAtFixedRate(Duration.ZERO, Duration.ofMillis(1000), () -> {
+        scheduling = scheduler.scheduleFixedRate(Duration.ZERO, Duration.ofMillis(1000), () -> {
             Current.sleep(1000);
             logger.log(counter.incrementAndGetInt());
             return null;
         });
-        Assert.assertFalse(running.isEnd());
+        Assert.assertFalse(scheduling.isEnd());
         Current.sleep(2500);
-        Assert.assertFalse(running.isEnd());
-        running.cancel(false);
-        Assert.assertTrue(running.isEnd());
+        Assert.assertFalse(scheduling.isEnd());
+        scheduling.cancel(false);
+        Assert.assertTrue(scheduling.isEnd());
 
         counter.reset();
-        running = runner.scheduleWithFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
+        scheduling = scheduler.scheduleFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
             Current.sleep(1000);
             logger.log(counter.incrementAndGetInt());
             return null;
         });
-        Assert.assertFalse(running.isEnd());
+        Assert.assertFalse(scheduling.isEnd());
         Current.sleep(3000);
-        Assert.assertFalse(running.isEnd());
-        running.cancel(false);
-        Assert.assertTrue(running.isEnd());
+        Assert.assertFalse(scheduling.isEnd());
+        scheduling.cancel(false);
+        Assert.assertTrue(scheduling.isEnd());
     }
 }

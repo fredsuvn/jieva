@@ -5,4 +5,4 @@ import java.util.concurrent.ScheduledFuture
 /**
  * Scheduled run processing.
  */
-interface ScheduledRunning<V> : Running<V>, ScheduledFuture<V>
+interface Scheduling<V> : Running<V>, ScheduledFuture<V>
