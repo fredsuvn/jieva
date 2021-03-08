@@ -46,7 +46,7 @@ if (infos.publish.isPublish) {
       mavenLocal()
       if (infos.publish.isSnapshot) {
         maven {
-          name = "${infos.publish.snapshotId}Snapshot"
+          name = "${infos.publish.snapshotId}"
           url = infos.publish.urls.snapshot
           credentials {
             username = "${passwords."${infos.publish.snapshotId}".username}"
@@ -54,13 +54,13 @@ if (infos.publish.isPublish) {
           }
         }
       }
-      if (infos.publish.isOfficial) {
+      if (infos.publish.isRelease) {
         maven {
-          name = "${infos.publish.officialId}"
+          name = "${infos.publish.releaseId}"
           url = infos.publish.urls.staging
           credentials {
-            username = "${passwords."${infos.publish.officialId}".username}"
-            password = "${passwords."${infos.publish.officialId}".password}"
+            username = "${passwords."${infos.publish.releaseId}".username}"
+            password = "${passwords."${infos.publish.releaseId}".password}"
           }
         }
       }
