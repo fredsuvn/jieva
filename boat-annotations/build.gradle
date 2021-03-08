@@ -2,6 +2,7 @@ plugins {
   id 'build.kotlin-publish-jar'
 }
 
+group = "xyz.srclab.annotations"
 description = "Boat Annotations"
 
 java {
