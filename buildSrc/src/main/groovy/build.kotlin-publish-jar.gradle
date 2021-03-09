@@ -34,7 +34,7 @@ artifacts {
 //compileKotlin.inputs.files(processResources)
 //compileJava.inputs.files(processResources)
 
-if (infos.publish.isPublish) {
+if (infos.publish.enablePublish) {
   publishing {
     publications {
       maven(MavenPublication) {

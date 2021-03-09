@@ -7,7 +7,7 @@ plugins {
 
 printer.info("${project.name}: import kotlin-publish-platform")
 
-if (infos.publish.isPublish) {
+if (infos.publish.enablePublish) {
   publishing {
     publications {
       maven(MavenPublication) {
