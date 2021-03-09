@@ -4,22 +4,19 @@
 ext["infos"] = [
 
     //Version
-    version            : "0.1.0",
-
-    //Dependencies version
-    dependenciesVersion: "1.1.1",
+    version      : "0.1.0",
 
     //Group
-    group              : "xyz.srclab.common",
+    group        : "xyz.srclab.common",
 
     //Project url
-    url                : "https://github.com/srclab-projects/boat",
+    url          : "https://github.com/srclab-projects/boat",
 
     //Project inception year
-    inceptionYear      : "2020",
+    inceptionYear: "2020",
 
     //Licenses
-    licenses           : [
+    licenses     : [
         [
             name: "The Apache License, Version 2.0",
             url : "http://www.apache.org/licenses/LICENSE-2.0.txt",
@@ -27,7 +24,7 @@ ext["infos"] = [
     ],
 
     //Developers
-    developers         : [
+    developers   : [
         [
             id   : "fredsuvn",
             name : "孙谦",
@@ -44,7 +41,7 @@ ext["infos"] = [
     ],
 
     //Publish info
-    publish            : [
+    publish      : [
         //Whether publish
         enablePublish: true,
 

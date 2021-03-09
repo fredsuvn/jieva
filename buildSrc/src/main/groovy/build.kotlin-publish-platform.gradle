@@ -18,23 +18,27 @@ if (infos.publish.enablePublish) {
           description = project.description
           url = infos.url
           inceptionYear = infos.inceptionYear
-          licenses {
-            infos.licenses.forEach { each ->
-              license {
-                name = each.name
-                url = each.url
-              }
-            }
-          }
           scm {
             connection = "scm:git:${infos.url}.git"
             developerConnection = "scm:git:${infos.url}.git"
             url = infos.url
           }
-          developers {
-            infos.developers.forEach { each ->
-              developer {
-                email = each.email
+          if (infos.licenses != null) {
+            licenses {
+              infos.licenses.forEach { each ->
+                license {
+                  name = each.name
+                  url = each.url
+                }
+              }
+            }
+          }
+          if (infos.developers != null) {
+            developers {
+              infos.developers.forEach { each ->
+                developer {
+                  email = each.email
+                }
               }
             }
           }
