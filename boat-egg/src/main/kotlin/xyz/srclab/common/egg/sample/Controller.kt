@@ -5,7 +5,7 @@ import xyz.srclab.common.egg.Egg
 /**
  * Controller of [Egg].
  */
-interface Controller<D : Data<S>, S : Scenario> {
+interface Controller<D : Data<*>> {
 
     val data: D
 

@@ -1,6 +1,10 @@
 package xyz.srclab.common.egg.sample
 
+import xyz.srclab.common.egg.Egg
+
 /**
+ * View of [Egg].
+ *
  * @author sunqian
  */
-interface View<E : Engine<C, D, S>, C : Controller<D, S>, D : Data<S>, S : Scenario>
+interface View

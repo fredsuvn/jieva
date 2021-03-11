@@ -12,7 +12,7 @@ import javax.swing.JPanel
 
 internal class OSpaceView(
     config: OSpaceConfig,
-) : JFrame("O Space Battle"), View<OSpaceEngine, OSpaceController, OSpaceData, OSpaceScenario> {
+) : JFrame("O Space Battle"), View {
 
     init {
         this.isResizable = false

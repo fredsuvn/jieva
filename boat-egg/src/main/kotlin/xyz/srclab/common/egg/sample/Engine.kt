@@ -5,7 +5,7 @@ import xyz.srclab.common.egg.Egg
 /**
  * Engine of [Egg].
  */
-interface Engine<C : Controller<D, S>, D : Data<S>, S : Scenario> {
+interface Engine<C : Controller<D>, D : Data<*>> {
 
     fun loadNew(): C
 
