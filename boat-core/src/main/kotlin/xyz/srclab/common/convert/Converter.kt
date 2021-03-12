@@ -25,10 +25,8 @@ import kotlin.collections.LinkedHashSet
 import kotlin.collections.plus
 import kotlin.collections.toList
 
-private const val NULL = "I am null!"
-
 /**
- * Converter.
+ * Converter, global type convert interface, to convert object to another type.
  *
  * @see ConvertHandler
  * @see NopConvertHandler
@@ -122,6 +120,11 @@ interface Converter {
     }
 }
 
+/**
+ * Handler for [Converter].
+ *
+ * @see Converter
+ */
 interface ConvertHandler {
 
     /**
