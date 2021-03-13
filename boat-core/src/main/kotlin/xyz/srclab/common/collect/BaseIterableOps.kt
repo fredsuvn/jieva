@@ -687,6 +687,10 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().toLinkedList()
     }
 
+    open fun toEnumeration(): Enumeration<T> {
+        return finalIterable().toEnumeration()
+    }
+
     open fun asToCollection(): Collection<T> {
         return finalIterable().asToCollection()
     }

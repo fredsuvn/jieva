@@ -990,6 +990,18 @@ fun <T> Iterable<T>.toLinkedList(): LinkedList<T> {
     return this.toCollection(LinkedList())
 }
 
+fun <T> Iterable<T>.toEnumeration():Enumeration<T>{
+    val iterator = this.iterator()
+    return object:Enumeration<T>{
+        override fun hasMoreElements(): Boolean {
+            return iterator.hasNext()
+        }
+        override fun nextElement(): T {
+            return iterator.next()
+        }
+    }
+}
+
 fun <T> Iterable<T>.asToCollection(): Collection<T> {
     return if (this is Collection<T>) this else this.toSet()
 }
