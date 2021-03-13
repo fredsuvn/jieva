@@ -1069,7 +1069,8 @@ public class CollectSample {
 Convert package provides type-conversion function：
 
 * Converts: Utilities for conversion;
-* Converter: Core interfaces for type-conversion, Converts use its default implementation.
+* Converter: Core interfaces for type-conversion, Converts use its default implementation;
+* FastConverter: Fast and narrowing version of Converter.
 
 ##### Java Examples
 
@@ -1092,6 +1093,13 @@ public class ConvertSample {
     logger.log("b1: {}", b.getP1());
     //2
     logger.log("b1: {}", b.getP2());
+
+    FastConverter<String> fastConverter = FastConverter.newFastConverter(
+        Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
+    //123
+    logger.log(fastConverter.convert(new StringBuilder("123")));
+    //123123
+    logger.log(fastConverter.convert("123"));
   }
 
   public static class A {
@@ -1135,6 +1143,34 @@ public class ConvertSample {
       this.p2 = p2;
     }
   }
+
+  private static class ObjectConvertHandler implements FastConvertHandler<String> {
+
+    @NotNull
+    @Override
+    public Class<?> supportedType() {
+      return Object.class;
+    }
+
+    @Override
+    public String convert(@NotNull Object from) {
+      return from.toString();
+    }
+  }
+
+  private static class StringConvertHandler implements FastConvertHandler<String> {
+
+    @NotNull
+    @Override
+    public Class<?> supportedType() {
+      return String.class;
+    }
+
+    @Override
+    public String convert(@NotNull Object from) {
+      return from.toString() + from.toString();
+    }
+  }
 }
 ```
 
@@ -1158,20 +1194,47 @@ class ConvertSample {
     logger.log("b1: {}", b.p1)
     //2
     logger.log("b1: {}", b.p2)
+
+    val fastConverter = newFastConverter(listOf(ObjectConvertHandler(), StringConvertHandler()))
+    //123
+    //123
+    logger.log(fastConverter.convert(StringBuilder("123")))
+    //123123
+    //123123
+    logger.log(fastConverter.convert("123"))
   }
 
-  class A {
-    var p1: String? = null
-    var p2: String? = null
-  }
-
-  class B {
-    var p1 = 0
-    var p2 = 0
-  }
 
   companion object {
     private val logger = TestLogger.DEFAULT
+  }
+}
+
+class A {
+  var p1: String? = null
+  var p2: String? = null
+}
+
+class B {
+  var p1 = 0
+  var p2 = 0
+}
+
+private class ObjectConvertHandler : FastConvertHandler<String> {
+
+  override val supportedType: Class<*> = Any::class.java
+
+  override fun convert(from: Any): String {
+    return from.toString()
+  }
+}
+
+private class StringConvertHandler : FastConvertHandler<String> {
+
+  override val supportedType: Class<*> = String::class.java
+
+  override fun convert(from: Any): String {
+    return from.toString() + from.toString()
   }
 }
 ```

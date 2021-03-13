@@ -7,7 +7,7 @@ import java.util.*
 import kotlin.collections.HashSet
 import kotlin.random.Random
 
-internal class OSpaceEngine(private val config: OSpaceConfig) : Engine<OSpaceController, OSpaceData, OSpaceScenario> {
+internal class OSpaceEngine(private val config: OSpaceConfig) : Engine<OSpaceController, OSpaceData> {
 
     override fun loadNew(): OSpaceController {
         return load(newOSpaceData())

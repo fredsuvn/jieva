@@ -1,7 +1,9 @@
 pluginManagement {
   repositories {
+    maven {
+      url "https://maven.aliyun.com/repository/gradle-plugin"
+    }
     gradlePluginPortal()
-    jcenter()
   }
   plugins {
     id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
