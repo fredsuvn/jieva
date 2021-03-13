@@ -4,7 +4,7 @@
 ext["infos"] = [
 
     //Version
-    version      : "0.1.0",
+    version      : "0.0.0",
 
     //Group
     group        : "xyz.srclab.common",
