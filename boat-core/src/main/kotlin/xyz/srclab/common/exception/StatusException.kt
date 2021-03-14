@@ -15,7 +15,7 @@ open class StatusException @JvmOverloads constructor(
     private val exceptionStatus: ExceptionStatus,
     cause: Throwable? = null
 ) : RuntimeException(
-    exceptionStatus.toExceptionMessage(), cause
+    exceptionStatus.toString(), cause
 ), ExceptionStatus {
 
     constructor() : this(ExceptionStatus.UNKNOWN)
