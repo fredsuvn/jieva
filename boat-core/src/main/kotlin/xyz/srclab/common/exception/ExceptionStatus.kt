@@ -20,11 +20,6 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
         return ExceptionStatusImpl(code, this.descriptions.moreDescriptions(moreDescription))
     }
 
-    @JvmDefault
-    fun toExceptionMessage(): String {
-        return toString()
-    }
-
     companion object {
 
         @JvmField
