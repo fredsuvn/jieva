@@ -4,4 +4,9 @@ package xyz.srclab.common.exception
  * @author sunqian
  */
 open class ShouldNotException @JvmOverloads constructor(message: String? = null) :
-    StatusException(ExceptionStatus.SHOULD_NOT.withMoreDescription(message))
+    StatusException(
+        if (message === null)
+            ExceptionStatus.SHOULD_NOT
+        else
+            ExceptionStatus.SHOULD_NOT.withMoreDescription(message)
+    )

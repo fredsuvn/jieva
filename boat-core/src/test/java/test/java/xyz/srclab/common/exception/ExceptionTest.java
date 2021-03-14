@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.exception.ExceptionStatus;
 import xyz.srclab.common.exception.ShouldNotException;
 import xyz.srclab.common.exception.StatusException;
-import xyz.srclab.common.state.State;
 
 /**
  * @author sunqian
@@ -23,7 +22,7 @@ public class ExceptionTest {
 
         TestException testException2 = new TestException("8", "888", shouldNotException);
         ExceptionStatus exceptionStatus = testException2.withMoreDescription("999");
-        Assert.assertEquals(exceptionStatus.description(), State.moreDescription("888", "999"));
+        Assert.assertEquals(exceptionStatus.description(), "888[999]");
         ExceptionStatus exceptionStatus2 = testException2.withNewDescription("999");
         Assert.assertEquals(exceptionStatus2.description(), "999");
     }
