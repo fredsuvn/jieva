@@ -1,10 +1,9 @@
 package xyz.srclab.common.exception
 
+import xyz.srclab.common.state.CharsState
+import xyz.srclab.common.state.CharsState.Companion.moreDescriptions
+import xyz.srclab.common.state.CharsState.Companion.newDescriptions
 import xyz.srclab.common.state.State
-import xyz.srclab.common.state.State.Companion.stateEquals
-import xyz.srclab.common.state.State.Companion.stateHashCode
-import xyz.srclab.common.state.State.Companion.stateMoreDescription
-import xyz.srclab.common.state.State.Companion.stateToString
 
 /**
  * [State] for exception.
@@ -13,18 +12,17 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
 
     @JvmDefault
     override fun withNewDescription(newDescription: String?): ExceptionStatus {
-        return if (description == newDescription)
-            this
-        else
-            of(code, newDescription)
+        return ExceptionStatusImpl(code, newDescriptions(newDescription))
     }
 
     @JvmDefault
-    override fun withMoreDescription(moreDescription: String?): ExceptionStatus {
-        return if (moreDescription === null)
-            this
-        else
-            of(code, description.stateMoreDescription(moreDescription))
+    override fun withMoreDescription(moreDescription: String): ExceptionStatus {
+        return ExceptionStatusImpl(code, this.descriptions.moreDescriptions(moreDescription))
+    }
+
+    @JvmDefault
+    fun toExceptionMessage(): String {
+        return toString()
     }
 
     companion object {
@@ -41,28 +39,25 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
         @JvmStatic
         @JvmOverloads
         fun of(code: CharSequence, description: CharSequence? = null): ExceptionStatus {
-            return ExceptionStatusImpl(code, description)
+            return ExceptionStatusImpl(code.toString(), listOf(description.toString()))
         }
     }
 }
 
 private class ExceptionStatusImpl(
     code: CharSequence,
-    description: CharSequence?
-) : ExceptionStatus {
+    descriptions: List<CharSequence> = emptyList()
+) : CharsState<ExceptionStatus>(code, descriptions), ExceptionStatus {
 
-    override val code = code.toString()
-    override val description = description?.toString()
-
-    override fun equals(other: Any?): Boolean {
-        return this.stateEquals(other)
+    override fun newStateImpl(code: String, descriptions: List<String>): ExceptionStatus {
+        return ExceptionStatusImpl(code, descriptions)
     }
 
-    override fun hashCode(): Int {
-        return this.stateHashCode()
+    override fun withNewDescription(newDescription: String?): ExceptionStatus {
+        return super<ExceptionStatus>.withNewDescription(newDescription)
     }
 
-    override fun toString(): String {
-        return this.stateToString()
+    override fun withMoreDescription(moreDescription: String): ExceptionStatus {
+        return super<ExceptionStatus>.withMoreDescription(moreDescription)
     }
 }

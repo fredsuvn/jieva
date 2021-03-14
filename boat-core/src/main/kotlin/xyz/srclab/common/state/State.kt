@@ -7,12 +7,15 @@ import xyz.srclab.common.exception.ExceptionStatus
 import xyz.srclab.common.exception.StatusException
 
 /**
+ * Represents a state or status.
+ *
  * @param C code type
  * @param D description type
  * @param T state type
  *
  * @author sunqian
  *
+ * @see CharsState
  * @see ExceptionStatus
  * @see StatusException
  */
@@ -22,18 +25,28 @@ interface State<C, D, T : State<C, D, T>> {
     val code: C
         @JvmName("code") get
 
+    /**
+     * Returns total [descriptions] as one description, or null if [descriptions] is empty.
+     */
     @Suppress(INAPPLICABLE_JVM_NAME)
     val description: D?
         @JvmName("description") get
 
+    /**
+     * Returns all this state's own description and descriptions inherited by [withNewDescription].
+     */
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val descriptions: List<D>
+        @JvmName("descriptions") get
+
     fun withNewDescription(newDescription: D?): T
 
-    fun withMoreDescription(moreDescription: D?): T
+    fun withMoreDescription(moreDescription: D): T
 
     companion object {
 
-        @JvmStatic
         @JvmName("equals")
+        @JvmStatic
         fun State<*, *, *>.stateEquals(other: Any?): Boolean {
             if (this === other) {
                 return true
@@ -41,31 +54,21 @@ interface State<C, D, T : State<C, D, T>> {
             if (other !is State<*, *, *>) {
                 return false
             }
-            return (this.code == other.code && this.description == other.description)
+            return (this.code == other.code && this.descriptions == other.descriptions)
         }
 
-        @JvmStatic
         @JvmName("hashCode")
+        @JvmStatic
         fun State<*, *, *>.stateHashCode(): Int {
-            return hash(this.code, this.description)
+            return hash(this.code, this.descriptions)
         }
 
-        @JvmStatic
         @JvmName("toString")
+        @JvmStatic
         fun State<*, *, *>.stateToString(): String {
             val code = this.code
             val description = this.description
             return if (description === null) code.toString() else "$code-$description"
-        }
-
-        @JvmStatic
-        @JvmName("moreDescription")
-        fun CharSequence?.stateMoreDescription(moreDescription: CharSequence?): String? {
-            return when {
-                this === null -> moreDescription?.toString()
-                moreDescription === null -> this.toString()
-                else -> "$this[$moreDescription]"
-            }
         }
     }
 }

@@ -15,7 +15,7 @@ open class StatusException @JvmOverloads constructor(
     private val exceptionStatus: ExceptionStatus,
     cause: Throwable? = null
 ) : RuntimeException(
-    exceptionStatus.toString(), cause
+    exceptionStatus.toExceptionMessage(), cause
 ), ExceptionStatus {
 
     constructor() : this(ExceptionStatus.UNKNOWN)
@@ -44,6 +44,10 @@ open class StatusException @JvmOverloads constructor(
     @Suppress(INAPPLICABLE_JVM_NAME)
     override val description: String?
         @JvmName("description") get() = exceptionStatus.description
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    override val descriptions: List<String>
+        @JvmName("descriptions") get() = exceptionStatus.descriptions
 
     override fun equals(other: Any?): Boolean {
         return this.stateEquals(other)
