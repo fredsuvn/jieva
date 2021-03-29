@@ -154,6 +154,52 @@ interface ConvertHandler {
             IterableConvertHandler,
             BeanConvertHandler.DEFAULT,
         )
+
+        @JvmStatic
+        fun defaultsWithDateTimeConvertHandler(
+            dateTimeConvertHandler: DateTimeConvertHandler,
+        ): List<ConvertHandler> {
+            return listOf(
+                NopConvertHandler,
+                WildcardTypeConvertHandler,
+                CharsConvertHandler,
+                NumberAndPrimitiveConvertHandler,
+                dateTimeConvertHandler,
+                IterableConvertHandler,
+                BeanConvertHandler.DEFAULT,
+            )
+        }
+
+        @JvmStatic
+        fun defaultsWithBeanConvertHandler(
+            beanConvertHandler: BeanConvertHandler,
+        ): List<ConvertHandler> {
+            return listOf(
+                NopConvertHandler,
+                WildcardTypeConvertHandler,
+                CharsConvertHandler,
+                NumberAndPrimitiveConvertHandler,
+                DateTimeConvertHandler.DEFAULT,
+                IterableConvertHandler,
+                beanConvertHandler,
+            )
+        }
+
+        @JvmStatic
+        fun defaultsWithDateTimeBeanConvertHandler(
+            dateTimeConvertHandler: DateTimeConvertHandler,
+            beanConvertHandler: BeanConvertHandler,
+        ): List<ConvertHandler> {
+            return listOf(
+                NopConvertHandler,
+                WildcardTypeConvertHandler,
+                CharsConvertHandler,
+                NumberAndPrimitiveConvertHandler,
+                dateTimeConvertHandler,
+                IterableConvertHandler,
+                beanConvertHandler,
+            )
+        }
     }
 }
 
@@ -275,7 +321,7 @@ object NumberAndPrimitiveConvertHandler : AbstractClassConvertHandler() {
     }
 }
 
-class DateTimeConvertHandler(
+open class DateTimeConvertHandler(
     private val dateFormat: DateFormat,
     private val instantFormatter: DateTimeFormatter,
     private val localDateTimeFormatter: DateTimeFormatter,
