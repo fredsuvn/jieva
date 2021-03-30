@@ -14,13 +14,13 @@ printer.info("${project.name}: import kotlin-compile")
 
 compileKotlin {
   kotlinOptions {
-    jvmTarget = "${javaVersion}"
+    jvmTarget = javaVersion
     freeCompilerArgs = ['-Xjvm-default=enable']
   }
 }
 compileTestKotlin {
   kotlinOptions {
-    jvmTarget = "${javaVersion}"
+    jvmTarget = javaVersion
     freeCompilerArgs = ['-Xjvm-default=enable']
   }
 }

@@ -34,6 +34,9 @@ dependencies {
   testCompile(project(":boat-test"))
   testCompile("org.springframework:spring-core")
   testCompile("cglib:cglib")
+
+  testAnnotationProcessor(platform(project(":boat-dependencies")))
+  testAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess")
 }
 
 test {
