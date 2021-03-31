@@ -215,7 +215,7 @@ interface BeanResolver {
                 }
                 to
             }
-            else -> throw IllegalArgumentException("Copy failed from $from to $to.")
+            else -> throw IllegalStateException("Unknown type, failed to copy properties from $from to $to.")
         }
     }
 

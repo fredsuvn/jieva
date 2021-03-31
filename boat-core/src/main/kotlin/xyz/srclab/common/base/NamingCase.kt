@@ -18,10 +18,13 @@ import java.util.*
  */
 interface NamingCase {
 
+    @Throws(NamingCaseException::class)
     fun segment(name: CharSequence): List<String>
 
+    @Throws(NamingCaseException::class)
     fun join(words: List<CharSequence>): String
 
+    @Throws(NamingCaseException::class)
     @JvmDefault
     fun convertTo(name: CharSequence, toCase: NamingCase): String {
         val words = segment(name)
@@ -189,11 +192,11 @@ abstract class CamelCase : NamingCase {
 
     override fun join(words: List<CharSequence>): String {
         if (words.isEmpty()) {
-            throw IllegalArgumentException("Given joined words list should have at least 1 word.")
+            throw NamingCaseException("Given joined words list should have at least 1 word.")
         }
         val first = words.first().toString()
         if (first.isEmpty()) {
-            throw IllegalArgumentException("Word of given first joined word should have at least 1 char.")
+            throw NamingCaseException("Word of given first joined word should have at least 1 char.")
         }
         if (first.length > 1 && StringUtils.isAllUpperCase(first)) {
             return words.joinToString("") { it.toString().capitalize(Default.locale) }
@@ -232,3 +235,7 @@ abstract class HyphenCase : NamingCase {
 
     protected abstract fun doWord(word: CharSequence): String
 }
+
+open class NamingCaseException @JvmOverloads constructor(
+    message: String? = null, cause: Throwable? = null
+) : RuntimeException(message, cause)
