@@ -32,10 +32,8 @@ ext["utils"] = [
 
 class Printer {
 
-  private static final PREFIX = ">> Boat: "
-
   def info(message) {
-    println("$PREFIX$message")
+    println(">> info: $message")
   }
 }
 
