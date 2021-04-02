@@ -568,6 +568,8 @@ private class BeanTypeImpl(
 }
 
 /**
+ * Handler to resolve specified bean type.
+ *
  * @see BeanStyleBeanResolveHandler
  * @see NamingStyleBeanResolveHandler
  */
