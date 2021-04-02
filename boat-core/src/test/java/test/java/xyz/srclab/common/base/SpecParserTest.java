@@ -3,6 +3,7 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.SpecParser;
+import xyz.srclab.common.base.SpecParsingException;
 
 import java.util.Arrays;
 
@@ -38,7 +39,7 @@ public class SpecParserTest {
                         Provider3.class.getName() + ", " + Provider2.class.getName()),
                 new Provider2()
         );
-        Assert.assertThrows(IllegalStateException.class, () -> SpecParser.parseFirstClassNameToInstance(
+        Assert.assertThrows(SpecParsingException.class, () -> SpecParser.parseFirstClassNameToInstance(
                 Provider3.class.getName() + ", " + Provider2.class.getName(), true));
         Assert.assertEquals(
                 SpecParser.parseFirstClassNameToInstanceOrNull(Provider3.class.getName()),

@@ -38,6 +38,7 @@ fun CharSequence.loadResourceOrNull(classLoader: ClassLoader = Current.classLoad
 /**
  * @throws ResourceNotFoundException
  */
+@Throws(ResourceNotFoundException::class)
 @JvmOverloads
 fun CharSequence.loadResource(classLoader: ClassLoader = Current.classLoader): URL {
     return loadResourceOrNull(classLoader) ?: throw ResourceNotFoundException(this)
@@ -51,6 +52,7 @@ fun CharSequence.loadBytesResourceOrNull(classLoader: ClassLoader = Current.clas
 /**
  * @throws ResourceNotFoundException
  */
+@Throws(ResourceNotFoundException::class)
 @JvmOverloads
 fun CharSequence.loadBytesResource(classLoader: ClassLoader = Current.classLoader): ByteArray {
     return loadBytesResourceOrNull(classLoader) ?: throw ResourceNotFoundException(this)
@@ -66,6 +68,7 @@ fun CharSequence.loadStringResourceOrNull(
 /**
  * @throws ResourceNotFoundException
  */
+@Throws(ResourceNotFoundException::class)
 @JvmOverloads
 fun CharSequence.loadStringResource(
     classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset

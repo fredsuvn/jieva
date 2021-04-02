@@ -11,11 +11,9 @@ java {
 }
 
 dependencies {
-  implementation(platform(project(":boat-dependencies")))
+  api project(":boat-core")
 
-  api(project(":boat-core"))
-
-  testCompile(project(":boat-test"))
+  testCompile project(":boat-test")
 }
 
 test {

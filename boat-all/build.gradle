@@ -11,11 +11,9 @@ java {
 }
 
 dependencies {
-  implementation(platform(project(":boat-dependencies")))
-
-  api(project(":boat-core"))
-  api(project(":boat-codec"))
-  api(project(":boat-serialize"))
-  api(project(":boat-id"))
-  //api(project(":boat-egg"))
+  api project(":boat-core")
+  api project(":boat-codec")
+  api project(":boat-serialize")
+  api project(":boat-id")
+  //api project(":boat-egg"))
 }

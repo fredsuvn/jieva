@@ -7,35 +7,42 @@ import xyz.srclab.common.reflect.toInstance
  */
 interface SpecParser<S> {
 
+    @Throws(SpecParsingException::class)
     fun <T : Any> parse(spec: S): List<T>
 
+    @Throws(SpecParsingException::class)
     @JvmDefault
     fun <T : Any> parseFirst(spec: S): T {
-        return parseFirstOrNull(spec) ?: throw java.lang.IllegalStateException("Spec parsed failed: $spec")
+        return parseFirstOrNull(spec) ?: throw SpecParsingException("Spec parsed failed: $spec")
     }
 
+    @Throws(SpecParsingException::class)
     fun <T : Any> parseFirstOrNull(spec: S): T?
 
     companion object {
 
+        @Throws(SpecParsingException::class)
         @JvmStatic
         @JvmOverloads
         fun <T : Any> CharSequence.parseClassNameToInstance(strict: Boolean = false): List<T> {
             return getClassNameSpecParser(strict).parse(this)
         }
 
+        @Throws(SpecParsingException::class)
         @JvmStatic
         @JvmOverloads
         fun <T : Any> CharSequence.parseFirstClassNameToInstance(strict: Boolean = false): T {
             return getClassNameSpecParser(strict).parseFirst(this)
         }
 
+        @Throws(SpecParsingException::class)
         @JvmStatic
         @JvmOverloads
         fun <T : Any> CharSequence.parseFirstClassNameToInstanceOrNull(strict: Boolean = false): T? {
             return getClassNameSpecParser(strict).parseFirstOrNull(this)
         }
 
+        @Throws(SpecParsingException::class)
         private fun getClassNameSpecParser(strict: Boolean): SpecParser<CharSequence> {
             return if (strict) StrictClassNameSpecParser else ClassNameSpecParser
         }
@@ -102,11 +109,15 @@ object StrictClassNameSpecParser : SpecParser<CharSequence> {
         val product: T? = try {
             trimmedClassName.toInstance()
         } catch (e: Exception) {
-            throw IllegalStateException("Instantiate class $trimmedClassName failed.", e)
+            throw SpecParsingException("Instantiate class $trimmedClassName failed.", e)
         }
         if (product === null) {
-            throw IllegalStateException("Class $trimmedClassName was not found.")
+            throw SpecParsingException("Class $trimmedClassName was not found.")
         }
         return product
     }
 }
+
+open class SpecParsingException @JvmOverloads constructor(
+    message: String? = null, cause: Throwable? = null
+) : RuntimeException(message, cause)
