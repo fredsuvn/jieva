@@ -11,10 +11,10 @@ java {
 }
 
 dependencies {
-  implementation(platform(project(":boat-dependencies")))
+  api platform(project(":boat-dependencies"))
 
-  api("org.jetbrains.kotlin:kotlin-test-testng")
-  api("org.openjdk.jmh:jmh-core")
+  api "org.jetbrains.kotlin:kotlin-test-testng"
+  api "org.openjdk.jmh:jmh-core"
 }
 
 test {

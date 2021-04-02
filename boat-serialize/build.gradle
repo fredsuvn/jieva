@@ -11,15 +11,13 @@ java {
 }
 
 dependencies {
-  implementation(platform(project(":boat-dependencies")))
+  api project(":boat-core")
+  api "com.fasterxml.jackson.core:jackson-core"
+  api "com.fasterxml.jackson.core:jackson-databind"
+  api "com.fasterxml.jackson.core:jackson-annotations"
+  api "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
 
-  api(project(":boat-core"))
-  api("com.fasterxml.jackson.core:jackson-core")
-  api("com.fasterxml.jackson.core:jackson-databind")
-  api("com.fasterxml.jackson.core:jackson-annotations")
-  api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-
-  testCompile(project(":boat-test"))
+  testCompile project(":boat-test")
 }
 
 test {

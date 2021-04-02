@@ -11,32 +11,32 @@ java {
 }
 
 dependencies {
-  implementation(platform(project(":boat-dependencies")))
+  api platform(project(":boat-dependencies"))
 
-  api(project(":boat-annotations"))
+  api project(":boat-annotations")
 
-  api("org.slf4j:slf4j-api")
-  api("org.apache.commons:commons-lang3")
-  api("org.apache.commons:commons-collections4")
-  api("commons-beanutils:commons-beanutils")
-  api("commons-io:commons-io")
-  //api("commons-codec:commons-codec")
-  api("com.google.guava:guava")
-  api("com.github.ben-manes.caffeine:caffeine")
-  api("org.yaml:snakeyaml")
+  api "org.slf4j:slf4j-api"
+  api "org.apache.commons:commons-lang3"
+  api "org.apache.commons:commons-collections4"
+  api "commons-beanutils:commons-beanutils"
+  api "commons-io:commons-io"
+  //api "commons-codec:commons-codec"
+  api "com.google.guava:guava"
+  api "com.github.ben-manes.caffeine:caffeine"
+  api "org.yaml:snakeyaml"
 
-  //api("org.jetbrains.kotlin:kotlin-annotations-jvm")
-  //api("com.squareup.okhttp3:okhttp")
+  //api "org.jetbrains.kotlin:kotlin-annotations-jvm"
+  //api "com.squareup.okhttp3:okhttp"
 
-  compileOnly("org.springframework:spring-core")
-  compileOnly("cglib:cglib")
+  compileOnly "org.springframework:spring-core"
+  compileOnly "cglib:cglib"
 
-  testCompile(project(":boat-test"))
-  testCompile("org.springframework:spring-core")
-  testCompile("cglib:cglib")
+  testCompile project(":boat-test")
+  testCompile "org.springframework:spring-core"
+  testCompile "cglib:cglib"
 
-  testAnnotationProcessor(platform(project(":boat-dependencies")))
-  testAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess")
+  testAnnotationProcessor platform(project(":boat-dependencies"))
+  testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
 }
 
 test {

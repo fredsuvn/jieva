@@ -11,13 +11,11 @@ java {
 }
 
 dependencies {
-  implementation(platform(project(":boat-dependencies")))
+  api project(":boat-core")
+  api "commons-codec:commons-codec"
+  api "org.bouncycastle:bcprov-jdk15on"
 
-  api(project(":boat-core"))
-  api("commons-codec:commons-codec")
-  api("org.bouncycastle:bcprov-jdk15on")
-
-  testCompile(project(":boat-test"))
+  testCompile project(":boat-test")
 }
 
 test {
