@@ -570,6 +570,7 @@ private class BeanTypeImpl(
 /**
  * Handler to resolve specified bean type.
  *
+ * @see AbstractBeanResolveHandler
  * @see BeanStyleBeanResolveHandler
  * @see NamingStyleBeanResolveHandler
  */
@@ -592,9 +593,17 @@ interface BeanResolveHandler {
             @JvmName("methods") get
 
         @Suppress(INAPPLICABLE_JVM_NAME)
-
         val typeArguments: Map<TypeVariable<*>, Type>
             @JvmName("typeArguments") get
+
+        @Suppress(INAPPLICABLE_JVM_NAME)
+        val isBroken: Boolean
+            @JvmName("isBroken") get
+
+        /**
+         * Stop and break resolving processing.
+         */
+        fun breakResolving()
     }
 
     companion object {
@@ -614,12 +623,21 @@ interface BeanResolveHandler {
             override val typeArguments: Map<TypeVariable<*>, Type>
         ) : Context {
 
+            private var _isBroken: Boolean = false
+
             override val properties: MutableMap<String, PropertyType> by lazy {
                 LinkedHashMap()
             }
 
             override val methods: List<Method> by lazy {
                 type.rawClass.methods.asList()
+            }
+
+            override val isBroken: Boolean
+                get() = _isBroken
+
+            override fun breakResolving() {
+                _isBroken = true
             }
         }
     }
@@ -703,6 +721,9 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     )
 
     override fun resolve(context: BeanResolveHandler.Context) {
+        if (context.isBroken) {
+            return
+        }
         val getters = LinkedHashMap<String, Method>()
         val setters = LinkedHashMap<String, Method>()
         resolveAccessors(context, getters, setters)
