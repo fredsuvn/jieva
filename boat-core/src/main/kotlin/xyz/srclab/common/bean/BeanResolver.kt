@@ -539,6 +539,9 @@ abstract class AbstractBeanResolver : BeanResolver {
             val context = BeanResolveHandler.newContext(beanType, it.typeArguments())
             for (handler in resolveHandlers) {
                 handler.resolve(context)
+                if (context.isBroken) {
+                    break
+                }
             }
             beanType.properties = context.properties.toImmutableMap()
             beanType
