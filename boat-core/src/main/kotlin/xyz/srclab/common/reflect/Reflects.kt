@@ -11,6 +11,7 @@ import xyz.srclab.common.base.Current
 import xyz.srclab.common.base.Default
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.base.loadClass
+import xyz.srclab.common.collect.isEmpty
 import java.lang.reflect.*
 
 val Member.isPublic: Boolean
@@ -1240,6 +1241,10 @@ fun @Acceptable(
             Accepted(Class::class),
             Accepted(ParameterizedType::class),
         ) Type? {
+    if (targets.isEmpty()) {
+        return null
+    }
+
     for (target in targets) {
         val result = if (target.isInterface)
             this.genericInterface(typeArguments, target)
@@ -1299,6 +1304,10 @@ fun @Acceptable(
             Accepted(Class::class),
             Accepted(ParameterizedType::class),
         ) Type? {
+    if (targets.isEmpty()) {
+        return null
+    }
+
     var rawClass = this.rawClass
     if (targets.contains(rawClass)) {
         return if (typeArguments === null) {
@@ -1370,6 +1379,10 @@ fun @Acceptable(
             Accepted(Class::class),
             Accepted(ParameterizedType::class),
         ) Type? {
+
+    if (targets.isEmpty()) {
+        return null
+    }
 
     //Level searching
     fun findInterface(genericTypes: List<Type>, targets: Iterable<Class<*>>): Type? {
