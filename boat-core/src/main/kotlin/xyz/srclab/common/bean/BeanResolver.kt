@@ -657,7 +657,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
     ) {
         val methods = context.methods
         for (method in methods) {
-            if (method.isBridge) {
+            if (method.isBridge || method.isSynthetic) {
                 continue
             }
             val name = method.name
@@ -696,7 +696,7 @@ object NamingStyleBeanResolveHandler : AbstractBeanResolveHandler() {
     ) {
         val methods = context.methods
         for (method in methods) {
-            if (method.isBridge || method.declaringClass == Any::class.java) {
+            if (method.isBridge || method.isSynthetic || method.declaringClass == Any::class.java) {
                 continue
             }
             val name = method.name
