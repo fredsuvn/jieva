@@ -49,32 +49,36 @@ interface BeanResolver {
 
     @JvmDefault
     fun <T : Any> copyProperties(from: Any, to: T): T {
-        return copyProperties(from, to, CopyOptions.DEFAULT)
+        return copyProperties(from, to, defaultCopyOptions)
     }
 
     @JvmDefault
     fun <T : Any> copyProperties(from: Any, to: T, converter: Converter): T {
-        return copyProperties(from, to, CopyOptions.DEFAULT.withConverter(converter))
+        return copyProperties(from, to, defaultCopyOptions.withConverter(converter))
     }
 
     @JvmDefault
     fun <T : Any> copyProperties(from: Any, to: T, fromType: Type, toType: Type, converter: Converter): T {
-        return copyProperties(from, to, CopyOptions.DEFAULT.withTypesConverter(fromType, toType, converter))
+        return copyProperties(from, to, defaultCopyOptions.withTypesConverter(fromType, toType, converter))
     }
 
     @JvmDefault
     fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T): T {
-        return copyProperties(from, to, CopyOptions.IGNORE_NULL)
+        return copyProperties(from, to, defaultCopyOptions.withIgnoreNull())
     }
 
     @JvmDefault
     fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T, converter: Converter): T {
-        return copyProperties(from, to, CopyOptions.IGNORE_NULL.withConverter(converter))
+        return copyProperties(from, to, defaultCopyOptions.withIgnoreNull().withConverter(converter))
     }
 
     @JvmDefault
     fun <T : Any> copyPropertiesIgnoreNull(from: Any, to: T, fromType: Type, toType: Type, converter: Converter): T {
-        return copyProperties(from, to, CopyOptions.IGNORE_NULL.withTypesConverter(fromType, toType, converter))
+        return copyProperties(
+            from,
+            to,
+            defaultCopyOptions.withIgnoreNull().withTypesConverter(fromType, toType, converter)
+        )
     }
 
     @JvmDefault
@@ -348,17 +352,18 @@ interface BeanResolver {
             return with(fromType, toType, converter, nameFilter, fromTypeFilter, fromValueFilter, convertFilter)
         }
 
+        @JvmDefault
+        fun withIgnoreNull(): CopyOptions {
+            return withFromValueFilter { _, _, _, fromValue -> fromValue !== null }
+        }
+
         companion object {
 
             @JvmField
             val DEFAULT = object : CopyOptions {}
 
-            @JvmField
-            val IGNORE_NULL = object : CopyOptions {
-                override val fromValueFilter:
-                            (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean =
-                    { _, _, _, fromValue -> fromValue !== null }
-            }
+            //@JvmField
+            //val IGNORE_NULL = DEFAULT.withIgnoreNull()
 
             @JvmField
             val DEFAULT_WITHOUT_CONVERSION = object : CopyOptions {
