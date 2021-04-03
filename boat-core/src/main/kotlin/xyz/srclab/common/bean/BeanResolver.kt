@@ -16,8 +16,11 @@ import xyz.srclab.common.reflect.*
 import java.lang.reflect.*
 
 /**
+ * Resolver for bean object.
+ *
  * @author sunqian
  *
+ * @see AbstractBeanResolver
  * @see BeanResolveHandler
  * @see BeanStyleBeanResolveHandler
  * @see NamingStyleBeanResolveHandler
@@ -28,10 +31,7 @@ interface BeanResolver {
     val resolveHandlers: List<BeanResolveHandler>
         @JvmName("resolveHandlers") get
 
-    @JvmDefault
-    fun resolve(type: Type): BeanType {
-        return DEFAULT.resolve(type)
-    }
+    fun resolve(type: Type): BeanType
 
     @JvmDefault
     fun asMap(bean: Any): MutableMap<String, Any?> {
@@ -434,7 +434,9 @@ interface BeanResolver {
 
         @JvmStatic
         fun newBeanResolver(resolveHandlers: Iterable<BeanResolveHandler>): BeanResolver {
-            return BeanResolverImpl(resolveHandlers.asToList())
+            return object : AbstractBeanResolver() {
+                override val resolveHandlers: List<BeanResolveHandler> = resolveHandlers.asToList()
+            }
         }
 
         private class BeanAsMap(
@@ -524,7 +526,10 @@ interface BeanResolver {
     }
 }
 
-private class BeanResolverImpl(override val resolveHandlers: List<BeanResolveHandler>) : BeanResolver {
+/**
+ * Abstract [BeanResolver].
+ */
+abstract class AbstractBeanResolver : BeanResolver {
 
     private val cache = Cache.newFastCache<Type, BeanType>()
 
