@@ -31,6 +31,10 @@ interface BeanResolver {
     val resolveHandlers: List<BeanResolveHandler>
         @JvmName("resolveHandlers") get
 
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val defaultCopyOptions: CopyOptions
+        @JvmName("defaultCopyOptions") get
+
     fun resolve(type: Type): BeanType
 
     @JvmDefault
@@ -432,10 +436,15 @@ interface BeanResolver {
         @JvmField
         val DEFAULT: BeanResolver = newBeanResolver(BeanResolveHandler.DEFAULTS)
 
+        @JvmOverloads
         @JvmStatic
-        fun newBeanResolver(resolveHandlers: Iterable<BeanResolveHandler>): BeanResolver {
+        fun newBeanResolver(
+            resolveHandlers: Iterable<BeanResolveHandler>,
+            defaultCopyOptions: CopyOptions = CopyOptions.DEFAULT
+        ): BeanResolver {
             return object : AbstractBeanResolver() {
                 override val resolveHandlers: List<BeanResolveHandler> = resolveHandlers.asToList()
+                override val defaultCopyOptions: CopyOptions = defaultCopyOptions
             }
         }
 
