@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
  * @author sunqian
  */
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 60)
-@Measurement(iterations = 3, time = 60)
+@Warmup(iterations = 3, time = 30)
+@Measurement(iterations = 3, time = 30)
 @Threads(16)
 @Fork(1)
 @State(value = Scope.Benchmark)
@@ -61,6 +61,11 @@ public class BeanBenchmark {
      * Benchmark                           Mode  Cnt     Score     Error   Units
      * BeanPerformanceTest.testBeanUtils  thrpt    3   360.217 ±  53.893  ops/ms
      * BeanPerformanceTest.testBeans      thrpt    3  6751.077 ± 157.653  ops/ms
+     *
+     * After invoker fixed:
+     * Benchmark                     Mode  Cnt     Score     Error   Units
+     * BeanBenchmark.testBeanUtils  thrpt    3   385.594 ±   4.501  ops/ms
+     * BeanBenchmark.testBeans      thrpt    3  7451.115 ± 737.159  ops/ms
      */
     public static void main(String[] args) throws Exception {
         Options options = new OptionsBuilder().include(BeanBenchmark.class.getSimpleName()).build();

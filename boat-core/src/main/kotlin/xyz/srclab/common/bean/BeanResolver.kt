@@ -581,8 +581,8 @@ interface BeanResolveHandler {
     interface Context {
 
         @Suppress(INAPPLICABLE_JVM_NAME)
-        val type: BeanType
-            @JvmName("type") get
+        val beanType: BeanType
+            @JvmName("beanType") get
 
         @Suppress(INAPPLICABLE_JVM_NAME)
         val properties: MutableMap<String, PropertyType>
@@ -619,7 +619,7 @@ interface BeanResolveHandler {
         }
 
         private class ContextImpl(
-            override val type: BeanType,
+            override val beanType: BeanType,
             override val typeArguments: Map<TypeVariable<*>, Type>
         ) : Context {
 
@@ -630,7 +630,7 @@ interface BeanResolveHandler {
             }
 
             override val methods: List<Method> by lazy {
-                type.rawClass.methods.asList()
+                beanType.rawClass.methods.asList()
             }
 
             override val isBroken: Boolean
@@ -652,8 +652,8 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
     override fun resolveAccessors(
         context: BeanResolveHandler.Context,
-        getters: MutableMap<String, Method>,
-        setters: MutableMap<String, Method>
+        getters: MutableMap<String, PropertyInvoker>,
+        setters: MutableMap<String, PropertyInvoker>,
     ) {
         val methods = context.methods
         for (method in methods) {
@@ -667,13 +667,15 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             if (name.startsWith("get") && method.parameterCount == 0) {
                 val propertyName =
                     NamingCase.UPPER_CAMEL.convertTo(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
-                getters[propertyName] = method
+                val type = method.genericReturnType.eraseTypeVariables(context.typeArguments)
+                getters[propertyName] = PropertyInvoker(type, method.toInvoker())
                 continue
             }
             if (name.startsWith("set") && method.parameterCount == 1) {
                 val propertyName =
                     NamingCase.UPPER_CAMEL.convertTo(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
-                setters[propertyName] = method
+                val type = method.genericParameterTypes[0].eraseTypeVariables(context.typeArguments)
+                setters[propertyName] = PropertyInvoker(type, method.toInvoker())
                 continue
             }
         }
@@ -689,8 +691,8 @@ object NamingStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
     override fun resolveAccessors(
         context: BeanResolveHandler.Context,
-        getters: MutableMap<String, Method>,
-        setters: MutableMap<String, Method>
+        getters: MutableMap<String, PropertyInvoker>,
+        setters: MutableMap<String, PropertyInvoker>,
     ) {
         val methods = context.methods
         for (method in methods) {
@@ -699,11 +701,13 @@ object NamingStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             }
             val name = method.name
             if (method.parameterCount == 0) {
-                getters[name] = method
+                val type = method.genericReturnType.eraseTypeVariables(context.typeArguments)
+                getters[name] = PropertyInvoker(type, method.toInvoker())
                 continue
             }
             if (method.parameterCount == 1) {
-                setters[name] = method
+                val type = method.genericParameterTypes[0].eraseTypeVariables(context.typeArguments)
+                setters[name] = PropertyInvoker(type, method.toInvoker())
                 continue
             }
         }
@@ -714,83 +718,69 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
 
     private val cache = Cache.newFastCache<Pair<BeanType, String>, PropertyType>()
 
-    protected abstract fun resolveAccessors(
-        @Written context: BeanResolveHandler.Context,
-        getters: MutableMap<String, Method>,
-        setters: MutableMap<String, Method>
-    )
-
     override fun resolve(context: BeanResolveHandler.Context) {
         if (context.isBroken) {
             return
         }
-        val getters = LinkedHashMap<String, Method>()
-        val setters = LinkedHashMap<String, Method>()
+        val getters: MutableMap<String, PropertyInvoker> = LinkedHashMap()
+        val setters: MutableMap<String, PropertyInvoker> = LinkedHashMap()
         resolveAccessors(context, getters, setters)
         val properties = context.properties
         for (getter in getters) {
             val propertyName = getter.key
-            val getterMethod = getter.value
-            val setterMethod = setters[propertyName]
-            if (setterMethod === null) {
-                properties[propertyName] = createProperty(context, propertyName, getterMethod, null)
+            val getterInvoker = getter.value.invoker
+            val setterPropertyInvoker = setters[propertyName]
+            if (setterPropertyInvoker === null) {
+                properties[propertyName] = createProperty(context, propertyName, getter.value.type, getterInvoker, null)
                 continue
             }
-            if (getterMethod.genericReturnType == setterMethod.genericParameterTypes[0]) {
-                properties[propertyName] = createProperty(context, propertyName, getterMethod, setterMethod)
+            val setterInvoker = setterPropertyInvoker.invoker
+            if (getter.value.type == setterPropertyInvoker.type) {
+                properties[propertyName] =
+                    createProperty(context, propertyName, setterPropertyInvoker.type, getterInvoker, setterInvoker)
                 continue
             }
             setters.remove(propertyName)
         }
         for (setter in setters) {
             val propertyName = setter.key
-            val setterMethod = setter.value
-            properties[propertyName] = createProperty(context, propertyName, null, setterMethod)
+            val setterPropertyInvoker = setter.value
+            properties[propertyName] =
+                createProperty(context, propertyName, setterPropertyInvoker.type, null, setterPropertyInvoker.invoker)
         }
     }
+
+    protected abstract fun resolveAccessors(
+        @Written context: BeanResolveHandler.Context,
+        getters: MutableMap<String, PropertyInvoker>,
+        setters: MutableMap<String, PropertyInvoker>,
+    )
 
     private fun createProperty(
         context: BeanResolveHandler.Context,
         name: String,
-        getterMethod: Method?,
-        setterMethod: Method?
+        type: Type,
+        getterInvoker: Invoker?,
+        setterInvoker: Invoker?
     ): PropertyType {
-        return cache.getOrLoad(context.type to name) {
-            PropertyTypeImpl(context.type, name, getterMethod, setterMethod, context.typeArguments)
+        return cache.getOrLoad(context.beanType to name) {
+            PropertyTypeImpl(context.beanType, name, type, getterInvoker, setterInvoker)
         }
     }
+
+    class PropertyInvoker(val type: Type, val invoker: Invoker)
 }
 
 private class PropertyTypeImpl(
     override val ownerType: BeanType,
     override val name: String,
-    private val getterMethod: Method?,
-    private val setterMethod: Method?,
-    private val typeArguments: Map<TypeVariable<*>, Type>,
+    override val type: Type,
+    override val getter: Invoker?,
+    override val setter: Invoker?,
 ) : PropertyType {
 
-    override val type: Type by lazy { tryType() }
-    override val getter: Invoker? by lazy { tryGetter() }
-    override val setter: Invoker? by lazy { trySetter() }
     override val backingField: Field? by lazy { tryBackingField() }
     override val backingFieldAnnotations: List<Annotation> by lazy { tryBackingFieldAnnotations() }
-
-    private fun tryType(): Type {
-        val type = if (getterMethod !== null) {
-            getterMethod.genericReturnType
-        } else {
-            setterMethod!!.genericParameterTypes[0]
-        }
-        return type.eraseTypeVariables(typeArguments)
-    }
-
-    private fun tryGetter(): Invoker? {
-        return if (getterMethod === null) null else getterMethod.toInvoker()
-    }
-
-    private fun trySetter(): Invoker? {
-        return if (setterMethod === null) null else setterMethod.toInvoker()
-    }
 
     private fun tryBackingField(): Field? {
         return ownerType.rawClass.searchFieldOrNull(name, deep = true)
