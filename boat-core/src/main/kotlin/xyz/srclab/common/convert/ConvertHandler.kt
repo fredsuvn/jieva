@@ -418,8 +418,9 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
     }
 }
 
-open class BeanConvertHandler(
-    private val beanResolver: BeanResolver = BeanResolver.DEFAULT
+open class BeanConvertHandler @JvmOverloads constructor(
+    beanResolver: BeanResolver = BeanResolver.DEFAULT,
+    private val instanceGenerator: (Class<*>) -> Any = { it.toInstance() },
 ) : AbstractTypeConvertHandler() {
 
     private val copyOptions: BeanCopyOptions = BeanCopyOptions.DEFAULT.withBeanResolver(beanResolver)
@@ -438,14 +439,17 @@ open class BeanConvertHandler(
                 if (toType.isArray) {
                     return null
                 }
-                return from.copyProperties(toType.toInstance(), copyOptions.withFromToTypes(fromType, toType))
+                return from.copyProperties(instanceGenerator(toType), copyOptions.withFromToTypes(fromType, toType))
             }
             is ParameterizedType -> {
                 return when (val rawClass = toType.rawClass) {
                     Map::class.java, LinkedHashMap::class.java -> toLinkedHashMap(from, fromType, toType, converter)
                     HashMap::class.java -> toHashMap(from, fromType, toType, converter)
                     TreeMap::class.java -> toTreeMap(from, fromType, toType, converter)
-                    else -> from.copyProperties(rawClass.toInstance(), copyOptions.withFromToTypes(fromType, toType))
+                    else -> from.copyProperties(
+                        instanceGenerator(rawClass),
+                        copyOptions.withFromToTypes(fromType, toType)
+                    )
                 }
             }
             else -> null
