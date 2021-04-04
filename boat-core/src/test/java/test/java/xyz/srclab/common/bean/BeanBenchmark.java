@@ -66,6 +66,11 @@ public class BeanBenchmark {
      * Benchmark                     Mode  Cnt     Score     Error   Units
      * BeanBenchmark.testBeanUtils  thrpt    3   385.594 ±   4.501  ops/ms
      * BeanBenchmark.testBeans      thrpt    3  7451.115 ± 737.159  ops/ms
+     *
+     * After BeanCopyOptions fixed:
+     * Benchmark                     Mode  Cnt     Score     Error   Units
+     * BeanBenchmark.testBeanUtils  thrpt    3   366.971 ± 201.670  ops/ms
+     * BeanBenchmark.testBeans      thrpt    3  7197.298 ± 253.467  ops/ms
      */
     public static void main(String[] args) throws Exception {
         Options options = new OptionsBuilder().include(BeanBenchmark.class.getSimpleName()).build();

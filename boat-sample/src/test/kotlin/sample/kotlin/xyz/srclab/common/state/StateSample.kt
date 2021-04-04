@@ -1,8 +1,10 @@
 package sample.kotlin.xyz.srclab.common.state
 
 import org.testng.annotations.Test
+import xyz.srclab.common.state.CharsState
+import xyz.srclab.common.state.CharsState.Companion.joinStateDescriptions
+import xyz.srclab.common.state.CharsState.Companion.moreDescriptions
 import xyz.srclab.common.state.State
-import xyz.srclab.common.state.State.Companion.stateMoreDescription
 import xyz.srclab.common.test.TestLogger
 
 class StateSample {
@@ -15,15 +17,20 @@ class StateSample {
         logger.log(newState.description)
     }
 
-    class MyState(override val code: Int, override val description: String?) :
-        State<Int, String, MyState> {
+    class MyState(
+        override val code: Int, override val descriptions: List<String>
+    ) : State<Int, String, MyState> {
+
+        constructor(code: Int, description: String?) : this(code, CharsState.newDescriptions(description))
+
+        override val description: String? = descriptions.joinStateDescriptions()
 
         override fun withNewDescription(newDescription: String?): MyState {
-            return MyState(code, newDescription)
+            return MyState(code, CharsState.newDescriptions(newDescription))
         }
 
-        override fun withMoreDescription(moreDescription: String?): MyState {
-            return MyState(code, description.stateMoreDescription(moreDescription))
+        override fun withMoreDescription(moreDescription: String): MyState {
+            return MyState(code, descriptions.moreDescriptions(moreDescription))
         }
     }
 
