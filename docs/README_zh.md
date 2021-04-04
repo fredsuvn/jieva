@@ -1612,11 +1612,16 @@ public class StateSample {
   public static class MyState implements State<Integer, String, MyState> {
 
     private final int code;
-    private final String description;
+    private final List<String> descriptions;
 
-    public MyState(int code, String description) {
+    public MyState(int code, @Nullable String description) {
       this.code = code;
-      this.description = description;
+      this.descriptions = CharsState.newDescriptions(description);
+    }
+
+    public MyState(int code, @Immutable List<String> descriptions) {
+      this.code = code;
+      this.descriptions = descriptions;
     }
 
     @Override
@@ -1627,19 +1632,25 @@ public class StateSample {
     @Nullable
     @Override
     public String description() {
-      return description;
+      return CharsState.joinDescriptions(descriptions);
+    }
+
+    @NotNull
+    @Override
+    public List<String> descriptions() {
+      return descriptions;
     }
 
     @NotNull
     @Override
     public MyState withNewDescription(@Nullable String newDescription) {
-      return new MyState(code, newDescription);
+      return new MyState(code, CharsState.newDescriptions(newDescription));
     }
 
     @NotNull
     @Override
-    public MyState withMoreDescription(@Nullable String moreDescription) {
-      return new MyState(code, State.moreDescription(description, moreDescription));
+    public MyState withMoreDescription(String moreDescription) {
+      return new MyState(code, CharsState.moreDescriptions(descriptions(), moreDescription));
     }
   }
 }
@@ -1658,15 +1669,20 @@ class StateSample {
     logger.log(newState.description)
   }
 
-  class MyState(override val code: Int, override val description: String?) :
-    State<Int, String, MyState> {
+  class MyState(
+    override val code: Int, override val descriptions: List<String>
+  ) : State<Int, String, MyState> {
+
+    constructor(code: Int, description: String?) : this(code, CharsState.newDescriptions(description))
+
+    override val description: String? = descriptions.joinStateDescriptions()
 
     override fun withNewDescription(newDescription: String?): MyState {
-      return MyState(code, newDescription)
+      return MyState(code, CharsState.newDescriptions(newDescription))
     }
 
-    override fun withMoreDescription(moreDescription: String?): MyState {
-      return MyState(code, description.stateMoreDescription(moreDescription))
+    override fun withMoreDescription(moreDescription: String): MyState {
+      return MyState(code, descriptions.moreDescriptions(moreDescription))
     }
   }
 
