@@ -420,7 +420,8 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
 
 open class BeanConvertHandler @JvmOverloads constructor(
     beanResolver: BeanResolver = BeanResolver.DEFAULT,
-    private val instanceGenerator: (Class<*>) -> Any = { it.toInstance() },
+    private val builderGenerator: (Class<*>) -> Any = { it.toInstance() },
+    private val buildFunction: (builder: Any, toType: Class<*>) -> Any = { builder, _ -> builder },
 ) : AbstractTypeConvertHandler() {
 
     private val copyOptions: BeanCopyOptions = BeanCopyOptions.DEFAULT.withBeanResolver(beanResolver)
@@ -439,17 +440,14 @@ open class BeanConvertHandler @JvmOverloads constructor(
                 if (toType.isArray) {
                     return null
                 }
-                return from.copyProperties(instanceGenerator(toType), copyOptions.withFromToTypes(fromType, toType))
+                return toObject(from, fromType, toType, converter)
             }
             is ParameterizedType -> {
                 return when (val rawClass = toType.rawClass) {
                     Map::class.java, LinkedHashMap::class.java -> toLinkedHashMap(from, fromType, toType, converter)
                     HashMap::class.java -> toHashMap(from, fromType, toType, converter)
                     TreeMap::class.java -> toTreeMap(from, fromType, toType, converter)
-                    else -> from.copyProperties(
-                        instanceGenerator(rawClass),
-                        copyOptions.withFromToTypes(fromType, toType)
-                    )
+                    else -> toObject(from, fromType, rawClass, converter)
                 }
             }
             else -> null
@@ -470,6 +468,12 @@ open class BeanConvertHandler @JvmOverloads constructor(
 
     private fun toConcurrentHashMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
         return from.copyProperties(ConcurrentHashMap<Any?, Any?>(), copyOptions.withFromToTypes(fromType, toType))
+    }
+
+    private fun toObject(from: Any, fromType: Type, toType: Class<*>, converter: Converter): Any {
+        val builder = builderGenerator(toType)
+        from.copyProperties(builder, copyOptions.withFromToTypes(fromType, toType))
+        return buildFunction(builder, toType)
     }
 
     companion object {

@@ -3,6 +3,7 @@
 
 package xyz.srclab.common.bean
 
+import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.collect.MapType
 import xyz.srclab.common.collect.MapType.Companion.toMapType
@@ -34,23 +35,23 @@ fun Any.asMap(
     return BeanAsMap(this, copyOptions)
 }
 
-fun <T : Any> Any.copyProperties(to: T): T {
+fun <T : Any> Any.copyProperties(@Written to: T): T {
     return copyProperties(to, BeanCopyOptions.DEFAULT)
 }
 
-fun <T : Any> Any.copyProperties(to: T, fromType: Type, toType: Type): T {
+fun <T : Any> Any.copyProperties(@Written to: T, fromType: Type, toType: Type): T {
     return copyProperties(to, BeanCopyOptions.DEFAULT.withFromToTypes(fromType, toType))
 }
 
-fun <T : Any> Any.copyPropertiesIgnoreNull(to: T): T {
+fun <T : Any> Any.copyPropertiesIgnoreNull(@Written to: T): T {
     return copyProperties(to, BeanCopyOptions.IGNORE_NULL)
 }
 
-fun <T : Any> Any.copyPropertiesIgnoreNull(to: T, fromType: Type, toType: Type): T {
+fun <T : Any> Any.copyPropertiesIgnoreNull(@Written to: T, fromType: Type, toType: Type): T {
     return copyProperties(to, BeanCopyOptions.IGNORE_NULL.withFromToTypes(fromType, toType))
 }
 
-fun <T : Any> Any.copyProperties(to: T, copyOptions: BeanCopyOptions): T {
+fun <T : Any> Any.copyProperties(@Written to: T, copyOptions: BeanCopyOptions): T {
     val beanResolver: BeanResolver = copyOptions.beanResolver ?: BeanResolver.DEFAULT
     val converter: Converter = copyOptions.converter ?: Converter.DEFAULT
     return when {
