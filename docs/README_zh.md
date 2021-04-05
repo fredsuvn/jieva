@@ -759,7 +759,7 @@ Bean包提供了强大的bean操作功能:
 * Beans: 默认的bean工具;
 * BeanResolver: Bean操作的核心接口, Beans使用它的默认实现;
 
-> 在复制属性(copy-properties)功能上, 它比Apache的BeanUtils快十倍以上.
+> 在复制属性(copy-properties)功能上, 它比Apache的BeanUtils快20倍以上.
 
 ##### Java Examples
 

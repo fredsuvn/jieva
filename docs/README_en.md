@@ -761,7 +761,7 @@ Bean package provides powerful bean operation ability:
 * Beans: Default utilities for bean operation;
 * BeanResolver: Core Interface to resolver bean, Beans use its default implementation;
 
-> In copy-properties function, It is more than 10 times faster than Apache BeanUtils.
+> In copy-properties function, It is more than 20 times faster than Apache BeanUtils.
 
 ##### Java Examples
 
