@@ -19,7 +19,12 @@ fun Any.asMap(
     beanResolver: BeanResolver,
     converter: Converter
 ): MutableMap<String, Any?> {
-    return asMap(BeanCopyOptions.DEFAULT.withBeanResolver(beanResolver).withConverter(converter))
+    return asMap(
+        BeanCopyOptions.DEFAULT.toBuilder()
+            .beanResolver(beanResolver)
+            .converter(converter)
+            .build()
+    )
 }
 
 @JvmOverloads

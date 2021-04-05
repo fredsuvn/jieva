@@ -147,7 +147,7 @@ interface BeanCopyOptions {
 
     @JvmDefault
     fun withIgnoreNull(): BeanCopyOptions {
-        return withFromValueFilter { _, _, _, fromValue -> fromValue !== null }
+        return toBuilder().ignoreNull().build()
     }
 
     class Builder : CachingProductBuilder<BeanCopyOptions>() {
@@ -223,6 +223,10 @@ interface BeanCopyOptions {
             ) -> Boolean
         ) = apply {
             this.convertFilter = convertFilter
+        }
+
+        fun ignoreNull() = apply {
+            fromValueFilter { _, _, _, fromValue -> fromValue !== null }
         }
 
         override fun buildNew(): BeanCopyOptions {
