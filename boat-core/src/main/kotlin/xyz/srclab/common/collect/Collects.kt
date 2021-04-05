@@ -990,12 +990,13 @@ fun <T> Iterable<T>.toLinkedList(): LinkedList<T> {
     return this.toCollection(LinkedList())
 }
 
-fun <T> Iterable<T>.toEnumeration():Enumeration<T>{
+fun <T> Iterable<T>.toEnumeration(): Enumeration<T> {
     val iterator = this.iterator()
-    return object:Enumeration<T>{
+    return object : Enumeration<T> {
         override fun hasMoreElements(): Boolean {
             return iterator.hasNext()
         }
+
         override fun nextElement(): T {
             return iterator.next()
         }
@@ -2708,4 +2709,24 @@ fun <T> Sequence<T>.minus(elements: Iterable<T>): Sequence<T> {
 
 fun <T> Sequence<T>.minus(elements: Sequence<T>): Sequence<T> {
     return this.minusKt(elements)
+}
+
+//Creation:
+fun <C : MutableMap<Any?, Any?>> C.putEntries(vararg keyValues: Any?): C {
+    return putEntries(keyValues.toListKt())
+}
+
+fun <C : MutableMap<Any?, Any?>> C.putEntries(keyValues: Iterable<Any?>): C {
+    val iterator = keyValues.iterator()
+    while (iterator.hasNext()) {
+        val key = iterator.next()
+        if (iterator.hasNext()) {
+            val value = iterator.next()
+            this[key] = value
+        } else {
+            this[key] = null
+            break
+        }
+    }
+    return this
 }
