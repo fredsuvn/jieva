@@ -2,7 +2,6 @@ package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanCopyOptions
-import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
 import xyz.srclab.common.collect.IterableType.Companion.toIterableType
@@ -419,12 +418,10 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
 }
 
 open class BeanConvertHandler @JvmOverloads constructor(
-    beanResolver: BeanResolver = BeanResolver.DEFAULT,
+    private val copyOptions: BeanCopyOptions = BeanCopyOptions.DEFAULT,
     private val builderGenerator: (Class<*>) -> Any = { it.toInstance() },
     private val buildFunction: (builder: Any, toType: Class<*>) -> Any = { builder, _ -> builder },
 ) : AbstractTypeConvertHandler() {
-
-    private val copyOptions: BeanCopyOptions = BeanCopyOptions.DEFAULT.withBeanResolver(beanResolver)
 
     override fun convertNull(toType: Type, converter: Converter): Any {
         return Default.NULL
@@ -455,25 +452,33 @@ open class BeanConvertHandler @JvmOverloads constructor(
     }
 
     private fun toLinkedHashMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
-        return from.copyProperties(LinkedHashMap<Any?, Any?>(), copyOptions.withFromToTypes(fromType, toType))
+        return from.copyProperties(LinkedHashMap<Any?, Any?>(), currentCopyOptions(fromType, toType, converter))
     }
 
     private fun toHashMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
-        return from.copyProperties(HashMap<Any?, Any?>(), copyOptions.withFromToTypes(fromType, toType))
+        return from.copyProperties(HashMap<Any?, Any?>(), currentCopyOptions(fromType, toType, converter))
     }
 
     private fun toTreeMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
-        return from.copyProperties(TreeMap<Any?, Any?>(), copyOptions.withFromToTypes(fromType, toType))
+        return from.copyProperties(TreeMap<Any?, Any?>(), currentCopyOptions(fromType, toType, converter))
     }
 
     private fun toConcurrentHashMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
-        return from.copyProperties(ConcurrentHashMap<Any?, Any?>(), copyOptions.withFromToTypes(fromType, toType))
+        return from.copyProperties(ConcurrentHashMap<Any?, Any?>(), currentCopyOptions(fromType, toType, converter))
     }
 
     private fun toObject(from: Any, fromType: Type, toType: Class<*>, converter: Converter): Any {
         val builder = builderGenerator(toType)
-        from.copyProperties(builder, copyOptions.withFromToTypes(fromType, toType))
+        from.copyProperties(builder, currentCopyOptions(fromType, builder.javaClass, converter))
         return buildFunction(builder, toType)
+    }
+
+    private fun currentCopyOptions(fromType: Type, toType: Type, converter: Converter): BeanCopyOptions {
+        return copyOptions.toBuilder()
+            .fromType(fromType)
+            .toType(toType)
+            .converter(converter)
+            .build()
     }
 
     companion object {
