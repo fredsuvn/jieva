@@ -1,7 +1,5 @@
 package test.java.xyz.srclab.common.bean;
 
-import kotlin.jvm.functions.Function1;
-import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Anys;
@@ -67,13 +65,14 @@ public class BeanTest {
 
         a.setP1("111");
         b.setP1("567");
-        Beans.copyProperties(a, b, new BeanResolver.CopyOptions() {
-            @NotNull
-            @Override
-            public Function1<Object, Boolean> nameFilter() {
-                return name -> !name.equals("p1");
-            }
-        });
+        Beans.copyProperties(a, b, BeanCopyOptions.DEFAULT.withNameFilter(name -> !name.equals("p1")));
+        //Beans.copyProperties(a, b, new BeanResolver.CopyOptions() {
+        //    @NotNull
+        //    @Override
+        //    public Function1<Object, Boolean> nameFilter() {
+        //        return name -> !name.equals("p1");
+        //    }
+        //});
         Assert.assertEquals(b.getP1(), "567");
         Assert.assertEquals(b.getP2(), a.getP2());
         Assert.assertEquals(b.getP3(), a.getP3());
@@ -114,9 +113,12 @@ public class BeanTest {
         simpleBean.setP2(888);
         Assert.assertEquals(simpleMap.get("p2"), 888);
 
-        BeanResolver.CopyOptions copyOptions = BeanResolver.CopyOptions.DEFAULT
-                .withTypes(SimpleBean.class, Types.parameterizedType(Map.class, String.class, int.class))
+        BeanCopyOptions copyOptions = BeanCopyOptions.DEFAULT
+                .withFromToTypes(SimpleBean.class, Types.parameterizedType(Map.class, String.class, int.class))
                 .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
+        //BeanResolver.CopyOptions copyOptions = BeanResolver.CopyOptions.DEFAULT
+        //        .withTypes(SimpleBean.class, Types.parameterizedType(Map.class, String.class, int.class))
+        //        .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
         Map<String, Integer> siMap = Anys.as(Beans.asMap(simpleBean, copyOptions));
         logger.log("siMap: {}", siMap);
         Assert.assertEquals(siMap.get("p1"), (Integer) 555);
@@ -140,7 +142,9 @@ public class BeanTest {
         a.setS(s1);
 
         B<Long> b = Beans.copyProperties(a, new B(),
-                BeanResolver.CopyOptions.DEFAULT.withToType(Types.parameterizedType(B.class, Long.class)));
+                BeanCopyOptions.DEFAULT.withToType(Types.parameterizedType(B.class, Long.class)));
+        //B<Long> b = Beans.copyProperties(a, new B(),
+        //        BeanResolver.CopyOptions.DEFAULT.withToType(Types.parameterizedType(B.class, Long.class)));
         Assert.assertEquals(b.getI1(), Arrays.asList(1, 2, 3));
         Assert.assertEquals(b.getI2(), new BigDecimal(666));
         Assert.assertEquals(b.getI3(), new List[]{Arrays.asList(1, 2, 3)});

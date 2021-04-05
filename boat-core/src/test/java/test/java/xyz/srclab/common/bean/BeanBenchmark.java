@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
  * @author sunqian
  */
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 60)
-@Measurement(iterations = 3, time = 60)
+@Warmup(iterations = 3, time = 30)
+@Measurement(iterations = 3, time = 30)
 @Threads(16)
 @Fork(1)
 @State(value = Scope.Benchmark)
@@ -24,11 +24,11 @@ public class BeanBenchmark {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
-    private PerformanceBean initBean;
+    private BenchmarkBean initBean;
 
     @Setup
     public void init() {
-        initBean = new PerformanceBean();
+        initBean = new BenchmarkBean();
         initBean.setS1("s1");
         initBean.setS2("s2");
         initBean.setS3("s3");
@@ -49,18 +49,40 @@ public class BeanBenchmark {
 
     @Benchmark
     public void testBeans() {
-        Beans.copyProperties(initBean, new PerformanceBean());
+        Beans.copyProperties(initBean, new BenchmarkBean());
     }
 
     @Benchmark
     public void testBeanUtils() throws Exception {
-        BeanUtils.copyProperties(new PerformanceBean(), initBean);
+        BeanUtils.copyProperties(new BenchmarkBean(), initBean);
+    }
+
+    @Benchmark
+    public void testSetDirectly() throws Exception {
+        BenchmarkBean bean = new BenchmarkBean();
+        bean.setS1(initBean.getS1());
+        bean.setS2(initBean.getS2());
+        bean.setS3(initBean.getS3());
+        bean.setS4(initBean.getS4());
+        bean.setS5(initBean.getS5());
+        bean.setS6(initBean.getS6());
+        bean.setS7(initBean.getS7());
+        bean.setS8(initBean.getS8());
+        bean.setI1(initBean.getI1());
+        bean.setI2(initBean.getI2());
+        bean.setI3(initBean.getI3());
+        bean.setI4(initBean.getI4());
+        bean.setI5(initBean.getI5());
+        bean.setI6(initBean.getI6());
+        bean.setI7(initBean.getI7());
+        bean.setI8(initBean.getI8());
     }
 
     /*
-     * Benchmark                           Mode  Cnt     Score     Error   Units
-     * BeanPerformanceTest.testBeanUtils  thrpt    3   360.217 ±  53.893  ops/ms
-     * BeanPerformanceTest.testBeans      thrpt    3  6751.077 ± 157.653  ops/ms
+     * Benchmark                       Mode  Cnt       Score     Error   Units
+     * BeanBenchmark.testBeanUtils    thrpt    3     370.502 ± 102.887  ops/ms
+     * BeanBenchmark.testBeans        thrpt    3    7469.095 ±  41.197  ops/ms
+     * BeanBenchmark.testSetDirectly  thrpt    3  154631.656 ± 921.842  ops/ms
      */
     public static void main(String[] args) throws Exception {
         Options options = new OptionsBuilder().include(BeanBenchmark.class.getSimpleName()).build();

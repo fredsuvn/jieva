@@ -1,6 +1,5 @@
 package xyz.srclab.common.state
 
-import xyz.srclab.common.collect.asToMutableList
 import xyz.srclab.common.state.State.Companion.stateEquals
 import xyz.srclab.common.state.State.Companion.stateHashCode
 import xyz.srclab.common.state.State.Companion.stateToString
@@ -56,8 +55,7 @@ abstract class CharsState<T : State<String, String, T>> @JvmOverloads constructo
         @JvmName("moreDescriptions")
         @JvmStatic
         fun List<CharSequence>.moreDescriptions(moreDescription: String): List<String> {
-            val newDescriptions = this.asToMutableList()
-            newDescriptions.add(moreDescription)
+            val newDescriptions = this.plus(moreDescription)
             return newDescriptions.toList().map { it.toString() }
         }
 
@@ -70,7 +68,7 @@ abstract class CharsState<T : State<String, String, T>> @JvmOverloads constructo
             if (this.size == 1) {
                 return this.first().toString()
             }
-            return "${this.first()}${this.subList(1, this.size).joinToString { "[$it]" }}"
+            return "${this.first()}${this.subList(1, this.size).joinToString("") { "[$it]" }}"
         }
     }
 }

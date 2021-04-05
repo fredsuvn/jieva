@@ -1,7 +1,8 @@
-package sample.java.xyz.srclab.common.state;
+package test.java.xyz.srclab.common.state;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.annotations.Immutable;
 import xyz.srclab.common.state.CharsState;
@@ -10,29 +11,31 @@ import xyz.srclab.common.test.TestLogger;
 
 import java.util.List;
 
-public class StateSample {
+public class StateTest {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testState() {
-        MyState myState = new MyState(1, "description");
-        MyState newState = myState.withMoreDescription("cause");
-        //description[cause]
-        logger.log(newState.description());
+        TestState testState = new TestState(1, "description");
+        TestState newState = testState.withMoreDescription("cause");
+        TestState newNewState = newState.withMoreDescription("cause2");
+        //description[cause][cause2]
+        logger.log(newNewState.description());
+        Assert.assertEquals(newNewState.description(), "description[cause][cause2]");
     }
 
-    public static class MyState implements State<Integer, String, MyState> {
+    public static class TestState implements State<Integer, String, TestState> {
 
         private final int code;
         private final List<String> descriptions;
 
-        public MyState(int code, @Nullable String description) {
+        public TestState(int code, @Nullable String description) {
             this.code = code;
             this.descriptions = CharsState.newDescriptions(description);
         }
 
-        public MyState(int code, @Immutable List<String> descriptions) {
+        public TestState(int code, @Immutable List<String> descriptions) {
             this.code = code;
             this.descriptions = descriptions;
         }
@@ -56,14 +59,14 @@ public class StateSample {
 
         @NotNull
         @Override
-        public MyState withNewDescription(@Nullable String newDescription) {
-            return new MyState(code, CharsState.newDescriptions(newDescription));
+        public StateTest.TestState withNewDescription(@Nullable String newDescription) {
+            return new TestState(code, CharsState.newDescriptions(newDescription));
         }
 
         @NotNull
         @Override
-        public MyState withMoreDescription(String moreDescription) {
-            return new MyState(code, CharsState.moreDescriptions(descriptions(), moreDescription));
+        public StateTest.TestState withMoreDescription(String moreDescription) {
+            return new TestState(code, CharsState.moreDescriptions(descriptions(), moreDescription));
         }
     }
 }

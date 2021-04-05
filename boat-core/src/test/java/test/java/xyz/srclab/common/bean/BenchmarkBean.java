@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.bean;
 /**
  * @author sunqian
  */
-public class PerformanceBean {
+public class BenchmarkBean {
 
     private String s1;
     private String s2;
