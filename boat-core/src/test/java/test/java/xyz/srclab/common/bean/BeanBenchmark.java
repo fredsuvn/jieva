@@ -80,9 +80,10 @@ public class BeanBenchmark {
 
     /*
      * Benchmark                       Mode  Cnt       Score     Error   Units
-     * BeanBenchmark.testBeanUtils    thrpt    3     370.502 ± 102.887  ops/ms
-     * BeanBenchmark.testBeans        thrpt    3    7469.095 ±  41.197  ops/ms
-     * BeanBenchmark.testSetDirectly  thrpt    3  154631.656 ± 921.842  ops/ms
+     * BeanBenchmark.testBeanUtils    thrpt    3     387.645 ±    25.111  ops/ms
+     * BeanBenchmark.testBeans        thrpt    3    8029.078 ±   367.402  ops/ms
+     *
+     * BeanBenchmark.testSetDirectly  thrpt    3  157626.355 ± 12370.720  ops/ms
      */
     public static void main(String[] args) throws Exception {
         Options options = new OptionsBuilder().include(BeanBenchmark.class.getSimpleName()).build();
