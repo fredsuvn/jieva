@@ -117,9 +117,9 @@ fun <K, V> Map<K, List<V>>.toListMap(): ListMap<K, V> {
 @JvmName("mutableListMap")
 @JvmOverloads
 fun <K, V> MutableMap<K, MutableList<V>>.toMutableListMap(
-    setGenerator: () -> MutableList<V> = { LinkedList() }
+    listGenerator: () -> MutableList<V> = { LinkedList() }
 ): MutableListMap<K, V> {
-    return MutableListMapImpl(this, setGenerator)
+    return MutableListMapImpl(this, listGenerator)
 }
 
 private open class ListMapBase<K, V>(map: Map<K, List<V>>) : Map<K, List<V>> by map
@@ -141,17 +141,17 @@ private class ListMapImpl<K, V>(private val map: Map<K, List<V>>) : ListMapBase<
 private open class MutableListMapBase<K, V>(map: MutableMap<K, MutableList<V>>) : MutableMap<K, MutableList<V>> by map
 private class MutableListMapImpl<K, V>(
     private val map: MutableMap<K, MutableList<V>>,
-    private val setGenerator: () -> MutableList<V>,
+    private val listGenerator: () -> MutableList<V>,
 ) : MutableListMapBase<K, V>(map), MutableListMap<K, V> {
 
     override fun add(key: K, value: V): MutableList<V> {
-        val result = this.getOrPut(key, setGenerator)
+        val result = this.getOrPut(key, listGenerator)
         result.add(value)
         return result
     }
 
     override fun addAll(key: K, values: Iterable<V>): MutableList<V> {
-        val result = this.getOrPut(key, setGenerator)
+        val result = this.getOrPut(key, listGenerator)
         result.addAll(values)
         return result
     }
