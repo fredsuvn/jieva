@@ -2712,19 +2712,32 @@ fun <T> Sequence<T>.minus(elements: Sequence<T>): Sequence<T> {
 }
 
 //Creation:
-fun <C : MutableMap<Any?, Any?>> C.putEntries(vararg keyValues: Any?): C {
+@JvmName("newCollection")
+fun <T, C : MutableCollection<T>> C.addElements(vararg elements: T): C {
+    return addElements(elements.toListKt())
+}
+
+@JvmName("newCollection")
+fun <T, C : MutableCollection<T>> C.addElements(elements: Iterable<T>): C {
+    this.addAll(elements)
+    return this
+}
+
+@JvmName("newMap")
+fun <K, V, C : MutableMap<K, V>> C.putEntries(vararg keyValues: Any?): C {
     return putEntries(keyValues.toListKt())
 }
 
-fun <C : MutableMap<Any?, Any?>> C.putEntries(keyValues: Iterable<Any?>): C {
+@JvmName("newMap")
+fun <K, V, C : MutableMap<K, V>> C.putEntries(keyValues: Iterable<Any?>): C {
     val iterator = keyValues.iterator()
     while (iterator.hasNext()) {
         val key = iterator.next()
         if (iterator.hasNext()) {
             val value = iterator.next()
-            this[key] = value
+            this[key.asAny()] = value.asAny()
         } else {
-            this[key] = null
+            this[key.asAny()] = null.asAny()
             break
         }
     }

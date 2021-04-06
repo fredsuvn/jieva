@@ -1052,7 +1052,8 @@ Collect package provides interfaces, utilities and Ops operation for collection 
 * ArrayCollects: Utilities for Array;
 * IterableOps, ListOps, SetOps, MapOps: Ops interfaces, provide chain operation, mainly for Java;
 * SequenceOps: Ops for Sequence;
-* IterableType, MapType: Meta type interfaces for generic Collection types.
+* IterableType, MapType: Meta type interfaces for generic Collection types;
+* MultiMaps: MultiMaps provides multi-values Map such as SetMap, MutableSetMap, ListMap and MutableListMap.
 
 ===== Java Examples
 
@@ -1084,6 +1085,84 @@ public class CollectSample {
                 .reduce(Integer::sum);
         //200
         logger.log("sum: {}", sum);
+    }
+
+    @Test
+    public void testMultiMap() {
+        SetMap<String, String> setMap = MultiMaps.setMap(
+                Collects.newMap(
+                        new LinkedHashMap<>(),
+                        "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
+                )
+        );
+        //setMap: {s=[1, 2, 3]}
+        logger.log("setMap: {}", setMap);
+
+        MutableSetMap<String, String> mutableSetMap = MultiMaps.mutableSetMap(
+                Collects.newMap(
+                        new LinkedHashMap<>(),
+                        "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
+                )
+        );
+        mutableSetMap.add("s", "9");
+        mutableSetMap.addAll("s", Collects.newCollection(new LinkedHashSet<>(), "11", "12", "13"));
+        //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
+        logger.log("mutableSetMap: {}", mutableSetMap);
+
+        ListMap<String, String> listMap = MultiMaps.listMap(
+                Collects.newMap(
+                        new LinkedHashMap<>(),
+                        "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
+                )
+        );
+        //listMap: {s=[1, 2, 3]}
+        logger.log("listMap: {}", listMap);
+
+        MutableListMap<String, String> mutableListMap = MultiMaps.mutableListMap(
+                Collects.newMap(
+                        new LinkedHashMap<>(),
+                        "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
+                )
+        );
+        mutableListMap.add("s", "9");
+        mutableListMap.addAll("s", Collects.newCollection(new LinkedList<>(), "11", "12", "13"));
+        //mutableListMap: {s=[1, 2, 3, 9, 11, 12, 13]}
+        logger.log("mutableListMap: {}", mutableListMap);
+    }
+}
+----
+
+===== Kotlin Examples
+
+[source,kotlin]
+----
+class CollectSample {
+
+    @Test
+    fun testMultiMap() {
+        val setMap = mapOf("s" to setOf("1", "2", "3")).toSetMap()
+        //setMap: {s=[1, 2, 3]}
+        logger.log("setMap: {}", setMap)
+
+        val mutableSetMap = mutableMapOf("s" to mutableSetOf("1", "2", "3")).toMutableSetMap()
+        mutableSetMap.add("s", "9")
+        mutableSetMap.addAll("s", LinkedHashSet<String>().addElements("11", "12", "13"))
+        //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
+        logger.log("mutableSetMap: {}", mutableSetMap)
+
+        val listMap = mapOf("s" to listOf("1", "2", "3")).toListMap()
+        //listMap: {s=[1, 2, 3]}
+        logger.log("listMap: {}", listMap)
+
+        val mutableListMap = mutableMapOf("s" to mutableListOf("1", "2", "3")).toMutableListMap()
+        mutableListMap.add("s", "9")
+        mutableListMap.addAll("s", LinkedList<String>().addElements("11", "12", "13"))
+        //mutableListMap: {s=[1, 2, 3, 9, 11, 12, 13]}
+        logger.log("mutableListMap: {}", mutableListMap)
+    }
+
+    companion object {
+        private val logger = TestLogger.DEFAULT
     }
 }
 ----
