@@ -205,7 +205,7 @@ Base包提供基本的核心基础接口, 功能和工具:
 * 语法增强(主要针对java): Let, Ref, Lazy;
 * 字符串功能: CharsFormat, CharsTemplate, NamingCase;
 * 核心基础接口: Accessor, Serial, SpecParser, CachingProductBuilder
-* 常用工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Loaders;
+* 常用工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
 * 其他工具: About, Counter, Shell.
 
 ##### Java Examples
@@ -404,6 +404,14 @@ public class BaseSample {
       //java.lang.NullPointerException: null
       logger.log("e: {}", e);
     }
+
+    //Enums examples:
+    TestEnum t1 = Enums.valueOf(TestEnum.class, "T1");
+    //t1: T1
+    logger.log("t1: {}", t1);
+    TestEnum t2 = Enums.valueOfIgnoreCase(TestEnum.class, "t2");
+    //t2: T2
+    logger.log("t2: {}", t2);
   }
 
   @Test
@@ -496,6 +504,11 @@ public class BaseSample {
     //Powered by: poweredBy
     //© 2021 SrcLab
     logger.log("About: {}", about);
+  }
+
+  public enum TestEnum {
+    T1,
+    T2
   }
 }
 ```
@@ -654,6 +667,14 @@ class BaseSample {
       //java.lang.NullPointerException: null
       logger.log("e: {}", e)
     }
+
+    //Enums examples:
+    val t1: TestEnum = TestEnum::class.java.enumValueOf("T1")
+    //t1: T1
+    logger.log("t1: {}", t1)
+    val t2: TestEnum = TestEnum::class.java.enumValueOfIgnoreCase("t2")
+    //t2: T2
+    logger.log("t2: {}", t2)
   }
 
   @Test
@@ -749,6 +770,10 @@ class BaseSample {
   companion object {
     private val logger = TestLogger.DEFAULT
   }
+}
+
+enum class TestEnum {
+  T1, T2
 }
 ```
 

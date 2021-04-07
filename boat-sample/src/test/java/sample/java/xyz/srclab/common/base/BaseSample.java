@@ -203,6 +203,14 @@ public class BaseSample {
             //java.lang.NullPointerException: null
             logger.log("e: {}", e);
         }
+
+        //Enums examples:
+        TestEnum t1 = Enums.valueOf(TestEnum.class, "T1");
+        //t1: T1
+        logger.log("t1: {}", t1);
+        TestEnum t2 = Enums.valueOfIgnoreCase(TestEnum.class, "t2");
+        //t2: T2
+        logger.log("t2: {}", t2);
     }
 
     @Test
@@ -295,5 +303,10 @@ public class BaseSample {
         //Powered by: poweredBy
         //© 2021 SrcLab
         logger.log("About: {}", about);
+    }
+
+    public enum TestEnum {
+        T1,
+        T2
     }
 }
