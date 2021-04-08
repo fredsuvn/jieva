@@ -166,6 +166,14 @@ class BaseSample {
             //java.lang.NullPointerException: null
             logger.log("e: {}", e)
         }
+
+        //Enums examples:
+        val t1: TestEnum = TestEnum::class.java.enumValueOf("T1")
+        //t1: T1
+        logger.log("t1: {}", t1)
+        val t2: TestEnum = TestEnum::class.java.enumValueOfIgnoreCase("t2")
+        //t2: T2
+        logger.log("t2: {}", t2)
     }
 
     @Test
@@ -261,4 +269,8 @@ class BaseSample {
     companion object {
         private val logger = TestLogger.DEFAULT
     }
+}
+
+enum class TestEnum {
+    T1, T2
 }

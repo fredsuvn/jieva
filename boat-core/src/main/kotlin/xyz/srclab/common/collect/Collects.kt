@@ -1048,7 +1048,7 @@ inline fun <reified T> Iterable<T>.toTypedArray(): Array<T> {
 
 fun <T> Iterable<T>.toArray(): Array<Any?> {
     val list = this.asToList()
-    return JavaCollects.toArray(list)
+    return JavaCollects.toArray(list).asAny()
 }
 
 fun <T> Iterable<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
@@ -2580,7 +2580,7 @@ inline fun <reified T> Sequence<T>.toTypedArray(): Array<T> {
 
 fun <T> Sequence<T>.toArray(): Array<Any?> {
     val list = this.toListKt()
-    return JavaCollects.toArray(list)
+    return JavaCollects.toArray(list).asAny()
 }
 
 fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {

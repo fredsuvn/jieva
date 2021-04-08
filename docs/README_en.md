@@ -207,7 +207,7 @@ Base package provides base core and basic interfaces, functions and utilities:
 * Syntax enhancement (mainly for Java): Let, Ref, Lazy;
 * String functions: CharsFormat, CharsTemplate, NamingCase;
 * Core and basic interfaces: Accessor, Serial, SpecParser, CachingProductBuilder
-* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Loaders;
+* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
 * Other tools: About, Counter, Shell.
 
 ##### Java Examples
@@ -406,6 +406,14 @@ public class BaseSample {
       //java.lang.NullPointerException: null
       logger.log("e: {}", e);
     }
+
+    //Enums examples:
+    TestEnum t1 = Enums.valueOf(TestEnum.class, "T1");
+    //t1: T1
+    logger.log("t1: {}", t1);
+    TestEnum t2 = Enums.valueOfIgnoreCase(TestEnum.class, "t2");
+    //t2: T2
+    logger.log("t2: {}", t2);
   }
 
   @Test
@@ -498,6 +506,11 @@ public class BaseSample {
     //Powered by: poweredBy
     //© 2021 SrcLab
     logger.log("About: {}", about);
+  }
+
+  public enum TestEnum {
+    T1,
+    T2
   }
 }
 ```
@@ -656,6 +669,14 @@ class BaseSample {
       //java.lang.NullPointerException: null
       logger.log("e: {}", e)
     }
+
+    //Enums examples:
+    val t1: TestEnum = TestEnum::class.java.enumValueOf("T1")
+    //t1: T1
+    logger.log("t1: {}", t1)
+    val t2: TestEnum = TestEnum::class.java.enumValueOfIgnoreCase("t2")
+    //t2: T2
+    logger.log("t2: {}", t2)
   }
 
   @Test
@@ -751,6 +772,10 @@ class BaseSample {
   companion object {
     private val logger = TestLogger.DEFAULT
   }
+}
+
+enum class TestEnum {
+  T1, T2
 }
 ```
 

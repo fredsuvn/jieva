@@ -1,5 +1,7 @@
 package xyz.srclab.common.collect;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 
 /**
@@ -7,11 +9,13 @@ import java.util.Collection;
  */
 class JavaCollects {
 
-    static Object[] toArray(Collection<?> collection) {
+    @NotNull
+    static Object[] toArray(@NotNull Collection<?> collection) {
         return collection.toArray();
     }
 
-    static <T> T[] toArray(Collection<T> collection, T[] array) {
+    @NotNull
+    static <T> T[] toArray(@NotNull Collection<T> collection, @NotNull T[] array) {
         return collection.toArray(array);
     }
 }
