@@ -9,10 +9,6 @@ import java.math.BigInteger
 import java.util.*
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
-import kotlin.NoSuchElementException
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
-import kotlin.collections.LinkedHashSet
 import kotlin.random.Random
 import kotlin.streams.asStream
 import kotlin.toBigDecimal
@@ -1787,6 +1783,11 @@ inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
     transform: (Map.Entry<K, V>) -> Iterable<R>
 ): C {
     return this.flatMapToKt(destination, transform)
+}
+
+@JvmOverloads
+fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = castSelfComparableComparator()): Map<K, V> {
+    return this.entries.sortedWithKt(comparator).associateToKt(LinkedHashMap()) { it.key to it.value }
 }
 
 fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> {
