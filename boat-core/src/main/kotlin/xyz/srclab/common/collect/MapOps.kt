@@ -1,6 +1,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.castSelfComparableComparator
 
 class MapOps<K, V>(private var map: Map<K, V>) {
 
@@ -78,6 +79,11 @@ class MapOps<K, V>(private var map: Map<K, V>) {
 
     fun <R, C : MutableCollection<in R>> flatMapTo(destination: C, transform: (Map.Entry<K, V>) -> Iterable<R>): C {
         return finalMap().flatMapTo(destination, transform)
+    }
+
+    @JvmOverloads
+    fun sorted(comparator: Comparator<in Map.Entry<K, V>> = castSelfComparableComparator()): Map<K, V> {
+        return finalMap().sorted(comparator)
     }
 
     fun toImmutableMap(): ImmutableMap<K, V> {
