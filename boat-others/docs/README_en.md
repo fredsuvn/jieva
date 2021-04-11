@@ -1,4 +1,4 @@
-# Boat Others:  Special or Third Parties Support [Boat/](../)
+# Boat Others:  Special or Third Parties Support Boat
 
 ## Variables
 
