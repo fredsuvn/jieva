@@ -90,6 +90,14 @@ class BaseSample {
     }
 
     @Test
+    fun testLazyToString() {
+        val counter = 0.counterStarts()
+        val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyToString()
+        //0
+        logger.log("lazyToString: {}", lazyToString)
+    }
+
+    @Test
     fun testLoaders() {
         val cls = "[[[Ljava.lang.String;".loadClass<Array<Array<Array<String>>>>()
         //class [[[Ljava.lang.String;

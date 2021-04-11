@@ -202,7 +202,7 @@ Base package provides base core and basic interfaces, functions and utilities:
 * String functions: CharsFormat, CharsTemplate, NamingCase;
 * Core and basic interfaces: Accessor, Serial, SpecParser, CachingProductBuilder
 * Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
-* Other tools: About, Counter, Shell.
+* Other tools: About, Counter, Shell, LazyToString.
 
 ##### Java Examples
 
@@ -321,6 +321,14 @@ public class BaseSample {
     logger.log("value1: {}", value1);
     logger.log("value2: {}", value2);
     logger.log("value3: {}", value3);
+  }
+
+  @Test
+  public void testLazyToString() {
+    Counter counter = Counter.startsAt(0);
+    LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+    //0
+    logger.log("lazyToString: {}", lazyToString);
   }
 
   @Test
@@ -584,6 +592,14 @@ class BaseSample {
     val atomicCounter = 100.counterStarts(true)
     atomicCounter.incrementAndGetInt()
     atomicCounter.reset()
+  }
+
+  @Test
+  fun testLazyToString() {
+    val counter = 0.counterStarts()
+    val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyToString()
+    //0
+    logger.log("lazyToString: {}", lazyToString)
   }
 
   @Test

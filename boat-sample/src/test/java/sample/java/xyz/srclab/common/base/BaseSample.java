@@ -127,6 +127,14 @@ public class BaseSample {
     }
 
     @Test
+    public void testLazyToString() {
+        Counter counter = Counter.startsAt(0);
+        LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+        //0
+        logger.log("lazyToString: {}", lazyToString);
+    }
+
+    @Test
     public void testLoaders() {
         Class<String[][][]> cls = Loaders.loadClass("[[[Ljava.lang.String;");
         //class [[[Ljava.lang.String;

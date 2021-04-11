@@ -198,7 +198,7 @@ Base包提供基本的核心基础接口, 功能和工具:
 * 字符串功能: CharsFormat, CharsTemplate, NamingCase;
 * 核心基础接口: Accessor, Serial, SpecParser, CachingProductBuilder
 * 常用工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
-* 其他工具: About, Counter, Shell.
+* 其他工具: About, Counter, Shell, LazyToString.
 
 ##### Java Examples
 
@@ -317,6 +317,14 @@ public class BaseSample {
     logger.log("value1: {}", value1);
     logger.log("value2: {}", value2);
     logger.log("value3: {}", value3);
+  }
+
+  @Test
+  public void testLazyToString() {
+    Counter counter = Counter.startsAt(0);
+    LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+    //0
+    logger.log("lazyToString: {}", lazyToString);
   }
 
   @Test
@@ -580,6 +588,14 @@ class BaseSample {
     val atomicCounter = 100.counterStarts(true)
     atomicCounter.incrementAndGetInt()
     atomicCounter.reset()
+  }
+
+  @Test
+  fun testLazyToString() {
+    val counter = 0.counterStarts()
+    val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyToString()
+    //0
+    logger.log("lazyToString: {}", lazyToString)
   }
 
   @Test
