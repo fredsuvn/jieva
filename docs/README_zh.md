@@ -7,16 +7,6 @@
 * author: Sun Qian
 * boat-version: 0.0.0
 
-## 修订
-
-|Date|Revision|Author|Content|
-|---|---|---|---|
-|日期|修订版|作者|内容
-|2020-03-26|0.0.0|{author}|旧项目
-|2020-04-12|1.0.0|{author}|旧项目更新
-|2020-12-10|0.0.0|{author}|新项目
-|2020-12-10|{boat-version}|{author}|新项目重构
-
 ## 目录
 
 * [简介](#introduction)

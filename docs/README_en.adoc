@@ -1,24 +1,13 @@
 = Boat: SrcLab Core Libraries for Java/kotlin
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
-:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
 :emaill: fredsuvn@163.com
 :url: https://github.com/srclab-projects/boat
 :qq: 1037555759
+:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
 :boat-version: 0.0.0
 
 image::../logo.svg[Boat]
-
-== Revision
-
-[options="header"]
-|===
-|Date|Revision|Author|Content
-|2020-03-26|0.0.0|{author}|Old
-|2020-04-12|1.0.0|{author}|Old update
-|2020-12-10|0.0.0|{author}|New
-|2020-12-10|{boat-version}|{author}|New refactoring
-|===
 
 == Toc
 
