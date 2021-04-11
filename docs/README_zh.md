@@ -33,6 +33,8 @@ Boat包括:
 
 * *boat*: 引入所有常用模块包括core, codec, serialize和id.
 
+Boat也有对其他特殊需求或第三方的支持, 参见[boat-others/](../boat-others/).
+
 ## <a id="getting"/>获取
 
 ### Gradle

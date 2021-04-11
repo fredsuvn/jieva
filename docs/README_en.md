@@ -34,6 +34,8 @@ If you want to import common above modules at once (core, codec, serialize and i
 
 * *boat*: To import common Boat modules including core, codec, serialize and id.
 
+Boat also contains libraries for supporting special or third parties, see [boat-others/](../boat-others/).
+
 ## <a id="getting"/>Getting
 
 ### Gradle
