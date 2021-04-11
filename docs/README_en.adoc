@@ -1,24 +1,13 @@
 = Boat: SrcLab Core Libraries for Java/kotlin
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
-:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
 :emaill: fredsuvn@163.com
 :url: https://github.com/srclab-projects/boat
 :qq: 1037555759
+:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
 :boat-version: 0.0.0
 
 image::../logo.svg[Boat]
-
-== Revision
-
-[options="header"]
-|===
-|Date|Revision|Author|Content
-|2020-03-26|0.0.0|{author}|Old
-|2020-04-12|1.0.0|{author}|Old update
-|2020-12-10|0.0.0|{author}|New
-|2020-12-10|{boat-version}|{author}|New refactoring
-|===
 
 == Toc
 
@@ -44,9 +33,11 @@ Boat includes:
 * *boat-test*: Test dependencies management, to import common test libraries in test scope;
 * *boat-bom*: Boat Bom.
 
-If you want to import all above modules (boat-test and boat-bom are exclusive), just import:
+If you want to import common above modules at once (core, codec, serialize and id), just import:
 
-* *boat-all*: To import all Boat modules.
+* *boat*: To import common Boat modules including core, codec, serialize and id.
+
+Boat also contains libraries for supporting special or third parties, see link:../boat-others/[boat-others/].
 
 [#getting]
 == Getting
@@ -55,7 +46,7 @@ If you want to import all above modules (boat-test and boat-bom are exclusive), 
 
 [source,groovy,subs="attributes+"]
 ----
-implementation("xyz.srclab.common:boat-all:{boat-version}")
+implementation("xyz.srclab.common:boat:{boat-version}")
 ----
 
 === Maven
@@ -64,7 +55,7 @@ implementation("xyz.srclab.common:boat-all:{boat-version}")
 ----
 <dependency>
     <groupId>xyz.srclab.common</groupId>
-    <artifactId>boat-all</artifactId>
+    <artifactId>boat</artifactId>
     <version>{boat-version}</version>
 </dependency>
 ----

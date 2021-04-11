@@ -2,7 +2,7 @@ plugins {
   id 'build.kotlin-publish-jar'
 }
 
-description = "Boat All: All Boat libraries."
+description = "Boat Common: Common Boat libraries collection."
 
 java {
   registerFeature('optionalSupport') {

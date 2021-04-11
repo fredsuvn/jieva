@@ -10,8 +10,12 @@ javaPlatform {
 
 dependencies {
   constraints {
-    file("${rootDir}").eachDirMatch(~/boat-.*/) { dir ->
+    api project(":boat")
+    file("${rootDir}").eachDirMatch(~/boat-(?!others).*/) { dir ->
       api project(":${dir.name}")
+    }
+    file("${rootDir}/boat-others").eachDirMatch(~/boat-.*/) { dir ->
+      api project(":boat-others:${dir.name}")
     }
   }
 }
