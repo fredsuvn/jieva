@@ -39,16 +39,16 @@ Boat包括:
 * *boat-test*: 测试依赖管理, 用来在测试编译和运行范围下引入测试框架;
 * *boat-bom*: Boat Bom.
 
-如果你需要引入以上所有模块 (不包括boat-test和boat-bom), 只需要:
+如果你需要一次引入常用的模块 (core, codec, serialize and id), 只需要:
 
-* *boat-all*: 引入所有Boat模块.
+* *boat*: 引入所有常用模块包括core, codec, serialize和id.
 
 ## <a id="getting"/>获取
 
 ### Gradle
 
 ```groovy
-implementation("xyz.srclab.common:boat-all:{boat-version}")
+implementation("xyz.srclab.common:boat:{boat-version}")
 ```
 
 ### Maven
@@ -57,7 +57,7 @@ implementation("xyz.srclab.common:boat-all:{boat-version}")
 
 <dependency>
   <groupId>xyz.srclab.common</groupId>
-  <artifactId>boat-all</artifactId>
+  <artifactId>boat</artifactId>
   <version>{boat-version}</version>
 </dependency>
 ```

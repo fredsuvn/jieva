@@ -44,9 +44,9 @@ Boat includes:
 * *boat-test*: Test dependencies management, to import common test libraries in test scope;
 * *boat-bom*: Boat Bom.
 
-If you want to import all above modules (boat-test and boat-bom are exclusive), just import:
+If you want to import common above modules at once (core, codec, serialize and id), just import:
 
-* *boat-all*: To import all Boat modules.
+* *boat*: To import common Boat modules including core, codec, serialize and id.
 
 [#getting]
 == Getting
@@ -55,7 +55,7 @@ If you want to import all above modules (boat-test and boat-bom are exclusive), 
 
 [source,groovy,subs="attributes+"]
 ----
-implementation("xyz.srclab.common:boat-all:{boat-version}")
+implementation("xyz.srclab.common:boat:{boat-version}")
 ----
 
 === Maven
@@ -64,7 +64,7 @@ implementation("xyz.srclab.common:boat-all:{boat-version}")
 ----
 <dependency>
     <groupId>xyz.srclab.common</groupId>
-    <artifactId>boat-all</artifactId>
+    <artifactId>boat</artifactId>
     <version>{boat-version}</version>
 </dependency>
 ----
