@@ -1,4 +1,4 @@
-# Boat Others:  支持特殊需求或第三方的[Boat/](../../)库
+# Boat Others:  支持特殊需求或第三方的[Boat/](../)库
 
 ## Variables
 
