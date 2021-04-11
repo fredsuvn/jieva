@@ -1,4 +1,4 @@
-= Boat Others:  支持特殊需求或第三方的link:../../[Boat/]库
+= Boat Others:  支持特殊需求或第三方的link:../[Boat/]库
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
