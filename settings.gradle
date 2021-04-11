@@ -14,6 +14,9 @@ rootProject.name = 'boat-build'
 
 //Including Boat projects
 include ":boat"
-file("${rootDir}/").eachDirMatch(~/boat-.*/) { dir ->
+file("${rootDir}/").eachDirMatch(~/boat-(?!others).*/) { dir ->
   include ":${dir.name}"
+}
+file("${rootDir}/boat-others").eachDirMatch(~/boat-.*/) { dir ->
+  include ":boat-others:${dir.name}"
 }
