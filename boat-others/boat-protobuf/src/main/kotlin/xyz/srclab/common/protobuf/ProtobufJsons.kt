@@ -12,7 +12,8 @@ import com.hubspot.jackson.datatype.protobuf.ProtobufModule
 import xyz.srclab.common.serialize.json.JsonSerializer
 import xyz.srclab.common.serialize.json.JsonSerializer.Companion.toJsonSerializer
 
-internal val PROTOBUF_OBJECT_MAPPER by lazy {
+@JvmField
+val PROTOBUF_OBJECT_MAPPER: JsonMapper = run {
     val mapper = JsonMapper()
     mapper.configure(JsonGenerator.Feature.IGNORE_UNKNOWN, false)
     mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
