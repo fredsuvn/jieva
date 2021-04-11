@@ -7,6 +7,15 @@
 * author: Sun Qian
 * boat-version: 0.0.0
 
+## Revision
+
+|Date|Revision|Author|Content|
+|---|---|---|---|
+|2020-03-26|0.0.0|{author}|Old
+|2020-04-12|1.0.0|{author}|Old update
+|2020-12-10|0.0.0|{author}|New
+|2020-12-10|{boat-version}|{author}|New refactoring
+
 ## Toc
 
 * [Introduction](#introduction)
@@ -29,9 +38,6 @@ Boat includes:
 * *boat-id*: A lightweight ID generation framework;
 * *boat-test*: Test dependencies management, to import common test libraries in test scope;
 * *boat-bom*: Boat Bom.
-
-* *boat-others*: Boat also contains libraries for supporting special or third parties,
-  see [boat-others/](../boat-others/).
 
 If you want to import common above modules at once (core, codec, serialize and id), just import:
 

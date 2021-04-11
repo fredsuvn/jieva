@@ -1,43 +1,49 @@
-# Boat: SrcLab Core Libraries for Java/kotlin
+# Boat: SrcLab的核心基础Java/kotlin库
 
 ![Boat](../logo.svg)
 
-## Variables
+## 变量
 
 * author: Sun Qian
 * boat-version: 0.0.0
 
-## Toc
+## 修订
 
-* [Introduction](#introduction)
-* [Getting](#getting)
-* [Usage](#usage)
-* [Contribution and Contact](#contact)
+|Date|Revision|Author|Content|
+|---|---|---|---|
+|日期|修订版|作者|内容
+|2020-03-26|0.0.0|{author}|旧项目
+|2020-04-12|1.0.0|{author}|旧项目更新
+|2020-12-10|0.0.0|{author}|新项目
+|2020-12-10|{boat-version}|{author}|新项目重构
+
+## 目录
+
+* [简介](#introduction)
+* [获取](#getting)
+* [使用](#usage)
+* [贡献和联系方式](#contact)
 * [License](#license)
 
-## <a id="introduction"/>Introduction
+## <a id="introduction"/>简介
 
-Boat is a set of core Java/Kotlin libraries (JDK 1.8+), mostly written by kotlin, widely used on JVM projects within
-SrcLab. It provides many fast and convenient interfaces, functions and utilities.
+Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于SrcLab里的项目. 它提供了许多方便快捷的接口, 函数和工具.
 
-Boat includes:
+Boat包括:
 
-* *boat-annotations*: Core annotations, such as @Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
-* *boat-core*: Core and basic interfaces, functions and utilities;
-* *boat-serialize*: Serialization and deserialization interfaces and utilities (for json and more);
-* *boat-codec*: Codec interfaces and utilities (supports hex, base64, SHA, MD, HMAC, AES, RSA, SM2, etc.);
-* *boat-id*: A lightweight ID generation framework;
-* *boat-test*: Test dependencies management, to import common test libraries in test scope;
+* *boat-annotations*: 核心注解, 如@Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
+* *boat-core*: 核心和基础的接口, 功能, 和工具;
+* *boat-serialize*: 序列化和反序列化的接口和工具 (支持json等);
+* *boat-codec*: 编码接口和工具 (支持hex, base64, SHA, MD, HMAC, AES, RSA, SM2等);
+* *boat-id*: 一个轻量级的ID生成框架;
+* *boat-test*: 测试依赖管理, 用来在测试编译和运行范围下引入测试框架;
 * *boat-bom*: Boat Bom.
 
-* *boat-others*: Boat also contains libraries for supporting special or third parties,
-  see [boat-others/](../boat-others/).
+如果你需要一次引入常用的模块 (core, codec, serialize and id), 只需要:
 
-If you want to import common above modules at once (core, codec, serialize and id), just import:
+* *boat*: 引入所有常用模块包括core, codec, serialize和id.
 
-* *boat*: To import common Boat modules including core, codec, serialize and id.
-
-## <a id="getting"/>Getting
+## <a id="getting"/>获取
 
 ### Gradle
 
@@ -56,11 +62,11 @@ implementation("xyz.srclab.common:boat:{boat-version}")
 </dependency>
 ```
 
-### Source Code
+### 源代码
 
 https://github.com/srclab-projects/boat
 
-## <a id="usage"/>Usage
+## <a id="usage"/>使用
 
 * [Boat Annotation](#usage-annotations)
 * [Boat Core](#usage-core)
@@ -82,21 +88,19 @@ https://github.com/srclab-projects/boat
 * [Boat Codec](#usage-codec)
 * [Boat Id](#usage-id)
 
-### <a id="usage-annotations"/>Boat Annotations (boat-annotations)
+### <a id="usage-annotations"/>BoatAnnotations (boat-annotations)
 
-Boat Annotations provides a set of annotations to make codes clear and clean:
+Boat Annotations提供了许多可以让代码整洁又干净的注解:
 
-* *DefaultNonNull*/*DefaultNullable*: It tells that all variables, fields, parameters, and other use of type are
-  non-null/nullable by default in annotated scope, usually used in package-info.java;
-* *NotNull*/*Nullable*: It tells that annotated variable, field, parameter, and other use of type is non-null/nullable;
-* *JavaBean*: It tells that annotated type is a java-bean, which all properties are nullable by default;
-* *Acceptable*/*Accepted*: It tells that annotated parameter only accepts specified types.
-* *Rejectable*/*Rejected*: It tells that annotated parameter will reject specified types.
-* *Written*: It tells that the parameter may be written;
-* *Immutable*: It tells that annotated variable, field, parameter, and other use of type is immutable and thread-safe;
-* *ThreadSafe*: It tells that annotated variable, field, parameter, and other use of type is thread-safe;
-* *ThreadSafeIf*: It tells that annotated variable, field, parameter, and other use of type is thread-safe if specified
-  conditions were met;
+* *DefaultNonNull*/*DefaultNullable*: 它说明注解范围内所有的变量, 属性, 参数和类型使用默认都是non-null/nullable的, 通常用在package-info.java中;
+* *NotNull*/*Nullable*: 它说明被注解的变量, 属性, 参数和类型使用是non-null/nullable的;
+* *JavaBean*: 它说明被注解的类型是一个javabean, 所有的属性默认都是nullable的;
+* *Acceptable*/*Accepted*: 它说明参数只能接受指定的几个类型.
+* *Rejectable*/*Rejected*: 它说明参数不接受指定的几个类型.
+* *Written*: 它说明参数可能被进行写操作;
+* *Immutable*: 它说明被注解的变量, 属性, 参数和类型使用是不可变和线程安全的;
+* *ThreadSafe*: 它说明被注解的变量, 属性, 参数和类型使用是线程安全的;
+* *ThreadSafeIf*: 它说明被注解的变量, 属性, 参数和类型使用在满足指定条件的情况下是线程安全的;
 
 #### Java Examples
 
@@ -191,18 +195,18 @@ class AnnotationSample {
 }
 ```
 
-### <a id ="usage-core"/> Boat Core(boat - core)
+### <a id="usage-core"/>Boat Core (boat-core)
 
-#### <a id ="usage-core-base"/> Base
+#### <a id="usage-core-base"/>Base
 
-Base package provides base core and basic interfaces, functions and utilities:
+Base包提供基本的核心基础接口, 功能和工具:
 
-* Global shortcut objects: Current, Default, Environment;
-* Syntax enhancement (mainly for Java): Let, Ref, Lazy;
-* String functions: CharsFormat, CharsTemplate, NamingCase;
-* Core and basic interfaces: Accessor, Serial, SpecParser, CachingProductBuilder
-* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
-* Other tools: About, Counter, Shell.
+* 全局快捷对象: Current, Default, Environment;
+* 语法增强(主要针对java): Let, Ref, Lazy;
+* 字符串功能: CharsFormat, CharsTemplate, NamingCase;
+* 核心基础接口: Accessor, Serial, SpecParser, CachingProductBuilder
+* 常用工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
+* 其他工具: About, Counter, Shell.
 
 ##### Java Examples
 
@@ -775,12 +779,12 @@ enum class TestEnum {
 
 #### <a id="usage-core-bean"/>Bean
 
-Bean package provides powerful bean operation ability:
+Bean包提供了强大的bean操作功能:
 
-* Beans: Default utilities for bean operation;
-* BeanResolver: Core Interface to resolver bean, Beans use its default implementation;
+* Beans: 默认的bean工具;
+* BeanResolver: Bean操作的核心接口, Beans使用它的默认实现;
 
-> In copy-properties function, It is more than 20 times faster than Apache BeanUtils.
+> 在复制属性(copy-properties)功能上, 它比Apache的BeanUtils快20倍以上.
 
 ##### Java Examples
 
@@ -884,7 +888,7 @@ class BeanSample {
 
 #### <a id="usage-core-bus"/>Bus
 
-Bus package provide EventBus.
+Bus包提供EventBus.
 
 ##### Java Examples
 
@@ -991,14 +995,14 @@ class EventBusSample {
 
 #### <a id="usage-core-cache"/>Cache
 
-Boat provides a Cache interface and several implementations:
+Boat提供一个缓存接口和若干实现:
 
-* Cache: Cache core interface;
-* FastCache: Implemented by WeakHashMap and ThreadLocal;
-* CaffeineCache: Implemented by Caffeine;
-* GuavaCache: Implemented by Guava;
-* MapCache: Map as Cache;
-* ThreadLocalCache: ThreadLocalMap as Cache.
+* Cache: 缓存核心接口;
+* FastCache: 使用WeakHashMap和ThreadLocal的实现;
+* CaffeineCache: 使用Caffeine的实现;
+* GuavaCache: 使用Guava的实现;
+* MapCache: 将Map作为缓存的实现;
+* ThreadLocalCache: 将ThreadLocalMap作为缓存的实现.
 
 ##### Java Examples
 
@@ -1042,14 +1046,14 @@ class CacheSample {
 
 #### <a id="usage-core-collect"/>Collect
 
-Collect package provides interfaces, utilities and Ops operation for collection and array:
+Collect包提供集合和数组的接口, 工具和Ops操作:
 
-* Collects: Utilities for Collection;
-* ArrayCollects: Utilities for Array;
-* IterableOps, ListOps, SetOps, MapOps: Ops interfaces, provide chain operation, mainly for Java;
-* SequenceOps: Ops for Sequence;
-* IterableType, MapType: Meta type interfaces for generic Collection types;
-* MultiMaps: MultiMaps provides multi-values Map such as SetMap, MutableSetMap, ListMap and MutableListMap.
+* Collects: Collection工具;
+* ArrayCollects: 数组工具;
+* IterableOps, ListOps, SetOps, MapOps: Ops接口, 提供链式操作, 主要用于Java;
+* SequenceOps: Sequence的Ops接口;
+* IterableType, MapType: 泛型集合的元类型接口;
+* MultiMaps: MultiMaps提供 multi-values Map, 比如SetMap, MutableSetMap, ListMap和MutableListMap.
 
 ##### Java Examples
 
@@ -1163,11 +1167,11 @@ class CollectSample {
 
 #### <a id="usage-core-convert"/>Convert
 
-Convert package provides type-conversion function：
+Convert包提供类型转换功能:
 
-* Converts: Utilities for conversion;
-* Converter: Core interfaces for type-conversion, Converts use its default implementation;
-* FastConverter: Fast and narrowing version of Converter.
+* Converts: 转换工具;
+* Converter: 类型转换的核心接口, Converts使用它的默认实现;
+* FastConverter: 快速和功能窄化版本的Converter.
 
 ##### Java Examples
 
@@ -1338,8 +1342,7 @@ private class StringConvertHandler : FastConvertHandler<String> {
 
 #### <a id="usage-core-exception"/>Exception
 
-Exception package provides StatusException and ExceptionStatus extended from State (see [State](#usage-core-state)), and
-a ShouldNotException.
+Exception包提供StatusException和ExceptionStatus, 继承自State (参考[State](#usage-core-state)), 还有一个ShouldNotException.
 
 ##### Java Examples
 
@@ -1386,7 +1389,7 @@ class ExceptionSample {
 
 #### <a id="usage-core-invoke"/>Invoke
 
-Invoke package provides Invoker interface to call methods (for Java) and functions (for Kotlin).
+Invoke包提供Invoker接口去调用方法和函数.
 
 ##### Java Examples
 
@@ -1426,7 +1429,7 @@ class InvokeSample {
 
 #### <a id="usage-core-jvm"/>Jvm
 
-Jvm package provides Jvms utilities classes to get JVM infos.
+Jvm包提供Jvms工具类.
 
 ##### Java Examples
 
@@ -1464,7 +1467,7 @@ class JvmSample {
 
 #### <a id="usage-core-proxy"/>Proxy
 
-Proxy package provides Class proxy function with spring-cglib, cglib or JDK proxy.
+Proxy提供类代理功能, 底层使用spring-cglib, cglib或者JDK proxy.
 
 ##### Java Examples
 
@@ -1554,11 +1557,11 @@ class ProxySample {
 
 #### <a id="usage-core-reflect"/>Reflect
 
-Reflect package provides utilities classes:
+Reflect包提供相关工具类:
 
-* Reflects: Provides reflect operations;
-* Types: To build generic types;
-* TypeRef: To build a type reference.
+* Reflects: 提供反射操作;
+* Types: 用来创建泛型类型;
+* TypeRef: 用来获取类型引用.
 
 ##### Java Examples
 
@@ -1614,7 +1617,7 @@ class ReflectSample {
 
 #### <a id="usage-core-run"/>Run
 
-Run package provides Runner and Scheduler interfaces to run codes in threads or coroutines.
+Run包提供Runner和Scheduler接口来运行一段代码, 可以在一个线程或者协程里.
 
 ##### Java Examples
 
@@ -1692,7 +1695,7 @@ class RunSample {
 
 #### <a id="usage-core-state"/>State
 
-State package provides State interface to help build custom state or status type.
+State包提供State接口来复制定制状态概念的类型.
 
 ##### Java Examples
 
@@ -1794,12 +1797,12 @@ class StateSample {
 
 #### <a id="usage-core-test"/>Test
 
-Test package provides simple test tools:
+Test包提供简单的测试工具:
 
-* Tester: interface to start test tasks;
-* TestLogger: simple logger for testing;
-* TestTask and TestListener: test task and listener;
-* Tests: common utilities class for test.
+* Tester: 一个用来启动测试任务的接口;
+* TestLogger: 简单的测试日志;
+* TestTask and TestListener: 测试任务和监听器;
+* Tests: 测试工具类.
 
 ##### Java Examples
 
@@ -1841,12 +1844,12 @@ class TestSample {
 
 ### <a id="usage-serialize"/>Boat Serialize (boat-serialize)
 
-Boat Serialize (should import boat-serialize) provides core Serializer interface for serialization:
+Boat Serializer(需要导入boat-serialize)提供序列化核心接口:
 
-* Serializer: Core interface for serialization;
-* JsonSerials: JSON serialization utilities;
-* JsonSerial: Core interface for JSON serialization, JsonSerials use its default implementation (Jackson);
-* Json: Core interface denote a JSON object.
+* Serializer: 序列化核心接口;
+* JsonSerials: JSON序列化工具;
+* JsonSerial: JSON序列化核心接口, JsonSerials使用它的默认实现(Jackson);
+* Json: JSON的核心接口, 代表一个JSON对象.
 
 #### Java Examples
 
@@ -1887,12 +1890,11 @@ class SerializeSample {
 
 ### <a id="usage-codec"/>Boat Codec (boat-codec)
 
-Boat Codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and other interfaces to do with codec
-functions, supports hex, base64, AES, RSA, SM2 and more algorithms:
+Boat Codec (需要引入boat-codec)提供Codec, CodecKeys, AesKeys 以及 其他接口来实现编码功能, 支持hex, base64, AES, RSA, SM2以及更多算法:
 
-* Codec: Core interface and utilities for codec function;
-* CodecKeys: Utilities for codec keys;
-* AesKeys: Utilities for AES keys.
+* Codec: 编码功能的核心接口;
+* CodecKeys: 编码秘钥工具;
+* AesKeys: AES秘钥工具.
 
 #### Java Examples
 
@@ -1956,16 +1958,14 @@ class CodecSample {
 
 ### <a id="usage-id"/>Boat Id (boat-id)
 
-Boat ID (should import boat-id) is a lightweight and fast id generation framework. It provides IdFactory and a set of
-interface to generate id:
+Boat Id (需要引入boat-id)是一个轻量级id生成框架. 它提供IdFactory和一套接口来生成id:
 
-* IdFactory: Core interface to generate new id;
-* IdComponentFactory: Core interface to generator component of an id;
-* AbstractIdFactory: Skeletal IdFactory to help implement full IdFactory;
-* StringIdFactory: Skeletal IdFactory to help implement String-id-type IdFactory;
+* IdFactory: 核心接口, 用来生成新id;
+* IdComponentFactory: 核心接口, 用来生成新id的一部分;
+* AbstractIdFactory: IdFactory骨架实现, 用来辅助实现完整的IdFactory;
+* StringIdFactory: IdFactory骨架实现, 用来辅助实现String类型id的IdFactory;
 
-Boat ID also provides StringIdSpec, a String-type IdFactory, can build new id from a specification string, see its
-javadoc.
+Boat ID同时提供StringIdSpec类, 一个String类型id的IdFactory, 可以从给定的字符串说明中生成新id, 请去看它的javadoc.
 
 #### Java Examples
 
@@ -2007,11 +2007,11 @@ class IdSample {
 }
 ```
 
-## <a id="contact"/>Contribution and Contact
+## <a id="contact"/>贡献和联系方式
 
 * fredsuvn@163.com
 * https://github.com/srclab-projects/boat
-* QQ group: 1037555759
+* QQ群: 1037555759
 
 ## <a id="license"/>License
 

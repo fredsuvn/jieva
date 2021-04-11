@@ -1,13 +1,24 @@
 = Boat: SrcLab的核心基础Java/kotlin库
 孙谦 <fredsuvn@163.com>
 :encoding: UTF-8
+:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
 :emaill: fredsuvn@163.com
 :url: https://github.com/srclab-projects/boat
 :qq: 1037555759
-:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
 :boat-version: 0.0.0
 
 image::../logo.svg[Boat]
+
+== 修订
+
+[options="header"]
+|===
+|日期|修订版|作者|内容
+|2020-03-26|0.0.0|{author}|旧项目
+|2020-04-12|1.0.0|{author}|旧项目更新
+|2020-12-10|0.0.0|{author}|新项目
+|2020-12-10|{boat-version}|{author}|新项目重构
+|===
 
 == 目录
 
@@ -32,8 +43,6 @@ Boat包括:
 * *boat-id*: 一个轻量级的ID生成框架;
 * *boat-test*: 测试依赖管理, 用来在测试编译和运行范围下引入测试框架;
 * *boat-bom*: Boat Bom.
-
-* *boat-others*: Boat也有对其他特殊需求或第三方的支持, 参见link:../boat-others/[boat-others/].
 
 如果你需要一次引入常用的模块 (core, codec, serialize and id), 只需要:
 
