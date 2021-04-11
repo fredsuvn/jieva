@@ -179,3 +179,26 @@ private class DynamicPeriodRefreshableLazy<T>(
         }
     }
 }
+
+/**
+ * A special type of [Lazy] class that override [toString] method by [get]. This class can be used in log message of
+ * which toString executing is expensive.
+ */
+open class LazyToString<T>(delegate: Lazy<T>) : Lazy<T> by delegate {
+
+    override fun toString(): String {
+        return get().toString()
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun <T> of(delegate: Lazy<T>): LazyToString<T> {
+            return LazyToString(delegate)
+        }
+    }
+}
+
+fun <T> Lazy<T>.toLazyToString(): LazyToString<T> {
+    return LazyToString.of(this)
+}
