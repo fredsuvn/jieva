@@ -1,7 +1,5 @@
 package test.xyz.srclab.common.protobuf;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import test.xyz.srclab.common.protobuf.protogen.MessageData;
@@ -15,6 +13,7 @@ import xyz.srclab.common.protobuf.ProtobufBeans;
 import xyz.srclab.common.protobuf.ProtobufConverts;
 import xyz.srclab.common.protobuf.ProtobufJsons;
 import xyz.srclab.common.serialize.json.JsonSerials;
+import xyz.srclab.common.test.TestLogger;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -23,7 +22,7 @@ import java.util.Map;
 
 public class ProtobufTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProtobufTest.class);
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testProtobufResolver() {
@@ -53,7 +52,7 @@ public class ProtobufTest {
 
         JavaMessageData javaMessageData = new JavaMessageData();
         Beans.copyProperties(messageData, javaMessageData, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
-        logger.info("javaMessageData: {}", JsonSerials.toJsonString(javaMessageData));
+        logger.log("javaMessageData: {}", JsonSerials.toJsonString(javaMessageData));
         Assert.assertEquals(javaMessageData.getType(), MessageData.Type.TYPE_0);
         Assert.assertEquals(javaMessageData.getMessage(), "666");
         Assert.assertEquals(javaMessageData.getNumberList(), Arrays.asList("7", "8", "9"));
@@ -64,7 +63,7 @@ public class ProtobufTest {
 
         JavaRequestMessage javaRequestMessage = new JavaRequestMessage();
         Beans.copyProperties(requestMessage, javaRequestMessage, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
-        logger.info("javaRequestMessage: {}", JsonSerials.toJsonString(javaRequestMessage));
+        logger.log("javaRequestMessage: {}", JsonSerials.toJsonString(javaRequestMessage));
         Assert.assertEquals(javaRequestMessage.getId(), "123");
         Assert.assertEquals(javaRequestMessage.getData().getType(), MessageData.Type.TYPE_0);
         Assert.assertEquals(javaRequestMessage.getData().getMessage(), "666");
@@ -83,7 +82,7 @@ public class ProtobufTest {
 
         MessageData.Builder messageDataBuilder = MessageData.newBuilder();
         Beans.copyProperties(javaMessageData, messageDataBuilder, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
-        logger.info(
+        logger.log(
                 "messageDataBuilder: {}",
                 ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(messageDataBuilder)
         );
@@ -97,7 +96,7 @@ public class ProtobufTest {
 
         RequestMessage.Builder requestMessageBuilder = RequestMessage.newBuilder();
         Beans.copyProperties(javaRequestMessage, requestMessageBuilder, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
-        logger.info(
+        logger.log(
                 "requestMessageBuilder: {}",
                 ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(requestMessageBuilder)
         );
@@ -112,7 +111,7 @@ public class ProtobufTest {
 
         RequestMessage convertRequestMessage =
                 ProtobufConverts.PROTOBUF_CONVERTER.convert(javaRequestMessage, RequestMessage.class);
-        logger.info(
+        logger.log(
                 "convertRequestMessage: {}",
                 ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(convertRequestMessage)
         );

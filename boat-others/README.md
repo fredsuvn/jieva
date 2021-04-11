@@ -1,4 +1,4 @@
-# Boat Others: Third or Special Support for [Boat](../)
+# Boat Others: Special or Third Parties Support for [Boat](../)
 
 ## _Choose the doc style and language you like_:
 
