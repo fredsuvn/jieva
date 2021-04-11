@@ -1,0 +1,46 @@
+= Title: A description
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
+:emaill: fredsuvn@163.com
+:url: https://github.com/srclab-projects/srclab-template
+:qq: 1037555759
+
+//image::logo.svg[logo]
+
+== Revision
+
+[options="header"]
+|===
+|Date|Revision|Author|Content
+|2020-12-10|1.0.0|{author}|New
+|===
+
+== Toc
+
+* <<section1>>
+* <<section2>>
+* <<contact>>
+* <<license>>
+
+[#section1]
+== Section1
+
+This is section 1
+
+[#section2]
+== Section2
+
+This is section 2
+
+[#contact]
+== Contribution and Contact
+
+* {emaill}
+* {url}
+* QQ group: 1037555759
+
+[#license]
+== License
+
+{license}

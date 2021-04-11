@@ -29,11 +29,11 @@ Boat包括:
 * *boat-test*: 测试依赖管理, 用来在测试编译和运行范围下引入测试框架;
 * *boat-bom*: Boat Bom.
 
+* *boat-others*: Boat也有对其他特殊需求或第三方的支持, 参见[boat-others/](../boat-others/).
+
 如果你需要一次引入常用的模块 (core, codec, serialize and id), 只需要:
 
 * *boat*: 引入所有常用模块包括core, codec, serialize和id.
-
-Boat也有对其他特殊需求或第三方的支持, 参见[boat-others/](../boat-others/).
 
 ## <a id="getting"/>获取
 
