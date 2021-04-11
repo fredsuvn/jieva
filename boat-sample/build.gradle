@@ -11,7 +11,7 @@ java {
 }
 
 dependencies {
-  implementation project(":boat-all")
+  implementation project(":boat-common")
   implementation project(":boat-egg")
 
   testCompile project(":boat-test")
