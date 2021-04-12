@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.reflect.INHERITANCE_COMPARATOR
 
 /**
  * Fast and narrowing version of [Converter], supports convert given object to type [R].
@@ -41,7 +42,7 @@ private class FastConverterImpl<R>(handlers: Iterable<FastConvertHandler<out R>>
         .sortedWith { it1, it2 ->
             val c1 = it1.supportedType
             val c2 = it2.supportedType
-            if (c1 == c2) 0 else if (c1.isAssignableFrom(c2)) 1 else if (c2.isAssignableFrom(c1)) -1 else 0
+            INHERITANCE_COMPARATOR.compare(c1, c2)
         }
         .toTypedArray()
 

@@ -1,5 +1,4 @@
 @file:JvmName("Reflects")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.reflect
 
@@ -12,6 +11,8 @@ import xyz.srclab.common.base.Default
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.base.loadClass
 import xyz.srclab.common.collect.isEmpty
+import xyz.srclab.common.collect.sort
+import xyz.srclab.common.collect.sorted
 import java.lang.reflect.*
 
 val Member.isPublic: Boolean
@@ -1439,6 +1440,22 @@ fun @Acceptable(
         superclass = superclass.superclass
     }
     return null
+}
+
+//Inheritance sort
+
+@JvmField
+val INHERITANCE_COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
+    if (c1 == c2) 0 else if (c1.isAssignableFrom(c2)) 1 else if (c2.isAssignableFrom(c1)) -1 else 0
+}
+
+fun <T> Iterable<Class<T>>.inheritanceSorted(): List<Class<T>> {
+    return this.sorted(INHERITANCE_COMPARATOR)
+}
+
+fun <T, C : MutableList<Class<T>>> C.sortInheritance(): C {
+    this.sort(INHERITANCE_COMPARATOR)
+    return this
 }
 
 class NoSuchPropertyException(name: String) : RuntimeException(name)
