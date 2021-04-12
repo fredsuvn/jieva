@@ -1444,15 +1444,24 @@ fun @Acceptable(
 
 //Inheritance sort
 
+/**
+ * The subclass comes before the parent.
+ */
 @JvmField
 val INHERITANCE_COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
     if (c1 == c2) 0 else if (c1.isAssignableFrom(c2)) 1 else if (c2.isAssignableFrom(c1)) -1 else 0
 }
 
+/**
+ * Use [INHERITANCE_COMPARATOR] to sort the classes
+ */
 fun <T> Iterable<Class<T>>.inheritanceSorted(): List<Class<T>> {
     return this.sorted(INHERITANCE_COMPARATOR)
 }
 
+/**
+ * Use [INHERITANCE_COMPARATOR] to sort the classes
+ */
 fun <T, C : MutableList<Class<T>>> C.sortInheritance(): C {
     this.sort(INHERITANCE_COMPARATOR)
     return this
