@@ -1,0 +1,97 @@
+plugins {
+  id 'build.core'
+}
+
+//asciidoc -> html
+task(group: "asciidoc", "convertAsciidocToHtml") {
+  doLast {
+    def adocDirList = new LinkedList<String>()
+    if (!rootProject.hasProperty("convertAsciidocDirs")) {
+      printer.info("Property convertAsciidocDirs not found, use default path: docs")
+      adocDirList.add("docs")
+    } else {
+      for (dir in convertAsciidocDirs.split(",")) {
+        adocDirList.add(dir.trim())
+      }
+    }
+    for (dir in adocDirList) {
+      def dirFile = new File("${rootProject.rootDir.path}${File.separator}${dir}")
+      if (!dirFile.exists()) {
+        printer.info("Asciidoc path not found and skipped: $dirFile")
+      }
+      for (adocFile in dirFile.listFiles(new FilenameFilter() {
+        @Override
+        boolean accept(File parent, String name) {
+          return name.endsWith(".adoc")
+        }
+      })) {
+        def targetHtmlFile = new File("${adocFile.path.substring(0, adocFile.path.length() - 5)}.html")
+        printer.info("convert $adocFile to $targetHtmlFile...")
+        def errorBuilder = new StringBuilder()
+        def adocToHtmlCmd = "$asciidoctorBin -b html $adocFile.path -o $targetHtmlFile.path"
+        def adocToHtmlCmdProcess = adocToHtmlCmd.execute()
+        adocToHtmlCmdProcess.consumeProcessErrorStream(errorBuilder)
+        adocToHtmlCmdProcess.waitFor()
+        def error = errorBuilder.toString()
+        if (!error.isEmpty()) {
+          printer.info("convert $adocFile to $targetHtmlFile error: $error")
+          return
+        }
+        printer.info("convert $adocFile to $targetHtmlFile successful")
+      }
+    }
+  }
+}
+
+//html -> markdown
+task(group: "asciidoc", "convertHtmlToMarkdown") {
+  doLast {
+    def adocDirList = new LinkedList<String>()
+    if (!rootProject.hasProperty("convertAsciidocDirs")) {
+      printer.info("Property convertAsciidocDirs not found, use default path: docs")
+      adocDirList.add("docs")
+    } else {
+      for (dir in convertAsciidocDirs.split(",")) {
+        adocDirList.add(dir.trim())
+      }
+    }
+    for (dir in adocDirList) {
+      def dirFile = new File("${rootProject.rootDir.path}${File.separator}${dir}")
+      if (!dirFile.exists()) {
+        printer.info("Asciidoc path not found and skipped: $dirFile")
+      }
+      for (htmlFile in dirFile.listFiles(new FilenameFilter() {
+        @Override
+        boolean accept(File parent, String name) {
+          return name.endsWith(".html")
+        }
+      })) {
+        def targetMarkdownFile = new File("${htmlFile.path.substring(0, htmlFile.path.length() - 5)}.md")
+        printer.info("convert $htmlFile to $targetMarkdownFile...")
+        def errorBuilder = new StringBuilder()
+        def htmlToMarkdownCmd = "$pandocBin -s -f html -t markdown_strict $htmlFile.path -o $targetMarkdownFile.path"
+        def htmlToMarkdownCmdProcess = htmlToMarkdownCmd.execute()
+        htmlToMarkdownCmdProcess.consumeProcessErrorStream(errorBuilder)
+        htmlToMarkdownCmdProcess.waitFor()
+        def error = errorBuilder.toString()
+        if (!error.isEmpty()) {
+          printer.info("convert $htmlFile to $targetMarkdownFile error: $error")
+          return
+        }
+        printer.info("convert $htmlFile to $targetMarkdownFile successful")
+      }
+    }
+  }
+}
+
+//asciidoc -> markdown
+task(group: "asciidoc", "convertAsciidocToHtmlAndMarkdown") {
+  doLast {
+    for (action in convertAsciidocToHtml.actions) {
+      action.execute(convertAsciidocToHtml)
+    }
+    for (action in convertHtmlToMarkdown.actions) {
+      action.execute(convertHtmlToMarkdown)
+    }
+  }
+}

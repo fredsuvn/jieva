@@ -1,18 +1,22 @@
-= Boat Others:  支持特殊需求或第三方的Boat库
+= Boat Others: Boat对第三方技术的支持
+:toc:
+:toclevels: 3
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 :url: https://github.com/srclab-projects/boat
-:qq: 1037555759
 :license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
+
+:qq-group: QQ group: 1037555759
 :boat-version: 0.0.0
 
-== 支持
+== 简介
 
-* <<boat-protobuf>>
+Boat others提供boat对第三方技术的支持, 比如protobuf.
 
-[#boat-protobuf]
-== Protobuf: boat-protobuf
+== 支持列表
+
+=== Protobuf: boat-protobuf
 
 boat-protobuf为protobuf类型提供bean, 类型转换和序列化功能:
 
@@ -23,8 +27,7 @@ boat-protobuf为protobuf类型提供bean, 类型转换和序列化功能:
 * ProtobufJsons.PROTOBUF_OBJECT_MAPPER: 支持protobuf类型的Jackson的object mapper;
 * ProtobufJsons.PROTOBUF_JSON_SERIALIZER: 支持protobuf类型的Json序列化器.
 
-=== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ProtobufSample {
@@ -201,8 +204,7 @@ public class ProtobufSample {
 }
 ----
 
-=== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ProtobufSample {
@@ -321,14 +323,12 @@ class ProtobufSample {
 }
 ----
 
-[#contact]
 == 贡献和联系方式
 
 * {emaill}
 * {url}
-* QQ group: 1037555759
+* {qq-group}
 
-[#license]
 == License
 
 {license}

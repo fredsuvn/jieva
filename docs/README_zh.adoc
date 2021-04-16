@@ -1,30 +1,23 @@
-= Boat: SrcLab的核心基础Java/kotlin库
+= Boat: SrcLab的Java/kotlin核心基础库
+:toc:
+:toclevels: 3
 孙谦 <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 :url: https://github.com/srclab-projects/boat
-:qq: 1037555759
 :license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
+
+:qq-group: QQ group: 1037555759
 :boat-version: 0.0.0
 
-image::../logo.svg[Boat]
-
-== 目录
-
-* <<introduction>>
-* <<getting>>
-* <<usage>>
-* <<contact>>
-* <<license>>
-
-[#introduction]
 == 简介
+
+image::../logo.svg[Boat]
 
 Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于SrcLab里的项目.
 它提供了许多方便快捷的接口, 函数和工具.
 
-Boat包括:
-
+.Boat包括:
 * *boat-annotations*: 核心注解, 如@Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
 * *boat-core*: 核心和基础的接口, 功能, 和工具;
 * *boat-serialize*: 序列化和反序列化的接口和工具 (支持json等);
@@ -39,18 +32,15 @@ Boat包括:
 
 * *boat*: 引入所有常用模块包括core, codec, serialize和id.
 
-[#getting]
 == 获取
 
-=== Gradle
-
+.Gradle
 [source,groovy,subs="attributes+"]
 ----
 implementation("xyz.srclab.common:boat:{boat-version}")
 ----
 
-=== Maven
-
+.Maven
 [source,xml,subs="attributes+"]
 ----
 <dependency>
@@ -60,34 +50,11 @@ implementation("xyz.srclab.common:boat:{boat-version}")
 </dependency>
 ----
 
-=== 源代码
-
+.源代码
 https://github.com/srclab-projects/boat
 
-[#usage]
 == 使用
 
-* <<usage-annotations>>
-* <<usage-core>>
-** <<usage-core-base>>
-** <<usage-core-bean>>
-** <<usage-core-bus>>
-** <<usage-core-cache>>
-** <<usage-core-collect>>
-** <<usage-core-convert>>
-** <<usage-core-exception>>
-** <<usage-core-invoke>>
-** <<usage-core-jvm>>
-** <<usage-core-proxy>>
-** <<usage-core-reflect>>
-** <<usage-core-run>>
-** <<usage-core-state>>
-** <<usage-core-test>>
-* <<usage-serialize>>
-* <<usage-codec>>
-* <<usage-id>>
-
-[#usage-annotations]
 === BoatAnnotations (boat-annotations)
 
 Boat Annotations提供了许多可以让代码整洁又干净的注解:
@@ -102,8 +69,7 @@ Boat Annotations提供了许多可以让代码整洁又干净的注解:
 * *ThreadSafe*: 它说明被注解的变量, 属性, 参数和类型使用是线程安全的;
 * *ThreadSafeIf*: 它说明被注解的变量, 属性, 参数和类型使用在满足指定条件的情况下是线程安全的;
 
-==== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class AnnotationSample {
@@ -153,8 +119,7 @@ public class AnnotationSample {
 }
 ----
 
-==== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class AnnotationSample {
@@ -197,10 +162,8 @@ class AnnotationSample {
 }
 ----
 
-[#usage-core]
 === Boat Core (boat-core)
 
-[#usage-core-base]
 ==== Base
 
 Base包提供基本的核心基础接口, 功能和工具:
@@ -212,8 +175,7 @@ Base包提供基本的核心基础接口, 功能和工具:
 * 常用工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
 * 其他工具: About, Counter, Shell, LazyToString.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class BaseSample {
@@ -526,8 +488,7 @@ public class BaseSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class BaseSample {
@@ -799,7 +760,6 @@ enum class TestEnum {
 }
 ----
 
-[#usage-core-bean]
 ==== Bean
 
 Bean包提供了强大的bean操作功能:
@@ -809,8 +769,7 @@ Bean包提供了强大的bean操作功能:
 
 TIP: 在复制属性(copy-properties)功能上, 它比Apache的BeanUtils快20倍以上.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class BeanSample {
@@ -875,8 +834,7 @@ public class BeanSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class BeanSample {
@@ -911,13 +869,11 @@ class BeanSample {
 }
 ----
 
-[#usage-core-bus]
 ==== Bus
 
 Bus包提供EventBus.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class EventBusSample {
@@ -968,8 +924,7 @@ public class EventBusSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class EventBusSample {
@@ -1021,7 +976,6 @@ class EventBusSample {
 }
 ----
 
-[#usage-core-cache]
 ==== Cache
 
 Boat提供一个缓存接口和若干实现:
@@ -1033,8 +987,7 @@ Boat提供一个缓存接口和若干实现:
 * MapCache: 将Map作为缓存的实现;
 * ThreadLocalCache: 将ThreadLocalMap作为缓存的实现.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class CacheSample {
@@ -1053,8 +1006,7 @@ public class CacheSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class CacheSample {
@@ -1075,7 +1027,6 @@ class CacheSample {
 }
 ----
 
-[#usage-core-collect]
 ==== Collect
 
 Collect包提供集合和数组的接口, 工具和Ops操作:
@@ -1087,8 +1038,7 @@ Collect包提供集合和数组的接口, 工具和Ops操作:
 * IterableType, MapType: 泛型集合的元类型接口;
 * MultiMaps: MultiMaps提供 multi-values Map, 比如SetMap, MutableSetMap, ListMap和MutableListMap.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class CollectSample {
@@ -1164,8 +1114,7 @@ public class CollectSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class CollectSample {
@@ -1199,7 +1148,6 @@ class CollectSample {
 }
 ----
 
-[#usage-core-convert]
 ==== Convert
 
 Convert包提供类型转换功能:
@@ -1208,8 +1156,7 @@ Convert包提供类型转换功能:
 * Converter: 类型转换的核心接口, Converts使用它的默认实现;
 * FastConverter: 快速和功能窄化版本的Converter.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ConvertSample {
@@ -1311,8 +1258,7 @@ public class ConvertSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ConvertSample {
@@ -1377,13 +1323,11 @@ private class StringConvertHandler : FastConvertHandler<String> {
 }
 ----
 
-[#usage-core-exception]
 ==== Exception
 
-Exception包提供StatusException和ExceptionStatus, 继承自State (参考 <<usage-core-state>>), 还有一个ShouldNotException.
+Exception包提供StatusException和ExceptionStatus, 继承自State (参考 <<State>>), 还有一个ShouldNotException.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ExceptionSample {
@@ -1406,8 +1350,7 @@ public class ExceptionSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ExceptionSample {
@@ -1427,13 +1370,11 @@ class ExceptionSample {
 }
 ----
 
-[#usage-core-invoke]
 ==== Invoke
 
 Invoke包提供Invoker接口去调用方法和函数.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class InvokeSample {
@@ -1450,8 +1391,7 @@ public class InvokeSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class InvokeSample {
@@ -1470,13 +1410,11 @@ class InvokeSample {
 }
 ----
 
-[#usage-core-jvm]
 ==== Jvm
 
 Jvm包提供Jvms工具类.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class JvmSample {
@@ -1492,8 +1430,7 @@ public class JvmSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class JvmSample {
@@ -1511,13 +1448,11 @@ class JvmSample {
 }
 ----
 
-[#usage-core-proxy]
 ==== Proxy
 
 Proxy提供类代理功能, 底层使用spring-cglib, cglib或者JDK proxy.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ProxySample {
@@ -1561,8 +1496,7 @@ public class ProxySample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ProxySample {
@@ -1604,7 +1538,6 @@ class ProxySample {
 }
 ----
 
-[#usage-core-reflect]
 ==== Reflect
 
 Reflect包提供相关工具类:
@@ -1613,8 +1546,7 @@ Reflect包提供相关工具类:
 * Types: 用来创建泛型类型;
 * TypeRef: 用来获取类型引用.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ReflectSample {
@@ -1639,8 +1571,7 @@ public class ReflectSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ReflectSample {
@@ -1667,13 +1598,11 @@ class ReflectSample {
 }
 ----
 
-[#usage-core-run]
 ==== Run
 
 Run包提供Runner和Scheduler接口来运行一段代码, 可以在一个线程或者协程里.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class RunSample {
@@ -1709,8 +1638,7 @@ public class RunSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class RunSample {
@@ -1748,13 +1676,11 @@ class RunSample {
 }
 ----
 
-[#usage-core-state]
 ==== State
 
 State包提供State接口来复制定制状态概念的类型.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class StateSample {
@@ -1816,8 +1742,7 @@ public class StateSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class StateSample {
@@ -1853,7 +1778,6 @@ class StateSample {
 }
 ----
 
-[#usage-core-test]
 ==== Test
 
 Test包提供简单的测试工具:
@@ -1863,8 +1787,7 @@ Test包提供简单的测试工具:
 * TestTask and TestListener: 测试任务和监听器;
 * Tests: 测试工具类.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class TestSample {
@@ -1882,8 +1805,7 @@ public class TestSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class TestSample {
@@ -1903,7 +1825,6 @@ class TestSample {
 }
 ----
 
-[#usage-serialize]
 === Boat Serialize (boat-serialize)
 
 Boat序列化工具(需要导入boat-serialize)提供序列化核心接口:
@@ -1913,8 +1834,7 @@ Boat序列化工具(需要导入boat-serialize)提供序列化核心接口:
 * JsonSerial: JSON序列化核心接口, JsonSerials使用它的默认实现(Jackson);
 * Json: JSON的核心接口, 代表一个JSON对象.
 
-==== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class SerializeSample {
@@ -1931,8 +1851,7 @@ public class SerializeSample {
 }
 ----
 
-==== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class SerializeSample {
@@ -1951,7 +1870,6 @@ class SerializeSample {
 }
 ----
 
-[#usage-codec]
 === Boat Codec (boat-codec)
 
 Boat Codec (需要引入boat-codec)提供Codec, CodecKeys, AesKeys 以及 其他接口来实现编码功能, 支持hex, base64, AES, RSA, SM2以及更多算法:
@@ -1960,8 +1878,7 @@ Boat Codec (需要引入boat-codec)提供Codec, CodecKeys, AesKeys 以及 其他
 * CodecKeys: 编码秘钥工具;
 * AesKeys: AES秘钥工具.
 
-==== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class CodecSample {
@@ -1990,8 +1907,7 @@ public class CodecSample {
 }
 ----
 
-==== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class CodecSample {
@@ -2022,7 +1938,6 @@ class CodecSample {
 }
 ----
 
-[#usage-id]
 === Boat Id (boat-id)
 
 Boat Id (需要引入boat-id)是一个轻量级id生成框架.
@@ -2035,8 +1950,7 @@ Boat Id (需要引入boat-id)是一个轻量级id生成框架.
 
 Boat ID同时提供StringIdSpec类, 一个String类型id的IdFactory, 可以从给定的字符串说明中生成新id, 请去看它的javadoc.
 
-==== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class IdSample {
@@ -2055,8 +1969,7 @@ public class IdSample {
 }
 ----
 
-==== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class IdSample {
@@ -2077,14 +1990,12 @@ class IdSample {
 }
 ----
 
-[#contact]
 == 贡献和联系方式
 
 * {emaill}
 * {url}
-* QQ group: 1037555759
+* {qq-group}
 
-[#license]
 == License
 
 {license}

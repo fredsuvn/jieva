@@ -1,18 +1,22 @@
-= Boat Others:  Special or Third Parties Support Boat
+= Boat Others: Third Parties Supporting for Boat
+:toc:
+:toclevels: 3
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 :url: https://github.com/srclab-projects/boat
-:qq: 1037555759
 :license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
+
+:qq-group: QQ group: 1037555759
 :boat-version: 0.0.0
 
-== Supporting
+== Introduction
 
-* <<boat-protobuf>>
+Boat others provides third party supporting for boat such as protobuf.
 
-[#boat-protobuf]
-== Protobuf: boat-protobuf
+== Supporting List
+
+=== Protobuf: boat-protobuf
 
 boat-protobuf provides bean, convert and serialize handlers and processors for protobuf type object:
 
@@ -23,8 +27,7 @@ boat-protobuf provides bean, convert and serialize handlers and processors for p
 * ProtobufJsons.PROTOBUF_OBJECT_MAPPER: Jackson's object mapper supporting protobuf type;
 * ProtobufJsons.PROTOBUF_JSON_SERIALIZER: Json serializer supporting protobuf type.
 
-=== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ProtobufSample {
@@ -201,8 +204,7 @@ public class ProtobufSample {
 }
 ----
 
-=== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ProtobufSample {
@@ -321,14 +323,12 @@ class ProtobufSample {
 }
 ----
 
-[#contact]
 == Contribution and Contact
 
 * {emaill}
 * {url}
-* QQ group: 1037555759
+* {qq-group}
 
-[#license]
 == License
 
 {license}

@@ -1,2036 +1,2052 @@
 # Boat: SrcLab Core Libraries for Java/kotlin
 
+<span id="author" class="author">Sun Qian</span>  
+<span id="email" class="email"><fredsuvn@163.com></span>  
+
+Table of Contents
+
+-   [Introduction](#_introduction)
+-   [Getting](#_getting)
+-   [Usage](#_usage)
+    -   [Boat Annotations
+        (boat-annotations)](#_boat_annotations_boat_annotations)
+    -   [Boat Core (boat-core)](#_boat_core_boat_core)
+        -   [Base](#_base)
+        -   [Bean](#_bean)
+        -   [Bus](#_bus)
+        -   [Cache](#_cache)
+        -   [Collect](#_collect)
+        -   [Convert](#_convert)
+        -   [Exception](#_exception)
+        -   [Invoke](#_invoke)
+        -   [Jvm](#_jvm)
+        -   [Proxy](#_proxy)
+        -   [Reflect](#_reflect)
+        -   [Run](#_run)
+        -   [State](#_state)
+        -   [Test](#_test)
+    -   [Boat Serialize
+        (boat-serialize)](#_boat_serialize_boat_serialize)
+    -   [Boat Codec (boat-codec)](#_boat_codec_boat_codec)
+    -   [Boat Id (boat-id)](#_boat_id_boat_id)
+-   [Contribution and Contact](#_contribution_and_contact)
+-   [License](#_license)
+
+## Introduction
+
 ![Boat](../logo.svg)
 
-## Variables
-
-* author: Sun Qian
-* boat-version: 0.0.0
-
-## Toc
-
-* [Introduction](#introduction)
-* [Getting](#getting)
-* [Usage](#usage)
-* [Contribution and Contact](#contact)
-* [License](#license)
-
-## <a id="introduction"/>Introduction
-
-Boat is a set of core Java/Kotlin libraries (JDK 1.8+), mostly written by kotlin, widely used on JVM projects within
-SrcLab. It provides many fast and convenient interfaces, functions and utilities.
+Boat is a set of core Java/Kotlin libraries (JDK 1.8+), mostly written
+by kotlin, widely used on JVM projects within SrcLab. It provides many
+fast and convenient interfaces, functions and utilities.
 
 Boat includes:
 
-* *boat-annotations*: Core annotations, such as @Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
-* *boat-core*: Core and basic interfaces, functions and utilities;
-* *boat-serialize*: Serialization and deserialization interfaces and utilities (for json and more);
-* *boat-codec*: Codec interfaces and utilities (supports hex, base64, SHA, MD, HMAC, AES, RSA, SM2, etc.);
-* *boat-id*: A lightweight ID generation framework;
-* *boat-test*: Test dependencies management, to import common test libraries in test scope;
-* *boat-bom*: Boat Bom.
+-   **boat-annotations**: Core annotations, such as @Nullable, @NotNull,
+    @DefaultNullable, @DefaultNotNull;
 
-* *boat-others*: Boat also contains libraries for supporting special or third parties,
-  see [boat-others/](../boat-others/docs/README_en.md).
+-   **boat-core**: Core and basic interfaces, functions and utilities;
 
-If you want to import common above modules at once (core, codec, serialize and id), just import:
+-   **boat-serialize**: Serialization and deserialization interfaces and
+    utilities (for json and more);
 
-* *boat*: To import common Boat modules including core, codec, serialize and id.
+-   **boat-codec**: Codec interfaces and utilities (supports hex,
+    base64, SHA, MD, HMAC, AES, RSA, SM2, etc.);
 
-## <a id="getting"/>Getting
+-   **boat-id**: A lightweight ID generation framework;
 
-### Gradle
+-   **boat-test**: Test dependencies management, to import common test
+    libraries in test scope;
 
-```groovy
-implementation("xyz.srclab.common:boat:{boat-version}")
-```
+-   **boat-bom**: Boat Bom.
 
-### Maven
+-   **boat-others**: Boat also contains libraries for supporting special
+    or third parties, see
+    [boat-others/](../boat-others/docs/README_en.adoc).
 
-```xml
+If you want to import common above modules at once (core, codec,
+serialize and id), just import:
 
-<dependency>
-  <groupId>xyz.srclab.common</groupId>
-  <artifactId>boat</artifactId>
-  <version>{boat-version}</version>
-</dependency>
-```
+-   **boat**: To import common Boat modules including core, codec,
+    serialize and id.
 
-### Source Code
+## Getting
 
-https://github.com/srclab-projects/boat
+Gradle
 
-## <a id="usage"/>Usage
+    implementation("xyz.srclab.common:boat:0.0.0")
 
-* [Boat Annotation](#usage-annotations)
-* [Boat Core](#usage-core)
-  * [Base](#usage-core-base)
-  * [Bean](#usage-core-bean)
-  * [Bus](#usage-core-bus)
-  * [Cache](#usage-core-cache)
-  * [Collect](#usage-core-collect)
-  * [Convert](#usage-core-convert)
-  * [Exception](#usage-core-exception)
-  * [Invoke](#usage-core-invoke)
-  * [Jvm](#usage-core-jvm)
-  * [Proxy](#usage-core-proxy)
-  * [Reflect](#usage-core-reflect)
-  * [Run](#usage-core-run)
-  * [State](#usage-core-state)
-  * [Test](#usage-core-test)
-* [Boat Serialize](#usage-serialize)
-* [Boat Codec](#usage-codec)
-* [Boat Id](#usage-id)
+Maven
 
-### <a id="usage-annotations"/>Boat Annotations (boat-annotations)
+    <dependency>
+        <groupId>xyz.srclab.common</groupId>
+        <artifactId>boat</artifactId>
+        <version>0.0.0</version>
+    </dependency>
 
-Boat Annotations provides a set of annotations to make codes clear and clean:
+Source Code
 
-* *DefaultNonNull*/*DefaultNullable*: It tells that all variables, fields, parameters, and other use of type are
-  non-null/nullable by default in annotated scope, usually used in package-info.java;
-* *NotNull*/*Nullable*: It tells that annotated variable, field, parameter, and other use of type is non-null/nullable;
-* *JavaBean*: It tells that annotated type is a java-bean, which all properties are nullable by default;
-* *Acceptable*/*Accepted*: It tells that annotated parameter only accepts specified types.
-* *Rejectable*/*Rejected*: It tells that annotated parameter will reject specified types.
-* *Written*: It tells that the parameter may be written;
-* *Immutable*: It tells that annotated variable, field, parameter, and other use of type is immutable and thread-safe;
-* *ThreadSafe*: It tells that annotated variable, field, parameter, and other use of type is thread-safe;
-* *ThreadSafeIf*: It tells that annotated variable, field, parameter, and other use of type is thread-safe if specified
-  conditions were met;
+<https://github.com/srclab-projects/boat>
 
-#### Java Examples
+## Usage
 
-```java
-public class AnnotationSample {
+### Boat Annotations (boat-annotations)
 
-  @Test
-  public void testAnnotations() {
-    TestBean testBean = new TestBean();
-    Assert.assertEquals(testBean.getP2().substring(1), "2");
-    Assert.expectThrows(NullPointerException.class, () -> testBean.getP1().substring(1));
+Boat Annotations provides a set of annotations to make codes clear and
+clean:
 
-    StringBuilder buffer = new StringBuilder();
-    writeBuffer(buffer, "123");
-    Assert.assertEquals(buffer.toString(), "123");
-  }
+-   **DefaultNonNull**/**DefaultNullable**: It tells that all variables,
+    fields, parameters, and other use of type are non-null/nullable by
+    default in annotated scope, usually used in package-info.java;
 
-  private void writeBuffer(
-      @Written StringBuilder buffer,
-      @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
-  ) {
-    buffer.append(readOnly);
-  }
+-   **NotNull**/**Nullable**: It tells that annotated variable, field,
+    parameter, and other use of type is non-null/nullable;
 
-  @JavaBean
-  public static class TestBean {
+-   **JavaBean**: It tells that annotated type is a java-bean, which all
+    properties are nullable by default;
 
-    private String p1;
-    @NonNull
-    private String p2 = "p2";
+-   **Acceptable**/**Accepted**: It tells that annotated parameter only
+    accepts specified types.
 
-    public String getP1() {
-      return p1;
+-   **Rejectable**/**Rejected**: It tells that annotated parameter will
+    reject specified types.
+
+-   **Written**: It tells that the parameter may be written;
+
+-   **Immutable**: It tells that annotated variable, field, parameter,
+    and other use of type is immutable and thread-safe;
+
+-   **ThreadSafe**: It tells that annotated variable, field, parameter,
+    and other use of type is thread-safe;
+
+-   **ThreadSafeIf**: It tells that annotated variable, field,
+    parameter, and other use of type is thread-safe if specified
+    conditions were met;
+
+Java Examples
+
+    public class AnnotationSample {
+
+        @Test
+        public void testAnnotations() {
+            TestBean testBean = new TestBean();
+            Assert.assertEquals(testBean.getP2().substring(1), "2");
+            Assert.expectThrows(NullPointerException.class, () -> testBean.getP1().substring(1));
+
+            StringBuilder buffer = new StringBuilder();
+            writeBuffer(buffer, "123");
+            Assert.assertEquals(buffer.toString(), "123");
+        }
+
+        private void writeBuffer(
+                @Written StringBuilder buffer,
+                @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
+        ) {
+            buffer.append(readOnly);
+        }
+
+        @JavaBean
+        public static class TestBean {
+
+            private String p1;
+            @NonNull
+            private String p2 = "p2";
+
+            public String getP1() {
+                return p1;
+            }
+
+            public void setP1(String p1) {
+                this.p1 = p1;
+            }
+
+            @NonNull
+            public String getP2() {
+                return p2;
+            }
+
+            public void setP2(@NonNull String p2) {
+                this.p2 = p2;
+            }
+        }
     }
 
-    public void setP1(String p1) {
-      this.p1 = p1;
+Kotlin Examples
+
+    class AnnotationSample {
+
+        @Test
+        fun testAnnotations() {
+            val buffer = StringBuilder()
+            buffer.writeBuffer("123")
+            Assert.assertEquals(buffer.toString(), "123")
+        }
+
+        private fun @receiver:Written StringBuilder.writeBuffer(
+            @Acceptable(
+                Accepted(String::class),
+                Accepted(StringBuffer::class),
+            )
+            readOnly: String
+        ) {
+            this.append(readOnly)
+        }
+    }
+    class AnnotationSample {
+
+        @Test
+        fun testAnnotations() {
+            val buffer = StringBuilder()
+            buffer.writeBuffer("123")
+            Assert.assertEquals(buffer.toString(), "123")
+        }
+
+        private fun @receiver:Written StringBuilder.writeBuffer(
+            @Acceptable(
+                Accepted(String::class),
+                Accepted(StringBuffer::class),
+            )
+            readOnly: String
+        ) {
+            this.append(readOnly)
+        }
     }
 
-    @NonNull
-    public String getP2() {
-      return p2;
+### Boat Core (boat-core)
+
+#### Base
+
+Base package provides base core and basic interfaces, functions and
+utilities:
+
+-   Global shortcut objects: Current, Default, Environment;
+
+-   Syntax enhancement (mainly for Java): Let, Ref, Lazy;
+
+-   String functions: CharsFormat, CharsTemplate, NamingCase;
+
+-   Core and basic interfaces: Accessor, Serial, SpecParser,
+    CachingProductBuilder
+
+-   Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms,
+    Compares, Checks, Requires, Enums, Loaders;
+
+-   Other tools: About, Counter, Shell, LazyToString.
+
+Java Examples
+
+    public class BaseSample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testLet() {
+            int sum = Let.of("1,2,3,4,5,6,7,8,9,10")
+                    .then(s -> s.split(","))
+                    .then(Arrays::asList)
+                    .then(l -> l.stream().mapToInt(Integer::parseInt))
+                    .then(IntStream::sum)
+                    .get();
+            //55
+            logger.log("sum: {}", sum);
+        }
+
+        @Test
+        public void testRef() {
+            Ref<String> ref = Ref.of("1");
+            List<String> list = Arrays.asList("-1", "-2", "-3");
+
+            //here <String> should be final without Ref
+            list.forEach(i -> ref.set(ref.get() + i));
+            //1-1-2-3
+            logger.log("result: {}", ref.get());
+        }
+
+        @Test
+        public void testCurrent() {
+            Current.set("1", "2");
+            //2
+            logger.log(Current.get("1"));
+            //System.currentTimeMillis();
+            logger.log(Current.millis());
+        }
+
+        @Test
+        public void testDefault() {
+            //UTF-8
+            logger.log(Default.charset());
+            //Locale.getDefault();
+            logger.log(Default.locale());
+        }
+
+        @Test
+        public void testEnvironment() {
+            logger.log(Environment.getProperty(Environment.KEY_OS_ARCH));
+            logger.log(Environment.availableProcessors());
+            logger.log(Environment.osVersion());
+            logger.log(Environment.isOsWindows());
+        }
+
+        @Test
+        public void testFormat() {
+            String byFast = CharsFormat.fastFormat("1, 2, {}", 3);
+            String byMessage = CharsFormat.messageFormat("1, 2, {0}", 3);
+            String byPrintf = CharsFormat.printfFormat("1, 2, %d", 3);
+            //1, 2, 3
+            logger.log("byFast: {}", byFast);
+            logger.log("byMessage: {}", byMessage);
+            logger.log("byPrintf: {}", byPrintf);
+        }
+
+        @Test
+        public void testTemplate() {
+            Map<Object, Object> args = new HashMap<>();
+            args.put("name", "Dog");
+            args.put("name}", "DogX");
+            args.put(1, "Cat");
+            args.put(2, "Bird");
+            CharsTemplate template1 = CharsTemplate.resolve(
+                    "This is a {name}, that is a {}", "{", "}");
+            //This is a Dog, that is a Cat
+            logger.log(template1.process(args));
+            CharsTemplate template2 = CharsTemplate.resolve(
+                    "This is a } {name}, that is a {}}", "{", "}");
+            //This is a } Dog, that is a Cat}
+            logger.log(template2.process(args));
+            CharsTemplate template3 = CharsTemplate.resolve(
+                    "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
+            //This is a } {DogX (Dog), that is a Bird\\{\
+            logger.log(template3.process(args));
+        }
+
+        @Test
+        public void testNamingCase() {
+            String upperCamel = "UpperCamel";
+            String lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL);
+            //upperCamel
+            logger.log("lowerCamel: {}", lowerCamel);
+        }
+
+        @Test
+        public void testCounter() {
+            Counter counter = Counter.startsAt(100);
+            counter.getAndIncrementInt();
+            counter.reset();
+            Counter atomicCounter = Counter.startsAt(100, true);
+            atomicCounter.incrementAndGetInt();
+            atomicCounter.reset();
+        }
+
+        @Test
+        public void testLazy() {
+            Lazy<String> lazy = Lazy.of(() -> UUID.randomUUID().toString());
+            String value1 = lazy.get();
+            String value2 = lazy.get();
+            lazy.refresh();
+            String value3 = lazy.get();
+            //value1 == value2
+            //value2 != value3
+            logger.log("value1: {}", value1);
+            logger.log("value2: {}", value2);
+            logger.log("value3: {}", value3);
+        }
+
+        @Test
+        public void testLazyToString() {
+            Counter counter = Counter.startsAt(0);
+            LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+            //0
+            logger.log("lazyToString: {}", lazyToString);
+        }
+
+        @Test
+        public void testLoaders() {
+            Class<String[][][]> cls = Loaders.loadClass("[[[Ljava.lang.String;");
+            //class [[[Ljava.lang.String;
+            logger.log("cls: {}", cls);
+        }
+
+        @Test
+        public void testSpecParser() {
+            String s = SpecParser.parseFirstClassNameToInstance("java.lang.String");
+            //an empty String
+            logger.log("s: {}", s);
+        }
+
+        @Test
+        public void testUtils() {
+
+            //Anys examples:
+            List<String>[] lists = Anys.as(new List[]{});
+            int hash = Anys.anyOrArrayHash(Arrays.asList("", 1));
+            boolean equals = Anys.anyOrArrayEquals(Arrays.asList("", 1), Arrays.asList("", 1));
+
+            //Chars examples:
+            byte[] bytes = "message10086".getBytes();
+            String toChars = Chars.toChars(bytes);
+            byte[] toBytes = Chars.toBytes(toChars);
+            //message10086
+            logger.log("toChars: {}", toChars);
+            //[109, 101, 115, 115, 97, 103, 101, 49, 48, 48, 56, 54]
+            logger.log("toBytes: {}", toBytes);
+
+            //Nums examples:
+            BigDecimal n = Nums.toBigDecimal("110");
+            int i = Nums.toInt(new BigDecimal("2333"));
+            //110
+            logger.log("n: {}", n);
+            //2333
+            logger.log("i: {}", i);
+
+            //Bools examples:
+            boolean b = Bools.toBoolean("true");
+            //true
+            logger.log("b: {}", b);
+
+            //Dates examples:
+            String timestamp = Dates.timestamp();
+            LocalDateTime localDateTime = Dates.toLocalDateTime("2011-12-03T10:15:30");
+            //20210207144816045
+            logger.log("timestamp: {}", timestamp);
+            //2011-12-03T10:15:30
+            logger.log("localDateTime: {}", localDateTime);
+
+            //Randoms examples:
+            //[10, 20]
+            for (int j = 0; j < 10; j++) {
+                logger.log("random[10, 20]: {}", Randoms.between(10, 21));
+            }
+
+            //Compares example:
+            //99
+            logger.log("inBounds: {}", Compares.inBounds(100, 0, 99));
+
+            //Checks examples:
+            try {
+                Checks.checkArgument(1 == 2, "1 != 2");
+            } catch (IllegalArgumentException e) {
+                //java.lang.IllegalArgumentException: 1 != 2
+                logger.log("e: {}", e);
+            }
+
+            //Requires examples:
+            try {
+                Object notNull = Requires.notNull(null, "null");
+            } catch (NullPointerException e) {
+                //java.lang.NullPointerException: null
+                logger.log("e: {}", e);
+            }
+
+            //Enums examples:
+            TestEnum t1 = Enums.valueOf(TestEnum.class, "T1");
+            //t1: T1
+            logger.log("t1: {}", t1);
+            TestEnum t2 = Enums.valueOfIgnoreCase(TestEnum.class, "t2");
+            //t2: T2
+            logger.log("t2: {}", t2);
+        }
+
+        @Test
+        public void testCachingBuilder() {
+
+            class CachingBuilderSample extends CachingProductBuilder<String> {
+
+                private String value = "null";
+
+                public void setValue(String value) {
+                    this.value = value;
+                    this.commitChange();
+                }
+
+                @NotNull
+                @Override
+                protected String buildNew() {
+                    return value + UUID.randomUUID().toString();
+                }
+            }
+
+            CachingBuilderSample cachingBuilderSample = new CachingBuilderSample();
+            cachingBuilderSample.setValue("1");
+            String value1 = cachingBuilderSample.build();
+            String value2 = cachingBuilderSample.build();
+            cachingBuilderSample.setValue("2");
+            String value3 = cachingBuilderSample.build();
+            //10c66dae9-c056-464e-8117-4787914c3af8
+            logger.log("value1: {}", value1);
+            //10c66dae9-c056-464e-8117-4787914c3af8
+            logger.log("value2: {}", value2);
+            //2c7c2e230-50b0-4a0f-8530-151723297fb8
+            logger.log("value3: {}", value3);
+        }
+
+        @Test
+        public void testShell() {
+            Shell shell = Shell.DEFAULT;
+            shell.println("Hello", ",", "World", "!");
+            shell.println(Arrays.asList("Hello", ",", "World", "!"));
+            shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
+            shell.println(
+                    SgrChars.foregroundRed("red"),
+                    SgrChars.backgroundCyan(" "),
+                    SgrChars.foregroundGreen("green")
+            );
+            shell.println(
+                    SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
+                    SgrChars.backgroundCyan(" "),
+                    SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
+            );
+            shell.println(
+                    SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
+                    SgrChars.backgroundCyan(" "),
+                    SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
+            );
+            shell.println(ControlChars.beep());
+            shell.println("123", ControlChars.backspaces(), "456", ControlChars.beep());
+        }
+
+        @Test
+        public void testAbout() {
+            String verString = "1.2.3-beta.2.3+123";
+            SemVer semVer = SemVer.parse(verString);
+            About about = About.of(
+                    "name",
+                    semVer.normalString(),
+                    Collections.singletonList(Author.of("name", "author@mail.com", null)),
+                    "123@123.com",
+                    "url",
+                    Collections.singletonList("licence"),
+                    Collections.singletonList(About.of(
+                            "poweredBy",
+                            null,
+                            Collections.emptyList(),
+                            null,
+                            null,
+                            Collections.emptyList(),
+                            Collections.emptyList(),
+                            null
+                    )),
+                    "© 2021 SrcLab"
+            );
+            //name
+            //Version: 1.2.3
+            //Author: name(author@mail.com)
+            //Mail: 123@123.com
+            //Url: url
+            //Licence: licence
+            //Powered by: poweredBy
+            //© 2021 SrcLab
+            logger.log("About: {}", about);
+        }
+
+        public enum TestEnum {
+            T1,
+            T2
+        }
     }
 
-    public void setP2(@NonNull String p2) {
-      this.p2 = p2;
-    }
-  }
-}
-```
+Kotlin Examples
 
-#### Kotlin Examples
+    class BaseSample {
 
-```kotlin
-class AnnotationSample {
+        @Test
+        fun testCurrent() {
+            Current.set("1", "2")
+            //2
+            logger.log(Current.get<Any>("1"))
+            //System.currentTimeMillis();
+            logger.log(Current.millis)
+        }
 
-  @Test
-  fun testAnnotations() {
-    val buffer = StringBuilder()
-    buffer.writeBuffer("123")
-    Assert.assertEquals(buffer.toString(), "123")
-  }
+        @Test
+        fun testDefault() {
+            //UTF-8
+            logger.log(Default.charset)
+            //Locale.getDefault();
+            logger.log(Default.locale)
+        }
 
-  private fun @receiver:Written StringBuilder.writeBuffer(
-    @Acceptable(
-      Accepted(String::class),
-      Accepted(StringBuffer::class),
-    )
-    readOnly: String
-  ) {
-    this.append(readOnly)
-  }
-}
-class AnnotationSample {
+        @Test
+        fun testEnvironment() {
+            logger.log(Environment.getProperty(Environment.KEY_OS_ARCH))
+            logger.log(Environment.availableProcessors)
+            logger.log(Environment.osVersion)
+            logger.log(Environment.isOsWindows)
+        }
 
-  @Test
-  fun testAnnotations() {
-    val buffer = StringBuilder()
-    buffer.writeBuffer("123")
-    Assert.assertEquals(buffer.toString(), "123")
-  }
+        @Test
+        fun testFormat() {
+            val byFast = "1, 2, {}".fastFormat(3)
+            val byMessage = "1, 2, {0}".messageFormat(3)
+            val byPrintf = "1, 2, %d".printfFormat(3)
+            //1, 2, 3
+            logger.log("byFast: {}", byFast)
+            logger.log("byMessage: {}", byMessage)
+            logger.log("byPrintf: {}", byPrintf)
+        }
 
-  private fun @receiver:Written StringBuilder.writeBuffer(
-    @Acceptable(
-      Accepted(String::class),
-      Accepted(StringBuffer::class),
-    )
-    readOnly: String
-  ) {
-    this.append(readOnly)
-  }
-}
-```
+        @Test
+        fun testTemplate() {
+            val args: MutableMap<Any, Any?> = HashMap()
+            args["name"] = "Dog"
+            args["name}"] = "DogX"
+            args[1] = "Cat"
+            args[2] = "Bird"
+            val template1 = "This is a {name}, that is a {}".resolveTemplate("{", "}")
+            //This is a Dog, that is a Cat
+            logger.log(template1.process(args))
+            val template2 = "This is a } {name}, that is a {}}".resolveTemplate("{", "}")
+            //This is a } Dog, that is a Cat}
+            logger.log(template2.process(args))
+            val template3 = "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\".resolveTemplate("{", "}", "\\")
+            //This is a } {DogX (Dog), that is a Bird\\{\
+            logger.log(template3.process(args))
+        }
 
-### <a id ="usage-core"/> Boat Core(boat - core)
+        @Test
+        fun testNamingCase() {
+            val upperCamel = "UpperCamel"
+            val lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL)
+            //upperCamel
+            logger.log("lowerCamel: {}", lowerCamel)
+        }
 
-#### <a id ="usage-core-base"/> Base
+        @Test
+        fun testCounter() {
+            val counter = 100.counterStarts()
+            counter.getAndIncrementInt()
+            counter.reset()
+            val atomicCounter = 100.counterStarts(true)
+            atomicCounter.incrementAndGetInt()
+            atomicCounter.reset()
+        }
 
-Base package provides base core and basic interfaces, functions and utilities:
+        @Test
+        fun testLazyToString() {
+            val counter = 0.counterStarts()
+            val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyToString()
+            //0
+            logger.log("lazyToString: {}", lazyToString)
+        }
 
-* Global shortcut objects: Current, Default, Environment;
-* Syntax enhancement (mainly for Java): Let, Ref, Lazy;
-* String functions: CharsFormat, CharsTemplate, NamingCase;
-* Core and basic interfaces: Accessor, Serial, SpecParser, CachingProductBuilder
-* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
-* Other tools: About, Counter, Shell, LazyToString.
+        @Test
+        fun testLoaders() {
+            val cls = "[[[Ljava.lang.String;".loadClass<Array<Array<Array<String>>>>()
+            //class [[[Ljava.lang.String;
+            logger.log("cls: {}", cls)
+        }
 
-##### Java Examples
+        @Test
+        fun testSpecParser() {
+            val s = "java.lang.String".parseFirstClassNameToInstance<String>()
+            //an empty String
+            logger.log("s: {}", s)
+        }
 
-```java
-public class BaseSample {
+        @Test
+        fun testUtils() {
 
-  private static final TestLogger logger = TestLogger.DEFAULT;
+            //Anys examples:
+            val lists = arrayOf<List<*>>().asAny<Array<List<String>>>()
+            val hash = Arrays.asList("", 1).anyOrArrayHash()
+            val equals = Arrays.asList("", 1).anyOrArrayEquals(Arrays.asList("", 1))
 
-  @Test
-  public void testLet() {
-    int sum = Let.of("1,2,3,4,5,6,7,8,9,10")
-        .then(s -> s.split(","))
-        .then(Arrays::asList)
-        .then(l -> l.stream().mapToInt(Integer::parseInt))
-        .then(IntStream::sum)
-        .get();
-    //55
-    logger.log("sum: {}", sum);
-  }
+            //Chars examples:
+            val bytes = "message10086".toByteArray()
+            val toChars = bytes.toChars()
+            val toBytes = toChars.toBytes()
+            //message10086
+            logger.log("toChars: {}", toChars)
+            //[109, 101, 115, 115, 97, 103, 101, 49, 48, 48, 56, 54]
+            logger.log("toBytes: {}", toBytes)
 
-  @Test
-  public void testRef() {
-    Ref<String> ref = Ref.of("1");
-    List<String> list = Arrays.asList("-1", "-2", "-3");
+            //Nums examples:
+            val n = "110".toBigDecimal()
+            val i = BigDecimal("2333").toInt()
+            //110
+            logger.log("n: {}", n)
+            //2333
+            logger.log("i: {}", i)
 
-    //here <String> should be final without Ref
-    list.forEach(i -> ref.set(ref.get() + i));
-    //1-1-2-3
-    logger.log("result: {}", ref.get());
-  }
+            //Bools examples:
+            val b = "true".toBoolean()
+            //true
+            logger.log("b: {}", b)
 
-  @Test
-  public void testCurrent() {
-    Current.set("1", "2");
-    //2
-    logger.log(Current.get("1"));
-    //System.currentTimeMillis();
-    logger.log(Current.millis());
-  }
+            //Dates examples:
+            val timestamp = timestamp()
+            val localDateTime = "2011-12-03T10:15:30".toLocalDateTime()
+            //20210207144816045
+            logger.log("timestamp: {}", timestamp)
+            //2011-12-03T10:15:30
+            logger.log("localDateTime: {}", localDateTime)
 
-  @Test
-  public void testDefault() {
-    //UTF-8
-    logger.log(Default.charset());
-    //Locale.getDefault();
-    logger.log(Default.locale());
-  }
+            //Randoms examples:
+            //[10, 20]
+            for (j in 0..9) {
+                logger.log("random[10, 20]: {}", randomBetween(10, 21))
+            }
 
-  @Test
-  public void testEnvironment() {
-    logger.log(Environment.getProperty(Environment.KEY_OS_ARCH));
-    logger.log(Environment.availableProcessors());
-    logger.log(Environment.osVersion());
-    logger.log(Environment.isOsWindows());
-  }
+            //Compares example:
+            //99
+            logger.log("inBounds: {}", 100.inBounds(0, 99))
 
-  @Test
-  public void testFormat() {
-    String byFast = CharsFormat.fastFormat("1, 2, {}", 3);
-    String byMessage = CharsFormat.messageFormat("1, 2, {0}", 3);
-    String byPrintf = CharsFormat.printfFormat("1, 2, %d", 3);
-    //1, 2, 3
-    logger.log("byFast: {}", byFast);
-    logger.log("byMessage: {}", byMessage);
-    logger.log("byPrintf: {}", byPrintf);
-  }
+            //Checks examples:
+            try {
+                checkArgument(1 == 2, "1 != 2")
+            } catch (e: IllegalArgumentException) {
+                //java.lang.IllegalArgumentException: 1 != 2
+                logger.log("e: {}", e)
+            }
 
-  @Test
-  public void testTemplate() {
-    Map<Object, Object> args = new HashMap<>();
-    args.put("name", "Dog");
-    args.put("name}", "DogX");
-    args.put(1, "Cat");
-    args.put(2, "Bird");
-    CharsTemplate template1 = CharsTemplate.resolve(
-        "This is a {name}, that is a {}", "{", "}");
-    //This is a Dog, that is a Cat
-    logger.log(template1.process(args));
-    CharsTemplate template2 = CharsTemplate.resolve(
-        "This is a } {name}, that is a {}}", "{", "}");
-    //This is a } Dog, that is a Cat}
-    logger.log(template2.process(args));
-    CharsTemplate template3 = CharsTemplate.resolve(
-        "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
-    //This is a } {DogX (Dog), that is a Bird\\{\
-    logger.log(template3.process(args));
-  }
+            //Requires examples:
+            try {
+                val notNull = null.notNull<Any>("null")
+            } catch (e: NullPointerException) {
+                //java.lang.NullPointerException: null
+                logger.log("e: {}", e)
+            }
 
-  @Test
-  public void testNamingCase() {
-    String upperCamel = "UpperCamel";
-    String lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL);
-    //upperCamel
-    logger.log("lowerCamel: {}", lowerCamel);
-  }
+            //Enums examples:
+            val t1: TestEnum = TestEnum::class.java.enumValueOf("T1")
+            //t1: T1
+            logger.log("t1: {}", t1)
+            val t2: TestEnum = TestEnum::class.java.enumValueOfIgnoreCase("t2")
+            //t2: T2
+            logger.log("t2: {}", t2)
+        }
 
-  @Test
-  public void testCounter() {
-    Counter counter = Counter.startsAt(100);
-    counter.getAndIncrementInt();
-    counter.reset();
-    Counter atomicCounter = Counter.startsAt(100, true);
-    atomicCounter.incrementAndGetInt();
-    atomicCounter.reset();
-  }
+        @Test
+        fun testCachingBuilder() {
 
-  @Test
-  public void testLazy() {
-    Lazy<String> lazy = Lazy.of(() -> UUID.randomUUID().toString());
-    String value1 = lazy.get();
-    String value2 = lazy.get();
-    lazy.refresh();
-    String value3 = lazy.get();
-    //value1 == value2
-    //value2 != value3
-    logger.log("value1: {}", value1);
-    logger.log("value2: {}", value2);
-    logger.log("value3: {}", value3);
-  }
+            class CachingBuilderSample : CachingProductBuilder<String>() {
+                private var value = "null"
+                fun setValue(value: String) {
+                    this.value = value
+                    commitChange()
+                }
 
-  @Test
-  public void testLazyToString() {
-    Counter counter = Counter.startsAt(0);
-    LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
-    //0
-    logger.log("lazyToString: {}", lazyToString);
-  }
+                override fun buildNew(): String {
+                    return value + UUID.randomUUID().toString()
+                }
+            }
 
-  @Test
-  public void testLoaders() {
-    Class<String[][][]> cls = Loaders.loadClass("[[[Ljava.lang.String;");
-    //class [[[Ljava.lang.String;
-    logger.log("cls: {}", cls);
-  }
+            val cachingBuilderSample = CachingBuilderSample()
+            cachingBuilderSample.setValue("1")
+            val value1 = cachingBuilderSample.build()
+            val value2 = cachingBuilderSample.build()
+            cachingBuilderSample.setValue("2")
+            val value3 = cachingBuilderSample.build()
+            //10c66dae9-c056-464e-8117-4787914c3af8
+            logger.log("value1: {}", value1)
+            //10c66dae9-c056-464e-8117-4787914c3af8
+            logger.log("value2: {}", value2)
+            //2c7c2e230-50b0-4a0f-8530-151723297fb8
+            logger.log("value3: {}", value3)
+        }
 
-  @Test
-  public void testSpecParser() {
-    String s = SpecParser.parseFirstClassNameToInstance("java.lang.String");
-    //an empty String
-    logger.log("s: {}", s);
-  }
+        @Test
+        fun testShell() {
+            val shell = Shell.DEFAULT
+            shell.println("Hello", ",", "World", "!")
+            shell.println(Arrays.asList("Hello", ",", "World", "!"))
+            shell.println("123", ControlChars.linefeed, "456", EscapeChars.newline, EscapeChars.reset)
+            shell.println(
+                SgrChars.foregroundRed("red"),
+                SgrChars.backgroundCyan(" "),
+                SgrChars.foregroundGreen("green")
+            )
+            shell.println(
+                SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
+                SgrChars.backgroundCyan(" "),
+                SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
+            )
+            shell.println(
+                SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
+                SgrChars.backgroundCyan(" "),
+                SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
+            )
+            shell.println(ControlChars.beep)
+            shell.println("123", ControlChars.backspaces, "456", ControlChars.beep)
+        }
 
-  @Test
-  public void testUtils() {
+        @Test
+        fun testAbout() {
+            val verString = "1.2.3-beta.2.3+123"
+            val semVer: SemVer = verString.parseSemVer()
+            val about = About.of(
+                "name",
+                semVer.normalString,
+                listOf(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
+                "url",
+                listOf("licence"),
+                listOf(
+                    About.of(
+                        "poweredBy",
+                        null,
+                        emptyList(),
+                        null,
+                        null,
+                        emptyList(),
+                        emptyList(),
+                        null
+                    )
+                ),
+                "© 2021 SrcLab"
+            )
+            //name
+            //Version: 1.2.3
+            //Author: name(author@mail.com)
+            //Mail: 123@123.com
+            //Url: url
+            //Licence: licence
+            //Powered by: poweredBy
+            //© 2021 SrcLab
+            logger.log("About: {}", about)
+        }
 
-    //Anys examples:
-    List<String>[] lists = Anys.as(new List[]{});
-    int hash = Anys.anyOrArrayHash(Arrays.asList("", 1));
-    boolean equals = Anys.anyOrArrayEquals(Arrays.asList("", 1), Arrays.asList("", 1));
-
-    //Chars examples:
-    byte[] bytes = "message10086".getBytes();
-    String toChars = Chars.toChars(bytes);
-    byte[] toBytes = Chars.toBytes(toChars);
-    //message10086
-    logger.log("toChars: {}", toChars);
-    //[109, 101, 115, 115, 97, 103, 101, 49, 48, 48, 56, 54]
-    logger.log("toBytes: {}", toBytes);
-
-    //Nums examples:
-    BigDecimal n = Nums.toBigDecimal("110");
-    int i = Nums.toInt(new BigDecimal("2333"));
-    //110
-    logger.log("n: {}", n);
-    //2333
-    logger.log("i: {}", i);
-
-    //Bools examples:
-    boolean b = Bools.toBoolean("true");
-    //true
-    logger.log("b: {}", b);
-
-    //Dates examples:
-    String timestamp = Dates.timestamp();
-    LocalDateTime localDateTime = Dates.toLocalDateTime("2011-12-03T10:15:30");
-    //20210207144816045
-    logger.log("timestamp: {}", timestamp);
-    //2011-12-03T10:15:30
-    logger.log("localDateTime: {}", localDateTime);
-
-    //Randoms examples:
-    //[10, 20]
-    for (int j = 0; j < 10; j++) {
-      logger.log("random[10, 20]: {}", Randoms.between(10, 21));
-    }
-
-    //Compares example:
-    //99
-    logger.log("inBounds: {}", Compares.inBounds(100, 0, 99));
-
-    //Checks examples:
-    try {
-      Checks.checkArgument(1 == 2, "1 != 2");
-    } catch (IllegalArgumentException e) {
-      //java.lang.IllegalArgumentException: 1 != 2
-      logger.log("e: {}", e);
-    }
-
-    //Requires examples:
-    try {
-      Object notNull = Requires.notNull(null, "null");
-    } catch (NullPointerException e) {
-      //java.lang.NullPointerException: null
-      logger.log("e: {}", e);
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
     }
 
-    //Enums examples:
-    TestEnum t1 = Enums.valueOf(TestEnum.class, "T1");
-    //t1: T1
-    logger.log("t1: {}", t1);
-    TestEnum t2 = Enums.valueOfIgnoreCase(TestEnum.class, "t2");
-    //t2: T2
-    logger.log("t2: {}", t2);
-  }
-
-  @Test
-  public void testCachingBuilder() {
-
-    class CachingBuilderSample extends CachingProductBuilder<String> {
-
-      private String value = "null";
-
-      public void setValue(String value) {
-        this.value = value;
-        this.commitChange();
-      }
-
-      @NotNull
-      @Override
-      protected String buildNew() {
-        return value + UUID.randomUUID().toString();
-      }
+    enum class TestEnum {
+        T1, T2
     }
 
-    CachingBuilderSample cachingBuilderSample = new CachingBuilderSample();
-    cachingBuilderSample.setValue("1");
-    String value1 = cachingBuilderSample.build();
-    String value2 = cachingBuilderSample.build();
-    cachingBuilderSample.setValue("2");
-    String value3 = cachingBuilderSample.build();
-    //10c66dae9-c056-464e-8117-4787914c3af8
-    logger.log("value1: {}", value1);
-    //10c66dae9-c056-464e-8117-4787914c3af8
-    logger.log("value2: {}", value2);
-    //2c7c2e230-50b0-4a0f-8530-151723297fb8
-    logger.log("value3: {}", value3);
-  }
-
-  @Test
-  public void testShell() {
-    Shell shell = Shell.DEFAULT;
-    shell.println("Hello", ",", "World", "!");
-    shell.println(Arrays.asList("Hello", ",", "World", "!"));
-    shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
-    shell.println(
-        SgrChars.foregroundRed("red"),
-        SgrChars.backgroundCyan(" "),
-        SgrChars.foregroundGreen("green")
-    );
-    shell.println(
-        SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
-        SgrChars.backgroundCyan(" "),
-        SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
-    );
-    shell.println(
-        SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
-        SgrChars.backgroundCyan(" "),
-        SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
-    );
-    shell.println(ControlChars.beep());
-    shell.println("123", ControlChars.backspaces(), "456", ControlChars.beep());
-  }
-
-  @Test
-  public void testAbout() {
-    String verString = "1.2.3-beta.2.3+123";
-    SemVer semVer = SemVer.parse(verString);
-    About about = About.of(
-        "name",
-        semVer.normalString(),
-        Collections.singletonList(Author.of("name", "author@mail.com", null)),
-        "123@123.com",
-        "url",
-        Collections.singletonList("licence"),
-        Collections.singletonList(About.of(
-            "poweredBy",
-            null,
-            Collections.emptyList(),
-            null,
-            null,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            null
-        )),
-        "© 2021 SrcLab"
-    );
-    //name
-    //Version: 1.2.3
-    //Author: name(author@mail.com)
-    //Mail: 123@123.com
-    //Url: url
-    //Licence: licence
-    //Powered by: poweredBy
-    //© 2021 SrcLab
-    logger.log("About: {}", about);
-  }
-
-  public enum TestEnum {
-    T1,
-    T2
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class BaseSample {
-
-  @Test
-  fun testCurrent() {
-    Current.set("1", "2")
-    //2
-    logger.log(Current.get<Any>("1"))
-    //System.currentTimeMillis();
-    logger.log(Current.millis)
-  }
-
-  @Test
-  fun testDefault() {
-    //UTF-8
-    logger.log(Default.charset)
-    //Locale.getDefault();
-    logger.log(Default.locale)
-  }
-
-  @Test
-  fun testEnvironment() {
-    logger.log(Environment.getProperty(Environment.KEY_OS_ARCH))
-    logger.log(Environment.availableProcessors)
-    logger.log(Environment.osVersion)
-    logger.log(Environment.isOsWindows)
-  }
-
-  @Test
-  fun testFormat() {
-    val byFast = "1, 2, {}".fastFormat(3)
-    val byMessage = "1, 2, {0}".messageFormat(3)
-    val byPrintf = "1, 2, %d".printfFormat(3)
-    //1, 2, 3
-    logger.log("byFast: {}", byFast)
-    logger.log("byMessage: {}", byMessage)
-    logger.log("byPrintf: {}", byPrintf)
-  }
-
-  @Test
-  fun testTemplate() {
-    val args: MutableMap<Any, Any?> = HashMap()
-    args["name"] = "Dog"
-    args["name}"] = "DogX"
-    args[1] = "Cat"
-    args[2] = "Bird"
-    val template1 = "This is a {name}, that is a {}".resolveTemplate("{", "}")
-    //This is a Dog, that is a Cat
-    logger.log(template1.process(args))
-    val template2 = "This is a } {name}, that is a {}}".resolveTemplate("{", "}")
-    //This is a } Dog, that is a Cat}
-    logger.log(template2.process(args))
-    val template3 = "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\".resolveTemplate("{", "}", "\\")
-    //This is a } {DogX (Dog), that is a Bird\\{\
-    logger.log(template3.process(args))
-  }
-
-  @Test
-  fun testNamingCase() {
-    val upperCamel = "UpperCamel"
-    val lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL)
-    //upperCamel
-    logger.log("lowerCamel: {}", lowerCamel)
-  }
-
-  @Test
-  fun testCounter() {
-    val counter = 100.counterStarts()
-    counter.getAndIncrementInt()
-    counter.reset()
-    val atomicCounter = 100.counterStarts(true)
-    atomicCounter.incrementAndGetInt()
-    atomicCounter.reset()
-  }
-
-  @Test
-  fun testLazyToString() {
-    val counter = 0.counterStarts()
-    val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyToString()
-    //0
-    logger.log("lazyToString: {}", lazyToString)
-  }
-
-  @Test
-  fun testLoaders() {
-    val cls = "[[[Ljava.lang.String;".loadClass<Array<Array<Array<String>>>>()
-    //class [[[Ljava.lang.String;
-    logger.log("cls: {}", cls)
-  }
-
-  @Test
-  fun testSpecParser() {
-    val s = "java.lang.String".parseFirstClassNameToInstance<String>()
-    //an empty String
-    logger.log("s: {}", s)
-  }
-
-  @Test
-  fun testUtils() {
-
-    //Anys examples:
-    val lists = arrayOf<List<*>>().asAny<Array<List<String>>>()
-    val hash = Arrays.asList("", 1).anyOrArrayHash()
-    val equals = Arrays.asList("", 1).anyOrArrayEquals(Arrays.asList("", 1))
-
-    //Chars examples:
-    val bytes = "message10086".toByteArray()
-    val toChars = bytes.toChars()
-    val toBytes = toChars.toBytes()
-    //message10086
-    logger.log("toChars: {}", toChars)
-    //[109, 101, 115, 115, 97, 103, 101, 49, 48, 48, 56, 54]
-    logger.log("toBytes: {}", toBytes)
-
-    //Nums examples:
-    val n = "110".toBigDecimal()
-    val i = BigDecimal("2333").toInt()
-    //110
-    logger.log("n: {}", n)
-    //2333
-    logger.log("i: {}", i)
-
-    //Bools examples:
-    val b = "true".toBoolean()
-    //true
-    logger.log("b: {}", b)
-
-    //Dates examples:
-    val timestamp = timestamp()
-    val localDateTime = "2011-12-03T10:15:30".toLocalDateTime()
-    //20210207144816045
-    logger.log("timestamp: {}", timestamp)
-    //2011-12-03T10:15:30
-    logger.log("localDateTime: {}", localDateTime)
-
-    //Randoms examples:
-    //[10, 20]
-    for (j in 0..9) {
-      logger.log("random[10, 20]: {}", randomBetween(10, 21))
-    }
-
-    //Compares example:
-    //99
-    logger.log("inBounds: {}", 100.inBounds(0, 99))
-
-    //Checks examples:
-    try {
-      checkArgument(1 == 2, "1 != 2")
-    } catch (e: IllegalArgumentException) {
-      //java.lang.IllegalArgumentException: 1 != 2
-      logger.log("e: {}", e)
-    }
-
-    //Requires examples:
-    try {
-      val notNull = null.notNull<Any>("null")
-    } catch (e: NullPointerException) {
-      //java.lang.NullPointerException: null
-      logger.log("e: {}", e)
-    }
-
-    //Enums examples:
-    val t1: TestEnum = TestEnum::class.java.enumValueOf("T1")
-    //t1: T1
-    logger.log("t1: {}", t1)
-    val t2: TestEnum = TestEnum::class.java.enumValueOfIgnoreCase("t2")
-    //t2: T2
-    logger.log("t2: {}", t2)
-  }
-
-  @Test
-  fun testCachingBuilder() {
-
-    class CachingBuilderSample : CachingProductBuilder<String>() {
-      private var value = "null"
-      fun setValue(value: String) {
-        this.value = value
-        commitChange()
-      }
-
-      override fun buildNew(): String {
-        return value + UUID.randomUUID().toString()
-      }
-    }
-
-    val cachingBuilderSample = CachingBuilderSample()
-    cachingBuilderSample.setValue("1")
-    val value1 = cachingBuilderSample.build()
-    val value2 = cachingBuilderSample.build()
-    cachingBuilderSample.setValue("2")
-    val value3 = cachingBuilderSample.build()
-    //10c66dae9-c056-464e-8117-4787914c3af8
-    logger.log("value1: {}", value1)
-    //10c66dae9-c056-464e-8117-4787914c3af8
-    logger.log("value2: {}", value2)
-    //2c7c2e230-50b0-4a0f-8530-151723297fb8
-    logger.log("value3: {}", value3)
-  }
-
-  @Test
-  fun testShell() {
-    val shell = Shell.DEFAULT
-    shell.println("Hello", ",", "World", "!")
-    shell.println(Arrays.asList("Hello", ",", "World", "!"))
-    shell.println("123", ControlChars.linefeed, "456", EscapeChars.newline, EscapeChars.reset)
-    shell.println(
-      SgrChars.foregroundRed("red"),
-      SgrChars.backgroundCyan(" "),
-      SgrChars.foregroundGreen("green")
-    )
-    shell.println(
-      SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
-      SgrChars.backgroundCyan(" "),
-      SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
-    )
-    shell.println(
-      SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
-      SgrChars.backgroundCyan(" "),
-      SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
-    )
-    shell.println(ControlChars.beep)
-    shell.println("123", ControlChars.backspaces, "456", ControlChars.beep)
-  }
-
-  @Test
-  fun testAbout() {
-    val verString = "1.2.3-beta.2.3+123"
-    val semVer: SemVer = verString.parseSemVer()
-    val about = About.of(
-      "name",
-      semVer.normalString,
-      listOf(Author.of("name", "author@mail.com", null)),
-      "123@123.com",
-      "url",
-      listOf("licence"),
-      listOf(
-        About.of(
-          "poweredBy",
-          null,
-          emptyList(),
-          null,
-          null,
-          emptyList(),
-          emptyList(),
-          null
-        )
-      ),
-      "© 2021 SrcLab"
-    )
-    //name
-    //Version: 1.2.3
-    //Author: name(author@mail.com)
-    //Mail: 123@123.com
-    //Url: url
-    //Licence: licence
-    //Powered by: poweredBy
-    //© 2021 SrcLab
-    logger.log("About: {}", about)
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-
-enum class TestEnum {
-  T1, T2
-}
-```
-
-#### <a id="usage-core-bean"/>Bean
+#### Bean
 
 Bean package provides powerful bean operation ability:
 
-* Beans: Default utilities for bean operation;
-* BeanResolver: Core Interface to resolver bean, Beans use its default implementation;
+-   Beans: Default utilities for bean operation;
 
-> In copy-properties function, It is more than 20 times faster than Apache BeanUtils.
+-   BeanResolver: Core Interface to resolver bean, Beans use its default
+    implementation;
 
-##### Java Examples
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td class="icon"><div class="title">
+Tip
+</div></td>
+<td class="content">In copy-properties function, It is more than 20 times faster than Apache BeanUtils.</td>
+</tr>
+</tbody>
+</table>
 
-```java
-public class BeanSample {
+Java Examples
 
-  private static final TestLogger logger = TestLogger.DEFAULT;
+    public class BeanSample {
 
-  @Test
-  public void testBean() {
-    A a = new A();
-    a.setP1("1");
-    a.setP2("2");
-    B b = Beans.copyProperties(a, new B());
-    int b1 = b.getP1();
-    int b2 = b.getP2();
-    //1
-    logger.log("b1: {}", b1);
-    //2
-    logger.log("b1: {}", b2);
-  }
+        private static final TestLogger logger = TestLogger.DEFAULT;
 
-  public static class A {
-    private String p1;
-    private String p2;
+        @Test
+        public void testBean() {
+            A a = new A();
+            a.setP1("1");
+            a.setP2("2");
+            B b = Beans.copyProperties(a, new B());
+            int b1 = b.getP1();
+            int b2 = b.getP2();
+            //1
+            logger.log("b1: {}", b1);
+            //2
+            logger.log("b1: {}", b2);
+        }
 
-    public String getP1() {
-      return p1;
+        public static class A {
+            private String p1;
+            private String p2;
+
+            public String getP1() {
+                return p1;
+            }
+
+            public void setP1(String p1) {
+                this.p1 = p1;
+            }
+
+            public String getP2() {
+                return p2;
+            }
+
+            public void setP2(String p2) {
+                this.p2 = p2;
+            }
+        }
+
+        public static class B {
+            private int p1;
+            private int p2;
+
+            public int getP1() {
+                return p1;
+            }
+
+            public void setP1(int p1) {
+                this.p1 = p1;
+            }
+
+            public int getP2() {
+                return p2;
+            }
+
+            public void setP2(int p2) {
+                this.p2 = p2;
+            }
+        }
     }
 
-    public void setP1(String p1) {
-      this.p1 = p1;
+Kotlin Examples
+
+    class BeanSample {
+
+        @Test
+        fun testBean() {
+            val a = A()
+            a.p1 = "1"
+            a.p2 = "2"
+            val b = a.copyProperties(B())
+            val b1 = b.p1
+            val b2 = b.p2
+            //1
+            logger.log("b1: {}", b1)
+            //2
+            logger.log("b1: {}", b2)
+        }
+
+        class A {
+            var p1: String? = null
+            var p2: String? = null
+        }
+
+        class B {
+            var p1 = 0
+            var p2 = 0
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
     }
 
-    public String getP2() {
-      return p2;
-    }
-
-    public void setP2(String p2) {
-      this.p2 = p2;
-    }
-  }
-
-  public static class B {
-    private int p1;
-    private int p2;
-
-    public int getP1() {
-      return p1;
-    }
-
-    public void setP1(int p1) {
-      this.p1 = p1;
-    }
-
-    public int getP2() {
-      return p2;
-    }
-
-    public void setP2(int p2) {
-      this.p2 = p2;
-    }
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class BeanSample {
-
-  @Test
-  fun testBean() {
-    val a = A()
-    a.p1 = "1"
-    a.p2 = "2"
-    val b = a.copyProperties(B())
-    val b1 = b.p1
-    val b2 = b.p2
-    //1
-    logger.log("b1: {}", b1)
-    //2
-    logger.log("b1: {}", b2)
-  }
-
-  class A {
-    var p1: String? = null
-    var p2: String? = null
-  }
-
-  class B {
-    var p1 = 0
-    var p2 = 0
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-#### <a id="usage-core-bus"/>Bus
+#### Bus
 
 Bus package provide EventBus.
 
-##### Java Examples
+Java Examples
 
-```java
-public class EventBusSample {
+    public class EventBusSample {
 
-  private static final TestLogger logger = TestLogger.DEFAULT;
+        private static final TestLogger logger = TestLogger.DEFAULT;
 
-  @Test
-  public void testEventBus() {
-    EventBus eventBus = EventBus.newEventBus(Arrays.asList(
-        new EventHandler<Object>() {
-          @NotNull
-          @Override
-          public Object eventType() {
-            return String.class;
-          }
+        @Test
+        public void testEventBus() {
+            EventBus eventBus = EventBus.newEventBus(Arrays.asList(
+                    new EventHandler<Object>() {
+                        @NotNull
+                        @Override
+                        public Object eventType() {
+                            return String.class;
+                        }
 
-          @Override
-          public void handle(@NotNull Object event) {
-            logger.log(event);
-          }
-        },
-        new EventHandler<Object>() {
-          @NotNull
-          @Override
-          public Object eventType() {
-            return Integer.class;
-          }
+                        @Override
+                        public void handle(@NotNull Object event) {
+                            logger.log(event);
+                        }
+                    },
+                    new EventHandler<Object>() {
+                        @NotNull
+                        @Override
+                        public Object eventType() {
+                            return Integer.class;
+                        }
 
-          @Override
-          public void handle(@NotNull Object event) {
-            logger.log(event);
-          }
-        }
-    ));
-    //1
-    eventBus.emit(1);
-    //2
-    eventBus.emit("2");
-    //No output
-    eventBus.emit(new Object());
-    try {
-      eventBus.emitOrThrow(new Object());
-    } catch (EventHandlerNotFoundException e) {
-      //xyz.srclab.common.bus.EventHandlerNotFoundException: class java.lang.Object
-      logger.log(e);
-    }
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class EventBusSample {
-
-  @Test
-  fun testEventBus() {
-    val eventBus = EventBus.newEventBus(
-      listOf(
-        object : EventHandler<Any> {
-
-          override val eventType: Any
-            get() {
-              return String::class.java
+                        @Override
+                        public void handle(@NotNull Object event) {
+                            logger.log(event);
+                        }
+                    }
+            ));
+            //1
+            eventBus.emit(1);
+            //2
+            eventBus.emit("2");
+            //No output
+            eventBus.emit(new Object());
+            try {
+                eventBus.emitOrThrow(new Object());
+            } catch (EventHandlerNotFoundException e) {
+                //xyz.srclab.common.bus.EventHandlerNotFoundException: class java.lang.Object
+                logger.log(e);
             }
-
-          override fun handle(event: Any) {
-            logger.log(event)
-          }
-        },
-        object : EventHandler<Any> {
-
-          override val eventType: Any
-            get() {
-              return Int::class.java
-            }
-
-          override fun handle(event: Any) {
-            logger.log(event)
-          }
         }
-      ))
-    //1
-    eventBus.emit(1)
-    //2
-    eventBus.emit("2")
-    //No output
-    eventBus.emit(Any())
-    try {
-      eventBus.emitOrThrow(Any())
-    } catch (e: EventHandlerNotFoundException) {
-      //xyz.srclab.common.bus.EventHandlerNotFoundException: class java.lang.Object
-      logger.log(e)
     }
-  }
 
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
+Kotlin Examples
 
-#### <a id="usage-core-cache"/>Cache
+    class EventBusSample {
+
+        @Test
+        fun testEventBus() {
+            val eventBus = EventBus.newEventBus(
+                listOf(
+                    object : EventHandler<Any> {
+
+                        override val eventType: Any
+                            get() {
+                                return String::class.java
+                            }
+
+                        override fun handle(event: Any) {
+                            logger.log(event)
+                        }
+                    },
+                    object : EventHandler<Any> {
+
+                        override val eventType: Any
+                            get() {
+                                return Int::class.java
+                            }
+
+                        override fun handle(event: Any) {
+                            logger.log(event)
+                        }
+                    }
+                ))
+            //1
+            eventBus.emit(1)
+            //2
+            eventBus.emit("2")
+            //No output
+            eventBus.emit(Any())
+            try {
+                eventBus.emitOrThrow(Any())
+            } catch (e: EventHandlerNotFoundException) {
+                //xyz.srclab.common.bus.EventHandlerNotFoundException: class java.lang.Object
+                logger.log(e)
+            }
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
+    }
+
+#### Cache
 
 Boat provides a Cache interface and several implementations:
 
-* Cache: Cache core interface;
-* FastCache: Implemented by WeakHashMap and ThreadLocal;
-* CaffeineCache: Implemented by Caffeine;
-* GuavaCache: Implemented by Guava;
-* MapCache: Map as Cache;
-* ThreadLocalCache: ThreadLocalMap as Cache.
+-   Cache: Cache core interface;
 
-##### Java Examples
+-   FastCache: Implemented by WeakHashMap and ThreadLocal;
 
-```java
-public class CacheSample {
+-   CaffeineCache: Implemented by Caffeine;
 
-  private static final TestLogger logger = TestLogger.DEFAULT;
+-   GuavaCache: Implemented by Guava;
 
-  @Test
-  public void testCache() {
-    Cache<String, String> cache = Cache.newFastCache();
-    cache.getOrLoad("1", k -> k);
-    //1
-    logger.log("1: {}", cache.get("1"));
-    //null
-    logger.log("2: {}", cache.getOrNull("2"));
-  }
-}
-```
+-   MapCache: Map as Cache;
 
-##### Kotlin Examples
+-   ThreadLocalCache: ThreadLocalMap as Cache.
 
-```kotlin
-class CacheSample {
+Java Examples
 
-  @Test
-  fun testCache() {
-    val cache = Cache.newFastCache<String, String>()
-    cache.getOrLoad("1") { k: String -> k }
-    //1
-    logger.log("1: {}", cache.get("1"))
-    //null
-    logger.log("2: {}", cache.getOrNull("2"))
-  }
+    public class CacheSample {
 
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
+        private static final TestLogger logger = TestLogger.DEFAULT;
 
-#### <a id="usage-core-collect"/>Collect
+        @Test
+        public void testCache() {
+            Cache<String, String> cache = Cache.newFastCache();
+            cache.getOrLoad("1", k -> k);
+            //1
+            logger.log("1: {}", cache.get("1"));
+            //null
+            logger.log("2: {}", cache.getOrNull("2"));
+        }
+    }
 
-Collect package provides interfaces, utilities and Ops operation for collection and array:
+Kotlin Examples
 
-* Collects: Utilities for Collection;
-* ArrayCollects: Utilities for Array;
-* IterableOps, ListOps, SetOps, MapOps: Ops interfaces, provide chain operation, mainly for Java;
-* SequenceOps: Ops for Sequence;
-* IterableType, MapType: Meta type interfaces for generic Collection types;
-* MultiMaps: MultiMaps provides multi-values Map such as SetMap, MutableSetMap, ListMap and MutableListMap.
+    class CacheSample {
 
-##### Java Examples
+        @Test
+        fun testCache() {
+            val cache = Cache.newFastCache<String, String>()
+            cache.getOrLoad("1") { k: String -> k }
+            //1
+            logger.log("1: {}", cache.get("1"))
+            //null
+            logger.log("2: {}", cache.getOrNull("2"))
+        }
 
-```java
-public class CollectSample {
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
+    }
 
-  private static final TestLogger logger = TestLogger.DEFAULT;
+#### Collect
 
-  @Test
-  public void testArray() {
-    String[] strings = ArrayCollects.newArray("1", "2", "3");
-    ArrayCollects.asList(strings).set(0, "111");
-    //111
-    logger.log("string[0]: {}", strings[0]);
-  }
+Collect package provides interfaces, utilities and Ops operation for
+collection and array:
 
-  @Test
-  public void testCollect() {
-    List<String> list = new ArrayList<>();
-    list.add("1");
-    list.add("2");
-    list.add("3");
-    ListOps<String> listOps = ListOps.opsFor(list);
-    int sum = listOps.addAll(ArrayCollects.newArray("4", "5", "6"))
-        .removeFirst()
-        .map(it -> it + "0")
-        .map(Nums::toInt)
-        .reduce(Integer::sum);
-    //200
-    logger.log("sum: {}", sum);
-  }
+-   Collects: Utilities for Collection;
 
-  @Test
-  public void testMultiMap() {
-    SetMap<String, String> setMap = MultiMaps.setMap(
-        Collects.newMap(
-            new LinkedHashMap<>(),
-            "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
-        )
-    );
-    //setMap: {s=[1, 2, 3]}
-    logger.log("setMap: {}", setMap);
+-   ArrayCollects: Utilities for Array;
 
-    MutableSetMap<String, String> mutableSetMap = MultiMaps.mutableSetMap(
-        Collects.newMap(
-            new LinkedHashMap<>(),
-            "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
-        )
-    );
-    mutableSetMap.add("s", "9");
-    mutableSetMap.addAll("s", Collects.newCollection(new LinkedHashSet<>(), "11", "12", "13"));
-    //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
-    logger.log("mutableSetMap: {}", mutableSetMap);
+-   IterableOps, ListOps, SetOps, MapOps: Ops interfaces, provide chain
+    operation, mainly for Java;
 
-    ListMap<String, String> listMap = MultiMaps.listMap(
-        Collects.newMap(
-            new LinkedHashMap<>(),
-            "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
-        )
-    );
-    //listMap: {s=[1, 2, 3]}
-    logger.log("listMap: {}", listMap);
+-   SequenceOps: Ops for Sequence;
 
-    MutableListMap<String, String> mutableListMap = MultiMaps.mutableListMap(
-        Collects.newMap(
-            new LinkedHashMap<>(),
-            "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
-        )
-    );
-    mutableListMap.add("s", "9");
-    mutableListMap.addAll("s", Collects.newCollection(new LinkedList<>(), "11", "12", "13"));
-    //mutableListMap: {s=[1, 2, 3, 9, 11, 12, 13]}
-    logger.log("mutableListMap: {}", mutableListMap);
-  }
-}
-```
+-   IterableType, MapType: Meta type interfaces for generic Collection
+    types;
 
-##### Kotlin Examples
+-   MultiMaps: MultiMaps provides multi-values Map such as SetMap,
+    MutableSetMap, ListMap and MutableListMap.
 
-```kotlin
-class CollectSample {
+Java Examples
 
-  @Test
-  fun testMultiMap() {
-    val setMap = mapOf("s" to setOf("1", "2", "3")).toSetMap()
-    //setMap: {s=[1, 2, 3]}
-    logger.log("setMap: {}", setMap)
+    public class CollectSample {
 
-    val mutableSetMap = mutableMapOf("s" to mutableSetOf("1", "2", "3")).toMutableSetMap()
-    mutableSetMap.add("s", "9")
-    mutableSetMap.addAll("s", LinkedHashSet<String>().addElements("11", "12", "13"))
-    //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
-    logger.log("mutableSetMap: {}", mutableSetMap)
+        private static final TestLogger logger = TestLogger.DEFAULT;
 
-    val listMap = mapOf("s" to listOf("1", "2", "3")).toListMap()
-    //listMap: {s=[1, 2, 3]}
-    logger.log("listMap: {}", listMap)
+        @Test
+        public void testArray() {
+            String[] strings = ArrayCollects.newArray("1", "2", "3");
+            ArrayCollects.asList(strings).set(0, "111");
+            //111
+            logger.log("string[0]: {}", strings[0]);
+        }
 
-    val mutableListMap = mutableMapOf("s" to mutableListOf("1", "2", "3")).toMutableListMap()
-    mutableListMap.add("s", "9")
-    mutableListMap.addAll("s", LinkedList<String>().addElements("11", "12", "13"))
-    //mutableListMap: {s=[1, 2, 3, 9, 11, 12, 13]}
-    logger.log("mutableListMap: {}", mutableListMap)
-  }
+        @Test
+        public void testCollect() {
+            List<String> list = new ArrayList<>();
+            list.add("1");
+            list.add("2");
+            list.add("3");
+            ListOps<String> listOps = ListOps.opsFor(list);
+            int sum = listOps.addAll(ArrayCollects.newArray("4", "5", "6"))
+                    .removeFirst()
+                    .map(it -> it + "0")
+                    .map(Nums::toInt)
+                    .reduce(Integer::sum);
+            //200
+            logger.log("sum: {}", sum);
+        }
 
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
+        @Test
+        public void testMultiMap() {
+            SetMap<String, String> setMap = MultiMaps.setMap(
+                    Collects.newMap(
+                            new LinkedHashMap<>(),
+                            "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
+                    )
+            );
+            //setMap: {s=[1, 2, 3]}
+            logger.log("setMap: {}", setMap);
 
-#### <a id="usage-core-convert"/>Convert
+            MutableSetMap<String, String> mutableSetMap = MultiMaps.mutableSetMap(
+                    Collects.newMap(
+                            new LinkedHashMap<>(),
+                            "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
+                    )
+            );
+            mutableSetMap.add("s", "9");
+            mutableSetMap.addAll("s", Collects.newCollection(new LinkedHashSet<>(), "11", "12", "13"));
+            //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
+            logger.log("mutableSetMap: {}", mutableSetMap);
+
+            ListMap<String, String> listMap = MultiMaps.listMap(
+                    Collects.newMap(
+                            new LinkedHashMap<>(),
+                            "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
+                    )
+            );
+            //listMap: {s=[1, 2, 3]}
+            logger.log("listMap: {}", listMap);
+
+            MutableListMap<String, String> mutableListMap = MultiMaps.mutableListMap(
+                    Collects.newMap(
+                            new LinkedHashMap<>(),
+                            "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
+                    )
+            );
+            mutableListMap.add("s", "9");
+            mutableListMap.addAll("s", Collects.newCollection(new LinkedList<>(), "11", "12", "13"));
+            //mutableListMap: {s=[1, 2, 3, 9, 11, 12, 13]}
+            logger.log("mutableListMap: {}", mutableListMap);
+        }
+    }
+
+Kotlin Examples
+
+    class CollectSample {
+
+        @Test
+        fun testMultiMap() {
+            val setMap = mapOf("s" to setOf("1", "2", "3")).toSetMap()
+            //setMap: {s=[1, 2, 3]}
+            logger.log("setMap: {}", setMap)
+
+            val mutableSetMap = mutableMapOf("s" to mutableSetOf("1", "2", "3")).toMutableSetMap()
+            mutableSetMap.add("s", "9")
+            mutableSetMap.addAll("s", LinkedHashSet<String>().addElements("11", "12", "13"))
+            //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
+            logger.log("mutableSetMap: {}", mutableSetMap)
+
+            val listMap = mapOf("s" to listOf("1", "2", "3")).toListMap()
+            //listMap: {s=[1, 2, 3]}
+            logger.log("listMap: {}", listMap)
+
+            val mutableListMap = mutableMapOf("s" to mutableListOf("1", "2", "3")).toMutableListMap()
+            mutableListMap.add("s", "9")
+            mutableListMap.addAll("s", LinkedList<String>().addElements("11", "12", "13"))
+            //mutableListMap: {s=[1, 2, 3, 9, 11, 12, 13]}
+            logger.log("mutableListMap: {}", mutableListMap)
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
+    }
+
+#### Convert
 
 Convert package provides type-conversion function：
 
-* Converts: Utilities for conversion;
-* Converter: Core interfaces for type-conversion, Converts use its default implementation;
-* FastConverter: Fast and narrowing version of Converter.
+-   Converts: Utilities for conversion;
 
-##### Java Examples
+-   Converter: Core interfaces for type-conversion, Converts use its
+    default implementation;
 
-```java
-public class ConvertSample {
+-   FastConverter: Fast and narrowing version of Converter.
 
-  private static final TestLogger logger = TestLogger.DEFAULT;
+Java Examples
 
-  @Test
-  public void testConvert() {
-    String s = Converts.convert(123, String.class);
-    //123
-    logger.log("s: {}", s);
+    public class ConvertSample {
 
-    A a = new A();
-    a.setP1("1");
-    a.setP2("2");
-    B b = Converts.convert(a, B.class);
-    //1
-    logger.log("b1: {}", b.getP1());
-    //2
-    logger.log("b1: {}", b.getP2());
+        private static final TestLogger logger = TestLogger.DEFAULT;
 
-    FastConverter<String> fastConverter = FastConverter.newFastConverter(
-        Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
-    //123
-    logger.log(fastConverter.convert(new StringBuilder("123")));
-    //123123
-    logger.log(fastConverter.convert("123"));
-  }
+        @Test
+        public void testConvert() {
+            String s = Converts.convert(123, String.class);
+            //123
+            logger.log("s: {}", s);
 
-  public static class A {
-    private String p1;
-    private String p2;
+            A a = new A();
+            a.setP1("1");
+            a.setP2("2");
+            B b = Converts.convert(a, B.class);
+            //1
+            logger.log("b1: {}", b.getP1());
+            //2
+            logger.log("b1: {}", b.getP2());
 
-    public String getP1() {
-      return p1;
+            FastConverter<String> fastConverter = FastConverter.newFastConverter(
+                    Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
+            //123
+            logger.log(fastConverter.convert(new StringBuilder("123")));
+            //123123
+            logger.log(fastConverter.convert("123"));
+        }
+
+        public static class A {
+            private String p1;
+            private String p2;
+
+            public String getP1() {
+                return p1;
+            }
+
+            public void setP1(String p1) {
+                this.p1 = p1;
+            }
+
+            public String getP2() {
+                return p2;
+            }
+
+            public void setP2(String p2) {
+                this.p2 = p2;
+            }
+        }
+
+        public static class B {
+            private int p1;
+            private int p2;
+
+            public int getP1() {
+                return p1;
+            }
+
+            public void setP1(int p1) {
+                this.p1 = p1;
+            }
+
+            public int getP2() {
+                return p2;
+            }
+
+            public void setP2(int p2) {
+                this.p2 = p2;
+            }
+        }
+
+        private static class ObjectConvertHandler implements FastConvertHandler<String> {
+
+            @NotNull
+            @Override
+            public Class<?> supportedType() {
+                return Object.class;
+            }
+
+            @Override
+            public String convert(@NotNull Object from) {
+                return from.toString();
+            }
+        }
+
+        private static class StringConvertHandler implements FastConvertHandler<String> {
+
+            @NotNull
+            @Override
+            public Class<?> supportedType() {
+                return String.class;
+            }
+
+            @Override
+            public String convert(@NotNull Object from) {
+                return from.toString() + from.toString();
+            }
+        }
     }
 
-    public void setP1(String p1) {
-      this.p1 = p1;
+Kotlin Examples
+
+    class ConvertSample {
+
+        @Test
+        fun testConvert() {
+            val s = 123.convert(String::class.java)
+            //123
+            logger.log("s: {}", s)
+            val a = A()
+            a.p1 = "1"
+            a.p2 = "2"
+            val b = a.convert(
+                B::class.java
+            )
+            //1
+            logger.log("b1: {}", b.p1)
+            //2
+            logger.log("b1: {}", b.p2)
+
+            val fastConverter = newFastConverter(listOf(ObjectConvertHandler(), StringConvertHandler()))
+            //123
+            //123
+            logger.log(fastConverter.convert(StringBuilder("123")))
+            //123123
+            //123123
+            logger.log(fastConverter.convert("123"))
+        }
+
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
     }
 
-    public String getP2() {
-      return p2;
+    class A {
+        var p1: String? = null
+        var p2: String? = null
     }
 
-    public void setP2(String p2) {
-      this.p2 = p2;
-    }
-  }
-
-  public static class B {
-    private int p1;
-    private int p2;
-
-    public int getP1() {
-      return p1;
+    class B {
+        var p1 = 0
+        var p2 = 0
     }
 
-    public void setP1(int p1) {
-      this.p1 = p1;
+    private class ObjectConvertHandler : FastConvertHandler<String> {
+
+        override val supportedType: Class<*> = Any::class.java
+
+        override fun convert(from: Any): String {
+            return from.toString()
+        }
     }
 
-    public int getP2() {
-      return p2;
+    private class StringConvertHandler : FastConvertHandler<String> {
+
+        override val supportedType: Class<*> = String::class.java
+
+        override fun convert(from: Any): String {
+            return from.toString() + from.toString()
+        }
     }
 
-    public void setP2(int p2) {
-      this.p2 = p2;
+#### Exception
+
+Exception package provides StatusException and ExceptionStatus extended
+from State (see [State](#_state)), and a ShouldNotException.
+
+Java Examples
+
+    public class ExceptionSample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testStatusException() {
+            SampleException sampleException = new SampleException();
+            //000001-Unknown Error[for sample]
+            logger.log("Status: {}", sampleException.withMoreDescription("for sample"));
+        }
+
+        public static class SampleException extends StatusException {
+
+            public SampleException() {
+                super(ExceptionStatus.UNKNOWN);
+            }
+        }
     }
-  }
 
-  private static class ObjectConvertHandler implements FastConvertHandler<String> {
+Kotlin Examples
 
-    @NotNull
-    @Override
-    public Class<?> supportedType() {
-      return Object.class;
+    class ExceptionSample {
+
+        @Test
+        fun testStatusException() {
+            val sampleException = SampleException()
+            //000001-Unknown Error[for sample]
+            logger.log("Status: {}", sampleException.withMoreDescription("for sample"))
+        }
+
+        class SampleException : StatusException(ExceptionStatus.UNKNOWN)
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
     }
 
-    @Override
-    public String convert(@NotNull Object from) {
-      return from.toString();
+#### Invoke
+
+Invoke package provides Invoker interface to call methods (for Java) and
+functions (for Kotlin).
+
+Java Examples
+
+    public class InvokeSample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testInvoke() throws Exception {
+            Invoker invoker = Invoker.forMethod(String.class.getMethod("getBytes"));
+            byte[] bytes = invoker.invoke("10086");
+            //[49, 48, 48, 56, 54]
+            logger.log("bytes: {}", bytes);
+        }
     }
-  }
 
-  private static class StringConvertHandler implements FastConvertHandler<String> {
+Kotlin Examples
 
-    @NotNull
-    @Override
-    public Class<?> supportedType() {
-      return String.class;
+    class InvokeSample {
+
+        @Test
+        fun testInvoke() {
+            val invoker: Invoker = Invoker.forMethod(String::class.java, "getBytes")
+            val bytes = invoker.invoke<ByteArray>("10086")
+            //[49, 48, 48, 56, 54]
+            logger.log("bytes: {}", bytes)
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
     }
 
-    @Override
-    public String convert(@NotNull Object from) {
-      return from.toString() + from.toString();
-    }
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class ConvertSample {
-
-  @Test
-  fun testConvert() {
-    val s = 123.convert(String::class.java)
-    //123
-    logger.log("s: {}", s)
-    val a = A()
-    a.p1 = "1"
-    a.p2 = "2"
-    val b = a.convert(
-      B::class.java
-    )
-    //1
-    logger.log("b1: {}", b.p1)
-    //2
-    logger.log("b1: {}", b.p2)
-
-    val fastConverter = newFastConverter(listOf(ObjectConvertHandler(), StringConvertHandler()))
-    //123
-    //123
-    logger.log(fastConverter.convert(StringBuilder("123")))
-    //123123
-    //123123
-    logger.log(fastConverter.convert("123"))
-  }
-
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-
-class A {
-  var p1: String? = null
-  var p2: String? = null
-}
-
-class B {
-  var p1 = 0
-  var p2 = 0
-}
-
-private class ObjectConvertHandler : FastConvertHandler<String> {
-
-  override val supportedType: Class<*> = Any::class.java
-
-  override fun convert(from: Any): String {
-    return from.toString()
-  }
-}
-
-private class StringConvertHandler : FastConvertHandler<String> {
-
-  override val supportedType: Class<*> = String::class.java
-
-  override fun convert(from: Any): String {
-    return from.toString() + from.toString()
-  }
-}
-```
-
-#### <a id="usage-core-exception"/>Exception
-
-Exception package provides StatusException and ExceptionStatus extended from State (see [State](#usage-core-state)), and
-a ShouldNotException.
-
-##### Java Examples
-
-```java
-public class ExceptionSample {
-
-  private static final TestLogger logger = TestLogger.DEFAULT;
-
-  @Test
-  public void testStatusException() {
-    SampleException sampleException = new SampleException();
-    //000001-Unknown Error[for sample]
-    logger.log("Status: {}", sampleException.withMoreDescription("for sample"));
-  }
-
-  public static class SampleException extends StatusException {
-
-    public SampleException() {
-      super(ExceptionStatus.UNKNOWN);
-    }
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class ExceptionSample {
-
-  @Test
-  fun testStatusException() {
-    val sampleException = SampleException()
-    //000001-Unknown Error[for sample]
-    logger.log("Status: {}", sampleException.withMoreDescription("for sample"))
-  }
-
-  class SampleException : StatusException(ExceptionStatus.UNKNOWN)
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-#### <a id="usage-core-invoke"/>Invoke
-
-Invoke package provides Invoker interface to call methods (for Java) and functions (for Kotlin).
-
-##### Java Examples
-
-```java
-public class InvokeSample {
-
-  private static final TestLogger logger = TestLogger.DEFAULT;
-
-  @Test
-  public void testInvoke() throws Exception {
-    Invoker invoker = Invoker.forMethod(String.class.getMethod("getBytes"));
-    byte[] bytes = invoker.invoke("10086");
-    //[49, 48, 48, 56, 54]
-    logger.log("bytes: {}", bytes);
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class InvokeSample {
-
-  @Test
-  fun testInvoke() {
-    val invoker: Invoker = Invoker.forMethod(String::class.java, "getBytes")
-    val bytes = invoker.invoke<ByteArray>("10086")
-    //[49, 48, 48, 56, 54]
-    logger.log("bytes: {}", bytes)
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-#### <a id="usage-core-jvm"/>Jvm
+#### Jvm
 
 Jvm package provides Jvms utilities classes to get JVM infos.
 
-##### Java Examples
+Java Examples
 
-```java
-public class JvmSample {
+    public class JvmSample {
 
-  private static final TestLogger logger = TestLogger.DEFAULT;
+        private static final TestLogger logger = TestLogger.DEFAULT;
 
-  @Test
-  public void testJvms() {
-    String jvmDescriptor = Jvms.jvmDescriptor(int.class);
-    //I
-    logger.log("jvmDescriptor: {}", jvmDescriptor);
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class JvmSample {
-
-  @Test
-  fun testJvms() {
-    val jvmDescriptor = Int::class.javaPrimitiveType!!.jvmDescriptor
-    //I
-    logger.log("jvmDescriptor: {}", jvmDescriptor)
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-#### <a id="usage-core-proxy"/>Proxy
-
-Proxy package provides Class proxy function with spring-cglib, cglib or JDK proxy.
-
-##### Java Examples
-
-```java
-public class ProxySample {
-
-  private static final TestLogger logger = TestLogger.DEFAULT;
-
-  @Test
-  public void testProxy() {
-    ProxyClass<Object> proxyClass = ProxyClass.newProxyClass(
-        Object.class,
-        Arrays.asList(
-            new ProxyMethod<Object>() {
-              @NotNull
-              @Override
-              public String name() {
-                return "toString";
-              }
-
-              @NotNull
-              @Override
-              public Class<?>[] parameterTypes() {
-                return new Class[0];
-              }
-
-              @Nullable
-              @Override
-              public Object invoke(
-                  Object proxied,
-                  @NotNull Method proxiedMethod,
-                  @Nullable Object[] args, @NotNull SuperInvoker superInvoker
-              ) {
-                return "Proxy[super: " + superInvoker.invoke(args) + "]";
-              }
-            }
-        )
-    );
-    String s = proxyClass.newInstance().toString();
-    //Proxy[super: net.sf.cglib.empty.Object$$EnhancerByCGLIB$$4926690c@256f38d9]
-    logger.log("s: {}", s);
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class ProxySample {
-
-  @Test
-  fun testProxy() {
-    val proxyClass = newProxyClass(
-      Any::class.java,
-      listOf(
-        object : ProxyMethod<Any> {
-          override val name: String
-            get() {
-              return "toString"
-            }
-
-          override val parameterTypes: Array<Class<*>>
-            get() {
-              return emptyArray()
-            }
-
-          override fun invoke(
-            proxied: Any,
-            proxiedMethod: Method,
-            args: Array<out Any?>?, superInvoker: SuperInvoker
-          ): Any? {
-            return "Proxy[super: " + superInvoker.invoke(args) + "]"
-          }
+        @Test
+        public void testJvms() {
+            String jvmDescriptor = Jvms.jvmDescriptor(int.class);
+            //I
+            logger.log("jvmDescriptor: {}", jvmDescriptor);
         }
-      )
-    )
-    val s = proxyClass.newInstance().toString()
-    //Proxy[super: net.sf.cglib.empty.Object$$EnhancerByCGLIB$$4926690c@256f38d9]
-    logger.log("s: {}", s)
-  }
+    }
 
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
+Kotlin Examples
 
-#### <a id="usage-core-reflect"/>Reflect
+    class JvmSample {
+
+        @Test
+        fun testJvms() {
+            val jvmDescriptor = Int::class.javaPrimitiveType!!.jvmDescriptor
+            //I
+            logger.log("jvmDescriptor: {}", jvmDescriptor)
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
+    }
+
+#### Proxy
+
+Proxy package provides Class proxy function with spring-cglib, cglib or
+JDK proxy.
+
+Java Examples
+
+    public class ProxySample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testProxy() {
+            ProxyClass<Object> proxyClass = ProxyClass.newProxyClass(
+                    Object.class,
+                    Arrays.asList(
+                            new ProxyMethod<Object>() {
+                                @NotNull
+                                @Override
+                                public String name() {
+                                    return "toString";
+                                }
+
+                                @NotNull
+                                @Override
+                                public Class<?>[] parameterTypes() {
+                                    return new Class[0];
+                                }
+
+                                @Nullable
+                                @Override
+                                public Object invoke(
+                                        Object proxied,
+                                        @NotNull Method proxiedMethod,
+                                        @Nullable Object[] args, @NotNull SuperInvoker superInvoker
+                                ) {
+                                    return "Proxy[super: " + superInvoker.invoke(args) + "]";
+                                }
+                            }
+                    )
+            );
+            String s = proxyClass.newInstance().toString();
+            //Proxy[super: net.sf.cglib.empty.Object$$EnhancerByCGLIB$$4926690c@256f38d9]
+            logger.log("s: {}", s);
+        }
+    }
+
+Kotlin Examples
+
+    class ProxySample {
+
+        @Test
+        fun testProxy() {
+            val proxyClass = newProxyClass(
+                Any::class.java,
+                listOf(
+                    object : ProxyMethod<Any> {
+                        override val name: String
+                            get() {
+                                return "toString"
+                            }
+
+                        override val parameterTypes: Array<Class<*>>
+                            get() {
+                                return emptyArray()
+                            }
+
+                        override fun invoke(
+                            proxied: Any,
+                            proxiedMethod: Method,
+                            args: Array<out Any?>?, superInvoker: SuperInvoker
+                        ): Any? {
+                            return "Proxy[super: " + superInvoker.invoke(args) + "]"
+                        }
+                    }
+                )
+            )
+            val s = proxyClass.newInstance().toString()
+            //Proxy[super: net.sf.cglib.empty.Object$$EnhancerByCGLIB$$4926690c@256f38d9]
+            logger.log("s: {}", s)
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
+    }
+
+#### Reflect
 
 Reflect package provides utilities classes:
 
-* Reflects: Provides reflect operations;
-* Types: To build generic types;
-* TypeRef: To build a type reference.
+-   Reflects: Provides reflect operations;
 
-##### Java Examples
+-   Types: To build generic types;
 
-```java
-public class ReflectSample {
+-   TypeRef: To build a type reference.
 
-  private static final TestLogger logger = TestLogger.DEFAULT;
+Java Examples
 
-  @Test
-  public void testReflects() {
-    Method method = Reflects.method(Object.class, "toString");
-    String s = Reflects.invoke(method, new Object());
-    //java.lang.Object@97c879e
-    logger.log("s: {}", s);
-  }
+    public class ReflectSample {
 
-  @Test
-  public void testTypes() {
-    ParameterizedType type = Types.parameterizedType(List.class, String.class);
-    GenericArrayType arrayType = Types.genericArrayType(type);
-    //java.util.List<java.lang.String>[]
-    logger.log("arrayType: {}", arrayType);
-  }
-}
-```
+        private static final TestLogger logger = TestLogger.DEFAULT;
 
-##### Kotlin Examples
+        @Test
+        public void testReflects() {
+            Method method = Reflects.method(Object.class, "toString");
+            String s = Reflects.invoke(method, new Object());
+            //java.lang.Object@97c879e
+            logger.log("s: {}", s);
+        }
 
-```kotlin
-class ReflectSample {
-
-  @Test
-  fun testReflects() {
-    val method = Any::class.java.method("toString")
-    val s = method.invoke<String>(Any())
-    //java.lang.Object@97c879e
-    logger.log("s: {}", s)
-  }
-
-  @Test
-  fun testTypes() {
-    val type = parameterizedType(MutableList::class.java, String::class.java)
-    val arrayType = type.genericArrayType()
-    //java.util.List<java.lang.String>[]
-    logger.log("arrayType: {}", arrayType)
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-#### <a id="usage-core-run"/>Run
-
-Run package provides Runner and Scheduler interfaces to run codes in threads or coroutines.
-
-##### Java Examples
-
-```java
-public class RunSample {
-
-  private static final TestLogger logger = TestLogger.DEFAULT;
-
-  @Test
-  public void testRunner() {
-    Runner runner = Runner.SYNC_RUNNER;
-    IntRef intRef = IntRef.of(0);
-    Running<?> running = runner.run(() -> {
-      intRef.set(666);
-      return null;
-    });
-    running.get();
-    //666
-    logger.log("int: {}", intRef.get());
-  }
-
-  @Test
-  public void testScheduledRunner() {
-    Scheduler scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER;
-    IntRef intRef = IntRef.of(0);
-    Scheduling<?> scheduling = scheduler.scheduleFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
-      intRef.set(intRef.get() + 100);
-      return null;
-    });
-    Current.sleep(2500);
-    scheduling.cancel(false);
-    //300
-    logger.log("int: {}", intRef.get());
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class RunSample {
-
-  @Test
-  fun testRunner() {
-    val runner: Runner = Runner.SYNC_RUNNER
-    val intRef = of(0)
-    val running: Running<*> = runner.run<Any?> {
-      intRef.set(666)
-      null
-    }
-    running.get()
-    //666
-    logger.log("int: {}", intRef.get())
-  }
-
-  @Test
-  fun testScheduledRunner() {
-    val scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER
-    val intRef = of(0)
-    val scheduling: Scheduling<*> = scheduler.scheduleFixedDelay<Any?>(Duration.ZERO, Duration.ofMillis(1000)) {
-      intRef.set(intRef.get() + 100)
-      null
-    }
-    sleep(2500)
-    scheduling.cancel(false)
-    //300
-    logger.log("int: {}", intRef.get())
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-#### <a id="usage-core-state"/>State
-
-State package provides State interface to help build custom state or status type.
-
-##### Java Examples
-
-```java
-public class StateSample {
-
-  private static final TestLogger logger = TestLogger.DEFAULT;
-
-  @Test
-  public void testState() {
-    MyState myState = new MyState(1, "description");
-    MyState newState = myState.withMoreDescription("cause");
-    //description[cause]
-    logger.log(newState.description());
-  }
-
-  public static class MyState implements State<Integer, String, MyState> {
-
-    private final int code;
-    private final List<String> descriptions;
-
-    public MyState(int code, @Nullable String description) {
-      this.code = code;
-      this.descriptions = CharsState.newDescriptions(description);
+        @Test
+        public void testTypes() {
+            ParameterizedType type = Types.parameterizedType(List.class, String.class);
+            GenericArrayType arrayType = Types.genericArrayType(type);
+            //java.util.List<java.lang.String>[]
+            logger.log("arrayType: {}", arrayType);
+        }
     }
 
-    public MyState(int code, @Immutable List<String> descriptions) {
-      this.code = code;
-      this.descriptions = descriptions;
+Kotlin Examples
+
+    class ReflectSample {
+
+        @Test
+        fun testReflects() {
+            val method = Any::class.java.method("toString")
+            val s = method.invoke<String>(Any())
+            //java.lang.Object@97c879e
+            logger.log("s: {}", s)
+        }
+
+        @Test
+        fun testTypes() {
+            val type = parameterizedType(MutableList::class.java, String::class.java)
+            val arrayType = type.genericArrayType()
+            //java.util.List<java.lang.String>[]
+            logger.log("arrayType: {}", arrayType)
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
     }
 
-    @Override
-    public Integer code() {
-      return code;
+#### Run
+
+Run package provides Runner and Scheduler interfaces to run codes in
+threads or coroutines.
+
+Java Examples
+
+    public class RunSample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testRunner() {
+            Runner runner = Runner.SYNC_RUNNER;
+            IntRef intRef = IntRef.of(0);
+            Running<?> running = runner.run(() -> {
+                intRef.set(666);
+                return null;
+            });
+            running.get();
+            //666
+            logger.log("int: {}", intRef.get());
+        }
+
+        @Test
+        public void testScheduledRunner() {
+            Scheduler scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER;
+            IntRef intRef = IntRef.of(0);
+            Scheduling<?> scheduling = scheduler.scheduleFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
+                intRef.set(intRef.get() + 100);
+                return null;
+            });
+            Current.sleep(2500);
+            scheduling.cancel(false);
+            //300
+            logger.log("int: {}", intRef.get());
+        }
     }
 
-    @Nullable
-    @Override
-    public String description() {
-      return CharsState.joinDescriptions(descriptions);
+Kotlin Examples
+
+    class RunSample {
+
+        @Test
+        fun testRunner() {
+            val runner: Runner = Runner.SYNC_RUNNER
+            val intRef = of(0)
+            val running: Running<*> = runner.run<Any?> {
+                intRef.set(666)
+                null
+            }
+            running.get()
+            //666
+            logger.log("int: {}", intRef.get())
+        }
+
+        @Test
+        fun testScheduledRunner() {
+            val scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER
+            val intRef = of(0)
+            val scheduling: Scheduling<*> = scheduler.scheduleFixedDelay<Any?>(Duration.ZERO, Duration.ofMillis(1000)) {
+                intRef.set(intRef.get() + 100)
+                null
+            }
+            sleep(2500)
+            scheduling.cancel(false)
+            //300
+            logger.log("int: {}", intRef.get())
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
     }
 
-    @NotNull
-    @Override
-    public List<String> descriptions() {
-      return descriptions;
+#### State
+
+State package provides State interface to help build custom state or
+status type.
+
+Java Examples
+
+    public class StateSample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testState() {
+            MyState myState = new MyState(1, "description");
+            MyState newState = myState.withMoreDescription("cause");
+            //description[cause]
+            logger.log(newState.description());
+        }
+
+        public static class MyState implements State<Integer, String, MyState> {
+
+            private final int code;
+            private final List<String> descriptions;
+
+            public MyState(int code, @Nullable String description) {
+                this.code = code;
+                this.descriptions = CharsState.newDescriptions(description);
+            }
+
+            public MyState(int code, @Immutable List<String> descriptions) {
+                this.code = code;
+                this.descriptions = descriptions;
+            }
+
+            @Override
+            public Integer code() {
+                return code;
+            }
+
+            @Nullable
+            @Override
+            public String description() {
+                return CharsState.joinDescriptions(descriptions);
+            }
+
+            @NotNull
+            @Override
+            public List<String> descriptions() {
+                return descriptions;
+            }
+
+            @NotNull
+            @Override
+            public MyState withNewDescription(@Nullable String newDescription) {
+                return new MyState(code, CharsState.newDescriptions(newDescription));
+            }
+
+            @NotNull
+            @Override
+            public MyState withMoreDescription(String moreDescription) {
+                return new MyState(code, CharsState.moreDescriptions(descriptions(), moreDescription));
+            }
+        }
     }
 
-    @NotNull
-    @Override
-    public MyState withNewDescription(@Nullable String newDescription) {
-      return new MyState(code, CharsState.newDescriptions(newDescription));
+Kotlin Examples
+
+    class StateSample {
+
+        @Test
+        fun testState() {
+            val myState = MyState(1, "description")
+            val newState = myState.withMoreDescription("cause")
+            //description[cause]
+            logger.log(newState.description)
+        }
+
+        class MyState(
+            override val code: Int, override val descriptions: List<String>
+        ) : State<Int, String, MyState> {
+
+            constructor(code: Int, description: String?) : this(code, CharsState.newDescriptions(description))
+
+            override val description: String? = descriptions.joinStateDescriptions()
+
+            override fun withNewDescription(newDescription: String?): MyState {
+                return MyState(code, CharsState.newDescriptions(newDescription))
+            }
+
+            override fun withMoreDescription(moreDescription: String): MyState {
+                return MyState(code, descriptions.moreDescriptions(moreDescription))
+            }
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
     }
 
-    @NotNull
-    @Override
-    public MyState withMoreDescription(String moreDescription) {
-      return new MyState(code, CharsState.moreDescriptions(descriptions(), moreDescription));
-    }
-  }
-}
-```
-
-##### Kotlin Examples
-
-```kotlin
-class StateSample {
-
-  @Test
-  fun testState() {
-    val myState = MyState(1, "description")
-    val newState = myState.withMoreDescription("cause")
-    //description[cause]
-    logger.log(newState.description)
-  }
-
-  class MyState(
-    override val code: Int, override val descriptions: List<String>
-  ) : State<Int, String, MyState> {
-
-    constructor(code: Int, description: String?) : this(code, CharsState.newDescriptions(description))
-
-    override val description: String? = descriptions.joinStateDescriptions()
-
-    override fun withNewDescription(newDescription: String?): MyState {
-      return MyState(code, CharsState.newDescriptions(newDescription))
-    }
-
-    override fun withMoreDescription(moreDescription: String): MyState {
-      return MyState(code, descriptions.moreDescriptions(moreDescription))
-    }
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-#### <a id="usage-core-test"/>Test
+#### Test
 
 Test package provides simple test tools:
 
-* Tester: interface to start test tasks;
-* TestLogger: simple logger for testing;
-* TestTask and TestListener: test task and listener;
-* Tests: common utilities class for test.
+-   Tester: interface to start test tasks;
 
-##### Java Examples
+-   TestLogger: simple logger for testing;
 
-```java
-public class TestSample {
+-   TestTask and TestListener: test task and listener;
 
-  private static final TestLogger logger = TestLogger.DEFAULT;
+-   Tests: common utilities class for test.
 
-  @Test
-  public void testTests() {
-    Tests.testTasks(Arrays.asList(
-        TestTask.newTask(() -> {
-          logger.log("Run test task!");
-        })
-    ));
-  }
-}
-```
+Java Examples
 
-##### Kotlin Examples
+    public class TestSample {
 
-```kotlin
-class TestSample {
+        private static final TestLogger logger = TestLogger.DEFAULT;
 
-  @Test
-  fun testTests() {
-    testTasks(
-      listOf(
-        TestTask.newTask { logger.log("Run test task!") }
-      )
-    )
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-### <a id="usage-serialize"/>Boat Serialize (boat-serialize)
-
-Boat Serialize (should import boat-serialize) provides core Serializer interface for serialization:
-
-* Serializer: Core interface for serialization;
-* JsonSerials: JSON serialization utilities;
-* JsonSerial: Core interface for JSON serialization, JsonSerials use its default implementation (Jackson);
-* Json: Core interface denote a JSON object.
-
-#### Java Examples
-
-```java
-public class SerializeSample {
-
-  private static final TestLogger logger = TestLogger.DEFAULT;
-
-  @Test
-  public void testJsonSerialize() {
-    Json json = JsonSerials.toJson("{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}");
-    Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {
-    });
-    //{p1=p1 value, p2=p2 value}
-    logger.log(map);
-  }
-}
-```
-
-#### Kotlin Examples
-
-```kotlin
-class SerializeSample {
-
-  @Test
-  fun testJsonSerialize() {
-    val json = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}".toJson()
-    val map: Map<String, String> = json.toObject(object : TypeRef<Map<String, String>>() {})
-    //{p1=p1 value, p2=p2 value}
-    logger.log(map)
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-### <a id="usage-codec"/>Boat Codec (boat-codec)
-
-Boat Codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and other interfaces to do with codec
-functions, supports hex, base64, AES, RSA, SM2 and more algorithms:
-
-* Codec: Core interface and utilities for codec function;
-* CodecKeys: Utilities for codec keys;
-* AesKeys: Utilities for AES keys.
-
-#### Java Examples
-
-```java
-public class CodecSample {
-
-  private static final TestLogger logger = TestLogger.DEFAULT;
-
-  @Test
-  public void testCodec() {
-    String password = "hei, xiongdi, womenhaojiubujiannizainali";
-    String messageBase64 = "aGVpLCBwZW5neW91LCBydWd1b3poZW5kZXNoaW5pcWluZ2Rhemhhb2h1";
-    SecretKey secretKey = AesKeys.newKey(password);
-
-    //Use static
-    String message = Codec.decodeBase64String(messageBase64);
-    byte[] encrypt = Codec.aesCipher().encrypt(secretKey, message);
-    String decrypt = Codec.aesCipher().decryptToString(secretKey, encrypt);
-    //hei, pengyou, ruguozhendeshiniqingdazhaohu
-    logger.log("decrypt: {}", decrypt);
-
-    //Use chain
-    encrypt = Codec.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
-    decrypt = Codec.forData(encrypt).decryptAes(secretKey).doFinalToString();
-    //hei, pengyou, ruguozhendeshiniqingdazhaohu
-    logger.log("decrypt: {}", decrypt);
-  }
-}
-```
-
-#### Kotlin Examples
-
-```kotlin
-class CodecSample {
-
-  @Test
-  fun testCodec() {
-    val password = "hei, xiongdi, womenhaojiubujiannizainali"
-    val messageBase64 = "aGVpLCBwZW5neW91LCBydWd1b3poZW5kZXNoaW5pcWluZ2Rhemhhb2h1"
-    val secretKey = password.toAesKey()
-
-    //Use static
-    val message: String = messageBase64.decodeBase64String()
-    var encrypt = Codec.aesCipher().encrypt(secretKey, message)
-    var decrypt = Codec.aesCipher().decryptToString(secretKey, encrypt)
-    //hei, pengyou, ruguozhendeshiniqingdazhaohu
-    logger.log("decrypt: {}", decrypt)
-
-    //Use chain
-    encrypt = Codec.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal()
-    decrypt = Codec.forData(encrypt).decryptAes(secretKey).doFinalToString()
-    //hei, pengyou, ruguozhendeshiniqingdazhaohu
-    logger.log("decrypt: {}", decrypt)
-  }
-
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
-
-### <a id="usage-id"/>Boat Id (boat-id)
-
-Boat ID (should import boat-id) is a lightweight and fast id generation framework. It provides IdFactory and a set of
-interface to generate id:
-
-* IdFactory: Core interface to generate new id;
-* IdComponentFactory: Core interface to generator component of an id;
-* AbstractIdFactory: Skeletal IdFactory to help implement full IdFactory;
-* StringIdFactory: Skeletal IdFactory to help implement String-id-type IdFactory;
-
-Boat ID also provides StringIdSpec, a String-type IdFactory, can build new id from a specification string, see its
-javadoc.
-
-#### Java Examples
-
-```java
-public class IdSample {
-
-  private static final TestLogger logger = TestLogger.DEFAULT;
-
-  @Test
-  public void testId() {
-    String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
-    StringIdSpec stringIdSpec = new StringIdSpec(spec);
-    //seq-202102071449568890000-tail
-    for (int i = 0; i < 10; i++) {
-      logger.log(stringIdSpec.create());
+        @Test
+        public void testTests() {
+            Tests.testTasks(Arrays.asList(
+                    TestTask.newTask(() -> {
+                        logger.log("Run test task!");
+                    })
+            ));
+        }
     }
-  }
-}
-```
 
-#### Kotlin Examples
+Kotlin Examples
 
-```kotlin
-class IdSample {
+    class TestSample {
 
-  @Test
-  fun testId() {
-    val spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail"
-    val stringIdSpec = StringIdSpec(spec)
-    //seq-202102071449568890000-tail
-    for (i in 0..9) {
-      logger.log(stringIdSpec.create())
+        @Test
+        fun testTests() {
+            testTasks(
+                listOf(
+                    TestTask.newTask { logger.log("Run test task!") }
+                )
+            )
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
     }
-  }
 
-  companion object {
-    private val logger = TestLogger.DEFAULT
-  }
-}
-```
+### Boat Serialize (boat-serialize)
 
-## <a id="contact"/>Contribution and Contact
+Boat Serialize (should import boat-serialize) provides core Serializer
+interface for serialization:
 
-* fredsuvn@163.com
-* https://github.com/srclab-projects/boat
-* QQ group: 1037555759
+-   Serializer: Core interface for serialization;
 
-## <a id="license"/>License
+-   JsonSerials: JSON serialization utilities;
 
-[Apache 2.0 license][license]
+-   JsonSerial: Core interface for JSON serialization, JsonSerials use
+    its default implementation (Jackson);
 
-[license]: https://www.apache.org/licenses/LICENSE-2.0.html
+-   Json: Core interface denote a JSON object.
+
+Java Examples
+
+    public class SerializeSample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testJsonSerialize() {
+            Json json = JsonSerials.toJson("{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}");
+            Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {});
+            //{p1=p1 value, p2=p2 value}
+            logger.log(map);
+        }
+    }
+
+Kotlin Examples
+
+    class SerializeSample {
+
+        @Test
+        fun testJsonSerialize() {
+            val json = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}".toJson()
+            val map: Map<String, String> = json.toObject(object : TypeRef<Map<String, String>>() {})
+            //{p1=p1 value, p2=p2 value}
+            logger.log(map)
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
+    }
+
+### Boat Codec (boat-codec)
+
+Boat Codec (should import boat-codec) provides Codec, CodecKeys, AesKeys
+and other interfaces to do with codec functions, supports hex, base64,
+AES, RSA, SM2 and more algorithms:
+
+-   Codec: Core interface and utilities for codec function;
+
+-   CodecKeys: Utilities for codec keys;
+
+-   AesKeys: Utilities for AES keys.
+
+Java Examples
+
+    public class CodecSample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testCodec() {
+            String password = "hei, xiongdi, womenhaojiubujiannizainali";
+            String messageBase64 = "aGVpLCBwZW5neW91LCBydWd1b3poZW5kZXNoaW5pcWluZ2Rhemhhb2h1";
+            SecretKey secretKey = AesKeys.newKey(password);
+
+            //Use static
+            String message = Codec.decodeBase64String(messageBase64);
+            byte[] encrypt = Codec.aesCipher().encrypt(secretKey, message);
+            String decrypt = Codec.aesCipher().decryptToString(secretKey, encrypt);
+            //hei, pengyou, ruguozhendeshiniqingdazhaohu
+            logger.log("decrypt: {}", decrypt);
+
+            //Use chain
+            encrypt = Codec.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+            decrypt = Codec.forData(encrypt).decryptAes(secretKey).doFinalToString();
+            //hei, pengyou, ruguozhendeshiniqingdazhaohu
+            logger.log("decrypt: {}", decrypt);
+        }
+    }
+
+Kotlin Examples
+
+    class CodecSample {
+
+        @Test
+        fun testCodec() {
+            val password = "hei, xiongdi, womenhaojiubujiannizainali"
+            val messageBase64 = "aGVpLCBwZW5neW91LCBydWd1b3poZW5kZXNoaW5pcWluZ2Rhemhhb2h1"
+            val secretKey = password.toAesKey()
+
+            //Use static
+            val message: String = messageBase64.decodeBase64String()
+            var encrypt = Codec.aesCipher().encrypt(secretKey, message)
+            var decrypt = Codec.aesCipher().decryptToString(secretKey, encrypt)
+            //hei, pengyou, ruguozhendeshiniqingdazhaohu
+            logger.log("decrypt: {}", decrypt)
+
+            //Use chain
+            encrypt = Codec.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal()
+            decrypt = Codec.forData(encrypt).decryptAes(secretKey).doFinalToString()
+            //hei, pengyou, ruguozhendeshiniqingdazhaohu
+            logger.log("decrypt: {}", decrypt)
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
+    }
+
+### Boat Id (boat-id)
+
+Boat ID (should import boat-id) is a lightweight and fast id generation
+framework. It provides IdFactory and a set of interface to generate id:
+
+-   IdFactory: Core interface to generate new id;
+
+-   IdComponentFactory: Core interface to generator component of an id;
+
+-   AbstractIdFactory: Skeletal IdFactory to help implement full
+    IdFactory;
+
+-   StringIdFactory: Skeletal IdFactory to help implement String-id-type
+    IdFactory;
+
+Boat ID also provides StringIdSpec, a String-type IdFactory, can build
+new id from a specification string, see its javadoc.
+
+Java Examples
+
+    public class IdSample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testId() {
+            String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";;
+            StringIdSpec stringIdSpec = new StringIdSpec(spec);
+            //seq-202102071449568890000-tail
+            for (int i = 0; i < 10; i++) {
+                logger.log(stringIdSpec.create());
+            }
+        }
+    }
+
+Kotlin Examples
+
+    class IdSample {
+
+        @Test
+        fun testId() {
+            val spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail"
+            val stringIdSpec = StringIdSpec(spec)
+            //seq-202102071449568890000-tail
+            for (i in 0..9) {
+                logger.log(stringIdSpec.create())
+            }
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
+    }
+
+## Contribution and Contact
+
+-   <fredsuvn@163.com>
+
+-   <https://github.com/srclab-projects/boat>
+
+-   QQ group: 1037555759
+
+## License
+
+[Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html)
+
+Last updated 2021-04-17 02:08:36 +0800

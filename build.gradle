@@ -1,5 +1,6 @@
 plugins {
   id 'build.core'
+  id 'build.asciidoc'
 }
 
 description = "Build for Boat projects"
@@ -7,25 +8,22 @@ description = "Build for Boat projects"
 printer.info("Build $project.name")
 
 allprojects { p ->
-  //Do for each project
-  processProject(p)
+  printProjectInfo(p)
 }
 
-//subprojects { p ->
-//  //Do for each project
-//  processProject(p)
-//}
+subprojects { p ->
+}
 
 tasks.withType(JavaCompile) {
   options.encoding = "UTF-8"
 }
 
-def processProject(anyProject) {
-  anyProject.group = infos.group
-  anyProject.version = infos.version
-  if (anyProject == rootProject) {
-    printer.info("Configure project ${anyProject.group}:${anyProject.name}:${anyProject.version} (root)")
+def printProjectInfo(p) {
+  p.group = infos.group
+  p.version = infos.version
+  if (p == rootProject) {
+    printer.info("Configure project ${p.group}:${p.name}:${p.version} (root)")
   } else {
-    printer.info("Configure project ${anyProject.group}:${anyProject.name}:${anyProject.version}")
+    printer.info("Configure project ${p.group}:${p.name}:${p.version}")
   }
 }

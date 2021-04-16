@@ -1,30 +1,23 @@
 = Boat: SrcLab Core Libraries for Java/kotlin
+:toc:
+:toclevels: 3
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
 :url: https://github.com/srclab-projects/boat
-:qq: 1037555759
 :license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
+
+:qq-group: QQ group: 1037555759
 :boat-version: 0.0.0
 
-image::../logo.svg[Boat]
-
-== Toc
-
-* <<introduction>>
-* <<getting>>
-* <<usage>>
-* <<contact>>
-* <<license>>
-
-[#introduction]
 == Introduction
+
+image::../logo.svg[Boat]
 
 Boat is a set of core Java/Kotlin libraries (JDK 1.8+), mostly written by kotlin, widely used on JVM projects within SrcLab.
 It provides many fast and convenient interfaces, functions and utilities.
 
-Boat includes:
-
+.Boat includes:
 * *boat-annotations*: Core annotations, such as @Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
 * *boat-core*: Core and basic interfaces, functions and utilities;
 * *boat-serialize*: Serialization and deserialization interfaces and utilities (for json and more);
@@ -39,18 +32,15 @@ If you want to import common above modules at once (core, codec, serialize and i
 
 * *boat*: To import common Boat modules including core, codec, serialize and id.
 
-[#getting]
 == Getting
 
-=== Gradle
-
+.Gradle
 [source,groovy,subs="attributes+"]
 ----
 implementation("xyz.srclab.common:boat:{boat-version}")
 ----
 
-=== Maven
-
+.Maven
 [source,xml,subs="attributes+"]
 ----
 <dependency>
@@ -60,34 +50,11 @@ implementation("xyz.srclab.common:boat:{boat-version}")
 </dependency>
 ----
 
-=== Source Code
-
+.Source Code
 https://github.com/srclab-projects/boat
 
-[#usage]
 == Usage
 
-* <<usage-annotations>>
-* <<usage-core>>
-** <<usage-core-base>>
-** <<usage-core-bean>>
-** <<usage-core-bus>>
-** <<usage-core-cache>>
-** <<usage-core-collect>>
-** <<usage-core-convert>>
-** <<usage-core-exception>>
-** <<usage-core-invoke>>
-** <<usage-core-jvm>>
-** <<usage-core-proxy>>
-** <<usage-core-reflect>>
-** <<usage-core-run>>
-** <<usage-core-state>>
-** <<usage-core-test>>
-* <<usage-serialize>>
-* <<usage-codec>>
-* <<usage-id>>
-
-[#usage-annotations]
 === Boat Annotations (boat-annotations)
 
 Boat Annotations provides a set of annotations to make codes clear and clean:
@@ -102,8 +69,7 @@ Boat Annotations provides a set of annotations to make codes clear and clean:
 * *ThreadSafe*: It tells that annotated variable, field, parameter, and other use of type is thread-safe;
 * *ThreadSafeIf*: It tells that annotated variable, field, parameter, and other use of type is thread-safe if specified conditions were met;
 
-==== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class AnnotationSample {
@@ -153,8 +119,7 @@ public class AnnotationSample {
 }
 ----
 
-==== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class AnnotationSample {
@@ -197,10 +162,8 @@ class AnnotationSample {
 }
 ----
 
-[#usage-core]
 === Boat Core (boat-core)
 
-[#usage-core-base]
 ==== Base
 
 Base package provides base core and basic interfaces, functions and utilities:
@@ -212,8 +175,7 @@ Base package provides base core and basic interfaces, functions and utilities:
 * Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
 * Other tools: About, Counter, Shell, LazyToString.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class BaseSample {
@@ -526,8 +488,7 @@ public class BaseSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class BaseSample {
@@ -799,7 +760,6 @@ enum class TestEnum {
 }
 ----
 
-[#usage-core-bean]
 ==== Bean
 
 Bean package provides powerful bean operation ability:
@@ -809,8 +769,7 @@ Bean package provides powerful bean operation ability:
 
 TIP: In copy-properties function, It is more than 20 times faster than Apache BeanUtils.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class BeanSample {
@@ -875,8 +834,7 @@ public class BeanSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class BeanSample {
@@ -911,13 +869,11 @@ class BeanSample {
 }
 ----
 
-[#usage-core-bus]
 ==== Bus
 
 Bus package provide EventBus.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class EventBusSample {
@@ -968,8 +924,7 @@ public class EventBusSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class EventBusSample {
@@ -1021,7 +976,6 @@ class EventBusSample {
 }
 ----
 
-[#usage-core-cache]
 ==== Cache
 
 Boat provides a Cache interface and several implementations:
@@ -1033,8 +987,7 @@ Boat provides a Cache interface and several implementations:
 * MapCache: Map as Cache;
 * ThreadLocalCache: ThreadLocalMap as Cache.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class CacheSample {
@@ -1053,8 +1006,7 @@ public class CacheSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class CacheSample {
@@ -1075,7 +1027,6 @@ class CacheSample {
 }
 ----
 
-[#usage-core-collect]
 ==== Collect
 
 Collect package provides interfaces, utilities and Ops operation for collection and array:
@@ -1087,8 +1038,7 @@ Collect package provides interfaces, utilities and Ops operation for collection 
 * IterableType, MapType: Meta type interfaces for generic Collection types;
 * MultiMaps: MultiMaps provides multi-values Map such as SetMap, MutableSetMap, ListMap and MutableListMap.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class CollectSample {
@@ -1164,8 +1114,7 @@ public class CollectSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class CollectSample {
@@ -1199,7 +1148,6 @@ class CollectSample {
 }
 ----
 
-[#usage-core-convert]
 ==== Convert
 
 Convert package provides type-conversion function：
@@ -1208,8 +1156,7 @@ Convert package provides type-conversion function：
 * Converter: Core interfaces for type-conversion, Converts use its default implementation;
 * FastConverter: Fast and narrowing version of Converter.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ConvertSample {
@@ -1311,8 +1258,7 @@ public class ConvertSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ConvertSample {
@@ -1377,13 +1323,11 @@ private class StringConvertHandler : FastConvertHandler<String> {
 }
 ----
 
-[#usage-core-exception]
 ==== Exception
 
-Exception package provides StatusException and ExceptionStatus extended from State (see <<usage-core-state>>), and a ShouldNotException.
+Exception package provides StatusException and ExceptionStatus extended from State (see <<State>>), and a ShouldNotException.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ExceptionSample {
@@ -1406,8 +1350,7 @@ public class ExceptionSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ExceptionSample {
@@ -1427,13 +1370,11 @@ class ExceptionSample {
 }
 ----
 
-[#usage-core-invoke]
 ==== Invoke
 
 Invoke package provides Invoker interface to call methods (for Java) and functions (for Kotlin).
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class InvokeSample {
@@ -1450,8 +1391,7 @@ public class InvokeSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class InvokeSample {
@@ -1470,13 +1410,11 @@ class InvokeSample {
 }
 ----
 
-[#usage-core-jvm]
 ==== Jvm
 
 Jvm package provides Jvms utilities classes to get JVM infos.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class JvmSample {
@@ -1492,8 +1430,7 @@ public class JvmSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class JvmSample {
@@ -1511,13 +1448,11 @@ class JvmSample {
 }
 ----
 
-[#usage-core-proxy]
 ==== Proxy
 
 Proxy package provides Class proxy function with spring-cglib, cglib or JDK proxy.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ProxySample {
@@ -1561,8 +1496,7 @@ public class ProxySample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ProxySample {
@@ -1604,7 +1538,6 @@ class ProxySample {
 }
 ----
 
-[#usage-core-reflect]
 ==== Reflect
 
 Reflect package provides utilities classes:
@@ -1613,8 +1546,7 @@ Reflect package provides utilities classes:
 * Types: To build generic types;
 * TypeRef: To build a type reference.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class ReflectSample {
@@ -1639,8 +1571,7 @@ public class ReflectSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class ReflectSample {
@@ -1667,13 +1598,11 @@ class ReflectSample {
 }
 ----
 
-[#usage-core-run]
 ==== Run
 
 Run package provides Runner and Scheduler interfaces to run codes in threads or coroutines.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class RunSample {
@@ -1709,8 +1638,7 @@ public class RunSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class RunSample {
@@ -1748,13 +1676,11 @@ class RunSample {
 }
 ----
 
-[#usage-core-state]
 ==== State
 
 State package provides State interface to help build custom state or status type.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class StateSample {
@@ -1816,8 +1742,7 @@ public class StateSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class StateSample {
@@ -1853,7 +1778,6 @@ class StateSample {
 }
 ----
 
-[#usage-core-test]
 ==== Test
 
 Test package provides simple test tools:
@@ -1863,8 +1787,7 @@ Test package provides simple test tools:
 * TestTask and TestListener: test task and listener;
 * Tests: common utilities class for test.
 
-===== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class TestSample {
@@ -1882,8 +1805,7 @@ public class TestSample {
 }
 ----
 
-===== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class TestSample {
@@ -1903,7 +1825,6 @@ class TestSample {
 }
 ----
 
-[#usage-serialize]
 === Boat Serialize (boat-serialize)
 
 Boat Serialize (should import boat-serialize) provides core Serializer interface for serialization:
@@ -1913,8 +1834,7 @@ Boat Serialize (should import boat-serialize) provides core Serializer interface
 * JsonSerial: Core interface for JSON serialization, JsonSerials use its default implementation (Jackson);
 * Json: Core interface denote a JSON object.
 
-==== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class SerializeSample {
@@ -1931,8 +1851,7 @@ public class SerializeSample {
 }
 ----
 
-==== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class SerializeSample {
@@ -1951,7 +1870,6 @@ class SerializeSample {
 }
 ----
 
-[#usage-codec]
 === Boat Codec (boat-codec)
 
 Boat Codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and other interfaces to do with codec functions, supports hex, base64, AES, RSA, SM2 and more algorithms:
@@ -1960,8 +1878,7 @@ Boat Codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and oth
 * CodecKeys: Utilities for codec keys;
 * AesKeys: Utilities for AES keys.
 
-==== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class CodecSample {
@@ -1990,8 +1907,7 @@ public class CodecSample {
 }
 ----
 
-==== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class CodecSample {
@@ -2022,7 +1938,6 @@ class CodecSample {
 }
 ----
 
-[#usage-id]
 === Boat Id (boat-id)
 
 Boat ID (should import boat-id) is a lightweight and fast id generation framework.
@@ -2035,8 +1950,7 @@ It provides IdFactory and a set of interface to generate id:
 
 Boat ID also provides StringIdSpec, a String-type IdFactory, can build new id from a specification string, see its javadoc.
 
-==== Java Examples
-
+.Java Examples
 [source,java]
 ----
 public class IdSample {
@@ -2055,8 +1969,7 @@ public class IdSample {
 }
 ----
 
-==== Kotlin Examples
-
+.Kotlin Examples
 [source,kotlin]
 ----
 class IdSample {
@@ -2077,14 +1990,12 @@ class IdSample {
 }
 ----
 
-[#contact]
 == Contribution and Contact
 
 * {emaill}
 * {url}
-* QQ group: 1037555759
+* {qq-group}
 
-[#license]
 == License
 
 {license}
