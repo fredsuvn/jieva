@@ -42,6 +42,8 @@ There seems to be something below...
 
 ## _boat-egg: Wow, you found me!_
 
+* Java
+
 ```java
 public class EggSample {
 
@@ -54,6 +56,8 @@ public class EggSample {
   }
 }
 ```
+
+* Kotlin
 
 ```kotlin
 class EggSample {
