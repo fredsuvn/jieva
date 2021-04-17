@@ -1,6 +1,4 @@
-# Boat: SrcLab Core Libraries for Java/kotlin
-
-![Boat](logo.svg)
+# ![Boat](logo.svg) Boat: SrcLab Core Libraries for Java/kotlin
 
 ## _Choose the doc style and language you like_:
 

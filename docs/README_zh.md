@@ -1,9 +1,9 @@
-# Boat: SrcLab的Java/kotlin核心基础库
+# <span class="image">![Boat](../logo.svg)</span> Boat: SrcLab的Java/kotlin核心基础库
 
 <span id="author" class="author">孙谦</span>  
 <span id="email" class="email"><fredsuvn@163.com></span>  
 
-Table of Contents
+目录
 
 -   [简介](#_简介)
 -   [获取](#_获取)
@@ -33,8 +33,6 @@ Table of Contents
 -   [License](#_license)
 
 ## 简介
-
-![Boat](../logo.svg)
 
 Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写,
 广泛应用于SrcLab里的项目. 它提供了许多方便快捷的接口, 函数和工具.
@@ -2025,5 +2023,3 @@ Kotlin Examples
 ## License
 
 [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html)
-
-Last updated 2021-04-17 02:08:43 +0800
