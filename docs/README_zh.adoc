@@ -1,6 +1,7 @@
 = Boat: SrcLab的Java/kotlin核心基础库
 :toc:
 :toclevels: 3
+:toc-title: 目录
 孙谦 <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
