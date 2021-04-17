@@ -2,6 +2,7 @@
 :toc:
 :toclevels: 3
 :toc-title: 目录
+:last-update-label!:
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com

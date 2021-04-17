@@ -341,5 +341,3 @@ Kotlin Examples
 ## License
 
 [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html)
-
-Last updated 2021-04-17 11:59:22 +0800

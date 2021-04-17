@@ -1,4 +1,4 @@
-# Boat: SrcLab Core Libraries for Java/kotlin
+# <span class="image">![Boat](../logo.svg)</span> Boat: SrcLab Core Libraries for Java/kotlin
 
 <span id="author" class="author">Sun Qian</span>  
 <span id="email" class="email"><fredsuvn@163.com></span>  
@@ -33,8 +33,6 @@ Table of Contents
 -   [License](#_license)
 
 ## Introduction
-
-![Boat](../logo.svg)
 
 Boat is a set of core Java/Kotlin libraries (JDK 1.8+), mostly written
 by kotlin, widely used on JVM projects within SrcLab. It provides many
@@ -2048,5 +2046,3 @@ Kotlin Examples
 ## License
 
 [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html)
-
-Last updated 2021-04-17 11:45:06 +0800
