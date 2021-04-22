@@ -1,39 +1,49 @@
-<svg width="300" height="100" xmlns="http://www.w3.org/2000/svg">
+<svg width="120" height="60" xmlns="http://www.w3.org/2000/svg">
   <g>
     <title>Boat</title>
     <path id="svg-boat"
-          d="M25,40 L275,40 L175,90 L75,90 Z" transform="rotate(-4, 25, 30)"
-          stroke="orange" stroke-width="5" stroke-miterlimit="100"
-          fill="#55AF7B"/>
-    <text id="svg-B"
-          x="80" y="74"
-          font-family="Helvetica, Arial, sans-serif" font-size="36"
-          fill="#4286F3">
-      B
-    </text>
-    <text id="svg-o"
-          x="110" y="70"
-          font-family="Helvetica, Arial, sans-serif" font-size="36"
-          fill="#EB4537">
-      o
-    </text>
-    <text id="svg-a"
-          x="136" y="67"
-          font-family="Helvetica, Arial, sans-serif" font-size="36"
-          fill="#FAC230">
-      a
-    </text>
-    <text id="svg-t"
-          x="165" y="66"
-          font-family="Helvetica, Arial, sans-serif" font-size="36"
-          fill="#4286F3">
-      t
-    </text>
-    <text id="svg-J"
-          x="40" y="105" transform="rotate(45 65,100)"
-          font-family="Helvetica, Arial, sans-serif" font-size="50"
-          fill="#EE50F3">
-      J
-    </text>
+          d="M0,0 l120,0 l-20,40 l-80,0 z"
+          fill="url(#boat-boat)"/>
+    <path id="boat-B"
+          d="M29,35 m-9,-30 l15,7.5 l-15,7.5 l18,7.5 l-18,7.5 z"
+          stroke="Crimson" stroke-width="3" stroke-miterlimit="100"
+          fill="none"/>
+    <path id="boat-o"
+          d="M52,35 m-9,-9 l9,-9 l9,9 l-9,9 z"
+          stroke="SaddleBrown" stroke-width="3" stroke-miterlimit="100"
+          fill="none"/>
+    <path id="boat-a"
+          d="M75,35 m-9,-18 l14,0 l4,18 l-18,0 l16,-9"
+          stroke="Orchid" stroke-width="3" stroke-miterlimit="100"
+          fill="none"/>
+    <path id="boat-t"
+          d="M94.5,35 m-5,-18 l11,0 m-5.5,-7 l0,25 l5,-9"
+          stroke="OliveDrab" stroke-width="3" stroke-miterlimit="100"
+          fill="none"/>
+    <path id="boat-J"
+          d="M30,60 m6,-20 l0,15 l-6,5 l-6,-5"
+          stroke="url(#boat-sea)" stroke-width="4" stroke-miterlimit="0"
+          fill="none"/>
+    <path id="boat-V"
+          d="M55,60 m-7,-20 l7,20 l7,-20"
+          stroke="url(#boat-sea)" stroke-width="4" stroke-miterlimit="0"
+          fill="none"/>
+    <path id="boat-M"
+          d="M85,60 m-12,0 l6,-20 l6,20 l6,-20 l6,20"
+          stroke="url(#boat-sea)" stroke-width="4" stroke-miterlimit="0"
+          fill="none"/>
   </g>
+
+  <defs>
+    <linearGradient id="boat-boat" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="BurlyWood"></stop>
+      <stop offset="100%" stop-color="PapayaWhip"></stop>
+    </linearGradient>
+  </defs>
+  <defs>
+    <linearGradient id="boat-sea" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="LightSkyBlue"></stop>
+      <stop offset="100%" stop-color="RoyalBlue"></stop>
+    </linearGradient>
+  </defs>
 </svg>
