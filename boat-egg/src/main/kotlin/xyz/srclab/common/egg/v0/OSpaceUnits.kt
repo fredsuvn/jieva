@@ -30,7 +30,6 @@ internal interface SubjectUnit : OUnit {
     var deathDuration: Long
     var keepBody: Boolean
     var force: Int
-    var drawerId: Int
 
     val isDead: Boolean
         get() = deathTime > 0
@@ -80,7 +79,6 @@ internal data class Ammo(
     override var deathDuration: Long = 5000,
     override var keepBody: Boolean = false,
     override var force: Int = NEUTRAL_FORCE,
-    override var drawerId: Int = 0,
 ) : BaseUnit(), SubjectUnit {
 }
 
@@ -99,7 +97,6 @@ internal data class Enemy(
     override var deathDuration: Long = 5000,
     override var keepBody: Boolean = false,
     override var force: Int = ENEMY_FORCE,
-    override var drawerId: Int = 0,
     override var hp: Int = 50,
     override var defense: Int = 0,
     override var weapons: List<Weapon>,
@@ -122,7 +119,6 @@ internal data class Player(
     override var deathDuration: Long = 5000,
     override var keepBody: Boolean = true,
     override var force: Int = PLAYER_FORCE,
-    override var drawerId: Int = 0,
     override var hp: Int = 100,
     override var defense: Int = 0,
     override var weapons: List<Weapon>,

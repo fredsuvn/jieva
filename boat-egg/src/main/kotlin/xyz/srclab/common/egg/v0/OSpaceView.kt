@@ -11,7 +11,7 @@ import javax.swing.JFrame
 import javax.swing.JPanel
 
 internal class OSpaceView(
-    config: OSpaceConfig,
+    config: Config,
 ) : JFrame("O Space Battle"), View {
 
     init {
@@ -28,7 +28,7 @@ internal class OSpaceView(
 }
 
 private class GamePanel(
-    private val config: OSpaceConfig,
+    private val config: Config,
     private val engine: OSpaceEngine,
     private val view: OSpaceView,
 ) : JPanel() {
