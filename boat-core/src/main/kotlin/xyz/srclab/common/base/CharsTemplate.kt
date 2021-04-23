@@ -9,7 +9,7 @@ import java.io.Writer
 import java.util.*
 
 /**
- * Chars template, to build a template with custom parameters, then process with given arguments:
+ * Chars template, to process a char sequence with placeholders and arguments:
  * ```
  * Map<Object, Object> args = new HashMap<>();
  * args.put("name", "Dog");
@@ -22,11 +22,19 @@ import java.util.*
  * CharsTemplate template2 = CharsTemplate.resolve(
  * "This is a } {name}, that is a {}}", "{", "}");
  * Assert.assertEquals(template2.process(args), "This is a } Dog, that is a Cat}");
+ * ```
+ * Chars template supports escape:
+ * ```
  * CharsTemplate template3 = CharsTemplate.resolve(
  * "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
  * //logger.log(template3.process(args));
  * Assert.assertEquals(template3.process(args), "This is a } {DogX (Dog), that is a Bird\\\\{\\");
  * ```
+ * Note:
+ * * Escape works in front of parameter prefix token outside parameter scope;
+ * * Escape works in front of parameter suffix token inside parameter scope;
+ * * Parameter suffix token can be used before parameter prefix token --
+ *   in this case, it will be seem as a common text.
  */
 @ThreadSafe
 interface CharsTemplate {
@@ -227,6 +235,137 @@ interface CharsTemplate {
         private const val ELLIPSES_NUMBER = 10
 
         @JvmStatic
+        @JvmName("resolve")
+        fun CharSequence.resolveTemplate(parameterPrefix: String, parameterSuffix: String): CharsTemplate {
+            var prefixIndex = this.indexOf(parameterPrefix)
+            if (prefixIndex < 0) {
+                return newCharsTemplateByTokens(this, listOf(Token.newToken(0, this.length, Token.Type.TEXT)))
+            }
+            var startIndex = 0
+            val tokens = LinkedList<Token>()
+            var argIndex = 0
+            while (prefixIndex >= 0) {
+                val suffixIndex = this.indexOf(parameterSuffix, prefixIndex + parameterPrefix.length)
+                if (suffixIndex < 0) {
+                    throw IllegalArgumentException(
+                        "Cannot find suffix after prefix at index: $prefixIndex (${
+                            this.subSequence(prefixIndex, this.length).ellipses(
+                                ELLIPSES_NUMBER
+                            )
+                        })"
+                    )
+                }
+                tokens.add(Token.newToken(startIndex, prefixIndex, Token.Type.TEXT))
+                tokens.add(
+                    Token.newToken(
+                        prefixIndex,
+                        prefixIndex + parameterPrefix.length,
+                        Token.Type.PREFIX,
+                        argIndex++
+                    )
+                )
+                if (prefixIndex + parameterPrefix.length < suffixIndex) {
+                    tokens.add(
+                        Token.newToken(
+                            prefixIndex + parameterPrefix.length,
+                            suffixIndex,
+                            Token.Type.TEXT,
+                            argIndex
+                        )
+                    )
+                }
+                tokens.add(
+                    Token.newToken(
+                        suffixIndex,
+                        suffixIndex + parameterSuffix.length,
+                        Token.Type.SUFFIX,
+                        argIndex
+                    )
+                )
+                startIndex = suffixIndex + parameterSuffix.length
+                prefixIndex = this.indexOf(parameterPrefix, startIndex)
+            }
+            if (startIndex < this.length) {
+                tokens.add(Token.newToken(startIndex, this.length, Token.Type.TEXT))
+            }
+            return newCharsTemplateByTokens(this, tokens)
+        }
+
+        @JvmStatic
+        @JvmName("resolve")
+        fun CharSequence.resolveTemplate(
+            parameterPrefix: String,
+            parameterSuffix: String,
+            escape: String
+        ): CharsTemplate {
+            val tokens = LinkedList<Token>()
+            var startIndex = 0
+            var i = 0
+            var inParameterScope = false
+            var argIndex = 0
+            while (i < this.length) {
+                val char = this[i]
+                if (this.startsWith(escape, i)) {
+                    val nextIndex = i + escape.length
+                    if (nextIndex >= this.length) {
+                        break
+                    }
+                    if (inParameterScope && this.startsWith(parameterSuffix, nextIndex)) {
+                        if (i > startIndex) {
+                            tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT, argIndex))
+                        }
+                        startIndex = nextIndex
+                        i = nextIndex + parameterSuffix.length
+                        continue
+                    }
+                    if (!inParameterScope && this.startsWith(parameterPrefix, nextIndex)) {
+                        tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT))
+                        startIndex = nextIndex
+                        i = nextIndex + parameterPrefix.length
+                        continue
+                    }
+                }
+                if (this.startsWith(parameterPrefix, i)) {
+                    if (inParameterScope) {
+                        throw IllegalArgumentException(
+                            "Wrong token $parameterPrefix at index $i (${
+                                this.subSequence(i, this.length).ellipses(ELLIPSES_NUMBER)
+                            })."
+                        )
+                    }
+                    tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT))
+                    tokens.add(Token.newToken(i, i + parameterPrefix.length, Token.Type.PREFIX, argIndex++))
+                    inParameterScope = true
+                    i += parameterPrefix.length
+                    startIndex = i
+                    continue
+                }
+                if (this.startsWith(parameterSuffix, i) && inParameterScope) {
+                    if (i > startIndex) {
+                        tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT, argIndex))
+                    }
+                    tokens.add(Token.newToken(i, i + parameterSuffix.length, Token.Type.SUFFIX, argIndex))
+                    inParameterScope = false
+                    i += parameterSuffix.length
+                    startIndex = i
+                    continue
+                }
+                i++
+            }
+            if (inParameterScope) {
+                throw IllegalArgumentException(
+                    "Suffix not found since index $startIndex (${
+                        this.subSequence(startIndex, this.length).ellipses(ELLIPSES_NUMBER)
+                    })."
+                )
+            }
+            if (startIndex < this.length) {
+                tokens.add(Token.newToken(startIndex, this.length, Token.Type.TEXT))
+            }
+            return newCharsTemplateByTokens(this, tokens)
+        }
+
+        @JvmStatic
         fun newCharsTemplate(chars: CharSequence, nodes: List<Node>): CharsTemplate {
             return object : CharsTemplate {
                 override val chars: CharSequence = chars
@@ -287,153 +426,6 @@ interface CharsTemplate {
                 nodes.add(Node.newNode(subTokens.toList(), Node.Type.TEXT))
             }
             return newCharsTemplate(chars, nodes.toList())
-        }
-
-        @JvmStatic
-        @JvmName("resolve")
-        fun CharSequence.resolveTemplate(parameterPrefix: String, parameterSuffix: String): CharsTemplate {
-            var prefixIndex = this.indexOf(parameterPrefix)
-            if (prefixIndex < 0) {
-                return newCharsTemplateByTokens(this, listOf(Token.newToken(0, this.length, Token.Type.TEXT)))
-            }
-            var p = 0
-            val tokens = LinkedList<Token>()
-            var argIndex = 0
-            while (prefixIndex >= 0) {
-                val suffixIndex = this.indexOf(parameterSuffix, prefixIndex + parameterPrefix.length)
-                if (suffixIndex < 0) {
-                    throw IllegalArgumentException(
-                        "Cannot find suffix after prefix at index: $prefixIndex (${
-                            this.subSequence(prefixIndex, this.length).ellipses(
-                                ELLIPSES_NUMBER
-                            )
-                        })"
-                    )
-                }
-                tokens.add(Token.newToken(p, prefixIndex, Token.Type.TEXT))
-                tokens.add(
-                    Token.newToken(
-                        prefixIndex,
-                        prefixIndex + parameterPrefix.length,
-                        Token.Type.PREFIX,
-                        argIndex++
-                    )
-                )
-                if (prefixIndex + parameterPrefix.length < suffixIndex) {
-                    tokens.add(
-                        Token.newToken(
-                            prefixIndex + parameterPrefix.length,
-                            suffixIndex,
-                            Token.Type.TEXT,
-                            argIndex
-                        )
-                    )
-                }
-                tokens.add(
-                    Token.newToken(
-                        suffixIndex,
-                        suffixIndex + parameterSuffix.length,
-                        Token.Type.SUFFIX,
-                        argIndex
-                    )
-                )
-                p = suffixIndex + parameterSuffix.length
-                prefixIndex = this.indexOf(parameterPrefix, p)
-            }
-            if (p < this.length) {
-                tokens.add(Token.newToken(p, this.length, Token.Type.TEXT))
-            }
-            return newCharsTemplateByTokens(this, tokens)
-        }
-
-        @JvmStatic
-        @JvmName("resolve")
-        fun CharSequence.resolveTemplate(
-            parameterPrefix: String,
-            parameterSuffix: String,
-            escape: String
-        ): CharsTemplate {
-
-            fun Char.isToken(index: Int, token: String): Boolean {
-                if (this != token[0] || index > this@resolveTemplate.length - token.length) {
-                    return false
-                }
-                var i = 1
-                while (i < token.length) {
-                    if (this@resolveTemplate[index + i] != token[i]) {
-                        return false
-                    }
-                    i++
-                }
-                return true
-            }
-
-            val tokens = LinkedList<Token>()
-            var p = 0
-            var i = 0
-            var inParameterScope = false
-            var argIndex = 0
-            while (i < this.length) {
-                val char = this[i]
-                if (char.isToken(i, escape)) {
-                    val nextIndex = i + escape.length
-                    if (nextIndex >= this.length) {
-                        break
-                    }
-                    val nextChar = this[nextIndex]
-                    if (inParameterScope && nextChar.isToken(nextIndex, parameterSuffix)) {
-                        if (i > p) {
-                            tokens.add(Token.newToken(p, i, Token.Type.TEXT, argIndex))
-                        }
-                        p = nextIndex
-                        i = nextIndex + parameterSuffix.length
-                        continue
-                    }
-                    if (!inParameterScope && nextChar.isToken(nextIndex, parameterPrefix)) {
-                        tokens.add(Token.newToken(p, i, Token.Type.TEXT))
-                        p = nextIndex
-                        i = nextIndex + parameterPrefix.length
-                        continue
-                    }
-                }
-                if (char.isToken(i, parameterPrefix)) {
-                    if (inParameterScope) {
-                        throw IllegalArgumentException(
-                            "Wrong token $parameterPrefix at index $i (${
-                                this.subSequence(i, this.length).ellipses(ELLIPSES_NUMBER)
-                            })."
-                        )
-                    }
-                    tokens.add(Token.newToken(p, i, Token.Type.TEXT))
-                    tokens.add(Token.newToken(i, i + parameterPrefix.length, Token.Type.PREFIX, argIndex++))
-                    inParameterScope = true
-                    i += parameterPrefix.length
-                    p = i
-                    continue
-                }
-                if (char.isToken(i, parameterSuffix) && inParameterScope) {
-                    if (i > p) {
-                        tokens.add(Token.newToken(p, i, Token.Type.TEXT, argIndex))
-                    }
-                    tokens.add(Token.newToken(i, i + parameterSuffix.length, Token.Type.SUFFIX, argIndex))
-                    inParameterScope = false
-                    i += parameterSuffix.length
-                    p = i
-                    continue
-                }
-                i++
-            }
-            if (inParameterScope) {
-                throw IllegalArgumentException(
-                    "Suffix not found since index $p (${
-                        this.subSequence(p, this.length).ellipses(ELLIPSES_NUMBER)
-                    })."
-                )
-            }
-            if (p < this.length) {
-                tokens.add(Token.newToken(p, this.length, Token.Type.TEXT))
-            }
-            return newCharsTemplateByTokens(this, tokens)
         }
     }
 }
