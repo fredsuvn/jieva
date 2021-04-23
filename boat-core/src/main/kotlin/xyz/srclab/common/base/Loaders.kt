@@ -4,6 +4,7 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.collect.map
+import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
@@ -100,7 +101,7 @@ fun CharSequence.loadPropertiesResource(
 fun CharSequence.loadPropertiesResourceOrNull(
     classLoader: ClassLoader = Current.classLoader,
 ): Map<String, String>? {
-    return loadResourceOrNull(classLoader)?.openStream()?.toPropertiesMap()
+    return loadResourceOrNull(classLoader)?.openStream()?.loadProperties()
 }
 
 @JvmOverloads
@@ -138,13 +139,7 @@ fun CharSequence.loadAllStringResources(
 fun CharSequence.loadAllPropertiesResources(
     classLoader: ClassLoader = Current.classLoader,
 ): List<Map<String, String>> {
-    return loadAllStreamResources(classLoader).map { stream -> stream.toPropertiesMap() }
-}
-
-private fun InputStream.toPropertiesMap(): Map<String, String> {
-    val properties = Properties()
-    properties.load(this)
-    return properties.map { k, v -> k.toString() to v.toString() }
+    return loadAllStreamResources(classLoader).map { stream -> stream.loadProperties() }
 }
 
 @JvmOverloads
@@ -156,8 +151,19 @@ fun <T> InputStream.loadClass(): Class<T> {
     return BytesClassLoader.loadClass(this).asAny()
 }
 
-fun <T> ByteBuffer.loadClass(): Class<T> {
-    return BytesClassLoader.loadClass(this).asAny()
+@JvmOverloads
+fun ByteArray.loadProperties(offset: Int = 0, length: Int = this.size - offset): Map<String, String> {
+    return ByteArrayInputStream(this).loadProperties()
+}
+
+fun InputStream.loadProperties(): Map<String, String> {
+    return this.toPropertiesMap()
+}
+
+private fun InputStream.toPropertiesMap(): Map<String, String> {
+    val properties = Properties()
+    properties.load(this)
+    return properties.map { k, v -> k.toString() to v.toString() }
 }
 
 object BytesClassLoader : ClassLoader() {
