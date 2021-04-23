@@ -15,7 +15,7 @@ internal data class AmmoMeta(
     var deathDuration: Long = 5000,
     var radius: Double = 12.0,
     var moveSpeed: Int = 80,
-    var drawerId: Int,
+    var drawer: UnitDrawer,
 )
 
 private class CommonWeaponActor : WeaponActor{
@@ -31,7 +31,7 @@ private class CommonWeaponActor : WeaponActor{
                 Config.DEATH_DURATION,
                 Config.AMMO_RADIUS,
                 Config.AMMO_MOVE_SPEED,
-                Config.PLAYER_1_AMMO_DRAWER_ID
+                UnitDrawerManager.getDrawer()
             )
         )
     }

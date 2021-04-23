@@ -10,12 +10,12 @@ internal interface UnitDrawer {
 
 internal object UnitDrawerManager {
 
-    private val player1Drawer: UnitDrawer = DrawerImpl(Config.player1Color, Config.player1Text)
-    private val player1AmmoDrawer: UnitDrawer = DrawerImpl(Config.player1AmmoColor, Config.player1AmmoText)
-    private val player2Drawer: UnitDrawer = DrawerImpl(Config.player2Color, Config.player2Text)
-    private val player2AmmoDrawer: UnitDrawer = DrawerImpl(Config.player2AmmoColor, Config.player2AmmoText)
-    private val enemyDrawer: UnitDrawer = DrawerImpl(Config.enemyColor, Config.enemyText)
-    private val enemyAmmoDrawer: UnitDrawer = DrawerImpl(Config.enemyAmmoColor, Config.enemyAmmoText)
+    private val player1Drawer: UnitDrawer = CircularDrawer(Config.player1Color, Config.player1Text)
+    private val player1AmmoDrawer: UnitDrawer = CircularDrawer(Config.player1AmmoColor, Config.player1AmmoText)
+    private val player2Drawer: UnitDrawer = CircularDrawer(Config.player2Color, Config.player2Text)
+    private val player2AmmoDrawer: UnitDrawer = CircularDrawer(Config.player2AmmoColor, Config.player2AmmoText)
+    private val enemyDrawer: UnitDrawer = CircularDrawer(Config.enemyColor, Config.enemyText)
+    private val enemyAmmoDrawer: UnitDrawer = CircularDrawer(Config.enemyAmmoColor, Config.enemyAmmoText)
 
     fun getDrawer(unit: SubjectUnit): UnitDrawer {
         return when (unit) {
@@ -35,7 +35,7 @@ internal object UnitDrawerManager {
     }
 }
 
-private class DrawerImpl(
+private class CircularDrawer(
     private val color: Color,
     private val text: String?,
 ) : UnitDrawer {

@@ -24,12 +24,6 @@ internal object Config {
     const val infoDisplayBoardHeight: Int = 25
     const val infoListSize: Int = 2
 
-    //Debug
-    const val isDebug: Boolean = false
-
-    //Version
-    const val version: String = "0.0.0"
-
     //Game
     const val PLAYER_RADIUS = 14.0
     const val ENEMY_RADIUS = 14.0
@@ -43,6 +37,8 @@ internal object Config {
     const val PLAYER_WEAPON_FIRE_SPEED = 95
     const val ENEMY_WEAPON_FIRE_SPEED = 50
     const val ENEMY_CRAZY_WEAPON_FIRE_SPEED = 40
+
+    //Units
     val player1Color: Color = Color.BLUE
     val player1Text: String? = null
     val player1AmmoColor: Color = Color.MAGENTA
@@ -55,4 +51,10 @@ internal object Config {
     val enemyText: String? = null
     val enemyAmmoColor: Color = Color.GRAY
     val enemyAmmoText: String? = null
+
+    //Debug
+    const val isDebug: Boolean = false
+
+    //Version
+    const val version: String = "0.0.0"
 }
