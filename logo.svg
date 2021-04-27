@@ -1,49 +1,47 @@
 <svg width="120" height="60" xmlns="http://www.w3.org/2000/svg">
+  <title>Boat</title>
   <g>
-    <title>Boat</title>
-    <path id="svg-boat"
-          d="M0,0 l120,0 l-20,40 l-80,0 z"
-          fill="url(#boat-boat)"/>
-    <path id="boat-B"
-          d="M29,35 m-9,-30 l15,7.5 l-15,7.5 l18,7.5 l-18,7.5 z"
-          stroke="Crimson" stroke-width="3" stroke-miterlimit="100"
-          fill="none"/>
-    <path id="boat-o"
-          d="M52,35 m-9,-9 l9,-9 l9,9 l-9,9 z"
-          stroke="SaddleBrown" stroke-width="3" stroke-miterlimit="100"
-          fill="none"/>
-    <path id="boat-a"
-          d="M75,35 m-9,-18 l14,0 l4,18 l-18,0 l16,-9"
-          stroke="Orchid" stroke-width="3" stroke-miterlimit="100"
-          fill="none"/>
-    <path id="boat-t"
-          d="M94.5,35 m-5,-18 l11,0 m-5.5,-7 l0,25 l5,-9"
-          stroke="OliveDrab" stroke-width="3" stroke-miterlimit="100"
-          fill="none"/>
-    <path id="boat-J"
-          d="M30,60 m6,-20 l0,15 l-6,5 l-6,-5"
-          stroke="url(#boat-sea)" stroke-width="4" stroke-miterlimit="0"
-          fill="none"/>
-    <path id="boat-V"
-          d="M55,60 m-7,-20 l7,20 l7,-20"
-          stroke="url(#boat-sea)" stroke-width="4" stroke-miterlimit="0"
-          fill="none"/>
-    <path id="boat-M"
-          d="M85,60 m-12,0 l6,-20 l6,20 l6,-20 l6,20"
-          stroke="url(#boat-sea)" stroke-width="4" stroke-miterlimit="0"
-          fill="none"/>
+    <g id="group-boat" fill="url(#color-boat)">
+      <path id="element-boat"
+            d="M0,0 l120,0 l-20,40 l-80,0 z"/>
+      <g id="group-boat-chars"
+         stroke-width="3" stroke-miterlimit="100"
+         fill="none">
+        <path id="element-B"
+              d="M29,35 m-9,-30 l15,7.5 l-15,7.5 l18,7.5 l-18,7.5 z"
+              stroke="Crimson"/>
+        <path id="element-o"
+              d="M52,35 m-9,-9 l9,-9 l9,9 l-9,9 z"
+              stroke="SaddleBrown"/>
+        <path id="element-a"
+              d="M75,35 m-9,-18 l14,0 l4,18 l-18,0 l16,-9"
+              stroke="Orchid"/>
+        <path id="element-t"
+              d="M94.5,35 m-5,-18 l11,0 m-5.5,-7 l0,25 l5,-9"
+              stroke="OliveDrab"/>
+      </g>
+    </g>
+    <g id="group-jvm"
+       stroke="url(#color-sea)" stroke-width="4" stroke-miterlimit="0"
+       fill="none">
+      <path id="element-J"
+            d="M30,60 m6,-20 l0,15 l-6,5 l-6,-5"/>
+      <path id="element-V"
+            d="M55,60 m-7,-20 l7,20 l7,-20"/>
+      <path id="element-M"
+            d="M85,60 m-12,0 l6,-20 l6,20 l6,-20 l6,20"/>
+    </g>
   </g>
-
   <defs>
-    <linearGradient id="boat-boat" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="BurlyWood"></stop>
-      <stop offset="100%" stop-color="PapayaWhip"></stop>
+    <linearGradient id="color-boat" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="BurlyWood"/>
+      <stop offset="100%" stop-color="PapayaWhip"/>
     </linearGradient>
   </defs>
   <defs>
-    <linearGradient id="boat-sea" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="LightSkyBlue"></stop>
-      <stop offset="100%" stop-color="RoyalBlue"></stop>
+    <linearGradient id="color-sea" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="LightSkyBlue"/>
+      <stop offset="100%" stop-color="RoyalBlue"/>
     </linearGradient>
   </defs>
 </svg>
