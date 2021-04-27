@@ -4,6 +4,7 @@ import xyz.srclab.common.base.toBytes
 import xyz.srclab.common.base.toChars
 import xyz.srclab.common.codec.Codec.Companion.encodeBase64String
 import xyz.srclab.common.codec.Codec.Companion.encodeHexString
+import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -103,14 +104,16 @@ interface DigestCipher : CodecCipher {
 
     companion object {
 
+        @JvmName("withAlgorithm")
         @JvmStatic
-        fun forAlgorithm(algorithm: String): DigestCipher {
-            return CommonDigestCipher(algorithm)
+        fun CharSequence.toDigestCipher(): DigestCipher {
+            return this.toCodecAlgorithm().toDigestCipher()
         }
 
+        @JvmName("withAlgorithm")
         @JvmStatic
-        fun forAlgorithm(algorithm: CodecAlgorithm): DigestCipher {
-            return CommonDigestCipher(algorithm.name)
+        fun CodecAlgorithm.toDigestCipher(): DigestCipher {
+            return CommonDigestCipher(this.name)
         }
     }
 }

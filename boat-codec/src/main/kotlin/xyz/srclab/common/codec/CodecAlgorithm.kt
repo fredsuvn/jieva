@@ -124,23 +124,25 @@ interface CodecAlgorithm {
         @JvmField
         val SM2 = newAlgorithm(SM2_NAME, CodecAlgorithmType.ASYMMETRIC)
 
+        @JvmName("forName")
         @JvmStatic
-        fun forName(algorithmName: String): CodecAlgorithm {
-            return forNameOrNull(algorithmName)
-                ?: throw IllegalArgumentException("Codec algorithm not found: $algorithmName.")
+        fun CharSequence.toCodecAlgorithm(): CodecAlgorithm {
+            return toCodecAlgorithmOrNull()
+                ?: throw IllegalArgumentException("Codec algorithm not found: $this.")
         }
 
+        @JvmName("forName")
         @JvmStatic
-        fun forName(algorithmName: String, algorithmType: CodecAlgorithmType): CodecAlgorithm {
-            val pre = forNameOrNull(algorithmName)
+        fun CharSequence.toCodecAlgorithm(algorithmType: CodecAlgorithmType): CodecAlgorithm {
+            val pre = toCodecAlgorithmOrNull()
             if (pre !== null && pre.type == algorithmType) {
                 return pre
             }
-            return newAlgorithm(algorithmName, algorithmType)
+            return newAlgorithm(this.toString(), algorithmType)
         }
 
-        private fun forNameOrNull(algorithmName: String): CodecAlgorithm? {
-            return when (algorithmName) {
+        private fun CharSequence.toCodecAlgorithmOrNull(): CodecAlgorithm? {
+            return when (this.toString()) {
                 PLAIN_NAME -> PLAIN
                 HEX_NAME -> HEX
                 BASE64_NAME -> BASE64
