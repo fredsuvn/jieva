@@ -176,10 +176,10 @@ class BaseSample {
         }
 
         //Enums examples:
-        val t1: TestEnum = TestEnum::class.java.enumValueOf("T1")
+        val t1: TestEnum = TestEnum::class.java.valueOfEnum("T1")
         //t1: T1
         logger.log("t1: {}", t1)
-        val t2: TestEnum = TestEnum::class.java.enumValueOfIgnoreCase("t2")
+        val t2: TestEnum = TestEnum::class.java.valueOfEnumIgnoreCase("t2")
         //t2: T2
         logger.log("t2: {}", t2)
     }
