@@ -65,8 +65,19 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
     }
 
     @Override
-    public byte[] encrypt(byte[] publicKeyBytes, byte[] data) {
-        return doEncrypt(data, curve.decodePoint(publicKeyBytes));
+    public byte[] encrypt(byte[] publicKey, byte[] data) {
+        return doEncrypt(data, curve.decodePoint(publicKey));
+    }
+
+    @Override
+    public byte[] encryptWithAny(Object publicKey, byte[] data) {
+        if (publicKey instanceof ECPoint) {
+            return encrypt((ECPoint) publicKey, data);
+        }
+        if (publicKey instanceof byte[]) {
+            return encrypt((byte[]) publicKey, data);
+        }
+        throw new IllegalArgumentException("Unsupported SM2 public key type: " + publicKey.getClass());
     }
 
     @Override
@@ -75,8 +86,19 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
     }
 
     @Override
-    public byte[] decrypt(byte[] privateKeyBytes, byte[] encrypted) {
-        return doDecrypt(encrypted, new BigInteger(privateKeyBytes));
+    public byte[] decrypt(byte[] privateKey, byte[] encrypted) {
+        return doDecrypt(encrypted, new BigInteger(privateKey));
+    }
+
+    @Override
+    public byte[] decryptWithAny(Object privateKey, byte[] encrypted) {
+        if (privateKey instanceof BigInteger) {
+            return decrypt((BigInteger) privateKey, encrypted);
+        }
+        if (privateKey instanceof byte[]) {
+            return decrypt((byte[]) privateKey, encrypted);
+        }
+        throw new IllegalArgumentException("Unsupported SM2 private key type: " + privateKey.getClass());
     }
 
     @Override

@@ -3,6 +3,11 @@ package xyz.srclab.common.codec
 import org.bouncycastle.math.ec.ECPoint
 import xyz.srclab.common.base.toBytes
 import xyz.srclab.common.base.toChars
+import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
+import xyz.srclab.common.codec.DigestCipher.Companion.toDigestCipher
+import xyz.srclab.common.codec.EncodeCipher.Companion.toEncodeCipher
+import xyz.srclab.common.codec.HmacDigestCipher.Companion.toSecretKeyHmacDigestCipher
+import xyz.srclab.common.codec.SymmetricCipher.Companion.toSecretKeySymmetricCipher
 import xyz.srclab.common.codec.rsa.RsaCipher
 import xyz.srclab.common.codec.sm2.Sm2Cipher
 import java.math.BigInteger
@@ -41,50 +46,50 @@ interface Codec {
 
     @JvmDefault
     fun encode(algorithm: String): Codec {
-        return encode(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.ENCODE))
+        return encode(algorithm.toCodecAlgorithm(CodecAlgorithmType.ENCODE))
     }
 
     fun encode(algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun decode(algorithm: String): Codec {
-        return decode(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.ENCODE))
+        return decode(algorithm.toCodecAlgorithm(CodecAlgorithmType.ENCODE))
     }
 
     fun decode(algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun encrypt(key: SecretKey, algorithm: String): Codec {
-        return encrypt(key, CodecAlgorithm.forName(algorithm))
+        return encrypt(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun encrypt(key: SecretKey, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return encrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return encrypt(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun encrypt(key: SecretKey, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun encrypt(key: ByteArray, algorithm: String): Codec {
-        return encrypt(key, CodecAlgorithm.forName(algorithm))
+        return encrypt(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun encrypt(key: ByteArray, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return encrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return encrypt(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun encrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun encrypt(key: CharSequence, algorithm: String): Codec {
-        return encrypt(key, CodecAlgorithm.forName(algorithm))
+        return encrypt(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun encrypt(key: CharSequence, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return encrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return encrypt(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     @JvmDefault
@@ -94,48 +99,48 @@ interface Codec {
 
     @JvmDefault
     fun encrypt(key: Any, algorithm: String): Codec {
-        return encrypt(key, CodecAlgorithm.forName(algorithm))
+        return encrypt(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun encrypt(key: Any, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return encrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return encrypt(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun encrypt(key: Any, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun decrypt(key: SecretKey, algorithm: String): Codec {
-        return decrypt(key, CodecAlgorithm.forName(algorithm))
+        return decrypt(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun decrypt(key: SecretKey, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return decrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return decrypt(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun decrypt(key: SecretKey, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun decrypt(key: ByteArray, algorithm: String): Codec {
-        return decrypt(key, CodecAlgorithm.forName(algorithm))
+        return decrypt(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun decrypt(key: ByteArray, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return decrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return decrypt(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun decrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun decrypt(key: CharSequence, algorithm: String): Codec {
-        return decrypt(key, CodecAlgorithm.forName(algorithm))
+        return decrypt(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun decrypt(key: CharSequence, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return decrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return decrypt(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     @JvmDefault
@@ -145,60 +150,60 @@ interface Codec {
 
     @JvmDefault
     fun decrypt(key: Any, algorithm: String): Codec {
-        return decrypt(key, CodecAlgorithm.forName(algorithm))
+        return decrypt(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun decrypt(key: Any, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return decrypt(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return decrypt(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun decrypt(key: Any, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun digest(algorithm: String): Codec {
-        return digest(CodecAlgorithm.forName(algorithm))
+        return digest(algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun digest(algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return digest(CodecAlgorithm.forName(algorithm, algorithmType))
+        return digest(algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun digest(algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun hmacDigest(key: SecretKey, algorithm: String): Codec {
-        return hmacDigest(key, CodecAlgorithm.forName(algorithm))
+        return hmacDigest(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun hmacDigest(key: SecretKey, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return hmacDigest(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return hmacDigest(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun hmacDigest(key: SecretKey, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun hmacDigest(key: ByteArray, algorithm: String): Codec {
-        return hmacDigest(key, CodecAlgorithm.forName(algorithm))
+        return hmacDigest(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun hmacDigest(key: ByteArray, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return hmacDigest(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return hmacDigest(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun hmacDigest(key: ByteArray, algorithm: CodecAlgorithm): Codec
 
     @JvmDefault
     fun hmacDigest(key: CharSequence, algorithm: String): Codec {
-        return hmacDigest(key, CodecAlgorithm.forName(algorithm))
+        return hmacDigest(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun hmacDigest(key: CharSequence, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return hmacDigest(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return hmacDigest(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     @JvmDefault
@@ -208,12 +213,12 @@ interface Codec {
 
     @JvmDefault
     fun hmacDigest(key: Any, algorithm: String): Codec {
-        return hmacDigest(key, CodecAlgorithm.forName(algorithm))
+        return hmacDigest(key, algorithm.toCodecAlgorithm())
     }
 
     @JvmDefault
     fun hmacDigest(key: Any, algorithm: String, algorithmType: CodecAlgorithmType): Codec {
-        return hmacDigest(key, CodecAlgorithm.forName(algorithm, algorithmType))
+        return hmacDigest(key, algorithm.toCodecAlgorithm(algorithmType))
     }
 
     fun hmacDigest(key: Any, algorithm: CodecAlgorithm): Codec
@@ -613,191 +618,133 @@ interface Codec {
         }
 
         @JvmStatic
-        fun symmetricCipher(algorithm: String): SecretKeySymmetricCipher {
-            return symmetricCipher(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.SYMMETRIC))
+        fun encodeCipher(algorithm: String): EncodeCipher {
+            return encodeCipher(algorithm.toCodecAlgorithm())
         }
 
         @JvmStatic
-        fun symmetricCipher(algorithm: CodecAlgorithm): SecretKeySymmetricCipher {
-            return SymmetricCipher.forAlgorithm(algorithm)
+        fun encodeCipher(algorithm: CodecAlgorithm): EncodeCipher {
+            return algorithm.toEncodeCipher()
         }
 
         @JvmStatic
         fun digestCipher(algorithm: String): DigestCipher {
-            return digestCipher(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.DIGEST))
+            return digestCipher(algorithm.toCodecAlgorithm(CodecAlgorithmType.DIGEST))
         }
 
         @JvmStatic
         fun digestCipher(algorithm: CodecAlgorithm): DigestCipher {
-            return DigestCipher.forAlgorithm(algorithm)
+            return algorithm.toDigestCipher()
         }
 
         @JvmStatic
         fun hmacDigestCipher(algorithm: String): SecretKeyHmacDigestCipher {
-            return hmacDigestCipher(CodecAlgorithm.forName(algorithm, CodecAlgorithmType.HMAC))
+            return hmacDigestCipher(algorithm.toCodecAlgorithm(CodecAlgorithmType.HMAC))
         }
 
         @JvmStatic
         fun hmacDigestCipher(algorithm: CodecAlgorithm): SecretKeyHmacDigestCipher {
-            return HmacDigestCipher.forAlgorithm(algorithm)
+            return algorithm.toSecretKeyHmacDigestCipher()
+        }
+
+        @JvmStatic
+        fun symmetricCipher(algorithm: String): SecretKeySymmetricCipher {
+            return symmetricCipher(algorithm.toCodecAlgorithm(CodecAlgorithmType.SYMMETRIC))
+        }
+
+        @JvmStatic
+        fun symmetricCipher(algorithm: CodecAlgorithm): SecretKeySymmetricCipher {
+            return algorithm.toSecretKeySymmetricCipher()
         }
     }
 }
 
 open class CommonCodec(private var data: ByteArray) : Codec {
 
+    private val ciphers: Map<CodecAlgorithm, () -> ReversibleCipher<*, *>> by lazy {
+        val map: MutableMap<CodecAlgorithm, () -> ReversibleCipher<*, *>> = HashMap()
+        map[CodecAlgorithm.RSA] = { Codec.rsaCipher() }
+        map[CodecAlgorithm.SM2] = { Codec.sm2Cipher() }
+        map
+    }
+
     override fun encode(algorithm: CodecAlgorithm): Codec {
-        data = getEncoder(algorithm).encode(data)
+        data = Codec.encodeCipher(algorithm).encode(data)
         return this
     }
 
     override fun decode(algorithm: CodecAlgorithm): Codec {
-        data = getEncoder(algorithm).decode(data)
+        data = Codec.encodeCipher(algorithm).decode(data)
         return this
     }
 
-    private fun getEncoder(algorithm: CodecAlgorithm): EncodeCipher {
-        return when (algorithm) {
-            CodecAlgorithm.HEX -> HexEncodeCipher
-            CodecAlgorithm.BASE64 -> Base64EncodeCipher
-            else -> throw CodecAlgorithmNotFound(algorithm)
-        }
-    }
-
     override fun encrypt(key: SecretKey, algorithm: CodecAlgorithm): Codec {
-        data = when (algorithm) {
-            CodecAlgorithm.RSA -> Codec.rsaCipher().encrypt(key.encoded, data)
-            CodecAlgorithm.SM2 -> Codec.sm2Cipher().encrypt(key.encoded, data)
-            else -> {
-                if (algorithm.type == CodecAlgorithmType.SYMMETRIC) {
-                    Codec.symmetricCipher(algorithm).encrypt(key, data)
-                } else {
-                    throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
+        data = when (algorithm.type) {
+            CodecAlgorithmType.SYMMETRIC -> Codec.symmetricCipher(algorithm).encrypt(key, data)
+            CodecAlgorithmType.HMAC -> Codec.hmacDigestCipher(algorithm).digest(key, data)
+            else -> return encrypt(key.encoded, algorithm)
         }
         return this
     }
 
     override fun encrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec {
-        data = when (algorithm) {
-            CodecAlgorithm.RSA -> Codec.rsaCipher().encrypt(key, data)
-            CodecAlgorithm.SM2 -> Codec.sm2Cipher().encrypt(key, data)
-            else -> {
-                if (algorithm.type == CodecAlgorithmType.SYMMETRIC) {
-                    Codec.symmetricCipher(algorithm).encrypt(key, data)
-                } else {
-                    throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
+        val cipher = ciphers[algorithm]
+        if (cipher !== null) {
+            data = cipher().encrypt(key, data)
+            return this
+        }
+        data = when (algorithm.type) {
+            CodecAlgorithmType.SYMMETRIC -> Codec.symmetricCipher(algorithm).encrypt(key, data)
+            CodecAlgorithmType.HMAC -> Codec.hmacDigestCipher(algorithm).digest(key, data)
+            else -> throw CodecAlgorithmNotFound(algorithm)
         }
         return this
     }
 
     override fun encrypt(key: Any, algorithm: CodecAlgorithm): Codec {
-        data = when (algorithm) {
-            CodecAlgorithm.RSA -> {
-                when (key) {
-                    is RSAPublicKey -> Codec.rsaCipher().encrypt(key, data)
-                    is ByteArray -> Codec.rsaCipher().encrypt(key, data)
-                    is CharSequence -> Codec.rsaCipher().encrypt(key, data)
-                    else -> throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
-            CodecAlgorithm.SM2 -> {
-                when (key) {
-                    is ECPoint -> Codec.sm2Cipher().encrypt(key, data)
-                    is ByteArray -> Codec.sm2Cipher().encrypt(key, data)
-                    is CharSequence -> Codec.sm2Cipher().encrypt(key, data)
-                    else -> throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
-            else -> {
-                if (algorithm.type != CodecAlgorithmType.SYMMETRIC) {
-                    throw CodecAlgorithmNotFound(algorithm)
-                }
-                when (key) {
-                    is SecretKey -> {
-                        Codec.symmetricCipher(algorithm).encrypt(key, data)
-                    }
-                    is ByteArray -> {
-                        Codec.symmetricCipher(algorithm).encrypt(key, data)
-                    }
-                    is CharSequence -> {
-                        Codec.symmetricCipher(algorithm).encrypt(key, data)
-                    }
-                    else -> throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
+        val cipher = ciphers[algorithm]
+        if (cipher !== null) {
+            data = cipher().encryptWithAny(key, data)
+            return this
+        }
+        data = when (algorithm.type) {
+            CodecAlgorithmType.SYMMETRIC -> Codec.symmetricCipher(algorithm).encryptWithAny(key, data)
+            CodecAlgorithmType.HMAC -> Codec.hmacDigestCipher(algorithm).digestWithAny(key, data)
+            else -> throw CodecAlgorithmNotFound(algorithm)
         }
         return this
     }
 
     override fun decrypt(key: SecretKey, algorithm: CodecAlgorithm): Codec {
-        data = when (algorithm) {
-            CodecAlgorithm.RSA -> Codec.rsaCipher().decrypt(key.encoded, data)
-            CodecAlgorithm.SM2 -> Codec.sm2Cipher().decrypt(key.encoded, data)
-            else -> {
-                if (algorithm.type == CodecAlgorithmType.SYMMETRIC) {
-                    Codec.symmetricCipher(algorithm).decrypt(key, data)
-                } else {
-                    throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
+        data = when (algorithm.type) {
+            CodecAlgorithmType.SYMMETRIC -> Codec.symmetricCipher(algorithm).decrypt(key, data)
+            else -> return decrypt(key.encoded, algorithm)
         }
         return this
     }
 
     override fun decrypt(key: ByteArray, algorithm: CodecAlgorithm): Codec {
-        data = when (algorithm) {
-            CodecAlgorithm.RSA -> Codec.rsaCipher().decrypt(key, data)
-            CodecAlgorithm.SM2 -> Codec.sm2Cipher().decrypt(key, data)
-            else -> {
-                if (algorithm.type == CodecAlgorithmType.SYMMETRIC) {
-                    Codec.symmetricCipher(algorithm).decrypt(key, data)
-                } else {
-                    throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
+        val cipher = ciphers[algorithm]
+        if (cipher !== null) {
+            data = cipher().decrypt(key, data)
+            return this
+        }
+        data = when (algorithm.type) {
+            CodecAlgorithmType.SYMMETRIC -> Codec.symmetricCipher(algorithm).decrypt(key, data)
+            else -> throw CodecAlgorithmNotFound(algorithm)
         }
         return this
     }
 
     override fun decrypt(key: Any, algorithm: CodecAlgorithm): Codec {
-        data = when (algorithm) {
-            CodecAlgorithm.RSA -> {
-                when (key) {
-                    is RSAPrivateKey -> Codec.rsaCipher().decrypt(key, data)
-                    is ByteArray -> Codec.rsaCipher().decrypt(key, data)
-                    is CharSequence -> Codec.rsaCipher().decrypt(key, data)
-                    else -> throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
-            CodecAlgorithm.SM2 -> {
-                when (key) {
-                    is BigInteger -> Codec.sm2Cipher().decrypt(key, data)
-                    is ByteArray -> Codec.sm2Cipher().decrypt(key, data)
-                    is CharSequence -> Codec.sm2Cipher().decrypt(key, data)
-                    else -> throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
-            else -> {
-                if (algorithm.type != CodecAlgorithmType.SYMMETRIC) {
-                    throw CodecAlgorithmNotFound(algorithm)
-                }
-                when (key) {
-                    is SecretKey -> {
-                        Codec.symmetricCipher(algorithm).decrypt(key, data)
-                    }
-                    is ByteArray -> {
-                        Codec.symmetricCipher(algorithm).decrypt(key, data)
-                    }
-                    is CharSequence -> {
-                        Codec.symmetricCipher(algorithm).decrypt(key, data)
-                    }
-                    else -> throw CodecAlgorithmNotFound(algorithm)
-                }
-            }
+        val cipher = ciphers[algorithm]
+        if (cipher !== null) {
+            data = cipher().decryptWithAny(key, data)
+            return this
+        }
+        data = when (algorithm.type) {
+            CodecAlgorithmType.SYMMETRIC -> Codec.symmetricCipher(algorithm).decryptWithAny(key, data)
+            else -> throw CodecAlgorithmNotFound(algorithm)
         }
         return this
     }
@@ -818,18 +765,7 @@ open class CommonCodec(private var data: ByteArray) : Codec {
     }
 
     override fun hmacDigest(key: Any, algorithm: CodecAlgorithm): Codec {
-        data = when (key) {
-            is SecretKey -> {
-                Codec.hmacDigestCipher(algorithm).digest(key, data)
-            }
-            is ByteArray -> {
-                Codec.hmacDigestCipher(algorithm).digest(key, data)
-            }
-            is CharSequence -> {
-                Codec.hmacDigestCipher(algorithm).digest(key, data)
-            }
-            else -> throw CodecAlgorithmNotFound(algorithm)
-        }
+        data = Codec.hmacDigestCipher(algorithm).digestWithAny(key, data)
         return this
     }
 

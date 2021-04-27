@@ -1,5 +1,6 @@
 package xyz.srclab.common.codec
 
+import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import javax.crypto.Cipher
 import javax.crypto.SecretKey
 
@@ -15,14 +16,16 @@ interface SymmetricCipher<K> : ReversibleCipher<K, K> {
 
     companion object {
 
+        @JvmName("withAlgorithm")
         @JvmStatic
-        fun forAlgorithm(algorithm: String): SecretKeySymmetricCipher {
-            return SecretKeySymmetricCipher(algorithm)
+        fun CharSequence.toSecretKeySymmetricCipher(): SecretKeySymmetricCipher {
+            return this.toCodecAlgorithm().toSecretKeySymmetricCipher()
         }
 
+        @JvmName("withAlgorithm")
         @JvmStatic
-        fun forAlgorithm(algorithm: CodecAlgorithm): SecretKeySymmetricCipher {
-            return SecretKeySymmetricCipher(algorithm.name)
+        fun CodecAlgorithm.toSecretKeySymmetricCipher(): SecretKeySymmetricCipher {
+            return SecretKeySymmetricCipher(this.name)
         }
     }
 }
@@ -45,6 +48,14 @@ open class SecretKeySymmetricCipher(private val algorithm: String) : SymmetricCi
         return encrypt(encryptKey.toSecretKey(algorithm), data)
     }
 
+    override fun encryptWithAny(encryptKey: Any, data: ByteArray): ByteArray {
+        return when (encryptKey) {
+            is SecretKey -> encrypt(encryptKey, data)
+            is ByteArray -> encrypt(encryptKey, data)
+            else -> throw IllegalArgumentException("Unsupported encrypt key type: ${encryptKey::javaClass}")
+        }
+    }
+
     override fun decrypt(decryptKey: SecretKey, encrypted: ByteArray): ByteArray {
         return try {
             val cipher = Cipher.getInstance(algorithm)
@@ -57,5 +68,13 @@ open class SecretKeySymmetricCipher(private val algorithm: String) : SymmetricCi
 
     override fun decrypt(decryptKey: ByteArray, encrypted: ByteArray): ByteArray {
         return decrypt(decryptKey.toSecretKey(algorithm), encrypted)
+    }
+
+    override fun decryptWithAny(decryptKey: Any, encrypted: ByteArray): ByteArray {
+        return when (decryptKey) {
+            is SecretKey -> decrypt(decryptKey, encrypted)
+            is ByteArray -> decrypt(decryptKey, encrypted)
+            else -> throw IllegalArgumentException("Unsupported key decrypt type: ${decryptKey::javaClass}")
+        }
     }
 }
