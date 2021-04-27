@@ -213,10 +213,10 @@ public class BaseSample {
         }
 
         //Enums examples:
-        TestEnum t1 = Enums.valueOf(TestEnum.class, "T1");
+        TestEnum t1 = Enums.value(TestEnum.class, "T1");
         //t1: T1
         logger.log("t1: {}", t1);
-        TestEnum t2 = Enums.valueOfIgnoreCase(TestEnum.class, "t2");
+        TestEnum t2 = Enums.valueIgnoreCase(TestEnum.class, "t2");
         //t2: T2
         logger.log("t2: {}", t2);
     }
