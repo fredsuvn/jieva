@@ -229,7 +229,7 @@ utilities:
 -   Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms,
     Compares, Checks, Requires, Enums, Loaders;
 
--   Other tools: About, Counter, Shell, LazyToString.
+-   Other tools: About, Counter, Shell, LazyString.
 
 Java Examples
 
@@ -350,11 +350,11 @@ Java Examples
         }
 
         @Test
-        public void testLazyToString() {
+        public void testLazyString() {
             Counter counter = Counter.startsAt(0);
-            LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+            LazyString<Integer> lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
             //0
-            logger.log("lazyToString: {}", lazyToString);
+            logger.log("lazyToString: {}", lazyString);
         }
 
         @Test
@@ -619,9 +619,9 @@ Kotlin Examples
         }
 
         @Test
-        fun testLazyToString() {
+        fun testLazyString() {
             val counter = 0.counterStarts()
-            val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyToString()
+            val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyString()
             //0
             logger.log("lazyToString: {}", lazyToString)
         }

@@ -714,7 +714,7 @@ class AnnotationSample {
 <p>Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;</p>
 </li>
 <li>
-<p>Other tools: About, Counter, Shell, LazyToString.</p>
+<p>Other tools: About, Counter, Shell, LazyString.</p>
 </li>
 </ul>
 </div>
@@ -838,11 +838,11 @@ class AnnotationSample {
     }
 
     @Test
-    public void testLazyToString() {
+    public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        LazyToString&lt;Integer&gt; lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+        LazyString&lt;Integer&gt; lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
         //0
-        logger.log("lazyToString: {}", lazyToString);
+        logger.log("lazyToString: {}", lazyString);
     }
 
     @Test
@@ -1109,9 +1109,9 @@ class AnnotationSample {
     }
 
     @Test
-    fun testLazyToString() {
+    fun testLazyString() {
         val counter = 0.counterStarts()
-        val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyToString()
+        val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyString()
         //0
         logger.log("lazyToString: {}", lazyToString)
     }

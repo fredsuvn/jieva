@@ -127,11 +127,11 @@ public class BaseSample {
     }
 
     @Test
-    public void testLazyToString() {
+    public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+        LazyString<Integer> lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
         //0
-        logger.log("lazyToString: {}", lazyToString);
+        logger.log("lazyToString: {}", lazyString);
     }
 
     @Test
