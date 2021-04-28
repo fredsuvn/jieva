@@ -6,7 +6,6 @@ package xyz.srclab.common.id
  * @param [E] component type
  * @author sunqian
  *
- * @see ConstantComponentFactory
  * @see TimeCountComponentFactory
  */
 interface IdComponentFactory<E> {
