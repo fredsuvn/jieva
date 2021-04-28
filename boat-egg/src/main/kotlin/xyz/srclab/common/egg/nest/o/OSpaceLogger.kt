@@ -1,4 +1,4 @@
-package xyz.srclab.common.egg.v0
+package xyz.srclab.common.egg.nest.o
 
 import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
 import xyz.srclab.common.base.Current

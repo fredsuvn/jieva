@@ -10,7 +10,8 @@ class EggNotFoundException(name: CharSequence) : RuntimeException(
             It need a true name and a true spell~
             If you don't know the true name,
             try "Hello, Boat Egg!",
-            it accepts any spell~
+            it accepts any spell~.
+            Or, see the shell of egg, maybe some clues there.
         """.trimIndent()
     }
 }

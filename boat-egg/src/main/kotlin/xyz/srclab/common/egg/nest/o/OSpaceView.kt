@@ -1,4 +1,4 @@
-package xyz.srclab.common.egg.v0
+package xyz.srclab.common.egg.nest.o
 
 import xyz.srclab.common.base.Current
 import xyz.srclab.common.egg.sample.View
@@ -62,13 +62,13 @@ private class GamePanel(
             }
         }
 
-        fun List<SubjectUnit>.draw() {
+        fun List<OObjectUnit>.draw() {
             for (subjectUnit in this) {
                 scenario.onDraw(subjectUnit, tick.time, g)
             }
         }
 
-        fun Player.drawScoreboard() {
+        fun OPlayer.drawScoreboard() {
             val x = if (this.number == 1) 0 else config.width - config.scoreboardWidth
             g.withColor(boardColor) {
                 it.drawString("Player ${this.number}", x, view.insets.top + config.scoreboardHeight)
@@ -77,8 +77,8 @@ private class GamePanel(
             }
         }
 
-        fun List<Player>.draw() {
-            (this as List<SubjectUnit>).draw()
+        fun List<OPlayer>.draw() {
+            (this as List<OObjectUnit>).draw()
             for (player in this) {
                 player.drawScoreboard()
             }

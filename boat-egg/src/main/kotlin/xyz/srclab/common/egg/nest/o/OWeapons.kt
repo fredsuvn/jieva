@@ -1,33 +1,35 @@
-package xyz.srclab.common.egg.v0
+package xyz.srclab.common.egg.nest.o
 
 import java.util.*
 
 internal interface WeaponActor {
 
-    fun fire(attacker: Living, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta>
+    fun fire(attacker: OSubject, player:OPlayer, tickTime: Long, targetX: Double, targetY: Double): List<OAmmo>
 }
-
-internal data class AmmoMeta(
-    var createTime: Long = 0,
-    var preparedTime: Long = 0,
-    var xStepUnit: Double,
-    var yStepUnit: Double,
-    var deathDuration: Long = 5000,
-    var radius: Double = 12.0,
-    var moveSpeed: Int = 80,
-    var drawer: UnitDrawer,
-)
 
 private class CommonWeaponActor : WeaponActor{
 
-    override fun fire(attacker: Living, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
+    override fun fire(weapon: OWeapon, player:OPlayer, tickTime: Long, targetX: Double, targetY: Double): List<OAmmo> {
+        val attacker = weapon.holder
+        val weaponType = OTypeManager.getWeaponType(weapon.typeId)
         val p = step(attacker.x, attacker.y, targetX, targetY)
         return Collections.singletonList(
-            AmmoMeta(
+            OAmmo(
                 0,
-                0,
+                attacker.x,
+                attacker.y,
+                attacker.x,
+                attacker.y,
                 p.x,
                 p.y,
+                weaponType.ammoRadius,
+                weaponType.ammoMoveSpeed,
+                0,
+                0,
+                weaponType.ammoDeathDuration,
+                false,
+                attacker.player,
+
                 Config.DEATH_DURATION,
                 Config.AMMO_RADIUS,
                 Config.AMMO_MOVE_SPEED,
@@ -41,7 +43,7 @@ private object EnemyWeaponActor : WeaponActor {
 
     override val id: Int = ENEMY_WEAPON_ACTOR_ID
 
-    override fun fire(attacker: Living, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
+    override fun fire(attacker: OSubjectUnit, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
         val p = step(attacker.x, attacker.y, targetX, targetY)
         return Collections.singletonList(
             AmmoMeta(
@@ -62,7 +64,7 @@ private object CrazyWeaponActor : WeaponActor {
 
     override val id: Int = ENEMY_CRAZY_WEAPON_ACTOR_ID
 
-    override fun fire(attacker: Living, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
+    override fun fire(attacker: OSubjectUnit, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
         val ammo1 = AmmoMeta(
             0,
             0,
@@ -88,7 +90,7 @@ private object ContinuousWeaponActor : WeaponActor {
 
     override val id: Int = ENEMY_CONTINUOUS_WEAPON_ACTOR_ID
 
-    override fun fire(attacker: Living, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
+    override fun fire(attacker: OSubjectUnit, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
         val p = step(attacker.x, attacker.y, targetX, targetY)
         val ammo1 = AmmoMeta(
             tickTime,

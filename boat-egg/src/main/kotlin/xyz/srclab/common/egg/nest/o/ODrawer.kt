@@ -1,57 +1,43 @@
-package xyz.srclab.common.egg.v0
+package xyz.srclab.common.egg.nest.o
 
+import xyz.srclab.common.base.loadPropertiesResource
+import xyz.srclab.common.collect.map
+import xyz.srclab.common.reflect.getFieldValue
 import java.awt.Color
 import java.awt.Graphics
+import java.awt.Rectangle
 
-internal interface UnitDrawer {
+internal object ODrawer {
 
-    fun draw(unit: SubjectUnit, tickTime: Long, graphics: Graphics)
-}
-
-internal object UnitDrawerManager {
-
-    private val player1Drawer: UnitDrawer = CircularDrawer(Config.player1Color, Config.player1Text)
-    private val player1AmmoDrawer: UnitDrawer = CircularDrawer(Config.player1AmmoColor, Config.player1AmmoText)
-    private val player2Drawer: UnitDrawer = CircularDrawer(Config.player2Color, Config.player2Text)
-    private val player2AmmoDrawer: UnitDrawer = CircularDrawer(Config.player2AmmoColor, Config.player2AmmoText)
-    private val enemyDrawer: UnitDrawer = CircularDrawer(Config.enemyColor, Config.enemyText)
-    private val enemyAmmoDrawer: UnitDrawer = CircularDrawer(Config.enemyAmmoColor, Config.enemyAmmoText)
-
-    fun getDrawer(unit: SubjectUnit): UnitDrawer {
-        return when (unit) {
-            is Ammo -> {
-                return when (val holder = unit.weapon.holder) {
-                    is Enemy -> enemyAmmoDrawer
-                    is Player -> if (holder.number == 1) player1AmmoDrawer else player2AmmoDrawer
-                    else -> throw IllegalStateException("Unknown unit: $unit")
-                }
+    private val draws: Map<Int, DrawProperties> by lazy {
+        "o/draw.properties".loadPropertiesResource().map { k, v ->
+            k.toInt() to run {
+                val args = v.split(",")
+                DrawProperties(
+                    args[0],
+                    if (args.size >= 2) Color::class.java.getFieldValue<Color>(args[1], null) else null
+                )
             }
-            is Player -> {
-                return if (unit.number == 1) player1Drawer else player2Drawer
-            }
-            is Enemy -> enemyDrawer
-            else -> throw IllegalStateException("Unknown unit: $unit")
         }
     }
-}
 
-private class CircularDrawer(
-    private val color: Color,
-    private val text: String?,
-) : UnitDrawer {
+    fun draw(unit: OObjectUnit, player: OPlayer, tickTime: Long, graphics: Graphics) {
+        val drawProperties = draws[unit.drawId]!!
 
-    override fun draw(unit: SubjectUnit, tickTime: Long, graphics: Graphics) {
         val leftUpX = (unit.x - unit.radius).toInt()
         val leftUpY = (unit.y - unit.radius).toInt()
         val width = (unit.radius * 2).toInt()
 
         fun drawBody() {
-            graphics.withColor(color) { g ->
-                if (text === null) {
-                    g.fillOval(leftUpX, leftUpY, width, width)
-                } else {
-                    g.withFontSize(width) {
-                        it.drawString(text, leftUpX, leftUpY)
+            graphics.withColor(player.color) { g ->
+                g.fillOval(leftUpX, leftUpY, width, width)
+                val text = drawProperties.text
+                val textColor = drawProperties.textColor
+                if (text.isNotBlank() && textColor !== null) {
+                    g.withFontSize(width) { g0 ->
+                        g0.withColor(textColor) {
+                            it.drawCenteredString(text, Rectangle(leftUpX, leftUpY, width, width))
+                        }
                     }
                 }
             }
@@ -119,4 +105,9 @@ private class CircularDrawer(
 
         drawBody()
     }
+
+    private data class DrawProperties(
+        var text: String,
+        var textColor: Color?,
+    )
 }

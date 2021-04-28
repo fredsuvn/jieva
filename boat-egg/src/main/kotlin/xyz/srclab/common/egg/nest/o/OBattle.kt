@@ -1,11 +1,11 @@
-package xyz.srclab.common.egg.v0
+package xyz.srclab.common.egg.nest.o
 
 import xyz.srclab.common.egg.Egg
 
 /**
  * @author sunqian
  */
-class OSpaceBattle : Egg {
+class OBattle : Egg {
 
     override fun hatchOut(spell: CharSequence) {
         when (spell.toString()) {

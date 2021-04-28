@@ -1,4 +1,4 @@
-package xyz.srclab.common.egg.v0
+package xyz.srclab.common.egg.nest.o
 
 import kotlin.math.absoluteValue
 import kotlin.math.pow

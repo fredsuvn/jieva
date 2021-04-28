@@ -1,7 +1,7 @@
-package xyz.srclab.common.egg.v0
+package xyz.srclab.common.egg.nest.o
 
 
-internal interface OSpaceController : Controller<OSpaceData> {
+internal interface OSpaceController : Controller<OData> {
 
     val config: Config
 
