@@ -3,28 +3,26 @@ package xyz.srclab.common.egg.nest.o
 import xyz.srclab.common.base.loadPropertiesResource
 import xyz.srclab.common.collect.map
 
-
-
 internal object OTypeManager {
 
-    private val subjectTypes: Map<Int, OSubjectType> by lazy {
+    private val subjectTypes: Map<String, OSubjectType> by lazy {
         "o/subjects.properties".loadPropertiesResource().map { k, v ->
-            k.toInt() to run {
+            k.trim() to run {
                 val args = v.split(",")
                 OSubjectType(
                     args[0].toDouble(),
                     args[1].toInt(),
                     args[2].toLong(),
                     args[3].toBoolean(),
-                    args[4].toInt(),
+                    args[4].trim(),
                 )
             }
         }
     }
 
-    private val weaponTypes: Map<Int, OWeaponType> by lazy {
+    private val weaponTypes: Map<String, OWeaponType> by lazy {
         "o/weapons.properties".loadPropertiesResource().map { k, v ->
-            k.toInt() to run {
+            k.trim() to run {
                 val args = v.split(",")
                 OWeaponType(
                     args[0].toInt(),
@@ -32,18 +30,36 @@ internal object OTypeManager {
                     args[2].toDouble(),
                     args[3].toInt(),
                     args[4].toLong(),
-                    args[4].toInt(),
-                    args[4].toInt(),
+                    args[4].trim(),
+                    args[4].trim(),
                 )
             }
         }
     }
 
-    fun getSubjectType(typeId: Int): OSubjectType {
+    fun getSubjectType(typeId: String): OSubjectType {
         return subjectTypes[typeId]!!
     }
 
-    fun getWeaponType(typeId: Int): OWeaponType {
+    fun getWeaponType(typeId: String): OWeaponType {
         return weaponTypes[typeId]!!
     }
 }
+
+internal data class OSubjectType(
+    var radius: Double,
+    var moveSpeed: Int,
+    var deathDuration: Long,
+    var keepBody: Boolean,
+    var drawId: String,
+)
+
+internal data class OWeaponType(
+    var damage: Int,
+    var fireSpeed: Int,
+    var ammoRadius: Double,
+    var ammoMoveSpeed: Int,
+    var ammoDeathDuration: Long,
+    var ammoDrawId: String,
+    var actorId: String,
+)

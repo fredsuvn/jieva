@@ -7,6 +7,9 @@ import xyz.srclab.common.egg.Egg
  */
 class OBattle : Egg {
 
+    override val shell: String
+        get() = TODO("Not yet implemented")
+
     override fun hatchOut(spell: CharSequence) {
         when (spell.toString()) {
             "Thank you, Taro.",
@@ -17,7 +20,7 @@ class OBattle : Egg {
     }
 
     private fun run() {
-        OSpaceView(OSpaceConfig()).isVisible = true
+        OView(OSpaceConfig()).isVisible = true
     }
 
     private class IAmSevenNotTaro : RuntimeException(

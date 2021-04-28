@@ -2,30 +2,11 @@ package xyz.srclab.common.egg.nest.o
 
 import java.awt.Color
 
-internal const val NEUTRAL_FORCE = 0
 internal const val PLAYER_FORCE = 1
 internal const val ENEMY_FORCE = 2
 
 internal const val STEP_UNIT = 1.0
 internal const val STEP_45_DEGREE_ANGLE = STEP_UNIT * 0.7071067812
-
-internal data class OSubjectType(
-    var radius: Double,
-    var moveSpeed: Int,
-    var deathDuration: Long,
-    var keepBody: Boolean,
-    var drawId: Int,
-)
-
-internal data class OWeaponType(
-    var damage: Int,
-    var fireSpeed: Int,
-    var ammoRadius: Double,
-    var ammoMoveSpeed: Int,
-    var ammoDeathDuration: Long,
-    var ammoDrawId: Int,
-    var actorId: Int,
-)
 
 internal interface OElement {
     var id: Long
@@ -44,8 +25,8 @@ internal interface OObjectUnit : OElement {
     var deathTime: Long
     var deathDuration: Long
     var keepBody: Boolean
-    var player: Int
-    var drawId: Int
+    var player: OPlayer
+    var drawResource: DrawResource
 
     val isDead: Boolean
         get() = deathTime > 0
@@ -94,8 +75,8 @@ internal data class OSubject(
     override var deathTime: Long,
     override var deathDuration: Long,
     override var keepBody: Boolean,
-    override var player: Int,
-    override var drawId: Int,
+    override var player: OPlayer,
+    override var drawResource: DrawResource,
     override var type: OSubjectType,
     override var hp: Int,
     override var defense: Int,
@@ -116,8 +97,8 @@ internal data class OAmmo(
     override var deathTime: Long,
     override var deathDuration: Long,
     override var keepBody: Boolean,
-    override var player: Int,
-    override var drawId: Int,
+    override var player: OPlayer,
+    override var drawResource: DrawResource,
     var weapon: OWeapon,
     var createTime: Long,
     var preparedTime: Long,
@@ -128,7 +109,7 @@ internal data class OWeapon(
     var damage: Int,
     var fireSpeed: Int,
     var lastFireTime: Long,
-    var actorId: Int,
+    var actor: WeaponActor,
     var type: OWeaponType,
 ) : OBaseUnit()
 
@@ -138,4 +119,5 @@ internal data class OPlayer(
     var score: Long,
     var force: Int,
     var color: Color,
+    var isDead: Boolean,
 )

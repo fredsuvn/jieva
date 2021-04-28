@@ -1,27 +1,36 @@
 package xyz.srclab.common.egg.nest.o
 
-import java.util.*
+internal object OWeaponManager {
+
+    fun getWeaponActor(id: String): WeaponActor {
+        return when (id) {
+            "common" -> CommonWeaponActor
+            "bloom" -> BloomWeaponActor
+            "bullet" -> BulletWeaponActor
+            else -> throw IllegalArgumentException("Weapon actor not found: $id")
+        }
+    }
+}
 
 internal interface WeaponActor {
 
-    fun fire(attacker: OSubject, player:OPlayer, tickTime: Long, targetX: Double, targetY: Double): List<OAmmo>
+    fun fire(weapon: OWeapon, tickTime: Long, targetX: Double, targetY: Double): List<OAmmo>
 }
 
-private class CommonWeaponActor : WeaponActor{
+private object CommonWeaponActor : WeaponActor {
 
-    override fun fire(weapon: OWeapon, player:OPlayer, tickTime: Long, targetX: Double, targetY: Double): List<OAmmo> {
+    override fun fire(weapon: OWeapon, tickTime: Long, targetX: Double, targetY: Double): List<OAmmo> {
         val attacker = weapon.holder
-        val weaponType = OTypeManager.getWeaponType(weapon.typeId)
+        val weaponType = weapon.type
         val p = step(attacker.x, attacker.y, targetX, targetY)
-        return Collections.singletonList(
+        return listOf(
             OAmmo(
-                0,
                 attacker.x,
                 attacker.y,
                 attacker.x,
                 attacker.y,
-                p.x,
-                p.y,
+                p.x * OConfig.xUnit,
+                p.y * OConfig.yUnit,
                 weaponType.ammoRadius,
                 weaponType.ammoMoveSpeed,
                 0,
@@ -29,78 +38,87 @@ private class CommonWeaponActor : WeaponActor{
                 weaponType.ammoDeathDuration,
                 false,
                 attacker.player,
-
-                Config.DEATH_DURATION,
-                Config.AMMO_RADIUS,
-                Config.AMMO_MOVE_SPEED,
-                UnitDrawerManager.getDrawer()
+                ODrawer.getDrawResource(weaponType.ammoDrawId),
+                weapon,
+                tickTime,
+                0
             )
         )
     }
 }
 
-private object EnemyWeaponActor : WeaponActor {
+private object BloomWeaponActor : WeaponActor {
 
-    override val id: Int = ENEMY_WEAPON_ACTOR_ID
-
-    override fun fire(attacker: OSubjectUnit, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
+    override fun fire(weapon: OWeapon, tickTime: Long, targetX: Double, targetY: Double): List<OAmmo> {
+        val attacker = weapon.holder
+        val weaponType = weapon.type
         val p = step(attacker.x, attacker.y, targetX, targetY)
-        return Collections.singletonList(
-            AmmoMeta(
-                0,
-                0,
-                p.x,
-                p.y,
-                DEATH_DURATION,
-                AMMO_RADIUS,
-                AMMO_MOVE_SPEED,
-                ENEMY_AMMO_DRAWER_ID
-            )
-        )
-    }
-}
-
-private object CrazyWeaponActor : WeaponActor {
-
-    override val id: Int = ENEMY_CRAZY_WEAPON_ACTOR_ID
-
-    override fun fire(attacker: OSubjectUnit, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
-        val ammo1 = AmmoMeta(
-            0,
-            0,
-            -1.0,
+        val ammo1 = OAmmo(
+            attacker.x,
+            attacker.y,
+            attacker.x,
+            attacker.y,
+            -OConfig.xUnit,
             0.0,
-            DEATH_DURATION,
-            AMMO_RADIUS,
-            AMMO_MOVE_SPEED,
-            ENEMY_AMMO_DRAWER_ID
+            weaponType.ammoRadius,
+            weaponType.ammoMoveSpeed,
+            0,
+            0,
+            weaponType.ammoDeathDuration,
+            false,
+            attacker.player,
+            ODrawer.getDrawResource(weaponType.ammoDrawId),
+            weapon,
+            tickTime,
+            0
         )
-        val ammo2 = ammo1.copy(xStepUnit = -1.0 * STEP_45_DEGREE_ANGLE, yStepUnit = -1.0 * STEP_45_DEGREE_ANGLE)
-        val ammo3 = ammo1.copy(xStepUnit = 0.0, yStepUnit = -1.0)
-        val ammo4 = ammo1.copy(xStepUnit = 1.0 * STEP_45_DEGREE_ANGLE, yStepUnit = -1.0 * STEP_45_DEGREE_ANGLE)
-        val ammo5 = ammo1.copy(xStepUnit = 1.0, yStepUnit = 0.0)
-        val ammo6 = ammo1.copy(xStepUnit = 1.0 * STEP_45_DEGREE_ANGLE, yStepUnit = 1.0 * STEP_45_DEGREE_ANGLE)
-        val ammo7 = ammo1.copy(xStepUnit = 0.0, yStepUnit = 1.0)
-        val ammo8 = ammo1.copy(xStepUnit = -1.0 * STEP_45_DEGREE_ANGLE, yStepUnit = 1.0 * STEP_45_DEGREE_ANGLE)
+        val ammo2 = ammo1.copy(
+            stepX = -1.0 * STEP_45_DEGREE_ANGLE * OConfig.xUnit,
+            stepY = -1.0 * STEP_45_DEGREE_ANGLE * OConfig.yUnit
+        )
+        val ammo3 = ammo1.copy(stepX = 0.0, stepY = -1.0 * OConfig.yUnit)
+        val ammo4 = ammo1.copy(
+            stepX = 1.0 * STEP_45_DEGREE_ANGLE * OConfig.xUnit,
+            stepY = -1.0 * STEP_45_DEGREE_ANGLE * OConfig.yUnit
+        )
+        val ammo5 = ammo1.copy(stepX = 1.0 * OConfig.xUnit, stepY = 0.0)
+        val ammo6 = ammo1.copy(
+            stepX = 1.0 * STEP_45_DEGREE_ANGLE * OConfig.xUnit,
+            stepY = 1.0 * STEP_45_DEGREE_ANGLE * OConfig.yUnit
+        )
+        val ammo7 = ammo1.copy(stepX = 0.0, stepY = 1.0 * OConfig.yUnit)
+        val ammo8 = ammo1.copy(
+            stepX = -1.0 * STEP_45_DEGREE_ANGLE * OConfig.xUnit,
+            stepY = 1.0 * STEP_45_DEGREE_ANGLE * OConfig.yUnit
+        )
         return listOf(ammo1, ammo2, ammo3, ammo4, ammo5, ammo6, ammo7, ammo8)
     }
 }
 
-private object ContinuousWeaponActor : WeaponActor {
+private object BulletWeaponActor : WeaponActor {
 
-    override val id: Int = ENEMY_CONTINUOUS_WEAPON_ACTOR_ID
-
-    override fun fire(attacker: OSubjectUnit, tickTime: Long, targetX: Double, targetY: Double): List<AmmoMeta> {
+    override fun fire(weapon: OWeapon, tickTime: Long, targetX: Double, targetY: Double): List<OAmmo> {
+        val attacker = weapon.holder
+        val weaponType = weapon.type
         val p = step(attacker.x, attacker.y, targetX, targetY)
-        val ammo1 = AmmoMeta(
-            tickTime,
+        val ammo1 = OAmmo(
+            attacker.x,
+            attacker.y,
+            attacker.x,
+            attacker.y,
+            p.x * OConfig.xUnit,
+            p.y * OConfig.yUnit,
+            weaponType.ammoRadius,
+            weaponType.ammoMoveSpeed,
             0,
-            p.x,
-            p.y,
-            DEATH_DURATION,
-            AMMO_RADIUS,
-            AMMO_MOVE_SPEED,
-            ENEMY_AMMO_DRAWER_ID
+            0,
+            weaponType.ammoDeathDuration,
+            false,
+            attacker.player,
+            ODrawer.getDrawResource(weaponType.ammoDrawId),
+            weapon,
+            tickTime,
+            0
         )
         val ammo2 = ammo1.copy(preparedTime = 100)
         val ammo3 = ammo1.copy(preparedTime = 200)

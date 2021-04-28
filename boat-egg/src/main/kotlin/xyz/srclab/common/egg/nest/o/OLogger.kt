@@ -7,34 +7,34 @@ import java.util.*
 /**
  * @author sunqian
  */
-internal object OSpaceLogger {
+internal object OLogger {
 
-    private val _infos = Collections.synchronizedList(LinkedList<OSpaceInfo>())
+    private val messages = Collections.synchronizedList(LinkedList<OLogMessage>())
 
-    val infos: List<OSpaceInfo>
-        get() = _infos
+    val infos: List<OLogMessage>
+        get() = messages
 
     fun info(pattern: String, vararg args: Any?) {
         //println("${Current.timestamp}-info: " + pattern.fastFormat(*args))
-        _infos.add(
-            OSpaceInfo(
+        messages.add(
+            OLogMessage(
                 pattern.fastFormat(*args),
                 Current.timestamp
             )
         )
-        if (_infos.size > Config.infoListSize) {
-            _infos.removeFirst()
+        if (messages.size > OConfig.infoListSize) {
+            messages.removeFirst()
         }
     }
 
     fun debug(pattern: String, vararg args: Any?) {
-        if (Config.isDebug) {
+        if (OConfig.isDebug) {
             println("${Current.timestamp}-debug: " + pattern.fastFormat(*args))
         }
     }
-}
 
-internal data class OSpaceInfo(
-    var message: String,
-    var timestamp: String,
-)
+    internal data class OLogMessage(
+        var message: String,
+        var timestamp: String,
+    )
+}

@@ -2,7 +2,7 @@ package xyz.srclab.common.egg.nest.o
 
 import java.awt.Color
 
-internal object Config {
+internal object OConfig {
 
     //Window
     const val width: Int = 640
@@ -11,7 +11,7 @@ internal object Config {
     const val preparedPadding: Int = 30
     const val xUnit: Double = 5.0
     const val yUnit: Double = 5.0
-    const val tickDuration: Long = 1
+    const val tickInterval: Long = 1
     const val fps: Int = 60
 
     //Boards

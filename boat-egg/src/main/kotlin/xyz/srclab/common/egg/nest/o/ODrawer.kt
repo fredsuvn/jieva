@@ -9,11 +9,11 @@ import java.awt.Rectangle
 
 internal object ODrawer {
 
-    private val draws: Map<Int, DrawProperties> by lazy {
+    private val draws: Map<String, DrawResource> by lazy {
         "o/draw.properties".loadPropertiesResource().map { k, v ->
-            k.toInt() to run {
+            k.trim() to run {
                 val args = v.split(",")
-                DrawProperties(
+                DrawResource(
                     args[0],
                     if (args.size >= 2) Color::class.java.getFieldValue<Color>(args[1], null) else null
                 )
@@ -21,18 +21,21 @@ internal object ODrawer {
         }
     }
 
-    fun draw(unit: OObjectUnit, player: OPlayer, tickTime: Long, graphics: Graphics) {
-        val drawProperties = draws[unit.drawId]!!
+    fun getDrawResource(id: String): DrawResource {
+        return draws[id]!!
+    }
 
+    fun draw(unit: OObjectUnit, tickTime: Long, graphics: Graphics) {
+        val drawResource = unit.drawResource
         val leftUpX = (unit.x - unit.radius).toInt()
         val leftUpY = (unit.y - unit.radius).toInt()
         val width = (unit.radius * 2).toInt()
 
         fun drawBody() {
-            graphics.withColor(player.color) { g ->
+            graphics.withColor(unit.player.color) { g ->
                 g.fillOval(leftUpX, leftUpY, width, width)
-                val text = drawProperties.text
-                val textColor = drawProperties.textColor
+                val text = drawResource.text
+                val textColor = drawResource.textColor
                 if (text.isNotBlank() && textColor !== null) {
                     g.withFontSize(width) { g0 ->
                         g0.withColor(textColor) {
@@ -105,9 +108,9 @@ internal object ODrawer {
 
         drawBody()
     }
-
-    private data class DrawProperties(
-        var text: String,
-        var textColor: Color?,
-    )
 }
+
+internal data class DrawResource(
+    var text: String,
+    var textColor: Color?,
+)
