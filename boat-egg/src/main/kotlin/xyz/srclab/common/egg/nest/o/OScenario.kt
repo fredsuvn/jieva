@@ -34,7 +34,7 @@ internal class OScenario(
     }
 
     fun onTick() {
-        if (data.player1.isDead && data.player2.isDead) {
+        if (data.player1Subject.isBody(tick.time) && data.player2Subject.isBody(tick.time)) {
             OController.stop()
             return
         }
@@ -46,14 +46,12 @@ internal class OScenario(
         player.hit++
         player.score += enemy.score
         if (enemy.isDead) {
-            val p = ammo.weapon.holder as OPlayer
-            OLogger.info("Player-{} killed enemy-{} at {}", p.number, enemy.id, tick.time)
+            OLogger.info("Player-{} killed enemy-{} at {}", player.number, enemy.id, tick.time)
         }
     }
 
     fun onHitHuman(ammo: OAmmo, human: OSubject) {
         if (human.isDead) {
-            human.player.isDead = true
             OLogger.info(
                 "Enemy-{} killed player-{} at {}", ammo.weapon.holder.id, human.player.number, tick.time
             )
@@ -199,7 +197,7 @@ internal class OScenario(
                 100,
                 0,
                 weapons,
-                0,
+                50,
             )
         }
     }

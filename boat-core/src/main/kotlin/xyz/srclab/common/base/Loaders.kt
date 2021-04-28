@@ -7,6 +7,7 @@ import xyz.srclab.common.collect.map
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
+import java.io.Reader
 import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
@@ -91,17 +92,17 @@ fun CharSequence.loadStringResourceOrNull(
 @Throws(ResourceNotFoundException::class)
 @JvmOverloads
 fun CharSequence.loadPropertiesResource(
-    classLoader: ClassLoader = Current.classLoader,
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
 ): Map<String, String> {
-    return loadPropertiesResourceOrNull(classLoader) ?: throw ResourceNotFoundException(this)
+    return loadPropertiesResourceOrNull(classLoader, charset) ?: throw ResourceNotFoundException(this)
 }
 
 @JvmName("loadPropertiesOrNull")
 @JvmOverloads
 fun CharSequence.loadPropertiesResourceOrNull(
-    classLoader: ClassLoader = Current.classLoader,
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
 ): Map<String, String>? {
-    return loadResourceOrNull(classLoader)?.openStream()?.loadProperties()
+    return loadResourceOrNull(classLoader)?.openStream()?.bufferedReader(charset)?.loadProperties()
 }
 
 @JvmOverloads
@@ -137,9 +138,9 @@ fun CharSequence.loadAllStringResources(
 @JvmName("loadAllProperties")
 @JvmOverloads
 fun CharSequence.loadAllPropertiesResources(
-    classLoader: ClassLoader = Current.classLoader,
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
 ): List<Map<String, String>> {
-    return loadAllStreamResources(classLoader).map { stream -> stream.loadProperties() }
+    return loadAllStreamResources(classLoader).map { stream -> stream.bufferedReader(charset).loadProperties() }
 }
 
 @JvmOverloads
@@ -156,11 +157,11 @@ fun ByteArray.loadProperties(offset: Int = 0, length: Int = this.size - offset):
     return ByteArrayInputStream(this).loadProperties()
 }
 
-fun InputStream.loadProperties(): Map<String, String> {
-    return this.toPropertiesMap()
+fun InputStream.loadProperties(charset: Charset = Default.charset): Map<String, String> {
+    return this.bufferedReader(charset).loadProperties()
 }
 
-private fun InputStream.toPropertiesMap(): Map<String, String> {
+fun Reader.loadProperties(): Map<String, String> {
     val properties = Properties()
     properties.load(this)
     return properties.map { k, v -> k.toString() to v.toString() }

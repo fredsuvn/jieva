@@ -76,7 +76,7 @@ internal class OEngine(
             return
         }
         val ammos = this.actor.fire(this, tickTime, targetX, targetY)
-        if (attacker.player.force == PLAYER_FORCE) {
+        if (attacker.player.force == HUMAN_FORCE) {
             data.humanAmmos.addAll(ammos)
         }
         if (attacker.player.force == ENEMY_FORCE) {
@@ -107,10 +107,10 @@ internal class OEngine(
     }
 
     private fun pickHumanSubject(): OSubject {
-        if (data.player1.isDead && !data.player2.isDead) {
+        if (data.player1Subject.isDead && !data.player2Subject.isDead) {
             return data.humanSubjects[1]
         }
-        if (data.player2.isDead && !data.player1.isDead) {
+        if (data.player2Subject.isDead && !data.player1Subject.isDead) {
             return data.humanSubjects[0]
         }
         return if (Random.nextBoolean()) data.humanSubjects[0] else data.humanSubjects[1]

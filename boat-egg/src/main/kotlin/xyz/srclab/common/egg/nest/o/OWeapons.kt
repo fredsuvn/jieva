@@ -52,7 +52,6 @@ private object BloomWeaponActor : WeaponActor {
     override fun fire(weapon: OWeapon, tickTime: Long, targetX: Double, targetY: Double): List<OAmmo> {
         val attacker = weapon.holder
         val weaponType = weapon.type
-        val p = step(attacker.x, attacker.y, targetX, targetY)
         val ammo1 = OAmmo(
             attacker.x,
             attacker.y,
@@ -120,13 +119,13 @@ private object BulletWeaponActor : WeaponActor {
             tickTime,
             0
         )
-        val ammo2 = ammo1.copy(preparedTime = 100)
-        val ammo3 = ammo1.copy(preparedTime = 200)
-        val ammo4 = ammo1.copy(preparedTime = 300)
-        val ammo5 = ammo1.copy(preparedTime = 400)
-        val ammo6 = ammo1.copy(preparedTime = 500)
-        val ammo7 = ammo1.copy(preparedTime = 600)
-        val ammo8 = ammo1.copy(preparedTime = 700)
+        val ammo2 = ammo1.copy(preparedTime = 100 * 2)
+        val ammo3 = ammo1.copy(preparedTime = 200 * 2)
+        val ammo4 = ammo1.copy(preparedTime = 300 * 2)
+        val ammo5 = ammo1.copy(preparedTime = 400 * 2)
+        val ammo6 = ammo1.copy(preparedTime = 500 * 2)
+        val ammo7 = ammo1.copy(preparedTime = 600 * 2)
+        val ammo8 = ammo1.copy(preparedTime = 700 * 2)
         return listOf(ammo1, ammo2, ammo3, ammo4, ammo5, ammo6, ammo7, ammo8)
     }
 }

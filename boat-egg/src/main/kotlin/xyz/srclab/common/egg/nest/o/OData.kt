@@ -13,4 +13,13 @@ internal data class OData(
     val enemySubjects: MutableList<OSubject> = LinkedList(),
     val humanAmmos: MutableList<OAmmo> = LinkedList(),
     val enemyAmmos: MutableList<OAmmo> = LinkedList(),
-)
+) {
+    val player1Subject: OSubject
+        get() {
+            return humanSubjects[0]
+        }
+    val player2Subject: OSubject
+        get() {
+            return humanSubjects[1]
+        }
+}

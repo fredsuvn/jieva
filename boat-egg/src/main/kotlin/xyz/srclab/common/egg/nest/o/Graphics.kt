@@ -25,7 +25,7 @@ internal inline fun Graphics.withFontSize(size: Int, action: (Graphics) -> Unit)
 
 internal fun Graphics.drawCenteredString(text: String, rect: Rectangle) {
     // Get the FontMetrics
-    val metrics: FontMetrics = this.getFontMetrics(font)
+    val metrics: FontMetrics = this.getFontMetrics(this.font)
     // Determine the X coordinate for the text
     val x: Int = rect.x + (rect.width - metrics.stringWidth(text)) / 2
     // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
