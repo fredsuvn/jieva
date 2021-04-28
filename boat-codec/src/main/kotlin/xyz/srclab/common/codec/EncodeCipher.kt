@@ -6,6 +6,7 @@ import xyz.srclab.common.base.toBytes
 import xyz.srclab.common.base.toChars
 import xyz.srclab.common.codec.Codec.Companion.encodeBase64String
 import xyz.srclab.common.codec.Codec.Companion.encodeHexString
+import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 
 /**
  * @see HexEncodeCipher
@@ -79,6 +80,25 @@ interface EncodeCipher : CodecCipher {
     @JvmDefault
     fun decodeToBase64String(encoded: CharSequence): String {
         return decode(encoded).encodeBase64String()
+    }
+
+    companion object {
+
+        @JvmName("withAlgorithm")
+        @JvmStatic
+        fun CharSequence.toEncodeCipher(): EncodeCipher {
+            return this.toCodecAlgorithm().toEncodeCipher()
+        }
+
+        @JvmName("withAlgorithm")
+        @JvmStatic
+        fun CodecAlgorithm.toEncodeCipher(): EncodeCipher {
+            return when (this.name) {
+                CodecAlgorithm.HEX_NAME -> HexEncodeCipher
+                CodecAlgorithm.BASE64_NAME -> Base64EncodeCipher
+                else -> throw IllegalArgumentException("Unknown algorithm: ${this.name}")
+            }
+        }
     }
 }
 

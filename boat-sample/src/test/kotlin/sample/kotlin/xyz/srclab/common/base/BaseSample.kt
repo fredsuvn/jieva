@@ -7,6 +7,7 @@ import xyz.srclab.common.base.CharsFormat.Companion.messageFormat
 import xyz.srclab.common.base.CharsFormat.Companion.printfFormat
 import xyz.srclab.common.base.CharsTemplate.Companion.resolveTemplate
 import xyz.srclab.common.base.Counter.Companion.counterStarts
+import xyz.srclab.common.base.LazyString.Companion.toLazyString
 import xyz.srclab.common.base.SemVer.Companion.parseSemVer
 import xyz.srclab.common.base.SpecParser.Companion.parseFirstClassNameToInstance
 import xyz.srclab.common.test.TestLogger
@@ -90,9 +91,9 @@ class BaseSample {
     }
 
     @Test
-    fun testLazyToString() {
+    fun testLazyString() {
         val counter = 0.counterStarts()
-        val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyToString()
+        val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyString()
         //0
         logger.log("lazyToString: {}", lazyToString)
     }
@@ -176,10 +177,10 @@ class BaseSample {
         }
 
         //Enums examples:
-        val t1: TestEnum = TestEnum::class.java.enumValueOf("T1")
+        val t1: TestEnum = TestEnum::class.java.valueOfEnum("T1")
         //t1: T1
         logger.log("t1: {}", t1)
-        val t2: TestEnum = TestEnum::class.java.enumValueOfIgnoreCase("t2")
+        val t2: TestEnum = TestEnum::class.java.valueOfEnumIgnoreCase("t2")
         //t2: T2
         logger.log("t2: {}", t2)
     }

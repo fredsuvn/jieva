@@ -714,7 +714,7 @@ class AnnotationSample {
 <p>Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;</p>
 </li>
 <li>
-<p>Other tools: About, Counter, Shell, LazyToString.</p>
+<p>Other tools: About, Counter, Shell, LazyString.</p>
 </li>
 </ul>
 </div>
@@ -838,11 +838,11 @@ class AnnotationSample {
     }
 
     @Test
-    public void testLazyToString() {
+    public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        LazyToString&lt;Integer&gt; lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+        LazyString&lt;Integer&gt; lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
         //0
-        logger.log("lazyToString: {}", lazyToString);
+        logger.log("lazyToString: {}", lazyString);
     }
 
     @Test
@@ -924,10 +924,10 @@ class AnnotationSample {
         }
 
         //Enums examples:
-        TestEnum t1 = Enums.valueOf(TestEnum.class, "T1");
+        TestEnum t1 = Enums.value(TestEnum.class, "T1");
         //t1: T1
         logger.log("t1: {}", t1);
-        TestEnum t2 = Enums.valueOfIgnoreCase(TestEnum.class, "t2");
+        TestEnum t2 = Enums.valueIgnoreCase(TestEnum.class, "t2");
         //t2: T2
         logger.log("t2: {}", t2);
     }
@@ -1109,9 +1109,9 @@ class AnnotationSample {
     }
 
     @Test
-    fun testLazyToString() {
+    fun testLazyString() {
         val counter = 0.counterStarts()
-        val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyToString()
+        val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyString()
         //0
         logger.log("lazyToString: {}", lazyToString)
     }
@@ -1195,10 +1195,10 @@ class AnnotationSample {
         }
 
         //Enums examples:
-        val t1: TestEnum = TestEnum::class.java.enumValueOf("T1")
+        val t1: TestEnum = TestEnum::class.java.valueOfEnum("T1")
         //t1: T1
         logger.log("t1: {}", t1)
-        val t2: TestEnum = TestEnum::class.java.enumValueOfIgnoreCase("t2")
+        val t2: TestEnum = TestEnum::class.java.valueOfEnumIgnoreCase("t2")
         //t2: T2
         logger.log("t2: {}", t2)
     }

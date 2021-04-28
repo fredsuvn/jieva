@@ -127,11 +127,11 @@ public class BaseSample {
     }
 
     @Test
-    public void testLazyToString() {
+    public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+        LazyString<Integer> lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
         //0
-        logger.log("lazyToString: {}", lazyToString);
+        logger.log("lazyToString: {}", lazyString);
     }
 
     @Test
@@ -213,10 +213,10 @@ public class BaseSample {
         }
 
         //Enums examples:
-        TestEnum t1 = Enums.valueOf(TestEnum.class, "T1");
+        TestEnum t1 = Enums.value(TestEnum.class, "T1");
         //t1: T1
         logger.log("t1: {}", t1);
-        TestEnum t2 = Enums.valueOfIgnoreCase(TestEnum.class, "t2");
+        TestEnum t2 = Enums.valueIgnoreCase(TestEnum.class, "t2");
         //t2: T2
         logger.log("t2: {}", t2);
     }

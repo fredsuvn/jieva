@@ -3,31 +3,46 @@
 package xyz.srclab.common.base
 
 @Throws(IllegalArgumentException::class)
-@JvmName("valueOf")
-fun <T : Enum<T>> Class<*>.enumValueOf(name: CharSequence): T {
-    val result = enumValueOfOrNull<T>(name)
+@JvmName("value")
+fun <T : Enum<T>> Class<*>.valueOfEnum(name: CharSequence): T {
+    val result = valueOfEnumOrNull<T>(name)
     if (result !== null) {
         return result
     }
-    throw IllegalArgumentException("Enum constant $name not found in $this")
+    throw IllegalArgumentException("$name not found in $this")
 }
 
-@JvmName("valueOfOrNull")
-fun <T : Enum<T>> Class<*>.enumValueOfOrNull(name: CharSequence): T? {
+@JvmName("valueOrNull")
+fun <T : Enum<T>> Class<*>.valueOfEnumOrNull(name: CharSequence): T? {
     return JavaEnums.valueOf(this.asAny<Class<T>>(), name.toString()).asAny()
 }
 
 @Throws(IllegalArgumentException::class)
-@JvmName("valueOfIgnoreCase")
-fun <T : Enum<T>> Class<*>.enumValueOfIgnoreCase(name: CharSequence): T {
-    val result = enumValueOfOrNullIgnoreCase<T>(name)
+@JvmName("valueIgnoreCase")
+fun <T : Enum<T>> Class<*>.valueOfEnumIgnoreCase(name: CharSequence): T {
+    val result = valueOfEnumIgnoreCaseOrNull<T>(name)
     if (result !== null) {
         return result
     }
-    throw IllegalArgumentException("Enum constant ignore case $name not found in $this")
+    throw IllegalArgumentException("$name ignore case not found in $this")
 }
 
-@JvmName("valueOfOrNullIgnoreCase")
-fun <T : Enum<T>> Class<*>.enumValueOfOrNullIgnoreCase(name: CharSequence): T? {
+@JvmName("valueIgnoreCaseOrNull")
+fun <T : Enum<T>> Class<*>.valueOfEnumIgnoreCaseOrNull(name: CharSequence): T? {
     return JavaEnums.valueOfIgnoreCase(this.asAny<Class<T>>(), name.toString()).asAny()
+}
+
+@Throws(IndexOutOfBoundsException::class)
+@JvmName("value")
+fun <T : Enum<T>> Class<*>.valueOfEnum(index: Int): T {
+    val result = valueOfEnumOrNull<T>(index)
+    if (result !== null) {
+        return result
+    }
+    throw IndexOutOfBoundsException("Index out of bounds in $this: $index")
+}
+
+@JvmName("valueOrNull")
+fun <T : Enum<T>> Class<*>.valueOfEnumOrNull(index: Int): T? {
+    return JavaEnums.indexOf(this.asAny<Class<T>>(), index).asAny()
 }

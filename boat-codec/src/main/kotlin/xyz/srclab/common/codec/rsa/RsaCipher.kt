@@ -36,44 +36,60 @@ class RsaCipher : AsymmetricCipher<RSAPublicKey, RSAPrivateKey> {
         return RsaKeyPair(publicKey, privateKey)
     }
 
-    override fun encrypt(encryptKey: RSAPublicKey, data: ByteArray): ByteArray {
-        return encrypt(encryptKey, data, DEFAULT_MAX_ENCRYPT_BLOCK)
+    override fun encrypt(publicKey: RSAPublicKey, data: ByteArray): ByteArray {
+        return encrypt(publicKey, data, DEFAULT_MAX_ENCRYPT_BLOCK)
     }
 
-    override fun encrypt(encryptKey: ByteArray, data: ByteArray): ByteArray {
-        val publicKey = keyFactory.generatePublic(X509EncodedKeySpec(encryptKey)) as RSAPublicKey
-        return encrypt(publicKey, data)
+    override fun encrypt(publicKey: ByteArray, data: ByteArray): ByteArray {
+        val rsaPublicKey = keyFactory.generatePublic(X509EncodedKeySpec(publicKey)) as RSAPublicKey
+        return encrypt(rsaPublicKey, data)
     }
 
-    fun encrypt(encryptKey: RSAPublicKey, data: ByteArray, maxBlock: Int): ByteArray {
+    override fun encryptWithAny(publicKey: Any, data: ByteArray): ByteArray {
+        return when (publicKey) {
+            is RSAPublicKey -> encrypt(publicKey, data)
+            is ByteArray -> encrypt(publicKey, data)
+            else -> throw IllegalArgumentException("Unsupported RSA public key type: ${publicKey::javaClass}")
+        }
+    }
+
+    fun encrypt(publicKey: RSAPublicKey, data: ByteArray, maxBlock: Int): ByteArray {
         val cipher = Cipher.getInstance(CodecAlgorithm.RSA.name)
-        cipher.init(Cipher.ENCRYPT_MODE, encryptKey)
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey)
         return getBytes(data, cipher, maxBlock)
     }
 
-    fun encrypt(encryptKey: ByteArray, data: ByteArray, maxBlock: Int): ByteArray {
-        val publicKey = keyFactory.generatePublic(X509EncodedKeySpec(encryptKey)) as RSAPublicKey
-        return encrypt(publicKey, data, maxBlock)
+    fun encrypt(publicKey: ByteArray, data: ByteArray, maxBlock: Int): ByteArray {
+        val rsaPublicKey = keyFactory.generatePublic(X509EncodedKeySpec(publicKey)) as RSAPublicKey
+        return encrypt(rsaPublicKey, data, maxBlock)
     }
 
-    override fun decrypt(decryptKey: RSAPrivateKey, encrypted: ByteArray): ByteArray {
-        return decrypt(decryptKey, encrypted, DEFAULT_MAX_DECRYPT_BLOCK)
+    override fun decrypt(privateKey: RSAPrivateKey, encrypted: ByteArray): ByteArray {
+        return decrypt(privateKey, encrypted, DEFAULT_MAX_DECRYPT_BLOCK)
     }
 
-    override fun decrypt(decryptKey: ByteArray, encrypted: ByteArray): ByteArray {
-        val privateKey = keyFactory.generatePrivate(PKCS8EncodedKeySpec(decryptKey)) as RSAPrivateKey
-        return decrypt(privateKey, encrypted)
+    override fun decrypt(privateKey: ByteArray, encrypted: ByteArray): ByteArray {
+        val rsaPrivateKey = keyFactory.generatePrivate(PKCS8EncodedKeySpec(privateKey)) as RSAPrivateKey
+        return decrypt(rsaPrivateKey, encrypted)
     }
 
-    fun decrypt(decryptKey: RSAPrivateKey, encrypted: ByteArray, maxBlock: Int): ByteArray {
+    override fun decryptWithAny(privateKey: Any, encrypted: ByteArray): ByteArray {
+        return when (privateKey) {
+            is RSAPrivateKey -> decrypt(privateKey, encrypted)
+            is ByteArray -> decrypt(privateKey, encrypted)
+            else -> throw IllegalArgumentException("Unsupported key RSA private type: ${privateKey::javaClass}")
+        }
+    }
+
+    fun decrypt(privateKey: RSAPrivateKey, encrypted: ByteArray, maxBlock: Int): ByteArray {
         val cipher = Cipher.getInstance(CodecAlgorithm.RSA.name)
-        cipher.init(Cipher.DECRYPT_MODE, decryptKey)
+        cipher.init(Cipher.DECRYPT_MODE, privateKey)
         return getBytes(encrypted, cipher, maxBlock)
     }
 
-    fun decrypt(decryptKey: ByteArray, encrypted: ByteArray, maxBlock: Int): ByteArray {
-        val privateKey = keyFactory.generatePrivate(PKCS8EncodedKeySpec(decryptKey)) as RSAPrivateKey
-        return decrypt(privateKey, encrypted, maxBlock)
+    fun decrypt(privateKey: ByteArray, encrypted: ByteArray, maxBlock: Int): ByteArray {
+        val rsaPrivateKey = keyFactory.generatePrivate(PKCS8EncodedKeySpec(privateKey)) as RSAPrivateKey
+        return decrypt(rsaPrivateKey, encrypted, maxBlock)
     }
 
     private fun getBytes(encryptedData: ByteArray, cipher: Cipher, maxDecryptBlock: Int): ByteArray {

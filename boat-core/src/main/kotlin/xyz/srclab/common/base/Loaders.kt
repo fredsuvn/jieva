@@ -3,20 +3,14 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.collect.map
+import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
-
-@JvmOverloads
-fun <T> CharSequence.loadClassOrNull(classLoader: ClassLoader = Current.classLoader): Class<T>? {
-    return try {
-        Class.forName(this.toString(), true, classLoader)
-    } catch (e: ClassNotFoundException) {
-        null
-    }.asAny()
-}
+import java.util.*
 
 /**
  * @throws ClassNotFoundException
@@ -31,13 +25,14 @@ fun <T> CharSequence.loadClass(classLoader: ClassLoader = Current.classLoader): 
 }
 
 @JvmOverloads
-fun CharSequence.loadResourceOrNull(classLoader: ClassLoader = Current.classLoader): URL? {
-    return classLoader.getResource(this.toString())
+fun <T> CharSequence.loadClassOrNull(classLoader: ClassLoader = Current.classLoader): Class<T>? {
+    return try {
+        Class.forName(this.toString(), true, classLoader)
+    } catch (e: ClassNotFoundException) {
+        null
+    }.asAny()
 }
 
-/**
- * @throws ResourceNotFoundException
- */
 @Throws(ResourceNotFoundException::class)
 @JvmOverloads
 fun CharSequence.loadResource(classLoader: ClassLoader = Current.classLoader): URL {
@@ -45,29 +40,37 @@ fun CharSequence.loadResource(classLoader: ClassLoader = Current.classLoader): U
 }
 
 @JvmOverloads
-fun CharSequence.loadBytesResourceOrNull(classLoader: ClassLoader = Current.classLoader): ByteArray? {
-    return loadResourceOrNull(classLoader)?.openStream()?.readBytes()
+fun CharSequence.loadResourceOrNull(classLoader: ClassLoader = Current.classLoader): URL? {
+    return classLoader.getResource(this.toString())
 }
 
-/**
- * @throws ResourceNotFoundException
- */
+@JvmName("loadBytes")
 @Throws(ResourceNotFoundException::class)
 @JvmOverloads
 fun CharSequence.loadBytesResource(classLoader: ClassLoader = Current.classLoader): ByteArray {
     return loadBytesResourceOrNull(classLoader) ?: throw ResourceNotFoundException(this)
 }
 
+@JvmName("loadBytesOrNull")
 @JvmOverloads
-fun CharSequence.loadStringResourceOrNull(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
-): String? {
-    return loadBytesResourceOrNull(classLoader)?.toChars(charset)
+fun CharSequence.loadBytesResourceOrNull(classLoader: ClassLoader = Current.classLoader): ByteArray? {
+    return loadResourceOrNull(classLoader)?.readBytes()
 }
 
-/**
- * @throws ResourceNotFoundException
- */
+@JvmName("loadStream")
+@Throws(ResourceNotFoundException::class)
+@JvmOverloads
+fun CharSequence.loadStreamResource(classLoader: ClassLoader = Current.classLoader): InputStream {
+    return loadStreamResourceOrNull(classLoader) ?: throw ResourceNotFoundException(this)
+}
+
+@JvmName("loadStreamOrNull")
+@JvmOverloads
+fun CharSequence.loadStreamResourceOrNull(classLoader: ClassLoader = Current.classLoader): InputStream? {
+    return loadResourceOrNull(classLoader)?.openStream()
+}
+
+@JvmName("loadString")
 @Throws(ResourceNotFoundException::class)
 @JvmOverloads
 fun CharSequence.loadStringResource(
@@ -76,8 +79,33 @@ fun CharSequence.loadStringResource(
     return loadStringResourceOrNull(classLoader, charset) ?: throw ResourceNotFoundException(this)
 }
 
+@JvmName("loadStringOrNull")
 @JvmOverloads
-fun CharSequence.loadResources(classLoader: ClassLoader = Current.classLoader): List<URL> {
+fun CharSequence.loadStringResourceOrNull(
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
+): String? {
+    return loadBytesResourceOrNull(classLoader)?.toChars(charset)
+}
+
+@JvmName("loadProperties")
+@Throws(ResourceNotFoundException::class)
+@JvmOverloads
+fun CharSequence.loadPropertiesResource(
+    classLoader: ClassLoader = Current.classLoader,
+): Map<String, String> {
+    return loadPropertiesResourceOrNull(classLoader) ?: throw ResourceNotFoundException(this)
+}
+
+@JvmName("loadPropertiesOrNull")
+@JvmOverloads
+fun CharSequence.loadPropertiesResourceOrNull(
+    classLoader: ClassLoader = Current.classLoader,
+): Map<String, String>? {
+    return loadResourceOrNull(classLoader)?.openStream()?.loadProperties()
+}
+
+@JvmOverloads
+fun CharSequence.loadAllResources(classLoader: ClassLoader = Current.classLoader): List<URL> {
     return try {
         val urlEnumeration = classLoader.getResources(this.toString())
         urlEnumeration.toList()
@@ -86,16 +114,32 @@ fun CharSequence.loadResources(classLoader: ClassLoader = Current.classLoader): 
     }
 }
 
+@JvmName("loadAllBytes")
 @JvmOverloads
-fun CharSequence.loadBytesResources(classLoader: ClassLoader = Current.classLoader): List<ByteArray> {
-    return loadResources(classLoader).map { url -> url.readBytes() }
+fun CharSequence.loadAllBytesResources(classLoader: ClassLoader = Current.classLoader): List<ByteArray> {
+    return loadAllResources(classLoader).map { url -> url.readBytes() }
 }
 
+@JvmName("loadAllStreams")
 @JvmOverloads
-fun CharSequence.loadStringResources(
+fun CharSequence.loadAllStreamResources(classLoader: ClassLoader = Current.classLoader): List<InputStream> {
+    return loadAllResources(classLoader).map { url -> url.openStream() }
+}
+
+@JvmName("loadAllStrings")
+@JvmOverloads
+fun CharSequence.loadAllStringResources(
     classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
 ): List<String> {
-    return loadBytesResources(classLoader).map { bytes -> bytes.toChars(charset) }
+    return loadAllBytesResources(classLoader).map { bytes -> bytes.toChars(charset) }
+}
+
+@JvmName("loadAllProperties")
+@JvmOverloads
+fun CharSequence.loadAllPropertiesResources(
+    classLoader: ClassLoader = Current.classLoader,
+): List<Map<String, String>> {
+    return loadAllStreamResources(classLoader).map { stream -> stream.loadProperties() }
 }
 
 @JvmOverloads
@@ -107,8 +151,19 @@ fun <T> InputStream.loadClass(): Class<T> {
     return BytesClassLoader.loadClass(this).asAny()
 }
 
-fun <T> ByteBuffer.loadClass(): Class<T> {
-    return BytesClassLoader.loadClass(this).asAny()
+@JvmOverloads
+fun ByteArray.loadProperties(offset: Int = 0, length: Int = this.size - offset): Map<String, String> {
+    return ByteArrayInputStream(this).loadProperties()
+}
+
+fun InputStream.loadProperties(): Map<String, String> {
+    return this.toPropertiesMap()
+}
+
+private fun InputStream.toPropertiesMap(): Map<String, String> {
+    val properties = Properties()
+    properties.load(this)
+    return properties.map { k, v -> k.toString() to v.toString() }
 }
 
 object BytesClassLoader : ClassLoader() {

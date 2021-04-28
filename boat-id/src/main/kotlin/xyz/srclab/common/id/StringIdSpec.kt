@@ -2,9 +2,10 @@ package xyz.srclab.common.id
 
 import xyz.srclab.common.base.CharsTemplate
 import xyz.srclab.common.base.CharsTemplate.Companion.resolveTemplate
-import xyz.srclab.common.id.StringIdSpec.Companion.DEFAULT_COMPONENT_FACTORY_GENERATORS
+import xyz.srclab.common.base.LazyString.Companion.toLazyString
+import xyz.srclab.common.base.lazyOf
+import xyz.srclab.common.id.StringIdSpec.Companion.DEFAULT_COMPONENT_FACTORY_PROVIDERS
 import java.util.*
-import kotlin.collections.HashMap
 
 /**
  * Specification implementation of [IdFactory]. For example:
@@ -33,8 +34,8 @@ import kotlin.collections.HashMap
  * seq{\}-202007311734474130000\-tail
  * ```
  *
- * There are default name of [IdComponentFactory]:
- * * [DEFAULT_COMPONENT_FACTORY_GENERATORS]
+ * Default name of [IdComponentFactory]:
+ * * [DEFAULT_COMPONENT_FACTORY_PROVIDERS]
  *
  * Note arguments type of those [IdComponentFactory]s only support [String] type.
  *
@@ -45,7 +46,7 @@ import kotlin.collections.HashMap
 class StringIdSpec @JvmOverloads constructor(
     spec: String,
     componentFactoryGenerators: Map<String, (args: Array<String>) -> IdComponentFactory<*>> =
-        DEFAULT_COMPONENT_FACTORY_GENERATORS,
+        DEFAULT_COMPONENT_FACTORY_PROVIDERS,
 ) : IdFactory<String> {
 
     private val template: CharsTemplate
@@ -84,28 +85,26 @@ class StringIdSpec @JvmOverloads constructor(
         for (parameter in parameters) {
             val component = IdComponentHolder.newIdComponent(parameter.value, context)
             components.add(component)
-            args[parameter.key] = LazyToString(parameter.value, context)
+            args[parameter.key] = lazyOf { component.get() }.toLazyString()
         }
         return template.process(args)
     }
 
-    private class LazyToString(private val componentFactory: IdComponentFactory<*>, private val context: IdContext) {
-        override fun toString(): String {
-            return componentFactory.create(context).toString()
-        }
-    }
-
     companion object {
 
-        const val TIME_COUNT_COMPONENT_FACTORY_KEY = "timeCount"
+        const val TIME_COUNT_COMPONENT_FACTORY_NAME = "timeCount"
 
         @JvmField
-        val DEFAULT_COMPONENT_FACTORY_GENERATORS: Map<String, (args: Array<String>) -> IdComponentFactory<*>>
+        val timeCountComponentFactoryProvider: (args: Array<String>) -> TimeCountComponentFactory =
+            { TimeCountComponentFactory(it) }
+
+        @JvmField
+        val DEFAULT_COMPONENT_FACTORY_PROVIDERS: Map<String, (args: Array<String>) -> IdComponentFactory<*>>
 
         init {
             val map = HashMap<String, (args: Array<String>) -> IdComponentFactory<*>>()
-            map[TIME_COUNT_COMPONENT_FACTORY_KEY] = { TimeCountComponentFactory(it) }
-            DEFAULT_COMPONENT_FACTORY_GENERATORS = Collections.unmodifiableMap(map)
+            map[TIME_COUNT_COMPONENT_FACTORY_NAME] = timeCountComponentFactoryProvider
+            DEFAULT_COMPONENT_FACTORY_PROVIDERS = Collections.unmodifiableMap(map)
         }
     }
 }

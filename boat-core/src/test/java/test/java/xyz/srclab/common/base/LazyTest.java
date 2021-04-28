@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Counter;
 import xyz.srclab.common.base.Lazy;
-import xyz.srclab.common.base.LazyToString;
+import xyz.srclab.common.base.LazyString;
 import xyz.srclab.common.test.TestLogger;
 
 import java.time.Duration;
@@ -46,12 +46,12 @@ public class LazyTest {
     }
 
     @Test
-    public void testLazyToString() {
+    public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
-        logger.log("lazyToString: {}", lazyToString);
+        LazyString<Integer> lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
+        logger.log("lazyString: {}", lazyString);
         Assert.assertEquals(
-                lazyToString.get(),
+                lazyString.get(),
                 new Integer(0)
         );
     }

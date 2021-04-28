@@ -7,7 +7,17 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 /**
+ * Id component factory to create [TimestampCount].
+ *
+ * In [StringIdSpec], its name is [StringIdSpec.TIME_COUNT_COMPONENT_FACTORY_NAME] and use 3 arguments:
+ * date time pattern, max count and toString pattern. For example:
+ * ```
+ * String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
+ * StringIdSpec idFactory = new StringIdSpec(spec);
+ * ```
+ *
  * @author sunqian
+ * @see StringIdSpec
  */
 class TimeCountComponentFactory(
     dateTimePattern: String?,

@@ -41,4 +41,22 @@ class JavaEnums {
             throw new ShouldNotException("values() cause InvocationTargetException on enum type!");
         }
     }
+
+    @Nullable
+    static <T extends Enum<T>> T indexOf(@NotNull Class<T> enumType, int index) {
+        try {
+            Method values = enumType.getMethod("values");
+            Enum<?>[] array = Anys.as(values.invoke(null));
+            if (Checks.isIndexInBounds(index, 0, array.length)) {
+                return Anys.as(array[index]);
+            }
+            return null;
+        } catch (NoSuchMethodException e) {
+            throw new ShouldNotException("values() not found on enum type!");
+        } catch (IllegalAccessException e) {
+            throw new ShouldNotException("values() cause IllegalAccessException on enum type!");
+        } catch (InvocationTargetException e) {
+            throw new ShouldNotException("values() cause InvocationTargetException on enum type!");
+        }
+    }
 }
