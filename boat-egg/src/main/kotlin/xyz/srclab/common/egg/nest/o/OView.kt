@@ -74,12 +74,6 @@ private class GamePanel(
             }
         }
 
-        fun List<OPlayer>.draw() {
-            for (player in this) {
-                player.drawScoreboard()
-            }
-        }
-
         fun drawInfo() {
             val x = OConfig.width / 2 - OConfig.infoDisplayBoardWidth / 2
             val y = OConfig.height - OConfig.infoDisplayBoardHeight * 4
@@ -107,10 +101,12 @@ private class GamePanel(
 
         synchronized(data) {
             drawVersion()
+            data.player1.drawScoreboard()
+            data.player2.drawScoreboard()
+            data.humanAmmos.draw()
             data.enemyAmmos.draw()
             data.humanSubjects.draw()
             data.enemySubjects.draw()
-            data.humanSubjects.draw()
             drawInfo()
             if (tick.isStop) {
                 drawEndBoard()
@@ -140,6 +136,7 @@ private class GamePanel(
             val tick = OController.tick
             if (tick.isStop) {
                 if (e.keyCode == KeyEvent.VK_G) {
+                    OController.clearKeys()
                     OController.start()
                     return
                 }

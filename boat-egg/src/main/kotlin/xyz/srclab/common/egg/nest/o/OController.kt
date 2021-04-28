@@ -149,6 +149,12 @@ internal object OController {
         }
     }
 
+    fun clearKeys() {
+        synchronized(keySet) {
+            keySet.clear()
+        }
+    }
+
     private fun getPlayer(player: Int): OSubject {
         return if (player == 1) data.humanSubjects[0] else data.humanSubjects[1]
     }
@@ -158,9 +164,8 @@ internal object OController {
             1,
             0,
             0,
-            PLAYER_FORCE,
+            HUMAN_FORCE,
             Color.ORANGE,
-            false,
         )
     }
 
@@ -169,9 +174,8 @@ internal object OController {
             2,
             0,
             0,
-            PLAYER_FORCE,
+            HUMAN_FORCE,
             Color.BLUE,
-            false,
         )
     }
 
@@ -182,7 +186,6 @@ internal object OController {
             0,
             ENEMY_FORCE,
             Color.GRAY,
-            false,
         )
     }
 }

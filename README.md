@@ -48,7 +48,7 @@ public class EggSample {
   @Test
   public void testEgg() {
     EggManager eggManager = BoatEggManager.INSTANCE;
-    Egg egg = eggManager.pick("O Space Battle");
+    Egg egg = eggManager.pick("O Battle");
     //egg.hatchOut("Thank you, Taro.");
     egg.hatchOut("谢谢你，泰罗。");
   }
@@ -62,7 +62,7 @@ class EggSample {
 
   @Test
   fun testEgg() {
-    val egg = BoatEggManager.pick("O Space Battle")
+    val egg = BoatEggManager.pick("O Battle")
     //egg.hatchOut("Thank you, Taro.")
     egg.hatchOut("谢谢你，泰罗。")
   }

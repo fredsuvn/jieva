@@ -13,9 +13,13 @@ internal object ODrawer {
         "o/draw.properties".loadPropertiesResource().map { k, v ->
             k.trim() to run {
                 val args = v.split(",")
+                val textSize = if (args[1].isNotBlank()) args[1].toInt() else 0
+                val textColor =
+                    if (args[2].isNotBlank()) Color::class.java.getFieldValue<Color>(args[2], null) else null
                 DrawResource(
-                    args[0],
-                    if (args[1].isNotBlank()) Color::class.java.getFieldValue<Color>(args[1], null) else null
+                    args[0].trim(),
+                    textSize,
+                    textColor,
                 )
             }
         }
@@ -35,9 +39,10 @@ internal object ODrawer {
             graphics.withColor(unit.player.color) { g ->
                 g.fillOval(leftUpX, leftUpY, width, width)
                 val text = drawResource.text
+                val textSize = drawResource.textSize
                 val textColor = drawResource.textColor
                 if (text.isNotBlank() && textColor !== null) {
-                    g.withFontSize(width) { g0 ->
+                    g.withFontSize(textSize) { g0 ->
                         g0.withColor(textColor) {
                             it.drawCenteredString(text, Rectangle(leftUpX, leftUpY, width, width))
                         }
@@ -112,5 +117,6 @@ internal object ODrawer {
 
 internal data class DrawResource(
     var text: String,
+    var textSize: Int,
     var textColor: Color?,
 )

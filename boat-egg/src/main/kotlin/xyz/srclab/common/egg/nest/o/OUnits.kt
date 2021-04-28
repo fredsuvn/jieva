@@ -2,7 +2,7 @@ package xyz.srclab.common.egg.nest.o
 
 import java.awt.Color
 
-internal const val PLAYER_FORCE = 1
+internal const val HUMAN_FORCE = 1
 internal const val ENEMY_FORCE = 2
 
 internal const val STEP_UNIT = 1.0
@@ -119,5 +119,4 @@ internal data class OPlayer(
     var score: Long,
     var force: Int,
     var color: Color,
-    var isDead: Boolean,
 )
