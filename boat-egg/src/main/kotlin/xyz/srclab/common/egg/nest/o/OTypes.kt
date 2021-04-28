@@ -30,8 +30,8 @@ internal object OTypeManager {
                     args[2].toDouble(),
                     args[3].toInt(),
                     args[4].toLong(),
-                    args[4].trim(),
-                    args[4].trim(),
+                    args[5].trim(),
+                    args[6].trim(),
                 )
             }
         }

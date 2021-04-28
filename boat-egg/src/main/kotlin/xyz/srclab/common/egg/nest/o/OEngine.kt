@@ -5,8 +5,9 @@ import java.awt.event.KeyEvent
 import kotlin.random.Random
 
 internal class OEngine(
-    private val scenario: OScenario,
     private val data: OData,
+    private val tick: OTick,
+    private val scenario: OScenario,
     private val keySet: Set<Int>
 ) {
 
@@ -27,7 +28,7 @@ internal class OEngine(
         ) {
             return
         }
-        (this as OObjectUnit).move(currentTime, stepX, stepY)
+        unit.move(currentTime, stepX, stepY)
     }
 
     fun attack(unit: OSubjectUnit, tickTime: Long, targetX: Double, targetY: Double) {
@@ -81,16 +82,16 @@ internal class OEngine(
         if (attacker.player.force == ENEMY_FORCE) {
             data.enemyAmmos.addAll(ammos)
         }
-        this.lastFireTime = OTick.time
+        this.lastFireTime = tick.time
     }
 
     private fun OAmmo.hit(subjectUnit: OSubjectUnit) {
         val damage = this.weapon.damage - subjectUnit.defense
         subjectUnit.hp -= damage
         if (subjectUnit.hp <= 0) {
-            subjectUnit.deathTime = OTick.time
+            subjectUnit.deathTime = tick.time
         }
-        this.deathTime = OTick.time
+        this.deathTime = tick.time
     }
 
     private fun OObjectUnit.isOutOfBounds(): Boolean {
@@ -120,8 +121,8 @@ internal class OEngine(
         override fun run() {
 
             fun doWait() {
-                if (!OTick.isGoing) {
-                    OTick.awaitToGo()
+                if (!tick.isGoing) {
+                    tick.awaitToGo()
                 } else {
                     Current.sleep(OConfig.tickInterval)
                 }
@@ -134,9 +135,9 @@ internal class OEngine(
                     while (iterator.hasNext()) {
                         val ammo = iterator.next()
                         if (ammo.stepX == 0.0 && ammo.stepY == 0.0) {
-                            ammo.deathTime = OTick.time
+                            ammo.deathTime = tick.time
                         }
-                        if (ammo.isOutOfBounds() || ammo.isDisappeared(OTick.time)) {
+                        if (ammo.isOutOfBounds() || ammo.isDisappeared(tick.time)) {
                             OLogger.debug("Ammo cleaned: {}", ammo.id)
                             iterator.remove()
                         }
@@ -147,7 +148,7 @@ internal class OEngine(
                     val iterator = this.iterator()
                     while (iterator.hasNext()) {
                         val living = iterator.next()
-                        if (living.isOutOfBounds() || living.isDisappeared(OTick.time)) {
+                        if (living.isOutOfBounds() || living.isDisappeared(tick.time)) {
                             OLogger.debug("Living cleaned: {}-{}", living.javaClass.typeName, living.id)
                             iterator.remove()
                         }
@@ -247,7 +248,7 @@ internal class OEngine(
                     if (enemy.isDead) {
                         continue
                     }
-                    enemy.attack(pickHumanSubject(), OTick.time)
+                    enemy.attack(pickHumanSubject(), tick.time)
                 }
             }
 
@@ -256,23 +257,23 @@ internal class OEngine(
                     if (enemiesAmmo.isDead) {
                         continue
                     }
-                    enemiesAmmo.move(OTick.time, enemiesAmmo.stepX, enemiesAmmo.stepY)
+                    enemiesAmmo.move(tick.time, enemiesAmmo.stepX, enemiesAmmo.stepY)
                 }
                 for (playerAmmo in data.humanAmmos) {
                     if (playerAmmo.isDead) {
                         continue
                     }
-                    playerAmmo.move(OTick.time, playerAmmo.stepX, playerAmmo.stepY)
+                    playerAmmo.move(tick.time, playerAmmo.stepX, playerAmmo.stepY)
                 }
                 for (enemy in data.enemySubjects) {
                     if (enemy.isDead) {
                         continue
                     }
-                    enemy.move(OTick.time, enemy.stepX, enemy.stepY)
+                    enemy.move(tick.time, enemy.stepX, enemy.stepY)
                 }
             }
 
-            while (!OTick.isStop) {
+            while (!tick.isStop) {
                 doWait()
                 synchronized(data) {
                     doClean()
@@ -282,7 +283,7 @@ internal class OEngine(
                     doAutoMove()
                     scenario.onTick()
                 }
-                OTick.tick()
+                tick.tick()
             }
             synchronized(data) {
                 scenario.onEnd()

@@ -9,7 +9,7 @@ import java.awt.event.KeyEvent
 import javax.swing.JFrame
 import javax.swing.JPanel
 
-internal class OView : JFrame("O Space Battle") {
+internal class OView : JFrame(OConfig.name) {
 
     init {
         this.isResizable = false
@@ -20,7 +20,7 @@ internal class OView : JFrame("O Space Battle") {
             OConfig.width + insets.left + insets.right, OConfig.height + insets.top + insets.bottom
         )
         this.setLocationRelativeTo(null)
-        val gamePanel = GamePanel( this)
+        val gamePanel = GamePanel(this)
         this.add(gamePanel, BorderLayout.CENTER)
         gamePanel.requestFocus()
     }
@@ -35,11 +35,12 @@ private class GamePanel(
     init {
         background = Color.BLACK
         isVisible = true
-        PaintThread().start()
-        addKeyListener(KeyHandler())
+        val keyHandler = KeyHandler()
+        addKeyListener(keyHandler)
 
         OController.start()
-        //OController.go()
+        PaintThread().start()
+        keyHandler.start()
     }
 
     override fun paint(g: Graphics) {
@@ -48,9 +49,9 @@ private class GamePanel(
     }
 
     private fun draw(g: Graphics) {
-        val tick = OTick
+
         val data = OController.data
-        val scenario = data.scenario
+        val tick = OController.tick
 
         fun drawVersion() {
             g.withColor(boardColor) {
@@ -59,8 +60,8 @@ private class GamePanel(
         }
 
         fun List<OObjectUnit>.draw() {
-            for (subjectUnit in this) {
-                scenario.onDraw(subjectUnit, tick.time, g)
+            for (unit in this) {
+                ODrawer.draw(unit, tick.time, g)
             }
         }
 
@@ -74,7 +75,6 @@ private class GamePanel(
         }
 
         fun List<OPlayer>.draw() {
-            (this as List<OObjectUnit>).draw()
             for (player in this) {
                 player.drawScoreboard()
             }
@@ -85,7 +85,7 @@ private class GamePanel(
             val y = OConfig.height - OConfig.infoDisplayBoardHeight * 4
             g.withColor(boardColor) {
                 var height = 0
-                for (info in OController.logger.infos) {
+                for (info in OLogger.infos) {
                     it.drawString("${info.timestamp}: ${info.message} ", x, y + height)
                     height += OConfig.infoDisplayBoardHeight
                 }
@@ -107,10 +107,10 @@ private class GamePanel(
 
         synchronized(data) {
             drawVersion()
-            data.enemiesAmmos.draw()
-            data.playersAmmos.draw()
-            data.players.draw()
-            data.enemies.draw()
+            data.enemyAmmos.draw()
+            data.humanSubjects.draw()
+            data.enemySubjects.draw()
+            data.humanSubjects.draw()
             drawInfo()
             if (tick.isStop) {
                 drawEndBoard()
@@ -131,10 +131,15 @@ private class GamePanel(
 
     private inner class KeyHandler : KeyAdapter() {
 
+        private var isStarted: Boolean = false
+
         override fun keyPressed(e: KeyEvent) {
-            if (OTick.isStop) {
+            if (!isStarted) {
+                return
+            }
+            val tick = OController.tick
+            if (tick.isStop) {
                 if (e.keyCode == KeyEvent.VK_G) {
-                    controller = engine.loadNew()
                     OController.start()
                     return
                 }
@@ -144,7 +149,7 @@ private class GamePanel(
                 OController.toggle()
                 return
             }
-            if (!OTick.isGoing) {
+            if (!tick.isGoing) {
                 return
             }
             when (e.keyCode) {
@@ -163,7 +168,11 @@ private class GamePanel(
         }
 
         override fun keyReleased(e: KeyEvent) {
-            if (OTick.isStop) {
+            if (!isStarted) {
+                return
+            }
+            val tick = OController.tick
+            if (tick.isStop) {
                 return
             }
             when (e.keyCode) {
@@ -179,6 +188,10 @@ private class GamePanel(
                 KeyEvent.VK_ENTER -> OController.releaseKey(KeyEvent.VK_ENTER)
                 else -> return
             }
+        }
+
+        fun start() {
+            isStarted = true
         }
     }
 }

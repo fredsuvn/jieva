@@ -15,7 +15,7 @@ internal object ODrawer {
                 val args = v.split(",")
                 DrawResource(
                     args[0],
-                    if (args.size >= 2) Color::class.java.getFieldValue<Color>(args[1], null) else null
+                    if (args[1].isNotBlank()) Color::class.java.getFieldValue<Color>(args[1], null) else null
                 )
             }
         }

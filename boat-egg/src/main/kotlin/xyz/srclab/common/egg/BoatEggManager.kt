@@ -1,6 +1,7 @@
 package xyz.srclab.common.egg
 
 import xyz.srclab.common.egg.nest.o.OBattle
+import xyz.srclab.common.egg.nest.o.OConfig
 
 /**
  * Boat Egg Manager.
@@ -13,7 +14,7 @@ object BoatEggManager : EggManager {
         eggMap["Hello, Boat Egg!"] = {
             SampleEgg
         }
-        eggMap["O Battle"] = {
+        eggMap[OConfig.name] = {
             OBattle()
         }
     }

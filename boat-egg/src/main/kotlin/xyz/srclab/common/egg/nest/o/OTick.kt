@@ -3,7 +3,7 @@ package xyz.srclab.common.egg.nest.o
 import xyz.srclab.common.base.Ref
 import java.util.concurrent.CountDownLatch
 
-internal object OTick {
+internal class OTick {
 
     private var _time: Long = 0
     private var _going: Boolean = false

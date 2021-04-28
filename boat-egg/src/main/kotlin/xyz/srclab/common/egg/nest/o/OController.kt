@@ -5,12 +5,17 @@ import java.awt.Color
 internal object OController {
 
     private var _data: OData? = null
+    private var _tick: OTick? = null
     private var _scenario: OScenario? = null
     private var _engine: OEngine? = null
 
     val data: OData
         get() {
             return _data!!
+        }
+    val tick: OTick
+        get() {
+            return _tick!!
         }
     private val scenario: OScenario
         get() {
@@ -29,8 +34,9 @@ internal object OController {
             createPlayer2(),
             createEnemyPlayer(),
         )
-        _scenario = OScenario(data)
-        _engine = OEngine(scenario, data, keySet)
+        _tick = OTick()
+        _scenario = OScenario(data, tick)
+        _engine = OEngine(data, tick, scenario, keySet)
 
         scenario.onStart()
         go()
@@ -39,58 +45,58 @@ internal object OController {
     }
 
     fun stop() {
-        if (OTick.isStop) {
+        if (tick.isStop) {
             throw IllegalStateException("Game has been over!")
         }
-        OTick.stop()
+        tick.stop()
         scenario.onStop()
     }
 
     fun go() {
-        if (OTick.isStop) {
+        if (tick.isStop) {
             throw IllegalStateException("Game has been over!")
         }
-        OTick.go()
+        tick.go()
     }
 
     fun pause() {
-        if (OTick.isStop) {
+        if (tick.isStop) {
             throw IllegalStateException("Game has been over!")
         }
-        OTick.pause()
+        tick.pause()
     }
 
     fun toggle() {
-        if (OTick.isStop) {
+        if (tick.isStop) {
             throw IllegalStateException("Game has been over!")
         }
-        if (OTick.isGoing) {
-            OTick.pause()
+        if (tick.isGoing) {
+            tick.pause()
         } else {
-            OTick.go()
+            tick.go()
         }
     }
 
     fun moveLeft(player: Int) {
-        engine.humanMove(getPlayer(player), OTick.time, -OConfig.xUnit, 0.0)
+        engine.humanMove(getPlayer(player), tick.time, -OConfig.xUnit, 0.0)
     }
 
     fun moveRight(player: Int) {
-        engine.humanMove(getPlayer(player), OTick.time, OConfig.xUnit, 0.0)
+        engine.humanMove(getPlayer(player), tick.time, OConfig.xUnit, 0.0)
     }
 
     fun moveUp(player: Int) {
-        engine.humanMove(getPlayer(player), OTick.time, 0.0, -OConfig.yUnit)
+        engine.humanMove(getPlayer(player), tick.time, 0.0, -OConfig.yUnit)
     }
 
     fun moveDown(player: Int) {
-        engine.humanMove(getPlayer(player), OTick.time, 0.0, OConfig.yUnit)
+        engine.humanMove(getPlayer(player), tick.time, 0.0, OConfig.yUnit)
     }
 
     fun moveLeftUp(player: Int) {
         engine.humanMove(
             getPlayer(player),
-            OTick.time,
+            tick.time,
             -OConfig.xUnit * STEP_45_DEGREE_ANGLE,
             -OConfig.yUnit * STEP_45_DEGREE_ANGLE
         )
@@ -99,7 +105,7 @@ internal object OController {
     fun moveRightUp(player: Int) {
         engine.humanMove(
             getPlayer(player),
-            OTick.time,
+            tick.time,
             OConfig.xUnit * STEP_45_DEGREE_ANGLE,
             -OConfig.yUnit * STEP_45_DEGREE_ANGLE
         )
@@ -108,7 +114,7 @@ internal object OController {
     fun moveLeftDown(player: Int) {
         engine.humanMove(
             getPlayer(player),
-            OTick.time,
+            tick.time,
             -OConfig.xUnit * STEP_45_DEGREE_ANGLE,
             OConfig.yUnit * STEP_45_DEGREE_ANGLE
         )
@@ -117,7 +123,7 @@ internal object OController {
     fun moveRightDown(player: Int) {
         engine.humanMove(
             getPlayer(player),
-            OTick.time,
+            tick.time,
             OConfig.xUnit * STEP_45_DEGREE_ANGLE,
             OConfig.yUnit * STEP_45_DEGREE_ANGLE
         )
@@ -128,7 +134,7 @@ internal object OController {
         if (p.isDead) {
             return
         }
-        engine.attack(p, OTick.time, p.x, 0.0)
+        engine.attack(p, tick.time, p.x, 0.0)
     }
 
     fun pressKey(vk: Int) {

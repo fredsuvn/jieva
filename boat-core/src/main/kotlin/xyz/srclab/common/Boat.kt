@@ -30,7 +30,10 @@ object Boat {
         "© 2021 SrcLab"
     )
 
-    @get:JvmName("secretCode")
+    @get:JvmName("secretCodes")
     @JvmStatic
-    val secretCode: String = "谢谢你，泰罗！"
+    val secretCodes: List<String> = listOf(
+        "Thank you, Taro.",
+        "谢谢你，泰罗。",
+    )
 }

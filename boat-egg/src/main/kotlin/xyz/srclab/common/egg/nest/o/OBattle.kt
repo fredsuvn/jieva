@@ -1,5 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
+import xyz.srclab.common.Boat
 import xyz.srclab.common.egg.Egg
 
 /**
@@ -7,20 +8,20 @@ import xyz.srclab.common.egg.Egg
  */
 class OBattle : Egg {
 
-    override val shell: String
-        get() = TODO("Not yet implemented")
+    override val shell: String = Boat::class.java.name
 
     override fun hatchOut(spell: CharSequence) {
-        when (spell.toString()) {
-            "Thank you, Taro.",
-            "谢谢你，泰罗。",
-            -> run()
-            else -> throw IAmSevenNotTaro()
+        for (secretCode in Boat.secretCodes) {
+            if (secretCode == spell) {
+                run()
+                return
+            }
         }
+        throw IAmSevenNotTaro()
     }
 
     private fun run() {
-        OView(OSpaceConfig()).isVisible = true
+        OView().isVisible = true
     }
 
     private class IAmSevenNotTaro : RuntimeException(

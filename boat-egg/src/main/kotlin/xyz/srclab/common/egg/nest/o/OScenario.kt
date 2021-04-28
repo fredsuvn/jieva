@@ -4,7 +4,10 @@ import xyz.srclab.common.base.randomBetween
 import xyz.srclab.common.collect.sumLong
 import java.awt.Graphics
 
-internal class OScenario(private val data: OData) {
+internal class OScenario(
+    private val data: OData,
+    private val tick: OTick,
+) {
 
     private val refresher: ORefresher = ORefresher(data)
 
@@ -44,7 +47,7 @@ internal class OScenario(private val data: OData) {
         player.score += enemy.score
         if (enemy.isDead) {
             val p = ammo.weapon.holder as OPlayer
-            OLogger.info("Player-{} killed enemy-{} at {}", p.number, enemy.id, OTick.time)
+            OLogger.info("Player-{} killed enemy-{} at {}", p.number, enemy.id, tick.time)
         }
     }
 
@@ -52,13 +55,13 @@ internal class OScenario(private val data: OData) {
         if (human.isDead) {
             human.player.isDead = true
             OLogger.info(
-                "Enemy-{} killed player-{} at {}", ammo.weapon.holder.id, human.player.number, OTick.time
+                "Enemy-{} killed player-{} at {}", ammo.weapon.holder.id, human.player.number, tick.time
             )
         }
     }
 
     fun onDraw(unit: OObjectUnit, graphics: Graphics) {
-        ODrawer.draw(unit, OTick.time, graphics)
+        ODrawer.draw(unit, tick.time, graphics)
     }
 
     private fun createHumanSubject(player: OPlayer, x: Double, y: Double): OSubject {
@@ -103,7 +106,7 @@ internal class OScenario(private val data: OData) {
         private var lastRefreshTime = 0L
 
         fun refresh() {
-            if (OTick.time - lastRefreshTime < refreshCoolDownTime) {
+            if (tick.time - lastRefreshTime < refreshCoolDownTime) {
                 return
             }
             val level = data.humanSubjects.sumLong { it.score }
@@ -116,7 +119,7 @@ internal class OScenario(private val data: OData) {
                     refreshCrazyEnemies(5)
                 }
             }
-            lastRefreshTime = OTick.time
+            lastRefreshTime = tick.time
         }
 
         private fun refreshEnemies(times: Int) {

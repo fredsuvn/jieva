@@ -34,7 +34,7 @@ public class EggTest {
     @Test
     public void testOSpaceBattle() {
         BoatEggManager eggManager = BoatEggManager.INSTANCE;
-        Egg egg = eggManager.pick("O Space Battle");
+        Egg egg = eggManager.pick("O Battle");
         //egg.hatchOut("Thank you, Taro.");
         egg.hatchOut("谢谢你，泰罗。");
     }
