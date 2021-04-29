@@ -185,7 +185,7 @@ internal object OController {
             0,
             0,
             ENEMY_FORCE,
-            Color.GRAY,
+            Color.LIGHT_GRAY,
         )
     }
 }
