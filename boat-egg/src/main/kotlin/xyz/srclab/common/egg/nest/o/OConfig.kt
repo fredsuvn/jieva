@@ -1,6 +1,10 @@
 package xyz.srclab.common.egg.nest.o
 
+import xyz.srclab.common.base.loadPropertiesResource
+
 internal object OConfig {
+
+    private val config: Map<String, String> = "o/config.properties".loadPropertiesResource()
 
     //Window
     const val width: Int = 640
@@ -25,7 +29,7 @@ internal object OConfig {
     //Debug
     const val isDebug: Boolean = false
 
-    //Version
-    const val name: String = "O Battle"
-    const val version: String = "0.0.0"
+    //Config
+    val name: String = config["name"]!!
+    val version: String = config["version"]!!
 }

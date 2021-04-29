@@ -11,7 +11,7 @@ java {
 }
 
 dependencies {
-  implementation project(":boat")
+  implementation project(":boat-core")
 
   testCompile project(":boat-test")
 }

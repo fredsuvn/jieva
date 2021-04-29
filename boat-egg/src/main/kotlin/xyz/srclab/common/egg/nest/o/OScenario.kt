@@ -1,7 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
 import xyz.srclab.common.base.randomBetween
-import xyz.srclab.common.collect.sumLong
 import java.awt.Graphics
 
 internal class OScenario(
@@ -107,14 +106,21 @@ internal class OScenario(
             if (tick.time - lastRefreshTime < refreshCoolDownTime) {
                 return
             }
-            val level = data.humanSubjects.sumLong { it.score }
+            val level = data.player1.score + data.player2.score
             when {
                 level < 100 -> refreshEnemies(1)
                 level < 1000 -> refreshEnemies(2)
                 level < 2000 -> refreshEnemies(3)
-                level < 5000 -> refreshEnemies(4)
+                level < 3000 -> refreshEnemies(4)
+                level < 4000 -> refreshEnemies(5)
+                level < 5000 -> refreshCrazyEnemies(6, 1)
+                level < 6000 -> refreshCrazyEnemies(7, 2)
+                level < 7000 -> refreshCrazyEnemies(8, 3)
+                level < 8000 -> refreshCrazyEnemies(9, 4)
+                level < 9000 -> refreshCrazyEnemies(10, 5)
+                level < 10000 -> refreshCrazyEnemies(11, 6)
                 else -> {
-                    refreshCrazyEnemies(5)
+                    refreshCrazyEnemies(15, 10)
                 }
             }
             lastRefreshTime = tick.time
@@ -130,9 +136,11 @@ internal class OScenario(
             }
         }
 
-        private fun refreshCrazyEnemies(times: Int) {
+        private fun refreshCrazyEnemies(times: Int, crazyTimes: Int) {
             refreshEnemies(times)
-            data.enemySubjects.add(createCrazyEnemy())
+            for (it in 1..crazyTimes) {
+                data.enemySubjects.add(createCrazyEnemy())
+            }
         }
 
         private fun createCommonEnemy(): OSubject {
