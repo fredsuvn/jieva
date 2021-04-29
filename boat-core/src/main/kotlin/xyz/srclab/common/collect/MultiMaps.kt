@@ -2,14 +2,13 @@
 
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.asAny
 import java.util.*
-import kotlin.collections.LinkedHashSet
 
 /**
  * Represents a type of [Map] of which key associated to a [Set].
  */
-interface SetMap<K, V> : Map<K, Set<V>> {
-}
+interface SetMap<K, V> : Map<K, Set<V>>
 
 /**
  * Represents a type of [MutableMap] of which key associated to [MutableSet].
@@ -30,8 +29,7 @@ interface MutableSetMap<K, V> : MutableMap<K, MutableSet<V>> {
 /**
  * Represents a type of [Map] of which key associated to a [List].
  */
-interface ListMap<K, V> : Map<K, List<V>> {
-}
+interface ListMap<K, V> : Map<K, List<V>>
 
 /**
  * Represents a type of [MutableMap] of which key associated to [MutableList].
@@ -56,10 +54,10 @@ fun <K, V> Map<K, Set<V>>.toSetMap(): SetMap<K, V> {
 
 @JvmName("mutableSetMap")
 @JvmOverloads
-fun <K, V> MutableMap<K, MutableSet<V>>.toMutableSetMap(
+fun <K, V> MutableMap<K, out MutableSet<V>>.toMutableSetMap(
     setGenerator: () -> MutableSet<V> = { LinkedHashSet() }
 ): MutableSetMap<K, V> {
-    return MutableSetMapImpl(this, setGenerator)
+    return MutableSetMapImpl(this.asAny(), setGenerator)
 }
 
 private open class SetMapBase<K, V>(map: Map<K, Set<V>>) : Map<K, Set<V>> by map
@@ -116,10 +114,10 @@ fun <K, V> Map<K, List<V>>.toListMap(): ListMap<K, V> {
 
 @JvmName("mutableListMap")
 @JvmOverloads
-fun <K, V> MutableMap<K, MutableList<V>>.toMutableListMap(
+fun <K, V> MutableMap<K, out MutableList<V>>.toMutableListMap(
     listGenerator: () -> MutableList<V> = { LinkedList() }
 ): MutableListMap<K, V> {
-    return MutableListMapImpl(this, listGenerator)
+    return MutableListMapImpl(this.asAny(), listGenerator)
 }
 
 private open class ListMapBase<K, V>(map: Map<K, List<V>>) : Map<K, List<V>> by map

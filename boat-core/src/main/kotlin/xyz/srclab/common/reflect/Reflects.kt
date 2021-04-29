@@ -1455,14 +1455,14 @@ val INHERITANCE_COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
 /**
  * Use [INHERITANCE_COMPARATOR] to sort the classes
  */
-fun <T> Iterable<Class<T>>.inheritanceSorted(): List<Class<T>> {
-    return this.sorted(INHERITANCE_COMPARATOR)
+fun <T> Iterable<Class<*>>.inheritanceSorted(): List<Class<T>> {
+    return this.sorted(INHERITANCE_COMPARATOR).asAny()
 }
 
 /**
  * Use [INHERITANCE_COMPARATOR] to sort the classes
  */
-fun <T, C : MutableList<Class<T>>> C.sortInheritance(): C {
+fun <C : MutableList<Class<*>>> C.sortInheritance(): C {
     this.sort(INHERITANCE_COMPARATOR)
     return this
 }
