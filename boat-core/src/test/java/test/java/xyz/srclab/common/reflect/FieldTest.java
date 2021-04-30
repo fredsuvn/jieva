@@ -84,5 +84,22 @@ public class FieldTest {
                 Reflects.getFieldValue(
                         NewClass.class, "superPrivateField", newClass, false, true)
         );
+
+        Assert.assertEquals(
+                Reflects.getFieldValue(
+                        newClass, "superPrivateField", true, true),
+                "superPrivateField2"
+        );
+        Reflects.setFieldValue(
+                newClass,
+                "superPrivateField",
+                "superPrivateField222",
+                true,
+                true);
+        Assert.assertEquals(
+                Reflects.getFieldValue(
+                        NewClass.class, "superPrivateField", newClass, true, true),
+                "superPrivateField222"
+        );
     }
 }
