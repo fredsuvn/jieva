@@ -1669,7 +1669,7 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 
     @Test
     public void testMultiMap() {
-        SetMap&lt;String, String&gt; setMap = MultiMaps.setMap(
+        SetMap&lt;String, String&gt; setMap = SetMap.newSetMap(
                 Collects.newMap(
                         new LinkedHashMap&lt;&gt;(),
                         "s", Collects.newCollection(new LinkedHashSet&lt;&gt;(), "1", "2", "3")
@@ -1678,7 +1678,7 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
         //setMap: {s=[1, 2, 3]}
         logger.log("setMap: {}", setMap);
 
-        MutableSetMap&lt;String, String&gt; mutableSetMap = MultiMaps.mutableSetMap(
+        MutableSetMap&lt;String, String&gt; mutableSetMap = MutableSetMap.newMutableSetMap(
                 Collects.newMap(
                         new LinkedHashMap&lt;&gt;(),
                         "s", Collects.newCollection(new LinkedHashSet&lt;&gt;(), "1", "2", "3")
@@ -1689,7 +1689,7 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
         //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
         logger.log("mutableSetMap: {}", mutableSetMap);
 
-        ListMap&lt;String, String&gt; listMap = MultiMaps.listMap(
+        ListMap&lt;String, String&gt; listMap = ListMap.newListMap(
                 Collects.newMap(
                         new LinkedHashMap&lt;&gt;(),
                         "s", Collects.newCollection(new LinkedList&lt;&gt;(), "1", "2", "3")
@@ -1698,7 +1698,7 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
         //listMap: {s=[1, 2, 3]}
         logger.log("listMap: {}", listMap);
 
-        MutableListMap&lt;String, String&gt; mutableListMap = MultiMaps.mutableListMap(
+        MutableListMap&lt;String, String&gt; mutableListMap = MutableListMap.newMutableListMap(
                 Collects.newMap(
                         new LinkedHashMap&lt;&gt;(),
                         "s", Collects.newCollection(new LinkedList&lt;&gt;(), "1", "2", "3")

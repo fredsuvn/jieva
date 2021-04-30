@@ -37,7 +37,7 @@ public class CollectSample {
 
     @Test
     public void testMultiMap() {
-        SetMap<String, String> setMap = MultiMaps.setMap(
+        SetMap<String, String> setMap = SetMap.newSetMap(
                 Collects.newMap(
                         new LinkedHashMap<>(),
                         "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
@@ -46,7 +46,7 @@ public class CollectSample {
         //setMap: {s=[1, 2, 3]}
         logger.log("setMap: {}", setMap);
 
-        MutableSetMap<String, String> mutableSetMap = MultiMaps.mutableSetMap(
+        MutableSetMap<String, String> mutableSetMap = MutableSetMap.newMutableSetMap(
                 Collects.newMap(
                         new LinkedHashMap<>(),
                         "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
@@ -57,7 +57,7 @@ public class CollectSample {
         //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
         logger.log("mutableSetMap: {}", mutableSetMap);
 
-        ListMap<String, String> listMap = MultiMaps.listMap(
+        ListMap<String, String> listMap = ListMap.newListMap(
                 Collects.newMap(
                         new LinkedHashMap<>(),
                         "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
@@ -66,7 +66,7 @@ public class CollectSample {
         //listMap: {s=[1, 2, 3]}
         logger.log("listMap: {}", listMap);
 
-        MutableListMap<String, String> mutableListMap = MultiMaps.mutableListMap(
+        MutableListMap<String, String> mutableListMap = MutableListMap.newMutableListMap(
                 Collects.newMap(
                         new LinkedHashMap<>(),
                         "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
