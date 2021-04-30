@@ -688,6 +688,7 @@ fun <T> Class<*>.getFieldValue(name: String, owner: Any?): T {
 
 /**
  * @throws NoSuchFieldException
+ * @throws IllegalAccessException
  */
 fun <T> Class<*>.getFieldValue(
     name: String,
@@ -730,6 +731,33 @@ fun Class<*>.setFieldValue(
         throw NoSuchFieldException(name)
     }
     return field.setValue(owner, value, force)
+}
+
+/**
+ * @throws NoSuchFieldException
+ * @throws IllegalAccessException
+ */
+@JvmOverloads
+fun <T> Any.getFieldValue(
+    name: String,
+    deep: Boolean = false,
+    force: Boolean = false
+): T {
+    return this.javaClass.getFieldValue(name, this, deep, force)
+}
+
+/**
+ * @throws NoSuchFieldException
+ * @throws IllegalAccessException
+ */
+@JvmOverloads
+fun Any.setFieldValue(
+    name: String,
+    value: Any?,
+    deep: Boolean = false,
+    force: Boolean = false
+) {
+    this.javaClass.setFieldValue(name, this, value, deep, force)
 }
 
 fun Class<*>.methodOrNull(name: String, vararg parameterTypes: Class<*>): Method? {
