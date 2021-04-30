@@ -33,6 +33,26 @@ interface Lazy<T> {
     }
 }
 
+/**
+ * A special type of [Lazy] class that override [toString] method by [get]. This class can be used in log message of
+ * which toString executing is expensive.
+ */
+open class LazyString<T>(delegate: Lazy<T>) : Lazy<T> by delegate {
+
+    override fun toString(): String {
+        return get().toString()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun <T> Lazy<T>.toLazyString(): LazyString<T> {
+            return LazyString(this)
+        }
+    }
+}
+
 fun <T> lazyOf(supplier: () -> T): Lazy<T> {
     return Lazy.of(supplier)
 }
@@ -176,26 +196,6 @@ private class DynamicPeriodRefreshableLazy<T>(
             lastPeriod = period(result)
             lastGetTime = LocalDateTime.now()
             lastValue.asNotNull()
-        }
-    }
-}
-
-/**
- * A special type of [Lazy] class that override [toString] method by [get]. This class can be used in log message of
- * which toString executing is expensive.
- */
-open class LazyString<T>(delegate: Lazy<T>) : Lazy<T> by delegate {
-
-    override fun toString(): String {
-        return get().toString()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun <T> Lazy<T>.toLazyString(): LazyString<T> {
-            return LazyString(this)
         }
     }
 }

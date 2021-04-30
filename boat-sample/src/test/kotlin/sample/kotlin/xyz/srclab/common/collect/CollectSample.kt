@@ -1,7 +1,11 @@
 package sample.kotlin.xyz.srclab.common.collect
 
 import org.testng.annotations.Test
-import xyz.srclab.common.collect.*
+import xyz.srclab.common.collect.ListMap.Companion.toListMap
+import xyz.srclab.common.collect.MutableListMap.Companion.toMutableListMap
+import xyz.srclab.common.collect.MutableSetMap.Companion.toMutableSetMap
+import xyz.srclab.common.collect.SetMap.Companion.toSetMap
+import xyz.srclab.common.collect.addElements
 import xyz.srclab.common.test.TestLogger
 import java.util.*
 
