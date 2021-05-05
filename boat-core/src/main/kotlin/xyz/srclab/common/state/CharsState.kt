@@ -8,13 +8,13 @@ import xyz.srclab.common.state.State.Companion.stateToString
  * Abstract [State] for [String] type code and description.
  */
 abstract class CharsState<T : State<String, String, T>> @JvmOverloads constructor(
-    code: CharSequence,
-    descriptions: List<CharSequence> = emptyList()
+        code: CharSequence,
+        descriptions: List<CharSequence> = emptyList()
 ) : State<String, String, T> {
 
     constructor(code: CharSequence, description: CharSequence) : this(code, listOf(description))
 
-    protected abstract fun newStateImpl(code: String, descriptions: List<String>): T
+    protected abstract fun newState(code: String, descriptions: List<String>): T
 
     override val code: String = code.toString()
 
@@ -25,11 +25,11 @@ abstract class CharsState<T : State<String, String, T>> @JvmOverloads constructo
     override val descriptions: List<String> = descriptions.map { it.toString() }
 
     override fun withNewDescription(newDescription: String?): T {
-        return newStateImpl(code, newDescriptions(newDescription))
+        return newState(code, newDescriptions(newDescription))
     }
 
     override fun withMoreDescription(moreDescription: String): T {
-        return newStateImpl(code, this.descriptions.moreDescriptions(moreDescription))
+        return newState(code, this.descriptions.moreDescriptions(moreDescription))
     }
 
     override fun equals(other: Any?): Boolean {
