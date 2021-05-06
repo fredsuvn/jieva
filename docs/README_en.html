@@ -598,7 +598,16 @@ It provides many fast and convenient interfaces, functions and utilities.</p>
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class AnnotationSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.annotations;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import xyz.srclab.annotations.Accepted;
+import xyz.srclab.annotations.JavaBean;
+import xyz.srclab.annotations.NonNull;
+import xyz.srclab.annotations.Written;
+
+public class AnnotationSample {
 
     @Test
     public void testAnnotations() {
@@ -612,8 +621,8 @@ It provides many fast and convenient interfaces, functions and utilities.</p>
     }
 
     private void writeBuffer(
-            @Written StringBuilder buffer,
-            @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
+        @Written StringBuilder buffer,
+        @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
     ) {
         buffer.append(readOnly);
     }
@@ -648,25 +657,14 @@ It provides many fast and convenient interfaces, functions and utilities.</p>
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class AnnotationSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.annotations
 
-    @Test
-    fun testAnnotations() {
-        val buffer = StringBuilder()
-        buffer.writeBuffer("123")
-        Assert.assertEquals(buffer.toString(), "123")
-    }
+import org.testng.Assert
+import org.testng.annotations.Test
+import xyz.srclab.annotations.Acceptable
+import xyz.srclab.annotations.Accepted
+import xyz.srclab.annotations.Written
 
-    private fun @receiver:Written StringBuilder.writeBuffer(
-        @Acceptable(
-            Accepted(String::class),
-            Accepted(StringBuffer::class),
-        )
-        readOnly: String
-    ) {
-        this.append(readOnly)
-    }
-}
 class AnnotationSample {
 
     @Test
@@ -721,18 +719,30 @@ class AnnotationSample {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class BaseSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.base;
+
+import org.jetbrains.annotations.NotNull;
+import org.testng.annotations.Test;
+import xyz.srclab.common.base.*;
+import xyz.srclab.common.test.TestLogger;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.IntStream;
+
+public class BaseSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testLet() {
         int sum = Let.of("1,2,3,4,5,6,7,8,9,10")
-                .then(s -&gt; s.split(","))
-                .then(Arrays::asList)
-                .then(l -&gt; l.stream().mapToInt(Integer::parseInt))
-                .then(IntStream::sum)
-                .get();
+            .then(s -&gt; s.split(","))
+            .then(Arrays::asList)
+            .then(l -&gt; l.stream().mapToInt(Integer::parseInt))
+            .then(IntStream::sum)
+            .get();
         //55
         logger.log("sum: {}", sum);
     }
@@ -792,15 +802,15 @@ class AnnotationSample {
         args.put(1, "Cat");
         args.put(2, "Bird");
         CharsTemplate template1 = CharsTemplate.resolve(
-                "This is a {name}, that is a {}", "{", "}");
+            "This is a {name}, that is a {}", "{", "}");
         //This is a Dog, that is a Cat
         logger.log(template1.process(args));
         CharsTemplate template2 = CharsTemplate.resolve(
-                "This is a } {name}, that is a {}}", "{", "}");
+            "This is a } {name}, that is a {}}", "{", "}");
         //This is a } Dog, that is a Cat}
         logger.log(template2.process(args));
         CharsTemplate template3 = CharsTemplate.resolve(
-                "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
+            "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
         //This is a } {DogX (Dog), that is a Bird\\{\
         logger.log(template3.process(args));
     }
@@ -972,19 +982,19 @@ class AnnotationSample {
         shell.println(Arrays.asList("Hello", ",", "World", "!"));
         shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
         shell.println(
-                SgrChars.foregroundRed("red"),
-                SgrChars.backgroundCyan(" "),
-                SgrChars.foregroundGreen("green")
+            SgrChars.foregroundRed("red"),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.foregroundGreen("green")
         );
         shell.println(
-                SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
-                SgrChars.backgroundCyan(" "),
-                SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
+            SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
         );
         shell.println(
-                SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
-                SgrChars.backgroundCyan(" "),
-                SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
+            SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
         );
         shell.println(ControlChars.beep());
         shell.println("123", ControlChars.backspaces(), "456", ControlChars.beep());
@@ -995,23 +1005,23 @@ class AnnotationSample {
         String verString = "1.2.3-beta.2.3+123";
         SemVer semVer = SemVer.parse(verString);
         About about = About.of(
-                "name",
-                semVer.normalString(),
-                Collections.singletonList(Author.of("name", "author@mail.com", null)),
-                "123@123.com",
-                "url",
-                Collections.singletonList("licence"),
-                Collections.singletonList(About.of(
-                        "poweredBy",
-                        null,
-                        Collections.emptyList(),
-                        null,
-                        null,
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        null
-                )),
-                "© 2021 SrcLab"
+            "name",
+            semVer.normalString(),
+            Collections.singletonList(Author.of("name", "author@mail.com", null)),
+            "123@123.com",
+            "url",
+            Collections.singletonList("licence"),
+            Collections.singletonList(About.of(
+                "poweredBy",
+                null,
+                Collections.emptyList(),
+                null,
+                null,
+                Collections.emptyList(),
+                Collections.emptyList(),
+                null
+            )),
+            "© 2021 SrcLab"
         );
         //name
         //Version: 1.2.3
@@ -1034,7 +1044,25 @@ class AnnotationSample {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class BaseSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.base
+
+import org.testng.annotations.Test
+import xyz.srclab.common.base.*
+import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
+import xyz.srclab.common.base.CharsFormat.Companion.messageFormat
+import xyz.srclab.common.base.CharsFormat.Companion.printfFormat
+import xyz.srclab.common.base.CharsTemplate.Companion.resolveTemplate
+import xyz.srclab.common.base.Counter.Companion.counterStarts
+import xyz.srclab.common.base.LazyString.Companion.toLazyString
+import xyz.srclab.common.base.SemVer.Companion.parseSemVer
+import xyz.srclab.common.base.SpecParser.Companion.parseFirstClassNameToInstance
+import xyz.srclab.common.test.TestLogger
+import java.math.BigDecimal
+import java.util.*
+import kotlin.text.toBigDecimal
+import kotlin.text.toBoolean
+
+class BaseSample {
 
     @Test
     fun testCurrent() {
@@ -1334,7 +1362,13 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class BeanSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.bean;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.bean.Beans;
+import xyz.srclab.common.test.TestLogger;
+
+public class BeanSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -1399,7 +1433,13 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class BeanSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.bean
+
+import org.testng.annotations.Test
+import xyz.srclab.common.bean.copyProperties
+import xyz.srclab.common.test.TestLogger
+
+class BeanSample {
 
     @Test
     fun testBean() {
@@ -1440,37 +1480,48 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class EventBusSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.bus;
+
+import org.jetbrains.annotations.NotNull;
+import org.testng.annotations.Test;
+import xyz.srclab.common.bus.EventBus;
+import xyz.srclab.common.bus.EventHandler;
+import xyz.srclab.common.bus.EventHandlerNotFoundException;
+import xyz.srclab.common.test.TestLogger;
+
+import java.util.Arrays;
+
+public class EventBusSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testEventBus() {
         EventBus eventBus = EventBus.newEventBus(Arrays.asList(
-                new EventHandler&lt;Object&gt;() {
-                    @NotNull
-                    @Override
-                    public Object eventType() {
-                        return String.class;
-                    }
-
-                    @Override
-                    public void handle(@NotNull Object event) {
-                        logger.log(event);
-                    }
-                },
-                new EventHandler&lt;Object&gt;() {
-                    @NotNull
-                    @Override
-                    public Object eventType() {
-                        return Integer.class;
-                    }
-
-                    @Override
-                    public void handle(@NotNull Object event) {
-                        logger.log(event);
-                    }
+            new EventHandler&lt;Object&gt;() {
+                @NotNull
+                @Override
+                public Object eventType() {
+                    return String.class;
                 }
+
+                @Override
+                public void handle(@NotNull Object event) {
+                    logger.log(event);
+                }
+            },
+            new EventHandler&lt;Object&gt;() {
+                @NotNull
+                @Override
+                public Object eventType() {
+                    return Integer.class;
+                }
+
+                @Override
+                public void handle(@NotNull Object event) {
+                    logger.log(event);
+                }
+            }
         ));
         //1
         eventBus.emit(1);
@@ -1491,7 +1542,15 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class EventBusSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.bus
+
+import org.testng.annotations.Test
+import xyz.srclab.common.bus.EventBus
+import xyz.srclab.common.bus.EventHandler
+import xyz.srclab.common.bus.EventHandlerNotFoundException
+import xyz.srclab.common.test.TestLogger
+
+class EventBusSample {
 
     @Test
     fun testEventBus() {
@@ -1571,7 +1630,13 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class CacheSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.cache;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.cache.Cache;
+import xyz.srclab.common.test.TestLogger;
+
+public class CacheSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -1590,7 +1655,13 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class CacheSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.cache
+
+import org.testng.annotations.Test
+import xyz.srclab.common.cache.Cache
+import xyz.srclab.common.test.TestLogger
+
+class CacheSample {
 
     @Test
     fun testCache() {
@@ -1639,7 +1710,16 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class CollectSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.collect;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.base.Nums;
+import xyz.srclab.common.collect.*;
+import xyz.srclab.common.test.TestLogger;
+
+import java.util.*;
+
+public class CollectSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -1659,10 +1739,10 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
         list.add("3");
         ListOps&lt;String&gt; listOps = ListOps.opsFor(list);
         int sum = listOps.addAll(ArrayCollects.newArray("4", "5", "6"))
-                .removeFirst()
-                .map(it -&gt; it + "0")
-                .map(Nums::toInt)
-                .reduce(Integer::sum);
+            .removeFirst()
+            .map(it -&gt; it + "0")
+            .map(Nums::toInt)
+            .reduce(Integer::sum);
         //200
         logger.log("sum: {}", sum);
     }
@@ -1670,19 +1750,19 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
     @Test
     public void testMultiMap() {
         SetMap&lt;String, String&gt; setMap = SetMap.newSetMap(
-                Collects.newMap(
-                        new LinkedHashMap&lt;&gt;(),
-                        "s", Collects.newCollection(new LinkedHashSet&lt;&gt;(), "1", "2", "3")
-                )
+            Collects.newMap(
+                new LinkedHashMap&lt;&gt;(),
+                "s", Collects.newCollection(new LinkedHashSet&lt;&gt;(), "1", "2", "3")
+            )
         );
         //setMap: {s=[1, 2, 3]}
         logger.log("setMap: {}", setMap);
 
         MutableSetMap&lt;String, String&gt; mutableSetMap = MutableSetMap.newMutableSetMap(
-                Collects.newMap(
-                        new LinkedHashMap&lt;&gt;(),
-                        "s", Collects.newCollection(new LinkedHashSet&lt;&gt;(), "1", "2", "3")
-                )
+            Collects.newMap(
+                new LinkedHashMap&lt;&gt;(),
+                "s", Collects.newCollection(new LinkedHashSet&lt;&gt;(), "1", "2", "3")
+            )
         );
         mutableSetMap.add("s", "9");
         mutableSetMap.addAll("s", Collects.newCollection(new LinkedHashSet&lt;&gt;(), "11", "12", "13"));
@@ -1690,19 +1770,19 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
         logger.log("mutableSetMap: {}", mutableSetMap);
 
         ListMap&lt;String, String&gt; listMap = ListMap.newListMap(
-                Collects.newMap(
-                        new LinkedHashMap&lt;&gt;(),
-                        "s", Collects.newCollection(new LinkedList&lt;&gt;(), "1", "2", "3")
-                )
+            Collects.newMap(
+                new LinkedHashMap&lt;&gt;(),
+                "s", Collects.newCollection(new LinkedList&lt;&gt;(), "1", "2", "3")
+            )
         );
         //listMap: {s=[1, 2, 3]}
         logger.log("listMap: {}", listMap);
 
         MutableListMap&lt;String, String&gt; mutableListMap = MutableListMap.newMutableListMap(
-                Collects.newMap(
-                        new LinkedHashMap&lt;&gt;(),
-                        "s", Collects.newCollection(new LinkedList&lt;&gt;(), "1", "2", "3")
-                )
+            Collects.newMap(
+                new LinkedHashMap&lt;&gt;(),
+                "s", Collects.newCollection(new LinkedList&lt;&gt;(), "1", "2", "3")
+            )
         );
         mutableListMap.add("s", "9");
         mutableListMap.addAll("s", Collects.newCollection(new LinkedList&lt;&gt;(), "11", "12", "13"));
@@ -1715,7 +1795,18 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class CollectSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.collect
+
+import org.testng.annotations.Test
+import xyz.srclab.common.collect.ListMap.Companion.toListMap
+import xyz.srclab.common.collect.MutableListMap.Companion.toMutableListMap
+import xyz.srclab.common.collect.MutableSetMap.Companion.toMutableSetMap
+import xyz.srclab.common.collect.SetMap.Companion.toSetMap
+import xyz.srclab.common.collect.addElements
+import xyz.srclab.common.test.TestLogger
+import java.util.*
+
+class CollectSample {
 
     @Test
     fun testMultiMap() {
@@ -1768,7 +1859,18 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class ConvertSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.convert;
+
+import org.jetbrains.annotations.NotNull;
+import org.testng.annotations.Test;
+import xyz.srclab.common.convert.Converts;
+import xyz.srclab.common.convert.FastConvertHandler;
+import xyz.srclab.common.convert.FastConverter;
+import xyz.srclab.common.test.TestLogger;
+
+import java.util.Arrays;
+
+public class ConvertSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -1788,7 +1890,7 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
         logger.log("b1: {}", b.getP2());
 
         FastConverter&lt;String&gt; fastConverter = FastConverter.newFastConverter(
-                Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
+            Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
         //123
         logger.log(fastConverter.convert(new StringBuilder("123")));
         //123123
@@ -1870,7 +1972,15 @@ In copy-properties function, It is more than 20 times faster than Apache BeanUti
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class ConvertSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.convert
+
+import org.testng.annotations.Test
+import xyz.srclab.common.convert.FastConvertHandler
+import xyz.srclab.common.convert.FastConverter.Companion.newFastConverter
+import xyz.srclab.common.convert.convert
+import xyz.srclab.common.test.TestLogger
+
+class ConvertSample {
 
     @Test
     fun testConvert() {
@@ -1941,7 +2051,14 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class ExceptionSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.exception;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.exception.ExceptionStatus;
+import xyz.srclab.common.exception.StatusException;
+import xyz.srclab.common.test.TestLogger;
+
+public class ExceptionSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -1964,7 +2081,14 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class ExceptionSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.exception
+
+import org.testng.annotations.Test
+import xyz.srclab.common.exception.ExceptionStatus
+import xyz.srclab.common.exception.StatusException
+import xyz.srclab.common.test.TestLogger
+
+class ExceptionSample {
 
     @Test
     fun testStatusException() {
@@ -1990,7 +2114,13 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class InvokeSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.invoke;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.invoke.Invoker;
+import xyz.srclab.common.test.TestLogger;
+
+public class InvokeSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -2007,7 +2137,13 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class InvokeSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.invoke
+
+import org.testng.annotations.Test
+import xyz.srclab.common.invoke.Invoker
+import xyz.srclab.common.test.TestLogger
+
+class InvokeSample {
 
     @Test
     fun testInvoke() {
@@ -2032,7 +2168,13 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class JvmSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.jvm;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.jvm.Jvms;
+import xyz.srclab.common.test.TestLogger;
+
+public class JvmSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -2048,7 +2190,13 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class JvmSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.jvm
+
+import org.testng.annotations.Test
+import xyz.srclab.common.jvm.jvmDescriptor
+import xyz.srclab.common.test.TestLogger
+
+class JvmSample {
 
     @Test
     fun testJvms() {
@@ -2072,39 +2220,52 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class ProxySample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.proxy;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.testng.annotations.Test;
+import xyz.srclab.common.proxy.ProxyClass;
+import xyz.srclab.common.proxy.ProxyMethod;
+import xyz.srclab.common.proxy.SuperInvoker;
+import xyz.srclab.common.test.TestLogger;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
+public class ProxySample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testProxy() {
         ProxyClass&lt;Object&gt; proxyClass = ProxyClass.newProxyClass(
-                Object.class,
-                Arrays.asList(
-                        new ProxyMethod&lt;Object&gt;() {
-                            @NotNull
-                            @Override
-                            public String name() {
-                                return "toString";
-                            }
+            Object.class,
+            Arrays.asList(
+                new ProxyMethod&lt;Object&gt;() {
+                    @NotNull
+                    @Override
+                    public String name() {
+                        return "toString";
+                    }
 
-                            @NotNull
-                            @Override
-                            public Class&lt;?&gt;[] parameterTypes() {
-                                return new Class[0];
-                            }
+                    @NotNull
+                    @Override
+                    public Class&lt;?&gt;[] parameterTypes() {
+                        return new Class[0];
+                    }
 
-                            @Nullable
-                            @Override
-                            public Object invoke(
-                                    Object proxied,
-                                    @NotNull Method proxiedMethod,
-                                    @Nullable Object[] args, @NotNull SuperInvoker superInvoker
-                            ) {
-                                return "Proxy[super: " + superInvoker.invoke(args) + "]";
-                            }
-                        }
-                )
+                    @Nullable
+                    @Override
+                    public Object invoke(
+                        Object proxied,
+                        @NotNull Method proxiedMethod,
+                        @Nullable Object[] args, @NotNull SuperInvoker superInvoker
+                    ) {
+                        return "Proxy[super: " + superInvoker.invoke(args) + "]";
+                    }
+                }
+            )
         );
         String s = proxyClass.newInstance().toString();
         //Proxy[super: net.sf.cglib.empty.Object$$EnhancerByCGLIB$$4926690c@256f38d9]
@@ -2116,7 +2277,16 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class ProxySample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.proxy
+
+import org.testng.annotations.Test
+import xyz.srclab.common.proxy.ProxyClass.Companion.newProxyClass
+import xyz.srclab.common.proxy.ProxyMethod
+import xyz.srclab.common.proxy.SuperInvoker
+import xyz.srclab.common.test.TestLogger
+import java.lang.reflect.Method
+
+class ProxySample {
 
     @Test
     fun testProxy() {
@@ -2177,7 +2347,19 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class ReflectSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.reflect;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.reflect.Reflects;
+import xyz.srclab.common.reflect.Types;
+import xyz.srclab.common.test.TestLogger;
+
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+
+public class ReflectSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -2202,7 +2384,16 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class ReflectSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.reflect
+
+import org.testng.annotations.Test
+import xyz.srclab.common.reflect.genericArrayType
+import xyz.srclab.common.reflect.invoke
+import xyz.srclab.common.reflect.method
+import xyz.srclab.common.reflect.parameterizedType
+import xyz.srclab.common.test.TestLogger
+
+class ReflectSample {
 
     @Test
     fun testReflects() {
@@ -2235,7 +2426,20 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class RunSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.run;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.base.Current;
+import xyz.srclab.common.base.IntRef;
+import xyz.srclab.common.run.Runner;
+import xyz.srclab.common.run.Running;
+import xyz.srclab.common.run.Scheduler;
+import xyz.srclab.common.run.Scheduling;
+import xyz.srclab.common.test.TestLogger;
+
+import java.time.Duration;
+
+public class RunSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -2271,7 +2475,19 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class RunSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.run
+
+import org.testng.annotations.Test
+import xyz.srclab.common.base.Current.sleep
+import xyz.srclab.common.base.IntRef.Companion.of
+import xyz.srclab.common.run.Runner
+import xyz.srclab.common.run.Running
+import xyz.srclab.common.run.Scheduler
+import xyz.srclab.common.run.Scheduling
+import xyz.srclab.common.test.TestLogger
+import java.time.Duration
+
+class RunSample {
 
     @Test
     fun testRunner() {
@@ -2315,7 +2531,19 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class StateSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.state;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.testng.annotations.Test;
+import xyz.srclab.annotations.Immutable;
+import xyz.srclab.common.state.CharsState;
+import xyz.srclab.common.state.State;
+import xyz.srclab.common.test.TestLogger;
+
+import java.util.List;
+
+public class StateSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -2377,7 +2605,16 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class StateSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.state
+
+import org.testng.annotations.Test
+import xyz.srclab.common.state.CharsState
+import xyz.srclab.common.state.CharsState.Companion.joinStateDescriptions
+import xyz.srclab.common.state.CharsState.Companion.moreDescriptions
+import xyz.srclab.common.state.State
+import xyz.srclab.common.test.TestLogger
+
+class StateSample {
 
     @Test
     fun testState() {
@@ -2435,16 +2672,25 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class TestSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.test;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.test.TestTask;
+import xyz.srclab.common.test.Tests;
+
+import java.util.Arrays;
+
+public class TestSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testTests() {
         Tests.testTasks(Arrays.asList(
-                TestTask.newTask(() -&gt; {
-                    logger.log("Run test task!");
-                })
+            TestTask.newTask(() -&gt; {
+                logger.log("Run test task!");
+            })
         ));
     }
 }</code></pre>
@@ -2453,7 +2699,14 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class TestSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.test
+
+import org.testng.annotations.Test
+import xyz.srclab.common.test.TestLogger
+import xyz.srclab.common.test.TestTask
+import xyz.srclab.common.test.testTasks
+
+class TestSample {
 
     @Test
     fun testTests() {
@@ -2496,14 +2749,25 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class SerializeSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.serialize;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.reflect.TypeRef;
+import xyz.srclab.common.serialize.json.Json;
+import xyz.srclab.common.serialize.json.JsonSerials;
+import xyz.srclab.common.test.TestLogger;
+
+import java.util.Map;
+
+public class SerializeSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testJsonSerialize() {
         Json json = JsonSerials.toJson("{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}");
-        Map&lt;String, String&gt; map = json.toObject(new TypeRef&lt;Map&lt;String, String&gt;&gt;() {});
+        Map&lt;String, String&gt; map = json.toObject(new TypeRef&lt;Map&lt;String, String&gt;&gt;() {
+        });
         //{p1=p1 value, p2=p2 value}
         logger.log(map);
     }
@@ -2513,7 +2777,14 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class SerializeSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.serialize
+
+import org.testng.annotations.Test
+import xyz.srclab.common.reflect.TypeRef
+import xyz.srclab.common.serialize.json.toJson
+import xyz.srclab.common.test.TestLogger
+
+class SerializeSample {
 
     @Test
     fun testJsonSerialize() {
@@ -2551,7 +2822,16 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class CodecSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.codec;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.codec.Codec;
+import xyz.srclab.common.codec.aes.AesKeys;
+import xyz.srclab.common.test.TestLogger;
+
+import javax.crypto.SecretKey;
+
+public class CodecSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -2580,7 +2860,15 @@ private class StringConvertHandler : FastConvertHandler&lt;String&gt; {
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class CodecSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.codec
+
+import org.testng.annotations.Test
+import xyz.srclab.common.codec.Codec
+import xyz.srclab.common.codec.Codec.Companion.decodeBase64String
+import xyz.srclab.common.codec.aes.toAesKey
+import xyz.srclab.common.test.TestLogger
+
+class CodecSample {
 
     @Test
     fun testCodec() {
@@ -2637,13 +2925,19 @@ It provides IdFactory and a set of interface to generate id:</p>
 <div class="listingblock">
 <div class="title">Java Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">public class IdSample {
+<pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.common.id;
+
+import org.testng.annotations.Test;
+import xyz.srclab.common.id.StringIdSpec;
+import xyz.srclab.common.test.TestLogger;
+
+public class IdSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testId() {
-        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";;
+        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
         StringIdSpec stringIdSpec = new StringIdSpec(spec);
         //seq-202102071449568890000-tail
         for (int i = 0; i &lt; 10; i++) {
@@ -2656,11 +2950,17 @@ It provides IdFactory and a set of interface to generate id:</p>
 <div class="listingblock">
 <div class="title">Kotlin Examples</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class IdSample {
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.common.id
+
+import org.testng.annotations.Test
+import xyz.srclab.common.id.StringIdSpec
+import xyz.srclab.common.test.TestLogger
+
+class IdSample {
 
     @Test
     fun testId() {
-        val spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail"
+        val spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
         val stringIdSpec = StringIdSpec(spec)
         //seq-202102071449568890000-tail
         for (i in 0..9) {

@@ -123,6 +123,15 @@ clean:
 
 Java Examples
 
+    package sample.java.xyz.srclab.annotations;
+
+    import org.testng.Assert;
+    import org.testng.annotations.Test;
+    import xyz.srclab.annotations.Accepted;
+    import xyz.srclab.annotations.JavaBean;
+    import xyz.srclab.annotations.NonNull;
+    import xyz.srclab.annotations.Written;
+
     public class AnnotationSample {
 
         @Test
@@ -137,8 +146,8 @@ Java Examples
         }
 
         private void writeBuffer(
-                @Written StringBuilder buffer,
-                @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
+            @Written StringBuilder buffer,
+            @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
         ) {
             buffer.append(readOnly);
         }
@@ -171,25 +180,14 @@ Java Examples
 
 Kotlin Examples
 
-    class AnnotationSample {
+    package sample.kotlin.xyz.srclab.annotations
 
-        @Test
-        fun testAnnotations() {
-            val buffer = StringBuilder()
-            buffer.writeBuffer("123")
-            Assert.assertEquals(buffer.toString(), "123")
-        }
+    import org.testng.Assert
+    import org.testng.annotations.Test
+    import xyz.srclab.annotations.Acceptable
+    import xyz.srclab.annotations.Accepted
+    import xyz.srclab.annotations.Written
 
-        private fun @receiver:Written StringBuilder.writeBuffer(
-            @Acceptable(
-                Accepted(String::class),
-                Accepted(StringBuffer::class),
-            )
-            readOnly: String
-        ) {
-            this.append(readOnly)
-        }
-    }
     class AnnotationSample {
 
         @Test
@@ -233,6 +231,18 @@ utilities:
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.base;
+
+    import org.jetbrains.annotations.NotNull;
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.base.*;
+    import xyz.srclab.common.test.TestLogger;
+
+    import java.math.BigDecimal;
+    import java.time.LocalDateTime;
+    import java.util.*;
+    import java.util.stream.IntStream;
+
     public class BaseSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -240,11 +250,11 @@ Java Examples
         @Test
         public void testLet() {
             int sum = Let.of("1,2,3,4,5,6,7,8,9,10")
-                    .then(s -> s.split(","))
-                    .then(Arrays::asList)
-                    .then(l -> l.stream().mapToInt(Integer::parseInt))
-                    .then(IntStream::sum)
-                    .get();
+                .then(s -> s.split(","))
+                .then(Arrays::asList)
+                .then(l -> l.stream().mapToInt(Integer::parseInt))
+                .then(IntStream::sum)
+                .get();
             //55
             logger.log("sum: {}", sum);
         }
@@ -304,15 +314,15 @@ Java Examples
             args.put(1, "Cat");
             args.put(2, "Bird");
             CharsTemplate template1 = CharsTemplate.resolve(
-                    "This is a {name}, that is a {}", "{", "}");
+                "This is a {name}, that is a {}", "{", "}");
             //This is a Dog, that is a Cat
             logger.log(template1.process(args));
             CharsTemplate template2 = CharsTemplate.resolve(
-                    "This is a } {name}, that is a {}}", "{", "}");
+                "This is a } {name}, that is a {}}", "{", "}");
             //This is a } Dog, that is a Cat}
             logger.log(template2.process(args));
             CharsTemplate template3 = CharsTemplate.resolve(
-                    "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
+                "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
             //This is a } {DogX (Dog), that is a Bird\\{\
             logger.log(template3.process(args));
         }
@@ -484,19 +494,19 @@ Java Examples
             shell.println(Arrays.asList("Hello", ",", "World", "!"));
             shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
             shell.println(
-                    SgrChars.foregroundRed("red"),
-                    SgrChars.backgroundCyan(" "),
-                    SgrChars.foregroundGreen("green")
+                SgrChars.foregroundRed("red"),
+                SgrChars.backgroundCyan(" "),
+                SgrChars.foregroundGreen("green")
             );
             shell.println(
-                    SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
-                    SgrChars.backgroundCyan(" "),
-                    SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
+                SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
+                SgrChars.backgroundCyan(" "),
+                SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
             );
             shell.println(
-                    SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
-                    SgrChars.backgroundCyan(" "),
-                    SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
+                SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
+                SgrChars.backgroundCyan(" "),
+                SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
             );
             shell.println(ControlChars.beep());
             shell.println("123", ControlChars.backspaces(), "456", ControlChars.beep());
@@ -507,23 +517,23 @@ Java Examples
             String verString = "1.2.3-beta.2.3+123";
             SemVer semVer = SemVer.parse(verString);
             About about = About.of(
-                    "name",
-                    semVer.normalString(),
-                    Collections.singletonList(Author.of("name", "author@mail.com", null)),
-                    "123@123.com",
-                    "url",
-                    Collections.singletonList("licence"),
-                    Collections.singletonList(About.of(
-                            "poweredBy",
-                            null,
-                            Collections.emptyList(),
-                            null,
-                            null,
-                            Collections.emptyList(),
-                            Collections.emptyList(),
-                            null
-                    )),
-                    "© 2021 SrcLab"
+                "name",
+                semVer.normalString(),
+                Collections.singletonList(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
+                "url",
+                Collections.singletonList("licence"),
+                Collections.singletonList(About.of(
+                    "poweredBy",
+                    null,
+                    Collections.emptyList(),
+                    null,
+                    null,
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    null
+                )),
+                "© 2021 SrcLab"
             );
             //name
             //Version: 1.2.3
@@ -543,6 +553,24 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.base
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.base.*
+    import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
+    import xyz.srclab.common.base.CharsFormat.Companion.messageFormat
+    import xyz.srclab.common.base.CharsFormat.Companion.printfFormat
+    import xyz.srclab.common.base.CharsTemplate.Companion.resolveTemplate
+    import xyz.srclab.common.base.Counter.Companion.counterStarts
+    import xyz.srclab.common.base.LazyString.Companion.toLazyString
+    import xyz.srclab.common.base.SemVer.Companion.parseSemVer
+    import xyz.srclab.common.base.SpecParser.Companion.parseFirstClassNameToInstance
+    import xyz.srclab.common.test.TestLogger
+    import java.math.BigDecimal
+    import java.util.*
+    import kotlin.text.toBigDecimal
+    import kotlin.text.toBoolean
 
     class BaseSample {
 
@@ -838,6 +866,12 @@ Tip
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.bean;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.bean.Beans;
+    import xyz.srclab.common.test.TestLogger;
+
     public class BeanSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -901,6 +935,12 @@ Java Examples
 
 Kotlin Examples
 
+    package sample.kotlin.xyz.srclab.common.bean
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.bean.copyProperties
+    import xyz.srclab.common.test.TestLogger
+
     class BeanSample {
 
         @Test
@@ -938,6 +978,17 @@ Bus package provide EventBus.
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.bus;
+
+    import org.jetbrains.annotations.NotNull;
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.bus.EventBus;
+    import xyz.srclab.common.bus.EventHandler;
+    import xyz.srclab.common.bus.EventHandlerNotFoundException;
+    import xyz.srclab.common.test.TestLogger;
+
+    import java.util.Arrays;
+
     public class EventBusSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -945,30 +996,30 @@ Java Examples
         @Test
         public void testEventBus() {
             EventBus eventBus = EventBus.newEventBus(Arrays.asList(
-                    new EventHandler<Object>() {
-                        @NotNull
-                        @Override
-                        public Object eventType() {
-                            return String.class;
-                        }
-
-                        @Override
-                        public void handle(@NotNull Object event) {
-                            logger.log(event);
-                        }
-                    },
-                    new EventHandler<Object>() {
-                        @NotNull
-                        @Override
-                        public Object eventType() {
-                            return Integer.class;
-                        }
-
-                        @Override
-                        public void handle(@NotNull Object event) {
-                            logger.log(event);
-                        }
+                new EventHandler<Object>() {
+                    @NotNull
+                    @Override
+                    public Object eventType() {
+                        return String.class;
                     }
+
+                    @Override
+                    public void handle(@NotNull Object event) {
+                        logger.log(event);
+                    }
+                },
+                new EventHandler<Object>() {
+                    @NotNull
+                    @Override
+                    public Object eventType() {
+                        return Integer.class;
+                    }
+
+                    @Override
+                    public void handle(@NotNull Object event) {
+                        logger.log(event);
+                    }
+                }
             ));
             //1
             eventBus.emit(1);
@@ -986,6 +1037,14 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.bus
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.bus.EventBus
+    import xyz.srclab.common.bus.EventHandler
+    import xyz.srclab.common.bus.EventHandlerNotFoundException
+    import xyz.srclab.common.test.TestLogger
 
     class EventBusSample {
 
@@ -1053,6 +1112,12 @@ Boat provides a Cache interface and several implementations:
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.cache;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.cache.Cache;
+    import xyz.srclab.common.test.TestLogger;
+
     public class CacheSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1069,6 +1134,12 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.cache
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.cache.Cache
+    import xyz.srclab.common.test.TestLogger
 
     class CacheSample {
 
@@ -1109,6 +1180,15 @@ collection and array:
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.collect;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.base.Nums;
+    import xyz.srclab.common.collect.*;
+    import xyz.srclab.common.test.TestLogger;
+
+    import java.util.*;
+
     public class CollectSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1129,10 +1209,10 @@ Java Examples
             list.add("3");
             ListOps<String> listOps = ListOps.opsFor(list);
             int sum = listOps.addAll(ArrayCollects.newArray("4", "5", "6"))
-                    .removeFirst()
-                    .map(it -> it + "0")
-                    .map(Nums::toInt)
-                    .reduce(Integer::sum);
+                .removeFirst()
+                .map(it -> it + "0")
+                .map(Nums::toInt)
+                .reduce(Integer::sum);
             //200
             logger.log("sum: {}", sum);
         }
@@ -1140,19 +1220,19 @@ Java Examples
         @Test
         public void testMultiMap() {
             SetMap<String, String> setMap = SetMap.newSetMap(
-                    Collects.newMap(
-                            new LinkedHashMap<>(),
-                            "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
-                    )
+                Collects.newMap(
+                    new LinkedHashMap<>(),
+                    "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
+                )
             );
             //setMap: {s=[1, 2, 3]}
             logger.log("setMap: {}", setMap);
 
             MutableSetMap<String, String> mutableSetMap = MutableSetMap.newMutableSetMap(
-                    Collects.newMap(
-                            new LinkedHashMap<>(),
-                            "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
-                    )
+                Collects.newMap(
+                    new LinkedHashMap<>(),
+                    "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
+                )
             );
             mutableSetMap.add("s", "9");
             mutableSetMap.addAll("s", Collects.newCollection(new LinkedHashSet<>(), "11", "12", "13"));
@@ -1160,19 +1240,19 @@ Java Examples
             logger.log("mutableSetMap: {}", mutableSetMap);
 
             ListMap<String, String> listMap = ListMap.newListMap(
-                    Collects.newMap(
-                            new LinkedHashMap<>(),
-                            "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
-                    )
+                Collects.newMap(
+                    new LinkedHashMap<>(),
+                    "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
+                )
             );
             //listMap: {s=[1, 2, 3]}
             logger.log("listMap: {}", listMap);
 
             MutableListMap<String, String> mutableListMap = MutableListMap.newMutableListMap(
-                    Collects.newMap(
-                            new LinkedHashMap<>(),
-                            "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
-                    )
+                Collects.newMap(
+                    new LinkedHashMap<>(),
+                    "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
+                )
             );
             mutableListMap.add("s", "9");
             mutableListMap.addAll("s", Collects.newCollection(new LinkedList<>(), "11", "12", "13"));
@@ -1182,6 +1262,17 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.collect
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.collect.ListMap.Companion.toListMap
+    import xyz.srclab.common.collect.MutableListMap.Companion.toMutableListMap
+    import xyz.srclab.common.collect.MutableSetMap.Companion.toMutableSetMap
+    import xyz.srclab.common.collect.SetMap.Companion.toSetMap
+    import xyz.srclab.common.collect.addElements
+    import xyz.srclab.common.test.TestLogger
+    import java.util.*
 
     class CollectSample {
 
@@ -1226,6 +1317,17 @@ Convert package provides type-conversion function：
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.convert;
+
+    import org.jetbrains.annotations.NotNull;
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.convert.Converts;
+    import xyz.srclab.common.convert.FastConvertHandler;
+    import xyz.srclab.common.convert.FastConverter;
+    import xyz.srclab.common.test.TestLogger;
+
+    import java.util.Arrays;
+
     public class ConvertSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1246,7 +1348,7 @@ Java Examples
             logger.log("b1: {}", b.getP2());
 
             FastConverter<String> fastConverter = FastConverter.newFastConverter(
-                    Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
+                Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
             //123
             logger.log(fastConverter.convert(new StringBuilder("123")));
             //123123
@@ -1326,6 +1428,14 @@ Java Examples
 
 Kotlin Examples
 
+    package sample.kotlin.xyz.srclab.common.convert
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.convert.FastConvertHandler
+    import xyz.srclab.common.convert.FastConverter.Companion.newFastConverter
+    import xyz.srclab.common.convert.convert
+    import xyz.srclab.common.test.TestLogger
+
     class ConvertSample {
 
         @Test
@@ -1394,6 +1504,13 @@ from State (see [State](#_state)), and a ShouldNotException.
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.exception;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.exception.ExceptionStatus;
+    import xyz.srclab.common.exception.StatusException;
+    import xyz.srclab.common.test.TestLogger;
+
     public class ExceptionSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1414,6 +1531,13 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.exception
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.exception.ExceptionStatus
+    import xyz.srclab.common.exception.StatusException
+    import xyz.srclab.common.test.TestLogger
 
     class ExceptionSample {
 
@@ -1438,6 +1562,12 @@ functions (for Kotlin).
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.invoke;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.invoke.Invoker;
+    import xyz.srclab.common.test.TestLogger;
+
     public class InvokeSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1452,6 +1582,12 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.invoke
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.invoke.Invoker
+    import xyz.srclab.common.test.TestLogger
 
     class InvokeSample {
 
@@ -1474,6 +1610,12 @@ Jvm package provides Jvms utilities classes to get JVM infos.
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.jvm;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.jvm.Jvms;
+    import xyz.srclab.common.test.TestLogger;
+
     public class JvmSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1487,6 +1629,12 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.jvm
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.jvm.jvmDescriptor
+    import xyz.srclab.common.test.TestLogger
 
     class JvmSample {
 
@@ -1509,6 +1657,19 @@ JDK proxy.
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.proxy;
+
+    import org.jetbrains.annotations.NotNull;
+    import org.jetbrains.annotations.Nullable;
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.proxy.ProxyClass;
+    import xyz.srclab.common.proxy.ProxyMethod;
+    import xyz.srclab.common.proxy.SuperInvoker;
+    import xyz.srclab.common.test.TestLogger;
+
+    import java.lang.reflect.Method;
+    import java.util.Arrays;
+
     public class ProxySample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1516,32 +1677,32 @@ Java Examples
         @Test
         public void testProxy() {
             ProxyClass<Object> proxyClass = ProxyClass.newProxyClass(
-                    Object.class,
-                    Arrays.asList(
-                            new ProxyMethod<Object>() {
-                                @NotNull
-                                @Override
-                                public String name() {
-                                    return "toString";
-                                }
+                Object.class,
+                Arrays.asList(
+                    new ProxyMethod<Object>() {
+                        @NotNull
+                        @Override
+                        public String name() {
+                            return "toString";
+                        }
 
-                                @NotNull
-                                @Override
-                                public Class<?>[] parameterTypes() {
-                                    return new Class[0];
-                                }
+                        @NotNull
+                        @Override
+                        public Class<?>[] parameterTypes() {
+                            return new Class[0];
+                        }
 
-                                @Nullable
-                                @Override
-                                public Object invoke(
-                                        Object proxied,
-                                        @NotNull Method proxiedMethod,
-                                        @Nullable Object[] args, @NotNull SuperInvoker superInvoker
-                                ) {
-                                    return "Proxy[super: " + superInvoker.invoke(args) + "]";
-                                }
-                            }
-                    )
+                        @Nullable
+                        @Override
+                        public Object invoke(
+                            Object proxied,
+                            @NotNull Method proxiedMethod,
+                            @Nullable Object[] args, @NotNull SuperInvoker superInvoker
+                        ) {
+                            return "Proxy[super: " + superInvoker.invoke(args) + "]";
+                        }
+                    }
+                )
             );
             String s = proxyClass.newInstance().toString();
             //Proxy[super: net.sf.cglib.empty.Object$$EnhancerByCGLIB$$4926690c@256f38d9]
@@ -1550,6 +1711,15 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.proxy
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.proxy.ProxyClass.Companion.newProxyClass
+    import xyz.srclab.common.proxy.ProxyMethod
+    import xyz.srclab.common.proxy.SuperInvoker
+    import xyz.srclab.common.test.TestLogger
+    import java.lang.reflect.Method
 
     class ProxySample {
 
@@ -1601,6 +1771,18 @@ Reflect package provides utilities classes:
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.reflect;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.reflect.Reflects;
+    import xyz.srclab.common.reflect.Types;
+    import xyz.srclab.common.test.TestLogger;
+
+    import java.lang.reflect.GenericArrayType;
+    import java.lang.reflect.Method;
+    import java.lang.reflect.ParameterizedType;
+    import java.util.List;
+
     public class ReflectSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1623,6 +1805,15 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.reflect
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.reflect.genericArrayType
+    import xyz.srclab.common.reflect.invoke
+    import xyz.srclab.common.reflect.method
+    import xyz.srclab.common.reflect.parameterizedType
+    import xyz.srclab.common.test.TestLogger
 
     class ReflectSample {
 
@@ -1653,6 +1844,19 @@ Run package provides Runner and Scheduler interfaces to run codes in
 threads or coroutines.
 
 Java Examples
+
+    package sample.java.xyz.srclab.common.run;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.base.Current;
+    import xyz.srclab.common.base.IntRef;
+    import xyz.srclab.common.run.Runner;
+    import xyz.srclab.common.run.Running;
+    import xyz.srclab.common.run.Scheduler;
+    import xyz.srclab.common.run.Scheduling;
+    import xyz.srclab.common.test.TestLogger;
+
+    import java.time.Duration;
 
     public class RunSample {
 
@@ -1687,6 +1891,18 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.run
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.base.Current.sleep
+    import xyz.srclab.common.base.IntRef.Companion.of
+    import xyz.srclab.common.run.Runner
+    import xyz.srclab.common.run.Running
+    import xyz.srclab.common.run.Scheduler
+    import xyz.srclab.common.run.Scheduling
+    import xyz.srclab.common.test.TestLogger
+    import java.time.Duration
 
     class RunSample {
 
@@ -1728,6 +1944,18 @@ State package provides State interface to help build custom state or
 status type.
 
 Java Examples
+
+    package sample.java.xyz.srclab.common.state;
+
+    import org.jetbrains.annotations.NotNull;
+    import org.jetbrains.annotations.Nullable;
+    import org.testng.annotations.Test;
+    import xyz.srclab.annotations.Immutable;
+    import xyz.srclab.common.state.CharsState;
+    import xyz.srclab.common.state.State;
+    import xyz.srclab.common.test.TestLogger;
+
+    import java.util.List;
 
     public class StateSample {
 
@@ -1789,6 +2017,15 @@ Java Examples
 
 Kotlin Examples
 
+    package sample.kotlin.xyz.srclab.common.state
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.state.CharsState
+    import xyz.srclab.common.state.CharsState.Companion.joinStateDescriptions
+    import xyz.srclab.common.state.CharsState.Companion.moreDescriptions
+    import xyz.srclab.common.state.State
+    import xyz.srclab.common.test.TestLogger
+
     class StateSample {
 
         @Test
@@ -1835,6 +2072,15 @@ Test package provides simple test tools:
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.test;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.test.TestLogger;
+    import xyz.srclab.common.test.TestTask;
+    import xyz.srclab.common.test.Tests;
+
+    import java.util.Arrays;
+
     public class TestSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1842,14 +2088,21 @@ Java Examples
         @Test
         public void testTests() {
             Tests.testTasks(Arrays.asList(
-                    TestTask.newTask(() -> {
-                        logger.log("Run test task!");
-                    })
+                TestTask.newTask(() -> {
+                    logger.log("Run test task!");
+                })
             ));
         }
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.test
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.test.TestLogger
+    import xyz.srclab.common.test.TestTask
+    import xyz.srclab.common.test.testTasks
 
     class TestSample {
 
@@ -1883,6 +2136,16 @@ interface for serialization:
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.serialize;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.reflect.TypeRef;
+    import xyz.srclab.common.serialize.json.Json;
+    import xyz.srclab.common.serialize.json.JsonSerials;
+    import xyz.srclab.common.test.TestLogger;
+
+    import java.util.Map;
+
     public class SerializeSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1890,13 +2153,21 @@ Java Examples
         @Test
         public void testJsonSerialize() {
             Json json = JsonSerials.toJson("{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}");
-            Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {});
+            Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {
+            });
             //{p1=p1 value, p2=p2 value}
             logger.log(map);
         }
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.serialize
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.reflect.TypeRef
+    import xyz.srclab.common.serialize.json.toJson
+    import xyz.srclab.common.test.TestLogger
 
     class SerializeSample {
 
@@ -1927,6 +2198,15 @@ AES, RSA, SM2 and more algorithms:
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.codec;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.codec.Codec;
+    import xyz.srclab.common.codec.aes.AesKeys;
+    import xyz.srclab.common.test.TestLogger;
+
+    import javax.crypto.SecretKey;
+
     public class CodecSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
@@ -1953,6 +2233,14 @@ Java Examples
     }
 
 Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.codec
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.codec.Codec
+    import xyz.srclab.common.codec.Codec.Companion.decodeBase64String
+    import xyz.srclab.common.codec.aes.toAesKey
+    import xyz.srclab.common.test.TestLogger
 
     class CodecSample {
 
@@ -2001,13 +2289,19 @@ new id from a specification string, see its javadoc.
 
 Java Examples
 
+    package sample.java.xyz.srclab.common.id;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.id.StringIdSpec;
+    import xyz.srclab.common.test.TestLogger;
+
     public class IdSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
 
         @Test
         public void testId() {
-            String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";;
+            String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
             StringIdSpec stringIdSpec = new StringIdSpec(spec);
             //seq-202102071449568890000-tail
             for (int i = 0; i < 10; i++) {
@@ -2018,11 +2312,17 @@ Java Examples
 
 Kotlin Examples
 
+    package sample.kotlin.xyz.srclab.common.id
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.id.StringIdSpec
+    import xyz.srclab.common.test.TestLogger
+
     class IdSample {
 
         @Test
         fun testId() {
-            val spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail"
+            val spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
             val stringIdSpec = StringIdSpec(spec)
             //seq-202102071449568890000-tail
             for (i in 0..9) {
