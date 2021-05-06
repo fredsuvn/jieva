@@ -16,10 +16,10 @@ public class LetTest {
     public void testLet() {
         Let<String> let = Let.of("1,2,3,4,5,6");
         int sum = let.then(s -> s.split(","))
-                .then(Arrays::asList)
-                .then(l -> l.stream().mapToInt(Integer::parseInt))
-                .then(IntStream::sum)
-                .get();
+            .then(Arrays::asList)
+            .then(l -> l.stream().mapToInt(Integer::parseInt))
+            .then(IntStream::sum)
+            .get();
         Assert.assertEquals(sum, 21);
     }
 }

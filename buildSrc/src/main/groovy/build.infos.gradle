@@ -3,70 +3,70 @@
  */
 ext["infos"] = [
 
-    //Version
-    version      : "0.0.0",
+  //Version
+  version      : "0.0.0",
 
-    //Group
-    group        : "xyz.srclab.common",
+  //Group
+  group        : "xyz.srclab.common",
 
-    //Project url
-    url          : "https://github.com/srclab-projects/boat",
+  //Project url
+  url          : "https://github.com/srclab-projects/boat",
 
-    //Project inception year
-    inceptionYear: "2020",
+  //Project inception year
+  inceptionYear: "2020",
 
-    //Licenses
-    licenses     : [
-        [
-            name: "The Apache License, Version 2.0",
-            url : "http://www.apache.org/licenses/LICENSE-2.0.txt",
-        ],
+  //Licenses
+  licenses     : [
+    [
+      name: "The Apache License, Version 2.0",
+      url : "http://www.apache.org/licenses/LICENSE-2.0.txt",
     ],
+  ],
 
-    //Developers
-    developers   : [
-        [
-            id   : "fredsuvn",
-            name : "孙谦",
-            email: "fredsuvn@163.com",
-            url  : "https://github.com/fredsuvn",
-        ],
-        [
-            id             : "SrcLab",
-            name           : "SrcLab Team",
-            email          : "srclab@163.com",
-            organization   : "SrcLab",
-            organizationUrl: "https://github.com/srclab-projects",
-        ],
+  //Developers
+  developers   : [
+    [
+      id   : "fredsuvn",
+      name : "孙谦",
+      email: "fredsuvn@163.com",
+      url  : "https://github.com/fredsuvn",
     ],
-
-    //Publish info
-    publish      : [
-        //Whether publish
-        enablePublish: true,
-
-        //Whether publish as snapshot
-        isSnapshot   : false,
-
-        //Snapshot id
-        snapshotId   : "sonatype",
-
-        //Whether publish as Release
-        isRelease    : true,
-
-        //Release id
-        releaseId    : "sonatype",
-
-        //Whether signing
-        isSigning    : false,
-
-        //Signing id
-        signingId    : "gpg",
-
-        //Publish urls
-        urls         : [
-            release : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
-            snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
-        ],
+    [
+      id             : "SrcLab",
+      name           : "SrcLab Team",
+      email          : "srclab@163.com",
+      organization   : "SrcLab",
+      organizationUrl: "https://github.com/srclab-projects",
     ],
+  ],
+
+  //Publish info
+  publish      : [
+    //Whether publish
+    enablePublish: true,
+
+    //Whether publish as snapshot
+    isSnapshot   : false,
+
+    //Snapshot id
+    snapshotId   : "sonatype",
+
+    //Whether publish as Release
+    isRelease    : true,
+
+    //Release id
+    releaseId    : "sonatype",
+
+    //Whether signing
+    isSigning    : false,
+
+    //Signing id
+    signingId    : "gpg",
+
+    //Publish urls
+    urls         : [
+      release : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
+      snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
+    ],
+  ],
 ]

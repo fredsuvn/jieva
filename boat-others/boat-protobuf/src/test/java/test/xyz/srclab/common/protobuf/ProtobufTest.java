@@ -27,27 +27,27 @@ public class ProtobufTest {
     @Test
     public void testProtobufResolver() {
         MessageData messageData = MessageData.newBuilder()
-                .setType(MessageData.Type.TYPE_0)
-                .setMessage("666")
-                .addAllNumber(Arrays.asList("7", "8", "9"))
-                .putEntry("m1", "mm1")
-                .putEntry("m2", "mm2")
-                .build();
+            .setType(MessageData.Type.TYPE_0)
+            .setMessage("666")
+            .addAllNumber(Arrays.asList("7", "8", "9"))
+            .putEntry("m1", "mm1")
+            .putEntry("m2", "mm2")
+            .build();
         RequestMessage requestMessage = RequestMessage.newBuilder()
-                .setId("123")
-                .setData(messageData)
-                .build();
+            .setId("123")
+            .setData(messageData)
+            .build();
 
         BeanResolver beanResolver = ProtobufBeans.PROTOBUF_BEAN_RESOLVER;
         BeanType dataType = beanResolver.resolve(messageData.getClass());
         Assert.assertEquals(
-                dataType.properties().keySet().toArray(),
-                new Object[]{"type", "message", "numberList", "entryMap", "class"}
+            dataType.properties().keySet().toArray(),
+            new Object[]{"type", "message", "numberList", "entryMap", "class"}
         );
         BeanType requestType = beanResolver.resolve(requestMessage.getClass());
         Assert.assertEquals(
-                requestType.properties().keySet().toArray(),
-                new Object[]{"id", "data", "class"}
+            requestType.properties().keySet().toArray(),
+            new Object[]{"id", "data", "class"}
         );
 
         JavaMessageData javaMessageData = new JavaMessageData();
@@ -57,8 +57,8 @@ public class ProtobufTest {
         Assert.assertEquals(javaMessageData.getMessage(), "666");
         Assert.assertEquals(javaMessageData.getNumberList(), Arrays.asList("7", "8", "9"));
         Assert.assertEquals(
-                javaMessageData.getEntryMap(),
-                Collects.newMap(new LinkedHashMap<>(), "m1", "mm1", "m2", "mm2")
+            javaMessageData.getEntryMap(),
+            Collects.newMap(new LinkedHashMap<>(), "m1", "mm1", "m2", "mm2")
         );
 
         JavaRequestMessage javaRequestMessage = new JavaRequestMessage();
@@ -69,8 +69,8 @@ public class ProtobufTest {
         Assert.assertEquals(javaRequestMessage.getData().getMessage(), "666");
         Assert.assertEquals(javaRequestMessage.getData().getNumberList(), Arrays.asList("7", "8", "9"));
         Assert.assertEquals(
-                javaRequestMessage.getData().getEntryMap(),
-                Collects.newMap(new LinkedHashMap<>(), "m1", "mm1", "m2", "mm2")
+            javaRequestMessage.getData().getEntryMap(),
+            Collects.newMap(new LinkedHashMap<>(), "m1", "mm1", "m2", "mm2")
         );
 
         javaRequestMessage.setId("999");
@@ -83,45 +83,45 @@ public class ProtobufTest {
         MessageData.Builder messageDataBuilder = MessageData.newBuilder();
         Beans.copyProperties(javaMessageData, messageDataBuilder, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
         logger.log(
-                "messageDataBuilder: {}",
-                ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(messageDataBuilder)
+            "messageDataBuilder: {}",
+            ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(messageDataBuilder)
         );
         Assert.assertEquals(messageDataBuilder.getType(), MessageData.Type.TYPE_1);
         Assert.assertEquals(messageDataBuilder.getMessage(), "java");
         Assert.assertEquals(messageDataBuilder.getNumberList(), Arrays.asList("5", "6", "7"));
         Assert.assertEquals(
-                messageDataBuilder.getEntryMap(),
-                Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")
+            messageDataBuilder.getEntryMap(),
+            Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")
         );
 
         RequestMessage.Builder requestMessageBuilder = RequestMessage.newBuilder();
         Beans.copyProperties(javaRequestMessage, requestMessageBuilder, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
         logger.log(
-                "requestMessageBuilder: {}",
-                ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(requestMessageBuilder)
+            "requestMessageBuilder: {}",
+            ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(requestMessageBuilder)
         );
         Assert.assertEquals(requestMessageBuilder.getId(), "999");
         Assert.assertEquals(requestMessageBuilder.getData().getType(), MessageData.Type.TYPE_1);
         Assert.assertEquals(requestMessageBuilder.getData().getMessage(), "java");
         Assert.assertEquals(requestMessageBuilder.getData().getNumberList(), Arrays.asList("5", "6", "7"));
         Assert.assertEquals(
-                requestMessageBuilder.getData().getEntryMap(),
-                Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")
+            requestMessageBuilder.getData().getEntryMap(),
+            Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")
         );
 
         RequestMessage convertRequestMessage =
-                ProtobufConverts.PROTOBUF_CONVERTER.convert(javaRequestMessage, RequestMessage.class);
+            ProtobufConverts.PROTOBUF_CONVERTER.convert(javaRequestMessage, RequestMessage.class);
         logger.log(
-                "convertRequestMessage: {}",
-                ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(convertRequestMessage)
+            "convertRequestMessage: {}",
+            ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(convertRequestMessage)
         );
         Assert.assertEquals(convertRequestMessage.getId(), "999");
         Assert.assertEquals(convertRequestMessage.getData().getType(), MessageData.Type.TYPE_1);
         Assert.assertEquals(convertRequestMessage.getData().getMessage(), "java");
         Assert.assertEquals(convertRequestMessage.getData().getNumberList(), Arrays.asList("5", "6", "7"));
         Assert.assertEquals(
-                convertRequestMessage.getData().getEntryMap(),
-                Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")
+            convertRequestMessage.getData().getEntryMap(),
+            Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")
         );
     }
 

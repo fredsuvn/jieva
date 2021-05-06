@@ -114,8 +114,8 @@ public class BeanTest {
         Assert.assertEquals(simpleMap.get("p2"), 888);
 
         BeanCopyOptions copyOptions = BeanCopyOptions.DEFAULT
-                .withFromToTypes(SimpleBean.class, Types.parameterizedType(Map.class, String.class, int.class))
-                .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
+            .withFromToTypes(SimpleBean.class, Types.parameterizedType(Map.class, String.class, int.class))
+            .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
         //BeanResolver.CopyOptions copyOptions = BeanResolver.CopyOptions.DEFAULT
         //        .withTypes(SimpleBean.class, Types.parameterizedType(Map.class, String.class, int.class))
         //        .withNameFilter(n -> "p1".equals(n) || "p2".equals(n));
@@ -142,7 +142,7 @@ public class BeanTest {
         a.setS(s1);
 
         B<Long> b = Beans.copyProperties(a, new B(),
-                BeanCopyOptions.DEFAULT.withToType(Types.parameterizedType(B.class, Long.class)));
+            BeanCopyOptions.DEFAULT.withToType(Types.parameterizedType(B.class, Long.class)));
         //B<Long> b = Beans.copyProperties(a, new B(),
         //        BeanResolver.CopyOptions.DEFAULT.withToType(Types.parameterizedType(B.class, Long.class)));
         Assert.assertEquals(b.getI1(), Arrays.asList(1, 2, 3));

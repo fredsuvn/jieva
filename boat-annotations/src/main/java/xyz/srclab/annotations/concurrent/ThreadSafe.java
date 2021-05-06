@@ -8,14 +8,14 @@ import java.lang.annotation.*;
 @javax.annotation.concurrent.ThreadSafe
 @TypeQualifierNickname
 @Target({
-        ElementType.TYPE,
-        ElementType.METHOD,
-        ElementType.CONSTRUCTOR,
-        ElementType.FIELD,
-        ElementType.PARAMETER,
-        ElementType.LOCAL_VARIABLE,
-        ElementType.TYPE_PARAMETER,
-        ElementType.TYPE_USE,
+    ElementType.TYPE,
+    ElementType.METHOD,
+    ElementType.CONSTRUCTOR,
+    ElementType.FIELD,
+    ElementType.PARAMETER,
+    ElementType.LOCAL_VARIABLE,
+    ElementType.TYPE_PARAMETER,
+    ElementType.TYPE_USE,
 })
 public @interface ThreadSafe {
 }

@@ -3,8 +3,6 @@
 
 package xyz.srclab.common.base
 
-import java.util.*
-
 fun <T : Comparable<T>> T.inBounds(min: T, max: T): T {
     if (this < min) {
         return min

@@ -18,7 +18,7 @@ public class AnysTest {
         Assert.assertFalse(Anys.equals(new int[]{1, 2, 3}, new int[]{1, 2, 3}));
         Assert.assertTrue(Anys.anyOrArrayEquals(new int[]{1, 2, 3}, new int[]{1, 2, 3}));
         Assert.assertTrue(Anys.anyOrArrayDeepEquals(
-                new Object[]{1, new int[]{1, 2, 3}, 3}, new Object[]{1, new int[]{1, 2, 3}, 3}));
+            new Object[]{1, new int[]{1, 2, 3}, 3}, new Object[]{1, new int[]{1, 2, 3}, 3}));
     }
 
     @Test

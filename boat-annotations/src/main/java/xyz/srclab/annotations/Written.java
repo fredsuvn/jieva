@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-        ElementType.PARAMETER,
+    ElementType.PARAMETER,
 })
 public @interface Written {
 }

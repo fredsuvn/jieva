@@ -42,7 +42,7 @@ public class IdTest {
     public void testCustomId() {
         String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-{my, value}";
         Map<String, Function1<String[], IdComponentFactory<?>>> generators =
-                new HashMap<>(StringIdSpec.DEFAULT_COMPONENT_FACTORY_PROVIDERS);
+            new HashMap<>(StringIdSpec.DEFAULT_COMPONENT_FACTORY_PROVIDERS);
         generators.put("my", (args) -> new MyIdComponentFactory(args[0]));
         StringIdSpec stringIdSpec = new StringIdSpec(spec, generators);
         for (int i = 0; i < 10; i++) {

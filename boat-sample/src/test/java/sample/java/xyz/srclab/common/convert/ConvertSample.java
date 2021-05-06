@@ -29,7 +29,7 @@ public class ConvertSample {
         logger.log("b1: {}", b.getP2());
 
         FastConverter<String> fastConverter = FastConverter.newFastConverter(
-                Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
+            Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
         //123
         logger.log(fastConverter.convert(new StringBuilder("123")));
         //123123

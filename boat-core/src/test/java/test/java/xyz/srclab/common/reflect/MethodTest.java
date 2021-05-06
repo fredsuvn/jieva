@@ -36,43 +36,43 @@ public class MethodTest {
     @Test
     public void testFind() throws Exception {
         Assert.assertEquals(
-                Reflects.methods(NewClass.class),
-                Arrays.asList(NewClass.class.getMethods())
+            Reflects.methods(NewClass.class),
+            Arrays.asList(NewClass.class.getMethods())
         );
         Assert.assertEquals(
-                Reflects.declaredMethods(NewClass.class),
-                Arrays.asList(NewClass.class.getDeclaredMethods())
+            Reflects.declaredMethods(NewClass.class),
+            Arrays.asList(NewClass.class.getDeclaredMethods())
         );
         Assert.assertEquals(
-                Collects.sorted(Reflects.ownedMethods(SubNewClass.class), Comparator.comparing(Method::toString)),
-                Collects.sorted(Arrays.asList(
-                        subPublicMethod,
-                        publicMethod,
-                        NewClass.class.getMethod("equals", Object.class),
-                        NewClass.class.getMethod("hashCode"),
-                        NewClass.class.getMethod("wait"),
-                        NewClass.class.getMethod("wait", long.class),
-                        NewClass.class.getMethod("wait", long.class, int.class),
-                        NewClass.class.getMethod("toString"),
-                        NewClass.class.getMethod("getClass"),
-                        NewClass.class.getMethod("notify"),
-                        NewClass.class.getMethod("notifyAll"),
-                        superPublicMethod,
-                        subProtectedMethod,
-                        subPrivateMethod,
-                        subPackageMethod
-                ), Comparator.comparing(Method::toString))
+            Collects.sorted(Reflects.ownedMethods(SubNewClass.class), Comparator.comparing(Method::toString)),
+            Collects.sorted(Arrays.asList(
+                subPublicMethod,
+                publicMethod,
+                NewClass.class.getMethod("equals", Object.class),
+                NewClass.class.getMethod("hashCode"),
+                NewClass.class.getMethod("wait"),
+                NewClass.class.getMethod("wait", long.class),
+                NewClass.class.getMethod("wait", long.class, int.class),
+                NewClass.class.getMethod("toString"),
+                NewClass.class.getMethod("getClass"),
+                NewClass.class.getMethod("notify"),
+                NewClass.class.getMethod("notifyAll"),
+                superPublicMethod,
+                subProtectedMethod,
+                subPrivateMethod,
+                subPackageMethod
+            ), Comparator.comparing(Method::toString))
         );
 
         Assert.assertEquals(
-                Reflects.ownedMethodOrNull(NewClass.class, "protectedMethod"),
-                NewClass.class.getDeclaredMethod("protectedMethod")
+            Reflects.ownedMethodOrNull(NewClass.class, "protectedMethod"),
+            NewClass.class.getDeclaredMethod("protectedMethod")
         );
         Assert.assertNull(Reflects.ownedMethodOrNull(NewClass.class, "superProtectedMethod"));
 
         Assert.assertEquals(
-                Reflects.searchMethods(SubNewClass.class, m -> m.getName().contains("ackage")),
-                Arrays.asList(subPackageMethod, packageMethod, superPackageMethod)
+            Reflects.searchMethods(SubNewClass.class, m -> m.getName().contains("ackage")),
+            Arrays.asList(subPackageMethod, packageMethod, superPackageMethod)
         );
     }
 
@@ -80,19 +80,19 @@ public class MethodTest {
     public void testInvoke() {
         NewClass newClass = new NewClass();
         Assert.assertEquals(
-                Reflects.invoke(superPublicMethod, newClass),
-                "superPublicField"
+            Reflects.invoke(superPublicMethod, newClass),
+            "superPublicField"
         );
         Assert.assertEquals(
-                Reflects.invokeForcible(privateMethod, newClass),
-                "privateField"
+            Reflects.invokeForcible(privateMethod, newClass),
+            "privateField"
         );
         Assert.expectThrows(IllegalAccessException.class, () ->
-                Reflects.invoke(superPrivateMethod, newClass)
+            Reflects.invoke(superPrivateMethod, newClass)
         );
         Assert.assertEquals(
-                Reflects.invokeForcible(superPrivateMethod, newClass),
-                "superPrivateField"
+            Reflects.invokeForcible(superPrivateMethod, newClass),
+            "superPrivateField"
         );
     }
 }

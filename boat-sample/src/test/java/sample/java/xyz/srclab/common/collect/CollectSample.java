@@ -27,10 +27,10 @@ public class CollectSample {
         list.add("3");
         ListOps<String> listOps = ListOps.opsFor(list);
         int sum = listOps.addAll(ArrayCollects.newArray("4", "5", "6"))
-                .removeFirst()
-                .map(it -> it + "0")
-                .map(Nums::toInt)
-                .reduce(Integer::sum);
+            .removeFirst()
+            .map(it -> it + "0")
+            .map(Nums::toInt)
+            .reduce(Integer::sum);
         //200
         logger.log("sum: {}", sum);
     }
@@ -38,19 +38,19 @@ public class CollectSample {
     @Test
     public void testMultiMap() {
         SetMap<String, String> setMap = SetMap.newSetMap(
-                Collects.newMap(
-                        new LinkedHashMap<>(),
-                        "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
-                )
+            Collects.newMap(
+                new LinkedHashMap<>(),
+                "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
+            )
         );
         //setMap: {s=[1, 2, 3]}
         logger.log("setMap: {}", setMap);
 
         MutableSetMap<String, String> mutableSetMap = MutableSetMap.newMutableSetMap(
-                Collects.newMap(
-                        new LinkedHashMap<>(),
-                        "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
-                )
+            Collects.newMap(
+                new LinkedHashMap<>(),
+                "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
+            )
         );
         mutableSetMap.add("s", "9");
         mutableSetMap.addAll("s", Collects.newCollection(new LinkedHashSet<>(), "11", "12", "13"));
@@ -58,19 +58,19 @@ public class CollectSample {
         logger.log("mutableSetMap: {}", mutableSetMap);
 
         ListMap<String, String> listMap = ListMap.newListMap(
-                Collects.newMap(
-                        new LinkedHashMap<>(),
-                        "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
-                )
+            Collects.newMap(
+                new LinkedHashMap<>(),
+                "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
+            )
         );
         //listMap: {s=[1, 2, 3]}
         logger.log("listMap: {}", listMap);
 
         MutableListMap<String, String> mutableListMap = MutableListMap.newMutableListMap(
-                Collects.newMap(
-                        new LinkedHashMap<>(),
-                        "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
-                )
+            Collects.newMap(
+                new LinkedHashMap<>(),
+                "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
+            )
         );
         mutableListMap.add("s", "9");
         mutableListMap.addAll("s", Collects.newCollection(new LinkedList<>(), "11", "12", "13"));

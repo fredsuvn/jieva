@@ -41,9 +41,9 @@ public class TypeRefTest {
         Assert.assertEquals(stringTypeRef.type(), String.class);
 
         Assert.assertEquals(
-                Types.parameterizedType(List.class, String.class),
-                new TypeRef<List<String>>() {
-                }.type()
+            Types.parameterizedType(List.class, String.class),
+            new TypeRef<List<String>>() {
+            }.type()
         );
     }
 }

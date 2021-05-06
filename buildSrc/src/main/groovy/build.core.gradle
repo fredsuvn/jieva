@@ -12,11 +12,11 @@ static boolean isEnable(Object value) {
   }
   String valueToString = value.toString()
   return valueToString.equalsIgnoreCase("true") ||
-      valueToString.equalsIgnoreCase("yes") ||
-      valueToString.equalsIgnoreCase("1") ||
-      valueToString.equalsIgnoreCase("t") ||
-      valueToString.equalsIgnoreCase("open") ||
-      valueToString.equalsIgnoreCase("enbale")
+    valueToString.equalsIgnoreCase("yes") ||
+    valueToString.equalsIgnoreCase("1") ||
+    valueToString.equalsIgnoreCase("t") ||
+    valueToString.equalsIgnoreCase("open") ||
+    valueToString.equalsIgnoreCase("enbale")
 }
 
 static def currentGradleDirectoryPath(buildscript) {
@@ -26,8 +26,8 @@ static def currentGradleDirectoryPath(buildscript) {
 }
 
 ext["utils"] = [
-    isEnable                  : this.&isEnable,
-    currentGradleDirectoryPath: this.&currentGradleDirectoryPath,
+  isEnable                  : this.&isEnable,
+  currentGradleDirectoryPath: this.&currentGradleDirectoryPath,
 ]
 
 class Printer {

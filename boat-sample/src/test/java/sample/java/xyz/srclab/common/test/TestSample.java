@@ -14,9 +14,9 @@ public class TestSample {
     @Test
     public void testTests() {
         Tests.testTasks(Arrays.asList(
-                TestTask.newTask(() -> {
-                    logger.log("Run test task!");
-                })
+            TestTask.newTask(() -> {
+                logger.log("Run test task!");
+            })
         ));
     }
 }

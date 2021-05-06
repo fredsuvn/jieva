@@ -39,8 +39,8 @@ private val protobufBuildFunction: (builder: Any, toType: Class<*>) -> Any = { b
     when {
         //Message but not builder
         (MessageOrBuilder::class.java.isAssignableFrom(toType)
-                && !Message.Builder::class.java.isAssignableFrom(toType)
-                && builder is Message.Builder) -> {
+            && !Message.Builder::class.java.isAssignableFrom(toType)
+            && builder is Message.Builder) -> {
             builder.build()
         }
         else -> builder

@@ -51,8 +51,8 @@ public class LazyTest {
         LazyString<Integer> lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
         logger.log("lazyString: {}", lazyString);
         Assert.assertEquals(
-                lazyString.get(),
-                new Integer(0)
+            lazyString.get(),
+            new Integer(0)
         );
     }
 }

@@ -31,30 +31,30 @@ public class FieldTest {
     @Test
     public void testFind() throws Exception {
         Assert.assertEquals(
-                Reflects.fields(NewClass.class),
-                Arrays.asList(NewClass.class.getFields())
+            Reflects.fields(NewClass.class),
+            Arrays.asList(NewClass.class.getFields())
         );
         Assert.assertEquals(
-                Reflects.declaredFields(NewClass.class),
-                Arrays.asList(NewClass.class.getDeclaredFields())
+            Reflects.declaredFields(NewClass.class),
+            Arrays.asList(NewClass.class.getDeclaredFields())
         );
         Assert.assertEquals(
-                Reflects.ownedFields(SubNewClass.class),
-                Arrays.asList(
-                        subPublicField, publicField, superPublicField,
-                        subProtectedField, subPrivateField, subPackageField
-                )
+            Reflects.ownedFields(SubNewClass.class),
+            Arrays.asList(
+                subPublicField, publicField, superPublicField,
+                subProtectedField, subPrivateField, subPackageField
+            )
         );
 
         Assert.assertEquals(
-                Reflects.ownedField(NewClass.class, "protectedField"),
-                NewClass.class.getDeclaredField("protectedField")
+            Reflects.ownedField(NewClass.class, "protectedField"),
+            NewClass.class.getDeclaredField("protectedField")
         );
         Assert.assertNull(Reflects.ownedFieldOrNull(NewClass.class, "superProtectedField"));
 
         Assert.assertEquals(
-                Reflects.searchFields(SubNewClass.class, f -> f.getName().contains("ackage")),
-                Arrays.asList(subPackageField, packageField, superPackageField)
+            Reflects.searchFields(SubNewClass.class, f -> f.getName().contains("ackage")),
+            Arrays.asList(subPackageField, packageField, superPackageField)
         );
     }
 
@@ -63,43 +63,43 @@ public class FieldTest {
         NewClass newClass = new NewClass();
 
         Assert.assertEquals(
-                Reflects.getFieldValue(
-                        NewClass.class, "superPrivateField", newClass, true, true),
-                "superPrivateField"
+            Reflects.getFieldValue(
+                NewClass.class, "superPrivateField", newClass, true, true),
+            "superPrivateField"
         );
         Reflects.setFieldValue(
-                NewClass.class,
-                "superPrivateField",
-                newClass,
-                "superPrivateField2",
-                true,
-                true);
+            NewClass.class,
+            "superPrivateField",
+            newClass,
+            "superPrivateField2",
+            true,
+            true);
         Assert.assertEquals(
-                Reflects.getFieldValue(
-                        NewClass.class, "superPrivateField", newClass, true, true),
-                "superPrivateField2"
+            Reflects.getFieldValue(
+                NewClass.class, "superPrivateField", newClass, true, true),
+            "superPrivateField2"
         );
 
         Assert.expectThrows(NoSuchFieldException.class, () ->
-                Reflects.getFieldValue(
-                        NewClass.class, "superPrivateField", newClass, false, true)
+            Reflects.getFieldValue(
+                NewClass.class, "superPrivateField", newClass, false, true)
         );
 
         Assert.assertEquals(
-                Reflects.getFieldValue(
-                        newClass, "superPrivateField", true, true),
-                "superPrivateField2"
+            Reflects.getFieldValue(
+                newClass, "superPrivateField", true, true),
+            "superPrivateField2"
         );
         Reflects.setFieldValue(
-                newClass,
-                "superPrivateField",
-                "superPrivateField222",
-                true,
-                true);
+            newClass,
+            "superPrivateField",
+            "superPrivateField222",
+            true,
+            true);
         Assert.assertEquals(
-                Reflects.getFieldValue(
-                        NewClass.class, "superPrivateField", newClass, true, true),
-                "superPrivateField222"
+            Reflects.getFieldValue(
+                NewClass.class, "superPrivateField", newClass, true, true),
+            "superPrivateField222"
         );
     }
 }

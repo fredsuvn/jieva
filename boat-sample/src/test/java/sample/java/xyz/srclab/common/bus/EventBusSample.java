@@ -16,30 +16,30 @@ public class EventBusSample {
     @Test
     public void testEventBus() {
         EventBus eventBus = EventBus.newEventBus(Arrays.asList(
-                new EventHandler<Object>() {
-                    @NotNull
-                    @Override
-                    public Object eventType() {
-                        return String.class;
-                    }
-
-                    @Override
-                    public void handle(@NotNull Object event) {
-                        logger.log(event);
-                    }
-                },
-                new EventHandler<Object>() {
-                    @NotNull
-                    @Override
-                    public Object eventType() {
-                        return Integer.class;
-                    }
-
-                    @Override
-                    public void handle(@NotNull Object event) {
-                        logger.log(event);
-                    }
+            new EventHandler<Object>() {
+                @NotNull
+                @Override
+                public Object eventType() {
+                    return String.class;
                 }
+
+                @Override
+                public void handle(@NotNull Object event) {
+                    logger.log(event);
+                }
+            },
+            new EventHandler<Object>() {
+                @NotNull
+                @Override
+                public Object eventType() {
+                    return Integer.class;
+                }
+
+                @Override
+                public void handle(@NotNull Object event) {
+                    logger.log(event);
+                }
+            }
         ));
         //1
         eventBus.emit(1);

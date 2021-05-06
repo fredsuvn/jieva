@@ -11,10 +11,10 @@ import java.util.Arrays;
 public class Sm3 {
 
     private static final char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8',
-            '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     private static final String ivHexStr = "7380166f 4914b2b9 172442d7 da8a0600 a96f30bc 163138aa e38dee4d b0fb0e4e";
     private static final BigInteger IV = new BigInteger(ivHexStr.replaceAll(" ",
-            ""), 16);
+        ""), 16);
     private static final Integer Tj15 = Integer.valueOf("79cc4519", 16);
     private static final Integer Tj63 = Integer.valueOf("7a879d8a", 16);
     private static final byte[] FirstPadding = {(byte) 0x80};
@@ -61,8 +61,8 @@ public class Sm3 {
             return x ^ y ^ z;
         } else if (j >= 16 && j <= 63) {
             return (x & y)
-                    | (x & z)
-                    | (y & z);
+                | (x & z)
+                | (y & z);
         } else {
             throw new RuntimeException("data invalid");
         }
@@ -73,7 +73,7 @@ public class Sm3 {
             return x ^ y ^ z;
         } else if (j >= 16 && j <= 63) {
             return (x & y)
-                    | (~x & z);
+                | (~x & z);
         } else {
             throw new RuntimeException("data invalid");
         }
@@ -81,14 +81,14 @@ public class Sm3 {
 
     private static Integer P0(Integer x) {
         return x
-                ^ Integer.rotateLeft(x, 9)
-                ^ Integer.rotateLeft(x, 17);
+            ^ Integer.rotateLeft(x, 9)
+            ^ Integer.rotateLeft(x, 17);
     }
 
     private static Integer P1(Integer x) {
         return x
-                ^ Integer.rotateLeft(x, 15)
-                ^ Integer.rotateLeft(x, 23);
+            ^ Integer.rotateLeft(x, 15)
+            ^ Integer.rotateLeft(x, 23);
     }
 
     private static byte[] padding(byte[] source) throws IOException {
@@ -135,7 +135,7 @@ public class Sm3 {
         }
         for (int j = 16; j < 68; j++) {
             w[j] = P1(w[j - 16] ^ w[j - 9] ^ Integer.rotateLeft(w[j - 3], 15))
-                    ^ Integer.rotateLeft(w[j - 13], 7) ^ w[j - 6];
+                ^ Integer.rotateLeft(w[j - 13], 7) ^ w[j - 6];
         }
         for (int j = 0; j < 64; j++) {
             w1[j] = w[j] ^ w[j + 4];
@@ -143,9 +143,9 @@ public class Sm3 {
         int ss1, ss2, tt1, tt2;
         for (int j = 0; j < 64; j++) {
             ss1 = Integer
-                    .rotateLeft(
-                            Integer.rotateLeft(a, 12) + e
-                                    + Integer.rotateLeft(T(j), j), 7);
+                .rotateLeft(
+                    Integer.rotateLeft(a, 12) + e
+                        + Integer.rotateLeft(T(j), j), 7);
             ss2 = ss1 ^ Integer.rotateLeft(a, 12);
             tt1 = FF(a, b, c, j) + d + ss2 + w1[j];
             tt2 = GG(e, f, g, j) + h + ss1 + w[j];

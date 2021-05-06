@@ -19,7 +19,7 @@ public class FastConvertTest {
     @Test
     public void testFastConvert() {
         FastConverter<String> fastConverter = FastConverter.newFastConverter(
-                Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
+            Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
         logger.log(fastConverter.convert(new StringBuilder("123")));
         logger.log(fastConverter.convert("123"));
         Assert.assertEquals(fastConverter.convert(new StringBuilder("123")), "123");

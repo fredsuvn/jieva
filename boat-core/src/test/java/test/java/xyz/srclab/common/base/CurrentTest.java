@@ -19,7 +19,7 @@ public class CurrentTest {
         Assert.assertEquals(Current.getOrElse("1234", "4321"), "4321");
         Assert.assertEquals(Current.getOrNull("1234"), (Object) null);
         Assert.expectThrows(IllegalArgumentException.class, () ->
-                Current.getOrThrow("1234", k -> new IllegalArgumentException(k.toString())));
+            Current.getOrThrow("1234", k -> new IllegalArgumentException(k.toString())));
 
         @Nullable StackTraceElement stackTraceElement = new Caller().call();
         Assert.assertNotNull(stackTraceElement);

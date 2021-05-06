@@ -40,23 +40,23 @@ public class AboutTest {
     @Test
     public void testAbout() {
         About about = About.of(
-                "name",
-                "1.2.3",
-                Collections.singletonList(Author.of("name", "author@mail.com", null)),
-                "123@123.com",
-                "url",
-                Collections.singletonList("licence"),
-                Collections.singletonList(About.of(
-                        "poweredBy",
-                        null,
-                        Collections.emptyList(),
-                        null,
-                        null,
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        null
-                )),
-                "© 2021 SrcLab"
+            "name",
+            "1.2.3",
+            Collections.singletonList(Author.of("name", "author@mail.com", null)),
+            "123@123.com",
+            "url",
+            Collections.singletonList("licence"),
+            Collections.singletonList(About.of(
+                "poweredBy",
+                null,
+                Collections.emptyList(),
+                null,
+                null,
+                Collections.emptyList(),
+                Collections.emptyList(),
+                null
+            )),
+            "© 2021 SrcLab"
         );
         logger.log(about);
     }

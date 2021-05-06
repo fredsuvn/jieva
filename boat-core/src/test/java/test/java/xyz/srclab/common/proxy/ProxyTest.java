@@ -44,16 +44,16 @@ public class ProxyTest {
 
             @Override
             public Object invoke(
-                    T proxied, @NotNull Method proxiedMethod, @Nullable Object[] args, @NotNull SuperInvoker superInvoker) {
+                T proxied, @NotNull Method proxiedMethod, @Nullable Object[] args, @NotNull SuperInvoker superInvoker) {
                 logger.log("method: {}, declaring class: {}", proxiedMethod, proxiedMethod.getDeclaringClass());
                 return "proxy-> " + (type.isInterface() ? "interface" : superInvoker.invoke(args));
             }
         };
         ProxyClass<T> proxyClass = ProxyClass.newProxyClass(
-                type, Arrays.asList(proxyMethod), Current.classLoader(), proxyClassFactory);
+            type, Arrays.asList(proxyMethod), Current.classLoader(), proxyClassFactory);
         Assert.assertEquals(
-                proxyClass.newInstance().hello("a", "b"),
-                type.isInterface() ? "proxy-> interface" : "proxy-> hello: a = a, b = b");
+            proxyClass.newInstance().hello("a", "b"),
+            type.isInterface() ? "proxy-> interface" : "proxy-> hello: a = a, b = b");
     }
 
     public static class TC implements TI {

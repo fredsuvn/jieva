@@ -22,8 +22,8 @@ abstract class TypeRef<T> {
         if (generic !is ParameterizedType) {
             throw ShouldNotException(
                 "Here: " +
-                        "[[val generic = this.javaClass.genericSuperclass(null, TypeRef::class.java)]] " +
-                        "should return a ParameterizedType but a $generic."
+                    "[[val generic = this.javaClass.genericSuperclass(null, TypeRef::class.java)]] " +
+                    "should return a ParameterizedType but a $generic."
             )
         }
         return generic.actualTypeArguments[0]

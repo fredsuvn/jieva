@@ -18,19 +18,19 @@ public class ShellTest {
         shell.println(Arrays.asList("Hello", ",", "World", "!"));
         shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
         shell.println(
-                SgrChars.foregroundRed("red"),
-                SgrChars.backgroundCyan(" "),
-                SgrChars.foregroundGreen("green")
+            SgrChars.foregroundRed("red"),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.foregroundGreen("green")
         );
         shell.println(
-                SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
-                SgrChars.backgroundCyan(" "),
-                SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
+            SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
         );
         shell.println(
-                SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
-                SgrChars.backgroundCyan(" "),
-                SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
+            SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
         );
         shell.println(ControlChars.beep());
         logger.log("123\010456\007");
@@ -49,8 +49,8 @@ public class ShellTest {
     private void testShellProcessOnUnixLike() {
         Shell shell = Shell.DEFAULT;
         String content = "first line;" + Default.lineSeparator() +
-                "第二行;" + Default.lineSeparator() +
-                "third line.";
+            "第二行;" + Default.lineSeparator() +
+            "third line.";
         ShellProcess shellProcess = shell.run("echo", content);
         String output = shellProcess.readAll();
         logger.log(output);

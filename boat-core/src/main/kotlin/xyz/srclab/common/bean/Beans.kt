@@ -218,8 +218,8 @@ private class BeanAsMap(
         properties.entries
             .filter {
                 val flag = it.value.isReadable
-                        && copyOptions.nameFilter(it.key)
-                        && copyOptions.fromTypeFilter(it.key, String::class.java, it.value.type)
+                    && copyOptions.nameFilter(it.key)
+                    && copyOptions.fromTypeFilter(it.key, String::class.java, it.value.type)
                 if (!flag) {
                     return@filter false
                 }
@@ -230,7 +230,7 @@ private class BeanAsMap(
                     it.value.type,
                     value
                 )
-                        && copyOptions.convertFilter(
+                    && copyOptions.convertFilter(
                     it.key,
                     String::class.java,
                     it.value.type,

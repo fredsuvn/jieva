@@ -18,32 +18,32 @@ public class ProxySample {
     @Test
     public void testProxy() {
         ProxyClass<Object> proxyClass = ProxyClass.newProxyClass(
-                Object.class,
-                Arrays.asList(
-                        new ProxyMethod<Object>() {
-                            @NotNull
-                            @Override
-                            public String name() {
-                                return "toString";
-                            }
+            Object.class,
+            Arrays.asList(
+                new ProxyMethod<Object>() {
+                    @NotNull
+                    @Override
+                    public String name() {
+                        return "toString";
+                    }
 
-                            @NotNull
-                            @Override
-                            public Class<?>[] parameterTypes() {
-                                return new Class[0];
-                            }
+                    @NotNull
+                    @Override
+                    public Class<?>[] parameterTypes() {
+                        return new Class[0];
+                    }
 
-                            @Nullable
-                            @Override
-                            public Object invoke(
-                                    Object proxied,
-                                    @NotNull Method proxiedMethod,
-                                    @Nullable Object[] args, @NotNull SuperInvoker superInvoker
-                            ) {
-                                return "Proxy[super: " + superInvoker.invoke(args) + "]";
-                            }
-                        }
-                )
+                    @Nullable
+                    @Override
+                    public Object invoke(
+                        Object proxied,
+                        @NotNull Method proxiedMethod,
+                        @Nullable Object[] args, @NotNull SuperInvoker superInvoker
+                    ) {
+                        return "Proxy[super: " + superInvoker.invoke(args) + "]";
+                    }
+                }
+            )
         );
         String s = proxyClass.newInstance().toString();
         //Proxy[super: net.sf.cglib.empty.Object$$EnhancerByCGLIB$$4926690c@256f38d9]

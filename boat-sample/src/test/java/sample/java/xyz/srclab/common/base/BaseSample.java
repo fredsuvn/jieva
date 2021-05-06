@@ -17,11 +17,11 @@ public class BaseSample {
     @Test
     public void testLet() {
         int sum = Let.of("1,2,3,4,5,6,7,8,9,10")
-                .then(s -> s.split(","))
-                .then(Arrays::asList)
-                .then(l -> l.stream().mapToInt(Integer::parseInt))
-                .then(IntStream::sum)
-                .get();
+            .then(s -> s.split(","))
+            .then(Arrays::asList)
+            .then(l -> l.stream().mapToInt(Integer::parseInt))
+            .then(IntStream::sum)
+            .get();
         //55
         logger.log("sum: {}", sum);
     }
@@ -81,15 +81,15 @@ public class BaseSample {
         args.put(1, "Cat");
         args.put(2, "Bird");
         CharsTemplate template1 = CharsTemplate.resolve(
-                "This is a {name}, that is a {}", "{", "}");
+            "This is a {name}, that is a {}", "{", "}");
         //This is a Dog, that is a Cat
         logger.log(template1.process(args));
         CharsTemplate template2 = CharsTemplate.resolve(
-                "This is a } {name}, that is a {}}", "{", "}");
+            "This is a } {name}, that is a {}}", "{", "}");
         //This is a } Dog, that is a Cat}
         logger.log(template2.process(args));
         CharsTemplate template3 = CharsTemplate.resolve(
-                "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
+            "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
         //This is a } {DogX (Dog), that is a Bird\\{\
         logger.log(template3.process(args));
     }
@@ -261,19 +261,19 @@ public class BaseSample {
         shell.println(Arrays.asList("Hello", ",", "World", "!"));
         shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
         shell.println(
-                SgrChars.foregroundRed("red"),
-                SgrChars.backgroundCyan(" "),
-                SgrChars.foregroundGreen("green")
+            SgrChars.foregroundRed("red"),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.foregroundGreen("green")
         );
         shell.println(
-                SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
-                SgrChars.backgroundCyan(" "),
-                SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
+            SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
         );
         shell.println(
-                SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
-                SgrChars.backgroundCyan(" "),
-                SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
+            SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
         );
         shell.println(ControlChars.beep());
         shell.println("123", ControlChars.backspaces(), "456", ControlChars.beep());
@@ -284,23 +284,23 @@ public class BaseSample {
         String verString = "1.2.3-beta.2.3+123";
         SemVer semVer = SemVer.parse(verString);
         About about = About.of(
-                "name",
-                semVer.normalString(),
-                Collections.singletonList(Author.of("name", "author@mail.com", null)),
-                "123@123.com",
-                "url",
-                Collections.singletonList("licence"),
-                Collections.singletonList(About.of(
-                        "poweredBy",
-                        null,
-                        Collections.emptyList(),
-                        null,
-                        null,
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        null
-                )),
-                "© 2021 SrcLab"
+            "name",
+            semVer.normalString(),
+            Collections.singletonList(Author.of("name", "author@mail.com", null)),
+            "123@123.com",
+            "url",
+            Collections.singletonList("licence"),
+            Collections.singletonList(About.of(
+                "poweredBy",
+                null,
+                Collections.emptyList(),
+                null,
+                null,
+                Collections.emptyList(),
+                Collections.emptyList(),
+                null
+            )),
+            "© 2021 SrcLab"
         );
         //name
         //Version: 1.2.3

@@ -2,7 +2,6 @@ package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
 import java.io.Serializable
-import java.util.*
 
 /*
  * Fuck un-supporting-primitive-generic-type! DAMN!
