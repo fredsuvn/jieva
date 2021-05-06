@@ -50,7 +50,7 @@ implementation("xyz.srclab.common:boat:{boat-version}")
 ----
 
 .Source Code
-https://github.com/srclab-projects/boat
+{url}
 
 == Usage
 

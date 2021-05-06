@@ -51,7 +51,7 @@ implementation("xyz.srclab.common:boat:{boat-version}")
 ----
 
 .源代码
-https://github.com/srclab-projects/boat
+{url}
 
 == 使用
 
