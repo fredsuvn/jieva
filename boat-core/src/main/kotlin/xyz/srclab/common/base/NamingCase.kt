@@ -202,9 +202,9 @@ abstract class CamelCase : NamingCase {
             return words.joinToString("") { it.toString().capitalize(Default.locale) }
         }
         return doFirst(first) +
-                words.subList(1, words.size).joinToString("") {
-                    it.toString().capitalize(Default.locale)
-                }
+            words.subList(1, words.size).joinToString("") {
+                it.toString().capitalize(Default.locale)
+            }
     }
 
     protected abstract fun doFirst(first: CharSequence): String

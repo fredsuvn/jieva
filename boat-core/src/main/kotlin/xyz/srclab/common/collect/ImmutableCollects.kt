@@ -4,7 +4,6 @@
 package xyz.srclab.common.collect
 
 import java.util.*
-import kotlin.collections.LinkedHashMap
 
 class ImmutableSet<T>(val iterable: Iterable<T>) : Set<T>
 by Collections.unmodifiableSet(iterable.toSet())

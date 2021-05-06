@@ -8,14 +8,14 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-        ElementType.TYPE,
-        ElementType.METHOD,
-        ElementType.CONSTRUCTOR,
-        ElementType.FIELD,
-        ElementType.PARAMETER,
-        ElementType.LOCAL_VARIABLE,
-        ElementType.TYPE_PARAMETER,
-        ElementType.TYPE_USE,
+    ElementType.TYPE,
+    ElementType.METHOD,
+    ElementType.CONSTRUCTOR,
+    ElementType.FIELD,
+    ElementType.PARAMETER,
+    ElementType.LOCAL_VARIABLE,
+    ElementType.TYPE_PARAMETER,
+    ElementType.TYPE_USE,
 })
 public @interface ThreadSafeIf {
 

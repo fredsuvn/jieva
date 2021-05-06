@@ -4,7 +4,6 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
-import java.util.*
 
 @Throws(IllegalArgumentException::class)
 fun checkArgument(expression: Boolean) {
@@ -147,8 +146,8 @@ fun checkIndexInBounds(index: Int, startInclusive: Int, endExclusive: Int) {
     if (!isIndexInBounds(index, startInclusive, endExclusive)) {
         throw IndexOutOfBoundsException(
             "Index out of bounds[" +
-                    "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
-                    "]."
+                "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
+                "]."
         )
     }
 }
@@ -158,8 +157,8 @@ fun checkIndexInBounds(index: Long, startInclusive: Long, endExclusive: Long) {
     if (!isIndexInBounds(index, startInclusive, endExclusive)) {
         throw IndexOutOfBoundsException(
             "Index out of bounds[" +
-                    "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
-                    "]."
+                "index: $index, startInclusive: $startInclusive, endExclusive: $endExclusive" +
+                "]."
         )
     }
 }
@@ -179,8 +178,8 @@ fun isRangeInBounds(
     startInclusive: Int, endExclusive: Int, startBoundInclusive: Int, endBoundExclusive: Int
 ): Boolean {
     return startInclusive >= startBoundInclusive
-            && endExclusive <= endBoundExclusive
-            && startInclusive <= endExclusive
+        && endExclusive <= endBoundExclusive
+        && startInclusive <= endExclusive
 }
 
 @Throws(IndexOutOfBoundsException::class)
@@ -188,8 +187,8 @@ fun isRangeInBounds(
     startInclusive: Long, endExclusive: Long, startBoundInclusive: Long, endBoundExclusive: Long
 ): Boolean {
     return startInclusive >= startBoundInclusive
-            && endExclusive <= endBoundExclusive
-            && startInclusive <= endExclusive
+        && endExclusive <= endBoundExclusive
+        && startInclusive <= endExclusive
 }
 
 @Throws(IndexOutOfBoundsException::class)
@@ -197,8 +196,8 @@ fun checkRangeInLength(startInclusive: Int, endExclusive: Int, length: Int) {
     if (!isRangeInLength(startInclusive, endExclusive, length)) {
         throw IndexOutOfBoundsException(
             "Range out of bounds[" +
-                    "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
-                    "]."
+                "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
+                "]."
         )
     }
 }
@@ -208,8 +207,8 @@ fun checkRangeInLength(startInclusive: Long, endExclusive: Long, length: Long) {
     if (!isRangeInLength(startInclusive, endExclusive, length)) {
         throw IndexOutOfBoundsException(
             "Range out of bounds[" +
-                    "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
-                    "]."
+                "startInclusive: $startInclusive, endExclusive: $endExclusive, length: $length" +
+                "]."
         )
     }
 }
@@ -219,9 +218,9 @@ fun checkRangeInBounds(startInclusive: Int, endExclusive: Int, startBoundInclusi
     if (!isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive)) {
         throw IndexOutOfBoundsException(
             "Range out of bounds[" +
-                    "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
-                    "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +
-                    "]."
+                "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
+                "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +
+                "]."
         )
     }
 }
@@ -236,9 +235,9 @@ fun checkRangeInBounds(
     if (!isRangeInBounds(startInclusive, endExclusive, startBoundInclusive, endBoundExclusive)) {
         throw IndexOutOfBoundsException(
             "Range out of bounds[" +
-                    "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
-                    "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +
-                    "]."
+                "startInclusive: $startInclusive, endExclusive: $endExclusive, " +
+                "startBoundInclusive: $startBoundInclusive, endBoundExclusive: $endBoundExclusive" +
+                "]."
         )
     }
 }

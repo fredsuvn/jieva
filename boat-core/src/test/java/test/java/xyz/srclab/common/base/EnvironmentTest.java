@@ -23,7 +23,7 @@ public class EnvironmentTest {
         logger.log("Environment.properties():");
         Map<String, String> properties = Environment.properties();
         properties.keySet().stream().sorted().forEach(k ->
-                System.out.printf("%-60s: %s%n", k, properties.get(k)));
+            System.out.printf("%-60s: %s%n", k, properties.get(k)));
     }
 
     @Test

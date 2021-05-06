@@ -335,7 +335,7 @@ val WildcardType.isUnbounded: Boolean
     @JvmName("isUnbounded") get() {
         val upperBounds = this.upperBounds
         return (upperBounds.isEmpty() || (upperBounds.size == 1 && upperBounds[0] == Any::class.java))
-                && this.lowerBounds.isEmpty()
+            && this.lowerBounds.isEmpty()
     }
 
 val Type.isArray: Boolean
@@ -1241,10 +1241,10 @@ fun @Acceptable(
     Accepted(Class::class),
     Accepted(ParameterizedType::class),
 ) Type.generalize(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>):
-        @Acceptable(
-            Accepted(Class::class),
-            Accepted(ParameterizedType::class),
-        ) Type? {
+    @Acceptable(
+        Accepted(Class::class),
+        Accepted(ParameterizedType::class),
+    ) Type? {
     return this.generalize(typeArguments, targets.asList())
 }
 
@@ -1266,10 +1266,10 @@ fun @Acceptable(
     Accepted(Class::class),
     Accepted(ParameterizedType::class),
 ) Type.generalize(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>):
-        @Acceptable(
-            Accepted(Class::class),
-            Accepted(ParameterizedType::class),
-        ) Type? {
+    @Acceptable(
+        Accepted(Class::class),
+        Accepted(ParameterizedType::class),
+    ) Type? {
     if (targets.isEmpty()) {
         return null
     }
@@ -1304,10 +1304,10 @@ fun @Acceptable(
     Accepted(Class::class),
     Accepted(ParameterizedType::class),
 ) Type.genericSuperclass(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>):
-        @Acceptable(
-            Accepted(Class::class),
-            Accepted(ParameterizedType::class),
-        ) Type? {
+    @Acceptable(
+        Accepted(Class::class),
+        Accepted(ParameterizedType::class),
+    ) Type? {
     return this.genericSuperclass(typeArguments, targets.asList())
 }
 
@@ -1329,10 +1329,10 @@ fun @Acceptable(
     Accepted(Class::class),
     Accepted(ParameterizedType::class),
 ) Type.genericSuperclass(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>):
-        @Acceptable(
-            Accepted(Class::class),
-            Accepted(ParameterizedType::class),
-        ) Type? {
+    @Acceptable(
+        Accepted(Class::class),
+        Accepted(ParameterizedType::class),
+    ) Type? {
     if (targets.isEmpty()) {
         return null
     }
@@ -1379,10 +1379,10 @@ fun @Acceptable(
     Accepted(Class::class),
     Accepted(ParameterizedType::class),
 ) Type.genericInterface(typeArguments: Map<TypeVariable<*>, Type>? = null, vararg targets: Class<*>):
-        @Acceptable(
-            Accepted(Class::class),
-            Accepted(ParameterizedType::class),
-        ) Type? {
+    @Acceptable(
+        Accepted(Class::class),
+        Accepted(ParameterizedType::class),
+    ) Type? {
     return this.genericInterface(typeArguments, targets.asList())
 }
 
@@ -1404,10 +1404,10 @@ fun @Acceptable(
     Accepted(Class::class),
     Accepted(ParameterizedType::class),
 ) Type.genericInterface(typeArguments: Map<TypeVariable<*>, Type>? = null, targets: Iterable<Class<*>>):
-        @Acceptable(
-            Accepted(Class::class),
-            Accepted(ParameterizedType::class),
-        ) Type? {
+    @Acceptable(
+        Accepted(Class::class),
+        Accepted(ParameterizedType::class),
+    ) Type? {
 
     if (targets.isEmpty()) {
         return null

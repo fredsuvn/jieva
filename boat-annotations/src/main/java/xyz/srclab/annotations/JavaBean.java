@@ -13,13 +13,13 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Nonnull(when = When.MAYBE)
 @TypeQualifierDefault({
-        ElementType.METHOD,
-        ElementType.FIELD,
-        ElementType.PARAMETER,
+    ElementType.METHOD,
+    ElementType.FIELD,
+    ElementType.PARAMETER,
 })
 @TypeQualifierNickname
 @Target({
-        ElementType.TYPE,
+    ElementType.TYPE,
 })
 public @interface JavaBean {
 }

@@ -9,19 +9,19 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Nonnull
 @TypeQualifierDefault({
-        ElementType.METHOD,
-        ElementType.FIELD,
-        ElementType.PARAMETER,
-        ElementType.LOCAL_VARIABLE,
-        ElementType.TYPE_PARAMETER,
-        ElementType.TYPE_USE,
+    ElementType.METHOD,
+    ElementType.FIELD,
+    ElementType.PARAMETER,
+    ElementType.LOCAL_VARIABLE,
+    ElementType.TYPE_PARAMETER,
+    ElementType.TYPE_USE,
 })
 @TypeQualifierNickname
 @Target({
-        ElementType.TYPE,
-        ElementType.METHOD,
-        ElementType.CONSTRUCTOR,
-        ElementType.PACKAGE,
+    ElementType.TYPE,
+    ElementType.METHOD,
+    ElementType.CONSTRUCTOR,
+    ElementType.PACKAGE,
 })
 public @interface DefaultNonNull {
 }

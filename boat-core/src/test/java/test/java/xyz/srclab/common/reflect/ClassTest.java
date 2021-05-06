@@ -15,14 +15,14 @@ public class ClassTest {
     @Test
     public void testToClass() {
         Class<NewClass> newClass = Reflects.toClass(
-                "test.java.xyz.srclab.common.reflect.NewClass");
+            "test.java.xyz.srclab.common.reflect.NewClass");
         Assert.assertEquals(newClass, NewClass.class);
     }
 
     @Test
     public void testToInstance() {
         NewClass newClass = Reflects.toInstance(
-                "test.java.xyz.srclab.common.reflect.NewClass");
+            "test.java.xyz.srclab.common.reflect.NewClass");
         Assert.assertEquals(newClass, new NewClass());
     }
 

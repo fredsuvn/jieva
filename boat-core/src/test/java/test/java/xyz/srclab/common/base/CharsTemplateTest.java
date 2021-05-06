@@ -23,13 +23,13 @@ public class CharsTemplateTest {
         args.put(1, "Cat");
         args.put(2, "Bird");
         CharsTemplate template1 = CharsTemplate.resolve(
-                "This is a {name}, that is a {}", "{", "}");
+            "This is a {name}, that is a {}", "{", "}");
         Assert.assertEquals(template1.process(args), "This is a Dog, that is a Cat");
         CharsTemplate template2 = CharsTemplate.resolve(
-                "This is a } {name}, that is a {}}", "{", "}");
+            "This is a } {name}, that is a {}}", "{", "}");
         Assert.assertEquals(template2.process(args), "This is a } Dog, that is a Cat}");
         CharsTemplate template3 = CharsTemplate.resolve(
-                "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
+            "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
         //logger.log(template3.process(args));
         Assert.assertEquals(template3.process(args), "This is a } {DogX (Dog), that is a Bird\\\\{\\");
     }

@@ -3,8 +3,6 @@
 
 package xyz.srclab.common.base
 
-import java.util.*
-
 @Throws(NullPointerException::class)
 fun <T : Any> T?.notNull(): T {
     checkNull(this !== null)

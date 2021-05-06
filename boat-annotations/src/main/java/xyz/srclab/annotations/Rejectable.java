@@ -11,12 +11,12 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-        ElementType.METHOD,
-        ElementType.FIELD,
-        ElementType.PARAMETER,
-        ElementType.LOCAL_VARIABLE,
-        ElementType.TYPE_PARAMETER,
-        ElementType.TYPE_USE,
+    ElementType.METHOD,
+    ElementType.FIELD,
+    ElementType.PARAMETER,
+    ElementType.LOCAL_VARIABLE,
+    ElementType.TYPE_PARAMETER,
+    ElementType.TYPE_USE,
 })
 public @interface Rejectable {
 

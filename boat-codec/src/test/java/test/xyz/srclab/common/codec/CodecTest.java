@@ -109,11 +109,11 @@ public class CodecTest {
 
         //解密
         String origin = Codec.forData(encrypt)
-                .decodeBase64()
-                .decryptSm2(sm2KeyPair.privateKeyBytes())
-                .decryptRsa(rsaKeyPair.privateKeyBytes())
-                .decryptAes(aesKey)
-                .doFinalToString();
+            .decodeBase64()
+            .decryptSm2(sm2KeyPair.privateKeyBytes())
+            .decryptRsa(rsaKeyPair.privateKeyBytes())
+            .decryptAes(aesKey)
+            .doFinalToString();
         logger.log("origin: " + origin);
         Assert.assertEquals(origin, data);
     }

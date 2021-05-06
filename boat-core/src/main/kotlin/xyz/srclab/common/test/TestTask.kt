@@ -102,9 +102,9 @@ interface TestListener {
                 override fun afterRunAll(testTasks: List<TestTask>, testResult: TestResult) {
                     testLogger.log(
                         "All tasks were accomplished, " +
-                                "await cost: ${testResult.awaitCost}, " +
-                                "total cost: ${testResult.totalCost}, " +
-                                "average cost: ${testResult.averageCost}"
+                            "await cost: ${testResult.awaitCost}, " +
+                            "total cost: ${testResult.totalCost}, " +
+                            "average cost: ${testResult.averageCost}"
                     )
                 }
             }

@@ -21,8 +21,8 @@ public class AnnotationSample {
     }
 
     private void writeBuffer(
-            @Written StringBuilder buffer,
-            @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
+        @Written StringBuilder buffer,
+        @Accepted(String.class) @Accepted(StringBuffer.class) CharSequence readOnly
     ) {
         buffer.append(readOnly);
     }

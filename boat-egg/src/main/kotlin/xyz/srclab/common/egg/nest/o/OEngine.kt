@@ -97,9 +97,9 @@ internal class OEngine(
     private fun OObjectUnit.isOutOfBounds(): Boolean {
         val length = this.radius * 2
         return this.x < -length
-                || this.x > OConfig.width + length
-                || this.y < -OConfig.preparedHeight
-                || this.y > OConfig.height + length
+            || this.x > OConfig.width + length
+            || this.y < -OConfig.preparedHeight
+            || this.y > OConfig.height + length
     }
 
     private fun OObjectUnit.distance(other: OObjectUnit): Double {

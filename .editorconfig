@@ -4,10 +4,10 @@ root = true
 charset = utf-8
 indent_style = space
 indent_size = 4
-continuation_indent_size = 8
+continuation_indent_size = 4
 insert_final_newline = false
 trim_trailing_whitespace = true
 
 [*.{groovy, gradle, kts, xml, html, js, ts, yml, yaml, svg, md, adoc}]
 indent_size = 2
-continuation_indent_size = 4
+continuation_indent_size = 2

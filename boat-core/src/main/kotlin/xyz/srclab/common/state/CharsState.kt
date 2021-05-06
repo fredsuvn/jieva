@@ -8,8 +8,8 @@ import xyz.srclab.common.state.State.Companion.stateToString
  * Abstract [State] for [String] type code and description.
  */
 abstract class CharsState<T : State<String, String, T>> @JvmOverloads constructor(
-        code: CharSequence,
-        descriptions: List<CharSequence> = emptyList()
+    code: CharSequence,
+    descriptions: List<CharSequence> = emptyList()
 ) : State<String, String, T> {
 
     constructor(code: CharSequence, description: CharSequence) : this(code, listOf(description))

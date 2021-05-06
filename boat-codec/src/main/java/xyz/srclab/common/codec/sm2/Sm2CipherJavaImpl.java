@@ -37,8 +37,8 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
         //int w = (int) Math.ceil(sm2Params.n().bitLength() * 1.0 / 2) - 1;
         //BigInteger _2w = new BigInteger("2").pow(w);
         curve = new ECCurve.Fp(sm2Params.p(), // q
-                sm2Params.a(), // a
-                sm2Params.b()); // b
+            sm2Params.a(), // a
+            sm2Params.b()); // b
         G = curve.createPoint(sm2Params.gx(), sm2Params.gy());
         ecc_bc_spec = new ECDomainParameters(curve, G, sm2Params.n());
     }
@@ -162,7 +162,7 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
 
         /* 7 计算C3 = Hash(x2 || M || y2) */
         byte[] C3 = sm3hash(kpb.getXCoord().toBigInteger().toByteArray(), input,
-                kpb.getYCoord().toBigInteger().toByteArray());
+            kpb.getYCoord().toBigInteger().toByteArray());
 
         /* 8 输出密文 C=C1 || C2 || C3 */
 
@@ -232,7 +232,7 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
 
         System.arraycopy(encryptData, encryptData.length - DIGEST_LENGTH, C3, 0, DIGEST_LENGTH);
         byte[] u = sm3hash(dBC1.getXCoord().toBigInteger().toByteArray(), M,
-                dBC1.getYCoord().toBigInteger().toByteArray());
+            dBC1.getYCoord().toBigInteger().toByteArray());
         if (Arrays.equals(u, C3)) {
             return M;
         }

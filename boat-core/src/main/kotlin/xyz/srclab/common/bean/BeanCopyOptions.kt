@@ -241,7 +241,7 @@ interface BeanCopyOptions {
                 override val fromTypeFilter: (name: Any?, fromNameType: Type, fromValueType: Type) -> Boolean =
                     this@Builder.fromTypeFilter
                 override val fromValueFilter:
-                            (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean =
+                    (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean =
                     this@Builder.fromValueFilter
                 override val convertFilter: (
                     name: Any?, fromNameType: Type, fromValueType: Type, value: Any?, toNameType: Type, toValueType: Type

@@ -36,9 +36,9 @@ public class JsonTest {
         TestObject testObject = new TestObject();
         testObject.setString("888");
         testObject.setMap(Arrays.asList(
-                newMap("1", new BigDecimal(1)),
-                newMap("2", new BigDecimal(2)),
-                newMap("3", new BigDecimal(3))
+            newMap("1", new BigDecimal(1)),
+            newMap("2", new BigDecimal(2)),
+            newMap("3", new BigDecimal(3))
         ));
         String jsonString = jsonSerializer.toJsonString(testObject);
         logger.log(jsonString);
@@ -48,8 +48,8 @@ public class JsonTest {
         Object jsonStringAsObject = jsonString;
         logger.log(jsonSerializer.toJson(jsonStringAsObject).toString());
         Assert.assertEquals(
-                jsonSerializer.toJson(jsonStringAsObject).toObject(TestObject.class),
-                testObject
+            jsonSerializer.toJson(jsonStringAsObject).toObject(TestObject.class),
+            testObject
         );
 
         //测试从json string还原java对象
@@ -62,9 +62,9 @@ public class JsonTest {
         TestObject2 testObject2 = new TestObject2();
         testObject2.setString(888);
         testObject2.setMap(Arrays.asList(
-                newMap(new BigDecimal(1), "1"),
-                newMap(new BigDecimal(2), "2"),
-                newMap(new BigDecimal(3), "3")
+            newMap(new BigDecimal(1), "1"),
+            newMap(new BigDecimal(2), "2"),
+            newMap(new BigDecimal(3), "3")
         ));
         TestObject2 fromJson2 = json.toObject(TestObject2.class);
         boolean equals2 = testObject2.equals(fromJson2);
@@ -187,8 +187,8 @@ public class JsonTest {
             if (object == null || getClass() != object.getClass()) return false;
             TestObject that = (TestObject) object;
             return longValue == that.longValue &&
-                    Objects.equals(string, that.string) &&
-                    Objects.equals(map, that.map);
+                Objects.equals(string, that.string) &&
+                Objects.equals(map, that.map);
         }
 
         @Override
@@ -232,8 +232,8 @@ public class JsonTest {
             if (object == null || getClass() != object.getClass()) return false;
             TestObject2 that = (TestObject2) object;
             return string == that.string &&
-                    longValue == that.longValue &&
-                    Objects.equals(map, that.map);
+                longValue == that.longValue &&
+                Objects.equals(map, that.map);
         }
 
         @Override
