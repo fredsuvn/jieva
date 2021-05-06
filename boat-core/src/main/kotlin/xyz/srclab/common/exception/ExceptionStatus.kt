@@ -44,7 +44,7 @@ private class ExceptionStatusImpl(
     descriptions: List<CharSequence> = emptyList()
 ) : CharsState<ExceptionStatus>(code, descriptions), ExceptionStatus {
 
-    override fun newStateImpl(code: String, descriptions: List<String>): ExceptionStatus {
+    override fun newState(code: String, descriptions: List<String>): ExceptionStatus {
         return ExceptionStatusImpl(code, descriptions)
     }
 
