@@ -14,23 +14,23 @@ package xyz.srclab.common.base
  * Date dateValue = DateUtils.stringToDate(stringValue)
  * ```
  */
-interface Let<T> : Getter<T> {
+interface Let<T : Any> : GenericGetter<T> {
 
-    fun <R> then(action: (T) -> R): Let<R>
+    fun <R : Any> then(action: (T) -> R): Let<R>
 
     companion object {
 
         @JvmStatic
         @JvmName("of")
-        fun <T> T.ofLet(): Let<T> {
+        fun <T : Any> T.ofLet(): Let<T> {
             return LetImpl(this)
         }
     }
 }
 
-private class LetImpl<T>(private var any: T) : Let<T> {
+private class LetImpl<T : Any>(private var any: T) : Let<T> {
 
-    override fun <R> then(action: (T) -> R): Let<R> {
+    override fun <R : Any> then(action: (T) -> R): Let<R> {
         any = action(any).asAny()
         return this.asAny()
     }
