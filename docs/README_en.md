@@ -221,8 +221,8 @@ utilities:
 
 -   String functions: CharsFormat, CharsTemplate, NamingCase;
 
--   Core and basic interfaces: Accessor, Serial, SpecParser,
-    CachingProductBuilder
+-   Core and basic interfaces: Accessor (and GenericAccessor), Serial,
+    SpecParser, CachingProductBuilder
 
 -   Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms,
     Compares, Checks, Requires, Enums, Loaders;

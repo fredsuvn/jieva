@@ -210,7 +210,8 @@ Base包提供基本的核心基础接口, 功能和工具:
 
 -   字符串功能: CharsFormat, CharsTemplate, NamingCase;
 
--   核心基础接口: Accessor, Serial, SpecParser, CachingProductBuilder
+-   核心基础接口: Accessor (以及 GenericAccessor), Serial, SpecParser,
+    CachingProductBuilder
 
 -   常用工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares,
     Checks, Requires, Enums, Loaders;

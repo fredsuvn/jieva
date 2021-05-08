@@ -89,7 +89,7 @@ Base package provides base core and basic interfaces, functions and utilities:
 * Global shortcut objects: Current, Default, Environment;
 * Syntax enhancement (mainly for Java): Let, Ref, Lazy;
 * String functions: CharsFormat, CharsTemplate, NamingCase;
-* Core and basic interfaces: Accessor, Serial, SpecParser, CachingProductBuilder
+* Core and basic interfaces: Accessor (and GenericAccessor), Serial, SpecParser, CachingProductBuilder
 * Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
 * Other tools: About, Counter, Shell, LazyString.
 

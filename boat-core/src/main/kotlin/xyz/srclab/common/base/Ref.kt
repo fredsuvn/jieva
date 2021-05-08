@@ -10,16 +10,16 @@ package xyz.srclab.common.base
  * list.forEach(i -> ref.set(ref.get() + i));
  * ```
  */
-interface Ref<T> : Accessor<T> {
+interface Ref<T : Any> : GenericAccessor<T> {
 
     companion object {
 
         @JvmStatic
-        fun <T> of(initial: T?): Ref<T> {
+        fun <T : Any> of(initial: T?): Ref<T> {
             return RefImpl(initial)
         }
 
-        private class RefImpl<T>(private var value: T?) : Ref<T> {
+        private class RefImpl<T : Any>(private var value: T?) : Ref<T> {
 
             override fun getOrNull(): T? {
                 return value
@@ -32,7 +32,7 @@ interface Ref<T> : Accessor<T> {
     }
 }
 
-fun <T> T.ref(): Ref<T> {
+fun <T : Any> T.ref(): Ref<T> {
     return Ref.of(this)
 }
 
