@@ -11,6 +11,8 @@ import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
 import com.google.common.cache.RemovalCause as guavaRemovalCause
 
 /**
+ * Cache interface.
+ *
  * @see GuavaCache
  * @see GuavaLoadingCache
  * @see CaffeineCache
@@ -110,6 +112,9 @@ interface Cache<K : Any, V> {
 
     fun cleanUp()
 
+    /**
+     * To build a [Cache] instance with [CaffeineCache] or [GuavaCache].
+     */
     class Builder<K : Any, V> : CachingProductBuilder<Cache<K, V>>() {
 
         private var initialCapacity: Int? = null
@@ -191,6 +196,9 @@ interface Cache<K : Any, V> {
             return this
         }
 
+        /**
+         * By default, this builder will use [CaffeineCache]. If set [useGuava] to true, use [GuavaCache].
+         */
         fun useGuava(useGuava: Boolean): Builder<K, V> {
             this.useGuava = useGuava
             this.commitChange()
