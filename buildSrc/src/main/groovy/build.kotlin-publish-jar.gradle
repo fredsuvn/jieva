@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
 plugins {
   id 'build.core'
   id 'build.kotlin-compile'
@@ -106,10 +109,14 @@ if (infos.publish.enablePublish) {
     }
 
     if (infos.publish.isSigning) {
-      ext."signing.keyId" = getProperty("signing${infos.publish.signingId.capitalize()}Id")
-      ext."signing.password" = getProperty("signing${infos.publish.signingId.capitalize()}Password")
-      ext."signing.secretKeyRingFile" = getProperty("signing${infos.publish.signingId.capitalize()}SecretKeyRingFile")
       signing {
+        def keyId = getProperty("signing${infos.publish.signingId.capitalize()}KeyId")
+        def password = getProperty("signing${infos.publish.signingId.capitalize()}Password")
+        def secretKeyRingFile = new String(Files.readAllBytes(
+          Paths.get(getProperty("signing${infos.publish.signingId.capitalize()}SecretKeyRingFile"))
+        ), "UTF-8")
+        printer.info("------------------------${secretKeyRingFile}")
+        useInMemoryPgpKeys(keyId, secretKeyRingFile, password)
         sign publishing.publications.maven
       }
     }

@@ -58,7 +58,7 @@ ext["infos"] = [
     releaseId    : "sonatype",
 
     //Whether signing
-    isSigning    : false,
+    isSigning    : true,
 
     //Signing id
     signingId    : "gpg",
