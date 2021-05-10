@@ -25,7 +25,7 @@ It provides many fast and convenient interfaces, functions and utilities.
 * *boat-test*: Test dependencies management, to import common test libraries in test scope;
 * *boat-bom*: Boat Bom.
 
-* *boat-others*: Boat also contains libraries for supporting special or third parties, see link:../boat-others/docs/README_en.adoc[boat-others/].
+* *boat-others*: Boat also contains libraries for supporting special or third parties, see link:../boat-others/README.md[boat-others].
 
 If you want to import common above modules at once (core, codec, serialize and id), just import:
 

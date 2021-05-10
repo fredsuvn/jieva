@@ -59,8 +59,7 @@ Boat includes:
 -   **boat-bom**: Boat Bom.
 
 -   **boat-others**: Boat also contains libraries for supporting special
-    or third parties, see
-    [boat-others/](../boat-others/docs/README_en.adoc).
+    or third parties, see [boat-others](../boat-others/README.md).
 
 If you want to import common above modules at once (core, codec,
 serialize and id), just import:

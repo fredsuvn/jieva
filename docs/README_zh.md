@@ -56,7 +56,7 @@ Boat包括:
 -   **boat-bom**: Boat Bom.
 
 -   **boat-others**: Boat也有对其他特殊需求或第三方的支持,
-    参见[boat-others/](../boat-others/docs/README_zh.adoc).
+    参见[boat-others](../boat-others/README.md).
 
 如果你需要一次引入常用的模块 (core, codec, serialize and id), 只需要:
 
