@@ -19,7 +19,7 @@ ext["infos"] = [
   licenses     : [
     [
       name: "The Apache License, Version 2.0",
-      url : "http://www.apache.org/licenses/LICENSE-2.0.txt",
+      url : "https://www.apache.org/licenses/LICENSE-2.0.txt",
     ],
   ],
 
@@ -65,8 +65,8 @@ ext["infos"] = [
 
     //Publish urls
     urls         : [
-      release : "https://oss.sonatype.org/service/local/staging/deploy/maven2/",
-      snapshot: "https://oss.sonatype.org/content/repositories/snapshots/",
+      snapshot: "https://s01.oss.sonatype.org/content/repositories/snapshots",
+      release : "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2",
     ],
   ],
 ]
