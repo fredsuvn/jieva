@@ -1,6 +1,6 @@
-# Boat Others: Third Parties Supporting for Boat
+# Boat Others: Third Parties Supporting for [Boat](../README.md)
 
-## _Choose the doc style and language you like_:
+## Choose doc style you like:
 
 - AsciiDoc:
   * [English](docs/README_en.adoc)
@@ -14,13 +14,13 @@
 
 More see [docs/](docs/)
 
-## _Contact_
+## Contribution and Contact
 
 * fredsuvn@163.com
 * https://github.com/srclab-projects/boat
 * QQ group: 1037555759
 
-## _License_
+## License
 
 [Apache 2.0 license][license]
 

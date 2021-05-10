@@ -1,4 +1,4 @@
-# Boat Others: Boat对第三方技术的支持
+# Boat Others: [Boat](../../README.md)对第三方技术的支持
 
 <span id="author" class="author">Sun Qian</span>  
 <span id="email" class="email"><fredsuvn@163.com></span>  

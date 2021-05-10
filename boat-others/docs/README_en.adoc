@@ -1,4 +1,4 @@
-= Boat Others: Third Parties Supporting for Boat
+= Boat Others: Third Parties Supporting for link:../../README.md[Boat]
 :toc:
 :toclevels: 3
 :last-update-label!:

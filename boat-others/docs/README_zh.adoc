@@ -1,4 +1,4 @@
-= Boat Others: Boat对第三方技术的支持
+= Boat Others: link:../../README.md[Boat]对第三方技术的支持
 :toc:
 :toclevels: 3
 :toc-title: 目录
