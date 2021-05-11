@@ -50,31 +50,40 @@ if (infos.publish.enablePublish) {
       mavenLocal()
       if (infos.publish.isSnapshot) {
         maven {
-          name = "${infos.publish.snapshotId}"
+          name = infos.publish.snapshotId
           url = infos.publish.urls.snapshot
           credentials {
-            username = getProperty("publish${infos.publish.snapshotId.capitalize()}Username")
-            password = getProperty("publish${infos.publish.snapshotId.capitalize()}Password")
+            username = getProperty("publish${name.capitalize()}Username")
+            password = getProperty("publish${name.capitalize()}Password")
+            printer.debug("snapshot.username: $username")
+            printer.debug("snapshot.password: $password")
           }
         }
       }
       if (infos.publish.isRelease) {
         maven {
-          name = "${infos.publish.releaseId}"
+          name = infos.publish.releaseId
           url = infos.publish.urls.release
           credentials {
-            username = getProperty("publish${infos.publish.releaseId.capitalize()}Username")
-            password = getProperty("publish${infos.publish.releaseId.capitalize()}Password")
+            username = getProperty("publish${name.capitalize()}Username")
+            password = getProperty("publish${name.capitalize()}Password")
+            printer.debug("snapshot.username: $username")
+            printer.debug("snapshot.password: $password")
           }
         }
       }
     }
 
     if (infos.publish.isSigning) {
-      ext."signing.keyId" = getProperty("signing${infos.publish.signingId.capitalize()}Id")
-      ext."signing.password" = getProperty("signing${infos.publish.signingId.capitalize()}Password")
-      ext."signing.secretKeyRingFile" = getProperty("signing${infos.publish.signingId.capitalize()}SecretKeyRingFile")
       signing {
+        def signingName = infos.publish.signingId
+        def signingKeyId = getProperty("signing${signingName.capitalize()}KeyId")
+        def signingPassword = getProperty("signing${signingName.capitalize()}Password")
+        def signingKey = utils.readFileAsString(getProperty("signing${signingName.capitalize()}KeyFile"), "UTF-8")
+        printer.debug("signing.signingKeyId: $signingKeyId")
+        printer.debug("signing.signingPassword: $signingPassword")
+        printer.debug("signing.signingKey: $signingKey")
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
         sign publishing.publications.maven
       }
     }
