@@ -1,6 +1,3 @@
-import java.nio.file.Files
-import java.nio.file.Paths
-
 plugins {
   id 'build.core'
   id 'build.kotlin-compile'
@@ -88,21 +85,21 @@ if (infos.publish.enablePublish) {
       mavenLocal()
       if (infos.publish.isSnapshot) {
         maven {
-          name = "${infos.publish.snapshotId}"
+          name = infos.publish.snapshotId
           url = infos.publish.urls.snapshot
           credentials {
-            username = getProperty("publish${infos.publish.snapshotId.capitalize()}Username")
-            password = getProperty("publish${infos.publish.snapshotId.capitalize()}Password")
+            username = getProperty("publish${name.capitalize()}Username")
+            password = getProperty("publish${name.capitalize()}Password")
           }
         }
       }
       if (infos.publish.isRelease) {
         maven {
-          name = "${infos.publish.releaseId}"
+          name = infos.publish.releaseId
           url = infos.publish.urls.release
           credentials {
-            username = getProperty("publish${infos.publish.releaseId.capitalize()}Username")
-            password = getProperty("publish${infos.publish.releaseId.capitalize()}Password")
+            username = getProperty("publish${name.capitalize()}Username")
+            password = getProperty("publish${name.capitalize()}Password")
           }
         }
       }
@@ -110,13 +107,11 @@ if (infos.publish.enablePublish) {
 
     if (infos.publish.isSigning) {
       signing {
-        def keyId = getProperty("signing${infos.publish.signingId.capitalize()}KeyId")
-        def password = getProperty("signing${infos.publish.signingId.capitalize()}Password")
-        def secretKeyRingFile = new String(Files.readAllBytes(
-          Paths.get(getProperty("signing${infos.publish.signingId.capitalize()}SecretKeyRingFile"))
-        ), "UTF-8")
-        printer.info("------------------------${secretKeyRingFile}")
-        useInMemoryPgpKeys(keyId, secretKeyRingFile, password)
+        def signingName = infos.publish.signingId
+        def signingKeyId = getProperty("signing${signingName.capitalize()}KeyId")
+        def signingPassword = getProperty("signing${signingName.capitalize()}Password")
+        def signingKey = utils.readFileAsString(getProperty("signing${signingName.capitalize()}KeyFile"), "UTF-8")
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
         sign publishing.publications.maven
       }
     }
