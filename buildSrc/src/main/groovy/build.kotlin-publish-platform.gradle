@@ -55,6 +55,8 @@ if (infos.publish.enablePublish) {
           credentials {
             username = getProperty("publish${name.capitalize()}Username")
             password = getProperty("publish${name.capitalize()}Password")
+            printer.debug("snapshot.username: $username")
+            printer.debug("snapshot.password: $password")
           }
         }
       }
@@ -65,6 +67,8 @@ if (infos.publish.enablePublish) {
           credentials {
             username = getProperty("publish${name.capitalize()}Username")
             password = getProperty("publish${name.capitalize()}Password")
+            printer.debug("snapshot.username: $username")
+            printer.debug("snapshot.password: $password")
           }
         }
       }
@@ -76,6 +80,9 @@ if (infos.publish.enablePublish) {
         def signingKeyId = getProperty("signing${signingName.capitalize()}KeyId")
         def signingPassword = getProperty("signing${signingName.capitalize()}Password")
         def signingKey = utils.readFileAsString(getProperty("signing${signingName.capitalize()}KeyFile"), "UTF-8")
+        printer.debug("signing.signingKeyId: $signingKeyId")
+        printer.debug("signing.signingPassword: $signingPassword")
+        printer.debug("signing.signingKey: $signingKey")
         useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
         sign publishing.publications.maven
       }

@@ -58,7 +58,7 @@ ext["infos"] = [
     releaseId    : "ossrh",
 
     //Whether signing
-    isSigning    : true,
+    isSigning    : false,
 
     //Signing id
     signingId    : "gpg",

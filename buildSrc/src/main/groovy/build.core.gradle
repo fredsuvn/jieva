@@ -42,8 +42,22 @@ ext["utils"] = [
 
 class Printer {
 
+  //50: debug
+  //100: info
+  private final int logLevel = 100
+
   def info(message) {
+    if (logLevel > 100) {
+      return
+    }
     println(">> info: $message")
+  }
+
+  def debug(message) {
+    if (logLevel > 50) {
+      return
+    }
+    println(">> debug: $message")
   }
 }
 
