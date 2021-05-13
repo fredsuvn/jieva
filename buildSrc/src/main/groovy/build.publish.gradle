@@ -18,8 +18,7 @@ def configurePublishRepositories(RepositoryHandler repositories) {
         printer.debug("snapshot.password: $password")
       }
     }
-  }
-  if (infos.publish.isRelease) {
+  } else {
     repositories.maven {
       name = infos.publish.releaseId
       url = infos.publish.urls.release

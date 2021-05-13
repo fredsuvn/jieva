@@ -24,7 +24,7 @@ def initProjectConfigure(p) {
   def infos = newInfo()
   p.ext["infos"] = infos
   p.group = infos.group
-  p.version = infos.version
+  p.version = infos.publish.isSnapshot ? "${infos.version}-SNAPSHOT" : infos.version
   if (p == rootProject) {
     printer.info("Configure project ${p.group}:${p.name}:${p.version} (root)")
   } else {
@@ -90,14 +90,11 @@ private static def newInfo() {
       //Snapshot id
       snapshotId   : "ossrh",
 
-      //Whether publish as Release
-      isRelease    : true,
-
       //Release id
       releaseId    : "ossrh",
 
       //Whether signing
-      isSigning    : true,
+      isSigning    : false,
 
       //Signing id
       signingId    : "gpg",
