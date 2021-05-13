@@ -1,0 +1,29 @@
+plugins {
+  id 'build.core'
+  id 'org.jetbrains.kotlin.jvm'
+}
+
+project.afterEvaluate {
+
+  printer.info("${project.name}: import build.compile")
+
+  //sourceSets {
+  //  main.kotlin.srcDirs += ['src/main/kotlin', 'src/main/java']
+  //  main.java.srcDirs += ['src/main/kotlin', 'src/main/java']
+  //  test.kotlin.srcDirs += ['src/test/kotlin', 'src/test/java']
+  //  test.java.srcDirs += ['src/test/kotlin', 'src/test/java']
+  //}
+
+  compileKotlin {
+    kotlinOptions {
+      jvmTarget = javaVersion
+      freeCompilerArgs = ['-Xjvm-default=enable']
+    }
+  }
+  compileTestKotlin {
+    kotlinOptions {
+      jvmTarget = javaVersion
+      freeCompilerArgs = ['-Xjvm-default=enable']
+    }
+  }
+}

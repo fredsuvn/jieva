@@ -1,0 +1,9 @@
+plugins {
+  id 'build.publish-platform'
+}
+
+project.afterEvaluate {
+
+  printer.info("${project.name}: import build.platform")
+
+}

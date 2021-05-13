@@ -1,5 +1,5 @@
 plugins {
-  id 'build.kotlin-publish-jar'
+  id 'build.jar'
 }
 
 description = "Boat ID: A lightweight ID generation framework."
@@ -14,9 +14,4 @@ dependencies {
   api project(":boat-core")
 
   testCompile project(":boat-test")
-}
-
-test {
-  useTestNG()
-  include("**/*Test.class", "**/*TestKt.class")
 }

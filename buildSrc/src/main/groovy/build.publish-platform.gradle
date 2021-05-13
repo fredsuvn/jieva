@@ -1,0 +1,30 @@
+plugins {
+  id 'build.core'
+  id 'java-platform'
+  id 'build.publish'
+}
+
+project.afterEvaluate {
+
+  printer.info("${project.name}: import build.publish-platform")
+
+  if (infos.publish.enablePublish) {
+    publishing {
+      publications {
+        maven(MavenPublication) {
+          from components.javaPlatform
+          configurePublishMavenPom(it)
+        }
+      }
+      repositories {
+        configurePublishRepositories(it)
+      }
+      if (infos.publish.isSigning) {
+        configureSigning()
+        signing {
+          sign publishing.publications.maven
+        }
+      }
+    }
+  }
+}

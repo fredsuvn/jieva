@@ -1,0 +1,14 @@
+plugins {
+  id 'build.core'
+  id 'build.compile'
+}
+
+project.afterEvaluate {
+
+  printer.info("${project.name}: import build.sample")
+
+  test {
+    useTestNG()
+    include("**/*Sample.class", "**/*SampleKt.class")
+  }
+}

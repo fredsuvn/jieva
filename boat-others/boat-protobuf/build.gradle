@@ -1,6 +1,6 @@
 plugins {
   id "com.google.protobuf" version "$protobufPluginVersion"
-  id 'build.kotlin-publish-jar'
+  id 'build.jar'
 }
 
 description = "Boat Protobuf: Protobuf support for Boat."
@@ -67,9 +67,4 @@ protobuf {
 
 clean {
   delete("${protobuf.generatedFilesBaseDir}")
-}
-
-test {
-  useTestNG()
-  include("**/*Test.class", "**/*TestKt.class")
 }

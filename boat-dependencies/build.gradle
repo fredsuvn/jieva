@@ -1,5 +1,5 @@
 plugins {
-  id 'build.kotlin-publish-platform'
+  id 'build.platform'
 }
 
 description = "Boat Dependencies Management"

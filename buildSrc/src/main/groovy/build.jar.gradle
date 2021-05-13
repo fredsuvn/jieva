@@ -1,0 +1,13 @@
+plugins {
+  id 'build.publish-jar'
+}
+
+project.afterEvaluate {
+
+  printer.info("${project.name}: import build.jar")
+
+  test {
+    useTestNG()
+    include("**/*Test.class", "**/*TestKt.class")
+  }
+}

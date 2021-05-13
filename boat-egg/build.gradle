@@ -1,5 +1,5 @@
 plugins {
-  id 'build.kotlin-publish-jar'
+  id 'build.jar'
 }
 
 description = "Happy Eggy!"
@@ -14,9 +14,4 @@ dependencies {
   implementation project(":boat-core")
 
   testCompile project(":boat-test")
-}
-
-test {
-  useTestNG()
-  include("**/*Test.class", "**/*TestKt.class")
 }

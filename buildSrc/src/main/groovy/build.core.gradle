@@ -2,9 +2,10 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 plugins {
-  id 'build.infos'
   id 'build.repositories'
 }
+
+final ThreadLocal<Project> localProject = ThreadLocal.withInitial { project }
 
 static boolean isEnable(Object value) {
   if (value == null) {
@@ -22,7 +23,7 @@ static boolean isEnable(Object value) {
     valueToString.equalsIgnoreCase("open")
 }
 
-static def currentGradleDirectoryPath(buildscript) {
+static String currentGradleDirectoryPath(buildscript) {
   java.nio.file.Path sourcePath = buildscript.sourceFile.toPath()
   def parent = sourcePath.getParent()
   return parent.toString() + File.separator
@@ -42,11 +43,14 @@ ext["utils"] = [
 
 class Printer {
 
-  //50: debug
-  //100: info
-  private final int logLevel = 100
+  private final ThreadLocal<Project> localProject;
+
+  Printer(ThreadLocal<Project> localProject) {
+    this.localProject = localProject
+  }
 
   def info(message) {
+    int logLevel = localProject.get().infos.logLevel
     if (logLevel > 100) {
       return
     }
@@ -54,6 +58,7 @@ class Printer {
   }
 
   def debug(message) {
+    int logLevel = localProject.get().infos.logLevel
     if (logLevel > 50) {
       return
     }
@@ -61,4 +66,4 @@ class Printer {
   }
 }
 
-ext["printer"] = new Printer()
+ext["printer"] = new Printer(localProject)

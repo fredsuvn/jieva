@@ -1,5 +1,5 @@
 plugins {
-  id 'build.kotlin-publish-jar'
+  id 'build.jar'
 }
 
 description = "Boat Serialize: Serialization and deserialization interfaces and utilities (for json and more)."
@@ -18,9 +18,4 @@ dependencies {
   api "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
 
   testCompile project(":boat-test")
-}
-
-test {
-  useTestNG()
-  include("**/*Test.class", "**/*TestKt.class")
 }
