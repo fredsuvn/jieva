@@ -1,5 +1,5 @@
 plugins {
-  id 'build.kotlin-publish-jar'
+  id 'build.jar'
 }
 
 description = "Boat Core: Core and basic interfaces, functions and utilities."
@@ -37,9 +37,4 @@ dependencies {
 
   testAnnotationProcessor platform(project(":boat-dependencies"))
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
-}
-
-test {
-  useTestNG()
-  include("**/*Test.class", "**/*TestKt.class")
 }

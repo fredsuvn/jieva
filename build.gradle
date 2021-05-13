@@ -3,22 +3,26 @@ plugins {
   id 'build.asciidoc'
 }
 
+initProjectConfigure(project)
+
 description = "Build for Boat projects"
 
 printer.info("Build $project.name")
 
 allprojects { p ->
-  printProjectInfo(p)
 }
 
 subprojects { p ->
+  initProjectConfigure(p)
 }
 
 tasks.withType(JavaCompile) {
   options.encoding = "UTF-8"
 }
 
-def printProjectInfo(p) {
+def initProjectConfigure(p) {
+  def infos = newInfo()
+  p.ext["infos"] = infos
   p.group = infos.group
   p.version = infos.version
   if (p == rootProject) {
@@ -26,4 +30,83 @@ def printProjectInfo(p) {
   } else {
     printer.info("Configure project ${p.group}:${p.name}:${p.version}")
   }
+}
+
+/**
+ * Project config infos.
+ */
+private static def newInfo() {
+  return [
+
+    //50: debug
+    //100: info
+    logLevel     : 100,
+
+    //Version
+    version      : "0.0.0",
+
+    //Group
+    group        : "xyz.srclab.common",
+
+    //Project url
+    url          : "https://github.com/srclab-projects/boat",
+
+    //Project inception year
+    inceptionYear: "2020",
+
+    //Licenses
+    licenses     : [
+      [
+        name: "The Apache License, Version 2.0",
+        url : "https://www.apache.org/licenses/LICENSE-2.0.txt",
+      ],
+    ],
+
+    //Developers
+    developers   : [
+      [
+        id   : "fredsuvn",
+        name : "孙谦",
+        email: "fredsuvn@163.com",
+        url  : "https://github.com/fredsuvn",
+      ],
+      [
+        id             : "SrcLab",
+        name           : "SrcLab Team",
+        email          : "srclab@163.com",
+        organization   : "SrcLab",
+        organizationUrl: "https://github.com/srclab-projects",
+      ],
+    ],
+
+    //Publish info
+    publish      : [
+      //Whether publish
+      enablePublish: true,
+
+      //Whether publish as snapshot
+      isSnapshot   : false,
+
+      //Snapshot id
+      snapshotId   : "ossrh",
+
+      //Whether publish as Release
+      isRelease    : true,
+
+      //Release id
+      releaseId    : "ossrh",
+
+      //Whether signing
+      isSigning    : true,
+
+      //Signing id
+      signingId    : "gpg",
+
+      //Publish urls
+      urls         : [
+        snapshot: "https://s01.oss.sonatype.org/content/repositories/snapshots",
+        release : "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2",
+      ],
+    ],
+  ]
 }

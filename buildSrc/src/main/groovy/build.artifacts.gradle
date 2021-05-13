@@ -1,0 +1,34 @@
+plugins {
+  id 'build.core'
+  id 'org.jetbrains.dokka'
+}
+
+project.afterEvaluate {
+
+  printer.info("${project.name}: import build.artifacts")
+
+  task sourceJar(type: Jar) {
+    classifier "sources"
+    from sourceSets.main.allSource
+  }
+
+  //task javadocJar(type: Jar, dependsOn: javadoc) {
+  //  classifier "javadoc"
+  //  from javadoc.destinationDir
+  //}
+  task javadocJar(type: Jar, dependsOn: dokkaJavadoc {
+    outputDirectory = javadoc.destinationDir
+  }) {
+    classifier "javadoc"
+    from javadoc.destinationDir
+  }
+
+  artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+  }
+
+  //compileKotlin.inputs.files(processResources)
+  //compileJava.inputs.files(processResources)
+}

@@ -1,5 +1,5 @@
 plugins {
-  id 'build.kotlin-sample'
+  id 'build.sample'
 }
 
 description = "Boat Samples"
@@ -16,9 +16,4 @@ dependencies {
 
   testCompile project(":boat-test")
   testCompile "cglib:cglib"
-}
-
-test {
-  useTestNG()
-  include("**/*Sample.class", "**/*SampleKt.class")
 }

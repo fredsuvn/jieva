@@ -1,6 +1,8 @@
 plugins {
-  id 'build.kotlin-publish-jar'
+  id 'build.jar'
 }
+
+printer.info("helo ${project.name}")
 
 group = "xyz.srclab.annotations"
 description = "Boat Annotations"
@@ -18,9 +20,4 @@ dependencies {
   api "org.jetbrains:annotations"
 
   testCompile project(":boat-test")
-}
-
-test {
-  useTestNG()
-  include("**/*Test.class", "**/*TestKt.class")
 }
