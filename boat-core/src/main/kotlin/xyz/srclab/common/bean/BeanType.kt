@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
 

@@ -1,7 +1,7 @@
 package sample.java.xyz.srclab.common.collect;
 
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Nums;
+import xyz.srclab.common.lang.Nums;
 import xyz.srclab.common.collect.*;
 import xyz.srclab.common.test.TestLogger;
 

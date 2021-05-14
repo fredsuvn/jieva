@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.collect.toImmutableMap

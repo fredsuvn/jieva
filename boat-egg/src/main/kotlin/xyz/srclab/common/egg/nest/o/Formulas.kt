@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.base.inBounds
+import xyz.srclab.common.lang.inBounds
 
 internal fun Int.moveSpeedToCoolDown(): Long {
     val interval = (100 - this)

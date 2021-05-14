@@ -1,6 +1,6 @@
 package xyz.srclab.common.exception
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.state.State
 import xyz.srclab.common.state.State.Companion.stateEquals
 import xyz.srclab.common.state.State.Companion.stateHashCode

@@ -3,7 +3,7 @@ package test.xyz.srclab.common.serialize;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Default;
+import xyz.srclab.common.lang.Default;
 import xyz.srclab.common.serialize.json.Json;
 import xyz.srclab.common.serialize.json.JsonSerializer;
 import xyz.srclab.common.serialize.json.JsonSerials;

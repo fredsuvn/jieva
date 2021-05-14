@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.base.randomBetween
+import xyz.srclab.common.lang.randomBetween
 import java.awt.Graphics
 
 internal class OScenario(

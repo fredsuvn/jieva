@@ -1,7 +1,7 @@
 package xyz.srclab.common.state
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.hash
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.hash
 
 import xyz.srclab.common.exception.ExceptionStatus
 import xyz.srclab.common.exception.StatusException

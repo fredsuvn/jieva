@@ -1,7 +1,7 @@
 package xyz.srclab.common.test
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.toTimestamp
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.toTimestamp
 import java.time.Duration
 import java.time.ZonedDateTime
 

@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.*
+import xyz.srclab.common.lang.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*

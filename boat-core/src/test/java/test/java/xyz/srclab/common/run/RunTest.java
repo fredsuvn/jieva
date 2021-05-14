@@ -2,9 +2,9 @@ package test.java.xyz.srclab.common.run;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Counter;
-import xyz.srclab.common.base.Current;
-import xyz.srclab.common.base.IntRef;
+import xyz.srclab.common.lang.Counter;
+import xyz.srclab.common.lang.Current;
+import xyz.srclab.common.lang.IntRef;
 import xyz.srclab.common.run.*;
 import xyz.srclab.common.test.TestLogger;
 

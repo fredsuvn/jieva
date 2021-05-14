@@ -1,6 +1,6 @@
 package xyz.srclab.common.cache
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 import java.time.Duration
 
 open class CaffeineCache<K : Any, V>(private val caffeine: com.github.benmanes.caffeine.cache.Cache<K, V>) :

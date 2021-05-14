@@ -1,7 +1,7 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
-import xyz.srclab.common.base.castSelfComparableComparator
+import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.lang.castSelfComparableComparator
 
 class MapOps<K, V>(private var map: Map<K, V>) {
 

@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.jvm.jvmDescriptor
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method

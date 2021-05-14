@@ -1,6 +1,6 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 
 class IterableOps<T>(iterable: Iterable<T>) :
     BaseIterableOps<T, Iterable<T>, MutableIterable<T>, IterableOps<T>>(iterable) {

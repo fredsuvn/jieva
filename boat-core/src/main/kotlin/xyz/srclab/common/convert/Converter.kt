@@ -1,8 +1,8 @@
 package xyz.srclab.common.convert
 
-import xyz.srclab.common.base.Default
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.Default
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.collect.plusBefore
 import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type

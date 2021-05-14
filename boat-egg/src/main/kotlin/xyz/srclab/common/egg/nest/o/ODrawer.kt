@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.base.loadPropertiesResource
+import xyz.srclab.common.lang.loadPropertiesResource
 import xyz.srclab.common.collect.map
 import xyz.srclab.common.reflect.getFieldValue
 import java.awt.Color

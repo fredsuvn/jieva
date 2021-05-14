@@ -1,7 +1,7 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.base.toBytes
-import xyz.srclab.common.base.toChars
+import xyz.srclab.common.lang.toBytes
+import xyz.srclab.common.lang.toChars
 import xyz.srclab.common.codec.Codec.Companion.encodeBase64String
 import xyz.srclab.common.codec.Codec.Companion.encodeHexString
 

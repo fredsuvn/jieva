@@ -1,7 +1,7 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
-import xyz.srclab.common.base.castSelfComparableComparator
+import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.lang.castSelfComparableComparator
 import kotlin.random.Random
 
 class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, ListOps<T>>(list) {

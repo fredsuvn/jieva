@@ -1,6 +1,6 @@
 package xyz.srclab.common.convert
 
-import xyz.srclab.common.base.*
+import xyz.srclab.common.lang.*
 import xyz.srclab.common.bean.BeanCopyOptions
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*

@@ -2,7 +2,7 @@ package test.xyz.srclab.common.codec;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Chars;
+import xyz.srclab.common.lang.Chars;
 import xyz.srclab.common.codec.Codec;
 import xyz.srclab.common.codec.CodecAlgorithm;
 import xyz.srclab.common.codec.CodecKeys;

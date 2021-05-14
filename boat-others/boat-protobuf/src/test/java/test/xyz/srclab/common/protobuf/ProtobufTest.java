@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import test.xyz.srclab.common.protobuf.protogen.MessageData;
 import test.xyz.srclab.common.protobuf.protogen.RequestMessage;
-import xyz.srclab.common.base.Anys;
+import xyz.srclab.common.lang.Anys;
 import xyz.srclab.common.bean.BeanResolver;
 import xyz.srclab.common.bean.BeanType;
 import xyz.srclab.common.bean.Beans;

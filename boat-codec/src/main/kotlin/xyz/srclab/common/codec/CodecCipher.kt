@@ -1,7 +1,7 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.annotations.concurrent.ThreadSafe
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 
 /**
  * Codec cipher.

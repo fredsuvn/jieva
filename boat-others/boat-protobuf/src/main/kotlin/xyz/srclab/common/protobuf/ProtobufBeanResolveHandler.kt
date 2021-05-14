@@ -3,7 +3,7 @@ package xyz.srclab.common.protobuf
 import com.google.protobuf.Descriptors
 import com.google.protobuf.Message
 import com.google.protobuf.MessageOrBuilder
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.bean.AbstractBeanResolveHandler
 import xyz.srclab.common.bean.BeanResolveHandler
 import xyz.srclab.common.invoke.Invoker

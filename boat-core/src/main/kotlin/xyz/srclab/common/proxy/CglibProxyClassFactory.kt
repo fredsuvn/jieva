@@ -1,7 +1,7 @@
 package xyz.srclab.common.proxy
 
 import net.sf.cglib.proxy.*
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 import java.lang.reflect.Method
 import java.util.*
 

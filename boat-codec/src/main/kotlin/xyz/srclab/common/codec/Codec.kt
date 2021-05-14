@@ -1,8 +1,8 @@
 package xyz.srclab.common.codec
 
 import org.bouncycastle.math.ec.ECPoint
-import xyz.srclab.common.base.toBytes
-import xyz.srclab.common.base.toChars
+import xyz.srclab.common.lang.toBytes
+import xyz.srclab.common.lang.toChars
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.DigestCipher.Companion.toDigestCipher
 import xyz.srclab.common.codec.EncodeCipher.Companion.toEncodeCipher

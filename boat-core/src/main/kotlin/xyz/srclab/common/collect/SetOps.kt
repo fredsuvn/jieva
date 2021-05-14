@@ -1,6 +1,6 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 
 class SetOps<T>(set: Set<T>) : CollectionOps<T, Set<T>, MutableSet<T>, SetOps<T>>(set) {
 

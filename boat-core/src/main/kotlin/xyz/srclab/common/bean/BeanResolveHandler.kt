@@ -1,9 +1,9 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.NamingCase
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.NamingCase
+import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker

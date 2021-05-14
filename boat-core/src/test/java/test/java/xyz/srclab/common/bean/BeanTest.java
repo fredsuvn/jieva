@@ -2,7 +2,7 @@ package test.java.xyz.srclab.common.bean;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Anys;
+import xyz.srclab.common.lang.Anys;
 import xyz.srclab.common.bean.*;
 import xyz.srclab.common.reflect.Types;
 import xyz.srclab.common.test.TestLogger;

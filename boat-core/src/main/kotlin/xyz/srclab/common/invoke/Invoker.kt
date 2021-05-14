@@ -1,6 +1,6 @@
 package xyz.srclab.common.invoke
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.reflect.declaredConstructorOrNull
 import xyz.srclab.common.reflect.isStatic
 import xyz.srclab.common.reflect.ownedMethodOrNull
