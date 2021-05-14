@@ -1,8 +1,8 @@
 package xyz.srclab.common.lang
 
 import org.apache.commons.io.IOUtils
-import xyz.srclab.common.lang.ShellProcess.Companion.asShellProcess
 import xyz.srclab.common.collect.arrayToStringArray
+import xyz.srclab.common.lang.ShellProcess.Companion.asShellProcess
 import java.io.InputStream
 import java.io.PrintStream
 import java.nio.charset.Charset

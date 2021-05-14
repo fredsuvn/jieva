@@ -1,10 +1,10 @@
 package xyz.srclab.common.id
 
+import xyz.srclab.common.id.StringIdSpec.Companion.DEFAULT_COMPONENT_FACTORY_PROVIDERS
 import xyz.srclab.common.lang.CharsTemplate
 import xyz.srclab.common.lang.CharsTemplate.Companion.resolveTemplate
 import xyz.srclab.common.lang.LazyString.Companion.toLazyString
 import xyz.srclab.common.lang.lazyOf
-import xyz.srclab.common.id.StringIdSpec.Companion.DEFAULT_COMPONENT_FACTORY_PROVIDERS
 import java.util.*
 
 /**

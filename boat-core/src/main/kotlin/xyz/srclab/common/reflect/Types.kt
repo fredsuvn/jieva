@@ -5,8 +5,8 @@ package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
 import org.apache.commons.lang3.reflect.TypeUtils
-import xyz.srclab.common.lang.anyOrArrayEquals
 import xyz.srclab.common.collect.toTypedArray
+import xyz.srclab.common.lang.anyOrArrayEquals
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type

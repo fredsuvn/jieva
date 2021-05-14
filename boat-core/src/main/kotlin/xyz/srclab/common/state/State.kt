@@ -1,10 +1,9 @@
 package xyz.srclab.common.state
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.lang.hash
-
 import xyz.srclab.common.exception.ExceptionStatus
 import xyz.srclab.common.exception.StatusException
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.hash
 
 /**
  * Represents a state or status.

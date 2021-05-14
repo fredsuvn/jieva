@@ -1,8 +1,8 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.lang.CachingProductBuilder
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.convert.Converter
 import java.lang.reflect.Type
 
 interface BeanCopyOptions {
@@ -241,7 +241,7 @@ interface BeanCopyOptions {
                 override val fromTypeFilter: (name: Any?, fromNameType: Type, fromValueType: Type) -> Boolean =
                     this@Builder.fromTypeFilter
                 override val fromValueFilter:
-                    (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean =
+                        (name: Any?, fromNameType: Type, fromValueType: Type, fromValue: Any?) -> Boolean =
                     this@Builder.fromValueFilter
                 override val convertFilter: (
                     name: Any?, fromNameType: Type, fromValueType: Type, value: Any?, toNameType: Type, toValueType: Type

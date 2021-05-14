@@ -2,8 +2,8 @@ package test.java.xyz.srclab.common.collect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Nums;
 import xyz.srclab.common.collect.*;
+import xyz.srclab.common.lang.Nums;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.*;

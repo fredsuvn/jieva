@@ -4,10 +4,10 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.collect.MapType
 import xyz.srclab.common.collect.MapType.Companion.toMapType
 import xyz.srclab.common.convert.Converter
+import xyz.srclab.common.lang.asAny
 import java.lang.reflect.Type
 
 private val defaultResolver = BeanResolver.DEFAULT
