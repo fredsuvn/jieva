@@ -9,5 +9,5 @@ javaPlatform {
 }
 
 dependencies {
-  api platform("xyz.srclab.dependencies:srclab-dependencies:0.0.0")
+  api platform("xyz.srclab.dependencies:srclab-dependencies:0.0.1")
 }

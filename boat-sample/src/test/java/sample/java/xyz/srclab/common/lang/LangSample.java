@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class BaseSample {
+public class LangSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
