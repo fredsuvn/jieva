@@ -3,8 +3,8 @@
 
 package xyz.srclab.common.codec.aes
 
-import xyz.srclab.common.base.toBytes
 import xyz.srclab.common.codec.CodecAlgorithm
+import xyz.srclab.common.lang.toBytes
 import java.security.SecureRandom
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey

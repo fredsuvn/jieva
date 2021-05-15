@@ -1,10 +1,10 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
 import xyz.srclab.common.collect.ListMap.Companion.toListMap
 import xyz.srclab.common.collect.MutableListMap.Companion.toMutableListMap
 import xyz.srclab.common.collect.MutableSetMap.Companion.toMutableSetMap
 import xyz.srclab.common.collect.SetMap.Companion.toSetMap
+import xyz.srclab.common.lang.asAny
 import java.util.*
 
 /**

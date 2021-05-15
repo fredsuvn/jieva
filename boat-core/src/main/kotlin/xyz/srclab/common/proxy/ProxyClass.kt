@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.base.Current
+import xyz.srclab.common.lang.Current
 
 /**
  * Proxy class.

@@ -1,6 +1,6 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.*
+import xyz.srclab.common.lang.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -548,7 +548,7 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     @JvmOverloads
-    open fun sorted(comparator: Comparator<in T> = castSelfComparableComparator()): ListOps<T> {
+    open fun sorted(comparator: Comparator<in T> = asComparableComparator()): ListOps<T> {
         return finalIterable().sorted(comparator).toListOps()
     }
 
@@ -565,22 +565,22 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     @JvmOverloads
-    open fun max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
+    open fun max(comparator: Comparator<in T> = asComparableComparator()): T {
         return finalIterable().max(comparator)
     }
 
     @JvmOverloads
-    open fun maxOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
+    open fun maxOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
         return finalIterable().maxOrNull(comparator)
     }
 
     @JvmOverloads
-    open fun min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
+    open fun min(comparator: Comparator<in T> = asComparableComparator()): T {
         return finalIterable().min(comparator)
     }
 
     @JvmOverloads
-    open fun minOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
+    open fun minOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
         return finalIterable().minOrNull(comparator)
     }
 
@@ -663,7 +663,7 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     @JvmOverloads
-    open fun toSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
+    open fun toSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
         return finalIterable().toSortedSet(comparator)
     }
 
@@ -708,7 +708,7 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     @JvmOverloads
-    open fun asToSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
+    open fun asToSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
         return finalIterable().asToSortedSet(comparator)
     }
 

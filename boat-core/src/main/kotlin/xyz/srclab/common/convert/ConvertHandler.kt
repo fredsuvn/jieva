@@ -1,10 +1,10 @@
 package xyz.srclab.common.convert
 
-import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanCopyOptions
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
 import xyz.srclab.common.collect.IterableType.Companion.toIterableType
+import xyz.srclab.common.lang.*
 import xyz.srclab.common.reflect.*
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType

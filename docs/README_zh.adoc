@@ -10,7 +10,7 @@
 :license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
 
 :qq-group: QQ group: 1037555759
-:boat-version: 0.0.0
+:boat-version: 0.0.1
 
 == 简介
 
@@ -83,27 +83,27 @@ include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/annotations/Ann
 
 === Boat Core (boat-core)
 
-==== Base
+==== Lang
 
-Base包提供基本的核心基础接口, 功能和工具:
+Base包提供对Java/Kotlin的基础和增强接口, 功能和工具:
 
-* 全局快捷对象: Current, Default, Environment;
-* 语法增强(主要针对java): Let, Ref, Lazy;
+* 全局运行时, 上下文, 默认和环境对象: Current, Default, Environment;
+* 语法增强(主要针对java): Let, Ref, Lazy, LazyString;
 * 字符串功能: CharsFormat, CharsTemplate, NamingCase;
-* 核心基础接口: Accessor (以及 GenericAccessor), Serial, SpecParser, CachingProductBuilder
+* 特殊字符支持: CtlChars, EscChars, CsiChars, SgrChars;
+* 核心和辅助接口: Accessor (以及 GenericAccessor), Serial, SpecParser, CachingProductBuilder, Processing;
 * 常用工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
-* 其他工具: About, Counter, Shell, LazyString.
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/base/BaseSample.java[]
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/lang/LangSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/base/BaseSample.kt[]
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/lang/LangSample.kt[]
 ----
 
 ==== Bean
@@ -323,6 +323,25 @@ include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/state/StateS
 [source,kotlin]
 ----
 include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/state/StateSample.kt[]
+----
+
+==== Utils
+
+其他辅助工具:
+
+* Counter: 针对int/long的简单计数器, 可原子化;
+* About: 产品信息如About, Author, SemVer.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/utils/UtilsSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/utils/UtilsSample.kt[]
 ----
 
 ==== Test

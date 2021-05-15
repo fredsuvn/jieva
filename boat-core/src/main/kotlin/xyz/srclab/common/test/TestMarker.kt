@@ -1,6 +1,6 @@
 package xyz.srclab.common.test
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 

@@ -1,7 +1,7 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
-import xyz.srclab.common.base.castSelfComparableComparator
+import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.lang.asComparableComparator
 
 class MapOps<K, V>(private var map: Map<K, V>) {
 
@@ -82,7 +82,7 @@ class MapOps<K, V>(private var map: Map<K, V>) {
     }
 
     @JvmOverloads
-    fun sorted(comparator: Comparator<in Map.Entry<K, V>> = castSelfComparableComparator()): Map<K, V> {
+    fun sorted(comparator: Comparator<in Map.Entry<K, V>> = asComparableComparator()): Map<K, V> {
         return finalMap().sorted(comparator)
     }
 

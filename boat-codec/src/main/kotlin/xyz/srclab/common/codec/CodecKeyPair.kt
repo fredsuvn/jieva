@@ -1,9 +1,9 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.toChars
 import xyz.srclab.common.codec.Codec.Companion.encodeBase64String
 import xyz.srclab.common.codec.Codec.Companion.encodeHexString
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.toChars
 
 /**
  * Key pair of codec.

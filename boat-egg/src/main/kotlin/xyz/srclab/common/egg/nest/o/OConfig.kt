@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.base.loadPropertiesResource
+import xyz.srclab.common.lang.loadPropertiesResource
 
 internal object OConfig {
 

@@ -4,10 +4,10 @@ import org.testng.Assert
 import org.testng.annotations.Test
 import sample.xyz.srclab.common.protobuf.protogen.MessageData
 import sample.xyz.srclab.common.protobuf.protogen.RequestMessage
-import xyz.srclab.common.base.asAny
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.putEntries
+import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.protobuf.PROTOBUF_BEAN_COPY_OPTIONS
 import xyz.srclab.common.protobuf.PROTOBUF_BEAN_RESOLVER
 import xyz.srclab.common.protobuf.PROTOBUF_CONVERTER

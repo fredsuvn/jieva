@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.base.toBytes
+import xyz.srclab.common.lang.toBytes
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 

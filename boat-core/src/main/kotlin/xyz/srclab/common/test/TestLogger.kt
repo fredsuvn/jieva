@@ -1,10 +1,10 @@
 package xyz.srclab.common.test
 
-import xyz.srclab.common.base.CharsFormat
-import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
-import xyz.srclab.common.base.CharsFormat.Companion.printfFormat
-import xyz.srclab.common.base.Current
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.CharsFormat
+import xyz.srclab.common.lang.CharsFormat.Companion.fastFormat
+import xyz.srclab.common.lang.CharsFormat.Companion.printfFormat
+import xyz.srclab.common.lang.Current
+import xyz.srclab.common.lang.asAny
 import java.io.PrintStream
 
 /**

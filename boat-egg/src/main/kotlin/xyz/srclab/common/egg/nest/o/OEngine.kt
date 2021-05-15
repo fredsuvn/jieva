@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.base.Current
+import xyz.srclab.common.lang.Current
 import java.awt.event.KeyEvent
 import kotlin.random.Random
 

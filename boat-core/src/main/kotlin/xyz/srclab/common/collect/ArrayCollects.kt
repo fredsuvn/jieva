@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 import kotlin.collections.joinTo as joinToKt
 import kotlin.collections.joinToString as joinToStringKt
 

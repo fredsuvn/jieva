@@ -11,7 +11,7 @@ Table of Contents
     -   [Boat Annotations
         (boat-annotations)](#_boat_annotations_boat_annotations)
     -   [Boat Core (boat-core)](#_boat_core_boat_core)
-        -   [Base](#_base)
+        -   [Lang](#_lang)
         -   [Bean](#_bean)
         -   [Bus](#_bus)
         -   [Cache](#_cache)
@@ -24,6 +24,7 @@ Table of Contents
         -   [Reflect](#_reflect)
         -   [Run](#_run)
         -   [State](#_state)
+        -   [Utils](#_utils)
         -   [Test](#_test)
     -   [Boat Serialize
         (boat-serialize)](#_boat_serialize_boat_serialize)
@@ -71,14 +72,14 @@ serialize and id), just import:
 
 Gradle
 
-    implementation("xyz.srclab.common:boat:0.0.0")
+    implementation("xyz.srclab.common:boat:0.0.1")
 
 Maven
 
     <dependency>
         <groupId>xyz.srclab.common</groupId>
         <artifactId>boat</artifactId>
-        <version>0.0.0</version>
+        <version>0.0.1</version>
     </dependency>
 
 Source Code
@@ -209,40 +210,43 @@ Kotlin Examples
 
 ### Boat Core (boat-core)
 
-#### Base
+#### Lang
 
-Base package provides base core and basic interfaces, functions and
-utilities:
+Lang package provides base and enhancement interfaces, functions and
+utilities for Java/Kotlin:
 
--   Global shortcut objects: Current, Default, Environment;
+-   Global runtime, context, default and environment objects: Current,
+    Default, Environment;
 
--   Syntax enhancement (mainly for Java): Let, Ref, Lazy;
+-   Syntax enhancement (mainly for Java): Let, Ref, Lazy, LazyString;
 
--   String functions: CharsFormat, CharsTemplate, NamingCase;
+-   String/CharSequence functions: CharsFormat, CharsTemplate,
+    NamingCase;
 
--   Core and basic interfaces: Accessor (and GenericAccessor), Serial,
-    SpecParser, CachingProductBuilder
+-   Special character support: CtlChars, EscChars, CsiChars, SgrChars;
+
+-   Core and helper interfaces: Accessor (and GenericAccessor), Serial,
+    SpecParser, CachingProductBuilder, Processing;
 
 -   Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms,
-    Compares, Checks, Requires, Enums, Loaders;
-
--   Other tools: About, Counter, Shell, LazyString.
+    Compares, Checks, Requires, Enums, Loaders.
 
 Java Examples
 
-    package sample.java.xyz.srclab.common.base;
+    package sample.java.xyz.srclab.common.lang;
 
     import org.jetbrains.annotations.NotNull;
     import org.testng.annotations.Test;
-    import xyz.srclab.common.base.*;
+    import xyz.srclab.common.lang.*;
     import xyz.srclab.common.test.TestLogger;
+    import xyz.srclab.common.utils.Counter;
 
     import java.math.BigDecimal;
     import java.time.LocalDateTime;
     import java.util.*;
     import java.util.stream.IntStream;
 
-    public class BaseSample {
+    public class LangSample {
 
         private static final TestLogger logger = TestLogger.DEFAULT;
 
@@ -288,14 +292,14 @@ Java Examples
 
         @Test
         public void testEnvironment() {
-            logger.log(Environment.getProperty(Environment.KEY_OS_ARCH));
+            logger.log(Environment.getProperty(Environment.OS_ARCH_KEY));
             logger.log(Environment.availableProcessors());
             logger.log(Environment.osVersion());
             logger.log(Environment.isOsWindows());
         }
 
         @Test
-        public void testFormat() {
+        public void testCharsFormat() {
             String byFast = CharsFormat.fastFormat("1, 2, {}", 3);
             String byMessage = CharsFormat.messageFormat("1, 2, {0}", 3);
             String byPrintf = CharsFormat.printfFormat("1, 2, %d", 3);
@@ -306,7 +310,7 @@ Java Examples
         }
 
         @Test
-        public void testTemplate() {
+        public void testCharsTemplate() {
             Map<Object, Object> args = new HashMap<>();
             args.put("name", "Dog");
             args.put("name}", "DogX");
@@ -332,16 +336,6 @@ Java Examples
             String lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL);
             //upperCamel
             logger.log("lowerCamel: {}", lowerCamel);
-        }
-
-        @Test
-        public void testCounter() {
-            Counter counter = Counter.startsAt(100);
-            counter.getAndIncrementInt();
-            counter.reset();
-            Counter atomicCounter = Counter.startsAt(100, true);
-            atomicCounter.incrementAndGetInt();
-            atomicCounter.reset();
         }
 
         @Test
@@ -381,7 +375,7 @@ Java Examples
         }
 
         @Test
-        public void testUtils() {
+        public void testBaseTypes() {
 
             //Anys examples:
             List<String>[] lists = Anys.as(new List[]{});
@@ -487,62 +481,45 @@ Java Examples
         }
 
         @Test
+        public void testProcess() {
+            if (Environment.isOsUnix()) {
+                testProcessing("echo", "ECHO_CONTENT");
+            }
+            if (Environment.isOsWindows()) {
+                testProcessing("cmd.exe", "/c", "echo " + "ECHO_CONTENT");
+            }
+        }
+
+        private void testProcessing(String... command) {
+            Processing processing = Processing.newProcessing(command);
+            processing.waitForTermination();
+            String output = processing.outputString();
+            //ECHO_CONTENT
+            logger.log(output);
+        }
+
+        @Test
         public void testShell() {
-            Shell shell = Shell.DEFAULT;
-            shell.println("Hello", ",", "World", "!");
-            shell.println(Arrays.asList("Hello", ",", "World", "!"));
-            shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
-            shell.println(
+            logger.log("Hello, world!");
+            logger.log("123{}456{}{}", EscChars.linefeed(), EscChars.newline(), EscChars.reset());
+            logger.log("{}{}{}",
                 SgrChars.foregroundRed("red"),
                 SgrChars.backgroundCyan(" "),
                 SgrChars.foregroundGreen("green")
             );
-            shell.println(
+            logger.log("{}{}{}",
                 SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
                 SgrChars.backgroundCyan(" "),
                 SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
             );
-            shell.println(
+            logger.log("{}{}{}",
                 SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
                 SgrChars.backgroundCyan(" "),
                 SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
             );
-            shell.println(ControlChars.beep());
-            shell.println("123", ControlChars.backspaces(), "456", ControlChars.beep());
-        }
-
-        @Test
-        public void testAbout() {
-            String verString = "1.2.3-beta.2.3+123";
-            SemVer semVer = SemVer.parse(verString);
-            About about = About.of(
-                "name",
-                semVer.normalString(),
-                Collections.singletonList(Author.of("name", "author@mail.com", null)),
-                "123@123.com",
-                "url",
-                Collections.singletonList("licence"),
-                Collections.singletonList(About.of(
-                    "poweredBy",
-                    null,
-                    Collections.emptyList(),
-                    null,
-                    null,
-                    Collections.emptyList(),
-                    Collections.emptyList(),
-                    null
-                )),
-                "© 2021 SrcLab"
-            );
-            //name
-            //Version: 1.2.3
-            //Author: name(author@mail.com)
-            //Mail: 123@123.com
-            //Url: url
-            //Licence: licence
-            //Powered by: poweredBy
-            //© 2021 SrcLab
-            logger.log("About: {}", about);
+            logger.log(CtlChars.beep());
+            logger.log("123\010456\007");
+            logger.log("123{}456{}", CtlChars.backspaces(), CtlChars.beep());
         }
 
         public enum TestEnum {
@@ -553,19 +530,19 @@ Java Examples
 
 Kotlin Examples
 
-    package sample.kotlin.xyz.srclab.common.base
+    package sample.kotlin.xyz.srclab.common.lang
 
     import org.testng.annotations.Test
-    import xyz.srclab.common.base.*
-    import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
-    import xyz.srclab.common.base.CharsFormat.Companion.messageFormat
-    import xyz.srclab.common.base.CharsFormat.Companion.printfFormat
-    import xyz.srclab.common.base.CharsTemplate.Companion.resolveTemplate
-    import xyz.srclab.common.base.Counter.Companion.counterStarts
-    import xyz.srclab.common.base.LazyString.Companion.toLazyString
-    import xyz.srclab.common.base.SemVer.Companion.parseSemVer
-    import xyz.srclab.common.base.SpecParser.Companion.parseFirstClassNameToInstance
+    import xyz.srclab.common.lang.*
+    import xyz.srclab.common.lang.CharsFormat.Companion.fastFormat
+    import xyz.srclab.common.lang.CharsFormat.Companion.messageFormat
+    import xyz.srclab.common.lang.CharsFormat.Companion.printfFormat
+    import xyz.srclab.common.lang.CharsTemplate.Companion.resolveTemplate
+    import xyz.srclab.common.lang.LazyString.Companion.toLazyString
+    import xyz.srclab.common.lang.Processing.Companion.newProcessing
+    import xyz.srclab.common.lang.SpecParser.Companion.parseFirstClassNameToInstance
     import xyz.srclab.common.test.TestLogger
+    import xyz.srclab.common.utils.Counter.Companion.counterStarts
     import java.math.BigDecimal
     import java.util.*
     import kotlin.text.toBigDecimal
@@ -592,14 +569,14 @@ Kotlin Examples
 
         @Test
         fun testEnvironment() {
-            logger.log(Environment.getProperty(Environment.KEY_OS_ARCH))
+            logger.log(Environment.getProperty(Environment.OS_ARCH_KEY))
             logger.log(Environment.availableProcessors)
             logger.log(Environment.osVersion)
             logger.log(Environment.isOsWindows)
         }
 
         @Test
-        fun testFormat() {
+        fun testCharsFormat() {
             val byFast = "1, 2, {}".fastFormat(3)
             val byMessage = "1, 2, {0}".messageFormat(3)
             val byPrintf = "1, 2, %d".printfFormat(3)
@@ -610,7 +587,7 @@ Kotlin Examples
         }
 
         @Test
-        fun testTemplate() {
+        fun testCharsTemplate() {
             val args: MutableMap<Any, Any?> = HashMap()
             args["name"] = "Dog"
             args["name}"] = "DogX"
@@ -636,16 +613,6 @@ Kotlin Examples
         }
 
         @Test
-        fun testCounter() {
-            val counter = 100.counterStarts()
-            counter.getAndIncrementInt()
-            counter.reset()
-            val atomicCounter = 100.counterStarts(true)
-            atomicCounter.incrementAndGetInt()
-            atomicCounter.reset()
-        }
-
-        @Test
         fun testLazyString() {
             val counter = 0.counterStarts()
             val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyString()
@@ -668,7 +635,7 @@ Kotlin Examples
         }
 
         @Test
-        fun testUtils() {
+        fun testBaseTypes() {
 
             //Anys examples:
             val lists = arrayOf<List<*>>().asAny<Array<List<String>>>()
@@ -770,64 +737,48 @@ Kotlin Examples
         }
 
         @Test
+        fun testProcess() {
+            if (Environment.isOsUnix) {
+                testProcessing("echo", "ECHO_CONTENT")
+            }
+            if (Environment.isOsWindows) {
+                testProcessing("cmd.exe", "/c", "echo " + "ECHO_CONTENT")
+            }
+        }
+
+        private fun testProcessing(vararg command: String) {
+            val processing = newProcessing(*command)
+            processing.waitForTermination()
+            val output = processing.outputString()
+            //ECHO_CONTENT
+            logger.log(output)
+        }
+
+        @Test
         fun testShell() {
-            val shell = Shell.DEFAULT
-            shell.println("Hello", ",", "World", "!")
-            shell.println(Arrays.asList("Hello", ",", "World", "!"))
-            shell.println("123", ControlChars.linefeed, "456", EscapeChars.newline, EscapeChars.reset)
-            shell.println(
+            logger.log("Hello, world!")
+            logger.log("123{}456{}{}", EscChars.linefeed, EscChars.newline, EscChars.reset)
+            logger.log(
+                "{}{}{}",
                 SgrChars.foregroundRed("red"),
                 SgrChars.backgroundCyan(" "),
                 SgrChars.foregroundGreen("green")
             )
-            shell.println(
+            logger.log(
+                "{}{}{}",
                 SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
                 SgrChars.backgroundCyan(" "),
                 SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
             )
-            shell.println(
+            logger.log(
+                "{}{}{}",
                 SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
                 SgrChars.backgroundCyan(" "),
                 SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
             )
-            shell.println(ControlChars.beep)
-            shell.println("123", ControlChars.backspaces, "456", ControlChars.beep)
-        }
-
-        @Test
-        fun testAbout() {
-            val verString = "1.2.3-beta.2.3+123"
-            val semVer: SemVer = verString.parseSemVer()
-            val about = About.of(
-                "name",
-                semVer.normalString,
-                listOf(Author.of("name", "author@mail.com", null)),
-                "123@123.com",
-                "url",
-                listOf("licence"),
-                listOf(
-                    About.of(
-                        "poweredBy",
-                        null,
-                        emptyList(),
-                        null,
-                        null,
-                        emptyList(),
-                        emptyList(),
-                        null
-                    )
-                ),
-                "© 2021 SrcLab"
-            )
-            //name
-            //Version: 1.2.3
-            //Author: name(author@mail.com)
-            //Mail: 123@123.com
-            //Url: url
-            //Licence: licence
-            //Powered by: poweredBy
-            //© 2021 SrcLab
-            logger.log("About: {}", about)
+            logger.log(CtlChars.beep)
+            //logger.log("123\010456\007");
+            logger.log("123{}456{}", CtlChars.backspaces, CtlChars.beep)
         }
 
         companion object {
@@ -1182,8 +1133,8 @@ Java Examples
     package sample.java.xyz.srclab.common.collect;
 
     import org.testng.annotations.Test;
-    import xyz.srclab.common.base.Nums;
     import xyz.srclab.common.collect.*;
+    import xyz.srclab.common.lang.Nums;
     import xyz.srclab.common.test.TestLogger;
 
     import java.util.*;
@@ -1847,8 +1798,8 @@ Java Examples
     package sample.java.xyz.srclab.common.run;
 
     import org.testng.annotations.Test;
-    import xyz.srclab.common.base.Current;
-    import xyz.srclab.common.base.IntRef;
+    import xyz.srclab.common.lang.Current;
+    import xyz.srclab.common.lang.IntRef;
     import xyz.srclab.common.run.Runner;
     import xyz.srclab.common.run.Running;
     import xyz.srclab.common.run.Scheduler;
@@ -1894,8 +1845,8 @@ Kotlin Examples
     package sample.kotlin.xyz.srclab.common.run
 
     import org.testng.annotations.Test
-    import xyz.srclab.common.base.Current.sleep
-    import xyz.srclab.common.base.IntRef.Companion.of
+    import xyz.srclab.common.lang.Current.sleep
+    import xyz.srclab.common.lang.IntRef.Companion.of
     import xyz.srclab.common.run.Runner
     import xyz.srclab.common.run.Running
     import xyz.srclab.common.run.Scheduler
@@ -2050,6 +2001,141 @@ Kotlin Examples
             override fun withMoreDescription(moreDescription: String): MyState {
                 return MyState(code, descriptions.moreDescriptions(moreDescription))
             }
+        }
+
+        companion object {
+            private val logger = TestLogger.DEFAULT
+        }
+    }
+
+#### Utils
+
+Other helpful utilities:
+
+-   Counter: Simple counter for int/long, amy atomic;
+
+-   About: Product info such as About, Author, SemVer.
+
+Java Examples
+
+    package sample.java.xyz.srclab.common.utils;
+
+    import org.testng.annotations.Test;
+    import xyz.srclab.common.test.TestLogger;
+    import xyz.srclab.common.utils.About;
+    import xyz.srclab.common.utils.Author;
+    import xyz.srclab.common.utils.Counter;
+    import xyz.srclab.common.utils.SemVer;
+
+    import java.util.Collections;
+
+    public class UtilsSample {
+
+        private static final TestLogger logger = TestLogger.DEFAULT;
+
+        @Test
+        public void testCounter() {
+            Counter counter = Counter.startsAt(100);
+            counter.getAndIncrementInt();
+            counter.reset();
+            Counter atomicCounter = Counter.startsAt(100, true);
+            atomicCounter.incrementAndGetInt();
+            atomicCounter.reset();
+        }
+
+        @Test
+        public void testAbout() {
+            String verString = "1.2.3-beta.2.3+123";
+            SemVer semVer = SemVer.parse(verString);
+            About about = About.of(
+                "name",
+                semVer.normalString(),
+                Collections.singletonList(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
+                "url",
+                Collections.singletonList("licence"),
+                Collections.singletonList(About.of(
+                    "poweredBy",
+                    null,
+                    Collections.emptyList(),
+                    null,
+                    null,
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    null
+                )),
+                "© 2021 SrcLab"
+            );
+            //name
+            //Version: 1.2.3
+            //Author: name(author@mail.com)
+            //Mail: 123@123.com
+            //Url: url
+            //Licence: licence
+            //Powered by: poweredBy
+            //© 2021 SrcLab
+            logger.log("About: {}", about);
+        }
+    }
+
+Kotlin Examples
+
+    package sample.kotlin.xyz.srclab.common.utils
+
+    import org.testng.annotations.Test
+    import xyz.srclab.common.test.TestLogger
+    import xyz.srclab.common.utils.About
+    import xyz.srclab.common.utils.Author
+    import xyz.srclab.common.utils.Counter.Companion.counterStarts
+    import xyz.srclab.common.utils.SemVer
+    import xyz.srclab.common.utils.SemVer.Companion.parseSemVer
+
+    class BaseSample {
+
+        @Test
+        fun testAbout() {
+            val verString = "1.2.3-beta.2.3+123"
+            val semVer: SemVer = verString.parseSemVer()
+            val about = About.of(
+                "name",
+                semVer.normalString,
+                listOf(Author.of("name", "author@mail.com", null)),
+                "123@123.com",
+                "url",
+                listOf("licence"),
+                listOf(
+                    About.of(
+                        "poweredBy",
+                        null,
+                        emptyList(),
+                        null,
+                        null,
+                        emptyList(),
+                        emptyList(),
+                        null
+                    )
+                ),
+                "© 2021 SrcLab"
+            )
+            //name
+            //Version: 1.2.3
+            //Author: name(author@mail.com)
+            //Mail: 123@123.com
+            //Url: url
+            //Licence: licence
+            //Powered by: poweredBy
+            //© 2021 SrcLab
+            logger.log("About: {}", about)
+        }
+
+        @Test
+        fun testCounter() {
+            val counter = 100.counterStarts()
+            counter.getAndIncrementInt()
+            counter.reset()
+            val atomicCounter = 100.counterStarts(true)
+            atomicCounter.incrementAndGetInt()
+            atomicCounter.reset()
         }
 
         companion object {

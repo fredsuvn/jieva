@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.base.Ref
+import xyz.srclab.common.lang.Ref
 import java.util.concurrent.CountDownLatch
 
 internal class CountDownRef(private val ref: Ref<CountDownLatch>) : Ref<CountDownLatch> by ref {

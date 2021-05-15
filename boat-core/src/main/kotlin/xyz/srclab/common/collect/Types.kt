@@ -2,7 +2,7 @@ package xyz.srclab.common.collect
 
 import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.reflect.parameterizedType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type

@@ -3,9 +3,9 @@ package xyz.srclab.common.cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
 import com.google.common.collect.MapMaker
-import xyz.srclab.common.base.CachingProductBuilder
-import xyz.srclab.common.base.Default
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.CachingProductBuilder
+import xyz.srclab.common.lang.Default
+import xyz.srclab.common.lang.asAny
 import java.time.Duration
 import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
 import com.google.common.cache.RemovalCause as guavaRemovalCause

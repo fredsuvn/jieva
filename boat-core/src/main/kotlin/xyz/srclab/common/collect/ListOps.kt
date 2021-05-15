@@ -1,7 +1,7 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
-import xyz.srclab.common.base.castSelfComparableComparator
+import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.lang.asComparableComparator
 import kotlin.random.Random
 
 class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, ListOps<T>>(list) {
@@ -165,7 +165,7 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
     }
 
     @JvmOverloads
-    fun binarySearch(element: T, comparator: Comparator<in T> = castSelfComparableComparator()): Int {
+    fun binarySearch(element: T, comparator: Comparator<in T> = asComparableComparator()): Int {
         return finalList().binarySearch(element, comparator)
     }
 
@@ -175,7 +175,7 @@ class ListOps<T>(list: List<T>) : CollectionOps<T, List<T>, MutableList<T>, List
     }
 
     @JvmOverloads
-    fun sort(comparator: Comparator<in T> = castSelfComparableComparator()): ListOps<T> {
+    fun sort(comparator: Comparator<in T> = asComparableComparator()): ListOps<T> {
         finalMutableList().sort(comparator)
         return this.asAny()
     }

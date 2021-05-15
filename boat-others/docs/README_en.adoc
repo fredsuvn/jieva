@@ -9,7 +9,7 @@ Sun Qian <fredsuvn@163.com>
 :license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
 
 :qq-group: QQ group: 1037555759
-:boat-version: 0.0.0
+:boat-version: 0.0.1
 
 == Introduction
 

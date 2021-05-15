@@ -1,8 +1,8 @@
 package sample.kotlin.xyz.srclab.common.run
 
 import org.testng.annotations.Test
-import xyz.srclab.common.base.Current.sleep
-import xyz.srclab.common.base.IntRef.Companion.of
+import xyz.srclab.common.lang.Current.sleep
+import xyz.srclab.common.lang.IntRef.Companion.of
 import xyz.srclab.common.run.Runner
 import xyz.srclab.common.run.Running
 import xyz.srclab.common.run.Scheduler

@@ -9,7 +9,7 @@ Sun Qian <fredsuvn@163.com>
 :license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
 
 :qq-group: QQ group: 1037555759
-:boat-version: 0.0.0
+:boat-version: 0.0.1
 
 == Introduction
 
@@ -82,27 +82,27 @@ include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/annotations/Ann
 
 === Boat Core (boat-core)
 
-==== Base
+==== Lang
 
-Base package provides base core and basic interfaces, functions and utilities:
+Lang package provides base and enhancement interfaces, functions and utilities for Java/Kotlin:
 
-* Global shortcut objects: Current, Default, Environment;
-* Syntax enhancement (mainly for Java): Let, Ref, Lazy;
-* String functions: CharsFormat, CharsTemplate, NamingCase;
-* Core and basic interfaces: Accessor (and GenericAccessor), Serial, SpecParser, CachingProductBuilder
-* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
-* Other tools: About, Counter, Shell, LazyString.
+* Global runtime, context, default and environment objects: Current, Default, Environment;
+* Syntax enhancement (mainly for Java): Let, Ref, Lazy, LazyString;
+* String/CharSequence functions: CharsFormat, CharsTemplate, NamingCase;
+* Special character support: CtlChars, EscChars, CsiChars, SgrChars;
+* Core and helper interfaces: Accessor (and GenericAccessor), Serial, SpecParser, CachingProductBuilder, Processing;
+* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/base/BaseSample.java[]
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/lang/LangSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/base/BaseSample.kt[]
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/lang/LangSample.kt[]
 ----
 
 ==== Bean
@@ -322,6 +322,25 @@ include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/state/StateS
 [source,kotlin]
 ----
 include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/state/StateSample.kt[]
+----
+
+==== Utils
+
+Other helpful utilities:
+
+* Counter: Simple counter for int/long, amy atomic;
+* About: Product info such as About, Author, SemVer.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/utils/UtilsSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/utils/UtilsSample.kt[]
 ----
 
 ==== Test

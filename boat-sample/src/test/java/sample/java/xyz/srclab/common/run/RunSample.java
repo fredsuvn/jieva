@@ -1,8 +1,8 @@
 package sample.java.xyz.srclab.common.run;
 
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Current;
-import xyz.srclab.common.base.IntRef;
+import xyz.srclab.common.lang.Current;
+import xyz.srclab.common.lang.IntRef;
 import xyz.srclab.common.run.Runner;
 import xyz.srclab.common.run.Running;
 import xyz.srclab.common.run.Scheduler;

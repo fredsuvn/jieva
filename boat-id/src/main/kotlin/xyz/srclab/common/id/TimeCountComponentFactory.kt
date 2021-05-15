@@ -1,7 +1,7 @@
 package xyz.srclab.common.id
 
-import xyz.srclab.common.base.CharsFormat.Companion.printfFormat
-import xyz.srclab.common.base.Current
+import xyz.srclab.common.lang.CharsFormat.Companion.printfFormat
+import xyz.srclab.common.lang.Current
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter

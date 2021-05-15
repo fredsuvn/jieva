@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.jvm
 
-import xyz.srclab.common.base.Default
+import xyz.srclab.common.lang.Default
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 

@@ -2,7 +2,6 @@ package test.xyz.srclab.common.codec;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Chars;
 import xyz.srclab.common.codec.Codec;
 import xyz.srclab.common.codec.CodecAlgorithm;
 import xyz.srclab.common.codec.CodecKeys;
@@ -11,6 +10,7 @@ import xyz.srclab.common.codec.rsa.RsaCipher;
 import xyz.srclab.common.codec.rsa.RsaKeyPair;
 import xyz.srclab.common.codec.sm2.Sm2Cipher;
 import xyz.srclab.common.codec.sm2.Sm2KeyPair;
+import xyz.srclab.common.lang.Chars;
 import xyz.srclab.common.test.TestLogger;
 
 import javax.crypto.SecretKey;

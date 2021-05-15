@@ -1,6 +1,6 @@
 package xyz.srclab.common.id
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.lang.asAny
 
 /**
  * Core factory for create new id.

@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg
 
-import xyz.srclab.common.base.Default
+import xyz.srclab.common.lang.Default
 
 class EggNotFoundException(name: CharSequence) : RuntimeException(
     "Egg not found: $name${Default.lineSeparator}$MESSAGE"

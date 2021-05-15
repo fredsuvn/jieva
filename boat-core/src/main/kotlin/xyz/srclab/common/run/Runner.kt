@@ -1,6 +1,6 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.Environment
+import xyz.srclab.common.lang.Environment
 import java.util.concurrent.*
 
 /**

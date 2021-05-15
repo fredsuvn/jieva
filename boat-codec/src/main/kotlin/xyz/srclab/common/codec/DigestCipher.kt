@@ -1,10 +1,10 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.base.toBytes
-import xyz.srclab.common.base.toChars
 import xyz.srclab.common.codec.Codec.Companion.encodeBase64String
 import xyz.srclab.common.codec.Codec.Companion.encodeHexString
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
+import xyz.srclab.common.lang.toBytes
+import xyz.srclab.common.lang.toChars
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 

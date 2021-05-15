@@ -3,10 +3,10 @@ package test.java.xyz.srclab.common.bus;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Counter;
 import xyz.srclab.common.bus.EventBus;
 import xyz.srclab.common.bus.EventHandler;
 import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.utils.Counter;
 
 import java.util.Arrays;
 

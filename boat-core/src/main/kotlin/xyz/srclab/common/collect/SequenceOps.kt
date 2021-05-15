@@ -1,6 +1,6 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.*
+import xyz.srclab.common.lang.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -491,7 +491,7 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Sequence<T> {
     }
 
     @JvmOverloads
-    fun sorted(comparator: Comparator<in T> = castSelfComparableComparator()): SequenceOps<T> {
+    fun sorted(comparator: Comparator<in T> = asComparableComparator()): SequenceOps<T> {
         return finalSequence().sorted(comparator).toSequenceOps()
     }
 
@@ -504,22 +504,22 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Sequence<T> {
     }
 
     @JvmOverloads
-    fun max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
+    fun max(comparator: Comparator<in T> = asComparableComparator()): T {
         return finalSequence().max(comparator)
     }
 
     @JvmOverloads
-    fun maxOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
+    fun maxOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
         return finalSequence().maxOrNull(comparator)
     }
 
     @JvmOverloads
-    fun min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
+    fun min(comparator: Comparator<in T> = asComparableComparator()): T {
         return finalSequence().min(comparator)
     }
 
     @JvmOverloads
-    fun minOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
+    fun minOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
         return finalSequence().minOrNull(comparator)
     }
 
@@ -598,7 +598,7 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Sequence<T> {
     }
 
     @JvmOverloads
-    fun toSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
+    fun toSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
         return finalSequence().toSortedSet(comparator)
     }
 

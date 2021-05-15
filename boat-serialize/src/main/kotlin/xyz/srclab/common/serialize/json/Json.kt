@@ -1,8 +1,8 @@
 package xyz.srclab.common.serialize.json
 
 import com.fasterxml.jackson.databind.node.NullNode
-import xyz.srclab.common.base.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.base.Serial
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.Serial
 import java.lang.reflect.Type
 
 /**
