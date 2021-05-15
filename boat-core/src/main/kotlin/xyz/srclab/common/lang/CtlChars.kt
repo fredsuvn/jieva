@@ -1,244 +1,5 @@
 package xyz.srclab.common.lang
 
-import org.apache.commons.io.IOUtils
-import xyz.srclab.common.collect.arrayToStringArray
-import xyz.srclab.common.lang.ShellProcess.Companion.asShellProcess
-import java.io.InputStream
-import java.io.PrintStream
-import java.nio.charset.Charset
-import java.time.Duration
-import java.util.*
-import java.util.concurrent.TimeUnit
-
-/**
- * Shell to run commands.
- *
- * @see SystemShell
- * @see ShellProcess
- * @see ShellIO
- *
- * @see ControlChars
- * @see EscapeChars
- * @see CsiChars
- * @see SgrChars
- * @see SgrParam
- */
-interface Shell : ShellIO {
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val errorOutput: PrintStream
-        @JvmName("errorOutput") get
-
-    @JvmDefault
-    fun run(vararg command: CharSequence): ShellProcess {
-        return run(charset, *command)
-    }
-
-    @JvmDefault
-    fun run(command: List<CharSequence>): ShellProcess {
-        return run(charset, command)
-    }
-
-    @JvmDefault
-    fun run(charset: Charset, vararg command: CharSequence): ShellProcess {
-        return ProcessBuilder()
-            .command(*command.arrayToStringArray())
-            .redirectErrorStream(true)
-            .start()
-            .asShellProcess(charset)
-    }
-
-    @JvmDefault
-    fun run(charset: Charset, command: List<CharSequence>): ShellProcess {
-        return ProcessBuilder()
-            .command(command.map { it.toString() })
-            .redirectErrorStream(true)
-            .start()
-            .asShellProcess(charset)
-    }
-
-    companion object {
-
-        @JvmField
-        val DEFAULT: Shell = SystemShell()
-
-        @JvmStatic
-        fun withCharset(charset: Charset): Shell {
-            return SystemShell(charset)
-        }
-    }
-}
-
-/**
- * Represents process called by [Shell]
- */
-interface ShellProcess : ShellIO {
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val process: Process
-        @JvmName("process") get
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val isAlive: Boolean
-        @JvmName("isAlive") get() {
-            return process.isAlive
-        }
-
-    /**
-     * @throws InterruptedException
-     */
-    @JvmDefault
-    //@Throws(InterruptedException::class)
-    fun waitFor(): Int {
-        return process.waitFor()
-    }
-
-    /**
-     * @throws InterruptedException
-     */
-    @JvmDefault
-    //@Throws(InterruptedException::class)
-    fun waitFor(timeout: Duration): Boolean {
-        return process.waitFor(timeout.toNanos(), TimeUnit.NANOSECONDS)
-    }
-
-    @JvmDefault
-    fun exitValue(): Int {
-        return process.exitValue()
-    }
-
-    @JvmDefault
-    fun close() {
-        process.destroyForcibly()
-    }
-
-    companion object {
-
-        @JvmStatic
-        @JvmOverloads
-        @JvmName("forProcess")
-        fun Process.asShellProcess(charset: Charset = Charset.defaultCharset()): ShellProcess {
-            return ShellProcessImpl(this, charset)
-        }
-
-        private class ShellProcessImpl(
-            override val process: Process,
-            override val charset: Charset,
-        ) : ShellProcess {
-
-            override val input: InputStream by lazy {
-                process.inputStream
-            }
-
-            override val output: PrintStream by lazy {
-                PrintStream(process.outputStream, false, charset.name())
-            }
-
-            override val scanner: Scanner by lazy {
-                Scanner(input, charset.name())
-            }
-        }
-    }
-}
-
-/**
- * IO for shell operation.
- *
- * @see Shell
- * @see ShellProcess
- */
-interface ShellIO {
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val charset: Charset
-        @JvmName("charset") get
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val input: InputStream
-        @JvmName("input") get
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val output: PrintStream
-        @JvmName("output") get
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val scanner: Scanner
-        @JvmName("scanner") get
-
-    @JvmDefault
-    fun readLine(): String {
-        return scanner.nextLine()
-    }
-
-    @JvmDefault
-    fun readAll(): String {
-        return IOUtils.toString(input, charset)
-    }
-
-    @JvmDefault
-    fun print(chars: Any?) {
-        output.print(chars)
-    }
-
-    @JvmDefault
-    fun print(vararg chars: Any?) {
-        for (c in chars) {
-            output.print(c)
-        }
-    }
-
-    @JvmDefault
-    fun print(chars: List<Any?>) {
-        for (c in chars) {
-            output.print(c)
-        }
-    }
-
-    @JvmDefault
-    fun println(chars: Any?) {
-        output.println(chars)
-    }
-
-    @JvmDefault
-    fun println(vararg chars: Any?) {
-        print(*chars)
-        println()
-    }
-
-    @JvmDefault
-    fun println(chars: List<Any?>) {
-        print(chars)
-        println()
-    }
-
-    @JvmDefault
-    fun println() {
-        output.println()
-    }
-
-    @JvmDefault
-    fun flushPrint() {
-        output.flush()
-    }
-}
-
-class SystemShell(override val charset: Charset = Charset.defaultCharset()) : Shell {
-
-    override val input: InputStream = System.`in`
-
-    override val output: PrintStream by lazy {
-        PrintStream(System.out, false, charset.name())
-    }
-
-    override val scanner: Scanner by lazy {
-        Scanner(input, charset.name())
-    }
-
-    override val errorOutput: PrintStream by lazy {
-        PrintStream(System.err, false, charset.name())
-    }
-}
-
 /**
  * Control characters:
  *
@@ -256,7 +17,7 @@ class SystemShell(override val charset: Charset = Charset.defaultCharset()) : Sh
  * * DEL (0x7F) is ignored;
  * * CSI (0x9B) is equivalent to ESC [.
  */
-object ControlChars {
+object CtlChars {
 
     @JvmStatic
     val beep: String
@@ -332,35 +93,35 @@ object ControlChars {
  * red/green/blue  values  (0–255).   ESC  ] R: reset
  * palette
  */
-object EscapeChars {
+object EscChars {
 
     @JvmStatic
     val reset: String
-        @JvmName("reset") get() = ControlChars.escape("c")
+        @JvmName("reset") get() = CtlChars.escape("c")
 
     @JvmStatic
     val linefeed: String
-        @JvmName("linefeed") get() = ControlChars.escape("D")
+        @JvmName("linefeed") get() = CtlChars.escape("D")
 
     @JvmStatic
     val newline: String
-        @JvmName("newline") get() = ControlChars.escape("E")
+        @JvmName("newline") get() = CtlChars.escape("E")
 
     @JvmStatic
     val setTabAtCurrentColumn: String
-        @JvmName("setTabAtCurrentColumn") get() = ControlChars.escape("H")
+        @JvmName("setTabAtCurrentColumn") get() = CtlChars.escape("H")
 
     @JvmStatic
     val reverseLinefeed: String
-        @JvmName("reverseLinefeed") get() = ControlChars.escape("M")
+        @JvmName("reverseLinefeed") get() = CtlChars.escape("M")
 
     @JvmStatic
     val saveState: String
-        @JvmName("saveState") get() = ControlChars.escape("7")
+        @JvmName("saveState") get() = CtlChars.escape("7")
 
     @JvmStatic
     val restoreState: String
-        @JvmName("restoreState") get() = ControlChars.escape("8")
+        @JvmName("restoreState") get() = CtlChars.escape("8")
 
     @JvmStatic
     val selectCharsetDefault: String
@@ -376,7 +137,7 @@ object EscapeChars {
 
     @JvmStatic
     val fillScreenWithE: String
-        @JvmName("fillScreenWithE") get() = ControlChars.escape("#8")
+        @JvmName("fillScreenWithE") get() = CtlChars.escape("#8")
 
     @JvmStatic
     val defineCharsetG0Default: String
@@ -412,35 +173,35 @@ object EscapeChars {
 
     @JvmStatic
     val setKeypadModeNumeric: String
-        @JvmName("setKeypadModeNumeric") get() = ControlChars.escape(">")
+        @JvmName("setKeypadModeNumeric") get() = CtlChars.escape(">")
 
     @JvmStatic
     val setKeypadModeApplication: String
-        @JvmName("setKeypadModeApplication") get() = ControlChars.escape("=")
+        @JvmName("setKeypadModeApplication") get() = CtlChars.escape("=")
 
     @JvmStatic
     fun csiChars(csiChars: CharSequence): String {
-        return ControlChars.escape("[") + csiChars
+        return CtlChars.escape("[") + csiChars
     }
 
     @JvmStatic
     fun selectCharset(charset: CharSequence): String {
-        return ControlChars.escape("%") + charset
+        return CtlChars.escape("%") + charset
     }
 
     @JvmStatic
     fun defineCharsetG0(charset: CharSequence): String {
-        return ControlChars.escape("(") + charset
+        return CtlChars.escape("(") + charset
     }
 
     @JvmStatic
     fun defineCharsetG1(charset: CharSequence): String {
-        return ControlChars.escape(")") + charset
+        return CtlChars.escape(")") + charset
     }
 
     @JvmStatic
     fun osCommand(command: CharSequence): String {
-        return ControlChars.escape("]") + command
+        return CtlChars.escape("]") + command
     }
 }
 
@@ -547,77 +308,77 @@ object CsiChars {
 
     @JvmStatic
     val saveCursor: String
-        @JvmName("saveCursor") get() = EscapeChars.csiChars("s")
+        @JvmName("saveCursor") get() = EscChars.csiChars("s")
 
     @JvmStatic
     val restoreCursor: String
-        @JvmName("restoreCursor") get() = EscapeChars.csiChars("u")
+        @JvmName("restoreCursor") get() = EscChars.csiChars("u")
 
     @JvmStatic
     val reportStatus: String
-        @JvmName("reportStatus") get() = EscapeChars.csiChars("5n")
+        @JvmName("reportStatus") get() = EscChars.csiChars("5n")
 
     @JvmStatic
     val reportCursor: String
-        @JvmName("reportCursor") get() = EscapeChars.csiChars("6n")
+        @JvmName("reportCursor") get() = EscChars.csiChars("6n")
 
     @JvmStatic
     @JvmOverloads
     fun cursorUp(n: Int = 1): String {
-        return EscapeChars.csiChars("${n}A")
+        return EscChars.csiChars("${n}A")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorDown(n: Int = 1): String {
-        return EscapeChars.csiChars("${n}B")
+        return EscChars.csiChars("${n}B")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorForward(n: Int = 1): String {
-        return EscapeChars.csiChars("${n}C")
+        return EscChars.csiChars("${n}C")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorBack(n: Int = 1): String {
-        return EscapeChars.csiChars("${n}D")
+        return EscChars.csiChars("${n}D")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorNextLine(n: Int = 1): String {
-        return EscapeChars.csiChars("${n}E")
+        return EscChars.csiChars("${n}E")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorPreviousLine(n: Int = 1): String {
-        return EscapeChars.csiChars("${n}F")
+        return EscChars.csiChars("${n}F")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorColumn(n: Int = 1): String {
-        return EscapeChars.csiChars("${n}G")
+        return EscChars.csiChars("${n}G")
     }
 
     @JvmStatic
     fun cursorMove(n: Int, m: Int): String {
-        return EscapeChars.csiChars("${n};${m}H")
+        return EscChars.csiChars("${n};${m}H")
     }
 
     @JvmStatic
     @JvmOverloads
     fun scrollUp(n: Int = 1): String {
-        return EscapeChars.csiChars("${n}S")
+        return EscChars.csiChars("${n}S")
     }
 
     @JvmStatic
     @JvmOverloads
     fun scrollDown(n: Int = 1): String {
-        return EscapeChars.csiChars("${n}T")
+        return EscChars.csiChars("${n}T")
     }
 
     /**
@@ -629,7 +390,7 @@ object CsiChars {
     @JvmStatic
     @JvmOverloads
     fun eraseDisplay(n: Int = 2): String {
-        return EscapeChars.csiChars("${n}J")
+        return EscChars.csiChars("${n}J")
     }
 
     /**
@@ -640,7 +401,7 @@ object CsiChars {
     @JvmStatic
     @JvmOverloads
     fun eraseLine(n: Int = 2): String {
-        return EscapeChars.csiChars("${n}K")
+        return EscChars.csiChars("${n}K")
     }
 
     /**
@@ -651,7 +412,7 @@ object CsiChars {
      */
     @JvmStatic
     fun setMode(h: Int): String {
-        return EscapeChars.csiChars("${h}h")
+        return EscChars.csiChars("${h}h")
     }
 
     /**
@@ -662,7 +423,7 @@ object CsiChars {
      */
     @JvmStatic
     fun resetMode(l: Int): String {
-        return EscapeChars.csiChars("${l}l")
+        return EscChars.csiChars("${l}l")
     }
 }
 
@@ -677,7 +438,7 @@ object SgrChars {
 
     @JvmStatic
     val reset: String
-        @JvmName("reset") get() = EscapeChars.csiChars("${SgrParam.RESET.value}m")
+        @JvmName("reset") get() = EscChars.csiChars("${SgrParam.RESET.value}m")
 
     @JvmStatic
     fun foregroundBlack(content: Any?): String {
@@ -771,7 +532,7 @@ object SgrChars {
 
     @JvmStatic
     fun withParam(content: Any?, sgrParams: SgrParam): String {
-        return EscapeChars.csiChars("${sgrParams.value}m${content}") + reset
+        return EscChars.csiChars("${sgrParams.value}m${content}") + reset
     }
 
     @JvmStatic

@@ -265,27 +265,26 @@ public class BaseSample {
 
     @Test
     public void testShell() {
-        Shell shell = Shell.DEFAULT;
-        shell.println("Hello", ",", "World", "!");
-        shell.println(Arrays.asList("Hello", ",", "World", "!"));
-        shell.println("123", EscapeChars.linefeed(), "456", EscapeChars.newline(), EscapeChars.reset());
-        shell.println(
+        logger.log("Hello, world!");
+        logger.log("123{}456{}{}", EscChars.linefeed(), EscChars.newline(), EscChars.reset());
+        logger.log("{}{}{}",
             SgrChars.foregroundRed("red"),
             SgrChars.backgroundCyan(" "),
             SgrChars.foregroundGreen("green")
         );
-        shell.println(
+        logger.log("{}{}{}",
             SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
             SgrChars.backgroundCyan(" "),
             SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
         );
-        shell.println(
+        logger.log("{}{}{}",
             SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
             SgrChars.backgroundCyan(" "),
             SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
         );
-        shell.println(ControlChars.beep());
-        shell.println("123", ControlChars.backspaces(), "456", ControlChars.beep());
+        logger.log(CtlChars.beep());
+        logger.log("123\010456\007");
+        logger.log("123{}456{}", CtlChars.backspaces(), CtlChars.beep());
     }
 
     public enum TestEnum {
