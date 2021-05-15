@@ -1,47 +1,56 @@
-<svg width="120" height="60" xmlns="http://www.w3.org/2000/svg">
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
   <title>Boat</title>
-  <g>
-    <g id="group-boat" fill="url(#color-boat)">
-      <path id="element-boat"
-            d="M0,0 l120,0 l-20,40 l-80,0 z"/>
-      <g id="group-boat-chars"
-         stroke-width="3" stroke-miterlimit="100"
-         fill="none">
-        <path id="element-B"
-              d="M29,35 m-9,-30 l15,7.5 l-15,7.5 l18,7.5 l-18,7.5 z"
-              stroke="Crimson"/>
-        <path id="element-o"
-              d="M52,35 m-9,-9 l9,-9 l9,9 l-9,9 z"
-              stroke="SaddleBrown"/>
-        <path id="element-a"
-              d="M75,35 m-9,-18 l14,0 l4,18 l-18,0 l16,-9"
-              stroke="Orchid"/>
-        <path id="element-t"
-              d="M94.5,35 m-5,-18 l11,0 m-5.5,-7 l0,25 l5,-9"
-              stroke="OliveDrab"/>
-      </g>
-    </g>
-    <g id="group-jvm"
-       stroke="url(#color-sea)" stroke-width="4" stroke-miterlimit="0"
-       fill="none">
-      <path id="element-J"
-            d="M30,60 m6,-20 l0,15 l-6,5 l-6,-5"/>
-      <path id="element-V"
-            d="M55,60 m-7,-20 l7,20 l7,-20"/>
-      <path id="element-M"
-            d="M85,60 m-12,0 l6,-20 l6,20 l6,-20 l6,20"/>
-    </g>
+  <g id="group-color"
+     stroke="none" stroke-width="none">
+    <!-- 43.3 -->
+    <path id="element-color-1"
+          d="M50,50 m0,-50 a50,50,1,0,0,-43.3,25 L50,50 z"
+          fill="LimeGreen"
+    />
+    <path id="element-color-2"
+          d="M50,50 m-43.5,-25 a50,50,1,0,0,0,50 L50,50 z"
+          fill="RoyalBlue"
+    />
+    <path id="element-color-3"
+          d="M50,50 m-43.5,25 a50,50,1,0,0,43.5,25 L50,50 z"
+          fill="BlueViolet"
+    />
+    <path id="element-color-4"
+          d="M50,50 m0,50 a50,50,1,0,0,43.5,-25 L50,50 z"
+          fill="Violet"
+    />
+    <path id="element-color-5"
+          d="M50,50 m43.5,25 a50,50,1,0,0,0,-50 L50,50 z"
+          fill="Crimson"
+    />
+    <path id="element-color-6"
+          d="M50,50 m43.5,-25 a50,50,1,0,0,-43.5,-25 L50,50 z"
+          fill="Orange"
+    />
+    <circle
+      cx="50" cy="50" r="35"
+      fill="SkyBlue"
+    />
+    <path id="element-boat"
+          d="M50,50 m-32,8 l64,0 l-16,16 l-32,0 z"
+          fill="BurlyWood"
+    />
+    <path id="element-sail"
+          d="M50,50 m-8,-32 l24,40 l-24,0 z"
+          fill="GhostWhite"
+    />
   </g>
-  <defs>
-    <linearGradient id="color-boat" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="BurlyWood"/>
-      <stop offset="100%" stop-color="PapayaWhip"/>
-    </linearGradient>
-  </defs>
-  <defs>
-    <linearGradient id="color-sea" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="LightSkyBlue"/>
-      <stop offset="100%" stop-color="RoyalBlue"/>
-    </linearGradient>
-  </defs>
+  <g id="group-text"
+     font-family="Helvetica, Arial, sans-serif" font-weight="bold">
+    <text id="element-boat"
+          x="50" y="71" text-anchor="middle" font-size="14"
+          fill="SaddleBrown">
+      Boat
+    </text>
+    <text id="element-jvm"
+          x="47" y="54" text-anchor="end" font-size="10" writing-mode="tb"
+          fill="SkyBlue">
+      JVM
+    </text>
+  </g>
 </svg>
