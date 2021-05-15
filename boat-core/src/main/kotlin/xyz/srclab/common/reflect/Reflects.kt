@@ -704,6 +704,30 @@ fun <T> Class<*>.getFieldValue(
 }
 
 /**
+ * Returns values of static field.
+ *
+ * @throws NoSuchFieldException
+ * @throws IllegalAccessException
+ */
+fun <T> Class<*>.staticFieldValue(name: String): T {
+    return getFieldValue(name, null)
+}
+
+/**
+ * Returns values of static field.
+ *
+ * @throws NoSuchFieldException
+ * @throws IllegalAccessException
+ */
+fun <T> Class<*>.staticFieldValue(
+    name: String,
+    deep: Boolean,
+    force: Boolean
+): T {
+    return getFieldValue(name, null, deep, force)
+}
+
+/**
  * @throws NoSuchFieldException
  * @throws IllegalAccessException
  */

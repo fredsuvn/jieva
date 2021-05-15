@@ -29,7 +29,7 @@ public class FieldTest {
     }
 
     @Test
-    public void testFind() throws Exception {
+    public void testField() throws Exception {
         Assert.assertEquals(
             Reflects.fields(NewClass.class),
             Arrays.asList(NewClass.class.getFields())
@@ -59,7 +59,7 @@ public class FieldTest {
     }
 
     @Test
-    public void testInvoke() {
+    public void testFieldValue() {
         NewClass newClass = new NewClass();
 
         Assert.assertEquals(
@@ -100,6 +100,11 @@ public class FieldTest {
             Reflects.getFieldValue(
                 NewClass.class, "superPrivateField", newClass, true, true),
             "superPrivateField222"
+        );
+
+        Assert.assertEquals(
+            Reflects.staticFieldValue(StaticClass.class, "STATIC_STRING"),
+            StaticClass.STATIC_STRING
         );
     }
 }
