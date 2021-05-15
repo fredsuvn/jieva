@@ -7,6 +7,7 @@ import xyz.srclab.common.lang.CharsFormat.Companion.messageFormat
 import xyz.srclab.common.lang.CharsFormat.Companion.printfFormat
 import xyz.srclab.common.lang.CharsTemplate.Companion.resolveTemplate
 import xyz.srclab.common.lang.LazyString.Companion.toLazyString
+import xyz.srclab.common.lang.Processing.Companion.newProcessing
 import xyz.srclab.common.lang.SpecParser.Companion.parseFirstClassNameToInstance
 import xyz.srclab.common.test.TestLogger
 import xyz.srclab.common.utils.Counter.Companion.counterStarts
@@ -201,6 +202,24 @@ class BaseSample {
         logger.log("value2: {}", value2)
         //2c7c2e230-50b0-4a0f-8530-151723297fb8
         logger.log("value3: {}", value3)
+    }
+
+    @Test
+    fun testProcess() {
+        if (Environment.isOsUnix) {
+            testProcessing("echo", "ECHO_CONTENT")
+        }
+        if (Environment.isOsWindows) {
+            testProcessing("cmd.exe", "/c", "echo " + "ECHO_CONTENT")
+        }
+    }
+
+    private fun testProcessing(vararg command: String) {
+        val processing = newProcessing(*command)
+        processing.waitForTermination()
+        val output = processing.outputString()
+        //ECHO_CONTENT
+        logger.log(output)
     }
 
     @Test

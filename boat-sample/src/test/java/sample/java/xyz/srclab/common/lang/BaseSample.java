@@ -246,6 +246,24 @@ public class BaseSample {
     }
 
     @Test
+    public void testProcess() {
+        if (Environment.isOsUnix()) {
+            testProcessing("echo", "ECHO_CONTENT");
+        }
+        if (Environment.isOsWindows()) {
+            testProcessing("cmd.exe", "/c", "echo " + "ECHO_CONTENT");
+        }
+    }
+
+    private void testProcessing(String... command) {
+        Processing processing = Processing.newProcessing(command);
+        processing.waitForTermination();
+        String output = processing.outputString();
+        //ECHO_CONTENT
+        logger.log(output);
+    }
+
+    @Test
     public void testShell() {
         Shell shell = Shell.DEFAULT;
         shell.println("Hello", ",", "World", "!");
