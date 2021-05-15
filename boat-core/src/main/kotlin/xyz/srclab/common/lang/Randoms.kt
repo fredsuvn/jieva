@@ -1,5 +1,4 @@
 @file:JvmName("Randoms")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.lang
 

@@ -1,5 +1,4 @@
 @file:JvmName("Chars")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.lang
 

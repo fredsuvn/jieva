@@ -1,9 +1,12 @@
 package xyz.srclab.common.lang
 
+import xyz.srclab.common.collect.toImmutableMap
 import java.lang.reflect.Method
 import java.time.Duration
 
 /**
+ * Represents `current` runtime, context and environment.
+ *
  * @author sunqian
  */
 object Current {
@@ -43,12 +46,6 @@ object Current {
         }
 
     @JvmStatic
-    val context: MutableMap<Any, Any?>
-        @JvmName("context") get() {
-            return localContext.get()
-        }
-
-    @JvmStatic
     @JvmOverloads
     fun sleep(millis: Long, nanos: Int = 0) {
         Thread.sleep(millis, nanos)
@@ -60,33 +57,56 @@ object Current {
     }
 
     @JvmStatic
-    fun <T> get(key: Any): T {
+    val context: MutableMap<Any, Any?>
+        @JvmName("context") get() {
+            return localContext.get()
+        }
+
+    @JvmStatic
+    fun <T : Any> get(key: Any): T {
         return getOrNull(key)!!
     }
 
     @JvmStatic
-    fun <T> getOrNull(key: Any): T? {
+    fun <T : Any> getOrNull(key: Any): T? {
         return context[key].asAny()
     }
 
     @JvmStatic
-    fun <T> getOrElse(key: Any, value: T): T {
+    fun <T : Any> getOrElse(key: Any, value: T): T {
         return context.getOrDefault(key, value).asAny()
     }
 
     @JvmStatic
-    fun <T> getOrElse(key: Any, supplier: (key: Any) -> T): T {
+    fun <T : Any> getOrElse(key: Any, supplier: (key: Any) -> T): T {
         return getOrNull(key) ?: supplier(key)
     }
 
     @JvmStatic
-    fun <T> getOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
+    fun <T : Any> getOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
         return getOrNull(key) ?: throw supplier(key)
     }
 
     @JvmStatic
     fun set(key: Any, value: Any?) {
         context[key] = value
+    }
+
+    /**
+     * Attach current context, current context as previously is returned
+     */
+    @JvmStatic
+    fun attach(): Map<Any, Any?> {
+        return context.toImmutableMap()
+    }
+
+    /**
+     * Reverse an [attach], restoring the previous context.
+     */
+    @JvmStatic
+    fun detach(previous: Map<Any, Any?>) {
+        context.clear()
+        context.putAll(previous)
     }
 
     @JvmStatic

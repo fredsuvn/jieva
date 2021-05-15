@@ -1,12 +1,12 @@
 package sample.kotlin.xyz.srclab.common.utils
 
 import org.testng.annotations.Test
-import xyz.srclab.common.lang.About
-import xyz.srclab.common.lang.Author
-import xyz.srclab.common.lang.Counter.Companion.counterStarts
-import xyz.srclab.common.lang.SemVer
-import xyz.srclab.common.lang.SemVer.Companion.parseSemVer
 import xyz.srclab.common.test.TestLogger
+import xyz.srclab.common.utils.About
+import xyz.srclab.common.utils.Author
+import xyz.srclab.common.utils.Counter.Companion.counterStarts
+import xyz.srclab.common.utils.SemVer
+import xyz.srclab.common.utils.SemVer.Companion.parseSemVer
 
 class BaseSample {
 

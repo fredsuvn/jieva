@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import xyz.srclab.common.lang.*;
 import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.utils.Counter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -56,7 +57,7 @@ public class BaseSample {
 
     @Test
     public void testEnvironment() {
-        logger.log(Environment.getProperty(Environment.KEY_OS_ARCH));
+        logger.log(Environment.getProperty(Environment.OS_ARCH_KEY));
         logger.log(Environment.availableProcessors());
         logger.log(Environment.osVersion());
         logger.log(Environment.isOsWindows());

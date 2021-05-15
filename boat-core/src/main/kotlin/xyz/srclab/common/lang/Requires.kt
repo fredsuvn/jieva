@@ -1,5 +1,4 @@
 @file:JvmName("Requires")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.lang
 

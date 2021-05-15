@@ -1,5 +1,9 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.utils
 
+import xyz.srclab.common.lang.Default
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.checkArgument
+import xyz.srclab.common.lang.isNumeric
 import kotlin.text.toInt as toIntKt
 
 /**

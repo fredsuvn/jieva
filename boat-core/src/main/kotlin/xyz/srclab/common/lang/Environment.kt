@@ -4,260 +4,234 @@ import org.apache.commons.lang3.SystemUtils
 import java.util.*
 
 /**
+ * Environment infos.
+ *
  * @author sunqian
  */
 object Environment {
 
-    @JvmField
-    val KEY_JAVA_VERSION = "java.version"
+    const val JAVA_VERSION_KEY = "java.version"
 
-    @JvmField
-    val KEY_JAVA_VENDOR = "java.vendor"
+    const val JAVA_VENDOR_KEY = "java.vendor"
 
-    @JvmField
-    val KEY_JAVA_VENDOR_URL = "java.vendor.url"
+    const val JAVA_VENDOR_URL_KEY = "java.vendor.url"
 
-    @JvmField
-    val KEY_JAVA_HOME = "java.home"
+    const val JAVA_HOME_KEY = "java.home"
 
-    @JvmField
-    val KEY_JAVA_VM_SPECIFICATION_VERSION = "java.vm.specification.version"
+    const val JAVA_VM_SPECIFICATION_VERSION_KEY = "java.vm.specification.version"
 
-    @JvmField
-    val KEY_JAVA_VM_SPECIFICATION_VENDOR = "java.vm.specification.vendor"
+    const val JAVA_VM_SPECIFICATION_VENDOR_KEY = "java.vm.specification.vendor"
 
-    @JvmField
-    val KEY_JAVA_VM_SPECIFICATION_NAME = "java.vm.specification.name"
+    const val JAVA_VM_SPECIFICATION_NAME_KEY = "java.vm.specification.name"
 
-    @JvmField
-    val KEY_JAVA_VM_VERSION = "java.vm.version"
+    const val JAVA_VM_VERSION_KEY = "java.vm.version"
 
-    @JvmField
-    val KEY_JAVA_VM_VENDOR = "java.vm.vendor"
+    const val JAVA_VM_VENDOR_KEY = "java.vm.vendor"
 
-    @JvmField
-    val KEY_JAVA_VM_NAME = "java.vm.name"
+    const val JAVA_VM_NAME_KEY = "java.vm.name"
 
-    @JvmField
-    val KEY_JAVA_SPECIFICATION_VERSION = "java.specification.version"
+    const val JAVA_SPECIFICATION_VERSION_KEY = "java.specification.version"
 
-    @JvmField
-    val KEY_JAVA_SPECIFICATION_VENDOR = "java.specification.vendor"
+    const val JAVA_SPECIFICATION_VENDOR_KEY = "java.specification.vendor"
 
-    @JvmField
-    val KEY_JAVA_SPECIFICATION_NAME = "java.specification.name"
+    const val JAVA_SPECIFICATION_NAME_KEY = "java.specification.name"
 
-    @JvmField
-    val KEY_JAVA_CLASS_VERSION = "java.class.version"
+    const val JAVA_CLASS_VERSION_KEY = "java.class.version"
 
-    @JvmField
-    val KEY_JAVA_CLASS_PATH = "java.class.path"
+    const val JAVA_CLASS_PATH_KEY = "java.class.path"
 
-    @JvmField
-    val KEY_JAVA_LIBRARY_PATH = "java.library.path"
+    const val JAVA_LIBRARY_PATH_KEY = "java.library.path"
 
-    @JvmField
-    val KEY_JAVA_IO_TMPDIR = "java.io.tmpdir"
+    const val JAVA_IO_TMPDIR_KEY = "java.io.tmpdir"
 
-    @JvmField
-    val KEY_JAVA_COMPILER = "java.compiler"
+    const val JAVA_COMPILER_KEY = "java.compiler"
 
-    @JvmField
-    val KEY_JAVA_EXT_DIRS = "java.ext.dirs"
+    const val JAVA_EXT_DIRS_KEY = "java.ext.dirs"
 
-    @JvmField
-    val KEY_OS_NAME = "os.name"
+    const val OS_NAME_KEY = "os.name"
 
-    @JvmField
-    val KEY_OS_ARCH = "os.arch"
+    const val OS_ARCH_KEY = "os.arch"
 
-    @JvmField
-    val KEY_OS_VERSION = "os.version"
+    const val OS_VERSION_KEY = "os.version"
 
-    @JvmField
-    val KEY_FILE_SEPARATOR = "file.separator"
+    const val FILE_SEPARATOR_KEY = "file.separator"
 
-    @JvmField
-    val KEY_PATH_SEPARATOR = "path.separator"
+    const val PATH_SEPARATOR_KEY = "path.separator"
 
-    @JvmField
-    val KEY_LINE_SEPARATOR = "line.separator"
+    const val LINE_SEPARATOR_KEY = "line.separator"
 
-    @JvmField
-    val KEY_USER_NAME = "user.name"
+    const val USER_NAME_KEY = "user.name"
 
-    @JvmField
-    val KEY_USER_HOME = "user.home"
+    const val USER_HOME_KEY = "user.home"
 
-    @JvmField
-    val KEY_USER_DIR = "user.dir"
+    const val USER_DIR_KEY = "user.dir"
 
     @JvmStatic
     val javaVersion: String
         @JvmName("javaVersion") get() {
-            return getPropertyAsNotNull(KEY_JAVA_VERSION)
+            return getPropertyAsNotNull(JAVA_VERSION_KEY)
         }
 
     @JvmStatic
     val javaVendor: String
         @JvmName("javaVendor") get() {
-            return getPropertyAsNotNull(KEY_JAVA_VENDOR)
+            return getPropertyAsNotNull(JAVA_VENDOR_KEY)
         }
 
     @JvmStatic
     val javaVendorUrl: String
         @JvmName("javaVendorUrl") get() {
-            return getPropertyAsNotNull(KEY_JAVA_VENDOR_URL)
+            return getPropertyAsNotNull(JAVA_VENDOR_URL_KEY)
         }
 
     @JvmStatic
     val javaHome: String
         @JvmName("javaHome") get() {
-            return getPropertyAsNotNull(KEY_JAVA_HOME)
+            return getPropertyAsNotNull(JAVA_HOME_KEY)
         }
 
     @JvmStatic
     val javaVmSpecificationVersion: String
         @JvmName("javaVmSpecificationVersion") get() {
-            return getPropertyAsNotNull(KEY_JAVA_VM_SPECIFICATION_VERSION)
+            return getPropertyAsNotNull(JAVA_VM_SPECIFICATION_VERSION_KEY)
         }
 
     @JvmStatic
     val javaVmSpecificationVendor: String
         @JvmName("javaVmSpecificationVendor") get() {
-            return getPropertyAsNotNull(KEY_JAVA_VM_SPECIFICATION_VENDOR)
+            return getPropertyAsNotNull(JAVA_VM_SPECIFICATION_VENDOR_KEY)
         }
 
     @JvmStatic
     val javaVmSpecificationName: String
         @JvmName("javaVmSpecificationName") get() {
-            return getPropertyAsNotNull(KEY_JAVA_VM_SPECIFICATION_NAME)
+            return getPropertyAsNotNull(JAVA_VM_SPECIFICATION_NAME_KEY)
         }
 
     @JvmStatic
     val javaVmVersion: String
         @JvmName("javaVmVersion") get() {
-            return getPropertyAsNotNull(KEY_JAVA_VM_VERSION)
+            return getPropertyAsNotNull(JAVA_VM_VERSION_KEY)
         }
 
     @JvmStatic
     val javaVmVendor: String
         @JvmName("javaVmVendor") get() {
-            return getPropertyAsNotNull(KEY_JAVA_VM_VENDOR)
+            return getPropertyAsNotNull(JAVA_VM_VENDOR_KEY)
         }
 
     @JvmStatic
     val javaVmName: String
         @JvmName("javaVmName") get() {
-            return getPropertyAsNotNull(KEY_JAVA_VM_NAME)
+            return getPropertyAsNotNull(JAVA_VM_NAME_KEY)
         }
 
     @JvmStatic
     val javaSpecificationVersion: String
         @JvmName("javaSpecificationVersion") get() {
-            return getPropertyAsNotNull(KEY_JAVA_SPECIFICATION_VERSION)
+            return getPropertyAsNotNull(JAVA_SPECIFICATION_VERSION_KEY)
         }
 
     @JvmStatic
     val javaSpecificationVendor: String
         @JvmName("javaSpecificationVendor") get() {
-            return getPropertyAsNotNull(KEY_JAVA_SPECIFICATION_VENDOR)
+            return getPropertyAsNotNull(JAVA_SPECIFICATION_VENDOR_KEY)
         }
 
     @JvmStatic
     val javaSpecificationName: String
         @JvmName("javaSpecificationName") get() {
-            return getPropertyAsNotNull(KEY_JAVA_SPECIFICATION_NAME)
+            return getPropertyAsNotNull(JAVA_SPECIFICATION_NAME_KEY)
         }
 
     @JvmStatic
     val javaClassVersion: String
         @JvmName("javaClassVersion") get() {
-            return getPropertyAsNotNull(KEY_JAVA_CLASS_VERSION)
+            return getPropertyAsNotNull(JAVA_CLASS_VERSION_KEY)
         }
 
     @JvmStatic
     val javaClassPath: String
         @JvmName("javaClassPath") get() {
-            return getPropertyAsNotNull(KEY_JAVA_CLASS_PATH)
+            return getPropertyAsNotNull(JAVA_CLASS_PATH_KEY)
         }
 
     @JvmStatic
     val javaLibraryPath: String
         @JvmName("javaLibraryPath") get() {
-            return getPropertyAsNotNull(KEY_JAVA_LIBRARY_PATH)
+            return getPropertyAsNotNull(JAVA_LIBRARY_PATH_KEY)
         }
 
     @JvmStatic
     val javaIoTmpdir: String
         @JvmName("javaIoTmpdir") get() {
-            return getPropertyAsNotNull(KEY_JAVA_IO_TMPDIR)
+            return getPropertyAsNotNull(JAVA_IO_TMPDIR_KEY)
         }
 
     @JvmStatic
     val javaCompiler: String
         @JvmName("javaCompiler") get() {
-            return getPropertyAsNotNull(KEY_JAVA_COMPILER)
+            return getPropertyAsNotNull(JAVA_COMPILER_KEY)
         }
 
     @JvmStatic
     val javaExtDirs: String
         @JvmName("javaExtDirs") get() {
-            return getPropertyAsNotNull(KEY_JAVA_EXT_DIRS)
+            return getPropertyAsNotNull(JAVA_EXT_DIRS_KEY)
         }
 
     @JvmStatic
     val osName: String
         @JvmName("osName") get() {
-            return getPropertyAsNotNull(KEY_OS_NAME)
+            return getPropertyAsNotNull(OS_NAME_KEY)
         }
 
     @JvmStatic
     val osArch: String
         @JvmName("osArch") get() {
-            return getPropertyAsNotNull(KEY_OS_ARCH)
+            return getPropertyAsNotNull(OS_ARCH_KEY)
         }
 
     @JvmStatic
     val osVersion: String
         @JvmName("osVersion") get() {
-            return getPropertyAsNotNull(KEY_OS_VERSION)
+            return getPropertyAsNotNull(OS_VERSION_KEY)
         }
 
     @JvmStatic
     val fileSeparator: String
         @JvmName("fileSeparator") get() {
-            return getPropertyAsNotNull(KEY_FILE_SEPARATOR)
+            return getPropertyAsNotNull(FILE_SEPARATOR_KEY)
         }
 
     @JvmStatic
     val pathSeparator: String
         @JvmName("pathSeparator") get() {
-            return getPropertyAsNotNull(KEY_PATH_SEPARATOR)
+            return getPropertyAsNotNull(PATH_SEPARATOR_KEY)
         }
 
     @JvmStatic
     val lineSeparator: String
         @JvmName("lineSeparator") get() {
-            return getPropertyAsNotNull(KEY_LINE_SEPARATOR)
+            return getPropertyAsNotNull(LINE_SEPARATOR_KEY)
         }
 
     @JvmStatic
     val userName: String
         @JvmName("userName") get() {
-            return getPropertyAsNotNull(KEY_USER_NAME)
+            return getPropertyAsNotNull(USER_NAME_KEY)
         }
 
     @JvmStatic
     val userHome: String
         @JvmName("userHome") get() {
-            return getPropertyAsNotNull(KEY_USER_HOME)
+            return getPropertyAsNotNull(USER_HOME_KEY)
         }
 
     @JvmStatic
     val userDir: String
         @JvmName("userDir") get() {
-            return getPropertyAsNotNull(KEY_USER_DIR)
+            return getPropertyAsNotNull(USER_DIR_KEY)
         }
 
     @JvmStatic
@@ -349,11 +323,8 @@ object Environment {
             return -1
         }
         val v0 = version[0].toInt()
-        if (v0 >= 9) {
+        if (v0 >= 9 || version.size < 2) {
             return v0
-        }
-        if (version.size < 2) {
-            return 1
         }
         return version[1].toInt()
     }

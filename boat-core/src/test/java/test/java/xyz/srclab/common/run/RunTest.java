@@ -2,11 +2,11 @@ package test.java.xyz.srclab.common.run;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Counter;
 import xyz.srclab.common.lang.Current;
 import xyz.srclab.common.lang.IntRef;
 import xyz.srclab.common.run.*;
 import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.utils.Counter;
 
 import java.time.Duration;
 

@@ -1,8 +1,8 @@
 package xyz.srclab.common
 
-import xyz.srclab.common.lang.About
-import xyz.srclab.common.lang.Author
-import xyz.srclab.common.lang.SemVer
+import xyz.srclab.common.utils.About
+import xyz.srclab.common.utils.Author
+import xyz.srclab.common.utils.SemVer
 
 object Boat {
 

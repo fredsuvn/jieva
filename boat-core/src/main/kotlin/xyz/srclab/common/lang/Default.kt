@@ -8,6 +8,9 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * Default settings and arguments.
+ */
 object Default {
 
     /**
@@ -74,8 +77,4 @@ object Default {
     @JvmStatic
     @get:JvmName("radix")
     val radix: Int = 10
-
-    @JvmStatic
-    @get:JvmName("shell")
-    val shell: Shell = Shell.DEFAULT
 }

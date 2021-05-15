@@ -2,10 +2,10 @@ package test.java.xyz.srclab.common.lang;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Counter;
 import xyz.srclab.common.lang.Lazy;
 import xyz.srclab.common.lang.LazyString;
 import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.utils.Counter;
 
 import java.time.Duration;
 

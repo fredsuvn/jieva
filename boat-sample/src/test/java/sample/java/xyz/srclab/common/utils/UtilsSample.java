@@ -1,11 +1,11 @@
 package sample.java.xyz.srclab.common.utils;
 
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.About;
-import xyz.srclab.common.lang.Author;
-import xyz.srclab.common.lang.Counter;
-import xyz.srclab.common.lang.SemVer;
 import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.utils.About;
+import xyz.srclab.common.utils.Author;
+import xyz.srclab.common.utils.Counter;
+import xyz.srclab.common.utils.SemVer;
 
 import java.util.Collections;
 

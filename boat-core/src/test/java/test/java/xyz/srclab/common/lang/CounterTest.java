@@ -2,7 +2,7 @@ package test.java.xyz.srclab.common.lang;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Counter;
+import xyz.srclab.common.utils.Counter;
 
 public class CounterTest {
 

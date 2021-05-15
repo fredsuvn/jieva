@@ -1,5 +1,4 @@
 @file:JvmName("Bools")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.lang
 

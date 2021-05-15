@@ -1,5 +1,4 @@
 @file:JvmName("Loaders")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.lang
 

@@ -1,5 +1,4 @@
 @file:JvmName("Checks")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.lang
 

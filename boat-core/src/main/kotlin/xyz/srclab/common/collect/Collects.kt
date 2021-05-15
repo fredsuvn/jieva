@@ -817,7 +817,7 @@ inline fun <T, K> Iterable<T>.distinct(selector: (T) -> K): List<T> {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.sorted(comparator: Comparator<in T> = castSelfComparableComparator()): List<T> {
+fun <T> Iterable<T>.sorted(comparator: Comparator<in T> = asComparableComparator()): List<T> {
     return this.sortedWithKt(comparator)
 }
 
@@ -834,22 +834,22 @@ fun <T> Iterable<T>.shuffled(random: Random): List<T> {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
+fun <T> Iterable<T>.max(comparator: Comparator<in T> = asComparableComparator()): T {
     return maxOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
+fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
     return this.maxWithOrNullKt(comparator)
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
+fun <T> Iterable<T>.min(comparator: Comparator<in T> = asComparableComparator()): T {
     return minOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
+fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
     return this.minWithOrNullKt(comparator)
 }
 
@@ -962,7 +962,7 @@ fun <T> Iterable<T>.toTreeSet(): TreeSet<T> {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
+fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
     return this.toSortedSetKt(comparator)
 }
 
@@ -1016,7 +1016,7 @@ fun <T> Iterable<T>.asToMutableSet(): MutableSet<T> {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.asToSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
+fun <T> Iterable<T>.asToSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
     return if (this is SortedSet<T>) this else this.toSortedSet(comparator)
 }
 
@@ -1582,7 +1582,7 @@ fun <T> List<T>.slice(indices: IntRange): List<T> {
 }
 
 @JvmOverloads
-fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T> = castSelfComparableComparator()): Int {
+fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T> = asComparableComparator()): Int {
     return this.binarySearchKt(element, comparator)
 }
 
@@ -1591,7 +1591,7 @@ fun <T> MutableList<T>.reverse() {
 }
 
 @JvmOverloads
-fun <T> MutableList<T>.sort(comparator: Comparator<in T> = castSelfComparableComparator()) {
+fun <T> MutableList<T>.sort(comparator: Comparator<in T> = asComparableComparator()) {
     this.sortWithKt(comparator)
 }
 
@@ -1786,7 +1786,7 @@ inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
 }
 
 @JvmOverloads
-fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = castSelfComparableComparator()): Map<K, V> {
+fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = asComparableComparator()): Map<K, V> {
     return this.entries.sortedWithKt(comparator).associateToKt(LinkedHashMap()) { it.key to it.value }
 }
 
@@ -2408,7 +2408,7 @@ fun <T, K> Sequence<T>.distinct(selector: (T) -> K): Sequence<T> {
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.sorted(comparator: Comparator<in T> = castSelfComparableComparator()): Sequence<T> {
+fun <T> Sequence<T>.sorted(comparator: Comparator<in T> = asComparableComparator()): Sequence<T> {
     return this.sortedWithKt(comparator)
 }
 
@@ -2421,22 +2421,22 @@ fun <T> Sequence<T>.shuffled(random: Random): Sequence<T> {
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.max(comparator: Comparator<in T> = castSelfComparableComparator()): T {
+fun <T> Sequence<T>.max(comparator: Comparator<in T> = asComparableComparator()): T {
     return maxOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.maxOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
+fun <T> Sequence<T>.maxOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
     return this.maxWithOrNullKt(comparator)
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.min(comparator: Comparator<in T> = castSelfComparableComparator()): T {
+fun <T> Sequence<T>.min(comparator: Comparator<in T> = asComparableComparator()): T {
     return minOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.minOrNull(comparator: Comparator<in T> = castSelfComparableComparator()): T? {
+fun <T> Sequence<T>.minOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
     return this.minWithOrNullKt(comparator)
 }
 
@@ -2545,7 +2545,7 @@ fun <T> Sequence<T>.toLinkedHashSet(): LinkedHashSet<T> {
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.toSortedSet(comparator: Comparator<in T> = castSelfComparableComparator()): SortedSet<T> {
+fun <T> Sequence<T>.toSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
     return this.toSortedSetKt(comparator)
 }
 

@@ -1,4 +1,4 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.utils
 
 import java.util.concurrent.atomic.AtomicLong
 

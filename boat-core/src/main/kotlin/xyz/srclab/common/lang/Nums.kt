@@ -1,5 +1,4 @@
 @file:JvmName("Nums")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.lang
 

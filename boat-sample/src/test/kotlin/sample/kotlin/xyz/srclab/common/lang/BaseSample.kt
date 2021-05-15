@@ -6,10 +6,10 @@ import xyz.srclab.common.lang.CharsFormat.Companion.fastFormat
 import xyz.srclab.common.lang.CharsFormat.Companion.messageFormat
 import xyz.srclab.common.lang.CharsFormat.Companion.printfFormat
 import xyz.srclab.common.lang.CharsTemplate.Companion.resolveTemplate
-import xyz.srclab.common.lang.Counter.Companion.counterStarts
 import xyz.srclab.common.lang.LazyString.Companion.toLazyString
 import xyz.srclab.common.lang.SpecParser.Companion.parseFirstClassNameToInstance
 import xyz.srclab.common.test.TestLogger
+import xyz.srclab.common.utils.Counter.Companion.counterStarts
 import java.math.BigDecimal
 import java.util.*
 import kotlin.text.toBigDecimal
@@ -36,7 +36,7 @@ class BaseSample {
 
     @Test
     fun testEnvironment() {
-        logger.log(Environment.getProperty(Environment.KEY_OS_ARCH))
+        logger.log(Environment.getProperty(Environment.OS_ARCH_KEY))
         logger.log(Environment.availableProcessors)
         logger.log(Environment.osVersion)
         logger.log(Environment.isOsWindows)
