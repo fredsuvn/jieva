@@ -48,7 +48,8 @@
       Boat
     </text>
     <text id="element-jvm"
-          x="47" y="54" text-anchor="end" font-size="10" writing-mode="tb"
+          x="43" y="57" text-anchor="end" font-size="10"
+          transform="rotate(90, 43, 57)"
           fill="SkyBlue">
       JVM
     </text>
