@@ -125,4 +125,12 @@ public class CodecTest {
         }
         return new String(result);
     }
+
+    @Test
+    public void testPassword() {
+        String password = "some password";
+        SecretKey key = AesKeys.newKey("123");
+        logger.log("password: {}, aes: {}",
+            password, Codec.aesCipher().encryptToBase64String(key, password));
+    }
 }
