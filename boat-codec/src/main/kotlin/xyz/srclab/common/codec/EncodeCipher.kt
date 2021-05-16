@@ -94,6 +94,7 @@ interface EncodeCipher : CodecCipher {
         @JvmStatic
         fun CodecAlgorithm.toEncodeCipher(): EncodeCipher {
             return when (this.name) {
+                CodecAlgorithm.PLAIN_NAME -> PlainEncodeCipher
                 CodecAlgorithm.HEX_NAME -> HexEncodeCipher
                 CodecAlgorithm.BASE64_NAME -> Base64EncodeCipher
                 else -> throw IllegalArgumentException("Unknown algorithm: ${this.name}")
@@ -102,9 +103,30 @@ interface EncodeCipher : CodecCipher {
     }
 }
 
+object PlainEncodeCipher : EncodeCipher {
+
+    override val name: String = CodecAlgorithm.PLAIN_NAME
+
+    override fun encode(data: ByteArray): ByteArray {
+        return data.clone()
+    }
+
+    override fun encode(data: CharSequence): ByteArray {
+        return data.toBytes()
+    }
+
+    override fun decode(encoded: ByteArray): ByteArray {
+        return encoded.clone()
+    }
+
+    override fun decode(encoded: CharSequence): ByteArray {
+        return encoded.toBytes()
+    }
+}
+
 object HexEncodeCipher : EncodeCipher {
 
-    override val name = CodecAlgorithm.HEX_NAME
+    override val name: String = CodecAlgorithm.HEX_NAME
 
     override fun encode(data: ByteArray): ByteArray {
         return Hex.encodeHex(data).toBytes()
@@ -133,7 +155,7 @@ object HexEncodeCipher : EncodeCipher {
 
 object Base64EncodeCipher : EncodeCipher {
 
-    override val name = CodecAlgorithm.HEX_NAME
+    override val name: String = CodecAlgorithm.HEX_NAME
 
     override fun encode(data: ByteArray): ByteArray {
         return Base64.encodeBase64(data)
