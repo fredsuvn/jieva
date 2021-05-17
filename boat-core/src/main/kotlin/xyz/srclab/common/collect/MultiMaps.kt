@@ -8,9 +8,56 @@ import xyz.srclab.common.lang.asAny
 import java.util.*
 
 /**
+ * Represents a type of [Map] of which key associated to a [C].
+ */
+interface MultiMap<K, V, C : Collection<V>> : Map<K, C> {
+
+    /**
+     * Used to help implement [getFirstOrDefault] and [getFirstOrElse], should be return a singleton.
+     */
+    val defaultValueCollection: C
+
+    @JvmDefault
+    fun getFirst(key: K): V? {
+        return get(key)?.first()
+    }
+
+    @JvmDefault
+    fun getFirstOrDefault(key: K, defaultValue: V): V {
+        val defaultSet: Set<V> = getOrDefault(key, defaultValueCollection).asAny()
+        if (defaultSet === defaultValueCollection) {
+            return defaultValue
+        }
+        return try {
+            defaultSet.first()
+        } catch (e: NoSuchElementException) {
+            defaultValue
+        }
+    }
+
+    @JvmDefault
+    fun getFirstOrElse(key: K, defaultValue: () -> V): V {
+        val defaultSet: Set<V> = getOrElse(key) { defaultValueCollection }.asAny()
+        if (defaultSet === defaultValueCollection) {
+            return defaultValue()
+        }
+        return try {
+            defaultSet.first()
+        } catch (e: NoSuchElementException) {
+            defaultValue()
+        }
+    }
+}
+
+/**
+ * Represents a type of [MutableMap] of which key associated to a [C].
+ */
+interface MutableMultiMap<K, V, C : MutableCollection<V>> : MultiMap<K, V, C>
+
+/**
  * Represents a type of [Map] of which key associated to a [Set].
  */
-interface SetMap<K, V> : Map<K, Set<V>> {
+interface SetMap<K, V> : MultiMap<K, V, Set<V>> {
 
     fun toMutableSetMap(): MutableSetMap<K, V>
 
@@ -21,27 +68,29 @@ interface SetMap<K, V> : Map<K, Set<V>> {
         fun <K, V> Map<K, Set<V>>.toSetMap(): SetMap<K, V> {
             return SetMapImpl(this)
         }
-    }
 
-    private open class SetMapBase<K, V>(map: Map<K, Set<V>>) : Map<K, Set<V>> by map
-    private class SetMapImpl<K, V>(private val map: Map<K, Set<V>>) : SetMapBase<K, V>(map), SetMap<K, V> {
+        private class SetMapImpl<K, V>(private val map: Map<K, Set<V>>) : MultiMapBase<K, V, Set<V>>(map),
+            SetMap<K, V> {
 
-        override fun toMutableSetMap(): MutableSetMap<K, V> {
-            return map.mapTo(LinkedHashMap()) { k, v ->
-                k to LinkedHashSet(v)
-            }.toMutableSetMap()
-        }
+            override val defaultValueCollection: Set<V> = DEFAULT_SET.asAny()
 
-        override fun equals(other: Any?): Boolean {
-            return map == other
-        }
+            override fun toMutableSetMap(): MutableSetMap<K, V> {
+                return map.mapTo(LinkedHashMap()) { k, v ->
+                    k to LinkedHashSet(v)
+                }.toMutableSetMap()
+            }
 
-        override fun hashCode(): Int {
-            return map.hashCode()
-        }
+            override fun equals(other: Any?): Boolean {
+                return map == other
+            }
 
-        override fun toString(): String {
-            return map.toString()
+            override fun hashCode(): Int {
+                return map.hashCode()
+            }
+
+            override fun toString(): String {
+                return map.toString()
+            }
         }
     }
 }
@@ -49,7 +98,7 @@ interface SetMap<K, V> : Map<K, Set<V>> {
 /**
  * Represents a type of [MutableMap] of which key associated to [MutableSet].
  */
-interface MutableSetMap<K, V> : MutableMap<K, MutableSet<V>> {
+interface MutableSetMap<K, V> : MutableMultiMap<K, V, MutableSet<V>> {
 
     /**
      * Add [value] for given [key], return result after adding.
@@ -83,11 +132,12 @@ interface MutableSetMap<K, V> : MutableMap<K, MutableSet<V>> {
         }
     }
 
-    private open class MutableSetMapBase<K, V>(map: MutableMap<K, MutableSet<V>>) : MutableMap<K, MutableSet<V>> by map
     private class MutableSetMapImpl<K, V>(
         private val map: MutableMap<K, MutableSet<V>>,
         private val setGenerator: () -> MutableSet<V>,
-    ) : MutableSetMapBase<K, V>(map), MutableSetMap<K, V> {
+    ) : MutableMultiMapBase<K, V, MutableSet<V>>(map), MutableSetMap<K, V> {
+
+        override val defaultValueCollection: MutableSet<V> = DEFAULT_SET.asAny()
 
         override fun add(key: K, value: V): MutableSet<V> {
             val result = this.getOrPut(key, setGenerator)
@@ -122,7 +172,7 @@ interface MutableSetMap<K, V> : MutableMap<K, MutableSet<V>> {
 /**
  * Represents a type of [Map] of which key associated to a [List].
  */
-interface ListMap<K, V> : Map<K, List<V>> {
+interface ListMap<K, V> : MultiMap<K, V, List<V>> {
 
     fun toMutableListMap(): MutableListMap<K, V>
 
@@ -135,8 +185,11 @@ interface ListMap<K, V> : Map<K, List<V>> {
         }
     }
 
-    private open class ListMapBase<K, V>(map: Map<K, List<V>>) : Map<K, List<V>> by map
-    private class ListMapImpl<K, V>(private val map: Map<K, List<V>>) : ListMapBase<K, V>(map), ListMap<K, V> {
+    private class ListMapImpl<K, V>(
+        private val map: Map<K, List<V>>
+    ) : MultiMapBase<K, V, List<V>>(map), ListMap<K, V> {
+
+        override val defaultValueCollection: List<V> = DEFAULT_LIST.asAny()
 
         override fun toMutableListMap(): MutableListMap<K, V> {
             return map.mapTo(LinkedHashMap()) { k, v ->
@@ -161,7 +214,7 @@ interface ListMap<K, V> : Map<K, List<V>> {
 /**
  * Represents a type of [MutableMap] of which key associated to [MutableList].
  */
-interface MutableListMap<K, V> : MutableMap<K, MutableList<V>> {
+interface MutableListMap<K, V> : MutableMultiMap<K, V, MutableList<V>> {
 
     /**
      * Add [value] for given [key], return result after adding.
@@ -195,13 +248,12 @@ interface MutableListMap<K, V> : MutableMap<K, MutableList<V>> {
         }
     }
 
-    private open class MutableListMapBase<K, V>(map: MutableMap<K, MutableList<V>>) :
-        MutableMap<K, MutableList<V>> by map
-
     private class MutableListMapImpl<K, V>(
         private val map: MutableMap<K, MutableList<V>>,
         private val listGenerator: () -> MutableList<V>,
-    ) : MutableListMapBase<K, V>(map), MutableListMap<K, V> {
+    ) : MutableMultiMapBase<K, V, MutableList<V>>(map), MutableListMap<K, V> {
+
+        override val defaultValueCollection: MutableList<V> = DEFAULT_LIST.asAny()
 
         override fun add(key: K, value: V): MutableList<V> {
             val result = this.getOrPut(key, listGenerator)
@@ -232,3 +284,10 @@ interface MutableListMap<K, V> : MutableMap<K, MutableList<V>> {
         }
     }
 }
+
+private val DEFAULT_SET = Collections.unmodifiableSet(HashSet<Any?>())
+private val DEFAULT_LIST = Collections.unmodifiableList(ArrayList<Any?>())
+
+private abstract class MultiMapBase<K, V, C : Collection<V>>(map: Map<K, C>) : Map<K, C> by map
+private abstract class MutableMultiMapBase<K, V, C : MutableCollection<V>>(map: MutableMap<K, C>) :
+    MutableMap<K, C> by map
