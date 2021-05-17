@@ -10,14 +10,24 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 
 /**
+ * Represents a invokable instance.
+ *
  * @see [InvokerProvider]
  * @see [ReflectedInvokerProvider]
  * @see [MethodHandlerInvokerProvider]
  */
 interface Invoker {
 
+    /**
+     * Invokes this Invoker. [object] is owner of this [Invoker] and [args] are arguments.
+     */
     fun <T> invoke(`object`: Any?, vararg args: Any?): T
 
+    /**
+     * Forcibly invokes.
+     *
+     * @see invoke
+     */
     fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T
 
     companion object {
