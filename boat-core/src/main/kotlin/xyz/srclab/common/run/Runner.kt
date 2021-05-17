@@ -18,6 +18,15 @@ interface Runner : Executor {
     @Throws(RejectedExecutionException::class)
     fun <V> run(task: () -> V): Running<V>
 
+    @Throws(RejectedExecutionException::class)
+    @JvmDefault
+    fun run(task: Runnable): Running<*> {
+        return run {
+            task.run()
+            null
+        }
+    }
+
     companion object {
 
         @JvmField
@@ -68,7 +77,17 @@ interface Runner : Executor {
         }
 
         @JvmStatic
+        fun runSync(task: Runnable): Running<*> {
+            return SYNC_RUNNER.run(task)
+        }
+
+        @JvmStatic
         fun <V> runAsync(task: () -> V): Running<V> {
+            return ASYNC_RUNNER.run(task)
+        }
+
+        @JvmStatic
+        fun runAsync(task: Runnable): Running<*> {
             return ASYNC_RUNNER.run(task)
         }
     }

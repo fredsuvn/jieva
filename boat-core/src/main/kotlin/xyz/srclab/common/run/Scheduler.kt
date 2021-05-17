@@ -20,10 +20,37 @@ interface Scheduler : Runner {
     fun <V> schedule(delay: Duration, task: () -> V): Scheduling<V>
 
     @Throws(RejectedExecutionException::class)
+    @JvmDefault
+    fun schedule(delay: Duration, task: Runnable): Scheduling<*> {
+        return schedule(delay) {
+            task.run()
+            null
+        }
+    }
+
+    @Throws(RejectedExecutionException::class)
     fun <V> scheduleFixedRate(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V>
 
     @Throws(RejectedExecutionException::class)
+    @JvmDefault
+    fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
+        return scheduleFixedRate(initialDelay, period) {
+            task.run()
+            null
+        }
+    }
+
+    @Throws(RejectedExecutionException::class)
     fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V>
+
+    @Throws(RejectedExecutionException::class)
+    @JvmDefault
+    fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
+        return scheduleFixedDelay(initialDelay, period) {
+            task.run()
+            null
+        }
+    }
 
     companion object {
 
