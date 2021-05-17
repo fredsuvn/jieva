@@ -57,6 +57,6 @@ private class FastConverterImpl<R>(handlers: Iterable<FastConvertHandler<out R>>
                 return arrayHandler.convert(from)
             }
         }
-        throw IllegalArgumentException("Cannot convert type: ${fromType.typeName}")
+        throw UnsupportedOperationException("Cannot convert type: ${fromType.typeName}")
     }
 }

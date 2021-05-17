@@ -112,7 +112,7 @@ interface Processing {
 
         @JvmStatic
         fun CharSequence.newProcessing(): Processing {
-            return ProcessBuilder(this.toString()).toProcessing()
+            return Runtime.getRuntime().exec(this.toString()).toProcessing()
         }
 
         @JvmStatic
