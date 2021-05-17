@@ -1,5 +1,6 @@
 package xyz.srclab.common.convert
 
+import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.common.bean.BeanCopyOptions
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
@@ -193,9 +194,20 @@ object CharsConvertHandler : AbstractClassConvertHandler() {
                 else
                     from.toString().toCharArray()
             }
+            Array<Char>::class.java -> {
+                if (from is ByteArray)
+                    ArrayUtils.toObject(from.toChars().toCharArray())
+                else
+                    ArrayUtils.toObject(from.toString().toCharArray())
+            }
             ByteArray::class.java -> when (from) {
                 is CharSequence -> from.toBytes()
                 is CharArray -> from.toBytes()
+                else -> from.toString()
+            }
+            Array<Byte>::class.java -> when (from) {
+                is CharSequence -> ArrayUtils.toObject(from.toBytes())
+                is CharArray -> ArrayUtils.toObject(from.toBytes())
                 else -> from.toString()
             }
             else -> null
@@ -406,7 +418,7 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
             return from.replaceNull().asAny()
         }
         if (from.javaClass.isArray) {
-            return from.replaceNull()?.arrayAsList()
+            return from.replaceNull().arrayAsList()
         }
         return null
     }
