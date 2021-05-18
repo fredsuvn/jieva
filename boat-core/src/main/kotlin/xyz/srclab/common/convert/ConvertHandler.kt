@@ -31,17 +31,17 @@ import kotlin.collections.mapTo
 interface ConvertHandler {
 
     /**
-     * Return null if [from] cannot be converted, return [Default.NULL] if result value is null.
+     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
      */
     fun convert(from: Any?, toType: Class<*>, converter: Converter): Any?
 
     /**
-     * Return null if [from] cannot be converted, return [Default.NULL] if result value is null.
+     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
      */
     fun convert(from: Any?, toType: Type, converter: Converter): Any?
 
     /**
-     * Return null if [from] cannot be converted, return [Default.NULL] if result value is null.
+     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
      */
     fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any?
 
@@ -113,7 +113,7 @@ object NopConvertHandler : ConvertHandler {
             return from.replaceNull()
         }
         if (from === null) {
-            return Default.NULL
+            return Defaults.NULL
         }
         val fromClass = from.javaClass
         if (fromClass == toType || toType.isAssignableFrom(fromClass)) {
@@ -305,7 +305,7 @@ abstract class AbstractTypeConvertHandler : ConvertHandler {
 object IterableConvertHandler : AbstractTypeConvertHandler() {
 
     override fun convertNull(toType: Type, converter: Converter): Any {
-        return Default.NULL
+        return Defaults.NULL
     }
 
     override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
@@ -431,7 +431,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
 ) : AbstractTypeConvertHandler() {
 
     override fun convertNull(toType: Type, converter: Converter): Any {
-        return Default.NULL
+        return Defaults.NULL
     }
 
     override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
@@ -496,5 +496,5 @@ open class BeanConvertHandler @JvmOverloads constructor(
 }
 
 private fun Any?.replaceNull(): Any {
-    return if (this === null) Default.NULL else this
+    return if (this === null) Defaults.NULL else this
 }

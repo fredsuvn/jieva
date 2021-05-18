@@ -30,9 +30,9 @@ class BaseSample {
     @Test
     fun testDefault() {
         //UTF-8
-        logger.log(Default.charset)
+        logger.log(Defaults.charset)
         //Locale.getDefault();
-        logger.log(Default.locale)
+        logger.log(Defaults.locale)
     }
 
     @Test

@@ -64,7 +64,7 @@ interface NamingCase {
  */
 object LowerCamel : CamelCase() {
     override fun doFirst(first: CharSequence): String {
-        return first.toString().decapitalize(Default.locale)
+        return first.toString().decapitalize(Defaults.locale)
     }
 }
 
@@ -73,7 +73,7 @@ object LowerCamel : CamelCase() {
  */
 object UpperCamel : CamelCase() {
     override fun doFirst(first: CharSequence): String {
-        return first.toString().capitalize(Default.locale)
+        return first.toString().capitalize(Defaults.locale)
     }
 }
 
@@ -82,7 +82,7 @@ object UpperCamel : CamelCase() {
  */
 object LowerUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Default.locale)
+        return word.toString().toLowerCase(Defaults.locale)
     }
 }
 
@@ -91,7 +91,7 @@ object LowerUnderscore : UnderscoreCase() {
  */
 object UpperUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toUpperCase(Default.locale)
+        return word.toString().toUpperCase(Defaults.locale)
     }
 }
 
@@ -100,7 +100,7 @@ object UpperUnderscore : UnderscoreCase() {
  */
 object CapitalizeUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Default.locale).capitalize(Default.locale)
+        return word.toString().toLowerCase(Defaults.locale).capitalize(Defaults.locale)
     }
 }
 
@@ -109,7 +109,7 @@ object CapitalizeUnderscore : UnderscoreCase() {
  */
 object LowerHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Default.locale)
+        return word.toString().toLowerCase(Defaults.locale)
     }
 }
 
@@ -118,7 +118,7 @@ object LowerHyphen : HyphenCase() {
  */
 object UpperHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toUpperCase(Default.locale)
+        return word.toString().toUpperCase(Defaults.locale)
     }
 }
 
@@ -127,7 +127,7 @@ object UpperHyphen : HyphenCase() {
  */
 object CapitalizeHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Default.locale).capitalize(Default.locale)
+        return word.toString().toLowerCase(Defaults.locale).capitalize(Defaults.locale)
     }
 }
 
@@ -199,11 +199,11 @@ abstract class CamelCase : NamingCase {
             throw NamingCaseException("Word of given first joined word should have at least 1 char.")
         }
         if (first.length > 1 && StringUtils.isAllUpperCase(first)) {
-            return words.joinToString("") { it.toString().capitalize(Default.locale) }
+            return words.joinToString("") { it.toString().capitalize(Defaults.locale) }
         }
         return doFirst(first) +
             words.subList(1, words.size).joinToString("") {
-                it.toString().capitalize(Default.locale)
+                it.toString().capitalize(Defaults.locale)
             }
     }
 

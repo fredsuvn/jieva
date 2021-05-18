@@ -3,7 +3,7 @@ package test.xyz.srclab.common.serialize;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Default;
+import xyz.srclab.common.lang.Defaults;
 import xyz.srclab.common.serialize.json.Json;
 import xyz.srclab.common.serialize.json.JsonSerializer;
 import xyz.srclab.common.serialize.json.JsonSerials;
@@ -137,7 +137,7 @@ public class JsonTest {
     @Test
     public void testUrl() throws Exception {
         Path path = Paths.get("json.txt");
-        Files.write(path, "{\"key1\":\"value1\"}".getBytes(Default.charset()));
+        Files.write(path, "{\"key1\":\"value1\"}".getBytes(Defaults.charset()));
         URL url = new URL("file:json.txt");
         Json json = JsonSerials.toJson(url);
         logger.log(json);

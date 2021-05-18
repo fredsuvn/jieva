@@ -46,7 +46,7 @@ interface Serial {
 
     @JvmDefault
     fun toReader(): Reader {
-        return toReader(Default.charset)
+        return toReader(Defaults.charset)
     }
 
     @JvmDefault

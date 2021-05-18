@@ -10,7 +10,7 @@ import xyz.srclab.common.collect.isEmpty
 import xyz.srclab.common.collect.sort
 import xyz.srclab.common.collect.sorted
 import xyz.srclab.common.lang.Current
-import xyz.srclab.common.lang.Default
+import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.lang.loadClass
 import java.lang.reflect.*
@@ -138,7 +138,7 @@ val Class<*>.isStrict: Boolean
 val Class<*>.shortName: String
     @JvmName("shortName") get() {
         val name = this.name
-        val lastDotIndex = Default.DOT_MATCHER.lastIndexIn(name)
+        val lastDotIndex = Defaults.DOT_MATCHER.lastIndexIn(name)
         return if (lastDotIndex < 0) name else name.substring(lastDotIndex + 1, name.length)
     }
 

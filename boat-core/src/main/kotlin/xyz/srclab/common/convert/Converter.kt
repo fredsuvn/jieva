@@ -1,7 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.collect.plusBefore
-import xyz.srclab.common.lang.Default
+import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.reflect.TypeRef
@@ -29,7 +29,7 @@ interface Converter {
     fun <T> convert(from: Any?, toType: Class<T>): T {
         for (handler in convertHandlers) {
             val result = handler.convert(from, toType, this)
-            if (result === Default.NULL) {
+            if (result === Defaults.NULL) {
                 return null.asAny()
             }
             if (result !== null) {
@@ -43,7 +43,7 @@ interface Converter {
     fun <T> convert(from: Any?, toType: Type): T {
         for (handler in convertHandlers) {
             val result = handler.convert(from, toType, this)
-            if (result === Default.NULL) {
+            if (result === Defaults.NULL) {
                 return null.asAny()
             }
             if (result !== null) {
@@ -62,7 +62,7 @@ interface Converter {
     fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
         for (handler in convertHandlers) {
             val result = handler.convert(from, fromType, toType, this)
-            if (result === Default.NULL) {
+            if (result === Defaults.NULL) {
                 return null.asAny()
             }
             if (result !== null) {

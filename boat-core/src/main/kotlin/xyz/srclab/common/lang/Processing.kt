@@ -86,24 +86,76 @@ interface Processing {
             process.destroyForcibly()
     }
 
+    /**
+     * Returns all output stream as `String`.
+     */
     @JvmDefault
     fun outputString(): String? {
         return inputStream?.readBytes()?.toChars()
     }
 
+    /**
+     * Returns all output stream as `String`.
+     */
     @JvmDefault
     fun outputString(charset: Charset): String? {
         return inputStream?.readBytes()?.toChars(charset)
     }
 
+    /**
+     *  Returns available output stream as `String`.
+     *
+     *  This method will return immediately after read available bytes, rather than all bytes like [outputString].
+     */
+    @JvmDefault
+    fun availableOutputString(): String? {
+        return inputStream?.readAvailableString()
+    }
+
+    /**
+     *  Returns available output stream as `String`.
+     *
+     *  This method will return immediately after read available bytes, rather than all bytes like [outputString].
+     */
+    @JvmDefault
+    fun availableOutputString(charset: Charset): String? {
+        return inputStream?.readAvailableString(charset)
+    }
+
+    /**
+     * Returns all error stream as `String`.
+     */
     @JvmDefault
     fun errorString(): String? {
         return errorStream?.readBytes()?.toChars()
     }
 
+    /**
+     * Returns all error stream as `String`.
+     */
     @JvmDefault
     fun errorString(charset: Charset): String? {
         return errorStream?.readBytes()?.toChars(charset)
+    }
+
+    /**
+     *  Returns available output stream as `String`.
+     *
+     *  This method will return immediately after read available bytes, rather than all bytes like [errorString].
+     */
+    @JvmDefault
+    fun availableErrorString(): String? {
+        return inputStream?.readAvailableString()
+    }
+
+    /**
+     *  Returns available output stream as `String`.
+     *
+     *  This method will return immediately after read available bytes, rather than all bytes like [errorString].
+     */
+    @JvmDefault
+    fun availableErrorString(charset: Charset): String? {
+        return inputStream?.readAvailableString(charset)
     }
 
     fun toProcess(): Process
@@ -155,6 +207,16 @@ interface Processing {
                     return this@toProcessing.toString()
                 }
             }
+        }
+
+        private fun InputStream.readAvailableString(charset: Charset = Defaults.charset): String {
+            val available = this.available()
+            if (available == 0) {
+                return ""
+            }
+            val bytes = ByteArray(available)
+            this.read(bytes)
+            return bytes.toChars(charset)
         }
     }
 }

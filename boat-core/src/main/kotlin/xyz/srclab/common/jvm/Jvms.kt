@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.jvm
 
-import xyz.srclab.common.lang.Default
+import xyz.srclab.common.lang.Defaults
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
@@ -125,5 +125,5 @@ val Array<out Class<*>>.jvmDescriptor: String
 //
 
 fun CharSequence.toJvmClassName(): String {
-    return Default.DOT_MATCHER.replaceFrom(this, '/')
+    return Defaults.DOT_MATCHER.replaceFrom(this, '/')
 }

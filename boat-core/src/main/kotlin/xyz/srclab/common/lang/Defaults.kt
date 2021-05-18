@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Default settings and arguments.
  */
-object Default {
+object Defaults {
 
     /**
      * Represents null value.

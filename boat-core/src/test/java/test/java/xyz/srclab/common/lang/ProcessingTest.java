@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.lang;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.lang.Current;
-import xyz.srclab.common.lang.Default;
+import xyz.srclab.common.lang.Defaults;
 import xyz.srclab.common.lang.Environment;
 import xyz.srclab.common.lang.Processing;
 import xyz.srclab.common.run.Runner;
@@ -37,7 +37,7 @@ public class ProcessingTest {
         processing.waitForTermination();
         String output = processing.outputString();
         logger.log(output);
-        Assert.assertEquals(output, ECHO_CONTENT + Default.lineSeparator());
+        Assert.assertEquals(output, ECHO_CONTENT + Defaults.lineSeparator());
     }
 
     private void testProcessingByPing() {

@@ -28,7 +28,7 @@ fun nanoseconds(): Long {
 }
 
 fun timestamp(): String {
-    return Default.timestampFormatter.format(LocalDateTime.now())
+    return Defaults.timestampFormatter.format(LocalDateTime.now())
 }
 
 @JvmOverloads
@@ -232,5 +232,5 @@ fun Any?.toDuration(): Duration {
 }
 
 fun Any?.toTimestamp(): String {
-    return Default.timestampFormatter.format(this.toLocalDateTime())
+    return Defaults.timestampFormatter.format(this.toLocalDateTime())
 }

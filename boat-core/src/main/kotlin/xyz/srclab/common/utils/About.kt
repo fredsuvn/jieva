@@ -1,6 +1,6 @@
 package xyz.srclab.common.utils
 
-import xyz.srclab.common.lang.Default
+import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.lang.checkArgument
 import xyz.srclab.common.lang.isNumeric
@@ -459,8 +459,8 @@ interface SemVer : Comparable<SemVer> {
             var preRelease: List<PreReleaseIdentifier>? = null
             var buildMetadata: List<String>? = null
 
-            val hyphenIndex = Default.HYPHEN_MATCHER.indexIn(this)
-            val plusSignIndex = Default.PLUS_SIGN_MATCHER.indexIn(this)
+            val hyphenIndex = Defaults.HYPHEN_MATCHER.indexIn(this)
+            val plusSignIndex = Defaults.PLUS_SIGN_MATCHER.indexIn(this)
             if (hyphenIndex < 0 && plusSignIndex < 0) {
                 return newSemVer(parseNormalNumbers(this), emptyList(), emptyList())
             }
