@@ -216,7 +216,7 @@ Lang package provides base and enhancement interfaces, functions and
 utilities for Java/Kotlin:
 
 -   Global runtime, context, default and environment objects: Current,
-    Default, Environment;
+    Defaults, Environment;
 
 -   Syntax enhancement (mainly for Java): Let, Ref, Lazy, LazyString;
 
@@ -285,9 +285,9 @@ Java Examples
         @Test
         public void testDefault() {
             //UTF-8
-            logger.log(Default.charset());
+            logger.log(Defaults.charset());
             //Locale.getDefault();
-            logger.log(Default.locale());
+            logger.log(Defaults.locale());
         }
 
         @Test
@@ -562,9 +562,9 @@ Kotlin Examples
         @Test
         fun testDefault() {
             //UTF-8
-            logger.log(Default.charset)
+            logger.log(Defaults.charset)
             //Locale.getDefault();
-            logger.log(Default.locale)
+            logger.log(Defaults.locale)
         }
 
         @Test

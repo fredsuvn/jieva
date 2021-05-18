@@ -87,7 +87,7 @@ include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/annotations/Ann
 
 Base包提供对Java/Kotlin的基础和增强接口, 功能和工具:
 
-* 全局运行时, 上下文, 默认和环境对象: Current, Default, Environment;
+* 全局运行时, 上下文, 默认和环境对象: Current, Defaults, Environment;
 * 语法增强(主要针对java): Let, Ref, Lazy, LazyString;
 * 字符串功能: CharsFormat, CharsTemplate, NamingCase;
 * 特殊字符支持: CtlChars, EscChars, CsiChars, SgrChars;

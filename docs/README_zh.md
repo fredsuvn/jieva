@@ -205,7 +205,7 @@ Kotlin Examples
 
 Base包提供对Java/Kotlin的基础和增强接口, 功能和工具:
 
--   全局运行时, 上下文, 默认和环境对象: Current, Default, Environment;
+-   全局运行时, 上下文, 默认和环境对象: Current, Defaults, Environment;
 
 -   语法增强(主要针对java): Let, Ref, Lazy, LazyString;
 
@@ -273,9 +273,9 @@ Java Examples
         @Test
         public void testDefault() {
             //UTF-8
-            logger.log(Default.charset());
+            logger.log(Defaults.charset());
             //Locale.getDefault();
-            logger.log(Default.locale());
+            logger.log(Defaults.locale());
         }
 
         @Test
@@ -550,9 +550,9 @@ Kotlin Examples
         @Test
         fun testDefault() {
             //UTF-8
-            logger.log(Default.charset)
+            logger.log(Defaults.charset)
             //Locale.getDefault();
-            logger.log(Default.locale)
+            logger.log(Defaults.locale)
         }
 
         @Test
