@@ -145,7 +145,7 @@ interface Processing {
      */
     @JvmDefault
     fun availableErrorString(): String? {
-        return inputStream?.readAvailableString()
+        return errorStream?.readAvailableString()
     }
 
     /**
@@ -155,7 +155,7 @@ interface Processing {
      */
     @JvmDefault
     fun availableErrorString(charset: Charset): String? {
-        return inputStream?.readAvailableString(charset)
+        return errorStream?.readAvailableString(charset)
     }
 
     fun toProcess(): Process

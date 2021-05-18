@@ -2,11 +2,9 @@ package test.java.xyz.srclab.common.lang;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Current;
 import xyz.srclab.common.lang.Defaults;
 import xyz.srclab.common.lang.Environment;
 import xyz.srclab.common.lang.Processing;
-import xyz.srclab.common.run.Runner;
 import xyz.srclab.common.test.TestLogger;
 
 import java.time.Duration;
@@ -42,12 +40,9 @@ public class ProcessingTest {
 
     private void testProcessingByPing() {
         Processing processing = Processing.newProcessing("ping 127.0.0.1");
-        Runner.runAsync(() -> {
-            String output = processing.outputString();
-            logger.log(output);
-        });
         processing.waitForTermination(Duration.ofSeconds(2));
+        String output = processing.availableOutputString();
+        logger.log(output);
         processing.destroy(true);
-        Current.sleep(1000);
     }
 }
