@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.collect.plusBefore
+import xyz.srclab.common.convert.Converter.Companion.withPreConvertHandler
 import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.lang.asAny
@@ -8,15 +9,18 @@ import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type
 
 /**
- * Converter, global type convert interface, to convert object to another type.
+ * Interface for type conversion.
+ *
+ * By default this interface use a serials of [ConvertHandler] to do with conversion,
+ * thus a simply way to custom a [Converter] is use [withPreConvertHandler] to add a custom [ConvertHandler].
  *
  * @see ConvertHandler
- * @see NopConvertHandler
+ * @see CompatibleConvertHandler
  * @see WildcardTypeConvertHandler
  * @see CharsConvertHandler
  * @see NumberAndPrimitiveConvertHandler
  * @see DateTimeConvertHandler
- * @see IterableConvertHandler
+ * @see CollectionConvertHandler
  * @see BeanConvertHandler
  */
 interface Converter {
@@ -27,30 +31,29 @@ interface Converter {
 
     @JvmDefault
     fun <T> convert(from: Any?, toType: Class<T>): T {
-        for (handler in convertHandlers) {
-            val result = handler.convert(from, toType, this)
-            if (result === Defaults.NULL) {
-                return null.asAny()
-            }
-            if (result !== null) {
-                return result.asAny()
-            }
+        val result = doConvert { it.convert(from, toType, this) }
+        if (result === null) {
+            throw UnsupportedOperationException("Cannot convert $from to $toType.")
         }
-        throw UnsupportedOperationException("Cannot convert $from to $toType.")
+        return finalResult(result).asAny()
     }
 
     @JvmDefault
     fun <T> convert(from: Any?, toType: Type): T {
-        for (handler in convertHandlers) {
-            val result = handler.convert(from, toType, this)
-            if (result === Defaults.NULL) {
-                return null.asAny()
-            }
-            if (result !== null) {
-                return result.asAny()
-            }
+        val result = doConvert { it.convert(from, toType, this) }
+        if (result === null) {
+            throw UnsupportedOperationException("Cannot convert $from to $toType.")
         }
-        throw UnsupportedOperationException("Cannot convert $from to $toType.")
+        return finalResult(result).asAny()
+    }
+
+    @JvmDefault
+    fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
+        val result = doConvert { it.convert(from, fromType, toType, this) }
+        if (result === null) {
+            throw UnsupportedOperationException("Cannot convert $from as $fromType to $toType.")
+        }
+        return finalResult(result).asAny()
     }
 
     @JvmDefault
@@ -59,27 +62,25 @@ interface Converter {
     }
 
     @JvmDefault
-    fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
-        for (handler in convertHandlers) {
-            val result = handler.convert(from, fromType, toType, this)
-            if (result === Defaults.NULL) {
-                return null.asAny()
-            }
-            if (result !== null) {
-                return result.asAny()
-            }
-        }
-        throw UnsupportedOperationException("Cannot convert $fromType to $toType.")
-    }
-
-    @JvmDefault
     fun <T> convert(from: Any?, fromTypeRef: TypeRef<T>, toTypeRef: TypeRef<T>): T {
         return convert(from, fromTypeRef.type, toTypeRef.type)
     }
 
-    @JvmDefault
-    fun withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
-        return newConverter(convertHandlers.plusBefore(0, preConvertHandler))
+    private inline fun <T> doConvert(action: (ConvertHandler) -> T): T? {
+        for (handler in convertHandlers) {
+            val result = action(handler)
+            if (result !== null) {
+                return result.asAny()
+            }
+        }
+        return null
+    }
+
+    private fun <T> finalResult(result: T): T {
+        if (result === Defaults.NULL) {
+            return null.asAny()
+        }
+        return result
     }
 
     companion object {
@@ -88,10 +89,7 @@ interface Converter {
         val DEFAULT: Converter = newConverter(ConvertHandler.DEFAULTS)
 
         @JvmField
-        val EMPTY: Converter = newConverter(emptyList())
-
-        @JvmField
-        val NOP: Converter = newConverter(listOf(NopConvertHandler))
+        val COMPATIBLE: Converter = newConverter(listOf(CompatibleConvertHandler))
 
         @JvmStatic
         fun newConverter(convertHandlers: Iterable<ConvertHandler>): Converter {
@@ -99,6 +97,13 @@ interface Converter {
                 override val convertHandlers = convertHandlers.toList()
             }
         }
+
+        /**
+         * Returns a new [Converter] consists of [preConvertHandler] followed by [this]'s old [ConvertHandler]s.
+         */
+        @JvmStatic
+        fun Converter.withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
+            return newConverter(convertHandlers.plusBefore(0, preConvertHandler))
+        }
     }
 }
-

@@ -31,30 +31,36 @@ import kotlin.collections.mapTo
 interface ConvertHandler {
 
     /**
-     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
+     * Note return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
      */
     fun convert(from: Any?, toType: Class<*>, converter: Converter): Any?
 
     /**
-     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
+     * Note return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
      */
     fun convert(from: Any?, toType: Type, converter: Converter): Any?
 
     /**
-     * Return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
+     * Note return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
      */
     fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any?
 
     companion object {
 
         @JvmField
+        val NULL = "NULL"
+
+        @JvmField
+        val BREAK = "BREAK"
+
+        @JvmField
         val DEFAULTS: List<ConvertHandler> = listOf(
-            NopConvertHandler,
+            CompatibleConvertHandler,
             WildcardTypeConvertHandler,
             CharsConvertHandler,
             NumberAndPrimitiveConvertHandler,
             DateTimeConvertHandler.DEFAULT,
-            IterableConvertHandler,
+            CollectionConvertHandler,
             BeanConvertHandler.DEFAULT,
         )
 
@@ -63,12 +69,12 @@ interface ConvertHandler {
             dateTimeConvertHandler: DateTimeConvertHandler,
         ): List<ConvertHandler> {
             return listOf(
-                NopConvertHandler,
+                CompatibleConvertHandler,
                 WildcardTypeConvertHandler,
                 CharsConvertHandler,
                 NumberAndPrimitiveConvertHandler,
                 dateTimeConvertHandler,
-                IterableConvertHandler,
+                CollectionConvertHandler,
                 BeanConvertHandler.DEFAULT,
             )
         }
@@ -78,12 +84,12 @@ interface ConvertHandler {
             beanConvertHandler: BeanConvertHandler,
         ): List<ConvertHandler> {
             return listOf(
-                NopConvertHandler,
+                CompatibleConvertHandler,
                 WildcardTypeConvertHandler,
                 CharsConvertHandler,
                 NumberAndPrimitiveConvertHandler,
                 DateTimeConvertHandler.DEFAULT,
-                IterableConvertHandler,
+                CollectionConvertHandler,
                 beanConvertHandler,
             )
         }
@@ -94,19 +100,22 @@ interface ConvertHandler {
             beanConvertHandler: BeanConvertHandler,
         ): List<ConvertHandler> {
             return listOf(
-                NopConvertHandler,
+                CompatibleConvertHandler,
                 WildcardTypeConvertHandler,
                 CharsConvertHandler,
                 NumberAndPrimitiveConvertHandler,
                 dateTimeConvertHandler,
-                IterableConvertHandler,
+                CollectionConvertHandler,
                 beanConvertHandler,
             )
         }
     }
 }
 
-object NopConvertHandler : ConvertHandler {
+/**
+ * Use [Class.isAssignableFrom] to check whether from type can cast to to type, if not, return null.
+ */
+object CompatibleConvertHandler : ConvertHandler {
 
     override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
         if (toType == Any::class.java) {
@@ -158,6 +167,9 @@ object WildcardTypeConvertHandler : ConvertHandler {
     }
 }
 
+/**
+ * Base [ConvertHandler] of which `fromType` and `toType` are [Class].
+ */
 abstract class AbstractClassConvertHandler : ConvertHandler {
 
     override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
@@ -169,6 +181,12 @@ abstract class AbstractClassConvertHandler : ConvertHandler {
     }
 }
 
+/**
+ * Supports convert `from` to types:
+ *
+ * * [String], [StringBuilder], [StringBuffer];
+ * * [CharArray], [ByteArray], [Array<Char>], [Array<Byte>];
+ */
 object CharsConvertHandler : AbstractClassConvertHandler() {
 
     override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
@@ -189,16 +207,18 @@ object CharsConvertHandler : AbstractClassConvertHandler() {
                 else -> StringBuffer(from.toString())
             }
             CharArray::class.java -> {
-                if (from is ByteArray)
+                if (from is ByteArray) {
                     from.toChars().toCharArray()
-                else
-                    from.toString().toCharArray()
+                } else {
+                }
+                from.toString().toCharArray()
             }
             Array<Char>::class.java -> {
-                if (from is ByteArray)
+                if (from is ByteArray) {
                     ArrayUtils.toObject(from.toChars().toCharArray())
-                else
-                    ArrayUtils.toObject(from.toString().toCharArray())
+                } else {
+                }
+                ArrayUtils.toObject(from.toString().toCharArray())
             }
             ByteArray::class.java -> when (from) {
                 is CharSequence -> from.toBytes()
@@ -215,6 +235,13 @@ object CharsConvertHandler : AbstractClassConvertHandler() {
     }
 }
 
+/**
+ * Supports convert `from` to types:
+ *
+ * * [Boolean], [Byte], [Short], [Char], [Int], [Long], [Float], [Double] and their wrapper types;
+ * * [BigInteger], [BigDecimal];
+ * * [Number];
+ */
 object NumberAndPrimitiveConvertHandler : AbstractClassConvertHandler() {
 
     override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
@@ -235,6 +262,14 @@ object NumberAndPrimitiveConvertHandler : AbstractClassConvertHandler() {
     }
 }
 
+/**
+ * Supports convert `from` to types:
+ *
+ * * [Date];
+ * * [Instant];
+ * * [LocalDate], [LocalTime], [LocalDateTime], [ZonedDateTime], [OffsetDateTime];
+ * * [Duration], [Temporal];
+ */
 open class DateTimeConvertHandler(
     private val dateFormat: DateFormat,
     private val instantFormatter: DateTimeFormatter,
@@ -277,6 +312,9 @@ open class DateTimeConvertHandler(
     }
 }
 
+/**
+ * Base [ConvertHandler] of which `fromType` and `toType` are [Class] or [Type].
+ */
 abstract class AbstractTypeConvertHandler : ConvertHandler {
 
     override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
@@ -302,7 +340,10 @@ abstract class AbstractTypeConvertHandler : ConvertHandler {
     abstract fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any?
 }
 
-object IterableConvertHandler : AbstractTypeConvertHandler() {
+/**
+ * Supports convert `from` to [Collection] types.
+ */
+object CollectionConvertHandler : AbstractTypeConvertHandler() {
 
     override fun convertNull(toType: Type, converter: Converter): Any {
         return Defaults.NULL
@@ -496,5 +537,9 @@ open class BeanConvertHandler @JvmOverloads constructor(
 }
 
 private fun Any?.replaceNull(): Any {
-    return if (this === null) Defaults.NULL else this
+    return when {
+        this === null -> Defaults.NULL
+        this === Defaults.NULL -> String(Defaults.NULL.toCharArray())
+        else -> this
+    }
 }

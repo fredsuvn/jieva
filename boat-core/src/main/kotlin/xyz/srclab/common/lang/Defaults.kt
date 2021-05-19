@@ -14,16 +14,14 @@ import java.util.concurrent.TimeUnit
 object Defaults {
 
     /**
-     * Represents null value.
+     * A [String] constant of which value is `NULL`.
      */
-    @JvmField
-    val NULL: Any = "NULL_VALUE"
+    const val NULL: String = "NULL"
 
     /**
-     * Represents absent value.
+     * A [String] constant of which value is `ABSENT`.
      */
-    @JvmField
-    val ABSENT: Any = "ABSENT_VALUE"
+    const val ABSENT: String = "ABSENT"
 
     @JvmField
     val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
