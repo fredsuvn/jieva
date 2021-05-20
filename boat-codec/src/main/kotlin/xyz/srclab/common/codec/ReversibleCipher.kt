@@ -1,773 +1,167 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.codec.Codec.Companion.encodeBase64String
-import xyz.srclab.common.codec.Codec.Companion.encodeHexString
+import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.lang.toBytes
 import xyz.srclab.common.lang.toChars
+import java.io.OutputStream
+import javax.crypto.Mac
 
 /**
  * Reversible cipher.
  *
- * @param [EK] encrypt key
- * @param [DK] decrypt key
  * @author sunqian
  *
  * @see SymmetricCipher
  * @see AsymmetricCipher
- * @see DigestCipher
- * @see HmacDigestCipher
+ * @see DigestCodec
+ * @see MacDigestCipher
  */
-interface ReversibleCipher<EK, DK> : CodecCipher {
+interface ReversibleCipher : Codec {
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data      data
-     * @return encrypted data
-     */
-    fun encrypt(encryptKey: EK, data: ByteArray): ByteArray
-
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data
-     */
-    fun encrypt(encryptKey: ByteArray, data: ByteArray): ByteArray
-
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data
-     */
     @JvmDefault
-    fun encrypt(encryptKey: CharSequence, data: ByteArray): ByteArray {
-        return encrypt(encryptKey.toBytes(), data)
+    fun encrypt(key: Any, data: ByteArray): ByteArray {
+        return encrypt(key, data, 0)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data
-     */
     @JvmDefault
-    fun encryptWithAny(encryptKey: Any, data: ByteArray): ByteArray
-
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data      data
-     * @return encrypted data
-     */
-    @JvmDefault
-    fun encrypt(encryptKey: EK, data: CharSequence): ByteArray {
-        return encrypt(encryptKey, data.toBytes())
+    fun encrypt(key: Any, data: ByteArray, offset: Int): ByteArray {
+        return encrypt(key, data, offset, data.size - offset)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data
-     */
     @JvmDefault
-    fun encrypt(encryptKey: ByteArray, data: CharSequence): ByteArray {
-        return encrypt(encryptKey, data.toBytes())
+    fun encrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray
+
+    @JvmDefault
+    fun encrypt(key: Any, data: ByteArray, output: OutputStream): Int {
+        return encrypt(key, data, 0, output)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data
-     */
     @JvmDefault
-    fun encrypt(encryptKey: CharSequence, data: CharSequence): ByteArray {
-        return encrypt(encryptKey, data.toBytes())
+    fun encrypt(key: Any, data: ByteArray, offset: Int, output: OutputStream): Int {
+        return encrypt(key, data, offset, data.size - offset, output)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data
-     */
     @JvmDefault
-    fun encryptWithAny(encryptKey: Any, data: CharSequence): ByteArray {
-        return encryptWithAny(encryptKey, data.toBytes())
+    fun encrypt(key: Any, data: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
+        val bytes = encrypt(key, data, offset, length)
+        output.write(bytes)
+        return bytes.size
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data      data
-     * @return encrypted data as string
-     */
     @JvmDefault
-    fun encryptToString(encryptKey: EK, data: ByteArray): String {
-        return encrypt(encryptKey, data).toChars()
+    fun encrypt(key: Any, data: CharSequence): ByteArray {
+        return encrypt(key, data.toBytes())
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data as string
-     */
     @JvmDefault
-    fun encryptToString(encryptKey: ByteArray, data: ByteArray): String {
-        return encrypt(encryptKey, data).toChars()
+    fun encrypt(key: Any, data: CharSequence, output: OutputStream): Int {
+        return encrypt(key, data.toBytes(), output)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data as string
-     */
     @JvmDefault
-    fun encryptToString(encryptKey: CharSequence, data: ByteArray): String {
-        return encrypt(encryptKey, data).toChars()
+    fun encryptToString(key: Any, data: ByteArray): String {
+        return encrypt(key, data).toChars()
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data as string
-     */
     @JvmDefault
-    fun encryptToStringWithAny(encryptKey: Any, data: ByteArray): String {
-        return encryptWithAny(encryptKey, data).toChars()
+    fun encryptToString(key: Any, data: ByteArray, offset: Int): String {
+        return encrypt(key, data, offset).toChars()
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data      data
-     * @return encrypted data as string
-     */
     @JvmDefault
-    fun encryptToString(encryptKey: EK, data: CharSequence): String {
-        return encrypt(encryptKey, data).toChars()
+    fun encryptToString(key: Any, data: ByteArray, offset: Int, length: Int): String {
+        return encrypt(key, data, offset, length).toChars()
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data as string
-     */
     @JvmDefault
-    fun encryptToString(encryptKey: ByteArray, data: CharSequence): String {
-        return encrypt(encryptKey, data).toChars()
+    fun encryptToString(key: Any, data: CharSequence): String {
+        return encrypt(key, data).toChars()
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data as string
-     */
     @JvmDefault
-    fun encryptToString(encryptKey: CharSequence, data: CharSequence): String {
-        return encrypt(encryptKey, data).toChars()
+    fun decrypt(key: Any, data: ByteArray): ByteArray {
+        return decrypt(key, data, 0)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return encrypted data as string
-     */
     @JvmDefault
-    fun encryptToStringWithAny(encryptKey: Any, data: CharSequence): String {
-        return encryptWithAny(encryptKey, data).toChars()
+    fun decrypt(key: Any, data: ByteArray, offset: Int): ByteArray {
+        return decrypt(key, data, offset, data.size - offset)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data      data
-     * @return hex string encoded by encrypted data
-     */
     @JvmDefault
-    fun encryptToHexString(encryptKey: EK, data: ByteArray): String {
-        return encrypt(encryptKey, data).encodeHexString()
+    fun decrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray
+
+    @JvmDefault
+    fun decrypt(key: Any, data: ByteArray, output: OutputStream): Int {
+        return decrypt(key, data, 0, output)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return hex string encoded by encrypted data
-     */
     @JvmDefault
-    fun encryptToHexString(encryptKey: ByteArray, data: ByteArray): String {
-        return encrypt(encryptKey, data).encodeHexString()
+    fun decrypt(key: Any, data: ByteArray, offset: Int, output: OutputStream): Int {
+        return decrypt(key, data, offset, data.size - offset, output)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return hex string encoded by encrypted data
-     */
     @JvmDefault
-    fun encryptToHexString(encryptKey: CharSequence, data: ByteArray): String {
-        return encrypt(encryptKey, data).encodeHexString()
+    fun decrypt(key: Any, data: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
+        val bytes = decrypt(key, data, offset, length)
+        output.write(bytes)
+        return bytes.size
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return hex string encoded by encrypted data
-     */
     @JvmDefault
-    fun encryptToHexStringWithAny(encryptKey: Any, data: ByteArray): String {
-        return encryptWithAny(encryptKey, data).encodeHexString()
+    fun decrypt(key: Any, data: CharSequence): ByteArray {
+        return decrypt(key, data.toBytes())
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data      data
-     * @return hex string encoded by encrypted data
-     */
     @JvmDefault
-    fun encryptToHexString(encryptKey: EK, data: CharSequence): String {
-        return encrypt(encryptKey, data).encodeHexString()
+    fun decrypt(key: Any, data: CharSequence, output: OutputStream): Int {
+        return decrypt(key, data.toBytes(), output)
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return hex string encoded by encrypted data
-     */
     @JvmDefault
-    fun encryptToHexString(encryptKey: ByteArray, data: CharSequence): String {
-        return encrypt(encryptKey, data).encodeHexString()
+    fun decryptToString(key: Any, data: ByteArray): String {
+        return decrypt(key, data).toChars()
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return hex string encoded by encrypted data
-     */
     @JvmDefault
-    fun encryptToHexString(encryptKey: CharSequence, data: CharSequence): String {
-        return encrypt(encryptKey, data).encodeHexString()
+    fun decryptToString(key: Any, data: ByteArray, offset: Int): String {
+        return decrypt(key, data, offset).toChars()
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return hex string encoded by encrypted data
-     */
     @JvmDefault
-    fun encryptToHexStringWithAny(encryptKey: Any, data: CharSequence): String {
-        return encryptWithAny(encryptKey, data).encodeHexString()
+    fun decryptToString(key: Any, data: ByteArray, offset: Int, length: Int): String {
+        return decrypt(key, data, offset, length).toChars()
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data      data
-     * @return base64 string encoded by encrypted data
-     */
     @JvmDefault
-    fun encryptToBase64String(encryptKey: EK, data: ByteArray): String {
-        return encrypt(encryptKey, data).encodeBase64String()
+    fun decryptToString(key: Any, data: CharSequence): String {
+        return decrypt(key, data).toChars()
     }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return base64 string encoded by encrypted data
-     */
-    @JvmDefault
-    fun encryptToBase64String(encryptKey: ByteArray, data: ByteArray): String {
-        return encrypt(encryptKey, data).encodeBase64String()
-    }
+    companion object {
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return base64 string encoded by encrypted data
-     */
-    @JvmDefault
-    fun encryptToBase64String(encryptKey: CharSequence, data: ByteArray): String {
-        return encrypt(encryptKey, data).encodeBase64String()
-    }
+        @JvmName("withAlgorithm")
+        @JvmStatic
+        fun CharSequence.toMacDigestCipher(): MacDigestCipher {
+            return this.toCodecAlgorithm().toMacDigestCipher()
+        }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return base64 string encoded by encrypted data
-     */
-    @JvmDefault
-    fun encryptToBase64StringWithAny(encryptKey: Any, data: ByteArray): String {
-        return encryptWithAny(encryptKey, data).encodeBase64String()
-    }
+        @JvmName("withAlgorithm")
+        @JvmStatic
+        fun CodecAlgorithm.toMacDigestCipher(): MacDigestCipher {
+            return MacDigestCipherImpl(this.name)
+        }
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data      data
-     * @return base64 string encoded by encrypted data
-     */
-    @JvmDefault
-    fun encryptToBase64String(encryptKey: EK, data: CharSequence): String {
-        return encrypt(encryptKey, data).encodeBase64String()
-    }
+        private class MacDigestCipherImpl(private val algorithm: String) : MacDigestCipher {
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return base64 string encoded by encrypted data
-     */
-    @JvmDefault
-    fun encryptToBase64String(encryptKey: ByteArray, data: CharSequence): String {
-        return encrypt(encryptKey, data).encodeBase64String()
-    }
+            override val name = algorithm
 
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return base64 string encoded by encrypted data
-     */
-    @JvmDefault
-    fun encryptToBase64String(encryptKey: CharSequence, data: CharSequence): String {
-        return encrypt(encryptKey, data).encodeBase64String()
-    }
-
-    /**
-     * Encrypts data by given encrypt key.
-     *
-     * @param encryptKey encrypt key
-     * @param data           data
-     * @return base64 string encoded by encrypted data
-     */
-    @JvmDefault
-    fun encryptToBase64StringWithAny(encryptKey: Any, data: CharSequence): String {
-        return encryptWithAny(encryptKey, data).encodeBase64String()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted  encrypted data
-     * @return decrypted data
-     */
-    fun decrypt(decryptKey: DK, encrypted: ByteArray): ByteArray
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data
-     */
-    fun decrypt(decryptKey: ByteArray, encrypted: ByteArray): ByteArray
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data
-     */
-    @JvmDefault
-    fun decrypt(decryptKey: CharSequence, encrypted: ByteArray): ByteArray {
-        return decrypt(decryptKey.toBytes(), encrypted)
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data
-     */
-    @JvmDefault
-    fun decryptWithAny(decryptKey: Any, encrypted: ByteArray): ByteArray
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted  encrypted data
-     * @return decrypted data
-     */
-    @JvmDefault
-    fun decrypt(decryptKey: DK, encrypted: CharSequence): ByteArray {
-        return decrypt(decryptKey, encrypted.toBytes())
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data
-     */
-    @JvmDefault
-    fun decrypt(decryptKey: ByteArray, encrypted: CharSequence): ByteArray {
-        return decrypt(decryptKey, encrypted.toBytes())
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data
-     */
-    @JvmDefault
-    fun decrypt(decryptKey: CharSequence, encrypted: CharSequence): ByteArray {
-        return decrypt(decryptKey, encrypted.toBytes())
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data
-     */
-    @JvmDefault
-    fun decryptWithAny(decryptKey: Any, encrypted: CharSequence): ByteArray {
-        return decryptWithAny(decryptKey, encrypted.toBytes())
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted  encrypted data
-     * @return decrypted data as string
-     */
-    @JvmDefault
-    fun decryptToString(decryptKey: DK, encrypted: ByteArray): String {
-        return decrypt(decryptKey, encrypted).toChars()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data as string
-     */
-    @JvmDefault
-    fun decryptToString(decryptKey: ByteArray, encrypted: ByteArray): String {
-        return decrypt(decryptKey, encrypted).toChars()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data as string
-     */
-    @JvmDefault
-    fun decryptToString(decryptKey: CharSequence, encrypted: ByteArray): String {
-        return decrypt(decryptKey, encrypted).toChars()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data as string
-     */
-    @JvmDefault
-    fun decryptToStringWithAny(decryptKey: Any, encrypted: ByteArray): String {
-        return decryptWithAny(decryptKey, encrypted).toChars()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted  encrypted data
-     * @return decrypted data as string
-     */
-    @JvmDefault
-    fun decryptToString(decryptKey: DK, encrypted: CharSequence): String {
-        return decrypt(decryptKey, encrypted).toChars()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data as string
-     */
-    @JvmDefault
-    fun decryptToString(decryptKey: ByteArray, encrypted: CharSequence): String {
-        return decrypt(decryptKey, encrypted).toChars()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data as string
-     */
-    @JvmDefault
-    fun decryptToString(decryptKey: CharSequence, encrypted: CharSequence): String {
-        return decrypt(decryptKey, encrypted).toChars()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return decrypted data as string
-     */
-    @JvmDefault
-    fun decryptToStringWithAny(decryptKey: Any, encrypted: CharSequence): String {
-        return decryptWithAny(decryptKey, encrypted).toChars()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted  encrypted data
-     * @return hex string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToHexString(decryptKey: DK, encrypted: ByteArray): String {
-        return decrypt(decryptKey, encrypted).encodeHexString()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return hex string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToHexString(decryptKey: ByteArray, encrypted: ByteArray): String {
-        return decrypt(decryptKey, encrypted).encodeHexString()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return hex string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToHexString(decryptKey: CharSequence, encrypted: ByteArray): String {
-        return decrypt(decryptKey, encrypted).encodeHexString()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return hex string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToHexStringWithAny(decryptKey: Any, encrypted: ByteArray): String {
-        return decryptWithAny(decryptKey, encrypted).encodeHexString()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted  encrypted data
-     * @return hex string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToHexString(decryptKey: DK, encrypted: CharSequence): String {
-        return decrypt(decryptKey, encrypted).encodeHexString()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return hex string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToHexString(decryptKey: ByteArray, encrypted: CharSequence): String {
-        return decrypt(decryptKey, encrypted).encodeHexString()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return hex string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToHexString(decryptKey: CharSequence, encrypted: CharSequence): String {
-        return decrypt(decryptKey, encrypted).encodeHexString()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return hex string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToHexStringWithAny(decryptKey: Any, encrypted: CharSequence): String {
-        return decryptWithAny(decryptKey, encrypted).encodeHexString()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted  encrypted data
-     * @return base64 string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToBase64String(decryptKey: DK, encrypted: ByteArray): String {
-        return decrypt(decryptKey, encrypted).encodeBase64String()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return base64 string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToBase64String(decryptKey: ByteArray, encrypted: ByteArray): String {
-        return decrypt(decryptKey, encrypted).encodeBase64String()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return base64 string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToBase64String(decryptKey: CharSequence, encrypted: ByteArray): String {
-        return decrypt(decryptKey, encrypted).encodeBase64String()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return base64 string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToBase64StringWithAny(decryptKey: Any, encrypted: ByteArray): String {
-        return decryptWithAny(decryptKey, encrypted).encodeBase64String()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted  encrypted data
-     * @return base64 string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToBase64String(decryptKey: DK, encrypted: CharSequence): String {
-        return decrypt(decryptKey, encrypted).encodeBase64String()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return base64 string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToBase64String(decryptKey: ByteArray, encrypted: CharSequence): String {
-        return decrypt(decryptKey, encrypted).encodeBase64String()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return base64 string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToBase64String(decryptKey: CharSequence, encrypted: CharSequence): String {
-        return decrypt(decryptKey, encrypted).encodeBase64String()
-    }
-
-    /**
-     * Decrypts data by given decrypt key.
-     *
-     * @param decryptKey decrypt key
-     * @param encrypted       encrypted data
-     * @return base64 string encoded by decrypted data
-     */
-    @JvmDefault
-    fun decryptToBase64StringWithAny(decryptKey: Any, encrypted: CharSequence): String {
-        return decryptWithAny(decryptKey, encrypted).encodeBase64String()
+            override fun digest(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
+                val mac = Mac.getInstance(algorithm)
+                mac.init(key.toSecretKey(algorithm))
+                mac.update(data, offset, length)
+                return mac.doFinal()
+            }
+        }
     }
 }
