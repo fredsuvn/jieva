@@ -7,11 +7,11 @@ import java.io.OutputStream
 import javax.crypto.Mac
 
 /**
- * MAC digest cipher.
+ * MAC digest codec.
  *
  * @author sunqian
  */
-interface MacDigestCipher : Codec {
+interface MacCodec : Codec {
 
     @JvmDefault
     fun digest(key: Any, data: ByteArray): ByteArray {
@@ -76,24 +76,58 @@ interface MacDigestCipher : Codec {
     companion object {
 
         @JvmName("withAlgorithm")
+        @JvmOverloads
         @JvmStatic
-        fun CharSequence.toMacDigestCipher(): MacDigestCipher {
-            return this.toCodecAlgorithm().toMacDigestCipher()
+        fun CharSequence.toMacCodec(
+            mac: () -> Mac = { Mac.getInstance(this.toString()) }
+        ): MacCodec {
+            return this.toCodecAlgorithm().toMacCodec(mac)
         }
 
         @JvmName("withAlgorithm")
+        @JvmOverloads
         @JvmStatic
-        fun CodecAlgorithm.toMacDigestCipher(): MacDigestCipher {
-            return MacDigestCipherImpl(this.name)
+        fun CodecAlgorithm.toMacCodec(
+            mac: () -> Mac = { Mac.getInstance(this.name) }
+        ): MacCodec {
+            return MacCodecImpl(this.name, mac)
         }
 
-        private class MacDigestCipherImpl(private val algorithm: String) : MacDigestCipher {
+        @JvmStatic
+        fun hmacMd5(): MacCodec {
+            return CodecAlgorithm.HMAC_MD5.toMacCodec()
+        }
+
+        @JvmStatic
+        fun hmacSha1(): MacCodec {
+            return CodecAlgorithm.HMAC_SHA1.toMacCodec()
+        }
+
+        @JvmStatic
+        fun hmacSha256(): MacCodec {
+            return CodecAlgorithm.HMAC_SHA256.toMacCodec()
+        }
+
+        @JvmStatic
+        fun hmacSha384(): MacCodec {
+            return CodecAlgorithm.HMAC_SHA384.toMacCodec()
+        }
+
+        @JvmStatic
+        fun hmacSha512(): MacCodec {
+            return CodecAlgorithm.HMAC_SHA512.toMacCodec()
+        }
+
+        private class MacCodecImpl(
+            private val algorithm: String,
+            private val mac: () -> Mac
+        ) : MacCodec {
 
             override val name = algorithm
 
             override fun digest(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
-                val mac = Mac.getInstance(algorithm)
-                mac.init(key.toSecretKey(algorithm))
+                val mac = this.mac()
+                mac.init(key.toCodecKey(algorithm))
                 mac.update(data, offset, length)
                 return mac.doFinal()
             }

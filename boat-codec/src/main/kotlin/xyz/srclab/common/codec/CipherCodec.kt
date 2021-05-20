@@ -1,22 +1,24 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
+import xyz.srclab.common.codec.rsa.RsaCodec
+import xyz.srclab.common.codec.sm2.Sm2Codec
+import xyz.srclab.common.codec.sm2.Sm2Params
 import xyz.srclab.common.lang.toBytes
 import xyz.srclab.common.lang.toChars
 import java.io.OutputStream
-import javax.crypto.Mac
+import javax.crypto.Cipher
 
 /**
- * Reversible cipher.
+ * Reversible cipher codec which support `encrypt` and `decrypt`.
  *
  * @author sunqian
  *
- * @see SymmetricCipher
- * @see AsymmetricCipher
- * @see DigestCodec
- * @see MacDigestCipher
+ * @see RsaCodec
+ * @see Sm2Codec
+ * @see AsymmetricCipherCodec
  */
-interface ReversibleCipher : Codec {
+interface CipherCodec : Codec {
 
     @JvmDefault
     fun encrypt(key: Any, data: ByteArray): ByteArray {
@@ -141,26 +143,74 @@ interface ReversibleCipher : Codec {
     companion object {
 
         @JvmName("withAlgorithm")
+        @JvmOverloads
         @JvmStatic
-        fun CharSequence.toMacDigestCipher(): MacDigestCipher {
-            return this.toCodecAlgorithm().toMacDigestCipher()
+        fun CharSequence.toCipherCodec(
+            cipher: () -> Cipher = { Cipher.getInstance(this.toString()) }
+        ): CipherCodec {
+            return this.toCodecAlgorithm().toCipherCodec(cipher)
         }
 
         @JvmName("withAlgorithm")
+        @JvmOverloads
         @JvmStatic
-        fun CodecAlgorithm.toMacDigestCipher(): MacDigestCipher {
-            return MacDigestCipherImpl(this.name)
+        fun CodecAlgorithm.toCipherCodec(
+            cipher: () -> Cipher = { Cipher.getInstance(this.name) }
+        ): CipherCodec {
+            return CipherCodecImpl(this.name, cipher)
         }
 
-        private class MacDigestCipherImpl(private val algorithm: String) : MacDigestCipher {
+        @JvmOverloads
+        @JvmStatic
+        fun aes(
+            cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.AES_NAME) }
+        ): CipherCodec {
+            return CodecAlgorithm.AES.toCipherCodec(cipher)
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun rsa(
+            cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.RSA_NAME) }
+        ): RsaCodec {
+            return RsaCodec(cipher = cipher)
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun rsa(
+            encryptBlockSize: Int,
+            decryptBlockSize: Int,
+            cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.RSA_NAME) }
+        ): RsaCodec {
+            return RsaCodec(encryptBlockSize, decryptBlockSize, cipher)
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun sm2(sm2Params: Sm2Params = Sm2Params.DEFAULT): Sm2Codec {
+            return Sm2Codec(sm2Params)
+        }
+
+        private class CipherCodecImpl(
+            private val algorithm: String,
+            private val cipher: () -> Cipher
+        ) : CipherCodec {
 
             override val name = algorithm
 
-            override fun digest(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
-                val mac = Mac.getInstance(algorithm)
-                mac.init(key.toSecretKey(algorithm))
-                mac.update(data, offset, length)
-                return mac.doFinal()
+            override fun encrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
+                val cipher = this.cipher()
+                cipher.init(Cipher.ENCRYPT_MODE, key.toCodecKey(algorithm))
+                //cipher.update(data, offset, length)
+                return cipher.doFinal(data, offset, length)
+            }
+
+            override fun decrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
+                val cipher = this.cipher()
+                cipher.init(Cipher.DECRYPT_MODE, key.toCodecKey(algorithm))
+                //cipher.update(data, offset, length)
+                return cipher.doFinal(data, offset, length)
             }
         }
     }

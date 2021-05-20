@@ -2286,7 +2286,9 @@ Java Examples
     package sample.java.xyz.srclab.common.codec;
 
     import org.testng.annotations.Test;
-    import xyz.srclab.common.codec.Codec;
+    import xyz.srclab.common.codec.CipherCodec;
+    import xyz.srclab.common.codec.Codecing;
+    import xyz.srclab.common.codec.EncodeCodec;
     import xyz.srclab.common.codec.aes.AesKeys;
     import xyz.srclab.common.test.TestLogger;
 
@@ -2303,15 +2305,15 @@ Java Examples
             SecretKey secretKey = AesKeys.newKey(password);
 
             //Use static
-            String message = Codec.decodeBase64String(messageBase64);
-            byte[] encrypt = Codec.aesCipher().encrypt(secretKey, message);
-            String decrypt = Codec.aesCipher().decryptToString(secretKey, encrypt);
+            String message = EncodeCodec.base64().decodeToString(messageBase64);
+            byte[] encrypt = CipherCodec.aes().encrypt(secretKey, message);
+            String decrypt = CipherCodec.aes().decryptToString(secretKey, encrypt);
             //hei, pengyou, ruguozhendeshiniqingdazhaohu
             logger.log("decrypt: {}", decrypt);
 
             //Use chain
-            encrypt = Codec.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
-            decrypt = Codec.forData(encrypt).decryptAes(secretKey).doFinalToString();
+            encrypt = Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+            decrypt = Codecing.forData(encrypt).decryptAes(secretKey).doFinalString();
             //hei, pengyou, ruguozhendeshiniqingdazhaohu
             logger.log("decrypt: {}", decrypt);
         }
@@ -2322,8 +2324,9 @@ Kotlin Examples
     package sample.kotlin.xyz.srclab.common.codec
 
     import org.testng.annotations.Test
-    import xyz.srclab.common.codec.Codec
-    import xyz.srclab.common.codec.Codec.Companion.decodeBase64String
+    import xyz.srclab.common.codec.Base64Codec
+    import xyz.srclab.common.codec.CipherCodec
+    import xyz.srclab.common.codec.Codecing.Companion.startCodec
     import xyz.srclab.common.codec.aes.toAesKey
     import xyz.srclab.common.test.TestLogger
 
@@ -2336,15 +2339,15 @@ Kotlin Examples
             val secretKey = password.toAesKey()
 
             //Use static
-            val message: String = messageBase64.decodeBase64String()
-            var encrypt = Codec.aesCipher().encrypt(secretKey, message)
-            var decrypt = Codec.aesCipher().decryptToString(secretKey, encrypt)
+            val message: String = Base64Codec.decodeToString(messageBase64)
+            var encrypt = CipherCodec.aes().encrypt(secretKey, message)
+            var decrypt = CipherCodec.aes().decryptToString(secretKey, encrypt)
             //hei, pengyou, ruguozhendeshiniqingdazhaohu
             logger.log("decrypt: {}", decrypt)
 
             //Use chain
-            encrypt = Codec.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal()
-            decrypt = Codec.forData(encrypt).decryptAes(secretKey).doFinalToString()
+            encrypt = messageBase64.startCodec().decodeBase64().encryptAes(secretKey).doFinal()
+            decrypt = encrypt.startCodec().decryptAes(secretKey).doFinalString()
             //hei, pengyou, ruguozhendeshiniqingdazhaohu
             logger.log("decrypt: {}", decrypt)
         }

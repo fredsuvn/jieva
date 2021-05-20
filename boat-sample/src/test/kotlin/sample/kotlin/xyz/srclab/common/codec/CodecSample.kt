@@ -1,8 +1,9 @@
 package sample.kotlin.xyz.srclab.common.codec
 
 import org.testng.annotations.Test
-import xyz.srclab.common.codec.Coding
-import xyz.srclab.common.codec.Coding.Companion.decodeBase64String
+import xyz.srclab.common.codec.Base64Codec
+import xyz.srclab.common.codec.CipherCodec
+import xyz.srclab.common.codec.Codecing.Companion.startCodec
 import xyz.srclab.common.codec.aes.toAesKey
 import xyz.srclab.common.test.TestLogger
 
@@ -15,15 +16,15 @@ class CodecSample {
         val secretKey = password.toAesKey()
 
         //Use static
-        val message: String = messageBase64.decodeBase64String()
-        var encrypt = Coding.aesCipher().encrypt(secretKey, message)
-        var decrypt = Coding.aesCipher().decryptToString(secretKey, encrypt)
+        val message: String = Base64Codec.decodeToString(messageBase64)
+        var encrypt = CipherCodec.aes().encrypt(secretKey, message)
+        var decrypt = CipherCodec.aes().decryptToString(secretKey, encrypt)
         //hei, pengyou, ruguozhendeshiniqingdazhaohu
         logger.log("decrypt: {}", decrypt)
 
         //Use chain
-        encrypt = Coding.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal()
-        decrypt = Coding.forData(encrypt).decryptAes(secretKey).doFinalToString()
+        encrypt = messageBase64.startCodec().decodeBase64().encryptAes(secretKey).doFinal()
+        decrypt = encrypt.startCodec().decryptAes(secretKey).doFinalString()
         //hei, pengyou, ruguozhendeshiniqingdazhaohu
         logger.log("decrypt: {}", decrypt)
     }

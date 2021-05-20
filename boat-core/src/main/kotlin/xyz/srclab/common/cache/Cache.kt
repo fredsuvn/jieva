@@ -343,6 +343,11 @@ interface Cache<K : Any, V> {
         fun <K : Any, V> newFastCache(): Cache<K, V> {
             return MapCache(MapMaker().concurrencyLevel(Defaults.concurrencyLevel).weakValues().makeMap())
         }
+
+        @JvmStatic
+        fun <K : Any, V> MutableMap<K, V>.toCache(): Cache<K, V> {
+            return MapCache(this)
+        }
     }
 }
 

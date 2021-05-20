@@ -1,7 +1,7 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.codec.Coding.Companion.encodeBase64String
-import xyz.srclab.common.codec.Coding.Companion.encodeHexString
+import xyz.srclab.common.codec.EncodeCodec.Companion.toBase64String
+import xyz.srclab.common.codec.EncodeCodec.Companion.toHexString
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.lang.toChars
 
@@ -13,99 +13,55 @@ import xyz.srclab.common.lang.toChars
  */
 interface CodecKeyPair<PUB, PRI> {
 
-    /**
-     * Returns public key.
-     *
-     * @return public key
-     */
+    @get:JvmName("publicKey")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val publicKey: PUB
-        @JvmName("publicKey") get
 
-    /**
-     * Returns private key.
-     *
-     * @return private key
-     */
+    @get:JvmName("privateKey")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val privateKey: PRI
-        @JvmName("privateKey") get
 
-    /**
-     * Returns public key as bytes.
-     *
-     * @return public key as bytes
-     */
+    @get:JvmName("publicKeyBytes")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val publicKeyBytes: ByteArray
-        @JvmName("publicKeyBytes") get
 
-    /**
-     * Returns private key as bytes.
-     *
-     * @return private key as bytes
-     */
+    @get:JvmName("privateKeyBytes")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val privateKeyBytes: ByteArray
-        @JvmName("privateKeyBytes") get
 
-    /**
-     * Returns public key as string.
-     *
-     * @return public key as string
-     */
+    @get:JvmName("publicKeyString")
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val publicKeyString: String
-        @JvmName("publicKeyString") get() = publicKeyBytes.toChars()
+        get() = publicKeyBytes.toChars()
 
-    /**
-     * Returns private key as string.
-     *
-     * @return private key as string
-     */
+    @get:JvmName("privateKeyString")
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val privateKeyString: String
-        @JvmName("privateKeyString") get() = privateKeyBytes.toChars()
+        get() = privateKeyBytes.toChars()
 
-    /**
-     * Returns public key as hex string.
-     *
-     * @return public key as hex string
-     */
+    @get:JvmName("publicKeyHexString")
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val publicKeyHexString: String
-        @JvmName("publicKeyHexString") get() = publicKeyBytes.encodeHexString()
+        get() = publicKeyBytes.toHexString()
 
-    /**
-     * Returns private key as hex string.
-     *
-     * @return private key as hex string
-     */
+    @get:JvmName("privateKeyHexString")
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val privateKeyHexString: String
-        @JvmName("privateKeyHexString") get() = privateKeyBytes.encodeHexString()
+        get() = privateKeyBytes.toHexString()
 
-    /**
-     * Returns public key as base64 string.
-     *
-     * @return public key as base64 string
-     */
+    @get:JvmName("publicKeyBase64String")
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val publicKeyBase64String: String
-        @JvmName("publicKeyBase64String") get() = publicKeyBytes.encodeBase64String()
+        get() = publicKeyBytes.toBase64String()
 
-    /**
-     * Returns private key as base64 string.
-     *
-     * @return private key as base64 string
-     */
+    @get:JvmName("privateKeyBase64String")
     @Suppress(INAPPLICABLE_JVM_NAME)
     @JvmDefault
     val privateKeyBase64String: String
-        @JvmName("privateKeyBase64String") get() = privateKeyBytes.encodeBase64String()
+        get() = privateKeyBytes.toBase64String()
 }

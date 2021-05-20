@@ -4,8 +4,9 @@ import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.codec.AsymmetricCipher;
+import xyz.srclab.common.codec.AsymmetricCipherCodec;
 import xyz.srclab.common.codec.CodecAlgorithm;
+import xyz.srclab.common.lang.Defaults;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,11 +15,11 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
- * SM2 cipher.
+ * SM2 cipher codec.
  *
  * @author sunqian
  */
-public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> {
+public class Sm2Codec implements AsymmetricCipherCodec<ECPoint, BigInteger> {
 
     private static final int DIGEST_LENGTH = 32;
 
@@ -28,11 +29,11 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
     private final ECCurve.Fp curve;
     private final ECPoint G;
 
-    public Sm2CipherJavaImpl() {
-        this(Sm2Params.defaultParams());
+    public Sm2Codec() {
+        this(Sm2Params.DEFAULT);
     }
 
-    public Sm2CipherJavaImpl(Sm2Params sm2Params) {
+    public Sm2Codec(Sm2Params sm2Params) {
         this.sm2Params = sm2Params;
         //int w = (int) Math.ceil(sm2Params.n().bitLength() * 1.0 / 2) - 1;
         //BigInteger _2w = new BigInteger("2").pow(w);
@@ -41,6 +42,15 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
             sm2Params.b()); // b
         G = curve.createPoint(sm2Params.gx(), sm2Params.gy());
         ecc_bc_spec = new ECDomainParameters(curve, G, sm2Params.n());
+    }
+
+    @Override
+    public String name() {
+        return CodecAlgorithm.RSA_NAME;
+    }
+
+    public String getName() {
+        return name();
     }
 
     @Override
@@ -60,63 +70,48 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
     }
 
     @Override
-    public byte[] encrypt(ECPoint publicKey, byte[] data) {
-        return doEncrypt(data, publicKey);
+    public byte[] encrypt(Object key, byte[] data, int offset, int length) {
+        return doEncrypt(directOrCopy(data, offset, length), toPublicKey(key));
     }
 
     @Override
-    public byte[] encrypt(byte[] publicKey, byte[] data) {
-        return doEncrypt(data, curve.decodePoint(publicKey));
+    public byte[] decrypt(Object key, byte[] data, int offset, int length) {
+        return doDecrypt(directOrCopy(data, offset, length), toPrivateKey(key));
     }
 
-    @Override
-    public byte[] encryptWithAny(Object publicKey, byte[] data) {
-        if (publicKey instanceof ECPoint) {
-            return encrypt((ECPoint) publicKey, data);
+    private byte[] directOrCopy(byte[] data, int offset, int length) {
+        if (offset == 0 && length == data.length) {
+            return data;
         }
-        if (publicKey instanceof byte[]) {
-            return encrypt((byte[]) publicKey, data);
+        return Arrays.copyOfRange(data, offset, offset + length);
+    }
+
+    private ECPoint toPublicKey(Object key) {
+        if (key instanceof ECPoint) {
+            return (ECPoint) key;
         }
-        throw new IllegalArgumentException("Unsupported SM2 public key type: " + publicKey.getClass());
-    }
-
-    @Override
-    public byte[] decrypt(BigInteger privateKey, byte[] encrypted) {
-        return doDecrypt(encrypted, privateKey);
-    }
-
-    @Override
-    public byte[] decrypt(byte[] privateKey, byte[] encrypted) {
-        return doDecrypt(encrypted, new BigInteger(privateKey));
-    }
-
-    @Override
-    public byte[] decryptWithAny(Object privateKey, byte[] encrypted) {
-        if (privateKey instanceof BigInteger) {
-            return decrypt((BigInteger) privateKey, encrypted);
+        if (key instanceof byte[]) {
+            return curve.decodePoint((byte[]) key);
         }
-        if (privateKey instanceof byte[]) {
-            return decrypt((byte[]) privateKey, encrypted);
+        if (key instanceof CharSequence) {
+            return curve.decodePoint(key.toString().getBytes(Defaults.charset()));
         }
-        throw new IllegalArgumentException("Unsupported SM2 private key type: " + privateKey.getClass());
+        throw new UnsupportedOperationException("Unsupported public key: " + key);
     }
 
-    @Override
-    public String name() {
-        return CodecAlgorithm.RSA_NAME;
+    private BigInteger toPrivateKey(Object key) {
+        if (key instanceof BigInteger) {
+            return (BigInteger) key;
+        }
+        if (key instanceof byte[]) {
+            return new BigInteger((byte[]) key);
+        }
+        if (key instanceof CharSequence) {
+            return new BigInteger(key.toString().getBytes(Defaults.charset()));
+        }
+        throw new UnsupportedOperationException("Unsupported private key: " + key);
     }
 
-    public String getName() {
-        return name();
-    }
-
-    /**
-     * 公钥加密
-     *
-     * @param input     加密原文
-     * @param publicKey 公钥
-     * @return
-     */
     private byte[] doEncrypt(byte[] input, ECPoint publicKey) {
 
         byte[] C1Buffer;
@@ -175,13 +170,6 @@ public class Sm2CipherJavaImpl implements AsymmetricCipher<ECPoint, BigInteger> 
         return encryptResult;
     }
 
-    /**
-     * 私钥解密
-     *
-     * @param encryptData 密文数据字节数组
-     * @param privateKey  解密私钥
-     * @return
-     */
     private byte[] doDecrypt(byte[] encryptData, BigInteger privateKey) {
 
         byte[] C1Byte = new byte[65];

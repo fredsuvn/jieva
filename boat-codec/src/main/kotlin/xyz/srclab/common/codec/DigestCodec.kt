@@ -76,25 +76,64 @@ interface DigestCodec : Codec {
     companion object {
 
         @JvmName("withAlgorithm")
+        @JvmOverloads
         @JvmStatic
-        fun CharSequence.toDigestCipher(): DigestCodec {
-            return this.toCodecAlgorithm().toDigestCipher()
+        fun CharSequence.toDigestCodec(
+            digest: () -> MessageDigest = { MessageDigest.getInstance(this.toString()) }
+        ): DigestCodec {
+            return this.toCodecAlgorithm().toDigestCodec(digest)
         }
 
         @JvmName("withAlgorithm")
+        @JvmOverloads
         @JvmStatic
-        fun CodecAlgorithm.toDigestCipher(): DigestCodec {
-            return DigestCipherImpl(this.name)
+        fun CodecAlgorithm.toDigestCodec(
+            digest: () -> MessageDigest = { MessageDigest.getInstance(this.name) }
+        ): DigestCodec {
+            return DigestCodecImpl(this.name, digest)
         }
 
-        private class DigestCipherImpl(private val algorithm: String) : DigestCodec {
+        @JvmStatic
+        fun md2(): DigestCodec {
+            return CodecAlgorithm.MD2.toDigestCodec()
+        }
+
+        @JvmStatic
+        fun md5(): DigestCodec {
+            return CodecAlgorithm.MD5.toDigestCodec()
+        }
+
+        @JvmStatic
+        fun sha1(): DigestCodec {
+            return CodecAlgorithm.SHA1.toDigestCodec()
+        }
+
+        @JvmStatic
+        fun sha256(): DigestCodec {
+            return CodecAlgorithm.SHA256.toDigestCodec()
+        }
+
+        @JvmStatic
+        fun sha384(): DigestCodec {
+            return CodecAlgorithm.SHA384.toDigestCodec()
+        }
+
+        @JvmStatic
+        fun sha512(): DigestCodec {
+            return CodecAlgorithm.SHA512.toDigestCodec()
+        }
+
+        private class DigestCodecImpl(
+            private val algorithm: String,
+            private val digest: () -> MessageDigest
+        ) : DigestCodec {
 
             override val name = algorithm
 
             override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
-                val digester = MessageDigest.getInstance(algorithm)
-                digester.update(data, offset, length)
-                return digester.digest()
+                val digest = this.digest()
+                digest.update(data, offset, length)
+                return digest.digest()
             }
         }
     }

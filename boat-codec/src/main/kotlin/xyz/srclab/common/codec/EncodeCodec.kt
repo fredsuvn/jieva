@@ -137,15 +137,30 @@ interface EncodeCodec : Codec {
 
     companion object {
 
-        @JvmName("withAlgorithm")
         @JvmStatic
-        fun CharSequence.toEncodeCipher(): EncodeCodec {
-            return this.toCodecAlgorithm().toEncodeCipher()
+        fun plain(): PlainCodec {
+            return PlainCodec
+        }
+
+        @JvmStatic
+        fun hex(): HexCodec {
+            return HexCodec
+        }
+
+        @JvmStatic
+        fun base64(): Base64Codec {
+            return Base64Codec
         }
 
         @JvmName("withAlgorithm")
         @JvmStatic
-        fun CodecAlgorithm.toEncodeCipher(): EncodeCodec {
+        fun CharSequence.toEncodeCodec(): EncodeCodec {
+            return this.toCodecAlgorithm().toEncodeCodec()
+        }
+
+        @JvmName("withAlgorithm")
+        @JvmStatic
+        fun CodecAlgorithm.toEncodeCodec(): EncodeCodec {
             return when (this.name) {
                 CodecAlgorithm.PLAIN_NAME -> PlainCodec
                 CodecAlgorithm.HEX_NAME -> HexCodec
@@ -153,9 +168,22 @@ interface EncodeCodec : Codec {
                 else -> throw IllegalArgumentException("Unknown algorithm: ${this.name}")
             }
         }
+
+        @JvmStatic
+        fun ByteArray.toHexString(): String {
+            return HexCodec.encodeToString(this)
+        }
+
+        @JvmStatic
+        fun ByteArray.toBase64String(): String {
+            return Base64Codec.encodeToString(this)
+        }
     }
 }
 
+/**
+ * A `NOP` Codec just return raw, plain bytes/text.
+ */
 object PlainCodec : EncodeCodec {
 
     override val name: String = CodecAlgorithm.PLAIN_NAME
@@ -201,6 +229,9 @@ object PlainCodec : EncodeCodec {
     }
 }
 
+/**
+ * Codec for hex encoding.
+ */
 object HexCodec : EncodeCodec {
 
     override val name: String = CodecAlgorithm.HEX_NAME
@@ -232,6 +263,9 @@ object HexCodec : EncodeCodec {
     }
 }
 
+/**
+ * Codec for base64 encoding.
+ */
 object Base64Codec : EncodeCodec {
 
     override val name: String = CodecAlgorithm.BASE64_NAME

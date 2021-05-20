@@ -6,9 +6,12 @@ import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 /**
  * Codec interface.
  *
- * Cipher is thread-safe.
- *
  * @author sunqian
+ *
+ * @see EncodeCodec
+ * @see DigestCodec
+ * @see MacCodec
+ * @see CipherCodec
  */
 @ThreadSafe
 interface Codec {

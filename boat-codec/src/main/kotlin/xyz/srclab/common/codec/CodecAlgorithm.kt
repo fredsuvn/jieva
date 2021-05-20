@@ -29,9 +29,6 @@ interface CodecAlgorithm {
         val BASE64_NAME = "BASE64"
 
         @JvmField
-        val AES_NAME = "AES"
-
-        @JvmField
         val MD2_NAME = "MD2"
 
         @JvmField
@@ -65,6 +62,9 @@ interface CodecAlgorithm {
         val HMAC_SHA512_NAME = "HmacSHA512"
 
         @JvmField
+        val AES_NAME = "AES"
+
+        @JvmField
         val RSA_NAME = "RSA"
 
         @JvmField
@@ -81,9 +81,6 @@ interface CodecAlgorithm {
 
         @JvmField
         val BASE64 = newAlgorithm(BASE64_NAME, CodecAlgorithmType.ENCODE)
-
-        @JvmField
-        val AES = newAlgorithm(AES_NAME, CodecAlgorithmType.SYMMETRIC)
 
         @JvmField
         val MD2 = newAlgorithm(MD2_NAME, CodecAlgorithmType.DIGEST)
@@ -104,19 +101,22 @@ interface CodecAlgorithm {
         val SHA512 = newAlgorithm(SHA512_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
-        val HMAC_MD5 = newAlgorithm(HMAC_MD5_NAME, CodecAlgorithmType.HMAC)
+        val HMAC_MD5 = newAlgorithm(HMAC_MD5_NAME, CodecAlgorithmType.MAC)
 
         @JvmField
-        val HMAC_SHA1 = newAlgorithm(HMAC_SHA1_NAME, CodecAlgorithmType.HMAC)
+        val HMAC_SHA1 = newAlgorithm(HMAC_SHA1_NAME, CodecAlgorithmType.MAC)
 
         @JvmField
-        val HMAC_SHA256 = newAlgorithm(HMAC_SHA256_NAME, CodecAlgorithmType.HMAC)
+        val HMAC_SHA256 = newAlgorithm(HMAC_SHA256_NAME, CodecAlgorithmType.MAC)
 
         @JvmField
-        val HMAC_SHA384 = newAlgorithm(HMAC_SHA384_NAME, CodecAlgorithmType.HMAC)
+        val HMAC_SHA384 = newAlgorithm(HMAC_SHA384_NAME, CodecAlgorithmType.MAC)
 
         @JvmField
-        val HMAC_SHA512 = newAlgorithm(HMAC_SHA512_NAME, CodecAlgorithmType.HMAC)
+        val HMAC_SHA512 = newAlgorithm(HMAC_SHA512_NAME, CodecAlgorithmType.MAC)
+
+        @JvmField
+        val AES = newAlgorithm(AES_NAME, CodecAlgorithmType.CIPHER)
 
         @JvmField
         val RSA = newAlgorithm(RSA_NAME, CodecAlgorithmType.ASYMMETRIC)
@@ -146,7 +146,6 @@ interface CodecAlgorithm {
                 PLAIN_NAME -> PLAIN
                 HEX_NAME -> HEX
                 BASE64_NAME -> BASE64
-                AES_NAME -> AES
                 MD2_NAME -> MD2
                 MD5_NAME -> MD5
                 SHA1_NAME -> SHA1
@@ -158,6 +157,7 @@ interface CodecAlgorithm {
                 HMAC_SHA256_NAME -> HMAC_SHA256
                 HMAC_SHA384_NAME -> HMAC_SHA384
                 HMAC_SHA512_NAME -> HMAC_SHA512
+                AES_NAME -> AES
                 RSA_NAME -> RSA
                 SM2_NAME -> SM2
                 else -> null
@@ -196,5 +196,5 @@ interface CodecAlgorithm {
 }
 
 enum class CodecAlgorithmType {
-    SYMMETRIC, DIGEST, HMAC, ASYMMETRIC, ENCODE
+    ENCODE, DIGEST, MAC, CIPHER, ASYMMETRIC,
 }
