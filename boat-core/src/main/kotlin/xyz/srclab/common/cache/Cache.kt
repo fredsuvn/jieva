@@ -18,7 +18,6 @@ import com.google.common.cache.RemovalCause as guavaRemovalCause
  * @see CaffeineCache
  * @see CaffeineLoadingCache
  * @see MapCache
- * @see ThreadLocalCache
  */
 interface Cache<K : Any, V> {
 
