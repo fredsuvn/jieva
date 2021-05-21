@@ -4,7 +4,6 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.collect.MapType
 import xyz.srclab.common.collect.MapType.Companion.toMapType
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.lang.asAny
@@ -16,11 +15,12 @@ fun Type.resolve(beanResolver: BeanResolver = BeanResolver.DEFAULT): BeanType {
 }
 
 @JvmOverloads
-fun Any.asMap(
+fun <V> Any.asMap(
+    valueType: Type = Any::class.java,
     beanResolver: BeanResolver = BeanResolver.DEFAULT,
     converter: Converter = Converter.DEFAULT
-): MutableMap<String, Any?> {
-    return BeanAsMap(this, beanResolver, converter)
+): MutableMap<String, V> {
+    return BeanAsMap(this, valueType, beanResolver, converter).asAny()
 }
 
 @JvmOverloads
@@ -126,11 +126,10 @@ fun <T : Any> Any.copyProperties(
 
 private class BeanAsMap(
     private val bean: Any,
+    private val valueType: Type,
     private val beanResolver: BeanResolver,
     private val converter: Converter
 ) : AbstractMutableMap<String, Any?>() {
-
-    private val mapType = MapType.BEAN_PATTERN
 
     private val properties: Map<String, PropertyType> = run {
         beanResolver.resolve(bean.javaClass).properties
@@ -148,12 +147,12 @@ private class BeanAsMap(
                     override val key: String = it.key
 
                     override val value: Any?
-                        get() = converter.convert(it.value.getValue(bean), mapType.valueType)
+                        get() = converter.convert(it.value.getValue(bean), valueType)
 
                     override fun setValue(newValue: Any?): Any? {
                         return it.value.setValueAndReturnOld(
                             bean,
-                            converter.convert(newValue, mapType.valueType)
+                            converter.convert(newValue, valueType)
                         )
                     }
                 }
@@ -169,7 +168,7 @@ private class BeanAsMap(
         if (propertyType === null) {
             return null
         }
-        return converter.convert(propertyType.getValue(bean), mapType.valueType)
+        return converter.convert(propertyType.getValue(bean), valueType)
     }
 
     override fun isEmpty(): Boolean {

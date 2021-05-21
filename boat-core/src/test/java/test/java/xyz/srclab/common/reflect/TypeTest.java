@@ -3,6 +3,7 @@ package test.java.xyz.srclab.common.reflect;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.collect.SetMap;
 import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.reflect.Types;
@@ -324,9 +325,15 @@ public class TypeTest {
 
     @Test
     public void testGenericSignature() {
-        logger.log(Reflects.generalize(F2.class, I4.class));
-
-        Reflects.genericInterface(String.class);
+        logger.log(Reflects.generalize(F2.class, S1.class));
+        Assert.assertEquals(
+            Reflects.generalize(F2.class, S1.class),
+            Types.parameterizedType(S1.class, String.class)
+        );
+        logger.log(Reflects.generalize(F2.class, C1.class));
+        logger.log(Reflects.genericInterface(String.class));
+        logger.log(Reflects.genericInterface(new TypeRef<SetMap<String, String>>() {
+        }.type(), Map.class));
     }
 
     public static class BoundClass<

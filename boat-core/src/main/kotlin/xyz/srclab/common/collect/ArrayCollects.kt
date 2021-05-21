@@ -1,4 +1,5 @@
 @file:JvmName("Collects")
+@file:JvmMultifileClass
 
 package xyz.srclab.common.collect
 
@@ -9,6 +10,15 @@ import kotlin.collections.joinTo as joinToKt
 import kotlin.collections.joinToString as joinToStringKt
 
 private const val NOT_ARRAY_TYPE_PREFIX = "Not a array type"
+
+fun <T> newArray(vararg elements: T): Array<T> {
+    val componentType = elements.javaClass.componentType
+    val array = componentType.newArray<T>(elements.size)
+    for (i in elements.indices) {
+        array[i] = elements[i]
+    }
+    return array
+}
 
 /**
  * Create new array of which component type is [this].

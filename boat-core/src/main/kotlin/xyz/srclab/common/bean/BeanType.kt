@@ -19,4 +19,13 @@ interface BeanType {
     @get:JvmName("properties")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val properties: Map<String, PropertyType>
+
+    @JvmDefault
+    @Throws(PropertyNotFoundException::class)
+    fun getProperty(name: CharSequence): PropertyType {
+        val nameString = name.toString()
+        return properties[nameString] ?: throw PropertyNotFoundException(nameString)
+    }
 }
+
+class PropertyNotFoundException(name: String) : RuntimeException(name)

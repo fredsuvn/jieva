@@ -3,7 +3,9 @@ package xyz.srclab.common.collect
 import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.reflect.genericInterface
 import xyz.srclab.common.reflect.rawClass
+import xyz.srclab.common.reflect.typeArguments
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -139,6 +141,7 @@ interface MapType : ParameterizedType {
         @JvmStatic
         @JvmName("from")
         fun Class<*>.toMapType(): MapType {
+            //val parameterizedType = this.genericInterface(this.typeArguments(),Map::class.java)
             return from(this, Any::class.java, Any::class.java, this.declaringClass)
         }
 
