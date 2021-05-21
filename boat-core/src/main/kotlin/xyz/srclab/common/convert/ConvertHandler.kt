@@ -1,6 +1,6 @@
 package xyz.srclab.common.convert
 
-import xyz.srclab.common.bean.BeanCopyOptions
+import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
 import xyz.srclab.common.collect.IterableType.Companion.toIterableType
@@ -501,87 +501,98 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
  * Supports convert `from` to bean or [Map] types:
  *
  * * Bean;
- * * [HashMap], [LinkedHashMap], [TreeMap];
+ * * [Map], [HashMap], [LinkedHashMap], [TreeMap];
  * * [ConcurrentHashMap];
- * * [SetMap], [ListMap];
+ * * [SetMap], [MutableSetMap], [ListMap], [MutableListMap];
  */
 open class BeanConvertHandler @JvmOverloads constructor(
-    private val builderGenerator: (Class<*>) -> Any = { it.toInstance() },
-    private val buildOption: (builder: Any, toType: Class<*>) -> Any = { builder, _ -> builder },
+    private val builder: (Type) -> Any = { it.rawClass.toInstance() },
+    private val build: (builder: Any, toType: Type) -> Any = { bean, _ -> bean },
+    private val beanResolver: BeanResolver = BeanResolver.DEFAULT,
 ) : AbstractTypeConvertHandler() {
 
     override val toTypeFastHit: List<Type> = listOf(
-        Iterable::class.java,
-        Collection::class.java,
-        Set::class.java,
-        List::class.java,
-        HashSet::class.java,
-        LinkedHashSet::class.java,
-        TreeSet::class.java,
+        Map::class.java,
         HashMap::class.java,
         LinkedHashMap::class.java,
         TreeMap::class.java,
         ConcurrentHashMap::class.java,
         SetMap::class.java,
+        MutableSetMap::class.java,
         ListMap::class.java,
+        MutableListMap::class.java,
     )
 
     override fun convertNull(toType: Type, converter: Converter): Any {
-        return Defaults.NULL
+        return Next.CONTINUE
     }
 
-    override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
-        return when (toType) {
-            Map::class.java, LinkedHashMap::class.java -> toLinkedHashMap(from, fromType, toType, converter)
-            HashMap::class.java -> toHashMap(from, fromType, toType, converter)
-            TreeMap::class.java -> toTreeMap(from, fromType, toType, converter)
-            ConcurrentHashMap::class.java -> toConcurrentHashMap(from, fromType, toType, converter)
-            is Class<*> -> {
-                if (toType.isArray) {
-                    return null
-                }
-                return toObject(from, fromType, toType, converter)
-            }
-            is ParameterizedType -> {
-                return when (val rawClass = toType.rawClass) {
-                    Map::class.java, LinkedHashMap::class.java -> toLinkedHashMap(from, fromType, toType, converter)
-                    HashMap::class.java -> toHashMap(from, fromType, toType, converter)
-                    TreeMap::class.java -> toTreeMap(from, fromType, toType, converter)
-                    else -> toObject(from, fromType, rawClass, converter)
-                }
-            }
-            else -> null
+    override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
+        if (toType is GenericArrayType) {
+            return Next.CONTINUE
+        }
+        val toRawClass = toType.rawClass
+        if (toRawClass.isArray) {
+            return Next.CONTINUE
+        }
+        return when (toRawClass) {
+            Map::class.java, LinkedHashMap::class.java ->
+                toLinkedHashMap(from, toType, converter)
+            HashMap::class.java ->
+                toHashMap(from, toType, converter)
+            TreeMap::class.java ->
+                toTreeMap(from, toType, converter)
+            ConcurrentHashMap::class.java ->
+                toConcurrentHashMap(from, toType, converter)
+            SetMap::class.java ->
+                toSetMap(from, toType, converter)
+            MutableSetMap::class.java ->
+                toMutableSetMap(from, toType, converter)
+            ListMap::class.java ->
+                toListMap(from, toType, converter)
+            MutableListMap::class.java ->
+                toMutableListMap(from, toType, converter)
+            else ->
+                toObject(from, toType, converter)
         }
     }
 
-    private fun toLinkedHashMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
-        return from.copyProperties(LinkedHashMap<Any?, Any?>(), currentCopyOptions(fromType, toType, converter))
+    private fun toLinkedHashMap(from: Any, toType: Type, converter: Converter): Any {
+        return from.copyProperties(LinkedHashMap<Any, Any?>(), toType, beanResolver, converter)
     }
 
-    private fun toHashMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
-        return from.copyProperties(HashMap<Any?, Any?>(), currentCopyOptions(fromType, toType, converter))
+    private fun toHashMap(from: Any, toType: Type, converter: Converter): Any {
+        return from.copyProperties(HashMap<Any, Any?>(), toType, beanResolver, converter)
     }
 
-    private fun toTreeMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
-        return from.copyProperties(TreeMap<Any?, Any?>(), currentCopyOptions(fromType, toType, converter))
+    private fun toTreeMap(from: Any, toType: Type, converter: Converter): Any {
+        return from.copyProperties(TreeMap<Any, Any?>(), toType, beanResolver, converter)
     }
 
-    private fun toConcurrentHashMap(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
-        return from.copyProperties(ConcurrentHashMap<Any?, Any?>(), currentCopyOptions(fromType, toType, converter))
+    private fun toConcurrentHashMap(from: Any, toType: Type, converter: Converter): Any {
+        return from.copyProperties(ConcurrentHashMap<Any, Any?>(), toType, beanResolver, converter)
     }
 
-    private fun toObject(from: Any, fromType: Type, toType: Class<*>, converter: Converter): Any {
-        val builder = builderGenerator(toType)
-        from.copyProperties(builder, currentCopyOptions(fromType, builder.javaClass, converter))
-        return buildOption(builder, toType)
+    private fun toSetMap(from: Any, toType: Type, converter: Converter): Any {
+        return toMutableSetMap(from, toType, converter).toSetMap()
     }
 
-    private fun currentCopyOptions(fromType: Type, toType: Type, converter: Converter): BeanCopyOptions {
-        return copyOptions.toBuilder()
-            .fromType(fromType)
-            .toType(toType)
-            .converter(converter)
-            .build()
+    private fun toMutableSetMap(from: Any, toType: Type, converter: Converter): MutableSetMap<Any, Any?> {
+        return from.copyProperties(MutableSetMap.newMutableSetMap(), toType, beanResolver, converter)
+    }
+
+    private fun toListMap(from: Any, toType: Type, converter: Converter): Any {
+        return toMutableListMap(from, toType, converter).toListMap()
+    }
+
+    private fun toMutableListMap(from: Any, toType: Type, converter: Converter): MutableListMap<Any, Any?> {
+        return from.copyProperties(MutableListMap.newMutableListMap(), toType, beanResolver, converter)
+    }
+
+    private fun toObject(from: Any, toType: Type, converter: Converter): Any {
+        val builder = builder(toType)
+        from.copyProperties(builder, toType, beanResolver, converter)
+        return build(builder, toType)
     }
 
     companion object {

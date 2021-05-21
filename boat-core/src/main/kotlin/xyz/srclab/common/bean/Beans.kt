@@ -26,7 +26,26 @@ fun Any.asMap(
 @JvmOverloads
 fun <T : Any> Any.copyProperties(
     @Written to: T,
-    copyNull: Boolean = true,
+    beanResolver: BeanResolver = BeanResolver.DEFAULT,
+    converter: Converter = Converter.DEFAULT,
+): T {
+    return copyProperties(to, true, beanResolver, converter)
+}
+
+@JvmOverloads
+fun <T : Any> Any.copyProperties(
+    @Written to: T,
+    toType: Type,
+    beanResolver: BeanResolver = BeanResolver.DEFAULT,
+    converter: Converter = Converter.DEFAULT,
+): T {
+    return copyProperties(to, toType, true, beanResolver, converter)
+}
+
+@JvmOverloads
+fun <T : Any> Any.copyProperties(
+    @Written to: T,
+    copyNull: Boolean,
     beanResolver: BeanResolver = BeanResolver.DEFAULT,
     converter: Converter = Converter.DEFAULT,
 ): T {
@@ -37,7 +56,7 @@ fun <T : Any> Any.copyProperties(
 fun <T : Any> Any.copyProperties(
     @Written to: T,
     toType: Type,
-    copyNull: Boolean = true,
+    copyNull: Boolean,
     beanResolver: BeanResolver = BeanResolver.DEFAULT,
     converter: Converter = Converter.DEFAULT,
 ): T {
