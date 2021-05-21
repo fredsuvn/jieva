@@ -1,9 +1,12 @@
 package xyz.srclab.common.convert
 
+import xyz.srclab.common.collect.ListMap
+import xyz.srclab.common.collect.MutableListMap
+import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.collect.plusBefore
 import xyz.srclab.common.convert.Converter.Companion.withPreConvertHandler
-import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.Next
 import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type
@@ -18,43 +21,26 @@ import java.lang.reflect.Type
  * @see CompatibleConvertHandler
  * @see WildcardTypeConvertHandler
  * @see CharsConvertHandler
- * @see NumberAndPrimitiveConvertHandler
+ * @see NumberBooleanConvertHandler
  * @see DateTimeConvertHandler
- * @see CollectionConvertHandler
+ * @see IterableConvertHandler
  * @see BeanConvertHandler
  */
 interface Converter {
 
+    @get:JvmName("convertHandlers")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val convertHandlers: List<ConvertHandler>
-        @JvmName("convertHandlers") get
 
-    @JvmDefault
-    fun <T> convert(from: Any?, toType: Class<T>): T {
-        val result = doConvert { it.convert(from, toType, this) }
-        if (result === null) {
-            throw UnsupportedOperationException("Cannot convert $from to $toType.")
-        }
-        return finalResult(result).asAny()
-    }
+    @get:JvmName("failedHandler")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val failedHandler: ConvertHandler
 
-    @JvmDefault
-    fun <T> convert(from: Any?, toType: Type): T {
-        val result = doConvert { it.convert(from, toType, this) }
-        if (result === null) {
-            throw UnsupportedOperationException("Cannot convert $from to $toType.")
-        }
-        return finalResult(result).asAny()
-    }
+    fun <T> convert(from: Any?, toType: Class<T>): T
 
-    @JvmDefault
-    fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
-        val result = doConvert { it.convert(from, fromType, toType, this) }
-        if (result === null) {
-            throw UnsupportedOperationException("Cannot convert $from as $fromType to $toType.")
-        }
-        return finalResult(result).asAny()
-    }
+    fun <T> convert(from: Any?, toType: Type): T
+
+    fun <T> convert(from: Any?, fromType: Type, toType: Type): T
 
     @JvmDefault
     fun <T> convert(from: Any?, toTypeRef: TypeRef<T>): T {
@@ -66,23 +52,6 @@ interface Converter {
         return convert(from, fromTypeRef.type, toTypeRef.type)
     }
 
-    private inline fun <T> doConvert(action: (ConvertHandler) -> T): T? {
-        for (handler in convertHandlers) {
-            val result = action(handler)
-            if (result !== null) {
-                return result.asAny()
-            }
-        }
-        return null
-    }
-
-    private fun <T> finalResult(result: T): T {
-        if (result === Defaults.NULL) {
-            return null.asAny()
-        }
-        return result
-    }
-
     companion object {
 
         @JvmField
@@ -91,11 +60,13 @@ interface Converter {
         @JvmField
         val COMPATIBLE: Converter = newConverter(listOf(CompatibleConvertHandler))
 
+        @JvmOverloads
         @JvmStatic
-        fun newConverter(convertHandlers: Iterable<ConvertHandler>): Converter {
-            return object : Converter {
-                override val convertHandlers = convertHandlers.toList()
-            }
+        fun newConverter(
+            convertHandlers: Iterable<ConvertHandler>,
+            failedHandler: ConvertHandler = DefaultFailedHandler
+        ): Converter {
+            return ConverterImpl(convertHandlers.asToList(), failedHandler)
         }
 
         /**
@@ -103,7 +74,63 @@ interface Converter {
          */
         @JvmStatic
         fun Converter.withPreConvertHandler(preConvertHandler: ConvertHandler): Converter {
-            return newConverter(convertHandlers.plusBefore(0, preConvertHandler))
+            return newConverter(convertHandlers.plusBefore(0, preConvertHandler), failedHandler)
+        }
+
+        private class ConverterImpl(
+            override val convertHandlers: List<ConvertHandler>,
+            override val failedHandler: ConvertHandler
+        ) : Converter {
+
+            private val toTypeFastHitMap: ListMap<Type, ConvertHandler> = run {
+                val toTypeFastHitMap: MutableListMap<Type, ConvertHandler> = MutableListMap.newMutableListMap()
+                for (handler in convertHandlers) {
+                    for (type in handler.toTypeFastHit) {
+                        toTypeFastHitMap.add(type, handler)
+                    }
+                }
+                toTypeFastHitMap.toListMap()
+            }
+
+            override fun <T> convert(from: Any?, toType: Class<T>): T {
+                return doConvert(toType) { it.convert(from, toType, this) }
+            }
+
+            override fun <T> convert(from: Any?, toType: Type): T {
+                return doConvert(toType) { it.convert(from, toType, this) }
+            }
+
+            override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
+                return doConvert(toType) { it.convert(from, fromType, toType, this) }
+            }
+
+            private inline fun <T> doConvert(toType: Type, action: (ConvertHandler) -> Any?): T {
+                val hitHandlers = toTypeFastHitMap[toType] ?: emptyList()
+                for (handler in hitHandlers) {
+                    val result = action(handler)
+                    if (result is Next) {
+                        when (result) {
+                            Next.CONTINUE -> continue
+                            Next.BREAK -> return action(failedHandler).asAny()
+                        }
+                    }
+                    return result.asAny()
+                }
+                for (handler in convertHandlers) {
+                    if (hitHandlers.contains(handler)) {
+                        continue
+                    }
+                    val result = action(handler)
+                    if (result is Next) {
+                        when (result) {
+                            Next.CONTINUE -> continue
+                            Next.BREAK -> return action(failedHandler).asAny()
+                        }
+                    }
+                    return result.asAny()
+                }
+                return action(failedHandler).asAny()
+            }
         }
     }
 }

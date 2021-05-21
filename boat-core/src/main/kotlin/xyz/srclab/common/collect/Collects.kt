@@ -1,9 +1,9 @@
 @file:JvmName("Collects")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.lang.*
+import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -1052,16 +1052,15 @@ fun <T> Iterable<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
     return JavaCollects.toArray(list, generator(list.size))
 }
 
-fun <T> Iterable<T>.toArray(componentType: Class<*>): Array<T> {
+@JvmOverloads
+fun <T, R> Iterable<T>.toArray(componentType: Type, selector: ((T) -> R)? = null): Array<R> {
     val list = this.asToList()
-    val array: Array<T> = componentType.newArray(list.size).asAny()
-    return JavaCollects.toArray(list, array)
-}
-
-fun <T, R> Iterable<T>.toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
-    val list = this.asToList()
-    val result = componentType.newArray<Array<R>>(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val result = componentType.newArray<R>(list.size)
+    if (selector !== null) {
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+    } else {
+        list.forEachIndexed { i, t -> result[i] = t.asAny() }
+    }
     return result
 }
 
@@ -1129,7 +1128,8 @@ inline fun <T> Iterable<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble
     return result
 }
 
-fun <T, A> Iterable<T>.toAnyArray(componentType: Class<*>): A {
+@JvmOverloads
+fun <T, R, A> Iterable<T>.toAnyArray(componentType: Type, selector: ((T) -> R)? = null): A {
     return when (componentType) {
         Boolean::class.javaPrimitiveType -> this.toBooleanArray()
         Byte::class.javaPrimitiveType -> this.toByteArray()
@@ -1139,7 +1139,7 @@ fun <T, A> Iterable<T>.toAnyArray(componentType: Class<*>): A {
         Long::class.javaPrimitiveType -> this.toLongArray()
         Float::class.javaPrimitiveType -> this.toFloatArray()
         Double::class.javaPrimitiveType -> this.toDoubleArray()
-        else -> this.toArray(componentType)
+        else -> this.toArray(componentType, selector)
     }.asAny()
 }
 
@@ -2589,16 +2589,15 @@ fun <T> Sequence<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
     return JavaCollects.toArray(list, generator(list.size))
 }
 
-fun <T> Sequence<T>.toArray(componentType: Class<*>): Array<T> {
+@JvmOverloads
+fun <T, R> Sequence<T>.toArray(componentType: Type, selector: ((T) -> R)? = null): Array<R> {
     val list = this.toListKt()
-    val array: Array<T> = componentType.newArray(0).asAny()
-    return JavaCollects.toArray(list, array)
-}
-
-fun <T, R> Sequence<T>.toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
-    val list = this.toListKt()
-    val result = componentType.newArray<Array<R>>(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val result = componentType.newArray<R>(list.size)
+    if (selector !== null) {
+        list.forEachIndexed { i, t -> result[i] = selector(t) }
+    } else {
+        list.forEachIndexed { i, t -> result[i] = t.asAny() }
+    }
     return result
 }
 
@@ -2666,7 +2665,8 @@ inline fun <T> Sequence<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble
     return result
 }
 
-fun <T, A> Sequence<T>.toAnyArray(componentType: Class<*>): A {
+@JvmOverloads
+fun <T, R, A> Sequence<T>.toAnyArray(componentType: Type, selector: ((T) -> R)? = null): A {
     return when (componentType) {
         Boolean::class.javaPrimitiveType -> this.toBooleanArray()
         Byte::class.javaPrimitiveType -> this.toByteArray()
@@ -2676,7 +2676,7 @@ fun <T, A> Sequence<T>.toAnyArray(componentType: Class<*>): A {
         Long::class.javaPrimitiveType -> this.toLongArray()
         Float::class.javaPrimitiveType -> this.toFloatArray()
         Double::class.javaPrimitiveType -> this.toDoubleArray()
-        else -> this.toArray(componentType)
+        else -> this.toArray(componentType, selector)
     }.asAny()
 }
 

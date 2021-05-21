@@ -1,24 +1,20 @@
-@file:JvmName("ArrayCollects")
-@file:JvmMultifileClass
+@file:JvmName("Collects")
 
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.reflect.rawClass
+import java.lang.reflect.Type
 import kotlin.collections.joinTo as joinToKt
 import kotlin.collections.joinToString as joinToStringKt
 
 private const val NOT_ARRAY_TYPE_PREFIX = "Not a array type"
 
-fun <T> newArray(vararg elements: T): Array<T> {
-    return elements.asAny()
-}
-
-fun <T> Class<T>.newArray(length: Int): Array<T> {
-    return java.lang.reflect.Array.newInstance(this, length).asAny()
-}
-
-fun <A> Class<*>.newArray(vararg dimensions: Int): A {
-    return java.lang.reflect.Array.newInstance(this, *dimensions).asAny()
+/**
+ * Create new array of which component type is [this].
+ */
+fun <T> Type.newArray(length: Int): Array<T> {
+    return java.lang.reflect.Array.newInstance(this.rawClass, length).asAny()
 }
 
 fun <T> Any.arrayAsListOrNull(): MutableList<T>? {

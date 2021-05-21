@@ -1,6 +1,5 @@
 package xyz.srclab.common.convert
 
-import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.common.bean.BeanCopyOptions
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
@@ -20,47 +19,51 @@ import java.time.temporal.Temporal
 import java.time.temporal.TemporalAdjuster
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.count
-import kotlin.collections.mapTo
 
 /**
  * Handler for [Converter].
+ *
+ * A [Converter] uses a group of [ConvertHandler]s to perform.
+ * If a handler returns [Next.CONTINUE], the converter will call next handler;
+ * if returns [Next.BREAK], the converter will fail to convert.
  *
  * @see Converter
  */
 interface ConvertHandler {
 
-    /**
-     * Note return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
-     */
-    fun convert(from: Any?, toType: Class<*>, converter: Converter): Any?
+    @get:JvmName("toTypeFastHit")
+    @JvmDefault
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val toTypeFastHit: List<Type>
+        get() {
+            return emptyList()
+        }
 
     /**
-     * Note return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
+     * Note [Next] type is a special type that cannot be supported.
+     */
+    fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any?
+
+    /**
+     * Note [Next] type is a special type that cannot be supported.
      */
     fun convert(from: Any?, toType: Type, converter: Converter): Any?
 
     /**
-     * Note return null if [from] cannot be converted, return [Defaults.NULL] if result value is null.
+     * Note [Next] type is a special type that cannot be supported.
      */
     fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any?
 
     companion object {
 
         @JvmField
-        val NULL = "NULL"
-
-        @JvmField
-        val BREAK = "BREAK"
-
-        @JvmField
         val DEFAULTS: List<ConvertHandler> = listOf(
             CompatibleConvertHandler,
             WildcardTypeConvertHandler,
             CharsConvertHandler,
-            NumberAndPrimitiveConvertHandler,
+            NumberBooleanConvertHandler,
             DateTimeConvertHandler.DEFAULT,
-            CollectionConvertHandler,
+            IterableConvertHandler,
             BeanConvertHandler.DEFAULT,
         )
 
@@ -72,9 +75,9 @@ interface ConvertHandler {
                 CompatibleConvertHandler,
                 WildcardTypeConvertHandler,
                 CharsConvertHandler,
-                NumberAndPrimitiveConvertHandler,
+                NumberBooleanConvertHandler,
                 dateTimeConvertHandler,
-                CollectionConvertHandler,
+                IterableConvertHandler,
                 BeanConvertHandler.DEFAULT,
             )
         }
@@ -87,9 +90,9 @@ interface ConvertHandler {
                 CompatibleConvertHandler,
                 WildcardTypeConvertHandler,
                 CharsConvertHandler,
-                NumberAndPrimitiveConvertHandler,
+                NumberBooleanConvertHandler,
                 DateTimeConvertHandler.DEFAULT,
-                CollectionConvertHandler,
+                IterableConvertHandler,
                 beanConvertHandler,
             )
         }
@@ -103,9 +106,9 @@ interface ConvertHandler {
                 CompatibleConvertHandler,
                 WildcardTypeConvertHandler,
                 CharsConvertHandler,
-                NumberAndPrimitiveConvertHandler,
+                NumberBooleanConvertHandler,
                 dateTimeConvertHandler,
-                CollectionConvertHandler,
+                IterableConvertHandler,
                 beanConvertHandler,
             )
         }
@@ -113,71 +116,74 @@ interface ConvertHandler {
 }
 
 /**
- * Use [Class.isAssignableFrom] to check whether from type can cast to to type, if not, return null.
+ * Use [Class.isAssignableFrom] to check whether from type can cast to to type, if not, return [Next.CONTINUE].
  */
 object CompatibleConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
-        if (toType == Any::class.java) {
-            return from.replaceNull()
-        }
+    override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any {
         if (from === null) {
-            return Defaults.NULL
+            return Next.CONTINUE
+        }
+        if (toType == Any::class.java) {
+            return from
         }
         val fromClass = from.javaClass
         if (fromClass == toType || toType.isAssignableFrom(fromClass)) {
-            return from.replaceNull()
+            return from
         }
-        return null
+        return Next.CONTINUE
     }
 
     override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
-        return if (toType is Class<*>) convert(from, toType, converter) else null
+        return if (toType is Class<*>) convert(from, toType, converter) else Next.CONTINUE
     }
 
     override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
-        if (toType == Any::class.java || fromType == toType) {
-            return from.replaceNull()
+        if (fromType == toType || toType == Any::class.java) {
+            return from
         }
-        if (from !== null && from.javaClass == fromType && toType is Class<*>) {
+        if (toType is Class<*>) {
             return convert(from, toType, converter)
         }
-        return null
-    }
-}
-
-object WildcardTypeConvertHandler : ConvertHandler {
-
-    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
-        return null
-    }
-
-    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
-        if (toType is WildcardType) {
-            return converter.convert(from, toType.upperBound)
-        }
-        return null
-    }
-
-    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
-        if (toType is WildcardType) {
-            return converter.convert(from, toType.upperBound)
-        }
-        return null
+        return Next.CONTINUE
     }
 }
 
 /**
- * Base [ConvertHandler] of which `fromType` and `toType` are [Class].
+ * Use [WildcardType.upperBound] to convert `toType` if `toType` is [WildcardType], else return [Next.CONTINUE].
+ */
+object WildcardTypeConvertHandler : ConvertHandler {
+
+    override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any {
+        return Next.CONTINUE
+    }
+
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        if (toType is WildcardType) {
+            return converter.convert(from, toType.upperBound)
+        }
+        return Next.CONTINUE
+    }
+
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        if (toType is WildcardType) {
+            return converter.convert(from, toType.upperBound)
+        }
+        return Next.CONTINUE
+    }
+}
+
+/**
+ * Base [ConvertHandler] of which `fromType` and `toType` are [Class], else return [Next.CONTINUE].
  */
 abstract class AbstractClassConvertHandler : ConvertHandler {
 
     override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
-        return if (toType is Class<*>) convert(from, toType, converter) else null
+        return if (toType is Class<*>) convert(from, toType, converter) else Next.CONTINUE
     }
 
     override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
-        return if (toType is Class<*>) convert(from, toType, converter) else null
+        return if (toType is Class<*>) convert(from, toType, converter) else Next.CONTINUE
     }
 }
 
@@ -189,7 +195,19 @@ abstract class AbstractClassConvertHandler : ConvertHandler {
  */
 object CharsConvertHandler : AbstractClassConvertHandler() {
 
-    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+    override val toTypeFastHit: List<Type> = listOf(
+        String::class.java,
+        CharSequence::class.java,
+        StringBuilder::class.java,
+        StringBuffer::class.java,
+        CharArray::class.java,
+        ByteArray::class.java,
+    )
+
+    override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any {
+        if (from !== null && from.javaClass == toType) {
+            return from
+        }
         return when (toType) {
             String::class.java, CharSequence::class.java -> when (from) {
                 is ByteArray -> from.toChars()
@@ -206,45 +224,47 @@ object CharsConvertHandler : AbstractClassConvertHandler() {
                 is CharArray -> StringBuffer(from.toChars())
                 else -> StringBuffer(from.toString())
             }
-            CharArray::class.java -> {
-                if (from is ByteArray) {
-                    from.toChars().toCharArray()
-                } else {
-                }
-                from.toString().toCharArray()
-            }
-            Array<Char>::class.java -> {
-                if (from is ByteArray) {
-                    ArrayUtils.toObject(from.toChars().toCharArray())
-                } else {
-                }
-                ArrayUtils.toObject(from.toString().toCharArray())
+            CharArray::class.java -> when (from) {
+                is ByteArray -> from.toChars().toCharArray()
+                else -> from.toString().toCharArray()
             }
             ByteArray::class.java -> when (from) {
                 is CharSequence -> from.toBytes()
                 is CharArray -> from.toBytes()
-                else -> from.toString()
+                else -> Next.CONTINUE
             }
-            Array<Byte>::class.java -> when (from) {
-                is CharSequence -> ArrayUtils.toObject(from.toBytes())
-                is CharArray -> ArrayUtils.toObject(from.toBytes())
-                else -> from.toString()
-            }
-            else -> null
+            else -> Next.CONTINUE
         }
     }
 }
 
 /**
- * Supports convert `from` to types:
+ * Supports convert `from` to number and boolean types:
  *
  * * [Boolean], [Byte], [Short], [Char], [Int], [Long], [Float], [Double] and their wrapper types;
  * * [BigInteger], [BigDecimal];
  * * [Number];
  */
-object NumberAndPrimitiveConvertHandler : AbstractClassConvertHandler() {
+object NumberBooleanConvertHandler : AbstractClassConvertHandler() {
 
-    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+    override val toTypeFastHit: List<Type> = listOf(
+        Boolean::class.javaPrimitiveType!!, Boolean::class.javaObjectType,
+        Byte::class.javaPrimitiveType!!, Byte::class.javaObjectType,
+        Short::class.javaPrimitiveType!!, Short::class.javaObjectType,
+        Char::class.javaPrimitiveType!!, Char::class.javaObjectType,
+        Int::class.javaPrimitiveType!!, Int::class.javaObjectType,
+        Long::class.javaPrimitiveType!!, Long::class.javaObjectType,
+        Float::class.javaPrimitiveType!!, Float::class.javaObjectType,
+        Double::class.javaPrimitiveType!!, Double::class.javaObjectType,
+        BigInteger::class.javaObjectType,
+        BigDecimal::class.javaObjectType,
+        Number::class.javaObjectType,
+    )
+
+    override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any {
+        if (from !== null && from.javaClass == toType) {
+            return from
+        }
         return when {
             toType.isBooleanType -> from.toBoolean()
             toType.isByteType -> from.toByte()
@@ -257,13 +277,13 @@ object NumberAndPrimitiveConvertHandler : AbstractClassConvertHandler() {
             toType == BigInteger::class.java -> from.toBigInteger()
             toType == BigDecimal::class.java -> from.toBigDecimal()
             toType == Number::class.java -> from.toNumber()
-            else -> null
+            else -> Next.CONTINUE
         }
     }
 }
 
 /**
- * Supports convert `from` to types:
+ * Supports convert `from` to datetime types:
  *
  * * [Date];
  * * [Instant];
@@ -280,6 +300,18 @@ open class DateTimeConvertHandler(
     private val localTimeFormatter: DateTimeFormatter,
 ) : AbstractClassConvertHandler() {
 
+    override val toTypeFastHit: List<Type> = listOf(
+        Date::class.java,
+        Instant::class.java,
+        LocalDate::class.java,
+        LocalTime::class.java,
+        LocalDateTime::class.java,
+        ZonedDateTime::class.java,
+        OffsetDateTime::class.java,
+        Duration::class.java,
+        Temporal::class.java,
+    )
+
     constructor() : this(
         dateFormat(),
         DateTimeFormatter.ISO_INSTANT,
@@ -290,7 +322,10 @@ open class DateTimeConvertHandler(
         DateTimeFormatter.ISO_LOCAL_TIME
     )
 
-    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+    override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any {
+        if (from !== null && from.javaClass == toType) {
+            return from
+        }
         return when (toType) {
             Date::class.java -> from.toDate(dateFormat)
             Instant::class.java -> from.toInstant(instantFormatter)
@@ -301,7 +336,7 @@ open class DateTimeConvertHandler(
             LocalTime::class.java -> from.toLocalTime(localTimeFormatter)
             Duration::class.java -> from.toDuration()
             Temporal::class.java, TemporalAdjuster::class.java -> from.toLocalDateTime(localDateTimeFormatter)
-            else -> null
+            else -> Next.CONTINUE
         }
     }
 
@@ -317,7 +352,7 @@ open class DateTimeConvertHandler(
  */
 abstract class AbstractTypeConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, toType: Class<*>, converter: Converter): Any? {
+    override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any? {
         return convert(from, toType as Type, converter)
     }
 
@@ -341,135 +376,155 @@ abstract class AbstractTypeConvertHandler : ConvertHandler {
 }
 
 /**
- * Supports convert `from` to [Collection] types.
+ * Supports convert `from` to iterable types:
+ *
+ * * Array, [GenericArrayType];
+ * * [Iterable], [Collection], [Set], [List];
+ * * [HashSet], [LinkedHashSet], [TreeSet];
  */
-object CollectionConvertHandler : AbstractTypeConvertHandler() {
+object IterableConvertHandler : AbstractTypeConvertHandler() {
+
+    override val toTypeFastHit: List<Type> = listOf(
+        Iterable::class.java,
+        Collection::class.java,
+        Set::class.java,
+        List::class.java,
+        HashSet::class.java,
+        LinkedHashSet::class.java,
+        TreeSet::class.java,
+    )
 
     override fun convertNull(toType: Type, converter: Converter): Any {
-        return Defaults.NULL
+        return Next.CONTINUE
     }
 
-    override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any? {
+    override fun convertNotNull(from: Any, fromType: Type, toType: Type, converter: Converter): Any {
+        if (from.javaClass == toType) {
+            return from
+        }
         return when (toType) {
             is Class<*> -> {
                 if (toType.isArray) {
-                    val iterable = fromToIterable(from)
-                    return if (iterable === null) {
-                        null
-                    } else {
-                        toArray(iterable, toType, converter)
+                    val iterable = from.toIterable()
+                    if (iterable === null) {
+                        return Next.CONTINUE
                     }
+                    return toArray(iterable, toType, converter)
                 }
                 if (Iterable::class.java.isAssignableFrom(toType)) {
-                    return toIterableType(from, toType.toIterableType(), converter)
+                    val iterable = from.toIterable()
+                    if (iterable === null) {
+                        return Next.CONTINUE
+                    }
+                    return toIterable(iterable, toType.toIterableType(), converter)
                 }
-                null
+                return Next.CONTINUE
             }
             is GenericArrayType -> convertNotNull(from, fromType, toType.rawClass, converter)
             is ParameterizedType -> {
                 val rawClass = toType.rawClass
                 if (Iterable::class.java.isAssignableFrom(rawClass)) {
-                    return toIterableType(from, toType.toIterableType(), converter)
+                    val iterable = from.toIterable()
+                    if (iterable === null) {
+                        return Next.CONTINUE
+                    }
+                    return toIterable(iterable, toType.toIterableType(), converter)
                 }
-                null
+                Next.CONTINUE
             }
-            else -> null
+            else -> Next.CONTINUE
         }
     }
 
-    private fun toArray(iterable: Iterable<Any?>, arrayClass: Class<*>, converter: Converter): Any {
-        val componentType = arrayClass.componentType
-        return when {
-            componentType.isByteType -> iterable.toBooleanArray()
-            componentType.isByteType -> iterable.toByteArray()
-            componentType.isShortType -> iterable.toShortArray()
-            componentType.isCharType -> iterable.toCharArray()
-            componentType.isIntType -> iterable.toIntArray()
-            componentType.isLongType -> iterable.toLongArray()
-            componentType.isFloatType -> iterable.toFloatArray()
-            componentType.isDoubleType -> iterable.toDoubleArray()
-            else -> iterable.toArray(componentType) { converter.convert(it, componentType) }
+    private fun toArray(from: Iterable<*>, toType: Class<*>, converter: Converter): Any {
+        return from.toAnyArray(toType.componentType) {
+            converter.convert(it, toType.componentType)
         }
     }
 
-    private fun toIterableType(from: Any, iterableType: IterableType, converter: Converter): Any? {
+    private fun toIterable(from: Iterable<*>, iterableType: IterableType, converter: Converter): Any {
         return when (iterableType.rawClass) {
-            List::class.java, ArrayList::class.java -> toArrayList(from, iterableType.componentType, converter)
-            LinkedList::class.java -> toLinkedList(from, iterableType.componentType, converter)
+            Iterable::class.java, List::class.java, ArrayList::class.java ->
+                toArrayList(from, iterableType.componentType, converter)
+            LinkedList::class.java ->
+                toLinkedList(from, iterableType.componentType, converter)
             Collection::class.java, Set::class.java, LinkedHashSet::class.java ->
                 toLinkedHashSet(from, iterableType.componentType, converter)
-            HashSet::class.java -> toHashSet(from, iterableType.componentType, converter)
-            TreeSet::class.java -> toTreeSet(from, iterableType.componentType, converter)
-            else -> null
+            HashSet::class.java ->
+                toHashSet(from, iterableType.componentType, converter)
+            TreeSet::class.java ->
+                toTreeSet(from, iterableType.componentType, converter)
+            else -> Next.CONTINUE
         }
     }
 
-    private fun toArrayList(from: Any, componentType: Type, converter: Converter): Any? {
-        val iterable = fromToIterable(from)
-        if (iterable === null) {
-            return null
-        }
+    private fun toArrayList(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
         return iterable.mapTo(ArrayList<Any?>(iterable.count())) {
             converter.convert(it, componentType)
         }
     }
 
-    private fun toLinkedList(from: Any, componentType: Type, converter: Converter): Any? {
-        val iterable = fromToIterable(from)
-        if (iterable === null) {
-            return null
-        }
+    private fun toLinkedList(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
         return iterable.mapTo(LinkedList<Any?>()) {
             converter.convert(it, componentType)
         }
     }
 
-    private fun toLinkedHashSet(from: Any, componentType: Type, converter: Converter): Any? {
-        val iterable = fromToIterable(from)
-        if (iterable === null) {
-            return null
-        }
+    private fun toLinkedHashSet(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
         return iterable.mapTo(LinkedHashSet<Any?>()) {
             converter.convert(it, componentType)
         }
     }
 
-    private fun toHashSet(from: Any, componentType: Type, converter: Converter): Any? {
-        val iterable = fromToIterable(from)
-        if (iterable === null) {
-            return null
-        }
+    private fun toHashSet(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
         return iterable.mapTo(HashSet<Any?>()) {
             converter.convert(it, componentType)
         }
     }
 
-    private fun toTreeSet(from: Any, componentType: Type, converter: Converter): Any? {
-        val iterable = fromToIterable(from)
-        if (iterable === null) {
-            return null
-        }
+    private fun toTreeSet(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
         return iterable.mapTo(TreeSet<Any?>()) {
             converter.convert(it, componentType)
         }
     }
 
-    private fun fromToIterable(from: Any): Iterable<Any?>? {
-        if (from is Iterable<*>) {
-            return from.replaceNull().asAny()
+    private fun Any.toIterable(): Iterable<Any?>? {
+        return when (this) {
+            is Iterable<*> -> this
+            javaClass.isArray -> this.arrayAsList()
+            else -> null
         }
-        if (from.javaClass.isArray) {
-            return from.replaceNull().arrayAsList()
-        }
-        return null
     }
 }
 
+/**
+ * Supports convert `from` to bean or [Map] types:
+ *
+ * * Bean;
+ * * [HashMap], [LinkedHashMap], [TreeMap];
+ * * [ConcurrentHashMap];
+ * * [SetMap], [ListMap];
+ */
 open class BeanConvertHandler @JvmOverloads constructor(
-    private val copyOptions: BeanCopyOptions = BeanCopyOptions.DEFAULT,
     private val builderGenerator: (Class<*>) -> Any = { it.toInstance() },
-    private val buildFunction: (builder: Any, toType: Class<*>) -> Any = { builder, _ -> builder },
+    private val buildOption: (builder: Any, toType: Class<*>) -> Any = { builder, _ -> builder },
 ) : AbstractTypeConvertHandler() {
+
+    override val toTypeFastHit: List<Type> = listOf(
+        Iterable::class.java,
+        Collection::class.java,
+        Set::class.java,
+        List::class.java,
+        HashSet::class.java,
+        LinkedHashSet::class.java,
+        TreeSet::class.java,
+        HashMap::class.java,
+        LinkedHashMap::class.java,
+        TreeMap::class.java,
+        ConcurrentHashMap::class.java,
+        SetMap::class.java,
+        ListMap::class.java,
+    )
 
     override fun convertNull(toType: Type, converter: Converter): Any {
         return Defaults.NULL
@@ -518,7 +573,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
     private fun toObject(from: Any, fromType: Type, toType: Class<*>, converter: Converter): Any {
         val builder = builderGenerator(toType)
         from.copyProperties(builder, currentCopyOptions(fromType, builder.javaClass, converter))
-        return buildFunction(builder, toType)
+        return buildOption(builder, toType)
     }
 
     private fun currentCopyOptions(fromType: Type, toType: Type, converter: Converter): BeanCopyOptions {
@@ -536,10 +591,17 @@ open class BeanConvertHandler @JvmOverloads constructor(
     }
 }
 
-private fun Any?.replaceNull(): Any {
-    return when {
-        this === null -> Defaults.NULL
-        this === Defaults.NULL -> String(Defaults.NULL.toCharArray())
-        else -> this
+object DefaultFailedHandler : ConvertHandler {
+
+    override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any? {
+        throw UnsupportedOperationException("from: $from, to: $toType")
+    }
+
+    override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
+        throw UnsupportedOperationException("from: $from, to: $toType")
+    }
+
+    override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
+        throw UnsupportedOperationException("from: $from, fromType: $from, to: $toType")
     }
 }

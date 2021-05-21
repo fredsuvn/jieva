@@ -6,12 +6,7 @@ import com.google.protobuf.MessageOrBuilder
 import xyz.srclab.common.bean.AbstractBeanResolveHandler
 import xyz.srclab.common.bean.BeanResolveHandler
 import xyz.srclab.common.invoke.Invoker
-import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.lang.asAny
-import xyz.srclab.common.reflect.genericInterface
-import xyz.srclab.common.reflect.method
-import xyz.srclab.common.reflect.methodOrNull
-import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Method
 
 /**
@@ -21,21 +16,21 @@ import java.lang.reflect.Method
  */
 object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
 
-    override fun resolve(context: BeanResolveHandler.Context) {
-        val rawClass = context.beanType.rawClass
+    override fun resolve(builder: BeanResolveHandler.BeanTypeBuilder) {
+        val rawClass = builder.type.rawClass
         if (!MessageOrBuilder::class.java.isAssignableFrom(rawClass)) {
             //context.breakResolving()
             return
         }
-        super.resolve(context)
+        super.resolve(builder)
     }
 
     override fun resolveAccessors(
-        context: BeanResolveHandler.Context,
+        context: BeanResolveHandler.BeanTypeBuilder,
         getters: MutableMap<String, PropertyInvoker>,
         setters: MutableMap<String, PropertyInvoker>
     ) {
-        val rawClass = context.beanType.rawClass
+        val rawClass = context.type.rawClass
 
         fun createPropertyInvoker(field: Descriptors.FieldDescriptor, isBuilder: Boolean) {
 

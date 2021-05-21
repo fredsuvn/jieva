@@ -1,6 +1,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.lang.*
+import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -635,11 +636,8 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Sequence<T> {
         return finalSequence().toArray(generator)
     }
 
-    open fun toArray(componentType: Class<*>): Array<T> {
-        return finalSequence().toArray(componentType)
-    }
-
-    open fun <R> toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
+    @JvmOverloads
+    open fun <R> toArray(componentType: Type, selector: ((T) -> R)? = null): Array<R> {
         return finalSequence().toArray(componentType, selector)
     }
 
@@ -683,8 +681,9 @@ class SequenceOps<T>(private var sequence: Sequence<T>) : Sequence<T> {
         return finalSequence().toDoubleArray(selector)
     }
 
-    open fun <A> toAnyArray(componentType: Class<*>): A {
-        return finalSequence().toAnyArray(componentType)
+    @JvmOverloads
+    open fun <R, A> toAnyArray(componentType: Type, selector: ((T) -> R)? = null): A {
+        return finalSequence().toAnyArray(componentType, selector)
     }
 
     fun plus(element: T): SequenceOps<T> {
