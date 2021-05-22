@@ -1,86 +1,39 @@
 @file:JvmName("Types")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
 import org.apache.commons.lang3.reflect.TypeUtils
 import xyz.srclab.common.collect.toTypedArray
-import xyz.srclab.common.lang.anyOrArrayEquals
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.WildcardType
 
-val Type.isBooleanType: Boolean
-    @JvmName("isBooleanType") get() {
-        return this == Boolean::class.javaPrimitiveType || this == Boolean::class.javaObjectType
-    }
-
-val Type.isByteType: Boolean
-    @JvmName("isByteType") get() {
-        return this == Byte::class.javaPrimitiveType || this == Byte::class.javaObjectType
-    }
-
-val Type.isShortType: Boolean
-    @JvmName("isShortType") get() {
-        return this == Short::class.javaPrimitiveType || this == Short::class.javaObjectType
-    }
-
-val Type.isCharType: Boolean
-    @JvmName("isCharType") get() {
-        return this == Char::class.javaPrimitiveType || this == Char::class.javaObjectType
-    }
-
-val Type.isIntType: Boolean
-    @JvmName("isIntType") get() {
-        return this == Int::class.javaPrimitiveType || this == Int::class.javaObjectType
-    }
-
-val Type.isLongType: Boolean
-    @JvmName("isLongType") get() {
-        return this == Long::class.javaPrimitiveType || this == Long::class.javaObjectType
-    }
-
-val Type.isFloatType: Boolean
-    @JvmName("isFloatType") get() {
-        return this == Float::class.javaPrimitiveType || this == Float::class.javaObjectType
-    }
-
-val Type.isDoubleType: Boolean
-    @JvmName("isDoubleType") get() {
-        return this == Double::class.javaPrimitiveType || this == Double::class.javaObjectType
-    }
-
-val Type.isVoidType: Boolean
-    @JvmName("isVoidType") get() {
-        return this == Void::class.javaPrimitiveType || this == Void::class.javaObjectType
-    }
-
 fun parameterizedType(
-    rawType: Type,
+    rawType: Class<*>,
     vararg actualTypeArguments: Type,
 ): ParameterizedType {
-    return TypeUtils.parameterize(rawType.rawClass, *actualTypeArguments)
+    return TypeUtils.parameterize(rawType, *actualTypeArguments)
 }
 
 fun parameterizedType(
-    rawType: Type,
+    rawType: Class<*>,
     actualTypeArguments: Iterable<Type>,
 ): ParameterizedType {
     return parameterizedType(rawType, *actualTypeArguments.toTypedArray())
 }
 
 fun parameterizedTypeWithOwner(
-    rawType: Type,
+    rawType: Class<*>,
     ownerType: Type?,
     vararg actualTypeArguments: Type,
 ): ParameterizedType {
-    return TypeUtils.parameterizeWithOwner(ownerType, rawType.rawClass, *actualTypeArguments)
+    return TypeUtils.parameterizeWithOwner(ownerType, rawType, *actualTypeArguments)
 }
 
 fun parameterizedTypeWithOwner(
-    rawType: Type,
+    rawType: Class<*>,
     ownerType: Type?,
     actualTypeArguments: Iterable<Type>,
 ): ParameterizedType {
@@ -92,10 +45,7 @@ fun ParameterizedType.withArguments(vararg actualTypeArguments: Type): Parameter
     if (this.actualTypeArguments.contentEquals(actualTypeArguments)) {
         return this
     }
-    return if (this.ownerType === null) parameterizedType(
-        this.rawType,
-        *actualTypeArguments
-    ) else parameterizedTypeWithOwner(this.rawType, this.ownerType, *actualTypeArguments)
+    return parameterizedTypeWithOwner(this.rawType.rawClass, this.ownerType, *actualTypeArguments)
 }
 
 @JvmName("parameterizedTypeWithArguments")
@@ -117,7 +67,7 @@ fun wildcardType(upperBounds: Iterable<Type>?, lowerBounds: Iterable<Type>?): Wi
 
 @JvmName("wildcardTypeWithBounds")
 fun WildcardType.withBounds(upperBounds: Array<out Type>?, lowerBounds: Array<out Type>?): WildcardType {
-    if (this.upperBounds.anyOrArrayEquals(upperBounds) && this.lowerBounds.anyOrArrayEquals(lowerBounds)) {
+    if (this.upperBounds.contentDeepEquals(upperBounds) && this.lowerBounds.contentDeepEquals(lowerBounds)) {
         return this
     }
     return wildcardType(upperBounds, lowerBounds)

@@ -1,6 +1,5 @@
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.exception.ShouldNotException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -10,30 +9,44 @@ abstract class TypeRef<T> {
     val type: Type
 
     protected constructor() {
-        type = reflectGenericSuperclass()
+        type = reflectToActualType()
     }
 
     protected constructor(type: Type) {
         this.type = type
     }
 
-    private fun reflectGenericSuperclass(): Type {
-        val generic = this.javaClass.genericSuperclass(null, TypeRef::class.java)
-        if (generic !is ParameterizedType) {
-            throw ShouldNotException(
-                "Here: " +
-                    "[[val generic = this.javaClass.genericSuperclass(null, TypeRef::class.java)]] " +
-                    "should return a ParameterizedType but a $generic."
-            )
+    private fun reflectToActualType(): Type {
+        val generic = this.javaClass.genericSuperclass
+        if (generic is ParameterizedType && generic.rawClass == TypeRef::class.java) {
+            return generic.actualTypeArguments[0]
         }
-        return generic.actualTypeArguments[0]
+        val typeRefSignature = generic.toTypeSignature(TypeRef::class.java)
+        return typeRefSignature.actualTypeArguments[0]
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TypeRef<*>) return false
+        if (type != other.type) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return type.hashCode()
     }
 
     override fun toString(): String {
-        return "TypeRef($type)"
+        return "ref ${type.typeName}"
     }
 
     companion object {
+
+        @JvmStatic
+        val <T> T.typeRef: TypeRef<T>
+            @JvmName("of") get() {
+                return object : TypeRef<T>() {}
+            }
 
         @JvmStatic
         fun <T> of(type: Type): TypeRef<T> {
@@ -41,11 +54,6 @@ abstract class TypeRef<T> {
         }
     }
 }
-
-val <T> T.typeRef: TypeRef<T>
-    get() {
-        return object : TypeRef<T>() {}
-    }
 
 fun <T> typeRef(): TypeRef<T> {
     return object : TypeRef<T>() {}
