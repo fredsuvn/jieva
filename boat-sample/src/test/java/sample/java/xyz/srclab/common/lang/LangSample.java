@@ -29,7 +29,7 @@ public class LangSample {
 
     @Test
     public void testRef() {
-        Ref<String> ref = Ref.of("1");
+        Ref<String> ref = Ref.with("1");
         List<String> list = Arrays.asList("-1", "-2", "-3");
 
         //here <String> should be final without Ref

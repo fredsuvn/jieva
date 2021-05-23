@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.lang.Ref
+import xyz.srclab.common.lang.Ref.Companion.withRef
 import java.util.concurrent.CountDownLatch
 
 internal class OTick {
@@ -9,7 +9,7 @@ internal class OTick {
     private var _going: Boolean = false
     private var _isStop: Boolean = false
 
-    private val countDownRef = CountDownRef(Ref.of(CountDownLatch((1))))
+    private val countDownRef = CountDownRef(CountDownLatch(1).withRef())
 
     val time: Long
         get() = _time

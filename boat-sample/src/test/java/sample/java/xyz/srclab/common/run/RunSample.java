@@ -18,7 +18,7 @@ public class RunSample {
     @Test
     public void testRunner() {
         Runner runner = Runner.SYNC_RUNNER;
-        IntRef intRef = IntRef.of(0);
+        IntRef intRef = IntRef.with(0);
         Running<?> running = runner.run(() -> {
             intRef.set(666);
             return null;
@@ -31,7 +31,7 @@ public class RunSample {
     @Test
     public void testScheduledRunner() {
         Scheduler scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER;
-        IntRef intRef = IntRef.of(0);
+        IntRef intRef = IntRef.with(0);
         Scheduling<?> scheduling = scheduler.scheduleFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
             intRef.set(intRef.get() + 100);
             return null;

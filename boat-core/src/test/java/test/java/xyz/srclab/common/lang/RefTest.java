@@ -8,7 +8,7 @@ public class RefTest {
 
     @Test
     public void testRef() {
-        Ref<String> ref = Ref.of(null);
+        Ref<String> ref = Ref.withRef(null);
         Assert.assertEquals(ref.getOrElse("null"), "null");
         Assert.assertFalse(ref.isPresent());
         ref.set("123");

@@ -13,8 +13,8 @@ public class CollectSample {
 
     @Test
     public void testArray() {
-        String[] strings = ArrayCollects.newArray("1", "2", "3");
-        ArrayCollects.asList(strings).set(0, "111");
+        String[] strings = Collects.newArray("1", "2", "3");
+        Collects.asList(strings).set(0, "111");
         //111
         logger.log("string[0]: {}", strings[0]);
     }
@@ -26,7 +26,7 @@ public class CollectSample {
         list.add("2");
         list.add("3");
         ListOps<String> listOps = ListOps.opsFor(list);
-        int sum = listOps.addAll(ArrayCollects.newArray("4", "5", "6"))
+        int sum = listOps.addAll(Collects.newArray("4", "5", "6"))
             .removeFirst()
             .map(it -> it + "0")
             .map(Nums::toInt)

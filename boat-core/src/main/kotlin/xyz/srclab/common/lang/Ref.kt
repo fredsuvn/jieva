@@ -16,8 +16,9 @@ interface Ref<T : Any> : GenericAccessor<T> {
 
     companion object {
 
+        @JvmName("with")
         @JvmStatic
-        fun <T : Any> T?.of(): Ref<T> {
+        fun <T : Any> T?.withRef(): Ref<T> {
             return RefImpl(this)
         }
 
@@ -42,8 +43,9 @@ interface BooleanRef {
 
     companion object {
 
+        @JvmName("with")
         @JvmStatic
-        fun Boolean.of(): BooleanRef {
+        fun Boolean.withRef(): BooleanRef {
             return BooleanRefImpl(this)
         }
 
@@ -68,8 +70,9 @@ interface ByteRef {
 
     companion object {
 
+        @JvmName("with")
         @JvmStatic
-        fun Byte.of(): ByteRef {
+        fun Byte.withRef(): ByteRef {
             return ByteRefImpl(this)
         }
 
@@ -94,8 +97,9 @@ interface ShortRef {
 
     companion object {
 
+        @JvmName("with")
         @JvmStatic
-        fun Short.of(): ShortRef {
+        fun Short.withRef(): ShortRef {
             return ShortRefImpl(this)
         }
 
@@ -120,8 +124,9 @@ interface CharRef {
 
     companion object {
 
+        @JvmName("with")
         @JvmStatic
-        fun Char.of(): CharRef {
+        fun Char.withRef(): CharRef {
             return CharRefImpl(this)
         }
 
@@ -146,8 +151,9 @@ interface IntRef {
 
     companion object {
 
+        @JvmName("with")
         @JvmStatic
-        fun Int.of(): IntRef {
+        fun Int.withRef(): IntRef {
             return IntRefImpl(this)
         }
 
@@ -172,8 +178,9 @@ interface LongRef {
 
     companion object {
 
+        @JvmName("with")
         @JvmStatic
-        fun Long.of(): LongRef {
+        fun Long.withRef(): LongRef {
             return LongRefImpl(this)
         }
 
@@ -198,8 +205,9 @@ interface FloatRef {
 
     companion object {
 
+        @JvmName("with")
         @JvmStatic
-        fun Float.of(): FloatRef {
+        fun Float.withRef(): FloatRef {
             return FloatRefImpl(this)
         }
 
@@ -224,8 +232,9 @@ interface DoubleRef {
 
     companion object {
 
+        @JvmName("with")
         @JvmStatic
-        fun Double.of(): DoubleRef {
+        fun Double.withRef(): DoubleRef {
             return DoubleRefImpl(this)
         }
 
