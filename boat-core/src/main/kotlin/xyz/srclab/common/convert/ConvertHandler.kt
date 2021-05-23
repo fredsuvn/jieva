@@ -36,6 +36,9 @@ import java.util.concurrent.ConcurrentHashMap
  */
 interface ConvertHandler {
 
+    /**
+     * Fast hit for `toType`.
+     */
     @get:JvmName("toTypeFastHit")
     @JvmDefault
     @Suppress(INAPPLICABLE_JVM_NAME)
