@@ -18,13 +18,6 @@ import java.lang.reflect.Type
  * thus a simply way to custom a [Converter] is use [withPreConvertHandler] to add a custom [ConvertHandler].
  *
  * @see ConvertHandler
- * @see CompatibleConvertHandler
- * @see WildcardTypeConvertHandler
- * @see CharsConvertHandler
- * @see NumberBooleanConvertHandler
- * @see DateTimeConvertHandler
- * @see IterableConvertHandler
- * @see BeanConvertHandler
  */
 interface Converter {
 

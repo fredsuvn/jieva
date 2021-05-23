@@ -5,7 +5,7 @@ import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.lang.NamingCase
 import xyz.srclab.common.lang.Next
-import xyz.srclab.common.reflect.eraseTypeVariables
+import xyz.srclab.common.reflect.eraseTypeParameters
 import java.lang.reflect.Type
 
 /**
@@ -114,14 +114,14 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             if (name.startsWith("get") && method.parameterCount == 0) {
                 val propertyName =
                     NamingCase.UPPER_CAMEL.convertTo(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
-                val type = method.genericReturnType.eraseTypeVariables(builder.typeArguments)
+                val type = method.genericReturnType.eraseTypeParameters(builder.typeArguments)
                 getters[propertyName] = PropertyInvoker(type, method.toInvoker())
                 continue
             }
             if (name.startsWith("set") && method.parameterCount == 1) {
                 val propertyName =
                     NamingCase.UPPER_CAMEL.convertTo(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
-                val type = method.genericParameterTypes[0].eraseTypeVariables(builder.typeArguments)
+                val type = method.genericParameterTypes[0].eraseTypeParameters(builder.typeArguments)
                 setters[propertyName] = PropertyInvoker(type, method.toInvoker())
                 continue
             }
@@ -148,12 +148,12 @@ object NamingStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             }
             val name = method.name
             if (method.parameterCount == 0) {
-                val type = method.genericReturnType.eraseTypeVariables(builder.typeArguments)
+                val type = method.genericReturnType.eraseTypeParameters(builder.typeArguments)
                 getters[name] = PropertyInvoker(type, method.toInvoker())
                 continue
             }
             if (method.parameterCount == 1) {
-                val type = method.genericParameterTypes[0].eraseTypeVariables(builder.typeArguments)
+                val type = method.genericParameterTypes[0].eraseTypeParameters(builder.typeArguments)
                 setters[name] = PropertyInvoker(type, method.toInvoker())
                 continue
             }

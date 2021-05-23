@@ -20,7 +20,7 @@ fun <V> Any.asMap(
     beanResolver: BeanResolver = BeanResolver.DEFAULT,
     converter: Converter = Converter.DEFAULT
 ): MutableMap<String, V> {
-    return BeanAsMap(this, valueType, beanResolver, converter).asAny()
+    return BeanMap(this, valueType, beanResolver, converter).asAny()
 }
 
 @JvmOverloads
@@ -97,6 +97,9 @@ fun <T : Any> Any.copyProperties(
                     return@forEach
                 }
                 val value = fromProperty.getValue<Any?>(this)
+                if (value === null && !copyNull) {
+                    return@forEach
+                }
                 val toKey = converter.convert<Any>(name, toMapType.keyType)
                 (to.asAny<MutableMap<Any, Any?>>())[toKey] = converter.convert(value, toMapType.valueType)
             }
@@ -116,78 +119,13 @@ fun <T : Any> Any.copyProperties(
                     return@forEach
                 }
                 val value = fromProperty.getValue<Any?>(this)
+                if (value === null && !copyNull) {
+                    return@forEach
+                }
                 toProperty.setValue(to, converter.convert(value, toProperty.type))
             }
             to
         }
         else -> throw IllegalStateException("Unknown type, failed to copy properties from $this to $to.")
-    }
-}
-
-private class BeanAsMap(
-    private val bean: Any,
-    private val valueType: Type,
-    private val beanResolver: BeanResolver,
-    private val converter: Converter
-) : AbstractMutableMap<String, Any?>() {
-
-    private val properties: Map<String, PropertyType> = run {
-        beanResolver.resolve(bean.javaClass).properties
-    }
-
-    override val size: Int
-        get() = entries.size
-
-    override val entries: MutableSet<MutableMap.MutableEntry<String, Any?>> by lazy {
-        properties.entries
-            .filter { it.value.isReadable }
-            .mapTo(LinkedHashSet()) {
-                object : MutableMap.MutableEntry<String, Any?> {
-
-                    override val key: String = it.key
-
-                    override val value: Any?
-                        get() = converter.convert(it.value.getValue(bean), valueType)
-
-                    override fun setValue(newValue: Any?): Any? {
-                        return it.value.setValueAndReturnOld(
-                            bean,
-                            converter.convert(newValue, valueType)
-                        )
-                    }
-                }
-            }
-    }
-
-    override fun containsKey(key: String): Boolean {
-        return properties.containsKey(key)
-    }
-
-    override fun get(key: String): Any? {
-        val propertyType = properties[key]
-        if (propertyType === null) {
-            return null
-        }
-        return converter.convert(propertyType.getValue(bean), valueType)
-    }
-
-    override fun isEmpty(): Boolean {
-        return properties.isEmpty()
-    }
-
-    override fun clear() {
-        throw UnsupportedOperationException()
-    }
-
-    override fun put(key: String, value: Any?): Any? {
-        val propertyType = properties[key]
-        if (propertyType === null) {
-            throw UnsupportedOperationException("Property $key doesn't exist.")
-        }
-        return propertyType.setValueAndReturnOld(bean, value)
-    }
-
-    override fun remove(key: String): Any? {
-        throw UnsupportedOperationException()
     }
 }

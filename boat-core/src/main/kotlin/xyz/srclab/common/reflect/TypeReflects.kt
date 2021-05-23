@@ -56,7 +56,7 @@ val Type.rawClass: Class<*>
     @JvmName("rawClass") @Throws(IllegalArgumentException::class)
     get() {
         return this.rawClassOrNull ?: throw IllegalArgumentException(
-            "Only Class, ParameterizedType or GenericArrayType has raw class."
+            "Only Class, ParameterizedType or GenericArrayType has raw class: $this"
         )
     }
 

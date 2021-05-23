@@ -125,7 +125,7 @@ interface BeanTypeBuilder {
         ): BeanTypeBuilder {
             return object : BeanTypeBuilder {
                 override val type: Type = type
-                override val typeArguments: Map<TypeVariable<*>, Type> = type.typeArguments()
+                override val typeArguments: Map<TypeVariable<*>, Type> = type.typeArguments
                 override val properties: MutableMap<String, PropertyTypeBuilder> = HashMap()
                 override val methods: List<Method> = type.rawClass.methods.asList()
             }
@@ -219,7 +219,7 @@ interface PropertyTypeBuilder {
  * Abstract [BeanResolver] which can cache resolved [BeanType] previous created.
  */
 abstract class AbstractCachingBeanResolver @JvmOverloads constructor(
-    private val cache: Cache<Type, BeanType> = Cache.newFastCache<Type, BeanType>()
+    private val cache: Cache<Type, BeanType> = Cache.newFastCache()
 ) : BeanResolver {
 
     override fun resolve(type: Type): BeanType {

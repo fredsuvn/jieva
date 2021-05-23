@@ -6,10 +6,7 @@ import xyz.srclab.common.collect.*
 import xyz.srclab.common.collect.IterableType.Companion.toIterableType
 import xyz.srclab.common.lang.*
 import xyz.srclab.common.reflect.*
-import java.lang.reflect.GenericArrayType
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
-import java.lang.reflect.WildcardType
+import java.lang.reflect.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.text.DateFormat
@@ -28,6 +25,14 @@ import java.util.concurrent.ConcurrentHashMap
  * if returns [Next.BREAK], the converter will fail to convert.
  *
  * @see Converter
+ * @see CompatibleConvertHandler
+ * @see LowerBoundConvertHandler
+ * @see CharsConvertHandler
+ * @see NumberBooleanConvertHandler
+ * @see DateTimeConvertHandler
+ * @see IterableConvertHandler
+ * @see BeanConvertHandler
+ * @see DefaultFailedHandler
  */
 interface ConvertHandler {
 
@@ -59,7 +64,7 @@ interface ConvertHandler {
         @JvmField
         val DEFAULTS: List<ConvertHandler> = listOf(
             CompatibleConvertHandler,
-            WildcardTypeConvertHandler,
+            LowerBoundConvertHandler,
             CharsConvertHandler,
             NumberBooleanConvertHandler,
             DateTimeConvertHandler.DEFAULT,
@@ -73,7 +78,7 @@ interface ConvertHandler {
         ): List<ConvertHandler> {
             return listOf(
                 CompatibleConvertHandler,
-                WildcardTypeConvertHandler,
+                LowerBoundConvertHandler,
                 CharsConvertHandler,
                 NumberBooleanConvertHandler,
                 dateTimeConvertHandler,
@@ -88,7 +93,7 @@ interface ConvertHandler {
         ): List<ConvertHandler> {
             return listOf(
                 CompatibleConvertHandler,
-                WildcardTypeConvertHandler,
+                LowerBoundConvertHandler,
                 CharsConvertHandler,
                 NumberBooleanConvertHandler,
                 DateTimeConvertHandler.DEFAULT,
@@ -104,7 +109,7 @@ interface ConvertHandler {
         ): List<ConvertHandler> {
             return listOf(
                 CompatibleConvertHandler,
-                WildcardTypeConvertHandler,
+                LowerBoundConvertHandler,
                 CharsConvertHandler,
                 NumberBooleanConvertHandler,
                 dateTimeConvertHandler,
@@ -150,26 +155,40 @@ object CompatibleConvertHandler : ConvertHandler {
 }
 
 /**
- * Use [WildcardType.upperBound] to convert `toType` if `toType` is [WildcardType], else return [Next.CONTINUE].
+ * Returns lower bound of `toType` with [lowerBound] for [WildcardType] and [TypeVariable].
  */
-object WildcardTypeConvertHandler : ConvertHandler {
+object LowerBoundConvertHandler : ConvertHandler {
 
     override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any {
         return Next.CONTINUE
     }
 
     override fun convert(from: Any?, toType: Type, converter: Converter): Any? {
-        if (toType is WildcardType) {
-            return converter.convert(from, toType.upperBound)
+        return when (toType) {
+            is WildcardType -> {
+                val lowerBound = toType.lowerBound
+                return if (lowerBound === null) {
+                    Next.CONTINUE
+                } else {
+                    converter.convert(from, lowerBound)
+                }
+            }
+            else -> Next.CONTINUE
         }
-        return Next.CONTINUE
     }
 
     override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
-        if (toType is WildcardType) {
-            return converter.convert(from, toType.upperBound)
+        return when (toType) {
+            is WildcardType -> {
+                val lowerBound = toType.lowerBound
+                return if (lowerBound === null) {
+                    Next.CONTINUE
+                } else {
+                    converter.convert(from, fromType, lowerBound)
+                }
+            }
+            else -> Next.CONTINUE
         }
-        return Next.CONTINUE
     }
 }
 
@@ -489,9 +508,9 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
     }
 
     private fun Any.toIterable(): Iterable<Any?>? {
-        return when (this) {
-            is Iterable<*> -> this
-            javaClass.isArray -> this.arrayAsList()
+        return when {
+            this is Iterable<*> -> this
+            this.javaClass.isArray -> this.arrayAsList()
             else -> null
         }
     }
@@ -506,7 +525,7 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
  * * [SetMap], [MutableSetMap], [ListMap], [MutableListMap];
  */
 open class BeanConvertHandler @JvmOverloads constructor(
-    private val builder: (Type) -> Any = { it.rawClass.toInstance() },
+    private val builder: (Type) -> Any = { it.rawClass.newInstance() },
     private val build: (builder: Any, toType: Type) -> Any = { bean, _ -> bean },
     private val beanResolver: BeanResolver = BeanResolver.DEFAULT,
 ) : AbstractTypeConvertHandler() {
@@ -531,7 +550,10 @@ open class BeanConvertHandler @JvmOverloads constructor(
         if (toType is GenericArrayType) {
             return Next.CONTINUE
         }
-        val toRawClass = toType.rawClass
+        val toRawClass = toType.rawClassOrNull
+        if (toRawClass === null) {
+            return Next.CONTINUE
+        }
         if (toRawClass.isArray) {
             return Next.CONTINUE
         }
