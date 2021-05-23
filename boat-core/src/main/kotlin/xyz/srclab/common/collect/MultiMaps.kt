@@ -108,6 +108,14 @@ interface MutableSetMap<K, V> : MutableMultiMap<K, V, MutableSet<V>> {
     /**
      * Add [values] for given [key], return result after adding.
      */
+    @JvmDefault
+    fun addAll(key: K, vararg values: V): MutableSet<V> {
+        return addAll(key, values.toList())
+    }
+
+    /**
+     * Add [values] for given [key], return result after adding.
+     */
     fun addAll(key: K, values: Iterable<V>): MutableSet<V>
 
     fun toSetMap(): SetMap<K, V>
@@ -220,6 +228,14 @@ interface MutableListMap<K, V> : MutableMultiMap<K, V, MutableList<V>> {
      * Add [value] for given [key], return result after adding.
      */
     fun add(key: K, value: V): MutableList<V>
+
+    /**
+     * Add [values] for given [key], return result after adding.
+     */
+    @JvmDefault
+    fun addAll(key: K, vararg values: V): MutableList<V> {
+        return addAll(key, values.toList())
+    }
 
     /**
      * Add [values] for given [key], return result after adding.
