@@ -1,7 +1,9 @@
 package xyz.srclab.common.lang
 
 /**
- * Help solve the problem that: in java language, a variable should be final if it will be used in lambda expression:
+ * A container holds an object.
+ * Can help solve the problem like that:
+ * a local variable should be final if it will be used in lambda expression (in java):
  * ```
  * Ref<String> ref = Ref.of("1");
  * List<String> list = Arrays.asList("-1", "-2", "-3");
@@ -15,8 +17,8 @@ interface Ref<T : Any> : GenericAccessor<T> {
     companion object {
 
         @JvmStatic
-        fun <T : Any> of(initial: T?): Ref<T> {
-            return RefImpl(initial)
+        fun <T : Any> T?.of(): Ref<T> {
+            return RefImpl(this)
         }
 
         private class RefImpl<T : Any>(private var value: T?) : Ref<T> {
@@ -32,10 +34,6 @@ interface Ref<T : Any> : GenericAccessor<T> {
     }
 }
 
-fun <T : Any> T.ref(): Ref<T> {
-    return Ref.of(this)
-}
-
 interface BooleanRef {
 
     fun get(): Boolean
@@ -45,8 +43,8 @@ interface BooleanRef {
     companion object {
 
         @JvmStatic
-        fun of(initial: Boolean): BooleanRef {
-            return BooleanRefImpl(initial)
+        fun Boolean.of(): BooleanRef {
+            return BooleanRefImpl(this)
         }
 
         private class BooleanRefImpl(private var value: Boolean) : BooleanRef {
@@ -62,10 +60,6 @@ interface BooleanRef {
     }
 }
 
-fun Boolean.ref(): BooleanRef {
-    return BooleanRef.of(this)
-}
-
 interface ByteRef {
 
     fun get(): Byte
@@ -75,8 +69,8 @@ interface ByteRef {
     companion object {
 
         @JvmStatic
-        fun of(initial: Byte): ByteRef {
-            return ByteRefImpl(initial)
+        fun Byte.of(): ByteRef {
+            return ByteRefImpl(this)
         }
 
         private class ByteRefImpl(private var value: Byte) : ByteRef {
@@ -92,10 +86,6 @@ interface ByteRef {
     }
 }
 
-fun Byte.ref(): ByteRef {
-    return ByteRef.of(this)
-}
-
 interface ShortRef {
 
     fun get(): Short
@@ -105,8 +95,8 @@ interface ShortRef {
     companion object {
 
         @JvmStatic
-        fun of(initial: Short): ShortRef {
-            return ShortRefImpl(initial)
+        fun Short.of(): ShortRef {
+            return ShortRefImpl(this)
         }
 
         private class ShortRefImpl(private var value: Short) : ShortRef {
@@ -122,10 +112,6 @@ interface ShortRef {
     }
 }
 
-fun Short.ref(): ShortRef {
-    return ShortRef.of(this)
-}
-
 interface CharRef {
 
     fun get(): Char
@@ -135,8 +121,8 @@ interface CharRef {
     companion object {
 
         @JvmStatic
-        fun of(initial: Char): CharRef {
-            return CharRefImpl(initial)
+        fun Char.of(): CharRef {
+            return CharRefImpl(this)
         }
 
         private class CharRefImpl(private var value: Char) : CharRef {
@@ -152,10 +138,6 @@ interface CharRef {
     }
 }
 
-fun Char.ref(): CharRef {
-    return CharRef.of(this)
-}
-
 interface IntRef {
 
     fun get(): Int
@@ -165,8 +147,8 @@ interface IntRef {
     companion object {
 
         @JvmStatic
-        fun of(initial: Int): IntRef {
-            return IntRefImpl(initial)
+        fun Int.of(): IntRef {
+            return IntRefImpl(this)
         }
 
         private class IntRefImpl(private var value: Int) : IntRef {
@@ -182,10 +164,6 @@ interface IntRef {
     }
 }
 
-fun Int.ref(): IntRef {
-    return IntRef.of(this)
-}
-
 interface LongRef {
 
     fun get(): Long
@@ -195,8 +173,8 @@ interface LongRef {
     companion object {
 
         @JvmStatic
-        fun of(initial: Long): LongRef {
-            return LongRefImpl(initial)
+        fun Long.of(): LongRef {
+            return LongRefImpl(this)
         }
 
         private class LongRefImpl(private var value: Long) : LongRef {
@@ -212,10 +190,6 @@ interface LongRef {
     }
 }
 
-fun Long.ref(): LongRef {
-    return LongRef.of(this)
-}
-
 interface FloatRef {
 
     fun get(): Float
@@ -225,8 +199,8 @@ interface FloatRef {
     companion object {
 
         @JvmStatic
-        fun of(initial: Float): FloatRef {
-            return FloatRefImpl(initial)
+        fun Float.of(): FloatRef {
+            return FloatRefImpl(this)
         }
 
         private class FloatRefImpl(private var value: Float) : FloatRef {
@@ -242,10 +216,6 @@ interface FloatRef {
     }
 }
 
-fun Float.ref(): FloatRef {
-    return FloatRef.of(this)
-}
-
 interface DoubleRef {
 
     fun get(): Double
@@ -255,8 +225,8 @@ interface DoubleRef {
     companion object {
 
         @JvmStatic
-        fun of(initial: Double): DoubleRef {
-            return DoubleRefImpl(initial)
+        fun Double.of(): DoubleRef {
+            return DoubleRefImpl(this)
         }
 
         private class DoubleRefImpl(private var value: Double) : DoubleRef {
@@ -270,8 +240,4 @@ interface DoubleRef {
             }
         }
     }
-}
-
-fun Double.ref(): DoubleRef {
-    return DoubleRef.of(this)
 }
