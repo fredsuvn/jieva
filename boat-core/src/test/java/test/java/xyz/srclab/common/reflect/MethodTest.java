@@ -71,7 +71,7 @@ public class MethodTest {
         Assert.assertNull(Reflects.ownedMethodOrNull(NewClass.class, "superProtectedMethod"));
 
         Assert.assertEquals(
-            Reflects.searchMethods(SubNewClass.class, m -> m.getName().contains("ackage")),
+            Reflects.searchMethods(SubNewClass.class, true, m -> m.getName().contains("ackage")),
             Arrays.asList(subPackageMethod, packageMethod, superPackageMethod)
         );
     }
@@ -84,14 +84,14 @@ public class MethodTest {
             "superPublicField"
         );
         Assert.assertEquals(
-            Reflects.invokeForcible(privateMethod, newClass),
+            Reflects.enforce(privateMethod, newClass),
             "privateField"
         );
         Assert.expectThrows(IllegalAccessException.class, () ->
             Reflects.invoke(superPrivateMethod, newClass)
         );
         Assert.assertEquals(
-            Reflects.invokeForcible(superPrivateMethod, newClass),
+            Reflects.enforce(superPrivateMethod, newClass),
             "superPrivateField"
         );
     }

@@ -53,16 +53,24 @@ fun Class<*>.declaredFields(): List<Field> {
 }
 
 /**
+ * Return public or declared field.
+ *
  * @throws NoSuchFieldException
  */
 fun Class<*>.ownedField(name: String): Field {
     return ownedFieldOrNull(name) ?: throw NoSuchFieldException(name)
 }
 
+/**
+ * Return public or declared field.
+ */
 fun Class<*>.ownedFieldOrNull(name: String): Field? {
     return searchFieldOrNull(name, false)
 }
 
+/**
+ * Return public and declared fields.
+ */
 fun Class<*>.ownedFields(): List<Field> {
     val set = LinkedHashSet<Field>()
     set.addAll(this.fields())
@@ -201,7 +209,7 @@ fun <T> Class<*>.getStaticFieldValue(name: String, force: Boolean = false): T {
  */
 @JvmOverloads
 fun Class<*>.setStaticFieldValue(name: String, value: Any?, force: Boolean = false) {
-    return setDeepFieldValue(name, null, value, force)
+    return setFieldValue(name, null, value, force)
 }
 
 /**

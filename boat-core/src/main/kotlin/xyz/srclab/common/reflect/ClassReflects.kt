@@ -4,7 +4,6 @@
 package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
-import xyz.srclab.common.collect.newArray
 import xyz.srclab.common.lang.Current
 import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.lang.asAny
@@ -98,7 +97,7 @@ fun <T> CharSequence.toClass(classLoader: ClassLoader = Current.classLoader): Cl
  */
 @JvmOverloads
 fun <T> CharSequence.newInstance(classLoader: ClassLoader = Current.classLoader): T {
-    return newInstance(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY, classLoader)
+    return newInstance(classLoader, ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
 }
 
 /**
@@ -107,12 +106,28 @@ fun <T> CharSequence.newInstance(classLoader: ClassLoader = Current.classLoader)
  */
 @JvmOverloads
 fun <T> CharSequence.newInstance(
-    parameterTypes: Array<out Class<*>>,
-    args: Array<out Any?>,
     classLoader: ClassLoader = Current.classLoader,
+    parameterTypes: Array<out Class<*>>,
+    args: Array<out Any?>
 ): T {
     val clazz: Class<T> = this.loadClass(classLoader)
     return clazz.newInstance(parameterTypes, args)
+}
+
+/**
+ * @throws ClassNotFoundException
+ * @throws NoSuchMethodException
+ */
+@JvmOverloads
+fun <T> CharSequence.newInstanceWithArguments(
+    classLoader: ClassLoader = Current.classLoader,
+    vararg args: Any
+): T {
+    return newInstance(
+        classLoader,
+        args.map { it.javaClass }.toTypedArray(),
+        args
+    )
 }
 
 /**
@@ -125,17 +140,6 @@ fun <T> Class<*>.newInstance(): T {
 /**
  * @throws NoSuchMethodException
  */
-fun <T> Class<*>.newInstance(vararg args: Any): T {
-    val parameterTypes = newArray<Class<*>>(args.size)
-    for (index in args.indices) {
-        parameterTypes[index] = args[index].javaClass
-    }
-    return newInstance(parameterTypes, args)
-}
-
-/**
- * @throws NoSuchMethodException
- */
 fun <T> Class<*>.newInstance(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
     val constructor = try {
         this.getConstructor(*parameterTypes)
@@ -143,6 +147,13 @@ fun <T> Class<*>.newInstance(parameterTypes: Array<out Class<*>>, args: Array<ou
         throw e
     }
     return constructor.newInstance(*args).asAny()
+}
+
+/**
+ * @throws NoSuchMethodException
+ */
+fun <T> Class<*>.newInstanceWithArguments(vararg args: Any): T {
+    return newInstance(args.map { it.javaClass }.toTypedArray(), args)
 }
 
 fun Class<*>.toWrapperClass(): Class<*> {

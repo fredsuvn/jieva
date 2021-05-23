@@ -37,7 +37,7 @@ public class ConstructorTest {
         Constructor<NewClass> classConstructor = Reflects.declaredConstructor(
             NewClass.class, String.class, String.class);
         Assert.assertNotNull(classConstructor);
-        NewClass result = Reflects.invokeForcibly(classConstructor, "1", "2");
+        NewClass result = Reflects.enforce(classConstructor, "1", "2");
         Assert.assertEquals(result, new NewClass("1 : 2"));
     }
 }

@@ -56,7 +56,7 @@ fun <T> Constructor<T>.invoke(vararg args: Any?): T {
     return this.newInstance(*args)
 }
 
-fun <T> Constructor<T>.invokeForcibly(vararg args: Any?): T {
+fun <T> Constructor<T>.enforce(vararg args: Any?): T {
     this.isAccessible = true
     return this.newInstance(*args)
 }

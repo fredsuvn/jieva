@@ -32,6 +32,10 @@ public class NewClass extends SuperNewClass {
         this(param0 + " : " + param1);
     }
 
+    public NewClass(String param0, String param1, String param2) {
+        this(param0 + " : " + param1 + " : " + param2);
+    }
+
     public String publicMethod() {
         return publicField;
     }

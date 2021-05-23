@@ -17,7 +17,10 @@ fun Class<*>.method(name: String, vararg parameterTypes: Class<*>): Method {
     }
 }
 
-fun Class<*>.methodOrNull(name: String, vararg parameterTypes: Class<*>): Method? {
+fun Class<*>.methodOrNull(
+    name: String, vararg parameterTypes: Class
+    <*>
+): Method? {
     return try {
         this.getMethod(name, *parameterTypes)
     } catch (e: NoSuchMethodException) {

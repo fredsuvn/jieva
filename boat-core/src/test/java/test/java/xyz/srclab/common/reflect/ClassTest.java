@@ -20,10 +20,11 @@ public class ClassTest {
     }
 
     @Test
-    public void testToInstance() {
-        NewClass newClass = Reflects.toInstance(
-            "test.java.xyz.srclab.common.reflect.NewClass");
-        Assert.assertEquals(newClass, new NewClass());
+    public void testNewInstance() {
+        String className = NewClass.class.getName();
+        Assert.assertEquals(Reflects.newInstance(className), new NewClass());
+        Assert.assertEquals(
+            Reflects.newInstanceWithArguments(className, "a", "b", "c"), new NewClass("a", "b", "c"));
     }
 
     @Test
@@ -42,46 +43,5 @@ public class ClassTest {
     @Test
     public void testShortName() {
         Assert.assertEquals(Reflects.shortName(getClass()), "ClassTest");
-    }
-
-    @Test
-    public void testProperty() {
-        Child child = new Child();
-        Reflects.setProperty(child, "child", "123456");
-        Assert.assertEquals(Reflects.getProperty(child, "child"), "123456");
-        Reflects.setProperty(child, "child2", "234567");
-        Assert.assertEquals(Reflects.getProperty(child, "child2"), "234567");
-        Reflects.setProperty(child, "parent", "345678");
-        Assert.assertEquals(Reflects.getProperty(child, "parent"), "345678");
-        Reflects.setProperty(child, "parent2", "456789");
-        Assert.assertEquals(Reflects.getProperty(child, "parent2"), "456789");
-    }
-
-    public static class Child extends Parent {
-
-        private String child;
-        private String child2;
-
-        public String getChild() {
-            return child;
-        }
-
-        public void setChild(String child) {
-            this.child = child;
-        }
-    }
-
-    public static class Parent {
-
-        private String parent;
-        private String parent2;
-
-        public String getParent() {
-            return parent;
-        }
-
-        public void setParent(String parent) {
-            this.parent = parent;
-        }
     }
 }

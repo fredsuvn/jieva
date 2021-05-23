@@ -33,7 +33,17 @@ val ParameterizedType.rawClass: Class<*>
 
 val GenericArrayType.rawClass: Class<*>
     @JvmName("rawClass") get() {
-        return this.genericComponentType.rawClass.arrayClass
+        var deep = 0
+        var componentType = this.genericComponentType
+        while (componentType is GenericArrayType) {
+            deep++
+            componentType = componentType.genericComponentType
+        }
+        var arrayClass = componentType.rawClass.arrayClass
+        for (i in 0 until deep) {
+            arrayClass = arrayClass.arrayClass
+        }
+        return arrayClass
     }
 
 val Type.rawClass: Class<*>
@@ -103,6 +113,7 @@ val Type.lowerBound: Type?
     @JvmName("lowerBound") get() {
         return when (this) {
             is WildcardType -> this.lowerBound
+            is TypeVariable<*> -> null
             else -> this
         }
     }
@@ -170,6 +181,10 @@ val Type.typeArguments: Map<TypeVariable<*>, Type>
                     this.resolveTypeParameters(to)
                 }
                 is ParameterizedType -> {
+                    val ownerType = this.ownerType
+                    if (ownerType !== null) {
+                        ownerType.resolveTypeParameters(to)
+                    }
                     this.resolveTypeArguments(to)
                     this.rawClass.resolveTypeParameters(to)
                 }
