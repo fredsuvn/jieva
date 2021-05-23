@@ -5,6 +5,7 @@ package xyz.srclab.common.reflect
 
 import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
+import xyz.srclab.annotations.Written
 import xyz.srclab.common.lang.asAny
 import java.lang.reflect.*
 
@@ -197,70 +198,14 @@ val Type.typeArguments: Map<TypeVariable<*>, Type>
 
         val typeArguments: MutableMap<TypeVariable<*>, Type> = HashMap()
         this.resolveTypeParameters(typeArguments)
-
-        fun actualType(type: Type, searchStack: MutableSet<TypeVariable<*>>): Type {
-
-            fun getAndSwapTypes(array: Array<Type>): Boolean {
-                var changed = false
-                for (i in array.indices) {
-                    val oldType = array[i]
-                    val newType = actualType(oldType, searchStack)
-                    if (newType != oldType) {
-                        array[i] = newType
-                        changed = true
-                    }
-                }
-                return changed
-            }
-
-            when (type) {
-                is ParameterizedType -> {
-                    val actualTypeArguments = type.actualTypeArguments
-                    return if (getAndSwapTypes(actualTypeArguments)) {
-                        type.withArguments(*actualTypeArguments)
-                    } else {
-                        type
-                    }
-                }
-                is WildcardType -> {
-                    val upperBounds = type.upperBounds
-                    val lowerBounds = type.lowerBounds
-                    return if (getAndSwapTypes(upperBounds) || getAndSwapTypes(lowerBounds)) {
-                        type.withBounds(upperBounds, lowerBounds)
-                    } else {
-                        type
-                    }
-                }
-                is GenericArrayType -> {
-                    val componentType = type.genericComponentType
-                    val newComponentType = actualType(componentType, searchStack)
-                    return if (newComponentType != componentType) {
-                        newComponentType.genericArrayType()
-                    } else {
-                        type
-                    }
-                }
-                is TypeVariable<*> -> {
-                    val value = typeArguments[type]
-                    if (value === null || searchStack.contains(value)) {
-                        return type
-                    }
-                    if (value !is TypeVariable<*>) {
-                        val newType = actualType(value, searchStack)
-                        for (typeVariable in searchStack) {
-                            typeArguments[typeVariable] = newType
-                        }
-                        return newType
-                    }
-                    searchStack.add(type)
-                    return actualType(value, searchStack)
-                }
-                else -> return type
-            }
-        }
-
+        val stack: MutableSet<TypeVariable<*>> = HashSet()
         for (entry in typeArguments) {
-            entry.setValue(actualType(entry.value, HashSet()))
+            stack.clear()
+            val oldType = entry.value
+            val newType = oldType.eraseTypeParameters(typeArguments, stack, true)
+            if (newType != oldType) {
+                entry.setValue(newType)
+            }
         }
         return typeArguments
     }
@@ -287,5 +232,83 @@ fun Type.toTypeSignature(to: Class<*>): ParameterizedType {
         parameterizedType(to, actualArguments)
     } else {
         parameterizedTypeWithOwner(to, owner, actualArguments)
+    }
+}
+
+/**
+ * Erase type parameter if [this] contains [TypeVariable].
+ * Return itself if there is no argument found in [typeArguments].
+ */
+@JvmOverloads
+fun Type.eraseTypeParameters(
+    typeArguments: Map<TypeVariable<*>, Type>,
+    @Written searchStack: MutableSet<TypeVariable<*>> = HashSet()
+): Type {
+    return eraseTypeParameters(typeArguments.asAny(), searchStack, false)
+}
+
+private fun Type.eraseTypeParameters(
+    @Written typeArguments: MutableMap<TypeVariable<*>, Type>,
+    @Written searchStack: MutableSet<TypeVariable<*>>,
+    replaceTypeParameter: Boolean,
+): Type {
+
+    fun getAndSwapTypes(@Written array: Array<Type>): Boolean {
+        var changed = false
+        for (i in array.indices) {
+            val oldType = array[i]
+            val newType = oldType.eraseTypeParameters(typeArguments, searchStack)
+            if (newType != oldType) {
+                array[i] = newType
+                changed = true
+            }
+        }
+        return changed
+    }
+
+    when (this) {
+        is ParameterizedType -> {
+            val actualTypeArguments = this.actualTypeArguments
+            return if (getAndSwapTypes(actualTypeArguments)) {
+                this.withArguments(*actualTypeArguments)
+            } else {
+                this
+            }
+        }
+        is WildcardType -> {
+            val upperBounds = this.upperBounds
+            val lowerBounds = this.lowerBounds
+            return if (getAndSwapTypes(upperBounds) || getAndSwapTypes(lowerBounds)) {
+                this.withBounds(upperBounds, lowerBounds)
+            } else {
+                this
+            }
+        }
+        is GenericArrayType -> {
+            val componentType = this.genericComponentType
+            val newComponentType = componentType.eraseTypeParameters(typeArguments, searchStack)
+            return if (newComponentType != componentType) {
+                newComponentType.genericArrayType()
+            } else {
+                this
+            }
+        }
+        is TypeVariable<*> -> {
+            val value = typeArguments[this]
+            if (value === null || searchStack.contains(value)) {
+                return this
+            }
+            if (value !is TypeVariable<*>) {
+                val newType = value.eraseTypeParameters(typeArguments, searchStack)
+                if (replaceTypeParameter && newType != this) {
+                    for (typeVariable in searchStack) {
+                        typeArguments[typeVariable] = newType
+                    }
+                }
+            }
+            searchStack.add(this)
+            return value.eraseTypeParameters(typeArguments, searchStack)
+        }
+        else -> return this
     }
 }
