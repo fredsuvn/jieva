@@ -15,29 +15,29 @@ public class ConstructorTest {
     @Test
     public void testFind() throws Exception {
         Assert.assertEquals(
-            Reflects.constructors(NewClass.class),
-            Arrays.asList(NewClass.class.getConstructors())
+            Reflects.constructors(ReflectClass.class),
+            Arrays.asList(ReflectClass.class.getConstructors())
         );
         Assert.assertEquals(
-            Reflects.declaredConstructors(NewClass.class),
-            Arrays.asList(NewClass.class.getDeclaredConstructors())
+            Reflects.declaredConstructors(ReflectClass.class),
+            Arrays.asList(ReflectClass.class.getDeclaredConstructors())
         );
         Assert.assertEquals(
-            Reflects.declaredConstructor(NewClass.class, String.class),
-            NewClass.class.getDeclaredConstructor(String.class)
+            Reflects.declaredConstructor(ReflectClass.class, String.class),
+            ReflectClass.class.getDeclaredConstructor(String.class)
         );
         Assert.assertEquals(
-            Reflects.declaredConstructor(NewClass.class, String.class, String.class),
-            NewClass.class.getDeclaredConstructor(String.class, String.class)
+            Reflects.declaredConstructor(ReflectClass.class, String.class, String.class),
+            ReflectClass.class.getDeclaredConstructor(String.class, String.class)
         );
     }
 
     @Test
     public void testInvoke() {
-        Constructor<NewClass> classConstructor = Reflects.declaredConstructor(
-            NewClass.class, String.class, String.class);
+        Constructor<ReflectClass> classConstructor = Reflects.declaredConstructor(
+            ReflectClass.class, String.class, String.class);
         Assert.assertNotNull(classConstructor);
-        NewClass result = Reflects.enforce(classConstructor, "1", "2");
-        Assert.assertEquals(result, new NewClass("1 : 2"));
+        ReflectClass result = Reflects.enforce(classConstructor, "1", "2");
+        Assert.assertEquals(result, new ReflectClass("1 : 2"));
     }
 }

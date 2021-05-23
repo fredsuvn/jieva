@@ -12,18 +12,18 @@ public class FieldTest {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
-    Field superPublicField = SuperNewClass.class.getDeclaredField("superPublicField");
-    Field superProtectedField = SuperNewClass.class.getDeclaredField("superProtectedField");
-    Field superPrivateField = SuperNewClass.class.getDeclaredField("superPrivateField");
-    Field superPackageField = SuperNewClass.class.getDeclaredField("superPackageField");
-    Field publicField = NewClass.class.getDeclaredField("publicField");
-    Field protectedField = NewClass.class.getDeclaredField("protectedField");
-    Field privateField = NewClass.class.getDeclaredField("privateField");
-    Field packageField = NewClass.class.getDeclaredField("packageField");
-    Field subPublicField = SubNewClass.class.getDeclaredField("subPublicField");
-    Field subProtectedField = SubNewClass.class.getDeclaredField("subProtectedField");
-    Field subPrivateField = SubNewClass.class.getDeclaredField("subPrivateField");
-    Field subPackageField = SubNewClass.class.getDeclaredField("subPackageField");
+    Field superPublicField = SuperReflectClass.class.getDeclaredField("superPublicField");
+    Field superProtectedField = SuperReflectClass.class.getDeclaredField("superProtectedField");
+    Field superPrivateField = SuperReflectClass.class.getDeclaredField("superPrivateField");
+    Field superPackageField = SuperReflectClass.class.getDeclaredField("superPackageField");
+    Field publicField = ReflectClass.class.getDeclaredField("publicField");
+    Field protectedField = ReflectClass.class.getDeclaredField("protectedField");
+    Field privateField = ReflectClass.class.getDeclaredField("privateField");
+    Field packageField = ReflectClass.class.getDeclaredField("packageField");
+    Field subPublicField = SubReflectClass.class.getDeclaredField("subPublicField");
+    Field subProtectedField = SubReflectClass.class.getDeclaredField("subProtectedField");
+    Field subPrivateField = SubReflectClass.class.getDeclaredField("subPrivateField");
+    Field subPackageField = SubReflectClass.class.getDeclaredField("subPackageField");
 
     public FieldTest() throws NoSuchFieldException {
     }
@@ -31,15 +31,15 @@ public class FieldTest {
     @Test
     public void testField() throws Exception {
         Assert.assertEquals(
-            Reflects.fields(NewClass.class),
-            Arrays.asList(NewClass.class.getFields())
+            Reflects.fields(ReflectClass.class),
+            Arrays.asList(ReflectClass.class.getFields())
         );
         Assert.assertEquals(
-            Reflects.declaredFields(NewClass.class),
-            Arrays.asList(NewClass.class.getDeclaredFields())
+            Reflects.declaredFields(ReflectClass.class),
+            Arrays.asList(ReflectClass.class.getDeclaredFields())
         );
         Assert.assertEquals(
-            Reflects.ownedFields(SubNewClass.class),
+            Reflects.ownedFields(SubReflectClass.class),
             Arrays.asList(
                 subPublicField, publicField, superPublicField,
                 subProtectedField, subPrivateField, subPackageField
@@ -47,46 +47,46 @@ public class FieldTest {
         );
 
         Assert.assertEquals(
-            Reflects.ownedField(NewClass.class, "protectedField"),
-            NewClass.class.getDeclaredField("protectedField")
+            Reflects.ownedField(ReflectClass.class, "protectedField"),
+            ReflectClass.class.getDeclaredField("protectedField")
         );
-        Assert.assertNull(Reflects.ownedFieldOrNull(NewClass.class, "superProtectedField"));
+        Assert.assertNull(Reflects.ownedFieldOrNull(ReflectClass.class, "superProtectedField"));
 
         Assert.assertEquals(
-            Reflects.searchFields(SubNewClass.class, true, f -> f.getName().contains("ackage")),
+            Reflects.searchFields(SubReflectClass.class, true, f -> f.getName().contains("ackage")),
             Arrays.asList(subPackageField, packageField, superPackageField)
         );
     }
 
     @Test
     public void testFieldValue() {
-        NewClass newClass = new NewClass();
+        ReflectClass reflectClass = new ReflectClass();
 
         Assert.assertEquals(
             Reflects.getDeepFieldValue(
-                NewClass.class, "superPrivateField", newClass, true),
+                ReflectClass.class, "superPrivateField", reflectClass, true),
             "superPrivateField"
         );
         Reflects.setDeepFieldValue(
-            NewClass.class,
+            ReflectClass.class,
             "superPrivateField",
-            newClass,
+            reflectClass,
             "superPrivateField2",
             true
         );
         Assert.assertEquals(
             Reflects.getDeepFieldValue(
-                NewClass.class, "superPrivateField", newClass, true),
+                ReflectClass.class, "superPrivateField", reflectClass, true),
             "superPrivateField2"
         );
 
         Assert.expectThrows(IllegalAccessException.class, () ->
             Reflects.getDeepFieldValue(
-                NewClass.class, "superPrivateField", newClass, false)
+                ReflectClass.class, "superPrivateField", reflectClass, false)
         );
         Assert.expectThrows(NoSuchFieldException.class, () ->
             Reflects.getFieldValue(
-                NewClass.class, "superPrivateField", newClass, false)
+                ReflectClass.class, "superPrivateField", reflectClass, false)
         );
 
         Assert.assertEquals(

@@ -305,6 +305,7 @@ private fun Type.eraseTypeParameters(
                         typeArguments[typeVariable] = newType
                     }
                 }
+                return newType
             }
             searchStack.add(this)
             return value.eraseTypeParameters(typeArguments, searchStack)

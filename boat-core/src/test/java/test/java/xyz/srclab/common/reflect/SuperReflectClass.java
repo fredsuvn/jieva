@@ -1,6 +1,6 @@
 package test.java.xyz.srclab.common.reflect;
 
-public class SuperNewClass {
+public class SuperReflectClass {
 
     public String superPublicField = "superPublicField";
     protected String superProtectedField = "superProtectedField";

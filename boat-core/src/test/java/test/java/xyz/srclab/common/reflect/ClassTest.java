@@ -14,17 +14,17 @@ public class ClassTest {
 
     @Test
     public void testToClass() {
-        Class<NewClass> newClass = Reflects.toClass(
-            "test.java.xyz.srclab.common.reflect.NewClass");
-        Assert.assertEquals(newClass, NewClass.class);
+        Class<ReflectClass> newClass = Reflects.toClass(
+            "test.java.xyz.srclab.common.reflect.ReflectClass");
+        Assert.assertEquals(newClass, ReflectClass.class);
     }
 
     @Test
     public void testNewInstance() {
-        String className = NewClass.class.getName();
-        Assert.assertEquals(Reflects.newInstance(className), new NewClass());
+        String className = ReflectClass.class.getName();
+        Assert.assertEquals(Reflects.newInstance(className), new ReflectClass());
         Assert.assertEquals(
-            Reflects.newInstanceWithArguments(className, "a", "b", "c"), new NewClass("a", "b", "c"));
+            Reflects.newInstanceWithArguments(className, "a", "b", "c"), new ReflectClass("a", "b", "c"));
     }
 
     @Test

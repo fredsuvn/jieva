@@ -1,6 +1,6 @@
 package test.java.xyz.srclab.common.reflect;
 
-public class SubNewClass extends NewClass {
+public class SubReflectClass extends ReflectClass {
 
     public String subPublicField = "subPublicField";
     protected String subProtectedField = "subProtectedField";

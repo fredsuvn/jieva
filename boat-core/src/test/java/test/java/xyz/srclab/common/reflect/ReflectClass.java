@@ -4,12 +4,12 @@ import xyz.srclab.common.test.TestLogger;
 
 import java.util.Objects;
 
-public class NewClass extends SuperNewClass {
+public class ReflectClass extends SuperReflectClass {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     static {
-        logger.log("Load class: " + NewClass.class);
+        logger.log("Load class: " + ReflectClass.class);
     }
 
     public final String publicField = "publicField";
@@ -19,20 +19,20 @@ public class NewClass extends SuperNewClass {
 
     private final String param;
 
-    public NewClass() {
+    public ReflectClass() {
         this("");
     }
 
-    protected NewClass(String param) {
+    protected ReflectClass(String param) {
         this.param = param;
         logger.log("New instance: " + param);
     }
 
-    private NewClass(String param0, String param1) {
+    private ReflectClass(String param0, String param1) {
         this(param0 + " : " + param1);
     }
 
-    public NewClass(String param0, String param1, String param2) {
+    public ReflectClass(String param0, String param1, String param2) {
         this(param0 + " : " + param1 + " : " + param2);
     }
 
@@ -59,6 +59,6 @@ public class NewClass extends SuperNewClass {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof NewClass && Objects.equals(param, ((NewClass) obj).param);
+        return obj instanceof ReflectClass && Objects.equals(param, ((ReflectClass) obj).param);
     }
 }
