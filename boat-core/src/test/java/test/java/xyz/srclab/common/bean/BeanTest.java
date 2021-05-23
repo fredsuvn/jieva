@@ -20,7 +20,7 @@ public class BeanTest {
     @Test
     public void testBeanResolve() {
         BeanResolver beanStyle = BeanResolver.newBeanResolver(BeanResolveHandler.DEFAULTS);
-        BeanType beanType = beanStyle.resolve(SimpleBean.class);
+        BeanType beanType = beanStyle.resolve(TestBean.class);
         Assert.assertEquals(beanType.properties().size(), 4);
         Assert.assertEquals(beanType.getProperty("p1").type(), String.class);
         Assert.assertEquals(beanType.getProperty("p2").type(), int.class);
@@ -38,12 +38,12 @@ public class BeanTest {
 
     @Test
     public void testSimpleBean() {
-        SimpleBean a = new SimpleBean();
+        TestBean a = new TestBean();
         a.setP1("123");
         a.setP2(6);
         a.setP3(Arrays.asList("1", "2", "3"));
 
-        SimpleBean b = new SimpleBean();
+        TestBean b = new TestBean();
         Beans.copyProperties(a, b);
         Assert.assertEquals(b.getP1(), a.getP1());
         Assert.assertEquals(b.getP2(), a.getP2());
@@ -51,7 +51,7 @@ public class BeanTest {
 
         a.setP1(null);
         Beans.copyProperties(a, b);
-        Assert.assertEquals(b.getP1(), a.getP1());
+        Assert.assertEquals(b.getP1(), "null");
         Assert.assertEquals(b.getP2(), a.getP2());
         Assert.assertEquals(b.getP3(), a.getP3());
 
@@ -66,7 +66,7 @@ public class BeanTest {
         a.setP2(222);
         a.setP3(Arrays.asList("1", "2", "3"));
         LinkedHashMap<String, Object> map = Beans.copyProperties(a, new LinkedHashMap<>());
-        Assert.assertEquals(map.size(), 3);
+        Assert.assertEquals(map.size(), 4);//include class
         Assert.assertEquals(map.get("p1"), "123");
         Assert.assertEquals(map.get("p2"), 222);
         Assert.assertEquals(map.get("p3"), Arrays.asList("1", "2", "3"));
@@ -76,7 +76,7 @@ public class BeanTest {
         Assert.assertEquals(a.getP2(), 999);
 
         LinkedHashMap<String, Object> map2 = Beans.copyProperties(map, new LinkedHashMap<>());
-        Assert.assertEquals(map2.size(), 3);
+        Assert.assertEquals(map2.size(), 4);//include class
         Assert.assertEquals(map2.get("p1"), "123");
         Assert.assertEquals(map2.get("p2"), 999);
         Assert.assertEquals(map2.get("p3"), Arrays.asList("1", "2", "3"));
@@ -84,25 +84,33 @@ public class BeanTest {
 
     @Test
     public void testBeanMap() {
-        SimpleBean simpleBean = new SimpleBean();
-        simpleBean.setP1("123");
-        simpleBean.setP2(6);
-        simpleBean.setP3(Arrays.asList("1", "2", "3"));
-        Map<String, Object> simpleMap = Beans.asMap(simpleBean);
-        Assert.assertEquals(simpleMap.get("p1"), "123");
-        Assert.assertEquals(simpleMap.get("p2"), 6);
-        Assert.assertEquals(simpleMap.get("p3"), Arrays.asList("1", "2", "3"));
-        simpleMap.put("p1", "555");
-        Assert.assertEquals(simpleBean.getP1(), "555");
-        Assert.expectThrows(UnsupportedOperationException.class, () -> simpleMap.put("p4", "p4"));
-        simpleBean.setP2(888);
-        Assert.assertEquals(simpleMap.get("p2"), 888);
+        TestBean testBean = new TestBean();
+        testBean.setP1("123");
+        testBean.setP2(6);
+        testBean.setP3(Arrays.asList("1", "2", "3"));
+        Map<String, Object> testMap = Beans.asMap(testBean);
+        logger.log("testMap: {}", testMap);
+        Assert.assertEquals(testMap.get("p1"), "123");
+        Assert.assertEquals(testMap.get("p2"), 6);
+        Assert.assertEquals(testMap.get("p3"), Arrays.asList("1", "2", "3"));
+        testMap.put("p1", "555");
+        Assert.assertEquals(testBean.getP1(), "555");
+        Assert.expectThrows(UnsupportedOperationException.class, () -> testMap.put("p4", "p4"));
+        testBean.setP2(888);
+        Assert.assertEquals(testMap.get("p2"), 888);
 
-        Map<String, Integer> siMap = Beans.asMap(simpleBean, int.class);
-        logger.log("siMap: {}", siMap);
-        Assert.assertEquals(siMap.get("p1"), (Integer) 555);
-        Assert.assertEquals(siMap.get("p2"), (Integer) 888);
-        Assert.assertEquals(siMap.size(), 2);
+        SimpleBean simpleBean = new SimpleBean();
+        simpleBean.setP1("789");
+        simpleBean.setP2(999);
+        Map<String, Integer> simpleMap = Beans.asMap(simpleBean, int.class);
+        logger.log("simpleMap: {}", simpleMap);
+        Assert.assertEquals(simpleMap.get("p1"), (Integer) 789);
+        Assert.assertEquals(simpleMap.get("p2"), (Integer) 999);
+        Assert.assertEquals(simpleMap.size(), 2);
+        simpleMap.put("p1", 10086);
+        simpleMap.put("p2", 10000);
+        Assert.assertEquals(simpleBean.getP1(), "10086");
+        Assert.assertEquals(simpleBean.getP2(), 10000);
     }
 
     @Test
@@ -121,8 +129,6 @@ public class BeanTest {
         a.setS(s1);
 
         B<Long> b = Beans.copyProperties(a, new B(), Types.parameterizedType(B.class, Long.class));
-        //B<Long> b = Beans.copyProperties(a, new B(),
-        //        BeanResolver.CopyOptions.DEFAULT.withToType(Types.parameterizedType(B.class, Long.class)));
         Assert.assertEquals(b.getI1(), Arrays.asList(1, 2, 3));
         Assert.assertEquals(b.getI2(), new BigDecimal(666));
         Assert.assertEquals(b.getI3(), new List[]{Arrays.asList(1, 2, 3)});
@@ -155,7 +161,7 @@ public class BeanTest {
         void setI3(T3 i3);
     }
 
-    public static abstract class C1<U> implements I1<List<? extends U>> {
+    public static abstract class C1<U> implements I1<List<U>> {
     }
 
     public static abstract class C2 extends C1<String> {
@@ -208,7 +214,7 @@ public class BeanTest {
 
     public static class A extends C2 implements I2<Integer>, I3<List<? super Integer>[]> {
 
-        private List<? extends String> i1;
+        private List<String> i1;
         private Integer i2;
         private List<? super Integer>[] i3;
 
@@ -220,12 +226,12 @@ public class BeanTest {
         private S1 s;
 
         @Override
-        public List<? extends String> getI1() {
+        public List<String> getI1() {
             return i1;
         }
 
         @Override
-        public void setI1(List<? extends String> i1) {
+        public void setI1(List<String> i1) {
             this.i1 = i1;
         }
 
@@ -292,7 +298,7 @@ public class BeanTest {
 
     public static class B<T> extends C3 implements I2<BigDecimal>, I3<List<? super String>[]> {
 
-        private List<? extends Integer> i1;
+        private List<Integer> i1;
         private BigDecimal i2;
         private List<? super String>[] i3;
 
@@ -304,12 +310,12 @@ public class BeanTest {
         private S2 s;
 
         @Override
-        public List<? extends Integer> getI1() {
+        public List<Integer> getI1() {
             return i1;
         }
 
         @Override
-        public void setI1(List<? extends Integer> i1) {
+        public void setI1(List<Integer> i1) {
             this.i1 = i1;
         }
 
