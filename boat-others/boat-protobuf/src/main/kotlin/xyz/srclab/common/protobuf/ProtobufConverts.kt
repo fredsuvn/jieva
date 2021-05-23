@@ -4,61 +4,94 @@ package xyz.srclab.common.protobuf
 
 import com.google.protobuf.Message
 import com.google.protobuf.MessageOrBuilder
-import xyz.srclab.common.bean.BeanCopyOptions
 import xyz.srclab.common.convert.BeanConvertHandler
 import xyz.srclab.common.convert.ConvertHandler
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.reflect.methodOrNull
-import xyz.srclab.common.reflect.toInstance
+import xyz.srclab.common.reflect.rawClass
+import java.lang.reflect.Type
 
-private val protobufBuilderGenerator: (Class<*>) -> Any = { it ->
-    when {
-        //Builder
-        Message.Builder::class.java.isAssignableFrom(it) -> {
-            val outClass = it.declaringClass
-            val newBuilderMethod = outClass.methodOrNull("newBuilder")
-            if (newBuilderMethod === null) {
-                throw IllegalStateException("Cannot find newBuilder method for $outClass")
-            }
-            newBuilderMethod.invoke(null)
-        }
-        //Message
-        (MessageOrBuilder::class.java.isAssignableFrom(it)) -> {
-            val newBuilderMethod = it.methodOrNull("newBuilder")
-            if (newBuilderMethod === null) {
-                throw IllegalStateException("Cannot find newBuilder method for $it")
-            }
-            newBuilderMethod.invoke(null)
-        }
-        //Other bean
-        else -> it.toInstance()
-    }
+private val protobufBuilderGenerator: (Type) -> Any = label@{ it ->
 }
 
-private val protobufBuildFunction: (builder: Any, toType: Class<*>) -> Any = { builder, toType ->
+private val protobufBuildAction: (builder: Any, toType: Type) -> Any = label@{ builder, toType ->
+    if (toType !is Class<*>) {
+        return@label builder
+    }
     when {
         //Message but not builder
         (MessageOrBuilder::class.java.isAssignableFrom(toType)
-            && !Message.Builder::class.java.isAssignableFrom(toType)
-            && builder is Message.Builder) -> {
+                && !Message.Builder::class.java.isAssignableFrom(toType)
+                && builder is Message.Builder) -> {
             builder.build()
         }
         else -> builder
     }
 }
 
-/**
- * [BeanCopyOptions] for [BeanConvertHandler] which supports protobuf object.
- */
-@JvmField
-val PROTOBUF_CONVERT_BEAN_COPY_OPTIONS: BeanCopyOptions = BeanCopyOptions.DEFAULT
-    .toBuilder()
-    .beanResolver(PROTOBUF_BEAN_RESOLVER)
-    .build()
-
 @JvmField
 val PROTOBUF_CONVERTER: Converter = Converter.newConverter(
     ConvertHandler.defaultsWithBeanConvertHandler(
-        BeanConvertHandler(PROTOBUF_CONVERT_BEAN_COPY_OPTIONS, protobufBuilderGenerator, protobufBuildFunction)
+        BeanConvertHandler(ProtobufBeanProvider, PROTOBUF_BEAN_RESOLVER)
     )
 )
+
+private object ProtobufBeanProvider : BeanConvertHandler.NewBeanProvider {
+
+    override fun newBuilder(toType: Type): Any {
+        if (toType !is Class<*>) {
+            return toType.rawClass.newInstance()
+        }
+        when {
+            //Builder
+            Message.Builder::class.java.isAssignableFrom(toType) -> {
+                val outClass = toType.declaringClass
+                val newBuilderMethod = outClass.methodOrNull("newBuilder")
+                if (newBuilderMethod === null) {
+                    throw IllegalStateException("Cannot find newBuilder method for $outClass")
+                }
+                return newBuilderMethod.invoke(null)
+            }
+            //Message
+            MessageOrBuilder::class.java.isAssignableFrom(toType) -> {
+                val newBuilderMethod = toType.methodOrNull("newBuilder")
+                if (newBuilderMethod === null) {
+                    throw IllegalStateException("Cannot find newBuilder method for $toType")
+                }
+                return newBuilderMethod.invoke(null)
+            }
+            //Other bean
+            else -> return toType.newInstance()
+        }
+    }
+
+    override fun builderType(builder: Any, toType: Type): Type {
+        if (toType !is Class<*>) {
+            return toType
+        }
+        return when {
+            //Message but not builder
+            (MessageOrBuilder::class.java.isAssignableFrom(toType)
+                    && !Message.Builder::class.java.isAssignableFrom(toType)
+                    && builder is Message.Builder) -> {
+                builder.javaClass
+            }
+            else -> toType
+        }
+    }
+
+    override fun build(builder: Any, toType: Type): Any {
+        if (toType !is Class<*>) {
+            return builder
+        }
+        return when {
+            //Message but not builder
+            (MessageOrBuilder::class.java.isAssignableFrom(toType)
+                    && !Message.Builder::class.java.isAssignableFrom(toType)
+                    && builder is Message.Builder) -> {
+                builder.build()
+            }
+            else -> builder
+        }
+    }
+}

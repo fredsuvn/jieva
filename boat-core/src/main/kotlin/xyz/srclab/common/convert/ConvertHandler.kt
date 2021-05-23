@@ -528,8 +528,7 @@ object IterableConvertHandler : AbstractTypeConvertHandler() {
  * * [SetMap], [MutableSetMap], [ListMap], [MutableListMap];
  */
 open class BeanConvertHandler @JvmOverloads constructor(
-    private val builder: (Type) -> Any = { it.rawClass.newInstance() },
-    private val build: (builder: Any, toType: Type) -> Any = { bean, _ -> bean },
+    private val newBeanProvider: NewBeanProvider = NewBeanProvider.DEFAULT,
     private val beanResolver: BeanResolver = BeanResolver.DEFAULT,
 ) : AbstractTypeConvertHandler() {
 
@@ -615,9 +614,51 @@ open class BeanConvertHandler @JvmOverloads constructor(
     }
 
     private fun toObject(from: Any, toType: Type, converter: Converter): Any {
-        val builder = builder(toType)
-        from.copyProperties(builder, toType, beanResolver, converter)
-        return build(builder, toType)
+        val builder = newBeanProvider.newBuilder(toType)
+        from.copyProperties(builder, newBeanProvider.builderType(builder, toType), beanResolver, converter)
+        return newBeanProvider.build(builder, toType)
+    }
+
+    /**
+     * Provider for create target bean which is convert to.
+     */
+    interface NewBeanProvider {
+
+        /**
+         * Returns builder of target bean.
+         */
+        fun newBuilder(toType: Type): Any
+
+        /**
+         * Builder's type.
+         */
+        fun builderType(builder: Any, toType: Type): Type
+
+        /**
+         * Builds the target bean.
+         */
+        fun build(builder: Any, toType: Type): Any
+
+        companion object {
+
+            /**
+             * Default new bean operation, with `new Bean()` then `setXxx(value)` way.
+             */
+            val DEFAULT: NewBeanProvider = object : NewBeanProvider {
+
+                override fun newBuilder(toType: Type): Any {
+                    return toType.rawClass.newInstance()
+                }
+
+                override fun builderType(builder: Any, toType: Type): Type {
+                    return toType
+                }
+
+                override fun build(builder: Any, toType: Type): Any {
+                    return builder
+                }
+            }
+        }
     }
 
     companion object {
