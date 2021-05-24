@@ -20,7 +20,7 @@ public class RunTest {
     @Test
     public void testRunSync() {
         Runner runner = Runner.SYNC_RUNNER;
-        IntRef intRef = IntRef.of(0);
+        IntRef intRef = IntRef.with(0);
         Running<?> running = runner.run(() -> {
             Current.sleep(2000);
             intRef.set(666);
@@ -43,7 +43,7 @@ public class RunTest {
     }
 
     private void doTestAsync(Runner runner) {
-        IntRef intRef = IntRef.of(0);
+        IntRef intRef = IntRef.with(0);
         Running<?> running = runner.run(() -> {
             Current.sleep(2000);
             intRef.set(666);

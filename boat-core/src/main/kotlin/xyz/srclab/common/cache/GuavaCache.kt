@@ -14,7 +14,7 @@ open class GuavaCache<K : Any, V>(private val guava: com.google.common.cache.Cac
     }
 
     override fun getOrLoad(key: K, loader: (K) -> V): V {
-        return guava.get(key, { loader(key) })
+        return guava.get(key) { loader(key) }
     }
 
     override fun getPresent(keys: Iterable<K>): Map<K, V> {
