@@ -59,7 +59,7 @@ public class ProtobufTest {
             ProtobufBeans.PROTOBUF_BEAN_RESOLVER, ProtobufConverts.PROTOBUF_CONVERTER
         );
         logger.log("javaMessageData: {}", JsonSerials.toJsonString(javaMessageData));
-        Assert.assertEquals(javaMessageData.getType(), MessageData.Type.TYPE_0);
+        Assert.assertEquals(javaMessageData.getType(), "TYPE_0");
         Assert.assertEquals(javaMessageData.getMessage(), "666");
         Assert.assertEquals(javaMessageData.getNumberList(), Arrays.asList("7", "8", "9"));
         Assert.assertEquals(
@@ -74,7 +74,7 @@ public class ProtobufTest {
         );
         logger.log("javaRequestMessage: {}", JsonSerials.toJsonString(javaRequestMessage));
         Assert.assertEquals(javaRequestMessage.getId(), "123");
-        Assert.assertEquals(javaRequestMessage.getData().getType(), MessageData.Type.TYPE_0);
+        Assert.assertEquals(javaRequestMessage.getData().getType(), "TYPE_0");
         Assert.assertEquals(javaRequestMessage.getData().getMessage(), "666");
         Assert.assertEquals(javaRequestMessage.getData().getNumberList(), Arrays.asList("7", "8", "9"));
         Assert.assertEquals(
@@ -83,7 +83,7 @@ public class ProtobufTest {
         );
 
         javaRequestMessage.setId("999");
-        javaMessageData.setType(MessageData.Type.TYPE_1);
+        javaMessageData.setType("type_1");
         javaMessageData.setMessage("java");
         javaMessageData.setNumberList(Arrays.asList("5", "6", "7"));
         javaMessageData.setEntryMap(Anys.as(Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")));
@@ -164,16 +164,16 @@ public class ProtobufTest {
 
     public static class JavaMessageData {
 
-        private MessageData.Type type;
+        private String type;
         private String message;
         private List<String> numberList;
         private Map<String, String> entryMap;
 
-        public MessageData.Type getType() {
+        public String getType() {
             return type;
         }
 
-        public void setType(MessageData.Type type) {
+        public void setType(String type) {
             this.type = type;
         }
 

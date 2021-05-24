@@ -34,4 +34,8 @@ public class TestBean {
     public void setP3(List<String> p3) {
         this.p3 = p3;
     }
+
+    public enum TestEnum {
+        A, B, C
+    }
 }

@@ -140,8 +140,10 @@ object CompatibleConvertHandler : ConvertHandler {
         }
         if (toType.isEnum) {
             val enumValue = toType.valueOfEnumIgnoreCaseOrNull<Enum<*>>(from.toString())
-            if (enumValue !== null) {
-                return enumValue
+            return if (enumValue !== null) {
+                enumValue
+            } else {
+                Next.CONTINUE
             }
         }
         val fromClass = from.javaClass
@@ -566,6 +568,9 @@ open class BeanConvertHandler @JvmOverloads constructor(
             return Next.CONTINUE
         }
         if (toRawClass.isArray) {
+            return Next.CONTINUE
+        }
+        if (toRawClass.isEnum) {
             return Next.CONTINUE
         }
         return when (toRawClass) {
