@@ -11,24 +11,6 @@ import xyz.srclab.common.reflect.methodOrNull
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
 
-private val protobufBuilderGenerator: (Type) -> Any = label@{ it ->
-}
-
-private val protobufBuildAction: (builder: Any, toType: Type) -> Any = label@{ builder, toType ->
-    if (toType !is Class<*>) {
-        return@label builder
-    }
-    when {
-        //Message but not builder
-        (MessageOrBuilder::class.java.isAssignableFrom(toType)
-                && !Message.Builder::class.java.isAssignableFrom(toType)
-                && builder is Message.Builder) -> {
-            builder.build()
-        }
-        else -> builder
-    }
-}
-
 @JvmField
 val PROTOBUF_CONVERTER: Converter = Converter.newConverter(
     ConvertHandler.defaultsWithBeanConvertHandler(
@@ -72,8 +54,8 @@ private object ProtobufBeanProvider : BeanConvertHandler.NewBeanProvider {
         return when {
             //Message but not builder
             (MessageOrBuilder::class.java.isAssignableFrom(toType)
-                    && !Message.Builder::class.java.isAssignableFrom(toType)
-                    && builder is Message.Builder) -> {
+                && !Message.Builder::class.java.isAssignableFrom(toType)
+                && builder is Message.Builder) -> {
                 builder.javaClass
             }
             else -> toType
@@ -87,8 +69,8 @@ private object ProtobufBeanProvider : BeanConvertHandler.NewBeanProvider {
         return when {
             //Message but not builder
             (MessageOrBuilder::class.java.isAssignableFrom(toType)
-                    && !Message.Builder::class.java.isAssignableFrom(toType)
-                    && builder is Message.Builder) -> {
+                && !Message.Builder::class.java.isAssignableFrom(toType)
+                && builder is Message.Builder) -> {
                 builder.build()
             }
             else -> builder
