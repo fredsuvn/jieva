@@ -124,7 +124,10 @@ interface ConvertHandler {
 }
 
 /**
- * Use [Class.isAssignableFrom] to check whether from type can cast to to type, if not, return [Next.CONTINUE].
+ * If `toType` is enum, this handler will invoke `toString()` of `fromType`
+ * and try to find out same name enum value (case-ignored);
+ * else use [Class.isAssignableFrom] to check whether from type can cast to to type;
+ * else return [Next.CONTINUE].
  */
 object CompatibleConvertHandler : ConvertHandler {
 
@@ -134,6 +137,12 @@ object CompatibleConvertHandler : ConvertHandler {
         }
         if (toType == Any::class.java) {
             return from
+        }
+        if (toType.isEnum) {
+            val enumValue = toType.valueOfEnumIgnoreCaseOrNull<Enum<*>>(from.toString())
+            if (enumValue !== null) {
+                return enumValue
+            }
         }
         val fromClass = from.javaClass
         if (fromClass == toType || toType.isAssignableFrom(fromClass)) {
