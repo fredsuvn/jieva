@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @see DateTimeConvertHandler
  * @see IterableConvertHandler
  * @see BeanConvertHandler
- * @see DefaultFailedHandler
+ * @see DefaultFailedConvertHandler
  */
 interface ConvertHandler {
 
@@ -668,7 +668,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
     }
 }
 
-object DefaultFailedHandler : ConvertHandler {
+object DefaultFailedConvertHandler : ConvertHandler {
 
     override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any? {
         throw UnsupportedOperationException("from: $from, to: $toType")
@@ -679,6 +679,6 @@ object DefaultFailedHandler : ConvertHandler {
     }
 
     override fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any? {
-        throw UnsupportedOperationException("from: $from, fromType: $from, to: $toType")
+        throw UnsupportedOperationException("from: $from, fromType: $fromType, to: $toType")
     }
 }

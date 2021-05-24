@@ -57,7 +57,7 @@ interface Converter {
         @JvmStatic
         fun newConverter(
             convertHandlers: Iterable<ConvertHandler>,
-            failedHandler: ConvertHandler = DefaultFailedHandler
+            failedHandler: ConvertHandler = DefaultFailedConvertHandler
         ): Converter {
             return ConverterImpl(convertHandlers.asToList(), failedHandler)
         }
