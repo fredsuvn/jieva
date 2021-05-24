@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.exception.ExceptionStatus;
-import xyz.srclab.common.exception.ShouldNotException;
+import xyz.srclab.common.exception.ImpossibleException;
 import xyz.srclab.common.exception.StatusException;
 
 /**
@@ -15,12 +15,12 @@ public class ExceptionTest {
 
     @Test
     public void test() {
-        ShouldNotException shouldNotException = new ShouldNotException();
-        TestException testException = new TestException(ExceptionStatus.INTERNAL, shouldNotException);
+        ImpossibleException impossibleException = new ImpossibleException();
+        TestException testException = new TestException(ExceptionStatus.INTERNAL, impossibleException);
         Assert.assertEquals(testException.description(), ExceptionStatus.INTERNAL.description());
-        Assert.assertEquals(testException.getCause(), shouldNotException);
+        Assert.assertEquals(testException.getCause(), impossibleException);
 
-        TestException testException2 = new TestException("8", "888", shouldNotException);
+        TestException testException2 = new TestException("8", "888", impossibleException);
         ExceptionStatus exceptionStatus = testException2.withMoreDescription("999");
         Assert.assertEquals(exceptionStatus.description(), "888[999]");
         ExceptionStatus exceptionStatus2 = testException2.withNewDescription("999");

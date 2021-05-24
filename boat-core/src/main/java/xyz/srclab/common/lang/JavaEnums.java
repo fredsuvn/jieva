@@ -2,7 +2,7 @@ package xyz.srclab.common.lang;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.srclab.common.exception.ShouldNotException;
+import xyz.srclab.common.exception.ImpossibleException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,12 +33,8 @@ class JavaEnums {
                 }
             }
             return null;
-        } catch (NoSuchMethodException e) {
-            throw new ShouldNotException("values() not found on enum type!");
-        } catch (IllegalAccessException e) {
-            throw new ShouldNotException("values() cause IllegalAccessException on enum type!");
-        } catch (InvocationTargetException e) {
-            throw new ShouldNotException("values() cause InvocationTargetException on enum type!");
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new ImpossibleException(e);
         }
     }
 
@@ -52,11 +48,11 @@ class JavaEnums {
             }
             return null;
         } catch (NoSuchMethodException e) {
-            throw new ShouldNotException("values() not found on enum type!");
+            throw new ImpossibleException("values() not found on enum type!");
         } catch (IllegalAccessException e) {
-            throw new ShouldNotException("values() cause IllegalAccessException on enum type!");
+            throw new ImpossibleException("values() cause IllegalAccessException on enum type!");
         } catch (InvocationTargetException e) {
-            throw new ShouldNotException("values() cause InvocationTargetException on enum type!");
+            throw new ImpossibleException("values() cause InvocationTargetException on enum type!");
         }
     }
 }

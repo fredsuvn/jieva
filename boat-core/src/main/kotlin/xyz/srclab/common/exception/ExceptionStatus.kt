@@ -29,7 +29,7 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
         val UNKNOWN = of("000001", "Unknown Error")
 
         @JvmField
-        val SHOULD_NOT = of("000002", "It should not be an exception")
+        val IMPOSSIBLE = of("000002", "WTF ??... That's IMPOSSIBLE!!")
 
         @JvmStatic
         @JvmOverloads
