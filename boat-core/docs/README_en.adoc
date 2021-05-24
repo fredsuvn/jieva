@@ -1,0 +1,389 @@
+= image:../../logo.svg[Boat Core] Boat Core: Core Lib of link:../../README.md[Boat]
+:toc:
+:toclevels: 3
+:last-update-label!:
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:emaill: fredsuvn@163.com
+:url: https://github.com/srclab-projects/boat
+:boat-version: 0.0.1
+
+== Introduction
+
+Boat core provides core interfaces, functions and utilities of link:../../README.md[Boat], including:
+
+* lang: Base package, a serials of core and base interfaces and components;
+* collect: Collection extension package, supports `chain operation`, `multi-value-map`, various utilities, etc.;
+* reflect: Reflection extension package, provides many convenient reflection operation;
+* bean: Bean package, supports fast and convenient operation for `bean`;
+* convert: Convert package, support various types conversion each other;
+* cache: Cache package, provides core cache interfaces and built-in implementations;
+* run: Package about run and thread, provides `Runner` interfaces and implementations;
+* bus: Bus package, provides `EventBus` interfaces;
+* invoke: Provides `Invoker` interfaces and implementations;
+* proxy: Provides `ProxyClass` to proxy a class in runtime, by reflection, `spring-core` or `cglib` ways;
+* state: Provides `State` interfaces represents a state or status;
+* exception: About exceptions;
+* jvm: Provides jvm underlying operations;
+* test: Provides interfaces and utilities for testing;
+* utils: Provides convenient tools;
+
+== Usage
+
+=== Lang
+
+Lang package provides a serials of core and base interfaces and components:
+
+* Global system objects: `Current`, `Defaults`, `Environment`;
+* Syntax enhancement (mainly for Java): `Let`, `Ref`, `Lazy`, `LazyString`;
+* String/CharSequence functions: `CharsFormat`, `CharsTemplate`, `NamingCase`;
+* Special character support: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
+* Access interfaces: `Accessor`, `Getter`, `Setter`, `GenericAccessor`, `GenericGetter`, `GenericSetter`;
+* Serial, SpecParser, CachingProductBuilder, Processing;
+* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/lang/LangSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/lang/LangSample.kt[]
+----
+
+==== Bean
+
+Bean package provides powerful bean operation ability:
+
+* Beans: Default utilities for bean operation;
+* BeanResolver: Core Interface to resolver bean, Beans use its default implementation;
+
+TIP: In copy-properties function, It is more than 20 times faster than Apache BeanUtils.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/bean/BeanSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/bean/BeanSample.kt[]
+----
+
+==== Bus
+
+Bus package provide EventBus.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/bus/EventBusSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/bus/EventBusSample.kt[]
+----
+
+==== Cache
+
+Boat provides a Cache interface and several implementations:
+
+* Cache: Cache core interface;
+* FastCache: Implemented by WeakHashMap and ThreadLocal;
+* CaffeineCache: Implemented by Caffeine;
+* GuavaCache: Implemented by Guava;
+* MapCache: Map as Cache;
+* ThreadLocalCache: ThreadLocalMap as Cache.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/cache/CacheSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/cache/CacheSample.kt[]
+----
+
+==== Collect
+
+Collect package provides interfaces, utilities and Ops operation for collection and array:
+
+* Collects: Utilities for Collection;
+* ArrayCollects: Utilities for Array;
+* IterableOps, ListOps, SetOps, MapOps: Ops interfaces, provide chain operation, mainly for Java;
+* SequenceOps: Ops for Sequence;
+* IterableType, MapType: Meta type interfaces for generic Collection types;
+* MultiMaps: MultiMaps provides multi-values Map such as SetMap, MutableSetMap, ListMap and MutableListMap.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/collect/CollectSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/collect/CollectSample.kt[]
+----
+
+==== Convert
+
+Convert package provides type-conversion function：
+
+* Converts: Utilities for conversion;
+* Converter: Core interfaces for type-conversion, Converts use its default implementation;
+* FastConverter: Fast and narrowing version of Converter.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/convert/ConvertSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/convert/ConvertSample.kt[]
+----
+
+==== Exception
+
+Exception package provides StatusException and ExceptionStatus extended from State (see <<State>>), and a ShouldNotException.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/exception/ExceptionSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/exception/ExceptionSample.kt[]
+----
+
+==== Invoke
+
+Invoke package provides Invoker interface to call methods (for Java) and functions (for Kotlin).
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/invoke/InvokeSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/invoke/InvokeSample.kt[]
+----
+
+==== Jvm
+
+Jvm package provides Jvms utilities classes to get JVM infos.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/jvm/JvmSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/jvm/JvmSample.kt[]
+----
+
+==== Proxy
+
+Proxy package provides Class proxy function with spring-cglib, cglib or JDK proxy.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/proxy/ProxySample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/proxy/ProxySample.kt[]
+----
+
+==== Reflect
+
+Reflect package provides utilities classes:
+
+* Reflects: Provides reflect operations;
+* Types: To build generic types;
+* TypeRef: To build a type reference.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/reflect/ReflectSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/reflect/ReflectSample.kt[]
+----
+
+==== Run
+
+Run package provides Runner and Scheduler interfaces to run codes in threads or coroutines.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/run/RunSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/run/RunSample.kt[]
+----
+
+==== State
+
+State package provides State interface to help build custom state or status type.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/state/StateSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/state/StateSample.kt[]
+----
+
+==== Utils
+
+Other helpful utilities:
+
+* Counter: Simple counter for int/long, amy atomic;
+* About: Product info such as About, Author, SemVer.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/utils/UtilsSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/utils/UtilsSample.kt[]
+----
+
+==== Test
+
+Test package provides simple test tools:
+
+* Tester: interface to start test tasks;
+* TestLogger: simple logger for testing;
+* TestTask and TestListener: test task and listener;
+* Tests: common utilities class for test.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/test/TestSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/test/TestSample.kt[]
+----
+
+=== Boat Serialize (boat-serialize)
+
+Boat Serialize (should import boat-serialize) provides core Serializer interface for serialization:
+
+* Serializer: Core interface for serialization;
+* JsonSerials: JSON serialization utilities;
+* JsonSerial: Core interface for JSON serialization, JsonSerials use its default implementation (Jackson);
+* Json: Core interface denote a JSON object.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/serialize/SerializeSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/serialize/SerializeSample.kt[]
+----
+
+=== Boat Codec (boat-codec)
+
+Boat Codec (should import boat-codec) provides Codec, CodecKeys, AesKeys and other interfaces to do with codec functions, supports hex, base64, AES, RSA, SM2 and more algorithms:
+
+* Codec: Core interface and utilities for codec function;
+* CodecKeys: Utilities for codec keys;
+* AesKeys: Utilities for AES keys.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/codec/CodecSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/codec/CodecSample.kt[]
+----
+
+=== Boat Id (boat-id)
+
+Boat ID (should import boat-id) is a lightweight and fast id generation framework.
+It provides IdFactory and a set of interface to generate id:
+
+* IdFactory: Core interface to generate new id;
+* IdComponentFactory: Core interface to generator component of an id;
+* AbstractIdFactory: Skeletal IdFactory to help implement full IdFactory;
+* StringIdFactory: Skeletal IdFactory to help implement String-id-type IdFactory;
+
+Boat ID also provides StringIdSpec, a String-type IdFactory, can build new id from a specification string, see its javadoc.
+
+.Java Examples
+[source,java]
+----
+include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/id/IdSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/id/IdSample.kt[]
+----
+
+== Contribution and Contact
+
+* {emaill}
+* {url}
+* {qq-group}
+
+== License
+
+{license}
