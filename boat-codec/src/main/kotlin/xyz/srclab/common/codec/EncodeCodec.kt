@@ -2,7 +2,6 @@ package xyz.srclab.common.codec
 
 import org.bouncycastle.util.encoders.Base64Encoder
 import org.bouncycastle.util.encoders.HexEncoder
-import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.lang.toBytes
 import xyz.srclab.common.lang.toChars
 import java.io.ByteArrayOutputStream
@@ -152,31 +151,19 @@ interface EncodeCodec : Codec {
             return Base64Codec
         }
 
-        @JvmName("withAlgorithm")
         @JvmStatic
-        fun CharSequence.toEncodeCodec(): EncodeCodec {
-            return this.toCodecAlgorithm().toEncodeCodec()
+        fun withAlgorithm(algorithm: CharSequence): EncodeCodec {
+            return withAlgorithm(algorithm.toCodecAlgorithm())
         }
 
-        @JvmName("withAlgorithm")
         @JvmStatic
-        fun CodecAlgorithm.toEncodeCodec(): EncodeCodec {
-            return when (this.name) {
+        fun withAlgorithm(algorithm: CodecAlgorithm): EncodeCodec {
+            return when (algorithm.name) {
                 CodecAlgorithm.PLAIN_NAME -> PlainCodec
                 CodecAlgorithm.HEX_NAME -> HexCodec
                 CodecAlgorithm.BASE64_NAME -> Base64Codec
-                else -> throw IllegalArgumentException("Unknown algorithm: ${this.name}")
+                else -> throw IllegalArgumentException("Unknown algorithm: ${algorithm.name}")
             }
-        }
-
-        @JvmStatic
-        fun ByteArray.toHexString(): String {
-            return HexCodec.encodeToString(this)
-        }
-
-        @JvmStatic
-        fun ByteArray.toBase64String(): String {
-            return Base64Codec.encodeToString(this)
         }
     }
 }

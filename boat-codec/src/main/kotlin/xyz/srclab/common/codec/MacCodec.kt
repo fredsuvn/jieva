@@ -1,13 +1,12 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.lang.toBytes
 import xyz.srclab.common.lang.toChars
 import java.io.OutputStream
 import javax.crypto.Mac
 
 /**
- * MAC digest codec.
+ * MAC digest codec such as `HmacMD5`.
  *
  * @author sunqian
  */
@@ -75,24 +74,6 @@ interface MacCodec : Codec {
 
     companion object {
 
-        @JvmName("withAlgorithm")
-        @JvmOverloads
-        @JvmStatic
-        fun CharSequence.toMacCodec(
-            mac: () -> Mac = { Mac.getInstance(this.toString()) }
-        ): MacCodec {
-            return this.toCodecAlgorithm().toMacCodec(mac)
-        }
-
-        @JvmName("withAlgorithm")
-        @JvmOverloads
-        @JvmStatic
-        fun CodecAlgorithm.toMacCodec(
-            mac: () -> Mac = { Mac.getInstance(this.name) }
-        ): MacCodec {
-            return MacCodecImpl(this.name, mac)
-        }
-
         @JvmStatic
         fun hmacMd5(): MacCodec {
             return CodecAlgorithm.HMAC_MD5.toMacCodec()
@@ -116,6 +97,22 @@ interface MacCodec : Codec {
         @JvmStatic
         fun hmacSha512(): MacCodec {
             return CodecAlgorithm.HMAC_SHA512.toMacCodec()
+        }
+
+        @JvmStatic
+        fun withAlgorithm(
+            algorithm: CharSequence,
+            mac: () -> Mac
+        ): MacCodec {
+            return withAlgorithm(algorithm.toCodecAlgorithm(), mac)
+        }
+
+        @JvmStatic
+        fun withAlgorithm(
+            algorithm: CodecAlgorithm,
+            mac: () -> Mac
+        ): MacCodec {
+            return MacCodecImpl(algorithm.name, mac)
         }
 
         private class MacCodecImpl(

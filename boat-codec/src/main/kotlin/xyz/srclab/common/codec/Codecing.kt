@@ -2,9 +2,6 @@ package xyz.srclab.common.codec
 
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.cache.Cache.Companion.toCache
-import xyz.srclab.common.codec.CipherCodec.Companion.toCipherCodec
-import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
-import xyz.srclab.common.codec.DigestCodec.Companion.toDigestCodec
 import xyz.srclab.common.lang.toBytes
 import xyz.srclab.common.lang.toChars
 import java.io.OutputStream
@@ -178,8 +175,8 @@ interface Codecing {
             val cipher = when (it) {
                 CodecAlgorithm.HEX -> HexCodec
                 CodecAlgorithm.BASE64 -> Base64Codec
-                CodecAlgorithm.RSA -> CipherCodec.rsa()
-                CodecAlgorithm.SM2 -> CipherCodec.sm2()
+                CodecAlgorithm.RSA -> rsaCodec()
+                CodecAlgorithm.SM2 -> sm2Codec()
                 CodecAlgorithm.PLAIN -> PlainCodec
                 else -> null
             }

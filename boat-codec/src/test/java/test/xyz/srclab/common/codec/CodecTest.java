@@ -25,7 +25,7 @@ public class CodecTest {
 
     @Test
     public void testRsa() {
-        RsaCodec rsaCodec = CipherCodec.rsa();
+        RsaCodec rsaCodec = Codecs.rsaCodec();
         RsaKeyPair rsaKeyPair = rsaCodec.newKeyPair();
         String data = random(512);
         byte[] dataBytes = Chars.toBytes(data);
@@ -48,7 +48,7 @@ public class CodecTest {
 
     @Test
     public void testSm2() {
-        Sm2Codec sm2Codec = CipherCodec.sm2();
+        Sm2Codec sm2Codec = Codecs.sm2Codec();
         Sm2KeyPair sm2KeyPair = sm2Codec.newKeyPair();
         String data = random(512);
         byte[] dataBytes = Chars.toBytes(data);
@@ -75,8 +75,8 @@ public class CodecTest {
         SecretKey secretKey = AesKeys.newKey(key);
         String data = random(512);
         byte[] dataBytes = Chars.toBytes(data);
-        byte[] encrypt = CipherCodec.aes().encrypt(secretKey, dataBytes);
-        byte[] decrypt = CipherCodec.aes().decrypt(secretKey, encrypt);
+        byte[] encrypt = Codecs.aesCodec().encrypt(secretKey, dataBytes);
+        byte[] decrypt = Codecs.aesCodec().decrypt(secretKey, encrypt);
         Assert.assertEquals(decrypt, dataBytes);
 
         String decryptData = Codecing.forData(encrypt).decryptAes(secretKey.getEncoded()).doFinalString();
@@ -93,14 +93,14 @@ public class CodecTest {
     public void testCodec() {
         String data = random(512);
         logger.log("data: " + data);
-        Sm2Codec sm2Codec = CipherCodec.sm2();
+        Sm2Codec sm2Codec = Codecs.sm2Codec();
         Sm2KeyPair sm2KeyPair = sm2Codec.newKeyPair();
-        RsaCodec rsaCodec = CipherCodec.rsa();
+        RsaCodec rsaCodec = Codecs.rsaCodec();
         RsaKeyPair rsaKeyPair = rsaCodec.newKeyPair();
-        SecretKey aesKey = CodecKeys.newSecretKey("0123456789012345", CodecAlgorithm.AES_NAME);
+        SecretKey aesKey = Codecs.secretKey("0123456789012345", CodecAlgorithm.AES_NAME);
 
         //加密
-        byte[] encrypt = CipherCodec.aes().encrypt(aesKey.getEncoded(), Chars.toBytes(data));
+        byte[] encrypt = Codecs.aesCodec().encrypt(aesKey.getEncoded(), Chars.toBytes(data));
         encrypt = rsaCodec.encrypt(rsaKeyPair.publicKey(), encrypt);
         encrypt = sm2Codec.encrypt(sm2KeyPair.publicKey(), encrypt);
         encrypt = EncodeCodec.base64().encode(encrypt);
@@ -147,13 +147,13 @@ public class CodecTest {
             EncodeCodec.base64().encodeToString(MacCodec.hmacSha512().digestToString(key, password)));
         SecretKey aesKey = AesKeys.newKey(key);
         logger.log("{}: {}", CodecAlgorithm.AES,
-            EncodeCodec.base64().encodeToString(CipherCodec.aes().encryptToString(aesKey, password)));
-        RsaKeyPair rsaKeyPair = CipherCodec.rsa().newKeyPair();
+            EncodeCodec.base64().encodeToString(Codecs.aesCodec().encryptToString(aesKey, password)));
+        RsaKeyPair rsaKeyPair = Codecs.rsaCodec().newKeyPair();
         logger.log("{}: {}", CodecAlgorithm.RSA,
-            EncodeCodec.base64().encodeToString(CipherCodec.rsa().encryptToString(rsaKeyPair.publicKey(), password)));
-        Sm2KeyPair sm2KeyPair = CipherCodec.sm2().newKeyPair();
+            EncodeCodec.base64().encodeToString(Codecs.rsaCodec().encryptToString(rsaKeyPair.publicKey(), password)));
+        Sm2KeyPair sm2KeyPair = Codecs.sm2Codec().newKeyPair();
         logger.log("{}: {}", CodecAlgorithm.SM2,
-            EncodeCodec.base64().encodeToString(CipherCodec.sm2().encryptToString(sm2KeyPair.publicKey(), password)));
+            EncodeCodec.base64().encodeToString(Codecs.sm2Codec().encryptToString(sm2KeyPair.publicKey(), password)));
     }
 
     @Test

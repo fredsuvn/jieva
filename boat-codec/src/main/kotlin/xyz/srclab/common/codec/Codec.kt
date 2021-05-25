@@ -4,7 +4,7 @@ import xyz.srclab.annotations.concurrent.ThreadSafe
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 
 /**
- * Codec interface.
+ * Codec interface, represents a type of codec way.
  *
  * @author sunqian
  *
@@ -12,6 +12,7 @@ import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
  * @see DigestCodec
  * @see MacCodec
  * @see CipherCodec
+ * @see CodecAlgorithm
  */
 @ThreadSafe
 interface Codec {

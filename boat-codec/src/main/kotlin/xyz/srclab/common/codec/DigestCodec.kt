@@ -1,13 +1,12 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.lang.toBytes
 import xyz.srclab.common.lang.toChars
 import java.io.OutputStream
 import java.security.MessageDigest
 
 /**
- * Digest codec.
+ * Digest codec such as `MD5`.
  *
  * @author sunqian
  */
@@ -75,24 +74,6 @@ interface DigestCodec : Codec {
 
     companion object {
 
-        @JvmName("withAlgorithm")
-        @JvmOverloads
-        @JvmStatic
-        fun CharSequence.toDigestCodec(
-            digest: () -> MessageDigest = { MessageDigest.getInstance(this.toString()) }
-        ): DigestCodec {
-            return this.toCodecAlgorithm().toDigestCodec(digest)
-        }
-
-        @JvmName("withAlgorithm")
-        @JvmOverloads
-        @JvmStatic
-        fun CodecAlgorithm.toDigestCodec(
-            digest: () -> MessageDigest = { MessageDigest.getInstance(this.name) }
-        ): DigestCodec {
-            return DigestCodecImpl(this.name, digest)
-        }
-
         @JvmStatic
         fun md2(): DigestCodec {
             return CodecAlgorithm.MD2.toDigestCodec()
@@ -123,8 +104,24 @@ interface DigestCodec : Codec {
             return CodecAlgorithm.SHA512.toDigestCodec()
         }
 
+        @JvmStatic
+        fun withAlgorithm(
+            algorithm: CharSequence,
+            digest: () -> MessageDigest
+        ): DigestCodec {
+            return withAlgorithm(algorithm.toCodecAlgorithm(), digest)
+        }
+
+        @JvmStatic
+        fun withAlgorithm(
+            algorithm: CodecAlgorithm,
+            digest: () -> MessageDigest
+        ): DigestCodec {
+            return DigestCodecImpl(algorithm.name, digest)
+        }
+
         private class DigestCodecImpl(
-            private val algorithm: String,
+            algorithm: String,
             private val digest: () -> MessageDigest
         ) : DigestCodec {
 

@@ -1,6 +1,5 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.rsa.RsaCodec
 import xyz.srclab.common.codec.sm2.Sm2Codec
 import xyz.srclab.common.codec.sm2.Sm2Params
@@ -10,7 +9,7 @@ import java.io.OutputStream
 import javax.crypto.Cipher
 
 /**
- * Reversible cipher codec which support `encrypt` and `decrypt`.
+ * Reversible cipher codec which support `encrypt` and `decrypt` such as `AES`.
  *
  * @author sunqian
  *
@@ -142,54 +141,48 @@ interface CipherCodec : Codec {
 
     companion object {
 
-        @JvmName("withAlgorithm")
-        @JvmOverloads
-        @JvmStatic
-        fun CharSequence.toCipherCodec(
-            cipher: () -> Cipher = { Cipher.getInstance(this.toString()) }
-        ): CipherCodec {
-            return this.toCodecAlgorithm().toCipherCodec(cipher)
-        }
-
-        @JvmName("withAlgorithm")
-        @JvmOverloads
-        @JvmStatic
-        fun CodecAlgorithm.toCipherCodec(
-            cipher: () -> Cipher = { Cipher.getInstance(this.name) }
-        ): CipherCodec {
-            return CipherCodecImpl(this.name, cipher)
-        }
-
-        @JvmOverloads
         @JvmStatic
         fun aes(
-            cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.AES_NAME) }
+            cipher: () -> Cipher
         ): CipherCodec {
             return CodecAlgorithm.AES.toCipherCodec(cipher)
         }
 
-        @JvmOverloads
         @JvmStatic
         fun rsa(
-            cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.RSA_NAME) }
+            cipher: () -> Cipher
         ): RsaCodec {
             return RsaCodec(cipher = cipher)
         }
 
-        @JvmOverloads
         @JvmStatic
         fun rsa(
             encryptBlockSize: Int,
             decryptBlockSize: Int,
-            cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.RSA_NAME) }
+            cipher: () -> Cipher
         ): RsaCodec {
             return RsaCodec(encryptBlockSize, decryptBlockSize, cipher)
         }
 
-        @JvmOverloads
         @JvmStatic
-        fun sm2(sm2Params: Sm2Params = Sm2Params.DEFAULT): Sm2Codec {
+        fun sm2(sm2Params: Sm2Params): Sm2Codec {
             return Sm2Codec(sm2Params)
+        }
+
+        @JvmStatic
+        fun withAlgorithm(
+            algorithm: CharSequence,
+            cipher: () -> Cipher
+        ): CipherCodec {
+            return withAlgorithm(algorithm.toCodecAlgorithm(), cipher)
+        }
+
+        @JvmStatic
+        fun withAlgorithm(
+            algorithm: CodecAlgorithm,
+            cipher: () -> Cipher
+        ): CipherCodec {
+            return CipherCodecImpl(algorithm.name, cipher)
         }
 
         private class CipherCodecImpl(
