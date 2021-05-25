@@ -1,4 +1,4 @@
-# ![Boat Core](../logo.svg) Boat Core: Core Lib of [Boat](../README.md)
+# ![Boat Core](../logo.svg) `boat-core`: Boat Core -- Core Lib of [Boat](../README.md)
 
 ## Choose doc style you like:
 

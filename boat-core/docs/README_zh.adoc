@@ -1,441 +1,356 @@
-= image:../logo.svg[Boat] Boat: SrcLab的Java/kotlin核心基础库
+= image:../../logo.svg[Boat Core] `boat-core`: Boat Core -- Core Lib of link:../../README.md[Boat]
 :toc:
 :toclevels: 3
 :toc-title: 目录
 :last-update-label!:
-孙谦 <fredsuvn@163.com>
+Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
-:url: https://github.com/srclab-projects/boat
-:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
-
-:qq-group: QQ group: 1037555759
-:boat-version: 0.0.1
 
 == 简介
 
-Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于SrcLab里的项目.
-它提供了许多方便快捷的接口, 函数和工具.
+Boat core link:../../README.md[Boat] 的核心接口, 方法和工具, 包括:
 
-.Boat包括:
-* *boat-annotations*: 核心注解, 如@Nullable, @NotNull, @DefaultNullable, @DefaultNotNull;
-* *boat-core*: 核心和基础的接口, 功能, 和工具;
-* *boat-serialize*: 序列化和反序列化的接口和工具 (支持json等);
-* *boat-codec*: 编码接口和工具 (支持hex, base64, SHA, MD, HMAC, AES, RSA, SM2等);
-* *boat-id*: 一个轻量级的ID生成框架;
-* *boat-test*: 测试依赖管理, 用来在测试编译和运行范围下引入测试框架;
-* *boat-bom*: Boat Bom.
+* <<Lang>>: 基础包, 提供一系列核心接口和组件;
+* <<Bean>>: Bean包, 支持快速便捷的`bean`操作;
+* <<Convert>>: 类型转换包, 支持大量的类型间相互转换;
+* <<Cache>>: 缓存包, 提供核心缓存接口和若干内置实现;
+* <<Run>>: 关于运行线程的包, 提供 `Runner` 接口和实现;
+* <<Bus>>: Bus包, 提供 `EventBus` 接口;
+* <<Invoke>>: 提供 `Invoker` 接口和实现;
+* <<Proxy>>: 提供 `ProxyClass` 来进行动态代理, 反射, `spring-core` 或 `cglib` 方式;
+* <<State>>: 提供 `State` 接口来代表一个状态;
+* <<Exception>>: 关于异常的包;
+* <<Collect>>: 集合扩展包, 支持 `链式操作`, `多值Map`, 大量集合工具类等;
+* <<Reflect>>: 反射扩展包, 提供许多便捷反射操作;
+* <<IO>>: IO扩展包;
+* <<Jvm>>: 提供JVM底层操作;
+* <<Utils>>: 其他便捷工具包;
+* <<Test>>: 提供用于测试的接口和工具;
 
-* *boat-others*: Boat也有对其他特殊需求或第三方的支持, 参见link:../boat-others/README.md[boat-others].
+== 用法
 
-如果你需要一次引入常用的模块 (core, codec, serialize and id), 只需要:
+=== Lang
 
-* *boat*: 引入所有常用模块包括core, codec, serialize和id.
+Lang包提供一系列核心接口和组件:
 
-== 获取
-
-.Gradle
-[source,groovy,subs="attributes+"]
-----
-implementation("xyz.srclab.common:boat:{boat-version}")
-----
-
-.Maven
-[source,xml,subs="attributes+"]
-----
-<dependency>
-    <groupId>xyz.srclab.common</groupId>
-    <artifactId>boat</artifactId>
-    <version>{boat-version}</version>
-</dependency>
-----
-
-.源代码
-{url}
-
-== 使用
-
-=== BoatAnnotations (boat-annotations)
-
-Boat Annotations提供了许多可以让代码整洁又干净的注解:
-
-* *DefaultNonNull*/*DefaultNullable*: 它说明注解范围内所有的变量, 属性, 参数和类型使用默认都是non-null/nullable的, 通常用在package-info.java中;
-* *NotNull*/*Nullable*: 它说明被注解的变量, 属性, 参数和类型使用是non-null/nullable的;
-* *JavaBean*: 它说明被注解的类型是一个javabean, 所有的属性默认都是nullable的;
-* *Acceptable*/*Accepted*: 它说明参数只能接受指定的几个类型.
-* *Rejectable*/*Rejected*: 它说明参数不接受指定的几个类型.
-* *Written*: 它说明参数可能被进行写操作;
-* *Immutable*: 它说明被注解的变量, 属性, 参数和类型使用是不可变和线程安全的;
-* *ThreadSafe*: 它说明被注解的变量, 属性, 参数和类型使用是线程安全的;
-* *ThreadSafeIf*: 它说明被注解的变量, 属性, 参数和类型使用在满足指定条件的情况下是线程安全的;
-
-..Java Examples
-[source,java]
-----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/annotations/AnnotationSample.java[]
-----
-
-.Kotlin Examples
-[source,kotlin]
-----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/annotations/AnnotationSample.kt[]
-----
-
-=== Boat Core (boat-core)
-
-==== Lang
-
-Base包提供对Java/Kotlin的基础和增强接口, 功能和工具:
-
-* 全局运行时, 上下文, 默认和环境对象: Current, Defaults, Environment;
-* 语法增强(主要针对java): Let, Ref, Lazy, LazyString;
-* 字符串功能: CharsFormat, CharsTemplate, NamingCase;
-* 特殊字符支持: CtlChars, EscChars, CsiChars, SgrChars;
-* 核心和辅助接口: Accessor (以及 GenericAccessor), Serial, SpecParser, CachingProductBuilder, Processing;
-* 常用工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders;
+* 全局系统对象: `Current`, `Defaults`, `Environment`;
+* 语法增强 (主要针对Java): `Let`, `Ref`, `Lazy`, `LazyString`;
+* 字符串功能: `CharsFormat`, `CharsTemplate`, `NamingCase`;
+* 特殊字符支持: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
+* 访问接口: `Accessor`, `Getter`, `Setter`, `GenericAccessor`, `GenericGetter`, `GenericSetter`;
+* 辅助对象: SpecParser, CachingProductBuilder, Processing;
+* 公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/lang/LangSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/lang/LangSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/lang/LangSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/lang/LangSample.kt[]
 ----
 
-==== Bean
+=== Bean
 
-Bean包提供了强大的bean操作功能:
+Bean包, 支持快速便捷的`bean`操作:
 
-* Beans: 默认的bean工具;
-* BeanResolver: Bean操作的核心接口, Beans使用它的默认实现;
+* `Beans`: Bean操作的工具类;
+* `BeanResolver`: 核心接口用来解析 `bean`, `Beans` 使用它的默认实现;
+* `BeanResolveHandler`: `BeanResolver` 用来解析的处理器;
+* `BeanMap`: 一种将 `bean` 和 `Map` 关联起来的 `Map`;
+* `BeanType`: 用来描述 `bean` 结构的接口, 就像 `Class`;
+* `PropertyType`: 用来描述 `bean` 属性的接口, 就像 `Field`;
 
-TIP: 在复制属性(copy-properties)功能上, 它比Apache的BeanUtils快20倍以上.
+TIP: `Beans` 在属性复制 (copyProperties) 上比 `Apache BeanUtils` 快20倍.
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/bean/BeanSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/bean/BeanSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/bean/BeanSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/bean/BeanSample.kt[]
 ----
 
-==== Bus
+=== Convert
 
-Bus包提供EventBus.
+Convert包提供大量的类型转换功能:
+
+* `Converts`: 类型转换工具类;
+* `Converter`: 类型转换的核心接口, `Converts` 使用它的默认实现;
+* `ConvertHandler`: `Converter` 用来转换的处理器;
+* `FastConverter`: 一种定向类型转换的转换器;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/bus/EventBusSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/convert/ConvertSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/bus/EventBusSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/convert/ConvertSample.kt[]
 ----
 
-==== Cache
+=== Cache
 
-Boat提供一个缓存接口和若干实现:
+Cache包提供缓存核心接口和内置实现:
 
-* Cache: 缓存核心接口;
-* FastCache: 使用WeakHashMap和ThreadLocal的实现;
-* CaffeineCache: 使用Caffeine的实现;
-* GuavaCache: 使用Guava的实现;
-* MapCache: 将Map作为缓存的实现;
-* ThreadLocalCache: 将ThreadLocalMap作为缓存的实现.
+* `Cache`: 核心缓存接口;
+* `FastCache`: 使用 `WeakHashMap` 和 `ThreadLocal` 的实现;
+* `CaffeineCache`: 使用 `Caffeine` 的实现;
+* `GuavaCache`: 使用 `Guava` 的实现;
+* `MapCache`: 使用 `Map` 的实现, 也就是让 `Map` 编程 `Cache`;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/cache/CacheSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/cache/CacheSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/cache/CacheSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/cache/CacheSample.kt[]
 ----
 
-==== Collect
+=== Run
 
-Collect包提供集合和数组的接口, 工具和Ops操作:
+Run包是关于运行线程的包, 提供 `Runner` 接口和实现:
 
-* Collects: Collection工具;
-* ArrayCollects: 数组工具;
-* IterableOps, ListOps, SetOps, MapOps: Ops接口, 提供链式操作, 主要用于Java;
-* SequenceOps: Sequence的Ops接口;
-* IterableType, MapType: 泛型集合的元类型接口;
-* MultiMaps: MultiMaps提供 multi-values Map, 比如SetMap, MutableSetMap, ListMap和MutableListMap.
+* `Runner`: 用来运行线程的核心接口;
+* `Running`: 代表一个运行中的实体;
+* `Scheduler`: 用来执行调度的核心接口;
+* `Scheduling`: 代表一个执行中的调度;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/collect/CollectSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/run/RunSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/collect/CollectSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/run/RunSample.kt[]
 ----
 
-==== Convert
+=== Bus
 
-Convert包提供类型转换功能:
+Bus包提供 `EventBus` 接口:
 
-* Converts: 转换工具;
-* Converter: 类型转换的核心接口, Converts使用它的默认实现;
-* FastConverter: 快速和功能窄化版本的Converter.
+* `EventBus`: 事件总线接口的实现;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/convert/ConvertSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/bus/EventBusSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/convert/ConvertSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/bus/EventBusSample.kt[]
 ----
 
-==== Exception
+=== Invoke
 
-Exception包提供StatusException和ExceptionStatus, 继承自State (参考 <<State>>), 还有一个ShouldNotException.
+Invoke包提供 `Invoker` 接口和实现:
+
+* `Invoker`: 核心调用接口;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/exception/ExceptionSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/invoke/InvokeSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/exception/ExceptionSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/invoke/InvokeSample.kt[]
 ----
 
-==== Invoke
+=== Proxy
 
-Invoke包提供Invoker接口去调用方法和函数.
+Proxy包提供 `ProxyClass` 用带进行动态代理, 使用 `反射`, `spring-core` 或 `cglib` 方法:
+
+* `ProxyClass`: 代理目标 `Class` 的核心接口;
+* `ProxyMethod`: 代理的方法体;
+* `ProxyClassFactory`: 创建 `ProxyClass` 的工厂, 内置 `Reflection`, `spring-core` 和 `cglib` 实现;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/invoke/InvokeSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/proxy/ProxySample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/invoke/InvokeSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/proxy/ProxySample.kt[]
 ----
 
-==== Jvm
+=== State
 
-Jvm包提供Jvms工具类.
+State包提供 `State` 接口代表一个状态:
+
+* `State`: 代表状态的核心接口;
+* `StringState`: 字符串类型的 `State`;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/jvm/JvmSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/state/StateSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/jvm/JvmSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/state/StateSample.kt[]
 ----
 
-==== Proxy
+=== Exception
 
-Proxy提供类代理功能, 底层使用spring-cglib, cglib或者JDK proxy.
+Exception包提供关于 `Exception` 的实现和工具:
+
+* `ExceptionStatus`: 继承 <<State>> 的状态, 用于 `Exception`;
+* `StatusException`: 实现 `ExceptionStatus` 的异常;
+* `ImpossibleException`: 代表一个不应该被抛出但确实被抛出的异常;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/proxy/ProxySample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/exception/ExceptionSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/proxy/ProxySample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/exception/ExceptionSample.kt[]
 ----
 
-==== Reflect
+=== Collect
 
-Reflect包提供相关工具类:
+集合扩展包, 支持 `链式操作`, `多值Map`, 大量集合工具类等:
 
-* Reflects: 提供反射操作;
-* Types: 用来创建泛型类型;
-* TypeRef: 用来获取类型引用.
+* `Collects`: 集合工具类;
+* `IterableOps`, `ListOps`, `SetOps`, `MapOps`, `SequenceOps`: 提供链式操作的接口;
+* `IterableType`, `MapType`: 代表集合泛型类型;
+* `MultiMaps`: `MultiMaps` 提供多值 `Map` 如 `SetMap`, `MutableSetMap`, `ListMap` 何 `MutableListMap`;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/reflect/ReflectSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/collect/CollectSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/reflect/ReflectSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/collect/CollectSample.kt[]
 ----
 
-==== Run
+=== Reflect
 
-Run包提供Runner和Scheduler接口来运行一段代码, 可以在一个线程或者协程里.
+反射扩展包, 提供许多便捷反射操作:
+
+* `Reflects`: 反射工具类;
+* `Types`: 用来构造泛型类型;
+* `TypeRef`: 以直接代码的方式构造泛型类型;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/run/RunSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/reflect/ReflectSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/run/RunSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/reflect/ReflectSample.kt[]
 ----
 
-==== State
+=== IO
 
-State包提供State接口来复制定制状态概念的类型.
+IO扩展包:
+
+* `IOStreams`: 提供 `Input`/`Output`, `Reader`/`Writer` 操作的工具类;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/state/StateSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/io/IOSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/state/StateSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/io/IOSample.kt[]
 ----
 
-==== Utils
+=== Jvm
 
-其他辅助工具:
+提供JVM底层操作:
 
-* Counter: 针对int/long的简单计数器, 可原子化;
-* About: 产品信息如About, Author, SemVer.
+* `Jvms`: 提供JVM底层操作;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/utils/UtilsSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/jvm/JvmSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/utils/UtilsSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/jvm/JvmSample.kt[]
 ----
 
-==== Test
+=== Utils
 
-Test包提供简单的测试工具:
+其他便捷工具包:
 
-* Tester: 一个用来启动测试任务的接口;
-* TestLogger: 简单的测试日志;
-* TestTask and TestListener: 测试任务和监听器;
-* Tests: 测试工具类.
+* `Counter`: 简单的int/long计数器, 可以是原子的;
+* `About`: 产品信息如 `About`, `Author`, `SemVer`;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/test/TestSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/utils/UtilsSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/test/TestSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/utils/UtilsSample.kt[]
 ----
 
-=== Boat Serialize (boat-serialize)
+=== Test
 
-Boat序列化工具(需要导入boat-serialize)提供序列化核心接口:
+提供用于测试的接口和工具:
 
-* Serializer: 序列化核心接口;
-* JsonSerials: JSON序列化工具;
-* JsonSerial: JSON序列化核心接口, JsonSerials使用它的默认实现(Jackson);
-* Json: JSON的核心接口, 代表一个JSON对象.
+* `Tester`: 执行测试人物的核心接口;
+* `TestTask`, `TestListener`: 测试任何和监听器的核心接口;
+* `TestLogger`: 简单的测试日志工具;
+* `Tests`: 测试工具类;
 
 .Java Examples
 [source,java]
 ----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/serialize/SerializeSample.java[]
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/test/TestSample.java[]
 ----
 
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/serialize/SerializeSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/test/TestSample.kt[]
 ----
-
-=== Boat Codec (boat-codec)
-
-Boat Codec (需要引入boat-codec)提供Codec, CodecKeys, AesKeys 以及 其他接口来实现编码功能, 支持hex, base64, AES, RSA, SM2以及更多算法:
-
-* Codec: 编码功能的核心接口;
-* CodecKeys: 编码秘钥工具;
-* AesKeys: AES秘钥工具.
-
-.Java Examples
-[source,java]
-----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/codec/CodecSample.java[]
-----
-
-.Kotlin Examples
-[source,kotlin]
-----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/codec/CodecSample.kt[]
-----
-
-=== Boat Id (boat-id)
-
-Boat Id (需要引入boat-id)是一个轻量级id生成框架.
-它提供IdFactory和一套接口来生成id:
-
-* IdFactory: 核心接口, 用来生成新id;
-* IdComponentFactory: 核心接口, 用来生成新id的一部分;
-* AbstractIdFactory: IdFactory骨架实现, 用来辅助实现完整的IdFactory;
-* StringIdFactory: IdFactory骨架实现, 用来辅助实现String类型id的IdFactory;
-
-Boat ID同时提供StringIdSpec类, 一个String类型id的IdFactory, 可以从给定的字符串说明中生成新id, 请去看它的javadoc.
-
-.Java Examples
-[source,java]
-----
-include::../boat-sample/src/test/java/sample/java/xyz/srclab/common/id/IdSample.java[]
-----
-
-.Kotlin Examples
-[source,kotlin]
-----
-include::../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/id/IdSample.kt[]
-----
-
-== 贡献和联系方式
-
-* {emaill}
-* {url}
-* {qq-group}
-
-== License
-
-{license}
