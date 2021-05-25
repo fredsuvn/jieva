@@ -216,10 +216,22 @@ fun sm2Codec(sm2Params: Sm2Params = Sm2Params.DEFAULT): Sm2Codec {
     return CipherCodec.sm2(sm2Params)
 }
 
+@JvmName("hexString")
 fun ByteArray.toHexString(): String {
     return hexCodec().encodeToString(this)
 }
 
+@JvmName("hexString")
+fun CharSequence.toHexString(): String {
+    return hexCodec().encodeToString(this)
+}
+
+@JvmName("base64String")
 fun ByteArray.toBase64String(): String {
+    return base64Codec().encodeToString(this)
+}
+
+@JvmName("base64String")
+fun CharSequence.toBase64String(): String {
     return base64Codec().encodeToString(this)
 }

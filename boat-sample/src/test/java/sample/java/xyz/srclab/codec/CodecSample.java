@@ -32,4 +32,10 @@ public class CodecSample {
         //hei, pengyou, ruguozhendeshiniqingdazhaohu
         logger.log("decrypt: {}", decrypt);
     }
+
+    @Test
+    public void testEncode() {
+        logger.log(Codecs.hexString("123456789"));
+        logger.log(Codecs.base64String("123456789"));
+    }
 }

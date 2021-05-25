@@ -5,6 +5,8 @@ import xyz.srclab.common.codec.Base64Codec
 import xyz.srclab.common.codec.Codecing.Companion.startCodec
 import xyz.srclab.common.codec.aes.toAesKey
 import xyz.srclab.common.codec.aesCodec
+import xyz.srclab.common.codec.toBase64String
+import xyz.srclab.common.codec.toHexString
 import xyz.srclab.common.test.TestLogger
 
 class CodecSample {
@@ -27,6 +29,12 @@ class CodecSample {
         decrypt = encrypt.startCodec().decryptAes(secretKey).doFinalString()
         //hei, pengyou, ruguozhendeshiniqingdazhaohu
         logger.log("decrypt: {}", decrypt)
+    }
+
+    @Test
+    fun testEncode() {
+        logger.log("123456789".toHexString())
+        logger.log("123456789".toBase64String())
     }
 
     companion object {
