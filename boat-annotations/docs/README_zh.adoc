@@ -1,0 +1,32 @@
+= image:../../logo.svg[Boat Annotations] `boat-annotations`: Boat Annotations -- Annotations of link:../../README.md[Boat]
+:toc:
+:toclevels: 3
+:toc-title: 目录
+:last-update-label!:
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:emaill: fredsuvn@163.com
+
+Boat Annotations提供了许多可以让代码整洁又干净的注解:
+
+* *DefaultNonNull*/*DefaultNullable*: 它说明注解范围内所有的变量, 属性, 参数和类型使用默认都是non-null/nullable的, 通常用在package-info.java中;
+* *NotNull*/*Nullable*: 它说明被注解的变量, 属性, 参数和类型使用是non-null/nullable的;
+* *JavaBean*: 它说明被注解的类型是一个javabean, 所有的属性默认都是nullable的;
+* *Acceptable*/*Accepted*: 它说明参数只能接受指定的几个类型;
+* *Rejectable*/*Rejected*: 它说明参数不接受指定的几个类型;
+* *Written*: 它说明参数可能被进行写操作;
+* *Immutable*: 它说明被注解的变量, 属性, 参数和类型使用是不可变和线程安全的;
+* *ThreadSafe*: 它说明被注解的变量, 属性, 参数和类型使用是线程安全的;
+* *ThreadSafeIf*: 它说明被注解的变量, 属性, 参数和类型使用在满足指定条件的情况下是线程安全的;
+
+..Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/annotations/AnnotationSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/annotations/AnnotationSample.kt[]
+----
