@@ -17,7 +17,7 @@ public class IOTest {
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
-    public void testIO() throws Exception {
+    public void testStream() throws Exception {
         String text = "123456\r\n234567\r\n";
         InputStream input = new ByteArrayInputStream(text.getBytes());
         String inputString = IOStreams.readString(input);
@@ -34,7 +34,12 @@ public class IOTest {
         IOStreams.readTo(input, output);
         input.reset();
         Assert.assertEquals(output.toByteArray(), bytes);
+    }
 
+    @Test
+    public void testReader() throws Exception {
+        String text = "123456\r\n234567\r\n";
+        InputStream input = new ByteArrayInputStream(text.getBytes());
         Reader reader = IOStreams.toReader(input);
         String readString = IOStreams.readString(reader);
         input.reset();
@@ -46,11 +51,11 @@ public class IOTest {
         List<String> readStrings = IOStreams.readLines(reader);
         input.reset();
         Assert.assertEquals(readStrings, Arrays.asList("123456", "234567"));
-        output.reset();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
         Writer writer = IOStreams.toWriter(output);
         IOStreams.readTo(reader, writer);
         input.reset();
         writer.flush();
-        Assert.assertEquals(output.toByteArray(), bytes);
+        Assert.assertEquals(output.toByteArray(), text.getBytes());
     }
 }
