@@ -1,4 +1,4 @@
-= image:../../logo.svg[Boat Codec] `boat-codec`: Boat Codec -- Codec Lib of link:../../README.md[Boat]
+= image:../../logo.svg[Boat Codec] `boat-codec`: Boat Codec -- link:../../README.md[Boat] 编码库
 :toc:
 :toclevels: 3
 :toc-title: 目录

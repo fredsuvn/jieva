@@ -51,7 +51,7 @@ class ProtobufSample {
         )
         //javaMessageData: {"type":"TYPE_0","message":"666","numberList":["7","8","9"],"entryMap":{"m1":"mm1","m2":"mm2"}}
         logger.log("javaMessageData: {}", javaMessageData.toJsonString())
-        Assert.assertEquals(javaMessageData.type, MessageData.Type.TYPE_0)
+        Assert.assertEquals(javaMessageData.type, "TYPE_0")
         Assert.assertEquals(javaMessageData.message, "666")
         Assert.assertEquals(javaMessageData.numberList, listOf("7", "8", "9"))
         Assert.assertEquals(
@@ -66,7 +66,7 @@ class ProtobufSample {
         //javaRequestMessage: {"id":"123","data":{"type":"TYPE_0","message":"666","numberList":["7","8","9"],"entryMap":{"m1":"mm1","m2":"mm2"}}}
         logger.log("javaRequestMessage: {}", javaRequestMessage.toJsonString())
         Assert.assertEquals(javaRequestMessage.id, "123")
-        Assert.assertEquals(javaRequestMessage.data!!.type, MessageData.Type.TYPE_0)
+        Assert.assertEquals(javaRequestMessage.data!!.type, "TYPE_0")
         Assert.assertEquals(javaRequestMessage.data!!.message, "666")
         Assert.assertEquals(javaRequestMessage.data!!.numberList, listOf("7", "8", "9"))
         Assert.assertEquals(
@@ -74,7 +74,7 @@ class ProtobufSample {
             LinkedHashMap<Any, Any>().putEntries("m1", "mm1", "m2", "mm2")
         )
         javaRequestMessage.id = "999"
-        javaMessageData.type = MessageData.Type.TYPE_1
+        javaMessageData.type = "TYPE_1"
         javaMessageData.message = "java"
         javaMessageData.numberList = listOf("5", "6", "7")
         javaMessageData.entryMap = LinkedHashMap<Any, Any>().putEntries("j1", "jj1").asAny<Map<String?, String?>>()
@@ -137,7 +137,7 @@ class ProtobufSample {
     }
 
     class JavaMessageData {
-        var type: MessageData.Type? = null
+        var type: String? = null
         var message: String? = null
         var numberList: List<String?>? = null
         var entryMap: Map<String?, String?>? = null

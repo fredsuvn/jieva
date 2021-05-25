@@ -1,4 +1,4 @@
-= image:../../logo.svg[Boat Core] `boat-core`: Boat Core -- Core Lib of link:../../README.md[Boat]
+= image:../../logo.svg[Boat Core] `boat-core`: Boat Core -- link:../../README.md[Boat] 核心库
 :toc:
 :toclevels: 3
 :toc-title: 目录

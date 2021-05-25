@@ -1,4 +1,4 @@
-= image:../../logo.svg[Boat Annotations] `boat-annotations`: Boat Annotations -- Annotations of link:../../README.md[Boat]
+= image:../../logo.svg[Boat Annotations] `boat-annotations`: Boat Annotations -- link:../../README.md[Boat] 注解库
 :toc:
 :toclevels: 3
 :toc-title: 目录

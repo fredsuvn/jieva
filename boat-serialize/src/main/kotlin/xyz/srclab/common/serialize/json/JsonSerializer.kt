@@ -43,6 +43,11 @@ interface JsonSerializer : Serializer<Json> {
         }
     }
 
+    @JvmDefault
+    fun toJsonString(source: Any?): String {
+        return toJson(source).toJsonString()
+    }
+
     companion object {
 
         @JvmField

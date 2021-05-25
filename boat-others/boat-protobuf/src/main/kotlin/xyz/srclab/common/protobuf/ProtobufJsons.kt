@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule
 import xyz.srclab.common.serialize.json.JsonSerializer
-import xyz.srclab.common.serialize.json.JsonSerializer.Companion.toJsonSerializer
+import xyz.srclab.common.serialize.json.toJsonSerializer
 
 @JvmField
 val PROTOBUF_OBJECT_MAPPER: JsonMapper = run {
