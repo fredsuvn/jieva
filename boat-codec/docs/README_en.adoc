@@ -1,0 +1,119 @@
+= image:../../logo.svg[Boat Codec] `boat-codec`: Boat Codec -- Codec Lib of link:../../README.md[Boat]
+:toc:
+:toclevels: 3
+:last-update-label!:
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:emaill: fredsuvn@163.com
+
+== Introduction
+
+Boat Codec provides Unified interfaces (`Codec`, `Codecing`) to support various codec operations sucu as HEX, BASE64, MD5, HmacMD5, AES, RSA, SM2 ,etc.
+
+== Usage
+
+Base utilities of boat-codec is `Codecs`:
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        RsaCodec rsaCodec = Codecs.rsaCodec();
+        RsaKeyPair rsaKeyPair = rsaCodec.newKeyPair();
+        String data = random(512);
+        byte[] bytes = rsaCodec.encrypt(rsaKeyPair.publicKey(), data);
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val rsaCodec = rsaCodec()
+        val rsaKeyPair = rsaCodec.newKeyPair()
+        val data: String = random(512)
+        val bytes = rsaCodec.encrypt(rsaKeyPair.publicKey, data)
+    }
+}
+----
+
+Boat Codec has 4 type of codec processor:
+
+* `Codec`: Core codec interface, represents a type of codec way;
+* `EncodeCodec`: Encode code such as HEX, BASE64;
+* `DigestCodec`: Digest codec such as MD5;
+* `MacCodec`: MAC codec such as HmacMD5;
+* `CipherCodec`: Cipher codec such as `AES`, `RSA`, `SM2`;
+
+There are two styles to do codec operation: `Static` or `Chain`
+
+=== Static Style:
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        RsaCodec rsaCodec = Codecs.rsaCodec();
+        byte[] bytes = rsaCodec.encrypt(rsaKeyPair.publicKey(), data);
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val rsaCodec = rsaCodec()
+        val bytes = rsaCodec.encrypt(rsaKeyPair.publicKey, data)
+    }
+}
+----
+
+=== Chain Style:
+
+Using `Codecing`: Codec processing for chain operation.
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        messageBase64.startCodec().decodeBase64().encryptAes(secretKey).doFinal()
+    }
+}
+----
+
+== Samples
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/codec/CodecSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/codec/CodecSample.kt[]
+----

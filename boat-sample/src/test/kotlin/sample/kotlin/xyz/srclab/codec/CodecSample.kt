@@ -2,9 +2,9 @@ package sample.kotlin.xyz.srclab.codec
 
 import org.testng.annotations.Test
 import xyz.srclab.common.codec.Base64Codec
-import xyz.srclab.common.codec.CipherCodec
 import xyz.srclab.common.codec.Codecing.Companion.startCodec
 import xyz.srclab.common.codec.aes.toAesKey
+import xyz.srclab.common.codec.aesCodec
 import xyz.srclab.common.test.TestLogger
 
 class CodecSample {
@@ -17,8 +17,8 @@ class CodecSample {
 
         //Use static
         val message: String = Base64Codec.decodeToString(messageBase64)
-        var encrypt = CipherCodec.aes().encrypt(secretKey, message)
-        var decrypt = CipherCodec.aes().decryptToString(secretKey, encrypt)
+        var encrypt = aesCodec().encrypt(secretKey, message)
+        var decrypt = aesCodec().decryptToString(secretKey, encrypt)
         //hei, pengyou, ruguozhendeshiniqingdazhaohu
         logger.log("decrypt: {}", decrypt)
 

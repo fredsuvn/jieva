@@ -1,8 +1,8 @@
 package sample.java.xyz.srclab.codec;
 
 import org.testng.annotations.Test;
-import xyz.srclab.common.codec.CipherCodec;
 import xyz.srclab.common.codec.Codecing;
+import xyz.srclab.common.codec.Codecs;
 import xyz.srclab.common.codec.EncodeCodec;
 import xyz.srclab.common.codec.aes.AesKeys;
 import xyz.srclab.common.test.TestLogger;
@@ -21,8 +21,8 @@ public class CodecSample {
 
         //Use static
         String message = EncodeCodec.base64().decodeToString(messageBase64);
-        byte[] encrypt = CipherCodec.aes().encrypt(secretKey, message);
-        String decrypt = CipherCodec.aes().decryptToString(secretKey, encrypt);
+        byte[] encrypt = Codecs.aesCodec().encrypt(secretKey, message);
+        String decrypt = Codecs.aesCodec().decryptToString(secretKey, encrypt);
         //hei, pengyou, ruguozhendeshiniqingdazhaohu
         logger.log("decrypt: {}", decrypt);
 
