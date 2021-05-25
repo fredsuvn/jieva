@@ -10,32 +10,34 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 /**
- * Represents a serializable type.
+ * Represents a serial type.
+ *
+ * Serial type is serializable.
  *
  * @author sunqian
  */
 interface Serial {
 
     @JvmDefault
-    fun <T : OutputStream> writeOutputStream(outputStream: T): T {
+    fun <T : OutputStream> writeTo(outputStream: T): T {
         toInputStream().copyTo(outputStream)
         return outputStream
     }
 
     @JvmDefault
-    fun <T : Writer> writeWriter(writer: T): T {
+    fun <T : Writer> writeTo(writer: T): T {
         toReader().copyTo(writer)
         return writer
     }
 
     @JvmDefault
-    fun <T : Writer> writeWriter(writer: T, charset: Charset): T {
+    fun <T : Writer> writeTo(writer: T, charset: Charset): T {
         toReader(charset).copyTo(writer)
         return writer
     }
 
     @JvmDefault
-    fun <T : ByteBuffer> writeByteBuffer(byteBuffer: T): T {
+    fun <T : ByteBuffer> writeTo(byteBuffer: T): T {
         byteBuffer.put(toByteBuffer())
         return byteBuffer
     }

@@ -40,7 +40,7 @@ public class JsonTest {
             newMap("2", new BigDecimal(2)),
             newMap("3", new BigDecimal(3))
         ));
-        String jsonString = jsonSerializer.toJsonString(testObject);
+        String jsonString = jsonSerializer.toJson(testObject).toJsonString();
         logger.log(jsonString);
         Assert.assertEquals(jsonString, objectMapper.writeValueAsString(testObject));
 
@@ -79,7 +79,7 @@ public class JsonTest {
         //测试时间类型
         long now = System.currentTimeMillis();
         logger.log("now: " + now);
-        String nowJson = jsonSerializer.toJsonString(now);
+        String nowJson = jsonSerializer.toJson(now).toJsonString();
         logger.log("nowJson: " + nowJson);
         Date date = jsonSerializer.toJson(nowJson).toObject(Date.class);
         logger.log("date: " + date);
@@ -144,6 +144,12 @@ public class JsonTest {
         String value1 = json.toMap().get("key1").toString();
         Assert.assertEquals(value1, "value1");
         Files.delete(path);
+    }
+
+    @Test
+    public void testString() {
+        String jsonString = "abc";
+        Assert.assertEquals(JsonSerials.stringify(jsonString), "\"abc\"");
     }
 
     private <K, V> Map<K, V> newMap(K key, V value) {
