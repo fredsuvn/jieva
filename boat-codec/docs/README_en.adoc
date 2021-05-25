@@ -12,7 +12,7 @@ Boat Codec provides Unified interfaces (`Codec`, `Codecing`) to support various 
 
 == Usage
 
-Base utilities of boat-codec is `Codecs`:
+Core utilities of boat-codec is `Codecs`:
 
 .Java Examples
 [source,java]
