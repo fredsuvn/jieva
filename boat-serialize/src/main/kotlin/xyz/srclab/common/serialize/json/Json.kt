@@ -2,7 +2,7 @@ package xyz.srclab.common.serialize.json
 
 import com.fasterxml.jackson.databind.node.NullNode
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.lang.Serial
+import xyz.srclab.common.serialize.Serial
 import java.lang.reflect.Type
 
 /**

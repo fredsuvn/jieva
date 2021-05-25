@@ -1,6 +1,5 @@
 package xyz.srclab.common.serialize
 
-import xyz.srclab.common.lang.Serial
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.serialize.json.JsonSerializer
 import java.lang.reflect.Type
