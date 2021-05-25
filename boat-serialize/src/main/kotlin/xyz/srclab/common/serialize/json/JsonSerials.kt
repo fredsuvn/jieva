@@ -48,7 +48,10 @@ fun Any?.toJsonBytes(): ByteArray {
     return toJson().toJsonBytes()
 }
 
-fun CharSequence.stringify(): String {
+/**
+ * Serializes [this] to json string.
+ */
+fun Any?.stringify(): String {
     return jsonSerializer.serialize(this).toJsonString()
 }
 
