@@ -169,44 +169,52 @@ interface Codecing {
         return decrypt(CodecAlgorithm.SM2, privateKey)
     }
 
+    interface CodecSupplier {
+
+        fun get(algorithm: CodecAlgorithm): Codec
+    }
+
     companion object {
 
-        private val DEFAULT_CIPHER_SUPPLIER: (CodecAlgorithm) -> Codec = label@{
-            val cipher = when (it) {
-                CodecAlgorithm.HEX -> HexCodec
-                CodecAlgorithm.BASE64 -> Base64Codec
-                CodecAlgorithm.RSA -> rsaCodec()
-                CodecAlgorithm.SM2 -> sm2Codec()
-                CodecAlgorithm.PLAIN -> PlainCodec
-                else -> null
-            }
-            if (cipher !== null) {
-                return@label cipher
-            }
-            when (it.type) {
-                CodecAlgorithmType.DIGEST -> it.toDigestCodec()
-                CodecAlgorithmType.CIPHER -> it.toCipherCodec()
-                else -> throw UnsupportedOperationException("Unsupported algorithm: $it")
+        @JvmField
+        val DEFAULT_CODEC_SUPPLIER: CodecSupplier = object : CodecSupplier {
+            override fun get(algorithm: CodecAlgorithm): Codec {
+                val cipher = when (algorithm) {
+                    CodecAlgorithm.HEX -> HexCodec
+                    CodecAlgorithm.BASE64 -> Base64Codec
+                    CodecAlgorithm.RSA -> rsaCodec()
+                    CodecAlgorithm.SM2 -> sm2Codec()
+                    CodecAlgorithm.PLAIN -> PlainCodec
+                    else -> null
+                }
+                if (cipher !== null) {
+                    return cipher
+                }
+                return when (algorithm.type) {
+                    CodecAlgorithmType.DIGEST -> algorithm.toDigestCodec()
+                    CodecAlgorithmType.CIPHER -> algorithm.toCipherCodec()
+                    else -> throw UnsupportedOperationException("Unsupported algorithm: $algorithm")
+                }
             }
         }
 
         @JvmName("forData")
         @JvmOverloads
         @JvmStatic
-        fun ByteArray.startCodec(codec: (CodecAlgorithm) -> Codec = DEFAULT_CIPHER_SUPPLIER): Codecing {
-            return CodecingImpl(this, codec)
+        fun ByteArray.startCodec(codecSupplier: CodecSupplier = DEFAULT_CODEC_SUPPLIER): Codecing {
+            return CodecingImpl(this, codecSupplier)
         }
 
         @JvmName("forData")
         @JvmOverloads
         @JvmStatic
-        fun CharSequence.startCodec(codec: (CodecAlgorithm) -> Codec = DEFAULT_CIPHER_SUPPLIER): Codecing {
-            return this.toBytes().startCodec(codec)
+        fun CharSequence.startCodec(codecSupplier: CodecSupplier = DEFAULT_CODEC_SUPPLIER): Codecing {
+            return this.toBytes().startCodec(codecSupplier)
         }
 
         private class CodecingImpl(
             initData: ByteArray,
-            private val codec: (CodecAlgorithm) -> Codec
+            private val codecSupplier: CodecSupplier = DEFAULT_CODEC_SUPPLIER
         ) : Codecing {
 
             private var data: ByteArray = initData
@@ -214,7 +222,7 @@ interface Codecing {
             private val codecCache: Cache<CodecAlgorithm, Codec> = WeakHashMap<CodecAlgorithm, Codec>().toCache()
 
             private fun getCodec(algorithm: CodecAlgorithm): Codec {
-                return codecCache.getOrLoad(algorithm, codec)
+                return codecCache.getOrLoad(algorithm) { codecSupplier.get(algorithm) }
             }
 
             override fun encode(algorithm: CodecAlgorithm): Codecing {

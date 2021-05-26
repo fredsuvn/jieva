@@ -1,7 +1,8 @@
 package sample.java.xyz.srclab.id;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.id.StringIdSpec;
+import xyz.srclab.common.id.IdSpec;
 import xyz.srclab.common.test.TestLogger;
 
 public class IdSample {
@@ -10,11 +11,37 @@ public class IdSample {
 
     @Test
     public void testId() {
-        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
-        StringIdSpec stringIdSpec = new StringIdSpec(spec);
-        //seq-202102071449568890000-tail
+        //seq-06803239610792857600-tail
+        String spec = "seq-{Snowflake, 20, 41, 10, 12}-tail";
+        IdSpec stringIdSpec = new IdSpec(spec);
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec.create());
+            logger.log(stringIdSpec.newId());
+        }
+
+        //seq{}-06803240106559590400-tail
+        String spec2 = "seq\\{}-{Snowflake, 20, 41, 10, 12}-tail";
+        IdSpec stringIdSpec2 = new IdSpec(spec2);
+        for (int i = 0; i < 10; i++) {
+            logger.log(stringIdSpec2.newId());
+        }
+
+        String spec3 = "seq\\{\\}-{Snowflake, 20, 41, 10, 12";
+        Assert.expectThrows(IllegalArgumentException.class, () -> new IdSpec(spec3));
+        //new StringIdSpec(spec3);
+    }
+
+    @Test
+    public void testCustomId() {
+        String spec = "seq-{Snowflake, 20, 41, 10, 12}-{My, 88888}";
+        IdSpec stringIdSpec = new IdSpec(spec, (IdSpec.ComponentSupplier) type -> {
+            if (type.equals(MyIdComponent.TYPE)) {
+                return new MyIdComponent();
+            }
+            return IdSpec.DEFAULT_COMPONENT_SUPPLIER.get(type);
+        });
+        //seq-06803242693339123712-88888
+        for (int i = 0; i < 10; i++) {
+            logger.log(stringIdSpec.newId());
         }
     }
 }
