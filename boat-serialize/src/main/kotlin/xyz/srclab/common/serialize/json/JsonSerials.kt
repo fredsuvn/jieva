@@ -20,23 +20,23 @@ fun ByteArray.toJson(offset: Int = 0, length: Int = this.size - offset): Json {
     return jsonSerializer.deserialize(this, offset, length)
 }
 
-fun CharSequence.toJson(chars: CharSequence): Json {
+fun CharSequence.toJson(): Json {
     return jsonSerializer.deserialize(this)
 }
 
-fun InputStream.toJson(input: InputStream): Json {
+fun InputStream.toJson(): Json {
     return jsonSerializer.deserialize(this)
 }
 
-fun Reader.toJson(reader: Reader): Json {
+fun Reader.toJson(): Json {
     return jsonSerializer.deserialize(this)
 }
 
-fun ByteBuffer.toJson(byteBuffer: ByteBuffer): Json {
+fun ByteBuffer.toJson(): Json {
     return jsonSerializer.deserialize(this)
 }
 
-fun URL.toJson(url: URL): Json {
+fun URL.toJson(): Json {
     return jsonSerializer.deserialize(this)
 }
 
@@ -59,7 +59,7 @@ fun Any?.stringify(): String {
  * Chars -> Object.
  */
 @JvmName("toObject")
-fun <T> CharSequence.jsonToObject(chars: CharSequence, type: Class<T>): T {
+fun <T> CharSequence.jsonToObject(type: Class<T>): T {
     return jsonSerializer.deserialize(this).toObject(type)
 }
 
@@ -67,7 +67,7 @@ fun <T> CharSequence.jsonToObject(chars: CharSequence, type: Class<T>): T {
  * Chars -> Object.
  */
 @JvmName("toObject")
-fun <T> CharSequence.jsonToObject(chars: CharSequence, type: Type): T {
+fun <T> CharSequence.jsonToObject(type: Type): T {
     return jsonSerializer.deserialize(this).toObject(type)
 }
 
@@ -75,6 +75,6 @@ fun <T> CharSequence.jsonToObject(chars: CharSequence, type: Type): T {
  * Chars -> Object.
  */
 @JvmName("toObject")
-fun <T> CharSequence.jsonToObject(chars: CharSequence, type: TypeRef<T>): T {
+fun <T> CharSequence.jsonToObject(type: TypeRef<T>): T {
     return jsonSerializer.deserialize(this).toObject(type)
 }
