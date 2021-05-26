@@ -1,0 +1,167 @@
+= image:../../logo.svg[Boat Id] `boat-id`: Boat Id -- Id Generation Lib of link:../../README.md[Boat]
+:toc:
+:toclevels: 3
+:last-update-label!:
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:emaill: fredsuvn@163.com
+
+== Introduction
+
+Boat Id is a simple id generation lib for link:../../README.md[Boat].
+It provides a set of interface such as `IdGenerator` and `IdSpec` to generate new id.
+
+== Usage
+
+=== IdSpec
+
+To create an id generation rule, we can use `IdSpec`:
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        String spec = "seq-{Snowflake, 20, 41, 10, 12}-tail";
+        IdSpec stringIdSpec = new IdSpec(spec);
+        String id = stringIdSpec.newId();
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val spec = "seq-{Snowflake, 20, 41, 10, 12}-tail"
+        val stringIdSpec = IdSpec(spec)
+        val id = stringIdSpec.newId()
+    }
+}
+----
+
+The result may be: `seq-06803239610792857600-tail`
+
+`IdSpec` consists of literals and ``IdComponent``'s,
+``IdComponent``s are wrapped between `{` and `}`, format is `{type[: name][, arg]+}`
+(a comma follows a space or not, note space will be trimmed).
+
+NOTE: ``IdSpec``'s parameter syntax is come from `CharsTemplate` of `boat-core`.
+
+`IdSpec` has 1 built-in `IdComponent`:
+
+* `Snowflake`
+
+For more detail about `IdSpec`, see its javadoc.
+
+=== IdGenerator
+
+`IdGenerator` is core interface of boat-id, `IdSpec` is its subtype.
+We can create an `IdGenerator` to custom generation rules.
+
+.Java Examples
+[source,java]
+----
+public class MyIdComponent implements IdComponent<String> {
+
+    public static final String TYPE = "My";
+
+    private String value;
+
+    @NotNull
+    @Override
+    public String type() {
+        return TYPE;
+    }
+
+    @Override
+    public void init(@NotNull List<?> args) {
+        this.value = String.valueOf(args.get(0));
+    }
+
+    @Override
+    public String newValue(@NotNull IdContext context) {
+        return value;
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class MyIdComponent : IdComponent<String?> {
+
+    private var value: String? = null
+    override val type: String = TYPE
+
+    override fun init(args: List<Any>) {
+        value = args[0].toString()
+    }
+
+    override fun newValue(context: IdContext): String? {
+        return value
+    }
+
+    companion object {
+        const val TYPE = "My"
+    }
+}
+----
+
+Then, add the `MyIdComponent`:
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        IdSpec stringIdSpec = new IdSpec(spec, type -> {
+            if (type.equals(MyIdComponent.TYPE)) {
+                return new MyIdComponent();
+            }
+            return IdSpec.DEFAULT_COMPONENT_SUPPLIER.get(type);
+        });
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val stringIdSpec = IdSpec(spec, object : ComponentSupplier {
+            override fun get(type: String): IdComponent<*> {
+                if (type == MyIdComponent.TYPE) {
+                    return MyIdComponent()
+                }
+                return IdSpec.DEFAULT_COMPONENT_SUPPLIER.get(type)
+            }
+        })
+    }
+}
+----
+
+== Samples
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/id/IdSample.java[]
+----
+
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/id/MyIdComponent.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/id/IdSample.kt[]
+----

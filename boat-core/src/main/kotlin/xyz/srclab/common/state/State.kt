@@ -14,7 +14,7 @@ import xyz.srclab.common.lang.hash
  *
  * @author sunqian
  *
- * @see CharsState
+ * @see StringState
  * @see ExceptionStatus
  * @see StatusException
  */

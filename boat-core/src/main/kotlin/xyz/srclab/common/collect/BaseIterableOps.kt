@@ -1,6 +1,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.lang.*
+import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -737,11 +738,8 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().toArray(generator)
     }
 
-    open fun toArray(componentType: Class<*>): Array<T> {
-        return finalIterable().toArray(componentType)
-    }
-
-    open fun <R> toArray(componentType: Class<*>, selector: (T) -> R): Array<R> {
+    @JvmOverloads
+    open fun <R> toArray(componentType: Type, selector: ((T) -> R)? = null): Array<R> {
         return finalIterable().toArray(componentType, selector)
     }
 
@@ -785,8 +783,9 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().toDoubleArray(selector)
     }
 
-    open fun <A> toAnyArray(componentType: Class<*>): A {
-        return finalIterable().toAnyArray(componentType)
+    @JvmOverloads
+    open fun <R, A> toAnyArray(componentType: Type, selector: ((T) -> R)? = null): A {
+        return finalIterable().toAnyArray(componentType, selector)
     }
 
     abstract fun plus(element: T): THIS

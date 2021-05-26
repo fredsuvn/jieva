@@ -1,0 +1,355 @@
+= image:../../logo.svg[Boat Core] `boat-core`: Boat Core -- Core Lib of link:../../README.md[Boat]
+:toc:
+:toclevels: 3
+:last-update-label!:
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:emaill: fredsuvn@163.com
+
+== Introduction
+
+Boat core provides core interfaces, functions and utilities for link:../../README.md[Boat], including:
+
+* <<Lang>>: Base package, a serials of core and base interfaces and components;
+* <<Bean>>: Bean package, supports fast and convenient operation for `bean`;
+* <<Convert>>: Convert package, supports various types conversion each other;
+* <<Cache>>: Cache package, provides core cache interfaces and built-in implementations;
+* <<Run>>: Package about run and thread, provides `Runner` interfaces and implementations;
+* <<Bus>>: Bus package, provides `EventBus` interfaces;
+* <<Invoke>>: Provides `Invoker` interfaces and implementations;
+* <<Proxy>>: Provides `ProxyClass` to proxy a class in runtime dynamically, by `reflection`, `spring-core` or `cglib` ways;
+* <<State>>: Provides `State` interfaces represents a state or status;
+* <<Exception>>: About exceptions;
+* <<Collect>>: Collection extension package, supports `chain operation`, `multi-value-map`, various utilities, etc.;
+* <<Reflect>>: Reflection extension package, provides many convenient reflection operation;
+* <<IO>>: Input/Output interfaces and utilities package;
+* <<Jvm>>: Provides JVM underlying operations;
+* <<Utils>>: Other convenient tools;
+* <<Test>>: Provides interfaces and utilities for testing;
+
+== Usage
+
+=== Lang
+
+Lang package provides a serials of core and base interfaces and components:
+
+* Global system objects: `Current`, `Defaults`, `Environment`;
+* Lang syntax enhancement (mainly for Java): `Let`, `Ref`, `Lazy`, `LazyString`;
+* String/CharSequence functions: `CharsFormat`, `CharsTemplate`, `NamingCase`;
+* Special character support: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
+* Access interfaces: `Accessor`, `Getter`, `Setter`, `GenericAccessor`, `GenericGetter`, `GenericSetter`;
+* Helper interfaces and utilities: SpecParser, CachingProductBuilder, Processing;
+* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/lang/LangSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/lang/LangSample.kt[]
+----
+
+=== Bean
+
+Bean package supports fast and convenient operation for `bean`:
+
+* `Beans`: Default utilities for bean operation;
+* `BeanResolver`: Core Interface to resolve `bean`, `Beans` use its default implementation;
+* `BeanResolveHandler`: Handler to process resolving for `BeanResolver`;
+* `BeanMap`: A type of `Map` implementation that associated with a `bean`, means make a `bean` as a `Map`;
+* `BeanType`: To describe struct of a type of `bean` like `Class`;
+* `PropertyType`: To describe a property of `bean` like `Field`;
+
+TIP: `Beans` is more than 20 times faster than `Apache BeanUtils` in copy-properties function.
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/bean/BeanSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/bean/BeanSample.kt[]
+----
+
+=== Convert
+
+Convert package supports various types conversion each other:
+
+* `Converts`: Default utilities for type conversion operation;
+* `Converter`: Core interfaces for type conversion, `Converts` use its default implementation;
+* `ConvertHandler`: Handler to process converting for `Converter`;
+* `FastConverter`: A fast type converter which must specify the target type;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/convert/ConvertSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/convert/ConvertSample.kt[]
+----
+
+=== Cache
+
+Cache package provides core cache interfaces and built-in implementations:
+
+* `Cache`: Core Cache interface;
+* `FastCache`: Implementation by `WeakHashMap` and `ThreadLocal`;
+* `CaffeineCache`: Implementation by `Caffeine`;
+* `GuavaCache`: Implementation by `Guava`;
+* `MapCache`: Implementation by `Map`, means make `Map` as `Cache`;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/cache/CacheSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/cache/CacheSample.kt[]
+----
+
+=== Run
+
+Run package is about run and thread, provides `Runner` interfaces and implementations:
+
+* `Runner`: Core interface to run threads;
+* `Running`: Core interface represents a running thread;
+* `Scheduler`: Core interface to schedule tasks;
+* `Scheduling`: Core interface represents a scheduling task;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/run/RunSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/run/RunSample.kt[]
+----
+
+=== Bus
+
+Bus package provides `EventBus` interfaces:
+
+* `EventBus`: Event bus interface and implementations;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/bus/EventBusSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/bus/EventBusSample.kt[]
+----
+
+=== Invoke
+
+Invoke package Provides `Invoker` interfaces and implementations:
+
+* `Invoker`: Core invoke interface;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/invoke/InvokeSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/invoke/InvokeSample.kt[]
+----
+
+=== Proxy
+
+Proxy package provides `ProxyClass` to proxy a class in runtime dynamically, by `reflection`, `spring-core` or `cglib` ways:
+
+* `ProxyClass`: Core interface to proxy target `Class`;
+* `ProxyMethod`: Core interface represents proxy method body;
+* `ProxyClassFactory`: Factory to create `ProxyClass`, built-in `Reflection`, `spring-core` and `cglib` implementation;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/proxy/ProxySample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/proxy/ProxySample.kt[]
+----
+
+=== State
+
+State package provides `State` interfaces represents a state or status:
+
+* `State`: Core interface represents a state or status;
+* `StringState`: `State` for `String` type;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/state/StateSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/state/StateSample.kt[]
+----
+
+=== Exception
+
+Exception package provides `Exception` implementation and utilities:
+
+* `ExceptionStatus`: Interface extends <<State>>, used for `Exception`;
+* `StatusException`: Exception implements `ExceptionStatus`;
+* `ImpossibleException`: The exception represents an impossible thrown case but actually thrown;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/exception/ExceptionSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/exception/ExceptionSample.kt[]
+----
+
+=== Collect
+
+Collect package extends collection function, supports `chain operation`, `multi-value-map`, various utilities, etc.:
+
+* `Collects`: Default utilities for Collection;
+* `IterableOps`, `ListOps`, `SetOps`, `MapOps`, `SequenceOps`: Ops interfaces, provide chain operation, mainly for Java;
+* `IterableType`, `MapType`: Meta type interfaces for generic Collection types;
+* `MultiMaps`: `MultiMaps` provides multi-values `Map` such as `SetMap`, `MutableSetMap`, `ListMap` and `MutableListMap`;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/collect/CollectSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/collect/CollectSample.kt[]
+----
+
+=== Reflect
+
+Reflect package extends reflection function, provides many convenient reflection operation:
+
+* `Reflects`: Provides reflect operations;
+* `Types`: To build generic types;
+* `TypeRef`: Help to code a type reference;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/reflect/ReflectSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/reflect/ReflectSample.kt[]
+----
+
+=== IO
+
+IO package provides Input/Output interfaces and utilities package:
+
+* `IOStreams`: Provides operations for `Input`/`Output`, `Reader`/`Writer`;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/io/IOSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/io/IOSample.kt[]
+----
+
+=== Jvm
+
+Jvm provides jvm underlying operations:
+
+* `Jvms`: Provides JVM underlying operations;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/jvm/JvmSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/jvm/JvmSample.kt[]
+----
+
+=== Utils
+
+Utils package provides Other convenient tools:
+
+* `Counter`: Simple counter for int/long, may atomic;
+* `About`: Product info such as `About`, `Author`, `SemVer`;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/utils/UtilsSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/utils/UtilsSample.kt[]
+----
+
+=== Test
+
+Test package provides interfaces and utilities for testing:
+
+* `Tester`: Core interface to run test tasks;
+* `TestTask`, `TestListener`: Cor interface of test task and listener;
+* `TestLogger`: Simple logger for testing;
+* `Tests`: Default utilities for testing;
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/test/TestSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/test/TestSample.kt[]
+----

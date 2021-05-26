@@ -3,6 +3,9 @@ package test.java.xyz.srclab.common.reflect;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.collect.MutableListMap;
+import xyz.srclab.common.collect.MutableSetMap;
+import xyz.srclab.common.collect.SetMap;
 import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.reflect.Types;
@@ -10,8 +13,7 @@ import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author sunqian
@@ -19,22 +21,6 @@ import java.util.Map;
 public class TypeTest {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
-
-    @Test
-    public void testTypeGenerator() {
-        Assert.assertEquals(
-            Types.parameterizedType(List.class, String.class),
-            TypeUtils.parameterize(List.class, String.class)
-        );
-        Assert.assertEquals(
-            Types.wildcardType(new Type[]{String.class}, new Type[]{String.class}),
-            TypeUtils.wildcardType().withUpperBounds(String.class).withLowerBounds(String.class).build()
-        );
-        Assert.assertEquals(
-            Types.genericArrayType(String.class),
-            TypeUtils.genericArrayType(String.class)
-        );
-    }
 
     @Test
     public void testRawClass() {
@@ -47,123 +33,17 @@ public class TypeTest {
             }.type()),
             List.class
         );
+        Assert.assertEquals(
+            Reflects.rawClass(new TypeRef<List<String>[][]>() {
+            }.type()),
+            List[][].class
+        );
         Assert.expectThrows(IllegalArgumentException.class, () ->
             Reflects.rawClass(TypeUtils.wildcardType().withUpperBounds(Object.class).build()));
     }
 
     @Test
-    public void testBoundClass() {
-        Assert.assertEquals(
-            Reflects.rawOrUpperClass(String.class),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.rawOrUpperClass(new TypeRef<List<String>>() {
-            }.type()),
-            List.class
-        );
-        Assert.assertEquals(
-            Reflects.upperClass(Types.wildcardType(new Type[]{String.class}, null)),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.upperClass(Types.wildcardType(new Type[]{
-                Types.wildcardType(new Type[]{String.class}, null)
-            }, null)),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.upperClass(Types.wildcardType(new Type[]{
-                    Types.wildcardType(new Type[]{
-                        new TypeRef<List<String>>() {
-                        }.type()
-                    }, null)
-                }, null)
-            ),
-            List.class
-        );
-        Assert.assertEquals(
-            Reflects.upperClass(BoundClass.class.getTypeParameters()[0]),
-            Object.class
-        );
-        Assert.assertEquals(
-            Reflects.upperClass(BoundClass.class.getTypeParameters()[1]),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.upperClass(BoundClass.class.getTypeParameters()[2]),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.upperClass(BoundClass.class.getTypeParameters()[3]),
-            List.class
-        );
-        Assert.assertEquals(
-            Reflects.rawOrUpperClass(TypeUtils.genericArrayType(String.class)),
-            String[].class
-        );
-
-        Assert.assertEquals(
-            Reflects.rawOrLowerClass(String.class),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.rawOrLowerClass(new TypeRef<List<String>>() {
-            }.type()),
-            List.class
-        );
-        Assert.assertEquals(
-            Reflects.lowerClass(Types.wildcardType(null, new Type[]{String.class})),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.lowerClass(Types.wildcardType(null, new Type[]{
-                Types.wildcardType(null, new Type[]{String.class})
-            })),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.lowerClass(Types.wildcardType(null, new Type[]{
-                    Types.wildcardType(null, new Type[]{
-                        new TypeRef<List<String>>() {
-                        }.type()
-                    })
-                })
-            ),
-            List.class
-        );
-        Assert.assertNull(Reflects.lowerClass(BoundClass.class.getTypeParameters()[0]));
-        Assert.assertEquals(
-            Reflects.lowerClass(BoundClass.class.getTypeParameters()[1]),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.lowerClass(BoundClass.class.getTypeParameters()[2]),
-            String.class
-        );
-        Assert.assertNull(Reflects.lowerClass(BoundClass.class.getTypeParameters()[3]));
-        Assert.assertEquals(
-            Reflects.rawOrLowerClass(TypeUtils.genericArrayType(String.class)),
-            String[].class
-        );
-        Assert.assertEquals(
-            Reflects.rawOrLowerClass(TypeUtils.genericArrayType(TypeUtils.genericArrayType(String.class))),
-            String[][].class
-        );
-    }
-
-    @Test
-    public void testBoundType() {
-        Assert.assertEquals(
-            Reflects.thisOrUpperBound(String.class),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.thisOrUpperBound(new TypeRef<List<String>>() {
-            }.type()),
-            new TypeRef<List<String>>() {
-            }.type()
-        );
+    public void testBound() {
         Assert.assertEquals(
             Reflects.upperBound(Types.wildcardType(new Type[]{String.class}, null)),
             String.class
@@ -202,21 +82,6 @@ public class TypeTest {
             "java.util.List<? extends T1>"
         );
         Assert.assertEquals(
-            Reflects.thisOrUpperBound(TypeUtils.genericArrayType(String.class)),
-            TypeUtils.genericArrayType(String.class)
-        );
-
-        Assert.assertEquals(
-            Reflects.thisOrLowerBound(String.class),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.thisOrLowerBound(new TypeRef<List<String>>() {
-            }.type()),
-            new TypeRef<List<String>>() {
-            }.type()
-        );
-        Assert.assertEquals(
             Reflects.lowerBound(Types.wildcardType(null, new Type[]{String.class})),
             String.class
         );
@@ -238,95 +103,114 @@ public class TypeTest {
             }.type()
         );
         Assert.assertNull(Reflects.lowerBound(BoundClass.class.getTypeParameters()[0]));
-        Assert.assertEquals(
-            Reflects.lowerBound(BoundClass.class.getTypeParameters()[1]),
-            String.class
-        );
-        Assert.assertEquals(
-            Reflects.lowerBound(BoundClass.class.getTypeParameters()[2]),
-            String.class
-        );
+        Assert.assertNull(Reflects.lowerBound(BoundClass.class.getTypeParameters()[1]));
+        Assert.assertNull(Reflects.lowerBound(BoundClass.class.getTypeParameters()[2]));
         Assert.assertNull(Reflects.lowerBound(BoundClass.class.getTypeParameters()[3]));
-        Assert.assertEquals(
-            Reflects.thisOrLowerBound(TypeUtils.genericArrayType(String.class)),
-            TypeUtils.genericArrayType(String.class)
-        );
     }
 
     @Test
     public void testTypeArguments() {
+        MutableSetMap<String, String> expected = MutableSetMap.newMutableSetMap(
+            new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+            () -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
+        );
+
         Map<TypeVariable<?>, Type> f1Map = Reflects.typeArguments(F1.class);
         logger.log("f1Map: " + f1Map);
-        Assert.assertEquals(
-            f1Map.toString(),
-            "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
-        );
-
-
-        Map<TypeVariable<?>, Type> f1c1Map = Reflects.typeArguments(F1.class, C1.class);
-        logger.log("f1c1Map: " + f1c1Map);
-        Assert.assertEquals(
-            f1c1Map.toString(),
-            "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>}"
-        );
-
+        expected.addAll("C1T1", "java.lang.String");
+        expected.addAll("C1T2", "java.util.List<? extends java.lang.String>");
+        expected.addAll("I1T1", "java.lang.String");
+        expected.addAll("I2T1", "java.util.List<? extends java.lang.String>");
+        expected.addAll("I3T1", "java.lang.String");
+        expected.addAll("S1T1", "java.lang.String");
+        expected.addAll("I4T1", "java.util.List<? extends java.lang.String>");
+        assertTypeArgumentsEquals(f1Map, expected);
+        expected.clear();
 
         Map<TypeVariable<?>, Type> f2Map = Reflects.typeArguments(F2.class);
         logger.log("f2Map: " + f2Map);
-        Assert.assertEquals(
-            f2Map.toString(),
-            "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
-        );
-
-        Map<TypeVariable<?>, Type> f2i3Map = Reflects.typeArguments(F2.class, I3.class);
-        logger.log("f2i3Map: " + f2i3Map);
-        Assert.assertEquals(
-            f2i3Map.toString(),
-            "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String}"
-        );
-
+        expected.addAll("C1T1", "java.lang.String");
+        expected.addAll("C1T2", "java.util.List<? extends java.lang.String>");
+        expected.addAll("I1T1", "java.lang.String");
+        expected.addAll("I2T1", "java.util.List<? extends java.lang.String>");
+        expected.addAll("I3T1", "java.lang.String");
+        expected.addAll("S1T1", "java.lang.String");
+        expected.addAll("I4T1", "java.util.List<? extends java.lang.String>");
+        assertTypeArgumentsEquals(f2Map, expected);
+        expected.clear();
 
         Map<TypeVariable<?>, Type> s1GenericMap = Reflects.typeArguments(
             Types.parameterizedType(S1.class, S1.class.getTypeParameters()[0]));
         logger.log("s1GenericMap: " + s1GenericMap);
-        Assert.assertEquals(
-            s1GenericMap.toString(),
-            "{S1T1=S1T1, C1T1=S1T1, C1T2=java.util.List<? extends S1T1>, I1T1=S1T1, I2T1=java.util.List<? extends S1T1>, I3T1=S1T1, I4T1=java.util.List<? extends S1T1>}"
-        );
-
-        Map<TypeVariable<?>, Type> s1i1GenericMap = Reflects.typeArguments(
-            Types.parameterizedType(S1.class, S1.class.getTypeParameters()[0]),
-            I2.class
-        );
-        logger.log("s1i1GenericMap: " + s1i1GenericMap);
-        Assert.assertEquals(
-            s1i1GenericMap.toString(),
-            "{S1T1=S1T1, C1T1=S1T1, C1T2=java.util.List<? extends S1T1>, I1T1=S1T1, I2T1=java.util.List<? extends S1T1>}"
-        );
+        expected.addAll("C1T1", "S1T1");
+        expected.addAll("C1T2", "java.util.List<? extends S1T1>");
+        expected.addAll("I1T1", "S1T1");
+        expected.addAll("I2T1", "java.util.List<? extends S1T1>");
+        expected.addAll("I3T1", "S1T1");
+        expected.addAll("S1T1", "S1T1");
+        expected.addAll("I4T1", "java.util.List<? extends S1T1>");
+        assertTypeArgumentsEquals(s1GenericMap, expected);
+        expected.clear();
 
         Map<TypeVariable<?>, Type> s1Map = Reflects.typeArguments(
             Types.parameterizedType(S1.class, String.class));
-        logger.log("s1Map: " + s1Map);
-        Assert.assertEquals(
-            s1Map.toString(),
-            "{S1T1=class java.lang.String, C1T1=class java.lang.String, C1T2=java.util.List<? extends java.lang.String>, I1T1=class java.lang.String, I2T1=java.util.List<? extends java.lang.String>, I3T1=class java.lang.String, I4T1=java.util.List<? extends java.lang.String>}"
-        );
+        logger.log("s1StringMap: " + s1Map);
+        expected.addAll("C1T1", "java.lang.String");
+        expected.addAll("C1T2", "java.util.List<? extends java.lang.String>");
+        expected.addAll("I1T1", "java.lang.String");
+        expected.addAll("I2T1", "java.util.List<? extends java.lang.String>");
+        expected.addAll("I3T1", "java.lang.String");
+        expected.addAll("S1T1", "java.lang.String");
+        expected.addAll("I4T1", "java.util.List<? extends java.lang.String>");
+        assertTypeArgumentsEquals(s1Map, expected);
+        expected.clear();
 
         Type c1c1GenericTypeRef = new TypeRef<C1<Long, Double>.C1C1<String>>() {
         }.type();
-        Map<TypeVariable<?>, Type> c1c1GenericMap = Reflects.typeArguments(c1c1GenericTypeRef);
-        logger.log("c1c1GenericMap: " + c1c1GenericMap);
-        Assert.assertEquals(
-            c1c1GenericMap.toString(),
-            "{C1T1=class java.lang.Long, C1T2=class java.lang.Double, I1T1=class java.lang.Long, I2T1=java.util.List<? extends java.lang.Long>, C1C1T1=class java.lang.String, I3T1=class java.lang.Double}"
+        Map<TypeVariable<?>, Type> c1c1Map = Reflects.typeArguments(c1c1GenericTypeRef);
+        logger.log("c1c1Map: " + c1c1Map);
+        expected.addAll("C1T1", "java.lang.Long");
+        expected.addAll("C1C1T1", "java.lang.String");
+        expected.addAll("C1T2", "java.lang.Double");
+        expected.addAll("I1T1", "java.lang.Long");
+        expected.addAll("I2T1", "java.util.List<? extends java.lang.Long>");
+        expected.addAll("I3T1", "java.lang.Double");
+        assertTypeArgumentsEquals(c1c1Map, expected);
+        expected.clear();
+    }
+
+    private void assertTypeArgumentsEquals(Map<TypeVariable<?>, Type> actual, MutableSetMap<String, String> expected) {
+        MutableSetMap<String, String> actualSorted = MutableSetMap.newMutableSetMap(
+            new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
+            () -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
         );
+        actual.forEach((k, v) -> {
+            actualSorted.add(k.getTypeName(), v.getTypeName());
+        });
+        Assert.assertEquals(actualSorted, expected);
     }
 
     @Test
-    public void testGenericSignature() {
-        logger.log(Reflects.generalize(F2.class, I4.class));
+    public void testTypeSignature() {
+        Type setMapType = new TypeRef<SetMap<String, String>>() {
+        }.type();
+        Type mapType = Reflects.toTypeSignature(setMapType, Map.class);
+        logger.log(mapType);
+        Assert.assertEquals(
+            mapType,
+            new TypeRef<Map<String, Set<? extends String>>>() {
+            }.type()
+        );
 
-        Reflects.genericInterface(String.class);
+        Type listMapType = new TypeRef<MutableListMap<String, String>>() {
+        }.type();
+        mapType = Reflects.toTypeSignature(listMapType, Map.class);
+        logger.log(mapType);
+        Assert.assertEquals(
+            mapType,
+            new TypeRef<Map<String, List<String>>>() {
+            }.type()
+        );
     }
 
     public static class BoundClass<

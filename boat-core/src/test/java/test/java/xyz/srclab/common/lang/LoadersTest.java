@@ -5,10 +5,14 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.collect.Collects;
 import xyz.srclab.common.lang.Loaders;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class LoadersTest {
 
@@ -16,9 +20,18 @@ public class LoadersTest {
 
     @Test
     public void testLoader() {
+        List<String> texts = Loaders.loadAllStrings("META-INF/test.properties");
+        logger.log("Load texts: {}", texts);
         Assert.assertEquals(
-            Loaders.loadAllStrings("META-INF/test.info"),
-            Collections.singletonList("test.info")
+            texts,
+            Collections.singletonList("info=123")
+        );
+
+        List<Map<String, String>> properties = Loaders.loadAllProperties("META-INF/test.properties");
+        logger.log("Load properties: {}", properties);
+        Assert.assertEquals(
+            properties,
+            Collections.singletonList(Collects.newMap(new HashMap<>(), "info", "123"))
         );
 
         String newClassName = "test.xyz.srclab.A";

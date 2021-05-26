@@ -1,4 +1,4 @@
-# Boat Others: Third Parties Supporting for [Boat](../README.md)
+# ![Boat Others](../logo.svg) `boat-other`: Boat Others -- Third Party Supporting and Extension Libs for [Boat](../README.md)
 
 ## Choose doc style you like:
 
@@ -13,15 +13,3 @@
   * [简体中文](docs/README_zh.html)
 
 More see [docs/](docs/)
-
-## Contribution and Contact
-
-* fredsuvn@163.com
-* https://github.com/srclab-projects/boat
-* QQ group: 1037555759
-
-## License
-
-[Apache 2.0 license][license]
-
-[license]: https://www.apache.org/licenses/LICENSE-2.0.html

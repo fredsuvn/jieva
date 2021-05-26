@@ -19,23 +19,26 @@ public class FastConvertTest {
     @Test
     public void testFastConvert() {
         FastConverter<String> fastConverter = FastConverter.newFastConverter(
-            Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
+            Arrays.asList(new CharsConvertHandler(), new StringConvertHandler()));
         logger.log(fastConverter.convert(new StringBuilder("123")));
         logger.log(fastConverter.convert("123"));
         Assert.assertEquals(fastConverter.convert(new StringBuilder("123")), "123");
         Assert.assertEquals(fastConverter.convert("123"), "123123");
+
+        Assert.expectThrows(UnsupportedOperationException.class, () -> fastConverter.convert(new Object()));
     }
 
-    private static class ObjectConvertHandler implements FastConvertHandler<String> {
+    private static class CharsConvertHandler implements FastConvertHandler<String> {
 
         @NotNull
         @Override
         public Class<?> supportedType() {
-            return Object.class;
+            return CharSequence.class;
         }
 
         @Override
         public String convert(@NotNull Object from) {
+            logger.log("By {}", getClass());
             return from.toString();
         }
     }
@@ -50,7 +53,8 @@ public class FastConvertTest {
 
         @Override
         public String convert(@NotNull Object from) {
-            return from.toString() + from.toString();
+            logger.log("By {}", getClass());
+            return from + from.toString();
         }
     }
 }

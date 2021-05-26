@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.reflect.INHERITANCE_COMPARATOR
 
 /**
@@ -14,9 +15,13 @@ interface FastConverter<R> {
 
     companion object {
 
+        @JvmOverloads
         @JvmStatic
-        fun <R> newFastConverter(handlers: Iterable<FastConvertHandler<out R>>): FastConverter<R> {
-            return FastConverterImpl(handlers)
+        fun <R> newFastConverter(
+            handlers: Iterable<FastConvertHandler<out R>>,
+            failedHandler: FastConvertHandler<R> = DefaultFailedFastConvertHandler.asAny()
+        ): FastConverter<R> {
+            return FastConverterImpl(handlers, failedHandler)
         }
     }
 }
@@ -35,7 +40,19 @@ interface FastConvertHandler<R> {
     fun convert(from: Any): R
 }
 
-private class FastConverterImpl<R>(handlers: Iterable<FastConvertHandler<out R>>) : FastConverter<R> {
+object DefaultFailedFastConvertHandler : FastConvertHandler<Nothing> {
+
+    override val supportedType: Class<*> = Nothing::class.java
+
+    override fun convert(from: Any): Nothing {
+        throw UnsupportedOperationException("${from.javaClass}")
+    }
+}
+
+private class FastConverterImpl<R>(
+    handlers: Iterable<FastConvertHandler<out R>>,
+    private val failedHandler: FastConvertHandler<R>
+) : FastConverter<R> {
 
     private val handlerMap: Map<Class<*>, FastConvertHandler<out R>> = handlers.associateBy { it.supportedType }
     private val handlerArray: Array<FastConvertHandler<out R>> = handlerMap.values
@@ -57,6 +74,6 @@ private class FastConverterImpl<R>(handlers: Iterable<FastConvertHandler<out R>>
                 return arrayHandler.convert(from)
             }
         }
-        throw UnsupportedOperationException("Cannot convert type: ${fromType.typeName}")
+        return failedHandler.convert(from)
     }
 }

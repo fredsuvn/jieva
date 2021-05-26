@@ -9,12 +9,12 @@ public class MemberTest {
     @Test
     public void testAccessibleFor() throws Exception {
         Assert.assertTrue(Reflects.isAccessibleFor(
-            NewClass.class.getDeclaredField("protectedField"),
-            SubNewClass.class
+            ReflectClass.class.getDeclaredField("protectedField"),
+            SubReflectClass.class
         ));
         Assert.assertFalse(Reflects.isAccessibleFor(
-            NewClass.class.getDeclaredField("privateField"),
-            SubNewClass.class
+            ReflectClass.class.getDeclaredField("privateField"),
+            SubReflectClass.class
         ));
     }
 }

@@ -19,44 +19,66 @@ import java.lang.reflect.Method
 interface Invoker {
 
     /**
-     * Invokes this Invoker. [object] is owner of this [Invoker] and [args] are arguments.
+     * Invokes this [Invoker]. [object] is owner of this [Invoker] and [args] are arguments.
      */
-    fun <T> invoke(`object`: Any?, vararg args: Any?): T
+    @JvmDefault
+    fun <T> invoke(`object`: Any?, vararg args: Any?): T {
+        return invokeWith(`object`, false, *args)
+    }
 
     /**
      * Forcibly invokes.
      *
      * @see invoke
      */
-    fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T
+    @JvmDefault
+    fun <T> enforce(`object`: Any?, vararg args: Any?): T {
+        return invokeWith(`object`, true, *args)
+    }
 
-    companion object {
+    /**
+     * Invokes this [Invoker] with arguments.
+     * [object] is owner of this [Invoker] and [args] are arguments, and [force] tell whether force to invoke.
+     */
+    fun <T> invokeWith(`object`: Any?, force: Boolean, vararg args: Any?): T
+
+    companion object : InvokerProvider {
+
+        private val defaultProvider = ReflectedInvokerProvider
 
         @JvmStatic
-        fun forMethod(clazz: Class<*>, methodName: String, vararg parameterTypes: Class<*>): Invoker {
-            return InvokerProvider.DEFAULT.forMethod(clazz, methodName, *parameterTypes)
+        override fun forMethod(method: Method): Invoker {
+            return defaultProvider.forMethod(method)
         }
 
         @JvmStatic
-        fun forConstructor(clazz: Class<*>, vararg parameterTypes: Class<*>): Invoker {
-            return InvokerProvider.DEFAULT.forConstructor(clazz, *parameterTypes)
+        override fun forMethod(clazz: Class<*>, methodName: String, vararg parameterTypes: Class<*>): Invoker {
+            return defaultProvider.forMethod(clazz, methodName, *parameterTypes)
         }
 
         @JvmStatic
-        @JvmName("forMethod")
+        override fun forConstructor(constructor: Constructor<*>): Invoker {
+            return defaultProvider.forConstructor(constructor)
+        }
+
+        @JvmStatic
+        override fun forConstructor(clazz: Class<*>, vararg parameterTypes: Class<*>): Invoker {
+            return defaultProvider.forConstructor(clazz, *parameterTypes)
+        }
+
         fun Method.toInvoker(): Invoker {
-            return InvokerProvider.DEFAULT.forMethod(this)
+            return forMethod(this)
         }
 
-        @JvmStatic
-        @JvmName("forConstructor")
         fun Constructor<*>.toInvoker(): Invoker {
-            return InvokerProvider.DEFAULT.forConstructor(this)
+            return forConstructor(this)
         }
     }
 }
 
 interface InvokerProvider {
+
+    fun forMethod(method: Method): Invoker
 
     @JvmDefault
     fun forMethod(clazz: Class<*>, methodName: String, vararg parameterTypes: Class<*>): Invoker {
@@ -66,22 +88,14 @@ interface InvokerProvider {
         )
     }
 
+    fun forConstructor(constructor: Constructor<*>): Invoker
+
     @JvmDefault
     fun forConstructor(clazz: Class<*>, vararg parameterTypes: Class<*>): Invoker {
         val constructor = clazz.declaredConstructorOrNull(*parameterTypes)
         return forConstructor(
             constructor ?: throw NoSuchMethodException("$clazz(${parameterTypes.contentToString()})")
         )
-    }
-
-    fun forMethod(method: Method): Invoker
-
-    fun forConstructor(constructor: Constructor<*>): Invoker
-
-    companion object {
-
-        @JvmField
-        val DEFAULT: InvokerProvider = ReflectedInvokerProvider
     }
 }
 
@@ -97,24 +111,20 @@ object ReflectedInvokerProvider : InvokerProvider {
 
     private class ReflectedMethodInvoker(private val method: Method) : Invoker {
 
-        override fun <T> invoke(`object`: Any?, vararg args: Any?): T {
-            return method.invoke(`object`, *args).asAny()
-        }
-
-        override fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T {
-            method.isAccessible = true
+        override fun <T> invokeWith(`object`: Any?, force: Boolean, vararg args: Any?): T {
+            if (force) {
+                method.isAccessible = true
+            }
             return method.invoke(`object`, *args).asAny()
         }
     }
 
     private class ReflectedConstructorInvoker(private val constructor: Constructor<*>) : Invoker {
 
-        override fun <T> invoke(`object`: Any?, vararg args: Any?): T {
-            return constructor.newInstance(*args).asAny()
-        }
-
-        override fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T {
-            constructor.isAccessible = true
+        override fun <T> invokeWith(`object`: Any?, force: Boolean, vararg args: Any?): T {
+            if (force) {
+                constructor.isAccessible = true
+            }
             return constructor.newInstance(*args).asAny()
         }
     }
@@ -142,7 +152,7 @@ object MethodHandlerInvokerProvider : InvokerProvider {
             methodHandle = findStaticMethodHandle(constructor)
         }
 
-        override fun <T> invoke(`object`: Any?, vararg args: Any?): T {
+        override fun <T> invokeWith(`object`: Any?, force: Boolean, vararg args: Any?): T {
             return when (args.size) {
                 0 -> methodHandle.invoke()
                 1 -> methodHandle.invoke(
@@ -202,10 +212,6 @@ object MethodHandlerInvokerProvider : InvokerProvider {
             }.asAny()
         }
 
-        override fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T {
-            return invoke(`object`, *args)
-        }
-
         private fun findStaticMethodHandle(method: Method): MethodHandle {
             //val methodType: MethodType = when (method.parameterCount) {
             //    0 -> MethodType.methodType(method.returnType)
@@ -238,7 +244,7 @@ object MethodHandlerInvokerProvider : InvokerProvider {
 
         private var methodHandle = findMethodHandle(method)
 
-        override fun <T> invoke(`object`: Any?, vararg args: Any?): T {
+        override fun <T> invokeWith(`object`: Any?, force: Boolean, vararg args: Any?): T {
             return when (args.size) {
                 0 -> methodHandle.invoke(
                     `object`
@@ -299,10 +305,6 @@ object MethodHandlerInvokerProvider : InvokerProvider {
                 )
                 else -> methodHandle.invokeWithArguments(`object`, *args)
             }.asAny()
-        }
-
-        override fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T {
-            return invoke(`object`, *args)
         }
 
         private fun findMethodHandle(method: Method): MethodHandle {

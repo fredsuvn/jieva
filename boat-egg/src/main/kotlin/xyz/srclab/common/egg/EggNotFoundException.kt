@@ -1,9 +1,9 @@
 package xyz.srclab.common.egg
 
-import xyz.srclab.common.lang.Default
+import xyz.srclab.common.lang.Defaults
 
 class EggNotFoundException(name: CharSequence) : RuntimeException(
-    "Egg not found: $name${Default.lineSeparator}$MESSAGE"
+    "Egg not found: $name${Defaults.lineSeparator}$MESSAGE"
 ) {
     companion object {
         private val MESSAGE = """

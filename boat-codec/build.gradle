@@ -16,4 +16,7 @@ dependencies {
   api "org.bouncycastle:bcprov-jdk15on"
 
   testCompile project(":boat-test")
+
+  testAnnotationProcessor platform(project(":boat-dependencies"))
+  testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
 }

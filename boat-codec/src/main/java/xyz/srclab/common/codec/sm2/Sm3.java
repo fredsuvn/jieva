@@ -8,7 +8,7 @@ import java.util.Arrays;
 /**
  * @author sunqian
  */
-public class Sm3 {
+class Sm3 {
 
     private static final char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8',
         '9', 'A', 'B', 'C', 'D', 'E', 'F'};
@@ -92,7 +92,7 @@ public class Sm3 {
     }
 
     private static byte[] padding(byte[] source) throws IOException {
-        long l = source.length * 8;
+        long l = source.length * 8L;
         long k = 448 - (l + 1) % 512;
         if (k < 0) {
             k = k + 512;

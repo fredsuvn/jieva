@@ -1,9 +1,9 @@
 package xyz.srclab.common.exception
 
-import xyz.srclab.common.state.CharsState
-import xyz.srclab.common.state.CharsState.Companion.moreDescriptions
-import xyz.srclab.common.state.CharsState.Companion.newDescriptions
 import xyz.srclab.common.state.State
+import xyz.srclab.common.state.StringState
+import xyz.srclab.common.state.StringState.Companion.moreDescriptions
+import xyz.srclab.common.state.StringState.Companion.newDescriptions
 
 /**
  * [State] for exception.
@@ -29,7 +29,7 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
         val UNKNOWN = of("000001", "Unknown Error")
 
         @JvmField
-        val SHOULD_NOT = of("000002", "It should not be an exception")
+        val IMPOSSIBLE = of("000002", "WTF ??... That's IMPOSSIBLE!!")
 
         @JvmStatic
         @JvmOverloads
@@ -42,7 +42,7 @@ interface ExceptionStatus : State<String, String, ExceptionStatus> {
 private class ExceptionStatusImpl(
     code: CharSequence,
     descriptions: List<CharSequence> = emptyList()
-) : CharsState<ExceptionStatus>(code, descriptions), ExceptionStatus {
+) : StringState<ExceptionStatus>(code, descriptions), ExceptionStatus {
 
     override fun newState(code: String, descriptions: List<String>): ExceptionStatus {
         return ExceptionStatusImpl(code, descriptions)

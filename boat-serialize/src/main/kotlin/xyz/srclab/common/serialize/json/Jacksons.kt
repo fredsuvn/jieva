@@ -1,3 +1,5 @@
+@file:JvmName("Jacksons")
+
 package xyz.srclab.common.serialize.json
 
 import com.fasterxml.jackson.core.JsonProcessingException
@@ -13,8 +15,10 @@ import java.io.*
 import java.lang.reflect.Type
 import java.net.URL
 import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets
 
-internal val DEFAULT_OBJECT_MAPPER by lazy {
+@JvmField
+val DEFAULT_OBJECT_MAPPER = run {
     val mapper = JsonMapper()
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     val javaTimeModule = JavaTimeModule()
@@ -22,140 +26,92 @@ internal val DEFAULT_OBJECT_MAPPER by lazy {
     mapper
 }
 
-internal class JsonSerializerImpl(private val objectMapper: ObjectMapper) : JsonSerializer {
+@JvmName("newJsonSerializer")
+fun ObjectMapper.toJsonSerializer(): JsonSerializer {
+    return JsonSerializerImpl(this)
+}
 
-    override fun toJsonString(javaObject: Any?): String {
-        return try {
-            objectMapper.writeValueAsString(javaObject)
-        } catch (e: Exception) {
-            throw IllegalStateException(e)
+private class JsonSerializerImpl(
+    private val objectMapper: ObjectMapper
+) : JsonSerializer {
+
+    override fun serialize(any: Any?): Json {
+        if (any === null) {
+            return JsonImpl.NULL
         }
-    }
-
-    override fun toJsonBytes(javaObject: Any?): ByteArray {
-        return try {
-            objectMapper.writeValueAsBytes(javaObject)
-        } catch (e: Exception) {
-            throw IllegalStateException(e)
-        }
-    }
-
-    override fun <T : OutputStream> writeJson(javaObject: Any?, outputStream: T): T {
-        try {
-            objectMapper.writeValue(outputStream, javaObject)
-            return outputStream
-        } catch (e: Exception) {
-            throw IllegalStateException(e)
-        }
-    }
-
-    override fun <T : Writer> writeJson(javaObject: Any?, writer: T): T {
-        try {
-            objectMapper.writeValue(writer, javaObject)
-            return writer
-        } catch (e: Exception) {
-            throw IllegalStateException(e)
-        }
-    }
-
-    override fun toJson(jsonString: CharSequence): Json {
         return try {
             JsonImpl(
                 objectMapper,
-                objectMapper.readTree(jsonString.toString())
+                objectMapper.convertValue(any, JsonNode::class.java)
             )
         } catch (e: Exception) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
-    override fun toJson(jsonBytes: ByteArray, offset: Int, length: Int): Json {
+    override fun deserialize(chars: CharSequence): Json {
         return try {
             JsonImpl(
                 objectMapper,
-                objectMapper.readTree(jsonBytes, offset, length)
+                objectMapper.readTree(chars.toString())
             )
         } catch (e: Exception) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
-    override fun toJson(jsonStream: InputStream): Json {
+    override fun deserialize(bytes: ByteArray, offset: Int, length: Int): Json {
         return try {
             JsonImpl(
                 objectMapper,
-                objectMapper.readTree(jsonStream)
+                objectMapper.readTree(bytes, offset, length)
             )
         } catch (e: Exception) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
-    override fun toJson(jsonReader: Reader): Json {
+    override fun deserialize(input: InputStream): Json {
         return try {
             JsonImpl(
                 objectMapper,
-                objectMapper.readTree(jsonReader)
+                objectMapper.readTree(input)
             )
         } catch (e: Exception) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
-    override fun toJson(jsonBuffer: ByteBuffer): Json {
+    override fun deserialize(reader: Reader): Json {
         return try {
             JsonImpl(
                 objectMapper,
-                objectMapper.readTree(bufferToBytes(jsonBuffer))
+                objectMapper.readTree(reader)
             )
         } catch (e: Exception) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
-    override fun toJson(jsonSource: URL): Json {
+    override fun deserialize(byteBuffer: ByteBuffer): Json {
         return try {
             JsonImpl(
                 objectMapper,
-                objectMapper.readTree(jsonSource)
+                objectMapper.readTree(bufferToBytes(byteBuffer))
             )
         } catch (e: Exception) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
-    override fun toJson(javaObject: Any?): Json {
-        if (javaObject === null) {
-            return JsonImpl(
-                objectMapper,
-                NullNode.getInstance()
-            )
-        }
-        if (javaObject is CharSequence) {
-            return toJson(javaObject.toString())
-        }
-        if (javaObject is ByteArray) {
-            return toJson(javaObject)
-        }
-        if (javaObject is InputStream) {
-            return toJson(javaObject)
-        }
-        if (javaObject is Reader) {
-            return toJson(javaObject)
-        }
-        if (javaObject is ByteBuffer) {
-            return toJson(javaObject)
-        }
-        return if (javaObject is URL) {
-            toJson(javaObject)
-        } else try {
-            val json = toJsonString(javaObject)
+    override fun deserialize(url: URL): Json {
+        return try {
             JsonImpl(
                 objectMapper,
-                objectMapper.readTree(json)
+                objectMapper.readTree(url)
             )
         } catch (e: Exception) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
@@ -166,29 +122,28 @@ internal class JsonSerializerImpl(private val objectMapper: ObjectMapper) : Json
     }
 }
 
-internal class JsonImpl(private val objectMapper: ObjectMapper, private val jsonNode: JsonNode) : Json {
+private class JsonImpl(
+    private val objectMapper: ObjectMapper,
+    private val jsonNode: JsonNode
+) : Json {
 
     override val type: JsonType = jsonNode.nodeType.toJsonType()
 
-    override fun toString(): String {
-        return jsonNode.toString()
-    }
-
-    override fun <T : OutputStream> writeOutputStream(outputStream: T): T {
+    override fun <T : OutputStream> writeTo(outputStream: T): T {
         try {
             objectMapper.writeValue(outputStream as OutputStream, jsonNode)
             return outputStream
         } catch (e: IOException) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
-    override fun <T : Writer> writeWriter(writer: T): T {
+    override fun <T : Writer> writeTo(writer: T): T {
         try {
             objectMapper.writeValue(writer, jsonNode)
             return writer
         } catch (e: IOException) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
@@ -196,7 +151,7 @@ internal class JsonImpl(private val objectMapper: ObjectMapper, private val json
         return try {
             objectMapper.writeValueAsBytes(jsonNode)
         } catch (e: JsonProcessingException) {
-            throw IllegalStateException(e)
+            throw e
         }
     }
 
@@ -212,8 +167,25 @@ internal class JsonImpl(private val objectMapper: ObjectMapper, private val json
                 }
             })
         } catch (e: IOException) {
-            throw IllegalStateException(e)
+            throw e
         }
+    }
+
+
+    override fun toJsonString(): String {
+        return jsonNode.toString()
+    }
+
+    override fun toJsonBytes(): ByteArray {
+        return toJsonString().toByteArray(StandardCharsets.UTF_8)
+    }
+
+    override fun toObjectString(): String {
+        return toObject(String::class.java)
+    }
+
+    override fun toString(): String {
+        return toJsonString()
     }
 
     private fun JsonNodeType.toJsonType(): JsonType {
@@ -227,5 +199,10 @@ internal class JsonImpl(private val objectMapper: ObjectMapper, private val json
             JsonNodeType.BINARY -> return JsonType.BINARY
             else -> JsonType.MISSING
         }
+    }
+
+    companion object {
+
+        val NULL = JsonImpl(DEFAULT_OBJECT_MAPPER, NullNode.getInstance())
     }
 }

@@ -1,4 +1,4 @@
-= Boat Others: link:../../README.md[Boat]对第三方技术的支持
+= image:../../logo.svg[Boat Serialize] `boat-other`: Boat Others -- link:../../README.md[Boat] 第三方支持和扩展库
 :toc:
 :toclevels: 3
 :toc-title: 目录
@@ -6,28 +6,22 @@
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
-:url: https://github.com/srclab-projects/boat
-:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
-
-:qq-group: QQ group: 1037555759
-:boat-version: 0.0.1
 
 == 简介
 
-Boat others提供boat对第三方技术的支持, 比如protobuf.
+Boat others 为 link:../../README.md[Boat]提供第三方支持和扩展.
 
 == 支持列表
 
 === Protobuf: boat-protobuf
 
-boat-protobuf为protobuf类型提供bean, 类型转换和序列化功能:
+boat-protobuf 提供为 `bean`, `convert` 何 `serialize` 领域的针对 protobuf 类型的处理器:
 
-* ProtobufBeanResolveHandler: 支持protobuf类型的bean分解器处理器;
-* ProtobufBeans.PROTOBUF_BEAN_RESOLVER: 支持protobuf类型的bean分解器, 继承自通用的bean分解器;
-* ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS: 适配protobuf类型的默认的bean属性赋值选项;
-* ProtobufConverts.PROTOBUF_CONVERT_BEAN_COPY_OPTIONS: 适配protobuf类型的默认的bean转换属性赋值选项;
-* ProtobufJsons.PROTOBUF_OBJECT_MAPPER: 支持protobuf类型的Jackson的object mapper;
-* ProtobufJsons.PROTOBUF_JSON_SERIALIZER: 支持protobuf类型的Json序列化器.
+* `ProtobufBeanResolveHandler`: 支持 protobuf 类型的bean解析器, 从 `BeanResolveHandler` (boat-core) 扩展;
+* `ProtobufBeans.PROTOBUF_BEAN_RESOLVER`: 支持 protobuf 类型的bean解析器处理器, 从 `BeanResolver` (boat-core) 扩展;
+* ProtobufConverts.PROTOBUF_CONVERTER: 支持 protobuf 类型的类型转换器, 从 `Converter` (boat-core) 扩展;
+* ProtobufJsons.PROTOBUF_OBJECT_MAPPER: ``Jackson``的 `ObjectMapper` (boat-serialize), 支持 protobuf 类型;
+* ProtobufJsons.PROTOBUF_JSON_SERIALIZER: `JsonSerializer` (boat-serialize), 支持 protobuf 类型.
 
 .Java Examples
 [source,java]
@@ -40,13 +34,3 @@ include::../boat-others-sample/src/test/java/sample/java/xyz/srclab/common/proto
 ----
 include::../boat-others-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/protobuf/ProtobufSample.kt[]
 ----
-
-== 贡献和联系方式
-
-* {emaill}
-* {url}
-* {qq-group}
-
-== License
-
-{license}

@@ -15,10 +15,7 @@ import xyz.srclab.common.protobuf.ProtobufJsons;
 import xyz.srclab.common.serialize.json.JsonSerials;
 import xyz.srclab.common.test.TestLogger;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ProtobufTest {
 
@@ -41,19 +38,28 @@ public class ProtobufTest {
         BeanResolver beanResolver = ProtobufBeans.PROTOBUF_BEAN_RESOLVER;
         BeanType dataType = beanResolver.resolve(messageData.getClass());
         Assert.assertEquals(
-            dataType.properties().keySet().toArray(),
-            new Object[]{"type", "message", "numberList", "entryMap", "class"}
+            Collects.sorted(dataType.properties().keySet(), String.CASE_INSENSITIVE_ORDER),
+            Collects.sorted(Collects.newCollection(new HashSet<>(),
+                "type", "message", "numberList", "entryMap", "class"),
+                String.CASE_INSENSITIVE_ORDER
+            )
         );
         BeanType requestType = beanResolver.resolve(requestMessage.getClass());
         Assert.assertEquals(
-            requestType.properties().keySet().toArray(),
-            new Object[]{"id", "data", "class"}
+            Collects.sorted(requestType.properties().keySet(), String.CASE_INSENSITIVE_ORDER),
+            Collects.sorted(Collects.newCollection(new HashSet<>(),
+                "id", "data", "class"),
+                String.CASE_INSENSITIVE_ORDER
+            )
         );
 
         JavaMessageData javaMessageData = new JavaMessageData();
-        Beans.copyProperties(messageData, javaMessageData, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
+        Beans.copyProperties(
+            messageData, javaMessageData,
+            ProtobufBeans.PROTOBUF_BEAN_RESOLVER, ProtobufConverts.PROTOBUF_CONVERTER
+        );
         logger.log("javaMessageData: {}", JsonSerials.toJsonString(javaMessageData));
-        Assert.assertEquals(javaMessageData.getType(), MessageData.Type.TYPE_0);
+        Assert.assertEquals(javaMessageData.getType(), "TYPE_0");
         Assert.assertEquals(javaMessageData.getMessage(), "666");
         Assert.assertEquals(javaMessageData.getNumberList(), Arrays.asList("7", "8", "9"));
         Assert.assertEquals(
@@ -62,10 +68,13 @@ public class ProtobufTest {
         );
 
         JavaRequestMessage javaRequestMessage = new JavaRequestMessage();
-        Beans.copyProperties(requestMessage, javaRequestMessage, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
+        Beans.copyProperties(
+            requestMessage, javaRequestMessage,
+            ProtobufBeans.PROTOBUF_BEAN_RESOLVER, ProtobufConverts.PROTOBUF_CONVERTER
+        );
         logger.log("javaRequestMessage: {}", JsonSerials.toJsonString(javaRequestMessage));
         Assert.assertEquals(javaRequestMessage.getId(), "123");
-        Assert.assertEquals(javaRequestMessage.getData().getType(), MessageData.Type.TYPE_0);
+        Assert.assertEquals(javaRequestMessage.getData().getType(), "TYPE_0");
         Assert.assertEquals(javaRequestMessage.getData().getMessage(), "666");
         Assert.assertEquals(javaRequestMessage.getData().getNumberList(), Arrays.asList("7", "8", "9"));
         Assert.assertEquals(
@@ -74,14 +83,17 @@ public class ProtobufTest {
         );
 
         javaRequestMessage.setId("999");
-        javaMessageData.setType(MessageData.Type.TYPE_1);
+        javaMessageData.setType("type_1");
         javaMessageData.setMessage("java");
         javaMessageData.setNumberList(Arrays.asList("5", "6", "7"));
         javaMessageData.setEntryMap(Anys.as(Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")));
         javaRequestMessage.setData(javaMessageData);
 
         MessageData.Builder messageDataBuilder = MessageData.newBuilder();
-        Beans.copyProperties(javaMessageData, messageDataBuilder, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
+        Beans.copyProperties(
+            javaMessageData, messageDataBuilder,
+            ProtobufBeans.PROTOBUF_BEAN_RESOLVER, ProtobufConverts.PROTOBUF_CONVERTER
+        );
         logger.log(
             "messageDataBuilder: {}",
             ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(messageDataBuilder)
@@ -95,7 +107,10 @@ public class ProtobufTest {
         );
 
         RequestMessage.Builder requestMessageBuilder = RequestMessage.newBuilder();
-        Beans.copyProperties(javaRequestMessage, requestMessageBuilder, ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS);
+        Beans.copyProperties(
+            javaRequestMessage, requestMessageBuilder,
+            ProtobufBeans.PROTOBUF_BEAN_RESOLVER, ProtobufConverts.PROTOBUF_CONVERTER
+        );
         logger.log(
             "requestMessageBuilder: {}",
             ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJsonString(requestMessageBuilder)
@@ -149,16 +164,16 @@ public class ProtobufTest {
 
     public static class JavaMessageData {
 
-        private MessageData.Type type;
+        private String type;
         private String message;
         private List<String> numberList;
         private Map<String, String> entryMap;
 
-        public MessageData.Type getType() {
+        public String getType() {
             return type;
         }
 
-        public void setType(MessageData.Type type) {
+        public void setType(String type) {
             this.type = type;
         }
 

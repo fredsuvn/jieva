@@ -1,32 +1,26 @@
-= Boat Others: Third Parties Supporting for link:../../README.md[Boat]
+= image:../../logo.svg[Boat Serialize] `boat-other`: Boat Others -- Third Party Supporting and Extension Libs for link:../../README.md[Boat]
 :toc:
 :toclevels: 3
 :last-update-label!:
 Sun Qian <fredsuvn@163.com>
 :encoding: UTF-8
 :emaill: fredsuvn@163.com
-:url: https://github.com/srclab-projects/boat
-:license: https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license]
-
-:qq-group: QQ group: 1037555759
-:boat-version: 0.0.1
 
 == Introduction
 
-Boat others provides third party supporting for boat such as protobuf.
+Boat others provides third party supporting and extension for link:../../README.md[Boat].
 
 == Supporting List
 
 === Protobuf: boat-protobuf
 
-boat-protobuf provides bean, convert and serialize handlers and processors for protobuf type object:
+boat-protobuf provides `bean`, `convert` and `serialize` handlers and processors for protobuf type object:
 
-* ProtobufBeanResolveHandler: Bean resolve handler supporting protobuf type;
-* ProtobufBeans.PROTOBUF_BEAN_RESOLVER: Bean resolve supporting protobuf type, extends from common bean resolver;
-* ProtobufBeans.PROTOBUF_BEAN_COPY_OPTIONS: Default bean copy options adapted for protobuf type;
-* ProtobufConverts.PROTOBUF_CONVERT_BEAN_COPY_OPTIONS: Default bean copy options adapted for convert protobuf type;
-* ProtobufJsons.PROTOBUF_OBJECT_MAPPER: Jackson's object mapper supporting protobuf type;
-* ProtobufJsons.PROTOBUF_JSON_SERIALIZER: Json serializer supporting protobuf type.
+* `ProtobufBeanResolveHandler`: Bean resolve handler supporting protobuf type, extends from `BeanResolveHandler` (boat-core);
+* `ProtobufBeans.PROTOBUF_BEAN_RESOLVER`: Bean resolve supporting protobuf type, extends from `BeanResolver` (boat-core);
+* ProtobufConverts.PROTOBUF_CONVERTER: Converter supporting protobuf type, extends from `Converter` (boat-core);
+* ProtobufJsons.PROTOBUF_OBJECT_MAPPER: ``Jackson``'s `ObjectMapper` (boat-serialize) supporting protobuf type;
+* ProtobufJsons.PROTOBUF_JSON_SERIALIZER: `JsonSerializer` (boat-serialize) supporting protobuf type.
 
 .Java Examples
 [source,java]
@@ -39,13 +33,3 @@ include::../boat-others-sample/src/test/java/sample/java/xyz/srclab/common/proto
 ----
 include::../boat-others-sample/src/test/kotlin/sample/kotlin/xyz/srclab/common/protobuf/ProtobufSample.kt[]
 ----
-
-== Contribution and Contact
-
-* {emaill}
-* {url}
-* {qq-group}
-
-== License
-
-{license}

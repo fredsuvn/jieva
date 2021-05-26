@@ -3,7 +3,7 @@ package test.xyz.srclab.common.serialize;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Default;
+import xyz.srclab.common.lang.Defaults;
 import xyz.srclab.common.serialize.json.Json;
 import xyz.srclab.common.serialize.json.JsonSerializer;
 import xyz.srclab.common.serialize.json.JsonSerials;
@@ -40,7 +40,7 @@ public class JsonTest {
             newMap("2", new BigDecimal(2)),
             newMap("3", new BigDecimal(3))
         ));
-        String jsonString = jsonSerializer.toJsonString(testObject);
+        String jsonString = jsonSerializer.toJson(testObject).toJsonString();
         logger.log(jsonString);
         Assert.assertEquals(jsonString, objectMapper.writeValueAsString(testObject));
 
@@ -79,7 +79,7 @@ public class JsonTest {
         //测试时间类型
         long now = System.currentTimeMillis();
         logger.log("now: " + now);
-        String nowJson = jsonSerializer.toJsonString(now);
+        String nowJson = jsonSerializer.toJson(now).toJsonString();
         logger.log("nowJson: " + nowJson);
         Date date = jsonSerializer.toJson(nowJson).toObject(Date.class);
         logger.log("date: " + date);
@@ -137,13 +137,19 @@ public class JsonTest {
     @Test
     public void testUrl() throws Exception {
         Path path = Paths.get("json.txt");
-        Files.write(path, "{\"key1\":\"value1\"}".getBytes(Default.charset()));
+        Files.write(path, "{\"key1\":\"value1\"}".getBytes(Defaults.charset()));
         URL url = new URL("file:json.txt");
         Json json = JsonSerials.toJson(url);
         logger.log(json);
         String value1 = json.toMap().get("key1").toString();
         Assert.assertEquals(value1, "value1");
         Files.delete(path);
+    }
+
+    @Test
+    public void testString() {
+        String jsonString = "abc";
+        Assert.assertEquals(JsonSerials.stringify(jsonString), "\"abc\"");
     }
 
     private <K, V> Map<K, V> newMap(K key, V value) {

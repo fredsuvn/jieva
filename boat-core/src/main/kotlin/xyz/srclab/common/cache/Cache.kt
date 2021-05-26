@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
 import com.google.common.collect.MapMaker
 import xyz.srclab.common.lang.CachingProductBuilder
-import xyz.srclab.common.lang.Default
+import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.lang.asAny
 import java.time.Duration
 import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
@@ -18,7 +18,6 @@ import com.google.common.cache.RemovalCause as guavaRemovalCause
  * @see CaffeineCache
  * @see CaffeineLoadingCache
  * @see MapCache
- * @see ThreadLocalCache
  */
 interface Cache<K : Any, V> {
 
@@ -26,8 +25,8 @@ interface Cache<K : Any, V> {
     @JvmDefault
     fun get(key: K): V {
         val thisAs = this.asAny<Cache<K, Any>>()
-        val value = thisAs.getOrElse(key, Default.ABSENT)
-        if (value === Default.ABSENT) {
+        val value = thisAs.getOrElse(key, NotFound)
+        if (value === NotFound) {
             throw NoSuchElementException(key.toString())
         }
         return value.asAny()
@@ -36,8 +35,8 @@ interface Cache<K : Any, V> {
     @JvmDefault
     fun getOrNull(key: K): V? {
         val thisAs = this.asAny<Cache<K, Any>>()
-        val value = thisAs.getOrElse(key, Default.ABSENT)
-        if (value === Default.ABSENT) {
+        val value = thisAs.getOrElse(key, NotFound)
+        if (value === NotFound) {
             return null
         }
         return value.asAny()
@@ -48,8 +47,8 @@ interface Cache<K : Any, V> {
     @JvmDefault
     fun getOrElse(key: K, defaultValue: (K) -> V): V {
         val thisAs = this.asAny<Cache<K, Any>>()
-        val value = thisAs.getOrElse(key, Default.ABSENT)
-        if (value === Default.ABSENT) {
+        val value = thisAs.getOrElse(key, NotFound)
+        if (value === NotFound) {
             return defaultValue(key)
         }
         return value.asAny()
@@ -60,28 +59,26 @@ interface Cache<K : Any, V> {
     @JvmDefault
     fun getPresent(keys: Iterable<K>): Map<K, V> {
         val resultMap = mutableMapOf<K, V>()
-        val thisAs = this.asAny<Cache<K, Any>>()
-        for (key in keys) {
-            val value = thisAs.getOrElse(key, Default.ABSENT)
-            if (value !== Default.ABSENT) {
-                resultMap[key] = value.asAny()
-            }
-        }
+        getPresent(resultMap, keys)
         return resultMap.toMap()
     }
 
     @JvmDefault
     fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
         val resultMap = mutableMapOf<K, V>()
-        val thisAs = this.asAny<Cache<K, Any>>()
-        for (key in keys) {
-            val value = thisAs.getOrElse(key, Default.ABSENT)
-            if (value !== Default.ABSENT) {
-                resultMap[key] = value.asAny()
-            }
-        }
+        getPresent(resultMap, keys)
         resultMap.putAll(loader(keys.minus(resultMap.keys)))
         return resultMap.toMap()
+    }
+
+    private fun getPresent(destination: MutableMap<K, V>, keys: Iterable<K>) {
+        val thisAs = this.asAny<Cache<K, Any>>()
+        for (key in keys) {
+            val value = thisAs.getOrElse(key, NotFound)
+            if (value !== NotFound) {
+                destination[key] = value.asAny()
+            }
+        }
     }
 
     fun put(key: K, value: V)
@@ -111,6 +108,8 @@ interface Cache<K : Any, V> {
     fun invalidateAll()
 
     fun cleanUp()
+
+    private object NotFound
 
     /**
      * To build a [Cache] instance with [CaffeineCache] or [GuavaCache].
@@ -341,7 +340,12 @@ interface Cache<K : Any, V> {
          */
         @JvmStatic
         fun <K : Any, V> newFastCache(): Cache<K, V> {
-            return MapCache(MapMaker().concurrencyLevel(Default.concurrencyLevel).weakValues().makeMap())
+            return MapCache(MapMaker().concurrencyLevel(Defaults.concurrencyLevel).weakValues().makeMap())
+        }
+
+        @JvmStatic
+        fun <K : Any, V> MutableMap<K, V>.toCache(): Cache<K, V> {
+            return MapCache(this)
         }
     }
 }

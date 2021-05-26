@@ -74,7 +74,7 @@ fun CharSequence.loadStreamResourceOrNull(classLoader: ClassLoader = Current.cla
 @Throws(ResourceNotFoundException::class)
 @JvmOverloads
 fun CharSequence.loadStringResource(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): String {
     return loadStringResourceOrNull(classLoader, charset) ?: throw ResourceNotFoundException(this)
 }
@@ -82,7 +82,7 @@ fun CharSequence.loadStringResource(
 @JvmName("loadStringOrNull")
 @JvmOverloads
 fun CharSequence.loadStringResourceOrNull(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): String? {
     return loadBytesResourceOrNull(classLoader)?.toChars(charset)
 }
@@ -91,7 +91,7 @@ fun CharSequence.loadStringResourceOrNull(
 @Throws(ResourceNotFoundException::class)
 @JvmOverloads
 fun CharSequence.loadPropertiesResource(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): Map<String, String> {
     return loadPropertiesResourceOrNull(classLoader, charset) ?: throw ResourceNotFoundException(this)
 }
@@ -99,7 +99,7 @@ fun CharSequence.loadPropertiesResource(
 @JvmName("loadPropertiesOrNull")
 @JvmOverloads
 fun CharSequence.loadPropertiesResourceOrNull(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): Map<String, String>? {
     return loadResourceOrNull(classLoader)?.openStream()?.bufferedReader(charset)?.loadProperties()
 }
@@ -129,7 +129,7 @@ fun CharSequence.loadAllStreamResources(classLoader: ClassLoader = Current.class
 @JvmName("loadAllStrings")
 @JvmOverloads
 fun CharSequence.loadAllStringResources(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): List<String> {
     return loadAllBytesResources(classLoader).map { bytes -> bytes.toChars(charset) }
 }
@@ -137,7 +137,7 @@ fun CharSequence.loadAllStringResources(
 @JvmName("loadAllProperties")
 @JvmOverloads
 fun CharSequence.loadAllPropertiesResources(
-    classLoader: ClassLoader = Current.classLoader, charset: Charset = Default.charset
+    classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): List<Map<String, String>> {
     return loadAllStreamResources(classLoader).map { stream -> stream.bufferedReader(charset).loadProperties() }
 }
@@ -156,7 +156,7 @@ fun ByteArray.loadProperties(offset: Int = 0, length: Int = this.size - offset):
     return ByteArrayInputStream(this).loadProperties()
 }
 
-fun InputStream.loadProperties(charset: Charset = Default.charset): Map<String, String> {
+fun InputStream.loadProperties(charset: Charset = Defaults.charset): Map<String, String> {
     return this.bufferedReader(charset).loadProperties()
 }
 

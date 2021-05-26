@@ -2,17 +2,24 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.asToList
-import xyz.srclab.common.collect.toImmutableMap
+import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.Next
+import xyz.srclab.common.reflect.rawClass
+import xyz.srclab.common.reflect.searchFieldOrNull
 import xyz.srclab.common.reflect.typeArguments
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.lang.reflect.Type
+import java.lang.reflect.TypeVariable
+import java.util.*
 
 /**
  * Resolver for bean object.
  *
  * @author sunqian
  *
- * @see AbstractBeanResolver
+ * @see AbstractCachingBeanResolver
  * @see BeanResolveHandler
  * @see BeanStyleBeanResolveHandler
  * @see NamingStyleBeanResolveHandler
@@ -23,7 +30,17 @@ interface BeanResolver {
     val resolveHandlers: List<BeanResolveHandler>
         @JvmName("resolveHandlers") get
 
-    fun resolve(type: Type): BeanType
+    @JvmDefault
+    fun resolve(type: Type): BeanType {
+        val builder = BeanTypeBuilder.newBeanTypeBuilder(type)
+        for (resolveHandler in resolveHandlers) {
+            when (resolveHandler.resolve(builder)) {
+                Next.CONTINUE -> continue
+                Next.BREAK -> break
+            }
+        }
+        return builder.build()
+    }
 
     @JvmDefault
     fun withPreResolveHandler(preResolveHandler: BeanResolveHandler): BeanResolver {
@@ -39,58 +56,175 @@ interface BeanResolver {
         fun newBeanResolver(
             resolveHandlers: Iterable<BeanResolveHandler>,
         ): BeanResolver {
-            return object : AbstractBeanResolver() {
+            return object : AbstractCachingBeanResolver() {
                 override val resolveHandlers: List<BeanResolveHandler> = resolveHandlers.asToList()
             }
         }
     }
 }
 
-/**
- * Abstract [BeanResolver].
- */
-abstract class AbstractBeanResolver : BeanResolver {
+interface BeanTypeBuilder {
 
-    private val cache = Cache.newFastCache<Type, BeanType>()
+    @get:JvmName("type")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val type: Type
 
-    override fun resolve(type: Type): BeanType {
-        return cache.getOrLoad(type) {
-            val beanType = BeanTypeImpl(it, emptyMap())
-            val context = BeanResolveHandler.newContext(beanType, it.typeArguments())
-            for (handler in resolveHandlers) {
-                handler.resolve(context)
-                if (context.isBroken) {
-                    break
-                }
+    @get:JvmName("typeArguments")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val typeArguments: Map<TypeVariable<*>, Type>
+
+    @get:JvmName("properties")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val properties: MutableMap<String, PropertyTypeBuilder>
+
+    @get:JvmName("methods")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val methods: List<Method>
+
+    @JvmDefault
+    fun build(): BeanType {
+        val properties: MutableMap<String, PropertyType> = HashMap()
+        val beanType = BeanTypeImpl(type, Collections.unmodifiableMap(properties))
+        for (propertyEntry in this.properties) {
+            properties[propertyEntry.key] = propertyEntry.value.build(beanType)
+        }
+        return beanType
+    }
+
+    private class BeanTypeImpl(
+        override val type: Type,
+        override val properties: Map<String, PropertyType>
+    ) : BeanType {
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is BeanType) return false
+
+            if (type != other.type) return false
+            if (properties != other.properties) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = type.hashCode()
+            result = 31 * result + properties.hashCode()
+            return result
+        }
+
+        override fun toString(): String {
+            return "bean ${type.typeName}"
+        }
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun newBeanTypeBuilder(
+            type: Type
+        ): BeanTypeBuilder {
+            return object : BeanTypeBuilder {
+                override val type: Type = type
+                override val typeArguments: Map<TypeVariable<*>, Type> = type.typeArguments
+                override val properties: MutableMap<String, PropertyTypeBuilder> = HashMap()
+                override val methods: List<Method> = type.rawClass.methods.asList()
             }
-            beanType.properties = context.properties.toImmutableMap()
-            beanType
         }
     }
 }
 
-private class BeanTypeImpl(
-    override val type: Type,
-    override var properties: Map<String, PropertyType>
-) : BeanType {
+interface PropertyTypeBuilder {
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is BeanType) return false
+    @get:JvmName("name")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val name: String
 
-        if (type != other.type) return false
-        if (properties != other.properties) return false
+    @get:JvmName("type")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val type: Type
 
-        return true
+    @get:JvmName("getter")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val getter: Invoker?
+
+    @get:JvmName("setter")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val setter: Invoker?
+
+    @get:JvmName("backingField")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val backingField: () -> Field?
+
+    @JvmDefault
+    fun build(ownerType: BeanType): PropertyType {
+        return PropertyTypeImpl(ownerType, name, type, getter, setter, backingField)
     }
 
-    override fun hashCode(): Int {
-        var result = type.hashCode()
-        result = 31 * result + properties.hashCode()
-        return result
+    private class PropertyTypeImpl(
+        override val ownerType: BeanType,
+        override val name: String,
+        override val type: Type,
+        override val getter: Invoker?,
+        override val setter: Invoker?,
+        backingField: () -> Field?
+    ) : PropertyType {
+
+        override val backingField: Field? by lazy { backingField() }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is PropertyType) return false
+
+            if (ownerType != other.ownerType) return false
+            if (name != other.name) return false
+            if (type != other.type) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = ownerType.hashCode()
+            result = 31 * result + name.hashCode()
+            return result
+        }
+
+        override fun toString(): String {
+            return "$name: ${ownerType.type.typeName}.${type.typeName}"
+        }
     }
 
-    override fun toString(): String {
-        return "bean ${type.typeName}"
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun newPropertyTypeBuilder(
+            name: String,
+            type: Type,
+            getter: Invoker?,
+            setter: Invoker?,
+            backingField: () -> Field? = { type.rawClass.searchFieldOrNull(name, deep = true) }
+        ): PropertyTypeBuilder {
+            return object : PropertyTypeBuilder {
+                override val name: String = name
+                override val type: Type = type
+                override val getter: Invoker? = getter
+                override val setter: Invoker? = setter
+                override val backingField: () -> Field? = backingField
+            }
+        }
+    }
+}
+
+/**
+ * Abstract [BeanResolver] which can cache resolved [BeanType] previous created.
+ */
+abstract class AbstractCachingBeanResolver @JvmOverloads constructor(
+    private val cache: Cache<Type, BeanType> = Cache.newFastCache()
+) : BeanResolver {
+
+    override fun resolve(type: Type): BeanType {
+        return cache.getOrLoad(type) {
+            super.resolve(type)
+        }
     }
 }

@@ -5,8 +5,8 @@ import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.annotations.Immutable;
-import xyz.srclab.common.state.CharsState;
 import xyz.srclab.common.state.State;
+import xyz.srclab.common.state.StringState;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class StateTest {
 
         public TestState(int code, @Nullable String description) {
             this.code = code;
-            this.descriptions = CharsState.newDescriptions(description);
+            this.descriptions = StringState.newDescriptions(description);
         }
 
         public TestState(int code, @Immutable List<String> descriptions) {
@@ -48,7 +48,7 @@ public class StateTest {
         @Nullable
         @Override
         public String description() {
-            return CharsState.joinDescriptions(descriptions);
+            return StringState.joinDescriptions(descriptions);
         }
 
         @NotNull
@@ -60,13 +60,13 @@ public class StateTest {
         @NotNull
         @Override
         public StateTest.TestState withNewDescription(@Nullable String newDescription) {
-            return new TestState(code, CharsState.newDescriptions(newDescription));
+            return new TestState(code, StringState.newDescriptions(newDescription));
         }
 
         @NotNull
         @Override
         public StateTest.TestState withMoreDescription(String moreDescription) {
-            return new TestState(code, CharsState.moreDescriptions(descriptions(), moreDescription));
+            return new TestState(code, StringState.moreDescriptions(descriptions(), moreDescription));
         }
     }
 }

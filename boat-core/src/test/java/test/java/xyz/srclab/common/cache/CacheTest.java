@@ -4,7 +4,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.MapCache;
-import xyz.srclab.common.cache.ThreadLocalCache;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,11 +23,6 @@ public class CacheTest {
     @Test
     public void testMapCache() {
         doTestCache(new MapCache<>(new HashMap<>()));
-    }
-
-    @Test
-    public void testThreadLocalCache() {
-        doTestCache(new ThreadLocalCache<>(() -> new MapCache<>(new HashMap<>())));
     }
 
     @Test

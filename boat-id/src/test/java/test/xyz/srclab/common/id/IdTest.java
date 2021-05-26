@@ -1,14 +1,9 @@
 package test.xyz.srclab.common.id;
 
-import kotlin.jvm.functions.Function1;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.id.IdComponentFactory;
-import xyz.srclab.common.id.StringIdSpec;
+import xyz.srclab.common.id.IdSpec;
 import xyz.srclab.common.test.TestLogger;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author sunqian
@@ -19,34 +14,37 @@ public class IdTest {
 
     @Test
     public void testId() {
-        //seq-202103040448046580000-tail
-        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-tail";
-        StringIdSpec stringIdSpec = new StringIdSpec(spec);
+        //seq-06803239610792857600-tail
+        String spec = "seq-{Snowflake, 20, 41, 10, 12}-tail";
+        IdSpec stringIdSpec = new IdSpec(spec);
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec.create());
+            logger.log(stringIdSpec.newId());
         }
 
-        //seq{}-202103040448046750000\\\}-tail
-        String spec2 = "seq\\{}-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d\\\\\\\\}}-tail";
-        StringIdSpec stringIdSpec2 = new StringIdSpec(spec2);
+        //seq{}-06803240106559590400-tail
+        String spec2 = "seq\\{}-{Snowflake, 20, 41, 10, 12}-tail";
+        IdSpec stringIdSpec2 = new IdSpec(spec2);
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec2.create());
+            logger.log(stringIdSpec2.newId());
         }
 
-        String spec3 = "seq\\{\\}-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d";
-        Assert.expectThrows(IllegalArgumentException.class, () -> new StringIdSpec(spec3));
+        String spec3 = "seq\\{\\}-{Snowflake, 20, 41, 10, 12";
+        Assert.expectThrows(IllegalArgumentException.class, () -> new IdSpec(spec3));
         //new StringIdSpec(spec3);
     }
 
     @Test
     public void testCustomId() {
-        String spec = "seq-{timeCount, yyyyMMddHHmmssSSS, 1023, %17s%04d}-{my, value}";
-        Map<String, Function1<String[], IdComponentFactory<?>>> generators =
-            new HashMap<>(StringIdSpec.DEFAULT_COMPONENT_FACTORY_PROVIDERS);
-        generators.put("my", (args) -> new MyIdComponentFactory(args[0]));
-        StringIdSpec stringIdSpec = new StringIdSpec(spec, generators);
+        String spec = "seq-{Snowflake, 20, 41, 10, 12}-{My, 88888}";
+        IdSpec stringIdSpec = new IdSpec(spec, (IdSpec.ComponentSupplier) type -> {
+            if (type.equals(MyIdComponent.TYPE)) {
+                return new MyIdComponent();
+            }
+            return IdSpec.DEFAULT_COMPONENT_SUPPLIER.get(type);
+        });
+        //seq-06803242693339123712-88888
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec.create());
+            logger.log(stringIdSpec.newId());
         }
     }
 }

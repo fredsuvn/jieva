@@ -5,13 +5,15 @@ import com.google.protobuf.Message
 import com.google.protobuf.MessageOrBuilder
 import xyz.srclab.common.bean.AbstractBeanResolveHandler
 import xyz.srclab.common.bean.BeanResolveHandler
+import xyz.srclab.common.bean.BeanTypeBuilder
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
+import xyz.srclab.common.lang.Next
 import xyz.srclab.common.lang.asAny
-import xyz.srclab.common.reflect.genericInterface
 import xyz.srclab.common.reflect.method
 import xyz.srclab.common.reflect.methodOrNull
 import xyz.srclab.common.reflect.rawClass
+import xyz.srclab.common.reflect.toTypeSignature
 import java.lang.reflect.Method
 
 /**
@@ -21,35 +23,31 @@ import java.lang.reflect.Method
  */
 object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
 
-    override fun resolve(context: BeanResolveHandler.Context) {
-        val rawClass = context.beanType.rawClass
+    override fun resolve(builder: BeanTypeBuilder): Next {
+        val rawClass = builder.type.rawClass
         if (!MessageOrBuilder::class.java.isAssignableFrom(rawClass)) {
             //context.breakResolving()
-            return
+            return Next.CONTINUE
         }
-        super.resolve(context)
+        super.resolve(builder)
+        return Next.BREAK
     }
 
     override fun resolveAccessors(
-        context: BeanResolveHandler.Context,
+        builder: BeanTypeBuilder,
         getters: MutableMap<String, PropertyInvoker>,
         setters: MutableMap<String, PropertyInvoker>
     ) {
-        val rawClass = context.beanType.rawClass
+        val rawClass = builder.type.rawClass
 
         fun createPropertyInvoker(field: Descriptors.FieldDescriptor, isBuilder: Boolean) {
 
             fun createSetInvoker(clearMethod: Method, addAllMethod: Method): Invoker {
                 return object : Invoker {
-
-                    override fun <T> invoke(`object`: Any?, vararg args: Any?): T {
+                    override fun <T> invokeWith(`object`: Any?, force: Boolean, vararg args: Any?): T {
                         clearMethod.invoke(`object`)
                         addAllMethod.invoke(`object`, *args)
                         return null.asAny()
-                    }
-
-                    override fun <T> invokeForcibly(`object`: Any?, vararg args: Any?): T {
-                        return invoke(`object`, *args)
                     }
                 }
             }
@@ -63,10 +61,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                 if (getterMethod === null) {
                     return
                 }
-                val type = getterMethod.genericReturnType.genericInterface(null, Map::class.java)
-                if (type === null) {
-                    throw IllegalStateException("Cannot find type of generic interface of field: $name")
-                }
+                val type = getterMethod.genericReturnType.toTypeSignature(Map::class.java)
                 val invoker = getterMethod.toInvoker()
                 getters[name] = PropertyInvoker(type, invoker)
 
@@ -94,10 +89,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                 if (getterMethod === null) {
                     return
                 }
-                val type = getterMethod.genericReturnType.genericInterface(null, List::class.java)
-                if (type === null) {
-                    throw IllegalStateException("Cannot find type of generic interface of field: $name")
-                }
+                val type = getterMethod.genericReturnType.toTypeSignature(List::class.java)
                 val invoker = getterMethod.toInvoker()
                 getters[name] = PropertyInvoker(type, invoker)
 
@@ -147,7 +139,5 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
 
         //Add class property
         getters["class"] = PropertyInvoker(Class::class.java, rawClass.method("getClass").toInvoker())
-
-        context.breakResolving()
     }
 }
