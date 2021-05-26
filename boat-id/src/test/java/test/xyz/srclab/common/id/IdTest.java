@@ -21,6 +21,20 @@ public class IdTest {
             logger.log(stringIdSpec.newId());
         }
 
+        //seq-00001826267315077279180346359808-tail
+        String spec0 = "seq-{Snowflake, 32, 55, 25, 25}-tail";
+        IdSpec stringIdSpec0 = new IdSpec(spec0);
+        for (int i = 0; i < 10; i++) {
+            logger.log(stringIdSpec0.newId());
+        }
+
+        //seq-29921563690270857976266765631488-tail
+        String spec1 = "seq-{Snowflake, 32, 63, 32, 32}-tail";
+        IdSpec stringIdSpec1 = new IdSpec(spec1);
+        for (int i = 0; i < 10; i++) {
+            logger.log(stringIdSpec1.newId());
+        }
+
         //seq{}-06803240106559590400-tail
         String spec2 = "seq\\{}-{Snowflake, 20, 41, 10, 12}-tail";
         IdSpec stringIdSpec2 = new IdSpec(spec2);

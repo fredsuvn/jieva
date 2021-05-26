@@ -24,7 +24,7 @@ import java.util.List;
  *     //May print: seq-06803239610792857600-tail
  *     String spec = "seq-{Snowflake, 20, 41, 10, 12}-tail";
  * </pre>
- * Bits count argument must in [1, 63] bits long.
+ * Timestamp bits count must in [1,63], worker id and sequence must in [1, 32].
  * <p>
  * You can extend this class to custom, override {@link #workerId()} to custom worker id.
  *
@@ -85,14 +85,14 @@ public class SnowflakeComponent implements IdComponent<Snowflake> {
         }
         if (args.size() >= 3) {
             workerIdBitsCount = Nums.toInt(args.get(2));
-            if (!Checks.isIndexInBounds(workerIdBitsCount, 1, 64)) {
-                throw new IllegalArgumentException("workerIdBitsCount must in [1, 63].");
+            if (!Checks.isIndexInBounds(workerIdBitsCount, 1, 33)) {
+                throw new IllegalArgumentException("workerIdBitsCount must in [1, 32].");
             }
         }
         if (args.size() >= 4) {
             sequenceBitsCount = Nums.toInt(args.get(3));
-            if (!Checks.isIndexInBounds(sequenceBitsCount, 1, 64)) {
-                throw new IllegalArgumentException("sequenceBitsCount must in [1, 63].");
+            if (!Checks.isIndexInBounds(sequenceBitsCount, 1, 33)) {
+                throw new IllegalArgumentException("sequenceBitsCount must in [1, 32].");
             }
         }
         timestampBitsMask = ~(0xffffffffffffffffL << timestampBitsCount);
