@@ -1,5 +1,6 @@
 package xyz.srclab.common.serialize.json
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import xyz.srclab.common.serialize.Serializer
 import java.io.InputStream
 import java.io.Reader
@@ -8,6 +9,8 @@ import java.nio.ByteBuffer
 
 /**
  * Json serialization of [Serializer].
+ *
+ * It is thread-safe if it uses [ObjectMapper] as underlying implementation.
  *
  * @author sunqian
  *

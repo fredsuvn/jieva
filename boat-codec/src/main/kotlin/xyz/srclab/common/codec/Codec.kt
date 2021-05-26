@@ -1,10 +1,11 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.annotations.concurrent.ThreadSafe
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 
 /**
  * Codec interface, represents a type of codec way.
+ *
+ * Note Codec is reusable but may not thread-safe.
  *
  * @author sunqian
  *
@@ -14,7 +15,6 @@ import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
  * @see CipherCodec
  * @see CodecAlgorithm
  */
-@ThreadSafe
 interface Codec {
 
     @get:JvmName("algorithm")
