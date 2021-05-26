@@ -100,6 +100,11 @@ open class IdSpec @JvmOverloads constructor(
 
     companion object {
 
+        /**
+         * Default [ComponentSupplier], supports:
+         *
+         * * [SnowflakeComponent]
+         */
         @JvmField
         val DEFAULT_COMPONENT_SUPPLIER: ComponentSupplier = object : ComponentSupplier {
             override fun get(type: String): IdComponent<*> {

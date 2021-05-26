@@ -33,7 +33,7 @@ public class IdSample {
     @Test
     public void testCustomId() {
         String spec = "seq-{Snowflake, 20, 41, 10, 12}-{My, 88888}";
-        IdSpec stringIdSpec = new IdSpec(spec, (IdSpec.ComponentSupplier) type -> {
+        IdSpec stringIdSpec = new IdSpec(spec, type -> {
             if (type.equals(MyIdComponent.TYPE)) {
                 return new MyIdComponent();
             }
