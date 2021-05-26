@@ -20,11 +20,14 @@ import javax.crypto.Cipher
  */
 class RsaCodec(
     private val encryptBlockSize: Int = DEFAULT_ENCRYPT_BLOCK,
-    private val decryptBlockSize: Int = DEFAULT_DECRYPT_BLOCK,
-    private val cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.RSA_NAME) }
+    private val decryptBlockSize: Int = DEFAULT_DECRYPT_BLOCK
 ) : AsymmetricCipherCodec<RSAPublicKey, RSAPrivateKey> {
 
-    override val name = CodecAlgorithm.RSA_NAME
+    override val algorithm = CodecAlgorithm.RSA_NAME
+
+    private fun getCipher(): Cipher {
+        return Cipher.getInstance(algorithm)
+    }
 
     override fun newKeyPair(): RsaKeyPair {
         return newKeyPair(DEFAULT_KEY_SIZE)
@@ -41,13 +44,13 @@ class RsaCodec(
     }
 
     override fun encrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
-        val cipher = this.cipher()
+        val cipher = getCipher()
         cipher.init(Cipher.ENCRYPT_MODE, key.toPublicKey())
         return getBytes(data, cipher, encryptBlockSize)
     }
 
     override fun decrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
-        val cipher = this.cipher()
+        val cipher = getCipher()
         cipher.init(Cipher.DECRYPT_MODE, key.toPrivateKey())
         return getBytes(data, cipher, decryptBlockSize)
     }
@@ -56,7 +59,7 @@ class RsaCodec(
         encryptBlockSize: Int,
         decryptBlockSize: Int
     ): RsaCodec {
-        return RsaCodec(encryptBlockSize, decryptBlockSize, cipher)
+        return RsaCodec(encryptBlockSize, decryptBlockSize)
     }
 
     private fun Any.toPublicKey(): RSAPublicKey {

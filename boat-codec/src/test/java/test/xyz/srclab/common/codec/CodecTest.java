@@ -4,10 +4,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.codec.CodecAlgorithm;
-import xyz.srclab.common.codec.Codecing;
-import xyz.srclab.common.codec.Codecs;
-import xyz.srclab.common.codec.EncodeCodec;
+import xyz.srclab.common.codec.*;
 import xyz.srclab.common.codec.aes.AesKeys;
 import xyz.srclab.common.codec.rsa.RsaCodec;
 import xyz.srclab.common.codec.rsa.RsaKeyPair;
@@ -16,7 +13,10 @@ import xyz.srclab.common.codec.sm2.Sm2KeyPair;
 import xyz.srclab.common.lang.Chars;
 import xyz.srclab.common.test.TestLogger;
 
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+import java.security.Key;
+import java.security.MessageDigest;
 import java.util.Random;
 
 /**
@@ -132,6 +132,34 @@ public class CodecTest {
         Assert.assertEquals(
             Codecs.base64String("123456789"),
             Base64.encodeBase64String("123456789".getBytes())
+        );
+    }
+
+    @Test
+    public void testDigest() throws Exception {
+        String message = "123456789";
+        DigestCodec md5 = Codecs.md5Codec();
+        Assert.assertEquals(
+            md5.digest(message),
+            MessageDigest.getInstance("Md5").digest(message.getBytes())
+        );
+        Assert.assertEquals(//test reset
+            md5.digest(message),
+            MessageDigest.getInstance("Md5").digest(message.getBytes())
+        );
+        MacCodec macCodec = Codecs.hmacMd5Codec();
+        Key aesKey = AesKeys.newKey("12345678");
+        Mac mac1 = Mac.getInstance("HmacMD5");
+        mac1.init(aesKey);
+        Assert.assertEquals(
+            macCodec.digest(aesKey, message),
+            mac1.doFinal(message.getBytes())
+        );
+        Mac mac2 = Mac.getInstance("HmacMD5");
+        mac2.init(aesKey);
+        Assert.assertEquals(
+            macCodec.digest(aesKey, message),
+            mac2.doFinal(message.getBytes())
         );
     }
 

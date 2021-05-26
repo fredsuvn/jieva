@@ -173,7 +173,7 @@ interface EncodeCodec : Codec {
  */
 object PlainCodec : EncodeCodec {
 
-    override val name: String = CodecAlgorithm.PLAIN_NAME
+    override val algorithm: String = CodecAlgorithm.PLAIN_NAME
 
     override fun encode(data: ByteArray): ByteArray {
         return data.clone()
@@ -221,7 +221,7 @@ object PlainCodec : EncodeCodec {
  */
 object HexCodec : EncodeCodec {
 
-    override val name: String = CodecAlgorithm.HEX_NAME
+    override val algorithm: String = CodecAlgorithm.HEX_NAME
 
     private val encoder = HexEncoder()
 
@@ -255,7 +255,7 @@ object HexCodec : EncodeCodec {
  */
 object Base64Codec : EncodeCodec {
 
-    override val name: String = CodecAlgorithm.BASE64_NAME
+    override val algorithm: String = CodecAlgorithm.BASE64_NAME
 
     private val encoder = Base64Encoder()
 

@@ -17,7 +17,7 @@ import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 @ThreadSafe
 interface Codec {
 
-    @get:JvmName("name")
+    @get:JvmName("algorithm")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val name: String
+    val algorithm: String
 }

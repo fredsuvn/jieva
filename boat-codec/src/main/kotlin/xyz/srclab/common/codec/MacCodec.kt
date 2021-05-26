@@ -76,54 +76,46 @@ interface MacCodec : Codec {
 
         @JvmStatic
         fun hmacMd5(): MacCodec {
-            return CodecAlgorithm.HMAC_MD5.toMacCodec()
+            return withAlgorithm(CodecAlgorithm.HMAC_MD5_NAME)
         }
 
         @JvmStatic
         fun hmacSha1(): MacCodec {
-            return CodecAlgorithm.HMAC_SHA1.toMacCodec()
+            return withAlgorithm(CodecAlgorithm.HMAC_SHA1_NAME)
         }
 
         @JvmStatic
         fun hmacSha256(): MacCodec {
-            return CodecAlgorithm.HMAC_SHA256.toMacCodec()
+            return withAlgorithm(CodecAlgorithm.HMAC_SHA256_NAME)
         }
 
         @JvmStatic
         fun hmacSha384(): MacCodec {
-            return CodecAlgorithm.HMAC_SHA384.toMacCodec()
+            return withAlgorithm(CodecAlgorithm.HMAC_SHA384_NAME)
         }
 
         @JvmStatic
         fun hmacSha512(): MacCodec {
-            return CodecAlgorithm.HMAC_SHA512.toMacCodec()
+            return withAlgorithm(CodecAlgorithm.HMAC_SHA512_NAME)
         }
 
         @JvmStatic
         fun withAlgorithm(
-            algorithm: CharSequence,
-            mac: () -> Mac
+            algorithm: CharSequence
         ): MacCodec {
-            return withAlgorithm(algorithm.toCodecAlgorithm(), mac)
-        }
-
-        @JvmStatic
-        fun withAlgorithm(
-            algorithm: CodecAlgorithm,
-            mac: () -> Mac
-        ): MacCodec {
-            return MacCodecImpl(algorithm.name, mac)
+            return MacCodecImpl(algorithm.toString())
         }
 
         private class MacCodecImpl(
-            private val algorithm: String,
-            private val mac: () -> Mac
+            override val algorithm: String
         ) : MacCodec {
 
-            override val name = algorithm
+            private val mac: Mac by lazy {
+                Mac.getInstance(algorithm)
+            }
 
             override fun digest(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
-                val mac = this.mac()
+                mac.reset()
                 mac.init(key.toCodecKey(algorithm))
                 mac.update(data, offset, length)
                 return mac.doFinal()

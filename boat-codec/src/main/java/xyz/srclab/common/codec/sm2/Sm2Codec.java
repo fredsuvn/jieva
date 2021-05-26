@@ -3,6 +3,7 @@ package xyz.srclab.common.codec.sm2;
 import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
+import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotations.Nullable;
 import xyz.srclab.common.codec.AsymmetricCipherCodec;
 import xyz.srclab.common.codec.CodecAlgorithm;
@@ -44,13 +45,10 @@ public class Sm2Codec implements AsymmetricCipherCodec<ECPoint, BigInteger> {
         ecc_bc_spec = new ECDomainParameters(curve, G, sm2Params.n());
     }
 
+    @NotNull
     @Override
-    public String name() {
-        return CodecAlgorithm.RSA_NAME;
-    }
-
-    public String getName() {
-        return name();
+    public String algorithm() {
+        return CodecAlgorithm.SM2_NAME;
     }
 
     @Override

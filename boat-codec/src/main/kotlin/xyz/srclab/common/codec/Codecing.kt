@@ -169,6 +169,9 @@ interface Codecing {
         return decrypt(CodecAlgorithm.SM2, privateKey)
     }
 
+    /**
+     * Supplier to get [Codec].
+     */
     interface CodecSupplier {
 
         fun get(algorithm: CodecAlgorithm): Codec
@@ -176,6 +179,18 @@ interface Codecing {
 
     companion object {
 
+        /**
+         * Default [CodecSupplier], supports:
+         *
+         * * [CodecAlgorithm.HEX]
+         * * [CodecAlgorithm.BASE64]
+         * * [CodecAlgorithm.RSA]
+         * * [CodecAlgorithm.SM2]
+         * * [CodecAlgorithm.HEX]
+         * * [CodecAlgorithm.PLAIN]
+         * * [CodecAlgorithmType.DIGEST]
+         * * [CodecAlgorithmType.CIPHER]
+         */
         @JvmField
         val DEFAULT_CODEC_SUPPLIER: CodecSupplier = object : CodecSupplier {
             override fun get(algorithm: CodecAlgorithm): Codec {

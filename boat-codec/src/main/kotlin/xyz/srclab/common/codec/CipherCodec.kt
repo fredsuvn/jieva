@@ -142,26 +142,21 @@ interface CipherCodec : Codec {
     companion object {
 
         @JvmStatic
-        fun aes(
-            cipher: () -> Cipher
-        ): CipherCodec {
-            return CodecAlgorithm.AES.toCipherCodec(cipher)
+        fun aes(): CipherCodec {
+            return withAlgorithm(CodecAlgorithm.AES_NAME)
         }
 
         @JvmStatic
-        fun rsa(
-            cipher: () -> Cipher
-        ): RsaCodec {
-            return RsaCodec(cipher = cipher)
+        fun rsa(): RsaCodec {
+            return RsaCodec()
         }
 
         @JvmStatic
         fun rsa(
             encryptBlockSize: Int,
-            decryptBlockSize: Int,
-            cipher: () -> Cipher
+            decryptBlockSize: Int
         ): RsaCodec {
-            return RsaCodec(encryptBlockSize, decryptBlockSize, cipher)
+            return RsaCodec(encryptBlockSize, decryptBlockSize)
         }
 
         @JvmStatic
@@ -171,36 +166,28 @@ interface CipherCodec : Codec {
 
         @JvmStatic
         fun withAlgorithm(
-            algorithm: CharSequence,
-            cipher: () -> Cipher
+            algorithm: CharSequence
         ): CipherCodec {
-            return withAlgorithm(algorithm.toCodecAlgorithm(), cipher)
-        }
-
-        @JvmStatic
-        fun withAlgorithm(
-            algorithm: CodecAlgorithm,
-            cipher: () -> Cipher
-        ): CipherCodec {
-            return CipherCodecImpl(algorithm.name, cipher)
+            return CipherCodecImpl(algorithm.toString())
         }
 
         private class CipherCodecImpl(
-            private val algorithm: String,
-            private val cipher: () -> Cipher
+            override val algorithm: String
         ) : CipherCodec {
 
-            override val name = algorithm
+            private fun getCipher(): Cipher {
+                return Cipher.getInstance(algorithm)
+            }
 
             override fun encrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
-                val cipher = this.cipher()
+                val cipher = getCipher()
                 cipher.init(Cipher.ENCRYPT_MODE, key.toCodecKey(algorithm))
                 //cipher.update(data, offset, length)
                 return cipher.doFinal(data, offset, length)
             }
 
             override fun decrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
-                val cipher = this.cipher()
+                val cipher = getCipher()
                 cipher.init(Cipher.DECRYPT_MODE, key.toCodecKey(algorithm))
                 //cipher.update(data, offset, length)
                 return cipher.doFinal(data, offset, length)

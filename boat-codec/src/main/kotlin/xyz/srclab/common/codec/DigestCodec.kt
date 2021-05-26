@@ -76,59 +76,51 @@ interface DigestCodec : Codec {
 
         @JvmStatic
         fun md2(): DigestCodec {
-            return CodecAlgorithm.MD2.toDigestCodec()
+            return withAlgorithm(CodecAlgorithm.MD2_NAME)
         }
 
         @JvmStatic
         fun md5(): DigestCodec {
-            return CodecAlgorithm.MD5.toDigestCodec()
+            return withAlgorithm(CodecAlgorithm.MD5_NAME)
         }
 
         @JvmStatic
         fun sha1(): DigestCodec {
-            return CodecAlgorithm.SHA1.toDigestCodec()
+            return withAlgorithm(CodecAlgorithm.SHA1_NAME)
         }
 
         @JvmStatic
         fun sha256(): DigestCodec {
-            return CodecAlgorithm.SHA256.toDigestCodec()
+            return withAlgorithm(CodecAlgorithm.SHA256_NAME)
         }
 
         @JvmStatic
         fun sha384(): DigestCodec {
-            return CodecAlgorithm.SHA384.toDigestCodec()
+            return withAlgorithm(CodecAlgorithm.SHA384_NAME)
         }
 
         @JvmStatic
         fun sha512(): DigestCodec {
-            return CodecAlgorithm.SHA512.toDigestCodec()
+            return withAlgorithm(CodecAlgorithm.SHA512_NAME)
         }
 
         @JvmStatic
         fun withAlgorithm(
-            algorithm: CharSequence,
-            digest: () -> MessageDigest
+            algorithm: CharSequence
         ): DigestCodec {
-            return withAlgorithm(algorithm.toCodecAlgorithm(), digest)
-        }
-
-        @JvmStatic
-        fun withAlgorithm(
-            algorithm: CodecAlgorithm,
-            digest: () -> MessageDigest
-        ): DigestCodec {
-            return DigestCodecImpl(algorithm.name, digest)
+            return DigestCodecImpl(algorithm.toString())
         }
 
         private class DigestCodecImpl(
-            algorithm: String,
-            private val digest: () -> MessageDigest
+            override val algorithm: String
         ) : DigestCodec {
 
-            override val name = algorithm
+            private val digest: MessageDigest by lazy {
+                MessageDigest.getInstance(algorithm)
+            }
 
             override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
-                val digest = this.digest()
+                digest.reset()
                 digest.update(data, offset, length)
                 return digest.digest()
             }

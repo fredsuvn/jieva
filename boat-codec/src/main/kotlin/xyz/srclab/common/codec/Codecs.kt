@@ -7,11 +7,8 @@ import xyz.srclab.common.codec.sm2.Sm2Codec
 import xyz.srclab.common.codec.sm2.Sm2Params
 import xyz.srclab.common.lang.toBytes
 import java.security.Key
-import java.security.MessageDigest
 import java.security.SecureRandom
-import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
-import javax.crypto.Mac
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
@@ -84,52 +81,34 @@ fun CodecAlgorithm.toEncodeCodec(): EncodeCodec {
     return EncodeCodec.withAlgorithm(this)
 }
 
-@JvmOverloads
 @JvmName("digestCodec")
-fun CharSequence.toDigestCodec(
-    digest: () -> MessageDigest = { MessageDigest.getInstance(this.toString()) }
-): DigestCodec {
-    return DigestCodec.withAlgorithm(this, digest)
+fun CharSequence.toDigestCodec(): DigestCodec {
+    return DigestCodec.withAlgorithm(this)
 }
 
-@JvmOverloads
 @JvmName("digestCodec")
-fun CodecAlgorithm.toDigestCodec(
-    digest: () -> MessageDigest = { MessageDigest.getInstance(this.name) }
-): DigestCodec {
-    return DigestCodec.withAlgorithm(this, digest)
+fun CodecAlgorithm.toDigestCodec(): DigestCodec {
+    return DigestCodec.withAlgorithm(this.name)
 }
 
-@JvmOverloads
 @JvmName("macCodec")
-fun CharSequence.toMacCodec(
-    mac: () -> Mac = { Mac.getInstance(this.toString()) }
-): MacCodec {
-    return MacCodec.withAlgorithm(this, mac)
+fun CharSequence.toMacCodec(): MacCodec {
+    return MacCodec.withAlgorithm(this)
 }
 
-@JvmOverloads
 @JvmName("macCodec")
-fun CodecAlgorithm.toMacCodec(
-    mac: () -> Mac = { Mac.getInstance(this.name) }
-): MacCodec {
-    return MacCodec.withAlgorithm(this, mac)
+fun CodecAlgorithm.toMacCodec(): MacCodec {
+    return MacCodec.withAlgorithm(this.name)
 }
 
-@JvmOverloads
 @JvmName("cipherCodec")
-fun CharSequence.toCipherCodec(
-    cipher: () -> Cipher = { Cipher.getInstance(this.toString()) }
-): CipherCodec {
-    return CipherCodec.withAlgorithm(this, cipher)
+fun CharSequence.toCipherCodec(): CipherCodec {
+    return CipherCodec.withAlgorithm(this)
 }
 
-@JvmOverloads
 @JvmName("cipherCodec")
-fun CodecAlgorithm.toCipherCodec(
-    cipher: () -> Cipher = { Cipher.getInstance(this.name) }
-): CipherCodec {
-    return CipherCodec.withAlgorithm(this, cipher)
+fun CodecAlgorithm.toCipherCodec(): CipherCodec {
+    return CipherCodec.withAlgorithm(this.name)
 }
 
 fun plainCodec(): EncodeCodec {
@@ -188,27 +167,19 @@ fun hmacSha512Codec(): MacCodec {
     return MacCodec.hmacSha512()
 }
 
-@JvmOverloads
-fun aesCodec(
-    cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.AES_NAME) }
-): CipherCodec {
-    return CipherCodec.aes(cipher)
+fun aesCodec(): CipherCodec {
+    return CipherCodec.aes()
 }
 
-@JvmOverloads
-fun rsaCodec(
-    cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.RSA_NAME) }
-): RsaCodec {
-    return CipherCodec.rsa(cipher)
+fun rsaCodec(): RsaCodec {
+    return CipherCodec.rsa()
 }
 
-@JvmOverloads
 fun rsaCodec(
     encryptBlockSize: Int,
-    decryptBlockSize: Int,
-    cipher: () -> Cipher = { Cipher.getInstance(CodecAlgorithm.RSA_NAME) }
+    decryptBlockSize: Int
 ): RsaCodec {
-    return CipherCodec.rsa(encryptBlockSize, decryptBlockSize, cipher)
+    return CipherCodec.rsa(encryptBlockSize, decryptBlockSize)
 }
 
 @JvmOverloads
