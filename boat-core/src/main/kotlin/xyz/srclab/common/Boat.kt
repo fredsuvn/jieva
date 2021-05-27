@@ -13,7 +13,9 @@ object Boat {
     private val sunqian = Author.of(
         "Sun Qian",
         "fredsuvn@163.com",
+        "https://github.com/fredsuvn"
     )
+
     private val srclab = Author.of(
         "SrcLab",
         "srclab@163.com",

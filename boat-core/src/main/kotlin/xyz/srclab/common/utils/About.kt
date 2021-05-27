@@ -101,16 +101,39 @@ interface About {
             }
 
             override fun toString(): String {
-                return """
-                    $name
-                    Version: $version
-                    Author: ${authors.joinToString()}
-                    Mail: $mail
-                    Url: $url
-                    Licence: ${licences.joinToString()}
-                    Powered by: ${poweredBys.joinToString { it.name }}
-                    $copyright
-                """.trimIndent()
+                val builder = StringBuilder()
+                var count = 0
+                if (!version.isNullOrEmpty()) {
+                    builder.append("Version: $version")
+                    count++
+                }
+
+                fun String.appendInfo() {
+                    if (count > 0) {
+                        builder.append(", ")
+                    }
+                    builder.append(this)
+                }
+
+                if (authors.isNotEmpty()) {
+                    "Authors: $authors".appendInfo()
+                }
+                if (!mail.isNullOrEmpty()) {
+                    "Mail: $mail".appendInfo()
+                }
+                if (!url.isNullOrEmpty()) {
+                    "Url: $url".appendInfo()
+                }
+                if (licences.isNotEmpty()) {
+                    "Licences: $licences".toString().appendInfo()
+                }
+                if (poweredBys.isNotEmpty()) {
+                    "Powered By: $poweredBys".toString().appendInfo()
+                }
+                if (!copyright.isNullOrEmpty()) {
+                    "Copyright: $copyright".appendInfo()
+                }
+                return if (count == 0) name else "$name[$builder]"
             }
         }
     }
@@ -170,12 +193,12 @@ interface Author {
                     return name
                 }
                 if (mail === null && url !== null) {
-                    return "$name($url)"
+                    return "$name[$url]"
                 }
                 if (mail !== null && url === null) {
-                    return "$name($mail)"
+                    return "$name[$mail]"
                 }
-                return "$name($mail, $url)"
+                return "$name[$mail, $url]"
             }
         }
     }
