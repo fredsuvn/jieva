@@ -456,8 +456,8 @@ object SgrChars {
     }
 
     @JvmStatic
-    fun foregroundBrown(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_BROWN)
+    fun foregroundYellow(content: Any?): String {
+        return withParam(content, SgrParam.FOREGROUND_YELLOW)
     }
 
     @JvmStatic
@@ -501,8 +501,8 @@ object SgrChars {
     }
 
     @JvmStatic
-    fun backgroundBrown(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_BROWN)
+    fun backgroundYellow(content: Any?): String {
+        return withParam(content, SgrParam.BACKGROUND_YELLOW)
     }
 
     @JvmStatic
@@ -654,7 +654,7 @@ interface SgrParam {
         val FOREGROUND_GREEN: SgrParam = SgrParam.of("32")
 
         @JvmField
-        val FOREGROUND_BROWN: SgrParam = SgrParam.of("33")
+        val FOREGROUND_YELLOW: SgrParam = SgrParam.of("33")
 
         @JvmField
         val FOREGROUND_BLUE: SgrParam = SgrParam.of("34")
@@ -681,7 +681,7 @@ interface SgrParam {
         val BACKGROUND_GREEN: SgrParam = SgrParam.of("42")
 
         @JvmField
-        val BACKGROUND_BROWN: SgrParam = SgrParam.of("43")
+        val BACKGROUND_YELLOW: SgrParam = SgrParam.of("43")
 
         @JvmField
         val BACKGROUND_BLUE: SgrParam = SgrParam.of("44")
