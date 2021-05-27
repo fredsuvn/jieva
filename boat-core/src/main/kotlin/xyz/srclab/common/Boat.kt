@@ -8,7 +8,7 @@ import xyz.srclab.common.utils.SemVer.Companion.parseSemVer
 
 object Boat {
 
-    private val buildInfo: Map<String, String> = "META-INF/build.properties".loadPropertiesResource()
+    private val buildInfos: Map<String, String> = "META-INF/build.properties".loadPropertiesResource()
 
     private val sunqian = Author.of(
         "Sun Qian",
@@ -22,7 +22,7 @@ object Boat {
 
     @get:JvmName("version")
     @JvmStatic
-    val version: SemVer = buildInfo["build.version"]!!.parseSemVer()
+    val version: SemVer = buildInfos["build.version"]!!.parseSemVer()
 
     @get:JvmName("about")
     @JvmStatic
