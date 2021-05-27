@@ -48,16 +48,17 @@ interface About {
 
     companion object {
 
+        @JvmOverloads
         @JvmStatic
         fun of(
             name: String,
-            version: String?,
-            author: List<Author>,
-            mail: String?,
-            url: String?,
-            licence: List<String>,
-            poweredBy: List<About>,
-            copyright: String?,
+            version: String? = null,
+            author: List<Author> = emptyList(),
+            mail: String? = null,
+            url: String? = null,
+            licence: List<String> = emptyList(),
+            poweredBy: List<About> = emptyList(),
+            copyright: String? = null,
         ): About {
             return AboutImpl(name, version, author, mail, url, licence, poweredBy, copyright)
         }
@@ -136,8 +137,9 @@ interface Author {
 
     companion object {
 
+        @JvmOverloads
         @JvmStatic
-        fun of(name: String, mail: String?, url: String?): Author {
+        fun of(name: String, mail: String? = null, url: String? = null): Author {
             return AuthorImpl(name, mail, url)
         }
 
@@ -396,8 +398,8 @@ interface SemVer : Comparable<SemVer> {
 
         private val IDENTIFIER_PATTERN = "[0-9A-Za-z-]+".toRegex()
 
-        @JvmStatic
         @JvmOverloads
+        @JvmStatic
         fun of(
             normalNumbers: List<Int>,
             preRelease: List<Any> = emptyList(),
@@ -406,8 +408,8 @@ interface SemVer : Comparable<SemVer> {
             return newSemVer(normalNumbers, preRelease.toPreRelease(), buildMetadata)
         }
 
-        @JvmStatic
         @JvmOverloads
+        @JvmStatic
         fun of(
             major: Int,
             minor: Int,
@@ -427,8 +429,8 @@ interface SemVer : Comparable<SemVer> {
             return SemVerImpl(normalNumbers, preRelease, buildMetadata.toBuildMetadata())
         }
 
-        @JvmStatic
         @JvmName("parse")
+        @JvmStatic
         fun CharSequence.parseSemVer(): SemVer {
 
             fun parseNormalNumbers(subSpec: CharSequence): List<Int> {

@@ -39,3 +39,5 @@ dependencies {
   testAnnotationProcessor platform(project(":boat-dependencies"))
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
 }
+
+utils.writeBuildInfos(project, "src/main/resources/META-INF/build.properties")
