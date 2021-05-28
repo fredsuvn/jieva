@@ -5,7 +5,9 @@ import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.reflect.INHERITANCE_COMPARATOR
 
 /**
- * Fast and narrowing version of [Converter], supports convert given object to type [R].
+ * Fast version of [Converter].
+ *
+ * It uses [FastConvertHandler] which must provide [FastConvertHandler.supportedType] to ensure supported `fromType`.
  *
  * @see FastConvertHandler
  */
