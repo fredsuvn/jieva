@@ -72,7 +72,7 @@ interface FastConverter {
 
             private val handlerMap: Map<Pair<Class<*>, Class<*>>, FastConvertHandler<*, *>> =
                 handlers.associateBy { it.fromType to it.toType }
-            private val handlerArray: Array<FastConvertHandler<*, *>> = handlerMap.values
+            private val handlerArray: Array<FastConvertHandler<*, *>> = handlers
                 .sortedWith label@{ it1, it2 ->
                     val c1From = it1.fromType
                     val c2From = it2.fromType
