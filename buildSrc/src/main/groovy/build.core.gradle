@@ -1,3 +1,4 @@
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -35,10 +36,21 @@ static String readFileAsString(String path, String charset) {
   ), charset)
 }
 
+static void writeBuildInfos(Project project, String relativePath) {
+  Map<String, String> properties = new LinkedHashMap<>()
+  properties.put("build.version", project.version.toString())
+  StringBuilder buffer = new StringBuilder()
+  properties.forEach() { k, v ->
+    buffer.append(k).append("=").append(v)
+  }
+  Files.write(Paths.get(project.projectDir.path, relativePath), buffer.toString().getBytes(StandardCharsets.UTF_8))
+}
+
 ext["utils"] = [
   isEnable                  : this.&isEnable,
   currentGradleDirectoryPath: this.&currentGradleDirectoryPath,
   readFileAsString          : this.&readFileAsString,
+  writeBuildInfos           : this.&writeBuildInfos,
 ]
 
 class Printer {

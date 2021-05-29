@@ -28,12 +28,12 @@ public class ConvertSample {
         //2
         logger.log("b1: {}", b.getP2());
 
-        FastConverter<String> fastConverter = FastConverter.newFastConverter(
-            Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
-        //123
-        logger.log(fastConverter.convert(new StringBuilder("123")));
-        //123123
-        logger.log(fastConverter.convert("123"));
+        FastConverter fastConverter = FastConverter.newFastConverter(
+            Arrays.asList(new IntToStringConvertHandler(), new NumberToStringConvertHandler()));
+        //I123
+        logger.log(fastConverter.convert(123, String.class));
+        //N123
+        logger.log(fastConverter.convert(123L, String.class));
     }
 
     public static class A {
@@ -78,31 +78,45 @@ public class ConvertSample {
         }
     }
 
-    private static class ObjectConvertHandler implements FastConvertHandler<String> {
+    private static class IntToStringConvertHandler implements FastConvertHandler<Integer, String> {
 
         @NotNull
         @Override
-        public Class<?> supportedType() {
-            return Object.class;
+        public Class<?> fromType() {
+            return Integer.class;
         }
-
-        @Override
-        public String convert(@NotNull Object from) {
-            return from.toString();
-        }
-    }
-
-    private static class StringConvertHandler implements FastConvertHandler<String> {
 
         @NotNull
         @Override
-        public Class<?> supportedType() {
+        public Class<?> toType() {
             return String.class;
         }
 
+        @NotNull
         @Override
-        public String convert(@NotNull Object from) {
-            return from.toString() + from.toString();
+        public String convert(@NotNull Integer from) {
+            return "I" + from;
+        }
+    }
+
+    private static class NumberToStringConvertHandler implements FastConvertHandler<Number, String> {
+
+        @NotNull
+        @Override
+        public Class<?> fromType() {
+            return Number.class;
+        }
+
+        @NotNull
+        @Override
+        public Class<?> toType() {
+            return String.class;
+        }
+
+        @NotNull
+        @Override
+        public String convert(@NotNull Number from) {
+            return "N" + from;
         }
     }
 }

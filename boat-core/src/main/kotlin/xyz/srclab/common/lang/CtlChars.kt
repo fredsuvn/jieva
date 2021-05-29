@@ -440,44 +440,52 @@ object SgrChars {
     val reset: String
         @JvmName("reset") get() = EscChars.csiChars("${SgrParam.RESET.value}m")
 
+    @JvmOverloads
     @JvmStatic
-    fun foregroundBlack(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_BLACK)
+    fun foregroundBlack(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_BLACK else SgrParam.FOREGROUND_BLACK)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun foregroundRed(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_RED)
+    fun foregroundRed(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_RED else SgrParam.FOREGROUND_RED)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun foregroundGreen(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_GREEN)
+    fun foregroundGreen(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_GREEN else SgrParam.FOREGROUND_GREEN)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun foregroundBrown(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_BROWN)
+    fun foregroundYellow(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_YELLOW else SgrParam.FOREGROUND_YELLOW)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun foregroundBlue(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_BLUE)
+    fun foregroundBlue(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_BLUE else SgrParam.FOREGROUND_BLUE)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun foregroundMagenta(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_MAGENTA)
+    fun foregroundMagenta(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_MAGENTA else SgrParam.FOREGROUND_MAGENTA)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun foregroundCyan(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_CYAN)
+    fun foregroundCyan(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_CYAN else SgrParam.FOREGROUND_CYAN)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun foregroundWhite(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_WHITE)
+    fun foregroundWhite(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_WHITE else SgrParam.FOREGROUND_WHITE)
     }
 
     @JvmStatic
@@ -485,44 +493,52 @@ object SgrChars {
         return withParam(content, SgrParam.FOREGROUND_DEFAULT)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun backgroundBlack(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_BLACK)
+    fun backgroundBlack(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_BLACK else SgrParam.BACKGROUND_BLACK)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun backgroundRed(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_RED)
+    fun backgroundRed(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_RED else SgrParam.BACKGROUND_RED)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun backgroundGreen(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_GREEN)
+    fun backgroundGreen(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_GREEN else SgrParam.BACKGROUND_GREEN)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun backgroundBrown(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_BROWN)
+    fun backgroundYellow(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_YELLOW else SgrParam.BACKGROUND_YELLOW)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun backgroundBlue(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_BLUE)
+    fun backgroundBlue(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_BLUE else SgrParam.BACKGROUND_BLUE)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun backgroundMagenta(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_MAGENTA)
+    fun backgroundMagenta(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_MAGENTA else SgrParam.BACKGROUND_MAGENTA)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun backgroundCyan(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_CYAN)
+    fun backgroundCyan(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_CYAN else SgrParam.BACKGROUND_CYAN)
     }
 
+    @JvmOverloads
     @JvmStatic
-    fun backgroundWhite(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_WHITE)
+    fun backgroundWhite(content: Any?, bright: Boolean = false): String {
+        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_WHITE else SgrParam.BACKGROUND_WHITE)
     }
 
     @JvmStatic
@@ -654,7 +670,7 @@ interface SgrParam {
         val FOREGROUND_GREEN: SgrParam = SgrParam.of("32")
 
         @JvmField
-        val FOREGROUND_BROWN: SgrParam = SgrParam.of("33")
+        val FOREGROUND_YELLOW: SgrParam = SgrParam.of("33")
 
         @JvmField
         val FOREGROUND_BLUE: SgrParam = SgrParam.of("34")
@@ -681,7 +697,7 @@ interface SgrParam {
         val BACKGROUND_GREEN: SgrParam = SgrParam.of("42")
 
         @JvmField
-        val BACKGROUND_BROWN: SgrParam = SgrParam.of("43")
+        val BACKGROUND_YELLOW: SgrParam = SgrParam.of("43")
 
         @JvmField
         val BACKGROUND_BLUE: SgrParam = SgrParam.of("44")
@@ -723,7 +739,7 @@ interface SgrParam {
         val FOREGROUND_BRIGHT_GREEN: SgrParam = SgrParam.of("92")
 
         @JvmField
-        val FOREGROUND_BRIGHT_BROWN: SgrParam = SgrParam.of("93")
+        val FOREGROUND_BRIGHT_YELLOW: SgrParam = SgrParam.of("93")
 
         @JvmField
         val FOREGROUND_BRIGHT_BLUE: SgrParam = SgrParam.of("94")
@@ -747,7 +763,7 @@ interface SgrParam {
         val BACKGROUND_BRIGHT_GREEN: SgrParam = SgrParam.of("102")
 
         @JvmField
-        val BACKGROUND_BRIGHT_BROWN: SgrParam = SgrParam.of("103")
+        val BACKGROUND_BRIGHT_YELLOW: SgrParam = SgrParam.of("103")
 
         @JvmField
         val BACKGROUND_BRIGHT_BLUE: SgrParam = SgrParam.of("104")

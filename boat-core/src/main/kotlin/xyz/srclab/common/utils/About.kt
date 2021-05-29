@@ -48,16 +48,17 @@ interface About {
 
     companion object {
 
+        @JvmOverloads
         @JvmStatic
         fun of(
             name: String,
-            version: String?,
-            author: List<Author>,
-            mail: String?,
-            url: String?,
-            licence: List<String>,
-            poweredBy: List<About>,
-            copyright: String?,
+            version: String? = null,
+            author: List<Author> = emptyList(),
+            mail: String? = null,
+            url: String? = null,
+            licence: List<String> = emptyList(),
+            poweredBy: List<About> = emptyList(),
+            copyright: String? = null,
         ): About {
             return AboutImpl(name, version, author, mail, url, licence, poweredBy, copyright)
         }
@@ -100,16 +101,39 @@ interface About {
             }
 
             override fun toString(): String {
-                return """
-                    $name
-                    Version: $version
-                    Author: ${authors.joinToString()}
-                    Mail: $mail
-                    Url: $url
-                    Licence: ${licences.joinToString()}
-                    Powered by: ${poweredBys.joinToString { it.name }}
-                    $copyright
-                """.trimIndent()
+                val builder = StringBuilder()
+                var count = 0
+                if (!version.isNullOrEmpty()) {
+                    builder.append("Version: $version")
+                    count++
+                }
+
+                fun String.appendInfo() {
+                    if (count > 0) {
+                        builder.append(", ")
+                    }
+                    builder.append(this)
+                }
+
+                if (authors.isNotEmpty()) {
+                    "Authors: $authors".appendInfo()
+                }
+                if (!mail.isNullOrEmpty()) {
+                    "Mail: $mail".appendInfo()
+                }
+                if (!url.isNullOrEmpty()) {
+                    "Url: $url".appendInfo()
+                }
+                if (licences.isNotEmpty()) {
+                    "Licences: $licences".toString().appendInfo()
+                }
+                if (poweredBys.isNotEmpty()) {
+                    "Powered By: $poweredBys".toString().appendInfo()
+                }
+                if (!copyright.isNullOrEmpty()) {
+                    "Copyright: $copyright".appendInfo()
+                }
+                return if (count == 0) name else "$name[$builder]"
             }
         }
     }
@@ -136,8 +160,9 @@ interface Author {
 
     companion object {
 
+        @JvmOverloads
         @JvmStatic
-        fun of(name: String, mail: String?, url: String?): Author {
+        fun of(name: String, mail: String? = null, url: String? = null): Author {
             return AuthorImpl(name, mail, url)
         }
 
@@ -168,12 +193,12 @@ interface Author {
                     return name
                 }
                 if (mail === null && url !== null) {
-                    return "$name($url)"
+                    return "$name[$url]"
                 }
                 if (mail !== null && url === null) {
-                    return "$name($mail)"
+                    return "$name[$mail]"
                 }
-                return "$name($mail, $url)"
+                return "$name[$mail, $url]"
             }
         }
     }
@@ -396,8 +421,8 @@ interface SemVer : Comparable<SemVer> {
 
         private val IDENTIFIER_PATTERN = "[0-9A-Za-z-]+".toRegex()
 
-        @JvmStatic
         @JvmOverloads
+        @JvmStatic
         fun of(
             normalNumbers: List<Int>,
             preRelease: List<Any> = emptyList(),
@@ -406,8 +431,8 @@ interface SemVer : Comparable<SemVer> {
             return newSemVer(normalNumbers, preRelease.toPreRelease(), buildMetadata)
         }
 
-        @JvmStatic
         @JvmOverloads
+        @JvmStatic
         fun of(
             major: Int,
             minor: Int,
@@ -427,8 +452,8 @@ interface SemVer : Comparable<SemVer> {
             return SemVerImpl(normalNumbers, preRelease, buildMetadata.toBuildMetadata())
         }
 
-        @JvmStatic
         @JvmName("parse")
+        @JvmStatic
         fun CharSequence.parseSemVer(): SemVer {
 
             fun parseNormalNumbers(subSpec: CharSequence): List<Int> {

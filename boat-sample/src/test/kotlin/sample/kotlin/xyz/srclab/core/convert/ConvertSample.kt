@@ -2,7 +2,7 @@ package sample.kotlin.xyz.srclab.core.convert
 
 import org.testng.annotations.Test
 import xyz.srclab.common.convert.FastConvertHandler
-import xyz.srclab.common.convert.FastConverter.Companion.newFastConverter
+import xyz.srclab.common.convert.FastConverter
 import xyz.srclab.common.convert.convert
 import xyz.srclab.common.test.TestLogger
 
@@ -24,13 +24,12 @@ class ConvertSample {
         //2
         logger.log("b1: {}", b.p2)
 
-        val fastConverter = newFastConverter(listOf(ObjectConvertHandler(), StringConvertHandler()))
-        //123
-        //123
-        logger.log(fastConverter.convert(StringBuilder("123")))
-        //123123
-        //123123
-        logger.log(fastConverter.convert("123"))
+        val fastConverter =
+            FastConverter.newFastConverter(listOf(IntToStringConvertHandler, NumberToStringConvertHandler))
+        //I123
+        logger.log(fastConverter.convert(123, String::class.java))
+        //N123
+        logger.log(fastConverter.convert(123L, String::class.java))
     }
 
 
@@ -49,20 +48,18 @@ class B {
     var p2 = 0
 }
 
-private class ObjectConvertHandler : FastConvertHandler<String> {
-
-    override val supportedType: Class<*> = Any::class.java
-
-    override fun convert(from: Any): String {
-        return from.toString()
+private object IntToStringConvertHandler : FastConvertHandler<Int, String> {
+    override val fromType: Class<*> = Int::class.java
+    override val toType: Class<*> = String::class.java
+    override fun convert(from: Int): String {
+        return "I$from"
     }
 }
 
-private class StringConvertHandler : FastConvertHandler<String> {
-
-    override val supportedType: Class<*> = String::class.java
-
-    override fun convert(from: Any): String {
-        return from.toString() + from.toString()
+private object NumberToStringConvertHandler : FastConvertHandler<Number, String> {
+    override val fromType: Class<*> = Number::class.java
+    override val toType: Class<*> = String::class.java
+    override fun convert(from: Number): String {
+        return "N$from"
     }
 }

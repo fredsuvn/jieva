@@ -1,6 +1,7 @@
 package xyz.srclab.common.id;
 
 import org.apache.commons.lang3.StringUtils;
+import xyz.srclab.common.exception.ImpossibleException;
 
 import java.math.BigInteger;
 import java.util.Objects;
@@ -89,10 +90,7 @@ public class Snowflake {
             lowId |= timestamp << sequenceBitsCount + workerIdBitsCount;
             highId = timestamp >>> lowTimestampBits;
         } else {
-            int lowWorkerIdBits = 64 - sequenceBitsCount;
-            highId = workerId >>> lowWorkerIdBits;
-            int highWorkerIdBits = workerIdBitsCount - lowWorkerIdBits;
-            highId |= timestamp << highWorkerIdBits;
+            throw new ImpossibleException("sequenceBitsCount + workerIdBitsCount > 64???");
         }
         byte[] result = new byte[16];
         result[0] = (byte) (highId >>> 56);
