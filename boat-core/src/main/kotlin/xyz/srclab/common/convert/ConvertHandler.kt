@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Handler for [Converter].
  *
- * A [Converter] uses a group of [ConvertHandler]s to perform.
+ * By default, a [Converter] uses a group of [ConvertHandler]s to do convert action for each handler.
  * If a handler returns [Next.CONTINUE], the converter will call next handler;
  * if returns [Next.BREAK], the converter will fail to convert.
  *
@@ -38,6 +38,8 @@ interface ConvertHandler {
 
     /**
      * Fast hit for `toType`.
+     *
+     * Default [Converter] implementation will try to find associate handler by this, and ask for conversation first.
      */
     @get:JvmName("toTypeFastHit")
     @JvmDefault
@@ -48,17 +50,29 @@ interface ConvertHandler {
         }
 
     /**
+     * Do convert from [from] to [toType].
+     *
      * Note [Next] type is a special type that cannot be supported.
+     * Returns [Next.CONTINUE] means current conversation is unsupported but suggest to ask for next handler;
+     * returns [Next.BREAK] means current conversation is unsupported and suggest to break immediately.
      */
     fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any?
 
     /**
+     * Do convert from [from] to [toType].
+     *
      * Note [Next] type is a special type that cannot be supported.
+     * Returns [Next.CONTINUE] means current conversation is unsupported but suggest to ask for next handler;
+     * returns [Next.BREAK] means current conversation is unsupported and suggest to break immediately.
      */
     fun convert(from: Any?, toType: Type, converter: Converter): Any?
 
     /**
+     * Do convert from [from] to [toType].
+     *
      * Note [Next] type is a special type that cannot be supported.
+     * Returns [Next.CONTINUE] means current conversation is unsupported but suggest to ask for next handler;
+     * returns [Next.BREAK] means current conversation is unsupported and suggest to break immediately.
      */
     fun convert(from: Any?, fromType: Type, toType: Type, converter: Converter): Any?
 
@@ -682,6 +696,9 @@ open class BeanConvertHandler @JvmOverloads constructor(
     }
 }
 
+/**
+ * Default [ConvertHandler] for `failed conversation`, see [Converter.newConverter].
+ */
 object DefaultFailedConvertHandler : ConvertHandler {
 
     override fun <T> convert(from: Any?, toType: Class<T>, converter: Converter): Any? {

@@ -10,7 +10,8 @@ import xyz.srclab.common.lang.asAny
 //Inheritance sort:
 
 /**
- * The subclass comes before the parent.
+ * Compares the inheritance tree in natural order,
+ * parent type is greater then subtype, so the subclass comes before the parent.
  */
 @get:JvmName("inheritanceComparator")
 val INHERITANCE_COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
