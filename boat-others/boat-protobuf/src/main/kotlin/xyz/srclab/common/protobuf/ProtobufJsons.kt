@@ -5,6 +5,7 @@ package xyz.srclab.common.protobuf
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -12,6 +13,9 @@ import com.hubspot.jackson.datatype.protobuf.ProtobufModule
 import xyz.srclab.common.serialize.json.JsonSerializer
 import xyz.srclab.common.serialize.json.toJsonSerializer
 
+/**
+ * [ObjectMapper] supports protobuf types.
+ */
 @JvmField
 val PROTOBUF_OBJECT_MAPPER: JsonMapper = run {
     val mapper = JsonMapper()
@@ -27,5 +31,10 @@ val PROTOBUF_OBJECT_MAPPER: JsonMapper = run {
     mapper
 }
 
+/**
+ * [JsonSerializer] supports protobuf types.
+ *
+ * @see PROTOBUF_OBJECT_MAPPER
+ */
 @JvmField
 val PROTOBUF_JSON_SERIALIZER: JsonSerializer = PROTOBUF_OBJECT_MAPPER.toJsonSerializer()

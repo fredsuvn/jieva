@@ -17,7 +17,7 @@ import xyz.srclab.common.reflect.toTypeSignature
 import java.lang.reflect.Method
 
 /**
- * Bean resolve handler for Protobuf object.
+ * Bean resolve handler supports Protobuf types.
  *
  * @see BeanResolveHandler
  */
