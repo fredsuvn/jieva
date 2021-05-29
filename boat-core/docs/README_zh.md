@@ -826,12 +826,12 @@ Java Examples
             //2
             logger.log("b1: {}", b.getP2());
 
-            FastConverter<String> fastConverter = FastConverter.newFastConverter(
-                Arrays.asList(new ObjectConvertHandler(), new StringConvertHandler()));
-            //123
-            logger.log(fastConverter.convert(new StringBuilder("123")));
-            //123123
-            logger.log(fastConverter.convert("123"));
+            FastConverter fastConverter = FastConverter.newFastConverter(
+                Arrays.asList(new IntToStringConvertHandler(), new NumberToStringConvertHandler()));
+            //I123
+            logger.log(fastConverter.convert(123, String.class));
+            //N123
+            logger.log(fastConverter.convert(123L, String.class));
         }
 
         public static class A {
@@ -876,31 +876,45 @@ Java Examples
             }
         }
 
-        private static class ObjectConvertHandler implements FastConvertHandler<String> {
+        private static class IntToStringConvertHandler implements FastConvertHandler<Integer, String> {
 
             @NotNull
             @Override
-            public Class<?> supportedType() {
-                return Object.class;
+            public Class<?> fromType() {
+                return Integer.class;
             }
-
-            @Override
-            public String convert(@NotNull Object from) {
-                return from.toString();
-            }
-        }
-
-        private static class StringConvertHandler implements FastConvertHandler<String> {
 
             @NotNull
             @Override
-            public Class<?> supportedType() {
+            public Class<?> toType() {
                 return String.class;
             }
 
+            @NotNull
             @Override
-            public String convert(@NotNull Object from) {
-                return from.toString() + from.toString();
+            public String convert(@NotNull Integer from) {
+                return "I" + from;
+            }
+        }
+
+        private static class NumberToStringConvertHandler implements FastConvertHandler<Number, String> {
+
+            @NotNull
+            @Override
+            public Class<?> fromType() {
+                return Number.class;
+            }
+
+            @NotNull
+            @Override
+            public Class<?> toType() {
+                return String.class;
+            }
+
+            @NotNull
+            @Override
+            public String convert(@NotNull Number from) {
+                return "N" + from;
             }
         }
     }
@@ -911,7 +925,7 @@ Kotlin Examples
 
     import org.testng.annotations.Test
     import xyz.srclab.common.convert.FastConvertHandler
-    import xyz.srclab.common.convert.FastConverter.Companion.newFastConverter
+    import xyz.srclab.common.convert.FastConverter
     import xyz.srclab.common.convert.convert
     import xyz.srclab.common.test.TestLogger
 
@@ -933,13 +947,12 @@ Kotlin Examples
             //2
             logger.log("b1: {}", b.p2)
 
-            val fastConverter = newFastConverter(listOf(ObjectConvertHandler(), StringConvertHandler()))
-            //123
-            //123
-            logger.log(fastConverter.convert(StringBuilder("123")))
-            //123123
-            //123123
-            logger.log(fastConverter.convert("123"))
+            val fastConverter =
+                FastConverter.newFastConverter(listOf(IntToStringConvertHandler, NumberToStringConvertHandler))
+            //I123
+            logger.log(fastConverter.convert(123, String::class.java))
+            //N123
+            logger.log(fastConverter.convert(123L, String::class.java))
         }
 
 
@@ -958,21 +971,19 @@ Kotlin Examples
         var p2 = 0
     }
 
-    private class ObjectConvertHandler : FastConvertHandler<String> {
-
-        override val supportedType: Class<*> = Any::class.java
-
-        override fun convert(from: Any): String {
-            return from.toString()
+    private object IntToStringConvertHandler : FastConvertHandler<Int, String> {
+        override val fromType: Class<*> = Int::class.java
+        override val toType: Class<*> = String::class.java
+        override fun convert(from: Int): String {
+            return "I$from"
         }
     }
 
-    private class StringConvertHandler : FastConvertHandler<String> {
-
-        override val supportedType: Class<*> = String::class.java
-
-        override fun convert(from: Any): String {
-            return from.toString() + from.toString()
+    private object NumberToStringConvertHandler : FastConvertHandler<Number, String> {
+        override val fromType: Class<*> = Number::class.java
+        override val toType: Class<*> = String::class.java
+        override fun convert(from: Number): String {
+            return "N$from"
         }
     }
 
