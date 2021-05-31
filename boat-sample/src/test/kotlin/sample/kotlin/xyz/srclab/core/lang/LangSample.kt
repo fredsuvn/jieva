@@ -68,7 +68,7 @@ class BaseSample {
         //This is a } Dog, that is a Cat}
         logger.log(template2.process(args))
         val template3 = "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\".resolveTemplate("{", "}", "\\")
-        //This is a } {DogX (Dog), that is a Bird\\{\
+        //This is a } {DogX (Dog), that is a Bird\{\
         logger.log(template3.process(args))
     }
 

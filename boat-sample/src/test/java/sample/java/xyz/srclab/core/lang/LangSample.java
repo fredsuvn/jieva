@@ -91,7 +91,7 @@ public class LangSample {
         logger.log(template2.process(args));
         CharsTemplate template3 = CharsTemplate.resolve(
             "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
-        //This is a } {DogX (Dog), that is a Bird\\{\
+        //This is a } {DogX (Dog), that is a Bird\{\
         logger.log(template3.process(args));
     }
 
