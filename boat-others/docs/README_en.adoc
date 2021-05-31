@@ -1,4 +1,4 @@
-= image:../../logo.svg[Boat Serialize] `boat-other`: Boat Others -- Third Party Supporting and Extension Libs for link:../../README.md[Boat]
+= image:../../logo.svg[Boat Others] Boat Others -- Third Party Supporting and Extension Libs for link:../../README.md[Boat]
 :toc:
 :toclevels: 3
 :last-update-label!:

@@ -1,4 +1,4 @@
-# ![Boat Others](../logo.svg) `boat-other`: Boat Others -- Third Party Supporting and Extension Libs for [Boat](../README.md)
+# ![Boat Others](../logo.svg) Boat Others -- Third Party Supporting and Extension Libs for [Boat](../README.md)
 
 ## Choose doc style you like:
 

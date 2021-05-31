@@ -15,7 +15,6 @@
 Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于 link:{srclab-url}[SrcLab] 里的项目.
 它提供了许多方便快捷的接口, 函数和工具.
 
-[[boat-include]]
 Boat 包括:
 
 * link:../boat-annotations/README.md[boat-annotations]: 核心注解;

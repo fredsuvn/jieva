@@ -14,7 +14,6 @@ Sun Qian <fredsuvn@163.com>
 Boat is a set of core Java/Kotlin libraries (JDK 1.8+), mostly written by kotlin, widely used on JVM projects within link:{srclab-url}[SrcLab].
 It provides many fast and convenient interfaces, functions and utilities.
 
-[[boat-include]]
 Boat includes:
 
 * link:../boat-annotations/README.md[boat-annotations]: Core annotations;

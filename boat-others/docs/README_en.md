@@ -1,4 +1,4 @@
-# <span class="image">![Boat Serialize](../../logo.svg)</span> `boat-other`: Boat Others — Third Party Supporting and Extension Libs for [Boat](../../README.md)
+# <span class="image">![Boat Others](../../logo.svg)</span> Boat Others — Third Party Supporting and Extension Libs for [Boat](../../README.md)
 
 <span id="author" class="author">Sun Qian</span>  
 <span id="email" class="email"><fredsuvn@163.com></span>  
