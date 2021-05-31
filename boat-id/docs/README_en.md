@@ -171,23 +171,43 @@ Java Examples
 
         @Test
         public void testId() {
-            //seq-06803239610792857600-tail
-            String spec = "seq-{Snowflake, 20, 41, 10, 12}-tail";
-            IdSpec stringIdSpec = new IdSpec(spec);
+            //seq0-06803239610792857600-tail
+            String spec0 = "seq0-{Snowflake, 20, 41, 10, 12}-tail";
+            IdSpec stringIdSpec0 = new IdSpec(spec0);
             for (int i = 0; i < 10; i++) {
-                logger.log(stringIdSpec.newId());
+                logger.log(stringIdSpec0.newId());
             }
 
-            //seq{}-06803240106559590400-tail
-            String spec2 = "seq\\{}-{Snowflake, 20, 41, 10, 12}-tail";
+            //seq1-00001826267315077279180346359808-tail
+            String spec1 = "seq1-{Snowflake, 32, 55, 25, 25}-tail";
+            IdSpec stringIdSpec1 = new IdSpec(spec1);
+            for (int i = 0; i < 10; i++) {
+                logger.log(stringIdSpec1.newId());
+            }
+
+            //seq2-29921563690270857976266765631488-tail
+            String spec2 = "seq2-{Snowflake, 32, 63, 32, 32}-tail";
             IdSpec stringIdSpec2 = new IdSpec(spec2);
             for (int i = 0; i < 10; i++) {
                 logger.log(stringIdSpec2.newId());
             }
 
-            String spec3 = "seq\\{\\}-{Snowflake, 20, 41, 10, 12";
-            Assert.expectThrows(IllegalArgumentException.class, () -> new IdSpec(spec3));
-            //new StringIdSpec(spec3);
+            //seq3{}-06803240106559590400-tail
+            String spec3 = "seq3\\{}-{Snowflake, 20, 41, 10, 12}-tail";
+            IdSpec stringIdSpec3 = new IdSpec(spec3);
+            for (int i = 0; i < 10; i++) {
+                logger.log(stringIdSpec3.newId());
+            }
+
+            //seq4{}-06805124180752646144-tail
+            String spec4 = "seq4\\{\\}-{Snowflake, 20, 41, 10, 12}-tail";
+            IdSpec stringIdSpec4 = new IdSpec(spec4);
+            for (int i = 0; i < 10; i++) {
+                logger.log(stringIdSpec4.newId());
+            }
+
+            String spec5 = "seq5\\{\\}-{Snowflake, 20, 41, 10, 12";
+            Assert.expectThrows(IllegalArgumentException.class, () -> new IdSpec(spec5));
         }
 
         @Test
@@ -253,28 +273,50 @@ Kotlin Examples
     import xyz.srclab.common.test.TestLogger
 
     class IdSample {
+
         private val logger = TestLogger.DEFAULT
 
         @Test
         fun testId() {
-            //seq-06803239610792857600-tail
-            val spec = "seq-{Snowflake, 20, 41, 10, 12}-tail"
-            val stringIdSpec = IdSpec(spec)
+            //seq0-06803239610792857600-tail
+            val spec0 = "seq0-{Snowflake, 20, 41, 10, 12}-tail"
+            val stringIdSpec0 = IdSpec(spec0)
             for (i in 0..9) {
-                logger.log(stringIdSpec.newId())
+                logger.log(stringIdSpec0.newId())
             }
 
-            //seq{}-06803240106559590400-tail
-            val spec2 = "seq\\{}-{Snowflake, 20, 41, 10, 12}-tail"
+            //seq1-00001826267315077279180346359808-tail
+            val spec1 = "seq1-{Snowflake, 32, 55, 25, 25}-tail"
+            val stringIdSpec1 = IdSpec(spec1)
+            for (i in 0..9) {
+                logger.log(stringIdSpec1.newId())
+            }
+
+            //seq2-29921563690270857976266765631488-tail
+            val spec2 = "seq2-{Snowflake, 32, 63, 32, 32}-tail"
             val stringIdSpec2 = IdSpec(spec2)
             for (i in 0..9) {
                 logger.log(stringIdSpec2.newId())
             }
-            val spec3 = "seq\\{\\}-{Snowflake, 20, 41, 10, 12"
+
+            //seq3{}-06803240106559590400-tail
+            val spec3 = "seq3\\{}-{Snowflake, 20, 41, 10, 12}-tail"
+            val stringIdSpec3 = IdSpec(spec3)
+            for (i in 0..9) {
+                logger.log(stringIdSpec3.newId())
+            }
+
+            //seq4{}-06805124180752646144-tail
+            val spec4 = "seq4\\{\\}-{Snowflake, 20, 41, 10, 12}-tail"
+            val stringIdSpec4 = IdSpec(spec4)
+            for (i in 0..9) {
+                logger.log(stringIdSpec4.newId())
+            }
+
+            val spec5 = "seq5\\{\\}-{Snowflake, 20, 41, 10, 12"
             Assert.expectThrows(
                 IllegalArgumentException::class.java
-            ) { IdSpec(spec3) }
-            //new StringIdSpec(spec3);
+            ) { IdSpec(spec5) }
         }
 
         @Test
