@@ -1,4 +1,4 @@
-= image:../../logo.svg[Boat Serialize] `boat-other`: Boat Others -- link:../../README.md[Boat] 第三方支持和扩展库
+= image:../../logo.svg[Boat Others] Boat Others -- link:../../README.md[Boat] 第三方支持和扩展库
 :toc:
 :toclevels: 3
 :toc-title: 目录

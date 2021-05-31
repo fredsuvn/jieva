@@ -1,4 +1,4 @@
-# <span class="image">![Boat Serialize](../../logo.svg)</span> `boat-other`: Boat Others — [Boat](../../README.md) 第三方支持和扩展库
+# <span class="image">![Boat Others](../../logo.svg)</span> Boat Others — [Boat](../../README.md) 第三方支持和扩展库
 
 <span id="author" class="author">Sun Qian</span>  
 <span id="email" class="email"><fredsuvn@163.com></span>  
