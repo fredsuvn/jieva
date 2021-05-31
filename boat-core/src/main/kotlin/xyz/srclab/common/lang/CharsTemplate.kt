@@ -31,10 +31,9 @@ import java.util.*
  * Assert.assertEquals(template3.process(args), "This is a } {DogX (Dog), that is a Bird\\\\{\\");
  * ```
  * Note:
- * * Escape works in front of parameter prefix token outside parameter scope;
- * * Escape works in front of parameter suffix token inside parameter scope;
+ * * Escape works in front of any token;
  * * Parameter suffix token can be used before parameter prefix token --
- *   in this case, it will be seem as a common text.
+ *   in this case, it will be seem as a common text;
  */
 @ThreadSafe
 interface CharsTemplate {
@@ -234,8 +233,8 @@ interface CharsTemplate {
 
         private const val ELLIPSES_NUMBER = 10
 
-        @JvmStatic
         @JvmName("resolve")
+        @JvmStatic
         fun CharSequence.resolveTemplate(parameterPrefix: String, parameterSuffix: String): CharsTemplate {
             var prefixIndex = this.indexOf(parameterPrefix)
             if (prefixIndex < 0) {
@@ -291,8 +290,8 @@ interface CharsTemplate {
             return newCharsTemplateByTokens(this, tokens)
         }
 
-        @JvmStatic
         @JvmName("resolve")
+        @JvmStatic
         fun CharSequence.resolveTemplate(
             parameterPrefix: String,
             parameterSuffix: String,
@@ -301,29 +300,18 @@ interface CharsTemplate {
             val tokens = LinkedList<Token>()
             var startIndex = 0
             var i = 0
-            var inParameterScope = false
             var argIndex = 0
+            var inParameterScope = false
             while (i < this.length) {
-                val char = this[i]
                 if (this.startsWith(escape, i)) {
                     val nextIndex = i + escape.length
                     if (nextIndex >= this.length) {
                         break
                     }
-                    if (inParameterScope && this.startsWith(parameterSuffix, nextIndex)) {
-                        if (i > startIndex) {
-                            tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT, argIndex))
-                        }
-                        startIndex = nextIndex
-                        i = nextIndex + parameterSuffix.length
-                        continue
-                    }
-                    if (!inParameterScope && this.startsWith(parameterPrefix, nextIndex)) {
-                        tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT))
-                        startIndex = nextIndex
-                        i = nextIndex + parameterPrefix.length
-                        continue
-                    }
+                    tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT))
+                    startIndex = nextIndex
+                    i = nextIndex + 1
+                    continue
                 }
                 if (this.startsWith(parameterPrefix, i)) {
                     if (inParameterScope) {
