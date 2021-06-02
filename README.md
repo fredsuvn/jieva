@@ -14,7 +14,7 @@
 
 More see [docs/](docs/)
 
-## Contribution and Contact
+## Join
 
 * fredsuvn@163.com
 * https://github.com/srclab-projects/boat
