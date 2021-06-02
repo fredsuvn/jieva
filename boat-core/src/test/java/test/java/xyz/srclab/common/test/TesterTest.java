@@ -3,6 +3,7 @@ package test.java.xyz.srclab.common.test;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.lang.Current;
 import xyz.srclab.common.run.Runner;
 import xyz.srclab.common.test.*;
 
@@ -16,7 +17,7 @@ import java.util.Random;
  */
 public class TesterTest {
 
-    private static final Random random = new Random();
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testTests() {
@@ -52,7 +53,9 @@ public class TesterTest {
                 public void afterRunEach(@NotNull TestTask testTask, @NotNull TestTaskResult testTaskResult) {
                     TestListener.DEFAULT.afterRunEach(testTask, testTaskResult);
                     long time = testMarker.getMark(testTask.name());
-                    Assert.assertTrue(testTaskResult.cost().toMillis() >= time);
+                    long cost = testTaskResult.cost().toMillis();
+                    logger.log("cost: {}, time: {}", cost, time);
+                    Assert.assertTrue(cost >= time);
                 }
 
                 @Override
@@ -64,9 +67,15 @@ public class TesterTest {
                     long average = map.values().stream().mapToLong(v -> Long.parseLong(v.toString())).sum() / 5;
                     long max = map.values().stream().mapToLong(v -> Long.parseLong(v.toString())).max()
                         .orElse(0);
-                    Assert.assertTrue(testResult.totalCost().toMillis() >= total);
-                    Assert.assertTrue(testResult.averageCost().toMillis() >= average);
-                    Assert.assertTrue(testResult.awaitCost().toMillis() >= max);
+                    long totalCost = testResult.totalCost().toMillis();
+                    long averageCost = testResult.averageCost().toMillis();
+                    long awaitCost = testResult.awaitCost().toMillis();
+                    logger.log("totalCost: {}, time: {}", totalCost, total);
+                    logger.log("averageCost: {}, time: {}", averageCost, average);
+                    logger.log("awaitCost: {}, time: {}", awaitCost, max);
+                    Assert.assertTrue(totalCost >= total);
+                    Assert.assertTrue(averageCost >= average);
+                    Assert.assertTrue(awaitCost >= max);
                 }
             }
         );
@@ -74,14 +83,9 @@ public class TesterTest {
 
     private TestTask newTask(String name, TestMarker testMarker) {
         return TestTask.newTask(name, () -> {
-            try {
-                long time = random.nextInt(5) * (random.nextInt(400) + 800);
-                testMarker.mark(name, time);
-                Thread.sleep(time);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return null;
+            long time = new Random().nextInt(400) + 800;
+            testMarker.mark(name, time);
+            Current.sleep(time);
         });
     }
 }
