@@ -1,8 +1,4 @@
-# Boat: SrcLab Core Libraries for Java/kotlin
-
-<p align="center">
-<img src="logo.svg"/>
-</p>
+# ![](logo.svg) Boat: SrcLab Core Libraries for Java/kotlin
 
 ## Read Me:
 
