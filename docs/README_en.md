@@ -1,9 +1,7 @@
-# Boat: SrcLab Core Libraries for Java/kotlin
+# <span class="image">![logo](../logo.svg)</span> Boat: SrcLab Core Libraries for Java/kotlin
 
 <span id="author" class="author">Sun Qian</span>  
 <span id="email" class="email"><fredsuvn@163.com></span>  
-
-![logo](../logo.svg)
 
 Table of Contents
 

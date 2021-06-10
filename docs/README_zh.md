@@ -1,9 +1,7 @@
-# Boat: SrcLab的Java/kotlin核心基础库
+# <span class="image">![logo](../logo.svg)</span> Boat: SrcLab的Java/kotlin核心基础库
 
 <span id="author" class="author">孙谦</span>  
 <span id="email" class="email"><fredsuvn@163.com></span>  
-
-![logo](../logo.svg)
 
 目录
 

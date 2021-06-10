@@ -1,5 +1,5 @@
-= Boat: SrcLab的Java/kotlin核心基础库
-:toc: macro
+= image:../logo.svg[] Boat: SrcLab的Java/kotlin核心基础库
+:toc:
 :toclevels: 3
 :toc-title: 目录
 :last-update-label!:
@@ -9,10 +9,6 @@
 :url: https://github.com/srclab-projects/boat
 :srclab-url: https://github.com/srclab-projects
 :boat-version: 0.0.1
-
-image::../logo.svg[align=center]
-
-toc::[]
 
 == 简介
 

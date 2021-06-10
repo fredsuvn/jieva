@@ -1,5 +1,5 @@
-= Boat: SrcLab Core Libraries for Java/kotlin
-:toc: macro
+= image:../logo.svg[] Boat: SrcLab Core Libraries for Java/kotlin
+:toc:
 :toclevels: 3
 :last-update-label!:
 Sun Qian <fredsuvn@163.com>
@@ -8,10 +8,6 @@ Sun Qian <fredsuvn@163.com>
 :url: https://github.com/srclab-projects/boat
 :srclab-url: https://github.com/srclab-projects
 :boat-version: 0.0.1
-
-image::../logo.svg[align=center]
-
-toc::[]
 
 == Introduction
 
