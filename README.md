@@ -25,7 +25,7 @@ cd srclab-dependencies && mvn clean install
 # build boat
 git clone -b master https://github.com/srclab-projects/boat.git
 
-cd boat && gradle clean build -x test
+cd boat && gradle clean build
 ```
 
 ## Join
