@@ -1,6 +1,10 @@
-# ![Boat](logo.svg) Boat: SrcLab Core Libraries for Java/kotlin
+# Boat: SrcLab Core Libraries for Java/kotlin
 
-## Choose doc style you like:
+<p align="center">
+<img src="logo.svg"/>
+</p>
+
+## Read Me:
 
 - AsciiDoc:
   * [English](docs/README_en.adoc)
@@ -28,6 +32,8 @@ More see [docs/](docs/)
 
 ###### _There seems to be something below?_
 
+↓↓↓↓↓↓↓↓
+
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
@@ -37,9 +43,9 @@ More see [docs/](docs/)
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
-## boat-egg: _*Wow, you found me!*_
+# boat-egg: _*Wow, you found me!*_
 
-* Java
+## Java
 
 ```java
 public class EggSample {
@@ -48,13 +54,14 @@ public class EggSample {
   public void testEgg() {
     EggManager eggManager = BoatEggManager.INSTANCE;
     Egg egg = eggManager.pick("O Battle");
-    //egg.hatchOut("Thank you, Taro.");
-    egg.hatchOut("谢谢你，泰罗。");
+    egg.hatchOut("Thank you, Taro.");
+    //Or
+    //egg.hatchOut("谢谢你，泰罗。");
   }
 }
 ```
 
-* Kotlin
+## Kotlin
 
 ```kotlin
 class EggSample {
@@ -63,6 +70,7 @@ class EggSample {
   fun testEgg() {
     val egg = BoatEggManager.pick("O Battle")
     egg.hatchOut("Thank you, Taro.")
+    //Or
     //egg.hatchOut("谢谢你，泰罗。")
   }
 }

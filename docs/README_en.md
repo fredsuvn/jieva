@@ -1,12 +1,15 @@
-# <span class="image">![Boat](../logo.svg)</span> Boat: SrcLab Core Libraries for Java/kotlin
+# Boat: SrcLab Core Libraries for Java/kotlin
 
 <span id="author" class="author">Sun Qian</span>  
 <span id="email" class="email"><fredsuvn@163.com></span>  
 
+![logo](../logo.svg)
+
 Table of Contents
 
 -   [Introduction](#_introduction)
--   [Getting](#_getting)
+-   [Install or Getting](#_install_or_getting)
+    -   [Install](#_install)
     -   [Get Boat](#_get_boat)
     -   [With BOM](#_with_bom)
 -   [Usages](#_usages)
@@ -51,7 +54,14 @@ If you want to import common jars at once (`annotations`, `core`,
 
 -   [boat](../boat/).
 
-## Getting
+## Install or Getting
+
+### Install
+
+Using gradle task `publishToMavenLocal` to install into local maven
+repository. Setting `publish` info in
+<a href="../build.gradle" class="bare">../build.gradle</a> for more
+publish options and tasks.
 
 ### Get Boat
 

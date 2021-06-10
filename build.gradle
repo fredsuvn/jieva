@@ -82,7 +82,7 @@ private static def newInfo() {
     //Publish info
     publish      : [
       //Whether publish
-      enablePublish: true,
+      enablePublish: false,
 
       //Whether publish as snapshot
       isSnapshot   : false,
