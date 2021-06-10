@@ -8,8 +8,7 @@
 Table of Contents
 
 -   [Introduction](#_introduction)
--   [Install or Getting](#_install_or_getting)
-    -   [Install](#_install)
+-   [Getting](#_getting)
     -   [Get Boat](#_get_boat)
     -   [With BOM](#_with_bom)
 -   [Usages](#_usages)
@@ -54,14 +53,7 @@ If you want to import common jars at once (`annotations`, `core`,
 
 -   [boat](../boat/).
 
-## Install or Getting
-
-### Install
-
-Using gradle task `publishToMavenLocal` to install into local maven
-repository. Setting `publish` info in
-<a href="../build.gradle" class="bare">../build.gradle</a> for more
-publish options and tasks.
+## Getting
 
 ### Get Boat
 

@@ -34,12 +34,7 @@ If you want to import common jars at once (`annotations`, `core`, `codec`, `seri
 
 * link:../boat/[boat].
 
-== Install or Getting
-
-=== Install
-
-Using gradle task `publishToMavenLocal` to install into local maven repository.
-Setting `publish` info in link:../build.gradle[] for more publish options and tasks.
+== Getting
 
 === Get Boat
 

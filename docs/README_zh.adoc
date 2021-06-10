@@ -35,12 +35,7 @@ Boat 包括:
 
 * link:../boat/[boat].
 
-== 安装和获取
-
-=== 安装
-
-使用gradle任务 `publishToMavenLocal` 来安装到本地maven仓库.
-在 link:../build.gradle[] 中设置 `publish` 属性来获取更多发布选项和任务.
+== 获取
 
 === 获取 Boat
 
