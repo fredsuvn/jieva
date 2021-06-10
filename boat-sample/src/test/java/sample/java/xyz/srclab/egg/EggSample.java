@@ -4,6 +4,9 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.egg.BoatEggManager;
 import xyz.srclab.common.egg.Egg;
 import xyz.srclab.common.egg.EggManager;
+import xyz.srclab.common.test.TestLogger;
+
+import java.awt.*;
 
 /**
  * @Author: TannerHu
@@ -12,12 +15,19 @@ import xyz.srclab.common.egg.EggManager;
  **/
 public class EggSample {
 
+    private static TestLogger logger = TestLogger.DEFAULT;
+
     @Test
     public void testEgg() {
-        EggManager eggManager = BoatEggManager.INSTANCE;
-        Egg egg = eggManager.pick("O Battle");
-        egg.hatchOut("Thank you, Taro.");
-        //Or
-        //egg.hatchOut("谢谢你，泰罗。");
+        try {
+            EggManager eggManager = BoatEggManager.INSTANCE;
+            Egg egg = eggManager.pick("O Battle");
+            egg.hatchOut("Thank you, Taro.");
+            //Or
+            //egg.hatchOut("谢谢你，泰罗。");
+        }catch (Exception e){
+            logger.log(e);
+        }
+
     }
 }
