@@ -14,6 +14,20 @@
 
 More see [docs/](docs/)
 
+## Build
+
+```shell
+# install srclab-dependencies
+git clone -b master https://github.com/srclab-projects/srclab-dependencies.git
+
+cd srclab-dependencies && mvn clean install
+
+# build boat
+git clone -b master https://github.com/srclab-projects/boat.git
+
+cd boat && gradle clean build -x test
+```
+
 ## Join
 
 * fredsuvn@163.com
