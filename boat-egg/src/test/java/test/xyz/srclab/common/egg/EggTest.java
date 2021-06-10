@@ -33,10 +33,15 @@ public class EggTest {
 
     @Test
     public void testOSpaceBattle() {
-        BoatEggManager eggManager = BoatEggManager.INSTANCE;
-        Egg egg = eggManager.pick("O Battle");
-        //egg.hatchOut("Thank you, Taro.");
-        egg.hatchOut("谢谢你，泰罗。");
+        try {
+            BoatEggManager eggManager = BoatEggManager.INSTANCE;
+            Egg egg = eggManager.pick("O Battle");
+            //egg.hatchOut("Thank you, Taro.");
+            //Or
+            egg.hatchOut("谢谢你，泰罗。");
+        } catch (Exception e) {
+            logger.log(e);
+        }
     }
 
     public static void main(String[] args) {
