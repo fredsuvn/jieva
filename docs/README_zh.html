@@ -441,17 +441,27 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article">
 <div id="header">
-<h1><span class="image"><img src="../logo.svg" alt="Boat"></span> Boat: SrcLab的Java/kotlin核心基础库</h1>
+<h1>Boat: SrcLab的Java/kotlin核心基础库</h1>
 <div class="details">
 <span id="author" class="author">孙谦</span><br>
 <span id="email" class="email"><a href="mailto:fredsuvn@163.com">fredsuvn@163.com</a></span><br>
 </div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="imageblock text-center">
+<div class="content">
+<img src="../logo.svg" alt="logo">
+</div>
+</div>
 <div id="toc" class="toc">
-<div id="toctitle">目录</div>
+<div id="toctitle" class="title">目录</div>
 <ul class="sectlevel1">
 <li><a href="#_简介">简介</a></li>
-<li><a href="#_获取">获取</a>
+<li><a href="#_安装和获取">安装和获取</a>
 <ul class="sectlevel2">
+<li><a href="#_安装">安装</a></li>
 <li><a href="#_获取_boat">获取 Boat</a></li>
 <li><a href="#_使用_bom">使用 BOM</a></li>
 </ul>
@@ -469,7 +479,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </div>
 </div>
-<div id="content">
+</div>
 <div class="sect1">
 <h2 id="_简介">简介</h2>
 <div class="sectionbody">
@@ -521,8 +531,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_获取">获取</h2>
+<h2 id="_安装和获取">安装和获取</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_安装">安装</h3>
+<div class="paragraph">
+<p>使用gradle任务 <code>publishToMavenLocal</code> 来安装到本地maven仓库.
+在 <a href="../build.gradle" class="bare">../build.gradle</a> 中设置 <code>publish</code> 属性来获取更多发布选项和任务.</p>
+</div>
+</div>
 <div class="sect2">
 <h3 id="_获取_boat">获取 Boat</h3>
 <div class="listingblock">

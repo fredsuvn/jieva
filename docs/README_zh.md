@@ -1,12 +1,15 @@
-# <span class="image">![Boat](../logo.svg)</span> Boat: SrcLab的Java/kotlin核心基础库
+# Boat: SrcLab的Java/kotlin核心基础库
 
 <span id="author" class="author">孙谦</span>  
 <span id="email" class="email"><fredsuvn@163.com></span>  
 
+![logo](../logo.svg)
+
 目录
 
 -   [简介](#_简介)
--   [获取](#_获取)
+-   [安装和获取](#_安装和获取)
+    -   [安装](#_安装)
     -   [获取 Boat](#_获取_boat)
     -   [使用 BOM](#_使用_bom)
 -   [用法](#_用法)
@@ -49,7 +52,13 @@ and `id`), 只需要导入:
 
 -   [boat](../boat/).
 
-## 获取
+## 安装和获取
+
+### 安装
+
+使用gradle任务 `publishToMavenLocal` 来安装到本地maven仓库. 在
+<a href="../build.gradle" class="bare">../build.gradle</a> 中设置
+`publish` 属性来获取更多发布选项和任务.
 
 ### 获取 Boat
 

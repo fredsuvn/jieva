@@ -1,5 +1,5 @@
-= image:../logo.svg[Boat] Boat: SrcLab Core Libraries for Java/kotlin
-:toc:
+= Boat: SrcLab Core Libraries for Java/kotlin
+:toc: macro
 :toclevels: 3
 :last-update-label!:
 Sun Qian <fredsuvn@163.com>
@@ -8,6 +8,10 @@ Sun Qian <fredsuvn@163.com>
 :url: https://github.com/srclab-projects/boat
 :srclab-url: https://github.com/srclab-projects
 :boat-version: 0.0.1
+
+image::../logo.svg[align=center]
+
+toc::[]
 
 == Introduction
 
@@ -30,7 +34,12 @@ If you want to import common jars at once (`annotations`, `core`, `codec`, `seri
 
 * link:../boat/[boat].
 
-== Getting
+== Install or Getting
+
+=== Install
+
+Using gradle task `publishToMavenLocal` to install into local maven repository.
+Setting `publish` info in link:../build.gradle[] for more publish options and tasks.
 
 === Get Boat
 
