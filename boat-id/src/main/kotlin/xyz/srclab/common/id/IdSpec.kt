@@ -37,9 +37,14 @@ import java.util.*
  *
  * * [SnowflakeComponent]
  *
- * [IdSpec] will call [IdComponent.init] after creating component,
- * `args` of [IdComponent.init] come from the `spec`,
- * and type of all `args` is [String].
+ * There are special [IdComponent]s:
+ *
+ * * [TextComponent]: Represent literal text in non-IdComponent part of [spec];
+ *
+ * To custom an [IdComponent], note [IdSpec] will call [IdComponent.init] after creating component,
+ * `args` of [IdComponent.init] come from the `spec`, and type of all `args` is [String].
+ *
+ * If you want to use your custom [IdComponent]s, remember pass your custom [componentSupplier].
  *
  * @author sunqian
  *
@@ -57,9 +62,8 @@ open class IdSpec @JvmOverloads constructor(
 
         val result = LinkedList<IdComponent<Any>>()
 
-        fun createParameterComponent(parameter: Any): IdComponent<*> {
-            val parameterValue = parameter.toString()
-            val split = parameterValue.split(",")
+        fun createParameterComponent(parameter: String): IdComponent<*> {
+            val split = parameter.split(",")
             if (split.isEmpty()) {
                 throw IllegalArgumentException("Wrong id spec: $spec")
             }
@@ -69,20 +73,15 @@ open class IdSpec @JvmOverloads constructor(
             return component
         }
 
-        fun createTextComponent(i: Int, any: Any): IdComponent<String> {
-            val text = any.toString()
-            return object : IdComponent<String> {
-                override val type: String = "Text"
-                override fun init(args: List<Any>) {}
-                override fun newValue(context: IdContext): String = text
-            }
+        fun createTextComponent(text: String): IdComponent<String> {
+            return TextComponent(text)
         }
 
-        for ((i, node) in template.nodes.withIndex()) {
+        for (node in template.nodes) {
             if (node.isParameter) {
-                result.add(createParameterComponent(node.toParameterNameOrIndex(spec)).asAny())
+                result.add(createParameterComponent(node.text).asAny())
             } else {
-                result.add(createTextComponent(i, node.toText(spec)).asAny())
+                result.add(createTextComponent(node.text).asAny())
             }
         }
         result.toList()

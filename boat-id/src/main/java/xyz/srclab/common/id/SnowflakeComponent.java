@@ -36,8 +36,9 @@ public class SnowflakeComponent implements IdComponent<Snowflake> {
 
     public static final String TYPE = "Snowflake";
 
+    private final long workerId = workerId();
+
     private long timestamp = Current.millis();
-    private long workerId = workerId();
     private long sequence = 0;
     private int length = 20;
 
@@ -52,24 +53,6 @@ public class SnowflakeComponent implements IdComponent<Snowflake> {
     @Override
     public String type() {
         return TYPE;
-    }
-
-    /**
-     * Return work id. Default is come from {@link InetAddress}.
-     */
-    public long workerId() {
-        try {
-            InetAddress address = InetAddress.getLocalHost();
-            byte[] bytes = address.getAddress();
-            long workerId = 0;
-            for (int i = bytes.length - 1, j = 0; i >= 0 && j <= 56; i--, j += 8) {
-                long b = bytes[i] & 0x00000000000000ffL;
-                workerId |= (b << j);
-            }
-            return workerId;
-        } catch (UnknownHostException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     @Override
@@ -127,5 +110,23 @@ public class SnowflakeComponent implements IdComponent<Snowflake> {
 
     private boolean isOverflow(long value, long mask) {
         return (value & ~mask) != 0;
+    }
+
+    /**
+     * Return work id. Default is come from {@link InetAddress}.
+     */
+    protected long workerId() {
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            byte[] bytes = address.getAddress();
+            long workerId = 0;
+            for (int i = bytes.length - 1, j = 0; i >= 0 && j <= 56; i--, j += 8) {
+                long b = bytes[i] & 0x00000000000000ffL;
+                workerId |= (b << j);
+            }
+            return workerId;
+        } catch (UnknownHostException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }
