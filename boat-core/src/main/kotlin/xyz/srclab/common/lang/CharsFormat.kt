@@ -4,7 +4,7 @@ import org.slf4j.helpers.MessageFormatter as MessageFormatterSlf4j
 import java.text.MessageFormat as MessageFormatKt
 
 /**
- * Chars format.
+ * Format for [CharSequence].
  *
  * @see FastCharsFormat
  * @see PrintfCharsFormat
@@ -20,24 +20,33 @@ interface CharsFormat {
         val FAST_FORMAT: FastCharsFormat = FastCharsFormat
 
         @JvmField
-        val PRINT_FORMAT: PrintfCharsFormat = PrintfCharsFormat
+        val PRINTF_FORMAT: PrintfCharsFormat = PrintfCharsFormat
 
         @JvmField
         val MESSAGE_FORMAT: MessageCharsFormat = MessageCharsFormat
 
+        /**
+         * Formats by [FastCharsFormat].
+         */
         @JvmStatic
         fun CharSequence.fastFormat(vararg args: Any?): String {
-            return FastCharsFormat.format(this, *args)
+            return FAST_FORMAT.format(this, *args)
         }
 
+        /**
+         * Formats by [PrintfCharsFormat].
+         */
         @JvmStatic
         fun CharSequence.printfFormat(vararg args: Any?): String {
-            return PrintfCharsFormat.format(this, *args)
+            return PRINTF_FORMAT.format(this, *args)
         }
 
+        /**
+         * Formats by [MessageCharsFormat].
+         */
         @JvmStatic
         fun CharSequence.messageFormat(vararg args: Any?): String {
-            return MessageCharsFormat.format(this, *args)
+            return MESSAGE_FORMAT.format(this, *args)
         }
     }
 }
@@ -48,21 +57,7 @@ interface CharsFormat {
 object FastCharsFormat : CharsFormat {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
-        processArguments(args)
         return MessageFormatterSlf4j.arrayFormat(pattern.toString(), args, null).message
-    }
-
-    private fun processArguments(array: Array<out Any?>) {
-        if (array.isEmpty()) {
-            return
-        }
-
-        /*
-        val lastElement = args[args.size - 1]
-        if (lastElement is Throwable) {
-            args[args.size - 1] = lastElement.toString()
-        }
-         */
     }
 }
 
