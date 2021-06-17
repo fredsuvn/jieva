@@ -39,6 +39,21 @@ processors for protobuf type object:
 -   ProtobufJsons.PROTOBUF\_JSON\_SERIALIZER: `JsonSerializer`
     (boat-serialize) supports protobuf types.
 
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td class="icon"><div class="title">
+Warning
+</div></td>
+<td class="content"><code>boat-protobuf</code> need <code>protoc</code> to compile protobuf files, some architectures don’t support it (such as arm). Check whether your environment support: <a href="https://repo1.maven.org/maven2/com/google/protobuf/protoc/" class="bare">https://repo1.maven.org/maven2/com/google/protobuf/protoc/</a></td>
+</tr>
+</tbody>
+</table>
+
 Java Examples
 
     package sample.java.xyz.srclab.common.protobuf;

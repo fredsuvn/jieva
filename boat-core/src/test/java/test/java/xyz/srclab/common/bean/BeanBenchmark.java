@@ -48,17 +48,17 @@ public class BeanBenchmark {
     }
 
     @Benchmark
-    public void testBeans() {
+    public void withBeans() {
         Beans.copyProperties(initBean, new BenchmarkBean());
     }
 
     @Benchmark
-    public void testBeanUtils() throws Exception {
+    public void withBeanUtils() throws Exception {
         BeanUtils.copyProperties(new BenchmarkBean(), initBean);
     }
 
     @Benchmark
-    public void testSetDirectly() throws Exception {
+    public void withSetDirectly() throws Exception {
         BenchmarkBean bean = new BenchmarkBean();
         bean.setS1(initBean.getS1());
         bean.setS2(initBean.getS2());
@@ -89,59 +89,4 @@ public class BeanBenchmark {
         Options options = new OptionsBuilder().include(BeanBenchmark.class.getSimpleName()).build();
         new Runner(options).run();
     }
-
-    /*
-     * Task BeanKit was accomplished, cost: PT1M59.624S
-     * Task Beanutils was accomplished, cost: PT13M2.245S
-     * All tasks were accomplished, await cost: PT13M2.248S, total cost: PT15M1.869S, average cost: PT7M30.9345S
-     *
-     * At 20201211165234499 prepare to run all tasks...
-     * Task BeanKit was accomplished, cost: PT56.024S
-     * Task Beanutils was accomplished, cost: PT12M13.491S
-     *
-     * At 20201216155802946 prepare to run all tasks...
-     * Task BeanKit was accomplished, cost: PT54.811S
-     * Task Beanutils was accomplished, cost: PT13M49.168S
-     *
-     * x.s.c.t.TestListener$Companion$withTestLogger$1(172 ): At 20210201151349655 prepare to run all tasks...
-     * x.s.c.t.TestListener$Companion$withTestLogger$1(180 ): Task BeanKit was accomplished, cost: PT48.247S
-     * x.s.c.t.TestListener$Companion$withTestLogger$1(180 ): Task Beanutils was accomplished, cost: PT11M19.115S
-     */
-    //@Test(enabled = false)
-    //public void testPerformance() {
-    //    PerformanceBean a = new PerformanceBean();
-    //    a.setS1("s1");
-    //    a.setS2("s2");
-    //    a.setS3("s3");
-    //    a.setS4("s4");
-    //    a.setS5("s5");
-    //    a.setS6("s6");
-    //    a.setS7("s7");
-    //    a.setS8("s8");
-    //    a.setI1(1);
-    //    a.setI2(2);
-    //    a.setI3(3);
-    //    a.setI4(4);
-    //    a.setI5(5);
-    //    a.setI6(6);
-    //    a.setI7(7);
-    //    a.setI8(8);
-    //    long times = 50000000;
-    //    Tests.testTasksParallel(
-    //            TestTask.newTask("BeanKit", times, () -> {
-    //                PerformanceBean b = new PerformanceBean();
-    //                Beans.copyProperties(a, b);
-    //                return null;
-    //            }),
-    //            TestTask.newTask("Beanutils", times, () -> {
-    //                PerformanceBean b = new PerformanceBean();
-    //                try {
-    //                    BeanUtils.copyProperties(b, a);
-    //                } catch (Exception e) {
-    //                    throw new IllegalStateException(e);
-    //                }
-    //                return null;
-    //            })
-    //    );
-    //}
 }

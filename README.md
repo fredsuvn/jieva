@@ -16,6 +16,8 @@ More see [docs/](docs/)
 
 ## Build
 
+This project depends on [srclab-dependencies](https://github.com/srclab-projects/srclab-dependencies), you may:
+
 ```shell
 # install srclab-dependencies
 git clone -b master https://github.com/srclab-projects/srclab-dependencies.git
@@ -27,6 +29,10 @@ git clone -b master https://github.com/srclab-projects/boat.git
 
 cd boat && gradle clean build
 ```
+
+**Note:**
+
+* **`boat-protobuf` need `protoc` to compile protobuf files, some architectures don't support it (such as arm);**
 
 ## Join
 

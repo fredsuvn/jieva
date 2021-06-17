@@ -6,28 +6,27 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.lang.CachingProductBuilder;
 import xyz.srclab.common.test.TestLogger;
 
-import java.util.UUID;
-
 public class BuildersTest {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
-    public void testBuilder() {
+    public void testCachingProductBuilder() {
 
         class TestCachingBuilder extends CachingProductBuilder<String> {
 
             private String value = "null";
+            private long counter = 0L;
 
             public void setValue(String value) {
                 this.value = value;
-                this.commitChange();
+                this.commitModification();
             }
 
             @NotNull
             @Override
             protected String buildNew() {
-                return value + UUID.randomUUID().toString();
+                return value + counter++;
             }
         }
 
@@ -40,7 +39,7 @@ public class BuildersTest {
         logger.log("value1: {}", value1);
         logger.log("value2: {}", value2);
         logger.log("value3: {}", value3);
-        Assert.assertEquals(value1, value2);
+        Assert.assertTrue(value1 == value2);
         Assert.assertNotEquals(value2, value3);
     }
 }

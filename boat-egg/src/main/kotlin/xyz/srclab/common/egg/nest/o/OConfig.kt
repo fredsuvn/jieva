@@ -1,5 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
+import xyz.srclab.common.Boat
 import xyz.srclab.common.lang.loadPropertiesResource
 
 internal object OConfig {
@@ -31,5 +32,5 @@ internal object OConfig {
 
     //Config
     val name: String = config["name"]!!
-    val version: String = config["version"]!!
+    val version: String = Boat.version.toString()
 }

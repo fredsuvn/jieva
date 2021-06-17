@@ -315,21 +315,22 @@ Java Examples
         }
 
         @Test
-        public void testCachingBuilder() {
+        public void testCachingProductBuilder() {
 
             class CachingBuilderSample extends CachingProductBuilder<String> {
 
                 private String value = "null";
+                private long counter = 0L;
 
                 public void setValue(String value) {
                     this.value = value;
-                    this.commitChange();
+                    this.commitModification();
                 }
 
                 @NotNull
                 @Override
                 protected String buildNew() {
-                    return value + UUID.randomUUID().toString();
+                    return value + counter++;
                 }
             }
 
@@ -339,11 +340,11 @@ Java Examples
             String value2 = cachingBuilderSample.build();
             cachingBuilderSample.setValue("2");
             String value3 = cachingBuilderSample.build();
-            //10c66dae9-c056-464e-8117-4787914c3af8
+            //10
             logger.log("value1: {}", value1);
-            //10c66dae9-c056-464e-8117-4787914c3af8
+            //10
             logger.log("value2: {}", value2);
-            //2c7c2e230-50b0-4a0f-8530-151723297fb8
+            //21
             logger.log("value3: {}", value3);
         }
 
@@ -575,17 +576,20 @@ Kotlin Examples
         }
 
         @Test
-        fun testCachingBuilder() {
+        fun testCachingProductBuilder() {
 
             class CachingBuilderSample : CachingProductBuilder<String>() {
+
                 private var value = "null"
+                private var counter = 0L
+
                 fun setValue(value: String) {
                     this.value = value
-                    commitChange()
+                    commitModification()
                 }
 
                 override fun buildNew(): String {
-                    return value + UUID.randomUUID().toString()
+                    return "$value${counter++}"
                 }
             }
 
@@ -595,11 +599,11 @@ Kotlin Examples
             val value2 = cachingBuilderSample.build()
             cachingBuilderSample.setValue("2")
             val value3 = cachingBuilderSample.build()
-            //10c66dae9-c056-464e-8117-4787914c3af8
+            //10
             logger.log("value1: {}", value1)
-            //10c66dae9-c056-464e-8117-4787914c3af8
+            //10
             logger.log("value2: {}", value2)
-            //2c7c2e230-50b0-4a0f-8530-151723297fb8
+            //21
             logger.log("value3: {}", value3)
         }
 
