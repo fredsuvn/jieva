@@ -30,6 +30,10 @@ git clone -b master https://github.com/srclab-projects/boat.git
 cd boat && gradle clean build
 ```
 
+**Note:**
+
+* **`boat-protobuf` need `protoc` to compile protobuf files, some architectures don't support it (such as arm);**
+
 ## Join
 
 * fredsuvn@163.com
