@@ -15,19 +15,17 @@ import java.awt.*;
  **/
 public class EggSample {
 
-    private static TestLogger logger = TestLogger.DEFAULT;
+    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testEgg() {
-        try {
-            EggManager eggManager = BoatEggManager.INSTANCE;
-            Egg egg = eggManager.pick("O Battle");
-            egg.hatchOut("Thank you, Taro.");
-            //Or
-            //egg.hatchOut("谢谢你，泰罗。");
-        }catch (Exception e){
-            logger.log(e);
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
         }
-
+        EggManager eggManager = BoatEggManager.INSTANCE;
+        Egg egg = eggManager.pick("O Battle");
+        egg.hatchOut("Thank you, Taro.");
+        //Or
+        //egg.hatchOut("谢谢你，泰罗。");
     }
 }
