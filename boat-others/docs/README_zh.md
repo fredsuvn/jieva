@@ -48,7 +48,7 @@ protobuf 类型的处理器:
 <td class="icon"><div class="title">
 Warning
 </div></td>
-<td class="content"><code>boat-protobuf</code> 需要 <code>protoc</code> 来编译 protobuf 文件, 一些架构并不支持 (如 arm). 检查你的环境是否支持: <a href="https://repo1.maven.org/maven2/com/google/protobuf/protoc/" class="bare">https://repo1.maven.org/maven2/com/google/protobuf/protoc/</a></td>
+<td class="content"><code>boat-protobuf</code> 需要 <code>protoc</code> 来编译 protobuf 文件, 一些架构并不支持 (如 <code>ARM</code>). 检查你的环境是否支持: <a href="https://repo1.maven.org/maven2/com/google/protobuf/protoc/" class="bare">https://repo1.maven.org/maven2/com/google/protobuf/protoc/</a></td>
 </tr>
 </tbody>
 </table>

@@ -49,7 +49,7 @@ processors for protobuf type object:
 <td class="icon"><div class="title">
 Warning
 </div></td>
-<td class="content"><code>boat-protobuf</code> need <code>protoc</code> to compile protobuf files, some architectures don’t support it (such as arm). Check whether your environment support: <a href="https://repo1.maven.org/maven2/com/google/protobuf/protoc/" class="bare">https://repo1.maven.org/maven2/com/google/protobuf/protoc/</a></td>
+<td class="content"><code>boat-protobuf</code> need <code>protoc</code> to compile protobuf files, some architectures don’t support it (such as <code>ARM</code>). Check whether your environment support: <a href="https://repo1.maven.org/maven2/com/google/protobuf/protoc/" class="bare">https://repo1.maven.org/maven2/com/google/protobuf/protoc/</a></td>
 </tr>
 </tbody>
 </table>
