@@ -39,7 +39,7 @@ dependencies {
   testAnnotationProcessor platform(project(":boat-dependencies"))
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
 
-  testCompile "org.apache.velocity:velocity:1.7"
+  testCompile "org.apache.velocity:velocity"
 }
 
 utils.writeBuildInfos(project, "src/main/resources/META-INF/build.properties")
