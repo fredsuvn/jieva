@@ -34,7 +34,7 @@ cd boat && gradle clean build
 
 * Some properties should be configured if you want to enable publish to remote, see publish info part
   of [build.gradle](build.gradle)
-* **`boat-protobuf` need `protoc` to compile protobuf files, some architectures don't support it (such as `ARM`);**
+* `boat-protobuf` need `protoc` to compile protobuf files, some architectures don't support it (such as `ARM`);
 
 ## Join
 
