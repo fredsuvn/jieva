@@ -8,6 +8,6 @@ continuation_indent_size = 4
 insert_final_newline = false
 trim_trailing_whitespace = true
 
-[*.{groovy, gradle, kts, xml, html, js, ts, yml, yaml, svg, md, adoc}]
+[*.{groovy, gradle, kts, xml, html, js, ts, yml, yaml, svg, md, adoc, json}]
 indent_size = 2
 continuation_indent_size = 2
