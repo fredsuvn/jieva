@@ -23,7 +23,7 @@ boat-protobuf provides `bean`, `convert` and `serialize` handlers and processors
 * ProtobufJsons.PROTOBUF_OBJECT_MAPPER: ``Jackson``'s `ObjectMapper` (boat-serialize) supports protobuf types;
 * ProtobufJsons.PROTOBUF_JSON_SERIALIZER: `JsonSerializer` (boat-serialize) supports protobuf types.
 
-WARNING: `boat-protobuf` need `protoc` to compile protobuf files, some architectures don't support it (such as arm).
+WARNING: `boat-protobuf` need `protoc` to compile protobuf files, some architectures don't support it (such as `ARM`).
 Check whether your environment support: link:https://repo1.maven.org/maven2/com/google/protobuf/protoc/[]
 
 .Java Examples

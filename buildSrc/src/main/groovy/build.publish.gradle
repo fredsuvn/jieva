@@ -4,36 +4,6 @@ plugins {
   id 'signing'
 }
 
-def configurePublishRepositories(RepositoryHandler repositories) {
-  if (infos.publish.isSnapshot) {
-    repositories.maven {
-      name = infos.publish.snapshotId
-      url = infos.publish.urls.snapshot
-      printer.debug("snapshot.name: $name")
-      printer.debug("snapshot.url: $url")
-      credentials {
-        username = getProperty("publish${name.capitalize()}Username")
-        password = getProperty("publish${name.capitalize()}Password")
-        printer.debug("snapshot.username: $username")
-        printer.debug("snapshot.password: $password")
-      }
-    }
-  } else {
-    repositories.maven {
-      name = infos.publish.releaseId
-      url = infos.publish.urls.release
-      printer.debug("release.name: $name")
-      printer.debug("release.url: $url")
-      credentials {
-        username = getProperty("publish${name.capitalize()}Username")
-        password = getProperty("publish${name.capitalize()}Password")
-        printer.debug("release.username: $username")
-        printer.debug("release.password: $password")
-      }
-    }
-  }
-}
-
 def configurePublishMavenPom(MavenPublication maven) {
   maven.pom {
     name = project.name
@@ -69,6 +39,36 @@ def configurePublishMavenPom(MavenPublication maven) {
   }
 }
 
+def configurePublishRepositories(RepositoryHandler repositories) {
+  if (infos.publish.isSnapshot) {
+    repositories.maven {
+      name = infos.publish.snapshotId
+      url = infos.publish.urls.snapshot
+      printer.debug("snapshot.name: $name")
+      printer.debug("snapshot.url: $url")
+      credentials {
+        username = getProperty("publish${name.capitalize()}Username")
+        password = getProperty("publish${name.capitalize()}Password")
+        printer.debug("snapshot.username: $username")
+        printer.debug("snapshot.password: $password")
+      }
+    }
+  } else {
+    repositories.maven {
+      name = infos.publish.releaseId
+      url = infos.publish.urls.release
+      printer.debug("release.name: $name")
+      printer.debug("release.url: $url")
+      credentials {
+        username = getProperty("publish${name.capitalize()}Username")
+        password = getProperty("publish${name.capitalize()}Password")
+        printer.debug("release.username: $username")
+        printer.debug("release.password: $password")
+      }
+    }
+  }
+}
+
 def configureSigning() {
   signing {
     def signingName = infos.publish.signingId
@@ -82,6 +82,6 @@ def configureSigning() {
   }
 }
 
-ext["configurePublishRepositories"] = this.&configurePublishRepositories
 ext["configurePublishMavenPom"] = this.&configurePublishMavenPom
+ext["configurePublishRepositories"] = this.&configurePublishRepositories
 ext["configureSigning"] = this.&configureSigning
