@@ -82,25 +82,34 @@ private static def newInfo() {
     //Publish info
     publish      : [
       //Whether publish
-      enablePublish: false,
+      enablePublish      : true,
 
       //Whether publish as snapshot
-      isSnapshot   : false,
+      isSnapshot         : false,
+
+      /*
+       * Whether publish to remote.
+       * To enable publish to remote repository, you must configure publishXxxUsername for snapshotId and releaseId.
+       */
+      enablePublishRemote: false,
 
       //Snapshot id
-      snapshotId   : "ossrh",
+      snapshotId         : "ossrh",
 
       //Release id
-      releaseId    : "ossrh",
+      releaseId          : "ossrh",
 
-      //Whether signing
-      isSigning    : false,
+      /*
+       * Whether signing.
+       * To enable signing, you must configure signingXxxKeyId, signingXxxPassword and signingXxxKeyFile for signingId.
+       */
+      isSigning          : false,
 
       //Signing id
-      signingId    : "gpg",
+      signingId          : "gpg",
 
       //Publish urls
-      urls         : [
+      urls               : [
         snapshot: "https://s01.oss.sonatype.org/content/repositories/snapshots",
         release : "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2",
       ],

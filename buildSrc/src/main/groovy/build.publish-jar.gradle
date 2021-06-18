@@ -23,8 +23,10 @@ project.afterEvaluate {
           configurePublishMavenPom(it)
         }
       }
-      repositories {
-        configurePublishRepositories(it)
+      if (infos.publish.enablePublishRemote) {
+        repositories {
+          configurePublishRepositories(it)
+        }
       }
       if (infos.publish.isSigning) {
         configureSigning()
