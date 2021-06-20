@@ -1,76 +1,20 @@
-<svg width="120" height="120" xmlns="http://www.w3.org/2000/svg">
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
   <title>Boat</title>
   <g id="group-back">
-    <rect id="back-global" x="0" y="0" width="120" height="120" fill="#3f3f3f" stroke="none"/>
+    <rect id="back-global" x="0" y="0" width="100%" height="100%" fill="DeepSkyBlue" stroke="none"/>
   </g>
-  <g id="group-hive"
+  <g id="group-boat"
      stroke-linecap="square" stroke-miterlimit="100"
-     stroke="#3f3f3f" stroke-width="2" fill="#fefefe"
+     stroke="none" fill="#f7f7f7"
   >
-    <path id="hive-top"
-          d="M60,60 m-10,-51 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
+    <path id="boat-body"
+          d="M60,60 m-55,30 l110,0 l-30,25 l-50,0 l-30,-25"
     />
-    <path id="hive-right-top"
-          d="M60,60 m20,-34 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
+    <path id="boat-sail-1"
+          d="M60,60 m0,28 l0,-85 l-40,85 l40,0"
     />
-    <path id="hive-right-bottom"
-          d="M60,60 m20,0 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
+    <path id="boat-sail-2"
+          d="M60,60 m2,28 l0,-60 l35,60 l-35,0"
     />
-    <path id="hive-bottom"
-          d="M60,60 m-10,17 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-    />
-    <path id="hive-left-bottom"
-          d="M60,60 m-40,0 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-    />
-    <path id="hive-left-top"
-          d="M60,60 m-40,-34 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-    />
-  </g>
-  <g id="group-color"
-     stroke-linecap="square" stroke-miterlimit="100"
-     stroke="#3f3f3f" stroke-width="2" fill-opacity="0.382"
-  >
-    <path id="color-top"
-          d="M60,60 m-10,-51 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-          fill="#ec8b00"
-    />
-    <path id="color-right-top"
-          d="M60,60 m20,-34 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-          fill="#7f52ff"
-    />
-    <path id="color-right-bottom"
-          d="M60,60 m20,0 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-          fill="#ec8b00"
-    />
-    <path id="color-bottom"
-          d="M60,60 m-10,17 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-          fill="#7f52ff"
-    />
-    <path id="color-left-bottom"
-          d="M60,60 m-40,0 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-          fill="#ec8b00"
-    />
-    <path id="color-left-top"
-          d="M60,60 m-40,-34 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-          fill="#7f52ff"
-    />
-  </g>
-  <g id="group-title">
-    <path id="title-back"
-          d="M60,60 m-10,-17 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-          stroke-linecap="square" stroke-miterlimit="100"
-          stroke="#3f3f3f" stroke-width="2" fill="#fefefe"
-    />
-    <path id="title-color"
-          d="M60,60 m-10,-17 l20,0 l10,17 l-10,17 l-20,0 l-10,-17 l10,-17"
-          stroke-linecap="square" stroke-miterlimit="100"
-          stroke="#3f3f3f" stroke-width="2" fill="BurlyWood" fill-opacity="0.382"
-    />
-    <text id="title-boat" x="60" y="64" text-anchor="middle"
-          font-family="Inter,Arial,sans-serif" font-size="12" font-weight="bold"
-          fill="SaddleBrown"
-    >
-      Boat
-    </text>
   </g>
 </svg>
