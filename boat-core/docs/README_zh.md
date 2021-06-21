@@ -89,6 +89,7 @@ Java Examples
     package sample.java.xyz.srclab.core.lang;
 
     import org.jetbrains.annotations.NotNull;
+    import org.testng.Assert;
     import org.testng.annotations.Test;
     import xyz.srclab.common.lang.*;
     import xyz.srclab.common.test.TestLogger;
@@ -265,12 +266,6 @@ Java Examples
             //2011-12-03T10:15:30
             logger.log("localDateTime: {}", localDateTime);
 
-            //Randoms examples:
-            //[10, 20]
-            for (int j = 0; j < 10; j++) {
-                logger.log("random[10, 20]: {}", Randoms.between(10, 21));
-            }
-
             //Compares example:
             //99
             logger.log("inBounds: {}", Compares.inBounds(100, 0, 99));
@@ -298,6 +293,37 @@ Java Examples
             TestEnum t2 = Enums.valueIgnoreCase(TestEnum.class, "t2");
             //t2: T2
             logger.log("t2: {}", t2);
+        }
+
+        @Test
+        public void testRandom() {
+            //[10, 20]
+            for (int j = 0; j < 10; j++) {
+                logger.log("random[10, 20]: {}", Randoms.between(new Random(), 10, 21));
+            }
+
+            RandomSupplier<?> randomSupplier = RandomSupplier.newBuilder()
+                .mayBe(20, "A")
+                .mayBe(20, "B")
+                .mayBe(60, "C")
+                .build();
+            int countA = 0;
+            int countB = 0;
+            int countC = 0;
+            for (int i = 0; i < 1000; i++) {
+                Object result = randomSupplier.get();
+                if (result.equals("A")) {
+                    countA++;
+                } else if (result.equals("B")) {
+                    countB++;
+                } else if (result.equals("C")) {
+                    countC++;
+                }
+            }
+            int total = countA + countB + countC;
+            Assert.assertEquals(total, 1000);
+            //countA: 189, countB: 190, countC: 621, total: 1000
+            logger.log("countA: {}, countB: {}, countC: {}, total: {}", countA, countB, countC, total);
         }
 
         @Test
@@ -386,6 +412,7 @@ Kotlin Examples
 
     package sample.kotlin.xyz.srclab.core.lang
 
+    import org.testng.Assert
     import org.testng.annotations.Test
     import xyz.srclab.common.lang.*
     import xyz.srclab.common.lang.CharsFormat.Companion.fastFormat
@@ -526,12 +553,6 @@ Kotlin Examples
             //2011-12-03T10:15:30
             logger.log("localDateTime: {}", localDateTime)
 
-            //Randoms examples:
-            //[10, 20]
-            for (j in 0..9) {
-                logger.log("random[10, 20]: {}", randomBetween(10, 21))
-            }
-
             //Compares example:
             //99
             logger.log("inBounds: {}", 100.inBounds(0, 99))
@@ -559,6 +580,38 @@ Kotlin Examples
             val t2: TestEnum = TestEnum::class.java.valueOfEnumIgnoreCase("t2")
             //t2: T2
             logger.log("t2: {}", t2)
+        }
+
+
+        @Test
+        fun testRandom() {
+            //[10, 20]
+            for (j in 0..9) {
+                logger.log("random[10, 20]: {}", Random().between(10, 21))
+            }
+
+            val randomSupplier = RandomSupplier.newBuilder<Any>()
+                .mayBe(20, "A")
+                .mayBe(20, "B")
+                .mayBe(60, "C")
+                .build()
+            var countA = 0
+            var countB = 0
+            var countC = 0
+            for (i in 0..999) {
+                val result = randomSupplier.get()
+                if (result == "A") {
+                    countA++
+                } else if (result == "B") {
+                    countB++
+                } else if (result == "C") {
+                    countC++
+                }
+            }
+            val total = countA + countB + countC
+            Assert.assertEquals(total, 1000)
+            //countA: 189, countB: 190, countC: 621, total: 1000
+            logger.log("countA: {}, countB: {}, countC: {}, total: {}", countA, countB, countC, total)
         }
 
         @Test
