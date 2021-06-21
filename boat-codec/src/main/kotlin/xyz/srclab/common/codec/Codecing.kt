@@ -216,15 +216,15 @@ interface Codecing {
         @JvmName("forData")
         @JvmOverloads
         @JvmStatic
-        fun ByteArray.startCodec(codecSupplier: CodecSupplier = DEFAULT_CODEC_SUPPLIER): Codecing {
+        fun ByteArray.codec(codecSupplier: CodecSupplier = DEFAULT_CODEC_SUPPLIER): Codecing {
             return CodecingImpl(this, codecSupplier)
         }
 
         @JvmName("forData")
         @JvmOverloads
         @JvmStatic
-        fun CharSequence.startCodec(codecSupplier: CodecSupplier = DEFAULT_CODEC_SUPPLIER): Codecing {
-            return this.toBytes().startCodec(codecSupplier)
+        fun CharSequence.codec(codecSupplier: CodecSupplier = DEFAULT_CODEC_SUPPLIER): Codecing {
+            return this.toBytes().codec(codecSupplier)
         }
 
         private class CodecingImpl(

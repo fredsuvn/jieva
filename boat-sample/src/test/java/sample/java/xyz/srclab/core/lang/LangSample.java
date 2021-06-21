@@ -1,6 +1,7 @@
 package sample.java.xyz.srclab.core.lang;
 
 import org.jetbrains.annotations.NotNull;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.lang.*;
 import xyz.srclab.common.test.TestLogger;
@@ -177,12 +178,6 @@ public class LangSample {
         //2011-12-03T10:15:30
         logger.log("localDateTime: {}", localDateTime);
 
-        //Randoms examples:
-        //[10, 20]
-        for (int j = 0; j < 10; j++) {
-            logger.log("random[10, 20]: {}", Randoms.between(10, 21));
-        }
-
         //Compares example:
         //99
         logger.log("inBounds: {}", Compares.inBounds(100, 0, 99));
@@ -210,6 +205,37 @@ public class LangSample {
         TestEnum t2 = Enums.valueIgnoreCase(TestEnum.class, "t2");
         //t2: T2
         logger.log("t2: {}", t2);
+    }
+
+    @Test
+    public void testRandom() {
+        //[10, 20]
+        for (int j = 0; j < 10; j++) {
+            logger.log("random[10, 20]: {}", Randoms.between(new Random(), 10, 21));
+        }
+
+        RandomSupplier<?> randomSupplier = RandomSupplier.newBuilder()
+            .mayBe(20, "A")
+            .mayBe(20, "B")
+            .mayBe(60, "C")
+            .build();
+        int countA = 0;
+        int countB = 0;
+        int countC = 0;
+        for (int i = 0; i < 1000; i++) {
+            Object result = randomSupplier.get();
+            if (result.equals("A")) {
+                countA++;
+            } else if (result.equals("B")) {
+                countB++;
+            } else if (result.equals("C")) {
+                countC++;
+            }
+        }
+        int total = countA + countB + countC;
+        Assert.assertEquals(total, 1000);
+        //countA: 189, countB: 190, countC: 621, total: 1000
+        logger.log("countA: {}, countB: {}, countC: {}, total: {}", countA, countB, countC, total);
     }
 
     @Test

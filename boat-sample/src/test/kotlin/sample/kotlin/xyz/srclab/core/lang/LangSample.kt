@@ -1,5 +1,6 @@
 package sample.kotlin.xyz.srclab.core.lang
 
+import org.testng.Assert
 import org.testng.annotations.Test
 import xyz.srclab.common.lang.*
 import xyz.srclab.common.lang.CharsFormat.Companion.fastFormat
@@ -140,12 +141,6 @@ class BaseSample {
         //2011-12-03T10:15:30
         logger.log("localDateTime: {}", localDateTime)
 
-        //Randoms examples:
-        //[10, 20]
-        for (j in 0..9) {
-            logger.log("random[10, 20]: {}", randomBetween(10, 21))
-        }
-
         //Compares example:
         //99
         logger.log("inBounds: {}", 100.inBounds(0, 99))
@@ -173,6 +168,38 @@ class BaseSample {
         val t2: TestEnum = TestEnum::class.java.valueOfEnumIgnoreCase("t2")
         //t2: T2
         logger.log("t2: {}", t2)
+    }
+
+
+    @Test
+    fun testRandom() {
+        //[10, 20]
+        for (j in 0..9) {
+            logger.log("random[10, 20]: {}", Random().between(10, 21))
+        }
+
+        val randomSupplier = RandomSupplier.newBuilder<Any>()
+            .mayBe(20, "A")
+            .mayBe(20, "B")
+            .mayBe(60, "C")
+            .build()
+        var countA = 0
+        var countB = 0
+        var countC = 0
+        for (i in 0..999) {
+            val result = randomSupplier.get()
+            if (result == "A") {
+                countA++
+            } else if (result == "B") {
+                countB++
+            } else if (result == "C") {
+                countC++
+            }
+        }
+        val total = countA + countB + countC
+        Assert.assertEquals(total, 1000)
+        //countA: 189, countB: 190, countC: 621, total: 1000
+        logger.log("countA: {}, countB: {}, countC: {}, total: {}", countA, countB, countC, total)
     }
 
     @Test

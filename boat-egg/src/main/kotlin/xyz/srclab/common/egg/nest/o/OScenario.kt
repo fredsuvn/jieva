@@ -1,7 +1,8 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.lang.randomBetween
+import xyz.srclab.common.lang.between
 import java.awt.Graphics
+import java.util.*
 
 internal class OScenario(
     private val data: OData,
@@ -101,6 +102,7 @@ internal class OScenario(
 
         private val refreshCoolDownTime = 5000L
         private var lastRefreshTime = 0L
+        private val random = Random()
 
         fun refresh() {
             if (tick.time - lastRefreshTime < refreshCoolDownTime) {
@@ -165,8 +167,8 @@ internal class OScenario(
         }
 
         private fun createEnemy(weaponTypes: List<OWeaponType>): OSubject {
-            val x = randomBetween(OConfig.preparedPadding, OConfig.width - OConfig.preparedPadding)
-            val y = randomBetween(
+            val x = random.between(OConfig.preparedPadding, OConfig.width - OConfig.preparedPadding)
+            val y = random.between(
                 -OConfig.preparedHeight + OConfig.preparedPadding, 0 - OConfig.preparedPadding
             )
             val subject = createEnemySubject(data.playerEnemy, x.toDouble(), y.toDouble(), emptyList())
