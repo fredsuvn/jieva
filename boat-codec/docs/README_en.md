@@ -155,7 +155,7 @@ Kotlin Examples
 
     import org.testng.annotations.Test
     import xyz.srclab.common.codec.Base64Codec
-    import xyz.srclab.common.codec.Codecing.Companion.startCodec
+    import xyz.srclab.common.codec.Codecing.Companion.codec
     import xyz.srclab.common.codec.aes.toAesKey
     import xyz.srclab.common.codec.aesCodec
     import xyz.srclab.common.codec.toBase64String
@@ -178,8 +178,8 @@ Kotlin Examples
             logger.log("decrypt: {}", decrypt)
 
             //Use chain
-            encrypt = messageBase64.startCodec().decodeBase64().encryptAes(secretKey).doFinal()
-            decrypt = encrypt.startCodec().decryptAes(secretKey).doFinalString()
+            encrypt = messageBase64.codec().decodeBase64().encryptAes(secretKey).doFinal()
+            decrypt = encrypt.codec().decryptAes(secretKey).doFinalString()
             //hei, pengyou, ruguozhendeshiniqingdazhaohu
             logger.log("decrypt: {}", decrypt)
         }
