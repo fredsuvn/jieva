@@ -1695,8 +1695,9 @@ Kotlin Examples
 
 -   `Collects`: 集合工具类;
 
--   `IterableOps`, `ListOps`, `SetOps`, `MapOps`, `SequenceOps`:
-    提供链式操作的接口;
+-   `Collecting`, `Mapping`: 提供链式操作的集合接口,
+    并且集成了常见集合的功能 (如 `Iterable`, `Collection`, `Set`,
+    `List`);
 
 -   `IterableType`, `MapType`: 代表集合泛型类型;
 
@@ -1732,8 +1733,8 @@ Java Examples
             list.add("1");
             list.add("2");
             list.add("3");
-            ListOps<String> listOps = ListOps.opsFor(list);
-            int sum = listOps.addAll(Collects.newArray("4", "5", "6"))
+            Collecting<String> collect = Collects.collect(list);
+            int sum = collect.addAll(Collects.newArray("4", "5", "6"))
                 .removeFirst()
                 .map(it -> it + "0")
                 .map(Nums::toInt)

@@ -55,13 +55,13 @@ public class CollectsTest {
     }
 
     @Test
-    public void testOps() {
+    public void testCollecting() {
         List<String> list = new ArrayList<>();
         list.add("1");
         list.add("2");
         list.add("3");
-        ListOps<String> listOps = ListOps.opsFor(list);
-        int sum = listOps.addAll(Collects.newArray("4", "5", "6"))
+        Collecting<String> collecting = Collects.collect(list);
+        int sum = collecting.addAll(Collects.newArray("4", "5", "6"))
             .removeFirst()
             .map(it -> it + "0")
             .map(Nums::toInt)
@@ -69,11 +69,11 @@ public class CollectsTest {
         Assert.assertEquals(sum, 200);
 
         int[] ints = {1, 2, 3};
-        ListOps<Integer> listOps2 = ListOps.opsFor(Collects.asList(ints));
-        int sum2 = listOps2.reduce(Integer::sum);
+        Collecting<Integer> collecting2 = Collects.collect(Collects.asList(ints));
+        int sum2 = collecting2.reduce(Integer::sum);
         Assert.assertEquals(sum2, 6);
         Assert.expectThrows(UnsupportedOperationException.class, () -> {
-            listOps2.addAll(Arrays.asList(4, 5, 6));
+            collecting2.addAll(Arrays.asList(4, 5, 6));
         });
     }
 

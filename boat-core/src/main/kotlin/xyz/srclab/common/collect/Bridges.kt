@@ -3,15 +3,15 @@ package xyz.srclab.common.collect
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import java.io.Serializable
 
-/*
- * Fuck un-supporting-primitive-generic-type! DAMN!
+/**
+ * Represent a bridge between array and object.
  */
-
+// Fuck un-supporting-primitive-generic-type! DAMN!
 interface ArrayBridge<T> {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @get:JvmName("get")
     val size: Int
-        @JvmName("size") get
 
     fun get(index: Int): T
 
