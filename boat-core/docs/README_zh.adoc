@@ -40,7 +40,7 @@ Lang包提供一系列核心接口和组件:
 * 特殊字符支持: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
 * 访问接口: `Accessor`, `Getter`, `Setter`, `GenericAccessor`, `GenericGetter`, `GenericSetter`;
 * 辅助对象: SpecParser, CachingProductBuilder, Processing;
-* 公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.
+* 公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
 
 .Java Examples
 [source,java]
@@ -243,7 +243,7 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/excepti
 集合扩展包, 支持 `链式操作`, `多值Map`, 大量集合工具类等:
 
 * `Collects`: 集合工具类;
-* `IterableOps`, `ListOps`, `SetOps`, `MapOps`, `SequenceOps`: 提供链式操作的接口;
+* `Collecting`, `Mapping`: 提供链式操作的集合接口, 并且集成了常见集合的功能 (如 `Iterable`, `Collection`, `Set`, `List`);
 * `IterableType`, `MapType`: 代表集合泛型类型;
 * `MultiMaps`: `MultiMaps` 提供多值 `Map` 如 `SetMap`, `MutableSetMap`, `ListMap` 何 `MutableListMap`;
 

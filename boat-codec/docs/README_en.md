@@ -13,13 +13,13 @@ Table of Contents
 
 ## Introduction
 
-Boat Codec provides Unified interfaces (`Codec`, `Codecing`) to support
-various codec operations sucu as HEX, BASE64, MD5, HmacMD5, AES, RSA,
+Boat Codec provides Unified classes (`Codec`, `Codecing`) to support
+various codec operations such as HEX, BASE64, MD5, HmacMD5, AES, RSA,
 SM2 ,etc.
 
 ## Usage
 
-Core utilities of boat-codec is `Codecs`:
+Core utilities and class of boat-codec is `Codecs` and `Codecing`:
 
 Java Examples
 
@@ -90,7 +90,7 @@ Java Examples
     class Example{
         @Test
         public void test() {
-            Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+            Codecs.codec(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
         }
     }
 
@@ -99,7 +99,7 @@ Kotlin Examples
     class Example {
         @Test
         fun test() {
-            messageBase64.startCodec().decodeBase64().encryptAes(secretKey).doFinal()
+            messageBase64.codec().decodeBase64().encryptAes(secretKey).doFinal()
         }
     }
 
@@ -110,7 +110,6 @@ Java Examples
     package sample.java.xyz.srclab.codec;
 
     import org.testng.annotations.Test;
-    import xyz.srclab.common.codec.Codecing;
     import xyz.srclab.common.codec.Codecs;
     import xyz.srclab.common.codec.EncodeCodec;
     import xyz.srclab.common.codec.aes.AesKeys;
@@ -136,8 +135,8 @@ Java Examples
             logger.log("decrypt: {}", decrypt);
 
             //Use chain
-            encrypt = Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
-            decrypt = Codecing.forData(encrypt).decryptAes(secretKey).doFinalString();
+            encrypt = Codecs.codec(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+            decrypt = Codecs.codec(encrypt).decryptAes(secretKey).doFinalString();
             //hei, pengyou, ruguozhendeshiniqingdazhaohu
             logger.log("decrypt: {}", decrypt);
         }
@@ -154,12 +153,8 @@ Kotlin Examples
     package sample.kotlin.xyz.srclab.codec
 
     import org.testng.annotations.Test
-    import xyz.srclab.common.codec.Base64Codec
-    import xyz.srclab.common.codec.Codecing.Companion.codec
+    import xyz.srclab.common.codec.*
     import xyz.srclab.common.codec.aes.toAesKey
-    import xyz.srclab.common.codec.aesCodec
-    import xyz.srclab.common.codec.toBase64String
-    import xyz.srclab.common.codec.toHexString
     import xyz.srclab.common.test.TestLogger
 
     class CodecSample {

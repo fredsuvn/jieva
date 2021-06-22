@@ -12,6 +12,16 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
+@JvmOverloads
+fun ByteArray.codec(codecSupplier: Codecing.CodecSupplier = Codecing.DEFAULT_CODEC_SUPPLIER): Codecing {
+    return Codecing(this, codecSupplier)
+}
+
+@JvmOverloads
+fun CharSequence.codec(codecSupplier: Codecing.CodecSupplier = Codecing.DEFAULT_CODEC_SUPPLIER): Codecing {
+    return this.toBytes().codec(codecSupplier)
+}
+
 @JvmName("secretKey")
 fun ByteArray.toSecretKey(algorithm: String): SecretKey {
     return SecretKeySpec(this, algorithm)

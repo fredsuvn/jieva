@@ -39,7 +39,7 @@ Lang package provides a serials of core and base interfaces and components:
 * Special character support: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
 * Access interfaces: `Accessor`, `Getter`, `Setter`, `GenericAccessor`, `GenericGetter`, `GenericSetter`;
 * Helper interfaces and utilities: SpecParser, CachingProductBuilder, Processing;
-* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.
+* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
 
 .Java Examples
 [source,java]
@@ -242,7 +242,7 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/excepti
 Collect package extends collection function, supports `chain operation`, `multi-value-map`, various utilities, etc.:
 
 * `Collects`: Default utilities for Collection;
-* `IterableOps`, `ListOps`, `SetOps`, `MapOps`, `SequenceOps`: Ops interfaces, provide chain operation, mainly for Java;
+* `Collecting`, `Mapping`: Collection interfaces provide chain operation and integrates common collection interface functions (such as `Iterable`, `Collection`, `Set`, `List`);
 * `IterableType`, `MapType`: Meta type interfaces for generic Collection types;
 * `MultiMaps`: `MultiMaps` provides multi-values `Map` such as `SetMap`, `MutableSetMap`, `ListMap` and `MutableListMap`;
 

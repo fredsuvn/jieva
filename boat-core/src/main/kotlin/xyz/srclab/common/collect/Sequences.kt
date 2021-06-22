@@ -87,8 +87,6 @@ import kotlin.sequences.windowed as windowedKt
 import kotlin.sequences.zip as zipKt
 import kotlin.sequences.zipWithNext as zipWithNextKt
 
-//For sequence:
-
 fun <T> Sequence<T>.contains(element: T): Boolean {
     return this.containsKt(element)
 }

@@ -96,7 +96,7 @@ components:
     Processing;
 
 -   Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms,
-    Compares, Checks, Requires, Enums, Loaders.
+    RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
 
 Java Examples
 
@@ -1719,8 +1719,9 @@ Collect package extends collection function, supports `chain operation`,
 
 -   `Collects`: Default utilities for Collection;
 
--   `IterableOps`, `ListOps`, `SetOps`, `MapOps`, `SequenceOps`: Ops
-    interfaces, provide chain operation, mainly for Java;
+-   `Collecting`, `Mapping`: Collection interfaces provide chain
+    operation and integrates common collection interface functions (such
+    as `Iterable`, `Collection`, `Set`, `List`);
 
 -   `IterableType`, `MapType`: Meta type interfaces for generic
     Collection types;
@@ -1757,8 +1758,8 @@ Java Examples
             list.add("1");
             list.add("2");
             list.add("3");
-            ListOps<String> listOps = ListOps.opsFor(list);
-            int sum = listOps.addAll(Collects.newArray("4", "5", "6"))
+            Collecting<String> collect = Collects.collect(list);
+            int sum = collect.addAll(Collects.newArray("4", "5", "6"))
                 .removeFirst()
                 .map(it -> it + "0")
                 .map(Nums::toInt)

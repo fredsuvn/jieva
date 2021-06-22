@@ -8,51 +8,100 @@ import java.util.*
 import java.util.stream.Stream
 import kotlin.random.Random
 
-abstract class BaseIterableOps<T, I : Iterable<T>, MI : MutableIterable<T>, THIS : BaseIterableOps<T, I, MI, THIS>>
-protected constructor(protected var operated: I) : MutableIterable<T> {
+/**
+ * Collection interface chain operation, integrated [Iterable], [Collection], [Set], [List] and their mutable version.
+ */
+open class Collecting<T> constructor(
+    protected open var operand: Iterable<T>
+) : MutableIterable<T> {
+
+    protected open fun <R> Iterable<R>.asSelf(): Collecting<R> {
+        operand = this.asAny()
+        return this@Collecting.asAny()
+    }
 
     open fun finalIterable(): Iterable<T> {
-        return operated
+        return operand
     }
 
     open fun finalMutableIterable(): MutableIterable<T> {
-        return operated.asAny()
+        val op = operand
+        if (op is MutableIterable<T>) {
+            return op
+        }
+        return op.toMutableList()
     }
 
-    protected open fun <T> Iterable<T>.toIterableOps(): IterableOps<T> {
-        return IterableOps.opsFor(this)
+    open fun finalCollection(): Collection<T> {
+        val op = operand
+        if (op is Collection<T>) {
+            return op
+        }
+        return op.toSet()
     }
 
-    protected open fun <T> List<T>.toListOps(): ListOps<T> {
-        return ListOps.opsFor(this)
+    open fun finalMutableCollection(): MutableCollection<T> {
+        val op = operand
+        if (op is MutableCollection<T>) {
+            return op
+        }
+        return op.toMutableSet()
     }
 
-    protected open fun <T> Set<T>.toSetOps(): SetOps<T> {
-        return SetOps.opsFor(this)
+    open fun finalSet(): Set<T> {
+        val op = operand
+        if (op is Set<T>) {
+            return op
+        }
+        return op.toSet()
     }
 
-    protected open fun <K, V> Map<K, V>.toMapOps(): MapOps<K, V> {
-        return MapOps.opsFor(this)
+    open fun finalMutableSet(): MutableSet<T> {
+        val op = operand
+        if (op is MutableSet<T>) {
+            return op
+        }
+        return op.toMutableSet()
     }
 
-    fun toSequenceOps(): SequenceOps<T> {
-        return SequenceOps.opsFor(finalIterable())
+    open fun finalList(): List<T> {
+        val op = operand
+        if (op is List<T>) {
+            return op
+        }
+        return op.toList()
+    }
+
+    open fun finalMutableList(): MutableList<T> {
+        val op = operand
+        if (op is MutableList<T>) {
+            return op
+        }
+        return op.toMutableList()
     }
 
     override fun iterator(): MutableIterator<T> {
         return finalMutableIterable().iterator()
     }
 
+    //Iterable:
+
     open fun contains(element: T): Boolean {
         return finalIterable().contains(element)
     }
 
     open fun containsAll(elements: Array<out T>): Boolean {
-        return finalIterable().containsAll(elements)
+        return when (val op = operand) {
+            is Collection<T> -> op.containsAll(elements)
+            else -> op.containsAll(elements)
+        }
     }
 
     open fun containsAll(elements: Iterable<T>): Boolean {
-        return finalIterable().containsAll(elements)
+        return when (val op = operand) {
+            is Collection<T> -> op.containsAll(elements)
+            else -> op.containsAll(elements)
+        }
     }
 
     open fun containsAll(elements: Collection<T>): Boolean {
@@ -60,7 +109,10 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     open fun count(): Int {
-        return finalIterable().count()
+        return when (val op = operand) {
+            is Collection<T> -> op.count()
+            else -> op.count()
+        }
     }
 
     open fun count(predicate: (T) -> Boolean): Int {
@@ -96,7 +148,10 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     open fun first(): T {
-        return finalIterable().first()
+        return when (val op = operand) {
+            is List<T> -> op.first()
+            else -> op.first()
+        }
     }
 
     open fun first(predicate: (T) -> Boolean): T {
@@ -104,7 +159,10 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     open fun firstOrNull(): T? {
-        return finalIterable().firstOrNull()
+        return when (val op = operand) {
+            is List<T> -> op.firstOrNull()
+            else -> op.firstOrNull()
+        }
     }
 
     open fun firstOrNull(predicate: (T) -> Boolean): T? {
@@ -112,19 +170,31 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     open fun last(): T {
-        return finalIterable().last()
+        return when (val op = operand) {
+            is List<T> -> op.last()
+            else -> op.last()
+        }
     }
 
     open fun last(predicate: (T) -> Boolean): T {
-        return finalIterable().last(predicate)
+        return when (val op = operand) {
+            is List<T> -> op.last(predicate)
+            else -> op.last(predicate)
+        }
     }
 
     open fun lastOrNull(): T? {
-        return finalIterable().lastOrNull()
+        return when (val op = operand) {
+            is List<T> -> op.lastOrNull()
+            else -> op.lastOrNull()
+        }
     }
 
     open fun lastOrNull(predicate: (T) -> Boolean): T? {
-        return finalIterable().lastOrNull(predicate)
+        return when (val op = operand) {
+            is List<T> -> op.lastOrNull(predicate)
+            else -> op.lastOrNull(predicate)
+        }
     }
 
     open fun random(): T {
@@ -144,15 +214,24 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     open fun elementAt(index: Int): T {
-        return finalIterable().elementAt(index)
+        return when (val op = operand) {
+            is List<T> -> op.elementAt(index)
+            else -> op.elementAt(index)
+        }
     }
 
     open fun elementAtOrElse(index: Int, defaultValue: (index: Int) -> T): T {
-        return finalIterable().elementAtOrElse(index, defaultValue)
+        return when (val op = operand) {
+            is List<T> -> op.elementAtOrElse(index, defaultValue)
+            else -> op.elementAtOrElse(index, defaultValue)
+        }
     }
 
     open fun elementAtOrNull(index: Int): T? {
-        return finalIterable().elementAtOrNull(index)
+        return when (val op = operand) {
+            is List<T> -> op.elementAtOrNull(index)
+            else -> op.elementAtOrNull(index)
+        }
     }
 
     open fun find(predicate: (T) -> Boolean): T? {
@@ -160,31 +239,46 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     open fun findLast(predicate: (T) -> Boolean): T? {
-        return finalIterable().findLast(predicate)
+        return when (val op = operand) {
+            is List<T> -> op.findLast(predicate)
+            else -> op.findLast(predicate)
+        }
     }
 
     open fun indexOf(element: T): Int {
-        return finalIterable().indexOf(element)
+        return when (val op = operand) {
+            is List<T> -> op.indexOf(element)
+            else -> op.indexOf(element)
+        }
     }
 
     open fun indexOf(predicate: (T) -> Boolean): Int {
-        return finalIterable().indexOf(predicate)
+        return when (val op = operand) {
+            is List<T> -> op.indexOf(predicate)
+            else -> op.indexOf(predicate)
+        }
     }
 
     open fun lastIndexOf(element: T): Int {
-        return finalIterable().lastIndexOf(element)
+        return when (val op = operand) {
+            is List<T> -> op.lastIndexOf(element)
+            else -> op.lastIndexOf(element)
+        }
     }
 
     open fun lastIndexOf(predicate: (T) -> Boolean): Int {
-        return finalIterable().lastIndexOf(predicate)
+        return when (val op = operand) {
+            is List<T> -> op.lastIndexOf(predicate)
+            else -> op.lastIndexOf(predicate)
+        }
     }
 
-    open fun take(n: Int): ListOps<T> {
-        return finalIterable().take(n).toListOps()
+    open fun take(n: Int): Collecting<T> {
+        return finalIterable().take(n).asSelf()
     }
 
-    open fun takeWhile(predicate: (T) -> Boolean): ListOps<T> {
-        return finalIterable().takeWhile(predicate).toListOps()
+    open fun takeWhile(predicate: (T) -> Boolean): Collecting<T> {
+        return finalIterable().takeWhile(predicate).asSelf()
     }
 
     open fun <C : MutableCollection<in T>> takeTo(n: Int, destination: C): C {
@@ -199,12 +293,12 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().takeAllTo(destination)
     }
 
-    open fun drop(n: Int): ListOps<T> {
-        return finalIterable().drop(n).toListOps()
+    open fun drop(n: Int): Collecting<T> {
+        return finalIterable().drop(n).asSelf()
     }
 
-    open fun dropWhile(predicate: (T) -> Boolean): ListOps<T> {
-        return finalIterable().dropWhile(predicate).toListOps()
+    open fun dropWhile(predicate: (T) -> Boolean): Collecting<T> {
+        return finalIterable().dropWhile(predicate).asSelf()
     }
 
     open fun <C : MutableCollection<in T>> dropTo(n: Int, destination: C): C {
@@ -219,16 +313,16 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().forEachIndexed(action)
     }
 
-    open fun filter(predicate: (T) -> Boolean): ListOps<T> {
-        return finalIterable().filter(predicate).toListOps()
+    open fun filter(predicate: (T) -> Boolean): Collecting<T> {
+        return finalIterable().filter(predicate).asSelf()
     }
 
-    open fun filterIndexed(predicate: (index: Int, T) -> Boolean): ListOps<T> {
-        return finalIterable().filterIndexed(predicate).toListOps()
+    open fun filterIndexed(predicate: (index: Int, T) -> Boolean): Collecting<T> {
+        return finalIterable().filterIndexed(predicate).asSelf()
     }
 
-    open fun filterNotNull(): ListOps<T> {
-        return finalIterable().filterNotNull().toListOps()
+    open fun filterNotNull(): Collecting<T> {
+        return finalIterable().filterNotNull().asSelf()
     }
 
     open fun <C : MutableCollection<in T>> filterTo(destination: C, predicate: (T) -> Boolean): C {
@@ -243,20 +337,20 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().filterNotNullTo(destination)
     }
 
-    open fun <R> map(transform: (T) -> R): ListOps<R> {
-        return finalIterable().map(transform).toListOps()
+    open fun <R> map(transform: (T) -> R): Collecting<R> {
+        return finalIterable().map(transform).asSelf()
     }
 
-    open fun <R> mapIndexed(transform: (index: Int, T) -> R): ListOps<R> {
-        return finalIterable().mapIndexed(transform).toListOps()
+    open fun <R> mapIndexed(transform: (index: Int, T) -> R): Collecting<R> {
+        return finalIterable().mapIndexed(transform).asSelf()
     }
 
-    open fun <R> mapNotNull(transform: (T) -> R?): ListOps<R> {
-        return finalIterable().mapNotNull(transform).toListOps()
+    open fun <R> mapNotNull(transform: (T) -> R?): Collecting<R> {
+        return finalIterable().mapNotNull(transform).asSelf()
     }
 
-    open fun <R> mapIndexedNotNull(transform: (index: Int, T) -> R?): ListOps<R> {
-        return finalIterable().mapIndexedNotNull(transform).toListOps()
+    open fun <R> mapIndexedNotNull(transform: (index: Int, T) -> R?): Collecting<R> {
+        return finalIterable().mapIndexedNotNull(transform).asSelf()
     }
 
     open fun <R, C : MutableCollection<in R>> mapTo(destination: C, transform: (T) -> R): C {
@@ -278,12 +372,12 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().mapIndexedNotNullTo(destination, transform)
     }
 
-    open fun <R> flatMap(transform: (T) -> Iterable<R>): ListOps<R> {
-        return finalIterable().flatMap(transform).toListOps()
+    open fun <R> flatMap(transform: (T) -> Iterable<R>): Collecting<R> {
+        return finalIterable().flatMap(transform).asSelf()
     }
 
-    open fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): ListOps<R> {
-        return finalIterable().flatMapIndexed(transform).toListOps()
+    open fun <R> flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): Collecting<R> {
+        return finalIterable().flatMapIndexed(transform).asSelf()
     }
 
     open fun <R, C : MutableCollection<in R>> flatMapTo(destination: C, transform: (T) -> Iterable<R>): C {
@@ -300,65 +394,65 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     open fun <K, V> associate(
         keySelector: (T) -> K,
         valueTransform: (T) -> V
-    ): MapOps<K, V> {
-        return finalIterable().associate(keySelector, valueTransform).toMapOps()
+    ): Mapping<K, V> {
+        return finalIterable().associate(keySelector, valueTransform).mapping()
     }
 
-    open fun <K, V> associate(transform: (T) -> Pair<K, V>): MapOps<K, V> {
-        return finalIterable().associate(transform).toMapOps()
+    open fun <K, V> associate(transform: (T) -> Pair<K, V>): Mapping<K, V> {
+        return finalIterable().associate(transform).mapping()
     }
 
-    open fun <K> associateKeys(keySelector: (T) -> K): MapOps<K, T> {
-        return finalIterable().associateKeys(keySelector).toMapOps()
+    open fun <K> associateKeys(keySelector: (T) -> K): Mapping<K, T> {
+        return finalIterable().associateKeys(keySelector).mapping()
     }
 
-    open fun <K> associateKeys(keys: Iterable<K>): MapOps<K, T> {
-        return finalIterable().associateKeys(keys).toMapOps()
+    open fun <K> associateKeys(keys: Iterable<K>): Mapping<K, T> {
+        return finalIterable().associateKeys(keys).mapping()
     }
 
-    open fun <V> associateValues(valueSelector: (T) -> V): MapOps<T, V> {
-        return finalIterable().associateValues(valueSelector).toMapOps()
+    open fun <V> associateValues(valueSelector: (T) -> V): Mapping<T, V> {
+        return finalIterable().associateValues(valueSelector).mapping()
     }
 
-    open fun <V> associateValues(values: Iterable<V>): MapOps<T, V> {
-        return finalIterable().associateValues(values).toMapOps()
+    open fun <V> associateValues(values: Iterable<V>): Mapping<T, V> {
+        return finalIterable().associateValues(values).mapping()
     }
 
     open fun <K, V> associateWithNext(
         keySelector: (T) -> K,
         valueTransform: (T) -> V
-    ): MapOps<K, V> {
-        return finalIterable().associateWithNext(keySelector, valueTransform).toMapOps()
+    ): Mapping<K, V> {
+        return finalIterable().associateWithNext(keySelector, valueTransform).mapping()
     }
 
-    open fun <K, V> associateWithNext(transform: (T, T) -> Pair<K, V>): MapOps<K, V> {
-        return finalIterable().associateWithNext(transform).toMapOps()
+    open fun <K, V> associateWithNext(transform: (T, T) -> Pair<K, V>): Mapping<K, V> {
+        return finalIterable().associateWithNext(transform).mapping()
     }
 
     open fun <K, V> associatePairs(
         keySelector: (T) -> K,
         valueTransform: (T) -> V
-    ): MapOps<K, V> {
-        return finalIterable().associatePairs(keySelector, valueTransform).toMapOps()
+    ): Mapping<K, V> {
+        return finalIterable().associatePairs(keySelector, valueTransform).mapping()
     }
 
-    open fun <K, V> associatePairs(transform: (T, T) -> Pair<K, V>): MapOps<K, V> {
-        return finalIterable().associatePairs(transform).toMapOps()
+    open fun <K, V> associatePairs(transform: (T, T) -> Pair<K, V>): Mapping<K, V> {
+        return finalIterable().associatePairs(transform).mapping()
     }
 
     open fun <K, V> associatePairs(
         complement: T,
         keySelector: (T) -> K,
         valueTransform: (T) -> V
-    ): MapOps<K, V> {
-        return finalIterable().associatePairs(complement, keySelector, valueTransform).toMapOps()
+    ): Mapping<K, V> {
+        return finalIterable().associatePairs(complement, keySelector, valueTransform).mapping()
     }
 
     open fun <K, V> associatePairs(
         complement: T,
         transform: (T, T) -> Pair<K, V>
-    ): MapOps<K, V> {
-        return finalIterable().associatePairs(complement, transform).toMapOps()
+    ): Mapping<K, V> {
+        return finalIterable().associatePairs(complement, transform).mapping()
     }
 
     open fun <K, V, M : MutableMap<in K, in V>> associateTo(
@@ -451,12 +545,12 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().associatePairsTo(destination, complement, transform)
     }
 
-    open fun <K> groupBy(keySelector: (T) -> K): MapOps<K, List<T>> {
-        return finalIterable().groupBy(keySelector).toMapOps()
+    open fun <K> groupBy(keySelector: (T) -> K): Mapping<K, List<T>> {
+        return finalIterable().groupBy(keySelector).mapping()
     }
 
-    open fun <K, V> groupBy(keySelector: (T) -> K, valueTransform: (T) -> V): MapOps<K, List<V>> {
-        return finalIterable().groupBy(keySelector, valueTransform).toMapOps()
+    open fun <K, V> groupBy(keySelector: (T) -> K, valueTransform: (T) -> V): Mapping<K, List<V>> {
+        return finalIterable().groupBy(keySelector, valueTransform).mapping()
     }
 
     open fun <K, M : MutableMap<in K, MutableList<T>>> groupByTo(destination: M, keySelector: (T) -> K): M {
@@ -495,28 +589,28 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().reduceIndexed(initial, operation)
     }
 
-    open fun <R, V> zip(other: Array<out R>, transform: (T, R) -> V): ListOps<V> {
-        return finalIterable().zip(other, transform).toListOps()
+    open fun <R, V> zip(other: Array<out R>, transform: (T, R) -> V): Collecting<V> {
+        return finalIterable().zip(other, transform).asSelf()
     }
 
-    open fun <R, V> zip(other: Iterable<R>, transform: (T, R) -> V): ListOps<V> {
-        return finalIterable().zip(other, transform).toListOps()
+    open fun <R, V> zip(other: Iterable<R>, transform: (T, R) -> V): Collecting<V> {
+        return finalIterable().zip(other, transform).asSelf()
     }
 
-    open fun <R> zipWithNext(transform: (T, T) -> R): ListOps<R> {
-        return finalIterable().zipWithNext(transform).toListOps()
+    open fun <R> zipWithNext(transform: (T, T) -> R): Collecting<R> {
+        return finalIterable().zipWithNext(transform).asSelf()
     }
 
-    open fun chunked(size: Int): ListOps<List<T>> {
-        return finalIterable().chunked(size).toListOps()
+    open fun chunked(size: Int): Collecting<List<T>> {
+        return finalIterable().chunked(size).asSelf()
     }
 
-    open fun <R> chunked(size: Int, transform: (List<T>) -> R): ListOps<R> {
-        return finalIterable().chunked(size, transform).toListOps()
+    open fun <R> chunked(size: Int, transform: (List<T>) -> R): Collecting<R> {
+        return finalIterable().chunked(size, transform).asSelf()
     }
 
-    open fun windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): ListOps<List<T>> {
-        return finalIterable().windowed(size, step, partialWindows).toListOps()
+    open fun windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): Collecting<List<T>> {
+        return finalIterable().windowed(size, step, partialWindows).asSelf()
     }
 
     open fun <R> windowed(
@@ -524,45 +618,45 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         step: Int = 1,
         partialWindows: Boolean = false,
         transform: (List<T>) -> R
-    ): ListOps<R> {
-        return finalIterable().windowed(size, step, partialWindows, transform).toListOps()
+    ): Collecting<R> {
+        return finalIterable().windowed(size, step, partialWindows, transform).asSelf()
     }
 
-    open fun intersect(other: Iterable<T>): SetOps<T> {
-        return finalIterable().intersect(other).toSetOps()
+    open fun intersect(other: Iterable<T>): Collecting<T> {
+        return finalIterable().intersect(other).asSelf()
     }
 
-    open fun union(other: Iterable<T>): SetOps<T> {
-        return finalIterable().union(other).toSetOps()
+    open fun union(other: Iterable<T>): Collecting<T> {
+        return finalIterable().union(other).asSelf()
     }
 
-    open fun subtract(other: Iterable<T>): SetOps<T> {
-        return finalIterable().subtract(other).toSetOps()
+    open fun subtract(other: Iterable<T>): Collecting<T> {
+        return finalIterable().subtract(other).asSelf()
     }
 
-    open fun distinct(): ListOps<T> {
-        return finalIterable().distinct().toListOps()
+    open fun distinct(): Collecting<T> {
+        return finalIterable().distinct().asSelf()
     }
 
-    open fun <K> distinct(selector: (T) -> K): ListOps<T> {
-        return finalIterable().distinct(selector).toListOps()
+    open fun <K> distinct(selector: (T) -> K): Collecting<T> {
+        return finalIterable().distinct(selector).asSelf()
     }
 
     @JvmOverloads
-    open fun sorted(comparator: Comparator<in T> = asComparableComparator()): ListOps<T> {
-        return finalIterable().sorted(comparator).toListOps()
+    open fun sorted(comparator: Comparator<in T> = asComparableComparator()): Collecting<T> {
+        return finalIterable().sorted(comparator).asSelf()
     }
 
-    open fun reversed(): ListOps<T> {
-        return finalIterable().reversed().toListOps()
+    open fun reversed(): Collecting<T> {
+        return finalIterable().reversed().asSelf()
     }
 
-    open fun shuffled(): ListOps<T> {
-        return finalIterable().shuffled().toListOps()
+    open fun shuffled(): Collecting<T> {
+        return finalIterable().shuffled().asSelf()
     }
 
-    open fun shuffled(random: Random): ListOps<T> {
-        return finalIterable().shuffled(random).toListOps()
+    open fun shuffled(random: Random): Collecting<T> {
+        return finalIterable().shuffled(random).asSelf()
     }
 
     @JvmOverloads
@@ -677,7 +771,10 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
     }
 
     open fun toMutableList(): MutableList<T> {
-        return finalIterable().toMutableList()
+        return when (val op = operand) {
+            is Collection<T> -> op.toMutableList()
+            else -> op.toMutableList()
+        }
     }
 
     open fun toArrayList(): ArrayList<T> {
@@ -788,81 +885,296 @@ protected constructor(protected var operated: I) : MutableIterable<T> {
         return finalIterable().toAnyArray(componentType, selector)
     }
 
-    abstract fun plus(element: T): THIS
-
-    abstract fun plus(elements: Array<out T>): THIS
-
-    abstract fun plus(elements: Iterable<T>): THIS
-
-    abstract fun plus(elements: Sequence<T>): THIS
-
-    abstract fun minus(element: T): THIS
-
-    abstract fun minus(elements: Array<out T>): THIS
-
-    abstract fun minus(elements: Iterable<T>): THIS
-
-    abstract fun minus(elements: Sequence<T>): THIS
-
-    open fun plusBefore(index: Int, element: T): ListOps<T> {
-        return finalIterable().plusBefore(index, element).toListOps()
+    open fun plus(element: T): Collecting<T> {
+        return when (val op = operand) {
+            is List<T> -> op.plus(element).asSelf()
+            is Set<T> -> op.plus(element).asSelf()
+            else -> op.plus(element).asSelf()
+        }
     }
 
-    open fun plusBefore(index: Int, elements: Array<out T>): ListOps<T> {
-        return finalIterable().plusBefore(index, elements).toListOps()
+    open fun plus(elements: Array<out T>): Collecting<T> {
+        return when (val op = operand) {
+            is List<T> -> op.plus(elements).asSelf()
+            is Set<T> -> op.plus(elements).asSelf()
+            else -> op.plus(elements).asSelf()
+        }
     }
 
-    open fun plusBefore(index: Int, elements: Iterable<T>): ListOps<T> {
-        return finalIterable().plusBefore(index, elements).toListOps()
+    open fun plus(elements: Iterable<T>): Collecting<T> {
+        return when (val op = operand) {
+            is List<T> -> op.plus(elements).asSelf()
+            is Set<T> -> op.plus(elements).asSelf()
+            else -> op.plus(elements).asSelf()
+        }
     }
 
-    open fun plusBefore(index: Int, elements: Sequence<T>): ListOps<T> {
-        return finalIterable().plusBefore(index, elements).toListOps()
+    open fun plus(elements: Sequence<T>): Collecting<T> {
+        return when (val op = operand) {
+            is List<T> -> op.plus(elements).asSelf()
+            is Set<T> -> op.plus(elements).asSelf()
+            else -> op.plus(elements).asSelf()
+        }
     }
 
-    open fun plusAfter(index: Int, element: T): ListOps<T> {
-        return finalIterable().plusAfter(index, element).toListOps()
+    open fun minus(element: T): Collecting<T> {
+        return when (val op = operand) {
+            is List<T> -> op.minus(element).asSelf()
+            is Set<T> -> op.minus(element).asSelf()
+            else -> op.minus(element).asSelf()
+        }
     }
 
-    open fun plusAfter(index: Int, elements: Array<out T>): ListOps<T> {
-        return finalIterable().plusAfter(index, elements).toListOps()
+    open fun minus(elements: Array<out T>): Collecting<T> {
+        return when (val op = operand) {
+            is List<T> -> op.minus(elements).asSelf()
+            is Set<T> -> op.minus(elements).asSelf()
+            else -> op.minus(elements).asSelf()
+        }
     }
 
-    open fun plusAfter(index: Int, elements: Iterable<T>): ListOps<T> {
-        return finalIterable().plusAfter(index, elements).toListOps()
+    open fun minus(elements: Iterable<T>): Collecting<T> {
+        return when (val op = operand) {
+            is List<T> -> op.minus(elements).asSelf()
+            is Set<T> -> op.minus(elements).asSelf()
+            else -> op.minus(elements).asSelf()
+        }
     }
 
-    open fun plusAfter(index: Int, elements: Sequence<T>): ListOps<T> {
-        return finalIterable().plusAfter(index, elements).toListOps()
+    open fun minus(elements: Sequence<T>): Collecting<T> {
+        return when (val op = operand) {
+            is List<T> -> op.minus(elements).asSelf()
+            is Set<T> -> op.minus(elements).asSelf()
+            else -> op.minus(elements).asSelf()
+        }
+    }
+
+    open fun plusBefore(index: Int, element: T): Collecting<T> {
+        return finalIterable().plusBefore(index, element).asSelf()
+    }
+
+    open fun plusBefore(index: Int, elements: Array<out T>): Collecting<T> {
+        return finalIterable().plusBefore(index, elements).asSelf()
+    }
+
+    open fun plusBefore(index: Int, elements: Iterable<T>): Collecting<T> {
+        return finalIterable().plusBefore(index, elements).asSelf()
+    }
+
+    open fun plusBefore(index: Int, elements: Sequence<T>): Collecting<T> {
+        return finalIterable().plusBefore(index, elements).asSelf()
+    }
+
+    open fun plusAfter(index: Int, element: T): Collecting<T> {
+        return finalIterable().plusAfter(index, element).asSelf()
+    }
+
+    open fun plusAfter(index: Int, elements: Array<out T>): Collecting<T> {
+        return finalIterable().plusAfter(index, elements).asSelf()
+    }
+
+    open fun plusAfter(index: Int, elements: Iterable<T>): Collecting<T> {
+        return finalIterable().plusAfter(index, elements).asSelf()
+    }
+
+    open fun plusAfter(index: Int, elements: Sequence<T>): Collecting<T> {
+        return finalIterable().plusAfter(index, elements).asSelf()
     }
 
     @JvmOverloads
-    open fun minusAt(index: Int, count: Int = 1): ListOps<T> {
-        return finalIterable().minusAt(index, count).toListOps()
+    open fun minusAt(index: Int, count: Int = 1): Collecting<T> {
+        return finalIterable().minusAt(index, count).asSelf()
     }
 
-    open fun remove(element: T): THIS {
+    open fun remove(element: T): Collecting<T> {
         finalMutableIterable().remove(element)
-        return this.asAny()
+        return this
     }
 
-    open fun remove(n: Int): THIS {
+    open fun remove(n: Int): Collecting<T> {
         finalMutableIterable().remove(n)
-        return this.asAny()
+        return this
     }
 
-    open fun removeWhile(predicate: (T) -> Boolean): THIS {
+    open fun removeWhile(predicate: (T) -> Boolean): Collecting<T> {
         finalMutableIterable().removeWhile(predicate)
-        return this.asAny()
+        return this
     }
 
-    open fun removeAll(): THIS {
+    open fun removeAll(): Collecting<T> {
         finalMutableIterable().removeAll()
+        return this
+    }
+
+    open fun retainAll(predicate: (T) -> Boolean): Collecting<T> {
+        when (val op = operand) {
+            is MutableList<T> -> op.retainAll(predicate)
+            else -> finalMutableIterable().retainAll(predicate)
+        }
+        return this
+    }
+
+    //Collection:
+
+    open fun addAll(elements: Array<out T>): Collecting<T> {
+        finalMutableCollection().addAll(elements)
+        return this
+    }
+
+    open fun addAll(elements: Iterable<T>): Collecting<T> {
+        finalMutableCollection().addAll(elements)
+        return this
+    }
+
+    open fun addAll(elements: Sequence<T>): Collecting<T> {
+        finalMutableCollection().addAll(elements)
+        return this
+    }
+
+    open fun removeAll(elements: Array<out T>): Collecting<T> {
+        finalMutableCollection().removeAll(elements)
+        return this
+    }
+
+    open fun removeAll(elements: Iterable<T>): Collecting<T> {
+        finalMutableCollection().removeAll(elements)
+        return this
+    }
+
+    open fun removeAll(elements: Sequence<T>): Collecting<T> {
+        finalMutableCollection().removeAll(elements)
+        return this
+    }
+
+    open fun retainAll(elements: Array<out T>): Collecting<T> {
+        finalMutableCollection().retainAll(elements)
+        return this
+    }
+
+    open fun retainAll(elements: Iterable<T>): Collecting<T> {
+        finalMutableCollection().retainAll(elements)
+        return this
+    }
+
+    open fun retainAll(elements: Sequence<T>): Collecting<T> {
+        finalMutableCollection().retainAll(elements)
+        return this
+    }
+
+    open fun clear(): Collecting<T> {
+        finalMutableCollection().clear()
+        return this
+    }
+
+    // Set:
+
+    // List:
+
+    open fun takeLast(n: Int): Collecting<T> {
+        return finalList().takeLast(n).asSelf()
+    }
+
+    open fun takeLastWhile(predicate: (T) -> Boolean): Collecting<T> {
+        return finalList().takeLastWhile(predicate).asSelf()
+    }
+
+    open fun dropLast(n: Int): Collecting<T> {
+        return finalList().dropLast(n).asSelf()
+    }
+
+    open fun dropLastWhile(predicate: (T) -> Boolean): Collecting<T> {
+        return finalList().dropLastWhile(predicate).asSelf()
+    }
+
+    open fun reduceRight(operation: (T, T) -> T): T {
+        return finalList().reduceRight(operation)
+    }
+
+    open fun reduceRightIndexed(operation: (Int, T, T) -> T): T {
+        return finalList().reduceRightIndexed(operation)
+    }
+
+    open fun reduceRightOrNull(operation: (T, T) -> T): T? {
+        return finalList().reduceRightOrNull(operation)
+    }
+
+    open fun reduceRightIndexedOrNull(operation: (Int, T, T) -> T): T? {
+        return finalList().reduceRightIndexedOrNull(operation)
+    }
+
+    open fun <R> reduceRight(initial: R, operation: (T, R) -> R): R {
+        return finalList().reduceRight(initial, operation)
+    }
+
+    open fun <R> reduceRightIndexed(initial: R, operation: (Int, T, R) -> R): R {
+        return finalList().reduceRightIndexed(initial, operation)
+    }
+
+    @JvmOverloads
+    open fun subList(fromIndex: Int, toIndex: Int = count()): Collecting<T> {
+        return finalList().subList(fromIndex, toIndex).asSelf()
+    }
+
+    open fun slice(indices: IntArray): Collecting<T> {
+        return finalList().slice(indices.asIterable()).asSelf()
+    }
+
+    open fun slice(indices: Iterable<Int>): Collecting<T> {
+        return finalList().slice(indices).asSelf()
+    }
+
+    open fun slice(indices: IntRange): Collecting<T> {
+        return finalList().slice(indices).asSelf()
+    }
+
+    @JvmOverloads
+    open fun binarySearch(element: T, comparator: Comparator<in T> = asComparableComparator()): Int {
+        return finalList().binarySearch(element, comparator)
+    }
+
+    open fun reverse(): Collecting<T> {
+        finalMutableList().reverse()
         return this.asAny()
     }
 
-    open fun retainAll(predicate: (T) -> Boolean): THIS {
-        finalMutableIterable().retainAll(predicate)
+    @JvmOverloads
+    open fun sort(comparator: Comparator<in T> = asComparableComparator()): Collecting<T> {
+        finalMutableList().sort(comparator)
+        return this.asAny()
+    }
+
+    open fun shuffle(): Collecting<T> {
+        finalMutableList().shuffle()
+        return this.asAny()
+    }
+
+    open fun shuffle(random: Random): Collecting<T> {
+        finalMutableList().shuffle(random)
+        return this.asAny()
+    }
+
+    open fun removeAll(predicate: (T) -> Boolean): Collecting<T> {
+        finalMutableList().removeAll(predicate)
+        return this.asAny()
+    }
+
+    open fun removeFirst(): Collecting<T> {
+        finalMutableList().removeFirst()
+        return this.asAny()
+    }
+
+    open fun removeFirstOrNull(): Collecting<T> {
+        finalMutableList().removeFirstOrNull()
+        return this.asAny()
+    }
+
+    open fun removeLast(): Collecting<T> {
+        finalMutableList().removeLast()
+        return this.asAny()
+    }
+
+    open fun removeLastOrNull(): Collecting<T> {
+        finalMutableList().removeLastOrNull()
         return this.asAny()
     }
 

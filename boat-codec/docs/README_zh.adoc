@@ -13,7 +13,7 @@ Boat Codec 提供了统一的接口 (`Codec`, `Codecing`) 来支持大量的编�
 
 == 用法
 
-boat-codec 的核心工具类是 `Codecs`:
+boat-codec 的核心工具类和接口是 `Codecs` 和 `Codecing`:
 
 .Java Examples
 [source,java]
@@ -89,7 +89,7 @@ Using `Codecing`: Codec processing for chain operation.
 class Example{
     @Test
     public void test() {
-        Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+        Codecs.collect(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
     }
 }
 ----
@@ -100,7 +100,7 @@ class Example{
 class Example {
     @Test
     fun test() {
-        messageBase64.startCodec().decodeBase64().encryptAes(secretKey).doFinal()
+        messageBase64.codec().decodeBase64().encryptAes(secretKey).doFinal()
     }
 }
 ----

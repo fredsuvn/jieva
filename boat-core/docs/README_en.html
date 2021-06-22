@@ -563,7 +563,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>Helper interfaces and utilities: SpecParser, CachingProductBuilder, Processing;</p>
 </li>
 <li>
-<p>Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.</p>
+<p>Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.</p>
 </li>
 </ul>
 </div>
@@ -2302,7 +2302,7 @@ class ExceptionSample {
 <p><code>Collects</code>: Default utilities for Collection;</p>
 </li>
 <li>
-<p><code>IterableOps</code>, <code>ListOps</code>, <code>SetOps</code>, <code>MapOps</code>, <code>SequenceOps</code>: Ops interfaces, provide chain operation, mainly for Java;</p>
+<p><code>Collecting</code>, <code>Mapping</code>: Collection interfaces provide chain operation and integrates common collection interface functions (such as <code>Iterable</code>, <code>Collection</code>, <code>Set</code>, <code>List</code>);</p>
 </li>
 <li>
 <p><code>IterableType</code>, <code>MapType</code>: Meta type interfaces for generic Collection types;</p>
@@ -2342,8 +2342,8 @@ public class CollectSample {
         list.add("1");
         list.add("2");
         list.add("3");
-        ListOps&lt;String&gt; listOps = ListOps.opsFor(list);
-        int sum = listOps.addAll(Collects.newArray("4", "5", "6"))
+        Collecting&lt;String&gt; collect = Collects.collect(list);
+        int sum = collect.addAll(Collects.newArray("4", "5", "6"))
             .removeFirst()
             .map(it -&gt; it + "0")
             .map(Nums::toInt)

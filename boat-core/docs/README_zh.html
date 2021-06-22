@@ -563,7 +563,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>辅助对象: SpecParser, CachingProductBuilder, Processing;</p>
 </li>
 <li>
-<p>公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.</p>
+<p>公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.</p>
 </li>
 </ul>
 </div>
@@ -2302,7 +2302,7 @@ class ExceptionSample {
 <p><code>Collects</code>: 集合工具类;</p>
 </li>
 <li>
-<p><code>IterableOps</code>, <code>ListOps</code>, <code>SetOps</code>, <code>MapOps</code>, <code>SequenceOps</code>: 提供链式操作的接口;</p>
+<p><code>Collecting</code>, <code>Mapping</code>: 提供链式操作的集合接口, 并且集成了常见集合的功能 (如 <code>Iterable</code>, <code>Collection</code>, <code>Set</code>, <code>List</code>);</p>
 </li>
 <li>
 <p><code>IterableType</code>, <code>MapType</code>: 代表集合泛型类型;</p>
@@ -2342,8 +2342,8 @@ public class CollectSample {
         list.add("1");
         list.add("2");
         list.add("3");
-        ListOps&lt;String&gt; listOps = ListOps.opsFor(list);
-        int sum = listOps.addAll(Collects.newArray("4", "5", "6"))
+        Collecting&lt;String&gt; collect = Collects.collect(list);
+        int sum = collect.addAll(Collects.newArray("4", "5", "6"))
             .removeFirst()
             .map(it -&gt; it + "0")
             .map(Nums::toInt)

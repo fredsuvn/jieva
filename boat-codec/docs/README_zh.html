@@ -473,7 +473,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_用法">用法</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>boat-codec 的核心工具类是 <code>Codecs</code>:</p>
+<p>boat-codec 的核心工具类和接口是 <code>Codecs</code> 和 <code>Codecing</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">Java Examples</div>
@@ -566,7 +566,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="highlight"><code class="language-java" data-lang="java">class Example{
     @Test
     public void test() {
-        Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+        Codecs.collect(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
     }
 }</code></pre>
 </div>
@@ -577,7 +577,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="highlight"><code class="language-kotlin" data-lang="kotlin">class Example {
     @Test
     fun test() {
-        messageBase64.startCodec().decodeBase64().encryptAes(secretKey).doFinal()
+        messageBase64.codec().decodeBase64().encryptAes(secretKey).doFinal()
     }
 }</code></pre>
 </div>
@@ -594,7 +594,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.codec;
 
 import org.testng.annotations.Test;
-import xyz.srclab.common.codec.Codecing;
 import xyz.srclab.common.codec.Codecs;
 import xyz.srclab.common.codec.EncodeCodec;
 import xyz.srclab.common.codec.aes.AesKeys;
@@ -620,8 +619,8 @@ public class CodecSample {
         logger.log("decrypt: {}", decrypt);
 
         //Use chain
-        encrypt = Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
-        decrypt = Codecing.forData(encrypt).decryptAes(secretKey).doFinalString();
+        encrypt = Codecs.codec(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+        decrypt = Codecs.codec(encrypt).decryptAes(secretKey).doFinalString();
         //hei, pengyou, ruguozhendeshiniqingdazhaohu
         logger.log("decrypt: {}", decrypt);
     }
@@ -640,12 +639,8 @@ public class CodecSample {
 <pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.codec
 
 import org.testng.annotations.Test
-import xyz.srclab.common.codec.Base64Codec
-import xyz.srclab.common.codec.Codecing.Companion.codec
+import xyz.srclab.common.codec.*
 import xyz.srclab.common.codec.aes.toAesKey
-import xyz.srclab.common.codec.aesCodec
-import xyz.srclab.common.codec.toBase64String
-import xyz.srclab.common.codec.toHexString
 import xyz.srclab.common.test.TestLogger
 
 class CodecSample {
