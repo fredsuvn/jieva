@@ -96,7 +96,7 @@ components:
     Processing;
 
 -   Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms,
-    Compares, Checks, Requires, Enums, Loaders.
+    RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
 
 Java Examples
 

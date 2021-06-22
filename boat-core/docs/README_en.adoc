@@ -39,7 +39,7 @@ Lang package provides a serials of core and base interfaces and components:
 * Special character support: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
 * Access interfaces: `Accessor`, `Getter`, `Setter`, `GenericAccessor`, `GenericGetter`, `GenericSetter`;
 * Helper interfaces and utilities: SpecParser, CachingProductBuilder, Processing;
-* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.
+* Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
 
 .Java Examples
 [source,java]

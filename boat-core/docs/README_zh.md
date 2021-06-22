@@ -81,8 +81,8 @@ Lang包提供一系列核心接口和组件:
 
 -   辅助对象: SpecParser, CachingProductBuilder, Processing;
 
--   公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares,
-    Checks, Requires, Enums, Loaders.
+-   公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier,
+    Compares, Checks, Requires, Enums, Loaders.
 
 Java Examples
 

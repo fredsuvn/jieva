@@ -40,7 +40,7 @@ Lang包提供一系列核心接口和组件:
 * 特殊字符支持: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
 * 访问接口: `Accessor`, `Getter`, `Setter`, `GenericAccessor`, `GenericGetter`, `GenericSetter`;
 * 辅助对象: SpecParser, CachingProductBuilder, Processing;
-* 公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, Compares, Checks, Requires, Enums, Loaders.
+* 公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
 
 .Java Examples
 [source,java]
