@@ -18,7 +18,7 @@ Boat Codec 提供了统一的接口 (`Codec`, `Codecing`) 来支持大量的编�
 
 ## 用法
 
-boat-codec 的核心工具类是 `Codecs`:
+boat-codec 的核心工具类和接口是 `Codecs` 和 `Codecing`:
 
 Java Examples
 
@@ -89,7 +89,7 @@ Java Examples
     class Example{
         @Test
         public void test() {
-            Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+            Codecs.collect(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
         }
     }
 
@@ -98,7 +98,7 @@ Kotlin Examples
     class Example {
         @Test
         fun test() {
-            messageBase64.startCodec().decodeBase64().encryptAes(secretKey).doFinal()
+            messageBase64.codec().decodeBase64().encryptAes(secretKey).doFinal()
         }
     }
 
@@ -109,7 +109,6 @@ Java Examples
     package sample.java.xyz.srclab.codec;
 
     import org.testng.annotations.Test;
-    import xyz.srclab.common.codec.Codecing;
     import xyz.srclab.common.codec.Codecs;
     import xyz.srclab.common.codec.EncodeCodec;
     import xyz.srclab.common.codec.aes.AesKeys;
@@ -135,8 +134,8 @@ Java Examples
             logger.log("decrypt: {}", decrypt);
 
             //Use chain
-            encrypt = Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
-            decrypt = Codecing.forData(encrypt).decryptAes(secretKey).doFinalString();
+            encrypt = Codecs.codec(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+            decrypt = Codecs.codec(encrypt).decryptAes(secretKey).doFinalString();
             //hei, pengyou, ruguozhendeshiniqingdazhaohu
             logger.log("decrypt: {}", decrypt);
         }
@@ -153,12 +152,8 @@ Kotlin Examples
     package sample.kotlin.xyz.srclab.codec
 
     import org.testng.annotations.Test
-    import xyz.srclab.common.codec.Base64Codec
-    import xyz.srclab.common.codec.Codecing.Companion.codec
+    import xyz.srclab.common.codec.*
     import xyz.srclab.common.codec.aes.toAesKey
-    import xyz.srclab.common.codec.aesCodec
-    import xyz.srclab.common.codec.toBase64String
-    import xyz.srclab.common.codec.toHexString
     import xyz.srclab.common.test.TestLogger
 
     class CodecSample {

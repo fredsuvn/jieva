@@ -8,11 +8,11 @@ Sun Qian <fredsuvn@163.com>
 
 == Introduction
 
-Boat Codec provides Unified interfaces (`Codec`, `Codecing`) to support various codec operations sucu as HEX, BASE64, MD5, HmacMD5, AES, RSA, SM2 ,etc.
+Boat Codec provides Unified classes (`Codec`, `Codecing`) to support various codec operations such as HEX, BASE64, MD5, HmacMD5, AES, RSA, SM2 ,etc.
 
 == Usage
 
-Core utilities of boat-codec is `Codecs`:
+Core utilities and class of boat-codec is `Codecs` and `Codecing`:
 
 .Java Examples
 [source,java]
@@ -88,7 +88,7 @@ Using `Codecing`: Codec processing for chain operation.
 class Example{
     @Test
     public void test() {
-        Codecing.forData(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
+        Codecs.codec(messageBase64).decodeBase64().encryptAes(secretKey).doFinal();
     }
 }
 ----
@@ -99,7 +99,7 @@ class Example{
 class Example {
     @Test
     fun test() {
-        messageBase64.startCodec().decodeBase64().encryptAes(secretKey).doFinal()
+        messageBase64.codec().decodeBase64().encryptAes(secretKey).doFinal()
     }
 }
 ----
