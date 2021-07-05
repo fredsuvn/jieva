@@ -32,46 +32,76 @@ object Defaults {
     @JvmField
     val PLUS_SIGN_MATCHER: CharMatcher = CharMatcher.`is`('+')
 
+    /**
+     * UTF-8.
+     */
     @JvmStatic
     @get:JvmName("charset")
     val charset: Charset = StandardCharsets.UTF_8
 
+    /**
+     * [Locale.getDefault].
+     */
     @JvmStatic
     val locale: Locale
         @JvmName("locale") get() {
             return Locale.getDefault()
         }
 
+    /**
+     * [TimeUnit.SECONDS].
+     */
     @JvmStatic
     @get:JvmName("timeUnit")
     val timeUnit: TimeUnit = TimeUnit.SECONDS
 
+    /**
+     * [Environment.availableProcessors] * 2.
+     */
     @JvmStatic
     @get:JvmName("concurrencyLevel")
     val concurrencyLevel: Int = Environment.availableProcessors * 2
 
+    /**
+     * [File.separator].
+     */
     @JvmStatic
     @get:JvmName("fileSeparator")
     val fileSeparator: String = File.separator
 
+    /**
+     * [File.pathSeparator].
+     */
     @JvmStatic
     @get:JvmName("pathSeparator")
     val pathSeparator: String = File.pathSeparator
 
+    /**
+     * [System.lineSeparator].
+     */
     @JvmStatic
     val lineSeparator: String
         @JvmName("lineSeparator") get() {
             return System.lineSeparator()
         }
 
+    /**
+     * yyyyMMddHHmmssSSS.
+     */
     @JvmStatic
     @get:JvmName("timestampPattern")
     val timestampPattern: String = "yyyyMMddHHmmssSSS"
 
+    /**
+     * yyyyMMddHHmmssSSS.
+     */
     @JvmStatic
     @get:JvmName("timestampFormatter")
     val timestampFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(timestampPattern, locale)
 
+    /**
+     * 10.
+     */
     @JvmStatic
     @get:JvmName("radix")
     val radix: Int = 10

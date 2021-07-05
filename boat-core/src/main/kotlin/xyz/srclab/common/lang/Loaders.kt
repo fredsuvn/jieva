@@ -17,11 +17,7 @@ import java.util.*
  */
 @JvmOverloads
 fun <T> CharSequence.loadClass(classLoader: ClassLoader = Current.classLoader): Class<T> {
-    return try {
-        Class.forName(this.toString(), true, classLoader)
-    } catch (e: ClassNotFoundException) {
-        throw e
-    }.asAny()
+    return Class.forName(this.toString(), true, classLoader).asAny()
 }
 
 @JvmOverloads
@@ -101,31 +97,39 @@ fun CharSequence.loadPropertiesResource(
 fun CharSequence.loadPropertiesResourceOrNull(
     classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): Map<String, String>? {
-    return loadResourceOrNull(classLoader)?.openStream()?.bufferedReader(charset)?.loadProperties()
+    return loadResourceOrNull(classLoader)?.openStream()?.loadProperties(charset)
 }
 
+/**
+ * @throws IOException
+ */
 @JvmOverloads
 fun CharSequence.loadAllResources(classLoader: ClassLoader = Current.classLoader): List<URL> {
-    return try {
-        val urlEnumeration = classLoader.getResources(this.toString())
-        urlEnumeration.toList()
-    } catch (e: Exception) {
-        throw IllegalStateException(e)
-    }
+    val urlEnumeration = classLoader.getResources(this.toString())
+    return urlEnumeration.toList()
 }
 
+/**
+ * @throws IOException
+ */
 @JvmName("loadAllBytes")
 @JvmOverloads
 fun CharSequence.loadAllBytesResources(classLoader: ClassLoader = Current.classLoader): List<ByteArray> {
     return loadAllResources(classLoader).map { url -> url.readBytes() }
 }
 
+/**
+ * @throws IOException
+ */
 @JvmName("loadAllStreams")
 @JvmOverloads
 fun CharSequence.loadAllStreamResources(classLoader: ClassLoader = Current.classLoader): List<InputStream> {
     return loadAllResources(classLoader).map { url -> url.openStream() }
 }
 
+/**
+ * @throws IOException
+ */
 @JvmName("loadAllStrings")
 @JvmOverloads
 fun CharSequence.loadAllStringResources(
@@ -134,12 +138,15 @@ fun CharSequence.loadAllStringResources(
     return loadAllBytesResources(classLoader).map { bytes -> bytes.toChars(charset) }
 }
 
+/**
+ * @throws IOException
+ */
 @JvmName("loadAllProperties")
 @JvmOverloads
 fun CharSequence.loadAllPropertiesResources(
     classLoader: ClassLoader = Current.classLoader, charset: Charset = Defaults.charset
 ): List<Map<String, String>> {
-    return loadAllStreamResources(classLoader).map { stream -> stream.bufferedReader(charset).loadProperties() }
+    return loadAllStreamResources(classLoader).map { stream -> stream.loadProperties(charset) }
 }
 
 @JvmOverloads
@@ -152,11 +159,20 @@ fun <T> InputStream.loadClass(): Class<T> {
 }
 
 @JvmOverloads
-fun ByteArray.loadProperties(offset: Int = 0, length: Int = this.size - offset): Map<String, String> {
-    return ByteArrayInputStream(this).loadProperties()
+fun ByteArray.loadProperties(
+    offset: Int = 0,
+    length: Int = this.size - offset,
+    charset: Charset = Defaults.charset
+): Map<String, String> {
+    return ByteArrayInputStream(this, offset, length).loadProperties(charset)
 }
 
 fun InputStream.loadProperties(charset: Charset = Defaults.charset): Map<String, String> {
+    if (charset == Defaults.charset) {
+        val properties = Properties()
+        properties.load(this)
+        return properties.map { k, v -> k.toString() to v.toString() }
+    }
     return this.bufferedReader(charset).loadProperties()
 }
 
@@ -174,11 +190,7 @@ object BytesClassLoader : ClassLoader() {
     }
 
     fun loadClass(inputStream: InputStream): Class<*> {
-        return try {
-            loadClass(inputStream.readBytes())
-        } catch (e: IOException) {
-            throw IllegalStateException(e)
-        }
+        return loadClass(inputStream.readBytes())
     }
 
     fun loadClass(byteBuffer: ByteBuffer): Class<*> {
