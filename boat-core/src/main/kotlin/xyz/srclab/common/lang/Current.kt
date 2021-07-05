@@ -17,7 +17,7 @@ object Current {
     }
 
     /**
-     * [milliseconds]
+     * [milliseconds].
      */
     @JvmStatic
     val millis: Long
@@ -26,7 +26,7 @@ object Current {
         }
 
     /**
-     * [nanoseconds]
+     * [nanoseconds].
      */
     @JvmStatic
     val nanos: Long
@@ -35,7 +35,7 @@ object Current {
         }
 
     /**
-     * With [timestampPattern]
+     * With [timestampPattern].
      */
     @JvmStatic
     val timestamp: String
@@ -44,7 +44,7 @@ object Current {
         }
 
     /**
-     * [Thread.currentThread]
+     * [Thread.currentThread].
      */
     @JvmStatic
     val thread: Thread
@@ -61,55 +61,82 @@ object Current {
             return thread.contextClassLoader
         }
 
+    /**
+     * Sleeps for [millis] and [nanos].
+     */
     @JvmStatic
     @JvmOverloads
     fun sleep(millis: Long, nanos: Int = 0) {
         Thread.sleep(millis, nanos)
     }
 
+    /**
+     * Sleeps for [duration].
+     */
     @JvmStatic
     fun sleep(duration: Duration) {
         sleep(duration.toMillis(), duration.nano)
     }
 
+    /**
+     * Context of current runner (maybe thread).
+     */
     @JvmStatic
     val context: MutableMap<Any, Any?>
         @JvmName("context") get() {
             return localContext.get()
         }
 
+    /**
+     * Gets from [context].
+     */
     @JvmStatic
     fun <T : Any> get(key: Any): T {
         return getOrNull(key)!!
     }
 
+    /**
+     * Gets or null from [context].
+     */
     @JvmStatic
     fun <T : Any> getOrNull(key: Any): T? {
         return context[key].asAny()
     }
 
+    /**
+     * Gets or else from [context].
+     */
     @JvmStatic
     fun <T : Any> getOrElse(key: Any, value: T): T {
         return context.getOrDefault(key, value).asAny()
     }
 
+    /**
+     * Gets or else from [context].
+     */
     @JvmStatic
     fun <T : Any> getOrElse(key: Any, supplier: (key: Any) -> T): T {
         return getOrNull(key) ?: supplier(key)
     }
 
+    /**
+     * Gets or throw from [context].
+     */
     @JvmStatic
     fun <T : Any> getOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
         return getOrNull(key) ?: throw supplier(key)
     }
 
+    /**
+     * Sets into [context].
+     */
     @JvmStatic
     fun set(key: Any, value: Any?) {
         context[key] = value
     }
 
     /**
-     * Attach current context, current context as previously is returned
+     * Attach [context], current context as previously is returned
      */
     @JvmStatic
     fun attach(): Map<Any, Any?> {
@@ -117,7 +144,7 @@ object Current {
     }
 
     /**
-     * Reverse an [attach], restoring the previous context.
+     * Reverse an [attach], restoring the previous [context].
      */
     @JvmStatic
     fun detach(previous: Map<Any, Any?>) {
@@ -125,11 +152,17 @@ object Current {
         context.putAll(previous)
     }
 
+    /**
+     * Clears [context].
+     */
     @JvmStatic
     fun clear() {
         context.clear()
     }
 
+    /**
+     * Returns last stack frame on [this] class from current runner (thread), or null if failed.
+     */
     @JvmStatic
     fun Class<*>.callerFrameOrNull(): StackTraceElement? {
         //Throwable().stackTrace
@@ -153,6 +186,9 @@ object Current {
         return null
     }
 
+    /**
+     * Returns last stack frame on [this] method from current runner (thread), or null if failed.
+     */
     @JvmStatic
     fun Method.callerFrameOrNull(): StackTraceElement? {
         val calledClassName = this.declaringClass.name
@@ -160,6 +196,10 @@ object Current {
         return callerFrameOrNull(calledClassName, calledMethodName)
     }
 
+    /**
+     * Returns last stack frame on [calledClassName] and [calledMethodName] from current runner (thread),
+     * or null if failed.
+     */
     @JvmStatic
     fun callerFrameOrNull(calledClassName: String, calledMethodName: String): StackTraceElement? {
         val stackTrace = thread.stackTrace
