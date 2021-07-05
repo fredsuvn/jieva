@@ -153,7 +153,7 @@ fun <T> InputStream.loadClass(): Class<T> {
 
 @JvmOverloads
 fun ByteArray.loadProperties(offset: Int = 0, length: Int = this.size - offset): Map<String, String> {
-    return ByteArrayInputStream(this).loadProperties()
+    return ByteArrayInputStream(this, offset, length).loadProperties()
 }
 
 fun InputStream.loadProperties(charset: Charset = Defaults.charset): Map<String, String> {
