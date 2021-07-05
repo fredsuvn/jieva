@@ -1,6 +1,7 @@
 package xyz.srclab.common.lang
 
 import xyz.srclab.common.collect.toImmutableMap
+import xyz.srclab.common.lang.Defaults.timestampPattern
 import java.lang.reflect.Method
 import java.time.Duration
 
@@ -15,30 +16,45 @@ object Current {
         ThreadLocal.withInitial { mutableMapOf() }
     }
 
+    /**
+     * [milliseconds]
+     */
     @JvmStatic
     val millis: Long
         @JvmName("millis") get() {
             return milliseconds()
         }
 
+    /**
+     * [nanoseconds]
+     */
     @JvmStatic
     val nanos: Long
         @JvmName("nanos") get() {
             return nanoseconds()
         }
 
+    /**
+     * With [timestampPattern]
+     */
     @JvmStatic
     val timestamp: String
         @JvmName("timestamp") get() {
             return timestamp()
         }
 
+    /**
+     * [Thread.currentThread]
+     */
     @JvmStatic
     val thread: Thread
         @JvmName("thread") get() {
             return Thread.currentThread()
         }
 
+    /**
+     * [ClassLoader] of current thread.
+     */
     @JvmStatic
     val classLoader: ClassLoader
         @JvmName("classLoader") get() {
