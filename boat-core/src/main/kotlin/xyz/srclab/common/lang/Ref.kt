@@ -12,7 +12,7 @@ package xyz.srclab.common.lang
  * list.forEach(i -> ref.set(ref.get() + i));
  * ```
  */
-interface Ref<T : Any> : GenericAccessor<T> {
+interface Ref<T : Any> : GenericSingleAccessor<T> {
 
     companion object {
 

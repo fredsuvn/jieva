@@ -14,7 +14,7 @@ package xyz.srclab.common.lang
  * Date dateValue = DateUtils.stringToDate(stringValue)
  * ```
  */
-interface Let<T : Any> : GenericGetter<T> {
+interface Let<T : Any> : GenericSingleGetter<T> {
 
     fun <R : Any> then(action: (T) -> R): Let<R>
 
