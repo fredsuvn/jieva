@@ -135,7 +135,7 @@ object Current {
      * Attach [runContext], current context as previously is returned
      */
     @JvmStatic
-    fun attach(): Map<Any, Any?> {
+    fun attach(): RunContext.Attach {
         return runContext.attach()
     }
 
@@ -143,7 +143,7 @@ object Current {
      * Reverse an [attach], restoring the previous [runContext].
      */
     @JvmStatic
-    fun detach(previous: Map<Any, Any?>) {
+    fun detach(previous: RunContext.Attach) {
         runContext.detach(previous)
     }
 
