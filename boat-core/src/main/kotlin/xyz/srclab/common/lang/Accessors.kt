@@ -1,7 +1,5 @@
 package xyz.srclab.common.lang
 
-import java.util.function.Supplier
-
 /**
  * Single object accessor for any type.
  *
@@ -45,18 +43,8 @@ interface SingleGetter {
     }
 
     @JvmDefault
-    fun <T : Any> getOrElse(supplier: Supplier<T>): T {
-        return getOrNull() ?: supplier.get()
-    }
-
-    @JvmDefault
     fun <T : Any> getOrThrow(supplier: () -> Throwable): T {
         return getOrNull() ?: throw supplier()
-    }
-
-    @JvmDefault
-    fun <T : Any> getOrThrow(supplier: Supplier<Throwable>): T {
-        return getOrNull() ?: throw supplier.get()
     }
 }
 
@@ -200,18 +188,8 @@ interface GenericSingleGetter<T : Any> {
     }
 
     @JvmDefault
-    fun getOrElse(supplier: Supplier<T>): T {
-        return getOrNull() ?: supplier.get()
-    }
-
-    @JvmDefault
     fun getOrThrow(supplier: () -> Throwable): T {
         return getOrNull() ?: throw supplier()
-    }
-
-    @JvmDefault
-    fun getOrThrow(supplier: Supplier<Throwable>): T {
-        return getOrNull() ?: throw supplier.get()
     }
 }
 
