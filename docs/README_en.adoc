@@ -81,54 +81,72 @@ api implementation("xyz.srclab.common:boat-bom:{boat-version}")
 
 === Boat Annotations
 
-* link:../boat-annotations/docs/README_en.adoc[boat-annotations.adoc English]
-* link:../boat-annotations/docs/README_zh.adoc[boat-annotations.adoc 简体中文]
-* link:../boat-annotations/docs/README_en.md[boat-annotations.md English]
-* link:../boat-annotations/docs/README_zh.md[boat-annotations.md 简体中文]
-* link:../boat-annotations/docs/README_en.html[boat-annotations.html English]
-* link:../boat-annotations/docs/README_zh.html[boat-annotations.html 简体中文]
+* AsciiDoc:
+** link:../boat-annotations/docs/README_en.adoc[English]
+** link:../boat-annotations/docs/README_zh.adoc[简体中文]
+* Markdown:
+** link:../boat-annotations/docs/README_en.md[English]
+** link:../boat-annotations/docs/README_zh.md[简体中文]
+* HTML:
+** link:../boat-annotations/docs/README_en.html[English]
+** link:../boat-annotations/docs/README_zh.html[简体中文]
 
 === Boat Core
 
-* link:../boat-core/docs/README_en.adoc[boat-core.adoc English]
-* link:../boat-core/docs/README_zh.adoc[boat-core.adoc 简体中文]
-* link:../boat-core/docs/README_en.md[boat-core.md English]
-* link:../boat-core/docs/README_zh.md[boat-core.md 简体中文]
-* link:../boat-core/docs/README_en.html[boat-core.html English]
-* link:../boat-core/docs/README_zh.html[boat-core.html 简体中文]
+* AsciiDoc:
+** link:../boat-core/docs/README_en.adoc[English]
+** link:../boat-core/docs/README_zh.adoc[简体中文]
+* Markdown:
+** link:../boat-core/docs/README_en.md[English]
+** link:../boat-core/docs/README_zh.md[简体中文]
+* HTML:
+** link:../boat-core/docs/README_en.html[English]
+** link:../boat-core/docs/README_zh.html[简体中文]
 
 === Boat Serialize
 
-* link:../boat-serialize/docs/README_en.adoc[boat-serialize.adoc English]
-* link:../boat-serialize/docs/README_zh.adoc[boat-serialize.adoc 简体中文]
-* link:../boat-serialize/docs/README_en.md[boat-serialize.md English]
-* link:../boat-serialize/docs/README_zh.md[boat-serialize.md 简体中文]
-* link:../boat-serialize/docs/README_en.html[boat-serialize.html English]
-* link:../boat-serialize/docs/README_zh.html[boat-serialize.html 简体中文]
+* AsciiDoc:
+** link:../boat-serialize/docs/README_en.adoc[English]
+** link:../boat-serialize/docs/README_zh.adoc[简体中文]
+* Markdown:
+** link:../boat-serialize/docs/README_en.md[English]
+** link:../boat-serialize/docs/README_zh.md[简体中文]
+* HTML:
+** link:../boat-serialize/docs/README_en.html[English]
+** link:../boat-serialize/docs/README_zh.html[简体中文]
 
 === Boat Codec
 
-* link:../boat-codec/docs/README_en.adoc[boat-codec.adoc English]
-* link:../boat-codec/docs/README_zh.adoc[boat-codec.adoc 简体中文]
-* link:../boat-codec/docs/README_en.md[boat-codec.md English]
-* link:../boat-codec/docs/README_zh.md[boat-codec.md 简体中文]
-* link:../boat-codec/docs/README_en.html[boat-codec.html English]
-* link:../boat-codec/docs/README_zh.html[boat-codec.html 简体中文]
+* AsciiDoc:
+** link:../boat-codec/docs/README_en.adoc[English]
+** link:../boat-codec/docs/README_zh.adoc[简体中文]
+* Markdown:
+** link:../boat-codec/docs/README_en.md[English]
+** link:../boat-codec/docs/README_zh.md[简体中文]
+* HTML:
+** link:../boat-codec/docs/README_en.html[English]
+** link:../boat-codec/docs/README_zh.html[简体中文]
 
 === Boat Id
 
-* link:../boat-id/docs/README_en.adoc[boat-id.adoc English]
-* link:../boat-id/docs/README_zh.adoc[boat-id.adoc 简体中文]
-* link:../boat-id/docs/README_en.md[boat-id.md English]
-* link:../boat-id/docs/README_zh.md[boat-id.md 简体中文]
-* link:../boat-id/docs/README_en.html[boat-id.html English]
-* link:../boat-id/docs/README_zh.html[boat-id.html 简体中文]
+* AsciiDoc:
+** link:../boat-id/docs/README_en.adoc[English]
+** link:../boat-id/docs/README_zh.adoc[简体中文]
+* Markdown:
+** link:../boat-id/docs/README_en.md[English]
+** link:../boat-id/docs/README_zh.md[简体中文]
+* HTML:
+** link:../boat-id/docs/README_en.html[English]
+** link:../boat-id/docs/README_zh.html[简体中文]
 
 === Boat Others
 
-* link:../boat-others/docs/README_en.adoc[boat-others.adoc English]
-* link:../boat-others/docs/README_zh.adoc[boat-others.adoc 简体中文]
-* link:../boat-others/docs/README_en.md[boat-others.md English]
-* link:../boat-others/docs/README_zh.md[boat-others.md 简体中文]
-* link:../boat-others/docs/README_en.html[boat-others.html English]
-* link:../boat-others/docs/README_zh.html[boat-others.html 简体中文]
+* AsciiDoc:
+** link:../boat-others/docs/README_en.adoc[English]
+** link:../boat-others/docs/README_zh.adoc[简体中文]
+* Markdown:
+** link:../boat-others/docs/README_en.md[English]
+** link:../boat-others/docs/README_zh.md[简体中文]
+* HTML:
+** link:../boat-others/docs/README_en.html[English]
+** link:../boat-others/docs/README_zh.html[简体中文]
