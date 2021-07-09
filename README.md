@@ -11,6 +11,9 @@
 - HTML:
   * [English](docs/README_en.html)
   * [简体中文](docs/README_zh.html)
+- DocBook:
+  * [English](docs/README_en.xml)
+  * [简体中文](docs/README_zh.xml)
 
 More see [docs/](docs/)
 
