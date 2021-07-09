@@ -21,6 +21,8 @@ class BaseSample {
 
     @Test
     fun testCurrent() {
+        //null
+        logger.log(Current.getOrNull("1"))
         Current.set("1", "2")
         //2
         logger.log(Current.get<Any>("1"))
@@ -279,6 +281,34 @@ class BaseSample {
         logger.log("123{}456{}", CtlChars.backspaces, CtlChars.beep)
     }
 
+    @Test
+    fun testSingleAccessor() {
+        val singleAccessor = TestSingleAccessor()
+        Assert.assertNull(singleAccessor.getOrNull())
+        Assert.assertEquals("666", singleAccessor.getOrElse("666"))
+        Assert.assertEquals("666", singleAccessor.getOrElse { "666" })
+        singleAccessor.set("777")
+        Assert.assertEquals("777", singleAccessor.get())
+        val genericSingleAccessor = TestGenericSingleAccessor()
+        Assert.assertNull(genericSingleAccessor.getOrNull())
+        Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"))
+        Assert.assertEquals("666", genericSingleAccessor.getOrElse { "666" })
+        genericSingleAccessor.set("777")
+        Assert.assertEquals("777", genericSingleAccessor.get())
+        val mapAccessor = TestMapAccessor()
+        Assert.assertNull(mapAccessor.getOrNull("1"))
+        Assert.assertEquals("666", mapAccessor.getOrElse("1", "666"))
+        Assert.assertEquals("666", mapAccessor.getOrElse("1") { k: Any? -> "666" })
+        mapAccessor.set("1", "777")
+        Assert.assertEquals("777", mapAccessor.get("1"))
+        val genericMapAccessor = TestGenericMapAccessor()
+        Assert.assertNull(genericMapAccessor.getOrNull("1"))
+        Assert.assertEquals("666", genericMapAccessor.getOrElse("1", "666"))
+        Assert.assertEquals("666", genericMapAccessor.getOrElse("1") { k: String? -> "666" })
+        genericMapAccessor.set("1", "777")
+        Assert.assertEquals("777", genericMapAccessor.get("1"))
+    }
+
     companion object {
         private val logger = TestLogger.DEFAULT
     }
@@ -286,4 +316,36 @@ class BaseSample {
 
 enum class TestEnum {
     T1, T2
+}
+
+class TestSingleAccessor : SingleAccessor {
+    private var value: String? = null
+    override fun <T : Any> getOrNull(): T? {
+        return value as T?
+    }
+
+    override fun set(value: Any?) {
+        this.value = value as String?
+    }
+}
+
+class TestGenericSingleAccessor : GenericSingleAccessor<String> {
+    private var value: String? = null
+    override fun getOrNull(): String? {
+        return value
+    }
+
+    override fun set(value: String?) {
+        this.value = value
+    }
+}
+
+class TestMapAccessor : MapAccessor {
+    private val values: MutableMap<Any, Any?> = HashMap()
+    override val contents: MutableMap<Any, Any?> = values
+}
+
+class TestGenericMapAccessor : GenericMapAccessor<String, String> {
+    private val values: MutableMap<String, String?> = HashMap()
+    override val contents: MutableMap<String, String?> = values
 }

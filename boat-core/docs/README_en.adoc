@@ -37,7 +37,7 @@ Lang package provides a serials of core and base interfaces and components:
 * Lang syntax enhancement (mainly for Java): `Let`, `Ref`, `Lazy`, `LazyString`;
 * String/CharSequence functions: `CharsFormat`, `CharsTemplate`, `NamingCase`;
 * Special character support: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
-* Access interfaces: `Accessor`, `Getter`, `Setter`, `GenericAccessor`, `GenericGetter`, `GenericSetter`;
+* Accessor interfaces: `SingleAccessor`, `MapAccessor`, `GenericSingleAccessor`, `GenericMapAccessor`;
 * Helper interfaces and utilities: SpecParser, CachingProductBuilder, Processing;
 * Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
 

@@ -89,8 +89,8 @@ components:
 -   Special character support: `CtlChars`, `EscChars`, `CsiChars`,
     `SgrChars`;
 
--   Access interfaces: `Accessor`, `Getter`, `Setter`,
-    `GenericAccessor`, `GenericGetter`, `GenericSetter`;
+-   Accessor interfaces: `SingleAccessor`, `MapAccessor`,
+    `GenericSingleAccessor`, `GenericMapAccessor`;
 
 -   Helper interfaces and utilities: SpecParser, CachingProductBuilder,
     Processing;
@@ -103,6 +103,7 @@ Java Examples
     package sample.java.xyz.srclab.core.lang;
 
     import org.jetbrains.annotations.NotNull;
+    import org.jetbrains.annotations.Nullable;
     import org.testng.Assert;
     import org.testng.annotations.Test;
     import xyz.srclab.common.lang.*;
@@ -143,6 +144,8 @@ Java Examples
 
         @Test
         public void testCurrent() {
+            //null
+            logger.log(Current.getOrNull("1"));
             Current.set("1", "2");
             //2
             logger.log(Current.get("1"));
@@ -416,9 +419,90 @@ Java Examples
             logger.log("123{}456{}", CtlChars.backspaces(), CtlChars.beep());
         }
 
+        @Test
+        public void testSingleAccessor() {
+            TestSingleAccessor singleAccessor = new TestSingleAccessor();
+            Assert.assertNull(singleAccessor.getOrNull());
+            Assert.assertEquals("666", singleAccessor.getOrElse("666"));
+            Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
+            singleAccessor.set("777");
+            Assert.assertEquals("777", singleAccessor.get());
+
+            TestGenericSingleAccessor genericSingleAccessor = new TestGenericSingleAccessor();
+            Assert.assertNull(genericSingleAccessor.getOrNull());
+            Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"));
+            Assert.assertEquals("666", genericSingleAccessor.getOrElse(() -> "666"));
+            genericSingleAccessor.set("777");
+            Assert.assertEquals("777", genericSingleAccessor.get());
+
+            TestMapAccessor mapAccessor = new TestMapAccessor();
+            Assert.assertNull(mapAccessor.getOrNull("1"));
+            Assert.assertEquals("666", mapAccessor.getOrElse("1", "666"));
+            Assert.assertEquals("666", mapAccessor.getOrElse("1", (k) -> "666"));
+            mapAccessor.set("1", "777");
+            Assert.assertEquals("777", mapAccessor.get("1"));
+
+            TestGenericMapAccessor genericMapAccessor = new TestGenericMapAccessor();
+            Assert.assertNull(genericMapAccessor.getOrNull("1"));
+            Assert.assertEquals("666", genericMapAccessor.getOrElse("1", "666"));
+            Assert.assertEquals("666", genericMapAccessor.getOrElse("1", (k) -> "666"));
+            genericMapAccessor.set("1", "777");
+            Assert.assertEquals("777", genericMapAccessor.get("1"));
+        }
+
         public enum TestEnum {
             T1,
             T2
+        }
+
+        public static class TestSingleAccessor implements SingleAccessor {
+
+            private String value;
+
+            @Override
+            public <T> T getOrNull() {
+                return (T) value;
+            }
+
+            @Override
+            public void set(@Nullable Object value) {
+                this.value = (String) value;
+            }
+        }
+
+        public static class TestGenericSingleAccessor implements GenericSingleAccessor<String> {
+
+            private String value;
+
+            @Override
+            public String getOrNull() {
+                return value;
+            }
+
+            @Override
+            public void set(@Nullable String value) {
+                this.value = value;
+            }
+        }
+
+        public static class TestMapAccessor implements MapAccessor {
+
+            private final Map<Object, Object> values = new HashMap<>();
+
+            @Override
+            public @NotNull Map<Object, Object> contents() {
+                return values;
+            }
+        }
+
+        public static class TestGenericMapAccessor implements GenericMapAccessor<String, String> {
+
+            private final Map<String, String> values = new HashMap<>();
+
+            @Override
+            public @NotNull Map<String, String> contents() {
+                return values;
+            }
         }
     }
 
@@ -447,6 +531,8 @@ Kotlin Examples
 
         @Test
         fun testCurrent() {
+            //null
+            logger.log(Current.getOrNull("1"))
             Current.set("1", "2")
             //2
             logger.log(Current.get<Any>("1"))
@@ -705,6 +791,34 @@ Kotlin Examples
             logger.log("123{}456{}", CtlChars.backspaces, CtlChars.beep)
         }
 
+        @Test
+        fun testSingleAccessor() {
+            val singleAccessor = TestSingleAccessor()
+            Assert.assertNull(singleAccessor.getOrNull())
+            Assert.assertEquals("666", singleAccessor.getOrElse("666"))
+            Assert.assertEquals("666", singleAccessor.getOrElse { "666" })
+            singleAccessor.set("777")
+            Assert.assertEquals("777", singleAccessor.get())
+            val genericSingleAccessor = TestGenericSingleAccessor()
+            Assert.assertNull(genericSingleAccessor.getOrNull())
+            Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"))
+            Assert.assertEquals("666", genericSingleAccessor.getOrElse { "666" })
+            genericSingleAccessor.set("777")
+            Assert.assertEquals("777", genericSingleAccessor.get())
+            val mapAccessor = TestMapAccessor()
+            Assert.assertNull(mapAccessor.getOrNull("1"))
+            Assert.assertEquals("666", mapAccessor.getOrElse("1", "666"))
+            Assert.assertEquals("666", mapAccessor.getOrElse("1") { k: Any? -> "666" })
+            mapAccessor.set("1", "777")
+            Assert.assertEquals("777", mapAccessor.get("1"))
+            val genericMapAccessor = TestGenericMapAccessor()
+            Assert.assertNull(genericMapAccessor.getOrNull("1"))
+            Assert.assertEquals("666", genericMapAccessor.getOrElse("1", "666"))
+            Assert.assertEquals("666", genericMapAccessor.getOrElse("1") { k: String? -> "666" })
+            genericMapAccessor.set("1", "777")
+            Assert.assertEquals("777", genericMapAccessor.get("1"))
+        }
+
         companion object {
             private val logger = TestLogger.DEFAULT
         }
@@ -712,6 +826,38 @@ Kotlin Examples
 
     enum class TestEnum {
         T1, T2
+    }
+
+    class TestSingleAccessor : SingleAccessor {
+        private var value: String? = null
+        override fun <T : Any> getOrNull(): T? {
+            return value as T?
+        }
+
+        override fun set(value: Any?) {
+            this.value = value as String?
+        }
+    }
+
+    class TestGenericSingleAccessor : GenericSingleAccessor<String> {
+        private var value: String? = null
+        override fun getOrNull(): String? {
+            return value
+        }
+
+        override fun set(value: String?) {
+            this.value = value
+        }
+    }
+
+    class TestMapAccessor : MapAccessor {
+        private val values: MutableMap<Any, Any?> = HashMap()
+        override val contents: MutableMap<Any, Any?> = values
+    }
+
+    class TestGenericMapAccessor : GenericMapAccessor<String, String> {
+        private val values: MutableMap<String, String?> = HashMap()
+        override val contents: MutableMap<String, String?> = values
     }
 
 ### Bean
@@ -1143,16 +1289,15 @@ Java Examples
 
     package sample.java.xyz.srclab.core.run;
 
+    import org.testng.Assert;
     import org.testng.annotations.Test;
     import xyz.srclab.common.lang.Current;
     import xyz.srclab.common.lang.IntRef;
-    import xyz.srclab.common.run.Runner;
-    import xyz.srclab.common.run.Running;
-    import xyz.srclab.common.run.Scheduler;
-    import xyz.srclab.common.run.Scheduling;
+    import xyz.srclab.common.run.*;
     import xyz.srclab.common.test.TestLogger;
 
     import java.time.Duration;
+    import java.util.concurrent.CountDownLatch;
 
     public class RunSample {
 
@@ -1184,21 +1329,37 @@ Java Examples
             //300
             logger.log("int: {}", intRef.get());
         }
+
+        @Test
+        public void testRunContext() throws Exception {
+            RunContext runContext = RunContext.current();
+            runContext.set("1", "666");
+            Assert.assertEquals("666", runContext.get("1"));
+            RunContext.Attach attach = runContext.attach();
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            Runner.ASYNC_RUNNER.run(() -> {
+                RunContext detach = RunContext.current();
+                detach.detach(attach);
+                Assert.assertEquals("666", detach.get("1"));
+                countDownLatch.countDown();
+            });
+            countDownLatch.await();
+        }
     }
 
 Kotlin Examples
 
     package sample.kotlin.xyz.srclab.core.run
 
+    import org.testng.Assert
     import org.testng.annotations.Test
     import xyz.srclab.common.lang.Current.sleep
     import xyz.srclab.common.lang.IntRef.Companion.withRef
-    import xyz.srclab.common.run.Runner
-    import xyz.srclab.common.run.Running
-    import xyz.srclab.common.run.Scheduler
-    import xyz.srclab.common.run.Scheduling
+    import xyz.srclab.common.run.*
+    import xyz.srclab.common.run.RunContext.Companion.current
     import xyz.srclab.common.test.TestLogger
     import java.time.Duration
+    import java.util.concurrent.CountDownLatch
 
     class RunSample {
 
@@ -1227,6 +1388,23 @@ Kotlin Examples
             scheduling.cancel(false)
             //300
             logger.log("int: {}", intRef.get())
+        }
+
+        @Test
+        @Throws(Exception::class)
+        fun testRunContext() {
+            val runContext = current()
+            runContext.set("1", "666")
+            Assert.assertEquals("666", runContext.get("1"))
+            val attach = runContext.attach()
+            val countDownLatch = CountDownLatch(1)
+            AsyncRunner.run {
+                val detach = current()
+                detach.detach(attach)
+                Assert.assertEquals("666", detach.get("1"))
+                countDownLatch.countDown()
+            }
+            countDownLatch.await()
         }
 
         companion object {

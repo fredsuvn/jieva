@@ -1,7 +1,7 @@
 package xyz.srclab.common.id
 
-import xyz.srclab.common.lang.Getter
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.SingleGetter
 import xyz.srclab.common.lang.asAny
 
 /**
@@ -48,12 +48,12 @@ abstract class AbstractIdGenerator<T> : IdGenerator<T> {
     }
 
     private inner class IdContextImpl : IdContext {
-        override val componentGetters: List<Getter> = this@AbstractIdGenerator.components.toGetters(this)
+        override val componentGetters: List<SingleGetter> = this@AbstractIdGenerator.components.toGetters(this)
     }
 
-    private fun Iterable<IdComponent<Any>>.toGetters(context: IdContext): List<Getter> {
+    private fun Iterable<IdComponent<Any>>.toGetters(context: IdContext): List<SingleGetter> {
         return this.map {
-            object : Getter {
+            object : SingleGetter {
 
                 private var cache: Any? = null
 

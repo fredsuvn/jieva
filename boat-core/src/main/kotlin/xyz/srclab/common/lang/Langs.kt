@@ -1,9 +1,12 @@
 package xyz.srclab.common.lang
 
+import xyz.srclab.common.lang.Next.BREAK
+import xyz.srclab.common.lang.Next.CONTINUE
+
 /**
  * Convenient interface for java:
  * ```
- * Date date = Let.forAny(intValue)
+ * Date date = Let.of(intValue)
  *     .then(StringUtils::intToString)
  *     .then(DateUtils::stringToDate)
  *     .get()
@@ -14,7 +17,7 @@ package xyz.srclab.common.lang
  * Date dateValue = DateUtils.stringToDate(stringValue)
  * ```
  */
-interface Let<T : Any> : GenericGetter<T> {
+interface Let<T : Any> : GenericSingleGetter<T> {
 
     fun <R : Any> then(action: (T) -> R): Let<R>
 
@@ -25,19 +28,22 @@ interface Let<T : Any> : GenericGetter<T> {
             return LetImpl(obj)
         }
 
-        private class LetImpl<T : Any>(private var any: T) : Let<T> {
+        private class LetImpl<T : Any>(obj: T) : Let<T> {
+
+            private var value: Any = obj
 
             override fun <R : Any> then(action: (T) -> R): Let<R> {
-                any = action(any).asAny()
+                val t: T = value.asAny()
+                value = action(t)
                 return this.asAny()
             }
 
             override fun get(): T {
-                return any
+                return value.asAny()
             }
 
             override fun getOrNull(): T? {
-                return any
+                return value.asAny()
             }
         }
     }

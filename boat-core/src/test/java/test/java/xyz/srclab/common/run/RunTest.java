@@ -9,6 +9,7 @@ import xyz.srclab.common.test.TestLogger;
 import xyz.srclab.common.utils.Counter;
 
 import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author sunqian
@@ -40,6 +41,22 @@ public class RunTest {
     public void testThreadPoolRunner() {
         Runner runner = ThreadPoolRunner.newBuilder().build();
         doTestAsync(runner);
+    }
+
+    @Test
+    public void testRunContext() throws Exception {
+        RunContext runContext = RunContext.current();
+        runContext.set("1", "666");
+        Assert.assertEquals("666", runContext.get("1"));
+        RunContext.Attach attach = runContext.attach();
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        Runner.ASYNC_RUNNER.run(() -> {
+            RunContext detach = RunContext.current();
+            detach.detach(attach);
+            Assert.assertEquals("666", detach.get("1"));
+            countDownLatch.countDown();
+        });
+        countDownLatch.await();
     }
 
     private void doTestAsync(Runner runner) {

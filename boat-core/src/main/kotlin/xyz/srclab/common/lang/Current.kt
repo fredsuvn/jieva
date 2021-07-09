@@ -1,7 +1,7 @@
 package xyz.srclab.common.lang
 
-import xyz.srclab.common.collect.toImmutableMap
 import xyz.srclab.common.lang.Defaults.timestampPattern
+import xyz.srclab.common.run.RunContext
 import java.lang.reflect.Method
 import java.time.Duration
 
@@ -11,10 +11,6 @@ import java.time.Duration
  * @author sunqian
  */
 object Current {
-
-    private val localContext: ThreadLocal<MutableMap<Any, Any?>> by lazy {
-        ThreadLocal.withInitial { mutableMapOf() }
-    }
 
     /**
      * [milliseconds].
@@ -62,6 +58,15 @@ object Current {
         }
 
     /**
+     * Context of current runner (maybe thread).
+     */
+    @get:JvmName("runContext")
+    @JvmStatic
+    val runContext: RunContext by lazy {
+        RunContext.current()
+    }
+
+    /**
      * Sleeps for [millis] and [nanos].
      */
     @JvmStatic
@@ -79,85 +84,75 @@ object Current {
     }
 
     /**
-     * Context of current runner (maybe thread).
-     */
-    @JvmStatic
-    val context: MutableMap<Any, Any?>
-        @JvmName("context") get() {
-            return localContext.get()
-        }
-
-    /**
-     * Gets from [context].
+     * Gets from [runContext].
      */
     @JvmStatic
     fun <T : Any> get(key: Any): T {
-        return getOrNull(key)!!
+        return runContext.get(key)
     }
 
     /**
-     * Gets or null from [context].
+     * Gets or null from [runContext].
      */
     @JvmStatic
     fun <T : Any> getOrNull(key: Any): T? {
-        return context[key].asAny()
+        return runContext.getOrNull(key)
     }
 
     /**
-     * Gets or else from [context].
+     * Gets or else from [runContext].
      */
     @JvmStatic
     fun <T : Any> getOrElse(key: Any, value: T): T {
-        return context.getOrDefault(key, value).asAny()
+        return runContext.getOrElse(key, value)
     }
 
     /**
-     * Gets or else from [context].
+     * Gets or else from [runContext].
      */
     @JvmStatic
     fun <T : Any> getOrElse(key: Any, supplier: (key: Any) -> T): T {
-        return getOrNull(key) ?: supplier(key)
+        return runContext.getOrElse(key, supplier)
     }
 
     /**
-     * Gets or throw from [context].
+     * Gets or throw from [runContext].
      */
     @JvmStatic
     fun <T : Any> getOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
-        return getOrNull(key) ?: throw supplier(key)
+        return runContext.getOrThrow(key, supplier)
     }
 
     /**
-     * Sets into [context].
+     * Sets into [runContext].
      */
     @JvmStatic
     fun set(key: Any, value: Any?) {
-        context[key] = value
+        runContext.set(key, value)
     }
 
     /**
-     * Attach [context], current context as previously is returned
+     * Attach [runContext], current context as previously is returned
      */
     @JvmStatic
-    fun attach(): Map<Any, Any?> {
-        return context.toImmutableMap()
+    fun attach(): RunContext.Attach {
+        return runContext.attach()
     }
 
     /**
-     * Reverse an [attach], restoring the previous [context].
+     * Reverse an [attach], restoring the previous [runContext].
      */
     @JvmStatic
-    fun detach(previous: Map<Any, Any?>) {
-        context.clear()
-        context.putAll(previous)
+    fun detach(previous: RunContext.Attach) {
+        runContext.detach(previous)
     }
 
     /**
-     * Clears [context].
+     * Clears [runContext].
      */
     @JvmStatic
     fun clear() {
-        context.clear()
+        runContext.clear()
     }
 
     /**

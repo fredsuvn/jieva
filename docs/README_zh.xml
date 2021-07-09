@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?asciidoc-toc maxdepth="3"?>
+<?asciidoc-numbered?>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+<info>
+<title><inlinemediaobject>
+<imageobject>
+<imagedata fileref="../logo.svg"/>
+</imageobject>
+<textobject><phrase>logo</phrase></textobject>
+</inlinemediaobject> Boat</title>
+<subtitle>SrcLab的Java/kotlin核心基础库</subtitle>
+<date>2021-07-09</date>
+<author>
+<personname>
+<firstname>孙谦</firstname>
+</personname>
+<email>fredsuvn@163.com</email>
+</author>
+<authorinitials>孙</authorinitials>
+</info>
+<section xml:id="_简介">
+<title>简介</title>
+<simpara>Boat是一组Java/Kotlin核心库集合（JDK 1.8+）, 主要由Kotlin编写, 广泛应用于 <link xl:href="https://github.com/srclab-projects">SrcLab</link> 里的项目.
+它提供了许多方便快捷的接口, 函数和工具.</simpara>
+<simpara>Boat 包括:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-annotations/README.md">boat-annotations</link>: 核心注解;</simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-core/README.md">boat-core</link>: 核心库;</simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-serialize/README.md">boat-serialize</link>: 序列化和反序列化核心库 (支持 <literal>JSON</literal>);</simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-codec/README.md">boat-codec</link>: 编码核心库 (支持 <literal>HEX</literal>, <literal>BASE64</literal>, <literal>SHA</literal>, <literal>MD</literal>, <literal>HMAC</literal>, <literal>AES</literal>, <literal>RSA</literal>, <literal>SM2</literal> 等);</simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-id/README.md">boat-id</link>: 快速ID生成框架;</simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-others/README.md">boat-others</link>: 第三方支持和扩展库 (如 <literal>protobuf</literal>);</simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-test/">boat-test</link>: 测试库的依赖管理工程;</simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-bom/">boat-bom</link>: BOM (gradle platform) project;</simpara>
+</listitem>
+</itemizedlist>
+<simpara>如果你需要一次性导入常用库 (<literal>annotations</literal>, <literal>core</literal>, <literal>codec</literal>, <literal>serialize</literal> and <literal>id</literal>), 只需要导入:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat/">boat</link>.</simpara>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_获取">
+<title>获取</title>
+<section xml:id="_获取_boat">
+<title>获取 Boat</title>
+<formalpara>
+<title>Gradle</title>
+<para>
+<programlisting language="groovy" linenumbering="unnumbered">implementation "xyz.srclab.common:boat:0.0.1"</programlisting>
+</para>
+</formalpara>
+<formalpara>
+<title>Maven</title>
+<para>
+<programlisting language="xml" linenumbering="unnumbered">&lt;dependency&gt;
+  &lt;groupId&gt;xyz.srclab.common&lt;/groupId&gt;
+  &lt;artifactId&gt;boat&lt;/artifactId&gt;
+  &lt;version&gt;0.0.1&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+</formalpara>
+</section>
+<section xml:id="_使用_bom">
+<title>使用 BOM</title>
+<formalpara>
+<title>Gradle</title>
+<para>
+<programlisting language="groovy" linenumbering="unnumbered">api implementation("xyz.srclab.common:boat-bom:0.0.1")</programlisting>
+</para>
+</formalpara>
+<formalpara>
+<title>Maven</title>
+<para>
+<programlisting language="xml" linenumbering="unnumbered">&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;xyz.srclab.common&lt;/groupId&gt;
+      &lt;artifactId&gt;boat&lt;/artifactId&gt;
+      &lt;version&gt;0.0.1&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;</programlisting>
+</para>
+</formalpara>
+<formalpara>
+<title>Source Code</title>
+<para><link xl:href="https://github.com/srclab-projects/boat">https://github.com/srclab-projects/boat</link></para>
+</formalpara>
+</section>
+</section>
+<section xml:id="_用法">
+<title>用法</title>
+<section xml:id="_boat_annotations">
+<title>Boat Annotations</title>
+<itemizedlist>
+<listitem>
+<simpara>AsciiDoc:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-annotations/docs/README_en.adoc">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-annotations/docs/README_zh.adoc">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Markdown:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-annotations/docs/README_en.md">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-annotations/docs/README_zh.md">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>HTML:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-annotations/docs/README_en.html">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-annotations/docs/README_zh.html">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_boat_core">
+<title>Boat Core</title>
+<itemizedlist>
+<listitem>
+<simpara>AsciiDoc:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-core/docs/README_en.adoc">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-core/docs/README_zh.adoc">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Markdown:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-core/docs/README_en.md">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-core/docs/README_zh.md">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>HTML:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-core/docs/README_en.html">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-core/docs/README_zh.html">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_boat_serialize">
+<title>Boat Serialize</title>
+<itemizedlist>
+<listitem>
+<simpara>AsciiDoc:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-serialize/docs/README_en.adoc">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-serialize/docs/README_zh.adoc">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Markdown:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-serialize/docs/README_en.md">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-serialize/docs/README_zh.md">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>HTML:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-serialize/docs/README_en.html">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-serialize/docs/README_zh.html">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_boat_codec">
+<title>Boat Codec</title>
+<itemizedlist>
+<listitem>
+<simpara>AsciiDoc:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-codec/docs/README_en.adoc">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-codec/docs/README_zh.adoc">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Markdown:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-codec/docs/README_en.md">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-codec/docs/README_zh.md">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>HTML:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-codec/docs/README_en.html">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-codec/docs/README_zh.html">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_boat_id">
+<title>Boat Id</title>
+<itemizedlist>
+<listitem>
+<simpara>AsciiDoc:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-id/docs/README_en.adoc">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-id/docs/README_zh.adoc">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Markdown:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-id/docs/README_en.md">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-id/docs/README_zh.md">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>HTML:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-id/docs/README_en.html">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-id/docs/README_zh.html">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_boat_others">
+<title>Boat Others</title>
+<itemizedlist>
+<listitem>
+<simpara>AsciiDoc:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-others/docs/README_en.adoc">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-others/docs/README_zh.adoc">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Markdown:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-others/docs/README_en.md">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-others/docs/README_zh.md">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>HTML:</simpara>
+<itemizedlist>
+<listitem>
+<simpara><link xl:href="../boat-others/docs/README_en.html">English</link></simpara>
+</listitem>
+<listitem>
+<simpara><link xl:href="../boat-others/docs/README_zh.html">简体中文</link></simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</itemizedlist>
+</section>
+</section>
+</article>
