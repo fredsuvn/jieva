@@ -1,7 +1,5 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.lang.asNotNull
-import xyz.srclab.common.lang.checkState
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.Callable
@@ -17,11 +15,23 @@ open class ExecutorServiceRunner(
 ) : Runner {
 
     override fun <V> run(task: () -> V): Running<V> {
-        return ExecutorServiceRunning(task)
+        return RunningImpl(task)
+    }
+
+    override fun run(task: Runnable): Running<*> {
+        return RunningImpl<Any>(task)
+    }
+
+    override fun <V> fastRun(task: () -> V) {
+        executorService.execute { task() }
+    }
+
+    override fun fastRun(task: Runnable) {
+        executorService.execute(task)
     }
 
     override fun execute(command: Runnable) {
-        executorService.execute(command)
+        fastRun(command)
     }
 
     val isShutdown: Boolean
@@ -53,49 +63,19 @@ open class ExecutorServiceRunner(
         return executorService.toString()
     }
 
-    private inner class ExecutorServiceRunning<V>(
-        task: () -> V
-    ) : Running<V> {
+    private inner class RunningImpl<V> : Running<V> {
 
-        private val runningTask = RunningTask(task)
-        private val future: Future<V> = executorService.submit(runningTask)
+        private val future: Future<V>
 
-        override val isStart: Boolean
-            get() {
-                return runningTask.startTime !== null
-            }
+        override var startTime: LocalDateTime? = null
+        override var endTime: LocalDateTime? = null
 
-        override val isEnd: Boolean
-            get() {
-                return runningTask.endTime !== null
-            }
-
-        override val startTime: LocalDateTime
-            get() {
-                checkState(runningTask.startTime !== null, "Task was not started.")
-                return runningTask.startTime.asNotNull()
-            }
-
-        override val endTime: LocalDateTime
-            get() {
-                checkState(runningTask.endTime !== null, "Task was not done.")
-                return runningTask.endTime.asNotNull()
-            }
-
-        override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
-            val canceled = future.cancel(mayInterruptIfRunning)
-            if (canceled) {
-                runningTask.endTime = LocalDateTime.now()
-            }
-            return canceled
+        constructor(task: () -> V) {
+            future = executorService.submit(CallableTask(task))
         }
 
-        override fun isCancelled(): Boolean {
-            return future.isCancelled
-        }
-
-        override fun isDone(): Boolean {
-            return future.isDone
+        constructor(task: Runnable) {
+            future = executorService.submit(RunnableTask(task), null)
         }
 
         override fun get(): V {
@@ -106,15 +86,38 @@ open class ExecutorServiceRunner(
             return future.get(timeout, unit)
         }
 
-        private inner class RunningTask<V>(private val task: () -> V) : Callable<V> {
+        override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+            return future.cancel(mayInterruptIfRunning)
+        }
 
-            var startTime: LocalDateTime? = null
-            var endTime: LocalDateTime? = null
+        override fun isCancelled(): Boolean {
+            return future.isCancelled
+        }
 
+        override fun isDone(): Boolean {
+            return future.isDone
+        }
+
+        private inner class CallableTask<V>(private val task: () -> V) : Callable<V> {
             override fun call(): V {
+                startTime = LocalDateTime.now()
                 try {
-                    startTime = LocalDateTime.now()
                     return task()
+                } catch (e: Exception) {
+                    throw e
+                } finally {
+                    endTime = LocalDateTime.now()
+                }
+            }
+        }
+
+        private inner class RunnableTask(private val task: Runnable) : Runnable {
+            override fun run() {
+                startTime = LocalDateTime.now()
+                try {
+                    task.run()
+                } catch (e: Exception) {
+                    throw e
                 } finally {
                     endTime = LocalDateTime.now()
                 }

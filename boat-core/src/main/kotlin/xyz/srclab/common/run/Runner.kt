@@ -15,17 +15,29 @@ import java.util.concurrent.*
  */
 interface Runner : Executor {
 
+    /**
+     * Run and returns [Running].
+     */
     @Throws(RejectedExecutionException::class)
     fun <V> run(task: () -> V): Running<V>
 
+    /**
+     * Run and returns [Running].
+     */
     @Throws(RejectedExecutionException::class)
-    @JvmDefault
-    fun run(task: Runnable): Running<*> {
-        return run {
-            task.run()
-            null
-        }
-    }
+    fun run(task: Runnable): Running<*>
+
+    /**
+     * Run and no return.
+     */
+    @Throws(RejectedExecutionException::class)
+    fun <V> fastRun(task: () -> V)
+
+    /**
+     * Run and no return.
+     */
+    @Throws(RejectedExecutionException::class)
+    fun fastRun(task: Runnable)
 
     companion object {
 

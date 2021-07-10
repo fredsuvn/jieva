@@ -1,8 +1,6 @@
 package xyz.srclab.common.run
 
 import xyz.srclab.common.lang.asAny
-import xyz.srclab.common.lang.asNotNull
-import xyz.srclab.common.lang.checkState
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.*
@@ -15,7 +13,7 @@ open class ScheduledExecutorServiceScheduler(
 ) : ExecutorServiceRunner(scheduledExecutorService), Scheduler {
 
     override fun <V> schedule(delay: Duration, task: () -> V): Scheduling<V> {
-        return ScheduledExecutorServiceScheduling(delay, task)
+        return ScheduleScheduling(delay, task)
     }
 
     override fun <V> scheduleFixedRate(
@@ -23,11 +21,7 @@ open class ScheduledExecutorServiceScheduler(
         period: Duration,
         task: () -> V
     ): Scheduling<V> {
-        return FixedRateRepeatableScheduledExecutorServiceScheduling(
-            initialDelay,
-            period,
-            task
-        )
+        return FixedRateScheduling(initialDelay, period, task)
     }
 
     override fun <V> scheduleFixedDelay(
@@ -35,155 +29,120 @@ open class ScheduledExecutorServiceScheduler(
         period: Duration,
         task: () -> V,
     ): Scheduling<V> {
-        return FixedDelayRepeatableScheduledExecutorServiceScheduling(
-            initialDelay,
-            period,
-            task
-        )
+        return FixedDelayScheduling(initialDelay, period, task)
     }
 
-    private abstract inner class AbstractScheduledExecutorServiceScheduling<V> : Scheduling<V> {
+    private inner class ScheduleScheduling<V>(delay: Duration, task: () -> V) : SchedulingImpl<V>() {
+        init {
+            val callable = CallableTask(this, task)
+            future = scheduledExecutorService.schedule(callable, delay.toNanos(), TimeUnit.NANOSECONDS)
+        }
+    }
 
-        abstract val schedulingTask: SchedulingTask<V>
-        abstract val scheduledFuture: ScheduledFuture<V>
+    private inner class FixedRateScheduling<V>(
+        initialDelay: Duration, period: Duration, task: () -> V
+    ) : SchedulingImpl<V>() {
+        init {
+            val runnable = RunnableTask(this) { task() }
+            val future = scheduledExecutorService.scheduleAtFixedRate(
+                runnable,
+                initialDelay.toNanos(),
+                period.toNanos(),
+                TimeUnit.NANOSECONDS
+            )
+            this.future = future.asAny()
+        }
+    }
 
-        override val isStart: Boolean
-            get() {
-                return schedulingTask.startTime !== null
-            }
+    private inner class FixedDelayScheduling<V>(
+        initialDelay: Duration, period: Duration, task: () -> V
+    ) : SchedulingImpl<V>() {
+        init {
+            val runnable = RunnableTask(this) { task() }
+            val future = scheduledExecutorService.scheduleWithFixedDelay(
+                runnable,
+                initialDelay.toNanos(),
+                period.toNanos(),
+                TimeUnit.NANOSECONDS
+            )
+            this.future = future.asAny()
+        }
+    }
+
+    private abstract class SchedulingImpl<V> : Scheduling<V> {
+
+        protected lateinit var future: ScheduledFuture<V>
+
+        override var startTime: LocalDateTime? = null
+        override var endTime: LocalDateTime? = null
 
         override val isEnd: Boolean
-            get() {
-                return schedulingTask.endTime !== null
-            }
+            get() = future.isDone
 
-        override val startTime: LocalDateTime
-            get() {
-                checkState(schedulingTask.startTime !== null, "Task was not started.")
-                return schedulingTask.startTime.asNotNull()
-            }
+        override fun get(): V {
+            return future.get()
+        }
 
-        override val endTime: LocalDateTime
-            get() {
-                checkState(schedulingTask.endTime !== null, "Task was not done.")
-                return schedulingTask.endTime.asNotNull()
-            }
+        override fun get(timeout: Long, unit: TimeUnit): V {
+            return future.get(timeout, unit)
+        }
 
         override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
-            val canceled = scheduledFuture.cancel(mayInterruptIfRunning)
-            if (canceled) {
-                schedulingTask.endTime = LocalDateTime.now()
+            val result = future.cancel(mayInterruptIfRunning)
+            if (result) {
+                endTime = LocalDateTime.now()
             }
-            return canceled
+            return result
         }
 
         override fun isCancelled(): Boolean {
-            return scheduledFuture.isCancelled
+            return future.isCancelled
         }
 
         override fun isDone(): Boolean {
-            return scheduledFuture.isDone
+            return future.isDone
         }
 
-        override fun get(): V {
-            return scheduledFuture.get()
-        }
-
-        override fun get(timeout: Long, unit: TimeUnit): V {
-            return scheduledFuture.get(timeout, unit)
-        }
-
-        override fun compareTo(other: Delayed): Int {
-            return scheduledFuture.compareTo(other)
+        override fun compareTo(other: Delayed?): Int {
+            return future.compareTo(other)
         }
 
         override fun getDelay(unit: TimeUnit): Long {
-            return scheduledFuture.getDelay(unit)
+            return future.getDelay(unit)
         }
     }
 
-    private inner class ScheduledExecutorServiceScheduling<V>(
-        delay: Duration,
-        task: () -> V,
-        override val schedulingTask: SchedulingTask<V> = SchedulingTask(task),
-        override val scheduledFuture: ScheduledFuture<V> = scheduledExecutorService.schedule(
-            schedulingTask,
-            delay.toNanos(),
-            TimeUnit.NANOSECONDS
-        )
-    ) : AbstractScheduledExecutorServiceScheduling<V>()
-
-    private abstract inner class RepeatableScheduledExecutorServiceScheduling<V> :
-        AbstractScheduledExecutorServiceScheduling<V>() {
-
-        abstract override val schedulingTask: RepeatableSchedulingTask<V>
-
-        override fun get(): V {
-            scheduledFuture.get()
-            return schedulingTask.result.asAny()
-        }
-
-        override fun get(timeout: Long, unit: TimeUnit): V {
-            scheduledFuture.get(timeout, unit)
-            return schedulingTask.result.asAny()
-        }
-    }
-
-    private inner class FixedRateRepeatableScheduledExecutorServiceScheduling<V>(
-        initialDelay: Duration,
-        period: Duration,
-        task: () -> V,
-        override val schedulingTask: RepeatableSchedulingTask<V> = RepeatableSchedulingTask(task),
-        override val scheduledFuture: ScheduledFuture<V> = scheduledExecutorService.scheduleAtFixedRate(
-            { schedulingTask.call() },
-            initialDelay.toNanos(),
-            period.toNanos(),
-            TimeUnit.NANOSECONDS
-        ).asAny()
-    ) : RepeatableScheduledExecutorServiceScheduling<V>()
-
-    private inner class FixedDelayRepeatableScheduledExecutorServiceScheduling<V>(
-        initialDelay: Duration,
-        period: Duration,
-        task: () -> V,
-        override val schedulingTask: RepeatableSchedulingTask<V> = RepeatableSchedulingTask(task),
-        override val scheduledFuture: ScheduledFuture<V> = scheduledExecutorService.scheduleWithFixedDelay(
-            { schedulingTask.call() },
-            initialDelay.toNanos(),
-            period.toNanos(),
-            TimeUnit.NANOSECONDS
-        ).asAny()
-    ) : RepeatableScheduledExecutorServiceScheduling<V>()
-
-    private open class SchedulingTask<V>(private val task: () -> V) : Callable<V> {
-
-        var startTime: LocalDateTime? = null
-        var endTime: LocalDateTime? = null
-
+    private class CallableTask<V>(
+        private val schedulingImpl: SchedulingImpl<V>,
+        private val task: () -> V
+    ) : Callable<V> {
         override fun call(): V {
+            schedulingImpl.endTime = null
+            schedulingImpl.startTime = LocalDateTime.now()
             try {
-                startTime = LocalDateTime.now()
                 return task()
+            } catch (e: Exception) {
+                throw e
             } finally {
-                endTime = LocalDateTime.now()
+                schedulingImpl.endTime = LocalDateTime.now()
             }
         }
     }
 
-    private class RepeatableSchedulingTask<V>(task: () -> V) : SchedulingTask<V>(task) {
-
-        var result: V? = null
-
-        override fun call(): V {
-            reset()
-            val superResult = super.call()
-            result = superResult
-            return superResult
-        }
-
-        private fun reset() {
-            startTime = null
-            endTime = null
+    private class RunnableTask(
+        private val schedulingImpl: SchedulingImpl<*>,
+        private val task: Runnable
+    ) : Runnable {
+        override fun run() {
+            schedulingImpl.endTime = null
+            schedulingImpl.startTime = LocalDateTime.now()
+            try {
+                task.run()
+            } catch (e: Exception) {
+                throw e
+            } finally {
+                schedulingImpl.endTime = LocalDateTime.now()
+            }
         }
     }
 }
