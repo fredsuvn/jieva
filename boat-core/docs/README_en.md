@@ -314,9 +314,9 @@ Java Examples
 
         @Test
         public void testRandom() {
-            //[10, 20]
+            //[10, 20)
             for (int j = 0; j < 10; j++) {
-                logger.log("random[10, 20]: {}", Randoms.between(new Random(), 10, 21));
+                logger.log("random[10, 20): {}", Randoms.between(10, 20));
             }
 
             RandomSupplier<?> randomSupplier = RandomSupplier.newBuilder()
@@ -685,9 +685,9 @@ Kotlin Examples
 
         @Test
         fun testRandom() {
-            //[10, 20]
+            //[10, 20)
             for (j in 0..9) {
-                logger.log("random[10, 20]: {}", Random().between(10, 21))
+                logger.log("random[10, 20): {}", randomBetween(10, 20))
             }
 
             val randomSupplier = RandomSupplier.newBuilder<Any>()
@@ -1422,14 +1422,11 @@ Java Examples
 
     package sample.java.xyz.srclab.core.bus;
 
-    import org.jetbrains.annotations.NotNull;
     import org.testng.annotations.Test;
     import xyz.srclab.common.bus.EventBus;
-    import xyz.srclab.common.bus.EventHandler;
-    import xyz.srclab.common.bus.EventHandlerNotFoundException;
+    import xyz.srclab.common.bus.Subscribe;
+    import xyz.srclab.common.lang.Next;
     import xyz.srclab.common.test.TestLogger;
-
-    import java.util.Arrays;
 
     public class EventBusSample {
 
@@ -1437,43 +1434,42 @@ Java Examples
 
         @Test
         public void testEventBus() {
-            EventBus eventBus = EventBus.newEventBus(Arrays.asList(
-                new EventHandler<Object>() {
-                    @NotNull
-                    @Override
-                    public Object eventType() {
-                        return String.class;
-                    }
+            EventBus eventBus = EventBus.newEventBus();
+            Handler1 handler1 = new Handler1();
+            eventBus.register(handler1);
+            eventBus.post("123");
+            //sub3sub2sub0 or sub0sub3sub2
+            logger.log("subs: " + handler1.stack);
+            eventBus.unregister(handler1);
+        }
 
-                    @Override
-                    public void handle(@NotNull Object event) {
-                        logger.log(event);
-                    }
-                },
-                new EventHandler<Object>() {
-                    @NotNull
-                    @Override
-                    public Object eventType() {
-                        return Integer.class;
-                    }
+        public static class Handler1 {
 
-                    @Override
-                    public void handle(@NotNull Object event) {
-                        logger.log(event);
-                    }
-                }
-            ));
-            //1
-            eventBus.emit(1);
-            //2
-            eventBus.emit("2");
-            //No output
-            eventBus.emit(new Object());
-            try {
-                eventBus.emitOrThrow(new Object());
-            } catch (EventHandlerNotFoundException e) {
-                //xyz.srclab.common.bus.EventHandlerNotFoundException: class java.lang.Object
-                logger.log(e);
+            public String stack = "";
+
+            @Subscribe(priority = 100)
+            public void sub0(CharSequence chars) {
+                logger.log("sub0:" + chars);
+                stack += "sub0";
+            }
+
+            @Subscribe
+            public void sub1(String chars) {
+                logger.log("sub1:" + chars);
+                stack += "sub1";
+            }
+
+            @Subscribe(priority = 100)
+            public Next sub2(String chars) {
+                logger.log("sub2:" + chars);
+                stack += "sub2";
+                return Next.BREAK;
+            }
+
+            @Subscribe(priority = 200)
+            public void sub3(String chars) {
+                logger.log("sub3:" + chars);
+                stack += "sub3";
             }
         }
     }
@@ -1484,50 +1480,50 @@ Kotlin Examples
 
     import org.testng.annotations.Test
     import xyz.srclab.common.bus.EventBus
-    import xyz.srclab.common.bus.EventHandler
-    import xyz.srclab.common.bus.EventHandlerNotFoundException
+    import xyz.srclab.common.bus.Subscribe
+    import xyz.srclab.common.lang.Next
     import xyz.srclab.common.test.TestLogger
 
     class EventBusSample {
 
         @Test
         fun testEventBus() {
-            val eventBus = EventBus.newEventBus(
-                listOf(
-                    object : EventHandler<Any> {
+            val eventBus = EventBus.newEventBus()
+            val handler1 = Handler1()
+            eventBus.register(handler1)
+            eventBus.post("123")
+            //sub3sub2sub0 or sub0sub3sub2
+            logger.log("subs: " + handler1.stack)
+            eventBus.unregister(handler1)
+        }
 
-                        override val eventType: Any
-                            get() {
-                                return String::class.java
-                            }
+        class Handler1 {
 
-                        override fun handle(event: Any) {
-                            logger.log(event)
-                        }
-                    },
-                    object : EventHandler<Any> {
+            var stack = ""
 
-                        override val eventType: Any
-                            get() {
-                                return Int::class.java
-                            }
+            @Subscribe(priority = 100)
+            fun sub0(chars: CharSequence) {
+                logger.log("sub0:$chars")
+                stack += "sub0"
+            }
 
-                        override fun handle(event: Any) {
-                            logger.log(event)
-                        }
-                    }
-                ))
-            //1
-            eventBus.emit(1)
-            //2
-            eventBus.emit("2")
-            //No output
-            eventBus.emit(Any())
-            try {
-                eventBus.emitOrThrow(Any())
-            } catch (e: EventHandlerNotFoundException) {
-                //xyz.srclab.common.bus.EventHandlerNotFoundException: class java.lang.Object
-                logger.log(e)
+            @Subscribe
+            fun sub1(chars: String) {
+                logger.log("sub1:$chars")
+                stack += "sub1"
+            }
+
+            @Subscribe(priority = 100)
+            fun sub2(chars: String): Next {
+                logger.log("sub2:$chars")
+                stack += "sub2"
+                return Next.BREAK
+            }
+
+            @Subscribe(priority = 200)
+            fun sub3(chars: String) {
+                logger.log("sub3:$chars")
+                stack += "sub3"
             }
         }
 
@@ -1906,6 +1902,8 @@ Collect package extends collection function, supports `chain operation`,
 
 -   `MultiMaps`: `MultiMaps` provides multi-values `Map` such as
     `SetMap`, `MutableSetMap`, `ListMap` and `MutableListMap`;
+
+-   `CopyOnWriteMap`: Map for copy-on-write operation;
 
 Java Examples
 
