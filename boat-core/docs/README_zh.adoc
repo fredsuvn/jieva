@@ -246,6 +246,7 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/excepti
 * `Collecting`, `Mapping`: 提供链式操作的集合接口, 并且集成了常见集合的功能 (如 `Iterable`, `Collection`, `Set`, `List`);
 * `IterableType`, `MapType`: 代表集合泛型类型;
 * `MultiMaps`: `MultiMaps` 提供多值 `Map` 如 `SetMap`, `MutableSetMap`, `ListMap` 何 `MutableListMap`;
+* `CopyOnWriteMap`: 实现copy-on-write操作的Map;
 
 .Java Examples
 [source,java]
