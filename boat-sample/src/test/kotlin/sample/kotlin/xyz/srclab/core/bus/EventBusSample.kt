@@ -2,50 +2,50 @@ package sample.kotlin.xyz.srclab.core.bus
 
 import org.testng.annotations.Test
 import xyz.srclab.common.bus.EventBus
-import xyz.srclab.common.bus.EventHandler
-import xyz.srclab.common.bus.EventHandlerNotFoundException
+import xyz.srclab.common.bus.Subscribe
+import xyz.srclab.common.lang.Next
 import xyz.srclab.common.test.TestLogger
 
 class EventBusSample {
 
     @Test
     fun testEventBus() {
-        val eventBus = EventBus.newEventBus(
-            listOf(
-                object : EventHandler<Any> {
+        val eventBus = EventBus.newEventBus()
+        val handler1 = Handler1()
+        eventBus.register(handler1)
+        eventBus.post("123")
+        //sub3sub2sub0 or sub0sub3sub2
+        logger.log("subs: " + handler1.stack)
+        eventBus.unregister(handler1)
+    }
 
-                    override val eventType: Any
-                        get() {
-                            return String::class.java
-                        }
+    class Handler1 {
 
-                    override fun handle(event: Any) {
-                        logger.log(event)
-                    }
-                },
-                object : EventHandler<Any> {
+        var stack = ""
 
-                    override val eventType: Any
-                        get() {
-                            return Int::class.java
-                        }
+        @Subscribe(priority = 100)
+        fun sub0(chars: CharSequence) {
+            logger.log("sub0:$chars")
+            stack += "sub0"
+        }
 
-                    override fun handle(event: Any) {
-                        logger.log(event)
-                    }
-                }
-            ))
-        //1
-        eventBus.emit(1)
-        //2
-        eventBus.emit("2")
-        //No output
-        eventBus.emit(Any())
-        try {
-            eventBus.emitOrThrow(Any())
-        } catch (e: EventHandlerNotFoundException) {
-            //xyz.srclab.common.bus.EventHandlerNotFoundException: class java.lang.Object
-            logger.log(e)
+        @Subscribe
+        fun sub1(chars: String) {
+            logger.log("sub1:$chars")
+            stack += "sub1"
+        }
+
+        @Subscribe(priority = 100)
+        fun sub2(chars: String): Next {
+            logger.log("sub2:$chars")
+            stack += "sub2"
+            return Next.BREAK
+        }
+
+        @Subscribe(priority = 200)
+        fun sub3(chars: String) {
+            logger.log("sub3:$chars")
+            stack += "sub3"
         }
     }
 
