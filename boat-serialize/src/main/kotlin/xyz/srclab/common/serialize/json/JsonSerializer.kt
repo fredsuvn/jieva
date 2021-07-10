@@ -20,7 +20,9 @@ import java.nio.ByteBuffer
 interface JsonSerializer : Serializer<Json> {
 
     /**
-     * Serialize or deserialize operation, source -> [Json], supports:
+     * Serialize or deserialize operation, source -> [Json].
+     *
+     * Deserialize:
      *
      * * [CharSequence]
      * * [ByteArray];
@@ -28,7 +30,10 @@ interface JsonSerializer : Serializer<Json> {
      * * [Reader];
      * * [ByteBuffer];
      * * [URL];
-     * * Other type seem as bean;
+     *
+     * Serialize:
+     *
+     * * Other types;
      *
      * @param source any object
      * @return [Json]

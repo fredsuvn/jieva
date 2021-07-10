@@ -8,7 +8,10 @@ import java.util.*
 import javax.crypto.SecretKey
 
 /**
- * Codec processing for chain operation.
+ * Codec processing supports chain operation.
+ *
+ * For many encrypt/decrypt methods, key parameter is [Any] type, that means the key's type will be supported if its
+ * [Codec] supports the type.
  *
  * @see EncodeCodec
  * @see DigestCodec
@@ -114,11 +117,9 @@ open class Codecing(
         output.write(data)
     }
 
-
     open fun doFinalString(): String {
         return doFinal().toChars()
     }
-
 
     open fun encodeHex(): Codecing {
         data = HexCodec.encode(data)
@@ -139,7 +140,6 @@ open class Codecing(
         data = Base64Codec.decode(data)
         return this
     }
-
 
     open fun encryptAes(key: Any): Codecing {
         return encrypt(CodecAlgorithm.AES, key)

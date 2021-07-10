@@ -11,6 +11,24 @@ import java.nio.ByteBuffer
 
 private val jsonSerializer: JsonSerializer = JsonSerializer.DEFAULT
 
+/**
+ * Serialize or deserialize operation, source -> [Json].
+ *
+ * Deserialize:
+ *
+ * * [CharSequence]
+ * * [ByteArray];
+ * * [InputStream];
+ * * [Reader];
+ * * [ByteBuffer];
+ * * [URL];
+ *
+ * Serialize:
+ *
+ * * Other types;
+ *
+ * @see [JsonSerializer.toJson]
+ */
 fun Any?.toJson(): Json {
     return jsonSerializer.toJson(this)
 }

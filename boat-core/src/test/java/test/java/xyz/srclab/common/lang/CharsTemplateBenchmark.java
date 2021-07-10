@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit;
  * @author sunqian
  */
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 30)
-@Measurement(iterations = 3, time = 30)
+@Warmup(iterations = 3, time = 3)
+@Measurement(iterations = 3, time = 3)
 @Threads(16)
 @Fork(1)
 @State(value = Scope.Benchmark)
@@ -83,12 +83,11 @@ public class CharsTemplateBenchmark {
     }
 
     /*
-     * Benchmark                                          Mode  Cnt      Score     Error   Units
-     * CharsTemplateBenchmark.withCharsTemplate          thrpt    3   4483.787 ± 410.260  ops/ms
-     * CharsTemplateBenchmark.withPreparedCharsTemplate  thrpt    3  15335.982 ± 847.195  ops/ms
-     *
-     * CharsTemplateBenchmark.withVelocity               thrpt    3      1.853 ±   0.464  ops/ms
-     * CharsTemplateBenchmark.withPreparedVelocity       thrpt    3    517.879 ±  17.861  ops/ms
+     * Benchmark                                          Mode  Cnt      Score      Error   Units
+     * CharsTemplateBenchmark.withCharsTemplate          thrpt    3   4367.437 ± 2032.660  ops/ms
+     * CharsTemplateBenchmark.withPreparedCharsTemplate  thrpt    3  15321.502 ± 2578.960  ops/ms
+     * CharsTemplateBenchmark.withPreparedVelocity       thrpt    3    603.137 ±   42.220  ops/ms
+     * CharsTemplateBenchmark.withVelocity               thrpt    3      1.825 ±    0.669  ops/ms
      */
     public static void main(String[] args) throws Exception {
         Options options = new OptionsBuilder().include(CharsTemplateBenchmark.class.getSimpleName()).build();

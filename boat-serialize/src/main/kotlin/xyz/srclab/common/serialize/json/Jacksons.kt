@@ -171,7 +171,6 @@ private class JsonImpl(
         }
     }
 
-
     override fun toJsonString(): String {
         return jsonNode.toString()
     }
@@ -186,6 +185,16 @@ private class JsonImpl(
 
     override fun toString(): String {
         return toJsonString()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is JsonImpl) return false
+        return jsonNode == other.jsonNode
+    }
+
+    override fun hashCode(): Int {
+        return jsonNode.hashCode()
     }
 
     private fun JsonNodeType.toJsonType(): JsonType {

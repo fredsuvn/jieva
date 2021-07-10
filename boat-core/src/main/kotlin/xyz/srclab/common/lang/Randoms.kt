@@ -5,6 +5,19 @@ package xyz.srclab.common.lang
 import java.util.*
 import java.util.function.Supplier
 
+private val random: Random = Random()
+
+/**
+ * Returns random number in `[from, to)`.
+ */
+@JvmName("between")
+fun randomBetween(from: Int, to: Int): Int {
+    return random.between(from, to)
+}
+
+/**
+ * Returns random number in `[from, to)`.
+ */
 @JvmName("between")
 fun Random.between(from: Int, to: Int): Int {
     return this.nextInt(to - from) + from

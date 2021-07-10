@@ -175,9 +175,9 @@ class BaseSample {
 
     @Test
     fun testRandom() {
-        //[10, 20]
+        //[10, 20)
         for (j in 0..9) {
-            logger.log("random[10, 20]: {}", Random().between(10, 21))
+            logger.log("random[10, 20): {}", randomBetween(10, 20))
         }
 
         val randomSupplier = RandomSupplier.newBuilder<Any>()

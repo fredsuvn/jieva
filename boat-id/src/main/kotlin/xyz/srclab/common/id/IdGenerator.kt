@@ -1,70 +1,35 @@
 package xyz.srclab.common.id
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.lang.SingleGetter
-import xyz.srclab.common.lang.asAny
-
 /**
- * Core interface to generate new id.
+ * Core interface to generate global unique id.
  *
- * Use [AbstractIdGenerator] to convenient to implement.
+ * To generate a global unique id, we need 3 values:
  *
- * Use [IdSpec] to convenient to generate id of [String] type.
+ * * [S]: seed value, such as timestamp or UUID;
+ * * [L]: local value, local value (with seed) value make id local unique, such as sequence number;
+ * * [I] instance value, instance value (with seed) value make id unique in all instances, such as sequence number;
  *
- * @author sunqian
- *
- * @see AbstractIdGenerator
- * @see IdSpec
+ * [R] is type of final global unique id, the final id comes from [S], [L] and [I].
  */
-interface IdGenerator<T> {
+interface IdGenerator<S, L, I, R> {
 
-    /**
-     * Returns new id.
-     *
-     * @return new id
-     */
-    fun newId(): T
-}
+    fun next(): R
 
-/**
- * Abstract [IdGenerator] to help convenient to implement a [IdGenerator].
- *
- * Subclass should provide [components] (and call its [IdComponent.init]) and [joiner].
- */
-abstract class AbstractIdGenerator<T> : IdGenerator<T> {
+    companion object {
 
-    @get:JvmName("components")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    abstract val components: Iterable<IdComponent<Any>>
-
-    @get:JvmName("joiner")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    abstract val joiner: IdJoiner<T>
-
-    override fun newId(): T {
-        val context = IdContextImpl()
-        val componentsValues = context.componentGetters.map { it.get<Any>() }
-        return joiner.join(componentsValues)
-    }
-
-    private inner class IdContextImpl : IdContext {
-        override val componentGetters: List<SingleGetter> = this@AbstractIdGenerator.components.toGetters(this)
-    }
-
-    private fun Iterable<IdComponent<Any>>.toGetters(context: IdContext): List<SingleGetter> {
-        return this.map {
-            object : SingleGetter {
-
-                private var cache: Any? = null
-
-                override fun <T : Any> getOrNull(): T? {
-                    val current = cache
-                    if (current !== null) {
-                        return current.asAny()
-                    }
-                    val newValue = it.newValue(context)
-                    cache = newValue
-                    return newValue.asAny()
+        @JvmStatic
+        fun <S, L, I, R> newIdGenerator(
+            seed: () -> S,
+            local: (S) -> L,
+            instance: (S) -> I,
+            joiner: (L, I) -> R
+        ): IdGenerator<S, L, I, R> {
+            return object : IdGenerator<S, L, I, R> {
+                override fun next(): R {
+                    val s = seed()
+                    val l = local(s)
+                    val i = instance(s)
+                    return joiner(l, i)
                 }
             }
         }

@@ -1,134 +1,164 @@
 package xyz.srclab.common.bus
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.invoke.Invoker
+import xyz.srclab.common.lang.Next
+import xyz.srclab.common.reflect.INHERITANCE_COMPARATOR
 import xyz.srclab.common.run.Runner
-import java.util.concurrent.ConcurrentHashMap
+import java.util.*
 import java.util.concurrent.Executor
-import java.util.concurrent.RejectedExecutionException
 
 /**
- * Event bus.
+ * Event bus. Use [register] or [registerAll] to register event handler, [unregister] and [unregisterAll] to unregister.
  *
- * @see EventHandler
+ * Each method which is annotated by [Subscribe] in event handler is a *Subscriber*.
+ * Event will be post to all *Subscriber*s of which event type (method parameter type) is compatible.
+ *
+ * If same event type has more than one *Subscriber*s, in high to low priority order ([Subscribe.priority]).
+ * If one *Subscriber* returns [Next.BREAK], the event will be dropped and *Subscriber* behind will not receive event.
+ *
+ * @see Subscribe
  */
 interface EventBus {
 
-    fun register(eventHandler: EventHandler<*>)
+    fun register(eventHandler: Any)
 
-    fun unregister(eventHandler: EventHandler<*>)
+    fun registerAll(eventHandlers: Iterable<Any>)
 
-    @JvmDefault
-    fun <T : Any> emit(event: T) {
-        return emit(event.javaClass, event)
-    }
+    fun unregister(eventHandler: Any)
 
-    @JvmDefault
-    fun <T : Any> emit(eventType: Any, event: T) {
-        try {
-            return emitOrThrow(eventType, event)
-        } catch (e: Exception) {
-            //Do nothing
-        }
-    }
+    fun unregisterAll(eventHandlers: Iterable<Any>)
 
-    @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
-    @JvmDefault
-    fun <T : Any> emitOrThrow(event: T) {
-        return emitOrThrow(event.javaClass, event)
-    }
-
-    @Throws(EventHandlerNotFoundException::class, RejectedExecutionException::class)
-    fun <T : Any> emitOrThrow(eventType: Any, event: T)
+    fun post(event: Any)
 
     companion object {
 
         @JvmStatic
         @JvmOverloads
         fun newEventBus(
-            handlers: Iterable<EventHandler<*>>,
             executor: Executor = Runner.SYNC_RUNNER,
-            mutable: Boolean = true,
         ): EventBus {
-            return if (mutable)
-                MutableEventBusImpl(handlers, executor)
-            else
-                EventBusImpl(handlers, executor)
+            return EventBusImpl(executor)
         }
-    }
-}
 
-interface EventHandler<T : Any> {
+        private class EventBusImpl(
+            private val executor: Executor
+        ) : EventBus {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val eventType: Any
-        @JvmName("eventType") get
+            private var subscribeMap: TreeMap<Class<*>, MutableList<Action>> =
+                TreeMap(INHERITANCE_COMPARATOR.reversed())
 
-    fun handle(event: T)
-}
+            override fun register(eventHandler: Any) {
+                val newActions = resolveHandler(eventHandler)
+                if (newActions.isEmpty()) {
+                    return
+                }
+                addActions(newActions)
+            }
 
-class EventHandlerNotFoundException(eventType: Any) : RuntimeException(eventType.toString())
+            override fun registerAll(eventHandlers: Iterable<Any>) {
+                val totalActions: MutableMap<Class<*>, MutableList<Action>> = HashMap()
+                for (eventHandler in eventHandlers) {
+                    val newActions = resolveHandler(eventHandler)
+                    for (newAction in newActions) {
+                        val actions = totalActions.getOrPut(newAction.key) { LinkedList() }
+                        actions.addAll(newAction.value)
+                    }
+                }
+                addActions(totalActions)
+            }
 
-abstract class AbstractEventBus(private val executor: Executor) : EventBus {
+            private fun addActions(newActions: Map<Class<*>, List<Action>>) {
+                synchronized(this) {
+                    val newMap = copySubscribers()
+                    for (newAction in newActions) {
+                        val eventType = newAction.key
+                        val actions = newAction.value
+                        val oldActions = newMap.getOrPut(eventType) { ArrayList() }
+                        oldActions.addAll(actions)
+                        oldActions.sortWith { a1, a2 ->
+                            a2.subscribe.priority - a1.subscribe.priority
+                        }
+                    }
+                    subscribeMap = newMap
+                }
+            }
 
-    protected abstract val handlersMapper: Map<Any, EventHandler<*>>
+            override fun unregister(eventHandler: Any) {
+                unregisterAll(listOf(eventHandler))
+            }
 
-    override fun register(eventHandler: EventHandler<*>) {
-        throw UnsupportedOperationException()
-    }
+            override fun unregisterAll(eventHandlers: Iterable<Any>) {
+                val set = eventHandlers.toSet()
+                synchronized(this) {
+                    val newMap = copySubscribers()
+                    for (entry in newMap) {
+                        val actions = entry.value
+                        val it = actions.iterator()
+                        while (it.hasNext()) {
+                            val action = it.next()
+                            if (set.contains(action.handler)) {
+                                it.remove()
+                            }
+                        }
+                    }
+                    subscribeMap = newMap
+                }
+            }
 
-    override fun unregister(eventHandler: EventHandler<*>) {
-        throw UnsupportedOperationException()
-    }
+            private fun copySubscribers(): TreeMap<Class<*>, MutableList<Action>> {
+                val newMap = TreeMap<Class<*>, MutableList<Action>>(subscribeMap.comparator())
+                for (mutableEntry in subscribeMap) {
+                    val newList = ArrayList<Action>()
+                    newList.addAll(mutableEntry.value)
+                    newMap[mutableEntry.key] = newList
+                }
+                return newMap
+            }
 
-    override fun <T : Any> emitOrThrow(eventType: Any, event: T) {
-        val eventHandler: EventHandler<T>? = handlersMapper[eventType].asAny()
-        if (eventHandler === null) {
-            throw EventHandlerNotFoundException(eventType)
+            private fun resolveHandler(eventHandler: Any): Map<Class<*>, List<Action>> {
+                val result: MutableMap<Class<*>, MutableList<Action>> = HashMap()
+                for (method in eventHandler.javaClass.methods) {
+                    val subscribe = method.getAnnotation(Subscribe::class.java)
+                    if (subscribe === null) {
+                        continue
+                    }
+                    if (method.parameterCount != 1) {
+                        continue
+                    }
+                    val eventType = method.parameterTypes[0]
+                    val action = Action(eventHandler, subscribe, Invoker.forMethod(method))
+                    val actions = result.getOrPut(eventType) { LinkedList() }
+                    actions.add(action)
+                }
+                return result
+            }
+
+            override fun post(event: Any) {
+                executor.execute { post0(event) }
+            }
+
+            private fun post0(event: Any) {
+                val subscribers = subscribeMap
+                    .subMap(Any::class.java, true, event.javaClass, true)
+                    .descendingMap()
+                for (subscriberEntry in subscribers) {
+                    val actions = subscriberEntry.value
+                    executor.execute {
+                        for (action in actions) {
+                            val result = action.invoker.invoke<Any?>(action.handler, event)
+                            if (result == Next.BREAK) {
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+
+            private data class Action(
+                val handler: Any,
+                val subscribe: Subscribe,
+                val invoker: Invoker,
+            )
         }
-        try {
-            executor.execute { eventHandler.handle(event) }
-        } catch (e: Exception) {
-            throw e
-        }
-    }
-}
-
-private class EventBusImpl(
-    handlers: Iterable<EventHandler<*>>,
-    executor: Executor,
-    override val handlersMapper: Map<Any, EventHandler<*>> = handlers.toMap()
-) : AbstractEventBus(executor)
-
-private class MutableEventBusImpl(
-    handlers: Iterable<EventHandler<*>>,
-    executor: Executor,
-    override val handlersMapper: MutableMap<Any, EventHandler<*>> = handlers.toMutableMap()
-) : AbstractEventBus(executor) {
-
-    override fun register(eventHandler: EventHandler<*>) {
-        handlersMapper[eventHandler.eventType] = eventHandler
-    }
-
-    override fun unregister(eventHandler: EventHandler<*>) {
-        handlersMapper.remove(eventHandler.eventType)
-    }
-}
-
-private fun Iterable<EventHandler<*>>.toMap(): Map<Any, EventHandler<*>> {
-    val map = HashMap<Any, EventHandler<*>>()
-    map.putAllHandlers(this)
-    return map
-}
-
-private fun Iterable<EventHandler<*>>.toMutableMap(): MutableMap<Any, EventHandler<*>> {
-    val map = ConcurrentHashMap<Any, EventHandler<*>>()
-    map.putAllHandlers(this)
-    return map
-}
-
-private fun MutableMap<Any, EventHandler<*>>.putAllHandlers(handlers: Iterable<EventHandler<*>>) = apply {
-    for (handler in handlers) {
-        this[handler.eventType] = handler
     }
 }

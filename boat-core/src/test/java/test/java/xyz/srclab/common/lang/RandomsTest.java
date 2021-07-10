@@ -6,16 +6,16 @@ import xyz.srclab.common.lang.RandomSupplier;
 import xyz.srclab.common.lang.Randoms;
 import xyz.srclab.common.test.TestLogger;
 
-import java.util.Random;
-
 public class RandomsTest {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testRandoms() {
-        for (int i = 0; i < 10; i++) {
-            logger.log("random[10, 20]: {}", Randoms.between(new Random(), 10, 21));
+        for (int i = 0; i < 10000; i++) {
+            int r = Randoms.between(10, 20);
+            logger.log("random[10, 20): {}", r);
+            Assert.assertTrue(r >= 10 && r < 20);
         }
     }
 

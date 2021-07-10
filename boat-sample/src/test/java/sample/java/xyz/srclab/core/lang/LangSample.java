@@ -212,9 +212,9 @@ public class LangSample {
 
     @Test
     public void testRandom() {
-        //[10, 20]
+        //[10, 20)
         for (int j = 0; j < 10; j++) {
-            logger.log("random[10, 20]: {}", Randoms.between(new Random(), 10, 21));
+            logger.log("random[10, 20): {}", Randoms.between(10, 20));
         }
 
         RandomSupplier<?> randomSupplier = RandomSupplier.newBuilder()
