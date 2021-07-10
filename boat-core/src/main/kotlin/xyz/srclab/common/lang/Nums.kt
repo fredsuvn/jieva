@@ -2,6 +2,7 @@
 
 package xyz.srclab.common.lang
 
+import org.apache.commons.lang3.StringUtils
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.text.toBigDecimal as toBigDecimalKt
@@ -187,4 +188,22 @@ fun Any?.toNumber(): Number {
         is Number -> this
         else -> toBigDecimal()
     }
+}
+
+/**
+ * To binary string.
+ * It will pad *0* before binary string if [size] > binary string's size, or no padding if [size] <= 0.
+ */
+@JvmOverloads
+fun Int.toBinaryString(size: Int = 32): String {
+    return StringUtils.leftPad(Integer.toBinaryString(this), size, "0")
+}
+
+/**
+ * To binary string.
+ * It will pad *0* before binary string if [size] > binary string's size, or no padding if [size] <= 0.
+ */
+@JvmOverloads
+fun Long.toBinaryString(size: Int = 64): String {
+    return StringUtils.leftPad(java.lang.Long.toBinaryString(this), size, "0")
 }
