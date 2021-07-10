@@ -37,7 +37,10 @@ interface Runner : Executor {
      * Run and no return.
      */
     @Throws(RejectedExecutionException::class)
-    fun fastRun(task: Runnable)
+    @JvmDefault
+    fun fastRun(task: Runnable) {
+        execute(task)
+    }
 
     companion object {
 

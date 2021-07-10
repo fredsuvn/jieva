@@ -26,12 +26,8 @@ open class ExecutorServiceRunner(
         executorService.execute { task() }
     }
 
-    override fun fastRun(task: Runnable) {
-        executorService.execute(task)
-    }
-
     override fun execute(command: Runnable) {
-        fastRun(command)
+        executorService.execute(command)
     }
 
     val isShutdown: Boolean
