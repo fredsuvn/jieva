@@ -1,67 +1,39 @@
 package sample.java.xyz.srclab.id;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.id.IdSpec;
+import xyz.srclab.common.id.IdGenerator;
+import xyz.srclab.common.id.SnowflakeIdGenerator;
+import xyz.srclab.common.lang.Nums;
 import xyz.srclab.common.test.TestLogger;
+
+import java.util.UUID;
 
 public class IdSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
-    public void testId() {
-        //seq0-06803239610792857600-tail
-        String spec0 = "seq0-{Snowflake, 20, 41, 10, 12}-tail";
-        IdSpec stringIdSpec0 = new IdSpec(spec0);
+    public void testSnowflake() {
+        SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(1);
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec0.newId());
+            long id = snowflakeIdGenerator.next();
+            //Snowflake: 6819769124932030464 : 0101111010100100101011111110001011101101110000000001000000000000
+            logger.log("Snowflake: " + id + " : " + Nums.toBinaryString(id));
         }
-
-        //seq1-00001826267315077279180346359808-tail
-        String spec1 = "seq1-{Snowflake, 32, 55, 25, 25}-tail";
-        IdSpec stringIdSpec1 = new IdSpec(spec1);
-        for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec1.newId());
-        }
-
-        //seq2-29921563690270857976266765631488-tail
-        String spec2 = "seq2-{Snowflake, 32, 63, 32, 32}-tail";
-        IdSpec stringIdSpec2 = new IdSpec(spec2);
-        for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec2.newId());
-        }
-
-        //seq3{}-06803240106559590400-tail
-        String spec3 = "seq3\\{}-{Snowflake, 20, 41, 10, 12}-tail";
-        IdSpec stringIdSpec3 = new IdSpec(spec3);
-        for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec3.newId());
-        }
-
-        //seq4{}-06805124180752646144-tail
-        String spec4 = "seq4\\{\\}-{Snowflake, 20, 41, 10, 12}-tail";
-        IdSpec stringIdSpec4 = new IdSpec(spec4);
-        for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec4.newId());
-        }
-
-        String spec5 = "seq5\\{\\}-{Snowflake, 20, 41, 10, 12";
-        Assert.expectThrows(IllegalArgumentException.class, () -> new IdSpec(spec5));
     }
 
     @Test
-    public void testCustomId() {
-        String spec = "seq-{Snowflake, 20, 41, 10, 12}-{My, 88888}";
-        IdSpec stringIdSpec = new IdSpec(spec, type -> {
-            if (type.equals(MyIdComponent.TYPE)) {
-                return new MyIdComponent();
-            }
-            return IdSpec.DEFAULT_COMPONENT_SUPPLIER.get(type);
-        });
-        //seq-06803242693339123712-88888
+    public void testIdGenerator() {
+        IdGenerator<String, String, String, String> idGenerator = IdGenerator.newIdGenerator(
+            () -> UUID.randomUUID().toString(),
+            l -> l.substring(0, 10),
+            i -> i.substring(11, 15),
+            (l, i) -> l + "-" + i
+        );
         for (int i = 0; i < 10; i++) {
-            logger.log(stringIdSpec.newId());
+            String id = idGenerator.next();
+            //IdGenerator: 4f8c8c34-2-83-4
+            logger.log("IdGenerator: " + id);
         }
     }
 }
