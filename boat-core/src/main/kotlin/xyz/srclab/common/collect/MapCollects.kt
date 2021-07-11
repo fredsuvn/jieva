@@ -4,6 +4,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.lang.asComparableComparator
+import java.util.*
 import kotlin.collections.associateTo as associateToKt
 import kotlin.collections.filter as filterKt
 import kotlin.collections.filterTo as filterToKt
@@ -115,6 +116,12 @@ fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = asCompa
 
 fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> {
     return if (this is ImmutableMap) this else ImmutableMap(this)
+}
+
+fun <K, V> Map<K, V>.toTreeMap(comparator: Comparator<in K>): TreeMap<K, V> {
+    val result: TreeMap<K, V> = TreeMap(comparator)
+    result.putAll(this)
+    return result
 }
 
 fun <K, V> Map<K, V>.plus(other: Map<out K, V>): Map<K, V> {

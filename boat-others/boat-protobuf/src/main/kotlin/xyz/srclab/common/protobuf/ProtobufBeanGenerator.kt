@@ -8,11 +8,11 @@ import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
 
 /**
- * [BeanConvertHandler.NewBeanProvider] supports protobuf types.
+ * [BeanConvertHandler.BeanGenerator] supports protobuf types.
  *
  * @see BeanConvertHandler
  */
-object ProtobufBeanProvider : BeanConvertHandler.NewBeanProvider {
+object ProtobufBeanGenerator : BeanConvertHandler.BeanGenerator {
 
     override fun newBuilder(toType: Type): Any {
         if (toType !is Class<*>) {
@@ -41,20 +41,24 @@ object ProtobufBeanProvider : BeanConvertHandler.NewBeanProvider {
         }
     }
 
-    override fun builderType(builder: Any, toType: Type): Type {
-        if (toType !is Class<*>) {
-            return toType
-        }
-        return when {
-            //Message but not builder
-            (MessageOrBuilder::class.java.isAssignableFrom(toType)
-                && !Message.Builder::class.java.isAssignableFrom(toType)
-                && builder is Message.Builder) -> {
-                builder.javaClass
-            }
-            else -> toType
-        }
-    }
+    //override fun builderType(toType: Type): Type {
+    //    TODO("Not yet implemented")
+    //}
+    //
+    //override fun builderType(builder: Any, toType: Type): Type {
+    //    if (toType !is Class<*>) {
+    //        return toType
+    //    }
+    //    return when {
+    //        //Message but not builder
+    //        (MessageOrBuilder::class.java.isAssignableFrom(toType)
+    //            && !Message.Builder::class.java.isAssignableFrom(toType)
+    //            && builder is Message.Builder) -> {
+    //            builder.javaClass
+    //        }
+    //        else -> toType
+    //    }
+    //}
 
     override fun build(builder: Any, toType: Type): Any {
         if (toType !is Class<*>) {
@@ -63,8 +67,8 @@ object ProtobufBeanProvider : BeanConvertHandler.NewBeanProvider {
         return when {
             //Message but not builder
             (MessageOrBuilder::class.java.isAssignableFrom(toType)
-                && !Message.Builder::class.java.isAssignableFrom(toType)
-                && builder is Message.Builder) -> {
+                    && !Message.Builder::class.java.isAssignableFrom(toType)
+                    && builder is Message.Builder) -> {
                 builder.build()
             }
             else -> builder

@@ -1,18 +1,19 @@
 package test.java.xyz.srclab.common.convert;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.collect.Collects;
+import xyz.srclab.common.convert.ConvertChain;
 import xyz.srclab.common.convert.ConvertHandler;
 import xyz.srclab.common.convert.Converter;
 import xyz.srclab.common.convert.Converts;
-import xyz.srclab.common.lang.Next;
+import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author sunqian
@@ -25,6 +26,22 @@ public class ConvertTest {
     public void testConverts() {
         E e = Converts.convert("b", E.class);
         logger.log("e: {}", e);
+        Assert.assertEquals(e, E.B);
+
+        Map<Iterable<Long>, HashMap<Float, StringBuilder>> source = new LinkedHashMap<>();
+        StringBuilder stringBuilder = new StringBuilder("BBB");
+        source.put(Arrays.asList(10086L), Collects.newMap(new HashMap<>(), 8.8, stringBuilder));
+        Map<List<Double>, HashMap<Integer, CharSequence>> map = Converts.convert(
+            source,
+            new TypeRef<Map<Iterable<Long>, HashMap<Float, StringBuilder>>>() {
+            },
+            new TypeRef<Map<List<Double>, HashMap<Integer, CharSequence>>>() {
+            });
+        logger.log("map: {}", map);
+        Assert.assertEquals(
+            map.get(Arrays.asList(10086.0)),
+            Collects.newMap(new HashMap<>(), 8, stringBuilder)
+        );
     }
 
     @Test
@@ -39,29 +56,12 @@ public class ConvertTest {
 
     public static class IntToStringHandler implements ConvertHandler {
 
-        @NotNull
+        @Nullable
         @Override
-        public List<Type> toTypeFastHit() {
-            return Collections.singletonList(String.class);
-        }
-
-        public <T> Object convert(Object from, @NotNull Class<T> toTye, @NotNull Converter converter) {
+        public Object convert(
+            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertChain chain) {
             if (from == null || !from.getClass().equals(Integer.class)) {
-                return Next.CONTINUE;
-            }
-            return "I" + from;
-        }
-
-        public Object convert(Object from, @NotNull Type Type, @NotNull Converter converter) {
-            if (from == null || !from.getClass().equals(Integer.class)) {
-                return Next.CONTINUE;
-            }
-            return "I" + from;
-        }
-
-        public Object convert(Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull Converter converter) {
-            if (from == null || !from.getClass().equals(Integer.class)) {
-                return Next.CONTINUE;
+                return chain.next(from, fromType, toType);
             }
             return "I" + from;
         }
@@ -69,29 +69,12 @@ public class ConvertTest {
 
     public static class LongToStringHandler implements ConvertHandler {
 
-        @NotNull
+        @Nullable
         @Override
-        public List<Type> toTypeFastHit() {
-            return Collections.singletonList(String.class);
-        }
-
-        public <T> Object convert(Object from, @NotNull Class<T> toTye, @NotNull Converter converter) {
+        public Object convert(
+            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertChain chain) {
             if (from == null || !from.getClass().equals(Long.class)) {
-                return Next.CONTINUE;
-            }
-            return "L" + from;
-        }
-
-        public Object convert(Object from, @NotNull Type Type, @NotNull Converter converter) {
-            if (from == null || !from.getClass().equals(Long.class)) {
-                return Next.CONTINUE;
-            }
-            return "L" + from;
-        }
-
-        public Object convert(Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull Converter converter) {
-            if (from == null || !from.getClass().equals(Long.class)) {
-                return Next.CONTINUE;
+                return chain.next(from, fromType, toType);
             }
             return "L" + from;
         }

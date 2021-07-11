@@ -23,6 +23,6 @@ fun <T> Any?.convert(toTypeRef: TypeRef<T>): T {
     return defaultConverter.convert(this, toTypeRef)
 }
 
-fun <T> Any?.convert(fromTypeRef: TypeRef<T>, toTypeRef: TypeRef<T>): T {
+fun <F, R> Any?.convert(fromTypeRef: TypeRef<F>, toTypeRef: TypeRef<R>): R {
     return defaultConverter.convert(this, fromTypeRef, toTypeRef)
 }

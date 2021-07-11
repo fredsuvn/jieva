@@ -1,7 +1,6 @@
 package xyz.srclab.common.lang
 
-import xyz.srclab.common.lang.Next.BREAK
-import xyz.srclab.common.lang.Next.CONTINUE
+import xyz.srclab.common.lang.Next.*
 
 /**
  * Convenient interface for java:
@@ -52,8 +51,11 @@ interface Let<T : Any> : GenericSingleGetter<T> {
 /**
  * Represents next operation, usually used for the object which delegate performance to a group of handlers.
  *
- * If one of handlers returns [CONTINUE], means that handler failed to convert and suggests continue to next handler;
- * if returns [BREAK], means that handler failed to convert and suggests break handler chain.
+ * For three values:
+ *
+ * * If one of handlers returns [CONTINUE], means that handler failed to convert and suggests continue to next handler;
+ * * If returns [BREAK], means that handler failed to convert and suggests break handler chain;
+ * * If returns [COMPLETE], means that handler success and complete conversation;
  */
 enum class Next {
 
@@ -66,4 +68,9 @@ enum class Next {
      * Represents current handler failed to convert and suggests break handler chain.
      */
     BREAK,
+
+    /**
+     * Represents current handler success and complete conversation.
+     */
+    COMPLETE,
 }

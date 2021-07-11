@@ -1,8 +1,8 @@
 package xyz.srclab.common.bus
 
 import xyz.srclab.common.invoke.Invoker
+import xyz.srclab.common.lang.INHERITANCE_COMPARATOR
 import xyz.srclab.common.lang.Next
-import xyz.srclab.common.reflect.INHERITANCE_COMPARATOR
 import xyz.srclab.common.run.Runner
 import java.util.*
 import java.util.concurrent.Executor
@@ -44,8 +44,7 @@ interface EventBus {
             private val executor: Executor
         ) : EventBus {
 
-            private var subscribeMap: TreeMap<Class<*>, MutableList<Action>> =
-                TreeMap(INHERITANCE_COMPARATOR.reversed())
+            private var subscribeMap: TreeMap<Class<*>, MutableList<Action>> = TreeMap(COMPARATOR)
 
             override fun register(eventHandler: Any) {
                 val newActions = resolveHandler(eventHandler)
@@ -142,6 +141,9 @@ interface EventBus {
                     .subMap(Any::class.java, true, event.javaClass, true)
                     .descendingMap()
                 for (subscriberEntry in subscribers) {
+                    if (!subscriberEntry.key.isAssignableFrom(event.javaClass)) {
+                        continue
+                    }
                     val actions = subscriberEntry.value
                     executor.execute {
                         for (action in actions) {
@@ -159,6 +161,20 @@ interface EventBus {
                 val subscribe: Subscribe,
                 val invoker: Invoker,
             )
+
+            companion object {
+
+                private val COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
+                    val r0 = -INHERITANCE_COMPARATOR.compare(c1, c2)
+                    if (r0 == 0) {
+                        if (c1 == c2) {
+                            return@Comparator r0
+                        }
+                        return@Comparator 1
+                    }
+                    r0
+                }
+            }
         }
     }
 }

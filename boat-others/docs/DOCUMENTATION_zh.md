@@ -23,7 +23,7 @@ protobuf 类型的处理器:
 -   `ProtobufBeanResolveHandler`: 支持 protobuf 类型的bean解析器, 从
     `BeanResolveHandler` (boat-core) 扩展;
 
--   `ProtobufBeanProvider`: 支持 protobuf 类型的
+-   `ProtobufBeanGenerator`: 支持 protobuf 类型的
     `BeanConvertHandler.NewBeanProvider` (boat-core);
 
 -   `ProtobufBeans.PROTOBUF_BEAN_RESOLVER`: 支持 protobuf

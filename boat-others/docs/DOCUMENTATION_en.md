@@ -24,7 +24,7 @@ processors for protobuf type object:
 -   `ProtobufBeanResolveHandler`: Bean resolve handler supports protobuf
     types, extends from `BeanResolveHandler` (boat-core);
 
--   `ProtobufBeanProvider`: `BeanConvertHandler.NewBeanProvider`
+-   `ProtobufBeanGenerator`: `BeanConvertHandler.NewBeanProvider`
     (boat-core) supports protobuf types;
 
 -   `ProtobufBeans.PROTOBUF_BEAN_RESOLVER`: Bean resolve supports

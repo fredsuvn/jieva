@@ -2,6 +2,7 @@ package xyz.srclab.common.collect
 
 import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.lang.asComparableComparator
+import java.util.*
 
 /**
  * Map interface support chain operation.
@@ -101,6 +102,10 @@ open class Mapping<K, V>(
 
     open fun toImmutableMap(): ImmutableMap<K, V> {
         return finalMap().toImmutableMap()
+    }
+
+    open fun toTreeMap(comparator: java.util.Comparator<in K>): TreeMap<K, V> {
+        return finalMap().toTreeMap(comparator)
     }
 
     open fun plus(other: Map<out K, V>): Mapping<K, V> {

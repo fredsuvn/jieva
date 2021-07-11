@@ -17,7 +17,7 @@ Boat others provides third party supporting and extension for link:../../README.
 boat-protobuf provides `bean`, `convert` and `serialize` handlers and processors for protobuf type object:
 
 * `ProtobufBeanResolveHandler`: Bean resolve handler supports protobuf types, extends from `BeanResolveHandler` (boat-core);
-* `ProtobufBeanProvider`: `BeanConvertHandler.NewBeanProvider` (boat-core) supports protobuf types;
+* `ProtobufBeanGenerator`: `BeanConvertHandler.NewBeanProvider` (boat-core) supports protobuf types;
 * `ProtobufBeans.PROTOBUF_BEAN_RESOLVER`: Bean resolve supports protobuf types, extends from `BeanResolver` (boat-core);
 * ProtobufConverts.PROTOBUF_CONVERTER: Converter supports protobuf types, extends from `Converter` (boat-core);
 * ProtobufJsons.PROTOBUF_OBJECT_MAPPER: ``Jackson``'s `ObjectMapper` (boat-serialize) supports protobuf types;

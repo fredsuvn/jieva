@@ -8,8 +8,8 @@
 <imagedata fileref="../../logo.svg"/>
 </imageobject>
 <textobject><phrase>Boat Others</phrase></textobject>
-</inlinemediaobject> Boat Others&#8201;&#8212;&#8201;Third Party Supporting and Extension Libs for <link xl:href="../../README.md">Boat</link></title>
-<date>2021-06-18</date>
+</inlinemediaobject> Boat Others&#8201;&#8212;&#8201;<link xl:href="../../README.md">Boat</link> 第三方支持和扩展库</title>
+<date>2021-07-12</date>
 <author>
 <personname>
 <firstname>Sun</firstname>
@@ -19,38 +19,38 @@
 </author>
 <authorinitials>SQ</authorinitials>
 </info>
-<section xml:id="_introduction">
-<title>Introduction</title>
-<simpara>Boat others provides third party supporting and extension for <link xl:href="../../README.md">Boat</link>.</simpara>
+<section xml:id="_简介">
+<title>简介</title>
+<simpara>Boat others 为 <link xl:href="../../README.md">Boat</link>提供第三方支持和扩展.</simpara>
 </section>
-<section xml:id="_supporting_list">
-<title>Supporting List</title>
+<section xml:id="_支持列表">
+<title>支持列表</title>
 <section xml:id="_protobuf_boat_protobuf">
 <title>Protobuf: boat-protobuf</title>
-<simpara>boat-protobuf provides <literal>bean</literal>, <literal>convert</literal> and <literal>serialize</literal> handlers and processors for protobuf type object:</simpara>
+<simpara>boat-protobuf 提供为 <literal>bean</literal>, <literal>convert</literal> 何 <literal>serialize</literal> 领域的针对 protobuf 类型的处理器:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><literal>ProtobufBeanResolveHandler</literal>: Bean resolve handler supports protobuf types, extends from <literal>BeanResolveHandler</literal> (boat-core);</simpara>
+<simpara><literal>ProtobufBeanResolveHandler</literal>: 支持 protobuf 类型的bean解析器, 从 <literal>BeanResolveHandler</literal> (boat-core) 扩展;</simpara>
 </listitem>
 <listitem>
-<simpara><literal>ProtobufBeanProvider</literal>: <literal>BeanConvertHandler.NewBeanProvider</literal> (boat-core) supports protobuf types;</simpara>
+<simpara><literal>ProtobufBeanGenerator</literal>: 支持 protobuf 类型的 <literal>BeanConvertHandler.NewBeanProvider</literal> (boat-core);</simpara>
 </listitem>
 <listitem>
-<simpara><literal>ProtobufBeans.PROTOBUF_BEAN_RESOLVER</literal>: Bean resolve supports protobuf types, extends from <literal>BeanResolver</literal> (boat-core);</simpara>
+<simpara><literal>ProtobufBeans.PROTOBUF_BEAN_RESOLVER</literal>: 支持 protobuf 类型的bean解析器处理器, 从 <literal>BeanResolver</literal> (boat-core) 扩展;</simpara>
 </listitem>
 <listitem>
-<simpara>ProtobufConverts.PROTOBUF_CONVERTER: Converter supports protobuf types, extends from <literal>Converter</literal> (boat-core);</simpara>
+<simpara>ProtobufConverts.PROTOBUF_CONVERTER: 支持 protobuf 类型的类型转换器, 从 <literal>Converter</literal> (boat-core) 扩展;</simpara>
 </listitem>
 <listitem>
-<simpara>ProtobufJsons.PROTOBUF_OBJECT_MAPPER: <literal>Jackson</literal>'s <literal>ObjectMapper</literal> (boat-serialize) supports protobuf types;</simpara>
+<simpara>ProtobufJsons.PROTOBUF_OBJECT_MAPPER: <literal>Jackson</literal>的 <literal>ObjectMapper</literal> (boat-serialize), 支持 protobuf 类型;</simpara>
 </listitem>
 <listitem>
-<simpara>ProtobufJsons.PROTOBUF_JSON_SERIALIZER: <literal>JsonSerializer</literal> (boat-serialize) supports protobuf types.</simpara>
+<simpara>ProtobufJsons.PROTOBUF_JSON_SERIALIZER: <literal>JsonSerializer</literal> (boat-serialize), 支持 protobuf 类型.</simpara>
 </listitem>
 </itemizedlist>
 <warning>
-<simpara><literal>boat-protobuf</literal> need <literal>protoc</literal> to compile protobuf files, some architectures don&#8217;t support it (such as <literal>ARM</literal>).
-Check whether your environment support: <link xl:href="https://repo1.maven.org/maven2/com/google/protobuf/protoc/">https://repo1.maven.org/maven2/com/google/protobuf/protoc/</link></simpara>
+<simpara><literal>boat-protobuf</literal> 需要 <literal>protoc</literal> 来编译 protobuf 文件, 一些架构并不支持 (如 <literal>ARM</literal>).
+检查你的环境是否支持: <link xl:href="https://repo1.maven.org/maven2/com/google/protobuf/protoc/">https://repo1.maven.org/maven2/com/google/protobuf/protoc/</link></simpara>
 </warning>
 <formalpara>
 <title>Java Examples</title>

@@ -58,6 +58,12 @@ public class EventBusTest {
         public String stack = "";
 
         @Subscribe
+        public void sub20(Integer integer) {
+            logger.log("sub20:" + integer);
+            stack += "sub20";
+        }
+
+        @Subscribe
         public void sub21(String chars) {
             logger.log("sub21:" + chars);
             stack += "sub21";
@@ -74,6 +80,12 @@ public class EventBusTest {
         public void sub23(String chars) {
             logger.log("sub23:" + chars);
             stack += "sub23";
+        }
+
+        @Subscribe(priority = 300)
+        public void sub24(Integer integer) {
+            logger.log("sub20:" + integer);
+            stack += "sub20";
         }
     }
 }

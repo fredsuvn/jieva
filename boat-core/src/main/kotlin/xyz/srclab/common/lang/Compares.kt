@@ -13,6 +13,15 @@ val AS_COMPARABLE_COMPARATOR: Comparator<*> =
         c1.compareTo(c2)
     }
 
+/**
+ * Compares the inheritance tree in natural order,
+ * parent type is greater then subtype, so the subclass comes before the parent.
+ */
+@JvmField
+val INHERITANCE_COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
+    if (c1 == c2) 0 else if (c1.isAssignableFrom(c2)) 1 else if (c2.isAssignableFrom(c1)) -1 else 0
+}
+
 fun <T : Comparable<T>> T.inBounds(min: T, max: T): T {
     if (this < min) {
         return min
