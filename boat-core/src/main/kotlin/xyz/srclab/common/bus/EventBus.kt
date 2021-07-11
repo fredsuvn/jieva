@@ -164,10 +164,8 @@ interface EventBus {
 
             companion object {
 
-                private val COMPARATOR0 = INHERITANCE_COMPARATOR.reversed()
-
                 private val COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
-                    val r0 = COMPARATOR0.compare(c1, c2)
+                    val r0 = -INHERITANCE_COMPARATOR.compare(c1, c2)
                     if (r0 == 0) {
                         if (c1 == c2) {
                             return@Comparator r0
