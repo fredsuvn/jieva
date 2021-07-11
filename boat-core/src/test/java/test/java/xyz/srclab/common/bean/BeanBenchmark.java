@@ -83,6 +83,12 @@ public class BeanBenchmark {
      * BeanBenchmark.withBeanUtils    thrpt    3     366.501 ±   266.764  ops/ms
      * BeanBenchmark.withBeans        thrpt    3    7508.884 ±  5385.327  ops/ms
      * BeanBenchmark.withSetDirectly  thrpt    3  152606.863 ± 32203.076  ops/ms
+     *
+     * 2021-7-11/12 Convert use ConvertChain:
+     * Benchmark                       Mode  Cnt       Score       Error   Units
+     * BeanBenchmark.withBeanUtils    thrpt    3     381.610 ±     0.972  ops/ms
+     * BeanBenchmark.withBeans        thrpt    3    5070.789 ±    16.408  ops/ms
+     * BeanBenchmark.withSetDirectly  thrpt    3  153512.701 ± 14054.397  ops/ms
      */
     public static void main(String[] args) throws Exception {
         Options options = new OptionsBuilder().include(BeanBenchmark.class.getSimpleName()).build();

@@ -9,11 +9,11 @@ import xyz.srclab.common.convert.Converter
 /**
  * Converter supports protobuf types.
  *
- * @see ProtobufBeanProvider
+ * @see ProtobufBeanGenerator
  */
 @JvmField
 val PROTOBUF_CONVERTER: Converter = Converter.newConverter(
     ConvertHandler.defaultsWithBeanConvertHandler(
-        BeanConvertHandler(ProtobufBeanProvider, PROTOBUF_BEAN_RESOLVER)
+        BeanConvertHandler(ProtobufBeanGenerator, PROTOBUF_BEAN_RESOLVER)
     )
 )
