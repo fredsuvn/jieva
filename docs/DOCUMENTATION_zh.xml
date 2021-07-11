@@ -10,7 +10,7 @@
 <textobject><phrase>logo</phrase></textobject>
 </inlinemediaobject> Boat</title>
 <subtitle>SrcLab的Java/kotlin核心基础库</subtitle>
-<date>2021-07-09</date>
+<date>2021-07-12</date>
 <author>
 <personname>
 <firstname>孙谦</firstname>
@@ -26,22 +26,22 @@
 <simpara>Boat 包括:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-annotations/README.md">boat-annotations</link>: 核心注解;</simpara>
+<simpara><link xl:href="../boat-annotations/DOCUMENTATION.md">boat-annotations</link>: 核心注解;</simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-core/README.md">boat-core</link>: 核心库;</simpara>
+<simpara><link xl:href="../boat-core/DOCUMENTATION.md">boat-core</link>: 核心库;</simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-serialize/README.md">boat-serialize</link>: 序列化和反序列化核心库 (支持 <literal>JSON</literal>);</simpara>
+<simpara><link xl:href="../boat-serialize/DOCUMENTATION.md">boat-serialize</link>: 序列化和反序列化核心库 (支持 <literal>JSON</literal>);</simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-codec/README.md">boat-codec</link>: 编码核心库 (支持 <literal>HEX</literal>, <literal>BASE64</literal>, <literal>SHA</literal>, <literal>MD</literal>, <literal>HMAC</literal>, <literal>AES</literal>, <literal>RSA</literal>, <literal>SM2</literal> 等);</simpara>
+<simpara><link xl:href="../boat-codec/DOCUMENTATION.md">boat-codec</link>: 编码核心库 (支持 <literal>HEX</literal>, <literal>BASE64</literal>, <literal>SHA</literal>, <literal>MD</literal>, <literal>HMAC</literal>, <literal>AES</literal>, <literal>RSA</literal>, <literal>SM2</literal> 等);</simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-id/README.md">boat-id</link>: 快速ID生成框架;</simpara>
+<simpara><link xl:href="../boat-id/DOCUMENTATION.md">boat-id</link>: 快速ID生成框架;</simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-others/README.md">boat-others</link>: 第三方支持和扩展库 (如 <literal>protobuf</literal>);</simpara>
+<simpara><link xl:href="../boat-others/DOCUMENTATION.md">boat-others</link>: 第三方支持和扩展库 (如 <literal>protobuf</literal>);</simpara>
 </listitem>
 <listitem>
 <simpara><link xl:href="../boat-test/">boat-test</link>: 测试库的依赖管理工程;</simpara>
@@ -117,10 +117,10 @@
 <simpara>AsciiDoc:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-annotations/docs/README_en.adoc">English</link></simpara>
+<simpara><link xl:href="../boat-annotations/docs/DOCUMENTATION_en.adoc">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-annotations/docs/README_zh.adoc">简体中文</link></simpara>
+<simpara><link xl:href="../boat-annotations/docs/DOCUMENTATION_zh.adoc">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -128,10 +128,10 @@
 <simpara>Markdown:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-annotations/docs/README_en.md">English</link></simpara>
+<simpara><link xl:href="../boat-annotations/docs/DOCUMENTATION_en.md">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-annotations/docs/README_zh.md">简体中文</link></simpara>
+<simpara><link xl:href="../boat-annotations/docs/DOCUMENTATION_zh.md">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -139,10 +139,10 @@
 <simpara>HTML:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-annotations/docs/README_en.html">English</link></simpara>
+<simpara><link xl:href="../boat-annotations/docs/DOCUMENTATION_en.html">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-annotations/docs/README_zh.html">简体中文</link></simpara>
+<simpara><link xl:href="../boat-annotations/docs/DOCUMENTATION_zh.html">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -155,10 +155,10 @@
 <simpara>AsciiDoc:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-core/docs/README_en.adoc">English</link></simpara>
+<simpara><link xl:href="../boat-core/docs/DOCUMENTATION_en.adoc">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-core/docs/README_zh.adoc">简体中文</link></simpara>
+<simpara><link xl:href="../boat-core/docs/DOCUMENTATION_zh.adoc">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -166,10 +166,10 @@
 <simpara>Markdown:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-core/docs/README_en.md">English</link></simpara>
+<simpara><link xl:href="../boat-core/docs/DOCUMENTATION_en.md">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-core/docs/README_zh.md">简体中文</link></simpara>
+<simpara><link xl:href="../boat-core/docs/DOCUMENTATION_zh.md">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -177,10 +177,10 @@
 <simpara>HTML:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-core/docs/README_en.html">English</link></simpara>
+<simpara><link xl:href="../boat-core/docs/DOCUMENTATION_en.html">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-core/docs/README_zh.html">简体中文</link></simpara>
+<simpara><link xl:href="../boat-core/docs/DOCUMENTATION_zh.html">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -193,10 +193,10 @@
 <simpara>AsciiDoc:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-serialize/docs/README_en.adoc">English</link></simpara>
+<simpara><link xl:href="../boat-serialize/docs/DOCUMENTATION_en.adoc">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-serialize/docs/README_zh.adoc">简体中文</link></simpara>
+<simpara><link xl:href="../boat-serialize/docs/DOCUMENTATION_zh.adoc">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -204,10 +204,10 @@
 <simpara>Markdown:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-serialize/docs/README_en.md">English</link></simpara>
+<simpara><link xl:href="../boat-serialize/docs/DOCUMENTATION_en.md">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-serialize/docs/README_zh.md">简体中文</link></simpara>
+<simpara><link xl:href="../boat-serialize/docs/DOCUMENTATION_zh.md">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -215,10 +215,10 @@
 <simpara>HTML:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-serialize/docs/README_en.html">English</link></simpara>
+<simpara><link xl:href="../boat-serialize/docs/DOCUMENTATION_en.html">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-serialize/docs/README_zh.html">简体中文</link></simpara>
+<simpara><link xl:href="../boat-serialize/docs/DOCUMENTATION_zh.html">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -231,10 +231,10 @@
 <simpara>AsciiDoc:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-codec/docs/README_en.adoc">English</link></simpara>
+<simpara><link xl:href="../boat-codec/docs/DOCUMENTATION_en.adoc">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-codec/docs/README_zh.adoc">简体中文</link></simpara>
+<simpara><link xl:href="../boat-codec/docs/DOCUMENTATION_zh.adoc">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -242,10 +242,10 @@
 <simpara>Markdown:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-codec/docs/README_en.md">English</link></simpara>
+<simpara><link xl:href="../boat-codec/docs/DOCUMENTATION_en.md">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-codec/docs/README_zh.md">简体中文</link></simpara>
+<simpara><link xl:href="../boat-codec/docs/DOCUMENTATION_zh.md">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -253,10 +253,10 @@
 <simpara>HTML:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-codec/docs/README_en.html">English</link></simpara>
+<simpara><link xl:href="../boat-codec/docs/DOCUMENTATION_en.html">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-codec/docs/README_zh.html">简体中文</link></simpara>
+<simpara><link xl:href="../boat-codec/docs/DOCUMENTATION_zh.html">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -269,10 +269,10 @@
 <simpara>AsciiDoc:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-id/docs/README_en.adoc">English</link></simpara>
+<simpara><link xl:href="../boat-id/docs/DOCUMENTATION_en.adoc">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-id/docs/README_zh.adoc">简体中文</link></simpara>
+<simpara><link xl:href="../boat-id/docs/DOCUMENTATION_zh.adoc">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -280,10 +280,10 @@
 <simpara>Markdown:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-id/docs/README_en.md">English</link></simpara>
+<simpara><link xl:href="../boat-id/docs/DOCUMENTATION_en.md">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-id/docs/README_zh.md">简体中文</link></simpara>
+<simpara><link xl:href="../boat-id/docs/DOCUMENTATION_zh.md">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -291,10 +291,10 @@
 <simpara>HTML:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-id/docs/README_en.html">English</link></simpara>
+<simpara><link xl:href="../boat-id/docs/DOCUMENTATION_en.html">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-id/docs/README_zh.html">简体中文</link></simpara>
+<simpara><link xl:href="../boat-id/docs/DOCUMENTATION_zh.html">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -307,10 +307,10 @@
 <simpara>AsciiDoc:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-others/docs/README_en.adoc">English</link></simpara>
+<simpara><link xl:href="../boat-others/docs/DOCUMENTATION_en.adoc">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-others/docs/README_zh.adoc">简体中文</link></simpara>
+<simpara><link xl:href="../boat-others/docs/DOCUMENTATION_zh.adoc">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -318,10 +318,10 @@
 <simpara>Markdown:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-others/docs/README_en.md">English</link></simpara>
+<simpara><link xl:href="../boat-others/docs/DOCUMENTATION_en.md">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-others/docs/README_zh.md">简体中文</link></simpara>
+<simpara><link xl:href="../boat-others/docs/DOCUMENTATION_zh.md">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -329,10 +329,10 @@
 <simpara>HTML:</simpara>
 <itemizedlist>
 <listitem>
-<simpara><link xl:href="../boat-others/docs/README_en.html">English</link></simpara>
+<simpara><link xl:href="../boat-others/docs/DOCUMENTATION_en.html">English</link></simpara>
 </listitem>
 <listitem>
-<simpara><link xl:href="../boat-others/docs/README_zh.html">简体中文</link></simpara>
+<simpara><link xl:href="../boat-others/docs/DOCUMENTATION_zh.html">简体中文</link></simpara>
 </listitem>
 </itemizedlist>
 </listitem>

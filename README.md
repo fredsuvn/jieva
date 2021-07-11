@@ -1,19 +1,19 @@
 # ![](logo.svg) Boat: SrcLab Core Libraries for Java/kotlin
 
-## Read Me:
+## Documentation:
 
 - AsciiDoc:
-  * [English](docs/README_en.adoc)
-  * [简体中文](docs/README_zh.adoc)
+  * [English](docs/DOCUMENTATION_en.adoc)
+  * [简体中文](docs/DOCUMENTATION_zh.adoc)
 - Markdown:
-  * [English](docs/README_en.md)
-  * [简体中文](docs/README_zh.md)
+  * [English](docs/DOCUMENTATION_en.md)
+  * [简体中文](docs/DOCUMENTATION_zh.md)
 - HTML:
-  * [English](docs/README_en.html)
-  * [简体中文](docs/README_zh.html)
+  * [English](docs/DOCUMENTATION_en.html)
+  * [简体中文](docs/DOCUMENTATION_zh.html)
 - DocBook:
-  * [English](docs/README_en.xml)
-  * [简体中文](docs/README_zh.xml)
+  * [English](docs/DOCUMENTATION_en.xml)
+  * [简体中文](docs/DOCUMENTATION_zh.xml)
 
 More see [docs/](docs/)
 
