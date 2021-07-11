@@ -1,8 +1,8 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.lang.INHERITANCE_COMPARATOR
 import xyz.srclab.common.lang.asAny
-import xyz.srclab.common.reflect.INHERITANCE_COMPARATOR
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type

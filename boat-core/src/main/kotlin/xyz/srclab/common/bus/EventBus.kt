@@ -1,8 +1,8 @@
 package xyz.srclab.common.bus
 
 import xyz.srclab.common.invoke.Invoker
+import xyz.srclab.common.lang.INHERITANCE_COMPARATOR
 import xyz.srclab.common.lang.Next
-import xyz.srclab.common.reflect.INHERITANCE_COMPARATOR
 import xyz.srclab.common.run.Runner
 import java.util.*
 import java.util.concurrent.Executor
