@@ -1,7 +1,6 @@
 package test.java.xyz.srclab.common.proxy;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.lang.Current;
@@ -30,25 +29,27 @@ public class ProxyTest {
     }
 
     private <T extends TI> void doTestProxy(ProxyClassFactory proxyClassFactory, Class<T> type) {
+
         ProxyMethod<T> proxyMethod = new ProxyMethod<T>() {
-            @NotNull
-            @Override
-            public String name() {
-                return "hello";
-            }
 
             @Override
-            public Class<?>[] parameterTypes() {
-                return new Class[]{String.class, String.class};
+            public boolean proxy(@NotNull Method method) {
+                return method.getName().equals("hello")
+                    && Arrays.equals(method.getParameterTypes(), new Class[]{String.class, String.class});
             }
 
             @Override
             public Object invoke(
-                T proxied, @NotNull Method proxiedMethod, @Nullable Object[] args, @NotNull SuperInvoker superInvoker) {
+                @NotNull T proxied,
+                @NotNull Method proxiedMethod,
+                @NotNull SuperInvoke superInvoke,
+                Object @NotNull [] args
+            ) {
                 logger.log("method: {}, declaring class: {}", proxiedMethod, proxiedMethod.getDeclaringClass());
-                return "proxy-> " + (type.isInterface() ? "interface" : superInvoker.invoke(args));
+                return "proxy-> " + (type.isInterface() ? "interface" : superInvoke.invoke(args));
             }
         };
+
         ProxyClass<T> proxyClass = ProxyClass.newProxyClass(
             type, Arrays.asList(proxyMethod), Current.classLoader(), proxyClassFactory);
         Assert.assertEquals(

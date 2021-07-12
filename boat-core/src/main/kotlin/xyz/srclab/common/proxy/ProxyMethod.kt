@@ -1,25 +1,21 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import java.lang.reflect.Method
 
 /**
+ * Represents a proxy method.
+ *
  * @author sunqian
  */
-interface ProxyMethod<T> {
+interface ProxyMethod<T : Any> {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val name: String
-        @JvmName("name") get
+    /**
+     * Returns whether proxy specified [method].
+     */
+    fun proxy(method: Method): Boolean
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val parameterTypes: Array<Class<*>>
-        @JvmName("parameterTypes") get
-
-    fun invoke(proxied: T, proxiedMethod: Method, args: Array<out Any?>?, superInvoker: SuperInvoker): Any?
-}
-
-interface SuperInvoker {
-
-    fun invoke(args: Array<out Any?>?): Any?
+    /**
+     * Proxy action
+     */
+    fun invoke(proxied: T, proxiedMethod: Method, superInvoke: SuperInvoke, args: Array<out Any?>): Any?
 }

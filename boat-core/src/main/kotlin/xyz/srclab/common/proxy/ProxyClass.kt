@@ -3,13 +3,9 @@ package xyz.srclab.common.proxy
 import xyz.srclab.common.lang.Current
 
 /**
- * Proxy class.
+ * Proxy class to create proxy instance.
  *
- * This class first try to use spring-cglib if it exists in current classpath,
- * if not, try cglib,
- * if not, use jdk-proxy.
- * @author sunqian
- *
+ * @see ProxyClassFactory
  * @see SpringProxyClassFactory
  * @see CglibProxyClassFactory
  * @see JdkProxyClassFactory

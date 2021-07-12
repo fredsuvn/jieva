@@ -2112,11 +2112,10 @@ class InvokeSample {
 <pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.core.proxy;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testng.annotations.Test;
 import xyz.srclab.common.proxy.ProxyClass;
 import xyz.srclab.common.proxy.ProxyMethod;
-import xyz.srclab.common.proxy.SuperInvoker;
+import xyz.srclab.common.proxy.SuperInvoke;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Method;
@@ -2132,26 +2131,21 @@ public class ProxySample {
             Object.class,
             Arrays.asList(
                 new ProxyMethod&lt;Object&gt;() {
-                    @NotNull
+
                     @Override
-                    public String name() {
-                        return "toString";
+                    public boolean proxy(@NotNull Method method) {
+                        return method.getName().equals("toString")
+                            &amp;&amp; Arrays.equals(method.getParameterTypes(), new Class[0]);
                     }
 
-                    @NotNull
-                    @Override
-                    public Class&lt;?&gt;[] parameterTypes() {
-                        return new Class[0];
-                    }
-
-                    @Nullable
                     @Override
                     public Object invoke(
-                        Object proxied,
+                        @NotNull Object proxied,
                         @NotNull Method proxiedMethod,
-                        @Nullable Object[] args, @NotNull SuperInvoker superInvoker
+                        @NotNull SuperInvoke superInvoke,
+                        Object @NotNull [] args
                     ) {
-                        return "Proxy[super: " + superInvoker.invoke(args) + "]";
+                        return "Proxy[super: " + superInvoke.invoke(args) + "]";
                     }
                 }
             )
@@ -2169,36 +2163,36 @@ public class ProxySample {
 <pre class="highlight"><code class="language-kotlin" data-lang="kotlin">package sample.kotlin.xyz.srclab.core.proxy
 
 import org.testng.annotations.Test
-import xyz.srclab.common.proxy.ProxyClass.Companion.newProxyClass
+import xyz.srclab.common.proxy.ProxyClass
 import xyz.srclab.common.proxy.ProxyMethod
-import xyz.srclab.common.proxy.SuperInvoker
+import xyz.srclab.common.proxy.SuperInvoke
 import xyz.srclab.common.test.TestLogger
 import java.lang.reflect.Method
+import java.util.*
 
 class ProxySample {
 
     @Test
     fun testProxy() {
-        val proxyClass = newProxyClass(
+        val proxyClass = ProxyClass.newProxyClass(
             Any::class.java,
             listOf(
                 object : ProxyMethod&lt;Any&gt; {
-                    override val name: String
-                        get() {
-                            return "toString"
-                        }
 
-                    override val parameterTypes: Array&lt;Class&lt;*&gt;&gt;
-                        get() {
-                            return emptyArray()
-                        }
+                    override fun proxy(method: Method): Boolean {
+                        return method.name == "toString" &amp;&amp; Arrays.equals(
+                            method.parameterTypes,
+                            arrayOfNulls&lt;Class&lt;*&gt;&gt;(0)
+                        )
+                    }
 
                     override fun invoke(
                         proxied: Any,
                         proxiedMethod: Method,
-                        args: Array&lt;out Any?&gt;?, superInvoker: SuperInvoker
-                    ): Any? {
-                        return "Proxy[super: " + superInvoker.invoke(args) + "]"
+                        superInvoke: SuperInvoke,
+                        args: Array&lt;out Any?&gt;
+                    ): Any {
+                        return "Proxy[super: " + superInvoke.invoke(*args) + "]"
                     }
                 }
             )
