@@ -23,7 +23,11 @@ object JdkProxyClassFactory : ProxyClassFactory {
     ) : ProxyClass<T> {
 
         override fun newInstance(): T {
-            return Proxy.newProxyInstance(classLoader, arrayOf(proxyClass), ProxyMethodInterceptor(proxyMethods))
+            return Proxy.newProxyInstance(
+                classLoader,
+                arrayOf(proxyClass),
+                ProxyMethodInterceptor(proxyClass, proxyMethods)
+            )
                 .asAny()
         }
 
@@ -32,12 +36,20 @@ object JdkProxyClassFactory : ProxyClassFactory {
         }
     }
 
-    private class ProxyMethodInterceptor<T : Any>(val proxyMethods: Iterable<ProxyMethod<T>>) : InvocationHandler {
+    private class ProxyMethodInterceptor<T : Any>(
+        proxyClass: Class<T>,
+        val proxyMethods: Iterable<ProxyMethod<T>>
+    ) : InvocationHandler {
 
         private val methodMap: Map<String, ProxyMethod<T>> by lazy {
             val map = HashMap<String, ProxyMethod<T>>()
-            for (proxyMethod in proxyMethods) {
-                map["${proxyMethod.name}${proxyMethod.parameterTypes.jvmDescriptor}"] = proxyMethod
+            val methods = proxyClass.methods
+            for (method in methods) {
+                for (proxyMethod in proxyMethods) {
+                    if (proxyMethod.proxy(method)) {
+                        map["${method.name}${method.parameterTypes.jvmDescriptor}"] = proxyMethod
+                    }
+                }
             }
             map
         }
@@ -56,11 +68,12 @@ object JdkProxyClassFactory : ProxyClassFactory {
             method: Method,
             args: Array<out Any>?
         ): Any? {
-            return proxyMethod.invoke(proxy.asAny(), method, args, object : SuperInvoker {
-                override fun invoke(args: Array<out Any?>?): Any? {
+            val superInvoke = object : SuperInvoke {
+                override fun invoke(vararg args: Any?): Any? {
                     throw IllegalStateException("Cannot call a interface method: $method")
                 }
-            })
+            }
+            return proxyMethod.invoke(proxy.asAny(), method, superInvoke, *args ?: emptyArray())
         }
     }
 }

@@ -2,6 +2,15 @@ package xyz.srclab.common.proxy
 
 import xyz.srclab.common.lang.loadClassOrNull
 
+/**
+ * Factory to create [ProxyClass].
+ *
+ * Default implementations in priority order are:
+ *
+ * * spring-cglib
+ * * cglib
+ * * jdk-proxy
+ */
 interface ProxyClassFactory {
 
     fun <T : Any> create(

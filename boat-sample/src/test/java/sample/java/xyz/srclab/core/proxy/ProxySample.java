@@ -1,11 +1,10 @@
 package sample.java.xyz.srclab.core.proxy;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testng.annotations.Test;
 import xyz.srclab.common.proxy.ProxyClass;
 import xyz.srclab.common.proxy.ProxyMethod;
-import xyz.srclab.common.proxy.SuperInvoker;
+import xyz.srclab.common.proxy.SuperInvoke;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Method;
@@ -21,26 +20,21 @@ public class ProxySample {
             Object.class,
             Arrays.asList(
                 new ProxyMethod<Object>() {
-                    @NotNull
+
                     @Override
-                    public String name() {
-                        return "toString";
+                    public boolean proxy(@NotNull Method method) {
+                        return method.getName().equals("toString")
+                            && Arrays.equals(method.getParameterTypes(), new Class[0]);
                     }
 
-                    @NotNull
-                    @Override
-                    public Class<?>[] parameterTypes() {
-                        return new Class[0];
-                    }
-
-                    @Nullable
                     @Override
                     public Object invoke(
-                        Object proxied,
+                        @NotNull Object proxied,
                         @NotNull Method proxiedMethod,
-                        @Nullable Object[] args, @NotNull SuperInvoker superInvoker
+                        @NotNull SuperInvoke superInvoke,
+                        Object @NotNull [] args
                     ) {
-                        return "Proxy[super: " + superInvoker.invoke(args) + "]";
+                        return "Proxy[super: " + superInvoke.invoke(args) + "]";
                     }
                 }
             )
