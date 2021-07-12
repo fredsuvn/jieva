@@ -42,6 +42,18 @@ interface Invoker {
      */
     fun <T> invokeWith(`object`: Any?, force: Boolean, vararg args: Any?): T
 
+    /**
+     * Invokes this [Invoker] with [object] -- owner of this [Invoker].
+     */
+    @JvmDefault
+    fun invokeWith(`object`: Any?): Invoke {
+        return object : Invoke {
+            override fun <T> startWith(force: Boolean, vararg args: Any?): T {
+                return invokeWith(`object`, force, *args)
+            }
+        }
+    }
+
     companion object : InvokerProvider {
 
         private val defaultProvider = ReflectedInvokerProvider

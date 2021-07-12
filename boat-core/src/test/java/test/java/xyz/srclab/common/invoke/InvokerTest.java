@@ -2,11 +2,10 @@ package test.java.xyz.srclab.common.invoke;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.invoke.Invoker;
-import xyz.srclab.common.invoke.InvokerProvider;
-import xyz.srclab.common.invoke.MethodHandlerInvokerProvider;
-import xyz.srclab.common.invoke.ReflectedInvokerProvider;
+import xyz.srclab.common.invoke.*;
 import xyz.srclab.common.test.TestMarker;
+
+import java.lang.reflect.Method;
 
 /**
  * @author sunqian
@@ -26,6 +25,13 @@ public class InvokerTest {
     @Test
     public void testMethodHandlerInvoker() {
         testInvokerProvider(MethodHandlerInvokerProvider.INSTANCE);
+    }
+
+    @Test
+    public void testInvoke() throws Exception {
+        Method method = A.class.getMethod("a1");
+        Invoke invoke = Invoker.forMethod(method).invokeWith(new A());
+        Assert.assertEquals(invoke.start(), "a1");
     }
 
     private void testInvokerProvider(InvokerProvider ip) {
