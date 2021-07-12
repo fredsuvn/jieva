@@ -31,15 +31,15 @@ task(group: "asciidoc", "convertHtmlToMarkdown") {
   }
 }
 
-//asciidoc -> html, docbook, markdown
-task(group: "asciidoc", "convertAsciidocToAll") {
+//asciidoc -> html, markdown
+task(group: "asciidoc", "convertAsciidocToHtmlMarkdown") {
   doLast {
     for (action in convertAsciidocToHtml.actions) {
       action.execute(convertAsciidocToHtml)
     }
-    for (action in convertAsciidocToDocBook.actions) {
-      action.execute(convertAsciidocToDocBook)
-    }
+    //for (action in convertAsciidocToDocBook.actions) {
+    //  action.execute(convertAsciidocToDocBook)
+    //}
     for (action in convertHtmlToMarkdown.actions) {
       action.execute(convertHtmlToMarkdown)
     }

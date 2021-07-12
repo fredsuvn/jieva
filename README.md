@@ -11,9 +11,6 @@
 - HTML:
   * [English](docs/DOCUMENTATION_en.html)
   * [简体中文](docs/DOCUMENTATION_zh.html)
-- DocBook:
-  * [English](docs/DOCUMENTATION_en.xml)
-  * [简体中文](docs/DOCUMENTATION_zh.xml)
 
 More see [docs/](docs/)
 
