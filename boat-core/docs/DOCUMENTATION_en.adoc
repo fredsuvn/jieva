@@ -85,7 +85,7 @@ Convert package supports various types conversion each other:
 * `Converts`: Default utilities for type conversion operation;
 * `Converter`: Core interfaces for type conversion, `Converts` use its default implementation;
 * `ConvertHandler`: Handler to process converting for `Converter`;
-* `FastConverter`: A fast type converter which must specify the target type;
+* `FastConverter`: A fast type of converter;
 
 .Java Examples
 [source,java]
