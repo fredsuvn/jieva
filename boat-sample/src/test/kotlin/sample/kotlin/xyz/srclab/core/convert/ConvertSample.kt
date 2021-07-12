@@ -17,7 +17,7 @@ class ConvertSample {
         a.p1 = "1"
         a.p2 = "2"
         val b = a.convert(
-            B::class.java
+                B::class.java
         )
         //1
         logger.log("b1: {}", b.p1)
@@ -25,11 +25,11 @@ class ConvertSample {
         logger.log("b1: {}", b.p2)
 
         val fastConverter =
-            FastConverter.newFastConverter(listOf(IntToStringConvertHandler, NumberToStringConvertHandler))
-        //I123
+                FastConverter.newFastConverter(FastHandler())
+        //123
         logger.log(fastConverter.convert(123, String::class.java))
-        //N123
-        logger.log(fastConverter.convert(123L, String::class.java))
+        //123
+        logger.log(fastConverter.convert("123", Int::class.javaPrimitiveType!!))
     }
 
 
@@ -48,18 +48,15 @@ class B {
     var p2 = 0
 }
 
-private object IntToStringConvertHandler : FastConvertHandler<Int, String> {
-    override val fromType: Class<*> = Int::class.java
-    override val toType: Class<*> = String::class.java
-    override fun convert(from: Int): String {
-        return "I$from"
-    }
-}
+class FastHandler {
 
-private object NumberToStringConvertHandler : FastConvertHandler<Number, String> {
-    override val fromType: Class<*> = Number::class.java
-    override val toType: Class<*> = String::class.java
-    override fun convert(from: Number): String {
-        return "N$from"
+    @FastConvertHandler
+    fun intToString(i: Integer): String {
+        return i.toString()
+    }
+
+    @FastConvertHandler
+    fun stringToInt(str: String): Int {
+        return str.toInt()
     }
 }
