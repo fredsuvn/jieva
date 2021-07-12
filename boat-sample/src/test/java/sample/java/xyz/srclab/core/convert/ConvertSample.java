@@ -1,13 +1,10 @@
 package sample.java.xyz.srclab.core.convert;
 
-import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import xyz.srclab.common.convert.Converts;
 import xyz.srclab.common.convert.FastConvertHandler;
 import xyz.srclab.common.convert.FastConverter;
 import xyz.srclab.common.test.TestLogger;
-
-import java.util.Arrays;
 
 public class ConvertSample {
 
@@ -28,12 +25,11 @@ public class ConvertSample {
         //2
         logger.log("b1: {}", b.getP2());
 
-        FastConverter fastConverter = FastConverter.newFastConverter(
-            Arrays.asList(new IntToStringConvertHandler(), new NumberToStringConvertHandler()));
-        //I123
+        FastConverter fastConverter = FastConverter.newFastConverter(new FastHandler());
+        //123
         logger.log(fastConverter.convert(123, String.class));
-        //N123
-        logger.log(fastConverter.convert(123L, String.class));
+        //123
+        logger.log(fastConverter.convert("123", int.class));
     }
 
     public static class A {
@@ -78,45 +74,16 @@ public class ConvertSample {
         }
     }
 
-    private static class IntToStringConvertHandler implements FastConvertHandler<Integer, String> {
+    public static class FastHandler {
 
-        @NotNull
-        @Override
-        public Class<?> fromType() {
-            return Integer.class;
+        @FastConvertHandler
+        public String intToString(Integer i) {
+            return String.valueOf(i);
         }
 
-        @NotNull
-        @Override
-        public Class<?> toType() {
-            return String.class;
-        }
-
-        @NotNull
-        @Override
-        public String convert(@NotNull Integer from) {
-            return "I" + from;
-        }
-    }
-
-    private static class NumberToStringConvertHandler implements FastConvertHandler<Number, String> {
-
-        @NotNull
-        @Override
-        public Class<?> fromType() {
-            return Number.class;
-        }
-
-        @NotNull
-        @Override
-        public Class<?> toType() {
-            return String.class;
-        }
-
-        @NotNull
-        @Override
-        public String convert(@NotNull Number from) {
-            return "N" + from;
+        @FastConvertHandler
+        public int stringToInt(String str) {
+            return Integer.parseInt(str);
         }
     }
 }

@@ -86,7 +86,7 @@ Convert包提供大量的类型转换功能:
 * `Converts`: 类型转换工具类;
 * `Converter`: 类型转换的核心接口, `Converts` 使用它的默认实现;
 * `ConvertHandler`: `Converter` 用来转换的处理器;
-* `FastConverter`: 一种定向类型转换的转换器;
+* `FastConverter`: 一种快速转换器;
 
 .Java Examples
 [source,java]

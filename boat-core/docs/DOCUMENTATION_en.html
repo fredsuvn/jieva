@@ -1500,7 +1500,7 @@ class BeanSample {
 <p><code>ConvertHandler</code>: Handler to process converting for <code>Converter</code>;</p>
 </li>
 <li>
-<p><code>FastConverter</code>: A fast type converter which must specify the target type;</p>
+<p><code>FastConverter</code>: A fast type of converter;</p>
 </li>
 </ul>
 </div>
@@ -1509,14 +1509,11 @@ class BeanSample {
 <div class="content">
 <pre class="highlight"><code class="language-java" data-lang="java">package sample.java.xyz.srclab.core.convert;
 
-import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import xyz.srclab.common.convert.Converts;
 import xyz.srclab.common.convert.FastConvertHandler;
 import xyz.srclab.common.convert.FastConverter;
 import xyz.srclab.common.test.TestLogger;
-
-import java.util.Arrays;
 
 public class ConvertSample {
 
@@ -1537,12 +1534,11 @@ public class ConvertSample {
         //2
         logger.log("b1: {}", b.getP2());
 
-        FastConverter fastConverter = FastConverter.newFastConverter(
-            Arrays.asList(new IntToStringConvertHandler(), new NumberToStringConvertHandler()));
-        //I123
+        FastConverter fastConverter = FastConverter.newFastConverter(new FastHandler());
+        //123
         logger.log(fastConverter.convert(123, String.class));
-        //N123
-        logger.log(fastConverter.convert(123L, String.class));
+        //123
+        logger.log(fastConverter.convert("123", int.class));
     }
 
     public static class A {
@@ -1587,45 +1583,16 @@ public class ConvertSample {
         }
     }
 
-    private static class IntToStringConvertHandler implements FastConvertHandler&lt;Integer, String&gt; {
+    public static class FastHandler {
 
-        @NotNull
-        @Override
-        public Class&lt;?&gt; fromType() {
-            return Integer.class;
+        @FastConvertHandler
+        public String intToString(Integer i) {
+            return String.valueOf(i);
         }
 
-        @NotNull
-        @Override
-        public Class&lt;?&gt; toType() {
-            return String.class;
-        }
-
-        @NotNull
-        @Override
-        public String convert(@NotNull Integer from) {
-            return "I" + from;
-        }
-    }
-
-    private static class NumberToStringConvertHandler implements FastConvertHandler&lt;Number, String&gt; {
-
-        @NotNull
-        @Override
-        public Class&lt;?&gt; fromType() {
-            return Number.class;
-        }
-
-        @NotNull
-        @Override
-        public Class&lt;?&gt; toType() {
-            return String.class;
-        }
-
-        @NotNull
-        @Override
-        public String convert(@NotNull Number from) {
-            return "N" + from;
+        @FastConvertHandler
+        public int stringToInt(String str) {
+            return Integer.parseInt(str);
         }
     }
 }</code></pre>
@@ -1653,7 +1620,7 @@ class ConvertSample {
         a.p1 = "1"
         a.p2 = "2"
         val b = a.convert(
-            B::class.java
+                B::class.java
         )
         //1
         logger.log("b1: {}", b.p1)
@@ -1661,11 +1628,11 @@ class ConvertSample {
         logger.log("b1: {}", b.p2)
 
         val fastConverter =
-            FastConverter.newFastConverter(listOf(IntToStringConvertHandler, NumberToStringConvertHandler))
-        //I123
+                FastConverter.newFastConverter(FastHandler())
+        //123
         logger.log(fastConverter.convert(123, String::class.java))
-        //N123
-        logger.log(fastConverter.convert(123L, String::class.java))
+        //123
+        logger.log(fastConverter.convert("123", Int::class.javaPrimitiveType!!))
     }
 
 
@@ -1684,19 +1651,16 @@ class B {
     var p2 = 0
 }
 
-private object IntToStringConvertHandler : FastConvertHandler&lt;Int, String&gt; {
-    override val fromType: Class&lt;*&gt; = Int::class.java
-    override val toType: Class&lt;*&gt; = String::class.java
-    override fun convert(from: Int): String {
-        return "I$from"
-    }
-}
+class FastHandler {
 
-private object NumberToStringConvertHandler : FastConvertHandler&lt;Number, String&gt; {
-    override val fromType: Class&lt;*&gt; = Number::class.java
-    override val toType: Class&lt;*&gt; = String::class.java
-    override fun convert(from: Number): String {
-        return "N$from"
+    @FastConvertHandler
+    fun intToString(i: Integer): String {
+        return i.toString()
+    }
+
+    @FastConvertHandler
+    fun stringToInt(str: String): Int {
+        return str.toInt()
     }
 }</code></pre>
 </div>

@@ -1,17 +1,14 @@
 package xyz.srclab.common.convert
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.lang.INHERITANCE_COMPARATOR
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.invoke.Invoke
+import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.reflect.TypeRef
-import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
 
 /**
  * Fast version of [Converter].
  *
- * It uses [FastConvertHandler] which must provide [FastConvertHandler.fromType] and [FastConvertHandler.toType]
- * to ensure supported `fromType` and `toType`.
+ * By default, it compute `fromType` and `toType`'s hash codes to find exactly matched [FastConvertHandler].
  *
  * @see FastConvertHandler
  */
@@ -20,6 +17,7 @@ interface FastConverter {
     /**
      * Convert from [from] to [R].
      */
+    @Throws(UnsupportedConvertException::class)
     @JvmDefault
     fun <T : Any, R : Any> convert(from: T, toType: Class<R>): R {
         return convert(from, toType as Type)
@@ -28,6 +26,7 @@ interface FastConverter {
     /**
      * Convert from [from] to [R].
      */
+    @Throws(UnsupportedConvertException::class)
     @JvmDefault
     fun <T : Any, R : Any> convert(from: T, toType: Type): R {
         return convert(from, from.javaClass, toType)
@@ -36,11 +35,13 @@ interface FastConverter {
     /**
      * Convert from [from] to [R].
      */
+    @Throws(UnsupportedConvertException::class)
     fun <T : Any, R : Any> convert(from: T, fromType: Type, toType: Type): R
 
     /**
      * Convert from [from] to [R].
      */
+    @Throws(UnsupportedConvertException::class)
     @JvmDefault
     fun <T : Any, R : Any> convert(from: T, toType: TypeRef<R>): R {
         return convert(from, toType.type)
@@ -49,6 +50,7 @@ interface FastConverter {
     /**
      * Convert from [from] to [R].
      */
+    @Throws(UnsupportedConvertException::class)
     @JvmDefault
     fun <T : Any, R : Any> convert(from: T, fromType: TypeRef<T>, toType: TypeRef<R>): R {
         return convert(from, fromType.type, toType.type)
@@ -56,79 +58,46 @@ interface FastConverter {
 
     companion object {
 
-        @JvmOverloads
         @JvmStatic
-        fun newFastConverter(
-            handlers: Iterable<FastConvertHandler<*, *>>,
-            failedHandler: FastConvertHandler<*, *> = DefaultFailedFastConvertHandler
-        ): FastConverter {
-            return FastConverterImpl(handlers, failedHandler)
+        fun newFastConverter(handler: Any): FastConverter {
+            return newFastConverter(listOf(handler))
+        }
+
+        @JvmStatic
+        fun newFastConverter(handlers: Iterable<Any>): FastConverter {
+            return FastConverterImpl(handlers)
         }
 
         private class FastConverterImpl(
-            handlers: Iterable<FastConvertHandler<*, *>>,
-            failedHandler: FastConvertHandler<*, *>
+                handlers: Iterable<Any>
         ) : FastConverter {
 
-            private val handlerMap: Map<Pair<Class<*>, Class<*>>, FastConvertHandler<*, *>> =
-                handlers.associateBy { it.fromType to it.toType }
-            private val handlerArray: Array<FastConvertHandler<*, *>> = handlers
-                .sortedWith label@{ it1, it2 ->
-                    val c1From = it1.fromType
-                    val c2From = it2.fromType
-                    val c1To = it1.toType
-                    val c2To = it2.toType
-                    val fromCompare = INHERITANCE_COMPARATOR.compare(c1From, c2From)
-                    if (fromCompare != 0) {
-                        return@label fromCompare
+            private val handlerMap: Map<Pair<Type, Type>, Invoke> = run {
+                val map = HashMap<Pair<Type, Type>, Invoke>()
+                for (handler in handlers) {
+                    val methods = handler.javaClass.methods
+                    for (method in methods) {
+                        val annotation = method.getAnnotation(FastConvertHandler::class.java)
+                        if (annotation === null) {
+                            continue
+                        }
+                        if (method.parameterCount != 1 || method.returnType == Void::class.java) {
+                            continue
+                        }
+                        map[method.genericParameterTypes[0] to method.genericReturnType] =
+                                Invoker.forMethod(method).invokeWith(handler)
                     }
-                    INHERITANCE_COMPARATOR.compare(c1To, c2To)
                 }
-                .toTypedArray()
-            private val failedHandler: FastConvertHandler<Any, *> = failedHandler.asAny()
+                map
+            }
 
             override fun <T : Any, R : Any> convert(from: T, fromType: Type, toType: Type): R {
-                val key = fromType to toType
-                val mapHandler: FastConvertHandler<Any, *>? = handlerMap[key].asAny()
-                if (mapHandler !== null) {
-                    return mapHandler.convert(from).asAny()
+                val invoke = handlerMap[fromType to toType]
+                if (invoke === null) {
+                    throw UnsupportedConvertException("$fromType to $toType")
                 }
-                for (fastConvertHandler in handlerArray) {
-                    if (fastConvertHandler.fromType.isAssignableFrom(fromType.rawClass)
-                        && toType.rawClass.isAssignableFrom(fastConvertHandler.toType)
-                    ) {
-                        val handler: FastConvertHandler<Any, *> = fastConvertHandler.asAny()
-                        return handler.convert(from).asAny()
-                    }
-                }
-                return failedHandler.convert(from).asAny()
+                return invoke.start(from)
             }
         }
-    }
-}
-
-/**
- * Handler for [FastConverter], support convert [T] to [R].
- *
- * @see FastConverter
- */
-interface FastConvertHandler<T : Any, R : Any> {
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val fromType: Class<*>
-        @JvmName("fromType") get
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val toType: Class<*>
-        @JvmName("toType") get
-
-    fun convert(from: T): R
-}
-
-object DefaultFailedFastConvertHandler : FastConvertHandler<Any, Nothing> {
-    override val fromType: Class<*> = Any::class.java
-    override val toType: Class<*> = Nothing::class.java
-    override fun convert(from: Any): Nothing {
-        throw UnsupportedOperationException("${from.javaClass}")
     }
 }

@@ -100,7 +100,7 @@ interface Converter {
 
                 override fun next(from: Any?, fromType: Type, toType: Type): Any? {
                     if (!handlerIterator.hasNext()) {
-                        throw UnsupportedConvertException("Cannot convert $fromType to $toType.")
+                        throw UnsupportedConvertException("$fromType to $toType.")
                     }
                     val handler = handlerIterator.next()
                     return handler.convert(from, fromType, toType, this)
