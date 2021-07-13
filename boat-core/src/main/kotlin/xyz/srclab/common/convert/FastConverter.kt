@@ -79,7 +79,7 @@ interface FastConverter {
                     val methods = handler.javaClass.methods
                     for (method in methods) {
                         val annotation = method.getAnnotation(FastConvertMethod::class.java)
-                        if (annotation === null) {
+                        if (annotation === null || method.isBridge) {
                             continue
                         }
                         if (method.parameterCount != 1 || method.returnType == Void::class.java) {

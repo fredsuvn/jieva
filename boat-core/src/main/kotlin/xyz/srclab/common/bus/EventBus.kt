@@ -118,7 +118,7 @@ interface EventBus {
                 val result: MutableMap<Class<*>, MutableList<Action>> = HashMap()
                 for (method in eventHandler.javaClass.methods) {
                     val subscribe = method.getAnnotation(SubscribeMethod::class.java)
-                    if (subscribe === null) {
+                    if (subscribe === null || method.isBridge) {
                         continue
                     }
                     if (method.parameterCount != 1) {
