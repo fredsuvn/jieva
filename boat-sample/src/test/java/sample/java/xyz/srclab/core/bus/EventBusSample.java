@@ -2,7 +2,7 @@ package sample.java.xyz.srclab.core.bus;
 
 import org.testng.annotations.Test;
 import xyz.srclab.common.bus.EventBus;
-import xyz.srclab.common.bus.Subscribe;
+import xyz.srclab.common.bus.SubscribeMethod;
 import xyz.srclab.common.lang.Next;
 import xyz.srclab.common.test.TestLogger;
 
@@ -25,26 +25,26 @@ public class EventBusSample {
 
         public String stack = "";
 
-        @Subscribe(priority = 100)
+        @SubscribeMethod(priority = 100)
         public void sub0(CharSequence chars) {
             logger.log("sub0:" + chars);
             stack += "sub0";
         }
 
-        @Subscribe
+        @SubscribeMethod
         public void sub1(String chars) {
             logger.log("sub1:" + chars);
             stack += "sub1";
         }
 
-        @Subscribe(priority = 100)
+        @SubscribeMethod(priority = 100)
         public Next sub2(String chars) {
             logger.log("sub2:" + chars);
             stack += "sub2";
             return Next.BREAK;
         }
 
-        @Subscribe(priority = 200)
+        @SubscribeMethod(priority = 200)
         public void sub3(String chars) {
             logger.log("sub3:" + chars);
             stack += "sub3";
