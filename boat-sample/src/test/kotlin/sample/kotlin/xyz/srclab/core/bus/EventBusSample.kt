@@ -2,7 +2,7 @@ package sample.kotlin.xyz.srclab.core.bus
 
 import org.testng.annotations.Test
 import xyz.srclab.common.bus.EventBus
-import xyz.srclab.common.bus.Subscribe
+import xyz.srclab.common.bus.SubscribeMethod
 import xyz.srclab.common.lang.Next
 import xyz.srclab.common.test.TestLogger
 
@@ -23,26 +23,26 @@ class EventBusSample {
 
         var stack = ""
 
-        @Subscribe(priority = 100)
+        @SubscribeMethod(priority = 100)
         fun sub0(chars: CharSequence) {
             logger.log("sub0:$chars")
             stack += "sub0"
         }
 
-        @Subscribe
+        @SubscribeMethod
         fun sub1(chars: String) {
             logger.log("sub1:$chars")
             stack += "sub1"
         }
 
-        @Subscribe(priority = 100)
+        @SubscribeMethod(priority = 100)
         fun sub2(chars: String): Next {
             logger.log("sub2:$chars")
             stack += "sub2"
             return Next.BREAK
         }
 
-        @Subscribe(priority = 200)
+        @SubscribeMethod(priority = 200)
         fun sub3(chars: String) {
             logger.log("sub3:$chars")
             stack += "sub3"

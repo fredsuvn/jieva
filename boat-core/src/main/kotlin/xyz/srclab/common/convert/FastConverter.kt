@@ -8,9 +8,10 @@ import java.lang.reflect.Type
 /**
  * Fast version of [Converter].
  *
- * By default, it compute `fromType` and `toType`'s hash codes to find exactly matched [FastConvertHandler].
+ * By default, it uses a set of fast-convert-handlers -- which have methods annotated by [FastConvertMethod].
+ * Each convert method has one parameter as `fromType`, and returns `toType` of value.
  *
- * @see FastConvertHandler
+ * @see FastConvertMethod
  */
 interface FastConverter {
 
@@ -69,7 +70,7 @@ interface FastConverter {
         }
 
         private class FastConverterImpl(
-                handlers: Iterable<Any>
+            handlers: Iterable<Any>
         ) : FastConverter {
 
             private val handlerMap: Map<Pair<Type, Type>, Invoke> = run {
@@ -77,15 +78,17 @@ interface FastConverter {
                 for (handler in handlers) {
                     val methods = handler.javaClass.methods
                     for (method in methods) {
-                        val annotation = method.getAnnotation(FastConvertHandler::class.java)
-                        if (annotation === null) {
+                        val annotation = method.getAnnotation(FastConvertMethod::class.java)
+                        if (annotation === null || method.isBridge) {
                             continue
                         }
                         if (method.parameterCount != 1 || method.returnType == Void::class.java) {
-                            continue
+                            throw IllegalArgumentException(
+                                "Fast convert method must have only one parameter and a non-void type of return value."
+                            )
                         }
                         map[method.genericParameterTypes[0] to method.genericReturnType] =
-                                Invoker.forMethod(method).invokeWith(handler)
+                            Invoker.forMethod(method).invokeWith(handler)
                     }
                 }
                 map

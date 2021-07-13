@@ -1003,7 +1003,7 @@ Java Examples
 
     import org.testng.annotations.Test;
     import xyz.srclab.common.convert.Converts;
-    import xyz.srclab.common.convert.FastConvertHandler;
+    import xyz.srclab.common.convert.FastConvertMethod;
     import xyz.srclab.common.convert.FastConverter;
     import xyz.srclab.common.test.TestLogger;
 
@@ -1077,12 +1077,12 @@ Java Examples
 
         public static class FastHandler {
 
-            @FastConvertHandler
+            @FastConvertMethod
             public String intToString(Integer i) {
                 return String.valueOf(i);
             }
 
-            @FastConvertHandler
+            @FastConvertMethod
             public int stringToInt(String str) {
                 return Integer.parseInt(str);
             }
@@ -1094,7 +1094,7 @@ Kotlin Examples
     package sample.kotlin.xyz.srclab.core.convert
 
     import org.testng.annotations.Test
-    import xyz.srclab.common.convert.FastConvertHandler
+    import xyz.srclab.common.convert.FastConvertMethod
     import xyz.srclab.common.convert.FastConverter
     import xyz.srclab.common.convert.convert
     import xyz.srclab.common.test.TestLogger
@@ -1110,7 +1110,7 @@ Kotlin Examples
             a.p1 = "1"
             a.p2 = "2"
             val b = a.convert(
-                    B::class.java
+                B::class.java
             )
             //1
             logger.log("b1: {}", b.p1)
@@ -1118,7 +1118,7 @@ Kotlin Examples
             logger.log("b1: {}", b.p2)
 
             val fastConverter =
-                    FastConverter.newFastConverter(FastHandler())
+                FastConverter.newFastConverter(FastHandler())
             //123
             logger.log(fastConverter.convert(123, String::class.java))
             //123
@@ -1143,12 +1143,12 @@ Kotlin Examples
 
     class FastHandler {
 
-        @FastConvertHandler
+        @FastConvertMethod
         fun intToString(i: Integer): String {
             return i.toString()
         }
 
-        @FastConvertHandler
+        @FastConvertMethod
         fun stringToInt(str: String): Int {
             return str.toInt()
         }
@@ -1367,7 +1367,7 @@ Java Examples
 
     import org.testng.annotations.Test;
     import xyz.srclab.common.bus.EventBus;
-    import xyz.srclab.common.bus.Subscribe;
+    import xyz.srclab.common.bus.SubscribeMethod;
     import xyz.srclab.common.lang.Next;
     import xyz.srclab.common.test.TestLogger;
 
@@ -1390,26 +1390,26 @@ Java Examples
 
             public String stack = "";
 
-            @Subscribe(priority = 100)
+            @SubscribeMethod(priority = 100)
             public void sub0(CharSequence chars) {
                 logger.log("sub0:" + chars);
                 stack += "sub0";
             }
 
-            @Subscribe
+            @SubscribeMethod
             public void sub1(String chars) {
                 logger.log("sub1:" + chars);
                 stack += "sub1";
             }
 
-            @Subscribe(priority = 100)
+            @SubscribeMethod(priority = 100)
             public Next sub2(String chars) {
                 logger.log("sub2:" + chars);
                 stack += "sub2";
                 return Next.BREAK;
             }
 
-            @Subscribe(priority = 200)
+            @SubscribeMethod(priority = 200)
             public void sub3(String chars) {
                 logger.log("sub3:" + chars);
                 stack += "sub3";
@@ -1423,7 +1423,7 @@ Kotlin Examples
 
     import org.testng.annotations.Test
     import xyz.srclab.common.bus.EventBus
-    import xyz.srclab.common.bus.Subscribe
+    import xyz.srclab.common.bus.SubscribeMethod
     import xyz.srclab.common.lang.Next
     import xyz.srclab.common.test.TestLogger
 
@@ -1444,26 +1444,26 @@ Kotlin Examples
 
             var stack = ""
 
-            @Subscribe(priority = 100)
+            @SubscribeMethod(priority = 100)
             fun sub0(chars: CharSequence) {
                 logger.log("sub0:$chars")
                 stack += "sub0"
             }
 
-            @Subscribe
+            @SubscribeMethod
             fun sub1(chars: String) {
                 logger.log("sub1:$chars")
                 stack += "sub1"
             }
 
-            @Subscribe(priority = 100)
+            @SubscribeMethod(priority = 100)
             fun sub2(chars: String): Next {
                 logger.log("sub2:$chars")
                 stack += "sub2"
                 return Next.BREAK
             }
 
-            @Subscribe(priority = 200)
+            @SubscribeMethod(priority = 200)
             fun sub3(chars: String) {
                 logger.log("sub3:$chars")
                 stack += "sub3"

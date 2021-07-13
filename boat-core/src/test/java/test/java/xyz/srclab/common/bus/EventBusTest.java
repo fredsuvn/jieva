@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.bus;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.bus.EventBus;
-import xyz.srclab.common.bus.Subscribe;
+import xyz.srclab.common.bus.SubscribeMethod;
 import xyz.srclab.common.lang.Next;
 import xyz.srclab.common.test.TestLogger;
 
@@ -40,13 +40,13 @@ public class EventBusTest {
 
         public String stack = "";
 
-        @Subscribe
+        @SubscribeMethod
         public void sub11(CharSequence chars) {
             logger.log("sub11:" + chars);
             stack += "sub11";
         }
 
-        @Subscribe(priority = 100)
+        @SubscribeMethod(priority = 100)
         public void sub12(String chars) {
             logger.log("sub12:" + chars);
             stack += "sub12";
@@ -57,32 +57,32 @@ public class EventBusTest {
 
         public String stack = "";
 
-        @Subscribe
+        @SubscribeMethod
         public void sub20(Integer integer) {
             logger.log("sub20:" + integer);
             stack += "sub20";
         }
 
-        @Subscribe
+        @SubscribeMethod
         public void sub21(String chars) {
             logger.log("sub21:" + chars);
             stack += "sub21";
         }
 
-        @Subscribe(priority = 100)
+        @SubscribeMethod(priority = 100)
         public Next sub22(String chars) {
             logger.log("sub22:" + chars);
             stack += "sub22";
             return Next.BREAK;
         }
 
-        @Subscribe(priority = 200)
+        @SubscribeMethod(priority = 200)
         public void sub23(String chars) {
             logger.log("sub23:" + chars);
             stack += "sub23";
         }
 
-        @Subscribe(priority = 300)
+        @SubscribeMethod(priority = 300)
         public void sub24(Integer integer) {
             logger.log("sub20:" + integer);
             stack += "sub20";

@@ -2,7 +2,7 @@ package sample.java.xyz.srclab.core.convert;
 
 import org.testng.annotations.Test;
 import xyz.srclab.common.convert.Converts;
-import xyz.srclab.common.convert.FastConvertHandler;
+import xyz.srclab.common.convert.FastConvertMethod;
 import xyz.srclab.common.convert.FastConverter;
 import xyz.srclab.common.test.TestLogger;
 
@@ -76,12 +76,12 @@ public class ConvertSample {
 
     public static class FastHandler {
 
-        @FastConvertHandler
+        @FastConvertMethod
         public String intToString(Integer i) {
             return String.valueOf(i);
         }
 
-        @FastConvertHandler
+        @FastConvertMethod
         public int stringToInt(String str) {
             return Integer.parseInt(str);
         }

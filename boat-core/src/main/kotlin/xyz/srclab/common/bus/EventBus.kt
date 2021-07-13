@@ -10,13 +10,13 @@ import java.util.concurrent.Executor
 /**
  * Event bus. Use [register] or [registerAll] to register event handler, [unregister] and [unregisterAll] to unregister.
  *
- * Each method which is annotated by [Subscribe] in event handler is a *Subscriber*.
- * Event will be post to all *Subscriber*s of which event type (method parameter type) is compatible.
+ * Each method which is annotated by [SubscribeMethod] in event handler is a `subscriber`.
+ * Event will be post to all `subscriber`s of which event type (method parameter type) is compatible.
  *
- * If same event type has more than one *Subscriber*s, in high to low priority order ([Subscribe.priority]).
+ * If same event type has more than one *Subscriber*s, in high to low priority order ([SubscribeMethod.priority]).
  * If one *Subscriber* returns [Next.BREAK], the event will be dropped and *Subscriber* behind will not receive event.
  *
- * @see Subscribe
+ * @see SubscribeMethod
  */
 interface EventBus {
 
@@ -75,7 +75,7 @@ interface EventBus {
                         val oldActions = newMap.getOrPut(eventType) { ArrayList() }
                         oldActions.addAll(actions)
                         oldActions.sortWith { a1, a2 ->
-                            a2.subscribe.priority - a1.subscribe.priority
+                            a2.subscribeMethod.priority - a1.subscribeMethod.priority
                         }
                     }
                     subscribeMap = newMap
@@ -117,12 +117,12 @@ interface EventBus {
             private fun resolveHandler(eventHandler: Any): Map<Class<*>, List<Action>> {
                 val result: MutableMap<Class<*>, MutableList<Action>> = HashMap()
                 for (method in eventHandler.javaClass.methods) {
-                    val subscribe = method.getAnnotation(Subscribe::class.java)
-                    if (subscribe === null) {
+                    val subscribe = method.getAnnotation(SubscribeMethod::class.java)
+                    if (subscribe === null || method.isBridge) {
                         continue
                     }
                     if (method.parameterCount != 1) {
-                        continue
+                        throw IllegalArgumentException("Subscribe method must have only one parameter.")
                     }
                     val eventType = method.parameterTypes[0]
                     val action = Action(eventHandler, subscribe, Invoker.forMethod(method))
@@ -158,7 +158,7 @@ interface EventBus {
 
             private data class Action(
                 val handler: Any,
-                val subscribe: Subscribe,
+                val subscribeMethod: SubscribeMethod,
                 val invoker: Invoker,
             )
 
