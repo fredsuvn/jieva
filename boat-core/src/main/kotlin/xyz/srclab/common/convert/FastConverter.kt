@@ -8,7 +8,7 @@ import java.lang.reflect.Type
 /**
  * Fast version of [Converter].
  *
- * By default, it use a set of fast-convert-handlers -- which have methods annotated by [FastConvertMethod].
+ * By default, it uses a set of fast-convert-handlers -- which have methods annotated by [FastConvertMethod].
  * Each convert method has one parameter as `fromType`, and returns `toType` of value.
  *
  * @see FastConvertMethod
