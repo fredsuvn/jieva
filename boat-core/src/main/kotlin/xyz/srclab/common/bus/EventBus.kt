@@ -122,7 +122,7 @@ interface EventBus {
                         continue
                     }
                     if (method.parameterCount != 1) {
-                        continue
+                        throw IllegalArgumentException("Subscribe method must have only one parameter.")
                     }
                     val eventType = method.parameterTypes[0]
                     val action = Action(eventHandler, subscribe, Invoker.forMethod(method))

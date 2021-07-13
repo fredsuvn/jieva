@@ -69,7 +69,7 @@ interface FastConverter {
         }
 
         private class FastConverterImpl(
-                handlers: Iterable<Any>
+            handlers: Iterable<Any>
         ) : FastConverter {
 
             private val handlerMap: Map<Pair<Type, Type>, Invoke> = run {
@@ -82,10 +82,12 @@ interface FastConverter {
                             continue
                         }
                         if (method.parameterCount != 1 || method.returnType == Void::class.java) {
-                            continue
+                            throw IllegalArgumentException(
+                                "Fast convert handler method must have only one parameter and a non-void type of return value."
+                            )
                         }
                         map[method.genericParameterTypes[0] to method.genericReturnType] =
-                                Invoker.forMethod(method).invokeWith(handler)
+                            Invoker.forMethod(method).invokeWith(handler)
                     }
                 }
                 map
