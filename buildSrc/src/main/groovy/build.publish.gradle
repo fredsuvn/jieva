@@ -8,16 +8,16 @@ def configurePublishMavenPom(MavenPublication maven) {
   maven.pom {
     name = project.name
     description = project.description
-    url = infos.url
-    inceptionYear = infos.inceptionYear
+    url = configs.url
+    inceptionYear = configs.inceptionYear
     scm {
-      connection = "scm:git:${infos.url}.git"
-      developerConnection = "scm:git:${infos.url}.git"
-      url = infos.url
+      connection = "scm:git:${configs.url}.git"
+      developerConnection = "scm:git:${configs.url}.git"
+      url = configs.url
     }
-    if (infos.licenses != null) {
+    if (configs.licenses != null) {
       licenses {
-        infos.licenses.forEach { each ->
+        configs.licenses.forEach { each ->
           license {
             name = each.name
             url = each.url
@@ -25,9 +25,9 @@ def configurePublishMavenPom(MavenPublication maven) {
         }
       }
     }
-    if (infos.developers != null) {
+    if (configs.developers != null) {
       developers {
-        infos.developers.forEach { each ->
+        configs.developers.forEach { each ->
           developer {
             email = each.email
           }
@@ -40,10 +40,10 @@ def configurePublishMavenPom(MavenPublication maven) {
 }
 
 def configurePublishRepositories(RepositoryHandler repositories) {
-  if (infos.publish.isSnapshot) {
+  if (configs.publish.isSnapshot) {
     repositories.maven {
-      name = infos.publish.snapshotId
-      url = infos.publish.urls.snapshot
+      name = configs.publish.snapshotId
+      url = configs.publish.urls.snapshot
       printer.debug("snapshot.name: $name")
       printer.debug("snapshot.url: $url")
       credentials {
@@ -55,8 +55,8 @@ def configurePublishRepositories(RepositoryHandler repositories) {
     }
   } else {
     repositories.maven {
-      name = infos.publish.releaseId
-      url = infos.publish.urls.release
+      name = configs.publish.releaseId
+      url = configs.publish.urls.release
       printer.debug("release.name: $name")
       printer.debug("release.url: $url")
       credentials {
@@ -71,7 +71,7 @@ def configurePublishRepositories(RepositoryHandler repositories) {
 
 def configureSigning() {
   signing {
-    def signingName = infos.publish.signingId
+    def signingName = configs.publish.signingId
     def signingKeyId = getProperty("signing${signingName.capitalize()}KeyId")
     def signingPassword = getProperty("signing${signingName.capitalize()}Password")
     def signingKey = utils.readFileAsString(getProperty("signing${signingName.capitalize()}KeyFile"), "UTF-8")
