@@ -8,7 +8,7 @@ project.afterEvaluate {
 
   printer.info("${project.name}: import build.publish-platform")
 
-  if (infos.publish.enablePublish) {
+  if (configs.publish.enablePublish) {
     publishing {
       publications {
         maven(MavenPublication) {
@@ -16,12 +16,12 @@ project.afterEvaluate {
           configurePublishMavenPom(it)
         }
       }
-      if (infos.publish.enablePublishRemote) {
+      if (configs.publish.enablePublishRemote) {
         repositories {
           configurePublishRepositories(it)
         }
       }
-      if (infos.publish.isSigning) {
+      if (configs.publish.isSigning) {
         configureSigning()
         signing {
           sign publishing.publications.maven
