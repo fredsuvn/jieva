@@ -480,10 +480,6 @@ interface SemVer : Comparable<SemVer> {
                 return subSpec.split(".").toBuildMetadata()
             }
 
-            var normalNumbers: List<Int>? = null
-            var preRelease: List<PreReleaseIdentifier>? = null
-            var buildMetadata: List<String>? = null
-
             val hyphenIndex = Defaults.HYPHEN_MATCHER.indexIn(this)
             val plusSignIndex = Defaults.PLUS_SIGN_MATCHER.indexIn(this)
             if (hyphenIndex < 0 && plusSignIndex < 0) {
