@@ -3,7 +3,7 @@ package xyz.srclab.common.cache
 import xyz.srclab.common.collect.removeAll
 import java.time.Duration
 
-class MapCache<K : Any, V>(private val map: MutableMap<K, V>) : Cache<K, V> {
+class MapCache<K : Any, V : Any>(private val map: MutableMap<K, V>) : Cache<K, V> {
 
     override fun getOrNull(key: K): V? {
         return map[key]
@@ -13,8 +13,39 @@ class MapCache<K : Any, V>(private val map: MutableMap<K, V>) : Cache<K, V> {
         return map.getOrDefault(key, defaultValue)
     }
 
+    override fun getOrElse(key: K, defaultValue: (K) -> V): V {
+        return map.getOrElse(key) { defaultValue(key) }
+    }
+
     override fun getOrLoad(key: K, loader: (K) -> V): V {
         return map.computeIfAbsent(key, loader)
+    }
+
+    override fun getPresent(keys: Iterable<K>): Map<K, V> {
+        val result = LinkedHashMap<K, V>()
+        for (key in keys) {
+            val value = map[key]
+            if (value !== null) {
+                result[key] = value
+            }
+        }
+        return result
+    }
+
+    override fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
+        val result = LinkedHashMap<K, V>()
+        for (key in keys) {
+            val value = map[key]
+            if (value !== null) {
+                result[key] = value
+            }
+        }
+        val restKeys = keys.minus(result.keys)
+        val newValues = loader(restKeys)
+        for (restKey in restKeys) {
+            result[restKey] = map.computeIfAbsent(restKey) { newValues[restKey]!! }
+        }
+        return result
     }
 
     override fun put(key: K, value: V) {

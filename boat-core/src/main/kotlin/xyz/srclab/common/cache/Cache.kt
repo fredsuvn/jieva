@@ -13,73 +13,58 @@ import com.google.common.cache.RemovalCause as guavaRemovalCause
 /**
  * Cache interface.
  *
+ * Note [V] doesn't support `null` value.
+ *
  * @see GuavaCache
  * @see GuavaLoadingCache
  * @see CaffeineCache
  * @see CaffeineLoadingCache
  * @see MapCache
  */
-interface Cache<K : Any, V> {
+interface Cache<K : Any, V : Any> {
 
+    /**
+     * Gets or throws from cache.
+     */
     @Throws(NoSuchElementException::class)
     @JvmDefault
     fun get(key: K): V {
-        val thisAs = this.asAny<Cache<K, Any>>()
-        val value = thisAs.getOrElse(key, NotFound)
-        if (value === NotFound) {
-            throw NoSuchElementException(key.toString())
-        }
-        return value.asAny()
+        return getOrNull(key) ?: throw NoSuchElementException(key.toString())
     }
 
+    /**
+     * Gets or returns null if not found from cache.
+     */
     @JvmDefault
-    fun getOrNull(key: K): V? {
-        val thisAs = this.asAny<Cache<K, Any>>()
-        val value = thisAs.getOrElse(key, NotFound)
-        if (value === NotFound) {
-            return null
-        }
-        return value.asAny()
-    }
+    fun getOrNull(key: K): V?
 
+    /**
+     * Gets or returns [defaultValue] if not found from cache.
+     */
     fun getOrElse(key: K, defaultValue: V): V
 
+    /**
+     * Gets or returns [defaultValue] if not found from cache.
+     */
     @JvmDefault
-    fun getOrElse(key: K, defaultValue: (K) -> V): V {
-        val thisAs = this.asAny<Cache<K, Any>>()
-        val value = thisAs.getOrElse(key, NotFound)
-        if (value === NotFound) {
-            return defaultValue(key)
-        }
-        return value.asAny()
-    }
+    fun getOrElse(key: K, defaultValue: (K) -> V): V
 
+    /**
+     * Gets or load then returns if not found from cache.
+     */
     fun getOrLoad(key: K, loader: (K) -> V): V
 
+    /**
+     * Returns a map of the values associated with the present keys from cache.
+     */
     @JvmDefault
-    fun getPresent(keys: Iterable<K>): Map<K, V> {
-        val resultMap = mutableMapOf<K, V>()
-        getPresent(resultMap, keys)
-        return resultMap.toMap()
-    }
+    fun getPresent(keys: Iterable<K>): Map<K, V>
 
+    /**
+     * Returns a map of the values associated with the keys, creating or retrieving those values if necessary.
+     */
     @JvmDefault
-    fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
-        val resultMap = mutableMapOf<K, V>()
-        getPresent(resultMap, keys)
-        resultMap.putAll(loader(keys.minus(resultMap.keys)))
-        return resultMap.toMap()
-    }
-
-    private fun getPresent(destination: MutableMap<K, V>, keys: Iterable<K>) {
-        val thisAs = this.asAny<Cache<K, Any>>()
-        for (key in keys) {
-            val value = thisAs.getOrElse(key, NotFound)
-            if (value !== NotFound) {
-                destination[key] = value.asAny()
-            }
-        }
-    }
+    fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V>
 
     fun put(key: K, value: V)
 
@@ -109,12 +94,10 @@ interface Cache<K : Any, V> {
 
     fun cleanUp()
 
-    private object NotFound
-
     /**
      * To build a [Cache] instance with [CaffeineCache] or [GuavaCache].
      */
-    class Builder<K : Any, V> : CachingProductBuilder<Cache<K, V>>() {
+    class Builder<K : Any, V : Any> : CachingProductBuilder<Cache<K, V>>() {
 
         private var initialCapacity: Int? = null
         private var maxSize: Long? = null
@@ -247,7 +230,7 @@ interface Cache<K : Any, V> {
             }
             if (params.removeListener !== null) {
                 guavaBuilder.removalListener(RemovalListener<K, V> { notification ->
-                    val removeCause: CacheRemoveListener.Cause = when (notification.cause) {
+                    val removeCause: CacheRemoveListener.Cause = when (notification.cause!!) {
                         guavaRemovalCause.EXPLICIT -> CacheRemoveListener.Cause.EXPLICIT
                         guavaRemovalCause.REPLACED -> CacheRemoveListener.Cause.REPLACED
                         guavaRemovalCause.COLLECTED -> CacheRemoveListener.Cause.COLLECTED
@@ -329,7 +312,7 @@ interface Cache<K : Any, V> {
     companion object {
 
         @JvmStatic
-        fun <K : Any, V> newBuilder(): Builder<K, V> {
+        fun <K : Any, V : Any> newBuilder(): Builder<K, V> {
             return Builder()
         }
 
@@ -339,96 +322,13 @@ interface Cache<K : Any, V> {
          * Does not support to set expiry time, and if the value has been created, cannot update (put) it.
          */
         @JvmStatic
-        fun <K : Any, V> newFastCache(): Cache<K, V> {
+        fun <K : Any, V : Any> newFastCache(): Cache<K, V> {
             return MapCache(MapMaker().concurrencyLevel(Defaults.concurrencyLevel).weakValues().makeMap())
         }
 
         @JvmStatic
-        fun <K : Any, V> MutableMap<K, V>.toCache(): Cache<K, V> {
+        fun <K : Any, V : Any> MutableMap<K, V>.toCache(): Cache<K, V> {
             return MapCache(this)
         }
-    }
-}
-
-interface CacheCreateListener<K, V> {
-    fun beforeCreate(key: K)
-    fun afterCreate(key: K, value: V)
-}
-
-interface CacheReadListener<K, V> {
-    fun beforeRead(key: K)
-    fun onHit(key: K, value: V)
-    fun onMiss(key: K)
-}
-
-interface CacheUpdateListener<K, V> {
-    fun beforeUpdate(key: K, oldValue: V)
-    fun afterUpdate(key: K, oldValue: V, newValue: V)
-}
-
-interface CacheRemoveListener<K, V> {
-    fun beforeRemove(key: K, value: V, cause: Cause)
-    fun afterRemove(key: K, value: V, cause: Cause)
-
-    enum class Cause {
-        /**
-         * The entry was manually removed by the user. This can result from the user invoking any of the
-         * following methods on the cache or map view.
-         */
-        EXPLICIT {
-            override val isEvicted: Boolean
-                get() {
-                    return false
-                }
-        },
-
-        /**
-         * The entry itself was not actually removed, but its value was replaced by the user. This can
-         * result from the user invoking any of the following methods on the cache or map view.
-         */
-        REPLACED {
-            override val isEvicted: Boolean
-                get() {
-                    return false
-                }
-        },
-
-        /**
-         * The entry was removed automatically because its key or value was garbage-collected.
-         */
-        COLLECTED {
-            override val isEvicted: Boolean
-                get() {
-                    return true
-                }
-        },
-
-        /**
-         * The entry's expiration timestamp has passed.
-         */
-        EXPIRED {
-            override val isEvicted: Boolean
-                get() {
-                    return true
-                }
-        },
-
-        /**
-         * The entry was evicted due to size constraints.
-         */
-        SIZE {
-            override val isEvicted: Boolean
-                get() {
-                    return true
-                }
-        };
-
-        /**
-         * Returns `true` if there was an automatic removal due to eviction (the cause is neither
-         * [EXPLICIT] nor [REPLACED]).
-         *
-         * @return if the entry was automatically removed due to eviction
-         */
-        abstract val isEvicted: Boolean
     }
 }
