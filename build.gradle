@@ -16,10 +16,6 @@ allprojects { p ->
 subprojects { p ->
 }
 
-tasks.withType(JavaCompile) {
-  options.encoding = "UTF-8"
-}
-
 def initProjectConfigure(p) {
   def configs = rootProject.configs
   p.ext["configs"] = configs
