@@ -2,7 +2,9 @@ package xyz.srclab.common.cache
 
 import java.time.Duration
 
-open class GuavaCache<K : Any, V>(private val guava: com.google.common.cache.Cache<K, V>) : Cache<K, V> {
+open class GuavaCache<K : Any, V : Any>(
+    private val guava: com.google.common.cache.Cache<K, V>
+) : Cache<K, V> {
 
     override fun getOrNull(key: K): V? {
         return guava.getIfPresent(key)
@@ -11,6 +13,11 @@ open class GuavaCache<K : Any, V>(private val guava: com.google.common.cache.Cac
     override fun getOrElse(key: K, defaultValue: V): V {
         val value = getOrNull(key)
         return value ?: defaultValue
+    }
+
+    override fun getOrElse(key: K, defaultValue: (K) -> V): V {
+        val value = getOrNull(key)
+        return value ?: defaultValue(key)
     }
 
     override fun getOrLoad(key: K, loader: (K) -> V): V {
@@ -22,9 +29,15 @@ open class GuavaCache<K : Any, V>(private val guava: com.google.common.cache.Cac
     }
 
     override fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
-        val resultMap = guava.getAllPresent(keys).toMutableMap()
-        resultMap.putAll(loader(keys.minus(resultMap.keys)))
-        return resultMap.toMap()
+        val resultMap = LinkedHashMap(guava.getAllPresent(keys))
+        val restKeys = keys.minus(resultMap.keys)
+        val newValues = loader(restKeys)
+        for (restKey in restKeys) {
+            resultMap[restKey] = guava.get(restKey) {
+                newValues[restKey]
+            }
+        }
+        return resultMap
     }
 
     override fun put(key: K, value: V) {
@@ -80,7 +93,9 @@ open class GuavaCache<K : Any, V>(private val guava: com.google.common.cache.Cac
     }
 }
 
-class GuavaLoadingCache<K : Any, V>(private val guava: com.google.common.cache.LoadingCache<K, V>) :
+class GuavaLoadingCache<K : Any, V : Any>(
+    private val guava: com.google.common.cache.LoadingCache<K, V>
+) :
     GuavaCache<K, V>(guava) {
 
     override fun get(key: K): V {

@@ -10,6 +10,7 @@ import java.lang.reflect.Type
 
 /**
  * Handler to resolve specified bean type.
+ * default, a [BeanResolver] contains a chain of [BeanResolveHandler]s.
  *
  * @see AbstractBeanResolveHandler
  * @see BeanStyleBeanResolveHandler
@@ -17,6 +18,9 @@ import java.lang.reflect.Type
  */
 interface BeanResolveHandler {
 
+    /**
+     * Resolves and returns whether continue to resolve by next handler.
+     */
     fun resolve(@Written builder: BeanTypeBuilder): Next
 
     companion object {

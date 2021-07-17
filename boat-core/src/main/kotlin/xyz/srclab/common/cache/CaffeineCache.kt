@@ -1,9 +1,10 @@
 package xyz.srclab.common.cache
 
-import xyz.srclab.common.lang.asAny
 import java.time.Duration
 
-open class CaffeineCache<K : Any, V>(private val caffeine: com.github.benmanes.caffeine.cache.Cache<K, V>) :
+open class CaffeineCache<K : Any, V : Any>(
+    private val caffeine: com.github.benmanes.caffeine.cache.Cache<K, V>
+) :
     Cache<K, V> {
 
     override fun getOrNull(key: K): V? {
@@ -15,8 +16,13 @@ open class CaffeineCache<K : Any, V>(private val caffeine: com.github.benmanes.c
         return value ?: defaultValue
     }
 
+    override fun getOrElse(key: K, defaultValue: (K) -> V): V {
+        val value = getOrNull(key)
+        return value ?: defaultValue(key)
+    }
+
     override fun getOrLoad(key: K, loader: (K) -> V): V {
-        return caffeine.get(key, loader).asAny()
+        return caffeine.get(key, loader)!!
     }
 
     override fun getPresent(keys: Iterable<K>): Map<K, V> {
@@ -80,7 +86,9 @@ open class CaffeineCache<K : Any, V>(private val caffeine: com.github.benmanes.c
     }
 }
 
-class CaffeineLoadingCache<K : Any, V>(private val caffeine: com.github.benmanes.caffeine.cache.LoadingCache<K, V>) :
+class CaffeineLoadingCache<K : Any, V : Any>(
+    private val caffeine: com.github.benmanes.caffeine.cache.LoadingCache<K, V>
+) :
     CaffeineCache<K, V>(caffeine) {
 
     override fun get(key: K): V {

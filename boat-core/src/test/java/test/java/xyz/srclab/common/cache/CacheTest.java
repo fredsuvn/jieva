@@ -1,14 +1,13 @@
 package test.java.xyz.srclab.common.cache;
 
+import kotlin.Pair;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.cache.MapCache;
+import xyz.srclab.common.collect.Collects;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * @author sunqian
@@ -64,5 +63,21 @@ public class CacheTest {
 
         cache.invalidate("1");
         Assert.assertNull(cache.getOrNull("1"));
+
+        cache.put("x1", "x1");
+        cache.put("x2", "x2");
+        cache.put("x3", "x3");
+        Map<String, String> resultPresent = cache.getPresent(Arrays.asList("x1", "x2", "x3", "x4"));
+        Assert.assertEquals(
+            resultPresent,
+            Collects.newMap(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3")
+        );
+        Map<String, String> resultAll = cache.getAll(
+            Arrays.asList("x1", "x2", "x3", "x4"),
+            keys -> Collects.associate(keys, (key) -> new Pair<String, String>(key, key)));
+        Assert.assertEquals(
+            resultAll,
+            Collects.newMap(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3", "x4", "x4")
+        );
     }
 }
