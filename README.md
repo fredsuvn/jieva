@@ -70,11 +70,10 @@ public class EggSample {
 
   @Test
   public void testEgg() {
-    EggManager eggManager = BoatEggManager.INSTANCE;
-    Egg egg = eggManager.pick("O Battle");
-    egg.hatchOut("Thank you, Taro.");
+    Egg egg = Egg.pick("xyz.srclab.common.egg.nest.o.OBattle");
+    egg.hatchOut("Thank you, Taro.", Collections.emptyMap());
     //Or
-    //egg.hatchOut("谢谢你，泰罗。");
+    //egg.hatchOut("谢谢你，泰罗。", Collections.emptyMap());
   }
 }
 ```
@@ -86,10 +85,10 @@ class EggSample {
 
   @Test
   fun testEgg() {
-    val egg = BoatEggManager.pick("O Battle")
-    egg.hatchOut("Thank you, Taro.")
+    val egg = Egg.pick("xyz.srclab.common.egg.nest.o.OBattle")
+    egg.hatchOut("Thank you, Taro.", emptyMap())
     //Or
-    //egg.hatchOut("谢谢你，泰罗。")
+    //egg.hatchOut("谢谢你，泰罗。", Collections.emptyMap());
   }
 }
 ```

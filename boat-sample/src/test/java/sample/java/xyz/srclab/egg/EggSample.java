@@ -1,12 +1,11 @@
 package sample.java.xyz.srclab.egg;
 
 import org.testng.annotations.Test;
-import xyz.srclab.common.egg.BoatEggManager;
 import xyz.srclab.common.egg.Egg;
-import xyz.srclab.common.egg.EggManager;
 import xyz.srclab.common.test.TestLogger;
 
 import java.awt.*;
+import java.util.Collections;
 
 /**
  * @Author: TannerHu
@@ -22,10 +21,9 @@ public class EggSample {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
-        EggManager eggManager = BoatEggManager.INSTANCE;
-        Egg egg = eggManager.pick("O Battle");
-        egg.hatchOut("Thank you, Taro.");
+        Egg egg = Egg.pick("xyz.srclab.common.egg.nest.o.OBattle");
+        egg.hatchOut("Thank you, Taro.", Collections.emptyMap());
         //Or
-        //egg.hatchOut("谢谢你，泰罗。");
+        //egg.hatchOut("谢谢你，泰罗。", Collections.emptyMap());
     }
 }
