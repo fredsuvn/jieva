@@ -155,4 +155,17 @@ open class Mapping<K, V>(
     open fun collectMutableEntry(): Collecting<MutableMap.MutableEntry<K, V>> {
         return finalMutableMap().entries.collect()
     }
+
+    // Sync
+
+    open fun toSync(): Mapping<K, V> {
+        val map = map
+        if (map is NavigableMap<K, V>) {
+            return map.toSync().asSelf()
+        }
+        if (map is SortedMap<K, V>) {
+            return map.toSync().asSelf()
+        }
+        return map.toSync().asSelf()
+    }
 }
