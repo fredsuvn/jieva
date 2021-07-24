@@ -21,7 +21,11 @@ open class Mapping<K, V>(
     }
 
     open fun finalMutableMap(): MutableMap<K, V> {
-        return map.asAny()
+        val map = map
+        if (map is MutableMap<K, V>) {
+            return map
+        }
+        return map.toMutableMap()
     }
 
     open fun containsKeys(keys: Array<out K>): Boolean {
