@@ -25,7 +25,6 @@ open class JacksonJsonSerializer(
 ) : JsonSerializer {
 
     init {
-        //objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         objectMapper.registerModule(JsonImplModule())
     }
 

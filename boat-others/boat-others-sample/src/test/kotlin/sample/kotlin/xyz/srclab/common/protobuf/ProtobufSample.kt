@@ -87,7 +87,7 @@ class ProtobufSample {
         //messageDataBuilder: {"type":"TYPE_1","message":"java","number":["5","6","7"],"entry":{"j1":"jj1"}}
         logger.log(
             "messageDataBuilder: {}",
-            PROTOBUF_JSON_SERIALIZER.toJsonString(messageDataBuilder)
+            PROTOBUF_JSON_SERIALIZER.toJson(messageDataBuilder).toJsonString()
         )
         Assert.assertEquals(messageDataBuilder.type, MessageData.Type.TYPE_1)
         Assert.assertEquals(messageDataBuilder.message, "java")
@@ -104,7 +104,7 @@ class ProtobufSample {
         //requestMessageBuilder: {"id":"999","data":{"type":"TYPE_1","message":"java","number":["5","6","7"],"entry":{"j1":"jj1"}}}
         logger.log(
             "requestMessageBuilder: {}",
-            PROTOBUF_JSON_SERIALIZER.toJsonString(requestMessageBuilder)
+            PROTOBUF_JSON_SERIALIZER.toJson(requestMessageBuilder).toJsonString()
         )
         Assert.assertEquals(requestMessageBuilder.id, "999")
         Assert.assertEquals(requestMessageBuilder.data.type, MessageData.Type.TYPE_1)
@@ -119,7 +119,7 @@ class ProtobufSample {
         //convertRequestMessage: {"id":"999","data":{"type":"TYPE_1","message":"java","number":["5","6","7"],"entry":{"j1":"jj1"}}}
         logger.log(
             "convertRequestMessage: {}",
-            PROTOBUF_JSON_SERIALIZER.toJsonString(convertRequestMessage)
+            PROTOBUF_JSON_SERIALIZER.toJson(convertRequestMessage).toJsonString()
         )
         Assert.assertEquals(convertRequestMessage.id, "999")
         Assert.assertEquals(convertRequestMessage.data.type, MessageData.Type.TYPE_1)
