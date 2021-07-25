@@ -8,6 +8,9 @@ import xyz.srclab.common.egg.Egg
  */
 class OBattle : Egg {
 
+    override val readme: String
+        get() = TODO("Not yet implemented")
+
     override fun hatchOut(spell: String, feed: Map<Any, Any>) {
         for (secretCode in Boat.secretCodes) {
             if (secretCode == spell) {

@@ -1,5 +1,6 @@
 package xyz.srclab.common.egg
 
+import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.lang.loadClass
 
 /**
@@ -8,6 +9,18 @@ import xyz.srclab.common.lang.loadClass
  * @author sunqian
  */
 interface Egg {
+
+    @get:JvmName("readme")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val readme: String
+
+    /**
+     * Hatches out with spell!
+     */
+    @JvmDefault
+    fun hatchOut(spell: String) {
+        hatchOut(spell, emptyMap())
+    }
 
     /**
      * Hatches out with spell and feed!

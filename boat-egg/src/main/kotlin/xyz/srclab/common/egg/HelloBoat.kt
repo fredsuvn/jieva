@@ -6,8 +6,10 @@ class HelloBoat : Egg {
 
     private lateinit var printer: PrintStream
 
+    override val readme: String = TITLE
+
     override fun hatchOut(spell: String, feed: Map<Any, Any>) {
-        if (spell != "Hello, Boat!") {
+        if (spell != TITLE) {
             throw WrongSpellException()
         }
         val out = feed["out"]
@@ -22,5 +24,9 @@ class HelloBoat : Egg {
 
     private fun go(message: String) {
         printer.println(message)
+    }
+
+    private companion object {
+        private const val TITLE = "Hello, Boat!"
     }
 }
