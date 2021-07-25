@@ -12,7 +12,6 @@ java {
 
 dependencies {
   implementation project(":boat")
-  implementation project(":boat-egg")
 
   testCompile project(":boat-test")
   testCompile "cglib:cglib"

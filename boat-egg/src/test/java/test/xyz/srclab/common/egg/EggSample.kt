@@ -1,4 +1,4 @@
-package sample.kotlin.xyz.srclab.egg
+package test.xyz.srclab.common.egg
 
 import org.testng.annotations.Test
 import xyz.srclab.common.egg.Egg
