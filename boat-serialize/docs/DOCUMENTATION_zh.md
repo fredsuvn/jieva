@@ -104,12 +104,13 @@ Java Examples
 
     package sample.java.xyz.srclab.serialize;
 
+    import com.fasterxml.jackson.databind.ObjectMapper;
     import org.testng.annotations.Test;
     import xyz.srclab.common.reflect.TypeRef;
-    import xyz.srclab.common.serialize.json.Jacksons;
     import xyz.srclab.common.serialize.json.Json;
     import xyz.srclab.common.serialize.json.JsonSerializer;
     import xyz.srclab.common.serialize.json.JsonSerials;
+    import xyz.srclab.common.serialize.json.jackson.Jacksons;
     import xyz.srclab.common.test.TestLogger;
 
     import java.util.Map;
@@ -147,7 +148,7 @@ Java Examples
 
         @Test
         public void testJackson() {
-            JsonSerializer serializer = Jacksons.newJsonSerializer(Jacksons.DEFAULT_OBJECT_MAPPER);
+            JsonSerializer serializer = Jacksons.newJsonSerializer(new ObjectMapper());
             String mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}";
             Map<String, String> map = serializer.toJson(mapJson).toObject(new TypeRef<Map<String, String>>() {
             });
@@ -164,9 +165,13 @@ Kotlin Examples
 
     package sample.kotlin.xyz.srclab.serialize
 
+    import com.fasterxml.jackson.databind.ObjectMapper
     import org.testng.annotations.Test
     import xyz.srclab.common.reflect.TypeRef
-    import xyz.srclab.common.serialize.json.*
+    import xyz.srclab.common.serialize.json.JsonSerializer
+    import xyz.srclab.common.serialize.json.jackson.toJsonSerializer
+    import xyz.srclab.common.serialize.json.stringifyJson
+    import xyz.srclab.common.serialize.json.toJson
     import xyz.srclab.common.test.TestLogger
 
     class SerializeSample {
@@ -181,7 +186,7 @@ Kotlin Examples
             logger.log(map)
             val stringJson = "abc"
             //"abc"
-            logger.log("stringJson: {}", stringJson.stringify())
+            logger.log("stringJson: {}", stringJson.stringifyJson())
         }
 
         @Test
@@ -199,7 +204,7 @@ Kotlin Examples
 
         @Test
         fun testJackson() {
-            val serializer: JsonSerializer = DEFAULT_OBJECT_MAPPER.toJsonSerializer()
+            val serializer: JsonSerializer = ObjectMapper().toJsonSerializer()
             val mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}"
             val map: Map<String, String> =
                 serializer.toJson(mapJson).toObject(object : TypeRef<Map<String, String>>() {})

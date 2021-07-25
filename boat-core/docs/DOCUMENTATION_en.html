@@ -2689,7 +2689,10 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.io.IOStreams;
 import xyz.srclab.common.test.TestLogger;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -2703,7 +2706,7 @@ public class IOSample {
     @Test
     public void testStream() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = new ByteArrayInputStream(text.getBytes());
+        InputStream input = IOStreams.toInputStream(text.getBytes());
         String inputString = IOStreams.readString(input);
         input.reset();
         logger.log("inputString: {}", inputString);
@@ -2723,7 +2726,7 @@ public class IOSample {
     @Test
     public void testReader() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = new ByteArrayInputStream(text.getBytes());
+        InputStream input = IOStreams.toInputStream(text.getBytes());
         Reader reader = IOStreams.toReader(input);
         String readString = IOStreams.readString(reader);
         input.reset();
@@ -2754,10 +2757,8 @@ import org.testng.Assert
 import org.testng.annotations.Test
 import xyz.srclab.common.io.*
 import xyz.srclab.common.test.TestLogger
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.util.*
 
 /**
  * @author sunqian
@@ -2768,7 +2769,7 @@ class IOSample {
     @Throws(Exception::class)
     fun testStream() {
         val text = "123456\r\n234567\r\n"
-        val input: InputStream = ByteArrayInputStream(text.toByteArray())
+        val input: InputStream = text.toByteArray().toInputStream()
         val inputString = input.readString()
         input.reset()
         logger.log("inputString: {}", inputString)
@@ -2778,7 +2779,7 @@ class IOSample {
         Assert.assertEquals(bytes, text.toByteArray())
         val inputStrings: List&lt;String?&gt; = input.readLines()
         input.reset()
-        Assert.assertEquals(inputStrings, Arrays.asList("123456", "234567"))
+        Assert.assertEquals(inputStrings, listOf("123456", "234567"))
         val output = ByteArrayOutputStream()
         input.readTo(output)
         input.reset()
@@ -2789,7 +2790,7 @@ class IOSample {
     @Throws(Exception::class)
     fun testReader() {
         val text = "123456\r\n234567\r\n"
-        val input: InputStream = ByteArrayInputStream(text.toByteArray())
+        val input: InputStream = text.toByteArray().toInputStream()
         val reader = input.toReader()
         val readString = reader.readString()
         input.reset()
@@ -2800,7 +2801,7 @@ class IOSample {
         Assert.assertEquals(chars, text.toCharArray())
         val readStrings: List&lt;String?&gt; = reader.readLines()
         input.reset()
-        Assert.assertEquals(readStrings, Arrays.asList("123456", "234567"))
+        Assert.assertEquals(readStrings, listOf("123456", "234567"))
         val output = ByteArrayOutputStream()
         val writer = output.toWriter()
         reader.readTo(writer)
