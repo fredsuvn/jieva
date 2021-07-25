@@ -69,7 +69,8 @@ fun Any?.toJsonBytes(): ByteArray {
 /**
  * Serializes [this] to json string.
  */
-fun Any?.stringify(): String {
+@JvmName("stringify")
+fun Any?.stringifyJson(): String {
     return jsonSerializer.serialize(this).toJsonString()
 }
 

@@ -3,11 +3,14 @@ package test.xyz.srclab.common.serialize;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.collect.Collects;
 import xyz.srclab.common.lang.Defaults;
+import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.serialize.json.Json;
 import xyz.srclab.common.serialize.json.JsonSerializer;
 import xyz.srclab.common.serialize.json.JsonSerials;
 import xyz.srclab.common.serialize.json.JsonType;
+import xyz.srclab.common.serialize.json.jackson.Jacksons;
 import xyz.srclab.common.test.TestLogger;
 
 import java.math.BigDecimal;
@@ -32,7 +35,7 @@ public class JsonTest {
     public void testJson() throws Exception {
         JsonSerializer jsonSerializer = JsonSerializer.DEFAULT;
 
-        //测试和原生Jackson生成json是否一致
+        //Jackson
         TestObject testObject = new TestObject();
         testObject.setString("888");
         testObject.setMap(Arrays.asList(
@@ -44,7 +47,7 @@ public class JsonTest {
         logger.log(jsonString);
         Assert.assertEquals(jsonString, objectMapper.writeValueAsString(testObject));
 
-        //测试toJson(Object)
+        //toJson(Object)
         Object jsonStringAsObject = jsonString;
         logger.log(jsonSerializer.toJson(jsonStringAsObject).toString());
         Assert.assertEquals(
@@ -52,7 +55,7 @@ public class JsonTest {
             testObject
         );
 
-        //测试从json string还原java对象
+        //json string -> java object
         Json json = jsonSerializer.toJson(jsonString);
         TestObject fromJson = json.toObject(TestObject.class);
         boolean equals = testObject.equals(fromJson);
@@ -71,12 +74,12 @@ public class JsonTest {
         logger.log("testObject2 == fromJson2: " + equals2);
         Assert.assertTrue(equals2);
 
-        //测试java对象转java对象
+        //java object -> java object
         Json jsonTest = jsonSerializer.toJson(testObject);
         logger.log("jsonTest: " + jsonTest.toString());
         Assert.assertEquals(jsonTest.toObject(TestObject2.class), testObject2);
 
-        //测试时间类型
+        //time format
         long now = System.currentTimeMillis();
         logger.log("now: " + now);
         String nowJson = jsonSerializer.toJson(now).toJsonString();
@@ -89,7 +92,7 @@ public class JsonTest {
         logger.log("instant: " + instant);
         Assert.assertEquals(instant.toEpochMilli(), now * 1000);
 
-        //测试json type
+        //json type
         JsonType jsonType = json.type();
         logger.log(jsonType);
         Assert.assertEquals(jsonType, JsonType.OBJECT);
@@ -114,7 +117,7 @@ public class JsonTest {
         logger.log(jsonType);
         Assert.assertEquals(jsonType, JsonType.STRING);
 
-        //测试map
+        //map
         Map<String, String> map = new HashMap<>();
         map.put("key1", "1");
         map.put("key2", "2");
@@ -131,7 +134,7 @@ public class JsonTest {
         Json nullJson = JsonSerials.toJson((Object) null);
         Assert.assertEquals(nullJson.toString(), "null");
         Assert.assertNull(nullJson.toStringOrNull());
-        Assert.expectThrows(IllegalStateException.class, () -> nullJson.toObject(String.class));
+        Assert.expectThrows(NullPointerException.class, () -> nullJson.toObject(String.class));
     }
 
     @Test
@@ -150,6 +153,44 @@ public class JsonTest {
     public void testString() {
         String jsonString = "abc";
         Assert.assertEquals(JsonSerials.stringify(jsonString), "\"abc\"");
+        jsonString = "\"abc\"";
+        Json json = JsonSerials.toJson(jsonString);
+        logger.log(json);
+        Assert.assertEquals(json.toJsonString(), jsonString);
+        Assert.assertEquals(json.toObject(String.class), "abc");
+        Assert.assertEquals(json.type(), JsonType.STRING);
+    }
+
+    @Test
+    public void testSubJson() {
+        Map<String, Object> map = Collects.newMap(new HashMap<>(), "s1", "sss", "s2", Arrays.asList("1", "2"));
+        String jsonString = JsonSerials.toJsonString(map);
+        logger.log(jsonString);
+        Map<String, Json> jsonMap = JsonSerials.toObject(jsonString, new TypeRef<Map<String, Json>>() {
+        });
+        logger.log(jsonMap);
+        logger.log(jsonMap.get("s2").getClass());
+        Assert.assertEquals(
+            jsonMap.get("s2").getClass().getName(), "xyz.srclab.common.serialize.json.jackson.JacksonJsonSerializer$JsomImpl");
+        Json s2 = jsonMap.get("s2");
+        Assert.assertEquals(s2.toObject(List.class), Arrays.asList("1", "2"));
+        String jsonImplJson = "{\"s1\":\"sss\",\"s2\":[\"1\",\"2\"]}";
+        Json jsonImpl = JsonSerials.toObject(jsonImplJson, Json.class);
+        logger.log(jsonImpl);
+    }
+
+    @Test
+    public void testJackson() {
+        JsonSerializer serializer = Jacksons.newJsonSerializer(new ObjectMapper());
+        String mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}";
+        Map<String, String> map = serializer.toJson(mapJson).toObject(new TypeRef<Map<String, String>>() {
+        });
+        logger.log(map);
+        Assert.assertEquals(map.toString(), "{p1=p1 value, p2=p2 value}");
+
+        String stringJson = "abc";
+        logger.log("stringJson: {}", serializer.serialize(stringJson));
+        Assert.assertEquals(serializer.serialize(stringJson).toString(), "\"abc\"");
     }
 
     private <K, V> Map<K, V> newMap(K key, V value) {
