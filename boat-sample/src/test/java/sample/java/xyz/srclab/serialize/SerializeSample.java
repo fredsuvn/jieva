@@ -1,11 +1,12 @@
 package sample.java.xyz.srclab.serialize;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.annotations.Test;
 import xyz.srclab.common.reflect.TypeRef;
-import xyz.srclab.common.serialize.json.Jacksons;
 import xyz.srclab.common.serialize.json.Json;
 import xyz.srclab.common.serialize.json.JsonSerializer;
 import xyz.srclab.common.serialize.json.JsonSerials;
+import xyz.srclab.common.serialize.json.jackson.Jacksons;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.Map;
@@ -43,7 +44,7 @@ public class SerializeSample {
 
     @Test
     public void testJackson() {
-        JsonSerializer serializer = Jacksons.newJsonSerializer(Jacksons.DEFAULT_OBJECT_MAPPER);
+        JsonSerializer serializer = Jacksons.newJsonSerializer(new ObjectMapper());
         String mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}";
         Map<String, String> map = serializer.toJson(mapJson).toObject(new TypeRef<Map<String, String>>() {
         });

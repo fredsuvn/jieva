@@ -5,7 +5,10 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.io.IOStreams;
 import xyz.srclab.common.test.TestLogger;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,7 +22,7 @@ public class IOSample {
     @Test
     public void testStream() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = new ByteArrayInputStream(text.getBytes());
+        InputStream input = IOStreams.toInputStream(text.getBytes());
         String inputString = IOStreams.readString(input);
         input.reset();
         logger.log("inputString: {}", inputString);
@@ -39,7 +42,7 @@ public class IOSample {
     @Test
     public void testReader() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = new ByteArrayInputStream(text.getBytes());
+        InputStream input = IOStreams.toInputStream(text.getBytes());
         Reader reader = IOStreams.toReader(input);
         String readString = IOStreams.readString(reader);
         input.reset();
