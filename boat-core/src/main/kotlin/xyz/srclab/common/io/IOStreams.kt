@@ -71,3 +71,7 @@ fun Reader.readString(): String {
 fun Reader.readLines(): List<String> {
     return IOUtils.readLines(this)
 }
+
+fun ByteArray.toInputStream(): InputStream {
+    return ByteArrayInputStream(this)
+}
