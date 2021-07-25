@@ -1,8 +1,8 @@
 package xyz.srclab.common.serialize.json
 
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
+import xyz.srclab.common.reflect.typeRef
 import xyz.srclab.common.serialize.Serial
-import java.lang.reflect.Type
 
 /**
  * Represents a `Json Serial`, can fast convert between literal json and java object.
@@ -21,7 +21,7 @@ interface Json : Serial {
         @JvmName("type") get
 
     /**
-     * Returns Stringified json content of this [Json].
+     * Returns stringified value of this [Json].
      * If content is `abs`, returns "abs".
      *
      * @see [toObjectString]
@@ -29,7 +29,7 @@ interface Json : Serial {
     fun toJsonString(): String
 
     /**
-     * Returns Stringified json content of this [Json].
+     * Returns stringified value of this [Json].
      * If content is `abs`, returns "abs"'s bytes.
      *
      * @see [toObjectString]
@@ -37,24 +37,25 @@ interface Json : Serial {
     fun toJsonBytes(): ByteArray
 
     /**
-     * Returns content of this [Json] as [String].
+     * Converts this [Json] to [String].
      * If content is `abs`, returns abs.
      *
      * @see [toJsonString]
      */
-    fun toObjectString(): String
+    fun toObjectString(): String {
+        return toObject(String::class.java)
+    }
 
     /**
-     * Must be same as [toJsonString].
+     * Same as [toJsonString].
      */
     override fun toString(): String
 
+    /**
+     * Returns as [Map]<[String], [Json]>.
+     */
     @JvmDefault
-    override fun <T> toObject(type: Type): T {
-        return toObjectOrNull<T>(type).orThrow()
-    }
-
-    private fun <T> T?.orThrow(): T {
-        return this ?: throw IllegalStateException("Null json node, use toObjectOrNull.")
+    fun toJsonMap(): Map<String, Json> {
+        return toObject(typeRef())
     }
 }

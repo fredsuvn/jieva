@@ -8,19 +8,20 @@ import xyz.srclab.common.egg.Egg
  */
 class OBattle : Egg {
 
-    override val shell: String = Boat::class.java.name
+    override val readme: String
+        get() = TODO("Not yet implemented")
 
-    override fun hatchOut(spell: CharSequence) {
+    override fun hatchOut(spell: String, feed: Map<Any, Any>) {
         for (secretCode in Boat.secretCodes) {
             if (secretCode == spell) {
-                run()
+                go()
                 return
             }
         }
         throw IAmSevenNotTaro()
     }
 
-    private fun run() {
+    private fun go() {
         OView().isVisible = true
     }
 

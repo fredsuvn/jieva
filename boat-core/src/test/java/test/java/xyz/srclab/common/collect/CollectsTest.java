@@ -78,6 +78,19 @@ public class CollectsTest {
     }
 
     @Test
+    public void testSync() {
+        List<String> list = new ArrayList<>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        List<String> syncList = Collects.toSync(list);
+        Assert.assertEquals(syncList, list);
+
+        Collecting<String> collecting = Collects.collect(list);
+        Assert.assertEquals(collecting.toSync().toList(), list);
+    }
+
+    @Test
     public void testMultiMap() {
         //Set
         SetMap<String, String> setMap = SetMap.newSetMap(

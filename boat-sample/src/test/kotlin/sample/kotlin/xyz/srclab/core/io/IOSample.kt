@@ -4,10 +4,8 @@ import org.testng.Assert
 import org.testng.annotations.Test
 import xyz.srclab.common.io.*
 import xyz.srclab.common.test.TestLogger
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.util.*
 
 /**
  * @author sunqian
@@ -18,7 +16,7 @@ class IOSample {
     @Throws(Exception::class)
     fun testStream() {
         val text = "123456\r\n234567\r\n"
-        val input: InputStream = ByteArrayInputStream(text.toByteArray())
+        val input: InputStream = text.toByteArray().toInputStream()
         val inputString = input.readString()
         input.reset()
         logger.log("inputString: {}", inputString)
@@ -28,7 +26,7 @@ class IOSample {
         Assert.assertEquals(bytes, text.toByteArray())
         val inputStrings: List<String?> = input.readLines()
         input.reset()
-        Assert.assertEquals(inputStrings, Arrays.asList("123456", "234567"))
+        Assert.assertEquals(inputStrings, listOf("123456", "234567"))
         val output = ByteArrayOutputStream()
         input.readTo(output)
         input.reset()
@@ -39,7 +37,7 @@ class IOSample {
     @Throws(Exception::class)
     fun testReader() {
         val text = "123456\r\n234567\r\n"
-        val input: InputStream = ByteArrayInputStream(text.toByteArray())
+        val input: InputStream = text.toByteArray().toInputStream()
         val reader = input.toReader()
         val readString = reader.readString()
         input.reset()
@@ -50,7 +48,7 @@ class IOSample {
         Assert.assertEquals(chars, text.toCharArray())
         val readStrings: List<String?> = reader.readLines()
         input.reset()
-        Assert.assertEquals(readStrings, Arrays.asList("123456", "234567"))
+        Assert.assertEquals(readStrings, listOf("123456", "234567"))
         val output = ByteArrayOutputStream()
         val writer = output.toWriter()
         reader.readTo(writer)

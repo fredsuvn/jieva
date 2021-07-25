@@ -8,6 +8,7 @@ import java.lang.annotation.*;
 @javax.annotation.concurrent.Immutable
 @TypeQualifierNickname
 @Target({
+    ElementType.TYPE,
     ElementType.METHOD,
     ElementType.FIELD,
     ElementType.PARAMETER,

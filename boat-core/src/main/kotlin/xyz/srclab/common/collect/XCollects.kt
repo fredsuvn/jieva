@@ -121,3 +121,25 @@ fun <T, A : Appendable> Iterable<T>.joinTo(
 ): A {
     return this.joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
 }
+
+//As mutable
+
+fun <T> Iterable<T>.asMutable(): MutableIterable<T> {
+    return this.asAny()
+}
+
+fun <T> Collection<T>.asMutable(): MutableCollection<T> {
+    return this.asAny()
+}
+
+fun <T> Set<T>.asMutable(): MutableSet<T> {
+    return this.asAny()
+}
+
+fun <T> List<T>.asMutable(): MutableList<T> {
+    return this.asAny()
+}
+
+fun <K, V> Map<K, V>.asMutable(): MutableMap<K, V> {
+    return this.asAny()
+}

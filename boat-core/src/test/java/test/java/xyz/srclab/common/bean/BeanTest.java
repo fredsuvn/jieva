@@ -140,6 +140,12 @@ public class BeanTest {
         Assert.assertEquals(b.getS().getS2(), 234d);
     }
 
+    @Test
+    public void testNewBeanResolver() {
+        // Test possible cyclic dependence.
+        BeanResolver resolver = BeanResolver.newBeanResolver(Collections.emptyList());
+    }
+
     public interface I1<T1> {
 
         T1 getI1();

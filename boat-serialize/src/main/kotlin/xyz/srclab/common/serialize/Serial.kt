@@ -1,8 +1,15 @@
 package xyz.srclab.common.serialize
 
+import xyz.srclab.annotations.Immutable
+import xyz.srclab.annotations.Written
+import xyz.srclab.common.io.toReader
 import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.reflect.TypeRef
-import java.io.*
+import xyz.srclab.common.serialize.json.Json
+import java.io.InputStream
+import java.io.OutputStream
+import java.io.Reader
+import java.io.Writer
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -10,41 +17,38 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 /**
- * Represents a serial type.
+ * Represents a serial type, immutable.
  *
  * Serial type is serializable.
  *
- * @author sunqian
+ * @see Serializer
+ * @see Json
  */
+@Immutable
 interface Serial {
 
+    // Serial -> Binary
+
     @JvmDefault
-    fun <T : OutputStream> writeTo(outputStream: T): T {
+    fun writeTo(@Written outputStream: OutputStream) {
         toInputStream().copyTo(outputStream)
-        return outputStream
     }
 
     @JvmDefault
-    fun <T : Writer> writeTo(writer: T): T {
+    fun writeTo(@Written writer: Writer) {
         toReader().copyTo(writer)
-        return writer
     }
 
     @JvmDefault
-    fun <T : Writer> writeTo(writer: T, charset: Charset): T {
+    fun writeTo(@Written writer: Writer, charset: Charset) {
         toReader(charset).copyTo(writer)
-        return writer
     }
 
     @JvmDefault
-    fun <T : ByteBuffer> writeTo(byteBuffer: T): T {
+    fun writeTo(@Written byteBuffer: ByteBuffer) {
         byteBuffer.put(toByteBuffer())
-        return byteBuffer
     }
 
-    fun toBytes(): ByteArray
-
-    @JvmDefault
     fun toInputStream(): InputStream
 
     @JvmDefault
@@ -54,7 +58,7 @@ interface Serial {
 
     @JvmDefault
     fun toReader(charset: Charset): Reader {
-        return InputStreamReader(toInputStream(), charset)
+        return toInputStream().toReader(charset)
     }
 
     @JvmDefault
@@ -63,15 +67,25 @@ interface Serial {
     }
 
     @JvmDefault
-    fun <T> toObject(type: Class<T>): T {
-        return toObject(type as Type)
+    fun toBytes(): ByteArray {
+        return toInputStream().readBytes()
     }
 
-    fun <T> toObject(type: Type): T
+    // Serial -> Java Object
+
+    @JvmDefault
+    fun <T> toObject(type: Class<T>): T {
+        return toObjectOrNull(type)!!
+    }
+
+    @JvmDefault
+    fun <T> toObject(type: Type): T {
+        return toObjectOrNull(type)!!
+    }
 
     @JvmDefault
     fun <T> toObject(typeRef: TypeRef<T>): T {
-        return toObject(typeRef.type)
+        return toObjectOrNull(typeRef)!!
     }
 
     @JvmDefault
@@ -86,8 +100,6 @@ interface Serial {
         return toObjectOrNull(typeRef.type)
     }
 
-    override fun toString(): String
-
     @JvmDefault
     fun toStringOrNull(): String? {
         return toObjectOrNull(String::class.java)
@@ -95,42 +107,42 @@ interface Serial {
 
     @JvmDefault
     fun toBoolean(): Boolean {
-        return toObject(Boolean::class.java)
+        return toObject(Boolean::class.javaPrimitiveType!!)
     }
 
     @JvmDefault
     fun toByte(): Byte {
-        return toObject(Byte::class.java)
+        return toObject(Byte::class.javaPrimitiveType!!)
     }
 
     @JvmDefault
     fun toShort(): Short {
-        return toObject(Short::class.java)
+        return toObject(Short::class.javaPrimitiveType!!)
     }
 
     @JvmDefault
     fun toChar(): Char {
-        return toObject(Char::class.java)
+        return toObject(Char::class.javaPrimitiveType!!)
     }
 
     @JvmDefault
     fun toInt(): Int {
-        return toObject(Int::class.java)
+        return toObject(Int::class.javaPrimitiveType!!)
     }
 
     @JvmDefault
     fun toLong(): Long {
-        return toObject(Long::class.java)
+        return toObject(Long::class.javaPrimitiveType!!)
     }
 
     @JvmDefault
     fun toFloat(): Float {
-        return toObject(Float::class.java)
+        return toObject(Float::class.javaPrimitiveType!!)
     }
 
     @JvmDefault
     fun toDouble(): Double {
-        return toObject(Double::class.java)
+        return toObject(Double::class.javaPrimitiveType!!)
     }
 
     @JvmDefault

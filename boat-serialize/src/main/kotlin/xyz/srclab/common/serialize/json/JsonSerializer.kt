@@ -1,7 +1,9 @@
 package xyz.srclab.common.serialize.json
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.json.JsonMapper
 import xyz.srclab.common.serialize.Serializer
+import xyz.srclab.common.serialize.json.jackson.toJsonSerializer
 import java.io.InputStream
 import java.io.Reader
 import java.net.URL
@@ -51,14 +53,9 @@ interface JsonSerializer : Serializer<Json> {
         }
     }
 
-    @JvmDefault
-    fun toJsonString(source: Any?): String {
-        return toJson(source).toJsonString()
-    }
-
     companion object {
 
         @JvmField
-        val DEFAULT = DEFAULT_OBJECT_MAPPER.toJsonSerializer()
+        val DEFAULT = JsonMapper().toJsonSerializer()
     }
 }

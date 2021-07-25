@@ -1236,4 +1236,26 @@ open class Collecting<T> constructor(
     ): A {
         return finalIterable().joinTo(buffer, separator, prefix, postfix, limit, truncated, transform)
     }
+
+    // Sync
+
+    open fun toSync(): Collecting<T> {
+        val op = operand
+        if (op is Collection<T>) {
+            return op.toSync().asSelf()
+        }
+        if (op is List<T>) {
+            return op.toSync().asSelf()
+        }
+        if (op is NavigableSet<T>) {
+            return op.toSync().asSelf()
+        }
+        if (op is SortedSet<T>) {
+            return op.toSync().asSelf()
+        }
+        if (op is Set<T>) {
+            return op.toSync().asSelf()
+        }
+        return op.toSet().toSync().asSelf()
+    }
 }

@@ -2058,7 +2058,10 @@ Java Examples
     import xyz.srclab.common.io.IOStreams;
     import xyz.srclab.common.test.TestLogger;
 
-    import java.io.*;
+    import java.io.ByteArrayOutputStream;
+    import java.io.InputStream;
+    import java.io.Reader;
+    import java.io.Writer;
     import java.util.Arrays;
     import java.util.List;
 
@@ -2072,7 +2075,7 @@ Java Examples
         @Test
         public void testStream() throws Exception {
             String text = "123456\r\n234567\r\n";
-            InputStream input = new ByteArrayInputStream(text.getBytes());
+            InputStream input = IOStreams.toInputStream(text.getBytes());
             String inputString = IOStreams.readString(input);
             input.reset();
             logger.log("inputString: {}", inputString);
@@ -2092,7 +2095,7 @@ Java Examples
         @Test
         public void testReader() throws Exception {
             String text = "123456\r\n234567\r\n";
-            InputStream input = new ByteArrayInputStream(text.getBytes());
+            InputStream input = IOStreams.toInputStream(text.getBytes());
             Reader reader = IOStreams.toReader(input);
             String readString = IOStreams.readString(reader);
             input.reset();
@@ -2121,10 +2124,8 @@ Kotlin Examples
     import org.testng.annotations.Test
     import xyz.srclab.common.io.*
     import xyz.srclab.common.test.TestLogger
-    import java.io.ByteArrayInputStream
     import java.io.ByteArrayOutputStream
     import java.io.InputStream
-    import java.util.*
 
     /**
      * @author sunqian
@@ -2135,7 +2136,7 @@ Kotlin Examples
         @Throws(Exception::class)
         fun testStream() {
             val text = "123456\r\n234567\r\n"
-            val input: InputStream = ByteArrayInputStream(text.toByteArray())
+            val input: InputStream = text.toByteArray().toInputStream()
             val inputString = input.readString()
             input.reset()
             logger.log("inputString: {}", inputString)
@@ -2145,7 +2146,7 @@ Kotlin Examples
             Assert.assertEquals(bytes, text.toByteArray())
             val inputStrings: List<String?> = input.readLines()
             input.reset()
-            Assert.assertEquals(inputStrings, Arrays.asList("123456", "234567"))
+            Assert.assertEquals(inputStrings, listOf("123456", "234567"))
             val output = ByteArrayOutputStream()
             input.readTo(output)
             input.reset()
@@ -2156,7 +2157,7 @@ Kotlin Examples
         @Throws(Exception::class)
         fun testReader() {
             val text = "123456\r\n234567\r\n"
-            val input: InputStream = ByteArrayInputStream(text.toByteArray())
+            val input: InputStream = text.toByteArray().toInputStream()
             val reader = input.toReader()
             val readString = reader.readString()
             input.reset()
@@ -2167,7 +2168,7 @@ Kotlin Examples
             Assert.assertEquals(chars, text.toCharArray())
             val readStrings: List<String?> = reader.readLines()
             input.reset()
-            Assert.assertEquals(readStrings, Arrays.asList("123456", "234567"))
+            Assert.assertEquals(readStrings, listOf("123456", "234567"))
             val output = ByteArrayOutputStream()
             val writer = output.toWriter()
             reader.readTo(writer)

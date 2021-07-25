@@ -1,7 +1,7 @@
-package sample.kotlin.xyz.srclab.egg
+package test.xyz.srclab.common.egg
 
 import org.testng.annotations.Test
-import xyz.srclab.common.egg.BoatEggManager
+import xyz.srclab.common.egg.Egg
 import xyz.srclab.common.test.TestLogger
 import java.awt.GraphicsEnvironment
 
@@ -17,10 +17,10 @@ class EggSample {
         if (GraphicsEnvironment.isHeadless()) {
             return
         }
-        val egg = BoatEggManager.pick("O Battle")
-        egg.hatchOut("Thank you, Taro.")
+        val egg = Egg.pick("xyz.srclab.common.egg.nest.o.OBattle")
+        egg.hatchOut("Thank you, Taro.", emptyMap())
         //Or
-        //egg.hatchOut("谢谢你，泰罗。")
+        //egg.hatchOut("谢谢你，泰罗。", Collections.emptyMap());
     }
 
     companion object {
