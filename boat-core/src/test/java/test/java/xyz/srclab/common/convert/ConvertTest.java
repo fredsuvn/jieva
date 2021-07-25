@@ -5,10 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.collect.Collects;
-import xyz.srclab.common.convert.ConvertChain;
-import xyz.srclab.common.convert.ConvertHandler;
-import xyz.srclab.common.convert.Converter;
-import xyz.srclab.common.convert.Converts;
+import xyz.srclab.common.convert.*;
 import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.test.TestLogger;
 
@@ -52,6 +49,12 @@ public class ConvertTest {
         Assert.assertEquals(converter.convert(100, String.class), "I100");
         logger.log("Convert long: {}", converter.convert(100L, String.class));
         Assert.assertEquals(converter.convert(100L, String.class), "L100");
+    }
+
+    @Test
+    public void testNewConverter() {
+        // Test possible cyclic dependence.
+        Converter converter = Converter.newConverter(Collections.singletonList(CompatibleConvertHandler.INSTANCE));
     }
 
     public static class IntToStringHandler implements ConvertHandler {
