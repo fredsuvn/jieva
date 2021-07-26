@@ -1,14 +1,20 @@
 package xyz.srclab.common.egg.o
 
 class OTick(
+    @Volatile
     private var count: Long = 0
 ) {
+
+    val now: Long
+        get() = count
+
     @Synchronized
     fun tick() {
         count++
     }
 
-    fun now(): Long {
-        return count
+    @Synchronized
+    fun lock(action: () -> Unit) {
+        action()
     }
 }

@@ -13,6 +13,8 @@ open class Touchable : OUnits() {
     var stepX: Double = 0.0
     var stepY: Double = 0.0
     var deathTime: Long = -1
+    var speed: Int = 50
+    var lastMoveTime: Long = -1
 }
 
 open class Bullet : Touchable() {
@@ -20,22 +22,23 @@ open class Bullet : Touchable() {
 }
 
 open class Soldier : Touchable() {
+    var hp: Int = 100
     var defense: Int = 0
-    var score: Int = 10
+    var reward: Int = 0
     var weapons: List<Weapon>? = null
-}
-
-open class Enemy : Soldier() {
+    var bullets: Map<Long, Bullet>? = null
 }
 
 open class Player : Soldier() {
+    var username: String? = null
+    var score: Long = 0
 }
 
 open class Weapon {
     var id: Long = 0
     var type: Int = 0
-    var coolDownTime: Long = 0
-    var fireTime: Long = 0
+    var fireSpeed: Long = 50
+    var lastFireTime: Long = -1
     var damage: Int = 50
 }
 
