@@ -2,6 +2,7 @@ package test.java.xyz.srclab.common.run;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.lang.Current;
 import xyz.srclab.common.run.RunLatch;
 import xyz.srclab.common.test.TestLogger;
 
@@ -24,6 +25,9 @@ public class RunLatchTest {
             testThread.start();
         }
         logger.log("sum before latch: {}", sum.get());
+        Current.sleep(1000);
+        logger.log("sum after 1000 millis sleep: {}", sum.get());
+        Assert.assertEquals(sum.get(), 0);
         latch.open();
         countDownLatch.await();
         logger.log("sum after latch: {}", sum.get());
