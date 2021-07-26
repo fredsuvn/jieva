@@ -1,6 +1,8 @@
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 plugins {
   id 'build.repositories'
@@ -55,7 +57,8 @@ ext["utils"] = [
 
 class Printer {
 
-  private final ThreadLocal<Project> localProject;
+  private final ThreadLocal<Project> localProject
+  private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
 
   Printer(ThreadLocal<Project> localProject) {
     this.localProject = localProject
@@ -66,7 +69,7 @@ class Printer {
     if (logLevel > 100) {
       return
     }
-    println(">> info: $message")
+    out("info: $message")
   }
 
   def debug(message) {
@@ -74,7 +77,11 @@ class Printer {
     if (logLevel > 50) {
       return
     }
-    println(">> debug: $message")
+    out("debug: $message")
+  }
+
+  private void out(String message) {
+    println(">> ${LocalDateTime.now().format(dateTimeFormatter)} $message")
   }
 }
 
