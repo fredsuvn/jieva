@@ -76,16 +76,18 @@ Kotlin Examples
         }
     }
 
-默认的 `JsonSerializer` 实现来自于 `Jacksons.DEFAULT_OBJECT_MAPPER`,
-一个 `jackson` 的 `ObjectMapper`. 我们也可以用另一个 `oObjectMapper`
-创建一个定制的 `JsonSerializer`:
+默认的, json序列化由 `Jackson` 实现:
+
+-   `JacksonJsonSerializer`: `Jackson` 对 `JsonSerializer` 的实现;
+
+-   `Jacksons`: `Jackson` json工具;
 
 Java Examples
 
     class Example{
         @Test
         public void test() {
-            JsonSerializer serializer = Jacksons.newJsonSerializer(Jacksons.DEFAULT_OBJECT_MAPPER);
+            JsonSerializer serializer = Jacksons.newJsonSerializer(new ObjectMapper());
         }
     }
 
@@ -94,7 +96,7 @@ Kotlin Examples
     class Example {
         @Test
         fun test() {
-            val serializer: JsonSerializer = DEFAULT_OBJECT_MAPPER.toJsonSerializer()
+            val serializer: JsonSerializer = ObjectMapper().toJsonSerializer()
         }
     }
 

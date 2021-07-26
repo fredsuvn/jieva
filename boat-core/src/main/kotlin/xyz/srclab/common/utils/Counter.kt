@@ -3,6 +3,8 @@ package xyz.srclab.common.utils
 import java.util.concurrent.atomic.AtomicLong
 
 /**
+ * Simple counter.
+ *
  * @author sunqian
  */
 interface Counter {

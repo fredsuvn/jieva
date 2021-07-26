@@ -46,6 +46,16 @@ task(group: "asciidoc", "convertAsciidocToHtmlMarkdown") {
   }
 }
 
+//asciidoc -> markdown
+task(group: "asciidoc", "convertAsciidocToMarkdown") {
+  doLast {
+    for (action in convertAsciidocToHtmlMarkdown.actions) {
+      action.execute(convertAsciidocToHtmlMarkdown)
+    }
+    deleteFiles("html", rootProject, printer)
+  }
+}
+
 private static void convertFiles(
   String fromExtName, String toExtName, rootProject, printer, BiFunction<File, File, String> cmd) {
   List<File> files = findFiles(fromExtName, rootProject, printer)
@@ -63,6 +73,21 @@ private static void convertFiles(
       return
     }
     printer.info("Execution successful")
+  }
+}
+
+private static void deleteFiles(String extName, rootProject, printer) {
+  List<File> files = findFiles(extName, rootProject, printer)
+  files.forEach {
+    try {
+      if (it.delete()) {
+        printer.info("Delete file $it successful")
+      } else {
+        printer.info("Delete file $it failed")
+      }
+    } catch (e) {
+      printer.info("Delete file $it failed, cause: $e")
+    }
   }
 }
 

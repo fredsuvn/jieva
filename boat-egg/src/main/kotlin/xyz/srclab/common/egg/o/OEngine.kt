@@ -1,51 +1,34 @@
 //package xyz.srclab.common.egg.o
 //
-//import xyz.srclab.common.collect.asMutable
-//import xyz.srclab.common.collect.toSync
-//import xyz.srclab.common.lang.Current
 //import java.util.*
-//import java.util.concurrent.CountDownLatch
 //
 //class OEngine(
-//    data: OData
+//    private val data: OData
 //) {
+//    private val hitListeners: MutableList<HitListener> = LinkedList<HitListener>()
+//    private val defeatListeners: MutableList<DefeatListener> = LinkedList<DefeatListener>()
+//    private val tickListeners: MutableList<TickListener> = LinkedList<TickListener>()
 //
-//    private val players: MutableList<Player> = LinkedList(data.players ?: emptyList()).toSync().asMutable()
-//    private val enemies: MutableList<Enemy> = LinkedList(data.enemies ?: emptyList()).toSync().asMutable()
-//    private val playerBullets: MutableList<Bullet> = LinkedList(data.playerBullets ?: emptyList()).toSync().asMutable()
-//    private val enemyBullets: MutableList<Bullet> = LinkedList(data.enemyBullets ?: emptyList()).toSync().asMutable()
-//    private val tick: OTick = data.tick ?: OTick()
-//
-//    private val killingListeners: MutableList<KillingListener> = LinkedList<KillingListener>().toSync().asMutable()
-//    private val defeatListeners: MutableList<DefeatListener> = LinkedList<DefeatListener>().toSync().asMutable()
-//    private val tickListeners: MutableList<TickListener> = LinkedList<TickListener>().toSync().asMutable()
-//
-//    private val latch: Latch = Latch()
-//
-//    fun addKillingListener(listener: KillingListener) {
-//        killingListeners.add(listener)
+//    fun addHitListener(listener: HitListener) {
+//        data.tick.lock {
+//            hitListeners.add(listener)
+//        }
 //    }
 //
 //    fun addDefeatListener(listener: DefeatListener) {
-//        defeatListeners.add(listener)
+//        data.tick.lock {
+//            defeatListeners.add(listener)
+//        }
 //    }
 //
 //    fun addTickListener(listener: TickListener) {
-//        tickListeners.add(listener)
+//        data.tick.lock {
+//            tickListeners.add(listener)
+//        }
 //    }
 //
-//    fun movePlayer(number: Int, stepX: Double, stepY: Double) {
-//        val player = players[number - 1]
-//        player.stepX = stepX
-//        player.stepY = stepY
-//    }
-//
-//    fun stopPlayer(number: Int) {
-//        movePlayer(number, 0.0, 0.0)
-//    }
-//
-//    interface KillingListener {
-//        fun onKilling(
+//    interface HitListener {
+//        fun onHit(
 //            attacker: Soldier,
 //            attacked: Soldier,
 //            weapon: Weapon,
@@ -58,77 +41,98 @@
 //    }
 //
 //    interface TickListener {
-//        fun onTick(
-//            tick: OTick,
-//            players: MutableList<Player>,
-//            enemies: MutableList<Enemy>,
-//            bullets: MutableList<Bullet>
-//        )
+//        fun onTick(tick: Long)
 //    }
 //
-//    private class Latch {
+//    // Tick
 //
-//        @Volatile
-//        private var _go: Boolean = false
-//
-//        @Volatile
-//        private var countDownLatch: CountDownLatch = CountDownLatch(1)
-//
-//        fun go(go: Boolean) {
-//            if (go) {
-//                _go = true
-//                countDownLatch.countDown()
-//            } else {
-//                countDownLatch = CountDownLatch(1)
-//                _go = false
-//            }
-//        }
-//
-//        fun await() {
-//            if (_go) {
-//                return
-//            }
-//            countDownLatch.await()
-//        }
+//    fun nextTick() {
+//        data.tick.lock { nextTick0() }
 //    }
 //
-//    private inner class GoThread : Thread("OEngine-GoThread") {
+//    private fun nextTick0() {
 //
-//        override fun run() {
-//            while (true) {
-//                latch.await()
-//                computeCollision()
-//                computeSteps()
-//                gc()
-//                Current.sleep(1)
+//        // Check hit and status
+//        fun doHitAndStatus(group1: OData.Group, group2: OData.Group) {
+//
+//            fun Touchable.isDeath(): Boolean {
+//                return this.deathTime >= 0
 //            }
-//        }
 //
-//        private fun computeCollision() {
+//            fun Touchable.outOfDeath(): Boolean {
+//                return data.tick.now - this.deathTime > this.deathKeepTime
+//            }
 //
-//            fun compute0(bullets: List<Bullet>, soldiers: List<Soldier>) {
-//                for (bullet in bullets) {
-//                    if (bullet.deathTime < 0) {
-//                        continue
+//            fun Touchable.outOfView(): Boolean {
+//                if (
+//                    this.x < -data.viewWidthBuffer - this.radius
+//                    || this.x > data.viewWidth + data.viewWidthBuffer + this.radius
+//                    || this.y < -data.viewHeightBuffer - this.radius
+//                    || this.y > data.viewHeight + data.viewHeightBuffer + this.radius
+//                ) {
+//                    return true
+//                }
+//                return false
+//            }
+//
+//            fun isHit(o1: Touchable, o2: Touchable):Boolean {
+//                val distance = distance(o1, o2)
+//                return distance < o1.radius + o2.radius
+//            }
+//
+//            fun doHit0(soldiers1: MutableIterable<Soldier>, soldiers2: MutableIterable<Soldier>) {
+//                val it1 = soldiers1.iterator()
+//                while (it1.hasNext()) {
+//                    val soldier1 = it1.next()
+//                    if (soldier1.isDeath()) {
+//
 //                    }
-//                    for (soldier in soldiers) {
-//                        if (distance(bullet, soldier) < bullet.radius + soldier.radius) {
-//                            val now = tick.now()
-//                            bullet.deathTime = now
-//                            soldier.deathTime = now
-//                            for (killingListener in killingListeners) {
-//                                //killingListener.onKilling(soldier)
+//                    var bulletCount = 0
+//                    for (weapon in soldier1.weapons!!) {
+//                        val bullets = weapon.bullets
+//                        if (bullets.isNullOrEmpty()) {
+//                            continue
+//                        }
+//                        bulletCount += bullets.size
+//                        val bt = bullets.iterator()
+//                        while (bt.hasNext()) {
+//                            val bullet = bt.next()
+//                            if (bullet.gc()) {
+//                                bt.remove()
+//                                bulletCount--
+//                                continue
+//                            }
+//                            for (soldier2 in soldiers2) {
+//                                if (bullet)
+//                                if (isHit(bullet, soldier2)) {
+//                                    for (hitListener in hitListeners) {
+//                                        hitListener.onHit(soldier1, soldier2, weapon, bullet)
+//                                    }
+//                                }
 //                            }
 //                        }
 //                    }
 //                }
 //            }
 //        }
+//        doHitAndStatus(data.group1, data.group2)
+//        doHitAndStatus(data.group2, data.group1)
 //
-//        private fun computeSteps() {
-//        }
+//        // Fire
+//        fun doFire(group: OData.Group) {
 //
-//        private fun gc() {
 //        }
+//        doFire(data.group1)
+//        doFire(data.group2)
+//
+//        // Auto moving
+//        fun doAutoMoving(group: OData.Group) {
+//
+//        }
+//        doAutoMoving(data.group1)
+//        doAutoMoving(data.group2)
+//
+//        // Tick
+//        data.tick.tick()
 //    }
 //}
