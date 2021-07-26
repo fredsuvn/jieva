@@ -77,17 +77,19 @@ Kotlin Examples
         }
     }
 
-Default `JsonSerializer` implementation is come from
-`Jacksons.DEFAULT_OBJECT_MAPPER` which is an `ObjectMapper` of
-`jackson`. We can also create a custom `JsonSerializer` with another
-`oObjectMapper`:
+By default, json-serialize is implemented by `Jackson`:
+
+-   `JacksonJsonSerializer`: `Jackson` implementation for
+    `JsonSerializer`;
+
+-   `Jacksons`: `Jackson` json utilities;
 
 Java Examples
 
     class Example{
         @Test
         public void test() {
-            JsonSerializer serializer = Jacksons.newJsonSerializer(Jacksons.DEFAULT_OBJECT_MAPPER);
+            JsonSerializer serializer = Jacksons.newJsonSerializer(new ObjectMapper());
         }
     }
 
@@ -96,7 +98,7 @@ Kotlin Examples
     class Example {
         @Test
         fun test() {
-            val serializer: JsonSerializer = DEFAULT_OBJECT_MAPPER.toJsonSerializer()
+            val serializer: JsonSerializer = ObjectMapper().toJsonSerializer()
         }
     }
 
