@@ -13,6 +13,7 @@ open class Touchable : OUnits() {
     var stepX: Double = 0.0
     var stepY: Double = 0.0
     var deathTime: Long = -1
+    var deathKeepTime: Long = 2000
     var speed: Int = 50
     var lastMoveTime: Long = -1
 }
@@ -25,8 +26,7 @@ open class Soldier : Touchable() {
     var hp: Int = 100
     var defense: Int = 0
     var reward: Int = 0
-    var weapons: List<Weapon>? = null
-    var bullets: Map<Long, Bullet>? = null
+    var weapons: MutableList<Weapon>? = null
 }
 
 open class Player : Soldier() {
@@ -40,6 +40,7 @@ open class Weapon {
     var fireSpeed: Long = 50
     var lastFireTime: Long = -1
     var damage: Int = 50
+    var bullets: MutableList<Bullet>? = null
 }
 
 const val COMPUTER_ENEMY_OWNER = 100

@@ -9,6 +9,11 @@ open class OSave {
     var group2: Group? = null
     var tick: Long = 0
 
+    var viewWidth: Int = ODefaults.viewWidth
+    var viewHeight: Int = ODefaults.viewHeight
+    var viewWidthBuffer: Int = ODefaults.viewWidthBuffer
+    var viewHeightBuffer: Int = ODefaults.viewHeightBuffer
+
     companion object {
 
         fun OSave.serialize(): ByteArray {
