@@ -2,7 +2,7 @@ package xyz.srclab.common.egg.o
 
 open class OUnits {
     var id: Long = 0
-    var owner: Long = 0
+    var index: Int = 0
     var group: Int = 0
 }
 
@@ -47,7 +47,7 @@ open class Touchable : OUnits() {
         return (100 - speed) * 1L
     }
 
-    fun readMove(now: Long): Boolean {
+    fun readyMove(now: Long): Boolean {
         if (now == lastMoveTime) {
             return false
         }
@@ -56,20 +56,20 @@ open class Touchable : OUnits() {
 }
 
 open class Bullet : Touchable() {
+    var targetId: Long = 0
+    var targetIndex: Int = 0
     var damage: Int = 50
+    var sleep: Int = 0
 }
 
 open class Soldier : Touchable() {
+
+    var totalHp: Int = 100
     var hp: Int = 100
     var defense: Int = 0
     var reward: Int = 0
     var weapons: MutableList<Weapon>? = null
-}
 
-open class Player : Soldier() {
-
-    var username: String? = null
-    var score: Long = 0
     var recovery: Int = 10
     var recoverySpeed: Int = 50
     var lastRecoveryTime: Long = -1
@@ -83,29 +83,37 @@ open class Player : Soldier() {
     }
 }
 
+open class Player : Soldier() {
+    var username: String? = null
+    var score: Long = 0
+}
+
 open class Weapon {
 
     var id: Long = 0
     var type: Int = 0
     var fireSpeed: Long = 50
     var lastFireTime: Long = -1
-    var fireKeepTime: Long = 0
-    var lastKeepTime: Long = -1
+    var subFireTimes: Int = 1
+    var subFireSpeed: Long = 50
+    var lastSubFireTime: Long = -1
     var damage: Int = 50
     var bullets: MutableList<Bullet>? = null
+    var sleepBullets: MutableList<Bullet>? = null
 
     fun fireCoolDown(): Long {
         return (100 - fireSpeed) * 20
     }
 
-    fun readyOrKeepFire(now: Long): Boolean {
-        if (now == lastFireTime) {
+    fun eachFireCoolDown(): Long {
+        return (100 - subFireSpeed) * 20
+    }
+
+    fun readyFire(now: Long): Boolean {
+        if (now == lastFireTime || now == lastSubFireTime) {
             return false
         }
-        if (now > lastFireTime && now <= lastFireTime + fireKeepTime) {
-            return true
-        }
-        return now - lastFireTime > fireCoolDown()
+        return now - lastFireTime > fireCoolDown() || now - lastSubFireTime > eachFireCoolDown()
     }
 }
 

@@ -126,7 +126,7 @@ class OEngine(
         fun doFire(soldiers: Iterable<Soldier>) {
             for (soldier in soldiers) {
                 for (weapon in soldier.weapons!!) {
-                    if (weapon.readyOrKeepFire(data.tick.now)) {
+                    if (weapon.readyFire(data.tick.now)) {
                         for (fireListener in fireListeners) {
                             fireListener.onFire(soldier, weapon)
                         }
@@ -137,11 +137,17 @@ class OEngine(
         doFire(data.players)
         doFire(data.computers)
 
-        // Auto move
-        fun doAutoMove(soldiers: Iterable<Soldier>) {
+        // Auto recover and move
+        fun doAutoRecoverAndMove(soldiers: Iterable<Soldier>) {
             for (soldier in soldiers) {
-                if (soldier.readMove(data.tick.now)) {
-                    if (!soldier.death()) {
+                if (!soldier.death()) {
+                    if (soldier.readyRecovery(data.tick.now)) {
+                        soldier.hp += soldier.recovery
+                        if (soldier.hp > soldier.totalHp) {
+                            soldier.hp = soldier.totalHp
+                        }
+                    }
+                    if (soldier.readyMove(data.tick.now)) {
                         soldier.x += soldier.stepX * config.unitX
                         soldier.y += soldier.stepY * config.unitX
                     }
@@ -149,14 +155,17 @@ class OEngine(
                 for (weapon in soldier.weapons!!) {
                     for (bullet in weapon.bullets!!) {
                         if (!bullet.death()) {
-                            bullet.x += bullet.stepX * config.unitX
-                            bullet.y += bullet.stepY * config.unitY
+                            if (bullet.readyMove(data.tick.now)) {
+                                bullet.x += bullet.stepX * config.unitX
+                                bullet.y += bullet.stepY * config.unitY
+                            }
                         }
                     }
                 }
             }
         }
-        doAutoMove(data.computers)
+        doAutoRecoverAndMove(data.players)
+        doAutoRecoverAndMove(data.computers)
 
         // Tick
         for (tickListener in tickListeners) {
