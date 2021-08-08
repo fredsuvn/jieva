@@ -3,10 +3,11 @@ package xyz.srclab.common.bean
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.lang.reflect.Type
 
 /**
- * Represents property type of a bean.
+ * Represents bean property.
  *
  * @see BeanType
  */
@@ -49,27 +50,49 @@ interface PropertyType {
     @Suppress(INAPPLICABLE_JVM_NAME)
     val setter: Invoker?
 
-    @get:JvmName("hasBackingField")
+    @get:JvmName("field")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
-    val hasBackingField: Boolean
-        get() {
-            return backingField !== null
-        }
+    val field: Field?
 
-    @get:JvmName("backingField")
+    @get:JvmName("getterMethod")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val backingField: Field?
+    val getterMethod: Method?
 
-    @get:JvmName("backingFieldAnnotations")
+    @get:JvmName("setterMethod")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val backingFieldAnnotations: List<Annotation>
+    val setterMethod: Method?
+
+    @get:JvmName("fieldAnnotations")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val fieldAnnotations: List<Annotation>
         get() {
-            val backingField = this.backingField
-            if (backingField === null) {
+            val f = this.field
+            if (f === null) {
                 return emptyList()
             }
-            return backingField.annotations.toList()
+            return f.annotations.toList()
+        }
+
+    @get:JvmName("getterAnnotations")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val getterAnnotations: List<Annotation>
+        get() {
+            val getterMethod = this.getterMethod
+            if (getterMethod === null) {
+                return emptyList()
+            }
+            return getterMethod.annotations.toList()
+        }
+
+    @get:JvmName("setterAnnotations")
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    val setterAnnotations: List<Annotation>
+        get() {
+            val setterMethod = this.setterMethod
+            if (setterMethod === null) {
+                return emptyList()
+            }
+            return setterMethod.annotations.toList()
         }
 
     @JvmDefault

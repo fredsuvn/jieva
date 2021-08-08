@@ -26,7 +26,7 @@ public class BeanTest {
         Assert.assertEquals(beanType.getProperty("p2").type(), int.class);
         Assert.assertEquals(beanType.getProperty("p3").type(), Types.parameterizedType(List.class, String.class));
 
-        BeanResolver namingStyle = BeanResolver.newBeanResolver(Arrays.asList(NamingStyleBeanResolveHandler.INSTANCE));
+        BeanResolver namingStyle = BeanResolver.newBeanResolver(Arrays.asList(RecordStyleBeanResolveHandler.INSTANCE));
         BeanType beanType2 = namingStyle.resolve(SimpleNamingBean.class);
         Assert.assertEquals(beanType2.properties().size(), 3);
         Assert.assertEquals(beanType2.getProperty("p1").type(), String.class);
@@ -102,11 +102,12 @@ public class BeanTest {
         SimpleBean simpleBean = new SimpleBean();
         simpleBean.setP1("789");
         simpleBean.setP2(999);
-        Map<String, Integer> simpleMap = Beans.asMap(simpleBean, int.class);
+        BeanMap<Integer> simpleMap = Beans.asMap(simpleBean, int.class);
         logger.log("simpleMap: {}", simpleMap);
         Assert.assertEquals(simpleMap.get("p1"), (Integer) 789);
         Assert.assertEquals(simpleMap.get("p2"), (Integer) 999);
         Assert.assertEquals(simpleMap.size(), 2);
+        Assert.assertEquals(SimpleBean.class, simpleMap.beanType().type());
         simpleMap.put("p1", 10086);
         simpleMap.put("p2", 10000);
         Assert.assertEquals(simpleBean.getP1(), "10086");

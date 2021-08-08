@@ -19,8 +19,8 @@ fun <V> Any.asMap(
     valueType: Type = Any::class.java,
     beanResolver: BeanResolver = BeanResolver.DEFAULT,
     converter: Converter = Converter.DEFAULT
-): MutableMap<String, V> {
-    return BeanMap(this, valueType, beanResolver, converter).asAny()
+): BeanMap<V> {
+    return BeanMap(this, valueType, beanResolver, converter)
 }
 
 @JvmOverloads

@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap
  * Handler for [Converter].
  *
  * By default, a [Converter] uses a chain of [ConvertHandler]s to do convert action.
- * Use [ConvertChain.next] or [ConvertChain.restart] if current handler doesn't supports current convert.
+ * Use [ConvertChain.next] or [ConvertChain.restart] if current handler doesn't support current convert.
  *
  * @see Converter
  * @see CompatibleConvertHandler
@@ -37,12 +37,11 @@ interface ConvertHandler {
     /**
      * Do convert from [from] to [to].
      *
-     * Return [ConvertChain.next] or [ConvertChain.restart] if current handler doesn't supports current convert.
+     * Return [ConvertChain.next] or [ConvertChain.restart] if current handler doesn't support current convert.
      */
     fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any?
 
     companion object {
-
         @JvmField
         val DEFAULTS: List<ConvertHandler> = listOf(
             CompatibleConvertHandler,
@@ -53,52 +52,6 @@ interface ConvertHandler {
             IterableConvertHandler,
             BeanConvertHandler.DEFAULT,
         )
-
-        @JvmStatic
-        fun defaultsWithDateTimeConvertHandler(
-            dateTimeConvertHandler: DateTimeConvertHandler,
-        ): List<ConvertHandler> {
-            return listOf(
-                CompatibleConvertHandler,
-                LowerBoundConvertHandler,
-                CharsConvertHandler,
-                NumberBooleanConvertHandler,
-                dateTimeConvertHandler,
-                IterableConvertHandler,
-                BeanConvertHandler.DEFAULT,
-            )
-        }
-
-        @JvmStatic
-        fun defaultsWithBeanConvertHandler(
-            beanConvertHandler: BeanConvertHandler,
-        ): List<ConvertHandler> {
-            return listOf(
-                CompatibleConvertHandler,
-                LowerBoundConvertHandler,
-                CharsConvertHandler,
-                NumberBooleanConvertHandler,
-                DateTimeConvertHandler.DEFAULT,
-                IterableConvertHandler,
-                beanConvertHandler,
-            )
-        }
-
-        @JvmStatic
-        fun defaultsWithDateTimeBeanConvertHandler(
-            dateTimeConvertHandler: DateTimeConvertHandler,
-            beanConvertHandler: BeanConvertHandler,
-        ): List<ConvertHandler> {
-            return listOf(
-                CompatibleConvertHandler,
-                LowerBoundConvertHandler,
-                CharsConvertHandler,
-                NumberBooleanConvertHandler,
-                dateTimeConvertHandler,
-                IterableConvertHandler,
-                beanConvertHandler,
-            )
-        }
     }
 }
 
@@ -109,12 +62,14 @@ interface ConvertHandler {
  * else return [ConvertChain.next].
  */
 object CompatibleConvertHandler : ConvertHandler {
-
     override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
-        if (fromType == toType || toType == Any::class.java) {
+        if (toType == Any::class.java || fromType == toType) {
             return from
         }
         if (toType is Class<*>) {
+            if (fromType is Class<*> && toType.isAssignableFrom(fromType)) {
+                return from
+            }
             if (toType.isEnum) {
                 val enumValue = toType.valueOfEnumIgnoreCaseOrNull<Enum<*>>(from.toString())
                 return if (enumValue !== null) {
@@ -122,9 +77,6 @@ object CompatibleConvertHandler : ConvertHandler {
                 } else {
                     chain.next(from, fromType, toType)
                 }
-            }
-            if (fromType is Class<*> && toType.isAssignableFrom(fromType)) {
-                return from
             }
         }
         return chain.next(from, fromType, toType)
@@ -135,7 +87,6 @@ object CompatibleConvertHandler : ConvertHandler {
  * Returns lower bound of `toType` with [lowerBound] for [WildcardType] and [TypeVariable].
  */
 object LowerBoundConvertHandler : ConvertHandler {
-
     override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
         return when (toType) {
             is WildcardType -> {
@@ -158,7 +109,6 @@ object LowerBoundConvertHandler : ConvertHandler {
  * * [CharArray], [ByteArray], [Array<Char>], [Array<Byte>];
  */
 object CharsConvertHandler : ConvertHandler {
-
     override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
         if (toType !is Class<*>) {
             return chain.next(from, fromType, toType)
@@ -201,7 +151,6 @@ object CharsConvertHandler : ConvertHandler {
  * * [Number];
  */
 object NumberBooleanConvertHandler : ConvertHandler {
-
     override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
         if (toType !is Class<*>) {
             return chain.next(from, fromType, toType)
@@ -270,7 +219,6 @@ open class DateTimeConvertHandler(
     }
 
     companion object {
-
         @JvmField
         val DEFAULT: DateTimeConvertHandler = DateTimeConvertHandler()
     }
@@ -386,7 +334,7 @@ object IterableConvertHandler : ConvertHandler {
 }
 
 /**
- * Supports convert `from` to bean or [Map] types:
+ * Supports convert `from` to `bean` or [Map] types:
  *
  * * Bean;
  * * [Map], [HashMap], [LinkedHashMap], [TreeMap];
@@ -482,19 +430,9 @@ open class BeanConvertHandler @JvmOverloads constructor(
     interface BeanGenerator {
 
         /**
-         * Returns builder for bean of [type].
+         * Returns builder of [toType].
          */
         fun newBuilder(toType: Type): Any
-
-        ///**
-        // * Builder's type.
-        // */
-        //fun builderType(builder: Any, toType: Type): Type
-
-        ///**
-        // * Returns builder's type.
-        // */
-        //fun builderType(toType: Type): Type
 
         /**
          * Builds [builder] to bean.
@@ -524,7 +462,6 @@ open class BeanConvertHandler @JvmOverloads constructor(
     }
 
     companion object {
-
         @JvmField
         val DEFAULT: BeanConvertHandler = BeanConvertHandler()
     }
