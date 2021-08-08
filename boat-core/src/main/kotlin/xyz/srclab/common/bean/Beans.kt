@@ -15,11 +15,11 @@ fun Type.resolve(beanResolver: BeanResolver = BeanResolver.DEFAULT): BeanType {
 }
 
 @JvmOverloads
-fun <V> Any.asMap(
+fun <T> Any.asMap(
     valueType: Type = Any::class.java,
     beanResolver: BeanResolver = BeanResolver.DEFAULT,
     converter: Converter = Converter.DEFAULT
-): BeanMap<V> {
+): BeanMap<T> {
     return BeanMap(this, valueType, beanResolver, converter)
 }
 
