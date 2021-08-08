@@ -7,6 +7,10 @@ import java.lang.reflect.Type
 /**
  * A [Map] which is associated with a `bean`,
  * of which keys are properties' names of the bean, values are properties' value.
+ *
+ * Note:
+ * * Property `class` (from [Object.getClass]) excludes;
+ * * Use [beanType] to get `class` info;
  */
 open class BeanMap<T>(
     private val bean: Any,
