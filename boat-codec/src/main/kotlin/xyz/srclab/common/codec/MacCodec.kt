@@ -22,7 +22,6 @@ interface MacCodec : Codec {
         return digest(key, data, offset, data.size - offset)
     }
 
-    @JvmDefault
     fun digest(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray
 
     @JvmDefault

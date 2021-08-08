@@ -5,7 +5,7 @@ import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 /**
  * Codec interface, represents a type of codec way.
  *
- * Note Codec is reusable but may not thread-safe.
+ * Note [Codec] **may not thread-safe**.
  *
  * @author sunqian
  *

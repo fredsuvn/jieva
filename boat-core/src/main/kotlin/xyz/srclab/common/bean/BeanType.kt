@@ -27,5 +27,3 @@ interface BeanType {
         return properties[nameString] ?: throw PropertyNotFoundException(nameString)
     }
 }
-
-class PropertyNotFoundException(name: String) : RuntimeException(name)

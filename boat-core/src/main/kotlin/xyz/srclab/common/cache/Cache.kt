@@ -317,9 +317,11 @@ interface Cache<K : Any, V : Any> {
         }
 
         /**
-         * Return a new fast Cache.
+         * Return a new fast Cache by `Weak Reference Map`.
          *
-         * Does not support to set expiry time, and if the value has been created, cannot update (put) it.
+         * Note:
+         * * Does not support to set expiry time;
+         * * Do not update value object -- it should be seen as immutable;
          */
         @JvmStatic
         fun <K : Any, V : Any> newFastCache(): Cache<K, V> {

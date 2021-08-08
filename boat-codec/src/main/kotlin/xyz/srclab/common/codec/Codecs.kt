@@ -13,12 +13,12 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
 @JvmOverloads
-fun ByteArray.codec(codecSupplier: Codecing.CodecSupplier = Codecing.DEFAULT_CODEC_SUPPLIER): Codecing {
-    return Codecing(this, codecSupplier)
+fun ByteArray.codec(codecSupplier: (CodecAlgorithm) -> Codec = Codecing.DEFAULT_CODEC_SUPPLIER): Codecing {
+    return Codecing.newCodecing(this, codecSupplier)
 }
 
 @JvmOverloads
-fun CharSequence.codec(codecSupplier: Codecing.CodecSupplier = Codecing.DEFAULT_CODEC_SUPPLIER): Codecing {
+fun CharSequence.codec(codecSupplier: (CodecAlgorithm) -> Codec = Codecing.DEFAULT_CODEC_SUPPLIER): Codecing {
     return this.toBytes().codec(codecSupplier)
 }
 
