@@ -22,7 +22,6 @@ interface DigestCodec : Codec {
         return digest(data, offset, data.size - offset)
     }
 
-    @JvmDefault
     fun digest(data: ByteArray, offset: Int, length: Int): ByteArray
 
     @JvmDefault

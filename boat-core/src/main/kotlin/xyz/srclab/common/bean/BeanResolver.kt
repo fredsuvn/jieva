@@ -14,7 +14,7 @@ import java.lang.reflect.Type
  * @see AbstractCachingBeanResolver
  * @see BeanResolveHandler
  * @see BeanStyleBeanResolveHandler
- * @see NamingStyleBeanResolveHandler
+ * @see RecordStyleBeanResolveHandler
  */
 interface BeanResolver {
 

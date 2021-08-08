@@ -5,14 +5,10 @@ import xyz.srclab.common.serialize.json.toJsonBytes
 
 open class OSave {
 
-    var group1: Group? = null
-    var group2: Group? = null
+    val players: List<Player>? = null
+    val computers: List<Soldier>? = null
     var tick: Long = 0
-
-    var viewWidth: Int = ODefaults.viewWidth
-    var viewHeight: Int = ODefaults.viewHeight
-    var viewWidthBuffer: Int = ODefaults.viewWidthBuffer
-    var viewHeightBuffer: Int = ODefaults.viewHeightBuffer
+    var config: OConfig? = null
 
     companion object {
 
@@ -23,10 +19,5 @@ open class OSave {
         fun ByteArray.deserialize(): OSave {
             return this.toJson().toObject(OSave::class.java)
         }
-    }
-
-    open class Group {
-        var players: Map<Long, Player>? = null
-        var soldiers: Map<Long, Soldier>? = null
     }
 }

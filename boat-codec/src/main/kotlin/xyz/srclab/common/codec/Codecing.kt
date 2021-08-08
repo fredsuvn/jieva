@@ -1,17 +1,14 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.common.cache.Cache
-import xyz.srclab.common.cache.Cache.Companion.toCache
 import xyz.srclab.common.lang.toChars
 import java.io.OutputStream
-import java.util.*
 import javax.crypto.SecretKey
 
 /**
  * Codec processing supports chain operation.
  *
- * For many encrypt/decrypt methods, key parameter is [Any] type, that means the key's type will be supported if its
- * [Codec] supports the type.
+ * Note this class **may not thread-safe**.
  *
  * @see EncodeCodec
  * @see DigestCodec
@@ -19,16 +16,11 @@ import javax.crypto.SecretKey
  * @see CipherCodec
  * @see AsymmetricCipherCodec
  */
-open class Codecing(
-    protected open var data: ByteArray,
-    protected open val codecSupplier: CodecSupplier = DEFAULT_CODEC_SUPPLIER
+abstract class Codecing(
+    protected open var data: ByteArray
 ) {
 
-    protected open val codecCache: Cache<CodecAlgorithm, Codec> = WeakHashMap<CodecAlgorithm, Codec>().toCache()
-
-    protected open fun getCodec(algorithm: CodecAlgorithm): Codec {
-        return codecCache.getOrLoad(algorithm) { codecSupplier.get(algorithm) }
-    }
+    protected abstract fun getCodec(algorithm: CodecAlgorithm): Codec
 
     open fun encode(algorithm: CodecAlgorithm): Codecing {
         val codec = getCodec(algorithm)
@@ -209,18 +201,10 @@ open class Codecing(
         return decrypt(CodecAlgorithm.SM2, privateKey)
     }
 
-    /**
-     * Supplier to get [Codec].
-     */
-    interface CodecSupplier {
-
-        fun get(algorithm: CodecAlgorithm): Codec
-    }
-
     companion object {
 
         /**
-         * Default [CodecSupplier], supports:
+         * Default [Codec] supplier function, supports:
          *
          * * [CodecAlgorithm.HEX]
          * * [CodecAlgorithm.BASE64]
@@ -232,24 +216,43 @@ open class Codecing(
          * * [CodecAlgorithmType.CIPHER]
          */
         @JvmField
-        val DEFAULT_CODEC_SUPPLIER: CodecSupplier = object : CodecSupplier {
-            override fun get(algorithm: CodecAlgorithm): Codec {
-                val cipher = when (algorithm) {
-                    CodecAlgorithm.HEX -> HexCodec
-                    CodecAlgorithm.BASE64 -> Base64Codec
-                    CodecAlgorithm.RSA -> rsaCodec()
-                    CodecAlgorithm.SM2 -> sm2Codec()
-                    CodecAlgorithm.PLAIN -> PlainCodec
-                    else -> null
-                }
-                if (cipher !== null) {
-                    return cipher
-                }
-                return when (algorithm.type) {
-                    CodecAlgorithmType.DIGEST -> algorithm.toDigestCodec()
-                    CodecAlgorithmType.CIPHER -> algorithm.toCipherCodec()
-                    else -> throw UnsupportedOperationException("Unsupported algorithm: $algorithm")
-                }
+        val DEFAULT_CODEC_SUPPLIER: (CodecAlgorithm) -> Codec = codec@{
+            val cipher = when (it) {
+                CodecAlgorithm.HEX -> HexCodec
+                CodecAlgorithm.BASE64 -> Base64Codec
+                CodecAlgorithm.RSA -> rsaCodec()
+                CodecAlgorithm.SM2 -> sm2Codec()
+                CodecAlgorithm.PLAIN -> PlainCodec
+                else -> null
+            }
+            if (cipher !== null) {
+                return@codec cipher
+            }
+            when (it.type) {
+                CodecAlgorithmType.DIGEST -> it.toDigestCodec()
+                CodecAlgorithmType.CIPHER -> it.toCipherCodec()
+                else -> throw UnsupportedOperationException("Unsupported algorithm: $it")
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun newCodecing(
+            data: ByteArray,
+            codecSupplier: (CodecAlgorithm) -> Codec = DEFAULT_CODEC_SUPPLIER
+        ): Codecing {
+            return CodecingImpl(data, codecSupplier)
+        }
+
+        private class CodecingImpl(
+            override var data: ByteArray,
+            private val codecSupplier: (CodecAlgorithm) -> Codec
+        ) : Codecing(data) {
+
+            val codecCache: Cache<CodecAlgorithm, Codec> = Cache.newFastCache()
+
+            override fun getCodec(algorithm: CodecAlgorithm): Codec {
+                return codecCache.getOrLoad(algorithm) { codecSupplier(algorithm) }
             }
         }
     }

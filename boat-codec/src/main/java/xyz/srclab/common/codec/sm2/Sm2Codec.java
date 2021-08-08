@@ -40,7 +40,10 @@ public class Sm2Codec implements AsymmetricCipherCodec<ECPoint, BigInteger> {
         //BigInteger _2w = new BigInteger("2").pow(w);
         curve = new ECCurve.Fp(sm2Params.p(), // q
             sm2Params.a(), // a
-            sm2Params.b()); // b
+            sm2Params.b(), //b
+            null,
+            null
+        );
         G = curve.createPoint(sm2Params.gx(), sm2Params.gy());
         ecc_bc_spec = new ECDomainParameters(curve, G, sm2Params.n());
     }
