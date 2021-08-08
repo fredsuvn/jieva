@@ -29,7 +29,6 @@ interface CipherCodec : Codec {
         return encrypt(key, data, offset, data.size - offset)
     }
 
-    @JvmDefault
     fun encrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray
 
     @JvmDefault
@@ -89,7 +88,6 @@ interface CipherCodec : Codec {
         return decrypt(key, data, offset, data.size - offset)
     }
 
-    @JvmDefault
     fun decrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray
 
     @JvmDefault
@@ -175,19 +173,17 @@ interface CipherCodec : Codec {
             override val algorithm: String
         ) : CipherCodec {
 
-            private fun getCipher(): Cipher {
-                return Cipher.getInstance(algorithm)
+            private val cipher: Cipher by lazy {
+                Cipher.getInstance(algorithm)
             }
 
             override fun encrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
-                val cipher = getCipher()
                 cipher.init(Cipher.ENCRYPT_MODE, key.toCodecKey(algorithm))
                 //cipher.update(data, offset, length)
                 return cipher.doFinal(data, offset, length)
             }
 
             override fun decrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
-                val cipher = getCipher()
                 cipher.init(Cipher.DECRYPT_MODE, key.toCodecKey(algorithm))
                 //cipher.update(data, offset, length)
                 return cipher.doFinal(data, offset, length)

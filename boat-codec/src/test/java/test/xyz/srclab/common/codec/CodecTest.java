@@ -78,10 +78,11 @@ public class CodecTest {
     public void testAes() {
         String key = "a";
         SecretKey secretKey = AesKeys.newKey(key);
+        CipherCodec aesCodec = Codecs.aesCodec();
         String data = random(512);
         byte[] dataBytes = Chars.toBytes(data);
-        byte[] encrypt = Codecs.aesCodec().encrypt(secretKey, dataBytes);
-        byte[] decrypt = Codecs.aesCodec().decrypt(secretKey, encrypt);
+        byte[] encrypt = aesCodec.encrypt(secretKey, dataBytes);
+        byte[] decrypt = aesCodec.decrypt(secretKey, encrypt);
         Assert.assertEquals(decrypt, dataBytes);
 
         String decryptData = Codecs.codec(encrypt).decryptAes(secretKey.getEncoded()).doFinalString();
@@ -92,6 +93,20 @@ public class CodecTest {
         byte[] encryptEmpty = Codecs.codec(emptyData).encryptAes(secretKey).doFinal();
         String decryptEmptyString = Codecs.codec(encryptEmpty).decryptAes(secretKey).doFinalString();
         Assert.assertEquals(decryptEmptyString, emptyData);
+
+        //Repeat use aes codec
+        SecretKey aesKey1 = AesKeys.newKey(random(32));
+        byte[] aesEncrypt1 = aesCodec.encrypt(aesKey1, data);
+        byte[] aesDecrypt1 = aesCodec.decrypt(aesKey1, aesEncrypt1);
+        Assert.assertEquals(aesDecrypt1, dataBytes);
+        SecretKey aesKey2 = AesKeys.newKey(random(32));
+        byte[] aesEncrypt2 = aesCodec.encrypt(aesKey2, data);
+        byte[] aesDecrypt2 = aesCodec.decrypt(aesKey2, aesEncrypt2);
+        Assert.assertEquals(aesDecrypt2, dataBytes);
+        SecretKey aesKey3 = AesKeys.newKey(random(32));
+        byte[] aesEncrypt3 = aesCodec.encrypt(aesKey3, data);
+        byte[] aesDecrypt3 = aesCodec.decrypt(aesKey3, aesEncrypt3);
+        Assert.assertEquals(aesDecrypt3, dataBytes);
     }
 
     @Test
