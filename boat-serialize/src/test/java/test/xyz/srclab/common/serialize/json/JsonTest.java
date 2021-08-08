@@ -1,4 +1,4 @@
-package test.xyz.srclab.common.serialize;
+package test.xyz.srclab.common.serialize.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
