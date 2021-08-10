@@ -14,5 +14,5 @@ dependencies {
   implementation project(":boat-core")
   implementation project(":boat-serialize")
 
-  testCompile project(":boat-test")
+  testImplementation project(":boat-test")
 }

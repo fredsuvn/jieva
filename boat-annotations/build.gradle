@@ -2,9 +2,6 @@ plugins {
   id 'build.jar'
 }
 
-printer.info("helo ${project.name}")
-
-group = "xyz.srclab.annotations"
 description = "Boat Annotations"
 
 java {
@@ -19,5 +16,5 @@ dependencies {
   api "com.google.code.findbugs:jsr305"
   api "org.jetbrains:annotations"
 
-  testCompile project(":boat-test")
+  testImplementation project(":boat-test")
 }

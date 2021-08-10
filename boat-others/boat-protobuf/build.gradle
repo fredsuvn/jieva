@@ -16,7 +16,7 @@ dependencies {
   api "com.google.protobuf:protobuf-java"
   api "com.hubspot.jackson:jackson-datatype-protobuf"
 
-  testCompile project(":boat-test")
+  testImplementation project(":boat-test")
 }
 
 def protoGenBaseDir = "generated/proto/"

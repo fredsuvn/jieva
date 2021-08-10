@@ -14,8 +14,8 @@ java {
 dependencies {
   implementation project(":boat-others:boat-protobuf")
 
-  testCompile project(":boat-test")
-  testCompile "cglib:cglib"
+  testImplementation project(":boat-test")
+  testImplementation "cglib:cglib"
 }
 
 def protoGenBaseDir = "generated/proto/"

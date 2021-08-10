@@ -15,7 +15,7 @@ dependencies {
   api "commons-codec:commons-codec"
   api "org.bouncycastle:bcprov-jdk15on"
 
-  testCompile project(":boat-test")
+  testImplementation project(":boat-test")
 
   testAnnotationProcessor platform(project(":boat-dependencies"))
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
