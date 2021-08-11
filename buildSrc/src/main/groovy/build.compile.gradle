@@ -24,13 +24,13 @@ project.afterEvaluate {
   compileKotlin {
     kotlinOptions {
       jvmTarget = javaVersion
-      freeCompilerArgs = ['-Xjvm-default=enable']
+      freeCompilerArgs = ['-Xjvm-default=all-compatibility']
     }
   }
   compileTestKotlin {
     kotlinOptions {
       jvmTarget = javaVersion
-      freeCompilerArgs = ['-Xjvm-default=enable']
+      freeCompilerArgs = ['-Xjvm-default=all-compatibility']
     }
   }
 }
