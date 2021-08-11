@@ -1,5 +1,6 @@
 package xyz.srclab.common.codec
 
+import xyz.srclab.common.codec.Codec.Companion.toCodecKey
 import xyz.srclab.common.codec.rsa.RsaCodec
 import xyz.srclab.common.codec.sm2.Sm2Codec
 import xyz.srclab.common.codec.sm2.Sm2Params
@@ -182,6 +183,12 @@ interface CipherCodec : Codec {
                 //cipher.update(data, offset, length)
                 return cipher.doFinal(data, offset, length)
             }
+
+            //override fun encrypt(key: Any, data: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
+            //    cipher.init(Cipher.ENCRYPT_MODE, key.toCodecKey(algorithm))
+            //    //cipher.update(data, offset, length)
+            //     cipher.doFinal(data, offset, length)
+            //}
 
             override fun decrypt(key: Any, data: ByteArray, offset: Int, length: Int): ByteArray {
                 cipher.init(Cipher.DECRYPT_MODE, key.toCodecKey(algorithm))

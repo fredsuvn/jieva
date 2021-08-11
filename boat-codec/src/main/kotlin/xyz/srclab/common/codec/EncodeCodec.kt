@@ -2,6 +2,7 @@ package xyz.srclab.common.codec
 
 import org.bouncycastle.util.encoders.Base64Encoder
 import org.bouncycastle.util.encoders.HexEncoder
+import xyz.srclab.common.codec.Codec.Companion.toCodecAlgorithm
 import xyz.srclab.common.lang.toBytes
 import xyz.srclab.common.lang.toChars
 import java.io.ByteArrayOutputStream

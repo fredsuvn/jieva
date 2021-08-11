@@ -1,6 +1,7 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.common.cache.Cache
+import xyz.srclab.common.codec.Codec.Companion.toCodecAlgorithm
 import xyz.srclab.common.lang.toChars
 import java.io.OutputStream
 import javax.crypto.SecretKey
@@ -203,43 +204,10 @@ abstract class Codecing(
 
     companion object {
 
-        /**
-         * Default [Codec] supplier function, supports:
-         *
-         * * [CodecAlgorithm.HEX]
-         * * [CodecAlgorithm.BASE64]
-         * * [CodecAlgorithm.RSA]
-         * * [CodecAlgorithm.SM2]
-         * * [CodecAlgorithm.HEX]
-         * * [CodecAlgorithm.PLAIN]
-         * * [CodecAlgorithmType.DIGEST]
-         * * [CodecAlgorithmType.CIPHER]
-         */
-        @JvmField
-        val DEFAULT_CODEC_SUPPLIER: (CodecAlgorithm) -> Codec = codec@{
-            val cipher = when (it) {
-                CodecAlgorithm.HEX -> HexCodec
-                CodecAlgorithm.BASE64 -> Base64Codec
-                CodecAlgorithm.RSA -> rsaCodec()
-                CodecAlgorithm.SM2 -> sm2Codec()
-                CodecAlgorithm.PLAIN -> PlainCodec
-                else -> null
-            }
-            if (cipher !== null) {
-                return@codec cipher
-            }
-            when (it.type) {
-                CodecAlgorithmType.DIGEST -> it.toDigestCodec()
-                CodecAlgorithmType.CIPHER -> it.toCipherCodec()
-                else -> throw UnsupportedOperationException("Unsupported algorithm: $it")
-            }
-        }
-
-        @JvmOverloads
         @JvmStatic
         fun newCodecing(
             data: ByteArray,
-            codecSupplier: (CodecAlgorithm) -> Codec = DEFAULT_CODEC_SUPPLIER
+            codecSupplier: (CodecAlgorithm) -> Codec
         ): Codecing {
             return CodecingImpl(data, codecSupplier)
         }

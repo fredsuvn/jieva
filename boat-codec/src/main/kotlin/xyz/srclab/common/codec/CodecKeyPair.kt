@@ -1,5 +1,7 @@
 package xyz.srclab.common.codec
 
+import xyz.srclab.common.codec.Codec.Companion.toBase64String
+import xyz.srclab.common.codec.Codec.Companion.toHexString
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.lang.toChars
 

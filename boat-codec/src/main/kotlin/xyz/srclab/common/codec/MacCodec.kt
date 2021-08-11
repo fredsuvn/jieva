@@ -1,5 +1,6 @@
 package xyz.srclab.common.codec
 
+import xyz.srclab.common.codec.Codec.Companion.toCodecKey
 import xyz.srclab.common.lang.toBytes
 import xyz.srclab.common.lang.toChars
 import java.io.OutputStream

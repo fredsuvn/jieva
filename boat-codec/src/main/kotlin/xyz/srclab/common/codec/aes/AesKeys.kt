@@ -2,8 +2,8 @@
 
 package xyz.srclab.common.codec.aes
 
+import xyz.srclab.common.codec.Codec.Companion.toSecretKey
 import xyz.srclab.common.codec.CodecAlgorithm
-import xyz.srclab.common.codec.toSecretKey
 import xyz.srclab.common.lang.toBytes
 import javax.crypto.SecretKey
 
