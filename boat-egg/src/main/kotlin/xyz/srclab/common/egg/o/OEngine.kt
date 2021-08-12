@@ -3,9 +3,11 @@ package xyz.srclab.common.egg.o
 import java.util.*
 
 class OEngine(
-    private val data: OData,
-    private val config: OConfig
+    private val data: OData
 ) {
+
+    private val config: OConfig = data.config
+    private val tick: OTick = data.tick
 
     private val startListeners: MutableList<StartListener> = LinkedList<StartListener>()
     private val hitListeners: MutableList<HitListener> = LinkedList<HitListener>()
@@ -13,25 +15,25 @@ class OEngine(
     private val tickListeners: MutableList<TickListener> = LinkedList<TickListener>()
 
     fun addStartListener(listener: StartListener) {
-        data.tick.lock {
+        synchronized(data) {
             startListeners.add(listener)
         }
     }
 
     fun addHitListener(listener: HitListener) {
-        data.tick.lock {
+        synchronized(data) {
             hitListeners.add(listener)
         }
     }
 
     fun addFireListener(listener: FireListener) {
-        data.tick.lock {
+        synchronized(data) {
             fireListeners.add(listener)
         }
     }
 
     fun addTickListener(listener: TickListener) {
-        data.tick.lock {
+        synchronized(data) {
             tickListeners.add(listener)
         }
     }
@@ -63,59 +65,23 @@ class OEngine(
     // Tick
 
     fun nextTick() {
-        data.tick.lock { nextTick0() }
+        synchronized(data) { nextTick0() }
     }
 
     private fun nextTick0() {
 
-        // Check hit and status
-        fun doHitAndStatus(soldiers1: MutableIterable<Soldier>, soldiers2: Iterable<Soldier>, gc: Boolean) {
-            val it1 = soldiers1.iterator()
-            while (it1.hasNext()) {
-                val soldier1 = it1.next()
-                var bulletCount = 0
-                for (weapon in soldier1.weapons!!) {
-                    val bullets = weapon.bullets
-                    if (bullets.isNullOrEmpty()) {
+        // Do hit
+        fun doHit(soldiers1: Iterable<Soldier>, soldiers2: Iterable<Soldier>) {
+            for (soldier1 in soldiers1) {
+                for (soldier2 in soldiers2) {
+                    if (soldier1 == soldier2 || soldier2.death() || soldier2.outOfView(config) || soldier2.clear) {
                         continue
                     }
-                    bulletCount += bullets.size
-                    val bt = bullets.iterator()
-                    while (bt.hasNext()) {
-                        val bullet = bt.next()
-                        if (bullet.death()) {
-                            if (bullet.outOfDeath(data.tick.now) || bullet.outOfView(config)) {
-                                bt.remove()
-                                OLogger.debug("bullet removed: {}", bullet.id)
-                                bulletCount--
-                            }
-                            continue
-                        }
-                        val it2 = soldiers2.iterator()
-                        while (it2.hasNext()) {
-                            val soldier2 = it2.next()
-                            if (bullet.group == soldier2.group) {
-                                continue
-                            }
-                            if (soldier2.death()) {
-                                continue
-                            }
-                            if (bullet.hit(soldier2)) {
-                                for (hitListener in hitListeners) {
-                                    hitListener.onHit(soldier1, soldier2, weapon, bullet)
-                                }
-                            }
+                    for (weapon in soldier1.weapons!!) {
+                        for (bullet in weapon.bullets!!) {
+                            if (bullet.death() || bullet.outOfView(config))
                         }
                     }
-                }
-                if (
-                    gc
-                    && bulletCount == 0
-                    && (soldier1.death() && soldier1.outOfDeath(data.tick.now)
-                        || soldier1.outOfView(config))
-                ) {
-                    it1.remove()
-                    OLogger.debug("solider removed: {}", soldier1.id)
                 }
             }
         }
