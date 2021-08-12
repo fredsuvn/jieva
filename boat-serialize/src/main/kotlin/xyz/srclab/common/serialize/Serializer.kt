@@ -45,7 +45,6 @@ interface Serializer<S : Serial> {
         return deserialize(bytes, offset, bytes.size - offset)
     }
 
-    @JvmDefault
     fun deserialize(bytes: ByteArray, offset: Int, length: Int): S
 
     fun deserialize(chars: CharSequence): S

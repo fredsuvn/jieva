@@ -54,7 +54,6 @@ interface JsonSerializer : Serializer<Json> {
     }
 
     companion object {
-
         @JvmField
         val DEFAULT = JsonMapper().toJsonSerializer()
     }
