@@ -3,7 +3,7 @@ package xyz.srclab.common.cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
 import com.google.common.collect.MapMaker
-import xyz.srclab.common.lang.CachingProductBuilder
+import xyz.srclab.common.lang.CacheableBuilder
 import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.lang.asAny
 import java.time.Duration
@@ -97,7 +97,7 @@ interface Cache<K : Any, V : Any> {
     /**
      * To build a [Cache] instance with [CaffeineCache] or [GuavaCache].
      */
-    class Builder<K : Any, V : Any> : CachingProductBuilder<Cache<K, V>>() {
+    class Builder<K : Any, V : Any> : CacheableBuilder<Cache<K, V>>() {
 
         private var initialCapacity: Int? = null
         private var maxSize: Long? = null

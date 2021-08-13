@@ -1,291 +1,245 @@
 package xyz.srclab.common.lang
 
 /**
- * Single object accessor for any type.
+ * Accessor for any type.
  *
- * @see SingleGetter
- * @see SingleSetter
- * @see GenericSingleAccessor
- * @see MapAccessor
+ * @see AnyGetter
+ * @see AnySetter
+ * @see GenericAccessor
  */
-interface SingleAccessor : SingleGetter, SingleSetter
+interface AnyAccessor : AnyGetter, AnySetter
 
 /**
- * Single object getter for any type.
+ * Getter for any type.
  *
- * @see SingleAccessor
+ * @see AnyAccessor
  */
-interface SingleGetter {
+interface AnyGetter {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val isPresent: Boolean
         @JvmName("isPresent") get() {
             return getOrNull<Any>() !== null
         }
 
     @Throws(NullPointerException::class)
-    @JvmDefault
     fun <T : Any> get(): T {
         return getOrNull() ?: throw NullPointerException()
     }
 
     fun <T : Any> getOrNull(): T?
 
-    @JvmDefault
     fun <T : Any> getOrElse(value: T): T {
         return getOrNull() ?: value
     }
 
-    @JvmDefault
     fun <T : Any> getOrElse(supplier: () -> T): T {
         return getOrNull() ?: supplier()
     }
 
-    @JvmDefault
     fun <T : Any> getOrThrow(supplier: () -> Throwable): T {
         return getOrNull() ?: throw supplier()
     }
 }
 
 /**
- * Single object setter for any type.
+ * Setter for any type.
  *
- * @see SingleAccessor
+ * @see AnyAccessor
  */
-interface SingleSetter {
+interface AnySetter {
 
     fun set(value: Any?)
 }
 
 /**
- * Map accessor for any type.
+ * Accessor for generic type.
  *
- * @see MapGetter
- * @see MapSetter
- * @see GenericMapAccessor
- * @see SingleAccessor
+ * @see GenericGetter
+ * @see GenericSetter
+ * @see AnyAccessor
  */
-interface MapAccessor : MapGetter, MapSetter
+interface GenericAccessor<T : Any> : GenericGetter<T>, GenericSetter<T>
 
 /**
- * Map getter for any type.
+ * Getter for generic type.
  *
- * @see MapAccessor
+ * @see GenericAccessor
  */
-interface MapGetter {
-
-    @get:JvmName("contents")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val contents: Map<Any, Any?>
-
-    @Throws(NullPointerException::class)
-    @JvmDefault
-    fun <T : Any> get(key: Any): T {
-        return contents[key]?.asAny() ?: throw NullPointerException()
-    }
-
-    @JvmDefault
-    fun <T : Any> getOrNull(key: Any): T? {
-        return contents[key]?.asAny()
-    }
-
-    @JvmDefault
-    fun <T : Any> getOrElse(key: Any, elseValue: T): T {
-        val result = contents.getOrDefault(key, elseValue)
-        if (result === null) {
-            return elseValue
-        }
-        return result.asAny()
-    }
-
-    @JvmDefault
-    fun <T : Any> getOrElse(key: Any, supplier: (key: Any) -> T): T {
-        val result = contents.getOrDefault(key, ELSE_VALUE)
-        if (result === null || result === ELSE_VALUE) {
-            return supplier(key)
-        }
-        return result.asAny()
-    }
-
-    @JvmDefault
-    fun <T : Any> getOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
-        val result = contents.getOrDefault(key, ELSE_VALUE)
-        if (result === null || result === ELSE_VALUE) {
-            throw supplier(key)
-        }
-        return result.asAny()
-    }
-
-    companion object {
-
-        private const val ELSE_VALUE = "ELSE_VALUE"
-    }
-}
-
-/**
- * Map setter for any type.
- *
- * @see MapAccessor
- */
-interface MapSetter {
-
-    @get:JvmName("contents")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val contents: MutableMap<Any, Any?>
-
-    @JvmDefault
-    fun set(key: Any, value: Any?) {
-        contents[key] = value
-    }
-
-    @JvmDefault
-    fun clear() {
-        contents.clear()
-    }
-}
-
-/**
- * Single object accessor for generic type.
- *
- * @see GenericSingleGetter
- * @see GenericSingleSetter
- * @see SingleAccessor
- * @see GenericMapAccessor
- */
-interface GenericSingleAccessor<T : Any> : GenericSingleGetter<T>, GenericSingleSetter<T>
-
-/**
- * Single object getter for generic type.
- *
- * @see GenericSingleAccessor
- */
-interface GenericSingleGetter<T : Any> {
+interface GenericGetter<T : Any> {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val isPresent: Boolean
         @JvmName("isPresent") get() {
             return getOrNull() !== null
         }
 
     @Throws(NullPointerException::class)
-    @JvmDefault
     fun get(): T {
         return getOrNull() ?: throw NullPointerException()
     }
 
     fun getOrNull(): T?
 
-    @JvmDefault
     fun getOrElse(value: T): T {
         return getOrNull() ?: value
     }
 
-    @JvmDefault
     fun getOrElse(supplier: () -> T): T {
         return getOrNull() ?: supplier()
     }
 
-    @JvmDefault
     fun getOrThrow(supplier: () -> Throwable): T {
         return getOrNull() ?: throw supplier()
     }
 }
 
 /**
- * Single object setter for generic type.
+ * Setter for generic type.
  *
- * @see GenericSingleAccessor
+ * @see GenericAccessor
  */
-interface GenericSingleSetter<T : Any> {
+interface GenericSetter<T : Any> {
 
     fun set(value: T?)
 }
 
 /**
- * Map accessor for generic type.
+ * Accessor for map type.
+ *
+ * @see MapGetter
+ * @see MapSetter
+ * @see GenericMapAccessor
+ */
+interface MapAccessor : MapGetter, MapSetter
+
+/**
+ * Getter for map type.
+ *
+ * @see MapAccessor
+ */
+interface MapGetter {
+
+    fun isPresent(key: Any): Boolean {
+        return getOrNull<Any>(key) !== null
+    }
+
+    @Throws(NullPointerException::class)
+    fun <T : Any> get(key: Any): T {
+        return getOrNull(key) ?: throw NullPointerException()
+    }
+
+    fun <T : Any> getOrNull(key: Any): T? {
+        return asMap()[key].asAny()
+    }
+
+    fun <T : Any> getOrElse(key: Any, value: T): T {
+        return getOrNull(key) ?: value
+    }
+
+    fun <T : Any> getOrElse(key: Any, supplier: (key: Any) -> T): T {
+        return getOrNull(key) ?: supplier(key)
+    }
+
+    fun <T : Any> getOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
+        return getOrNull(key) ?: throw supplier(key)
+    }
+
+    /**
+     * Returns a [Map] associated with current object.
+     * Means any modification will reflect to returned map, and vice versa.
+     */
+    fun asMap(): Map<Any, Any?>
+}
+
+/**
+ * Setter for map type.
+ *
+ * @see MapAccessor
+ */
+interface MapSetter {
+
+    fun set(key: Any, value: Any?) {
+        asMap()[key] = value
+    }
+
+    fun clear() {
+        asMap().clear()
+    }
+
+    /**
+     * Returns a [Map] associated with current object.
+     * Means any modification will reflect to returned map, and vice versa.
+     */
+    fun asMap(): MutableMap<Any, Any?>
+}
+
+/**
+ * Accessor for generic map type.
  *
  * @see GenericMapGetter
  * @see GenericMapSetter
  * @see MapAccessor
- * @see GenericSingleAccessor
  */
 interface GenericMapAccessor<K : Any, V : Any> : GenericMapGetter<K, V>, GenericMapSetter<K, V>
 
 /**
- * Map getter for generic type.
+ * Getter for generic map type.
  *
  * @see GenericMapAccessor
  */
 interface GenericMapGetter<K : Any, V : Any> {
 
-    @get:JvmName("contents")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val contents: Map<K, V?>
+    fun isPresent(key: K): Boolean {
+        return getOrNull(key) !== null
+    }
 
     @Throws(NullPointerException::class)
-    @JvmDefault
     fun get(key: K): V {
-        return contents[key]?.asAny() ?: throw NullPointerException()
+        return getOrNull(key) ?: throw NullPointerException()
     }
 
-    @JvmDefault
     fun getOrNull(key: K): V? {
-        return contents[key]?.asAny()
+        return asMap()[key]
     }
 
-    @JvmDefault
-    fun getOrElse(key: K, elseValue: V): V {
-        val result = contents.getOrDefault(key, elseValue)
-        if (result === null) {
-            return elseValue
-        }
-        return result.asAny()
+    fun getOrElse(key: K, value: V): V {
+        return getOrNull(key) ?: value
     }
 
-    @JvmDefault
     fun getOrElse(key: K, supplier: (key: K) -> V): V {
-        val result = contents.getOrDefault(key, ELSE_VALUE)
-        if (result === null || result === ELSE_VALUE) {
-            return supplier(key)
-        }
-        return result.asAny()
+        return getOrNull(key) ?: supplier(key)
     }
 
-    @JvmDefault
     fun getOrThrow(key: K, supplier: (key: K) -> Throwable): V {
-        val result = contents.getOrDefault(key, ELSE_VALUE)
-        if (result === null || result === ELSE_VALUE) {
-            throw supplier(key)
-        }
-        return result.asAny()
+        return getOrNull(key) ?: throw supplier(key)
     }
 
-    companion object {
-
-        private const val ELSE_VALUE = "ELSE_VALUE"
-    }
+    /**
+     * Returns a [Map] associated with current object.
+     * Means any modification will reflect to returned map, and vice versa.
+     */
+    fun asMap(): Map<K, V?>
 }
 
 /**
- * Map setter for generic type.
+ * Setter for generic map type.
  *
  * @see GenericMapAccessor
  */
 interface GenericMapSetter<K : Any, V : Any> {
 
-    @get:JvmName("contents")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val contents: MutableMap<K, V?>
-
-    @JvmDefault
     fun set(key: K, value: V?) {
-        contents[key] = value
+        asMap()[key] = value
     }
 
-    @JvmDefault
     fun clear() {
-        contents.clear()
+        asMap().clear()
     }
+
+    /**
+     * Returns a [Map] associated with current object.
+     * Means any modification will reflect to returned map, and vice versa.
+     */
+    fun asMap(): MutableMap<K, V?>
 }

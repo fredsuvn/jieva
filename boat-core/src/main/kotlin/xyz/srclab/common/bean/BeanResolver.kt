@@ -22,7 +22,6 @@ interface BeanResolver {
     val resolveHandlers: List<BeanResolveHandler>
         @JvmName("resolveHandlers") get
 
-    @JvmDefault
     fun resolve(type: Type): BeanType {
         val builder = BeanTypeBuilder.newBeanTypeBuilder(type)
         for (resolveHandler in resolveHandlers) {
@@ -34,7 +33,6 @@ interface BeanResolver {
         return builder.build()
     }
 
-    @JvmDefault
     fun withPreResolveHandler(preResolveHandler: BeanResolveHandler): BeanResolver {
         return newBeanResolver(listOf(preResolveHandler).plus(resolveHandlers))
     }

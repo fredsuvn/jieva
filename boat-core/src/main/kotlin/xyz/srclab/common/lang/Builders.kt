@@ -1,24 +1,24 @@
 package xyz.srclab.common.lang
 
 /**
- * Abstract Builder class to help cache last result value.
- * If there is no modification, [build] method will always return last result value.
- * Note [commitModification] should be called for each operation which may lead the cache expired
- * (such as setXxx method).
+ * Cacheable builder, an abstract build which stores last build result from [buildNew].
+ *
+ * By default, if there is no modification, [build] method will return last result of [buildNew].
+ * Subclass should call [commitModification] for each `set` operation, which leads the cache expired.
  */
-abstract class CachingProductBuilder<T : Any> {
+abstract class CacheableBuilder<T : Any> {
 
     private var cache: T? = null
     private var version: Int = 0
     private var buildVersion: Int = 0
 
     /**
-     * Returns a new result value.
+     * Returns a new result value and stores it as cache.
      */
     protected abstract fun buildNew(): T
 
     /**
-     * Commits modification of this Builder, may lead cache refresh.
+     * Commits modification of this Builder, lead cache refresh.
      */
     protected open fun commitModification() {
         version++
@@ -27,6 +27,9 @@ abstract class CachingProductBuilder<T : Any> {
         }
     }
 
+    /**
+     * Returns last cache result if no modification, or new one if this build is modified.
+     */
     open fun build(): T {
         val cache = this.cache
         if (cache === null || version != buildVersion) {

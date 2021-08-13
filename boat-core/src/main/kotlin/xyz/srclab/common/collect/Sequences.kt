@@ -677,7 +677,7 @@ fun <T, K> Sequence<T>.distinct(selector: (T) -> K): Sequence<T> {
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.sorted(comparator: Comparator<in T> = asComparableComparator()): Sequence<T> {
+fun <T> Sequence<T>.sorted(comparator: Comparator<in T> = comparableComparator()): Sequence<T> {
     return this.sortedWithKt(comparator)
 }
 
@@ -690,22 +690,22 @@ fun <T> Sequence<T>.shuffled(random: Random): Sequence<T> {
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.max(comparator: Comparator<in T> = asComparableComparator()): T {
+fun <T> Sequence<T>.max(comparator: Comparator<in T> = comparableComparator()): T {
     return maxOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.maxOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
+fun <T> Sequence<T>.maxOrNull(comparator: Comparator<in T> = comparableComparator()): T? {
     return this.maxWithOrNullKt(comparator)
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.min(comparator: Comparator<in T> = asComparableComparator()): T {
+fun <T> Sequence<T>.min(comparator: Comparator<in T> = comparableComparator()): T {
     return minOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.minOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
+fun <T> Sequence<T>.minOrNull(comparator: Comparator<in T> = comparableComparator()): T? {
     return this.minWithOrNullKt(comparator)
 }
 
@@ -814,7 +814,7 @@ fun <T> Sequence<T>.toLinkedHashSet(): LinkedHashSet<T> {
 }
 
 @JvmOverloads
-fun <T> Sequence<T>.toSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
+fun <T> Sequence<T>.toSortedSet(comparator: Comparator<in T> = comparableComparator()): SortedSet<T> {
     return this.toSortedSetKt(comparator)
 }
 

@@ -2,7 +2,6 @@ package xyz.srclab.common.bus
 
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.lang.INHERITANCE_COMPARATOR
-import xyz.srclab.common.lang.Next
 import xyz.srclab.common.run.Runner
 import java.util.*
 import java.util.concurrent.Executor
@@ -10,11 +9,9 @@ import java.util.concurrent.Executor
 /**
  * Event bus. Use [register] or [registerAll] to register event handler, [unregister] and [unregisterAll] to unregister.
  *
- * Each method which is annotated by [SubscribeMethod] in event handler is a `subscriber`.
- * Event will be post to all `subscriber`s of which event type (method parameter type) is compatible.
- *
- * If same event type has more than one *Subscriber*s, in high to low priority order ([SubscribeMethod.priority]).
- * If one *Subscriber* returns [Next.BREAK], the event will be dropped and *Subscriber* behind will not receive event.
+ * For event handler, each method annotated by [SubscribeMethod] will be seen as `Subscriber`.
+ * `Subscriber` must have only one parameter, and parameter's [Class] is its event type.
+ * [EventBus] will post given event for all compatible event type.
  *
  * @see SubscribeMethod
  */
@@ -44,7 +41,7 @@ interface EventBus {
             private val executor: Executor
         ) : EventBus {
 
-            private var subscribeMap: TreeMap<Class<*>, MutableList<Action>> = TreeMap(COMPARATOR)
+            private var subscribeMap: TreeMap<Class<*>, MutableCollection<Action>> = TreeMap(COMPARATOR)
 
             override fun register(eventHandler: Any) {
                 val newActions = resolveHandler(eventHandler)
@@ -74,9 +71,6 @@ interface EventBus {
                         val actions = newAction.value
                         val oldActions = newMap.getOrPut(eventType) { ArrayList() }
                         oldActions.addAll(actions)
-                        oldActions.sortWith { a1, a2 ->
-                            a2.subscribeMethod.priority - a1.subscribeMethod.priority
-                        }
                     }
                     subscribeMap = newMap
                 }
@@ -87,7 +81,7 @@ interface EventBus {
             }
 
             override fun unregisterAll(eventHandlers: Iterable<Any>) {
-                val set = eventHandlers.toSet()
+                val handlerSet = eventHandlers.toSet()
                 synchronized(this) {
                     val newMap = copySubscribers()
                     for (entry in newMap) {
@@ -95,7 +89,7 @@ interface EventBus {
                         val it = actions.iterator()
                         while (it.hasNext()) {
                             val action = it.next()
-                            if (set.contains(action.handler)) {
+                            if (handlerSet.contains(action.handler)) {
                                 it.remove()
                             }
                         }
@@ -104,10 +98,10 @@ interface EventBus {
                 }
             }
 
-            private fun copySubscribers(): TreeMap<Class<*>, MutableList<Action>> {
-                val newMap = TreeMap<Class<*>, MutableList<Action>>(subscribeMap.comparator())
+            private fun copySubscribers(): TreeMap<Class<*>, MutableCollection<Action>> {
+                val newMap = TreeMap<Class<*>, MutableCollection<Action>>(subscribeMap.comparator())
                 for (mutableEntry in subscribeMap) {
-                    val newList = ArrayList<Action>()
+                    val newList = LinkedList<Action>()
                     newList.addAll(mutableEntry.value)
                     newMap[mutableEntry.key] = newList
                 }
@@ -145,12 +139,9 @@ interface EventBus {
                         continue
                     }
                     val actions = subscriberEntry.value
-                    executor.execute {
-                        for (action in actions) {
-                            val result = action.invoker.invoke<Any?>(action.handler, event)
-                            if (result == Next.BREAK) {
-                                break
-                            }
+                    for (action in actions) {
+                        executor.execute {
+                            action.invoker.invoke<Any?>(action.handler, event)
                         }
                     }
                 }
@@ -163,7 +154,6 @@ interface EventBus {
             )
 
             companion object {
-
                 private val COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
                     val r0 = -INHERITANCE_COMPARATOR.compare(c1, c2)
                     if (r0 == 0) {

@@ -55,7 +55,6 @@ interface CharsFormat {
  * [CharsFormat] with `slf4j` style.
  */
 object FastCharsFormat : CharsFormat {
-
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         return MessageFormatterSlf4j.arrayFormat(pattern.toString(), args, null).message
     }
@@ -65,17 +64,15 @@ object FastCharsFormat : CharsFormat {
  * [CharsFormat] with `System.out.printf` style.
  */
 object PrintfCharsFormat : CharsFormat {
-
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         return String.format(Defaults.locale, pattern.toString(), *args)
     }
 }
 
 /**
- * [CharsFormat] with `String.format` style.
+ * [CharsFormat] with `MessageFormat` style.
  */
 object MessageCharsFormat : CharsFormat {
-
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         return MessageFormatKt.format(pattern.toString(), *args)
     }

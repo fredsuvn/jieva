@@ -5,6 +5,7 @@ import java.util.*
 
 /**
  * Naming case.
+ *
  * @author sunqian
  *
  * @see LowerCamel
@@ -25,7 +26,6 @@ interface NamingCase {
     fun join(words: List<CharSequence>): String
 
     @Throws(NamingCaseException::class)
-    @JvmDefault
     fun convertTo(name: CharSequence, toCase: NamingCase): String {
         val words = segment(name)
         return toCase.join(words)
@@ -64,7 +64,7 @@ interface NamingCase {
  */
 object LowerCamel : CamelCase() {
     override fun doFirst(first: CharSequence): String {
-        return first.toString().decapitalize(Defaults.locale)
+        return first.toString().uncapitalize()
     }
 }
 
@@ -73,7 +73,7 @@ object LowerCamel : CamelCase() {
  */
 object UpperCamel : CamelCase() {
     override fun doFirst(first: CharSequence): String {
-        return first.toString().capitalize(Defaults.locale)
+        return first.toString().capitalize()
     }
 }
 
@@ -82,7 +82,7 @@ object UpperCamel : CamelCase() {
  */
 object LowerUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Defaults.locale)
+        return word.toString().lowercase(Defaults.locale)
     }
 }
 
@@ -91,7 +91,7 @@ object LowerUnderscore : UnderscoreCase() {
  */
 object UpperUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toUpperCase(Defaults.locale)
+        return word.toString().uppercase(Defaults.locale)
     }
 }
 
@@ -100,7 +100,7 @@ object UpperUnderscore : UnderscoreCase() {
  */
 object CapitalizeUnderscore : UnderscoreCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Defaults.locale).capitalize(Defaults.locale)
+        return word.toString().lowercase(Defaults.locale).capitalize()
     }
 }
 
@@ -109,7 +109,7 @@ object CapitalizeUnderscore : UnderscoreCase() {
  */
 object LowerHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Defaults.locale)
+        return word.toString().lowercase(Defaults.locale)
     }
 }
 
@@ -118,7 +118,7 @@ object LowerHyphen : HyphenCase() {
  */
 object UpperHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toUpperCase(Defaults.locale)
+        return word.toString().uppercase(Defaults.locale)
     }
 }
 
@@ -127,7 +127,7 @@ object UpperHyphen : HyphenCase() {
  */
 object CapitalizeHyphen : HyphenCase() {
     override fun doWord(word: CharSequence): String {
-        return word.toString().toLowerCase(Defaults.locale).capitalize(Defaults.locale)
+        return word.toString().lowercase(Defaults.locale).capitalize()
     }
 }
 
@@ -199,11 +199,11 @@ abstract class CamelCase : NamingCase {
             throw NamingCaseException("Word of given first joined word should have at least 1 char.")
         }
         if (first.length > 1 && StringUtils.isAllUpperCase(first)) {
-            return words.joinToString("") { it.toString().capitalize(Defaults.locale) }
+            return words.joinToString("") { it.toString().capitalize() }
         }
         return doFirst(first) +
             words.subList(1, words.size).joinToString("") {
-                it.toString().capitalize(Defaults.locale)
+                it.toString().capitalize()
             }
     }
 

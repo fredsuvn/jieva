@@ -20,7 +20,6 @@ interface BeanType {
     @Suppress(INAPPLICABLE_JVM_NAME)
     val properties: Map<String, PropertyType>
 
-    @JvmDefault
     @Throws(PropertyNotFoundException::class)
     fun getProperty(name: CharSequence): PropertyType {
         val nameString = name.toString()

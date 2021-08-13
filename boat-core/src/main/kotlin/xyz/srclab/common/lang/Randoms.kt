@@ -28,25 +28,25 @@ fun Random.between(from: Int, to: Int): Int {
  */
 interface RandomSupplier<T : Any> : Supplier<T> {
 
-    class Builder<T : Any> : CachingProductBuilder<RandomSupplier<T>>() {
+    class Builder<T : Any> : CacheableBuilder<RandomSupplier<T>>() {
 
         private var builderRandom: Random? = null
         private var builderTotalScore: Int = 1
         private val builderCases: MutableList<Case<T>> = LinkedList()
 
-        fun mayBe(score: Int, `object`: T): Builder<T> {
-            return mayBe(score) { `object` }
+        fun score(score: Int, `object`: T): Builder<T> {
+            return score(score) { `object` }
         }
 
-        fun mayBe(score: Int, supplier: () -> T): Builder<T> {
+        fun score(score: Int, supplier: () -> T): Builder<T> {
             builderCases.add(Case(builderTotalScore, builderTotalScore + score, supplier))
             builderTotalScore += score
             this.commitModification()
             return this
         }
 
-        fun mayBe(score: Int, supplier: Supplier<T>): Builder<T> {
-            return mayBe(score) { supplier.get() }
+        fun score(score: Int, supplier: Supplier<T>): Builder<T> {
+            return score(score) { supplier.get() }
         }
 
         fun random(random: Random): Builder<T> {
@@ -86,7 +86,6 @@ interface RandomSupplier<T : Any> : Supplier<T> {
     }
 
     companion object {
-
         @JvmStatic
         fun <T : Any> newBuilder(): Builder<T> {
             return Builder()

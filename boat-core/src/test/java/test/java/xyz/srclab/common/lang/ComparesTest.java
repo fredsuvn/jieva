@@ -11,8 +11,8 @@ public class ComparesTest {
 
     @Test
     public void testCompares() {
-        Assert.assertEquals(Compares.inBounds(100, 101, 666), Integer.valueOf(101));
-        Assert.assertEquals(Compares.inBounds(100, 0, 99), Integer.valueOf(99));
-        Assert.assertEquals(Compares.inBounds(100, 0, 666), Integer.valueOf(100));
+        Assert.assertEquals(Compares.between(100, 101, 666), Integer.valueOf(101));
+        Assert.assertEquals(Compares.between(100, 0, 99), Integer.valueOf(99));
+        Assert.assertEquals(Compares.between(100, 0, 666), Integer.valueOf(100));
     }
 }

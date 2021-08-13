@@ -35,7 +35,6 @@ interface BeanTypeBuilder {
     @Suppress(INAPPLICABLE_JVM_NAME)
     val methods: List<Method>
 
-    @JvmDefault
     fun build(): BeanType {
         return preparedBeanType
     }

@@ -59,3 +59,11 @@ fun CharSequence.toBytes(charset: CharSequence): ByteArray {
 fun CharSequence.toBytes(charset: Charset = Defaults.charset): ByteArray {
     return toString().toByteArray(charset)
 }
+
+fun CharSequence.capitalize(): String {
+    return StringUtils.capitalize(this.toString())
+}
+
+fun CharSequence.uncapitalize(): String {
+    return StringUtils.uncapitalize(this.toString())
+}

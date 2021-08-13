@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.lang;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.CachingProductBuilder;
+import xyz.srclab.common.lang.CacheableBuilder;
 import xyz.srclab.common.test.TestLogger;
 
 public class BuildersTest {
@@ -13,7 +13,7 @@ public class BuildersTest {
     @Test
     public void testCachingProductBuilder() {
 
-        class TestCachingBuilder extends CachingProductBuilder<String> {
+        class TestCachingBuilder extends CacheableBuilder<String> {
 
             private String value = "null";
             private long counter = 0L;

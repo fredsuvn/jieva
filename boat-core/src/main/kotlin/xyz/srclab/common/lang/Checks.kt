@@ -21,7 +21,7 @@ fun checkArgument(expression: Boolean, message: String?) {
 @Throws(IllegalArgumentException::class)
 fun checkArgument(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw IllegalArgumentException(format(messagePattern, *messageArgs))
+        throw IllegalArgumentException(messagePattern?.fastFormat(*messageArgs))
     }
 }
 
@@ -42,7 +42,7 @@ fun checkState(expression: Boolean, message: String?) {
 @Throws(IllegalStateException::class)
 fun checkState(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw IllegalStateException(format(messagePattern, *messageArgs))
+        throw IllegalStateException(messagePattern?.fastFormat(*messageArgs))
     }
 }
 
@@ -63,7 +63,7 @@ fun checkNull(expression: Boolean, message: String?) {
 @Throws(NullPointerException::class)
 fun checkNull(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw NullPointerException(format(messagePattern, *messageArgs))
+        throw NullPointerException(messagePattern?.fastFormat(*messageArgs))
     }
 }
 
@@ -84,7 +84,7 @@ fun checkSupported(expression: Boolean, message: String?) {
 @Throws(UnsupportedOperationException::class)
 fun checkSupported(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw UnsupportedOperationException(format(messagePattern, *messageArgs))
+        throw UnsupportedOperationException(messagePattern?.fastFormat(*messageArgs))
     }
 }
 
@@ -105,7 +105,7 @@ fun checkElement(expression: Boolean, message: String?) {
 @Throws(NoSuchElementException::class)
 fun checkElement(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw NoSuchElementException(format(messagePattern, *messageArgs))
+        throw NoSuchElementException(messagePattern?.fastFormat(*messageArgs))
     }
 }
 
@@ -126,7 +126,7 @@ fun checkBounds(expression: Boolean, message: String?) {
 @Throws(IndexOutOfBoundsException::class)
 fun checkBounds(expression: Boolean, messagePattern: String?, vararg messageArgs: Any?) {
     if (!expression) {
-        throw IndexOutOfBoundsException(format(messagePattern, *messageArgs))
+        throw IndexOutOfBoundsException(messagePattern?.fastFormat(*messageArgs))
     }
 }
 
@@ -239,11 +239,4 @@ fun checkRangeInBounds(
                 "]."
         )
     }
-}
-
-private fun format(pattern: String?, vararg args: Any?): String? {
-    if (pattern === null) {
-        return null
-    }
-    return pattern.fastFormat(*args)
 }

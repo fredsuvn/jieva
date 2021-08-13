@@ -14,7 +14,7 @@ interface RunContext : MapAccessor {
     @JvmDefault
     fun attach(): Attach {
         return object : Attach {
-            override val contents: Map<Any, Any?> = this@RunContext.contents
+            override val contents: Map<Any, Any?> = this@RunContext.asMap()
         }
     }
 
@@ -23,7 +23,7 @@ interface RunContext : MapAccessor {
      */
     fun detach(previous: Attach) {
         clear()
-        contents.putAll(previous.contents)
+        asMap().putAll(previous.contents)
     }
 
     interface Attach {
@@ -45,8 +45,9 @@ interface RunContext : MapAccessor {
             private val threadLocal: ThreadLocal<MutableMap<Any, Any?>> =
                 ThreadLocal.withInitial { HashMap(attach?.contents ?: emptyMap()) }
 
-            override val contents: MutableMap<Any, Any?>
-                get() = threadLocal.get()
+            override fun asMap(): MutableMap<Any, Any?> {
+                return threadLocal.get()
+            }
         }
     }
 }

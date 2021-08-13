@@ -13,16 +13,6 @@ import java.util.concurrent.TimeUnit
  */
 object Defaults {
 
-    /**
-     * A [String] constant of which value is `NULL`.
-     */
-    const val NULL: String = "NULL"
-
-    /**
-     * A [String] constant of which value is `ABSENT`.
-     */
-    const val ABSENT: String = "ABSENT"
-
     @JvmField
     val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
 

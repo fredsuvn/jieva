@@ -1,7 +1,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.lang.asAny
-import xyz.srclab.common.lang.asComparableComparator
+import xyz.srclab.common.lang.comparableComparator
 import java.util.*
 
 /**
@@ -100,7 +100,7 @@ open class Mapping<K, V>(
     }
 
     @JvmOverloads
-    open fun sorted(comparator: Comparator<in Map.Entry<K, V>> = asComparableComparator()): Map<K, V> {
+    open fun sorted(comparator: Comparator<in Map.Entry<K, V>> = comparableComparator()): Map<K, V> {
         return finalMap().sorted(comparator)
     }
 

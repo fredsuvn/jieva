@@ -7,7 +7,7 @@ import xyz.srclab.common.lang.CharsFormat.Companion.fastFormat
 import xyz.srclab.common.lang.CharsFormat.Companion.messageFormat
 import xyz.srclab.common.lang.CharsFormat.Companion.printfFormat
 import xyz.srclab.common.lang.CharsTemplate.Companion.resolveTemplate
-import xyz.srclab.common.lang.LazyString.Companion.toLazyString
+import xyz.srclab.common.lang.LazyToString.Companion.lazyToString
 import xyz.srclab.common.lang.Processing.Companion.newProcessing
 import xyz.srclab.common.lang.SpecParser.Companion.parseFirstClassNameToInstance
 import xyz.srclab.common.test.TestLogger
@@ -86,7 +86,7 @@ class BaseSample {
     @Test
     fun testLazyString() {
         val counter = 0.counterStarts()
-        val lazyToString = lazyOf { counter.getAndIncrementInt() }.toLazyString()
+        val lazyToString = lazyOf { counter.getAndIncrementInt() }.lazyToString()
         //0
         logger.log("lazyToString: {}", lazyToString)
     }
@@ -145,7 +145,7 @@ class BaseSample {
 
         //Compares example:
         //99
-        logger.log("inBounds: {}", 100.inBounds(0, 99))
+        logger.log("inBounds: {}", 100.between(0, 99))
 
         //Checks examples:
         try {
@@ -181,9 +181,9 @@ class BaseSample {
         }
 
         val randomSupplier = RandomSupplier.newBuilder<Any>()
-            .mayBe(20, "A")
-            .mayBe(20, "B")
-            .mayBe(60, "C")
+            .score(20, "A")
+            .score(20, "B")
+            .score(60, "C")
             .build()
         var countA = 0
         var countB = 0
@@ -207,7 +207,7 @@ class BaseSample {
     @Test
     fun testCachingProductBuilder() {
 
-        class CachingBuilderSample : CachingProductBuilder<String>() {
+        class CachingBuilderSample : CacheableBuilder<String>() {
 
             private var value = "null"
             private var counter = 0L
@@ -283,13 +283,13 @@ class BaseSample {
 
     @Test
     fun testSingleAccessor() {
-        val singleAccessor = TestSingleAccessor()
+        val singleAccessor = TestAnyAccessor()
         Assert.assertNull(singleAccessor.getOrNull())
         Assert.assertEquals("666", singleAccessor.getOrElse("666"))
         Assert.assertEquals("666", singleAccessor.getOrElse { "666" })
         singleAccessor.set("777")
         Assert.assertEquals("777", singleAccessor.get())
-        val genericSingleAccessor = TestGenericSingleAccessor()
+        val genericSingleAccessor = TestGenericAccessor()
         Assert.assertNull(genericSingleAccessor.getOrNull())
         Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"))
         Assert.assertEquals("666", genericSingleAccessor.getOrElse { "666" })
@@ -318,7 +318,7 @@ enum class TestEnum {
     T1, T2
 }
 
-class TestSingleAccessor : SingleAccessor {
+class TestAnyAccessor : AnyAccessor {
     private var value: String? = null
     override fun <T : Any> getOrNull(): T? {
         return value as T?
@@ -329,7 +329,7 @@ class TestSingleAccessor : SingleAccessor {
     }
 }
 
-class TestGenericSingleAccessor : GenericSingleAccessor<String> {
+class TestGenericAccessor : GenericAccessor<String> {
     private var value: String? = null
     override fun getOrNull(): String? {
         return value

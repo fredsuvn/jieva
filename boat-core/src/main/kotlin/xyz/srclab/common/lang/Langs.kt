@@ -4,19 +4,22 @@ import xyz.srclab.common.lang.Next.*
 
 /**
  * Convenient interface for java:
+ *
  * ```
  * Date date = Let.of(intValue)
  *     .then(StringUtils::intToString)
  *     .then(DateUtils::stringToDate)
  *     .get()
  * ```
+ *
  * Same as:
+ *
  * ```
  * String stringValue = StringUtils.intToString(intValue)
  * Date dateValue = DateUtils.stringToDate(stringValue)
  * ```
  */
-interface Let<T : Any> : GenericSingleGetter<T> {
+interface Let<T : Any> : GenericGetter<T> {
 
     fun <R : Any> then(action: (T) -> R): Let<R>
 

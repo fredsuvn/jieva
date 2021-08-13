@@ -10,6 +10,14 @@ import kotlin.collections.toList as toListKt
 
 //Creation:
 
+fun <T> newSet(vararg keyValues: T): LinkedHashSet<T> {
+    return LinkedHashSet<T>().addElements(*keyValues)
+}
+
+fun <T> newSet(keyValues: Iterable<T>): LinkedHashSet<T> {
+    return LinkedHashSet<T>().addElements(keyValues)
+}
+
 @JvmName("newCollection")
 fun <T, C : MutableCollection<T>> C.addElements(vararg elements: T): C {
     return addElements(elements.toListKt())
@@ -19,6 +27,14 @@ fun <T, C : MutableCollection<T>> C.addElements(vararg elements: T): C {
 fun <T, C : MutableCollection<T>> C.addElements(elements: Iterable<T>): C {
     this.addAll(elements)
     return this
+}
+
+fun <K, V> newMap(vararg keyValues: Any?): LinkedHashMap<K, V> {
+    return LinkedHashMap<K, V>().putEntries(*keyValues)
+}
+
+fun <K, V> newMap(keyValues: Iterable<Any?>): LinkedHashMap<K, V> {
+    return LinkedHashMap<K, V>().putEntries(keyValues)
 }
 
 @JvmName("newMap")

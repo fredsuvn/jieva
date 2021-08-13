@@ -31,6 +31,6 @@ public class CharsTemplateTest {
         CharsTemplate template3 = CharsTemplate.resolve(
             "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
         logger.log(template3.process(args));
-        Assert.assertEquals(template3.process(args), "This is a } {DogX (Dog), that is a Bird\\{\\");
+        Assert.assertEquals(template3.process(args), "This is a } {DogX (Dog), that is a Bird\\{");
     }
 }

@@ -23,12 +23,10 @@ interface PropertyType {
 
     @get:JvmName("ownerType")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val ownerType: BeanType
 
     @get:JvmName("isReadable")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val isReadable: Boolean
         get() {
             return getter !== null
@@ -36,7 +34,6 @@ interface PropertyType {
 
     @get:JvmName("isWriteable")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val isWriteable: Boolean
         get() {
             return setter !== null
@@ -95,7 +92,6 @@ interface PropertyType {
             return setterMethod.annotations.toList()
         }
 
-    @JvmDefault
     fun <T> getValue(bean: Any): T {
         val getter = this.getter
         if (getter === null) {
@@ -104,7 +100,6 @@ interface PropertyType {
         return getter.invoke(bean)
     }
 
-    @JvmDefault
     fun setValue(bean: Any, value: Any?) {
         val setter = this.setter
         if (setter === null) {
@@ -113,7 +108,6 @@ interface PropertyType {
         setter.invoke<Any?>(bean, value)
     }
 
-    @JvmDefault
     fun <T> setValueAndReturnOld(bean: Any, value: Any?): T? {
         val old = getValue<T?>(bean)
         setValue(bean, value)

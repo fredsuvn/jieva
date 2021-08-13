@@ -35,10 +35,10 @@ Boat core link:../../README.md[Boat] 的核心接口, 方法和工具, 包括:
 Lang包提供一系列核心接口和组件:
 
 * 全局系统对象: `Current`, `Defaults`, `Environment`;
-* 语法增强 (主要针对Java): `Let`, `Ref`, `Lazy`, `LazyString`;
+* 语法增强 (主要针对Java): `Let`, `Ref`, `Lazy`, `LazyToString`;
 * 字符串功能: `CharsFormat`, `CharsTemplate`, `NamingCase`;
 * 特殊字符支持: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
-* 访问接口: `SingleAccessor`, `MapAccessor`, `GenericSingleAccessor`, `GenericMapAccessor`;
+* 访问接口: `AnyAccessor`, `MapAccessor`, `GenericAccessor`, `GenericMapAccessor`;
 * 辅助对象: SpecParser, CachingProductBuilder, Processing;
 * 公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
 

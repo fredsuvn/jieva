@@ -720,7 +720,7 @@ inline fun <T, K> Iterable<T>.distinct(selector: (T) -> K): List<T> {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.sorted(comparator: Comparator<in T> = asComparableComparator()): List<T> {
+fun <T> Iterable<T>.sorted(comparator: Comparator<in T> = comparableComparator()): List<T> {
     return this.sortedWithKt(comparator)
 }
 
@@ -737,22 +737,22 @@ fun <T> Iterable<T>.shuffled(random: Random): List<T> {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.max(comparator: Comparator<in T> = asComparableComparator()): T {
+fun <T> Iterable<T>.max(comparator: Comparator<in T> = comparableComparator()): T {
     return maxOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
+fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T> = comparableComparator()): T? {
     return this.maxWithOrNullKt(comparator)
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.min(comparator: Comparator<in T> = asComparableComparator()): T {
+fun <T> Iterable<T>.min(comparator: Comparator<in T> = comparableComparator()): T {
     return minOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
+fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T> = comparableComparator()): T? {
     return this.minWithOrNullKt(comparator)
 }
 
@@ -865,7 +865,7 @@ fun <T> Iterable<T>.toTreeSet(): TreeSet<T> {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
+fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T> = comparableComparator()): SortedSet<T> {
     return this.toSortedSetKt(comparator)
 }
 
@@ -919,7 +919,7 @@ fun <T> Iterable<T>.asToMutableSet(): MutableSet<T> {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.asToSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
+fun <T> Iterable<T>.asToSortedSet(comparator: Comparator<in T> = comparableComparator()): SortedSet<T> {
     return if (this is SortedSet<T>) this else this.toSortedSet(comparator)
 }
 

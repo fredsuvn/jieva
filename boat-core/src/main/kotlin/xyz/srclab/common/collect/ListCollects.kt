@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.lang.asComparableComparator
+import xyz.srclab.common.lang.comparableComparator
 import kotlin.random.Random
 import kotlin.collections.binarySearch as binarySearchKt
 import kotlin.collections.dropLast as dropLastKt
@@ -148,7 +148,7 @@ fun <T> List<T>.slice(indices: IntRange): List<T> {
 }
 
 @JvmOverloads
-fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T> = asComparableComparator()): Int {
+fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T> = comparableComparator()): Int {
     return this.binarySearchKt(element, comparator)
 }
 
@@ -157,7 +157,7 @@ fun <T> MutableList<T>.reverse() {
 }
 
 @JvmOverloads
-fun <T> MutableList<T>.sort(comparator: Comparator<in T> = asComparableComparator()) {
+fun <T> MutableList<T>.sort(comparator: Comparator<in T> = comparableComparator()) {
     this.sortWithKt(comparator)
 }
 

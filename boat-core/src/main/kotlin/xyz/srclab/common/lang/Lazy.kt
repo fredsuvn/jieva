@@ -4,6 +4,8 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 /**
+ * Lazy to create return value.
+ *
  * @author sunqian
  */
 interface Lazy<T> {
@@ -34,10 +36,10 @@ interface Lazy<T> {
 }
 
 /**
- * A special type of [Lazy] class that override [toString] method by [get]. This class can be used in log message of
- * which toString executing is expensive.
+ * A special type of [Lazy] which overrides [toString] method by [get]. This class can be used in log message of
+ * which [toString] is expensive.
  */
-open class LazyString<T>(delegate: Lazy<T>) : Lazy<T> by delegate {
+open class LazyToString<T>(delegate: Lazy<T>) : Lazy<T> by delegate {
 
     override fun toString(): String {
         return get().toString()
@@ -47,22 +49,15 @@ open class LazyString<T>(delegate: Lazy<T>) : Lazy<T> by delegate {
 
         @JvmName("of")
         @JvmStatic
-        fun <T> Lazy<T>.toLazyString(): LazyString<T> {
-            return LazyString(this)
+        fun <T> Lazy<T>.lazyToString(): LazyToString<T> {
+            return LazyToString(this)
+        }
+
+        @JvmStatic
+        fun <T> of(supplier: () -> T): LazyToString<T> {
+            return OnceLazy(supplier).lazyToString()
         }
     }
-}
-
-fun <T> lazyOf(supplier: () -> T): Lazy<T> {
-    return Lazy.of(supplier)
-}
-
-fun <T> lazyOf(period: Duration, supplier: () -> T): Lazy<T> {
-    return Lazy.of(period, supplier)
-}
-
-fun <T> lazyOf(period: (T) -> Duration, supplier: () -> T): Lazy<T> {
-    return Lazy.of(period, supplier)
 }
 
 private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {

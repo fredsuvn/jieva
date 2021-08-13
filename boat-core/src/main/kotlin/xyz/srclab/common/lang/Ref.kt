@@ -2,8 +2,8 @@ package xyz.srclab.common.lang
 
 /**
  * A container holds an object.
- * Can help solve the problem like that:
- * a local variable should be final if it will be used in lambda expression (in java):
+ * Can help solve the problem like that a local variable is final if it is used in lambda expression (in java):
+ *
  * ```
  * Ref<String> ref = Ref.of("1");
  * List<String> list = Arrays.asList("-1", "-2", "-3");
@@ -12,7 +12,7 @@ package xyz.srclab.common.lang
  * list.forEach(i -> ref.set(ref.get() + i));
  * ```
  */
-interface Ref<T : Any> : GenericSingleAccessor<T> {
+interface Ref<T : Any> : GenericAccessor<T> {
 
     companion object {
 

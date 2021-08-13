@@ -5,6 +5,7 @@ package xyz.srclab.common.io
 import org.apache.commons.io.IOUtils
 import xyz.srclab.common.lang.Defaults
 import java.io.*
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import kotlin.io.readBytes as readBytesKt
 
@@ -74,4 +75,18 @@ fun Reader.readLines(): List<String> {
 
 fun ByteArray.toInputStream(): InputStream {
     return ByteArrayInputStream(this)
+}
+
+@JvmOverloads
+fun ByteBuffer.toByteArray(permitBacked: Boolean = true): ByteArray {
+    if (this.hasArray()) {
+        return if (permitBacked) {
+            this.array()
+        } else {
+            this.array().clone()
+        }
+    }
+    val array = ByteArray(this.remaining())
+    this.get(array)
+    return array
 }

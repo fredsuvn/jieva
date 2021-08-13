@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.lang.asComparableComparator
+import xyz.srclab.common.lang.comparableComparator
 import java.util.*
 import kotlin.collections.associateTo as associateToKt
 import kotlin.collections.filter as filterKt
@@ -110,7 +110,7 @@ inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
 }
 
 @JvmOverloads
-fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = asComparableComparator()): Map<K, V> {
+fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = comparableComparator()): Map<K, V> {
     return this.entries.sortedWithKt(comparator).associateToKt(LinkedHashMap()) { it.key to it.value }
 }
 

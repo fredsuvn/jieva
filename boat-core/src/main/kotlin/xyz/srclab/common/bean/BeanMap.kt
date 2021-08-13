@@ -9,6 +9,7 @@ import java.lang.reflect.Type
  * of which keys are properties' names of the bean, values are properties' value.
  *
  * Note:
+ *
  * * Property `class` (from [Object.getClass]) excludes;
  * * Use [beanType] to get `class` info;
  */

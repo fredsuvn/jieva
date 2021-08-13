@@ -124,9 +124,9 @@ public class LangSample {
     @Test
     public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        LazyString<Integer> lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
+        LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
         //0
-        logger.log("lazyToString: {}", lazyString);
+        logger.log("lazyToString: {}", lazyToString);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class LangSample {
 
         //Compares example:
         //99
-        logger.log("inBounds: {}", Compares.inBounds(100, 0, 99));
+        logger.log("inBounds: {}", Compares.between(100, 0, 99));
 
         //Checks examples:
         try {
@@ -218,9 +218,9 @@ public class LangSample {
         }
 
         RandomSupplier<?> randomSupplier = RandomSupplier.newBuilder()
-            .mayBe(20, "A")
-            .mayBe(20, "B")
-            .mayBe(60, "C")
+            .score(20, "A")
+            .score(20, "B")
+            .score(60, "C")
             .build();
         int countA = 0;
         int countB = 0;
@@ -244,7 +244,7 @@ public class LangSample {
     @Test
     public void testCachingProductBuilder() {
 
-        class CachingBuilderSample extends CachingProductBuilder<String> {
+        class CachingBuilderSample extends CacheableBuilder<String> {
 
             private String value = "null";
             private long counter = 0L;
@@ -319,14 +319,14 @@ public class LangSample {
 
     @Test
     public void testSingleAccessor() {
-        TestSingleAccessor singleAccessor = new TestSingleAccessor();
+        TestAnyAccessor singleAccessor = new TestAnyAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
         singleAccessor.set("777");
         Assert.assertEquals("777", singleAccessor.get());
 
-        TestGenericSingleAccessor genericSingleAccessor = new TestGenericSingleAccessor();
+        TestGenericAccessor genericSingleAccessor = new TestGenericAccessor();
         Assert.assertNull(genericSingleAccessor.getOrNull());
         Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"));
         Assert.assertEquals("666", genericSingleAccessor.getOrElse(() -> "666"));
@@ -353,7 +353,7 @@ public class LangSample {
         T2
     }
 
-    public static class TestSingleAccessor implements SingleAccessor {
+    public static class TestAnyAccessor implements AnyAccessor {
 
         private String value;
 
@@ -368,7 +368,7 @@ public class LangSample {
         }
     }
 
-    public static class TestGenericSingleAccessor implements GenericSingleAccessor<String> {
+    public static class TestGenericAccessor implements GenericAccessor<String> {
 
         private String value;
 

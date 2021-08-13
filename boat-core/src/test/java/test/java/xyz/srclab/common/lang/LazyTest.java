@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.lang;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.lang.Lazy;
-import xyz.srclab.common.lang.LazyString;
+import xyz.srclab.common.lang.LazyToString;
 import xyz.srclab.common.test.TestLogger;
 import xyz.srclab.common.utils.Counter;
 
@@ -48,10 +48,10 @@ public class LazyTest {
     @Test
     public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        LazyString<Integer> lazyString = LazyString.of(Lazy.of(counter::getAndIncrementInt));
-        logger.log("lazyString: {}", lazyString);
+        LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+        logger.log("lazyString: {}", lazyToString);
         Assert.assertEquals(
-            lazyString.get(),
+            lazyToString.get(),
             new Integer(0)
         );
     }

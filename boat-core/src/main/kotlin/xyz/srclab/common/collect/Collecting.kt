@@ -643,7 +643,7 @@ open class Collecting<T> constructor(
     }
 
     @JvmOverloads
-    open fun sorted(comparator: Comparator<in T> = asComparableComparator()): Collecting<T> {
+    open fun sorted(comparator: Comparator<in T> = comparableComparator()): Collecting<T> {
         return finalIterable().sorted(comparator).asSelf()
     }
 
@@ -660,22 +660,22 @@ open class Collecting<T> constructor(
     }
 
     @JvmOverloads
-    open fun max(comparator: Comparator<in T> = asComparableComparator()): T {
+    open fun max(comparator: Comparator<in T> = comparableComparator()): T {
         return finalIterable().max(comparator)
     }
 
     @JvmOverloads
-    open fun maxOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
+    open fun maxOrNull(comparator: Comparator<in T> = comparableComparator()): T? {
         return finalIterable().maxOrNull(comparator)
     }
 
     @JvmOverloads
-    open fun min(comparator: Comparator<in T> = asComparableComparator()): T {
+    open fun min(comparator: Comparator<in T> = comparableComparator()): T {
         return finalIterable().min(comparator)
     }
 
     @JvmOverloads
-    open fun minOrNull(comparator: Comparator<in T> = asComparableComparator()): T? {
+    open fun minOrNull(comparator: Comparator<in T> = comparableComparator()): T? {
         return finalIterable().minOrNull(comparator)
     }
 
@@ -758,7 +758,7 @@ open class Collecting<T> constructor(
     }
 
     @JvmOverloads
-    open fun toSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
+    open fun toSortedSet(comparator: Comparator<in T> = comparableComparator()): SortedSet<T> {
         return finalIterable().toSortedSet(comparator)
     }
 
@@ -806,7 +806,7 @@ open class Collecting<T> constructor(
     }
 
     @JvmOverloads
-    open fun asToSortedSet(comparator: Comparator<in T> = asComparableComparator()): SortedSet<T> {
+    open fun asToSortedSet(comparator: Comparator<in T> = comparableComparator()): SortedSet<T> {
         return finalIterable().asToSortedSet(comparator)
     }
 
@@ -1128,7 +1128,7 @@ open class Collecting<T> constructor(
     }
 
     @JvmOverloads
-    open fun binarySearch(element: T, comparator: Comparator<in T> = asComparableComparator()): Int {
+    open fun binarySearch(element: T, comparator: Comparator<in T> = comparableComparator()): Int {
         return finalList().binarySearch(element, comparator)
     }
 
@@ -1138,7 +1138,7 @@ open class Collecting<T> constructor(
     }
 
     @JvmOverloads
-    open fun sort(comparator: Comparator<in T> = asComparableComparator()): Collecting<T> {
+    open fun sort(comparator: Comparator<in T> = comparableComparator()): Collecting<T> {
         finalMutableList().sort(comparator)
         return this.asAny()
     }

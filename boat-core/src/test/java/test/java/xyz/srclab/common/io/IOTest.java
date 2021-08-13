@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,5 +61,31 @@ public class IOTest {
         input.reset();
         writer.flush();
         Assert.assertEquals(output.toByteArray(), text.getBytes());
+    }
+
+    @Test
+    public void testByteBuffer() {
+        ByteBuffer buffer = ByteBuffer.allocate(100);
+        initBuffer(buffer);
+        byte[] bytes = IOStreams.toByteArray(buffer);
+        Assert.assertEquals(bytes, buffer.array());
+        ByteBuffer buffer2 = ByteBuffer.allocateDirect(100);
+        initBuffer(buffer2);
+        byte[] bytes2 = IOStreams.toByteArray(buffer2);
+        Assert.assertEquals(bytes2, initArray(new byte[100]));
+    }
+
+    private void initBuffer(ByteBuffer buffer) {
+        for (int i = 0; i < 100; i++) {
+            buffer.put((byte) i);
+        }
+        buffer.flip();
+    }
+
+    private byte[] initArray(byte[] array) {
+        for (int i = 0; i < 100; i++) {
+            array[i] = (byte) i;
+        }
+        return array;
     }
 }

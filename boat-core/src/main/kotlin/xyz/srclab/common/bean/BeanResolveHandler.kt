@@ -123,6 +123,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
 
 /**
  * Bean style of [AbstractBeanResolveHandler]:
+ *
  * * getter: getXxx()
  * * setter: setXxx(Xxx)
  */
@@ -165,6 +166,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
 /**
  * Record style of [AbstractBeanResolveHandler]:
+ *
  * * getter: xxx()
  * * setter: xxx(xxx)
  */

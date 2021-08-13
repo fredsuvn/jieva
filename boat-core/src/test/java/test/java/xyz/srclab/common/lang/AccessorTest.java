@@ -4,10 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.lang.AnyAccessor;
+import xyz.srclab.common.lang.GenericAccessor;
 import xyz.srclab.common.lang.GenericMapAccessor;
-import xyz.srclab.common.lang.GenericSingleAccessor;
 import xyz.srclab.common.lang.MapAccessor;
-import xyz.srclab.common.lang.SingleAccessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ public class AccessorTest {
 
     @Test
     public void testSingleAccessor() {
-        TestSingleAccessor singleAccessor = new TestSingleAccessor();
+        TestAnyAccessor singleAccessor = new TestAnyAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
@@ -26,7 +26,7 @@ public class AccessorTest {
 
     @Test
     public void testGenericSingleAccessor() {
-        TestGenericSingleAccessor singleAccessor = new TestGenericSingleAccessor();
+        TestGenericAccessor singleAccessor = new TestGenericAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
@@ -54,7 +54,7 @@ public class AccessorTest {
         Assert.assertEquals("777", mapAccessor.get("1"));
     }
 
-    public static class TestSingleAccessor implements SingleAccessor {
+    public static class TestAnyAccessor implements AnyAccessor {
 
         private String value;
 
@@ -69,7 +69,7 @@ public class AccessorTest {
         }
     }
 
-    public static class TestGenericSingleAccessor implements GenericSingleAccessor<String> {
+    public static class TestGenericAccessor implements GenericAccessor<String> {
 
         private String value;
 
@@ -89,7 +89,7 @@ public class AccessorTest {
         private final Map<Object, Object> values = new HashMap<>();
 
         @Override
-        public @NotNull Map<Object, Object> contents() {
+        public @NotNull Map<Object, Object> asMap() {
             return values;
         }
     }
@@ -99,7 +99,7 @@ public class AccessorTest {
         private final Map<String, String> values = new HashMap<>();
 
         @Override
-        public @NotNull Map<String, String> contents() {
+        public @NotNull Map<String, String> asMap() {
             return values;
         }
     }

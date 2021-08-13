@@ -22,9 +22,9 @@ public class RandomsTest {
     @Test
     public void testRandomSupplier() {
         RandomSupplier<?> randomSupplier = RandomSupplier.newBuilder()
-            .mayBe(20, "A")
-            .mayBe(20, "B")
-            .mayBe(60, "C")
+            .score(20, "A")
+            .score(20, "B")
+            .score(60, "C")
             .build();
         int countA = 0;
         int countB = 0;
