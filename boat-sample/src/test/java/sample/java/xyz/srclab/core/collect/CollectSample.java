@@ -25,7 +25,7 @@ public class CollectSample {
         list.add("1");
         list.add("2");
         list.add("3");
-        Collecting<String> collect = Collects.collect(list);
+        Collecting<String> collect = Collects.collecting(list);
         int sum = collect.addAll(Collects.newArray("4", "5", "6"))
             .removeFirst()
             .map(it -> it + "0")

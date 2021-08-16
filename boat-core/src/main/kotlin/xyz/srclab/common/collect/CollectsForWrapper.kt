@@ -36,3 +36,35 @@ fun <K, V> SortedMap<K, V>.toSync(): SortedMap<K, V> {
 fun <K, V> NavigableMap<K, V>.toSync(): NavigableMap<K, V> {
     return Collections.synchronizedNavigableMap(this)
 }
+
+fun <T> Collection<T>.toUnmodifiable(): Collection<T> {
+    return Collections.unmodifiableCollection(this)
+}
+
+fun <T> Set<T>.toUnmodifiable(): Set<T> {
+    return Collections.unmodifiableSet(this)
+}
+
+fun <T> SortedSet<T>.toUnmodifiable(): SortedSet<T> {
+    return Collections.unmodifiableSortedSet(this)
+}
+
+fun <T> NavigableSet<T>.toUnmodifiable(): NavigableSet<T> {
+    return Collections.unmodifiableNavigableSet(this)
+}
+
+fun <T> List<T>.toUnmodifiable(): List<T> {
+    return Collections.unmodifiableList(this)
+}
+
+fun <K, V> Map<K, V>.toUnmodifiable(): Map<K, V> {
+    return Collections.unmodifiableMap(this)
+}
+
+fun <K, V> SortedMap<K, V>.toUnmodifiable(): SortedMap<K, V> {
+    return Collections.unmodifiableSortedMap(this)
+}
+
+fun <K, V> NavigableMap<K, V>.toUnmodifiable(): NavigableMap<K, V> {
+    return Collections.unmodifiableNavigableMap(this)
+}

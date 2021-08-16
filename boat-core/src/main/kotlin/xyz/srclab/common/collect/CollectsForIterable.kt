@@ -844,10 +844,6 @@ fun <T> Iterable<T>.toSet(): Set<T> {
     return this.toSetKt()
 }
 
-fun <T> Iterable<T>.toImmutableSet(): ImmutableSet<T> {
-    return if (this is ImmutableSet) this else ImmutableSet(this)
-}
-
 fun <T> Iterable<T>.toMutableSet(): MutableSet<T> {
     return this.toMutableSetKt()
 }
@@ -861,7 +857,7 @@ fun <T> Iterable<T>.toLinkedHashSet(): LinkedHashSet<T> {
 }
 
 fun <T> Iterable<T>.toTreeSet(): TreeSet<T> {
-    return this.toCollection(TreeSet())
+    return toCollection(TreeSet())
 }
 
 @JvmOverloads
@@ -871,10 +867,6 @@ fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T> = comparableCompara
 
 fun <T> Iterable<T>.toList(): List<T> {
     return this.toListKt()
-}
-
-fun <T> Iterable<T>.toImmutableList(): ImmutableList<T> {
-    return if (this is ImmutableList) this else ImmutableList(this)
 }
 
 fun <T> Iterable<T>.toMutableList(): MutableList<T> {

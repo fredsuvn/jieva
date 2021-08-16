@@ -61,7 +61,7 @@ open class Mapping<K, V>(
     }
 
     open fun <R> map(transform: (Map.Entry<K, V>) -> R): Collecting<R> {
-        return finalMap().map(transform).collect()
+        return finalMap().map(transform).collecting()
     }
 
     open fun <RK, RV> map(keySelector: (K) -> RK, valueTransform: (V) -> RV): Mapping<RK, RV> {
@@ -89,7 +89,7 @@ open class Mapping<K, V>(
     }
 
     open fun <R> flatMap(transform: (Map.Entry<K, V>) -> Iterable<R>): Collecting<R> {
-        return finalMap().flatMap(transform).collect()
+        return finalMap().flatMap(transform).collecting()
     }
 
     open fun <R, C : MutableCollection<in R>> flatMapTo(
@@ -104,11 +104,7 @@ open class Mapping<K, V>(
         return finalMap().sorted(comparator)
     }
 
-    open fun toImmutableMap(): ImmutableMap<K, V> {
-        return finalMap().toImmutableMap()
-    }
-
-    open fun toTreeMap(comparator: java.util.Comparator<in K>): TreeMap<K, V> {
+    open fun toTreeMap(comparator: Comparator<in K>): TreeMap<K, V> {
         return finalMap().toTreeMap(comparator)
     }
 
@@ -149,11 +145,11 @@ open class Mapping<K, V>(
     }
 
     open fun collectEntries(): Collecting<Map.Entry<K, V>> {
-        return finalMap().entries.collect()
+        return finalMap().entries.collecting()
     }
 
     open fun collectMutableEntry(): Collecting<MutableMap.MutableEntry<K, V>> {
-        return finalMutableMap().entries.collect()
+        return finalMutableMap().entries.collecting()
     }
 
     // Sync

@@ -114,8 +114,12 @@ fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = compara
     return this.entries.sortedWithKt(comparator).associateToKt(LinkedHashMap()) { it.key to it.value }
 }
 
-fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> {
-    return if (this is ImmutableMap) this else ImmutableMap(this)
+fun <K, V> Map<K, V>.toHashMap(): HashMap<K, V> {
+    return HashMap(this)
+}
+
+fun <K, V> Map<K, V>.toLinkedHashMap(): LinkedHashMap<K, V> {
+    return LinkedHashMap(this)
 }
 
 fun <K, V> Map<K, V>.toTreeMap(comparator: Comparator<in K>): TreeMap<K, V> {

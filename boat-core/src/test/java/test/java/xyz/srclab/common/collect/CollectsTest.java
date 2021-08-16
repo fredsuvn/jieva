@@ -60,7 +60,7 @@ public class CollectsTest {
         list.add("1");
         list.add("2");
         list.add("3");
-        Collecting<String> collecting = Collects.collect(list);
+        Collecting<String> collecting = Collects.collecting(list);
         int sum = collecting.addAll(Collects.newArray("4", "5", "6"))
             .removeFirst()
             .map(it -> it + "0")
@@ -69,7 +69,7 @@ public class CollectsTest {
         Assert.assertEquals(sum, 200);
 
         int[] ints = {1, 2, 3};
-        Collecting<Integer> collecting2 = Collects.collect(Collects.asList(ints));
+        Collecting<Integer> collecting2 = Collects.collecting(Collects.asList(ints));
         int sum2 = collecting2.reduce(Integer::sum);
         Assert.assertEquals(sum2, 6);
         Assert.expectThrows(UnsupportedOperationException.class, () -> {
@@ -86,7 +86,7 @@ public class CollectsTest {
         List<String> syncList = Collects.toSync(list);
         Assert.assertEquals(syncList, list);
 
-        Collecting<String> collecting = Collects.collect(list);
+        Collecting<String> collecting = Collects.collecting(list);
         Assert.assertEquals(collecting.toSync().toList(), list);
     }
 
