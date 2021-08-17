@@ -11,7 +11,7 @@ import java.time.temporal.Temporal
 import java.util.*
 
 @JvmField
-val MIN_DATE = Date(0)
+val MIN_DATE: Date = Date.from(Instant.MIN)
 
 @JvmField
 val MIN_ZONED_DATE_TIME: ZonedDateTime = OffsetDateTime.MIN.toZonedDateTime()

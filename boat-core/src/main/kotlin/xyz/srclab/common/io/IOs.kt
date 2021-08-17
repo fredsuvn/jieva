@@ -4,6 +4,7 @@ package xyz.srclab.common.io
 
 import org.apache.commons.io.IOUtils
 import xyz.srclab.common.lang.Defaults
+import xyz.srclab.common.lang.toChars
 import java.io.*
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
@@ -63,6 +64,20 @@ fun InputStream.readString(charset: Charset = Defaults.charset): String {
 @JvmOverloads
 fun InputStream.readLines(charset: Charset = Defaults.charset): List<String> {
     return IOUtils.readLines(this, charset)
+}
+
+fun InputStream.availableBytes(): ByteArray {
+    val available = this.available()
+    if (available == 0) {
+        return byteArrayOf()
+    }
+    val bytes = ByteArray(available)
+    this.read(bytes)
+    return bytes
+}
+
+fun InputStream.availableString(charset: Charset = Defaults.charset): String {
+    return availableBytes().toChars(charset)
 }
 
 fun Reader.readString(): String {

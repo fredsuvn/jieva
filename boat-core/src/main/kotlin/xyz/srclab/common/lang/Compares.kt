@@ -18,9 +18,10 @@ val COMPARABLE_COMPARATOR: Comparator<*> =
  * parent type is greater than subtype, so the subclass comes before the parent.
  */
 @JvmField
-val INHERITANCE_COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
-    if (c1 == c2) 0 else if (c1.isAssignableFrom(c2)) 1 else if (c2.isAssignableFrom(c1)) -1 else 0
-}
+val INHERITANCE_COMPARATOR: Comparator<Class<*>> =
+    Comparator { c1, c2 ->
+        if (c1 == c2) 0 else if (c1.isAssignableFrom(c2)) 1 else if (c2.isAssignableFrom(c1)) -1 else 0
+    }
 
 /**
  * Returns a [Comparator] of which arguments will be seen as [Comparable] type.

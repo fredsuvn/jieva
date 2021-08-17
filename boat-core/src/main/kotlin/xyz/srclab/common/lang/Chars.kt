@@ -67,3 +67,11 @@ fun CharSequence.capitalize(): String {
 fun CharSequence.uncapitalize(): String {
     return StringUtils.uncapitalize(this.toString())
 }
+
+fun Array<out Any?>.toStringArray(): Array<String> {
+    return this.map { it.toString() }.toTypedArray()
+}
+
+fun Array<out Any?>.toNullableStringArray(): Array<String?> {
+    return this.map { it?.toString() }.toTypedArray()
+}
