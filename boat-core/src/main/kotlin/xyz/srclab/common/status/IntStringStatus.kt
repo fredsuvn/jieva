@@ -61,6 +61,6 @@ open class IntStringStatus : Status<Int, String>, Serializable {
     override fun hashCode(): Int = _hashcode
 
     override fun toString(): String {
-        return "$code-$description"
+        return "$code: $description"
     }
 }
