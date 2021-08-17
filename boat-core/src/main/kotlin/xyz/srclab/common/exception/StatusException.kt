@@ -1,59 +1,62 @@
 package xyz.srclab.common.exception
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.state.State
-import xyz.srclab.common.state.State.Companion.stateEquals
-import xyz.srclab.common.state.State.Companion.stateHashCode
+import xyz.srclab.common.status.Status
+import xyz.srclab.common.status.StringStatus
 
 /**
- * Exception implements [ExceptionStatus].
+ * Exception implementation with [Status].
  *
- * @see ExceptionStatus
- * @see State
+ * @see Status
+ * @see StringStatus
  */
 open class StatusException @JvmOverloads constructor(
-    private val exceptionStatus: ExceptionStatus,
+    private val status: Status<String, String>,
     cause: Throwable? = null
 ) : RuntimeException(
-    exceptionStatus.toString(), cause
-), ExceptionStatus {
+    status.toString(), cause
+), Status<String, String> {
 
-    constructor() : this(ExceptionStatus.UNKNOWN)
+    constructor() : this(INTERNAL_STATUS)
 
     constructor(cause: Throwable?) : this(
-        ExceptionStatus.INTERNAL,
+        INTERNAL_STATUS,
         cause
     )
 
-    constructor(message: String?) : this(ExceptionStatus.INTERNAL.withNewDescription(message))
+    constructor(message: String?) : this(
+        INTERNAL_STATUS.withNewDescription(message))
 
     constructor(message: String?, cause: Throwable?) : this(
-        ExceptionStatus.INTERNAL.withNewDescription(message),
+        INTERNAL_STATUS.withNewDescription(message),
         cause
     )
 
     constructor(code: String, description: String?, cause: Throwable?) : this(
-        ExceptionStatus.of(code, description),
+        StringStatus(code, description),
         cause
     )
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    override val code: String
-        @JvmName("code") get() = exceptionStatus.code
+    override val code: String = status.code
+    override val description: String? = status.description
+    override val descriptions: List<String> = status.descriptions
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    override val description: String?
-        @JvmName("description") get() = exceptionStatus.description
-
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    override val descriptions: List<String>
-        @JvmName("descriptions") get() = exceptionStatus.descriptions
-
-    override fun equals(other: Any?): Boolean {
-        return this.stateEquals(other)
+    override fun withNewDescription(newDescription: String?): Status<String, String> {
+        return status.withNewDescription(newDescription)
     }
 
-    override fun hashCode(): Int {
-        return this.stateHashCode()
+    override fun withMoreDescription(moreDescription: String): Status<String, String> {
+        return status.withMoreDescription(moreDescription)
+    }
+
+    companion object {
+
+        @JvmField
+        val INTERNAL_STATUS = StringStatus("G-99999", "Internal Error")
+
+        @JvmField
+        val UNKNOWN_STATUS = StringStatus("G-99998", "Unknown Error")
+
+        @JvmField
+        val IMPOSSIBLE_STATUS = StringStatus("G-99997", "WTF??... That's IMPOSSIBLE!!")
     }
 }

@@ -5,37 +5,37 @@ import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.annotations.Immutable;
-import xyz.srclab.common.state.State;
-import xyz.srclab.common.state.StringState;
+import xyz.srclab.common.status.Status;
+import xyz.srclab.common.status.StringStatus;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.List;
 
-public class StateTest {
+public class StatusTest {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testState() {
-        TestState testState = new TestState(1, "description");
-        TestState newState = testState.withMoreDescription("cause");
-        TestState newNewState = newState.withMoreDescription("cause2");
+        TestStatus testState = new TestStatus(1, "description");
+        TestStatus newState = testState.withMoreDescription("cause");
+        TestStatus newNewState = newState.withMoreDescription("cause2");
         //description[cause][cause2]
         logger.log(newNewState.description());
         Assert.assertEquals(newNewState.description(), "description[cause][cause2]");
     }
 
-    public static class TestState implements State<Integer, String, TestState> {
+    public static class TestStatus implements Status<Integer, String, TestStatus> {
 
         private final int code;
         private final List<String> descriptions;
 
-        public TestState(int code, @Nullable String description) {
+        public TestStatus(int code, @Nullable String description) {
             this.code = code;
-            this.descriptions = StringState.newDescriptions(description);
+            this.descriptions = StringStatus.newDescriptions(description);
         }
 
-        public TestState(int code, @Immutable List<String> descriptions) {
+        public TestStatus(int code, @Immutable List<String> descriptions) {
             this.code = code;
             this.descriptions = descriptions;
         }
@@ -48,7 +48,7 @@ public class StateTest {
         @Nullable
         @Override
         public String description() {
-            return StringState.joinDescriptions(descriptions);
+            return StringStatus.joinDescriptions(descriptions);
         }
 
         @NotNull
@@ -59,14 +59,14 @@ public class StateTest {
 
         @NotNull
         @Override
-        public StateTest.TestState withNewDescription(@Nullable String newDescription) {
-            return new TestState(code, StringState.newDescriptions(newDescription));
+        public StatusTest.TestStatus withNewDescription(@Nullable String newDescription) {
+            return new TestStatus(code, StringStatus.newDescriptions(newDescription));
         }
 
         @NotNull
         @Override
-        public StateTest.TestState withMoreDescription(String moreDescription) {
-            return new TestState(code, StringState.moreDescriptions(descriptions(), moreDescription));
+        public StatusTest.TestStatus withMoreDescription(String moreDescription) {
+            return new TestStatus(code, StringStatus.moreDescriptions(descriptions(), moreDescription));
         }
     }
 }

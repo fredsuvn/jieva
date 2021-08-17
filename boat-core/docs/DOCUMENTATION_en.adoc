@@ -203,7 +203,7 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/proxy/P
 State package provides `State` interfaces represents a state or status:
 
 * `State`: Core interface represents a state or status;
-* `StringState`: `State` for `String` type;
+* `StringStatus`: `State` for `String` type;
 
 .Java Examples
 [source,java]
@@ -214,7 +214,7 @@ include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/state/State
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/state/StateSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/state/StatusSample.kt[]
 ----
 
 === Exception

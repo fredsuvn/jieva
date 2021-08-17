@@ -2,8 +2,8 @@ package test.java.xyz.srclab.common.collect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.collect.*;
-import xyz.srclab.common.lang.Nums;
+import xyz.srclab.common.collect.Collects;
+import xyz.srclab.common.collect.CopyOnWriteMap;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.*;
@@ -26,7 +26,7 @@ public class CollectsTest {
     }
 
     @Test
-    public void testList() {
+    public void testJoinToString() {
         String[] strings = Collects.newArray("1", "2", "3");
         Collects.asList(strings).set(0, "111");
         Collects.asList(strings).set(1, "222");
@@ -55,109 +55,53 @@ public class CollectsTest {
     }
 
     @Test
-    public void testCollecting() {
-        List<String> list = new ArrayList<>();
-        list.add("1");
-        list.add("2");
-        list.add("3");
-        Collecting<String> collecting = Collects.collecting(list);
-        int sum = collecting.addAll(Collects.newArray("4", "5", "6"))
-            .removeFirst()
-            .map(it -> it + "0")
-            .map(Nums::toInt)
-            .reduce(Integer::sum);
-        Assert.assertEquals(sum, 200);
-
-        int[] ints = {1, 2, 3};
-        Collecting<Integer> collecting2 = Collects.collecting(Collects.asList(ints));
-        int sum2 = collecting2.reduce(Integer::sum);
-        Assert.assertEquals(sum2, 6);
-        Assert.expectThrows(UnsupportedOperationException.class, () -> {
-            collecting2.addAll(Arrays.asList(4, 5, 6));
-        });
+    public void testPlus() {
+        List<String> list = Arrays.asList("1", "2", "3");
+        Assert.assertEquals(
+            Collects.plusBefore(list, 1, "99"),
+            Arrays.asList("1", "99", "2", "3")
+        );
+        Assert.assertEquals(
+            Collects.plusAfter(list, 1, "99"),
+            Arrays.asList("1", "2", "99", "3")
+        );
+        Assert.assertEquals(
+            Collects.minusAt(list, 1, 2),
+            Collections.singletonList("1")
+        );
     }
 
     @Test
-    public void testSync() {
-        List<String> list = new ArrayList<>();
-        list.add("1");
-        list.add("2");
-        list.add("3");
-        List<String> syncList = Collects.toSync(list);
-        Assert.assertEquals(syncList, list);
-
-        Collecting<String> collecting = Collects.collecting(list);
-        Assert.assertEquals(collecting.toSync().toList(), list);
+    public void testEnumeration() {
+        List<String> list = Arrays.asList("1", "2", "3");
+        Enumeration<String> enumeration = Collects.asEnumeration(list);
+        Iterable<String> iterable = Collects.asIterable(enumeration);
+        Set<String> set = Collects.toSet(iterable);
+        Assert.assertEquals(set, Collects.newSet("1", "2", "3"));
     }
 
-    @Test
-    public void testMultiMap() {
-        //Set
-        SetMap<String, String> setMap = SetMap.newSetMap(
-            Collects.newMap(
-                new LinkedHashMap<>(),
-                "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
-            )
-        );
-        logger.log("setMap: {}", setMap);
-        Assert.assertEquals(
-            setMap,
-            Collects.newMap(
-                new LinkedHashMap<>(),
-                "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
-            )
-        );
-        MutableSetMap<String, String> mutableSetMap = MutableSetMap.newMutableSetMap(
-            Collects.newMap(
-                new LinkedHashMap<>(),
-                "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
-            )
-        );
-        mutableSetMap.add("s", "9");
-        mutableSetMap.addAll("s", Collects.newCollection(new LinkedHashSet<>(), "11", "12", "13"));
-        logger.log("mutableSetMap: {}", mutableSetMap);
-        Assert.assertEquals(
-            mutableSetMap,
-            Collects.newMap(
-                new LinkedHashMap<>(),
-                "s", Collects.newCollection(
-                    new LinkedHashSet<>(), "1", "2", "3", "9", "11", "12", "13")
-            )
-        );
-
-        //List
-        ListMap<String, String> listMap = ListMap.newListMap(
-            Collects.newMap(
-                new LinkedHashMap<>(),
-                "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
-            )
-        );
-        logger.log("listMap: {}", listMap);
-        Assert.assertEquals(
-            listMap,
-            Collects.newMap(
-                new LinkedHashMap<>(),
-                "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
-            )
-        );
-        MutableListMap<String, String> mutableListMap = MutableListMap.newMutableListMap(
-            Collects.newMap(
-                new LinkedHashMap<>(),
-                "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")
-            )
-        );
-        mutableListMap.add("s", "9");
-        mutableListMap.addAll("s", Collects.newCollection(new LinkedList<>(), "11", "12", "13"));
-        logger.log("mutableListMap: {}", mutableListMap);
-        Assert.assertEquals(
-            mutableListMap,
-            Collects.newMap(
-                new LinkedHashMap<>(),
-                "s", Collects.newCollection(
-                    new LinkedList<>(), "1", "2", "3", "9", "11", "12", "13")
-            )
-        );
-    }
+    //@Test
+    //public void testCollecting() {
+    //    List<String> list = new ArrayList<>();
+    //    list.add("1");
+    //    list.add("2");
+    //    list.add("3");
+    //    Collecting<String> collecting = Collects.collecting(list);
+    //    int sum = collecting.addAll(Collects.newArray("4", "5", "6"))
+    //        .removeFirst()
+    //        .map(it -> it + "0")
+    //        .map(Nums::toInt)
+    //        .reduce(Integer::sum);
+    //    Assert.assertEquals(sum, 200);
+    //
+    //    int[] ints = {1, 2, 3};
+    //    Collecting<Integer> collecting2 = Collects.collecting(Collects.asList(ints));
+    //    int sum2 = collecting2.reduce(Integer::sum);
+    //    Assert.assertEquals(sum2, 6);
+    //    Assert.expectThrows(UnsupportedOperationException.class, () -> {
+    //        collecting2.addAll(Arrays.asList(4, 5, 6));
+    //    });
+    //}
 
     @Test
     public void testCopyOnWriteMap() {

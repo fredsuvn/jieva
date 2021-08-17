@@ -1,18 +1,19 @@
 package xyz.srclab.common.exception
 
 /**
- * The exception represents an impossible thrown case but actually thrown.
+ * Exception represents an impossible cause.
  *
  * @author sunqian
  */
-open class ImpossibleException @JvmOverloads constructor(message: String? = null, cause: Throwable? = null) :
-    StatusException(
-        if (message === null)
-            ExceptionStatus.IMPOSSIBLE
-        else
-            ExceptionStatus.IMPOSSIBLE.withMoreDescription(message),
-        cause
-    ) {
+open class ImpossibleException : StatusException {
 
-    constructor(cause: Throwable) : this(null, cause)
+    constructor(message: String? = null, cause: Throwable? = null) : super(
+        if (message === null)
+            IMPOSSIBLE_STATUS.toString()
+        else
+            IMPOSSIBLE_STATUS.withMoreDescription(message).toString(),
+        cause
+    )
+
+    constructor(cause: Throwable?) : this(null, cause)
 }

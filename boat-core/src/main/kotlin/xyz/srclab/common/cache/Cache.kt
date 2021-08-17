@@ -27,7 +27,6 @@ interface Cache<K : Any, V : Any> {
      * Gets or throws from cache.
      */
     @Throws(NoSuchElementException::class)
-    @JvmDefault
     fun get(key: K): V {
         return getOrNull(key) ?: throw NoSuchElementException(key.toString())
     }
@@ -35,7 +34,6 @@ interface Cache<K : Any, V : Any> {
     /**
      * Gets or returns null if not found from cache.
      */
-    @JvmDefault
     fun getOrNull(key: K): V?
 
     /**
@@ -46,7 +44,6 @@ interface Cache<K : Any, V : Any> {
     /**
      * Gets or returns [defaultValue] if not found from cache.
      */
-    @JvmDefault
     fun getOrElse(key: K, defaultValue: (K) -> V): V
 
     /**
@@ -57,13 +54,11 @@ interface Cache<K : Any, V : Any> {
     /**
      * Returns a map of the values associated with the present keys from cache.
      */
-    @JvmDefault
     fun getPresent(keys: Iterable<K>): Map<K, V>
 
     /**
      * Returns a map of the values associated with the keys, creating or retrieving those values if necessary.
      */
-    @JvmDefault
     fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V>
 
     fun put(key: K, value: V)
@@ -320,8 +315,10 @@ interface Cache<K : Any, V : Any> {
          * Return a new fast Cache by `Weak Reference Map`.
          *
          * Note:
+         *
          * * Does not support to set expiry time;
          * * Do not update value object -- it should be seen as immutable;
+         * * It is thread-safe;
          */
         @JvmStatic
         fun <K : Any, V : Any> newFastCache(): Cache<K, V> {

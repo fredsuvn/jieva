@@ -840,6 +840,14 @@ fun <T, C : MutableCollection<in T>> Iterable<T>.toCollection(destination: C): C
     return this.toCollectionKt(destination)
 }
 
+fun <T> Iterable<T>.toCollection(): Collection<T> {
+    return toSet()
+}
+
+fun <T> Iterable<T>.toMutableCollection(): MutableCollection<T> {
+    return toMutableSet()
+}
+
 fun <T> Iterable<T>.toSet(): Set<T> {
     return this.toSetKt()
 }
@@ -856,13 +864,14 @@ fun <T> Iterable<T>.toLinkedHashSet(): LinkedHashSet<T> {
     return if (this is Collection<T>) toCollection(LinkedHashSet(size)) else toCollection(LinkedHashSet())
 }
 
-fun <T> Iterable<T>.toTreeSet(): TreeSet<T> {
-    return toCollection(TreeSet())
+@JvmOverloads
+fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T>? = null): SortedSet<T> {
+    return if (comparator === null) this.toSortedSetKt(comparableComparator()) else this.toSortedSetKt(comparator)
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T> = comparableComparator()): SortedSet<T> {
-    return this.toSortedSetKt(comparator)
+fun <T> Iterable<T>.toTreeSet(comparator: Comparator<in T>? = null): TreeSet<T> {
+    return toCollection(if (comparator === null) TreeSet() else TreeSet(comparator))
 }
 
 fun <T> Iterable<T>.toList(): List<T> {
@@ -881,46 +890,54 @@ fun <T> Iterable<T>.toLinkedList(): LinkedList<T> {
     return this.toCollection(LinkedList())
 }
 
-fun <T> Iterable<T>.toEnumeration(): Enumeration<T> {
-    val iterator = this.iterator()
-    return object : Enumeration<T> {
-        override fun hasMoreElements(): Boolean {
-            return iterator.hasNext()
-        }
-
-        override fun nextElement(): T {
-            return iterator.next()
-        }
-    }
-}
-
 fun <T> Iterable<T>.asToCollection(): Collection<T> {
-    return if (this is Collection<T>) this else this.toSet()
+    return if (this is Collection<T>) this else toCollection()
 }
 
 fun <T> Iterable<T>.asToMutableCollection(): MutableCollection<T> {
-    return if (this is MutableCollection<T>) this else this.toLinkedHashSet()
+    return if (this is MutableCollection<T>) this else toMutableCollection()
 }
 
 fun <T> Iterable<T>.asToSet(): Set<T> {
-    return if (this is Set<T>) this else this.toSet()
+    return if (this is Set<T>) this else toSet()
 }
 
 fun <T> Iterable<T>.asToMutableSet(): MutableSet<T> {
-    return if (this is MutableSet<T>) this else this.toLinkedHashSet()
+    return if (this is MutableSet<T>) this else toMutableSet()
+}
+
+fun <T> Iterable<T>.asToHashSet(): HashSet<T> {
+    return if (this is HashSet<T>) this else toHashSet()
+}
+
+fun <T> Iterable<T>.asToLinkedHashSet(): LinkedHashSet<T> {
+    return if (this is LinkedHashSet<T>) this else toLinkedHashSet()
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.asToSortedSet(comparator: Comparator<in T> = comparableComparator()): SortedSet<T> {
-    return if (this is SortedSet<T>) this else this.toSortedSet(comparator)
+fun <T> Iterable<T>.asToSortedSet(comparator: Comparator<in T>? = null): SortedSet<T> {
+    return if (this is SortedSet<T>) this else toSortedSet(comparator)
+}
+
+@JvmOverloads
+fun <T> Iterable<T>.asToTreeSet(comparator: Comparator<in T>? = null): TreeSet<T> {
+    return if (this is TreeSet<T>) this else toTreeSet(comparator)
 }
 
 fun <T> Iterable<T>.asToList(): List<T> {
-    return if (this is List<T>) this else this.toList()
+    return if (this is List<T>) this else toList()
 }
 
 fun <T> Iterable<T>.asToMutableList(): MutableList<T> {
-    return if (this is MutableList<T>) this else this.toMutableList()
+    return if (this is MutableList<T>) this else toMutableList()
+}
+
+fun <T> Iterable<T>.asToArrayList(): ArrayList<T> {
+    return if (this is ArrayList<T>) this else toArrayList()
+}
+
+fun <T> Iterable<T>.asToLinkedList(): LinkedList<T> {
+    return if (this is LinkedList<T>) this else toLinkedList()
 }
 
 @JvmOverloads
@@ -933,93 +950,92 @@ fun <T> Iterable<T>.toSequence(): Sequence<T> {
 }
 
 inline fun <reified T> Iterable<T>.toTypedArray(): Array<T> {
-    val list = this.asToList()
-    return list.toTypedArrayKt()
+    return asToCollection().toTypedArrayKt()
 }
 
 fun <T> Iterable<T>.toArray(): Array<Any?> {
-    val list = this.asToList()
-    return JavaCollects.toArray(list).asAny()
+    return asToCollection().toTypedArrayKt()
 }
 
-fun <T> Iterable<T>.toArray(generator: (size: Int) -> Array<T>): Array<T> {
-    val list = this.asToList()
-    return JavaCollects.toArray(list, generator(list.size))
+fun <T> Iterable<T>.toArray(array: (size: Int) -> Array<T>): Array<T> {
+    val collection = asToCollection()
+    val result = array(collection.size)
+    return JavaCollects.toArray(collection, result)
 }
 
 @JvmOverloads
 fun <T, R> Iterable<T>.toArray(componentType: Type, selector: ((T) -> R)? = null): Array<R> {
-    val list = this.asToList()
-    val result = componentType.newArray<R>(list.size)
+    val collection = asToCollection()
+    val result = componentType.newArray<R>(collection.size)
     if (selector !== null) {
-        list.forEachIndexed { i, t -> result[i] = selector(t) }
+        collection.forEachIndexed { i, t -> result[i] = selector(t) }
     } else {
-        list.forEachIndexed { i, t -> result[i] = t.asAny() }
+        collection.forEachIndexed { i, t -> result[i] = t.asAny() }
     }
     return result
 }
 
 @JvmOverloads
 inline fun <T> Iterable<T>.toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
-    val list = this.asToList()
-    val result = BooleanArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val collection = asToCollection()
+    val result = BooleanArray(collection.size)
+    collection.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }
 
 @JvmOverloads
 inline fun <T> Iterable<T>.toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
-    val list = this.asToList()
-    val result = ByteArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val collection = asToCollection()
+    val result = ByteArray(collection.size)
+    collection.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }
 
 @JvmOverloads
 inline fun <T> Iterable<T>.toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
-    val list = this.asToList()
-    val result = ShortArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val collection = asToCollection()
+    val result = ShortArray(collection.size)
+    collection.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }
 
 @JvmOverloads
 inline fun <T> Iterable<T>.toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
-    val list = this.asToList()
-    val result = CharArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val collection = asToCollection()
+    val result = CharArray(collection.size)
+    collection.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }
 
 @JvmOverloads
 inline fun <T> Iterable<T>.toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
-    val list = this.asToList()
-    val result = IntArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val collection = asToCollection()
+    val result = IntArray(collection.size)
+    collection.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }
 
 @JvmOverloads
 inline fun <T> Iterable<T>.toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
-    val list = this.asToList()
-    val result = LongArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val collection = asToCollection()
+    val result = LongArray(collection.size)
+    collection.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }
 
 @JvmOverloads
 inline fun <T> Iterable<T>.toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
-    val list = this.asToList()
-    val result = FloatArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val collection = asToCollection()
+    val result = FloatArray(collection.size)
+    collection.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }
 
 @JvmOverloads
 inline fun <T> Iterable<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
-    val list = this.asToList()
-    val result = DoubleArray(list.size)
-    list.forEachIndexed { i, t -> result[i] = selector(t) }
+    val collection = asToCollection()
+    val result = DoubleArray(collection.size)
+    collection.forEachIndexed { i, t -> result[i] = selector(t) }
     return result
 }
 
@@ -1082,7 +1098,7 @@ fun <T> Iterable<T>.plusBefore(index: Int, elements: Iterable<T>): List<T> {
     if (index == 0) {
         return elements.plusKt(this)
     }
-    val list = this.toList()
+    val list = asToList()
     val front = list.subList(0, index)
     val back = list.subList(index, list.size)
     return front.plusKt(elements).plusKt(back)
@@ -1101,7 +1117,7 @@ fun <T> Iterable<T>.plusAfter(index: Int, elements: Array<out T>): List<T> {
 }
 
 fun <T> Iterable<T>.plusAfter(index: Int, elements: Iterable<T>): List<T> {
-    val list = this.toList()
+    val list = asToList()
     if (index == list.size - 1) {
         return list.plusKt(this)
     }
@@ -1116,7 +1132,7 @@ fun <T> Iterable<T>.plusAfter(index: Int, elements: Sequence<T>): List<T> {
 
 @JvmOverloads
 fun <T> Iterable<T>.minusAt(index: Int, count: Int = 1): List<T> {
-    val list = this.toList()
+    val list = asToList()
     if (index == 0) {
         return if (count < list.size) list.subList(count, list.size) else emptyList()
     }

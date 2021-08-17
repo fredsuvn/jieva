@@ -27,6 +27,18 @@ fun <T> Type.newArray(length: Int): Array<T> {
     return java.lang.reflect.Array.newInstance(this.rawClass, length).asAny()
 }
 
+/**
+ * Returns a fixed-size array associated given array,
+ * or throws [IllegalArgumentException] if given object is not an array.
+ */
+fun <T> Any.arrayAsList(): MutableList<T> {
+    return arrayAsListOrNull() ?: throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
+}
+
+/**
+ * Returns a fixed-size array associated given array,
+ * or null if given object if not an array.
+ */
 fun <T> Any.arrayAsListOrNull(): MutableList<T>? {
     return when (this) {
         is Array<*> -> this.asList().asAny()
@@ -42,14 +54,9 @@ fun <T> Any.arrayAsListOrNull(): MutableList<T>? {
     }
 }
 
-fun <T> Any.arrayAsList(): MutableList<T> {
-    val result = this.arrayAsListOrNull<T>()
-    if (result === null) {
-        throw throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
-    }
-    return result
-}
-
+/**
+ * Returns a fixed-size array associated given array
+ */
 fun <T> Array<T>.asList(): MutableList<T> {
     val bridge = object : ArrayBridge<T> {
         override val size: Int = this@asList.size
@@ -65,6 +72,9 @@ fun <T> Array<T>.asList(): MutableList<T> {
     return ArrayBridgeList(bridge)
 }
 
+/**
+ * Returns a fixed-size array associated given array
+ */
 fun BooleanArray.asList(): MutableList<Boolean> {
     val bridge = object : ArrayBridge<Boolean> {
         override val size: Int = this@asList.size
@@ -80,6 +90,9 @@ fun BooleanArray.asList(): MutableList<Boolean> {
     return ArrayBridgeList(bridge)
 }
 
+/**
+ * Returns a fixed-size array associated given array
+ */
 fun ByteArray.asList(): MutableList<Byte> {
     val bridge = object : ArrayBridge<Byte> {
         override val size: Int = this@asList.size
@@ -95,6 +108,9 @@ fun ByteArray.asList(): MutableList<Byte> {
     return ArrayBridgeList(bridge)
 }
 
+/**
+ * Returns a fixed-size array associated given array
+ */
 fun ShortArray.asList(): MutableList<Short> {
     val bridge = object : ArrayBridge<Short> {
         override val size: Int = this@asList.size
@@ -110,6 +126,9 @@ fun ShortArray.asList(): MutableList<Short> {
     return ArrayBridgeList(bridge)
 }
 
+/**
+ * Returns a fixed-size array associated given array
+ */
 fun CharArray.asList(): MutableList<Char> {
     val bridge = object : ArrayBridge<Char> {
         override val size: Int = this@asList.size
@@ -125,6 +144,9 @@ fun CharArray.asList(): MutableList<Char> {
     return ArrayBridgeList(bridge)
 }
 
+/**
+ * Returns a fixed-size array associated given array
+ */
 fun IntArray.asList(): MutableList<Int> {
     val bridge = object : ArrayBridge<Int> {
         override val size: Int = this@asList.size
@@ -140,6 +162,9 @@ fun IntArray.asList(): MutableList<Int> {
     return ArrayBridgeList(bridge)
 }
 
+/**
+ * Returns a fixed-size array associated given array
+ */
 fun LongArray.asList(): MutableList<Long> {
     val bridge = object : ArrayBridge<Long> {
         override val size: Int = this@asList.size
@@ -155,6 +180,9 @@ fun LongArray.asList(): MutableList<Long> {
     return ArrayBridgeList(bridge)
 }
 
+/**
+ * Returns a fixed-size array associated given array
+ */
 fun FloatArray.asList(): MutableList<Float> {
     val bridge = object : ArrayBridge<Float> {
         override val size: Int = this@asList.size
@@ -170,6 +198,9 @@ fun FloatArray.asList(): MutableList<Float> {
     return ArrayBridgeList(bridge)
 }
 
+/**
+ * Returns a fixed-size array associated given array
+ */
 fun DoubleArray.asList(): MutableList<Double> {
     val bridge = object : ArrayBridge<Double> {
         override val size: Int = this@asList.size
@@ -213,32 +244,32 @@ fun Any.arrayJoinToString(
 fun Any.arrayJoinToString(
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
-    postfix: CharSequence = "",
+    suffix: CharSequence = "",
     limit: Int = -1,
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): String {
-    return this.arrayJoinToString0(separator, prefix, postfix, limit, truncated, transform)
+    return this.arrayJoinToString0(separator, prefix, suffix, limit, truncated, transform)
 }
 
 private fun Any.arrayJoinToString0(
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
-    postfix: CharSequence = "",
+    suffix: CharSequence = "",
     limit: Int = -1,
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): String {
     return when (this) {
-        is Array<*> -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is BooleanArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is ByteArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is ShortArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is CharArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is IntArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is LongArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is FloatArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
-        is DoubleArray -> joinToStringKt(separator, prefix, postfix, limit, truncated, transform)
+        is Array<*> -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform)
+        is BooleanArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform)
+        is ByteArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform)
+        is ShortArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform)
+        is CharArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform)
+        is IntArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform)
+        is LongArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform)
+        is FloatArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform)
+        is DoubleArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform)
         else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
     }
 }
@@ -275,43 +306,33 @@ fun <A : Appendable> Any.arrayJoinTo(
     buffer: A,
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
-    postfix: CharSequence = "",
+    suffix: CharSequence = "",
     limit: Int = -1,
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): A {
-    return this.arrayJoinTo0(buffer, separator, prefix, postfix, limit, truncated, transform)
+    return this.arrayJoinTo0(buffer, separator, prefix, suffix, limit, truncated, transform)
 }
 
 private fun <A : Appendable> Any.arrayJoinTo0(
     buffer: A,
     separator: CharSequence = ", ",
     prefix: CharSequence = "",
-    postfix: CharSequence = "",
+    suffix: CharSequence = "",
     limit: Int = -1,
     truncated: CharSequence = "...",
     transform: ((Any?) -> CharSequence)? = null
 ): A {
     return when (this) {
-        is Array<*> -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is BooleanArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is ByteArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is ShortArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is CharArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is IntArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is LongArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is FloatArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
-        is DoubleArray -> joinToKt(buffer, separator, prefix, postfix, limit, truncated, transform)
+        is Array<*> -> joinToKt(buffer, separator, prefix, suffix, limit, truncated, transform)
+        is BooleanArray -> joinToKt(buffer, separator, prefix, suffix, limit, truncated, transform)
+        is ByteArray -> joinToKt(buffer, separator, prefix, suffix, limit, truncated, transform)
+        is ShortArray -> joinToKt(buffer, separator, prefix, suffix, limit, truncated, transform)
+        is CharArray -> joinToKt(buffer, separator, prefix, suffix, limit, truncated, transform)
+        is IntArray -> joinToKt(buffer, separator, prefix, suffix, limit, truncated, transform)
+        is LongArray -> joinToKt(buffer, separator, prefix, suffix, limit, truncated, transform)
+        is FloatArray -> joinToKt(buffer, separator, prefix, suffix, limit, truncated, transform)
+        is DoubleArray -> joinToKt(buffer, separator, prefix, suffix, limit, truncated, transform)
         else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
     }
-}
-
-@JvmName("toStringArray")
-fun Any.arrayToStringArray(): Array<String> {
-    return arrayAsList<Any?>().map { it.toString() }.toArray(String::class.java)
-}
-
-@JvmName("toStringOrNullArray")
-fun Any.arrayToStringOrNullArray(): Array<String?> {
-    return arrayAsList<Any?>().map { it?.toString() }.toArray(String::class.java)
 }

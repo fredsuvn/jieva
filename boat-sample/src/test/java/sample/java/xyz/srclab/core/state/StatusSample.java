@@ -4,35 +4,35 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.annotations.Test;
 import xyz.srclab.annotations.Immutable;
-import xyz.srclab.common.state.State;
-import xyz.srclab.common.state.StringState;
+import xyz.srclab.common.status.Status;
+import xyz.srclab.common.status.StringStatus;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.List;
 
-public class StateSample {
+public class StatusSample {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testState() {
-        MyState myState = new MyState(1, "description");
-        MyState newState = myState.withMoreDescription("cause");
+        MyStatus myState = new MyStatus(1, "description");
+        MyStatus newState = myState.withMoreDescription("cause");
         //description[cause]
         logger.log(newState.description());
     }
 
-    public static class MyState implements State<Integer, String, MyState> {
+    public static class MyStatus implements Status<Integer, String, MyStatus> {
 
         private final int code;
         private final List<String> descriptions;
 
-        public MyState(int code, @Nullable String description) {
+        public MyStatus(int code, @Nullable String description) {
             this.code = code;
-            this.descriptions = StringState.newDescriptions(description);
+            this.descriptions = StringStatus.newDescriptions(description);
         }
 
-        public MyState(int code, @Immutable List<String> descriptions) {
+        public MyStatus(int code, @Immutable List<String> descriptions) {
             this.code = code;
             this.descriptions = descriptions;
         }
@@ -45,7 +45,7 @@ public class StateSample {
         @Nullable
         @Override
         public String description() {
-            return StringState.joinDescriptions(descriptions);
+            return StringStatus.joinDescriptions(descriptions);
         }
 
         @NotNull
@@ -56,14 +56,14 @@ public class StateSample {
 
         @NotNull
         @Override
-        public MyState withNewDescription(@Nullable String newDescription) {
-            return new MyState(code, StringState.newDescriptions(newDescription));
+        public StatusSample.MyStatus withNewDescription(@Nullable String newDescription) {
+            return new MyStatus(code, StringStatus.newDescriptions(newDescription));
         }
 
         @NotNull
         @Override
-        public MyState withMoreDescription(String moreDescription) {
-            return new MyState(code, StringState.moreDescriptions(descriptions(), moreDescription));
+        public StatusSample.MyStatus withMoreDescription(String moreDescription) {
+            return new MyStatus(code, StringStatus.moreDescriptions(descriptions(), moreDescription));
         }
     }
 }

@@ -204,7 +204,7 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/proxy/P
 State包提供 `State` 接口代表一个状态:
 
 * `State`: 代表状态的核心接口;
-* `StringState`: 字符串类型的 `State`;
+* `StringStatus`: 字符串类型的 `State`;
 
 .Java Examples
 [source,java]
@@ -215,7 +215,7 @@ include::../../boat-sample/src/test/java/sample/java/xyz/srclab/core/state/State
 .Kotlin Examples
 [source,kotlin]
 ----
-include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/state/StateSample.kt[]
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/state/StatusSample.kt[]
 ----
 
 === Exception
