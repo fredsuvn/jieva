@@ -6,16 +6,6 @@ package xyz.srclab.common.collect
 import kotlin.collections.joinTo as joinToKt
 import kotlin.collections.joinToString as joinToStringKt
 
-//Processing:
-
-fun <T> Iterable<T>.collecting(): Collecting<T> {
-    return Collecting(this)
-}
-
-fun <K, V> Map<K, V>.mapping(): Mapping<K, V> {
-    return Mapping(this)
-}
-
 //Join to String:
 
 @JvmOverloads
