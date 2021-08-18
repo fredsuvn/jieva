@@ -211,9 +211,9 @@ val Type.typeArguments: Map<TypeVariable<*>, Type>
     }
 
 /**
- * Returns type signature of [this] for [to] type.
+ * Returns a [ParameterizedType] as signature of [this], target for [to] type.
  *
- * Assume `class Foo<T>` and its subclass `class StringFoo extends Foo<String>`:
+ * Assume `class Foo<T>` and its subclass `class StringFoo` extends `Foo<String>`:
  *
  * ```
  * Reflects.toTypeSignature(StringFoo.class, Foo.class);
@@ -233,6 +233,26 @@ fun Type.toTypeSignature(to: Class<*>): ParameterizedType {
     } else {
         parameterizedTypeWithOwner(to, owner, actualArguments)
     }
+}
+
+/**
+ * Returns a [ActualType] of [this], target for [to] type.
+ *
+ * Assume `class Foo<T>` and its subclass `class StringFoo` extends `Foo<String>`:
+ *
+ * ```
+ * Reflects.toActualType(StringFoo.class, Foo.class);
+ * ```
+ *
+ * will return: `Foo<String>`
+ */
+fun Type.toActualType(to: Class<*>): ActualType {
+    val typeParameters = to.typeParameters
+    val typeArguments = this.typeArguments
+    val actualArguments = typeParameters.map {
+        typeArguments[it] ?: it
+    }
+    return ActualType.newActualType(to, actualArguments)
 }
 
 /**

@@ -37,7 +37,6 @@ interface Runner : Executor {
      * Run and no return.
      */
     @Throws(RejectedExecutionException::class)
-    @JvmDefault
     fun fastRun(task: Runnable) {
         execute(task)
     }
@@ -106,12 +105,4 @@ interface Runner : Executor {
             return ASYNC_RUNNER.run(task)
         }
     }
-}
-
-fun <V> runSync(task: () -> V): Running<V> {
-    return Runner.runSync(task)
-}
-
-fun <V> runAsync(task: () -> V): Running<V> {
-    return Runner.runAsync(task)
 }

@@ -4,7 +4,6 @@ import xyz.srclab.annotations.Written
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.lang.NamingCase
-import xyz.srclab.common.lang.Next
 import xyz.srclab.common.reflect.eraseTypeParameters
 import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.reflect.searchFieldOrNull
@@ -23,9 +22,9 @@ import java.lang.reflect.Type
 interface BeanResolveHandler {
 
     /**
-     * Resolves and returns whether continue to resolve by next handler.
+     * Resolves into given [builder].
      */
-    fun resolve(@Written builder: BeanTypeBuilder): Next
+    fun resolve(@Written builder: BeanTypeBuilder)
 
     companion object {
         @JvmField
@@ -49,7 +48,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
         @Written setters: MutableMap<String, SetterInfo>,
     )
 
-    override fun resolve(builder: BeanTypeBuilder): Next {
+    override fun resolve(builder: BeanTypeBuilder) {
         val getters: MutableMap<String, GetterInfo> = LinkedHashMap()
         val setters: MutableMap<String, SetterInfo> = LinkedHashMap()
 
@@ -61,7 +60,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
             val getter = getterEntry.value
             val setter = setters[propertyName]
             if (setter === null) {
-                properties[propertyName] = BeanTypeBuilder.newPropertyType(
+                properties[propertyName] = PropertyType.newPropertyType(
                     builder.preparedBeanType,
                     propertyName,
                     getter.type,
@@ -72,7 +71,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
                     null
                 )
             } else if (getter.type == setter.type) {
-                properties[propertyName] = BeanTypeBuilder.newPropertyType(
+                properties[propertyName] = PropertyType.newPropertyType(
                     builder.preparedBeanType,
                     propertyName,
                     getter.type,
@@ -89,7 +88,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
         for (setterEntry in setters) {
             val propertyName = setterEntry.key
             val setter = setterEntry.value
-            properties[propertyName] = BeanTypeBuilder.newPropertyType(
+            properties[propertyName] = PropertyType.newPropertyType(
                 builder.preparedBeanType,
                 propertyName,
                 setter.type,
@@ -100,7 +99,6 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
                 setter.setterMethod
             )
         }
-        return Next.CONTINUE
     }
 
     data class GetterInfo(

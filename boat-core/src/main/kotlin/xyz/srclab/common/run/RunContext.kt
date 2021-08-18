@@ -11,7 +11,6 @@ interface RunContext : MapAccessor {
     /**
      * Attach contents of this context, current context as previously is returned.
      */
-    @JvmDefault
     fun attach(): Attach {
         return object : Attach {
             override val contents: Map<Any, Any?> = this@RunContext.asMap()

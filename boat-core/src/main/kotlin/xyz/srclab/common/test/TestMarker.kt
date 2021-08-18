@@ -9,27 +9,22 @@ import java.util.concurrent.atomic.AtomicLong
  */
 interface TestMarker {
 
-    @JvmDefault
     fun <T> mark(key: Any, value: Any): T {
         return getMarkMap(this).put(key, value).asAny()
     }
 
-    @JvmDefault
     fun <T> unmark(key: Any): T {
         return getMarkMap(this).remove(key).asAny()
     }
 
-    @JvmDefault
     fun <T> getMark(key: Any): T {
         return getMarkMap(this)[key].asAny()
     }
 
-    @JvmDefault
     fun clearMarks() {
         getMarkMap(this).clear()
     }
 
-    @JvmDefault
     fun asMap(): MutableMap<Any, Any?> {
         return getMarkMap(this).asAny()
     }

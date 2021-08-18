@@ -14,37 +14,37 @@ import kotlin.text.toInt as toIntKt
  */
 interface About {
 
+    @get:JvmName("name")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
-        @JvmName("name") get
 
+    @get:JvmName("version")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val version: String?
-        @JvmName("version") get
 
+    @get:JvmName("author")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val authors: List<Author>
-        @JvmName("author") get
 
+    @get:JvmName("mail")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val mail: String?
-        @JvmName("mail") get
 
+    @get:JvmName("url")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String?
-        @JvmName("url") get
 
+    @get:JvmName("licence")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val licences: List<String>
-        @JvmName("licence") get
 
+    @get:JvmName("poweredBy")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    val poweredBys: List<About>
-        @JvmName("poweredBy") get
+    val poweredBy: List<About>
 
+    @get:JvmName("copyright")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val copyright: String?
-        @JvmName("copyright") get
 
     companion object {
 
@@ -70,7 +70,7 @@ interface About {
             override val mail: String?,
             override val url: String?,
             override val licences: List<String>,
-            override val poweredBys: List<About>,
+            override val poweredBy: List<About>,
             override val copyright: String?,
         ) : About {
 
@@ -83,7 +83,7 @@ interface About {
                 if (mail != other.mail) return false
                 if (url != other.url) return false
                 if (licences != other.licences) return false
-                if (poweredBys != other.poweredBys) return false
+                if (poweredBy != other.poweredBy) return false
                 if (copyright != other.copyright) return false
                 return true
             }
@@ -95,7 +95,7 @@ interface About {
                 result = 31 * result + mail.hashCode()
                 result = 31 * result + url.hashCode()
                 result = 31 * result + licences.hashCode()
-                result = 31 * result + poweredBys.hashCode()
+                result = 31 * result + poweredBy.hashCode()
                 result = 31 * result + copyright.hashCode()
                 return result
             }
@@ -127,8 +127,8 @@ interface About {
                 if (licences.isNotEmpty()) {
                     "Licences: $licences".toString().appendInfo()
                 }
-                if (poweredBys.isNotEmpty()) {
-                    "Powered By: $poweredBys".toString().appendInfo()
+                if (poweredBy.isNotEmpty()) {
+                    "Powered By: $poweredBy".toString().appendInfo()
                 }
                 if (!copyright.isNullOrEmpty()) {
                     "Copyright: $copyright".appendInfo()
@@ -146,17 +146,17 @@ interface About {
  */
 interface Author {
 
+    @get:JvmName("name")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
-        @JvmName("name") get
 
+    @get:JvmName("mail")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val mail: String?
-        @JvmName("mail") get
 
+    @get:JvmName("url")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String?
-        @JvmName("url") get
 
     companion object {
 
@@ -212,53 +212,57 @@ interface Author {
  */
 interface SemVer : Comparable<SemVer> {
 
+    @get:JvmName("normalNumbers")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val normalNumbers: List<Int>
-        @JvmName("numbers") get
 
+    @get:JvmName("major")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val major: Int
-        @JvmName("major") get() = normalNumbers[0]
+        get() = normalNumbers[0]
 
+    @get:JvmName("minor")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val minor: Int
-        @JvmName("minor") get() = if (normalNumbers.size > 1) normalNumbers[1] else 0
+        get() = if (normalNumbers.size > 1) normalNumbers[1] else 0
 
+    @get:JvmName("patch")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val patch: Int
-        @JvmName("patch") get() = if (normalNumbers.size > 2) normalNumbers[2] else 0
+        get() = if (normalNumbers.size > 2) normalNumbers[2] else 0
 
+    @get:JvmName("normalString")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val normalString: String
-        @JvmName("normalString") get() = normalNumbers.joinDotToString()
+        get() = normalNumbers.joinDotToString()
 
+    @get:JvmName("preRelease")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val preRelease: List<PreReleaseIdentifier>
-        @JvmName("preRelease") get
 
+    @get:JvmName("preReleaseString")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val preReleaseString: String
-        @JvmName("preReleaseString") get() = preRelease.joinDotToString()
+        get() = preRelease.joinDotToString()
 
+    @get:JvmName("buildMetadata")
     @Suppress(INAPPLICABLE_JVM_NAME)
     val buildMetadata: List<String>
-        @JvmName("buildMetadata") get
 
+    @get:JvmName("buildMetadataString")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val buildMetadataString: String
-        @JvmName("buildMetadataString") get() = buildMetadata.joinDotToString()
+        get() = buildMetadata.joinDotToString()
 
+    @get:JvmName("isNormal")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val isNormal: Boolean
-        @JvmName("isNormal") get() = preRelease.isEmpty()
+        get() = preRelease.isEmpty()
 
+    @get:JvmName("isPreRelease")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val isPreRelease: Boolean
-        @JvmName("isPreRelease") get() = preRelease.isNotEmpty()
+        get() = preRelease.isNotEmpty()
 
     interface PreReleaseIdentifier {
 

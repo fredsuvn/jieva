@@ -20,7 +20,6 @@ interface Scheduler : Runner {
     fun <V> schedule(delay: Duration, task: () -> V): Scheduling<V>
 
     @Throws(RejectedExecutionException::class)
-    @JvmDefault
     fun schedule(delay: Duration, task: Runnable): Scheduling<*> {
         return schedule(delay) {
             task.run()
@@ -32,7 +31,6 @@ interface Scheduler : Runner {
     fun <V> scheduleFixedRate(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V>
 
     @Throws(RejectedExecutionException::class)
-    @JvmDefault
     fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
         return scheduleFixedRate(initialDelay, period) {
             task.run()
@@ -44,7 +42,6 @@ interface Scheduler : Runner {
     fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V>
 
     @Throws(RejectedExecutionException::class)
-    @JvmDefault
     fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
         return scheduleFixedDelay(initialDelay, period) {
             task.run()
@@ -109,20 +106,4 @@ interface Scheduler : Runner {
             return DEFAULT_THREAD_SCHEDULER.scheduleFixedDelay(initialDelay, period, task)
         }
     }
-}
-
-fun <V> scheduleDefaultThread(delay: Duration, task: () -> V): Scheduling<V> {
-    return Scheduler.scheduleDefaultThread(delay, task)
-}
-
-fun <V> scheduleDefaultThreadFixedRate(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V> {
-    return Scheduler.scheduleDefaultThreadFixedRate(initialDelay, period, task)
-}
-
-fun <V> scheduleDefaultThreadFixedDelay(
-    initialDelay: Duration,
-    period: Duration,
-    task: () -> V,
-): Scheduling<V> {
-    return Scheduler.scheduleDefaultThreadFixedDelay(initialDelay, period, task)
 }

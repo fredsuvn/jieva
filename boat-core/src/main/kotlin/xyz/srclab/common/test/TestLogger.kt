@@ -17,7 +17,6 @@ interface TestLogger {
     /**
      * Using [CharsFormat.fastFormat] to format.
      */
-    @JvmDefault
     fun log(pattern: CharSequence, vararg args: Any?) {
         log(pattern.fastFormat(*args).asAny<Any?>())
     }
@@ -87,9 +86,7 @@ interface TestLogger {
             }
 
             companion object {
-
                 private const val CLASS_NAME_MAX_LENGTH = 30
-
                 private const val LINE_NUMBER_MAX_LENGTH = 4
             }
         }

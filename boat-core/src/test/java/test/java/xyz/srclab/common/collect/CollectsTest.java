@@ -80,29 +80,6 @@ public class CollectsTest {
         Assert.assertEquals(set, Collects.newSet("1", "2", "3"));
     }
 
-    //@Test
-    //public void testCollecting() {
-    //    List<String> list = new ArrayList<>();
-    //    list.add("1");
-    //    list.add("2");
-    //    list.add("3");
-    //    Collecting<String> collecting = Collects.collecting(list);
-    //    int sum = collecting.addAll(Collects.newArray("4", "5", "6"))
-    //        .removeFirst()
-    //        .map(it -> it + "0")
-    //        .map(Nums::toInt)
-    //        .reduce(Integer::sum);
-    //    Assert.assertEquals(sum, 200);
-    //
-    //    int[] ints = {1, 2, 3};
-    //    Collecting<Integer> collecting2 = Collects.collecting(Collects.asList(ints));
-    //    int sum2 = collecting2.reduce(Integer::sum);
-    //    Assert.assertEquals(sum2, 6);
-    //    Assert.expectThrows(UnsupportedOperationException.class, () -> {
-    //        collecting2.addAll(Arrays.asList(4, 5, 6));
-    //    });
-    //}
-
     @Test
     public void testCopyOnWriteMap() {
         Map<String, Object> map = new CopyOnWriteMap<>();

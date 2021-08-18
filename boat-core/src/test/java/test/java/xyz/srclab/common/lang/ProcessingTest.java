@@ -31,7 +31,7 @@ public class ProcessingTest {
     }
 
     private void testProcessing(String... command) {
-        Processing processing = Processing.newProcessing(command);
+        Processing processing = Processing.start(command);
         processing.waitForTermination();
         String output = processing.outputString();
         logger.log(output);
@@ -39,7 +39,7 @@ public class ProcessingTest {
     }
 
     private void testProcessingByPing() {
-        Processing processing = Processing.newProcessing("ping 127.0.0.1");
+        Processing processing = Processing.start("ping 127.0.0.1");
         processing.waitForTermination(Duration.ofSeconds(2));
         String output = processing.availableOutputString();
         logger.log(output);

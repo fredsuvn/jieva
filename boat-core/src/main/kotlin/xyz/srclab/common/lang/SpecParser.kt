@@ -11,7 +11,6 @@ interface SpecParser<S> {
     fun <T : Any> parse(spec: S): List<T>
 
     @Throws(SpecParsingException::class)
-    @JvmDefault
     fun <T : Any> parseFirst(spec: S): T {
         return parseFirstOrNull(spec) ?: throw SpecParsingException("Spec parsed failed: $spec")
     }

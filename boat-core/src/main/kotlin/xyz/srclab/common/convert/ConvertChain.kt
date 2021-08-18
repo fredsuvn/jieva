@@ -4,7 +4,7 @@ import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import java.lang.reflect.Type
 
 /**
- * Context for each conversation of [Converter].
+ * Convert handler chain and context for each conversion of [Converter].
  */
 interface ConvertChain {
 

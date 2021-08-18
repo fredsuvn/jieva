@@ -8,7 +8,6 @@ interface Invoke {
     /**
      * Starts this [Invoke].
      */
-    @JvmDefault
     fun <T> start(vararg args: Any?): T {
         return startWith(false, *args)
     }

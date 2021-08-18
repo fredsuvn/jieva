@@ -29,7 +29,6 @@ interface Running<V> : Future<V> {
 
     @get:JvmName("isStart")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val isStart: Boolean
         get() {
             return startTime !== null
@@ -37,7 +36,6 @@ interface Running<V> : Future<V> {
 
     @get:JvmName("isEnd")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val isEnd: Boolean
         get() {
             return endTime !== null
@@ -48,7 +46,6 @@ interface Running<V> : Future<V> {
      */
     @get:JvmName("startMilliseconds")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val startMilliseconds: Long
         get() {
             return startTime?.toInstant(ZoneOffset.UTC)?.toEpochMilli() ?: -1
@@ -59,7 +56,6 @@ interface Running<V> : Future<V> {
      */
     @get:JvmName("endMilliseconds")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val endMilliseconds: Long
         get() {
             return endTime?.toInstant(ZoneOffset.UTC)?.toEpochMilli() ?: -1
@@ -70,7 +66,6 @@ interface Running<V> : Future<V> {
      */
     @get:JvmName("cost")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val cost: Duration?
         get() {
             val start = startTime
@@ -86,7 +81,6 @@ interface Running<V> : Future<V> {
      */
     @get:JvmName("costMillis")
     @Suppress(INAPPLICABLE_JVM_NAME)
-    @JvmDefault
     val costMillis: Long
         get() {
             return cost?.toMillis() ?: -1
@@ -126,7 +120,6 @@ interface Running<V> : Future<V> {
      * while waiting
      * @throws TimeoutException if the wait timed out
      */
-    @JvmDefault
     fun get(duration: Duration): V {
         return get(duration.nano.toLong(), TimeUnit.NANOSECONDS)
     }

@@ -3,8 +3,7 @@ package test.java.xyz.srclab.common.reflect;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.collect.MutableListMap;
-import xyz.srclab.common.collect.MutableSetMap;
+import xyz.srclab.common.collect.ListMap;
 import xyz.srclab.common.collect.SetMap;
 import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.reflect.TypeRef;
@@ -110,9 +109,9 @@ public class TypeTest {
 
     @Test
     public void testTypeArguments() {
-        MutableSetMap<String, String> expected = MutableSetMap.newMutableSetMap(
+        SetMap<String, String> expected = new SetMap<>(
             new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
-            () -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
+            (key) -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
         );
 
         Map<TypeVariable<?>, Type> f1Map = Reflects.typeArguments(F1.class);
@@ -179,10 +178,10 @@ public class TypeTest {
         expected.clear();
     }
 
-    private void assertTypeArgumentsEquals(Map<TypeVariable<?>, Type> actual, MutableSetMap<String, String> expected) {
-        MutableSetMap<String, String> actualSorted = MutableSetMap.newMutableSetMap(
+    private void assertTypeArgumentsEquals(Map<TypeVariable<?>, Type> actual, SetMap<String, String> expected) {
+        SetMap<String, String> actualSorted = new SetMap<>(
             new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
-            () -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
+            (key) -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
         );
         actual.forEach((k, v) -> {
             actualSorted.add(k.getTypeName(), v.getTypeName());
@@ -202,7 +201,7 @@ public class TypeTest {
             }.type()
         );
 
-        Type listMapType = new TypeRef<MutableListMap<String, String>>() {
+        Type listMapType = new TypeRef<ListMap<String, String>>() {
         }.type();
         mapType = Reflects.toTypeSignature(listMapType, Map.class);
         logger.log(mapType);

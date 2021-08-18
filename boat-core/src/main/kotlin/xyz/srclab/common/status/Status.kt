@@ -17,8 +17,8 @@ import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
  */
 interface Status<C, D> {
 
-    @get:JvmName("code")
     @Suppress(INAPPLICABLE_JVM_NAME)
+    @get:JvmName("code")
     val code: C
 
     /**

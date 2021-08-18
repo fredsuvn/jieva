@@ -19,7 +19,6 @@ interface FastConverter {
      * Convert from [from] to [R].
      */
     @Throws(UnsupportedConvertException::class)
-    @JvmDefault
     fun <T : Any, R : Any> convert(from: T, toType: Class<R>): R {
         return convert(from, toType as Type)
     }
@@ -28,7 +27,6 @@ interface FastConverter {
      * Convert from [from] to [R].
      */
     @Throws(UnsupportedConvertException::class)
-    @JvmDefault
     fun <T : Any, R : Any> convert(from: T, toType: Type): R {
         return convert(from, from.javaClass, toType)
     }
@@ -43,7 +41,6 @@ interface FastConverter {
      * Convert from [from] to [R].
      */
     @Throws(UnsupportedConvertException::class)
-    @JvmDefault
     fun <T : Any, R : Any> convert(from: T, toType: TypeRef<R>): R {
         return convert(from, toType.type)
     }
@@ -52,7 +49,6 @@ interface FastConverter {
      * Convert from [from] to [R].
      */
     @Throws(UnsupportedConvertException::class)
-    @JvmDefault
     fun <T : Any, R : Any> convert(from: T, fromType: TypeRef<T>, toType: TypeRef<R>): R {
         return convert(from, fromType.type, toType.type)
     }

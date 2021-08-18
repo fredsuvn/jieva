@@ -5,6 +5,7 @@ import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
+import java.util.*
 
 /**
  * Represents bean property.
@@ -112,5 +113,55 @@ interface PropertyType {
         val old = getValue<T?>(bean)
         setValue(bean, value)
         return old
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun newPropertyType(
+            ownerType: BeanType,
+            name: String,
+            type: Type,
+            getter: Invoker?,
+            setter: Invoker?,
+            field: Field?,
+            getterMethod: Method?,
+            setterMethod: Method?,
+        ): PropertyType {
+            return PropertyTypeImpl(ownerType, name, type, getter, setter, field, getterMethod, setterMethod)
+        }
+
+        private class PropertyTypeImpl(
+            override val ownerType: BeanType,
+            override val name: String,
+            override val type: Type,
+            override val getter: Invoker?,
+            override val setter: Invoker?,
+            override val field: Field?,
+            override val getterMethod: Method?,
+            override val setterMethod: Method?,
+        ) : PropertyType {
+
+            private val _hashcode: Int by lazy { Objects.hash(ownerType, name, type) }
+
+            override val fieldAnnotations: List<Annotation> by lazy { super.fieldAnnotations }
+            override val getterAnnotations: List<Annotation> by lazy { super.getterAnnotations }
+            override val setterAnnotations: List<Annotation> by lazy { super.setterAnnotations }
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (other !is PropertyType) return false
+                if (ownerType != other.ownerType) return false
+                if (name != other.name) return false
+                if (type != other.type) return false
+                return true
+            }
+
+            override fun hashCode(): Int = _hashcode
+
+            override fun toString(): String {
+                return "${ownerType.type.typeName}.$name: ${type.typeName}"
+            }
+        }
     }
 }

@@ -3,7 +3,6 @@ package xyz.srclab.common.convert
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
-import xyz.srclab.common.collect.IterableType.Companion.toIterableType
 import xyz.srclab.common.lang.*
 import xyz.srclab.common.reflect.*
 import java.lang.reflect.*
@@ -251,7 +250,7 @@ object IterableConvertHandler : ConvertHandler {
                     if (iterable === null) {
                         return chain.next(from, fromType, toType)
                     }
-                    return toIterableOrNull(iterable, toType.toIterableType(), chain.converter)
+                    return toIterableOrNull(iterable, toType.toActualType(Iterable::class.java), chain.converter)
                 }
                 return chain.next(from, fromType, toType)
             }
@@ -263,7 +262,7 @@ object IterableConvertHandler : ConvertHandler {
                     if (iterable === null) {
                         return chain.next(from, fromType, toType)
                     }
-                    return toIterableOrNull(iterable, toType.toIterableType(), chain.converter)
+                    return toIterableOrNull(iterable, toType.toActualType(Iterable::class.java), chain.converter)
                         ?: chain.next(from, fromType, toType)
                 }
                 chain.next(from, fromType, toType)
@@ -278,18 +277,19 @@ object IterableConvertHandler : ConvertHandler {
         }
     }
 
-    private fun toIterableOrNull(from: Iterable<*>, iterableType: IterableType, converter: Converter): Any? {
+    private fun toIterableOrNull(from: Iterable<*>, iterableType: ActualType, converter: Converter): Any? {
+        val componentType = iterableType.argumentTypeOrNull(0) ?: Any::class.java
         return when (iterableType.rawClass) {
             Iterable::class.java, List::class.java, ArrayList::class.java ->
-                toArrayList(from, iterableType.componentType, converter)
+                toArrayList(from, componentType, converter)
             LinkedList::class.java ->
-                toLinkedList(from, iterableType.componentType, converter)
+                toLinkedList(from, componentType, converter)
             Collection::class.java, Set::class.java, LinkedHashSet::class.java ->
-                toLinkedHashSet(from, iterableType.componentType, converter)
+                toLinkedHashSet(from, componentType, converter)
             HashSet::class.java ->
-                toHashSet(from, iterableType.componentType, converter)
+                toHashSet(from, componentType, converter)
             TreeSet::class.java ->
-                toTreeSet(from, iterableType.componentType, converter)
+                toTreeSet(from, componentType, converter)
             else -> null
         }
     }
@@ -374,12 +374,8 @@ open class BeanConvertHandler @JvmOverloads constructor(
                 toConcurrentHashMap(from, toType, chain.converter)
             SetMap::class.java ->
                 toSetMap(from, toType, chain.converter)
-            MutableSetMap::class.java ->
-                toMutableSetMap(from, toType, chain.converter)
             ListMap::class.java ->
                 toListMap(from, toType, chain.converter)
-            MutableListMap::class.java ->
-                toMutableListMap(from, toType, chain.converter)
             else ->
                 toObject(from, toType, chain.converter)
         }
@@ -402,19 +398,11 @@ open class BeanConvertHandler @JvmOverloads constructor(
     }
 
     private fun toSetMap(from: Any, toType: Type, converter: Converter): Any {
-        return toMutableSetMap(from, toType, converter).toSetMap()
-    }
-
-    private fun toMutableSetMap(from: Any, toType: Type, converter: Converter): MutableSetMap<Any, Any?> {
-        return from.copyProperties(MutableSetMap.newMutableSetMap(), toType, beanResolver, converter)
+        return from.copyProperties(SetMap<Any, Any?>(), toType, beanResolver, converter)
     }
 
     private fun toListMap(from: Any, toType: Type, converter: Converter): Any {
-        return toMutableListMap(from, toType, converter).toListMap()
-    }
-
-    private fun toMutableListMap(from: Any, toType: Type, converter: Converter): MutableListMap<Any, Any?> {
-        return from.copyProperties(MutableListMap.newMutableListMap(), toType, beanResolver, converter)
+        return from.copyProperties(ListMap<Any, Any?>(), toType, beanResolver, converter)
     }
 
     private fun toObject(from: Any, toType: Type, converter: Converter): Any {

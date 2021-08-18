@@ -7,6 +7,7 @@ package xyz.srclab.common.exception
  */
 open class ImpossibleException : StatusException {
 
+    @JvmOverloads
     constructor(message: String? = null, cause: Throwable? = null) : super(
         if (message === null)
             IMPOSSIBLE_STATUS.toString()
