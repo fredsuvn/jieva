@@ -197,7 +197,7 @@ public class TypeTest {
         logger.log(mapType);
         Assert.assertEquals(
             mapType,
-            new TypeRef<Map<String, Set<? extends String>>>() {
+            new TypeRef<Map<String, Set<String>>>() {
             }.type()
         );
 

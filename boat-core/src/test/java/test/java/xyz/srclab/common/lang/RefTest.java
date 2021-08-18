@@ -27,7 +27,7 @@ public class RefTest {
 
     @Test
     public void testChainOps() {
-        String dateString = "22222-2-22 22:22:22";
+        String dateString = "2222-12-22 22:22:22";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Date date = Ref.of(dateString)
             .accept(logger::log)

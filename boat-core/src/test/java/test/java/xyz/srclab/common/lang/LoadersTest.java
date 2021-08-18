@@ -31,7 +31,7 @@ public class LoadersTest {
         logger.log("Load properties: {}", properties);
         Assert.assertEquals(
             properties,
-            Collections.singletonList(Collects.newMap(new HashMap<>(), "info", "123"))
+            Collections.singletonList(Collects.putEntries(new HashMap<>(), "info", "123"))
         );
 
         String newClassName = "test.xyz.srclab.A";

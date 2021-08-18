@@ -62,6 +62,7 @@ fun <T : Any> Any.copyProperties(
 ): T {
     return when {
         this is Map<*, *> && to is MutableMap<*, *> -> {
+            //TODO
             val toMapType = toType.toActualType(Map::class.java)
             this.forEach { (k, v) ->
                 if (v === null && !copyNull) {

@@ -27,7 +27,7 @@ public class ConvertTest {
 
         Map<Iterable<Long>, HashMap<Float, StringBuilder>> source = new LinkedHashMap<>();
         StringBuilder stringBuilder = new StringBuilder("BBB");
-        source.put(Arrays.asList(10086L), Collects.newMap(new HashMap<>(), 8.8, stringBuilder));
+        source.put(Arrays.asList(10086L), Collects.putEntries(new HashMap<>(), 8.8, stringBuilder));
         Map<List<Double>, HashMap<Integer, CharSequence>> map = Converts.convert(
             source,
             new TypeRef<Map<Iterable<Long>, HashMap<Float, StringBuilder>>>() {
@@ -37,7 +37,7 @@ public class ConvertTest {
         logger.log("map: {}", map);
         Assert.assertEquals(
             map.get(Arrays.asList(10086.0)),
-            Collects.newMap(new HashMap<>(), 8, stringBuilder)
+            Collects.putEntries(new HashMap<>(), 8, stringBuilder)
         );
     }
 

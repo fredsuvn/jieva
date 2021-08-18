@@ -250,7 +250,7 @@ object IterableConvertHandler : ConvertHandler {
                     if (iterable === null) {
                         return chain.next(from, fromType, toType)
                     }
-                    return toIterableOrNull(iterable, toType.toActualType(Iterable::class.java), chain.converter)
+                    return toIterableOrNull(iterable, ActualType.newActualType(toType), chain.converter)
                 }
                 return chain.next(from, fromType, toType)
             }
@@ -262,7 +262,7 @@ object IterableConvertHandler : ConvertHandler {
                     if (iterable === null) {
                         return chain.next(from, fromType, toType)
                     }
-                    return toIterableOrNull(iterable, toType.toActualType(Iterable::class.java), chain.converter)
+                    return toIterableOrNull(iterable, toType.toActualType(rawClass), chain.converter)
                         ?: chain.next(from, fromType, toType)
                 }
                 chain.next(from, fromType, toType)

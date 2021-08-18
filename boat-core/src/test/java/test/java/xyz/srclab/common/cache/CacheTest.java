@@ -70,14 +70,14 @@ public class CacheTest {
         Map<String, String> resultPresent = cache.getPresent(Arrays.asList("x1", "x2", "x3", "x4"));
         Assert.assertEquals(
             resultPresent,
-            Collects.newMap(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3")
+            Collects.putEntries(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3")
         );
         Map<String, String> resultAll = cache.getAll(
             Arrays.asList("x1", "x2", "x3", "x4"),
             keys -> Collects.associate(keys, (key) -> new Pair<String, String>(key, key)));
         Assert.assertEquals(
             resultAll,
-            Collects.newMap(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3", "x4", "x4")
+            Collects.putEntries(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3", "x4", "x4")
         );
     }
 }
