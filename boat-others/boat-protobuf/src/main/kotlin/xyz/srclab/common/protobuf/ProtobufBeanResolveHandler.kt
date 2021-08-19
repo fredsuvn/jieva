@@ -13,7 +13,7 @@ import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.reflect.method
 import xyz.srclab.common.reflect.methodOrNull
 import xyz.srclab.common.reflect.rawClass
-import xyz.srclab.common.reflect.toTypeSignature
+import xyz.srclab.common.reflect.getTypeSignature
 import java.lang.reflect.Method
 
 /**
@@ -61,7 +61,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                 if (getterMethod === null) {
                     return
                 }
-                val type = getterMethod.genericReturnType.toTypeSignature(Map::class.java)
+                val type = getterMethod.genericReturnType.getTypeSignature(Map::class.java)
                 val invoker = getterMethod.toInvoker()
                 getters[name] = PropertyInvoker(type, invoker)
 
@@ -89,7 +89,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                 if (getterMethod === null) {
                     return
                 }
-                val type = getterMethod.genericReturnType.toTypeSignature(List::class.java)
+                val type = getterMethod.genericReturnType.getTypeSignature(List::class.java)
                 val invoker = getterMethod.toInvoker()
                 getters[name] = PropertyInvoker(type, invoker)
 

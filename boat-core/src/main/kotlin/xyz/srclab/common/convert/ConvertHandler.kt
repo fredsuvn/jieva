@@ -3,6 +3,7 @@ package xyz.srclab.common.convert
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
+import xyz.srclab.common.collect.CollectType.Companion.toCollectType
 import xyz.srclab.common.lang.*
 import xyz.srclab.common.reflect.*
 import java.lang.reflect.*
@@ -250,7 +251,7 @@ object IterableConvertHandler : ConvertHandler {
                     if (iterable === null) {
                         return chain.next(from, fromType, toType)
                     }
-                    return toIterableOrNull(iterable, ActualType.newActualType(toType), chain.converter)
+                    return toIterableOrNull(iterable, toType.toCollectType(), chain.converter)
                 }
                 return chain.next(from, fromType, toType)
             }
@@ -262,7 +263,7 @@ object IterableConvertHandler : ConvertHandler {
                     if (iterable === null) {
                         return chain.next(from, fromType, toType)
                     }
-                    return toIterableOrNull(iterable, toType.toActualType(rawClass), chain.converter)
+                    return toIterableOrNull(iterable, toType.toCollectType(), chain.converter)
                         ?: chain.next(from, fromType, toType)
                 }
                 chain.next(from, fromType, toType)
@@ -277,19 +278,18 @@ object IterableConvertHandler : ConvertHandler {
         }
     }
 
-    private fun toIterableOrNull(from: Iterable<*>, iterableType: ActualType, converter: Converter): Any? {
-        val componentType = iterableType.argumentTypeOrNull(0) ?: Any::class.java
+    private fun toIterableOrNull(from: Iterable<*>, iterableType: CollectType, converter: Converter): Any? {
         return when (iterableType.rawClass) {
             Iterable::class.java, List::class.java, ArrayList::class.java ->
-                toArrayList(from, componentType, converter)
+                toArrayList(from, iterableType.componentType, converter)
             LinkedList::class.java ->
-                toLinkedList(from, componentType, converter)
+                toLinkedList(from, iterableType.componentType, converter)
             Collection::class.java, Set::class.java, LinkedHashSet::class.java ->
-                toLinkedHashSet(from, componentType, converter)
+                toLinkedHashSet(from, iterableType.componentType, converter)
             HashSet::class.java ->
-                toHashSet(from, componentType, converter)
+                toHashSet(from, iterableType.componentType, converter)
             TreeSet::class.java ->
-                toTreeSet(from, componentType, converter)
+                toTreeSet(from, iterableType.componentType, converter)
             else -> null
         }
     }
@@ -339,7 +339,7 @@ object IterableConvertHandler : ConvertHandler {
  * * Bean;
  * * [Map], [HashMap], [LinkedHashMap], [TreeMap];
  * * [ConcurrentHashMap];
- * * [SetMap], [MutableSetMap], [ListMap], [MutableListMap];
+ * * [SetMap], [ListMap];
  */
 open class BeanConvertHandler @JvmOverloads constructor(
     private val beanGenerator: BeanGenerator = BeanGenerator.DEFAULT,

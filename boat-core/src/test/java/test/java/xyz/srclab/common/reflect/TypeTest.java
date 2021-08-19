@@ -193,7 +193,7 @@ public class TypeTest {
     public void testTypeSignature() {
         Type setMapType = new TypeRef<SetMap<String, String>>() {
         }.type();
-        Type mapType = Reflects.toTypeSignature(setMapType, Map.class);
+        Type mapType = Reflects.getTypeSignature(setMapType, Map.class);
         logger.log(mapType);
         Assert.assertEquals(
             mapType,
@@ -203,7 +203,7 @@ public class TypeTest {
 
         Type listMapType = new TypeRef<ListMap<String, String>>() {
         }.type();
-        mapType = Reflects.toTypeSignature(listMapType, Map.class);
+        mapType = Reflects.getTypeSignature(listMapType, Map.class);
         logger.log(mapType);
         Assert.assertEquals(
             mapType,

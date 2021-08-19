@@ -4,9 +4,9 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
+import xyz.srclab.common.collect.MapType.Companion.toMapType
 import xyz.srclab.common.convert.Converter
 import xyz.srclab.common.lang.asAny
-import xyz.srclab.common.reflect.toActualType
 import java.lang.reflect.Type
 
 @JvmOverloads
@@ -62,16 +62,13 @@ fun <T : Any> Any.copyProperties(
 ): T {
     return when {
         this is Map<*, *> && to is MutableMap<*, *> -> {
-            //TODO
-            val toMapType = toType.toActualType(Map::class.java)
+            val toMapType = toType.toMapType()
             this.forEach { (k, v) ->
                 if (v === null && !copyNull) {
                     return@forEach
                 }
-                val toKey = converter.convert<Any>(k, toMapType.argumentTypeOrNull(0) ?: Any::class.java)
-                (to.asAny<MutableMap<Any, Any?>>())[toKey] = converter.convert(
-                    v, toMapType.argumentTypeOrNull(1) ?: Any::class.java
-                )
+                val toKey = converter.convert<Any>(k, toMapType.keyType)
+                (to.asAny<MutableMap<Any, Any?>>())[toKey] = converter.convert(v, toMapType.valueType)
             }
             to
         }
@@ -94,7 +91,7 @@ fun <T : Any> Any.copyProperties(
         this !is Map<*, *> && to is MutableMap<*, *> -> {
             val fromBeanType = beanResolver.resolve(this.javaClass)
             val fromProperties = fromBeanType.properties
-            val toMapType = toType.toActualType(Map::class.java)
+            val toMapType = toType.toMapType()
             fromProperties.forEach { (name, fromProperty) ->
                 if (!fromProperty.isReadable) {
                     return@forEach
@@ -103,10 +100,8 @@ fun <T : Any> Any.copyProperties(
                 if (value === null && !copyNull) {
                     return@forEach
                 }
-                val toKey = converter.convert<Any>(name, toMapType.argumentTypeOrNull(0) ?: Any::class.java)
-                (to.asAny<MutableMap<Any, Any?>>())[toKey] = converter.convert(
-                    value, toMapType.argumentTypeOrNull(1) ?: Any::class.java
-                )
+                val toKey = converter.convert<Any>(name, toMapType.keyType)
+                (to.asAny<MutableMap<Any, Any?>>())[toKey] = converter.convert(value, toMapType.valueType)
             }
             to
         }

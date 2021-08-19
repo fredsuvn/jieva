@@ -221,7 +221,7 @@ val Type.typeArguments: Map<TypeVariable<*>, Type>
  *
  * will return: `Foo<String>`
  */
-fun Type.toTypeSignature(to: Class<*>): ParameterizedType {
+fun Type.getTypeSignature(to: Class<*>): ParameterizedType {
     val typeParameters = to.typeParameters
     val typeArguments = this.typeArguments
     val actualArguments = typeParameters.map {
@@ -246,7 +246,7 @@ fun Type.toTypeSignature(to: Class<*>): ParameterizedType {
  *
  * will return: `Foo<String>`
  */
-fun Type.toActualType(to: Class<*>): ActualType {
+fun Type.getActualType(to: Class<*>): ActualType {
     val typeParameters = to.typeParameters
     val typeArguments = this.typeArguments
     val actualArguments = typeParameters.map {

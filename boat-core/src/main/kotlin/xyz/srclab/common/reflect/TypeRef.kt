@@ -21,7 +21,7 @@ abstract class TypeRef<T> {
         if (generic is ParameterizedType && generic.rawClass == TypeRef::class.java) {
             return generic.actualTypeArguments[0]
         }
-        val typeRefSignature = generic.toTypeSignature(TypeRef::class.java)
+        val typeRefSignature = generic.getTypeSignature(TypeRef::class.java)
         return typeRefSignature.actualTypeArguments[0]
     }
 
