@@ -4,6 +4,7 @@ import xyz.srclab.common.lang.Defaults.timestampPattern
 import xyz.srclab.common.run.RunContext
 import java.lang.reflect.Method
 import java.time.Duration
+import java.time.LocalDateTime
 
 /**
  * Represents `current` runtime, context and environment.
@@ -13,38 +14,11 @@ import java.time.Duration
 object Current {
 
     /**
-     * [milliseconds].
-     */
-    @JvmStatic
-    val millis: Long
-        @JvmName("millis") get() {
-            return milliseconds()
-        }
-
-    /**
-     * [nanoseconds].
-     */
-    @JvmStatic
-    val nanos: Long
-        @JvmName("nanos") get() {
-            return nanoseconds()
-        }
-
-    /**
-     * With [timestampPattern].
-     */
-    @JvmStatic
-    val timestamp: String
-        @JvmName("timestamp") get() {
-            return timestamp()
-        }
-
-    /**
      * [Thread.currentThread].
      */
     @JvmStatic
     val thread: Thread
-        @JvmName("thread") get() {
+        get() {
             return Thread.currentThread()
         }
 
@@ -53,17 +27,40 @@ object Current {
      */
     @JvmStatic
     val classLoader: ClassLoader
-        @JvmName("classLoader") get() {
+        get() {
             return thread.contextClassLoader
         }
 
     /**
      * Context of current runner (maybe thread).
      */
-    @get:JvmName("runContext")
     @JvmStatic
     val runContext: RunContext by lazy {
         RunContext.current()
+    }
+
+    /**
+     * Returns current milliseconds.
+     */
+    @JvmStatic
+    fun milliseconds(): Long {
+        return System.currentTimeMillis()
+    }
+
+    /**
+     * Returns current nanoseconds.
+     */
+    @JvmStatic
+    fun nanoseconds(): Long {
+        return System.nanoTime()
+    }
+
+    /**
+     * Returns current timestamp with pattern [timestampPattern].
+     */
+    @JvmStatic
+    fun timestamp(): String {
+        return Defaults.timestampFormatter.format(LocalDateTime.now())
     }
 
     /**
@@ -129,22 +126,6 @@ object Current {
     @JvmStatic
     fun set(key: Any, value: Any?) {
         runContext.set(key, value)
-    }
-
-    /**
-     * Attach [runContext], current context as previously is returned
-     */
-    @JvmStatic
-    fun attach(): RunContext.Attach {
-        return runContext.attach()
-    }
-
-    /**
-     * Reverse an [attach], restoring the previous [runContext].
-     */
-    @JvmStatic
-    fun detach(previous: RunContext.Attach) {
-        runContext.detach(previous)
     }
 
     /**

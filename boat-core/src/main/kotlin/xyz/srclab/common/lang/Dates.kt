@@ -31,18 +31,6 @@ val EPOCH_LOCAL_TIME: LocalTime = EPOCH_LOCAL_DATE_TIME.toLocalTime()
 @JvmField
 val ISO_DATE_FORMAT: String = DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.pattern
 
-fun milliseconds(): Long {
-    return System.currentTimeMillis()
-}
-
-fun nanoseconds(): Long {
-    return System.nanoTime()
-}
-
-fun timestamp(): String {
-    return Defaults.timestampFormatter.format(LocalDateTime.now())
-}
-
 @JvmOverloads
 fun dateFormat(pattern: String = ISO_DATE_FORMAT): DateFormat {
     return SimpleDateFormat(pattern)
@@ -244,5 +232,5 @@ fun Any?.toDuration(): Duration {
 }
 
 fun Any?.toTimestamp(): String {
-    return Defaults.timestampFormatter.format(this.toLocalDateTime())
+    return Defaults.timestampFormatter.format(toLocalDateTime())
 }

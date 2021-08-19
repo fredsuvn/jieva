@@ -25,8 +25,7 @@ object Defaults {
     /**
      * UTF-8.
      */
-    @JvmStatic
-    @get:JvmName("charset")
+    @JvmField
     val charset: Charset = StandardCharsets.UTF_8
 
     /**

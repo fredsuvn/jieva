@@ -43,12 +43,8 @@ interface CharsTemplate {
     /**
      * Source chars template.
      */
-    @get:JvmName("template")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val template: CharSequence
 
-    @get:JvmName("nodes")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val nodes: List<Node>
 
     /**
@@ -95,32 +91,20 @@ interface CharsTemplate {
 
     interface Node {
 
-        @get:JvmName("tokens")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val tokens: List<Token>
 
-        @get:JvmName("type")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val type: Type
 
         /**
          * Parameter index, or -1 if this is not a parameter.
          */
-        @get:JvmName("parameterIndex")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val parameterIndex: Int
 
-        @get:JvmName("text")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val text: String
 
-        @get:JvmName("isText")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val isText: Boolean
             get() = (type == Type.TEXT)
 
-        @get:JvmName("isParameter")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val isParameter: Boolean
             get() = (type == Type.PARAMETER)
 
@@ -152,41 +136,25 @@ interface CharsTemplate {
 
     interface Token {
 
-        @get:JvmName("startIndex")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val startIndex: Int
-
-        @get:JvmName("endIndex")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val endIndex: Int
-
-        @get:JvmName("type")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val type: Type
 
-        @get:JvmName("isText")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val isText: Boolean
             get() {
                 return type == Type.TEXT
             }
 
-        @get:JvmName("isPrefix")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val isPrefix: Boolean
             get() {
                 return type == Type.PREFIX
             }
 
-        @get:JvmName("isSuffix")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val isSuffix: Boolean
             get() {
                 return type == Type.SUFFIX
             }
 
-        @get:JvmName("isEscape")
-        @Suppress(INAPPLICABLE_JVM_NAME)
         val isEscape: Boolean
             get() {
                 return type == Type.ESCAPE

@@ -16,9 +16,8 @@ interface AnyAccessor : AnyGetter, AnySetter
  */
 interface AnyGetter {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val isPresent: Boolean
-        @JvmName("isPresent") get() {
+        get() {
             return getOrNull<Any>() !== null
         }
 
@@ -68,9 +67,8 @@ interface GenericAccessor<T : Any> : GenericGetter<T>, GenericSetter<T>
  */
 interface GenericGetter<T : Any> {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val isPresent: Boolean
-        @JvmName("isPresent") get() {
+        get() {
             return getOrNull() !== null
         }
 
