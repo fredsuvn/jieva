@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * @author sunqian
  */
-public class AnysTest {
+public class AnysKtKtTest {
 
     @Test
     public void testEqual() {

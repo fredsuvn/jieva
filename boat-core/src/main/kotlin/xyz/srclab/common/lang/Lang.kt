@@ -1,7 +1,5 @@
 package xyz.srclab.common.lang
 
-import xyz.srclab.common.lang.Next.*
-
 /**
  * Represents next operation, usually used for the object which delegate performance to a group of handlers.
  *

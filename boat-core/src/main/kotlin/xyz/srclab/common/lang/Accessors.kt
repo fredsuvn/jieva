@@ -144,8 +144,8 @@ interface MapGetter {
     }
 
     /**
-     * Returns a [Map] associated with current object.
-     * Means any modification will reflect to returned map, and vice versa.
+     * Returns a [Map] associated with current object,
+     * any modification will reflect the returned map, and vice versa.
      */
     fun asMap(): Map<Any, Any?>
 }
@@ -166,8 +166,8 @@ interface MapSetter {
     }
 
     /**
-     * Returns a [Map] associated with current object.
-     * Means any modification will reflect to returned map, and vice versa.
+     * Returns a [MutableMap] associated with current object,
+     * any modification will reflect the returned map, and vice versa.
      */
     fun asMap(): MutableMap<Any, Any?>
 }
@@ -214,8 +214,8 @@ interface GenericMapGetter<K : Any, V : Any> {
     }
 
     /**
-     * Returns a [Map] associated with current object.
-     * Means any modification will reflect to returned map, and vice versa.
+     * Returns a [Map] associated with current object,
+     * any modification will reflect the returned map, and vice versa.
      */
     fun asMap(): Map<K, V?>
 }
@@ -236,8 +236,8 @@ interface GenericMapSetter<K : Any, V : Any> {
     }
 
     /**
-     * Returns a [Map] associated with current object.
-     * Means any modification will reflect to returned map, and vice versa.
+     * Returns a [MutableMap] associated with current object,
+     * any modification will reflect the returned map, and vice versa.
      */
     fun asMap(): MutableMap<K, V?>
 }
