@@ -1,6 +1,6 @@
 @file:JvmName("Bools")
 
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import kotlin.text.toBoolean as toBooleanKt
 

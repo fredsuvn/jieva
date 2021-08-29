@@ -1,6 +1,6 @@
 @file:JvmName("Chars")
 
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import org.apache.commons.lang3.StringUtils
 import java.nio.charset.Charset
@@ -17,26 +17,17 @@ fun CharSequence?.isWhitespace(): Boolean {
     return StringUtils.isWhitespace(this)
 }
 
-/**
- * Note Minimum abbreviation width is 4.
- */
-@JvmOverloads
-fun CharSequence?.ellipses(maxLength: Int, offset: Int = 0): String {
-    return StringUtils.abbreviate(this.toString(), offset, maxLength)
-}
-
-fun CharSequence.toCharSet(): Charset {
-    return Charset.forName(this.toString())
-}
-
+@JvmName("toString")
 fun CharArray.toChars(): String {
     return String(this)
 }
 
+@JvmName("toString")
 fun ByteArray.toChars(charset: CharSequence): String {
-    return toChars(charset.toCharSet())
+    return String(this, charset.toCharSet())
 }
 
+@JvmName("toString")
 @JvmOverloads
 fun ByteArray.toChars(charset: Charset = Defaults.charset): String {
     return String(this, charset)
@@ -48,7 +39,7 @@ fun CharArray.toBytes(charset: CharSequence): ByteArray {
 
 @JvmOverloads
 fun CharArray.toBytes(charset: Charset = Defaults.charset): ByteArray {
-    return toChars().toByteArray(charset)
+    return toString().toByteArray(charset)
 }
 
 fun CharSequence.toBytes(charset: CharSequence): ByteArray {
@@ -60,6 +51,14 @@ fun CharSequence.toBytes(charset: Charset = Defaults.charset): ByteArray {
     return toString().toByteArray(charset)
 }
 
+/**
+ * Note Minimum abbreviation width is 4.
+ */
+@JvmOverloads
+fun CharSequence?.ellipses(maxLength: Int, offset: Int = 0): String {
+    return StringUtils.abbreviate(this.toChars(), offset, maxLength)
+}
+
 fun CharSequence.capitalize(): String {
     return StringUtils.capitalize(this.toString())
 }
@@ -68,8 +67,13 @@ fun CharSequence.uncapitalize(): String {
     return StringUtils.uncapitalize(this.toString())
 }
 
+@JvmName("charset")
+fun CharSequence.toCharSet(): Charset {
+    return Charset.forName(this.toString())
+}
+
 fun Array<out Any?>.toStringArray(): Array<String> {
-    return this.map { it.toString() }.toTypedArray()
+    return this.map { it.toChars() }.toTypedArray()
 }
 
 fun Array<out Any?>.toNullableStringArray(): Array<String?> {

@@ -1,6 +1,6 @@
 @file:JvmName("Anys")
 
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import java.util.*
 import kotlin.toString as toStringKt
@@ -60,6 +60,6 @@ fun Any?.deepToString(): String {
         is FloatArray -> Arrays.toString(this)
         is DoubleArray -> Arrays.toString(this)
         is Array<*> -> Arrays.deepToString(this)
-        else -> this.toString()
+        else -> this.toStringKt()
     }
 }

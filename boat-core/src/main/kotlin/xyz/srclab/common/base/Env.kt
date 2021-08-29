@@ -1,6 +1,7 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import org.apache.commons.lang3.SystemUtils
+import xyz.srclab.common.lang.toInt
 import java.util.*
 
 /**
@@ -8,7 +9,7 @@ import java.util.*
  *
  * @author sunqian
  */
-object Environment {
+object Env {
 
     const val JAVA_VERSION_KEY = "java.version"
 
@@ -346,7 +347,7 @@ object Environment {
 
     private fun propertiesToMap(properties: Properties): Map<String, String> {
         val map = mutableMapOf<String, String>()
-        properties.forEach { k: Any?, v: Any? -> map[k.toString()] = v.toString() }
+        properties.forEach { k: Any?, v: Any? -> map[k.toChars()] = v.toChars() }
         return map
     }
 

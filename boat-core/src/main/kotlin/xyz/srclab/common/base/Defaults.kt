@@ -1,4 +1,4 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import com.google.common.base.CharMatcher
 import java.io.File
@@ -9,89 +9,110 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- * Default settings and arguments.
+ * Default values.
  */
 object Defaults {
-
-    @JvmField
-    val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
-
-    @JvmField
-    val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
-
-    @JvmField
-    val PLUS_SIGN_MATCHER: CharMatcher = CharMatcher.`is`('+')
 
     /**
      * UTF-8.
      */
-    @JvmField
+    @get:JvmName("charset")
+    @JvmStatic
     val charset: Charset = StandardCharsets.UTF_8
 
     /**
      * [Locale.getDefault].
      */
+    @get:JvmName("locale")
     @JvmStatic
     val locale: Locale
-        @JvmName("locale") get() {
+        get() {
             return Locale.getDefault()
         }
 
     /**
      * [TimeUnit.SECONDS].
      */
-    @JvmStatic
     @get:JvmName("timeUnit")
+    @JvmStatic
     val timeUnit: TimeUnit = TimeUnit.SECONDS
 
     /**
-     * [Environment.availableProcessors] * 2.
+     * [Env.availableProcessors] * 2.
      */
-    @JvmStatic
     @get:JvmName("concurrencyLevel")
-    val concurrencyLevel: Int = Environment.availableProcessors * 2
+    @JvmStatic
+    val concurrencyLevel: Int
+        get() {
+            return Env.availableProcessors * 2
+        }
 
     /**
      * [File.separator].
+     * "/" on Unix, "\\" on Windows.
      */
-    @JvmStatic
     @get:JvmName("fileSeparator")
+    @JvmStatic
     val fileSeparator: String = File.separator
 
     /**
      * [File.pathSeparator].
+     * ":" on Unix, ";" on Windows.
      */
-    @JvmStatic
     @get:JvmName("pathSeparator")
+    @JvmStatic
     val pathSeparator: String = File.pathSeparator
 
     /**
      * [System.lineSeparator].
+     * "\n" on Unix, "\r\n" on Windows, "\r" on Mac.
      */
+    @get:JvmName("lineSeparator")
     @JvmStatic
     val lineSeparator: String
-        @JvmName("lineSeparator") get() {
+        get() {
             return System.lineSeparator()
         }
 
     /**
      * yyyyMMddHHmmssSSS.
      */
-    @JvmStatic
     @get:JvmName("timestampPattern")
+    @JvmStatic
     val timestampPattern: String = "yyyyMMddHHmmssSSS"
 
     /**
      * yyyyMMddHHmmssSSS.
      */
-    @JvmStatic
     @get:JvmName("timestampFormatter")
+    @JvmStatic
     val timestampFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(timestampPattern, locale)
 
     /**
      * 10.
      */
-    @JvmStatic
     @get:JvmName("radix")
+    @JvmStatic
     val radix: Int = 10
+
+    /**
+     * [CharMatcher] of pattern dot: ".".
+     */
+    @get:JvmName("dotMatcher")
+    @JvmStatic
+    val dotMatcher: CharMatcher = CharMatcher.`is`('.')
+
+    /**
+     * [CharMatcher] of pattern hyphen: "-".
+     */
+    @get:JvmName("hyphenMatcher")
+    @JvmStatic
+    val hyphenMatcher: CharMatcher = CharMatcher.`is`('-')
+
+    /**
+     * [CharMatcher] of pattern plus sign: "+".
+     */
+    @get:JvmName("plusMatcher")
+    @JvmStatic
+    val plusMatcher: CharMatcher = CharMatcher.`is`('+')
 }

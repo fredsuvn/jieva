@@ -1,6 +1,5 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
-import xyz.srclab.common.lang.Defaults.timestampPattern
 import xyz.srclab.common.run.RunContext
 import java.lang.reflect.Method
 import java.time.Duration
