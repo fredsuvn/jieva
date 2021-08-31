@@ -1,9 +1,9 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.lang.isIndexInBounds
 import xyz.srclab.common.run.RunContext
 import java.lang.reflect.Method
 import java.time.Duration
-import java.time.LocalDateTime
 
 /**
  * Represents `current` runtime, context and environment.
@@ -15,6 +15,7 @@ object Current {
     /**
      * [Thread.currentThread].
      */
+    @get:JvmName("thread")
     @JvmStatic
     val thread: Thread
         get() {
@@ -24,6 +25,7 @@ object Current {
     /**
      * [ClassLoader] of current thread.
      */
+    @get:JvmName("classLoader")
     @JvmStatic
     val classLoader: ClassLoader
         get() {
@@ -31,35 +33,12 @@ object Current {
         }
 
     /**
-     * Context of current runner (maybe thread).
+     * Current run-context.
      */
+    @get:JvmName("runContext")
     @JvmStatic
     val runContext: RunContext by lazy {
         RunContext.current()
-    }
-
-    /**
-     * Returns current milliseconds.
-     */
-    @JvmStatic
-    fun milliseconds(): Long {
-        return System.currentTimeMillis()
-    }
-
-    /**
-     * Returns current nanoseconds.
-     */
-    @JvmStatic
-    fun nanoseconds(): Long {
-        return System.nanoTime()
-    }
-
-    /**
-     * Returns current timestamp with pattern [timestampPattern].
-     */
-    @JvmStatic
-    fun timestamp(): String {
-        return Defaults.timestampFormatter.format(LocalDateTime.now())
     }
 
     /**
@@ -172,27 +151,31 @@ object Current {
     }
 
     /**
-     * Returns last stack frame on [calledClassName] and [calledMethodName] from current runner (thread),
-     * or null if failed.
+     * Returns last stack trace element of current thread.
+     *
+     * Searching will start from first stack trace element specified by [className] and [methodName],
+     * if an element's className and methodName both
      */
     @JvmStatic
-    fun callerFrameOrNull(calledClassName: String, calledMethodName: String): StackTraceElement? {
+    fun lastStackTraceElement(className: String, methodName: String, offset: Int): StackTraceElement? {
         val stackTrace = thread.stackTrace
         if (stackTrace.isNullOrEmpty()) {
             return null
         }
-        var calledIndex = 0
+        var index = 0
         for (i in stackTrace.indices) {
-            if (stackTrace[i].className == calledClassName && stackTrace[i].methodName == calledMethodName) {
-                calledIndex = i
+            if (stackTrace[i].className == className && stackTrace[i].methodName == methodName) {
+                index = i
                 break
             }
         }
-        for (i in calledIndex + 1 until stackTrace.size) {
-            if (stackTrace[i].className != calledClassName && stackTrace[i].methodName != calledMethodName) {
-                return stackTrace[i]
+        for (i in index + 1 until stackTrace.size) {
+            if (stackTrace[i].className != className && stackTrace[i].methodName != methodName) {
+                index = i
+                break;
             }
         }
-        return null
+        val lastIndex = index + offset
+        return if (isIndexInBounds(lastIndex, 0, stackTrace.size)) stackTrace[lastIndex] else null
     }
 }

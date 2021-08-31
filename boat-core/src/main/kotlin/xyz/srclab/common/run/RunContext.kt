@@ -1,7 +1,7 @@
 package xyz.srclab.common.run
 
 import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.lang.MapAccessor
+import xyz.srclab.common.base.MapAccessor
 
 /**
  * Run context just like [ThreadLocal].

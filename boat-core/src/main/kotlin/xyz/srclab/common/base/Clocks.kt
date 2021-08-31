@@ -8,20 +8,20 @@ import java.time.LocalDateTime
 /**
  * Returns current time as milliseconds.
  */
-fun currentMillis(): Long {
+fun nowMillis(): Long {
     return System.currentTimeMillis()
 }
 
 /**
  * Returns the current running time in nanoseconds.
  */
-fun currentNanos(): Long {
+fun nowNanos(): Long {
     return System.nanoTime();
 }
 
 /**
  * Returns current timestamp by [Defaults.timestampPattern].
  */
-fun timestamp(): String {
+fun nowTimestamp(): String {
     return Defaults.timestampFormatter.format(LocalDateTime.now())
 }
