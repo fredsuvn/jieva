@@ -330,12 +330,18 @@ object Environments {
     }
 
     @JvmStatic
-    fun setProperty(key: String, value: String?) {
+    fun setProperty(key: String, value: String) {
         System.setProperty(key, value)
     }
 
+    @Throws(NullPointerException::class)
     @JvmStatic
-    fun getEnvironmentVariable(key: String): String? {
+    fun getEnvironmentVariable(key: String): String {
+        return getEnvironmentVariableOrNull(key)!!
+    }
+
+    @JvmStatic
+    fun getEnvironmentVariableOrNull(key: String): String? {
         return System.getenv(key)
     }
 

@@ -1,4 +1,4 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
@@ -45,6 +45,9 @@ interface CharsTemplate {
      */
     val template: CharSequence
 
+    /**
+     * Resolved nodes.
+     */
     val nodes: List<Node>
 
     /**
@@ -232,7 +235,8 @@ interface CharsTemplate {
             }
         }
 
-        private class WithEscape(template: CharSequence, prefix: String, suffix: String, escape: String) : FromTokens(template) {
+        private class WithEscape(template: CharSequence, prefix: String, suffix: String, escape: String) :
+            FromTokens(template) {
 
             override val nodes: List<Node> by lazy {
                 val tokens = LinkedList<Token>()
@@ -325,7 +329,14 @@ interface CharsTemplate {
                             if (tokens[i].isText || tokens[i].isEscape) {
                                 i++
                             } else if (tokens[i].isSuffix) {
-                                nodes.add(Node.newNode(template, tokens.subList(start, i), Node.Type.PARAMETER, parameterIndex))
+                                nodes.add(
+                                    Node.newNode(
+                                        template,
+                                        tokens.subList(start, i),
+                                        Node.Type.PARAMETER,
+                                        parameterIndex
+                                    )
+                                )
                                 i++
                                 start = i
                                 parameterIndex++

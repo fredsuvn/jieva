@@ -1,6 +1,6 @@
 @file:JvmName("Nums")
 
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import org.apache.commons.lang3.StringUtils
 import java.math.BigDecimal
@@ -192,7 +192,7 @@ fun Any?.toNumber(): Number {
 
 /**
  * To binary string.
- * It will pad *0* before binary string if [size] > binary string's size, or no padding if [size] <= 0.
+ * It will pad `0` before binary string if [size] > binary string's size, or no padding if [size] <= `0`.
  */
 @JvmOverloads
 fun Int.toBinaryString(size: Int = 32): String {
@@ -201,7 +201,7 @@ fun Int.toBinaryString(size: Int = 32): String {
 
 /**
  * To binary string.
- * It will pad *0* before binary string if [size] > binary string's size, or no padding if [size] <= 0.
+ * It will pad `0` before binary string if [size] > binary string's size, or no padding if [size] <= `0`.
  */
 @JvmOverloads
 fun Long.toBinaryString(size: Int = 64): String {

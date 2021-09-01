@@ -3,15 +3,23 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.lang.isIndexInBounds
+import java.time.Duration
 
 private val threadLocal: ThreadLocal<MutableMap<Any, Any?>> = ThreadLocal.withInitial { HashMap() }
 
 /**
  * Returns current thread.
  */
-fun thread(): Thread {
+@JvmName("thread")
+fun currentThread(): Thread {
     return Thread.currentThread()
+}
+
+/**
+ * [ClassLoader] of current thread.
+ */
+fun classLoader(): ClassLoader {
+    return currentThread().contextClassLoader
 }
 
 @JvmName("get")
@@ -60,35 +68,54 @@ fun getContextAsMap(): MutableMap<Any, Any?> {
 }
 
 /**
- * Finds the index of stack trace element of which class name is [className], method name is [methodName],
- * computes  next stack trace element which passes the [filter].
- *
- * Searching will start from first stack trace element specified by [className] and [methodName],
- * if an element's className and methodName both
+ * Sleeps for [millis] and [nanos].
  */
-@JvmStatic
-fun nextStackTraceElement(
-    find: (StackTraceElement) -> Boolean,
-    offset: Int,
-    filter: (StackTraceElement) -> Boolean
+@JvmOverloads
+fun sleep(millis: Long, nanos: Int = 0) {
+    Thread.sleep(millis, nanos)
+}
+
+/**
+ * Sleeps for [duration].
+ */
+fun sleep(duration: Duration) {
+    sleep(duration.toMillis(), duration.nano)
+}
+
+/**
+ * Try to find caller stack trace element.
+ *
+ * This function calls [filter] for each stack trace element of current thread,
+ * first try to find the `called` element of which return value is `0`,
+ * then continue (from ``called``'s index + 1) to find the `caller` element of which return value is `1`,
+ * returns the element of which index is ``caller``'s index + [offset].
+ *
+ * Note if stack trace elements of current thread is null,
+ * or ``caller``'s index + [offset] is out of bounds, return null.
+ */
+@JvmOverloads
+fun callerStackTrace(
+    offset: Int = 0,
+    filter: (StackTraceElement, findCalled: Boolean) -> Int
 ): StackTraceElement? {
-    val stackTrace = Current.thread.stackTrace
+    val stackTrace = currentThread().stackTrace
     if (stackTrace.isNullOrEmpty()) {
         return null
     }
-    var index = 0
     for (i in stackTrace.indices) {
-        if (stackTrace[i].className == className && stackTrace[i].methodName == methodName) {
-            index = i
-            break
+        val ir = filter(stackTrace[i], false)
+        if (ir == 0) {
+            for (j in i + 1 until stackTrace.size) {
+                val jr = filter(stackTrace[j], true)
+                if (jr == 1) {
+                    val r = jr + offset
+                    if (isIndexInBounds(r, 0, stackTrace.size)) {
+                        return stackTrace[r]
+                    }
+                    return null
+                }
+            }
         }
     }
-    for (i in index + 1 until stackTrace.size) {
-        if (stackTrace[i].className != className && stackTrace[i].methodName != methodName) {
-            index = i
-            break;
-        }
-    }
-    val lastIndex = index + offset
-    return if (isIndexInBounds(lastIndex, 0, stackTrace.size)) stackTrace[lastIndex] else null
+    return null
 }

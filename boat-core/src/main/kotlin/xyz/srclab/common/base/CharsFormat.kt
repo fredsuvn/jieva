@@ -1,4 +1,4 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import org.slf4j.helpers.MessageFormatter as MessageFormatterSlf4j
 import java.text.MessageFormat as MessageFormatKt

@@ -1,8 +1,8 @@
 @file:JvmName("Checks")
 
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
-import xyz.srclab.common.lang.CharsFormat.Companion.fastFormat
+import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
 
 @Throws(IllegalArgumentException::class)
 fun checkArgument(expression: Boolean) {
