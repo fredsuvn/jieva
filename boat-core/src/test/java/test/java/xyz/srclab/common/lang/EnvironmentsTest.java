@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author sunqian
  */
-public class EnvTest {
+public class EnvironmentsTest {
 
     private static final TestLogger logger = TestLogger.DEFAULT;
 

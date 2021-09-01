@@ -150,32 +150,5 @@ object Current {
         return callerFrameOrNull(calledClassName, calledMethodName)
     }
 
-    /**
-     * Returns last stack trace element of current thread.
-     *
-     * Searching will start from first stack trace element specified by [className] and [methodName],
-     * if an element's className and methodName both
-     */
-    @JvmStatic
-    fun lastStackTraceElement(className: String, methodName: String, offset: Int): StackTraceElement? {
-        val stackTrace = thread.stackTrace
-        if (stackTrace.isNullOrEmpty()) {
-            return null
-        }
-        var index = 0
-        for (i in stackTrace.indices) {
-            if (stackTrace[i].className == className && stackTrace[i].methodName == methodName) {
-                index = i
-                break
-            }
-        }
-        for (i in index + 1 until stackTrace.size) {
-            if (stackTrace[i].className != className && stackTrace[i].methodName != methodName) {
-                index = i
-                break;
-            }
-        }
-        val lastIndex = index + offset
-        return if (isIndexInBounds(lastIndex, 0, stackTrace.size)) stackTrace[lastIndex] else null
-    }
+
 }

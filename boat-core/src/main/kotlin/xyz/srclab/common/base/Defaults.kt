@@ -38,13 +38,13 @@ object Defaults {
     val timeUnit: TimeUnit = TimeUnit.SECONDS
 
     /**
-     * [Env.availableProcessors] * 2.
+     * [Environments.availableProcessors] * 2.
      */
     @get:JvmName("concurrencyLevel")
     @JvmStatic
     val concurrencyLevel: Int
         get() {
-            return Env.availableProcessors * 2
+            return Environments.availableProcessors * 2
         }
 
     /**
