@@ -1,6 +1,6 @@
 package xyz.srclab.common.test
 
-import xyz.srclab.common.lang.toTimestamp
+import xyz.srclab.common.base.toTimestamp
 import java.time.ZonedDateTime
 
 interface TestListener {

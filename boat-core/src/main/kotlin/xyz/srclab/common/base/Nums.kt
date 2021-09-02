@@ -5,6 +5,7 @@ package xyz.srclab.common.base
 import org.apache.commons.lang3.StringUtils
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.MathContext
 import kotlin.text.toBigDecimal as toBigDecimalKt
 import kotlin.text.toBigInteger as toBigIntegerKt
 import kotlin.text.toByte as toByteKt
@@ -13,13 +14,6 @@ import kotlin.text.toFloat as toFloatKt
 import kotlin.text.toInt as toIntKt
 import kotlin.text.toLong as toLongKt
 import kotlin.text.toShort as toShortKt
-import kotlin.toBigDecimal as numberToBigDecimalKt
-import kotlin.toBigInteger as numberToBigIntegerKt
-
-@JvmOverloads
-fun CharSequence.toByte(radix: Int = Defaults.radix): Byte {
-    return this.toString().toByteKt(radix)
-}
 
 @JvmOverloads
 fun Any?.toByte(radix: Int = Defaults.radix): Byte {
@@ -30,11 +24,6 @@ fun Any?.toByte(radix: Int = Defaults.radix): Byte {
         true -> 1
         else -> toString().toByteKt(radix)
     }
-}
-
-@JvmOverloads
-fun CharSequence.toShort(radix: Int = Defaults.radix): Short {
-    return this.toString().toShortKt(radix)
 }
 
 @JvmOverloads
@@ -49,11 +38,6 @@ fun Any?.toShort(radix: Int = Defaults.radix): Short {
 }
 
 @JvmOverloads
-fun CharSequence.toChar(radix: Int = Defaults.radix): Char {
-    return this.toString().toIntKt(radix).toChar()
-}
-
-@JvmOverloads
 fun Any?.toChar(radix: Int = Defaults.radix): Char {
     return when (this) {
         null -> 0.toChar()
@@ -62,11 +46,6 @@ fun Any?.toChar(radix: Int = Defaults.radix): Char {
         true -> 1.toChar()
         else -> toString().toIntKt(radix).toChar()
     }
-}
-
-@JvmOverloads
-fun CharSequence.toInt(radix: Int = Defaults.radix): Int {
-    return this.toString().toIntKt(radix)
 }
 
 @JvmOverloads
@@ -81,11 +60,6 @@ fun Any?.toInt(radix: Int = Defaults.radix): Int {
 }
 
 @JvmOverloads
-fun CharSequence.toLong(radix: Int = Defaults.radix): Long {
-    return this.toString().toLongKt(radix)
-}
-
-@JvmOverloads
 fun Any?.toLong(radix: Int = Defaults.radix): Long {
     return when (this) {
         null -> 0L
@@ -96,10 +70,6 @@ fun Any?.toLong(radix: Int = Defaults.radix): Long {
     }
 }
 
-fun CharSequence.toFloat(): Float {
-    return this.toString().toFloatKt()
-}
-
 fun Any?.toFloat(): Float {
     return when (this) {
         null -> 0f
@@ -108,10 +78,6 @@ fun Any?.toFloat(): Float {
         true -> 1f
         else -> toString().toFloatKt()
     }
-}
-
-fun CharSequence.toDouble(): Double {
-    return this.toString().toDoubleKt()
 }
 
 fun Any?.toDouble(): Double {
@@ -125,74 +91,52 @@ fun Any?.toDouble(): Double {
 }
 
 @JvmOverloads
-fun CharSequence.toBigInteger(radix: Int = Defaults.radix): BigInteger {
+fun Any?.toBigInteger(radix: Int = Defaults.radix): BigInteger {
+    if (this === null) {
+        return BigInteger.ZERO
+    }
+    if (this is BigInteger) {
+        return this
+    }
+    val str = this.toString()
+    if (str.isEmpty()) {
+        return BigInteger.ZERO
+    }
     if (radix == 10) {
-        return when (this) {
-            "", "0" -> BigInteger.ZERO
+        return when (str) {
+            "0" -> BigInteger.ZERO
             "1" -> BigInteger.ONE
             "10" -> BigInteger.TEN
-            else -> toString().toBigIntegerKt()
+            else -> str.toBigIntegerKt()
         }
     }
-    return toString().toBigIntegerKt(radix)
+    return str.toBigIntegerKt(radix)
 }
 
-@JvmOverloads
-fun Any?.toBigInteger(radix: Int = Defaults.radix): BigInteger {
-    if (radix == 10) {
-        return when (this) {
-            null -> BigInteger.ZERO
-            is BigInteger -> this
-            false -> BigInteger.ZERO
-            true -> BigInteger.ONE
-            is BigDecimal -> toBigInteger()
-            is Number -> toLong().numberToBigIntegerKt()
-            else -> toString().toBigIntegerKt()
-        }
+fun Any?.toBigDecimal(mathContext: MathContext = MathContext.UNLIMITED): BigDecimal {
+    if (this === null) {
+        return BigDecimal.ZERO
     }
-    return when (this) {
-        null -> BigInteger.ZERO
-        is BigInteger -> this
-        false -> BigInteger.ZERO
-        true -> BigInteger.ONE
-        is BigDecimal -> toBigInteger()
-        else -> toString().toBigIntegerKt(radix)
+    if (this is BigDecimal) {
+        return this
     }
-}
-
-fun CharSequence.toBigDecimal(): BigDecimal {
-    return when (this) {
-        "", "0" -> BigDecimal.ZERO
+    val str = this.toString()
+    if (str.isEmpty()) {
+        return BigDecimal.ZERO
+    }
+    return when (str) {
+        "0" -> BigDecimal.ZERO
         "1" -> BigDecimal.ONE
         "10" -> BigDecimal.TEN
-        else -> toString().toBigDecimalKt()
-    }
-}
-
-fun Any?.toBigDecimal(): BigDecimal {
-    return when (this) {
-        null -> BigDecimal.ZERO
-        is BigDecimal -> this
-        false -> BigDecimal.ZERO
-        true -> BigDecimal.ONE
-        is BigInteger -> numberToBigDecimalKt()
-        is Int, Long, Byte, Short -> (this as Number).toLong().numberToBigDecimalKt()
-        is Char -> toLong().numberToBigDecimalKt()
-        is Float, Double -> (this as Number).toDouble().numberToBigDecimalKt()
-        else -> toString().toBigDecimalKt()
-    }
-}
-
-fun Any?.toNumber(): Number {
-    return when (this) {
-        is Number -> this
-        else -> toBigDecimal()
+        else -> str.toBigDecimalKt(mathContext)
     }
 }
 
 /**
- * To binary string.
+ * **Unsigned** int to binary string.
  * It will pad `0` before binary string if [size] > binary string's size, or no padding if [size] <= `0`.
+ *
+ * @see Integer.toBinaryString
  */
 @JvmOverloads
 fun Int.toBinaryString(size: Int = 32): String {
@@ -200,10 +144,56 @@ fun Int.toBinaryString(size: Int = 32): String {
 }
 
 /**
- * To binary string.
+ * **Unsigned** long to binary string.
  * It will pad `0` before binary string if [size] > binary string's size, or no padding if [size] <= `0`.
+ *
+ * @see java.lang.Long.toBinaryString
  */
 @JvmOverloads
 fun Long.toBinaryString(size: Int = 64): String {
     return StringUtils.leftPad(java.lang.Long.toBinaryString(this), size, "0")
+}
+
+/**
+ * **Unsigned** int to hex string.
+ * It will pad `0` before binary string if [size] > binary string's size, or no padding if [size] <= `0`.
+ *
+ * @see Integer.toHexString
+ */
+@JvmOverloads
+fun Int.toHexString(size: Int = 8): String {
+    return StringUtils.leftPad(Integer.toHexString(this), size, "0")
+}
+
+/**
+ * **Unsigned** long to hex string.
+ * It will pad `0` before binary string if [size] > binary string's size, or no padding if [size] <= `0`.
+ *
+ * @see java.lang.Long.toHexString
+ */
+@JvmOverloads
+fun Long.toHexString(size: Int = 16): String {
+    return StringUtils.leftPad(java.lang.Long.toHexString(this), size, "0")
+}
+
+/**
+ * **Unsigned** int to octal string.
+ * It will pad `0` before binary string if [size] > binary string's size, or no padding if [size] <= `0`.
+ *
+ * @see Integer.toOctalString
+ */
+@JvmOverloads
+fun Int.toOctalString(size: Int = 11): String {
+    return StringUtils.leftPad(Integer.toOctalString(this), size, "0")
+}
+
+/**
+ * **Unsigned** long to octal string.
+ * It will pad `0` before binary string if [size] > binary string's size, or no padding if [size] <= `0`.
+ *
+ * @see java.lang.Long.toOctalString
+ */
+@JvmOverloads
+fun Long.toOctalString(size: Int = 22): String {
+    return StringUtils.leftPad(java.lang.Long.toOctalString(this), size, "0")
 }

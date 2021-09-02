@@ -1,8 +1,7 @@
 @file:JvmName("Dates")
 
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
-import org.apache.commons.lang3.time.DateFormatUtils
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.*
@@ -14,13 +13,7 @@ import java.util.*
 val EPOCH_DATE: Date = Date.from(Instant.EPOCH)
 
 @JvmField
-val EPOCH_LOCAL_DATE_TIME: LocalDateTime = LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault())
-
-@JvmField
-val EPOCH_ZONED_DATE_TIME: ZonedDateTime = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault())
-
-@JvmField
-val EPOCH_OFFSET_DATE_TIME: OffsetDateTime = OffsetDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault())
+val EPOCH_LOCAL_DATE_TIME: LocalDateTime = LocalDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC)
 
 @JvmField
 val EPOCH_LOCAL_DATE: LocalDate = EPOCH_LOCAL_DATE_TIME.toLocalDate()
@@ -28,12 +21,14 @@ val EPOCH_LOCAL_DATE: LocalDate = EPOCH_LOCAL_DATE_TIME.toLocalDate()
 @JvmField
 val EPOCH_LOCAL_TIME: LocalTime = EPOCH_LOCAL_DATE_TIME.toLocalTime()
 
-@JvmField
-val ISO_DATE_FORMAT: String = DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.pattern
+@JvmName("dateTimeFormatter")
+fun CharSequence.toDateTimeFormatter(): DateTimeFormatter {
+    return DateTimeFormatter.ofPattern(this.toString())
+}
 
-@JvmOverloads
-fun dateFormat(pattern: String = ISO_DATE_FORMAT): DateFormat {
-    return SimpleDateFormat(pattern)
+@JvmName("dateFormat")
+fun CharSequence.toDateFormat(): DateFormat {
+    return SimpleDateFormat(this.toString())
 }
 
 fun Any?.toDate(datePattern: String): Date {
@@ -41,7 +36,7 @@ fun Any?.toDate(datePattern: String): Date {
 }
 
 @JvmOverloads
-fun Any?.toDate(dateFormat: DateFormat = dateFormat()): Date {
+fun Any?.toDate(dateFormat: DateFormat = Defaults.timestampFormat): Date {
     return when (this) {
         null -> EPOCH_DATE
         is Date -> this

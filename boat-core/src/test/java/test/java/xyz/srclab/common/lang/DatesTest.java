@@ -2,7 +2,7 @@ package test.java.xyz.srclab.common.lang;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Dates;
+import xyz.srclab.common.base.Dates;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
