@@ -9,6 +9,14 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
 import java.util.*
 
+const val TIMESTAMP_PATTERN = "yyyyMMddhhmmssSSS"
+
+@JvmField
+val LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss"
+
+@JvmField
+val ZONED_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss ZZZZZ"
+
 @JvmField
 val EPOCH_DATE: Date = Date.from(Instant.EPOCH)
 
