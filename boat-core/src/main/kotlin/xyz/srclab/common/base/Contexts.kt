@@ -10,7 +10,6 @@ private val threadLocal: ThreadLocal<MutableMap<Any, Any?>> = ThreadLocal.withIn
 /**
  * Returns current thread.
  */
-@JvmName("thread")
 fun currentThread(): Thread {
     return Thread.currentThread()
 }
@@ -56,6 +55,22 @@ fun setContext(key: Any, value: Any?) {
 @JvmName("clear")
 fun clearContext() {
     threadLocal.get().clear()
+}
+
+/**
+ * Adds [context] into current context.
+ */
+@JvmName("attach")
+fun attachContext(context: Map<Any, Any?>) {
+    getContextAsMap().putAll(context)
+}
+
+/**
+ * Returns copy of current context.
+ */
+@JvmName("detach")
+fun detachContext(): Map<Any, Any?> {
+    return getContextAsMap().toMap()
 }
 
 /**
