@@ -39,6 +39,13 @@ fun CharSequence.toDateFormat(): DateFormat {
     return SimpleDateFormat(this.toString())
 }
 
+fun CharSequence.toDate(pattern: String): Date {
+    if (pattern == Defaults.dateTimePattern) {
+        return Defaults.dateTimeFormat.parse(this.toString())
+    }
+    return pattern.toDateFormat().parse(this.toString())
+}
+
 fun Any?.toDate(datePattern: String): Date {
     return toDate(SimpleDateFormat(datePattern))
 }

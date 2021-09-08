@@ -2,8 +2,28 @@
 
 package xyz.srclab.common.base
 
+import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.StringUtils
 import java.nio.charset.Charset
+
+
+/**
+ * [CharMatcher] of pattern dot: ".".
+ */
+@get:JvmName("dotMatcher")
+val dotMatcher: CharMatcher = CharMatcher.`is`('.')
+
+/**
+ * [CharMatcher] of pattern hyphen: "-".
+ */
+@get:JvmName("hyphenMatcher")
+val hyphenMatcher: CharMatcher = CharMatcher.`is`('-')
+
+/**
+ * [CharMatcher] of pattern plus sign: "+".
+ */
+@get:JvmName("plusMatcher")
+val plusMatcher: CharMatcher = CharMatcher.`is`('+')
 
 fun CharSequence?.isNumeric(): Boolean {
     return StringUtils.isNumeric(this)
