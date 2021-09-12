@@ -6,19 +6,22 @@ import java.io.File
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
+/**
+ * Returns default charset: UTF-8.
+ */
+fun defaultCharset(): Charset = StandardCharsets.UTF_8
 
 /**
- * Default charset: UTF-8.
+ * Default radix: 10.
  */
-@JvmField
-val CHARSET: Charset = StandardCharsets.UTF_8
+const val RADIX: Int = 10
 
 /**
- * Default concurrent level: Math.min([Environments.availableProcessors] * 2, 16).
+ * Default concurrent level: Math.min([Systems.availableProcessors] * 2, 16).
  */
-val CONCURRENCY_LEVEL: Int
+fun default: Int
     get() {
-        return (Environments.availableProcessors * 2).coerceAtMost(16)
+        return (Systems.availableProcessors * 2).coerceAtMost(16)
     }
 
 /**
@@ -41,8 +44,3 @@ val PATH_SEPARATOR: String = File.pathSeparator
  */
 @JvmField
 val LINE_SEPARATOR: String = System.lineSeparator()
-
-/**
- * Default radix: 10.
- */
-const val RADIX: Int = 10

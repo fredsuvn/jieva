@@ -6,24 +6,23 @@ import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.StringUtils
 import java.nio.charset.Charset
 
+/**
+ * [CharMatcher] of pattern dot: `.`
+ */
+@JvmField
+val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
 
 /**
- * [CharMatcher] of pattern dot: ".".
+ * [CharMatcher] of pattern hyphen: `-`
  */
-@get:JvmName("dotMatcher")
-val dotMatcher: CharMatcher = CharMatcher.`is`('.')
+@JvmField
+val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
 
 /**
- * [CharMatcher] of pattern hyphen: "-".
+ * [CharMatcher] of pattern plus sign: `+`
  */
-@get:JvmName("hyphenMatcher")
-val hyphenMatcher: CharMatcher = CharMatcher.`is`('-')
-
-/**
- * [CharMatcher] of pattern plus sign: "+".
- */
-@get:JvmName("plusMatcher")
-val plusMatcher: CharMatcher = CharMatcher.`is`('+')
+@JvmField
+val PLUS_MATCHER: CharMatcher = CharMatcher.`is`('+')
 
 fun CharSequence?.isNumeric(): Boolean {
     return StringUtils.isNumeric(this)
