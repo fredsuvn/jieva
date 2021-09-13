@@ -5,6 +5,13 @@ package xyz.srclab.common.base
 import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.StringUtils
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
+
+/**
+ * Default charset: UTF-8.
+ */
+@JvmField
+val DEFAULT_CHARSET: Charset = StandardCharsets.UTF_8
 
 /**
  * [CharMatcher] of pattern dot: `.`
@@ -24,36 +31,73 @@ val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
 @JvmField
 val PLUS_MATCHER: CharMatcher = CharMatcher.`is`('+')
 
+/**
+ * Checks if given chars is empty or null.
+ */
+fun CharSequence?.isEmpty(): Boolean {
+    return this.isNullOrEmpty()
+}
+
+/**
+ * Checks if given chars is empty or all blank.
+ */
+fun CharSequence?.isBlank(): Boolean {
+    return this.isNullOrBlank()
+}
+
+/**
+ * Checks if given chars is numeric by [Character.isDigit].
+ */
 fun CharSequence?.isNumeric(): Boolean {
     return StringUtils.isNumeric(this)
 }
 
-fun CharSequence?.isNumericSpace(): Boolean {
-    return StringUtils.isNumericSpace(this)
-}
-
+/**
+ * Checks if given chars are all white space by [Character.isWhitespace].
+ */
 fun CharSequence?.isWhitespace(): Boolean {
     return StringUtils.isWhitespace(this)
 }
 
 /**
- * Abbreviates a String using ellipses:
+ * Abbreviates a String using ellipses. This will turn "Now is the time for all good men" into "...is the time for..."
+ *
+ * It allows you to specify a "left edge" offset.
+ * Note that this left edge is not necessarily going to be the leftmost character in the result,
+ * or the first character following the ellipses, but it will appear somewhere in the result.
+ *
+ * In no case will it return a String of length greater than [length].
  *
  * ```
- * Chars.ellipses("abcdefghijklmno", 5, 1) = "bcdef..."
+ * Chars.ellipses("", 4, 0)                  = ""
+ * Chars.ellipses("abcdefghijklmno", 10, -1) = "abcdefg..."
+ * Chars.ellipses("abcdefghijklmno", 10, 0)  = "abcdefg..."
+ * Chars.ellipses("abcdefghijklmno", 10, 1)  = "abcdefg..."
+ * Chars.ellipses("abcdefghijklmno", 10, 4)  = "abcdefg..."
+ * Chars.ellipses("abcdefghijklmno", 10, 5)  = "...fghi..."
+ * Chars.ellipses("abcdefghijklmno", 10, 6)  = "...ghij..."
+ * Chars.ellipses("abcdefghijklmno", 10, 8)  = "...ijklmno"
+ * Chars.ellipses("abcdefghijklmno", 10, 10) = "...ijklmno"
+ * Chars.ellipses("abcdefghijklmno", 10, 12) = "...ijklmno"
+ * Chars.ellipses("abcdefghij", 3, 0)        = IllegalArgumentException
+ * Chars.ellipses("abcdefghij", 6, 5)        = IllegalArgumentException
  * ```
- *
- * Note min [length] of abbreviated string is 4.
  */
 @JvmOverloads
-fun CharSequence.ellipses(length: Int, offset: Int = 0): String {
+fun CharSequence.ellipses(length: Int = 6, offset: Int = 0): String {
     return StringUtils.abbreviate(this.toString(), offset, length)
 }
 
+/**
+ * Capitalizes given chars.
+ */
 fun CharSequence.capitalize(): String {
     return StringUtils.capitalize(this.toString())
 }
 
+/**
+ * Uncapitalize given chars.
+ */
 fun CharSequence.uncapitalize(): String {
     return StringUtils.uncapitalize(this.toString())
 }
@@ -65,7 +109,7 @@ fun ByteArray.encodeToString(charset: CharSequence): String {
 
 @JvmName("toString")
 @JvmOverloads
-fun ByteArray.encodeToString(charset: Charset = Defaults.charset): String {
+fun ByteArray.encodeToString(charset: Charset = DEFAULT_CHARSET): String {
     return String(this, charset)
 }
 
@@ -74,7 +118,7 @@ fun CharSequence.toBytes(charset: CharSequence): ByteArray {
 }
 
 @JvmOverloads
-fun CharSequence.toBytes(charset: Charset = Defaults.charset): ByteArray {
+fun CharSequence.toBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
     return this.toString().toByteArray(charset)
 }
 
@@ -83,7 +127,7 @@ fun CharArray.toBytes(charset: CharSequence): ByteArray {
 }
 
 @JvmOverloads
-fun CharArray.toBytes(charset: Charset = Defaults.charset): ByteArray {
+fun CharArray.toBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
     return String(this).toByteArray(charset)
 }
 
@@ -93,9 +137,17 @@ fun CharSequence.toCharSet(): Charset {
 }
 
 fun Array<out Any?>.toStringArray(): Array<String> {
-    return this.map { it.toString() }.toTypedArray()
+    val result = arrayOfNulls<String>(this.size)
+    for ((i, t) in this.withIndex()) {
+        result[i] = t.toString()
+    }
+    return result.asAny()
 }
 
 fun Array<out Any?>.toNullableStringArray(): Array<String?> {
-    return this.map { it?.toString() }.toTypedArray()
+    val result = arrayOfNulls<String>(this.size)
+    for ((i, t) in this.withIndex()) {
+        result[i] = t?.toString()
+    }
+    return result
 }

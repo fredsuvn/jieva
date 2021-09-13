@@ -6,15 +6,9 @@ import java.io.File
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
-/**
- * Returns default charset: UTF-8.
- */
-fun defaultCharset(): Charset = StandardCharsets.UTF_8
 
-/**
- * Default radix: 10.
- */
-const val RADIX: Int = 10
+
+
 
 /**
  * Default concurrent level: Math.min([Systems.availableProcessors] * 2, 16).
