@@ -1,5 +1,7 @@
 package xyz.srclab.common.base
 
+import java.io.File
+
 const val JAVA_VERSION_KEY = "java.version"
 
 const val JAVA_VENDOR_KEY = "java.vendor"
@@ -56,79 +58,100 @@ const val USER_HOME_KEY = "user.home"
 
 const val USER_DIR_KEY = "user.dir"
 
-fun javaVersion(): String {
+/**
+ * Default file separator: [File.separator].
+ * "/" on Unix, "\\" on Windows.
+ */
+@JvmField
+val FILE_SEPARATOR: String = File.separator
+
+/**
+ * Default path separator: [File.pathSeparator].
+ * ":" on Unix, ";" on Windows.
+ */
+@JvmField
+val PATH_SEPARATOR: String = File.pathSeparator
+
+/**
+ * Default line separator: [System.lineSeparator].
+ * "\n" on Unix, "\r\n" on Windows, "\r" on Mac.
+ */
+@JvmField
+val LINE_SEPARATOR: String = System.lineSeparator()
+
+fun getJavaVersion(): String {
     return getSystemProperty(JAVA_VERSION_KEY)
 }
 
-fun javaVendor(): String {
+fun getJavaVendor(): String {
     return getSystemProperty(JAVA_VENDOR_KEY)
 }
 
-fun javaVendorUrl(): String {
+fun getJavaVendorUrl(): String {
     return getSystemProperty(JAVA_VENDOR_URL_KEY)
 }
 
-fun javaHome(): String {
+fun getJavaHome(): String {
     return getSystemProperty(JAVA_HOME_KEY)
 }
 
-fun javaVmSpecificationVersion(): String {
+fun getJavaVmSpecificationVersion(): String {
     return getSystemProperty(JAVA_VM_SPECIFICATION_VERSION_KEY)
 }
 
-fun javaVmSpecificationVendor(): String {
+fun getJavaVmSpecificationVendor(): String {
     return getSystemProperty(JAVA_VM_SPECIFICATION_VENDOR_KEY)
 }
 
-fun javaVmSpecificationName(): String {
+fun getJavaVmSpecificationName(): String {
     return getSystemProperty(JAVA_VM_SPECIFICATION_NAME_KEY)
 }
 
-fun javaVmVersion(): String {
+fun getJavaVmVersion(): String {
     return getSystemProperty(JAVA_VM_VERSION_KEY)
 }
 
-fun javaVmVendor(): String {
+fun getJavaVmVendor(): String {
     return getSystemProperty(JAVA_VM_VENDOR_KEY)
 }
 
-fun javaVmName(): String {
+fun getJavaVmName(): String {
     return getSystemProperty(JAVA_VM_NAME_KEY)
 }
 
-fun javaSpecificationVersion(): String {
+fun getJavaSpecificationVersion(): String {
     return getSystemProperty(JAVA_SPECIFICATION_VERSION_KEY)
 }
 
-fun javaSpecificationVendor(): String {
+fun getJavaSpecificationVendor(): String {
     return getSystemProperty(JAVA_SPECIFICATION_VENDOR_KEY)
 }
 
-fun javaSpecificationName(): String {
+fun getJavaSpecificationName(): String {
     return getSystemProperty(JAVA_SPECIFICATION_NAME_KEY)
 }
 
-fun javaClassVersion(): String {
+fun getJavaClassVersion(): String {
     return getSystemProperty(JAVA_CLASS_VERSION_KEY)
 }
 
-fun javaClassPath(): String {
+fun getJavaClassPath(): String {
     return getSystemProperty(JAVA_CLASS_PATH_KEY)
 }
 
-fun javaLibraryPath(): String {
+fun getJavaLibraryPath(): String {
     return getSystemProperty(JAVA_LIBRARY_PATH_KEY)
 }
 
-fun javaIoTmpdir(): String {
+fun getJavaIoTmpdir(): String {
     return getSystemProperty(JAVA_IO_TMPDIR_KEY)
 }
 
-fun javaCompiler(): String {
+fun getJavaCompiler(): String {
     return getSystemProperty(JAVA_COMPILER_KEY)
 }
 
-fun javaExtDirs(): String {
+fun getJavaExtDirs(): String {
     return getSystemProperty(JAVA_EXT_DIRS_KEY)
 }
 
@@ -136,35 +159,35 @@ fun osName(): String {
     return getSystemProperty(OS_NAME_KEY)
 }
 
-fun osArch(): String {
+fun getOsArch(): String {
     return getSystemProperty(OS_ARCH_KEY)
 }
 
-fun osVersion(): String {
+fun getOsVersion(): String {
     return getSystemProperty(OS_VERSION_KEY)
 }
 
-fun fileSeparator(): String {
+fun getFileSeparator(): String {
     return getSystemProperty(FILE_SEPARATOR_KEY)
 }
 
-fun pathSeparator(): String {
+fun getPathSeparator(): String {
     return getSystemProperty(PATH_SEPARATOR_KEY)
 }
 
-fun lineSeparator(): String {
+fun getLineSeparator(): String {
     return getSystemProperty(LINE_SEPARATOR_KEY)
 }
 
-fun userName(): String {
+fun getUserName(): String {
     return getSystemProperty(USER_NAME_KEY)
 }
 
-fun userHome(): String {
+fun getUserHome(): String {
     return getSystemProperty(USER_HOME_KEY)
 }
 
-fun userDir(): String {
+fun getUserDir(): String {
     return getSystemProperty(USER_DIR_KEY)
 }
 
@@ -254,8 +277,8 @@ fun availableProcessors(): Int {
  * If java version is equal to or less than 1.8, return second version number such as _6 of 1.6.x_, _8 of 1.8.x_.
  * Else return first number such as _9 of 9.0_.
  */
-fun javaMajorVersion(): Int {
-    val javaVersion = javaVersion()
+fun getJavaMajorVersion(): Int {
+    val javaVersion = getJavaVersion()
     val dotIndex = DOT_MATCHER.indexIn(javaVersion)
     if (dotIndex <= 0) {
         return -1

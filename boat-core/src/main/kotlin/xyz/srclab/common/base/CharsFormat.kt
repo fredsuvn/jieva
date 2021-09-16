@@ -65,7 +65,7 @@ object FastCharsFormat : CharsFormat {
  */
 object PrintfCharsFormat : CharsFormat {
     override fun format(pattern: CharSequence, vararg args: Any?): String {
-        return String.format(Defaults.locale, pattern.toString(), *args)
+        return String.format(pattern.toString(), *args)
     }
 }
 

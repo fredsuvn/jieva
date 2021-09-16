@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.lang.comparableComparator
+import xyz.srclab.common.base.comparableComparator
 import java.util.*
 import kotlin.collections.associateTo as associateToKt
 import kotlin.collections.filter as filterKt

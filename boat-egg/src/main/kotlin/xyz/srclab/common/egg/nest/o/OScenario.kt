@@ -1,6 +1,6 @@
 package xyz.srclab.common.egg.nest.o
 
-import xyz.srclab.common.lang.between
+import xyz.srclab.common.base.between
 import java.awt.Graphics
 import java.util.*
 

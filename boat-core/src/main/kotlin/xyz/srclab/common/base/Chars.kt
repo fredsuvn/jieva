@@ -20,6 +20,12 @@ val DEFAULT_CHARSET: Charset = StandardCharsets.UTF_8
 val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
 
 /**
+ * [CharMatcher] of pattern space: ` `
+ */
+@JvmField
+val SPACE_MATCHER: CharMatcher = CharMatcher.`is`(' ')
+
+/**
  * [CharMatcher] of pattern hyphen: `-`
  */
 @JvmField
@@ -62,7 +68,7 @@ fun CharSequence?.isWhitespace(): Boolean {
 /**
  * Abbreviates a String using ellipses. This will turn "Now is the time for all good men" into "...is the time for..."
  *
- * It allows you to specify a "left edge" offset.
+ * It allows you to specify a "left edge" [offset].
  * Note that this left edge is not necessarily going to be the leftmost character in the result,
  * or the first character following the ellipses, but it will appear somewhere in the result.
  *
@@ -120,15 +126,6 @@ fun CharSequence.toBytes(charset: CharSequence): ByteArray {
 @JvmOverloads
 fun CharSequence.toBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
     return this.toString().toByteArray(charset)
-}
-
-fun CharArray.toBytes(charset: CharSequence): ByteArray {
-    return toBytes(charset.toCharSet())
-}
-
-@JvmOverloads
-fun CharArray.toBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
-    return String(this).toByteArray(charset)
 }
 
 @JvmName("charset")

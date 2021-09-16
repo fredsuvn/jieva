@@ -4,6 +4,7 @@
 package xyz.srclab.common.base
 
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 /**
  * Returns current time as milliseconds.
@@ -20,8 +21,8 @@ fun nowNanos(): Long {
 }
 
 /**
- * Returns current timestamp by [Defaults.timestampPattern].
+ * Returns current timestamp of [ZoneOffset.UTC] by [TIMESTAMP_PATTERN].
  */
 fun nowTimestamp(): String {
-    return Defaults.timestampFormatter.format(LocalDateTime.now())
+    return TIMESTAMP_FORMATTER.format(LocalDateTime.now(ZoneOffset.UTC))
 }

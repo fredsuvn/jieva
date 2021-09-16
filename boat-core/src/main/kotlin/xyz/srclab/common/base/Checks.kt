@@ -2,8 +2,6 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
-
 @Throws(IllegalArgumentException::class)
 fun checkArgument(expression: Boolean) {
     if (!expression) {
@@ -239,4 +237,8 @@ fun checkRangeInBounds(
                 "]."
         )
     }
+}
+
+private fun String.fastFormat(vararg messageArgs: Any?): String {
+    return FastCharsFormat.format(this, *messageArgs)
 }

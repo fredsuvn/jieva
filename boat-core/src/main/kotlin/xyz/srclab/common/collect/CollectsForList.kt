@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.lang.comparableComparator
+import xyz.srclab.common.base.comparableComparator
 import kotlin.random.Random
 import kotlin.collections.binarySearch as binarySearchKt
 import kotlin.collections.dropLast as dropLastKt

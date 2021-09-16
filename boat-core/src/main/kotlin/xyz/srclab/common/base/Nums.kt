@@ -44,13 +44,7 @@ fun Any?.toShort(radix: Int = DEFAULT_RADIX): Short {
 
 @JvmOverloads
 fun Any?.toChar(radix: Int = DEFAULT_RADIX): Char {
-    return when (this) {
-        null -> 0.toChar()
-        is Number -> if (radix == 10) toChar() else toString().toIntKt(radix).toChar()
-        false -> 0.toChar()
-        true -> 1.toChar()
-        else -> toString().toIntKt(radix).toChar()
-    }
+    return toInt(radix).toChar()
 }
 
 @JvmOverloads
@@ -194,52 +188,71 @@ fun Long.toOctalString(size: Int = 22): String {
 /**
  * Parses given chars to [BigInteger].
  *
- * Given chars must have two parts: `sign` and `body`:
+ * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
  *
- * * Sign: may be `+` or `-` at first char, or none;
- * * Body: may be hex, binary, octal or decimal;
- *
- * For sign:
- *
- * * `+` if positive;
- * * `-` if negative;
- *
- * For body:
- *
- * * Hex if starts with `0x`;
- * * Binary if starts with `0b`;
- * * Octal if starts with `0`;
- *
- * Examples:
- *
- * * 0xffeecc: a positive hex chars;
- * * -0xffeecc: a negative hex chars;
- * * +0774411: a positive octal chars;
- * * 0b001100: a positive binary chars;
+ * * 123456: positive decimal
+ * * 0xffeecc: positive hex;
+ * * -0xffeecc: negative hex;
+ * * +0774411: positive octal;
+ * * 0b001100: positive binary;
  */
 fun CharSequence?.parseToBigInteger(): BigInteger {
     if (this.isNullOrBlank()) {
         return BigInteger.ZERO
     }
 
-    fun parse(chars: CharSequence, offset: Int): BigInteger {
-        if (chars.startsWith("0x", offset)) {
-            return BigInteger(chars.substring(offset + 2), 16)
+    fun parse(offset: Int): BigInteger {
+        if (this.startsWith("0x", offset)) {
+            return BigInteger(this.substring(offset + 2), 16)
         }
-        if (chars.startsWith("0b", offset)) {
-            return BigInteger(chars.substring(offset + 2), 2)
+        if (this.startsWith("0b", offset)) {
+            return BigInteger(this.substring(offset + 2), 2)
         }
-        if (chars.startsWith("0", offset)) {
-            return BigInteger(chars.substring(offset + 1), 8)
+        if (this.startsWith("0", offset)) {
+            return BigInteger(this.substring(offset + 1), 8)
         }
-        return BigInteger(chars.substring(offset))
+        return BigInteger(this.substring(offset))
     }
 
     return if (this.startsWith("-")) {
-        parse(this, 1).negate()
+        parse(1).negate()
     } else if (this.startsWith("+")) {
-        parse(this, 1)
+        parse(1)
     } else {
-        parse(this, 0)
+        parse(0)
     }
+}
+
+/**
+ * Parses given chars to int.
+ *
+ * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
+ *
+ * * 123456: positive decimal
+ * * 0xffeecc: positive hex;
+ * * -0xffeecc: negative hex;
+ * * +0774411: positive octal;
+ * * 0b001100: positive binary;
+ *
+ * @see parseToBigInteger
+ */
+fun CharSequence?.parseToInt(): Int {
+    return parseToBigInteger().toInt()
+}
+
+/**
+ * Parses given chars to int.
+ *
+ * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
+ *
+ * * 123456: positive decimal
+ * * 0xffeecc: positive hex;
+ * * -0xffeecc: negative hex;
+ * * +0774411: positive octal;
+ * * 0b001100: positive binary;
+ *
+ * @see parseToBigInteger
+ */
+fun CharSequence?.parseToLong(): Long {
+    return parseToBigInteger().toLong()
 }
