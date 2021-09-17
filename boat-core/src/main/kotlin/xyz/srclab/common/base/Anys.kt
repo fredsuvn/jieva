@@ -63,3 +63,10 @@ fun Any?.deepToString(): String {
         else -> this.toStringKt()
     }
 }
+
+fun Any?.toChars(): CharSequence {
+    return if (this is CharSequence)
+        this
+    else
+        this.toStringKt()
+}

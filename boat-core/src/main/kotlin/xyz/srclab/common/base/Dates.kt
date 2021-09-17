@@ -11,18 +11,33 @@ import java.util.*
 
 const val TIMESTAMP_PATTERN = "yyyyMMddhhmmssSSS"
 
-const val LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss"
+const val SIMPLE_LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss"
 
-const val OFFSET_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss Z"
+const val SIMPLE_OFFSET_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss XXX"
+
+const val ISO_LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd'T'hh:mm:ss"
+
+const val ISO_OFFSET_DATE_TIME_PATTERN = "yyyy-MM-dd'T'hh:mm:ssXXX"
+
+const val ISO_ZONED_DATE_TIME_PATTERN = "yyyy-MM-dd'T'hh:mm:ssXXX'['VV']'"
 
 @JvmField
 val TIMESTAMP_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN)
 
 @JvmField
-val LOCAL_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(LOCAL_DATE_TIME_PATTERN)
+val SIMPLE_LOCAL_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(SIMPLE_LOCAL_DATE_TIME_PATTERN)
 
 @JvmField
-val OFFSET_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(OFFSET_DATE_TIME_PATTERN)
+val SIMPLE_OFFSET_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(SIMPLE_OFFSET_DATE_TIME_PATTERN)
+
+@JvmField
+val ISO_LOCAL_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(ISO_LOCAL_DATE_TIME_PATTERN)
+
+@JvmField
+val ISO_OFFSET_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(ISO_OFFSET_DATE_TIME_PATTERN)
+
+@JvmField
+val ISO_ZONED_DATE_TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(ISO_ZONED_DATE_TIME_PATTERN)
 
 @JvmField
 val EPOCH_DATE: Date = Date.from(Instant.EPOCH)
@@ -47,39 +62,78 @@ fun CharSequence.toDateFormat(): DateFormat {
 }
 
 /**
+ * Guesses given date time string's pattern:
+ *
+ * * [SIMPLE_LOCAL_DATE_TIME_PATTERN] if string like `2021-09-16 03:00:18`;
+ * * [SIMPLE_OFFSET_DATE_TIME_PATTERN] else if string like `2021-09-16 03:00:18 +08:00`;
+ * * [ISO_LOCAL_DATE_TIME_PATTERN] else if string like `2021-09-16T03:00:18`;
+ * * [ISO_OFFSET_DATE_TIME_PATTERN] else if string like `2021-09-16T03:00:18+08:00`;
+ * * [ISO_ZONED_DATE_TIME_PATTERN] else if string like `2011-12-03T10:15:30+01:00[Europe/Paris]`;
+ * * [TIMESTAMP_PATTERN] else if string is numeric;
+ *
+ * If no matched, return null.
+ */
+fun CharSequence.guessDateTimePatternOrNull(): String? {
+    val localPatternLength = "2021-09-16 03:00:18".length
+    if (this.length == localPatternLength) {
+        if (this.contains(' ')) {
+            return SIMPLE_LOCAL_DATE_TIME_PATTERN
+        }
+        if (this.contains('T')) {
+            return ISO_LOCAL_DATE_TIME_PATTERN
+        }
+    }
+    val simpleOffsetPatternLength = "2021-09-16 03:00:18 +08:00".length
+    if (this.length == simpleOffsetPatternLength && this.contains(' ')) {
+        return SIMPLE_OFFSET_DATE_TIME_PATTERN
+    }
+    val isoOffsetPatternLength = "2021-09-16T03:00:18+08:00".length
+    if (this.length == isoOffsetPatternLength && this.contains('T')) {
+        return ISO_OFFSET_DATE_TIME_PATTERN
+    }
+    val isoZonedPatternLength = "2011-12-03T10:15:30+01:00[]".length
+    if (this.length > isoZonedPatternLength && this.endsWith(']')) {
+        return ISO_ZONED_DATE_TIME_PATTERN
+    }
+    if (this.isNumeric()) {
+        return TIMESTAMP_PATTERN
+    }
+    return null
+}
+
+/**
  * Guesses given date time string's formatter:
  *
- * * [LOCAL_DATE_TIME_FORMATTER] if string like `2021-09-16 03:00:18`;
- * * [DateTimeFormatter.ISO_LOCAL_DATE_TIME] else if string like `2021-09-16T03:00:18`;
- * * [OFFSET_DATE_TIME_FORMATTER] else if string like `2021-09-16 03:00:18 +0800`;
- * * [DateTimeFormatter.ISO_OFFSET_DATE_TIME] else if string like `2021-09-16T03:00:18+08:00`;
- * * [DateTimeFormatter.ISO_ZONED_DATE_TIME] else if string like `2011-12-03T10:15:30+01:00[Europe/Paris]`;
+ * * [SIMPLE_LOCAL_DATE_TIME_FORMATTER] if string like `2021-09-16 03:00:18`;
+ * * [SIMPLE_OFFSET_DATE_TIME_FORMATTER] else if string like `2021-09-16 03:00:18 +08:00`;
+ * * [ISO_LOCAL_DATE_TIME_FORMATTER] else if string like `2021-09-16T03:00:18`;
+ * * [ISO_OFFSET_DATE_TIME_FORMATTER] else if string like `2021-09-16T03:00:18+08:00`;
+ * * [ISO_ZONED_DATE_TIME_FORMATTER] else if string like `2011-12-03T10:15:30+01:00[Europe/Paris]`;
  * * [TIMESTAMP_FORMATTER] else if string is numeric;
  *
  * If no matched, return null.
  */
 fun CharSequence.guessDateTimeFormatterOrNull(): DateTimeFormatter? {
-    DateTimeFormatter.ISO_ZONED_DATE_TIME
-    val lfl = "2021-09-16 03:00:18".length
-    if (this.length == lfl) {
+    val localPatternLength = "2021-09-16 03:00:18".length
+    if (this.length == localPatternLength) {
         if (this.contains(' ')) {
-            return LOCAL_DATE_TIME_FORMATTER
+            return SIMPLE_LOCAL_DATE_TIME_FORMATTER
         }
         if (this.contains('T')) {
-            return DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            return ISO_LOCAL_DATE_TIME_FORMATTER
         }
     }
-    val ofl = "2021-09-16 03:00:18 +0800".length
-    if (this.length == ofl) {
-        if (this.contains(' ')) {
-            return OFFSET_DATE_TIME_FORMATTER
-        }
-        if (this.contains('T')) {
-            return DateTimeFormatter.ISO_OFFSET_DATE_TIME
-        }
+    val simpleOffsetPatternLength = "2021-09-16 03:00:18 +08:00".length
+    if (this.length == simpleOffsetPatternLength && this.contains(' ')) {
+        return SIMPLE_OFFSET_DATE_TIME_FORMATTER
     }
-    if (this.length > ofl && this.contains('[')) {
-        return DateTimeFormatter.ISO_ZONED_DATE_TIME
+    val isoOffsetPatternLength = "2021-09-16T03:00:18+08:00".length
+    if (this.length == isoOffsetPatternLength && this.contains('T')) {
+        return ISO_OFFSET_DATE_TIME_FORMATTER
+    }
+    val isoZonedPatternLength = "2011-12-03T10:15:30+01:00[]".length
+    if (this.length > isoZonedPatternLength && this.endsWith(']')) {
+        return ISO_ZONED_DATE_TIME_FORMATTER
     }
     if (this.isNumeric()) {
         return TIMESTAMP_FORMATTER
@@ -93,6 +147,11 @@ fun Any?.toDate(pattern: String): Date {
 
 @JvmOverloads
 fun Any?.toDate(dateFormat: DateFormat? = null): Date {
+
+    fun charsToDate():Date {
+        if (da)
+    }
+
     return when (this) {
         null -> EPOCH_DATE
         is Date -> this
@@ -109,7 +168,15 @@ fun Any?.toDate(dateFormat: DateFormat? = null): Date {
         }
         false -> EPOCH_DATE
         true -> Date()
-        else -> dateFormat.parse(toString())
+        else -> {
+            if (dateFormat !== null) {
+                return dateFormat.parse(this.toString())
+            }
+            val dateString = this.toString()
+            val dateFormatPattern = dateString.guessDateTimePatternOrNull()
+            dateFormatPattern?.toDateFormat()?.parse(dateString)
+                ?: TIMESTAMP_PATTERN.toDateFormat().parse(dateString)
+        }
     }
 }
 
@@ -118,7 +185,7 @@ fun Any?.toInstant(dateTimePattern: String): Instant {
 }
 
 @JvmOverloads
-fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_INSTANT): Instant {
+fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter? = null): Instant {
     return when (this) {
         null -> Instant.EPOCH
         is Instant -> this
@@ -135,7 +202,9 @@ fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_
         }
         false -> Instant.EPOCH
         true -> Instant.now()
-        else -> return Instant.from(dateTimeFormatter.parse(toString()))
+        else -> return Instant.from(
+            dateTimeFormatter?.parse(toString()) ?:
+        )
     }
 }
 
