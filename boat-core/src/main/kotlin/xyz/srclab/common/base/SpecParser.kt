@@ -1,20 +1,32 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import xyz.srclab.common.reflect.newInstance
 
 /**
  * Help parse object by spec of type [S].
+ *
+ * @see ClassNameSpecParser
+ * @see StrictClassNameSpecParser
  */
 interface SpecParser<S> {
 
+    /**
+     * Returns all parsed results by [spec].
+     */
     @Throws(SpecParsingException::class)
     fun <T : Any> parse(spec: S): List<T>
 
+    /**
+     * Returns first parsed result by [spec].
+     */
     @Throws(SpecParsingException::class)
     fun <T : Any> parseFirst(spec: S): T {
         return parseFirstOrNull(spec) ?: throw SpecParsingException("Spec parsed failed: $spec")
     }
 
+    /**
+     * Returns first parsed result by [spec], or null if failed.
+     */
     @Throws(SpecParsingException::class)
     fun <T : Any> parseFirstOrNull(spec: S): T?
 
@@ -42,12 +54,24 @@ interface SpecParser<S> {
         }
 
         @Throws(SpecParsingException::class)
-        private fun getClassNameSpecParser(strict: Boolean): SpecParser<CharSequence> {
+        @JvmStatic
+        @JvmOverloads
+        fun getClassNameSpecParser(strict: Boolean = false): SpecParser<CharSequence> {
             return if (strict) StrictClassNameSpecParser else ClassNameSpecParser
         }
     }
 }
 
+/**
+ * Spec parser which parses chars to instance:
+ *
+ * ```
+ * // Spaces will be erased for each class name.
+ * List<A> list = ClassNameSpecParser.parse("a.b.A1, a.b.A2, a.b.A3")
+ * ```
+ *
+ * Note this implementation will ignore failed parsing, use [StrictClassNameSpecParser] if you need strict parsing.
+ */
 object ClassNameSpecParser : SpecParser<CharSequence> {
 
     override fun <T : Any> parse(spec: CharSequence): List<T> {
@@ -55,14 +79,12 @@ object ClassNameSpecParser : SpecParser<CharSequence> {
         val result = ArrayList<T>(classNames.size)
         for (className in classNames) {
             val trimmedClassName = className.trim()
-            val product: T? = try {
+            val product: T = try {
                 trimmedClassName.newInstance()
             } catch (e: Exception) {
                 continue
             }
-            if (product !== null) {
-                result.add(product)
-            }
+            result.add(product)
         }
         return result
     }
@@ -71,19 +93,27 @@ object ClassNameSpecParser : SpecParser<CharSequence> {
         val classNames = spec.split(",")
         for (className in classNames) {
             val trimmedClassName = className.trim()
-            val product: T? = try {
+            val product: T = try {
                 trimmedClassName.newInstance()
             } catch (e: Exception) {
                 continue
             }
-            if (product !== null) {
-                return product
-            }
+            return product
         }
         return null
     }
 }
 
+/**
+ * Spec parser which parses chars to instance:
+ *
+ * ```
+ * // Spaces will be erased for each class name.
+ * List<A> list = ClassNameSpecParser.parse("a.b.A1, a.b.A2, a.b.A3")
+ * ```
+ *
+ * Note this implementation will throw exception for failed parsing, use [ClassNameSpecParser] if you need ignore error.
+ */
 object StrictClassNameSpecParser : SpecParser<CharSequence> {
 
     override fun <T : Any> parse(spec: CharSequence): List<T> {
@@ -105,13 +135,10 @@ object StrictClassNameSpecParser : SpecParser<CharSequence> {
 
     private fun <T : Any> createInstance(className: CharSequence): T {
         val trimmedClassName = className.trim()
-        val product: T? = try {
+        val product: T = try {
             trimmedClassName.newInstance()
         } catch (e: Exception) {
             throw SpecParsingException("Instantiate class $trimmedClassName failed.", e)
-        }
-        if (product === null) {
-            throw SpecParsingException("Class $trimmedClassName was not found.")
         }
         return product
     }

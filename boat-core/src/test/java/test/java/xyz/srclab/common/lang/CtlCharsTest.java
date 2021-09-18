@@ -4,7 +4,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.lang.CtlChars;
 import xyz.srclab.common.lang.EscChars;
 import xyz.srclab.common.lang.SgrChars;
-import xyz.srclab.common.lang.SgrParam;
+import xyz.srclab.common.base.SgrParam;
 import xyz.srclab.common.test.TestLogger;
 
 public class CtlCharsTest {

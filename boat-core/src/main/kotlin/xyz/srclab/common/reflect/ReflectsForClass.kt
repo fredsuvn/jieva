@@ -7,7 +7,7 @@ import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.common.lang.Current
 import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.lang.asAny
-import xyz.srclab.common.lang.loadClass
+import xyz.srclab.common.base.loadClass
 
 val Class<*>.isBooleanType: Boolean
     @JvmName("isBooleanType") get() {

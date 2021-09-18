@@ -8,16 +8,16 @@ import java.time.Duration
 private val threadLocal: ThreadLocal<MutableMap<Any, Any?>> = ThreadLocal.withInitial { HashMap() }
 
 /**
- * Returns current thread.
+ * [Thread] of current context.
  */
 fun currentThread(): Thread {
     return Thread.currentThread()
 }
 
 /**
- * [ClassLoader] of current thread.
+ * [ClassLoader] of current context.
  */
-fun contextClassLoader(): ClassLoader {
+fun currentClassLoader(): ClassLoader {
     return currentThread().contextClassLoader
 }
 

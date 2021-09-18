@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.lang;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.lang.SpecParser;
-import xyz.srclab.common.lang.SpecParsingException;
+import xyz.srclab.common.base.SpecParsingException;
 
 import java.util.Arrays;
 

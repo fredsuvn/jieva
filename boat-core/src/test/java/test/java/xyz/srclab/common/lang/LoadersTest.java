@@ -5,8 +5,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.Loaders;
 import xyz.srclab.common.collect.Collects;
-import xyz.srclab.common.lang.Loaders;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.Collections;

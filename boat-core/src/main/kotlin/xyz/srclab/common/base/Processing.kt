@@ -1,4 +1,4 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import xyz.srclab.common.io.availableString
 import java.io.InputStream
@@ -16,40 +16,28 @@ import java.util.concurrent.TimeUnit
  */
 interface Processing {
 
-    @get:JvmName("process")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val process: Process
 
-    @get:JvmName("inputStream")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val outputStream: OutputStream?
         get() {
             return process.outputStream
         }
 
-    @get:JvmName("outputStream")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val inputStream: InputStream?
         get() {
             return process.inputStream
         }
 
-    @get:JvmName("errorStream")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val errorStream: InputStream?
         get() {
             return process.errorStream
         }
 
-    @get:JvmName("isAlive")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val isAlive: Boolean
         get() {
             return process.isAlive
         }
 
-    @get:JvmName("exitValue")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val exitValue: Int
         get() {
             return process.exitValue()
@@ -58,14 +46,14 @@ interface Processing {
     /**
      * @throws InterruptedException
      */
-    fun waitForTermination(): Int {
+    fun waitFor(): Int {
         return process.waitFor()
     }
 
     /**
      * @throws InterruptedException
      */
-    fun waitForTermination(timeout: Duration): Boolean {
+    fun waitFor(timeout: Duration): Boolean {
         return process.waitFor(timeout.toNanos(), TimeUnit.NANOSECONDS)
     }
 
@@ -84,14 +72,14 @@ interface Processing {
      * Returns all output stream as `String`.
      */
     fun outputString(): String? {
-        return inputStream?.readBytes()?.toChars()
+        return inputStream?.readBytes()?.toString()
     }
 
     /**
      * Returns all output stream as `String`.
      */
     fun outputString(charset: Charset): String? {
-        return inputStream?.readBytes()?.toChars(charset)
+        return inputStream?.readBytes()?.toString(charset)
     }
 
     /**
@@ -116,14 +104,14 @@ interface Processing {
      * Returns all error stream as `String`.
      */
     fun errorString(): String? {
-        return errorStream?.readBytes()?.toChars()
+        return errorStream?.readBytes()?.toString()
     }
 
     /**
      * Returns all error stream as `String`.
      */
     fun errorString(charset: Charset): String? {
-        return errorStream?.readBytes()?.toChars(charset)
+        return errorStream?.readBytes()?.toString(charset)
     }
 
     /**
@@ -148,23 +136,13 @@ interface Processing {
 
         @JvmName("start")
         @JvmStatic
-        fun CharSequence.startProcessing(): Processing {
+        fun CharSequence.startProcess(): Processing {
             return Runtime.getRuntime().exec(this.toString()).toProcessing()
         }
 
+        @JvmName("start")
         @JvmStatic
-        fun start(vararg command: CharSequence): Processing {
-            return ProcessBuilder(*(command.toStringArray())).toProcessing()
-        }
-
-        @JvmStatic
-        fun start(commands: List<CharSequence>): Processing {
-            return ProcessBuilder(commands.map { it.toString() }).toProcessing()
-        }
-
-        @JvmName("of")
-        @JvmStatic
-        fun ProcessBuilder.toProcessing(): Processing {
+        fun ProcessBuilder.startProcess(): Processing {
             return this.start().toProcessing()
         }
 

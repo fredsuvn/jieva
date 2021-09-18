@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.lang.loadClassOrNull
+import xyz.srclab.common.base.loadClassOrNull
 
 /**
  * Factory to create [ProxyClass].
