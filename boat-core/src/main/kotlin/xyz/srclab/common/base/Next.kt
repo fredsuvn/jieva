@@ -1,4 +1,4 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 /**
  * Represents next operation, usually used for the object which delegate performance to a group of handlers.

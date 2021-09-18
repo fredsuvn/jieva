@@ -1,6 +1,6 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
-import xyz.srclab.common.lang.Ref.Companion.toRef
+import xyz.srclab.common.base.Ref.Companion.toRef
 import java.util.function.Consumer
 
 /**
@@ -85,6 +85,34 @@ interface Ref<T : Any> : GenericAccessor<T> {
     fun acceptOrNull(action: Consumer<T?>): Ref<T> {
         action.accept(getOrNull())
         return this
+    }
+
+    /**
+     * If value of this [Ref] is `non-null`, given [action] will be executed, else not.
+     *
+     * Result of [action] execution will be set in this [Ref], and returns this [Ref] as target generic type.
+     */
+    fun <R : Any> acceptApply(action: (T) -> R): Ref<R> {
+        val v = getOrNull()
+        val thisAs = this.asAny<Ref<R>>()
+        if (v === null) {
+            thisAs.set(null)
+        } else {
+            thisAs.set(action(v))
+        }
+        return thisAs
+    }
+
+    /**
+     * Executes given [action].
+     *
+     * Result of [action] execution will be set in this [Ref], and returns this [Ref] as target generic type.
+     */
+    fun <R : Any> acceptApplyOrNull(action: (T?) -> R?): Ref<R> {
+        val v = getOrNull()
+        val thisAs = this.asAny<Ref<R>>()
+        thisAs.set(action(v))
+        return thisAs
     }
 
     companion object {

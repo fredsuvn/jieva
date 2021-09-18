@@ -2,7 +2,7 @@ package test.java.xyz.srclab.common.lang;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Enums;
+import xyz.srclab.common.base.Enums;
 
 public class EnumsTest {
 

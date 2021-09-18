@@ -1,6 +1,6 @@
 @file:JvmName("Randoms")
 
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import java.util.*
 import java.util.function.Supplier
@@ -31,16 +31,16 @@ interface RandomSupplier<T : Any> : Supplier<T> {
     class Builder<T : Any> : CacheableBuilder<RandomSupplier<T>>() {
 
         private var builderRandom: Random? = null
-        private var builderTotalScore: Int = 1
         private val builderCases: MutableList<Case<T>> = LinkedList()
+        private var scoreCount = 1
 
-        fun score(score: Int, `object`: T): Builder<T> {
-            return score(score) { `object` }
+        fun score(score: Int, obj: T): Builder<T> {
+            return score(score) { obj }
         }
 
         fun score(score: Int, supplier: () -> T): Builder<T> {
-            builderCases.add(Case(builderTotalScore, builderTotalScore + score, supplier))
-            builderTotalScore += score
+            builderCases.add(Case(scoreCount, scoreCount + score, supplier))
+            scoreCount += score
             this.commitModification()
             return this
         }
@@ -59,19 +59,19 @@ interface RandomSupplier<T : Any> : Supplier<T> {
             return object : RandomSupplier<T> {
 
                 private val random = builderRandom ?: Random()
-                private var totalScore = builderTotalScore
+                private var totalScore = scoreCount
                 private val cases = builderCases.sortedWith { a, b -> a.from - b.from }
 
                 override fun get(): T {
                     val score = random.between(1, totalScore)
                     val index = cases.binarySearch {
                         if (it.from <= score && it.to > score) {
-                            return@binarySearch 0
+                            return@binarySearch EQUAL_TO
                         }
                         if (it.from > score) {
-                            return@binarySearch 1
+                            return@binarySearch GREATER_THAN
                         }
-                        -1
+                        LESS_THAN
                     }
                     return cases[index].supplier()
                 }

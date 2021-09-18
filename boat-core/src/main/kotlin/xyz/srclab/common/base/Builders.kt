@@ -1,4 +1,4 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 /**
  * Cacheable builder, an abstract build which stores last build result from [buildNew].

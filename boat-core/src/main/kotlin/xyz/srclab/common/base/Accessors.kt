@@ -23,7 +23,7 @@ interface AnyGetter {
 
     @Throws(NullPointerException::class)
     fun <T : Any> get(): T {
-        return getOrNull() ?: throw NullPointerException()
+        return getOrNull()!!
     }
 
     fun <T : Any> getOrNull(): T?
@@ -74,7 +74,7 @@ interface GenericGetter<T : Any> {
 
     @Throws(NullPointerException::class)
     fun get(): T {
-        return getOrNull() ?: throw NullPointerException()
+        return getOrNull()!!
     }
 
     fun getOrNull(): T?
@@ -124,7 +124,7 @@ interface MapGetter {
 
     @Throws(NullPointerException::class)
     fun <T : Any> get(key: Any): T {
-        return getOrNull(key) ?: throw NullPointerException()
+        return getOrNull(key)!!
     }
 
     fun <T : Any> getOrNull(key: Any): T? {
@@ -194,7 +194,7 @@ interface GenericMapGetter<K : Any, V : Any> {
 
     @Throws(NullPointerException::class)
     fun get(key: K): V {
-        return getOrNull(key) ?: throw NullPointerException()
+        return getOrNull(key)!!
     }
 
     fun getOrNull(key: K): V? {

@@ -38,6 +38,30 @@ val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
 val PLUS_MATCHER: CharMatcher = CharMatcher.`is`('+')
 
 /**
+ * [CharMatcher] of pattern `[A-Z]`
+ */
+@JvmField
+val UPPER_CASE_MATCHER: CharMatcher = CharMatcher.inRange('A', 'Z')
+
+/**
+ * [CharMatcher] of pattern `[a-z]`
+ */
+@JvmField
+val LOWER_CASE_MATCHER: CharMatcher = CharMatcher.inRange('a', 'z')
+
+/**
+ * [CharMatcher] of pattern `[A-Z][a-z]`
+ */
+@JvmField
+val LETTER_MATCHER: CharMatcher = UPPER_CASE_MATCHER.and(LOWER_CASE_MATCHER)
+
+/**
+ * [CharMatcher] of pattern underscore: `_`
+ */
+@JvmField
+val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')
+
+/**
  * Checks if given chars is empty or null.
  */
 fun CharSequence?.isEmpty(): Boolean {

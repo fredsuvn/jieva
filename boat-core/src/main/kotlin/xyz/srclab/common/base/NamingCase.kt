@@ -1,10 +1,16 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
-import org.apache.commons.lang3.StringUtils
 import java.util.*
 
 /**
- * Naming case.
+ * Naming case. Used to convert different naming case style:
+ *
+ * ```
+ * // firstSecond -> FIRST_SECOND
+ * NamingCase.LOWER_CAMEL.convertTo("firstSecond", NamingCase.UPPER_UNDERSCORE)
+ * ```
+ *
+ * Note default [NamingCase] implementations only support `[A-Z][a-z][0-9]`.
  *
  * @author sunqian
  *
@@ -12,19 +18,31 @@ import java.util.*
  * @see UpperCamel
  * @see LowerUnderscore
  * @see UpperUnderscore
- * @see CapitalizeUnderscore
  * @see LowerHyphen
  * @see UpperHyphen
- * @see CapitalizeHyphen
  */
 interface NamingCase {
 
-    @Throws(NamingCaseException::class)
-    fun segment(name: CharSequence): List<String>
+    /**
+     * Validates whether given [name] is in current case style.
+     */
+    fun validate(name: CharSequence): Boolean
 
+    /**
+     * Splits [name] to words which are used for [join].
+     */
+    @Throws(NamingCaseException::class)
+    fun segment(name: CharSequence): List<CharSequence>
+
+    /**
+     * Joins [words] to a new name with current case style.
+     */
     @Throws(NamingCaseException::class)
     fun join(words: List<CharSequence>): String
 
+    /**
+     * Converts [name] to [toCase] style.
+     */
     @Throws(NamingCaseException::class)
     fun convertTo(name: CharSequence, toCase: NamingCase): String {
         val words = segment(name)
@@ -46,16 +64,10 @@ interface NamingCase {
         val UPPER_UNDERSCORE: UpperUnderscore = UpperUnderscore
 
         @JvmField
-        val CAPITALIZE_UNDERSCORE: CapitalizeUnderscore = CapitalizeUnderscore
-
-        @JvmField
         val LOWER_HYPHEN: LowerHyphen = LowerHyphen
 
         @JvmField
         val UPPER_HYPHEN: UpperHyphen = UpperHyphen
-
-        @JvmField
-        val CAPITALIZE_HYPHEN: CapitalizeHyphen = CapitalizeHyphen
     }
 }
 
@@ -63,8 +75,8 @@ interface NamingCase {
  * [NamingCase] with `lowerCamel` style.
  */
 object LowerCamel : CamelCase() {
-    override fun doFirst(first: CharSequence): String {
-        return first.toString().uncapitalize()
+    override fun doFirstChar(first: CharSequence): String {
+        return first.uncapitalize()
     }
 }
 
@@ -72,8 +84,8 @@ object LowerCamel : CamelCase() {
  * [NamingCase] with `UpperCamel` style.
  */
 object UpperCamel : CamelCase() {
-    override fun doFirst(first: CharSequence): String {
-        return first.toString().capitalize()
+    override fun doFirstChar(first: CharSequence): String {
+        return first.capitalize()
     }
 }
 
@@ -81,8 +93,15 @@ object UpperCamel : CamelCase() {
  * [NamingCase] with `lower_underscore` style.
  */
 object LowerUnderscore : UnderscoreCase() {
+
+    private val LOWER_UNDERSCORE_MATCHER = LOWER_CASE_MATCHER.and(UNDERSCORE_MATCHER)
+
+    override fun validate(name: CharSequence): Boolean {
+        return LOWER_UNDERSCORE_MATCHER.matchesAllOf(name)
+    }
+
     override fun doWord(word: CharSequence): String {
-        return word.toString().lowercase(Defaults.locale)
+        return word.toString().lowercase()
     }
 }
 
@@ -90,17 +109,15 @@ object LowerUnderscore : UnderscoreCase() {
  * [NamingCase] with `UPPER_UNDERSCORE` style.
  */
 object UpperUnderscore : UnderscoreCase() {
-    override fun doWord(word: CharSequence): String {
-        return word.toString().uppercase(Defaults.locale)
-    }
-}
 
-/**
- * [NamingCase] with `Capitalize_Underscore` style.
- */
-object CapitalizeUnderscore : UnderscoreCase() {
+    private val UPPER_UNDERSCORE_MATCHER = UPPER_CASE_MATCHER.and(UNDERSCORE_MATCHER)
+
+    override fun validate(name: CharSequence): Boolean {
+        return UPPER_UNDERSCORE_MATCHER.matchesAllOf(name)
+    }
+
     override fun doWord(word: CharSequence): String {
-        return word.toString().lowercase(Defaults.locale).capitalize()
+        return word.toString().uppercase()
     }
 }
 
@@ -108,8 +125,15 @@ object CapitalizeUnderscore : UnderscoreCase() {
  * [NamingCase] with `lower-hyphen` style.
  */
 object LowerHyphen : HyphenCase() {
+
+    private val LOWER_HYPHEN_MATCHER = LOWER_CASE_MATCHER.and(HYPHEN_MATCHER)
+
+    override fun validate(name: CharSequence): Boolean {
+        return LOWER_HYPHEN_MATCHER.matchesAllOf(name)
+    }
+
     override fun doWord(word: CharSequence): String {
-        return word.toString().lowercase(Defaults.locale)
+        return word.toString().lowercase()
     }
 }
 
@@ -117,61 +141,63 @@ object LowerHyphen : HyphenCase() {
  * [NamingCase] with `UPPER-HYPHEN` style.
  */
 object UpperHyphen : HyphenCase() {
-    override fun doWord(word: CharSequence): String {
-        return word.toString().uppercase(Defaults.locale)
-    }
-}
 
-/**
- * [NamingCase] with `Capitalize-Hyphen` style.
- */
-object CapitalizeHyphen : HyphenCase() {
+    private val UPPER_HYPHEN_MATCHER = LOWER_CASE_MATCHER.and(HYPHEN_MATCHER)
+
+    override fun validate(name: CharSequence): Boolean {
+        return UPPER_HYPHEN_MATCHER.matchesAllOf(name)
+    }
+
     override fun doWord(word: CharSequence): String {
-        return word.toString().lowercase(Defaults.locale).capitalize()
+        return word.toString().uppercase()
     }
 }
 
 abstract class CamelCase : NamingCase {
 
-    override fun segment(name: CharSequence): List<String> {
+    override fun validate(name: CharSequence): Boolean {
+        return LETTER_MATCHER.matchesAllOf(name)
+    }
 
-        fun Char.asUpperCase(): Boolean {
+    override fun segment(name: CharSequence): List<CharSequence> {
+
+        fun Char.isUpper(): Boolean {
             return this.isUpperCase()
         }
 
-        fun Char.asLowerCase(): Boolean {
+        fun Char.isLower(): Boolean {
             return this.isLowerCase() || (this in '0'..'9')
         }
 
         val length = name.length
         if (length <= 1) {
-            return listOf(name.toString())
+            return listOf(name)
         }
-        val result = LinkedList<String>()
+        val result = LinkedList<CharSequence>()
         val buffer = StringBuilder()
         var lastLower = true
         for (c in name) {
             if (buffer.isEmpty()) {
-                lastLower = c.asLowerCase()
+                lastLower = c.isLower()
                 buffer.append(c)
                 continue
             }
-            if (lastLower && c.asLowerCase()) {
+            if (lastLower && c.isLower()) {
                 buffer.append(c)
                 continue
             }
-            if (!lastLower && c.asUpperCase()) {
+            if (!lastLower && c.isUpper()) {
                 buffer.append(c)
                 continue
             }
-            if (lastLower && c.asUpperCase()) {
+            if (lastLower && c.isUpper()) {
                 result.add(buffer.toString())
                 buffer.clear()
                 buffer.append(c)
                 lastLower = false
                 continue
             }
-            if (!lastLower && c.asLowerCase()) {
+            if (!lastLower && c.isLower()) {
                 val bufferLength = buffer.length
                 if (bufferLength == 1) {
                     buffer.append(c)
@@ -187,32 +213,32 @@ abstract class CamelCase : NamingCase {
         if (buffer.isNotEmpty()) {
             result.add(buffer.toString())
         }
-        return result.toList()
+        return result
     }
 
     override fun join(words: List<CharSequence>): String {
         if (words.isEmpty()) {
             throw NamingCaseException("Given joined words list should have at least 1 word.")
         }
-        val first = words.first().toString()
-        if (first.isEmpty()) {
-            throw NamingCaseException("Word of given first joined word should have at least 1 char.")
-        }
-        if (first.length > 1 && StringUtils.isAllUpperCase(first)) {
-            return words.joinToString("") { it.toString().capitalize() }
-        }
-        return doFirst(first) +
-            words.subList(1, words.size).joinToString("") {
-                it.toString().capitalize()
+        var i = 0
+        val buffer = StringBuilder()
+        for (word in words) {
+            if (i == 0) {
+                buffer.append(doFirstChar(word))
+                i++
+            } else {
+                buffer.append(word.capitalize())
             }
+        }
+        return buffer.toString()
     }
 
-    protected abstract fun doFirst(first: CharSequence): String
+    protected abstract fun doFirstChar(first: CharSequence): CharSequence
 }
 
 abstract class UnderscoreCase : NamingCase {
 
-    override fun segment(name: CharSequence): List<String> {
+    override fun segment(name: CharSequence): List<CharSequence> {
         return name.split("_")
     }
 
@@ -220,12 +246,12 @@ abstract class UnderscoreCase : NamingCase {
         return words.joinToString("_") { doWord(it.toString()) }
     }
 
-    protected abstract fun doWord(word: CharSequence): String
+    protected abstract fun doWord(word: CharSequence): CharSequence
 }
 
 abstract class HyphenCase : NamingCase {
 
-    override fun segment(name: CharSequence): List<String> {
+    override fun segment(name: CharSequence): List<CharSequence> {
         return name.split("-")
     }
 
@@ -233,7 +259,7 @@ abstract class HyphenCase : NamingCase {
         return words.joinToString("-") { doWord(it.toString()) }
     }
 
-    protected abstract fun doWord(word: CharSequence): String
+    protected abstract fun doWord(word: CharSequence): CharSequence
 }
 
 open class NamingCaseException @JvmOverloads constructor(

@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.lang;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.CacheableBuilder;
+import xyz.srclab.common.base.CacheableBuilder;
 import xyz.srclab.common.test.TestLogger;
 
 public class BuildersTest {

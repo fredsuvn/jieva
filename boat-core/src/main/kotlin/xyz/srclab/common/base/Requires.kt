@@ -1,6 +1,6 @@
 @file:JvmName("Requires")
 
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 @Throws(NullPointerException::class)
 fun <T : Any> T?.notNull(): T {

@@ -1,36 +1,38 @@
-package xyz.srclab.common.lang
+package xyz.srclab.common.base
 
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.Instant
 
 /**
  * Lazy to create return value.
  *
  * @author sunqian
  */
-interface Lazy<T> {
-
-    fun get(): T
+interface Lazy<T : Any> : GenericGetter<T> {
 
     fun refresh()
 
-    fun refreshAndGet(): T
+    fun refreshAndGet(): T {
+        return refreshAndGetOrNull()!!
+    }
+
+    fun refreshAndGetOrNull(): T?
 
     companion object {
 
         @JvmStatic
-        fun <T> of(supplier: () -> T): Lazy<T> {
+        fun <T : Any> of(supplier: () -> T): Lazy<T> {
             return OnceLazy(supplier)
         }
 
         @JvmStatic
-        fun <T> of(period: Duration, supplier: () -> T): Lazy<T> {
+        fun <T : Any> of(period: Duration, supplier: () -> T): Lazy<T> {
             return FixedPeriodRefreshableLazy(period, supplier)
         }
 
         @JvmStatic
-        fun <T> of(period: (T) -> Duration, supplier: () -> T): Lazy<T> {
-            return DynamicPeriodRefreshableLazy(period, supplier)
+        fun <T : Any> of(initPeriod: Duration, period: (T) -> Duration, supplier: () -> T): Lazy<T> {
+            return DynamicPeriodRefreshableLazy(initPeriod, period, supplier)
         }
     }
 }
@@ -39,7 +41,7 @@ interface Lazy<T> {
  * A special type of [Lazy] which overrides [toString] method by [get]. This class can be used in log message of
  * which [toString] is expensive.
  */
-open class LazyToString<T>(delegate: Lazy<T>) : Lazy<T> by delegate {
+open class LazyToString<T : Any>(delegate: Lazy<T>) : Lazy<T> by delegate {
 
     override fun toString(): String {
         return get().toString()
@@ -49,18 +51,18 @@ open class LazyToString<T>(delegate: Lazy<T>) : Lazy<T> by delegate {
 
         @JvmName("of")
         @JvmStatic
-        fun <T> Lazy<T>.lazyToString(): LazyToString<T> {
+        fun <T : Any> Lazy<T>.lazyToString(): LazyToString<T> {
             return LazyToString(this)
         }
 
         @JvmStatic
-        fun <T> of(supplier: () -> T): LazyToString<T> {
+        fun <T : Any> of(supplier: () -> T): LazyToString<T> {
             return OnceLazy(supplier).lazyToString()
         }
     }
 }
 
-private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
+private class OnceLazy<T : Any>(private val supplier: () -> T) : Lazy<T> {
 
     @Volatile
     private var hasGet = false
@@ -68,9 +70,9 @@ private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
     @Volatile
     private var lastValue: T? = null
 
-    override fun get(): T {
+    override fun getOrNull(): T? {
         if (hasGet) {
-            return lastValue.asNotNull()
+            return lastValue
         }
         return synchronized(this) {
             if (hasGet) {
@@ -78,7 +80,7 @@ private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
             }
             lastValue = supplier()
             hasGet = true
-            lastValue.asNotNull()
+            lastValue
         }
     }
 
@@ -88,78 +90,79 @@ private class OnceLazy<T>(private val supplier: () -> T) : Lazy<T> {
         }
     }
 
-    override fun refreshAndGet(): T {
+    override fun refreshAndGetOrNull(): T? {
         return synchronized(this) {
             lastValue = supplier()
             hasGet = true
-            lastValue.asNotNull()
+            lastValue
         }
     }
 }
 
-private class FixedPeriodRefreshableLazy<T>(
+private class FixedPeriodRefreshableLazy<T : Any>(
     private val period: Duration,
     private val supplier: () -> T,
 ) : Lazy<T> {
 
     @Volatile
-    private var lastGetTime: LocalDateTime = LocalDateTime.MIN
+    private var lastGetTime: Instant = Instant.MIN
 
     @Volatile
     private var lastValue: T? = null
 
-    override fun get(): T {
-        val now = LocalDateTime.now()
+    override fun getOrNull(): T? {
+        val now = Instant.now()
         if (!needRefresh(now)) {
-            return lastValue.asNotNull()
+            return lastValue
         }
         return synchronized(this) {
             if (!needRefresh(now)) {
                 lastValue
             }
             lastValue = supplier()
-            lastGetTime = LocalDateTime.now()
-            lastValue.asNotNull()
+            lastGetTime = Instant.now()
+            lastValue
         }
-    }
-
-    private fun needRefresh(now: LocalDateTime): Boolean {
-        return period < Duration.between(lastGetTime, now)
     }
 
     override fun refresh() {
         synchronized(this) {
-            lastGetTime = LocalDateTime.MIN
+            lastGetTime = Instant.MIN
         }
     }
 
-    override fun refreshAndGet(): T {
+    override fun refreshAndGetOrNull(): T? {
         return synchronized(this) {
             lastValue = supplier()
-            lastGetTime = LocalDateTime.now()
-            lastValue.asNotNull()
+            lastGetTime = Instant.now()
+            lastValue
         }
+    }
+
+    private fun needRefresh(now: Instant): Boolean {
+        return period < Duration.between(lastGetTime, now)
     }
 }
 
-private class DynamicPeriodRefreshableLazy<T>(
+private class DynamicPeriodRefreshableLazy<T : Any>(
+    initPeriod: Duration,
     private val period: (T) -> Duration,
     private val supplier: () -> T,
 ) : Lazy<T> {
 
     @Volatile
-    private var lastGetTime: LocalDateTime = LocalDateTime.MIN
+    private var lastGetTime: Instant = Instant.MIN
 
     @Volatile
-    private var lastPeriod: Duration = Duration.ZERO
+    private var lastPeriod: Duration = initPeriod
 
     @Volatile
     private var lastValue: T? = null
 
-    override fun get(): T {
-        val now = LocalDateTime.now()
+    override fun getOrNull(): T? {
+        val now = Instant.now()
         if (!needRefresh(now)) {
-            return lastValue.asNotNull()
+            return lastValue
         }
         return synchronized(this) {
             if (!needRefresh(now)) {
@@ -168,29 +171,28 @@ private class DynamicPeriodRefreshableLazy<T>(
             val result = supplier()
             lastValue = result
             lastPeriod = period(result)
-            lastGetTime = LocalDateTime.now()
-            lastValue.asNotNull()
+            lastGetTime = Instant.now()
+            lastValue
         }
-    }
-
-    private fun needRefresh(now: LocalDateTime): Boolean {
-        return lastPeriod < Duration.between(lastGetTime, now)
     }
 
     override fun refresh() {
         synchronized(this) {
-            lastGetTime = LocalDateTime.MIN
-            lastPeriod = Duration.ZERO
+            lastGetTime = Instant.MIN
         }
     }
 
-    override fun refreshAndGet(): T {
+    override fun refreshAndGetOrNull(): T? {
         return synchronized(this) {
             val result = supplier()
             lastValue = result
             lastPeriod = period(result)
-            lastGetTime = LocalDateTime.now()
-            lastValue.asNotNull()
+            lastGetTime = Instant.now()
+            lastValue
         }
+    }
+
+    private fun needRefresh(now: Instant): Boolean {
+        return lastPeriod < Duration.between(lastGetTime, now)
     }
 }
