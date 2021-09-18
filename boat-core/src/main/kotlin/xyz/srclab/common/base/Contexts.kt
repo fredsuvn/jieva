@@ -17,69 +17,69 @@ fun currentThread(): Thread {
 /**
  * [ClassLoader] of current thread.
  */
-fun classLoader(): ClassLoader {
+fun contextClassLoader(): ClassLoader {
     return currentThread().contextClassLoader
 }
 
-@JvmName("get")
+@JvmName("getProperty")
 @Throws(NullPointerException::class)
-fun <T : Any> getContext(key: Any): T {
-    return getContextOrNull(key) ?: throw NullPointerException("getContext($key)")
+fun <T : Any> getContextProperty(key: Any): T {
+    return getContextPropertyOrNull(key) ?: throw NullPointerException("getContext($key)")
 }
 
-@JvmName("getOrElse")
-fun <T : Any> getContextOrElse(key: Any, value: T): T {
-    return getContextOrNull(key) ?: value
+@JvmName("getPropertyOrElse")
+fun <T : Any> getContextPropertyOrElse(key: Any, value: T): T {
+    return getContextPropertyOrNull(key) ?: value
 }
 
-@JvmName("getOrElse")
-fun <T : Any> getContextOrElse(key: Any, supplier: (key: Any) -> T): T {
-    return getContextOrNull(key) ?: supplier(key)
+@JvmName("getPropertyOrElse")
+fun <T : Any> getContextPropertyOrElse(key: Any, supplier: (key: Any) -> T): T {
+    return getContextPropertyOrNull(key) ?: supplier(key)
 }
 
-@JvmName("getOrThrow")
-fun <T : Any> getContextOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
-    return getContextOrNull(key) ?: throw supplier(key)
+@JvmName("getPropertyOrThrow")
+fun <T : Any> getContextPropertyOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
+    return getContextPropertyOrNull(key) ?: throw supplier(key)
 }
 
-@JvmName("getOrNull")
-fun <T : Any> getContextOrNull(key: Any): T? {
+@JvmName("getPropertyOrNull")
+fun <T : Any> getContextPropertyOrNull(key: Any): T? {
     return threadLocal.get()[key].asAny()
 }
 
-@JvmName("set")
-fun setContext(key: Any, value: Any?) {
+@JvmName("setProperty")
+fun setContextProperty(key: Any, value: Any?) {
     threadLocal.get()[key] = value
-}
-
-@JvmName("clear")
-fun clearContext() {
-    threadLocal.get().clear()
-}
-
-/**
- * Adds [context] into current context.
- */
-@JvmName("attach")
-fun attachContext(context: Map<Any, Any?>) {
-    getContextAsMap().putAll(context)
-}
-
-/**
- * Returns copy of current context.
- */
-@JvmName("detach")
-fun detachContext(): Map<Any, Any?> {
-    return getContextAsMap().toMap()
 }
 
 /**
  * Returns current context as [MutableMap].
  * Note any operation for the return map will reflect the context map, and vice versa.
  */
-@JvmName("asMap")
-fun getContextAsMap(): MutableMap<Any, Any?> {
+@JvmName("getPropertiesAsMap")
+fun getContextPropertiesAsMap(): MutableMap<Any, Any?> {
     return threadLocal.get()
+}
+
+@JvmName("clearProperties")
+fun clearContextProperties() {
+    threadLocal.get().clear()
+}
+
+/**
+ * Adds [context] into current context.
+ */
+@JvmName("attachProperties")
+fun attachContextProperties(context: Map<Any, Any?>) {
+    getContextPropertiesAsMap().putAll(context)
+}
+
+/**
+ * Returns copy of current context.
+ */
+@JvmName("detachProperties")
+fun detachContextProperties(): Map<Any, Any?> {
+    return getContextPropertiesAsMap().toMap()
 }
 
 /**

@@ -2,8 +2,6 @@ package xyz.srclab.common.base
 
 import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
-import java.io.StringWriter
-import java.io.Writer
 import java.util.*
 
 /**
@@ -53,40 +51,37 @@ interface CharsTemplate {
     /**
      * Process with [args].
      */
-    fun process(
-        args: Map<out @Acceptable(
-            Accepted(String::class),
-            Accepted(Integer::class),
-        ) Any, Any?>
+    fun process(args: Map<
+        @Acceptable(Accepted(String::class), Accepted(Integer::class)) Any,
+        Any?
+        >
     ): String {
-        val writer = StringWriter()
-        process(writer, args)
-        return writer.toString()
+        val builder = StringBuilder()
+        process(builder, args)
+        return builder.toString()
     }
 
     /**
      * Processes with [args].
      */
     fun process(
-        dest: Writer,
-        args: Map<out @Acceptable(
-            Accepted(String::class),
-            Accepted(Integer::class),
-        ) Any, Any?>,
+        dest: Appendable,
+        args: Map<
+            @Acceptable(Accepted(String::class), Accepted(Integer::class)) Any,
+            Any?
+            >,
     ) {
         for (node in nodes) {
             val value = node.text
             if (node.isText) {
-                dest.write(value)
+                dest.append(value)
                 continue
             }
-            if (value.isEmpty()) {
-                dest.write(args[node.parameterIndex].toString())
-            } else {
-                if (args.containsKey(value)) {
-                    dest.write(args[value].toString())
+            if (node.isParameter) {
+                if (value.isEmpty()) {
+                    dest.append(args[node.parameterIndex].toChars())
                 } else {
-                    dest.write(args[node.parameterIndex].toString())
+                    dest.append(args[value].toChars())
                 }
             }
         }
@@ -199,31 +194,29 @@ interface CharsTemplate {
             return WithEscape(this, parameterPrefix, parameterSuffix, escape)
         }
 
-        private class WithoutEscape(template: CharSequence, prefix: String, suffix: String) : FromTokens(template) {
+        private class WithoutEscape(
+            template: CharSequence, prefix: String, suffix: String
+        ) : AbstractCharsTemplate(template) {
 
-            override val nodes: List<Node> by lazy {
+            override val tokens: List<Token> by lazy {
                 var prefixIndex = template.indexOf(prefix)
                 if (prefixIndex < 0) {
-                    return@lazy fromTokens(listOf(Token.newToken(0, template.length, Token.Type.TEXT)))
+                    return@lazy listOf(Token.newToken(0, template.length, Token.Type.TEXT))
                 }
                 var startIndex = 0
                 val tokens = LinkedList<Token>()
                 while (prefixIndex >= 0) {
                     val suffixIndex = template.indexOf(suffix, prefixIndex + prefix.length)
                     if (suffixIndex < 0) {
-                        throw IllegalArgumentException(
-                            "Cannot find suffix after prefix at index: $prefixIndex (${
-                                template.subSequence(prefixIndex, template.length).ellipses(
-                                    ELLIPSES_NUMBER
-                                )
-                            })"
-                        )
+                        throw IllegalArgumentException("Cannot find suffix after prefix at index: $prefixIndex (${
+                            template.subSequence(prefixIndex, template.length).ellipses(ELLIPSES_NUMBER)
+                        })")
                     }
-                    tokens.add(Token.newToken(startIndex, prefixIndex, Token.Type.TEXT))
+                    if (prefixIndex > startIndex) {
+                        tokens.add(Token.newToken(startIndex, prefixIndex, Token.Type.TEXT))
+                    }
                     tokens.add(Token.newToken(prefixIndex, prefixIndex + prefix.length, Token.Type.PREFIX))
-                    if (prefixIndex + prefix.length < suffixIndex) {
-                        tokens.add(Token.newToken(prefixIndex + prefix.length, suffixIndex, Token.Type.TEXT))
-                    }
+                    tokens.add(Token.newToken(prefixIndex + prefix.length, suffixIndex, Token.Type.TEXT))
                     tokens.add(Token.newToken(suffixIndex, suffixIndex + suffix.length, Token.Type.SUFFIX))
                     startIndex = suffixIndex + suffix.length
                     prefixIndex = template.indexOf(prefix, startIndex)
@@ -231,14 +224,15 @@ interface CharsTemplate {
                 if (startIndex < template.length) {
                     tokens.add(Token.newToken(startIndex, template.length, Token.Type.TEXT))
                 }
-                fromTokens(tokens)
+                tokens
             }
         }
 
-        private class WithEscape(template: CharSequence, prefix: String, suffix: String, escape: String) :
-            FromTokens(template) {
+        private class WithEscape(
+            template: CharSequence, prefix: String, suffix: String, escape: String
+        ) : AbstractCharsTemplate(template) {
 
-            override val nodes: List<Node> by lazy {
+            override val tokens: List<Token> by lazy {
                 val tokens = LinkedList<Token>()
                 var startIndex = 0
                 var i = 0
@@ -246,10 +240,9 @@ interface CharsTemplate {
                 while (i < template.length) {
                     if (template.startsWith(escape, i)) {
                         val nextIndex = i + escape.length
-                        //if (nextIndex >= template.length) {
-                        //    break
-                        //}
-                        tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT))
+                        if (i > startIndex) {
+                            tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT))
+                        }
                         tokens.add(Token.newToken(i, nextIndex, Token.Type.ESCAPE))
                         startIndex = nextIndex
                         i = nextIndex + 1
@@ -257,13 +250,13 @@ interface CharsTemplate {
                     }
                     if (template.startsWith(prefix, i)) {
                         if (inParameterScope) {
-                            throw IllegalArgumentException(
-                                "Wrong token $prefix at index $i (${
-                                    template.subSequence(i, template.length).ellipses(ELLIPSES_NUMBER)
-                                })."
-                            )
+                            throw IllegalArgumentException("Wrong token $prefix at index $i (${
+                                template.subSequence(i, template.length).ellipses(ELLIPSES_NUMBER)
+                            }).")
                         }
-                        tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT))
+                        if (i > startIndex) {
+                            tokens.add(Token.newToken(startIndex, i, Token.Type.TEXT))
+                        }
                         tokens.add(Token.newToken(i, i + prefix.length, Token.Type.PREFIX))
                         inParameterScope = true
                         i += prefix.length
@@ -283,79 +276,79 @@ interface CharsTemplate {
                     i++
                 }
                 if (inParameterScope) {
-                    throw IllegalArgumentException(
-                        "Suffix not found since index $startIndex (${
-                            template.subSequence(startIndex, template.length).ellipses(ELLIPSES_NUMBER)
-                        })."
-                    )
+                    throw IllegalArgumentException("Suffix not found since index $startIndex (${
+                        template.subSequence(startIndex, template.length).ellipses(ELLIPSES_NUMBER)
+                    }).")
                 }
                 if (startIndex < template.length) {
                     tokens.add(Token.newToken(startIndex, template.length, Token.Type.TEXT))
                 }
-                fromTokens(tokens)
+                tokens
             }
         }
+    }
+}
 
-        private abstract class FromTokens(
-            override val template: CharSequence
-        ) : CharsTemplate {
+/**
+ * Abstract [CharsTemplate].
+ */
+abstract class AbstractCharsTemplate(
+    override val template: CharSequence
+) : CharsTemplate {
 
-            protected fun fromTokens(tokens: List<Token>): List<Node> {
-                if (tokens.isEmpty()) {
-                    return emptyList()
-                }
-                val nodes = LinkedList<Node>()
-                var i = 0
-                var start = i
-                var parameterIndex = 0
-                loop@ while (i < tokens.size) {
-                    val token = tokens[i]
-                    if (token.isText || token.isEscape) {
-                        i++
-                        while (i < tokens.size) {
-                            if (tokens[i].isText || tokens[i].isEscape) {
-                                i++
-                            } else {
-                                nodes.add(Node.newNode(template, tokens.subList(start, i), Node.Type.TEXT, -1))
-                                start = i
-                                continue@loop
-                            }
-                        }
-                        break
-                    }
-                    if (token.isPrefix) {
-                        i++
-                        while (i < tokens.size) {
-                            if (tokens[i].isText || tokens[i].isEscape) {
-                                i++
-                            } else if (tokens[i].isSuffix) {
-                                nodes.add(
-                                    Node.newNode(
-                                        template,
-                                        tokens.subList(start, i),
-                                        Node.Type.PARAMETER,
-                                        parameterIndex
-                                    )
-                                )
-                                i++
-                                start = i
-                                parameterIndex++
-                                continue@loop
-                            } else {
-                                throw IllegalArgumentException(
-                                    "Only text or suffix token is permitted after a prefix token."
-                                )
-                            }
-                        }
-                        break
-                    }
-                    throw IllegalArgumentException("Suffix token must after a prefix token.")
-                }
-                if (start != i) {
-                    nodes.add(Node.newNode(template, tokens.subList(start, i), Node.Type.TEXT, -1))
-                }
-                return nodes
-            }
+    protected abstract val tokens: List<CharsTemplate.Token>
+
+    override val nodes: List<CharsTemplate.Node> by lazy { tokensToNodes(tokens) }
+
+    private fun tokensToNodes(tokens: List<CharsTemplate.Token>): List<CharsTemplate.Node> {
+        if (tokens.isEmpty()) {
+            return emptyList()
         }
+        val nodes = LinkedList<CharsTemplate.Node>()
+        var i = 0
+        var start = i
+        var parameterIndex = 0
+        loop@ while (i < tokens.size) {
+            val token = tokens[i]
+            if (token.isText || token.isEscape) {
+                i++
+                while (i < tokens.size) {
+                    if (tokens[i].isText || tokens[i].isEscape) {
+                        i++
+                    } else {
+                        nodes.add(CharsTemplate.Node.newNode(
+                            template, tokens.subList(start, i), CharsTemplate.Node.Type.TEXT, -1))
+                        start = i
+                        continue@loop
+                    }
+                }
+                break
+            }
+            if (token.isPrefix) {
+                i++
+                while (i < tokens.size) {
+                    if (tokens[i].isText || tokens[i].isEscape) {
+                        i++
+                    } else if (tokens[i].isSuffix) {
+                        nodes.add(CharsTemplate.Node.newNode(
+                            template, tokens.subList(start, i), CharsTemplate.Node.Type.PARAMETER, parameterIndex)
+                        )
+                        i++
+                        start = i
+                        parameterIndex++
+                        continue@loop
+                    } else {
+                        throw IllegalArgumentException("Only text or suffix token is permitted after a prefix token.")
+                    }
+                }
+                break
+            }
+            throw IllegalArgumentException("Suffix token must after a prefix token.")
+        }
+        if (start != i) {
+            nodes.add(CharsTemplate.Node.newNode(
+                template, tokens.subList(start, i), CharsTemplate.Node.Type.TEXT, -1))
+        }
+        return nodes
     }
 }

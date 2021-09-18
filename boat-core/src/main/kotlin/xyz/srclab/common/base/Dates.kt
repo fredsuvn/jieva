@@ -2,6 +2,7 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.exception.ImpossibleException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.*
@@ -50,6 +51,12 @@ val EPOCH_LOCAL_DATE: LocalDate = EPOCH_LOCAL_DATE_TIME.toLocalDate()
 
 @JvmField
 val EPOCH_LOCAL_TIME: LocalTime = EPOCH_LOCAL_DATE_TIME.toLocalTime()
+
+@JvmField
+val EPOCH_OFFSET_DATE_TIME: OffsetDateTime = EPOCH_LOCAL_DATE_TIME.atOffset(ZoneOffset.UTC)
+
+@JvmField
+val EPOCH_ZONED_DATE_TIME: ZonedDateTime = EPOCH_LOCAL_DATE_TIME.atZone(ZoneOffset.UTC)
 
 @JvmName("dateTimeFormatter")
 fun CharSequence.toDateTimeFormatter(): DateTimeFormatter {
@@ -148,19 +155,23 @@ fun Any?.toDate(pattern: String): Date {
 @JvmOverloads
 fun Any?.toDate(dateFormat: DateFormat? = null): Date {
 
-    fun charsToDate():Date {
-        if (da)
+    fun String.getDateFormat(): DateFormat {
+        if (dateFormat !== null) {
+            return dateFormat
+        }
+        return (this.guessDateTimePatternOrNull()
+            ?: throw IllegalArgumentException("Unknown datetime formatter: $this.")).toDateFormat()
     }
 
     return when (this) {
         null -> EPOCH_DATE
         is Date -> this
         is Instant -> Date.from(this)
-        is LocalDateTime -> Date.from(toInstant(OffsetDateTime.now().offset))
         is ZonedDateTime -> Date.from(toInstant())
         is OffsetDateTime -> Date.from(toInstant())
-        is LocalDate -> Date.from(ZonedDateTime.of(this, EPOCH_LOCAL_TIME, ZoneId.systemDefault()).toInstant())
-        is LocalTime -> Date.from(ZonedDateTime.of(EPOCH_LOCAL_DATE, this, ZoneId.systemDefault()).toInstant())
+        is LocalDateTime -> Date.from(toInstant(OffsetDateTime.now().offset))
+        is LocalDate -> Date.from(toLocalDateTime().toInstant(OffsetDateTime.now().offset))
+        is LocalTime -> Date.from(toLocalDateTime().toInstant(OffsetDateTime.now().offset))
         is Temporal -> Date.from(Instant.from(this))
         is Number -> when (val value = toLong()) {
             0L -> EPOCH_DATE
@@ -169,13 +180,8 @@ fun Any?.toDate(dateFormat: DateFormat? = null): Date {
         false -> EPOCH_DATE
         true -> Date()
         else -> {
-            if (dateFormat !== null) {
-                return dateFormat.parse(this.toString())
-            }
             val dateString = this.toString()
-            val dateFormatPattern = dateString.guessDateTimePatternOrNull()
-            dateFormatPattern?.toDateFormat()?.parse(dateString)
-                ?: TIMESTAMP_PATTERN.toDateFormat().parse(dateString)
+            dateString.getDateFormat().parse(dateString)
         }
     }
 }
@@ -190,11 +196,11 @@ fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter? = null): Instant {
         null -> Instant.EPOCH
         is Instant -> this
         is Date -> toInstant()
-        is LocalDateTime -> toInstant(ZonedDateTime.now().offset)
         is ZonedDateTime -> toInstant()
         is OffsetDateTime -> toInstant()
-        is LocalDate -> ZonedDateTime.of(this, EPOCH_LOCAL_TIME, ZoneId.systemDefault()).toInstant()
-        is LocalTime -> ZonedDateTime.of(EPOCH_LOCAL_DATE, this, ZoneId.systemDefault()).toInstant()
+        is LocalDateTime -> toInstant(OffsetDateTime.now().offset)
+        is LocalDate -> toLocalDateTime().toInstant(OffsetDateTime.now().offset)
+        is LocalTime -> toLocalDateTime().toInstant(OffsetDateTime.now().offset)
         is Temporal -> Instant.from(this)
         is Number -> when (val value = toLong()) {
             0L -> Instant.EPOCH
@@ -202,35 +208,12 @@ fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter? = null): Instant {
         }
         false -> Instant.EPOCH
         true -> Instant.now()
-        else -> return Instant.from(
-            dateTimeFormatter?.parse(toString()) ?:
-        )
-    }
-}
-
-fun Any?.toLocalDateTime(dateTimePattern: String): LocalDateTime {
-    return toLocalDateTime(DateTimeFormatter.ofPattern(dateTimePattern))
-}
-
-@JvmOverloads
-fun Any?.toLocalDateTime(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME): LocalDateTime {
-    return when (this) {
-        null -> EPOCH_LOCAL_DATE_TIME
-        is LocalDateTime -> this
-        is Date -> toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-        is Instant -> atZone(ZoneId.systemDefault()).toLocalDateTime()
-        is ZonedDateTime -> toLocalDateTime()
-        is OffsetDateTime -> toLocalDateTime()
-        is LocalDate -> LocalDateTime.of(this, EPOCH_LOCAL_TIME)
-        is LocalTime -> LocalDateTime.of(EPOCH_LOCAL_DATE, this)
-        is Temporal -> LocalDateTime.from(this)
-        is Number -> when (val value = toLong()) {
-            0L -> EPOCH_LOCAL_DATE_TIME
-            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDateTime()
+        else -> {
+            val dateString = this.toString()
+            Instant.from(
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+            )
         }
-        false -> EPOCH_LOCAL_DATE_TIME
-        true -> LocalDateTime.now()
-        else -> return LocalDateTime.from(dateTimeFormatter.parse(toString()))
     }
 }
 
@@ -239,24 +222,29 @@ fun Any?.toZonedDateTime(dateTimePattern: String): ZonedDateTime {
 }
 
 @JvmOverloads
-fun Any?.toZonedDateTime(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME): ZonedDateTime {
+fun Any?.toZonedDateTime(dateTimeFormatter: DateTimeFormatter? = null): ZonedDateTime {
     return when (this) {
         null -> EPOCH_ZONED_DATE_TIME
         is ZonedDateTime -> this
-        is Date -> toInstant().atZone(ZoneId.systemDefault())
-        is Instant -> atZone(ZoneId.systemDefault())
-        is LocalDateTime -> ZonedDateTime.of(this, ZoneId.systemDefault())
+        is Date -> toInstant().atZone(ZoneOffset.UTC)
+        is Instant -> atZone(ZoneOffset.UTC)
         is OffsetDateTime -> toZonedDateTime()
+        is LocalDateTime -> atZone(ZoneId.systemDefault())
         is LocalDate -> ZonedDateTime.of(this, EPOCH_LOCAL_TIME, ZoneId.systemDefault())
         is LocalTime -> ZonedDateTime.of(EPOCH_LOCAL_DATE, this, ZoneId.systemDefault())
         is Temporal -> ZonedDateTime.from(this)
         is Number -> when (val value = toLong()) {
             0L -> EPOCH_ZONED_DATE_TIME
-            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault())
+            else -> Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC)
         }
         false -> EPOCH_ZONED_DATE_TIME
         true -> ZonedDateTime.now()
-        else -> return ZonedDateTime.from(dateTimeFormatter.parse(toString()))
+        else -> {
+            val dateString = this.toString()
+            ZonedDateTime.from(
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+            )
+        }
     }
 }
 
@@ -265,24 +253,60 @@ fun Any?.toOffsetDateTime(dateTimePattern: String): OffsetDateTime {
 }
 
 @JvmOverloads
-fun Any?.toOffsetDateTime(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME): OffsetDateTime {
+fun Any?.toOffsetDateTime(dateTimeFormatter: DateTimeFormatter? = null): OffsetDateTime {
     return when (this) {
         null -> EPOCH_OFFSET_DATE_TIME
         is OffsetDateTime -> this
-        is Date -> toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime()
-        is Instant -> atZone(ZoneId.systemDefault()).toOffsetDateTime()
-        is LocalDateTime -> ZonedDateTime.of(this, ZoneId.systemDefault()).toOffsetDateTime()
+        is Date -> toInstant().atOffset(ZoneOffset.UTC)
+        is Instant -> atOffset(ZoneOffset.UTC)
         is ZonedDateTime -> toOffsetDateTime()
-        is LocalDate -> ZonedDateTime.of(this, EPOCH_LOCAL_TIME, ZoneId.systemDefault()).toOffsetDateTime()
-        is LocalTime -> ZonedDateTime.of(EPOCH_LOCAL_DATE, this, ZoneId.systemDefault()).toOffsetDateTime()
+        is LocalDateTime -> toZonedDateTime().toOffsetDateTime()
+        is LocalDate -> toZonedDateTime().toOffsetDateTime()
+        is LocalTime -> toZonedDateTime().toOffsetDateTime()
         is Temporal -> OffsetDateTime.from(this)
         is Number -> when (val value = toLong()) {
             0L -> EPOCH_OFFSET_DATE_TIME
-            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toOffsetDateTime()
+            else -> Instant.ofEpochMilli(value).atOffset(ZoneOffset.UTC)
         }
         false -> EPOCH_OFFSET_DATE_TIME
         true -> OffsetDateTime.now()
-        else -> return OffsetDateTime.from(dateTimeFormatter.parse(toString()))
+        else -> {
+            val dateString = this.toString()
+            OffsetDateTime.from(
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+            )
+        }
+    }
+}
+
+fun Any?.toLocalDateTime(dateTimePattern: String): LocalDateTime {
+    return toLocalDateTime(DateTimeFormatter.ofPattern(dateTimePattern))
+}
+
+@JvmOverloads
+fun Any?.toLocalDateTime(dateTimeFormatter: DateTimeFormatter? = null): LocalDateTime {
+    return when (this) {
+        null -> EPOCH_LOCAL_DATE_TIME
+        is LocalDateTime -> this
+        is Date -> LocalDateTime.ofInstant(toInstant(), ZoneOffset.UTC)
+        is Instant -> LocalDateTime.ofInstant(this, ZoneOffset.UTC)
+        is ZonedDateTime -> toLocalDateTime()
+        is OffsetDateTime -> toLocalDateTime()
+        is LocalDate -> LocalDateTime.of(this, EPOCH_LOCAL_TIME)
+        is LocalTime -> LocalDateTime.of(EPOCH_LOCAL_DATE, this)
+        is Temporal -> LocalDateTime.from(this)
+        is Number -> when (val value = toLong()) {
+            0L -> EPOCH_LOCAL_DATE_TIME
+            else -> LocalDateTime.ofInstant(Instant.ofEpochMilli(value), ZoneOffset.UTC)
+        }
+        false -> EPOCH_LOCAL_DATE_TIME
+        true -> LocalDateTime.now()
+        else -> {
+            val dateString = this.toString()
+            LocalDateTime.from(
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+            )
+        }
     }
 }
 
@@ -291,24 +315,29 @@ fun Any?.toLocalDate(dateTimePattern: String): LocalDate {
 }
 
 @JvmOverloads
-fun Any?.toLocalDate(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE): LocalDate {
+fun Any?.toLocalDate(dateTimeFormatter: DateTimeFormatter? = null): LocalDate {
     return when (this) {
         null -> EPOCH_LOCAL_DATE
         is LocalDate -> this
-        is Date -> toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-        is Instant -> atZone(ZoneId.systemDefault()).toLocalDate()
-        is LocalDateTime -> ZonedDateTime.of(this, ZoneId.systemDefault()).toLocalDate()
+        is Date -> toInstant().atOffset(ZoneOffset.UTC).toLocalDate()
+        is Instant -> atOffset(ZoneOffset.UTC).toLocalDate()
         is ZonedDateTime -> toLocalDate()
         is OffsetDateTime -> toLocalDate()
+        is LocalDateTime -> toLocalDate()
         is LocalTime -> EPOCH_LOCAL_DATE
         is Temporal -> LocalDate.from(this)
         is Number -> when (val value = toLong()) {
             0L -> EPOCH_LOCAL_DATE
-            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDate()
+            else -> Instant.ofEpochMilli(value).atOffset(ZoneOffset.UTC).toLocalDate()
         }
         false -> EPOCH_LOCAL_DATE
         true -> LocalDate.now()
-        else -> return LocalDate.from(dateTimeFormatter.parse(toString()))
+        else -> {
+            val dateString = this.toString()
+            LocalDate.from(
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+            )
+        }
     }
 }
 
@@ -317,24 +346,29 @@ fun Any?.toLocalTime(dateTimePattern: String): LocalTime {
 }
 
 @JvmOverloads
-fun Any?.toLocalTime(dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_TIME): LocalTime {
+fun Any?.toLocalTime(dateTimeFormatter: DateTimeFormatter? = null): LocalTime {
     return when (this) {
         null -> EPOCH_LOCAL_TIME
         is LocalTime -> this
-        is Date -> toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
-        is Instant -> atZone(ZoneId.systemDefault()).toLocalTime()
-        is LocalDateTime -> ZonedDateTime.of(this, ZoneId.systemDefault()).toLocalTime()
+        is Date -> toInstant().atOffset(ZoneOffset.UTC).toLocalTime()
+        is Instant -> atOffset(ZoneOffset.UTC).toLocalTime()
         is ZonedDateTime -> toLocalTime()
         is OffsetDateTime -> toLocalTime()
+        is LocalDateTime -> toLocalTime()
         is LocalDate -> EPOCH_LOCAL_TIME
         is Temporal -> LocalTime.from(this)
         is Number -> when (val value = toLong()) {
             0L -> EPOCH_LOCAL_TIME
-            else -> Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalTime()
+            else -> Instant.ofEpochMilli(value).atOffset(ZoneOffset.UTC).toLocalTime()
         }
         false -> EPOCH_LOCAL_TIME
         true -> LocalTime.now()
-        else -> return LocalTime.from(dateTimeFormatter.parse(toString()))
+        else -> {
+            val dateString = this.toString()
+            LocalTime.from(
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+            )
+        }
     }
 }
 
@@ -352,5 +386,31 @@ fun Any?.toDuration(): Duration {
 }
 
 fun Any?.toTimestamp(): String {
-    return Defaults.timestampFormatter.format(toLocalDateTime())
+    val dateString = this.toString()
+    val formatter = dateString.guessDateTimeFormatterOrNull()
+    if (formatter === null) {
+        throw IllegalArgumentException("Unknown datetime formatter: $this")
+    }
+    return when (formatter) {
+        TIMESTAMP_FORMATTER ->
+            TIMESTAMP_FORMATTER.format(TIMESTAMP_FORMATTER.parse(dateString))
+        SIMPLE_LOCAL_DATE_TIME_FORMATTER ->
+            SIMPLE_LOCAL_DATE_TIME_FORMATTER.format(SIMPLE_LOCAL_DATE_TIME_FORMATTER.parse(dateString))
+        SIMPLE_OFFSET_DATE_TIME_FORMATTER ->
+            SIMPLE_OFFSET_DATE_TIME_FORMATTER.format(SIMPLE_OFFSET_DATE_TIME_FORMATTER.parse(dateString))
+        ISO_LOCAL_DATE_TIME_FORMATTER ->
+            ISO_LOCAL_DATE_TIME_FORMATTER.format(ISO_LOCAL_DATE_TIME_FORMATTER.parse(dateString))
+        ISO_OFFSET_DATE_TIME_FORMATTER ->
+            ISO_OFFSET_DATE_TIME_FORMATTER.format(ISO_OFFSET_DATE_TIME_FORMATTER.parse(dateString))
+        ISO_ZONED_DATE_TIME_FORMATTER ->
+            ISO_ZONED_DATE_TIME_FORMATTER.format(ISO_ZONED_DATE_TIME_FORMATTER.parse(dateString))
+        else -> throw ImpossibleException(dateString)
+    }
+}
+
+private fun String.getDateTimeFormatter(dateTimeFormatter: DateTimeFormatter?): DateTimeFormatter {
+    if (dateTimeFormatter !== null) {
+        return dateTimeFormatter
+    }
+    return this.guessDateTimeFormatterOrNull() ?: throw IllegalArgumentException("Unknown datetime formatter: $this.")
 }

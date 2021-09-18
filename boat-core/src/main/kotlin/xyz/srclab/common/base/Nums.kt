@@ -146,7 +146,7 @@ fun Int.toBinaryString(size: Int = 32): String {
  */
 @JvmOverloads
 fun Long.toBinaryString(size: Int = 64): String {
-    return StringUtils.leftPad(java.lang.Long.toBinaryString(this), size, "0")
+    return StringUtils.leftPad(JavaLong.toBinaryString(this), size, "0")
 }
 
 /**
@@ -164,7 +164,7 @@ fun Int.toHexString(size: Int = 8): String {
  */
 @JvmOverloads
 fun Long.toHexString(size: Int = 16): String {
-    return StringUtils.leftPad(java.lang.Long.toHexString(this), size, "0")
+    return StringUtils.leftPad(JavaLong.toHexString(this), size, "0")
 }
 
 /**
@@ -182,7 +182,7 @@ fun Int.toOctalString(size: Int = 11): String {
  */
 @JvmOverloads
 fun Long.toOctalString(size: Int = 22): String {
-    return StringUtils.leftPad(java.lang.Long.toOctalString(this), size, "0")
+    return StringUtils.leftPad(JavaLong.toOctalString(this), size, "0")
 }
 
 /**
