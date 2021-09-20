@@ -123,6 +123,9 @@ inline fun <T> Iterable<T>.count(predicate: (T) -> Boolean): Int {
 }
 
 fun <T> Iterable<T>.isEmpty(): Boolean {
+    if (this is Collection) {
+        return this.isEmpty()
+    }
     for (it in this) {
         return false
     }

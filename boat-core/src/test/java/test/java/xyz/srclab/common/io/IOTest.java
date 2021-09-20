@@ -67,11 +67,11 @@ public class IOTest {
     public void testByteBuffer() {
         ByteBuffer buffer = ByteBuffer.allocate(100);
         initBuffer(buffer);
-        byte[] bytes = IOStreams.toByteArray(buffer);
+        byte[] bytes = IOStreams.toBytes(buffer);
         Assert.assertEquals(bytes, buffer.array());
         ByteBuffer buffer2 = ByteBuffer.allocateDirect(100);
         initBuffer(buffer2);
-        byte[] bytes2 = IOStreams.toByteArray(buffer2);
+        byte[] bytes2 = IOStreams.toBytes(buffer2);
         Assert.assertEquals(bytes2, initArray(new byte[100]));
     }
 

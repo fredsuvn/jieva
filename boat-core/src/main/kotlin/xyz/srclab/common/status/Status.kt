@@ -1,7 +1,7 @@
 package xyz.srclab.common.status
 
+import xyz.srclab.annotations.Immutable
 import xyz.srclab.common.exception.StatusException
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 
 /**
  * Represents a `status` such as response status.
@@ -15,27 +15,45 @@ import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
  * @see IntStringStatus
  * @see StatusException
  */
+@Immutable
 interface Status<C, D> {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    @get:JvmName("code")
+    /**
+     * Code of status.
+     */
     val code: C
 
     /**
-     * Returns total [descriptions] as one description, or null if [descriptions] is empty.
+     * Returns all [descriptions] as one description, or null if [descriptions] is empty.
      */
-    @get:JvmName("description")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val description: D?
 
     /**
-     * Returns all this state's own description and descriptions inherited by [withNewDescription].
+     * Returns all descriptions of this `status`.
      */
-    @get:JvmName("descriptions")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val descriptions: List<D>
 
-    fun withNewDescription(newDescription: D?): Status<C, D>
+    /**
+     * Returns a new `status` instance which is appended additional description.
+     */
+    fun withMoreDescription(addition: D): Status<C, D> {
+        return withMoreDescriptions(descriptions.plus(addition))
+    }
 
-    fun withMoreDescription(moreDescription: D): Status<C, D>
+    /**
+     * Returns a new `status` instance which is appended additional descriptions.
+     */
+    fun withMoreDescriptions(additions: Iterable<D>): Status<C, D>
+
+    /**
+     * Returns a new `status` instance of which descriptions are replaced by [description] but code is not changed.
+     */
+    fun withNewDescription(description: D?): Status<C, D> {
+        return withNewDescriptions(if (description === null) emptyList() else listOf(description))
+    }
+
+    /**
+     * Returns a new `status` instance of which descriptions are replaced by [descriptions] but code is not changed.
+     */
+    fun withNewDescriptions(descriptions: Iterable<D>): Status<C, D>
 }

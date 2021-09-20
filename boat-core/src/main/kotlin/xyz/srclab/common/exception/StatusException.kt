@@ -9,6 +9,7 @@ import xyz.srclab.common.status.StringStatus
  * @see Status
  * @see StringStatus
  */
+@JvmDefaultWithoutCompatibility
 open class StatusException @JvmOverloads constructor(
     private val status: Status<String, String>,
     cause: Throwable? = null
@@ -24,7 +25,8 @@ open class StatusException @JvmOverloads constructor(
     )
 
     constructor(message: String?) : this(
-        INTERNAL_STATUS.withNewDescription(message))
+        INTERNAL_STATUS.withNewDescription(message)
+    )
 
     constructor(message: String?, cause: Throwable?) : this(
         INTERNAL_STATUS.withNewDescription(message),
@@ -40,23 +42,23 @@ open class StatusException @JvmOverloads constructor(
     override val description: String? = status.description
     override val descriptions: List<String> = status.descriptions
 
-    override fun withNewDescription(newDescription: String?): Status<String, String> {
-        return status.withNewDescription(newDescription)
+    override fun withMoreDescriptions(additions: Iterable<String>): Status<String, String> {
+        return status.withMoreDescriptions(additions)
     }
 
-    override fun withMoreDescription(moreDescription: String): Status<String, String> {
-        return status.withMoreDescription(moreDescription)
+    override fun withNewDescriptions(descriptions: Iterable<String>): Status<String, String> {
+        return status.withNewDescriptions(descriptions)
     }
 
     companion object {
 
         @JvmField
-        val INTERNAL_STATUS = StringStatus("G-99999", "Internal Error")
+        val INTERNAL_STATUS = StringStatus("B-99999", "Internal Error")
 
         @JvmField
-        val UNKNOWN_STATUS = StringStatus("G-99998", "Unknown Error")
+        val UNKNOWN_STATUS = StringStatus("B-99998", "Unknown Error")
 
         @JvmField
-        val IMPOSSIBLE_STATUS = StringStatus("G-99997", "WTF??... That's IMPOSSIBLE!!")
+        val IMPOSSIBLE_STATUS = StringStatus("B-99997", "WTF??... That's IMPOSSIBLE!!")
     }
 }
