@@ -3,20 +3,57 @@
 package xyz.srclab.common.io
 
 import org.apache.commons.io.IOUtils
-import xyz.srclab.common.lang.Defaults
-import xyz.srclab.common.lang.toChars
+import xyz.srclab.common.base.DEFAULT_CHARSET
+import xyz.srclab.common.base.encodeToString
 import java.io.*
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import kotlin.io.readBytes as readBytesKt
 
+fun InputStream.readBytes(): ByteArray {
+    return this.readBytesKt()
+}
+
 @JvmOverloads
-fun InputStream.toReader(charset: Charset = Defaults.charset): Reader {
+fun InputStream.readString(charset: Charset = DEFAULT_CHARSET): String {
+    return toReader(charset).readText()
+}
+
+@JvmOverloads
+fun InputStream.readLines(charset: Charset = DEFAULT_CHARSET): List<String> {
+    return IOUtils.readLines(this, charset)
+}
+
+fun InputStream.availableBytes(): ByteArray {
+    val available = this.available()
+    if (available == 0) {
+        return byteArrayOf()
+    }
+    val bytes = ByteArray(available)
+    this.read(bytes)
+    return bytes
+}
+
+@JvmOverloads
+fun InputStream.availableString(charset: Charset = DEFAULT_CHARSET): String {
+    return availableBytes().encodeToString(charset)
+}
+
+fun Reader.readString(): String {
+    return this.readText()
+}
+
+fun Reader.readLines(): List<String> {
+    return IOUtils.readLines(this)
+}
+
+@JvmOverloads
+fun InputStream.toReader(charset: Charset = DEFAULT_CHARSET): Reader {
     return InputStreamReader(this, charset)
 }
 
 @JvmOverloads
-fun OutputStream.toWriter(charset: Charset = Defaults.charset): Writer {
+fun OutputStream.toWriter(charset: Charset = DEFAULT_CHARSET): Writer {
     return OutputStreamWriter(this, charset)
 }
 
@@ -52,50 +89,15 @@ fun Reader.readTo(output: Writer, bufferSize: Int = DEFAULT_BUFFER_SIZE): Long {
     return this.copyTo(output, bufferSize)
 }
 
-fun InputStream.readBytes(): ByteArray {
-    return this.readBytesKt()
-}
-
-@JvmOverloads
-fun InputStream.readString(charset: Charset = Defaults.charset): String {
-    return toReader(charset).readText()
-}
-
-@JvmOverloads
-fun InputStream.readLines(charset: Charset = Defaults.charset): List<String> {
-    return IOUtils.readLines(this, charset)
-}
-
-fun InputStream.availableBytes(): ByteArray {
-    val available = this.available()
-    if (available == 0) {
-        return byteArrayOf()
-    }
-    val bytes = ByteArray(available)
-    this.read(bytes)
-    return bytes
-}
-
-fun InputStream.availableString(charset: Charset = Defaults.charset): String {
-    return availableBytes().toChars(charset)
-}
-
-fun Reader.readString(): String {
-    return this.readText()
-}
-
-fun Reader.readLines(): List<String> {
-    return IOUtils.readLines(this)
-}
 
 fun ByteArray.toInputStream(): InputStream {
     return ByteArrayInputStream(this)
 }
 
 @JvmOverloads
-fun ByteBuffer.toByteArray(permitBacked: Boolean = true): ByteArray {
+fun ByteBuffer.toBytes(useBackedArray: Boolean = true): ByteArray {
     if (this.hasArray()) {
-        return if (permitBacked) {
+        return if (useBackedArray) {
             this.array()
         } else {
             this.array().clone()
