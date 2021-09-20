@@ -3,19 +3,19 @@ package xyz.srclab.common.proxy
 import java.lang.reflect.Method
 
 /**
- * Represents a proxy method.
+ * To describe proxy method info.
  *
  * @author sunqian
  */
 interface ProxyMethod<T : Any> {
 
     /**
-     * Returns whether proxy specified [method].
+     * Returns whether this [ProxyMethod] is valid for given [method].
      */
-    fun proxy(method: Method): Boolean
+    fun isProxy(method: Method): Boolean
 
     /**
-     * Proxy action
+     * Proxy action.
      */
-    fun invoke(proxied: T, proxiedMethod: Method, superInvoke: SuperInvoke, args: Array<out Any?>): Any?
+    fun invoke(sourceObject: T, sourceMethod: Method, sourceInvoke: SourceInvoke, args: Array<out Any?>?): Any?
 }

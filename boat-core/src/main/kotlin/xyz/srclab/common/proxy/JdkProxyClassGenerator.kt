@@ -1,53 +1,54 @@
 package xyz.srclab.common.proxy
 
+import xyz.srclab.common.base.asAny
 import xyz.srclab.common.jvm.jvmDescriptor
-import xyz.srclab.common.lang.asAny
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
-object JdkProxyClassFactory : ProxyClassFactory {
+object JdkProxyClassGenerator : ProxyClassGenerator {
 
-    override fun <T : Any> create(
-        proxyClass: Class<T>,
+    override fun <T : Any> generate(
+        sourceClass: Class<T>,
         proxyMethods: Iterable<ProxyMethod<T>>,
         classLoader: ClassLoader
     ): ProxyClass<T> {
-        return ProxyClassImpl(proxyClass, proxyMethods, classLoader)
+        return ProxyClassImpl(sourceClass, proxyMethods, classLoader)
     }
 
     private class ProxyClassImpl<T : Any>(
-        private val proxyClass: Class<T>,
+        private val sourceClass: Class<T>,
         private val proxyMethods: Iterable<ProxyMethod<T>>,
         private val classLoader: ClassLoader
     ) : ProxyClass<T> {
 
-        override fun newInstance(): T {
+        override fun instantiate(): T {
             return Proxy.newProxyInstance(
                 classLoader,
-                arrayOf(proxyClass),
-                ProxyMethodInterceptor(proxyClass, proxyMethods)
+                arrayOf(sourceClass),
+                ProxyMethodInterceptor(sourceClass, proxyMethods)
             )
                 .asAny()
         }
 
-        override fun newInstance(parameterTypes: Array<Class<*>>?, args: Array<Any?>?): T {
-            throw IllegalArgumentException("JDK proxy only support interface proxy.")
+        override fun instantiate(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
+            throw IllegalArgumentException("JDK proxy only supports interface.")
         }
     }
 
     private class ProxyMethodInterceptor<T : Any>(
-        proxyClass: Class<T>,
-        val proxyMethods: Iterable<ProxyMethod<T>>
+        sourceClass: Class<T>,
+        private val proxyMethods: Iterable<ProxyMethod<T>>
     ) : InvocationHandler {
 
         private val methodMap: Map<String, ProxyMethod<T>> by lazy {
             val map = HashMap<String, ProxyMethod<T>>()
-            val methods = proxyClass.methods
+            val methods = sourceClass.methods
             for (method in methods) {
                 for (proxyMethod in proxyMethods) {
-                    if (proxyMethod.proxy(method)) {
+                    if (proxyMethod.isProxy(method)) {
                         map["${method.name}${method.parameterTypes.jvmDescriptor}"] = proxyMethod
+                        break
                     }
                 }
             }
@@ -68,12 +69,12 @@ object JdkProxyClassFactory : ProxyClassFactory {
             method: Method,
             args: Array<out Any>?
         ): Any? {
-            val superInvoke = object : SuperInvoke {
-                override fun invoke(vararg args: Any?): Any? {
+            val sourceInvoke = object : SourceInvoke {
+                override fun invoke(args: Array<out Any?>?): Any? {
                     throw IllegalStateException("Cannot call a interface method: $method")
                 }
             }
-            return proxyMethod.invoke(proxy.asAny(), method, superInvoke, *args ?: emptyArray())
+            return proxyMethod.invoke(proxy.asAny(), method, sourceInvoke, args)
         }
     }
 }

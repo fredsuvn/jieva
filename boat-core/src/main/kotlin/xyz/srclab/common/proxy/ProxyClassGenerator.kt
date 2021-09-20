@@ -3,7 +3,7 @@ package xyz.srclab.common.proxy
 import xyz.srclab.common.base.loadClassOrNull
 
 /**
- * Factory to create [ProxyClass].
+ * Generator to create [ProxyClass].
  *
  * Default implementations in priority order are:
  *
@@ -11,10 +11,10 @@ import xyz.srclab.common.base.loadClassOrNull
  * * cglib
  * * jdk-proxy
  */
-interface ProxyClassFactory {
+interface ProxyClassGenerator {
 
-    fun <T : Any> create(
-        proxyClass: Class<T>,
+    fun <T : Any> generate(
+        sourceClass: Class<T>,
         proxyMethods: Iterable<ProxyMethod<T>>,
         classLoader: ClassLoader,
     ): ProxyClass<T>
@@ -22,18 +22,18 @@ interface ProxyClassFactory {
     companion object {
 
         @JvmField
-        val DEFAULT: ProxyClassFactory = findDefaultProxyClassGenerator()
+        val DEFAULT: ProxyClassGenerator = findDefaultProxyClassGenerator()
 
-        private fun findDefaultProxyClassGenerator(): ProxyClassFactory {
+        private fun findDefaultProxyClassGenerator(): ProxyClassGenerator {
             val springLib = "org.springframework.cglib.proxy.Enhancer".loadClassOrNull<Any>()
             if (springLib !== null) {
-                return SpringProxyClassFactory
+                return SpringProxyClassGenerator
             }
             val cgLib = "net.sf.cglib.proxy.Enhancer".loadClassOrNull<Any>()
             if (cgLib !== null) {
-                return CglibProxyClassFactory
+                return CglibProxyClassGenerator
             }
-            return JdkProxyClassFactory
+            return JdkProxyClassGenerator
         }
     }
 }

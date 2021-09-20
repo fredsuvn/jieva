@@ -1,66 +1,67 @@
 package xyz.srclab.common.proxy
 
-import org.springframework.cglib.proxy.*
-import xyz.srclab.common.lang.asAny
+import net.sf.cglib.proxy.*
+import org.apache.commons.lang3.ArrayUtils
+import xyz.srclab.common.base.asAny
 import java.lang.reflect.Method
 import java.util.*
 
-object SpringProxyClassFactory : ProxyClassFactory {
+object CglibProxyClassGenerator : ProxyClassGenerator {
 
-    override fun <T : Any> create(
-        proxyClass: Class<T>,
+    override fun <T : Any> generate(
+        sourceClass: Class<T>,
         proxyMethods: Iterable<ProxyMethod<T>>,
         classLoader: ClassLoader
     ): ProxyClass<T> {
         val enhancer = Enhancer()
         enhancer.classLoader = classLoader
-        if (proxyClass.isInterface) {
-            enhancer.setInterfaces(arrayOf(proxyClass))
+        if (sourceClass.isInterface) {
+            enhancer.setInterfaces(arrayOf(sourceClass))
         } else {
-            enhancer.setSuperclass(proxyClass)
+            enhancer.setSuperclass(sourceClass)
         }
+
         val callbacks = LinkedList<Callback>()
+        //index 0
         callbacks.add(NoOp.INSTANCE)
+        //index 1..
         for (proxyMethod in proxyMethods) {
             callbacks.add(ProxyMethodInterceptor(proxyMethod))
         }
         val callbackFilter = CallbackFilter { method ->
-            for (i in callbacks.indices) {
-                val callback = callbacks[i]
+            for ((i, callback) in callbacks.withIndex()) {
                 if (callback is ProxyMethodInterceptor<*>) {
-                    if (callback.proxyMethod.proxy(method)) {
+                    if (callback.proxyMethod.isProxy(method)) {
                         return@CallbackFilter i
-                    } else {
-                        return@CallbackFilter 0
                     }
                 }
             }
             0
         }
+
         enhancer.setCallbacks(callbacks.toTypedArray())
         enhancer.setCallbackFilter(callbackFilter)
         return ProxyClassImpl(enhancer)
     }
 
     private class ProxyMethodInterceptor<T : Any>(val proxyMethod: ProxyMethod<T>) : MethodInterceptor {
-
         override fun intercept(obj: Any, method: Method, args: Array<out Any?>?, proxy: MethodProxy): Any? {
-            val superInvoke = object : SuperInvoke {
-                override fun invoke(vararg args: Any?): Any? {
-                    return proxy.invokeSuper(obj, args)
+            val sourceInvoke = object : SourceInvoke {
+                override fun invoke(args: Array<out Any?>?): Any? {
+                    return proxy.invokeSuper(obj, args ?: ArrayUtils.EMPTY_CLASS_ARRAY)
                 }
             }
-            return proxyMethod.invoke(obj.asAny(), method, superInvoke, *args ?: emptyArray())
+            return proxyMethod.invoke(obj.asAny(), method, sourceInvoke, args)
         }
     }
 
     private class ProxyClassImpl<T : Any>(private val enhancer: Enhancer) : ProxyClass<T> {
 
-        override fun newInstance(): T {
+        override fun instantiate(): T {
             return enhancer.create().asAny()
         }
 
-        override fun newInstance(parameterTypes: Array<Class<*>>?, args: Array<Any?>?): T {
+        override fun instantiate(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
             return enhancer.create(parameterTypes, args).asAny()
         }
     }

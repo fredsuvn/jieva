@@ -185,7 +185,7 @@ Proxy包提供 `ProxyClass` 用带进行动态代理, 使用 `反射`, `spring-c
 
 * `ProxyClass`: 代理目标 `Class` 的核心接口;
 * `ProxyMethod`: 代理的方法体;
-* `ProxyClassFactory`: 创建 `ProxyClass` 的工厂, 内置 `Reflection`, `spring-core` 和 `cglib` 实现;
+* `ProxyClassGenerator`: 创建 `ProxyClass` 的工厂, 内置 `Reflection`, `spring-core` 和 `cglib` 实现;
 
 .Java Examples
 [source,java]

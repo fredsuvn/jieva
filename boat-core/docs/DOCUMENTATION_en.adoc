@@ -184,7 +184,7 @@ Proxy package provides `ProxyClass` to proxy a class in runtime dynamically, by 
 
 * `ProxyClass`: Core interface to proxy target `Class`;
 * `ProxyMethod`: Core interface represents proxy method body;
-* `ProxyClassFactory`: Factory to create `ProxyClass`, built-in `Reflection`, `spring-core` and `cglib` implementation;
+* `ProxyClassGenerator`: Factory to create `ProxyClass`, built-in `Reflection`, `spring-core` and `cglib` implementation;
 
 .Java Examples
 [source,java]

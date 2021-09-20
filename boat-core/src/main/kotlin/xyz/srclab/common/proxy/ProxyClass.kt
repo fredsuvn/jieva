@@ -1,34 +1,35 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.lang.Current
+import xyz.srclab.common.base.currentClassLoader
 
 /**
- * Proxy class to create proxy instance.
+ * Represents a proxy class, used to instantiate proxy object.
  *
- * @see ProxyClassFactory
- * @see SpringProxyClassFactory
- * @see CglibProxyClassFactory
- * @see JdkProxyClassFactory
+ * @see ProxyClassGenerator
+ * @see SpringProxyClassGenerator
+ * @see CglibProxyClassGenerator
+ * @see JdkProxyClassGenerator
  */
 interface ProxyClass<T : Any> {
 
-    fun newInstance(): T
+    fun instantiate(): T
 
-    fun newInstance(parameterTypes: Array<Class<*>>?, args: Array<Any?>?): T
-
-    //fun getProxyClass(): Class<T>
+    fun instantiate(parameterTypes: Array<Class<*>>, args: Array<Any?>): T
 
     companion object {
 
+        /**
+         * Generates proxy class.
+         */
         @JvmStatic
         @JvmOverloads
-        fun <T : Any> newProxyClass(
-            proxiedClass: Class<T>,
-            proxiedMethods: Iterable<ProxyMethod<T>>,
-            classLoader: ClassLoader = Current.classLoader,
-            proxyClassFactory: ProxyClassFactory = ProxyClassFactory.DEFAULT,
+        fun <T : Any> generate(
+            sourceClass: Class<T>,
+            proxyMethods: Iterable<ProxyMethod<T>>,
+            classLoader: ClassLoader = currentClassLoader(),
+            proxyClassGenerator: ProxyClassGenerator = ProxyClassGenerator.DEFAULT,
         ): ProxyClass<T> {
-            return proxyClassFactory.create(proxiedClass, proxiedMethods, classLoader)
+            return proxyClassGenerator.generate(sourceClass, proxyMethods, classLoader)
         }
     }
 }

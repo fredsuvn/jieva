@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import xyz.srclab.common.proxy.ProxyClass;
 import xyz.srclab.common.proxy.ProxyMethod;
-import xyz.srclab.common.proxy.SuperInvoke;
+import xyz.srclab.common.proxy.SourceInvoke;
 import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Method;
@@ -22,7 +22,7 @@ public class ProxySample {
                 new ProxyMethod<Object>() {
 
                     @Override
-                    public boolean proxy(@NotNull Method method) {
+                    public boolean isProxy(@NotNull Method method) {
                         return method.getName().equals("toString")
                             && Arrays.equals(method.getParameterTypes(), new Class[0]);
                     }
@@ -31,7 +31,7 @@ public class ProxySample {
                     public Object invoke(
                         @NotNull Object proxied,
                         @NotNull Method proxiedMethod,
-                        @NotNull SuperInvoke superInvoke,
+                        @NotNull SourceInvoke superInvoke,
                         Object @NotNull [] args
                     ) {
                         return "Proxy[super: " + superInvoke.invoke(args) + "]";
