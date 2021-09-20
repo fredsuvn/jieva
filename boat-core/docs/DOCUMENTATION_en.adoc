@@ -244,7 +244,7 @@ Collect package extends collection function, supports `chain operation`, `multi-
 * `Collects`: Default utilities for Collection;
 * `Collecting`, `Mapping`: Collection interfaces provide chain operation and integrates common collection interface functions (such as `Iterable`, `Collection`, `Set`, `List`);
 * `IterableType`, `MapType`: Meta type interfaces for generic Collection types;
-* `MultiMaps`: `MultiMaps` provides multi-values `Map` such as `SetMap`, `MutableSetMap`, `ListMap` and `MutableListMap`;
+* `MultiMaps.kt`: `MultiMaps.kt` provides multi-values `Map` such as `SetMap`, `MutableSetMap`, `ListMap` and `MutableListMap`;
 * `CopyOnWriteMap`: Map for copy-on-write operation;
 
 .Java Examples

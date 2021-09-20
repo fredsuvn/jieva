@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.asAny
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
 import kotlin.collections.joinTo as joinToKt
@@ -11,18 +11,10 @@ import kotlin.collections.joinToString as joinToStringKt
 
 private const val NOT_ARRAY_TYPE_PREFIX = "Not a array type"
 
-fun <T> newArray(vararg elements: T): Array<T> {
-    val componentType = elements.javaClass.componentType
-    val array = componentType.newArray<T>(elements.size)
-    for (i in elements.indices) {
-        array[i] = elements[i]
-    }
-    return array
+fun <T> asArray(vararg elements: T): Array<T> {
+    return elements.asAny()
 }
 
-/**
- * Create new array of which component type is [this].
- */
 fun <T> Type.newArray(length: Int): Array<T> {
     return java.lang.reflect.Array.newInstance(this.rawClass, length).asAny()
 }
@@ -32,12 +24,12 @@ fun <T> Type.newArray(length: Int): Array<T> {
  * or throws [IllegalArgumentException] if given object is not an array.
  */
 fun <T> Any.arrayAsList(): MutableList<T> {
-    return arrayAsListOrNull() ?: throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
+    return arrayAsListOrNull() ?: throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: $this")
 }
 
 /**
  * Returns a fixed-size array associated given array,
- * or null if given object if not an array.
+ * or null if given object is not an array.
  */
 fun <T> Any.arrayAsListOrNull(): MutableList<T>? {
     return when (this) {

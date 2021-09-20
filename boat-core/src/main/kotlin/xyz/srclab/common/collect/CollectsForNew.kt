@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.asAny
 import kotlin.collections.toList as toListKt
 
 fun <T> newSet(vararg keyValues: T): LinkedHashSet<T> {

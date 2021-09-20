@@ -4,6 +4,9 @@ import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
 
+/**
+ * Copy-On-Write [Map].
+ */
 open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
     map: Map<out K, V> = emptyMap(),
     private val newMapFun: (Map<out K, V>) -> MutableMap<K, V> = { HashMap(it) }
