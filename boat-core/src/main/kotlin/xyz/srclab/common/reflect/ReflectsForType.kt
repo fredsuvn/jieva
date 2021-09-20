@@ -6,11 +6,11 @@ package xyz.srclab.common.reflect
 import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.asAny
 import java.lang.reflect.*
 
 val Type.isArray: Boolean
-    @JvmName("isArray") get() {
+    get() {
         return when (this) {
             is Class<*> -> this.isArray
             is GenericArrayType -> true
@@ -19,7 +19,7 @@ val Type.isArray: Boolean
     }
 
 val Type.componentTypeOrNull: Type?
-    @JvmName("componentTypeOrNull") get() {
+    get() {
         return when (this) {
             is Class<*> -> this.componentType
             is GenericArrayType -> this.genericComponentType
@@ -28,12 +28,12 @@ val Type.componentTypeOrNull: Type?
     }
 
 val ParameterizedType.rawClass: Class<*>
-    @JvmName("rawClass") get() {
+    get() {
         return this.rawType.asAny()
     }
 
 val GenericArrayType.rawClass: Class<*>
-    @JvmName("rawClass") get() {
+    get() {
         var deep = 0
         var componentType = this.genericComponentType
         while (componentType is GenericArrayType) {
@@ -53,7 +53,7 @@ val Type.rawClass: Class<*>
         Accepted(ParameterizedType::class),
         Accepted(GenericArrayType::class),
     )
-    @JvmName("rawClass") @Throws(IllegalArgumentException::class)
+    @Throws(IllegalArgumentException::class)
     get() {
         return this.rawClassOrNull ?: throw IllegalArgumentException(
             "Only Class, ParameterizedType or GenericArrayType has raw class: $this"
@@ -61,7 +61,7 @@ val Type.rawClass: Class<*>
     }
 
 val Type.rawClassOrNull: Class<*>?
-    @JvmName("rawClassOrNull") get() {
+    get() {
         return when (this) {
             is Class<*> -> this
             is ParameterizedType -> this.rawClass
@@ -71,7 +71,7 @@ val Type.rawClassOrNull: Class<*>?
     }
 
 val TypeVariable<*>.upperBound: Type
-    @JvmName("upperBound") get() {
+    get() {
         val bounds = this.bounds
         return if (bounds.isEmpty()) {
             Any::class.java
@@ -81,7 +81,7 @@ val TypeVariable<*>.upperBound: Type
     }
 
 val WildcardType.upperBound: Type
-    @JvmName("upperBound") get() {
+    get() {
         val upperBounds = this.upperBounds
         return if (upperBounds.isEmpty()) {
             Any::class.java
@@ -91,7 +91,7 @@ val WildcardType.upperBound: Type
     }
 
 val Type.upperBound: Type
-    @JvmName("upperBound") get() {
+    get() {
         return when (this) {
             is TypeVariable<*> -> this.upperBound
             is WildcardType -> this.upperBound
@@ -100,7 +100,6 @@ val Type.upperBound: Type
     }
 
 val WildcardType.lowerBound: Type?
-    @JvmName("lowerBound")
     get() {
         val lowerBounds = this.lowerBounds
         return if (lowerBounds.isEmpty()) {
@@ -111,7 +110,7 @@ val WildcardType.lowerBound: Type?
     }
 
 val Type.lowerBound: Type?
-    @JvmName("lowerBound") get() {
+    get() {
         return when (this) {
             is WildcardType -> this.lowerBound
             is TypeVariable<*> -> null
@@ -136,7 +135,6 @@ val Type.typeArguments: Map<TypeVariable<*>, Type>
         Accepted(ParameterizedType::class),
         Accepted(GenericArrayType::class),
     )
-    @JvmName("typeArguments")
     get() {
 
         fun Type.resolveTypeParameters(to: MutableMap<TypeVariable<*>, Type>) {

@@ -3,12 +3,13 @@
 
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.asAny
 import java.lang.reflect.Constructor
 
 /**
  * @throws NoSuchMethodException
  */
+@JvmName("getConstructor")
 fun <T> Class<T>.constructor(vararg parameterTypes: Class<*>): Constructor<T> {
     return try {
         this.getConstructor(*parameterTypes)
@@ -17,6 +18,7 @@ fun <T> Class<T>.constructor(vararg parameterTypes: Class<*>): Constructor<T> {
     }
 }
 
+@JvmName("getConstructorOrNull")
 fun <T> Class<T>.constructorOrNull(vararg parameterTypes: Class<*>): Constructor<T>? {
     return try {
         this.getConstructor(*parameterTypes)
@@ -25,6 +27,7 @@ fun <T> Class<T>.constructorOrNull(vararg parameterTypes: Class<*>): Constructor
     }
 }
 
+@JvmName("getConstructors")
 fun <T> Class<T>.constructors(): List<Constructor<T>> {
     return this.constructors.asList().asAny()
 }
@@ -32,6 +35,7 @@ fun <T> Class<T>.constructors(): List<Constructor<T>> {
 /**
  * @throws NoSuchMethodException
  */
+@JvmName("getDeclaredConstructor")
 fun <T> Class<T>.declaredConstructor(vararg parameterTypes: Class<*>): Constructor<T> {
     return try {
         this.getDeclaredConstructor(*parameterTypes)
@@ -40,6 +44,7 @@ fun <T> Class<T>.declaredConstructor(vararg parameterTypes: Class<*>): Construct
     }
 }
 
+@JvmName("getDeclaredConstructorOrNull")
 fun <T> Class<T>.declaredConstructorOrNull(vararg parameterTypes: Class<*>): Constructor<T>? {
     return try {
         this.getDeclaredConstructor(*parameterTypes)
@@ -48,6 +53,7 @@ fun <T> Class<T>.declaredConstructorOrNull(vararg parameterTypes: Class<*>): Con
     }
 }
 
+@JvmName("getDeclaredConstructors")
 fun <T> Class<T>.declaredConstructors(): List<Constructor<T>> {
     return this.declaredConstructors.asList().asAny()
 }

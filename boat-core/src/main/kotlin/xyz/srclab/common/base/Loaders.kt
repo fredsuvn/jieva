@@ -3,6 +3,8 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.collect.map
+import xyz.srclab.common.reflect.toClass
+import xyz.srclab.common.reflect.toClassOrNull
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -17,16 +19,12 @@ import java.util.*
  */
 @JvmOverloads
 fun <T> CharSequence.loadClass(classLoader: ClassLoader = currentClassLoader()): Class<T> {
-    return Class.forName(this.toString(), true, classLoader).asAny()
+    return this.toClass(classLoader)
 }
 
 @JvmOverloads
 fun <T> CharSequence.loadClassOrNull(classLoader: ClassLoader = currentClassLoader()): Class<T>? {
-    return try {
-        Class.forName(this.toString(), true, classLoader)
-    } catch (e: ClassNotFoundException) {
-        null
-    }.asAny()
+    return this.toClassOrNull(classLoader)
 }
 
 @Throws(ResourceNotFoundException::class)

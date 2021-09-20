@@ -4,65 +4,71 @@
 package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
-import xyz.srclab.common.lang.Current
-import xyz.srclab.common.lang.Defaults
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.DOT_MATCHER
+import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.currentClassLoader
 import xyz.srclab.common.base.loadClass
+import java.lang.reflect.Modifier
+
+val Class<*>.isStatic: Boolean
+    get() {
+        return Modifier.isStatic(this.modifiers)
+    }
 
 val Class<*>.isBooleanType: Boolean
-    @JvmName("isBooleanType") get() {
+    get() {
         return this == Boolean::class.javaPrimitiveType || this == Boolean::class.javaObjectType
     }
 
 val Class<*>.isByteType: Boolean
-    @JvmName("isByteType") get() {
+    get() {
         return this == Byte::class.javaPrimitiveType || this == Byte::class.javaObjectType
     }
 
 val Class<*>.isShortType: Boolean
-    @JvmName("isShortType") get() {
+    get() {
         return this == Short::class.javaPrimitiveType || this == Short::class.javaObjectType
     }
 
 val Class<*>.isCharType: Boolean
-    @JvmName("isCharType") get() {
+    get() {
         return this == Char::class.javaPrimitiveType || this == Char::class.javaObjectType
     }
 
 val Class<*>.isIntType: Boolean
-    @JvmName("isIntType") get() {
+    get() {
         return this == Int::class.javaPrimitiveType || this == Int::class.javaObjectType
     }
 
 val Class<*>.isLongType: Boolean
-    @JvmName("isLongType") get() {
+    get() {
         return this == Long::class.javaPrimitiveType || this == Long::class.javaObjectType
     }
 
 val Class<*>.isFloatType: Boolean
-    @JvmName("isFloatType") get() {
+    get() {
         return this == Float::class.javaPrimitiveType || this == Float::class.javaObjectType
     }
 
 val Class<*>.isDoubleType: Boolean
-    @JvmName("isDoubleType") get() {
+    get() {
         return this == Double::class.javaPrimitiveType || this == Double::class.javaObjectType
     }
 
 val Class<*>.isVoidType: Boolean
-    @JvmName("isVoidType") get() {
+    get() {
         return this == Void::class.javaPrimitiveType || this == Void::class.javaObjectType
     }
 
 val Class<*>.shortName: String
-    @JvmName("shortName") get() {
+    get() {
         val name = this.name
-        val lastDotIndex = Defaults.DOT_MATCHER.lastIndexIn(name)
+        val lastDotIndex = DOT_MATCHER.lastIndexIn(name)
         return if (lastDotIndex < 0) name else name.substring(lastDotIndex + 1, name.length)
     }
 
 val <T> Class<T>.arrayClass: Class<Array<T>>
-    @JvmName("arrayClass") get() {
+    get() {
         if (this.isArray) {
             return "[${this.name}".loadClass()
         }
@@ -76,71 +82,43 @@ val <T> Class<T>.arrayClass: Class<Array<T>>
             Float::class.javaPrimitiveType -> "[F"
             Double::class.javaPrimitiveType -> "[D"
             Void::class.javaPrimitiveType -> "[V"
-            else -> {
-                "[L" + this.canonicalName + ";"
-            }
+            else -> "[L${this.name};"
         }
-        return arrayClassName.loadClass()
+        return arrayClassName.loadClass(this.classLoader)
     }
 
 /**
  * @throws ClassNotFoundException
  */
 @JvmOverloads
-fun <T> CharSequence.toClass(classLoader: ClassLoader = Current.classLoader): Class<T> {
-    return this.loadClass(classLoader)
+fun <T> CharSequence.toClass(classLoader: ClassLoader = currentClassLoader()): Class<T> {
+    return Class.forName(this.toString(), true, classLoader).asAny()
 }
 
-/**
- * @throws ClassNotFoundException
- * @throws NoSuchMethodException
- */
 @JvmOverloads
-fun <T> CharSequence.newInstance(classLoader: ClassLoader = Current.classLoader): T {
-    return newInstance(classLoader, ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
-}
-
-/**
- * @throws ClassNotFoundException
- * @throws NoSuchMethodException
- */
-@JvmOverloads
-fun <T> CharSequence.newInstance(
-    classLoader: ClassLoader = Current.classLoader,
-    parameterTypes: Array<out Class<*>>,
-    args: Array<out Any?>
-): T {
-    val clazz: Class<T> = this.loadClass(classLoader)
-    return clazz.newInstance(parameterTypes, args)
-}
-
-/**
- * @throws ClassNotFoundException
- * @throws NoSuchMethodException
- */
-@JvmOverloads
-fun <T> CharSequence.newInstanceWithArguments(
-    classLoader: ClassLoader = Current.classLoader,
-    vararg args: Any
-): T {
-    return newInstance(
-        classLoader,
-        args.map { it.javaClass }.toTypedArray(),
-        args
-    )
+fun <T> CharSequence.toClassOrNull(classLoader: ClassLoader = currentClassLoader()): Class<T>? {
+    return try {
+        Class.forName(this.toString(), true, classLoader)
+    } catch (e: ClassNotFoundException) {
+        null
+    }.asAny()
 }
 
 /**
  * @throws NoSuchMethodException
  */
-fun <T> Class<*>.newInstance(): T {
-    return newInstance(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
+fun <T> Class<*>.instantiate(): T {
+    return instantiate(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
+}
+
+fun <T> Class<*>.instantiateOrNull(): T? {
+    return instantiateOrNull(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
 }
 
 /**
  * @throws NoSuchMethodException
  */
-fun <T> Class<*>.newInstance(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
+fun <T> Class<*>.instantiate(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
     val constructor = try {
         this.getConstructor(*parameterTypes)
     } catch (e: NoSuchMethodException) {
@@ -149,11 +127,69 @@ fun <T> Class<*>.newInstance(parameterTypes: Array<out Class<*>>, args: Array<ou
     return constructor.newInstance(*args).asAny()
 }
 
+fun <T> Class<*>.instantiateOrNull(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T? {
+    val constructor = try {
+        this.getConstructor(*parameterTypes)
+    } catch (e: NoSuchMethodException) {
+        null
+    }
+    return constructor?.newInstance(*args)?.asAny()
+}
+
 /**
  * @throws NoSuchMethodException
  */
-fun <T> Class<*>.newInstanceWithArguments(vararg args: Any): T {
-    return newInstance(args.map { it.javaClass }.toTypedArray(), args)
+fun <T> Class<*>.instantiateWithArguments(vararg args: Any): T {
+    return instantiate(args.map { it.javaClass }.toTypedArray(), args)
+}
+
+/**
+ * @throws ClassNotFoundException
+ * @throws NoSuchMethodException
+ */
+@JvmOverloads
+fun <T> CharSequence.toInstance(classLoader: ClassLoader = currentClassLoader()): T {
+    return toClass<T>(classLoader).instantiate()
+}
+
+@JvmOverloads
+fun <T> CharSequence.toInstanceOrNull(classLoader: ClassLoader = currentClassLoader()): T? {
+    return toClassOrNull<T>(classLoader)?.instantiateOrNull()
+}
+
+/**
+ * @throws ClassNotFoundException
+ * @throws NoSuchMethodException
+ */
+@JvmOverloads
+fun <T> CharSequence.toInstance(
+    classLoader: ClassLoader = currentClassLoader(),
+    parameterTypes: Array<out Class<*>>,
+    args: Array<out Any?>
+): T {
+    return toClass<T>(classLoader).instantiate(parameterTypes, args)
+}
+
+@JvmOverloads
+fun <T> CharSequence.toInstanceOrNull(
+    classLoader: ClassLoader = currentClassLoader(),
+    parameterTypes: Array<out Class<*>>,
+    args: Array<out Any?>
+): T? {
+    return toClassOrNull<T>(classLoader)?.instantiateOrNull(parameterTypes, args)
+}
+
+/**
+ * @throws ClassNotFoundException
+ * @throws NoSuchMethodException
+ */
+@JvmOverloads
+fun <T> CharSequence.toInstanceWithArguments(classLoader: ClassLoader = currentClassLoader(), vararg args: Any): T {
+    return toInstance(
+        classLoader,
+        args.map { it.javaClass }.toTypedArray(),
+        args
+    )
 }
 
 fun Class<*>.toWrapperClass(): Class<*> {

@@ -3,12 +3,13 @@
 
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.asAny
 import java.lang.reflect.Method
 
 /**
  * @throws NoSuchMethodException
  */
+@JvmName("getMethod")
 fun Class<*>.method(name: String, vararg parameterTypes: Class<*>): Method {
     return try {
         this.getMethod(name, *parameterTypes)
@@ -17,6 +18,7 @@ fun Class<*>.method(name: String, vararg parameterTypes: Class<*>): Method {
     }
 }
 
+@JvmName("getMethodOrNull")
 fun Class<*>.methodOrNull(
     name: String, vararg parameterTypes: Class
     <*>
@@ -28,6 +30,7 @@ fun Class<*>.methodOrNull(
     }
 }
 
+@JvmName("getMethods")
 fun Class<*>.methods(): List<Method> {
     return this.methods.asList()
 }
@@ -35,6 +38,7 @@ fun Class<*>.methods(): List<Method> {
 /**
  * @throws NoSuchMethodException
  */
+@JvmName("getDeclaredMethod")
 fun Class<*>.declaredMethod(name: String, vararg parameterTypes: Class<*>): Method {
     return try {
         this.getDeclaredMethod(name, *parameterTypes)
@@ -43,6 +47,7 @@ fun Class<*>.declaredMethod(name: String, vararg parameterTypes: Class<*>): Meth
     }
 }
 
+@JvmName("getDeclaredMethodOrNull")
 fun Class<*>.declaredMethodOrNull(name: String, vararg parameterTypes: Class<*>): Method? {
     return try {
         this.getDeclaredMethod(name, *parameterTypes)
@@ -51,29 +56,39 @@ fun Class<*>.declaredMethodOrNull(name: String, vararg parameterTypes: Class<*>)
     }
 }
 
+@JvmName("getDeclaredMethods")
 fun Class<*>.declaredMethods(): List<Method> {
     return this.declaredMethods.asList()
 }
 
 /**
+ * Return public or declared method.
+ *
  * @throws NoSuchMethodException
  */
+@JvmName("getOwnedMethod")
 fun Class<*>.ownedMethod(name: String, vararg parameterTypes: Class<*>): Method {
-    return ownedMethodOrNull(name, *parameterTypes) ?: throw NoSuchMethodException(
-        "name: $name, parameters: ${parameterTypes.contentToString()}"
-    )
+    return methodOrNull(name, *parameterTypes) ?: declaredMethod(name, *parameterTypes)
 }
 
+/**
+ * Return public or declared method.
+ */
+@JvmName("getOwnedMethodOrNull")
 fun Class<*>.ownedMethodOrNull(name: String, vararg parameterTypes: Class<*>): Method? {
-    return searchMethodOrNull(name, parameterTypes, false)
+    return methodOrNull(name, *parameterTypes) ?: declaredMethodOrNull(name, *parameterTypes)
 }
 
+/**
+ * Return declared and public methods.
+ */
+@JvmName("getOwnedMethods")
 fun Class<*>.ownedMethods(): List<Method> {
     val set = LinkedHashSet<Method>()
-    set.addAll(this.methods())
-    for (declaredMethod in this.declaredMethods()) {
-        if (!set.contains(declaredMethod)) {
-            set.add(declaredMethod)
+    set.addAll(this.declaredMethods)
+    for (method in this.methods) {
+        if (!set.contains(method)) {
+            set.add(method)
         }
     }
     return set.toList()
@@ -85,15 +100,7 @@ fun Class<*>.searchMethodOrNull(
     parameterTypes: Array<out Class<*>>,
     deep: Boolean = true,
 ): Method? {
-    var method = try {
-        this.getMethod(name, *parameterTypes)
-    } catch (e: NoSuchMethodException) {
-        null
-    }
-    if (method !== null) {
-        return method
-    }
-    method = declaredMethodOrNull(name, *parameterTypes)
+    var method = ownedMethodOrNull(name, *parameterTypes)
     if (method !== null) {
         return method
     }
@@ -112,31 +119,34 @@ fun Class<*>.searchMethodOrNull(
 }
 
 @JvmOverloads
-fun Class<*>.searchMethods(deep: Boolean = true, predicate: (Method) -> Boolean = { true }): List<Method> {
-    val result = mutableListOf<Method>()
+fun <C : MutableCollection<in Method>> Class<*>.searchMethods(
+    destination: C,
+    deep: Boolean = true,
+    predicate: (Method) -> Boolean = { true }
+): C {
     for (method in this.methods) {
         if (predicate(method)) {
-            result.add(method)
+            destination.add(method)
         }
     }
     for (method in this.declaredMethods) {
-        if (!result.contains(method) && predicate(method)) {
-            result.add(method)
+        if (!destination.contains(method) && predicate(method)) {
+            destination.add(method)
         }
     }
     if (!deep) {
-        return result
+        return destination
     }
     var superClass = this.superclass
     while (superClass !== null) {
         for (method in superClass.declaredMethods) {
-            if (!result.contains(method) && predicate(method)) {
-                result.add(method)
+            if (!destination.contains(method) && predicate(method)) {
+                destination.add(method)
             }
         }
         superClass = superClass.superclass
     }
-    return result
+    return destination
 }
 
 /**
@@ -191,12 +201,6 @@ fun <T> Method.enforceStatic(vararg args: Any?): T {
     }
 }
 
-fun Method.canOverrideBy(clazz: Class<*>): Boolean {
-    if (this.isPrivate || this.isFinal) {
-        return false
-    }
-    if (!this.declaringClass.isAssignableFrom(clazz)) {
-        return false
-    }
-    return true
+fun Array<out Class<*>>.parameterTypesToString(): String {
+    return this.joinToString { it.name }
 }

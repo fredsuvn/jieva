@@ -7,81 +7,84 @@ import java.lang.reflect.Member
 import java.lang.reflect.Modifier
 
 val Member.isPublic: Boolean
-    @JvmName("isPublic") get() {
+    get() {
         return Modifier.isPublic(this.modifiers)
     }
 
 val Member.isPrivate: Boolean
-    @JvmName("isPrivate") get() {
+    get() {
         return Modifier.isPrivate(this.modifiers)
     }
 
 val Member.isProtected: Boolean
-    @JvmName("isProtected") get() {
+    get() {
         return Modifier.isProtected(this.modifiers)
     }
 
 val Member.isStatic: Boolean
-    @JvmName("isStatic") get() {
+    get() {
         return Modifier.isStatic(this.modifiers)
     }
 
 val Member.isFinal: Boolean
-    @JvmName("isFinal") get() {
+    get() {
         return Modifier.isFinal(this.modifiers)
     }
 
 val Member.isSynchronized: Boolean
-    @JvmName("isSynchronized") get() {
+    get() {
         return Modifier.isSynchronized(this.modifiers)
     }
 
 val Member.isVolatile: Boolean
-    @JvmName("isVolatile") get() {
+    get() {
         return Modifier.isVolatile(this.modifiers)
     }
 
 val Member.isTransient: Boolean
-    @JvmName("isTransient") get() {
+    get() {
         return Modifier.isTransient(this.modifiers)
     }
 
 val Member.isNative: Boolean
-    @JvmName("isNative") get() {
+    get() {
         return Modifier.isNative(this.modifiers)
     }
 
 val Member.isInterface: Boolean
-    @JvmName("isInterface") get() {
+    get() {
         return Modifier.isInterface(this.modifiers)
     }
 
 val Member.isAbstract: Boolean
-    @JvmName("isAbstract") get() {
+    get() {
         return Modifier.isAbstract(this.modifiers)
     }
 
 val Member.isStrict: Boolean
-    @JvmName("isStrict") get() {
+    get() {
         return Modifier.isStrict(this.modifiers)
     }
 
 /**
- * Returns whether [clazz] can use [this]
+ * Returns whether [this] is accessible for given [request].
  */
-fun Member.isAccessibleFor(clazz: Class<*>): Boolean {
+fun Member.isAccessibleFor(request: Class<*>): Boolean {
     if (this.isPublic) {
         return true
     }
-    if (this.isPrivate) {
-        return this.declaringClass == clazz
+    if (this.declaringClass == request) {
+        return true
     }
-    val declaringPackage = this.declaringClass.`package`
-    if (declaringPackage == clazz.`package`) {
+    if (this.isPrivate) {
+        //member inner class
+        return request.declaringClass == this.declaringClass && !request.isStatic
+    }
+    if (this.declaringClass.`package` == request.`package`) {
         return true
     }
     if (this.isProtected) {
-        return this.declaringClass.isAssignableFrom(clazz)
+        return this.declaringClass.isAssignableFrom(request)
     }
     return false
 }

@@ -3,9 +3,25 @@ package xyz.srclab.common.reflect
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
+/**
+ * Represents a reference of a type:
+ *
+ * ```
+ * TypeRef<String> stringTypeRef = TypeRef.of();
+ * TypeRef<Map<String, String>> mapTypeRef = TypeRef.of();
+ * ```
+ *
+ * Then you can simply get target type:
+ *
+ * ```
+ * //Class type: String
+ * Type stringType = stringTypeRef.getType();
+ * //Parameterized type: Map<String, String>
+ * Type mapType = mapTypeRef.getType();
+ * ```
+ */
 abstract class TypeRef<T> {
 
-    @get:JvmName("type")
     val type: Type
 
     protected constructor() {
@@ -43,10 +59,9 @@ abstract class TypeRef<T> {
     companion object {
 
         @JvmStatic
-        val <T> T.typeRef: TypeRef<T>
-            @JvmName("of") get() {
-                return object : TypeRef<T>() {}
-            }
+        fun <T> of(): TypeRef<T> {
+            return object : TypeRef<T>() {}
+        }
 
         @JvmStatic
         fun <T> of(type: Type): TypeRef<T> {

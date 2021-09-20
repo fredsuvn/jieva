@@ -3,12 +3,13 @@
 
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.asAny
 import java.lang.reflect.Field
 
 /**
  * @throws NoSuchFieldException
  */
+@JvmName("getField")
 fun Class<*>.field(name: String): Field {
     return try {
         this.getField(name)
@@ -17,6 +18,7 @@ fun Class<*>.field(name: String): Field {
     }
 }
 
+@JvmName("getFieldOrNull")
 fun Class<*>.fieldOrNull(name: String): Field? {
     return try {
         this.getField(name)
@@ -25,6 +27,7 @@ fun Class<*>.fieldOrNull(name: String): Field? {
     }
 }
 
+@JvmName("getFields")
 fun Class<*>.fields(): List<Field> {
     return this.fields.asList()
 }
@@ -32,6 +35,7 @@ fun Class<*>.fields(): List<Field> {
 /**
  * @throws NoSuchFieldException
  */
+@JvmName("getDeclaredField")
 fun Class<*>.declaredField(name: String): Field {
     return try {
         this.getDeclaredField(name)
@@ -40,6 +44,7 @@ fun Class<*>.declaredField(name: String): Field {
     }
 }
 
+@JvmName("getDeclaredFieldOrNull")
 fun Class<*>.declaredFieldOrNull(name: String): Field? {
     return try {
         this.getDeclaredField(name)
@@ -48,6 +53,7 @@ fun Class<*>.declaredFieldOrNull(name: String): Field? {
     }
 }
 
+@JvmName("getDeclaredFields")
 fun Class<*>.declaredFields(): List<Field> {
     return this.declaredFields.asList()
 }
@@ -57,26 +63,29 @@ fun Class<*>.declaredFields(): List<Field> {
  *
  * @throws NoSuchFieldException
  */
+@JvmName("getOwnedField")
 fun Class<*>.ownedField(name: String): Field {
-    return ownedFieldOrNull(name) ?: throw NoSuchFieldException(name)
+    return fieldOrNull(name) ?: declaredField(name)
 }
 
 /**
  * Return public or declared field.
  */
+@JvmName("getOwnedFieldOrNull")
 fun Class<*>.ownedFieldOrNull(name: String): Field? {
-    return searchFieldOrNull(name, false)
+    return fieldOrNull(name) ?: declaredFieldOrNull(name)
 }
 
 /**
- * Return public and declared fields.
+ * Return declared and public fields.
  */
+@JvmName("getOwnedFields")
 fun Class<*>.ownedFields(): List<Field> {
     val set = LinkedHashSet<Field>()
-    set.addAll(this.fields())
-    for (declaredField in declaredFields()) {
-        if (!set.contains(declaredField)) {
-            set.add(declaredField)
+    set.addAll(this.declaredFields)
+    for (field in this.fields) {
+        if (!set.contains(field)) {
+            set.add(field)
         }
     }
     return set.toList()
@@ -84,15 +93,7 @@ fun Class<*>.ownedFields(): List<Field> {
 
 @JvmOverloads
 fun Class<*>.searchFieldOrNull(name: String, deep: Boolean = true): Field? {
-    var field = try {
-        this.getField(name)
-    } catch (e: NoSuchFieldException) {
-        null
-    }
-    if (field !== null) {
-        return field
-    }
-    field = declaredFieldOrNull(name)
+    var field = ownedFieldOrNull(name)
     if (field !== null) {
         return field
     }
@@ -111,38 +112,41 @@ fun Class<*>.searchFieldOrNull(name: String, deep: Boolean = true): Field? {
 }
 
 @JvmOverloads
-fun Class<*>.searchFields(deep: Boolean = true, predicate: (Field) -> Boolean = { true }): List<Field> {
-    val result = mutableListOf<Field>()
+fun <C : MutableCollection<in Field>> Class<*>.searchFields(
+    destination: C,
+    deep: Boolean = true,
+    predicate: (Field) -> Boolean = { true }
+): C {
     for (field in this.fields) {
         if (predicate(field)) {
-            result.add(field)
+            destination.add(field)
         }
     }
     for (field in this.declaredFields) {
-        if (!result.contains(field) && predicate(field)) {
-            result.add(field)
+        if (!destination.contains(field) && predicate(field)) {
+            destination.add(field)
         }
     }
     if (!deep) {
-        return result
+        return destination
     }
     var superClass = this.superclass
     while (superClass !== null) {
         for (field in superClass.declaredFields) {
-            if (!result.contains(field) && predicate(field)) {
-                result.add(field)
+            if (!destination.contains(field) && predicate(field)) {
+                destination.add(field)
             }
         }
         superClass = superClass.superclass
     }
-    return result
+    return destination
 }
 
 /**
  * @throws IllegalAccessException
  */
-@JvmOverloads
 @JvmName("getFieldValue")
+@JvmOverloads
 fun <T> Field.getValue(owner: Any?, force: Boolean = false): T {
     return try {
         if (force) {
@@ -157,8 +161,8 @@ fun <T> Field.getValue(owner: Any?, force: Boolean = false): T {
 /**
  * @throws IllegalAccessException
  */
-@JvmOverloads
 @JvmName("setFieldValue")
+@JvmOverloads
 fun Field.setValue(owner: Any?, value: Any?, force: Boolean = false) {
     try {
         if (force) {
@@ -176,7 +180,7 @@ fun Field.setValue(owner: Any?, value: Any?, force: Boolean = false) {
  */
 @JvmOverloads
 fun <T> Class<*>.getFieldValue(name: String, owner: Any?, force: Boolean = false): T {
-    val field = field(name)
+    val field = if (force) ownedField(name) else field(name)
     return field.getValue(owner, force)
 }
 
@@ -186,7 +190,7 @@ fun <T> Class<*>.getFieldValue(name: String, owner: Any?, force: Boolean = false
  */
 @JvmOverloads
 fun Class<*>.setFieldValue(name: String, owner: Any?, value: Any?, force: Boolean = false) {
-    val field = field(name)
+    val field = if (force) ownedField(name) else field(name)
     return field.setValue(value, owner, force)
 }
 
@@ -213,26 +217,27 @@ fun Class<*>.setStaticFieldValue(name: String, value: Any?, force: Boolean = fal
 }
 
 /**
+ * Uses [searchFieldOrNull] to find deep field and gets its value.
+ *
  * @throws NoSuchFieldException
- * @throws IllegalAccessException
  */
-@JvmOverloads
-fun <T> Class<*>.getDeepFieldValue(name: String, owner: Any?, force: Boolean = false): T {
+fun <T> Class<*>.getDeepFieldValue(name: String, owner: Any?): T {
     val field = searchFieldOrNull(name, true)
     if (field === null) {
         throw NoSuchFieldException(name)
     }
-    return field.getValue(owner, force)
+    return field.getValue(owner, true)
 }
 
 /**
+ * Uses [searchFieldOrNull] to find deep field and sets its value.
+ *
  * @throws NoSuchFieldException
- * @throws IllegalAccessException
  */
-fun Class<*>.setDeepFieldValue(name: String, owner: Any?, value: Any?, force: Boolean = false) {
+fun Class<*>.setDeepFieldValue(name: String, owner: Any?, value: Any?) {
     val field = searchFieldOrNull(name, true)
     if (field === null) {
         throw NoSuchFieldException(name)
     }
-    return field.setValue(owner, value, force)
+    return field.setValue(owner, value, true)
 }
