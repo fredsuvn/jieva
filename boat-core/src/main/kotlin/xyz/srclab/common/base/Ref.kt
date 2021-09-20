@@ -12,7 +12,7 @@ import java.util.function.Consumer
  * Date dateValue = Ref.of(intValue)
  *     .apply(StringUtils::intToString)
  *     .accept(SystemUtils::printString)
- *     .apply(DateUtils::stringToDate)
+ *     .with(DateUtils::stringToDate)
  *     .get();
  * ```
  *
@@ -24,13 +24,11 @@ import java.util.function.Consumer
  * Date dateValue = DateUtils.stringToDate(stringValue);
  * ```
  *
- * It also provides a mutable place for final variable such as local variable in Java lambda expression:
+ * It also provides a mutable reference for final variable:
  *
  * ```
  * Ref<String> ref = Ref.of("1");
  * List<String> list = Arrays.asList("-1", "-2", "-3");
- *
- * //here <String> should be final without Ref
  * list.forEach(i -> ref.set(ref.get() + i));
  * ```
  *
@@ -90,9 +88,9 @@ interface Ref<T : Any> : GenericAccessor<T> {
     /**
      * If value of this [Ref] is `non-null`, given [action] will be executed, else not.
      *
-     * Result of [action] execution will be set in this [Ref], and returns this [Ref] as target generic type.
+     * Result of [action] execution will be set in this [Ref], and returns `this` itself as target generic type.
      */
-    fun <R : Any> acceptApply(action: (T) -> R): Ref<R> {
+    fun <R : Any> with(action: (T) -> R): Ref<R> {
         val v = getOrNull()
         val thisAs = this.asAny<Ref<R>>()
         if (v === null) {
@@ -106,9 +104,9 @@ interface Ref<T : Any> : GenericAccessor<T> {
     /**
      * Executes given [action].
      *
-     * Result of [action] execution will be set in this [Ref], and returns this [Ref] as target generic type.
+     * Result of [action] execution will be set in this [Ref], and returns `this` itself as target generic type.
      */
-    fun <R : Any> acceptApplyOrNull(action: (T?) -> R?): Ref<R> {
+    fun <R : Any> withOrNull(action: (T?) -> R?): Ref<R> {
         val v = getOrNull()
         val thisAs = this.asAny<Ref<R>>()
         thisAs.set(action(v))

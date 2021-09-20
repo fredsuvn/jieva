@@ -149,24 +149,24 @@ interface Processing {
         @JvmName("of")
         @JvmStatic
         fun Process.toProcessing(): Processing {
-            return object : Processing {
+            return ProcessingImpl(this)
+        }
 
-                override val process: Process = this@toProcessing
+        private class ProcessingImpl(override val process: Process) : Processing {
 
-                override fun equals(other: Any?): Boolean {
-                    if (other is Processing) {
-                        return this@toProcessing == other.process
-                    }
-                    return false
+            override fun equals(other: Any?): Boolean {
+                if (other is Processing) {
+                    return this.process == other.process
                 }
+                return false
+            }
 
-                override fun hashCode(): Int {
-                    return this@toProcessing.hashCode()
-                }
+            override fun hashCode(): Int {
+                return this.process.hashCode()
+            }
 
-                override fun toString(): String {
-                    return this@toProcessing.toString()
-                }
+            override fun toString(): String {
+                return this.process.toString()
             }
         }
     }

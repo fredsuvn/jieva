@@ -53,6 +53,12 @@ interface SpecParser<S> {
             return getClassNameSpecParser(strict).parseFirstOrNull(this)
         }
 
+        /**
+         * Returns a spec parser which parses chars to instance.
+         *
+         * @see ClassNameSpecParser
+         * @see StrictClassNameSpecParser
+         */
         @Throws(SpecParsingException::class)
         @JvmStatic
         @JvmOverloads
