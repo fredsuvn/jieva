@@ -4,8 +4,8 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
 import com.google.common.collect.MapMaker
 import xyz.srclab.common.base.CacheableBuilder
-import xyz.srclab.common.lang.Defaults
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.availableProcessors
 import java.time.Duration
 import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
 import com.google.common.cache.RemovalCause as guavaRemovalCause
@@ -75,11 +75,11 @@ interface Cache<K : Any, V : Any> {
 
     fun expiry(key: K, expirySeconds: Long)
 
-    fun expiry(key: K, expirySeconds: Duration)
+    fun expiry(key: K, expiry: Duration)
 
     fun expiryAll(keys: Iterable<K>, expirySeconds: Long)
 
-    fun expiryAll(keys: Iterable<K>, expirySeconds: Duration)
+    fun expiryAll(keys: Iterable<K>, expiry: Duration)
 
     fun invalidate(key: K)
 
@@ -312,7 +312,7 @@ interface Cache<K : Any, V : Any> {
         }
 
         /**
-         * Return a new fast Cache by `Weak Reference Map`.
+         * Return a Cache by `Weak Reference Map`.
          *
          * Note:
          *
@@ -320,11 +320,13 @@ interface Cache<K : Any, V : Any> {
          * * Do not update value object -- it should be seen as immutable;
          * * It is thread-safe;
          */
+        @JvmOverloads
         @JvmStatic
-        fun <K : Any, V : Any> newFastCache(): Cache<K, V> {
-            return MapCache(MapMaker().concurrencyLevel(Defaults.concurrencyLevel).weakValues().makeMap())
+        fun <K : Any, V : Any> newWeakCache(concurrencyLevel: Int = availableProcessors()): Cache<K, V> {
+            return MapCache(MapMaker().concurrencyLevel(concurrencyLevel).weakValues().makeMap())
         }
 
+        @JvmName("ofMap")
         @JvmStatic
         fun <K : Any, V : Any> MutableMap<K, V>.toCache(): Cache<K, V> {
             return MapCache(this)

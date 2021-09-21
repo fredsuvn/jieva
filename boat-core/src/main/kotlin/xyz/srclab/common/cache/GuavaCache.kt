@@ -67,13 +67,13 @@ open class GuavaCache<K : Any, V : Any>(
     override fun expiry(key: K, expirySeconds: Long) {
     }
 
-    override fun expiry(key: K, expirySeconds: Duration) {
+    override fun expiry(key: K, expiry: Duration) {
     }
 
     override fun expiryAll(keys: Iterable<K>, expirySeconds: Long) {
     }
 
-    override fun expiryAll(keys: Iterable<K>, expirySeconds: Duration) {
+    override fun expiryAll(keys: Iterable<K>, expiry: Duration) {
     }
 
     override fun invalidate(key: K) {

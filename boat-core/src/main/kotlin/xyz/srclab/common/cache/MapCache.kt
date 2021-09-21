@@ -75,13 +75,13 @@ class MapCache<K : Any, V : Any>(private val map: MutableMap<K, V>) : Cache<K, V
     override fun expiry(key: K, expirySeconds: Long) {
     }
 
-    override fun expiry(key: K, expirySeconds: Duration) {
+    override fun expiry(key: K, expiry: Duration) {
     }
 
     override fun expiryAll(keys: Iterable<K>, expirySeconds: Long) {
     }
 
-    override fun expiryAll(keys: Iterable<K>, expirySeconds: Duration) {
+    override fun expiryAll(keys: Iterable<K>, expiry: Duration) {
     }
 
     override fun invalidate(key: K) {
