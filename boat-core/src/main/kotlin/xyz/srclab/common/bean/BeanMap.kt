@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.base.asAny
 import xyz.srclab.common.convert.Converter
-import xyz.srclab.common.lang.asAny
 import java.lang.reflect.Type
 
 /**

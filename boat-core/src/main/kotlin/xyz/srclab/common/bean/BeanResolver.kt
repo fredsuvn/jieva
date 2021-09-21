@@ -2,7 +2,6 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.asToList
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import java.lang.reflect.Type
 
 /**
@@ -17,20 +16,9 @@ import java.lang.reflect.Type
  */
 interface BeanResolver {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val resolveHandlers: List<BeanResolveHandler>
-        @JvmName("resolveHandlers") get
 
-    fun resolve(type: Type): BeanType {
-        val builder = BeanTypeBuilder.newBeanTypeBuilder(type)
-        for (resolveHandler in resolveHandlers) {
-            resolveHandler.resolve(builder)
-            if (builder.isComplete) {
-                break
-            }
-        }
-        return builder.build()
-    }
+    fun resolve(type: Type): BeanType
 
     fun withPreResolveHandler(preResolveHandler: BeanResolveHandler): BeanResolver {
         return newBeanResolver(listOf(preResolveHandler).plus(resolveHandlers))
@@ -56,12 +44,23 @@ interface BeanResolver {
  * Abstract [BeanResolver] which can cache resolved [BeanType] previous created.
  */
 abstract class AbstractCachingBeanResolver @JvmOverloads constructor(
-    private val cache: Cache<Type, BeanType> = Cache.newFastCache()
+    private val cache: Cache<Type, BeanType> = Cache.newWeakCache()
 ) : BeanResolver {
 
     override fun resolve(type: Type): BeanType {
         return cache.getOrLoad(type) {
-            super.resolve(type)
+            resolve0(type)
         }
+    }
+
+    private fun resolve0(type: Type): BeanType {
+        val builder = BeanResolveContext.newBeanResolveContext(type)
+        for (resolveHandler in resolveHandlers) {
+            resolveHandler.resolve(builder)
+            if (builder.isComplete) {
+                break
+            }
+        }
+        return builder.build()
     }
 }

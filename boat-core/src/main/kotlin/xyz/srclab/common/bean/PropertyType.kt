@@ -1,7 +1,6 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.common.invoke.Invoker
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
@@ -14,54 +13,32 @@ import java.util.*
  */
 interface PropertyType {
 
-    @get:JvmName("name")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
 
-    @get:JvmName("type")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val type: Type
 
-    @get:JvmName("ownerType")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val ownerType: BeanType
 
-    @get:JvmName("isReadable")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val isReadable: Boolean
         get() {
             return getter !== null
         }
 
-    @get:JvmName("isWriteable")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val isWriteable: Boolean
         get() {
             return setter !== null
         }
 
-    @get:JvmName("getter")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val getter: Invoker?
 
-    @get:JvmName("setter")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val setter: Invoker?
 
-    @get:JvmName("field")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val field: Field?
 
-    @get:JvmName("getterMethod")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val getterMethod: Method?
 
-    @get:JvmName("setterMethod")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val setterMethod: Method?
 
-    @get:JvmName("fieldAnnotations")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val fieldAnnotations: List<Annotation>
         get() {
             val f = this.field
@@ -71,8 +48,6 @@ interface PropertyType {
             return f.annotations.toList()
         }
 
-    @get:JvmName("getterAnnotations")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val getterAnnotations: List<Annotation>
         get() {
             val getterMethod = this.getterMethod
@@ -82,8 +57,6 @@ interface PropertyType {
             return getterMethod.annotations.toList()
         }
 
-    @get:JvmName("setterAnnotations")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val setterAnnotations: List<Annotation>
         get() {
             val setterMethod = this.setterMethod

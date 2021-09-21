@@ -3,7 +3,7 @@ package xyz.srclab.common.bean
 import xyz.srclab.annotations.Written
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
-import xyz.srclab.common.lang.NamingCase
+import xyz.srclab.common.base.NamingCase
 import xyz.srclab.common.reflect.eraseTypeParameters
 import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.reflect.searchFieldOrNull
@@ -24,7 +24,7 @@ interface BeanResolveHandler {
     /**
      * Resolves into given [builder].
      */
-    fun resolve(@Written builder: BeanTypeBuilder)
+    fun resolve(@Written builder: BeanResolveContext)
 
     companion object {
         @JvmField
@@ -43,12 +43,12 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
      * Overrides this method to provide getters and setters of target bean type.
      */
     protected abstract fun resolveAccessors(
-        @Written builder: BeanTypeBuilder,
+        @Written builder: BeanResolveContext,
         @Written getters: MutableMap<String, GetterInfo>,
         @Written setters: MutableMap<String, SetterInfo>,
     )
 
-    override fun resolve(builder: BeanTypeBuilder) {
+    override fun resolve(builder: BeanResolveContext) {
         val getters: MutableMap<String, GetterInfo> = LinkedHashMap()
         val setters: MutableMap<String, SetterInfo> = LinkedHashMap()
 
@@ -128,7 +128,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
 object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
     override fun resolveAccessors(
-        builder: BeanTypeBuilder,
+        builder: BeanResolveContext,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
     ) {
@@ -171,7 +171,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 object RecordStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
     override fun resolveAccessors(
-        builder: BeanTypeBuilder,
+        builder: BeanResolveContext,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
     ) {

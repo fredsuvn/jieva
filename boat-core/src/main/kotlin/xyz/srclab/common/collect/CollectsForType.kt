@@ -38,6 +38,16 @@ interface IterableType : ParameterizedType {
             return IterableTypeImpl(this)
         }
 
+        @JvmName("of")
+        @JvmStatic
+        fun Type.toIterableType(): IterableType {
+            return when (this) {
+                is ParameterizedType -> toIterableType()
+                is Class<*> -> of(this, Any::class.java)
+                else -> throw IllegalArgumentException("Must be ParameterizedType or Class.")
+            }
+        }
+
         private class IterableTypeImpl(
             private val parameterizedType: ParameterizedType
         ) : IterableType {
@@ -107,6 +117,17 @@ interface MapType : ParameterizedType {
         fun ParameterizedType.toMapType(): MapType {
             return MapTypeImpl(this)
         }
+
+        @JvmName("of")
+        @JvmStatic
+        fun Type.toMapType(): MapType {
+            return when (this) {
+                is ParameterizedType -> toMapType()
+                is Class<*> -> of(this, Any::class.java, Any::class.java)
+                else -> throw IllegalArgumentException("Must be ParameterizedType or Class.")
+            }
+        }
+
 
         private class MapTypeImpl(
             private val parameterizedType: ParameterizedType

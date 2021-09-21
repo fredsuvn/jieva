@@ -5,7 +5,7 @@ import com.google.protobuf.Message
 import com.google.protobuf.MessageOrBuilder
 import xyz.srclab.common.bean.AbstractBeanResolveHandler
 import xyz.srclab.common.bean.BeanResolveHandler
-import xyz.srclab.common.bean.BeanTypeBuilder
+import xyz.srclab.common.bean.BeanResolveContext
 import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.lang.Next
@@ -23,7 +23,7 @@ import java.lang.reflect.Method
  */
 object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
 
-    override fun resolve(builder: BeanTypeBuilder): Next {
+    override fun resolve(builder: BeanResolveContext): Next {
         val rawClass = builder.type.rawClass
         if (!MessageOrBuilder::class.java.isAssignableFrom(rawClass)) {
             //context.breakResolving()
@@ -34,7 +34,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
     }
 
     override fun resolveAccessors(
-        builder: BeanTypeBuilder,
+        builder: BeanResolveContext,
         getters: MutableMap<String, PropertyInvoker>,
         setters: MutableMap<String, PropertyInvoker>
     ) {
