@@ -1,6 +1,6 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.lang.asNotNull
+import xyz.srclab.common.base.asNotNull
 import java.time.Duration
 import java.util.concurrent.*
 
@@ -12,67 +12,67 @@ class ScheduledThreadPoolScheduler(
 ) : ScheduledExecutorServiceScheduler(scheduledThreadPoolExecutor) {
 
     val corePoolSize: Int
-        @JvmName("corePoolSize") get() {
+        get() {
             return scheduledThreadPoolExecutor.corePoolSize
         }
 
     val allowCoreThreadTimeOut: Boolean
-        @JvmName("allowCoreThreadTimeOut") get() {
+        get() {
             return scheduledThreadPoolExecutor.allowsCoreThreadTimeOut()
         }
 
     val maximumPoolSize: Int
-        @JvmName("maximumPoolSize") get() {
+        get() {
             return scheduledThreadPoolExecutor.maximumPoolSize
         }
 
     val keepAliveTime: Duration
-        @JvmName("keepAliveTime") get() {
+        get() {
             return Duration.ofNanos(scheduledThreadPoolExecutor.getKeepAliveTime(TimeUnit.NANOSECONDS))
         }
 
     val queue: BlockingQueue<Runnable>
-        @JvmName("queue") get() {
+        get() {
             return scheduledThreadPoolExecutor.queue
         }
 
     val poolSize: Int
-        @JvmName("poolSize") get() {
+        get() {
             return scheduledThreadPoolExecutor.poolSize
         }
 
     val activeCount: Int
-        @JvmName("activeCount") get() {
+        get() {
             return scheduledThreadPoolExecutor.activeCount
         }
 
     val largestPoolSize: Int
-        @JvmName("largestPoolSize") get() {
+        get() {
             return scheduledThreadPoolExecutor.largestPoolSize
         }
 
     val taskCount: Long
-        @JvmName("taskCount") get() {
+        get() {
             return scheduledThreadPoolExecutor.taskCount
         }
 
     val completedTaskCount: Long
-        @JvmName("completedTaskCount") get() {
+        get() {
             return scheduledThreadPoolExecutor.completedTaskCount
         }
 
     val continueExistingPeriodicTasksAfterShutdownPolicy: Boolean
-        @JvmName("continueExistingPeriodicTasksAfterShutdownPolicy") get() {
+        get() {
             return scheduledThreadPoolExecutor.continueExistingPeriodicTasksAfterShutdownPolicy
         }
 
     val executeExistingDelayedTasksAfterShutdownPolicy: Boolean
-        @JvmName("executeExistingDelayedTasksAfterShutdownPolicy") get() {
+        get() {
             return scheduledThreadPoolExecutor.executeExistingDelayedTasksAfterShutdownPolicy
         }
 
     val removeOnCancelPolicy: Boolean
-        @JvmName("removeOnCancelPolicy") get() {
+        get() {
             return scheduledThreadPoolExecutor.removeOnCancelPolicy
         }
 
@@ -153,10 +153,11 @@ class ScheduledThreadPoolScheduler(
             if (threadFactory === null) {
                 threadFactory = Executors.defaultThreadFactory()
             }
-            val scheduledThreadPoolExecutor = if (rejectedExecutionHandler === null) ScheduledThreadPoolExecutor(
+            val scheduledThreadPoolExecutor = ScheduledThreadPoolExecutor(
                 corePoolSize,
-                threadFactory
-            ) else ScheduledThreadPoolExecutor(corePoolSize, threadFactory, rejectedExecutionHandler)
+                threadFactory ?: Executors.defaultThreadFactory(),
+                rejectedExecutionHandler ?: ThreadPoolExecutor.AbortPolicy()
+            )
             if (keepAliveTime !== null) {
                 scheduledThreadPoolExecutor.setKeepAliveTime(keepAliveTime.asNotNull().toNanos(), TimeUnit.NANOSECONDS)
             }
