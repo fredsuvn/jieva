@@ -1,7 +1,8 @@
 package xyz.srclab.common.bus
 
-import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.base.INHERITANCE_COMPARATOR
+import xyz.srclab.common.invoke.Invoker
+import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.run.Runner
 import java.util.*
 import java.util.concurrent.Executor
@@ -41,7 +42,8 @@ interface EventBus {
             private val executor: Executor
         ) : EventBus {
 
-            private var subscribeMap: TreeMap<Class<*>, MutableCollection<Action>> = TreeMap(COMPARATOR)
+            private var subscribeMap: TreeMap<Class<*>, MutableCollection<Action>> =
+                TreeMap(INHERITANCE_COMPARATOR.reversed())
 
             override fun register(eventHandler: Any) {
                 val newActions = resolveHandler(eventHandler)
@@ -119,7 +121,7 @@ interface EventBus {
                         throw IllegalArgumentException("Subscribe method must have only one parameter.")
                     }
                     val eventType = method.parameterTypes[0]
-                    val action = Action(eventHandler, subscribe, Invoker.forMethod(method))
+                    val action = Action(eventHandler, subscribe, method.toInvoker())
                     val actions = result.getOrPut(eventType) { LinkedList() }
                     actions.add(action)
                 }
@@ -152,19 +154,6 @@ interface EventBus {
                 val subscribeMethod: SubscribeMethod,
                 val invoker: Invoker,
             )
-
-            companion object {
-                private val COMPARATOR: Comparator<Class<*>> = Comparator { c1, c2 ->
-                    val r0 = -INHERITANCE_COMPARATOR.compare(c1, c2)
-                    if (r0 == 0) {
-                        if (c1 == c2) {
-                            return@Comparator r0
-                        }
-                        return@Comparator 1
-                    }
-                    r0
-                }
-            }
         }
     }
 }
