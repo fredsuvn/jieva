@@ -3,9 +3,8 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.run.RunContext
 import java.time.Duration
-
-private val threadLocal: ThreadLocal<MutableMap<Any, Any?>> = ThreadLocal.withInitial { HashMap() }
 
 /**
  * [Thread] of current context.
@@ -44,12 +43,12 @@ fun <T : Any> getContextPropertyOrThrow(key: Any, supplier: (key: Any) -> Throwa
 
 @JvmName("getPropertyOrNull")
 fun <T : Any> getContextPropertyOrNull(key: Any): T? {
-    return threadLocal.get()[key].asAny()
+    return RunContext.current().getOrNull(key)
 }
 
 @JvmName("setProperty")
 fun setContextProperty(key: Any, value: Any?) {
-    threadLocal.get()[key] = value
+    RunContext.current().set(key, value)
 }
 
 /**
@@ -58,28 +57,28 @@ fun setContextProperty(key: Any, value: Any?) {
  */
 @JvmName("getPropertiesAsMap")
 fun getContextPropertiesAsMap(): MutableMap<Any, Any?> {
-    return threadLocal.get()
+    return RunContext.current().asMap()
 }
 
 @JvmName("clearProperties")
 fun clearContextProperties() {
-    threadLocal.get().clear()
-}
-
-/**
- * Adds [context] into current context.
- */
-@JvmName("attachProperties")
-fun attachContextProperties(context: Map<Any, Any?>) {
-    getContextPropertiesAsMap().putAll(context)
+    RunContext.current().clear()
 }
 
 /**
  * Returns copy of current context.
  */
+@JvmName("attachProperties")
+fun attachContextProperties(): Map<Any, Any?> {
+    return RunContext.current().attach()
+}
+
+/**
+ * Adds [contents] into current context.
+ */
 @JvmName("detachProperties")
-fun detachContextProperties(): Map<Any, Any?> {
-    return getContextPropertiesAsMap().toMap()
+fun detachContextProperties(contents: Map<Any, Any?>) {
+    RunContext.current().detach(contents)
 }
 
 /**

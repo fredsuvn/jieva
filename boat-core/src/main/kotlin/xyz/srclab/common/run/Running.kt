@@ -1,9 +1,7 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import java.time.Duration
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.Instant
 import java.util.concurrent.*
 
 /**
@@ -16,26 +14,18 @@ interface Running<V> : Future<V> {
     /**
      * Return start time, or null if not finished.
      */
-    @get:JvmName("startTime")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val startTime: LocalDateTime?
+    val startTime: Instant?
 
     /**
      * Return end time, or null if not finished.
      */
-    @get:JvmName("endTime")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val endTime: LocalDateTime?
+    val endTime: Instant?
 
-    @get:JvmName("isStart")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val isStart: Boolean
         get() {
             return startTime !== null
         }
 
-    @get:JvmName("isEnd")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val isEnd: Boolean
         get() {
             return endTime !== null
@@ -44,29 +34,23 @@ interface Running<V> : Future<V> {
     /**
      * Return start time in milliseconds, or -1 if not finished.
      */
-    @get:JvmName("startMilliseconds")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val startMilliseconds: Long
+    val startTimeMillis: Long
         get() {
-            return startTime?.toInstant(ZoneOffset.UTC)?.toEpochMilli() ?: -1
+            return startTime?.toEpochMilli() ?: -1
         }
 
     /**
      * Return end time in milliseconds, or -1 if not finished.
      */
-    @get:JvmName("endMilliseconds")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val endMilliseconds: Long
+    val endTimeMillis: Long
         get() {
-            return endTime?.toInstant(ZoneOffset.UTC)?.toEpochMilli() ?: -1
+            return endTime?.toEpochMilli() ?: -1
         }
 
     /**
      * Return cost in milliseconds, or null if not finished.
      */
-    @get:JvmName("cost")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val cost: Duration?
+    val costTime: Duration?
         get() {
             val start = startTime
             val end = endTime
@@ -79,11 +63,9 @@ interface Running<V> : Future<V> {
     /**
      * Return cost in milliseconds, or -1 if not finished.
      */
-    @get:JvmName("costMillis")
-    @Suppress(INAPPLICABLE_JVM_NAME)
-    val costMillis: Long
+    val costTimeMillis: Long
         get() {
-            return cost?.toMillis() ?: -1
+            return costTime?.toMillis() ?: -1
         }
 
     /**

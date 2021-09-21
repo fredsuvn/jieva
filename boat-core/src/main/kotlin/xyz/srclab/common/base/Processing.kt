@@ -46,14 +46,14 @@ interface Processing {
     /**
      * @throws InterruptedException
      */
-    fun waitFor(): Int {
+    fun await(): Int {
         return process.waitFor()
     }
 
     /**
      * @throws InterruptedException
      */
-    fun waitFor(timeout: Duration): Boolean {
+    fun await(timeout: Duration): Boolean {
         return process.waitFor(timeout.toNanos(), TimeUnit.NANOSECONDS)
     }
 

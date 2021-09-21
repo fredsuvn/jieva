@@ -1,7 +1,7 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.lang.Environment
-import xyz.srclab.common.lang.asNotNull
+import xyz.srclab.common.base.asNotNull
+import xyz.srclab.common.base.availableProcessors
 import java.time.Duration
 import java.util.concurrent.*
 
@@ -13,52 +13,52 @@ open class ThreadPoolRunner(
 ) : ExecutorServiceRunner(threadPoolExecutor) {
 
     val corePoolSize: Int
-        @JvmName("corePoolSize") get() {
+        get() {
             return threadPoolExecutor.corePoolSize
         }
 
     val allowCoreThreadTimeOut: Boolean
-        @JvmName("allowCoreThreadTimeOut") get() {
+        get() {
             return threadPoolExecutor.allowsCoreThreadTimeOut()
         }
 
     val maximumPoolSize: Int
-        @JvmName("maximumPoolSize") get() {
+        get() {
             return threadPoolExecutor.maximumPoolSize
         }
 
     val keepAliveTime: Duration
-        @JvmName("keepAliveTime") get() {
+        get() {
             return Duration.ofNanos(threadPoolExecutor.getKeepAliveTime(TimeUnit.NANOSECONDS))
         }
 
     val queue: BlockingQueue<Runnable>
-        @JvmName("queue") get() {
+        get() {
             return threadPoolExecutor.queue
         }
 
     val poolSize: Int
-        @JvmName("poolSize") get() {
+        get() {
             return threadPoolExecutor.poolSize
         }
 
     val activeCount: Int
-        @JvmName("activeCount") get() {
+        get() {
             return threadPoolExecutor.activeCount
         }
 
     val largestPoolSize: Int
-        @JvmName("largestPoolSize") get() {
+        get() {
             return threadPoolExecutor.largestPoolSize
         }
 
     val taskCount: Long
-        @JvmName("taskCount") get() {
+        get() {
             return threadPoolExecutor.taskCount
         }
 
     val completedTaskCount: Long
-        @JvmName("completedTaskCount") get() {
+        get() {
             return threadPoolExecutor.completedTaskCount
         }
 
@@ -84,9 +84,9 @@ open class ThreadPoolRunner(
 
     class Builder {
 
-        private var corePoolSize = Environment.availableProcessors * 2
-        private var maximumPoolSize = Environment.availableProcessors * 8
-        private var workQueueCapacity = maximumPoolSize * 32
+        private var corePoolSize = 1
+        private var maximumPoolSize = availableProcessors() * 4
+        private var workQueueCapacity = maximumPoolSize * 8
         private var keepAliveTime: Duration? = null
         private var workQueue: BlockingQueue<Runnable>? = null
         private var threadFactory: ThreadFactory? = null
@@ -141,22 +141,14 @@ open class ThreadPoolRunner(
                 keepTime = keepAliveTime.asNotNull().toNanos()
                 keepUnit = TimeUnit.NANOSECONDS
             }
-            if (workQueue === null) {
-                workQueue = LinkedBlockingQueue(workQueueCapacity)
-            }
-            if (threadFactory === null) {
-                threadFactory = Executors.defaultThreadFactory()
-            }
-            val threadPoolExecutor = if (rejectedExecutionHandler === null) ThreadPoolExecutor(
-                corePoolSize, maximumPoolSize, keepTime, keepUnit, workQueue, threadFactory
-            ) else ThreadPoolExecutor(
+            val threadPoolExecutor = ThreadPoolExecutor(
                 corePoolSize,
                 maximumPoolSize,
                 keepTime,
                 keepUnit,
-                workQueue,
-                threadFactory,
-                rejectedExecutionHandler
+                workQueue ?: LinkedBlockingQueue(workQueueCapacity),
+                threadFactory ?: Executors.defaultThreadFactory(),
+                rejectedExecutionHandler ?: ThreadPoolExecutor.AbortPolicy()
             )
             threadPoolExecutor.allowCoreThreadTimeOut(allowCoreThreadTimeOut)
             return threadPoolExecutor

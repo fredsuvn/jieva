@@ -1,6 +1,6 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.lang.Environment
+import xyz.srclab.common.base.availableProcessors
 import java.util.concurrent.*
 
 /**
@@ -66,7 +66,7 @@ interface Runner : Executor {
 
         @JvmStatic
         @JvmOverloads
-        fun newWorkStealingPool(parallelism: Int = Environment.availableProcessors): ExecutorServiceRunner {
+        fun newWorkStealingPool(parallelism: Int = availableProcessors()): ExecutorServiceRunner {
             return newExecutorServiceRunner(Executors.newWorkStealingPool(parallelism))
         }
 
@@ -103,6 +103,26 @@ interface Runner : Executor {
         @JvmStatic
         fun runAsync(task: Runnable): Running<*> {
             return ASYNC_RUNNER.run(task)
+        }
+
+        @JvmStatic
+        fun <V> fastRunSync(task: () -> V) {
+            SYNC_RUNNER.fastRun(task)
+        }
+
+        @JvmStatic
+        fun fastRunSync(task: Runnable) {
+            SYNC_RUNNER.fastRun(task)
+        }
+
+        @JvmStatic
+        fun <V> fastRunAsync(task: () -> V) {
+            ASYNC_RUNNER.fastRun(task)
+        }
+
+        @JvmStatic
+        fun fastRunAsync(task: Runnable) {
+            ASYNC_RUNNER.fastRun(task)
         }
     }
 }

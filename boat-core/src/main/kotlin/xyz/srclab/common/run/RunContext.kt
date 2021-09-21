@@ -1,48 +1,37 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.base.MapAccessor
 
 /**
- * Run context just like [ThreadLocal].
+ * Context info of a running environment, just like [ThreadLocal].
  */
 interface RunContext : MapAccessor {
 
     /**
-     * Attach contents of this context, current context as previously is returned.
+     * Returns a copy of current context's contents.
      */
-    fun attach(): Attach {
-        return object : Attach {
-            override val contents: Map<Any, Any?> = this@RunContext.asMap()
-        }
+    fun attach(): Map<Any, Any?> {
+        return LinkedHashMap(asMap())
     }
 
     /**
-     * Reverse an [attach], restoring the previous context.
+     * Adds given [contents].
      */
-    fun detach(previous: Attach) {
-        clear()
-        asMap().putAll(previous.contents)
-    }
-
-    interface Attach {
-
-        @get:JvmName("contents")
-        @Suppress(INAPPLICABLE_JVM_NAME)
-        val contents: Map<Any, Any?>
+    fun detach(contents: Map<Any, Any?>) {
+        asMap().putAll(contents)
     }
 
     companion object {
 
         @JvmStatic
         fun current(): RunContext {
-            return RunContextImpl(null)
+            return RunContextImpl
         }
 
-        private class RunContextImpl(attach: Attach?) : RunContext {
+        private object RunContextImpl : RunContext {
 
             private val threadLocal: ThreadLocal<MutableMap<Any, Any?>> =
-                ThreadLocal.withInitial { HashMap(attach?.contents ?: emptyMap()) }
+                ThreadLocal.withInitial { HashMap() }
 
             override fun asMap(): MutableMap<Any, Any?> {
                 return threadLocal.get()

@@ -1,7 +1,7 @@
 package xyz.srclab.common.run
 
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
@@ -63,8 +63,8 @@ open class ExecutorServiceRunner(
 
         private val future: Future<V>
 
-        override var startTime: LocalDateTime? = null
-        override var endTime: LocalDateTime? = null
+        override var startTime: Instant? = null
+        override var endTime: Instant? = null
 
         constructor(task: () -> V) {
             future = executorService.submit(CallableTask(task))
@@ -96,26 +96,26 @@ open class ExecutorServiceRunner(
 
         private inner class CallableTask<V>(private val task: () -> V) : Callable<V> {
             override fun call(): V {
-                startTime = LocalDateTime.now()
+                startTime = Instant.now()
                 try {
                     return task()
                 } catch (e: Exception) {
                     throw e
                 } finally {
-                    endTime = LocalDateTime.now()
+                    endTime = Instant.now()
                 }
             }
         }
 
         private inner class RunnableTask(private val task: Runnable) : Runnable {
             override fun run() {
-                startTime = LocalDateTime.now()
+                startTime = Instant.now()
                 try {
                     task.run()
                 } catch (e: Exception) {
                     throw e
                 } finally {
-                    endTime = LocalDateTime.now()
+                    endTime = Instant.now()
                 }
             }
         }

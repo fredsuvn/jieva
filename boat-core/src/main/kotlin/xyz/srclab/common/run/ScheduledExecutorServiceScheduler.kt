@@ -1,8 +1,8 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.asAny
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.concurrent.*
 
 /**
@@ -73,8 +73,8 @@ open class ScheduledExecutorServiceScheduler(
 
         protected lateinit var future: ScheduledFuture<V>
 
-        override var startTime: LocalDateTime? = null
-        override var endTime: LocalDateTime? = null
+        override var startTime: Instant? = null
+        override var endTime: Instant? = null
 
         override val isEnd: Boolean
             get() = future.isDone
@@ -90,7 +90,7 @@ open class ScheduledExecutorServiceScheduler(
         override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
             val result = future.cancel(mayInterruptIfRunning)
             if (result) {
-                endTime = LocalDateTime.now()
+                endTime = Instant.now()
             }
             return result
         }
@@ -118,13 +118,13 @@ open class ScheduledExecutorServiceScheduler(
     ) : Callable<V> {
         override fun call(): V {
             schedulingImpl.endTime = null
-            schedulingImpl.startTime = LocalDateTime.now()
+            schedulingImpl.startTime = Instant.now()
             try {
                 return task()
             } catch (e: Exception) {
                 throw e
             } finally {
-                schedulingImpl.endTime = LocalDateTime.now()
+                schedulingImpl.endTime = Instant.now()
             }
         }
     }
@@ -135,13 +135,13 @@ open class ScheduledExecutorServiceScheduler(
     ) : Runnable {
         override fun run() {
             schedulingImpl.endTime = null
-            schedulingImpl.startTime = LocalDateTime.now()
+            schedulingImpl.startTime = Instant.now()
             try {
                 task.run()
             } catch (e: Exception) {
                 throw e
             } finally {
-                schedulingImpl.endTime = LocalDateTime.now()
+                schedulingImpl.endTime = Instant.now()
             }
         }
     }

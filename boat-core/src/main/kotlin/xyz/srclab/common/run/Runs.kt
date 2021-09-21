@@ -13,6 +13,14 @@ fun <V> runAsync(task: () -> V): Running<V> {
     return Runner.runAsync(task)
 }
 
+fun <V> fastRunSync(task: () -> V) {
+    Runner.fastRunSync(task)
+}
+
+fun <V> fastRunAsync(task: () -> V) {
+    Runner.fastRunSync(task)
+}
+
 fun <V> scheduleDefaultThread(delay: Duration, task: () -> V): Scheduling<V> {
     return Scheduler.scheduleDefaultThread(delay, task)
 }

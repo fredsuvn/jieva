@@ -1,7 +1,7 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.lang.asAny
-import java.time.LocalDateTime
+import xyz.srclab.common.base.asAny
+import java.time.Instant
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
@@ -29,30 +29,30 @@ object SyncRunner : Runner {
     private class RunningImpl<V> : Running<V> {
 
         private var result: V? = null
-        override var startTime: LocalDateTime? = null
-        override var endTime: LocalDateTime? = null
+        override var startTime: Instant? = null
+        override var endTime: Instant? = null
 
         private var exception: Exception? = null
 
         constructor(task: () -> V) {
             try {
-                startTime = LocalDateTime.now()
+                startTime = Instant.now()
                 result = task()
             } catch (e: Exception) {
                 exception = e
             } finally {
-                endTime = LocalDateTime.now()
+                endTime = Instant.now()
             }
         }
 
         constructor(task: Runnable) {
             try {
-                startTime = LocalDateTime.now()
+                startTime = Instant.now()
                 task.run()
             } catch (e: Exception) {
                 exception = e
             } finally {
-                endTime = LocalDateTime.now()
+                endTime = Instant.now()
             }
         }
 
