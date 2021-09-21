@@ -69,12 +69,12 @@ object JdkProxyClassGenerator : ProxyClassGenerator {
             method: Method,
             args: Array<out Any>?
         ): Any? {
-            val sourceInvoke = object : SourceInvoke {
+            val sourceInvoker = object : SourceInvoker {
                 override fun invoke(args: Array<out Any?>?): Any? {
                     throw IllegalStateException("Cannot call a interface method: $method")
                 }
             }
-            return proxyMethod.invoke(proxy.asAny(), method, sourceInvoke, args)
+            return proxyMethod.invoke(proxy.asAny(), method, sourceInvoker, args)
         }
     }
 }

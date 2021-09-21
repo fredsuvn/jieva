@@ -3,7 +3,7 @@ package xyz.srclab.common.proxy
 /**
  * To invoke source method (proxied method).
  */
-interface SourceInvoke {
+interface SourceInvoker {
 
     /**
      * Invokes source method.

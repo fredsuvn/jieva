@@ -17,5 +17,5 @@ interface ProxyMethod<T : Any> {
     /**
      * Proxy action.
      */
-    fun invoke(sourceObject: T, sourceMethod: Method, sourceInvoke: SourceInvoke, args: Array<out Any?>?): Any?
+    fun invoke(sourceObject: T, sourceMethod: Method, sourceInvoker: SourceInvoker, args: Array<out Any?>?): Any?
 }

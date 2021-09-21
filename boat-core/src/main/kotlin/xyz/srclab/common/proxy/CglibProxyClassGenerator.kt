@@ -46,12 +46,12 @@ object CglibProxyClassGenerator : ProxyClassGenerator {
 
     private class ProxyMethodInterceptor<T : Any>(val proxyMethod: ProxyMethod<T>) : MethodInterceptor {
         override fun intercept(obj: Any, method: Method, args: Array<out Any?>?, proxy: MethodProxy): Any? {
-            val sourceInvoke = object : SourceInvoke {
+            val sourceInvoker = object : SourceInvoker {
                 override fun invoke(args: Array<out Any?>?): Any? {
                     return proxy.invokeSuper(obj, args ?: ArrayUtils.EMPTY_CLASS_ARRAY)
                 }
             }
-            return proxyMethod.invoke(obj.asAny(), method, sourceInvoke, args)
+            return proxyMethod.invoke(obj.asAny(), method, sourceInvoker, args)
         }
     }
 

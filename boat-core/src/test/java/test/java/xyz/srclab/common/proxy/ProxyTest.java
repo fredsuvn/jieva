@@ -42,7 +42,7 @@ public class ProxyTest {
             public Object invoke(
                 @NotNull T proxied,
                 @NotNull Method proxiedMethod,
-                @NotNull SourceInvoke superInvoke,
+                @NotNull SourceInvoker superInvoke,
                 Object @NotNull [] args
             ) {
                 logger.log("method: {}, declaring class: {}", proxiedMethod, proxiedMethod.getDeclaringClass());
