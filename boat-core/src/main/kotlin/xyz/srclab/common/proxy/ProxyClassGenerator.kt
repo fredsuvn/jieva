@@ -3,7 +3,7 @@ package xyz.srclab.common.proxy
 import xyz.srclab.common.base.loadClassOrNull
 
 /**
- * Generator to create [ProxyClass].
+ * Generator to generate [ProxyClass].
  *
  * Default implementations in priority order are:
  *

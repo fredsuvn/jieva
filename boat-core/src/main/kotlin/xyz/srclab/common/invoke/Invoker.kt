@@ -6,17 +6,17 @@ import java.lang.reflect.Method
 /**
  * Represents a invokable instance.
  *
- * @see [InvokerProvider]
- * @see [ReflectedInvokerProvider]
- * @see [MethodHandlerInvokerProvider]
+ * @see [InvokerGenerator]
+ * @see [ReflectInvokerGenerator]
+ * @see [MethodHandlerInvokerGenerator]
  */
 interface Invoker {
 
     /**
-     * Invokes this [Invoker]. [object] is owner of this [Invoker] and [args] are arguments.
+     * Does invoke, not forcibly.
      */
-    fun <T> invoke(`object`: Any?, vararg args: Any?): T {
-        return invokeWith(`object`, false, *args)
+    fun <T> invoke(obj: Any?, vararg args: Any?): T {
+        return doInvoke(obj, false, *args)
     }
 
     /**
@@ -24,59 +24,57 @@ interface Invoker {
      *
      * @see invoke
      */
-    fun <T> enforce(`object`: Any?, vararg args: Any?): T {
-        return invokeWith(`object`, true, *args)
+    fun <T> enforce(obj: Any?, vararg args: Any?): T {
+        return doInvoke(obj, true, *args)
     }
 
     /**
-     * Invokes this [Invoker] with arguments.
-     * [object] is owner of this [Invoker] and [args] are arguments, and [force] tell whether force to invoke.
+     * Does invoke with [obj] -- specifies invoking object, and [force] -- specifies whether forcibly invoke.
      */
-    fun <T> invokeWith(`object`: Any?, force: Boolean, vararg args: Any?): T
+    fun <T> doInvoke(obj: Any?, force: Boolean, vararg args: Any?): T
 
     /**
-     * Invokes this [Invoker] with [object] -- owner of this [Invoker].
+     * Prepares an invoking, not forcibly.
      */
-    fun invokeWith(`object`: Any?): Invoke {
+    fun prepare(obj: Any?): Invoke {
+        return prepare(obj, false)
+    }
+
+    /**
+     * Prepares an invoking.
+     */
+    fun prepare(obj: Any?, force: Boolean): Invoke {
         return object : Invoke {
-            override fun <T> startWith(force: Boolean, vararg args: Any?): T {
-                return invokeWith(`object`, force, *args)
+            override fun <T> start(vararg args: Any?): T {
+                return doInvoke(obj, force, *args)
             }
         }
     }
 
-    companion object : InvokerProvider {
+    companion object {
 
-        private val defaultProvider = ReflectedInvokerProvider
+        private val defaultProvider = ReflectInvokerGenerator
 
-        @JvmStatic
-        override fun forMethod(method: Method): Invoker {
-            return defaultProvider.forMethod(method)
-        }
-
-        @JvmStatic
-        override fun forMethod(clazz: Class<*>, methodName: String, vararg parameterTypes: Class<*>): Invoker {
-            return defaultProvider.forMethod(clazz, methodName, *parameterTypes)
-        }
-
-        @JvmStatic
-        override fun forConstructor(constructor: Constructor<*>): Invoker {
-            return defaultProvider.forConstructor(constructor)
-        }
-
-        @JvmStatic
-        override fun forConstructor(clazz: Class<*>, vararg parameterTypes: Class<*>): Invoker {
-            return defaultProvider.forConstructor(clazz, *parameterTypes)
-        }
-
+        @JvmName("ofMethod")
         @JvmStatic
         fun Method.toInvoker(): Invoker {
-            return forMethod(this)
+            return defaultProvider.ofMethod(this)
         }
 
         @JvmStatic
+        fun ofMethod(clazz: Class<*>, methodName: String, vararg parameterTypes: Class<*>): Invoker {
+            return defaultProvider.ofMethod(clazz, methodName, *parameterTypes)
+        }
+
+        @JvmName("ofConstructor")
+        @JvmStatic
         fun Constructor<*>.toInvoker(): Invoker {
-            return forConstructor(this)
+            return defaultProvider.ofConstructor(this)
+        }
+
+        @JvmStatic
+        fun ofConstructor(clazz: Class<*>, vararg parameterTypes: Class<*>): Invoker {
+            return defaultProvider.ofConstructor(clazz, *parameterTypes)
         }
     }
 }
