@@ -62,7 +62,7 @@ public class ConvertTest {
         @Nullable
         @Override
         public Object convert(
-            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertChain chain) {
+            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertContext chain) {
             if (from == null || !from.getClass().equals(Integer.class)) {
                 return chain.next(from, fromType, toType);
             }
@@ -75,7 +75,7 @@ public class ConvertTest {
         @Nullable
         @Override
         public Object convert(
-            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertChain chain) {
+            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertContext chain) {
             if (from == null || !from.getClass().equals(Long.class)) {
                 return chain.next(from, fromType, toType);
             }

@@ -9,7 +9,7 @@ import java.lang.reflect.Type
  *
  * @author sunqian
  *
- * @see AbstractCachingBeanResolver
+ * @see AbstractBeanResolver
  * @see BeanResolveHandler
  * @see BeanStyleBeanResolveHandler
  * @see RecordStyleBeanResolveHandler
@@ -33,7 +33,7 @@ interface BeanResolver {
         fun newBeanResolver(
             resolveHandlers: Iterable<BeanResolveHandler>,
         ): BeanResolver {
-            return object : AbstractCachingBeanResolver() {
+            return object : AbstractBeanResolver() {
                 override val resolveHandlers: List<BeanResolveHandler> = resolveHandlers.asToList()
             }
         }
@@ -43,7 +43,7 @@ interface BeanResolver {
 /**
  * Abstract [BeanResolver] which can cache resolved [BeanType] previous created.
  */
-abstract class AbstractCachingBeanResolver @JvmOverloads constructor(
+abstract class AbstractBeanResolver @JvmOverloads constructor(
     private val cache: Cache<Type, BeanType> = Cache.newWeakCache()
 ) : BeanResolver {
 

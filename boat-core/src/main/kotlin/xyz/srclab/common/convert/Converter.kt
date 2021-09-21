@@ -4,8 +4,7 @@ import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.collect.isEmpty
 import xyz.srclab.common.collect.plusBefore
 import xyz.srclab.common.convert.Converter.Companion.extend
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.lang.asAny
+import xyz.srclab.common.base.asAny
 import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type
 
@@ -19,8 +18,6 @@ import java.lang.reflect.Type
  */
 interface Converter {
 
-    @get:JvmName("convertHandlers")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val convertHandlers: List<ConvertHandler>
 
     /**
@@ -98,11 +95,11 @@ interface Converter {
         ) : Converter {
 
             override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
-                val chain = ConvertChainImpl()
+                val chain = ConvertContextImpl()
                 return chain.next(from, fromType, toType).asAny()
             }
 
-            private inner class ConvertChainImpl : ConvertChain {
+            private inner class ConvertContextImpl : ConvertContext {
 
                 private var handlerIterator = convertHandlers.iterator()
 

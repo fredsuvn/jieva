@@ -4,8 +4,6 @@ import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
-import xyz.srclab.common.collect.CollectType.Companion.toCollectType
-import xyz.srclab.common.lang.*
 import xyz.srclab.common.reflect.*
 import java.lang.reflect.*
 import java.math.BigDecimal
@@ -22,9 +20,6 @@ import kotlin.toString
 /**
  * Handler for [Converter].
  *
- * By default, a [Converter] uses a chain of [ConvertHandler]s to do convert action.
- * Use [ConvertChain.next] or [ConvertChain.restart] if current handler doesn't support current convert.
- *
  * @see Converter
  * @see CompatibleConvertHandler
  * @see LowerBoundConvertHandler
@@ -37,11 +32,9 @@ import kotlin.toString
 interface ConvertHandler {
 
     /**
-     * Do convert from [from] to [to].
-     *
-     * Return [ConvertChain.next] or [ConvertChain.restart] if current handler doesn't support current convert.
+     * Does convert from [from] to [to], returns null if unsupported.
      */
-    fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any?
+    fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any?
 
     companion object {
         @JvmField
@@ -58,14 +51,14 @@ interface ConvertHandler {
 }
 
 /**
- * If `toType` is enum, this handler will invoke `toString()` of `fromType`
- * and try to find out same name enum value (case-ignored);
- * else use [Class.isAssignableFrom] to check whether from type can cast to to type;
- * else return [ConvertChain.next].
+ * [ConvertHandler] which is used to convert compatible type:
+ *
+ * * Returns `from` itself if `fromType` == `toType` or `toType` is compatible with `from`;
+ * * If `toType` is enum, invoke `from.toString()` and try to find out same name enum value (case-ignored);
  */
 object CompatibleConvertHandler : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
-        if (toType == Any::class.java || fromType == toType) {
+    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
+        if (fromType == toType || toType == Any::class.java) {
             return from
         }
         if (toType is Class<*>) {
@@ -73,15 +66,10 @@ object CompatibleConvertHandler : ConvertHandler {
                 return from
             }
             if (toType.isEnum) {
-                val enumValue = toType.valueOfEnumIgnoreCaseOrNull<Enum<*>>(from.toString())
-                return if (enumValue !== null) {
-                    enumValue
-                } else {
-                    chain.next(from, fromType, toType)
-                }
+                return toType.enumValueIgnoreCaseOrNull<Any>(from.toString())
             }
         }
-        return chain.next(from, fromType, toType)
+        return null
     }
 }
 
@@ -89,17 +77,17 @@ object CompatibleConvertHandler : ConvertHandler {
  * Returns lower bound of `toType` with [lowerBound] for [WildcardType] and [TypeVariable].
  */
 object LowerBoundConvertHandler : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         return when (toType) {
             is WildcardType -> {
                 val lowerBound = toType.lowerBound
                 if (lowerBound === null) {
-                    chain.next(from, fromType, toType)
+                    null
                 } else {
-                    chain.restart(from, fromType, lowerBound)
+                    context.converter.convert(from, fromType, lowerBound)
                 }
             }
-            else -> chain.next(from, fromType, toType)
+            else -> null
         }
     }
 }
@@ -111,36 +99,29 @@ object LowerBoundConvertHandler : ConvertHandler {
  * * [CharArray], [ByteArray], [Array<Char>], [Array<Byte>];
  */
 object CharsConvertHandler : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (toType !is Class<*>) {
-            return chain.next(from, fromType, toType)
+            return null
+        }
+        fun fromToChars(): CharSequence {
+            return when (from) {
+                is ByteArray -> from.encodeToString()
+                is CharArray -> String(from)
+                else -> from.toChars()
+            }
         }
         return when (toType) {
-            String::class.java, CharSequence::class.java -> when (from) {
-                is ByteArray -> from.toChars()
-                is CharArray -> from.toChars()
-                else -> from.toString()
-            }
-            StringBuilder::class.java -> when (from) {
-                is ByteArray -> StringBuilder(from.toChars())
-                is CharArray -> StringBuilder(from.toChars())
-                else -> StringBuilder(from.toString())
-            }
-            StringBuffer::class.java -> when (from) {
-                is ByteArray -> StringBuffer(from.toChars())
-                is CharArray -> StringBuffer(from.toChars())
-                else -> StringBuffer(from.toString())
-            }
-            CharArray::class.java -> when (from) {
-                is ByteArray -> from.toChars().toCharArray()
-                else -> from.toString().toCharArray()
-            }
+            CharSequence::class.java -> fromToChars()
+            String::class.java -> fromToChars().toString()
+            StringBuilder::class.java -> StringBuilder(fromToChars())
+            StringBuffer::class.java -> StringBuffer(fromToChars())
+            CharArray::class.java -> fromToChars().toString().toCharArray()
             ByteArray::class.java -> when (from) {
                 is CharSequence -> from.toBytes()
-                is CharArray -> from.toBytes()
-                else -> chain.next(from, fromType, toType)
+                is CharArray -> String(from).toBytes()
+                else -> null
             }
-            else -> chain.next(from, fromType, toType)
+            else -> null
         }
     }
 }
@@ -153,9 +134,9 @@ object CharsConvertHandler : ConvertHandler {
  * * [Number];
  */
 object NumberBooleanConvertHandler : ConvertHandler {
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (toType !is Class<*>) {
-            return chain.next(from, fromType, toType)
+            return null
         }
         return when {
             toType.isBooleanType -> from.toBoolean()
@@ -168,8 +149,8 @@ object NumberBooleanConvertHandler : ConvertHandler {
             toType.isDoubleType -> from.toDouble()
             toType == BigInteger::class.java -> from.toBigInteger()
             toType == BigDecimal::class.java -> from.toBigDecimal()
-            toType == Number::class.java -> from.toNumber()
-            else -> chain.next(from, fromType, toType)
+            toType == Number::class.java -> from.toInt()
+            else -> null
         }
     }
 }
@@ -202,7 +183,7 @@ open class DateTimeConvertHandler(
         DateTimeFormatter.ISO_LOCAL_TIME
     )
 
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertContext): Any? {
         if (toType !is Class<*>) {
             return chain.next(from, fromType, toType)
         }
@@ -235,7 +216,7 @@ open class DateTimeConvertHandler(
  */
 object IterableConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertContext): Any? {
         if (from === null) {
             return chain.next(from, fromType, toType)
         }
@@ -348,7 +329,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
     private val beanResolver: BeanResolver = BeanResolver.DEFAULT,
 ) : ConvertHandler {
 
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertChain): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertContext): Any? {
         if (from === null) {
             return chain.next(from, fromType, toType)
         }
