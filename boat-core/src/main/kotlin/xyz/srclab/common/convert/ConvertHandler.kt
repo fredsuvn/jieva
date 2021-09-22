@@ -4,6 +4,7 @@ import xyz.srclab.common.base.*
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
+import xyz.srclab.common.collect.IterableType.Companion.toIterableType
 import xyz.srclab.common.reflect.*
 import java.lang.reflect.*
 import java.math.BigDecimal
@@ -32,11 +33,17 @@ import kotlin.toString
 interface ConvertHandler {
 
     /**
-     * Does convert from [from] to [to], returns null if unsupported.
+     * Does convert from [from] to [to],
+     * returns null if unsupported,
+     * returns [NULL] if result explicitly is `null`.
      */
     fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any?
 
     companion object {
+
+        @JvmField
+        val NULL: Any = "(╯°Д°)╯︵ ┻━┻"
+
         @JvmField
         val DEFAULTS: List<ConvertHandler> = listOf(
             CompatibleConvertHandler,
@@ -62,8 +69,13 @@ object CompatibleConvertHandler : ConvertHandler {
             return from
         }
         if (toType is Class<*>) {
-            if (fromType is Class<*> && toType.isAssignableFrom(fromType)) {
-                return from
+            if (fromType is Class<*>) {
+                if (toType.isAssignableFrom(fromType)) {
+                    return from
+                }
+                if (fromType.toWrapperClass() == toType.toWrapperClass()) {
+                    return from
+                }
             }
             if (toType.isEnum) {
                 return toType.enumValueIgnoreCaseOrNull<Any>(from.toString())
@@ -163,41 +175,26 @@ object NumberBooleanConvertHandler : ConvertHandler {
  * * [LocalDate], [LocalTime], [LocalDateTime], [ZonedDateTime], [OffsetDateTime];
  * * [Duration], [Temporal];
  */
-open class DateTimeConvertHandler(
-    private val dateFormat: DateFormat,
-    private val instantFormatter: DateTimeFormatter,
-    private val localDateTimeFormatter: DateTimeFormatter,
-    private val zonedDateTimeFormatter: DateTimeFormatter,
-    private val offsetDateTimeFormatter: DateTimeFormatter,
-    private val localDateFormatter: DateTimeFormatter,
-    private val localTimeFormatter: DateTimeFormatter,
+open class DateTimeConvertHandler @JvmOverloads constructor(
+    private val dateFormat: DateFormat? = null,
+    private val dateTimeFormatter: DateTimeFormatter? = null,
 ) : ConvertHandler {
 
-    constructor() : this(
-        dateFormat(),
-        DateTimeFormatter.ISO_INSTANT,
-        DateTimeFormatter.ISO_LOCAL_DATE_TIME,
-        DateTimeFormatter.ISO_ZONED_DATE_TIME,
-        DateTimeFormatter.ISO_OFFSET_DATE_TIME,
-        DateTimeFormatter.ISO_LOCAL_DATE,
-        DateTimeFormatter.ISO_LOCAL_TIME
-    )
-
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (toType !is Class<*>) {
-            return chain.next(from, fromType, toType)
+            return null
         }
         return when (toType) {
             Date::class.java -> from.toDate(dateFormat)
-            Instant::class.java -> from.toInstant(instantFormatter)
-            LocalDateTime::class.java -> from.toLocalDateTime(localDateTimeFormatter)
-            ZonedDateTime::class.java -> from.toZonedDateTime(zonedDateTimeFormatter)
-            OffsetDateTime::class.java -> from.toOffsetDateTime(offsetDateTimeFormatter)
-            LocalDate::class.java -> from.toLocalDate(localDateFormatter)
-            LocalTime::class.java -> from.toLocalTime(localTimeFormatter)
+            Instant::class.java -> from.toInstant(dateTimeFormatter)
+            LocalDateTime::class.java -> from.toLocalDateTime(dateTimeFormatter)
+            ZonedDateTime::class.java -> from.toZonedDateTime(dateTimeFormatter)
+            OffsetDateTime::class.java -> from.toOffsetDateTime(dateTimeFormatter)
+            LocalDate::class.java -> from.toLocalDate(dateTimeFormatter)
+            LocalTime::class.java -> from.toLocalTime(dateTimeFormatter)
             Duration::class.java -> from.toDuration()
-            Temporal::class.java, TemporalAdjuster::class.java -> from.toLocalDateTime(localDateTimeFormatter)
-            else -> chain.next(from, fromType, toType)
+            Temporal::class.java, TemporalAdjuster::class.java -> from.toLocalDateTime(dateTimeFormatter)
+            else -> null
         }
     }
 
@@ -216,101 +213,119 @@ open class DateTimeConvertHandler(
  */
 object IterableConvertHandler : ConvertHandler {
 
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (from === null) {
-            return chain.next(from, fromType, toType)
+            return null
+        }
+        val fromComponentType = getFromComponentType(fromType)
+        if (fromComponentType === null) {
+            return null
+        }
+        val iterable = fromToIterableOrNull(from)
+        if (iterable === null) {
+            return null
         }
         return when (toType) {
             is Class<*> -> {
                 if (toType.isArray) {
-                    val iterable = from.toIterable()
-                    if (iterable === null) {
-                        return chain.next(from, fromType, toType)
-                    }
-                    return toArray(iterable, toType, chain.converter)
+                    return iterableToArray(iterable, fromComponentType, toType, context.converter)
                 }
                 if (Iterable::class.java.isAssignableFrom(toType)) {
-                    val iterable = from.toIterable()
-                    if (iterable === null) {
-                        return chain.next(from, fromType, toType)
-                    }
-                    return toIterableOrNull(iterable, toType.toCollectType(), chain.converter)
+                    return iterableToIterable(iterable, fromComponentType, toType, Any::class.java, context.converter)
                 }
-                return chain.next(from, fromType, toType)
+                return null
             }
-            is GenericArrayType -> convert(from, fromType, toType.rawClass, chain)
             is ParameterizedType -> {
-                val rawClass = toType.rawClass
-                if (Iterable::class.java.isAssignableFrom(rawClass)) {
-                    val iterable = from.toIterable()
-                    if (iterable === null) {
-                        return chain.next(from, fromType, toType)
+                val toClass = toType.rawClass
+                if (Iterable::class.java.isAssignableFrom(toClass)) {
+                    val toComponentType = getToComponentType(toType)
+                    if (toComponentType === null) {
+                        return null
                     }
-                    return toIterableOrNull(iterable, toType.toCollectType(), chain.converter)
-                        ?: chain.next(from, fromType, toType)
+                    return iterableToIterable(iterable, fromComponentType, toClass, toComponentType, context.converter)
                 }
-                chain.next(from, fromType, toType)
+                return null
             }
-            else -> chain.next(from, fromType, toType)
-        }
-    }
-
-    private fun toArray(from: Iterable<*>, toType: Class<*>, converter: Converter): Any {
-        return from.toAnyArray(toType.componentType) {
-            converter.convert(it, toType.componentType)
-        }
-    }
-
-    private fun toIterableOrNull(from: Iterable<*>, iterableType: CollectType, converter: Converter): Any? {
-        return when (iterableType.rawClass) {
-            Iterable::class.java, List::class.java, ArrayList::class.java ->
-                toArrayList(from, iterableType.componentType, converter)
-            LinkedList::class.java ->
-                toLinkedList(from, iterableType.componentType, converter)
-            Collection::class.java, Set::class.java, LinkedHashSet::class.java ->
-                toLinkedHashSet(from, iterableType.componentType, converter)
-            HashSet::class.java ->
-                toHashSet(from, iterableType.componentType, converter)
-            TreeSet::class.java ->
-                toTreeSet(from, iterableType.componentType, converter)
+            is GenericArrayType -> convert(from, fromType, toType.rawClass, context)
             else -> null
         }
     }
 
-    private fun toArrayList(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
-        return iterable.mapTo(ArrayList<Any?>(iterable.count())) {
-            converter.convert(it, componentType)
+    private fun getFromComponentType(fromType: Type): Type? {
+        val fromClass = fromType.rawClass
+        if (fromClass.isArray) {
+            return fromClass.componentType
+        }
+        if (fromType is ParameterizedType) {
+            return try {
+                val iterableParameterizedType = fromType.getTypeSignature(Iterable::class.java)
+                iterableParameterizedType.toIterableType().componentType
+            } catch (e: Exception) {
+                null
+            }
+        }
+        return null
+    }
+
+    private fun getToComponentType(toType: ParameterizedType): Type? {
+        return try {
+            val iterableParameterizedType = toType.getTypeSignature(Iterable::class.java)
+            iterableParameterizedType.toIterableType().componentType
+        } catch (e: Exception) {
+            null
         }
     }
 
-    private fun toLinkedList(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
-        return iterable.mapTo(LinkedList<Any?>()) {
-            converter.convert(it, componentType)
+    private fun fromToIterableOrNull(from: Any): Iterable<Any?>? {
+        if (from is Iterable<Any?>) {
+            return from
+        }
+        if (from.javaClass.isArray) {
+            return from.arrayAsList()
+        }
+        return null
+    }
+
+    private fun iterableToArray(
+        from: Iterable<Any?>,
+        fromComponentType: Type,
+        toType: Class<*>,
+        converter: Converter
+    ): Any {
+        val toComponentType = toType.componentType
+        return from.toAnyArray(toComponentType) {
+            converter.convert<Any>(it, fromComponentType, toComponentType)
         }
     }
 
-    private fun toLinkedHashSet(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
-        return iterable.mapTo(LinkedHashSet<Any?>()) {
-            converter.convert(it, componentType)
-        }
-    }
-
-    private fun toHashSet(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
-        return iterable.mapTo(HashSet<Any?>()) {
-            converter.convert(it, componentType)
-        }
-    }
-
-    private fun toTreeSet(iterable: Iterable<*>, componentType: Type, converter: Converter): Any {
-        return iterable.mapTo(TreeSet<Any?>()) {
-            converter.convert(it, componentType)
-        }
-    }
-
-    private fun Any.toIterable(): Iterable<Any?>? {
-        return when {
-            this is Iterable<*> -> this
-            this.javaClass.isArray -> this.arrayAsList()
+    private fun iterableToIterable(
+        from: Iterable<Any?>,
+        fromComponentType: Type,
+        toClass: Class<*>,
+        toComponentType: Type,
+        converter: Converter
+    ): Iterable<Any?>? {
+        return when (toClass) {
+            Iterable::class.java, List::class.java, ArrayList::class.java ->
+                from.mapTo(ArrayList(from.count())) {
+                    converter.convert(it, fromComponentType, toComponentType)
+                }
+            LinkedList::class.java ->
+                from.mapTo(LinkedList()) {
+                    converter.convert(it, fromComponentType, toComponentType)
+                }
+            Collection::class.java, Set::class.java, LinkedHashSet::class.java ->
+                from.mapTo(LinkedHashSet()) {
+                    converter.convert(it, fromComponentType, toComponentType)
+                }
+            HashSet::class.java ->
+                from.mapTo(HashSet()) {
+                    converter.convert(it, fromComponentType, toComponentType)
+                }
+            TreeSet::class.java ->
+                from.mapTo(TreeSet()) {
+                    converter.convert(it, fromComponentType, toComponentType)
+                }
             else -> null
         }
     }
@@ -329,38 +344,38 @@ open class BeanConvertHandler @JvmOverloads constructor(
     private val beanResolver: BeanResolver = BeanResolver.DEFAULT,
 ) : ConvertHandler {
 
-    override fun convert(from: Any?, fromType: Type, toType: Type, chain: ConvertContext): Any? {
+    override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (from === null) {
-            return chain.next(from, fromType, toType)
+            return null
         }
         if (toType is GenericArrayType) {
-            return chain.next(from, fromType, toType)
+            return null
         }
         val toRawClass = toType.rawClassOrNull
         if (toRawClass === null) {
-            return chain.next(from, fromType, toType)
+            return null
         }
         if (toRawClass.isArray) {
-            return chain.next(from, fromType, toType)
+            return null
         }
         if (toRawClass.isEnum) {
-            return chain.next(from, fromType, toType)
+            return null
         }
         return when (toRawClass) {
             Map::class.java, LinkedHashMap::class.java ->
-                toLinkedHashMap(from, toType, chain.converter)
+                toLinkedHashMap(from, toType, context.converter)
             HashMap::class.java ->
-                toHashMap(from, toType, chain.converter)
+                toHashMap(from, toType, context.converter)
             TreeMap::class.java ->
-                toTreeMap(from, toType, chain.converter)
+                toTreeMap(from, toType, context.converter)
             ConcurrentHashMap::class.java ->
-                toConcurrentHashMap(from, toType, chain.converter)
+                toConcurrentHashMap(from, toType, context.converter)
             SetMap::class.java ->
-                toSetMap(from, toType, chain.converter)
+                toSetMap(from, toType, context.converter)
             ListMap::class.java ->
-                toListMap(from, toType, chain.converter)
+                toListMap(from, toType, context.converter)
             else ->
-                toObject(from, toType, chain.converter)
+                toObject(from, toType, context.converter)
         }
     }
 
@@ -392,7 +407,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
         val builder = beanGenerator.newBuilder(toType)
         //from.copyProperties(builder, newBeanProvider.builderType(builder, toType), beanResolver, converter)
         from.copyProperties(builder, beanResolver, converter)
-        return beanGenerator.build(builder, toType)
+        return beanGenerator.build(builder)
     }
 
     /**
@@ -408,7 +423,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
         /**
          * Builds [builder] to bean.
          */
-        fun build(builder: Any, toType: Type): Any
+        fun build(builder: Any): Any
 
         companion object {
 
@@ -425,7 +440,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
                 //    return toType
                 //}
 
-                override fun build(builder: Any, toType: Type): Any {
+                override fun build(builder: Any): Any {
                     return builder
                 }
             }

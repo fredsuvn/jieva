@@ -129,84 +129,83 @@ val Type.lowerBound: Type?
  *
  * will return: `{T=java.lang.String}`
  */
-val Type.typeArguments: Map<TypeVariable<*>, Type>
-    @Acceptable(
-        Accepted(Class::class),
-        Accepted(ParameterizedType::class),
-        Accepted(GenericArrayType::class),
-    )
-    get() {
+@Throws(IllegalArgumentException::class)
+fun @receiver:Acceptable(
+    Accepted(Class::class),
+    Accepted(ParameterizedType::class),
+    Accepted(GenericArrayType::class),
+) Type.getTypeArguments(): Map<TypeVariable<*>, Type> {
 
-        fun Type.resolveTypeParameters(to: MutableMap<TypeVariable<*>, Type>) {
+    fun Type.resolveTypeParameters(to: MutableMap<TypeVariable<*>, Type>) {
 
-            fun ParameterizedType.resolveTypeArguments(to: MutableMap<TypeVariable<*>, Type>) {
-                val actualArguments = this.actualTypeArguments
-                val typeParameters = this.rawClass.typeParameters
-                for (i in typeParameters.indices) {
-                    to[typeParameters[i]] = actualArguments[i]
-                }
-            }
-
-            fun Class<*>.resolveTypeParameters(to: MutableMap<TypeVariable<*>, Type>) {
-
-                fun Class<*>.doInterfaces() {
-                    val genericInterfaces = this.genericInterfaces
-                    for (genericInterface in genericInterfaces) {
-                        if (genericInterface is ParameterizedType) {
-                            genericInterface.resolveTypeArguments(to)
-                        }
-                    }
-                    for (genericInterface in genericInterfaces) {
-                        genericInterface.rawClass.doInterfaces()
-                    }
-                }
-
-                fun Class<*>.doSuperclass() {
-                    val genericSuperclass = this.genericSuperclass
-                    if (genericSuperclass is ParameterizedType) {
-                        genericSuperclass.resolveTypeArguments(to)
-                    }
-                    this.doInterfaces()
-                    if (genericSuperclass !== null) {
-                        genericSuperclass.rawClass.doSuperclass()
-                    }
-                }
-
-                doSuperclass()
-            }
-
-            when (this) {
-                is Class<*> -> {
-                    this.resolveTypeParameters(to)
-                }
-                is ParameterizedType -> {
-                    val ownerType = this.ownerType
-                    if (ownerType !== null) {
-                        ownerType.resolveTypeParameters(to)
-                    }
-                    this.resolveTypeArguments(to)
-                    this.rawClass.resolveTypeParameters(to)
-                }
-                is GenericArrayType -> {
-                    this.genericComponentType.resolveTypeParameters(to)
-                }
-                else -> throw IllegalArgumentException("Cannot resolve type arguments for $this")
+        fun ParameterizedType.resolveTypeArguments(to: MutableMap<TypeVariable<*>, Type>) {
+            val actualArguments = this.actualTypeArguments
+            val typeParameters = this.rawClass.typeParameters
+            for (i in typeParameters.indices) {
+                to[typeParameters[i]] = actualArguments[i]
             }
         }
 
-        val typeArguments: MutableMap<TypeVariable<*>, Type> = HashMap()
-        this.resolveTypeParameters(typeArguments)
-        val stack: MutableSet<TypeVariable<*>> = HashSet()
-        for (entry in typeArguments) {
-            stack.clear()
-            val oldType = entry.value
-            val newType = oldType.eraseTypeParameters(typeArguments, stack, true)
-            if (newType != oldType) {
-                entry.setValue(newType)
+        fun Class<*>.resolveTypeParameters(to: MutableMap<TypeVariable<*>, Type>) {
+
+            fun Class<*>.doInterfaces() {
+                val genericInterfaces = this.genericInterfaces
+                for (genericInterface in genericInterfaces) {
+                    if (genericInterface is ParameterizedType) {
+                        genericInterface.resolveTypeArguments(to)
+                    }
+                }
+                for (genericInterface in genericInterfaces) {
+                    genericInterface.rawClass.doInterfaces()
+                }
             }
+
+            fun Class<*>.doSuperclass() {
+                val genericSuperclass = this.genericSuperclass
+                if (genericSuperclass is ParameterizedType) {
+                    genericSuperclass.resolveTypeArguments(to)
+                }
+                this.doInterfaces()
+                if (genericSuperclass !== null) {
+                    genericSuperclass.rawClass.doSuperclass()
+                }
+            }
+
+            doSuperclass()
         }
-        return typeArguments
+
+        when (this) {
+            is Class<*> -> {
+                this.resolveTypeParameters(to)
+            }
+            is ParameterizedType -> {
+                val ownerType = this.ownerType
+                if (ownerType !== null) {
+                    ownerType.resolveTypeParameters(to)
+                }
+                this.resolveTypeArguments(to)
+                this.rawClass.resolveTypeParameters(to)
+            }
+            is GenericArrayType -> {
+                this.genericComponentType.resolveTypeParameters(to)
+            }
+            else -> throw IllegalArgumentException("Cannot resolve type arguments for $this")
+        }
     }
+
+    val typeArguments: MutableMap<TypeVariable<*>, Type> = HashMap()
+    this.resolveTypeParameters(typeArguments)
+    val stack: MutableSet<TypeVariable<*>> = HashSet()
+    for (entry in typeArguments) {
+        stack.clear()
+        val oldType = entry.value
+        val newType = oldType.eraseTypeParameters(typeArguments, stack, true)
+        if (newType != oldType) {
+            entry.setValue(newType)
+        }
+    }
+    return typeArguments
+}
 
 /**
  * Returns a [ParameterizedType] as signature of [this], target for [to] type.
@@ -219,9 +218,10 @@ val Type.typeArguments: Map<TypeVariable<*>, Type>
  *
  * will return: `Foo<String>`
  */
+@Throws(IllegalArgumentException::class)
 fun Type.getTypeSignature(to: Class<*>): ParameterizedType {
     val typeParameters = to.typeParameters
-    val typeArguments = this.typeArguments
+    val typeArguments = this.getTypeArguments()
     val actualArguments = typeParameters.map {
         typeArguments[it] ?: it
     }
@@ -231,26 +231,6 @@ fun Type.getTypeSignature(to: Class<*>): ParameterizedType {
     } else {
         parameterizedTypeWithOwner(to, owner, actualArguments)
     }
-}
-
-/**
- * Returns a [ActualType] of [this], target for [to] type.
- *
- * Assume `class Foo<T>` and its subclass `class StringFoo` extends `Foo<String>`:
- *
- * ```
- * Reflects.toActualType(StringFoo.class, Foo.class);
- * ```
- *
- * will return: `Foo<String>`
- */
-fun Type.getActualType(to: Class<*>): ActualType {
-    val typeParameters = to.typeParameters
-    val typeArguments = this.typeArguments
-    val actualArguments = typeParameters.map {
-        typeArguments[it] ?: it
-    }
-    return ActualType.newActualType(to, actualArguments)
 }
 
 /**

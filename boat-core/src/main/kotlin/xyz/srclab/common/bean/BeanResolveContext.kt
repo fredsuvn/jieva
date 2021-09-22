@@ -1,9 +1,9 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.common.collect.toUnmodifiable
+import xyz.srclab.common.reflect.getTypeArguments
 import xyz.srclab.common.reflect.methods
 import xyz.srclab.common.reflect.rawClass
-import xyz.srclab.common.reflect.typeArguments
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 import java.lang.reflect.TypeVariable
@@ -44,7 +44,7 @@ interface BeanResolveContext {
                 override val isComplete: Boolean get() = complete
                 override val preparedBeanType: BeanType = preparedBeanType
                 override val type: Type = type
-                override val typeArguments: Map<TypeVariable<*>, Type> = type.typeArguments
+                override val typeArguments: Map<TypeVariable<*>, Type> = type.getTypeArguments()
                 override val properties: MutableMap<String, PropertyType> = properties
                 override val methods: List<Method> = type.rawClass.methods()
 
