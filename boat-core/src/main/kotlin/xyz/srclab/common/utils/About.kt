@@ -1,9 +1,9 @@
 package xyz.srclab.common.utils
 
-import xyz.srclab.common.lang.Defaults
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-import xyz.srclab.common.lang.checkArgument
-import xyz.srclab.common.lang.isNumeric
+import xyz.srclab.common.base.HYPHEN_MATCHER
+import xyz.srclab.common.base.PLUS_MATCHER
+import xyz.srclab.common.base.checkArgument
+import xyz.srclab.common.base.isNumeric
 import kotlin.text.toInt as toIntKt
 
 /**
@@ -14,36 +14,13 @@ import kotlin.text.toInt as toIntKt
  */
 interface About {
 
-    @get:JvmName("name")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
-
-    @get:JvmName("version")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val version: String?
-
-    @get:JvmName("author")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val authors: List<Author>
-
-    @get:JvmName("mail")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val mail: String?
-
-    @get:JvmName("url")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String?
-
-    @get:JvmName("licence")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val licences: List<String>
-
-    @get:JvmName("poweredBy")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val poweredBy: List<About>
-
-    @get:JvmName("copyright")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val copyright: String?
 
     companion object {
@@ -101,39 +78,14 @@ interface About {
             }
 
             override fun toString(): String {
-                val builder = StringBuilder()
-                var count = 0
-                if (!version.isNullOrEmpty()) {
-                    builder.append("Version: $version")
-                    count++
+                val builder = StringBuilder(name)
+                if (version !== null) {
+                    builder.append(" V$version")
                 }
-
-                fun String.appendInfo() {
-                    if (count > 0) {
-                        builder.append(", ")
-                    }
-                    builder.append(this)
+                if (copyright !== null) {
+                    builder.append(" $copyright")
                 }
-
-                if (authors.isNotEmpty()) {
-                    "Authors: $authors".appendInfo()
-                }
-                if (!mail.isNullOrEmpty()) {
-                    "Mail: $mail".appendInfo()
-                }
-                if (!url.isNullOrEmpty()) {
-                    "Url: $url".appendInfo()
-                }
-                if (licences.isNotEmpty()) {
-                    "Licences: $licences".toString().appendInfo()
-                }
-                if (poweredBy.isNotEmpty()) {
-                    "Powered By: $poweredBy".toString().appendInfo()
-                }
-                if (!copyright.isNullOrEmpty()) {
-                    "Copyright: $copyright".appendInfo()
-                }
-                return if (count == 0) name else "$name[$builder]"
+                return builder.toString()
             }
         }
     }
@@ -146,16 +98,8 @@ interface About {
  */
 interface Author {
 
-    @get:JvmName("name")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
-
-    @get:JvmName("mail")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val mail: String?
-
-    @get:JvmName("url")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val url: String?
 
     companion object {
@@ -212,55 +156,33 @@ interface Author {
  */
 interface SemVer : Comparable<SemVer> {
 
-    @get:JvmName("normalNumbers")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val normalNumbers: List<Int>
 
-    @get:JvmName("major")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val major: Int
         get() = normalNumbers[0]
 
-    @get:JvmName("minor")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val minor: Int
         get() = if (normalNumbers.size > 1) normalNumbers[1] else 0
 
-    @get:JvmName("patch")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val patch: Int
         get() = if (normalNumbers.size > 2) normalNumbers[2] else 0
 
-    @get:JvmName("normalString")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val normalString: String
         get() = normalNumbers.joinDotToString()
 
-    @get:JvmName("preRelease")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val preRelease: List<PreReleaseIdentifier>
 
-    @get:JvmName("preReleaseString")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val preReleaseString: String
         get() = preRelease.joinDotToString()
 
-    @get:JvmName("buildMetadata")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val buildMetadata: List<String>
 
-    @get:JvmName("buildMetadataString")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val buildMetadataString: String
         get() = buildMetadata.joinDotToString()
 
-    @get:JvmName("isNormal")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val isNormal: Boolean
         get() = preRelease.isEmpty()
 
-    @get:JvmName("isPreRelease")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val isPreRelease: Boolean
         get() = preRelease.isNotEmpty()
 
@@ -484,8 +406,8 @@ interface SemVer : Comparable<SemVer> {
                 return subSpec.split(".").toBuildMetadata()
             }
 
-            val hyphenIndex = Defaults.HYPHEN_MATCHER.indexIn(this)
-            val plusSignIndex = Defaults.PLUS_SIGN_MATCHER.indexIn(this)
+            val hyphenIndex = HYPHEN_MATCHER.indexIn(this)
+            val plusSignIndex = PLUS_MATCHER.indexIn(this)
             if (hyphenIndex < 0 && plusSignIndex < 0) {
                 return newSemVer(parseNormalNumbers(this), emptyList(), emptyList())
             }

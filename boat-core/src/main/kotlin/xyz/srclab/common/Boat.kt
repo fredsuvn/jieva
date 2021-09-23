@@ -1,6 +1,6 @@
 package xyz.srclab.common
 
-import xyz.srclab.common.lang.loadPropertiesResource
+import xyz.srclab.common.base.loadResourceAsProperties
 import xyz.srclab.common.utils.About
 import xyz.srclab.common.utils.Author
 import xyz.srclab.common.utils.SemVer
@@ -8,7 +8,7 @@ import xyz.srclab.common.utils.SemVer.Companion.parseSemVer
 
 object Boat {
 
-    private val buildInfos: Map<String, String> = "META-INF/build.properties".loadPropertiesResource()
+    private val buildInfos: Map<String, String> = "META-INF/build.properties".loadResourceAsProperties()
 
     private val sunqian = Author.of(
         "Sun Qian",
@@ -22,15 +22,13 @@ object Boat {
         "https://github.com/srclab-projects"
     )
 
-    @get:JvmName("version")
-    @JvmStatic
-    val version: SemVer = buildInfos["build.version"]!!.parseSemVer()
+    @JvmField
+    val VERSION: SemVer = buildInfos["build.version"]!!.parseSemVer()
 
-    @get:JvmName("about")
-    @JvmStatic
-    val about: About = About.of(
+    @JvmField
+    val ABOUT: About = About.of(
         "Boat",
-        version.toString(),
+        VERSION.toString(),
         listOf(sunqian, srclab),
         srclab.mail,
         "https://github.com/srclab-projects/boat",
@@ -39,9 +37,8 @@ object Boat {
         "© 2021 SrcLab"
     )
 
-    @get:JvmName("secretCodes")
-    @JvmStatic
-    val secretCodes: List<String> = listOf(
+    @JvmField
+    val SECRET_CODES: List<String> = listOf(
         "Thank you, Taro.",
         "谢谢你，泰罗。",
     )
