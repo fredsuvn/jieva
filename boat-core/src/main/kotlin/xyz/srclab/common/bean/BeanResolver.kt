@@ -44,7 +44,7 @@ interface BeanResolver {
  * Abstract [BeanResolver] which can cache resolved [BeanType] previous created.
  */
 abstract class AbstractBeanResolver @JvmOverloads constructor(
-    private val cache: Cache<Type, BeanType> = Cache.newWeakCache()
+    private val cache: Cache<Type, BeanType> = Cache.weakCache()
 ) : BeanResolver {
 
     override fun resolve(type: Type): BeanType {

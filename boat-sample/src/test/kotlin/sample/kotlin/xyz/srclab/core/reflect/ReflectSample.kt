@@ -5,7 +5,6 @@ import xyz.srclab.common.reflect.genericArrayType
 import xyz.srclab.common.reflect.invoke
 import xyz.srclab.common.reflect.method
 import xyz.srclab.common.reflect.parameterizedType
-import xyz.srclab.common.test.TestLogger
 
 class ReflectSample {
 

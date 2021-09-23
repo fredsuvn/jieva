@@ -4,7 +4,6 @@ import org.testng.Assert
 import org.testng.annotations.Test
 import xyz.srclab.common.serialize.json.jsonToObject
 import xyz.srclab.common.serialize.json.toJsonString
-import xyz.srclab.common.test.TestLogger
 
 class KotlinDataClassTest {
 

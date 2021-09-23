@@ -1,7 +1,6 @@
 package sample.kotlin.xyz.srclab.core.test
 
 import org.testng.annotations.Test
-import xyz.srclab.common.test.TestLogger
 import xyz.srclab.common.test.TestTask
 import xyz.srclab.common.test.testTasks
 

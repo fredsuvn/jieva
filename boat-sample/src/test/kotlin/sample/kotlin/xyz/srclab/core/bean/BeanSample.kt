@@ -2,7 +2,6 @@ package sample.kotlin.xyz.srclab.core.bean
 
 import org.testng.annotations.Test
 import xyz.srclab.common.bean.copyProperties
-import xyz.srclab.common.test.TestLogger
 
 class BeanSample {
 

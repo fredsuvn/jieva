@@ -52,34 +52,34 @@ interface Scheduler : Runner {
     companion object {
 
         @JvmField
-        val DEFAULT_THREAD_SCHEDULER: Scheduler = newSingleThreadScheduler()
+        val DEFAULT_THREAD_SCHEDULER: Scheduler = singleThreadScheduler()
 
         @JvmStatic
-        fun newSingleThreadScheduler(): ScheduledExecutorServiceScheduler {
-            return newScheduledExecutorServiceScheduler(Executors.newSingleThreadScheduledExecutor())
+        fun singleThreadScheduler(): ScheduledExecutorServiceScheduler {
+            return scheduledExecutorServiceScheduler(Executors.newSingleThreadScheduledExecutor())
         }
 
         @JvmStatic
-        fun newThreadPoolScheduler(corePoolSize: Int): ScheduledExecutorServiceScheduler {
-            return newScheduledExecutorServiceScheduler(Executors.newScheduledThreadPool(corePoolSize))
+        fun threadPoolScheduler(corePoolSize: Int): ScheduledExecutorServiceScheduler {
+            return scheduledExecutorServiceScheduler(Executors.newScheduledThreadPool(corePoolSize))
         }
 
         @JvmStatic
-        fun newScheduledExecutorServiceScheduler(
+        fun scheduledExecutorServiceScheduler(
             scheduledExecutorService: ScheduledExecutorService
         ): ScheduledExecutorServiceScheduler {
             return ScheduledExecutorServiceScheduler(scheduledExecutorService)
         }
 
         @JvmStatic
-        fun newScheduledThreadPoolScheduler(
+        fun scheduledThreadPoolScheduler(
             scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor
         ): ScheduledThreadPoolScheduler {
             return ScheduledThreadPoolScheduler(scheduledThreadPoolExecutor)
         }
 
         @JvmStatic
-        fun newScheduledThreadPoolSchedulerBuilder(): ScheduledThreadPoolScheduler.Builder {
+        fun scheduledThreadPoolSchedulerBuilder(): ScheduledThreadPoolScheduler.Builder {
             return ScheduledThreadPoolScheduler.Builder()
         }
 

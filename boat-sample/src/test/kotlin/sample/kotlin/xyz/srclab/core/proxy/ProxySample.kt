@@ -3,7 +3,6 @@ package sample.kotlin.xyz.srclab.core.proxy
 import org.testng.annotations.Test
 import xyz.srclab.common.proxy.ProxyClass
 import xyz.srclab.common.proxy.ProxyMethod
-import xyz.srclab.common.test.TestLogger
 import java.lang.reflect.Method
 import java.util.*
 

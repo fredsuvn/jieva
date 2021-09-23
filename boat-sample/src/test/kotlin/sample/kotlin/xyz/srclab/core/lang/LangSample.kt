@@ -10,7 +10,6 @@ import xyz.srclab.common.lang.CharsTemplate.Companion.resolveTemplate
 import xyz.srclab.common.lang.LazyToString.Companion.lazyToString
 import xyz.srclab.common.lang.Processing.Companion.newProcessing
 import xyz.srclab.common.lang.SpecParser.Companion.parseFirstClassNameToInstance
-import xyz.srclab.common.test.TestLogger
 import xyz.srclab.common.utils.Counter.Companion.counterStarts
 import java.math.BigDecimal
 import java.util.*

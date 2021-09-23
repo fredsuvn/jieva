@@ -5,7 +5,6 @@ import xyz.srclab.common.status.Status
 import xyz.srclab.common.status.StringStatus
 import xyz.srclab.common.status.StringStatus.Companion.joinStateDescriptions
 import xyz.srclab.common.status.StringStatus.Companion.moreDescriptions
-import xyz.srclab.common.test.TestLogger
 
 class StatusSample {
 

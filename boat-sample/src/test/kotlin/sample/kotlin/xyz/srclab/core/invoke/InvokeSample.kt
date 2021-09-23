@@ -2,7 +2,6 @@ package sample.kotlin.xyz.srclab.core.invoke
 
 import org.testng.annotations.Test
 import xyz.srclab.common.invoke.Invoker
-import xyz.srclab.common.test.TestLogger
 
 class InvokeSample {
 

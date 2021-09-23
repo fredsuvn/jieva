@@ -3,7 +3,6 @@ package sample.kotlin.xyz.srclab.codec
 import org.testng.annotations.Test
 import xyz.srclab.common.codec.*
 import xyz.srclab.common.codec.aes.toAesKey
-import xyz.srclab.common.test.TestLogger
 
 class CodecSample {
 

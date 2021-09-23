@@ -7,7 +7,6 @@ import xyz.srclab.common.serialize.json.JsonSerializer
 import xyz.srclab.common.serialize.json.jackson.toJsonSerializer
 import xyz.srclab.common.serialize.json.stringifyJson
 import xyz.srclab.common.serialize.json.toJson
-import xyz.srclab.common.test.TestLogger
 
 class SerializeSample {
 

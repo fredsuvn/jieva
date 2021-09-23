@@ -102,14 +102,30 @@ fun sleep(duration: Duration) {
  * This function calls [filter] for each stack trace element of current thread,
  * first try to find the `called` element of which return value is `0`,
  * then continue (from ``called``'s index + 1) to find the `caller` element of which return value is `1`,
+ * returns the element of which index is ``caller``'s index.
+ *
+ * Note if stack trace elements of current thread is null,
+ * or ``caller``'s index is out of bounds, return null.
+ */
+fun callerStackTrace(
+    filter: (StackTraceElement, findCalled: Boolean) -> Int
+): StackTraceElement? {
+    return callerStackTrace(0, filter)
+}
+
+/**
+ * Try to find caller stack trace element.
+ *
+ * This function calls [filter] for each stack trace element of current thread,
+ * first try to find the `called` element of which return value is `0`,
+ * then continue (from ``called``'s index + 1) to find the `caller` element of which return value is `1`,
  * returns the element of which index is ``caller``'s index + [offset].
  *
  * Note if stack trace elements of current thread is null,
  * or ``caller``'s index + [offset] is out of bounds, return null.
  */
-@JvmOverloads
 fun callerStackTrace(
-    offset: Int = 0,
+    offset: Int,
     filter: (StackTraceElement, findCalled: Boolean) -> Int
 ): StackTraceElement? {
     val stackTrace = currentThread().stackTrace
