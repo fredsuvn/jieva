@@ -1,7 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.invoke.Invoke
-import xyz.srclab.common.invoke.Invoker
+import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type
 
@@ -69,7 +69,7 @@ interface FastConverter {
             handlers: Iterable<Any>
         ) : FastConverter {
 
-            private val handlerMap: Map<Pair<Type, Type>, Invoke> = run {
+            private val handlerMap: Map<Pair<Type, Type>, Invoke> by lazy {
                 val map = HashMap<Pair<Type, Type>, Invoke>()
                 for (handler in handlers) {
                     val methods = handler.javaClass.methods
@@ -84,7 +84,7 @@ interface FastConverter {
                             )
                         }
                         map[method.genericParameterTypes[0] to method.genericReturnType] =
-                            Invoker.forMethod(method).invokeWith(handler)
+                            method.toInvoker().prepareFor(handler)
                     }
                 }
                 map
@@ -93,7 +93,7 @@ interface FastConverter {
             override fun <T : Any, R : Any> convert(from: T, fromType: Type, toType: Type): R {
                 val invoke = handlerMap[fromType to toType]
                 if (invoke === null) {
-                    throw UnsupportedConvertException("$fromType to $toType")
+                    throw UnsupportedConvertException("$fromType to $toType.")
                 }
                 return invoke.start(from)
             }

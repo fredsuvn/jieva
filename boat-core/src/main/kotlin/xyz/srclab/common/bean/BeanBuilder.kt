@@ -24,9 +24,7 @@ interface BeanBuilder {
         /**
          * @see EmptyConstructorBeanBuilder
          */
-        fun emptyConstructorBeanBuilder(): BeanBuilder {
-            return EmptyConstructorBeanBuilder
-        }
+        val DEFAULT = EmptyConstructorBeanBuilder
     }
 }
 

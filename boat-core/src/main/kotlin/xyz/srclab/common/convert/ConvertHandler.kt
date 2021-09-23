@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.bean.BeanBuilder
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
@@ -16,7 +17,6 @@ import java.time.temporal.Temporal
 import java.time.temporal.TemporalAdjuster
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.toString
 
 /**
  * Handler for [Converter].
@@ -65,17 +65,16 @@ interface ConvertHandler {
  */
 object CompatibleConvertHandler : ConvertHandler {
     override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
-        if (fromType == toType || toType == Any::class.java) {
+        if (from === null || fromType == toType || toType == Any::class.java) {
             return from
         }
         if (toType is Class<*>) {
-            if (fromType is Class<*>) {
-                if (toType.isAssignableFrom(fromType)) {
-                    return from
-                }
-                if (fromType.toWrapperClass() == toType.toWrapperClass()) {
-                    return from
-                }
+            val fromClass = from.javaClass
+            if (toType.isAssignableFrom(fromClass)) {
+                return from
+            }
+            if (fromClass.toWrapperClass() == toType.toWrapperClass()) {
+                return from
             }
             if (toType.isEnum) {
                 return toType.enumValueIgnoreCaseOrNull<Any>(from.toString())
@@ -96,7 +95,7 @@ object LowerBoundConvertHandler : ConvertHandler {
                 if (lowerBound === null) {
                     null
                 } else {
-                    context.converter.convert(from, fromType, lowerBound)
+                    context.converter.convert<Any?>(from, fromType, lowerBound)
                 }
             }
             else -> null
@@ -217,6 +216,9 @@ object IterableConvertHandler : ConvertHandler {
         if (from === null) {
             return null
         }
+        if (fromType is GenericArrayType) {
+            return convert(from, fromType, toType.rawClass, context)
+        }
         val fromComponentType = getFromComponentType(fromType)
         if (fromComponentType === null) {
             return null
@@ -246,7 +248,6 @@ object IterableConvertHandler : ConvertHandler {
                 }
                 return null
             }
-            is GenericArrayType -> convert(from, fromType, toType.rawClass, context)
             else -> null
         }
     }
@@ -340,7 +341,7 @@ object IterableConvertHandler : ConvertHandler {
  * * [SetMap], [ListMap];
  */
 open class BeanConvertHandler @JvmOverloads constructor(
-    private val beanGenerator: BeanGenerator = BeanGenerator.DEFAULT,
+    private val beanBuilder: BeanBuilder = BeanBuilder.DEFAULT,
     private val beanResolver: BeanResolver = BeanResolver.DEFAULT,
 ) : ConvertHandler {
 
@@ -403,48 +404,14 @@ open class BeanConvertHandler @JvmOverloads constructor(
         return from.copyProperties(ListMap<Any, Any?>(), toType, beanResolver, converter)
     }
 
-    private fun toObject(from: Any, toType: Type, converter: Converter): Any {
-        val builder = beanGenerator.newBuilder(toType)
+    private fun toObject(from: Any, toType: Type, converter: Converter): Any? {
+        if (toType !is Class<*>) {
+            return null
+        }
+        val builder = beanBuilder.newBuilder(toType)
         //from.copyProperties(builder, newBeanProvider.builderType(builder, toType), beanResolver, converter)
         from.copyProperties(builder, beanResolver, converter)
-        return beanGenerator.build(builder)
-    }
-
-    /**
-     * Bean generator to create target bean.
-     */
-    interface BeanGenerator {
-
-        /**
-         * Returns builder of [toType].
-         */
-        fun newBuilder(toType: Type): Any
-
-        /**
-         * Builds [builder] to bean.
-         */
-        fun build(builder: Any): Any
-
-        companion object {
-
-            /**
-             * Default new bean operation, with `new Bean()` then `setXxx(value)` way.
-             */
-            val DEFAULT: BeanGenerator = object : BeanGenerator {
-
-                override fun newBuilder(toType: Type): Any {
-                    return toType.rawClass.newInstance()
-                }
-
-                //override fun builderType(toType: Type): Type {
-                //    return toType
-                //}
-
-                override fun build(builder: Any): Any {
-                    return builder
-                }
-            }
-        }
+        return beanBuilder.build(builder)
     }
 
     companion object {

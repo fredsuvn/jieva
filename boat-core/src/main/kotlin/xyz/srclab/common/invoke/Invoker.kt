@@ -36,14 +36,14 @@ interface Invoker {
     /**
      * Prepares an invoking, not forcibly.
      */
-    fun prepare(obj: Any?): Invoke {
-        return prepare(obj, false)
+    fun prepareFor(obj: Any?): Invoke {
+        return prepareFor(obj, false)
     }
 
     /**
      * Prepares an invoking.
      */
-    fun prepare(obj: Any?, force: Boolean): Invoke {
+    fun prepareFor(obj: Any?, force: Boolean): Invoke {
         return object : Invoke {
             override fun <T> start(vararg args: Any?): T {
                 return doInvoke(obj, force, *args)

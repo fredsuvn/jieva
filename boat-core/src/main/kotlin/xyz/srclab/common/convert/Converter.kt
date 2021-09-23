@@ -1,10 +1,10 @@
 package xyz.srclab.common.convert
 
+import xyz.srclab.common.base.asAny
 import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.collect.isEmpty
 import xyz.srclab.common.collect.plusBefore
 import xyz.srclab.common.convert.Converter.Companion.extend
-import xyz.srclab.common.base.asAny
 import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type
 
@@ -95,28 +95,21 @@ interface Converter {
         ) : Converter {
 
             override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
-                val chain = ConvertContextImpl()
-                return chain.next(from, fromType, toType).asAny()
+                val context = ConvertContextImpl()
+                for (convertHandler in convertHandlers) {
+                    val result = convertHandler.convert(from, fromType, toType, context)
+                    if (result === ConvertHandler.NULL) {
+                        return null.asAny()
+                    }
+                    if (result !== null) {
+                        return result.asAny()
+                    }
+                }
+                throw UnsupportedConvertException("Unsupported converting: $from to $toType.")
             }
 
             private inner class ConvertContextImpl : ConvertContext {
-
-                private var handlerIterator = convertHandlers.iterator()
-
                 override val converter: Converter = this@ConverterImpl
-
-                override fun next(from: Any?, fromType: Type, toType: Type): Any? {
-                    if (!handlerIterator.hasNext()) {
-                        throw UnsupportedConvertException("$fromType to $toType.")
-                    }
-                    val handler = handlerIterator.next()
-                    return handler.convert(from, fromType, toType, this)
-                }
-
-                override fun restart(from: Any?, fromType: Type, toType: Type): Any? {
-                    handlerIterator = convertHandlers.iterator()
-                    return handlerIterator.next().convert(from, fromType, toType, this)
-                }
             }
         }
     }
