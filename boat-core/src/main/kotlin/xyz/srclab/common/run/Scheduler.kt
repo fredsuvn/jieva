@@ -32,18 +32,55 @@ interface Scheduler : Runner {
 
     @Throws(RejectedExecutionException::class)
     fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
-        return scheduleFixedRate(initialDelay, period) {
+        return scheduleFixedRate(true, initialDelay, period)
+    }
+
+    @Throws(RejectedExecutionException::class)
+    fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V>{
+        return scheduleFixedDelay(true, initialDelay, period, task)
+    }
+
+    @Throws(RejectedExecutionException::class)
+    fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
+        return scheduleFixedDelay(true, initialDelay, period, task)
+    }
+
+    @Throws(RejectedExecutionException::class)
+    fun <V> schedule(statistics: Boolean, delay: Duration, task: () -> V): Scheduling<V>
+
+    @Throws(RejectedExecutionException::class)
+    fun schedule(statistics: Boolean, delay: Duration, task: Runnable): Scheduling<*> {
+        return schedule(statistics, delay) {
             task.run()
             null
         }
     }
 
     @Throws(RejectedExecutionException::class)
-    fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V>
+    fun <V> scheduleFixedRate(
+        statistics: Boolean, initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V>
 
     @Throws(RejectedExecutionException::class)
-    fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
-        return scheduleFixedDelay(initialDelay, period) {
+    fun scheduleFixedRate(
+        statistics: Boolean, initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
+        return scheduleFixedRate(statistics, initialDelay, period) {
+            task.run()
+            null
+        }
+    }
+
+    @Throws(RejectedExecutionException::class)
+    fun <V> scheduleFixedDelay(
+        statistics: Boolean, initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V>
+
+    @Throws(RejectedExecutionException::class)
+    fun scheduleFixedDelay(
+        statistics: Boolean,
+        initialDelay: Duration,
+        period: Duration,
+        task: Runnable
+    ): Scheduling<*> {
+        return scheduleFixedDelay(statistics, initialDelay, period) {
             task.run()
             null
         }

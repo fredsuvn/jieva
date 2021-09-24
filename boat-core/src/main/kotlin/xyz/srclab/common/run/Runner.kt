@@ -16,30 +16,52 @@ import java.util.concurrent.*
 interface Runner : Executor {
 
     /**
-     * Run and returns [Running].
+     * Runs and returns [Running] with statistics. It is equivalent to:
+     *
+     * ```
+     * run(true, task)
+     * ```
      */
     @Throws(RejectedExecutionException::class)
-    fun <V> run(task: () -> V): Running<V>
-
-    /**
-     * Run and returns [Running].
-     */
-    @Throws(RejectedExecutionException::class)
-    fun run(task: Runnable): Running<*>
-
-    /**
-     * Run and no return.
-     */
-    @Throws(RejectedExecutionException::class)
-    fun <V> fastRun(task: () -> V)
-
-    /**
-     * Run and no return.
-     */
-    @Throws(RejectedExecutionException::class)
-    fun fastRun(task: Runnable) {
-        execute(task)
+    fun <V> run(task: () -> V): Running<V> {
+        return run(true, task)
     }
+
+    /**
+     * Runs and returns [Running] with statistics. It is equivalent to:
+     *
+     * ```
+     * run(true, task)
+     * ```
+     */
+    @Throws(RejectedExecutionException::class)
+    fun run(task: Runnable): Running<*> {
+        return run(true, task)
+    }
+
+    /**
+     * Runs and returns [Running].
+     *
+     * @param statistics specifies whether enable statistics function
+     */
+    @Throws(RejectedExecutionException::class)
+    fun <V> run(statistics: Boolean, task: () -> V): Running<V>
+
+    /**
+     * Runs and returns [Running].
+     *
+     * @param statistics specifies whether enable statistics function
+     */
+    @Throws(RejectedExecutionException::class)
+    fun run(statistics: Boolean, task: Runnable): Running<*>
+
+    /**
+     * Runs and no return.
+     *
+     * @see Executor.execute
+     */
+    @Throws(RejectedExecutionException::class)
+    fun <V> execute(task: () -> V)
 
     companion object {
 
@@ -106,23 +128,43 @@ interface Runner : Executor {
         }
 
         @JvmStatic
-        fun <V> fastRunSync(task: () -> V) {
-            SYNC_RUNNER.fastRun(task)
+        fun <V> runSync(statistics: Boolean, task: () -> V): Running<V> {
+            return SYNC_RUNNER.run(statistics, task)
         }
 
         @JvmStatic
-        fun fastRunSync(task: Runnable) {
-            SYNC_RUNNER.fastRun(task)
+        fun runSync(statistics: Boolean, task: Runnable): Running<*> {
+            return SYNC_RUNNER.run(statistics, task)
         }
 
         @JvmStatic
-        fun <V> fastRunAsync(task: () -> V) {
-            ASYNC_RUNNER.fastRun(task)
+        fun <V> runAsync(statistics: Boolean, task: () -> V): Running<V> {
+            return ASYNC_RUNNER.run(statistics, task)
         }
 
         @JvmStatic
-        fun fastRunAsync(task: Runnable) {
-            ASYNC_RUNNER.fastRun(task)
+        fun runAsync(statistics: Boolean, task: Runnable): Running<*> {
+            return ASYNC_RUNNER.run(statistics, task)
+        }
+
+        @JvmStatic
+        fun <V> executeSync(task: () -> V) {
+            SYNC_RUNNER.execute(task)
+        }
+
+        @JvmStatic
+        fun executeSync(task: Runnable) {
+            SYNC_RUNNER.execute(task)
+        }
+
+        @JvmStatic
+        fun <V> executeAsync(task: () -> V) {
+            ASYNC_RUNNER.execute(task)
+        }
+
+        @JvmStatic
+        fun executeAsync(task: Runnable) {
+            ASYNC_RUNNER.execute(task)
         }
     }
 }

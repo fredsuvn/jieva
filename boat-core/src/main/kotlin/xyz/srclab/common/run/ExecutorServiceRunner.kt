@@ -14,15 +14,15 @@ open class ExecutorServiceRunner(
     private val executorService: ExecutorService
 ) : Runner {
 
-    override fun <V> run(task: () -> V): Running<V> {
-        return RunningImpl(task)
+    override fun <V> run(statistics: Boolean, task: () -> V): Running<V> {
+        return if (statistics) StatisticsRunning(task) else SimpleRunning(task)
     }
 
-    override fun run(task: Runnable): Running<*> {
-        return RunningImpl<Any>(task)
+    override fun run(statistics: Boolean, task: Runnable): Running<*> {
+        return if (statistics) StatisticsRunning<Any?>(task) else SimpleRunning<Any?>(task)
     }
 
-    override fun <V> fastRun(task: () -> V) {
+    override fun <V> execute(task: () -> V) {
         executorService.execute { task() }
     }
 
@@ -59,9 +59,21 @@ open class ExecutorServiceRunner(
         return executorService.toString()
     }
 
-    private inner class RunningImpl<V> : Running<V> {
+    private inner class SimpleRunning<V> : AbstractRunning<V> {
 
-        private val future: Future<V>
+        override var startTime: Instant? = null
+        override var endTime: Instant? = null
+
+        constructor(task: () -> V) {
+            future = executorService.submit(task)
+        }
+
+        constructor(task: Runnable) {
+            future = executorService.submit(task, null)
+        }
+    }
+
+    private inner class StatisticsRunning<V> : AbstractRunning<V> {
 
         override var startTime: Instant? = null
         override var endTime: Instant? = null
@@ -72,26 +84,6 @@ open class ExecutorServiceRunner(
 
         constructor(task: Runnable) {
             future = executorService.submit(RunnableTask(task), null)
-        }
-
-        override fun get(): V {
-            return future.get()
-        }
-
-        override fun get(timeout: Long, unit: TimeUnit): V {
-            return future.get(timeout, unit)
-        }
-
-        override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
-            return future.cancel(mayInterruptIfRunning)
-        }
-
-        override fun isCancelled(): Boolean {
-            return future.isCancelled
-        }
-
-        override fun isDone(): Boolean {
-            return future.isDone
         }
 
         private inner class CallableTask<V>(private val task: () -> V) : Callable<V> {
@@ -118,6 +110,31 @@ open class ExecutorServiceRunner(
                     endTime = Instant.now()
                 }
             }
+        }
+    }
+
+    private abstract class AbstractRunning<V> : Running<V> {
+
+        protected lateinit var future: Future<V>
+
+        override fun get(): V {
+            return future.get()
+        }
+
+        override fun get(timeout: Long, unit: TimeUnit): V {
+            return future.get(timeout, unit)
+        }
+
+        override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+            return future.cancel(mayInterruptIfRunning)
+        }
+
+        override fun isCancelled(): Boolean {
+            return future.isCancelled
+        }
+
+        override fun isDone(): Boolean {
+            return future.isDone
         }
     }
 }

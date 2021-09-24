@@ -74,6 +74,10 @@ interface Logger {
             private val output: PrintStream
         ) : Logger {
             override fun log(level: Int, message: String, vararg args: Any?) {
+                if (level < this.level) {
+                    return
+                }
+
                 fun levelToString(level: Int): String {
                     return when {
                         level <= DEBUG_LEVEL -> "TRACE"
@@ -108,14 +112,12 @@ interface Logger {
                 val levelDescription = levelToString(level)
                 val timestamp = SIMPLE_LOCAL_DATE_TIME_FORMATTER.format(LocalDateTime.now())
                 val formattedMessage = message.fastFormat(*arguments)
-                if (level >= this.level) {
-                    if (callerStackTrace === null) {
-                        output.println("[$levelDescription][$timestamp] - $formattedMessage")
-                    } else {
-                        output.println("[$levelDescription][$timestamp]" +
-                            "[${callerStackTrace.className}.${callerStackTrace.methodName}" +
-                            "(${callerStackTrace.lineNumber})] - $formattedMessage")
-                    }
+                if (callerStackTrace === null) {
+                    output.println("[$levelDescription][$timestamp] - $formattedMessage")
+                } else {
+                    output.println("[$levelDescription][$timestamp]" +
+                        "[${callerStackTrace.className}.${callerStackTrace.methodName}" +
+                        "(${callerStackTrace.lineNumber})] - $formattedMessage")
                 }
             }
         }

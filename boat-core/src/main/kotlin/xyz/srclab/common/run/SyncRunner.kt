@@ -10,15 +10,15 @@ import java.util.concurrent.TimeUnit
  */
 object SyncRunner : Runner {
 
-    override fun <V> run(task: () -> V): Running<V> {
-        return RunningImpl(task)
+    override fun <V> run(statistics: Boolean, task: () -> V): Running<V> {
+        return if (statistics) StatisticsRunning(task) else SimpleRunning(task)
     }
 
-    override fun run(task: Runnable): Running<*> {
-        return RunningImpl<Any>(task)
+    override fun run(statistics: Boolean, task: Runnable): Running<*> {
+        return if (statistics) StatisticsRunning<Any?>(task) else SimpleRunning<Any?>(task)
     }
 
-    override fun <V> fastRun(task: () -> V) {
+    override fun <V> execute(task: () -> V) {
         task()
     }
 
@@ -26,33 +26,56 @@ object SyncRunner : Runner {
         command.run()
     }
 
-    private class RunningImpl<V> : Running<V> {
+    private class SimpleRunning<V> : AbstractRunning<V> {
 
-        private var result: V? = null
-        override var startTime: Instant? = null
-        override var endTime: Instant? = null
-
-        private var exception: Exception? = null
+        override val startTime: Instant? = null
+        override val endTime: Instant? = null
 
         constructor(task: () -> V) {
-            try {
-                startTime = Instant.now()
-                result = task()
-            } catch (e: Exception) {
-                exception = e
-            } finally {
-                endTime = Instant.now()
-            }
+            run(task)
         }
 
         constructor(task: Runnable) {
+            run(task)
+        }
+    }
+
+    private class StatisticsRunning<V> : AbstractRunning<V> {
+
+        override var startTime: Instant? = null
+        override var endTime: Instant? = null
+
+        constructor(task: () -> V) {
+            startTime = Instant.now()
+            run(task)
+            endTime = Instant.now()
+        }
+
+        constructor(task: Runnable) {
+            startTime = Instant.now()
+            run(task)
+            endTime = Instant.now()
+        }
+    }
+
+    private abstract class AbstractRunning<V> : Running<V> {
+
+        protected var result: V? = null
+        protected var exception: Exception? = null
+
+        protected fun run(task: () -> V) {
             try {
-                startTime = Instant.now()
+                result = task()
+            } catch (e: Exception) {
+                exception = e
+            }
+        }
+
+        protected fun run(task: Runnable) {
+            try {
                 task.run()
             } catch (e: Exception) {
                 exception = e
-            } finally {
-                endTime = Instant.now()
             }
         }
 

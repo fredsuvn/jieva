@@ -1,7 +1,6 @@
 package xyz.srclab.common.run
 
 import java.time.Duration
-import java.time.Instant
 import java.util.concurrent.*
 
 /**
@@ -9,64 +8,7 @@ import java.util.concurrent.*
  *
  * @see Runner
  */
-interface Running<V> : Future<V> {
-
-    /**
-     * Return start time, or null if not finished.
-     */
-    val startTime: Instant?
-
-    /**
-     * Return end time, or null if not finished.
-     */
-    val endTime: Instant?
-
-    val isStart: Boolean
-        get() {
-            return startTime !== null
-        }
-
-    val isEnd: Boolean
-        get() {
-            return endTime !== null
-        }
-
-    /**
-     * Return start time in milliseconds, or -1 if not finished.
-     */
-    val startTimeMillis: Long
-        get() {
-            return startTime?.toEpochMilli() ?: -1
-        }
-
-    /**
-     * Return end time in milliseconds, or -1 if not finished.
-     */
-    val endTimeMillis: Long
-        get() {
-            return endTime?.toEpochMilli() ?: -1
-        }
-
-    /**
-     * Return cost in milliseconds, or null if not finished.
-     */
-    val costTime: Duration?
-        get() {
-            val start = startTime
-            val end = endTime
-            if (start === null || end === null) {
-                return null
-            }
-            return Duration.between(start, end)
-        }
-
-    /**
-     * Return cost in milliseconds, or -1 if not finished.
-     */
-    val costTimeMillis: Long
-        get() {
-            return costTime?.toMillis() ?: -1
-        }
+interface Running<V> : RunningStatistics, Future<V> {
 
     /**
      * Waits if necessary for the computation to complete, and then retrieves its result.
