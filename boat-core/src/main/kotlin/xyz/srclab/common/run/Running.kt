@@ -4,7 +4,7 @@ import java.time.Duration
 import java.util.concurrent.*
 
 /**
- * Run processing.
+ * Represents run processing.
  *
  * @see Runner
  */

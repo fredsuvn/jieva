@@ -3,7 +3,7 @@ package xyz.srclab.common.run
 import java.util.concurrent.Future
 
 /**
- * Statistics for a running [Future].
+ * Statistics for a scheduled running [Future].
  */
 interface SchedulingStatistics : RunningStatistics {
 

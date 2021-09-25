@@ -9,7 +9,10 @@ import java.util.concurrent.*
  * A type of [Runner] use [ThreadPoolExecutor].
  */
 open class ThreadPoolRunner(
-    private val threadPoolExecutor: ThreadPoolExecutor
+    /**
+     * Underlying thread pool executor, all functions of [ThreadPoolRunner] are based on it.
+     */
+    val threadPoolExecutor: ThreadPoolExecutor
 ) : ExecutorServiceRunner(threadPoolExecutor) {
 
     val corePoolSize: Int

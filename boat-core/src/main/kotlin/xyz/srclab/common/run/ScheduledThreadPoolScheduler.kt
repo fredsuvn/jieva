@@ -8,6 +8,9 @@ import java.util.concurrent.*
  * A type of [Scheduler] use [ScheduledThreadPoolExecutor].
  */
 class ScheduledThreadPoolScheduler(
+    /**
+     * Underlying scheduled thread pool executor, all functions of [ScheduledThreadPoolScheduler] are based on it.
+     */
     private val scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor
 ) : ScheduledExecutorServiceScheduler(scheduledThreadPoolExecutor) {
 

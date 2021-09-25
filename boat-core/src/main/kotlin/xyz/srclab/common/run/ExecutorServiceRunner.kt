@@ -11,7 +11,10 @@ import java.util.concurrent.TimeUnit
  * A type of [Runner] use [ExecutorService].
  */
 open class ExecutorServiceRunner(
-    private val executorService: ExecutorService
+    /**
+     * Underlying executor service, all functions of [ExecutorServiceRunner] are based on it.
+     */
+    val executorService: ExecutorService
 ) : Runner {
 
     override fun <V> run(statistics: Boolean, task: () -> V): Running<V> {

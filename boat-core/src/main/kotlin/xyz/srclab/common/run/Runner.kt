@@ -4,7 +4,7 @@ import xyz.srclab.common.base.availableProcessors
 import java.util.concurrent.*
 
 /**
- * For run a processing, may based on a thread, a coroutine, or others.
+ * Runner is used to run tasks, with thread, coroutine, or others.
  *
  * @see Running
  * @see SyncRunner
@@ -42,7 +42,7 @@ interface Runner : Executor {
     /**
      * Runs and returns [Running].
      *
-     * @param statistics specifies whether enable statistics function
+     * @param statistics specifies whether enable statistics
      */
     @Throws(RejectedExecutionException::class)
     fun <V> run(statistics: Boolean, task: () -> V): Running<V>
@@ -50,7 +50,7 @@ interface Runner : Executor {
     /**
      * Runs and returns [Running].
      *
-     * @param statistics specifies whether enable statistics function
+     * @param statistics specifies whether enable statistics
      */
     @Throws(RejectedExecutionException::class)
     fun run(statistics: Boolean, task: Runnable): Running<*>

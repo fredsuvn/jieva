@@ -9,72 +9,162 @@ import java.util.concurrent.*
  * A type of [Scheduler] use [ScheduledExecutorService].
  */
 open class ScheduledExecutorServiceScheduler(
-    private val scheduledExecutorService: ScheduledExecutorService
+    /**
+     * Underlying scheduled executor service, all functions of [ScheduledExecutorServiceScheduler] are based on it.
+     */
+    val scheduledExecutorService: ScheduledExecutorService
 ) : ExecutorServiceRunner(scheduledExecutorService), Scheduler {
 
-    override fun <V> schedule(delay: Duration, task: () -> V): Scheduling<V> {
-        return ScheduleScheduling(delay, task)
+    override fun <V> schedule(statistics: Boolean, delay: Duration, task: () -> V): Scheduling<V> {
+        return DelayScheduling(statistics, delay, task)
+    }
+
+    override fun schedule(statistics: Boolean, delay: Duration, task: Runnable): Scheduling<*> {
+        return DelayScheduling<Any?>(statistics, delay, task)
     }
 
     override fun <V> scheduleFixedRate(
+        statistics: Boolean,
         initialDelay: Duration,
         period: Duration,
         task: () -> V
     ): Scheduling<V> {
-        return FixedRateScheduling(initialDelay, period, task)
+        return FixedRateScheduling(statistics, initialDelay, period, task)
+    }
+
+    override fun scheduleFixedRate(
+        statistics: Boolean,
+        initialDelay: Duration,
+        period: Duration,
+        task: Runnable
+    ): Scheduling<*> {
+        return FixedRateScheduling<Any?>(statistics, initialDelay, period, task)
     }
 
     override fun <V> scheduleFixedDelay(
+        statistics: Boolean,
         initialDelay: Duration,
         period: Duration,
-        task: () -> V,
+        task: () -> V
     ): Scheduling<V> {
-        return FixedDelayScheduling(initialDelay, period, task)
+        return FixedDelayScheduling(statistics, initialDelay, period, task)
     }
 
-    private inner class ScheduleScheduling<V>(delay: Duration, task: () -> V) : SchedulingImpl<V>() {
-        init {
-            val callable = CallableTask(this, task)
-            future = scheduledExecutorService.schedule(callable, delay.toNanos(), TimeUnit.NANOSECONDS)
+    override fun scheduleFixedDelay(
+        statistics: Boolean,
+        initialDelay: Duration,
+        period: Duration,
+        task: Runnable
+    ): Scheduling<*> {
+        return FixedDelayScheduling<Any?>(statistics, initialDelay, period, task)
+    }
+
+    private inner class DelayScheduling<V> : AbstractScheduling<V> {
+
+        constructor(statistics: Boolean, delay: Duration, task: () -> V) {
+            if (statistics) {
+                this.future =
+                    scheduledExecutorService.schedule(
+                        CallableTask(this, task), delay.toNanos(), TimeUnit.NANOSECONDS
+                    )
+            } else {
+                this.future = scheduledExecutorService.schedule(task, delay.toNanos(), TimeUnit.NANOSECONDS)
+            }
+        }
+
+        constructor(statistics: Boolean, delay: Duration, task: Runnable) {
+            if (statistics) {
+                this.future =
+                    scheduledExecutorService.schedule(
+                        RunnableTask(this, task), delay.toNanos(), TimeUnit.NANOSECONDS
+                    ).asAny()
+            } else {
+                this.future = scheduledExecutorService.schedule(task, delay.toNanos(), TimeUnit.NANOSECONDS).asAny()
+            }
         }
     }
 
-    private inner class FixedRateScheduling<V>(
-        initialDelay: Duration, period: Duration, task: () -> V
-    ) : SchedulingImpl<V>() {
-        init {
-            val runnable = RunnableTask(this) { task() }
-            val future = scheduledExecutorService.scheduleAtFixedRate(
-                runnable,
-                initialDelay.toNanos(),
-                period.toNanos(),
-                TimeUnit.NANOSECONDS
-            )
-            this.future = future.asAny()
+    private inner class FixedRateScheduling<V> : AbstractScheduling<V> {
+
+        constructor(statistics: Boolean, initialDelay: Duration, period: Duration, task: () -> V) {
+            if (statistics) {
+                this.future =
+                    scheduledExecutorService.scheduleAtFixedRate(
+                        RunnableTask(this, task.toRunnable()),
+                        initialDelay.toNanos(),
+                        period.toNanos(),
+                        TimeUnit.NANOSECONDS
+                    ).asAny()
+            } else {
+                this.future =
+                    scheduledExecutorService.scheduleAtFixedRate(
+                        task.toRunnable(), initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
+                    ).asAny()
+            }
+        }
+
+        constructor(statistics: Boolean, initialDelay: Duration, period: Duration, task: Runnable) {
+            if (statistics) {
+                this.future =
+                    scheduledExecutorService.scheduleAtFixedRate(
+                        RunnableTask(this, task),
+                        initialDelay.toNanos(),
+                        period.toNanos(),
+                        TimeUnit.NANOSECONDS
+                    ).asAny()
+            } else {
+                this.future =
+                    scheduledExecutorService.scheduleAtFixedRate(
+                        task, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
+                    ).asAny()
+            }
         }
     }
 
-    private inner class FixedDelayScheduling<V>(
-        initialDelay: Duration, period: Duration, task: () -> V
-    ) : SchedulingImpl<V>() {
-        init {
-            val runnable = RunnableTask(this) { task() }
-            val future = scheduledExecutorService.scheduleWithFixedDelay(
-                runnable,
-                initialDelay.toNanos(),
-                period.toNanos(),
-                TimeUnit.NANOSECONDS
-            )
-            this.future = future.asAny()
+    private inner class FixedDelayScheduling<V> : AbstractScheduling<V> {
+
+        constructor(statistics: Boolean, initialDelay: Duration, period: Duration, task: () -> V) {
+            if (statistics) {
+                this.future =
+                    scheduledExecutorService.scheduleWithFixedDelay(
+                        RunnableTask(this, task.toRunnable()),
+                        initialDelay.toNanos(),
+                        period.toNanos(),
+                        TimeUnit.NANOSECONDS
+                    ).asAny()
+            } else {
+                this.future =
+                    scheduledExecutorService.scheduleWithFixedDelay(
+                        task.toRunnable(), initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
+                    ).asAny()
+            }
+        }
+
+        constructor(statistics: Boolean, initialDelay: Duration, period: Duration, task: Runnable) {
+            if (statistics) {
+                this.future =
+                    scheduledExecutorService.scheduleWithFixedDelay(
+                        RunnableTask(this, task),
+                        initialDelay.toNanos(),
+                        period.toNanos(),
+                        TimeUnit.NANOSECONDS
+                    ).asAny()
+            } else {
+                this.future =
+                    scheduledExecutorService.scheduleWithFixedDelay(
+                        task, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
+                    ).asAny()
+            }
         }
     }
 
-    private abstract class SchedulingImpl<V> : Scheduling<V> {
+    private abstract class AbstractScheduling<V> : Scheduling<V> {
 
         protected lateinit var future: ScheduledFuture<V>
 
         override var startTime: Instant? = null
         override var endTime: Instant? = null
+        override var executionTimes: Long = 0
 
         override val isEnd: Boolean
             get() = future.isDone
@@ -113,35 +203,37 @@ open class ScheduledExecutorServiceScheduler(
     }
 
     private class CallableTask<V>(
-        private val schedulingImpl: SchedulingImpl<V>,
+        private val scheduling: AbstractScheduling<V>,
         private val task: () -> V
     ) : Callable<V> {
         override fun call(): V {
-            schedulingImpl.endTime = null
-            schedulingImpl.startTime = Instant.now()
+            scheduling.endTime = null
+            scheduling.startTime = Instant.now()
             try {
                 return task()
             } catch (e: Exception) {
                 throw e
             } finally {
-                schedulingImpl.endTime = Instant.now()
+                scheduling.endTime = Instant.now()
+                scheduling.executionTimes++
             }
         }
     }
 
     private class RunnableTask(
-        private val schedulingImpl: SchedulingImpl<*>,
+        private val scheduling: AbstractScheduling<*>,
         private val task: Runnable
     ) : Runnable {
         override fun run() {
-            schedulingImpl.endTime = null
-            schedulingImpl.startTime = Instant.now()
+            scheduling.endTime = null
+            scheduling.startTime = Instant.now()
             try {
                 task.run()
             } catch (e: Exception) {
                 throw e
             } finally {
-                schedulingImpl.endTime = Instant.now()
+                scheduling.endTime = Instant.now()
+                scheduling.executionTimes++
             }
         }
     }
