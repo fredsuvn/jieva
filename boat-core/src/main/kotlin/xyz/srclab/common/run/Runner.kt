@@ -35,7 +35,7 @@ interface Runner : Executor {
      * ```
      */
     @Throws(RejectedExecutionException::class)
-    fun run(task: Runnable): Running<*> {
+    fun run(task: Runnable): Running<Any?> {
         return run(true, task)
     }
 
@@ -53,7 +53,7 @@ interface Runner : Executor {
      * @param statistics specifies whether enable statistics
      */
     @Throws(RejectedExecutionException::class)
-    fun run(statistics: Boolean, task: Runnable): Running<*>
+    fun run(statistics: Boolean, task: Runnable): Running<Any?>
 
     /**
      * Runs and no return.

@@ -124,3 +124,7 @@ fun Runnable.toFunction(): () -> Any? {
 fun (() -> Any?).toRunnable(): Runnable {
     return Runnable { this() }
 }
+
+fun <V> (() -> V).wrapperTask(wrapper: (() -> V) -> (() -> V)): () -> V {
+    return wrapper(this)
+}
