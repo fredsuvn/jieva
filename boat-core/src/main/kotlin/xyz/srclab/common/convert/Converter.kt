@@ -44,7 +44,24 @@ interface Converter {
      * Converts [from] (as type of [fromType]) to [toType].
      */
     @Throws(UnsupportedConvertException::class)
-    fun <T> convert(from: Any?, fromType: Type, toType: Type): T
+    fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
+
+        class ConvertContextImpl : ConvertContext {
+            override val converter: Converter = this@Converter
+        }
+
+        val context = ConvertContextImpl()
+        for (convertHandler in convertHandlers) {
+            val result = convertHandler.convert(from, fromType, toType, context)
+            if (result === ConvertHandler.NULL) {
+                return null.asAny()
+            }
+            if (result !== null) {
+                return result.asAny()
+            }
+        }
+        throw UnsupportedConvertException("Unsupported converting: $from to $toType.")
+    }
 
     /**
      * Converts [from] to type from [toTypeRef].
@@ -79,38 +96,17 @@ interface Converter {
             if (convertHandlers.isEmpty()) {
                 throw IllegalArgumentException("Convert handler list cannot be empty.")
             }
-            return ConverterImpl(convertHandlers.asToList())
+            return object : Converter {
+                override val convertHandlers: List<ConvertHandler> = convertHandlers.asToList()
+            }
         }
 
         /**
-         * Returns a new [Converter] consists of [extendHandler] followed by old [ConvertHandler]s.
+         * Returns a new [Converter] consists of given [handler] followed by existed [ConvertHandler]s.
          */
         @JvmStatic
-        fun Converter.extend(extendHandler: ConvertHandler): Converter {
-            return newConverter(this.convertHandlers.plusBefore(0, extendHandler))
-        }
-
-        private class ConverterImpl(
-            override val convertHandlers: List<ConvertHandler>,
-        ) : Converter {
-
-            override fun <T> convert(from: Any?, fromType: Type, toType: Type): T {
-                val context = ConvertContextImpl()
-                for (convertHandler in convertHandlers) {
-                    val result = convertHandler.convert(from, fromType, toType, context)
-                    if (result === ConvertHandler.NULL) {
-                        return null.asAny()
-                    }
-                    if (result !== null) {
-                        return result.asAny()
-                    }
-                }
-                throw UnsupportedConvertException("Unsupported converting: $from to $toType.")
-            }
-
-            private inner class ConvertContextImpl : ConvertContext {
-                override val converter: Converter = this@ConverterImpl
-            }
+        fun Converter.extend(handler: ConvertHandler): Converter {
+            return newConverter(this.convertHandlers.plusBefore(0, handler))
         }
     }
 }
