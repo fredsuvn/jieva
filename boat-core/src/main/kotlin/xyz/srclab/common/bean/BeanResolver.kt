@@ -2,58 +2,26 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.asToList
+import xyz.srclab.common.collect.plusBefore
 import java.lang.reflect.Type
 
 /**
- * Resolver for bean object.
+ * Resolver for bean.
+ *
+ * Note default methods implementations will not cache result, use [CachedBeanResolver] if you need caching.
  *
  * @author sunqian
  *
- * @see AbstractBeanResolver
  * @see BeanResolveHandler
  * @see BeanStyleBeanResolveHandler
  * @see RecordStyleBeanResolveHandler
+ * @see CachedBeanResolver
  */
 interface BeanResolver {
 
     val resolveHandlers: List<BeanResolveHandler>
 
-    fun resolve(type: Type): BeanType
-
-    fun withPreResolveHandler(preResolveHandler: BeanResolveHandler): BeanResolver {
-        return newBeanResolver(listOf(preResolveHandler).plus(resolveHandlers))
-    }
-
-    companion object {
-
-        @JvmField
-        val DEFAULT: BeanResolver = newBeanResolver(BeanResolveHandler.DEFAULTS)
-
-        @JvmStatic
-        fun newBeanResolver(
-            resolveHandlers: Iterable<BeanResolveHandler>,
-        ): BeanResolver {
-            return object : AbstractBeanResolver() {
-                override val resolveHandlers: List<BeanResolveHandler> = resolveHandlers.asToList()
-            }
-        }
-    }
-}
-
-/**
- * Abstract [BeanResolver] which can cache resolved [BeanType] previous created.
- */
-abstract class AbstractBeanResolver @JvmOverloads constructor(
-    private val cache: Cache<Type, BeanType> = Cache.weakCache()
-) : BeanResolver {
-
-    override fun resolve(type: Type): BeanType {
-        return cache.getOrLoad(type) {
-            resolve0(type)
-        }
-    }
-
-    private fun resolve0(type: Type): BeanType {
+    fun resolve(type: Type): BeanType {
         val builder = BeanResolveContext.newBeanResolveContext(type)
         for (resolveHandler in resolveHandlers) {
             resolveHandler.resolve(builder)
@@ -62,5 +30,30 @@ abstract class AbstractBeanResolver @JvmOverloads constructor(
             }
         }
         return builder.build()
+    }
+
+    companion object {
+
+        @JvmField
+        val DEFAULT: BeanResolver = newBeanResolver(BeanResolveHandler.DEFAULTS)
+
+        /**
+         * Return a new [CachedBeanResolver] with given [resolveHandlers] and [cache] (default is [Cache.weakCache]).
+         */
+        @JvmStatic
+        fun newBeanResolver(
+            resolveHandlers: Iterable<BeanResolveHandler>,
+            cache: Cache<Type, BeanType> = Cache.weakCache()
+        ): BeanResolver {
+            return CachedBeanResolver(resolveHandlers.asToList(), cache)
+        }
+
+        /**
+         * Returns a new [BeanResolver] consists of given [handler] followed by existed [BeanResolveHandler]s.
+         */
+        @JvmStatic
+        fun BeanResolver.extend(handler: BeanResolveHandler): BeanResolver {
+            return newBeanResolver(this.resolveHandlers.plusBefore(0, handler))
+        }
     }
 }
