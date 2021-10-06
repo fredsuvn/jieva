@@ -13,47 +13,28 @@ import java.util.concurrent.*
  * @see ThreadPoolRunner
  * @see Scheduler
  */
-interface Runner : Executor {
-
-    /**
-     * Runs and returns [Running] with statistics. It is equivalent to:
-     *
-     * ```
-     * run(true, task)
-     * ```
-     */
-    @Throws(RejectedExecutionException::class)
-    fun <V> run(task: () -> V): Running<V> {
-        return run(true, task)
-    }
-
-    /**
-     * Runs and returns [Running] with statistics. It is equivalent to:
-     *
-     * ```
-     * run(true, task)
-     * ```
-     */
-    @Throws(RejectedExecutionException::class)
-    fun run(task: Runnable): Running<Any?> {
-        return run(true, task)
-    }
+interface Runner {
 
     /**
      * Runs and returns [Running].
-     *
-     * @param statistics specifies whether enable statistics
      */
     @Throws(RejectedExecutionException::class)
-    fun <V> run(statistics: Boolean, task: () -> V): Running<V>
+    fun <V> run(task: () -> V): Running<V>
 
     /**
      * Runs and returns [Running].
-     *
-     * @param statistics specifies whether enable statistics
      */
     @Throws(RejectedExecutionException::class)
-    fun run(statistics: Boolean, task: Runnable): Running<Any?>
+    fun run(task: Runnable): Running<*>
+
+    /**
+     * Runs and returns [Running].
+     */
+    @Throws(RejectedExecutionException::class)
+    fun <V> run(task: RunTask<V>): Running<V> {
+        task.initialize()
+        return run { task.run() }
+    }
 
     /**
      * Runs and no return.
@@ -62,6 +43,16 @@ interface Runner : Executor {
      */
     @Throws(RejectedExecutionException::class)
     fun <V> execute(task: () -> V)
+
+    /**
+     * Runs and no return.
+     *
+     * @see Executor.execute
+     */
+    @Throws(RejectedExecutionException::class)
+    fun execute(task: Runnable)
+
+    fun asExecutor(): Executor
 
     companion object {
 
@@ -118,6 +109,11 @@ interface Runner : Executor {
         }
 
         @JvmStatic
+        fun <V> runSync(task: RunTask<V>): Running<V> {
+            return SYNC_RUNNER.run(task)
+        }
+
+        @JvmStatic
         fun <V> runAsync(task: () -> V): Running<V> {
             return ASYNC_RUNNER.run(task)
         }
@@ -128,23 +124,8 @@ interface Runner : Executor {
         }
 
         @JvmStatic
-        fun <V> runSync(statistics: Boolean, task: () -> V): Running<V> {
-            return SYNC_RUNNER.run(statistics, task)
-        }
-
-        @JvmStatic
-        fun runSync(statistics: Boolean, task: Runnable): Running<*> {
-            return SYNC_RUNNER.run(statistics, task)
-        }
-
-        @JvmStatic
-        fun <V> runAsync(statistics: Boolean, task: () -> V): Running<V> {
-            return ASYNC_RUNNER.run(statistics, task)
-        }
-
-        @JvmStatic
-        fun runAsync(statistics: Boolean, task: Runnable): Running<*> {
-            return ASYNC_RUNNER.run(statistics, task)
+        fun <V> runAsync(task: RunTask<V>): Running<V> {
+            return ASYNC_RUNNER.run(task)
         }
 
         @JvmStatic

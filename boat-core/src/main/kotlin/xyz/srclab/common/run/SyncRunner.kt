@@ -1,36 +1,47 @@
 package xyz.srclab.common.run
 
 import xyz.srclab.common.base.asAny
-import java.time.Instant
 import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executor
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
 /**
  * A type of [Runner] always use current thread.
  */
-object SyncRunner : Runner {
+object SyncRunner : Runner, Executor {
 
-    override fun <V> run(statistics: Boolean, task: () -> V): Running<V> {
-        return if (statistics) StatisticsRunning(task) else SimpleRunning(task)
+    override fun <V> run(task: () -> V): Running<V> {
+        return RunningImpl(task)
     }
 
-    override fun run(statistics: Boolean, task: Runnable): Running<Any?> {
-        return if (statistics) StatisticsRunning(task) else SimpleRunning(task)
+    override fun run(task: Runnable): Running<*> {
+        return RunningImpl<Any?>(task)
     }
 
     override fun <V> execute(task: () -> V) {
-        task()
+        try {
+            task()
+        } catch (e: Exception) {
+            //Dropped
+        }
     }
 
-    override fun execute(command: Runnable) {
-        command.run()
+    override fun execute(task: Runnable) {
+        try {
+            task.run()
+        } catch (e: Exception) {
+            //Dropped
+        }
     }
 
-    private class SimpleRunning<V> : Running<V> {
+    override fun asExecutor(): Executor = this
 
-        override val future: Future<V>
-        override val statistics: RunningStatistics? = null
+    private class RunningImpl<V> : Running<V> {
+
+        private val future: SyncFuture<V>
+
+        override val isStart: Boolean = true
 
         constructor(task: () -> V) {
             future = SyncFuture(task)
@@ -39,23 +50,9 @@ object SyncRunner : Runner {
         constructor(task: Runnable) {
             future = SyncFuture(task)
         }
-    }
 
-    private class StatisticsRunning<V> : Running<V> {
-
-        override val future: Future<V>
-        override val statistics: SimpleRunningStatistics = SimpleRunningStatistics()
-
-        constructor(task: () -> V) {
-            statistics.startTime = Instant.now()
-            future = SyncFuture(task)
-            statistics.endTime = Instant.now()
-        }
-
-        constructor(task: Runnable) {
-            statistics.startTime = Instant.now()
-            future = SyncFuture(task)
-            statistics.endTime = Instant.now()
+        override fun asFuture(): Future<V> {
+            return future
         }
     }
 

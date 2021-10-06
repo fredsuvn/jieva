@@ -9,10 +9,7 @@ import java.util.concurrent.*
  * A type of [Runner] use [ThreadPoolExecutor].
  */
 open class ThreadPoolRunner(
-    /**
-     * Underlying thread pool executor, all functions of [ThreadPoolRunner] are based on it.
-     */
-    val threadPoolExecutor: ThreadPoolExecutor
+    private val threadPoolExecutor: ThreadPoolExecutor
 ) : ExecutorServiceRunner(threadPoolExecutor) {
 
     val corePoolSize: Int
@@ -80,6 +77,8 @@ open class ThreadPoolRunner(
     fun purge() {
         threadPoolExecutor.purge()
     }
+
+    override fun asExecutor(): ThreadPoolExecutor = threadPoolExecutor
 
     override fun toString(): String {
         return threadPoolExecutor.toString()

@@ -5,12 +5,15 @@ package xyz.srclab.common.run
 
 import java.time.Duration
 
-
 fun <V> runSync(task: () -> V): Running<V> {
     return Runner.runSync(task)
 }
 
 fun runSync(task: Runnable): Running<*> {
+    return Runner.runSync(task)
+}
+
+fun <V> runSync(task: RunTask<V>): Running<V> {
     return Runner.runSync(task)
 }
 
@@ -22,20 +25,8 @@ fun runAsync(task: Runnable): Running<*> {
     return Runner.runAsync(task)
 }
 
-fun <V> runSync(statistics: Boolean, task: () -> V): Running<V> {
-    return Runner.runSync(statistics, task)
-}
-
-fun runSync(statistics: Boolean, task: Runnable): Running<*> {
-    return Runner.runSync(statistics, task)
-}
-
-fun <V> runAsync(statistics: Boolean, task: () -> V): Running<V> {
-    return Runner.runAsync(statistics, task)
-}
-
-fun runAsync(statistics: Boolean, task: Runnable): Running<*> {
-    return Runner.runAsync(statistics, task)
+fun <V> runAsync(task: RunTask<V>): Running<V> {
+    return Runner.runAsync(task)
 }
 
 fun <V> executeSync(task: () -> V) {
@@ -64,10 +55,46 @@ fun <V> scheduleWithSingleThread(delay: Duration, task: () -> V): Scheduling<V> 
 /**
  * Schedules with [SingleThreadScheduler].
  */
+fun scheduleWithSingleThread(delay: Duration, task: Runnable): Scheduling<*> {
+    return Scheduler.scheduleWithSingleThread(delay, task)
+}
+
+/**
+ * Schedules with [SingleThreadScheduler].
+ */
+fun <V> scheduleWithSingleThread(delay: Duration, task: RunTask<V>): Scheduling<V> {
+    return Scheduler.scheduleWithSingleThread(delay, task)
+}
+
+/**
+ * Schedules with [SingleThreadScheduler].
+ */
 fun <V> scheduleFixedRateWithSingleThread(
     initialDelay: Duration,
     period: Duration,
     task: () -> V,
+): Scheduling<V> {
+    return Scheduler.scheduleFixedRateWithSingleThread(initialDelay, period, task)
+}
+
+/**
+ * Schedules with [SingleThreadScheduler].
+ */
+fun scheduleFixedRateWithSingleThread(
+    initialDelay: Duration,
+    period: Duration,
+    task: Runnable,
+): Scheduling<*> {
+    return Scheduler.scheduleFixedRateWithSingleThread(initialDelay, period, task)
+}
+
+/**
+ * Schedules with [SingleThreadScheduler].
+ */
+fun <V> scheduleFixedRateWithSingleThread(
+    initialDelay: Duration,
+    period: Duration,
+    task: RunTask<V>,
 ): Scheduling<V> {
     return Scheduler.scheduleFixedRateWithSingleThread(initialDelay, period, task)
 }
@@ -86,32 +113,23 @@ fun <V> scheduleFixedDelayWithSingleThread(
 /**
  * Schedules with [SingleThreadScheduler].
  */
-fun <V> scheduleWithSingleThread(statistics: Boolean, delay: Duration, task: () -> V): Scheduling<V> {
-    return Scheduler.scheduleWithSingleThread(statistics, delay, task)
-}
-
-/**
- * Schedules with [SingleThreadScheduler].
- */
-fun <V> scheduleFixedRateWithSingleThread(
-    statistics: Boolean,
+fun scheduleFixedDelayWithSingleThread(
     initialDelay: Duration,
     period: Duration,
-    task: () -> V,
-): Scheduling<V> {
-    return Scheduler.scheduleFixedRateWithSingleThread(statistics, initialDelay, period, task)
+    task: Runnable
+): Scheduling<*> {
+    return Scheduler.scheduleFixedDelayWithSingleThread(initialDelay, period, task)
 }
 
 /**
  * Schedules with [SingleThreadScheduler].
  */
 fun <V> scheduleFixedDelayWithSingleThread(
-    statistics: Boolean,
     initialDelay: Duration,
     period: Duration,
-    task: () -> V
+    task: RunTask<V>
 ): Scheduling<V> {
-    return Scheduler.scheduleFixedDelayWithSingleThread(statistics, initialDelay, period, task)
+    return Scheduler.scheduleFixedDelayWithSingleThread(initialDelay, period, task)
 }
 
 fun Runnable.toFunction(): () -> Any? {
@@ -123,8 +141,4 @@ fun Runnable.toFunction(): () -> Any? {
 
 fun (() -> Any?).toRunnable(): Runnable {
     return Runnable { this() }
-}
-
-fun <V> (() -> V).wrapperTask(wrapper: (() -> V) -> (() -> V)): () -> V {
-    return wrapper(this)
 }

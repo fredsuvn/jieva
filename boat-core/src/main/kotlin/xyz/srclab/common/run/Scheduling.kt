@@ -5,9 +5,16 @@ import java.util.concurrent.ScheduledFuture
 /**
  * Represents a scheduled run processing.
  *
- * Note [startTime] and [endTime] are set by current or last execution, and will be refreshed for each execution.
- *
+ * @see Scheduler
  * @see Runner
  * @see Running
  */
-interface Scheduling<V> : Running<V>, SchedulingStatistics, ScheduledFuture<V>
+interface Scheduling<V> : Running<V> {
+
+    /**
+     * Execution count, starts from `0`, increases after each execution.
+     */
+    val executionCount: Long
+
+    override fun asFuture(): ScheduledFuture<V>
+}

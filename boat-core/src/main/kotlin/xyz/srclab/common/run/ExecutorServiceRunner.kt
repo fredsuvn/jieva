@@ -1,7 +1,6 @@
 package xyz.srclab.common.run
 
 import java.time.Duration
-import java.time.Instant
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
@@ -11,27 +10,26 @@ import java.util.concurrent.TimeUnit
  * A type of [Runner] use [ExecutorService].
  */
 open class ExecutorServiceRunner(
-    /**
-     * Underlying executor service, all functions of [ExecutorServiceRunner] are based on it.
-     */
-    val executorService: ExecutorService
+    private val executorService: ExecutorService
 ) : Runner {
 
-    override fun <V> run(statistics: Boolean, task: () -> V): Running<V> {
-        return if (statistics) StatisticsRunning(task) else SimpleRunning(task)
+    override fun <V> run(task: () -> V): Running<V> {
+        return RunningImpl(task)
     }
 
-    override fun run(statistics: Boolean, task: Runnable): Running<Any?> {
-        return if (statistics) StatisticsRunning(task) else SimpleRunning(task)
+    override fun run(task: Runnable): Running<*> {
+        return RunningImpl<Any?>(task)
     }
 
     override fun <V> execute(task: () -> V) {
         executorService.execute { task() }
     }
 
-    override fun execute(command: Runnable) {
-        executorService.execute(command)
+    override fun execute(task: Runnable) {
+        executorService.execute(task)
     }
+
+    override fun asExecutor(): ExecutorService = executorService
 
     val isShutdown: Boolean
         @JvmName("isShutdown") get() {
@@ -62,53 +60,28 @@ open class ExecutorServiceRunner(
         return executorService.toString()
     }
 
-    private inner class SimpleRunning<V> : Running<V> {
+    private inner class RunningImpl<V> : Running<V> {
 
-        override val future: Future<V>
-        override val statistics: RunningStatistics? = null
+        private val future: Future<V>
 
         constructor(task: () -> V) {
-            future = executorService.submit(task)
+            future = executorService.submit(Callable {
+                isStart = true
+                task()
+            })
         }
 
         constructor(task: Runnable) {
-            future = executorService.submit(task, null)
-        }
-    }
-
-    private inner class StatisticsRunning<V> : Running<V> {
-
-        override val future: Future<V>
-        override val statistics: SimpleRunningStatistics = SimpleRunningStatistics()
-
-        constructor(task: () -> V) {
-            future = executorService.submit(CallableTask(task))
+            future = executorService.submit({
+                isStart = true
+                task.run()
+            }, null)
         }
 
-        constructor(task: Runnable) {
-            future = executorService.submit(RunnableTask(task), null)
-        }
+        override var isStart: Boolean = false
 
-        private inner class CallableTask<V>(private val task: () -> V) : Callable<V> {
-            override fun call(): V {
-                statistics.startTime = Instant.now()
-                try {
-                    return task()
-                } finally {
-                    statistics.endTime = Instant.now()
-                }
-            }
-        }
-
-        private inner class RunnableTask(private val task: Runnable) : Runnable {
-            override fun run() {
-                statistics.startTime = Instant.now()
-                try {
-                    task.run()
-                } finally {
-                    statistics.endTime = Instant.now()
-                }
-            }
+        override fun asFuture(): Future<V> {
+            return future
         }
     }
 }

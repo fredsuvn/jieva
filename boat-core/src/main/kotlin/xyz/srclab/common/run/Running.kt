@@ -11,14 +11,25 @@ import java.util.concurrent.*
 interface Running<V> {
 
     /**
-     * Returns underlying [Future].
+     * Returns whether started.
      */
-    val future: Future<V>
+    val isStart: Boolean
 
     /**
-     * Returns statistics info, or null if statistics is not enabled.
+     * Returns whether ended.
      */
-    val statistics: RunningStatistics?
+    val isEnd: Boolean
+        get() {
+            return asFuture().isDone
+        }
+
+    /**
+     * Returns whether cancelled.
+     */
+    val isCancelled: Boolean
+        get() {
+            return asFuture().isCancelled
+        }
 
     /**
      * Waits if necessary for the computation to complete, and then retrieves its result.
@@ -29,7 +40,7 @@ interface Running<V> {
      * @throws InterruptedException if the current thread was interrupted
      */
     fun get(): V {
-        return future.get()
+        return asFuture().get()
     }
 
     /**
@@ -44,6 +55,33 @@ interface Running<V> {
      * @throws TimeoutException if the wait timed out
      */
     fun get(duration: Duration): V {
-        return future.get(duration.nano.toLong(), TimeUnit.NANOSECONDS)
+        return asFuture().get(duration.nano.toLong(), TimeUnit.NANOSECONDS)
     }
+
+    /**
+     * Cancels or interrupts the task associated by this [Running]. This method is equivalent to:
+     *
+     * ```
+     * cancel(true)
+     * ```
+     *
+     * @see Future.cancel
+     */
+    fun cancel(): Boolean {
+        return cancel(true)
+    }
+
+    /**
+     * Cancel the task associated by this [Running].
+     *
+     * @see Future.cancel
+     */
+    fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+        return asFuture().cancel(mayInterruptIfRunning)
+    }
+
+    /**
+     * Returns this running as [Future].
+     */
+    fun asFuture(): Future<V>
 }

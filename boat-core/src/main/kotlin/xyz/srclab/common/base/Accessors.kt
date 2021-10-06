@@ -1,5 +1,7 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.collect.removeAll
+
 /**
  * Accessor for any type.
  *
@@ -157,8 +159,24 @@ interface MapGetter {
  */
 interface MapSetter {
 
-    fun set(key: Any, value: Any?) {
-        asMap()[key] = value
+    fun set(key: Any, value: Any?): Any? {
+        return asMap().put(key, value)
+    }
+
+    fun remove(key: Any): Any? {
+        return asMap().remove(key)
+    }
+
+    fun removeAll(keys: Array<out Any>) {
+        asMap().removeAll(keys)
+    }
+
+    fun removeAll(keys: Iterable<Any>) {
+        asMap().removeAll(keys)
+    }
+
+    fun removeAll(keys: Sequence<Any>) {
+        asMap().removeAll(keys)
     }
 
     fun clear() {
@@ -227,8 +245,24 @@ interface GenericMapGetter<K : Any, V : Any> {
  */
 interface GenericMapSetter<K : Any, V : Any> {
 
-    fun set(key: K, value: V?) {
-        asMap()[key] = value
+    fun set(key: K, value: V?): V? {
+        return asMap().put(key, value)
+    }
+
+    fun remove(key: K): V? {
+        return asMap().remove(key)
+    }
+
+    fun removeAll(keys: Array<out K>) {
+        asMap().removeAll(keys)
+    }
+
+    fun removeAll(keys: Iterable<K>) {
+        asMap().removeAll(keys)
+    }
+
+    fun removeAll(keys: Sequence<K>) {
+        asMap().removeAll(keys)
     }
 
     fun clear() {
