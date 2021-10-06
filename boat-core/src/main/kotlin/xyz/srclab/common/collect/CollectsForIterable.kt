@@ -13,7 +13,6 @@ import java.util.stream.StreamSupport
 import kotlin.random.Random
 import kotlin.toBigDecimal
 import kotlin.toBigInteger
-import kotlin.collections.addAll as addAllKt
 import kotlin.collections.all as allKt
 import kotlin.collections.any as anyKt
 import kotlin.collections.asSequence as asSequenceKt
@@ -244,51 +243,16 @@ fun <T> Iterable<T>.take(n: Int): List<T> {
     return this.takeKt(n)
 }
 
-inline fun <T> Iterable<T>.takeWhile(predicate: (T) -> Boolean): List<T> {
+inline fun <T> Iterable<T>.take(predicate: (T) -> Boolean): List<T> {
     return this.takeWhileKt(predicate)
-}
-
-fun <T, C : MutableCollection<in T>> Iterable<T>.takeTo(n: Int, destination: C): C {
-    destination.addAll(take(n))
-    return destination
-}
-
-inline fun <T, C : MutableCollection<in T>> Iterable<T>.takeWhileTo(
-    destination: C,
-    predicate: (T) -> Boolean
-): C {
-    destination.addAll(takeWhile(predicate))
-    return destination
-}
-
-fun <T, C : MutableCollection<in T>> Iterable<T>.takeAllTo(destination: C): C {
-    destination.addAllKt(this)
-    return destination
 }
 
 fun <T> Iterable<T>.drop(n: Int): List<T> {
     return this.dropKt(n)
 }
 
-inline fun <T> Iterable<T>.dropWhile(predicate: (T) -> Boolean): List<T> {
+inline fun <T> Iterable<T>.drop(predicate: (T) -> Boolean): List<T> {
     return this.dropWhileKt(predicate)
-}
-
-fun <T, C : MutableCollection<in T>> Iterable<T>.dropTo(n: Int, destination: C): C {
-    destination.addAll(drop(n))
-    return destination
-}
-
-inline fun <T, C : MutableCollection<in T>> Iterable<T>.dropWhileTo(
-    destination: C,
-    predicate: (T) -> Boolean
-): C {
-    destination.addAll(dropWhile(predicate))
-    return destination
-}
-
-inline fun <T> Iterable<T>.forEachIndexed(action: (index: Int, T) -> Unit) {
-    return this.forEachIndexedKt(action)
 }
 
 inline fun <T> Iterable<T>.filter(predicate: (T) -> Boolean): List<T> {
@@ -739,6 +703,10 @@ fun <T> Iterable<T>.shuffled(random: Random): List<T> {
     return this.shuffledKt(random)
 }
 
+inline fun <T> Iterable<T>.forEach(action: (index: Int, T) -> Unit) {
+    return this.forEachIndexedKt(action)
+}
+
 @JvmOverloads
 fun <T> Iterable<T>.max(comparator: Comparator<in T> = comparableComparator()): T {
     return maxOrNull(comparator) ?: throw NoSuchElementException()
@@ -971,9 +939,9 @@ fun <T, R> Iterable<T>.toArray(componentType: Type, selector: ((T) -> R)? = null
     val collection = asToCollection()
     val result = componentType.newArray<R>(collection.size)
     if (selector !== null) {
-        collection.forEachIndexed { i, t -> result[i] = selector(t) }
+        collection.forEach { i, t -> result[i] = selector(t) }
     } else {
-        collection.forEachIndexed { i, t -> result[i] = t.asAny() }
+        collection.forEach { i, t -> result[i] = t.asAny() }
     }
     return result
 }
@@ -982,7 +950,7 @@ fun <T, R> Iterable<T>.toArray(componentType: Type, selector: ((T) -> R)? = null
 inline fun <T> Iterable<T>.toBooleanArray(selector: (T) -> Boolean = { it.toBoolean() }): BooleanArray {
     val collection = asToCollection()
     val result = BooleanArray(collection.size)
-    collection.forEachIndexed { i, t -> result[i] = selector(t) }
+    collection.forEach { i, t -> result[i] = selector(t) }
     return result
 }
 
@@ -990,7 +958,7 @@ inline fun <T> Iterable<T>.toBooleanArray(selector: (T) -> Boolean = { it.toBool
 inline fun <T> Iterable<T>.toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
     val collection = asToCollection()
     val result = ByteArray(collection.size)
-    collection.forEachIndexed { i, t -> result[i] = selector(t) }
+    collection.forEach { i, t -> result[i] = selector(t) }
     return result
 }
 
@@ -998,7 +966,7 @@ inline fun <T> Iterable<T>.toByteArray(selector: (T) -> Byte = { it.toByte() }):
 inline fun <T> Iterable<T>.toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
     val collection = asToCollection()
     val result = ShortArray(collection.size)
-    collection.forEachIndexed { i, t -> result[i] = selector(t) }
+    collection.forEach { i, t -> result[i] = selector(t) }
     return result
 }
 
@@ -1006,7 +974,7 @@ inline fun <T> Iterable<T>.toShortArray(selector: (T) -> Short = { it.toShort() 
 inline fun <T> Iterable<T>.toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
     val collection = asToCollection()
     val result = CharArray(collection.size)
-    collection.forEachIndexed { i, t -> result[i] = selector(t) }
+    collection.forEach { i, t -> result[i] = selector(t) }
     return result
 }
 
@@ -1014,7 +982,7 @@ inline fun <T> Iterable<T>.toCharArray(selector: (T) -> Char = { it.toChar() }):
 inline fun <T> Iterable<T>.toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
     val collection = asToCollection()
     val result = IntArray(collection.size)
-    collection.forEachIndexed { i, t -> result[i] = selector(t) }
+    collection.forEach { i, t -> result[i] = selector(t) }
     return result
 }
 
@@ -1022,7 +990,7 @@ inline fun <T> Iterable<T>.toIntArray(selector: (T) -> Int = { it.toInt() }): In
 inline fun <T> Iterable<T>.toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
     val collection = asToCollection()
     val result = LongArray(collection.size)
-    collection.forEachIndexed { i, t -> result[i] = selector(t) }
+    collection.forEach { i, t -> result[i] = selector(t) }
     return result
 }
 
@@ -1030,7 +998,7 @@ inline fun <T> Iterable<T>.toLongArray(selector: (T) -> Long = { it.toLong() }):
 inline fun <T> Iterable<T>.toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
     val collection = asToCollection()
     val result = FloatArray(collection.size)
-    collection.forEachIndexed { i, t -> result[i] = selector(t) }
+    collection.forEach { i, t -> result[i] = selector(t) }
     return result
 }
 
@@ -1038,7 +1006,7 @@ inline fun <T> Iterable<T>.toFloatArray(selector: (T) -> Float = { it.toFloat() 
 inline fun <T> Iterable<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
     val collection = asToCollection()
     val result = DoubleArray(collection.size)
-    collection.forEachIndexed { i, t -> result[i] = selector(t) }
+    collection.forEach { i, t -> result[i] = selector(t) }
     return result
 }
 
@@ -1104,7 +1072,8 @@ fun <T> Iterable<T>.plusBefore(index: Int, elements: Iterable<T>): List<T> {
     val list = asToList()
     val front = list.subList(0, index)
     val back = list.subList(index, list.size)
-    return front.plusKt(elements).plusKt(back)
+    return concatList(front, elements, back)
+    //return front.plusKt(elements).plusKt(back)
 }
 
 fun <T> Iterable<T>.plusBefore(index: Int, elements: Sequence<T>): List<T> {
@@ -1126,7 +1095,8 @@ fun <T> Iterable<T>.plusAfter(index: Int, elements: Iterable<T>): List<T> {
     }
     val front = list.subList(0, index + 1)
     val back = list.subList(index + 1, list.size)
-    return front.plusKt(elements).plusKt(back)
+    return concatList(front, elements, back)
+    //return front.plusKt(elements).plusKt(back)
 }
 
 fun <T> Iterable<T>.plusAfter(index: Int, elements: Sequence<T>): List<T> {
@@ -1158,7 +1128,7 @@ fun <T> MutableIterable<T>.remove(element: T): Boolean {
     return false
 }
 
-fun <T> MutableIterable<T>.remove(n: Int): Boolean {
+fun <T> MutableIterable<T>.removeFirst(n: Int): Boolean {
     val iterator = this.iterator()
     var success = true
     for (i in 1..n) {
@@ -1173,7 +1143,7 @@ fun <T> MutableIterable<T>.remove(n: Int): Boolean {
     return success
 }
 
-fun <T> MutableIterable<T>.removeWhile(predicate: (T) -> Boolean): Boolean {
+fun <T> MutableIterable<T>.removeAll(predicate: (T) -> Boolean): Boolean {
     return this.removeAllKt(predicate)
 }
 

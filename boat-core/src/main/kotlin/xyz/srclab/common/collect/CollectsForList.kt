@@ -99,7 +99,7 @@ fun <T> List<T>.takeLast(n: Int): List<T> {
     return this.takeLastKt(n)
 }
 
-inline fun <T> List<T>.takeLastWhile(predicate: (T) -> Boolean): List<T> {
+inline fun <T> List<T>.takeLast(predicate: (T) -> Boolean): List<T> {
     return this.takeLastWhileKt(predicate)
 }
 
@@ -107,7 +107,7 @@ fun <T> List<T>.dropLast(n: Int): List<T> {
     return this.dropLastKt(n)
 }
 
-inline fun <T> List<T>.dropLastWhile(predicate: (T) -> Boolean): List<T> {
+inline fun <T> List<T>.dropLast(predicate: (T) -> Boolean): List<T> {
     return this.dropLastWhileKt(predicate)
 }
 

@@ -144,7 +144,19 @@ fun <K, V> Map<K, V>.minus(keys: Iterable<K>): Map<K, V> {
     return this.minusKt(keys)
 }
 
+fun <K, V> MutableMap<K, V>.removeAll(keys: Array<out K>) {
+    for (key in keys) {
+        this.remove(key)
+    }
+}
+
 fun <K, V> MutableMap<K, V>.removeAll(keys: Iterable<K>) {
+    for (key in keys) {
+        this.remove(key)
+    }
+}
+
+fun <K, V> MutableMap<K, V>.removeAll(keys: Sequence<K>) {
     for (key in keys) {
         this.remove(key)
     }
