@@ -2,6 +2,7 @@ package xyz.srclab.common.run
 
 import xyz.srclab.common.base.asAny
 import java.time.Duration
+import java.util.concurrent.Callable
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -44,11 +45,19 @@ open class ScheduledExecutorServiceScheduler(
         override val future: ScheduledFuture<V>
 
         constructor(delay: Duration, task: () -> V) {
-            this.future = scheduledExecutorService.schedule(task, delay.toNanos(), TimeUnit.NANOSECONDS)
+            this.future = scheduledExecutorService.schedule(Callable {
+                this.isStart = true
+                this.executionCount++
+                task()
+            }, delay.toNanos(), TimeUnit.NANOSECONDS)
         }
 
         constructor(delay: Duration, task: Runnable) {
-            this.future = scheduledExecutorService.schedule(task, delay.toNanos(), TimeUnit.NANOSECONDS).asAny()
+            this.future = scheduledExecutorService.schedule({
+                this.isStart = true
+                this.executionCount++
+                task.run()
+            }, delay.toNanos(), TimeUnit.NANOSECONDS).asAny()
         }
     }
 
@@ -58,13 +67,21 @@ open class ScheduledExecutorServiceScheduler(
 
         constructor(initialDelay: Duration, period: Duration, task: () -> V) {
             this.future = scheduledExecutorService.scheduleAtFixedRate(
-                task.toRunnable(), initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
+                {
+                    this.isStart = true
+                    this.executionCount++
+                    task()
+                }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
             ).asAny()
         }
 
         constructor(initialDelay: Duration, period: Duration, task: Runnable) {
             this.future = scheduledExecutorService.scheduleAtFixedRate(
-                task, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
+                {
+                    this.isStart = true
+                    this.executionCount++
+                    task.run()
+                }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
             ).asAny()
         }
     }
@@ -75,13 +92,21 @@ open class ScheduledExecutorServiceScheduler(
 
         constructor(initialDelay: Duration, period: Duration, task: () -> V) {
             this.future = scheduledExecutorService.scheduleWithFixedDelay(
-                task.toRunnable(), initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
+                {
+                    this.isStart = true
+                    this.executionCount++
+                    task()
+                }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
             ).asAny()
         }
 
         constructor(initialDelay: Duration, period: Duration, task: Runnable) {
             this.future = scheduledExecutorService.scheduleWithFixedDelay(
-                task, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
+                {
+                    this.isStart = true
+                    this.executionCount++
+                    task.run()
+                }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
             ).asAny()
         }
     }
@@ -91,7 +116,7 @@ open class ScheduledExecutorServiceScheduler(
         protected abstract val future: ScheduledFuture<V>
 
         override var executionCount: Long = 0
-        override var isStart: Boolean = true
+        override var isStart: Boolean = false
 
         override fun asFuture(): ScheduledFuture<V> {
             return future
