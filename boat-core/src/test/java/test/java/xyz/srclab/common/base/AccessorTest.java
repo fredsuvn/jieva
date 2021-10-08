@@ -1,13 +1,13 @@
-package test.java.xyz.srclab.common.lang;
+package test.java.xyz.srclab.common.base;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.AnyAccessor;
-import xyz.srclab.common.lang.GenericAccessor;
-import xyz.srclab.common.lang.GenericMapAccessor;
-import xyz.srclab.common.lang.MapAccessor;
+import xyz.srclab.common.base.AnyAccessor;
+import xyz.srclab.common.base.GenericAccessor;
+import xyz.srclab.common.base.GenericMapAccessor;
+import xyz.srclab.common.base.MapAccessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.Map;
 public class AccessorTest {
 
     @Test
-    public void testSingleAccessor() {
+    public void testAnyAccessor() {
         TestAnyAccessor singleAccessor = new TestAnyAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
@@ -25,7 +25,7 @@ public class AccessorTest {
     }
 
     @Test
-    public void testGenericSingleAccessor() {
+    public void testGenericAccessor() {
         TestGenericAccessor singleAccessor = new TestGenericAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));

@@ -1,4 +1,4 @@
-package test.java.xyz.srclab.common.lang;
+package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -8,11 +8,11 @@ public class EnumsTest {
 
     @Test
     public void test() {
-        TestEnum t1 = Enums.value(TestEnum.class, "T1");
+        TestEnum t1 = Enums.getValue(TestEnum.class, "T1");
         Assert.assertEquals(t1, TestEnum.T1);
-        TestEnum t2 = Enums.valueIgnoreCase(TestEnum.class, "t2");
+        TestEnum t2 = Enums.getValueIgnoreCase(TestEnum.class, "t2");
         Assert.assertEquals(t2, TestEnum.T2);
-        TestEnum t3 = Enums.value(TestEnum.class, 2);
+        TestEnum t3 = Enums.getValue(TestEnum.class, 2);
         Assert.assertEquals(t3, TestEnum.T3);
     }
 

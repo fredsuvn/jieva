@@ -1,10 +1,10 @@
-package test.java.xyz.srclab.common.lang;
+package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Lazy;
-import xyz.srclab.common.lang.LazyToString;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.base.Lazy;
+import xyz.srclab.common.base.LazyToString;
+import xyz.srclab.common.logging.Logger;
 import xyz.srclab.common.utils.Counter;
 
 import java.time.Duration;
@@ -14,7 +14,7 @@ import java.time.Duration;
  */
 public class LazyTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
+    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testLazy() throws InterruptedException {
@@ -34,7 +34,7 @@ public class LazyTest {
         Assert.assertEquals(pi3, 2);
 
         counter.setInt(0);
-        Lazy<Integer> ppLazy = Lazy.of(i -> Duration.ofMillis(1), counter::getAndIncrementInt);
+        Lazy<Integer> ppLazy = Lazy.of(Duration.ofMillis(1), counter::getAndIncrementInt);
         int ppi1 = ppLazy.get();
         Assert.assertEquals(ppi1, 0);
         Thread.sleep(2);
@@ -49,7 +49,7 @@ public class LazyTest {
     public void testLazyString() {
         Counter counter = Counter.startsAt(0);
         LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
-        logger.log("lazyString: {}", lazyToString);
+        logger.info("lazyString: {}", lazyToString);
         Assert.assertEquals(
             lazyToString.get(),
             new Integer(0)

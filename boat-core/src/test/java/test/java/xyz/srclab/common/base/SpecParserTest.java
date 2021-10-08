@@ -1,8 +1,8 @@
-package test.java.xyz.srclab.common.lang;
+package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.SpecParser;
+import xyz.srclab.common.base.SpecParser;
 import xyz.srclab.common.base.SpecParsingException;
 
 import java.util.Arrays;

@@ -1,9 +1,9 @@
-package test.java.xyz.srclab.common.lang;
+package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Ref;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.base.Ref;
+import xyz.srclab.common.logging.Logger;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -13,7 +13,7 @@ import java.util.Date;
 
 public class RefTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
+    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testRef() {
@@ -30,12 +30,12 @@ public class RefTest {
         String dateString = "2222-12-22 22:22:22";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Date date = Ref.of(dateString)
-            .accept(logger::log)
+            .accept(logger::info)
             .apply(d -> LocalDateTime.parse(d, formatter))
             .apply(d -> d.atZone(ZoneId.systemDefault()))
-            .apply(ChronoZonedDateTime::toInstant)
-            .apply(Date::from)
+            .with(ChronoZonedDateTime::toInstant)
+            .with(Date::from)
             .get();
-        logger.log(date);
+        logger.info("date: {}", date);
     }
 }

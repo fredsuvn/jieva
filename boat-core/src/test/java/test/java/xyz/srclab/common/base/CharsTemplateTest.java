@@ -1,9 +1,9 @@
-package test.java.xyz.srclab.common.lang;
+package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.CharsTemplate;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.base.CharsTemplate;
+import xyz.srclab.common.logging.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class CharsTemplateTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
+    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testTemplate() {
@@ -30,7 +30,7 @@ public class CharsTemplateTest {
         Assert.assertEquals(template2.process(args), "This is a } Dog, that is a Cat}");
         CharsTemplate template3 = CharsTemplate.resolve(
             "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
-        logger.log(template3.process(args));
+        logger.info(template3.process(args));
         Assert.assertEquals(template3.process(args), "This is a } {DogX (Dog), that is a Bird\\{");
     }
 }

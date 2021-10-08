@@ -1,8 +1,8 @@
-package test.java.xyz.srclab.common.lang;
+package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.NamingCase;
+import xyz.srclab.common.base.NamingCase;
 
 public class NamingCaseTest {
 
@@ -51,10 +51,6 @@ public class NamingCaseTest {
         Assert.assertEquals(
             NamingCase.UPPER_CAMEL.convertTo("upper@#$%Camel", NamingCase.LOWER_UNDERSCORE),
             "upper_camel"
-        );
-        Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convertTo("UpperCamel", NamingCase.CAPITALIZE_UNDERSCORE),
-            "Upper_Camel"
         );
     }
 }

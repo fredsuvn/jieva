@@ -1,4 +1,4 @@
-package test.java.xyz.srclab.common.lang;
+package test.java.xyz.srclab.common.base;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -6,8 +6,8 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import xyz.srclab.common.lang.CharsTemplate;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.base.CharsTemplate;
+import xyz.srclab.common.logging.Logger;
 
 import java.io.StringWriter;
 import java.time.LocalDateTime;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class CharsTemplateBenchmark {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
+    private static final Logger logger = Logger.simpleLogger();
 
     private static final String charsTemplateContent = "Hello, this is {name}, now is {date}";
     private CharsTemplate charsTemplate;
@@ -56,14 +56,14 @@ public class CharsTemplateBenchmark {
     }
 
     @Benchmark
-    public void withCharsTemplate() {
+    public void useCharsTemplate() {
         CharsTemplate template = CharsTemplate.resolve(charsTemplateContent, "{", "}");
         StringWriter writer = new StringWriter();
         template.process(writer, charsTemplateArgs);
     }
 
     @Benchmark
-    public void withVelocity() {
+    public void useVelocity() {
         VelocityEngine ve = new VelocityEngine();
         ve.init();
         StringWriter writer = new StringWriter();
@@ -71,13 +71,13 @@ public class CharsTemplateBenchmark {
     }
 
     @Benchmark
-    public void withPreparedCharsTemplate() {
+    public void usePreparedCharsTemplate() {
         StringWriter writer = new StringWriter();
         charsTemplate.process(writer, charsTemplateArgs);
     }
 
     @Benchmark
-    public void withPreparedVelocity() {
+    public void usePreparedVelocity() {
         StringWriter writer = new StringWriter();
         velocityEngine.evaluate(velocityContext, writer, "", velocityTemplate);
     }
