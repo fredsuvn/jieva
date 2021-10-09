@@ -5,7 +5,6 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.srclab.common.collect.CopyOnWriteMap;
-import xyz.srclab.common.test.TestLogger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,8 +42,6 @@ public class CopyOnWriteBenchmark {
     @State(value = Scope.Benchmark)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public static class ReadBenchmark {
-
-        private static final TestLogger logger = TestLogger.DEFAULT;
 
         private static final List<Object> keys = new ArrayList<>();
         private static final int size = 1024 * 1024;
@@ -106,8 +103,6 @@ public class CopyOnWriteBenchmark {
     @State(value = Scope.Benchmark)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public static class ReadWriteBenchmark {
-
-        private static final TestLogger logger = TestLogger.DEFAULT;
 
         private static final List<Object> keys = new ArrayList<>();
         private static final int size = 1024;

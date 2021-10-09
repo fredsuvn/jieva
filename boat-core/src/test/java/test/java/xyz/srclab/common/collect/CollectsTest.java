@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.collect.Collects;
 import xyz.srclab.common.collect.CopyOnWriteMap;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.logging.Logs;
 
 import java.util.*;
 
@@ -13,12 +13,10 @@ import java.util.*;
  */
 public class CollectsTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
-
     @Test
     public void testArray() {
-        String[] stringArray = Collects.newArray("1", "2", "3");
-        logger.log(Collects.joinToString(stringArray));
+        String[] stringArray = Collects.asArray("1", "2", "3");
+        Logs.info(Collects.joinToString(stringArray));
         Assert.assertEquals(
             Collects.joinToString(stringArray),
             "1, 2, 3"
@@ -27,7 +25,7 @@ public class CollectsTest {
 
     @Test
     public void testJoinToString() {
-        String[] strings = Collects.newArray("1", "2", "3");
+        String[] strings = Collects.asArray("1", "2", "3");
         Collects.asList(strings).set(0, "111");
         Collects.asList(strings).set(1, "222");
         Collects.asList(strings).set(2, "333");
