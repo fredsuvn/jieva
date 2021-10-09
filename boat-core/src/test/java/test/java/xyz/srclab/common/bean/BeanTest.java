@@ -3,8 +3,8 @@ package test.java.xyz.srclab.common.bean;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.bean.*;
+import xyz.srclab.common.logging.Logger;
 import xyz.srclab.common.reflect.Types;
-import xyz.srclab.common.test.TestLogger;
 
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -15,23 +15,23 @@ import java.util.*;
  */
 public class BeanTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
+    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testBeanResolve() {
         BeanResolver beanStyle = BeanResolver.newBeanResolver(BeanResolveHandler.DEFAULTS);
         BeanType beanType = beanStyle.resolve(TestBean.class);
-        Assert.assertEquals(beanType.properties().size(), 4);
-        Assert.assertEquals(beanType.getProperty("p1").type(), String.class);
-        Assert.assertEquals(beanType.getProperty("p2").type(), int.class);
-        Assert.assertEquals(beanType.getProperty("p3").type(), Types.parameterizedType(List.class, String.class));
+        Assert.assertEquals(beanType.getProperties().size(), 4);
+        Assert.assertEquals(beanType.getProperty("p1").getType(), String.class);
+        Assert.assertEquals(beanType.getProperty("p2").getType(), int.class);
+        Assert.assertEquals(beanType.getProperty("p3").getType(), Types.parameterizedType(List.class, String.class));
 
         BeanResolver namingStyle = BeanResolver.newBeanResolver(Arrays.asList(RecordStyleBeanResolveHandler.INSTANCE));
         BeanType beanType2 = namingStyle.resolve(SimpleNamingBean.class);
-        Assert.assertEquals(beanType2.properties().size(), 3);
-        Assert.assertEquals(beanType2.getProperty("p1").type(), String.class);
-        Assert.assertEquals(beanType2.getProperty("p2").type(), int.class);
-        Assert.assertEquals(beanType2.getProperty("p3").type(), Types.parameterizedType(List.class, String.class));
+        Assert.assertEquals(beanType2.getProperties().size(), 3);
+        Assert.assertEquals(beanType2.getProperty("p1").getType(), String.class);
+        Assert.assertEquals(beanType2.getProperty("p2").getType(), int.class);
+        Assert.assertEquals(beanType2.getProperty("p3").getType(), Types.parameterizedType(List.class, String.class));
 
         Assert.assertNotSame(beanType, beanType2);
     }
@@ -89,7 +89,7 @@ public class BeanTest {
         testBean.setP2(6);
         testBean.setP3(Arrays.asList("1", "2", "3"));
         Map<String, Object> testMap = Beans.asMap(testBean);
-        logger.log("testMap: {}", testMap);
+        logger.info("testMap: {}", testMap);
         Assert.assertEquals(testMap.get("p1"), "123");
         Assert.assertEquals(testMap.get("p2"), 6);
         Assert.assertEquals(testMap.get("p3"), Arrays.asList("1", "2", "3"));
@@ -103,11 +103,11 @@ public class BeanTest {
         simpleBean.setP1("789");
         simpleBean.setP2(999);
         BeanMap<Integer> simpleMap = Beans.asMap(simpleBean, int.class);
-        logger.log("simpleMap: {}", simpleMap);
+        logger.info("simpleMap: {}", simpleMap);
         Assert.assertEquals(simpleMap.get("p1"), (Integer) 789);
         Assert.assertEquals(simpleMap.get("p2"), (Integer) 999);
         Assert.assertEquals(simpleMap.size(), 2);
-        Assert.assertEquals(SimpleBean.class, simpleMap.beanType().type());
+        Assert.assertEquals(SimpleBean.class, simpleMap.beanType().getType());
         simpleMap.put("p1", 10086);
         simpleMap.put("p2", 10000);
         Assert.assertEquals(simpleBean.getP1(), "10086");

@@ -40,6 +40,7 @@ interface BeanResolver {
         /**
          * Return a new [CachedBeanResolver] with given [resolveHandlers] and [cache] (default is [Cache.weakCache]).
          */
+        @JvmOverloads
         @JvmStatic
         fun newBeanResolver(
             resolveHandlers: Iterable<BeanResolveHandler>,
