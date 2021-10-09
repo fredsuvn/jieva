@@ -3,16 +3,14 @@ package test.java.xyz.srclab.common.proxy;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Current;
+import xyz.srclab.common.base.Contexts;
+import xyz.srclab.common.logging.Logs;
 import xyz.srclab.common.proxy.*;
-import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 public class ProxyTest {
-
-    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testClassProxy() {
@@ -45,15 +43,15 @@ public class ProxyTest {
                 @NotNull SourceInvoker superInvoke,
                 Object @NotNull [] args
             ) {
-                logger.log("method: {}, declaring class: {}", proxiedMethod, proxiedMethod.getDeclaringClass());
+                Logs.info("method: {}, declaring class: {}", proxiedMethod, proxiedMethod.getDeclaringClass());
                 return "proxy-> " + (type.isInterface() ? "interface" : superInvoke.invoke(args));
             }
         };
 
-        ProxyClass<T> proxyClass = ProxyClass.newProxyClass(
-            type, Arrays.asList(proxyMethod), Current.classLoader(), proxyClassGenerator);
+        ProxyClass<T> proxyClass = ProxyClass.generate(
+            type, Arrays.asList(proxyMethod), Contexts.currentClassLoader(), proxyClassGenerator);
         Assert.assertEquals(
-            proxyClass.newInstance().hello("a", "b"),
+            proxyClass.instantiate().hello("a", "b"),
             type.isInterface() ? "proxy-> interface" : "proxy-> hello: a = a, b = b");
     }
 
