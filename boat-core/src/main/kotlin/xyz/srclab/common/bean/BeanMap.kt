@@ -39,7 +39,13 @@ open class BeanMap<T>(
                     override val key: String = it.key
 
                     override val value: Any?
-                        get() = converter.convert(propertyType.getValue(bean), valueType)
+                        get() {
+                            val value = propertyType.getValue<Any?>(bean)
+                            if (value === null) {
+                                return value
+                            }
+                            return converter.convert(value, valueType)
+                        }
 
                     override fun setValue(newValue: Any?): Any? {
                         return propertyType.setValueAndReturnOld(

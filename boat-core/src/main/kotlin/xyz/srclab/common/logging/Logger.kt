@@ -1,9 +1,12 @@
 package xyz.srclab.common.logging
 
-import xyz.srclab.common.base.*
 import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
+import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.callerStackTrace
+import xyz.srclab.common.base.stackTraceToString
 import java.io.PrintStream
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Logger.
@@ -71,6 +74,7 @@ interface Logger {
             private val output: PrintStream,
             private val callerOffset: Int
         ) : Logger {
+
             override fun log(level: Int, message: String?, vararg args: Any?) {
                 if (level < this.level) {
                     return
@@ -78,10 +82,10 @@ interface Logger {
 
                 fun levelToString(level: Int): String {
                     return when {
-                        level <= DEBUG_LEVEL -> "TRACE"
-                        level <= INFO_LEVEL -> "DEBUG"
-                        level <= WARN_LEVEL -> "INFO"
-                        level <= ERROR_LEVEL -> "WARN"
+                        level < DEBUG_LEVEL -> "TRACE"
+                        level < INFO_LEVEL -> "DEBUG"
+                        level < WARN_LEVEL -> "INFO"
+                        level < ERROR_LEVEL -> "WARN"
                         else -> "ERROR"
                     }
                 }
@@ -99,32 +103,37 @@ interface Logger {
                 //Builds message.
                 val formattedMessage = if (message === null) null else message.fastFormat(*arguments)
                 val levelDescription = levelToString(level)
-                val timestamp = SIMPLE_LOCAL_DATE_TIME_FORMATTER.format(LocalDateTime.now())
+                val timestamp = TIMESTAMP_FORMATTER.format(LocalDateTime.now())
 
                 //Computes stack trace.
-                val stackTrace = currentThread().stackTrace
-                if (stackTrace.isNullOrEmpty()) {
-                    output.println("[$levelDescription][$timestamp] - $formattedMessage")
-                    return
-                }
-                var callerTraceIndex = -1
-                for (i in stackTrace.indices) {
-                    val currentTrace = stackTrace[i]
-                    if (currentTrace.className != SimpleLogger::class.java.name
-                        && currentTrace.className != Logger::class.java.name) {
-                        callerTraceIndex = i + callerOffset
-                        break
+                val callerTrace = callerStackTrace(callerOffset) { trace, findCalled ->
+                    if (!findCalled) {
+                        if (trace.className == SimpleLogger::class.java.name
+                            || trace.className == Logger::class.java.name) {
+                            return@callerStackTrace 0
+                        }
                     }
+                    if (findCalled) {
+                        if (trace.className != SimpleLogger::class.java.name
+                            && trace.className != Logger::class.java.name) {
+                            return@callerStackTrace 1
+                        }
+                    }
+                    -1
                 }
 
-                if (isIndexInBounds(callerTraceIndex, 0, stackTrace.size)) {
-                    val callerTrace = stackTrace[callerTraceIndex]
+                if (callerTrace === null) {
+                    output.println("[$levelDescription][$timestamp] - $formattedMessage")
+                } else {
                     output.println("[$levelDescription][$timestamp]" +
                         "[${callerTrace.className}.${callerTrace.methodName}" +
                         "(${callerTrace.lineNumber})] - $formattedMessage")
-                } else {
-                    output.println("[$levelDescription][$timestamp] - $formattedMessage")
                 }
+            }
+
+            companion object {
+                private val TIMESTAMP_FORMATTER: DateTimeFormatter =
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
             }
         }
     }

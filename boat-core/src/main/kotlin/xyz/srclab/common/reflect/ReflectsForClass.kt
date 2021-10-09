@@ -84,7 +84,7 @@ val <T> Class<T>.arrayClass: Class<Array<T>>
             Void::class.javaPrimitiveType -> "[V"
             else -> "[L${this.name};"
         }
-        return arrayClassName.loadClass(this.classLoader)
+        return arrayClassName.loadClass(this.classLoader ?: currentClassLoader())
     }
 
 /**

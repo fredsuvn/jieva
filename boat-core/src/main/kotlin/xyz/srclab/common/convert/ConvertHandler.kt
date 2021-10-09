@@ -216,7 +216,7 @@ object IterableConvertHandler : ConvertHandler {
         if (from === null) {
             return null
         }
-        if (fromType is GenericArrayType) {
+        if (toType is GenericArrayType) {
             return convert(from, fromType, toType.rawClass, context)
         }
         val fromComponentType = getFromComponentType(fromType)
@@ -257,15 +257,12 @@ object IterableConvertHandler : ConvertHandler {
         if (fromClass.isArray) {
             return fromClass.componentType
         }
-        if (fromType is ParameterizedType) {
-            return try {
-                val iterableParameterizedType = fromType.getTypeSignature(Iterable::class.java)
-                iterableParameterizedType.toIterableType().componentType
-            } catch (e: Exception) {
-                null
-            }
+        return try {
+            val iterableParameterizedType = fromType.getTypeSignature(Iterable::class.java)
+            iterableParameterizedType.toIterableType().componentType
+        } catch (e: Exception) {
+            null
         }
-        return null
     }
 
     private fun getToComponentType(toType: ParameterizedType): Type? {

@@ -72,7 +72,7 @@ public class InvokerTest {
             "a1"
         );
         Assert.assertThrows(IllegalAccessException.class, () ->
-            generator.forMethod(A.class, "a2").invoke(a));
+            generator.ofMethod(A.class, "a2").invoke(a));
         Assert.assertEquals(
             generator.ofMethod(A.class, "a2").enforce(a),
             "a2"
@@ -82,7 +82,7 @@ public class InvokerTest {
             "a3: 123"
         );
         Assert.assertThrows(IllegalAccessException.class, () ->
-            generator.forMethod(A.class, "a4", String.class).invoke(a, "123"));
+            generator.ofMethod(A.class, "a4", String.class).invoke(a, "123"));
         Assert.assertEquals(
             generator.ofMethod(A.class, "a4", String.class).enforce(a, "123"),
             "a4: 123"

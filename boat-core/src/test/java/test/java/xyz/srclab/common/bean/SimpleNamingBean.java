@@ -10,6 +10,7 @@ public class SimpleNamingBean {
     private String p1;
     private int p2;
     private List<String> p3;
+    private long[] p4;
 
     public String p1() {
         return p1;
@@ -33,5 +34,13 @@ public class SimpleNamingBean {
 
     public void p3(List<String> p3) {
         this.p3 = p3;
+    }
+
+    public long[] p4() {
+        return p4;
+    }
+
+    public void p4(long[] p4) {
+        this.p4 = p4;
     }
 }

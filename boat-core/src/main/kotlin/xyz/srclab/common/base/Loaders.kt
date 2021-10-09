@@ -74,7 +74,7 @@ fun CharSequence.loadResourceAsReaderOrNull(
     classLoader: ClassLoader = currentClassLoader(),
     charset: Charset = DEFAULT_CHARSET
 ): Reader? {
-    return loadResourceOrNull(classLoader)?.openStream()?.reader()
+    return loadResourceOrNull(classLoader)?.openStream()?.reader(charset)
 }
 
 @Throws(ResourceNotFoundException::class)
@@ -188,31 +188,15 @@ fun Reader.loadProperties(): Map<String, String> {
 
 @JvmOverloads
 fun <T> ByteArray.loadClass(offset: Int = 0, length: Int = this.size - offset): Class<T> {
-    return BytesClassLoader.loadClass(this, offset, length).asAny()
+    return BoatClassLoader.loadClass(this, offset, length).asAny()
 }
 
 fun <T> InputStream.loadClass(): Class<T> {
-    return BytesClassLoader.loadClass(this).asAny()
+    return BoatClassLoader.loadClass(this).asAny()
 }
 
 fun <T> ByteBuffer.loadClass(): Class<T> {
-    return BytesClassLoader.loadClass(this).asAny()
-}
-
-object BytesClassLoader : ClassLoader() {
-
-    @JvmOverloads
-    fun loadClass(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size): Class<*> {
-        return super.defineClass(null, bytes, offset, length)
-    }
-
-    fun loadClass(inputStream: InputStream): Class<*> {
-        return loadClass(inputStream.readBytes())
-    }
-
-    fun loadClass(byteBuffer: ByteBuffer): Class<*> {
-        return super.defineClass(null, byteBuffer, null)
-    }
+    return BoatClassLoader.loadClass(this).asAny()
 }
 
 open class ResourceNotFoundException : RuntimeException {

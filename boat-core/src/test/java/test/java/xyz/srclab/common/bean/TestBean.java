@@ -10,6 +10,7 @@ public class TestBean {
     private String p1;
     private int p2;
     private List<String> p3;
+    private long[] p4;
 
     public String getP1() {
         return p1;
@@ -33,6 +34,14 @@ public class TestBean {
 
     public void setP3(List<String> p3) {
         this.p3 = p3;
+    }
+
+    public long[] getP4() {
+        return p4;
+    }
+
+    public void setP4(long[] p4) {
+        this.p4 = p4;
     }
 
     public enum TestEnum {

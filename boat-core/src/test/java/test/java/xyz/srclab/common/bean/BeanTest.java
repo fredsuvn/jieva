@@ -19,17 +19,19 @@ public class BeanTest {
     public void testBeanResolve() {
         BeanResolver beanStyle = BeanResolver.newBeanResolver(BeanResolveHandler.DEFAULTS);
         BeanType beanType = beanStyle.resolve(TestBean.class);
-        Assert.assertEquals(beanType.getProperties().size(), 4);
+        Assert.assertEquals(beanType.getProperties().size(), 5);
         Assert.assertEquals(beanType.getProperty("p1").getType(), String.class);
         Assert.assertEquals(beanType.getProperty("p2").getType(), int.class);
         Assert.assertEquals(beanType.getProperty("p3").getType(), Types.parameterizedType(List.class, String.class));
+        Assert.assertEquals(beanType.getProperty("p4").getType(), long[].class);
 
         BeanResolver namingStyle = BeanResolver.newBeanResolver(Arrays.asList(RecordStyleBeanResolveHandler.INSTANCE));
         BeanType beanType2 = namingStyle.resolve(SimpleNamingBean.class);
-        Assert.assertEquals(beanType2.getProperties().size(), 3);
+        Assert.assertEquals(beanType2.getProperties().size(), 4);
         Assert.assertEquals(beanType2.getProperty("p1").getType(), String.class);
         Assert.assertEquals(beanType2.getProperty("p2").getType(), int.class);
         Assert.assertEquals(beanType2.getProperty("p3").getType(), Types.parameterizedType(List.class, String.class));
+        Assert.assertEquals(beanType2.getProperty("p4").getType(), long[].class);
 
         Assert.assertNotSame(beanType, beanType2);
     }
@@ -40,18 +42,21 @@ public class BeanTest {
         a.setP1("123");
         a.setP2(6);
         a.setP3(Arrays.asList("1", "2", "3"));
+        a.setP4(new long[]{7, 8, 9});
 
         TestBean b = new TestBean();
         Beans.copyProperties(a, b);
         Assert.assertEquals(b.getP1(), a.getP1());
         Assert.assertEquals(b.getP2(), a.getP2());
         Assert.assertEquals(b.getP3(), a.getP3());
+        Assert.assertEquals(b.getP4(), a.getP4());
 
         a.setP1(null);
         Beans.copyProperties(a, b);
         Assert.assertEquals(b.getP1(), "null");
         Assert.assertEquals(b.getP2(), a.getP2());
         Assert.assertEquals(b.getP3(), a.getP3());
+        Assert.assertEquals(b.getP4(), a.getP4());
 
         a.setP1(null);
         b.setP1("234");
@@ -59,25 +64,30 @@ public class BeanTest {
         Assert.assertEquals(b.getP1(), "234");
         Assert.assertEquals(b.getP2(), a.getP2());
         Assert.assertEquals(b.getP3(), a.getP3());
+        Assert.assertEquals(b.getP4(), a.getP4());
 
         a.setP1("123");
         a.setP2(222);
         a.setP3(Arrays.asList("1", "2", "3"));
+        long[] p4 = new long[]{7, 8, 9};
+        a.setP4(p4);
         LinkedHashMap<String, Object> map = Beans.copyProperties(a, new LinkedHashMap<>());
-        Assert.assertEquals(map.size(), 4);//include class
+        Assert.assertEquals(map.size(), 5);//include class
         Assert.assertEquals(map.get("p1"), "123");
         Assert.assertEquals(map.get("p2"), 222);
-        Assert.assertEquals(map.get("p3"), Arrays.asList("1", "2", "3"));
+        Assert.assertEquals(map.get("p2"), 222);
+        Assert.assertEquals(map.get("p4"), p4);
 
         map.put("p2", 999);
         Beans.copyProperties(map, a);
         Assert.assertEquals(a.getP2(), 999);
 
         LinkedHashMap<String, Object> map2 = Beans.copyProperties(map, new LinkedHashMap<>());
-        Assert.assertEquals(map2.size(), 4);//include class
+        Assert.assertEquals(map2.size(), 5);//include class
         Assert.assertEquals(map2.get("p1"), "123");
         Assert.assertEquals(map2.get("p2"), 999);
         Assert.assertEquals(map2.get("p3"), Arrays.asList("1", "2", "3"));
+        Assert.assertEquals(map.get("p4"), p4);
     }
 
     @Test
@@ -93,7 +103,7 @@ public class BeanTest {
         Assert.assertEquals(testMap.get("p3"), Arrays.asList("1", "2", "3"));
         testMap.put("p1", "555");
         Assert.assertEquals(testBean.getP1(), "555");
-        Assert.expectThrows(UnsupportedOperationException.class, () -> testMap.put("p4", "p4"));
+        Assert.expectThrows(UnsupportedOperationException.class, () -> testMap.put("p5", "p5"));
         testBean.setP2(888);
         Assert.assertEquals(testMap.get("p2"), 888);
 
@@ -122,6 +132,7 @@ public class BeanTest {
         a.setP2(new String[]{"1", "1", "1"});
         a.setP3("pppppp".toCharArray());
         a.setP4("bbbbbb".getBytes(Charset.defaultCharset()));
+        a.setP5(Arrays.asList("7", "8", "9"));
         S1 s1 = new S1();
         s1.setS1("123");
         s1.setS2(234);
@@ -135,6 +146,7 @@ public class BeanTest {
         Assert.assertEquals(b.getP2(), Collections.singleton(1));
         Assert.assertEquals(b.getP3(), "pppppp");
         Assert.assertEquals(b.getP4(), "bbbbbb");
+        Assert.assertEquals(b.getP5(), new long[]{7, 8, 9});
         Assert.assertEquals(b.getS().getS1(), 123);
         Assert.assertEquals(b.getS().getS2(), 234d);
     }
@@ -228,6 +240,8 @@ public class BeanTest {
         private char[] p3;
         private byte[] p4;
 
+        private List<String> p5;
+
         private S1 s;
 
         @Override
@@ -292,6 +306,14 @@ public class BeanTest {
             this.p4 = p4;
         }
 
+        public List<String> getP5() {
+            return p5;
+        }
+
+        public void setP5(List<String> p5) {
+            this.p5 = p5;
+        }
+
         public S1 getS() {
             return s;
         }
@@ -311,6 +333,8 @@ public class BeanTest {
         private Set<Integer> p2;
         private String p3;
         private String p4;
+
+        private long[] p5;
 
         private S2 s;
 
@@ -374,6 +398,14 @@ public class BeanTest {
 
         public void setP4(String p4) {
             this.p4 = p4;
+        }
+
+        public long[] getP5() {
+            return p5;
+        }
+
+        public void setP5(long[] p5) {
+            this.p5 = p5;
         }
 
         public S2 getS() {

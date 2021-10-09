@@ -1,6 +1,6 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.common.reflect.newInstance
+import xyz.srclab.common.reflect.toInstance
 
 /**
  * Help parse object by spec of type [S].
@@ -86,7 +86,7 @@ object ClassNameSpecParser : SpecParser<CharSequence> {
         for (className in classNames) {
             val trimmedClassName = className.trim()
             val product: T = try {
-                trimmedClassName.newInstance()
+                trimmedClassName.toInstance()
             } catch (e: Exception) {
                 continue
             }
@@ -100,7 +100,7 @@ object ClassNameSpecParser : SpecParser<CharSequence> {
         for (className in classNames) {
             val trimmedClassName = className.trim()
             val product: T = try {
-                trimmedClassName.newInstance()
+                trimmedClassName.toInstance()
             } catch (e: Exception) {
                 continue
             }
@@ -142,7 +142,7 @@ object StrictClassNameSpecParser : SpecParser<CharSequence> {
     private fun <T : Any> createInstance(className: CharSequence): T {
         val trimmedClassName = className.trim()
         val product: T = try {
-            trimmedClassName.newInstance()
+            trimmedClassName.toInstance()
         } catch (e: Exception) {
             throw SpecParsingException("Instantiate class $trimmedClassName failed.", e)
         }
