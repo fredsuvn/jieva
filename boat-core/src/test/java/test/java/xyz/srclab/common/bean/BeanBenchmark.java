@@ -6,7 +6,6 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.srclab.common.bean.Beans;
-import xyz.srclab.common.logging.Logger;
 
 import java.util.concurrent.TimeUnit;
 
@@ -21,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 @State(value = Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class BeanBenchmark {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     private Bean initBean;
 

@@ -7,7 +7,6 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.srclab.common.base.CharsTemplate;
-import xyz.srclab.common.logging.Logger;
 
 import java.io.StringWriter;
 import java.time.LocalDateTime;
@@ -26,8 +25,6 @@ import java.util.concurrent.TimeUnit;
 @State(value = Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class CharsTemplateBenchmark {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     private static final String charsTemplateContent = "Hello, this is {name}, now is {date}";
     private CharsTemplate charsTemplate;

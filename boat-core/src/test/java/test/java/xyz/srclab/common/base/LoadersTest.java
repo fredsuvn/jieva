@@ -7,7 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Loaders;
 import xyz.srclab.common.collect.Collects;
-import xyz.srclab.common.logging.Logger;
+import xyz.srclab.common.logging.Logs;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,19 +16,17 @@ import java.util.Map;
 
 public class LoadersTest {
 
-    private static final Logger logger = Logger.simpleLogger();
-
     @Test
     public void testLoader() {
         List<String> texts = Loaders.loadAllResourcesAsStrings("META-INF/test.properties");
-        logger.info("Load texts: {}", texts);
+        Logs.info("Load texts: {}", texts);
         Assert.assertEquals(
             texts,
             Collections.singletonList("info=123")
         );
 
         List<Map<String, String>> properties = Loaders.loadAllResourcesAsProperties("META-INF/test.properties");
-        logger.info("Load properties: {}", properties);
+        Logs.info("Load properties: {}", properties);
         Assert.assertEquals(
             properties,
             Collections.singletonList(Collects.putEntries(new HashMap<>(), "info", "123"))
@@ -36,8 +34,8 @@ public class LoadersTest {
 
         String newClassName = "test.xyz.srclab.A";
         Class<?> clazz = Loaders.loadClass(createClass(newClassName));
-        logger.info("class: {}", clazz);
-        logger.info("class loader: {}", clazz.getClassLoader());
+        Logs.info("class: {}", clazz);
+        Logs.info("class loader: {}", clazz.getClassLoader());
         Assert.assertEquals(clazz.getName(), newClassName);
     }
 

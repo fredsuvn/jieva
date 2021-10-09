@@ -4,11 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.CacheableBuilder;
-import xyz.srclab.common.logging.Logger;
+import xyz.srclab.common.logging.Logs;
 
 public class BuildersTest {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testCachingProductBuilder() {
@@ -36,9 +34,9 @@ public class BuildersTest {
         String value2 = testCachingBuilder.build();
         testCachingBuilder.setValue("2");
         String value3 = testCachingBuilder.build();
-        logger.info("value1: {}", value1);
-        logger.info("value2: {}", value2);
-        logger.info("value3: {}", value3);
+        Logs.info("value1: {}", value1);
+        Logs.info("value2: {}", value2);
+        Logs.info("value3: {}", value3);
         Assert.assertSame(value1, value2);
         Assert.assertNotEquals(value2, value3);
     }

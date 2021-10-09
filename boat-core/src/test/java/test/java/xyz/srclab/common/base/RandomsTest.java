@@ -4,17 +4,15 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.RandomSupplier;
 import xyz.srclab.common.base.Randoms;
-import xyz.srclab.common.logging.Logger;
+import xyz.srclab.common.logging.Logs;
 
 public class RandomsTest {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testRandoms() {
         for (int i = 0; i < 10000; i++) {
             int r = Randoms.between(10, 20);
-            logger.info("random[10, 20): {}", r);
+            Logs.info("random[10, 20): {}", r);
             Assert.assertTrue(r >= 10 && r < 20);
         }
     }
@@ -41,6 +39,6 @@ public class RandomsTest {
         }
         int total = countA + countB + countC;
         Assert.assertEquals(total, 1000);
-        logger.info("countA: {}, countB: {}, countC: {}, total: {}", countA, countB, countC, total);
+        Logs.info("countA: {}, countB: {}, countC: {}, total: {}", countA, countB, countC, total);
     }
 }

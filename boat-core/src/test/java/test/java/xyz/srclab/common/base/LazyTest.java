@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Lazy;
 import xyz.srclab.common.base.LazyToString;
-import xyz.srclab.common.logging.Logger;
+import xyz.srclab.common.logging.Logs;
 import xyz.srclab.common.utils.Counter;
 
 import java.time.Duration;
@@ -13,8 +13,6 @@ import java.time.Duration;
  * @author sunqian
  */
 public class LazyTest {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testLazy() throws InterruptedException {
@@ -49,7 +47,7 @@ public class LazyTest {
     public void testLazyString() {
         Counter counter = Counter.startsAt(0);
         LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
-        logger.info("lazyString: {}", lazyToString);
+        Logs.info("lazyString: {}", lazyToString);
         Assert.assertEquals(
             lazyToString.get(),
             new Integer(0)

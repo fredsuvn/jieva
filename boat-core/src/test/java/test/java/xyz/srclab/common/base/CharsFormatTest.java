@@ -3,14 +3,12 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.CharsFormat;
-import xyz.srclab.common.logging.Logger;
+import xyz.srclab.common.logging.Logs;
 
 /**
  * @author sunqian
  */
 public class CharsFormatTest {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testFormat() {
@@ -66,7 +64,7 @@ public class CharsFormatTest {
         Object... args
     ) {
         String actual = format.format(pattern, args);
-        logger.info("Test CharsFormat ({}): {}", format, actual);
+        Logs.info("Test CharsFormat ({}): {}", format, actual);
         Assert.assertEquals(actual, expected);
     }
 }

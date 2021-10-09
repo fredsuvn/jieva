@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Ref;
-import xyz.srclab.common.logging.Logger;
+import xyz.srclab.common.logging.Logs;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,8 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class RefTest {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testRef() {
@@ -30,12 +28,12 @@ public class RefTest {
         String dateString = "2222-12-22 22:22:22";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Date date = Ref.of(dateString)
-            .accept(logger::info)
+            .accept(Logs::info)
             .apply(d -> LocalDateTime.parse(d, formatter))
             .apply(d -> d.atZone(ZoneId.systemDefault()))
             .with(ChronoZonedDateTime::toInstant)
             .with(Date::from)
             .get();
-        logger.info("date: {}", date);
+        Logs.info("date: {}", date);
     }
 }

@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.bean;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.bean.*;
-import xyz.srclab.common.logging.Logger;
+import xyz.srclab.common.logging.Logs;
 import xyz.srclab.common.reflect.Types;
 
 import java.math.BigDecimal;
@@ -14,8 +14,6 @@ import java.util.*;
  * @author sunqian
  */
 public class BeanTest {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testBeanResolve() {
@@ -89,7 +87,7 @@ public class BeanTest {
         testBean.setP2(6);
         testBean.setP3(Arrays.asList("1", "2", "3"));
         Map<String, Object> testMap = Beans.asMap(testBean);
-        logger.info("testMap: {}", testMap);
+        Logs.info("testMap: {}", testMap);
         Assert.assertEquals(testMap.get("p1"), "123");
         Assert.assertEquals(testMap.get("p2"), 6);
         Assert.assertEquals(testMap.get("p3"), Arrays.asList("1", "2", "3"));
@@ -103,7 +101,7 @@ public class BeanTest {
         simpleBean.setP1("789");
         simpleBean.setP2(999);
         BeanMap<Integer> simpleMap = Beans.asMap(simpleBean, int.class);
-        logger.info("simpleMap: {}", simpleMap);
+        Logs.info("simpleMap: {}", simpleMap);
         Assert.assertEquals(simpleMap.get("p1"), (Integer) 789);
         Assert.assertEquals(simpleMap.get("p2"), (Integer) 999);
         Assert.assertEquals(simpleMap.size(), 2);

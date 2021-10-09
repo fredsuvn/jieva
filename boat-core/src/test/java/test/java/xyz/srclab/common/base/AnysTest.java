@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Anys;
-import xyz.srclab.common.logging.Logger;
+import xyz.srclab.common.logging.Logs;
 
 import java.util.Arrays;
 
@@ -11,8 +11,6 @@ import java.util.Arrays;
  * @author sunqian
  */
 public class AnysTest {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testEqual() {
@@ -45,9 +43,9 @@ public class AnysTest {
     public void testToString() {
         Object obj = new Object();
         Assert.assertEquals(Anys.toString(obj), obj.toString());
-        logger.info(Anys.arrayToString(new int[]{1, 2, 3}));
+        Logs.info(Anys.arrayToString(new int[]{1, 2, 3}));
         Assert.assertEquals(Anys.arrayToString(new int[]{1, 2, 3}), Arrays.toString(new int[]{1, 2, 3}));
-        logger.info(Anys.deepToString(new Object[]{1, new int[]{1, 2, 3}, 3}));
+        Logs.info(Anys.deepToString(new Object[]{1, new int[]{1, 2, 3}, 3}));
         Assert.assertEquals(
             Anys.deepToString(new Object[]{1, new int[]{1, 2, 3}, 3}),
             Arrays.deepToString(new Object[]{1, new int[]{1, 2, 3}, 3})

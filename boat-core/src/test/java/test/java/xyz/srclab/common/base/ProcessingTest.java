@@ -5,13 +5,11 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Processing;
 import xyz.srclab.common.base.Systems;
-import xyz.srclab.common.logging.Logger;
+import xyz.srclab.common.logging.Logs;
 
 import java.time.Duration;
 
 public class ProcessingTest {
-
-    private static final Logger logger = Logger.simpleLogger();
 
     private static final String ECHO_CONTENT = "ECHO_CONTENT";
 
@@ -34,7 +32,7 @@ public class ProcessingTest {
         Processing processing = Processing.start(command);
         processing.await();
         String output = processing.outputString();
-        logger.info(output);
+        Logs.info(output);
         Assert.assertEquals(output, ECHO_CONTENT + Systems.getLineSeparator());
     }
 
@@ -42,7 +40,7 @@ public class ProcessingTest {
         Processing processing = Processing.start("ping 127.0.0.1");
         processing.await(Duration.ofSeconds(2));
         String output = processing.availableOutputString();
-        logger.info(output);
+        Logs.info(output);
         processing.destroy(true);
     }
 }
