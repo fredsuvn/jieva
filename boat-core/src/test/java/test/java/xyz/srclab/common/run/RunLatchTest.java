@@ -2,16 +2,14 @@ package test.java.xyz.srclab.common.run;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.lang.Current;
+import xyz.srclab.common.base.Contexts;
+import xyz.srclab.common.logging.Logs;
 import xyz.srclab.common.run.RunLatch;
-import xyz.srclab.common.test.TestLogger;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RunLatchTest {
-
-    private static final TestLogger logger = TestLogger.DEFAULT;
 
     private static final int THREAD_NUMBER = 88;
     private static final AtomicInteger sum = new AtomicInteger(0);
@@ -24,13 +22,13 @@ public class RunLatchTest {
             TestThread testThread = new TestThread(latch);
             testThread.start();
         }
-        logger.log("sum before latch: {}", sum.get());
-        Current.sleep(1000);
-        logger.log("sum after 1000 millis sleep: {}", sum.get());
+        Logs.info("sum before latch: {}", sum.get());
+        Contexts.sleep(1000);
+        Logs.info("sum after 1000 millis sleep: {}", sum.get());
         Assert.assertEquals(sum.get(), 0);
         latch.open();
         countDownLatch.await();
-        logger.log("sum after latch: {}", sum.get());
+        Logs.info("sum after latch: {}", sum.get());
         Assert.assertEquals(sum.get(), THREAD_NUMBER);
     }
 
