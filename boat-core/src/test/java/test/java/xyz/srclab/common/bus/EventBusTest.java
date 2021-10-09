@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.bus.EventBus;
 import xyz.srclab.common.bus.SubscribeMethod;
 import xyz.srclab.common.collect.Collects;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.logging.Logger;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class EventBusTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
+    private static final Logger logger = Logger.simpleLogger();
 
     @Test
     public void testEventBus() {
@@ -45,13 +45,13 @@ public class EventBusTest {
 
         @SubscribeMethod
         public void sub11(CharSequence chars) {
-            logger.log("sub11:" + chars);
+            logger.info("sub11:" + chars);
             stack.add("sub11");
         }
 
         @SubscribeMethod
         public void sub12(String chars) {
-            logger.log("sub12:" + chars);
+            logger.info("sub12:" + chars);
             stack.add("sub12");
         }
     }
@@ -62,31 +62,31 @@ public class EventBusTest {
 
         @SubscribeMethod
         public void sub20(Integer integer) {
-            logger.log("sub20:" + integer);
+            logger.info("sub20:" + integer);
             stack.add("sub20");
         }
 
         @SubscribeMethod
         public void sub21(String chars) {
-            logger.log("sub21:" + chars);
+            logger.info("sub21:" + chars);
             stack.add("sub21");
         }
 
         @SubscribeMethod
         public void sub22(String chars) {
-            logger.log("sub22:" + chars);
+            logger.info("sub22:" + chars);
             stack.add("sub22");
         }
 
         @SubscribeMethod
         public void sub23(String chars) {
-            logger.log("sub23:" + chars);
+            logger.info("sub23:" + chars);
             stack.add("sub23");
         }
 
         @SubscribeMethod
         public void sub24(Integer integer) {
-            logger.log("sub20:" + integer);
+            logger.info("sub20:" + integer);
             stack.add("sub20");
         }
     }
