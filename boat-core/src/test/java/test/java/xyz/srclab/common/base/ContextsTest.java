@@ -29,4 +29,14 @@ public class ContextsTest {
         });
         countDownLatch.await();
     }
+
+    @Test
+    public void testContextValue() {
+        Contexts.setProperty("123", "321");
+        Assert.assertEquals(Contexts.getProperty("123"), "321");
+        Assert.assertEquals(Contexts.getPropertyOrElse("1234", "4321"), "4321");
+        Assert.assertEquals(Contexts.getPropertyOrNull("1234"), (Object) null);
+        Assert.expectThrows(IllegalArgumentException.class, () ->
+            Contexts.getPropertyOrThrow("1234", k -> new IllegalArgumentException(k.toString())));
+    }
 }
