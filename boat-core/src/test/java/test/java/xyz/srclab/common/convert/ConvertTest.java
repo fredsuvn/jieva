@@ -6,8 +6,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.collect.Collects;
 import xyz.srclab.common.convert.*;
+import xyz.srclab.common.logging.Logs;
 import xyz.srclab.common.reflect.TypeRef;
-import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -17,12 +17,10 @@ import java.util.*;
  */
 public class ConvertTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
-
     @Test
     public void testConverts() {
         E e = Converts.convert("b", E.class);
-        logger.log("e: {}", e);
+        Logs.info("e: {}", e);
         Assert.assertEquals(e, E.B);
 
         Map<Iterable<Long>, HashMap<Float, StringBuilder>> source = new LinkedHashMap<>();
@@ -34,7 +32,7 @@ public class ConvertTest {
             },
             new TypeRef<Map<List<Double>, HashMap<Integer, CharSequence>>>() {
             });
-        logger.log("map: {}", map);
+        Logs.info("map: {}", map);
         Assert.assertEquals(
             map.get(Arrays.asList(10086.0)),
             Collects.putEntries(new HashMap<>(), 8, stringBuilder)
@@ -42,12 +40,12 @@ public class ConvertTest {
     }
 
     @Test
-    public void testSameToTypeFastHit() {
+    public void testCustomHandler() {
         Converter converter = Converter.newConverter(
             Arrays.asList(new IntToStringHandler(), new LongToStringHandler()));
-        logger.log("Convert int: {}", converter.convert(100, String.class));
+        Logs.info("Convert int: {}", converter.convert(100, String.class));
         Assert.assertEquals(converter.convert(100, String.class), "I100");
-        logger.log("Convert long: {}", converter.convert(100L, String.class));
+        Logs.info("Convert long: {}", converter.convert(100L, String.class));
         Assert.assertEquals(converter.convert(100L, String.class), "L100");
     }
 
@@ -62,9 +60,9 @@ public class ConvertTest {
         @Nullable
         @Override
         public Object convert(
-            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertContext chain) {
+            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertContext context) {
             if (from == null || !from.getClass().equals(Integer.class)) {
-                return chain.next(from, fromType, toType);
+                return null;
             }
             return "I" + from;
         }
@@ -75,9 +73,9 @@ public class ConvertTest {
         @Nullable
         @Override
         public Object convert(
-            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertContext chain) {
+            @Nullable Object from, @NotNull Type fromType, @NotNull Type toType, @NotNull ConvertContext context) {
             if (from == null || !from.getClass().equals(Long.class)) {
-                return chain.next(from, fromType, toType);
+                return null;
             }
             return "L" + from;
         }

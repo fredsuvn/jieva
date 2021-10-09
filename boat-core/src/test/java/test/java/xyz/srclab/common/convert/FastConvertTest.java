@@ -5,23 +5,21 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.convert.FastConvertMethod;
 import xyz.srclab.common.convert.FastConverter;
 import xyz.srclab.common.convert.UnsupportedConvertException;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.logging.Logs;
 
 /**
  * @author sunqian
  */
 public class FastConvertTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
-
     @Test
     public void testFastConvert() {
         FastConverter fastConverter = FastConverter.newFastConverter(new FastHandler());
         String intToString = fastConverter.convert(123, int.class, String.class);
-        logger.log("intToString: {}", intToString);
+        Logs.info("intToString: {}", intToString);
         Assert.assertEquals(intToString, "123");
         int stringToInt = fastConverter.convert("123", int.class);
-        logger.log("stringToInt: {}", stringToInt);
+        Logs.info("stringToInt: {}", stringToInt);
         Assert.assertEquals(stringToInt, 123);
 
         Assert.expectThrows(UnsupportedConvertException.class, () ->
