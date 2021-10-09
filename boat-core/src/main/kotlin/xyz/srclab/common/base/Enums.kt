@@ -11,7 +11,11 @@ fun <T> Class<*>.enumValue(name: CharSequence): T {
 @Throws(IllegalArgumentException::class)
 @JvmName("getValueOrNull")
 fun <T> Class<*>.enumValueOrNull(name: CharSequence): T? {
-    return JavaEnum.valueOf(this.asAny<Class<Enum<*>>>(), name.toString()).asAny()
+    return try {
+        JavaEnum.valueOf(this.asAny<Class<Enum<*>>>(), name.toString()).asAny()
+    } catch (e: Exception) {
+        null
+    }
 }
 
 @Throws(IllegalArgumentException::class)

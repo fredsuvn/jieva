@@ -18,11 +18,14 @@ import java.util.*;
 public class ConvertTest {
 
     @Test
-    public void testConverts() {
+    public void testConvertEnum() {
         E e = Converts.convert("b", E.class);
         Logs.info("e: {}", e);
         Assert.assertEquals(e, E.B);
+    }
 
+    @Test
+    public void testConvertMap() {
         Map<Iterable<Long>, HashMap<Float, StringBuilder>> source = new LinkedHashMap<>();
         StringBuilder stringBuilder = new StringBuilder("BBB");
         source.put(Arrays.asList(10086L), Collects.putEntries(new HashMap<>(), 8.8, stringBuilder));
@@ -37,6 +40,25 @@ public class ConvertTest {
             map.get(Arrays.asList(10086.0)),
             Collects.putEntries(new HashMap<>(), 8, stringBuilder)
         );
+    }
+
+    @Test
+    public void testConvertList() {
+        List<String> list = Collects.newList("1", "2", "3");
+        byte[] bytes = Converts.convert(list, byte[].class);
+        Assert.assertEquals(bytes, new byte[]{1, 2, 3});
+    }
+
+    @Test
+    public void testBean() {
+        A a = new A();
+        a.setP1("1");
+        a.setP2(2);
+        B b = Converts.convert(a, B.class);
+        B bb = new B();
+        bb.setP1(1);
+        bb.setP2(2.0f);
+        Assert.assertEquals(b, bb);
     }
 
     @Test
@@ -83,5 +105,62 @@ public class ConvertTest {
 
     public static enum E {
         A, B, C
+    }
+
+    public static class A {
+
+        private String p1;
+        private int p2;
+
+        public String getP1() {
+            return p1;
+        }
+
+        public void setP1(String p1) {
+            this.p1 = p1;
+        }
+
+        public int getP2() {
+            return p2;
+        }
+
+        public void setP2(int p2) {
+            this.p2 = p2;
+        }
+    }
+
+    public static class B {
+
+        private double p1;
+        private Float p2;
+
+        public double getP1() {
+            return p1;
+        }
+
+        public void setP1(double p1) {
+            this.p1 = p1;
+        }
+
+        public Float getP2() {
+            return p2;
+        }
+
+        public void setP2(Float p2) {
+            this.p2 = p2;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            B b = (B) o;
+            return Double.compare(b.p1, p1) == 0 && Objects.equals(p2, b.p2);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(p1, p2);
+        }
     }
 }
