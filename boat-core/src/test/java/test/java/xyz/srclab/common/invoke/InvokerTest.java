@@ -2,10 +2,12 @@ package test.java.xyz.srclab.common.invoke;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.collect.Collects;
 import xyz.srclab.common.invoke.*;
-import xyz.srclab.common.test.TestMarker;
 
 import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author sunqian
@@ -13,101 +15,97 @@ import java.lang.reflect.Method;
 public class InvokerTest {
 
     @Test
-    public void testInvoker() {
-        testInvokerProvider(Invoker.Companion);
-    }
-
-    @Test
     public void testReflectedInvoker() {
-        testInvokerProvider(ReflectedInvokerProvider.INSTANCE);
+        testInvokerGenerator(ReflectInvokerGenerator.INSTANCE);
     }
 
     @Test
     public void testMethodHandlerInvoker() {
-        testInvokerProvider(MethodHandlerInvokerProvider.INSTANCE);
+        testInvokerGenerator(MethodHandlerInvokerGenerator.INSTANCE);
     }
 
     @Test
     public void testInvoke() throws Exception {
         Method method = A.class.getMethod("a1");
-        Invoke invoke = Invoker.forMethod(method).invokeWith(new A());
+        Invoke invoke = Invoker.ofMethod(method).prepareFor(new A());
         Assert.assertEquals(invoke.start(), "a1");
     }
 
-    private void testInvokerProvider(InvokerProvider ip) {
-        A a1 = ip.forConstructor(A.class).invoke(null);
+    private void testInvokerGenerator(InvokerGenerator generator) {
+        A a1 = generator.ofConstructor(A.class).invoke(null);
         Assert.assertEquals(
-            a1.getMark("A()"),
+            A.stack.get(0),
             "A()"
         );
-        A a2 = ip.forConstructor(A.class, String.class).enforce(null, "123");
+        A a2 = generator.ofConstructor(A.class, String.class).enforce(null, "123");
         Assert.assertEquals(
-            a2.getMark("A(123)"),
-            "A(123)"
+            A.stack,
+            Collects.newList("A()", "A(123)")
         );
 
         A a = new A();
         Assert.assertEquals(
-            ip.forMethod(I.class, "i1").invoke(a),
+            generator.ofMethod(I.class, "i1").invoke(a),
             "i1"
         );
         Assert.assertEquals(
-            ip.forMethod(I.class, "i2", String.class).invoke(a, "123"),
+            generator.ofMethod(I.class, "i2", String.class).invoke(a, "123"),
             "i2: 123"
         );
 
         Assert.assertEquals(
-            ip.forMethod(A.class, "i1").invoke(a),
+            generator.ofMethod(A.class, "i1").invoke(a),
             "i1"
         );
         Assert.assertEquals(
-            ip.forMethod(A.class, "i2", String.class).invoke(a, "123"),
+            generator.ofMethod(A.class, "i2", String.class).invoke(a, "123"),
             "i2: 123"
         );
 
         Assert.assertEquals(
-            ip.forMethod(A.class, "a1").invoke(a),
+            generator.ofMethod(A.class, "a1").invoke(a),
             "a1"
         );
-        //Assert.assertThrows(IllegalAccessException.class, () ->
-        //        ip.forMethod(A.class, "a2").invoke(a));
+        Assert.assertThrows(IllegalAccessException.class, () ->
+            generator.forMethod(A.class, "a2").invoke(a));
         Assert.assertEquals(
-            ip.forMethod(A.class, "a2").enforce(a),
+            generator.ofMethod(A.class, "a2").enforce(a),
             "a2"
         );
         Assert.assertEquals(
-            ip.forMethod(A.class, "a3", String.class).invoke(a, "123"),
+            generator.ofMethod(A.class, "a3", String.class).invoke(a, "123"),
             "a3: 123"
         );
-        //Assert.assertThrows(IllegalAccessException.class, () ->
-        //        ip.forMethod(A.class, "a4", String.class).invoke(a, "123"));
+        Assert.assertThrows(IllegalAccessException.class, () ->
+            generator.forMethod(A.class, "a4", String.class).invoke(a, "123"));
         Assert.assertEquals(
-            ip.forMethod(A.class, "a4", String.class).enforce(a, "123"),
+            generator.ofMethod(A.class, "a4", String.class).enforce(a, "123"),
             "a4: 123"
         );
 
         Assert.assertEquals(
-            ip.forMethod(I.class, "i3").invoke(a),
+            generator.ofMethod(I.class, "i3").invoke(a),
             "i3"
         );
         Assert.assertEquals(
-            ip.forMethod(I.class, "i4", String.class).invoke(a, "123"),
+            generator.ofMethod(I.class, "i4", String.class).invoke(a, "123"),
             "i4: 123"
         );
         Assert.assertEquals(
-            ip.forMethod(A.class, "i3").invoke(a),
+            generator.ofMethod(A.class, "i3").invoke(a),
             "i3"
         );
         Assert.assertEquals(
-            ip.forMethod(A.class, "i4", String.class).invoke(a, "123"),
+            generator.ofMethod(A.class, "i4", String.class).invoke(a, "123"),
             "i4: 123"
         );
 
-        ip.forMethod(A.class, "av").invoke(a);
+        generator.ofMethod(A.class, "av").invoke(a);
         Assert.assertEquals(
-            a.getMark("av"),
-            "av"
+            A.stack,
+            Collects.newList("A()", "A(123)", "av")
         );
+        A.stack.clear();
     }
 
     public interface I {
@@ -125,14 +123,16 @@ public class InvokerTest {
         String i4(String a);
     }
 
-    public static class A implements I, TestMarker {
+    public static class A implements I {
+
+        static final List<String> stack = new LinkedList<>();
 
         public A() {
-            this.mark("A()", "A()");
+            stack.add("A()");
         }
 
         private A(String a) {
-            this.mark("A(" + a + ")", "A(" + a + ")");
+            stack.add("A(" + a + ")");
         }
 
         public String a1() {
@@ -162,7 +162,7 @@ public class InvokerTest {
         }
 
         public void av() {
-            this.mark("av", "av");
+            stack.add("av");
         }
     }
 }
