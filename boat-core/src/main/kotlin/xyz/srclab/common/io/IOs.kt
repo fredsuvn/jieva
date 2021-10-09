@@ -1,4 +1,4 @@
-@file:JvmName("IOStreams")
+@file:JvmName("IOs")
 
 package xyz.srclab.common.io
 
