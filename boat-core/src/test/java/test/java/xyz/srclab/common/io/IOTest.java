@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.io;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.io.IOStreams;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.logging.Logs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -18,15 +18,13 @@ import java.util.List;
  */
 public class IOTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
-
     @Test
     public void testStream() throws Exception {
         String text = "123456\r\n234567\r\n";
         InputStream input = IOStreams.toInputStream(text.getBytes());
         String inputString = IOStreams.readString(input);
         input.reset();
-        logger.log("inputString: {}", inputString);
+        Logs.info("inputString: {}", inputString);
         Assert.assertEquals(inputString, text);
         byte[] bytes = IOStreams.readBytes(input);
         input.reset();
@@ -47,7 +45,7 @@ public class IOTest {
         Reader reader = IOStreams.toReader(input);
         String readString = IOStreams.readString(reader);
         input.reset();
-        logger.log("readString: {}", readString);
+        Logs.info("readString: {}", readString);
         Assert.assertEquals(readString, text);
         char[] chars = IOStreams.readString(reader).toCharArray();
         input.reset();
