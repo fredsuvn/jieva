@@ -4,7 +4,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.collect.Collects;
 import xyz.srclab.common.reflect.Reflects;
-import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -14,8 +13,6 @@ import java.util.Comparator;
  * @author sunqian
  */
 public class MethodTest {
-
-    private static final TestLogger logger = TestLogger.DEFAULT;
 
     Method superPublicMethod = SuperReflectClass.class.getDeclaredMethod("superPublicMethod");
     Method superProtectedMethod = SuperReflectClass.class.getDeclaredMethod("superProtectedMethod");
@@ -36,15 +33,15 @@ public class MethodTest {
     @Test
     public void testFind() throws Exception {
         Assert.assertEquals(
-            Reflects.methods(ReflectClass.class),
+            Reflects.getMethods(ReflectClass.class),
             Arrays.asList(ReflectClass.class.getMethods())
         );
         Assert.assertEquals(
-            Reflects.declaredMethods(ReflectClass.class),
+            Reflects.getDeclaredMethods(ReflectClass.class),
             Arrays.asList(ReflectClass.class.getDeclaredMethods())
         );
         Assert.assertEquals(
-            Collects.sorted(Reflects.ownedMethods(SubReflectClass.class), Comparator.comparing(Method::toString)),
+            Collects.sorted(Reflects.getOwnedMethods(SubReflectClass.class), Comparator.comparing(Method::toString)),
             Collects.sorted(Arrays.asList(
                 subPublicMethod,
                 publicMethod,
@@ -65,10 +62,10 @@ public class MethodTest {
         );
 
         Assert.assertEquals(
-            Reflects.ownedMethodOrNull(ReflectClass.class, "protectedMethod"),
+            Reflects.getOwnedMethodOrNull(ReflectClass.class, "protectedMethod"),
             ReflectClass.class.getDeclaredMethod("protectedMethod")
         );
-        Assert.assertNull(Reflects.ownedMethodOrNull(ReflectClass.class, "superProtectedMethod"));
+        Assert.assertNull(Reflects.getOwnedMethodOrNull(ReflectClass.class, "superProtectedMethod"));
 
         Assert.assertEquals(
             Reflects.searchMethods(SubReflectClass.class, true, m -> m.getName().contains("ackage")),

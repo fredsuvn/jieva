@@ -18,9 +18,12 @@ public class TypeRefTest {
 
     @Test
     public void testTypeRef() {
-        TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<Map<String, List<? extends String>>>() {
+        TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<>() {
         };
-        Type type = typeRef.type();
+        TypeRef<Map<String, List<? extends String>>> typeRef2 = TypeRef.of();
+        Assert.assertEquals(typeRef.getType(), typeRef2.getType());
+
+        Type type = typeRef.getType();
         Assert.assertTrue(type instanceof ParameterizedType);
         ParameterizedType mapType = (ParameterizedType) type;
         Assert.assertEquals(mapType.getRawType(), Map.class);
@@ -38,12 +41,12 @@ public class TypeRefTest {
 
         TypeRef<String> stringTypeRef = new TypeRef<String>() {
         };
-        Assert.assertEquals(stringTypeRef.type(), String.class);
+        Assert.assertEquals(stringTypeRef.getType(), String.class);
 
         Assert.assertEquals(
             Types.parameterizedType(List.class, String.class),
             new TypeRef<List<String>>() {
-            }.type()
+            }.getType()
         );
     }
 }

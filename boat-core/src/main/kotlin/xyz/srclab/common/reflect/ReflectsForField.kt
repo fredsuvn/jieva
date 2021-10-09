@@ -112,6 +112,14 @@ fun Class<*>.searchFieldOrNull(name: String, deep: Boolean = true): Field? {
 }
 
 @JvmOverloads
+fun Class<*>.searchFields(
+    deep: Boolean = true,
+    predicate: (Field) -> Boolean = { true }
+): List<Field> {
+    return searchFields(ArrayList(), deep, predicate)
+}
+
+@JvmOverloads
 fun <C : MutableCollection<in Field>> Class<*>.searchFields(
     destination: C,
     deep: Boolean = true,

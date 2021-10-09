@@ -3,14 +3,11 @@ package test.java.xyz.srclab.common.reflect;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.reflect.Reflects;
-import xyz.srclab.common.test.TestLogger;
 
 /**
  * @author sunqian
  */
 public class ClassTest {
-
-    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testToClass() {
@@ -22,9 +19,9 @@ public class ClassTest {
     @Test
     public void testNewInstance() {
         String className = ReflectClass.class.getName();
-        Assert.assertEquals(Reflects.newInstance(className), new ReflectClass());
+        Assert.assertEquals(Reflects.toInstance(className), new ReflectClass());
         Assert.assertEquals(
-            Reflects.newInstanceWithArguments(className, "a", "b", "c"), new ReflectClass("a", "b", "c"));
+            Reflects.toInstanceWithArguments(className, "a", "b", "c"), new ReflectClass("a", "b", "c"));
     }
 
     @Test
@@ -42,6 +39,6 @@ public class ClassTest {
 
     @Test
     public void testShortName() {
-        Assert.assertEquals(Reflects.shortName(getClass()), "ClassTest");
+        Assert.assertEquals(Reflects.getShortName(getClass()), "ClassTest");
     }
 }

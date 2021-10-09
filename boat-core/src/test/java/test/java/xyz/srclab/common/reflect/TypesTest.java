@@ -4,7 +4,6 @@ import org.apache.commons.lang3.reflect.TypeUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.reflect.Types;
-import xyz.srclab.common.test.TestLogger;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -13,8 +12,6 @@ import java.util.List;
  * @author sunqian
  */
 public class TypesTest {
-
-    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testTypes() {

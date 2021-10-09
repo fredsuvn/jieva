@@ -1,15 +1,13 @@
 package test.java.xyz.srclab.common.reflect;
 
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.logging.Logs;
 
 import java.util.Objects;
 
 public class ReflectClass extends SuperReflectClass {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
-
     static {
-        logger.log("Load class: " + ReflectClass.class);
+        Logs.info("Load class: " + ReflectClass.class);
     }
 
     public final String publicField = "publicField";
@@ -25,7 +23,7 @@ public class ReflectClass extends SuperReflectClass {
 
     protected ReflectClass(String param) {
         this.param = param;
-        logger.log("New instance: " + param);
+        Logs.info("New instance: " + param);
     }
 
     private ReflectClass(String param0, String param1) {

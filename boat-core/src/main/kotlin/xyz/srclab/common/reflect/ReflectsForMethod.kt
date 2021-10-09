@@ -119,6 +119,14 @@ fun Class<*>.searchMethodOrNull(
 }
 
 @JvmOverloads
+fun Class<*>.searchMethods(
+    deep: Boolean = true,
+    predicate: (Method) -> Boolean = { true }
+): List<Method> {
+    return searchMethods(ArrayList(), deep, predicate)
+}
+
+@JvmOverloads
 fun <C : MutableCollection<in Method>> Class<*>.searchMethods(
     destination: C,
     deep: Boolean = true,
