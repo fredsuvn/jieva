@@ -1,3 +1,5 @@
+@file:JvmName("Systems")
+
 package xyz.srclab.common.base
 
 import java.io.File
@@ -196,6 +198,7 @@ fun getUserDir(): String {
  *
  * @see System.getProperty
  */
+@JvmName("getProperty")
 @Throws(NullPointerException::class)
 fun getSystemProperty(key: String): String {
     return getSystemPropertyOrNull(key)!!
@@ -206,6 +209,7 @@ fun getSystemProperty(key: String): String {
  *
  * @see System.getProperty
  */
+@JvmName("getPropertyOrNull")
 fun getSystemPropertyOrNull(key: String): String? {
     return System.getProperty(key)
 }
@@ -215,6 +219,7 @@ fun getSystemPropertyOrNull(key: String): String? {
  *
  * @see System.setProperty
  */
+@JvmName("setProperty")
 fun setSystemProperty(key: String, value: String) {
     System.setProperty(key, value)
 }
@@ -224,6 +229,7 @@ fun setSystemProperty(key: String, value: String) {
  *
  * @see System.getProperties
  */
+@JvmName("getProperties")
 fun getSystemProperties(): Map<String, String> {
     val result: MutableMap<String, String> = HashMap()
     System.getProperties().forEach {

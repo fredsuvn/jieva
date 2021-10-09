@@ -92,13 +92,13 @@ interface Ref<T : Any> : GenericAccessor<T> {
      */
     fun <R : Any> with(action: (T) -> R): Ref<R> {
         val v = getOrNull()
-        val thisAs = this.asAny<Ref<R>>()
+        val thisRef = this.asAny<Ref<R>>()
         if (v === null) {
-            thisAs.set(null)
+            thisRef.set(null)
         } else {
-            thisAs.set(action(v))
+            thisRef.set(action(v))
         }
-        return thisAs
+        return thisRef
     }
 
     /**
@@ -108,9 +108,9 @@ interface Ref<T : Any> : GenericAccessor<T> {
      */
     fun <R : Any> withOrNull(action: (T?) -> R?): Ref<R> {
         val v = getOrNull()
-        val thisAs = this.asAny<Ref<R>>()
-        thisAs.set(action(v))
-        return thisAs
+        val thisRef = this.asAny<Ref<R>>()
+        thisRef.set(action(v))
+        return thisRef
     }
 
     companion object {

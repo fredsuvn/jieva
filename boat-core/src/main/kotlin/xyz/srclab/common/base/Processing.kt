@@ -142,6 +142,12 @@ interface Processing {
 
         @JvmName("start")
         @JvmStatic
+        fun startProcess(vararg cmd: String): Processing {
+            return Runtime.getRuntime().exec(cmd).toProcessing()
+        }
+
+        @JvmName("start")
+        @JvmStatic
         fun ProcessBuilder.startProcess(): Processing {
             return this.start().toProcessing()
         }

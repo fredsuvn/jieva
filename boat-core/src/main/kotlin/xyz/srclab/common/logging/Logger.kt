@@ -18,42 +18,42 @@ interface Logger {
     /**
      * Trace level.
      */
-    fun trace(message: String, vararg args: Any?) {
+    fun trace(message: String?, vararg args: Any?) {
         log(TRACE_LEVEL, message, *args)
     }
 
     /**
      * Debug level.
      */
-    fun debug(message: String, vararg args: Any?) {
+    fun debug(message: String?, vararg args: Any?) {
         log(DEBUG_LEVEL, message, *args)
     }
 
     /**
      * Info level.
      */
-    fun info(message: String, vararg args: Any?) {
+    fun info(message: String?, vararg args: Any?) {
         log(INFO_LEVEL, message, *args)
     }
 
     /**
      * Warn level.
      */
-    fun warn(message: String, vararg args: Any?) {
+    fun warn(message: String?, vararg args: Any?) {
         log(WARN_LEVEL, message, *args)
     }
 
     /**
      * Error level.
      */
-    fun error(message: String, vararg args: Any?) {
+    fun error(message: String?, vararg args: Any?) {
         log(ERROR_LEVEL, message, *args)
     }
 
     /**
      * Logs with specified [level].
      */
-    fun log(level: Int, message: String, vararg args: Any?)
+    fun log(level: Int, message: String?, vararg args: Any?)
 
     companion object {
 
@@ -73,9 +73,13 @@ interface Logger {
             override val level: Int,
             private val output: PrintStream
         ) : Logger {
-            override fun log(level: Int, message: String, vararg args: Any?) {
+            override fun log(level: Int, message: String?, vararg args: Any?) {
                 if (level < this.level) {
                     return
+                }
+
+                if (message === null) {
+                    return output.println(message as String?)
                 }
 
                 fun levelToString(level: Int): String {

@@ -35,8 +35,38 @@ fun Any?.hash(): Int {
     return this.hashCode()
 }
 
-fun hash(vararg args: Any?): Int {
-    return Objects.hash(*args)
+fun Any?.arrayHash(): Int {
+    return when (this) {
+        is BooleanArray -> Arrays.hashCode(this)
+        is ByteArray -> Arrays.hashCode(this)
+        is ShortArray -> Arrays.hashCode(this)
+        is CharArray -> Arrays.hashCode(this)
+        is IntArray -> Arrays.hashCode(this)
+        is LongArray -> Arrays.hashCode(this)
+        is FloatArray -> Arrays.hashCode(this)
+        is DoubleArray -> Arrays.hashCode(this)
+        is Array<*> -> Arrays.hashCode(this)
+        else -> hash()
+    }
+}
+
+fun Any?.deepHash(): Int {
+    return when (this) {
+        is BooleanArray -> Arrays.hashCode(this)
+        is ByteArray -> Arrays.hashCode(this)
+        is ShortArray -> Arrays.hashCode(this)
+        is CharArray -> Arrays.hashCode(this)
+        is IntArray -> Arrays.hashCode(this)
+        is LongArray -> Arrays.hashCode(this)
+        is FloatArray -> Arrays.hashCode(this)
+        is DoubleArray -> Arrays.hashCode(this)
+        is Array<*> -> Arrays.deepHashCode(this)
+        else -> hash()
+    }
+}
+
+fun arrayHash(vararg args: Any?): Int {
+    return args.contentHashCode()
 }
 
 fun deepHash(vararg args: Any?): Int {
@@ -47,6 +77,21 @@ fun deepHash(vararg args: Any?): Int {
 
 fun Any?.toString(): String {
     return this.toStringKt()
+}
+
+fun Any?.arrayToString(): String {
+    return when (this) {
+        is BooleanArray -> Arrays.toString(this)
+        is ByteArray -> Arrays.toString(this)
+        is ShortArray -> Arrays.toString(this)
+        is CharArray -> Arrays.toString(this)
+        is IntArray -> Arrays.toString(this)
+        is LongArray -> Arrays.toString(this)
+        is FloatArray -> Arrays.toString(this)
+        is DoubleArray -> Arrays.toString(this)
+        is Array<*> -> Arrays.toString(this)
+        else -> this.toStringKt()
+    }
 }
 
 fun Any?.deepToString(): String {
