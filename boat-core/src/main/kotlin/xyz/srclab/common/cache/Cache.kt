@@ -322,7 +322,7 @@ interface Cache<K : Any, V : Any> {
          */
         @JvmOverloads
         @JvmStatic
-        fun <K : Any, V : Any> weakCache(concurrencyLevel: Int = availableProcessors()): Cache<K, V> {
+        fun <K : Any, V : Any> weakCache(concurrencyLevel: Int = availableProcessors() * 2): Cache<K, V> {
             return MapCache(MapMaker().concurrencyLevel(concurrencyLevel).weakValues().makeMap())
         }
 

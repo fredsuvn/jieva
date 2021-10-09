@@ -4,7 +4,6 @@ import kotlin.Pair;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.cache.MapCache;
 import xyz.srclab.common.collect.Collects;
 
 import java.util.*;
@@ -15,13 +14,13 @@ import java.util.*;
 public class CacheTest {
 
     @Test
-    public void testFastCache() {
-        doTestCache(Cache.newFastCache());
+    public void testWeakCache() {
+        doTestCache(Cache.weakCache());
     }
 
     @Test
     public void testMapCache() {
-        doTestCache(new MapCache<>(new HashMap<>()));
+        doTestCache(Cache.ofMap(new HashMap<>()));
     }
 
     @Test
