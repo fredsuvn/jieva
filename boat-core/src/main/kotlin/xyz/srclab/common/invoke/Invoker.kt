@@ -53,28 +53,29 @@ interface Invoker {
 
     companion object {
 
-        private val defaultProvider = ReflectInvokerGenerator
+        @JvmField
+        val DEFAULT_INVOKER_GENERATOR = ReflectInvokerGenerator
 
         @JvmName("ofMethod")
         @JvmStatic
         fun Method.toInvoker(): Invoker {
-            return defaultProvider.ofMethod(this)
+            return DEFAULT_INVOKER_GENERATOR.ofMethod(this)
         }
 
         @JvmStatic
         fun ofMethod(clazz: Class<*>, methodName: String, vararg parameterTypes: Class<*>): Invoker {
-            return defaultProvider.ofMethod(clazz, methodName, *parameterTypes)
+            return DEFAULT_INVOKER_GENERATOR.ofMethod(clazz, methodName, *parameterTypes)
         }
 
         @JvmName("ofConstructor")
         @JvmStatic
         fun Constructor<*>.toInvoker(): Invoker {
-            return defaultProvider.ofConstructor(this)
+            return DEFAULT_INVOKER_GENERATOR.ofConstructor(this)
         }
 
         @JvmStatic
         fun ofConstructor(clazz: Class<*>, vararg parameterTypes: Class<*>): Invoker {
-            return defaultProvider.ofConstructor(clazz, *parameterTypes)
+            return DEFAULT_INVOKER_GENERATOR.ofConstructor(clazz, *parameterTypes)
         }
     }
 }

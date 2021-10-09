@@ -15,6 +15,11 @@ import java.util.List;
 public class InvokerTest {
 
     @Test
+    public void testInvoker() {
+        testInvokerGenerator(Invoker.DEFAULT_INVOKER_GENERATOR);
+    }
+
+    @Test
     public void testReflectedInvoker() {
         testInvokerGenerator(ReflectInvokerGenerator.INSTANCE);
     }
