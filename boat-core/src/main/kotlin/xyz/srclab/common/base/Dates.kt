@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.temporal.Temporal
+import java.time.temporal.TemporalAccessor
+import java.time.temporal.TemporalField
 import java.util.*
 
 const val TIMESTAMP_PATTERN = "yyyyMMddhhmmssSSS"
@@ -211,7 +213,7 @@ fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter? = null): Instant {
         else -> {
             val dateString = this.toString()
             Instant.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
             )
         }
     }
@@ -242,7 +244,7 @@ fun Any?.toZonedDateTime(dateTimeFormatter: DateTimeFormatter? = null): ZonedDat
         else -> {
             val dateString = this.toString()
             ZonedDateTime.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
             )
         }
     }
@@ -273,7 +275,7 @@ fun Any?.toOffsetDateTime(dateTimeFormatter: DateTimeFormatter? = null): OffsetD
         else -> {
             val dateString = this.toString()
             OffsetDateTime.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
             )
         }
     }
@@ -304,7 +306,7 @@ fun Any?.toLocalDateTime(dateTimeFormatter: DateTimeFormatter? = null): LocalDat
         else -> {
             val dateString = this.toString()
             LocalDateTime.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
             )
         }
     }
@@ -335,7 +337,7 @@ fun Any?.toLocalDate(dateTimeFormatter: DateTimeFormatter? = null): LocalDate {
         else -> {
             val dateString = this.toString()
             LocalDate.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
             )
         }
     }
@@ -366,7 +368,7 @@ fun Any?.toLocalTime(dateTimeFormatter: DateTimeFormatter? = null): LocalTime {
         else -> {
             val dateString = this.toString()
             LocalTime.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString)
+                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
             )
         }
     }
@@ -413,4 +415,19 @@ private fun String.getDateTimeFormatter(dateTimeFormatter: DateTimeFormatter?): 
         return dateTimeFormatter
     }
     return this.guessDateTimeFormatterOrNull() ?: throw IllegalArgumentException("Unknown datetime formatter: $this.")
+}
+
+private class TemporalAccessorWrapper(private val temporalAccessor: TemporalAccessor) : TemporalAccessor {
+
+    override fun isSupported(field: TemporalField?): Boolean {
+        return true
+    }
+
+    override fun getLong(field: TemporalField?): Long {
+        return try {
+            temporalAccessor.getLong(field)
+        } catch (e: Exception) {
+            0
+        }
+    }
 }

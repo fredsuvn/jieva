@@ -43,13 +43,13 @@ public class RunSample {
 
     @Test
     public void testRunContext() throws Exception {
-        RunContext runContext = RunContext.current();
-        runContext.set("1", "666");
-        Assert.assertEquals("666", runContext.get("1"));
-        RunContext.Attach attach = runContext.attach();
+        RunningContext runningContext = RunningContext.current();
+        runningContext.set("1", "666");
+        Assert.assertEquals("666", runningContext.get("1"));
+        RunningContext.Attach attach = runningContext.attach();
         CountDownLatch countDownLatch = new CountDownLatch(1);
         Runner.ASYNC_RUNNER.run(() -> {
-            RunContext detach = RunContext.current();
+            RunningContext detach = RunningContext.current();
             detach.detach(attach);
             Assert.assertEquals("666", detach.get("1"));
             countDownLatch.countDown();
