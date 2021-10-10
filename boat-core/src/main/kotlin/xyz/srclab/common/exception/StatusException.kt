@@ -9,7 +9,6 @@ import xyz.srclab.common.status.StringStatus
  * @see Status
  * @see StringStatus
  */
-@JvmDefaultWithoutCompatibility
 open class StatusException @JvmOverloads constructor(
     private val status: Status<String, String>,
     cause: Throwable? = null

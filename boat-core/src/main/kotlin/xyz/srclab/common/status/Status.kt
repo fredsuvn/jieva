@@ -37,7 +37,7 @@ interface Status<C, D> {
      * Returns a new `status` instance which is appended additional description.
      */
     fun withMoreDescription(addition: D): Status<C, D> {
-        return withMoreDescriptions(descriptions.plus(addition))
+        return withMoreDescriptions(listOf(addition))
     }
 
     /**

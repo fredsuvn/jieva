@@ -7,8 +7,8 @@ import java.lang.reflect.Type
  * Represents a reference of a type:
  *
  * ```
- * TypeRef<String> stringTypeRef = TypeRef.of();
- * TypeRef<Map<String, String>> mapTypeRef = TypeRef.of();
+ * TypeRef<String> stringTypeRef = new TypeRef<String>(){};
+ * TypeRef<Map<String, String>> mapTypeRef = new TypeRef<Map<String, String>>(){};
  * ```
  *
  * Then you can simply get target type:

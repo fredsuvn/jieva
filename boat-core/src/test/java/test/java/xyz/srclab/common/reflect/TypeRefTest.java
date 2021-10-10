@@ -20,7 +20,6 @@ public class TypeRefTest {
     public void testTypeRef() {
         TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<Map<String, List<? extends String>>>() {
         };
-
         Type type = typeRef.getType();
         Assert.assertTrue(type instanceof ParameterizedType);
         ParameterizedType mapType = (ParameterizedType) type;

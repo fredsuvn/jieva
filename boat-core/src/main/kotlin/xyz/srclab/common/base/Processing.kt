@@ -72,14 +72,14 @@ interface Processing {
      * Returns all output stream as `String`.
      */
     fun outputString(): String? {
-        return inputStream?.readBytes()?.toString()
+        return inputStream?.readBytes()?.encodeToString()
     }
 
     /**
      * Returns all output stream as `String`.
      */
     fun outputString(charset: Charset): String? {
-        return inputStream?.readBytes()?.toString(charset)
+        return inputStream?.readBytes()?.encodeToString(charset)
     }
 
     /**
@@ -104,14 +104,14 @@ interface Processing {
      * Returns all error stream as `String`.
      */
     fun errorString(): String? {
-        return errorStream?.readBytes()?.toString()
+        return errorStream?.readBytes()?.encodeToString()
     }
 
     /**
      * Returns all error stream as `String`.
      */
     fun errorString(charset: Charset): String? {
-        return errorStream?.readBytes()?.toString(charset)
+        return errorStream?.readBytes()?.encodeToString(charset)
     }
 
     /**

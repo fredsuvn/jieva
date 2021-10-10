@@ -7,7 +7,6 @@ import java.util.*
 /**
  * [Status] of which type of code is [Int] and of descriptions is [String].
  */
-@JvmDefaultWithoutCompatibility
 open class IntStringStatus(
     override val code: Int,
     override val descriptions: List<String>
