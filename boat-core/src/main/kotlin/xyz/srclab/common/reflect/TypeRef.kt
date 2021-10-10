@@ -53,15 +53,10 @@ abstract class TypeRef<T> {
     }
 
     override fun toString(): String {
-        return "ref ${type.typeName}"
+        return "typeRef ${type.typeName}"
     }
 
     companion object {
-
-        @JvmStatic
-        fun <T> of(): TypeRef<T> {
-            return object : TypeRef<T>() {}
-        }
 
         @JvmStatic
         fun <T> of(type: Type): TypeRef<T> {

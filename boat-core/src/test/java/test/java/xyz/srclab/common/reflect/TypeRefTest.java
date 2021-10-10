@@ -18,10 +18,8 @@ public class TypeRefTest {
 
     @Test
     public void testTypeRef() {
-        TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<>() {
+        TypeRef<Map<String, List<? extends String>>> typeRef = new TypeRef<Map<String, List<? extends String>>>() {
         };
-        TypeRef<Map<String, List<? extends String>>> typeRef2 = TypeRef.of();
-        Assert.assertEquals(typeRef.getType(), typeRef2.getType());
 
         Type type = typeRef.getType();
         Assert.assertTrue(type instanceof ParameterizedType);

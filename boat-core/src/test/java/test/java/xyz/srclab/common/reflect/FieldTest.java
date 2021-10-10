@@ -2,10 +2,12 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.collect.Collects;
 import xyz.srclab.common.reflect.Reflects;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class FieldTest {
 
@@ -36,8 +38,8 @@ public class FieldTest {
             Arrays.asList(ReflectClass.class.getDeclaredFields())
         );
         Assert.assertEquals(
-            Reflects.getOwnedFields(SubReflectClass.class),
-            Arrays.asList(
+            new HashSet<>(Reflects.getOwnedFields(SubReflectClass.class)),
+            Collects.newSet(
                 subPublicField, publicField, superPublicField,
                 subProtectedField, subPrivateField, subPackageField
             )
@@ -53,8 +55,8 @@ public class FieldTest {
     @Test
     public void testSearchField() {
         Assert.assertEquals(
-            Reflects.searchFields(SubReflectClass.class, true, f -> f.getName().contains("ackage")),
-            Arrays.asList(subPackageField, packageField, superPackageField)
+            new HashSet<>(Reflects.searchFields(SubReflectClass.class, true, f -> f.getName().contains("ackage"))),
+            Collects.newSet(subPackageField, packageField, superPackageField)
         );
     }
 
