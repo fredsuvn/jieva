@@ -10,12 +10,30 @@ import xyz.srclab.common.logging.Logs;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author sunqian
  */
 public class ConvertTest {
+
+    @Test
+    public void testConvert() {
+        String str = "9999";
+        BigInteger bigInteger = Converts.convert(str, BigInteger.class);
+        Assert.assertEquals(bigInteger, new BigInteger("9999"));
+    }
+
+    @Test
+    public void testConvertGeneric() {
+        List<? super Map<String, Long>> list = Collects.newList(Collects.newMap("777", 888));
+        Set<? super ConcurrentHashMap<Integer, Double>> set = Converts.convert(
+            list, new TypeRef<Set<? super ConcurrentHashMap<Integer, Double>>>() {
+            });
+        Assert.assertEquals(set, Collects.newSet(new ConcurrentHashMap(Collects.newMap(777, 888.0))));
+    }
 
     @Test
     public void testConvertEnum() {

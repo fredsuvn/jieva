@@ -253,7 +253,7 @@ object IterableConvertHandler : ConvertHandler {
     }
 
     private fun getFromComponentType(fromType: Type): Type? {
-        val fromClass = fromType.rawClass
+        val fromClass = fromType.rawClassOrNull ?: Any::class.java
         if (fromClass.isArray) {
             return fromClass.componentType
         }
