@@ -1,4 +1,4 @@
-package test.java.xyz.srclab.common.base;
+package test.java.xyz.srclab.common.utils;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
