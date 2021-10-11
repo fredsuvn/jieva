@@ -2,7 +2,6 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.exception.ImpossibleException
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.*
@@ -381,6 +380,16 @@ fun Any?.toLocalTime(dateTimeFormatter: DateTimeFormatter? = null): LocalTime {
     }
 }
 
+fun Any?.toTimestamp(dateTimePattern: String): String {
+    return toTimestamp(DateTimeFormatter.ofPattern(dateTimePattern))
+}
+
+@JvmOverloads
+fun Any?.toTimestamp(dateTimeFormatter: DateTimeFormatter? = null): String {
+    val local = toLocalDateTime(dateTimeFormatter)
+    return TIMESTAMP_FORMATTER.format(local)
+}
+
 fun Any?.toDuration(): Duration {
     return when (this) {
         null -> Duration.ZERO
@@ -391,29 +400,6 @@ fun Any?.toDuration(): Duration {
         }
         false -> Duration.ZERO
         else -> Duration.parse(toString())
-    }
-}
-
-fun Any?.toTimestamp(): String {
-    val dateString = this.toString()
-    val formatter = dateString.guessDateTimeFormatterOrNull()
-    if (formatter === null) {
-        throw IllegalArgumentException("Unknown datetime formatter: $this")
-    }
-    return when (formatter) {
-        TIMESTAMP_FORMATTER ->
-            TIMESTAMP_FORMATTER.format(TIMESTAMP_FORMATTER.parse(dateString))
-        SIMPLE_LOCAL_DATE_TIME_FORMATTER ->
-            SIMPLE_LOCAL_DATE_TIME_FORMATTER.format(SIMPLE_LOCAL_DATE_TIME_FORMATTER.parse(dateString))
-        SIMPLE_OFFSET_DATE_TIME_FORMATTER ->
-            SIMPLE_OFFSET_DATE_TIME_FORMATTER.format(SIMPLE_OFFSET_DATE_TIME_FORMATTER.parse(dateString))
-        ISO_LOCAL_DATE_TIME_FORMATTER ->
-            ISO_LOCAL_DATE_TIME_FORMATTER.format(ISO_LOCAL_DATE_TIME_FORMATTER.parse(dateString))
-        ISO_OFFSET_DATE_TIME_FORMATTER ->
-            ISO_OFFSET_DATE_TIME_FORMATTER.format(ISO_OFFSET_DATE_TIME_FORMATTER.parse(dateString))
-        ISO_ZONED_DATE_TIME_FORMATTER ->
-            ISO_ZONED_DATE_TIME_FORMATTER.format(ISO_ZONED_DATE_TIME_FORMATTER.parse(dateString))
-        else -> throw ImpossibleException(dateString)
     }
 }
 
