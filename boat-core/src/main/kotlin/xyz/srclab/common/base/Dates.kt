@@ -7,22 +7,20 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.time.temporal.Temporal
-import java.time.temporal.TemporalAccessor
-import java.time.temporal.TemporalField
+import java.time.temporal.*
 import java.util.*
 
-const val TIMESTAMP_PATTERN = "yyyyMMddhhmmssSSS"
+const val TIMESTAMP_PATTERN = "yyyyMMddHHmmssSSS"
 
-const val SIMPLE_LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss"
+const val SIMPLE_LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss"
 
-const val SIMPLE_OFFSET_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss XXX"
+const val SIMPLE_OFFSET_DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss XXX"
 
-const val ISO_LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd'T'hh:mm:ss"
+const val ISO_LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss"
 
-const val ISO_OFFSET_DATE_TIME_PATTERN = "yyyy-MM-dd'T'hh:mm:ssXXX"
+const val ISO_OFFSET_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ssXXX"
 
-const val ISO_ZONED_DATE_TIME_PATTERN = "yyyy-MM-dd'T'hh:mm:ssXXX'['VV']'"
+const val ISO_ZONED_DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ssXXX'['VV']'"
 
 @JvmField
 val TIMESTAMP_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern(TIMESTAMP_PATTERN)
@@ -213,7 +211,7 @@ fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter? = null): Instant {
         else -> {
             val dateString = this.toString()
             Instant.from(
-                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
             )
         }
     }
@@ -244,7 +242,7 @@ fun Any?.toZonedDateTime(dateTimeFormatter: DateTimeFormatter? = null): ZonedDat
         else -> {
             val dateString = this.toString()
             ZonedDateTime.from(
-                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
             )
         }
     }
@@ -274,8 +272,8 @@ fun Any?.toOffsetDateTime(dateTimeFormatter: DateTimeFormatter? = null): OffsetD
         true -> OffsetDateTime.now()
         else -> {
             val dateString = this.toString()
-            OffsetDateTime.from(
-                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
+            return OffsetDateTime.from(
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
             )
         }
     }
@@ -306,7 +304,7 @@ fun Any?.toLocalDateTime(dateTimeFormatter: DateTimeFormatter? = null): LocalDat
         else -> {
             val dateString = this.toString()
             LocalDateTime.from(
-                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
             )
         }
     }
@@ -337,7 +335,7 @@ fun Any?.toLocalDate(dateTimeFormatter: DateTimeFormatter? = null): LocalDate {
         else -> {
             val dateString = this.toString()
             LocalDate.from(
-                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
             )
         }
     }
@@ -368,7 +366,7 @@ fun Any?.toLocalTime(dateTimeFormatter: DateTimeFormatter? = null): LocalTime {
         else -> {
             val dateString = this.toString()
             LocalTime.from(
-                TemporalAccessorWrapper(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString))
+                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
             )
         }
     }
@@ -417,17 +415,56 @@ private fun String.getDateTimeFormatter(dateTimeFormatter: DateTimeFormatter?): 
     return this.guessDateTimeFormatterOrNull() ?: throw IllegalArgumentException("Unknown datetime formatter: $this.")
 }
 
+private fun TemporalAccessor.wrap(): TemporalAccessor {
+    return TemporalAccessorWrapper(this)
+}
+
 private class TemporalAccessorWrapper(private val temporalAccessor: TemporalAccessor) : TemporalAccessor {
 
-    override fun isSupported(field: TemporalField?): Boolean {
-        return true
+    override fun isSupported(field: TemporalField): Boolean {
+        val actual = temporalAccessor.isSupported(field)
+        if (!actual) {
+            if (field == ChronoField.NANO_OF_DAY || field == ChronoField.NANO_OF_SECOND) {
+                return true
+            }
+        }
+        return actual
     }
 
-    override fun getLong(field: TemporalField?): Long {
+    override fun getLong(field: TemporalField): Long {
         return try {
             temporalAccessor.getLong(field)
         } catch (e: Exception) {
             0
+        }
+    }
+
+    override fun <R> query(query: TemporalQuery<R>): R {
+        if (query == TemporalQueries.localTime()) {
+            return super.query(LOCAL_TIME).asAny()
+        }
+        if (query == TemporalQueries.zoneId()) {
+            return super.query(TemporalQueries.offset()).normalized().asAny()
+        }
+        return super.query(query)
+    }
+
+    companion object {
+
+        private val LOCAL_TIME = TemporalQuery<LocalTime> { temporal: TemporalAccessor ->
+            if (temporal.isSupported(ChronoField.NANO_OF_DAY)) {
+                var nanos = temporal.getLong(ChronoField.NANO_OF_DAY)
+                if (nanos == 0L) {
+                    val hours = temporal.getLong(ChronoField.HOUR_OF_DAY)
+                    val minutes = temporal.getLong(ChronoField.MINUTE_OF_HOUR)
+                    val seconds = temporal.getLong(ChronoField.SECOND_OF_MINUTE)
+                    val millis = temporal.getLong(ChronoField.MILLI_OF_SECOND)
+                    nanos = ((3600 * hours + 60 * minutes + seconds) * 1000 + millis) * 1000
+                }
+                LocalTime.ofNanoOfDay(nanos)
+            } else {
+                null
+            }
         }
     }
 }
