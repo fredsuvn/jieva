@@ -1,5 +1,6 @@
 package test.java.xyz.srclab.common.bean;
 
+import cn.hutool.core.bean.BeanUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
@@ -13,13 +14,37 @@ import java.util.concurrent.TimeUnit;
  * @author sunqian
  */
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 3)
-@Measurement(iterations = 3, time = 3)
-@Threads(16)
+@Warmup(iterations = 3, time = 60)
+@Measurement(iterations = 3, time = 60)
+@Threads(1)
 @Fork(1)
 @State(value = Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class BeanBenchmark {
+
+    /*
+     * Benchmark                       Mode  Cnt       Score       Error   Units
+     * BeanBenchmark.withBeanUtils    thrpt    3     366.501 ±   266.764  ops/ms
+     * BeanBenchmark.withBeans        thrpt    3    7508.884 ±  5385.327  ops/ms
+     * BeanBenchmark.withSetDirectly  thrpt    3  152606.863 ± 32203.076  ops/ms
+     *
+     * 2021-7-11/12 Convert use ConvertChain:
+     * Benchmark                       Mode  Cnt       Score       Error   Units
+     * BeanBenchmark.withBeanUtils    thrpt    3     381.610 ±     0.972  ops/ms
+     * BeanBenchmark.withBeans        thrpt    3    5070.789 ±    16.408  ops/ms
+     * BeanBenchmark.withSetDirectly  thrpt    3  153512.701 ± 14054.397  ops/ms
+     *
+     * 2021-10-11 After optimizing, Hutool has joined:
+     * Benchmark                       Mode  Cnt      Score    Error   Units
+     * BeanBenchmark.withBeanUtils    thrpt    3    308.779 ± 45.209  ops/ms
+     * BeanBenchmark.withBeans        thrpt    3   4951.200 ± 50.192  ops/ms
+     * BeanBenchmark.withHutool       thrpt    3    613.972 ± 52.985  ops/ms
+     * BeanBenchmark.withSetDirectly  thrpt    3  63368.347 ± 93.651  ops/ms
+     */
+    public static void main(String[] args) throws Exception {
+        Options options = new OptionsBuilder().include(BeanBenchmark.class.getSimpleName()).build();
+        new Runner(options).run();
+    }
 
     private Bean initBean;
 
@@ -55,6 +80,11 @@ public class BeanBenchmark {
     }
 
     @Benchmark
+    public void withHutool() throws Exception {
+        BeanUtil.copyProperties(initBean, new Bean());
+    }
+
+    @Benchmark
     public void withSetDirectly() throws Exception {
         Bean bean = new Bean();
         bean.setS1(initBean.getS1());
@@ -73,23 +103,6 @@ public class BeanBenchmark {
         bean.setI6(initBean.getI6());
         bean.setI7(initBean.getI7());
         bean.setI8(initBean.getI8());
-    }
-
-    /*
-     * Benchmark                       Mode  Cnt       Score       Error   Units
-     * BeanBenchmark.withBeanUtils    thrpt    3     366.501 ±   266.764  ops/ms
-     * BeanBenchmark.withBeans        thrpt    3    7508.884 ±  5385.327  ops/ms
-     * BeanBenchmark.withSetDirectly  thrpt    3  152606.863 ± 32203.076  ops/ms
-     *
-     * 2021-7-11/12 Convert use ConvertChain:
-     * Benchmark                       Mode  Cnt       Score       Error   Units
-     * BeanBenchmark.withBeanUtils    thrpt    3     381.610 ±     0.972  ops/ms
-     * BeanBenchmark.withBeans        thrpt    3    5070.789 ±    16.408  ops/ms
-     * BeanBenchmark.withSetDirectly  thrpt    3  153512.701 ± 14054.397  ops/ms
-     */
-    public static void main(String[] args) throws Exception {
-        Options options = new OptionsBuilder().include(BeanBenchmark.class.getSimpleName()).build();
-        new Runner(options).run();
     }
 
     public static class Bean {

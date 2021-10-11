@@ -35,9 +35,9 @@ public class CopyOnWriteBenchmark {
     }
 
     @BenchmarkMode(Mode.Throughput)
-    @Warmup(iterations = 3, time = 3)
-    @Measurement(iterations = 3, time = 3)
-    @Threads(99)
+    @Warmup(iterations = 3, time = 60)
+    @Measurement(iterations = 3, time = 60)
+    @Threads(1)
     @Fork(1)
     @State(value = Scope.Benchmark)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -96,9 +96,9 @@ public class CopyOnWriteBenchmark {
     }
 
     @BenchmarkMode(Mode.Throughput)
-    @Warmup(iterations = 3, time = 3)
-    @Measurement(iterations = 3, time = 3)
-    @Threads(99)
+    @Warmup(iterations = 3, time = 60)
+    @Measurement(iterations = 3, time = 60)
+    @Threads(1)
     @Fork(1)
     @State(value = Scope.Benchmark)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)

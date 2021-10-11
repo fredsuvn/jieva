@@ -1,5 +1,6 @@
 package test.java.xyz.srclab.common.base;
 
+import cn.hutool.core.util.StrUtil;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.openjdk.jmh.annotations.*;
@@ -18,13 +19,33 @@ import java.util.concurrent.TimeUnit;
  * @author sunqian
  */
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 3, time = 3)
-@Measurement(iterations = 3, time = 3)
-@Threads(16)
+@Warmup(iterations = 3, time = 60)
+@Measurement(iterations = 3, time = 60)
+@Threads(1)
 @Fork(1)
 @State(value = Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class CharsTemplateBenchmark {
+
+    /*
+     * Benchmark                                          Mode  Cnt      Score      Error   Units
+     * CharsTemplateBenchmark.withCharsTemplate          thrpt    3   4367.437 ± 2032.660  ops/ms
+     * CharsTemplateBenchmark.withPreparedCharsTemplate  thrpt    3  15321.502 ± 2578.960  ops/ms
+     * CharsTemplateBenchmark.withPreparedVelocity       thrpt    3    603.137 ±   42.220  ops/ms
+     * CharsTemplateBenchmark.withVelocity               thrpt    3      1.825 ±    0.669  ops/ms
+     *
+     * 2021-10-11:
+     * Benchmark                                         Mode  Cnt     Score    Error   Units
+     * CharsTemplateBenchmark.useCharsTemplate          thrpt    3  1310.213 ± 83.936  ops/ms
+     * CharsTemplateBenchmark.useHutool                 thrpt    3  2101.221 ± 11.355  ops/ms
+     * CharsTemplateBenchmark.usePreparedCharsTemplate  thrpt    3  3382.516 ±  4.486  ops/ms
+     * CharsTemplateBenchmark.usePreparedVelocity       thrpt    3   191.202 ±  2.512  ops/ms
+     * CharsTemplateBenchmark.useVelocity               thrpt    3     0.553 ±  0.068  ops/ms
+     */
+    public static void main(String[] args) throws Exception {
+        Options options = new OptionsBuilder().include(CharsTemplateBenchmark.class.getSimpleName()).build();
+        new Runner(options).run();
+    }
 
     private static final String charsTemplateContent = "Hello, this is {name}, now is {date}";
     private CharsTemplate charsTemplate;
@@ -33,6 +54,9 @@ public class CharsTemplateBenchmark {
     private static final String velocityTemplate = "Hello, this is $name, now is $date";
     private VelocityEngine velocityEngine;
     private VelocityContext velocityContext;
+
+    private static final String hutoolFormat = charsTemplateContent;
+    private Map<Object, Object> hutoolFormatArgs;
 
     @Setup
     public void init() {
@@ -50,6 +74,11 @@ public class CharsTemplateBenchmark {
         velocityContext = new VelocityContext();
         velocityContext.put("name", "javaboy2012");
         velocityContext.put("date", now);
+
+        //Hutool
+        hutoolFormatArgs = new HashMap<>();
+        hutoolFormatArgs.put("name", "Boat");
+        hutoolFormatArgs.put("date", now);
     }
 
     @Benchmark
@@ -79,15 +108,8 @@ public class CharsTemplateBenchmark {
         velocityEngine.evaluate(velocityContext, writer, "", velocityTemplate);
     }
 
-    /*
-     * Benchmark                                          Mode  Cnt      Score      Error   Units
-     * CharsTemplateBenchmark.withCharsTemplate          thrpt    3   4367.437 ± 2032.660  ops/ms
-     * CharsTemplateBenchmark.withPreparedCharsTemplate  thrpt    3  15321.502 ± 2578.960  ops/ms
-     * CharsTemplateBenchmark.withPreparedVelocity       thrpt    3    603.137 ±   42.220  ops/ms
-     * CharsTemplateBenchmark.withVelocity               thrpt    3      1.825 ±    0.669  ops/ms
-     */
-    public static void main(String[] args) throws Exception {
-        Options options = new OptionsBuilder().include(CharsTemplateBenchmark.class.getSimpleName()).build();
-        new Runner(options).run();
+    @Benchmark
+    public void useHutool() {
+        StrUtil.format(hutoolFormat, hutoolFormatArgs);
     }
 }
