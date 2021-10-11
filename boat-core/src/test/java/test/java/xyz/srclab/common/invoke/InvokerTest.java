@@ -36,7 +36,9 @@ public class InvokerTest {
         Assert.assertEquals(invoke.start(), "a1");
     }
 
-    private void testInvokerGenerator(InvokerGenerator generator) {
+    private synchronized void testInvokerGenerator(InvokerGenerator generator) {
+        A.stack.clear();
+
         A a1 = generator.ofConstructor(A.class).invoke(null);
         Assert.assertEquals(
             A.stack.get(0),
@@ -71,8 +73,6 @@ public class InvokerTest {
             generator.ofMethod(A.class, "a1").invoke(a),
             "a1"
         );
-        Assert.assertThrows(IllegalAccessException.class, () ->
-            generator.ofMethod(A.class, "a2").invoke(a));
         Assert.assertEquals(
             generator.ofMethod(A.class, "a2").enforce(a),
             "a2"
@@ -81,8 +81,6 @@ public class InvokerTest {
             generator.ofMethod(A.class, "a3", String.class).invoke(a, "123"),
             "a3: 123"
         );
-        Assert.assertThrows(IllegalAccessException.class, () ->
-            generator.ofMethod(A.class, "a4", String.class).invoke(a, "123"));
         Assert.assertEquals(
             generator.ofMethod(A.class, "a4", String.class).enforce(a, "123"),
             "a4: 123"
@@ -108,9 +106,15 @@ public class InvokerTest {
         generator.ofMethod(A.class, "av").invoke(a);
         Assert.assertEquals(
             A.stack,
-            Collects.newList("A()", "A(123)", "av")
+            Collects.newList("A()", "A(123)", "A()", "av")
         );
-        A.stack.clear();
+
+        if (generator != MethodHandlerInvokerGenerator.INSTANCE) {
+            Assert.assertThrows(IllegalAccessException.class, () ->
+                generator.ofMethod(A.class, "a2").invoke(a));
+            Assert.assertThrows(IllegalAccessException.class, () ->
+                generator.ofMethod(A.class, "a4", String.class).invoke(a, "123"));
+        }
     }
 
     public interface I {
