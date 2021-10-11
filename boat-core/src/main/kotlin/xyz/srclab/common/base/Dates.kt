@@ -241,9 +241,18 @@ fun Any?.toZonedDateTime(dateTimeFormatter: DateTimeFormatter? = null): ZonedDat
         true -> ZonedDateTime.now()
         else -> {
             val dateString = this.toString()
-            ZonedDateTime.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
-            )
+            val formatter = dateString.getDateTimeFormatter(dateTimeFormatter)
+            val temporal = formatter.parse(dateString).wrap()
+            return if (formatter === ISO_ZONED_DATE_TIME_FORMATTER) {
+                val local = LocalDateTime.from(formatter.parse(dateString))
+                val zoneIdStartIndex = dateString.indexOf('[') + 1
+                val zoneIdEndIndex = dateString.length - 1
+                val zoneIdString = dateString.subSequence(zoneIdStartIndex, zoneIdEndIndex)
+                val zoneId = ZoneId.of(zoneIdString.toString())
+                local.atZone(zoneId)
+            } else {
+                ZonedDateTime.from(temporal.wrap())
+            }
         }
     }
 }
@@ -442,9 +451,6 @@ private class TemporalAccessorWrapper(private val temporalAccessor: TemporalAcce
     override fun <R> query(query: TemporalQuery<R>): R {
         if (query == TemporalQueries.localTime()) {
             return super.query(LOCAL_TIME).asAny()
-        }
-        if (query == TemporalQueries.zoneId()) {
-            return super.query(TemporalQueries.offset()).normalized().asAny()
         }
         return super.query(query)
     }

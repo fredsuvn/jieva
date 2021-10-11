@@ -40,6 +40,9 @@ dependencies {
   testAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess"
 
   testImplementation "org.apache.velocity:velocity"
+
+  testImplementation group: 'cn.hutool', name: 'hutool-all', version: '5.7.14'
+
 }
 
 utils.writeBuildInfos(project, "src/main/resources/META-INF/build.properties")
