@@ -64,7 +64,3 @@ abstract class TypeRef<T> {
         }
     }
 }
-
-fun <T> typeRef(): TypeRef<T> {
-    return object : TypeRef<T>() {}
-}

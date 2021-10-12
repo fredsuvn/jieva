@@ -1,61 +1,46 @@
 package xyz.srclab.common.serialize
 
-import xyz.srclab.common.reflect.TypeRef
+import xyz.srclab.common.io.toBytes
 import xyz.srclab.common.serialize.json.JsonSerializer
 import java.io.InputStream
 import java.io.Reader
-import java.lang.reflect.Type
 import java.net.URL
 import java.nio.ByteBuffer
 
 /**
- * Serializer interface, to serialize and deserialize [S].
+ * Serializer interface, to serialize and deserialize Java object or binary sequence to [S].
  *
  * @see Serial
  * @see JsonSerializer
  */
 interface Serializer<S : Serial> {
 
+    // Serialize methods: Java Object -> Serial
+
     fun serialize(any: Any?): S
 
-    @JvmDefault
-    fun <T> deserialize(serial: S, type: Class<T>): T {
-        return serial.toObject(type)
-    }
+    // Deserialize methods: Binary Sequence -> Serial
 
-    @JvmDefault
-    fun <T> deserialize(serial: S, type: Type): T {
-        return serial.toObject(type)
-    }
+    fun deserialize(input: InputStream): S
 
-    @JvmDefault
-    fun <T> deserialize(serial: S, typeRef: TypeRef<T>): T {
-        return serial.toObject(typeRef)
-    }
+    fun deserialize(reader: Reader): S
 
-    // Binary -> Serial
-
-    @JvmDefault
     fun deserialize(bytes: ByteArray): S {
         return deserialize(bytes, 0)
     }
 
-    @JvmDefault
     fun deserialize(bytes: ByteArray, offset: Int): S {
         return deserialize(bytes, offset, bytes.size - offset)
     }
 
     fun deserialize(bytes: ByteArray, offset: Int, length: Int): S
 
+    fun deserialize(byteBuffer: ByteBuffer): S {
+        return deserialize(byteBuffer.toBytes())
+    }
+
     fun deserialize(chars: CharSequence): S
 
-    fun deserialize(input: InputStream): S
-
-    fun deserialize(reader: Reader): S
-
-    fun deserialize(byteBuffer: ByteBuffer): S
-
-    @JvmDefault
     fun deserialize(url: URL): S {
         return deserialize(url.openStream())
     }

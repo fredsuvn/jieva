@@ -1,9 +1,8 @@
 package xyz.srclab.common.serialize
 
 import xyz.srclab.annotations.Immutable
-import xyz.srclab.annotations.Written
+import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.io.toReader
-import xyz.srclab.common.lang.Defaults
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.serialize.json.Json
 import java.io.InputStream
@@ -17,9 +16,11 @@ import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
 /**
- * Represents a serial type, immutable.
+ * Serial represents a middle object between binary sequence and java object. There are two type of methods:
  *
- * Serial type is serializable.
+ * * To methods: Includes pattern of toXxx() and writeToXxx(),
+ * used to convert serial to binary sequence such as [toInputStream];
+ * * Parse methods: used to convert serial to java object such as [parseMap];
  *
  * @see Serializer
  * @see Json
@@ -27,136 +28,143 @@ import java.nio.charset.Charset
 @Immutable
 interface Serial {
 
-    // Serial -> Binary
-
-    @JvmDefault
-    fun writeTo(@Written outputStream: OutputStream) {
-        toInputStream().copyTo(outputStream)
-    }
-
-    @JvmDefault
-    fun writeTo(@Written writer: Writer) {
-        toReader().copyTo(writer)
-    }
-
-    @JvmDefault
-    fun writeTo(@Written writer: Writer, charset: Charset) {
-        toReader(charset).copyTo(writer)
-    }
-
-    @JvmDefault
-    fun writeTo(@Written byteBuffer: ByteBuffer) {
-        byteBuffer.put(toByteBuffer())
-    }
+    // To methods: Serial -> Binary Sequence
 
     fun toInputStream(): InputStream
 
-    @JvmDefault
     fun toReader(): Reader {
-        return toReader(Defaults.charset)
+        return toReader(DEFAULT_CHARSET)
     }
 
-    @JvmDefault
     fun toReader(charset: Charset): Reader {
         return toInputStream().toReader(charset)
     }
 
-    @JvmDefault
-    fun toByteBuffer(): ByteBuffer {
-        return ByteBuffer.wrap(toBytes())
-    }
-
-    @JvmDefault
     fun toBytes(): ByteArray {
         return toInputStream().readBytes()
     }
 
-    // Serial -> Java Object
-
-    @JvmDefault
-    fun <T> toObject(type: Class<T>): T {
-        return toObjectOrNull(type)!!
+    fun toByteBuffer(): ByteBuffer {
+        return ByteBuffer.wrap(toBytes())
     }
 
-    @JvmDefault
-    fun <T> toObject(type: Type): T {
-        return toObjectOrNull(type)!!
+    fun toText(): String {
+        return toReader().readText()
     }
 
-    @JvmDefault
-    fun <T> toObject(typeRef: TypeRef<T>): T {
-        return toObjectOrNull(typeRef)!!
+    fun toText(charset: Charset): String {
+        return toReader(charset).readText()
     }
 
-    @JvmDefault
-    fun <T> toObjectOrNull(type: Class<T>): T? {
-        return toObjectOrNull(type as Type)
+    fun writeTo(outputStream: OutputStream) {
+        toInputStream().copyTo(outputStream)
     }
 
-    fun <T> toObjectOrNull(type: Type): T?
-
-    @JvmDefault
-    fun <T> toObjectOrNull(typeRef: TypeRef<T>): T? {
-        return toObjectOrNull(typeRef.type)
+    fun writeTo(writer: Writer) {
+        toReader().copyTo(writer)
     }
 
-    @JvmDefault
-    fun toStringOrNull(): String? {
-        return toObjectOrNull(String::class.java)
+    fun writeTo(writer: Writer, charset: Charset) {
+        toReader(charset).copyTo(writer)
     }
 
-    @JvmDefault
-    fun toBoolean(): Boolean {
-        return toObject(Boolean::class.javaPrimitiveType!!)
+    fun writeTo(byteArray: ByteArray) {
+        toInputStream().read(byteArray)
     }
 
-    @JvmDefault
-    fun toByte(): Byte {
-        return toObject(Byte::class.javaPrimitiveType!!)
+    fun writeTo(byteArray: ByteArray, offset: Int) {
+        writeTo(byteArray, offset, byteArray.size - offset)
     }
 
-    @JvmDefault
-    fun toShort(): Short {
-        return toObject(Short::class.javaPrimitiveType!!)
+    fun writeTo(byteArray: ByteArray, offset: Int, length: Int) {
+        toInputStream().read(byteArray, offset, length)
     }
 
-    @JvmDefault
-    fun toChar(): Char {
-        return toObject(Char::class.javaPrimitiveType!!)
+    fun writeTo(byteBuffer: ByteBuffer) {
+        byteBuffer.put(toBytes())
     }
 
-    @JvmDefault
-    fun toInt(): Int {
-        return toObject(Int::class.javaPrimitiveType!!)
+    fun writeTo(appendable: Appendable) {
+        appendable.append(toReader().readText())
     }
 
-    @JvmDefault
-    fun toLong(): Long {
-        return toObject(Long::class.javaPrimitiveType!!)
+    fun writeTo(appendable: Appendable, charset: Charset) {
+        appendable.append(toReader(charset).readText())
     }
 
-    @JvmDefault
-    fun toFloat(): Float {
-        return toObject(Float::class.javaPrimitiveType!!)
+    // Parse methods: Serial -> Java Object
+
+    fun <T> parse(type: Class<T>): T {
+        return parseOrNull(type) ?: throw IllegalArgumentException("Failed parse to: $type")
     }
 
-    @JvmDefault
-    fun toDouble(): Double {
-        return toObject(Double::class.javaPrimitiveType!!)
+    fun <T> parse(type: Type): T {
+        return parseOrNull(type) ?: throw IllegalArgumentException("Failed parse to: $type")
     }
 
-    @JvmDefault
-    fun toBigInteger(): BigInteger {
-        return toObject(BigInteger::class.java)
+    fun <T> parse(typeRef: TypeRef<T>): T {
+        return parseOrNull(typeRef) ?: throw IllegalArgumentException("Failed parse to: ${typeRef.type}")
     }
 
-    @JvmDefault
-    fun toBigDecimal(): BigDecimal {
-        return toObject(BigDecimal::class.java)
+    fun <T> parseOrNull(type: Class<T>): T? {
+        return parseOrNull(type as Type)
     }
 
-    @JvmDefault
-    fun toMap(): Map<String, Any?> {
-        return toObject(object : TypeRef<Map<String, Any?>>() {})
+    fun <T> parseOrNull(type: Type): T?
+
+    fun <T> parseOrNull(typeRef: TypeRef<T>): T? {
+        return parseOrNull(typeRef.type)
+    }
+
+    fun parseString(): String? {
+        return parse(String::class.java)
+    }
+
+    fun parseStringOrNull(): String? {
+        return parseOrNull(String::class.java)
+    }
+
+    fun parseBoolean(): Boolean {
+        return parse(Boolean::class.javaPrimitiveType!!)
+    }
+
+    fun parseByte(): Byte {
+        return parse(Byte::class.javaPrimitiveType!!)
+    }
+
+    fun parseShort(): Short {
+        return parse(Short::class.javaPrimitiveType!!)
+    }
+
+    fun parseChar(): Char {
+        return parse(Char::class.javaPrimitiveType!!)
+    }
+
+    fun parseInt(): Int {
+        return parse(Int::class.javaPrimitiveType!!)
+    }
+
+    fun parseLong(): Long {
+        return parse(Long::class.javaPrimitiveType!!)
+    }
+
+    fun parseFloat(): Float {
+        return parse(Float::class.javaPrimitiveType!!)
+    }
+
+    fun parseDouble(): Double {
+        return parse(Double::class.javaPrimitiveType!!)
+    }
+
+    fun parseBigInteger(): BigInteger {
+        return parse(BigInteger::class.java)
+    }
+
+    fun parseBigDecimal(): BigDecimal {
+        return parse(BigDecimal::class.java)
+    }
+
+    fun parseMap(): Map<String, Any?> {
+        return parse(object : TypeRef<Map<String, Any?>>() {})
     }
 }

@@ -3,14 +3,14 @@ package xyz.srclab.common.serialize.json
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.json.JsonMapper
 import xyz.srclab.common.serialize.Serializer
-import xyz.srclab.common.serialize.json.jackson.toJsonSerializer
+import xyz.srclab.common.serialize.jackson.toJsonSerializer
 import java.io.InputStream
 import java.io.Reader
 import java.net.URL
 import java.nio.ByteBuffer
 
 /**
- * Json serialization of [Serializer].
+ * Json [Serializer].
  *
  * It is thread-safe if it uses [ObjectMapper] as underlying implementation.
  *
@@ -40,8 +40,7 @@ interface JsonSerializer : Serializer<Json> {
      * @param source any object
      * @return [Json]
      */
-    @JvmDefault
-    fun toJson(source: Any?): Json {
+    fun parse(source: Any?): Json {
         return when (source) {
             is CharSequence -> deserialize(source)
             is ByteArray -> deserialize(source)

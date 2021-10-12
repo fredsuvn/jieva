@@ -1,7 +1,7 @@
 # <span class="image">![Boat Serialize](../../logo.svg)</span> `boat-serialize`: Boat Serialize — [Boat](../../README.md) 序列化和反序列化库
 
-<span id="author" class="author">Sun Qian</span>  
-<span id="email" class="email"><fredsuvn@163.com></span>  
+<span id="author" class="author">Sun Qian</span>
+<span id="email" class="email"><fredsuvn@163.com></span>
 
 目录
 
@@ -112,7 +112,7 @@ Java Examples
     import xyz.srclab.common.serialize.json.Json;
     import xyz.srclab.common.serialize.json.JsonSerializer;
     import xyz.srclab.common.serialize.json.JsonSerials;
-    import xyz.srclab.common.serialize.json.jackson.Jacksons;
+    import xyz.srclab.common.serialize.jackson.Jacksons;
     import xyz.srclab.common.test.TestLogger;
 
     import java.util.Map;
@@ -171,7 +171,7 @@ Kotlin Examples
     import org.testng.annotations.Test
     import xyz.srclab.common.reflect.TypeRef
     import xyz.srclab.common.serialize.json.JsonSerializer
-    import xyz.srclab.common.serialize.json.jackson.toJsonSerializer
+    import xyz.srclab.common.serialize.jackson.toJsonSerializer
     import xyz.srclab.common.serialize.json.stringifyJson
     import xyz.srclab.common.serialize.json.toJson
     import xyz.srclab.common.test.TestLogger

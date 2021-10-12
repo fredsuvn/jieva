@@ -95,7 +95,7 @@ fun ByteArray.toInputStream(): InputStream {
 }
 
 @JvmOverloads
-fun ByteBuffer.toBytes(useBackedArray: Boolean = true): ByteArray {
+fun ByteBuffer.toBytes(useBackedArray: Boolean = false): ByteArray {
     if (this.hasArray()) {
         return if (useBackedArray) {
             this.array()

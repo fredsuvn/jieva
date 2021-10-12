@@ -1,6 +1,6 @@
 @file:JvmName("Jacksons")
 
-package xyz.srclab.common.serialize.json.jackson
+package xyz.srclab.common.serialize.jackson
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
