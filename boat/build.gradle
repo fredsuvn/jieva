@@ -14,6 +14,5 @@ dependencies {
   api project(":boat-core")
   api project(":boat-codec")
   api project(":boat-serialize")
-  api project(":boat-id")
   //api project(":boat-egg"))
 }
