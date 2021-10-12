@@ -1,10 +1,10 @@
 package test.xyz.srclab.common.id;
 
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.Nums;
 import xyz.srclab.common.id.IdGenerator;
 import xyz.srclab.common.id.SnowflakeIdGenerator;
-import xyz.srclab.common.lang.Nums;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.logging.Logs;
 
 import java.util.UUID;
 
@@ -13,14 +13,12 @@ import java.util.UUID;
  */
 public class IdTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
-
     @Test
     public void testSnowflake() {
         SnowflakeIdGenerator snowflakeIdGenerator = new SnowflakeIdGenerator(1);
         for (int i = 0; i < 10; i++) {
             long id = snowflakeIdGenerator.next();
-            logger.log("Snowflake: " + id + " : " + Nums.toBinaryString(id));
+            Logs.info("Snowflake: " + id + " : " + Nums.toBinaryString(id));
         }
     }
 
@@ -34,7 +32,7 @@ public class IdTest {
         );
         for (int i = 0; i < 10; i++) {
             String id = idGenerator.next();
-            logger.log("IdGenerator: " + id);
+            Logs.info("IdGenerator: " + id);
         }
     }
 }
