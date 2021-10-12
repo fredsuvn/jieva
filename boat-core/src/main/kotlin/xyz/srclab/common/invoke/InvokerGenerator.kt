@@ -10,7 +10,7 @@ import java.lang.reflect.Method
  * Generator to generate [Invoker].
  *
  * @see ReflectInvokerGenerator
- * @see MethodHandlerInvokerGenerator
+ * @see MethodHandleInvokerGenerator
  */
 interface InvokerGenerator {
 

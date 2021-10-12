@@ -26,7 +26,7 @@ public class InvokerTest {
 
     @Test
     public void testMethodHandlerInvoker() {
-        testInvokerGenerator(MethodHandlerInvokerGenerator.INSTANCE);
+        testInvokerGenerator(MethodHandleInvokerGenerator.INSTANCE);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class InvokerTest {
             Collects.newList("A()", "A(123)", "A()", "av")
         );
 
-        if (generator != MethodHandlerInvokerGenerator.INSTANCE) {
+        if (generator != MethodHandleInvokerGenerator.INSTANCE) {
             Assert.assertThrows(IllegalAccessException.class, () ->
                 generator.ofMethod(A.class, "a2").invoke(a));
             Assert.assertThrows(IllegalAccessException.class, () ->

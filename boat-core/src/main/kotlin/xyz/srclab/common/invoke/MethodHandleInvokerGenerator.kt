@@ -12,17 +12,17 @@ import java.lang.reflect.Method
  *
  * Note this generator will always set `accessible` to `true`, means it will never throw an [IllegalAccessException].
  */
-object MethodHandlerInvokerGenerator : InvokerGenerator {
+object MethodHandleInvokerGenerator : InvokerGenerator {
 
     override fun ofMethod(method: Method): Invoker {
-        return if (method.isStatic) StaticMethodHandlerInvoker(method) else VirtualMethodHandlerInvoker(method)
+        return if (method.isStatic) StaticMethodHandleInvoker(method) else VirtualMethodHandleInvoker(method)
     }
 
     override fun ofConstructor(constructor: Constructor<*>): Invoker {
-        return StaticMethodHandlerInvoker(constructor)
+        return StaticMethodHandleInvoker(constructor)
     }
 
-    private class StaticMethodHandlerInvoker() : Invoker {
+    private class StaticMethodHandleInvoker() : Invoker {
 
         private lateinit var methodHandle: MethodHandle
 
@@ -67,7 +67,7 @@ object MethodHandlerInvokerGenerator : InvokerGenerator {
         }
     }
 
-    private class VirtualMethodHandlerInvoker(method: Method) : Invoker {
+    private class VirtualMethodHandleInvoker(method: Method) : Invoker {
 
         private var methodHandle = findMethodHandle(method)
 

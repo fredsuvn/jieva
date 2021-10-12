@@ -8,7 +8,7 @@ import java.lang.reflect.Method
  *
  * @see [InvokerGenerator]
  * @see [ReflectInvokerGenerator]
- * @see [MethodHandlerInvokerGenerator]
+ * @see [MethodHandleInvokerGenerator]
  */
 interface Invoker {
 
