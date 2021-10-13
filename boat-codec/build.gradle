@@ -12,7 +12,7 @@ java {
 
 dependencies {
   api project(":boat-core")
-  api "commons-codec:commons-codec"
+  //api "commons-codec:commons-codec"
   api "org.bouncycastle:bcprov-jdk15on"
 
   testImplementation project(":boat-test")

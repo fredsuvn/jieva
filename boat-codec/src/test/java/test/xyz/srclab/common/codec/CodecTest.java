@@ -124,7 +124,7 @@ public class CodecTest {
         byte[] encrypt = Codec.aesCodec().encrypt(aesKey.getEncoded(), Chars.toBytes(data));
         encrypt = rsaCodec.encrypt(rsaKeyPair.publicKey(), encrypt);
         encrypt = sm2Codec.encrypt(sm2KeyPair.publicKey(), encrypt);
-        encrypt = EncodeCodec.base64().encode(encrypt);
+        encrypt = Encoder.base64().encode(encrypt);
 
         //解密
         String origin = Codec.forData(encrypt)
@@ -187,36 +187,36 @@ public class CodecTest {
         logger.log("{}: {}", CodecAlgorithm.HEX, Codec.hexCodec().encodeToString(password));
         logger.log("{}: {}", CodecAlgorithm.BASE64, Codec.base64Codec().encodeToString(password));
         logger.log("{}: {}", CodecAlgorithm.MD2,
-            EncodeCodec.base64().encodeToString(Codec.md2Codec().digestToString(password)));
+            Encoder.base64().encodeToString(Codec.md2Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.MD5,
-            EncodeCodec.base64().encodeToString(Codec.md5Codec().digestToString(password)));
+            Encoder.base64().encodeToString(Codec.md5Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.SHA1,
-            EncodeCodec.base64().encodeToString(Codec.sha1Codec().digestToString(password)));
+            Encoder.base64().encodeToString(Codec.sha1Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.SHA256,
-            EncodeCodec.base64().encodeToString(Codec.sha256Codec().digestToString(password)));
+            Encoder.base64().encodeToString(Codec.sha256Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.SHA384,
-            EncodeCodec.base64().encodeToString(Codec.sha384Codec().digestToString(password)));
+            Encoder.base64().encodeToString(Codec.sha384Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.SHA512,
-            EncodeCodec.base64().encodeToString(Codec.sha512Codec().digestToString(password)));
+            Encoder.base64().encodeToString(Codec.sha512Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_MD5,
-            EncodeCodec.base64().encodeToString(Codec.hmacMd5Codec().digestToString(key, password)));
+            Encoder.base64().encodeToString(Codec.hmacMd5Codec().digestToString(key, password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_SHA1,
-            EncodeCodec.base64().encodeToString(Codec.hmacSha1Codec().digestToString(key, password)));
+            Encoder.base64().encodeToString(Codec.hmacSha1Codec().digestToString(key, password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_SHA256,
-            EncodeCodec.base64().encodeToString(Codec.hmacSha256Codec().digestToString(key, password)));
+            Encoder.base64().encodeToString(Codec.hmacSha256Codec().digestToString(key, password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_SHA384,
-            EncodeCodec.base64().encodeToString(Codec.hmacSha384Codec().digestToString(key, password)));
+            Encoder.base64().encodeToString(Codec.hmacSha384Codec().digestToString(key, password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_SHA512,
-            EncodeCodec.base64().encodeToString(Codec.hmacSha512Codec().digestToString(key, password)));
+            Encoder.base64().encodeToString(Codec.hmacSha512Codec().digestToString(key, password)));
         SecretKey aesKey = AesKeys.newKey(key);
         logger.log("{}: {}", CodecAlgorithm.AES,
-            EncodeCodec.base64().encodeToString(Codec.aesCodec().encryptToString(aesKey, password)));
+            Encoder.base64().encodeToString(Codec.aesCodec().encryptToString(aesKey, password)));
         RsaKeyPair rsaKeyPair = Codec.rsaCodec().newKeyPair();
         logger.log("{}: {}", CodecAlgorithm.RSA,
-            EncodeCodec.base64().encodeToString(Codec.rsaCodec().encryptToString(rsaKeyPair.publicKey(), password)));
+            Encoder.base64().encodeToString(Codec.rsaCodec().encryptToString(rsaKeyPair.publicKey(), password)));
         Sm2KeyPair sm2KeyPair = Codec.sm2Codec().newKeyPair();
         logger.log("{}: {}", CodecAlgorithm.SM2,
-            EncodeCodec.base64().encodeToString(Codec.sm2Codec().encryptToString(sm2KeyPair.publicKey(), password)));
+            Encoder.base64().encodeToString(Codec.sm2Codec().encryptToString(sm2KeyPair.publicKey(), password)));
     }
 
     @Test

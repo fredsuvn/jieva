@@ -11,7 +11,7 @@ import javax.crypto.SecretKey
  *
  * Note this class **may not thread-safe**.
  *
- * @see EncodeCodec
+ * @see Encoder
  * @see DigestCodec
  * @see MacCodec
  * @see CipherCodec
@@ -26,7 +26,7 @@ abstract class Codecing(
     open fun encode(algorithm: CodecAlgorithm): Codecing {
         val codec = getCodec(algorithm)
         data = when (codec) {
-            is EncodeCodec -> codec.encode(data)
+            is Encoder -> codec.encode(data)
             is DigestCodec -> codec.digest(data)
             else -> throw UnsupportedOperationException("Unsupported encode or digest algorithm: $algorithm")
         }
@@ -40,7 +40,7 @@ abstract class Codecing(
     open fun decode(algorithm: CodecAlgorithm): Codecing {
         val codec = getCodec(algorithm)
         data = when (codec) {
-            is EncodeCodec -> codec.decode(data)
+            is Encoder -> codec.decode(data)
             else -> throw UnsupportedOperationException("Unsupported decode algorithm: $algorithm")
         }
         return this

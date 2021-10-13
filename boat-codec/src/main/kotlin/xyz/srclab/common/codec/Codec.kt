@@ -3,7 +3,6 @@ package xyz.srclab.common.codec
 import xyz.srclab.common.codec.rsa.RsaCodec
 import xyz.srclab.common.codec.sm2.Sm2Codec
 import xyz.srclab.common.codec.sm2.Sm2Params
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
 import xyz.srclab.common.lang.toBytes
 import java.security.Key
 import java.security.SecureRandom
@@ -18,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec
  *
  * @author sunqian
  *
- * @see EncodeCodec
+ * @see Encoder
  * @see DigestCodec
  * @see MacCodec
  * @see CipherCodec
@@ -144,14 +143,14 @@ interface Codec {
 
         @JvmName("encodeCodec")
         @JvmStatic
-        fun CharSequence.toEncodeCodec(): EncodeCodec {
-            return EncodeCodec.withAlgorithm(this)
+        fun CharSequence.toEncodeCodec(): Encoder {
+            return Encoder.withAlgorithm(this)
         }
 
         @JvmName("encodeCodec")
         @JvmStatic
-        fun CodecAlgorithm.toEncodeCodec(): EncodeCodec {
-            return EncodeCodec.withAlgorithm(this)
+        fun CodecAlgorithm.toEncodeCodec(): Encoder {
+            return Encoder.withAlgorithm(this)
         }
 
         @JvmName("digestCodec")
@@ -191,18 +190,18 @@ interface Codec {
         }
 
         @JvmStatic
-        fun plainCodec(): EncodeCodec {
-            return EncodeCodec.plain()
+        fun plainCodec(): Encoder {
+            return Encoder.plain()
         }
 
         @JvmStatic
-        fun hexCodec(): EncodeCodec {
-            return EncodeCodec.hex()
+        fun hexCodec(): Encoder {
+            return Encoder.hex()
         }
 
         @JvmStatic
-        fun base64Codec(): EncodeCodec {
-            return EncodeCodec.base64()
+        fun base64Codec(): Encoder {
+            return Encoder.base64()
         }
 
         @JvmStatic

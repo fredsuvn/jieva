@@ -45,7 +45,7 @@ class Example {
 Boat Codec has 4 type of codec processor:
 
 * `Codec`: Core codec interface, represents a type of codec way;
-* `EncodeCodec`: Encode code such as HEX, BASE64;
+* `Encoder`: Encode code such as HEX, BASE64;
 * `DigestCodec`: Digest codec such as MD5;
 * `MacCodec`: MAC codec such as HmacMD5;
 * `CipherCodec`: Cipher codec such as `AES`, `RSA`, `SM2`;
