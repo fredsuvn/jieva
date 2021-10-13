@@ -2,6 +2,7 @@
 
 package xyz.srclab.common.base
 
+import com.google.common.primitives.UnsignedBytes
 import org.apache.commons.lang3.StringUtils
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -129,6 +130,26 @@ fun Any?.toBigDecimal(mathContext: MathContext = MathContext.UNLIMITED): BigDeci
         "10" -> BigDecimal.TEN
         else -> str.toBigDecimalKt(mathContext)
     }
+}
+
+fun Byte.toUnsignedInt(): Int {
+    return UnsignedBytes.toInt(this)
+}
+
+fun Byte.toUnsignedLong(): Long {
+    return this.toLong() and 0xFF
+}
+
+fun Short.toUnsignedInt(): Int {
+    return this.toInt() and 0xFFFF
+}
+
+fun Short.toUnsignedLong(): Long {
+    return this.toLong() and 0xFFFF
+}
+
+fun Int.toUnsignedLong(): Long {
+    return this.toLong() and 0xFFFFFFFF
 }
 
 /**
