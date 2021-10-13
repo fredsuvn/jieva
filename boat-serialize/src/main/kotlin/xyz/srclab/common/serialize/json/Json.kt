@@ -39,4 +39,11 @@ interface Json : Serial {
     fun parseJsonMap(): Map<String, Json> {
         return parse(object : TypeRef<Map<String, Json>>() {})
     }
+
+    /**
+     * Returns as [Array]<[Json]>.
+     */
+    fun parseJsonArray(): Array<Json> {
+        return parse(Array<Json>::class.java)
+    }
 }

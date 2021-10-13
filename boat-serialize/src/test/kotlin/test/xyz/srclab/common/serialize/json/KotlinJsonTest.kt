@@ -9,7 +9,7 @@ import xyz.srclab.common.serialize.json.toJsonString
 class KotlinDataClassTest {
 
     @Test
-    fun testKotlinDataClass() {
+    fun testKotlinData() {
         val data = Data("1", "2", "3")
         val json = data.toJsonString()
         info("json: {}", json)
@@ -19,3 +19,9 @@ class KotlinDataClassTest {
         Assert.assertEquals(data2, data)
     }
 }
+
+data class Data(
+    val data1: String,
+    val data2: String,
+    val data3: String,
+)

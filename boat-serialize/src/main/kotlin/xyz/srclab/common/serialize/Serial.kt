@@ -2,7 +2,9 @@ package xyz.srclab.common.serialize
 
 import xyz.srclab.annotations.Immutable
 import xyz.srclab.common.base.DEFAULT_CHARSET
+import xyz.srclab.common.io.toOutputStream
 import xyz.srclab.common.io.toReader
+import xyz.srclab.common.io.toWriter
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.serialize.json.Json
 import java.io.InputStream
@@ -81,15 +83,18 @@ interface Serial {
     }
 
     fun writeTo(byteBuffer: ByteBuffer) {
-        byteBuffer.put(toBytes())
+        //byteBuffer.put(toBytes())
+        toInputStream().copyTo(byteBuffer.toOutputStream())
     }
 
     fun writeTo(appendable: Appendable) {
-        appendable.append(toReader().readText())
+        //appendable.append(toReader().readText())
+        toReader().copyTo(appendable.toWriter())
     }
 
     fun writeTo(appendable: Appendable, charset: Charset) {
-        appendable.append(toReader(charset).readText())
+        //appendable.append(toReader(charset).readText())
+        toReader(charset).copyTo(appendable.toWriter())
     }
 
     // Parse methods: Serial -> Java Object
@@ -166,5 +171,9 @@ interface Serial {
 
     fun parseMap(): Map<String, Any?> {
         return parse(object : TypeRef<Map<String, Any?>>() {})
+    }
+
+    fun parseArray(): Array<Any?> {
+        return parse(Array<Any?>::class.java)
     }
 }

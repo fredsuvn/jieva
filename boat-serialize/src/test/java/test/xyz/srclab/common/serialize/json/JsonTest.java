@@ -191,6 +191,25 @@ public class JsonTest {
         Assert.assertEquals(serializer.serialize(stringJson).toString(), "\"abc\"");
     }
 
+    @Test
+    public void testJsonProperty() {
+        JsonSerializer jsonSerializer = JsonSerializer.DEFAULT;
+
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("key1", "1");
+        map.put("key2", "2");
+        Json json = jsonSerializer.serialize(map);
+        Logs.info("json: {}", json);
+
+        Map<String, Object> map2 = new LinkedHashMap<>();
+        map2.put("string", jsonSerializer.serialize("json"));
+        map2.put("json", json);
+        map2.put("jsonArray", jsonSerializer.serialize(new String[]{"1", "2", "3"}));
+        Json json2 = jsonSerializer.serialize(map2);
+        Logs.info("json2: {}", json2);
+        Assert.assertEquals(json2.toJsonString(), "{\"string\":\"json\",\"json\":{\"key1\":\"1\",\"key2\":\"2\"},\"jsonArray\":[\"1\",\"2\",\"3\"]}");
+    }
+
     private <K, V> Map<K, V> newMap(K key, V value) {
         Map<K, V> result = new HashMap<>(1);
         result.put(key, value);

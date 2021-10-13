@@ -1,6 +1,7 @@
 package xyz.srclab.common.serialize
 
-import xyz.srclab.common.io.toBytes
+import xyz.srclab.common.io.toInputStream
+import xyz.srclab.common.io.toReader
 import xyz.srclab.common.serialize.json.JsonSerializer
 import java.io.InputStream
 import java.io.Reader
@@ -36,10 +37,12 @@ interface Serializer<S : Serial> {
     fun deserialize(bytes: ByteArray, offset: Int, length: Int): S
 
     fun deserialize(byteBuffer: ByteBuffer): S {
-        return deserialize(byteBuffer.toBytes())
+        return deserialize(byteBuffer.toInputStream())
     }
 
-    fun deserialize(chars: CharSequence): S
+    fun deserialize(chars: CharSequence): S {
+        return deserialize(chars.toReader())
+    }
 
     fun deserialize(url: URL): S {
         return deserialize(url.openStream())
