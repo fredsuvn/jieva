@@ -89,9 +89,14 @@ fun Reader.readTo(output: Writer, bufferSize: Int = DEFAULT_BUFFER_SIZE): Long {
     return this.copyTo(output, bufferSize)
 }
 
+@JvmOverloads
+fun ByteArray.toInputStream(offset: Int = 0, length: Int = this.size - offset): InputStream {
+    return ByteArrayInputStream(this, offset, length)
+}
 
-fun ByteArray.toInputStream(): InputStream {
-    return ByteArrayInputStream(this)
+@JvmOverloads
+fun ByteArray.toOutputStream(offset: Int = 0, length: Int = this.size - offset): OutputStream {
+    return BytesOutputStream(this, offset, length)
 }
 
 @JvmOverloads
@@ -106,4 +111,12 @@ fun ByteBuffer.toBytes(useBackedArray: Boolean = false): ByteArray {
     val array = ByteArray(this.remaining())
     this.get(array)
     return array
+}
+
+fun ByteBuffer.toInputStream(): InputStream {
+    return ByteBufferInputStream(this)
+}
+
+fun ByteBuffer.toOutputStream(): OutputStream {
+    return ByteBufferOutputStream(this)
 }
