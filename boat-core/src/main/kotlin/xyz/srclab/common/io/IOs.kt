@@ -3,6 +3,8 @@
 package xyz.srclab.common.io
 
 import org.apache.commons.io.IOUtils
+import org.apache.commons.io.input.CharSequenceReader
+import org.apache.commons.io.output.AppendableWriter
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.toChars
 import java.io.*
@@ -90,13 +92,22 @@ fun Reader.readTo(output: Writer, bufferSize: Int = DEFAULT_BUFFER_SIZE): Long {
 }
 
 @JvmOverloads
-fun ByteArray.toInputStream(offset: Int = 0, length: Int = this.size - offset): InputStream {
+fun ByteArray.toInputStream(offset: Int = 0, length: Int = this.size - offset): ByteArrayInputStream {
     return ByteArrayInputStream(this, offset, length)
 }
 
 @JvmOverloads
-fun ByteArray.toOutputStream(offset: Int = 0, length: Int = this.size - offset): OutputStream {
+fun ByteArray.toOutputStream(offset: Int = 0, length: Int = this.size - offset): BytesOutputStream {
     return BytesOutputStream(this, offset, length)
+}
+
+@JvmOverloads
+fun CharSequence.toReader(offset: Int = 0, length: Int = this.length - offset): CharSequenceReader {
+    return CharSequenceReader(this, offset, offset + length)
+}
+
+fun <T : Appendable> T.toWriter(): AppendableWriter<T> {
+    return AppendableWriter(this)
 }
 
 @JvmOverloads

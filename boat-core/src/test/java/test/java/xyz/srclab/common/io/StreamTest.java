@@ -6,6 +6,8 @@ import xyz.srclab.common.io.IOs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 
@@ -51,5 +53,26 @@ public class StreamTest {
         outputStream.write(2);
         Assert.assertEquals(array, new byte[]{1, 1, 2});
         Assert.assertThrows(BufferOverflowException.class, () -> outputStream.write(2));
+    }
+
+    @Test
+    public void testCharsReader() throws Exception {
+        String str = "123";
+        Reader reader = IOs.toReader(str);
+        Assert.assertEquals(reader.read(), '1');
+        reader.mark(0);
+        Assert.assertEquals(reader.read(), '2');
+        Assert.assertEquals(reader.read(), '3');
+        reader.reset();
+        Assert.assertEquals(reader.read(), '2');
+        Assert.assertEquals(reader.read(), '3');
+    }
+
+    @Test
+    public void testAppenderWriter() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        Writer writer = IOs.toWriter(sb);
+        writer.write("hello");
+        Assert.assertEquals(sb.toString(), "hello");
     }
 }
