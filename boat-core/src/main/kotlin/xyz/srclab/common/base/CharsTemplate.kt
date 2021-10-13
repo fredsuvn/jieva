@@ -79,9 +79,9 @@ interface CharsTemplate {
             }
             if (node.isParameter) {
                 if (value.isEmpty()) {
-                    dest.append(args[node.parameterIndex].toChars())
+                    dest.append(args[node.parameterIndex].toCharSeq())
                 } else {
-                    dest.append(args[value].toChars())
+                    dest.append(args[value].toCharSeq())
                 }
             }
         }

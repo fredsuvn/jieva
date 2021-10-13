@@ -114,19 +114,19 @@ object CharsConvertHandler : ConvertHandler {
         if (toType !is Class<*>) {
             return null
         }
-        fun fromToChars(): CharSequence {
+        fun fromToCharSeq(): CharSequence {
             return when (from) {
-                is ByteArray -> from.encodeToString()
+                is ByteArray -> from.toChars()
                 is CharArray -> String(from)
-                else -> from.toChars()
+                else -> from.toCharSeq()
             }
         }
         return when (toType) {
-            CharSequence::class.java -> fromToChars()
-            String::class.java -> fromToChars().toString()
-            StringBuilder::class.java -> StringBuilder(fromToChars())
-            StringBuffer::class.java -> StringBuffer(fromToChars())
-            CharArray::class.java -> fromToChars().toString().toCharArray()
+            CharSequence::class.java -> fromToCharSeq()
+            String::class.java -> fromToCharSeq().toString()
+            StringBuilder::class.java -> StringBuilder(fromToCharSeq())
+            StringBuffer::class.java -> StringBuffer(fromToCharSeq())
+            CharArray::class.java -> fromToCharSeq().toString().toCharArray()
             ByteArray::class.java -> when (from) {
                 is CharSequence -> from.toBytes()
                 is CharArray -> String(from).toBytes()

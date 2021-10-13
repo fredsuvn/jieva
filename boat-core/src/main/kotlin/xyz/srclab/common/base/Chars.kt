@@ -133,13 +133,13 @@ fun CharSequence.uncapitalize(): String {
 }
 
 @JvmName("toString")
-fun ByteArray.encodeToString(charset: CharSequence): String {
-    return encodeToString(charset.toCharSet())
+fun ByteArray.toChars(charset: CharSequence): String {
+    return toChars(charset.toCharSet())
 }
 
 @JvmName("toString")
 @JvmOverloads
-fun ByteArray.encodeToString(charset: Charset = DEFAULT_CHARSET): String {
+fun ByteArray.toChars(charset: Charset = DEFAULT_CHARSET): String {
     return String(this, charset)
 }
 

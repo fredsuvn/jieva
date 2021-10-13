@@ -4,7 +4,7 @@ package xyz.srclab.common.io
 
 import org.apache.commons.io.IOUtils
 import xyz.srclab.common.base.DEFAULT_CHARSET
-import xyz.srclab.common.base.encodeToString
+import xyz.srclab.common.base.toChars
 import java.io.*
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
@@ -36,7 +36,7 @@ fun InputStream.availableBytes(): ByteArray {
 
 @JvmOverloads
 fun InputStream.availableString(charset: Charset = DEFAULT_CHARSET): String {
-    return availableBytes().encodeToString(charset)
+    return availableBytes().toChars(charset)
 }
 
 fun Reader.readString(): String {

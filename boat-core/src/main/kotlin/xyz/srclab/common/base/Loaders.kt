@@ -89,7 +89,7 @@ fun CharSequence.loadResourceAsString(
 fun CharSequence.loadResourceAsStringOrNull(
     classLoader: ClassLoader = currentClassLoader(), charset: Charset = DEFAULT_CHARSET
 ): String? {
-    return loadResourceAsBytesOrNull(classLoader)?.encodeToString(charset)
+    return loadResourceAsBytesOrNull(classLoader)?.toChars(charset)
 }
 
 @Throws(ResourceNotFoundException::class)
@@ -149,7 +149,7 @@ fun CharSequence.loadAllResourcesAsReaders(
 fun CharSequence.loadAllResourcesAsStrings(
     classLoader: ClassLoader = currentClassLoader(), charset: Charset = DEFAULT_CHARSET
 ): List<String> {
-    return loadAllResourcesAsBytes(classLoader).map { bytes -> bytes.encodeToString(charset) }
+    return loadAllResourcesAsBytes(classLoader).map { bytes -> bytes.toChars(charset) }
 }
 
 /**

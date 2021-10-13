@@ -109,7 +109,7 @@ fun Any?.deepToString(): String {
     }
 }
 
-fun Any?.toChars(): CharSequence {
+fun Any?.toCharSeq(): CharSequence {
     return if (this is CharSequence)
         this
     else
