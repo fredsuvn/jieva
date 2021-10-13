@@ -26,8 +26,6 @@ import javax.crypto.spec.SecretKeySpec
  */
 interface Codec {
 
-    @get:JvmName("algorithm")
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val algorithm: String
 
     companion object {

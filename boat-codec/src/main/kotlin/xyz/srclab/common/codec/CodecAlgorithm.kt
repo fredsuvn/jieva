@@ -1,21 +1,15 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.lang.INAPPLICABLE_JVM_NAME
-
 /**
- * codec algorithm.
+ * Represents codec algorithm.
  *
  * @author sunqian
  */
 interface CodecAlgorithm {
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val name: String
-        @JvmName("name") get
 
-    @Suppress(INAPPLICABLE_JVM_NAME)
     val type: CodecAlgorithmType
-        @JvmName("type") get
 
     companion object {
 
@@ -126,20 +120,25 @@ interface CodecAlgorithm {
 
         @JvmStatic
         fun forName(chars: CharSequence): CodecAlgorithm {
-            return chars.toCodecAlgorithmOrNull()
+            return chars.searchPrepared()
                 ?: throw IllegalArgumentException("Codec algorithm not found: $this.")
         }
 
         @JvmStatic
         fun forName(chars: CharSequence, algorithmType: CodecAlgorithmType): CodecAlgorithm {
-            val pre = chars.toCodecAlgorithmOrNull()
+            val pre = chars.searchPrepared()
             if (pre !== null && pre.type == algorithmType) {
                 return pre
             }
             return newAlgorithm(this.toString(), algorithmType)
         }
 
-        private fun CharSequence.toCodecAlgorithmOrNull(): CodecAlgorithm? {
+        @JvmStatic
+        fun newAlgorithm(name: String, type: CodecAlgorithmType): CodecAlgorithm {
+            return CodecAlgorithmImpl(name, type)
+        }
+
+        private fun CharSequence.searchPrepared(): CodecAlgorithm? {
             return when (this.toString()) {
                 PLAIN_NAME -> PLAIN
                 HEX_NAME -> HEX
@@ -162,11 +161,6 @@ interface CodecAlgorithm {
             }
         }
 
-        @JvmStatic
-        fun newAlgorithm(name: String, type: CodecAlgorithmType): CodecAlgorithm {
-            return CodecAlgorithmImpl(name, type)
-        }
-
         private class CodecAlgorithmImpl(
             override val name: String,
             override val type: CodecAlgorithmType
@@ -187,12 +181,15 @@ interface CodecAlgorithm {
             }
 
             override fun toString(): String {
-                return "Algorithm: $name"
+                return "$name ($type)"
             }
         }
     }
 }
 
+/**
+ * Algorithm type.
+ */
 enum class CodecAlgorithmType {
     ENCODE, DIGEST, MAC, CIPHER, ASYMMETRIC,
 }
