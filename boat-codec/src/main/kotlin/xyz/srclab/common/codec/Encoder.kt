@@ -4,9 +4,6 @@ import org.bouncycastle.util.encoders.Base64Encoder
 import org.bouncycastle.util.encoders.HexEncoder
 import xyz.srclab.common.base.toBytes
 import xyz.srclab.common.base.toChars
-import xyz.srclab.common.codec.Codec.Companion.toCodecAlgorithm
-import xyz.srclab.common.codec.Encoder.Companion.HexCodec
-import xyz.srclab.common.io.toInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -14,10 +11,6 @@ import java.io.Reader
 
 /**
  * To encode/decoder such as Hex, Base64 and Plain.
- *
- * @see PlainCodec
- * @see HexCodec
- * @see Base64Codec
  */
 interface Encoder : Codec {
 
@@ -47,7 +40,9 @@ interface Encoder : Codec {
 
     fun encode(data: ByteArray, offset: Int, length: Int, output: OutputStream): Int
 
-    fun encode(data: InputStream, output: OutputStream): Int
+    fun encode(data: InputStream, output: OutputStream): Int {
+        return encode(data.readBytes(), output)
+    }
 
     fun encode(data: CharSequence): ByteArray {
         val outputStream = ByteArrayOutputStream()
@@ -57,7 +52,9 @@ interface Encoder : Codec {
 
     fun encode(data: CharSequence, output: OutputStream): Int
 
-    fun encode(data: Reader, output: OutputStream): Int
+    fun encode(data: Reader, output: OutputStream): Int {
+        return encode(data.readText(), output)
+    }
 
     fun encodeToString(data: ByteArray): String {
         return encode(data).toChars()
@@ -101,7 +98,9 @@ interface Encoder : Codec {
 
     fun decode(data: ByteArray, offset: Int, length: Int, output: OutputStream): Int
 
-    fun decode(data: InputStream, output: OutputStream): Int
+    fun decode(data: InputStream, output: OutputStream): Int {
+        return decode(data.readBytes(), output)
+    }
 
     fun decode(data: CharSequence): ByteArray {
         val outputStream = ByteArrayOutputStream()
@@ -111,7 +110,9 @@ interface Encoder : Codec {
 
     fun decode(data: CharSequence, output: OutputStream): Int
 
-    fun decode(data: Reader, output: OutputStream): Int
+    fun decode(data: Reader, output: OutputStream): Int {
+        return decode(data.readText(), output)
+    }
 
     fun decodeToString(data: ByteArray): String {
         return decode(data).toChars()
@@ -131,144 +132,91 @@ interface Encoder : Codec {
 
     companion object {
 
-        /**
-         * Codec for hex encoding.
-         */
-        val HexCodec = BcprovEncodeCodec(
+        @JvmField
+        val PLAIN = PlainEncoder
+
+        @JvmField
+        val HEX = BcprovEncoder(
             HexEncoder(),
             CodecAlgorithm.HEX_NAME
         )
 
-        @JvmStatic
-        fun plain(): PlainCodec {
-            return PlainCodec
-        }
+        @JvmField
+        val BASE64 = BcprovEncoder(
+            Base64Encoder(),
+            CodecAlgorithm.BASE64_NAME
+        )
 
-        @JvmStatic
-        fun hex(): HexCodec {
-            return HexCodec
-        }
-
-        @JvmStatic
-        fun base64(): Base64Codec {
-            return Base64Codec
-        }
-
-        @JvmStatic
-        fun withAlgorithm(algorithm: CharSequence): xyz.srclab.common.codec.Encoder {
-            return withAlgorithm(algorithm.toCodecAlgorithm())
-        }
-
-        @JvmStatic
-        fun withAlgorithm(algorithm: CodecAlgorithm): xyz.srclab.common.codec.Encoder {
-            return when (algorithm.name) {
-                CodecAlgorithm.PLAIN_NAME -> PlainCodec
-                CodecAlgorithm.HEX_NAME -> HexCodec
-                CodecAlgorithm.BASE64_NAME -> Base64Codec
-                else -> throw IllegalArgumentException("Unknown algorithm: ${algorithm.name}")
-            }
-        }
-
-        private class BcprovEncoder(
+        class BcprovEncoder(
             private val encoder: org.bouncycastle.util.encoders.Encoder,
             override val algorithm: String
         ) : Encoder {
 
-            override fun encode(data: ByteArray, offset: Int, length: Int): ByteArray {
-                val output = ByteArrayOutputStream()
-                encode(data, offset, length, output)
-                return output.toByteArray()
-            }
-
             override fun encode(data: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
                 return encoder.encode(data, offset, length, output)
-            }
-
-            override fun encode(data: CharSequence): ByteArray {
-                return encode(data.toBytes())
             }
 
             override fun encode(data: CharSequence, output: OutputStream): Int {
                 return encode(data.toBytes(), output)
             }
 
-            override fun decode(encoded: ByteArray, offset: Int, length: Int): ByteArray {
-                val output = ByteArrayOutputStream()
-                decode(encoded, offset, length, output)
-                return output.toByteArray()
+            override fun decode(data: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
+                return encoder.decode(data, offset, length, output)
             }
 
-            override fun decode(encoded: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
-                return encoder.decode(encoded, offset, length, output)
+            override fun decode(data: CharSequence, output: OutputStream): Int {
+                return encoder.decode(data.toString(), output)
+            }
+        }
+
+        object PlainEncoder : Encoder {
+
+            override val algorithm: String = CodecAlgorithm.PLAIN_NAME
+
+            override fun encode(data: ByteArray, offset: Int, length: Int): ByteArray {
+                return data.copyOfRange(offset, offset + length)
             }
 
-            override fun decode(encoded: CharSequence): ByteArray {
-                val output = ByteArrayOutputStream()
-                decode(encoded, output)
-                return output.toByteArray()
+            override fun encode(data: CharSequence): ByteArray {
+                return data.toBytes()
             }
 
-            override fun decode(encoded: CharSequence, output: OutputStream): Int {
-                return encoder.decode(encoded.toString(), output)
+            override fun encodeToString(data: CharSequence): String {
+                return data.toString()
+            }
+
+            override fun decode(data: ByteArray, offset: Int, length: Int): ByteArray {
+                return encode(data, offset, length)
+            }
+
+            override fun decode(data: CharSequence): ByteArray {
+                return encode(data)
+            }
+
+            override fun decodeToString(data: CharSequence): String {
+                return encodeToString(data)
+            }
+
+            override fun encode(data: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
+                output.write(data, offset, length)
+                return length
+            }
+
+            override fun encode(data: InputStream, output: OutputStream): Int {
+                return data.copyTo(output).toInt()
+            }
+
+            override fun encode(data: CharSequence, output: OutputStream): Int {
+                return encode(data.toBytes(), output)
+            }
+
+            override fun decode(data: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
+                return encode(data, offset, length, output)
+            }
+
+            override fun decode(data: CharSequence, output: OutputStream): Int {
+                return encode(data, output)
             }
         }
     }
 }
-
-/**
- * A `NOP` Codec just return plain bytes/text.
- */
-object PlainCodec : xyz.srclab.common.codec.Encoder {
-
-    override val algorithm: String = CodecAlgorithm.PLAIN_NAME
-
-    override fun encode(data: ByteArray, offset: Int, length: Int): ByteArray {
-        return data.sliceArray(offset until length)
-    }
-
-    override fun encode(data: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
-        return data.toInputStream(offset, length).copyTo(output).toInt()
-    }
-
-    override fun encode(data: CharSequence): ByteArray {
-        return data.toBytes()
-    }
-
-    override fun encode(data: CharSequence, output: OutputStream): Int {
-        return encode(encode(data), output)
-    }
-
-    override fun decode(encoded: ByteArray, offset: Int, length: Int): ByteArray {
-        return encode(encoded, offset, length)
-    }
-
-    override fun decode(encoded: ByteArray, offset: Int, length: Int, output: OutputStream): Int {
-        return encode(encoded, offset, length, output)
-    }
-
-    override fun decode(encoded: CharSequence): ByteArray {
-        return encode(encoded)
-    }
-
-    override fun decode(encoded: CharSequence, output: OutputStream): Int {
-        return encode(encoded, output)
-    }
-
-    override fun encodeToString(data: CharSequence): String {
-        return data.toString()
-    }
-
-    override fun decodeToString(encoded: CharSequence): String {
-        return encoded.toString()
-    }
-}
-
-
-/**
- * Codec for base64 encoding.
- */
-object Base64Codec : BcprovEncodeCodec(
-    Base64Encoder(),
-    CodecAlgorithm.BASE64_NAME
-)
-

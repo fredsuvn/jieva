@@ -18,7 +18,7 @@ import javax.crypto.spec.SecretKeySpec
  * @author sunqian
  *
  * @see Encoder
- * @see DigestCodec
+ * @see Digester
  * @see MacCodec
  * @see CipherCodec
  * @see CodecAlgorithm
@@ -155,14 +155,14 @@ interface Codec {
 
         @JvmName("digestCodec")
         @JvmStatic
-        fun CharSequence.toDigestCodec(): DigestCodec {
-            return DigestCodec.withAlgorithm(this)
+        fun CharSequence.toDigestCodec(): Digester {
+            return Digester.withAlgorithm(this)
         }
 
         @JvmName("digestCodec")
         @JvmStatic
-        fun CodecAlgorithm.toDigestCodec(): DigestCodec {
-            return DigestCodec.withAlgorithm(this.name)
+        fun CodecAlgorithm.toDigestCodec(): Digester {
+            return Digester.withAlgorithm(this.name)
         }
 
         @JvmName("macCodec")
@@ -205,33 +205,33 @@ interface Codec {
         }
 
         @JvmStatic
-        fun md2Codec(): DigestCodec {
-            return DigestCodec.md2()
+        fun md2Codec(): Digester {
+            return Digester.md2()
         }
 
         @JvmStatic
-        fun md5Codec(): DigestCodec {
-            return DigestCodec.md5()
+        fun md5Codec(): Digester {
+            return Digester.md5()
         }
 
         @JvmStatic
-        fun sha1Codec(): DigestCodec {
-            return DigestCodec.sha1()
+        fun sha1Codec(): Digester {
+            return Digester.sha1()
         }
 
         @JvmStatic
-        fun sha256Codec(): DigestCodec {
-            return DigestCodec.sha256()
+        fun sha256Codec(): Digester {
+            return Digester.sha256()
         }
 
         @JvmStatic
-        fun sha384Codec(): DigestCodec {
-            return DigestCodec.sha384()
+        fun sha384Codec(): Digester {
+            return Digester.sha384()
         }
 
         @JvmStatic
-        fun sha512Codec(): DigestCodec {
-            return DigestCodec.sha512()
+        fun sha512Codec(): Digester {
+            return Digester.sha512()
         }
 
         @JvmStatic

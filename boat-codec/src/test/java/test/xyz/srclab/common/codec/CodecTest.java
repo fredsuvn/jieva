@@ -154,7 +154,7 @@ public class CodecTest {
     @Test
     public void testDigest() throws Exception {
         String message = "123456789";
-        DigestCodec md5 = Codec.md5Codec();
+        Digester md5 = Codec.md5Codec();
         Assert.assertEquals(
             md5.digest(message),
             MessageDigest.getInstance("Md5").digest(message.getBytes())
