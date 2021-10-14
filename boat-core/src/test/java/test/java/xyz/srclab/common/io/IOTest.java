@@ -21,7 +21,7 @@ public class IOTest {
     @Test
     public void testStream() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = IOs.toInputStream(text.getBytes());
+        InputStream input = IOs.asInputStream(text.getBytes());
         String inputString = IOs.readString(input);
         input.reset();
         Logs.info("inputString: {}", inputString);
@@ -41,7 +41,7 @@ public class IOTest {
     @Test
     public void testReader() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = IOs.toInputStream(text.getBytes());
+        InputStream input = IOs.asInputStream(text.getBytes());
         Reader reader = IOs.toReader(input);
         String readString = IOs.readString(reader);
         input.reset();

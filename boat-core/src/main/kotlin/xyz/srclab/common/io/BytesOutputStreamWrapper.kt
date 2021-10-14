@@ -4,9 +4,9 @@ import xyz.srclab.common.base.checkIndexInBounds
 import java.io.OutputStream
 
 /**
- * Implementation of [OutputStream] which uses an array to store the data.
+ * Wraps array as [OutputStream].
  */
-open class BytesOutputStream @JvmOverloads constructor(
+open class BytesOutputStreamWrapper @JvmOverloads constructor(
     private val array: ByteArray,
     private val offset: Int = 0,
     private val length: Int = array.size - offset

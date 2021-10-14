@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.JsonNodeType
 import com.fasterxml.jackson.datatype.jsr310.PackageVersion
-import xyz.srclab.common.io.toInputStream
-import xyz.srclab.common.io.toReader
+import xyz.srclab.common.io.asInputStream
+import xyz.srclab.common.io.asReader
 import xyz.srclab.common.serialize.json.Json
 import xyz.srclab.common.serialize.json.JsonSerializer
 import xyz.srclab.common.serialize.json.JsonType
@@ -53,11 +53,11 @@ open class JacksonJsonSerializer(
         override val type: JsonType = jsonNode.nodeType.toJsonType()
 
         override fun toInputStream(): InputStream {
-            return toBytes().toInputStream()
+            return toBytes().asInputStream()
         }
 
         override fun toReader(): Reader {
-            return toText().toReader()
+            return toText().asReader()
         }
 
         override fun toReader(charset: Charset): Reader {

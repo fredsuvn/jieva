@@ -5,11 +5,11 @@ import java.nio.BufferOverflowException
 import java.nio.ByteBuffer
 
 /**
- * Implementation of [OutputStream] which uses a [ByteBuffer] to store the data.
+ * Wraps [ByteBuffer] as [OutputStream].
  *
  * Note this implementation will throw [BufferOverflowException] when writing overflow.
  */
-open class ByteBufferOutputStream(
+open class ByteBufferOutputStreamWrapper(
     private val buffer: ByteBuffer
 ) : OutputStream() {
 

@@ -14,9 +14,27 @@ import java.nio.ByteBuffer;
 public class StreamTest {
 
     @Test
-    public void testBytesOutputStream() throws Exception {
+    public void testBytesInputStreamWrapper() throws Exception {
+        byte[] array = new byte[]{1, 2, 3, 4};
+        InputStream inputStream = IOs.asInputStream(array, 1);
+        inputStream.mark(0);
+        int b1 = inputStream.read();
+        byte[] dest = new byte[3];
+        int len1 = inputStream.read(dest, 1, 2);
+        Assert.assertEquals(b1, 2);
+        Assert.assertEquals(dest, new byte[]{0, 3, 4});
+        Assert.assertEquals(len1, 2);
+        inputStream.reset();
+        Assert.assertEquals(b1, inputStream.read());
+        int len2 = inputStream.read(dest, 0, 3);
+        Assert.assertEquals(dest, new byte[]{3, 4, 4});
+        Assert.assertEquals(len2, 2);
+    }
+
+    @Test
+    public void testBytesOutputStreamWrapper() throws Exception {
         byte[] array = new byte[4];
-        OutputStream outputStream = IOs.toOutputStream(array, 1);
+        OutputStream outputStream = IOs.asOutputStream(array, 1);
         outputStream.write(1);
         outputStream.write(array, 1, 1);
         outputStream.write(2);
@@ -25,10 +43,10 @@ public class StreamTest {
     }
 
     @Test
-    public void testByteBufferInputStream() throws Exception {
+    public void testByteBufferInputStreamWrapper() throws Exception {
         byte[] array = new byte[]{1, 2, 3};
         ByteBuffer byteBuffer = ByteBuffer.wrap(array);
-        InputStream inputStream = IOs.toInputStream(byteBuffer);
+        InputStream inputStream = IOs.asInputStream(byteBuffer);
         inputStream.mark(0);
         int b1 = inputStream.read();
         byte[] dest = new byte[3];
@@ -47,7 +65,7 @@ public class StreamTest {
     public void testByteBufferOutputStream() throws Exception {
         byte[] array = new byte[3];
         ByteBuffer byteBuffer = ByteBuffer.wrap(array);
-        OutputStream outputStream = IOs.toOutputStream(byteBuffer);
+        OutputStream outputStream = IOs.asOutputStream(byteBuffer);
         outputStream.write(1);
         outputStream.write(array, 0, 1);
         outputStream.write(2);
@@ -58,7 +76,7 @@ public class StreamTest {
     @Test
     public void testCharsReader() throws Exception {
         String str = "123";
-        Reader reader = IOs.toReader(str);
+        Reader reader = IOs.asReader(str);
         Assert.assertEquals(reader.read(), '1');
         reader.mark(0);
         Assert.assertEquals(reader.read(), '2');
@@ -71,7 +89,7 @@ public class StreamTest {
     @Test
     public void testAppenderWriter() throws Exception {
         StringBuilder sb = new StringBuilder();
-        Writer writer = IOs.toWriter(sb);
+        Writer writer = IOs.asWriter(sb);
         writer.write("hello");
         Assert.assertEquals(sb.toString(), "hello");
     }

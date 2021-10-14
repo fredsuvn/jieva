@@ -3,8 +3,6 @@
 package xyz.srclab.common.io
 
 import org.apache.commons.io.IOUtils
-import org.apache.commons.io.input.CharSequenceReader
-import org.apache.commons.io.output.AppendableWriter
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.toChars
 import java.io.*
@@ -92,22 +90,27 @@ fun Reader.readTo(output: Writer, bufferSize: Int = DEFAULT_BUFFER_SIZE): Long {
 }
 
 @JvmOverloads
-fun ByteArray.toInputStream(offset: Int = 0, length: Int = this.size - offset): ByteArrayInputStream {
-    return ByteArrayInputStream(this, offset, length)
+fun ByteArray.asInputStream(offset: Int = 0, length: Int = this.size - offset): BytesInputStreamWrapper {
+    return BytesInputStreamWrapper(this, offset, length)
 }
 
 @JvmOverloads
-fun ByteArray.toOutputStream(offset: Int = 0, length: Int = this.size - offset): BytesOutputStream {
-    return BytesOutputStream(this, offset, length)
+fun ByteArray.asOutputStream(offset: Int = 0, length: Int = this.size - offset): BytesOutputStreamWrapper {
+    return BytesOutputStreamWrapper(this, offset, length)
 }
 
 @JvmOverloads
-fun CharSequence.toReader(offset: Int = 0, length: Int = this.length - offset): CharSequenceReader {
-    return CharSequenceReader(this, offset, offset + length)
+fun CharSequence.asReader(offset: Int = 0, length: Int = this.length - offset): CharsReaderWrapper {
+    return CharsReaderWrapper(this, offset, offset + length)
 }
 
-fun <T : Appendable> T.toWriter(): AppendableWriter<T> {
-    return AppendableWriter(this)
+@JvmOverloads
+fun CharArray.asReader(offset: Int = 0, length: Int = this.size - offset): CharsReaderWrapper {
+    return CharsReaderWrapper(this, offset, offset + length)
+}
+
+fun <T : Appendable> T.asWriter(): AppendableWriterWrapper<T> {
+    return AppendableWriterWrapper(this)
 }
 
 @JvmOverloads
@@ -124,10 +127,10 @@ fun ByteBuffer.toBytes(useBackedArray: Boolean = false): ByteArray {
     return array
 }
 
-fun ByteBuffer.toInputStream(): InputStream {
-    return ByteBufferInputStream(this)
+fun ByteBuffer.asInputStream(): InputStream {
+    return ByteBufferInputStreamWrapper(this)
 }
 
-fun ByteBuffer.toOutputStream(): OutputStream {
-    return ByteBufferOutputStream(this)
+fun ByteBuffer.asOutputStream(): OutputStream {
+    return ByteBufferOutputStreamWrapper(this)
 }

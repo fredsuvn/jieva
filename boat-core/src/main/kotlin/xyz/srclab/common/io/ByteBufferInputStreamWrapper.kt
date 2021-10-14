@@ -6,9 +6,9 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 
 /**
- * Implementation of [InputStream] which uses a [ByteBuffer] to store the data.
+ * Wraps [ByteBuffer] as [InputStream].
  */
-class ByteBufferInputStream(
+open class ByteBufferInputStreamWrapper(
     private val buffer: ByteBuffer
 ) : InputStream() {
 
