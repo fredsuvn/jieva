@@ -26,3 +26,24 @@ enum class Next {
      */
     COMPLETE,
 }
+
+/**
+ * Used to specify policy of thread-safe.
+ */
+enum class ThreadSafePolicy {
+
+    /**
+     * Uses none thread-safe policy.
+     */
+    NONE,
+
+    /**
+     * Uses synchronization policy.
+     */
+    SYNCHRONIZED,
+
+    /**
+     * Uses thread local policy.
+     */
+    THREAD_LOCAL
+}
