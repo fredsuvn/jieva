@@ -133,14 +133,15 @@ fun CharSequence.uncapitalize(): String {
 }
 
 @JvmName("toString")
-fun ByteArray.toChars(charset: CharSequence): String {
-    return toChars(charset.toCharSet())
+@JvmOverloads
+fun ByteArray.toChars(charset: CharSequence, offset: Int = 0, length: Int = this.size - offset): String {
+    return toChars(charset.toCharSet(), offset, length)
 }
 
 @JvmName("toString")
 @JvmOverloads
-fun ByteArray.toChars(charset: Charset = DEFAULT_CHARSET): String {
-    return String(this, charset)
+fun ByteArray.toChars(charset: Charset = DEFAULT_CHARSET, offset: Int = 0, length: Int = this.size - offset): String {
+    return String(this, offset, length, charset)
 }
 
 fun CharSequence.toBytes(charset: CharSequence): ByteArray {
@@ -150,6 +151,17 @@ fun CharSequence.toBytes(charset: CharSequence): ByteArray {
 @JvmOverloads
 fun CharSequence.toBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
     return this.toString().toByteArray(charset)
+}
+
+@JvmOverloads
+fun CharArray.toBytes(charset: CharSequence, offset: Int = 0, length: Int = this.size - offset): ByteArray {
+    return toBytes(charset.toCharSet(), offset, length)
+}
+
+@JvmOverloads
+fun CharArray.toBytes(
+    charset: Charset = DEFAULT_CHARSET, offset: Int = 0, length: Int = this.size - offset): ByteArray {
+    return String(this, offset, length).toByteArray(charset)
 }
 
 @JvmName("charset")

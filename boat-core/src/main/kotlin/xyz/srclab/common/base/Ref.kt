@@ -411,6 +411,7 @@ interface DoubleRef {
 interface BaseArrayRef {
     val startIndex: Int
     val endIndex: Int
+    val offset: Int get() = startIndex
     val length: Int get() = endIndex - startIndex
 }
 
