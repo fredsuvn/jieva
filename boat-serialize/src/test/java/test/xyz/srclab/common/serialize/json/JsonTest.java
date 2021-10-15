@@ -169,7 +169,7 @@ public class JsonTest {
         Logs.info("jsonMap: {}", jsonMap);
         Logs.info("jsonMap.get(\"s2\").getClass(): {}", jsonMap.get("s2").getClass());
         Assert.assertEquals(
-            jsonMap.get("s2").getClass().getName(), "xyz.srclab.common.serialize.jackson.JacksonJsonSerializer$JsomImpl");
+            jsonMap.get("s2").getClass().getName(), "xyz.srclab.common.serialize.jackson.JacksonJsonSerializer$JsonImpl");
         Json s2 = jsonMap.get("s2");
         Assert.assertEquals(s2.parse(List.class), Arrays.asList("1", "2"));
         String jsonImplJson = "{\"s1\":\"sss\",\"s2\":[\"1\",\"2\"]}";

@@ -31,22 +31,22 @@ open class JacksonJsonSerializer(
         if (any is Json) {
             return any
         }
-        return JsomImpl(objectMapper.convertValue(any, JsonNode::class.java))
+        return JsonImpl(objectMapper.convertValue(any, JsonNode::class.java))
     }
 
     override fun deserialize(input: InputStream): Json {
-        return JsomImpl(objectMapper.readTree(input))
+        return JsonImpl(objectMapper.readTree(input))
     }
 
     override fun deserialize(reader: Reader): Json {
-        return JsomImpl(objectMapper.readTree(reader))
+        return JsonImpl(objectMapper.readTree(reader))
     }
 
     override fun deserialize(bytes: ByteArray, offset: Int, length: Int): Json {
-        return JsomImpl(objectMapper.readTree(bytes, offset, length))
+        return JsonImpl(objectMapper.readTree(bytes, offset, length))
     }
 
-    inner class JsomImpl(
+    inner class JsonImpl(
         val jsonNode: JsonNode
     ) : Json {
 
@@ -121,29 +121,29 @@ open class JacksonJsonSerializer(
     private inner class JsonImplModule : SimpleModule(PackageVersion.VERSION) {
 
         init {
-            addSerializer(JsomImpl::class.java, JsonImplSerializer())
-            addDeserializer(JsomImpl::class.java, JsonImplDeserializer())
+            addSerializer(JsonImpl::class.java, JsonImplSerializer())
+            addDeserializer(Json::class.java, JsonImplDeserializer())
         }
 
-        private inner class JsonImplSerializer : com.fasterxml.jackson.databind.JsonSerializer<JsomImpl>() {
+        private inner class JsonImplSerializer : com.fasterxml.jackson.databind.JsonSerializer<JsonImpl>() {
 
-            override fun handledType(): Class<JsomImpl> {
-                return JsomImpl::class.java
+            override fun handledType(): Class<JsonImpl> {
+                return JsonImpl::class.java
             }
 
-            override fun serialize(value: JsomImpl, gen: JsonGenerator, serializers: SerializerProvider) {
+            override fun serialize(value: JsonImpl, gen: JsonGenerator, serializers: SerializerProvider) {
                 gen.writeObject(value.jsonNode)
             }
         }
 
-        private inner class JsonImplDeserializer : JsonDeserializer<JsomImpl>() {
+        private inner class JsonImplDeserializer : JsonDeserializer<Json>() {
 
             override fun handledType(): Class<*> {
-                return JsomImpl::class.java
+                return Json::class.java
             }
 
-            override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): JsomImpl {
-                return JsomImpl(
+            override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): Json {
+                return JsonImpl(
                     objectMapper.readValue(parser, JsonNode::class.java)
                 )
             }

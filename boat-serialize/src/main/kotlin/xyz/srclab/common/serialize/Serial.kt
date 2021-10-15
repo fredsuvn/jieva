@@ -1,6 +1,7 @@
 package xyz.srclab.common.serialize
 
 import xyz.srclab.annotations.Immutable
+import xyz.srclab.common.base.ByteArrayRef
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.io.asOutputStream
 import xyz.srclab.common.io.asWriter
@@ -80,6 +81,10 @@ interface Serial {
 
     fun writeTo(byteArray: ByteArray, offset: Int, length: Int) {
         toInputStream().read(byteArray, offset, length)
+    }
+
+    fun writeTo(byteArrayRef: ByteArrayRef) {
+        toInputStream().read(byteArrayRef.array, byteArrayRef.startIndex, byteArrayRef.length)
     }
 
     fun writeTo(byteBuffer: ByteBuffer) {

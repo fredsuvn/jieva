@@ -407,3 +407,252 @@ interface DoubleRef {
         }
     }
 }
+
+interface BaseArrayRef {
+    val startIndex: Int
+    val endIndex: Int
+    val length: Int get() = endIndex - startIndex
+}
+
+/**
+ * Ref of array.
+ */
+interface ArrayRef<T> : BaseArrayRef {
+
+    val array: Array<T>
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun <T> of(array: Array<T>, startIndex: Int = 0, endIndex: Int = array.size): ArrayRef<T> {
+            return object : ArrayRef<T> {
+                override val array = array
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun <T> offset(array: Array<T>, offset: Int = 0, length: Int = array.size - offset): ArrayRef<T> {
+            return of(array, offset, offset + length)
+        }
+    }
+}
+
+/**
+ * Ref of boolean array.
+ */
+interface BooleanArrayRef : BaseArrayRef {
+
+    val array: BooleanArray
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun of(array: BooleanArray, startIndex: Int = 0, endIndex: Int = array.size): BooleanArrayRef {
+            return object : BooleanArrayRef {
+                override val array = array
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun offset(array: BooleanArray, offset: Int = 0, length: Int = array.size - offset): BooleanArrayRef {
+            return of(array, offset, offset + length)
+        }
+    }
+}
+
+/**
+ * Ref of byte array.
+ */
+interface ByteArrayRef : BaseArrayRef {
+
+    val array: ByteArray
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun of(array: ByteArray, startIndex: Int = 0, endIndex: Int = array.size): ByteArrayRef {
+            return object : ByteArrayRef {
+                override val array = array
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun offset(array: ByteArray, offset: Int = 0, length: Int = array.size - offset): ByteArrayRef {
+            return of(array, offset, offset + length)
+        }
+    }
+}
+
+/**
+ * Ref of short array.
+ */
+interface ShortArrayRef : BaseArrayRef {
+
+    val array: ShortArray
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun of(array: ShortArray, startIndex: Int = 0, endIndex: Int = array.size): ShortArrayRef {
+            return object : ShortArrayRef {
+                override val array = array
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun offset(array: ShortArray, offset: Int = 0, length: Int = array.size - offset): ShortArrayRef {
+            return of(array, offset, offset + length)
+        }
+    }
+}
+
+/**
+ * Ref of char array.
+ */
+interface CharArrayRef : BaseArrayRef {
+
+    val array: CharArray
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun of(array: CharArray, startIndex: Int = 0, endIndex: Int = array.size): CharArrayRef {
+            return object : CharArrayRef {
+                override val array = array
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun offset(array: CharArray, offset: Int = 0, length: Int = array.size - offset): CharArrayRef {
+            return of(array, offset, offset + length)
+        }
+    }
+}
+
+/**
+ * Ref of int array.
+ */
+interface IntArrayRef : BaseArrayRef {
+
+    val array: IntArray
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun of(array: IntArray, startIndex: Int = 0, endIndex: Int = array.size): IntArrayRef {
+            return object : IntArrayRef {
+                override val array = array
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun offset(array: IntArray, offset: Int = 0, length: Int = array.size - offset): IntArrayRef {
+            return of(array, offset, offset + length)
+        }
+    }
+}
+
+/**
+ * Ref of long array.
+ */
+interface LongArrayRef : BaseArrayRef {
+
+    val array: LongArray
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun of(array: LongArray, startIndex: Int = 0, endIndex: Int = array.size): LongArrayRef {
+            return object : LongArrayRef {
+                override val array = array
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun offset(array: LongArray, offset: Int = 0, length: Int = array.size - offset): LongArrayRef {
+            return of(array, offset, offset + length)
+        }
+    }
+}
+
+/**
+ * Ref of float array.
+ */
+interface FloatArrayRef : BaseArrayRef {
+
+    val array: FloatArray
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun of(array: FloatArray, startIndex: Int = 0, endIndex: Int = array.size): FloatArrayRef {
+            return object : FloatArrayRef {
+                override val array = array
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun offset(array: FloatArray, offset: Int = 0, length: Int = array.size - offset): FloatArrayRef {
+            return of(array, offset, offset + length)
+        }
+    }
+}
+
+/**
+ * Ref of double array.
+ */
+interface DoubleArrayRef : BaseArrayRef {
+
+    val array: DoubleArray
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun of(array: DoubleArray, startIndex: Int = 0, endIndex: Int = array.size): DoubleArrayRef {
+            return object : DoubleArrayRef {
+                override val array = array
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun offset(array: DoubleArray, offset: Int = 0, length: Int = array.size - offset): DoubleArrayRef {
+            return of(array, offset, offset + length)
+        }
+    }
+}
