@@ -3,6 +3,8 @@
 package xyz.srclab.common.io
 
 import org.apache.commons.io.IOUtils
+import org.apache.commons.io.input.ReaderInputStream
+import org.apache.commons.io.output.WriterOutputStream
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.toChars
 import java.io.*
@@ -55,6 +57,16 @@ fun InputStream.toReader(charset: Charset = DEFAULT_CHARSET): Reader {
 @JvmOverloads
 fun OutputStream.toWriter(charset: Charset = DEFAULT_CHARSET): Writer {
     return OutputStreamWriter(this, charset)
+}
+
+@JvmOverloads
+fun Reader.toInputStream(charset: Charset = DEFAULT_CHARSET): InputStream {
+    return ReaderInputStream(this, charset)
+}
+
+@JvmOverloads
+fun Writer.toOutputStream(charset: Charset = DEFAULT_CHARSET): OutputStream {
+    return WriterOutputStream(this, charset)
 }
 
 @JvmOverloads
@@ -113,6 +125,14 @@ fun <T : Appendable> T.asWriter(): AppendableWriterWrapper<T> {
     return AppendableWriterWrapper(this)
 }
 
+fun ByteBuffer.asInputStream(): InputStream {
+    return ByteBufferInputStreamWrapper(this)
+}
+
+fun ByteBuffer.asOutputStream(): OutputStream {
+    return ByteBufferOutputStreamWrapper(this)
+}
+
 @JvmOverloads
 fun ByteBuffer.toBytes(useBackedArray: Boolean = false): ByteArray {
     if (this.hasArray()) {
@@ -125,12 +145,4 @@ fun ByteBuffer.toBytes(useBackedArray: Boolean = false): ByteArray {
     val array = ByteArray(this.remaining())
     this.get(array)
     return array
-}
-
-fun ByteBuffer.asInputStream(): InputStream {
-    return ByteBufferInputStreamWrapper(this)
-}
-
-fun ByteBuffer.asOutputStream(): OutputStream {
-    return ByteBufferOutputStreamWrapper(this)
 }
