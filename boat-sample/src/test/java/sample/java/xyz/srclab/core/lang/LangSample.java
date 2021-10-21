@@ -319,14 +319,14 @@ public class LangSample {
 
     @Test
     public void testSingleAccessor() {
-        TestAnyAccessor singleAccessor = new TestAnyAccessor();
+        TestObjAccessor singleAccessor = new TestObjAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
         singleAccessor.set("777");
         Assert.assertEquals("777", singleAccessor.get());
 
-        TestGenericAccessor genericSingleAccessor = new TestGenericAccessor();
+        TestTypedAccessor genericSingleAccessor = new TestTypedAccessor();
         Assert.assertNull(genericSingleAccessor.getOrNull());
         Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"));
         Assert.assertEquals("666", genericSingleAccessor.getOrElse(() -> "666"));
@@ -340,7 +340,7 @@ public class LangSample {
         mapAccessor.set("1", "777");
         Assert.assertEquals("777", mapAccessor.get("1"));
 
-        TestGenericMapAccessor genericMapAccessor = new TestGenericMapAccessor();
+        TestTypedMapAccessor genericMapAccessor = new TestTypedMapAccessor();
         Assert.assertNull(genericMapAccessor.getOrNull("1"));
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1", "666"));
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1", (k) -> "666"));
@@ -353,7 +353,7 @@ public class LangSample {
         T2
     }
 
-    public static class TestAnyAccessor implements AnyAccessor {
+    public static class TestObjAccessor implements ObjAccessor {
 
         private String value;
 
@@ -368,7 +368,7 @@ public class LangSample {
         }
     }
 
-    public static class TestGenericAccessor implements GenericAccessor<String> {
+    public static class TestTypedAccessor implements TypedAccessor<String> {
 
         private String value;
 
@@ -393,7 +393,7 @@ public class LangSample {
         }
     }
 
-    public static class TestGenericMapAccessor implements GenericMapAccessor<String, String> {
+    public static class TestTypedMapAccessor implements TypedMapAccessor<String, String> {
 
         private final Map<String, String> values = new HashMap<>();
 

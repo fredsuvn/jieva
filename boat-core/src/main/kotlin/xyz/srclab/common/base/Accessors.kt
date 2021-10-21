@@ -3,20 +3,20 @@ package xyz.srclab.common.base
 import xyz.srclab.common.collect.removeAll
 
 /**
- * Accessor for any type.
+ * Accessor for object.
  *
- * @see AnyGetter
- * @see AnySetter
- * @see GenericAccessor
+ * @see ObjGetter
+ * @see ObjSetter
+ * @see TypedAccessor
  */
-interface AnyAccessor : AnyGetter, AnySetter
+interface ObjAccessor : ObjGetter, ObjSetter
 
 /**
- * Getter for any type.
+ * Getter for object.
  *
- * @see AnyAccessor
+ * @see ObjAccessor
  */
-interface AnyGetter {
+interface ObjGetter {
 
     val isPresent: Boolean
         get() {
@@ -44,30 +44,30 @@ interface AnyGetter {
 }
 
 /**
- * Setter for any type.
+ * Setter for object.
  *
- * @see AnyAccessor
+ * @see ObjAccessor
  */
-interface AnySetter {
+interface ObjSetter {
 
     fun set(value: Any?)
 }
 
 /**
- * Accessor for generic type.
+ * Accessor for typed object.
  *
- * @see GenericGetter
- * @see GenericSetter
- * @see AnyAccessor
+ * @see TypedGetter
+ * @see TypedSetter
+ * @see ObjAccessor
  */
-interface GenericAccessor<T : Any> : GenericGetter<T>, GenericSetter<T>
+interface TypedAccessor<T : Any> : TypedGetter<T>, TypedSetter<T>
 
 /**
- * Getter for generic type.
+ * Getter for typed object.
  *
- * @see GenericAccessor
+ * @see TypedAccessor
  */
-interface GenericGetter<T : Any> {
+interface TypedGetter<T : Any> {
 
     val isPresent: Boolean
         get() {
@@ -95,26 +95,26 @@ interface GenericGetter<T : Any> {
 }
 
 /**
- * Setter for generic type.
+ * Setter for typed object.
  *
- * @see GenericAccessor
+ * @see TypedAccessor
  */
-interface GenericSetter<T : Any> {
+interface TypedSetter<T : Any> {
 
     fun set(value: T?)
 }
 
 /**
- * Accessor for map type.
+ * Accessor for map.
  *
  * @see MapGetter
  * @see MapSetter
- * @see GenericMapAccessor
+ * @see TypedMapAccessor
  */
 interface MapAccessor : MapGetter, MapSetter
 
 /**
- * Getter for map type.
+ * Getter for map.
  *
  * @see MapAccessor
  */
@@ -191,20 +191,20 @@ interface MapSetter {
 }
 
 /**
- * Accessor for generic map type.
+ * Accessor for typed map.
  *
- * @see GenericMapGetter
- * @see GenericMapSetter
+ * @see TypedMapGetter
+ * @see TypedMapSetter
  * @see MapAccessor
  */
-interface GenericMapAccessor<K : Any, V : Any> : GenericMapGetter<K, V>, GenericMapSetter<K, V>
+interface TypedMapAccessor<K : Any, V : Any> : TypedMapGetter<K, V>, TypedMapSetter<K, V>
 
 /**
- * Getter for generic map type.
+ * Getter for typed map.
  *
- * @see GenericMapAccessor
+ * @see TypedMapAccessor
  */
-interface GenericMapGetter<K : Any, V : Any> {
+interface TypedMapGetter<K : Any, V : Any> {
 
     fun isPresent(key: K): Boolean {
         return getOrNull(key) !== null
@@ -239,11 +239,11 @@ interface GenericMapGetter<K : Any, V : Any> {
 }
 
 /**
- * Setter for generic map type.
+ * Setter for typed map.
  *
- * @see GenericMapAccessor
+ * @see TypedMapAccessor
  */
-interface GenericMapSetter<K : Any, V : Any> {
+interface TypedMapSetter<K : Any, V : Any> {
 
     fun set(key: K, value: V?): V? {
         return asMap().put(key, value)

@@ -8,7 +8,7 @@ import java.time.Instant
  *
  * @author sunqian
  */
-interface Lazy<T : Any> : GenericGetter<T> {
+interface Lazy<T : Any> : TypedGetter<T> {
 
     fun refresh()
 

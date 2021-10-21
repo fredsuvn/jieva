@@ -282,13 +282,13 @@ class BaseSample {
 
     @Test
     fun testSingleAccessor() {
-        val singleAccessor = TestAnyAccessor()
+        val singleAccessor = TestObjAccessor()
         Assert.assertNull(singleAccessor.getOrNull())
         Assert.assertEquals("666", singleAccessor.getOrElse("666"))
         Assert.assertEquals("666", singleAccessor.getOrElse { "666" })
         singleAccessor.set("777")
         Assert.assertEquals("777", singleAccessor.get())
-        val genericSingleAccessor = TestGenericAccessor()
+        val genericSingleAccessor = TestTypedAccessor()
         Assert.assertNull(genericSingleAccessor.getOrNull())
         Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"))
         Assert.assertEquals("666", genericSingleAccessor.getOrElse { "666" })
@@ -300,7 +300,7 @@ class BaseSample {
         Assert.assertEquals("666", mapAccessor.getOrElse("1") { k: Any? -> "666" })
         mapAccessor.set("1", "777")
         Assert.assertEquals("777", mapAccessor.get("1"))
-        val genericMapAccessor = TestGenericMapAccessor()
+        val genericMapAccessor = TestTypedMapAccessor()
         Assert.assertNull(genericMapAccessor.getOrNull("1"))
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1", "666"))
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1") { k: String? -> "666" })
@@ -317,7 +317,7 @@ enum class TestEnum {
     T1, T2
 }
 
-class TestAnyAccessor : AnyAccessor {
+class TestObjAccessor : ObjAccessor {
     private var value: String? = null
     override fun <T : Any> getOrNull(): T? {
         return value as T?
@@ -328,7 +328,7 @@ class TestAnyAccessor : AnyAccessor {
     }
 }
 
-class TestGenericAccessor : GenericAccessor<String> {
+class TestTypedAccessor : TypedAccessor<String> {
     private var value: String? = null
     override fun getOrNull(): String? {
         return value
@@ -344,7 +344,7 @@ class TestMapAccessor : MapAccessor {
     override val contents: MutableMap<Any, Any?> = values
 }
 
-class TestGenericMapAccessor : GenericMapAccessor<String, String> {
+class TestTypedMapAccessor : TypedMapAccessor<String, String> {
     private val values: MutableMap<String, String?> = HashMap()
     override val contents: MutableMap<String, String?> = values
 }

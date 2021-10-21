@@ -4,9 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.AnyAccessor;
-import xyz.srclab.common.base.GenericAccessor;
-import xyz.srclab.common.base.GenericMapAccessor;
+import xyz.srclab.common.base.ObjAccessor;
+import xyz.srclab.common.base.TypedAccessor;
+import xyz.srclab.common.base.TypedMapAccessor;
 import xyz.srclab.common.base.MapAccessor;
 
 import java.util.HashMap;
@@ -16,7 +16,7 @@ public class AccessorTest {
 
     @Test
     public void testAnyAccessor() {
-        TestAnyAccessor singleAccessor = new TestAnyAccessor();
+        TestObjAccessor singleAccessor = new TestObjAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
@@ -26,7 +26,7 @@ public class AccessorTest {
 
     @Test
     public void testGenericAccessor() {
-        TestGenericAccessor singleAccessor = new TestGenericAccessor();
+        TestTypedAccessor singleAccessor = new TestTypedAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
@@ -46,7 +46,7 @@ public class AccessorTest {
 
     @Test
     public void testGenericMapAccessor() {
-        TestGenericMapAccessor mapAccessor = new TestGenericMapAccessor();
+        TestTypedMapAccessor mapAccessor = new TestTypedMapAccessor();
         Assert.assertNull(mapAccessor.getOrNull("1"));
         Assert.assertEquals("666", mapAccessor.getOrElse("1", "666"));
         Assert.assertEquals("666", mapAccessor.getOrElse("1", (k) -> "666"));
@@ -54,7 +54,7 @@ public class AccessorTest {
         Assert.assertEquals("777", mapAccessor.get("1"));
     }
 
-    public static class TestAnyAccessor implements AnyAccessor {
+    public static class TestObjAccessor implements ObjAccessor {
 
         private String value;
 
@@ -69,7 +69,7 @@ public class AccessorTest {
         }
     }
 
-    public static class TestGenericAccessor implements GenericAccessor<String> {
+    public static class TestTypedAccessor implements TypedAccessor<String> {
 
         private String value;
 
@@ -94,7 +94,7 @@ public class AccessorTest {
         }
     }
 
-    public static class TestGenericMapAccessor implements GenericMapAccessor<String, String> {
+    public static class TestTypedMapAccessor implements TypedMapAccessor<String, String> {
 
         private final Map<String, String> values = new HashMap<>();
 

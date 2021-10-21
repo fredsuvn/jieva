@@ -41,7 +41,7 @@ import java.util.function.Consumer
  * @see FloatRef
  * @see DoubleRef
  */
-interface Ref<T : Any> : GenericAccessor<T> {
+interface Ref<T : Any> : TypedAccessor<T> {
 
     /**
      * If value of this [Ref] is `non-null`, given [action] will be executed, else not.
