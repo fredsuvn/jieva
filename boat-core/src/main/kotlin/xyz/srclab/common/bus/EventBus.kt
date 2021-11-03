@@ -1,7 +1,6 @@
 package xyz.srclab.common.bus
 
 import xyz.srclab.common.base.INHERITANCE_COMPARATOR
-import xyz.srclab.common.invoke.Invoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.run.Runner
 import java.util.*

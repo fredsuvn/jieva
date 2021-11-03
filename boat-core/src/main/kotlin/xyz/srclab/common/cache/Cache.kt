@@ -109,67 +109,67 @@ interface Cache<K : Any, V : Any> {
 
         fun initialCapacity(initialCapacity: Int): Builder<K, V> {
             this.initialCapacity = initialCapacity
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun maxSize(maxSize: Long): Builder<K, V> {
             this.maxSize = maxSize
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun concurrencyLevel(concurrencyLevel: Int): Builder<K, V> {
             this.concurrencyLevel = concurrencyLevel
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun expireAfterAccess(expireAfterAccess: Duration): Builder<K, V> {
             this.expireAfterAccess = expireAfterAccess
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun expireAfterWrite(expireAfterWrite: Duration): Builder<K, V> {
             this.expireAfterWrite = expireAfterWrite
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun refreshAfterWrite(refreshAfterWrite: Duration): Builder<K, V> {
             this.refreshAfterWrite = refreshAfterWrite
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun loader(loader: ((K) -> V)): Builder<K, V> {
             this.loader = loader
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun createListener(createListener: CacheCreateListener<in K, in V>): Builder<K, V> {
             this.createListener = createListener
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun readListener(readListener: CacheReadListener<in K, in V>): Builder<K, V> {
             this.readListener = readListener
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun updateListener(updateListener: CacheUpdateListener<in K, in V>): Builder<K, V> {
             this.updateListener = updateListener
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun removeListener(removeListener: CacheRemoveListener<in K, in V>): Builder<K, V> {
             this.removeListener = removeListener
-            this.commitModification()
+            this.commit()
             return this
         }
 
@@ -178,7 +178,7 @@ interface Cache<K : Any, V : Any> {
          */
         fun useGuava(useGuava: Boolean): Builder<K, V> {
             this.useGuava = useGuava
-            this.commitModification()
+            this.commit()
             return this
         }
 

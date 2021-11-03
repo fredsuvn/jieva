@@ -16,9 +16,12 @@ interface BeanType {
     val properties: Map<String, PropertyType>
 
     @Throws(PropertyNotFoundException::class)
-    fun getProperty(name: CharSequence): PropertyType {
-        val nameString = name.toString()
-        return properties[nameString] ?: throw PropertyNotFoundException(nameString)
+    fun getProperty(name: String): PropertyType {
+        return getPropertyOrNull(name) ?: throw PropertyNotFoundException(name)
+    }
+
+    fun getPropertyOrNull(name: String): PropertyType? {
+        return properties[name]
     }
 
     companion object {

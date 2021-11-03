@@ -4,7 +4,7 @@ package xyz.srclab.common.base
  * Cacheable builder, an abstract build which stores last build result from [buildNew].
  *
  * By default, if there is no modification, [build] method will return last result of [buildNew].
- * Subclass should call [commitModification] for each `set` operation, which leads the cache expired.
+ * Subclass should call [commit] for each `set` operation, which leads the cache expired.
  */
 abstract class CacheableBuilder<T : Any> {
 
@@ -20,7 +20,7 @@ abstract class CacheableBuilder<T : Any> {
     /**
      * Commits modification of this Builder, lead cache refresh.
      */
-    protected open fun commitModification() {
+    protected open fun commit() {
         version++
         if (version == buildVersion) {
             version++

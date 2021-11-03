@@ -1,6 +1,5 @@
 package xyz.srclab.common.convert
 
-import xyz.srclab.common.invoke.Invoke
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type

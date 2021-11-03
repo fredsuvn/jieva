@@ -96,7 +96,7 @@ fun <T : Any> Any.copyProperties(
                 if (!fromProperty.isReadable) {
                     return@forEach
                 }
-                val value = fromProperty.getValue<Any?>(this)
+                val value = fromProperty.getValue(this)
                 if (value === null && !copyNull) {
                     return@forEach
                 }
@@ -118,7 +118,7 @@ fun <T : Any> Any.copyProperties(
                 if (toProperty === null || !toProperty.isWriteable) {
                     return@forEach
                 }
-                val value = fromProperty.getValue<Any?>(this)
+                val value = fromProperty.getValue(this)
                 if (value === null && !copyNull) {
                     return@forEach
                 }

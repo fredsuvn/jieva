@@ -1,6 +1,6 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.Next.*
+import xyz.srclab.common.base.Then.*
 import java.io.InputStream
 import java.nio.ByteBuffer
 
@@ -24,7 +24,7 @@ object BoatClassLoader : ClassLoader() {
 }
 
 /**
- * Represents next operation, usually used for the object which delegate performance to a group of handlers.
+ * Represents action of next step, usually used for the object which delegate performance to a group of handlers.
  *
  * For three values:
  *
@@ -32,7 +32,7 @@ object BoatClassLoader : ClassLoader() {
  * * If returns [BREAK], means that handler failed to convert and suggests break handler chain;
  * * If returns [COMPLETE], means that handler success and complete conversation;
  */
-enum class Next {
+enum class Then {
 
     /**
      * Represents current handler failed to convert and suggests continue to next handler.
@@ -43,11 +43,11 @@ enum class Next {
      * Represents current handler failed to convert and suggests break handler chain.
      */
     BREAK,
+    ;
 
-    /**
-     * Represents current handler success and complete conversation.
-     */
-    COMPLETE,
+    fun ss() {
+
+    }
 }
 
 /**

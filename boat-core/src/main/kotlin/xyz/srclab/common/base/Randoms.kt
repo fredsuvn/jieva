@@ -41,7 +41,7 @@ interface RandomSupplier<T : Any> : Supplier<T> {
         fun score(score: Int, supplier: () -> T): Builder<T> {
             builderCases.add(Case(scoreCount, scoreCount + score, supplier))
             scoreCount += score
-            this.commitModification()
+            this.commit()
             return this
         }
 
@@ -51,7 +51,7 @@ interface RandomSupplier<T : Any> : Supplier<T> {
 
         fun random(random: Random): Builder<T> {
             this.builderRandom = random
-            this.commitModification()
+            this.commit()
             return this
         }
 

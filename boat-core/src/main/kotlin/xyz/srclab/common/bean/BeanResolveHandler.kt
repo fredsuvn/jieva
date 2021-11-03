@@ -2,7 +2,7 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.NamingCase
-import xyz.srclab.common.invoke.Invoker
+import xyz.srclab.common.base.Then
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.reflect.eraseTypeParameters
 import xyz.srclab.common.reflect.rawClass
@@ -24,7 +24,7 @@ interface BeanResolveHandler {
     /**
      * Resolves into given [builder].
      */
-    fun resolve(@Written builder: BeanResolveContext)
+    fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder):Then
 
     companion object {
         @JvmField

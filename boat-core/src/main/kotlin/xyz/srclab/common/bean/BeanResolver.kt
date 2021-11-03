@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.base.Then
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.collect.plusBefore
@@ -22,10 +23,11 @@ interface BeanResolver {
     val resolveHandlers: List<BeanResolveHandler>
 
     fun resolve(type: Type): BeanType {
-        val builder = BeanResolveContext.newBeanResolveContext(type)
+        val context = BeanResolveContext(type)
+        val builder = BeanTypeBuilder(type)
         for (resolveHandler in resolveHandlers) {
-            resolveHandler.resolve(builder)
-            if (builder.isComplete) {
+            val next = resolveHandler.resolve(context,builder)
+            if (next != Then.CONTINUE) {
                 break
             }
         }
