@@ -1,6 +1,7 @@
 package xyz.srclab.common.invoke
 
 import xyz.srclab.common.base.asAny
+import java.lang.reflect.Method
 
 /**
  * Invoker used to invoke instance method.
@@ -18,6 +19,15 @@ interface InstInvoker {
             override fun invoke(vararg args: Any?): Any? {
                 return this@InstInvoker.invoke(inst, *args)
             }
+        }
+    }
+
+    companion object {
+
+        @JvmOverloads
+        @JvmStatic
+        fun from(method: Method, force: Boolean = false, reflect: Boolean = true): InstInvoker {
+            return method.toInstInvoker(force, reflect)
         }
     }
 }

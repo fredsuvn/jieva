@@ -62,7 +62,8 @@ fun Function<Array<out Any?>, *>.toFuncInvoker(): FuncInvoker {
     }
 }
 
-fun toFuncInvoker(func: (Array<out Any?>) -> Any?): FuncInvoker {
+@JvmName("toFuncInvoker")
+fun funcInvoker(func: (Array<out Any?>) -> Any?): FuncInvoker {
     return object : FuncInvoker {
         override fun invoke(vararg args: Any?): Any? {
             return func(args)
