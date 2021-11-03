@@ -2,7 +2,8 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.NamingCase
-import xyz.srclab.common.base.Then
+import xyz.srclab.common.base.JumpStatement
+import xyz.srclab.common.invoke.InstInvoker
 import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
 import xyz.srclab.common.reflect.eraseTypeParameters
 import xyz.srclab.common.reflect.rawClass
@@ -24,7 +25,7 @@ interface BeanResolveHandler {
     /**
      * Resolves into given [builder].
      */
-    fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder):Then
+    fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder):JumpStatement
 
     companion object {
         @JvmField
@@ -43,18 +44,19 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
      * Overrides this method to provide getters and setters of target bean type.
      */
     protected abstract fun resolveAccessors(
-        @Written builder: BeanResolveContext,
+        context: BeanResolveContext,
         @Written getters: MutableMap<String, GetterInfo>,
         @Written setters: MutableMap<String, SetterInfo>,
     )
 
-    override fun resolve(builder: BeanResolveContext) {
+    override fun resolve(context: BeanResolveContext, @Written builder2: BeanTypeBuilder) {
+
         val getters: MutableMap<String, GetterInfo> = LinkedHashMap()
         val setters: MutableMap<String, SetterInfo> = LinkedHashMap()
 
-        resolveAccessors(builder, getters, setters)
+        resolveAccessors(context, getters, setters)
 
-        val properties = builder.properties
+        val properties:MutableMap<String, PropertyType> = LinkedHashMap()
         for (getterEntry in getters) {
             val propertyName = getterEntry.key
             val getter = getterEntry.value
@@ -104,7 +106,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     data class GetterInfo(
         val name: String,
         val type: Type,
-        val getter: Invoker?,
+        val getter: InstInvoker?,
         val field: Field?,
         val getterMethod: Method?,
     )
@@ -112,7 +114,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     data class SetterInfo(
         val name: String,
         val type: Type,
-        val setter: Invoker?,
+        val setter: InstInvoker?,
         val field: Field?,
         val setterMethod: Method?,
     )

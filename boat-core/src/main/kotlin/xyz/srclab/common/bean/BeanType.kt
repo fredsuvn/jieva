@@ -5,8 +5,6 @@ import java.lang.reflect.Type
 /**
  * Represents bean type.
  *
- * @author sunqian
- *
  * @see PropertyType
  */
 interface BeanType {

@@ -1,6 +1,5 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.Then
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.collect.plusBefore
@@ -10,8 +9,6 @@ import java.lang.reflect.Type
  * Resolver for bean.
  *
  * Note default methods implementations will not cache result, use [CachedBeanResolver] if you need caching.
- *
- * @author sunqian
  *
  * @see BeanResolveHandler
  * @see BeanStyleBeanResolveHandler
@@ -26,8 +23,8 @@ interface BeanResolver {
         val context = BeanResolveContext(type)
         val builder = BeanTypeBuilder(type)
         for (resolveHandler in resolveHandlers) {
-            val next = resolveHandler.resolve(context,builder)
-            if (next != Then.CONTINUE) {
+            val jumpStatement = resolveHandler.resolve(context, builder)
+            if (!jumpStatement.isContinue()) {
                 break
             }
         }
