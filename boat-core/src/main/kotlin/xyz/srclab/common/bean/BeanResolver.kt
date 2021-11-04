@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.bean.BeanResolver.Companion.CachedBeanResolver
 import xyz.srclab.common.cache.Cache
 import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.collect.plusBefore
@@ -37,7 +38,7 @@ interface BeanResolver {
         val DEFAULT: BeanResolver = newBeanResolver(BeanResolveHandler.DEFAULTS)
 
         /**
-         * Return a new [CachedBeanResolver] with given [resolveHandlers] and [cache] (default is [Cache.weakCache]).
+         * Return a new [BeanResolver] with given [resolveHandlers] and [cache] (default is [Cache.weakCache]).
          */
         @JvmOverloads
         @JvmStatic
@@ -54,6 +55,21 @@ interface BeanResolver {
         @JvmStatic
         fun BeanResolver.extend(handler: BeanResolveHandler): BeanResolver {
             return newBeanResolver(this.resolveHandlers.plusBefore(0, handler))
+        }
+
+        /**
+         * [BeanResolver] implementation which can cache resolved [BeanType].
+         */
+        private class CachedBeanResolver(
+            override val resolveHandlers: List<BeanResolveHandler>,
+            private val cache: Cache<Type, BeanType>
+        ) : BeanResolver {
+
+            override fun resolve(type: Type): BeanType {
+                return cache.getOrLoad(type) {
+                    super.resolve(type)
+                }
+            }
         }
     }
 }

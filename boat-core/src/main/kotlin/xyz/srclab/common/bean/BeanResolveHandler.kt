@@ -1,10 +1,10 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.base.NamingCase
 import xyz.srclab.common.base.JumpStatement
+import xyz.srclab.common.base.NamingCase
 import xyz.srclab.common.invoke.InstInvoker
-import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
+import xyz.srclab.common.invoke.toInstInvoker
 import xyz.srclab.common.reflect.eraseTypeParameters
 import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.reflect.searchFieldOrNull
@@ -25,12 +25,19 @@ interface BeanResolveHandler {
     /**
      * Resolves into given [builder].
      */
-    fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder):JumpStatement
+    fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder): JumpStatement
 
     companion object {
+
+        @JvmField
+        val BEAN_STYLE = BeanStyleBeanResolveHandler
+
+        @JvmField
+        val RECORD_STYLE = RecordStyleBeanResolveHandler
+
         @JvmField
         val DEFAULTS: List<BeanResolveHandler> = listOf(
-            BeanStyleBeanResolveHandler
+            BEAN_STYLE
         )
     }
 }
@@ -45,25 +52,26 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
      */
     protected abstract fun resolveAccessors(
         context: BeanResolveContext,
+        @Written builder: BeanTypeBuilder,
         @Written getters: MutableMap<String, GetterInfo>,
         @Written setters: MutableMap<String, SetterInfo>,
-    )
+    ): JumpStatement
 
-    override fun resolve(context: BeanResolveContext, @Written builder2: BeanTypeBuilder) {
+    override fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder): JumpStatement {
 
         val getters: MutableMap<String, GetterInfo> = LinkedHashMap()
         val setters: MutableMap<String, SetterInfo> = LinkedHashMap()
 
-        resolveAccessors(context, getters, setters)
+        val result = resolveAccessors(context, builder, getters, setters)
 
-        val properties:MutableMap<String, PropertyType> = LinkedHashMap()
+        val beanType = builder.build()
         for (getterEntry in getters) {
             val propertyName = getterEntry.key
             val getter = getterEntry.value
             val setter = setters[propertyName]
             if (setter === null) {
-                properties[propertyName] = PropertyType.newPropertyType(
-                    builder.preparedBeanType,
+                val propertyType = PropertyType.newPropertyType(
+                    beanType,
                     propertyName,
                     getter.type,
                     getter.getter,
@@ -72,9 +80,10 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
                     getter.getterMethod,
                     null
                 )
+                builder.addProperty(propertyType)
             } else if (getter.type == setter.type) {
-                properties[propertyName] = PropertyType.newPropertyType(
-                    builder.preparedBeanType,
+                val propertyType = PropertyType.newPropertyType(
+                    beanType,
                     propertyName,
                     getter.type,
                     getter.getter,
@@ -83,6 +92,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
                     getter.getterMethod,
                     setter.setterMethod
                 )
+                builder.addProperty(propertyType)
                 setters.remove(propertyName)
             }
         }
@@ -90,8 +100,8 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
         for (setterEntry in setters) {
             val propertyName = setterEntry.key
             val setter = setterEntry.value
-            properties[propertyName] = PropertyType.newPropertyType(
-                builder.preparedBeanType,
+            val propertyType = PropertyType.newPropertyType(
+                beanType,
                 propertyName,
                 setter.type,
                 null,
@@ -100,7 +110,10 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
                 null,
                 setter.setterMethod
             )
+            builder.addProperty(propertyType)
         }
+
+        return result
     }
 
     data class GetterInfo(
@@ -126,16 +139,19 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
  *
  * * getter: getXxx()
  * * setter: setXxx(Xxx)
+ *
+ * Note this handler doesn't add property if property's name has been existed in builder's properties.
  */
 object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
     override fun resolveAccessors(
-        builder: BeanResolveContext,
+        context: BeanResolveContext,
+        @Written builder: BeanTypeBuilder,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
-    ) {
-        val beanClass = builder.preparedBeanType.type.rawClass
-        val methods = builder.methods
+    ): JumpStatement {
+        val beanClass = builder.type.rawClass
+        val methods = context.methods
         for (method in methods) {
             if (method.isBridge || method.isSynthetic) {
                 continue
@@ -146,21 +162,28 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             }
             if (name.startsWith("get") && method.parameterCount == 0) {
                 val propertyName =
-                    NamingCase.UPPER_CAMEL.convertTo(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
-                val type = method.genericReturnType.eraseTypeParameters(builder.typeArguments)
+                    NamingCase.UPPER_CAMEL.convert(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
+                if (builder.hasProperty(propertyName)) {
+                    continue
+                }
+                val type = method.genericReturnType.eraseTypeParameters(context.typeArguments)
                 val field = beanClass.searchFieldOrNull(propertyName, true)
-                getters[propertyName] = GetterInfo(propertyName, type, method.toInvoker(), field, method)
+                getters[propertyName] = GetterInfo(propertyName, type, method.toInstInvoker(), field, method)
                 continue
             }
             if (name.startsWith("set") && method.parameterCount == 1) {
                 val propertyName =
-                    NamingCase.UPPER_CAMEL.convertTo(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
-                val type = method.genericParameterTypes[0].eraseTypeParameters(builder.typeArguments)
+                    NamingCase.UPPER_CAMEL.convert(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
+                if (builder.hasProperty(propertyName)) {
+                    continue
+                }
+                val type = method.genericParameterTypes[0].eraseTypeParameters(context.typeArguments)
                 val field = beanClass.searchFieldOrNull(propertyName, true)
-                setters[propertyName] = SetterInfo(propertyName, type, method.toInvoker(), field, method)
+                setters[propertyName] = SetterInfo(propertyName, type, method.toInstInvoker(), field, method)
                 continue
             }
         }
+        return JumpStatement.CONTINUE
     }
 }
 
@@ -169,33 +192,40 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
  *
  * * getter: xxx()
  * * setter: xxx(xxx)
+ *
+ * Note this handler doesn't add property if property's name has been existed in builder's properties.
  */
 object RecordStyleBeanResolveHandler : AbstractBeanResolveHandler() {
 
     override fun resolveAccessors(
-        builder: BeanResolveContext,
+        context: BeanResolveContext,
+        @Written builder: BeanTypeBuilder,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
-    ) {
-        val beanClass = builder.preparedBeanType.type.rawClass
-        val methods = builder.methods
+    ): JumpStatement {
+        val beanClass = builder.type.rawClass
+        val methods = context.methods
         for (method in methods) {
             if (method.isBridge || method.isSynthetic || method.declaringClass == Any::class.java) {
                 continue
             }
-            val name = method.name
+            val propertyName = method.name
+            if (builder.hasProperty(propertyName)) {
+                continue
+            }
             if (method.parameterCount == 0) {
-                val type = method.genericReturnType.eraseTypeParameters(builder.typeArguments)
-                val field = beanClass.searchFieldOrNull(name, true)
-                getters[name] = GetterInfo(name, type, method.toInvoker(), field, method)
+                val type = method.genericReturnType.eraseTypeParameters(context.typeArguments)
+                val field = beanClass.searchFieldOrNull(propertyName, true)
+                getters[propertyName] = GetterInfo(propertyName, type, method.toInstInvoker(), field, method)
                 continue
             }
             if (method.parameterCount == 1) {
-                val type = method.genericParameterTypes[0].eraseTypeParameters(builder.typeArguments)
-                val field = beanClass.searchFieldOrNull(name, true)
-                setters[name] = SetterInfo(name, type, method.toInvoker(), field, method)
+                val type = method.genericParameterTypes[0].eraseTypeParameters(context.typeArguments)
+                val field = beanClass.searchFieldOrNull(propertyName, true)
+                setters[propertyName] = SetterInfo(propertyName, type, method.toInstInvoker(), field, method)
                 continue
             }
         }
+        return JumpStatement.CONTINUE
     }
 }

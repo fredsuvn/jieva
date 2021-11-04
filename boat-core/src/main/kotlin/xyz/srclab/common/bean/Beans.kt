@@ -6,21 +6,39 @@ package xyz.srclab.common.bean
 import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.asAny
 import xyz.srclab.common.collect.MapType.Companion.toMapType
+import xyz.srclab.common.collect.toUnmodifiable
 import xyz.srclab.common.convert.Converter
 import java.lang.reflect.Type
 
+@JvmName("resolve")
 @JvmOverloads
-fun Type.resolve(beanResolver: BeanResolver = BeanResolver.DEFAULT): BeanType {
+fun Type.resolveBean(beanResolver: BeanResolver = BeanResolver.DEFAULT): BeanType {
     return beanResolver.resolve(this)
 }
 
 @JvmOverloads
-fun <T> Any.asMap(
-    valueType: Type = Any::class.java,
-    beanResolver: BeanResolver = BeanResolver.DEFAULT,
-    converter: Converter = Converter.DEFAULT
-): BeanMap<T> {
-    return BeanMap(this, valueType, beanResolver, converter)
+fun Any.asMap(beanResolver: BeanResolver = BeanResolver.DEFAULT): BeanMap {
+    return BeanMap(this, beanResolver.resolve(this.javaClass))
+}
+
+fun Any.asMap(beanType: BeanType): BeanMap {
+    return BeanMap(this, beanType)
+}
+
+@JvmOverloads
+fun Any?.toMap(beanResolver: BeanResolver = BeanResolver.DEFAULT): Map<String, Any?> {
+    if (this === null) {
+        return emptyMap()
+    }
+    return toMutableMap(beanResolver).toUnmodifiable()
+}
+
+@JvmOverloads
+fun Any?.toMutableMap(beanResolver: BeanResolver = BeanResolver.DEFAULT): MutableMap<String, Any?> {
+    if (this === null) {
+        return LinkedHashMap()
+    }
+    return LinkedHashMap(asMap(beanResolver))
 }
 
 @JvmOverloads
@@ -62,13 +80,15 @@ fun <T : Any> Any.copyProperties(
 ): T {
     return when {
         this is Map<*, *> && to is MutableMap<*, *> -> {
+            val toMap = to.asAny<MutableMap<Any?, Any?>>()
             val toMapType = toType.toMapType()
             this.forEach { (k, v) ->
                 if (v === null && !copyNull) {
                     return@forEach
                 }
-                val toKey = converter.convert<Any>(k, toMapType.keyType)
-                (to.asAny<MutableMap<Any, Any?>>())[toKey] = converter.convert(v, toMapType.valueType)
+                val toKey = converter.convertOrNull<Any>(k, toMapType.keyType)
+                val toValue = converter.convertOrNull<Any>(v, toMapType.valueType)
+                toMap[toKey] = toValue
             }
             to
         }
@@ -79,18 +99,22 @@ fun <T : Any> Any.copyProperties(
                 if (v === null && !copyNull) {
                     return@forEach
                 }
-                val toPropertyName = converter.convert<Any>(k, String::class.java)
+                val toPropertyName = converter.convertOrNull<Any>(k, String::class.java)
+                if (toPropertyName === null) {
+                    return@forEach
+                }
                 val toProperty = toProperties[toPropertyName]
                 if (toProperty === null || !toProperty.isWriteable) {
                     return@forEach
                 }
-                toProperty.setValue(to, converter.convert(v, toProperty.type))
+                toProperty.setValue(to, converter.convertOrNull(v, toProperty.type))
             }
             to
         }
         this !is Map<*, *> && to is MutableMap<*, *> -> {
             val fromBeanType = beanResolver.resolve(this.javaClass)
             val fromProperties = fromBeanType.properties
+            val toMap = to.asAny<MutableMap<Any?, Any?>>()
             val toMapType = toType.toMapType()
             fromProperties.forEach { (name, fromProperty) ->
                 if (!fromProperty.isReadable) {
@@ -100,8 +124,9 @@ fun <T : Any> Any.copyProperties(
                 if (value === null && !copyNull) {
                     return@forEach
                 }
-                val toKey = converter.convert<Any>(name, toMapType.keyType)
-                (to.asAny<MutableMap<Any, Any?>>())[toKey] = converter.convert(value, toMapType.valueType)
+                val toKey = converter.convertOrNull<Any>(name, toMapType.keyType)
+                val toValue = converter.convertOrNull<Any>(value, toMapType.valueType)
+                toMap[toKey] = toValue
             }
             to
         }
@@ -122,10 +147,10 @@ fun <T : Any> Any.copyProperties(
                 if (value === null && !copyNull) {
                     return@forEach
                 }
-                toProperty.setValue(to, converter.convert(value, toProperty.type))
+                toProperty.setValue(to, converter.convertOrNull(value, toProperty.type))
             }
             to
         }
-        else -> throw IllegalStateException("Unknown type, failed to copy properties from $this to $to.")
+        else -> throw IllegalStateException("Cannot copy properties from $this to $to.")
     }
 }

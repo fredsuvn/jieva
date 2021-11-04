@@ -1,95 +1,76 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.asAny
-import xyz.srclab.common.convert.Converter
-import java.lang.reflect.Type
+import xyz.srclab.common.collect.map
 
 /**
  * A [Map] which is associated with a `bean`,
- * of which keys are properties' names of the bean, values are properties' value.
+ * of which keys are properties' names, values are properties' value.
  *
  * Note:
  *
- * * Property `class` (from [Object.getClass]) excludes;
- * * Use [beanType] to get `class` info;
+ * * For this map and origin bean, any modification will reflect each other;
  */
-open class BeanMap<T>(
-    private val bean: Any,
-    private val valueType: Type,
-    beanResolver: BeanResolver,
-    private val converter: Converter
-) : AbstractMutableMap<String, T>() {
+open class BeanMap(
+    val bean: Any,
+    val beanType: BeanType = bean::class.java.resolveBean()
+) : AbstractMutableMap<String, Any?>() {
 
-    @get:JvmName("beanType")
-    val beanType: BeanType = beanResolver.resolve(bean.javaClass)
+    //private val properties: Map<String, PropertyType> =
+    //    beanType.properties.filter { it.key != "class" }
 
-    private val properties: Map<String, PropertyType> =
-        beanType.properties.filter { it.key != "class" }
+    private val entryMap: Map<String, MutableMap.MutableEntry<String, Any?>> =
+        beanType.properties.map { name, propertyType ->
+            name to object : MutableMap.MutableEntry<String, Any?> {
+
+                override val key: String = name
+
+                override val value: Any?
+                    get() {
+                        return propertyType.getValue(bean)
+                    }
+
+                override fun setValue(newValue: Any?): Any? {
+                    val old = propertyType.getValue(bean)
+                    propertyType.setValue(bean, newValue)
+                    return old
+                }
+            }
+        }
 
     override val size: Int
         get() = entries.size
 
-    override val entries: MutableSet<MutableMap.MutableEntry<String, T>> by lazy {
-        properties.entries
-            .filter { it.value.isReadable }
-            .mapTo(LinkedHashSet()) {
-                val propertyType = it.value
-                object : MutableMap.MutableEntry<String, Any?> {
-
-                    override val key: String = it.key
-
-                    override val value: Any?
-                        get() {
-                            val value = propertyType.getValue<Any?>(bean)
-                            if (value === null) {
-                                return value
-                            }
-                            return converter.convert(value, valueType)
-                        }
-
-                    override fun setValue(newValue: Any?): Any? {
-                        return propertyType.setValueAndReturnOld(
-                            bean,
-                            converter.convert(newValue, propertyType.type)
-                        )
-                    }
-                }
-            }
-            .asAny()
-    }
+    override val entries: MutableSet<MutableMap.MutableEntry<String, Any?>> = LinkedHashSet(entryMap.values)
 
     override fun containsKey(key: String): Boolean {
-        return properties.containsKey(key)
+        return entryMap.containsKey(key)
     }
 
-    override fun get(key: String): T {
-        val propertyType = properties[key]
-        if (propertyType === null) {
-            return null.asAny()
+    override fun get(key: String): Any? {
+        val entry = entryMap[key]
+        if (entry === null) {
+            return null
         }
-        return converter.convert(propertyType.getValue(bean), valueType)
+        return entry.value
     }
 
     override fun isEmpty(): Boolean {
-        return properties.isEmpty()
+        return entryMap.isEmpty()
     }
 
     override fun clear() {
         throw UnsupportedOperationException()
     }
 
-    override fun put(key: String, value: T): T {
-        val propertyType = properties[key]
-        if (propertyType === null) {
-            throw UnsupportedOperationException("Property $key doesn't exist.")
+    override fun put(key: String, value: Any?): Any? {
+        val entry = entryMap[key]
+        if (entry === null) {
+            throw UnsupportedOperationException("Property $key not found.")
         }
-        return propertyType.setValueAndReturnOld<T>(
-            bean,
-            converter.convert(value, propertyType.type)
-        ).asAny()
+        return entry.setValue(value)
     }
 
-    override fun remove(key: String): T {
+    override fun remove(key: String): Any? {
         throw UnsupportedOperationException()
     }
 }

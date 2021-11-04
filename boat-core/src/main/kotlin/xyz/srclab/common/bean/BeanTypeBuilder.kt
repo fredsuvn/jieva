@@ -1,13 +1,12 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.CacheableBuilder
 import xyz.srclab.common.collect.toUnmodifiable
 import java.lang.reflect.Type
 
 /**
  * Builder for [BeanType].
  */
-class BeanTypeBuilder(val type: Type) : CacheableBuilder<BeanType>() {
+class BeanTypeBuilder(val type: Type) {
 
     private val _properties: MutableMap<String, PropertyType> = LinkedHashMap()
 
@@ -23,10 +22,9 @@ class BeanTypeBuilder(val type: Type) : CacheableBuilder<BeanType>() {
 
     fun addProperty(propertyType: PropertyType) {
         _properties[propertyType.name] = propertyType
-        this.commit()
     }
 
-    override fun buildNew(): BeanType {
+    fun build(): BeanType {
         return BeanType.newBeanType(type, properties)
     }
 }

@@ -4,14 +4,14 @@ import xyz.srclab.common.base.asAny
 import xyz.srclab.common.reflect.instantiate
 
 /**
- * Builder helper for beans.
+ * Bean creator.
  *
- * @see EmptyConstructorBeanBuilder
+ * @see EmptyConstructorBeanCreator
  */
-interface BeanBuilder {
+interface BeanCreator {
 
     /**
-     * Returns a new builder.
+     * Returns a new bean builder.
      */
     fun <T> newBuilder(type: Class<T>): T
 
@@ -22,20 +22,20 @@ interface BeanBuilder {
 
     companion object {
         /**
-         * @see EmptyConstructorBeanBuilder
+         * @see EmptyConstructorBeanCreator
          */
-        val DEFAULT = EmptyConstructorBeanBuilder
+        val DEFAULT = EmptyConstructorBeanCreator
     }
 }
 
 /**
- * [BeanBuilder] which uses empty-parameters-constructor to build new bean like:
+ * [BeanCreator] which uses empty-parameters-constructor to build new bean like:
  *
  * ```
  * Foo foo = new Foo();
  * ```
  */
-object EmptyConstructorBeanBuilder : BeanBuilder {
+object EmptyConstructorBeanCreator : BeanCreator {
 
     override fun <T> newBuilder(type: Class<T>): T {
         return type.instantiate()
