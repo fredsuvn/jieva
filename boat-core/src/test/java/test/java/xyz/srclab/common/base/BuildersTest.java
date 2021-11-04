@@ -18,7 +18,7 @@ public class BuildersTest {
 
             public void setValue(String value) {
                 this.value = value;
-                this.commitModification();
+                this.commit();
             }
 
             @NotNull

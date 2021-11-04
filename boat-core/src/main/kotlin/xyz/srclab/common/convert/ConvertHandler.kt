@@ -1,7 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
-import xyz.srclab.common.bean.BeanBuilder
+import xyz.srclab.common.bean.BeanCreator
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
@@ -33,9 +33,9 @@ import java.util.concurrent.ConcurrentHashMap
 interface ConvertHandler {
 
     /**
-     * Does convert from [from] to [to],
-     * returns null if unsupported,
-     * returns [NULL] if result explicitly is `null`.
+     * Converts from [from] to [toType]. Returns null if it is unsupported.
+     *
+     * If the result value is exactly `null`, return [NULL].
      */
     fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any?
 
@@ -61,7 +61,8 @@ interface ConvertHandler {
  * [ConvertHandler] which is used to convert compatible type:
  *
  * * Returns `from` itself if `fromType` == `toType` or `toType` is compatible with `from`;
- * * If `toType` is enum, invoke `from.toString()` and try to find out same name enum value (case-ignored);
+ * * If `from` is [String] and `toType` is enum, call `from.toString()` and find out the enum (case-ignored);
+ * * If `from` is enum and `toType` is [String], return `from.toString()`;
  */
 object CompatibleConvertHandler : ConvertHandler {
     override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
@@ -76,8 +77,11 @@ object CompatibleConvertHandler : ConvertHandler {
             if (fromClass.toWrapperClass() == toType.toWrapperClass()) {
                 return from
             }
-            if (toType.isEnum) {
+            if (fromClass == String::class.java && toType.isEnum) {
                 return toType.enumValueIgnoreCaseOrNull<Any>(from.toString())
+            }
+            if (fromClass.isEnum && toType == String::class.java) {
+                return from.toString()
             }
         }
         return null
@@ -95,7 +99,7 @@ object LowerBoundConvertHandler : ConvertHandler {
                 if (lowerBound === null) {
                     null
                 } else {
-                    context.converter.convert<Any?>(from, fromType, lowerBound)
+                    context.converter.convertOrNull<Any>(from, fromType, lowerBound)
                 }
             }
             else -> null
@@ -178,6 +182,12 @@ open class DateTimeConvertHandler @JvmOverloads constructor(
     private val dateFormat: DateFormat? = null,
     private val dateTimeFormatter: DateTimeFormatter? = null,
 ) : ConvertHandler {
+
+    @JvmOverloads
+    constructor(
+        dateFormatPattern: CharSequence,
+        dateTimeFormatterPattern: CharSequence = dateFormatPattern
+    ) : this(dateFormatPattern.toDateFormat(), dateTimeFormatterPattern.toDateTimeFormatter())
 
     override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (toType !is Class<*>) {
@@ -338,7 +348,7 @@ object IterableConvertHandler : ConvertHandler {
  * * [SetMap], [ListMap];
  */
 open class BeanConvertHandler @JvmOverloads constructor(
-    private val beanBuilder: BeanBuilder = BeanBuilder.DEFAULT,
+    private val beanCreator: BeanCreator = BeanCreator.DEFAULT,
     private val beanResolver: BeanResolver = BeanResolver.DEFAULT,
 ) : ConvertHandler {
 
@@ -405,10 +415,10 @@ open class BeanConvertHandler @JvmOverloads constructor(
         if (toType !is Class<*>) {
             return null
         }
-        val builder = beanBuilder.newBuilder(toType)
+        val builder = beanCreator.newBuilder(toType)
         //from.copyProperties(builder, newBeanProvider.builderType(builder, toType), beanResolver, converter)
         from.copyProperties(builder, beanResolver, converter)
-        return beanBuilder.build(builder)
+        return beanCreator.build(builder)
     }
 
     companion object {

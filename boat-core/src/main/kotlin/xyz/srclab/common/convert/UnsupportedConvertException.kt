@@ -1,8 +1,8 @@
 package xyz.srclab.common.convert
 
+import java.lang.reflect.Type
+
 open class UnsupportedConvertException : RuntimeException {
-    constructor() : super()
-    constructor(message: CharSequence?) : super(message?.toString())
-    constructor(message: CharSequence?, cause: Throwable?) : super(message?.toString(), cause)
-    constructor(cause: Throwable?) : super(cause)
+    constructor(fromType: Type, toType: Type) : super("Convert is unsupported: $fromType -> $toType")
+    constructor(from: Any?, toType: Type) : super("Convert is unsupported: ${from?.javaClass} -> $toType")
 }

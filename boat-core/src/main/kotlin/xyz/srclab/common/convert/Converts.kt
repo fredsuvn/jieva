@@ -2,27 +2,58 @@
 
 package xyz.srclab.common.convert
 
-import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type
 
 private val defaultConverter = Converter.DEFAULT
 
-fun <T> Any?.convert(toType: Class<T>): T {
+@Throws(UnsupportedConvertException::class)
+fun <T : Any> Any?.convert(toType: Class<T>): T {
     return defaultConverter.convert(this, toType)
 }
 
-fun <T> Any?.convert(toType: Type): T {
+@Throws(UnsupportedConvertException::class)
+fun <T : Any> Any?.convert(toType: Type): T {
     return defaultConverter.convert(this, toType)
 }
 
-fun <T> Any?.convert(fromType: Type, toType: Type): T {
+@Throws(UnsupportedConvertException::class)
+fun <T : Any> Any?.convert(fromType: Type, toType: Class<T>): T {
     return defaultConverter.convert(this, fromType, toType)
 }
 
-fun <T> Any?.convert(toTypeRef: TypeRef<T>): T {
-    return defaultConverter.convert(this, toTypeRef)
+@Throws(UnsupportedConvertException::class)
+fun <T : Any> Any?.convert(fromType: Type, toType: Type): T {
+    return defaultConverter.convert(this, fromType, toType)
 }
 
-fun <F, R> Any?.convert(fromTypeRef: TypeRef<F>, toTypeRef: TypeRef<R>): R {
-    return defaultConverter.convert(this, fromTypeRef, toTypeRef)
+fun <T : Any> Any?.convertOrDefault(toType: Class<T>, defaultValue: T): T {
+    return defaultConverter.convertOrDefault(this, toType, defaultValue)
+}
+
+fun <T : Any> Any?.convertOrDefault(toType: Type, defaultValue: T): T {
+    return defaultConverter.convertOrDefault(this, toType, defaultValue)
+}
+
+fun <T : Any> Any?.convertOrDefault(fromType: Type, toType: Class<T>, defaultValue: T): T {
+    return defaultConverter.convertOrDefault(this, fromType, toType, defaultValue)
+}
+
+fun <T : Any> Any?.convertOrDefault(fromType: Type, toType: Type, defaultValue: T): T {
+    return defaultConverter.convertOrDefault(this, fromType, toType, defaultValue)
+}
+
+fun <T : Any> Any?.convertOrNull(toType: Class<T>): T? {
+    return defaultConverter.convertOrNull(this, toType)
+}
+
+fun <T : Any> Any?.convertOrNull(toType: Type): T? {
+    return defaultConverter.convertOrNull(this, toType)
+}
+
+fun <T : Any> Any?.convertOrNull(fromType: Type, toType: Class<T>): T? {
+    return defaultConverter.convertOrNull(this, fromType, toType)
+}
+
+fun <T : Any> Any?.convertOrNull(fromType: Type, toType: Type): T? {
+    return defaultConverter.convertOrNull(this, fromType, toType)
 }
