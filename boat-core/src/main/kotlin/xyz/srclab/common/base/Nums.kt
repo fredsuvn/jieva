@@ -17,14 +17,19 @@ import kotlin.text.toLong as toLongKt
 import kotlin.text.toShort as toShortKt
 
 /**
+ * Default number value of null: 0
+ */
+const val NULL_NUMBER_VALUE = 0
+
+/**
  * Default radix: 10.
  */
 const val DEFAULT_RADIX: Int = 10
 
 @JvmOverloads
-fun Any?.toByte(radix: Int = DEFAULT_RADIX): Byte {
+fun Any?.toByte(defaultValue: Byte = NULL_NUMBER_VALUE.toByte(), radix: Int = DEFAULT_RADIX): Byte {
     return when (this) {
-        null -> 0
+        null -> defaultValue
         is Number -> if (radix == 10) toByte() else toString().toByteKt(radix)
         false -> 0
         true -> 1
@@ -33,9 +38,9 @@ fun Any?.toByte(radix: Int = DEFAULT_RADIX): Byte {
 }
 
 @JvmOverloads
-fun Any?.toShort(radix: Int = DEFAULT_RADIX): Short {
+fun Any?.toShort(defaultValue: Short = NULL_NUMBER_VALUE.toShort(), radix: Int = DEFAULT_RADIX): Short {
     return when (this) {
-        null -> 0
+        null -> defaultValue
         is Number -> if (radix == 10) toShort() else toString().toShortKt(radix)
         false -> 0
         true -> 1
@@ -44,14 +49,14 @@ fun Any?.toShort(radix: Int = DEFAULT_RADIX): Short {
 }
 
 @JvmOverloads
-fun Any?.toChar(radix: Int = DEFAULT_RADIX): Char {
-    return toInt(radix).toChar()
+fun Any?.toChar(defaultValue: Char = NULL_NUMBER_VALUE.toChar(), radix: Int = DEFAULT_RADIX): Char {
+    return toInt(radix).toChar(defaultValue)
 }
 
 @JvmOverloads
-fun Any?.toInt(radix: Int = DEFAULT_RADIX): Int {
+fun Any?.toInt(defaultValue: Int = NULL_NUMBER_VALUE, radix: Int = DEFAULT_RADIX): Int {
     return when (this) {
-        null -> 0
+        null -> defaultValue
         is Number -> if (radix == 10) toInt() else toString().toIntKt(radix)
         false -> 0
         true -> 1
@@ -60,9 +65,9 @@ fun Any?.toInt(radix: Int = DEFAULT_RADIX): Int {
 }
 
 @JvmOverloads
-fun Any?.toLong(radix: Int = DEFAULT_RADIX): Long {
+fun Any?.toLong(defaultValue: Long = NULL_NUMBER_VALUE.toLong(), radix: Int = DEFAULT_RADIX): Long {
     return when (this) {
-        null -> 0L
+        null -> defaultValue
         is Number -> if (radix == 10) toLong() else toString().toLongKt(radix)
         false -> 0L
         true -> 1L
@@ -70,9 +75,10 @@ fun Any?.toLong(radix: Int = DEFAULT_RADIX): Long {
     }
 }
 
-fun Any?.toFloat(): Float {
+@JvmOverloads
+fun Any?.toFloat(defaultValue: Float = NULL_NUMBER_VALUE.toFloat()): Float {
     return when (this) {
-        null -> 0f
+        null -> defaultValue
         is Number -> toFloat()
         false -> 0f
         true -> 1f
@@ -80,9 +86,10 @@ fun Any?.toFloat(): Float {
     }
 }
 
-fun Any?.toDouble(): Double {
+@JvmOverloads
+fun Any?.toDouble(defaultValue: Double = NULL_NUMBER_VALUE.toDouble()): Double {
     return when (this) {
-        null -> 0.0
+        null -> defaultValue
         is Number -> toDouble()
         false -> 0.0
         true -> 1.0
@@ -91,9 +98,9 @@ fun Any?.toDouble(): Double {
 }
 
 @JvmOverloads
-fun Any?.toBigInteger(radix: Int = DEFAULT_RADIX): BigInteger {
+fun Any?.toBigInteger(defaultValue: BigInteger = BigInteger.ZERO, radix: Int = DEFAULT_RADIX): BigInteger {
     if (this === null) {
-        return BigInteger.ZERO
+        return defaultValue
     }
     if (this is BigInteger) {
         return this
@@ -113,9 +120,13 @@ fun Any?.toBigInteger(radix: Int = DEFAULT_RADIX): BigInteger {
     return str.toBigIntegerKt(radix)
 }
 
-fun Any?.toBigDecimal(mathContext: MathContext = MathContext.UNLIMITED): BigDecimal {
+@JvmOverloads
+fun Any?.toBigDecimal(
+    defaultValue: BigDecimal = BigDecimal.ZERO,
+    mathContext: MathContext = MathContext.UNLIMITED
+): BigDecimal {
     if (this === null) {
-        return BigDecimal.ZERO
+        return defaultValue
     }
     if (this is BigDecimal) {
         return this
@@ -217,9 +228,10 @@ fun Long.toOctalString(size: Int = 22): String {
  * * +0774411: positive octal;
  * * 0b001100: positive binary;
  */
-fun CharSequence?.parseToBigInteger(): BigInteger {
+@JvmOverloads
+fun CharSequence?.parseToBigInteger(defaultValue: BigInteger = BigInteger.ZERO): BigInteger {
     if (this.isNullOrBlank()) {
-        return BigInteger.ZERO
+        return defaultValue
     }
 
     fun parse(offset: Int): BigInteger {
@@ -257,7 +269,11 @@ fun CharSequence?.parseToBigInteger(): BigInteger {
  *
  * @see parseToBigInteger
  */
-fun CharSequence?.parseToInt(): Int {
+@JvmOverloads
+fun CharSequence?.parseToInt(defaultValue: Int = NULL_NUMBER_VALUE): Int {
+    if (this === null) {
+        return defaultValue
+    }
     return parseToBigInteger().toInt()
 }
 
@@ -274,6 +290,10 @@ fun CharSequence?.parseToInt(): Int {
  *
  * @see parseToBigInteger
  */
-fun CharSequence?.parseToLong(): Long {
+@JvmOverloads
+fun CharSequence?.parseToLong(defaultValue: Long = NULL_NUMBER_VALUE.toLong()): Long {
+    if (this === null) {
+        return defaultValue
+    }
     return parseToBigInteger().toLong()
 }
