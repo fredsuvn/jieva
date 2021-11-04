@@ -1,5 +1,7 @@
 package xyz.srclab.common.base
 
+
+
 /**
  * Jump statement for process control: [CONTINUE], [BREAK] or [RETURN].
  */

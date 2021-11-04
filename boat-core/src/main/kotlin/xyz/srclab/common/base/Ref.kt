@@ -1,6 +1,5 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.Ref.Companion.toRef
 import java.util.function.Consumer
 
 /**
@@ -31,15 +30,6 @@ import java.util.function.Consumer
  * List<String> list = Arrays.asList("-1", "-2", "-3");
  * list.forEach(i -> ref.set(ref.get() + i));
  * ```
- *
- * @see BooleanRef
- * @see ByteRef
- * @see ShortRef
- * @see CharRef
- * @see IntRef
- * @see LongRef
- * @see FloatRef
- * @see DoubleRef
  */
 interface Ref<T : Any> : TypedAccessor<T> {
 
@@ -137,325 +127,48 @@ interface Ref<T : Any> : TypedAccessor<T> {
 }
 
 /**
- * Boolean type of [Ref].
+ * Ref of an array.
+ *
+ * @param A array type
  */
-interface BooleanRef {
+interface ArrayRef<A : Any> {
 
-    fun get(): Boolean
+    /**
+     * Returns source array.
+     */
+    val array: A
 
-    fun set(value: Boolean)
-
-    fun toObjectRef(): Ref<Boolean> {
-        return get().toRef<Boolean>()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun Boolean.toRef(): BooleanRef {
-            return BooleanRefImpl(this)
-        }
-
-        private class BooleanRefImpl(private var value: Boolean) : BooleanRef {
-
-            override fun get(): Boolean {
-                return value
-            }
-
-            override fun set(value: Boolean) {
-                this.value = value
-            }
-        }
-    }
-}
-
-/**
- * Byte type of [Ref].
- */
-interface ByteRef {
-
-    fun get(): Byte
-
-    fun set(value: Byte)
-
-    fun toObjectRef(): Ref<Byte> {
-        return get().toRef<Byte>()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun Byte.toRef(): ByteRef {
-            return ByteRefImpl(this)
-        }
-
-        private class ByteRefImpl(private var value: Byte) : ByteRef {
-
-            override fun get(): Byte {
-                return value
-            }
-
-            override fun set(value: Byte) {
-                this.value = value
-            }
-        }
-    }
-}
-
-/**
- * Short type of [Ref].
- */
-interface ShortRef {
-
-    fun get(): Short
-
-    fun set(value: Short)
-
-    fun toObjectRef(): Ref<Short> {
-        return get().toRef<Short>()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun Short.toRef(): ShortRef {
-            return ShortRefImpl(this)
-        }
-
-        private class ShortRefImpl(private var value: Short) : ShortRef {
-
-            override fun get(): Short {
-                return value
-            }
-
-            override fun set(value: Short) {
-                this.value = value
-            }
-        }
-    }
-}
-
-/**
- * Char type of [Ref].
- */
-interface CharRef {
-
-    fun get(): Char
-
-    fun set(value: Char)
-
-    fun toObjectRef(): Ref<Char> {
-        return get().toRef<Char>()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun Char.toRef(): CharRef {
-            return CharRefImpl(this)
-        }
-
-        private class CharRefImpl(private var value: Char) : CharRef {
-
-            override fun get(): Char {
-                return value
-            }
-
-            override fun set(value: Char) {
-                this.value = value
-            }
-        }
-    }
-}
-
-/**
- * Int type of [Ref].
- */
-interface IntRef {
-
-    fun get(): Int
-
-    fun set(value: Int)
-
-    fun toObjectRef(): Ref<Int> {
-        return get().toRef<Int>()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun Int.toRef(): IntRef {
-            return IntRefImpl(this)
-        }
-
-        private class IntRefImpl(private var value: Int) : IntRef {
-
-            override fun get(): Int {
-                return value
-            }
-
-            override fun set(value: Int) {
-                this.value = value
-            }
-        }
-    }
-}
-
-/**
- * Long type of [Ref].
- */
-interface LongRef {
-
-    fun get(): Long
-
-    fun set(value: Long)
-
-    fun toObjectRef(): Ref<Long> {
-        return get().toRef<Long>()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun Long.toRef(): LongRef {
-            return LongRefImpl(this)
-        }
-
-        private class LongRefImpl(private var value: Long) : LongRef {
-
-            override fun get(): Long {
-                return value
-            }
-
-            override fun set(value: Long) {
-                this.value = value
-            }
-        }
-    }
-}
-
-/**
- * Float type of [Ref].
- */
-interface FloatRef {
-
-    fun get(): Float
-
-    fun set(value: Float)
-
-    fun toObjectRef(): Ref<Float> {
-        return get().toRef<Float>()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun Float.toRef(): FloatRef {
-            return FloatRefImpl(this)
-        }
-
-        private class FloatRefImpl(private var value: Float) : FloatRef {
-
-            override fun get(): Float {
-                return value
-            }
-
-            override fun set(value: Float) {
-                this.value = value
-            }
-        }
-    }
-}
-
-/**
- * Double type of [Ref].
- */
-interface DoubleRef {
-
-    fun get(): Double
-
-    fun set(value: Double)
-
-    fun toObjectRef(): Ref<Double> {
-        return get().toRef<Double>()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun Double.toRef(): DoubleRef {
-            return DoubleRefImpl(this)
-        }
-
-        private class DoubleRefImpl(private var value: Double) : DoubleRef {
-
-            override fun get(): Double {
-                return value
-            }
-
-            override fun set(value: Double) {
-                this.value = value
-            }
-        }
-    }
-}
-
-interface BaseArrayRef {
     val startIndex: Int
     val endIndex: Int
     val offset: Int get() = startIndex
     val length: Int get() = endIndex - startIndex
-}
 
-/**
- * Ref of array.
- */
-interface ArrayRef<T> : BaseArrayRef {
-
-    val array: Array<T>
-
-    companion object {
-
-        @JvmOverloads
-        @JvmStatic
-        fun <T> of(array: Array<T>, startIndex: Int = 0, endIndex: Int = array.size): ArrayRef<T> {
-            return object : ArrayRef<T> {
-                override val array = array
-                override val startIndex = startIndex
-                override val endIndex = endIndex
-            }
-        }
-
-        @JvmOverloads
-        @JvmStatic
-        fun <T> offset(array: Array<T>, offset: Int = 0, length: Int = array.size - offset): ArrayRef<T> {
-            return of(array, offset, offset + length)
-        }
+    /**
+     * Returns a new array which is a copy of current range.
+     */
+    fun copyOfRange(): A {
+        val arr = array
+        return when (arr) {
+            is BooleanArray -> arr.copyOfRange(startIndex, endIndex)
+            is ByteArray -> arr.copyOfRange(startIndex, endIndex)
+            is CharArray -> arr.copyOfRange(startIndex, endIndex)
+            is ShortArray -> arr.copyOfRange(startIndex, endIndex)
+            is IntArray -> arr.copyOfRange(startIndex, endIndex)
+            is LongArray -> arr.copyOfRange(startIndex, endIndex)
+            is FloatArray -> arr.copyOfRange(startIndex, endIndex)
+            is DoubleArray -> arr.copyOfRange(startIndex, endIndex)
+            is Array<*> -> arr.copyOfRange(startIndex, endIndex)
+            else -> throw IllegalStateException("Not an array: ${array.javaClass}")
+        }.asAny()
     }
-}
-
-/**
- * Ref of boolean array.
- */
-interface BooleanArrayRef : BaseArrayRef {
-
-    val array: BooleanArray
 
     companion object {
 
         @JvmOverloads
         @JvmStatic
-        fun of(array: BooleanArray, startIndex: Int = 0, endIndex: Int = array.size): BooleanArrayRef {
-            return object : BooleanArrayRef {
-                override val array = array
+        fun <T> Array<T>.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<Array<T>> {
+            return object : ArrayRef<Array<T>> {
+                override val array = this@toArrayRef
                 override val startIndex = startIndex
                 override val endIndex = endIndex
             }
@@ -463,26 +176,9 @@ interface BooleanArrayRef : BaseArrayRef {
 
         @JvmOverloads
         @JvmStatic
-        fun offset(array: BooleanArray, offset: Int = 0, length: Int = array.size - offset): BooleanArrayRef {
-            return of(array, offset, offset + length)
-        }
-    }
-}
-
-/**
- * Ref of byte array.
- */
-interface ByteArrayRef : BaseArrayRef {
-
-    val array: ByteArray
-
-    companion object {
-
-        @JvmOverloads
-        @JvmStatic
-        fun of(array: ByteArray, startIndex: Int = 0, endIndex: Int = array.size): ByteArrayRef {
-            return object : ByteArrayRef {
-                override val array = array
+        fun BooleanArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<BooleanArray> {
+            return object : ArrayRef<BooleanArray> {
+                override val array = this@toArrayRef
                 override val startIndex = startIndex
                 override val endIndex = endIndex
             }
@@ -490,26 +186,9 @@ interface ByteArrayRef : BaseArrayRef {
 
         @JvmOverloads
         @JvmStatic
-        fun offset(array: ByteArray, offset: Int = 0, length: Int = array.size - offset): ByteArrayRef {
-            return of(array, offset, offset + length)
-        }
-    }
-}
-
-/**
- * Ref of short array.
- */
-interface ShortArrayRef : BaseArrayRef {
-
-    val array: ShortArray
-
-    companion object {
-
-        @JvmOverloads
-        @JvmStatic
-        fun of(array: ShortArray, startIndex: Int = 0, endIndex: Int = array.size): ShortArrayRef {
-            return object : ShortArrayRef {
-                override val array = array
+        fun ByteArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<ByteArray> {
+            return object : ArrayRef<ByteArray> {
+                override val array = this@toArrayRef
                 override val startIndex = startIndex
                 override val endIndex = endIndex
             }
@@ -517,26 +196,9 @@ interface ShortArrayRef : BaseArrayRef {
 
         @JvmOverloads
         @JvmStatic
-        fun offset(array: ShortArray, offset: Int = 0, length: Int = array.size - offset): ShortArrayRef {
-            return of(array, offset, offset + length)
-        }
-    }
-}
-
-/**
- * Ref of char array.
- */
-interface CharArrayRef : BaseArrayRef {
-
-    val array: CharArray
-
-    companion object {
-
-        @JvmOverloads
-        @JvmStatic
-        fun of(array: CharArray, startIndex: Int = 0, endIndex: Int = array.size): CharArrayRef {
-            return object : CharArrayRef {
-                override val array = array
+        fun CharArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<CharArray> {
+            return object : ArrayRef<CharArray> {
+                override val array = this@toArrayRef
                 override val startIndex = startIndex
                 override val endIndex = endIndex
             }
@@ -544,26 +206,9 @@ interface CharArrayRef : BaseArrayRef {
 
         @JvmOverloads
         @JvmStatic
-        fun offset(array: CharArray, offset: Int = 0, length: Int = array.size - offset): CharArrayRef {
-            return of(array, offset, offset + length)
-        }
-    }
-}
-
-/**
- * Ref of int array.
- */
-interface IntArrayRef : BaseArrayRef {
-
-    val array: IntArray
-
-    companion object {
-
-        @JvmOverloads
-        @JvmStatic
-        fun of(array: IntArray, startIndex: Int = 0, endIndex: Int = array.size): IntArrayRef {
-            return object : IntArrayRef {
-                override val array = array
+        fun ShortArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<ShortArray> {
+            return object : ArrayRef<ShortArray> {
+                override val array = this@toArrayRef
                 override val startIndex = startIndex
                 override val endIndex = endIndex
             }
@@ -571,26 +216,9 @@ interface IntArrayRef : BaseArrayRef {
 
         @JvmOverloads
         @JvmStatic
-        fun offset(array: IntArray, offset: Int = 0, length: Int = array.size - offset): IntArrayRef {
-            return of(array, offset, offset + length)
-        }
-    }
-}
-
-/**
- * Ref of long array.
- */
-interface LongArrayRef : BaseArrayRef {
-
-    val array: LongArray
-
-    companion object {
-
-        @JvmOverloads
-        @JvmStatic
-        fun of(array: LongArray, startIndex: Int = 0, endIndex: Int = array.size): LongArrayRef {
-            return object : LongArrayRef {
-                override val array = array
+        fun IntArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<IntArray> {
+            return object : ArrayRef<IntArray> {
+                override val array = this@toArrayRef
                 override val startIndex = startIndex
                 override val endIndex = endIndex
             }
@@ -598,26 +226,9 @@ interface LongArrayRef : BaseArrayRef {
 
         @JvmOverloads
         @JvmStatic
-        fun offset(array: LongArray, offset: Int = 0, length: Int = array.size - offset): LongArrayRef {
-            return of(array, offset, offset + length)
-        }
-    }
-}
-
-/**
- * Ref of float array.
- */
-interface FloatArrayRef : BaseArrayRef {
-
-    val array: FloatArray
-
-    companion object {
-
-        @JvmOverloads
-        @JvmStatic
-        fun of(array: FloatArray, startIndex: Int = 0, endIndex: Int = array.size): FloatArrayRef {
-            return object : FloatArrayRef {
-                override val array = array
+        fun LongArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<LongArray> {
+            return object : ArrayRef<LongArray> {
+                override val array = this@toArrayRef
                 override val startIndex = startIndex
                 override val endIndex = endIndex
             }
@@ -625,26 +236,9 @@ interface FloatArrayRef : BaseArrayRef {
 
         @JvmOverloads
         @JvmStatic
-        fun offset(array: FloatArray, offset: Int = 0, length: Int = array.size - offset): FloatArrayRef {
-            return of(array, offset, offset + length)
-        }
-    }
-}
-
-/**
- * Ref of double array.
- */
-interface DoubleArrayRef : BaseArrayRef {
-
-    val array: DoubleArray
-
-    companion object {
-
-        @JvmOverloads
-        @JvmStatic
-        fun of(array: DoubleArray, startIndex: Int = 0, endIndex: Int = array.size): DoubleArrayRef {
-            return object : DoubleArrayRef {
-                override val array = array
+        fun FloatArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<FloatArray> {
+            return object : ArrayRef<FloatArray> {
+                override val array = this@toArrayRef
                 override val startIndex = startIndex
                 override val endIndex = endIndex
             }
@@ -652,8 +246,32 @@ interface DoubleArrayRef : BaseArrayRef {
 
         @JvmOverloads
         @JvmStatic
-        fun offset(array: DoubleArray, offset: Int = 0, length: Int = array.size - offset): DoubleArrayRef {
-            return of(array, offset, offset + length)
+        fun DoubleArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<DoubleArray> {
+            return object : ArrayRef<DoubleArray> {
+                override val array = this@toArrayRef
+                override val startIndex = startIndex
+                override val endIndex = endIndex
+            }
+        }
+
+        @JvmOverloads
+        @JvmStatic
+        fun <A : Any> A.toArrayRef(
+            startIndex: Int = 0,
+            endIndex: Int = java.lang.reflect.Array.getLength(this)
+        ): ArrayRef<A> {
+            return when (this) {
+                is BooleanArray -> toArrayRef(startIndex, endIndex)
+                is ByteArray -> toArrayRef(startIndex, endIndex)
+                is CharArray -> toArrayRef(startIndex, endIndex)
+                is ShortArray -> toArrayRef(startIndex, endIndex)
+                is IntArray -> toArrayRef(startIndex, endIndex)
+                is LongArray -> toArrayRef(startIndex, endIndex)
+                is FloatArray -> toArrayRef(startIndex, endIndex)
+                is DoubleArray -> toArrayRef(startIndex, endIndex)
+                is Array<*> -> toArrayRef(startIndex, endIndex)
+                else -> throw IllegalStateException("Not an array: ${this.javaClass}")
+            }.asAny()
         }
     }
 }
