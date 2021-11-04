@@ -41,12 +41,12 @@ interface NamingCase {
     fun join(words: List<CharSequence>): String
 
     /**
-     * Converts [name] to [toCase] style.
+     * Converts [name] to [target] style.
      */
     @Throws(NamingCaseException::class)
-    fun convertTo(name: CharSequence, toCase: NamingCase): String {
+    fun convert(name: CharSequence, target: NamingCase): String {
         val words = segment(name)
-        return toCase.join(words)
+        return target.join(words)
     }
 
     companion object {
