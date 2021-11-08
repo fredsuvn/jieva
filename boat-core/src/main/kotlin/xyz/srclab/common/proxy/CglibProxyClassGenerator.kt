@@ -2,7 +2,7 @@ package xyz.srclab.common.proxy
 
 import net.sf.cglib.proxy.*
 import org.apache.commons.lang3.ArrayUtils
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import java.lang.reflect.Method
 import java.util.*
 
@@ -51,18 +51,18 @@ object CglibProxyClassGenerator : ProxyClassGenerator {
                     return proxy.invokeSuper(obj, args ?: ArrayUtils.EMPTY_CLASS_ARRAY)
                 }
             }
-            return proxyMethod.invoke(obj.asAny(), method, sourceInvoker, args)
+            return proxyMethod.invoke(obj.asTyped(), method, sourceInvoker, args)
         }
     }
 
     private class ProxyClassImpl<T : Any>(private val enhancer: Enhancer) : ProxyClass<T> {
 
         override fun instantiate(): T {
-            return enhancer.create().asAny()
+            return enhancer.create().asTyped()
         }
 
         override fun instantiate(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
-            return enhancer.create(parameterTypes, args).asAny()
+            return enhancer.create(parameterTypes, args).asTyped()
         }
     }
 }

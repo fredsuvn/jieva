@@ -188,15 +188,15 @@ fun Reader.loadProperties(): Map<String, String> {
 
 @JvmOverloads
 fun <T> ByteArray.loadClass(offset: Int = 0, length: Int = this.size - offset): Class<T> {
-    return BoatClassLoader.loadClass(this, offset, length).asAny()
+    return BoatClassLoader.loadClass(this, offset, length).asTyped()
 }
 
 fun <T> InputStream.loadClass(): Class<T> {
-    return BoatClassLoader.loadClass(this).asAny()
+    return BoatClassLoader.loadClass(this).asTyped()
 }
 
 fun <T> ByteBuffer.loadClass(): Class<T> {
-    return BoatClassLoader.loadClass(this).asAny()
+    return BoatClassLoader.loadClass(this).asTyped()
 }
 
 open class ResourceNotFoundException : RuntimeException {

@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import kotlin.collections.toList as toListKt
 
 fun <T> newSet(vararg elements: T): LinkedHashSet<T> {
@@ -43,9 +43,9 @@ fun <K, V, C : MutableMap<K, V>> C.putEntries(keyValues: Iterable<Any?>): C {
         val key = iterator.next()
         if (iterator.hasNext()) {
             val value = iterator.next()
-            this[key.asAny()] = value.asAny()
+            this[key.asTyped()] = value.asTyped()
         } else {
-            this[key.asAny()] = null.asAny()
+            this[key.asTyped()] = null.asTyped()
             break
         }
     }

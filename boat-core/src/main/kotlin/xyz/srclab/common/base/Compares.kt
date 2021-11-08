@@ -23,8 +23,8 @@ const val GREATER_THAN = 1
 @JvmField
 val COMPARABLE_COMPARATOR: Comparator<Comparable<*>> =
     Comparator { o1, o2 ->
-        val c1: Comparable<Any?> = o1.asAny()
-        val c2: Comparable<Any?> = o2.asAny()
+        val c1: Comparable<Any?> = o1.asTyped()
+        val c2: Comparable<Any?> = o2.asTyped()
         c1.compareTo(c2)
     }
 
@@ -46,7 +46,7 @@ val INHERITANCE_COMPARATOR: Comparator<Class<*>> =
  * @see COMPARABLE_COMPARATOR
  */
 fun <T> comparableComparator(): Comparator<T> {
-    return COMPARABLE_COMPARATOR.asAny()
+    return COMPARABLE_COMPARATOR.asTyped()
 }
 
 /**

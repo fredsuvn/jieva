@@ -82,7 +82,7 @@ interface Ref<T : Any> : TypedAccessor<T> {
      */
     fun <R : Any> with(action: (T) -> R): Ref<R> {
         val v = getOrNull()
-        val thisRef = this.asAny<Ref<R>>()
+        val thisRef = this.asTyped<Ref<R>>()
         if (v === null) {
             thisRef.set(null)
         } else {
@@ -98,7 +98,7 @@ interface Ref<T : Any> : TypedAccessor<T> {
      */
     fun <R : Any> withOrNull(action: (T?) -> R?): Ref<R> {
         val v = getOrNull()
-        val thisRef = this.asAny<Ref<R>>()
+        val thisRef = this.asTyped<Ref<R>>()
         thisRef.set(action(v))
         return thisRef
     }
@@ -159,7 +159,7 @@ interface ArrayRef<A : Any> {
             is DoubleArray -> arr.copyOfRange(startIndex, endIndex)
             is Array<*> -> arr.copyOfRange(startIndex, endIndex)
             else -> throw IllegalStateException("Not an array: ${array.javaClass}")
-        }.asAny()
+        }.asTyped()
     }
 
     companion object {
@@ -271,7 +271,7 @@ interface ArrayRef<A : Any> {
                 is DoubleArray -> toArrayRef(startIndex, endIndex)
                 is Array<*> -> toArrayRef(startIndex, endIndex)
                 else -> throw IllegalStateException("Not an array: ${this.javaClass}")
-            }.asAny()
+            }.asTyped()
         }
     }
 }

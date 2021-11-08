@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
 import kotlin.collections.joinTo as joinToKt
@@ -12,11 +12,11 @@ import kotlin.collections.joinToString as joinToStringKt
 private const val NOT_ARRAY_TYPE_PREFIX = "Not a array type"
 
 fun <T> asArray(vararg elements: T): Array<T> {
-    return elements.asAny()
+    return elements.asTyped()
 }
 
 fun <T> Type.newArray(length: Int): Array<T> {
-    return java.lang.reflect.Array.newInstance(this.rawClass, length).asAny()
+    return java.lang.reflect.Array.newInstance(this.rawClass, length).asTyped()
 }
 
 /**
@@ -33,15 +33,15 @@ fun <T> Any.arrayAsList(): MutableList<T> {
  */
 fun <T> Any.arrayAsListOrNull(): MutableList<T>? {
     return when (this) {
-        is Array<*> -> this.asList().asAny()
-        is BooleanArray -> this.asList().asAny()
-        is ByteArray -> this.asList().asAny()
-        is ShortArray -> this.asList().asAny()
-        is CharArray -> this.asList().asAny()
-        is IntArray -> this.asList().asAny()
-        is LongArray -> this.asList().asAny()
-        is FloatArray -> this.asList().asAny()
-        is DoubleArray -> this.asList().asAny()
+        is Array<*> -> this.asList().asTyped()
+        is BooleanArray -> this.asList().asTyped()
+        is ByteArray -> this.asList().asTyped()
+        is ShortArray -> this.asList().asTyped()
+        is CharArray -> this.asList().asTyped()
+        is IntArray -> this.asList().asTyped()
+        is LongArray -> this.asList().asTyped()
+        is FloatArray -> this.asList().asTyped()
+        is DoubleArray -> this.asList().asTyped()
         else -> null
     }
 }

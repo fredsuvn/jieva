@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.ObjAccessor;
+import xyz.srclab.common.base.ObjectAccessor;
 import xyz.srclab.common.base.TypedAccessor;
 import xyz.srclab.common.base.TypedMapAccessor;
 import xyz.srclab.common.base.MapAccessor;
@@ -16,7 +16,7 @@ public class AccessorTest {
 
     @Test
     public void testAnyAccessor() {
-        TestObjAccessor singleAccessor = new TestObjAccessor();
+        TestObjectAccessor singleAccessor = new TestObjectAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
@@ -54,7 +54,7 @@ public class AccessorTest {
         Assert.assertEquals("777", mapAccessor.get("1"));
     }
 
-    public static class TestObjAccessor implements ObjAccessor {
+    public static class TestObjectAccessor implements ObjectAccessor {
 
         private String value;
 

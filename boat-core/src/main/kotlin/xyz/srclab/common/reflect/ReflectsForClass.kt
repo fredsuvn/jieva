@@ -5,7 +5,7 @@ package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.common.base.DOT_MATCHER
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.currentClassLoader
 import xyz.srclab.common.base.loadClass
 import java.lang.reflect.Modifier
@@ -92,7 +92,7 @@ val <T> Class<T>.arrayClass: Class<Array<T>>
  */
 @JvmOverloads
 fun <T> CharSequence.toClass(classLoader: ClassLoader = currentClassLoader()): Class<T> {
-    return Class.forName(this.toString(), true, classLoader).asAny()
+    return Class.forName(this.toString(), true, classLoader).asTyped()
 }
 
 @JvmOverloads
@@ -101,7 +101,7 @@ fun <T> CharSequence.toClassOrNull(classLoader: ClassLoader = currentClassLoader
         Class.forName(this.toString(), true, classLoader)
     } catch (e: ClassNotFoundException) {
         null
-    }.asAny()
+    }.asTyped()
 }
 
 /**
@@ -124,7 +124,7 @@ fun <T> Class<*>.instantiate(parameterTypes: Array<out Class<*>>, args: Array<ou
     } catch (e: NoSuchMethodException) {
         throw e
     }
-    return constructor.newInstance(*args).asAny()
+    return constructor.newInstance(*args).asTyped()
 }
 
 fun <T> Class<*>.instantiateOrNull(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T? {
@@ -133,7 +133,7 @@ fun <T> Class<*>.instantiateOrNull(parameterTypes: Array<out Class<*>>, args: Ar
     } catch (e: NoSuchMethodException) {
         null
     }
-    return constructor?.newInstance(*args)?.asAny()
+    return constructor?.newInstance(*args)?.asTyped()
 }
 
 /**

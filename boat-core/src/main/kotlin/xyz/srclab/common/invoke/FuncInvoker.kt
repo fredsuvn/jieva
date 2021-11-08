@@ -1,6 +1,6 @@
 package xyz.srclab.common.invoke
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.util.concurrent.Callable
@@ -14,7 +14,7 @@ interface FuncInvoker {
     fun invoke(vararg args: Any?): Any?
 
     fun <T> invokeTyped(vararg args: Any?): T {
-        return invoke(*args).asAny()
+        return invoke(*args).asTyped()
     }
 
     companion object {

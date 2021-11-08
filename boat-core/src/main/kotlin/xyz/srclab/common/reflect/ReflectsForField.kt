@@ -3,7 +3,7 @@
 
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import java.lang.reflect.Field
 
 /**
@@ -160,7 +160,7 @@ fun <T> Field.getValue(owner: Any?, force: Boolean = false): T {
         if (force) {
             this.isAccessible = true
         }
-        this.get(owner).asAny()
+        this.get(owner).asTyped()
     } catch (e: IllegalAccessException) {
         throw e
     }

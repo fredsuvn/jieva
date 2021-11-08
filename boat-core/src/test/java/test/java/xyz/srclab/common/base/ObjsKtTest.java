@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * @author sunqian
  */
-public class AnysTest {
+public class ObjsKtTest {
 
     @Test
     public void testEqual() {

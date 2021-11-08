@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.jvm.jvmDescriptor
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
@@ -28,7 +28,7 @@ object JdkProxyClassGenerator : ProxyClassGenerator {
                 arrayOf(sourceClass),
                 ProxyMethodInterceptor(sourceClass, proxyMethods)
             )
-                .asAny()
+                .asTyped()
         }
 
         override fun instantiate(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
@@ -74,7 +74,7 @@ object JdkProxyClassGenerator : ProxyClassGenerator {
                     throw IllegalStateException("Cannot call a interface method: $method")
                 }
             }
-            return proxyMethod.invoke(proxy.asAny(), method, sourceInvoker, args)
+            return proxyMethod.invoke(proxy.asTyped(), method, sourceInvoker, args)
         }
     }
 }

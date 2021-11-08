@@ -1,6 +1,6 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import java.time.Duration
 import java.util.concurrent.Callable
 import java.util.concurrent.ScheduledExecutorService
@@ -57,7 +57,7 @@ open class ScheduledExecutorServiceScheduler(
                 this.isStart = true
                 this.executionCount++
                 task.run()
-            }, delay.toNanos(), TimeUnit.NANOSECONDS).asAny()
+            }, delay.toNanos(), TimeUnit.NANOSECONDS).asTyped()
         }
     }
 
@@ -72,7 +72,7 @@ open class ScheduledExecutorServiceScheduler(
                     this.executionCount++
                     task()
                 }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
-            ).asAny()
+            ).asTyped()
         }
 
         constructor(initialDelay: Duration, period: Duration, task: Runnable) {
@@ -82,7 +82,7 @@ open class ScheduledExecutorServiceScheduler(
                     this.executionCount++
                     task.run()
                 }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
-            ).asAny()
+            ).asTyped()
         }
     }
 
@@ -97,7 +97,7 @@ open class ScheduledExecutorServiceScheduler(
                     this.executionCount++
                     task()
                 }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
-            ).asAny()
+            ).asTyped()
         }
 
         constructor(initialDelay: Duration, period: Duration, task: Runnable) {
@@ -107,7 +107,7 @@ open class ScheduledExecutorServiceScheduler(
                     this.executionCount++
                     task.run()
                 }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
-            ).asAny()
+            ).asTyped()
         }
     }
 

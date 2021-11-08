@@ -1,6 +1,6 @@
 package xyz.srclab.common.invoke
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import java.lang.reflect.Method
 
 /**
@@ -11,7 +11,7 @@ interface InstInvoker {
     fun invoke(inst: Any, vararg args: Any?): Any?
 
     fun <T> invokeTyped(inst: Any, vararg args: Any?): T {
-        return invoke(inst, *args).asAny()
+        return invoke(inst, *args).asTyped()
     }
 
     fun toFuncInvoker(inst: Any): FuncInvoker {

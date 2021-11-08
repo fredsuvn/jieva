@@ -1,4 +1,4 @@
-@file:JvmName("Anys")
+@file:JvmName("Objs")
 
 package xyz.srclab.common.base
 
@@ -6,16 +6,12 @@ import java.util.*
 import kotlin.toString as toStringKt
 
 @JvmName("as")
-fun <T> Any?.asAny(): T {
+fun <T> Any?.asTyped(): T {
     return this as T
 }
 
 @JvmName("as")
-fun <T> Nothing?.asAny(): T {
-    return this as T
-}
-
-fun <T : Any> T?.asNotNull(): T {
+fun <T> Nothing?.asTyped(): T {
     return this as T
 }
 

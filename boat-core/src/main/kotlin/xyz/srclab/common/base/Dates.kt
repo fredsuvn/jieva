@@ -436,7 +436,7 @@ private class TemporalAccessorWrapper(private val temporalAccessor: TemporalAcce
 
     override fun <R> query(query: TemporalQuery<R>): R {
         if (query == TemporalQueries.localTime()) {
-            return super.query(LOCAL_TIME).asAny()
+            return super.query(LOCAL_TIME).asTyped()
         }
         return super.query(query)
     }

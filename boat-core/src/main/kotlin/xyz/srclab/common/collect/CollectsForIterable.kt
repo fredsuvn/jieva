@@ -941,7 +941,7 @@ fun <T, R> Iterable<T>.toArray(componentType: Type, selector: ((T) -> R)? = null
     if (selector !== null) {
         collection.forEach { i, t -> result[i] = selector(t) }
     } else {
-        collection.forEach { i, t -> result[i] = t.asAny() }
+        collection.forEach { i, t -> result[i] = t.asTyped() }
     }
     return result
 }
@@ -1022,7 +1022,7 @@ fun <T, R, A> Iterable<T>.toAnyArray(componentType: Type, selector: ((T) -> R)? 
         Float::class.javaPrimitiveType -> this.toFloatArray()
         Double::class.javaPrimitiveType -> this.toDoubleArray()
         else -> this.toArray(componentType, selector)
-    }.asAny()
+    }.asTyped()
 }
 
 fun <T> Iterable<T>.plus(element: T): List<T> {

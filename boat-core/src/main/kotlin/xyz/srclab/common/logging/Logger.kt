@@ -1,7 +1,7 @@
 package xyz.srclab.common.logging
 
 import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.callerStackTrace
 import xyz.srclab.common.base.stackTraceToString
 import java.io.PrintStream
@@ -91,7 +91,7 @@ interface Logger {
                 }
 
                 //Configures args.
-                val arguments: Array<Any?> = args.asAny()
+                val arguments: Array<Any?> = args.asTyped()
                 val length = arguments.size
                 if (arguments.isNotEmpty()) {
                     val lastArgument = arguments[length - 1]

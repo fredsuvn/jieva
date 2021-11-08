@@ -3,67 +3,76 @@ package xyz.srclab.common.base
 import xyz.srclab.common.collect.removeAll
 
 /**
- * Accessor for object.
+ * Accessor for specified object.
  *
- * @see ObjGetter
- * @see ObjSetter
+ * @see ObjectGetter
+ * @see ObjectSetter
  * @see TypedAccessor
  */
-interface ObjAccessor : ObjGetter, ObjSetter
+interface ObjectAccessor : ObjectGetter, ObjectSetter
 
 /**
- * Getter for object.
+ * Getter for specified object.
  *
- * @see ObjAccessor
+ * @see ObjectAccessor
  */
-interface ObjGetter {
+interface ObjectGetter {
 
     val isPresent: Boolean
         get() {
-            return getOrNull<Any>() !== null
+            return getOrNull() !== null
         }
 
     @Throws(NullPointerException::class)
-    fun <T : Any> get(): T {
+    fun get(): Any {
         return getOrNull()!!
     }
 
-    fun <T : Any> getOrNull(): T?
+    fun getOrNull(): Any?
+
+    @Throws(NullPointerException::class)
+    fun <T : Any> getTyped(): T {
+        return getTypedOrNull()!!
+    }
+
+    fun <T : Any> getTypedOrNull(): T? {
+        return getOrNull().asTyped()
+    }
 
     fun <T : Any> getOrElse(value: T): T {
-        return getOrNull() ?: value
+        return getTypedOrNull() ?: value
     }
 
     fun <T : Any> getOrElse(supplier: () -> T): T {
-        return getOrNull() ?: supplier()
+        return getTypedOrNull() ?: supplier()
     }
 
     fun <T : Any> getOrThrow(supplier: () -> Throwable): T {
-        return getOrNull() ?: throw supplier()
+        return getTypedOrNull() ?: throw supplier()
     }
 }
 
 /**
- * Setter for object.
+ * Setter for specified object.
  *
- * @see ObjAccessor
+ * @see ObjectAccessor
  */
-interface ObjSetter {
+interface ObjectSetter {
 
     fun set(value: Any?)
 }
 
 /**
- * Accessor for typed object.
+ * Accessor for specified object as typed.
  *
  * @see TypedGetter
  * @see TypedSetter
- * @see ObjAccessor
+ * @see ObjectAccessor
  */
 interface TypedAccessor<T : Any> : TypedGetter<T>, TypedSetter<T>
 
 /**
- * Getter for typed object.
+ * Getter for specified object as typed.
  *
  * @see TypedAccessor
  */
@@ -95,7 +104,7 @@ interface TypedGetter<T : Any> {
 }
 
 /**
- * Setter for typed object.
+ * Setter for specified object as typed.
  *
  * @see TypedAccessor
  */
@@ -107,6 +116,8 @@ interface TypedSetter<T : Any> {
 /**
  * Accessor for map.
  *
+ * This is a simple interface of [MutableMap].
+ *
  * @see MapGetter
  * @see MapSetter
  * @see TypedMapAccessor
@@ -116,33 +127,44 @@ interface MapAccessor : MapGetter, MapSetter
 /**
  * Getter for map.
  *
+ * This is a simple interface of [Map].
+ *
  * @see MapAccessor
  */
 interface MapGetter {
 
     fun isPresent(key: Any): Boolean {
-        return getOrNull<Any>(key) !== null
+        return asMap().containsKey(key)
     }
 
     @Throws(NullPointerException::class)
-    fun <T : Any> get(key: Any): T {
+    fun get(key: Any): Any {
         return getOrNull(key)!!
     }
 
-    fun <T : Any> getOrNull(key: Any): T? {
-        return asMap()[key].asAny()
+    fun getOrNull(key: Any): Any? {
+        return asMap()[key]
+    }
+
+    @Throws(NullPointerException::class)
+    fun <T : Any> getTyped(key: Any): T {
+        return getTypedOrNull(key)!!
+    }
+
+    fun <T : Any> getTypedOrNull(key: Any): T? {
+        return asMap()[key].asTyped()
     }
 
     fun <T : Any> getOrElse(key: Any, value: T): T {
-        return getOrNull(key) ?: value
+        return getTypedOrNull(key) ?: value
     }
 
     fun <T : Any> getOrElse(key: Any, supplier: (key: Any) -> T): T {
-        return getOrNull(key) ?: supplier(key)
+        return getTypedOrNull(key) ?: supplier(key)
     }
 
     fun <T : Any> getOrThrow(key: Any, supplier: (key: Any) -> Throwable): T {
-        return getOrNull(key) ?: throw supplier(key)
+        return getTypedOrNull(key) ?: throw supplier(key)
     }
 
     /**
@@ -153,7 +175,9 @@ interface MapGetter {
 }
 
 /**
- * Setter for map type.
+ * Setter for map.
+ *
+ * This is a simple interface of [MutableMap].
  *
  * @see MapAccessor
  */
@@ -193,6 +217,8 @@ interface MapSetter {
 /**
  * Accessor for typed map.
  *
+ * This is a simple interface of [MutableMap].
+ *
  * @see TypedMapGetter
  * @see TypedMapSetter
  * @see MapAccessor
@@ -202,12 +228,14 @@ interface TypedMapAccessor<K : Any, V : Any> : TypedMapGetter<K, V>, TypedMapSet
 /**
  * Getter for typed map.
  *
+ * This is a simple interface of [Map].
+ *
  * @see TypedMapAccessor
  */
 interface TypedMapGetter<K : Any, V : Any> {
 
     fun isPresent(key: K): Boolean {
-        return getOrNull(key) !== null
+        return asMap().containsKey(key)
     }
 
     @Throws(NullPointerException::class)
@@ -240,6 +268,8 @@ interface TypedMapGetter<K : Any, V : Any> {
 
 /**
  * Setter for typed map.
+ *
+ * This is a simple interface of [MutableMap].
  *
  * @see TypedMapAccessor
  */

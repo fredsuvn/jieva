@@ -6,7 +6,7 @@ package xyz.srclab.common.reflect
 import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import java.lang.reflect.*
 
 val Type.isArray: Boolean
@@ -29,7 +29,7 @@ val Type.componentTypeOrNull: Type?
 
 val ParameterizedType.rawClass: Class<*>
     get() {
-        return this.rawType.asAny()
+        return this.rawType.asTyped()
     }
 
 val GenericArrayType.rawClass: Class<*>
@@ -242,7 +242,7 @@ fun Type.eraseTypeParameters(
     typeArguments: Map<TypeVariable<*>, Type>,
     @Written searchStack: MutableSet<TypeVariable<*>> = HashSet()
 ): Type {
-    return eraseTypeParameters(typeArguments.asAny(), searchStack, false)
+    return eraseTypeParameters(typeArguments.asTyped(), searchStack, false)
 }
 
 private fun Type.eraseTypeParameters(

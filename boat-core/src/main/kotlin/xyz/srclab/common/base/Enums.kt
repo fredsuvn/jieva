@@ -12,7 +12,7 @@ fun <T> Class<*>.enumValue(name: CharSequence): T {
 @JvmName("getValueOrNull")
 fun <T> Class<*>.enumValueOrNull(name: CharSequence): T? {
     return try {
-        JavaEnum.valueOf(this.asAny<Class<Enum<*>>>(), name.toString()).asAny()
+        JavaEnum.valueOf(this.asTyped<Class<Enum<*>>>(), name.toString()).asTyped()
     } catch (e: Exception) {
         null
     }
@@ -32,10 +32,10 @@ fun <T> Class<*>.enumValueIgnoreCaseOrNull(name: CharSequence): T? {
         return t
     }
     val values: Array<out Enum<*>> =
-        this.enumConstants.asAny() ?: throw IllegalArgumentException("Must be an enum type: $this")
+        this.enumConstants.asTyped() ?: throw IllegalArgumentException("Must be an enum type: $this")
     for (value in values) {
         if (value.name.contentEquals(name, true)) {
-            return value.asAny()
+            return value.asTyped()
         }
     }
     return null
@@ -51,7 +51,7 @@ fun <T> Class<*>.enumValue(index: Int): T {
 fun <T> Class<*>.enumValueOrNull(index: Int): T? {
     val values = this.enumConstants ?: throw IllegalArgumentException("Must be an enum type: $this")
     if (isIndexInBounds(index, 0, values.size)) {
-        return values[index].asAny()
+        return values[index].asTyped()
     }
     return null
 }

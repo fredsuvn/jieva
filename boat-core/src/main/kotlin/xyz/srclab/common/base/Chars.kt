@@ -174,7 +174,7 @@ fun Array<out Any?>.toStringArray(): Array<String> {
     for ((i, t) in this.withIndex()) {
         result[i] = t.toString()
     }
-    return result.asAny()
+    return result.asTyped()
 }
 
 fun Array<out Any?>.toNullableStringArray(): Array<String?> {

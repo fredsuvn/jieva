@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.invoke.InstInvoker
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -75,7 +75,7 @@ interface PropertyType {
     }
 
     fun <T> getTypedValue(bean: Any): T {
-        return getValue(bean).asAny()
+        return getValue(bean).asTyped()
     }
 
     fun setValue(bean: Any, value: Any?) {

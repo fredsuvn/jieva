@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
 import com.google.common.collect.MapMaker
 import xyz.srclab.common.base.CacheableBuilder
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.availableProcessors
 import java.time.Duration
 import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
@@ -276,7 +276,7 @@ interface Cache<K : Any, V : Any> {
                         caffeineRemovalCause.EXPIRED -> CacheRemoveListener.Cause.EXPIRED
                         caffeineRemovalCause.SIZE -> CacheRemoveListener.Cause.SIZE
                     }
-                    params.removeListener.afterRemove(key.asAny(), value.asAny(), removeCause)
+                    params.removeListener.afterRemove(key.asTyped(), value.asTyped(), removeCause)
                 }
             }
             val loader = params.loader

@@ -1,6 +1,6 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.asAny
+import xyz.srclab.common.base.asTyped
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
 import java.util.concurrent.Future
@@ -93,7 +93,7 @@ object SyncRunner : Runner, Executor {
             if (exception !== null) {
                 throw ExecutionException(exception)
             }
-            return result.asAny()
+            return result.asTyped()
         }
 
         override fun get(timeout: Long, unit: TimeUnit): V {
