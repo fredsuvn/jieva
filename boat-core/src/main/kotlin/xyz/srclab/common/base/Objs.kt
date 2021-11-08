@@ -15,6 +15,16 @@ fun <T> Nothing?.asTyped(): T {
     return this as T
 }
 
+//Null:
+
+fun Any?.isNull(): Boolean {
+    return this === null
+}
+
+fun Any?.isNotNull(): Boolean {
+    return this !== null
+}
+
 //Equals:
 
 fun Any?.equals(other: Any?): Boolean {

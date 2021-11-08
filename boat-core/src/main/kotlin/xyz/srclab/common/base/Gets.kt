@@ -7,12 +7,64 @@ import java.lang.reflect.Type
 
 private val defaultConverter = Converter.DEFAULT
 
-fun <T : Any> get(any: T?, defaultValue: T): T {
-    return any ?: defaultValue
+@Throws(NullPointerException::class)
+fun <T : Any> T?.notNull(): T {
+    return this!!
+}
+
+@Throws(NullPointerException::class)
+fun <T : Any> T?.notNull( message: CharSequence): T {
+    return this ?: throw NullPointerException(message.toString())
+}
+
+@Throws(NullPointerException::class)
+fun <T : Any> T?.notNull( message: () -> CharSequence): T {
+    return this ?: throw NullPointerException(message().toString())
+}
+
+fun <T : Any> T?.orElse( value: T): T {
+    return this ?: value
+}
+
+fun <T : Any> T?.orElse( supplier: () -> T): T {
+    return this ?: supplier()
+}
+
+fun <T : Any> T?.orThrow( supplier: () -> Throwable): T {
+    return this.orElse { throw supplier() }
+}
+
+@Throws(IndexOutOfBoundsException::class,NullPointerException::class)
+fun <T : Any> Array<out T?>.notNull(index: Int): T {
+    return this[index].notNull()
+}
+
+@Throws(IndexOutOfBoundsException::class,NullPointerException::class)
+fun <T : Any> Iterable<T?>.notNull(index: Int): T {
+    return this.elementAt(index).notNull()
+}
+
+@Throws(NullPointerException::class)
+fun <T : Any> Map<*, T?>.notNull(key: Any?): T {
+    return this[key].notNull()
+}
+
+fun <T : Any> Array<out T?>.orNull(index: Int): T? {
+    if (!index.isIndexInBounds(0, this.size)) {
+        return null
+    }
+    return this[index]
+}
+
+fun <T : Any> Iterable<T?>.orNull(index: Int): T? {
+    if (!index.isIndexInBounds(0, this.count())) {
+        return null
+    }
+    return this.elementAtOrNull(index)
 }
 
 @JvmOverloads
-fun <T : Any> get(
+fun <T : Any> notNull(
     iterable: Iterable<*>,
     index: Int,
     toType: Class<T>,
@@ -23,7 +75,7 @@ fun <T : Any> get(
 }
 
 @JvmOverloads
-fun <T : Any> get(
+fun <T : Any> notNull(
     iterable: Iterable<*>,
     index: Int,
     toType: Type,
@@ -34,7 +86,7 @@ fun <T : Any> get(
 }
 
 @JvmOverloads
-fun <T : Any> get(
+fun <T : Any> notNull(
     map: Map<*, *>,
     key: Any?,
     toType: Class<T>,
@@ -45,7 +97,7 @@ fun <T : Any> get(
 }
 
 @JvmOverloads
-fun <T : Any> get(
+fun <T : Any> notNull(
     map: Map<*, *>,
     key: Any?,
     toType: Type,
