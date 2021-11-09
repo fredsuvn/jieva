@@ -39,20 +39,36 @@ interface Converter {
         return convertOrNull(from, fromType, toType) ?: throw UnsupportedConvertException(fromType, toType)
     }
 
-    fun <T : Any> convertOrDefault(from: Any?, toType: Class<T>, defaultValue: T): T {
+    fun <T> convertOrElse(from: Any?, toType: Class<T>, defaultValue: T): T {
         return convertOrNull(from, toType) ?: defaultValue
     }
 
-    fun <T : Any> convertOrDefault(from: Any?, toType: Type, defaultValue: T): T {
+    fun <T> convertOrElse(from: Any?, toType: Type, defaultValue: T): T {
         return convertOrNull(from, toType) ?: defaultValue
     }
 
-    fun <T : Any> convertOrDefault(from: Any?, fromType: Type, toType: Class<T>, defaultValue: T): T {
+    fun <T> convertOrElse(from: Any?, fromType: Type, toType: Class<T>, defaultValue: T): T {
         return convertOrNull(from, fromType, toType) ?: defaultValue
     }
 
-    fun <T : Any> convertOrDefault(from: Any?, fromType: Type, toType: Type, defaultValue: T): T {
+    fun <T> convertOrElse(from: Any?, fromType: Type, toType: Type, defaultValue: T): T {
         return convertOrNull(from, fromType, toType) ?: defaultValue
+    }
+
+    fun <T> convertOrElse(from: Any?, toType: Class<T>, defaultValue: () -> T): T {
+        return convertOrNull(from, toType) ?: defaultValue()
+    }
+
+    fun <T> convertOrElse(from: Any?, toType: Type, defaultValue: () -> T): T {
+        return convertOrNull(from, toType) ?: defaultValue()
+    }
+
+    fun <T> convertOrElse(from: Any?, fromType: Type, toType: Class<T>, defaultValue: () -> T): T {
+        return convertOrNull(from, fromType, toType) ?: defaultValue()
+    }
+
+    fun <T> convertOrElse(from: Any?, fromType: Type, toType: Type, defaultValue: () -> T): T {
+        return convertOrNull(from, fromType, toType) ?: defaultValue()
     }
 
     fun <T : Any> convertOrNull(from: Any?, toType: Class<T>): T? {
@@ -87,6 +103,11 @@ interface Converter {
     }
 
     companion object {
+
+        @JvmStatic
+        fun defaultConverter(): Converter {
+            return DEFAULT
+        }
 
         @JvmField
         val DEFAULT: Converter = newConverter(ConvertHandler.DEFAULTS)

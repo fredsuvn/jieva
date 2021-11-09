@@ -26,20 +26,36 @@ fun <T : Any> Any?.convert(fromType: Type, toType: Type): T {
     return defaultConverter.convert(this, fromType, toType)
 }
 
-fun <T : Any> Any?.convertOrDefault(toType: Class<T>, defaultValue: T): T {
-    return defaultConverter.convertOrDefault(this, toType, defaultValue)
+fun <T> Any?.convertOrElse(toType: Class<T>, defaultValue: T): T {
+    return defaultConverter.convertOrElse(this, toType, defaultValue)
 }
 
-fun <T : Any> Any?.convertOrDefault(toType: Type, defaultValue: T): T {
-    return defaultConverter.convertOrDefault(this, toType, defaultValue)
+fun <T> Any?.convertOrElse(toType: Type, defaultValue: T): T {
+    return defaultConverter.convertOrElse(this, toType, defaultValue)
 }
 
-fun <T : Any> Any?.convertOrDefault(fromType: Type, toType: Class<T>, defaultValue: T): T {
-    return defaultConverter.convertOrDefault(this, fromType, toType, defaultValue)
+fun <T> Any?.convertOrElse(fromType: Type, toType: Class<T>, defaultValue: T): T {
+    return defaultConverter.convertOrElse(this, fromType, toType, defaultValue)
 }
 
-fun <T : Any> Any?.convertOrDefault(fromType: Type, toType: Type, defaultValue: T): T {
-    return defaultConverter.convertOrDefault(this, fromType, toType, defaultValue)
+fun <T> Any?.convertOrElse(fromType: Type, toType: Type, defaultValue: T): T {
+    return defaultConverter.convertOrElse(this, fromType, toType, defaultValue)
+}
+
+fun <T> Any?.convertOrElse(toType: Class<T>, defaultValue: () -> T): T {
+    return defaultConverter.convertOrElse(this, toType, defaultValue)
+}
+
+fun <T> Any?.convertOrElse(toType: Type, defaultValue: () -> T): T {
+    return defaultConverter.convertOrElse(this, toType, defaultValue)
+}
+
+fun <T> Any?.convertOrElse(fromType: Type, toType: Class<T>, defaultValue: () -> T): T {
+    return defaultConverter.convertOrElse(this, fromType, toType, defaultValue)
+}
+
+fun <T> Any?.convertOrElse(fromType: Type, toType: Type, defaultValue: () -> T): T {
+    return defaultConverter.convertOrElse(this, fromType, toType, defaultValue)
 }
 
 fun <T : Any> Any?.convertOrNull(toType: Class<T>): T? {
