@@ -1,5 +1,6 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.annotations.ForJava
 import java.util.function.Consumer
 
 /**
@@ -29,6 +30,7 @@ import java.util.function.Consumer
  * list.forEach(i -> ref.set(ref.get() + i));
  * ```
  */
+@ForJava
 interface BRef<T : Any> : BAccessor<T> {
 
     /**
@@ -93,145 +95,3 @@ interface BRef<T : Any> : BAccessor<T> {
         }
     }
 }
-
-/**
- * Ref of an array.
- *
- * @param A array type
- */
-interface BArrayRef<A : Any, E> : BRef<A> {
-
-    /**
-     * Returns source array.
-     */
-    val array: A
-
-    val startIndex: Int
-    val endIndex: Int
-    val offset: Int get() = startIndex
-    val length: Int get() = endIndex - startIndex
-
-    operator fun get(index:Int):E
-
-    operator fun set(index:Int, value:E)
-
-    /**
-     * Returns a new array which is a copy of current range.
-     */
-    fun copyOfRange(): A
-
-    companion object {
-
-        //@JvmOverloads
-        //@JvmStatic
-        //fun <T> Array<T>.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<Array<T>> {
-        //    return object : BArrayRef<Array<T>> {
-        //        override val array = this@toArrayRef
-        //        override val startIndex = startIndex
-        //        override val endIndex = endIndex
-        //    }
-        //}
-        //
-        //@JvmOverloads
-        //@JvmStatic
-        //fun BooleanArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<BooleanArray> {
-        //    return object : BArrayRef<BooleanArray> {
-        //        override val array = this@toArrayRef
-        //        override val startIndex = startIndex
-        //        override val endIndex = endIndex
-        //    }
-        //}
-        //
-        //@JvmOverloads
-        //@JvmStatic
-        //fun ByteArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<ByteArray> {
-        //    return object : BArrayRef<ByteArray> {
-        //        override val array = this@toArrayRef
-        //        override val startIndex = startIndex
-        //        override val endIndex = endIndex
-        //    }
-        //}
-        //
-        //@JvmOverloads
-        //@JvmStatic
-        //fun CharArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<CharArray> {
-        //    return object : BArrayRef<CharArray> {
-        //        override val array = this@toArrayRef
-        //        override val startIndex = startIndex
-        //        override val endIndex = endIndex
-        //    }
-        //}
-        //
-        //@JvmOverloads
-        //@JvmStatic
-        //fun ShortArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<ShortArray> {
-        //    return object : BArrayRef<ShortArray> {
-        //        override val array = this@toArrayRef
-        //        override val startIndex = startIndex
-        //        override val endIndex = endIndex
-        //    }
-        //}
-        //
-        //@JvmOverloads
-        //@JvmStatic
-        //fun IntArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<IntArray> {
-        //    return object : BArrayRef<IntArray> {
-        //        override val array = this@toArrayRef
-        //        override val startIndex = startIndex
-        //        override val endIndex = endIndex
-        //    }
-        //}
-        //
-        //@JvmOverloads
-        //@JvmStatic
-        //fun LongArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<LongArray> {
-        //    return object : BArrayRef<LongArray> {
-        //        override val array = this@toArrayRef
-        //        override val startIndex = startIndex
-        //        override val endIndex = endIndex
-        //    }
-        //}
-        //
-        //@JvmOverloads
-        //@JvmStatic
-        //fun FloatArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<FloatArray> {
-        //    return object : BArrayRef<FloatArray> {
-        //        override val array = this@toArrayRef
-        //        override val startIndex = startIndex
-        //        override val endIndex = endIndex
-        //    }
-        //}
-        //
-        //@JvmOverloads
-        //@JvmStatic
-        //fun DoubleArray.toArrayRef(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<DoubleArray> {
-        //    return object : BArrayRef<DoubleArray> {
-        //        override val array = this@toArrayRef
-        //        override val startIndex = startIndex
-        //        override val endIndex = endIndex
-        //    }
-        //}
-        //
-        //@JvmOverloads
-        //@JvmStatic
-        //fun <A : Any> A.toArrayRef(
-        //    startIndex: Int = 0,
-        //    endIndex: Int = java.lang.reflect.Array.getLength(this)
-        //): BArrayRef<A> {
-        //    return when (this) {
-        //        is BooleanArray -> toArrayRef(startIndex, endIndex)
-        //        is ByteArray -> toArrayRef(startIndex, endIndex)
-        //        is CharArray -> toArrayRef(startIndex, endIndex)
-        //        is ShortArray -> toArrayRef(startIndex, endIndex)
-        //        is IntArray -> toArrayRef(startIndex, endIndex)
-        //        is LongArray -> toArrayRef(startIndex, endIndex)
-        //        is FloatArray -> toArrayRef(startIndex, endIndex)
-        //        is DoubleArray -> toArrayRef(startIndex, endIndex)
-        //        is Array<*> -> toArrayRef(startIndex, endIndex)
-        //        else -> throw IllegalStateException("Not an array: ${this.javaClass}")
-        //    }.asTyped()
-        //}
-    }
-}
-
-open class

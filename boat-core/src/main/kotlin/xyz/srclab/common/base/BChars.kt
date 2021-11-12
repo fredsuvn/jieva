@@ -6,6 +6,12 @@ import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.StringUtils
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+import java.util.*
+import kotlin.text.toCollection as toCollectionKt
+import kotlin.text.toHashSet as toHashSetKt
+import kotlin.text.toList as toListKt
+import kotlin.text.toSet as toSetKt
+import kotlin.text.toSortedSet as toSortedSetKt
 
 /**
  * Default charset: UTF-8.
@@ -61,6 +67,8 @@ val LETTER_MATCHER: CharMatcher = UPPER_CASE_MATCHER.and(LOWER_CASE_MATCHER)
 @JvmField
 val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')
 
+//Utils:
+
 /**
  * Checks if given chars is empty or null.
  */
@@ -89,8 +97,22 @@ fun CharSequence?.isWhitespace(): Boolean {
     return StringUtils.isWhitespace(this)
 }
 
+/**
+ * Capitalizes given chars.
+ */
+fun CharSequence.capitalize(): String {
+    return StringUtils.capitalize(this.toString())
+}
+
+/**
+ * Uncapitalize given chars.
+ */
+fun CharSequence.uncapitalize(): String {
+    return StringUtils.uncapitalize(this.toString())
+}
+
 @JvmOverloads
-fun CharSequence?.equals(other: CharSequence?, ignoreCase:Boolean = false):Boolean {
+fun CharSequence?.equals(other: CharSequence?, ignoreCase: Boolean = false): Boolean {
     if (this === null && other === null) {
         return true
     }
@@ -115,18 +137,18 @@ fun CharSequence?.equals(other: CharSequence?, ignoreCase:Boolean = false):Boole
  * In no case will it return a String of length greater than [length].
  *
  * ```
- * Chars.ellipses("", 4, 0)                  = ""
- * Chars.ellipses("abcdefghijklmno", 10, -1) = "abcdefg..."
- * Chars.ellipses("abcdefghijklmno", 10, 0)  = "abcdefg..."
- * Chars.ellipses("abcdefghijklmno", 10, 1)  = "abcdefg..."
- * Chars.ellipses("abcdefghijklmno", 10, 4)  = "abcdefg..."
- * Chars.ellipses("abcdefghijklmno", 10, 5)  = "...fghi..."
- * Chars.ellipses("abcdefghijklmno", 10, 6)  = "...ghij..."
- * Chars.ellipses("abcdefghijklmno", 10, 8)  = "...ijklmno"
- * Chars.ellipses("abcdefghijklmno", 10, 10) = "...ijklmno"
- * Chars.ellipses("abcdefghijklmno", 10, 12) = "...ijklmno"
- * Chars.ellipses("abcdefghij", 3, 0)        = IllegalArgumentException
- * Chars.ellipses("abcdefghij", 6, 5)        = IllegalArgumentException
+ * BChars.ellipses("", 4, 0)                  = ""
+ * BChars.ellipses("abcdefghijklmno", 10, -1) = "abcdefg..."
+ * BChars.ellipses("abcdefghijklmno", 10, 0)  = "abcdefg..."
+ * BChars.ellipses("abcdefghijklmno", 10, 1)  = "abcdefg..."
+ * BChars.ellipses("abcdefghijklmno", 10, 4)  = "abcdefg..."
+ * BChars.ellipses("abcdefghijklmno", 10, 5)  = "...fghi..."
+ * BChars.ellipses("abcdefghijklmno", 10, 6)  = "...ghij..."
+ * BChars.ellipses("abcdefghijklmno", 10, 8)  = "...ijklmno"
+ * BChars.ellipses("abcdefghijklmno", 10, 10) = "...ijklmno"
+ * BChars.ellipses("abcdefghijklmno", 10, 12) = "...ijklmno"
+ * BChars.ellipses("abcdefghij", 3, 0)        = IllegalArgumentException
+ * BChars.ellipses("abcdefghij", 6, 5)        = IllegalArgumentException
  * ```
  */
 @JvmOverloads
@@ -134,49 +156,68 @@ fun CharSequence.ellipses(length: Int = 6, offset: Int = 0): String {
     return StringUtils.abbreviate(this.toString(), offset, length)
 }
 
-/**
- * Capitalizes given chars.
- */
-fun CharSequence.capitalize(): String {
-    return StringUtils.capitalize(this.toString())
+//Refs:
+
+@JvmOverloads
+fun CharSequence.refOfRange(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
+    return CharSequenceRef(this, startIndex, endIndex)
 }
 
-/**
- * Uncapitalize given chars.
- */
-fun CharSequence.uncapitalize(): String {
-    return StringUtils.uncapitalize(this.toString())
+@JvmOverloads
+fun CharSequence.refOfOffset(offset: Int = 0, length: Int = this.length - offset): CharSequence {
+    return CharSequenceRef(this, offset, offset + length)
+}
+
+@JvmOverloads
+fun CharArray.charsRefOfRange(startIndex: Int = 0, endIndex: Int = this.size): CharSequence {
+    return CharArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun CharArray.charsRefOfOffset(offset: Int = 0, length: Int = this.size - offset): CharSequence {
+    return CharArrayRef(this, offset, offset + length)
+}
+
+//Encode:
+
+@JvmName("toString")
+@JvmOverloads
+fun ByteArray.encodeToString(charset: CharSequence, offset: Int = 0, length: Int = this.size - offset): String {
+    return encodeToString(charset.toCharSet(), offset, length)
 }
 
 @JvmName("toString")
 @JvmOverloads
-fun ByteArray.toChars(charset: CharSequence, offset: Int = 0, length: Int = this.size - offset): String {
-    return toChars(charset.toCharSet(), offset, length)
-}
-
-@JvmName("toString")
-@JvmOverloads
-fun ByteArray.toChars(charset: Charset = DEFAULT_CHARSET, offset: Int = 0, length: Int = this.size - offset): String {
+fun ByteArray.encodeToString(
+    charset: Charset = DEFAULT_CHARSET,
+    offset: Int = 0,
+    length: Int = this.size - offset
+): String {
     return String(this, offset, length, charset)
 }
 
-fun CharSequence.toBytes(charset: CharSequence): ByteArray {
-    return toBytes(charset.toCharSet())
+@JvmName("toBytes")
+fun CharSequence.decodeToBytes(charset: CharSequence): ByteArray {
+    return decodeToBytes(charset.toCharSet())
 }
 
+@JvmName("toBytes")
 @JvmOverloads
-fun CharSequence.toBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
+fun CharSequence.decodeToBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
     return this.toString().toByteArray(charset)
 }
 
+@JvmName("toBytes")
 @JvmOverloads
-fun CharArray.toBytes(charset: CharSequence, offset: Int = 0, length: Int = this.size - offset): ByteArray {
-    return toBytes(charset.toCharSet(), offset, length)
+fun CharArray.decodeToBytes(charset: CharSequence, offset: Int = 0, length: Int = this.size - offset): ByteArray {
+    return decodeToBytes(charset.toCharSet(), offset, length)
 }
 
+@JvmName("toBytes")
 @JvmOverloads
-fun CharArray.toBytes(
-    charset: Charset = DEFAULT_CHARSET, offset: Int = 0, length: Int = this.size - offset): ByteArray {
+fun CharArray.decodeToBytes(
+    charset: Charset = DEFAULT_CHARSET, offset: Int = 0, length: Int = this.size - offset
+): ByteArray {
     return String(this, offset, length).toByteArray(charset)
 }
 
@@ -185,18 +226,68 @@ fun CharSequence.toCharSet(): Charset {
     return Charset.forName(this.toString())
 }
 
-fun Array<out Any?>.toStringArray(): Array<String> {
-    val result = arrayOfNulls<String>(this.size)
-    for ((i, t) in this.withIndex()) {
-        result[i] = t.toString()
-    }
-    return result.asTyped()
+//toCollection:
+
+fun <C : MutableCollection<in Char>> CharSequence.toCollection(destination: C): C {
+    return this.toCollectionKt(destination)
 }
 
-fun Array<out Any?>.toNullableStringArray(): Array<String?> {
-    val result = arrayOfNulls<String>(this.size)
-    for ((i, t) in this.withIndex()) {
-        result[i] = t?.toString()
+fun CharSequence.toSet(): Set<Char> {
+    return this.toSetKt()
+}
+
+fun CharSequence.toHashSet(): HashSet<Char> {
+    return this.toHashSetKt()
+}
+
+fun CharSequence.toSortedSet(): SortedSet<Char> {
+    return this.toSortedSetKt()
+}
+
+fun CharSequence.toList(): List<Char> {
+    return this.toListKt()
+}
+
+private class CharSequenceRef(
+    private val chars: CharSequence,
+    private val startIndex: Int,
+    private val endIndex: Int
+) : CharSequence {
+
+    override val length: Int = endIndex - startIndex
+
+    override fun get(index: Int): Char {
+        index.checkIndexInBounds(startIndex, endIndex)
+        return chars[startIndex + index]
     }
-    return result
+
+    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+        checkRangeInBounds(startIndex, endIndex, 0, length)
+        if (startIndex == endIndex) {
+            return ""
+        }
+        return CharSequenceRef(chars, this.startIndex + startIndex, this.startIndex + endIndex)
+    }
+}
+
+private class CharArrayRef(
+    private val chars: CharArray,
+    private val startIndex: Int,
+    private val endIndex: Int
+) : CharSequence {
+
+    override val length: Int = endIndex - startIndex
+
+    override fun get(index: Int): Char {
+        index.checkIndexInBounds(startIndex, endIndex)
+        return chars[startIndex + index]
+    }
+
+    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+        checkRangeInBounds(startIndex, endIndex, 0, length)
+        if (startIndex == endIndex) {
+            return ""
+        }
+        return CharArrayRef(chars, this.startIndex + startIndex, this.startIndex + endIndex)
+    }
 }

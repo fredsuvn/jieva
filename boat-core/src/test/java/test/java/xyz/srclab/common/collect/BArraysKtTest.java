@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * @author sunqian
  */
-public class CollectsTest {
+public class BArraysKtTest {
 
     @Test
     public void testArray() {

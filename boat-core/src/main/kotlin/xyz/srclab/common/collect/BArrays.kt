@@ -1,5 +1,4 @@
-@file:JvmName("Collects")
-@file:JvmMultifileClass
+@file:JvmName("BArrays")
 
 package xyz.srclab.common.collect
 
@@ -11,12 +10,98 @@ import kotlin.collections.joinToString as joinToStringKt
 
 private const val NOT_ARRAY_TYPE_PREFIX = "Not a array type"
 
-fun <T> asArray(vararg elements: T): Array<T> {
-    return elements.asTyped()
-}
-
 fun <T> Type.newArray(length: Int): Array<T> {
     return java.lang.reflect.Array.newInstance(this.rawClass, length).asTyped()
+}
+
+@JvmOverloads
+fun <T> Array<T>.refOfRange(startIndex: Int = 0, endIndex: Int = this.size): BArrayRef<T> {
+    return BArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun BooleanArray.refOfRange(startIndex: Int = 0, endIndex: Int = this.size): BBooleanArrayRef {
+    return BBooleanArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun ByteArray.refOfRange(startIndex: Int = 0, endIndex: Int = this.size): BByteArrayRef {
+    return BByteArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun ShortArray.refOfRange(startIndex: Int = 0, endIndex: Int = this.size): BShortArrayRef {
+    return BShortArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun CharArray.refOfRange(startIndex: Int = 0, endIndex: Int = this.size): BCharArrayRef {
+    return BCharArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun IntArray.refOfRange(startIndex: Int = 0, endIndex: Int = this.size): BIntArrayRef {
+    return BIntArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun LongArray.refOfRange(startIndex: Int = 0, endIndex: Int = this.size): BLongArrayRef {
+    return BLongArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun FloatArray.refOfRange(startIndex: Int = 0, endIndex: Int = this.size): BFloatArrayRef {
+    return BFloatArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun DoubleArray.refOfRange(startIndex: Int = 0, endIndex: Int = this.size): BDoubleArrayRef {
+    return BDoubleArrayRef(this, startIndex, endIndex)
+}
+
+@JvmOverloads
+fun <T> Array<T>.refOfOffset(offset: Int = 0, length: Int = this.size - offset): BArrayRef<T> {
+    return BArrayRef(this, offset, offset + length)
+}
+
+@JvmOverloads
+fun BooleanArray.refOfOffset(offset: Int = 0, length: Int = this.size - offset): BBooleanArrayRef {
+    return BBooleanArrayRef(this, offset, offset + length)
+}
+
+@JvmOverloads
+fun ByteArray.refOfOffset(offset: Int = 0, length: Int = this.size - offset): BByteArrayRef {
+    return BByteArrayRef(this, offset, offset + length)
+}
+
+@JvmOverloads
+fun ShortArray.refOfOffset(offset: Int = 0, length: Int = this.size - offset): BShortArrayRef {
+    return BShortArrayRef(this, offset, offset + length)
+}
+
+@JvmOverloads
+fun CharArray.refOfOffset(offset: Int = 0, length: Int = this.size - offset): BCharArrayRef {
+    return BCharArrayRef(this, offset, offset + length)
+}
+
+@JvmOverloads
+fun IntArray.refOfOffset(offset: Int = 0, length: Int = this.size - offset): BIntArrayRef {
+    return BIntArrayRef(this, offset, offset + length)
+}
+
+@JvmOverloads
+fun LongArray.refOfOffset(offset: Int = 0, length: Int = this.size - offset): BLongArrayRef {
+    return BLongArrayRef(this, offset, offset + length)
+}
+
+@JvmOverloads
+fun FloatArray.refOfOffset(offset: Int = 0, length: Int = this.size - offset): BFloatArrayRef {
+    return BFloatArrayRef(this, offset, offset + length)
+}
+
+@JvmOverloads
+fun DoubleArray.refOfOffset(offset: Int = 0, length: Int = this.size - offset): BDoubleArrayRef {
+    return BDoubleArrayRef(this, offset, offset + length)
 }
 
 /**
