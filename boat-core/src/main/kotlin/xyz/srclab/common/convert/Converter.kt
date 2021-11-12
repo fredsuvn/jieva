@@ -39,6 +39,26 @@ interface Converter {
         return convertOrNull(from, fromType, toType) ?: throw UnsupportedConvertException(fromType, toType)
     }
 
+    fun <T : Any> convertOrNull(from: Any?, toType: Class<T>): T? {
+        return convertOrNull(from, from?.javaClass ?: Any::class.java, toType)
+    }
+
+    fun <T : Any> convertOrNull(from: Any?, toType: Type): T? {
+        return convertOrNull(from, from?.javaClass ?: Any::class.java, toType)
+    }
+
+    fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: Class<T>): T? {
+        return convertOrNull(from, fromType, toType as Type)
+    }
+
+    fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: Type): T? {
+        val result: Any? = convertOrNull0(from, fromType, toType)
+        if (result === ConvertHandler.NULL) {
+            return null
+        }
+        return result.asTyped()
+    }
+
     fun <T> convertOrElse(from: Any?, toType: Class<T>, defaultValue: T): T {
         return convertOrNull(from, toType) ?: defaultValue
     }
@@ -71,26 +91,6 @@ interface Converter {
         return convertOrNull(from, fromType, toType) ?: defaultValue()
     }
 
-    fun <T : Any> convertOrNull(from: Any?, toType: Class<T>): T? {
-        return convertOrNull(from, from?.javaClass ?: Any::class.java, toType)
-    }
-
-    fun <T : Any> convertOrNull(from: Any?, toType: Type): T? {
-        return convertOrNull(from, from?.javaClass ?: Any::class.java, toType)
-    }
-
-    fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: Class<T>): T? {
-        return convertOrNull(from, fromType, toType)
-    }
-
-    fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: Type): T? {
-        val result: Any? = convertOrNull0(from, fromType, toType)
-        if (result === ConvertHandler.NULL) {
-            return null
-        }
-        return result.asTyped()
-    }
-
     private fun convertOrNull0(from: Any?, fromType: Type, toType: Type): Any? {
         val context = ConvertContext.newConvertContext(this)
         for (convertHandler in convertHandlers) {
@@ -104,13 +104,8 @@ interface Converter {
 
     companion object {
 
-        @JvmStatic
-        fun defaultConverter(): Converter {
-            return DEFAULT
-        }
-
         @JvmField
-        val DEFAULT: Converter = newConverter(ConvertHandler.DEFAULTS)
+        val COMMON: Converter = newConverter(ConvertHandler.DEFAULTS)
 
         /**
          * This [Converter] only convert same or compatible types, or convert between enum and [String].
@@ -119,6 +114,14 @@ interface Converter {
          */
         @JvmField
         val SIMPLE: Converter = newConverter(listOf(CompatibleConvertHandler))
+
+        @JvmField
+         val defaultConverter:Converter = newConverter(ConvertHandler.DEFAULTS)
+
+        @JvmStatic
+        fun defaultConverter(): Converter {
+            return DEFAULT
+        }
 
         @JvmStatic
         fun newConverter(

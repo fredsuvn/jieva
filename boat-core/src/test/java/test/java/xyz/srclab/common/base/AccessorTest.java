@@ -5,8 +5,8 @@ import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.ObjectAccessor;
-import xyz.srclab.common.base.TypedAccessor;
-import xyz.srclab.common.base.TypedMapAccessor;
+import xyz.srclab.common.base.BAccessor;
+import xyz.srclab.common.base.BMapAccessor;
 import xyz.srclab.common.base.MapAccessor;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class AccessorTest {
 
     @Test
     public void testGenericAccessor() {
-        TestTypedAccessor singleAccessor = new TestTypedAccessor();
+        TestBAccessor singleAccessor = new TestBAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
@@ -46,7 +46,7 @@ public class AccessorTest {
 
     @Test
     public void testGenericMapAccessor() {
-        TestTypedMapAccessor mapAccessor = new TestTypedMapAccessor();
+        TestBMapAccessor mapAccessor = new TestBMapAccessor();
         Assert.assertNull(mapAccessor.getOrNull("1"));
         Assert.assertEquals("666", mapAccessor.getOrElse("1", "666"));
         Assert.assertEquals("666", mapAccessor.getOrElse("1", (k) -> "666"));
@@ -69,7 +69,7 @@ public class AccessorTest {
         }
     }
 
-    public static class TestTypedAccessor implements TypedAccessor<String> {
+    public static class TestBAccessor implements BAccessor<String> {
 
         private String value;
 
@@ -94,7 +94,7 @@ public class AccessorTest {
         }
     }
 
-    public static class TestTypedMapAccessor implements TypedMapAccessor<String, String> {
+    public static class TestBMapAccessor implements BMapAccessor<String, String> {
 
         private final Map<String, String> values = new HashMap<>();
 

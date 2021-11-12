@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * @author sunqian
  */
-public class TypeRefTest {
+public class TypeBRefTest {
 
     @Test
     public void testTypeRef() {

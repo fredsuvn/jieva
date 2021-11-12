@@ -1,4 +1,4 @@
-@file:JvmName("Chars")
+@file:JvmName("BChars")
 
 package xyz.srclab.common.base
 
@@ -87,6 +87,22 @@ fun CharSequence?.isNumeric(): Boolean {
  */
 fun CharSequence?.isWhitespace(): Boolean {
     return StringUtils.isWhitespace(this)
+}
+
+@JvmOverloads
+fun CharSequence?.equals(other: CharSequence?, ignoreCase:Boolean = false):Boolean {
+    if (this === null && other === null) {
+        return true
+    }
+    if (this === null || other === null || this.length != other.length) {
+        return false
+    }
+    for (i in this.indices) {
+        if (!this[i].equals(other[i], ignoreCase)) {
+            return false
+        }
+    }
+    return true
 }
 
 /**

@@ -44,8 +44,11 @@ interface ConvertHandler {
         @JvmField
         val NULL: Any = "(╯°Д°)╯︵ ┻━┻"
 
+        /**
+         * Common handlers.
+         */
         @JvmField
-        val DEFAULTS: List<ConvertHandler> = listOf(
+        val COMMON_HANDLERS: List<ConvertHandler> = listOf(
             CompatibleConvertHandler,
             LowerBoundConvertHandler,
             CharsConvertHandler,
@@ -148,7 +151,7 @@ object CharsConvertHandler : ConvertHandler {
  * * [BigInteger], [BigDecimal];
  * * [Number];
  */
-object NumberBooleanConvertHandler : ConvertHandler {
+open class NumberBooleanConvertHandler : ConvertHandler {
     override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (toType !is Class<*>) {
             return null
