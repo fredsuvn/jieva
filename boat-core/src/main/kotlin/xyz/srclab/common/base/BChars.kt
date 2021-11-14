@@ -113,18 +113,7 @@ fun CharSequence.uncapitalize(): String {
 
 @JvmOverloads
 fun CharSequence?.equals(other: CharSequence?, ignoreCase: Boolean = false): Boolean {
-    if (this === null && other === null) {
-        return true
-    }
-    if (this === null || other === null || this.length != other.length) {
-        return false
-    }
-    for (i in this.indices) {
-        if (!this[i].equals(other[i], ignoreCase)) {
-            return false
-        }
-    }
-    return true
+    return this.contentEquals(other, ignoreCase)
 }
 
 /**
@@ -221,7 +210,6 @@ fun CharArray.decodeToBytes(
     return String(this, offset, length).toByteArray(charset)
 }
 
-@JvmName("charset")
 fun CharSequence.toCharSet(): Charset {
     return Charset.forName(this.toString())
 }
@@ -252,7 +240,7 @@ private class CharSequenceRef(
     private val chars: CharSequence,
     private val startIndex: Int,
     private val endIndex: Int
-) : CharSequence {
+) : CharSequenceHashAndEquals() {
 
     override val length: Int = endIndex - startIndex
 
@@ -274,7 +262,7 @@ private class CharArrayRef(
     private val chars: CharArray,
     private val startIndex: Int,
     private val endIndex: Int
-) : CharSequence {
+) : CharSequenceHashAndEquals() {
 
     override val length: Int = endIndex - startIndex
 
@@ -289,5 +277,31 @@ private class CharArrayRef(
             return ""
         }
         return CharArrayRef(chars, this.startIndex + startIndex, this.startIndex + endIndex)
+    }
+}
+
+private abstract class CharSequenceHashAndEquals : CharSequence {
+
+    private val chars: String by lazy {
+        val result = CharArray(this.length)
+        var i = 0
+        for (c in this) {
+            result[i++] = c
+        }
+        String(result)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CharSequence) return false
+        return this.contentEquals(other)
+    }
+
+    override fun hashCode(): Int {
+        return chars.hashCode()
+    }
+
+    override fun toString(): String {
+        return chars
     }
 }

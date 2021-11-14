@@ -1,5 +1,4 @@
-@file:JvmName("Clocks")
-@file:JvmMultifileClass
+@file:JvmName("BClocks")
 
 package xyz.srclab.common.base
 

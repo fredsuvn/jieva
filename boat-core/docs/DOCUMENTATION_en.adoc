@@ -35,7 +35,7 @@ Lang package provides a serials of core and base interfaces and components:
 
 * Global system objects: `Current`, `Defaults`, `Environment`;
 * Lang syntax enhancement (mainly for Java): `Let`, `Ref`, `Lazy`, `LazyToString`;
-* String/CharSequence functions: `CharsFormat`, `CharsTemplate`, `NamingCase`;
+* String/CharSequence functions: `BFormat`, `BTemplate`, `NamingCase`;
 * Special character support: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
 * Accessor interfaces: `ObjectAccessor`, `MapAccessor`, `BAccessor`, `BMapAccessor`;
 * Helper interfaces and utilities: SpecParser, CachingProductBuilder, Processing;

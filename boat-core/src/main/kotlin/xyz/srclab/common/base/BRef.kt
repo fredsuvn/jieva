@@ -9,7 +9,7 @@ import java.util.function.Consumer
  * It supports chain operation in Java:
  *
  * ```
- * Date dateValue = Ref.of(intValue)
+ * Date dateValue = BRef.of(intValue)
  *     .apply(StringUtils::intToString)
  *     .accept(SystemUtils::printString)
  *     .get();
@@ -42,17 +42,19 @@ interface BRef<T : Any> : BAccessor<T> {
         if (cur === null) {
             return this.asTyped()
         }
-        val thisRef = this.asTyped<BRef<R>>()
-        thisRef.set(action(cur))
-        return thisRef
+        return applyOrNull0(cur, action.asTyped())
     }
 
     /**
      * Given [action] will be executed, returns `this` with new value.
      */
     fun <R : Any> applyOrNull(action: (T?) -> R): BRef<R> {
+        return applyOrNull0(getOrNull(), action)
+    }
+
+    private fun <R : Any> applyOrNull0(value: T?, action: (T?) -> R): BRef<R> {
         val thisRef = this.asTyped<BRef<R>>()
-        thisRef.set(action(getOrNull()))
+        thisRef.set(action(value))
         return thisRef
     }
 
@@ -64,15 +66,18 @@ interface BRef<T : Any> : BAccessor<T> {
         if (cur === null) {
             return this.asTyped()
         }
-        action.accept(cur)
-        return this
+        return acceptOrNull0(cur, action.asTyped())
     }
 
     /**
      * Given [action] will be executed, returns `this`.
      */
     fun acceptOrNull(action: Consumer<T?>): BRef<T> {
-        action.accept(getOrNull())
+        return acceptOrNull0(getOrNull(), action)
+    }
+
+    private fun acceptOrNull0(value: T?, action: Consumer<T?>): BRef<T> {
+        action.accept(value)
         return this
     }
 

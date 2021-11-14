@@ -1,4 +1,4 @@
-@file:JvmName("Compares")
+@file:JvmName("BCompares")
 
 package xyz.srclab.common.base
 

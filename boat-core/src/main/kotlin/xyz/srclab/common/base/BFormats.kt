@@ -1,7 +1,30 @@
+@file:JvmName("BFormats")
+
 package xyz.srclab.common.base
 
 import org.slf4j.helpers.MessageFormatter as MessageFormatterSlf4j
 import java.text.MessageFormat as MessageFormatKt
+
+/**
+ * Formats by [FastCharsFormat].
+ */
+fun CharSequence.fastFormat(vararg args: Any?): String {
+    return BFormat.FAST_FORMAT.format(this, *args)
+}
+
+/**
+ * Formats by [PrintfCharsFormat].
+ */
+fun CharSequence.printfFormat(vararg args: Any?): String {
+    return BFormat.PRINTF_FORMAT.format(this, *args)
+}
+
+/**
+ * Formats by [MessageCharsFormat].
+ */
+fun CharSequence.messageFormat(vararg args: Any?): String {
+    return BFormat.MESSAGE_FORMAT.format(this, *args)
+}
 
 /**
  * Format for [CharSequence].
@@ -10,7 +33,7 @@ import java.text.MessageFormat as MessageFormatKt
  * @see PrintfCharsFormat
  * @see MessageCharsFormat
  */
-interface CharsFormat {
+interface BFormat {
 
     fun format(pattern: CharSequence, vararg args: Any?): String
 
@@ -24,55 +47,31 @@ interface CharsFormat {
 
         @JvmField
         val MESSAGE_FORMAT: MessageCharsFormat = MessageCharsFormat
-
-        /**
-         * Formats by [FastCharsFormat].
-         */
-        @JvmStatic
-        fun CharSequence.fastFormat(vararg args: Any?): String {
-            return FAST_FORMAT.format(this, *args)
-        }
-
-        /**
-         * Formats by [PrintfCharsFormat].
-         */
-        @JvmStatic
-        fun CharSequence.printfFormat(vararg args: Any?): String {
-            return PRINTF_FORMAT.format(this, *args)
-        }
-
-        /**
-         * Formats by [MessageCharsFormat].
-         */
-        @JvmStatic
-        fun CharSequence.messageFormat(vararg args: Any?): String {
-            return MESSAGE_FORMAT.format(this, *args)
-        }
     }
 }
 
 /**
- * [CharsFormat] with `slf4j` style.
+ * [BFormat] with `slf4j` style.
  */
-object FastCharsFormat : CharsFormat {
+object FastCharsFormat : BFormat {
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         return MessageFormatterSlf4j.arrayFormat(pattern.toString(), args, null).message
     }
 }
 
 /**
- * [CharsFormat] with `System.out.printf` style.
+ * [BFormat] with `System.out.printf` style.
  */
-object PrintfCharsFormat : CharsFormat {
+object PrintfCharsFormat : BFormat {
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         return String.format(pattern.toString(), *args)
     }
 }
 
 /**
- * [CharsFormat] with `MessageFormat` style.
+ * [BFormat] with `MessageFormat` style.
  */
-object MessageCharsFormat : CharsFormat {
+object MessageCharsFormat : BFormat {
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         return MessageFormatKt.format(pattern.toString(), *args)
     }

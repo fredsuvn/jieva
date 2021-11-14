@@ -69,9 +69,9 @@ public class LangSample {
 
     @Test
     public void testCharsFormat() {
-        String byFast = CharsFormat.fastFormat("1, 2, {}", 3);
-        String byMessage = CharsFormat.messageFormat("1, 2, {0}", 3);
-        String byPrintf = CharsFormat.printfFormat("1, 2, %d", 3);
+        String byFast = BFormat.fastFormat("1, 2, {}", 3);
+        String byMessage = BFormat.messageFormat("1, 2, {0}", 3);
+        String byPrintf = BFormat.printfFormat("1, 2, %d", 3);
         //1, 2, 3
         logger.log("byFast: {}", byFast);
         logger.log("byMessage: {}", byMessage);
@@ -85,15 +85,15 @@ public class LangSample {
         args.put("name}", "DogX");
         args.put(1, "Cat");
         args.put(2, "Bird");
-        CharsTemplate template1 = CharsTemplate.resolve(
+        BTemplate template1 = BTemplate.resolve(
             "This is a {name}, that is a {}", "{", "}");
         //This is a Dog, that is a Cat
         logger.log(template1.process(args));
-        CharsTemplate template2 = CharsTemplate.resolve(
+        BTemplate template2 = BTemplate.resolve(
             "This is a } {name}, that is a {}}", "{", "}");
         //This is a } Dog, that is a Cat}
         logger.log(template2.process(args));
-        CharsTemplate template3 = CharsTemplate.resolve(
+        BTemplate template3 = BTemplate.resolve(
             "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
         //This is a } {DogX (Dog), that is a Bird\{\
         logger.log(template3.process(args));

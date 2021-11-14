@@ -7,7 +7,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import xyz.srclab.common.base.CharsTemplate;
+import xyz.srclab.common.base.BTemplate;
 
 import java.io.StringWriter;
 import java.time.LocalDateTime;
@@ -48,7 +48,7 @@ public class CharsTemplateBenchmark {
     }
 
     private static final String charsTemplateContent = "Hello, this is {name}, now is {date}";
-    private CharsTemplate charsTemplate;
+    private BTemplate charsTemplate;
     private Map<Object, Object> charsTemplateArgs;
 
     private static final String velocityTemplate = "Hello, this is $name, now is $date";
@@ -63,7 +63,7 @@ public class CharsTemplateBenchmark {
         LocalDateTime now = LocalDateTime.now();
 
         //CharsTemplate
-        charsTemplate = CharsTemplate.resolve(charsTemplateContent, "{", "}");
+        charsTemplate = BTemplate.resolve(charsTemplateContent, "{", "}");
         charsTemplateArgs = new HashMap<>();
         charsTemplateArgs.put("name", "Boat");
         charsTemplateArgs.put("date", now);
@@ -83,7 +83,7 @@ public class CharsTemplateBenchmark {
 
     @Benchmark
     public void useCharsTemplate() {
-        CharsTemplate template = CharsTemplate.resolve(charsTemplateContent, "{", "}");
+        BTemplate template = BTemplate.resolve(charsTemplateContent, "{", "}");
         StringWriter writer = new StringWriter();
         template.process(writer, charsTemplateArgs);
     }

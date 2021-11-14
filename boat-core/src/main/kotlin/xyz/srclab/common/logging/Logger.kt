@@ -1,6 +1,6 @@
 package xyz.srclab.common.logging
 
-import xyz.srclab.common.base.CharsFormat.Companion.fastFormat
+import xyz.srclab.common.base.BFormat.Companion.fastFormat
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.callerStackTrace
 import xyz.srclab.common.base.stackTraceToString
