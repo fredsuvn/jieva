@@ -14,10 +14,10 @@ fun currentThread(): Thread {
 }
 
 /**
- * [ClassLoader] of current context, if it is null, returns [BoatClassLoader].
+ * [ClassLoader] of current context, if it is null, returns [BClassLoader].
  */
 fun currentClassLoader(): ClassLoader {
-    return currentThread().contextClassLoader ?: BoatClassLoader
+    return currentThread().contextClassLoader ?: BClassLoader
 }
 
 @JvmName("getProperty")

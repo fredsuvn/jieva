@@ -4,9 +4,6 @@ import org.testng.Assert
 import org.testng.annotations.Test
 import xyz.srclab.common.base.*
 import xyz.srclab.common.lang.*
-import xyz.srclab.common.lang.CharsFormat.Companion.messageFormat
-import xyz.srclab.common.lang.CharsFormat.Companion.printfFormat
-import xyz.srclab.common.lang.CharsTemplate.Companion.resolveTemplate
 import xyz.srclab.common.lang.LazyToString.Companion.lazyToString
 import xyz.srclab.common.lang.Processing.Companion.newProcessing
 import xyz.srclab.common.lang.SpecParser.Companion.parseFirstClassNameToInstance
@@ -77,7 +74,7 @@ class BaseSample {
     @Test
     fun testNamingCase() {
         val upperCamel = "UpperCamel"
-        val lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL)
+        val lowerCamel = BNamingCase.UPPER_CAMEL.convert(upperCamel, BNamingCase.LOWER_CAMEL)
         //upperCamel
         logger.log("lowerCamel: {}", lowerCamel)
     }
@@ -108,7 +105,7 @@ class BaseSample {
     fun testBaseTypes() {
 
         //Anys examples:
-        val lists = arrayOf<List<*>>().asAny<Array<List<String>>>()
+        val lists = arrayOf<List<*>>().asTyped<Array<List<String>>>()
         val hash = Arrays.asList("", 1).anyOrArrayHash()
         val equals = Arrays.asList("", 1).anyOrArrayEquals(Arrays.asList("", 1))
 
@@ -179,7 +176,7 @@ class BaseSample {
             logger.log("random[10, 20): {}", randomBetween(10, 20))
         }
 
-        val randomSupplier = RandomSupplier.newBuilder<Any>()
+        val BRandomer = BRandomer.newBuilder<Any>()
             .score(20, "A")
             .score(20, "B")
             .score(60, "C")
@@ -188,7 +185,7 @@ class BaseSample {
         var countB = 0
         var countC = 0
         for (i in 0..999) {
-            val result = randomSupplier.get()
+            val result = BRandomer.get()
             if (result == "A") {
                 countA++
             } else if (result == "B") {
@@ -213,7 +210,7 @@ class BaseSample {
 
             fun setValue(value: String) {
                 this.value = value
-                commitModification()
+                commit()
             }
 
             override fun buildNew(): String {
@@ -256,39 +253,39 @@ class BaseSample {
     @Test
     fun testShell() {
         logger.log("Hello, world!")
-        logger.log("123{}456{}{}", EscChars.linefeed, EscChars.newline, EscChars.reset)
+        logger.log("123{}456{}{}", BEscChars.linefeed, BEscChars.newline, BEscChars.reset)
         logger.log(
             "{}{}{}",
-            SgrChars.foregroundRed("red"),
-            SgrChars.backgroundCyan(" "),
-            SgrChars.foregroundGreen("green")
+            BSgrChars.foregroundRed("red"),
+            BSgrChars.backgroundCyan(" "),
+            BSgrChars.foregroundGreen("green")
         )
         logger.log(
             "{}{}{}",
-            SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
-            SgrChars.backgroundCyan(" "),
-            SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
+            BSgrChars.withParam("bright red", BSgrParam.FOREGROUND_BRIGHT_RED),
+            BSgrChars.backgroundCyan(" "),
+            BSgrChars.withParam("bright green", BSgrParam.FOREGROUND_BRIGHT_GREEN)
         )
         logger.log(
             "{}{}{}",
-            SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
-            SgrChars.backgroundCyan(" "),
-            SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
+            BSgrChars.withParam("color 8", BSgrParam.foregroundColor(8)),
+            BSgrChars.backgroundCyan(" "),
+            BSgrChars.withParam("rgb(100, 100, 50)", BSgrParam.foregroundColor(100, 100, 50))
         )
-        logger.log(CtlChars.beep)
+        logger.log(BCtlChars.beep)
         //logger.log("123\010456\007");
-        logger.log("123{}456{}", CtlChars.backspaces, CtlChars.beep)
+        logger.log("123{}456{}", BCtlChars.backspaces, BCtlChars.beep)
     }
 
     @Test
     fun testSingleAccessor() {
-        val singleAccessor = TestObjAccessor()
+        val singleAccessor = TestObjectAccessor()
         Assert.assertNull(singleAccessor.getOrNull())
         Assert.assertEquals("666", singleAccessor.getOrElse("666"))
         Assert.assertEquals("666", singleAccessor.getOrElse { "666" })
         singleAccessor.set("777")
         Assert.assertEquals("777", singleAccessor.get())
-        val genericSingleAccessor = TestTypedAccessor()
+        val genericSingleAccessor = TestBAccessor()
         Assert.assertNull(genericSingleAccessor.getOrNull())
         Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"))
         Assert.assertEquals("666", genericSingleAccessor.getOrElse { "666" })
@@ -300,7 +297,7 @@ class BaseSample {
         Assert.assertEquals("666", mapAccessor.getOrElse("1") { k: Any? -> "666" })
         mapAccessor.set("1", "777")
         Assert.assertEquals("777", mapAccessor.get("1"))
-        val genericMapAccessor = TestTypedMapAccessor()
+        val genericMapAccessor = TestBMapAccessor()
         Assert.assertNull(genericMapAccessor.getOrNull("1"))
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1", "666"))
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1") { k: String? -> "666" })
@@ -317,7 +314,7 @@ enum class TestEnum {
     T1, T2
 }
 
-class TestObjAccessor : ObjAccessor {
+class TestObjectAccessor : ObjectAccessor {
     private var value: String? = null
     override fun <T : Any> getOrNull(): T? {
         return value as T?
@@ -328,7 +325,7 @@ class TestObjAccessor : ObjAccessor {
     }
 }
 
-class TestTypedAccessor : TypedAccessor<String> {
+class TestBAccessor : BAccessor<String> {
     private var value: String? = null
     override fun getOrNull(): String? {
         return value
@@ -344,7 +341,7 @@ class TestMapAccessor : MapAccessor {
     override val contents: MutableMap<Any, Any?> = values
 }
 
-class TestTypedMapAccessor : TypedMapAccessor<String, String> {
+class TestBMapAccessor : BMapAccessor<String, String> {
     private val values: MutableMap<String, String?> = HashMap()
     override val contents: MutableMap<String, String?> = values
 }

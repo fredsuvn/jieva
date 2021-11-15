@@ -135,7 +135,7 @@ fun <T> Any.arrayAsListOrNull(): MutableList<T>? {
  * Returns a fixed-size array associated given array
  */
 fun <T> Array<T>.asList(): MutableList<T> {
-    val bridge = object : ArrayBridge<T> {
+    val bridge = object : BArrayBridge<T> {
         override val size: Int = this@asList.size
 
         override fun get(index: Int): T {
@@ -153,7 +153,7 @@ fun <T> Array<T>.asList(): MutableList<T> {
  * Returns a fixed-size array associated given array
  */
 fun BooleanArray.asList(): MutableList<Boolean> {
-    val bridge = object : ArrayBridge<Boolean> {
+    val bridge = object : BArrayBridge<Boolean> {
         override val size: Int = this@asList.size
 
         override fun get(index: Int): Boolean {
@@ -171,7 +171,7 @@ fun BooleanArray.asList(): MutableList<Boolean> {
  * Returns a fixed-size array associated given array
  */
 fun ByteArray.asList(): MutableList<Byte> {
-    val bridge = object : ArrayBridge<Byte> {
+    val bridge = object : BArrayBridge<Byte> {
         override val size: Int = this@asList.size
 
         override fun get(index: Int): Byte {
@@ -189,7 +189,7 @@ fun ByteArray.asList(): MutableList<Byte> {
  * Returns a fixed-size array associated given array
  */
 fun ShortArray.asList(): MutableList<Short> {
-    val bridge = object : ArrayBridge<Short> {
+    val bridge = object : BArrayBridge<Short> {
         override val size: Int = this@asList.size
 
         override fun get(index: Int): Short {
@@ -207,7 +207,7 @@ fun ShortArray.asList(): MutableList<Short> {
  * Returns a fixed-size array associated given array
  */
 fun CharArray.asList(): MutableList<Char> {
-    val bridge = object : ArrayBridge<Char> {
+    val bridge = object : BArrayBridge<Char> {
         override val size: Int = this@asList.size
 
         override fun get(index: Int): Char {
@@ -225,7 +225,7 @@ fun CharArray.asList(): MutableList<Char> {
  * Returns a fixed-size array associated given array
  */
 fun IntArray.asList(): MutableList<Int> {
-    val bridge = object : ArrayBridge<Int> {
+    val bridge = object : BArrayBridge<Int> {
         override val size: Int = this@asList.size
 
         override fun get(index: Int): Int {
@@ -243,7 +243,7 @@ fun IntArray.asList(): MutableList<Int> {
  * Returns a fixed-size array associated given array
  */
 fun LongArray.asList(): MutableList<Long> {
-    val bridge = object : ArrayBridge<Long> {
+    val bridge = object : BArrayBridge<Long> {
         override val size: Int = this@asList.size
 
         override fun get(index: Int): Long {
@@ -261,7 +261,7 @@ fun LongArray.asList(): MutableList<Long> {
  * Returns a fixed-size array associated given array
  */
 fun FloatArray.asList(): MutableList<Float> {
-    val bridge = object : ArrayBridge<Float> {
+    val bridge = object : BArrayBridge<Float> {
         override val size: Int = this@asList.size
 
         override fun get(index: Int): Float {
@@ -279,7 +279,7 @@ fun FloatArray.asList(): MutableList<Float> {
  * Returns a fixed-size array associated given array
  */
 fun DoubleArray.asList(): MutableList<Double> {
-    val bridge = object : ArrayBridge<Double> {
+    val bridge = object : BArrayBridge<Double> {
         override val size: Int = this@asList.size
 
         override fun get(index: Int): Double {

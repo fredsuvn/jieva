@@ -35,9 +35,9 @@ Boat core link:../../README.md[Boat] 的核心接口, 方法和工具, 包括:
 Lang包提供一系列核心接口和组件:
 
 * 全局系统对象: `Current`, `Defaults`, `Environment`;
-* 语法增强 (主要针对Java): `Let`, `Ref`, `Lazy`, `LazyToString`;
-* 字符串功能: `BFormat`, `BTemplate`, `NamingCase`;
-* 特殊字符支持: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
+* 语法增强 (主要针对Java): `Let`, `Ref`, `Lazy`, `BLazyGetterCharSeq`;
+* 字符串功能: `BFormat`, `BTemplate`, `BNamingCase`;
+* 特殊字符支持: `BCtlChars`, `BEscChars`, `BCsiChars`, `BSgrChars`;
 * 访问接口: `ObjectAccessor`, `MapAccessor`, `BAccessor`, `BMapAccessor`;
 * 辅助对象: SpecParser, CachingProductBuilder, Processing;
 * 公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
@@ -244,7 +244,7 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/excepti
 
 * `Collects`: 集合工具类;
 * `Collecting`, `Mapping`: 提供链式操作的集合接口, 并且集成了常见集合的功能 (如 `Iterable`, `Collection`, `Set`, `List`);
-* `IterableType`, `MapType`: 代表集合泛型类型;
+* `BCollectType`, `BMapType`: 代表集合泛型类型;
 * `MultiMaps.kt`: `MultiMaps.kt` 提供多值 `Map` 如 `SetMap`, `MutableSetMap`, `ListMap` 何 `MutableListMap`;
 * `CopyOnWriteMap`: 实现copy-on-write操作的Map;
 

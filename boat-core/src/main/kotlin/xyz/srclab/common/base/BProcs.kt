@@ -1,3 +1,5 @@
+@file:JvmName("BProcs")
+
 package xyz.srclab.common.base
 
 import xyz.srclab.common.io.availableString
@@ -7,6 +9,22 @@ import java.nio.charset.Charset
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
+fun CharSequence.startProcess(): BProcessing {
+    return Runtime.getRuntime().exec(this.toString()).toProcessing()
+}
+
+fun startProcess(vararg cmd: String): BProcessing {
+    return Runtime.getRuntime().exec(cmd).toProcessing()
+}
+
+fun ProcessBuilder.startProcess(): BProcessing {
+    return this.start().toProcessing()
+}
+
+fun Process.toProcessing(): BProcessing {
+    return ProcessingImpl(this)
+}
+
 /**
  * Represents processing of [Process].
  *
@@ -14,7 +32,7 @@ import java.util.concurrent.TimeUnit
  *
  * @see [Process]
  */
-interface Processing {
+interface BProcessing {
 
     val process: Process
 
@@ -72,14 +90,14 @@ interface Processing {
      * Returns all output stream as `String`.
      */
     fun outputString(): String? {
-        return inputStream?.readBytes()?.toChars()
+        return inputStream?.readBytes()?.encodeToString()
     }
 
     /**
      * Returns all output stream as `String`.
      */
     fun outputString(charset: Charset): String? {
-        return inputStream?.readBytes()?.toChars(charset)
+        return inputStream?.readBytes()?.encodeToString(charset)
     }
 
     /**
@@ -104,14 +122,14 @@ interface Processing {
      * Returns all error stream as `String`.
      */
     fun errorString(): String? {
-        return errorStream?.readBytes()?.toChars()
+        return errorStream?.readBytes()?.encodeToString()
     }
 
     /**
      * Returns all error stream as `String`.
      */
     fun errorString(charset: Charset): String? {
-        return errorStream?.readBytes()?.toChars(charset)
+        return errorStream?.readBytes()?.encodeToString(charset)
     }
 
     /**
@@ -131,49 +149,22 @@ interface Processing {
     fun availableErrorString(charset: Charset): String? {
         return errorStream?.availableString(charset)
     }
+}
 
-    companion object {
+private class ProcessingImpl(override val process: Process) : BProcessing {
 
-        @JvmName("start")
-        @JvmStatic
-        fun CharSequence.startProcess(): Processing {
-            return Runtime.getRuntime().exec(this.toString()).toProcessing()
+    override fun equals(other: Any?): Boolean {
+        if (other is BProcessing) {
+            return this.process == other.process
         }
+        return false
+    }
 
-        @JvmName("start")
-        @JvmStatic
-        fun startProcess(vararg cmd: String): Processing {
-            return Runtime.getRuntime().exec(cmd).toProcessing()
-        }
+    override fun hashCode(): Int {
+        return this.process.hashCode()
+    }
 
-        @JvmName("start")
-        @JvmStatic
-        fun ProcessBuilder.startProcess(): Processing {
-            return this.start().toProcessing()
-        }
-
-        @JvmName("of")
-        @JvmStatic
-        fun Process.toProcessing(): Processing {
-            return ProcessingImpl(this)
-        }
-
-        private class ProcessingImpl(override val process: Process) : Processing {
-
-            override fun equals(other: Any?): Boolean {
-                if (other is Processing) {
-                    return this.process == other.process
-                }
-                return false
-            }
-
-            override fun hashCode(): Int {
-                return this.process.hashCode()
-            }
-
-            override fun toString(): String {
-                return this.process.toString()
-            }
-        }
+    override fun toString(): String {
+        return this.process.toString()
     }
 }

@@ -82,19 +82,19 @@ interface Digester : Codec {
 
         fun algorithm(algorithm: String): Builder {
             this.algorithm = algorithm
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun digestSupplier(digestSupplier: () -> MessageDigest): Builder {
             this.digestSupplier = digestSupplier
-            this.commitModification()
+            this.commit()
             return this
         }
 
         fun threadSafePolicy(threadSafePolicy: ThreadSafePolicy): Builder {
             this.threadSafePolicy = threadSafePolicy
-            this.commitModification()
+            this.commit()
             return this
         }
 

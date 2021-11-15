@@ -7,7 +7,7 @@ import java.io.Serializable
  * Represent a bridge between array and object.
  */
 // Fuck un-supporting-primitive-generic-type! DAMN!
-interface ArrayBridge<T> {
+interface BArrayBridge<T> {
 
     @Suppress(INAPPLICABLE_JVM_NAME)
     @get:JvmName("get")
@@ -19,7 +19,7 @@ interface ArrayBridge<T> {
 }
 
 class ArrayBridgeList<T>(
-    private val arrayBridge: ArrayBridge<T>,
+    private val arrayBridge: BArrayBridge<T>,
     override val size: Int = arrayBridge.size
 ) : AbstractMutableList<T>(), RandomAccess, Serializable {
 

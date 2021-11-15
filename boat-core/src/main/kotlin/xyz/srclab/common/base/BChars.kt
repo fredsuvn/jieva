@@ -149,12 +149,12 @@ fun CharSequence.ellipses(length: Int = 6, offset: Int = 0): String {
 
 @JvmOverloads
 fun CharSequence.refOfRange(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
-    return CharSequenceRef(this, startIndex, endIndex)
+    return CharSeqRef(this, startIndex, endIndex)
 }
 
 @JvmOverloads
 fun CharSequence.refOfOffset(offset: Int = 0, length: Int = this.length - offset): CharSequence {
-    return CharSequenceRef(this, offset, offset + length)
+    return CharSeqRef(this, offset, offset + length)
 }
 
 @JvmOverloads
@@ -236,7 +236,7 @@ fun CharSequence.toList(): List<Char> {
     return this.toListKt()
 }
 
-private class CharSequenceRef(
+private class CharSeqRef(
     private val chars: CharSequence,
     private val startIndex: Int,
     private val endIndex: Int
@@ -254,7 +254,7 @@ private class CharSequenceRef(
         if (startIndex == endIndex) {
             return ""
         }
-        return CharSequenceRef(chars, this.startIndex + startIndex, this.startIndex + endIndex)
+        return CharSeqRef(chars, this.startIndex + startIndex, this.startIndex + endIndex)
     }
 }
 

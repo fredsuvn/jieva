@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LoadersTest {
+public class BLoadersKtTest {
 
     @Test
     public void testLoader() {

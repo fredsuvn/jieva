@@ -5,7 +5,7 @@ import xyz.srclab.common.bean.BeanCreator
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
 import xyz.srclab.common.collect.*
-import xyz.srclab.common.collect.IterableType.Companion.toIterableType
+import xyz.srclab.common.collect.BCollectType.Companion.toIterableType
 import xyz.srclab.common.reflect.*
 import java.lang.reflect.*
 import java.math.BigDecimal

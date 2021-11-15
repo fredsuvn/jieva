@@ -1,14 +1,35 @@
+@file:JvmName("BLazys")
+
 package xyz.srclab.common.base
 
 import java.time.Duration
 import java.time.Instant
+
+@JvmName("getter")
+fun <T : Any> lazyGetter(supplier: () -> T): BLazyGetter<T> {
+    return SimpleLazyGetter(supplier)
+}
+
+@JvmName("getter")
+fun <T : Any> lazyGetter(period: Duration, supplier: () -> T): BLazyGetter<T> {
+    return FixedPeriodLazyGetter(period, supplier)
+}
+
+@JvmName("getter")
+fun <T : Any> lazyGetter(initPeriod: Duration, period: (T) -> Duration, supplier: () -> T): BLazyGetter<T> {
+    return DynamicPeriodLazyGetter(initPeriod, period, supplier)
+}
+
+fun <T : Any> lazyString(lazyGetter: BLazyGetter<T>): BLazyString<T> {
+    return BLazyString(lazyGetter)
+}
 
 /**
  * Lazy to create return value.
  *
  * @author sunqian
  */
-interface Lazy<T : Any> : BGetter<T> {
+interface BLazyGetter<T : Any> : BGetter<T> {
 
     fun refresh()
 
@@ -17,52 +38,9 @@ interface Lazy<T : Any> : BGetter<T> {
     }
 
     fun refreshAndGetOrNull(): T?
-
-    companion object {
-
-        @JvmStatic
-        fun <T : Any> of(supplier: () -> T): Lazy<T> {
-            return OnceLazy(supplier)
-        }
-
-        @JvmStatic
-        fun <T : Any> of(period: Duration, supplier: () -> T): Lazy<T> {
-            return FixedPeriodRefreshableLazy(period, supplier)
-        }
-
-        @JvmStatic
-        fun <T : Any> of(initPeriod: Duration, period: (T) -> Duration, supplier: () -> T): Lazy<T> {
-            return DynamicPeriodRefreshableLazy(initPeriod, period, supplier)
-        }
-    }
 }
 
-/**
- * A special type of [Lazy] which overrides [toString] method by [get]. This class can be used in log message of
- * which [toString] is expensive.
- */
-open class LazyToString<T : Any>(delegate: Lazy<T>) : Lazy<T> by delegate {
-
-    override fun toString(): String {
-        return get().toString()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun <T : Any> Lazy<T>.lazyToString(): LazyToString<T> {
-            return LazyToString(this)
-        }
-
-        @JvmStatic
-        fun <T : Any> of(supplier: () -> T): LazyToString<T> {
-            return OnceLazy(supplier).lazyToString()
-        }
-    }
-}
-
-private class OnceLazy<T : Any>(private val supplier: () -> T) : Lazy<T> {
+private class SimpleLazyGetter<T : Any>(private val supplier: () -> T) : BLazyGetter<T> {
 
     @Volatile
     private var hasGet = false
@@ -99,10 +77,10 @@ private class OnceLazy<T : Any>(private val supplier: () -> T) : Lazy<T> {
     }
 }
 
-private class FixedPeriodRefreshableLazy<T : Any>(
+private class FixedPeriodLazyGetter<T : Any>(
     private val period: Duration,
     private val supplier: () -> T,
-) : Lazy<T> {
+) : BLazyGetter<T> {
 
     @Volatile
     private var lastGetTime: Instant = Instant.MIN
@@ -144,11 +122,11 @@ private class FixedPeriodRefreshableLazy<T : Any>(
     }
 }
 
-private class DynamicPeriodRefreshableLazy<T : Any>(
+private class DynamicPeriodLazyGetter<T : Any>(
     initPeriod: Duration,
     private val period: (T) -> Duration,
     private val supplier: () -> T,
-) : Lazy<T> {
+) : BLazyGetter<T> {
 
     @Volatile
     private var lastGetTime: Instant = Instant.MIN
@@ -194,5 +172,16 @@ private class DynamicPeriodRefreshableLazy<T : Any>(
 
     private fun needRefresh(now: Instant): Boolean {
         return lastPeriod < Duration.between(lastGetTime, now)
+    }
+}
+
+/**
+ * A special type of [BLazyGetter] of which [toString] method is overridden by result of [get].
+ * It is used in where [toString] operation is expensive.
+ */
+open class BLazyString<T : Any>(delegate: BLazyGetter<T>) : BLazyGetter<T> by delegate {
+
+    override fun toString(): String {
+        return get().toString()
     }
 }

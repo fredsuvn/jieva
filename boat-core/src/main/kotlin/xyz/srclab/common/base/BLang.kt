@@ -1,14 +1,12 @@
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.JumpStatement.*
+import xyz.srclab.common.base.BJumpState.*
 import xyz.srclab.common.base.ThreadSafePolicy.*
-import java.io.InputStream
-import java.nio.ByteBuffer
 
 /**
  * Jump statement for process control: [CONTINUE], [BREAK] or [RETURN].
  */
-enum class JumpStatement {
+enum class BJumpState {
 
     /**
      * Stops the current execution of the iteration and proceeds to the next iteration in the loop.
@@ -36,25 +34,6 @@ enum class JumpStatement {
 
     fun isReturn(): Boolean {
         return this == RETURN
-    }
-}
-
-/**
- * Base class loader.
- */
-object BoatClassLoader : ClassLoader() {
-
-    @JvmOverloads
-    fun loadClass(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size): Class<*> {
-        return super.defineClass(null, bytes, offset, length)
-    }
-
-    fun loadClass(inputStream: InputStream): Class<*> {
-        return loadClass(inputStream.readBytes())
-    }
-
-    fun loadClass(byteBuffer: ByteBuffer): Class<*> {
-        return super.defineClass(null, byteBuffer, null)
     }
 }
 

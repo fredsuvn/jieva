@@ -17,7 +17,7 @@ package xyz.srclab.common.base
  * * DEL (0x7F) is ignored;
  * * CSI (0x9B) is equivalent to ESC [.
  */
-object CtlChars {
+object BCtlChars {
 
     const val BEEP: String = "\u0007"
 
@@ -77,28 +77,28 @@ object CtlChars {
  * red/green/blue  values  (0–255).   ESC  ] R: reset
  * palette
  */
-object EscChars {
+object BEscChars {
 
     @JvmField
-    val RESET: String = CtlChars.escape("c")
+    val RESET: String = BCtlChars.escape("c")
 
     @JvmField
-    val LINEFEED: String = CtlChars.escape("D")
+    val LINEFEED: String = BCtlChars.escape("D")
 
     @JvmField
-    val NEWLINE: String = CtlChars.escape("E")
+    val NEWLINE: String = BCtlChars.escape("E")
 
     @JvmField
-    val SET_TAB_AT_CURRENT_COLUMN: String = CtlChars.escape("H")
+    val SET_TAB_AT_CURRENT_COLUMN: String = BCtlChars.escape("H")
 
     @JvmField
-    val REVERSE_LINEFEED: String = CtlChars.escape("M")
+    val REVERSE_LINEFEED: String = BCtlChars.escape("M")
 
     @JvmField
-    val SAVE_STATE: String = CtlChars.escape("7")
+    val SAVE_STATE: String = BCtlChars.escape("7")
 
     @JvmField
-    val RESTORE_STATE: String = CtlChars.escape("8")
+    val RESTORE_STATE: String = BCtlChars.escape("8")
 
     @JvmField
     val SELECT_CHARSET_DEFAULT: String = selectCharset("@")
@@ -110,7 +110,7 @@ object EscChars {
     val SELECT_CHARSET_UTF8_OBSOLETE: String = selectCharset("8")
 
     @JvmField
-    val FILL_SCREEN_WITH_E: String = CtlChars.escape("#8")
+    val FILL_SCREEN_WITH_E: String = BCtlChars.escape("#8")
 
     @JvmField
     val DEFINE_CHARSET_G0_DEFAULT: String = defineCharsetG0("B")
@@ -137,34 +137,34 @@ object EscChars {
     val DEFINE_CHARSET_G1_USER: String = defineCharsetG1("K")
 
     @JvmField
-    val SET_KEYPAD_MODE_NUMERIC: String = CtlChars.escape(">")
+    val SET_KEYPAD_MODE_NUMERIC: String = BCtlChars.escape(">")
 
     @JvmField
-    val SET_KEYPAD_MODE_APPLICATION: String = CtlChars.escape("=")
+    val SET_KEYPAD_MODE_APPLICATION: String = BCtlChars.escape("=")
 
     @JvmStatic
     fun csiChars(csiChars: CharSequence): String {
-        return CtlChars.escape("[") + csiChars
+        return BCtlChars.escape("[") + csiChars
     }
 
     @JvmStatic
     fun selectCharset(charset: CharSequence): String {
-        return CtlChars.escape("%") + charset
+        return BCtlChars.escape("%") + charset
     }
 
     @JvmStatic
     fun defineCharsetG0(charset: CharSequence): String {
-        return CtlChars.escape("(") + charset
+        return BCtlChars.escape("(") + charset
     }
 
     @JvmStatic
     fun defineCharsetG1(charset: CharSequence): String {
-        return CtlChars.escape(")") + charset
+        return BCtlChars.escape(")") + charset
     }
 
     @JvmStatic
     fun osCommand(command: CharSequence): String {
-        return CtlChars.escape("]") + command
+        return BCtlChars.escape("]") + command
     }
 }
 
@@ -223,7 +223,7 @@ object EscChars {
  * * u   ?         Restore cursor location.
  * * `   HPA       Move cursor to indicated column in current row.
  */
-object CsiChars {
+object BCsiChars {
 
     @JvmField
     val ERASE_DISPLAY_FROM_START_TO_CURSOR: String = eraseDisplay(1)
@@ -259,74 +259,74 @@ object CsiChars {
     val RESET_FOLLOW_CR: String = resetMode(20)
 
     @JvmField
-    val SAVE_CURSOR: String = EscChars.csiChars("s")
+    val SAVE_CURSOR: String = BEscChars.csiChars("s")
 
     @JvmField
-    val RESTORE_CURSOR: String = EscChars.csiChars("u")
+    val RESTORE_CURSOR: String = BEscChars.csiChars("u")
 
     @JvmField
-    val REPORT_STATUS: String = EscChars.csiChars("5n")
+    val REPORT_STATUS: String = BEscChars.csiChars("5n")
 
     @JvmField
-    val REPORT_CURSOR: String = EscChars.csiChars("6n")
+    val REPORT_CURSOR: String = BEscChars.csiChars("6n")
 
     @JvmStatic
     @JvmOverloads
     fun cursorUp(n: Int = 1): String {
-        return EscChars.csiChars("${n}A")
+        return BEscChars.csiChars("${n}A")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorDown(n: Int = 1): String {
-        return EscChars.csiChars("${n}B")
+        return BEscChars.csiChars("${n}B")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorForward(n: Int = 1): String {
-        return EscChars.csiChars("${n}C")
+        return BEscChars.csiChars("${n}C")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorBack(n: Int = 1): String {
-        return EscChars.csiChars("${n}D")
+        return BEscChars.csiChars("${n}D")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorNextLine(n: Int = 1): String {
-        return EscChars.csiChars("${n}E")
+        return BEscChars.csiChars("${n}E")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorPreviousLine(n: Int = 1): String {
-        return EscChars.csiChars("${n}F")
+        return BEscChars.csiChars("${n}F")
     }
 
     @JvmStatic
     @JvmOverloads
     fun cursorColumn(n: Int = 1): String {
-        return EscChars.csiChars("${n}G")
+        return BEscChars.csiChars("${n}G")
     }
 
     @JvmStatic
     fun cursorMove(n: Int, m: Int): String {
-        return EscChars.csiChars("${n};${m}H")
+        return BEscChars.csiChars("${n};${m}H")
     }
 
     @JvmStatic
     @JvmOverloads
     fun scrollUp(n: Int = 1): String {
-        return EscChars.csiChars("${n}S")
+        return BEscChars.csiChars("${n}S")
     }
 
     @JvmStatic
     @JvmOverloads
     fun scrollDown(n: Int = 1): String {
-        return EscChars.csiChars("${n}T")
+        return BEscChars.csiChars("${n}T")
     }
 
     /**
@@ -338,7 +338,7 @@ object CsiChars {
     @JvmStatic
     @JvmOverloads
     fun eraseDisplay(n: Int = 2): String {
-        return EscChars.csiChars("${n}J")
+        return BEscChars.csiChars("${n}J")
     }
 
     /**
@@ -349,7 +349,7 @@ object CsiChars {
     @JvmStatic
     @JvmOverloads
     fun eraseLine(n: Int = 2): String {
-        return EscChars.csiChars("${n}K")
+        return BEscChars.csiChars("${n}K")
     }
 
     /**
@@ -360,7 +360,7 @@ object CsiChars {
      */
     @JvmStatic
     fun setMode(h: Int): String {
-        return EscChars.csiChars("${h}h")
+        return BEscChars.csiChars("${h}h")
     }
 
     /**
@@ -371,7 +371,7 @@ object CsiChars {
      */
     @JvmStatic
     fun resetMode(l: Int): String {
-        return EscChars.csiChars("${l}l")
+        return BEscChars.csiChars("${l}l")
     }
 }
 
@@ -382,363 +382,363 @@ object CsiChars {
  * can be set in the same sequence, separated by semicolons.   An  empty  parameter  (between
  * semicolons or string initiator or terminator) is interpreted as a zero.
  */
-object SgrChars {
+object BSgrChars {
 
     @JvmField
-    val RESET: String = EscChars.csiChars("${SgrParam.RESET.value}m")
+    val RESET: String = BEscChars.csiChars("${BSgrParam.RESET.value}m")
 
     @JvmOverloads
     @JvmStatic
     fun foregroundBlack(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_BLACK else SgrParam.FOREGROUND_BLACK)
+        return withParam(content, if (bright) BSgrParam.FOREGROUND_BRIGHT_BLACK else BSgrParam.FOREGROUND_BLACK)
     }
 
     @JvmOverloads
     @JvmStatic
     fun foregroundRed(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_RED else SgrParam.FOREGROUND_RED)
+        return withParam(content, if (bright) BSgrParam.FOREGROUND_BRIGHT_RED else BSgrParam.FOREGROUND_RED)
     }
 
     @JvmOverloads
     @JvmStatic
     fun foregroundGreen(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_GREEN else SgrParam.FOREGROUND_GREEN)
+        return withParam(content, if (bright) BSgrParam.FOREGROUND_BRIGHT_GREEN else BSgrParam.FOREGROUND_GREEN)
     }
 
     @JvmOverloads
     @JvmStatic
     fun foregroundYellow(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_YELLOW else SgrParam.FOREGROUND_YELLOW)
+        return withParam(content, if (bright) BSgrParam.FOREGROUND_BRIGHT_YELLOW else BSgrParam.FOREGROUND_YELLOW)
     }
 
     @JvmOverloads
     @JvmStatic
     fun foregroundBlue(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_BLUE else SgrParam.FOREGROUND_BLUE)
+        return withParam(content, if (bright) BSgrParam.FOREGROUND_BRIGHT_BLUE else BSgrParam.FOREGROUND_BLUE)
     }
 
     @JvmOverloads
     @JvmStatic
     fun foregroundMagenta(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_MAGENTA else SgrParam.FOREGROUND_MAGENTA)
+        return withParam(content, if (bright) BSgrParam.FOREGROUND_BRIGHT_MAGENTA else BSgrParam.FOREGROUND_MAGENTA)
     }
 
     @JvmOverloads
     @JvmStatic
     fun foregroundCyan(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_CYAN else SgrParam.FOREGROUND_CYAN)
+        return withParam(content, if (bright) BSgrParam.FOREGROUND_BRIGHT_CYAN else BSgrParam.FOREGROUND_CYAN)
     }
 
     @JvmOverloads
     @JvmStatic
     fun foregroundWhite(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.FOREGROUND_BRIGHT_WHITE else SgrParam.FOREGROUND_WHITE)
+        return withParam(content, if (bright) BSgrParam.FOREGROUND_BRIGHT_WHITE else BSgrParam.FOREGROUND_WHITE)
     }
 
     @JvmStatic
     fun foregroundDefault(content: Any?): String {
-        return withParam(content, SgrParam.FOREGROUND_DEFAULT)
+        return withParam(content, BSgrParam.FOREGROUND_DEFAULT)
     }
 
     @JvmOverloads
     @JvmStatic
     fun backgroundBlack(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_BLACK else SgrParam.BACKGROUND_BLACK)
+        return withParam(content, if (bright) BSgrParam.BACKGROUND_BRIGHT_BLACK else BSgrParam.BACKGROUND_BLACK)
     }
 
     @JvmOverloads
     @JvmStatic
     fun backgroundRed(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_RED else SgrParam.BACKGROUND_RED)
+        return withParam(content, if (bright) BSgrParam.BACKGROUND_BRIGHT_RED else BSgrParam.BACKGROUND_RED)
     }
 
     @JvmOverloads
     @JvmStatic
     fun backgroundGreen(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_GREEN else SgrParam.BACKGROUND_GREEN)
+        return withParam(content, if (bright) BSgrParam.BACKGROUND_BRIGHT_GREEN else BSgrParam.BACKGROUND_GREEN)
     }
 
     @JvmOverloads
     @JvmStatic
     fun backgroundYellow(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_YELLOW else SgrParam.BACKGROUND_YELLOW)
+        return withParam(content, if (bright) BSgrParam.BACKGROUND_BRIGHT_YELLOW else BSgrParam.BACKGROUND_YELLOW)
     }
 
     @JvmOverloads
     @JvmStatic
     fun backgroundBlue(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_BLUE else SgrParam.BACKGROUND_BLUE)
+        return withParam(content, if (bright) BSgrParam.BACKGROUND_BRIGHT_BLUE else BSgrParam.BACKGROUND_BLUE)
     }
 
     @JvmOverloads
     @JvmStatic
     fun backgroundMagenta(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_MAGENTA else SgrParam.BACKGROUND_MAGENTA)
+        return withParam(content, if (bright) BSgrParam.BACKGROUND_BRIGHT_MAGENTA else BSgrParam.BACKGROUND_MAGENTA)
     }
 
     @JvmOverloads
     @JvmStatic
     fun backgroundCyan(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_CYAN else SgrParam.BACKGROUND_CYAN)
+        return withParam(content, if (bright) BSgrParam.BACKGROUND_BRIGHT_CYAN else BSgrParam.BACKGROUND_CYAN)
     }
 
     @JvmOverloads
     @JvmStatic
     fun backgroundWhite(content: Any?, bright: Boolean = false): String {
-        return withParam(content, if (bright) SgrParam.BACKGROUND_BRIGHT_WHITE else SgrParam.BACKGROUND_WHITE)
+        return withParam(content, if (bright) BSgrParam.BACKGROUND_BRIGHT_WHITE else BSgrParam.BACKGROUND_WHITE)
     }
 
     @JvmStatic
     fun backgroundDefault(content: Any?): String {
-        return withParam(content, SgrParam.BACKGROUND_DEFAULT)
+        return withParam(content, BSgrParam.BACKGROUND_DEFAULT)
     }
 
     @JvmStatic
-    fun withParam(content: Any?, sgrParams: SgrParam): String {
-        return EscChars.csiChars("${sgrParams.value}m${content}") + RESET
+    fun withParam(content: Any?, sgrParams: BSgrParam): String {
+        return BEscChars.csiChars("${sgrParams.value}m${content}") + RESET
     }
 
     @JvmStatic
-    fun withParams(content: Any?, vararg sgrParams: SgrParam): String {
-        return withParam(content, SgrParam.concat(*sgrParams))
+    fun withParams(content: Any?, vararg sgrParams: BSgrParam): String {
+        return withParam(content, BSgrParam.concat(*sgrParams))
     }
 
     @JvmStatic
-    fun withParams(content: Any?, sgrParams: List<SgrParam>): String {
-        return withParam(content, SgrParam.concat(sgrParams))
+    fun withParams(content: Any?, sgrParams: List<BSgrParam>): String {
+        return withParam(content, BSgrParam.concat(sgrParams))
     }
 }
 
 /**
- * Parameters for [SgrChars].
+ * Parameters for [BSgrChars].
  */
-interface SgrParam {
+interface BSgrParam {
 
     val value: String
 
     companion object {
 
         @JvmField
-        val RESET: SgrParam = of("0")
+        val RESET: BSgrParam = of("0")
 
         @JvmField
-        val BOLD: SgrParam = of("1")
+        val BOLD: BSgrParam = of("1")
 
         @JvmField
-        val HALF_BRIGHT: SgrParam = of("2")
+        val HALF_BRIGHT: BSgrParam = of("2")
 
         @JvmField
-        val ITALIC: SgrParam = of("3")
+        val ITALIC: BSgrParam = of("3")
 
         @JvmField
-        val UNDERSCORE: SgrParam = of("4")
+        val UNDERSCORE: BSgrParam = of("4")
 
         @JvmField
-        val BLINK: SgrParam = of("5")
+        val BLINK: BSgrParam = of("5")
 
         @JvmField
-        val FAST_BLINK: SgrParam = of("6")
+        val FAST_BLINK: BSgrParam = of("6")
 
         @JvmField
-        val INVERSE: SgrParam = of("7")
+        val INVERSE: BSgrParam = of("7")
 
         @JvmField
-        val INVISIBLE: SgrParam = of("8")
+        val INVISIBLE: BSgrParam = of("8")
 
         @JvmField
-        val STRIKETHROUGH: SgrParam = of("9")
+        val STRIKETHROUGH: BSgrParam = of("9")
 
         @JvmField
-        val PRIMARY_FONT: SgrParam = of("10")
+        val PRIMARY_FONT: BSgrParam = of("10")
 
         @JvmField
-        val ALTERNATE_FONT_1: SgrParam = of("11")
+        val ALTERNATE_FONT_1: BSgrParam = of("11")
 
         @JvmField
-        val ALTERNATE_FONT_2: SgrParam = of("12")
+        val ALTERNATE_FONT_2: BSgrParam = of("12")
 
         @JvmField
-        val ALTERNATE_FONT_3: SgrParam = of("13")
+        val ALTERNATE_FONT_3: BSgrParam = of("13")
 
         @JvmField
-        val ALTERNATE_FONT_4: SgrParam = of("14")
+        val ALTERNATE_FONT_4: BSgrParam = of("14")
 
         @JvmField
-        val ALTERNATE_FONT_5: SgrParam = of("15")
+        val ALTERNATE_FONT_5: BSgrParam = of("15")
 
         @JvmField
-        val ALTERNATE_FONT_6: SgrParam = of("16")
+        val ALTERNATE_FONT_6: BSgrParam = of("16")
 
         @JvmField
-        val ALTERNATE_FONT_7: SgrParam = of("17")
+        val ALTERNATE_FONT_7: BSgrParam = of("17")
 
         @JvmField
-        val ALTERNATE_FONT_8: SgrParam = of("18")
+        val ALTERNATE_FONT_8: BSgrParam = of("18")
 
         @JvmField
-        val ALTERNATE_FONT_9: SgrParam = of("19")
+        val ALTERNATE_FONT_9: BSgrParam = of("19")
 
         @JvmField
-        val BOLD_OFF: SgrParam = of("21")
+        val BOLD_OFF: BSgrParam = of("21")
 
         @JvmField
-        val HALF_BRIGHT_OFF: SgrParam = of("22")
+        val HALF_BRIGHT_OFF: BSgrParam = of("22")
 
         @JvmField
-        val ITALIC_OFF: SgrParam = of("23")
+        val ITALIC_OFF: BSgrParam = of("23")
 
         @JvmField
-        val UNDERSCORE_OFF: SgrParam = of("24")
+        val UNDERSCORE_OFF: BSgrParam = of("24")
 
         @JvmField
-        val BLINK_OFF: SgrParam = of("25")
+        val BLINK_OFF: BSgrParam = of("25")
 
         @JvmField
-        val FAST_BLINK_OFF: SgrParam = of("26")
+        val FAST_BLINK_OFF: BSgrParam = of("26")
 
         @JvmField
-        val INVERSE_OFF: SgrParam = of("27")
+        val INVERSE_OFF: BSgrParam = of("27")
 
         @JvmField
-        val INVISIBLE_OFF: SgrParam = of("28")
+        val INVISIBLE_OFF: BSgrParam = of("28")
 
         @JvmField
-        val STRIKETHROUGH_OFF: SgrParam = of("29")
+        val STRIKETHROUGH_OFF: BSgrParam = of("29")
 
         @JvmField
-        val FOREGROUND_BLACK: SgrParam = of("30")
+        val FOREGROUND_BLACK: BSgrParam = of("30")
 
         @JvmField
-        val FOREGROUND_RED: SgrParam = of("31")
+        val FOREGROUND_RED: BSgrParam = of("31")
 
         @JvmField
-        val FOREGROUND_GREEN: SgrParam = of("32")
+        val FOREGROUND_GREEN: BSgrParam = of("32")
 
         @JvmField
-        val FOREGROUND_YELLOW: SgrParam = of("33")
+        val FOREGROUND_YELLOW: BSgrParam = of("33")
 
         @JvmField
-        val FOREGROUND_BLUE: SgrParam = of("34")
+        val FOREGROUND_BLUE: BSgrParam = of("34")
 
         @JvmField
-        val FOREGROUND_MAGENTA: SgrParam = of("35")
+        val FOREGROUND_MAGENTA: BSgrParam = of("35")
 
         @JvmField
-        val FOREGROUND_CYAN: SgrParam = of("36")
+        val FOREGROUND_CYAN: BSgrParam = of("36")
 
         @JvmField
-        val FOREGROUND_WHITE: SgrParam = of("37")
+        val FOREGROUND_WHITE: BSgrParam = of("37")
 
         @JvmField
-        val FOREGROUND_DEFAULT: SgrParam = of("39")
+        val FOREGROUND_DEFAULT: BSgrParam = of("39")
 
         @JvmField
-        val BACKGROUND_BLACK: SgrParam = of("40")
+        val BACKGROUND_BLACK: BSgrParam = of("40")
 
         @JvmField
-        val BACKGROUND_RED: SgrParam = of("41")
+        val BACKGROUND_RED: BSgrParam = of("41")
 
         @JvmField
-        val BACKGROUND_GREEN: SgrParam = of("42")
+        val BACKGROUND_GREEN: BSgrParam = of("42")
 
         @JvmField
-        val BACKGROUND_YELLOW: SgrParam = of("43")
+        val BACKGROUND_YELLOW: BSgrParam = of("43")
 
         @JvmField
-        val BACKGROUND_BLUE: SgrParam = of("44")
+        val BACKGROUND_BLUE: BSgrParam = of("44")
 
         @JvmField
-        val BACKGROUND_MAGENTA: SgrParam = of("45")
+        val BACKGROUND_MAGENTA: BSgrParam = of("45")
 
         @JvmField
-        val BACKGROUND_CYAN: SgrParam = of("46")
+        val BACKGROUND_CYAN: BSgrParam = of("46")
 
         @JvmField
-        val BACKGROUND_WHITE: SgrParam = of("47")
+        val BACKGROUND_WHITE: BSgrParam = of("47")
 
         @JvmField
-        val BACKGROUND_DEFAULT: SgrParam = of("49")
+        val BACKGROUND_DEFAULT: BSgrParam = of("49")
 
         @JvmField
-        val FRAMED: SgrParam = of("51")
+        val FRAMED: BSgrParam = of("51")
 
         @JvmField
-        val ENCIRCLED: SgrParam = of("52")
+        val ENCIRCLED: BSgrParam = of("52")
 
         @JvmField
-        val OVERLINE: SgrParam = of("53")
+        val OVERLINE: BSgrParam = of("53")
 
         @JvmField
-        val FRAMED_ENCIRCLED_OFF: SgrParam = of("54")
+        val FRAMED_ENCIRCLED_OFF: BSgrParam = of("54")
 
         @JvmField
-        val OVERLINE_OFF: SgrParam = of("55")
+        val OVERLINE_OFF: BSgrParam = of("55")
 
         @JvmField
-        val FOREGROUND_BRIGHT_BLACK: SgrParam = of("90")
+        val FOREGROUND_BRIGHT_BLACK: BSgrParam = of("90")
 
         @JvmField
-        val FOREGROUND_BRIGHT_RED: SgrParam = of("91")
+        val FOREGROUND_BRIGHT_RED: BSgrParam = of("91")
 
         @JvmField
-        val FOREGROUND_BRIGHT_GREEN: SgrParam = of("92")
+        val FOREGROUND_BRIGHT_GREEN: BSgrParam = of("92")
 
         @JvmField
-        val FOREGROUND_BRIGHT_YELLOW: SgrParam = of("93")
+        val FOREGROUND_BRIGHT_YELLOW: BSgrParam = of("93")
 
         @JvmField
-        val FOREGROUND_BRIGHT_BLUE: SgrParam = of("94")
+        val FOREGROUND_BRIGHT_BLUE: BSgrParam = of("94")
 
         @JvmField
-        val FOREGROUND_BRIGHT_MAGENTA: SgrParam = of("95")
+        val FOREGROUND_BRIGHT_MAGENTA: BSgrParam = of("95")
 
         @JvmField
-        val FOREGROUND_BRIGHT_CYAN: SgrParam = of("96")
+        val FOREGROUND_BRIGHT_CYAN: BSgrParam = of("96")
 
         @JvmField
-        val FOREGROUND_BRIGHT_WHITE: SgrParam = of("97")
+        val FOREGROUND_BRIGHT_WHITE: BSgrParam = of("97")
 
         @JvmField
-        val BACKGROUND_BRIGHT_BLACK: SgrParam = of("100")
+        val BACKGROUND_BRIGHT_BLACK: BSgrParam = of("100")
 
         @JvmField
-        val BACKGROUND_BRIGHT_RED: SgrParam = of("101")
+        val BACKGROUND_BRIGHT_RED: BSgrParam = of("101")
 
         @JvmField
-        val BACKGROUND_BRIGHT_GREEN: SgrParam = of("102")
+        val BACKGROUND_BRIGHT_GREEN: BSgrParam = of("102")
 
         @JvmField
-        val BACKGROUND_BRIGHT_YELLOW: SgrParam = of("103")
+        val BACKGROUND_BRIGHT_YELLOW: BSgrParam = of("103")
 
         @JvmField
-        val BACKGROUND_BRIGHT_BLUE: SgrParam = of("104")
+        val BACKGROUND_BRIGHT_BLUE: BSgrParam = of("104")
 
         @JvmField
-        val BACKGROUND_BRIGHT_MAGENTA: SgrParam = of("105")
+        val BACKGROUND_BRIGHT_MAGENTA: BSgrParam = of("105")
 
         @JvmField
-        val BACKGROUND_BRIGHT_CYAN: SgrParam = of("106")
+        val BACKGROUND_BRIGHT_CYAN: BSgrParam = of("106")
 
         @JvmField
-        val BACKGROUND_BRIGHT_WHITE: SgrParam = of("107")
+        val BACKGROUND_BRIGHT_WHITE: BSgrParam = of("107")
 
         @JvmStatic
-        fun of(value: CharSequence): SgrParam {
+        fun of(value: CharSequence): BSgrParam {
             return SgrParamImpl(value.toString())
         }
 
         @JvmStatic
-        fun concat(vararg params: SgrParam): SgrParam {
+        fun concat(vararg params: BSgrParam): BSgrParam {
             return concat(params.toList())
         }
 
         @JvmStatic
-        fun concat(params: List<SgrParam>): SgrParam {
+        fun concat(params: List<BSgrParam>): BSgrParam {
             return SgrParamImpl(params.joinToString(separator = ";") { r -> r.value })
         }
 
         @JvmStatic
-        fun alternateFont(n: Int): SgrParam {
+        fun alternateFont(n: Int): BSgrParam {
             return when (n) {
                 1 -> ALTERNATE_FONT_1
                 2 -> ALTERNATE_FONT_2
@@ -754,25 +754,25 @@ interface SgrParam {
         }
 
         @JvmStatic
-        fun foregroundColor(n: Int): SgrParam {
+        fun foregroundColor(n: Int): BSgrParam {
             return SgrParamImpl("38;5;$n")
         }
 
         @JvmStatic
-        fun foregroundColor(r: Int, g: Int, b: Int): SgrParam {
+        fun foregroundColor(r: Int, g: Int, b: Int): BSgrParam {
             return SgrParamImpl("38;2;$r;$g;$b")
         }
 
         @JvmStatic
-        fun backgroundColor(n: Int): SgrParam {
+        fun backgroundColor(n: Int): BSgrParam {
             return SgrParamImpl("48;5;$n")
         }
 
         @JvmStatic
-        fun backgroundColor(r: Int, g: Int, b: Int): SgrParam {
+        fun backgroundColor(r: Int, g: Int, b: Int): BSgrParam {
             return SgrParamImpl("48;2;$r;$g;$b")
         }
 
-        private class SgrParamImpl(override val value: String) : SgrParam
+        private class SgrParamImpl(override val value: String) : BSgrParam
     }
 }

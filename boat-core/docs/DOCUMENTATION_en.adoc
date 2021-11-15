@@ -34,9 +34,9 @@ Boat core provides core interfaces, functions and utilities for link:../../READM
 Lang package provides a serials of core and base interfaces and components:
 
 * Global system objects: `Current`, `Defaults`, `Environment`;
-* Lang syntax enhancement (mainly for Java): `Let`, `Ref`, `Lazy`, `LazyToString`;
-* String/CharSequence functions: `BFormat`, `BTemplate`, `NamingCase`;
-* Special character support: `CtlChars`, `EscChars`, `CsiChars`, `SgrChars`;
+* Lang syntax enhancement (mainly for Java): `Let`, `Ref`, `Lazy`, `BLazyGetterCharSeq`;
+* String/CharSequence functions: `BFormat`, `BTemplate`, `BNamingCase`;
+* Special character support: `BCtlChars`, `BEscChars`, `BCsiChars`, `BSgrChars`;
 * Accessor interfaces: `ObjectAccessor`, `MapAccessor`, `BAccessor`, `BMapAccessor`;
 * Helper interfaces and utilities: SpecParser, CachingProductBuilder, Processing;
 * Common utilities: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
@@ -243,7 +243,7 @@ Collect package extends collection function, supports `chain operation`, `multi-
 
 * `Collects`: Default utilities for Collection;
 * `Collecting`, `Mapping`: Collection interfaces provide chain operation and integrates common collection interface functions (such as `Iterable`, `Collection`, `Set`, `List`);
-* `IterableType`, `MapType`: Meta type interfaces for generic Collection types;
+* `BCollectType`, `BMapType`: Meta type interfaces for generic Collection types;
 * `MultiMaps.kt`: `MultiMaps.kt` provides multi-values `Map` such as `SetMap`, `MutableSetMap`, `ListMap` and `MutableListMap`;
 * `CopyOnWriteMap`: Map for copy-on-write operation;
 

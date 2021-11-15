@@ -1,10 +1,10 @@
 package test.java.xyz.srclab.common.base;
 
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.CtlChars;
-import xyz.srclab.common.base.EscChars;
-import xyz.srclab.common.base.SgrChars;
-import xyz.srclab.common.base.SgrParam;
+import xyz.srclab.common.base.BCtlChars;
+import xyz.srclab.common.base.BEscChars;
+import xyz.srclab.common.base.BSgrChars;
+import xyz.srclab.common.base.BSgrParam;
 import xyz.srclab.common.logging.Logs;
 
 public class CtlCharsTest {
@@ -12,24 +12,24 @@ public class CtlCharsTest {
     @Test
     public void testShell() {
         Logs.info("Hello, world!");
-        Logs.info("123{}456{}{}", EscChars.LINEFEED, EscChars.NEWLINE, EscChars.RESET);
+        Logs.info("123{}456{}{}", BEscChars.LINEFEED, BEscChars.NEWLINE, BEscChars.RESET);
         Logs.info("{}{}{}",
-            SgrChars.foregroundRed("red"),
-            SgrChars.backgroundCyan(" "),
-            SgrChars.foregroundGreen("green")
+            BSgrChars.foregroundRed("red"),
+            BSgrChars.backgroundCyan(" "),
+            BSgrChars.foregroundGreen("green")
         );
         Logs.info("{}{}{}",
-            SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
-            SgrChars.backgroundCyan(" "),
-            SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
+            BSgrChars.withParam("bright red", BSgrParam.FOREGROUND_BRIGHT_RED),
+            BSgrChars.backgroundCyan(" "),
+            BSgrChars.withParam("bright green", BSgrParam.FOREGROUND_BRIGHT_GREEN)
         );
         Logs.info("{}{}{}",
-            SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
-            SgrChars.backgroundCyan(" "),
-            SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
+            BSgrChars.withParam("color 8", BSgrParam.foregroundColor(8)),
+            BSgrChars.backgroundCyan(" "),
+            BSgrChars.withParam("rgb(100, 100, 50)", BSgrParam.foregroundColor(100, 100, 50))
         );
-        Logs.info(CtlChars.BEEP);
+        Logs.info(BCtlChars.BEEP);
         Logs.info("123\010456\007");
-        Logs.info("123{}456{}", CtlChars.BACKSPACES, CtlChars.BEEP);
+        Logs.info("123{}456{}", BCtlChars.BACKSPACES, BCtlChars.BEEP);
     }
 }

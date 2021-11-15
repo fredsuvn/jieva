@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.Enums;
 
-public class EnumsTest {
+public class BEnumsKtTest {
 
     @Test
     public void test() {

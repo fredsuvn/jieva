@@ -8,11 +8,11 @@ import java.util.function.Function
  * Copy-On-Write [Map].
  */
 open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
-    map: Map<out K, V> = emptyMap(),
+    initMap: Map<out K, V> = emptyMap(),
     private val newMapFun: (Map<out K, V>) -> MutableMap<K, V> = { HashMap(it) }
 ) : MutableMap<K, V> {
 
-    private var currentMap: MutableMap<K, V> = newMapFun(map)
+    private var currentMap: MutableMap<K, V> = newMapFun(initMap)
 
     override val size: Int
         get() = currentMap.size
@@ -103,11 +103,12 @@ open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
     }
 
     private inline fun <T> cow(action: (MutableMap<K, V>) -> T): T {
-        synchronized(this) {
-            val newMap = newMapFun(currentMap)
+        return synchronized(this) {
+            val curMap = currentMap
+            val newMap = newMapFun(curMap)
             val result = action(newMap)
             currentMap = newMap
-            return result
+            result
         }
     }
 

@@ -1,6 +1,64 @@
+@file:JvmName("BSpecs")
+
 package xyz.srclab.common.base
 
 import xyz.srclab.common.reflect.toInstance
+
+/**
+ * Returns all parsed results of "class name to instance".
+ *
+ * For example:
+ *
+ * ```
+ * List<Foo> list = BSpecs.classNamesToInstances("a.b.Foo, a.b.Foo");
+ * ```
+ */
+@Throws(SpecParsingException::class)
+@JvmOverloads
+fun <T : Any> CharSequence.classNamesToInstances(strict: Boolean = false): List<T> {
+    return getClassNameSpecParser(strict).parse(this)
+}
+
+/**
+ * Returns first parsed result of "class name to instance".
+ *
+ * For example:
+ *
+ * ```
+ * Foo first = BSpecs.classNamesToInstances("a.b.Foo, a.b.Foo");
+ * ```
+ */
+@Throws(SpecParsingException::class)
+@JvmOverloads
+fun <T : Any> CharSequence.classNameToInstance(strict: Boolean = false): T {
+    return getClassNameSpecParser(strict).parseFirst(this)
+}
+
+/**
+ * Returns first parsed result of "class name to instance"., or null if failed.
+ *
+ * For example:
+ *
+ * ```
+ * Foo first = BSpecs.classNamesToInstances("a.b.Foo, a.b.Foo");
+ * ```
+ */
+@Throws(SpecParsingException::class)
+@JvmOverloads
+fun <T : Any> CharSequence.classNameToInstanceOrNull(strict: Boolean = false): T? {
+    return getClassNameSpecParser(strict).parseFirstOrNull(this)
+}
+
+/**
+ * Returns a spec parser which parses chars to instance.
+ *
+ * @see ClassNameSpecParser
+ * @see StrictClassNameSpecParser
+ */
+@Throws(SpecParsingException::class)
+private fun getClassNameSpecParser(strict: Boolean = false): SpecParser<CharSequence> {
+    return if (strict) StrictClassNameSpecParser else ClassNameSpecParser
+}
 
 /**
  * Help parse object by spec of type [S].
@@ -29,43 +87,6 @@ interface SpecParser<S> {
      */
     @Throws(SpecParsingException::class)
     fun <T : Any> parseFirstOrNull(spec: S): T?
-
-    companion object {
-
-        @Throws(SpecParsingException::class)
-        @JvmStatic
-        @JvmOverloads
-        fun <T : Any> CharSequence.parseClassNameToInstance(strict: Boolean = false): List<T> {
-            return getClassNameSpecParser(strict).parse(this)
-        }
-
-        @Throws(SpecParsingException::class)
-        @JvmStatic
-        @JvmOverloads
-        fun <T : Any> CharSequence.parseFirstClassNameToInstance(strict: Boolean = false): T {
-            return getClassNameSpecParser(strict).parseFirst(this)
-        }
-
-        @Throws(SpecParsingException::class)
-        @JvmStatic
-        @JvmOverloads
-        fun <T : Any> CharSequence.parseFirstClassNameToInstanceOrNull(strict: Boolean = false): T? {
-            return getClassNameSpecParser(strict).parseFirstOrNull(this)
-        }
-
-        /**
-         * Returns a spec parser which parses chars to instance.
-         *
-         * @see ClassNameSpecParser
-         * @see StrictClassNameSpecParser
-         */
-        @Throws(SpecParsingException::class)
-        @JvmStatic
-        @JvmOverloads
-        fun getClassNameSpecParser(strict: Boolean = false): SpecParser<CharSequence> {
-            return if (strict) StrictClassNameSpecParser else ClassNameSpecParser
-        }
-    }
 }
 
 /**

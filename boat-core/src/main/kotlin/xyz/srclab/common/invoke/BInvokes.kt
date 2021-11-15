@@ -1,5 +1,4 @@
-@file:JvmName("Invokes")
-@file:JvmMultifileClass
+@file:JvmName("BInvokes")
 
 package xyz.srclab.common.invoke
 
@@ -11,7 +10,7 @@ import java.util.concurrent.Callable
 import java.util.function.Function
 
 @JvmOverloads
-fun Method.toInstInvoker(force: Boolean = false, reflect: Boolean = true): InstInvoker {
+fun Method.toInstInvoker(force: Boolean = false, reflect: Boolean = true): BInstInvoker {
     return if (reflect)
         ReflectedInstInvoker(this, force)
     else {
@@ -20,7 +19,7 @@ fun Method.toInstInvoker(force: Boolean = false, reflect: Boolean = true): InstI
 }
 
 @JvmOverloads
-fun Method.toFuncInvoker(force: Boolean = false, reflect: Boolean = true): FuncInvoker {
+fun Method.toFuncInvoker(force: Boolean = false, reflect: Boolean = true): BFuncInvoker {
     return if (reflect)
         ReflectedFuncInvoker(this, force)
     else {
@@ -29,7 +28,7 @@ fun Method.toFuncInvoker(force: Boolean = false, reflect: Boolean = true): FuncI
 }
 
 @JvmOverloads
-fun Constructor<*>.toFuncInvoker(force: Boolean = false, reflect: Boolean = true): FuncInvoker {
+fun Constructor<*>.toFuncInvoker(force: Boolean = false, reflect: Boolean = true): BFuncInvoker {
     return if (reflect)
         ReflectedConstructorInvoker(this, force)
     else {
@@ -37,8 +36,8 @@ fun Constructor<*>.toFuncInvoker(force: Boolean = false, reflect: Boolean = true
     }
 }
 
-fun Runnable.toFuncInvoker(): FuncInvoker {
-    return object : FuncInvoker {
+fun Runnable.toFuncInvoker(): BFuncInvoker {
+    return object : BFuncInvoker {
         override fun invoke(vararg args: Any?): Any? {
             this@toFuncInvoker.run()
             return null
@@ -46,16 +45,16 @@ fun Runnable.toFuncInvoker(): FuncInvoker {
     }
 }
 
-fun Callable<*>.toFuncInvoker(): FuncInvoker {
-    return object : FuncInvoker {
+fun Callable<*>.toFuncInvoker(): BFuncInvoker {
+    return object : BFuncInvoker {
         override fun invoke(vararg args: Any?): Any? {
             return this@toFuncInvoker.call()
         }
     }
 }
 
-fun Function<Array<out Any?>, *>.toFuncInvoker(): FuncInvoker {
-    return object : FuncInvoker {
+fun Function<Array<out Any?>, *>.toFuncInvoker(): BFuncInvoker {
+    return object : BFuncInvoker {
         override fun invoke(vararg args: Any?): Any? {
             return this@toFuncInvoker.apply(args)
         }
@@ -63,8 +62,8 @@ fun Function<Array<out Any?>, *>.toFuncInvoker(): FuncInvoker {
 }
 
 @JvmName("toFuncInvoker")
-fun funcInvoker(func: (Array<out Any?>) -> Any?): FuncInvoker {
-    return object : FuncInvoker {
+fun funcInvoker(func: (Array<out Any?>) -> Any?): BFuncInvoker {
+    return object : BFuncInvoker {
         override fun invoke(vararg args: Any?): Any? {
             return func(args)
         }
@@ -74,7 +73,7 @@ fun funcInvoker(func: (Array<out Any?>) -> Any?): FuncInvoker {
 private class ReflectedInstInvoker(
     private val method: Method,
     force: Boolean,
-) : InstInvoker {
+) : BInstInvoker {
 
     init {
         if (force) {
@@ -90,7 +89,7 @@ private class ReflectedInstInvoker(
 private class UnreflectedInstInvoker(
     method: Method,
     force: Boolean,
-) : InstInvoker {
+) : BInstInvoker {
 
     private val handle: MethodHandle
 
@@ -112,7 +111,7 @@ private class UnreflectedInstInvoker(
 private class ReflectedFuncInvoker(
     private val method: Method,
     force: Boolean,
-) : FuncInvoker {
+) : BFuncInvoker {
 
     init {
         if (force) {
@@ -128,7 +127,7 @@ private class ReflectedFuncInvoker(
 private class ReflectedConstructorInvoker(
     private val constructor: Constructor<*>,
     force: Boolean,
-) : FuncInvoker {
+) : BFuncInvoker {
 
     init {
         if (force) {
@@ -144,7 +143,7 @@ private class ReflectedConstructorInvoker(
 private class UnreflectedFuncInvoker(
     method: Method,
     force: Boolean,
-) : FuncInvoker {
+) : BFuncInvoker {
 
     private val handle: MethodHandle
 
@@ -163,7 +162,7 @@ private class UnreflectedFuncInvoker(
 private class UnreflectedConstructorInvoker(
     constructor: Constructor<*>,
     force: Boolean,
-) : FuncInvoker {
+) : BFuncInvoker {
 
     private val handle: MethodHandle
 

@@ -1,9 +1,8 @@
-@file:JvmName("Randoms")
+@file:JvmName("BRandoms")
 
 package xyz.srclab.common.base
 
 import java.util.*
-import java.util.function.Supplier
 
 private val random: Random = Random()
 
@@ -18,17 +17,25 @@ fun randomBetween(from: Int, to: Int): Int {
 /**
  * Returns random number in `[from, to)`.
  */
-@JvmName("between")
 fun Random.between(from: Int, to: Int): Int {
     return this.nextInt(to - from) + from
 }
 
 /**
+ * Builds a new [BRandomer].
+ */
+fun <T : Any> randomer(): BRandomer.Builder<T> {
+    return BRandomer.Builder()
+}
+
+/**
  * Interface to get [T] in random.
  */
-interface RandomSupplier<T : Any> : Supplier<T> {
+interface BRandomer<T : Any> {
 
-    class Builder<T : Any> : CacheableBuilder<RandomSupplier<T>>() {
+    fun next(): T
+
+    class Builder<T : Any>() {
 
         private var builderRandom: Random? = null
         private val builderCases: MutableList<Case<T>> = LinkedList()
@@ -41,28 +48,22 @@ interface RandomSupplier<T : Any> : Supplier<T> {
         fun score(score: Int, supplier: () -> T): Builder<T> {
             builderCases.add(Case(scoreCount, scoreCount + score, supplier))
             scoreCount += score
-            this.commit()
             return this
-        }
-
-        fun score(score: Int, supplier: Supplier<T>): Builder<T> {
-            return score(score) { supplier.get() }
         }
 
         fun random(random: Random): Builder<T> {
             this.builderRandom = random
-            this.commit()
             return this
         }
 
-        override fun buildNew(): RandomSupplier<T> {
-            return object : RandomSupplier<T> {
+        fun build(): BRandomer<T> {
+            return object : BRandomer<T> {
 
                 private val random = builderRandom ?: Random()
                 private var totalScore = scoreCount
                 private val cases = builderCases.sortedWith { a, b -> a.from - b.from }
 
-                override fun get(): T {
+                override fun next(): T {
                     val score = random.between(1, totalScore)
                     val index = cases.binarySearch {
                         if (it.from <= score && it.to > score) {

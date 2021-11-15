@@ -5,7 +5,7 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.collect.MapType.Companion.toMapType
+import xyz.srclab.common.collect.BMapType.Companion.toMapType
 import xyz.srclab.common.collect.toUnmodifiable
 import xyz.srclab.common.convert.Converter
 import java.lang.reflect.Type

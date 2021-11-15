@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.base;
 import org.apache.commons.lang.SystemUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Processing;
+import xyz.srclab.common.base.BProcessing;
 import xyz.srclab.common.base.Systems;
 import xyz.srclab.common.logging.Logs;
 
@@ -29,7 +29,7 @@ public class ProcessingTest {
     }
 
     private void testProcessing(String... command) {
-        Processing processing = Processing.start(command);
+        BProcessing processing = BProcessing.start(command);
         processing.await();
         String output = processing.outputString();
         Logs.info(output);
@@ -37,7 +37,7 @@ public class ProcessingTest {
     }
 
     private void testProcessingByPing() {
-        Processing processing = Processing.start("ping 127.0.0.1");
+        BProcessing processing = BProcessing.start("ping 127.0.0.1");
         processing.await(Duration.ofSeconds(2));
         String output = processing.availableOutputString();
         Logs.info(output);

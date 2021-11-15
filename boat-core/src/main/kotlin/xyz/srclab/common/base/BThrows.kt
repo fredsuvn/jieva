@@ -1,4 +1,4 @@
-@file:JvmName("Throws")
+@file:JvmName("BThrows")
 
 package xyz.srclab.common.base
 

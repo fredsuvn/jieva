@@ -6,15 +6,15 @@ import xyz.srclab.annotations.Accepted
 import java.util.*
 
 @JvmName("resolve")
-fun CharSequence.resolveTemplate(parameterPrefix: String, parameterSuffix: String): BTemplate {
+fun CharSequence.resolveTemplate(parameterPrefix: CharSequence, parameterSuffix: CharSequence): BTemplate {
     return WithoutEscape(this, parameterPrefix, parameterSuffix)
 }
 
 @JvmName("resolve")
 fun CharSequence.resolveTemplate(
-    parameterPrefix: String,
-    parameterSuffix: String,
-    escape: String
+    parameterPrefix: CharSequence,
+    parameterSuffix: CharSequence,
+    escape: CharSequence
 ): BTemplate {
     return WithEscape(this, parameterPrefix, parameterSuffix, escape)
 }
@@ -94,11 +94,6 @@ interface BTemplate {
 
         val type: Type
 
-        ///**
-        // * Parameter index, or -1 if this is not a parameter.
-        // */
-        //val parameterIndex: Int
-
         /**
          * If this node is text, `value` is actual value of the node;
          *
@@ -127,20 +122,18 @@ interface BTemplate {
                 return object : Node {
                     override val tokens: List<Token> = tokens
                     override val type: Type = type
-
-                    //override val parameterIndex: Int = parameterIndex
                     override val value: Any by lazy {
                         if (parameterIndex != -1) {
                             return@lazy parameterIndex
                         }
-                        val stringBuilder = StringBuilder()
+                        val chars = LinkedList<CharSequence>()
                         for (token in tokens) {
                             if (!token.isText) {
                                 continue
                             }
-                            stringBuilder.append(template.refOfRange(token.startIndex, token.endIndex))
+                            chars.add(template.refOfRange(token.startIndex, token.endIndex))
                         }
-                        stringBuilder.toString()
+                        chars.joinToString("")
                     }
                 }
             }
@@ -199,9 +192,9 @@ abstract class AbstractCharsTemplate(
 
     protected abstract val tokens: List<BTemplate.Token>
 
-    override val nodes: List<BTemplate.Node> by lazy { tokensToNodes(tokens) }
+    override val nodes: List<BTemplate.Node> by lazy { resolveNodes(tokens) }
 
-    private fun tokensToNodes(tokens: List<BTemplate.Token>): List<BTemplate.Node> {
+    private fun resolveNodes(tokens: List<BTemplate.Token>): List<BTemplate.Node> {
         if (tokens.isEmpty()) {
             return emptyList()
         }
@@ -217,11 +210,9 @@ abstract class AbstractCharsTemplate(
                     if (tokens[i].isText || tokens[i].isEscape) {
                         i++
                     } else {
-                        nodes.add(
-                            BTemplate.Node.newNode(
-                                template, tokens.subList(start, i), BTemplate.Node.Type.TEXT, -1
-                            )
-                        )
+                        nodes.add(BTemplate.Node.newNode(
+                            template, tokens.subList(start, i), BTemplate.Node.Type.TEXT, -1
+                        ))
                         start = i
                         continue@loop
                     }
@@ -234,11 +225,9 @@ abstract class AbstractCharsTemplate(
                     if (tokens[i].isText || tokens[i].isEscape) {
                         i++
                     } else if (tokens[i].isSuffix) {
-                        nodes.add(
-                            BTemplate.Node.newNode(
-                                template, tokens.subList(start, i), BTemplate.Node.Type.PARAMETER, parameterIndex
-                            )
-                        )
+                        nodes.add(BTemplate.Node.newNode(
+                            template, tokens.subList(start, i), BTemplate.Node.Type.PARAMETER, parameterIndex
+                        ))
                         i++
                         start = i
                         parameterIndex++
@@ -252,24 +241,32 @@ abstract class AbstractCharsTemplate(
             throw IllegalArgumentException("Suffix token must after a prefix token.")
         }
         if (start != i) {
-            nodes.add(
-                BTemplate.Node.newNode(
-                    template, tokens.subList(start, i), BTemplate.Node.Type.TEXT, -1
-                )
-            )
+            nodes.add(BTemplate.Node.newNode(
+                template, tokens.subList(start, i), BTemplate.Node.Type.TEXT, -1
+            ))
         }
         return nodes
     }
 }
 
 private class WithoutEscape(
-    template: CharSequence, prefix: String, suffix: String
+    template: CharSequence,
+    prefix: CharSequence,
+    suffix: CharSequence
 ) : AbstractCharsTemplate(template) {
 
     override val tokens: List<BTemplate.Token> by lazy {
+        resolveTokens(template, prefix.toString(), suffix.toString())
+    }
+
+    private fun resolveTokens(
+        template: CharSequence,
+        prefix: String,
+        suffix: String
+    ): List<BTemplate.Token> {
         var prefixIndex = template.indexOf(prefix)
         if (prefixIndex < 0) {
-            return@lazy listOf(BTemplate.Token.newToken(0, template.length, BTemplate.Token.Type.TEXT))
+            return listOf(BTemplate.Token.newToken(0, template.length, BTemplate.Token.Type.TEXT))
         }
         var startIndex = 0
         val tokens = LinkedList<BTemplate.Token>()
@@ -294,15 +291,27 @@ private class WithoutEscape(
         if (startIndex < template.length) {
             tokens.add(BTemplate.Token.newToken(startIndex, template.length, BTemplate.Token.Type.TEXT))
         }
-        tokens
+        return tokens
     }
 }
 
 private class WithEscape(
-    template: CharSequence, prefix: String, suffix: String, escape: String
+    template: CharSequence,
+    prefix: CharSequence,
+    suffix: CharSequence,
+    escape: CharSequence
 ) : AbstractCharsTemplate(template) {
 
     override val tokens: List<BTemplate.Token> by lazy {
+        resolveTokens(template, prefix.toString(), suffix.toString(), escape.toString())
+    }
+
+    private fun resolveTokens(
+        template: CharSequence,
+        prefix: String,
+        suffix: String,
+        escape: String
+    ): List<BTemplate.Token> {
         val tokens = LinkedList<BTemplate.Token>()
         var startIndex = 0
         var i = 0
@@ -357,6 +366,6 @@ private class WithEscape(
         if (startIndex < template.length) {
             tokens.add(BTemplate.Token.newToken(startIndex, template.length, BTemplate.Token.Type.TEXT))
         }
-        tokens
+        return tokens
     }
 }

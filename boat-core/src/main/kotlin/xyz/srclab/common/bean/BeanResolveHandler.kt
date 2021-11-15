@@ -1,9 +1,9 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.base.JumpStatement
-import xyz.srclab.common.base.NamingCase
-import xyz.srclab.common.invoke.InstInvoker
+import xyz.srclab.common.base.BJumpState
+import xyz.srclab.common.base.BNamingCase
+import xyz.srclab.common.invoke.BInstInvoker
 import xyz.srclab.common.invoke.toInstInvoker
 import xyz.srclab.common.reflect.eraseTypeParameters
 import xyz.srclab.common.reflect.rawClass
@@ -25,7 +25,7 @@ interface BeanResolveHandler {
     /**
      * Resolves into given [builder].
      */
-    fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder): JumpStatement
+    fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder): BJumpState
 
     companion object {
 
@@ -55,9 +55,9 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
         @Written builder: BeanTypeBuilder,
         @Written getters: MutableMap<String, GetterInfo>,
         @Written setters: MutableMap<String, SetterInfo>,
-    ): JumpStatement
+    ): BJumpState
 
-    override fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder): JumpStatement {
+    override fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder): BJumpState {
 
         val getters: MutableMap<String, GetterInfo> = LinkedHashMap()
         val setters: MutableMap<String, SetterInfo> = LinkedHashMap()
@@ -119,7 +119,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     data class GetterInfo(
         val name: String,
         val type: Type,
-        val getter: InstInvoker?,
+        val getter: BInstInvoker?,
         val field: Field?,
         val getterMethod: Method?,
     )
@@ -127,7 +127,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     data class SetterInfo(
         val name: String,
         val type: Type,
-        val setter: InstInvoker?,
+        val setter: BInstInvoker?,
         val field: Field?,
         val setterMethod: Method?,
     )
@@ -149,7 +149,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
         @Written builder: BeanTypeBuilder,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
-    ): JumpStatement {
+    ): BJumpState {
         val beanClass = builder.type.rawClass
         val methods = context.methods
         for (method in methods) {
@@ -162,7 +162,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             }
             if (name.startsWith("get") && method.parameterCount == 0) {
                 val propertyName =
-                    NamingCase.UPPER_CAMEL.convert(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
+                    BNamingCase.UPPER_CAMEL.convert(name.substring(3, name.length), BNamingCase.LOWER_CAMEL)
                 if (builder.hasProperty(propertyName)) {
                     continue
                 }
@@ -173,7 +173,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             }
             if (name.startsWith("set") && method.parameterCount == 1) {
                 val propertyName =
-                    NamingCase.UPPER_CAMEL.convert(name.substring(3, name.length), NamingCase.LOWER_CAMEL)
+                    BNamingCase.UPPER_CAMEL.convert(name.substring(3, name.length), BNamingCase.LOWER_CAMEL)
                 if (builder.hasProperty(propertyName)) {
                     continue
                 }
@@ -183,7 +183,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
                 continue
             }
         }
-        return JumpStatement.CONTINUE
+        return BJumpState.CONTINUE
     }
 }
 
@@ -202,7 +202,7 @@ object RecordStyleBeanResolveHandler : AbstractBeanResolveHandler() {
         @Written builder: BeanTypeBuilder,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
-    ): JumpStatement {
+    ): BJumpState {
         val beanClass = builder.type.rawClass
         val methods = context.methods
         for (method in methods) {
@@ -226,6 +226,6 @@ object RecordStyleBeanResolveHandler : AbstractBeanResolveHandler() {
                 continue
             }
         }
-        return JumpStatement.CONTINUE
+        return BJumpState.CONTINUE
     }
 }

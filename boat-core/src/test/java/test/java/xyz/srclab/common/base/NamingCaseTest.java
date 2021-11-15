@@ -2,54 +2,54 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.NamingCase;
+import xyz.srclab.common.base.BNamingCase;
 
 public class NamingCaseTest {
 
     @Test
     public void testNamingCase() {
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("UpperCamel", NamingCase.LOWER_CAMEL),
+            BNamingCase.UPPER_CAMEL.convert("UpperCamel", BNamingCase.LOWER_CAMEL),
             "upperCamel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("UpperCamel", NamingCase.LOWER_HYPHEN),
+            BNamingCase.UPPER_CAMEL.convert("UpperCamel", BNamingCase.LOWER_HYPHEN),
             "upper-camel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("UpperCamel", NamingCase.LOWER_UNDERSCORE),
+            BNamingCase.UPPER_CAMEL.convert("UpperCamel", BNamingCase.LOWER_UNDERSCORE),
             "upper_camel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("AUpperCamel", NamingCase.LOWER_CAMEL),
+            BNamingCase.UPPER_CAMEL.convert("AUpperCamel", BNamingCase.LOWER_CAMEL),
             "aUpperCamel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("AUpperCamel", NamingCase.LOWER_HYPHEN),
+            BNamingCase.UPPER_CAMEL.convert("AUpperCamel", BNamingCase.LOWER_HYPHEN),
             "a-upper-camel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("AUpperCamel", NamingCase.LOWER_UNDERSCORE),
+            BNamingCase.UPPER_CAMEL.convert("AUpperCamel", BNamingCase.LOWER_UNDERSCORE),
             "a_upper_camel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("upperCamel", NamingCase.LOWER_CAMEL),
+            BNamingCase.UPPER_CAMEL.convert("upperCamel", BNamingCase.LOWER_CAMEL),
             "upperCamel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("upperCamel", NamingCase.LOWER_HYPHEN),
+            BNamingCase.UPPER_CAMEL.convert("upperCamel", BNamingCase.LOWER_HYPHEN),
             "upper-camel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("upperCamel", NamingCase.LOWER_UNDERSCORE),
+            BNamingCase.UPPER_CAMEL.convert("upperCamel", BNamingCase.LOWER_UNDERSCORE),
             "upper_camel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("upper2Camel", NamingCase.LOWER_UNDERSCORE),
+            BNamingCase.UPPER_CAMEL.convert("upper2Camel", BNamingCase.LOWER_UNDERSCORE),
             "upper2_camel"
         );
         Assert.assertEquals(
-            NamingCase.UPPER_CAMEL.convert("upper@#$%Camel", NamingCase.LOWER_UNDERSCORE),
+            BNamingCase.UPPER_CAMEL.convert("upper@#$%Camel", BNamingCase.LOWER_UNDERSCORE),
             "upper_camel"
         );
     }

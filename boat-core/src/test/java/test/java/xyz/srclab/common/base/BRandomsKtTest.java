@@ -2,11 +2,11 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.RandomSupplier;
+import xyz.srclab.common.base.BRandomer;
 import xyz.srclab.common.base.Randoms;
 import xyz.srclab.common.logging.Logs;
 
-public class RandomsTest {
+public class BRandomsKtTest {
 
     @Test
     public void testRandoms() {
@@ -19,7 +19,7 @@ public class RandomsTest {
 
     @Test
     public void testRandomSupplier() {
-        RandomSupplier<?> randomSupplier = RandomSupplier.newBuilder()
+        BRandomer<?> BRandomer = BRandomer.newBuilder()
             .score(20, "A")
             .score(20, "B")
             .score(60, "C")
@@ -28,7 +28,7 @@ public class RandomsTest {
         int countB = 0;
         int countC = 0;
         for (int i = 0; i < 1000; i++) {
-            Object result = randomSupplier.get();
+            Object result = BRandomer.get();
             if (result.equals("A")) {
                 countA++;
             } else if (result.equals("B")) {

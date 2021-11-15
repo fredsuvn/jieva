@@ -1,6 +1,31 @@
+@file:JvmName("BNamingCases")
+
 package xyz.srclab.common.base
 
 import java.util.*
+
+
+@JvmField
+val LOWER_CAMEL: LowerCamel = LowerCamel
+
+@JvmField
+val UPPER_CAMEL: UpperCamel = UpperCamel
+
+@JvmField
+val LOWER_UNDERSCORE: LowerUnderscore = LowerUnderscore
+
+@JvmField
+val UPPER_UNDERSCORE: UpperUnderscore = UpperUnderscore
+
+@JvmField
+val LOWER_HYPHEN: LowerHyphen = LowerHyphen
+
+@JvmField
+val UPPER_HYPHEN: UpperHyphen = UpperHyphen
+
+fun CharSequence.namingCase(from: BNamingCase, to: BNamingCase): String {
+    return from.convert(this, to)
+}
 
 /**
  * Naming case. Used to convert different naming case style:
@@ -10,7 +35,7 @@ import java.util.*
  * NamingCase.LOWER_CAMEL.convertTo("firstSecond", NamingCase.UPPER_UNDERSCORE)
  * ```
  *
- * Note default [NamingCase] implementations only support `[A-Z][a-z][0-9]`.
+ * Note default [BNamingCase] implementations only support `[A-Z][a-z][0-9]`.
  *
  * @author sunqian
  *
@@ -21,7 +46,7 @@ import java.util.*
  * @see LowerHyphen
  * @see UpperHyphen
  */
-interface NamingCase {
+interface BNamingCase {
 
     /**
      * Validates whether given [name] is in current case style.
@@ -44,35 +69,14 @@ interface NamingCase {
      * Converts [name] to [target] style.
      */
     @Throws(NamingCaseException::class)
-    fun convert(name: CharSequence, target: NamingCase): String {
+    fun convert(name: CharSequence, target: BNamingCase): String {
         val words = segment(name)
         return target.join(words)
-    }
-
-    companion object {
-
-        @JvmField
-        val LOWER_CAMEL: LowerCamel = LowerCamel
-
-        @JvmField
-        val UPPER_CAMEL: UpperCamel = UpperCamel
-
-        @JvmField
-        val LOWER_UNDERSCORE: LowerUnderscore = LowerUnderscore
-
-        @JvmField
-        val UPPER_UNDERSCORE: UpperUnderscore = UpperUnderscore
-
-        @JvmField
-        val LOWER_HYPHEN: LowerHyphen = LowerHyphen
-
-        @JvmField
-        val UPPER_HYPHEN: UpperHyphen = UpperHyphen
     }
 }
 
 /**
- * [NamingCase] with `lowerCamel` style.
+ * [BNamingCase] with `lowerCamel` style.
  */
 object LowerCamel : CamelCase() {
     override fun doFirstChar(first: CharSequence): String {
@@ -81,7 +85,7 @@ object LowerCamel : CamelCase() {
 }
 
 /**
- * [NamingCase] with `UpperCamel` style.
+ * [BNamingCase] with `UpperCamel` style.
  */
 object UpperCamel : CamelCase() {
     override fun doFirstChar(first: CharSequence): String {
@@ -90,7 +94,7 @@ object UpperCamel : CamelCase() {
 }
 
 /**
- * [NamingCase] with `lower_underscore` style.
+ * [BNamingCase] with `lower_underscore` style.
  */
 object LowerUnderscore : UnderscoreCase() {
 
@@ -106,7 +110,7 @@ object LowerUnderscore : UnderscoreCase() {
 }
 
 /**
- * [NamingCase] with `UPPER_UNDERSCORE` style.
+ * [BNamingCase] with `UPPER_UNDERSCORE` style.
  */
 object UpperUnderscore : UnderscoreCase() {
 
@@ -122,7 +126,7 @@ object UpperUnderscore : UnderscoreCase() {
 }
 
 /**
- * [NamingCase] with `lower-hyphen` style.
+ * [BNamingCase] with `lower-hyphen` style.
  */
 object LowerHyphen : HyphenCase() {
 
@@ -138,7 +142,7 @@ object LowerHyphen : HyphenCase() {
 }
 
 /**
- * [NamingCase] with `UPPER-HYPHEN` style.
+ * [BNamingCase] with `UPPER-HYPHEN` style.
  */
 object UpperHyphen : HyphenCase() {
 
@@ -153,7 +157,7 @@ object UpperHyphen : HyphenCase() {
     }
 }
 
-abstract class CamelCase : NamingCase {
+abstract class CamelCase : BNamingCase {
 
     override fun validate(name: CharSequence): Boolean {
         return LETTER_MATCHER.matchesAllOf(name)
@@ -236,7 +240,7 @@ abstract class CamelCase : NamingCase {
     protected abstract fun doFirstChar(first: CharSequence): CharSequence
 }
 
-abstract class UnderscoreCase : NamingCase {
+abstract class UnderscoreCase : BNamingCase {
 
     override fun segment(name: CharSequence): List<CharSequence> {
         return name.split("_")
@@ -249,7 +253,7 @@ abstract class UnderscoreCase : NamingCase {
     protected abstract fun doWord(word: CharSequence): CharSequence
 }
 
-abstract class HyphenCase : NamingCase {
+abstract class HyphenCase : BNamingCase {
 
     override fun segment(name: CharSequence): List<CharSequence> {
         return name.split("-")

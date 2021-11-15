@@ -31,7 +31,7 @@ public class LangSample {
 
     @Test
     public void testRef() {
-        Ref<String> ref = Ref.with("1");
+        BRef<String> ref = BRef.with("1");
         List<String> list = Arrays.asList("-1", "-2", "-3");
 
         //here <String> should be final without Ref
@@ -102,14 +102,14 @@ public class LangSample {
     @Test
     public void testNamingCase() {
         String upperCamel = "UpperCamel";
-        String lowerCamel = NamingCase.UPPER_CAMEL.convertTo(upperCamel, NamingCase.LOWER_CAMEL);
+        String lowerCamel = BNamingCase.UPPER_CAMEL.convert(upperCamel, BNamingCase.LOWER_CAMEL);
         //upperCamel
         logger.log("lowerCamel: {}", lowerCamel);
     }
 
     @Test
     public void testLazy() {
-        Lazy<String> lazy = Lazy.of(() -> UUID.randomUUID().toString());
+        BLazyGetter<String> lazy = BLazyGetter.of(() -> UUID.randomUUID().toString());
         String value1 = lazy.get();
         String value2 = lazy.get();
         lazy.refresh();
@@ -124,7 +124,7 @@ public class LangSample {
     @Test
     public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        LazyToString<Integer> lazyToString = LazyToString.of(Lazy.of(counter::getAndIncrementInt));
+        BLazyGetterCharSeq<Integer> lazyToString = BLazyGetterCharSeq.of(BLazyGetter.of(counter::getAndIncrementInt));
         //0
         logger.log("lazyToString: {}", lazyToString);
     }
@@ -217,7 +217,7 @@ public class LangSample {
             logger.log("random[10, 20): {}", Randoms.between(10, 20));
         }
 
-        RandomSupplier<?> randomSupplier = RandomSupplier.newBuilder()
+        BRandomer<?> BRandomer = BRandomer.newBuilder()
             .score(20, "A")
             .score(20, "B")
             .score(60, "C")
@@ -226,7 +226,7 @@ public class LangSample {
         int countB = 0;
         int countC = 0;
         for (int i = 0; i < 1000; i++) {
-            Object result = randomSupplier.get();
+            Object result = BRandomer.get();
             if (result.equals("A")) {
                 countA++;
             } else if (result.equals("B")) {
@@ -251,7 +251,7 @@ public class LangSample {
 
             public void setValue(String value) {
                 this.value = value;
-                this.commitModification();
+                this.commit();
             }
 
             @NotNull
@@ -286,7 +286,7 @@ public class LangSample {
     }
 
     private void testProcessing(String... command) {
-        Processing processing = Processing.newProcessing(command);
+        BProcessing processing = BProcessing.newProcessing(command);
         processing.waitForTermination();
         String output = processing.outputString();
         //ECHO_CONTENT
@@ -296,37 +296,37 @@ public class LangSample {
     @Test
     public void testShell() {
         logger.log("Hello, world!");
-        logger.log("123{}456{}{}", EscChars.linefeed(), EscChars.newline(), EscChars.reset());
+        logger.log("123{}456{}{}", BEscChars.linefeed(), BEscChars.newline(), BEscChars.reset());
         logger.log("{}{}{}",
-            SgrChars.foregroundRed("red"),
-            SgrChars.backgroundCyan(" "),
-            SgrChars.foregroundGreen("green")
+            BSgrChars.foregroundRed("red"),
+            BSgrChars.backgroundCyan(" "),
+            BSgrChars.foregroundGreen("green")
         );
         logger.log("{}{}{}",
-            SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
-            SgrChars.backgroundCyan(" "),
-            SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
+            BSgrChars.withParam("bright red", BSgrParam.FOREGROUND_BRIGHT_RED),
+            BSgrChars.backgroundCyan(" "),
+            BSgrChars.withParam("bright green", BSgrParam.FOREGROUND_BRIGHT_GREEN)
         );
         logger.log("{}{}{}",
-            SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
-            SgrChars.backgroundCyan(" "),
-            SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
+            BSgrChars.withParam("color 8", BSgrParam.foregroundColor(8)),
+            BSgrChars.backgroundCyan(" "),
+            BSgrChars.withParam("rgb(100, 100, 50)", BSgrParam.foregroundColor(100, 100, 50))
         );
-        logger.log(CtlChars.beep());
+        logger.log(BCtlChars.beep());
         logger.log("123\010456\007");
-        logger.log("123{}456{}", CtlChars.backspaces(), CtlChars.beep());
+        logger.log("123{}456{}", BCtlChars.backspaces(), BCtlChars.beep());
     }
 
     @Test
     public void testSingleAccessor() {
-        TestObjAccessor singleAccessor = new TestObjAccessor();
+        TestObjectAccessor singleAccessor = new TestObjectAccessor();
         Assert.assertNull(singleAccessor.getOrNull());
         Assert.assertEquals("666", singleAccessor.getOrElse("666"));
         Assert.assertEquals("666", singleAccessor.getOrElse(() -> "666"));
         singleAccessor.set("777");
         Assert.assertEquals("777", singleAccessor.get());
 
-        TestTypedAccessor genericSingleAccessor = new TestTypedAccessor();
+        TestBAccessor genericSingleAccessor = new TestBAccessor();
         Assert.assertNull(genericSingleAccessor.getOrNull());
         Assert.assertEquals("666", genericSingleAccessor.getOrElse("666"));
         Assert.assertEquals("666", genericSingleAccessor.getOrElse(() -> "666"));
@@ -340,7 +340,7 @@ public class LangSample {
         mapAccessor.set("1", "777");
         Assert.assertEquals("777", mapAccessor.get("1"));
 
-        TestTypedMapAccessor genericMapAccessor = new TestTypedMapAccessor();
+        TestBMapAccessor genericMapAccessor = new TestBMapAccessor();
         Assert.assertNull(genericMapAccessor.getOrNull("1"));
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1", "666"));
         Assert.assertEquals("666", genericMapAccessor.getOrElse("1", (k) -> "666"));
@@ -353,7 +353,7 @@ public class LangSample {
         T2
     }
 
-    public static class TestObjAccessor implements ObjAccessor {
+    public static class TestObjectAccessor implements ObjectAccessor {
 
         private String value;
 
@@ -368,7 +368,7 @@ public class LangSample {
         }
     }
 
-    public static class TestTypedAccessor implements TypedAccessor<String> {
+    public static class TestBAccessor implements BAccessor<String> {
 
         private String value;
 
@@ -393,7 +393,7 @@ public class LangSample {
         }
     }
 
-    public static class TestTypedMapAccessor implements TypedMapAccessor<String, String> {
+    public static class TestBMapAccessor implements BMapAccessor<String, String> {
 
         private final Map<String, String> values = new HashMap<>();
 
