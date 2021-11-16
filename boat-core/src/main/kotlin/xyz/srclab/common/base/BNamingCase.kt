@@ -80,7 +80,7 @@ interface BNamingCase {
  */
 object LowerCamel : CamelCase() {
     override fun doFirstChar(first: CharSequence): String {
-        return first.uncapitalize()
+        return first.lowerFirst()
     }
 }
 
@@ -89,7 +89,7 @@ object LowerCamel : CamelCase() {
  */
 object UpperCamel : CamelCase() {
     override fun doFirstChar(first: CharSequence): String {
-        return first.capitalize()
+        return first.upperFirst()
     }
 }
 
@@ -231,7 +231,7 @@ abstract class CamelCase : BNamingCase {
                 buffer.append(doFirstChar(word))
                 i++
             } else {
-                buffer.append(word.capitalize())
+                buffer.append(word.upperFirst())
             }
         }
         return buffer.toString()

@@ -37,7 +37,7 @@ public class CollectSample {
 
     @Test
     public void testMultiMap() {
-        SetMap<String, String> setMap = SetMap.newSetMap(
+        BSetMap<String, String> setMap = BSetMap.newSetMap(
             Collects.newMap(
                 new LinkedHashMap<>(),
                 "s", Collects.newCollection(new LinkedHashSet<>(), "1", "2", "3")
@@ -57,7 +57,7 @@ public class CollectSample {
         //mutableSetMap: {s=[1, 2, 3, 9, 11, 12, 13]}
         logger.log("mutableSetMap: {}", mutableSetMap);
 
-        ListMap<String, String> listMap = ListMap.newListMap(
+        BListMap<String, String> listMap = BListMap.newListMap(
             Collects.newMap(
                 new LinkedHashMap<>(),
                 "s", Collects.newCollection(new LinkedList<>(), "1", "2", "3")

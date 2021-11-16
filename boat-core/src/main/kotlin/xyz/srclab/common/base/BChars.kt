@@ -98,16 +98,16 @@ fun CharSequence?.isWhitespace(): Boolean {
 }
 
 /**
- * Capitalizes given chars.
+ * Sets first character of given chars upper case.
  */
-fun CharSequence.capitalize(): String {
+fun CharSequence.upperFirst(): String {
     return StringUtils.capitalize(this.toString())
 }
 
 /**
- * Uncapitalize given chars.
+ * Sets first character of given chars lower case.
  */
-fun CharSequence.uncapitalize(): String {
+fun CharSequence.lowerFirst(): String {
     return StringUtils.uncapitalize(this.toString())
 }
 

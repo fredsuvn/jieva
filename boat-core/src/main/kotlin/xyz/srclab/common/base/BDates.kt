@@ -104,7 +104,7 @@ fun CharSequence.guessDateTimePatternOrNull(): String? {
     if (this.length > isoZonedPatternLength && this.endsWith(']')) {
         return ISO_ZONED_DATE_TIME_PATTERN
     }
-    if (this.isNumeric()) {
+    if (this.length == TIMESTAMP_PATTERN.length && this.isNumeric()) {
         return TIMESTAMP_PATTERN
     }
     return null
@@ -144,7 +144,7 @@ fun CharSequence.guessDateTimeFormatterOrNull(): DateTimeFormatter? {
     if (this.length > isoZonedPatternLength && this.endsWith(']')) {
         return ISO_ZONED_DATE_TIME_FORMATTER
     }
-    if (this.isNumeric()) {
+    if (this.length == TIMESTAMP_PATTERN.length && this.isNumeric()) {
         return TIMESTAMP_FORMATTER
     }
     return null

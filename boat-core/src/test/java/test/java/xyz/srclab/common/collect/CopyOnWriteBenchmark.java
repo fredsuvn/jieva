@@ -4,7 +4,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import xyz.srclab.common.collect.CopyOnWriteMap;
+import xyz.srclab.common.collect.BCopyOnWriteMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +58,7 @@ public class CopyOnWriteBenchmark {
             }
             initMap(hashMap);
             concurrentHashMap = new ConcurrentHashMap<>(hashMap);
-            copyOnWriteMap = new CopyOnWriteMap<>(hashMap);
+            copyOnWriteMap = new BCopyOnWriteMap<>(hashMap);
         }
 
         private static void initMap(Map<Object, Object> map) {
@@ -119,7 +119,7 @@ public class CopyOnWriteBenchmark {
             }
             initMap(hashMap);
             concurrentHashMap = new ConcurrentHashMap<>(hashMap);
-            copyOnWriteMap = new CopyOnWriteMap<>(hashMap);
+            copyOnWriteMap = new BCopyOnWriteMap<>(hashMap);
         }
 
         private static void initMap(Map<Object, Object> map) {

@@ -19,7 +19,7 @@ import kotlin.text.toShort as toShortKt
 /**
  * Default number value of null: 0
  */
-const val NULL_NUMBER_VALUE = 0
+const val DEFAULT_NULL_NUMBER = 0
 
 /**
  * Default radix: 10.
@@ -27,7 +27,7 @@ const val NULL_NUMBER_VALUE = 0
 const val DEFAULT_RADIX: Int = 10
 
 @JvmOverloads
-fun Any?.toByte(defaultValue: Byte = NULL_NUMBER_VALUE.toByte(), radix: Int = DEFAULT_RADIX): Byte {
+fun Any?.toByte(defaultValue: Byte = DEFAULT_NULL_NUMBER.toByte(), radix: Int = DEFAULT_RADIX): Byte {
     return when (this) {
         null -> defaultValue
         is Number -> if (radix == 10) toByte() else toString().toByteKt(radix)
@@ -38,7 +38,7 @@ fun Any?.toByte(defaultValue: Byte = NULL_NUMBER_VALUE.toByte(), radix: Int = DE
 }
 
 @JvmOverloads
-fun Any?.toShort(defaultValue: Short = NULL_NUMBER_VALUE.toShort(), radix: Int = DEFAULT_RADIX): Short {
+fun Any?.toShort(defaultValue: Short = DEFAULT_NULL_NUMBER.toShort(), radix: Int = DEFAULT_RADIX): Short {
     return when (this) {
         null -> defaultValue
         is Number -> if (radix == 10) toShort() else toString().toShortKt(radix)
@@ -49,12 +49,12 @@ fun Any?.toShort(defaultValue: Short = NULL_NUMBER_VALUE.toShort(), radix: Int =
 }
 
 @JvmOverloads
-fun Any?.toChar(defaultValue: Char = NULL_NUMBER_VALUE.toChar(), radix: Int = DEFAULT_RADIX): Char {
+fun Any?.toChar(defaultValue: Char = DEFAULT_NULL_NUMBER.toChar(), radix: Int = DEFAULT_RADIX): Char {
     return toInt(radix).toChar(defaultValue)
 }
 
 @JvmOverloads
-fun Any?.toInt(defaultValue: Int = NULL_NUMBER_VALUE, radix: Int = DEFAULT_RADIX): Int {
+fun Any?.toInt(defaultValue: Int = DEFAULT_NULL_NUMBER, radix: Int = DEFAULT_RADIX): Int {
     return when (this) {
         null -> defaultValue
         is Number -> if (radix == 10) toInt() else toString().toIntKt(radix)
@@ -65,7 +65,7 @@ fun Any?.toInt(defaultValue: Int = NULL_NUMBER_VALUE, radix: Int = DEFAULT_RADIX
 }
 
 @JvmOverloads
-fun Any?.toLong(defaultValue: Long = NULL_NUMBER_VALUE.toLong(), radix: Int = DEFAULT_RADIX): Long {
+fun Any?.toLong(defaultValue: Long = DEFAULT_NULL_NUMBER.toLong(), radix: Int = DEFAULT_RADIX): Long {
     return when (this) {
         null -> defaultValue
         is Number -> if (radix == 10) toLong() else toString().toLongKt(radix)
@@ -76,7 +76,7 @@ fun Any?.toLong(defaultValue: Long = NULL_NUMBER_VALUE.toLong(), radix: Int = DE
 }
 
 @JvmOverloads
-fun Any?.toFloat(defaultValue: Float = NULL_NUMBER_VALUE.toFloat()): Float {
+fun Any?.toFloat(defaultValue: Float = DEFAULT_NULL_NUMBER.toFloat()): Float {
     return when (this) {
         null -> defaultValue
         is Number -> toFloat()
@@ -87,7 +87,7 @@ fun Any?.toFloat(defaultValue: Float = NULL_NUMBER_VALUE.toFloat()): Float {
 }
 
 @JvmOverloads
-fun Any?.toDouble(defaultValue: Double = NULL_NUMBER_VALUE.toDouble()): Double {
+fun Any?.toDouble(defaultValue: Double = DEFAULT_NULL_NUMBER.toDouble()): Double {
     return when (this) {
         null -> defaultValue
         is Number -> toDouble()
@@ -270,7 +270,7 @@ fun CharSequence?.parseToBigInteger(defaultValue: BigInteger = BigInteger.ZERO):
  * @see parseToBigInteger
  */
 @JvmOverloads
-fun CharSequence?.parseToInt(defaultValue: Int = NULL_NUMBER_VALUE): Int {
+fun CharSequence?.parseToInt(defaultValue: Int = DEFAULT_NULL_NUMBER): Int {
     if (this === null) {
         return defaultValue
     }
@@ -291,7 +291,7 @@ fun CharSequence?.parseToInt(defaultValue: Int = NULL_NUMBER_VALUE): Int {
  * @see parseToBigInteger
  */
 @JvmOverloads
-fun CharSequence?.parseToLong(defaultValue: Long = NULL_NUMBER_VALUE.toLong()): Long {
+fun CharSequence?.parseToLong(defaultValue: Long = DEFAULT_NULL_NUMBER.toLong()): Long {
     if (this === null) {
         return defaultValue
     }

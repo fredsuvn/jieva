@@ -85,7 +85,7 @@ Convert包提供大量的类型转换功能:
 
 * `Converts`: 类型转换工具类;
 * `Converter`: 类型转换的核心接口, `Converts` 使用它的默认实现;
-* `ConvertHandler`: `Converter` 用来转换的处理器;
+* `BConvertHandler`: `Converter` 用来转换的处理器;
 * `FastConverter`: 一种快速转换器;
 
 .Java Examples
@@ -245,8 +245,8 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/excepti
 * `Collects`: 集合工具类;
 * `Collecting`, `Mapping`: 提供链式操作的集合接口, 并且集成了常见集合的功能 (如 `Iterable`, `Collection`, `Set`, `List`);
 * `BCollectType`, `BMapType`: 代表集合泛型类型;
-* `MultiMaps.kt`: `MultiMaps.kt` 提供多值 `Map` 如 `SetMap`, `MutableSetMap`, `ListMap` 何 `MutableListMap`;
-* `CopyOnWriteMap`: 实现copy-on-write操作的Map;
+* `BMultiMaps.kt`: `BMultiMaps.kt` 提供多值 `Map` 如 `BSetMap`, `MutableSetMap`, `BListMap` 何 `MutableListMap`;
+* `BCopyOnWriteMap`: 实现copy-on-write操作的Map;
 
 .Java Examples
 [source,java]

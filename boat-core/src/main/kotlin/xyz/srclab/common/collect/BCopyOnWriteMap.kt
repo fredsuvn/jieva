@@ -1,15 +1,26 @@
+@file:JvmName("BCollects")
+@file:JvmMultifileClass
+
 package xyz.srclab.common.collect
 
 import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
 
+@JvmOverloads
+fun <K, V> copyOnWriteMap(
+    initMap: Map<out K, V> = emptyMap(),
+    newMapFun: (Map<out K, V>) -> MutableMap<K, V> = { HashMap(it) }
+): MutableMap<K, V> {
+    return CopyOnWriteMap(initMap, newMapFun)
+}
+
 /**
  * Copy-On-Write [Map].
  */
-open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
-    initMap: Map<out K, V> = emptyMap(),
-    private val newMapFun: (Map<out K, V>) -> MutableMap<K, V> = { HashMap(it) }
+private class CopyOnWriteMap<K, V> constructor(
+    initMap: Map<out K, V>,
+    private val newMapFun: (Map<out K, V>) -> MutableMap<K, V>
 ) : MutableMap<K, V> {
 
     private var currentMap: MutableMap<K, V> = newMapFun(initMap)

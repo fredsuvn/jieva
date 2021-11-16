@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.collect;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.collect.Collects;
-import xyz.srclab.common.collect.CopyOnWriteMap;
+import xyz.srclab.common.collect.BCopyOnWriteMap;
 import xyz.srclab.common.logging.Logs;
 
 import java.util.*;
@@ -80,7 +80,7 @@ public class BArraysKtTest {
 
     @Test
     public void testCopyOnWriteMap() {
-        Map<String, Object> map = new CopyOnWriteMap<>();
+        Map<String, Object> map = new BCopyOnWriteMap<>();
         Map<String, Object> hashMap = new HashMap<>();
         for (int i = 0; i <= 10086; i++) {
             String key = String.valueOf(i);

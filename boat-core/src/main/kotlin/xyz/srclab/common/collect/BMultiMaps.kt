@@ -1,13 +1,32 @@
+@file:JvmName("BCollects")
+@file:JvmMultifileClass
+
 package xyz.srclab.common.collect
 
 import java.util.*
 
+@JvmOverloads
+fun <K, V> setMap(
+    map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
+    valueSet: (K) -> MutableSet<V> = { LinkedHashSet() }
+): BSetMap<K, V> {
+    return BSetMap(map, valueSet)
+}
+
+@JvmOverloads
+fun <K, V> listMap(
+    map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
+    valueList: (K) -> MutableList<V> = { LinkedList() }
+): BListMap<K, V> {
+    return BListMap(map, valueList)
+}
+
 /**
  * A type of Multi-Map of which values are [MutableSet].
  */
-open class SetMap<K, V> @JvmOverloads constructor(
-    private val map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
-    private val valueSet: (K) -> MutableSet<V> = { LinkedHashSet() }
+open class BSetMap<K, V> constructor(
+    private val map: MutableMap<K, MutableSet<V>>,
+    private val valueSet: (K) -> MutableSet<V>
 ) : MutableMap<K, MutableSet<V>> by map {
 
     fun add(key: K, value: V): Boolean {
@@ -29,9 +48,9 @@ open class SetMap<K, V> @JvmOverloads constructor(
 /**
  * A type of Multi-Map of which values are [MutableList].
  */
-open class ListMap<K, V> @JvmOverloads constructor(
-    private val map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
-    private val valueList: (K) -> MutableList<V> = { LinkedList() }
+open class BListMap<K, V> constructor(
+    private val map: MutableMap<K, MutableList<V>>,
+    private val valueList: (K) -> MutableList<V>
 ) : MutableMap<K, MutableList<V>> by map {
 
     fun add(key: K, value: V): Boolean {

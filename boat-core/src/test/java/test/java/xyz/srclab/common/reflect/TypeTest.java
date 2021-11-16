@@ -3,8 +3,8 @@ package test.java.xyz.srclab.common.reflect;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.collect.ListMap;
-import xyz.srclab.common.collect.SetMap;
+import xyz.srclab.common.collect.BListMap;
+import xyz.srclab.common.collect.BSetMap;
 import xyz.srclab.common.logging.Logs;
 import xyz.srclab.common.reflect.Reflects;
 import xyz.srclab.common.reflect.TypeRef;
@@ -107,7 +107,7 @@ public class TypeTest {
 
     @Test
     public void testTypeArguments() {
-        SetMap<String, String> expected = new SetMap<>(
+        BSetMap<String, String> expected = new BSetMap<>(
             new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
             (key) -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
         );
@@ -176,8 +176,8 @@ public class TypeTest {
         expected.clear();
     }
 
-    private void assertTypeArgumentsEquals(Map<TypeVariable<?>, Type> actual, SetMap<String, String> expected) {
-        SetMap<String, String> actualSorted = new SetMap<>(
+    private void assertTypeArgumentsEquals(Map<TypeVariable<?>, Type> actual, BSetMap<String, String> expected) {
+        BSetMap<String, String> actualSorted = new BSetMap<>(
             new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
             (key) -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
         );
@@ -189,7 +189,7 @@ public class TypeTest {
 
     @Test
     public void testTypeSignature() {
-        Type setMapType = new TypeRef<SetMap<String, String>>() {
+        Type setMapType = new TypeRef<BSetMap<String, String>>() {
         }.getType();
         Type mapType = Reflects.getTypeSignature(setMapType, Map.class);
         Logs.info("mapType: {}", mapType);
@@ -199,7 +199,7 @@ public class TypeTest {
             }.getType()
         );
 
-        Type listMapType = new TypeRef<ListMap<String, String>>() {
+        Type listMapType = new TypeRef<BListMap<String, String>>() {
         }.getType();
         mapType = Reflects.getTypeSignature(listMapType, Map.class);
         Logs.info("mapType: {}", mapType);

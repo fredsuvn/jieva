@@ -95,7 +95,7 @@ public class ConvertTest {
         Converter converter = Converter.newConverter(Collections.singletonList(CompatibleConvertHandler.INSTANCE));
     }
 
-    public static class IntToStringHandler implements ConvertHandler {
+    public static class IntToStringHandler implements BConvertHandler {
 
         @Nullable
         @Override
@@ -108,7 +108,7 @@ public class ConvertTest {
         }
     }
 
-    public static class LongToStringHandler implements ConvertHandler {
+    public static class LongToStringHandler implements BConvertHandler {
 
         @Nullable
         @Override

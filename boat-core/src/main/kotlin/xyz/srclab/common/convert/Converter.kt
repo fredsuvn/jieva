@@ -10,14 +10,14 @@ import java.lang.reflect.Type
 /**
  * Interface for type conversion.
  *
- * By default, this interface use a chain of [ConvertHandler] to do each conversion,
- * use [extend] to add a custom [ConvertHandler] before old handlers.
+ * By default, this interface use a chain of [BConvertHandler] to do each conversion,
+ * use [extend] to add a custom [BConvertHandler] before old handlers.
  *
- * @see ConvertHandler
+ * @see BConvertHandler
  */
 interface Converter {
 
-    val convertHandlers: List<ConvertHandler>
+    val convertHandlers: List<BConvertHandler>
 
     @Throws(UnsupportedConvertException::class)
     fun <T : Any> convert(from: Any?, toType: Class<T>): T {
@@ -53,7 +53,7 @@ interface Converter {
 
     fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: Type): T? {
         val result: Any? = convertOrNull0(from, fromType, toType)
-        if (result === ConvertHandler.NULL) {
+        if (result === BConvertHandler.NULL) {
             return null
         }
         return result.asTyped()
@@ -105,7 +105,7 @@ interface Converter {
     companion object {
 
         @JvmField
-        val COMMON: Converter = newConverter(ConvertHandler.DEFAULTS)
+        val COMMON: Converter = newConverter(BConvertHandler.DEFAULTS)
 
         /**
          * This [Converter] only convert same or compatible types, or convert between enum and [String].
@@ -116,7 +116,7 @@ interface Converter {
         val SIMPLE: Converter = newConverter(listOf(CompatibleConvertHandler))
 
         @JvmField
-         val defaultConverter:Converter = newConverter(ConvertHandler.DEFAULTS)
+         val defaultConverter:Converter = newConverter(BConvertHandler.DEFAULTS)
 
         @JvmStatic
         fun defaultConverter(): Converter {
@@ -125,21 +125,21 @@ interface Converter {
 
         @JvmStatic
         fun newConverter(
-            convertHandlers: Iterable<ConvertHandler>
+            convertHandlers: Iterable<BConvertHandler>
         ): Converter {
             if (convertHandlers.isEmpty()) {
                 throw IllegalArgumentException("Convert handler list cannot be empty.")
             }
             return object : Converter {
-                override val convertHandlers: List<ConvertHandler> = convertHandlers.asToList()
+                override val convertHandlers: List<BConvertHandler> = convertHandlers.asToList()
             }
         }
 
         /**
-         * Returns a new [Converter] consists of given [handler] followed by existed [ConvertHandler]s.
+         * Returns a new [Converter] consists of given [handler] followed by existed [BConvertHandler]s.
          */
         @JvmStatic
-        fun Converter.extend(handler: ConvertHandler): Converter {
+        fun Converter.extend(handler: BConvertHandler): Converter {
             return newConverter(this.convertHandlers.plusBefore(0, handler))
         }
     }
