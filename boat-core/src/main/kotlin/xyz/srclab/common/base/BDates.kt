@@ -9,6 +9,147 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.*
 import java.util.*
 
+/**
+ * Format of date, used to format or parse between string and date objects.
+ */
+interface BDateFormat {
+
+    /**
+     * Pattern of format.
+     */
+    val pattern: String
+
+    /**
+     * Converts to [DateTimeFormatter].
+     */
+    fun toFormatter(): DateTimeFormatter
+
+    /**
+     * Formats given [temporalAccessor].
+     */
+    fun format(temporalAccessor: TemporalAccessor): String {
+        return toFormatter().format(temporalAccessor)
+    }
+
+    /**
+     * Formats given [date].
+     */
+    fun format(date: Date): String {
+        val instant = date.toInstant()
+        return toFormatter().format(instant)
+    }
+
+    /**
+     * Parse to [Instant].
+     */
+    fun parseInstant(chars: CharSequence): Instant {
+        val temporal = toFormatter().parse(chars)
+    }
+}
+
+fun TemporalAccessor.toLocalDateTimeOrNull(): LocalDateTime? {
+    if (this is LocalDateTime) {
+        return this
+    }
+    if (this is ZonedDateTime) {
+        return this.toLocalDateTime()
+    }
+    if (this is OffsetDateTime) {
+        return this.toLocalDateTime()
+    }
+    //LocalDateTime.
+    val localDate = this.toLocalDateOrNull()
+}
+
+fun TemporalAccessor.toLocalDateOrNull(): LocalDate? {
+    if (this is LocalDate) {
+        return this
+    }
+
+    if (this.isSupported(ChronoField.EPOCH_DAY)) {
+        return LocalDate.ofEpochDay(this.getLong(ChronoField.EPOCH_DAY))
+    }
+
+    var year = 0
+    if (this.isSupported(ChronoField.YEAR)) {
+        year = this.get(ChronoField.YEAR)
+    } else if (this.isSupported(ChronoField.YEAR_OF_ERA) && this.isSupported(ChronoField.ERA)) {
+        val era = this.get(ChronoField.ERA)
+        if (era == 1) {
+            year = this.get(ChronoField.YEAR_OF_ERA)
+        } else if (era == 0) {
+            year = -this.get(ChronoField.YEAR_OF_ERA) + 1
+        }
+    }
+
+    if (this.isSupported(ChronoField.DAY_OF_YEAR)) {
+        return LocalDate.ofYearDay(year, this.get(ChronoField.DAY_OF_YEAR))
+    }
+
+    var month = 1
+    if (this.isSupported(ChronoField.MONTH_OF_YEAR)) {
+        month = this.get(ChronoField.MONTH_OF_YEAR)
+    }
+    var day = 1
+    if (this.isSupported(ChronoField.DAY_OF_MONTH)) {
+        day = this.get(ChronoField.DAY_OF_MONTH)
+    }
+    return LocalDate.of(year, month, day)
+}
+
+fun TemporalAccessor.toLocalTimeOrNull(): LocalTime? {
+    if (this is LocalTime) {
+        return this
+    }
+
+    if (this.isSupported(ChronoField.NANO_OF_DAY)) {
+        return LocalTime.ofNanoOfDay(this.getLong(ChronoField.NANO_OF_DAY))
+    }
+
+    var nano = 0
+    if (this.isSupported(ChronoField.NANO_OF_SECOND)) {
+        nano = this.get(ChronoField.NANO_OF_SECOND)
+    }
+
+    if (this.isSupported(ChronoField.SECOND_OF_DAY)) {
+        val secondOfDay = this.getLong(ChronoField.SECOND_OF_DAY)
+        return LocalTime.ofNanoOfDay(secondOfDay + nano)
+    }
+
+    var second = 0
+    if (this.isSupported(ChronoField.SECOND_OF_MINUTE)) {
+        second = this.get(ChronoField.SECOND_OF_MINUTE)
+    }
+
+    if (this.isSupported(ChronoField.MINUTE_OF_DAY)) {
+        val minuteOfDay = this.getLong(ChronoField.MINUTE_OF_DAY)
+        val secondOfDay = minuteOfDay * 60
+        return LocalTime.ofNanoOfDay(secondOfDay + nano)
+    }
+
+    var hour = 0
+    if (this.isSupported(ChronoField.HOUR_OF_DAY)) {
+        hour = this.get(ChronoField.HOUR_OF_DAY)
+    } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_DAY)) {
+        hour = this.get(ChronoField.CLOCK_HOUR_OF_DAY) - 1
+    } else if (this.isSupported(ChronoField.AMPM_OF_DAY)) {
+        if (this.isSupported(ChronoField.HOUR_OF_AMPM)) {
+            val ampm = this.get(ChronoField.AMPM_OF_DAY)
+            hour = this.get(ChronoField.HOUR_OF_AMPM) + ampm * 12
+        } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_AMPM)) {
+            val ampm = this.get(ChronoField.AMPM_OF_DAY)
+            hour = this.get(ChronoField.CLOCK_HOUR_OF_AMPM) - 1 + ampm * 12
+        }
+    }
+
+    var minute = 0
+    if (this.isSupported(ChronoField.MINUTE_OF_HOUR)) {
+        minute = this.get(ChronoField.MINUTE_OF_HOUR)
+    }
+
+    return LocalTime.of(hour, minute, second, nano)
+}
+
 const val TIMESTAMP_PATTERN = "yyyyMMddHHmmssSSS"
 
 const val SIMPLE_LOCAL_DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss"
@@ -214,26 +355,18 @@ fun Any?.toInstant(dateTimeFormatter: DateTimeFormatter? = null, defaultValue: I
         true -> Instant.now()
         else -> {
             val dateString = this.toString()
-            Instant.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
-            )
+            Instant.from(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap())
         }
     }
 }
 
 @JvmOverloads
-fun Any?.toZonedDateTime(
-    dateTimePattern: CharSequence,
-    defaultValue: ZonedDateTime = EPOCH_ZONED_DATE_TIME
-): ZonedDateTime {
+fun Any?.toZonedDateTime(dateTimePattern: CharSequence, defaultValue: ZonedDateTime = EPOCH_ZONED_DATE_TIME): ZonedDateTime {
     return toZonedDateTime(dateTimePattern.toDateTimeFormatter(), defaultValue)
 }
 
 @JvmOverloads
-fun Any?.toZonedDateTime(
-    dateTimeFormatter: DateTimeFormatter? = null,
-    defaultValue: ZonedDateTime = EPOCH_ZONED_DATE_TIME
-): ZonedDateTime {
+fun Any?.toZonedDateTime(dateTimeFormatter: DateTimeFormatter? = null, defaultValue: ZonedDateTime = EPOCH_ZONED_DATE_TIME): ZonedDateTime {
     return when (this) {
         null -> defaultValue
         is ZonedDateTime -> this
@@ -269,18 +402,12 @@ fun Any?.toZonedDateTime(
 }
 
 @JvmOverloads
-fun Any?.toOffsetDateTime(
-    dateTimePattern: CharSequence,
-    defaultValue: OffsetDateTime = EPOCH_OFFSET_DATE_TIME
-): OffsetDateTime {
+fun Any?.toOffsetDateTime(dateTimePattern: CharSequence, defaultValue: OffsetDateTime = EPOCH_OFFSET_DATE_TIME): OffsetDateTime {
     return toOffsetDateTime(dateTimePattern.toDateTimeFormatter(), defaultValue)
 }
 
 @JvmOverloads
-fun Any?.toOffsetDateTime(
-    dateTimeFormatter: DateTimeFormatter? = null,
-    defaultValue: OffsetDateTime = EPOCH_OFFSET_DATE_TIME
-): OffsetDateTime {
+fun Any?.toOffsetDateTime(dateTimeFormatter: DateTimeFormatter? = null, defaultValue: OffsetDateTime = EPOCH_OFFSET_DATE_TIME): OffsetDateTime {
     return when (this) {
         null -> defaultValue
         is OffsetDateTime -> this
@@ -299,26 +426,18 @@ fun Any?.toOffsetDateTime(
         true -> OffsetDateTime.now()
         else -> {
             val dateString = this.toString()
-            return OffsetDateTime.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
-            )
+            return OffsetDateTime.from(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap())
         }
     }
 }
 
 @JvmOverloads
-fun Any?.toLocalDateTime(
-    dateTimePattern: CharSequence,
-    defaultValue: LocalDateTime = EPOCH_LOCAL_DATE_TIME
-): LocalDateTime {
+fun Any?.toLocalDateTime(dateTimePattern: CharSequence, defaultValue: LocalDateTime = EPOCH_LOCAL_DATE_TIME): LocalDateTime {
     return toLocalDateTime(dateTimePattern.toDateTimeFormatter(), defaultValue)
 }
 
 @JvmOverloads
-fun Any?.toLocalDateTime(
-    dateTimeFormatter: DateTimeFormatter? = null,
-    defaultValue: LocalDateTime = EPOCH_LOCAL_DATE_TIME
-): LocalDateTime {
+fun Any?.toLocalDateTime(dateTimeFormatter: DateTimeFormatter? = null, defaultValue: LocalDateTime = EPOCH_LOCAL_DATE_TIME): LocalDateTime {
     return when (this) {
         null -> defaultValue
         is LocalDateTime -> this
@@ -337,26 +456,18 @@ fun Any?.toLocalDateTime(
         true -> LocalDateTime.now()
         else -> {
             val dateString = this.toString()
-            LocalDateTime.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
-            )
+            LocalDateTime.from(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap())
         }
     }
 }
 
 @JvmOverloads
-fun Any?.toLocalDate(
-    dateTimePattern: CharSequence,
-    defaultValue: LocalDate = EPOCH_LOCAL_DATE
-): LocalDate {
+fun Any?.toLocalDate(dateTimePattern: CharSequence, defaultValue: LocalDate = EPOCH_LOCAL_DATE): LocalDate {
     return toLocalDate(dateTimePattern.toDateTimeFormatter(), defaultValue)
 }
 
 @JvmOverloads
-fun Any?.toLocalDate(
-    dateTimeFormatter: DateTimeFormatter? = null,
-    defaultValue: LocalDate = EPOCH_LOCAL_DATE
-): LocalDate {
+fun Any?.toLocalDate(dateTimeFormatter: DateTimeFormatter? = null, defaultValue: LocalDate = EPOCH_LOCAL_DATE): LocalDate {
     return when (this) {
         null -> defaultValue
         is LocalDate -> this
@@ -375,26 +486,18 @@ fun Any?.toLocalDate(
         true -> LocalDate.now()
         else -> {
             val dateString = this.toString()
-            LocalDate.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
-            )
+            LocalDate.from(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap())
         }
     }
 }
 
 @JvmOverloads
-fun Any?.toLocalTime(
-    dateTimePattern: CharSequence,
-    defaultValue: LocalTime = EPOCH_LOCAL_TIME
-): LocalTime {
+fun Any?.toLocalTime(dateTimePattern: CharSequence, defaultValue: LocalTime = EPOCH_LOCAL_TIME): LocalTime {
     return toLocalTime(dateTimePattern.toDateTimeFormatter(), defaultValue)
 }
 
 @JvmOverloads
-fun Any?.toLocalTime(
-    dateTimeFormatter: DateTimeFormatter? = null,
-    defaultValue: LocalTime = EPOCH_LOCAL_TIME
-): LocalTime {
+fun Any?.toLocalTime(dateTimeFormatter: DateTimeFormatter? = null, defaultValue: LocalTime = EPOCH_LOCAL_TIME): LocalTime {
     return when (this) {
         null -> defaultValue
         is LocalTime -> this
@@ -413,9 +516,7 @@ fun Any?.toLocalTime(
         true -> LocalTime.now()
         else -> {
             val dateString = this.toString()
-            LocalTime.from(
-                dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap()
-            )
+            LocalTime.from(dateString.getDateTimeFormatter(dateTimeFormatter).parse(dateString).wrap())
         }
     }
 }
