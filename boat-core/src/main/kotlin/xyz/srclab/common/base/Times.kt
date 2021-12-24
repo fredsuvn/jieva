@@ -1,4 +1,4 @@
-@file:JvmName("BDates")
+@file:JvmName("Times")
 
 package xyz.srclab.common.base
 
@@ -8,6 +8,25 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.temporal.*
 import java.util.*
+
+fun epochSecond(): Long {
+    return epochMilli() / 1000L
+}
+
+fun epochMilli(): Long {
+    return System.currentTimeMillis()
+}
+
+/**
+ * Returns current timestamp of [ZoneOffset.UTC] by [TIMESTAMP_PATTERN].
+ */
+fun nowTimestamp(): String {
+    return TIMESTAMP_FORMATTER.format(LocalDateTime.now(ZoneOffset.UTC))
+}
+
+fun currentZoneOffset(): ZoneOffset {
+    return ZoneId.systemDefault().rules.getOffset(LocalDateTime.now())
+}
 
 ///**
 // * Format of date, used to format or parse between string and date objects.
@@ -47,134 +66,6 @@ import java.util.*
 //    }
 //}
 
-fun TemporalAccessor.toLocalDateTimeOrNull(): LocalDateTime? {
-    return when (this) {
-        is Instant -> LocalDateTime.ofInstant(this, ZoneId.systemDefault())
-        is LocalDateTime -> this
-        is ZonedDateTime -> this.toLocalDateTime()
-        is OffsetDateTime -> this.toLocalDateTime()
-        is LocalDate -> LocalDateTime.of(this, LocalTime.MIN)
-        is LocalTime -> LocalDateTime.of(LocalDate.MIN, this)
-        else -> buildLocalDateTimeOrNull()
-    }
-}
-
-fun TemporalAccessor.toLocalDateOrNull(): LocalDate? {
-    return when (this) {
-        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalDate()
-        is LocalDateTime -> this.toLocalDate()
-        is ZonedDateTime -> this.toLocalDate()
-        is OffsetDateTime -> this.toLocalDate()
-        is LocalDate -> this
-        is LocalTime -> null
-        else -> buildLocalDateOrNull()
-    }
-}
-
-fun TemporalAccessor.toLocalTimeOrNull(): LocalTime? {
-    return when (this) {
-        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalTime()
-        is LocalDateTime -> this.toLocalTime()
-        is ZonedDateTime -> this.toLocalTime()
-        is OffsetDateTime -> this.toLocalTime()
-        is LocalDate -> null
-        is LocalTime -> this
-        else -> buildLocalTimeOrNull()
-    }
-}
-
-fun TemporalAccessor.buildLocalDateTimeOrNull(): LocalDateTime? {
-    val localDate = toLocalDateOrNull()
-    if (localDate === null) {
-        return null
-    }
-    val localTime = toLocalTimeOrNull()
-    if (localTime === null) {
-        return LocalDateTime.of(localDate, LocalTime.MIN)
-    }
-    return LocalDateTime.of(localDate, localTime)
-}
-
-fun TemporalAccessor.buildLocalDateOrNull(): LocalDate? {
-    if (this.isSupported(ChronoField.EPOCH_DAY)) {
-        return LocalDate.ofEpochDay(this.getLong(ChronoField.EPOCH_DAY))
-    }
-
-    var year = 0
-    if (this.isSupported(ChronoField.YEAR)) {
-        year = this.get(ChronoField.YEAR)
-    } else if (this.isSupported(ChronoField.YEAR_OF_ERA) && this.isSupported(ChronoField.ERA)) {
-        val era = this.get(ChronoField.ERA)
-        if (era == 1) {
-            year = this.get(ChronoField.YEAR_OF_ERA)
-        } else if (era == 0) {
-            year = -this.get(ChronoField.YEAR_OF_ERA) + 1
-        }
-    }
-
-    if (this.isSupported(ChronoField.DAY_OF_YEAR)) {
-        return LocalDate.ofYearDay(year, this.get(ChronoField.DAY_OF_YEAR))
-    }
-
-    var month = 1
-    if (this.isSupported(ChronoField.MONTH_OF_YEAR)) {
-        month = this.get(ChronoField.MONTH_OF_YEAR)
-    }
-    var day = 1
-    if (this.isSupported(ChronoField.DAY_OF_MONTH)) {
-        day = this.get(ChronoField.DAY_OF_MONTH)
-    }
-    return LocalDate.of(year, month, day)
-}
-
-fun TemporalAccessor.buildLocalTimeOrNull(): LocalTime? {
-    if (this.isSupported(ChronoField.NANO_OF_DAY)) {
-        return LocalTime.ofNanoOfDay(this.getLong(ChronoField.NANO_OF_DAY))
-    }
-
-    var nano = 0
-    if (this.isSupported(ChronoField.NANO_OF_SECOND)) {
-        nano = this.get(ChronoField.NANO_OF_SECOND)
-    }
-
-    if (this.isSupported(ChronoField.SECOND_OF_DAY)) {
-        val secondOfDay = this.getLong(ChronoField.SECOND_OF_DAY)
-        return LocalTime.ofNanoOfDay(secondOfDay + nano)
-    }
-
-    var second = 0
-    if (this.isSupported(ChronoField.SECOND_OF_MINUTE)) {
-        second = this.get(ChronoField.SECOND_OF_MINUTE)
-    }
-
-    if (this.isSupported(ChronoField.MINUTE_OF_DAY)) {
-        val minuteOfDay = this.getLong(ChronoField.MINUTE_OF_DAY)
-        val secondOfDay = minuteOfDay * 60
-        return LocalTime.ofNanoOfDay(secondOfDay + nano)
-    }
-
-    var hour = 0
-    if (this.isSupported(ChronoField.HOUR_OF_DAY)) {
-        hour = this.get(ChronoField.HOUR_OF_DAY)
-    } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_DAY)) {
-        hour = this.get(ChronoField.CLOCK_HOUR_OF_DAY) - 1
-    } else if (this.isSupported(ChronoField.AMPM_OF_DAY)) {
-        if (this.isSupported(ChronoField.HOUR_OF_AMPM)) {
-            val ampm = this.get(ChronoField.AMPM_OF_DAY)
-            hour = this.get(ChronoField.HOUR_OF_AMPM) + ampm * 12
-        } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_AMPM)) {
-            val ampm = this.get(ChronoField.AMPM_OF_DAY)
-            hour = this.get(ChronoField.CLOCK_HOUR_OF_AMPM) - 1 + ampm * 12
-        }
-    }
-
-    var minute = 0
-    if (this.isSupported(ChronoField.MINUTE_OF_HOUR)) {
-        minute = this.get(ChronoField.MINUTE_OF_HOUR)
-    }
-
-    return LocalTime.of(hour, minute, second, nano)
-}
 
 const val TIMESTAMP_PATTERN = "yyyyMMddHHmmssSSS"
 
@@ -639,4 +530,213 @@ private class TemporalAccessorWrapper(private val temporalAccessor: TemporalAcce
             }
         }
     }
+}
+
+fun TemporalAccessor.toZonedDateTimeOrNull(): ZonedDateTime? {
+    return when (this) {
+        is Instant -> ZonedDateTime.ofInstant(this, ZoneId.systemDefault())
+        is LocalDateTime -> this.atZone(ZoneId.systemDefault())
+        is ZonedDateTime -> this
+        is OffsetDateTime -> this.toZonedDateTime()
+        is LocalDate -> ZonedDateTime.of(this, LocalTime.MIN, ZoneId.systemDefault())
+        is LocalTime -> ZonedDateTime.of(LocalDate.MIN, this, ZoneId.systemDefault())
+        else -> buildZonedDateTimeOrNull()
+    }
+}
+
+fun TemporalAccessor.toOffsetDateTimeOrNull(): OffsetDateTime? {
+    return when (this) {
+        is Instant -> OffsetDateTime.ofInstant(this, ZoneId.systemDefault())
+        is LocalDateTime -> this.atOffset(ZoneId.systemDefault().rules.getOffset(this))
+        is ZonedDateTime -> this.toOffsetDateTime()
+        is OffsetDateTime -> this
+        is LocalDate -> OffsetDateTime.of(this, LocalTime.MIN, currentZoneOffset())
+        is LocalTime -> OffsetDateTime.of(LocalDate.MIN, this, currentZoneOffset())
+        else -> buildOffsetDateTimeOrNull()
+    }
+}
+
+fun TemporalAccessor.toLocalDateTimeOrNull(): LocalDateTime? {
+    return when (this) {
+        is Instant -> LocalDateTime.ofInstant(this, ZoneId.systemDefault())
+        is LocalDateTime -> this
+        is ZonedDateTime -> this.toLocalDateTime()
+        is OffsetDateTime -> this.toLocalDateTime()
+        is LocalDate -> LocalDateTime.of(this, LocalTime.MIN)
+        is LocalTime -> LocalDateTime.of(LocalDate.MIN, this)
+        else -> buildLocalDateTimeOrNull()
+    }
+}
+
+fun TemporalAccessor.toLocalDateOrNull(): LocalDate? {
+    return when (this) {
+        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalDate()
+        is LocalDateTime -> this.toLocalDate()
+        is ZonedDateTime -> this.toLocalDate()
+        is OffsetDateTime -> this.toLocalDate()
+        is LocalDate -> this
+        is LocalTime -> null
+        else -> buildLocalDateOrNull()
+    }
+}
+
+fun TemporalAccessor.toLocalTimeOrNull(): LocalTime? {
+    return when (this) {
+        is Instant -> this.atZone(ZoneId.systemDefault()).toLocalTime()
+        is LocalDateTime -> this.toLocalTime()
+        is ZonedDateTime -> this.toLocalTime()
+        is OffsetDateTime -> this.toLocalTime()
+        is LocalDate -> null
+        is LocalTime -> this
+        else -> buildLocalTimeOrNull()
+    }
+}
+
+fun TemporalAccessor.buildInstantOrNull(): Instant? {
+    if (this.isSupported(ChronoField.INSTANT_SECONDS)) {
+        val second = this.getLong(ChronoField.INSTANT_SECONDS)
+        val nano = getNanoOfSecond()
+        return Instant.ofEpochSecond(second, nano.toLong())
+    }
+    val zonedDateTime = buildZonedDateTimeOrNull()
+    if (zonedDateTime === null) {
+        return null
+    }
+    return zonedDateTime.toInstant()
+}
+
+fun TemporalAccessor.buildZonedDateTimeOrNull(): ZonedDateTime? {
+    return buildDateTimeOrNull { local, zoneId -> ZonedDateTime.of(local, zoneId) }
+}
+
+fun TemporalAccessor.buildOffsetDateTimeOrNull(): OffsetDateTime? {
+    return buildDateTimeOrNull { local, zoneId -> OffsetDateTime.of(local, zoneId.rules.getOffset(local)) }
+}
+
+private inline fun <T> TemporalAccessor.buildDateTimeOrNull(
+    generator: (local: LocalDateTime, zoneId: ZoneId) -> T?
+): T? {
+    val local = buildLocalDateTimeOrNull()
+    if (local === null) {
+        return null
+    }
+    val zoneId = if (this.isSupported(ChronoField.OFFSET_SECONDS)) {
+        val offsetSecond = this.get(ChronoField.OFFSET_SECONDS)
+        ZoneOffset.ofTotalSeconds(offsetSecond)
+    } else {
+        ZoneId.systemDefault()
+    }
+    return generator(local, zoneId)
+}
+
+fun TemporalAccessor.buildLocalDateTimeOrNull(): LocalDateTime? {
+    val localDate = buildLocalDateOrNull()
+    if (localDate === null) {
+        return null
+    }
+    val localTime = buildLocalTimeOrNull()
+    if (localTime === null) {
+        return LocalDateTime.of(localDate, LocalTime.MIN)
+    }
+    return LocalDateTime.of(localDate, localTime)
+}
+
+fun TemporalAccessor.buildLocalDateOrNull(): LocalDate? {
+    if (this.isSupported(ChronoField.EPOCH_DAY)) {
+        return LocalDate.ofEpochDay(this.getLong(ChronoField.EPOCH_DAY))
+    }
+
+    val year = getYear()
+
+    if (this.isSupported(ChronoField.DAY_OF_YEAR)) {
+        return LocalDate.ofYearDay(year, this.get(ChronoField.DAY_OF_YEAR))
+    }
+
+    var month = 1
+    if (this.isSupported(ChronoField.MONTH_OF_YEAR)) {
+        month = this.get(ChronoField.MONTH_OF_YEAR)
+    }
+    var day = 1
+    if (this.isSupported(ChronoField.DAY_OF_MONTH)) {
+        day = this.get(ChronoField.DAY_OF_MONTH)
+    }
+    return LocalDate.of(year, month, day)
+}
+
+fun TemporalAccessor.buildLocalTimeOrNull(): LocalTime? {
+    if (this.isSupported(ChronoField.NANO_OF_DAY)) {
+        return LocalTime.ofNanoOfDay(this.getLong(ChronoField.NANO_OF_DAY))
+    }
+
+    val nano = getNanoOfSecond()
+
+    if (this.isSupported(ChronoField.SECOND_OF_DAY)) {
+        val secondOfDay = this.getLong(ChronoField.SECOND_OF_DAY)
+        return LocalTime.ofNanoOfDay(secondOfDay + nano)
+    }
+
+    var second = 0
+    if (this.isSupported(ChronoField.SECOND_OF_MINUTE)) {
+        second = this.get(ChronoField.SECOND_OF_MINUTE)
+    }
+
+    if (this.isSupported(ChronoField.MINUTE_OF_DAY)) {
+        val minuteOfDay = this.getLong(ChronoField.MINUTE_OF_DAY)
+        val secondOfDay = minuteOfDay * 60
+        return LocalTime.ofNanoOfDay(secondOfDay + nano)
+    }
+
+    val hour = getHourOfSecond()
+
+    var minute = 0
+    if (this.isSupported(ChronoField.MINUTE_OF_HOUR)) {
+        minute = this.get(ChronoField.MINUTE_OF_HOUR)
+    }
+
+    return LocalTime.of(hour, minute, second, nano)
+}
+
+fun TemporalAccessor.getNanoOfSecond(): Int {
+    var nano = 0
+    if (this.isSupported(ChronoField.NANO_OF_SECOND)) {
+        nano = this.get(ChronoField.NANO_OF_SECOND)
+    } else if (this.isSupported(ChronoField.MICRO_OF_SECOND)) {
+        nano = this.get(ChronoField.MICRO_OF_SECOND) * 1000
+    } else if (this.isSupported(ChronoField.MILLI_OF_SECOND)) {
+        nano = this.get(ChronoField.MILLI_OF_SECOND) * 1000_000
+    }
+    return nano
+}
+
+fun TemporalAccessor.getHourOfSecond(): Int {
+    var hour = 0
+    if (this.isSupported(ChronoField.HOUR_OF_DAY)) {
+        hour = this.get(ChronoField.HOUR_OF_DAY)
+    } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_DAY)) {
+        hour = this.get(ChronoField.CLOCK_HOUR_OF_DAY) - 1
+    } else if (this.isSupported(ChronoField.AMPM_OF_DAY)) {
+        if (this.isSupported(ChronoField.HOUR_OF_AMPM)) {
+            val ampm = this.get(ChronoField.AMPM_OF_DAY)
+            hour = this.get(ChronoField.HOUR_OF_AMPM) + ampm * 12
+        } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_AMPM)) {
+            val ampm = this.get(ChronoField.AMPM_OF_DAY)
+            hour = this.get(ChronoField.CLOCK_HOUR_OF_AMPM) - 1 + ampm * 12
+        }
+    }
+    return hour
+}
+
+fun TemporalAccessor.getYear(): Int {
+    var year = 0
+    if (this.isSupported(ChronoField.YEAR)) {
+        year = this.get(ChronoField.YEAR)
+    } else if (this.isSupported(ChronoField.YEAR_OF_ERA) && this.isSupported(ChronoField.ERA)) {
+        val era = this.get(ChronoField.ERA)
+        if (era == 1) {
+            year = this.get(ChronoField.YEAR_OF_ERA)
+        } else if (era == 0) {
+            year = -this.get(ChronoField.YEAR_OF_ERA) + 1
+        }
+    }
+    return year
 }
