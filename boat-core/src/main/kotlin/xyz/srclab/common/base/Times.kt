@@ -15,137 +15,6 @@ import java.util.*
 @JvmField
 val TIMESTAMP_PATTERN: DatePattern = "yyyyMMddHHmmssSSS".toDatePattern()
 
-/**
- * Pattern of datetime.
- */
-interface DatePattern {
-
-    val pattern: String
-
-    fun toFormatter(): DateTimeFormatter
-
-    fun toDateFormat(): DateFormat
-
-    fun format(temporalAccessor: TemporalAccessor): String {
-        return toFormatter().format(temporalAccessor)
-    }
-
-    fun format(date: Date): String {
-        return toDateFormat().format(date)
-    }
-
-    fun parseDate(chars: CharSequence): Date {
-        return toDateFormat().parse(chars.toString())
-    }
-
-    fun parseTemporalAccessor(chars: CharSequence): TemporalAccessor {
-        return toFormatter().parse(chars)
-    }
-
-    fun parseTemporalAccessorOrNull(chars: CharSequence): TemporalAccessor? {
-        return try {
-            toFormatter().parse(chars)
-        } catch (e: DateTimeParseException) {
-            null
-        }
-    }
-
-    fun parseInstant(chars: CharSequence): Instant {
-        return Instant.parse(chars)
-    }
-
-    fun parseZonedDateTime(chars: CharSequence): ZonedDateTime {
-        return ZonedDateTime.parse(chars, toFormatter())
-    }
-
-    fun parseOffsetDateTime(chars: CharSequence): OffsetDateTime {
-        return OffsetDateTime.parse(chars, toFormatter())
-    }
-
-    fun parseLocalDateTime(chars: CharSequence): LocalDateTime {
-        return LocalDateTime.parse(chars, toFormatter())
-    }
-
-    fun parseLocalDate(chars: CharSequence): LocalDate {
-        return LocalDate.parse(chars, toFormatter())
-    }
-
-    fun parseLocalTime(chars: CharSequence): LocalTime {
-        return LocalTime.parse(chars, toFormatter())
-    }
-
-    fun buildInstant(chars: CharSequence): Instant {
-        return parseTemporalAccessor(chars).toInstant()
-    }
-
-    fun buildZonedDateTime(chars: CharSequence): ZonedDateTime {
-        return parseTemporalAccessor(chars).toZonedDateTime()
-    }
-
-    fun buildOffsetDateTime(chars: CharSequence): OffsetDateTime {
-        return parseTemporalAccessor(chars).toOffsetDateTime()
-    }
-
-    fun buildLocalDateTime(chars: CharSequence): LocalDateTime {
-        return parseTemporalAccessor(chars).toLocalDateTime()
-    }
-
-    fun buildLocalDate(chars: CharSequence): LocalDate {
-        return parseTemporalAccessor(chars).toLocalDate()
-    }
-
-    fun buildLocalTime(chars: CharSequence): LocalTime {
-        return parseTemporalAccessor(chars).toLocalTime()
-    }
-
-    fun buildInstantOrNull(chars: CharSequence): Instant? {
-        return parseTemporalAccessorOrNull(chars)?.toInstantOrNull()
-    }
-
-    fun buildZonedDateTimeOrNull(chars: CharSequence): ZonedDateTime? {
-        return parseTemporalAccessorOrNull(chars)?.toZonedDateTimeOrNull()
-    }
-
-    fun buildOffsetDateTimeOrNull(chars: CharSequence): OffsetDateTime? {
-        return parseTemporalAccessorOrNull(chars)?.toOffsetDateTimeOrNull()
-    }
-
-    fun buildLocalDateTimeOrNull(chars: CharSequence): LocalDateTime? {
-        return parseTemporalAccessorOrNull(chars)?.toLocalDateTimeOrNull()
-    }
-
-    fun buildLocalDateOrNull(chars: CharSequence): LocalDate? {
-        return parseTemporalAccessorOrNull(chars)?.toLocalDateOrNull()
-    }
-
-    fun buildLocalTimeOrNull(chars: CharSequence): LocalTime? {
-        return parseTemporalAccessorOrNull(chars)?.toLocalTimeOrNull()
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun CharSequence.toDatePattern(): DatePattern {
-            return DatePatternImpl(this)
-        }
-
-        private class DatePatternImpl(
-            pattern: CharSequence
-        ) : DatePattern {
-
-            override val pattern: String = pattern.toString()
-            private val formatter = DateTimeFormatter.ofPattern(this.pattern)
-
-            override fun toFormatter(): DateTimeFormatter = formatter
-
-            override fun toDateFormat(): DateFormat {
-                return SimpleDateFormat(pattern)
-            }
-        }
-    }
-}
-
 fun epochSecond(): Long {
     return epochMilli() / 1000L
 }
@@ -451,4 +320,136 @@ fun TemporalAccessor.getYear(): Int {
         }
     }
     return year
+}
+
+
+/**
+ * Pattern of datetime.
+ */
+interface DatePattern {
+
+    val pattern: String
+
+    fun toFormatter(): DateTimeFormatter
+
+    fun toDateFormat(): DateFormat
+
+    fun format(temporalAccessor: TemporalAccessor): String {
+        return toFormatter().format(temporalAccessor)
+    }
+
+    fun format(date: Date): String {
+        return toDateFormat().format(date)
+    }
+
+    fun parseDate(chars: CharSequence): Date {
+        return toDateFormat().parse(chars.toString())
+    }
+
+    fun parseTemporalAccessor(chars: CharSequence): TemporalAccessor {
+        return toFormatter().parse(chars)
+    }
+
+    fun parseTemporalAccessorOrNull(chars: CharSequence): TemporalAccessor? {
+        return try {
+            toFormatter().parse(chars)
+        } catch (e: DateTimeParseException) {
+            null
+        }
+    }
+
+    fun parseInstant(chars: CharSequence): Instant {
+        return Instant.parse(chars)
+    }
+
+    fun parseZonedDateTime(chars: CharSequence): ZonedDateTime {
+        return ZonedDateTime.parse(chars, toFormatter())
+    }
+
+    fun parseOffsetDateTime(chars: CharSequence): OffsetDateTime {
+        return OffsetDateTime.parse(chars, toFormatter())
+    }
+
+    fun parseLocalDateTime(chars: CharSequence): LocalDateTime {
+        return LocalDateTime.parse(chars, toFormatter())
+    }
+
+    fun parseLocalDate(chars: CharSequence): LocalDate {
+        return LocalDate.parse(chars, toFormatter())
+    }
+
+    fun parseLocalTime(chars: CharSequence): LocalTime {
+        return LocalTime.parse(chars, toFormatter())
+    }
+
+    fun buildInstant(chars: CharSequence): Instant {
+        return parseTemporalAccessor(chars).toInstant()
+    }
+
+    fun buildZonedDateTime(chars: CharSequence): ZonedDateTime {
+        return parseTemporalAccessor(chars).toZonedDateTime()
+    }
+
+    fun buildOffsetDateTime(chars: CharSequence): OffsetDateTime {
+        return parseTemporalAccessor(chars).toOffsetDateTime()
+    }
+
+    fun buildLocalDateTime(chars: CharSequence): LocalDateTime {
+        return parseTemporalAccessor(chars).toLocalDateTime()
+    }
+
+    fun buildLocalDate(chars: CharSequence): LocalDate {
+        return parseTemporalAccessor(chars).toLocalDate()
+    }
+
+    fun buildLocalTime(chars: CharSequence): LocalTime {
+        return parseTemporalAccessor(chars).toLocalTime()
+    }
+
+    fun buildInstantOrNull(chars: CharSequence): Instant? {
+        return parseTemporalAccessorOrNull(chars)?.toInstantOrNull()
+    }
+
+    fun buildZonedDateTimeOrNull(chars: CharSequence): ZonedDateTime? {
+        return parseTemporalAccessorOrNull(chars)?.toZonedDateTimeOrNull()
+    }
+
+    fun buildOffsetDateTimeOrNull(chars: CharSequence): OffsetDateTime? {
+        return parseTemporalAccessorOrNull(chars)?.toOffsetDateTimeOrNull()
+    }
+
+    fun buildLocalDateTimeOrNull(chars: CharSequence): LocalDateTime? {
+        return parseTemporalAccessorOrNull(chars)?.toLocalDateTimeOrNull()
+    }
+
+    fun buildLocalDateOrNull(chars: CharSequence): LocalDate? {
+        return parseTemporalAccessorOrNull(chars)?.toLocalDateOrNull()
+    }
+
+    fun buildLocalTimeOrNull(chars: CharSequence): LocalTime? {
+        return parseTemporalAccessorOrNull(chars)?.toLocalTimeOrNull()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun CharSequence.toDatePattern(): DatePattern {
+            return DatePatternImpl(this)
+        }
+
+        private class DatePatternImpl(
+            pattern: CharSequence
+        ) : DatePattern {
+
+            override val pattern: String = pattern.toString()
+            private val formatter = DateTimeFormatter.ofPattern(this.pattern)
+
+            override fun toFormatter(): DateTimeFormatter = formatter
+
+            override fun toDateFormat(): DateFormat {
+                return SimpleDateFormat(pattern)
+            }
+        }
+    }
 }
