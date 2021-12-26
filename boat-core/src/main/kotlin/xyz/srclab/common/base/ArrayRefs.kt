@@ -66,7 +66,7 @@ interface ArrayRef<T> : ArrayRefBase<Array<T>, ArrayRef<T>> {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun <T> Array<T>.asRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<T> {
+        fun <T> Array<T>.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<T> {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
             return ArrayRefImpl(this, startIndex, endIndex)
         }
@@ -74,8 +74,11 @@ interface ArrayRef<T> : ArrayRefBase<Array<T>, ArrayRef<T>> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun <T> Array<T>.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ArrayRef<T> {
-            return asRef(offset, offset + length)
+        fun <T> Array<T>.arrayRefByOffset(
+            offset: Int = 0,
+            length: Int = remainingLength(this.size, offset)
+        ): ArrayRef<T> {
+            return arrayRef(offset, offset + length)
         }
 
         private class ArrayRefImpl<T>(
@@ -89,8 +92,8 @@ interface ArrayRef<T> : ArrayRefBase<Array<T>, ArrayRef<T>> {
             }
 
             override fun subArray(startIndex: Int, endIndex: Int): ArrayRef<T> {
-                checkRangeInBounds(startIndex, endIndex, 0, length)
-                return array.asRef(actualIndex(startIndex), actualIndex(endIndex))
+                checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                return ArrayRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
         }
     }
@@ -118,7 +121,7 @@ interface BooleansRef : ArrayRefBase<BooleanArray, BooleansRef> {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun BooleanArray.asRef(startIndex: Int = 0, endIndex: Int = this.size): BooleansRef {
+        fun BooleanArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): BooleansRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
             return BooleansRefImpl(this, startIndex, endIndex)
         }
@@ -126,8 +129,11 @@ interface BooleansRef : ArrayRefBase<BooleanArray, BooleansRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun BooleanArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BooleansRef {
-            return asRef(offset, offset + length)
+        fun BooleanArray.arrayRefByOffset(
+            offset: Int = 0,
+            length: Int = remainingLength(this.size, offset)
+        ): BooleansRef {
+            return arrayRef(offset, offset + length)
         }
 
         private class BooleansRefImpl(
@@ -141,8 +147,8 @@ interface BooleansRef : ArrayRefBase<BooleanArray, BooleansRef> {
             }
 
             override fun subArray(startIndex: Int, endIndex: Int): BooleansRef {
-                checkRangeInBounds(startIndex, endIndex, 0, length)
-                return array.asRef(actualIndex(startIndex), actualIndex(endIndex))
+                checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                return BooleansRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
         }
     }
@@ -170,7 +176,7 @@ interface BytesRef : ArrayRefBase<ByteArray, BytesRef> {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun ByteArray.asRef(startIndex: Int = 0, endIndex: Int = this.size): BytesRef {
+        fun ByteArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): BytesRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
             return BytesRefImpl(this, startIndex, endIndex)
         }
@@ -178,8 +184,8 @@ interface BytesRef : ArrayRefBase<ByteArray, BytesRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun ByteArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesRef {
-            return asRef(offset, offset + length)
+        fun ByteArray.arrayRefByOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesRef {
+            return arrayRef(offset, offset + length)
         }
 
         private class BytesRefImpl(
@@ -193,8 +199,8 @@ interface BytesRef : ArrayRefBase<ByteArray, BytesRef> {
             }
 
             override fun subArray(startIndex: Int, endIndex: Int): BytesRef {
-                checkRangeInBounds(startIndex, endIndex, 0, length)
-                return array.asRef(actualIndex(startIndex), actualIndex(endIndex))
+                checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                return BytesRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
         }
     }
@@ -204,10 +210,6 @@ interface BytesRef : ArrayRefBase<ByteArray, BytesRef> {
  * Char array reference.
  */
 interface CharsRef : ArrayRefBase<CharArray, CharsRef> {
-
-    override val startIndex: Int
-    override val endIndex: Int
-    override val length: Int
 
     val array: CharArray
 
@@ -226,7 +228,7 @@ interface CharsRef : ArrayRefBase<CharArray, CharsRef> {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun CharArray.asRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
+        fun CharArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
             return CharsRefImpl(this, startIndex, endIndex)
         }
@@ -234,8 +236,8 @@ interface CharsRef : ArrayRefBase<CharArray, CharsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun CharArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsRef {
-            return asRef(offset, offset + length)
+        fun CharArray.arrayRefByOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsRef {
+            return arrayRef(offset, offset + length)
         }
 
         private class CharsRefImpl(
@@ -243,15 +245,14 @@ interface CharsRef : ArrayRefBase<CharArray, CharsRef> {
             override val startIndex: Int,
             override val endIndex: Int,
         ) : CharsRef {
-            override val length: Int = endIndex - startIndex
 
             override fun copyOfRange(): CharArray {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
             override fun subArray(startIndex: Int, endIndex: Int): CharsRef {
-                checkRangeInBounds(startIndex, endIndex, 0, length)
-                return array.asRef(actualIndex(startIndex), actualIndex(endIndex))
+                checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                return CharsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
         }
     }
@@ -279,7 +280,7 @@ interface ShortsRef : ArrayRefBase<ShortArray, ShortsRef> {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun ShortArray.asRef(startIndex: Int = 0, endIndex: Int = this.size): ShortsRef {
+        fun ShortArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): ShortsRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
             return ShortsRefImpl(this, startIndex, endIndex)
         }
@@ -287,8 +288,8 @@ interface ShortsRef : ArrayRefBase<ShortArray, ShortsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun ShortArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ShortsRef {
-            return asRef(offset, offset + length)
+        fun ShortArray.arrayRefByOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ShortsRef {
+            return arrayRef(offset, offset + length)
         }
 
         private class ShortsRefImpl(
@@ -302,8 +303,8 @@ interface ShortsRef : ArrayRefBase<ShortArray, ShortsRef> {
             }
 
             override fun subArray(startIndex: Int, endIndex: Int): ShortsRef {
-                checkRangeInBounds(startIndex, endIndex, 0, length)
-                return array.asRef(actualIndex(startIndex), actualIndex(endIndex))
+                checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                return ShortsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
         }
     }
@@ -331,7 +332,7 @@ interface IntsRef : ArrayRefBase<IntArray, IntsRef> {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun IntArray.asRef(startIndex: Int = 0, endIndex: Int = this.size): IntsRef {
+        fun IntArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): IntsRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
             return IntsRefImpl(this, startIndex, endIndex)
         }
@@ -339,8 +340,8 @@ interface IntsRef : ArrayRefBase<IntArray, IntsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun IntArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): IntsRef {
-            return asRef(offset, offset + length)
+        fun IntArray.arrayRefByOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): IntsRef {
+            return arrayRef(offset, offset + length)
         }
 
         private class IntsRefImpl(
@@ -354,8 +355,8 @@ interface IntsRef : ArrayRefBase<IntArray, IntsRef> {
             }
 
             override fun subArray(startIndex: Int, endIndex: Int): IntsRef {
-                checkRangeInBounds(startIndex, endIndex, 0, length)
-                return array.asRef(actualIndex(startIndex), actualIndex(endIndex))
+                checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                return IntsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
         }
     }
@@ -383,7 +384,7 @@ interface LongsRef : ArrayRefBase<LongArray, LongsRef> {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun LongArray.asRef(startIndex: Int = 0, endIndex: Int = this.size): LongsRef {
+        fun LongArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): LongsRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
             return LongsRefImpl(this, startIndex, endIndex)
         }
@@ -391,8 +392,8 @@ interface LongsRef : ArrayRefBase<LongArray, LongsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun LongArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): LongsRef {
-            return asRef(offset, offset + length)
+        fun LongArray.arrayRefByOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): LongsRef {
+            return arrayRef(offset, offset + length)
         }
 
         private class LongsRefImpl(
@@ -406,8 +407,8 @@ interface LongsRef : ArrayRefBase<LongArray, LongsRef> {
             }
 
             override fun subArray(startIndex: Int, endIndex: Int): LongsRef {
-                checkRangeInBounds(startIndex, endIndex, 0, length)
-                return array.asRef(actualIndex(startIndex), actualIndex(endIndex))
+                checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                return LongsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
         }
     }
@@ -435,7 +436,7 @@ interface FloatsRef : ArrayRefBase<FloatArray, FloatsRef> {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun FloatArray.asRef(startIndex: Int = 0, endIndex: Int = this.size): FloatsRef {
+        fun FloatArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): FloatsRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
             return FloatsRefImpl(this, startIndex, endIndex)
         }
@@ -443,8 +444,8 @@ interface FloatsRef : ArrayRefBase<FloatArray, FloatsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun FloatArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): FloatsRef {
-            return asRef(offset, offset + length)
+        fun FloatArray.arrayRefByOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): FloatsRef {
+            return arrayRef(offset, offset + length)
         }
 
         private class FloatsRefImpl(
@@ -458,8 +459,8 @@ interface FloatsRef : ArrayRefBase<FloatArray, FloatsRef> {
             }
 
             override fun subArray(startIndex: Int, endIndex: Int): FloatsRef {
-                checkRangeInBounds(startIndex, endIndex, 0, length)
-                return array.asRef(actualIndex(startIndex), actualIndex(endIndex))
+                checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                return FloatsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
         }
     }
@@ -487,7 +488,7 @@ interface DoublesRef : ArrayRefBase<DoubleArray, DoublesRef> {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun DoubleArray.asRef(startIndex: Int = 0, endIndex: Int = this.size): DoublesRef {
+        fun DoubleArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): DoublesRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
             return DoublesRefImpl(this, startIndex, endIndex)
         }
@@ -495,8 +496,11 @@ interface DoublesRef : ArrayRefBase<DoubleArray, DoublesRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun DoubleArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): DoublesRef {
-            return asRef(offset, offset + length)
+        fun DoubleArray.arrayRefByOffset(
+            offset: Int = 0,
+            length: Int = remainingLength(this.size, offset)
+        ): DoublesRef {
+            return arrayRef(offset, offset + length)
         }
 
         private class DoublesRefImpl(
@@ -510,8 +514,8 @@ interface DoublesRef : ArrayRefBase<DoubleArray, DoublesRef> {
             }
 
             override fun subArray(startIndex: Int, endIndex: Int): DoublesRef {
-                checkRangeInBounds(startIndex, endIndex, 0, length)
-                return array.asRef(actualIndex(startIndex), actualIndex(endIndex))
+                checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
+                return DoublesRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
         }
     }
