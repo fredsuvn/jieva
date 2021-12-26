@@ -1,4 +1,4 @@
-@file:JvmName("Langs")
+@file:JvmName("BLangs")
 
 package xyz.srclab.common.base
 

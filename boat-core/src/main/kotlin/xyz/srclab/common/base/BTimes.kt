@@ -1,4 +1,4 @@
-@file:JvmName("Times")
+@file:JvmName("BTimes")
 
 package xyz.srclab.common.base
 

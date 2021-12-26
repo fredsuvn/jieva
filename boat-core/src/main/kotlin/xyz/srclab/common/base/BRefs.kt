@@ -1,4 +1,4 @@
-@file:JvmName("Refs")
+@file:JvmName("BRefs")
 
 package xyz.srclab.common.base
 
