@@ -74,7 +74,7 @@ interface ArrayRef<T> : ArrayRefBase<Array<T>, ArrayRef<T>> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun <T> Array<T>.offsetRef(offset: Int = 0, length: Int = this.size): ArrayRef<T> {
+        fun <T> Array<T>.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ArrayRef<T> {
             return asRef(offset, offset + length)
         }
 
@@ -126,7 +126,7 @@ interface BooleansRef : ArrayRefBase<BooleanArray, BooleansRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun BooleanArray.offsetRef(offset: Int = 0, length: Int = this.size): BooleansRef {
+        fun BooleanArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BooleansRef {
             return asRef(offset, offset + length)
         }
 
@@ -178,7 +178,7 @@ interface BytesRef : ArrayRefBase<ByteArray, BytesRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun ByteArray.offsetRef(offset: Int = 0, length: Int = this.size): BytesRef {
+        fun ByteArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesRef {
             return asRef(offset, offset + length)
         }
 
@@ -234,7 +234,7 @@ interface CharsRef : ArrayRefBase<CharArray, CharsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun CharArray.offsetRef(offset: Int = 0, length: Int = this.size): CharsRef {
+        fun CharArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsRef {
             return asRef(offset, offset + length)
         }
 
@@ -287,7 +287,7 @@ interface ShortsRef : ArrayRefBase<ShortArray, ShortsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun ShortArray.offsetRef(offset: Int = 0, length: Int = this.size): ShortsRef {
+        fun ShortArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ShortsRef {
             return asRef(offset, offset + length)
         }
 
@@ -339,7 +339,7 @@ interface IntsRef : ArrayRefBase<IntArray, IntsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun IntArray.offsetRef(offset: Int = 0, length: Int = this.size): IntsRef {
+        fun IntArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): IntsRef {
             return asRef(offset, offset + length)
         }
 
@@ -391,7 +391,7 @@ interface LongsRef : ArrayRefBase<LongArray, LongsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun LongArray.offsetRef(offset: Int = 0, length: Int = this.size): LongsRef {
+        fun LongArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): LongsRef {
             return asRef(offset, offset + length)
         }
 
@@ -443,7 +443,7 @@ interface FloatsRef : ArrayRefBase<FloatArray, FloatsRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun FloatArray.offsetRef(offset: Int = 0, length: Int = this.size): FloatsRef {
+        fun FloatArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): FloatsRef {
             return asRef(offset, offset + length)
         }
 
@@ -495,7 +495,7 @@ interface DoublesRef : ArrayRefBase<DoubleArray, DoublesRef> {
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun DoubleArray.offsetRef(offset: Int = 0, length: Int = this.size): DoublesRef {
+        fun DoubleArray.offsetRef(offset: Int = 0, length: Int = remainingLength(this.size, offset)): DoublesRef {
             return asRef(offset, offset + length)
         }
 
