@@ -35,6 +35,24 @@ fun Any?.deepEquals(other: Any?): Boolean {
     return Objects.deepEquals(this, other)
 }
 
+fun Any?.anyEquals(vararg other: Any?): Boolean {
+    for (any in other) {
+        if (equals(any)) {
+            return true
+        }
+    }
+    return false
+}
+
+fun Any?.allEquals(vararg other: Any?): Boolean {
+    for (any in other) {
+        if (!equals(any)) {
+            return false
+        }
+    }
+    return true
+}
+
 //Hash:
 
 fun Any?.hash(): Int {
