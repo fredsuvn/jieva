@@ -4,39 +4,78 @@ package xyz.srclab.common.base
 
 import kotlin.text.toBoolean as toBooleanKt
 
-fun Any?.toBoolean(): Boolean {
-    return when (this) {
-        null -> false
-        is Boolean -> this
-        is Number -> toInt() != 0
-        else -> toString().toBooleanKt()
-    }
+fun CharSequence?.toBoolean(): Boolean {
+    return this?.toString().toBooleanKt()
 }
 
-fun CharSequence.isTrue(vararg accepts: CharSequence): Boolean {
-    for (accept in accepts) {
-        if (this.equals(accept, false)) {
+fun anyTrue(vararg charSeqs: CharSequence?): Boolean {
+    for (charSeq in charSeqs) {
+        if (charSeq.toBoolean()) {
             return true
         }
     }
     return false
 }
 
-fun CharSequence.isTrueIgnoreCase(vararg accepts: CharSequence): Boolean {
-    for (accept in accepts) {
-        if (this.equals(accept, true)) {
+fun anyTrue(charSeqs: Iterable<CharSequence?>): Boolean {
+    for (charSeq in charSeqs) {
+        if (charSeq.toBoolean()) {
             return true
         }
     }
     return false
 }
 
-@JvmOverloads
-fun CharSequence.isTrue(accepts: Iterable<CharSequence>, ignoreCase: Boolean = true): Boolean {
-    for (accept in accepts) {
-        if (this.equals(accept, ignoreCase)) {
+fun allTrue(vararg charSeqs: CharSequence?): Boolean {
+    for (charSeq in charSeqs) {
+        if (!charSeq.toBoolean()) {
+            return false
+        }
+    }
+    return true
+}
+
+fun allTrue(charSeqs: Iterable<CharSequence?>): Boolean {
+    for (charSeq in charSeqs) {
+        if (!charSeq.toBoolean()) {
+            return false
+        }
+    }
+    return true
+}
+
+fun anyFalse(vararg charSeqs: CharSequence?): Boolean {
+    for (charSeq in charSeqs) {
+        if (!charSeq.toBoolean()) {
             return true
         }
     }
     return false
+}
+
+fun anyFalse(charSeqs: Iterable<CharSequence?>): Boolean {
+    for (charSeq in charSeqs) {
+        if (!charSeq.toBoolean()) {
+            return true
+        }
+    }
+    return false
+}
+
+fun allFalse(vararg charSeqs: CharSequence?): Boolean {
+    for (charSeq in charSeqs) {
+        if (charSeq.toBoolean()) {
+            return false
+        }
+    }
+    return true
+}
+
+fun allFalse(charSeqs: Iterable<CharSequence?>): Boolean {
+    for (charSeq in charSeqs) {
+        if (charSeq.toBoolean()) {
+            return false
+        }
+    }
+    return true
 }

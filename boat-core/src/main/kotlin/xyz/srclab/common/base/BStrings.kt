@@ -97,6 +97,78 @@ fun CharSequence?.isWhitespace(): Boolean {
     return StringUtils.isWhitespace(this)
 }
 
+fun anyEmpty(vararg charSeqs: CharSequence?): Boolean {
+    for (charSeq in charSeqs) {
+        if (charSeq.isEmpty()) {
+            return true
+        }
+    }
+    return false
+}
+
+fun anyEmpty(charSeqs: Iterable<CharSequence?>): Boolean {
+    for (charSeq in charSeqs) {
+        if (charSeq.isEmpty()) {
+            return true
+        }
+    }
+    return false
+}
+
+fun allEmpty(vararg charSeqs: CharSequence?): Boolean {
+    for (charSeq in charSeqs) {
+        if (!charSeq.isEmpty()) {
+            return false
+        }
+    }
+    return true
+}
+
+fun allEmpty(charSeqs: Iterable<CharSequence?>): Boolean {
+    for (charSeq in charSeqs) {
+        if (!charSeq.isEmpty()) {
+            return false
+        }
+    }
+    return true
+}
+
+fun anyBlank(vararg charSeqs: CharSequence?): Boolean {
+    for (charSeq in charSeqs) {
+        if (charSeq.isBlank()) {
+            return true
+        }
+    }
+    return false
+}
+
+fun anyBlank(charSeqs: Iterable<CharSequence?>): Boolean {
+    for (charSeq in charSeqs) {
+        if (charSeq.isBlank()) {
+            return true
+        }
+    }
+    return false
+}
+
+fun allBlank(vararg charSeqs: CharSequence?): Boolean {
+    for (charSeq in charSeqs) {
+        if (!charSeq.isBlank()) {
+            return false
+        }
+    }
+    return true
+}
+
+fun allBlank(charSeqs: Iterable<CharSequence?>): Boolean {
+    for (charSeq in charSeqs) {
+        if (!charSeq.isBlank()) {
+            return false
+        }
+    }
+    return true
+}
+
 /**
  * Sets first character of given chars upper case.
  */
@@ -114,6 +186,62 @@ fun CharSequence.uncapitalize(): String {
 @JvmOverloads
 fun CharSequence?.equals(other: CharSequence?, ignoreCase: Boolean = false): Boolean {
     return this.contentEquals(other, ignoreCase)
+}
+
+fun CharSequence?.equalsAny(vararg others: CharSequence?): Boolean {
+    for (other in others) {
+        if (this == other) {
+            return true
+        }
+    }
+    return false
+}
+
+fun CharSequence?.equalsAll(vararg others: CharSequence?): Boolean {
+    for (other in others) {
+        if (this != other) {
+            return false
+        }
+    }
+    return true
+}
+
+fun CharSequence?.equalsAnyIgnoreCase(vararg others: CharSequence?): Boolean {
+    for (other in others) {
+        if (this.equals(other, true)) {
+            return true
+        }
+    }
+    return false
+}
+
+fun CharSequence?.equalsAllIgnoreCase(vararg others: CharSequence?): Boolean {
+    for (other in others) {
+        if (this.equals(other, true)) {
+            return false
+        }
+    }
+    return true
+}
+
+@JvmOverloads
+fun CharSequence?.equalsAny(others: Iterable<CharSequence?>, ignoreCase: Boolean = false): Boolean {
+    for (other in others) {
+        if (this.equals(other, ignoreCase)) {
+            return true
+        }
+    }
+    return false
+}
+
+@JvmOverloads
+fun CharSequence?.equalsAll(others: Iterable<CharSequence?>, ignoreCase: Boolean = false): Boolean {
+    for (other in others) {
+        if (this.equals(other, ignoreCase)) {
+            return false
+        }
+    }
+    return true
 }
 
 fun CharSequence.toCharSet(): Charset {

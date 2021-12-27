@@ -35,18 +35,18 @@ fun Any?.deepEquals(other: Any?): Boolean {
     return Objects.deepEquals(this, other)
 }
 
-fun Any?.anyEquals(vararg other: Any?): Boolean {
-    for (any in other) {
-        if (equals(any)) {
+fun Any?.equalsAny(vararg others: Any?): Boolean {
+    for (other in others) {
+        if (equals(other)) {
             return true
         }
     }
     return false
 }
 
-fun Any?.allEquals(vararg other: Any?): Boolean {
-    for (any in other) {
-        if (!equals(any)) {
+fun Any?.equalsAll(vararg others: Any?): Boolean {
+    for (other in others) {
+        if (!equals(other)) {
             return false
         }
     }
