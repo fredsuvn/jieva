@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
+import java.util.function.Supplier
 import kotlin.text.toCollection as toCollectionKt
 import kotlin.text.toHashSet as toHashSetKt
 import kotlin.text.toList as toListKt
@@ -278,6 +279,12 @@ fun CharSequence.toList(): List<Char> {
     return this.toListKt()
 }
 
+//Lazy:
+
+fun lazyString(supplier: Supplier<String>): LazyString {
+    return LazyString.of(supplier)
+}
+
 /**
  * String reference, to refer to a range of [CharSequence] with indexes but not store the copy of data.
  */
@@ -410,6 +417,56 @@ interface StringRef : CharSequence {
 
             override fun toString(): String {
                 return copyOfRange()
+            }
+        }
+    }
+}
+
+/**
+ * Represents a string with lazy initialization.
+ *
+ * This class is usually used for logging.
+ */
+interface LazyString : CharSequence {
+
+    companion object {
+
+        @JvmStatic
+        fun of(supplier: Supplier<String>): LazyString {
+            return LazyStringImpl(supplier)
+        }
+
+        private class LazyStringImpl(private val supplier: Supplier<String>) : LazyString {
+
+            private var value: String? = null
+
+            override val length: Int
+                get() = getOrLoadString().length
+
+            override fun get(index: Int): Char {
+                return getOrLoadString()[index]
+            }
+
+            override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+                return getOrLoadString().subSequence(startIndex, endIndex)
+            }
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (other !is LazyString) return false
+                return getOrLoadString() == other.toString()
+            }
+
+            override fun hashCode(): Int {
+                return getOrLoadString().hashCode()
+            }
+
+            override fun toString(): String {
+                return getOrLoadString()
+            }
+
+            private fun getOrLoadString(): String {
+                return value ?: supplier.get()
             }
         }
     }
