@@ -90,9 +90,6 @@ interface NamingCase {
 
 /**
  * Camel-Case class.
- *
- * @see LowerCamel
- * @see UpperCamel
  */
 open class CamelCase(
     private val firstWordProcessor: Function<CharSequence, CharSequence>
