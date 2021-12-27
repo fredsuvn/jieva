@@ -169,6 +169,14 @@ fun allBlank(charSeqs: Iterable<CharSequence?>): Boolean {
     return true
 }
 
+fun CharSequence.lowerCase(): String {
+    return this.toString().lowercase()
+}
+
+fun CharSequence.upperCase(): String {
+    return this.toString().uppercase()
+}
+
 /**
  * Sets first character of given chars upper case.
  */
