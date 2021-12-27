@@ -2,7 +2,6 @@
 
 package xyz.srclab.common.base
 
-import com.google.common.primitives.UnsignedBytes
 import org.apache.commons.lang3.StringUtils
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -17,98 +16,48 @@ import kotlin.text.toLong as toLongKt
 import kotlin.text.toShort as toShortKt
 
 /**
- * Default number value of null: 0
- */
-const val DEFAULT_NULL_NUMBER = 0
-
-/**
  * Default radix: 10.
  */
 const val DEFAULT_RADIX: Int = 10
 
+@Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toByte(defaultValue: Byte = DEFAULT_NULL_NUMBER.toByte(), radix: Int = DEFAULT_RADIX): Byte {
-    return when (this) {
-        null -> defaultValue
-        is Number -> if (radix == 10) toByte() else toString().toByteKt(radix)
-        false -> 0
-        true -> 1
-        else -> toString().toByteKt(radix)
-    }
+fun CharSequence.toByte(radix: Int = DEFAULT_RADIX): Byte {
+    return this.toString().toByteKt(radix)
 }
 
+@Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toShort(defaultValue: Short = DEFAULT_NULL_NUMBER.toShort(), radix: Int = DEFAULT_RADIX): Short {
-    return when (this) {
-        null -> defaultValue
-        is Number -> if (radix == 10) toShort() else toString().toShortKt(radix)
-        false -> 0
-        true -> 1
-        else -> toString().toShortKt(radix)
-    }
+fun CharSequence.toShort(radix: Int = DEFAULT_RADIX): Short {
+    return this.toString().toShortKt(radix)
 }
 
+@Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toChar(defaultValue: Char = DEFAULT_NULL_NUMBER.toChar(), radix: Int = DEFAULT_RADIX): Char {
-    return toInt(radix).toChar(defaultValue)
+fun CharSequence.toInt(radix: Int = DEFAULT_RADIX): Int {
+    return this.toString().toIntKt(radix)
 }
 
+@Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toInt(defaultValue: Int = DEFAULT_NULL_NUMBER, radix: Int = DEFAULT_RADIX): Int {
-    return when (this) {
-        null -> defaultValue
-        is Number -> if (radix == 10) toInt() else toString().toIntKt(radix)
-        false -> 0
-        true -> 1
-        else -> toString().toIntKt(radix)
-    }
+fun CharSequence.toLong(radix: Int = DEFAULT_RADIX): Long {
+    return this.toString().toLongKt(radix)
 }
 
-@JvmOverloads
-fun Any?.toLong(defaultValue: Long = DEFAULT_NULL_NUMBER.toLong(), radix: Int = DEFAULT_RADIX): Long {
-    return when (this) {
-        null -> defaultValue
-        is Number -> if (radix == 10) toLong() else toString().toLongKt(radix)
-        false -> 0L
-        true -> 1L
-        else -> toString().toLongKt(radix)
-    }
+@Throws(NumberFormatException::class)
+fun CharSequence.toFloat(): Float {
+    return this.toString().toFloatKt()
 }
 
-@JvmOverloads
-fun Any?.toFloat(defaultValue: Float = DEFAULT_NULL_NUMBER.toFloat()): Float {
-    return when (this) {
-        null -> defaultValue
-        is Number -> toFloat()
-        false -> 0f
-        true -> 1f
-        else -> toString().toFloatKt()
-    }
+@Throws(NumberFormatException::class)
+fun CharSequence.toDouble(): Double {
+    return this.toString().toDoubleKt()
 }
 
+@Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toDouble(defaultValue: Double = DEFAULT_NULL_NUMBER.toDouble()): Double {
-    return when (this) {
-        null -> defaultValue
-        is Number -> toDouble()
-        false -> 0.0
-        true -> 1.0
-        else -> toString().toDoubleKt()
-    }
-}
-
-@JvmOverloads
-fun Any?.toBigInteger(defaultValue: BigInteger = BigInteger.ZERO, radix: Int = DEFAULT_RADIX): BigInteger {
-    if (this === null) {
-        return defaultValue
-    }
-    if (this is BigInteger) {
-        return this
-    }
+fun CharSequence.toBigInteger(radix: Int = DEFAULT_RADIX): BigInteger {
     val str = this.toString()
-    if (str.isEmpty()) {
-        return BigInteger.ZERO
-    }
     if (radix == 10) {
         return when (str) {
             "0" -> BigInteger.ZERO
@@ -120,22 +69,10 @@ fun Any?.toBigInteger(defaultValue: BigInteger = BigInteger.ZERO, radix: Int = D
     return str.toBigIntegerKt(radix)
 }
 
+@Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toBigDecimal(
-    defaultValue: BigDecimal = BigDecimal.ZERO,
-    mathContext: MathContext = MathContext.UNLIMITED
-): BigDecimal {
-    if (this === null) {
-        return defaultValue
-    }
-    if (this is BigDecimal) {
-        return this
-    }
-    val str = this.toString()
-    if (str.isEmpty()) {
-        return BigDecimal.ZERO
-    }
-    return when (str) {
+fun CharSequence.toBigDecimal(mathContext: MathContext = MathContext.UNLIMITED): BigDecimal {
+    return when (val str = this.toString()) {
         "0" -> BigDecimal.ZERO
         "1" -> BigDecimal.ONE
         "10" -> BigDecimal.TEN
@@ -144,23 +81,15 @@ fun Any?.toBigDecimal(
 }
 
 fun Byte.toUnsignedInt(): Int {
-    return UnsignedBytes.toInt(this)
-}
-
-fun Byte.toUnsignedLong(): Long {
-    return this.toLong() and 0xFF
+    return this.toInt() and 0x0000_00FF
 }
 
 fun Short.toUnsignedInt(): Int {
-    return this.toInt() and 0xFFFF
-}
-
-fun Short.toUnsignedLong(): Long {
-    return this.toLong() and 0xFFFF
+    return this.toInt() and 0x0000_FFFF
 }
 
 fun Int.toUnsignedLong(): Long {
-    return this.toLong() and 0xFFFFFFFF
+    return this.toLong() and 0x0000_0000_FFFF_FFFF
 }
 
 /**
@@ -218,6 +147,76 @@ fun Long.toOctalString(size: Int = 22): String {
 }
 
 /**
+ * Parses given chars to int.
+ *
+ * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
+ *
+ * * 123456: positive decimal
+ * * 0xffeecc: positive hex;
+ * * -0xffeecc: negative hex;
+ * * +0774411: positive octal;
+ * * 0b001100: positive binary;
+ */
+fun CharSequence.parseInt(): Int {
+
+    fun parse(offset: Int): Int {
+        if (this.startsWith("0x", offset)) {
+            return this.substring(offset + 2).toIntKt(16)
+        }
+        if (this.startsWith("0b", offset)) {
+            return this.substring(offset + 2).toIntKt(2)
+        }
+        if (this.startsWith("0", offset)) {
+            return this.substring(offset + 1).toIntKt(8)
+        }
+        return this.substring(offset).toIntKt()
+    }
+
+    return if (this.startsWith("-")) {
+        -parse(1)
+    } else if (this.startsWith("+")) {
+        parse(1)
+    } else {
+        parse(0)
+    }
+}
+
+/**
+ * Parses given chars to int.
+ *
+ * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
+ *
+ * * 123456: positive decimal
+ * * 0xffeecc: positive hex;
+ * * -0xffeecc: negative hex;
+ * * +0774411: positive octal;
+ * * 0b001100: positive binary;
+ */
+fun CharSequence.parseLong(): Long {
+
+    fun parse(offset: Int): Long {
+        if (this.startsWith("0x", offset)) {
+            return this.substring(offset + 2).toLongKt(16)
+        }
+        if (this.startsWith("0b", offset)) {
+            return this.substring(offset + 2).toLongKt(2)
+        }
+        if (this.startsWith("0", offset)) {
+            return this.substring(offset + 1).toLongKt(8)
+        }
+        return this.substring(offset).toLongKt()
+    }
+
+    return if (this.startsWith("-")) {
+        -parse(1)
+    } else if (this.startsWith("+")) {
+        parse(1)
+    } else {
+        parse(0)
+    }
+}
+
+/**
  * Parses given chars to [BigInteger].
  *
  * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
@@ -228,11 +227,7 @@ fun Long.toOctalString(size: Int = 22): String {
  * * +0774411: positive octal;
  * * 0b001100: positive binary;
  */
-@JvmOverloads
-fun CharSequence?.parseToBigInteger(defaultValue: BigInteger = BigInteger.ZERO): BigInteger {
-    if (this.isNullOrBlank()) {
-        return defaultValue
-    }
+fun CharSequence.parseBigInteger(): BigInteger {
 
     fun parse(offset: Int): BigInteger {
         if (this.startsWith("0x", offset)) {
@@ -254,46 +249,4 @@ fun CharSequence?.parseToBigInteger(defaultValue: BigInteger = BigInteger.ZERO):
     } else {
         parse(0)
     }
-}
-
-/**
- * Parses given chars to int.
- *
- * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
- *
- * * 123456: positive decimal
- * * 0xffeecc: positive hex;
- * * -0xffeecc: negative hex;
- * * +0774411: positive octal;
- * * 0b001100: positive binary;
- *
- * @see parseToBigInteger
- */
-@JvmOverloads
-fun CharSequence?.parseToInt(defaultValue: Int = DEFAULT_NULL_NUMBER): Int {
-    if (this === null) {
-        return defaultValue
-    }
-    return parseToBigInteger().toInt()
-}
-
-/**
- * Parses given chars to int.
- *
- * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
- *
- * * 123456: positive decimal
- * * 0xffeecc: positive hex;
- * * -0xffeecc: negative hex;
- * * +0774411: positive octal;
- * * 0b001100: positive binary;
- *
- * @see parseToBigInteger
- */
-@JvmOverloads
-fun CharSequence?.parseToLong(defaultValue: Long = DEFAULT_NULL_NUMBER.toLong()): Long {
-    if (this === null) {
-        return defaultValue
-    }
-    return parseToBigInteger().toLong()
 }
