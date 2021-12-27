@@ -21,7 +21,7 @@ const val GREATER_THAN = 1
  * [Comparator] of which arguments will be seen as [Comparable] type.
  */
 @JvmField
-val COMPARABLE_COMPARATOR: Comparator<Comparable<*>> =
+val CAST_COMPARABLE_COMPARATOR: Comparator<Comparable<*>> =
     Comparator { o1, o2 ->
         val c1: Comparable<Any?> = o1.asTyped()
         val c2: Comparable<Any?> = o2.asTyped()
@@ -32,10 +32,10 @@ val COMPARABLE_COMPARATOR: Comparator<Comparable<*>> =
  * [Comparator] which compares the order in inheritance tree in natural order (low to high):
  *
  * * Parent type is greater than subtype;
- * * If there is no inheritance relationship in two classes, second param is greater than first;
+ * * If there is no inheritance relationship in two classes, keep encounter order;
  */
 @JvmField
-val INHERITANCE_COMPARATOR: Comparator<Class<*>> =
+val CLASS_INHERITANCE_COMPARATOR: Comparator<Class<*>> =
     Comparator { c1, c2 ->
         if (c1 == c2) 0 else if (c1.isAssignableFrom(c2)) 1 else -1
     }
@@ -43,22 +43,22 @@ val INHERITANCE_COMPARATOR: Comparator<Class<*>> =
 /**
  * Returns a [Comparator] of which arguments will be seen as [Comparable] type.
  *
- * @see COMPARABLE_COMPARATOR
+ * @see CAST_COMPARABLE_COMPARATOR
  */
-fun <T> comparableComparator(): Comparator<T> {
-    return COMPARABLE_COMPARATOR.asTyped()
+fun <T> castComparableComparator(): Comparator<T> {
+    return CAST_COMPARABLE_COMPARATOR.asTyped()
 }
 
 /**
  * Returns a [Comparator] which compares the order in inheritance tree in natural order (low to high):
  *
  * * Parent type is greater than subtype;
- * * If there is no inheritance relationship in two classes, second param is greater than first;
+ * * If there is no inheritance relationship in two classes, keep encounter order;
  *
- * @see INHERITANCE_COMPARATOR
+ * @see CLASS_INHERITANCE_COMPARATOR
  */
-fun <T> inheritanceComparator(): Comparator<Class<T>> {
-    return INHERITANCE_COMPARATOR.asTyped()
+fun <T> classInheritanceComparator(): Comparator<Class<T>> {
+    return CLASS_INHERITANCE_COMPARATOR.asTyped()
 }
 
 /**
