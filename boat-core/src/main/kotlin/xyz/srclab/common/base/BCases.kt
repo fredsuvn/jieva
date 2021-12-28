@@ -2,6 +2,7 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.annotations.concurrent.ThreadSafe
 import xyz.srclab.common.base.StringRef.Companion.stringRef
 import java.util.*
 import java.util.function.Function
@@ -46,6 +47,7 @@ fun CharSequence.convertCase(from: NamingCase, to: NamingCase): String {
  * @see CamelCase
  * @see SeparatorCase
  */
+@ThreadSafe
 interface NamingCase {
 
     /**
