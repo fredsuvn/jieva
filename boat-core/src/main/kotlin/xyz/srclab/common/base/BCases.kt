@@ -62,10 +62,7 @@ interface NamingCase {
      */
     @Throws(NamingCaseException::class)
     fun <T : CharSequence> join(words: Words<T>): String {
-        val sb = if (words.splitList.isEmpty())
-            StringBuilder()
-        else
-            StringBuilder(words.splitCharCount)
+        val sb = StringBuilder()
         joinTo(sb, words)
         return sb.toString()
     }
@@ -91,29 +88,32 @@ interface NamingCase {
     interface Words<T : CharSequence> {
 
         /**
-         * Original name.
+         * Name.
          */
         val name: T
 
         /**
          * Split words list,
-         * or `empty` if the [name] consists of only one word (means this list has at least 2 elements).
+         * or `empty` if the [name] consists of only one word which is name itself.
          */
         val splitList: List<CharSequence>
 
         /**
-         * Char number of split words, or -1 if [splitList] is `empty`.
+         * Char number of split words.
          */
         val splitCharCount: Int
 
         companion object {
 
+            /**
+             * Name itself as a [Words].
+             */
             @JvmStatic
-            fun <T : CharSequence> singletonWord(name: T): Words<T> {
+            fun <T : CharSequence> nameSelf(name: T): Words<T> {
                 return object : Words<T> {
                     override val name: T = name
                     override val splitList: List<CharSequence> = emptyList()
-                    override val splitCharCount: Int = -1
+                    override val splitCharCount: Int = name.length
                 }
             }
 
@@ -148,7 +148,7 @@ open class CamelCase(
 
         val length = name.length
         if (length <= 1) {
-            return NamingCase.Words.singletonWord(name)
+            return NamingCase.Words.nameSelf(name)
         }
 
         var splitList: MutableList<CharSequence>? = null
@@ -199,7 +199,7 @@ open class CamelCase(
             }
         }
         if (splitList === null) {
-            return NamingCase.Words.singletonWord(name)
+            return NamingCase.Words.nameSelf(name)
         }
         if (startIndex < name.length) {
             getSplitList().add(name.stringRef(startIndex))
@@ -246,13 +246,13 @@ open class SeparatorCase @JvmOverloads constructor(
     override fun <T : CharSequence> split(name: T): NamingCase.Words<T> {
 
         if (name.isEmpty()) {
-            return NamingCase.Words.singletonWord(name)
+            return NamingCase.Words.nameSelf(name)
         }
 
         val separatorString = separator.toString()
         var index = name.indexOf(separatorString)
         if (index < 0) {
-            return NamingCase.Words.singletonWord(name)
+            return NamingCase.Words.nameSelf(name)
         }
 
         var splitList: MutableList<CharSequence>? = null
@@ -280,19 +280,15 @@ open class SeparatorCase @JvmOverloads constructor(
         var startIndex = index + separatorString.length
         while (startIndex < name.length) {
             index = name.indexOf(separatorString, startIndex)
-            if (index > 0) {
-                addToDest(startIndex, index)
-            } else {
+            if (index < 0) {
                 addToDest(startIndex, name.length)
                 break
             }
+            addToDest(startIndex, index)
             startIndex += separatorString.length
         }
         if (splitList === null) {
-            return NamingCase.Words.singletonWord("")
-        }
-        if (startIndex < name.length) {
-            getSplitList().add(name.stringRef(startIndex))
+            return NamingCase.Words.of(name, listOf(""), splitCharCount)
         }
         return NamingCase.Words.of(name, splitList!!, splitCharCount)
     }
