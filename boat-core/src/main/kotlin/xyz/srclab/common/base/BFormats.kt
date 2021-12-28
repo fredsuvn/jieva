@@ -109,5 +109,5 @@ fun CharSequence.fastFormat(vararg args: Any?): String {
         getBuffer().add(this.stringRef(start))
     }
 
-    return getBuffer().joinToString("")
+    return getBuffer().joinToString("") { it.deepToString() }
 }
