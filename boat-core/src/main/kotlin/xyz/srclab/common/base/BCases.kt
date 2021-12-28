@@ -70,10 +70,10 @@ interface NamingCase {
     }
 
     /**
-     * Joins [words] with current case style into [appendable].
+     * Joins [words] with current case style into [dest].
      */
     @Throws(NamingCaseException::class)
-    fun <T : CharSequence> joinTo(appendable: Appendable, words: Words<T>)
+    fun <T : CharSequence> joinTo(dest: Appendable, words: Words<T>)
 
     /**
      * Converts [name] to [target] style.
@@ -215,12 +215,12 @@ open class CamelCase(
         return sb.toString()
     }
 
-    override fun <T : CharSequence> joinTo(appendable: Appendable, words: NamingCase.Words<T>) {
+    override fun <T : CharSequence> joinTo(dest: Appendable, words: NamingCase.Words<T>) {
         if (words.splitList.isEmpty()) {
-            appendable.append(firstWord.apply(words.name))
+            dest.append(firstWord.apply(words.name))
             return
         }
-        join0(words, appendable)
+        join0(words, dest)
     }
 
     private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
@@ -295,12 +295,12 @@ open class SeparatorCase @JvmOverloads constructor(
         return sb.toString()
     }
 
-    override fun <T : CharSequence> joinTo(appendable: Appendable, words: NamingCase.Words<T>) {
+    override fun <T : CharSequence> joinTo(dest: Appendable, words: NamingCase.Words<T>) {
         if (words.splitList.isEmpty()) {
-            appendable.append(wordProcessor.apply(words.name))
+            dest.append(wordProcessor.apply(words.name))
             return
         }
-        join0(words, appendable)
+        join0(words, dest)
     }
 
     private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
