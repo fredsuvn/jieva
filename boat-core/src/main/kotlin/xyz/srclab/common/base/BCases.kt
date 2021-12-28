@@ -3,6 +3,7 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.base.StringRef.Companion.stringRef
+import java.util.*
 import java.util.function.Function
 
 @JvmField
@@ -51,22 +52,17 @@ interface NamingCase {
      * Splits [name] by case boundary.
      */
     @Throws(NamingCaseException::class)
-    fun split(name: CharSequence): List<CharSequence> {
-        return split(name, mutableListOf())
-    }
-
-    /**
-     * Splits [name] by case boundary into [dest]
-     */
-    @Throws(NamingCaseException::class)
-    fun <C : MutableCollection<in CharSequence>> split(name: CharSequence, dest: C): C
+    fun <T : CharSequence> split(name: T): Words<T>
 
     /**
      * Joins [words] with current case style.
      */
     @Throws(NamingCaseException::class)
-    fun join(words: List<CharSequence>): String {
-        val sb = StringBuilder()
+    fun <T : CharSequence> join(words: Words<T>): String {
+        val sb = if (words.splitList.isEmpty())
+            StringBuilder()
+        else
+            StringBuilder(words.splitCharCount)
         join(words, sb)
         return sb.toString()
     }
@@ -75,16 +71,58 @@ interface NamingCase {
      * Joins [words] with current case style into [appendable].
      */
     @Throws(NamingCaseException::class)
-    fun join(words: List<CharSequence>, appendable: Appendable)
+    fun <T : CharSequence> join(words: Words<T>, appendable: Appendable)
 
     /**
      * Converts [name] to [target] style.
      */
     @Throws(NamingCaseException::class)
     fun convert(name: CharSequence, target: NamingCase): String {
-        val words = mutableListOf<CharSequence>()
-        split(name, words)
+        val words = split(name)
         return target.join(words)
+    }
+
+    /**
+     * Resolved words from specified name-case.
+     */
+    interface Words<T : CharSequence> {
+
+        /**
+         * Original name.
+         */
+        val name: T
+
+        /**
+         * Split words list,
+         * or `empty` if the [name] consists of only one word (means this list has at least 2 elements).
+         */
+        val splitList: List<CharSequence>
+
+        /**
+         * Char number of split words, or -1 if [splitList] is `empty`.
+         */
+        val splitCharCount: Int
+
+        companion object {
+
+            @JvmStatic
+            fun <T : CharSequence> singletonWord(name: T): Words<T> {
+                return object : Words<T> {
+                    override val name: T = name
+                    override val splitList: List<CharSequence> = emptyList()
+                    override val splitCharCount: Int = -1
+                }
+            }
+
+            @JvmStatic
+            fun <T : CharSequence> of(name: T, splitList: List<CharSequence>, splitCharCount: Int): Words<T> {
+                return object : Words<T> {
+                    override val name: T = name
+                    override val splitList: List<CharSequence> = splitList
+                    override val splitCharCount: Int = splitCharCount
+                }
+            }
+        }
     }
 }
 
@@ -92,10 +130,10 @@ interface NamingCase {
  * Camel-Case class.
  */
 open class CamelCase(
-    private val firstWordProcessor: Function<CharSequence, CharSequence>
+    private val firstWordProcessor: Function<CharSequence, String>
 ) : NamingCase {
 
-    override fun <C : MutableCollection<in CharSequence>> split(name: CharSequence, dest: C): C {
+    override fun <T : CharSequence> split(name: T): NamingCase.Words<T> {
 
         fun Char.isUpper(): Boolean {
             return this.isUpperCase()
@@ -107,8 +145,19 @@ open class CamelCase(
 
         val length = name.length
         if (length <= 1) {
-            dest.add(name)
-            return dest
+            return NamingCase.Words.singletonWord(name)
+        }
+
+        var splitList: MutableList<CharSequence>? = null
+
+        fun getSplitList(): MutableList<CharSequence> {
+            val sl = splitList
+            if (sl === null) {
+                val newList = LinkedList<CharSequence>()
+                splitList = newList
+                return newList
+            }
+            return sl
         }
 
         var startIndex = 0
@@ -126,7 +175,7 @@ open class CamelCase(
                 continue
             }
             if (isLastLower && c.isUpper()) {
-                dest.add(name.stringRef(startIndex, i))
+                getSplitList().add(name.stringRef(startIndex, i))
                 startIndex = i
                 isLastLower = false
                 continue
@@ -139,7 +188,7 @@ open class CamelCase(
                     //Case "Ab"
                 } else {
                     //Case "AAb"
-                    dest.add(name.stringRef(startIndex, i - 1))
+                    getSplitList().add(name.stringRef(startIndex, i - 1))
                     startIndex = i - 1
                 }
                 isLastLower = true
@@ -147,22 +196,37 @@ open class CamelCase(
             }
         }
         if (startIndex < name.length) {
-            dest.add(name.stringRef(startIndex))
+            if (startIndex == 0) {
+                return NamingCase.Words.singletonWord(name)
+            }
+            getSplitList().add(name.stringRef(startIndex))
         }
-        return dest
+        return NamingCase.Words.of(name, splitList!!, name.length)
     }
 
-    override fun join(words: List<CharSequence>, appendable: Appendable) {
-        if (words.isEmpty()) {
-            throw NamingCaseException("Must have at least 1 word.")
+    override fun <T : CharSequence> join(words: NamingCase.Words<T>): String {
+        if (words.splitList.isEmpty()) {
+            return firstWordProcessor.apply(words.name)
         }
-        appendable.append(firstWordProcessor.apply(words[0]))
-        if (words.size == 1) {
+        val sb = StringBuilder(words.splitCharCount)
+        join0(words, sb)
+        return sb.toString()
+    }
+
+    override fun <T : CharSequence> join(words: NamingCase.Words<T>, appendable: Appendable) {
+        if (words.splitList.isEmpty()) {
+            appendable.append(firstWordProcessor.apply(words.name))
             return
         }
+        join0(words, appendable)
+    }
+
+    private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
+        val splitList = words.splitList
+        appendable.append(firstWordProcessor.apply(splitList[0]))
         var i = 1
-        while (i < words.size) {
-            appendable.append(words[i].capitalize())
+        while (i < splitList.size) {
+            appendable.append(splitList[i].capitalize())
             i++
         }
     }
@@ -173,27 +237,37 @@ open class CamelCase(
  */
 open class SeparatorCase @JvmOverloads constructor(
     private val separator: CharSequence,
-    private val wordProcessor: Function<CharSequence, CharSequence> = Function { it }
+    private val wordProcessor: Function<CharSequence, String> = Function { it.toString() }
 ) : NamingCase {
 
-    override fun <C : MutableCollection<in CharSequence>> split(name: CharSequence, dest: C): C {
-
-        fun addToDest(startIndex: Int, endIndex: Int) {
-            if (endIndex > startIndex) {
-                dest.add(name.stringRef(startIndex, endIndex))
-            }
-        }
-
+    override fun <T : CharSequence> split(name: T): NamingCase.Words<T> {
         val separatorString = separator.toString()
         var index = name.indexOf(separatorString)
         if (index < 0) {
-            dest.add(name)
-            return dest
+            return NamingCase.Words.singletonWord(name)
         }
 
-        if (index > 0) {
-            addToDest(0, index)
+        var splitList: MutableList<CharSequence>? = null
+        var splitCharCount = 0
+
+        fun getSplitList(): MutableList<CharSequence> {
+            val sl = splitList
+            if (sl === null) {
+                val newList = LinkedList<CharSequence>()
+                splitList = newList
+                return newList
+            }
+            return sl
         }
+
+        fun addToDest(startIndex: Int, endIndex: Int) {
+            if (endIndex > startIndex) {
+                getSplitList().add(name.stringRef(startIndex, endIndex))
+                splitCharCount += endIndex - startIndex
+            }
+        }
+
+        addToDest(0, index)
 
         var startIndex = index + separatorString.length
         while (startIndex < name.length) {
@@ -207,22 +281,28 @@ open class SeparatorCase @JvmOverloads constructor(
             startIndex += separatorString.length
         }
 
-        return dest
+        return NamingCase.Words.of(name, splitList!!, splitCharCount)
     }
 
-    override fun join(words: List<CharSequence>, appendable: Appendable) {
-        if (words.isEmpty()) {
-            throw NamingCaseException("Must have at least 1 word.")
+    override fun <T : CharSequence> join(words: NamingCase.Words<T>): String {
+        if (words.splitList.isEmpty()) {
+            return wordProcessor.apply(words.name)
         }
-        appendable.append(wordProcessor.apply(words[0]))
-        if (words.size == 1) {
+        val sb = StringBuilder(words.splitCharCount + separator.length * (words.splitList.size - 1))
+        join0(words, sb)
+        return sb.toString()
+    }
+
+    override fun <T : CharSequence> join(words: NamingCase.Words<T>, appendable: Appendable) {
+        if (words.splitList.isEmpty()) {
+            appendable.append(wordProcessor.apply(words.name))
             return
         }
-        var i = 1
-        while (i < words.size) {
-            appendable.append(wordProcessor.apply(words[i]))
-            i++
-        }
+        join0(words, appendable)
+    }
+
+    private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
+        words.splitList.joinTo(appendable, separator)
     }
 }
 
