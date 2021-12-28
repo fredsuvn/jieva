@@ -65,7 +65,7 @@ interface NamingCase {
             StringBuilder()
         else
             StringBuilder(words.splitCharCount)
-        join(words, sb)
+        joinTo(sb, words)
         return sb.toString()
     }
 
@@ -73,7 +73,7 @@ interface NamingCase {
      * Joins [words] with current case style into [appendable].
      */
     @Throws(NamingCaseException::class)
-    fun <T : CharSequence> join(words: Words<T>, appendable: Appendable)
+    fun <T : CharSequence> joinTo(appendable: Appendable, words: Words<T>)
 
     /**
      * Converts [name] to [target] style.
@@ -132,7 +132,7 @@ interface NamingCase {
  * Camel-Case class.
  */
 open class CamelCase(
-    private val firstWordProcessor: Function<CharSequence, String>
+    private val firstWord: Function<CharSequence, String>
 ) : NamingCase {
 
     override fun <T : CharSequence> split(name: T): NamingCase.Words<T> {
@@ -208,16 +208,16 @@ open class CamelCase(
 
     override fun <T : CharSequence> join(words: NamingCase.Words<T>): String {
         if (words.splitList.isEmpty()) {
-            return firstWordProcessor.apply(words.name)
+            return firstWord.apply(words.name)
         }
         val sb = StringBuilder(words.splitCharCount)
         join0(words, sb)
         return sb.toString()
     }
 
-    override fun <T : CharSequence> join(words: NamingCase.Words<T>, appendable: Appendable) {
+    override fun <T : CharSequence> joinTo(appendable: Appendable, words: NamingCase.Words<T>) {
         if (words.splitList.isEmpty()) {
-            appendable.append(firstWordProcessor.apply(words.name))
+            appendable.append(firstWord.apply(words.name))
             return
         }
         join0(words, appendable)
@@ -225,7 +225,7 @@ open class CamelCase(
 
     private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
         val splitList = words.splitList
-        appendable.append(firstWordProcessor.apply(splitList[0]))
+        appendable.append(firstWord.apply(splitList[0]))
         var i = 1
         while (i < splitList.size) {
             appendable.append(splitList[i].capitalize())
@@ -295,7 +295,7 @@ open class SeparatorCase @JvmOverloads constructor(
         return sb.toString()
     }
 
-    override fun <T : CharSequence> join(words: NamingCase.Words<T>, appendable: Appendable) {
+    override fun <T : CharSequence> joinTo(appendable: Appendable, words: NamingCase.Words<T>) {
         if (words.splitList.isEmpty()) {
             appendable.append(wordProcessor.apply(words.name))
             return
