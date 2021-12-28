@@ -15,8 +15,12 @@ import java.util.*
  * BEscapes.escape("\"ss\": \"sss\\n\"", '\\', '"', '{', '}');
  * ```
  */
+@Throws(StringEscapeException::class)
 fun CharSequence.escape(escapeChar: Char, vararg escapedChars: Char): String {
-    return escape(escapeChar, escapedChars.toSet())
+    if (this.isEmpty()) {
+        return this.toString()
+    }
+    return escape0(escapeChar, escapedChars.toSet())
 }
 
 /**
@@ -28,7 +32,15 @@ fun CharSequence.escape(escapeChar: Char, vararg escapedChars: Char): String {
  * BEscapes.escape("\"ss\": \"sss\\n\"", '\\', BSets.newSet('"', '{', '}'));
  * ```
  */
+@Throws(StringEscapeException::class)
 fun CharSequence.escape(escapeChar: Char, escapedChars: Collection<Char>): String {
+    if (this.isEmpty()) {
+        return this.toString()
+    }
+    return escape0(escapeChar, escapedChars)
+}
+
+private fun CharSequence.escape0(escapeChar: Char, escapedChars: Collection<Char>): String {
 
     var buffer: MutableList<Any>? = null
 
@@ -74,8 +86,12 @@ fun CharSequence.escape(escapeChar: Char, escapedChars: Collection<Char>): Strin
  * BEscapes.unescape("\\\"ss\\\": \\\"sss\\\\n\\\"", '\\', '"', '{', '}');
  * ```
  */
+@Throws(StringEscapeException::class)
 fun CharSequence.unescape(escapeChar: Char, vararg escapedChars: Char): String {
-    return unescape(escapeChar, escapedChars.toSet())
+    if (this.isEmpty()) {
+        return this.toString()
+    }
+    return unescape0(escapeChar, escapedChars.toSet())
 }
 
 /**
@@ -87,7 +103,15 @@ fun CharSequence.unescape(escapeChar: Char, vararg escapedChars: Char): String {
  * BEscapes.unescape("\\\"ss\\\": \\\"sss\\\\n\\\"", '\\', BSets.newSet('"', '{', '}'));
  * ```
  */
+@Throws(StringEscapeException::class)
 fun CharSequence.unescape(escapeChar: Char, escapedChars: Collection<Char>): String {
+    if (this.isEmpty()) {
+        return this.toString()
+    }
+    return unescape0(escapeChar, escapedChars)
+}
+
+private fun CharSequence.unescape0(escapeChar: Char, escapedChars: Collection<Char>): String {
 
     var buffer: MutableList<CharSequence>? = null
 
@@ -107,15 +131,14 @@ fun CharSequence.unescape(escapeChar: Char, escapedChars: Collection<Char>): Str
         val c = this[i]
         if (c == escapeChar) {
             i++
-            if (i < this.length) {
-                val cn = this[i]
-                if (escapedChars.contains(cn)) {
-                    //Unescape: \\ -> \
-                    getBuffer().add(this.stringRef(start, i - 1))
-                    start = i
-                }
-            } else {
+            if (i >= this.length) {
                 break
+            }
+            val cn = this[i]
+            if (escapedChars.contains(cn)) {
+                //Unescape: \\ -> \
+                getBuffer().add(this.stringRef(start, i - 1))
+                start = i
             }
         }
         i++
@@ -131,17 +154,18 @@ fun CharSequence.unescape(escapeChar: Char, escapedChars: Collection<Char>): Str
     return getBuffer().joinToString("")
 }
 
-
 /**
  * Used to escape and unescape (may not be implemented) string.
  *
- * @see SimpleStringEscape
+ * @see SimpleEscape
  */
 @ThreadSafe
 interface StringEscape {
 
+    @Throws(StringEscapeException::class)
     fun escape(chars: CharSequence): String
 
+    @Throws(StringEscapeException::class)
     fun unescape(chars: CharSequence): String
 }
 
@@ -159,7 +183,7 @@ interface StringEscape {
  * se.unescape("\\\"ss\\\": \\\"sss\\\\n\\\"");
  * ```
  */
-open class SimpleStringEscape(
+open class SimpleEscape(
     private val escapeChar: Char,
     private val escapedChars: Collection<Char>
 ) : StringEscape {
@@ -174,3 +198,7 @@ open class SimpleStringEscape(
         return chars.unescape(escapeChar, escapedChars)
     }
 }
+
+open class StringEscapeException @JvmOverloads constructor(
+    message: String? = null, cause: Throwable? = null
+) : RuntimeException(message, cause)

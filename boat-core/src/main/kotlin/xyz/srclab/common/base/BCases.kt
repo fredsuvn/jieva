@@ -25,6 +25,7 @@ val LOWER_HYPHEN: NamingCase = SeparatorCase("-") { it.lowerCase() }
 @JvmField
 val UPPER_HYPHEN: NamingCase = SeparatorCase("-") { it.upperCase() }
 
+@Throws(NamingCaseException::class)
 fun CharSequence.convertCase(from: NamingCase, to: NamingCase): String {
     return from.convert(this, to)
 }
@@ -197,10 +198,10 @@ open class CamelCase(
                 continue
             }
         }
+        if (splitList === null) {
+            return NamingCase.Words.singletonWord(name)
+        }
         if (startIndex < name.length) {
-            if (startIndex == 0) {
-                return NamingCase.Words.singletonWord(name)
-            }
             getSplitList().add(name.stringRef(startIndex))
         }
         return NamingCase.Words.of(name, splitList!!, name.length)
@@ -243,6 +244,11 @@ open class SeparatorCase @JvmOverloads constructor(
 ) : NamingCase {
 
     override fun <T : CharSequence> split(name: T): NamingCase.Words<T> {
+
+        if (name.isEmpty()) {
+            return NamingCase.Words.singletonWord(name)
+        }
+
         val separatorString = separator.toString()
         var index = name.indexOf(separatorString)
         if (index < 0) {
@@ -282,7 +288,12 @@ open class SeparatorCase @JvmOverloads constructor(
             }
             startIndex += separatorString.length
         }
-
+        if (splitList === null) {
+            return NamingCase.Words.singletonWord("")
+        }
+        if (startIndex < name.length) {
+            getSplitList().add(name.stringRef(startIndex))
+        }
         return NamingCase.Words.of(name, splitList!!, splitCharCount)
     }
 

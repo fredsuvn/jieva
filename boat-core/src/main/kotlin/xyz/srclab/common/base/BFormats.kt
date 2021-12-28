@@ -7,7 +7,7 @@ import xyz.srclab.common.base.StringRef.Companion.stringRef
 import java.util.*
 
 /**
- * Using [FastStringFormat] (slf4j-like style, may not exactly same) format receiver pattern:
+ * Using [FastFormat] (slf4j-like style, may not exactly same) format receiver pattern:
  *
  * ```
  * BFormats.fastFormat("1 + 1 = {}, 2 + 2 = {}", 2, 4);
@@ -32,20 +32,22 @@ import java.util.*
  * C:\file.zip\_{}
  * ```
  *
- * @see FastStringFormat
+ * @see FastFormat
  */
+@Throws(StringFormatException::class)
 fun CharSequence.fastFormat(vararg args: Any?): String {
-    return FastStringFormat.format(this, *args)
+    return FastFormat.format(this, *args)
 }
 
 /**
  * Used to format [CharSequence].
  *
- * @see FastStringFormat
+ * @see FastFormat
  */
 @ThreadSafe
 interface StringFormat {
 
+    @Throws(StringFormatException::class)
     fun format(pattern: CharSequence, vararg args: Any?): String
 }
 
@@ -75,10 +77,14 @@ interface StringFormat {
  * C:\file.zip\_{}
  * ```
  */
-object FastStringFormat : StringFormat {
+object FastFormat : StringFormat {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         //return MessageFormatterSlf4j.arrayFormat(this.toString(), args, null).message
+
+        if (pattern.isEmpty()) {
+            return pattern.toString()
+        }
 
         var buffer: MutableList<Any?>? = null
 
@@ -99,50 +105,49 @@ object FastStringFormat : StringFormat {
             val c = pattern[i]
             if (c == '\\') {
                 i++
-                if (i < pattern.length) {
-                    val cn = pattern[i]
-                    if (cn == '\\') {
-                        //Escape: \\ -> \
-                        getBuffer().add(pattern.stringRef(start, i))
-                        i++
-                        start = i
-                        continue
-                    } else if (cn == '{') {
-                        i++
-                        if (i < pattern.length) {
-                            val cnn = pattern[i]
-                            if (cnn == '}') {
-                                //Escape: \{} -> {}
-                                getBuffer().add(pattern.stringRef(start, i - 2))
-                                start = i - 1
-                                i++
-                                continue
-                            }
-                        } else {
-                            break
-                        }
-                    }
-                } else {
+                if (i >= pattern.length) {
                     break
                 }
-            } else if (c == '{') {
-                i++
-                if (i < pattern.length) {
-                    val cn = pattern[i]
-                    if (cn == '}') {
-                        //Insert parameter
-                        if (!argIndex.isIndexInBounds(0, args.size)) {
-                            throw IndexOutOfBoundsException("Argument index out of bounds: $argIndex")
-                        }
-                        getBuffer().add(pattern.stringRef(start, i - 1))
-                        getBuffer().add(args[argIndex])
+                val cn = pattern[i]
+                if (cn == '\\') {
+                    //Escape: \\ -> \
+                    getBuffer().add(pattern.stringRef(start, i))
+                    i++
+                    start = i
+                    continue
+                }
+                if (cn == '{') {
+                    i++
+                    if (i > pattern.length) {
+                        break
+                    }
+                    val cnn = pattern[i]
+                    if (cnn == '}') {
+                        //Escape: \{} -> {}
+                        getBuffer().add(pattern.stringRef(start, i - 2))
+                        start = i - 1
                         i++
-                        start = i
-                        argIndex++
                         continue
                     }
-                } else {
+                }
+            }
+            if (c == '{') {
+                i++
+                if (i >= pattern.length) {
                     break
+                }
+                val cn = pattern[i]
+                if (cn == '}') {
+                    //Insert parameter
+                    if (!argIndex.isIndexInBounds(0, args.size)) {
+                        throw StringFormatException("Argument index out of bounds: $argIndex")
+                    }
+                    getBuffer().add(pattern.stringRef(start, i - 1))
+                    getBuffer().add(args[argIndex])
+                    i++
+                    start = i
+                    argIndex++
+                    continue
                 }
             }
             i++
@@ -158,3 +163,7 @@ object FastStringFormat : StringFormat {
         return getBuffer().joinToString("") { it.deepToString() }
     }
 }
+
+open class StringFormatException @JvmOverloads constructor(
+    message: String? = null, cause: Throwable? = null
+) : RuntimeException(message, cause)
