@@ -201,7 +201,7 @@ fun getUserDir(): String {
  */
 @JvmName("getProperty")
 fun getSystemProperty(key: String): String {
-    return getSystemPropertyOrNull(key)!!
+    return getSystemPropertyOrNull(key) ?: throw NullPointerException("Value not found: $key")
 }
 
 /**
@@ -246,7 +246,7 @@ fun getSystemProperties(): Map<String, String> {
  * @see System.getenv
  */
 fun getEnv(key: String): String {
-    return getEnvOrNull(key)!!
+    return getEnvOrNull(key) ?: throw NullPointerException("Env not found: $key")
 }
 
 /**
@@ -323,5 +323,6 @@ fun isBsd(): Boolean {
 }
 
 fun isYunfan(): Boolean {
-    throw UnsupportedOperationException("占个坑~")
+    class YunfanIsComingException : RuntimeException("长风破浪会有时，直挂云帆济沧海。占个坑~")
+    throw YunfanIsComingException()
 }
