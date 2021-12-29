@@ -6,9 +6,15 @@ import xyz.srclab.annotations.Accepted
 import xyz.srclab.common.base.StringRef.Companion.stringRef
 import java.util.*
 
+/**
+ * Resolves receiver string to [StringTemplate] implemented by [SimpleTemplate].
+ *
+ * @see StringTemplate
+ * @see SimpleTemplate
+ */
 @JvmName("resolve")
 @JvmOverloads
-fun CharSequence.resolveTemplate(
+fun CharSequence.toTemplate(
     escapeChar: Char,
     parameterPrefix: CharSequence,
     parameterSuffix: CharSequence? = null
@@ -150,6 +156,71 @@ interface StringTemplate {
     }
 }
 
+/**
+ * Simple [StringTemplate] implementation.
+ * It supports an [escapeChar], a parameter prefix and a parameter suffix (may null). For example:
+ *
+ * ```
+ * Map<Object, Object> args = BMaps.newMap("name", "Zero")
+ * SimpleTemplate st = new SimpleTemplate(
+ *     "Ultraman ${name} is strongest!",
+ *     '\\',
+ *     "${",
+ *     "}"
+ * );
+ * //"Ultraman Zero is strongest!"
+ * st.process(args)
+ * ```
+ *
+ * Parameter suffix may be null, in this case [SimpleTemplate] use [Character.isWhitespace] to split a parameter:
+ *
+ * ```
+ * SimpleTemplate st = new SimpleTemplate(
+ *     "Ultraman $name is strongest!",
+ *     '\\',
+ *     "$"
+ * );
+ * //"Ultraman Zero is strongest!"
+ * st.process(args)
+ * ```
+ *
+ * Parameter name may be empty if suffix is not null, in this case use index instead of name:
+ *
+ * ```
+ * Map<Object, Object> args = BMaps.newMap(0, "Zero")
+ * SimpleTemplate st = new SimpleTemplate(
+ *     "Ultraman ${} is strongest!",
+ *     '\\',
+ *     "${",
+ *     "}"
+ * );
+ * //"Ultraman Zero is strongest!"
+ * st.process(args)
+ * ```
+ *
+ * Escape char is valid in following cases:
+ *
+ * * Escape char followed by parameter prefix;
+ * * Escape char followed by escape char;
+ * * If a parameter prefix is found, this template will find next delimiter (suffix or whitespace)
+ * and escape char is ignored;
+ * * Otherwise no escape;
+ *
+ * For example:
+ *
+ * ```
+ * Map<Object, Object> args = BMaps.newMap("name", "Taiga", "${name", "Zero")
+ * //Note java string `\\` means `\`
+ * String template = "Ultraman \\${} \\\\ } ${${name} is strongest rather than ${name}!";
+ *
+ * ```
+ *
+ * will output:
+ *
+ * ```
+ * Ultraman ${} \ } Zero is strongest rather than Taiga!
+ * ```
+ */
 open class SimpleTemplate(
     private val template: CharSequence,
     private val escapeChar: Char,
