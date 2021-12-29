@@ -2,6 +2,7 @@
 
 package xyz.srclab.common.base
 
+import org.apache.commons.lang3.SystemUtils
 import java.io.File
 
 const val JAVA_VERSION_KEY = "java.version"
@@ -157,7 +158,7 @@ fun getJavaExtDirs(): String {
     return getSystemProperty(JAVA_EXT_DIRS_KEY)
 }
 
-fun osName(): String {
+fun getOsName(): String {
     return getSystemProperty(OS_NAME_KEY)
 }
 
@@ -199,7 +200,6 @@ fun getUserDir(): String {
  * @see System.getProperty
  */
 @JvmName("getProperty")
-@Throws(NullPointerException::class)
 fun getSystemProperty(key: String): String {
     return getSystemPropertyOrNull(key)!!
 }
@@ -245,9 +245,8 @@ fun getSystemProperties(): Map<String, String> {
  *
  * @see System.getenv
  */
-@Throws(NullPointerException::class)
-fun getEnvironmentVariable(key: String): String {
-    return getEnvironmentVariableOrNull(key)!!
+fun getEnv(key: String): String {
+    return getEnvOrNull(key)!!
 }
 
 /**
@@ -255,7 +254,7 @@ fun getEnvironmentVariable(key: String): String {
  *
  * @see System.getenv
  */
-fun getEnvironmentVariableOrNull(key: String): String? {
+fun getEnvOrNull(key: String): String? {
     return System.getenv(key)
 }
 
@@ -264,7 +263,7 @@ fun getEnvironmentVariableOrNull(key: String): String? {
  *
  * @see System.getenv
  */
-fun getEnvironmentVariables(): Map<String, String> {
+fun getEnvs(): Map<String, String> {
     return System.getenv()
 }
 
@@ -301,4 +300,28 @@ fun getJavaMajorVersion(): Int {
         return Integer.parseInt(javaVersion.substring(dotIndex + 1, nextDotIndex))
     }
     return -1
+}
+
+fun isWindows(): Boolean {
+    return SystemUtils.IS_OS_WINDOWS
+}
+
+fun isLinux(): Boolean {
+    return SystemUtils.IS_OS_LINUX
+}
+
+fun isMac(): Boolean {
+    return SystemUtils.IS_OS_MAC
+}
+
+fun isUnix(): Boolean {
+    return SystemUtils.IS_OS_UNIX
+}
+
+fun isBsd(): Boolean {
+    return SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_OPEN_BSD || SystemUtils.IS_OS_NET_BSD
+}
+
+fun isYunfan(): Boolean {
+    throw UnsupportedOperationException("占个坑~")
 }
