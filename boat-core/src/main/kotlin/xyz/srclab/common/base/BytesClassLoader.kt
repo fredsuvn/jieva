@@ -9,12 +9,14 @@ import java.nio.ByteBuffer
 object BytesClassLoader : ClassLoader() {
 
     @JvmOverloads
-    fun loadClass(bytes: ByteArray, offset: Int = 0, length: Int = bytes.size - offset): Class<*> {
+    fun loadClass(bytes: ByteArray, offset: Int = 0, length: Int = remainingLength(bytes.size, offset)): Class<*> {
         return super.defineClass(null, bytes, offset, length)
     }
 
     @JvmOverloads
-    fun loadClass(name: String, bytes: ByteArray, offset: Int = 0, length: Int = bytes.size - offset): Class<*> {
+    fun loadClass(
+        name: String, bytes: ByteArray, offset: Int = 0, length: Int = remainingLength(bytes.size, offset)
+    ): Class<*> {
         return super.defineClass(name, bytes, offset, length)
     }
 
