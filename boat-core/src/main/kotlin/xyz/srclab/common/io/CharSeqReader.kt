@@ -1,17 +1,20 @@
 package xyz.srclab.common.io
 
 import xyz.srclab.common.base.checkRangeInBounds
-import xyz.srclab.common.base.toUnsignedInt
-import java.io.InputStream
+import java.io.Reader
 
 /**
- * Wraps array as [InputStream].
+ * Makes [CharSequence] as source of [Reader].
  */
-open class BytesInputStreamWrapper @JvmOverloads constructor(
-    private val array: ByteArray,
-    private val offset: Int = 0,
-    private val length: Int = array.size - offset
-) : InputStream() {
+open class CharSeqReader<T : CharSequence>(
+    val source: T,
+    private val offset: Int,
+    private val length: Int
+) : Reader() {
+
+    init {
+        checkRangeInBounds(offset, offset + length, 0, source.length)
+    }
 
     private var pos = offset
     private var mark = offset
@@ -20,31 +23,34 @@ open class BytesInputStreamWrapper @JvmOverloads constructor(
         if (pos >= offset + length) {
             return -1
         }
-        val cur = array[pos]
+        val cur = source[pos]
         pos++
-        return cur.toUnsignedInt()
+        return cur.toInt()
     }
 
-    override fun read(b: ByteArray): Int {
+    override fun read(b: CharArray): Int {
         return read(b, 0, b.size)
     }
 
-    override fun read(b: ByteArray, off: Int, len: Int): Int {
+    override fun read(b: CharArray, off: Int, len: Int): Int {
         checkRangeInBounds(off, off + len, 0, b.size)
         if (pos >= offset + length) {
             return -1
         }
         val remaining = offset + length - pos
         return if (remaining <= len) {
-            System.arraycopy(array, pos, b, off, remaining)
+            System.arraycopy(source, pos, b, off, remaining)
             remaining
         } else {
-            System.arraycopy(array, pos, b, off, len)
+            System.arraycopy(source, pos, b, off, len)
             len
         }
     }
 
-    override fun available(): Int {
+    override fun close() {
+    }
+
+    fun available(): Int {
         return offset + length - pos
     }
 

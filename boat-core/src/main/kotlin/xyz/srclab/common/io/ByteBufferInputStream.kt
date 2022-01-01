@@ -6,17 +6,17 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 
 /**
- * Wraps [ByteBuffer] as [InputStream].
+ * Makes [ByteBuffer] as [InputStream].
  */
-open class ByteBufferInputStreamWrapper(
-    private val buffer: ByteBuffer
+open class ByteBufferInputStream(
+    val source: ByteBuffer
 ) : InputStream() {
 
     override fun read(): Int {
-        if (!buffer.hasRemaining()) {
+        if (!source.hasRemaining()) {
             return -1
         }
-        return buffer.get().toUnsignedInt()
+        return source.get().toUnsignedInt()
     }
 
     override fun read(b: ByteArray): Int {
@@ -25,29 +25,29 @@ open class ByteBufferInputStreamWrapper(
 
     override fun read(b: ByteArray, off: Int, len: Int): Int {
         checkRangeInBounds(off, off + len, 0, b.size)
-        val remaining = buffer.remaining()
+        val remaining = source.remaining()
         if (remaining == 0) {
             return -1
         }
         return if (remaining <= len) {
-            buffer.get(b, off, remaining)
+            source.get(b, off, remaining)
             remaining
         } else {
-            buffer.get(b, off, len)
+            source.get(b, off, len)
             len
         }
     }
 
     override fun available(): Int {
-        return buffer.remaining()
+        return source.remaining()
     }
 
     override fun mark(readlimit: Int) {
-        buffer.mark()
+        source.mark()
     }
 
     override fun reset() {
-        buffer.reset()
+        source.reset()
     }
 
     override fun markSupported(): Boolean {
