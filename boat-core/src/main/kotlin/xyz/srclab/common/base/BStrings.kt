@@ -8,6 +8,7 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.function.Supplier
+import kotlin.text.lines as linesKt
 import kotlin.text.toCollection as toCollectionKt
 import kotlin.text.toHashSet as toHashSetKt
 import kotlin.text.toList as toListKt
@@ -255,6 +256,10 @@ fun CharSequence?.equalsAll(others: Iterable<CharSequence?>, ignoreCase: Boolean
 
 fun CharSequence.toCharSet(): Charset {
     return Charset.forName(this.toString())
+}
+
+fun CharSequence.lines(): List<String> {
+    return this.linesKt()
 }
 
 //toCollection:
