@@ -17,7 +17,9 @@ fun InputStream.readProperties(charset: Charset = DEFAULT_CHARSET): Map<String, 
 fun Reader.readProperties(): Map<String, String> {
     val props = Properties()
     props.load(this)
-    return props.toMap()
+    val map = props.toMap()
+    this.close()
+    return map
 }
 
 @JvmOverloads
