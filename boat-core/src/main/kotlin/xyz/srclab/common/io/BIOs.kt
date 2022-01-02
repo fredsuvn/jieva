@@ -3,8 +3,10 @@
 package xyz.srclab.common.io
 
 import xyz.srclab.common.base.DEFAULT_CHARSET
+import xyz.srclab.common.base.isEmpty
 import xyz.srclab.common.base.remainingLength
 import java.io.*
+import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import kotlin.io.readBytes as readBytesKt
@@ -171,4 +173,28 @@ fun ByteBuffer.toInputStream(): InputStream {
 
 fun ByteBuffer.toOutputStream(): OutputStream {
     return ByteBufferOutputStream(this)
+}
+
+fun URL.toFileOrNull(): File? {
+    return try {
+        this.file.let {
+            if (it.isEmpty()) {
+                null
+            } else {
+                File(it)
+            }
+        }
+    } catch (e: IOException) {
+        null
+    }
+}
+
+fun URL.toFile(): File {
+    return this.file.let {
+        if (it.isEmpty()) {
+            throw FileNotFoundException(it)
+        } else {
+            File(it)
+        }
+    }
 }
