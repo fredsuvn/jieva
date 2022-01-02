@@ -2,61 +2,69 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.io.readString
+import xyz.srclab.common.io.toFile
+import xyz.srclab.common.io.toFileOrNull
 import java.io.File
 import java.io.InputStream
 import java.net.URL
 import java.nio.charset.Charset
-import java.util.*
 
+@JvmName("load")
 fun CharSequence.loadResource(): URL {
     return loadResourceOrNull() ?: throw ResourceNotFoundException("Resource not found: $this")
 }
 
+@JvmName("loadOrNull")
 fun CharSequence.loadResourceOrNull(): URL? {
     return Any::class.java.getResource(this.addAbsolute())
 }
 
+@JvmName("loadStream")
 fun CharSequence.loadResourceStream(): InputStream {
     return loadResource().openStream()
 }
 
+@JvmName("loadStreamOrNull")
 fun CharSequence.loadResourceStreamOrNull(): InputStream? {
     return loadResourceOrNull()?.openStream()
 }
 
+@JvmName("loadFile")
 fun CharSequence.loadResourceFile(): File {
-    return loadResourceFileOrNull() ?: throw ResourceNotFoundException("Resource file not found: $this")
+    return loadResource().toFile()
 }
 
+@JvmName("loadFileOrNull")
 fun CharSequence.loadResourceFileOrNull(): File? {
-    val path = loadResourceOrNull()?.file
-    return if (path === null) {
-        null
-    } else {
-        File(path)
-    }
+    return loadResourceOrNull()?.toFileOrNull()
 }
 
+@JvmName("loadString")
 @JvmOverloads
 fun CharSequence.loadResourceString(charset: Charset = DEFAULT_CHARSET): String {
-    return loadResourceStream().reader(charset).readText()
+    return loadResourceStream().readString(charset, true)
 }
 
+@JvmName("loadStringOrNull")
 @JvmOverloads
 fun CharSequence.loadResourceStringOrNull(charset: Charset = DEFAULT_CHARSET): String? {
-    return loadResourceStreamOrNull()?.reader(charset)?.readText()
+    return loadResourceStreamOrNull()?.readString(charset, true)
 }
 
-fun CharSequence.loadResourceProperties(): Map<String, String> {
-    val input = loadResourceStreamOrNull()
-    if (input === null) {
-        return emptyMap()
-    }
-    val prop = Properties()
-    prop.load(input)
-    return prop.toMap()
+@JvmName("loadProperties")
+@JvmOverloads
+fun CharSequence.loadResourceProperties(charset: Charset = DEFAULT_CHARSET): Map<String, String> {
+    return loadResource().readProperties(charset)
 }
 
+@JvmName("loadPropertiesOrNull")
+@JvmOverloads
+fun CharSequence.loadResourcePropertiesOrNull(charset: Charset = DEFAULT_CHARSET): Map<String, String>? {
+    return loadResourceOrNull()?.readProperties(charset)
+}
+
+@JvmName("loadAll")
 fun CharSequence.loadResources(): Set<URL> {
     val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
     val result = mutableSetOf<URL>()
@@ -66,6 +74,7 @@ fun CharSequence.loadResources(): Set<URL> {
     return result
 }
 
+@JvmName("loadStreams")
 fun CharSequence.loadResourceStreams(): Set<InputStream> {
     val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
     val result = mutableSetOf<InputStream>()
@@ -75,25 +84,34 @@ fun CharSequence.loadResourceStreams(): Set<InputStream> {
     return result
 }
 
+@JvmName("loadFiles")
 fun CharSequence.loadResourceFiles(): Set<File> {
     val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
     val result = mutableSetOf<File>()
     while (enumeration.hasMoreElements()) {
-        val path = enumeration.nextElement()?.file
-        if (path !== null) {
-            result.add(File(path))
-        }
+        result.add(enumeration.nextElement().toFile())
     }
     return result
 }
 
+@JvmName("loadStrings")
 @JvmOverloads
 fun CharSequence.loadResourceStrings(charset: Charset = DEFAULT_CHARSET): Set<String> {
     val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
     val result = mutableSetOf<String>()
     while (enumeration.hasMoreElements()) {
-        val text = enumeration.nextElement().openStream().reader(charset).readText()
-        result.add(text)
+        result.add(enumeration.nextElement().openStream().readString(charset, true))
+    }
+    return result
+}
+
+@JvmName("loadPropertiesSet")
+@JvmOverloads
+fun CharSequence.loadResourcePropertiesSet(charset: Charset = DEFAULT_CHARSET): Set<Map<String, String>> {
+    val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
+    val result = mutableSetOf<Map<String, String>>()
+    while (enumeration.hasMoreElements()) {
+        result.add(enumeration.nextElement().readProperties(charset))
     }
     return result
 }
@@ -112,16 +130,6 @@ private fun CharSequence.removeAbsolute(): String {
     } else {
         this.toString()
     }
-}
-
-private fun Properties.toMap(): Map<String, String> {
-    val result = mutableMapOf<String, String>()
-    for (mutableEntry in this) {
-        if (mutableEntry.key !== null || mutableEntry.value !== null) {
-            result[mutableEntry.key.toString()] = mutableEntry.value.toString()
-        }
-    }
-    return result
 }
 
 open class ResourceNotFoundException(message: String?) : RuntimeException(message)
