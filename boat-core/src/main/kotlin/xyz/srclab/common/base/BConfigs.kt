@@ -5,12 +5,13 @@ package xyz.srclab.common.base
 import java.io.File
 import java.io.InputStream
 import java.io.Reader
+import java.net.URL
+import java.nio.charset.Charset
 import java.util.*
 
-fun InputStream.readProperties(): Map<String, String> {
-    val props = Properties()
-    props.load(this)
-    return props.toMap()
+@JvmOverloads
+fun InputStream.readProperties(charset: Charset = DEFAULT_CHARSET): Map<String, String> {
+    return this.reader(charset).readProperties()
 }
 
 fun Reader.readProperties(): Map<String, String> {
@@ -19,10 +20,14 @@ fun Reader.readProperties(): Map<String, String> {
     return props.toMap()
 }
 
-fun File.readProperties(): Map<String, String> {
-    val props = Properties()
-    props.load(this.inputStream())
-    return props.toMap()
+@JvmOverloads
+fun File.readProperties(charset: Charset = DEFAULT_CHARSET): Map<String, String> {
+    return this.reader(charset).readProperties()
+}
+
+@JvmOverloads
+fun URL.readProperties(charset: Charset = DEFAULT_CHARSET): Map<String, String> {
+    return this.openStream().readProperties(charset)
 }
 
 fun Properties.toMap(): Map<String, String> {
