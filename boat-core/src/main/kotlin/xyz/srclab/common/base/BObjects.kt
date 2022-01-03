@@ -15,6 +15,10 @@ fun <T> Nothing?.asTyped(): T {
     return this as T
 }
 
+fun <T : Any> T?.asNotNull(): T {
+    return this as T
+}
+
 //Null:
 
 fun Any?.isNull(): Boolean {
