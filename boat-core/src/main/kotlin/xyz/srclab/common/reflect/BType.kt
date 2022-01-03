@@ -1,4 +1,4 @@
-@file:JvmName("BTypes")
+@file:JvmName("BType")
 
 package xyz.srclab.common.reflect
 

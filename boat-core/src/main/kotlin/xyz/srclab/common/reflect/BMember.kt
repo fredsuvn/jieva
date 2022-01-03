@@ -1,5 +1,4 @@
-@file:JvmName("BReflects")
-@file:JvmMultifileClass
+@file:JvmName("BMember")
 
 package xyz.srclab.common.reflect
 
