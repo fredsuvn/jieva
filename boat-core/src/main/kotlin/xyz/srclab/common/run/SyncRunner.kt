@@ -1,33 +1,22 @@
 package xyz.srclab.common.run
 
 import xyz.srclab.common.base.asTyped
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executor
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 
 /**
  * A type of [Runner] always use current thread.
  */
 object SyncRunner : Runner, Executor {
 
-    override fun <V> run(task: () -> V): Running<V> {
-        return RunningImpl(task)
+    override fun <V> submit(task: Callable<V>): RunWork<V> {
+        return RunWorkImpl(task)
     }
 
-    override fun run(task: Runnable): Running<*> {
-        return RunningImpl<Any?>(task)
+    override fun submit(task: Runnable): RunWork<*> {
+        return RunWorkImpl<Any?>(task)
     }
 
-    override fun execute(task: () -> Any?) {
-        try {
-            task()
-        } catch (e: Exception) {
-            //Dropped
-        }
-    }
-
-    override fun execute(task: Runnable) {
+    override fun run(task: Runnable) {
         try {
             task.run()
         } catch (e: Exception) {
@@ -35,24 +24,24 @@ object SyncRunner : Runner, Executor {
         }
     }
 
+    override fun execute(command: Runnable) {
+        run(command)
+    }
+
     override fun asExecutor(): Executor = this
 
-    private class RunningImpl<V> : Running<V> {
+    private class RunWorkImpl<V> : RunWork<V> {
 
-        private val future: SyncFuture<V>
+        override val future: SyncFuture<V>
 
         override val isStart: Boolean = true
 
-        constructor(task: () -> V) {
+        constructor(task: Callable<V>) {
             future = SyncFuture(task)
         }
 
         constructor(task: Runnable) {
             future = SyncFuture(task)
-        }
-
-        override fun asFuture(): Future<V> {
-            return future
         }
     }
 
@@ -61,9 +50,9 @@ object SyncRunner : Runner, Executor {
         private var result: V? = null
         private var exception: Exception? = null
 
-        constructor(task: () -> V) {
+        constructor(task: Callable<V>) {
             try {
-                result = task()
+                result = task.call()
             } catch (e: Exception) {
                 exception = e
             }

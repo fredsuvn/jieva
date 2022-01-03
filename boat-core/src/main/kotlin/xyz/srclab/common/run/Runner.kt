@@ -1,12 +1,15 @@
 package xyz.srclab.common.run
 
+import xyz.srclab.common.base.toCallable
+import xyz.srclab.common.base.toRunnable
+import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.RejectedExecutionException
 
 /**
  * Runner is used to run tasks, with thread, coroutine, or others.
  *
- * @see Running
+ * @see RunWork
  * @see SyncRunner
  * @see AsyncRunner
  * @see ExecutorServiceRunner
@@ -16,24 +19,33 @@ import java.util.concurrent.RejectedExecutionException
 interface Runner {
 
     /**
-     * Runs and returns [Running].
+     * Runs and returns [RunWork].
      */
     @Throws(RejectedExecutionException::class)
-    fun <V> run(task: () -> V): Running<V>
+    @JvmSynthetic
+    fun <V> submit(task: () -> V): RunWork<V> {
+        return submit(task.toCallable())
+    }
 
     /**
-     * Runs and returns [Running].
+     * Runs and returns [RunWork].
      */
     @Throws(RejectedExecutionException::class)
-    fun run(task: Runnable): Running<*>
+    fun <V> submit(task: Callable<V>): RunWork<V>
 
     /**
-     * Runs and returns [Running].
+     * Runs and returns [RunWork].
      */
     @Throws(RejectedExecutionException::class)
-    fun <V> run(task: RunTask<V>): Running<V> {
+    fun submit(task: Runnable): RunWork<*>
+
+    /**
+     * Runs and returns [RunWork].
+     */
+    @Throws(RejectedExecutionException::class)
+    fun <V> submit(task: RunTask<V>): RunWork<V> {
         task.prepare()
-        return run { task.run() }
+        return submit(task.toCallable())
     }
 
     /**
@@ -42,7 +54,10 @@ interface Runner {
      * @see Executor.execute
      */
     @Throws(RejectedExecutionException::class)
-    fun execute(task: () -> Any?)
+    @JvmSynthetic
+    fun run(task: () -> Any?) {
+        return run(task.toRunnable())
+    }
 
     /**
      * Runs and no return.
@@ -50,7 +65,7 @@ interface Runner {
      * @see Executor.execute
      */
     @Throws(RejectedExecutionException::class)
-    fun execute(task: Runnable)
+    fun run(task: Runnable)
 
     /**
      * Runs and no return.
@@ -58,9 +73,9 @@ interface Runner {
      * @see Executor.execute
      */
     @Throws(RejectedExecutionException::class)
-    fun execute(task: RunTask<*>) {
+    fun run(task: RunTask<*>) {
         task.prepare()
-        execute { task.run() }
+        return run(task.toRunnable())
     }
 
     fun asExecutor(): Executor

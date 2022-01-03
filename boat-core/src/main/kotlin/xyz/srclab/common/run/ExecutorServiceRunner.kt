@@ -13,31 +13,27 @@ open class ExecutorServiceRunner(
     private val executorService: ExecutorService
 ) : Runner {
 
-    override fun <V> run(task: () -> V): Running<V> {
-        return RunningImpl(task)
+    override fun <V> submit(task: Callable<V>): RunWork<V> {
+        return RunWorkImpl(task)
     }
 
-    override fun run(task: Runnable): Running<*> {
-        return RunningImpl<Any?>(task)
+    override fun submit(task: Runnable): RunWork<*> {
+        return RunWorkImpl<Any?>(task)
     }
 
-    override fun execute(task: () -> Any?) {
-        executorService.execute { task() }
-    }
-
-    override fun execute(task: Runnable) {
+    override fun run(task: Runnable) {
         executorService.execute(task)
     }
 
     override fun asExecutor(): ExecutorService = executorService
 
     val isShutdown: Boolean
-        @JvmName("isShutdown") get() {
+        get() {
             return executorService.isShutdown
         }
 
     val isTerminated: Boolean
-        @JvmName("isTerminated") get() {
+        get() {
             return executorService.isTerminated
         }
 
@@ -60,14 +56,15 @@ open class ExecutorServiceRunner(
         return executorService.toString()
     }
 
-    private inner class RunningImpl<V> : Running<V> {
+    private inner class RunWorkImpl<V> : RunWork<V> {
 
-        private val future: Future<V>
+        override val future: Future<V>
+        override var isStart: Boolean = false
 
-        constructor(task: () -> V) {
+        constructor(task: Callable<V>) {
             future = executorService.submit(Callable {
                 isStart = true
-                task()
+                task.call()
             })
         }
 
@@ -76,12 +73,6 @@ open class ExecutorServiceRunner(
                 isStart = true
                 task.run()
             }, null)
-        }
-
-        override var isStart: Boolean = false
-
-        override fun asFuture(): Future<V> {
-            return future
         }
     }
 }

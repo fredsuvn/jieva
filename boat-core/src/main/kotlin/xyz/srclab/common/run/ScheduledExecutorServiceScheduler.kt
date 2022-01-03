@@ -14,42 +14,36 @@ open class ScheduledExecutorServiceScheduler(
     private val scheduledExecutorService: ScheduledExecutorService
 ) : ExecutorServiceRunner(scheduledExecutorService), Scheduler {
 
-    override fun <V> schedule(delay: Duration, task: () -> V): Scheduling<V> {
+    override fun <V> schedule(delay: Duration, task: Callable<V>): ScheduleWork<V> {
         return DelayScheduling(delay, task)
     }
 
-    override fun schedule(delay: Duration, task: Runnable): Scheduling<*> {
+    override fun schedule(delay: Duration, task: Runnable): ScheduleWork<*> {
         return DelayScheduling<Any?>(delay, task)
     }
 
-    override fun <V> scheduleFixedRate(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V> {
-        return FixedRateScheduling(initialDelay, period, task)
-    }
-
-    override fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
+    override fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: Runnable): ScheduleWork<*> {
         return FixedRateScheduling<Any?>(initialDelay, period, task)
     }
 
-    override fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V> {
-        return FixedDelayScheduling(initialDelay, period, task)
-    }
-
-    override fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
+    override fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: Runnable): ScheduleWork<*> {
         return FixedDelayScheduling<Any?>(initialDelay, period, task)
     }
 
     override fun asExecutor(): ScheduledExecutorService = scheduledExecutorService
 
-    private inner class DelayScheduling<V> : AbstractScheduling<V> {
+    private inner class DelayScheduling<V> : AbstractScheduleWork<V> {
 
         override val future: ScheduledFuture<V>
 
-        constructor(delay: Duration, task: () -> V) {
-            this.future = scheduledExecutorService.schedule(Callable {
-                this.isStart = true
-                this.executionCount++
-                task()
-            }, delay.toNanos(), TimeUnit.NANOSECONDS)
+        constructor(delay: Duration, task: Callable<V>) {
+            this.future = scheduledExecutorService.schedule(
+                Callable {
+                    this.isStart = true
+                    this.executionCount++
+                    task.call()
+                }, delay.toNanos(), TimeUnit.NANOSECONDS
+            )
         }
 
         constructor(delay: Duration, task: Runnable) {
@@ -61,21 +55,13 @@ open class ScheduledExecutorServiceScheduler(
         }
     }
 
-    private inner class FixedRateScheduling<V> : AbstractScheduling<V> {
+    private inner class FixedRateScheduling<V>(
+        initialDelay: Duration, period: Duration, task: Runnable
+    ) : AbstractScheduleWork<V>() {
 
         override val future: ScheduledFuture<V>
 
-        constructor(initialDelay: Duration, period: Duration, task: () -> V) {
-            this.future = scheduledExecutorService.scheduleAtFixedRate(
-                {
-                    this.isStart = true
-                    this.executionCount++
-                    task()
-                }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
-            ).asTyped()
-        }
-
-        constructor(initialDelay: Duration, period: Duration, task: Runnable) {
+        init {
             this.future = scheduledExecutorService.scheduleAtFixedRate(
                 {
                     this.isStart = true
@@ -86,21 +72,13 @@ open class ScheduledExecutorServiceScheduler(
         }
     }
 
-    private inner class FixedDelayScheduling<V> : AbstractScheduling<V> {
+    private inner class FixedDelayScheduling<V>(
+        initialDelay: Duration, period: Duration, task: Runnable
+    ) : AbstractScheduleWork<V>() {
 
         override val future: ScheduledFuture<V>
 
-        constructor(initialDelay: Duration, period: Duration, task: () -> V) {
-            this.future = scheduledExecutorService.scheduleWithFixedDelay(
-                {
-                    this.isStart = true
-                    this.executionCount++
-                    task()
-                }, initialDelay.toNanos(), period.toNanos(), TimeUnit.NANOSECONDS
-            ).asTyped()
-        }
-
-        constructor(initialDelay: Duration, period: Duration, task: Runnable) {
+        init {
             this.future = scheduledExecutorService.scheduleWithFixedDelay(
                 {
                     this.isStart = true
@@ -111,15 +89,8 @@ open class ScheduledExecutorServiceScheduler(
         }
     }
 
-    private abstract class AbstractScheduling<V> : Scheduling<V> {
-
-        protected abstract val future: ScheduledFuture<V>
-
+    private abstract class AbstractScheduleWork<V> : ScheduleWork<V> {
         override var executionCount: Long = 0
         override var isStart: Boolean = false
-
-        override fun asFuture(): ScheduledFuture<V> {
-            return future
-        }
     }
 }

@@ -1,5 +1,7 @@
 package xyz.srclab.common.run
 
+import java.util.concurrent.Callable
+
 /**
  * Task to run by [Runner].
  *
@@ -17,4 +19,12 @@ interface RunTask<V> {
      * Run the task, will be called by specified [Runner].
      */
     fun run(): V
+}
+
+fun <V> RunTask<V>.toCallable(): Callable<V> {
+    return Callable { this.run() }
+}
+
+fun RunTask<*>.toRunnable(): Runnable {
+    return Runnable { this.run() }
 }

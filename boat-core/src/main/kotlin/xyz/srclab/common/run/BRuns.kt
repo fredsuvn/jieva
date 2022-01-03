@@ -59,86 +59,94 @@ fun threadPoolSchedulerBuilder(): ScheduledThreadPoolScheduler.Builder {
     return ScheduledThreadPoolScheduler.Builder()
 }
 
-fun <V> runSync(task: () -> V): Running<V> {
-    return SyncRunner.run(task)
+fun <V> runSync(task: () -> V): RunWork<V> {
+    return SyncRunner.submit(task)
 }
 
-fun runSync(task: Runnable): Running<*> {
-    return SyncRunner.run(task)
+fun <V> runSync(task: Callable<V>): RunWork<V> {
+    return SyncRunner.submit(task)
 }
 
-fun <V> runSync(task: RunTask<V>): Running<V> {
-    return SyncRunner.run(task)
+fun runSync(task: Runnable): RunWork<*> {
+    return SyncRunner.submit(task)
 }
 
-fun <V> runAsync(task: () -> V): Running<V> {
-    return AsyncRunner.run(task)
+fun <V> runSync(task: RunTask<V>): RunWork<V> {
+    return SyncRunner.submit(task)
 }
 
-fun runAsync(task: Runnable): Running<*> {
-    return AsyncRunner.run(task)
+fun <V> runAsync(task: () -> V): RunWork<V> {
+    return AsyncRunner.submit(task)
 }
 
-fun <V> runAsync(task: RunTask<V>): Running<V> {
-    return AsyncRunner.run(task)
+fun <V> runAsync(task: Callable<V>): RunWork<V> {
+    return AsyncRunner.submit(task)
+}
+
+fun runAsync(task: Runnable): RunWork<*> {
+    return AsyncRunner.submit(task)
+}
+
+fun <V> runAsync(task: RunTask<V>): RunWork<V> {
+    return AsyncRunner.submit(task)
 }
 
 fun executeSync(task: () -> Any?) {
-    return SyncRunner.execute(task)
+    return SyncRunner.run(task)
 }
 
 fun executeSync(task: Runnable) {
-    return SyncRunner.execute(task)
+    return SyncRunner.run(task)
 }
 
 fun executeSync(task: RunTask<*>) {
-    return SyncRunner.execute(task)
+    return SyncRunner.run(task)
 }
 
 fun executeAsync(task: () -> Any?) {
-    return AsyncRunner.execute(task)
+    return AsyncRunner.run(task)
 }
 
 fun executeAsync(task: Runnable) {
-    return AsyncRunner.execute(task)
+    return AsyncRunner.run(task)
 }
 
 fun executeAsync(task: RunTask<*>) {
-    return AsyncRunner.execute(task)
+    return AsyncRunner.run(task)
 }
 
-fun <V> schedule(delay: Duration, task: () -> V): Scheduling<V> {
+fun <V> schedule(delay: Duration, task: () -> V): ScheduleWork<V> {
     return SingleThreadScheduler.schedule(delay, task)
 }
 
-fun schedule(delay: Duration, task: Runnable): Scheduling<*> {
+fun schedule(delay: Duration, task: Runnable): ScheduleWork<*> {
     return SingleThreadScheduler.schedule(delay, task)
 }
 
-fun <V> schedule(delay: Duration, task: RunTask<V>): Scheduling<V> {
+fun <V> schedule(delay: Duration, task: RunTask<V>): ScheduleWork<V> {
     return SingleThreadScheduler.schedule(delay, task)
 }
 
-fun <V> scheduleFixedRate(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V> {
+fun <V> scheduleFixedRate(initialDelay: Duration, period: Duration, task: () -> V): ScheduleWork<V> {
     return SingleThreadScheduler.scheduleFixedRate(initialDelay, period, task)
 }
 
-fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
+fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: Runnable): ScheduleWork<*> {
     return SingleThreadScheduler.scheduleFixedRate(initialDelay, period, task)
 }
 
-fun <V> scheduleFixedRate(initialDelay: Duration, period: Duration, task: RunTask<V>): Scheduling<V> {
+fun <V> scheduleFixedRate(initialDelay: Duration, period: Duration, task: RunTask<V>): ScheduleWork<V> {
     return SingleThreadScheduler.scheduleFixedRate(initialDelay, period, task)
 }
 
-fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> V): Scheduling<V> {
+fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> V): ScheduleWork<V> {
     return SingleThreadScheduler.scheduleFixedDelay(initialDelay, period, task)
 }
 
-fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: Runnable): Scheduling<*> {
+fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: Runnable): ScheduleWork<*> {
     return SingleThreadScheduler.scheduleFixedDelay(initialDelay, period, task)
 }
 
-fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: RunTask<V>): Scheduling<V> {
+fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: RunTask<V>): ScheduleWork<V> {
     return SingleThreadScheduler.scheduleFixedDelay(initialDelay, period, task)
 }

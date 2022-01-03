@@ -3,18 +3,18 @@ package xyz.srclab.common.run
 import java.util.concurrent.ScheduledFuture
 
 /**
- * Represents a scheduled run processing.
+ * Represents a schedule-work submitted by [Scheduler].
  *
  * @see Scheduler
  * @see Runner
- * @see Running
+ * @see RunWork
  */
-interface Scheduling<V> : Running<V> {
+interface ScheduleWork<V> : RunWork<V> {
+
+    override val future: ScheduledFuture<V>
 
     /**
      * Execution count, starts from `0`, increases after each execution start.
      */
     val executionCount: Long
-
-    override fun asFuture(): ScheduledFuture<V>
 }

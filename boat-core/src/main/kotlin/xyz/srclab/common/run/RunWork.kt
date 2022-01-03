@@ -4,11 +4,16 @@ import java.time.Duration
 import java.util.concurrent.*
 
 /**
- * Represents run processing.
+ * Represents run-work submitted by [Runner].
  *
  * @see Runner
  */
-interface Running<V> {
+interface RunWork<V> {
+
+    /**
+     * [Future] associated with this work.
+     */
+    val future: Future<V>
 
     /**
      * Returns whether started.
@@ -20,7 +25,7 @@ interface Running<V> {
      */
     val isEnd: Boolean
         get() {
-            return asFuture().isDone
+            return future.isDone
         }
 
     /**
@@ -28,7 +33,7 @@ interface Running<V> {
      */
     val isCancelled: Boolean
         get() {
-            return asFuture().isCancelled
+            return future.isCancelled
         }
 
     /**
@@ -39,8 +44,8 @@ interface Running<V> {
      * exception
      * @throws InterruptedException if the current thread was interrupted
      */
-    fun get(): V {
-        return asFuture().get()
+    fun getResult(): V {
+        return future.get()
     }
 
     /**
@@ -54,12 +59,12 @@ interface Running<V> {
      * while waiting
      * @throws TimeoutException if the wait timed out
      */
-    fun get(duration: Duration): V {
-        return asFuture().get(duration.nano.toLong(), TimeUnit.NANOSECONDS)
+    fun getResult(duration: Duration): V {
+        return future.get(duration.nano.toLong(), TimeUnit.NANOSECONDS)
     }
 
     /**
-     * Cancels or interrupts the task associated by this [Running]. This method is equivalent to:
+     * Cancels or interrupts the task associated by this [RunWork]. This method is equivalent to:
      *
      * ```
      * cancel(true)
@@ -72,16 +77,11 @@ interface Running<V> {
     }
 
     /**
-     * Cancel the task associated by this [Running].
+     * Cancel the task associated by this [RunWork].
      *
      * @see Future.cancel
      */
     fun cancel(mayInterruptIfRunning: Boolean): Boolean {
-        return asFuture().cancel(mayInterruptIfRunning)
+        return future.cancel(mayInterruptIfRunning)
     }
-
-    /**
-     * Returns this running as [Future].
-     */
-    fun asFuture(): Future<V>
 }
