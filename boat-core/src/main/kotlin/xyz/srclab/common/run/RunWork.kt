@@ -16,20 +16,19 @@ interface RunWork<V> {
     val future: Future<V>
 
     /**
-     * Returns whether started.
+     * Returns whether this work is done.
+     *
+     * @see Future.isDone
      */
-    val isStart: Boolean
-
-    /**
-     * Returns whether ended.
-     */
-    val isEnd: Boolean
+    val isDone: Boolean
         get() {
             return future.isDone
         }
 
     /**
-     * Returns whether cancelled.
+     * Returns whether this work is cancelled.
+     *
+     * @see Future.isCancelled
      */
     val isCancelled: Boolean
         get() {

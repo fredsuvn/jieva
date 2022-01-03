@@ -59,63 +59,72 @@ fun threadPoolSchedulerBuilder(): ScheduledThreadPoolScheduler.Builder {
     return ScheduledThreadPoolScheduler.Builder()
 }
 
-fun <V> runSync(task: () -> V): RunWork<V> {
+@JvmSynthetic
+fun <V> submitSync(task: () -> V): RunWork<V> {
     return SyncRunner.submit(task)
 }
 
-fun <V> runSync(task: Callable<V>): RunWork<V> {
+fun <V> submitSync(task: Callable<V>): RunWork<V> {
     return SyncRunner.submit(task)
 }
 
-fun runSync(task: Runnable): RunWork<*> {
+fun submitSync(task: Runnable): RunWork<*> {
     return SyncRunner.submit(task)
 }
 
-fun <V> runSync(task: RunTask<V>): RunWork<V> {
+fun <V> submitSync(task: RunTask<V>): RunWork<V> {
     return SyncRunner.submit(task)
 }
 
-fun <V> runAsync(task: () -> V): RunWork<V> {
+@JvmSynthetic
+fun <V> submitAsync(task: () -> V): RunWork<V> {
     return AsyncRunner.submit(task)
 }
 
-fun <V> runAsync(task: Callable<V>): RunWork<V> {
+fun <V> submitAsync(task: Callable<V>): RunWork<V> {
     return AsyncRunner.submit(task)
 }
 
-fun runAsync(task: Runnable): RunWork<*> {
+fun submitAsync(task: Runnable): RunWork<*> {
     return AsyncRunner.submit(task)
 }
 
-fun <V> runAsync(task: RunTask<V>): RunWork<V> {
+fun <V> submitAsync(task: RunTask<V>): RunWork<V> {
     return AsyncRunner.submit(task)
 }
 
-fun executeSync(task: () -> Any?) {
+@JvmSynthetic
+fun runSync(task: () -> Any?) {
     return SyncRunner.run(task)
 }
 
-fun executeSync(task: Runnable) {
+fun runSync(task: Runnable) {
     return SyncRunner.run(task)
 }
 
-fun executeSync(task: RunTask<*>) {
+fun runSync(task: RunTask<*>) {
     return SyncRunner.run(task)
 }
 
-fun executeAsync(task: () -> Any?) {
+@JvmSynthetic
+fun runAsync(task: () -> Any?) {
     return AsyncRunner.run(task)
 }
 
-fun executeAsync(task: Runnable) {
+fun runAsync(task: Runnable) {
     return AsyncRunner.run(task)
 }
 
-fun executeAsync(task: RunTask<*>) {
+fun runAsync(task: RunTask<*>) {
     return AsyncRunner.run(task)
 }
 
+@JvmSynthetic
 fun <V> schedule(delay: Duration, task: () -> V): ScheduleWork<V> {
+    return SingleThreadScheduler.schedule(delay, task)
+}
+
+fun <V> schedule(delay: Duration, task: Callable<V>): ScheduleWork<V> {
     return SingleThreadScheduler.schedule(delay, task)
 }
 
@@ -127,7 +136,8 @@ fun <V> schedule(delay: Duration, task: RunTask<V>): ScheduleWork<V> {
     return SingleThreadScheduler.schedule(delay, task)
 }
 
-fun <V> scheduleFixedRate(initialDelay: Duration, period: Duration, task: () -> V): ScheduleWork<V> {
+@JvmSynthetic
+fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: () -> Any?): ScheduleWork<*> {
     return SingleThreadScheduler.scheduleFixedRate(initialDelay, period, task)
 }
 
@@ -135,11 +145,12 @@ fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: Runnable):
     return SingleThreadScheduler.scheduleFixedRate(initialDelay, period, task)
 }
 
-fun <V> scheduleFixedRate(initialDelay: Duration, period: Duration, task: RunTask<V>): ScheduleWork<V> {
+fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: RunTask<*>): ScheduleWork<*> {
     return SingleThreadScheduler.scheduleFixedRate(initialDelay, period, task)
 }
 
-fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> V): ScheduleWork<V> {
+@JvmSynthetic
+fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> Any?): ScheduleWork<*> {
     return SingleThreadScheduler.scheduleFixedDelay(initialDelay, period, task)
 }
 
@@ -147,6 +158,6 @@ fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: Runnable)
     return SingleThreadScheduler.scheduleFixedDelay(initialDelay, period, task)
 }
 
-fun <V> scheduleFixedDelay(initialDelay: Duration, period: Duration, task: RunTask<V>): ScheduleWork<V> {
+fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: RunTask<*>): ScheduleWork<*> {
     return SingleThreadScheduler.scheduleFixedDelay(initialDelay, period, task)
 }

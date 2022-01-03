@@ -34,8 +34,6 @@ object SyncRunner : Runner, Executor {
 
         override val future: SyncFuture<V>
 
-        override val isStart: Boolean = true
-
         constructor(task: Callable<V>) {
             future = SyncFuture(task)
         }

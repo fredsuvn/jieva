@@ -59,20 +59,13 @@ open class ExecutorServiceRunner(
     private inner class RunWorkImpl<V> : RunWork<V> {
 
         override val future: Future<V>
-        override var isStart: Boolean = false
 
         constructor(task: Callable<V>) {
-            future = executorService.submit(Callable {
-                isStart = true
-                task.call()
-            })
+            future = executorService.submit(task)
         }
 
         constructor(task: Runnable) {
-            future = executorService.submit({
-                isStart = true
-                task.run()
-            }, null)
+            future = executorService.submit(task, null)
         }
     }
 }
