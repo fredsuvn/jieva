@@ -11,8 +11,9 @@ import java.net.URL
 import java.nio.charset.Charset
 
 @JvmName("load")
+@Throws(ResourceNotFoundException::class)
 fun CharSequence.loadResource(): URL {
-    return loadResourceOrNull() ?: throw ResourceNotFoundException("Resource not found: $this")
+    return loadResourceOrNull() ?: throw ResourceNotFoundException("$this")
 }
 
 @JvmName("loadOrNull")
@@ -21,6 +22,7 @@ fun CharSequence.loadResourceOrNull(): URL? {
 }
 
 @JvmName("loadStream")
+@Throws(ResourceNotFoundException::class)
 fun CharSequence.loadResourceStream(): InputStream {
     return loadResource().openStream()
 }
@@ -31,6 +33,7 @@ fun CharSequence.loadResourceStreamOrNull(): InputStream? {
 }
 
 @JvmName("loadFile")
+@Throws(ResourceNotFoundException::class)
 fun CharSequence.loadResourceFile(): File {
     return loadResource().toFile()
 }
@@ -42,6 +45,7 @@ fun CharSequence.loadResourceFileOrNull(): File? {
 
 @JvmName("loadString")
 @JvmOverloads
+@Throws(ResourceNotFoundException::class)
 fun CharSequence.loadResourceString(charset: Charset = DEFAULT_CHARSET): String {
     return loadResourceStream().readString(charset, true)
 }
