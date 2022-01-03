@@ -22,16 +22,16 @@ fun Random.between(from: Int, to: Int): Int {
 }
 
 /**
- * Builds a new [BRandomer].
+ * Returns a builder for [Randomer].
  */
-fun <T : Any> randomer(): BRandomer.Builder<T> {
-    return BRandomer.Builder()
+fun <T : Any> randomerBuilder(): Randomer.Builder<T> {
+    return Randomer.Builder()
 }
 
 /**
- * Interface to get [T] in random.
+ * Random object generator.
  */
-interface BRandomer<T : Any> {
+interface Randomer<T : Any> {
 
     fun next(): T
 
@@ -56,11 +56,11 @@ interface BRandomer<T : Any> {
             return this
         }
 
-        fun build(): BRandomer<T> {
-            return object : BRandomer<T> {
+        fun build(): Randomer<T> {
+            return object : Randomer<T> {
 
                 private val random = builderRandom ?: Random()
-                private var totalScore = scoreCount
+                private val totalScore = scoreCount
                 private val cases = builderCases.sortedWith { a, b -> a.from - b.from }
 
                 override fun next(): T {
