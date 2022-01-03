@@ -1,12 +1,56 @@
-package xyz.srclab.common.logging
+@file:JvmName("BLogs")
 
-import xyz.srclab.common.base.BFormat.Companion.fastFormat
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.base.callerStackTrace
+import xyz.srclab.common.base.callerStackTraceOrNull
+import xyz.srclab.common.base.fastFormat
 import xyz.srclab.common.base.stackTraceToString
 import java.io.PrintStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+
+private val logger: Logger = Logger.simpleLogger(callerOffset = 1)
+
+/**
+ * Trace level.
+ */
+fun trace(message: String?, vararg args: Any?) {
+    logger.trace(message, *args)
+}
+
+/**
+ * Debug level.
+ */
+fun debug(message: String?, vararg args: Any?) {
+    logger.debug(message, *args)
+}
+
+/**
+ * Info level.
+ */
+fun info(message: String?, vararg args: Any?) {
+    logger.info(message, *args)
+}
+
+/**
+ * Warn level.
+ */
+fun warn(message: String?, vararg args: Any?) {
+    logger.warn(message, *args)
+}
+
+/**
+ * Error level.
+ */
+fun error(message: String?, vararg args: Any?) {
+    logger.error(message, *args)
+}
+
+/**
+ * Logs with specified [level].
+ */
+fun log(level: Int, message: String?, vararg args: Any?) {
+    logger.log(level, message, *args)
+}
 
 /**
  * Logger.
@@ -101,33 +145,37 @@ interface Logger {
                 }
 
                 //Builds message.
-                val formattedMessage = if (message === null) null else message.fastFormat(*arguments)
+                val formattedMessage = message?.fastFormat(*args)
                 val levelDescription = levelToString(level)
                 val timestamp = TIMESTAMP_FORMATTER.format(LocalDateTime.now())
 
-                //Computes stack trace.
-                val callerTrace = callerStackTrace(callerOffset) { trace, findCalled ->
+                //Computes caller stack trace.
+                val callerTrace = callerStackTraceOrNull(callerOffset) { trace, findCalled ->
                     if (!findCalled) {
                         if (trace.className == SimpleLogger::class.java.name
-                            || trace.className == Logger::class.java.name) {
-                            return@callerStackTrace 0
+                            || trace.className == Logger::class.java.name
+                        ) {
+                            return@callerStackTraceOrNull 0
                         }
                     }
                     if (findCalled) {
                         if (trace.className != SimpleLogger::class.java.name
-                            && trace.className != Logger::class.java.name) {
-                            return@callerStackTrace 1
+                            && trace.className != Logger::class.java.name
+                        ) {
+                            return@callerStackTraceOrNull 1
                         }
                     }
                     -1
                 }
 
                 if (callerTrace === null) {
-                    output.println("[$levelDescription][$timestamp] - $formattedMessage")
+                    output.println("[$levelDescription][$timestamp]: $formattedMessage")
                 } else {
-                    output.println("[$levelDescription][$timestamp]" +
-                        "[${callerTrace.className}.${callerTrace.methodName}" +
-                        "(${callerTrace.lineNumber})] - $formattedMessage")
+                    output.println(
+                        "[$levelDescription][$timestamp]" +
+                            "[${callerTrace.className}.${callerTrace.methodName}" +
+                            "(${callerTrace.lineNumber})]: $formattedMessage"
+                    )
                 }
             }
 
