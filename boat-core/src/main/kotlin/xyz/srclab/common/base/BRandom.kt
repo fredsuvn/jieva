@@ -1,8 +1,9 @@
-@file:JvmName("BRandoms")
+@file:JvmName("BRandom")
 
 package xyz.srclab.common.base
 
 import java.util.*
+import java.util.function.Supplier
 
 private val random: Random = Random()
 
@@ -35,7 +36,7 @@ interface Randomer<T : Any> {
 
     fun next(): T
 
-    class Builder<T : Any>() {
+    class Builder<T : Any> {
 
         private var builderRandom: Random? = null
         private val builderCases: MutableList<Case<T>> = LinkedList()
@@ -45,7 +46,12 @@ interface Randomer<T : Any> {
             return score(score) { obj }
         }
 
+        @JvmSynthetic
         fun score(score: Int, supplier: () -> T): Builder<T> {
+            return score(score, supplier.toSupplier())
+        }
+
+        fun score(score: Int, supplier: Supplier<T>): Builder<T> {
             builderCases.add(Case(scoreCount, scoreCount + score, supplier))
             scoreCount += score
             return this
@@ -74,7 +80,7 @@ interface Randomer<T : Any> {
                         }
                         LESS_THAN
                     }
-                    return cases[index].supplier()
+                    return cases[index].supplier.get()
                 }
             }
         }
@@ -82,7 +88,7 @@ interface Randomer<T : Any> {
         private data class Case<T>(
             val from: Int,
             val to: Int,
-            val supplier: () -> T
+            val supplier: Supplier<T>
         )
     }
 

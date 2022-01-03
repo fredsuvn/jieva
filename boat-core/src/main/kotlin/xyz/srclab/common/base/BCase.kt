@@ -1,4 +1,4 @@
-@file:JvmName("BCases")
+@file:JvmName("BCase")
 
 package xyz.srclab.common.base
 
@@ -132,9 +132,7 @@ interface NamingCase {
 /**
  * Camel-Case class.
  */
-open class CamelCase(
-    private val firstWord: Function<CharSequence, String>
-) : NamingCase {
+open class CamelCase(private val firstWord: Function<CharSequence, String>) : NamingCase {
 
     override fun <T : CharSequence> split(name: T): NamingCase.Words<T> {
 

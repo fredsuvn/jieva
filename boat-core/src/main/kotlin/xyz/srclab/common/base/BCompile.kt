@@ -1,4 +1,4 @@
-@file:JvmName("BCompiles")
+@file:JvmName("BCompile")
 
 package xyz.srclab.common.base
 

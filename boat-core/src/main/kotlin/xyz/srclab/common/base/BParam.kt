@@ -1,4 +1,4 @@
-@file:JvmName("BParams")
+@file:JvmName("BParam")
 
 package xyz.srclab.common.base
 

@@ -1,4 +1,4 @@
-@file:JvmName("BEscapes")
+@file:JvmName("BEscape")
 
 package xyz.srclab.common.base
 

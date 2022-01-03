@@ -1,4 +1,4 @@
-@file:JvmName("BLogs")
+@file:JvmName("BLog")
 
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.callerStackTraceOrNull

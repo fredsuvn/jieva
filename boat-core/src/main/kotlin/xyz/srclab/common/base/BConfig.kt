@@ -1,4 +1,4 @@
-@file:JvmName("BConfigs")
+@file:JvmName("BConfig")
 
 package xyz.srclab.common.base
 

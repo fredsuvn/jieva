@@ -1,4 +1,4 @@
-@file:JvmName("BBools")
+@file:JvmName("BBoolean")
 
 package xyz.srclab.common.base
 

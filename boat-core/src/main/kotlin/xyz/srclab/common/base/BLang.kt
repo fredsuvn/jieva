@@ -1,4 +1,4 @@
-@file:JvmName("BLangs")
+@file:JvmName("BLang")
 
 package xyz.srclab.common.base
 
@@ -6,6 +6,10 @@ import xyz.srclab.common.base.JumpState.*
 import java.util.concurrent.Callable
 import java.util.function.*
 import java.util.function.Function
+
+fun <T> Supplier<T>.toFunction(): (() -> T) = {
+    this.get()
+}
 
 fun <T> Predicate<T>.toFunction(): (T) -> Boolean = {
     this.test(it)
@@ -29,6 +33,10 @@ fun <T, U, R> BiFunction<T, U, R>.toFunction(): (T, U) -> R = { it1, it2 ->
 
 fun <T, U> BiConsumer<T, U>.toFunction(): (T, U) -> Unit = { it1, it2 ->
     this.accept(it1, it2)
+}
+
+fun <T> (() -> T).toSupplier(): Supplier<T> {
+    return Supplier { this() }
 }
 
 fun <T> ((T) -> Boolean).toPredicate(): Predicate<T> {

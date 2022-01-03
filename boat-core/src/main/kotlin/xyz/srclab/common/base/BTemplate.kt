@@ -1,4 +1,4 @@
-@file:JvmName("BTemplates")
+@file:JvmName("BTemplate")
 
 package xyz.srclab.common.base
 

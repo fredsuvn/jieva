@@ -1,4 +1,4 @@
-@file:JvmName("BObjects")
+@file:JvmName("BObject")
 
 package xyz.srclab.common.base
 

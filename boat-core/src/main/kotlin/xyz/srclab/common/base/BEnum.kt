@@ -1,4 +1,4 @@
-@file:JvmName("BEnums")
+@file:JvmName("BEnum")
 
 package xyz.srclab.common.base
 

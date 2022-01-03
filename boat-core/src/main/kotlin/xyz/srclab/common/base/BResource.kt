@@ -1,4 +1,4 @@
-@file:JvmName("BResources")
+@file:JvmName("BResource")
 
 package xyz.srclab.common.base
 

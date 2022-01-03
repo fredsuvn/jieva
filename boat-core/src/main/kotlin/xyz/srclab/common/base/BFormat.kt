@@ -1,4 +1,4 @@
-@file:JvmName("BFormats")
+@file:JvmName("BFormat")
 
 package xyz.srclab.common.base
 

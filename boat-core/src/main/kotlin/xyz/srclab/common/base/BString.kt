@@ -1,4 +1,4 @@
-@file:JvmName("BStrings")
+@file:JvmName("BString")
 
 package xyz.srclab.common.base
 
@@ -286,8 +286,9 @@ fun CharSequence.toList(): List<Char> {
 
 //Lazy:
 
-fun lazyString(supplier: Supplier<String>): LazyString {
-    return LazyString.of(supplier)
+@JvmSynthetic
+fun lazyString(supplier: () -> String): LazyString {
+    return LazyString.of(supplier.toSupplier())
 }
 
 /**
