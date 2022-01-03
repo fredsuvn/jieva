@@ -1,34 +1,37 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.MapAccessor
+import xyz.srclab.common.base.asTyped
 
 /**
  * Context info of a running environment, just like [ThreadLocal].
  */
-interface RunContext : MapAccessor {
+interface RunContext {
 
-    /**
-     * Returns a copy of current context's contents.
-     */
-    fun attach(): Map<Any, Any?> {
-        return LinkedHashMap(asMap())
+    fun get(key: Any): Any? {
+        return asMap()[key]
+    }
+
+    fun <T> getTyped(key: Any): T {
+        return get(key).asTyped()
+    }
+
+    fun set(key: Any, value: Any?) {
+        asMap()[key] = value
     }
 
     /**
-     * Adds given [contents].
+     * Returns a [MutableMap] which is associated with this [RunContext], any change affects each other.
      */
-    fun detach(contents: Map<Any, Any?>) {
-        asMap().putAll(contents)
-    }
+    fun asMap(): MutableMap<Any, Any?>
 
     companion object {
 
         @JvmStatic
         fun current(): RunContext {
-            return RunContextImpl
+            return ThreadLocalRunContext
         }
 
-        private object RunContextImpl : RunContext {
+        private object ThreadLocalRunContext : RunContext {
 
             private val threadLocal: ThreadLocal<MutableMap<Any, Any?>> =
                 ThreadLocal.withInitial { HashMap() }
