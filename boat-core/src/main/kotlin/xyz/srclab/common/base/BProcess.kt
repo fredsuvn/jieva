@@ -1,38 +1,28 @@
-@file:JvmName("BProcs")
+@file:JvmName("BProcess")
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.base.ProcessWork.Companion.toProcessWork
 import xyz.srclab.common.io.availableString
+import xyz.srclab.common.io.readString
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.charset.Charset
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
-fun CharSequence.startProcess(): BProcessing {
-    return Runtime.getRuntime().exec(this.toString()).toProcessing()
+fun CharSequence.startProcess(): ProcessWork {
+    return Runtime.getRuntime().exec(this.toString()).toProcessWork()
 }
 
-fun startProcess(vararg cmd: String): BProcessing {
-    return Runtime.getRuntime().exec(cmd).toProcessing()
-}
-
-fun ProcessBuilder.startProcess(): BProcessing {
-    return this.start().toProcessing()
-}
-
-fun Process.toProcessing(): BProcessing {
-    return ProcessingImpl(this)
+fun startProcess(vararg cmd: String): ProcessWork {
+    return Runtime.getRuntime().exec(cmd).toProcessWork()
 }
 
 /**
- * Represents processing of [Process].
- *
- * Note [inputStream] is from [Process.getOutputStream], [outputStream] is from [Process.getInputStream].
- *
- * @see [Process]
+ * Represents process-work associated with [Process].
  */
-interface BProcessing {
+interface ProcessWork {
 
     val process: Process
 
@@ -43,6 +33,7 @@ interface BProcessing {
 
     val inputStream: InputStream?
         get() {
+            kotlin.run { }
             return process.inputStream
         }
 
@@ -64,8 +55,8 @@ interface BProcessing {
     /**
      * @throws InterruptedException
      */
-    fun await(): Int {
-        return process.waitFor()
+    fun await() = apply {
+        process.waitFor()
     }
 
     /**
@@ -90,14 +81,14 @@ interface BProcessing {
      * Returns all output stream as `String`.
      */
     fun outputString(): String? {
-        return inputStream?.readBytes()?.encodeToString()
+        return inputStream?.readString()
     }
 
     /**
      * Returns all output stream as `String`.
      */
     fun outputString(charset: Charset): String? {
-        return inputStream?.readBytes()?.encodeToString(charset)
+        return inputStream?.readString(charset)
     }
 
     /**
@@ -122,14 +113,14 @@ interface BProcessing {
      * Returns all error stream as `String`.
      */
     fun errorString(): String? {
-        return errorStream?.readBytes()?.encodeToString()
+        return errorStream?.readString()
     }
 
     /**
      * Returns all error stream as `String`.
      */
     fun errorString(charset: Charset): String? {
-        return errorStream?.readBytes()?.encodeToString(charset)
+        return errorStream?.readString(charset)
     }
 
     /**
@@ -149,22 +140,31 @@ interface BProcessing {
     fun availableErrorString(charset: Charset): String? {
         return errorStream?.availableString(charset)
     }
-}
 
-private class ProcessingImpl(override val process: Process) : BProcessing {
+    companion object {
 
-    override fun equals(other: Any?): Boolean {
-        if (other is BProcessing) {
-            return this.process == other.process
+        @JvmName("of")
+        @JvmStatic
+        fun Process.toProcessWork(): ProcessWork {
+            return ProcessWorkImpl(this)
         }
-        return false
-    }
 
-    override fun hashCode(): Int {
-        return this.process.hashCode()
-    }
+        private class ProcessWorkImpl(override val process: Process) : ProcessWork {
 
-    override fun toString(): String {
-        return this.process.toString()
+            override fun equals(other: Any?): Boolean {
+                if (other is ProcessWork) {
+                    return this.process == other.process
+                }
+                return false
+            }
+
+            override fun hashCode(): Int {
+                return this.process.hashCode()
+            }
+
+            override fun toString(): String {
+                return this.process.toString()
+            }
+        }
     }
 }
