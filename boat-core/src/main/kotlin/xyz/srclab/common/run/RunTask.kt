@@ -3,18 +3,18 @@ package xyz.srclab.common.run
 /**
  * Task to run by [Runner].
  *
- * [run] method is main body of the task, it will be called in specified run context of [Runner] or [Scheduler].
- * [initialize] method is used to do prepared initialized works in current run context.
+ * [run] method is run body of the task, it will be run by specified [Runner].
+ * [prepare] method is used to do prepared works in current thread and context.
  */
 interface RunTask<V> {
 
     /**
-     * Prepared works before running, will be called in current run context
+     * Prepared works before running, will be called in current thread and context
      */
-    fun initialize()
+    fun prepare()
 
     /**
-     * Run the task, will be called in specified run context.
+     * Run the task, will be called by specified [Runner].
      */
     fun run(): V
 }

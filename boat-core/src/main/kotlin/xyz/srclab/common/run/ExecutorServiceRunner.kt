@@ -21,7 +21,7 @@ open class ExecutorServiceRunner(
         return RunningImpl<Any?>(task)
     }
 
-    override fun <V> execute(task: () -> V) {
+    override fun execute(task: () -> Any?) {
         executorService.execute { task() }
     }
 

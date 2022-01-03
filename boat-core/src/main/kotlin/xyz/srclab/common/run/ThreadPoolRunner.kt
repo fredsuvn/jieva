@@ -158,7 +158,6 @@ open class ThreadPoolRunner(
     }
 
     companion object {
-
         @JvmStatic
         fun newBuilder(): Builder {
             return Builder()

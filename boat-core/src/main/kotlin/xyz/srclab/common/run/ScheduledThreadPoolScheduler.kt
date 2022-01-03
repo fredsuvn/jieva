@@ -174,7 +174,6 @@ class ScheduledThreadPoolScheduler(
     }
 
     companion object {
-
         @JvmStatic
         fun newBuilder(): Builder {
             return Builder()

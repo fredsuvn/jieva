@@ -19,7 +19,7 @@ object SyncRunner : Runner, Executor {
         return RunningImpl<Any?>(task)
     }
 
-    override fun <V> execute(task: () -> V) {
+    override fun execute(task: () -> Any?) {
         try {
             task()
         } catch (e: Exception) {
