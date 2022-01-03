@@ -30,6 +30,15 @@ fun <T, U> BiConsumer<T, U>.toFunction(): (T, U) -> Unit = { it1, it2 ->
     this.accept(it1, it2)
 }
 
+fun Runnable.toFunction(): () -> Any? = {
+    this.run()
+    null
+}
+
+fun <R> (() -> R).toRunnable(): Runnable {
+    return Runnable { this() }
+}
+
 /**
  * Jump statement for process control: [CONTINUE], [BREAK] or [RETURN].
  */
