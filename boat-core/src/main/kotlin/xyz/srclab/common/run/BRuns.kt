@@ -1,5 +1,4 @@
 @file:JvmName("BRuns")
-@file:JvmMultifileClass
 
 package xyz.srclab.common.run
 
