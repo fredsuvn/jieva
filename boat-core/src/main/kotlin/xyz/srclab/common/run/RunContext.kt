@@ -27,6 +27,14 @@ interface RunContext {
         asMap()[key] = value
     }
 
+    fun remove(key: Any) {
+        asMap().remove(key)
+    }
+
+    fun clear() {
+        asMap().clear()
+    }
+
     /**
      * Returns a [MutableMap] which is associated with this [RunContext], any change affects each other.
      */
