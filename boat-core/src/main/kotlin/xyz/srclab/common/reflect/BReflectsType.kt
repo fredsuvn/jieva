@@ -1,9 +1,8 @@
-@file:JvmName("Reflects")
+@file:JvmName("BReflects")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.reflect
 
-import xyz.srclab.annotations.Acceptable
 import xyz.srclab.annotations.Accepted
 import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.asTyped
@@ -48,11 +47,7 @@ val GenericArrayType.rawClass: Class<*>
     }
 
 val Type.rawClass: Class<*>
-    @Acceptable(
-        Accepted(Class::class),
-        Accepted(ParameterizedType::class),
-        Accepted(GenericArrayType::class),
-    )
+    @Accepted(Class::class, ParameterizedType::class, GenericArrayType::class)
     @Throws(IllegalArgumentException::class)
     get() {
         return this.rawClassOrNull ?: throw IllegalArgumentException(
@@ -130,10 +125,10 @@ val Type.lowerBound: Type?
  * will return: `{T=java.lang.String}`
  */
 @Throws(IllegalArgumentException::class)
-fun @receiver:Acceptable(
-    Accepted(Class::class),
-    Accepted(ParameterizedType::class),
-    Accepted(GenericArrayType::class),
+fun @receiver:Accepted(
+    Class::class,
+    ParameterizedType::class,
+    GenericArrayType::class
 ) Type.getTypeArguments(): Map<TypeVariable<*>, Type> {
 
     fun Type.resolveTypeParameters(to: MutableMap<TypeVariable<*>, Type>) {

@@ -1,13 +1,13 @@
-@file:JvmName("Reflects")
+@file:JvmName("BReflects")
 @file:JvmMultifileClass
 
 package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
+import xyz.srclab.common.base.BytesClassLoader
 import xyz.srclab.common.base.DOT_MATCHER
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.base.currentClassLoader
-import xyz.srclab.common.base.loadClass
+import xyz.srclab.common.base.currentThread
 import java.lang.reflect.Modifier
 
 val Class<*>.isStatic: Boolean
@@ -70,7 +70,7 @@ val Class<*>.shortName: String
 val <T> Class<T>.arrayClass: Class<Array<T>>
     get() {
         if (this.isArray) {
-            return "[${this.name}".loadClass()
+            return "[${this.name}".toClass()
         }
         val arrayClassName = when (this) {
             Boolean::class.javaPrimitiveType -> "[Z"
@@ -84,8 +84,15 @@ val <T> Class<T>.arrayClass: Class<Array<T>>
             Void::class.javaPrimitiveType -> "[V"
             else -> "[L${this.name};"
         }
-        return arrayClassName.loadClass(this.classLoader ?: currentClassLoader())
+        return arrayClassName.toClass(this.classLoader ?: currentClassLoader())
     }
+
+/**
+ * Returns current [Thread.contextClassLoader], or [BytesClassLoader] if `contextClassLoader` is null.
+ */
+fun currentClassLoader(): ClassLoader {
+    return currentThread().contextClassLoader ?: BytesClassLoader
+}
 
 /**
  * @throws ClassNotFoundException
