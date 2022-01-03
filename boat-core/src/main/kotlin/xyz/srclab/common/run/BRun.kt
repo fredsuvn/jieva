@@ -1,4 +1,4 @@
-@file:JvmName("BRuns")
+@file:JvmName("BRun")
 
 package xyz.srclab.common.run
 
