@@ -3,6 +3,7 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.base.JumpState.*
+import java.util.concurrent.Callable
 import java.util.function.*
 import java.util.function.Function
 
@@ -30,13 +31,36 @@ fun <T, U> BiConsumer<T, U>.toFunction(): (T, U) -> Unit = { it1, it2 ->
     this.accept(it1, it2)
 }
 
-fun Runnable.toFunction(): () -> Any? = {
-    this.run()
-    null
+fun <T> ((T) -> Boolean).toPredicate(): Predicate<T> {
+    return Predicate { this(it) }
+}
+
+fun <T, R> ((T) -> R).toFunction(): Function<T, R> {
+    return Function { this(it) }
+}
+
+fun <T> ((T) -> Any?).toConsumer(): Consumer<T> {
+    return Consumer { this(it) }
+}
+
+fun <T, U> ((T, U) -> Boolean).toPredicate(): BiPredicate<T, U> {
+    return BiPredicate { it0, it1 -> this(it0, it1) }
+}
+
+fun <T, U, R> ((T, U) -> R).toFunction(): BiFunction<T, U, R> {
+    return BiFunction { it0, it1 -> this(it0, it1) }
+}
+
+fun <T, U> ((T, U) -> Any?).toConsumer(): BiConsumer<T, U> {
+    return BiConsumer { it0, it1 -> this(it0, it1) }
 }
 
 fun <R> (() -> R).toRunnable(): Runnable {
     return Runnable { this() }
+}
+
+fun <R> (() -> R).toCallable(): Callable<R> {
+    return Callable { this() }
 }
 
 /**
