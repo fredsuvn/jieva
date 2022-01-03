@@ -1,4 +1,4 @@
-@file:JvmName("BIOs")
+@file:JvmName("BIO")
 
 package xyz.srclab.common.io
 
