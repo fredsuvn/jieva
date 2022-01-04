@@ -8,6 +8,14 @@ fun CharSequence?.toBoolean(): Boolean {
     return this?.toString().toBooleanKt()
 }
 
+fun Any?.toBoolean(): Boolean {
+    return when (this) {
+        null -> false
+        is Boolean -> this
+        else -> this.toCharSeq().toBoolean()
+    }
+}
+
 fun anyTrue(vararg charSeqs: CharSequence?): Boolean {
     for (charSeq in charSeqs) {
         if (charSeq.toBoolean()) {

@@ -34,6 +34,12 @@ fun CharSequence.toShort(radix: Int = DEFAULT_RADIX): Short {
 
 @Throws(NumberFormatException::class)
 @JvmOverloads
+fun CharSequence.toChar(radix: Int = DEFAULT_RADIX): Char {
+    return this.toString().toIntKt(radix).toChar()
+}
+
+@Throws(NumberFormatException::class)
+@JvmOverloads
 fun CharSequence.toInt(radix: Int = DEFAULT_RADIX): Int {
     return this.toString().toIntKt(radix)
 }
@@ -77,6 +83,101 @@ fun CharSequence.toBigDecimal(mathContext: MathContext = MathContext.UNLIMITED):
         "1" -> BigDecimal.ONE
         "10" -> BigDecimal.TEN
         else -> str.toBigDecimalKt(mathContext)
+    }
+}
+
+@Throws(NumberFormatException::class)
+@JvmOverloads
+fun Any?.toByte(radix: Int = DEFAULT_RADIX): Byte {
+    return when (this) {
+        null -> 0
+        is Byte -> this
+        is Number -> this.toByte()
+        else -> this.toCharSeq().toByte(radix)
+    }
+}
+
+@Throws(NumberFormatException::class)
+@JvmOverloads
+fun Any?.toShort(radix: Int = DEFAULT_RADIX): Short {
+    return when (this) {
+        null -> 0
+        is Short -> this
+        is Number -> this.toShort()
+        else -> this.toCharSeq().toShort(radix)
+    }
+}
+
+@Throws(NumberFormatException::class)
+@JvmOverloads
+fun Any?.toChar(radix: Int = DEFAULT_RADIX): Char {
+    return when (this) {
+        null -> 0.toChar()
+        is Char -> this
+        is Number -> this.toInt().toChar()
+        else -> this.toCharSeq().toChar(radix)
+    }
+}
+
+@Throws(NumberFormatException::class)
+@JvmOverloads
+fun Any?.toInt(radix: Int = DEFAULT_RADIX): Int {
+    return when (this) {
+        null -> 0
+        is Int -> this
+        is Number -> this.toInt()
+        else -> this.toCharSeq().toInt(radix)
+    }
+}
+
+@Throws(NumberFormatException::class)
+@JvmOverloads
+fun Any?.toLong(radix: Int = DEFAULT_RADIX): Long {
+    return when (this) {
+        null -> 0
+        is Long -> this
+        is Number -> this.toLong()
+        else -> this.toCharSeq().toLong(radix)
+    }
+}
+
+@Throws(NumberFormatException::class)
+fun Any?.toFloat(): Float {
+    return when (this) {
+        null -> 0f
+        is Float -> this
+        is Number -> this.toFloat()
+        else -> this.toCharSeq().toFloat()
+    }
+}
+
+@Throws(NumberFormatException::class)
+fun Any?.toDouble(): Double {
+    return when (this) {
+        null -> 0.0
+        is Double -> this
+        is Number -> this.toDouble()
+        else -> this.toCharSeq().toDouble()
+    }
+}
+
+@Throws(NumberFormatException::class)
+@JvmOverloads
+fun Any?.toBigInteger(radix: Int = DEFAULT_RADIX): BigInteger {
+    return when (this) {
+        null -> BigInteger.ZERO
+        is BigInteger -> this
+        else -> this.toCharSeq().toBigInteger(radix)
+    }
+}
+
+@Throws(NumberFormatException::class)
+@JvmOverloads
+fun Any?.toBigDecimal(mathContext: MathContext = MathContext.UNLIMITED): BigDecimal {
+    return when (this) {
+        null -> BigDecimal.ZERO
+        is BigDecimal -> this
+        else -> this.toCharSeq().toBigDecimal(mathContext)
     }
 }
 

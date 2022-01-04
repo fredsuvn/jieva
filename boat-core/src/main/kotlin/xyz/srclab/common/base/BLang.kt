@@ -19,6 +19,10 @@ fun <T, R> Function<T, R>.toFunction(): (T) -> R = {
     this.apply(it)
 }
 
+fun <R> IntFunction<R>.toFunction(): (Int) -> R = {
+    this.apply(it)
+}
+
 fun <T> Consumer<T>.toFunction(): (T) -> Unit = {
     this.accept(it)
 }
@@ -45,6 +49,10 @@ fun <T> ((T) -> Boolean).toPredicate(): Predicate<T> {
 
 fun <T, R> ((T) -> R).toFunction(): Function<T, R> {
     return Function { this(it) }
+}
+
+fun <R> ((Int) -> R).toIntFunction(): IntFunction<R> {
+    return IntFunction { this(it) }
 }
 
 fun <T> ((T) -> Any?).toConsumer(): Consumer<T> {
