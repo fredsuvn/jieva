@@ -197,3 +197,21 @@ fun <T> MutableList<T>.removeLastOrNull(): T? {
 fun <T> MutableList<T>.retainAll(predicate: (T) -> Boolean): Boolean {
     return this.retainAllKt(predicate)
 }
+
+
+fun <T> concatList(vararg lists: Iterable<T>): List<T> {
+    var size = 0
+    for (list in lists) {
+        if (list is Collection) {
+            size += list.size
+        } else {
+            size = -1
+            break
+        }
+    }
+    val result = if (size <= 0) java.util.ArrayList() else java.util.ArrayList<T>(size)
+    for (list in lists) {
+        result.addAll(list)
+    }
+    return result
+}

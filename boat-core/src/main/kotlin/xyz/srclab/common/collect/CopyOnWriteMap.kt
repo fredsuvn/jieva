@@ -1,29 +1,19 @@
-@file:JvmName("BCollects")
-@file:JvmMultifileClass
-
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.toFunction
 import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
 
-@JvmOverloads
-fun <K, V> copyOnWriteMap(
-    initMap: Map<out K, V> = emptyMap(),
-    newMapFun: (Map<out K, V>) -> MutableMap<K, V> = { HashMap(it) }
-): MutableMap<K, V> {
-    return CopyOnWriteMap(initMap, newMapFun)
-}
-
 /**
  * Copy-On-Write [Map].
  */
-private class CopyOnWriteMap<K, V> constructor(
-    initMap: Map<out K, V>,
-    private val newMapFun: (Map<out K, V>) -> MutableMap<K, V>
+private class CopyOnWriteMap<K, V> @JvmOverloads constructor(
+    initMap: Map<out K, V> = emptyMap(),
+    private val newMap: Function<Map<out K, V>, MutableMap<K, V>> = Function { HashMap(it) }
 ) : MutableMap<K, V> {
 
-    private var currentMap: MutableMap<K, V> = newMapFun(initMap)
+    private var currentMap: MutableMap<K, V> = newMap.apply(initMap)
 
     override val size: Int
         get() = currentMap.size
@@ -36,6 +26,19 @@ private class CopyOnWriteMap<K, V> constructor(
 
     override val values: MutableCollection<V>
         get() = currentMap.values
+
+    constructor(
+        newMap: Function<Map<out K, V>, MutableMap<K, V>>
+    ) : this(emptyMap(), newMap)
+
+    constructor(
+        newMap: (Map<out K, V>) -> MutableMap<K, V>
+    ) : this(emptyMap(), newMap)
+
+    constructor(
+        initMap: Map<out K, V>,
+        newMap: (Map<out K, V>) -> MutableMap<K, V>
+    ) : this(initMap, newMap.toFunction())
 
     override fun containsKey(key: K): Boolean {
         return currentMap.containsKey(key)
@@ -116,7 +119,7 @@ private class CopyOnWriteMap<K, V> constructor(
     private inline fun <T> cow(action: (MutableMap<K, V>) -> T): T {
         return synchronized(this) {
             val curMap = currentMap
-            val newMap = newMapFun(curMap)
+            val newMap = newMap.apply(curMap)
             val result = action(newMap)
             currentMap = newMap
             result
