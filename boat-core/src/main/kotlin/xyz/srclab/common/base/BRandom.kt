@@ -29,7 +29,6 @@ fun <T : Any> randomSupplierBuilder(): RandomSupplierBuilder<T> {
     return RandomSupplierBuilder()
 }
 
-
 class RandomSupplierBuilder<T : Any> {
 
     private var builderRandom: Random? = null
