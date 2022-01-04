@@ -1,9 +1,9 @@
-@file:JvmName("BCollects")
-@file:JvmMultifileClass
+@file:JvmName("BMap")
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.comparableComparator
+import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.castComparableComparator
 import java.util.*
 import kotlin.collections.associateTo as associateToKt
 import kotlin.collections.filter as filterKt
@@ -16,6 +16,33 @@ import kotlin.collections.minus as minusKt
 import kotlin.collections.plus as plusKt
 import kotlin.collections.sortedWith as sortedWithKt
 import kotlin.collections.toSet as toSetKt
+
+fun <K, V> newMap(vararg keyValues: Any?): LinkedHashMap<K, V> {
+    return LinkedHashMap<K, V>().putEntries(*keyValues)
+}
+
+fun <K, V> newMap(keyValues: Iterable<Any?>): LinkedHashMap<K, V> {
+    return LinkedHashMap<K, V>().putEntries(keyValues)
+}
+
+fun <K, V, C : MutableMap<K, V>> C.putEntries(vararg keyValues: Any?): C {
+    return putEntries(keyValues.toList())
+}
+
+fun <K, V, C : MutableMap<K, V>> C.putEntries(keyValues: Iterable<Any?>): C {
+    val iterator = keyValues.iterator()
+    while (iterator.hasNext()) {
+        val key = iterator.next()
+        if (iterator.hasNext()) {
+            val value = iterator.next()
+            this[key.asTyped()] = value.asTyped()
+        } else {
+            this[key.asTyped()] = null.asTyped()
+            break
+        }
+    }
+    return this
+}
 
 fun <K, V> Map<K, V>.containsKeys(keys: Array<out K>): Boolean {
     return this.keys.containsAll(keys.toSetKt())
@@ -110,7 +137,7 @@ inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
 }
 
 @JvmOverloads
-fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = comparableComparator()): Map<K, V> {
+fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = castComparableComparator()): Map<K, V> {
     return this.entries.sortedWithKt(comparator).associateToKt(LinkedHashMap()) { it.key to it.value }
 }
 

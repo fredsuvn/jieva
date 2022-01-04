@@ -687,7 +687,7 @@ inline fun <T, K> Iterable<T>.distinct(selector: (T) -> K): List<T> {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.sorted(comparator: Comparator<in T> = comparableComparator()): List<T> {
+fun <T> Iterable<T>.sorted(comparator: Comparator<in T> = castComparableComparator()): List<T> {
     return this.sortedWithKt(comparator)
 }
 
@@ -708,22 +708,22 @@ inline fun <T> Iterable<T>.forEach(action: (index: Int, T) -> Unit) {
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.max(comparator: Comparator<in T> = comparableComparator()): T {
+fun <T> Iterable<T>.max(comparator: Comparator<in T> = castComparableComparator()): T {
     return maxOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T> = comparableComparator()): T? {
+fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T> = castComparableComparator()): T? {
     return this.maxWithOrNullKt(comparator)
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.min(comparator: Comparator<in T> = comparableComparator()): T {
+fun <T> Iterable<T>.min(comparator: Comparator<in T> = castComparableComparator()): T {
     return minOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 @JvmOverloads
-fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T> = comparableComparator()): T? {
+fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T> = castComparableComparator()): T? {
     return this.minWithOrNullKt(comparator)
 }
 
@@ -837,7 +837,7 @@ fun <T> Iterable<T>.toLinkedHashSet(): LinkedHashSet<T> {
 
 @JvmOverloads
 fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T>? = null): SortedSet<T> {
-    return if (comparator === null) this.toSortedSetKt(comparableComparator()) else this.toSortedSetKt(comparator)
+    return if (comparator === null) this.toSortedSetKt(castComparableComparator()) else this.toSortedSetKt(comparator)
 }
 
 @JvmOverloads

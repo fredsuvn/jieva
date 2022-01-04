@@ -1,9 +1,8 @@
-@file:JvmName("BCollects")
-@file:JvmMultifileClass
+@file:JvmName("BList")
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.comparableComparator
+import xyz.srclab.common.base.castComparableComparator
 import kotlin.random.Random
 import kotlin.collections.binarySearch as binarySearchKt
 import kotlin.collections.dropLast as dropLastKt
@@ -38,6 +37,12 @@ import kotlin.collections.slice as sliceKt
 import kotlin.collections.sortWith as sortWithKt
 import kotlin.collections.takeLast as takeLastKt
 import kotlin.collections.takeLastWhile as takeLastWhileKt
+
+fun <T> newList(vararg elements: T): ArrayList<T> {
+    val list = ArrayList<T>(elements.size)
+    list.addAll(elements)
+    return list
+}
 
 fun <T> List<T>.first(): T {
     return this.firstKt()
@@ -148,7 +153,7 @@ fun <T> List<T>.slice(indices: IntRange): List<T> {
 }
 
 @JvmOverloads
-fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T> = comparableComparator()): Int {
+fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T> = castComparableComparator()): Int {
     return this.binarySearchKt(element, comparator)
 }
 
@@ -157,7 +162,7 @@ fun <T> MutableList<T>.reverse() {
 }
 
 @JvmOverloads
-fun <T> MutableList<T>.sort(comparator: Comparator<in T> = comparableComparator()) {
+fun <T> MutableList<T>.sort(comparator: Comparator<in T> = castComparableComparator()) {
     this.sortWithKt(comparator)
 }
 

@@ -1,10 +1,13 @@
-@file:JvmName("BCollects")
-@file:JvmMultifileClass
+@file:JvmName("BSet")
 
 package xyz.srclab.common.collect
 
 import kotlin.collections.minus as minusKt
 import kotlin.collections.plus as plusKt
+
+fun <T> newSet(vararg elements: T): LinkedHashSet<T> {
+    return LinkedHashSet<T>().addElements(*elements)
+}
 
 fun <T> Set<T>.plus(element: T): Set<T> {
     return this.plusKt(element)
