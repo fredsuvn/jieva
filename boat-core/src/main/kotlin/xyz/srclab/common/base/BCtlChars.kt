@@ -1,5 +1,7 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.collect.asList
+
 /**
  * Control characters:
  *
@@ -729,7 +731,7 @@ interface BSgrParam {
 
         @JvmStatic
         fun concat(vararg params: BSgrParam): BSgrParam {
-            return concat(params.toList())
+            return concat(params.asList())
         }
 
         @JvmStatic
