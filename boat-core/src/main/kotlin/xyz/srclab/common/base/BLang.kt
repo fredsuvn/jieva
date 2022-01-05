@@ -7,36 +7,52 @@ import java.util.concurrent.Callable
 import java.util.function.*
 import java.util.function.Function
 
-fun <T> Supplier<T>.toFunction(): (() -> T) = {
+fun <T> Supplier<T>.toKotlinFun(): (() -> T) = {
     this.get()
 }
 
-fun <T> Predicate<T>.toFunction(): (T) -> Boolean = {
+fun <T> Predicate<T>.toKotlinFun(): (T) -> Boolean = {
     this.test(it)
 }
 
-fun <T, R> Function<T, R>.toFunction(): (T) -> R = {
+fun <T, R> Function<T, R>.toKotlinFun(): (T) -> R = {
     this.apply(it)
 }
 
-fun <R> IntFunction<R>.toFunction(): (Int) -> R = {
+fun <R> IntFunction<R>.toKotlinFun(): (Int) -> R = {
     this.apply(it)
 }
 
-fun <T> Consumer<T>.toFunction(): (T) -> Unit = {
+fun <T> Consumer<T>.toKotlinFun(): (T) -> Unit = {
     this.accept(it)
 }
 
-fun <T, U> BiPredicate<T, U>.toFunction(): (T, U) -> Boolean = { it1, it2 ->
-    this.test(it1, it2)
+fun <T, U> BiPredicate<T, U>.toKotlinFun(): (T, U) -> Boolean = { it0, it1 ->
+    this.test(it0, it1)
 }
 
-fun <T, U, R> BiFunction<T, U, R>.toFunction(): (T, U) -> R = { it1, it2 ->
-    this.apply(it1, it2)
+fun <T, U, R> BiFunction<T, U, R>.toKotlinFun(): (T, U) -> R = { it0, it1 ->
+    this.apply(it0, it1)
 }
 
-fun <T, U> BiConsumer<T, U>.toFunction(): (T, U) -> Unit = { it1, it2 ->
-    this.accept(it1, it2)
+fun <T, U> BiConsumer<T, U>.toKotlinFun(): (T, U) -> Unit = { it0, it1 ->
+    this.accept(it0, it1)
+}
+
+fun <T> IndexPredicate<T>.toKotlinFun(): (Int, T) -> Boolean = { i, it ->
+    this.test(i, it)
+}
+
+fun <T, R> IndexFunction<T, R>.toKotlinFun(): (Int, T) -> R = { i, it ->
+    this.apply(i, it)
+}
+
+fun <T, U, R> IndexBiFunction<T, U, R>.toKotlinFun(): (Int, T, U) -> R = { i, it0, it1 ->
+    this.apply(i, it0, it1)
+}
+
+fun <T> IndexConsumer<T>.toKotlinFun(): (Int, T) -> Unit = { i, it ->
+    this.accept(i, it)
 }
 
 fun <T> (() -> T).toSupplier(): Supplier<T> {
@@ -77,6 +93,38 @@ fun <R> (() -> R).toRunnable(): Runnable {
 
 fun <R> (() -> R).toCallable(): Callable<R> {
     return Callable { this() }
+}
+
+fun <T> ((Int, T) -> Boolean).toIndexPredicate(): IndexPredicate<T> {
+    return object : IndexPredicate<T> {
+        override fun test(index: Int, t: T): Boolean {
+            return this@toIndexPredicate(index, t)
+        }
+    }
+}
+
+fun <T, R> ((Int, T) -> R).toIndexFunction(): IndexFunction<T, R> {
+    return object : IndexFunction<T, R> {
+        override fun apply(index: Int, t: T): R {
+            return this@toIndexFunction(index, t)
+        }
+    }
+}
+
+fun <T, U, R> ((Int, T, U) -> R).toIndexFunction(): IndexBiFunction<T, U, R> {
+    return object : IndexBiFunction<T, U, R> {
+        override fun apply(index: Int, t: T, u: U): R {
+            return this@toIndexFunction(index, t, u)
+        }
+    }
+}
+
+fun <T> ((Int, T) -> Any?).toIndexConsumer(): IndexConsumer<T> {
+    return object : IndexConsumer<T> {
+        override fun accept(index: Int, t: T) {
+            this@toIndexConsumer(index, t)
+        }
+    }
 }
 
 /**
@@ -142,4 +190,28 @@ enum class ThreadSafePolicy {
      * Copy-on-write.
      */
     COPY_ON_WRITE,
+}
+
+@FunctionalInterface
+interface IndexPredicate<T> {
+
+    fun test(index: Int, t: T): Boolean
+}
+
+@FunctionalInterface
+interface IndexFunction<T, R> {
+
+    fun apply(index: Int, t: T): R
+}
+
+@FunctionalInterface
+interface IndexBiFunction<T, U, R> {
+
+    fun apply(index: Int, t: T, u: U): R
+}
+
+@FunctionalInterface
+interface IndexConsumer<T> {
+
+    fun accept(index: Int, t: T)
 }
