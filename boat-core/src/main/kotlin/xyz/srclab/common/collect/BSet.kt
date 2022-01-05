@@ -6,7 +6,7 @@ import kotlin.collections.minus as minusKt
 import kotlin.collections.plus as plusKt
 
 fun <T> newSet(vararg elements: T): LinkedHashSet<T> {
-    return LinkedHashSet<T>().addElements(*elements)
+    return LinkedHashSet<T>().collect(*elements)
 }
 
 fun <T> Set<T>.plus(element: T): Set<T> {

@@ -1,6 +1,5 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.toFunction
 import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -8,12 +7,12 @@ import java.util.function.Function
 /**
  * Copy-On-Write [Map].
  */
-private class CopyOnWriteMap<K, V> @JvmOverloads constructor(
-    initMap: Map<out K, V> = emptyMap(),
-    private val newMap: Function<Map<out K, V>, MutableMap<K, V>> = Function { HashMap(it) }
+open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
+    initMap: Map<out K, V>,
+    private val newMap: (Map<out K, V>) -> MutableMap<K, V>
 ) : MutableMap<K, V> {
 
-    private var currentMap: MutableMap<K, V> = newMap.apply(initMap)
+    private var currentMap: MutableMap<K, V> = newMap(initMap)
 
     override val size: Int
         get() = currentMap.size
@@ -26,19 +25,6 @@ private class CopyOnWriteMap<K, V> @JvmOverloads constructor(
 
     override val values: MutableCollection<V>
         get() = currentMap.values
-
-    constructor(
-        newMap: Function<Map<out K, V>, MutableMap<K, V>>
-    ) : this(emptyMap(), newMap)
-
-    constructor(
-        newMap: (Map<out K, V>) -> MutableMap<K, V>
-    ) : this(emptyMap(), newMap)
-
-    constructor(
-        initMap: Map<out K, V>,
-        newMap: (Map<out K, V>) -> MutableMap<K, V>
-    ) : this(initMap, newMap.toFunction())
 
     override fun containsKey(key: K): Boolean {
         return currentMap.containsKey(key)
@@ -119,7 +105,7 @@ private class CopyOnWriteMap<K, V> @JvmOverloads constructor(
     private inline fun <T> cow(action: (MutableMap<K, V>) -> T): T {
         return synchronized(this) {
             val curMap = currentMap
-            val newMap = newMap.apply(curMap)
+            val newMap = newMap(curMap)
             val result = action(newMap)
             currentMap = newMap
             result

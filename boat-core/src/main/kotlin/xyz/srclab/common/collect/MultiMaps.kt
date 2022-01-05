@@ -1,30 +1,9 @@
-@file:JvmName("BCollects")
-@file:JvmMultifileClass
-
 package xyz.srclab.common.collect
-
-import java.util.*
-
-@JvmOverloads
-fun <K, V> setMap(
-    map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
-    valueSet: (K) -> MutableSet<V> = { LinkedHashSet() }
-): BSetMap<K, V> {
-    return BSetMap(map, valueSet)
-}
-
-@JvmOverloads
-fun <K, V> listMap(
-    map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
-    valueList: (K) -> MutableList<V> = { LinkedList() }
-): BListMap<K, V> {
-    return BListMap(map, valueList)
-}
 
 /**
  * A type of Multi-Map of which values are [MutableSet].
  */
-open class BSetMap<K, V> constructor(
+open class SetMap<K, V> constructor(
     private val map: MutableMap<K, MutableSet<V>>,
     private val valueSet: (K) -> MutableSet<V>
 ) : MutableMap<K, MutableSet<V>> by map {
@@ -48,7 +27,7 @@ open class BSetMap<K, V> constructor(
 /**
  * A type of Multi-Map of which values are [MutableList].
  */
-open class BListMap<K, V> constructor(
+open class ListMap<K, V> constructor(
     private val map: MutableMap<K, MutableList<V>>,
     private val valueList: (K) -> MutableList<V>
 ) : MutableMap<K, MutableList<V>> by map {
