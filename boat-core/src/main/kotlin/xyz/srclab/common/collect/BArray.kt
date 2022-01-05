@@ -11,8 +11,12 @@ import kotlin.collections.joinToString as joinToStringKt
 
 private const val NOT_ARRAY_TYPE_PREFIX = "Not an array type"
 
+fun <T> Class<T>.newArray(length: Int): Array<T> {
+    return java.lang.reflect.Array.newInstance(this, length).asTyped()
+}
+
 fun <T> Type.newArray(length: Int): Array<T> {
-    return java.lang.reflect.Array.newInstance(this.rawClass, length).asTyped()
+    return this.rawClass.newArray(length).asTyped()
 }
 
 /**

@@ -3,26 +3,21 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.*
-import java.lang.reflect.Type
-import java.math.BigDecimal
-import java.math.BigInteger
 import java.util.*
+import java.util.function.BiFunction
+import java.util.function.Function
 import java.util.function.IntFunction
 import java.util.function.Predicate
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
 import kotlin.random.Random
-import kotlin.toBigDecimal
-import kotlin.toBigInteger
+import kotlin.collections.addAll as addAllKt
 import kotlin.collections.all as allKt
 import kotlin.collections.any as anyKt
-import kotlin.collections.asSequence as asSequenceKt
 import kotlin.collections.associate as associateKt
 import kotlin.collections.associateBy as associateByKt
 import kotlin.collections.associateByTo as associateByToKt
 import kotlin.collections.associateTo as associateToKt
-import kotlin.collections.associateWith as associateWithKt
-import kotlin.collections.associateWithTo as associateWithToKt
 import kotlin.collections.chunked as chunkedKt
 import kotlin.collections.contains as containsKt
 import kotlin.collections.count as countKt
@@ -54,16 +49,14 @@ import kotlin.collections.indexOf as indexOfKt
 import kotlin.collections.indexOfFirst as indexOfFirstKt
 import kotlin.collections.indexOfLast as indexOfLastKt
 import kotlin.collections.intersect as intersectKt
+import kotlin.collections.joinTo as joinToKt
+import kotlin.collections.joinToString as joinToStringKt
 import kotlin.collections.last as lastKt
 import kotlin.collections.lastIndexOf as lastIndexOfKt
 import kotlin.collections.lastOrNull as lastOrNullKt
 import kotlin.collections.map as mapKt
 import kotlin.collections.mapIndexed as mapIndexedKt
-import kotlin.collections.mapIndexedNotNull as mapIndexedNotNullKt
-import kotlin.collections.mapIndexedNotNullTo as mapIndexedNotNullToKt
 import kotlin.collections.mapIndexedTo as mapIndexedToKt
-import kotlin.collections.mapNotNull as mapNotNullKt
-import kotlin.collections.mapNotNullTo as mapNotNullToKt
 import kotlin.collections.mapTo as mapToKt
 import kotlin.collections.maxWithOrNull as maxWithOrNullKt
 import kotlin.collections.minWithOrNull as minWithOrNullKt
@@ -82,7 +75,6 @@ import kotlin.collections.reversed as reversedKt
 import kotlin.collections.shuffled as shuffledKt
 import kotlin.collections.sortedWith as sortedWithKt
 import kotlin.collections.subtract as subtractKt
-import kotlin.collections.sumOf as sumOfKt
 import kotlin.collections.take as takeKt
 import kotlin.collections.takeWhile as takeWhileKt
 import kotlin.collections.toCollection as toCollectionKt
@@ -97,9 +89,6 @@ import kotlin.collections.union as unionKt
 import kotlin.collections.windowed as windowedKt
 import kotlin.collections.zip as zipKt
 import kotlin.collections.zipWithNext as zipWithNextKt
-import kotlin.collections.joinTo as joinToKt
-import kotlin.collections.joinToString as joinToStringKt
-import kotlin.collections.addAll as addAllKt
 
 fun <T, C : MutableCollection<T>> newCollection(collection: C, vararg elements: T): C {
     collection.addAll(elements)
@@ -115,7 +104,7 @@ fun <T> Iterable<T>.count(): Int {
 }
 
 fun <T> Iterable<T>.count(predicate: Predicate<T>): Int {
-    return this.countKt(predicate.toFunction())
+    return this.countKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.isEmpty(): Boolean {
@@ -137,7 +126,7 @@ fun <T> Iterable<T>.any(): Boolean {
 }
 
 fun <T> Iterable<T>.any(predicate: Predicate<T>): Boolean {
-    return this.anyKt(predicate.toFunction())
+    return this.anyKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.none(): Boolean {
@@ -145,11 +134,11 @@ fun <T> Iterable<T>.none(): Boolean {
 }
 
 fun <T> Iterable<T>.none(predicate: Predicate<T>): Boolean {
-    return this.noneKt(predicate.toFunction())
+    return this.noneKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.all(predicate: Predicate<T>): Boolean {
-    return this.allKt(predicate.toFunction())
+    return this.allKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.first(): T {
@@ -157,7 +146,7 @@ fun <T> Iterable<T>.first(): T {
 }
 
 fun <T> Iterable<T>.first(predicate: Predicate<T>): T {
-    return this.firstKt(predicate.toFunction())
+    return this.firstKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.firstOrNull(): T? {
@@ -165,7 +154,7 @@ fun <T> Iterable<T>.firstOrNull(): T? {
 }
 
 fun <T> Iterable<T>.firstOrNull(predicate: Predicate<T>): T? {
-    return this.firstOrNullKt(predicate.toFunction())
+    return this.firstOrNullKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.last(): T {
@@ -173,7 +162,7 @@ fun <T> Iterable<T>.last(): T {
 }
 
 fun <T> Iterable<T>.last(predicate: Predicate<T>): T {
-    return this.lastKt(predicate.toFunction())
+    return this.lastKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.lastOrNull(): T? {
@@ -181,7 +170,7 @@ fun <T> Iterable<T>.lastOrNull(): T? {
 }
 
 fun <T> Iterable<T>.lastOrNull(predicate: Predicate<T>): T? {
-    return this.lastOrNullKt(predicate.toFunction())
+    return this.lastOrNullKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.random(): T {
@@ -209,19 +198,19 @@ fun <T> Iterable<T>.getOrNull(index: Int): T? {
 }
 
 fun <T> Iterable<T>.getOrDefault(index: Int, defaultValue: T): T {
-    return this.elementAtOrElseKt(index){defaultValue}
+    return this.elementAtOrElseKt(index) { defaultValue }
 }
 
 fun <T> Iterable<T>.getOrElse(index: Int, defaultValue: IntFunction<T>): T {
-    return this.elementAtOrElseKt(index, defaultValue.toFunction())
+    return this.elementAtOrElseKt(index, defaultValue.toKotlinFun())
 }
 
 fun <T> Iterable<T>.find(predicate: Predicate<T>): T? {
-    return this.findKt(predicate.toFunction())
+    return this.findKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.findLast(predicate: Predicate<T>): T? {
-    return this.firstKt(predicate.toFunction())
+    return this.firstKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.indexOf(element: T): Int {
@@ -229,7 +218,7 @@ fun <T> Iterable<T>.indexOf(element: T): Int {
 }
 
 fun <T> Iterable<T>.indexOf(predicate: Predicate<T>): Int {
-    return this.indexOfFirstKt(predicate.toFunction())
+    return this.indexOfFirstKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.lastIndexOf(element: T): Int {
@@ -237,7 +226,7 @@ fun <T> Iterable<T>.lastIndexOf(element: T): Int {
 }
 
 fun <T> Iterable<T>.lastIndexOf(predicate: Predicate<T>): Int {
-    return this.indexOfLastKt(predicate.toFunction())
+    return this.indexOfLastKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.take(n: Int): List<T> {
@@ -245,7 +234,7 @@ fun <T> Iterable<T>.take(n: Int): List<T> {
 }
 
 fun <T> Iterable<T>.take(predicate: Predicate<T>): List<T> {
-    return this.takeWhileKt(predicate.toFunction())
+    return this.takeWhileKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.drop(n: Int): List<T> {
@@ -253,15 +242,15 @@ fun <T> Iterable<T>.drop(n: Int): List<T> {
 }
 
 fun <T> Iterable<T>.drop(predicate: Predicate<T>): List<T> {
-    return this.dropWhileKt(predicate.toFunction())
+    return this.dropWhileKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.filter(predicate: Predicate<T>): List<T> {
-    return this.filterKt(predicate.toFunction())
+    return this.filterKt(predicate.toKotlinFun())
 }
 
-inline fun <T> Iterable<T>.filterIndexed(predicate: (index: Int, T) -> Boolean): List<T> {
-    return this.filterIndexedKt(predicate)
+fun <T> Iterable<T>.filterIndexed(predicate: IndexPredicate<T>): List<T> {
+    return this.filterIndexedKt(predicate.toKotlinFun())
 }
 
 fun <T> Iterable<T>.filterNotNull(): List<T> {
@@ -269,14 +258,11 @@ fun <T> Iterable<T>.filterNotNull(): List<T> {
 }
 
 fun <T, C : MutableCollection<in T>> Iterable<T>.filterTo(destination: C, predicate: Predicate<T>): C {
-    return this.filterToKt(destination, predicate.toFunction())
+    return this.filterToKt(destination, predicate.toKotlinFun())
 }
 
-inline fun <T, C : MutableCollection<in T>> Iterable<T>.filterIndexedTo(
-    destination: C,
-    predicate: (index: Int, T) -> Boolean
-): C {
-    return this.filterIndexedToKt(destination, predicate)
+fun <T, C : MutableCollection<in T>> Iterable<T>.filterIndexedTo(destination: C, predicate: IndexPredicate<T>): C {
+    return this.filterIndexedToKt(destination, predicate.toKotlinFun())
 }
 
 fun <C : MutableCollection<in T>, T> Iterable<T>.filterNotNullTo(destination: C): C {
@@ -287,384 +273,298 @@ inline fun <T, R> Iterable<T>.map(transform: (T) -> R): List<R> {
     return this.mapKt(transform)
 }
 
-inline fun <T, R> Iterable<T>.mapIndexed(transform: (index: Int, T) -> R): List<R> {
-    return this.mapIndexedKt(transform)
+fun <T, R> Iterable<T>.mapIndexed(transform: IndexFunction<T, R>): List<R> {
+    return this.mapIndexedKt(transform.toKotlinFun())
 }
 
-inline fun <T, R : Any> Iterable<T>.mapNotNull(transform: (T) -> R?): List<R> {
-    return this.mapNotNullKt(transform)
+fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapTo(destination: C, transform: Function<T, R>): C {
+    return this.mapToKt(destination, transform.toKotlinFun())
 }
 
-inline fun <T, R : Any> Iterable<T>.mapIndexedNotNull(transform: (index: Int, T) -> R?): List<R> {
-    return this.mapIndexedNotNullKt(transform)
+fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapIndexedTo(destination: C, transform: IndexFunction<T, R>): C {
+    return this.mapIndexedToKt(destination, transform.toKotlinFun())
 }
 
-inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapTo(destination: C, transform: (T) -> R): C {
-    return this.mapToKt(destination, transform)
+fun <T, R> Iterable<T>.flatMap(transform: Function<T, Iterable<R>>): List<R> {
+    return this.flatMapKt(transform.toKotlinFun())
 }
 
-inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapIndexedTo(
-    destination: C,
-    transform: (index: Int, T) -> R
-): C {
-    return this.mapIndexedToKt(destination, transform)
+fun <T, R> Iterable<T>.flatMapIndexed(transform: IndexFunction<T, Iterable<R>>): List<R> {
+    return this.flatMapIndexedKt(transform.toKotlinFun())
 }
 
-inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapNotNullTo(
-    destination: C,
-    transform: (T) -> R?
-): C {
-    return this.mapNotNullToKt(destination, transform)
+fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapTo(destination: C, transform: Function<T, Iterable<R>>): C {
+    return this.flatMapToKt(destination, transform.toKotlinFun())
 }
 
-inline fun <T, R : Any, C : MutableCollection<in R>> Iterable<T>.mapIndexedNotNullTo(
-    destination: C,
-    transform: (index: Int, T) -> R?
-): C {
-    return this.mapIndexedNotNullToKt(destination, transform)
+fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapIndexedTo(destination: C, transform: IndexFunction<T, Iterable<R>>): C {
+    return this.flatMapIndexedToKt(destination, transform.toKotlinFun())
 }
 
-inline fun <T, R> Iterable<T>.flatMap(transform: (T) -> Iterable<R>): List<R> {
-    return this.flatMapKt(transform)
-}
-
-inline fun <T, R> Iterable<T>.flatMapIndexed(transform: (index: Int, T) -> Iterable<R>): List<R> {
-    return this.flatMapIndexedKt(transform)
-}
-
-inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapTo(
-    destination: C,
-    transform: (T) -> Iterable<R>
-): C {
-    return this.flatMapToKt(destination, transform)
-}
-
-inline fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapIndexedTo(
-    destination: C,
-    transform: (index: Int, T) -> Iterable<R>
-): C {
-    return this.flatMapIndexedToKt(destination, transform)
-}
-
-inline fun <T, K, V> Iterable<T>.associate(
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
+fun <T, K, V> Iterable<T>.toMap(
+    keySelector: Function<T, K>,
+    valueTransform: Function<T, V>
 ): Map<K, V> {
-    return this.associateByKt(keySelector, valueTransform)
+    return this.associateByKt(keySelector.toKotlinFun(), valueTransform.toKotlinFun())
 }
 
-inline fun <T, K, V> Iterable<T>.associate(transform: (T) -> Pair<K, V>): Map<K, V> {
-    return this.associateKt(transform)
+fun <T, K, V> Iterable<T>.toMap(transform: Function<T, Map.Entry<K, V>>): Map<K, V> {
+    return this.associateKt { transform.apply(it).toPair() }
 }
 
-inline fun <T, K> Iterable<T>.associateKeys(keySelector: (T) -> K): Map<K, T> {
-    return this.associateByKt(keySelector)
-}
-
-fun <T, K> Iterable<T>.associateKeys(keys: Iterable<K>): Map<K, T> {
-    return associateKeysTo(LinkedHashMap(), keys)
-}
-
-inline fun <T, V> Iterable<T>.associateValues(valueSelector: (T) -> V): Map<T, V> {
-    return this.associateWithKt(valueSelector)
-}
-
-fun <T, V> Iterable<T>.associateValues(values: Iterable<V>): Map<T, V> {
-    return associateValuesTo(LinkedHashMap(), values)
-}
-
-inline fun <T, K, V> Iterable<T>.associateWithNext(
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
+fun <T, K, V> Iterable<T>.toMapWithNext(
+    keySelector: Function<T, K>,
+    valueTransform: Function<T, V>
 ): Map<K, V> {
-    return associateWithNextTo(LinkedHashMap(), keySelector, valueTransform)
+    return toMapWithNext(LinkedHashMap(), keySelector, valueTransform)
 }
 
-inline fun <T, K, V> Iterable<T>.associateWithNext(transform: (T, T) -> Pair<K, V>): Map<K, V> {
-    return associateWithNextTo(LinkedHashMap(), transform)
+fun <T, K, V> Iterable<T>.toMapWithNext(transform: BiFunction<T, T, Map.Entry<K, V>>): Map<K, V> {
+    return toMapWithNext(LinkedHashMap(), transform)
 }
 
-inline fun <T, K, V> Iterable<T>.associatePairs(
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
+fun <T, K, V> Iterable<T>.toMapWithNext(
+    defaultValue: T,
+    keySelector: Function<T, K>,
+    valueTransform: Function<T, V>
 ): Map<K, V> {
-    return associatePairsTo(LinkedHashMap(), keySelector, valueTransform)
+    return toMapWithNext(LinkedHashMap(), defaultValue, keySelector, valueTransform)
 }
 
-inline fun <T, K, V> Iterable<T>.associatePairs(transform: (T, T) -> Pair<K, V>): Map<K, V> {
-    return associatePairsTo(LinkedHashMap(), transform)
-}
-
-inline fun <T, K, V> Iterable<T>.associatePairs(
-    complement: T,
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
+fun <T, K, V> Iterable<T>.toMapWithNext(
+    defaultValue: T,
+    transform: BiFunction<T, T, Map.Entry<K, V>>
 ): Map<K, V> {
-    return associatePairsTo(LinkedHashMap(), complement, keySelector, valueTransform)
+    return toMapWithNext(LinkedHashMap(), defaultValue, transform)
 }
 
-inline fun <T, K, V> Iterable<T>.associatePairs(
-    complement: T,
-    transform: (T, T) -> Pair<K, V>
-): Map<K, V> {
-    return associatePairsTo(LinkedHashMap(), complement, transform)
-}
-
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateTo(
+fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMap(
     destination: M,
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
+    keySelector: Function<T, K>,
+    valueTransform: Function<T, V>
 ): M {
-    return this.associateByToKt(destination, keySelector, valueTransform)
+    return this.associateByToKt(destination, keySelector.toKotlinFun(), valueTransform.toKotlinFun())
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateTo(
+fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMap(
     destination: M,
-    transform: (T) -> Pair<K, V>
+    transform: Function<T, Map.Entry<K, V>>
 ): M {
-    return this.associateToKt(destination, transform)
+    return this.associateToKt(destination) { transform.apply(it).toPair() }
 }
 
-inline fun <T, K, M : MutableMap<in K, in T>> Iterable<T>.associateKeysTo(
+fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
     destination: M,
-    keySelector: (T) -> K
-): M {
-    return this.associateByToKt(destination, keySelector)
-}
-
-fun <T, K, M : MutableMap<in K, in T>> Iterable<T>.associateKeysTo(
-    destination: M,
-    keys: Iterable<K>
-): M {
-    val values = this.iterator()
-    for (key in keys) {
-        if (!values.hasNext()) {
-            break
-        }
-        destination[key] = values.next()
-    }
-    return destination
-}
-
-inline fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValuesTo(
-    destination: M,
-    valueSelector: (T) -> V
-): M {
-    return this.associateWithToKt(destination, valueSelector)
-}
-
-fun <T, V, M : MutableMap<in T, in V>> Iterable<T>.associateValuesTo(
-    destination: M,
-    values: Iterable<V>
-): M {
-    val valueIterator = values.iterator()
-    for (key in this) {
-        if (!valueIterator.hasNext()) {
-            break
-        }
-        destination[key] = valueIterator.next()
-    }
-    return destination
-}
-
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
-    destination: M,
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
-): M {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return destination
-    var current = iterator.next()
-    while (iterator.hasNext()) {
-        val next = iterator.next()
-        val k = keySelector(current)
-        val v = valueTransform(next)
-        destination.put(k, v)
-        current = next
-    }
-    return destination
-}
-
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associateWithNextTo(
-    destination: M,
-    transform: (T, T) -> Pair<K, V>
-): M {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return destination
-    var current = iterator.next()
-    while (iterator.hasNext()) {
-        val next = iterator.next()
-        val pair = transform(current, next)
-        destination.put(pair.first, pair.second)
-        current = next
-    }
-    return destination
-}
-
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairsTo(
-    destination: M,
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
+    keySelector: Function<T, K>,
+    valueTransform: Function<T, V>
 ): M {
     val iterator = this.iterator()
     while (iterator.hasNext()) {
-        val ik = iterator.next()
-        if (iterator.hasNext()) {
-            val iv = iterator.next()
-            val k = keySelector(ik)
-            val v = valueTransform(iv)
-            destination.put(k, v)
-        } else {
-            break
+        val e1 = iterator.next()
+        if (!iterator.hasNext()) {
+            return destination
         }
+        val e2 = iterator.next()
+        val k = keySelector.apply(e1)
+        val v = valueTransform.apply(e2)
+        destination[k] = v
     }
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairsTo(
+fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
     destination: M,
-    transform: (T, T) -> Pair<K, V>
+    transform: BiFunction<T, T, Map.Entry<K, V>>
 ): M {
     val iterator = this.iterator()
     while (iterator.hasNext()) {
-        val ik = iterator.next()
-        if (iterator.hasNext()) {
-            val iv = iterator.next()
-            val pair = transform(ik, iv)
-            destination.put(pair.first, pair.second)
-        } else {
-            break
+        val e1 = iterator.next()
+        if (!iterator.hasNext()) {
+            return destination
         }
+        val e2 = iterator.next()
+        val entry = transform.apply(e1, e2)
+        destination[entry.key] = entry.value
     }
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairsTo(
+fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
     destination: M,
-    complement: T,
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
+    defaultValue: T,
+    keySelector: Function<T, K>,
+    valueTransform: Function<T, V>
 ): M {
     val iterator = this.iterator()
     while (iterator.hasNext()) {
-        val ik = iterator.next()
-        if (iterator.hasNext()) {
-            val iv = iterator.next()
-            val k = keySelector(ik)
-            val v = valueTransform(iv)
-            destination.put(k, v)
+        val e1 = iterator.next()
+        val e2 = if (iterator.hasNext()) {
+            iterator.next()
         } else {
-            val k = keySelector(ik)
-            val v = valueTransform(complement)
-            destination.put(k, v)
-            break
+            defaultValue
         }
+        val k = keySelector.apply(e1)
+        val v = valueTransform.apply(e2)
+        destination[k] = v
     }
     return destination
 }
 
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.associatePairsTo(
+fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
     destination: M,
-    complement: T,
-    transform: (T, T) -> Pair<K, V>
+    defaultValue: T,
+    transform: BiFunction<T, T, Map.Entry<K, V>>
 ): M {
     val iterator = this.iterator()
     while (iterator.hasNext()) {
-        val ik = iterator.next()
-        if (iterator.hasNext()) {
-            val iv = iterator.next()
-            val pair = transform(ik, iv)
-            destination.put(pair.first, pair.second)
+        val e1 = iterator.next()
+        val e2 = if (iterator.hasNext()) {
+            iterator.next()
         } else {
-            val pair = transform(ik, complement)
-            destination.put(pair.first, pair.second)
-            break
+            defaultValue
         }
+        val entry = transform.apply(e1, e2)
+        destination[entry.key] = entry.value
     }
     return destination
 }
 
-inline fun <T, K> Iterable<T>.groupBy(keySelector: (T) -> K): Map<K, List<T>> {
-    return this.groupByKt(keySelector)
+fun <T, K> Iterable<T>.groupBy(keySelector: Function<T, K>): Map<K, List<T>> {
+    return this.groupByKt(keySelector.toKotlinFun())
 }
 
-inline fun <T, K, V> Iterable<T>.groupBy(
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
+fun <T, K, V> Iterable<T>.groupBy(
+    keySelector: Function<T, K>,
+    valueTransform: Function<T, V>
 ): Map<K, List<V>> {
-    return this.groupByKt(keySelector, valueTransform)
+    return this.groupByKt(keySelector.toKotlinFun(), valueTransform.toKotlinFun())
 }
 
-inline fun <T, K, M : MutableMap<in K, MutableList<T>>> Iterable<T>.groupByTo(
+fun <T, K, M : MutableMap<in K, MutableList<T>>> Iterable<T>.groupByTo(
     destination: M,
-    keySelector: (T) -> K
+    keySelector: Function<T, K>
 ): M {
-    return this.groupByToKt(destination, keySelector)
+    return this.groupByToKt(destination, keySelector.toKotlinFun())
 }
 
-inline fun <T, K, V, M : MutableMap<in K, MutableList<V>>> Iterable<T>.groupByTo(
+fun <T, K, V, M : MutableMap<in K, MutableList<V>>> Iterable<T>.groupByTo(
     destination: M,
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
+    keySelector: Function<T, K>,
+    valueTransform: Function<T, V>
 ): M {
-    return this.groupByToKt(destination, keySelector, valueTransform)
+    return this.groupByToKt(destination, keySelector.toKotlinFun(), valueTransform.toKotlinFun())
 }
 
-inline fun <S, T : S> Iterable<T>.reduce(operation: (S, T) -> S): S {
-    return this.reduceKt(operation)
+fun <S, T : S> Iterable<T>.reduce(operation: BiFunction<S, T, S>): S {
+    return this.reduceKt(operation.toKotlinFun())
 }
 
-inline fun <S, T : S> Iterable<T>.reduceIndexed(operation: (index: Int, S, T) -> S): S {
-    return this.reduceIndexedKt(operation)
+fun <S, T : S> Iterable<T>.reduceIndexed(operation: IndexBiFunction<S, T, S>): S {
+    return this.reduceIndexedKt(operation.toKotlinFun())
 }
 
-inline fun <S, T : S> Iterable<T>.reduceOrNull(operation: (S, T) -> S): S? {
-    return this.reduceOrNullKt(operation)
+fun <S, T : S> Iterable<T>.reduceOrNull(operation: BiFunction<S, T, S>): S? {
+    return this.reduceOrNullKt(operation.toKotlinFun())
 }
 
-inline fun <S, T : S> Iterable<T>.reduceIndexedOrNull(operation: (index: Int, S, T) -> S): S? {
-    return this.reduceIndexedOrNullKt(operation)
+fun <S, T : S> Iterable<T>.reduceIndexedOrNull(operation: IndexBiFunction<S, T, S>): S? {
+    return this.reduceIndexedOrNullKt(operation.toKotlinFun())
 }
 
-inline fun <T, R> Iterable<T>.reduce(initial: R, operation: (R, T) -> R): R {
-    return this.foldKt(initial, operation)
+fun <T, R> Iterable<T>.reduce(initial: R, operation: BiFunction<R, T, R>): R {
+    return this.foldKt(initial, operation.toKotlinFun())
 }
 
-inline fun <T, R> Iterable<T>.reduceIndexed(initial: R, operation: (index: Int, R, T) -> R): R {
-    return this.foldIndexedKt(initial, operation)
+fun <T, R> Iterable<T>.reduceIndexed(initial: R, operation: IndexBiFunction<R, T, R>): R {
+    return this.foldIndexedKt(initial, operation.toKotlinFun())
 }
 
-inline fun <T, R, V> Iterable<T>.zip(other: Array<out R>, transform: (T, R) -> V): List<V> {
-    return this.zipKt(other, transform)
+fun <T, R, V> Iterable<T>.zip(other: Array<out R>, transform: BiFunction<T, R, V>): List<V> {
+    return this.zipKt(other, transform.toKotlinFun())
 }
 
-inline fun <T, R, V> Iterable<T>.zip(other: Iterable<R>, transform: (T, R) -> V): List<V> {
-    return this.zipKt(other, transform)
+fun <T, R, V> Iterable<T>.zip(other: Iterable<R>, transform: BiFunction<T, R, V>): List<V> {
+    return this.zipKt(other, transform.toKotlinFun())
 }
 
-inline fun <T, R> Iterable<T>.zipWithNext(transform: (T, T) -> R): List<R> {
-    return this.zipWithNextKt(transform)
+fun <T, R> Iterable<T>.zipWithNext(transform: BiFunction<T, T, R>): List<R> {
+    return this.zipWithNextKt(transform.toKotlinFun())
+}
+
+fun <K, V> Iterable<K>.zipMap(other: Array<out V>): Map<K, V> {
+    return zipMapTo(LinkedHashMap(), other)
+}
+
+fun <K, V> Iterable<K>.zipMap(other: Iterable<V>): Map<K, V> {
+    return zipMapTo(LinkedHashMap(), other)
+}
+
+fun <K, V> Iterable<K>.zipMap(other: Array<out V>, defaultKey: K, defaultValue: V): Map<K, V> {
+    return zipMapTo(LinkedHashMap(), other, defaultKey, defaultValue)
+}
+
+fun <K, V> Iterable<K>.zipMap(other: Iterable<V>, defaultKey: K, defaultValue: V): Map<K, V> {
+    return zipMapTo(LinkedHashMap(), other, defaultKey, defaultValue)
+}
+
+fun <K, V, M : MutableMap<in K, in V>> Iterable<K>.zipMapTo(destination: M, other: Array<out V>): M {
+    return zipMapTo(destination, other.asList())
+}
+
+fun <K, V, M : MutableMap<in K, in V>> Iterable<K>.zipMapTo(destination: M, other: Iterable<V>): M {
+    val itk = this.iterator()
+    val itv = other.iterator()
+    while (itk.hasNext()) {
+        if (itv.hasNext()) {
+            destination[itk.next()] = itv.next()
+        } else {
+            break
+        }
+    }
+    return destination
+}
+
+fun <K, V, M : MutableMap<in K, in V>> Iterable<K>.zipMapTo(destination: M, other: Array<out V>, defaultKey: K, defaultValue: V): M {
+    return zipMapTo(destination, other.asList(), defaultKey, defaultValue)
+}
+
+fun <K, V, M : MutableMap<in K, in V>> Iterable<K>.zipMapTo(destination: M, other: Iterable<V>, defaultKey: K, defaultValue: V): M {
+    val itk = this.iterator()
+    val itv = other.iterator()
+    while (itk.hasNext()) {
+        val k = itk.next()
+        val v = if (itv.hasNext()) {
+            itv.next()
+        } else {
+            defaultValue
+        }
+        destination[k] = v
+    }
+    while (itv.hasNext()) {
+        destination[defaultKey] = itv.next()
+    }
+    return destination
 }
 
 fun <T> Iterable<T>.chunked(size: Int): List<List<T>> {
     return this.chunkedKt(size)
 }
 
-fun <T, R> Iterable<T>.chunked(size: Int, transform: (List<T>) -> R): List<R> {
-    return this.chunkedKt(size, transform)
+fun <T, R> Iterable<T>.chunked(size: Int, transform: Function<List<T>, R>): List<R> {
+    return this.chunkedKt(size, transform.toKotlinFun())
 }
 
+@JvmOverloads
 fun <T> Iterable<T>.windowed(size: Int, step: Int = 1, partialWindows: Boolean = false): List<List<T>> {
     return this.windowedKt(size, step, partialWindows)
 }
 
-fun <T, R> Iterable<T>.windowed(
-    size: Int,
-    step: Int = 1,
-    partialWindows: Boolean = false,
-    transform: (List<T>) -> R
-): List<R> {
-    return this.windowedKt(size, step, partialWindows, transform)
+fun <T, R> Iterable<T>.windowed(size: Int, transform: Function<List<T>, R>): List<R> {
+    return this.windowedKt(size, 1, false, transform.toKotlinFun())
+}
+
+fun <T, R> Iterable<T>.windowed(size: Int, step: Int, partialWindows: Boolean, transform: Function<List<T>, R>): List<R> {
+    return this.windowedKt(size, step, partialWindows, transform.toKotlinFun())
 }
 
 fun <T> Iterable<T>.intersect(other: Iterable<T>): Set<T> {
@@ -683,8 +583,8 @@ fun <T> Iterable<T>.distinct(): List<T> {
     return this.distinctKt()
 }
 
-inline fun <T, K> Iterable<T>.distinct(selector: (T) -> K): List<T> {
-    return this.distinctByKt(selector)
+fun <T, K> Iterable<T>.distinct(selector: Function<T, K>): List<T> {
+    return this.distinctByKt(selector.toKotlinFun())
 }
 
 @JvmOverloads
@@ -704,8 +604,8 @@ fun <T> Iterable<T>.shuffled(random: Random): List<T> {
     return this.shuffledKt(random)
 }
 
-inline fun <T> Iterable<T>.forEach(action: (index: Int, T) -> Unit) {
-    return this.forEachIndexedKt(action)
+fun <T> Iterable<T>.forEachIndexed(action: IndexConsumer<T>) {
+    return this.forEachIndexedKt(action.toKotlinFun())
 }
 
 @JvmOverloads
@@ -726,86 +626,6 @@ fun <T> Iterable<T>.min(comparator: Comparator<in T> = castComparableComparator(
 @JvmOverloads
 fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T> = castComparableComparator()): T? {
     return this.minWithOrNullKt(comparator)
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.sumInt(selector: (T) -> Int = { it.toInt() }): Int {
-    return this.sumOfKt(selector)
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.sumLong(selector: (T) -> Long = { it.toLong() }): Long {
-    return this.sumOfKt(selector)
-}
-
-@JvmOverloads
-fun <T> Iterable<T>.sumDouble(selector: (T) -> Double = { it.toDouble() }): Double {
-    return this.sumOfKt(selector)
-}
-
-@JvmOverloads
-fun <T> Iterable<T>.sumBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
-    return this.sumOfKt(selector)
-}
-
-@JvmOverloads
-fun <T> Iterable<T>.sumBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
-    return this.sumOfKt(selector)
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.averageInt(selector: (T) -> Int = { it.toInt() }): Int {
-    var sum = 0
-    var count = 0
-    for (t in this) {
-        sum += selector(t)
-        count++
-    }
-    return if (count == 0) 0 else sum / count
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.averageLong(selector: (T) -> Long = { it.toLong() }): Long {
-    var sum = 0L
-    var count = 0
-    for (t in this) {
-        sum += selector(t)
-        count++
-    }
-    return if (count == 0) 0 else sum / count
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.averageDouble(selector: (T) -> Double = { it.toDouble() }): Double {
-    var sum = 0.0
-    var count = 0
-    for (t in this) {
-        sum += selector(t)
-        count++
-    }
-    return if (count == 0) 0.0 else sum / count
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.averageBigInteger(selector: (T) -> BigInteger = { it.toBigInteger() }): BigInteger {
-    var sum = BigInteger.ZERO
-    var count = 0
-    for (t in this) {
-        sum += selector(t)
-        count++
-    }
-    return if (count == 0) BigInteger.ZERO else sum / count.toBigInteger()
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.averageBigDecimal(selector: (T) -> BigDecimal = { it.toBigDecimal() }): BigDecimal {
-    var sum = BigDecimal.ZERO
-    var count = 0
-    for (t in this) {
-        sum += selector(t)
-        count++
-    }
-    return if (count == 0) BigDecimal.ZERO else sum / count.toBigDecimal()
 }
 
 fun <T, C : MutableCollection<in T>> Iterable<T>.toCollection(destination: C): C {
@@ -917,10 +737,6 @@ fun <T> Iterable<T>.toStream(parallel: Boolean = false): Stream<T> {
     return StreamSupport.stream(this.spliterator(), parallel)
 }
 
-fun <T> Iterable<T>.toSequence(): Sequence<T> {
-    return this.asSequenceKt()
-}
-
 inline fun <reified T> Iterable<T>.toTypedArray(): Array<T> {
     return asToCollection().toTypedArrayKt()
 }
@@ -929,101 +745,52 @@ fun <T> Iterable<T>.toArray(): Array<Any?> {
     return asToCollection().toTypedArrayKt()
 }
 
-fun <T> Iterable<T>.toArray(array: (size: Int) -> Array<T>): Array<T> {
-    val collection = asToCollection()
-    val result = array(collection.size)
-    return JavaCollects.toArray(collection, result)
+fun <T : R, R> Iterable<T>.toArray(type: Class<R>): Array<R> {
+    val set = asToCollection()
+    val array = type.newArray(set.size)
+    return toArray(array)
 }
 
-@JvmOverloads
-fun <T, R> Iterable<T>.toArray(componentType: Type, selector: ((T) -> R)? = null): Array<R> {
-    val collection = asToCollection()
-    val result = componentType.newArray<R>(collection.size)
-    if (selector !== null) {
-        collection.forEach { i, t -> result[i] = selector(t) }
-    } else {
-        collection.forEach { i, t -> result[i] = t.asTyped() }
+fun <T : R, R> Iterable<T>.toArray(array: Array<R>): Array<R> {
+    var i = 0
+    for (t in this) {
+        if (i < array.size) {
+            array[i] = t
+            i++
+        } else {
+            break
+        }
     }
-    return result
+    return array
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.toBooleanArray(selector: Predicate<T> = Predicate{ it.toBoolean() }): BooleanArray {
-    val collection = asToCollection()
-    val result = BooleanArray(collection.size)
-    collection.forEach { i, t -> result[i] = selector.test(t) }
-    return result
+fun <T, R> Iterable<T>.toArray(type: Class<R>, transform: Function<T, R>): Array<R> {
+    return toArray(type, transform.toKotlinFun())
 }
 
-@JvmOverloads
-inline fun <T> Iterable<T>.toByteArray(selector: (T) -> Byte = { it.toByte() }): ByteArray {
-    val collection = asToCollection()
-    val result = ByteArray(collection.size)
-    collection.forEach { i, t -> result[i] = selector(t) }
-    return result
+fun <T, R> Iterable<T>.toArray(array: Array<R>, transform: Function<T, R>): Array<R> {
+    return toArray(array, transform.toKotlinFun())
 }
 
-@JvmOverloads
-inline fun <T> Iterable<T>.toShortArray(selector: (T) -> Short = { it.toShort() }): ShortArray {
-    val collection = asToCollection()
-    val result = ShortArray(collection.size)
-    collection.forEach { i, t -> result[i] = selector(t) }
-    return result
+@JvmSynthetic
+inline fun <T, R> Iterable<T>.toArray(type: Class<R>, transform: (T) -> R): Array<R> {
+    val set = asToCollection()
+    val array = type.newArray(set.size)
+    return toArray(array, transform)
 }
 
-@JvmOverloads
-inline fun <T> Iterable<T>.toCharArray(selector: (T) -> Char = { it.toChar() }): CharArray {
-    val collection = asToCollection()
-    val result = CharArray(collection.size)
-    collection.forEach { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.toIntArray(selector: (T) -> Int = { it.toInt() }): IntArray {
-    val collection = asToCollection()
-    val result = IntArray(collection.size)
-    collection.forEach { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.toLongArray(selector: (T) -> Long = { it.toLong() }): LongArray {
-    val collection = asToCollection()
-    val result = LongArray(collection.size)
-    collection.forEach { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.toFloatArray(selector: (T) -> Float = { it.toFloat() }): FloatArray {
-    val collection = asToCollection()
-    val result = FloatArray(collection.size)
-    collection.forEach { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-inline fun <T> Iterable<T>.toDoubleArray(selector: (T) -> Double = { it.toDouble() }): DoubleArray {
-    val collection = asToCollection()
-    val result = DoubleArray(collection.size)
-    collection.forEach { i, t -> result[i] = selector(t) }
-    return result
-}
-
-@JvmOverloads
-fun <T, R, A> Iterable<T>.toAnyArray(componentType: Type, selector: ((T) -> R)? = null): A {
-    return when (componentType) {
-        Boolean::class.javaPrimitiveType -> this.toBooleanArray()
-        Byte::class.javaPrimitiveType -> this.toByteArray()
-        Short::class.javaPrimitiveType -> this.toShortArray()
-        Char::class.javaPrimitiveType -> this.toCharArray()
-        Int::class.javaPrimitiveType -> this.toIntArray()
-        Long::class.javaPrimitiveType -> this.toLongArray()
-        Float::class.javaPrimitiveType -> this.toFloatArray()
-        Double::class.javaPrimitiveType -> this.toDoubleArray()
-        else -> this.toArray(componentType, selector)
-    }.asTyped()
+@JvmSynthetic
+inline fun <T, R> Iterable<T>.toArray(array: Array<R>, transform: (T) -> R): Array<R> {
+    var i = 0
+    for (t in this) {
+        if (i < array.size) {
+            array[i] = transform(t)
+            i++
+        } else {
+            break
+        }
+    }
+    return array
 }
 
 fun <T> Iterable<T>.plus(element: T): List<T> {
@@ -1038,10 +805,6 @@ fun <T> Iterable<T>.plus(elements: Iterable<T>): List<T> {
     return this.plusKt(elements)
 }
 
-fun <T> Iterable<T>.plus(elements: Sequence<T>): List<T> {
-    return this.plusKt(elements)
-}
-
 fun <T> Iterable<T>.minus(element: T): List<T> {
     return this.minusKt(element)
 }
@@ -1051,10 +814,6 @@ fun <T> Iterable<T>.minus(elements: Array<out T>): List<T> {
 }
 
 fun <T> Iterable<T>.minus(elements: Iterable<T>): List<T> {
-    return this.minusKt(elements)
-}
-
-fun <T> Iterable<T>.minus(elements: Sequence<T>): List<T> {
     return this.minusKt(elements)
 }
 
@@ -1077,10 +836,6 @@ fun <T> Iterable<T>.plusBefore(index: Int, elements: Iterable<T>): List<T> {
     //return front.plusKt(elements).plusKt(back)
 }
 
-fun <T> Iterable<T>.plusBefore(index: Int, elements: Sequence<T>): List<T> {
-    return plusBefore(index, elements.toList())
-}
-
 fun <T> Iterable<T>.plusAfter(index: Int, element: T): List<T> {
     return plusAfter(index, listOf(element))
 }
@@ -1098,10 +853,6 @@ fun <T> Iterable<T>.plusAfter(index: Int, elements: Iterable<T>): List<T> {
     val back = list.subList(index + 1, list.size)
     return concatList(front, elements, back)
     //return front.plusKt(elements).plusKt(back)
-}
-
-fun <T> Iterable<T>.plusAfter(index: Int, elements: Sequence<T>): List<T> {
-    return plusAfter(index, elements.toList())
 }
 
 @JvmOverloads
@@ -1145,7 +896,7 @@ fun <T> MutableIterable<T>.removeFirst(n: Int): Boolean {
 }
 
 fun <T> MutableIterable<T>.removeAll(predicate: Predicate<T>): Boolean {
-    return this.removeAllKt(predicate.toFunction())
+    return this.removeAllKt(predicate.toKotlinFun())
 }
 
 fun <T> MutableCollection<T>.removeAll(elements: Array<out T>): Boolean {
@@ -1157,7 +908,7 @@ fun <T> MutableCollection<T>.removeAll(elements: Iterable<T>): Boolean {
 }
 
 fun <T> MutableIterable<T>.retainAll(predicate: Predicate<T>): Boolean {
-    return this.retainAllKt(predicate.toFunction())
+    return this.retainAllKt(predicate.toKotlinFun())
 }
 
 fun <T> MutableCollection<T>.retainAll(elements: Array<out T>): Boolean {
@@ -1195,8 +946,6 @@ fun <T> MutableCollection<T>.addAll(elements: Iterable<T>): Boolean {
 fun <T> MutableCollection<T>.addAll(elements: Sequence<T>): Boolean {
     return this.addAllKt(elements)
 }
-
-
 
 //Join to String:
 
@@ -1280,9 +1029,6 @@ fun <T> Iterator<T>.asIterable(): Iterable<T> {
 
 //Enumeration
 
-/**
- * For java.
- */
 fun <T> Enumeration<T>.asIterator(): Iterator<T> {
     return this.iterator()
 }
