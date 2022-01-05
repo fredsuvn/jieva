@@ -7,6 +7,7 @@ import xyz.srclab.common.base.Ref.Companion.referred
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Function
+import java.util.function.Supplier
 
 fun <T : Any> Optional<T>.toRef(): Ref<T> {
     return this.orElse(null).referred()
@@ -136,6 +137,11 @@ interface GetRef<T : Any> {
         return orNull() ?: value
     }
 
+    fun orElse(value: Supplier<T>): T {
+        return orNull() ?: value.get()
+    }
+
+    @JvmSynthetic
     fun orElse(value: () -> T): T {
         return orNull() ?: value()
     }
@@ -144,6 +150,11 @@ interface GetRef<T : Any> {
         return orNull() ?: value
     }
 
+    fun orNullableElse(value: Supplier<T?>): T? {
+        return orNull() ?: value.get()
+    }
+
+    @JvmSynthetic
     fun orNullableElse(value: () -> T?): T? {
         return orNull() ?: value()
     }

@@ -2,6 +2,8 @@
 
 package xyz.srclab.common.base
 
+import java.util.function.Supplier
+
 @Throws(NullPointerException::class)
 fun checkNotNull(expression: Boolean) {
     if (!expression) {
@@ -17,6 +19,14 @@ fun checkNotNull(expression: Boolean, message: CharSequence?) {
 }
 
 @Throws(NullPointerException::class)
+fun checkNotNull(expression: Boolean, message: Supplier<CharSequence?>) {
+    if (!expression) {
+        throw NullPointerException(message.get()?.toString())
+    }
+}
+
+@Throws(NullPointerException::class)
+@JvmSynthetic
 fun checkNotNull(expression: Boolean, message: () -> CharSequence?) {
     if (!expression) {
         throw NullPointerException(message()?.toString())
@@ -38,6 +48,14 @@ fun checkArgument(expression: Boolean, message: CharSequence?) {
 }
 
 @Throws(IllegalArgumentException::class)
+fun checkArgument(expression: Boolean, message: Supplier<CharSequence?>) {
+    if (!expression) {
+        throw IllegalArgumentException(message.get()?.toString())
+    }
+}
+
+@Throws(IllegalArgumentException::class)
+@JvmSynthetic
 fun checkArgument(expression: Boolean, message: () -> CharSequence?) {
     if (!expression) {
         throw IllegalArgumentException(message()?.toString())
@@ -59,6 +77,14 @@ fun checkState(expression: Boolean, message: CharSequence?) {
 }
 
 @Throws(IllegalStateException::class)
+fun checkState(expression: Boolean, message: Supplier<CharSequence?>) {
+    if (!expression) {
+        throw IllegalStateException(message.get()?.toString())
+    }
+}
+
+@Throws(IllegalStateException::class)
+@JvmSynthetic
 fun checkState(expression: Boolean, message: () -> CharSequence?) {
     if (!expression) {
         throw IllegalStateException(message()?.toString())
@@ -80,6 +106,14 @@ fun checkSupported(expression: Boolean, message: CharSequence?) {
 }
 
 @Throws(UnsupportedOperationException::class)
+fun checkSupported(expression: Boolean, message: Supplier<CharSequence?>) {
+    if (!expression) {
+        throw UnsupportedOperationException(message.get()?.toString())
+    }
+}
+
+@Throws(UnsupportedOperationException::class)
+@JvmSynthetic
 fun checkSupported(expression: Boolean, message: () -> CharSequence?) {
     if (!expression) {
         throw UnsupportedOperationException(message()?.toString())
@@ -101,6 +135,14 @@ fun checkElement(expression: Boolean, message: CharSequence?) {
 }
 
 @Throws(NoSuchElementException::class)
+fun checkElement(expression: Boolean, message: Supplier<CharSequence?>) {
+    if (!expression) {
+        throw NoSuchElementException(message.get()?.toString())
+    }
+}
+
+@Throws(NoSuchElementException::class)
+@JvmSynthetic
 fun checkElement(expression: Boolean, message: () -> CharSequence?) {
     if (!expression) {
         throw NoSuchElementException(message()?.toString())
@@ -122,6 +164,14 @@ fun checkInBounds(expression: Boolean, message: CharSequence?) {
 }
 
 @Throws(IndexOutOfBoundsException::class)
+fun checkInBounds(expression: Boolean, message: Supplier<CharSequence?>) {
+    if (!expression) {
+        throw IndexOutOfBoundsException(message.get()?.toString())
+    }
+}
+
+@Throws(IndexOutOfBoundsException::class)
+@JvmSynthetic
 fun checkInBounds(expression: Boolean, message: () -> CharSequence?) {
     if (!expression) {
         throw IndexOutOfBoundsException(message()?.toString())

@@ -7,6 +7,30 @@ import java.util.concurrent.Callable
 import java.util.function.*
 import java.util.function.Function
 
+@FunctionalInterface
+interface IndexPredicate<T> {
+
+    fun test(index: Int, t: T): Boolean
+}
+
+@FunctionalInterface
+interface IndexFunction<T, R> {
+
+    fun apply(index: Int, t: T): R
+}
+
+@FunctionalInterface
+interface IndexBiFunction<T, U, R> {
+
+    fun apply(index: Int, t: T, u: U): R
+}
+
+@FunctionalInterface
+interface IndexConsumer<T> {
+
+    fun accept(index: Int, t: T)
+}
+
 fun <T> Supplier<T>.toKotlinFun(): (() -> T) = {
     this.get()
 }
@@ -190,28 +214,4 @@ enum class ThreadSafePolicy {
      * Copy-on-write.
      */
     COPY_ON_WRITE,
-}
-
-@FunctionalInterface
-interface IndexPredicate<T> {
-
-    fun test(index: Int, t: T): Boolean
-}
-
-@FunctionalInterface
-interface IndexFunction<T, R> {
-
-    fun apply(index: Int, t: T): R
-}
-
-@FunctionalInterface
-interface IndexBiFunction<T, U, R> {
-
-    fun apply(index: Int, t: T, u: U): R
-}
-
-@FunctionalInterface
-interface IndexConsumer<T> {
-
-    fun accept(index: Int, t: T)
 }

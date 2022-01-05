@@ -36,24 +36,6 @@ fun sleep(duration: Duration) {
  * * Then from next element continue to find first element as `caller` of which invoking result is `1`;
  * * Return `caller` element.
  *
- * Note if stack trace elements of current thread is null,
- * or index of `caller` is out of bounds, return null.
- */
-fun callerStackTraceOrNull(
-    filter: (StackTraceElement, findCalled: Boolean) -> Int
-): StackTraceElement? {
-    return callerStackTraceOrNull(0, filter)
-}
-
-/**
- * Try to find caller stack trace element, usually used in logging.
- *
- * This function invokes [filter] for each stack trace element of current [Thread.getStackTrace], and:
- *
- * * Find first element as `called` of which invoking result is `0`;
- * * Then from next element continue to find first element as `caller` of which invoking result is `1`;
- * * Return `caller` element.
- *
  * Note second parameter (boolean type) indicates whether `called` element has found.
  *
  * Note if stack trace elements of current thread is null,
@@ -72,16 +54,16 @@ fun callerStackTraceOrNull(
  *
  * * Find first element as `called` of which invoking result is `0`;
  * * Then from next element continue to find first element as `caller` of which invoking result is `1`;
- * * Return element of which index is ([offset] + index of `caller` element).
+ * * Return `caller` element.
  *
  * Note if stack trace elements of current thread is null,
  * or index of `caller` is out of bounds, return null.
  */
+@JvmSynthetic
 fun callerStackTraceOrNull(
-    offset: Int,
     filter: (StackTraceElement, findCalled: Boolean) -> Int
 ): StackTraceElement? {
-    return callerStackTraceOrNull(offset, filter.toFunction())
+    return callerStackTraceOrNull(0, filter)
 }
 
 /**
@@ -122,4 +104,24 @@ fun callerStackTraceOrNull(
         }
     }
     return null
+}
+
+/**
+ * Try to find caller stack trace element, usually used in logging.
+ *
+ * This function invokes [filter] for each stack trace element of current [Thread.getStackTrace], and:
+ *
+ * * Find first element as `called` of which invoking result is `0`;
+ * * Then from next element continue to find first element as `caller` of which invoking result is `1`;
+ * * Return element of which index is ([offset] + index of `caller` element).
+ *
+ * Note if stack trace elements of current thread is null,
+ * or index of `caller` is out of bounds, return null.
+ */
+@JvmSynthetic
+fun callerStackTraceOrNull(
+    offset: Int,
+    filter: (StackTraceElement, findCalled: Boolean) -> Int
+): StackTraceElement? {
+    return callerStackTraceOrNull(offset, filter.toFunction())
 }
