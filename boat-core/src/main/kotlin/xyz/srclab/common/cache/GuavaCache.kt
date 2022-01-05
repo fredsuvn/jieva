@@ -1,102 +1,57 @@
 package xyz.srclab.common.cache
 
-import java.time.Duration
+import java.util.function.Function
 
+/**
+ * [Cache] based on [google guava](https://github.com/google/guava).
+ *
+ * `null` value is not permitted.
+ */
 open class GuavaCache<K : Any, V : Any>(
     private val guava: com.google.common.cache.Cache<K, V>
 ) : Cache<K, V> {
 
-    override fun getOrNull(key: K): V? {
-        return guava.getIfPresent(key)
-    }
-
-    override fun getOrElse(key: K, defaultValue: V): V {
-        val value = getOrNull(key)
-        return value ?: defaultValue
-    }
-
-    override fun getOrElse(key: K, defaultValue: (K) -> V): V {
-        val value = getOrNull(key)
-        return value ?: defaultValue(key)
-    }
-
-    override fun getOrLoad(key: K, loader: (K) -> V): V {
-        return guava.get(key) { loader(key) }
-    }
-
-    override fun getPresent(keys: Iterable<K>): Map<K, V> {
+    override fun getAllPresent(keys: Iterable<K>): Map<K, V> {
         return guava.getAllPresent(keys)
     }
 
-    override fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
-        val resultMap = LinkedHashMap(guava.getAllPresent(keys))
-        val restKeys = keys.minus(resultMap.keys)
-        val newValues = loader(restKeys)
-        for (restKey in restKeys) {
-            resultMap[restKey] = guava.get(restKey) {
-                newValues[restKey]
-            }
+    override fun getOrLoadAll(keys: Iterable<K>, loader: Function<in Iterable<K>, Map<K, V>>): Map<K, V> {
+        val present = guava.getAllPresent(keys)
+        val remaining = keys.minus(present.keys)
+        if (remaining.isEmpty()) {
+            return present
         }
-        return resultMap
+        val loaded = loader.apply(remaining)
+        return present.plus(loaded)
     }
 
-    override fun put(key: K, value: V) {
-        guava.put(key, value)
-    }
-
-    override fun put(key: K, value: V, expirySeconds: Long) {
-        put(key, value)
-    }
-
-    override fun put(key: K, value: V, expiry: Duration) {
-        put(key, value)
-    }
-
-    override fun putAll(entries: Map<out K, V>) {
-        guava.putAll(entries)
-    }
-
-    override fun putAll(entries: Map<out K, V>, expirySeconds: Long) {
-        putAll(entries)
-    }
-
-    override fun putAll(entries: Map<out K, V>, expiry: Duration) {
-        putAll(entries)
-    }
-
-    override fun expiry(key: K, expirySeconds: Long) {
-    }
-
-    override fun expiry(key: K, expiry: Duration) {
-    }
-
-    override fun expiryAll(keys: Iterable<K>, expirySeconds: Long) {
-    }
-
-    override fun expiryAll(keys: Iterable<K>, expiry: Duration) {
-    }
-
-    override fun invalidate(key: K) {
-        guava.invalidate(key)
-    }
-
-    override fun invalidateAll(keys: Iterable<K>) {
-        guava.invalidateAll(keys)
-    }
-
-    override fun invalidateAll() {
-        guava.invalidateAll()
+    override fun getOrLoadAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
+        val present = guava.getAllPresent(keys)
+        val remaining = keys.minus(present.keys)
+        if (remaining.isEmpty()) {
+            return present
+        }
+        val loaded = loader(remaining)
+        return present.plus(loaded)
     }
 
     override fun cleanUp() {
         guava.cleanUp()
     }
+
+    override fun asMap(): MutableMap<K, V> {
+        return guava.asMap()
+    }
 }
 
-class GuavaLoadingCache<K : Any, V : Any>(
+/**
+ * [Cache] based on loading [google guava](https://github.com/google/guava).
+ *
+ * `null` value is not permitted.
+ */
+open class GuavaLoadingCache<K : Any, V : Any>(
     private val guava: com.google.common.cache.LoadingCache<K, V>
-) :
-    GuavaCache<K, V>(guava) {
+) : GuavaCache<K, V>(guava) {
 
     override fun get(key: K): V {
         return guava.get(key)

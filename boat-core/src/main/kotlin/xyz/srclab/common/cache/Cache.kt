@@ -3,17 +3,22 @@ package xyz.srclab.common.cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.cache.RemovalListener
 import com.google.common.collect.MapMaker
-import xyz.srclab.common.base.CacheableBuilder
+import xyz.srclab.annotations.concurrent.ThreadSafe
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.availableProcessors
+import xyz.srclab.common.base.toFunction
+import xyz.srclab.common.base.toKotlinFun
 import java.time.Duration
+import java.util.*
+import java.util.function.Function
+import java.util.function.Supplier
 import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
 import com.google.common.cache.RemovalCause as guavaRemovalCause
 
 /**
  * Cache interface.
  *
- * Note [V] doesn't support `null` value.
+ * Note whether [V] permit `null` is depend on implementation.
  *
  * @see GuavaCache
  * @see GuavaLoadingCache
@@ -21,78 +26,145 @@ import com.google.common.cache.RemovalCause as guavaRemovalCause
  * @see CaffeineLoadingCache
  * @see MapCache
  */
-interface Cache<K : Any, V : Any> {
+@ThreadSafe
+interface Cache<K : Any, V> {
 
-    /**
-     * Gets or throws from cache.
-     */
-    @Throws(NoSuchElementException::class)
-    fun get(key: K): V {
-        return getOrNull(key) ?: throw NoSuchElementException(key.toString())
+    @Throws(NullPointerException::class)
+    operator fun get(key: K): V {
+        return getOrNull(key) ?: throw NullPointerException("Value of key is not found or null: $key")
+    }
+
+    fun getOrNull(key: K): V? {
+        return asMap()[key]
+    }
+
+    fun getOrDefault(key: K, defaultValue: V): V {
+        return asMap().getOrDefault(key, defaultValue)
+    }
+
+    fun getOrElse(key: K, value: Supplier<V>): V {
+        return asMap().getOrElse(key) { value.get() }
+    }
+
+    @JvmSynthetic
+    fun getOrElse(key: K, value: () -> V): V {
+        return asMap().getOrElse(key, value)
     }
 
     /**
-     * Gets or returns null if not found from cache.
+     * If value is not found, [loader] will be called and result will be put.
+     *
+     * Note `null` may be a valid value.
      */
-    fun getOrNull(key: K): V?
+    fun getOrLoad(key: K, loader: Function<in K, V>): V {
+        return asMap().computeIfAbsent(key, loader)
+    }
 
     /**
-     * Gets or returns [defaultValue] if not found from cache.
+     * If value is not found, [loader] will be called and result will be put.
+     *
+     * Note `null` may be a valid value.
      */
-    fun getOrElse(key: K, defaultValue: V): V
+    @JvmSynthetic
+    fun getOrLoad(key: K, loader: (K) -> V): V {
+        return asMap().computeIfAbsent(key, loader)
+    }
 
-    /**
-     * Gets or returns [defaultValue] if not found from cache.
-     */
-    fun getOrElse(key: K, defaultValue: (K) -> V): V
-
-    /**
-     * Gets or load then returns if not found from cache.
-     */
-    fun getOrLoad(key: K, loader: (K) -> V): V
-
-    /**
-     * Returns a map of the values associated with the present keys from cache.
-     */
-    fun getPresent(keys: Iterable<K>): Map<K, V>
+    fun getAllPresent(keys: Iterable<K>): Map<K, V> {
+        val result = LinkedHashMap<K, V>()
+        for (key in keys) {
+            val v = getOrNull(key)
+            if (v !== null) {
+                result[key] = v
+            }
+        }
+        return result
+    }
 
     /**
      * Returns a map of the values associated with the keys, creating or retrieving those values if necessary.
      */
-    fun getAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V>
+    fun getOrLoadAll(keys: Iterable<K>, loader: Function<in Iterable<K>, Map<K, V>>): Map<K, V> {
+        val result = LinkedHashMap<K, V>()
+        val notFound = LinkedList<K>()
+        for (key in keys) {
+            val v = getOrNull(key)
+            if (v !== null) {
+                result[key] = v
+            } else {
+                notFound.add(key)
+            }
+        }
+        if (notFound.isNotEmpty()) {
+            result.putAll(loader.apply(notFound))
+        }
+        return result
+    }
 
-    fun put(key: K, value: V)
+    /**
+     * Returns a map of the values associated with the keys, creating or retrieving those values if necessary.
+     */
+    @JvmSynthetic
+    fun getOrLoadAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
+        return getOrLoadAll(keys, loader.toFunction())
+    }
 
-    fun put(key: K, value: V, expirySeconds: Long)
+    fun put(key: K, value: V) {
+        asMap()[key] = value
+    }
 
-    fun put(key: K, value: V, expiry: Duration)
+    fun put(key: K, value: V, expirySecond: Long) {
+        put(key, value)
+    }
 
-    fun putAll(entries: Map<out K, V>)
+    fun put(key: K, value: V, expiry: Duration) {
+        put(key, value)
+    }
 
-    fun putAll(entries: Map<out K, V>, expirySeconds: Long)
+    fun putAll(entries: Map<out K, V>) {
+        for (entry in entries) {
+            put(entry.key, entry.value)
+        }
+    }
 
-    fun putAll(entries: Map<out K, V>, expiry: Duration)
+    fun putAll(entries: Map<out K, V>, expirySecond: Long) {
+        putAll(entries)
+    }
 
-    fun expiry(key: K, expirySeconds: Long)
+    fun putAll(entries: Map<out K, V>, expiry: Duration) {
+        putAll(entries)
+    }
 
-    fun expiry(key: K, expiry: Duration)
+    fun expire(key: K, expirySecond: Long) {}
 
-    fun expiryAll(keys: Iterable<K>, expirySeconds: Long)
+    fun expire(key: K, expiry: Duration) {}
 
-    fun expiryAll(keys: Iterable<K>, expiry: Duration)
+    fun expireAll(keys: Iterable<K>, expirySecond: Long) {}
 
-    fun invalidate(key: K)
+    fun expireAll(keys: Iterable<K>, expiry: Duration) {}
 
-    fun invalidateAll(keys: Iterable<K>)
+    fun remove(key: K) {
+        asMap().remove(key)
+    }
 
-    fun invalidateAll()
+    fun removeAll(keys: Iterable<K>) {
+        for (key in keys) {
+            remove(key)
+        }
+    }
+
+    fun removeAll() {
+        asMap().clear()
+    }
 
     fun cleanUp()
+
+    fun asMap(): MutableMap<K, V>
 
     /**
      * To build a [Cache] instance with [CaffeineCache] or [GuavaCache].
      */
-    class Builder<K : Any, V : Any> : CacheableBuilder<Cache<K, V>>() {
+    class Builder<K : Any, V : Any> {
 
         private var initialCapacity: Int? = null
         private var maxSize: Long? = null
@@ -107,82 +179,63 @@ interface Cache<K : Any, V : Any> {
         private var removeListener: CacheRemoveListener<in K, in V>? = null
         private var useGuava = false
 
-        fun initialCapacity(initialCapacity: Int): Builder<K, V> {
+        fun initialCapacity(initialCapacity: Int): Builder<K, V> = apply {
             this.initialCapacity = initialCapacity
-            this.commit()
-            return this
         }
 
-        fun maxSize(maxSize: Long): Builder<K, V> {
+        fun maxSize(maxSize: Long): Builder<K, V> = apply {
             this.maxSize = maxSize
-            this.commit()
-            return this
         }
 
-        fun concurrencyLevel(concurrencyLevel: Int): Builder<K, V> {
+        fun concurrencyLevel(concurrencyLevel: Int): Builder<K, V> = apply {
             this.concurrencyLevel = concurrencyLevel
-            this.commit()
-            return this
         }
 
-        fun expireAfterAccess(expireAfterAccess: Duration): Builder<K, V> {
+        fun expireAfterAccess(expireAfterAccess: Duration): Builder<K, V> = apply {
             this.expireAfterAccess = expireAfterAccess
-            this.commit()
-            return this
         }
 
-        fun expireAfterWrite(expireAfterWrite: Duration): Builder<K, V> {
+        fun expireAfterWrite(expireAfterWrite: Duration): Builder<K, V> = apply {
             this.expireAfterWrite = expireAfterWrite
-            this.commit()
-            return this
         }
 
-        fun refreshAfterWrite(refreshAfterWrite: Duration): Builder<K, V> {
+        fun refreshAfterWrite(refreshAfterWrite: Duration): Builder<K, V> = apply {
             this.refreshAfterWrite = refreshAfterWrite
-            this.commit()
-            return this
         }
 
-        fun loader(loader: ((K) -> V)): Builder<K, V> {
+        fun loader(loader: Function<in K, V>): Builder<K, V> = apply {
+            this.loader = loader.toKotlinFun()
+        }
+
+        @JvmSynthetic
+        fun loader(loader: ((K) -> V)): Builder<K, V> = apply {
             this.loader = loader
-            this.commit()
-            return this
         }
 
-        fun createListener(createListener: CacheCreateListener<in K, in V>): Builder<K, V> {
+        fun createListener(createListener: CacheCreateListener<in K, in V>): Builder<K, V> = apply {
             this.createListener = createListener
-            this.commit()
-            return this
         }
 
-        fun readListener(readListener: CacheReadListener<in K, in V>): Builder<K, V> {
+        fun readListener(readListener: CacheReadListener<in K, in V>): Builder<K, V> = apply {
             this.readListener = readListener
-            this.commit()
-            return this
         }
 
-        fun updateListener(updateListener: CacheUpdateListener<in K, in V>): Builder<K, V> {
+        fun updateListener(updateListener: CacheUpdateListener<in K, in V>): Builder<K, V> = apply {
             this.updateListener = updateListener
-            this.commit()
-            return this
         }
 
-        fun removeListener(removeListener: CacheRemoveListener<in K, in V>): Builder<K, V> {
+        fun removeListener(removeListener: CacheRemoveListener<in K, in V>): Builder<K, V> = apply {
             this.removeListener = removeListener
-            this.commit()
-            return this
         }
 
         /**
          * By default, this builder will use [CaffeineCache]. If set [useGuava] to true, use [GuavaCache].
          */
-        fun useGuava(useGuava: Boolean): Builder<K, V> {
+        fun useGuava(useGuava: Boolean): Builder<K, V> = apply {
             this.useGuava = useGuava
-            this.commit()
-            return this
         }
 
-        override fun buildNew(): Cache<K, V> {
+        fun build(): Cache<K, V> {
             val params = Params(
                 initialCapacity,
                 maxSize,
@@ -311,6 +364,12 @@ interface Cache<K : Any, V : Any> {
             return Builder()
         }
 
+        @JvmName("ofMap")
+        @JvmStatic
+        fun <K : Any, V> MutableMap<K, V>.toCache(): Cache<K, V> {
+            return MapCache(this)
+        }
+
         /**
          * Return a Cache by `Weak Reference Map`.
          *
@@ -322,14 +381,8 @@ interface Cache<K : Any, V : Any> {
          */
         @JvmOverloads
         @JvmStatic
-        fun <K : Any, V : Any> weakCache(concurrencyLevel: Int = availableProcessors() * 2): Cache<K, V> {
-            return MapCache(MapMaker().concurrencyLevel(concurrencyLevel).weakValues().makeMap())
-        }
-
-        @JvmName("ofMap")
-        @JvmStatic
-        fun <K : Any, V : Any> MutableMap<K, V>.toCache(): Cache<K, V> {
-            return MapCache(this)
+        fun <K : Any, V> ofWeak(concurrencyLevel: Int = availableProcessors() * 2): Cache<K, V> {
+            return MapMaker().concurrencyLevel(concurrencyLevel).weakValues().makeMap<K, V>().toCache()
         }
     }
 }
