@@ -2,62 +2,51 @@ package xyz.srclab.common.exception
 
 import xyz.srclab.common.status.Status
 import xyz.srclab.common.status.StringStatus
+import xyz.srclab.common.status.statusToString
 
 /**
- * Exception implementation with [Status].
+ * Exception implementation with [Status] and [StringStatus].
  *
  * @see Status
  * @see StringStatus
  */
 open class StatusException @JvmOverloads constructor(
-    private val status: Status<String, String>,
+    override val code: String,
+    override val description: String? = null,
     cause: Throwable? = null
-) : RuntimeException(
-    status.toString(), cause
-), Status<String, String> {
+) : RuntimeException(statusToString(code, description), cause), Status<String, String, StringStatus> {
 
     constructor() : this(INTERNAL_STATUS)
+
+    @JvmOverloads
+    constructor(status: Status<String, String, StringStatus>, cause: Throwable? = null) : this(
+        status.code,
+        status.description,
+        cause
+    )
 
     constructor(cause: Throwable?) : this(
         INTERNAL_STATUS,
         cause
     )
 
-    constructor(message: String?) : this(
-        INTERNAL_STATUS.withNewDescription(message)
-    )
-
-    constructor(message: String?, cause: Throwable?) : this(
-        INTERNAL_STATUS.withNewDescription(message),
-        cause
-    )
-
-    constructor(code: String, description: String?, cause: Throwable?) : this(
-        StringStatus(code, description),
-        cause
-    )
-
-    override val code: String = status.code
-    override val description: String? = status.description
-    override val descriptions: List<String> = status.descriptions
-
-    override fun withMoreDescriptions(additions: Iterable<String>): Status<String, String> {
-        return status.withMoreDescriptions(additions)
+    override fun withMoreDescription(addition: String): StringStatus {
+        return StringStatus(code, "$description[$addition]")
     }
 
-    override fun withNewDescriptions(descriptions: Iterable<String>): Status<String, String> {
-        return status.withNewDescriptions(descriptions)
+    override fun withNewDescription(description: String?): StringStatus {
+        return StringStatus(code, description)
     }
 
     companion object {
 
         @JvmField
-        val INTERNAL_STATUS = StringStatus("B-99999", "Internal Error")
+        val INTERNAL_STATUS = StringStatus("B0999000", "Internal Error")
 
         @JvmField
-        val UNKNOWN_STATUS = StringStatus("B-99998", "Unknown Error")
+        val UNKNOWN_STATUS = StringStatus("B0999999", "Unknown Error")
 
         @JvmField
-        val IMPOSSIBLE_STATUS = StringStatus("B-99997", "WTF??... That's IMPOSSIBLE!!")
+        val IMPOSSIBLE_STATUS = StringStatus("B0999666", "WTF??... That's IMPOSSIBLE!!")
     }
 }
