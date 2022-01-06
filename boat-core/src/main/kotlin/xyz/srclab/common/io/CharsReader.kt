@@ -25,11 +25,7 @@ open class CharsReader(
         }
         val cur = source[pos]
         pos++
-        return cur.toInt()
-    }
-
-    override fun read(b: CharArray): Int {
-        return read(b, 0, b.size)
+        return cur.code
     }
 
     override fun read(b: CharArray, off: Int, len: Int): Int {

@@ -25,11 +25,8 @@ open class CharsWriter(
         pos++
     }
 
-    override fun write(b: CharArray) {
-        write(b, 0, b.size)
-    }
-
     override fun write(b: CharArray, off: Int, len: Int) {
+        checkRangeInBounds(off, off + len, 0, b.size)
         val nextPos = pos + len
         (nextPos - 1).checkIndexInBounds(offset, offset + length)
         System.arraycopy(b, off, destination, pos, len)

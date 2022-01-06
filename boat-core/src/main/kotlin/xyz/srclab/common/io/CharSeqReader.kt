@@ -2,6 +2,7 @@ package xyz.srclab.common.io
 
 import xyz.srclab.common.base.checkRangeInBounds
 import java.io.Reader
+import kotlin.math.min
 
 /**
  * Makes [CharSequence] as source of [Reader].
@@ -25,11 +26,7 @@ open class CharSeqReader<T : CharSequence>(
         }
         val cur = source[pos]
         pos++
-        return cur.toInt()
-    }
-
-    override fun read(b: CharArray): Int {
-        return read(b, 0, b.size)
+        return cur.code
     }
 
     override fun read(b: CharArray, off: Int, len: Int): Int {
@@ -38,13 +35,14 @@ open class CharSeqReader<T : CharSequence>(
             return -1
         }
         val remaining = offset + length - pos
-        return if (remaining <= len) {
-            System.arraycopy(source, pos, b, off, remaining)
-            remaining
-        } else {
-            System.arraycopy(source, pos, b, off, len)
-            len
+        val result = min(remaining, len)
+        var i = 0
+        while (i < result) {
+            b[off + i] = source[pos + i]
+            i++
         }
+        pos += result
+        return result
     }
 
     override fun close() {

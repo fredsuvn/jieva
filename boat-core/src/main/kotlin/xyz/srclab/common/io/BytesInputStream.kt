@@ -29,10 +29,6 @@ open class BytesInputStream(
         return cur.toUnsignedInt()
     }
 
-    override fun read(b: ByteArray): Int {
-        return read(b, 0, b.size)
-    }
-
     override fun read(b: ByteArray, off: Int, len: Int): Int {
         checkRangeInBounds(off, off + len, 0, b.size)
         if (pos >= offset + length) {

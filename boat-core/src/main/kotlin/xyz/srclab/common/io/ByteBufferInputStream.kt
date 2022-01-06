@@ -1,6 +1,5 @@
 package xyz.srclab.common.io
 
-import xyz.srclab.common.base.checkRangeInBounds
 import xyz.srclab.common.base.toUnsignedInt
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -24,7 +23,6 @@ open class ByteBufferInputStream(
     }
 
     override fun read(b: ByteArray, off: Int, len: Int): Int {
-        checkRangeInBounds(off, off + len, 0, b.size)
         val remaining = source.remaining()
         if (remaining == 0) {
             return -1

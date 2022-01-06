@@ -1,5 +1,6 @@
 package xyz.srclab.common.io
 
+import xyz.srclab.common.base.checkRangeInBounds
 import java.io.Writer
 
 /**
@@ -13,11 +14,8 @@ open class AppendableWriter<T : Appendable>(
         destination.append(b.toChar())
     }
 
-    override fun write(b: CharArray) {
-        write(b, 0, b.size)
-    }
-
     override fun write(b: CharArray, off: Int, len: Int) {
+        checkRangeInBounds(off, off + len, 0, b.size)
         var i = off
         while (i < off + len) {
             destination.append(b[i])

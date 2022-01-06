@@ -167,11 +167,11 @@ fun <T : Appendable> T.toWriter(): AppendableWriter<T> {
     return AppendableWriter(this)
 }
 
-fun ByteBuffer.toInputStream(): InputStream {
+fun ByteBuffer.toInputStream(): ByteBufferInputStream {
     return ByteBufferInputStream(this)
 }
 
-fun ByteBuffer.toOutputStream(): OutputStream {
+fun ByteBuffer.toOutputStream(): ByteBufferOutputStream {
     return ByteBufferOutputStream(this)
 }
 
@@ -197,4 +197,14 @@ fun URL.toFile(): File {
             File(it)
         }
     }
+}
+
+fun RandomAccessFile.toInputStream(
+    offset: Long = 0, length: Long = remainingLength(this.length(), offset)): RandomInputStream {
+    return RandomInputStream(this, offset, length)
+}
+
+fun RandomAccessFile.toOutputStream(
+    offset: Long = 0, length: Long = remainingLength(this.length(), offset)): RandomOutputStream {
+    return RandomOutputStream(this, offset, length)
 }
