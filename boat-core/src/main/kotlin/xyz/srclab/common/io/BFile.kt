@@ -2,20 +2,42 @@
 
 package xyz.srclab.common.io
 
+import xyz.srclab.common.collect.toTypedArray
 import java.io.File
-import java.io.FileInputStream
+import java.io.InputStream
+import java.io.OutputStream
 import java.io.RandomAccessFile
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
-import java.nio.file.Files
-import java.nio.file.OpenOption
+import java.nio.file.*
+import java.nio.file.attribute.FileAttribute
 
-fun CharSequence.openFileInputStream(): FileInputStream {
-    return FileInputStream(this.toString())
+fun CharSequence.toPath(): Path {
+    return Paths.get(this.toString())
 }
 
-fun File.openStream(): FileInputStream {
-    return this.inputStream()
+fun CharSequence.openInputStream(): InputStream {
+    return this.toPath().openInputStream()
+}
+
+fun File.openInputStream(): InputStream {
+    return this.toPath().openInputStream()
+}
+
+fun Path.openInputStream(): InputStream {
+    return Files.newInputStream(this)
+}
+
+fun CharSequence.openOutputStream(): OutputStream {
+    return this.toPath().openOutputStream()
+}
+
+fun File.openOutputStream(): OutputStream {
+    return this.toPath().openOutputStream()
+}
+
+fun Path.openOutputStream(): OutputStream {
+    return Files.newOutputStream(this)
 }
 
 @JvmOverloads
@@ -24,11 +46,52 @@ fun CharSequence.openRandomAccessFile(mode: CharSequence = "r"): RandomAccessFil
 }
 
 @JvmOverloads
-fun File.openRandomAccess(mode: CharSequence = "r"): RandomAccessFile {
+fun File.openRandomAccessFile(mode: CharSequence = "r"): RandomAccessFile {
     return RandomAccessFile(this, mode.toString())
 }
 
-//fun File.openMappedByteBuffer(vararg openOptions: OpenOption):MappedByteBuffer {
-//    val channel = FileChannel.open(this.toPath(),*openOptions)
-//    return channel.map()
-//}
+@JvmOverloads
+fun Path.openRandomAccessFile(mode: CharSequence = "r"): RandomAccessFile {
+    return this.toFile().openRandomAccessFile(mode)
+}
+
+@JvmOverloads
+fun Path.readByteBuffer(
+    vararg openOptions: OpenOption = arrayOf(StandardOpenOption.READ)
+): MappedByteBuffer {
+    val channel = FileChannel.open(this, *openOptions)
+    return channel.map(FileChannel.MapMode.READ_ONLY, 0, Integer.MAX_VALUE.toLong())
+}
+
+@JvmOverloads
+fun Path.mappedByteBuffer(
+    vararg openOptions: OpenOption = arrayOf(
+        StandardOpenOption.READ,
+        StandardOpenOption.WRITE,
+        StandardOpenOption.APPEND
+    )
+): MappedByteBuffer {
+    val channel = FileChannel.open(this, *openOptions)
+    return channel.map(FileChannel.MapMode.READ_ONLY, 0, Integer.MAX_VALUE.toLong())
+}
+
+fun Path.mappedByteBuffer(
+    mode: FileChannel.MapMode,
+    position: Long,
+    size: Long,
+    vararg openOptions: OpenOption
+): MappedByteBuffer {
+    val channel = FileChannel.open(this, *openOptions)
+    return channel.map(mode, position, size)
+}
+
+fun Path.mappedByteBuffer(
+    mode: FileChannel.MapMode,
+    position: Long,
+    size: Long,
+    openOptions: Iterable<OpenOption>,
+    fileAttributes: Iterable<FileAttribute<*>>
+): MappedByteBuffer {
+    val channel = FileChannel.open(this, openOptions.toSet(), *fileAttributes.toTypedArray())
+    return channel.map(mode, position, size)
+}
