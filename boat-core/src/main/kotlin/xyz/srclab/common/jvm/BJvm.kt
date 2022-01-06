@@ -1,5 +1,4 @@
-@file:JvmName("Jvms")
-@file:JvmMultifileClass
+@file:JvmName("BJvm")
 
 package xyz.srclab.common.jvm
 
