@@ -4,8 +4,6 @@ import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Simple counter.
- *
- * @author sunqian
  */
 interface Counter {
 
@@ -107,7 +105,10 @@ interface Counter {
             }
         }
 
-        private class AtomicCounter(private val atomicLong: AtomicLong, private val initValue: Long = atomicLong.get()) :
+        private class AtomicCounter(
+            private val atomicLong: AtomicLong,
+            private val initValue: Long = atomicLong.get()
+        ) :
             Counter {
 
             override fun getLong(): Long {

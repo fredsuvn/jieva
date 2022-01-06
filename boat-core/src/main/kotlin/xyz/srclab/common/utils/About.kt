@@ -136,10 +136,10 @@ interface Author {
                 if (mail === null && url === null) {
                     return name
                 }
-                if (mail === null && url !== null) {
+                if (mail === null) {
                     return "$name[$url]"
                 }
-                if (mail !== null && url === null) {
+                if (url === null) {
                     return "$name[$mail]"
                 }
                 return "$name[$mail, $url]"

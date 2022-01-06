@@ -1,6 +1,6 @@
 package xyz.srclab.common.utils
 
-import xyz.srclab.common.base.nowMillis
+import xyz.srclab.common.base.epochMilli
 
 /**
  * Snowflake is a unique id generator for distributed service providers.
@@ -61,8 +61,7 @@ open class Snowflake {
         DEFAULT_TIMESTAMP_BITS,
         DEFAULT_WORKER_ID_BITS,
         workerId
-    ) {
-    }
+    )
 
     /**
      * return next id.
@@ -107,7 +106,7 @@ open class Snowflake {
     }
 
     protected fun timestamp(): Long {
-        return nowMillis()
+        return epochMilli()
     }
 
     companion object {
