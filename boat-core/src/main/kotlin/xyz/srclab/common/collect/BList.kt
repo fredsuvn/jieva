@@ -2,9 +2,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.IndexBiFunction
-import xyz.srclab.common.base.castComparableComparator
-import xyz.srclab.common.base.toKotlinFun
+import xyz.srclab.common.base.*
 import java.util.function.BiFunction
 import java.util.function.IntFunction
 import java.util.function.Predicate
@@ -77,6 +75,70 @@ fun <T> List<T>.getOrDefault(index: Int, defaultValue: T): T {
 
 fun <T> List<T>.getOrElse(index: Int, defaultValue: IntFunction<T>): T {
     return this.elementAtOrElseKt(index, defaultValue.toKotlinFun())
+}
+
+fun List<*>.getBoolean(index: Int): Boolean {
+    return get(index).toBoolean()
+}
+
+fun List<*>.getBooleanOrNull(index: Int): Boolean? {
+    return getOrNull(index)?.toBoolean()
+}
+
+fun List<*>.getByte(index: Int): Byte {
+    return get(index).toByte()
+}
+
+fun List<*>.getByteOrNull(index: Int): Byte? {
+    return getOrNull(index)?.toByte()
+}
+
+fun List<*>.getShort(index: Int): Short {
+    return get(index).toShort()
+}
+
+fun List<*>.getShortOrNull(index: Int): Short? {
+    return getOrNull(index)?.toShort()
+}
+
+fun List<*>.getChar(index: Int): Char {
+    return get(index).toChar()
+}
+
+fun List<*>.getCharOrNull(index: Int): Char? {
+    return getOrNull(index)?.toChar()
+}
+
+fun List<*>.getInt(index: Int): Int {
+    return get(index).toInt()
+}
+
+fun List<*>.getIntOrNull(index: Int): Int? {
+    return getOrNull(index)?.toInt()
+}
+
+fun List<*>.getLong(index: Int): Long {
+    return get(index).toLong()
+}
+
+fun List<*>.getLongOrNull(index: Int): Long? {
+    return getOrNull(index)?.toLong()
+}
+
+fun List<*>.getFloat(index: Int): Float {
+    return get(index).toFloat()
+}
+
+fun List<*>.getFloatOrNull(index: Int): Float? {
+    return getOrNull(index)?.toFloat()
+}
+
+fun List<*>.getDouble(index: Int): Double {
+    return get(index).toDouble()
+}
+
+fun List<*>.getDoubleOrNull(index: Int): Double? {
+    return getOrNull(index)?.toDouble()
 }
 
 fun <T> List<T>.findLast(predicate: Predicate<in T>): T? {

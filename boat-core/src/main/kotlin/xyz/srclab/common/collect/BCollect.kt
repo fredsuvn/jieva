@@ -208,6 +208,70 @@ fun <T> Iterable<T>.getOrElse(index: Int, defaultValue: IntFunction<T>): T {
     return this.elementAtOrElseKt(index, defaultValue.toKotlinFun())
 }
 
+fun Iterable<*>.getBoolean(index: Int): Boolean {
+    return get(index).toBoolean()
+}
+
+fun Iterable<*>.getBooleanOrNull(index: Int): Boolean? {
+    return getOrNull(index)?.toBoolean()
+}
+
+fun Iterable<*>.getByte(index: Int): Byte {
+    return get(index).toByte()
+}
+
+fun Iterable<*>.getByteOrNull(index: Int): Byte? {
+    return getOrNull(index)?.toByte()
+}
+
+fun Iterable<*>.getShort(index: Int): Short {
+    return get(index).toShort()
+}
+
+fun Iterable<*>.getShortOrNull(index: Int): Short? {
+    return getOrNull(index)?.toShort()
+}
+
+fun Iterable<*>.getChar(index: Int): Char {
+    return get(index).toChar()
+}
+
+fun Iterable<*>.getCharOrNull(index: Int): Char? {
+    return getOrNull(index)?.toChar()
+}
+
+fun Iterable<*>.getInt(index: Int): Int {
+    return get(index).toInt()
+}
+
+fun Iterable<*>.getIntOrNull(index: Int): Int? {
+    return getOrNull(index)?.toInt()
+}
+
+fun Iterable<*>.getLong(index: Int): Long {
+    return get(index).toLong()
+}
+
+fun Iterable<*>.getLongOrNull(index: Int): Long? {
+    return getOrNull(index)?.toLong()
+}
+
+fun Iterable<*>.getFloat(index: Int): Float {
+    return get(index).toFloat()
+}
+
+fun Iterable<*>.getFloatOrNull(index: Int): Float? {
+    return getOrNull(index)?.toFloat()
+}
+
+fun Iterable<*>.getDouble(index: Int): Double {
+    return get(index).toDouble()
+}
+
+fun Iterable<*>.getDoubleOrNull(index: Int): Double? {
+    return getOrNull(index)?.toDouble()
+}
+
 fun <T> Iterable<T>.find(predicate: Predicate<in T>): T? {
     return this.findKt(predicate.toKotlinFun())
 }

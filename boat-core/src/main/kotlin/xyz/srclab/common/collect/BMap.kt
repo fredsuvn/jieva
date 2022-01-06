@@ -2,9 +2,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.base.castComparableComparator
-import xyz.srclab.common.base.toKotlinFun
+import xyz.srclab.common.base.*
 import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -44,6 +42,70 @@ fun <K, V, C : MutableMap<in K, in V>> C.collect(keyValues: Iterable<Any?>): C {
         }
     }
     return this
+}
+
+fun <K> Map<K, *>.getBoolean(key: K): Boolean {
+    return get(key)!!.toBoolean()
+}
+
+fun <K> Map<K, *>.getBooleanOrNull(key: K): Boolean? {
+    return get(key)?.toBoolean()
+}
+
+fun <K> Map<K, *>.getByte(key: K): Byte {
+    return get(key)!!.toByte()
+}
+
+fun <K> Map<K, *>.getByteOrNull(key: K): Byte? {
+    return get(key)?.toByte()
+}
+
+fun <K> Map<K, *>.getShort(key: K): Short {
+    return get(key)!!.toShort()
+}
+
+fun <K> Map<K, *>.getShortOrNull(key: K): Short? {
+    return get(key)?.toShort()
+}
+
+fun <K> Map<K, *>.getChar(key: K): Char {
+    return get(key)!!.toChar()
+}
+
+fun <K> Map<K, *>.getCharOrNull(key: K): Char? {
+    return get(key)?.toChar()
+}
+
+fun <K> Map<K, *>.getInt(key: K): Int {
+    return get(key)!!.toInt()
+}
+
+fun <K> Map<K, *>.getIntOrNull(key: K): Int? {
+    return get(key)?.toInt()
+}
+
+fun <K> Map<K, *>.getLong(key: K): Long {
+    return get(key)!!.toLong()
+}
+
+fun <K> Map<K, *>.getLongOrNull(key: K): Long? {
+    return get(key)?.toLong()
+}
+
+fun <K> Map<K, *>.getFloat(key: K): Float {
+    return get(key)!!.toFloat()
+}
+
+fun <K> Map<K, *>.getFloatOrNull(key: K): Float? {
+    return get(key)?.toFloat()
+}
+
+fun <K> Map<K, *>.getDouble(key: K): Double {
+    return get(key)!!.toDouble()
+}
+
+fun <K> Map<K, *>.getDoubleOrNull(key: K): Double? {
+    return get(key)?.toDouble()
 }
 
 fun <K, V> Map<K, V>.filter(predicate: Predicate<in Map.Entry<K, V>>): Map<K, V> {
