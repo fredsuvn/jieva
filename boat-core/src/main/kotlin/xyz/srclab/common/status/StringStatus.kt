@@ -33,6 +33,6 @@ open class StringStatus @JvmOverloads constructor(
     }
 
     override fun toString(): String {
-        return "$code-$description"
+        return statusToString(code, description)
     }
 }
