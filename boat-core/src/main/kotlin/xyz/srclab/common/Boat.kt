@@ -1,6 +1,6 @@
 package xyz.srclab.common
 
-import xyz.srclab.common.base.loadResourceAsProperties
+import xyz.srclab.common.base.loadResourceProperties
 import xyz.srclab.common.utils.About
 import xyz.srclab.common.utils.Author
 import xyz.srclab.common.utils.SemVer
@@ -8,7 +8,7 @@ import xyz.srclab.common.utils.SemVer.Companion.parseSemVer
 
 object Boat {
 
-    private val buildInfos: Map<String, String> = "META-INF/build.properties".loadResourceAsProperties()
+    private val buildInfos: Map<String, String> = "META-INF/build.properties".loadResourceProperties()
 
     private val sunqian = Author.of(
         "Sun Qian",

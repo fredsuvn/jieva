@@ -1,8 +1,22 @@
-package xyz.srclab.common.utils
+@file:JvmName("BId")
 
-import xyz.srclab.common.base.BJava
-import xyz.srclab.common.base.epochMilli
-import xyz.srclab.common.base.sleep
+package xyz.srclab.common.base
+
+import java.util.*
+
+val DEFAULT_SNOWFLAKE_ID = SnowflakeId(0)
+
+fun nextUuid(): String {
+    return UUID.randomUUID().toString()
+}
+
+fun nextSnowflakeId(): Long {
+    return DEFAULT_SNOWFLAKE_ID.next()
+}
+
+fun newSnowflakeId(workerId: Int): SnowflakeId {
+    return SnowflakeId(workerId)
+}
 
 /**
  * Snowflake is a unique id generator for distributed service providers.
@@ -20,7 +34,7 @@ import xyz.srclab.common.base.sleep
  * * workerId: 10
  * * sequence: 12
  */
-open class Snowflake {
+open class SnowflakeId {
 
     private val reservedBits: Int
     private val timestampBits: Int
@@ -45,12 +59,12 @@ open class Snowflake {
         reservedBits: Int,
         timestampBits: Int,
         workerIdBits: Int,
-        workerId: Long,
+        workerId: Int,
         maxWaitTimeMilli: Long = 1000
     ) {
         require(reservedBits in 0..61) { "reservedBits must in [0, 61]: $reservedBits" }
         require(timestampBits in 0..61) { "timestampBits must in [0, 61]: $timestampBits" }
-        require(workerIdBits in 0..61) { "workerIdBits must in [0, 61]: $workerIdBits" }
+        require(workerIdBits in 0..32) { "workerIdBits must in [0, 32]: $workerIdBits" }
         require(reservedBits + timestampBits + workerIdBits in 0..63) {
             "reservedBits + timestampBits + workerIdBits must in [0, 63]: $workerIdBits"
         }
@@ -67,12 +81,12 @@ open class Snowflake {
 
         val maskWorkerIdLeftBits = 64 - workerIdBits
         val maskWorkerIdRightBits = reservedBits + timestampBits
-        this.workerId = maskBits(workerId, maskWorkerIdLeftBits, maskWorkerIdRightBits)
+        this.workerId = maskBits(workerId.toUnsignedLong(), maskWorkerIdLeftBits, maskWorkerIdRightBits)
 
         this.maxWaitTimeMilli = maxWaitTimeMilli
     }
 
-    constructor(workerId: Long) : this(
+    constructor(workerId: Int) : this(
         DEFAULT_RESERVED_BITS,
         DEFAULT_TIMESTAMP_BITS,
         DEFAULT_WORKER_ID_BITS,
