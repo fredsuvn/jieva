@@ -3,20 +3,10 @@
 package xyz.srclab.common.jvm
 
 import xyz.srclab.common.base.DOT_MATCHER
-import java.lang.reflect.Field
 import java.lang.reflect.Method
 
-//const val CONSTRUCTOR_METHOD_NAME = "<init>"
-//
-//private const val WRONG_TYPE_PREFIX = "Wrong type"
-
-val Class<*>.jvmName: String
-    @JvmName("jvmName") get() {
-        return this.name.toJvmClassName()
-    }
-
-val Class<*>.jvmDescriptor: String
-    @JvmName("jvmDescriptor") get() {
+val Class<*>.typeSignature: String
+    get() {
         return when (this) {
             Boolean::class.javaPrimitiveType -> "Z"
             Byte::class.javaPrimitiveType -> "B"
@@ -28,30 +18,28 @@ val Class<*>.jvmDescriptor: String
             Double::class.javaPrimitiveType -> "D"
             Void::class.javaPrimitiveType -> "V"
             else -> if (this.isArray) {
-                "[${this.componentType.jvmDescriptor}"
+                "[${this.componentType.typeSignature}"
             } else {
-                "L${this.jvmName};"
+                "L${DOT_MATCHER.replaceFrom(this.name, '/')};"
             }
         }
     }
 
-val Field.jvmDescriptor: String
-    @JvmName("jvmDescriptor") get() {
-        return this.type.jvmDescriptor
-    }
-
-val Method.jvmDescriptor: String
-    @JvmName("jvmDescriptor") get() {
-        val parameterTypesDescriptors = this.parameterTypes.jvmDescriptor
-        val returnDescriptor = this.returnType.jvmDescriptor
+val Method.typeSignature: String
+    get() {
+        val parameterTypesDescriptors = this.parameterTypes.parametersTypeSignature
+        val returnDescriptor = this.returnType.typeSignature
         return "($parameterTypesDescriptors)$returnDescriptor"
     }
 
-val Array<out Class<*>>.jvmDescriptor: String
-    @JvmName("jvmDescriptor") get() {
-        val parameterTypesDescriptors = this.joinToString("") { it.jvmDescriptor }
-        return "($parameterTypesDescriptors)"
+val Array<out Class<*>>.parametersTypeSignature: String
+    get() {
+        return this.joinToString("") { it.typeSignature }
     }
+
+//const val CONSTRUCTOR_METHOD_NAME = "<init>"
+//
+//private const val WRONG_TYPE_PREFIX = "Wrong type"
 
 //val Type.jvmJavaTypeSignature: String
 //    @JvmName("jvmJavaTypeSignature") get() {
@@ -122,7 +110,3 @@ val Array<out Class<*>>.jvmDescriptor: String
 //        return ""
 //    }
 //
-
-fun CharSequence.toJvmClassName(): String {
-    return DOT_MATCHER.replaceFrom(this, '/')
-}
