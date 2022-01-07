@@ -99,6 +99,16 @@ fun CharSequence?.isWhitespace(): Boolean {
     return StringUtils.isWhitespace(this)
 }
 
+/**
+ * Checks if given chars are all white space by [Character.isWhitespace].
+ */
+fun CharSequence?.isLeadingZeroes(): Boolean {
+    if (this === null || this.length < 2) {
+        return false
+    }
+    return this[0] == '0'
+}
+
 fun anyEmpty(vararg charSeqs: CharSequence?): Boolean {
     for (charSeq in charSeqs) {
         if (charSeq.isEmpty()) {
