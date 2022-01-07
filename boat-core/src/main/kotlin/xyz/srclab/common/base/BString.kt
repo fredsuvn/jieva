@@ -100,7 +100,7 @@ fun CharSequence?.isWhitespace(): Boolean {
 }
 
 /**
- * Checks if given chars are all white space by [Character.isWhitespace].
+ * Checks if given chars contains leading zeros.
  */
 fun CharSequence?.isLeadingZeroes(): Boolean {
     if (this === null || this.length < 2) {
