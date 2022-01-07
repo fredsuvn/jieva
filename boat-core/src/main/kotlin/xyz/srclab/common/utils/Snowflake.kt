@@ -1,63 +1,79 @@
 package xyz.srclab.common.utils
 
+import xyz.srclab.common.base.BJava
 import xyz.srclab.common.base.epochMilli
+import xyz.srclab.common.base.sleep
 
 /**
  * Snowflake is a unique id generator for distributed service providers.
  *
- * A snowflake id is a long type value, consists of:
+ * A snowflake id is a long type value (64 bits), consists of:
  *
- * * `0` at first bits (not necessary);
- * * Timestamp value in next bits;
- * * Sequence value in next bits;
- * * Worker id in last bits;
+ * ```
+ * |--reserved--|--timestamp--|--workerId--|--sequence--|
+ * ```
+ *
+ * By default, bits of each part are:
+ *
+ * * reserved: 1
+ * * timestamp: 41
+ * * workerId: 10
+ * * sequence: 12
  */
 open class Snowflake {
 
-    private val timestampOffset: Long
-    private val timestampLeftShiftBits: Long
-    private val workerIdLeftShiftBits: Long
-    private val timestampMask: Long
-    private val workerIdMask: Long
-    private val sequenceMask: Long
+    private val reservedBits: Int
+    private val timestampBits: Int
+    private val workerIdBits: Int
+    private val sequenceBits: Int
+
+    private val maskReservedLeftBits: Int
+    private val maskTimestampLeftBits: Int
+    private val maskTimestampRightBits: Int
+    private val maskSequenceLeftBits: Int
+
     private val workerId: Long
+
     private var sequence = 0L
     private var lastTimestamp = -1L
+    private val maxSequenceMask: Long
 
-    /**
-     * Constructs with [timestampOffset], [timestampBits], [workerIdBits] and [workerId].
-     *
-     * @param timestampOffset timestamp offset
-     * @param timestampBits   timestamp bits number
-     * @param workerIdBits    worker id bits number
-     * @param workerId        worker id
-     */
+    private val maxWaitTimeMilli: Long
+
+    @JvmOverloads
     constructor(
-        timestampOffset: Long,
+        reservedBits: Int,
         timestampBits: Int,
         workerIdBits: Int,
-        workerId: Long
+        workerId: Long,
+        maxWaitTimeMilli: Long = 1000
     ) {
-        require(!(timestampBits <= 0 || timestampBits >= 63)) { "timestampBits: $timestampBits" }
-        require(!(workerIdBits <= 0 || workerIdBits >= 63)) { "workerIdBits: $workerIdBits" }
-        require(timestampBits + workerIdBits < 63) { "timestampBits + workerIdBits: " + (timestampBits + workerIdBits) }
-        this.timestampOffset = timestampOffset
-        this.workerId = workerId
-        val sequenceBits = (63 - timestampBits - workerIdBits).toLong()
-        timestampLeftShiftBits = workerIdBits + sequenceBits
-        workerIdLeftShiftBits = sequenceBits
-        timestampMask = -0x1L ushr 64 - timestampBits
-        workerIdMask = -0x1L ushr 64 - workerIdBits
-        sequenceMask = -0x1L ushr (64 - sequenceBits).toInt()
+        require(reservedBits in 0..61) { "reservedBits must in [0, 61]: $reservedBits" }
+        require(timestampBits in 0..61) { "timestampBits must in [0, 61]: $timestampBits" }
+        require(workerIdBits in 0..61) { "workerIdBits must in [0, 61]: $workerIdBits" }
+        require(reservedBits + timestampBits + workerIdBits in 0..63) {
+            "reservedBits + timestampBits + workerIdBits must in [0, 63]: $workerIdBits"
+        }
+        this.reservedBits = reservedBits
+        this.timestampBits = timestampBits
+        this.workerIdBits = workerIdBits
+        this.sequenceBits = 64 - reservedBits - timestampBits - workerIdBits
+
+        maskReservedLeftBits = 64 - reservedBits
+        maskTimestampLeftBits = 64 - timestampBits
+        maskTimestampRightBits = reservedBits
+        maskSequenceLeftBits = 64 - sequenceBits
+        this.maxSequenceMask = maskBits(BJava.LONG_MASK_VALUE, maskSequenceLeftBits, maskSequenceLeftBits).inv()
+
+        val maskWorkerIdLeftBits = 64 - workerIdBits
+        val maskWorkerIdRightBits = reservedBits + timestampBits
+        this.workerId = maskBits(workerId, maskWorkerIdLeftBits, maskWorkerIdRightBits)
+
+        this.maxWaitTimeMilli = maxWaitTimeMilli
     }
 
-    /**
-     * Constructs with [workerId].
-     *
-     * @param workerId worker id
-     */
     constructor(workerId: Long) : this(
-        DEFAULT_TIMESTAMP_OFFSET_OFFSET.toLong(),
+        DEFAULT_RESERVED_BITS,
         DEFAULT_TIMESTAMP_BITS,
         DEFAULT_WORKER_ID_BITS,
         workerId
@@ -68,49 +84,50 @@ open class Snowflake {
      */
     @Synchronized
     fun next(): Long {
-        var timestamp = timestamp()
-
-        //Clock moved backwards
-        check(timestamp >= lastTimestamp) {
-            String.format(
-                "Clock moved backwards. Refusing to generate id for %d milliseconds",
-                lastTimestamp - timestamp
-            )
-        }
-        if (lastTimestamp == timestamp) {
-            sequence = sequence + 1 and sequenceMask
+        val startTime = epochMilli()
+        var timestamp = startTime
+        do {
+            //Clock moved backwards
+            if (lastTimestamp > timestamp) {
+                throw IllegalStateException(
+                    "Clock moved backwards. Refusing to generate id for ${lastTimestamp - timestamp} milliseconds."
+                )
+            }
+            if (timestamp > lastTimestamp) {
+                sequence = 0
+                break
+            }
+            val nextSequence = (sequence + 1) and maxSequenceMask
             //Overflow
-            if (sequence == 0L) {
-                timestamp = awaitForNextMillis(lastTimestamp)
+            if (nextSequence == 0L) {
+                sleep(1)
+                timestamp = epochMilli()
+                if (timestamp - startTime > maxWaitTimeMilli) {
+                    throw IllegalStateException("Sequence overflow.")
+                }
+                continue
             }
-        } else {
-            sequence = 0L
-        }
-        lastTimestamp = timestamp
-        return (timestamp + timestampOffset and timestampMask shl timestampLeftShiftBits.toInt()
-            or (workerId and workerIdMask shl workerIdLeftShiftBits.toInt()) //
-            or (sequence and sequenceMask))
+            sequence = nextSequence
+            lastTimestamp = timestamp
+            break
+        } while (true)
+        return maskTimestamp(timestamp) or workerId or maskSequence(sequence)
     }
 
-    protected fun awaitForNextMillis(lastTimestamp: Long): Long {
-        var timestamp = timestamp()
-        while (timestamp <= lastTimestamp) {
-            try {
-                Thread.sleep(1)
-            } catch (e: InterruptedException) {
-                throw IllegalStateException("Await for next millis failed.", e)
-            }
-            timestamp = timestamp()
-        }
-        return timestamp
+    private fun maskTimestamp(value: Long): Long {
+        return maskBits(value, maskTimestampLeftBits, maskTimestampRightBits)
     }
 
-    protected fun timestamp(): Long {
-        return epochMilli()
+    private fun maskSequence(value: Long): Long {
+        return maskBits(value, maskSequenceLeftBits, maskSequenceLeftBits)
+    }
+
+    private fun maskBits(value: Long, leftShiftBits: Int, rightShiftBits: Int): Long {
+        return (value shl leftShiftBits) ushr rightShiftBits
     }
 
     companion object {
-        const val DEFAULT_TIMESTAMP_OFFSET_OFFSET = 0
+        const val DEFAULT_RESERVED_BITS = 1
         const val DEFAULT_TIMESTAMP_BITS = 41
         const val DEFAULT_WORKER_ID_BITS = 10
     }
