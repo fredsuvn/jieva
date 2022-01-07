@@ -3,6 +3,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.checkIndexInBounds
 import xyz.srclab.common.base.toKotlinFun
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
@@ -19,6 +20,34 @@ fun <T> Class<T>.newArray(length: Int): Array<T> {
 
 fun <T> Type.newArray(length: Int): Array<T> {
     return this.rawClass.newArray(length).asTyped()
+}
+
+@JvmOverloads
+fun <T> Array<T>.add(element: T, index: Int = this.size): Array<T> {
+    if (index == this.size) {
+        val result = this.copyOf(this.size + 1)
+        result[this.size] = element
+        return result.asTyped()
+    }
+    index.checkIndexInBounds(0, this.size)
+    val result: Array<T?> = this.javaClass.componentType.newArray(this.size + 1).asTyped()
+    System.arraycopy(this, 0, result, 0, index)
+    result[index] = element
+    System.arraycopy(this, index, result, index + 1, this.size - index)
+    return result.asTyped()
+}
+
+@JvmOverloads
+fun <T> Array<T>.remove(index: Int = this.size - 1): Array<T> {
+    if (index == this.size - 1) {
+        val result = this.copyOf(this.size - 1)
+        return result.asTyped()
+    }
+    index.checkIndexInBounds(0, this.size)
+    val result: Array<T?> = this.javaClass.componentType.newArray(this.size - 1).asTyped()
+    System.arraycopy(this, 0, result, 0, index)
+    System.arraycopy(this, index + 1, result, index, this.size - index - 1)
+    return result.asTyped()
 }
 
 /**
