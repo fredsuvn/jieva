@@ -52,6 +52,12 @@ val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
 val PLUS_MATCHER: CharMatcher = CharMatcher.`is`('+')
 
 /**
+ * [CharMatcher] of pattern `[0-9]`
+ */
+@JvmField
+val NUMERIC_MATCHER: CharMatcher = CharMatcher.inRange('0', '9')
+
+/**
  * [CharMatcher] of pattern `[A-Z]`
  */
 @JvmField
