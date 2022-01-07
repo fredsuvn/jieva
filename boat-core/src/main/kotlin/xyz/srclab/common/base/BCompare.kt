@@ -32,12 +32,18 @@ val CAST_COMPARABLE_COMPARATOR: Comparator<Comparable<*>> =
  * [Comparator] which compares the order in inheritance tree in natural order (low to high):
  *
  * * Parent type is greater than subtype;
- * * If there is no inheritance relationship in two classes, keep encounter order;
+ * * If there is no inheritance relationship in two classes, return 0;
  */
 @JvmField
 val CLASS_INHERITANCE_COMPARATOR: Comparator<Class<*>> =
     Comparator { c1, c2 ->
-        if (c1 == c2) 0 else if (c1.isAssignableFrom(c2)) 1 else -1
+        if (c1.isAssignableFrom(c2)) {
+            return@Comparator 1
+        }
+        if (c2.isAssignableFrom(c1)) {
+            return@Comparator -1
+        }
+        0
     }
 
 /**
@@ -53,7 +59,7 @@ fun <T> castComparableComparator(): Comparator<T> {
  * Returns a [Comparator] which compares the order in inheritance tree in natural order (low to high):
  *
  * * Parent type is greater than subtype;
- * * If there is no inheritance relationship in two classes, keep encounter order;
+ * * If there is no inheritance relationship in two classes, return 0;
  *
  * @see CLASS_INHERITANCE_COMPARATOR
  */
