@@ -1,9 +1,9 @@
 package xyz.srclab.common.bus
 
-import xyz.srclab.common.base.INHERITANCE_COMPARATOR
-import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
-import xyz.srclab.common.run.Runner
-import java.util.*
+import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.collect.add
+import xyz.srclab.common.collect.remove
+import xyz.srclab.common.run.SyncRunner
 import java.util.concurrent.Executor
 
 /**
@@ -17,13 +17,21 @@ import java.util.concurrent.Executor
  */
 interface EventBus {
 
-    fun register(eventHandler: Any)
+    fun register(eventHandler: EventHandler<*>)
 
-    fun registerAll(eventHandlers: Iterable<Any>)
+    fun registerAll(eventHandlers: Iterable<EventHandler<*>>) {
+        for (eventHandler in eventHandlers) {
+            register(eventHandler)
+        }
+    }
 
-    fun unregister(eventHandler: Any)
+    fun unregister(eventHandler: EventHandler<*>)
 
-    fun unregisterAll(eventHandlers: Iterable<Any>)
+    fun unregisterAll(eventHandlers: Iterable<EventHandler<*>>) {
+        for (eventHandler in eventHandlers) {
+            unregister(eventHandler)
+        }
+    }
 
     fun post(event: Any)
 
@@ -31,9 +39,7 @@ interface EventBus {
 
         @JvmStatic
         @JvmOverloads
-        fun newEventBus(
-            executor: Executor = Runner.SYNC_RUNNER,
-        ): EventBus {
+        fun newEventBus(executor: Executor = SyncRunner): EventBus {
             return EventBusImpl(executor)
         }
 
@@ -41,118 +47,84 @@ interface EventBus {
             private val executor: Executor
         ) : EventBus {
 
-            private var subscribeMap: TreeMap<Class<*>, MutableCollection<Action>> =
-                TreeMap(INHERITANCE_COMPARATOR.reversed())
+            private var handlers: Array<EventHandler<*>> = emptyArray()
 
-            override fun register(eventHandler: Any) {
-                val newActions = resolveHandler(eventHandler)
-                if (newActions.isEmpty()) {
-                    return
-                }
-                addActions(newActions)
-            }
-
-            override fun registerAll(eventHandlers: Iterable<Any>) {
-                val totalActions: MutableMap<Class<*>, MutableList<Action>> = HashMap()
-                for (eventHandler in eventHandlers) {
-                    val newActions = resolveHandler(eventHandler)
-                    for (newAction in newActions) {
-                        val actions = totalActions.getOrPut(newAction.key) { LinkedList() }
-                        actions.addAll(newAction.value)
+            @Synchronized
+            override fun register(eventHandler: EventHandler<*>) {
+                var i = 0
+                while (i < handlers.size) {
+                    val hi = handlers[i]
+                    if (hi == eventHandler) {
+                        handlers[i] = eventHandler
+                        return
                     }
-                }
-                addActions(totalActions)
-            }
-
-            private fun addActions(newActions: Map<Class<*>, List<Action>>) {
-                synchronized(this) {
-                    val newMap = copySubscribers()
-                    for (newAction in newActions) {
-                        val eventType = newAction.key
-                        val actions = newAction.value
-                        val oldActions = newMap.getOrPut(eventType) { ArrayList() }
-                        oldActions.addAll(actions)
+                    val ci = hi.eventType
+                    val c = eventHandler.eventType
+                    if (ci == c) {
+                        handlers = handlers.add(eventHandler, i)
+                        return
                     }
-                    subscribeMap = newMap
-                }
-            }
-
-            override fun unregister(eventHandler: Any) {
-                unregisterAll(listOf(eventHandler))
-            }
-
-            override fun unregisterAll(eventHandlers: Iterable<Any>) {
-                val handlerSet = eventHandlers.toSet()
-                synchronized(this) {
-                    val newMap = copySubscribers()
-                    for (entry in newMap) {
-                        val actions = entry.value
-                        val it = actions.iterator()
-                        while (it.hasNext()) {
-                            val action = it.next()
-                            if (handlerSet.contains(action.handler)) {
-                                it.remove()
+                    if (ci.isAssignableFrom(c)) {
+                        handlers = handlers.add(eventHandler, i)
+                        return
+                    }
+                    if (c.isAssignableFrom(ci)) {
+                        i++
+                        while (i < handlers.size) {
+                            val hx = handlers[i]
+                            if (hx == eventHandler) {
+                                handlers[i] = eventHandler
+                                return
                             }
+                            val cx = hx.eventType
+                            if (cx == c) {
+                                handlers = handlers.add(eventHandler, i)
+                                return
+                            }
+                            if (cx.isAssignableFrom(c)) {
+                                handlers = handlers.add(eventHandler, i)
+                                return
+                            }
+                            if (c.isAssignableFrom(cx)) {
+                                i++
+                                continue
+                            }
+                            handlers = handlers.add(eventHandler, i)
+                            return
                         }
+                        handlers = handlers.add(eventHandler, i)
+                        return
                     }
-                    subscribeMap = newMap
+                    i++
                 }
+                handlers = handlers.add(eventHandler, 0)
             }
 
-            private fun copySubscribers(): TreeMap<Class<*>, MutableCollection<Action>> {
-                val newMap = TreeMap<Class<*>, MutableCollection<Action>>(subscribeMap.comparator())
-                for (mutableEntry in subscribeMap) {
-                    val newList = LinkedList<Action>()
-                    newList.addAll(mutableEntry.value)
-                    newMap[mutableEntry.key] = newList
-                }
-                return newMap
-            }
-
-            private fun resolveHandler(eventHandler: Any): Map<Class<*>, List<Action>> {
-                val result: MutableMap<Class<*>, MutableList<Action>> = HashMap()
-                for (method in eventHandler.javaClass.methods) {
-                    val subscribe = method.getAnnotation(SubscribeMethod::class.java)
-                    if (subscribe === null || method.isBridge) {
-                        continue
+            @Synchronized
+            override fun unregister(eventHandler: EventHandler<*>) {
+                var i = 0
+                while (i < handlers.size) {
+                    val hi = handlers[i]
+                    if (hi == eventHandler) {
+                        handlers = handlers.remove(i)
+                        return
                     }
-                    if (method.parameterCount != 1) {
-                        throw IllegalArgumentException("Subscribe method must have only one parameter.")
-                    }
-                    val eventType = method.parameterTypes[0]
-                    val action = Action(eventHandler, subscribe, method.toInvoker())
-                    val actions = result.getOrPut(eventType) { LinkedList() }
-                    actions.add(action)
+                    i++
                 }
-                return result
             }
 
             override fun post(event: Any) {
-                executor.execute { post0(event) }
-            }
-
-            private fun post0(event: Any) {
-                val subscribers = subscribeMap
-                    .subMap(Any::class.java, true, event.javaClass, true)
-                    .descendingMap()
-                for (subscriberEntry in subscribers) {
-                    if (!subscriberEntry.key.isAssignableFrom(event.javaClass)) {
-                        continue
-                    }
-                    val actions = subscriberEntry.value
-                    for (action in actions) {
+                val type = event.javaClass
+                for (handler in handlers) {
+                    val h = handler.asTyped<EventHandler<Any>>()
+                    val ht = handler.eventType
+                    if (ht.isAssignableFrom(type)) {
                         executor.execute {
-                            action.invoker.invoke<Any?>(action.handler, event)
+                            h.doEvent(event)
                         }
                     }
                 }
             }
-
-            private data class Action(
-                val handler: Any,
-                val subscribeMethod: SubscribeMethod,
-                val invoker: Invoker,
-            )
         }
     }
 }
