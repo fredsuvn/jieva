@@ -108,7 +108,7 @@ fun CharSequence?.isWhitespace(): Boolean {
 /**
  * Checks if given chars contains leading zeros.
  */
-fun CharSequence?.isLeadingZeroes(): Boolean {
+fun CharSequence?.isLedByZeros(): Boolean {
     if (this === null || this.length < 2) {
         return false
     }
