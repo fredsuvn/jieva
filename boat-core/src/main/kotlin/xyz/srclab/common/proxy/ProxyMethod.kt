@@ -1,13 +1,12 @@
 package xyz.srclab.common.proxy
 
+import xyz.srclab.common.func.StaticFunc
 import java.lang.reflect.Method
 
 /**
  * To describe proxy method info.
- *
- * @author sunqian
  */
-interface ProxyMethod<T : Any> {
+interface ProxyMethod {
 
     /**
      * Returns whether this [ProxyMethod] is valid for given [method].
@@ -17,5 +16,10 @@ interface ProxyMethod<T : Any> {
     /**
      * Proxy action.
      */
-    fun invoke(sourceObject: T, sourceMethod: Method, sourceInvoker: SourceInvoker, args: Array<out Any?>?): Any?
+    operator fun invoke(
+        sourceObject: Any,
+        sourceMethod: Method,
+        sourceInvoke: StaticFunc,
+        args: Array<out Any?>?
+    ): Any?
 }

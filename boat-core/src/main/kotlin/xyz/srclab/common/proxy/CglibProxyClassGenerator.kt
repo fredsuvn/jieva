@@ -1,8 +1,8 @@
 package xyz.srclab.common.proxy
 
 import net.sf.cglib.proxy.*
-import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.func.StaticFunc
 import java.lang.reflect.Method
 import java.util.*
 
@@ -10,7 +10,7 @@ object CglibProxyClassGenerator : ProxyClassGenerator {
 
     override fun <T : Any> generate(
         sourceClass: Class<T>,
-        proxyMethods: Iterable<ProxyMethod<T>>,
+        proxyMethods: Iterable<ProxyMethod>,
         classLoader: ClassLoader
     ): ProxyClass<T> {
         val enhancer = Enhancer()
@@ -30,7 +30,7 @@ object CglibProxyClassGenerator : ProxyClassGenerator {
         }
         val callbackFilter = CallbackFilter { method ->
             for ((i, callback) in callbacks.withIndex()) {
-                if (callback is ProxyMethodInterceptor<*>) {
+                if (callback is ProxyMethodInterceptor) {
                     if (callback.proxyMethod.isProxy(method)) {
                         return@CallbackFilter i
                     }
@@ -44,14 +44,14 @@ object CglibProxyClassGenerator : ProxyClassGenerator {
         return ProxyClassImpl(enhancer)
     }
 
-    private class ProxyMethodInterceptor<T : Any>(val proxyMethod: ProxyMethod<T>) : MethodInterceptor {
+    private class ProxyMethodInterceptor(val proxyMethod: ProxyMethod) : MethodInterceptor {
         override fun intercept(obj: Any, method: Method, args: Array<out Any?>?, proxy: MethodProxy): Any? {
-            val sourceInvoker = object : SourceInvoker {
-                override fun invoke(args: Array<out Any?>?): Any? {
-                    return proxy.invokeSuper(obj, args ?: ArrayUtils.EMPTY_CLASS_ARRAY)
+            val sourceInvoker = object : StaticFunc {
+                override fun invoke(vararg args: Any?): Any? {
+                    return proxy.invokeSuper(obj, args)
                 }
             }
-            return proxyMethod.invoke(obj.asTyped(), method, sourceInvoker, args)
+            return proxyMethod.invoke(obj, method, sourceInvoker, args)
         }
     }
 

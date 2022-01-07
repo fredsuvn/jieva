@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.base.currentClassLoader
+import xyz.srclab.common.reflect.currentClassLoader
 
 /**
  * Represents a proxy class, used to instantiate proxy object.
@@ -25,7 +25,7 @@ interface ProxyClass<T : Any> {
         @JvmOverloads
         fun <T : Any> generate(
             sourceClass: Class<T>,
-            proxyMethods: Iterable<ProxyMethod<T>>,
+            proxyMethods: Iterable<ProxyMethod>,
             classLoader: ClassLoader = currentClassLoader(),
             proxyClassGenerator: ProxyClassGenerator = ProxyClassGenerator.DEFAULT,
         ): ProxyClass<T> {
