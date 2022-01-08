@@ -10,14 +10,14 @@ import java.lang.reflect.Type
 /**
  * Interface for type conversion.
  *
- * By default, this interface use a chain of [BConvertHandler] to do each conversion,
- * use [extend] to add a custom [BConvertHandler] before old handlers.
+ * By default, this interface use a chain of [ConvertHandler] to do each conversion,
+ * use [extend] to add a custom [ConvertHandler] before old handlers.
  *
- * @see BConvertHandler
+ * @see ConvertHandler
  */
 interface Converter {
 
-    val convertHandlers: List<BConvertHandler>
+    val convertHandlers: List<ConvertHandler>
 
     @Throws(UnsupportedConvertException::class)
     fun <T : Any> convert(from: Any?, toType: Class<T>): T {
@@ -53,46 +53,14 @@ interface Converter {
 
     fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: Type): T? {
         val result: Any? = convertOrNull0(from, fromType, toType)
-        if (result === BConvertHandler.NULL) {
+        if (result === ConvertHandler.NULL) {
             return null
         }
         return result.asTyped()
     }
 
-    fun <T> convertOrElse(from: Any?, toType: Class<T>, defaultValue: T): T {
-        return convertOrNull(from, toType) ?: defaultValue
-    }
-
-    fun <T> convertOrElse(from: Any?, toType: Type, defaultValue: T): T {
-        return convertOrNull(from, toType) ?: defaultValue
-    }
-
-    fun <T> convertOrElse(from: Any?, fromType: Type, toType: Class<T>, defaultValue: T): T {
-        return convertOrNull(from, fromType, toType) ?: defaultValue
-    }
-
-    fun <T> convertOrElse(from: Any?, fromType: Type, toType: Type, defaultValue: T): T {
-        return convertOrNull(from, fromType, toType) ?: defaultValue
-    }
-
-    fun <T> convertOrElse(from: Any?, toType: Class<T>, defaultValue: () -> T): T {
-        return convertOrNull(from, toType) ?: defaultValue()
-    }
-
-    fun <T> convertOrElse(from: Any?, toType: Type, defaultValue: () -> T): T {
-        return convertOrNull(from, toType) ?: defaultValue()
-    }
-
-    fun <T> convertOrElse(from: Any?, fromType: Type, toType: Class<T>, defaultValue: () -> T): T {
-        return convertOrNull(from, fromType, toType) ?: defaultValue()
-    }
-
-    fun <T> convertOrElse(from: Any?, fromType: Type, toType: Type, defaultValue: () -> T): T {
-        return convertOrNull(from, fromType, toType) ?: defaultValue()
-    }
-
     private fun convertOrNull0(from: Any?, fromType: Type, toType: Type): Any? {
-        val context = ConvertContext.newConvertContext(this)
+        val context = ConvertContext(this)
         for (convertHandler in convertHandlers) {
             val result = convertHandler.convert(from, fromType, toType, context)
             if (result !== null) {
@@ -104,42 +72,35 @@ interface Converter {
 
     companion object {
 
-        @JvmField
-        val COMMON: Converter = newConverter(BConvertHandler.DEFAULTS)
-
-        /**
-         * This [Converter] only convert same or compatible types, or convert between enum and [String].
-         *
-         * @see CompatibleConvertHandler
-         */
-        @JvmField
-        val SIMPLE: Converter = newConverter(listOf(CompatibleConvertHandler))
-
-        @JvmField
-         val defaultConverter:Converter = newConverter(BConvertHandler.DEFAULTS)
+        private var defaultConverter: Converter = newConverter(ConvertHandler.DEFAULT_HANDLERS)
 
         @JvmStatic
         fun defaultConverter(): Converter {
-            return DEFAULT
+            return defaultConverter
+        }
+
+        @JvmStatic
+        fun setDefaultConverter(converter: Converter) {
+            this.defaultConverter = converter
         }
 
         @JvmStatic
         fun newConverter(
-            convertHandlers: Iterable<BConvertHandler>
+            convertHandlers: Iterable<ConvertHandler>
         ): Converter {
             if (convertHandlers.isEmpty()) {
                 throw IllegalArgumentException("Convert handler list cannot be empty.")
             }
             return object : Converter {
-                override val convertHandlers: List<BConvertHandler> = convertHandlers.asToList()
+                override val convertHandlers: List<ConvertHandler> = convertHandlers.asToList()
             }
         }
 
         /**
-         * Returns a new [Converter] consists of given [handler] followed by existed [BConvertHandler]s.
+         * Returns a new [Converter] consists of given [handler] followed by existed [ConvertHandler]s.
          */
         @JvmStatic
-        fun Converter.extend(handler: BConvertHandler): Converter {
+        fun Converter.extend(handler: ConvertHandler): Converter {
             return newConverter(this.convertHandlers.plusBefore(0, handler))
         }
     }
