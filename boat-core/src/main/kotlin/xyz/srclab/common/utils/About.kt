@@ -261,7 +261,7 @@ interface SemVer : Comparable<SemVer> {
 
         @JvmName("parse")
         @JvmStatic
-        fun CharSequence.toSemVer(): SemVer {
+        fun CharSequence.parseSemVer(): SemVer {
 
             fun CharSequence.isNumericAndNoLedByZeros(): Boolean {
                 if (this.isEmpty()) {
