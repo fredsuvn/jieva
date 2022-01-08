@@ -5,37 +5,17 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Loaders;
-import xyz.srclab.common.collect.Collects;
-import xyz.srclab.common.logging.Logs;
+import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.base.BytesClassLoader;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-public class BLoadersKtTest {
+public class BytesClassLoaderTest {
 
     @Test
-    public void testLoader() {
-        List<String> texts = Loaders.loadAllResourcesAsStrings("META-INF/test.properties");
-        Logs.info("Load texts: {}", texts);
-        Assert.assertEquals(
-            texts,
-            Collections.singletonList("info=123")
-        );
-
-        List<Map<String, String>> properties = Loaders.loadAllResourcesAsProperties("META-INF/test.properties");
-        Logs.info("Load properties: {}", properties);
-        Assert.assertEquals(
-            properties,
-            Collections.singletonList(Collects.putEntries(new HashMap<>(), "info", "123"))
-        );
-
+    public void testLoadClass() {
         String newClassName = "test.xyz.srclab.A";
-        Class<?> clazz = Loaders.loadClass(createClass(newClassName));
-        Logs.info("class: {}", clazz);
-        Logs.info("class loader: {}", clazz.getClassLoader());
+        Class<?> clazz = BytesClassLoader.INSTANCE.loadClass(createClass(newClassName));
+        BLog.info("class: {}", clazz);
+        BLog.info("class loader: {}", clazz.getClassLoader());
         Assert.assertEquals(clazz.getName(), newClassName);
     }
 

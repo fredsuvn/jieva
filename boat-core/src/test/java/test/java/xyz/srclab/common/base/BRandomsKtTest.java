@@ -2,7 +2,7 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BRandomer;
+import xyz.srclab.common.base.Randomer;
 import xyz.srclab.common.base.Randoms;
 import xyz.srclab.common.logging.Logs;
 
@@ -19,7 +19,7 @@ public class BRandomsKtTest {
 
     @Test
     public void testRandomSupplier() {
-        BRandomer<?> BRandomer = BRandomer.newBuilder()
+        Randomer<?> BRandomer = BRandomer.newBuilder()
             .score(20, "A")
             .score(20, "B")
             .score(60, "C")

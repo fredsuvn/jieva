@@ -2,8 +2,8 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BRef;
-import xyz.srclab.common.logging.Logs;
+import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.base.Ref;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -15,11 +15,11 @@ public class BRefTest {
 
     @Test
     public void testRef() {
-        BRef<String> ref = BRef.of(null);
-        Assert.assertEquals(ref.getOrElse("null"), "null");
+        Ref<String> ref = Ref.of(null);
+        Assert.assertEquals(ref.orDefault("null"), "null");
         Assert.assertFalse(ref.isPresent());
         ref.set("123");
-        Assert.assertEquals(ref.getOrElse("null"), "123");
+        Assert.assertEquals(ref.orDefault("null"), "123");
         Assert.assertTrue(ref.isPresent());
     }
 
@@ -27,13 +27,13 @@ public class BRefTest {
     public void testChainOps() {
         String dateString = "2222-12-22 22:22:22";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        Date date = BRef.of(dateString)
-            .accept(Logs::info)
-            .apply(d -> LocalDateTime.parse(d, formatter))
-            .apply(d -> d.atZone(ZoneId.systemDefault()))
-            .with(ChronoZonedDateTime::toInstant)
-            .with(Date::from)
+        Date date = Ref.of(dateString)
+            .accept(BLog::info)
+            .map(d -> LocalDateTime.parse(d, formatter))
+            .map(d -> d.atZone(ZoneId.systemDefault()))
+            .map(ChronoZonedDateTime::toInstant)
+            .map(Date::from)
             .get();
-        Logs.info("date: {}", date);
+        BLog.info("date: {}", date);
     }
 }
