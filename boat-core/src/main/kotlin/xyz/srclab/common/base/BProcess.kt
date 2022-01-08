@@ -15,8 +15,8 @@ fun CharSequence.startProcess(): ProcessWork {
     return Runtime.getRuntime().exec(this.toString()).toProcessWork()
 }
 
-fun startProcess(vararg cmd: String): ProcessWork {
-    return Runtime.getRuntime().exec(cmd).toProcessWork()
+fun startProcess(vararg cmd: CharSequence): ProcessWork {
+    return Runtime.getRuntime().exec(cmd.map { it.toString() }.toTypedArray()).toProcessWork()
 }
 
 /**
