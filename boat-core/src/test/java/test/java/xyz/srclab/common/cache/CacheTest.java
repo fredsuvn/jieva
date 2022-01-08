@@ -1,10 +1,10 @@
 package test.java.xyz.srclab.common.cache;
 
-import kotlin.Pair;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.cache.Cache;
-import xyz.srclab.common.collect.Collects;
+import xyz.srclab.common.collect.BCollect;
+import xyz.srclab.common.collect.BMap;
 
 import java.util.*;
 
@@ -15,7 +15,7 @@ public class CacheTest {
 
     @Test
     public void testWeakCache() {
-        doTestCache(Cache.weakCache());
+        doTestCache(Cache.ofWeak());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class CacheTest {
     private void doTestCache(Cache<String, String> cache) {
         cache.cleanUp();
         Assert.expectThrows(NoSuchElementException.class, () -> cache.get("1"));
-        Assert.assertEquals(cache.getOrElse("1", k -> k + k), "11");
+        Assert.assertEquals(cache.getOrElse("1", () -> "1" + "1"), "11");
         Assert.assertNull(cache.getOrNull("1"));
         Assert.assertEquals(cache.getOrLoad("1", k -> "111"), "111");
         Assert.assertEquals(cache.getOrNull("1"), "111");
@@ -50,7 +50,7 @@ public class CacheTest {
         map.put("1", "111");
         map.put("2", "222");
         map.put("5", "55");
-        Assert.assertEquals(cache.getAll(Arrays.asList("1", "2", "5"), it -> {
+        Assert.assertEquals(cache.getOrLoadAll(Arrays.asList("1", "2", "5"), it -> {
             Map<String, String> result = new HashMap<>();
             for (String s : it) {
                 result.put(s, s + s);
@@ -58,25 +58,26 @@ public class CacheTest {
             return result;
         }), map);
         map.remove("5");
-        Assert.assertEquals(cache.getPresent(Arrays.asList("1", "2", "6")), map);
+        Assert.assertEquals(cache.getAllPresent(Arrays.asList("1", "2", "6")), map);
 
-        cache.invalidate("1");
+        cache.remove("1");
         Assert.assertNull(cache.getOrNull("1"));
 
         cache.put("x1", "x1");
         cache.put("x2", "x2");
         cache.put("x3", "x3");
-        Map<String, String> resultPresent = cache.getPresent(Arrays.asList("x1", "x2", "x3", "x4"));
+        Map<String, String> resultPresent = cache.getAllPresent(Arrays.asList("x1", "x2", "x3", "x4"));
         Assert.assertEquals(
             resultPresent,
-            Collects.putEntries(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3")
+            BMap.collect(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3")
         );
-        Map<String, String> resultAll = cache.getAll(
+        Map<String, String> resultAll = cache.getOrLoadAll(
             Arrays.asList("x1", "x2", "x3", "x4"),
-            keys -> Collects.associate(keys, (key) -> new Pair<String, String>(key, key)));
+            keys -> BCollect.toMap(keys, (k) -> BMap.newEntry(k, k))
+        );
         Assert.assertEquals(
             resultAll,
-            Collects.putEntries(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3", "x4", "x4")
+            BMap.collect(new LinkedHashMap<>(), "x1", "x1", "x2", "x2", "x3", "x3", "x4", "x4")
         );
     }
 }
