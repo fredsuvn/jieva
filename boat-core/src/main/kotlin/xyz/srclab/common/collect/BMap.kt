@@ -3,6 +3,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.convert.Converter
 import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -42,6 +43,24 @@ fun <K, V, C : MutableMap<in K, in V>> C.collect(keyValues: Iterable<Any?>): C {
         }
     }
     return this
+}
+
+@JvmOverloads
+fun <K, T : Any> Map<K, *>.get(key: K, type: Class<out T>, converter: Converter = Converter.defaultConverter()): T {
+    return converter.convert(this[key], type)
+}
+
+@JvmOverloads
+fun <K, T : Any> Map<K, *>.getOrNull(
+    key: K,
+    type: Class<out T>,
+    converter: Converter = Converter.defaultConverter()
+): T? {
+    return converter.convertOrNull(this[key], type)
+}
+
+fun <K, T : Any> Map<K, *>.getOrDefault(key: K, defaultValue: T, converter: Converter): T {
+    return converter.convertOrNull(this[key], defaultValue.javaClass) ?: defaultValue
 }
 
 fun <K> Map<K, *>.getBoolean(key: K): Boolean {

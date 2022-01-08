@@ -3,6 +3,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.convert.Converter
 import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -206,6 +207,24 @@ fun <T> Iterable<T>.getOrDefault(index: Int, defaultValue: T): T {
 
 fun <T> Iterable<T>.getOrElse(index: Int, defaultValue: IntFunction<T>): T {
     return this.elementAtOrElseKt(index, defaultValue.toKotlinFun())
+}
+
+@JvmOverloads
+fun <T : Any> Iterable<*>.get(index: Int, type: Class<out T>, converter: Converter = Converter.defaultConverter()): T {
+    return converter.convert(getOrNull(index), type)
+}
+
+@JvmOverloads
+fun <T : Any> Iterable<*>.getOrNull(
+    index: Int,
+    type: Class<out T>,
+    converter: Converter = Converter.defaultConverter()
+): T? {
+    return converter.convertOrNull(getOrNull(index), type)
+}
+
+fun <T : Any> Iterable<*>.getOrDefault(index: Int, defaultValue: T, converter: Converter): T {
+    return converter.convertOrNull(getOrNull(index), defaultValue.javaClass) ?: defaultValue
 }
 
 fun Iterable<*>.getBoolean(index: Int): Boolean {

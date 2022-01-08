@@ -3,6 +3,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.convert.Converter
 import java.util.function.BiFunction
 import java.util.function.IntFunction
 import java.util.function.Predicate
@@ -11,7 +12,6 @@ import kotlin.collections.binarySearch as binarySearchKt
 import kotlin.collections.dropLast as dropLastKt
 import kotlin.collections.dropLastWhile as dropLastWhileKt
 import kotlin.collections.elementAtOrElse as elementAtOrElseKt
-import kotlin.collections.elementAtOrNull as elementAtOrNullKt
 import kotlin.collections.findLast as findLastKt
 import kotlin.collections.first as firstKt
 import kotlin.collections.firstOrNull as firstOrNullKt
@@ -66,7 +66,7 @@ fun <T> List<T>.lastOrNull(predicate: Predicate<in T>): T? {
 }
 
 fun <T> List<T>.getOrNull(index: Int): T? {
-    return this.elementAtOrNullKt(index)
+    return this[index]
 }
 
 fun <T> List<T>.getOrDefault(index: Int, defaultValue: T): T {
@@ -75,6 +75,24 @@ fun <T> List<T>.getOrDefault(index: Int, defaultValue: T): T {
 
 fun <T> List<T>.getOrElse(index: Int, defaultValue: IntFunction<T>): T {
     return this.elementAtOrElseKt(index, defaultValue.toKotlinFun())
+}
+
+@JvmOverloads
+fun <T : Any> List<*>.get(index: Int, type: Class<out T>, converter: Converter = Converter.defaultConverter()): T {
+    return converter.convert(getOrNull(index), type)
+}
+
+@JvmOverloads
+fun <T : Any> List<*>.getOrNull(
+    index: Int,
+    type: Class<out T>,
+    converter: Converter = Converter.defaultConverter()
+): T? {
+    return converter.convertOrNull(getOrNull(index), type)
+}
+
+fun <T : Any> List<*>.getOrDefault(index: Int, defaultValue: T, converter: Converter): T {
+    return converter.convertOrNull(getOrNull(index), defaultValue.javaClass) ?: defaultValue
 }
 
 fun List<*>.getBoolean(index: Int): Boolean {
