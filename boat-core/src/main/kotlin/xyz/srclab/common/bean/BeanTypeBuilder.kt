@@ -1,16 +1,17 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.collect.toUnmodifiable
 import java.lang.reflect.Type
+import java.util.*
+import kotlin.collections.LinkedHashMap
 
 /**
  * Builder for [BeanType].
  */
-class BeanTypeBuilder(val type: Type) {
+open class BeanTypeBuilder(val type: Type) {
 
     private val _properties: MutableMap<String, PropertyType> = LinkedHashMap()
 
-    val properties: Map<String, PropertyType> = _properties.toUnmodifiable()
+    val properties: Map<String, PropertyType> = Collections.unmodifiableMap(_properties)
 
     fun hasProperty(name: String): Boolean {
         return _properties.containsKey(name)

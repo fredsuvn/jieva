@@ -19,23 +19,7 @@ open class BeanMap(
     //    beanType.properties.filter { it.key != "class" }
 
     private val entryMap: Map<String, MutableMap.MutableEntry<String, Any?>> =
-        beanType.properties.map { name, propertyType ->
-            name to object : MutableMap.MutableEntry<String, Any?> {
-
-                override val key: String = name
-
-                override val value: Any?
-                    get() {
-                        return propertyType.getValue(bean)
-                    }
-
-                override fun setValue(newValue: Any?): Any? {
-                    val old = propertyType.getValue(bean)
-                    propertyType.setValue(bean, newValue)
-                    return old
-                }
-            }
-        }
+        beanType.properties.map { name, propertyType -> name to BeanEntry(propertyType) }
 
     override val size: Int
         get() = entries.size
@@ -72,5 +56,23 @@ open class BeanMap(
 
     override fun remove(key: String): Any? {
         throw UnsupportedOperationException()
+    }
+
+    private inner class BeanEntry(
+        private val propertyType: PropertyType
+    ) : MutableMap.MutableEntry<String, Any?> {
+
+        override val key: String = propertyType.name
+
+        override val value: Any?
+            get() {
+                return propertyType.getValue(bean)
+            }
+
+        override fun setValue(newValue: Any?): Any? {
+            val old = propertyType.getValue(bean)
+            propertyType.setValue(bean, newValue)
+            return old
+        }
     }
 }

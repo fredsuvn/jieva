@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.reflect.instantiate
+import xyz.srclab.common.reflect.newInst
 
 /**
  * Bean creator.
@@ -38,7 +38,7 @@ interface BeanCreator {
 object EmptyConstructorBeanCreator : BeanCreator {
 
     override fun <T> newBuilder(type: Class<T>): T {
-        return type.instantiate()
+        return type.newInst()
     }
 
     override fun <T, R> build(builder: T): R {

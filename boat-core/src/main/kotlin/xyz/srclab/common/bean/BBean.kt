@@ -1,51 +1,38 @@
-@file:JvmName("Beans")
-@file:JvmMultifileClass
+@file:JvmName("BBean")
 
 package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.collect.BMapType.Companion.toMapType
-import xyz.srclab.common.collect.toUnmodifiable
+import xyz.srclab.common.collect.MapType.Companion.toMapType
 import xyz.srclab.common.convert.Converter
 import java.lang.reflect.Type
 
+private val defaultResolver: BeanResolver
+    get() = BeanResolver.defaultResolver()
+private val defaultConverter
+    get() = Converter.defaultConverter()
+
 @JvmName("resolve")
 @JvmOverloads
-fun Type.resolveBean(beanResolver: BeanResolver = BeanResolver.DEFAULT): BeanType {
+fun Type.resolveBean(beanResolver: BeanResolver = defaultResolver): BeanType {
     return beanResolver.resolve(this)
 }
 
 @JvmOverloads
-fun Any.asMap(beanResolver: BeanResolver = BeanResolver.DEFAULT): BeanMap {
+fun Any.asBeanMap(beanResolver: BeanResolver = defaultResolver): BeanMap {
     return BeanMap(this, beanResolver.resolve(this.javaClass))
 }
 
-fun Any.asMap(beanType: BeanType): BeanMap {
+fun Any.asBeanMap(beanType: BeanType): BeanMap {
     return BeanMap(this, beanType)
-}
-
-@JvmOverloads
-fun Any?.toMap(beanResolver: BeanResolver = BeanResolver.DEFAULT): Map<String, Any?> {
-    if (this === null) {
-        return emptyMap()
-    }
-    return toMutableMap(beanResolver).toUnmodifiable()
-}
-
-@JvmOverloads
-fun Any?.toMutableMap(beanResolver: BeanResolver = BeanResolver.DEFAULT): MutableMap<String, Any?> {
-    if (this === null) {
-        return LinkedHashMap()
-    }
-    return LinkedHashMap(asMap(beanResolver))
 }
 
 @JvmOverloads
 fun <T : Any> Any.copyProperties(
     @Written to: T,
-    beanResolver: BeanResolver = BeanResolver.DEFAULT,
-    converter: Converter = Converter.DEFAULT,
+    beanResolver: BeanResolver = defaultResolver,
+    converter: Converter = defaultConverter,
 ): T {
     return copyProperties(to, true, beanResolver, converter)
 }
@@ -54,8 +41,8 @@ fun <T : Any> Any.copyProperties(
 fun <T : Any> Any.copyProperties(
     @Written to: T,
     toType: Type,
-    beanResolver: BeanResolver = BeanResolver.DEFAULT,
-    converter: Converter = Converter.DEFAULT,
+    beanResolver: BeanResolver = defaultResolver,
+    converter: Converter = defaultConverter,
 ): T {
     return copyProperties(to, toType, true, beanResolver, converter)
 }
@@ -64,8 +51,8 @@ fun <T : Any> Any.copyProperties(
 fun <T : Any> Any.copyProperties(
     @Written to: T,
     copyNull: Boolean,
-    beanResolver: BeanResolver = BeanResolver.DEFAULT,
-    converter: Converter = Converter.DEFAULT,
+    beanResolver: BeanResolver = defaultResolver,
+    converter: Converter = defaultConverter,
 ): T {
     return copyProperties(to, to.javaClass, copyNull, beanResolver, converter)
 }
@@ -75,8 +62,8 @@ fun <T : Any> Any.copyProperties(
     @Written to: T,
     toType: Type,
     copyNull: Boolean,
-    beanResolver: BeanResolver = BeanResolver.DEFAULT,
-    converter: Converter = Converter.DEFAULT,
+    beanResolver: BeanResolver = defaultResolver,
+    converter: Converter = defaultConverter,
 ): T {
     return when {
         this is Map<*, *> && to is MutableMap<*, *> -> {

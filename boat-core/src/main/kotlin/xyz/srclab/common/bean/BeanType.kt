@@ -1,5 +1,6 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
 
 /**
@@ -10,6 +11,9 @@ import java.lang.reflect.Type
 interface BeanType {
 
     val type: Type
+
+    val classType: Class<*>
+        get() = type.rawClass
 
     val properties: Map<String, PropertyType>
 
@@ -27,6 +31,11 @@ interface BeanType {
         @JvmStatic
         fun newBeanType(type: Type, properties: Map<String, PropertyType>): BeanType {
             return BeanTypeImpl(type, properties)
+        }
+
+        @JvmName("parse")
+        fun Type.parseBeanType(resolver: BeanResolver = BeanResolver.defaultResolver()): BeanType {
+            return resolver.resolve(this)
         }
 
         private class BeanTypeImpl(

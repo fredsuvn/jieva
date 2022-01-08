@@ -24,8 +24,8 @@ interface BeanResolver {
         val context = BeanResolveContext(type)
         val builder = BeanTypeBuilder(type)
         for (resolveHandler in resolveHandlers) {
-            val jumpStatement = resolveHandler.resolve(context, builder)
-            if (!jumpStatement.isContinue()) {
+            resolveHandler.resolve(context, builder)
+            if (context.isBreak) {
                 break
             }
         }
@@ -34,8 +34,17 @@ interface BeanResolver {
 
     companion object {
 
-        @JvmField
-        val DEFAULT: BeanResolver = newBeanResolver(BeanResolveHandler.DEFAULTS)
+        private var defaultResolver: BeanResolver = newBeanResolver(BeanResolveHandler.DEFAULTS)
+
+        @JvmStatic
+        fun defaultResolver(): BeanResolver {
+            return defaultResolver
+        }
+
+        @JvmStatic
+        fun setDefaultResolver(resolver: BeanResolver) {
+            this.defaultResolver = resolver
+        }
 
         /**
          * Return a new [BeanResolver] with given [resolveHandlers] and [cache] (default is [Cache.weakCache]).
@@ -44,7 +53,7 @@ interface BeanResolver {
         @JvmStatic
         fun newBeanResolver(
             resolveHandlers: Iterable<BeanResolveHandler>,
-            cache: Cache<Type, BeanType> = Cache.weakCache()
+            cache: Cache<Type, BeanType> = Cache.ofWeak()
         ): BeanResolver {
             return CachedBeanResolver(resolveHandlers.asToList(), cache)
         }
@@ -64,7 +73,6 @@ interface BeanResolver {
             override val resolveHandlers: List<BeanResolveHandler>,
             private val cache: Cache<Type, BeanType>
         ) : BeanResolver {
-
             override fun resolve(type: Type): BeanType {
                 return cache.getOrLoad(type) {
                     super.resolve(type)

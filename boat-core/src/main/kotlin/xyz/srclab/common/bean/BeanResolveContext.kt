@@ -10,8 +10,18 @@ import java.lang.reflect.TypeVariable
 /**
  * Context of bean resolving.
  */
-class BeanResolveContext(val type: Type) {
+open class BeanResolveContext(val type: Type) {
+
+    private var _isBreak = false
 
     val typeArguments: Map<TypeVariable<*>, Type> = type.getTypeArguments()
     val methods: List<Method> = type.rawClass.methods()
+    val isBreak: Boolean get() = _isBreak
+
+    /**
+     * Sets current resolving completed, causes remainder [BeanResolveHandler] will not be called.
+     */
+    fun complete() {
+        _isBreak = true
+    }
 }

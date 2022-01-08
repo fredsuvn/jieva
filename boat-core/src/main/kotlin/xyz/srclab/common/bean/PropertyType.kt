@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.invoke.BInstInvoker
+import xyz.srclab.common.func.InstFunc
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
@@ -29,9 +29,9 @@ interface PropertyType {
             return setter !== null
         }
 
-    val getter: BInstInvoker?
+    val getter: InstFunc?
 
-    val setter: BInstInvoker?
+    val setter: InstFunc?
 
     val field: Field?
 
@@ -93,8 +93,8 @@ interface PropertyType {
             ownerType: BeanType,
             name: String,
             type: Type,
-            getter: BInstInvoker?,
-            setter: BInstInvoker?,
+            getter: InstFunc?,
+            setter: InstFunc?,
             field: Field?,
             getterMethod: Method?,
             setterMethod: Method?,
@@ -106,8 +106,8 @@ interface PropertyType {
             override val ownerType: BeanType,
             override val name: String,
             override val type: Type,
-            override val getter: BInstInvoker?,
-            override val setter: BInstInvoker?,
+            override val getter: InstFunc?,
+            override val setter: InstFunc?,
             override val field: Field?,
             override val getterMethod: Method?,
             override val setterMethod: Method?,
