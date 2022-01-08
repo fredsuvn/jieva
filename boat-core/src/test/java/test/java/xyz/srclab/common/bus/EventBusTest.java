@@ -1,91 +1,71 @@
 package test.java.xyz.srclab.common.bus;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.StringRef;
 import xyz.srclab.common.bus.EventBus;
-import xyz.srclab.common.bus.SubscribeMethod;
-import xyz.srclab.common.collect.Collects;
-import xyz.srclab.common.logging.Logs;
+import xyz.srclab.common.bus.EventBusHandler;
+import xyz.srclab.common.collect.BList;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EventBusTest {
+
+    private static final List<CharSequence> chars = new CopyOnWriteArrayList<>();
 
     @Test
     public void testEventBus() {
         EventBus eventBus = EventBus.newEventBus();
-        Handler1 handler1 = new Handler1();
-        eventBus.register(handler1);
-        eventBus.post("123");
-        eventBus.post(new Object());
-        Assert.assertTrue(Collects.newSet("sub11", "sub12").containsAll(handler1.stack));
-        Assert.assertTrue(handler1.stack.containsAll(Collects.newSet("sub11", "sub12")));
-        eventBus.unregister(handler1);
+        eventBus.registerAll(BList.newList(new CharSeqHandler(), new StringHandler(), new IntegerHandler()));
 
-        Handler2 handler2 = new Handler2();
-        eventBus.register(handler2);
-        eventBus.post("123");
-        Assert.assertTrue(Collects.newSet("sub11", "sub12").containsAll(handler1.stack));
-        Assert.assertTrue(Collects.newSet("sub21", "sub22", "sub23").containsAll(handler2.stack));
-        eventBus.unregister(handler2);
+        eventBus.post("x");
+        eventBus.post(StringRef.of("y"));
+        eventBus.post(6);
 
-        eventBus.registerAll(Arrays.asList(handler1, handler2));
-        eventBus.post("456");
-        Assert.assertTrue(Collects.newSet("sub11", "sub12").containsAll(handler1.stack));
-        Assert.assertTrue(Collects.newSet("sub21", "sub22", "sub23").containsAll(handler2.stack));
+        Assert.assertEquals(chars, BList.newList("xsxy7"));
     }
 
-    public static class Handler1 {
+    public static class StringHandler implements EventBusHandler<String> {
 
-        public Set<String> stack = new HashSet<>();
-
-        @SubscribeMethod
-        public void sub11(CharSequence chars) {
-            Logs.info("sub11:" + chars);
-            stack.add("sub11");
+        @NotNull
+        @Override
+        public Class<String> getEventType() {
+            return String.class;
         }
 
-        @SubscribeMethod
-        public void sub12(String chars) {
-            Logs.info("sub12:" + chars);
-            stack.add("sub12");
+        @Override
+        public void doEvent(String event) {
+            chars.add(event + "s");
         }
     }
 
-    public static class Handler2 {
+    public static class CharSeqHandler implements EventBusHandler<CharSequence> {
 
-        public Set<String> stack = new HashSet<>();
-
-        @SubscribeMethod
-        public void sub20(Integer integer) {
-            Logs.info("sub20:" + integer);
-            stack.add("sub20");
+        @NotNull
+        @Override
+        public Class<CharSequence> getEventType() {
+            return CharSequence.class;
         }
 
-        @SubscribeMethod
-        public void sub21(String chars) {
-            Logs.info("sub21:" + chars);
-            stack.add("sub21");
+        @Override
+        public void doEvent(CharSequence event) {
+            chars.add(event.toString());
+        }
+    }
+
+    public static class IntegerHandler implements EventBusHandler<Integer> {
+
+        @NotNull
+        @Override
+        public Class<Integer> getEventType() {
+            return Integer.class;
         }
 
-        @SubscribeMethod
-        public void sub22(String chars) {
-            Logs.info("sub22:" + chars);
-            stack.add("sub22");
-        }
-
-        @SubscribeMethod
-        public void sub23(String chars) {
-            Logs.info("sub23:" + chars);
-            stack.add("sub23");
-        }
-
-        @SubscribeMethod
-        public void sub24(Integer integer) {
-            Logs.info("sub20:" + integer);
-            stack.add("sub20");
+        @Override
+        public void doEvent(Integer event) {
+            chars.add(String.valueOf(event + 1));
         }
     }
 }
