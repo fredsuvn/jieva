@@ -342,12 +342,18 @@ interface DatePattern {
         return toDateFormat().format(date)
     }
 
-    fun parseDate(chars: CharSequence): Date {
-        return toDateFormat().parse(chars.toString())
-    }
-
     fun parseTemporalAccessor(chars: CharSequence): TemporalAccessor {
         return toFormatter().parse(chars)
+    }
+
+    fun parseTemporalAccessor(obj: Any): TemporalAccessor {
+        if (obj is TemporalAccessor) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toInstant()
+        }
+        return parseTemporalAccessor(obj.toString())
     }
 
     fun parseTemporalAccessorOrNull(chars: CharSequence): TemporalAccessor? {
@@ -358,76 +364,337 @@ interface DatePattern {
         }
     }
 
+    fun parseTemporalAccessorOrNull(obj: Any): TemporalAccessor? {
+        if (obj is TemporalAccessor) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toInstant()
+        }
+        return parseTemporalAccessorOrNull(obj.toString())
+    }
+
+    fun parseDate(chars: CharSequence): Date {
+        return toDateFormat().parse(chars.toString())
+    }
+
+    fun parseDate(obj: Any): Date {
+        if (obj is Instant) {
+            return Date.from(obj)
+        }
+        if (obj is Date) {
+            return obj
+        }
+        if (obj is TemporalAccessor) {
+            return Date.from(Instant.from(obj))
+        }
+        return parseDate(obj.toString())
+    }
+
     fun parseInstant(chars: CharSequence): Instant {
         return Instant.parse(chars)
+    }
+
+    fun parseInstant(obj: Any): Instant {
+        if (obj is Instant) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toInstant()
+        }
+        if (obj is TemporalAccessor) {
+            return Instant.from(obj)
+        }
+        return parseInstant(obj.toString())
     }
 
     fun parseZonedDateTime(chars: CharSequence): ZonedDateTime {
         return ZonedDateTime.parse(chars, toFormatter())
     }
 
+    fun parseZonedDateTime(obj: Any): ZonedDateTime {
+        if (obj is ZonedDateTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return ZonedDateTime.ofInstant(obj.toInstant(), ZoneId.systemDefault())
+        }
+        if (obj is TemporalAccessor) {
+            return ZonedDateTime.from(obj)
+        }
+        return parseZonedDateTime(obj.toString())
+    }
+
     fun parseOffsetDateTime(chars: CharSequence): OffsetDateTime {
         return OffsetDateTime.parse(chars, toFormatter())
+    }
+
+    fun parseOffsetDateTime(obj: Any): OffsetDateTime {
+        if (obj is OffsetDateTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return OffsetDateTime.ofInstant(obj.toInstant(), ZoneId.systemDefault())
+        }
+        if (obj is TemporalAccessor) {
+            return OffsetDateTime.from(obj)
+        }
+        return parseOffsetDateTime(obj.toString())
     }
 
     fun parseLocalDateTime(chars: CharSequence): LocalDateTime {
         return LocalDateTime.parse(chars, toFormatter())
     }
 
+    fun parseLocalDateTime(obj: Any): LocalDateTime {
+        if (obj is LocalDateTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return LocalDateTime.ofInstant(obj.toInstant(), ZoneId.systemDefault())
+        }
+        if (obj is TemporalAccessor) {
+            return LocalDateTime.from(obj)
+        }
+        return parseLocalDateTime(obj.toString())
+    }
+
     fun parseLocalDate(chars: CharSequence): LocalDate {
         return LocalDate.parse(chars, toFormatter())
+    }
+
+    fun parseLocalDate(obj: Any): LocalDate {
+        if (obj is LocalDate) {
+            return obj
+        }
+        if (obj is Date) {
+            return parseTemporalAccessor(obj).toLocalDate()
+        }
+        if (obj is TemporalAccessor) {
+            return LocalDate.from(obj)
+        }
+        return parseLocalDate(obj.toString())
     }
 
     fun parseLocalTime(chars: CharSequence): LocalTime {
         return LocalTime.parse(chars, toFormatter())
     }
 
+    fun parseLocalTime(obj: Any): LocalTime {
+        if (obj is LocalTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return parseTemporalAccessor(obj).toLocalTime()
+        }
+        if (obj is TemporalAccessor) {
+            return LocalTime.from(obj)
+        }
+        return parseLocalTime(obj.toString())
+    }
+
     fun buildInstant(chars: CharSequence): Instant {
         return parseTemporalAccessor(chars).toInstant()
+    }
+
+    fun buildInstant(obj: Any): Instant {
+        if (obj is Instant) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toInstant()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toInstant()
+        }
+        return buildInstant(obj.toString())
     }
 
     fun buildZonedDateTime(chars: CharSequence): ZonedDateTime {
         return parseTemporalAccessor(chars).toZonedDateTime()
     }
 
+    fun buildZonedDateTime(obj: Any): ZonedDateTime {
+        if (obj is ZonedDateTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toZonedDateTime()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toZonedDateTime()
+        }
+        return buildZonedDateTime(obj.toString())
+    }
+
     fun buildOffsetDateTime(chars: CharSequence): OffsetDateTime {
         return parseTemporalAccessor(chars).toOffsetDateTime()
+    }
+
+    fun buildOffsetDateTime(obj: Any): OffsetDateTime {
+        if (obj is OffsetDateTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toOffsetDateTime()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toOffsetDateTime()
+        }
+        return buildOffsetDateTime(obj.toString())
     }
 
     fun buildLocalDateTime(chars: CharSequence): LocalDateTime {
         return parseTemporalAccessor(chars).toLocalDateTime()
     }
 
+    fun buildLocalDateTime(obj: Any): LocalDateTime {
+        if (obj is LocalDateTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toLocalDateTime()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toLocalDateTime()
+        }
+        return buildLocalDateTime(obj.toString())
+    }
+
     fun buildLocalDate(chars: CharSequence): LocalDate {
         return parseTemporalAccessor(chars).toLocalDate()
+    }
+
+    fun buildLocalDate(obj: Any): LocalDate {
+        if (obj is LocalDate) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toLocalDate()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toLocalDate()
+        }
+        return buildLocalDate(obj.toString())
     }
 
     fun buildLocalTime(chars: CharSequence): LocalTime {
         return parseTemporalAccessor(chars).toLocalTime()
     }
 
+    fun buildLocalTime(obj: Any): LocalTime {
+        if (obj is LocalTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toLocalTime()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toLocalTime()
+        }
+        return buildLocalTime(obj.toString())
+    }
+
     fun buildInstantOrNull(chars: CharSequence): Instant? {
         return parseTemporalAccessorOrNull(chars)?.toInstantOrNull()
+    }
+
+    fun buildInstantOrNull(obj: Any): Instant? {
+        if (obj is Instant) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toInstant()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toInstantOrNull()
+        }
+        return buildInstantOrNull(obj.toString())
     }
 
     fun buildZonedDateTimeOrNull(chars: CharSequence): ZonedDateTime? {
         return parseTemporalAccessorOrNull(chars)?.toZonedDateTimeOrNull()
     }
 
+    fun buildZonedDateTimeOrNull(obj: Any): ZonedDateTime? {
+        if (obj is ZonedDateTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toZonedDateTime()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toZonedDateTimeOrNull()
+        }
+        return buildZonedDateTimeOrNull(obj.toString())
+    }
+
     fun buildOffsetDateTimeOrNull(chars: CharSequence): OffsetDateTime? {
         return parseTemporalAccessorOrNull(chars)?.toOffsetDateTimeOrNull()
+    }
+
+    fun buildOffsetDateTimeOrNull(obj: Any): OffsetDateTime? {
+        if (obj is OffsetDateTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toOffsetDateTime()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toOffsetDateTimeOrNull()
+        }
+        return buildOffsetDateTimeOrNull(obj.toString())
     }
 
     fun buildLocalDateTimeOrNull(chars: CharSequence): LocalDateTime? {
         return parseTemporalAccessorOrNull(chars)?.toLocalDateTimeOrNull()
     }
 
+    fun buildLocalDateTimeOrNull(obj: Any): LocalDateTime? {
+        if (obj is LocalDateTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toLocalDateTime()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toLocalDateTimeOrNull()
+        }
+        return buildLocalDateTimeOrNull(obj.toString())
+    }
+
     fun buildLocalDateOrNull(chars: CharSequence): LocalDate? {
         return parseTemporalAccessorOrNull(chars)?.toLocalDateOrNull()
     }
 
+    fun buildLocalDateOrNull(obj: Any): LocalDate? {
+        if (obj is LocalDate) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toLocalDate()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toLocalDateOrNull()
+        }
+        return buildLocalDateOrNull(obj.toString())
+    }
+
     fun buildLocalTimeOrNull(chars: CharSequence): LocalTime? {
         return parseTemporalAccessorOrNull(chars)?.toLocalTimeOrNull()
+    }
+
+    fun buildLocalTimeOrNull(obj: Any): LocalTime? {
+        if (obj is LocalTime) {
+            return obj
+        }
+        if (obj is Date) {
+            return obj.toLocalTime()
+        }
+        if (obj is TemporalAccessor) {
+            return obj.toLocalTimeOrNull()
+        }
+        return buildLocalTimeOrNull(obj.toString())
     }
 
     companion object {
