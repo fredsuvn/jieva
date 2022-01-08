@@ -1,9 +1,7 @@
 @file:JvmName("BLog")
 
-import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.base.callerStackTraceOrNull
-import xyz.srclab.common.base.fastFormat
-import xyz.srclab.common.base.stackTraceToString
+package xyz.srclab.common.base
+
 import java.io.PrintStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
