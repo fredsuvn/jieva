@@ -2,6 +2,8 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.reflect.canAssignedBy
+
 /**
  * Represents `less than` in compare.
  */
@@ -37,10 +39,10 @@ val CAST_COMPARABLE_COMPARATOR: Comparator<Comparable<*>> =
 @JvmField
 val CLASS_INHERITANCE_COMPARATOR: Comparator<Class<*>> =
     Comparator { c1, c2 ->
-        if (c1.isAssignableFrom(c2)) {
+        if (c1.canAssignedBy(c2)) {
             return@Comparator 1
         }
-        if (c2.isAssignableFrom(c1)) {
+        if (c2.canAssignedBy(c1)) {
             return@Comparator -1
         }
         0

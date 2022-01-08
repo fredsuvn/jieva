@@ -3,6 +3,7 @@ package xyz.srclab.common.bus
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.collect.add
 import xyz.srclab.common.collect.remove
+import xyz.srclab.common.reflect.canAssignedBy
 import xyz.srclab.common.run.SyncRunner
 import java.util.concurrent.Executor
 
@@ -62,11 +63,11 @@ interface EventBus {
                         handlers = handlers.add(handler, i)
                         return
                     }
-                    if (ci.isAssignableFrom(c)) {
+                    if (ci.canAssignedBy(c)) {
                         handlers = handlers.add(handler, i)
                         return
                     }
-                    if (c.isAssignableFrom(ci)) {
+                    if (c.canAssignedBy(ci)) {
                         i++
                         while (i < handlers.size) {
                             val hx = handlers[i]
@@ -79,11 +80,11 @@ interface EventBus {
                                 handlers = handlers.add(handler, i)
                                 return
                             }
-                            if (cx.isAssignableFrom(c)) {
+                            if (cx.canAssignedBy(c)) {
                                 handlers = handlers.add(handler, i)
                                 return
                             }
-                            if (c.isAssignableFrom(cx)) {
+                            if (c.canAssignedBy(cx)) {
                                 i++
                                 continue
                             }
@@ -116,7 +117,7 @@ interface EventBus {
                 for (handler in handlers) {
                     val h = handler.asTyped<EventBusHandler<Any>>()
                     val ht = handler.eventType
-                    if (ht.isAssignableFrom(type)) {
+                    if (ht.canAssignedBy(type)) {
                         executor.execute {
                             h.doEvent(event)
                         }

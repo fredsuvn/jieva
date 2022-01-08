@@ -74,7 +74,7 @@ object CompatibleConvertHandler : ConvertHandler {
         }
         if (toType is Class<*>) {
             val fromClass = from.javaClass
-            if (toType.isAssignableFrom(fromClass)) {
+            if (toType.canAssignedBy(fromClass)) {
                 return from
             }
             if (fromClass.toWrapperClass() == toType.toWrapperClass()) {

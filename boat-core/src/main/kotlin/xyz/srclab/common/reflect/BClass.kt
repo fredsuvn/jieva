@@ -194,3 +194,10 @@ fun Class<*>.toWrapperClass(): Class<*> {
         else -> this
     }
 }
+
+fun Class<*>.canAssignedBy(other: Class<*>): Boolean {
+    if (this.isAssignableFrom(other)) {
+        return true
+    }
+    return this.toWrapperClass() == other.toWrapperClass()
+}
