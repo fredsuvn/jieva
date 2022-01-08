@@ -69,9 +69,9 @@ fun CharSequence.loadResourcePropertiesOrNull(charset: Charset = DEFAULT_CHARSET
 }
 
 @JvmName("loadAll")
-fun CharSequence.loadResources(): Set<URL> {
+fun CharSequence.loadResources(): List<URL> {
     val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
-    val result = mutableSetOf<URL>()
+    val result = mutableListOf<URL>()
     while (enumeration.hasMoreElements()) {
         result.add(enumeration.nextElement())
     }
@@ -79,9 +79,9 @@ fun CharSequence.loadResources(): Set<URL> {
 }
 
 @JvmName("loadStreams")
-fun CharSequence.loadResourceStreams(): Set<InputStream> {
+fun CharSequence.loadResourceStreams(): List<InputStream> {
     val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
-    val result = mutableSetOf<InputStream>()
+    val result = mutableListOf<InputStream>()
     while (enumeration.hasMoreElements()) {
         result.add(enumeration.nextElement().openStream())
     }
@@ -89,9 +89,9 @@ fun CharSequence.loadResourceStreams(): Set<InputStream> {
 }
 
 @JvmName("loadFiles")
-fun CharSequence.loadResourceFiles(): Set<File> {
+fun CharSequence.loadResourceFiles(): List<File> {
     val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
-    val result = mutableSetOf<File>()
+    val result = mutableListOf<File>()
     while (enumeration.hasMoreElements()) {
         result.add(enumeration.nextElement().toFile())
     }
@@ -100,20 +100,20 @@ fun CharSequence.loadResourceFiles(): Set<File> {
 
 @JvmName("loadStrings")
 @JvmOverloads
-fun CharSequence.loadResourceStrings(charset: Charset = DEFAULT_CHARSET): Set<String> {
+fun CharSequence.loadResourceStrings(charset: Charset = DEFAULT_CHARSET): List<String> {
     val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
-    val result = mutableSetOf<String>()
+    val result = mutableListOf<String>()
     while (enumeration.hasMoreElements()) {
         result.add(enumeration.nextElement().openStream().readString(charset, true))
     }
     return result
 }
 
-@JvmName("loadPropertiesSet")
+@JvmName("loadPropertiesList")
 @JvmOverloads
-fun CharSequence.loadResourcePropertiesSet(charset: Charset = DEFAULT_CHARSET): Set<Map<String, String>> {
+fun CharSequence.loadResourcePropertiesList(charset: Charset = DEFAULT_CHARSET): List<Map<String, String>> {
     val enumeration = BytesClassLoader.getResources(this.removeAbsolute())
-    val result = mutableSetOf<Map<String, String>>()
+    val result = mutableListOf<Map<String, String>>()
     while (enumeration.hasMoreElements()) {
         result.add(enumeration.nextElement().readProperties(charset))
     }
