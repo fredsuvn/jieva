@@ -69,7 +69,7 @@ val Class<*>.shortName: String
 val <T> Class<T>.arrayClass: Class<Array<T>>
     get() {
         if (this.isArray) {
-            return "[${this.name}".toClass()
+            return "[${this.name}".classForName()
         }
         val arrayClassName = when (this) {
             Boolean::class.javaPrimitiveType -> "[Z"
@@ -83,7 +83,7 @@ val <T> Class<T>.arrayClass: Class<Array<T>>
             Void::class.javaPrimitiveType -> "[V"
             else -> "[L${this.name};"
         }
-        return arrayClassName.toClass(this.classLoader ?: currentClassLoader())
+        return arrayClassName.classForName(this.classLoader ?: currentClassLoader())
     }
 
 /**
@@ -96,13 +96,15 @@ fun currentClassLoader(): ClassLoader {
 /**
  * @throws ClassNotFoundException
  */
+@JvmName("forName")
 @JvmOverloads
-fun <T> CharSequence.toClass(classLoader: ClassLoader = currentClassLoader()): Class<T> {
+fun <T> CharSequence.classForName(classLoader: ClassLoader = currentClassLoader()): Class<T> {
     return Class.forName(this.toString(), true, classLoader).asTyped()
 }
 
+@JvmName("forNameOrNull")
 @JvmOverloads
-fun <T> CharSequence.toClassOrNull(classLoader: ClassLoader = currentClassLoader()): Class<T>? {
+fun <T> CharSequence.classForNameOrNull(classLoader: ClassLoader = currentClassLoader()): Class<T>? {
     return try {
         Class.forName(this.toString(), true, classLoader)
     } catch (e: ClassNotFoundException) {
@@ -113,18 +115,18 @@ fun <T> CharSequence.toClassOrNull(classLoader: ClassLoader = currentClassLoader
 /**
  * @throws NoSuchMethodException
  */
-fun <T> Class<*>.instantiate(): T {
-    return instantiate(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
+fun <T> Class<*>.newInst(): T {
+    return newInst(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
 }
 
-fun <T> Class<*>.instantiateOrNull(): T? {
-    return instantiateOrNull(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
+fun <T> Class<*>.newInstOrNull(): T? {
+    return newInstOrNull(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_CLASS_ARRAY)
 }
 
 /**
  * @throws NoSuchMethodException
  */
-fun <T> Class<*>.instantiate(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
+fun <T> Class<*>.newInst(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T {
     val constructor = try {
         this.getConstructor(*parameterTypes)
     } catch (e: NoSuchMethodException) {
@@ -133,7 +135,7 @@ fun <T> Class<*>.instantiate(parameterTypes: Array<out Class<*>>, args: Array<ou
     return constructor.newInstance(*args).asTyped()
 }
 
-fun <T> Class<*>.instantiateOrNull(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T? {
+fun <T> Class<*>.newInstOrNull(parameterTypes: Array<out Class<*>>, args: Array<out Any?>): T? {
     val constructor = try {
         this.getConstructor(*parameterTypes)
     } catch (e: NoSuchMethodException) {
@@ -143,10 +145,17 @@ fun <T> Class<*>.instantiateOrNull(parameterTypes: Array<out Class<*>>, args: Ar
 }
 
 /**
+ * @throws ClassNotFoundException
  * @throws NoSuchMethodException
  */
-fun <T> Class<*>.instantiateWithArguments(vararg args: Any): T {
-    return instantiate(args.map { it.javaClass }.toTypedArray(), args)
+@JvmOverloads
+fun <T> CharSequence.instForName(classLoader: ClassLoader = currentClassLoader()): T {
+    return classForName<T>(classLoader).newInst()
+}
+
+@JvmOverloads
+fun <T> CharSequence.instForNameOrNull(classLoader: ClassLoader = currentClassLoader()): T? {
+    return classForNameOrNull<T>(classLoader)?.newInstOrNull()
 }
 
 /**
@@ -154,48 +163,21 @@ fun <T> Class<*>.instantiateWithArguments(vararg args: Any): T {
  * @throws NoSuchMethodException
  */
 @JvmOverloads
-fun <T> CharSequence.toInstance(classLoader: ClassLoader = currentClassLoader()): T {
-    return toClass<T>(classLoader).instantiate()
-}
-
-@JvmOverloads
-fun <T> CharSequence.toInstanceOrNull(classLoader: ClassLoader = currentClassLoader()): T? {
-    return toClassOrNull<T>(classLoader)?.instantiateOrNull()
-}
-
-/**
- * @throws ClassNotFoundException
- * @throws NoSuchMethodException
- */
-@JvmOverloads
-fun <T> CharSequence.toInstance(
+fun <T> CharSequence.instForName(
     classLoader: ClassLoader = currentClassLoader(),
     parameterTypes: Array<out Class<*>>,
     args: Array<out Any?>
 ): T {
-    return toClass<T>(classLoader).instantiate(parameterTypes, args)
+    return classForName<T>(classLoader).newInst(parameterTypes, args)
 }
 
 @JvmOverloads
-fun <T> CharSequence.toInstanceOrNull(
+fun <T> CharSequence.instForNameOrNull(
     classLoader: ClassLoader = currentClassLoader(),
     parameterTypes: Array<out Class<*>>,
     args: Array<out Any?>
 ): T? {
-    return toClassOrNull<T>(classLoader)?.instantiateOrNull(parameterTypes, args)
-}
-
-/**
- * @throws ClassNotFoundException
- * @throws NoSuchMethodException
- */
-@JvmOverloads
-fun <T> CharSequence.toInstanceWithArguments(classLoader: ClassLoader = currentClassLoader(), vararg args: Any): T {
-    return toInstance(
-        classLoader,
-        args.map { it.javaClass }.toTypedArray(),
-        args
-    )
+    return classForNameOrNull<T>(classLoader)?.newInstOrNull(parameterTypes, args)
 }
 
 fun Class<*>.toWrapperClass(): Class<*> {

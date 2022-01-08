@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.reflect.toClassOrNull
+import xyz.srclab.common.reflect.classForNameOrNull
 
 /**
  * Generator to generate [ProxyClass].
@@ -25,11 +25,11 @@ interface ProxyClassGenerator {
         val DEFAULT: ProxyClassGenerator = findDefaultProxyClassGenerator()
 
         private fun findDefaultProxyClassGenerator(): ProxyClassGenerator {
-            val springLib = "org.springframework.cglib.proxy.Enhancer".toClassOrNull<Any>()
+            val springLib = "org.springframework.cglib.proxy.Enhancer".classForNameOrNull<Any>()
             if (springLib !== null) {
                 return SpringProxyClassGenerator
             }
-            val cgLib = "net.sf.cglib.proxy.Enhancer".toClassOrNull<Any>()
+            val cgLib = "net.sf.cglib.proxy.Enhancer".classForNameOrNull<Any>()
             if (cgLib !== null) {
                 return CglibProxyClassGenerator
             }
