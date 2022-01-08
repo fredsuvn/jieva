@@ -9,27 +9,25 @@ import java.util.concurrent.Executor
 /**
  * Event bus. Use [register] or [registerAll] to register event handler, [unregister] and [unregisterAll] to unregister.
  *
- * For event handler, each method annotated by [SubscribeMethod] will be seen as `Subscriber`.
- * `Subscriber` must have only one parameter, and parameter's [Class] is its event type.
- * [EventBus] will post given event for all compatible event type.
- *
- * @see SubscribeMethod
+ * [EventBusHandler] is used to handle event.
+ * [EventBus] will post event for each [EventBusHandler] of which [EventBusHandler.eventType] is assignable from event,
+ * in sub-to-super order.
  */
 interface EventBus {
 
-    fun register(eventHandler: EventHandler<*>)
+    fun register(handler: EventBusHandler<*>)
 
-    fun registerAll(eventHandlers: Iterable<EventHandler<*>>) {
-        for (eventHandler in eventHandlers) {
-            register(eventHandler)
+    fun registerAll(handlers: Iterable<EventBusHandler<*>>) {
+        for (handler in handlers) {
+            register(handler)
         }
     }
 
-    fun unregister(eventHandler: EventHandler<*>)
+    fun unregister(handler: EventBusHandler<*>)
 
-    fun unregisterAll(eventHandlers: Iterable<EventHandler<*>>) {
-        for (eventHandler in eventHandlers) {
-            unregister(eventHandler)
+    fun unregisterAll(handlers: Iterable<EventBusHandler<*>>) {
+        for (handler in handlers) {
+            unregister(handler)
         }
     }
 
@@ -47,65 +45,65 @@ interface EventBus {
             private val executor: Executor
         ) : EventBus {
 
-            private var handlers: Array<EventHandler<*>> = emptyArray()
+            private var handlers: Array<EventBusHandler<*>> = emptyArray()
 
             @Synchronized
-            override fun register(eventHandler: EventHandler<*>) {
+            override fun register(handler: EventBusHandler<*>) {
                 var i = 0
                 while (i < handlers.size) {
                     val hi = handlers[i]
-                    if (hi == eventHandler) {
-                        handlers[i] = eventHandler
+                    if (hi == handler) {
+                        handlers[i] = handler
                         return
                     }
                     val ci = hi.eventType
-                    val c = eventHandler.eventType
+                    val c = handler.eventType
                     if (ci == c) {
-                        handlers = handlers.add(eventHandler, i)
+                        handlers = handlers.add(handler, i)
                         return
                     }
                     if (ci.isAssignableFrom(c)) {
-                        handlers = handlers.add(eventHandler, i)
+                        handlers = handlers.add(handler, i)
                         return
                     }
                     if (c.isAssignableFrom(ci)) {
                         i++
                         while (i < handlers.size) {
                             val hx = handlers[i]
-                            if (hx == eventHandler) {
-                                handlers[i] = eventHandler
+                            if (hx == handler) {
+                                handlers[i] = handler
                                 return
                             }
                             val cx = hx.eventType
                             if (cx == c) {
-                                handlers = handlers.add(eventHandler, i)
+                                handlers = handlers.add(handler, i)
                                 return
                             }
                             if (cx.isAssignableFrom(c)) {
-                                handlers = handlers.add(eventHandler, i)
+                                handlers = handlers.add(handler, i)
                                 return
                             }
                             if (c.isAssignableFrom(cx)) {
                                 i++
                                 continue
                             }
-                            handlers = handlers.add(eventHandler, i)
+                            handlers = handlers.add(handler, i)
                             return
                         }
-                        handlers = handlers.add(eventHandler, i)
+                        handlers = handlers.add(handler, i)
                         return
                     }
                     i++
                 }
-                handlers = handlers.add(eventHandler, 0)
+                handlers = handlers.add(handler, 0)
             }
 
             @Synchronized
-            override fun unregister(eventHandler: EventHandler<*>) {
+            override fun unregister(handler: EventBusHandler<*>) {
                 var i = 0
                 while (i < handlers.size) {
                     val hi = handlers[i]
-                    if (hi == eventHandler) {
+                    if (hi == handler) {
                         handlers = handlers.remove(i)
                         return
                     }
@@ -116,7 +114,7 @@ interface EventBus {
             override fun post(event: Any) {
                 val type = event.javaClass
                 for (handler in handlers) {
-                    val h = handler.asTyped<EventHandler<Any>>()
+                    val h = handler.asTyped<EventBusHandler<Any>>()
                     val ht = handler.eventType
                     if (ht.isAssignableFrom(type)) {
                         executor.execute {

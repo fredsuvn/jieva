@@ -2,8 +2,10 @@ package xyz.srclab.common.bus
 
 /**
  * To deal with event of [T].
+ *
+ * @see EventBus
  */
-interface EventHandler<T> {
+interface EventBusHandler<T> {
 
     val eventType: Class<T>
 
