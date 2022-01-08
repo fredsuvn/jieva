@@ -1,10 +1,7 @@
 package xyz.srclab.common.utils
 
-import xyz.srclab.common.base.HYPHEN_MATCHER
-import xyz.srclab.common.base.PLUS_MATCHER
-import xyz.srclab.common.base.checkArgument
-import xyz.srclab.common.base.isNumeric
-import kotlin.text.toInt as toIntKt
+import xyz.srclab.common.base.*
+import xyz.srclab.common.base.StringRef.Companion.stringRef
 
 /**
  * Project about info.
@@ -156,206 +153,99 @@ interface Author {
  */
 interface SemVer : Comparable<SemVer> {
 
-    val normalNumbers: List<Int>
-
     val major: Int
-        get() = normalNumbers[0]
 
     val minor: Int
-        get() = if (normalNumbers.size > 1) normalNumbers[1] else 0
 
     val patch: Int
-        get() = if (normalNumbers.size > 2) normalNumbers[2] else 0
 
-    val normalString: String
-        get() = normalNumbers.joinDotToString()
-
-    val preRelease: List<PreReleaseIdentifier>
-
-    val preReleaseString: String
-        get() = preRelease.joinDotToString()
+    val preRelease: List<String>
 
     val buildMetadata: List<String>
 
     val buildMetadataString: String
         get() = buildMetadata.joinDotToString()
 
-    val isNormal: Boolean
-        get() = preRelease.isEmpty()
+    fun normalString(): String = "$major.$minor.$patch"
 
-    val isPreRelease: Boolean
-        get() = preRelease.isNotEmpty()
+    fun preReleaseString(): String = preRelease.joinDotToString()
 
-    interface PreReleaseIdentifier {
+    fun buildMetadataString(): String = buildMetadata.joinDotToString()
 
-        val isNumeric: Boolean
-
-        fun toNumber(): Int
-
-        override fun toString(): String
-
-        companion object {
-
-            internal fun of(value: Any): PreReleaseIdentifier {
-                if (value is Number) {
-                    return of(value.toInt())
-                }
-                return of(value.toString())
-            }
-
-            internal fun of(value: Int): PreReleaseIdentifier {
-                return NumericIdentifier(value)
-            }
-
-            internal fun of(value: CharSequence): PreReleaseIdentifier {
-                if (value.isNumeric()) {
-                    return of(value.toString().toIntKt())
-                }
-                if (value.matches(IDENTIFIER_PATTERN)) {
-                    return StringIdentifier(value)
-                }
-                throw IllegalArgumentException(
-                    "SemVer pre-release identifier should be in ${IDENTIFIER_PATTERN.pattern}: $value"
-                )
-            }
-
-            private class NumericIdentifier(private val value: Int) : PreReleaseIdentifier {
-                override val isNumeric: Boolean = true
-                override fun toNumber(): Int = value
-                override fun toString(): String = value.toString()
-
-                override fun equals(other: Any?): Boolean {
-                    if (this === other) return true
-                    if (other !is PreReleaseIdentifier) return false
-                    if (!other.isNumeric) return false
-                    if (toNumber() != other.toNumber()) return false
-                    return true
-                }
-
-                override fun hashCode(): Int {
-                    return value
-                }
-            }
-
-            private class StringIdentifier(private val value: CharSequence) : PreReleaseIdentifier {
-                override val isNumeric: Boolean = false
-                override fun toNumber(): Int = throw IllegalStateException("Not a numeric pre-release identifier.")
-                override fun toString(): String = value.toString()
-
-                override fun equals(other: Any?): Boolean {
-                    if (this === other) return true
-                    if (other !is PreReleaseIdentifier) return false
-                    if (other.isNumeric) return false
-                    if (toString() != other.toString()) return false
-                    return true
-                }
-
-                override fun hashCode(): Int {
-                    return value.hashCode()
-                }
-            }
+    fun fullString(): String {
+        if (preRelease.isEmpty() && buildMetadata.isEmpty()) {
+            return normalString()
         }
+        if (preRelease.isEmpty() && buildMetadata.isNotEmpty()) {
+            return normalString() + "+" + buildMetadataString()
+        }
+        if (preRelease.isNotEmpty() && buildMetadata.isEmpty()) {
+            return normalString() + "-" + preReleaseString()
+        }
+        return normalString() + "-" + preReleaseString() + "+" + buildMetadataString()
     }
 
-    private class SemVerImpl(
-        override val normalNumbers: List<Int>,
-        override val preRelease: List<PreReleaseIdentifier>,
-        override val buildMetadata: List<String>,
-    ) : SemVer {
-
-        override fun compareTo(other: SemVer): Int {
-            for (i in normalNumbers.indices) {
-                if (normalNumbers[i] > other.normalNumbers[i]) {
-                    return 1
-                }
-                if (normalNumbers[i] < other.normalNumbers[i]) {
-                    return -1
-                }
-            }
-            if (preRelease.isEmpty() && other.preRelease.isEmpty()) {
-                return 0
-            }
-            if (preRelease.isEmpty() && other.preRelease.isNotEmpty()) {
-                return 1
-            }
-            if (preRelease.isNotEmpty() && other.preRelease.isEmpty()) {
-                return -1
-            }
-            val preIt = preRelease.iterator()
-            val otherPreIt = other.preRelease.iterator()
-            while (preIt.hasNext()) {
-                if (!otherPreIt.hasNext()) {
-                    return 1
-                }
-                val preV = preIt.next()
-                val otherPreV = otherPreIt.next()
-                //Numeric identifiers always have lower precedence than non-numeric identifiers.
-                if (preV.isNumeric && !otherPreV.isNumeric) {
-                    return -1
-                }
-                if (!preV.isNumeric && otherPreV.isNumeric) {
-                    return 1
-                }
-                if (preV.isNumeric && otherPreV.isNumeric) {
-                    if (preV.toNumber() > otherPreV.toNumber()) {
-                        return 1
-                    }
-                    if (preV.toNumber() < otherPreV.toNumber()) {
-                        return -1
-                    }
-                }
-                val stringCompare = preV.toString().compareTo(otherPreV.toString())
-                if (stringCompare != 0) {
-                    return stringCompare
-                }
-            }
-            if (otherPreIt.hasNext()) {
-                return -1
-            }
+    override fun compareTo(other: SemVer): Int {
+        if (major != other.minor) {
+            return major - other.major
+        }
+        if (minor != other.minor) {
+            return minor - other.minor
+        }
+        if (patch != other.patch) {
+            return patch - other.patch
+        }
+        if (preRelease.isEmpty() && other.preRelease.isEmpty()) {
             return 0
         }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other !is SemVer) return false
-            if (normalNumbers != other.normalNumbers) return false
-            if (preRelease != other.preRelease) return false
-            if (buildMetadata != other.buildMetadata) return false
-            return true
+        if (preRelease.isEmpty() && other.preRelease.isNotEmpty()) {
+            return 1
         }
-
-        override fun hashCode(): Int {
-            var result = normalNumbers.hashCode()
-            result = 31 * result + preRelease.hashCode()
-            result = 31 * result + buildMetadata.hashCode()
-            return result
+        if (preRelease.isNotEmpty() && other.preRelease.isEmpty()) {
+            return -1
         }
-
-        override fun toString(): String {
-            val buffer = StringBuilder(normalString)
-            if (preRelease.isNotEmpty()) {
-                buffer.append("-$preReleaseString")
+        val it = preRelease.iterator()
+        val ito = other.preRelease.iterator()
+        while (it.hasNext()) {
+            if (!ito.hasNext()) {
+                return 1
             }
-            if (buildMetadata.isNotEmpty()) {
-                buffer.append("+$buildMetadataString")
+            val n = it.next()
+            val no = ito.next()
+            if (n == no) {
+                continue
             }
-            return buffer.toString()
+            val isNumberN = n.isNumeric()
+            val isNumberNo = no.isNumeric()
+            if (isNumberN && isNumberNo) {
+                if (n.length != no.length) {
+                    return n.length - no.length
+                }
+                return n.compareTo(no)
+            }
+            if (isNumberN) {
+                return -1
+            }
+            if (isNumberNo) {
+                return 1
+            }
+            return n.compareTo(no)
         }
+        if (ito.hasNext()) {
+            return -1
+        }
+        return 0
     }
+
 
     companion object {
 
-        private val IDENTIFIER_PATTERN = "[0-9A-Za-z-]+".toRegex()
+        private val IDENTIFIER_CHAR_MATCHER = NUMERIC_MATCHER
+            .or(UPPER_CASE_MATCHER)
+            .or(LOWER_CASE_MATCHER)
+            .or(HYPHEN_MATCHER)
 
-        @JvmOverloads
-        @JvmStatic
-        fun of(
-            normalNumbers: List<Int>,
-            preRelease: List<Any> = emptyList(),
-            buildMetadata: List<String> = emptyList(),
-        ): SemVer {
-            return newSemVer(normalNumbers, preRelease.toPreRelease(), buildMetadata)
-        }
+        private const val ILLEGAL_SEM_VER_CHARS = "Illegal SemVer: "
 
         @JvmOverloads
         @JvmStatic
@@ -363,102 +253,133 @@ interface SemVer : Comparable<SemVer> {
             major: Int,
             minor: Int,
             patch: Int,
-            preRelease: List<Any> = emptyList(),
+            preRelease: List<String> = emptyList(),
             buildMetadata: List<String> = emptyList()
         ): SemVer {
-            return newSemVer(listOf(major, minor, patch), preRelease.toPreRelease(), buildMetadata)
-        }
-
-        @JvmStatic
-        fun newSemVer(
-            normalNumbers: List<Int>,
-            preRelease: List<PreReleaseIdentifier>,
-            buildMetadata: List<String>,
-        ): SemVer {
-            return SemVerImpl(normalNumbers, preRelease, buildMetadata.toBuildMetadata())
+            return SemVerImpl(major, minor, patch, preRelease, buildMetadata)
         }
 
         @JvmName("parse")
         @JvmStatic
-        fun CharSequence.parseSemVer(): SemVer {
+        fun CharSequence.toSemVer(): SemVer {
 
-            fun parseNormalNumbers(subSpec: CharSequence): List<Int> {
-                val list = subSpec.split(".")
-                checkArgument(
-                    list.isNotEmpty(),
-                    "SemVer need at least dot separated parts: x[.y[.z[...]]]."
-                )
-                return list.map {
-                    try {
-                        it.toIntKt()
-                    } catch (e: Exception) {
-                        throw IllegalArgumentException("Wrong normal number: $it", e)
-                    }
+            fun CharSequence.isNumericAndNoLedByZeros(): Boolean {
+                if (this.isEmpty()) {
+                    return false
+                }
+                if (!this.isNumeric()) {
+                    return false
+                }
+                return !this.isLedByZeros()
+            }
+
+            fun CharSequence.checkAndParseNormal(): Int {
+                if (!this.isNumericAndNoLedByZeros()) {
+                    throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
+                }
+                return this.toInt()
+            }
+
+            fun CharSequence.checkPreRelease() {
+                if (this.isNumeric() && this.isLedByZeros()) {
+                    throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
+                }
+                if (!IDENTIFIER_CHAR_MATCHER.matchesAllOf(this)) {
+                    throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
                 }
             }
 
-            fun parsePreVersion(subSpec: CharSequence): List<PreReleaseIdentifier> {
-                val list = subSpec.split(".")
-                return list.toPreRelease()
+            fun CharSequence.checkBuildMetadata() {
+                if (!IDENTIFIER_CHAR_MATCHER.matchesAllOf(this)) {
+                    throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
+                }
             }
 
-            fun parseBuildMetadata(subSpec: CharSequence): List<String> {
-                return subSpec.split(".").toBuildMetadata()
+            var normalSeq: CharSequence? = null
+            var preReleaseSeq: CharSequence? = null
+            var buildMetadataSeq: CharSequence? = null
+
+            val iPre = HYPHEN_MATCHER.indexIn(this)
+            if (iPre in 0..4) {
+                throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
+            }
+            val iPlus = PLUS_MATCHER.indexIn(this)
+            if (iPlus in 0..4) {
+                throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
+            }
+            if (iPre < 0 && iPlus < 0) {
+                normalSeq = this
+            } else if (iPre > 0 && iPlus < 0) {
+                normalSeq = this.stringRef(0, iPre)
+                preReleaseSeq = this.stringRef(iPre + 1)
+            } else if (iPre < 0) {
+                normalSeq = this.stringRef(0, iPlus)
+                buildMetadataSeq = this.stringRef(iPlus + 1)
+            } else if (iPre < iPlus) {
+                normalSeq = this.stringRef(0, iPre)
+                preReleaseSeq = this.stringRef(iPre + 1, iPlus)
+                buildMetadataSeq = this.stringRef(iPlus + 1)
+            } else {
+                normalSeq = this.stringRef(0, iPlus)
+                buildMetadataSeq = this.stringRef(iPlus + 1)
             }
 
-            val hyphenIndex = HYPHEN_MATCHER.indexIn(this)
-            val plusSignIndex = PLUS_MATCHER.indexIn(this)
-            if (hyphenIndex < 0 && plusSignIndex < 0) {
-                return newSemVer(parseNormalNumbers(this), emptyList(), emptyList())
+            val normals = normalSeq.split('.')
+            if (normals.size != 3) {
+                throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
             }
-            if (hyphenIndex > 0 && plusSignIndex < 0) {
-                return newSemVer(
-                    parseNormalNumbers(this.subSequence(0, hyphenIndex)),
-                    parsePreVersion(this.subSequence(hyphenIndex + 1, this.length)),
-                    emptyList()
-                )
+            val major = normals[0].checkAndParseNormal()
+            val minor = normals[1].checkAndParseNormal()
+            val patch = normals[2].checkAndParseNormal()
+
+            var preRelease: List<String> = emptyList()
+            var buildMetadata: List<String> = emptyList()
+
+            if (preReleaseSeq !== null) {
+                preRelease = preReleaseSeq.split('.')
+                for (s in preRelease) {
+                    s.checkPreRelease()
+                }
             }
-            if (hyphenIndex < 0 && plusSignIndex > 0) {
-                return newSemVer(
-                    parseNormalNumbers(this.subSequence(0, plusSignIndex)),
-                    emptyList(),
-                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length))
-                )
+            if (buildMetadataSeq !== null) {
+                buildMetadata = buildMetadataSeq.split('.')
+                for (s in preRelease) {
+                    s.checkBuildMetadata()
+                }
             }
-            if (plusSignIndex < hyphenIndex) {
-                return newSemVer(
-                    parseNormalNumbers(this.subSequence(0, plusSignIndex)),
-                    emptyList(),
-                    parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length))
-                )
+
+            return SemVerImpl(major, minor, patch, preRelease, buildMetadata)
+        }
+
+        private class SemVerImpl(
+            override val major: Int,
+            override val minor: Int,
+            override val patch: Int,
+            override val preRelease: List<String>,
+            override val buildMetadata: List<String>
+        ) : SemVer {
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (other !is SemVer) return false
+                return this.compareTo(other) == 0
             }
-            return newSemVer(
-                parseNormalNumbers(this.subSequence(0, hyphenIndex)),
-                parsePreVersion(this.subSequence(hyphenIndex + 1, plusSignIndex)),
-                parseBuildMetadata(this.subSequence(plusSignIndex + 1, this.length))
-            )
+
+            override fun hashCode(): Int {
+                var result = major
+                result = 31 * result + minor
+                result = 31 * result + patch
+                result = 31 * result + preRelease.hashCode()
+                return result
+            }
+
+            override fun toString(): String {
+                return fullString()
+            }
         }
 
         private fun List<Any>.joinDotToString(): String {
             return this.joinToString(".")
-        }
-
-        private fun List<Any>.toPreRelease(): List<PreReleaseIdentifier> {
-            return this.map {
-                PreReleaseIdentifier.of(it)
-            }
-        }
-
-        private fun List<Any>.toBuildMetadata(): List<String> {
-            return this.map {
-                val string = it.toString()
-                if (!string.matches(IDENTIFIER_PATTERN)) {
-                    throw IllegalArgumentException(
-                        "SemVer build metadata identifier should be in ${IDENTIFIER_PATTERN.pattern}: $string"
-                    )
-                }
-                string
-            }
         }
     }
 }
