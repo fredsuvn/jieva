@@ -331,11 +331,11 @@ fun <K, V> setMap(
     map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
     valueSet: Function<K, MutableSet<V>> = Function { LinkedHashSet() }
 ): SetMap<K, V> {
-    return setMap(map, valueSet.toKotlinFun())
+    return newSetMap(map, valueSet.toKotlinFun())
 }
 
 @JvmSynthetic
-fun <K, V> setMap(
+fun <K, V> newSetMap(
     map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
     valueSet: (K) -> MutableSet<V> = { LinkedHashSet() }
 ): SetMap<K, V> {
@@ -353,11 +353,11 @@ fun <K, V> listMap(
     map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
     valueList: Function<K, MutableList<V>> = Function { LinkedList() }
 ): ListMap<K, V> {
-    return listMap(map, valueList.toKotlinFun())
+    return newListMap(map, valueList.toKotlinFun())
 }
 
 @JvmSynthetic
-fun <K, V> listMap(
+fun <K, V> newListMap(
     map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
     valueList: (K) -> MutableList<V> = { LinkedList() }
 ): ListMap<K, V> {
