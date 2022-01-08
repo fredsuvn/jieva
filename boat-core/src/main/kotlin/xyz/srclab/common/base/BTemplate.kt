@@ -12,9 +12,9 @@ import java.util.*
  * @see StringTemplate
  * @see SimpleTemplate
  */
-@JvmName("resolve")
+@JvmName("parse")
 @JvmOverloads
-fun CharSequence.toTemplate(
+fun CharSequence.parseTemplate(
     escapeChar: Char,
     parameterPrefix: CharSequence,
     parameterSuffix: CharSequence? = null
