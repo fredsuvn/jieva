@@ -4,11 +4,13 @@ package xyz.srclab.common.base
 
 @JvmName("getValue")
 @Throws(EnumNotFoundException::class)
+@JvmOverloads
 fun <T : Enum<T>> Class<*>.enumValue(name: CharSequence, ignoreCase: Boolean = false): T {
     return enumValueOrNull(name, ignoreCase) ?: throw EnumNotFoundException("$this.$name")
 }
 
 @JvmName("getValueOrNull")
+@JvmOverloads
 fun <T> Class<*>.enumValueOrNull(name: CharSequence, ignoreCase: Boolean = false): T? {
     if (!ignoreCase) {
         return name.toString().toEnumOrNull(this)?.asTyped()
