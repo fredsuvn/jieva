@@ -6,11 +6,11 @@ import java.util.*
 
 val DEFAULT_SNOWFLAKE_ID = SnowflakeId(0)
 
-fun nextUuid(): String {
+fun uuid(): String {
     return UUID.randomUUID().toString()
 }
 
-fun nextSnowflakeId(): Long {
+fun snowflakeId(): Long {
     return DEFAULT_SNOWFLAKE_ID.next()
 }
 
