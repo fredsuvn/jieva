@@ -45,6 +45,21 @@ fun <K, V, C : MutableMap<in K, in V>> C.collect(keyValues: Iterable<Any?>): C {
     return this
 }
 
+fun <K, V> newEntry(key: K, value: V): MutableMap.MutableEntry<K, V> {
+    return object : MutableMap.MutableEntry<K, V> {
+        private var v = value
+        override val key: K = key
+        override val value: V
+            get() = v
+
+        override fun setValue(newValue: V): V {
+            val result = v
+            v = newValue
+            return v
+        }
+    }
+}
+
 @JvmOverloads
 fun <K, T : Any> Map<K, *>.get(key: K, type: Class<out T>, converter: Converter = Converter.defaultConverter()): T {
     return converter.convert(this[key], type)
