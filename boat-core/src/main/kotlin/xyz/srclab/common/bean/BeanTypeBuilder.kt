@@ -2,7 +2,6 @@ package xyz.srclab.common.bean
 
 import java.lang.reflect.Type
 import java.util.*
-import kotlin.collections.LinkedHashMap
 
 /**
  * Builder for [BeanType].

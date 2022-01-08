@@ -200,11 +200,13 @@ fun URL.toFile(): File {
 }
 
 fun RandomAccessFile.toInputStream(
-    offset: Long = 0, length: Long = remainingLength(this.length(), offset)): RandomInputStream {
+    offset: Long = 0, length: Long = remainingLength(this.length(), offset)
+): RandomInputStream {
     return RandomInputStream(this, offset, length)
 }
 
 fun RandomAccessFile.toOutputStream(
-    offset: Long = 0, length: Long = remainingLength(this.length(), offset)): RandomOutputStream {
+    offset: Long = 0, length: Long = remainingLength(this.length(), offset)
+): RandomOutputStream {
     return RandomOutputStream(this, offset, length)
 }
