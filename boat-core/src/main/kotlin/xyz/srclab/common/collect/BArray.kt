@@ -144,11 +144,11 @@ fun FloatArray.asList(): MutableList<Float> {
     return ArrayBridgeList(object : ArrayBridge<Float> {
         override val size: Int get() = this@asList.size
         override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Float): Boolean = this@asList.contains(element)
+        override fun contains(element: Float): Boolean = this@asList.any { it == element }
         override fun get(index: Int): Float = this@asList[index]
         override fun set(index: Int, element: Float): Float = this@asList[index].let { this@asList[index] = element;it }
-        override fun indexOf(element: Float): Int = this@asList.indexOf(element)
-        override fun lastIndexOf(element: Float): Int = this@asList.lastIndexOf(element)
+        override fun indexOf(element: Float): Int = this@asList.indexOfFirst { it == element }
+        override fun lastIndexOf(element: Float): Int = this@asList.indexOfLast { it == element }
     })
 }
 
@@ -159,13 +159,13 @@ fun DoubleArray.asList(): MutableList<Double> {
     return ArrayBridgeList(object : ArrayBridge<Double> {
         override val size: Int get() = this@asList.size
         override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Double): Boolean = this@asList.contains(element)
+        override fun contains(element: Double): Boolean = this@asList.any { it == element }
         override fun get(index: Int): Double = this@asList[index]
         override fun set(index: Int, element: Double): Double =
             this@asList[index].let { this@asList[index] = element;it }
 
-        override fun indexOf(element: Double): Int = this@asList.indexOf(element)
-        override fun lastIndexOf(element: Double): Int = this@asList.lastIndexOf(element)
+        override fun indexOf(element: Double): Int = this@asList.indexOfFirst { it == element }
+        override fun lastIndexOf(element: Double): Int = this@asList.indexOfLast { it == element }
     })
 }
 
