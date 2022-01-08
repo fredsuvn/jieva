@@ -7,7 +7,7 @@ import java.util.function.Function
 /**
  * Copy-On-Write [Map].
  */
-open class CopyOnWriteMap<K, V> @JvmOverloads constructor(
+open class CopyOnWriteMap<K, V>(
     initMap: Map<out K, V>,
     private val newMap: (Map<out K, V>) -> MutableMap<K, V>
 ) : MutableMap<K, V> {
