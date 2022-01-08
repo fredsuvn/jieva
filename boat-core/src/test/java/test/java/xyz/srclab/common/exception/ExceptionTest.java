@@ -7,8 +7,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.exception.ImpossibleException;
 import xyz.srclab.common.exception.StatusException;
 import xyz.srclab.common.status.Status;
-
-import java.util.List;
+import xyz.srclab.common.status.StringStatus;
 
 /**
  * @author sunqian
@@ -23,31 +22,16 @@ public class ExceptionTest {
         Assert.assertEquals(testException.getCause(), impossibleException);
 
         TestException testException2 = new TestException("8", "888", impossibleException);
-        Status<String, String> exceptionStatus = testException2.withMoreDescription("999");
+        Status<String, String, StringStatus> exceptionStatus = testException2.withMoreDescription("999");
         Assert.assertEquals(exceptionStatus.getDescription(), "888[999]");
-        Status<String, String> exceptionStatus2 = testException2.withNewDescription("999");
+        Status<String, String, StringStatus> exceptionStatus2 = testException2.withNewDescription("999");
         Assert.assertEquals(exceptionStatus2.getDescription(), "999");
     }
 
     public static class TestException extends StatusException {
 
-        public TestException(@NotNull Status<String, String> exceptionStatus, @Nullable Throwable cause) {
+        public TestException(@NotNull Status<String, String, StringStatus> exceptionStatus, @Nullable Throwable cause) {
             super(exceptionStatus, cause);
-        }
-
-        public TestException() {
-        }
-
-        public TestException(@Nullable Throwable cause) {
-            super(cause);
-        }
-
-        public TestException(@Nullable String message) {
-            super(message);
-        }
-
-        public TestException(@Nullable String message, @Nullable Throwable cause) {
-            super(message, cause);
         }
 
         public TestException(@NotNull String code, @Nullable String description, @Nullable Throwable cause) {
@@ -63,12 +47,6 @@ public class ExceptionTest {
         @Override
         public String getDescription() {
             return super.getDescription();
-        }
-
-        @NotNull
-        @Override
-        public List<String> getDescriptions() {
-            return super.getDescriptions();
         }
     }
 }
