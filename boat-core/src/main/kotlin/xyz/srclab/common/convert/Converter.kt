@@ -5,6 +5,7 @@ import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.collect.isEmpty
 import xyz.srclab.common.collect.plusBefore
 import xyz.srclab.common.convert.Converter.Companion.extend
+import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type
 
 /**
@@ -30,6 +31,11 @@ interface Converter {
     }
 
     @Throws(UnsupportedConvertException::class)
+    fun <T : Any> convert(from: Any?, toType: TypeRef<T>): T {
+        return convert(from, toType.type)
+    }
+
+    @Throws(UnsupportedConvertException::class)
     fun <T : Any> convert(from: Any?, fromType: Type, toType: Class<T>): T {
         return convertOrNull(from, fromType, toType) ?: throw UnsupportedConvertException(fromType, toType)
     }
@@ -45,6 +51,10 @@ interface Converter {
 
     fun <T : Any> convertOrNull(from: Any?, toType: Type): T? {
         return convertOrNull(from, from?.javaClass ?: Any::class.java, toType)
+    }
+
+    fun <T : Any> convertOrNull(from: Any?, toType: TypeRef<T>): T? {
+        return convertOrNull(from, toType.type)
     }
 
     fun <T : Any> convertOrNull(from: Any?, fromType: Type, toType: Class<T>): T? {

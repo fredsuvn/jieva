@@ -4,9 +4,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.collect.Collects;
+import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.collect.BList;
+import xyz.srclab.common.collect.BMap;
+import xyz.srclab.common.collect.BSet;
 import xyz.srclab.common.convert.*;
-import xyz.srclab.common.logging.Logs;
 import xyz.srclab.common.reflect.TypeRef;
 
 import java.lang.reflect.Type;
@@ -22,23 +24,23 @@ public class ConvertTest {
     @Test
     public void testConvert() {
         String str = "9999";
-        BigInteger bigInteger = Converts.convert(str, BigInteger.class);
+        BigInteger bigInteger = BConvert.convert(str, BigInteger.class);
         Assert.assertEquals(bigInteger, new BigInteger("9999"));
     }
 
     @Test
     public void testConvertGeneric() {
-        List<? super Map<String, Long>> list = Collects.newList(Collects.newMap("777", 888));
-        Set<? super ConcurrentHashMap<Integer, Double>> set = Converts.convert(
+        List<? super Map<String, Long>> list = BList.newList(BMap.newMap("777", 888));
+        Set<? super ConcurrentHashMap<Integer, Double>> set = BConvert.convert(
             list, new TypeRef<Set<? super ConcurrentHashMap<Integer, Double>>>() {
             });
-        Assert.assertEquals(set, Collects.newSet(new ConcurrentHashMap(Collects.newMap(777, 888.0))));
+        Assert.assertEquals(set, BSet.newSet(new ConcurrentHashMap(BMap.newMap(777, 888.0))));
     }
 
     @Test
     public void testConvertEnum() {
-        E e = Converts.convert("b", E.class);
-        Logs.info("e: {}", e);
+        E e = BConvert.convert("b", E.class);
+        BLog.info("e: {}", e);
         Assert.assertEquals(e, E.B);
     }
 
@@ -46,24 +48,24 @@ public class ConvertTest {
     public void testConvertMap() {
         Map<Iterable<Long>, HashMap<Float, StringBuilder>> source = new LinkedHashMap<>();
         StringBuilder stringBuilder = new StringBuilder("BBB");
-        source.put(Arrays.asList(10086L), Collects.putEntries(new HashMap<>(), 8.8, stringBuilder));
-        Map<List<Double>, HashMap<Integer, CharSequence>> map = Converts.convert(
+        source.put(Arrays.asList(10086L), BMap.collect(new HashMap<>(), 8.8, stringBuilder));
+        Map<List<Double>, HashMap<Integer, CharSequence>> map = BConvert.convert(
             source,
             new TypeRef<Map<Iterable<Long>, HashMap<Float, StringBuilder>>>() {
-            },
+            }.getType(),
             new TypeRef<Map<List<Double>, HashMap<Integer, CharSequence>>>() {
-            });
-        Logs.info("map: {}", map);
+            }.getType());
+        BLog.info("map: {}", map);
         Assert.assertEquals(
             map.get(Arrays.asList(10086.0)),
-            Collects.putEntries(new HashMap<>(), 8, stringBuilder)
+            BMap.collect(new HashMap<>(), 8, stringBuilder)
         );
     }
 
     @Test
     public void testConvertList() {
-        List<String> list = Collects.newList("1", "2", "3");
-        byte[] bytes = Converts.convert(list, byte[].class);
+        List<String> list = BList.newList("1", "2", "3");
+        byte[] bytes = BConvert.convert(list, byte[].class);
         Assert.assertEquals(bytes, new byte[]{1, 2, 3});
     }
 
@@ -72,7 +74,7 @@ public class ConvertTest {
         A a = new A();
         a.setP1("1");
         a.setP2(2);
-        B b = Converts.convert(a, B.class);
+        B b = BConvert.convert(a, B.class);
         B bb = new B();
         bb.setP1(1);
         bb.setP2(2.0f);
@@ -83,9 +85,9 @@ public class ConvertTest {
     public void testCustomHandler() {
         Converter converter = Converter.newConverter(
             Arrays.asList(new IntToStringHandler(), new LongToStringHandler()));
-        Logs.info("Convert int: {}", converter.convert(100, String.class));
+        BLog.info("Convert int: {}", converter.convert(100, String.class));
         Assert.assertEquals(converter.convert(100, String.class), "I100");
-        Logs.info("Convert long: {}", converter.convert(100L, String.class));
+        BLog.info("Convert long: {}", converter.convert(100L, String.class));
         Assert.assertEquals(converter.convert(100L, String.class), "L100");
     }
 
@@ -95,7 +97,7 @@ public class ConvertTest {
         Converter converter = Converter.newConverter(Collections.singletonList(CompatibleConvertHandler.INSTANCE));
     }
 
-    public static class IntToStringHandler implements BConvertHandler {
+    public static class IntToStringHandler implements ConvertHandler {
 
         @Nullable
         @Override
@@ -108,7 +110,7 @@ public class ConvertTest {
         }
     }
 
-    public static class LongToStringHandler implements BConvertHandler {
+    public static class LongToStringHandler implements ConvertHandler {
 
         @Nullable
         @Override
@@ -121,7 +123,7 @@ public class ConvertTest {
         }
     }
 
-    public static enum E {
+    public enum E {
         A, B, C
     }
 

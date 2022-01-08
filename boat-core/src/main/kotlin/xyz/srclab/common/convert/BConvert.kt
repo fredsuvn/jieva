@@ -2,6 +2,7 @@
 
 package xyz.srclab.common.convert
 
+import xyz.srclab.common.reflect.TypeRef
 import java.lang.reflect.Type
 
 private val defaultConverter
@@ -14,6 +15,11 @@ fun <T : Any> Any?.convert(toType: Class<T>): T {
 
 @Throws(UnsupportedConvertException::class)
 fun <T : Any> Any?.convert(toType: Type): T {
+    return defaultConverter.convert(this, toType)
+}
+
+@Throws(UnsupportedConvertException::class)
+fun <T : Any> Any?.convert(toType: TypeRef<T>): T {
     return defaultConverter.convert(this, toType)
 }
 
@@ -32,6 +38,10 @@ fun <T : Any> Any?.convertOrNull(toType: Class<T>): T? {
 }
 
 fun <T : Any> Any?.convertOrNull(toType: Type): T? {
+    return defaultConverter.convertOrNull(this, toType)
+}
+
+fun <T : Any> Any?.convertOrNull(toType: TypeRef<T>): T? {
     return defaultConverter.convertOrNull(this, toType)
 }
 
