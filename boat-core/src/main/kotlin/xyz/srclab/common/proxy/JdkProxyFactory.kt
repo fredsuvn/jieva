@@ -6,13 +6,13 @@ import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
-object JdkProxyClassGenerator : ProxyClassGenerator {
+object JdkProxyFactory : ClassProxyFactory {
 
     override fun <T : Any> generate(
         sourceClass: Class<T>,
         proxyMethods: Iterable<ProxyMethod>,
         classLoader: ClassLoader
-    ): ProxyClass<T> {
+    ): ClassProxy<T> {
         return ProxyClassImpl(sourceClass, proxyMethods, classLoader)
     }
 
@@ -20,9 +20,9 @@ object JdkProxyClassGenerator : ProxyClassGenerator {
         private val sourceClass: Class<T>,
         private val proxyMethods: Iterable<ProxyMethod>,
         private val classLoader: ClassLoader
-    ) : ProxyClass<T> {
+    ) : ClassProxy<T> {
 
-        override fun instantiate(): T {
+        override fun create(): T {
             return Proxy.newProxyInstance(
                 classLoader,
                 arrayOf(sourceClass),
@@ -30,7 +30,7 @@ object JdkProxyClassGenerator : ProxyClassGenerator {
             ).asTyped()
         }
 
-        override fun instantiate(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
+        override fun create(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
             throw IllegalArgumentException("JDK proxy only supports interface.")
         }
     }

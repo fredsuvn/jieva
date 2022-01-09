@@ -5,16 +5,16 @@ import xyz.srclab.common.reflect.currentClassLoader
 /**
  * Represents a proxy class, used to instantiate proxy object.
  *
- * @see ProxyClassGenerator
- * @see SpringProxyClassGenerator
- * @see CglibProxyClassGenerator
- * @see JdkProxyClassGenerator
+ * @see ClassProxyFactory
+ * @see SpringProxyFactory
+ * @see CglibProxyFactory
+ * @see JdkProxyFactory
  */
-interface ProxyClass<T : Any> {
+interface ClassProxy<T : Any> {
 
-    fun instantiate(): T
+    fun create(): T
 
-    fun instantiate(parameterTypes: Array<Class<*>>, args: Array<Any?>): T
+    fun create(parameterTypes: Array<Class<*>>, args: Array<Any?>): T
 
     companion object {
 
@@ -27,8 +27,8 @@ interface ProxyClass<T : Any> {
             sourceClass: Class<T>,
             proxyMethods: Iterable<ProxyMethod>,
             classLoader: ClassLoader = currentClassLoader(),
-            proxyClassGenerator: ProxyClassGenerator = ProxyClassGenerator.DEFAULT,
-        ): ProxyClass<T> {
+            proxyClassGenerator: ClassProxyFactory = ClassProxyFactory.DEFAULT,
+        ): ClassProxy<T> {
             return proxyClassGenerator.generate(sourceClass, proxyMethods, classLoader)
         }
     }

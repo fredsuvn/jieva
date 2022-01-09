@@ -1,18 +1,18 @@
 package xyz.srclab.common.proxy
 
-import net.sf.cglib.proxy.*
+import org.springframework.cglib.proxy.*
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.func.StaticFunc
 import java.lang.reflect.Method
 import java.util.*
 
-object CglibProxyClassGenerator : ProxyClassGenerator {
+object SpringProxyFactory : ClassProxyFactory {
 
     override fun <T : Any> generate(
         sourceClass: Class<T>,
         proxyMethods: Iterable<ProxyMethod>,
         classLoader: ClassLoader
-    ): ProxyClass<T> {
+    ): ClassProxy<T> {
         val enhancer = Enhancer()
         enhancer.classLoader = classLoader
         if (sourceClass.isInterface) {
@@ -55,13 +55,13 @@ object CglibProxyClassGenerator : ProxyClassGenerator {
         }
     }
 
-    private class ProxyClassImpl<T : Any>(private val enhancer: Enhancer) : ProxyClass<T> {
+    private class ProxyClassImpl<T : Any>(private val enhancer: Enhancer) : ClassProxy<T> {
 
-        override fun instantiate(): T {
+        override fun create(): T {
             return enhancer.create().asTyped()
         }
 
-        override fun instantiate(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
+        override fun create(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
             return enhancer.create(parameterTypes, args).asTyped()
         }
     }

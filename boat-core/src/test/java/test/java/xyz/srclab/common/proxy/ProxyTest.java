@@ -3,9 +3,12 @@ package test.java.xyz.srclab.common.proxy;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Contexts;
-import xyz.srclab.common.logging.Logs;
-import xyz.srclab.common.proxy.*;
+import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.func.StaticFunc;
+import xyz.srclab.common.proxy.ClassProxy;
+import xyz.srclab.common.proxy.ClassProxyFactory;
+import xyz.srclab.common.proxy.ProxyMethod;
+import xyz.srclab.common.reflect.BClass;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -14,21 +17,21 @@ public class ProxyTest {
 
     @Test
     public void testClassProxy() {
-        Assert.assertEquals(ProxyClassGenerator.DEFAULT, SpringProxyClassGenerator.INSTANCE);
-        doTestProxy(CglibProxyClassGenerator.INSTANCE, TC.class);
+        Assert.assertEquals(ClassProxyFactory.defaultFactory(), ClassProxyFactory.spring());
+        doTestProxy(ClassProxyFactory.cglib(), TC.class);
         //doTestProxy(SpringProxyClassFactory.INSTANCE, TC.class);
     }
 
     @Test
     public void testInterfaceProxy() {
         //doTestProxy(CglibProxyClassFactory.INSTANCE, TI.class);
-        doTestProxy(SpringProxyClassGenerator.INSTANCE, TI.class);
-        doTestProxy(JdkProxyClassGenerator.INSTANCE, TI.class);
+        doTestProxy(ClassProxyFactory.spring(), TI.class);
+        doTestProxy(ClassProxyFactory.jdk(), TI.class);
     }
 
-    private <T extends TI> void doTestProxy(ProxyClassGenerator proxyClassGenerator, Class<T> type) {
+    private <T extends TI> void doTestProxy(ClassProxyFactory factory, Class<T> type) {
 
-        ProxyMethod<T> proxyMethod = new ProxyMethod<T>() {
+        ProxyMethod proxyMethod = new ProxyMethod() {
 
             @Override
             public boolean isProxy(@NotNull Method method) {
@@ -38,20 +41,20 @@ public class ProxyTest {
 
             @Override
             public Object invoke(
-                @NotNull T proxied,
-                @NotNull Method proxiedMethod,
-                @NotNull SourceInvoker superInvoke,
-                Object @NotNull [] args
+                @NotNull Object sourceObject,
+                @NotNull Method sourceMethod,
+                @NotNull StaticFunc sourceInvoke,
+                Object[] args
             ) {
-                Logs.info("method: {}, declaring class: {}", proxiedMethod, proxiedMethod.getDeclaringClass());
-                return "proxy-> " + (type.isInterface() ? "interface" : superInvoke.invoke(args));
+                BLog.info("method: {}, declaring class: {}", sourceMethod, sourceMethod.getDeclaringClass());
+                return "proxy-> " + (type.isInterface() ? "interface" : sourceInvoke.invoke(args));
             }
         };
 
-        ProxyClass<T> proxyClass = ProxyClass.generate(
-            type, Arrays.asList(proxyMethod), Contexts.currentClassLoader(), proxyClassGenerator);
+        ClassProxy<T> proxyClass = ClassProxy.generate(
+            type, Arrays.asList(proxyMethod), BClass.currentClassLoader(), factory);
         Assert.assertEquals(
-            proxyClass.instantiate().hello("a", "b"),
+            proxyClass.create().hello("a", "b"),
             type.isInterface() ? "proxy-> interface" : "proxy-> hello: a = a, b = b");
     }
 
