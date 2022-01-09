@@ -2,8 +2,8 @@ package test.java.xyz.srclab.common.io;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.io.IOs;
-import xyz.srclab.common.logging.Logs;
+import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.io.BIO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -21,19 +21,19 @@ public class IOTest {
     @Test
     public void testStream() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = IOs.asInputStream(text.getBytes());
-        String inputString = IOs.readString(input);
+        InputStream input = BIO.toInputStream(text.getBytes());
+        String inputString = BIO.readString(input);
         input.reset();
-        Logs.info("inputString: {}", inputString);
+        BLog.info("inputString: {}", inputString);
         Assert.assertEquals(inputString, text);
-        byte[] bytes = IOs.readBytes(input);
+        byte[] bytes = BIO.readBytes(input);
         input.reset();
         Assert.assertEquals(bytes, text.getBytes());
-        List<String> inputStrings = IOs.readLines(input);
+        List<String> inputStrings = BIO.readLines(input);
         input.reset();
         Assert.assertEquals(inputStrings, Arrays.asList("123456", "234567"));
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        IOs.readTo(input, output);
+        BIO.readTo(input, output);
         input.reset();
         Assert.assertEquals(output.toByteArray(), bytes);
     }
@@ -41,21 +41,21 @@ public class IOTest {
     @Test
     public void testReader() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = IOs.asInputStream(text.getBytes());
-        Reader reader = IOs.toReader(input);
-        String readString = IOs.readString(reader);
+        InputStream input = BIO.toInputStream(text.getBytes());
+        Reader reader = BIO.toReader(input);
+        String readString = BIO.readString(reader);
         input.reset();
-        Logs.info("readString: {}", readString);
+        BLog.info("readString: {}", readString);
         Assert.assertEquals(readString, text);
-        char[] chars = IOs.readString(reader).toCharArray();
+        char[] chars = BIO.readString(reader).toCharArray();
         input.reset();
         Assert.assertEquals(chars, text.toCharArray());
-        List<String> readStrings = IOs.readLines(reader);
+        List<String> readStrings = BIO.readLines(reader);
         input.reset();
         Assert.assertEquals(readStrings, Arrays.asList("123456", "234567"));
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Writer writer = IOs.toWriter(output);
-        IOs.readTo(reader, writer);
+        Writer writer = BIO.toWriter(output);
+        BIO.readTo(reader, writer);
         input.reset();
         writer.flush();
         Assert.assertEquals(output.toByteArray(), text.getBytes());
@@ -65,11 +65,11 @@ public class IOTest {
     public void testByteBuffer() {
         ByteBuffer buffer = ByteBuffer.allocate(100);
         initBuffer(buffer);
-        byte[] bytes = IOs.toBytes(buffer);
+        byte[] bytes = BIO.toBytes(buffer);
         Assert.assertEquals(bytes, buffer.array());
         ByteBuffer buffer2 = ByteBuffer.allocateDirect(100);
         initBuffer(buffer2);
-        byte[] bytes2 = IOs.toBytes(buffer2);
+        byte[] bytes2 = BIO.toBytes(buffer2);
         Assert.assertEquals(bytes2, initArray(new byte[100]));
     }
 

@@ -2,11 +2,10 @@
 
 package xyz.srclab.common.io
 
+import xyz.srclab.common.base.isEmpty
 import xyz.srclab.common.collect.toTypedArray
-import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.RandomAccessFile
+import java.io.*
+import java.net.URL
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.file.*
@@ -94,4 +93,36 @@ fun Path.mappedByteBuffer(
 ): MappedByteBuffer {
     val channel = FileChannel.open(this, openOptions.toSet(), *fileAttributes.toTypedArray())
     return channel.map(mode, position, size)
+}
+
+fun URL.toFile(): File {
+    return this.file.let {
+        if (it.isEmpty()) {
+            throw FileNotFoundException(it)
+        } else {
+            File(it)
+        }
+    }
+}
+
+fun URL.toFileOrNull(): File? {
+    return try {
+        this.file.let {
+            if (it.isEmpty()) {
+                null
+            } else {
+                File(it)
+            }
+        }
+    } catch (e: IOException) {
+        null
+    }
+}
+
+fun URL.toPath(): Path {
+    return toFile().toPath()
+}
+
+fun URL.toPathOrNull(): Path? {
+    return toFileOrNull()?.toPath()
 }
