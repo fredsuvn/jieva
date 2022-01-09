@@ -1,4 +1,4 @@
-@file:JvmName("Jacksons")
+@file:JvmName("BJackson")
 
 package xyz.srclab.common.serialize.jackson
 
@@ -13,17 +13,18 @@ import xyz.srclab.common.serialize.json.JsonSerializer
 val JAVA_TIME_MODULE = JavaTimeModule()
 
 /**
- * Returns [JsonSerializer] by Jackson implementation.
+ * Adds following modules and configurations:
  *
- * Following module and configure will be set:
  * * [DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES] : false
  * * [JavaTimeModule]
  * * [KotlinModule]
  */
-@JvmName("newJsonSerializer")
-fun ObjectMapper.toJsonSerializer(): JsonSerializer {
+fun ObjectMapper.addCommonSettings() = apply {
     this.registerModule(JAVA_TIME_MODULE)
     this.registerKotlinModule()
     this.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+}
+
+fun ObjectMapper.toJsonSerializer(): JsonSerializer {
     return JacksonJsonSerializer(this)
 }

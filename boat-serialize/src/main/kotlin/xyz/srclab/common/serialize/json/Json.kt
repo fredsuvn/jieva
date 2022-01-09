@@ -18,16 +18,18 @@ interface Json : Serial {
     val type: JsonType
 
     /**
-     * Returns stringified value of this [Json].
-     * If content is `abs`, returns "abs".
+     * To json string.
+     *
+     * Note if content is `abs`, returns `"abs"`.
      *
      * @see [toText]
      */
     fun toJsonString(): String
 
     /**
-     * Returns stringified value of this [Json].
-     * If content is `abs`, returns "abs"'s bytes.
+     * To json string as bytes.
+     *
+     * Note if content is `abs`, returns bytes of `"abs"`.
      *
      * @see [toBytes]
      */

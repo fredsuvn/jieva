@@ -9,7 +9,10 @@ import java.lang.reflect.Type
 import java.net.URL
 import java.nio.ByteBuffer
 
-private val jsonSerializer: JsonSerializer = JsonSerializer.DEFAULT
+private val jsonSerializer: JsonSerializer
+    get() {
+        return JsonSerializer.defaultSerializer()
+    }
 
 /**
  * Serialize or deserialize operation, source -> [Json].

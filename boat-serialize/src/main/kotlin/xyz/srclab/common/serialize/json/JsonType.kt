@@ -2,8 +2,6 @@ package xyz.srclab.common.serialize.json
 
 /**
  * Type of json.
- *
- * @author sunqian
  */
 enum class JsonType {
 

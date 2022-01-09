@@ -1,8 +1,8 @@
 package xyz.srclab.common.serialize.json
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.json.JsonMapper
 import xyz.srclab.common.serialize.Serializer
+import xyz.srclab.common.serialize.jackson.addCommonSettings
 import xyz.srclab.common.serialize.jackson.toJsonSerializer
 import java.io.InputStream
 import java.io.Reader
@@ -13,8 +13,6 @@ import java.nio.ByteBuffer
  * Json [Serializer].
  *
  * It is thread-safe if it uses [ObjectMapper] as underlying implementation.
- *
- * @author sunqian
  *
  * @see Json
  * @see Serializer
@@ -53,7 +51,17 @@ interface JsonSerializer : Serializer<Json> {
     }
 
     companion object {
-        @JvmField
-        val DEFAULT = JsonMapper().toJsonSerializer()
+
+        private var defaultSerializer: JsonSerializer = JsonMapper().addCommonSettings().toJsonSerializer()
+
+        @JvmStatic
+        fun defaultSerializer(): JsonSerializer {
+            return defaultSerializer
+        }
+
+        @JvmStatic
+        fun setDefaultSerializer(defaultSerializer: JsonSerializer) {
+            this.defaultSerializer = defaultSerializer
+        }
     }
 }

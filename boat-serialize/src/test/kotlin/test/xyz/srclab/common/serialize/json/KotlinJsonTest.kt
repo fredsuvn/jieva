@@ -2,7 +2,7 @@ package test.xyz.srclab.common.serialize.json
 
 import org.testng.Assert
 import org.testng.annotations.Test
-import xyz.srclab.common.logging.info
+import xyz.srclab.common.base.info
 import xyz.srclab.common.serialize.json.parseJson
 import xyz.srclab.common.serialize.json.toJsonString
 

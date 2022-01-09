@@ -1,11 +1,9 @@
 package xyz.srclab.common.serialize
 
 import xyz.srclab.annotations.Immutable
-import xyz.srclab.common.base.ByteArrayRef
+import xyz.srclab.common.base.BytesRef
 import xyz.srclab.common.base.DEFAULT_CHARSET
-import xyz.srclab.common.io.asOutputStream
-import xyz.srclab.common.io.asWriter
-import xyz.srclab.common.io.toReader
+import xyz.srclab.common.io.*
 import xyz.srclab.common.reflect.TypeRef
 import xyz.srclab.common.serialize.json.Json
 import java.io.InputStream
@@ -17,6 +15,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
+import kotlin.io.readBytes
 
 /**
  * Serial represents a middle object between binary sequence and java object. There are two type of methods:
@@ -83,23 +82,23 @@ interface Serial {
         toInputStream().read(byteArray, offset, length)
     }
 
-    fun writeTo(byteArrayRef: ByteArrayRef) {
-        toInputStream().read(byteArrayRef.array, byteArrayRef.startIndex, byteArrayRef.length)
+    fun writeTo(bytes: BytesRef) {
+        writeTo(bytes.array, bytes.offset, bytes.length)
     }
 
     fun writeTo(byteBuffer: ByteBuffer) {
         //byteBuffer.put(toBytes())
-        toInputStream().copyTo(byteBuffer.asOutputStream())
+        toInputStream().copyTo(byteBuffer.toOutputStream())
     }
 
     fun writeTo(appendable: Appendable) {
         //appendable.append(toReader().readText())
-        toReader().copyTo(appendable.asWriter())
+        toReader().copyTo(appendable.toWriter())
     }
 
     fun writeTo(appendable: Appendable, charset: Charset) {
         //appendable.append(toReader(charset).readText())
-        toReader(charset).copyTo(appendable.asWriter())
+        toReader(charset).copyTo(appendable.toWriter())
     }
 
     // Parse methods: Serial -> Java Object
