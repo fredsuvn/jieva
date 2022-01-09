@@ -2,6 +2,8 @@
 
 package xyz.srclab.common.io
 
+import org.apache.commons.io.input.ReaderInputStream
+import org.apache.commons.io.output.WriterOutputStream
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.remainingLength
 import java.io.*
@@ -132,6 +134,16 @@ fun OutputStream.toBufferedWriter(
     bufferSize: Int = DEFAULT_BUFFER_SIZE
 ): BufferedWriter {
     return this.writer(charset).buffered(bufferSize)
+}
+
+@JvmOverloads
+fun Reader.toInputStream(charset: Charset = DEFAULT_CHARSET): InputStream {
+    return ReaderInputStream(this, charset)
+}
+
+@JvmOverloads
+fun Writer.toOutputStream(charset: Charset = DEFAULT_CHARSET): OutputStream {
+    return WriterOutputStream(this, charset)
 }
 
 @JvmOverloads
