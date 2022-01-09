@@ -32,6 +32,18 @@ import java.util.*
  * C:\file.zip\_{}
  * ```
  *
+ * If Args' size less than `{}`, will output `{}` itself:
+ *
+ * ```
+ * BFormats.fastFormat("C:\\\\{}\\_{}", "file.zip");
+ * ```
+ *
+ * will output:
+ *
+ * ```
+ * C:\file.zip\_{}
+ * ```
+ *
  * @see FastFormat
  */
 @Throws(StringFormatException::class)
@@ -69,6 +81,18 @@ interface StringFormat {
  * ```
  * //Note java string `\\` means `\`
  * format("C:\\\\{}\\_\\{}", "file.zip");
+ * ```
+ *
+ * will output:
+ *
+ * ```
+ * C:\file.zip\_{}
+ * ```
+ *
+ * If Args' size less than `{}`, will output `{}` itself:
+ *
+ * ```
+ * format("C:\\\\{}\\_{}", "file.zip");
  * ```
  *
  * will output:
@@ -140,7 +164,10 @@ object FastFormat : StringFormat {
                 if (cn == '}') {
                     //Insert parameter
                     if (!argIndex.isIndexInBounds(0, args.size)) {
-                        throw StringFormatException("Argument index out of bounds: $argIndex")
+                        //Args bounds out of bounds
+                        //throw StringFormatException("Argument index out of bounds: $argIndex")
+                        i++
+                        continue
                     }
                     getBuffer().add(pattern.stringRef(start, i - 1))
                     getBuffer().add(args[argIndex])

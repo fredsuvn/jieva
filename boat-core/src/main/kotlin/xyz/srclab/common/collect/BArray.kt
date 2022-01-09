@@ -7,7 +7,6 @@ import xyz.srclab.common.base.checkIndexInBounds
 import xyz.srclab.common.base.toKotlinFun
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
-import java.util.*
 import java.util.function.Function
 import kotlin.collections.joinTo as joinToKt
 import kotlin.collections.joinToString as joinToStringKt
@@ -25,6 +24,10 @@ fun <T> Class<T>.newArray(length: Int): Array<T> {
 
 fun <T> Type.newArray(length: Int): Array<T> {
     return this.rawClass.newArray(length).asTyped()
+}
+
+fun Class<*>.newPrimitiveArray(length: Int): Any {
+    return java.lang.reflect.Array.newInstance(this, length)
 }
 
 @JvmOverloads
@@ -79,7 +82,15 @@ fun <T> Any.arrayAsList(): MutableList<T> {
  * Returns a [MutableList] that wraps the original array.
  */
 fun <T> Array<T>.asList(): MutableList<T> {
-    return Arrays.asList(*this)
+    return ArrayBridgeList(object : ArrayBridge<T> {
+        override val size: Int get() = this@asList.size
+        override fun isEmpty(): Boolean = this@asList.isEmpty()
+        override fun contains(element: T): Boolean = this@asList.contains(element)
+        override fun get(index: Int): T = this@asList[index]
+        override fun set(index: Int, element: T): T = this@asList[index].let { this@asList[index] = element;it }
+        override fun indexOf(element: T): Int = this@asList.indexOf(element)
+        override fun lastIndexOf(element: T): Int = this@asList.lastIndexOf(element)
+    })
 }
 
 /**

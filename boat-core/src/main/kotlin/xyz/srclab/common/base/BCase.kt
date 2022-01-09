@@ -309,7 +309,7 @@ open class SeparatorCase @JvmOverloads constructor(
     }
 
     private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
-        words.splitList.joinTo(appendable, separator)
+        words.splitList.joinTo(appendable, separator) { wordProcessor.apply(it) }
     }
 }
 

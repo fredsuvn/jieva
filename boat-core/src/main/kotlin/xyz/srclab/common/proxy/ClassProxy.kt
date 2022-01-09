@@ -27,7 +27,7 @@ interface ClassProxy<T : Any> {
             sourceClass: Class<T>,
             proxyMethods: Iterable<ProxyMethod>,
             classLoader: ClassLoader = currentClassLoader(),
-            proxyClassGenerator: ClassProxyFactory = ClassProxyFactory.DEFAULT,
+            proxyClassGenerator: ClassProxyFactory = ClassProxyFactory.defaultFactory(),
         ): ClassProxy<T> {
             return proxyClassGenerator.generate(sourceClass, proxyMethods, classLoader)
         }

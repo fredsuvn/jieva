@@ -460,35 +460,31 @@ interface LazyString : CharSequence {
 
         private class LazyStringImpl(private val supplier: Supplier<String>) : LazyString {
 
-            private var value: String? = null
+            private val value: String by lazy { supplier.get() }
 
             override val length: Int
-                get() = getOrLoadString().length
+                get() = value.length
 
             override fun get(index: Int): Char {
-                return getOrLoadString()[index]
+                return value[index]
             }
 
             override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
-                return getOrLoadString().subSequence(startIndex, endIndex)
+                return value.subSequence(startIndex, endIndex)
             }
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is LazyString) return false
-                return getOrLoadString() == other.toString()
+                return value == other.toString()
             }
 
             override fun hashCode(): Int {
-                return getOrLoadString().hashCode()
+                return value.hashCode()
             }
 
             override fun toString(): String {
-                return getOrLoadString()
-            }
-
-            private fun getOrLoadString(): String {
-                return value ?: supplier.get()
+                return value
             }
         }
     }

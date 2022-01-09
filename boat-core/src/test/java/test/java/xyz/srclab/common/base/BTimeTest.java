@@ -28,19 +28,25 @@ public class BTimeTest {
     }
 
     @Test
-    public void testDatePattern() {
-        DatePattern datePattern1 = DatePattern.of("yyyy-MM-dd hh:mm:ss");
-        String dateString1 = "2021-09-16 03:00:18";
+    public void testParseDate() {
+        DatePattern pattern = DatePattern.of("yyyy-MM-dd HH:mm:ss.SSS");
+        String date = "2021-09-16 03:00:18.000";
         Assert.assertEquals(
-            datePattern1.parseLocalDateTime(dateString1),
+            pattern.parseLocalDateTime(date),
+            LocalDateTime.of(2021, 9, 16, 3, 0, 18)
+        );
+    }
+
+    @Test
+    public void testBuildDate() {
+        DatePattern pattern = DatePattern.of("yyyy-MM-dd hh:mm:ss");
+        String date = "2021-09-16 03:00:18";
+        Assert.assertEquals(
+            pattern.buildLocalDateTime(date),
             LocalDateTime.of(2021, 9, 16, 3, 0, 18)
         );
         Assert.assertEquals(
-            datePattern1.buildLocalDateTime(dateString1),
-            LocalDateTime.of(2021, 9, 16, 3, 0, 18)
-        );
-        Assert.assertEquals(
-            datePattern1.buildLocalDateTimeOrNull(dateString1),
+            pattern.buildLocalDateTimeOrNull(date),
             LocalDateTime.of(2021, 9, 16, 3, 0, 18)
         );
     }

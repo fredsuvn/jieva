@@ -16,7 +16,7 @@ public class BStringTest {
         Assert.assertTrue(BString.equalsAny("1", "", "2", "1", "3"));
         Assert.assertFalse(BString.equalsAny("1", "", "2", "2", "3"));
         Assert.assertTrue(BString.equalsAll("1", "1", "1", "1"));
-        Assert.assertFalse(BString.equalsAny("1", "1", "1", "2"));
+        Assert.assertFalse(BString.equalsAny("1", "2", "3", "4"));
     }
 
     @Test

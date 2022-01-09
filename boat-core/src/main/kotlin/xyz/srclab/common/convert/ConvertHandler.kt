@@ -8,6 +8,7 @@ import xyz.srclab.common.collect.*
 import xyz.srclab.common.collect.IterableType.Companion.toIterableType
 import xyz.srclab.common.reflect.*
 import java.lang.reflect.*
+import java.lang.reflect.Array
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.charset.Charset
@@ -298,9 +299,17 @@ object CollectionConvertHandler : ConvertHandler {
         converter: Converter
     ): Any {
         val toComponentType = toType.componentType
-        return from.toArray(toComponentType.asTyped<Class<Any?>>()) {
-            converter.convertOrNull(it, fromComponentType, toComponentType)
+        if (!toComponentType.isPrimitive) {
+            return from.toArray(toComponentType.asTyped<Class<Any?>>()) {
+                converter.convertOrNull(it, fromComponentType, toComponentType)
+            }
         }
+        val primitiveArray = toComponentType.newPrimitiveArray(from.count())
+        for ((i, any) in from.withIndex()) {
+            val element = any.convert(toComponentType)
+            Array.set(primitiveArray, i, element)
+        }
+        return primitiveArray
     }
 
     private fun iterableToIterable(

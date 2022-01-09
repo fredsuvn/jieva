@@ -6,7 +6,10 @@ import xyz.srclab.common.cache.Cache;
 import xyz.srclab.common.collect.BCollect;
 import xyz.srclab.common.collect.BMap;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author sunqian
@@ -37,7 +40,7 @@ public class CacheTest {
 
     private void doTestCache(Cache<String, String> cache) {
         cache.cleanUp();
-        Assert.expectThrows(NoSuchElementException.class, () -> cache.get("1"));
+        Assert.expectThrows(NullPointerException.class, () -> cache.get("1"));
         Assert.assertEquals(cache.getOrElse("1", () -> "1" + "1"), "11");
         Assert.assertNull(cache.getOrNull("1"));
         Assert.assertEquals(cache.getOrLoad("1", k -> "111"), "111");

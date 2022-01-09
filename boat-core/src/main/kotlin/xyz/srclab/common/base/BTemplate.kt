@@ -73,7 +73,7 @@ interface StringTemplate {
         while (i < nodesArray.size) {
             val node = nodesArray[i]
             if (node is Parameter) {
-                nodesArray[i] = args.getValue(node).toCharSeq()
+                nodesArray[i] = args[node].toCharSeq()
             }
             i++
         }
@@ -87,7 +87,7 @@ interface StringTemplate {
     fun processTo(dest: Appendable, args: Map<@Accepted(String::class, Integer::class) Any, Any?>) {
         for (node in nodes) {
             if (node is Parameter) {
-                dest.append(args.getValue(node).toCharSeq())
+                dest.append(args[node].toCharSeq())
             } else {
                 dest.append(node)
             }
@@ -115,41 +115,74 @@ interface StringTemplate {
         companion object {
 
             @JvmStatic
-            fun empty(index: Int): Parameter {
-                return object : Parameter {
-
-                    override val index: Int = index
-
-                    override val length: Int = 0
-
-                    override fun get(index: Int): Char {
-                        throw IndexOutOfBoundsException("$index")
-                    }
-
-                    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
-                        if (startIndex == endIndex) {
-                            return this
-                        }
-                        throw IndexOutOfBoundsException("startIndex: $startIndex, endIndex: $endIndex")
-                    }
-                }
+            fun of(chars: CharSequence, index: Int): Parameter {
+                return StringParameter(chars, index)
             }
 
             @JvmStatic
-            fun of(chars: CharSequence, index: Int): Parameter {
-                return object : Parameter {
+            fun of(index: Int): Parameter {
+                return IndexParameter(index)
+            }
 
-                    override val index: Int = index
+            private class StringParameter(
+                chars: CharSequence, override val index: Int
+            ) : Parameter {
 
-                    override val length: Int = chars.length
+                private val value = chars.toString()
+                override val length: Int = value.length
 
-                    override fun get(index: Int): Char {
-                        return chars[index]
+                override fun get(index: Int): Char {
+                    return value[index]
+                }
+
+                override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+                    return value.subSequence(startIndex, endIndex)
+                }
+
+                override fun equals(other: Any?): Boolean {
+                    if (this === other) return true
+                    if (other !is CharSequence) return false
+                    return value == other
+                }
+
+                override fun hashCode(): Int {
+                    return value.hashCode()
+                }
+
+                override fun toString(): String {
+                    return value
+                }
+            }
+
+            private class IndexParameter(
+                override val index: Int
+            ) : Parameter {
+
+                override val length: Int = 0
+
+                override fun get(index: Int): Char {
+                    throw IndexOutOfBoundsException("$index")
+                }
+
+                override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+                    if (startIndex == endIndex) {
+                        return this
                     }
+                    throw IndexOutOfBoundsException("startIndex: $startIndex, endIndex: $endIndex")
+                }
 
-                    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
-                        return chars.subSequence(startIndex, endIndex)
-                    }
+                override fun equals(other: Any?): Boolean {
+                    if (this === other) return true
+                    if (other !is Int) return false
+                    return index == other
+                }
+
+                override fun hashCode(): Int {
+                    return index.hashCode()
+                }
+
+                override fun toString(): String {
+                    return index.toString()
                 }
             }
         }
@@ -270,7 +303,7 @@ open class SimpleTemplate(
             val c = template[i]
             if (c == escapeChar) {
                 i++
-                if (i > template.length) {
+                if (i >= template.length) {
                     break
                 }
                 val cn = template[i]
@@ -315,7 +348,7 @@ open class SimpleTemplate(
                     throw StringTemplateException("Parameter prefix is not enclose at index: $i.")
                 }
                 if (suffixIndex == i) {
-                    getBuffer().add(StringTemplate.Parameter.empty(paramIndex++))
+                    getBuffer().add(StringTemplate.Parameter.of(paramIndex++))
                     i++
                     start = i
                     continue

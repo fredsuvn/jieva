@@ -186,7 +186,7 @@ interface SemVer : Comparable<SemVer> {
     }
 
     override fun compareTo(other: SemVer): Int {
-        if (major != other.minor) {
+        if (major != other.major) {
             return major - other.major
         }
         if (minor != other.minor) {

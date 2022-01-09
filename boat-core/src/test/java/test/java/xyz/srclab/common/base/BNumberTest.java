@@ -17,7 +17,7 @@ public class BNumberTest {
         byte b = -12;
         Assert.assertEquals(BNumber.toUnsignedInt(b), -12 & 0xFF);
         short s = -88;
-        Assert.assertEquals(BNumber.toUnsignedLong(s), -88 & 0xFFFF);
+        Assert.assertEquals(BNumber.toUnsignedLong(s), -88 & 0xFFFFL);
     }
 
     @Test

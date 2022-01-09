@@ -9,8 +9,8 @@ public class BBooleanTest {
     @Test
     public void testBoolean() {
         Assert.assertTrue(BBoolean.toBoolean("true"));
-        Assert.assertTrue(BBoolean.allTrue("true", "TURE"));
+        Assert.assertTrue(BBoolean.allTrue("true", "TRUE"));
         Assert.assertTrue(BBoolean.anyFalse("true", "x"));
-        Assert.assertFalse(BBoolean.anyFalse("x", "y"));
+        Assert.assertFalse(BBoolean.anyTrue("x", "y"));
     }
 }

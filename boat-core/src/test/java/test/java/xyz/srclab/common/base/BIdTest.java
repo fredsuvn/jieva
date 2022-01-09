@@ -21,7 +21,7 @@ public class BIdTest {
     public void testSnowflake() {
         for (int i = 0; i < 10; i++) {
             long id = BId.snowflakeId();
-            BLog.info("Snowflake Id: {}" + BNumber.toBinaryString(id));
+            BLog.info("Snowflake Id: {}", BNumber.toBinaryString(id));
         }
     }
 }

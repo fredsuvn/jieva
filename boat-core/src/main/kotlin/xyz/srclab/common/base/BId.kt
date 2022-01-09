@@ -122,9 +122,9 @@ open class SnowflakeId {
                 continue
             }
             sequence = nextSequence
-            lastTimestamp = timestamp
             break
         } while (true)
+        lastTimestamp = timestamp
         return maskTimestamp(timestamp) or workerId or maskSequence(sequence)
     }
 

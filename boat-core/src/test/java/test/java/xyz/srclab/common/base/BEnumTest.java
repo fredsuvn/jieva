@@ -10,7 +10,7 @@ public class BEnumTest {
     public void test() {
         TestEnum t1 = BEnum.getValue(TestEnum.class, "T1");
         Assert.assertEquals(t1, TestEnum.T1);
-        TestEnum t2 = BEnum.getValue(TestEnum.class, "t2", false);
+        TestEnum t2 = BEnum.getValue(TestEnum.class, "t2", true);
         Assert.assertEquals(t2, TestEnum.T2);
         TestEnum t3 = BEnum.getValue(TestEnum.class, 2);
         Assert.assertEquals(t3, TestEnum.T3);

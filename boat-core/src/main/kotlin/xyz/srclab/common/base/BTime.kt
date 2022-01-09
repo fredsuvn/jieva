@@ -290,19 +290,26 @@ fun TemporalAccessor.getNanoOfSecond(): Int {
 }
 
 fun TemporalAccessor.getHourOfSecond(): Int {
+
+    fun getAmPm(): Int {
+        return try {
+            this.get(ChronoField.AMPM_OF_DAY)
+        } catch (e: Exception) {
+            0
+        }
+    }
+
     var hour = 0
     if (this.isSupported(ChronoField.HOUR_OF_DAY)) {
         hour = this.get(ChronoField.HOUR_OF_DAY)
     } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_DAY)) {
         hour = this.get(ChronoField.CLOCK_HOUR_OF_DAY) - 1
-    } else if (this.isSupported(ChronoField.AMPM_OF_DAY)) {
-        if (this.isSupported(ChronoField.HOUR_OF_AMPM)) {
-            val ampm = this.get(ChronoField.AMPM_OF_DAY)
-            hour = this.get(ChronoField.HOUR_OF_AMPM) + ampm * 12
-        } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_AMPM)) {
-            val ampm = this.get(ChronoField.AMPM_OF_DAY)
-            hour = this.get(ChronoField.CLOCK_HOUR_OF_AMPM) - 1 + ampm * 12
-        }
+    } else if (this.isSupported(ChronoField.HOUR_OF_AMPM)) {
+        val ampm = getAmPm()
+        hour = this.get(ChronoField.HOUR_OF_AMPM) + ampm * 12
+    } else if (this.isSupported(ChronoField.CLOCK_HOUR_OF_AMPM)) {
+        val ampm = getAmPm()
+        hour = this.get(ChronoField.CLOCK_HOUR_OF_AMPM) - 1 + ampm * 12
     }
     return hour
 }
@@ -311,7 +318,7 @@ fun TemporalAccessor.getYear(): Int {
     var year = 0
     if (this.isSupported(ChronoField.YEAR)) {
         year = this.get(ChronoField.YEAR)
-    } else if (this.isSupported(ChronoField.YEAR_OF_ERA) && this.isSupported(ChronoField.ERA)) {
+    } else if (this.isSupported(ChronoField.YEAR_OF_ERA)) {
         val era = this.get(ChronoField.ERA)
         if (era == 1) {
             year = this.get(ChronoField.YEAR_OF_ERA)

@@ -16,6 +16,8 @@ public class BFormatTest {
     public void testFormat() {
         String fastFormat = BFormat.fastFormat("This is {} {}.", "fast", "format");
         Assert.assertEquals(fastFormat, "This is fast format.");
+        String fastFormat2 = BFormat.fastFormat("This is {} {} {} {}.", "fast", "format");
+        Assert.assertEquals(fastFormat2, "This is fast format {} {}.");
     }
 
     @Test
@@ -27,9 +29,9 @@ public class BFormatTest {
             "fast", "format", new NullPointerException()
         );
         assertEquals(
-            "1, 2, {}, \\\\",
+            "1, 2, {}, \\} \\ \\",
             FastFormat.INSTANCE,
-            "{}, {}, \\{}, \\\\",
+            "{}, {}, \\{}, \\} \\\\ \\",
             1, 2, 3
         );
     }

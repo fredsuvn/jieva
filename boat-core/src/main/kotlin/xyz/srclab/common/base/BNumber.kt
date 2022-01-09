@@ -185,8 +185,16 @@ fun Byte.toUnsignedInt(): Int {
     return this.toInt() and 0x0000_00FF
 }
 
+fun Byte.toUnsignedLong(): Int {
+    return this.toUnsignedInt() and 0x0000_00FF
+}
+
 fun Short.toUnsignedInt(): Int {
     return this.toInt() and 0x0000_FFFF
+}
+
+fun Short.toUnsignedLong(): Long {
+    return this.toUnsignedInt().toLong() and 0x0000_FFFF
 }
 
 fun Int.toUnsignedLong(): Long {

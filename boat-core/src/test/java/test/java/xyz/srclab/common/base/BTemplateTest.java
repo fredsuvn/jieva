@@ -18,7 +18,7 @@ public class BTemplateTest {
     public void testTemplate() {
         Map<Object, Object> args = new HashMap<>();
         args.put("name", "Dog");
-        args.put("name}", "DogX");
+        args.put("name\\", "DogX");
         args.put(1, "Cat");
         args.put(2, "Bird");
         StringTemplate template1 = BTemplate.parse(
@@ -30,6 +30,6 @@ public class BTemplateTest {
         StringTemplate template3 = BTemplate.parse(
             "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", '\\', "{", "}");
         BLog.info(template3.process(args));
-        Assert.assertEquals(template3.process(args), "This is a } {DogX (Dog), that is a Bird\\{");
+        Assert.assertEquals(template3.process(args), "This is a } {DogX} (Dog), that is a Bird\\{\\");
     }
 }

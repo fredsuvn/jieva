@@ -50,7 +50,7 @@ public class BCaseTest {
         );
         Assert.assertEquals(
             BCase.UPPER_CAMEL.convert("upper@#$%Camel", BCase.LOWER_UNDERSCORE),
-            "upper_camel"
+            "upper@#$%_camel"
         );
     }
 }

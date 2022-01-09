@@ -92,9 +92,9 @@ public class BeanTest {
         BLog.info("simpleMap: {}", simpleMap);
         Assert.assertEquals(simpleMap.get("p1"), "789");
         Assert.assertEquals(simpleMap.get("p2"), 999);
-        Assert.assertEquals(simpleMap.size(), 2);
+        Assert.assertEquals(simpleMap.size(), 3);//include class
         Assert.assertEquals(SimpleBean.class, simpleMap.getBeanType().getType());
-        simpleMap.put("p1", 10086);
+        simpleMap.put("p1", "10086");
         simpleMap.put("p2", 10000);
         Assert.assertEquals(simpleBean.getP1(), "10086");
         Assert.assertEquals(simpleBean.getP2(), 10000);
