@@ -2,6 +2,7 @@ package test.java.xyz.srclab.common.io;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.base.BResource;
 import xyz.srclab.common.io.BFile;
 import xyz.srclab.common.io.BIO;
@@ -12,15 +13,25 @@ import java.nio.MappedByteBuffer;
 public class FileTest {
 
     @Test
+    public void testReadMappedByteBuffer() {
+        URL url = BResource.load("META-INF/test.mapped.txt");
+        MappedByteBuffer buffer = BFile.readByteBuffer(BFile.toPath(url));
+        BLog.info("testReadMappedByteBuffer: {}", BIO.readString(BIO.toInputStream(buffer)));
+    }
+
+    @Test
     public void testMappedByteBuffer() {
         URL url = BResource.load("META-INF/test.mapped.txt");
         MappedByteBuffer buffer = BFile.mappedByteBuffer(BFile.toPath(url));
         String content = BIO.readString(BIO.toInputStream(buffer));
+        BLog.info("testMappedByteBuffer: {}", content);
         buffer.flip();
-        buffer.put("6666666666666666".getBytes());
-        Assert.assertEquals(BIO.readString(BIO.toInputStream(buffer)), "6666666666666666");
-        buffer.flip();
+        String newContent = "666777888";
+        buffer.put(newContent.getBytes());
+
+        Assert.assertEquals(BIO.readString(BIO.toInputStream(url)), newContent + content.substring(newContent.length()));
+        buffer.clear();
         buffer.put(content.getBytes());
-        Assert.assertEquals(BIO.readString(BIO.toInputStream(buffer)), content);
+        Assert.assertEquals(BIO.readString(BIO.toInputStream(url)), content);
     }
 }

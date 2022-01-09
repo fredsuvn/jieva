@@ -9,15 +9,26 @@ public class BEscapeTest {
     @Test
     public void testEscape() {
         String text = "{\"abc\":\"xyz\"}";
-        String eText = BEscape.escape(text, '\\', '\"');
+        String eText = BEscape.escape(text, '\\', "\"");
         Assert.assertEquals(eText, "{\\\"abc\\\":\\\"xyz\\\"}");
 
-        text = "{\\\"abc\\\":\\\"xyz\\\"}";
-        String uText = BEscape.unescape(text, '\\', '\"');
+        text = "{\"ss\": \"sss\\n\"}";
+        eText = BEscape.escape(text, '\\', "\"{}");
+        Assert.assertEquals(eText, "\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}");
+    }
+
+    @Test
+    public void testUnescape() {
+        String text = "{\\\"abc\\\":\\\"xyz\\\"}";
+        String uText = BEscape.unescape(text, '\\', "\"");
         Assert.assertEquals(uText, "{\"abc\":\"xyz\"}");
 
         text = "{\\\"abc\\\":\\\"x\\yz\\\"}\\";
-        uText = BEscape.unescape(text, '\\', '\"');
+        uText = BEscape.unescape(text, '\\', "\"");
         Assert.assertEquals(uText, "{\"abc\":\"x\\yz\"}\\");
+
+        text = "\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}";
+        uText = BEscape.unescape(text, '\\', "\"{}");
+        Assert.assertEquals(uText, "{\"ss\": \"sss\\n\"}");
     }
 }

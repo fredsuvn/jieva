@@ -24,7 +24,7 @@ public class EventBusTest {
         eventBus.post(StringRef.of("y"));
         eventBus.post(6);
 
-        Assert.assertEquals(chars, BList.newList("xsxy7"));
+        Assert.assertEquals(chars, BList.newList("xs", "x", "y", "7"));
     }
 
     public static class StringHandler implements EventBusHandler<String> {

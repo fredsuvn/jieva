@@ -17,7 +17,7 @@ public class FuncTest {
 
     @Test
     public void testFunc() throws Exception {
-        testInvokerGenerator(FuncFactory.DEFAULT);
+        testInvokerGenerator(FuncFactory.defaultFactory());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class FuncTest {
             A.stack.get(0),
             "A()"
         );
-        A a2 = factory.createStaticFunc(BConstructor.getConstructor(A.class, String.class), true).invokeTyped("123");
+        A a2 = factory.createStaticFunc(BConstructor.getDeclaredConstructor(A.class, String.class), true).invokeTyped("123");
         Assert.assertEquals(
             A.stack,
             BList.newList("A()", "A(123)")
@@ -68,7 +68,7 @@ public class FuncTest {
             "a1"
         );
         Assert.assertEquals(
-            factory.createInstFunc(BMethod.getMethod(A.class, "a2"), true).invoke(a),
+            factory.createInstFunc(BMethod.getDeclaredMethod(A.class, "a2"), true).invoke(a),
             "a2"
         );
         Assert.assertEquals(
@@ -76,7 +76,7 @@ public class FuncTest {
             "a3: 123"
         );
         Assert.assertEquals(
-            factory.createInstFunc(BMethod.getMethod(A.class, "a4", String.class), true).invoke(a, "123"),
+            factory.createInstFunc(BMethod.getDeclaredMethod(A.class, "a4", String.class), true).invoke(a, "123"),
             "a4: 123"
         );
 
@@ -105,9 +105,9 @@ public class FuncTest {
 
         if (factory != FuncFactory.unreflected()) {
             Assert.assertThrows(IllegalAccessException.class, () ->
-                factory.createInstFunc(BMethod.getMethod(A.class, "a2")).invoke(a));
+                factory.createInstFunc(BMethod.getDeclaredMethod(A.class, "a2")).invoke(a));
             Assert.assertThrows(IllegalAccessException.class, () ->
-                factory.createInstFunc(BMethod.getMethod(A.class, "a4", String.class)).invoke(a, "123"));
+                factory.createInstFunc(BMethod.getDeclaredMethod(A.class, "a4", String.class)).invoke(a, "123"));
         }
     }
 

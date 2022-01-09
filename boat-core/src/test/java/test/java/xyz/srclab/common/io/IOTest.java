@@ -31,7 +31,7 @@ public class IOTest {
         Assert.assertEquals(bytes, text.getBytes());
         List<String> inputStrings = BIO.readLines(input);
         input.reset();
-        Assert.assertEquals(inputStrings, Arrays.asList("123456", "234567"));
+        Assert.assertEquals(inputStrings, Arrays.asList("123456", "234567", ""));//note end with \r\n
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         BIO.readTo(input, output);
         input.reset();
@@ -52,7 +52,7 @@ public class IOTest {
         Assert.assertEquals(chars, text.toCharArray());
         List<String> readStrings = BIO.readLines(reader);
         input.reset();
-        Assert.assertEquals(readStrings, Arrays.asList("123456", "234567"));
+        Assert.assertEquals(readStrings, Arrays.asList("123456", "234567", ""));//note end with \r\n
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Writer writer = BIO.toWriter(output);
         BIO.readTo(reader, writer);
