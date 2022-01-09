@@ -322,7 +322,7 @@ fun <K, V> copyOnWriteMap(
 @JvmOverloads
 fun <K, V> copyOnWriteMap(
     initMap: Map<out K, V> = emptyMap(),
-    newMap: Function<in Map<out K, V>, MutableMap<K, V>> = Function { HashMap() }
+    newMap: Function<in Map<out K, V>, MutableMap<K, V>> = Function { HashMap(it) }
 ): CopyOnWriteMap<K, V> {
     return copyOnWriteMap(initMap, newMap.toKotlinFun())
 }
@@ -330,7 +330,7 @@ fun <K, V> copyOnWriteMap(
 @JvmSynthetic
 fun <K, V> copyOnWriteMap(
     initMap: Map<out K, V> = emptyMap(),
-    newMap: (Map<out K, V>) -> MutableMap<K, V> = { HashMap() }
+    newMap: (Map<out K, V>) -> MutableMap<K, V> = { HashMap(it) }
 ): CopyOnWriteMap<K, V> {
     return CopyOnWriteMap(initMap, newMap)
 }

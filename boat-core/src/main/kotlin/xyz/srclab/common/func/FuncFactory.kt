@@ -25,13 +25,22 @@ interface FuncFactory {
 
     companion object {
 
-        @JvmField
-        val DEFAULT: FuncFactory = kotlin.run {
+        private var defaultFactory: FuncFactory = run {
             val javaVersion = getJavaMajorVersion()
             if (javaVersion <= 8) {
                 return@run reflected()
             }
             unreflected()
+        }
+
+        @JvmStatic
+        fun defaultFactory(): FuncFactory {
+            return defaultFactory
+        }
+
+        @JvmStatic
+        fun setDefaultFactory(defaultFactory: FuncFactory) {
+            this.defaultFactory = defaultFactory
         }
 
         @JvmStatic

@@ -11,36 +11,15 @@ import java.util.*
  * It inserts [escapeChar] before each [escapedChars] when escaping:
  *
  * ```
- * //"ss": "sss\n" -> \"ss\": \"sss\\n\"
- * BEscapes.escape("\"ss\": \"sss\\n\"", '\\', '"', '{', '}');
+ * //{"ss": "sss\n"} -> \{\"ss\": \"sss\\n\"\}
+ * BEscapes.escape("{\"ss\": \"sss\\n\"}", '\\', "\"{}");
  * ```
  */
 @Throws(StringEscapeException::class)
-fun CharSequence.escape(escapeChar: Char, vararg escapedChars: Char): String {
+fun CharSequence.escape(escapeChar: Char, escapedChars: CharSequence): String {
     if (this.isEmpty()) {
         return this.toString()
     }
-    return escape0(escapeChar, escapedChars.toSet())
-}
-
-/**
- * Simply escapes receiver [CharSequence] with [escapeChar].
- * It inserts [escapeChar] before each [escapedChars] when escaping:
- *
- * ```
- * //"ss": "sss\n" -> \"ss\": \"sss\\n\"
- * BEscapes.escape("\"ss\": \"sss\\n\"", '\\', BSets.newSet('"', '{', '}'));
- * ```
- */
-@Throws(StringEscapeException::class)
-fun CharSequence.escape(escapeChar: Char, escapedChars: Collection<Char>): String {
-    if (this.isEmpty()) {
-        return this.toString()
-    }
-    return escape0(escapeChar, escapedChars)
-}
-
-private fun CharSequence.escape0(escapeChar: Char, escapedChars: Collection<Char>): String {
 
     var buffer: MutableList<Any>? = null
 
@@ -82,36 +61,15 @@ private fun CharSequence.escape0(escapeChar: Char, escapedChars: Collection<Char
  * It removes [escapeChar] before each [escapedChars] when unescaping:
  *
  * ```
- * //\"ss\": \"sss\\n\" -> "ss": "sss\n"
- * BEscapes.unescape("\\\"ss\\\": \\\"sss\\\\n\\\"", '\\', '"', '{', '}');
+ * //\{\"ss\": \"sss\\n\"\} -> {"ss": "sss\n"}
+ * BEscapes.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}", '\\', "\"{}");
  * ```
  */
 @Throws(StringEscapeException::class)
-fun CharSequence.unescape(escapeChar: Char, vararg escapedChars: Char): String {
+fun CharSequence.unescape(escapeChar: Char, escapedChars: CharSequence): String {
     if (this.isEmpty()) {
         return this.toString()
     }
-    return unescape0(escapeChar, escapedChars.toSet())
-}
-
-/**
- * Simply unescapes receiver [CharSequence] with [escapeChar].
- * It removes [escapeChar] before each [escapedChars] when unescaping:
- *
- * ```
- * //\"ss\": \"sss\\n\" -> "ss": "sss\n"
- * BEscapes.unescape("\\\"ss\\\": \\\"sss\\\\n\\\"", '\\', BSets.newSet('"', '{', '}'));
- * ```
- */
-@Throws(StringEscapeException::class)
-fun CharSequence.unescape(escapeChar: Char, escapedChars: Collection<Char>): String {
-    if (this.isEmpty()) {
-        return this.toString()
-    }
-    return unescape0(escapeChar, escapedChars)
-}
-
-private fun CharSequence.unescape0(escapeChar: Char, escapedChars: Collection<Char>): String {
 
     var buffer: MutableList<CharSequence>? = null
 
@@ -135,7 +93,7 @@ private fun CharSequence.unescape0(escapeChar: Char, escapedChars: Collection<Ch
                 break
             }
             val cn = this[i]
-            if (escapedChars.contains(cn)) {
+            if (cn == escapeChar || escapedChars.contains(cn)) {
                 //Unescape: \\ -> \
                 getBuffer().add(this.stringRef(start, i - 1))
                 start = i
@@ -176,19 +134,17 @@ interface StringEscape {
  * For example:
  *
  * ```
- * StringEscape se = new SimpleStringEscape('\\', '"', '{', '}');
- * //"ss": "sss\n" -> \"ss\": \"sss\\n\"
- * se.escape("\"ss\": \"sss\\n\"");
- * //\"ss\": \"sss\\n\" -> "ss": "sss\n"
- * se.unescape("\\\"ss\\\": \\\"sss\\\\n\\\"");
+ * StringEscape se = new SimpleStringEscape('\\', "\"{}");
+ * //{"ss": "sss\n"} -> \{\"ss\": \"sss\\n\"\}
+ * se.escape("{\"ss\": \"sss\\n\"}");
+ * //\{\"ss\": \"sss\\n\"\} -> {"ss": "sss\n"}
+ * se.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}");
  * ```
  */
 open class SimpleEscape(
     private val escapeChar: Char,
-    private val escapedChars: Collection<Char>
+    private val escapedChars: CharSequence
 ) : StringEscape {
-
-    constructor(escapeChar: Char, vararg escapedChars: Char) : this(escapeChar, escapedChars.toSet())
 
     override fun escape(chars: CharSequence): String {
         return chars.escape(escapeChar, escapedChars)

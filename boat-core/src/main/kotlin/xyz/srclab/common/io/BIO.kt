@@ -5,6 +5,7 @@ package xyz.srclab.common.io
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.remainingLength
 import java.io.*
+import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import kotlin.io.readBytes as readBytesKt
@@ -183,4 +184,8 @@ fun RandomAccessFile.toOutputStream(
     offset: Long = 0, length: Long = remainingLength(this.length(), offset)
 ): RandomOutputStream {
     return RandomOutputStream(this, offset, length)
+}
+
+fun URL.toInputStream(): InputStream {
+    return this.openStream()
 }

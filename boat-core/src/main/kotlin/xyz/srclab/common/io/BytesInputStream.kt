@@ -35,13 +35,15 @@ open class BytesInputStream(
             return -1
         }
         val remaining = offset + length - pos
-        return if (remaining <= len) {
+        val result = if (remaining <= len) {
             System.arraycopy(source, pos, b, off, remaining)
             remaining
         } else {
             System.arraycopy(source, pos, b, off, len)
             len
         }
+        pos += result
+        return result
     }
 
     override fun available(): Int {

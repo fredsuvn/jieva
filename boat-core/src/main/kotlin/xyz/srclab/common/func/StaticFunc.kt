@@ -20,13 +20,13 @@ interface StaticFunc {
         @JvmName("of")
         @JvmOverloads
         fun Method.toStaticFunc(force: Boolean = false): StaticFunc {
-            return FuncFactory.DEFAULT.createStaticFunc(this, force)
+            return FuncFactory.defaultFactory().createStaticFunc(this, force)
         }
 
         @JvmName("of")
         @JvmOverloads
         fun Constructor<*>.toStaticFunc(force: Boolean = false): StaticFunc {
-            return FuncFactory.DEFAULT.createStaticFunc(this, force)
+            return FuncFactory.defaultFactory().createStaticFunc(this, force)
         }
     }
 }

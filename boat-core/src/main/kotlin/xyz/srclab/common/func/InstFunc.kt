@@ -27,7 +27,7 @@ interface InstFunc {
         @JvmName("of")
         @JvmOverloads
         fun Method.toInstFunc(force: Boolean = false): InstFunc {
-            return FuncFactory.DEFAULT.createInstFunc(this, force)
+            return FuncFactory.defaultFactory().createInstFunc(this, force)
         }
     }
 }
