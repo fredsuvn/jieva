@@ -15,9 +15,7 @@ import javax.crypto.spec.SecretKeySpec
  *
  * Note [Codec] **may not thread-safe**.
  *
- * @author sunqian
- *
- * @see Encoder
+ * @see EncCodec
  * @see Digester
  * @see MacCodec
  * @see CipherCodec
@@ -143,14 +141,14 @@ interface Codec {
 
         @JvmName("encodeCodec")
         @JvmStatic
-        fun CharSequence.toEncodeCodec(): Encoder {
-            return Encoder.withAlgorithm(this)
+        fun CharSequence.toEncodeCodec(): EncCodec {
+            return EncCodec.withAlgorithm(this)
         }
 
         @JvmName("encodeCodec")
         @JvmStatic
-        fun CodecAlgorithm.toEncodeCodec(): Encoder {
-            return Encoder.withAlgorithm(this)
+        fun CodecAlgorithm.toEncodeCodec(): EncCodec {
+            return EncCodec.withAlgorithm(this)
         }
 
         @JvmName("digestCodec")
@@ -190,18 +188,18 @@ interface Codec {
         }
 
         @JvmStatic
-        fun plainCodec(): Encoder {
-            return Encoder.plain()
+        fun plainCodec(): EncCodec {
+            return EncCodec.plain()
         }
 
         @JvmStatic
-        fun hexCodec(): Encoder {
-            return Encoder.hex()
+        fun hexCodec(): EncCodec {
+            return EncCodec.hex()
         }
 
         @JvmStatic
-        fun base64Codec(): Encoder {
-            return Encoder.base64()
+        fun base64Codec(): EncCodec {
+            return EncCodec.base64()
         }
 
         @JvmStatic

@@ -1,9 +1,11 @@
 package xyz.srclab.common.codec
 
+import org.bouncycastle.util.encoders.HexEncoder
 import xyz.srclab.common.codec.Codec.Companion.toCodecKey
 import xyz.srclab.common.lang.toBytes
 import xyz.srclab.common.lang.toChars
 import java.io.OutputStream
+import java.util.*
 import javax.crypto.Mac
 
 /**
@@ -15,6 +17,7 @@ interface MacCodec : Codec {
 
     @JvmDefault
     fun digest(key: Any, data: ByteArray): ByteArray {
+        HexEncoder.
         return digest(key, data, 0)
     }
 
