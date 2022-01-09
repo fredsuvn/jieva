@@ -87,3 +87,17 @@ fun allFalse(charSeqs: Iterable<CharSequence?>): Boolean {
     }
     return true
 }
+
+fun Boolean.toInt(): Int {
+    if (this) {
+        return 1
+    }
+    return 0
+}
+
+fun Boolean?.toInt(): Int {
+    if (this !== null && this) {
+        return 1
+    }
+    return 0
+}

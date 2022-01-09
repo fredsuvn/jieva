@@ -2,8 +2,8 @@ package test.java.xyz.srclab.common.reflect;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.reflect.BType;
 import xyz.srclab.common.reflect.TypeRef;
-import xyz.srclab.common.reflect.Types;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * @author sunqian
  */
-public class TypeBRefTest {
+public class TypeRefTest {
 
     @Test
     public void testTypeRef() {
@@ -41,7 +41,7 @@ public class TypeBRefTest {
         Assert.assertEquals(stringTypeRef.getType(), String.class);
 
         Assert.assertEquals(
-            Types.parameterizedType(List.class, String.class),
+            BType.parameterizedType(List.class, String.class),
             new TypeRef<List<String>>() {
             }.getType()
         );

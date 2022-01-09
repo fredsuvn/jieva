@@ -3,14 +3,14 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.annotations.ForJava
-import xyz.srclab.common.base.Ref.Companion.referred
+import xyz.srclab.common.base.Ref.Companion.ref
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Function
 import java.util.function.Supplier
 
 fun <T : Any> Optional<T>.toRef(): Ref<T> {
-    return this.orElse(null).referred()
+    return this.orElse(null).ref()
 }
 
 /**
@@ -91,7 +91,7 @@ interface Ref<T : Any> : GetRef<T>, SetRef<T> {
     }
 
     fun copy(): Ref<T> {
-        return orNull().referred()
+        return orNull().ref()
     }
 
     fun toOptional(): Optional<T> {
@@ -102,11 +102,11 @@ interface Ref<T : Any> : GetRef<T>, SetRef<T> {
 
         @JvmName("of")
         @JvmStatic
-        fun <T : Any> T?.referred(): Ref<T> {
-            return BRefImpl(this)
+        fun <T : Any> T?.ref(): Ref<T> {
+            return RefImpl(this)
         }
 
-        private class BRefImpl<T : Any>(private var value: T?) : Ref<T> {
+        private class RefImpl<T : Any>(private var value: T?) : Ref<T> {
 
             override fun orNull(): T? {
                 return value
@@ -163,4 +163,324 @@ interface GetRef<T : Any> {
 interface SetRef<T : Any> {
 
     fun set(value: T?)
+}
+
+/**
+ * Boolean version of [Ref].
+ */
+@ForJava
+interface BooleanRef {
+
+    fun get(): Boolean
+
+    fun set(value: Boolean): BooleanRef
+
+    fun copy(): BooleanRef {
+        return get().intRef()
+    }
+
+    fun toOptional(): OptionalInt {
+        return OptionalInt.of(get().toInt())
+    }
+
+    fun toRef(): Ref<Boolean> {
+        return get().ref()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun Boolean.intRef(): BooleanRef {
+            return BooleanRefImpl(this)
+        }
+
+        private class BooleanRefImpl(private var value: Boolean) : BooleanRef {
+            override fun get(): Boolean = value
+
+            override fun set(value: Boolean) = apply {
+                this.value = value
+            }
+        }
+    }
+}
+
+/**
+ * Byte version of [Ref].
+ */
+@ForJava
+interface ByteRef {
+
+    fun get(): Byte
+
+    fun set(value: Byte): ByteRef
+
+    fun copy(): ByteRef {
+        return get().intRef()
+    }
+
+    fun toOptional(): OptionalInt {
+        return OptionalInt.of(get().toUnsignedInt())
+    }
+
+    fun toRef(): Ref<Byte> {
+        return get().ref()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun Byte.intRef(): ByteRef {
+            return ByteRefImpl(this)
+        }
+
+        private class ByteRefImpl(private var value: Byte) : ByteRef {
+            override fun get(): Byte = value
+
+            override fun set(value: Byte) = apply {
+                this.value = value
+            }
+        }
+    }
+}
+
+/**
+ * Short version of [Ref].
+ */
+@ForJava
+interface ShortRef {
+
+    fun get(): Short
+
+    fun set(value: Short): ShortRef
+
+    fun copy(): ShortRef {
+        return get().intRef()
+    }
+
+    fun toOptional(): OptionalInt {
+        return OptionalInt.of(get().toUnsignedInt())
+    }
+
+    fun toRef(): Ref<Short> {
+        return get().ref()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun Short.intRef(): ShortRef {
+            return ShortRefImpl(this)
+        }
+
+        private class ShortRefImpl(private var value: Short) : ShortRef {
+            override fun get(): Short = value
+
+            override fun set(value: Short) = apply {
+                this.value = value
+            }
+        }
+    }
+}
+
+/**
+ * Char version of [Ref].
+ */
+@ForJava
+interface CharRef {
+
+    fun get(): Char
+
+    fun set(value: Char): CharRef
+
+    fun copy(): CharRef {
+        return get().intRef()
+    }
+
+    fun toOptional(): OptionalInt {
+        return OptionalInt.of(get().code)
+    }
+
+    fun toRef(): Ref<Char> {
+        return get().ref()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun Char.intRef(): CharRef {
+            return CharRefImpl(this)
+        }
+
+        private class CharRefImpl(private var value: Char) : CharRef {
+            override fun get(): Char = value
+
+            override fun set(value: Char) = apply {
+                this.value = value
+            }
+        }
+    }
+}
+
+/**
+ * Int version of [Ref].
+ */
+@ForJava
+interface IntRef {
+
+    fun get(): Int
+
+    fun set(value: Int): IntRef
+
+    fun copy(): IntRef {
+        return get().intRef()
+    }
+
+    fun toOptional(): OptionalInt {
+        return OptionalInt.of(get())
+    }
+
+    fun toRef(): Ref<Int> {
+        return get().ref()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun Int.intRef(): IntRef {
+            return IntRefImpl(this)
+        }
+
+        private class IntRefImpl(private var value: Int) : IntRef {
+            override fun get(): Int = value
+
+            override fun set(value: Int) = apply {
+                this.value = value
+            }
+        }
+    }
+}
+
+/**
+ * Long version of [Ref].
+ */
+@ForJava
+interface LongRef {
+
+    fun get(): Long
+
+    fun set(value: Long): LongRef
+
+    fun copy(): LongRef {
+        return get().intRef()
+    }
+
+    fun toOptional(): OptionalLong {
+        return OptionalLong.of(get())
+    }
+
+    fun toRef(): Ref<Long> {
+        return get().ref()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun Long.intRef(): LongRef {
+            return LongRefImpl(this)
+        }
+
+        private class LongRefImpl(private var value: Long) : LongRef {
+            override fun get(): Long = value
+
+            override fun set(value: Long) = apply {
+                this.value = value
+            }
+        }
+    }
+}
+
+/**
+ * Float version of [Ref].
+ */
+@ForJava
+interface FloatRef {
+
+    fun get(): Float
+
+    fun set(value: Float): FloatRef
+
+    fun copy(): FloatRef {
+        return get().intRef()
+    }
+
+    fun toOptional(): OptionalDouble {
+        return OptionalDouble.of(get().toDouble())
+    }
+
+    fun toRef(): Ref<Float> {
+        return get().ref()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun Float.intRef(): FloatRef {
+            return FloatRefImpl(this)
+        }
+
+        private class FloatRefImpl(private var value: Float) : FloatRef {
+            override fun get(): Float = value
+
+            override fun set(value: Float) = apply {
+                this.value = value
+            }
+        }
+    }
+}
+
+/**
+ * Double version of [Ref].
+ */
+@ForJava
+interface DoubleRef {
+
+    fun get(): Double
+
+    fun set(value: Double): DoubleRef
+
+    fun copy(): DoubleRef {
+        return get().intRef()
+    }
+
+    fun toOptional(): OptionalDouble {
+        return OptionalDouble.of(get())
+    }
+
+    fun toRef(): Ref<Double> {
+        return get().ref()
+    }
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun Double.intRef(): DoubleRef {
+            return DoubleRefImpl(this)
+        }
+
+        private class DoubleRefImpl(private var value: Double) : DoubleRef {
+            override fun get(): Double = value
+
+            override fun set(value: Double) = apply {
+                this.value = value
+            }
+        }
+    }
 }

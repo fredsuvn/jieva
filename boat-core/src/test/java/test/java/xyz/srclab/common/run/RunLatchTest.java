@@ -2,8 +2,8 @@ package test.java.xyz.srclab.common.run;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Contexts;
-import xyz.srclab.common.logging.Logs;
+import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.base.BThread;
 import xyz.srclab.common.run.RunLatch;
 
 import java.util.concurrent.CountDownLatch;
@@ -22,13 +22,13 @@ public class RunLatchTest {
             TestThread testThread = new TestThread(latch);
             testThread.start();
         }
-        Logs.info("sum before latch: {}", sum.get());
-        Contexts.sleep(1000);
-        Logs.info("sum after 1000 millis sleep: {}", sum.get());
+        BLog.info("sum before latch: {}", sum.get());
+        BThread.sleep(1000);
+        BLog.info("sum after 1000 millis sleep: {}", sum.get());
         Assert.assertEquals(sum.get(), 0);
         latch.open();
         countDownLatch.await();
-        Logs.info("sum after latch: {}", sum.get());
+        BLog.info("sum after latch: {}", sum.get());
         Assert.assertEquals(sum.get(), THREAD_NUMBER);
     }
 

@@ -2,7 +2,7 @@ package test.java.xyz.srclab.common.utils;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.logging.Logs;
+import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.utils.About;
 import xyz.srclab.common.utils.Author;
 import xyz.srclab.common.utils.SemVer;
@@ -23,11 +23,11 @@ public class AboutTest {
         SemVer v3 = SemVer.parse(verString3);
         SemVer v4 = SemVer.parse(verString4);
         SemVer v5 = SemVer.parse(verString5);
-        Logs.info("SemVer1: {}", v1);
-        Logs.info("SemVer2: {}", v2);
-        Logs.info("SemVer3: {}", v3);
-        Logs.info("SemVer4: {}", v4);
-        Logs.info("SemVer5: {}", v5);
+        BLog.info("SemVer1: {}", v1);
+        BLog.info("SemVer2: {}", v2);
+        BLog.info("SemVer3: {}", v3);
+        BLog.info("SemVer4: {}", v4);
+        BLog.info("SemVer5: {}", v5);
         Assert.assertTrue(v1.compareTo(v2) > 0);
         Assert.assertTrue(v3.compareTo(v1) > 0);
         Assert.assertTrue(v3.compareTo(v2) > 0);
@@ -56,6 +56,6 @@ public class AboutTest {
             )),
             "© 2021 SrcLab"
         );
-        Logs.info("about: {}", about);
+        BLog.info("about: {}", about);
     }
 }

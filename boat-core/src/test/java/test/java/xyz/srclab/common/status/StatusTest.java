@@ -4,11 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.logging.Logs;
+import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.status.IntStringStatus;
 import xyz.srclab.common.status.Status;
-
-import java.util.List;
 
 public class StatusTest {
 
@@ -18,7 +16,7 @@ public class StatusTest {
         TestStatus newState = testState.withMoreDescription("cause");
         TestStatus newNewState = newState.withMoreDescription("cause2");
         //description[cause][cause2]
-        Logs.info("newNewState.getDescription: {}", newNewState.getDescription());
+        BLog.info("newNewState.getDescription: {}", newNewState.getDescription());
         Assert.assertEquals(newNewState.getDescription(), "description[cause][cause2]");
     }
 
@@ -28,11 +26,7 @@ public class StatusTest {
             super(code, description);
         }
 
-        public TestStatus(int code, @NotNull List<String> descriptions) {
-            super(code, descriptions);
-        }
-
-        public TestStatus(Status<Integer, String> intStringStatus) {
+        public TestStatus(Status<Integer, String, IntStringStatus> intStringStatus) {
             super(intStringStatus.getCode(), intStringStatus.getDescription());
         }
 
@@ -58,12 +52,6 @@ public class StatusTest {
         @Override
         public String getDescription() {
             return super.getDescription();
-        }
-
-        @NotNull
-        @Override
-        public List<String> getDescriptions() {
-            return super.getDescriptions();
         }
     }
 }

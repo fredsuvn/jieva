@@ -2,9 +2,9 @@ package test.java.xyz.srclab.common.run;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.Contexts;
+import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.base.BThread;
 import xyz.srclab.common.base.IntRef;
-import xyz.srclab.common.logging.Logs;
 import xyz.srclab.common.run.*;
 import xyz.srclab.common.utils.Counter;
 
@@ -19,22 +19,22 @@ public class RunTest {
 
     @Test
     public void testRunSync() {
-        Runner runner = Runner.SYNC_RUNNER;
+        Runner runner = SyncRunner.INSTANCE;
         IntRef intRef = IntRef.of(0);
-        Running<?> running = runner.run(() -> {
-            Contexts.sleep(2000);
+        RunWork<?> work = runner.submit(() -> {
+            BThread.sleep(2000);
             intRef.set(666);
         });
-        Assert.assertTrue(running.isEnd());
+        Assert.assertTrue(work.isDone());
         Assert.assertEquals(intRef.get(), 666);
 
-        runner.run(() -> intRef.set(888));
+        runner.submit(() -> intRef.set(888));
         Assert.assertEquals(intRef.get(), 888);
     }
 
     @Test
     public void testRunAsync() {
-        Runner runner = Runner.ASYNC_RUNNER;
+        Runner runner = AsyncRunner.INSTANCE;
         doTestAsync(runner);
     }
 
@@ -47,7 +47,7 @@ public class RunTest {
     private void doTestAsync(Runner runner) {
         IntRef intRef = IntRef.of(0);
         CountDownLatch currentLatch = new CountDownLatch(1);
-        Running<?> running = runner.run(() -> {
+        RunWork<?> work = runner.submit(() -> {
             try {
                 currentLatch.await();
             } catch (InterruptedException e) {
@@ -56,13 +56,13 @@ public class RunTest {
             intRef.set(666);
         });
         Assert.assertEquals(intRef.get(), 0);
-        Assert.assertFalse(running.isEnd());
+        Assert.assertFalse(work.isDone());
         currentLatch.countDown();
-        running.get();
-        Assert.assertTrue(running.isEnd());
+        work.getResult();
+        Assert.assertTrue(work.isDone());
         Assert.assertEquals(intRef.get(), 666);
 
-        runner.run(() -> {
+        runner.submit(() -> {
             intRef.set(888);
             Assert.assertEquals(intRef.get(), 888);
         });
@@ -83,36 +83,36 @@ public class RunTest {
     private void doTestScheduledRunSync(Scheduler scheduler) {
         Counter counter = Counter.startsAt(0);
         CountDownLatch currentLatch = new CountDownLatch(1);
-        Scheduling<?> scheduling = scheduler.schedule(Duration.ofMillis(1000), () -> {
-            Contexts.sleep(1000);
-            Logs.info("count: {}", counter.incrementAndGetInt());
+        ScheduleWork<?> scheduling = scheduler.schedule(Duration.ofMillis(1000), () -> {
+            BThread.sleep(1000);
+            BLog.info("count: {}", counter.incrementAndGetInt());
         });
-        Assert.assertFalse(scheduling.isEnd());
-        Contexts.sleep(2500);
-        Assert.assertTrue(scheduling.isEnd());
+        Assert.assertFalse(scheduling.isDone());
+        BThread.sleep(2500);
+        Assert.assertTrue(scheduling.isDone());
         Assert.assertEquals(counter.getInt(), 1);
 
         counter.reset();
         scheduling = scheduler.scheduleFixedRate(Duration.ZERO, Duration.ofMillis(1000), () -> {
-            Contexts.sleep(1000);
-            Logs.info("count: {}", counter.incrementAndGetInt());
+            BThread.sleep(1000);
+            BLog.info("count: {}", counter.incrementAndGetInt());
         });
-        Assert.assertFalse(scheduling.isEnd());
-        Contexts.sleep(2500);
-        Assert.assertFalse(scheduling.isEnd());
+        Assert.assertFalse(scheduling.isDone());
+        BThread.sleep(2500);
+        Assert.assertFalse(scheduling.isDone());
         scheduling.cancel(false);
-        Assert.assertTrue(scheduling.isEnd());
+        Assert.assertTrue(scheduling.isDone());
 
         counter.reset();
         scheduling = scheduler.scheduleFixedDelay(Duration.ZERO, Duration.ofMillis(1000), () -> {
-            Contexts.sleep(1000);
-            Logs.info("count: {}", counter.incrementAndGetInt());
+            BThread.sleep(1000);
+            BLog.info("count: {}", counter.incrementAndGetInt());
         });
-        Assert.assertFalse(scheduling.isEnd());
-        Contexts.sleep(3000);
-        Assert.assertFalse(scheduling.isEnd());
+        Assert.assertFalse(scheduling.isDone());
+        BThread.sleep(3000);
+        Assert.assertFalse(scheduling.isDone());
         scheduling.cancel(false);
-        Assert.assertTrue(scheduling.isEnd());
+        Assert.assertTrue(scheduling.isDone());
     }
 
     @Test
@@ -120,11 +120,11 @@ public class RunTest {
         RunContext runContext = RunContext.current();
         runContext.set("1", "666");
         Assert.assertEquals("666", runContext.get("1"));
-        Map<Object, Object> attach = runContext.attach();
+        Map<Object, Object> attach = runContext.asMap();
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        Runner.ASYNC_RUNNER.run(() -> {
+        AsyncRunner.INSTANCE.run(() -> {
             RunContext detach = RunContext.current();
-            detach.detach(attach);
+            detach.asMap().putAll(attach);
             Assert.assertEquals("666", detach.get("1"));
             countDownLatch.countDown();
         });
