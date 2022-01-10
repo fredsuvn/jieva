@@ -278,6 +278,34 @@ fun CharSequence.lines(): List<String> {
     return this.linesKt()
 }
 
+@JvmOverloads
+fun CharSequence.byteArray(charset: Charset = DEFAULT_CHARSET): ByteArray {
+    return this.toString().toByteArray(charset)
+}
+
+@JvmOverloads
+fun CharArray.byteArray(charset: Charset = DEFAULT_CHARSET): ByteArray {
+    return String(this).toByteArray(charset)
+}
+
+@JvmOverloads
+fun ByteArray.string(charset: Charset = DEFAULT_CHARSET): String {
+    return String(this, charset)
+}
+
+@JvmOverloads
+fun ByteArray.charArray(charset: Charset = DEFAULT_CHARSET): CharArray {
+    return String(this, charset).toCharArray()
+}
+
+fun CharSequence.charArray(): CharArray {
+    val array = CharArray(this.length)
+    for (c in this.withIndex()) {
+        array[c.index] = c.value
+    }
+    return array
+}
+
 //toCollection:
 
 fun <C : MutableCollection<in Char>> CharSequence.toCollection(destination: C): C {

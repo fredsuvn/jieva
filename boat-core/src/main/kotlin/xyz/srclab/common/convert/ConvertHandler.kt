@@ -126,7 +126,7 @@ open class StringConvertHandler @JvmOverloads constructor(
         }
         fun fromToCharSeq(): CharSequence {
             return when (from) {
-                is ByteArray -> String(from, charset)
+                is ByteArray -> from.string(charset)
                 is CharArray -> String(from)
                 else -> from.toCharSeq()
             }
@@ -136,10 +136,14 @@ open class StringConvertHandler @JvmOverloads constructor(
             String::class.java -> fromToCharSeq().toString()
             StringBuilder::class.java -> StringBuilder(fromToCharSeq())
             StringBuffer::class.java -> StringBuffer(fromToCharSeq())
-            CharArray::class.java -> fromToCharSeq().toString().toCharArray()
+            CharArray::class.java -> when (from) {
+                is CharSequence -> from.charArray()
+                is ByteArray -> from.charArray(charset)
+                else -> null
+            }
             ByteArray::class.java -> when (from) {
-                is CharSequence -> from.toString().toByteArray(charset)
-                is CharArray -> String(from).toByteArray(charset)
+                is CharSequence -> from.byteArray(charset)
+                is CharArray -> from.byteArray(charset)
                 else -> null
             }
             else -> null
