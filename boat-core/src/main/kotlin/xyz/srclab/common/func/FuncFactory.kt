@@ -143,13 +143,13 @@ interface FuncFactory {
 
                 override fun invoke(inst: Any, vararg args: Any?): Any? {
                     return when (args.size) {
-                        0 -> handle.invokeWithArguments(inst)
-                        1 -> handle.invokeWithArguments(inst, args[0])
-                        2 -> handle.invokeWithArguments(inst, args[0], args[1])
-                        3 -> handle.invokeWithArguments(inst, args[0], args[1], args[2])
-                        4 -> handle.invokeWithArguments(inst, args[0], args[1], args[2], args[3])
-                        5 -> handle.invokeWithArguments(inst, args[0], args[1], args[2], args[3], args[4])
-                        6 -> handle.invokeWithArguments(inst, args[0], args[1], args[2], args[3], args[4], args[5])
+                        0 -> handle.invoke(inst)
+                        1 -> handle.invoke(inst, args[0])
+                        2 -> handle.invoke(inst, args[0], args[1])
+                        3 -> handle.invoke(inst, args[0], args[1], args[2])
+                        4 -> handle.invoke(inst, args[0], args[1], args[2], args[3])
+                        5 -> handle.invoke(inst, args[0], args[1], args[2], args[3], args[4])
+                        6 -> handle.invoke(inst, args[0], args[1], args[2], args[3], args[4], args[5])
                         else -> {
                             val actualArgs = arrayOfNulls<Any?>(args.size + 1)
                             actualArgs[0] = inst
@@ -194,14 +194,14 @@ interface FuncFactory {
 
             private fun invokeWithArguments(handle: MethodHandle, vararg args: Any?): Any? {
                 return when (args.size) {
-                    0 -> handle.invokeWithArguments()
-                    1 -> handle.invokeWithArguments(args[0])
-                    2 -> handle.invokeWithArguments(args[0], args[1])
-                    3 -> handle.invokeWithArguments(args[0], args[1], args[2])
-                    4 -> handle.invokeWithArguments(args[0], args[1], args[2], args[3])
-                    5 -> handle.invokeWithArguments(args[0], args[1], args[2], args[3], args[4])
-                    6 -> handle.invokeWithArguments(args[0], args[1], args[2], args[3], args[4], args[5])
-                    7 -> handle.invokeWithArguments(args[0], args[1], args[2], args[3], args[4], args[5], args[6])
+                    0 -> handle.invoke()
+                    1 -> handle.invoke(args[0])
+                    2 -> handle.invoke(args[0], args[1])
+                    3 -> handle.invoke(args[0], args[1], args[2])
+                    4 -> handle.invoke(args[0], args[1], args[2], args[3])
+                    5 -> handle.invoke(args[0], args[1], args[2], args[3], args[4])
+                    6 -> handle.invoke(args[0], args[1], args[2], args[3], args[4], args[5])
+                    7 -> handle.invoke(args[0], args[1], args[2], args[3], args[4], args[5], args[6])
                     else -> handle.invokeWithArguments(*args)
                 }
             }
