@@ -306,6 +306,10 @@ fun CharSequence.charArray(): CharArray {
     return array
 }
 
+fun CharArray.string(): String {
+    return String(this)
+}
+
 //toCollection:
 
 fun <C : MutableCollection<in Char>> CharSequence.toCollection(destination: C): C {
