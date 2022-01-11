@@ -38,6 +38,8 @@ public class MapTest {
         setMap.add("1", "2");
         Assert.assertEquals(setMap.get("1"), BSet.newSet("1", "2"));
         Assert.assertEquals(setMap.get("2"), BSet.newSet("2"));
+        Assert.assertEquals(setMap.getFirst("1"), "1");
+        Assert.assertEquals(setMap.getFirst("2"), "2");
 
         ListMap<String, Object> listMap = BMap.listMap();
         listMap.add("1", "1");
@@ -46,5 +48,11 @@ public class MapTest {
         listMap.add("1", "2");
         Assert.assertEquals(listMap.get("1"), BList.newList("1", "2", "2"));
         Assert.assertEquals(listMap.get("2"), BList.newList("2"));
+        Assert.assertEquals(listMap.getFirst("1"), "1");
+        Assert.assertEquals(listMap.getFirst("2"), "2");
+        Assert.assertEquals(listMap.getLast("1"), "2");
+        Assert.assertEquals(listMap.get("1", 0), "1");
+        Assert.assertEquals(listMap.get("1", 1), "2");
+        Assert.assertEquals(listMap.get("1", 2), "2");
     }
 }

@@ -1,5 +1,7 @@
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.asTyped
+
 /**
  * A type of Multi-Map of which values are [MutableSet].
  */
@@ -21,6 +23,10 @@ open class SetMap<K, V> constructor(
     fun addAll(key: K, values: Iterable<V>): Boolean {
         val set = map.computeIfAbsent(key, valueSet)
         return set.addAll(values)
+    }
+
+    fun getFirst(key: K): V {
+        return get(key)?.iterator()?.next().asTyped()
     }
 }
 
@@ -45,5 +51,17 @@ open class ListMap<K, V> constructor(
     fun addAll(key: K, values: Iterable<V>): Boolean {
         val list = map.computeIfAbsent(key, valueList)
         return list.addAll(values)
+    }
+
+    fun getFirst(key: K): V {
+        return get(key)?.get(0).asTyped()
+    }
+
+    fun getLast(key: K): V {
+        return get(key)?.last().asTyped()
+    }
+
+    fun get(key: K, index: Int): V {
+        return get(key)?.get(index).asTyped()
     }
 }
