@@ -1,6 +1,5 @@
 package test.java.xyz.srclab.common.base;
 
-import org.apache.commons.lang.SystemUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
@@ -16,10 +15,10 @@ public class BProcessTest {
 
     @Test
     public void testProcess() {
-        if (SystemUtils.IS_OS_UNIX) {
+        if (BSystem.isLinux()) {
             echo("echo", ECHO_CONTENT);
         }
-        if (SystemUtils.IS_OS_WINDOWS) {
+        if (BSystem.isWindows()) {
             echo("cmd.exe", "/c", "echo " + ECHO_CONTENT);
         }
     }

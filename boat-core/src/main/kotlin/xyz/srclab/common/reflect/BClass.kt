@@ -83,13 +83,13 @@ val <T> Class<T>.arrayClass: Class<Array<T>>
             Void::class.javaPrimitiveType -> "[V"
             else -> "[L${this.name};"
         }
-        return arrayClassName.classForName(this.classLoader ?: currentClassLoader())
+        return arrayClassName.classForName(this.classLoader ?: defaultClassLoader())
     }
 
 /**
  * Returns current [Thread.contextClassLoader], or [BytesClassLoader] if `contextClassLoader` is null.
  */
-fun currentClassLoader(): ClassLoader {
+fun defaultClassLoader(): ClassLoader {
     return currentThread().contextClassLoader ?: BytesClassLoader
 }
 
@@ -98,13 +98,13 @@ fun currentClassLoader(): ClassLoader {
  */
 @JvmName("forName")
 @JvmOverloads
-fun <T> CharSequence.classForName(classLoader: ClassLoader = currentClassLoader()): Class<T> {
+fun <T> CharSequence.classForName(classLoader: ClassLoader = defaultClassLoader()): Class<T> {
     return Class.forName(this.toString(), true, classLoader).asTyped()
 }
 
 @JvmName("forNameOrNull")
 @JvmOverloads
-fun <T> CharSequence.classForNameOrNull(classLoader: ClassLoader = currentClassLoader()): Class<T>? {
+fun <T> CharSequence.classForNameOrNull(classLoader: ClassLoader = defaultClassLoader()): Class<T>? {
     return try {
         Class.forName(this.toString(), true, classLoader)
     } catch (e: ClassNotFoundException) {
@@ -149,12 +149,12 @@ fun <T> Class<*>.newInstOrNull(parameterTypes: Array<out Class<*>>, args: Array<
  * @throws NoSuchMethodException
  */
 @JvmOverloads
-fun <T> CharSequence.instForName(classLoader: ClassLoader = currentClassLoader()): T {
+fun <T> CharSequence.instForName(classLoader: ClassLoader = defaultClassLoader()): T {
     return classForName<T>(classLoader).newInst()
 }
 
 @JvmOverloads
-fun <T> CharSequence.instForNameOrNull(classLoader: ClassLoader = currentClassLoader()): T? {
+fun <T> CharSequence.instForNameOrNull(classLoader: ClassLoader = defaultClassLoader()): T? {
     return classForNameOrNull<T>(classLoader)?.newInstOrNull()
 }
 
@@ -164,7 +164,7 @@ fun <T> CharSequence.instForNameOrNull(classLoader: ClassLoader = currentClassLo
  */
 @JvmOverloads
 fun <T> CharSequence.instForName(
-    classLoader: ClassLoader = currentClassLoader(),
+    classLoader: ClassLoader = defaultClassLoader(),
     parameterTypes: Array<out Class<*>>,
     args: Array<out Any?>
 ): T {
@@ -173,7 +173,7 @@ fun <T> CharSequence.instForName(
 
 @JvmOverloads
 fun <T> CharSequence.instForNameOrNull(
-    classLoader: ClassLoader = currentClassLoader(),
+    classLoader: ClassLoader = defaultClassLoader(),
     parameterTypes: Array<out Class<*>>,
     args: Array<out Any?>
 ): T? {

@@ -52,7 +52,7 @@ public class ProxyTest {
         };
 
         ClassProxy<T> proxyClass = ClassProxy.generate(
-            type, Arrays.asList(proxyMethod), BClass.currentClassLoader(), factory);
+            type, Arrays.asList(proxyMethod), BClass.defaultClassLoader(), factory);
         Assert.assertEquals(
             proxyClass.create().hello("a", "b"),
             type.isInterface() ? "proxy-> interface" : "proxy-> hello: a = a, b = b");

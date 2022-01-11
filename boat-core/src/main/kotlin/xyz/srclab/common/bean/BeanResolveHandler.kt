@@ -1,7 +1,6 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.base.JumpState
 import xyz.srclab.common.base.uncapitalize
 import xyz.srclab.common.func.InstFunc
 import xyz.srclab.common.func.InstFunc.Companion.toInstFunc
@@ -55,14 +54,14 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
         @Written builder: BeanTypeBuilder,
         @Written getters: MutableMap<String, GetterInfo>,
         @Written setters: MutableMap<String, SetterInfo>,
-    ): JumpState
+    )
 
     override fun resolve(context: BeanResolveContext, @Written builder: BeanTypeBuilder) {
 
         val getters: MutableMap<String, GetterInfo> = LinkedHashMap()
         val setters: MutableMap<String, SetterInfo> = LinkedHashMap()
 
-        val result = resolveAccessors(context, builder, getters, setters)
+        resolveAccessors(context, builder, getters, setters)
 
         val beanType = builder.build()
         for (getterEntry in getters) {
@@ -147,7 +146,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
         @Written builder: BeanTypeBuilder,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
-    ): JumpState {
+    ) {
         val beanClass = builder.type.rawClass
         val methods = context.methods
         for (method in methods) {
@@ -179,7 +178,6 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
                 continue
             }
         }
-        return JumpState.CONTINUE
     }
 }
 
@@ -198,7 +196,7 @@ object RecordStyleBeanResolveHandler : AbstractBeanResolveHandler() {
         @Written builder: BeanTypeBuilder,
         getters: MutableMap<String, GetterInfo>,
         setters: MutableMap<String, SetterInfo>,
-    ): JumpState {
+    ) {
         val beanClass = builder.type.rawClass
         val methods = context.methods
         for (method in methods) {
@@ -222,6 +220,5 @@ object RecordStyleBeanResolveHandler : AbstractBeanResolveHandler() {
                 continue
             }
         }
-        return JumpState.CONTINUE
     }
 }
