@@ -295,7 +295,7 @@ interface SemVer : Comparable<SemVer> {
                 }
             }
 
-            var normalSeq: CharSequence? = null
+            val normalSeq: CharSequence?
             var preReleaseSeq: CharSequence? = null
             var buildMetadataSeq: CharSequence? = null
 

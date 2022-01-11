@@ -55,7 +55,7 @@ fun <K, V> newEntry(key: K, value: V): MutableMap.MutableEntry<K, V> {
         override fun setValue(newValue: V): V {
             val result = v
             v = newValue
-            return v
+            return result
         }
     }
 }

@@ -102,12 +102,12 @@ fun ByteBuffer.toBytes(useBackedArray: Boolean = false): ByteArray {
 
 @JvmOverloads
 fun InputStream.toBuffered(bufferSize: Int = DEFAULT_BUFFER_SIZE): BufferedInputStream {
-    return this.toBuffered(DEFAULT_BUFFER_SIZE)
+    return this.toBuffered(bufferSize)
 }
 
 @JvmOverloads
 fun OutputStream.toBuffered(bufferSize: Int = DEFAULT_BUFFER_SIZE): BufferedOutputStream {
-    return this.buffered(DEFAULT_BUFFER_SIZE)
+    return this.buffered(bufferSize)
 }
 
 @JvmOverloads

@@ -2,7 +2,6 @@
 
 package xyz.srclab.common.base
 
-import org.apache.commons.lang3.SystemUtils
 import java.io.File
 
 const val JAVA_VERSION_KEY = "java.version"
@@ -162,6 +161,10 @@ fun getOsName(): String {
     return getSystemProperty(OS_NAME_KEY)
 }
 
+fun getOsNameOrNull(): String? {
+    return getSystemPropertyOrNull(OS_NAME_KEY)
+}
+
 fun getOsArch(): String {
     return getSystemProperty(OS_ARCH_KEY)
 }
@@ -276,6 +279,43 @@ fun availableProcessors(): Int {
     return Runtime.getRuntime().availableProcessors()
 }
 
+fun isWindows(): Boolean {
+    val osName = getOsNameOrNull()
+    if (osName === null) {
+        return false
+    }
+    return osName.startsWith("Windows")
+}
+
+fun isLinux(): Boolean {
+    val osName = getOsNameOrNull()
+    if (osName === null) {
+        return false
+    }
+    return osName.startsWith("Linux") || osName.startsWith("LINUX")
+}
+
+fun isMac(): Boolean {
+    val osName = getOsNameOrNull()
+    if (osName === null) {
+        return false
+    }
+    return osName.startsWith("Mac")
+}
+
+fun isBsd(): Boolean {
+    val osName = getOsNameOrNull()
+    if (osName === null) {
+        return false
+    }
+    return osName.startsWith("FreeBSD") || osName.startsWith("OpenBSD") || osName.startsWith("NetBSD")
+}
+
+fun isYunfan(): Boolean {
+    class YunfanIsComingException : RuntimeException("长风破浪会有时，直挂云帆济沧海。占个坑~")
+    throw YunfanIsComingException()
+}
+
 /**
  * Gets java major version.
  *
@@ -286,7 +326,7 @@ fun getJavaMajorVersion(): Int {
     val javaVersion = getJavaVersion()
     val dotIndex = DOT_MATCHER.indexIn(javaVersion)
     if (dotIndex <= 0) {
-        return -1
+        return javaVersion.toInt()
     }
     val v = Integer.parseInt(javaVersion.substring(0, dotIndex))
     if (v >= 9) {
@@ -302,27 +342,6 @@ fun getJavaMajorVersion(): Int {
     return -1
 }
 
-fun isWindows(): Boolean {
-    return SystemUtils.IS_OS_WINDOWS
-}
-
-fun isLinux(): Boolean {
-    return SystemUtils.IS_OS_LINUX
-}
-
-fun isMac(): Boolean {
-    return SystemUtils.IS_OS_MAC
-}
-
-fun isUnix(): Boolean {
-    return SystemUtils.IS_OS_UNIX
-}
-
-fun isBsd(): Boolean {
-    return SystemUtils.IS_OS_FREE_BSD || SystemUtils.IS_OS_OPEN_BSD || SystemUtils.IS_OS_NET_BSD
-}
-
-fun isYunfan(): Boolean {
-    class YunfanIsComingException : RuntimeException("长风破浪会有时，直挂云帆济沧海。占个坑~")
-    throw YunfanIsComingException()
+fun isJdk9OrHigher(): Boolean {
+    return getJavaMajorVersion() >= 9
 }

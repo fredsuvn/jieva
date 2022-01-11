@@ -17,8 +17,8 @@ public class BTimeTest {
 
     @Test
     public void testTime() {
-        LocalDateTime now = LocalDateTime.now();
         String timestamp = BTime.timestamp();
+        LocalDateTime now = LocalDateTime.from(BTime.TIMESTAMP_PATTERN.toFormatter().parse(timestamp));
         Assert.assertEquals(DateTimeFormatter.ofPattern(BTime.TIMESTAMP_PATTERN.getPattern()).format(now), timestamp);
         Assert.assertEquals(BTime.toInstant(now), now.atZone(ZoneId.systemDefault()).toInstant());
         Assert.assertEquals(BTime.toDate(now), Date.from(BTime.toInstant(now)));

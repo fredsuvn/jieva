@@ -7,13 +7,27 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoField
 import java.time.temporal.TemporalAccessor
 import java.util.*
 
+const val TIMESTAMP_PATTERN_STRING = "yyyyMMddHHmmssSSS"
+
 @JvmField
-val TIMESTAMP_PATTERN: DatePattern = "yyyyMMddHHmmssSSS".toDatePattern()
+val TIMESTAMP_PATTERN: DatePattern = run {
+    //Fuck jdk8
+    //"yyyyMMddHHmmssSSS".toDatePattern()
+    if (isJdk9OrHigher()) {
+        return@run TIMESTAMP_PATTERN_STRING.toDatePattern()
+    }
+    val formatter: DateTimeFormatter = DateTimeFormatterBuilder() // date/time
+        .appendPattern("yyyyMMddHHmmss") // milliseconds
+        .appendValue(ChronoField.MILLI_OF_SECOND, 3) // create formatter
+        .toFormatter()
+    TIMESTAMP_PATTERN_STRING.toDatePattern(formatter)
+}
 
 fun epochSecond(): Long {
     return epochMilli() / 1000L
@@ -25,7 +39,7 @@ fun epochMilli(): Long {
 
 @JvmOverloads
 fun timestamp(pattern: DatePattern = TIMESTAMP_PATTERN, zoneId: ZoneId = ZoneId.systemDefault()): String {
-    return TIMESTAMP_PATTERN.format(LocalDateTime.now(zoneId))
+    return pattern.format(LocalDateTime.now(zoneId))
 }
 
 fun currentZoneOffset(): ZoneOffset {
@@ -709,15 +723,57 @@ interface DatePattern {
         @JvmName("of")
         @JvmStatic
         fun CharSequence.toDatePattern(): DatePattern {
-            return DatePatternImpl(this)
+            return OfPattern(this)
         }
 
-        private class DatePatternImpl(
+        @JvmName("of")
+        @JvmStatic
+        fun CharSequence.toDatePattern(formatter: DateTimeFormatter): DatePattern {
+            return OfPatternFormatter(this, formatter)
+        }
+
+        /**
+         * Note `pattern` and `toDateFormat` is unsupported for returned [DatePattern].
+         */
+        @JvmName("of")
+        @JvmStatic
+        fun DateTimeFormatter.toDatePattern(): DatePattern {
+            return OfFormatter(this)
+        }
+
+        private class OfPattern(
             pattern: CharSequence
         ) : DatePattern {
 
             override val pattern: String = pattern.toString()
             private val formatter = DateTimeFormatter.ofPattern(this.pattern)
+
+            override fun toFormatter(): DateTimeFormatter = formatter
+
+            override fun toDateFormat(): DateFormat {
+                return SimpleDateFormat(pattern)
+            }
+        }
+
+        private class OfFormatter(
+            private val formatter: DateTimeFormatter
+        ) : DatePattern {
+
+            override val pattern: String = throw UnsupportedOperationException("")
+
+            override fun toFormatter(): DateTimeFormatter = formatter
+
+            override fun toDateFormat(): DateFormat {
+                throw UnsupportedOperationException("")
+            }
+        }
+
+        private class OfPatternFormatter(
+            pattern: CharSequence,
+            private val formatter: DateTimeFormatter
+        ) : DatePattern {
+
+            override val pattern: String = pattern.toString()
 
             override fun toFormatter(): DateTimeFormatter = formatter
 
