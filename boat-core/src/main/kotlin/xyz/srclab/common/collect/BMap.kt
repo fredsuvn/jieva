@@ -160,7 +160,7 @@ fun <K, V, RK, RV> Map<K, V>.map(
     return mapTo(LinkedHashMap(), keySelector, valueTransform)
 }
 
-fun <K, V, RK, RV> Map<K, V>.map(transform: BiFunction<in K, in V, Pair<RK, RV>>): Map<RK, RV> {
+fun <K, V, RK, RV> Map<K, V>.map(transform: BiFunction<in K, in V, Map.Entry<RK, RV>>): Map<RK, RV> {
     return mapTo(LinkedHashMap(), transform)
 }
 
@@ -187,9 +187,9 @@ fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
 
 fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
     destination: C,
-    transform: BiFunction<in K, in V, Pair<RK, RV>>
+    transform: BiFunction<in K, in V, Map.Entry<RK, RV>>
 ): C {
-    return mapTo(destination, transform.toKotlinFun())
+    return mapTo(destination) { it0, it1 -> transform.apply(it0, it1).toPair() }
 }
 
 @JvmSynthetic
@@ -324,57 +324,65 @@ fun <K, V> copyOnWriteMap(
     initMap: Map<out K, V> = emptyMap(),
     newMap: Function<in Map<out K, V>, MutableMap<K, V>> = Function { HashMap(it) }
 ): CopyOnWriteMap<K, V> {
-    return copyOnWriteMap(initMap, newMap.toKotlinFun())
+    return newCopyOnWriteMap(initMap, newMap.toKotlinFun())
 }
 
 @JvmSynthetic
-fun <K, V> copyOnWriteMap(
+fun <K, V> newCopyOnWriteMap(
     initMap: Map<out K, V> = emptyMap(),
     newMap: (Map<out K, V>) -> MutableMap<K, V> = { HashMap(it) }
 ): CopyOnWriteMap<K, V> {
     return CopyOnWriteMap(initMap, newMap)
 }
 
-fun <K, V> setMap(
+fun <K, V> mutableSetMap(
     valueSet: Function<K, MutableSet<V>>
-): SetMap<K, V> {
-    return setMap(LinkedHashMap(), valueSet)
+): MutableSetMap<K, V> {
+    return mutableSetMap(LinkedHashMap(), valueSet)
 }
 
 @JvmOverloads
-fun <K, V> setMap(
+fun <K, V> mutableSetMap(
     map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
     valueSet: Function<K, MutableSet<V>> = Function { LinkedHashSet() }
-): SetMap<K, V> {
-    return newSetMap(map, valueSet.toKotlinFun())
+): MutableSetMap<K, V> {
+    return newMutableSetMap(map, valueSet.toKotlinFun())
 }
 
 @JvmSynthetic
-fun <K, V> newSetMap(
+fun <K, V> newMutableSetMap(
     map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
     valueSet: (K) -> MutableSet<V> = { LinkedHashSet() }
-): SetMap<K, V> {
-    return SetMap(map, valueSet)
+): MutableSetMap<K, V> {
+    return MutableSetMap(map, valueSet)
 }
 
-fun <K, V> listMap(
+fun <K, V> Map<K, Set<V>>.toSetMap(): SetMap<K, V> {
+    return SetMap(this)
+}
+
+fun <K, V> mutableListMap(
     valueList: Function<K, MutableList<V>>
-): ListMap<K, V> {
-    return listMap(LinkedHashMap(), valueList)
+): MutableListMap<K, V> {
+    return mutableListMap(LinkedHashMap(), valueList)
 }
 
 @JvmOverloads
-fun <K, V> listMap(
+fun <K, V> mutableListMap(
     map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
     valueList: Function<K, MutableList<V>> = Function { LinkedList() }
-): ListMap<K, V> {
-    return newListMap(map, valueList.toKotlinFun())
+): MutableListMap<K, V> {
+    return newMutableListMap(map, valueList.toKotlinFun())
 }
 
 @JvmSynthetic
-fun <K, V> newListMap(
+fun <K, V> newMutableListMap(
     map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
     valueList: (K) -> MutableList<V> = { LinkedList() }
-): ListMap<K, V> {
-    return ListMap(map, valueList)
+): MutableListMap<K, V> {
+    return MutableListMap(map, valueList)
+}
+
+fun <K, V> Map<K, List<V>>.toListMap(): ListMap<K, V> {
+    return ListMap(this)
 }

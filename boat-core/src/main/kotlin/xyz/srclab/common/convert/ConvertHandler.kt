@@ -355,7 +355,7 @@ object CollectionConvertHandler : ConvertHandler {
  * * Bean;
  * * [Map], [HashMap], [LinkedHashMap], [TreeMap];
  * * [ConcurrentHashMap];
- * * [SetMap], [ListMap];
+ * * [MutableSetMap], [MutableListMap];
  */
 open class BeanConvertHandler @JvmOverloads constructor(
     private val beanCreator: BeanCreator = BeanCreator.DEFAULT,
@@ -388,6 +388,10 @@ open class BeanConvertHandler @JvmOverloads constructor(
                 toTreeMap(from, toType, context.converter)
             ConcurrentHashMap::class.java ->
                 toConcurrentHashMap(from, toType, context.converter)
+            MutableSetMap::class.java ->
+                toMutableSetMap(from, toType, context.converter)
+            MutableListMap::class.java ->
+                toMutableListMap(from, toType, context.converter)
             SetMap::class.java ->
                 toSetMap(from, toType, context.converter)
             ListMap::class.java ->
@@ -397,28 +401,36 @@ open class BeanConvertHandler @JvmOverloads constructor(
         }
     }
 
-    private fun toLinkedHashMap(from: Any, toType: Type, converter: Converter): Any {
-        return from.copyProperties(LinkedHashMap<Any, Any?>(), toType, beanResolver, converter)
+    private fun toLinkedHashMap(from: Any, toType: Type, converter: Converter): LinkedHashMap<Any, Any?> {
+        return from.copyProperties(LinkedHashMap(), toType, beanResolver, converter)
     }
 
-    private fun toHashMap(from: Any, toType: Type, converter: Converter): Any {
-        return from.copyProperties(HashMap<Any, Any?>(), toType, beanResolver, converter)
+    private fun toHashMap(from: Any, toType: Type, converter: Converter): HashMap<Any, Any?> {
+        return from.copyProperties(HashMap(), toType, beanResolver, converter)
     }
 
-    private fun toTreeMap(from: Any, toType: Type, converter: Converter): Any {
-        return from.copyProperties(TreeMap<Any, Any?>(), toType, beanResolver, converter)
+    private fun toTreeMap(from: Any, toType: Type, converter: Converter): TreeMap<Any, Any?> {
+        return from.copyProperties(TreeMap(), toType, beanResolver, converter)
     }
 
-    private fun toConcurrentHashMap(from: Any, toType: Type, converter: Converter): Any {
-        return from.copyProperties(ConcurrentHashMap<Any, Any?>(), toType, beanResolver, converter)
+    private fun toConcurrentHashMap(from: Any, toType: Type, converter: Converter): ConcurrentHashMap<Any, Any?> {
+        return from.copyProperties(ConcurrentHashMap(), toType, beanResolver, converter)
     }
 
-    private fun toSetMap(from: Any, toType: Type, converter: Converter): Any {
-        return from.copyProperties(newSetMap<Any, Any?>(), toType, beanResolver, converter)
+    private fun toMutableSetMap(from: Any, toType: Type, converter: Converter): MutableSetMap<Any, Any?> {
+        return from.copyProperties(newMutableSetMap(), toType, beanResolver, converter)
     }
 
-    private fun toListMap(from: Any, toType: Type, converter: Converter): Any {
-        return from.copyProperties(newListMap<Any, Any?>(), toType, beanResolver, converter)
+    private fun toMutableListMap(from: Any, toType: Type, converter: Converter): MutableListMap<Any, Any?> {
+        return from.copyProperties(mutableListMap(), toType, beanResolver, converter)
+    }
+
+    private fun toSetMap(from: Any, toType: Type, converter: Converter): SetMap<Any, Any?> {
+        return toMutableSetMap(from, toType, converter).toSetMap()
+    }
+
+    private fun toListMap(from: Any, toType: Type, converter: Converter): ListMap<Any, Any?> {
+        return toMutableListMap(from, toType, converter).toListMap()
     }
 
     private fun toObject(from: Any, toType: Type, converter: Converter): Any? {

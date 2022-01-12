@@ -4,8 +4,8 @@ import org.apache.commons.lang3.reflect.TypeUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.collect.ListMap;
-import xyz.srclab.common.collect.SetMap;
+import xyz.srclab.common.collect.MutableListMap;
+import xyz.srclab.common.collect.MutableSetMap;
 import xyz.srclab.common.reflect.BReflect;
 import xyz.srclab.common.reflect.BType;
 import xyz.srclab.common.reflect.TypeRef;
@@ -107,7 +107,7 @@ public class ReflectTest {
 
     @Test
     public void testTypeArguments() {
-        SetMap<String, String> expected = new SetMap<>(
+        MutableSetMap<String, String> expected = new MutableSetMap<>(
             new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
             (key) -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
         );
@@ -176,8 +176,8 @@ public class ReflectTest {
         expected.clear();
     }
 
-    private void assertTypeArgumentsEquals(Map<TypeVariable<?>, Type> actual, SetMap<String, String> expected) {
-        SetMap<String, String> actualSorted = new SetMap<>(
+    private void assertTypeArgumentsEquals(Map<TypeVariable<?>, Type> actual, MutableSetMap<String, String> expected) {
+        MutableSetMap<String, String> actualSorted = new MutableSetMap<>(
             new TreeMap<>(String.CASE_INSENSITIVE_ORDER),
             (key) -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)
         );
@@ -189,7 +189,7 @@ public class ReflectTest {
 
     @Test
     public void testTypeSignature() {
-        Type setMapType = new TypeRef<SetMap<String, String>>() {
+        Type setMapType = new TypeRef<MutableSetMap<String, String>>() {
         }.getType();
         Type mapType = BReflect.getTypeSignature(setMapType, Map.class);
         BLog.info("mapType: {}", mapType);
@@ -199,7 +199,7 @@ public class ReflectTest {
             }.getType()
         );
 
-        Type listMapType = new TypeRef<ListMap<String, String>>() {
+        Type listMapType = new TypeRef<MutableListMap<String, String>>() {
         }.getType();
         mapType = BReflect.getTypeSignature(listMapType, Map.class);
         BLog.info("mapType: {}", mapType);
