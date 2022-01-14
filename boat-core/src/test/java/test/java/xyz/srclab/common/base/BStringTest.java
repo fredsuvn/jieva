@@ -43,4 +43,13 @@ public class BStringTest {
         BLog.info("Value of laze string [2] is {}!", ls);
         Assert.assertEquals(ref.get().intValue(), 2);
     }
+
+    @Test
+    public void testPassword() {
+        String string = "123456";
+        Password password = Password.of(string);
+        Assert.assertEquals(password.toCharArray(), string.toCharArray());
+        password.clear();
+        Assert.assertEquals(password.toCharArray(), new char[]{0, 0, 0, 0, 0, 0});
+    }
 }

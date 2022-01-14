@@ -521,3 +521,90 @@ interface LazyString : CharSequence {
         }
     }
 }
+
+/**
+ * Represents password, use [clear] to clear content.
+ */
+interface Password : CharSequence {
+
+    val isClear: Boolean
+
+    fun clear()
+
+    fun toCharArray(): CharArray
+
+    companion object {
+
+        @JvmName("of")
+        @JvmStatic
+        fun CharArray.toPassword(offset: Int = 0, length: Int = remainingLength(this.size, offset)): Password {
+            return PasswordImpl(this, offset, length)
+        }
+
+        @JvmName("of")
+        @JvmStatic
+        fun CharSequence.toPassword(): Password {
+            return PasswordImpl(this)
+        }
+
+        private class PasswordImpl : Password {
+
+            private val passwordChars: CharArray
+            private var clear = false
+
+            constructor(chars: CharArray, offset: Int, length: Int) {
+                this.passwordChars = chars.copyOfRange(offset, offset + length)
+            }
+
+            constructor(chars: CharSequence) {
+                this.passwordChars = CharArray(chars.length)
+                var i = 0
+                while (i < passwordChars.size) {
+                    passwordChars[i] = chars[i]
+                    i++
+                }
+            }
+
+            override val length: Int
+                get() = passwordChars.size
+
+            override val isClear: Boolean
+                get() = clear
+
+            override fun get(index: Int): Char {
+                return passwordChars[index]
+            }
+
+            override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+                return PasswordImpl(passwordChars, startIndex, endIndex)
+            }
+
+            override fun clear() {
+                var i = 0
+                while (i < passwordChars.size) {
+                    passwordChars[i] = 0.toChar()
+                    i++
+                }
+                clear = true
+            }
+
+            override fun toCharArray(): CharArray {
+                return passwordChars.copyOfRange(0, passwordChars.size)
+            }
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (other !is Password) return false
+                return this.contentEquals(other)
+            }
+
+            override fun hashCode(): Int {
+                return passwordChars.contentHashCode()
+            }
+
+            override fun toString(): String {
+                return String(passwordChars)
+            }
+        }
+    }
+}
