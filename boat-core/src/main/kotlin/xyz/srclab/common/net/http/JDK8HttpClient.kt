@@ -2,6 +2,7 @@ package xyz.srclab.common.net.http
 
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.toCharSet
+import xyz.srclab.common.io.asInputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -34,8 +35,9 @@ object JDK8HttpClient : HttpClient {
         return HttpResp().let {
             it.status = status
             it.headers = conn.headerFields
-            it.body = conn.inputStream
+            it.body = conn.inputStream.readBytes().asInputStream()
             it.charset = charset?.toCharSet() ?: DEFAULT_CHARSET
+            conn.disconnect()
             it
         }
     }
