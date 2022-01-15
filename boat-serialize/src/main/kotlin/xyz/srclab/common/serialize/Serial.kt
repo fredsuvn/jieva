@@ -39,7 +39,7 @@ interface Serial {
     }
 
     fun toReader(charset: Charset): Reader {
-        return toInputStream().toReader(charset)
+        return toInputStream().asReader(charset)
     }
 
     fun toBytes(): ByteArray {
@@ -88,17 +88,17 @@ interface Serial {
 
     fun writeTo(byteBuffer: ByteBuffer) {
         //byteBuffer.put(toBytes())
-        toInputStream().copyTo(byteBuffer.toOutputStream())
+        toInputStream().copyTo(byteBuffer.asOutputStream())
     }
 
     fun writeTo(appendable: Appendable) {
         //appendable.append(toReader().readText())
-        toReader().copyTo(appendable.toWriter())
+        toReader().copyTo(appendable.asWriter())
     }
 
     fun writeTo(appendable: Appendable, charset: Charset) {
         //appendable.append(toReader(charset).readText())
-        toReader(charset).copyTo(appendable.toWriter())
+        toReader(charset).copyTo(appendable.asWriter())
     }
 
     // Parse methods: Serial -> Java Object
