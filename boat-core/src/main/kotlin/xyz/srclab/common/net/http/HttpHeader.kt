@@ -61,5 +61,17 @@ open class HttpHeader(
 
         @JvmField
         val CONTENT_TYPE_MULTI = CONTENT_TYPE_FORM.withNewValue("multipart/form-data")
+
+        @JvmField
+        val CONTENT_LENGTH = HttpHeader("Content-Length", "0")
+
+        @JvmField
+        val TRANSFER_ENCODING_CHUNKED = HttpHeader("Transfer-Encoding", "chunked")
+
+        @JvmField
+        val AUTHORIZATION_BASIC = HttpHeader("Authorization", "Basic base64encode")
+
+        @JvmField
+        val WWW_AUTHENTICATE = HttpHeader("WWW-Authenticate", "Basic realm=\"Secure Area\"")
     }
 }
