@@ -24,10 +24,10 @@ interface ClassProxy<T : Any> {
         @JvmStatic
         @JvmOverloads
         fun <T : Any> generate(
-                sourceClass: Class<T>,
-                proxyMethods: Iterable<ProxyMethod>,
-                classLoader: ClassLoader = defaultClassLoader(),
-                proxyClassGenerator: ClassProxyFactory = ClassProxyFactory.defaultFactory(),
+            sourceClass: Class<T>,
+            proxyMethods: Iterable<ProxyMethod>,
+            classLoader: ClassLoader = defaultClassLoader(),
+            proxyClassGenerator: ClassProxyFactory = ClassProxyFactory.defaultFactory(),
         ): ClassProxy<T> {
             return proxyClassGenerator.generate(sourceClass, proxyMethods, classLoader)
         }

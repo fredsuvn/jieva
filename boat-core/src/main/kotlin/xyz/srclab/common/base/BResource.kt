@@ -55,28 +55,32 @@ fun CharSequence.loadResourceFileOrNull(classLoader: ClassLoader = defaultClassL
 @JvmOverloads
 @Throws(ResourceNotFoundException::class)
 fun CharSequence.loadResourceString(
-    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()): String {
+    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()
+): String {
     return loadResourceStream(classLoader).readString(charset, true)
 }
 
 @JvmName("loadStringOrNull")
 @JvmOverloads
 fun CharSequence.loadResourceStringOrNull(
-    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()): String? {
+    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()
+): String? {
     return loadResourceStreamOrNull(classLoader)?.readString(charset, true)
 }
 
 @JvmName("loadProperties")
 @JvmOverloads
 fun CharSequence.loadResourceProperties(
-    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()): Map<String, String> {
+    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()
+): Map<String, String> {
     return loadResource(classLoader).readProperties(charset)
 }
 
 @JvmName("loadPropertiesOrNull")
 @JvmOverloads
 fun CharSequence.loadResourcePropertiesOrNull(
-    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()): Map<String, String>? {
+    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()
+): Map<String, String>? {
     return loadResourceOrNull(classLoader)?.readProperties(charset)
 }
 
@@ -116,7 +120,8 @@ fun CharSequence.loadResourceFiles(classLoader: ClassLoader = defaultClassLoader
 @JvmName("loadStrings")
 @JvmOverloads
 fun CharSequence.loadResourceStrings(
-    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()): List<String> {
+    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()
+): List<String> {
     val enumeration = loadAll0(classLoader)
     val result = mutableListOf<String>()
     while (enumeration.hasMoreElements()) {
@@ -128,7 +133,8 @@ fun CharSequence.loadResourceStrings(
 @JvmName("loadPropertiesList")
 @JvmOverloads
 fun CharSequence.loadResourcePropertiesList(
-    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()): List<Map<String, String>> {
+    charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()
+): List<Map<String, String>> {
     val enumeration = loadAll0(classLoader)
     val result = mutableListOf<Map<String, String>>()
     while (enumeration.hasMoreElements()) {
@@ -142,11 +148,7 @@ private fun CharSequence.loadAll0(classLoader: ClassLoader = defaultClassLoader(
 }
 
 private fun CharSequence.removeAbsolute(): String {
-    return if (this.startsWith('/')) {
-        this.substring(1)
-    } else {
-        this.toString()
-    }
+    return this.removeIfStartWith("/")
 }
 
 open class ResourceNotFoundException(message: String?) : RuntimeException(message)

@@ -12,7 +12,7 @@ public class ReflectClass extends SuperReflectClass {
 
     public final String publicField = "publicField";
     protected final String protectedField = "protectedField";
-    private String privateField = "privateField";
+    private final String privateField = "privateField";
     String packageField = "packageField";
 
     private final String param;

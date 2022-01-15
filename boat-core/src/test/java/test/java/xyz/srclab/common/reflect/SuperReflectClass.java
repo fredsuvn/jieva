@@ -4,7 +4,7 @@ public class SuperReflectClass {
 
     public String superPublicField = "superPublicField";
     protected String superProtectedField = "superProtectedField";
-    private String superPrivateField = "superPrivateField";
+    private final String superPrivateField = "superPrivateField";
     String superPackageField = "superPackageField";
 
     public String superPublicMethod() {

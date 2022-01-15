@@ -310,6 +310,22 @@ fun CharArray.string(): String {
     return String(this)
 }
 
+fun CharSequence.addIfNotStartWith(prefix: CharSequence): String {
+    return if (this.startsWith(prefix)) {
+        this.toString()
+    } else {
+        "$prefix$this"
+    }
+}
+
+fun CharSequence.removeIfStartWith(prefix: CharSequence): String {
+    return if (this.startsWith(prefix)) {
+        this.substring(prefix.length)
+    } else {
+        this.toString()
+    }
+}
+
 //toCollection:
 
 fun <C : MutableCollection<in Char>> CharSequence.toCollection(destination: C): C {
@@ -364,7 +380,7 @@ interface StringRef : CharSequence {
         @JvmStatic
         fun CharArray.stringRef(startIndex: Int = 0, endIndex: Int = this.size): StringRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
-            return CharArrayStringRef(this, startIndex, endIndex)
+            return CharsStringRef(this, startIndex, endIndex)
         }
 
         @JvmName("offset")
@@ -429,7 +445,7 @@ interface StringRef : CharSequence {
             }
         }
 
-        private class CharArrayStringRef(
+        private class CharsStringRef(
             private val chars: CharArray,
             private val startIndex: Int,
             private val endIndex: Int
@@ -444,7 +460,7 @@ interface StringRef : CharSequence {
 
             override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
-                return CharArrayStringRef(chars, startIndex.actualIndex(), endIndex.actualIndex())
+                return CharsStringRef(chars, startIndex.actualIndex(), endIndex.actualIndex())
             }
 
             override fun copyOfRange(): String {
@@ -455,7 +471,7 @@ interface StringRef : CharSequence {
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
-                if (other !is CharArrayStringRef) return false
+                if (other !is CharsStringRef) return false
                 if (chars !== other.chars) return false
                 if (startIndex != other.startIndex) return false
                 if (endIndex != other.endIndex) return false
@@ -507,97 +523,6 @@ interface LazyString : CharSequence {
 
             override fun toString(): String {
                 return value
-            }
-        }
-    }
-}
-
-/**
- * Represents password, use [clear] to clear content.
- */
-interface Password : CharSequence {
-
-    val isClear: Boolean
-
-    fun clear()
-
-    fun toCharArray(): CharArray
-
-    fun verify(chars: CharSequence): Boolean {
-        if (this.length != chars.length) {
-            return false
-        }
-        var i = 0
-        while (i < this.length) {
-            if (this[i] != chars[i]) {
-                return false
-            }
-            i++
-        }
-        return true
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun CharArray.toPassword(offset: Int = 0, length: Int = remainingLength(this.size, offset)): Password {
-            return PasswordImpl(this, offset, length)
-        }
-
-        @JvmName("of")
-        @JvmStatic
-        fun CharSequence.toPassword(): Password {
-            return PasswordImpl(this)
-        }
-
-        private class PasswordImpl : Password {
-
-            private val passwordChars: CharArray
-            private var clear = false
-
-            constructor(chars: CharArray, offset: Int, length: Int) {
-                this.passwordChars = chars.copyOfRange(offset, offset + length)
-            }
-
-            constructor(chars: CharSequence) {
-                this.passwordChars = CharArray(chars.length)
-                var i = 0
-                while (i < passwordChars.size) {
-                    passwordChars[i] = chars[i]
-                    i++
-                }
-            }
-
-            override val length: Int
-                get() = passwordChars.size
-
-            override val isClear: Boolean
-                get() = clear
-
-            override fun get(index: Int): Char {
-                return passwordChars[index]
-            }
-
-            override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
-                return PasswordImpl(passwordChars, startIndex, endIndex)
-            }
-
-            override fun clear() {
-                var i = 0
-                while (i < passwordChars.size) {
-                    passwordChars[i] = 0.toChar()
-                    i++
-                }
-                clear = true
-            }
-
-            override fun toCharArray(): CharArray {
-                return passwordChars.copyOfRange(0, passwordChars.size)
-            }
-
-            override fun toString(): String {
-                return String(passwordChars)
             }
         }
     }
