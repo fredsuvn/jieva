@@ -14,7 +14,7 @@ interface InstFunc {
         return invoke(inst, *args).asTyped()
     }
 
-    fun toStaticFunc(inst: Any): StaticFunc {
+    fun asStaticFunc(inst: Any): StaticFunc {
         return object : StaticFunc {
             override fun invoke(vararg args: Any?): Any? {
                 return this@InstFunc(inst, *args)

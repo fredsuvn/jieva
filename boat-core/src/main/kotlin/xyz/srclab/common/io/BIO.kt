@@ -101,27 +101,27 @@ fun ByteBuffer.toBytes(useBackedArray: Boolean = false): ByteArray {
 //Convert:
 
 @JvmOverloads
-fun InputStream.toBuffered(bufferSize: Int = DEFAULT_BUFFER_SIZE): BufferedInputStream {
-    return this.toBuffered(bufferSize)
-}
-
-@JvmOverloads
-fun OutputStream.toBuffered(bufferSize: Int = DEFAULT_BUFFER_SIZE): BufferedOutputStream {
+fun InputStream.asBuffered(bufferSize: Int = DEFAULT_BUFFER_SIZE): BufferedInputStream {
     return this.buffered(bufferSize)
 }
 
 @JvmOverloads
-fun InputStream.toReader(charset: Charset = DEFAULT_CHARSET): Reader {
+fun OutputStream.asBuffered(bufferSize: Int = DEFAULT_BUFFER_SIZE): BufferedOutputStream {
+    return this.buffered(bufferSize)
+}
+
+@JvmOverloads
+fun InputStream.asReader(charset: Charset = DEFAULT_CHARSET): Reader {
     return InputStreamReader(this, charset)
 }
 
 @JvmOverloads
-fun OutputStream.toWriter(charset: Charset = DEFAULT_CHARSET): Writer {
+fun OutputStream.asWriter(charset: Charset = DEFAULT_CHARSET): Writer {
     return OutputStreamWriter(this, charset)
 }
 
 @JvmOverloads
-fun InputStream.toBufferedReader(
+fun InputStream.asBufferedReader(
     charset: Charset = DEFAULT_CHARSET,
     bufferSize: Int = DEFAULT_BUFFER_SIZE
 ): BufferedReader {
@@ -129,7 +129,7 @@ fun InputStream.toBufferedReader(
 }
 
 @JvmOverloads
-fun OutputStream.toBufferedWriter(
+fun OutputStream.asBufferedWriter(
     charset: Charset = DEFAULT_CHARSET,
     bufferSize: Int = DEFAULT_BUFFER_SIZE
 ): BufferedWriter {
@@ -137,62 +137,62 @@ fun OutputStream.toBufferedWriter(
 }
 
 @JvmOverloads
-fun Reader.toInputStream(charset: Charset = DEFAULT_CHARSET): InputStream {
+fun Reader.asInputStream(charset: Charset = DEFAULT_CHARSET): InputStream {
     return ReaderInputStream(this, charset)
 }
 
 @JvmOverloads
-fun Writer.toOutputStream(charset: Charset = DEFAULT_CHARSET): OutputStream {
+fun Writer.asOutputStream(charset: Charset = DEFAULT_CHARSET): OutputStream {
     return WriterOutputStream(this, charset)
 }
 
 @JvmOverloads
-fun ByteArray.toInputStream(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesInputStream {
+fun ByteArray.asInputStream(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesInputStream {
     return BytesInputStream(this, offset, length)
 }
 
 @JvmOverloads
-fun ByteArray.toOutputStream(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesOutputStream {
+fun ByteArray.asOutputStream(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesOutputStream {
     return BytesOutputStream(this, offset, length)
 }
 
 @JvmOverloads
-fun CharArray.toReader(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsReader {
+fun CharArray.asReader(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsReader {
     return CharsReader(this, offset, length)
 }
 
 @JvmOverloads
-fun CharArray.toWriter(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsWriter {
+fun CharArray.asWriter(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsWriter {
     return CharsWriter(this, offset, length)
 }
 
 @JvmOverloads
-fun <T : CharSequence> T.toReader(
+fun <T : CharSequence> T.asReader(
     offset: Int = 0,
     length: Int = remainingLength(this.length, offset)
 ): CharSeqReader<T> {
     return CharSeqReader(this, offset, length)
 }
 
-fun <T : Appendable> T.toWriter(): AppendableWriter<T> {
+fun <T : Appendable> T.asWriter(): AppendableWriter<T> {
     return AppendableWriter(this)
 }
 
-fun ByteBuffer.toInputStream(): ByteBufferInputStream {
+fun ByteBuffer.asInputStream(): ByteBufferInputStream {
     return ByteBufferInputStream(this)
 }
 
-fun ByteBuffer.toOutputStream(): ByteBufferOutputStream {
+fun ByteBuffer.asOutputStream(): ByteBufferOutputStream {
     return ByteBufferOutputStream(this)
 }
 
-fun RandomAccessFile.toInputStream(
+fun RandomAccessFile.asInputStream(
     offset: Long = 0, length: Long = remainingLength(this.length(), offset)
 ): RandomInputStream {
     return RandomInputStream(this, offset, length)
 }
 
-fun RandomAccessFile.toOutputStream(
+fun RandomAccessFile.asOutputStream(
     offset: Long = 0, length: Long = remainingLength(this.length(), offset)
 ): RandomOutputStream {
     return RandomOutputStream(this, offset, length)

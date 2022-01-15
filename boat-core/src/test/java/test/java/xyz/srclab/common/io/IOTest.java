@@ -21,7 +21,7 @@ public class IOTest {
     @Test
     public void testStream() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = BIO.toInputStream(text.getBytes());
+        InputStream input = BIO.asInputStream(text.getBytes());
         String inputString = BIO.readString(input);
         input.reset();
         BLog.info("inputString: {}", inputString);
@@ -41,8 +41,8 @@ public class IOTest {
     @Test
     public void testReader() throws Exception {
         String text = "123456\r\n234567\r\n";
-        InputStream input = BIO.toInputStream(text.getBytes());
-        Reader reader = BIO.toReader(input);
+        InputStream input = BIO.asInputStream(text.getBytes());
+        Reader reader = BIO.asReader(input);
         String readString = BIO.readString(reader);
         input.reset();
         BLog.info("readString: {}", readString);
@@ -54,7 +54,7 @@ public class IOTest {
         input.reset();
         Assert.assertEquals(readStrings, Arrays.asList("123456", "234567", ""));//note end with \r\n
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Writer writer = BIO.toWriter(output);
+        Writer writer = BIO.asWriter(output);
         BIO.readTo(reader, writer);
         input.reset();
         writer.flush();

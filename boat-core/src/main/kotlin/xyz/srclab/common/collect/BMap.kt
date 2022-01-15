@@ -153,47 +153,47 @@ fun <K, V, M : MutableMap<in K, in V>> Map<K, V>.filterTo(
     return this.filterToKt(destination, predicate.toKotlinFun())
 }
 
-fun <K, V, RK, RV> Map<K, V>.map(
+fun <K, V, RK, RV> Map<K, V>.mapEntries(
     keySelector: Function<in K, RK>,
     valueTransform: Function<in V, RV>
 ): Map<RK, RV> {
-    return mapTo(LinkedHashMap(), keySelector, valueTransform)
+    return mapEntriesTo(LinkedHashMap(), keySelector, valueTransform)
 }
 
-fun <K, V, RK, RV> Map<K, V>.map(transform: BiFunction<in K, in V, Map.Entry<RK, RV>>): Map<RK, RV> {
-    return mapTo(LinkedHashMap(), transform)
+fun <K, V, RK, RV> Map<K, V>.mapEntries(transform: BiFunction<in K, in V, Map.Entry<RK, RV>>): Map<RK, RV> {
+    return mapEntriesTo(LinkedHashMap(), transform)
 }
 
 @JvmSynthetic
-inline fun <K, V, RK, RV> Map<K, V>.map(
+inline fun <K, V, RK, RV> Map<K, V>.mapEntries(
     crossinline keySelector: (K) -> RK,
     crossinline valueTransform: (V) -> RV
 ): Map<RK, RV> {
-    return mapTo(LinkedHashMap(), keySelector, valueTransform)
+    return mapEntriesTo(LinkedHashMap(), keySelector, valueTransform)
 }
 
 @JvmSynthetic
-inline fun <K, V, RK, RV> Map<K, V>.map(transform: (K, V) -> Pair<RK, RV>): Map<RK, RV> {
-    return mapTo(LinkedHashMap(), transform)
+inline fun <K, V, RK, RV> Map<K, V>.mapEntries(transform: (K, V) -> Pair<RK, RV>): Map<RK, RV> {
+    return mapEntriesTo(LinkedHashMap(), transform)
 }
 
-fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
+fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     destination: C,
     keySelector: Function<in K, RK>,
     valueTransform: Function<in V, RV>
 ): C {
-    return mapTo(destination, keySelector.toKotlinFun(), valueTransform.toKotlinFun())
+    return mapEntriesTo(destination, keySelector.toKotlinFun(), valueTransform.toKotlinFun())
 }
 
-fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
+fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     destination: C,
     transform: BiFunction<in K, in V, Map.Entry<RK, RV>>
 ): C {
-    return mapTo(destination) { it0, it1 -> transform.apply(it0, it1).toPair() }
+    return mapEntriesTo(destination) { it0, it1 -> transform.apply(it0, it1).toPair() }
 }
 
 @JvmSynthetic
-inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
+inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     destination: C,
     crossinline keySelector: (K) -> RK,
     crossinline valueTransform: (V) -> RV
@@ -207,7 +207,7 @@ inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
 }
 
 @JvmSynthetic
-inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
+inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     destination: C,
     transform: (K, V) -> Pair<RK, RV>
 ): C {
@@ -218,52 +218,26 @@ inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapTo(
     return destination
 }
 
-fun <K, V, R> Map<K, V>.toList(transform: Function<in Map.Entry<K, V>, R>): List<R> {
+fun <K, V, R> Map<K, V>.map(transform: Function<in Map.Entry<K, V>, R>): List<R> {
     return this.mapKt(transform.toKotlinFun())
 }
 
-fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.toList(
+fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.mapTo(
     destination: C,
     transform: Function<in Map.Entry<K, V>, R>
 ): C {
     return this.mapToKt(destination, transform.toKotlinFun())
 }
 
-@JvmSynthetic
-inline fun <K, V, R> Map<K, V>.toList(transform: (Map.Entry<K, V>) -> R): List<R> {
-    return this.mapKt(transform)
-}
-
-@JvmSynthetic
-inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.toList(
-    destination: C,
-    transform: (Map.Entry<K, V>) -> R
-): C {
-    return this.mapToKt(destination, transform)
-}
-
-fun <K, V, R> Map<K, V>.flatToList(transform: Function<in Map.Entry<K, V>, Iterable<R>>): List<R> {
+fun <K, V, R> Map<K, V>.flatMap(transform: Function<in Map.Entry<K, V>, Iterable<R>>): List<R> {
     return this.flatMapKt(transform.toKotlinFun())
 }
 
-fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatToList(
+fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
     destination: C,
     transform: Function<in Map.Entry<K, V>, Iterable<R>>
 ): C {
     return this.flatMapToKt(destination, transform.toKotlinFun())
-}
-
-@JvmSynthetic
-inline fun <K, V, R> Map<K, V>.flatToList(transform: (Map.Entry<K, V>) -> Iterable<R>): List<R> {
-    return this.flatMapKt(transform)
-}
-
-@JvmSynthetic
-inline fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatToList(
-    destination: C,
-    transform: (Map.Entry<K, V>) -> Iterable<R>
-): C {
-    return this.flatMapToKt(destination, transform)
 }
 
 @JvmOverloads

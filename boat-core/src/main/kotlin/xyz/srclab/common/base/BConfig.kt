@@ -17,7 +17,7 @@ fun InputStream.readProperties(charset: Charset = DEFAULT_CHARSET): Map<String, 
 fun Reader.readProperties(): Map<String, String> {
     val props = Properties()
     props.load(this)
-    val map = props.toMap()
+    val map = props.toStringMap()
     this.close()
     return map
 }
@@ -32,7 +32,7 @@ fun URL.readProperties(charset: Charset = DEFAULT_CHARSET): Map<String, String> 
     return this.openStream().readProperties(charset)
 }
 
-fun Properties.toMap(): Map<String, String> {
+fun Properties.toStringMap(): Map<String, String> {
     val result = mutableMapOf<String, String>()
     for (mutableEntry in this) {
         if (mutableEntry.key !== null || mutableEntry.value !== null) {

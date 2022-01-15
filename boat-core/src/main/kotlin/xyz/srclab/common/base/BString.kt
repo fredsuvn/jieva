@@ -505,16 +505,6 @@ interface LazyString : CharSequence {
                 return value.subSequence(startIndex, endIndex)
             }
 
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other !is LazyString) return false
-                return value == other.toString()
-            }
-
-            override fun hashCode(): Int {
-                return value.hashCode()
-            }
-
             override fun toString(): String {
                 return value
             }
@@ -532,6 +522,20 @@ interface Password : CharSequence {
     fun clear()
 
     fun toCharArray(): CharArray
+
+    fun verify(chars: CharSequence): Boolean {
+        if (this.length != chars.length) {
+            return false
+        }
+        var i = 0
+        while (i < this.length) {
+            if (this[i] != chars[i]) {
+                return false
+            }
+            i++
+        }
+        return true
+    }
 
     companion object {
 
@@ -590,16 +594,6 @@ interface Password : CharSequence {
 
             override fun toCharArray(): CharArray {
                 return passwordChars.copyOfRange(0, passwordChars.size)
-            }
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other !is Password) return false
-                return this.contentEquals(other)
-            }
-
-            override fun hashCode(): Int {
-                return passwordChars.contentHashCode()
             }
 
             override fun toString(): String {

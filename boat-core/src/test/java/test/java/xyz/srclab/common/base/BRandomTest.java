@@ -20,7 +20,7 @@ public class BRandomTest {
 
     @Test
     public void testRandomSupplier() {
-        Supplier<?> rs = BRandom.randomSupplierBuilder()
+        Supplier<?> rs = BRandom.newBuilder()
             .score(20, "A")
             .score(20, "B")
             .score(60, "C")

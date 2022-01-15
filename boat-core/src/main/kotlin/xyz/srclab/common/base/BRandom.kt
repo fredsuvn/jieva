@@ -25,11 +25,12 @@ fun Random.between(from: Int, to: Int): Int {
 /**
  * Returns a new [RandomSupplierBuilder].
  */
-fun <T : Any> randomSupplierBuilder(): RandomSupplierBuilder<T> {
+@JvmName("newBuilder")
+fun <T : Any> newRandomBuilder(): RandomSupplierBuilder<T> {
     return RandomSupplierBuilder()
 }
 
-class RandomSupplierBuilder<T : Any> {
+open class RandomSupplierBuilder<T : Any> {
 
     private var builderRandom: Random? = null
     private val builderCases: MutableList<Case<T>> = LinkedList()

@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.collect.map
+import xyz.srclab.common.collect.mapEntries
 
 /**
  * A [Map] which is associated with a `bean`,
@@ -19,7 +19,7 @@ open class BeanMap(
     //    beanType.properties.filter { it.key != "class" }
 
     private val entryMap: Map<String, MutableMap.MutableEntry<String, Any?>> =
-        beanType.properties.map { name, propertyType -> name to BeanEntry(propertyType) }
+        beanType.properties.mapEntries { name, propertyType -> name to BeanEntry(propertyType) }
 
     override val size: Int
         get() = entries.size
