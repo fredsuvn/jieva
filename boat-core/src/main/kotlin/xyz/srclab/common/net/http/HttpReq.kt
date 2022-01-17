@@ -15,4 +15,5 @@ open class HttpReq {
     var chunkedSize: Int = DEFAULT_BUFFER_SIZE
     var connectTimeoutMillis: Int = DEFAULT_HTTP_CONNECT_TIMEOUT_MILLIS
     var readTimeoutMillis: Int = DEFAULT_HTTP_READ_TIMEOUT_MILLIS
+    var useCaches: Boolean = false
 }

@@ -16,6 +16,13 @@ public class BRandomTest {
             BLog.info("random[10, 20): {}", r);
             Assert.assertTrue(r >= 10 && r < 20);
         }
+        String rd = BRandom.randomString(100);
+        BLog.info("randomString: {}", rd);
+        Assert.assertEquals(rd.length(), 100);
+        for (int i = 0; i < rd.length(); i++) {
+            char c = rd.charAt(i);
+            Assert.assertTrue(Character.isLetterOrDigit(c));
+        }
     }
 
     @Test

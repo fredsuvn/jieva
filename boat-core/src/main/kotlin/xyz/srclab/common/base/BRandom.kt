@@ -5,14 +5,19 @@ package xyz.srclab.common.base
 import java.util.*
 import java.util.function.Supplier
 
-private val random: Random = Random()
+private val defaultRandom: Random = Random()
+
+private const val randomDigits = "0123456789"
+private const val randomLowerLetters = "abcdefghijklnmopqrstuvwxyz"
+private const val randomUpperLetters = "ABCDEFGHIJKLNMOPQRSTUVWXYZ"
+private val randomChars = randomDigits + randomLowerLetters + randomUpperLetters
 
 /**
  * Returns random number in `[from, to)`.
  */
 @JvmName("between")
 fun randomBetween(from: Int, to: Int): Int {
-    return random.between(from, to)
+    return defaultRandom.between(from, to)
 }
 
 /**
@@ -20,6 +25,36 @@ fun randomBetween(from: Int, to: Int): Int {
  */
 fun Random.between(from: Int, to: Int): Int {
     return this.nextInt(to - from) + from
+}
+
+@JvmOverloads
+fun randomDigits(size: Int, random: Random = defaultRandom): String {
+    return randomDigits.randomString(size, random)
+}
+
+@JvmOverloads
+fun randomLowerLetters(size: Int, random: Random = defaultRandom): String {
+    return randomLowerLetters.randomString(size, random)
+}
+
+@JvmOverloads
+fun randomUpperLetters(size: Int, random: Random = defaultRandom): String {
+    return randomUpperLetters.randomString(size, random)
+}
+
+@JvmOverloads
+fun randomString(size: Int, random: Random = defaultRandom): String {
+    return randomChars.randomString(size, random)
+}
+
+fun CharSequence.randomString(size: Int, random: Random = defaultRandom): String {
+    val result = CharArray(size)
+    var i = 0
+    while (i < result.size) {
+        result[i] = this[random.between(0, this.length)]
+        i++
+    }
+    return result.string()
 }
 
 /**

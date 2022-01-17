@@ -162,3 +162,34 @@ fun request(url: String, method: String, body: String): HttpResp {
         it
     })
 }
+
+fun connect(req: HttpReq): HttpConnect {
+    return defaultClient.connect(req)
+}
+
+@JvmOverloads
+fun connect(url: String, method: String = HTTP_GET_METHOD): HttpConnect {
+    return defaultClient.connect(HttpReq().let {
+        it.url = url
+        it.method = method
+        it
+    })
+}
+
+fun connect(url: String, method: String, body: InputStream): HttpConnect {
+    return defaultClient.connect(HttpReq().let {
+        it.url = url
+        it.method = method
+        it.body = body
+        it
+    })
+}
+
+fun connect(url: String, method: String, body: String): HttpConnect {
+    return defaultClient.connect(HttpReq().let {
+        it.url = url
+        it.method = method
+        it.body = body.byteInputStream()
+        it
+    })
+}

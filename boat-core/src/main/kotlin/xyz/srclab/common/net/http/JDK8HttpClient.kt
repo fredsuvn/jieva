@@ -7,38 +7,54 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object JDK8HttpClient : HttpClient {
-    override fun request(req: HttpReq): HttpResp {
+
+    override fun connect(req: HttpReq): HttpConnect {
         val conn = URL(req.url).openConnection() as HttpURLConnection
-        conn.connectTimeout = req.connectTimeoutMillis
-        conn.readTimeout = req.readTimeoutMillis
-        conn.requestMethod = req.method
-        for (header in req.headers) {
-            for (value in header.value) {
-                conn.setRequestProperty(header.key, value)
+        return HttpConnectImpl(conn, req)
+    }
+
+    private class HttpConnectImpl(
+        private val conn: HttpURLConnection,
+        private val req: HttpReq
+    ) : HttpConnect {
+
+        override fun getResponse(readAll: Boolean): HttpResp {
+            conn.connectTimeout = req.connectTimeoutMillis
+            conn.readTimeout = req.readTimeoutMillis
+            conn.requestMethod = req.method
+            for (header in req.headers) {
+                for (value in header.value) {
+                    conn.setRequestProperty(header.key, value)
+                }
+            }
+            if (req.chunkedSize > 0) {
+                conn.setChunkedStreamingMode(req.chunkedSize)
+            } else if (req.contentLength >= 0) {
+                conn.setFixedLengthStreamingMode(req.contentLength)
+            }
+            conn.doOutput = true
+            conn.useCaches = req.useCaches
+            conn.connect()
+            val body = req.body
+            if (body !== null) {
+                body.copyTo(conn.outputStream, if (req.chunkedSize > 0) req.chunkedSize else DEFAULT_BUFFER_SIZE)
+                conn.outputStream.flush()
+            }
+            val status = HttpStatus(conn.responseCode, conn.responseMessage)
+            val charset = conn.contentType?.split(";")?.firstOrNull {
+                it.trim().startsWith("charset=")
+            }?.substring(8)
+            return HttpResp().let {
+                it.status = status
+                it.headers = conn.headerFields
+                it.body = if (readAll) conn.inputStream.readBytes().asInputStream() else conn.inputStream
+                it.charset = charset?.toCharSet() ?: DEFAULT_CHARSET
+                it
             }
         }
-        if (req.chunkedSize > 0) {
-            conn.setChunkedStreamingMode(req.chunkedSize)
-        } else if (req.contentLength >= 0) {
-            conn.setFixedLengthStreamingMode(req.contentLength)
-        }
-        conn.doOutput = true
-        conn.connect()
-        val body = req.body
-        if (body !== null) {
-            body.copyTo(conn.outputStream, if (req.chunkedSize > 0) req.chunkedSize else DEFAULT_BUFFER_SIZE)
-        }
-        val status = HttpStatus(conn.responseCode, conn.responseMessage)
-        val charset = conn.contentType?.split(";")?.firstOrNull {
-            it.trim().startsWith("charset=")
-        }?.substring(8)
-        return HttpResp().let {
-            it.status = status
-            it.headers = conn.headerFields
-            it.body = conn.inputStream.readBytes().asInputStream()
-            it.charset = charset?.toCharSet() ?: DEFAULT_CHARSET
+
+        override fun close() {
             conn.disconnect()
-            it
         }
     }
 }
