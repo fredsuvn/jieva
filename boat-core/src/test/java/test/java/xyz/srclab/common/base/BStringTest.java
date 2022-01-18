@@ -43,4 +43,22 @@ public class BStringTest {
         BLog.info("Value of laze string [2] is {}!", ls);
         Assert.assertEquals(ref.get().intValue(), 2);
     }
+
+    @Test
+    public void test8Bit() {
+        String randomString = BRandom.randomString(100);
+        byte[] bytes = BString.to8BitBytes(randomString);
+        byte[] bytes2 = BString.to8BitBytes(randomString.toCharArray());
+        byte[] expectedBytes = new byte[100];
+        for (int i = 0; i < expectedBytes.length; i++) {
+            expectedBytes[i] = (byte) randomString.charAt(i);
+        }
+        Assert.assertEquals(bytes, expectedBytes);
+        Assert.assertEquals(bytes, bytes2);
+        char[] expectedChars = new char[100];
+        for (int i = 0; i < expectedBytes.length; i++) {
+            expectedChars[i] = (char) (bytes[i] & 0xff);
+        }
+        Assert.assertEquals(randomString, new String(expectedChars));
+    }
 }

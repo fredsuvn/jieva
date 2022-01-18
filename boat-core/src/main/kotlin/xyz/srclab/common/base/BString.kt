@@ -326,6 +326,34 @@ fun CharSequence.removeIfStartWith(prefix: CharSequence): String {
     }
 }
 
+fun CharSequence.to8BitBytes(): ByteArray {
+    val array = ByteArray(this.length)
+    for (c in this.withIndex()) {
+        array[c.index] = c.value.code.toByte()
+    }
+    return array
+}
+
+fun CharArray.to8BitBytes(): ByteArray {
+    val array = ByteArray(this.size)
+    for (c in this.withIndex()) {
+        array[c.index] = c.value.code.toByte()
+    }
+    return array
+}
+
+fun ByteArray.to8BitChars(): CharArray {
+    val array = CharArray(this.size)
+    for (c in this.withIndex()) {
+        array[c.index] = c.value.toUnsignedInt().toChar()
+    }
+    return array
+}
+
+fun ByteArray.to8BitString(): String {
+    return this.to8BitChars().string()
+}
+
 //toCollection:
 
 fun <C : MutableCollection<in Char>> CharSequence.toCollection(destination: C): C {
