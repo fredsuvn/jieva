@@ -9,16 +9,18 @@ import java.net.URL
 object JDK8HttpClient : HttpClient {
 
     override fun connect(req: HttpReq): HttpConnect {
-        val conn = URL(req.url).openConnection() as HttpURLConnection
-        return HttpConnectImpl(conn, req)
+        return HttpConnectImpl(req)
     }
 
     private class HttpConnectImpl(
-        private val conn: HttpURLConnection,
         private val req: HttpReq
     ) : HttpConnect {
 
+        private var conn: HttpURLConnection? = null
+
         override fun getResponse(readAll: Boolean): HttpResp {
+            val conn = URL(req.url).openConnection() as HttpURLConnection
+            this.conn = conn
             conn.connectTimeout = req.connectTimeoutMillis
             conn.readTimeout = req.readTimeoutMillis
             conn.requestMethod = req.method
@@ -54,7 +56,7 @@ object JDK8HttpClient : HttpClient {
         }
 
         override fun close() {
-            conn.disconnect()
+            conn?.disconnect()
         }
     }
 }

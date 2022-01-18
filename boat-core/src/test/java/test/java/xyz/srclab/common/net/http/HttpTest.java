@@ -11,7 +11,6 @@ import io.netty.handler.codec.http.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.base.BRandom;
 import xyz.srclab.common.base.BString;
 import xyz.srclab.common.collect.BMap;
 import xyz.srclab.common.io.BIO;
@@ -19,15 +18,16 @@ import xyz.srclab.common.net.http.BHttp;
 import xyz.srclab.common.net.http.HttpConnect;
 import xyz.srclab.common.net.http.HttpReq;
 import xyz.srclab.common.net.http.HttpResp;
+import xyz.srclab.common.net.socket.BSocket;
 
-import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 public class HttpTest {
 
-    private static final String TEST_RESP_BODY = BRandom.randomString(10);
-    private static final String TEST_REQ_BODY = "qqq";
+    private static final String TEST_RESP_EMPTY_BODY = "TEST_RESP_EMPTY_BODY";
+    private static final String TEST_RESP_BODY = "TEST_RESP_BODY";
+    private static final String TEST_REQ_BODY = "TEST_REQ_BODY";
 
     @Test
     public void testUrl() throws Exception {
@@ -62,28 +62,35 @@ public class HttpTest {
 
     @Test
     public void testRequest() throws Exception {
-        //HttpResp resp = BHttp.request("https://www.baidu.com");
-        //BLog.info("resp: {}", resp.bodyAsString());
-
-        ServerSocket serverSocket = new ServerSocket(0); //读取空闲的可用端口
-        int port = serverSocket.getLocalPort();
-        serverSocket.close();
+        int port = BSocket.availableSocketPort();
         TestServer testServer = new TestServer();
         testServer.start(port);
 
+        HttpResp resp = BHttp.request("http://localhost:" + port + "/empty");
+        String body = resp.bodyAsString();
+        BLog.info("resp: {}", body);
+        Assert.assertEquals(body, TEST_RESP_EMPTY_BODY);
+
+        HttpConnect connect = BHttp.connect("http://localhost:" + port + "/empty");
+        resp = connect.getResponse(true);
+        body = resp.bodyAsString();
+        BLog.info("resp: {}", body);
+        Assert.assertEquals(body, TEST_RESP_EMPTY_BODY);
+
+
         HttpReq req = new HttpReq();
-        req.setUrl("http://localhost:" + serverSocket.getLocalPort());
+        req.setUrl("http://localhost:" + port + "/body");
         req.setMethod(BHttp.HTTP_POST_METHOD);
         req.setContentLength(TEST_REQ_BODY.length());
-        HttpConnect connect = BHttp.connect(req);
         req.setBody(BIO.asInputStream(TEST_REQ_BODY.getBytes(StandardCharsets.UTF_8)));
-        HttpResp resp = connect.getResponse(true);
-        String body = resp.bodyAsString();
+        resp = BHttp.request(req);
+        body = resp.bodyAsString();
         BLog.info("resp: {}", body);
         Assert.assertEquals(body, TEST_RESP_BODY);
 
+        connect = BHttp.connect(req);
         req.setBody(BIO.asInputStream(TEST_REQ_BODY.getBytes(StandardCharsets.UTF_8)));
-        resp = BHttp.request(req);
+        resp = connect.getResponse(true);
         body = resp.bodyAsString();
         BLog.info("resp: {}", body);
         Assert.assertEquals(body, TEST_RESP_BODY);
@@ -128,23 +135,33 @@ public class HttpTest {
     }
 
     private static class HttpServerHandler extends ChannelInboundHandlerAdapter {
+
+        private boolean isEmpty = false;
+
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception {
+            if (msg instanceof LastHttpContent) {
+                return;
+            }
             if (msg instanceof HttpRequest) {
-                BLog.info("req uri: {}", ((FullHttpRequest) msg).uri());
-                FullHttpResponse response = new DefaultFullHttpResponse(
-                    HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(TEST_RESP_BODY.getBytes()));
-                response.headers().set(HttpHeaders.CONTENT_TYPE, "text/plain;charset=utf-8");
-                response.headers().set(HttpHeaders.CONTENT_LENGTH, response.content().readableBytes());
-                response.headers().set(HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-                ctx.write(response);
-                ctx.flush();
+                String uri = ((HttpRequest) msg).uri();
+                BLog.info("req uri: {}", uri);
+                if ("/empty".equals(uri)) {
+                    isEmpty = true;
+                    sendMessage(ctx, TEST_RESP_EMPTY_BODY);
+                }
+                if ("/body".equals(uri)) {
+                    isEmpty = false;
+                    sendMessage(ctx, TEST_RESP_BODY);
+                }
             }
             if (msg instanceof HttpContent) {
-                String body = ((HttpContent) msg).content().toString(BString.DEFAULT_CHARSET);
-                BLog.info("req body: {}", body);
-                Assert.assertEquals(body, TEST_REQ_BODY);
+                if (!isEmpty) {
+                    String body = ((HttpContent) msg).content().toString(BString.DEFAULT_CHARSET);
+                    BLog.info("req body: {}", body);
+                    Assert.assertEquals(body, TEST_REQ_BODY);
+                }
             }
         }
 
@@ -157,6 +174,17 @@ public class HttpTest {
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception {
             ctx.close();
+        }
+
+        private void sendMessage(ChannelHandlerContext ctx, String data) {
+            byte[] bytes = data.getBytes(BString.DEFAULT_CHARSET);
+            FullHttpResponse response = new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(bytes));
+            response.headers().set(HttpHeaders.CONTENT_TYPE, "text/plain;charset=utf-8");
+            response.headers().set(HttpHeaders.CONTENT_LENGTH, bytes.length);
+            response.headers().set(HttpHeaders.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+            ctx.write(response);
+            ctx.flush();
         }
     }
 }
