@@ -85,13 +85,13 @@ fun Reader.readTo(output: Writer, bufferSize: Int = DEFAULT_BUFFER_SIZE): Long {
 }
 
 fun ByteBuffer.toBytes(): ByteArray {
-    if (this.hasArray()) {
-        val array = this.array()
-        val offset = this.arrayOffset()
-        val pos = this.position()
-        val limit = this.limit()
-        return array.copyOfRange(offset + pos, offset + limit)
-    }
+    //if (this.hasArray()) {
+    //    val array = this.array()
+    //    val offset = this.arrayOffset()
+    //    val pos = this.position()
+    //    val limit = this.limit()
+    //    return array.copyOfRange(offset + pos, offset + limit)
+    //}
     val array = ByteArray(this.remaining())
     this.get(array)
     return array
