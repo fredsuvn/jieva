@@ -67,10 +67,15 @@ public class IOTest {
         initBuffer(buffer);
         byte[] bytes = BIO.toBytes(buffer);
         Assert.assertEquals(bytes, buffer.array());
+
         ByteBuffer buffer2 = ByteBuffer.allocateDirect(100);
         initBuffer(buffer2);
         byte[] bytes2 = BIO.toBytes(buffer2);
         Assert.assertEquals(bytes2, initArray(new byte[100]));
+
+        byte[] bytes3 = initArray(new byte[100]);
+        ByteBuffer buffer3 = ByteBuffer.wrap(bytes3, 10, 90);
+        Assert.assertEquals(BIO.toBytes(buffer3), Arrays.copyOfRange(bytes3, 10, 100));
     }
 
     private void initBuffer(ByteBuffer buffer) {

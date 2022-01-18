@@ -84,14 +84,13 @@ fun Reader.readTo(output: Writer, bufferSize: Int = DEFAULT_BUFFER_SIZE): Long {
     return this.copyTo(output, bufferSize)
 }
 
-@JvmOverloads
-fun ByteBuffer.toBytes(useBackedArray: Boolean = false): ByteArray {
+fun ByteBuffer.toBytes(): ByteArray {
     if (this.hasArray()) {
-        return if (useBackedArray) {
-            this.array()
-        } else {
-            this.array().clone()
-        }
+        val array = this.array()
+        val offset = this.arrayOffset()
+        val pos = this.position()
+        val limit = this.limit()
+        return array.copyOfRange(offset + pos, offset + limit)
     }
     val array = ByteArray(this.remaining())
     this.get(array)
