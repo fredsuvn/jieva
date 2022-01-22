@@ -2,8 +2,8 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.io.BytesAppender
 import xyz.srclab.common.io.asInputStream
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -47,32 +47,16 @@ fun ByteArray.base64(offset: Int, length: Int = remainingLength(this.size, offse
 }
 
 fun InputStream.base64(): ByteArray {
-    val output = ByteArrayOutputStream()
-    base64(output)
-    return output.toByteArray()
+    val output = BytesAppender()
+    val encOut = Base64.getEncoder().wrap(output)
+    this.copyTo(encOut)
+    encOut.close()
+    return output.toBytes()
 }
 
-fun InputStream.base64(output: OutputStream) {
+fun InputStream.base64(output: OutputStream): Long {
     val encOut = Base64.getEncoder().wrap(output)
-    val length = this.copyTo(encOut)
-    when (length) {
-        1L -> {
-            encOut.write(0)
-            encOut.write(0)
-        }
-        2L -> encOut.write(0)
-    }
-    val r = length % 3
-    if (r != 0L) {
-        when (r) {
-            1L -> {
-                //encOut.write(0)
-                //encOut.write(0)
-            }
-            2L -> encOut.write(0)
-        }
-    }
-    encOut.flush()
+    return this.copyTo(encOut)
 }
 
 @JvmOverloads
@@ -94,12 +78,13 @@ fun ByteArray.deBase64(offset: Int, length: Int = remainingLength(this.size, off
 }
 
 fun InputStream.deBase64(): ByteArray {
-    val output = ByteArrayOutputStream()
-    deBase64(output)
-    return output.toByteArray()
+    val encIn = Base64.getDecoder().wrap(this)
+    val output = BytesAppender()
+    encIn.copyTo(output)
+    return output.toBytes()
 }
 
-fun InputStream.deBase64(output: OutputStream) {
+fun InputStream.deBase64(output: OutputStream): Long {
     val encIn = Base64.getDecoder().wrap(this)
-    encIn.copyTo(output)
+    return encIn.copyTo(output)
 }
