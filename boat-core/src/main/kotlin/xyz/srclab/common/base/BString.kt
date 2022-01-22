@@ -16,12 +16,6 @@ import kotlin.text.toSet as toSetKt
 import kotlin.text.toSortedSet as toSortedSetKt
 
 /**
- * Default charset: UTF-8.
- */
-@JvmField
-val DEFAULT_CHARSET: Charset = StandardCharsets.UTF_8
-
-/**
  * [CharMatcher] of pattern dot: `.`
  */
 @JvmField
@@ -106,9 +100,9 @@ fun CharSequence?.isWhitespace(): Boolean {
 }
 
 /**
- * Checks if given chars contains leading zeros.
+ * Returns whether [this] has a leading zero (assumed [this] is numeric).
  */
-fun CharSequence?.isLedByZeros(): Boolean {
+fun CharSequence?.numericWithLeadingZero(): Boolean {
     if (this === null || this.length < 2) {
         return false
     }
@@ -270,7 +264,7 @@ fun CharSequence?.equalsAll(others: Iterable<CharSequence?>, ignoreCase: Boolean
     return true
 }
 
-fun CharSequence.toCharSet(): Charset {
+fun CharSequence.charset(): Charset {
     return Charset.forName(this.toString())
 }
 
@@ -342,16 +336,16 @@ fun CharArray.to8BitBytes(): ByteArray {
     return array
 }
 
+fun ByteArray.to8BitString(): String {
+    return String(this, StandardCharsets.US_ASCII)
+}
+
 fun ByteArray.to8BitChars(): CharArray {
     val array = CharArray(this.size)
     for (c in this.withIndex()) {
         array[c.index] = c.value.toUnsignedInt().toChar()
     }
     return array
-}
-
-fun ByteArray.to8BitString(): String {
-    return this.to8BitChars().string()
 }
 
 //toCollection:

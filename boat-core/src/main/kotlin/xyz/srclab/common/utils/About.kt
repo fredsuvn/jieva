@@ -270,7 +270,7 @@ interface SemVer : Comparable<SemVer> {
                 if (!this.isNumeric()) {
                     return false
                 }
-                return !this.isLedByZeros()
+                return !this.numericWithLeadingZero()
             }
 
             fun CharSequence.checkAndParseNormal(): Int {
@@ -281,7 +281,7 @@ interface SemVer : Comparable<SemVer> {
             }
 
             fun CharSequence.checkPreRelease() {
-                if (this.isNumeric() && this.isLedByZeros()) {
+                if (this.isNumeric() && this.numericWithLeadingZero()) {
                     throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
                 }
                 if (!IDENTIFIER_CHAR_MATCHER.matchesAllOf(this)) {

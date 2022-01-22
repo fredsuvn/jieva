@@ -10,7 +10,7 @@ private val defaultRandom: Random = Random()
 private const val randomDigits = "0123456789"
 private const val randomLowerLetters = "abcdefghijklnmopqrstuvwxyz"
 private const val randomUpperLetters = "ABCDEFGHIJKLNMOPQRSTUVWXYZ"
-private val randomChars = randomDigits + randomLowerLetters + randomUpperLetters
+private const val randomString = randomDigits + randomLowerLetters + randomUpperLetters
 
 /**
  * Returns random number in `[from, to)`.
@@ -44,7 +44,7 @@ fun randomUpperLetters(size: Int, random: Random = defaultRandom): String {
 
 @JvmOverloads
 fun randomString(size: Int, random: Random = defaultRandom): String {
-    return randomChars.randomString(size, random)
+    return randomString.randomString(size, random)
 }
 
 fun CharSequence.randomString(size: Int, random: Random = defaultRandom): String {

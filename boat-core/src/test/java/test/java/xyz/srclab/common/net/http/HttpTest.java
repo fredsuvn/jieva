@@ -10,8 +10,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.BDefault;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.base.BString;
 import xyz.srclab.common.collect.BMap;
 import xyz.srclab.common.io.BIO;
 import xyz.srclab.common.net.http.BHttp;
@@ -158,7 +158,7 @@ public class HttpTest {
             }
             if (msg instanceof HttpContent) {
                 if (!isEmpty) {
-                    String body = ((HttpContent) msg).content().toString(BString.DEFAULT_CHARSET);
+                    String body = ((HttpContent) msg).content().toString(BDefault.DEFAULT_CHARSET);
                     BLog.info("req body: {}", body);
                     Assert.assertEquals(body, TEST_REQ_BODY);
                 }
@@ -177,7 +177,7 @@ public class HttpTest {
         }
 
         private void sendMessage(ChannelHandlerContext ctx, String data) {
-            byte[] bytes = data.getBytes(BString.DEFAULT_CHARSET);
+            byte[] bytes = data.getBytes(BDefault.DEFAULT_CHARSET);
             FullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(bytes));
             response.headers().set(HttpHeaders.CONTENT_TYPE, "text/plain;charset=utf-8");

@@ -388,6 +388,8 @@ open class BeanConvertHandler @JvmOverloads constructor(
                 toTreeMap(from, toType, context.converter)
             ConcurrentHashMap::class.java ->
                 toConcurrentHashMap(from, toType, context.converter)
+            Hashtable::class.java ->
+                toHashtable(from, toType, context.converter)
             MutableSetMap::class.java ->
                 toMutableSetMap(from, toType, context.converter)
             MutableListMap::class.java ->
@@ -415,6 +417,10 @@ open class BeanConvertHandler @JvmOverloads constructor(
 
     private fun toConcurrentHashMap(from: Any, toType: Type, converter: Converter): ConcurrentHashMap<Any, Any?> {
         return from.copyProperties(ConcurrentHashMap(), toType, beanResolver, converter)
+    }
+
+    private fun toHashtable(from: Any, toType: Type, converter: Converter): Hashtable<Any, Any?> {
+        return from.copyProperties(Hashtable(), toType, beanResolver, converter)
     }
 
     private fun toMutableSetMap(from: Any, toType: Type, converter: Converter): MutableSetMap<Any, Any?> {

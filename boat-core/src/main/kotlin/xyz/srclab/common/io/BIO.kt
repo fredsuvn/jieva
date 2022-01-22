@@ -5,6 +5,7 @@ package xyz.srclab.common.io
 import org.apache.commons.io.input.ReaderInputStream
 import org.apache.commons.io.output.WriterOutputStream
 import xyz.srclab.common.base.DEFAULT_CHARSET
+import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.base.remainingLength
 import java.io.*
 import java.net.URL
@@ -75,12 +76,12 @@ fun Reader.readLines(close: Boolean = false): List<String> {
 }
 
 @JvmOverloads
-fun InputStream.readTo(output: OutputStream, bufferSize: Int = DEFAULT_BUFFER_SIZE): Long {
+fun InputStream.readTo(output: OutputStream, bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): Long {
     return this.copyTo(output, bufferSize)
 }
 
 @JvmOverloads
-fun Reader.readTo(output: Writer, bufferSize: Int = DEFAULT_BUFFER_SIZE): Long {
+fun Reader.readTo(output: Writer, bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): Long {
     return this.copyTo(output, bufferSize)
 }
 
@@ -100,12 +101,12 @@ fun ByteBuffer.toBytes(): ByteArray {
 //Convert:
 
 @JvmOverloads
-fun InputStream.asBuffered(bufferSize: Int = DEFAULT_BUFFER_SIZE): BufferedInputStream {
+fun InputStream.asBuffered(bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): BufferedInputStream {
     return this.buffered(bufferSize)
 }
 
 @JvmOverloads
-fun OutputStream.asBuffered(bufferSize: Int = DEFAULT_BUFFER_SIZE): BufferedOutputStream {
+fun OutputStream.asBuffered(bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): BufferedOutputStream {
     return this.buffered(bufferSize)
 }
 
@@ -122,7 +123,7 @@ fun OutputStream.asWriter(charset: Charset = DEFAULT_CHARSET): Writer {
 @JvmOverloads
 fun InputStream.asBufferedReader(
     charset: Charset = DEFAULT_CHARSET,
-    bufferSize: Int = DEFAULT_BUFFER_SIZE
+    bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
 ): BufferedReader {
     return this.reader(charset).buffered(bufferSize)
 }
@@ -130,7 +131,7 @@ fun InputStream.asBufferedReader(
 @JvmOverloads
 fun OutputStream.asBufferedWriter(
     charset: Charset = DEFAULT_CHARSET,
-    bufferSize: Int = DEFAULT_BUFFER_SIZE
+    bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
 ): BufferedWriter {
     return this.writer(charset).buffered(bufferSize)
 }
