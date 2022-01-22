@@ -12,69 +12,69 @@ open class ThreadPoolRunner(
     private val threadPoolExecutor: ThreadPoolExecutor
 ) : ExecutorServiceRunner(threadPoolExecutor) {
 
-    val corePoolSize: Int
+    open val corePoolSize: Int
         get() {
             return threadPoolExecutor.corePoolSize
         }
 
-    val allowCoreThreadTimeOut: Boolean
+    open val allowCoreThreadTimeOut: Boolean
         get() {
             return threadPoolExecutor.allowsCoreThreadTimeOut()
         }
 
-    val maximumPoolSize: Int
+    open val maximumPoolSize: Int
         get() {
             return threadPoolExecutor.maximumPoolSize
         }
 
-    val keepAliveTime: Duration
+    open val keepAliveTime: Duration
         get() {
             return Duration.ofNanos(threadPoolExecutor.getKeepAliveTime(TimeUnit.NANOSECONDS))
         }
 
-    val queue: BlockingQueue<Runnable>
+    open val queue: BlockingQueue<Runnable>
         get() {
             return threadPoolExecutor.queue
         }
 
-    val poolSize: Int
+    open val poolSize: Int
         get() {
             return threadPoolExecutor.poolSize
         }
 
-    val activeCount: Int
+    open val activeCount: Int
         get() {
             return threadPoolExecutor.activeCount
         }
 
-    val largestPoolSize: Int
+    open val largestPoolSize: Int
         get() {
             return threadPoolExecutor.largestPoolSize
         }
 
-    val taskCount: Long
+    open val taskCount: Long
         get() {
             return threadPoolExecutor.taskCount
         }
 
-    val completedTaskCount: Long
+    open val completedTaskCount: Long
         get() {
             return threadPoolExecutor.completedTaskCount
         }
 
-    fun prestartCoreThread(): Boolean {
+    open fun prestartCoreThread(): Boolean {
         return threadPoolExecutor.prestartCoreThread()
     }
 
-    fun prestartAllCoreThreads(): Int {
+    open fun prestartAllCoreThreads(): Int {
         return threadPoolExecutor.prestartAllCoreThreads()
     }
 
-    fun remove(task: Runnable?): Boolean {
+    open fun remove(task: Runnable?): Boolean {
         return threadPoolExecutor.remove(task)
     }
 
-    fun purge() {
+    open fun purge() {
         threadPoolExecutor.purge()
     }
 
@@ -84,7 +84,7 @@ open class ThreadPoolRunner(
         return threadPoolExecutor.toString()
     }
 
-    class Builder {
+    open class Builder {
 
         private var corePoolSize = 1
         private var maximumPoolSize = availableProcessors() * 4
@@ -97,39 +97,39 @@ open class ThreadPoolRunner(
         // Set after newing
         private var allowCoreThreadTimeOut = false
 
-        fun corePoolSize(corePoolSize: Int) = apply {
+        open fun corePoolSize(corePoolSize: Int) = apply {
             this.corePoolSize = corePoolSize
         }
 
-        fun maximumPoolSize(maximumPoolSize: Int) = apply {
+        open fun maximumPoolSize(maximumPoolSize: Int) = apply {
             this.maximumPoolSize = maximumPoolSize
         }
 
-        fun workQueueCapacity(workQueueCapacity: Int) = apply {
+        open fun workQueueCapacity(workQueueCapacity: Int) = apply {
             this.workQueueCapacity = workQueueCapacity
         }
 
-        fun keepAliveTime(keepAliveTime: Duration) = apply {
+        open fun keepAliveTime(keepAliveTime: Duration) = apply {
             this.keepAliveTime = keepAliveTime
         }
 
-        fun workQueue(workQueue: BlockingQueue<Runnable>) = apply {
+        open fun workQueue(workQueue: BlockingQueue<Runnable>) = apply {
             this.workQueue = workQueue
         }
 
-        fun threadFactory(threadFactory: ThreadFactory) = apply {
+        open fun threadFactory(threadFactory: ThreadFactory) = apply {
             this.threadFactory = threadFactory
         }
 
-        fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler) = apply {
+        open fun rejectedExecutionHandler(rejectedExecutionHandler: RejectedExecutionHandler) = apply {
             this.rejectedExecutionHandler = rejectedExecutionHandler
         }
 
-        fun allowCoreThreadTimeOut(allowCoreThreadTimeOut: Boolean) = apply {
+        open fun allowCoreThreadTimeOut(allowCoreThreadTimeOut: Boolean) = apply {
             this.allowCoreThreadTimeOut = allowCoreThreadTimeOut
         }
 
-        fun build(): ThreadPoolRunner {
+        open fun build(): ThreadPoolRunner {
             return ThreadPoolRunner(createThreadPoolExecutor())
         }
 

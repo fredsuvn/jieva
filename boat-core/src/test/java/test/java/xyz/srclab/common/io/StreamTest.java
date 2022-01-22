@@ -2,7 +2,9 @@ package test.java.xyz.srclab.common.io;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.BString;
 import xyz.srclab.common.io.BIO;
+import xyz.srclab.common.io.BytesAppender;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -92,5 +94,14 @@ public class StreamTest {
         Writer writer = BIO.asWriter(sb);
         writer.write("hello");
         Assert.assertEquals(sb.toString(), "hello");
+    }
+
+    @Test
+    public void testBytesAppender() {
+        BytesAppender bytesAppender = new BytesAppender();
+        bytesAppender.append('a');
+        bytesAppender.append(ByteBuffer.wrap(new byte[]{'b', 'c'}));
+        bytesAppender.append(new byte[]{'d', 'e'}, 1);
+        Assert.assertEquals(BString.to8BitString(bytesAppender.toBytes()), "abce");
     }
 }

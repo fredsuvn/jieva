@@ -7,7 +7,7 @@ import java.io.Writer
  * Makes array as destination of [Appendable].
  */
 open class AppendableWriter<T : Appendable>(
-    val destination: T
+    private val destination: T
 ) : Writer() {
 
     override fun write(b: Int) {

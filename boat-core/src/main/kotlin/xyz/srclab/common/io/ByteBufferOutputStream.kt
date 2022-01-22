@@ -7,7 +7,7 @@ import java.nio.ByteBuffer
  * Makes [ByteBuffer] as [OutputStream].
  */
 open class ByteBufferOutputStream(
-    val source: ByteBuffer
+    private val source: ByteBuffer
 ) : OutputStream() {
 
     override fun write(b: Int) {

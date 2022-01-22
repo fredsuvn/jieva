@@ -6,8 +6,8 @@ import java.net.HttpURLConnection
  * Http response status.
  */
 open class HttpStatus(
-    val code: Int,
-    val message: String
+    open val code: Int,
+    open val message: String
 ) {
 
     override fun equals(other: Any?): Boolean {

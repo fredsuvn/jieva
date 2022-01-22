@@ -8,7 +8,7 @@ import kotlin.math.min
  * Makes [CharSequence] as source of [Reader].
  */
 open class CharSeqReader<T : CharSequence>(
-    val source: T,
+    private val source: T,
     private val offset: Int,
     private val length: Int
 ) : Reader() {
@@ -48,7 +48,7 @@ open class CharSeqReader<T : CharSequence>(
     override fun close() {
     }
 
-    fun available(): Int {
+    open fun available(): Int {
         return offset + length - pos
     }
 

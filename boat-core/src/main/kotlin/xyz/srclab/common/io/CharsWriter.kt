@@ -8,7 +8,7 @@ import java.io.Writer
  * Makes array as destination of [Writer].
  */
 open class CharsWriter(
-    val destination: CharArray,
+    private val destination: CharArray,
     private val offset: Int,
     private val length: Int
 ) : Writer() {

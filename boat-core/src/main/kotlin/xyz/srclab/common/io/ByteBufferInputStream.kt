@@ -8,7 +8,7 @@ import java.nio.ByteBuffer
  * Makes [ByteBuffer] as [InputStream].
  */
 open class ByteBufferInputStream(
-    val source: ByteBuffer
+    private val source: ByteBuffer
 ) : InputStream() {
 
     override fun read(): Int {

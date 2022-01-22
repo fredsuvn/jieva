@@ -8,7 +8,7 @@ import java.io.RandomAccessFile
  * Makes [RandomAccessFile] as source of [InputStream].
  */
 open class RandomInputStream(
-    val source: RandomAccessFile,
+    private val source: RandomAccessFile,
     private val offset: Long,
     private val length: Long
 ) : InputStream() {

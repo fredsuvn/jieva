@@ -7,7 +7,7 @@ import java.io.Reader
  * Makes array as source of [Reader].
  */
 open class CharsReader(
-    val source: CharArray,
+    private val source: CharArray,
     private val offset: Int,
     private val length: Int
 ) : Reader() {
@@ -48,7 +48,7 @@ open class CharsReader(
     override fun close() {
     }
 
-    fun available(): Int {
+    open fun available(): Int {
         return offset + length - pos
     }
 
@@ -67,7 +67,7 @@ open class CharsReader(
     /**
      * Return copy of range of [source].
      */
-    fun toCharArray(): CharArray {
+    open fun toCharArray(): CharArray {
         return source.copyOfRange(offset, offset + length)
     }
 }

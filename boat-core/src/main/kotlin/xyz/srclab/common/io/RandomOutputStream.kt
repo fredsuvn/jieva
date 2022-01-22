@@ -9,7 +9,7 @@ import java.io.RandomAccessFile
  * Makes [RandomAccessFile] as destination of [OutputStream].
  */
 open class RandomOutputStream(
-    val destination: RandomAccessFile,
+    private val destination: RandomAccessFile,
     private val offset: Long,
     private val length: Long
 ) : OutputStream() {

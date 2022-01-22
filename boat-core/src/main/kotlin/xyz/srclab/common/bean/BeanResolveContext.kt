@@ -10,7 +10,7 @@ import java.lang.reflect.TypeVariable
 /**
  * Context of bean resolving.
  */
-open class BeanResolveContext(val type: Type) {
+open class BeanResolveContext(open val type: Type) {
 
     private var _isBreak = false
 
@@ -21,7 +21,7 @@ open class BeanResolveContext(val type: Type) {
     /**
      * Sets current resolving completed, causes remainder [BeanResolveHandler] will not be called.
      */
-    fun complete() {
+    open fun complete() {
         _isBreak = true
     }
 }

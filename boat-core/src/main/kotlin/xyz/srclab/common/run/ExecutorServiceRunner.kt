@@ -27,28 +27,28 @@ open class ExecutorServiceRunner(
 
     override fun asExecutor(): ExecutorService = executorService
 
-    val isShutdown: Boolean
+    open val isShutdown: Boolean
         get() {
             return executorService.isShutdown
         }
 
-    val isTerminated: Boolean
+    open val isTerminated: Boolean
         get() {
             return executorService.isTerminated
         }
 
-    fun shutdown() {
+    open fun shutdown() {
         executorService.shutdown()
     }
 
-    fun shutdownNow(): List<Runnable> {
+    open fun shutdownNow(): List<Runnable> {
         return executorService.shutdownNow()
     }
 
     /**
      * @throws InterruptedException
      */
-    fun awaitTermination(duration: Duration): Boolean {
+    open fun awaitTermination(duration: Duration): Boolean {
         return executorService.awaitTermination(duration.toNanos(), TimeUnit.NANOSECONDS)
     }
 

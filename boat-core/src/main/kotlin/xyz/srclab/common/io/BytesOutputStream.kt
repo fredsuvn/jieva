@@ -8,7 +8,7 @@ import java.io.OutputStream
  * Makes array as destination of [OutputStream].
  */
 open class BytesOutputStream(
-    val destination: ByteArray,
+    private val destination: ByteArray,
     private val offset: Int,
     private val length: Int
 ) : OutputStream() {

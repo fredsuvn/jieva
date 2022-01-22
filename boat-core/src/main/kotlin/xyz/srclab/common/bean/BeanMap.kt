@@ -11,8 +11,8 @@ import xyz.srclab.common.collect.mapEntries
  * * For this map and origin bean, any modification will reflect each other;
  */
 open class BeanMap(
-    val bean: Any,
-    val beanType: BeanType = bean::class.java.resolveBean()
+    open val bean: Any,
+    open val beanType: BeanType = bean::class.java.resolveBean()
 ) : AbstractMutableMap<String, Any?>() {
 
     //private val properties: Map<String, PropertyType> =

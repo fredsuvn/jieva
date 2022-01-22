@@ -10,13 +10,13 @@ import java.nio.charset.Charset
  */
 open class HttpResp {
 
-    var version: String = HTTP_VERSION_1_1
-    var status: HttpStatus = HttpStatus.OK
-    var headers: Map<String, List<String>> = emptyMap()
-    var body: InputStream? = null
-    var charset: Charset = DEFAULT_CHARSET
+    open var version: String = HTTP_VERSION_1_1
+    open var status: HttpStatus = HttpStatus.OK
+    open var headers: Map<String, List<String>> = emptyMap()
+    open var body: InputStream? = null
+    open var charset: Charset = DEFAULT_CHARSET
 
-    fun bodyAsString(): String? {
+    open fun bodyAsString(): String? {
         return body?.readString(charset, true)
     }
 }

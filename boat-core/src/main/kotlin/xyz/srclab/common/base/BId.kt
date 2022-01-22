@@ -97,7 +97,7 @@ open class SnowflakeId {
      * return next id.
      */
     @Synchronized
-    fun next(): Long {
+    open fun next(): Long {
         val startTime = epochMilli()
         var timestamp = startTime
         do {

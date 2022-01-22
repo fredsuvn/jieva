@@ -4,11 +4,11 @@ package xyz.srclab.common.net.http
  * Http header.
  */
 open class HttpHeader(
-    val key: String,
-    val value: String
+    open val key: String,
+    open val value: String
 ) {
 
-    fun withNewValue(value: String): HttpHeader {
+    open fun withNewValue(value: String): HttpHeader {
         return HttpHeader(key, value)
     }
 

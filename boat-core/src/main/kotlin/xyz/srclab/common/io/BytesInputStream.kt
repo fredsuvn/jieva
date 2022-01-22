@@ -8,7 +8,7 @@ import java.io.InputStream
  * Makes array as source of [InputStream].
  */
 open class BytesInputStream(
-    val source: ByteArray,
+    private val source: ByteArray,
     private val offset: Int,
     private val length: Int
 ) : InputStream() {
@@ -60,12 +60,5 @@ open class BytesInputStream(
 
     override fun markSupported(): Boolean {
         return true
-    }
-
-    /**
-     * Return copy of range of [source].
-     */
-    fun toByteArray(): ByteArray {
-        return source.copyOfRange(offset, offset + length)
     }
 }
