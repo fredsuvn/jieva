@@ -8,15 +8,15 @@ import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule
-import xyz.srclab.common.data.json.JsonSerializer
+import xyz.srclab.common.data.json.JsonParser
 import xyz.srclab.common.data.json.jackson.JAVA_TIME_MODULE
 import xyz.srclab.common.data.json.jackson.toJsonSerializer
 
 /**
- * Default [JsonSerializer] supports protobuf types.
+ * Default [JsonParser] supports protobuf types.
  */
 @JvmField
-val PROTOBUF_JSON_SERIALIZER: JsonSerializer = run {
+val PROTOBUF_JSON_SERIALIZER: JsonParser = run {
     val objectMapper = ObjectMapper()
     objectMapper.configureForProtobuf(true)
     objectMapper.toJsonSerializer()

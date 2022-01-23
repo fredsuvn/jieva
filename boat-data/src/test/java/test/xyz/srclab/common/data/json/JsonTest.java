@@ -3,15 +3,16 @@ package test.xyz.srclab.common.data.json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.BDefault;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.base.BString;
 import xyz.srclab.common.collect.BMap;
-import xyz.srclab.common.reflect.TypeRef;
+import xyz.srclab.common.data.DataException;
 import xyz.srclab.common.data.jackson.BJackson;
+import xyz.srclab.common.data.json.BJson;
 import xyz.srclab.common.data.json.Json;
-import xyz.srclab.common.data.json.JsonSerializer;
+import xyz.srclab.common.data.json.JsonParser;
 import xyz.srclab.common.data.json.JsonType;
-import xyz.srclab.common.data.json.Jsons;
+import xyz.srclab.common.reflect.TypeRef;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -31,7 +32,7 @@ public class JsonTest {
 
     @Test
     public void testJson() throws Exception {
-        JsonSerializer jsonSerializer = JsonSerializer.defaultSerializer();
+        JsonParser jsonParser = JsonParser.defaultParser();
 
         //Jackson
         TestObject testObject = new TestObject();
@@ -41,21 +42,20 @@ public class JsonTest {
             newMap("2", new BigDecimal(2)),
             newMap("3", new BigDecimal(3))
         ));
-        String jsonString = jsonSerializer.parse(testObject).toJsonString();
+        String jsonString = jsonParser.toJson(testObject).toJsonString();
         BLog.info(jsonString);
         Assert.assertEquals(jsonString, objectMapper.writeValueAsString(testObject));
 
         //parse(Object)
-        Object jsonStringAsObject = jsonString;
-        BLog.info("jsonStringAsObject:{}", jsonSerializer.parse(jsonStringAsObject).toJsonString());
+        BLog.info("jsonStringAsObject:{}", jsonParser.parse(jsonString).toJsonString());
         Assert.assertEquals(
-            jsonSerializer.parse(jsonStringAsObject).parse(TestObject.class),
+            jsonParser.parse(jsonString).toObject(TestObject.class),
             testObject
         );
 
         //json string -> java object
-        Json json = jsonSerializer.parse(jsonString);
-        TestObject fromJson = json.parse(TestObject.class);
+        Json json = jsonParser.parse(jsonString);
+        TestObject fromJson = json.toObject(TestObject.class);
         boolean equals = testObject.equals(fromJson);
         BLog.info("testObject == fromJson: " + equals);
         Assert.assertTrue(equals);
@@ -67,26 +67,26 @@ public class JsonTest {
             newMap(new BigDecimal(2), "2"),
             newMap(new BigDecimal(3), "3")
         ));
-        TestObject2 fromJson2 = json.parse(TestObject2.class);
+        TestObject2 fromJson2 = json.toObject(TestObject2.class);
         boolean equals2 = testObject2.equals(fromJson2);
         BLog.info("testObject2 == fromJson2: " + equals2);
         Assert.assertTrue(equals2);
 
         //java object -> java object
-        Json jsonTest = jsonSerializer.parse(testObject);
+        Json jsonTest = jsonParser.toJson(testObject);
         BLog.info("jsonTest: " + jsonTest.toString());
-        Assert.assertEquals(jsonTest.parse(TestObject2.class), testObject2);
+        Assert.assertEquals(jsonTest.toObject(TestObject2.class), testObject2);
 
         //time format
         long now = System.currentTimeMillis();
         BLog.info("now: " + now);
-        String nowJson = jsonSerializer.parse(now).parseString();
+        String nowJson = jsonParser.toJson(now).toJsonString();
         BLog.info("nowJson: " + nowJson);
-        Date date = jsonSerializer.parse(nowJson).parse(Date.class);
+        Date date = jsonParser.parse(nowJson).toObject(Date.class);
         BLog.info("date: " + date);
         Assert.assertEquals(date.getTime(), now);
         //这里实际是按照“秒”这个单位来create的，所以下面的now要乘以1000
-        Instant instant = jsonSerializer.parse(nowJson).parse(Instant.class);
+        Instant instant = jsonParser.parse(nowJson).toObject(Instant.class);
         BLog.info("instant: " + instant);
         Assert.assertEquals(instant.toEpochMilli(), now * 1000);
 
@@ -95,23 +95,23 @@ public class JsonTest {
         BLog.info("jsonType: {}", jsonType);
         Assert.assertEquals(jsonType, JsonType.OBJECT);
 
-        jsonType = jsonSerializer.parse("true").getType();
+        jsonType = jsonParser.parse("true").getType();
         BLog.info("jsonType: {}", jsonType);
         Assert.assertEquals(jsonType, JsonType.BOOLEAN);
 
-        jsonType = jsonSerializer.parse("1").getType();
+        jsonType = jsonParser.parse("1").getType();
         BLog.info("jsonType: {}", jsonType);
         Assert.assertEquals(jsonType, JsonType.NUMBER);
 
-        jsonType = jsonSerializer.parse("null").getType();
+        jsonType = jsonParser.parse("null").getType();
         BLog.info("jsonType: {}", jsonType);
         Assert.assertEquals(jsonType, JsonType.NULL);
 
-        jsonType = jsonSerializer.parse("[]").getType();
+        jsonType = jsonParser.parse("[]").getType();
         BLog.info("jsonType: {}", jsonType);
         Assert.assertEquals(jsonType, JsonType.ARRAY);
 
-        jsonType = jsonSerializer.parse("\"666\"").getType();
+        jsonType = jsonParser.parse("\"666\"").getType();
         BLog.info("jsonType: {}", jsonType);
         Assert.assertEquals(jsonType, JsonType.STRING);
 
@@ -119,7 +119,7 @@ public class JsonTest {
         Map<String, String> map = new HashMap<>();
         map.put("key1", "1");
         map.put("key2", "2");
-        Json mapJson = jsonSerializer.parse(map);
+        Json mapJson = jsonParser.toJson(map);
         String parseString = "{\"key1\":\"1\",\"key2\":\"2\"}";
         BLog.info(mapJson.toString());
         Assert.assertEquals(mapJson.toString(), parseString);
@@ -129,20 +129,20 @@ public class JsonTest {
     @Test
     public void testNull() {
         //Test null
-        Json nullJson = Jsons.parse((Object) null);
+        Json nullJson = BJson.toJson((Object) null);
         Assert.assertEquals(nullJson.toJsonString(), "null");
-        Assert.assertNull(nullJson.parseStringOrNull());
-        Assert.expectThrows(IllegalArgumentException.class, () -> nullJson.parse(String.class));
+        Assert.assertNull(nullJson.toObjectOrNull(String.class));
+        Assert.expectThrows(DataException.class, () -> nullJson.toObject(String.class));
     }
 
     @Test
     public void testUrl() throws Exception {
         Path path = Paths.get("json.txt");
-        Files.write(path, "{\"key1\":\"value1\"}".getBytes(BString.DEFAULT_CHARSET));
+        Files.write(path, "{\"key1\":\"value1\"}".getBytes(BDefault.DEFAULT_CHARSET));
         URL url = new URL("file:json.txt");
-        Json json = Jsons.parse(url);
+        Json json = BJson.parse(url.openStream());
         BLog.info("json: {}", json);
-        String value1 = json.parseMap().get("key1").toString();
+        String value1 = json.toMap().get("key1").toString();
         Assert.assertEquals(value1, "value1");
         Files.delete(path);
     }
@@ -151,61 +151,62 @@ public class JsonTest {
     public void testString() {
         String javaString = "abc";
         String jsonString = "\"abc\"";
-        Assert.assertEquals(Jsons.toJson(javaString).toJsonString(), jsonString);
-        Json json = Jsons.parse(jsonString);
-        BLog.info("json: {}", json);
-        Assert.assertEquals(json.parseString(), javaString);
-        Assert.assertEquals(json.parse(String.class), javaString);
+        Assert.assertEquals(BJson.toJson(javaString).toJsonString(), jsonString);
+        Assert.assertEquals(BJson.toJsonString(javaString), jsonString);
+        Json json = BJson.parse(jsonString);
+        BLog.info("jsonString: {}", json);
+        Assert.assertEquals(json.toJsonString(), jsonString);
+        Assert.assertEquals(json.toObject(String.class), javaString);
         Assert.assertEquals(json.getType(), JsonType.STRING);
     }
 
     @Test
     public void testSubJson() {
         Map<String, Object> map = BMap.newMap("s1", "sss", "s2", Arrays.asList("1", "2"));
-        String jsonString = Jsons.toJsonString(map);
+        String jsonString = BJson.toJsonString(map);
         BLog.info("jsonString: {}", jsonString);
-        Map<String, Json> jsonMap = Jsons.parse(jsonString, new TypeRef<Map<String, Json>>() {
+        Map<String, Json> jsonMap = BJson.parse(jsonString, new TypeRef<Map<String, Json>>() {
         });
         BLog.info("jsonMap: {}", jsonMap);
-        BLog.info("jsonMap.get(\"s2\").getClass(): {}", jsonMap.get("s2").getClass());
-        Assert.assertEquals(
-            jsonMap.get("s2").getClass().getName(), "xyz.srclab.common.serialize.jackson.JacksonJsonSerializer$JsonImpl");
-        Json s2 = jsonMap.get("s2");
-        Assert.assertEquals(s2.parse(List.class), Arrays.asList("1", "2"));
+        BLog.info("jsonMap.get(\"s2\"): {}", jsonMap.get("s2"));
+        Json s2 = BJson.toJson(Arrays.asList("1", "2"));
+        Assert.assertEquals(jsonMap.get("s2"), s2);
+        s2 = jsonMap.get("s2");
+        Assert.assertEquals(s2.toObject(List.class), Arrays.asList("1", "2"));
         String jsonImplJson = "{\"s1\":\"sss\",\"s2\":[\"1\",\"2\"]}";
-        Json jsonImpl = Jsons.parse(jsonImplJson, Json.class);
+        Json jsonImpl = BJson.parse(jsonImplJson, Json.class);
         BLog.info("jsonImpl: {}", jsonImpl);
     }
 
     @Test
     public void testJackson() {
-        JsonSerializer serializer = BJackson.toJsonSerializer(new ObjectMapper());
+        JsonParser jsonParser = BJackson.toJsonSerializer(new ObjectMapper());
         String mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}";
-        Map<String, String> map = serializer.parse(mapJson).parse(new TypeRef<Map<String, String>>() {
+        Map<String, String> map = jsonParser.parse(mapJson).toObject(new TypeRef<Map<String, String>>() {
         });
         BLog.info("map:{}", map);
         Assert.assertEquals(map.toString(), "{p1=p1 value, p2=p2 value}");
 
         String stringJson = "abc";
-        BLog.info("stringJson: {}", serializer.serialize(stringJson));
-        Assert.assertEquals(serializer.serialize(stringJson).toString(), "\"abc\"");
+        BLog.info("stringJson: {}", jsonParser.toJson(stringJson));
+        Assert.assertEquals(jsonParser.toJson(stringJson).toString(), "\"abc\"");
     }
 
     @Test
     public void testJsonProperty() {
-        JsonSerializer jsonSerializer = JsonSerializer.defaultSerializer();
+        JsonParser jsonParser = JsonParser.defaultParser();
 
         Map<String, String> map = new LinkedHashMap<>();
         map.put("key1", "1");
         map.put("key2", "2");
-        Json json = jsonSerializer.serialize(map);
+        Json json = jsonParser.toJson(map);
         BLog.info("json: {}", json);
 
         Map<String, Object> map2 = new LinkedHashMap<>();
-        map2.put("string", jsonSerializer.serialize("json"));
+        map2.put("string", jsonParser.toJson("json"));
         map2.put("json", json);
-        map2.put("jsonArray", jsonSerializer.serialize(new String[]{"1", "2", "3"}));
-        Json json2 = jsonSerializer.serialize(map2);
+        map2.put("jsonArray", jsonParser.toJson(new String[]{"1", "2", "3"}));
+        Json json2 = jsonParser.toJson(map2);
         BLog.info("json2: {}", json2);
         Assert.assertEquals(json2.toJsonString(), "{\"string\":\"json\",\"json\":{\"key1\":\"1\",\"key2\":\"2\"},\"jsonArray\":[\"1\",\"2\",\"3\"]}");
     }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.annotations.Test;
 import xyz.srclab.common.reflect.TypeRef;
 import xyz.srclab.common.data.json.Json;
-import xyz.srclab.common.data.json.JsonSerializer;
+import xyz.srclab.common.data.json.JsonParser;
 import xyz.srclab.common.data.json.JsonSerials;
 import xyz.srclab.common.data.json.jackson.Jacksons;
 import xyz.srclab.common.test.TestLogger;
@@ -30,7 +30,7 @@ public class SerializeSample {
 
     @Test
     public void testJsonSerializer() {
-        JsonSerializer serializer = JsonSerializer.DEFAULT;
+        JsonParser serializer = JsonParser.DEFAULT;
         String mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}";
         Map<String, String> map = serializer.toJson(mapJson).toObject(new TypeRef<Map<String, String>>() {
         });
@@ -44,7 +44,7 @@ public class SerializeSample {
 
     @Test
     public void testJackson() {
-        JsonSerializer serializer = Jacksons.newJsonSerializer(new ObjectMapper());
+        JsonParser serializer = Jacksons.newJsonSerializer(new ObjectMapper());
         String mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}";
         Map<String, String> map = serializer.toJson(mapJson).toObject(new TypeRef<Map<String, String>>() {
         });

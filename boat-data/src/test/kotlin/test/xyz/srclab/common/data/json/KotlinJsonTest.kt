@@ -1,4 +1,4 @@
-package test.xyz.srclab.common.serialize.json
+package test.xyz.srclab.common.data.json
 
 import org.testng.Assert
 import org.testng.annotations.Test

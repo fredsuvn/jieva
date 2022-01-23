@@ -9,7 +9,7 @@ Sun Qian <fredsuvn@163.com>
 
 == 简介
 
-Boat Serialize 提供了同意的接口 (`Serializer`, `Serial`) 来支持序列化和反序列化.
+Boat Serialize 提供了同意的接口 (`DataParser`, `Data`) 来支持序列化和反序列化.
 
 当前它支持的格式有:
 
@@ -19,7 +19,7 @@ Boat Serialize 提供了同意的接口 (`Serializer`, `Serial`) 来支持序列
 
 === JSON
 
-Json包提供 `Serial` 的JSON格式实现: `Json`.
+Json包提供 `Data` 的JSON格式实现: `Json`.
 
 想要获得一个 `Json`, 我们可以使用 boat-data 的核心工具类: `JsonSerials`.
 
@@ -48,8 +48,8 @@ class Example {
 }
 ----
 
-`JsonSerials` 使用默认的 `JsonSerializer` -- `Serializer` 针对 `JSON` 格式的核心接口, 来实现它的方法.
-我们也可以直接使用 `JsonSerializer`:
+`JsonSerials` 使用默认的 `DataParser` -- `DataParser` 针对 `JSON` 格式的核心接口, 来实现它的方法.
+我们也可以直接使用 `DataParser`:
 
 .Java Examples
 [source,java]
@@ -81,7 +81,7 @@ class Example {
 
 默认的, json序列化由 `Jackson` 实现:
 
-* `JacksonJsonSerializer`: `Jackson` 对 `JsonSerializer` 的实现;
+* `JacksonJsonParser`: `Jackson` 对 `DataParser` 的实现;
 * `Jacksons`: `Jackson` json工具;
 
 .Java Examples

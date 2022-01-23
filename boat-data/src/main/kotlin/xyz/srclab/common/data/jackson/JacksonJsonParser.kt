@@ -1,49 +1,58 @@
 package xyz.srclab.common.data.jackson
 
 import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.JsonNodeType
 import com.fasterxml.jackson.datatype.jsr310.PackageVersion
+import xyz.srclab.common.data.json.Json
+import xyz.srclab.common.data.json.JsonType
 import xyz.srclab.common.io.asInputStream
 import xyz.srclab.common.io.asReader
-import xyz.srclab.common.data.json.Json
-import xyz.srclab.common.data.json.JsonSerializer
-import xyz.srclab.common.data.json.JsonType
 import java.io.InputStream
-import java.io.OutputStream
-import java.io.Reader
-import java.io.Writer
 import java.lang.reflect.Type
-import java.nio.charset.Charset
+import java.nio.ByteBuffer
 
-open class JacksonJsonSerializer(
+open class JacksonJsonParser(
     private val objectMapper: ObjectMapper
-) : JsonSerializer {
+) : xyz.srclab.common.data.json.JsonParser {
 
     init {
         objectMapper.registerModule(JsonImplModule())
     }
 
-    override fun serialize(any: Any?): Json {
-        if (any is Json) {
-            return any
-        }
-        return JsonImpl(objectMapper.convertValue(any, JsonNode::class.java))
+    override fun toString(obj: Any?): String {
+        return objectMapper.writeValueAsString(obj)
     }
 
-    override fun deserialize(input: InputStream): Json {
-        return JsonImpl(objectMapper.readTree(input))
+    override fun toBytes(obj: Any?): ByteArray {
+        return objectMapper.writeValueAsBytes(obj)
     }
 
-    override fun deserialize(reader: Reader): Json {
-        return JsonImpl(objectMapper.readTree(reader))
+    override fun toDataNode(obj: Any?): Json {
+        val jsonNode = objectMapper.convertValue(obj, JsonNode::class.java)
+        return JsonImpl(jsonNode)
     }
 
-    override fun deserialize(bytes: ByteArray, offset: Int, length: Int): Json {
-        return JsonImpl(objectMapper.readTree(bytes, offset, length))
+    override fun parse(chars: CharSequence): Json {
+        val jsonNode = if (chars is String) objectMapper.readTree(chars) else objectMapper.readTree(chars.asReader())
+        return JsonImpl(jsonNode)
+    }
+
+    override fun parse(bytes: ByteArray, offset: Int, length: Int): Json {
+        val jsonNode = objectMapper.readTree(bytes, offset, length)
+        return JsonImpl(jsonNode)
+    }
+
+    override fun parse(input: InputStream): Json {
+        val jsonNode = objectMapper.readTree(input)
+        return JsonImpl(jsonNode)
+    }
+
+    override fun parse(byteBuffer: ByteBuffer): Json {
+        val jsonNode = objectMapper.readTree(byteBuffer.asInputStream())
+        return JsonImpl(jsonNode)
     }
 
     inner class JsonImpl(
@@ -52,48 +61,21 @@ open class JacksonJsonSerializer(
 
         override val type: JsonType = jsonNode.nodeType.toJsonType()
 
-        override fun toInputStream(): InputStream {
-            return toBytes().asInputStream()
-        }
-
-        override fun toReader(): Reader {
-            return toText().asReader()
-        }
-
-        override fun toReader(charset: Charset): Reader {
-            return toReader()
+        override fun toString(): String {
+            return jsonNode.toString()
         }
 
         override fun toBytes(): ByteArray {
             return objectMapper.writeValueAsBytes(jsonNode)
         }
 
-        override fun toText(): String {
-            return objectMapper.writeValueAsString(jsonNode)
-        }
-
-        override fun toText(charset: Charset): String {
-            return toText()
-        }
-
-        override fun writeTo(outputStream: OutputStream) {
-            objectMapper.writeValue(outputStream, jsonNode)
-        }
-
-        override fun writeTo(writer: Writer) {
-            objectMapper.writeValue(writer, jsonNode)
-        }
-
-        override fun toJsonString(): String {
-            return objectMapper.writeValueAsString(jsonNode)
-        }
-
-        override fun toJsonBytes(): ByteArray {
-            return toBytes()
-        }
-
-        override fun <T> parseOrNull(type: Type): T? {
-            return objectMapper.readValue(jsonNode.traverse(), object : TypeReference<T>() {
+        override fun <T> toObjectOrNull(type: Type): T? {
+            //return objectMapper.readValue(jsonNode.traverse(), object : TypeReference<T>() {
+            //    override fun getType(): Type {
+            //        return type
+            //    }
+            //})
+            return objectMapper.convertValue(jsonNode, object : TypeReference<T>() {
                 override fun getType(): Type {
                     return type
                 }
@@ -113,8 +95,14 @@ open class JacksonJsonSerializer(
             }
         }
 
-        override fun toString(): String {
-            return jsonNode.toString()
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is JsonImpl) return false
+            return this.jsonNode == other.jsonNode
+        }
+
+        override fun hashCode(): Int {
+            return jsonNode.hashCode()
         }
     }
 
@@ -125,7 +113,7 @@ open class JacksonJsonSerializer(
             addDeserializer(Json::class.java, JsonImplDeserializer())
         }
 
-        private inner class JsonImplSerializer : com.fasterxml.jackson.databind.JsonSerializer<JsonImpl>() {
+        private inner class JsonImplSerializer : JsonSerializer<JsonImpl>() {
 
             override fun handledType(): Class<JsonImpl> {
                 return JsonImpl::class.java
@@ -142,7 +130,10 @@ open class JacksonJsonSerializer(
                 return Json::class.java
             }
 
-            override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): Json {
+            override fun deserialize(
+                parser: com.fasterxml.jackson.core.JsonParser,
+                ctxt: DeserializationContext
+            ): Json {
                 return JsonImpl(
                     objectMapper.readValue(parser, JsonNode::class.java)
                 )

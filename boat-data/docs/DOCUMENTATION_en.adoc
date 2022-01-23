@@ -8,7 +8,7 @@ Sun Qian <fredsuvn@163.com>
 
 == Introduction
 
-Boat Serialize provides Unified interfaces (`Serializer`, `Serial`) to support serialize and deserialize operations.
+Boat Serialize provides Unified interfaces (`DataParser`, `Data`) to support serialize and deserialize operations.
 
 Now format it supports are:
 
@@ -18,7 +18,7 @@ Now format it supports are:
 
 === JSON
 
-Json package provides JSON format implementation of `Serial`: `Json`.
+Json package provides JSON format implementation of `Data`: `Json`.
 
 To get a `Json`, we can use core utilities of boat-data: `JsonSerials`.
 
@@ -47,8 +47,8 @@ class Example {
 }
 ----
 
-`JsonSerials` uses default `JsonSerializer` -- the core interface for `Serializer` with `JSON`, to implement its methods.
-We can also use `JsonSerializer` directly:
+`JsonSerials` uses default `DataParser` -- the core interface for `DataParser` with `JSON`, to implement its methods.
+We can also use `DataParser` directly:
 
 .Java Examples
 [source,java]
@@ -80,7 +80,7 @@ class Example {
 
 By default, json-serialize is implemented by `Jackson`:
 
-* `JacksonJsonSerializer`: `Jackson` implementation for `JsonSerializer`;
+* `JacksonJsonParser`: `Jackson` implementation for `DataParser`;
 * `Jacksons`: `Jackson` json utilities;
 
 .Java Examples

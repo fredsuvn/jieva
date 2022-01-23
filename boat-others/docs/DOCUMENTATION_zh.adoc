@@ -22,7 +22,7 @@ boat-protobuf 提供为 `bean`, `convert` 何 `data` 领域的针对 protobuf �
 * `ProtobufBeans.PROTOBUF_BEAN_RESOLVER`: 支持 protobuf 类型的bean解析器处理器, 从 `BeanResolver` (boat-core) 扩展;
 * ProtobufConverts.PROTOBUF_CONVERTER: 支持 protobuf 类型的类型转换器, 从 `Converter` (boat-core) 扩展;
 * ProtobufJsons.PROTOBUF_OBJECT_MAPPER: ``Jackson``的 `ObjectMapper` (boat-data), 支持 protobuf 类型;
-* ProtobufJsons.PROTOBUF_JSON_SERIALIZER: `JsonSerializer` (boat-data), 支持 protobuf 类型.
+* ProtobufJsons.PROTOBUF_JSON_SERIALIZER: `DataParser` (boat-data), 支持 protobuf 类型.
 
 WARNING: `boat-protobuf` 需要 `protoc` 来编译 protobuf 文件, 一些架构并不支持 (如 `ARM`).
 检查你的环境是否支持: link:https://repo1.maven.org/maven2/com/google/protobuf/protoc/[]

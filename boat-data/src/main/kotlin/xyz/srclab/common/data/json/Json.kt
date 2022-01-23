@@ -1,14 +1,14 @@
 package xyz.srclab.common.data.json
 
+import xyz.srclab.common.data.DataNode
 import xyz.srclab.common.reflect.TypeRef
-import xyz.srclab.common.data.Serial
 
 /**
- * Represents a `Json [Serial]`, middle type between raw json string/bytes and java object.
+ * Represents a json type.
  *
- * @author sunqian
+ * @see DataNode
  */
-interface Json : Serial {
+interface Json : DataNode {
 
     /**
      * Returns type of json.
@@ -22,9 +22,11 @@ interface Json : Serial {
      *
      * Note if content is `abs`, returns `"abs"`.
      *
-     * @see [toText]
+     * @see [toString]
      */
-    fun toJsonString(): String
+    fun toJsonString(): String {
+        return toString()
+    }
 
     /**
      * To json string as bytes.
@@ -33,19 +35,21 @@ interface Json : Serial {
      *
      * @see [toBytes]
      */
-    fun toJsonBytes(): ByteArray
+    fun toJsonBytes(): ByteArray {
+        return toBytes()
+    }
 
     /**
      * Returns as [Map]<[String], [Json]>.
      */
-    fun parseJsonMap(): Map<String, Json> {
-        return parse(object : TypeRef<Map<String, Json>>() {})
+    fun toJsonMap(): Map<String, Json> {
+        return toObject(object : TypeRef<Map<String, Json>>() {})
     }
 
     /**
      * Returns as [Array]<[Json]>.
      */
-    fun parseJsonArray(): Array<Json> {
-        return parse(Array<Json>::class.java)
+    fun toJsonArray(): Array<Json> {
+        return toObject(Array<Json>::class.java)
     }
 }

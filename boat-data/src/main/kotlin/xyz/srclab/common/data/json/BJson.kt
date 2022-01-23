@@ -1,96 +1,119 @@
-@file:JvmName("Jsons")
+@file:JvmName("BJson")
 
 package xyz.srclab.common.data.json
 
+import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.reflect.TypeRef
 import java.io.InputStream
-import java.io.Reader
 import java.lang.reflect.Type
-import java.net.URL
 import java.nio.ByteBuffer
 
-private val jsonSerializer: JsonSerializer
+private val jsonParser: JsonParser
     get() {
-        return JsonSerializer.defaultSerializer()
+        return JsonParser.defaultParser()
     }
 
-/**
- * Serialize or deserialize operation, source -> [Json].
- *
- * Deserialize:
- *
- * * [CharSequence]
- * * [ByteArray];
- * * [InputStream];
- * * [Reader];
- * * [ByteBuffer];
- * * [URL];
- *
- * Serialize:
- *
- * * Other types;
- *
- * @see [JsonSerializer.parse]
- */
-@JvmName("parse")
-fun Any?.parseJson(): Json {
-    return jsonSerializer.parse(this)
-}
-
 fun Any?.toJson(): Json {
-    return jsonSerializer.serialize(this)
+    return jsonParser.toJson(this)
 }
 
-@JvmName("parse")
+fun Any?.toJsonString(): String {
+    return jsonParser.toString(this)
+}
+
+fun Any?.toJsonBytes(): ByteArray {
+    return jsonParser.toBytes(this)
+}
+
+fun CharSequence.jsonToMap(): Map<String, Any?> {
+    return jsonParser.parse(this).toMap()
+}
+
 @JvmOverloads
-fun ByteArray.parseJson(offset: Int = 0, length: Int = this.size - offset): Json {
-    return jsonSerializer.deserialize(this, offset, length)
+fun ByteArray.jsonToMap(offset: Int = 0, length: Int = remainingLength(this.size, offset)): Map<String, Any?> {
+    return jsonParser.parse(this, offset, length).toMap()
 }
 
 @JvmName("parse")
 fun CharSequence.parseJson(): Json {
-    return jsonSerializer.deserialize(this)
+    return jsonParser.parse(this)
+}
+
+@JvmName("parse")
+@JvmOverloads
+fun ByteArray.parseJson(offset: Int = 0, length: Int = remainingLength(this.size, offset)): Json {
+    return jsonParser.parse(this, offset, length)
 }
 
 @JvmName("parse")
 fun InputStream.parseJson(): Json {
-    return jsonSerializer.deserialize(this)
-}
-
-@JvmName("parse")
-fun Reader.parseJson(): Json {
-    return jsonSerializer.deserialize(this)
+    return jsonParser.parse(this)
 }
 
 @JvmName("parse")
 fun ByteBuffer.parseJson(): Json {
-    return jsonSerializer.deserialize(this)
-}
-
-@JvmName("parse")
-fun URL.parseJson(): Json {
-    return jsonSerializer.deserialize(this)
-}
-
-fun Any?.toJsonString(): String {
-    return parseJson().toJsonString()
-}
-
-fun Any?.toJsonBytes(): ByteArray {
-    return parseJson().toJsonBytes()
+    return jsonParser.parse(this)
 }
 
 @JvmName("parse")
 fun <T> CharSequence.parseJson(type: Class<T>): T {
-    return jsonSerializer.deserialize(this).parse(type)
+    return jsonParser.parse(this).toObject(type)
+}
+
+@JvmName("parse")
+@JvmOverloads
+fun <T> ByteArray.parseJson(type: Class<T>, offset: Int = 0, length: Int = remainingLength(this.size, offset)): T {
+    return jsonParser.parse(this, offset, length).toObject(type)
+}
+
+@JvmName("parse")
+fun <T> InputStream.parseJson(type: Class<T>): T {
+    return jsonParser.parse(this).toObject(type)
+}
+
+@JvmName("parse")
+fun <T> ByteBuffer.parseJson(type: Class<T>): T {
+    return jsonParser.parse(this).toObject(type)
 }
 
 @JvmName("parse")
 fun <T> CharSequence.parseJson(type: Type): T {
-    return jsonSerializer.deserialize(this).parse(type)
+    return jsonParser.parse(this).toObject(type)
+}
+
+@JvmName("parse")
+@JvmOverloads
+fun <T> ByteArray.parseJson(type: Type, offset: Int = 0, length: Int = remainingLength(this.size, offset)): T {
+    return jsonParser.parse(this, offset, length).toObject(type)
+}
+
+@JvmName("parse")
+fun <T> InputStream.parseJson(type: Type): T {
+    return jsonParser.parse(this).toObject(type)
+}
+
+@JvmName("parse")
+fun <T> ByteBuffer.parseJson(type: Type): T {
+    return jsonParser.parse(this).toObject(type)
 }
 
 @JvmName("parse")
 fun <T> CharSequence.parseJson(type: TypeRef<T>): T {
-    return jsonSerializer.deserialize(this).parse(type)
+    return jsonParser.parse(this).toObject(type)
+}
+
+@JvmName("parse")
+@JvmOverloads
+fun <T> ByteArray.parseJson(type: TypeRef<T>, offset: Int = 0, length: Int = remainingLength(this.size, offset)): T {
+    return jsonParser.parse(this, offset, length).toObject(type)
+}
+
+@JvmName("parse")
+fun <T> InputStream.parseJson(type: TypeRef<T>): T {
+    return jsonParser.parse(this).toObject(type)
+}
+
+@JvmName("parse")
+fun <T> ByteBuffer.parseJson(type: TypeRef<T>): T {
+    return jsonParser.parse(this).toObject(type)
 }
