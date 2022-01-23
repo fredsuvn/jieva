@@ -12,10 +12,10 @@ import javax.crypto.SecretKey
  * Note this class **may not thread-safe**.
  *
  * @see EncCodec
- * @see Digester
- * @see MacCodec
- * @see CipherCodec
- * @see AsymmetricCipherCodec
+ * @see DigestCodec
+ * @see HmacCodec
+ * @see CryptCodec
+ * @see AsymmetricCryptCodec
  */
 abstract class Codecing(
     protected open var data: ByteArray
@@ -27,7 +27,7 @@ abstract class Codecing(
         val codec = getCodec(algorithm)
         data = when (codec) {
             is EncCodec -> codec.encode(data)
-            is Digester -> codec.digest(data)
+            is DigestCodec -> codec.digest(data)
             else -> throw UnsupportedOperationException("Unsupported encode or digest algorithm: $algorithm")
         }
         return this
@@ -53,7 +53,7 @@ abstract class Codecing(
     open fun digest(algorithm: CodecAlgorithm): Codecing {
         val codec = getCodec(algorithm)
         data = when (codec) {
-            is Digester -> codec.digest(data)
+            is DigestCodec -> codec.digest(data)
             else -> throw UnsupportedOperationException("Unsupported digest algorithm: $algorithm")
         }
         return this
@@ -66,7 +66,7 @@ abstract class Codecing(
     open fun digest(algorithm: CodecAlgorithm, key: Any): Codecing {
         val codec = getCodec(algorithm)
         data = when (codec) {
-            is MacCodec -> codec.digest(key, data)
+            is HmacCodec -> codec.digest(key, data)
             else -> throw UnsupportedOperationException("Unsupported MAC digest algorithm: $algorithm")
         }
         return this
@@ -79,7 +79,7 @@ abstract class Codecing(
     open fun encrypt(algorithm: CodecAlgorithm, key: Any): Codecing {
         val codec = getCodec(algorithm)
         data = when (codec) {
-            is CipherCodec -> codec.encrypt(key, data)
+            is CryptCodec -> codec.encrypt(key, data)
             else -> throw UnsupportedOperationException("Unsupported cipher encrypt: $algorithm")
         }
         return this
@@ -92,7 +92,7 @@ abstract class Codecing(
     open fun decrypt(algorithm: CodecAlgorithm, key: Any): Codecing {
         val codec = getCodec(algorithm)
         data = when (codec) {
-            is CipherCodec -> codec.decrypt(key, data)
+            is CryptCodec -> codec.decrypt(key, data)
             else -> throw UnsupportedOperationException("Unsupported cipher decrypt: $algorithm")
         }
         return this

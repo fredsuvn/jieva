@@ -16,9 +16,9 @@ import javax.crypto.Cipher
  *
  * @see RsaCodec
  * @see Sm2Codec
- * @see AsymmetricCipherCodec
+ * @see AsymmetricCryptCodec
  */
-interface CipherCodec : Codec {
+interface CryptCodec : Codec {
 
     @JvmDefault
     fun encrypt(key: Any, data: ByteArray): ByteArray {
@@ -141,7 +141,7 @@ interface CipherCodec : Codec {
     companion object {
 
         @JvmStatic
-        fun aes(): CipherCodec {
+        fun aes(): CryptCodec {
             return withAlgorithm(CodecAlgorithm.AES_NAME)
         }
 
@@ -166,13 +166,13 @@ interface CipherCodec : Codec {
         @JvmStatic
         fun withAlgorithm(
             algorithm: CharSequence
-        ): CipherCodec {
-            return CipherCodecImpl(algorithm.toString())
+        ): CryptCodec {
+            return CryptCodecImpl(algorithm.toString())
         }
 
-        private class CipherCodecImpl(
+        private class CryptCodecImpl(
             override val algorithm: String
-        ) : CipherCodec {
+        ) : CryptCodec {
 
             private val cipher: Cipher by lazy {
                 Cipher.getInstance(algorithm)

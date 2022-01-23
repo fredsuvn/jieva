@@ -5,7 +5,7 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.codec.AsymmetricCipherCodec;
+import xyz.srclab.common.codec.AsymmetricCryptCodec;
 import xyz.srclab.common.codec.CodecAlgorithm;
 import xyz.srclab.common.lang.Defaults;
 
@@ -20,7 +20,7 @@ import java.util.Arrays;
  *
  * @author sunqian
  */
-public class Sm2Codec implements AsymmetricCipherCodec<ECPoint, BigInteger> {
+public class Sm2Codec implements AsymmetricCryptCodec<ECPoint, BigInteger> {
 
     private static final int DIGEST_LENGTH = 32;
 
@@ -196,7 +196,7 @@ public class Sm2Codec implements AsymmetricCipherCodec<ECPoint, BigInteger> {
         @Nullable byte[] t = KDF(dBC1Bytes, klen);
         // DerivationFunction kdf = new KDF1BytesGenerator(new
         // ShortenedDigest(new SHA256Digest(), DIGEST_LENGTH));
-        // if (debug)
+        // if (xyz.srclab.common.base.debug)
         // System.out.println("klen = " + klen);
         // kdf.init(new ISO18033KDFParameters(dBC1Bytes));
         // kdf.generateBytes(t, 0, t.length);

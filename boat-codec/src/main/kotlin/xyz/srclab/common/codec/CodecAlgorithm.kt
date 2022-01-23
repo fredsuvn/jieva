@@ -2,8 +2,6 @@ package xyz.srclab.common.codec
 
 /**
  * Represents codec algorithm.
- *
- * @author sunqian
  */
 interface CodecAlgorithm {
 

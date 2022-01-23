@@ -16,14 +16,14 @@ import javax.crypto.spec.SecretKeySpec
  * Note [Codec] **may not thread-safe**.
  *
  * @see EncCodec
- * @see Digester
- * @see MacCodec
- * @see CipherCodec
+ * @see DigestCodec
+ * @see HmacCodec
+ * @see CryptCodec
  * @see CodecAlgorithm
  */
 interface Codec {
 
-    val algorithm: String
+    val algorithm: CodecAlgorithm
 
     companion object {
 
@@ -153,38 +153,38 @@ interface Codec {
 
         @JvmName("digestCodec")
         @JvmStatic
-        fun CharSequence.toDigestCodec(): Digester {
-            return Digester.withAlgorithm(this)
+        fun CharSequence.toDigestCodec(): DigestCodec {
+            return DigestCodec.withAlgorithm(this)
         }
 
         @JvmName("digestCodec")
         @JvmStatic
-        fun CodecAlgorithm.toDigestCodec(): Digester {
-            return Digester.withAlgorithm(this.name)
+        fun CodecAlgorithm.toDigestCodec(): DigestCodec {
+            return DigestCodec.withAlgorithm(this.name)
         }
 
         @JvmName("macCodec")
         @JvmStatic
-        fun CharSequence.toMacCodec(): MacCodec {
-            return MacCodec.withAlgorithm(this)
+        fun CharSequence.toMacCodec(): HmacCodec {
+            return HmacCodec.withAlgorithm(this)
         }
 
         @JvmName("macCodec")
         @JvmStatic
-        fun CodecAlgorithm.toMacCodec(): MacCodec {
-            return MacCodec.withAlgorithm(this.name)
+        fun CodecAlgorithm.toMacCodec(): HmacCodec {
+            return HmacCodec.withAlgorithm(this.name)
         }
 
         @JvmName("cipherCodec")
         @JvmStatic
-        fun CharSequence.toCipherCodec(): CipherCodec {
-            return CipherCodec.withAlgorithm(this)
+        fun CharSequence.toCipherCodec(): CryptCodec {
+            return CryptCodec.withAlgorithm(this)
         }
 
         @JvmName("cipherCodec")
         @JvmStatic
-        fun CodecAlgorithm.toCipherCodec(): CipherCodec {
-            return CipherCodec.withAlgorithm(this.name)
+        fun CodecAlgorithm.toCipherCodec(): CryptCodec {
+            return CryptCodec.withAlgorithm(this.name)
         }
 
         @JvmStatic
@@ -203,68 +203,68 @@ interface Codec {
         }
 
         @JvmStatic
-        fun md2Codec(): Digester {
-            return Digester.md2()
+        fun md2Codec(): DigestCodec {
+            return DigestCodec.md2()
         }
 
         @JvmStatic
-        fun md5Codec(): Digester {
-            return Digester.md5()
+        fun md5Codec(): DigestCodec {
+            return DigestCodec.md5()
         }
 
         @JvmStatic
-        fun sha1Codec(): Digester {
-            return Digester.sha1()
+        fun sha1Codec(): DigestCodec {
+            return DigestCodec.sha1()
         }
 
         @JvmStatic
-        fun sha256Codec(): Digester {
-            return Digester.sha256()
+        fun sha256Codec(): DigestCodec {
+            return DigestCodec.sha256()
         }
 
         @JvmStatic
-        fun sha384Codec(): Digester {
-            return Digester.sha384()
+        fun sha384Codec(): DigestCodec {
+            return DigestCodec.sha384()
         }
 
         @JvmStatic
-        fun sha512Codec(): Digester {
-            return Digester.sha512()
+        fun sha512Codec(): DigestCodec {
+            return DigestCodec.sha512()
         }
 
         @JvmStatic
-        fun hmacMd5Codec(): MacCodec {
-            return MacCodec.hmacMd5()
+        fun hmacMd5Codec(): HmacCodec {
+            return HmacCodec.hmacMd5()
         }
 
         @JvmStatic
-        fun hmacSha1Codec(): MacCodec {
-            return MacCodec.hmacSha1()
+        fun hmacSha1Codec(): HmacCodec {
+            return HmacCodec.hmacSha1()
         }
 
         @JvmStatic
-        fun hmacSha256Codec(): MacCodec {
-            return MacCodec.hmacSha256()
+        fun hmacSha256Codec(): HmacCodec {
+            return HmacCodec.hmacSha256()
         }
 
         @JvmStatic
-        fun hmacSha384Codec(): MacCodec {
-            return MacCodec.hmacSha384()
+        fun hmacSha384Codec(): HmacCodec {
+            return HmacCodec.hmacSha384()
         }
 
         @JvmStatic
-        fun hmacSha512Codec(): MacCodec {
-            return MacCodec.hmacSha512()
+        fun hmacSha512Codec(): HmacCodec {
+            return HmacCodec.hmacSha512()
         }
 
         @JvmStatic
-        fun aesCodec(): CipherCodec {
-            return CipherCodec.aes()
+        fun aesCodec(): CryptCodec {
+            return CryptCodec.aes()
         }
 
         @JvmStatic
         fun rsaCodec(): RsaCodec {
-            return CipherCodec.rsa()
+            return CryptCodec.rsa()
         }
 
         @JvmStatic
@@ -272,13 +272,13 @@ interface Codec {
             encryptBlockSize: Int,
             decryptBlockSize: Int
         ): RsaCodec {
-            return CipherCodec.rsa(encryptBlockSize, decryptBlockSize)
+            return CryptCodec.rsa(encryptBlockSize, decryptBlockSize)
         }
 
         @JvmOverloads
         @JvmStatic
         fun sm2Codec(sm2Params: Sm2Params = Sm2Params.DEFAULT): Sm2Codec {
-            return CipherCodec.sm2(sm2Params)
+            return CryptCodec.sm2(sm2Params)
         }
 
         @JvmName("hexString")

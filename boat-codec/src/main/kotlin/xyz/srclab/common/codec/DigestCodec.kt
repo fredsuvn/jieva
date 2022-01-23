@@ -13,7 +13,7 @@ import java.util.function.Supplier
 /**
  * Digest codec such as `MD5`.
  */
-interface Digester : Codec {
+interface DigestCodec : Codec {
 
     fun digest(data: ByteArray): ByteArray {
         return digest(data, 0)
@@ -41,7 +41,7 @@ interface Digester : Codec {
     }
 
     fun digest(data: ByteBuffer): ByteBuffer {
-        return ByteBuffer.wrap(data.toBytes())
+        return ByteBuffer.wrap(digest(data.toBytes(true)))
     }
 
     fun digest(data: InputStream): ByteArray {
@@ -53,55 +53,54 @@ interface Digester : Codec {
     }
 
     /**
-     * Builder for [Digester].
+     * Builder for [DigestCodec].
      */
     open class Builder {
 
         private var algorithm: CodecAlgorithm? = null
-        private var digesterSupplier: Supplier<MessageDigest>? = null
+        private var digestSupplier: Supplier<MessageDigest>? = null
         private var threadSafePolicy: ThreadSafePolicy = ThreadSafePolicy.SYNCHRONIZED
 
-        open fun algorithm(algorithm: CodecAlgorithm): Builder {
+        open fun algorithm(algorithm: CodecAlgorithm) = apply {
             this.algorithm = algorithm
-            return this
         }
 
-        open fun digesterSupplier(digestSupplier: Supplier<MessageDigest>): Builder {
-            this.digesterSupplier = digestSupplier
+        open fun digestSupplier(digestSupplier: Supplier<MessageDigest>) = apply {
+            this.digestSupplier = digestSupplier
             return this
         }
 
         /**
          * Default is [ThreadSafePolicy.SYNCHRONIZED].
          */
-        open fun threadSafePolicy(threadSafePolicy: ThreadSafePolicy): Builder {
+        open fun threadSafePolicy(threadSafePolicy: ThreadSafePolicy) = apply {
             this.threadSafePolicy = threadSafePolicy
             return this
         }
 
-        open fun build(): Digester {
+        open fun build(): DigestCodec {
             val algorithm = this.algorithm
             if (algorithm === null) {
                 throw IllegalStateException("algorithm was not specified.")
             }
-            val digesterSupplier = this.digesterSupplier
+            val digesterSupplier = this.digestSupplier
             if (digesterSupplier === null) {
                 throw IllegalStateException("digesterSupplier was not specified.")
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
-                return ThreadLocalDigester(algorithm, digesterSupplier.toKotlinFun())
+                return ThreadLocalDigestCodec(algorithm, digesterSupplier.toKotlinFun())
             }
-            val digester = DigesterImpl(algorithm, digesterSupplier.get())
+            val digester = DigestCodecImpl(algorithm, digesterSupplier.get())
             if (threadSafePolicy == ThreadSafePolicy.SYNCHRONIZED) {
-                return SynchronizedDigester(digester)
+                return SynchronizedDigestCodec(digester)
             }
             return digester
         }
 
-        private class DigesterImpl(
+        private class DigestCodecImpl(
             override val algorithm: CodecAlgorithm,
             private val digest: MessageDigest
-        ) : Digester {
+        ) : DigestCodec {
 
             override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
                 digest.reset()
@@ -116,29 +115,29 @@ interface Digester : Codec {
             }
         }
 
-        private class SynchronizedDigester(
-            private val digester: Digester
-        ) : Digester {
+        private class SynchronizedDigestCodec(
+            private val digestCodec: DigestCodec
+        ) : DigestCodec {
 
-            override val algorithm: CodecAlgorithm = digester.algorithm
+            override val algorithm: CodecAlgorithm = digestCodec.algorithm
 
             @Synchronized
             override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
-                return digester.digest(data, offset, length)
+                return digestCodec.digest(data, offset, length)
             }
 
             @Synchronized
             override fun digest(data: ByteBuffer): ByteBuffer {
-                return digester.digest(data)
+                return digestCodec.digest(data)
             }
         }
 
-        private class ThreadLocalDigester(
+        private class ThreadLocalDigestCodec(
             override val algorithm: CodecAlgorithm,
-            digester: () -> MessageDigest
-        ) : Digester {
+            digest: () -> MessageDigest
+        ) : DigestCodec {
 
-            private val threadLocal: ThreadLocal<MessageDigest> = ThreadLocal.withInitial(digester)
+            private val threadLocal: ThreadLocal<MessageDigest> = ThreadLocal.withInitial(digest)
 
             override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
                 val digest = threadLocal.get()
@@ -164,42 +163,42 @@ interface Digester : Codec {
         }
 
         @JvmStatic
-        fun md2(): Digester {
+        fun md2(): DigestCodec {
             return withAlgorithm(CodecAlgorithm.MD2_NAME)
         }
 
         @JvmStatic
-        fun md5(): Digester {
+        fun md5(): DigestCodec {
             return withAlgorithm(CodecAlgorithm.MD5_NAME)
         }
 
         @JvmStatic
-        fun sha1(): Digester {
+        fun sha1(): DigestCodec {
             return withAlgorithm(CodecAlgorithm.SHA1_NAME)
         }
 
         @JvmStatic
-        fun sha256(): Digester {
+        fun sha256(): DigestCodec {
             return withAlgorithm(CodecAlgorithm.SHA256_NAME)
         }
 
         @JvmStatic
-        fun sha384(): Digester {
+        fun sha384(): DigestCodec {
             return withAlgorithm(CodecAlgorithm.SHA384_NAME)
         }
 
         @JvmStatic
-        fun sha512(): Digester {
+        fun sha512(): DigestCodec {
             return withAlgorithm(CodecAlgorithm.SHA512_NAME)
         }
 
         @JvmStatic
         fun withAlgorithm(
             algorithm: CharSequence
-        ): Digester {
+        ): DigestCodec {
             return newBuilder()
                 .algorithm(CodecAlgorithm.forName(algorithm))
-                .digesterSupplier { MessageDigest.getInstance(algorithm.toString()) }
+                .digestSupplier { MessageDigest.getInstance(algorithm.toString()) }
                 .build()
         }
     }

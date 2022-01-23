@@ -79,7 +79,7 @@ public class CodecTest {
     public void testAes() {
         String key = "a";
         SecretKey secretKey = AesKeys.newKey(key);
-        CipherCodec aesCodec = Codec.aesCodec();
+        CryptCodec aesCodec = Codec.aesCodec();
         String data = random(512);
         byte[] dataBytes = Chars.toBytes(data);
         byte[] encrypt = aesCodec.encrypt(secretKey, dataBytes);
@@ -124,7 +124,7 @@ public class CodecTest {
         byte[] encrypt = Codec.aesCodec().encrypt(aesKey.getEncoded(), Chars.toBytes(data));
         encrypt = rsaCodec.encrypt(rsaKeyPair.publicKey(), encrypt);
         encrypt = sm2Codec.encrypt(sm2KeyPair.publicKey(), encrypt);
-        encrypt = Encoder.base64().encode(encrypt);
+        encrypt = EncCodec.base64().encode(encrypt);
 
         //解密
         String origin = Codec.forData(encrypt)
@@ -154,7 +154,7 @@ public class CodecTest {
     @Test
     public void testDigest() throws Exception {
         String message = "123456789";
-        Digester md5 = Codec.md5Codec();
+        DigestCodec md5 = Codec.md5Codec();
         Assert.assertEquals(
             md5.digest(message),
             MessageDigest.getInstance("Md5").digest(message.getBytes())
@@ -163,18 +163,18 @@ public class CodecTest {
             md5.digest(message),
             MessageDigest.getInstance("Md5").digest(message.getBytes())
         );
-        MacCodec macCodec = Codec.hmacMd5Codec();
+        HmacCodec hmacCodec = Codec.hmacMd5Codec();
         Key aesKey = AesKeys.newKey("12345678");
         Mac mac1 = Mac.getInstance("HmacMD5");
         mac1.init(aesKey);
         Assert.assertEquals(
-            macCodec.digest(aesKey, message),
+            hmacCodec.digest(aesKey, message),
             mac1.doFinal(message.getBytes())
         );
         Mac mac2 = Mac.getInstance("HmacMD5");
         mac2.init(aesKey);
         Assert.assertEquals(
-            macCodec.digest(aesKey, message),
+            hmacCodec.digest(aesKey, message),
             mac2.doFinal(message.getBytes())
         );
     }
@@ -187,36 +187,36 @@ public class CodecTest {
         logger.log("{}: {}", CodecAlgorithm.HEX, Codec.hexCodec().encodeToString(password));
         logger.log("{}: {}", CodecAlgorithm.BASE64, Codec.base64Codec().encodeToString(password));
         logger.log("{}: {}", CodecAlgorithm.MD2,
-            Encoder.base64().encodeToString(Codec.md2Codec().digestToString(password)));
+            EncCodec.base64().encodeToString(Codec.md2Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.MD5,
-            Encoder.base64().encodeToString(Codec.md5Codec().digestToString(password)));
+            EncCodec.base64().encodeToString(Codec.md5Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.SHA1,
-            Encoder.base64().encodeToString(Codec.sha1Codec().digestToString(password)));
+            EncCodec.base64().encodeToString(Codec.sha1Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.SHA256,
-            Encoder.base64().encodeToString(Codec.sha256Codec().digestToString(password)));
+            EncCodec.base64().encodeToString(Codec.sha256Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.SHA384,
-            Encoder.base64().encodeToString(Codec.sha384Codec().digestToString(password)));
+            EncCodec.base64().encodeToString(Codec.sha384Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.SHA512,
-            Encoder.base64().encodeToString(Codec.sha512Codec().digestToString(password)));
+            EncCodec.base64().encodeToString(Codec.sha512Codec().digestToString(password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_MD5,
-            Encoder.base64().encodeToString(Codec.hmacMd5Codec().digestToString(key, password)));
+            EncCodec.base64().encodeToString(Codec.hmacMd5Codec().digestToString(key, password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_SHA1,
-            Encoder.base64().encodeToString(Codec.hmacSha1Codec().digestToString(key, password)));
+            EncCodec.base64().encodeToString(Codec.hmacSha1Codec().digestToString(key, password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_SHA256,
-            Encoder.base64().encodeToString(Codec.hmacSha256Codec().digestToString(key, password)));
+            EncCodec.base64().encodeToString(Codec.hmacSha256Codec().digestToString(key, password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_SHA384,
-            Encoder.base64().encodeToString(Codec.hmacSha384Codec().digestToString(key, password)));
+            EncCodec.base64().encodeToString(Codec.hmacSha384Codec().digestToString(key, password)));
         logger.log("{}: {}", CodecAlgorithm.HMAC_SHA512,
-            Encoder.base64().encodeToString(Codec.hmacSha512Codec().digestToString(key, password)));
+            EncCodec.base64().encodeToString(Codec.hmacSha512Codec().digestToString(key, password)));
         SecretKey aesKey = AesKeys.newKey(key);
         logger.log("{}: {}", CodecAlgorithm.AES,
-            Encoder.base64().encodeToString(Codec.aesCodec().encryptToString(aesKey, password)));
+            EncCodec.base64().encodeToString(Codec.aesCodec().encryptToString(aesKey, password)));
         RsaKeyPair rsaKeyPair = Codec.rsaCodec().newKeyPair();
         logger.log("{}: {}", CodecAlgorithm.RSA,
-            Encoder.base64().encodeToString(Codec.rsaCodec().encryptToString(rsaKeyPair.publicKey(), password)));
+            EncCodec.base64().encodeToString(Codec.rsaCodec().encryptToString(rsaKeyPair.publicKey(), password)));
         Sm2KeyPair sm2KeyPair = Codec.sm2Codec().newKeyPair();
         logger.log("{}: {}", CodecAlgorithm.SM2,
-            Encoder.base64().encodeToString(Codec.sm2Codec().encryptToString(sm2KeyPair.publicKey(), password)));
+            EncCodec.base64().encodeToString(Codec.sm2Codec().encryptToString(sm2KeyPair.publicKey(), password)));
     }
 
     @Test
