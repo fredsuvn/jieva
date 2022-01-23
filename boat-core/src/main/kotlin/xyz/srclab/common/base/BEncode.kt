@@ -4,6 +4,7 @@ package xyz.srclab.common.base
 
 import xyz.srclab.common.io.BytesAppender
 import xyz.srclab.common.io.asInputStream
+import xyz.srclab.common.io.unclose
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -47,16 +48,19 @@ fun ByteArray.base64(offset: Int, length: Int = remainingLength(this.size, offse
 }
 
 fun InputStream.base64(): ByteArray {
-    val output = BytesAppender()
-    val encOut = Base64.getEncoder().wrap(output)
+    val out = BytesAppender()
+    val encOut = Base64.getEncoder().wrap(out)
     this.copyTo(encOut)
     encOut.close()
-    return output.toBytes()
+    return out.toBytes()
 }
 
 fun InputStream.base64(output: OutputStream): Long {
-    val encOut = Base64.getEncoder().wrap(output)
-    return this.copyTo(encOut)
+    val out = output.unclose()
+    val encOut = Base64.getEncoder().wrap(out)
+    val result = this.copyTo(encOut)
+    encOut.close()
+    return result
 }
 
 @JvmOverloads

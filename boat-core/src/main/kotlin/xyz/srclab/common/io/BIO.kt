@@ -201,3 +201,107 @@ fun RandomAccessFile.asOutputStream(
 fun URL.toInputStream(): InputStream {
     return this.openStream()
 }
+
+/**
+ * Returns a [InputStream] which wraps all method of given stream but prevents the `close` method.
+ */
+fun InputStream.unclose(): InputStream {
+    return UncloseInputStream(this)
+}
+
+/**
+ * Returns a [OutputStream] which wraps all method of given stream but prevents the `close` method.
+ */
+fun OutputStream.unclose(): OutputStream {
+    return UncloseOutputStream(this)
+}
+
+private class UncloseInputStream(private val source: InputStream) : InputStream() {
+
+    override fun close() {
+    }
+
+    override fun read(): Int {
+        return source.read()
+    }
+
+    override fun read(b: ByteArray): Int {
+        return source.read(b)
+    }
+
+    override fun read(b: ByteArray, off: Int, len: Int): Int {
+        return source.read(b, off, len)
+    }
+
+    override fun skip(n: Long): Long {
+        return source.skip(n)
+    }
+
+    override fun available(): Int {
+        return source.available()
+    }
+
+    override fun mark(readlimit: Int) {
+        source.mark(readlimit)
+    }
+
+    override fun reset() {
+        source.reset()
+    }
+
+    override fun markSupported(): Boolean {
+        return source.markSupported()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is UncloseInputStream) {
+            return source == other.source
+        }
+        return source == other
+    }
+
+    override fun hashCode(): Int {
+        return source.hashCode()
+    }
+
+    override fun toString(): String {
+        return source.toString()
+    }
+}
+
+private class UncloseOutputStream(private val source: OutputStream) : OutputStream() {
+
+    override fun close() {
+    }
+
+    override fun flush() {
+        source.flush()
+    }
+
+    override fun write(b: Int) {
+        source.write(b)
+    }
+
+    override fun write(b: ByteArray) {
+        source.write(b)
+    }
+
+    override fun write(b: ByteArray, off: Int, len: Int) {
+        source.write(b, off, len)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is UncloseOutputStream) {
+            return source == other.source
+        }
+        return source == other
+    }
+
+    override fun hashCode(): Int {
+        return source.hashCode()
+    }
+
+    override fun toString(): String {
+        return source.toString()
+    }
+}

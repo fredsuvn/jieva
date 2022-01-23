@@ -6,10 +6,7 @@ import xyz.srclab.common.base.BString;
 import xyz.srclab.common.io.BIO;
 import xyz.srclab.common.io.BytesAppender;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 
@@ -103,5 +100,55 @@ public class StreamTest {
         bytesAppender.append(ByteBuffer.wrap(new byte[]{'b', 'c'}));
         bytesAppender.append(new byte[]{'d', 'e'}, 1);
         Assert.assertEquals(BString.to8BitString(bytesAppender.toBytes()), "abce");
+    }
+
+    @Test
+    public void testUnclose() throws Exception {
+        TestUncloseInStream ti = new TestUncloseInStream();
+        InputStream ui = BIO.unclose(ti);
+        ui.close();
+        Assert.assertFalse(ti.isClose());
+
+        TestUncloseOutStream to = new TestUncloseOutStream();
+        OutputStream uo = BIO.unclose(to);
+        uo.close();
+        Assert.assertFalse(to.isClose());
+    }
+
+    private static class TestUncloseInStream extends InputStream {
+
+        private boolean isClose = false;
+
+        @Override
+        public int read() throws IOException {
+            return 0;
+        }
+
+        @Override
+        public void close() throws IOException {
+            isClose = true;
+        }
+
+        public boolean isClose() {
+            return isClose;
+        }
+    }
+
+    private static class TestUncloseOutStream extends OutputStream {
+
+        private boolean isClose = false;
+
+        @Override
+        public void write(int b) throws IOException {
+        }
+
+        @Override
+        public void close() throws IOException {
+            isClose = true;
+        }
+
+        public boolean isClose() {
+            return isClose;
+        }
     }
 }

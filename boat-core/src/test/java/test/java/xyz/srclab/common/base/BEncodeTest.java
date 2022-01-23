@@ -2,10 +2,9 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BDefault;
-import xyz.srclab.common.base.BEncode;
-import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.base.BRandom;
+import xyz.srclab.common.base.*;
+import xyz.srclab.common.io.BIO;
+import xyz.srclab.common.io.BytesAppender;
 
 import java.util.Arrays;
 import java.util.Base64;
@@ -13,7 +12,7 @@ import java.util.Base64;
 public class BEncodeTest {
 
     @Test
-    public void test() {
+    public void testBase64() {
         String rd1 = BRandom.randomString(100);
         String rd1Base64 = BEncode.base64(rd1);
         byte[] rd1Bytes = rd1.getBytes(BDefault.DEFAULT_CHARSET);
@@ -39,5 +38,12 @@ public class BEncodeTest {
         String rd2DeBase64 = BEncode.deBase64(rd2Base64);
         BLog.info("rd2.de-base64: {}", rd2DeBase64);
         Assert.assertEquals(rd2DeBase64, new String(Base64.getDecoder().decode(rd2Base64.getBytes(BDefault.DEFAULT_CHARSET))));
+
+        //Test output stream
+        BytesAppender out = new BytesAppender();
+        BEncode.base64(BIO.asInputStream(rd1.getBytes(BDefault.DEFAULT_CHARSET)), out);
+        String outBase64String = BString.to8BitString(out.toBytes());
+        BLog.info("outBase64String: {}", outBase64String);
+        Assert.assertEquals(outBase64String, rd1Base64);
     }
 }
