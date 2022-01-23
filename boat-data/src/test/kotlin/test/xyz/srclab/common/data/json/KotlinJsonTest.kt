@@ -6,7 +6,7 @@ import xyz.srclab.common.base.info
 import xyz.srclab.common.data.json.parseJson
 import xyz.srclab.common.data.json.toJsonString
 
-class KotlinDataClassTest {
+class KotlinJsonTest {
 
     @Test
     fun testKotlinData() {
