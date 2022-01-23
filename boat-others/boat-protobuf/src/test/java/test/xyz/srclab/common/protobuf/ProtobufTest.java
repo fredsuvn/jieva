@@ -12,7 +12,7 @@ import xyz.srclab.common.lang.Anys;
 import xyz.srclab.common.protobuf.ProtobufBeans;
 import xyz.srclab.common.protobuf.ProtobufConverts;
 import xyz.srclab.common.protobuf.ProtobufJsons;
-import xyz.srclab.common.serialize.json.JsonSerials;
+import xyz.srclab.common.data.json.JsonSerials;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.*;

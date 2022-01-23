@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule
-import xyz.srclab.common.serialize.json.JsonSerializer
-import xyz.srclab.common.serialize.json.jackson.JAVA_TIME_MODULE
-import xyz.srclab.common.serialize.json.jackson.toJsonSerializer
+import xyz.srclab.common.data.json.JsonSerializer
+import xyz.srclab.common.data.json.jackson.JAVA_TIME_MODULE
+import xyz.srclab.common.data.json.jackson.toJsonSerializer
 
 /**
  * Default [JsonSerializer] supports protobuf types.

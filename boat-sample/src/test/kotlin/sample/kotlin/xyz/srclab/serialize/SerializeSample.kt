@@ -3,10 +3,10 @@ package sample.kotlin.xyz.srclab.serialize
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.testng.annotations.Test
 import xyz.srclab.common.reflect.TypeRef
-import xyz.srclab.common.serialize.json.JsonSerializer
-import xyz.srclab.common.serialize.json.jackson.toJsonSerializer
-import xyz.srclab.common.serialize.json.stringifyJson
-import xyz.srclab.common.serialize.json.toJson
+import xyz.srclab.common.data.json.JsonSerializer
+import xyz.srclab.common.data.json.jackson.toJsonSerializer
+import xyz.srclab.common.data.json.stringifyJson
+import xyz.srclab.common.data.json.toJson
 
 class SerializeSample {
 

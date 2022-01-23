@@ -1,10 +1,10 @@
 package sample.kotlin.xyz.srclab.core.collect
 
 import org.testng.annotations.Test
-import xyz.srclab.common.collect.BListMap.Companion.toListMap
+import xyz.srclab.common.collect.MutableListMap.Companion.toListMap
 import xyz.srclab.common.collect.MutableListMap.Companion.toMutableListMap
 import xyz.srclab.common.collect.MutableSetMap.Companion.toMutableSetMap
-import xyz.srclab.common.collect.BSetMap.Companion.toSetMap
+import xyz.srclab.common.collect.MutableSetMap.Companion.toSetMap
 import xyz.srclab.common.collect.addElements
 import java.util.*
 

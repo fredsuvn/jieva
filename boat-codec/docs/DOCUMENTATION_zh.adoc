@@ -46,7 +46,7 @@ class Example {
 Boat Codec 有四种编码器:
 
 * `Codec`: 核心编码器接口;
-* `Encoder`: 普通编码器如 HEX, BASE64;
+* `EncCodec`: 普通编码器如 HEX, BASE64;
 * `Digester`: 摘要算法编码器如 MD5;
 * `MacCodec`: 加密摘要编码器如 HmacMD5;
 * `CipherCodec`: 加密算法编码器如 `AES`, `RSA`, `SM2`;

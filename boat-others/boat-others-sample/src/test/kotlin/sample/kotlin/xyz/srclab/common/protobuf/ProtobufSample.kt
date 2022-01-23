@@ -13,7 +13,7 @@ import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.protobuf.PROTOBUF_BEAN_RESOLVER
 import xyz.srclab.common.protobuf.PROTOBUF_CONVERTER
 import xyz.srclab.common.protobuf.PROTOBUF_JSON_SERIALIZER
-import xyz.srclab.common.serialize.json.toJsonString
+import xyz.srclab.common.data.json.toJsonString
 
 class ProtobufSample {
 

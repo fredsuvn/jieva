@@ -3,10 +3,10 @@ package sample.java.xyz.srclab.serialize;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.annotations.Test;
 import xyz.srclab.common.reflect.TypeRef;
-import xyz.srclab.common.serialize.json.Json;
-import xyz.srclab.common.serialize.json.JsonSerializer;
-import xyz.srclab.common.serialize.json.JsonSerials;
-import xyz.srclab.common.serialize.json.jackson.Jacksons;
+import xyz.srclab.common.data.json.Json;
+import xyz.srclab.common.data.json.JsonSerializer;
+import xyz.srclab.common.data.json.JsonSerials;
+import xyz.srclab.common.data.json.jackson.Jacksons;
 import xyz.srclab.common.test.TestLogger;
 
 import java.util.Map;

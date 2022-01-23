@@ -15,11 +15,11 @@ class RunSample {
     fun testRunner() {
         val runner: Runner = Runner.SYNC_RUNNER
         val intRef = 0.withRef()
-        val running: Running<*> = runner.run<Any?> {
+        val running: RunWork<*> = runner.submit<Any?> {
             intRef.set(666)
             null
         }
-        running.get()
+        running.getResult()
         //666
         logger.log("int: {}", intRef.get())
     }
@@ -28,7 +28,7 @@ class RunSample {
     fun testScheduledRunner() {
         val scheduler = Scheduler.DEFAULT_THREAD_SCHEDULER
         val intRef = 0.withRef()
-        val scheduling: Scheduling<*> = scheduler.scheduleFixedDelay<Any?>(Duration.ZERO, Duration.ofMillis(1000)) {
+        val scheduling: ScheduleWork<*> = scheduler.scheduleFixedDelay<Any?>(Duration.ZERO, Duration.ofMillis(1000)) {
             intRef.set(intRef.get() + 100)
             null
         }
@@ -46,7 +46,7 @@ class RunSample {
         Assert.assertEquals("666", runContext.get("1"))
         val attach = runContext.attach()
         val countDownLatch = CountDownLatch(1)
-        AsyncRunner.run {
+        AsyncRunner.submit {
             val detach = current()
             detach.detach(attach)
             Assert.assertEquals("666", detach.get("1"))

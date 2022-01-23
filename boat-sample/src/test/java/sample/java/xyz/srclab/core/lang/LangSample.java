@@ -31,7 +31,7 @@ public class LangSample {
 
     @Test
     public void testRef() {
-        BRef<String> ref = BRef.with("1");
+        Ref<String> ref = Ref.with("1");
         List<String> list = Arrays.asList("-1", "-2", "-3");
 
         //here <String> should be final without Ref
@@ -69,9 +69,9 @@ public class LangSample {
 
     @Test
     public void testCharsFormat() {
-        String byFast = BFormat.fastFormat("1, 2, {}", 3);
-        String byMessage = BFormat.messageFormat("1, 2, {0}", 3);
-        String byPrintf = BFormat.printfFormat("1, 2, %d", 3);
+        String byFast = StringFormat.fastFormat("1, 2, {}", 3);
+        String byMessage = StringFormat.messageFormat("1, 2, {0}", 3);
+        String byPrintf = StringFormat.printfFormat("1, 2, %d", 3);
         //1, 2, 3
         logger.log("byFast: {}", byFast);
         logger.log("byMessage: {}", byMessage);
@@ -85,15 +85,15 @@ public class LangSample {
         args.put("name}", "DogX");
         args.put(1, "Cat");
         args.put(2, "Bird");
-        BTemplate template1 = BTemplate.resolve(
+        StringTemplate template1 = StringTemplate.resolve(
             "This is a {name}, that is a {}", "{", "}");
         //This is a Dog, that is a Cat
         logger.log(template1.process(args));
-        BTemplate template2 = BTemplate.resolve(
+        StringTemplate template2 = StringTemplate.resolve(
             "This is a } {name}, that is a {}}", "{", "}");
         //This is a } Dog, that is a Cat}
         logger.log(template2.process(args));
-        BTemplate template3 = BTemplate.resolve(
+        StringTemplate template3 = StringTemplate.resolve(
             "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
         //This is a } {DogX (Dog), that is a Bird\{\
         logger.log(template3.process(args));
@@ -109,7 +109,7 @@ public class LangSample {
 
     @Test
     public void testLazy() {
-        BLazyGetter<String> lazy = BLazyGetter.of(() -> UUID.randomUUID().toString());
+        LazyGet<String> lazy = LazyGet.of(() -> UUID.randomUUID().toString());
         String value1 = lazy.get();
         String value2 = lazy.get();
         lazy.refresh();
@@ -124,7 +124,7 @@ public class LangSample {
     @Test
     public void testLazyString() {
         Counter counter = Counter.startsAt(0);
-        BLazyGetterCharSeq<Integer> lazyToString = BLazyGetterCharSeq.of(BLazyGetter.of(counter::getAndIncrementInt));
+        BLazyGetterCharSeq<Integer> lazyToString = BLazyGetterCharSeq.of(LazyGet.of(counter::getAndIncrementInt));
         //0
         logger.log("lazyToString: {}", lazyToString);
     }
@@ -217,7 +217,7 @@ public class LangSample {
             logger.log("random[10, 20): {}", Randoms.between(10, 20));
         }
 
-        BRandomer<?> BRandomer = BRandomer.newBuilder()
+        Randomer<?> BRandomer = BRandomer.newBuilder()
             .score(20, "A")
             .score(20, "B")
             .score(60, "C")
@@ -286,7 +286,7 @@ public class LangSample {
     }
 
     private void testProcessing(String... command) {
-        BProcessing processing = BProcessing.newProcessing(command);
+        ProcessWork processing = ProcessWork.newProcessing(command);
         processing.waitForTermination();
         String output = processing.outputString();
         //ECHO_CONTENT
@@ -368,7 +368,7 @@ public class LangSample {
         }
     }
 
-    public static class TestBAccessor implements BAccessor<String> {
+    public static class TestBAccessor implements BAccessRef<String> {
 
         private String value;
 

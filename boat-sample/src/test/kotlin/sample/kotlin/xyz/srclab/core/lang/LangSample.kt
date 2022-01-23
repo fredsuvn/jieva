@@ -176,7 +176,7 @@ class BaseSample {
             logger.log("random[10, 20): {}", randomBetween(10, 20))
         }
 
-        val BRandomer = BRandomer.newBuilder<Any>()
+        val BRandomer = Randomer.newBuilder<Any>()
             .score(20, "A")
             .score(20, "B")
             .score(60, "C")
@@ -325,7 +325,7 @@ class TestObjectAccessor : ObjectAccessor {
     }
 }
 
-class TestBAccessor : BAccessor<String> {
+class TestBAccessor : BAccessRef<String> {
     private var value: String? = null
     override fun getOrNull(): String? {
         return value

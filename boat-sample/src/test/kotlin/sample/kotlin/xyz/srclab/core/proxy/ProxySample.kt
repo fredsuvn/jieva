@@ -1,7 +1,7 @@
 package sample.kotlin.xyz.srclab.core.proxy
 
 import org.testng.annotations.Test
-import xyz.srclab.common.proxy.ProxyClass
+import xyz.srclab.common.proxy.ClassProxy
 import xyz.srclab.common.proxy.ProxyMethod
 import java.lang.reflect.Method
 import java.util.*
@@ -10,7 +10,7 @@ class ProxySample {
 
     @Test
     fun testProxy() {
-        val proxyClass = ProxyClass.newProxyClass(
+        val proxyClass = ClassProxy.newProxyClass(
             Any::class.java,
             listOf(
                 object : ProxyMethod<Any> {

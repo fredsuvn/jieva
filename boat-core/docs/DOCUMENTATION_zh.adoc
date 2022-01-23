@@ -18,7 +18,7 @@ Boat core link:../../README.md[Boat] 的核心接口, 方法和工具, 包括:
 * <<Run>>: 关于运行线程的包, 提供 `Runner` 接口和实现;
 * <<Bus>>: Bus包, 提供 `EventBus` 接口;
 * <<Invoke>>: 提供 `Invoker` 接口和实现;
-* <<Proxy>>: 提供 `ProxyClass` 来进行动态代理, 反射, `spring-core` 或 `cglib` 方式;
+* <<Proxy>>: 提供 `ClassProxy` 来进行动态代理, 反射, `spring-core` 或 `cglib` 方式;
 * <<State>>: 提供 `State` 接口来代表一个状态;
 * <<Exception>>: 关于异常的包;
 * <<Collect>>: 集合扩展包, 支持 `链式操作`, `多值Map`, 大量集合工具类等;
@@ -36,9 +36,9 @@ Lang包提供一系列核心接口和组件:
 
 * 全局系统对象: `Current`, `Defaults`, `Environment`;
 * 语法增强 (主要针对Java): `Let`, `Ref`, `Lazy`, `BLazyGetterCharSeq`;
-* 字符串功能: `BFormat`, `BTemplate`, `BNamingCase`;
+* 字符串功能: `StringFormat`, `StringTemplate`, `BNamingCase`;
 * 特殊字符支持: `BCtlChars`, `BEscChars`, `BCsiChars`, `BSgrChars`;
-* 访问接口: `ObjectAccessor`, `MapAccessor`, `BAccessor`, `BMapAccessor`;
+* 访问接口: `ObjectAccessor`, `MapAccessor`, `BAccessRef`, `BMapAccessor`;
 * 辅助对象: SpecParser, CachingProductBuilder, Processing;
 * 公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.
 
@@ -85,7 +85,7 @@ Convert包提供大量的类型转换功能:
 
 * `Converts`: 类型转换工具类;
 * `Converter`: 类型转换的核心接口, `Converts` 使用它的默认实现;
-* `BConvertHandler`: `Converter` 用来转换的处理器;
+* `ConvertHandler`: `Converter` 用来转换的处理器;
 * `FastConverter`: 一种快速转换器;
 
 .Java Examples
@@ -127,9 +127,9 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/cache/C
 Run包是关于运行线程的包, 提供 `Runner` 接口和实现:
 
 * `Runner`: 用来运行线程的核心接口;
-* `Running`: 代表一个运行中的实体;
+* `RunWork`: 代表一个运行中的实体;
 * `Scheduler`: 用来执行调度的核心接口;
-* `Scheduling`: 代表一个执行中的调度;
+* `ScheduleWork`: 代表一个执行中的调度;
 
 .Java Examples
 [source,java]
@@ -181,11 +181,11 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/invoke/
 
 === Proxy
 
-Proxy包提供 `ProxyClass` 用带进行动态代理, 使用 `反射`, `spring-core` 或 `cglib` 方法:
+Proxy包提供 `ClassProxy` 用带进行动态代理, 使用 `反射`, `spring-core` 或 `cglib` 方法:
 
-* `ProxyClass`: 代理目标 `Class` 的核心接口;
+* `ClassProxy`: 代理目标 `Class` 的核心接口;
 * `ProxyMethod`: 代理的方法体;
-* `ProxyClassGenerator`: 创建 `ProxyClass` 的工厂, 内置 `Reflection`, `spring-core` 和 `cglib` 实现;
+* `ClassProxyFactory`: 创建 `ClassProxy` 的工厂, 内置 `Reflection`, `spring-core` 和 `cglib` 实现;
 
 .Java Examples
 [source,java]
@@ -244,8 +244,8 @@ include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/core/excepti
 
 * `Collects`: 集合工具类;
 * `Collecting`, `Mapping`: 提供链式操作的集合接口, 并且集成了常见集合的功能 (如 `Iterable`, `Collection`, `Set`, `List`);
-* `BCollectType`, `BMapType`: 代表集合泛型类型;
-* `BMultiMaps.kt`: `BMultiMaps.kt` 提供多值 `Map` 如 `BSetMap`, `MutableSetMap`, `BListMap` 何 `MutableListMap`;
+* `IterableType`, `MapType`: 代表集合泛型类型;
+* `MultiMaps.kt`: `MultiMaps.kt` 提供多值 `Map` 如 `MutableSetMap`, `MutableSetMap`, `MutableListMap` 何 `MutableListMap`;
 * `BCopyOnWriteMap`: 实现copy-on-write操作的Map;
 
 .Java Examples

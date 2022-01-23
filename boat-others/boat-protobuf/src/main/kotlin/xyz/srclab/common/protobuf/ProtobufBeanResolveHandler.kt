@@ -6,7 +6,7 @@ import com.google.protobuf.MessageOrBuilder
 import xyz.srclab.common.bean.AbstractBeanResolveHandler
 import xyz.srclab.common.bean.BeanResolveHandler
 import xyz.srclab.common.bean.BeanResolveContext
-import xyz.srclab.common.invoke.Invoker.Companion.toInvoker
+import xyz.srclab.common.func.Invoker.Companion.toInvoker
 import xyz.srclab.common.lang.Next
 import xyz.srclab.common.lang.asAny
 import xyz.srclab.common.reflect.method

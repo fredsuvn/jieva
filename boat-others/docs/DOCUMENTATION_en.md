@@ -1,7 +1,7 @@
 # <span class="image">![Boat Others](../../logo.svg)</span> Boat Others — Third Party Supporting and Extension Libs for [Boat](../../README.md)
 
-<span id="author" class="author">Sun Qian</span>  
-<span id="email" class="email"><fredsuvn@163.com></span>  
+<span id="author" class="author">Sun Qian</span>
+<span id="email" class="email"><fredsuvn@163.com></span>
 
 Table of Contents
 
@@ -34,10 +34,10 @@ processors for protobuf type object:
     types, extends from `Converter` (boat-core);
 
 -   ProtobufJsons.PROTOBUF\_OBJECT\_MAPPER: `Jackson`'s `ObjectMapper`
-    (boat-serialize) supports protobuf types;
+    (boat-data) supports protobuf types;
 
 -   ProtobufJsons.PROTOBUF\_JSON\_SERIALIZER: `JsonSerializer`
-    (boat-serialize) supports protobuf types.
+    (boat-data) supports protobuf types.
 
 <table>
 <colgroup>
@@ -70,7 +70,7 @@ Java Examples
     import xyz.srclab.common.protobuf.ProtobufBeans;
     import xyz.srclab.common.protobuf.ProtobufConverts;
     import xyz.srclab.common.protobuf.ProtobufJsons;
-    import xyz.srclab.common.serialize.json.JsonSerials;
+    import xyz.srclab.common.data.json.JsonSerials;
     import xyz.srclab.common.test.TestLogger;
 
     import java.util.*;
@@ -275,7 +275,7 @@ Kotlin Examples
     import xyz.srclab.common.protobuf.PROTOBUF_BEAN_RESOLVER
     import xyz.srclab.common.protobuf.PROTOBUF_CONVERTER
     import xyz.srclab.common.protobuf.PROTOBUF_JSON_SERIALIZER
-    import xyz.srclab.common.serialize.json.toJsonString
+    import xyz.srclab.common.data.json.toJsonString
     import xyz.srclab.common.test.TestLogger
 
     class ProtobufSample {

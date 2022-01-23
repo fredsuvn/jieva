@@ -3,7 +3,7 @@
 package xyz.srclab.common.protobuf
 
 import xyz.srclab.common.convert.BeanConvertHandler
-import xyz.srclab.common.convert.BConvertHandler
+import xyz.srclab.common.convert.ConvertHandler
 import xyz.srclab.common.convert.Converter
 
 /**
@@ -13,7 +13,7 @@ import xyz.srclab.common.convert.Converter
  */
 @JvmField
 val PROTOBUF_CONVERTER: Converter = Converter.newConverter(
-    BConvertHandler.defaultsWithBeanConvertHandler(
+    ConvertHandler.defaultsWithBeanConvertHandler(
         BeanConvertHandler(ProtobufBeanGenerator, PROTOBUF_BEAN_RESOLVER)
     )
 )

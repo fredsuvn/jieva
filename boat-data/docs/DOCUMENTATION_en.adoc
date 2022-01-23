@@ -1,0 +1,120 @@
+= image:../../logo.svg[Boat Serialize] `boat-data`: Boat Serialize -- Serialize and Deserialize Lib of link:../../README.md[Boat]
+:toc:
+:toclevels: 3
+:last-update-label!:
+Sun Qian <fredsuvn@163.com>
+:encoding: UTF-8
+:emaill: fredsuvn@163.com
+
+== Introduction
+
+Boat Serialize provides Unified interfaces (`Serializer`, `Serial`) to support serialize and deserialize operations.
+
+Now format it supports are:
+
+* <<JSON>>
+
+== Usage
+
+=== JSON
+
+Json package provides JSON format implementation of `Serial`: `Json`.
+
+To get a `Json`, we can use core utilities of boat-data: `JsonSerials`.
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        Json json = JsonSerials.toJson("{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}");
+        Map<String, String> map = json.toObject(new TypeRef<Map<String, String>>() {
+        });
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val json = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}".toJson()
+        val map: Map<String, String> = json.toObject(object : TypeRef<Map<String, String>>() {})
+    }
+}
+----
+
+`JsonSerials` uses default `JsonSerializer` -- the core interface for `Serializer` with `JSON`, to implement its methods.
+We can also use `JsonSerializer` directly:
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        JsonSerializer serializer = JsonSerializer.DEFAULT;
+        String mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}";
+        Map<String, String> map = serializer.toJson(mapJson).toObject(new TypeRef<Map<String, String>>() {
+        });
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val serializer = JsonSerializer.DEFAULT
+        val mapJson = "{\"p1\":\"p1 value\",\"p2\":\"p2 value\"}"
+        val map: Map<String, String> =
+            serializer.toJson(mapJson).toObject(object : TypeRef<Map<String, String>>() {})
+    }
+}
+----
+
+By default, json-serialize is implemented by `Jackson`:
+
+* `JacksonJsonSerializer`: `Jackson` implementation for `JsonSerializer`;
+* `Jacksons`: `Jackson` json utilities;
+
+.Java Examples
+[source,java]
+----
+class Example{
+    @Test
+    public void test() {
+        JsonSerializer serializer = Jacksons.newJsonSerializer(new ObjectMapper());
+    }
+}
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+class Example {
+    @Test
+    fun test() {
+        val serializer: JsonSerializer = ObjectMapper().toJsonSerializer()
+    }
+}
+----
+
+== Samples
+
+.Java Examples
+[source,java]
+----
+include::../../boat-sample/src/test/java/sample/java/xyz/srclab/serialize/SerializeSample.java[]
+----
+
+.Kotlin Examples
+[source,kotlin]
+----
+include::../../boat-sample/src/test/kotlin/sample/kotlin/xyz/srclab/serialize/SerializeSample.kt[]
+----

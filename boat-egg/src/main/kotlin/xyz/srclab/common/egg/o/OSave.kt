@@ -1,7 +1,7 @@
 package xyz.srclab.common.egg.o
 
-import xyz.srclab.common.serialize.json.toJson
-import xyz.srclab.common.serialize.json.toJsonBytes
+import xyz.srclab.common.data.json.toJson
+import xyz.srclab.common.data.json.toJsonBytes
 
 open class OSave {
 

@@ -29,7 +29,7 @@ internal object OLogger {
 
     fun debug(pattern: String, vararg args: Any?) {
         if (OConfig.isDebug) {
-            println("${Current.timestamp}-debug: " + pattern.fastFormat(*args))
+            println("${Current.timestamp}-xyz.srclab.common.base.debug: " + pattern.fastFormat(*args))
         }
     }
 

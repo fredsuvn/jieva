@@ -2,7 +2,6 @@ package sample.kotlin.xyz.srclab.core.bus
 
 import org.testng.annotations.Test
 import xyz.srclab.common.bus.EventBus
-import xyz.srclab.common.bus.SubscribeMethod
 import xyz.srclab.common.lang.Next
 
 class EventBusSample {
