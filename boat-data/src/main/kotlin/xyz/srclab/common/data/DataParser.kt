@@ -34,7 +34,7 @@ interface DataParser<T : DataNode> {
     fun parse(chars: CharSequence): T
 
     fun parse(bytes: ByteArray): T {
-        return parse(bytes, 0, bytes.size)
+        return parse(bytes, 0)
     }
 
     fun parse(bytes: ByteArray, offset: Int): T {
