@@ -14,8 +14,8 @@ import javax.crypto.SecretKey
  * @see EncCodec
  * @see DigestCodec
  * @see HmacCodec
- * @see CryptCodec
- * @see AsymmetricCryptCodec
+ * @see CipherCodec
+ * @see AsymmetricCipherCodec
  */
 abstract class Codecing(
     protected open var data: ByteArray
@@ -79,7 +79,7 @@ abstract class Codecing(
     open fun encrypt(algorithm: CodecAlgorithm, key: Any): Codecing {
         val codec = getCodec(algorithm)
         data = when (codec) {
-            is CryptCodec -> codec.encrypt(key, data)
+            is CipherCodec -> codec.encrypt(key, data)
             else -> throw UnsupportedOperationException("Unsupported cipher encrypt: $algorithm")
         }
         return this
@@ -92,7 +92,7 @@ abstract class Codecing(
     open fun decrypt(algorithm: CodecAlgorithm, key: Any): Codecing {
         val codec = getCodec(algorithm)
         data = when (codec) {
-            is CryptCodec -> codec.decrypt(key, data)
+            is CipherCodec -> codec.decrypt(key, data)
             else -> throw UnsupportedOperationException("Unsupported cipher decrypt: $algorithm")
         }
         return this

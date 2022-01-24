@@ -79,7 +79,7 @@ public class CodecTest {
     public void testAes() {
         String key = "a";
         SecretKey secretKey = AesKeys.newKey(key);
-        CryptCodec aesCodec = Codec.aesCodec();
+        CipherCodec aesCodec = Codec.aesCodec();
         String data = random(512);
         byte[] dataBytes = Chars.toBytes(data);
         byte[] encrypt = aesCodec.encrypt(secretKey, dataBytes);

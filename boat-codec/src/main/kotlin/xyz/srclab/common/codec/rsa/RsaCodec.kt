@@ -1,6 +1,6 @@
 package xyz.srclab.common.codec.rsa
 
-import xyz.srclab.common.codec.AsymmetricCryptCodec
+import xyz.srclab.common.codec.AsymmetricCipherCodec
 import xyz.srclab.common.codec.CodecAlgorithm
 import xyz.srclab.common.lang.toBytes
 import java.io.ByteArrayOutputStream
@@ -21,7 +21,7 @@ import javax.crypto.Cipher
 class RsaCodec(
     private val encryptBlockSize: Int = DEFAULT_ENCRYPT_BLOCK,
     private val decryptBlockSize: Int = DEFAULT_DECRYPT_BLOCK
-) : AsymmetricCryptCodec<RSAPublicKey, RSAPrivateKey> {
+) : AsymmetricCipherCodec<RSAPublicKey, RSAPrivateKey> {
 
     override val algorithm = CodecAlgorithm.RSA_NAME
 

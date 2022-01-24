@@ -18,7 +18,7 @@ import javax.crypto.spec.SecretKeySpec
  * @see EncCodec
  * @see DigestCodec
  * @see HmacCodec
- * @see CryptCodec
+ * @see CipherCodec
  * @see CodecAlgorithm
  */
 interface Codec {
@@ -166,25 +166,25 @@ interface Codec {
         @JvmName("macCodec")
         @JvmStatic
         fun CharSequence.toMacCodec(): HmacCodec {
-            return HmacCodec.withAlgorithm(this)
+            return HmacCodec.forAlgorithm(this)
         }
 
         @JvmName("macCodec")
         @JvmStatic
         fun CodecAlgorithm.toMacCodec(): HmacCodec {
-            return HmacCodec.withAlgorithm(this.name)
+            return HmacCodec.forAlgorithm(this.name)
         }
 
         @JvmName("cipherCodec")
         @JvmStatic
-        fun CharSequence.toCipherCodec(): CryptCodec {
-            return CryptCodec.withAlgorithm(this)
+        fun CharSequence.toCipherCodec(): CipherCodec {
+            return CipherCodec.withAlgorithm(this)
         }
 
         @JvmName("cipherCodec")
         @JvmStatic
-        fun CodecAlgorithm.toCipherCodec(): CryptCodec {
-            return CryptCodec.withAlgorithm(this.name)
+        fun CodecAlgorithm.toCipherCodec(): CipherCodec {
+            return CipherCodec.withAlgorithm(this.name)
         }
 
         @JvmStatic
@@ -258,13 +258,13 @@ interface Codec {
         }
 
         @JvmStatic
-        fun aesCodec(): CryptCodec {
-            return CryptCodec.aes()
+        fun aesCodec(): CipherCodec {
+            return CipherCodec.aes()
         }
 
         @JvmStatic
         fun rsaCodec(): RsaCodec {
-            return CryptCodec.rsa()
+            return CipherCodec.rsa()
         }
 
         @JvmStatic
@@ -272,13 +272,13 @@ interface Codec {
             encryptBlockSize: Int,
             decryptBlockSize: Int
         ): RsaCodec {
-            return CryptCodec.rsa(encryptBlockSize, decryptBlockSize)
+            return CipherCodec.rsa(encryptBlockSize, decryptBlockSize)
         }
 
         @JvmOverloads
         @JvmStatic
         fun sm2Codec(sm2Params: Sm2Params = Sm2Params.DEFAULT): Sm2Codec {
-            return CryptCodec.sm2(sm2Params)
+            return CipherCodec.sm2(sm2Params)
         }
 
         @JvmName("hexString")

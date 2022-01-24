@@ -3,7 +3,7 @@ package xyz.srclab.common.codec
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.base.toKotlinFun
-import xyz.srclab.common.io.toBytes
+import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -15,6 +15,8 @@ import java.util.function.Supplier
  */
 interface DigestCodec : Codec {
 
+    val digest: MessageDigest
+
     fun digest(data: ByteArray): ByteArray {
         return digest(data, 0)
     }
@@ -23,8 +25,12 @@ interface DigestCodec : Codec {
         return digest(data, offset, remainingLength(data.size, offset))
     }
 
-    fun digest(data: ByteArray, offset: Int, length: Int): ByteArray
-
+    fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
+        val digest = this.digest
+        digest.reset()
+        digest.update(data, offset, length)
+        return digest.digest()
+    }
 
     fun digest(data: ByteArray, output: OutputStream): Long {
         return digest(data, 0, output)
@@ -41,7 +47,10 @@ interface DigestCodec : Codec {
     }
 
     fun digest(data: ByteBuffer): ByteBuffer {
-        return ByteBuffer.wrap(digest(data.toBytes(true)))
+        val digest = this.digest
+        digest.reset()
+        digest.update(data)
+        return ByteBuffer.wrap(digest.digest())
     }
 
     fun digest(data: InputStream): ByteArray {
@@ -83,43 +92,31 @@ interface DigestCodec : Codec {
             if (algorithm === null) {
                 throw IllegalStateException("algorithm was not specified.")
             }
-            val digesterSupplier = this.digestSupplier
-            if (digesterSupplier === null) {
+            val digestSupplier = this.digestSupplier
+            if (digestSupplier === null) {
                 throw IllegalStateException("digesterSupplier was not specified.")
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
-                return ThreadLocalDigestCodec(algorithm, digesterSupplier.toKotlinFun())
+                return ThreadLocalDigestCodec(algorithm, digestSupplier.toKotlinFun())
             }
-            val digester = DigestCodecImpl(algorithm, digesterSupplier.get())
+            val digestCodec = DigestCodecImpl(algorithm, digestSupplier.get())
             if (threadSafePolicy == ThreadSafePolicy.SYNCHRONIZED) {
-                return SynchronizedDigestCodec(digester)
+                return SynchronizedDigestCodec(digestCodec)
             }
-            return digester
+            return digestCodec
         }
 
         private class DigestCodecImpl(
             override val algorithm: CodecAlgorithm,
-            private val digest: MessageDigest
-        ) : DigestCodec {
-
-            override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
-                digest.reset()
-                digest.update(data, offset, length)
-                return digest.digest()
-            }
-
-            override fun digest(data: ByteBuffer): ByteBuffer {
-                digest.reset()
-                digest.update(data)
-                return ByteBuffer.wrap(digest.digest())
-            }
-        }
+            override val digest: MessageDigest
+        ) : DigestCodec
 
         private class SynchronizedDigestCodec(
             private val digestCodec: DigestCodec
         ) : DigestCodec {
 
             override val algorithm: CodecAlgorithm = digestCodec.algorithm
+            override val digest: MessageDigest = digestCodec.digest
 
             @Synchronized
             override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
@@ -136,22 +133,9 @@ interface DigestCodec : Codec {
             override val algorithm: CodecAlgorithm,
             digest: () -> MessageDigest
         ) : DigestCodec {
-
             private val threadLocal: ThreadLocal<MessageDigest> = ThreadLocal.withInitial(digest)
-
-            override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
-                val digest = threadLocal.get()
-                digest.reset()
-                digest.update(data, offset, length)
-                return digest.digest()
-            }
-
-            override fun digest(data: ByteBuffer): ByteBuffer {
-                val digest = threadLocal.get()
-                digest.reset()
-                digest.update(data)
-                return ByteBuffer.wrap(digest.digest())
-            }
+            override val digest: MessageDigest
+                get() = threadLocal.get()
         }
     }
 
@@ -196,8 +180,15 @@ interface DigestCodec : Codec {
         fun withAlgorithm(
             algorithm: CharSequence
         ): DigestCodec {
+            return forAlgorithm(algorithm.toCodecAlgorithm())
+        }
+
+        @JvmStatic
+        fun forAlgorithm(
+            algorithm: CodecAlgorithm
+        ): DigestCodec {
             return newBuilder()
-                .algorithm(CodecAlgorithm.forName(algorithm))
+                .algorithm(algorithm)
                 .digestSupplier { MessageDigest.getInstance(algorithm.toString()) }
                 .build()
         }

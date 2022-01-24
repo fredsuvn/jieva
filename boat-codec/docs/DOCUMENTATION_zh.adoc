@@ -49,7 +49,7 @@ Boat Codec 有四种编码器:
 * `EncCodec`: 普通编码器如 HEX, BASE64;
 * `DigestCodec`: 摘要算法编码器如 MD5;
 * `HmacCodec`: 加密摘要编码器如 HmacMD5;
-* `CryptCodec`: 加密算法编码器如 `AES`, `RSA`, `SM2`;
+* `CipherCodec`: 加密算法编码器如 `AES`, `RSA`, `SM2`;
 
 有两种编码风格: `静态调用风格` 或者 `链式调用风格`
 

@@ -5,7 +5,7 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.jetbrains.annotations.NotNull;
 import xyz.srclab.annotations.Nullable;
-import xyz.srclab.common.codec.AsymmetricCryptCodec;
+import xyz.srclab.common.codec.AsymmetricCipherCodec;
 import xyz.srclab.common.codec.CodecAlgorithm;
 import xyz.srclab.common.lang.Defaults;
 
@@ -20,7 +20,7 @@ import java.util.Arrays;
  *
  * @author sunqian
  */
-public class Sm2Codec implements AsymmetricCryptCodec<ECPoint, BigInteger> {
+public class Sm2Codec implements AsymmetricCipherCodec<ECPoint, BigInteger> {
 
     private static final int DIGEST_LENGTH = 32;
 

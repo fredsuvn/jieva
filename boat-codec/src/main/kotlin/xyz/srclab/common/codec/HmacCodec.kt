@@ -3,7 +3,7 @@ package xyz.srclab.common.codec
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.base.toKotlinFun
-import xyz.srclab.common.io.toBytes
+import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -12,11 +12,11 @@ import java.util.function.Supplier
 import javax.crypto.Mac
 
 /**
- * MAC digest codec such as `HmacMD5`.
- *
- * @author sunqian
+ * HMAC codec such as `HmacMD5`.
  */
 interface HmacCodec : Codec {
+
+    val hmac: Mac
 
     fun digest(key: Key, data: ByteArray): ByteArray {
         return digest(key, data, 0)
@@ -26,8 +26,13 @@ interface HmacCodec : Codec {
         return digest(key, data, offset, remainingLength(data.size, offset))
     }
 
-    fun digest(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray
-
+    fun digest(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
+        val hmac = this.hmac
+        hmac.reset()
+        hmac.init(key)
+        hmac.update(data, offset, length)
+        return hmac.doFinal()
+    }
 
     fun digest(key: Key, data: ByteArray, output: OutputStream): Long {
         return digest(key, data, 0, output)
@@ -44,7 +49,11 @@ interface HmacCodec : Codec {
     }
 
     fun digest(key: Key, data: ByteBuffer): ByteBuffer {
-        return ByteBuffer.wrap(digest(key, data.toBytes(true)))
+        val hmac = this.hmac
+        hmac.reset()
+        hmac.init(key)
+        hmac.update(data)
+        return ByteBuffer.wrap(hmac.doFinal())
     }
 
     fun digest(key: Key, data: InputStream): ByteArray {
@@ -91,38 +100,24 @@ interface HmacCodec : Codec {
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
                 return ThreadLocalHmacCodec(algorithm, hmacSupplier.toKotlinFun())
             }
-            val digester = HmacCodecImpl(algorithm, hmacSupplier.get())
+            val hmacCodec = HmacCodecImpl(algorithm, hmacSupplier.get())
             if (threadSafePolicy == ThreadSafePolicy.SYNCHRONIZED) {
-                return SynchronizedHmacCodec(digester)
+                return SynchronizedHmacCodec(hmacCodec)
             }
-            return digester
+            return hmacCodec
         }
 
         private class HmacCodecImpl(
             override val algorithm: CodecAlgorithm,
-            private val hmac: Mac
-        ) : HmacCodec {
-
-            override fun digest(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
-                hmac.reset()
-                hmac.init(key)
-                hmac.update(data, offset, length)
-                return hmac.doFinal()
-            }
-
-            override fun digest(key: Key, data: ByteBuffer): ByteBuffer {
-                hmac.reset()
-                hmac.init(key)
-                hmac.update(data)
-                return ByteBuffer.wrap(hmac.doFinal())
-            }
-        }
+            override val hmac: Mac
+        ) : HmacCodec
 
         private class SynchronizedHmacCodec(
             private val hmacCodec: HmacCodec
         ) : HmacCodec {
 
             override val algorithm: CodecAlgorithm = hmacCodec.algorithm
+            override val hmac: Mac = hmacCodec.hmac
 
             @Synchronized
             override fun digest(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
@@ -139,24 +134,9 @@ interface HmacCodec : Codec {
             override val algorithm: CodecAlgorithm,
             hmac: () -> Mac
         ) : HmacCodec {
-
             private val threadLocal: ThreadLocal<Mac> = ThreadLocal.withInitial(hmac)
-
-            override fun digest(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
-                val hmac = threadLocal.get()
-                hmac.reset()
-                hmac.init(key)
-                hmac.update(data, offset, length)
-                return hmac.doFinal()
-            }
-
-            override fun digest(key: Key, data: ByteBuffer): ByteBuffer {
-                val hmac = threadLocal.get()
-                hmac.reset()
-                hmac.init(key)
-                hmac.update(data)
-                return ByteBuffer.wrap(hmac.doFinal())
-            }
+            override val hmac: Mac
+                get() = threadLocal.get()
         }
     }
 
@@ -169,35 +149,42 @@ interface HmacCodec : Codec {
 
         @JvmStatic
         fun hmacMd5(): HmacCodec {
-            return withAlgorithm(CodecAlgorithm.HMAC_MD5_NAME)
+            return forAlgorithm(CodecAlgorithm.HMAC_MD5)
         }
 
         @JvmStatic
         fun hmacSha1(): HmacCodec {
-            return withAlgorithm(CodecAlgorithm.HMAC_SHA1_NAME)
+            return forAlgorithm(CodecAlgorithm.HMAC_SHA1)
         }
 
         @JvmStatic
         fun hmacSha256(): HmacCodec {
-            return withAlgorithm(CodecAlgorithm.HMAC_SHA256_NAME)
+            return forAlgorithm(CodecAlgorithm.HMAC_SHA256)
         }
 
         @JvmStatic
         fun hmacSha384(): HmacCodec {
-            return withAlgorithm(CodecAlgorithm.HMAC_SHA384_NAME)
+            return forAlgorithm(CodecAlgorithm.HMAC_SHA384)
         }
 
         @JvmStatic
         fun hmacSha512(): HmacCodec {
-            return withAlgorithm(CodecAlgorithm.HMAC_SHA512_NAME)
+            return forAlgorithm(CodecAlgorithm.HMAC_SHA512)
         }
 
         @JvmStatic
-        fun withAlgorithm(
+        fun forAlgorithm(
             algorithm: CharSequence
         ): HmacCodec {
+            return forAlgorithm(algorithm.toCodecAlgorithm())
+        }
+
+        @JvmStatic
+        fun forAlgorithm(
+            algorithm: CodecAlgorithm
+        ): HmacCodec {
             return newBuilder()
-                .algorithm(CodecAlgorithm.forName(algorithm))
+                .algorithm(algorithm)
                 .hmacSupplier { Mac.getInstance(algorithm.toString()) }
                 .build()
         }

@@ -48,7 +48,7 @@ Boat Codec has 4 type of codec processor:
 * `EncCodec`: Encode code such as HEX, BASE64;
 * `DigestCodec`: Digest codec such as MD5;
 * `HmacCodec`: MAC codec such as HmacMD5;
-* `CryptCodec`: Cipher codec such as `AES`, `RSA`, `SM2`;
+* `CipherCodec`: Cipher codec such as `AES`, `RSA`, `SM2`;
 
 There are two styles to do codec operation: `Static` or `Chain`
 

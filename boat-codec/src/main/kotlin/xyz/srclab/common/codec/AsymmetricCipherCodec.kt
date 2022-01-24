@@ -9,7 +9,7 @@ import xyz.srclab.common.codec.sm2.Sm2Codec
  * @see RsaCodec
  * @see Sm2Codec
  */
-interface AsymmetricCryptCodec<PUB, PRI> : CryptCodec {
+interface AsymmetricCipherCodec<PUB, PRI> : CipherCodec {
 
     fun newKeyPair(): CodecKeyPair<PUB, PRI>
 
