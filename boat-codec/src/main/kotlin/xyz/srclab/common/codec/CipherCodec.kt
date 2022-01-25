@@ -128,6 +128,7 @@ interface CipherCodec : Codec {
 
         private var algorithm: CodecAlgorithm? = null
         private var cipherSupplier: Supplier<Cipher>? = null
+        private var codecSupplier: Supplier<CipherCodec>? = null
         private var threadSafePolicy: ThreadSafePolicy = ThreadSafePolicy.SYNCHRONIZED
 
         open fun algorithm(algorithm: CodecAlgorithm) = apply {
@@ -136,6 +137,10 @@ interface CipherCodec : Codec {
 
         open fun cipherSupplier(cipherSupplier: Supplier<Cipher>) = apply {
             this.cipherSupplier = cipherSupplier
+        }
+
+        open fun codecSupplier(codecSupplier: Supplier<CipherCodec>) = apply {
+            this.codecSupplier = codecSupplier
         }
 
         /**
@@ -150,26 +155,27 @@ interface CipherCodec : Codec {
             if (algorithm === null) {
                 throw IllegalStateException("algorithm was not specified.")
             }
-            val cipherSupplier = this.cipherSupplier
-            if (cipherSupplier === null) {
-                throw IllegalStateException("digesterSupplier was not specified.")
+            val codecSupplier = run {
+                val c = this.codecSupplier
+                if (c === null) {
+                    val supplier = this.cipherSupplier
+                    if (supplier === null) {
+                        throw IllegalStateException("digesterSupplier was not specified.")
+                    }
+                    return@run Supplier { simpleImpl(algorithm, supplier.get()) }
+                }
+                c
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
                 return ThreadLocalCipherCodec(algorithm) {
-                    CipherCodecImpl(algorithm, cipherSupplier.get())
+                    codecSupplier.get()
                 }
             }
-            val cipherCodec = CipherCodecImpl(algorithm, cipherSupplier.get())
             if (threadSafePolicy == ThreadSafePolicy.SYNCHRONIZED) {
-                return SynchronizedCipherCodec(cipherCodec)
+                return SynchronizedCipherCodec(codecSupplier.get())
             }
-            return cipherCodec
+            return codecSupplier.get()
         }
-
-        private class CipherCodecImpl(
-            override val algorithm: CodecAlgorithm,
-            override val cipher: Cipher
-        ) : CipherCodec
 
         private class SynchronizedCipherCodec(
             private val cipherCodec: CipherCodec
@@ -178,9 +184,43 @@ interface CipherCodec : Codec {
             override val algorithm: CodecAlgorithm = cipherCodec.algorithm
             override val cipher: Cipher = cipherCodec.cipher
 
+            @get:Synchronized
+            override val blockSize: Int
+                get() = cipherCodec.blockSize
+
+            @Synchronized
+            override fun getOutputSize(inputSize: Int): Int {
+                return cipherCodec.getOutputSize(inputSize)
+            }
+
+            @Synchronized
+            override fun encrypt(key: Key, data: ByteArray): ByteArray {
+                return cipherCodec.encrypt(key, data)
+            }
+
+            @Synchronized
+            override fun encrypt(key: Key, data: ByteArray, offset: Int): ByteArray {
+                return cipherCodec.encrypt(key, data, offset)
+            }
+
             @Synchronized
             override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
                 return cipherCodec.encrypt(key, data, offset, length)
+            }
+
+            @Synchronized
+            override fun encrypt(key: Key, data: ByteArray, output: OutputStream): Long {
+                return cipherCodec.encrypt(key, data, output)
+            }
+
+            @Synchronized
+            override fun encrypt(key: Key, data: ByteArray, offset: Int, output: OutputStream): Long {
+                return cipherCodec.encrypt(key, data, offset, output)
+            }
+
+            @Synchronized
+            override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
+                return cipherCodec.encrypt(key, data, offset, length, output)
             }
 
             @Synchronized
@@ -189,13 +229,58 @@ interface CipherCodec : Codec {
             }
 
             @Synchronized
+            override fun encrypt(key: Key, data: InputStream): ByteArray {
+                return cipherCodec.encrypt(key, data)
+            }
+
+            @Synchronized
+            override fun encrypt(key: Key, data: InputStream, output: OutputStream): Long {
+                return cipherCodec.encrypt(key, data, output)
+            }
+
+            @Synchronized
+            override fun decrypt(key: Key, data: ByteArray): ByteArray {
+                return cipherCodec.decrypt(key, data)
+            }
+
+            @Synchronized
+            override fun decrypt(key: Key, data: ByteArray, offset: Int): ByteArray {
+                return cipherCodec.decrypt(key, data, offset)
+            }
+
+            @Synchronized
             override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
                 return cipherCodec.decrypt(key, data, offset, length)
             }
 
             @Synchronized
+            override fun decrypt(key: Key, data: ByteArray, output: OutputStream): Long {
+                return cipherCodec.decrypt(key, data, output)
+            }
+
+            @Synchronized
+            override fun decrypt(key: Key, data: ByteArray, offset: Int, output: OutputStream): Long {
+                return cipherCodec.decrypt(key, data, offset, output)
+            }
+
+            @Synchronized
+            override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
+                return cipherCodec.decrypt(key, data, offset, length, output)
+            }
+
+            @Synchronized
             override fun decrypt(key: Key, data: ByteBuffer): ByteBuffer {
                 return cipherCodec.decrypt(key, data)
+            }
+
+            @Synchronized
+            override fun decrypt(key: Key, data: InputStream): ByteArray {
+                return cipherCodec.decrypt(key, data)
+            }
+
+            @Synchronized
+            override fun decrypt(key: Key, data: InputStream, output: OutputStream): Long {
+                return cipherCodec.decrypt(key, data, output)
             }
         }
 
@@ -206,10 +291,97 @@ interface CipherCodec : Codec {
             private val threadLocal: ThreadLocal<CipherCodec> = ThreadLocal.withInitial(cipher)
             override val cipher: Cipher
                 get() = threadLocal.get().cipher
+
+            override val blockSize: Int
+                get() = threadLocal.get().blockSize
+
+            override fun getOutputSize(inputSize: Int): Int {
+                return threadLocal.get().getOutputSize(inputSize)
+            }
+
+            override fun encrypt(key: Key, data: ByteArray): ByteArray {
+                return threadLocal.get().encrypt(key, data)
+            }
+
+            override fun encrypt(key: Key, data: ByteArray, offset: Int): ByteArray {
+                return threadLocal.get().encrypt(key, data, offset)
+            }
+
+            override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
+                return threadLocal.get().encrypt(key, data, offset, length)
+            }
+
+            override fun encrypt(key: Key, data: ByteArray, output: OutputStream): Long {
+                return threadLocal.get().encrypt(key, data, output)
+            }
+
+            override fun encrypt(key: Key, data: ByteArray, offset: Int, output: OutputStream): Long {
+                return threadLocal.get().encrypt(key, data, offset, output)
+            }
+
+            override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
+                return threadLocal.get().encrypt(key, data, offset, length, output)
+            }
+
+            override fun encrypt(key: Key, data: ByteBuffer): ByteBuffer {
+                return threadLocal.get().encrypt(key, data)
+            }
+
+            override fun encrypt(key: Key, data: InputStream): ByteArray {
+                return threadLocal.get().encrypt(key, data)
+            }
+
+            override fun encrypt(key: Key, data: InputStream, output: OutputStream): Long {
+                return threadLocal.get().encrypt(key, data, output)
+            }
+
+            override fun decrypt(key: Key, data: ByteArray): ByteArray {
+                return threadLocal.get().decrypt(key, data)
+            }
+
+            override fun decrypt(key: Key, data: ByteArray, offset: Int): ByteArray {
+                return threadLocal.get().decrypt(key, data, offset)
+            }
+
+            override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
+                return threadLocal.get().decrypt(key, data, offset, length)
+            }
+
+            override fun decrypt(key: Key, data: ByteArray, output: OutputStream): Long {
+                return threadLocal.get().decrypt(key, data, output)
+            }
+
+            override fun decrypt(key: Key, data: ByteArray, offset: Int, output: OutputStream): Long {
+                return threadLocal.get().decrypt(key, data, offset, output)
+            }
+
+            override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
+                return threadLocal.get().decrypt(key, data, offset, length, output)
+            }
+
+            override fun decrypt(key: Key, data: ByteBuffer): ByteBuffer {
+                return threadLocal.get().decrypt(key, data)
+            }
+
+            override fun decrypt(key: Key, data: InputStream): ByteArray {
+                return threadLocal.get().decrypt(key, data)
+            }
+
+            override fun decrypt(key: Key, data: InputStream, output: OutputStream): Long {
+                return threadLocal.get().decrypt(key, data, output)
+            }
         }
     }
 
     companion object {
+
+        @JvmStatic
+        fun simpleImpl(algorithm: CodecAlgorithm, cipher: Cipher): CipherCodec {
+            return object : CipherCodec {
+                override val cipher: Cipher = cipher
+                override val algorithm: CodecAlgorithm = algorithm
+            }
+        }
 
         @JvmStatic
         fun newBuilder(): Builder {

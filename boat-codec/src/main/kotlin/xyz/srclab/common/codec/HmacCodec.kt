@@ -100,11 +100,11 @@ interface HmacCodec : Codec {
             val codecSupplier = run {
                 val c = this.codecSupplier
                 if (c === null) {
-                    val hmacSupplier = this.hmacSupplier
-                    if (hmacSupplier === null) {
+                    val supplier = this.hmacSupplier
+                    if (supplier === null) {
                         throw IllegalStateException("digesterSupplier was not specified.")
                     }
-                    return@run Supplier { simpleImpl(algorithm, hmacSupplier.get()) }
+                    return@run Supplier { simpleImpl(algorithm, supplier.get()) }
                 }
                 c
             }
@@ -127,13 +127,48 @@ interface HmacCodec : Codec {
             override val hmac: Mac = hmacCodec.hmac
 
             @Synchronized
+            override fun digest(key: Key, data: ByteArray): ByteArray {
+                return hmacCodec.digest(key, data)
+            }
+
+            @Synchronized
+            override fun digest(key: Key, data: ByteArray, offset: Int): ByteArray {
+                return hmacCodec.digest(key, data, offset)
+            }
+
+            @Synchronized
             override fun digest(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
                 return hmacCodec.digest(key, data, offset, length)
             }
 
             @Synchronized
+            override fun digest(key: Key, data: ByteArray, output: OutputStream): Long {
+                return hmacCodec.digest(key, data, output)
+            }
+
+            @Synchronized
+            override fun digest(key: Key, data: ByteArray, offset: Int, output: OutputStream): Long {
+                return hmacCodec.digest(key, data, offset, output)
+            }
+
+            @Synchronized
+            override fun digest(key: Key, data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
+                return hmacCodec.digest(key, data, offset, length, output)
+            }
+
+            @Synchronized
             override fun digest(key: Key, data: ByteBuffer): ByteBuffer {
                 return hmacCodec.digest(key, data)
+            }
+
+            @Synchronized
+            override fun digest(key: Key, data: InputStream): ByteArray {
+                return hmacCodec.digest(key, data)
+            }
+
+            @Synchronized
+            override fun digest(key: Key, data: InputStream, output: OutputStream): Long {
+                return hmacCodec.digest(key, data, output)
             }
         }
 
@@ -144,6 +179,42 @@ interface HmacCodec : Codec {
             private val threadLocal: ThreadLocal<HmacCodec> = ThreadLocal.withInitial(hmac)
             override val hmac: Mac
                 get() = threadLocal.get().hmac
+
+            override fun digest(key: Key, data: ByteArray): ByteArray {
+                return threadLocal.get().digest(key, data)
+            }
+
+            override fun digest(key: Key, data: ByteArray, offset: Int): ByteArray {
+                return threadLocal.get().digest(key, data, offset)
+            }
+
+            override fun digest(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
+                return threadLocal.get().digest(key, data, offset, length)
+            }
+
+            override fun digest(key: Key, data: ByteArray, output: OutputStream): Long {
+                return threadLocal.get().digest(key, data, output)
+            }
+
+            override fun digest(key: Key, data: ByteArray, offset: Int, output: OutputStream): Long {
+                return threadLocal.get().digest(key, data, offset, output)
+            }
+
+            override fun digest(key: Key, data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
+                return threadLocal.get().digest(key, data, offset, length, output)
+            }
+
+            override fun digest(key: Key, data: ByteBuffer): ByteBuffer {
+                return threadLocal.get().digest(key, data)
+            }
+
+            override fun digest(key: Key, data: InputStream): ByteArray {
+                return threadLocal.get().digest(key, data)
+            }
+
+            override fun digest(key: Key, data: InputStream, output: OutputStream): Long {
+                return threadLocal.get().digest(key, data, output)
+            }
         }
     }
 

@@ -67,6 +67,7 @@ interface DigestCodec : Codec {
 
         private var algorithm: CodecAlgorithm? = null
         private var digestSupplier: Supplier<MessageDigest>? = null
+        private var codecSupplier: Supplier<DigestCodec>? = null
         private var threadSafePolicy: ThreadSafePolicy = ThreadSafePolicy.SYNCHRONIZED
 
         open fun algorithm(algorithm: CodecAlgorithm) = apply {
@@ -76,6 +77,10 @@ interface DigestCodec : Codec {
         open fun digestSupplier(digestSupplier: Supplier<MessageDigest>) = apply {
             this.digestSupplier = digestSupplier
             return this
+        }
+
+        open fun codecSupplier(codecSupplier: Supplier<DigestCodec>) = apply {
+            this.codecSupplier = codecSupplier
         }
 
         /**
@@ -91,26 +96,27 @@ interface DigestCodec : Codec {
             if (algorithm === null) {
                 throw IllegalStateException("algorithm was not specified.")
             }
-            val digestSupplier = this.digestSupplier
-            if (digestSupplier === null) {
-                throw IllegalStateException("digesterSupplier was not specified.")
+            val codecSupplier = run {
+                val c = this.codecSupplier
+                if (c === null) {
+                    val supplier = this.digestSupplier
+                    if (supplier === null) {
+                        throw IllegalStateException("digesterSupplier was not specified.")
+                    }
+                    return@run Supplier { simpleImpl(algorithm, supplier.get()) }
+                }
+                c
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
                 return ThreadLocalDigestCodec(algorithm) {
-                    DigestCodecImpl(algorithm, digestSupplier.get())
+                    codecSupplier.get()
                 }
             }
-            val digestCodec = DigestCodecImpl(algorithm, digestSupplier.get())
             if (threadSafePolicy == ThreadSafePolicy.SYNCHRONIZED) {
-                return SynchronizedDigestCodec(digestCodec)
+                return SynchronizedDigestCodec(codecSupplier.get())
             }
-            return digestCodec
+            return codecSupplier.get()
         }
-
-        private class DigestCodecImpl(
-            override val algorithm: CodecAlgorithm,
-            override val digest: MessageDigest
-        ) : DigestCodec
 
         private class SynchronizedDigestCodec(
             private val digestCodec: DigestCodec
@@ -120,13 +126,48 @@ interface DigestCodec : Codec {
             override val digest: MessageDigest = digestCodec.digest
 
             @Synchronized
+            override fun digest(data: ByteArray): ByteArray {
+                return digestCodec.digest(data)
+            }
+
+            @Synchronized
+            override fun digest(data: ByteArray, offset: Int): ByteArray {
+                return digestCodec.digest(data, offset)
+            }
+
+            @Synchronized
             override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
                 return digestCodec.digest(data, offset, length)
             }
 
             @Synchronized
+            override fun digest(data: ByteArray, output: OutputStream): Long {
+                return digestCodec.digest(data, output)
+            }
+
+            @Synchronized
+            override fun digest(data: ByteArray, offset: Int, output: OutputStream): Long {
+                return digestCodec.digest(data, offset, output)
+            }
+
+            @Synchronized
+            override fun digest(data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
+                return digestCodec.digest(data, offset, length, output)
+            }
+
+            @Synchronized
             override fun digest(data: ByteBuffer): ByteBuffer {
                 return digestCodec.digest(data)
+            }
+
+            @Synchronized
+            override fun digest(data: InputStream): ByteArray {
+                return digestCodec.digest(data)
+            }
+
+            @Synchronized
+            override fun digest(data: InputStream, output: OutputStream): Long {
+                return digestCodec.digest(data, output)
             }
         }
 
@@ -137,10 +178,54 @@ interface DigestCodec : Codec {
             private val threadLocal: ThreadLocal<DigestCodec> = ThreadLocal.withInitial(digest)
             override val digest: MessageDigest
                 get() = threadLocal.get().digest
+
+            override fun digest(data: ByteArray): ByteArray {
+                return threadLocal.get().digest(data)
+            }
+
+            override fun digest(data: ByteArray, offset: Int): ByteArray {
+                return threadLocal.get().digest(data, offset)
+            }
+
+            override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
+                return threadLocal.get().digest(data, offset, length)
+            }
+
+            override fun digest(data: ByteArray, output: OutputStream): Long {
+                return threadLocal.get().digest(data, output)
+            }
+
+            override fun digest(data: ByteArray, offset: Int, output: OutputStream): Long {
+                return threadLocal.get().digest(data, offset, output)
+            }
+
+            override fun digest(data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
+                return threadLocal.get().digest(data, offset, length, output)
+            }
+
+            override fun digest(data: ByteBuffer): ByteBuffer {
+                return threadLocal.get().digest(data)
+            }
+
+            override fun digest(data: InputStream): ByteArray {
+                return threadLocal.get().digest(data)
+            }
+
+            override fun digest(data: InputStream, output: OutputStream): Long {
+                return threadLocal.get().digest(data, output)
+            }
         }
     }
 
     companion object {
+
+        @JvmStatic
+        fun simpleImpl(algorithm: CodecAlgorithm, digest: MessageDigest): DigestCodec {
+            return object : DigestCodec {
+                override val digest: MessageDigest = digest
+                override val algorithm: CodecAlgorithm = algorithm
+            }
+        }
 
         @JvmStatic
         fun newBuilder(): Builder {
