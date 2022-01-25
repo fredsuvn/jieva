@@ -2,7 +2,6 @@ package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
-import xyz.srclab.common.base.toKotlinFun
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import java.io.InputStream
 import java.io.OutputStream
@@ -97,7 +96,9 @@ interface DigestCodec : Codec {
                 throw IllegalStateException("digesterSupplier was not specified.")
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
-                return ThreadLocalDigestCodec(algorithm, digestSupplier.toKotlinFun())
+                return ThreadLocalDigestCodec(algorithm) {
+                    DigestCodecImpl(algorithm, digestSupplier.get())
+                }
             }
             val digestCodec = DigestCodecImpl(algorithm, digestSupplier.get())
             if (threadSafePolicy == ThreadSafePolicy.SYNCHRONIZED) {
@@ -131,11 +132,11 @@ interface DigestCodec : Codec {
 
         private class ThreadLocalDigestCodec(
             override val algorithm: CodecAlgorithm,
-            digest: () -> MessageDigest
+            digest: () -> DigestCodec
         ) : DigestCodec {
-            private val threadLocal: ThreadLocal<MessageDigest> = ThreadLocal.withInitial(digest)
+            private val threadLocal: ThreadLocal<DigestCodec> = ThreadLocal.withInitial(digest)
             override val digest: MessageDigest
-                get() = threadLocal.get()
+                get() = threadLocal.get().digest
         }
     }
 
@@ -148,48 +149,46 @@ interface DigestCodec : Codec {
 
         @JvmStatic
         fun md2(): DigestCodec {
-            return withAlgorithm(CodecAlgorithm.MD2_NAME)
+            return CodecAlgorithm.MD2_NAME.toDigestCodec()
         }
 
         @JvmStatic
         fun md5(): DigestCodec {
-            return withAlgorithm(CodecAlgorithm.MD5_NAME)
+            return CodecAlgorithm.MD5_NAME.toDigestCodec()
         }
 
         @JvmStatic
         fun sha1(): DigestCodec {
-            return withAlgorithm(CodecAlgorithm.SHA1_NAME)
+            return CodecAlgorithm.SHA1_NAME.toDigestCodec()
         }
 
         @JvmStatic
         fun sha256(): DigestCodec {
-            return withAlgorithm(CodecAlgorithm.SHA256_NAME)
+            return CodecAlgorithm.SHA256_NAME.toDigestCodec()
         }
 
         @JvmStatic
         fun sha384(): DigestCodec {
-            return withAlgorithm(CodecAlgorithm.SHA384_NAME)
+            return CodecAlgorithm.SHA384_NAME.toDigestCodec()
         }
 
         @JvmStatic
         fun sha512(): DigestCodec {
-            return withAlgorithm(CodecAlgorithm.SHA512_NAME)
+            return CodecAlgorithm.SHA512_NAME.toDigestCodec()
         }
 
+        @JvmName("forAlgorithm")
         @JvmStatic
-        fun withAlgorithm(
-            algorithm: CharSequence
-        ): DigestCodec {
-            return forAlgorithm(algorithm.toCodecAlgorithm())
+        fun CharSequence.toDigestCodec(): DigestCodec {
+            return this.toCodecAlgorithm().toDigestCodec()
         }
 
+        @JvmName("forAlgorithm")
         @JvmStatic
-        fun forAlgorithm(
-            algorithm: CodecAlgorithm
-        ): DigestCodec {
+        fun CodecAlgorithm.toDigestCodec(): DigestCodec {
             return newBuilder()
-                .algorithm(algorithm)
-                .digestSupplier { MessageDigest.getInstance(algorithm.toString()) }
+                .algorithm(this)
+                .digestSupplier() { MessageDigest.getInstance(this.name) }
                 .build()
         }
     }

@@ -1,7 +1,6 @@
 package xyz.srclab.common.codec.sm2
 
 import org.bouncycastle.math.ec.ECPoint
-import xyz.srclab.common.codec.CodecKeyPair
 import java.math.BigInteger
 
 /**

@@ -2,7 +2,6 @@ package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
-import xyz.srclab.common.base.toKotlinFun
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import java.io.InputStream
 import java.io.OutputStream
@@ -71,6 +70,7 @@ interface HmacCodec : Codec {
 
         private var algorithm: CodecAlgorithm? = null
         private var hmacSupplier: Supplier<Mac>? = null
+        private var codecSupplier: Supplier<HmacCodec>? = null
         private var threadSafePolicy: ThreadSafePolicy = ThreadSafePolicy.SYNCHRONIZED
 
         open fun algorithm(algorithm: CodecAlgorithm) = apply {
@@ -79,6 +79,10 @@ interface HmacCodec : Codec {
 
         open fun hmacSupplier(hmacSupplier: Supplier<Mac>) = apply {
             this.hmacSupplier = hmacSupplier
+        }
+
+        open fun codecSupplier(codecSupplier: Supplier<HmacCodec>) = apply {
+            this.codecSupplier = codecSupplier
         }
 
         /**
@@ -93,24 +97,27 @@ interface HmacCodec : Codec {
             if (algorithm === null) {
                 throw IllegalStateException("algorithm was not specified.")
             }
-            val hmacSupplier = this.hmacSupplier
-            if (hmacSupplier === null) {
-                throw IllegalStateException("digesterSupplier was not specified.")
+            val codecSupplier = run {
+                val c = this.codecSupplier
+                if (c === null) {
+                    val hmacSupplier = this.hmacSupplier
+                    if (hmacSupplier === null) {
+                        throw IllegalStateException("digesterSupplier was not specified.")
+                    }
+                    return@run Supplier { simpleImpl(algorithm, hmacSupplier.get()) }
+                }
+                c
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
-                return ThreadLocalHmacCodec(algorithm, hmacSupplier.toKotlinFun())
+                return ThreadLocalHmacCodec(algorithm) {
+                    codecSupplier.get()
+                }
             }
-            val hmacCodec = HmacCodecImpl(algorithm, hmacSupplier.get())
             if (threadSafePolicy == ThreadSafePolicy.SYNCHRONIZED) {
-                return SynchronizedHmacCodec(hmacCodec)
+                return SynchronizedHmacCodec(codecSupplier.get())
             }
-            return hmacCodec
+            return codecSupplier.get()
         }
-
-        private class HmacCodecImpl(
-            override val algorithm: CodecAlgorithm,
-            override val hmac: Mac
-        ) : HmacCodec
 
         private class SynchronizedHmacCodec(
             private val hmacCodec: HmacCodec
@@ -132,15 +139,23 @@ interface HmacCodec : Codec {
 
         private class ThreadLocalHmacCodec(
             override val algorithm: CodecAlgorithm,
-            hmac: () -> Mac
+            hmac: () -> HmacCodec
         ) : HmacCodec {
-            private val threadLocal: ThreadLocal<Mac> = ThreadLocal.withInitial(hmac)
+            private val threadLocal: ThreadLocal<HmacCodec> = ThreadLocal.withInitial(hmac)
             override val hmac: Mac
-                get() = threadLocal.get()
+                get() = threadLocal.get().hmac
         }
     }
 
     companion object {
+
+        @JvmStatic
+        fun simpleImpl(algorithm: CodecAlgorithm, hmac: Mac): HmacCodec {
+            return object : HmacCodec {
+                override val hmac: Mac = hmac
+                override val algorithm: CodecAlgorithm = algorithm
+            }
+        }
 
         @JvmStatic
         fun newBuilder(): Builder {
@@ -149,43 +164,41 @@ interface HmacCodec : Codec {
 
         @JvmStatic
         fun hmacMd5(): HmacCodec {
-            return forAlgorithm(CodecAlgorithm.HMAC_MD5)
+            return CodecAlgorithm.HMAC_MD5.toHmacCodec()
         }
 
         @JvmStatic
         fun hmacSha1(): HmacCodec {
-            return forAlgorithm(CodecAlgorithm.HMAC_SHA1)
+            return CodecAlgorithm.HMAC_SHA1.toHmacCodec()
         }
 
         @JvmStatic
         fun hmacSha256(): HmacCodec {
-            return forAlgorithm(CodecAlgorithm.HMAC_SHA256)
+            return CodecAlgorithm.HMAC_SHA256.toHmacCodec()
         }
 
         @JvmStatic
         fun hmacSha384(): HmacCodec {
-            return forAlgorithm(CodecAlgorithm.HMAC_SHA384)
+            return CodecAlgorithm.HMAC_SHA384.toHmacCodec()
         }
 
         @JvmStatic
         fun hmacSha512(): HmacCodec {
-            return forAlgorithm(CodecAlgorithm.HMAC_SHA512)
+            return CodecAlgorithm.HMAC_SHA512.toHmacCodec()
         }
 
+        @JvmName("forAlgorithm")
         @JvmStatic
-        fun forAlgorithm(
-            algorithm: CharSequence
-        ): HmacCodec {
-            return forAlgorithm(algorithm.toCodecAlgorithm())
+        fun CharSequence.toHmacCodec(): HmacCodec {
+            return this.toCodecAlgorithm().toHmacCodec()
         }
 
+        @JvmName("forAlgorithm")
         @JvmStatic
-        fun forAlgorithm(
-            algorithm: CodecAlgorithm
-        ): HmacCodec {
+        fun CodecAlgorithm.toHmacCodec(): HmacCodec {
             return newBuilder()
-                .algorithm(algorithm)
-                .hmacSupplier { Mac.getInstance(algorithm.toString()) }
+                .algorithm(this)
+                .hmacSupplier { Mac.getInstance(this.name) }
                 .build()
         }
     }

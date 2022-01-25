@@ -93,28 +93,28 @@ interface CodecAlgorithm {
         val SHA512 = of(SHA512_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
-        val HMAC_MD5 = of(HMAC_MD5_NAME, CodecAlgorithmType.MAC)
+        val HMAC_MD5 = of(HMAC_MD5_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
-        val HMAC_SHA1 = of(HMAC_SHA1_NAME, CodecAlgorithmType.MAC)
+        val HMAC_SHA1 = of(HMAC_SHA1_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
-        val HMAC_SHA256 = of(HMAC_SHA256_NAME, CodecAlgorithmType.MAC)
+        val HMAC_SHA256 = of(HMAC_SHA256_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
-        val HMAC_SHA384 = of(HMAC_SHA384_NAME, CodecAlgorithmType.MAC)
+        val HMAC_SHA384 = of(HMAC_SHA384_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
-        val HMAC_SHA512 = of(HMAC_SHA512_NAME, CodecAlgorithmType.MAC)
+        val HMAC_SHA512 = of(HMAC_SHA512_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
         val AES = of(AES_NAME, CodecAlgorithmType.CIPHER)
 
         @JvmField
-        val RSA = of(RSA_NAME, CodecAlgorithmType.ASYMMETRIC)
+        val RSA = of(RSA_NAME, CodecAlgorithmType.CIPHER)
 
         @JvmField
-        val SM2 = of(SM2_NAME, CodecAlgorithmType.ASYMMETRIC)
+        val SM2 = of(SM2_NAME, CodecAlgorithmType.CIPHER)
 
         @JvmStatic
         fun CharSequence.toCodecAlgorithm(): CodecAlgorithm {
@@ -189,7 +189,7 @@ interface CodecAlgorithm {
  * Algorithm type.
  */
 enum class CodecAlgorithmType {
-    DIGEST, MAC, CIPHER, ASYMMETRIC,
+    DIGEST, HMAC, CIPHER, SIGN,
 }
 
 @JvmSynthetic

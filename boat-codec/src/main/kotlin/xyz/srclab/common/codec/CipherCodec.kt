@@ -2,8 +2,9 @@ package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
-import xyz.srclab.common.base.toKotlinFun
+import xyz.srclab.common.codec.Codec.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.rsa.RsaCodec
+import xyz.srclab.common.codec.rsa.newRsaCodec
 import xyz.srclab.common.codec.sm2.Sm2Codec
 import xyz.srclab.common.codec.sm2.Sm2Params
 import java.io.InputStream
@@ -23,6 +24,14 @@ import javax.crypto.Cipher
 interface CipherCodec : Codec {
 
     val cipher: Cipher
+
+    val blockSize: Int
+        get() = cipher.blockSize
+
+    fun getOutputSize(inputSize: Int): Int {
+        val cipher = this.cipher
+        return cipher.getOutputSize(inputSize)
+    }
 
     fun encrypt(key: Key, data: ByteArray): ByteArray {
         return encrypt(key, data, 0)
@@ -146,7 +155,9 @@ interface CipherCodec : Codec {
                 throw IllegalStateException("digesterSupplier was not specified.")
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
-                return ThreadLocalCipherCodec(algorithm, cipherSupplier.toKotlinFun())
+                return ThreadLocalCipherCodec(algorithm) {
+                    CipherCodecImpl(algorithm, cipherSupplier.get())
+                }
             }
             val cipherCodec = CipherCodecImpl(algorithm, cipherSupplier.get())
             if (threadSafePolicy == ThreadSafePolicy.SYNCHRONIZED) {
@@ -190,11 +201,11 @@ interface CipherCodec : Codec {
 
         private class ThreadLocalCipherCodec(
             override val algorithm: CodecAlgorithm,
-            cipher: () -> Cipher
+            cipher: () -> CipherCodec
         ) : CipherCodec {
-            private val threadLocal: ThreadLocal<Cipher> = ThreadLocal.withInitial(cipher)
+            private val threadLocal: ThreadLocal<CipherCodec> = ThreadLocal.withInitial(cipher)
             override val cipher: Cipher
-                get() = threadLocal.get()
+                get() = threadLocal.get().cipher
         }
     }
 
@@ -207,20 +218,12 @@ interface CipherCodec : Codec {
 
         @JvmStatic
         fun aes(): CipherCodec {
-            return withAlgorithm(CodecAlgorithm.AES_NAME)
+            return CodecAlgorithm.AES_NAME.toCipherCodec()
         }
 
         @JvmStatic
         fun rsa(): RsaCodec {
-            return RsaCodec()
-        }
-
-        @JvmStatic
-        fun rsa(
-            encryptBlockSize: Int,
-            decryptBlockSize: Int
-        ): RsaCodec {
-            return RsaCodec(encryptBlockSize, decryptBlockSize)
+            return newRsaCodec()
         }
 
         @JvmStatic
@@ -228,12 +231,10 @@ interface CipherCodec : Codec {
             return Sm2Codec(sm2Params)
         }
 
+        @JvmName("forAlgorithm")
         @JvmStatic
         fun CharSequence.toCipherCodec(): CipherCodec {
-            return newBuilder()
-                .algorithm(CodecAlgorithm.forName(algorithm))
-                .cipherSupplier { Cipher.getInstance(algorithm.toString()) }
-                .build()
+            return this.toCodecAlgorithm().toCipherCodec()
         }
 
         @JvmName("forAlgorithm")
