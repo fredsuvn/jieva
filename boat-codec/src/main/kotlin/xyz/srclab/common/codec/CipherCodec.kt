@@ -19,7 +19,6 @@ import javax.crypto.Cipher
  *
  * @see RsaCodec
  * @see Sm2Codec
- * @see AsymmetricCipherCodec
  */
 interface CipherCodec : Codec {
 
@@ -64,9 +63,15 @@ interface CipherCodec : Codec {
     fun encrypt(key: Key, data: ByteBuffer): ByteBuffer {
         val cipher = this.cipher
         cipher.init(Cipher.ENCRYPT_MODE, key)
-        val result = ByteBuffer.allocate(cipher.getOutputSize(data.remaining()))
-        cipher.doFinal(data, result)
-        return result
+        val dest = ByteBuffer.allocate(cipher.getOutputSize(data.remaining()))
+        cipher.doFinal(data, dest)
+        return dest
+    }
+
+    fun encrypt(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
+        val cipher = this.cipher
+        cipher.init(Cipher.ENCRYPT_MODE, key)
+        return cipher.doFinal(data, dest)
     }
 
     fun encrypt(key: Key, data: InputStream): ByteArray {
@@ -108,9 +113,15 @@ interface CipherCodec : Codec {
     fun decrypt(key: Key, data: ByteBuffer): ByteBuffer {
         val cipher = this.cipher
         cipher.init(Cipher.DECRYPT_MODE, key)
-        val result = ByteBuffer.allocate(cipher.getOutputSize(data.remaining()))
-        cipher.doFinal(data, result)
-        return result
+        val dest = ByteBuffer.allocate(cipher.getOutputSize(data.remaining()))
+        cipher.doFinal(data, dest)
+        return dest
+    }
+
+    fun decrypt(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
+        val cipher = this.cipher
+        cipher.init(Cipher.DECRYPT_MODE, key)
+        return cipher.doFinal(data, dest)
     }
 
     fun decrypt(key: Key, data: InputStream): ByteArray {
@@ -229,6 +240,11 @@ interface CipherCodec : Codec {
             }
 
             @Synchronized
+            override fun encrypt(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
+                return cipherCodec.encrypt(key, data, dest)
+            }
+
+            @Synchronized
             override fun encrypt(key: Key, data: InputStream): ByteArray {
                 return cipherCodec.encrypt(key, data)
             }
@@ -274,6 +290,11 @@ interface CipherCodec : Codec {
             }
 
             @Synchronized
+            override fun decrypt(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
+                return cipherCodec.decrypt(key, data, dest)
+            }
+
+            @Synchronized
             override fun decrypt(key: Key, data: InputStream): ByteArray {
                 return cipherCodec.decrypt(key, data)
             }
@@ -288,6 +309,7 @@ interface CipherCodec : Codec {
             override val algorithm: CodecAlgorithm,
             cipher: () -> CipherCodec
         ) : CipherCodec {
+
             private val threadLocal: ThreadLocal<CipherCodec> = ThreadLocal.withInitial(cipher)
             override val cipher: Cipher
                 get() = threadLocal.get().cipher
@@ -327,6 +349,10 @@ interface CipherCodec : Codec {
                 return threadLocal.get().encrypt(key, data)
             }
 
+            override fun encrypt(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
+                return threadLocal.get().encrypt(key, data, dest)
+            }
+
             override fun encrypt(key: Key, data: InputStream): ByteArray {
                 return threadLocal.get().encrypt(key, data)
             }
@@ -361,6 +387,10 @@ interface CipherCodec : Codec {
 
             override fun decrypt(key: Key, data: ByteBuffer): ByteBuffer {
                 return threadLocal.get().decrypt(key, data)
+            }
+
+            override fun decrypt(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
+                return threadLocal.get().decrypt(key, data, dest)
             }
 
             override fun decrypt(key: Key, data: InputStream): ByteArray {

@@ -9,7 +9,6 @@ import java.nio.ByteBuffer
 import java.security.Key
 import java.util.function.Supplier
 import javax.crypto.Mac
-import kotlin.math.min
 
 /**
  * HMAC codec such as `HmacMD5`.
@@ -18,8 +17,8 @@ interface HmacCodec : Codec {
 
     val hmac: Mac
 
-    val hmacLength:Int
-    get() = hmac.macLength
+    val hmacLength: Int
+        get() = hmac.macLength
 
     fun digest(key: Key, data: ByteArray): ByteArray {
         return digest(key, data, 0)
@@ -68,13 +67,12 @@ interface HmacCodec : Codec {
             val startPos = dest.position()
             val array = dest.array()
             val arrayOffset = dest.arrayOffset()
-            val length = min(remainingLength(array.size, arrayOffset), dest.remaining())
-             hmac.doFinal(array, arrayOffset)
-            dest.position(startPos + result)
-            0
+            hmac.doFinal(array, arrayOffset)
+            dest.position(startPos + hmacLength)
+            hmacLength
         } else {
             val startPos = dest.position()
-            dest.put(hmac.digest())
+            dest.put(hmac.doFinal())
             dest.position() - startPos
         }
     }
@@ -150,6 +148,10 @@ interface HmacCodec : Codec {
             override val algorithm: CodecAlgorithm = hmacCodec.algorithm
             override val hmac: Mac = hmacCodec.hmac
 
+            @get:Synchronized
+            override val hmacLength: Int
+                get() = hmacCodec.hmacLength
+
             @Synchronized
             override fun digest(key: Key, data: ByteArray): ByteArray {
                 return hmacCodec.digest(key, data)
@@ -181,8 +183,13 @@ interface HmacCodec : Codec {
             }
 
             @Synchronized
-            override fun digest(key: Key, data: ByteBuffer): ByteBuffer {
+            override fun digest(key: Key, data: ByteBuffer): ByteArray {
                 return hmacCodec.digest(key, data)
+            }
+
+            @Synchronized
+            override fun digest(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
+                return hmacCodec.digest(key, data, dest)
             }
 
             @Synchronized
@@ -200,9 +207,13 @@ interface HmacCodec : Codec {
             override val algorithm: CodecAlgorithm,
             hmac: () -> HmacCodec
         ) : HmacCodec {
+
             private val threadLocal: ThreadLocal<HmacCodec> = ThreadLocal.withInitial(hmac)
             override val hmac: Mac
                 get() = threadLocal.get().hmac
+
+            override val hmacLength: Int
+                get() = threadLocal.get().hmacLength
 
             override fun digest(key: Key, data: ByteArray): ByteArray {
                 return threadLocal.get().digest(key, data)
@@ -228,8 +239,12 @@ interface HmacCodec : Codec {
                 return threadLocal.get().digest(key, data, offset, length, output)
             }
 
-            override fun digest(key: Key, data: ByteBuffer): ByteBuffer {
+            override fun digest(key: Key, data: ByteBuffer): ByteArray {
                 return threadLocal.get().digest(key, data)
+            }
+
+            override fun digest(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
+                return threadLocal.get().digest(key, data, dest)
             }
 
             override fun digest(key: Key, data: InputStream): ByteArray {

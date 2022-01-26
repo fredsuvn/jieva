@@ -207,6 +207,7 @@ interface DigestCodec : Codec {
             override val algorithm: CodecAlgorithm,
             digest: () -> DigestCodec
         ) : DigestCodec {
+
             private val threadLocal: ThreadLocal<DigestCodec> = ThreadLocal.withInitial(digest)
             override val digest: MessageDigest
                 get() = threadLocal.get().digest

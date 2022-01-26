@@ -48,11 +48,11 @@ fun ByteArray.base64(offset: Int, length: Int = remainingLength(this.size, offse
 }
 
 fun InputStream.base64(): ByteArray {
-    val out = BytesAppender()
-    val encOut = Base64.getEncoder().wrap(out)
+    val output = BytesAppender(getBase64Length(this.available()))
+    val encOut = Base64.getEncoder().wrap(output)
     this.copyTo(encOut)
     encOut.close()
-    return out.toBytes()
+    return output.toBytes()
 }
 
 fun InputStream.base64(output: OutputStream): Long {
@@ -83,7 +83,7 @@ fun ByteArray.deBase64(offset: Int, length: Int = remainingLength(this.size, off
 
 fun InputStream.deBase64(): ByteArray {
     val encIn = Base64.getDecoder().wrap(this)
-    val output = BytesAppender()
+    val output = BytesAppender(getBase64Length(this.available()))
     encIn.copyTo(output)
     return output.toBytes()
 }
