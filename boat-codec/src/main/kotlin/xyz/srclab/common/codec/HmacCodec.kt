@@ -9,6 +9,7 @@ import java.nio.ByteBuffer
 import java.security.Key
 import java.util.function.Supplier
 import javax.crypto.Mac
+import kotlin.math.min
 
 /**
  * HMAC codec such as `HmacMD5`.
@@ -16,6 +17,9 @@ import javax.crypto.Mac
 interface HmacCodec : Codec {
 
     val hmac: Mac
+
+    val hmacLength:Int
+    get() = hmac.macLength
 
     fun digest(key: Key, data: ByteArray): ByteArray {
         return digest(key, data, 0)
@@ -47,12 +51,32 @@ interface HmacCodec : Codec {
         return digest.size.toLong()
     }
 
-    fun digest(key: Key, data: ByteBuffer): ByteBuffer {
+    fun digest(key: Key, data: ByteBuffer): ByteArray {
         val hmac = this.hmac
         hmac.reset()
         hmac.init(key)
         hmac.update(data)
-        return ByteBuffer.wrap(hmac.doFinal())
+        return hmac.doFinal()
+    }
+
+    fun digest(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
+        val hmac = this.hmac
+        hmac.reset()
+        hmac.init(key)
+        hmac.update(data)
+        return if (dest.hasArray()) {
+            val startPos = dest.position()
+            val array = dest.array()
+            val arrayOffset = dest.arrayOffset()
+            val length = min(remainingLength(array.size, arrayOffset), dest.remaining())
+             hmac.doFinal(array, arrayOffset)
+            dest.position(startPos + result)
+            0
+        } else {
+            val startPos = dest.position()
+            dest.put(hmac.digest())
+            dest.position() - startPos
+        }
     }
 
     fun digest(key: Key, data: InputStream): ByteArray {

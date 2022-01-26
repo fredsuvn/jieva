@@ -8,6 +8,7 @@ import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 import java.util.function.Supplier
+import kotlin.math.min
 
 /**
  * Digest codec such as `MD5`.
@@ -15,6 +16,9 @@ import java.util.function.Supplier
 interface DigestCodec : Codec {
 
     val digest: MessageDigest
+
+    val digestLength: Int
+        get() = digest.digestLength
 
     fun digest(data: ByteArray): ByteArray {
         return digest(data, 0)
@@ -45,11 +49,30 @@ interface DigestCodec : Codec {
         return digest.size.toLong()
     }
 
-    fun digest(data: ByteBuffer): ByteBuffer {
+    fun digest(data: ByteBuffer): ByteArray {
         val digest = this.digest
         digest.reset()
         digest.update(data)
-        return ByteBuffer.wrap(digest.digest())
+        return digest.digest()
+    }
+
+    fun digest(data: ByteBuffer, dest: ByteBuffer): Int {
+        val digest = this.digest
+        digest.reset()
+        digest.update(data)
+        return if (dest.hasArray()) {
+            val startPos = dest.position()
+            val array = dest.array()
+            val arrayOffset = dest.arrayOffset()
+            val length = min(remainingLength(array.size, arrayOffset), dest.remaining())
+            val result = digest.digest(array, arrayOffset, length)
+            dest.position(startPos + result)
+            result
+        } else {
+            val startPos = dest.position()
+            dest.put(digest.digest())
+            dest.position() - startPos
+        }
     }
 
     fun digest(data: InputStream): ByteArray {
@@ -125,6 +148,10 @@ interface DigestCodec : Codec {
             override val algorithm: CodecAlgorithm = digestCodec.algorithm
             override val digest: MessageDigest = digestCodec.digest
 
+            @get:Synchronized
+            override val digestLength: Int
+                get() = digestCodec.digestLength
+
             @Synchronized
             override fun digest(data: ByteArray): ByteArray {
                 return digestCodec.digest(data)
@@ -156,8 +183,13 @@ interface DigestCodec : Codec {
             }
 
             @Synchronized
-            override fun digest(data: ByteBuffer): ByteBuffer {
+            override fun digest(data: ByteBuffer): ByteArray {
                 return digestCodec.digest(data)
+            }
+
+            @Synchronized
+            override fun digest(data: ByteBuffer, dest: ByteBuffer): Int {
+                return digestCodec.digest(data, dest)
             }
 
             @Synchronized
@@ -178,6 +210,9 @@ interface DigestCodec : Codec {
             private val threadLocal: ThreadLocal<DigestCodec> = ThreadLocal.withInitial(digest)
             override val digest: MessageDigest
                 get() = threadLocal.get().digest
+
+            override val digestLength: Int
+                get() = threadLocal.get().digestLength
 
             override fun digest(data: ByteArray): ByteArray {
                 return threadLocal.get().digest(data)
@@ -203,8 +238,12 @@ interface DigestCodec : Codec {
                 return threadLocal.get().digest(data, offset, length, output)
             }
 
-            override fun digest(data: ByteBuffer): ByteBuffer {
+            override fun digest(data: ByteBuffer): ByteArray {
                 return threadLocal.get().digest(data)
+            }
+
+            override fun digest(data: ByteBuffer, dest: ByteBuffer): Int {
+                return threadLocal.get().digest(data, dest)
             }
 
             override fun digest(data: InputStream): ByteArray {
