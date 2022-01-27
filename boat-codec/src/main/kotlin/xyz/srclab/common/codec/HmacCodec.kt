@@ -303,7 +303,7 @@ interface HmacCodec : Codec {
         @JvmName("forAlgorithm")
         @JvmStatic
         fun CharSequence.toHmacCodec(): HmacCodec {
-            return this.toCodecAlgorithm().toHmacCodec()
+            return this.toCodecAlgorithm(CodecAlgorithmType.HMAC).toHmacCodec()
         }
 
         @JvmName("forAlgorithm")

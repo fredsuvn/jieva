@@ -2,10 +2,9 @@ package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
-import xyz.srclab.common.codec.Codec.Companion.toCodecAlgorithm
+import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.rsa.RsaCodec
 import xyz.srclab.common.codec.sm2.Sm2Codec
-import xyz.srclab.common.codec.sm2.Sm2Params
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -433,14 +432,16 @@ interface CipherCodec : Codec {
         }
 
         @JvmStatic
-        fun sm2(sm2Params: Sm2Params): Sm2Codec {
-            return Sm2Codec(sm2Params)
+        fun sm2(): CipherCodec {
+            return newBuilder()
+                .codecSupplier { Sm2Codec() }
+                .build()
         }
 
         @JvmName("forAlgorithm")
         @JvmStatic
         fun CharSequence.toCipherCodec(): CipherCodec {
-            return this.toCodecAlgorithm().toCipherCodec()
+            return this.toCodecAlgorithm(CodecAlgorithmType.CIPHER).toCipherCodec()
         }
 
         @JvmName("forAlgorithm")

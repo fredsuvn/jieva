@@ -308,7 +308,7 @@ interface DigestCodec : Codec {
         @JvmName("forAlgorithm")
         @JvmStatic
         fun CharSequence.toDigestCodec(): DigestCodec {
-            return this.toCodecAlgorithm().toDigestCodec()
+            return this.toCodecAlgorithm(CodecAlgorithmType.DIGEST).toDigestCodec()
         }
 
         @JvmName("forAlgorithm")

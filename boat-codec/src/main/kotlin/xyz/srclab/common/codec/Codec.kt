@@ -2,24 +2,19 @@ package xyz.srclab.common.codec
 
 import xyz.srclab.common.codec.rsa.RsaCodec
 import xyz.srclab.common.codec.sm2.Sm2Codec
-import xyz.srclab.common.codec.sm2.Sm2Params
-import xyz.srclab.common.lang.toBytes
-import java.security.Key
-import java.security.SecureRandom
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.spec.SecretKeySpec
+import java.security.MessageDigest
+import javax.crypto.Cipher
+import javax.crypto.Mac
 
 /**
  * Codec interface, represents a type of codec way.
  *
- * Note [Codec] **may not thread-safe**.
- *
- * @see EncCodec
  * @see DigestCodec
  * @see HmacCodec
  * @see CipherCodec
  * @see CodecAlgorithm
+ * @see RsaCodec
+ * @see Sm2Codec
  */
 interface Codec {
 
@@ -27,230 +22,104 @@ interface Codec {
 
     companion object {
 
-        /**
-         * Default [Codec] supplier function, supports:
-         *
-         * * [CodecAlgorithm.HEX]
-         * * [CodecAlgorithm.BASE64]
-         * * [CodecAlgorithm.RSA]
-         * * [CodecAlgorithm.SM2]
-         * * [CodecAlgorithm.HEX]
-         * * [CodecAlgorithm.PLAIN]
-         * * [CodecAlgorithmType.DIGEST]
-         * * [CodecAlgorithmType.CIPHER]
-         */
-        @JvmField
-        val DEFAULT_CODEC_SUPPLIER: (CodecAlgorithm) -> Codec = codec@{
-            val cipher = when (it) {
-                CodecAlgorithm.HEX -> HexCodec
-                CodecAlgorithm.BASE64 -> Base64Codec
-                CodecAlgorithm.RSA -> rsaCodec()
-                CodecAlgorithm.SM2 -> sm2Codec()
-                CodecAlgorithm.PLAIN -> PlainCodec
-                else -> null
-            }
-            if (cipher !== null) {
-                return@codec cipher
-            }
-            when (it.type) {
-                CodecAlgorithmType.DIGEST -> it.toDigestCodec()
-                CodecAlgorithmType.CIPHER -> it.toCipherCodec()
-                else -> throw UnsupportedOperationException("Unsupported algorithm: $it")
-            }
-        }
-
-        @JvmName("forData")
-        @JvmOverloads
         @JvmStatic
-        fun ByteArray.codec(codecSupplier: (CodecAlgorithm) -> Codec = DEFAULT_CODEC_SUPPLIER): Codecing {
-            return Codecing.newCodecing(this, codecSupplier)
-        }
-
-        @JvmName("forData")
-        @JvmOverloads
-        @JvmStatic
-        fun CharSequence.codec(codecSupplier: (CodecAlgorithm) -> Codec = DEFAULT_CODEC_SUPPLIER): Codecing {
-            return this.toBytes().codec(codecSupplier)
-        }
-
-
-
-        @JvmName("codecAlgorithm")
-        @JvmStatic
-        fun CharSequence.toCodecAlgorithm(): CodecAlgorithm {
-            return CodecAlgorithm.forName(this)
-        }
-
-        @JvmName("codecAlgorithm")
-        @JvmStatic
-        fun CharSequence.toCodecAlgorithm(type: CodecAlgorithmType): CodecAlgorithm {
-            return CodecAlgorithm.forName(this, type)
-        }
-
-        @JvmName("encodeCodec")
-        @JvmStatic
-        fun CharSequence.toEncodeCodec(): EncCodec {
-            return EncCodec.withAlgorithm(this)
-        }
-
-        @JvmName("encodeCodec")
-        @JvmStatic
-        fun CodecAlgorithm.toEncodeCodec(): EncCodec {
-            return EncCodec.withAlgorithm(this)
-        }
-
-        @JvmName("digestCodec")
-        @JvmStatic
-        fun CharSequence.toDigestCodec(): DigestCodec {
-            return DigestCodec.withAlgorithm(this)
-        }
-
-        @JvmName("digestCodec")
-        @JvmStatic
-        fun CodecAlgorithm.toDigestCodec(): DigestCodec {
-            return DigestCodec.withAlgorithm(this.name)
-        }
-
-        @JvmName("macCodec")
-        @JvmStatic
-        fun CharSequence.toMacCodec(): HmacCodec {
-            return HmacCodec.forAlgorithm(this)
-        }
-
-        @JvmName("macCodec")
-        @JvmStatic
-        fun CodecAlgorithm.toMacCodec(): HmacCodec {
-            return HmacCodec.forAlgorithm(this.name)
-        }
-
-        @JvmName("cipherCodec")
-        @JvmStatic
-        fun CharSequence.toCipherCodec(): CipherCodec {
-            return CipherCodec.withAlgorithm(this)
-        }
-
-        @JvmName("cipherCodec")
-        @JvmStatic
-        fun CodecAlgorithm.toCipherCodec(): CipherCodec {
-            return CipherCodec.withAlgorithm(this.name)
+        fun simpleDigest(algorithm: CodecAlgorithm, digest: MessageDigest): DigestCodec {
+            return DigestCodec.simpleImpl(algorithm, digest)
         }
 
         @JvmStatic
-        fun plainCodec(): EncCodec {
-            return EncCodec.plain()
+        fun simpleHmac(algorithm: CodecAlgorithm, hmac: Mac): HmacCodec {
+            return HmacCodec.simpleImpl(algorithm, hmac)
         }
 
         @JvmStatic
-        fun hexCodec(): EncCodec {
-            return EncCodec.hex()
+        fun simpleCipher(algorithm: CodecAlgorithm, cipher: Cipher): CipherCodec {
+            return CipherCodec.simpleImpl(algorithm, cipher)
         }
 
         @JvmStatic
-        fun base64Codec(): EncCodec {
-            return EncCodec.base64()
+        fun newDigestBuilder(): DigestCodec.Builder {
+            return DigestCodec.newBuilder()
         }
 
         @JvmStatic
-        fun md2Codec(): DigestCodec {
+        fun newHmacBuilder(): HmacCodec.Builder {
+            return HmacCodec.newBuilder()
+        }
+
+        @JvmStatic
+        fun newCipherBuilder(): CipherCodec.Builder {
+            return CipherCodec.newBuilder()
+        }
+
+        @JvmStatic
+        fun md2(): DigestCodec {
             return DigestCodec.md2()
         }
 
         @JvmStatic
-        fun md5Codec(): DigestCodec {
+        fun md5(): DigestCodec {
             return DigestCodec.md5()
         }
 
         @JvmStatic
-        fun sha1Codec(): DigestCodec {
+        fun sha1(): DigestCodec {
             return DigestCodec.sha1()
         }
 
         @JvmStatic
-        fun sha256Codec(): DigestCodec {
+        fun sha256(): DigestCodec {
             return DigestCodec.sha256()
         }
 
         @JvmStatic
-        fun sha384Codec(): DigestCodec {
+        fun sha384(): DigestCodec {
             return DigestCodec.sha384()
         }
 
         @JvmStatic
-        fun sha512Codec(): DigestCodec {
+        fun sha512(): DigestCodec {
             return DigestCodec.sha512()
         }
 
         @JvmStatic
-        fun hmacMd5Codec(): HmacCodec {
+        fun hmacMd5(): HmacCodec {
             return HmacCodec.hmacMd5()
         }
 
         @JvmStatic
-        fun hmacSha1Codec(): HmacCodec {
+        fun hmacSha1(): HmacCodec {
             return HmacCodec.hmacSha1()
         }
 
         @JvmStatic
-        fun hmacSha256Codec(): HmacCodec {
+        fun hmacSha256(): HmacCodec {
             return HmacCodec.hmacSha256()
         }
 
         @JvmStatic
-        fun hmacSha384Codec(): HmacCodec {
+        fun hmacSha384(): HmacCodec {
             return HmacCodec.hmacSha384()
         }
 
         @JvmStatic
-        fun hmacSha512Codec(): HmacCodec {
+        fun hmacSha512(): HmacCodec {
             return HmacCodec.hmacSha512()
         }
 
         @JvmStatic
-        fun aesCodec(): CipherCodec {
+        fun aes(): CipherCodec {
             return CipherCodec.aes()
         }
 
         @JvmStatic
-        fun rsaCodec(): RsaCodec {
+        fun rsa(): CipherCodec {
             return CipherCodec.rsa()
         }
 
         @JvmStatic
-        fun rsaCodec(
-            encryptBlockSize: Int,
-            decryptBlockSize: Int
-        ): RsaCodec {
-            return CipherCodec.rsa(encryptBlockSize, decryptBlockSize)
-        }
-
-        @JvmOverloads
-        @JvmStatic
-        fun sm2Codec(sm2Params: Sm2Params = Sm2Params.DEFAULT): Sm2Codec {
-            return CipherCodec.sm2(sm2Params)
-        }
-
-        @JvmName("hexString")
-        @JvmStatic
-        fun ByteArray.toHexString(): String {
-            return hexCodec().encodeToString(this)
-        }
-
-        @JvmName("hexString")
-        @JvmStatic
-        fun CharSequence.toHexString(): String {
-            return hexCodec().encodeToString(this)
-        }
-
-        @JvmName("base64String")
-        @JvmStatic
-        fun ByteArray.toBase64String(): String {
-            return base64Codec().encodeToString(this)
-        }
-
-        @JvmName("base64String")
-        @JvmStatic
-        fun CharSequence.toBase64String(): String {
-            return base64Codec().encodeToString(this)
+        fun sm2(): CipherCodec {
+            return CipherCodec.sm2()
         }
     }
 }
