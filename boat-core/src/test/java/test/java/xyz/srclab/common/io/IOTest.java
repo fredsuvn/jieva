@@ -9,7 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,46 +58,5 @@ public class IOTest {
         input.reset();
         writer.flush();
         Assert.assertEquals(output.toByteArray(), text.getBytes());
-    }
-
-    @Test
-    public void testByteBuffer() {
-        ByteBuffer buffer = ByteBuffer.allocate(100);
-        initBuffer(buffer);
-        byte[] bytes = BIO.toBytes(buffer);
-        Assert.assertEquals(bytes, buffer.array());
-
-        ByteBuffer buffer2 = ByteBuffer.allocateDirect(100);
-        initBuffer(buffer2);
-        byte[] bytes2 = BIO.toBytes(buffer2);
-        Assert.assertEquals(bytes2, initArray(new byte[100]));
-
-        byte[] bytes3 = initArray(new byte[100]);
-        ByteBuffer buffer3 = ByteBuffer.wrap(bytes3, 10, 90);
-        Assert.assertEquals(BIO.toBytes(buffer3), Arrays.copyOfRange(bytes3, 10, 100));
-
-        byte[] bytes4 = initArray(new byte[100]);
-        ByteBuffer buffer4 = ByteBuffer.wrap(bytes4);
-        byte[] bytes4t = BIO.toBytes(buffer4, true);
-        Assert.assertSame(bytes4t, bytes4);
-        Assert.assertEquals(bytes4t, bytes4);
-        buffer4.flip();
-        byte[] bytes4f = BIO.toBytes(buffer4);
-        Assert.assertNotSame(bytes4f, bytes4);
-        Assert.assertEquals(bytes4f, bytes4);
-    }
-
-    private void initBuffer(ByteBuffer buffer) {
-        for (int i = 0; i < 100; i++) {
-            buffer.put((byte) i);
-        }
-        buffer.flip();
-    }
-
-    private byte[] initArray(byte[] array) {
-        for (int i = 0; i < 100; i++) {
-            array[i] = (byte) i;
-        }
-        return array;
     }
 }
