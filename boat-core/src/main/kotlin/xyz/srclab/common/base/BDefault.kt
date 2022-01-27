@@ -14,5 +14,4 @@ val DEFAULT_CHARSET: Charset = StandardCharsets.UTF_8
 /**
  * Default io buffer size: 8 * 1024.
  */
-@JvmField
-val DEFAULT_IO_BUFFER_SIZE: Int = 8 * 1024
+const val DEFAULT_IO_BUFFER_SIZE: Int = 8 * 1024
