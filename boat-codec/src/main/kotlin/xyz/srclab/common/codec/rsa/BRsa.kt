@@ -26,7 +26,3 @@ fun CharSequence.passphraseToAesKey(charset: Charset = DEFAULT_CHARSET): SecretK
 fun ByteArray.passphraseToAesKey(): SecretKey {
     return this.passphraseToKey(CodecAlgorithm.AES_NAME, DEFAULT_AES_KEY_SIZE)
 }
-
-fun newRsaCodec(): RsaCodec {
-    return RsaCodec()
-}

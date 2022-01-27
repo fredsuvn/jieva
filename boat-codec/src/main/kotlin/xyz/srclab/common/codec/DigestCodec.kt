@@ -115,10 +115,6 @@ interface DigestCodec : Codec {
         }
 
         open fun build(): DigestCodec {
-            val algorithm = this.algorithm
-            if (algorithm === null) {
-                throw IllegalStateException("algorithm was not specified.")
-            }
             val codecSupplier = run {
                 val c = this.codecSupplier
                 if (c === null) {
@@ -126,12 +122,16 @@ interface DigestCodec : Codec {
                     if (supplier === null) {
                         throw IllegalStateException("digesterSupplier was not specified.")
                     }
+                    val algorithm = this.algorithm
+                    if (algorithm === null) {
+                        throw IllegalStateException("algorithm was not specified.")
+                    }
                     return@run Supplier { simpleImpl(algorithm, supplier.get()) }
                 }
                 c
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
-                return ThreadLocalDigestCodec(algorithm) {
+                return ThreadLocalDigestCodec {
                     codecSupplier.get()
                 }
             }
@@ -204,11 +204,14 @@ interface DigestCodec : Codec {
         }
 
         private class ThreadLocalDigestCodec(
-            override val algorithm: CodecAlgorithm,
             digest: () -> DigestCodec
         ) : DigestCodec {
 
             private val threadLocal: ThreadLocal<DigestCodec> = ThreadLocal.withInitial(digest)
+
+            override val algorithm: CodecAlgorithm
+                get() = threadLocal.get().algorithm
+
             override val digest: MessageDigest
                 get() = threadLocal.get().digest
 

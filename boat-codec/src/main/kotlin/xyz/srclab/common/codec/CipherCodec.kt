@@ -4,7 +4,6 @@ import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.Codec.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.rsa.RsaCodec
-import xyz.srclab.common.codec.rsa.newRsaCodec
 import xyz.srclab.common.codec.sm2.Sm2Codec
 import xyz.srclab.common.codec.sm2.Sm2Params
 import java.io.InputStream
@@ -162,10 +161,6 @@ interface CipherCodec : Codec {
         }
 
         open fun build(): CipherCodec {
-            val algorithm = this.algorithm
-            if (algorithm === null) {
-                throw IllegalStateException("algorithm was not specified.")
-            }
             val codecSupplier = run {
                 val c = this.codecSupplier
                 if (c === null) {
@@ -173,12 +168,16 @@ interface CipherCodec : Codec {
                     if (supplier === null) {
                         throw IllegalStateException("digesterSupplier was not specified.")
                     }
+                    val algorithm = this.algorithm
+                    if (algorithm === null) {
+                        throw IllegalStateException("algorithm was not specified.")
+                    }
                     return@run Supplier { simpleImpl(algorithm, supplier.get()) }
                 }
                 c
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
-                return ThreadLocalCipherCodec(algorithm) {
+                return ThreadLocalCipherCodec {
                     codecSupplier.get()
                 }
             }
@@ -306,11 +305,14 @@ interface CipherCodec : Codec {
         }
 
         private class ThreadLocalCipherCodec(
-            override val algorithm: CodecAlgorithm,
             cipher: () -> CipherCodec
         ) : CipherCodec {
 
             private val threadLocal: ThreadLocal<CipherCodec> = ThreadLocal.withInitial(cipher)
+
+            override val algorithm: CodecAlgorithm
+                get() = threadLocal.get().algorithm
+
             override val cipher: Cipher
                 get() = threadLocal.get().cipher
 
@@ -424,8 +426,10 @@ interface CipherCodec : Codec {
         }
 
         @JvmStatic
-        fun rsa(): RsaCodec {
-            return newRsaCodec()
+        fun rsa(): CipherCodec {
+            return newBuilder()
+                .codecSupplier { RsaCodec() }
+                .build()
         }
 
         @JvmStatic

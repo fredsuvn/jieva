@@ -115,10 +115,6 @@ interface HmacCodec : Codec {
         }
 
         open fun build(): HmacCodec {
-            val algorithm = this.algorithm
-            if (algorithm === null) {
-                throw IllegalStateException("algorithm was not specified.")
-            }
             val codecSupplier = run {
                 val c = this.codecSupplier
                 if (c === null) {
@@ -126,12 +122,16 @@ interface HmacCodec : Codec {
                     if (supplier === null) {
                         throw IllegalStateException("digesterSupplier was not specified.")
                     }
+                    val algorithm = this.algorithm
+                    if (algorithm === null) {
+                        throw IllegalStateException("algorithm was not specified.")
+                    }
                     return@run Supplier { simpleImpl(algorithm, supplier.get()) }
                 }
                 c
             }
             if (threadSafePolicy == ThreadSafePolicy.THREAD_LOCAL) {
-                return ThreadLocalHmacCodec(algorithm) {
+                return ThreadLocalHmacCodec {
                     codecSupplier.get()
                 }
             }
@@ -204,11 +204,14 @@ interface HmacCodec : Codec {
         }
 
         private class ThreadLocalHmacCodec(
-            override val algorithm: CodecAlgorithm,
             hmac: () -> HmacCodec
         ) : HmacCodec {
 
             private val threadLocal: ThreadLocal<HmacCodec> = ThreadLocal.withInitial(hmac)
+
+            override val algorithm: CodecAlgorithm
+                get() = threadLocal.get().algorithm
+
             override val hmac: Mac
                 get() = threadLocal.get().hmac
 
