@@ -39,6 +39,9 @@ interface CodecAlgorithm {
         val SHA512_NAME = "SHA-512"
 
         @JvmField
+        val SM3_NAME = "SM3"
+
+        @JvmField
         val HMAC_MD5_NAME = "HmacMD5"
 
         @JvmField
@@ -64,9 +67,6 @@ interface CodecAlgorithm {
 
         @JvmField
         val SHA1PRNG_NAME = "SHA1PRNG"
-
-        @JvmField
-        val SHA1_WITH_DSA_NAME = "SHA1withDSA"
 
         @JvmField
         val SHA1_WITH_RSA_NAME = "SHA1withRSA"
@@ -105,6 +105,9 @@ interface CodecAlgorithm {
         val SHA512 = of(SHA512_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
+        val SM3 = of(SM3_NAME, CodecAlgorithmType.DIGEST)
+
+        @JvmField
         val HMAC_MD5 = of(HMAC_MD5_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
@@ -127,9 +130,6 @@ interface CodecAlgorithm {
 
         @JvmField
         val SM2 = of(SM2_NAME, CodecAlgorithmType.CIPHER)
-
-        @JvmField
-        val SHA1_WITH_DSA = of(SHA1_WITH_DSA_NAME, CodecAlgorithmType.SIGN)
 
         @JvmField
         val SHA1_WITH_RSA = of(SHA1_WITH_RSA_NAME, CodecAlgorithmType.SIGN)

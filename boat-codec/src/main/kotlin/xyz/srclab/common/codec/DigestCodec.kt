@@ -3,6 +3,7 @@ package xyz.srclab.common.codec
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
+import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest
@@ -269,6 +270,14 @@ interface DigestCodec : Codec {
         @JvmStatic
         fun sha512(): DigestCodec {
             return CodecAlgorithm.SHA512.toDigestCodec()
+        }
+
+        @JvmStatic
+        fun sm3(): DigestCodec {
+            return newBuilder()
+                .algorithm(CodecAlgorithm.SM3)
+                .digestSupplier { MessageDigest.getInstance(CodecAlgorithm.SM3_NAME, DEFAULT_BCPROV_PROVIDER) }
+                .build()
         }
 
         @JvmName("forAlgorithm")

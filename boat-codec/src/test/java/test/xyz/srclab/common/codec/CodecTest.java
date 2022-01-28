@@ -1,246 +1,116 @@
 package test.xyz.srclab.common.codec;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.BRandom;
 import xyz.srclab.common.codec.*;
-import xyz.srclab.common.codec.aes.AesKeys;
-import xyz.srclab.common.codec.rsa.RsaCodec;
-import xyz.srclab.common.codec.rsa.RsaKeyPair;
-import xyz.srclab.common.codec.sm2.Sm2Codec;
-import xyz.srclab.common.codec.sm2.Sm2KeyPair;
-import xyz.srclab.common.lang.Chars;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.codec.rsa.BRsa;
+import xyz.srclab.common.codec.sm2.BSm2;
+import xyz.srclab.common.io.BBuffer;
+import xyz.srclab.common.io.BIO;
+import xyz.srclab.common.io.BytesAppender;
 
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
+import java.nio.ByteBuffer;
 import java.security.Key;
-import java.security.MessageDigest;
-import java.util.Random;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 /**
  * @author sunqian
  */
 public class CodecTest {
 
-    private static final TestLogger logger = TestLogger.DEFAULT;
-
-    private static final String CHARS = "0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
-
     @Test
-    public void testRsa() {
-        RsaCodec rsaCodec = Codec.rsaCodec();
-        RsaKeyPair rsaKeyPair = rsaCodec.newKeyPair();
-        String data = random(512);
-        byte[] dataBytes = Chars.toBytes(data);
-        byte[] encrypt1 = rsaCodec.encrypt(rsaKeyPair.publicKey(), dataBytes);
-        byte[] decrypt1 = rsaCodec.decrypt(rsaKeyPair.privateKey(), encrypt1);
-        byte[] encrypt2 = Codec.forData(data).encryptRsa(rsaKeyPair.publicKey()).doFinal();
-        byte[] decrypt2 = Codec.forData(encrypt2).decryptRsa(rsaKeyPair.privateKey()).doFinal();
-        Assert.assertEquals(decrypt1, dataBytes);
-        Assert.assertEquals(decrypt2, dataBytes);
-
-        String decryptData = Codec.forData(encrypt1).decryptRsa(rsaKeyPair.privateKeyBytes()).doFinalString();
-        Assert.assertEquals(decryptData, data);
-
-        //Test empty string
-        String emptyData = "";
-        byte[] encryptEmpty = Codec.forData(emptyData).encryptRsa(rsaKeyPair.publicKey()).doFinal();
-        String decryptEmptyString = Codec.forData(encryptEmpty).decryptRsa(rsaKeyPair.privateKey()).doFinalString();
-        Assert.assertEquals(decryptEmptyString, emptyData);
+    public void testDigest() {
+        testDigest(BCodec.md5());
+        testDigest(BCodec.sha256());
+        testDigest(BCodec.sm3());
     }
 
     @Test
-    public void testSm2() {
-        Sm2Codec sm2Codec = Codec.sm2Codec();
-        Sm2KeyPair sm2KeyPair = sm2Codec.newKeyPair();
-        String data = random(512);
-        byte[] dataBytes = Chars.toBytes(data);
-        byte[] encrypt1 = sm2Codec.encrypt(sm2KeyPair.publicKey(), dataBytes);
-        byte[] decrypt1 = sm2Codec.decrypt(sm2KeyPair.privateKey(), encrypt1);
-        byte[] encrypt2 = Codec.forData(data).encryptSm2(sm2KeyPair.publicKey()).doFinal();
-        byte[] decrypt2 = Codec.forData(encrypt2).decryptSm2(sm2KeyPair.privateKey()).doFinal();
-        Assert.assertEquals(decrypt1, dataBytes);
-        Assert.assertEquals(decrypt2, dataBytes);
-
-        String decryptData = Codec.forData(encrypt1).decryptSm2(sm2KeyPair.privateKeyBytes()).doFinalString();
-        Assert.assertEquals(decryptData, data);
-
-        //Test empty string
-        String emptyData = "";
-        byte[] encryptEmpty = Codec.forData(emptyData).encryptSm2(sm2KeyPair.publicKey()).doFinal();
-        String decryptEmptyString = Codec.forData(encryptEmpty).decryptSm2(sm2KeyPair.privateKey()).doFinalString();
-        Assert.assertEquals(decryptEmptyString, emptyData);
+    public void testHmac() {
+        String password = "123";
+        testHmac(BCodec.hmacMd5(), BKey.passphraseToKey(password, CodecAlgorithm.HMAC_MD5_NAME, 128));
+        testHmac(BCodec.hmacSha256(), BKey.passphraseToKey(password, CodecAlgorithm.HMAC_SHA256_NAME, 128));
     }
 
     @Test
-    public void testAes() {
-        String key = "a";
-        SecretKey secretKey = AesKeys.newKey(key);
-        CipherCodec aesCodec = Codec.aesCodec();
-        String data = random(512);
-        byte[] dataBytes = Chars.toBytes(data);
-        byte[] encrypt = aesCodec.encrypt(secretKey, dataBytes);
-        byte[] decrypt = aesCodec.decrypt(secretKey, encrypt);
-        Assert.assertEquals(decrypt, dataBytes);
-
-        String decryptData = Codec.forData(encrypt).decryptAes(secretKey.getEncoded()).doFinalString();
-        Assert.assertEquals(decryptData, data);
-
-        //Test empty string
-        String emptyData = "";
-        byte[] encryptEmpty = Codec.forData(emptyData).encryptAes(secretKey).doFinal();
-        String decryptEmptyString = Codec.forData(encryptEmpty).decryptAes(secretKey).doFinalString();
-        Assert.assertEquals(decryptEmptyString, emptyData);
-
-        //Repeat use aes codec
-        SecretKey aesKey1 = AesKeys.newKey(random(32));
-        byte[] aesEncrypt1 = aesCodec.encrypt(aesKey1, data);
-        byte[] aesDecrypt1 = aesCodec.decrypt(aesKey1, aesEncrypt1);
-        Assert.assertEquals(aesDecrypt1, dataBytes);
-        SecretKey aesKey2 = AesKeys.newKey(random(32));
-        byte[] aesEncrypt2 = aesCodec.encrypt(aesKey2, data);
-        byte[] aesDecrypt2 = aesCodec.decrypt(aesKey2, aesEncrypt2);
-        Assert.assertEquals(aesDecrypt2, dataBytes);
-        SecretKey aesKey3 = AesKeys.newKey(random(32));
-        byte[] aesEncrypt3 = aesCodec.encrypt(aesKey3, data);
-        byte[] aesDecrypt3 = aesCodec.decrypt(aesKey3, aesEncrypt3);
-        Assert.assertEquals(aesDecrypt3, dataBytes);
+    public void testSign() {
+        KeyPair rsa = BRsa.generateKeyPair();
+        testSign(BCodec.sha256WithRsa(), rsa.getPublic(), rsa.getPrivate());
+        KeyPair sm2 = BSm2.generateKeyPair();
+        testSign(BCodec.sm3WithSm2(), sm2.getPublic(), sm2.getPrivate());
     }
 
-    @Test
-    public void testCodec() {
-        String data = random(512);
-        logger.log("data: " + data);
-        Sm2Codec sm2Codec = Codec.sm2Codec();
-        Sm2KeyPair sm2KeyPair = sm2Codec.newKeyPair();
-        RsaCodec rsaCodec = Codec.rsaCodec();
-        RsaKeyPair rsaKeyPair = rsaCodec.newKeyPair();
-        SecretKey aesKey = Codec.secretKey("0123456789012345", CodecAlgorithm.AES_NAME);
-
-        //加密
-        byte[] encrypt = Codec.aesCodec().encrypt(aesKey.getEncoded(), Chars.toBytes(data));
-        encrypt = rsaCodec.encrypt(rsaKeyPair.publicKey(), encrypt);
-        encrypt = sm2Codec.encrypt(sm2KeyPair.publicKey(), encrypt);
-        encrypt = EncCodec.base64().encode(encrypt);
-
-        //解密
-        String origin = Codec.forData(encrypt)
-            .decodeBase64()
-            .decryptSm2(sm2KeyPair.privateKeyBytes())
-            .decryptRsa(rsaKeyPair.privateKeyBytes())
-            .decryptAes(aesKey)
-            .doFinalString();
-        logger.log("origin: " + origin);
-        Assert.assertEquals(origin, data);
+    private void testDigest(DigestCodec digestCodec) {
+        int offset = 6;
+        int length = 998;
+        byte[] data = BRandom.randomString(1888).getBytes();
+        ByteBuffer dataBuffer = ByteBuffer.allocate(data.length);
+        dataBuffer.put(data, offset, length);
+        dataBuffer.flip();
+        byte[] d1 = digestCodec.digest(data, offset, length).doFinal();
+        byte[] d2 = digestCodec.digest(dataBuffer).doFinal();
+        Assert.assertEquals(d1, d2);
+        ByteBuffer destBuffer = ByteBuffer.allocateDirect(2222);
+        dataBuffer.position(0);
+        digestCodec.digest(dataBuffer).doFinal(destBuffer);
+        destBuffer.flip();
+        Assert.assertEquals(BBuffer.toBytes(destBuffer), d2);
+        dataBuffer.position(0);
+        BytesAppender appender = new BytesAppender();
+        digestCodec.digest(dataBuffer).doFinal(appender);
+        Assert.assertEquals(appender.toBytes(), d2);
+        byte[] d3 = digestCodec.digest(BIO.asInputStream(data, offset, length)).doFinal();
+        Assert.assertEquals(d3, d1);
     }
 
-    @Test
-    public void testEncode() {
-        logger.log(Codec.hexString("123456789"));
-        logger.log(Codec.base64String("123456789"));
-        Assert.assertEquals(
-            Codec.hexString("123456789"),
-            Hex.encodeHexString("123456789".getBytes())
-        );
-        Assert.assertEquals(
-            Codec.base64String("123456789"),
-            Base64.encodeBase64String("123456789".getBytes())
-        );
+    private void testHmac(HmacCodec hmacCodec, Key key) {
+        int offset = 6;
+        int length = 998;
+        byte[] data = BRandom.randomString(1888).getBytes();
+        ByteBuffer dataBuffer = ByteBuffer.allocate(data.length);
+        dataBuffer.put(data, offset, length);
+        dataBuffer.flip();
+        byte[] d1 = hmacCodec.hmac(key, data, offset, length).doFinal();
+        byte[] d2 = hmacCodec.hmac(key, dataBuffer).doFinal();
+        Assert.assertEquals(d1, d2);
+        ByteBuffer destBuffer = ByteBuffer.allocateDirect(2222);
+        dataBuffer.position(0);
+        hmacCodec.hmac(key, dataBuffer).doFinal(destBuffer);
+        destBuffer.flip();
+        Assert.assertEquals(BBuffer.toBytes(destBuffer), d2);
+        dataBuffer.position(0);
+        BytesAppender appender = new BytesAppender();
+        hmacCodec.hmac(key, dataBuffer).doFinal(appender);
+        Assert.assertEquals(appender.toBytes(), d2);
     }
 
-    @Test
-    public void testDigest() throws Exception {
-        String message = "123456789";
-        DigestCodec md5 = Codec.md5Codec();
-        Assert.assertEquals(
-            md5.digest(message),
-            MessageDigest.getInstance("Md5").digest(message.getBytes())
-        );
-        Assert.assertEquals(//test reset
-            md5.digest(message),
-            MessageDigest.getInstance("Md5").digest(message.getBytes())
-        );
-        HmacCodec hmacCodec = Codec.hmacMd5Codec();
-        Key aesKey = AesKeys.newKey("12345678");
-        Mac mac1 = Mac.getInstance("HmacMD5");
-        mac1.init(aesKey);
-        Assert.assertEquals(
-            hmacCodec.digest(aesKey, message),
-            mac1.doFinal(message.getBytes())
-        );
-        Mac mac2 = Mac.getInstance("HmacMD5");
-        mac2.init(aesKey);
-        Assert.assertEquals(
-            hmacCodec.digest(aesKey, message),
-            mac2.doFinal(message.getBytes())
-        );
-    }
+    private void testSign(SignCodec signCodec, PublicKey publicKey, PrivateKey privateKey) {
+        int offset = 6;
+        int length = 998;
+        byte[] data = BRandom.randomString(1888).getBytes();
+        ByteBuffer dataBuffer = ByteBuffer.allocate(data.length);
+        dataBuffer.put(data, offset, length);
+        dataBuffer.flip();
+        byte[] d1 = signCodec.sign(privateKey, data, offset, length).doFinal();
+        byte[] d2 = signCodec.sign(privateKey, dataBuffer).doFinal();
+        //Assert.assertEquals(d1, d2);
+        ByteBuffer destBuffer = ByteBuffer.allocateDirect(2222);
+        dataBuffer.position(0);
+        signCodec.sign(privateKey, dataBuffer).doFinal(destBuffer);
+        destBuffer.flip();
+        //Assert.assertEquals(BBuffer.toBytes(destBuffer), d2);
+        dataBuffer.position(0);
+        BytesAppender appender = new BytesAppender();
+        signCodec.sign(privateKey, dataBuffer).doFinal(appender);
+        //Assert.assertEquals(appender.toBytes(), d2);
 
-    @Test
-    public void testAlgorithm() {
-        String key = "123";
-        String password = "666666666666666666666666";
-        logger.log("{}: {}", CodecAlgorithm.PLAIN, Codec.plainCodec().encodeToString(password));
-        logger.log("{}: {}", CodecAlgorithm.HEX, Codec.hexCodec().encodeToString(password));
-        logger.log("{}: {}", CodecAlgorithm.BASE64, Codec.base64Codec().encodeToString(password));
-        logger.log("{}: {}", CodecAlgorithm.MD2,
-            EncCodec.base64().encodeToString(Codec.md2Codec().digestToString(password)));
-        logger.log("{}: {}", CodecAlgorithm.MD5,
-            EncCodec.base64().encodeToString(Codec.md5Codec().digestToString(password)));
-        logger.log("{}: {}", CodecAlgorithm.SHA1,
-            EncCodec.base64().encodeToString(Codec.sha1Codec().digestToString(password)));
-        logger.log("{}: {}", CodecAlgorithm.SHA256,
-            EncCodec.base64().encodeToString(Codec.sha256Codec().digestToString(password)));
-        logger.log("{}: {}", CodecAlgorithm.SHA384,
-            EncCodec.base64().encodeToString(Codec.sha384Codec().digestToString(password)));
-        logger.log("{}: {}", CodecAlgorithm.SHA512,
-            EncCodec.base64().encodeToString(Codec.sha512Codec().digestToString(password)));
-        logger.log("{}: {}", CodecAlgorithm.HMAC_MD5,
-            EncCodec.base64().encodeToString(Codec.hmacMd5Codec().digestToString(key, password)));
-        logger.log("{}: {}", CodecAlgorithm.HMAC_SHA1,
-            EncCodec.base64().encodeToString(Codec.hmacSha1Codec().digestToString(key, password)));
-        logger.log("{}: {}", CodecAlgorithm.HMAC_SHA256,
-            EncCodec.base64().encodeToString(Codec.hmacSha256Codec().digestToString(key, password)));
-        logger.log("{}: {}", CodecAlgorithm.HMAC_SHA384,
-            EncCodec.base64().encodeToString(Codec.hmacSha384Codec().digestToString(key, password)));
-        logger.log("{}: {}", CodecAlgorithm.HMAC_SHA512,
-            EncCodec.base64().encodeToString(Codec.hmacSha512Codec().digestToString(key, password)));
-        SecretKey aesKey = AesKeys.newKey(key);
-        logger.log("{}: {}", CodecAlgorithm.AES,
-            EncCodec.base64().encodeToString(Codec.aesCodec().encryptToString(aesKey, password)));
-        RsaKeyPair rsaKeyPair = Codec.rsaCodec().newKeyPair();
-        logger.log("{}: {}", CodecAlgorithm.RSA,
-            EncCodec.base64().encodeToString(Codec.rsaCodec().encryptToString(rsaKeyPair.publicKey(), password)));
-        Sm2KeyPair sm2KeyPair = Codec.sm2Codec().newKeyPair();
-        logger.log("{}: {}", CodecAlgorithm.SM2,
-            EncCodec.base64().encodeToString(Codec.sm2Codec().encryptToString(sm2KeyPair.publicKey(), password)));
-    }
-
-    @Test
-    public void testPassword() {
-        String password = "some password";
-        SecretKey key = AesKeys.newKey("123");
-        logger.log("password: {}, aes: {}",
-            password, Codec.forData(password).encryptAes(key).encodeBase64().doFinalString());
-    }
-
-    private String random(int length) {
-        char[] result = new char[length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = CHARS.charAt(new Random().nextInt(CHARS.length()));
-        }
-        return new String(result);
-    }
-
-    public static class Xxx implements Codec {
-
-        @NotNull
-        @Override
-        public String algorithm() {
-            return null;
-        }
+        dataBuffer.position(0);
+        Assert.assertTrue(signCodec.verify(publicKey, data, offset, length).verify(d1));
+        Assert.assertTrue(signCodec.verify(publicKey, dataBuffer).verify(d2));
+        destBuffer.position(0);
+        Assert.assertTrue(signCodec.verify(publicKey, BIO.asInputStream(data, offset, length)).verify(destBuffer));
     }
 }
