@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class BufferTest {
 
     @Test
-    public void testByteBuffer() {
+    public void testToBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(100);
         initBuffer(buffer);
         byte[] bytes = BBuffer.toBytes(buffer);
@@ -37,14 +37,26 @@ public class BufferTest {
         byte[] bytes4f = BBuffer.toBytes(buffer4);
         Assert.assertNotSame(bytes4f, bytes4);
         Assert.assertEquals(bytes4f, bytes4);
+    }
 
-        byte[] bytes5 = initArray(new byte[100]);
-        ByteBuffer buffer5 = ByteBuffer.wrap(bytes5);
-        ByteBuffer buffer55 = BBuffer.getBuffer(buffer5, 50);
+    @Test
+    public void testGetBuffer() {
+        byte[] bytes = initArray(new byte[100]);
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        ByteBuffer getBuffer = BBuffer.getBuffer(buffer, 50);
         Assert.assertEquals(
-            buffer55.array(),
-            Arrays.copyOfRange(bytes5, 0, 50)
+            getBuffer.array(),
+            Arrays.copyOfRange(bytes, 0, 50)
         );
+    }
+
+    @Test
+    public void testToBuffer() {
+        byte[] bytes = initArray(new byte[100]);
+        ByteBuffer buffer = BBuffer.toBuffer(bytes, true);
+        Assert.assertEquals(BBuffer.toBytes(buffer), bytes);
+        ByteBuffer buffer2 = BBuffer.toBuffer(bytes);
+        Assert.assertEquals(BBuffer.toBytes(buffer2), bytes);
     }
 
     private void initBuffer(ByteBuffer buffer) {

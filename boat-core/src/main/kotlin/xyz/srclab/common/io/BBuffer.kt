@@ -2,6 +2,7 @@
 
 package xyz.srclab.common.io
 
+import xyz.srclab.common.base.remainingLength
 import java.nio.ByteBuffer
 
 /**
@@ -34,3 +35,40 @@ fun ByteBuffer.getBuffer(length: Int): ByteBuffer {
     this.get(array)
     return ByteBuffer.wrap(array)
 }
+
+/**
+ * Return a [ByteBuffer] with full data come from [this] array, of which position is `0`, limit is size of array.
+ */
+fun ByteArray.toBuffer(direct: Boolean): ByteBuffer {
+    return toBuffer(0, this.size, direct)
+}
+
+/**
+ * Return a [ByteBuffer] with full data come from [this] array, of which position is `0`, limit is [length].
+ */
+@JvmOverloads
+fun ByteArray.toBuffer(
+    offset: Int = 0,
+    length: Int = remainingLength(this.size, offset),
+    direct: Boolean = false
+): ByteBuffer {
+    val buffer = if (direct) ByteBuffer.allocateDirect(length) else ByteBuffer.allocate(length)
+    buffer.put(this, offset, length)
+    buffer.flip()
+    return buffer
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
