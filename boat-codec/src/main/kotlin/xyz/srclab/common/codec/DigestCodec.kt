@@ -4,11 +4,9 @@ import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import java.io.InputStream
-import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 import java.util.function.Supplier
-import kotlin.math.min
 
 /**
  * Digest codec such as `MD5`.
@@ -20,67 +18,80 @@ interface DigestCodec : Codec {
     val digestLength: Int
         get() = digest.digestLength
 
-    fun digest(data: ByteArray): ByteArray {
+    fun digest(data: ByteArray): PreparedCodec {
         return digest(data, 0)
     }
 
-    fun digest(data: ByteArray, offset: Int): ByteArray {
+    fun digest(data: ByteArray, offset: Int): PreparedCodec {
         return digest(data, offset, remainingLength(data.size, offset))
     }
 
-    fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
-        val digest = this.digest
-        digest.reset()
-        digest.update(data, offset, length)
-        return digest.digest()
+    fun digest(data: ByteArray, offset: Int, length: Int): PreparedCodec {
+        return ByteArrayPreparedCodec(digest, data, offset, length)
     }
 
-    fun digest(data: ByteArray, output: OutputStream): Long {
-        return digest(data, 0, output)
+    fun digest(data: ByteBuffer): PreparedCodec {
+        return ByteBufferPreparedCodec(digest, data)
     }
 
-    fun digest(data: ByteArray, offset: Int, output: OutputStream): Long {
-        return digest(data, offset, remainingLength(data.size, offset), output)
+    fun digest(data: InputStream): PreparedCodec {
+        return InputStreamPreparedCodec(digest, data)
     }
 
-    fun digest(data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
-        val digest = digest(data, offset, length)
-        output.write(digest)
-        return digest.size.toLong()
-    }
+    open class ByteArrayPreparedCodec(
+        private val digest: MessageDigest,
+        private val data: ByteArray,
+        private val dataOffset: Int,
+        private val dataLength: Int
+    ) : PreparedCodec {
 
-    fun digest(data: ByteBuffer): ByteArray {
-        val digest = this.digest
-        digest.reset()
-        digest.update(data)
-        return digest.digest()
-    }
+        override fun doFinal(): ByteArray {
+            digest.reset()
+            digest.update(data, dataOffset, dataLength)
+            return digest.digest()
+        }
 
-    fun digest(data: ByteBuffer, dest: ByteBuffer): Int {
-        val digest = this.digest
-        digest.reset()
-        digest.update(data)
-        return if (dest.hasArray()) {
-            val startPos = dest.position()
-            val array = dest.array()
-            val arrayOffset = dest.arrayOffset()
-            val length = min(remainingLength(array.size, arrayOffset), dest.remaining())
-            val result = digest.digest(array, arrayOffset, length)
-            dest.position(startPos + result)
-            result
-        } else {
-            val startPos = dest.position()
-            dest.put(digest.digest())
-            dest.position() - startPos
+        override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+            digest.reset()
+            digest.update(data, dataOffset, dataLength)
+            return digest.digest(dest, offset, length)
         }
     }
 
-    fun digest(data: InputStream): ByteArray {
-        return digest(data.readBytes())
+    open class ByteBufferPreparedCodec(
+        private val digest: MessageDigest,
+        private val data: ByteBuffer
+    ) : PreparedCodec {
+
+        override fun doFinal(): ByteArray {
+            digest.reset()
+            digest.update(data)
+            return digest.digest()
+        }
+
+        override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+            digest.reset()
+            digest.update(data)
+            return digest.digest(dest, offset, length)
+        }
     }
 
-    fun digest(data: InputStream, output: OutputStream): Long {
-        return digest(data.readBytes(), output)
+    open class InputStreamPreparedCodec(
+        private val digest: MessageDigest,
+        private val data: InputStream
+    ) : PreparedCodec {
+
+        override fun doFinal(): ByteArray {
+            digest.reset()
+            digest.update(data.readBytes())
+            return digest.digest()
+        }
+
+        override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+            digest.reset()
+            digest.update(data.readBytes())
+            return digest.digest(dest, offset, length)
+        }
     }
 
     /**
@@ -120,7 +131,7 @@ interface DigestCodec : Codec {
                 if (c === null) {
                     val supplier = this.digestSupplier
                     if (supplier === null) {
-                        throw IllegalStateException("digesterSupplier was not specified.")
+                        throw IllegalStateException("digestSupplier was not specified.")
                     }
                     val algorithm = this.algorithm
                     if (algorithm === null) {
@@ -153,53 +164,28 @@ interface DigestCodec : Codec {
                 get() = digestCodec.digestLength
 
             @Synchronized
-            override fun digest(data: ByteArray): ByteArray {
+            override fun digest(data: ByteArray): PreparedCodec {
                 return digestCodec.digest(data)
             }
 
             @Synchronized
-            override fun digest(data: ByteArray, offset: Int): ByteArray {
+            override fun digest(data: ByteArray, offset: Int): PreparedCodec {
                 return digestCodec.digest(data, offset)
             }
 
             @Synchronized
-            override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
+            override fun digest(data: ByteArray, offset: Int, length: Int): PreparedCodec {
                 return digestCodec.digest(data, offset, length)
             }
 
             @Synchronized
-            override fun digest(data: ByteArray, output: OutputStream): Long {
-                return digestCodec.digest(data, output)
-            }
-
-            @Synchronized
-            override fun digest(data: ByteArray, offset: Int, output: OutputStream): Long {
-                return digestCodec.digest(data, offset, output)
-            }
-
-            @Synchronized
-            override fun digest(data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
-                return digestCodec.digest(data, offset, length, output)
-            }
-
-            @Synchronized
-            override fun digest(data: ByteBuffer): ByteArray {
+            override fun digest(data: ByteBuffer): PreparedCodec {
                 return digestCodec.digest(data)
             }
 
             @Synchronized
-            override fun digest(data: ByteBuffer, dest: ByteBuffer): Int {
-                return digestCodec.digest(data, dest)
-            }
-
-            @Synchronized
-            override fun digest(data: InputStream): ByteArray {
+            override fun digest(data: InputStream): PreparedCodec {
                 return digestCodec.digest(data)
-            }
-
-            @Synchronized
-            override fun digest(data: InputStream, output: OutputStream): Long {
-                return digestCodec.digest(data, output)
             }
         }
 
@@ -218,44 +204,24 @@ interface DigestCodec : Codec {
             override val digestLength: Int
                 get() = threadLocal.get().digestLength
 
-            override fun digest(data: ByteArray): ByteArray {
+            override fun digest(data: ByteArray): PreparedCodec {
                 return threadLocal.get().digest(data)
             }
 
-            override fun digest(data: ByteArray, offset: Int): ByteArray {
+            override fun digest(data: ByteArray, offset: Int): PreparedCodec {
                 return threadLocal.get().digest(data, offset)
             }
 
-            override fun digest(data: ByteArray, offset: Int, length: Int): ByteArray {
+            override fun digest(data: ByteArray, offset: Int, length: Int): PreparedCodec {
                 return threadLocal.get().digest(data, offset, length)
             }
 
-            override fun digest(data: ByteArray, output: OutputStream): Long {
-                return threadLocal.get().digest(data, output)
-            }
-
-            override fun digest(data: ByteArray, offset: Int, output: OutputStream): Long {
-                return threadLocal.get().digest(data, offset, output)
-            }
-
-            override fun digest(data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
-                return threadLocal.get().digest(data, offset, length, output)
-            }
-
-            override fun digest(data: ByteBuffer): ByteArray {
+            override fun digest(data: ByteBuffer): PreparedCodec {
                 return threadLocal.get().digest(data)
             }
 
-            override fun digest(data: ByteBuffer, dest: ByteBuffer): Int {
-                return threadLocal.get().digest(data, dest)
-            }
-
-            override fun digest(data: InputStream): ByteArray {
+            override fun digest(data: InputStream): PreparedCodec {
                 return threadLocal.get().digest(data)
-            }
-
-            override fun digest(data: InputStream, output: OutputStream): Long {
-                return threadLocal.get().digest(data, output)
             }
         }
     }
@@ -277,32 +243,32 @@ interface DigestCodec : Codec {
 
         @JvmStatic
         fun md2(): DigestCodec {
-            return CodecAlgorithm.MD2_NAME.toDigestCodec()
+            return CodecAlgorithm.MD2.toDigestCodec()
         }
 
         @JvmStatic
         fun md5(): DigestCodec {
-            return CodecAlgorithm.MD5_NAME.toDigestCodec()
+            return CodecAlgorithm.MD5.toDigestCodec()
         }
 
         @JvmStatic
         fun sha1(): DigestCodec {
-            return CodecAlgorithm.SHA1_NAME.toDigestCodec()
+            return CodecAlgorithm.SHA1.toDigestCodec()
         }
 
         @JvmStatic
         fun sha256(): DigestCodec {
-            return CodecAlgorithm.SHA256_NAME.toDigestCodec()
+            return CodecAlgorithm.SHA256.toDigestCodec()
         }
 
         @JvmStatic
         fun sha384(): DigestCodec {
-            return CodecAlgorithm.SHA384_NAME.toDigestCodec()
+            return CodecAlgorithm.SHA384.toDigestCodec()
         }
 
         @JvmStatic
         fun sha512(): DigestCodec {
-            return CodecAlgorithm.SHA512_NAME.toDigestCodec()
+            return CodecAlgorithm.SHA512.toDigestCodec()
         }
 
         @JvmName("forAlgorithm")
@@ -316,7 +282,7 @@ interface DigestCodec : Codec {
         fun CodecAlgorithm.toDigestCodec(): DigestCodec {
             return newBuilder()
                 .algorithm(this)
-                .digestSupplier() { MessageDigest.getInstance(this.name) }
+                .digestSupplier { MessageDigest.getInstance(this.name) }
                 .build()
         }
     }

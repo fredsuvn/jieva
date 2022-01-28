@@ -3,6 +3,7 @@ package xyz.srclab.common.codec.rsa
 import xyz.srclab.common.base.needingBlock
 import xyz.srclab.common.codec.CipherCodec
 import xyz.srclab.common.codec.CodecAlgorithm
+import xyz.srclab.common.codec.PreparedCodec
 import xyz.srclab.common.io.BytesAppender
 import java.io.InputStream
 import java.io.OutputStream
@@ -20,203 +21,540 @@ open class RsaCodec @JvmOverloads constructor(
 
     override val algorithm = CodecAlgorithm.RSA
 
-    override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
-        val cipher = this.cipher
-        cipher.init(Cipher.ENCRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        return encrypt0(data, offset, length, cipher, blockSize, outputSize)
+    override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
+        return ByteArrayEnPreparedCodec(cipher, key, data, offset, length)
     }
 
-    override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
-        val cipher = this.cipher
-        cipher.init(Cipher.ENCRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        return encrypt0(data, offset, length, output, cipher, blockSize, outputSize)
+    override fun encrypt(key: Key, data: ByteBuffer): PreparedCodec {
+        return ByteBufferEnPreparedCodec(cipher, key, data)
     }
 
-    override fun encrypt(key: Key, data: ByteBuffer): ByteBuffer {
-        val cipher = this.cipher
-        cipher.init(Cipher.ENCRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        val length = data.remaining()
-        val needingSize = needingBlock(length, blockSize) * outputSize
-        val dest = ByteBuffer.allocate(needingSize)
-        encrypt0(data, dest, cipher, blockSize, outputSize, length)
-        return dest
+    override fun encrypt(key: Key, data: InputStream): PreparedCodec {
+        return InputStreamEnPreparedCodec(cipher, key, data)
     }
 
-    override fun encrypt(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
-        val cipher = this.cipher
-        cipher.init(Cipher.ENCRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        val length = data.remaining()
-        return encrypt0(data, dest, cipher, blockSize, outputSize, length)
+    override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
+        return ByteArrayDePreparedCodec(cipher, key, data, offset, length)
     }
 
-    override fun encrypt(key: Key, data: InputStream): ByteArray {
-        val cipher = this.cipher
-        cipher.init(Cipher.ENCRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        val needingSize = needingBlock(data.available(), blockSize) * outputSize
-        val output = BytesAppender(needingSize)
-        encrypt0(data, output, cipher, blockSize)
-        return output.toBytes()
+    override fun decrypt(key: Key, data: ByteBuffer): PreparedCodec {
+        return ByteBufferDePreparedCodec(cipher, key, data)
     }
 
-    override fun encrypt(key: Key, data: InputStream, output: OutputStream): Long {
-        val cipher = this.cipher
-        cipher.init(Cipher.ENCRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        return encrypt0(data, output, cipher, blockSize)
-    }
-
-    override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int): ByteArray {
-        val cipher = this.cipher
-        cipher.init(Cipher.DECRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        return encrypt0(data, offset, length, cipher, outputSize, blockSize)
-    }
-
-    override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int, output: OutputStream): Long {
-        val cipher = this.cipher
-        cipher.init(Cipher.DECRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        return encrypt0(data, offset, length, output, cipher, outputSize, blockSize)
-    }
-
-    override fun decrypt(key: Key, data: ByteBuffer): ByteBuffer {
-        val cipher = this.cipher
-        cipher.init(Cipher.DECRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        val length = data.remaining()
-        val needingSize = needingBlock(length, outputSize) * blockSize
-        val dest = ByteBuffer.allocate(needingSize)
-        encrypt0(data, dest, cipher, outputSize, blockSize, length)
-        return dest
-    }
-
-    override fun decrypt(key: Key, data: ByteBuffer, dest: ByteBuffer): Int {
-        val cipher = this.cipher
-        cipher.init(Cipher.DECRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        val length = data.remaining()
-        return encrypt0(data, dest, cipher, outputSize, blockSize, length)
-    }
-
-    override fun decrypt(key: Key, data: InputStream): ByteArray {
-        val cipher = this.cipher
-        cipher.init(Cipher.DECRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        val blockSize = outputSize - 11
-        val needingSize = needingBlock(data.available(), outputSize) * blockSize
-        val output = BytesAppender(needingSize)
-        encrypt0(data, output, cipher, outputSize)
-        return output.toBytes()
-    }
-
-    override fun decrypt(key: Key, data: InputStream, output: OutputStream): Long {
-        val cipher = this.cipher
-        cipher.init(Cipher.DECRYPT_MODE, key)
-        val outputSize = cipher.getOutputSize(0)
-        return encrypt0(data, output, cipher, outputSize)
+    override fun decrypt(key: Key, data: InputStream): PreparedCodec {
+        return InputStreamDePreparedCodec(cipher, key, data)
     }
 
     private fun encrypt0(
-        data: ByteArray, offset: Int, length: Int, cipher: Cipher, blockSize: Int, outputSize: Int
+        data: ByteArray, offset: Int, length: Int,
+        cipher: Cipher, blockSize: Int, outputSize: Int
     ): ByteArray {
         val needingSize = needingBlock(length, blockSize) * outputSize
         val dest = ByteArray(needingSize)
-        var dataOffset = offset
-        var destOffset = 0
-        while (dataOffset < data.size) {
-            val inLength = inLength(offset, length, dataOffset, blockSize)
-            val outLength = cipher.doFinal(data, dataOffset, inLength, dest, destOffset)
-            dataOffset += inLength
-            destOffset += outLength
+        var curDataOffset = offset
+        var curDestOffset = 0
+        while (curDataOffset < offset + length) {
+            val inLength = inLength(offset, length, curDataOffset, blockSize)
+            val outLength = cipher.doFinal(data, curDataOffset, inLength, dest, curDestOffset)
+            curDataOffset += inLength
+            curDestOffset += outLength
         }
-        return if (destOffset == needingSize) dest else dest.copyOfRange(0, destOffset)
+        return if (curDestOffset == needingSize) dest else dest.copyOfRange(0, curDestOffset)
     }
 
     private fun encrypt0(
-        data: ByteArray, offset: Int, length: Int, output: OutputStream,
+        data: ByteArray, dataOffset: Int, dataLength: Int,
+        dest: ByteArray, destOffset: Int,
+        cipher: Cipher, blockSize: Int
+    ): Int {
+        var curDataOffset = dataOffset
+        var curDestOffset = destOffset
+        while (curDataOffset < dataOffset + dataLength) {
+            val inLength = inLength(dataOffset, dataLength, curDataOffset, blockSize)
+            val outLength = cipher.doFinal(data, curDataOffset, inLength, dest, curDestOffset)
+            curDataOffset += inLength
+            curDestOffset += outLength
+        }
+        return curDestOffset - destOffset
+    }
+
+    private fun encrypt0(
+        data: ByteArray, dataOffset: Int, dataLength: Int,
+        dest: ByteBuffer,
         cipher: Cipher, blockSize: Int, outputSize: Int
-    ): Long {
-        val outBuffer = ByteArray(outputSize)
-        var dataOffset = offset
-        var destLength = 0L
-        while (dataOffset < data.size) {
-            val inLength = inLength(offset, length, dataOffset, blockSize)
-            val outLength = cipher.doFinal(data, dataOffset, inLength, outBuffer)
-            output.write(outBuffer, 0, outLength)
-            dataOffset += inLength
-            destLength += outLength
+    ): Int {
+        if (dest.hasArray()) {
+            val startPos = dest.position()
+            val cryptLength = encrypt0(data, dataOffset, dataLength, dest.array(), startPos, cipher, blockSize)
+            dest.position(startPos + cryptLength)
+            return cryptLength
         }
-        return destLength
+        val buffer = ByteArray(outputSize)
+        var curDataOffset = dataOffset
+        var cryptLength = 0
+        while (curDataOffset < dataOffset + dataLength) {
+            val inLength = inLength(dataOffset, dataLength, curDataOffset, blockSize)
+            val outLength = cipher.doFinal(data, curDataOffset, inLength, buffer)
+            dest.put(buffer, 0, outLength)
+            curDataOffset += inLength
+            cryptLength += outLength
+        }
+        return cryptLength
     }
 
     private fun encrypt0(
-        data: ByteBuffer, dest: ByteBuffer, cipher: Cipher, blockSize: Int, outputSize: Int, remaining: Int
+        data: ByteArray, offset: Int, length: Int,
+        dest: OutputStream,
+        cipher: Cipher, blockSize: Int, outputSize: Int
+    ): Int {
+        val buffer = ByteArray(outputSize)
+        var curDataOffset = offset
+        var cryptLength = 0
+        while (curDataOffset < offset + length) {
+            val inLength = inLength(offset, length, curDataOffset, blockSize)
+            val outLength = cipher.doFinal(data, curDataOffset, inLength, buffer)
+            dest.write(buffer, 0, outLength)
+            curDataOffset += inLength
+            cryptLength += outLength
+        }
+        return cryptLength
+    }
+
+    private fun encrypt0(
+        data: ByteBuffer,
+        cipher: Cipher, blockSize: Int, outputSize: Int
+    ): ByteArray {
+        if (data.hasArray()) {
+            val startPos = data.position()
+            val array = data.array()
+            val arrayOffset = data.arrayOffset() + startPos
+            val result = encrypt0(array, arrayOffset, data.remaining(), cipher, blockSize, outputSize)
+            data.position(startPos + result.size)
+            return result
+        }
+        val length = data.remaining()
+        val needingSize = needingBlock(length, blockSize) * outputSize
+        val dest = ByteArray(needingSize)
+        val buffer = ByteArray(blockSize)
+        var curDataOffset = 0
+        var curDestOffset = 0
+        while (curDataOffset < length) {
+            val inLength = inLength(data, blockSize)
+            data.get(buffer)
+            val outLength = cipher.doFinal(buffer, 0, inLength, dest, curDestOffset)
+            curDataOffset += inLength
+            curDestOffset += outLength
+        }
+        return if (curDestOffset == needingSize) dest else dest.copyOfRange(0, curDestOffset)
+    }
+
+    private fun encrypt0(
+        data: ByteBuffer,
+        dest: ByteArray, destOffset: Int,
+        cipher: Cipher, blockSize: Int
     ): Int {
         if (data.hasArray()) {
-            val buffer = ByteArray(outputSize)
+            val startPos = data.position()
             val array = data.array()
-            val arrayOffset = data.arrayOffset() + data.position()
-            var dataOffset = arrayOffset
-            var destLength = 0
-            while (arrayOffset < remaining) {
-                val inLength = inLength(arrayOffset, remaining, dataOffset, blockSize)
-                val outLength = cipher.doFinal(array, arrayOffset, inLength, buffer)
-                dest.put(buffer, 0, outLength)
-                dataOffset += inLength
-                destLength += outLength
-            }
-            data.position(data.position() + destLength)
-            return destLength
+            val arrayOffset = data.arrayOffset() + startPos
+            val cryptLength = encrypt0(array, arrayOffset, data.remaining(), dest, destOffset, cipher, blockSize)
+            data.position(startPos + cryptLength)
+            return cryptLength
+        }
+        val length = data.remaining()
+        val buffer = ByteArray(blockSize)
+        var curDataOffset = 0
+        var curDestOffset = destOffset
+        while (curDataOffset < length) {
+            val inLength = inLength(data, blockSize)
+            data.get(buffer)
+            val outLength = cipher.doFinal(buffer, 0, inLength, dest, curDestOffset)
+            curDataOffset += inLength
+            curDestOffset += outLength
+        }
+        return curDestOffset - destOffset
+    }
+
+    private fun encrypt0(
+        data: ByteBuffer,
+        dest: ByteBuffer,
+        cipher: Cipher, blockSize: Int, outputSize: Int
+    ): Int {
+        if (data.hasArray() && dest.hasArray()) {
+            val dataStartPos = data.position()
+            val dataArray = data.array()
+            val dataArrayOffset = data.arrayOffset() + dataStartPos
+            val destStartPos = data.position()
+            val destArray = dest.array()
+            val destArrayOffset = dest.arrayOffset() + destStartPos
+            val cryptLength = encrypt0(
+                dataArray, dataArrayOffset, data.remaining(), destArray, destArrayOffset, cipher, blockSize)
+            data.position(dataStartPos + cryptLength)
+            dest.position(destStartPos + cryptLength)
+            return cryptLength
+        } else if (data.hasArray() && !dest.hasArray()) {
+            val dataStartPos = data.position()
+            val dataArray = data.array()
+            val dataArrayOffset = data.arrayOffset() + dataStartPos
+            val cryptLength = encrypt0(
+                dataArray, dataArrayOffset, data.remaining(), dest, cipher, blockSize, outputSize)
+            data.position(dataStartPos + cryptLength)
+            return cryptLength
+        } else if (!data.hasArray() && dest.hasArray()) {
+            val destStartPos = data.position()
+            val destArray = dest.array()
+            val destArrayOffset = dest.arrayOffset() + destStartPos
+            val cryptLength = encrypt0(data, destArray, destArrayOffset, cipher, blockSize)
+            dest.position(destStartPos + cryptLength)
+            return cryptLength
         } else {
+            val length = data.remaining()
             val inBuffer = ByteArray(blockSize)
             val outBuffer = ByteArray(outputSize)
-            var dataOffset = 0
-            var destLength = 0
-            while (dataOffset < remaining) {
-                val inLength = if (data.remaining() >= inBuffer.size) inBuffer.size else data.remaining()
+            var curDataOffset = 0
+            var cryptLength = 0
+            while (curDataOffset < length) {
+                val inLength = inLength(data, blockSize)
                 data.get(inBuffer)
-                val outLength = cipher.doFinal(inBuffer, 0, inLength, outBuffer)
+                val outLength = cipher.doFinal(inBuffer, 0, inLength, outBuffer, 0)
                 dest.put(outBuffer, 0, outLength)
-                dataOffset += inLength
-                destLength += outLength
+                curDataOffset += inLength
+                cryptLength += outLength
             }
-            return destLength
+            return cryptLength
         }
     }
 
-    private fun encrypt0(data: InputStream, output: OutputStream, cipher: Cipher, blockSize: Int): Long {
+    private fun encrypt0(
+        data: ByteBuffer,
+        dest: OutputStream,
+        cipher: Cipher, blockSize: Int, outputSize: Int
+    ): Int {
+        if (data.hasArray()) {
+            val startPos = data.position()
+            val array = data.array()
+            val arrayOffset = data.arrayOffset() + startPos
+            val cryptLength = encrypt0(array, arrayOffset, data.remaining(), dest, cipher, blockSize, outputSize)
+            data.position(startPos + cryptLength)
+            return cryptLength
+        }
+        val length = data.remaining()
         val inBuffer = ByteArray(blockSize)
-        var destLength = 0L
+        val outBuffer = ByteArray(outputSize)
+        var curDataOffset = 0
+        var cryptLength = 0
+        while (curDataOffset < length) {
+            val inLength = inLength(data, blockSize)
+            data.get(inBuffer)
+            val outLength = cipher.doFinal(inBuffer, 0, inLength, outBuffer, 0)
+            dest.write(outBuffer, 0, outLength)
+            curDataOffset += inLength
+            cryptLength += outLength
+        }
+        return cryptLength
+    }
+
+    private fun encrypt0(
+        data: InputStream,
+        cipher: Cipher, blockSize: Int, outputSize: Int
+    ): ByteArray {
+        val length = data.available()
+        val needingSize = needingBlock(length, blockSize) * outputSize
+        val dest = BytesAppender(needingSize)
+        encrypt0(data, dest, cipher, blockSize, outputSize)
+        return dest.toBytes()
+    }
+
+    private fun encrypt0(
+        data: InputStream,
+        dest: ByteArray, destOffset: Int,
+        cipher: Cipher, blockSize: Int
+    ): Int {
+        val buffer = ByteArray(blockSize)
+        var curDestOffset = destOffset
+        while (true) {
+            val inLength = data.read(buffer)
+            if (inLength < 0) {
+                break
+            }
+            if (inLength > 0) {
+                val outLength = cipher.doFinal(buffer, 0, inLength, dest, curDestOffset)
+                curDestOffset += outLength
+            }
+        }
+        return curDestOffset - destOffset
+    }
+
+    private fun encrypt0(
+        data: InputStream,
+        dest: ByteBuffer,
+        cipher: Cipher, blockSize: Int, outputSize: Int
+    ): Int {
+        if (dest.hasArray()) {
+            val startPos = dest.position()
+            val array = dest.array()
+            val arrayOffset = dest.arrayOffset() + startPos
+            val cryptLength = encrypt0(data, array, arrayOffset, cipher, blockSize)
+            dest.position(startPos + cryptLength)
+            return cryptLength
+        }
+        val inBuffer = ByteArray(blockSize)
+        val outBuffer = ByteArray(outputSize)
+        var cryptLength = 0
         while (true) {
             val inLength = data.read(inBuffer)
             if (inLength < 0) {
                 break
             }
             if (inLength > 0) {
-                val outBuffer = cipher.doFinal(inBuffer, 0, inLength)
-                output.write(outBuffer)
-                destLength += outBuffer.size
+                val outLength = cipher.doFinal(inBuffer, 0, inLength, outBuffer, 0)
+                dest.put(outBuffer, 0, outLength)
+                cryptLength += outLength
             }
         }
-        return destLength
+        return cryptLength
+    }
+
+    private fun encrypt0(
+        data: InputStream,
+        dest: OutputStream,
+        cipher: Cipher, blockSize: Int, outputSize: Int
+    ): Int {
+        val inBuffer = ByteArray(blockSize)
+        val outBuffer = ByteArray(outputSize)
+        var cryptLength = 0
+        while (true) {
+            val inLength = data.read(inBuffer)
+            if (inLength < 0) {
+                break
+            }
+            if (inLength > 0) {
+                val outLength = cipher.doFinal(inBuffer, 0, inLength, outBuffer, 0)
+                dest.write(outBuffer, 0, outLength)
+                cryptLength += outLength
+            }
+        }
+        return cryptLength
     }
 
     private fun inLength(offset: Int, length: Int, dataOffset: Int, blockSize: Int): Int {
         return min(offset + length - dataOffset, blockSize)
+    }
+
+    private fun inLength(buffer: ByteBuffer, blockSize: Int): Int {
+        return min(buffer.remaining(), blockSize)
+    }
+
+
+    open inner class ByteArrayEnPreparedCodec(
+        private val cipher: Cipher,
+        private val key: Key,
+        private val data: ByteArray,
+        private val dataOffset: Int,
+        private val dataLength: Int
+    ) : PreparedCodec {
+
+        override fun doFinal(): ByteArray {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dataOffset, dataLength, cipher, blockSize, outputSize)
+        }
+
+        override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dataOffset, dataLength, dest, offset, cipher, blockSize)
+        }
+
+        override fun doFinal(dest: ByteBuffer): Int {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dataOffset, dataLength, dest, cipher, blockSize, outputSize)
+        }
+
+        override fun doFinal(dest: OutputStream): Int {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dataOffset, dataLength, dest, cipher, blockSize, outputSize)
+        }
+    }
+
+    open inner class ByteBufferEnPreparedCodec(
+        private val cipher: Cipher,
+        private val key: Key,
+        private val data: ByteBuffer
+    ) : PreparedCodec {
+
+        override fun doFinal(): ByteArray {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, cipher, blockSize, outputSize)
+        }
+
+        override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, offset, cipher, blockSize)
+        }
+
+        override fun doFinal(dest: ByteBuffer): Int {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, cipher, blockSize, outputSize)
+        }
+
+        override fun doFinal(dest: OutputStream): Int {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, cipher, blockSize, outputSize)
+        }
+    }
+
+    open inner class InputStreamEnPreparedCodec(
+        private val cipher: Cipher,
+        private val key: Key,
+        private val data: InputStream
+    ) : PreparedCodec {
+
+        override fun doFinal(): ByteArray {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, cipher, blockSize, outputSize)
+        }
+
+        override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, offset, cipher, blockSize)
+        }
+
+        override fun doFinal(dest: ByteBuffer): Int {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, cipher, blockSize, outputSize)
+        }
+
+        override fun doFinal(dest: OutputStream): Int {
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, cipher, blockSize, outputSize)
+        }
+    }
+
+
+    open inner class ByteArrayDePreparedCodec(
+        private val cipher: Cipher,
+        private val key: Key,
+        private val data: ByteArray,
+        private val dataOffset: Int,
+        private val dataLength: Int
+    ) : PreparedCodec {
+
+        override fun doFinal(): ByteArray {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dataOffset, dataLength, cipher, outputSize, blockSize)
+        }
+
+        override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            return encrypt0(data, dataOffset, dataLength, dest, offset, cipher, outputSize)
+        }
+
+        override fun doFinal(dest: ByteBuffer): Int {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dataOffset, dataLength, dest, cipher, outputSize, blockSize)
+        }
+
+        override fun doFinal(dest: OutputStream): Int {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dataOffset, dataLength, dest, cipher, outputSize, blockSize)
+        }
+    }
+
+    open inner class ByteBufferDePreparedCodec(
+        private val cipher: Cipher,
+        private val key: Key,
+        private val data: ByteBuffer
+    ) : PreparedCodec {
+
+        override fun doFinal(): ByteArray {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, cipher, outputSize, blockSize)
+        }
+
+        override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            return encrypt0(data, dest, offset, cipher, outputSize)
+        }
+
+        override fun doFinal(dest: ByteBuffer): Int {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, cipher, outputSize, blockSize)
+        }
+
+        override fun doFinal(dest: OutputStream): Int {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, cipher, outputSize, blockSize)
+        }
+    }
+
+    open inner class InputStreamDePreparedCodec(
+        private val cipher: Cipher,
+        private val key: Key,
+        private val data: InputStream
+    ) : PreparedCodec {
+
+        override fun doFinal(): ByteArray {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, cipher, outputSize, blockSize)
+        }
+
+        override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            return encrypt0(data, dest, offset, cipher, outputSize)
+        }
+
+        override fun doFinal(dest: ByteBuffer): Int {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, cipher, outputSize, blockSize)
+        }
+
+        override fun doFinal(dest: OutputStream): Int {
+            cipher.init(Cipher.DECRYPT_MODE, key)
+            val outputSize = cipher.getOutputSize(0)
+            val blockSize = outputSize - 11
+            return encrypt0(data, dest, cipher, outputSize, blockSize)
+        }
     }
 }

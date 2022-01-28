@@ -65,6 +65,18 @@ interface CodecAlgorithm {
         @JvmField
         val SHA1PRNG_NAME = "SHA1PRNG"
 
+        @JvmField
+        val SHA1_WITH_DSA_NAME = "SHA1withDSA"
+
+        @JvmField
+        val SHA1_WITH_RSA_NAME = "SHA1withRSA"
+
+        @JvmField
+        val SHA256_WITH_RSA_NAME = "SHA256withRSA"
+
+        @JvmField
+        val SM3_WITH_SM2_NAME = "SM3WithSM2"
+
         //@JvmField
         //val PLAIN = newAlgorithm(PLAIN_NAME, CodecAlgorithmType.ENCODE)
         //
@@ -115,6 +127,18 @@ interface CodecAlgorithm {
 
         @JvmField
         val SM2 = of(SM2_NAME, CodecAlgorithmType.CIPHER)
+
+        @JvmField
+        val SHA1_WITH_DSA = of(SHA1_WITH_DSA_NAME, CodecAlgorithmType.SIGN)
+
+        @JvmField
+        val SHA1_WITH_RSA = of(SHA1_WITH_RSA_NAME, CodecAlgorithmType.SIGN)
+
+        @JvmField
+        val SHA256_WITH_RSA = of(SHA256_WITH_RSA_NAME, CodecAlgorithmType.SIGN)
+
+        @JvmField
+        val SM3_WITH_SM2 = of(SM3_WITH_SM2_NAME, CodecAlgorithmType.SIGN)
 
         @JvmStatic
         fun CharSequence.toCodecAlgorithm(): CodecAlgorithm {
