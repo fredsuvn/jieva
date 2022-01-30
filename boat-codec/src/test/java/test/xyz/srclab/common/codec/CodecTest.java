@@ -11,8 +11,7 @@ import xyz.srclab.common.io.BBuffer;
 import xyz.srclab.common.io.BIO;
 import xyz.srclab.common.io.BytesAppender;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.security.Key;
 import java.security.KeyPair;
@@ -41,17 +40,21 @@ public class CodecTest {
 
     @Test
     public void testSign() {
-        KeyPair rsa = BRsa.generateKeyPair();
-        testSign(BCodec.sha256WithRsa(), rsa.getPublic(), rsa.getPrivate());
-        KeyPair sm2 = BSm2.generateKeyPair();
-        testSign(BCodec.sm3WithSm2(), sm2.getPublic(), sm2.getPrivate());
+        KeyPair rsaKeys = BRsa.generateKeyPair();
+        testSign(BCodec.sha256WithRsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
+        KeyPair sm2Keys = BSm2.generateKeyPair();
+        testSign(BCodec.sm3WithSm2(), sm2Keys.getPublic(), sm2Keys.getPrivate());
     }
 
     @Test
-    public void testCipher() {
+    public void testCipher() throws Exception {
         String password = "123";
         Key key = BAes.passphraseToKey(password);
         testCipher(BCodec.aes(), key, key);
+        KeyPair rsaKeys = BRsa.generateKeyPair();
+        testCipher(BCodec.rsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
+        KeyPair sm2Keys = BSm2.generateKeyPair();
+        testCipher(BCodec.sm2(), sm2Keys.getPublic(), sm2Keys.getPrivate());
     }
 
     private void testDigest(DigestCodec digestCodec) {
@@ -119,69 +122,158 @@ public class CodecTest {
         Assert.assertTrue(signCodec.verify(publicKey, BIO.asInputStream(data, offset, length)).verify(destBuffer));
     }
 
-    private void testCipher(CipherCodec cipherCodec, Key publicKey, Key privateKey) {
+    private void testCipher(CipherCodec cipherCodec, Key publicKey, Key privateKey) throws Exception {
         int offset = 777;
         int length = 55555;
         int destOffset = 66;
         byte[] data = BRandom.randomString(66666).getBytes();
+        ByteBuffer dataBuffer = BBuffer.toBuffer(data, offset, length);
+        InputStream dataStream = BIO.asInputStream(data, offset, length);
 
-        // bytes -> bytes
+        //1 bytes -> bytes
         byte[] en1 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal();
         byte[] de1 = cipherCodec.decrypt(publicKey, en1).doFinal();
         Assert.assertEquals(de1, Arrays.copyOfRange(data, offset, offset + length));
 
-        // bytes -> dest bytes
+        //2 bytes -> dest bytes
         byte[] dest2 = new byte[111111];
-        int outLength2 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal(dest2, destOffset);
-        byte[] de2 = new byte[length];
-        cipherCodec.decrypt(publicKey, dest2, destOffset, outLength2).doFinal(de2, 0);
-        Assert.assertEquals(de2, Arrays.copyOfRange(data, offset, offset + length));
+        int enLength2 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal(dest2, destOffset);
+        byte[] de2 = new byte[dest2.length];
+        int deLength2 = cipherCodec.decrypt(publicKey, dest2, destOffset, enLength2).doFinal(de2, 0);
+        Assert.assertEquals(
+            Arrays.copyOfRange(de2, 0, deLength2),
+            Arrays.copyOfRange(data, offset, offset + length)
+        );
 
-        // bytes -> buffer
+        //3 bytes -> buffer
         ByteBuffer dest3 = ByteBuffer.allocateDirect(111111);
-        int outLength3 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal(dest3);
-        ByteBuffer de3 = ByteBuffer.allocateDirect(length);
+        int enLength3 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal(dest3);
+        ByteBuffer de3 = ByteBuffer.allocate(dest3.capacity());
         dest3.flip();
-        cipherCodec.decrypt(publicKey, dest3).doFinal(de3);
+        int deLength3 = cipherCodec.decrypt(publicKey, BBuffer.toBytes(BBuffer.getBuffer(dest3, enLength3))).doFinal(de3);
         de3.flip();
-        Assert.assertEquals(BBuffer.toBytes(de3), Arrays.copyOfRange(data, offset, offset + length));
-        Assert.assertEquals(outLength3, outLength2);
+        Assert.assertEquals(
+            BBuffer.toBytes(BBuffer.getBuffer(de3, deLength3)),
+            Arrays.copyOfRange(data, offset, offset + length)
+        );
 
-        // bytes -> output
+        //4 bytes -> output
         BytesAppender dest4 = new BytesAppender();
-        int outLength4 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal(dest4);
-        byte[] de4 = new byte[length];
-        cipherCodec.decrypt(publicKey, dest4.toBytes()).doFinal(de4, 0);
-        Assert.assertEquals(de4, Arrays.copyOfRange(data, offset, offset + length));
-        Assert.assertEquals(outLength4, outLength3);
+        int enLength4 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal(dest4);
+        BytesAppender de4 = new BytesAppender();
+        int deLength4 = cipherCodec.decrypt(publicKey, dest4.toBytes()).doFinal(de4);
+        Assert.assertEquals(de4.toBytes(), Arrays.copyOfRange(data, offset, offset + length));
+        Assert.assertEquals(enLength4, enLength3);
+        Assert.assertEquals(deLength4, deLength3);
+
+        //5 buffer -> bytes
+        byte[] en5 = cipherCodec.encrypt(privateKey, dataBuffer).doFinal();
+        dataBuffer.flip();
+        byte[] de5 = cipherCodec.decrypt(publicKey, en5).doFinal();
+        Assert.assertEquals(de5, Arrays.copyOfRange(data, offset, offset + length));
+
+        //6 buffer -> dest bytes
+        byte[] dest6 = new byte[111111];
+        int enLength6 = cipherCodec.encrypt(privateKey, dataBuffer).doFinal(dest6, destOffset);
+        dataBuffer.flip();
+        byte[] de6 = new byte[dest6.length];
+        int deLength6 = cipherCodec.decrypt(publicKey, dest6, destOffset, enLength6).doFinal(de6, 0);
+        Assert.assertEquals(
+            Arrays.copyOfRange(de6, 0, deLength6),
+            Arrays.copyOfRange(data, offset, offset + length)
+        );
+
+        //7 buffer -> buffer
+        ByteBuffer dest7 = ByteBuffer.allocateDirect(111111);
+        int enLength7 = cipherCodec.encrypt(privateKey, dataBuffer).doFinal(dest7);
+        dataBuffer.flip();
+        ByteBuffer de7 = ByteBuffer.allocate(dest7.capacity());
+        dest7.flip();
+        int deLength7 = cipherCodec.decrypt(publicKey, BBuffer.toBytes(BBuffer.getBuffer(dest7, enLength7))).doFinal(de7);
+        de7.flip();
+        Assert.assertEquals(
+            BBuffer.toBytes(BBuffer.getBuffer(de7, deLength7)),
+            Arrays.copyOfRange(data, offset, offset + length)
+        );
+
+        //8 buffer -> output
+        BytesAppender dest8 = new BytesAppender();
+        int enLength8 = cipherCodec.encrypt(privateKey, dataBuffer).doFinal(dest8);
+        dataBuffer.flip();
+        BytesAppender de8 = new BytesAppender();
+        int deLength8 = cipherCodec.decrypt(publicKey, dest8.toBytes()).doFinal(de8);
+        Assert.assertEquals(de8.toBytes(), Arrays.copyOfRange(data, offset, offset + length));
+        Assert.assertEquals(enLength8, enLength7);
+        Assert.assertEquals(deLength8, deLength7);
+
+        //a stream -> bytes
+        byte[] enA = cipherCodec.encrypt(privateKey, dataStream).doFinal();
+        dataStream.reset();
+        byte[] deA = cipherCodec.decrypt(publicKey, enA).doFinal();
+        Assert.assertEquals(deA, Arrays.copyOfRange(data, offset, offset + length));
+
+        //b stream -> dest bytes
+        byte[] destB = new byte[111111];
+        int enLengthB = cipherCodec.encrypt(privateKey, dataStream).doFinal(destB, destOffset);
+        dataStream.reset();
+        byte[] deB = new byte[dest6.length];
+        int deLengthB = cipherCodec.decrypt(publicKey, destB, destOffset, enLengthB).doFinal(deB, 0);
+        Assert.assertEquals(
+            Arrays.copyOfRange(deB, 0, deLengthB),
+            Arrays.copyOfRange(data, offset, offset + length)
+        );
+
+        //c stream -> buffer
+        ByteBuffer destC = ByteBuffer.allocateDirect(111111);
+        int enLengthC = cipherCodec.encrypt(privateKey, dataStream).doFinal(destC);
+        dataStream.reset();
+        ByteBuffer deC = ByteBuffer.allocate(destC.capacity());
+        destC.flip();
+        int deLengthC = cipherCodec.decrypt(publicKey, BBuffer.toBytes(BBuffer.getBuffer(destC, enLengthC))).doFinal(deC);
+        deC.flip();
+        Assert.assertEquals(
+            BBuffer.toBytes(BBuffer.getBuffer(deC, deLengthC)),
+            Arrays.copyOfRange(data, offset, offset + length)
+        );
+
+        //d stream -> output
+        BytesAppender destD = new BytesAppender();
+        int enLengthD = cipherCodec.encrypt(privateKey, dataStream).doFinal(destD);
+        dataStream.reset();
+        BytesAppender deD = new BytesAppender();
+        int deLengthD = cipherCodec.decrypt(publicKey, destD.toBytes()).doFinal(deD);
+        Assert.assertEquals(deD.toBytes(), Arrays.copyOfRange(data, offset, offset + length));
+        Assert.assertEquals(enLengthD, enLength7);
+        Assert.assertEquals(deLengthD, deLength7);
     }
 
-    @Test
-    public void testAes() throws Exception {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(128);
-        Key key = keyGenerator.generateKey();
-        Cipher cipher = Cipher.getInstance("AES");
-        byte[] data = "data".getBytes();
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        cipher.update(data);
-        byte[] en = cipher.doFinal();
-
-        // success for byte[] type
-        byte[] destBytes = new byte[data.length];
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        cipher.update(en);
-        cipher.doFinal(destBytes, 0);
-        // OK
-        Assert.assertEquals(destBytes, data);
-
-        // error: Need at least 16 bytes of space in output buffer
-        // If replace data.length with en.length, success:
-        // destBuffer = ByteBuffer.allocate(en.length);
-        ByteBuffer destBuffer = ByteBuffer.allocate(data.length);
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        cipher.doFinal(ByteBuffer.wrap(en), destBuffer);
-        destBuffer.flip();
-        Assert.assertEquals(Arrays.copyOfRange(destBuffer.array(), 0, data.length), data);
-    }
+    //@Test
+    //public void testAes() throws Exception {
+    //    KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+    //    keyGenerator.init(128);
+    //    Key key = keyGenerator.generateKey();
+    //    Cipher cipher = Cipher.getInstance("AES", BBcprov.DEFAULT_BCPROV_PROVIDER);
+    //    //Cipher cipher = Cipher.getInstance("AES");
+    //    byte[] data = "data".getBytes();
+    //    cipher.init(Cipher.ENCRYPT_MODE, key);
+    //    cipher.update(data);
+    //    byte[] en = cipher.doFinal();
+    //
+    //    // success for byte[] type
+    //    byte[] destBytes = new byte[en.length];
+    //    cipher.init(Cipher.DECRYPT_MODE, key);
+    //    cipher.update(en);
+    //    cipher.doFinal(destBytes, 0);
+    //    // OK
+    //    Assert.assertEquals(destBytes, data);
+    //
+    //    // error: Need at least 16 bytes of space in output buffer
+    //    // If replace data.length with en.length, success:
+    //    // destBuffer = ByteBuffer.allocate(en.length);
+    //    ByteBuffer destBuffer = ByteBuffer.allocate(en.length);
+    //    cipher.init(Cipher.DECRYPT_MODE, key);
+    //    cipher.doFinal(ByteBuffer.wrap(en), destBuffer);
+    //    destBuffer.flip();
+    //    Assert.assertEquals(Arrays.copyOfRange(destBuffer.array(), 0, data.length), data);
+    //}
 }

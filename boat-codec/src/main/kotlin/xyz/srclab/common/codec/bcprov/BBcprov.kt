@@ -8,15 +8,15 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECParameterSpec
 
 @JvmField
-val DEFAULT_EC_PARAMETERS: X9ECParameters = GMNamedCurves.getByName("sm2p256v1")
+val DEFAULT_X9_EC_PARAMETERS: X9ECParameters = GMNamedCurves.getByName("sm2p256v1")
 
 @JvmField
 val DEFAULT_EC_PARAMETER_SPEC: ECParameterSpec =
     ECParameterSpec(
-        DEFAULT_EC_PARAMETERS.curve,
-        DEFAULT_EC_PARAMETERS.g,
-        DEFAULT_EC_PARAMETERS.n,
-        DEFAULT_EC_PARAMETERS.h
+        DEFAULT_X9_EC_PARAMETERS.curve,
+        DEFAULT_X9_EC_PARAMETERS.g,
+        DEFAULT_X9_EC_PARAMETERS.n,
+        DEFAULT_X9_EC_PARAMETERS.h
     )
 
 @JvmField

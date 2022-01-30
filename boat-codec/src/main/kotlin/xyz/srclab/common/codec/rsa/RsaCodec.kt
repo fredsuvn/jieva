@@ -10,6 +10,7 @@ import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.security.Key
 import javax.crypto.Cipher
+import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -49,7 +50,7 @@ open class RsaCodec @JvmOverloads constructor(
         data: ByteArray, offset: Int, length: Int,
         cipher: Cipher, blockSize: Int, outputSize: Int
     ): ByteArray {
-        val needingSize = needingBlock(length, blockSize) * outputSize
+        val needingSize = rsaNeedingBlock(length, blockSize, outputSize)
         val dest = ByteArray(needingSize)
         var curDataOffset = offset
         var curDestOffset = 0
@@ -89,13 +90,13 @@ open class RsaCodec @JvmOverloads constructor(
             dest.position(startPos + cryptLength)
             return cryptLength
         }
-        val buffer = ByteArray(outputSize)
+        val outBuffer = ByteArray(max(blockSize, outputSize))
         var curDataOffset = dataOffset
         var cryptLength = 0
         while (curDataOffset < dataOffset + dataLength) {
             val inLength = inLength(dataOffset, dataLength, curDataOffset, blockSize)
-            val outLength = cipher.doFinal(data, curDataOffset, inLength, buffer)
-            dest.put(buffer, 0, outLength)
+            val outLength = cipher.doFinal(data, curDataOffset, inLength, outBuffer)
+            dest.put(outBuffer, 0, outLength)
             curDataOffset += inLength
             cryptLength += outLength
         }
@@ -107,13 +108,13 @@ open class RsaCodec @JvmOverloads constructor(
         dest: OutputStream,
         cipher: Cipher, blockSize: Int, outputSize: Int
     ): Int {
-        val buffer = ByteArray(outputSize)
+        val outBuffer = ByteArray(max(blockSize, outputSize))
         var curDataOffset = offset
         var cryptLength = 0
         while (curDataOffset < offset + length) {
             val inLength = inLength(offset, length, curDataOffset, blockSize)
-            val outLength = cipher.doFinal(data, curDataOffset, inLength, buffer)
-            dest.write(buffer, 0, outLength)
+            val outLength = cipher.doFinal(data, curDataOffset, inLength, outBuffer)
+            dest.write(outBuffer, 0, outLength)
             curDataOffset += inLength
             cryptLength += outLength
         }
@@ -129,19 +130,19 @@ open class RsaCodec @JvmOverloads constructor(
             val array = data.array()
             val arrayOffset = data.arrayOffset() + startPos
             val result = encrypt0(array, arrayOffset, data.remaining(), cipher, blockSize, outputSize)
-            data.position(startPos + result.size)
+            data.position(data.limit())
             return result
         }
         val length = data.remaining()
-        val needingSize = needingBlock(length, blockSize) * outputSize
+        val needingSize = rsaNeedingBlock(length, blockSize, outputSize)
         val dest = ByteArray(needingSize)
-        val buffer = ByteArray(blockSize)
+        val inBuffer = ByteArray(blockSize)
         var curDataOffset = 0
         var curDestOffset = 0
         while (curDataOffset < length) {
             val inLength = inLength(data, blockSize)
-            data.get(buffer)
-            val outLength = cipher.doFinal(buffer, 0, inLength, dest, curDestOffset)
+            data.get(inBuffer)
+            val outLength = cipher.doFinal(inBuffer, 0, inLength, dest, curDestOffset)
             curDataOffset += inLength
             curDestOffset += outLength
         }
@@ -151,24 +152,24 @@ open class RsaCodec @JvmOverloads constructor(
     private fun encrypt0(
         data: ByteBuffer,
         dest: ByteArray, destOffset: Int,
-        cipher: Cipher, blockSize: Int
+        cipher: Cipher, blockSize: Int, outputSize: Int
     ): Int {
         if (data.hasArray()) {
             val startPos = data.position()
             val array = data.array()
             val arrayOffset = data.arrayOffset() + startPos
             val cryptLength = encrypt0(array, arrayOffset, data.remaining(), dest, destOffset, cipher, blockSize)
-            data.position(startPos + cryptLength)
+            data.position(data.limit())
             return cryptLength
         }
         val length = data.remaining()
-        val buffer = ByteArray(blockSize)
+        val inBuffer = ByteArray(blockSize)
         var curDataOffset = 0
         var curDestOffset = destOffset
         while (curDataOffset < length) {
             val inLength = inLength(data, blockSize)
-            data.get(buffer)
-            val outLength = cipher.doFinal(buffer, 0, inLength, dest, curDestOffset)
+            data.get(inBuffer)
+            val outLength = cipher.doFinal(inBuffer, 0, inLength, dest, curDestOffset)
             curDataOffset += inLength
             curDestOffset += outLength
         }
@@ -189,7 +190,7 @@ open class RsaCodec @JvmOverloads constructor(
             val destArrayOffset = dest.arrayOffset() + destStartPos
             val cryptLength = encrypt0(
                 dataArray, dataArrayOffset, data.remaining(), destArray, destArrayOffset, cipher, blockSize)
-            data.position(dataStartPos + cryptLength)
+            data.position(data.limit())
             dest.position(destStartPos + cryptLength)
             return cryptLength
         } else if (data.hasArray() && !dest.hasArray()) {
@@ -198,19 +199,19 @@ open class RsaCodec @JvmOverloads constructor(
             val dataArrayOffset = data.arrayOffset() + dataStartPos
             val cryptLength = encrypt0(
                 dataArray, dataArrayOffset, data.remaining(), dest, cipher, blockSize, outputSize)
-            data.position(dataStartPos + cryptLength)
+            data.position(data.limit())
             return cryptLength
         } else if (!data.hasArray() && dest.hasArray()) {
             val destStartPos = data.position()
             val destArray = dest.array()
             val destArrayOffset = dest.arrayOffset() + destStartPos
-            val cryptLength = encrypt0(data, destArray, destArrayOffset, cipher, blockSize)
+            val cryptLength = encrypt0(data, destArray, destArrayOffset, cipher, blockSize, outputSize)
             dest.position(destStartPos + cryptLength)
             return cryptLength
         } else {
             val length = data.remaining()
             val inBuffer = ByteArray(blockSize)
-            val outBuffer = ByteArray(outputSize)
+            val outBuffer = ByteArray(max(blockSize, outputSize))
             var curDataOffset = 0
             var cryptLength = 0
             while (curDataOffset < length) {
@@ -235,12 +236,12 @@ open class RsaCodec @JvmOverloads constructor(
             val array = data.array()
             val arrayOffset = data.arrayOffset() + startPos
             val cryptLength = encrypt0(array, arrayOffset, data.remaining(), dest, cipher, blockSize, outputSize)
-            data.position(startPos + cryptLength)
+            data.position(data.limit())
             return cryptLength
         }
         val length = data.remaining()
         val inBuffer = ByteArray(blockSize)
-        val outBuffer = ByteArray(outputSize)
+        val outBuffer = ByteArray(max(blockSize, outputSize))
         var curDataOffset = 0
         var cryptLength = 0
         while (curDataOffset < length) {
@@ -259,7 +260,7 @@ open class RsaCodec @JvmOverloads constructor(
         cipher: Cipher, blockSize: Int, outputSize: Int
     ): ByteArray {
         val length = data.available()
-        val needingSize = needingBlock(length, blockSize) * outputSize
+        val needingSize = rsaNeedingBlock(length, blockSize, outputSize)
         val dest = BytesAppender(needingSize)
         encrypt0(data, dest, cipher, blockSize, outputSize)
         return dest.toBytes()
@@ -268,17 +269,17 @@ open class RsaCodec @JvmOverloads constructor(
     private fun encrypt0(
         data: InputStream,
         dest: ByteArray, destOffset: Int,
-        cipher: Cipher, blockSize: Int
+        cipher: Cipher, blockSize: Int, outputSize: Int
     ): Int {
-        val buffer = ByteArray(blockSize)
+        val inBuffer = ByteArray(blockSize)
         var curDestOffset = destOffset
         while (true) {
-            val inLength = data.read(buffer)
+            val inLength = data.read(inBuffer)
             if (inLength < 0) {
                 break
             }
             if (inLength > 0) {
-                val outLength = cipher.doFinal(buffer, 0, inLength, dest, curDestOffset)
+                val outLength = cipher.doFinal(inBuffer, 0, inLength, dest, curDestOffset)
                 curDestOffset += outLength
             }
         }
@@ -294,12 +295,12 @@ open class RsaCodec @JvmOverloads constructor(
             val startPos = dest.position()
             val array = dest.array()
             val arrayOffset = dest.arrayOffset() + startPos
-            val cryptLength = encrypt0(data, array, arrayOffset, cipher, blockSize)
+            val cryptLength = encrypt0(data, array, arrayOffset, cipher, blockSize, outputSize)
             dest.position(startPos + cryptLength)
             return cryptLength
         }
         val inBuffer = ByteArray(blockSize)
-        val outBuffer = ByteArray(outputSize)
+        val outBuffer = ByteArray(max(blockSize, outputSize))
         var cryptLength = 0
         while (true) {
             val inLength = data.read(inBuffer)
@@ -321,7 +322,7 @@ open class RsaCodec @JvmOverloads constructor(
         cipher: Cipher, blockSize: Int, outputSize: Int
     ): Int {
         val inBuffer = ByteArray(blockSize)
-        val outBuffer = ByteArray(outputSize)
+        val outBuffer = ByteArray(max(blockSize, outputSize))
         var cryptLength = 0
         while (true) {
             val inLength = data.read(inBuffer)
@@ -345,6 +346,13 @@ open class RsaCodec @JvmOverloads constructor(
         return min(buffer.remaining(), blockSize)
     }
 
+    private fun rsaNeedingBlock(length: Int, blockSize: Int, outputSize: Int): Int {
+        val actualSize = needingBlock(length, blockSize) * outputSize
+        if (blockSize <= outputSize) {
+            return actualSize
+        }
+        return actualSize - outputSize + blockSize
+    }
 
     open inner class ByteArrayEnPreparedCodec(
         private val cipher: Cipher,
@@ -400,7 +408,7 @@ open class RsaCodec @JvmOverloads constructor(
             cipher.init(Cipher.ENCRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
             val blockSize = outputSize - 11
-            return encrypt0(data, dest, offset, cipher, blockSize)
+            return encrypt0(data, dest, offset, cipher, blockSize, outputSize)
         }
 
         override fun doFinal(dest: ByteBuffer): Int {
@@ -435,7 +443,7 @@ open class RsaCodec @JvmOverloads constructor(
             cipher.init(Cipher.ENCRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
             val blockSize = outputSize - 11
-            return encrypt0(data, dest, offset, cipher, blockSize)
+            return encrypt0(data, dest, offset, cipher, blockSize, outputSize)
         }
 
         override fun doFinal(dest: ByteBuffer): Int {
@@ -452,7 +460,6 @@ open class RsaCodec @JvmOverloads constructor(
             return encrypt0(data, dest, cipher, blockSize, outputSize)
         }
     }
-
 
     open inner class ByteArrayDePreparedCodec(
         private val cipher: Cipher,
@@ -506,7 +513,7 @@ open class RsaCodec @JvmOverloads constructor(
         override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
             cipher.init(Cipher.DECRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
-            return encrypt0(data, dest, offset, cipher, outputSize)
+            return encrypt0(data, dest, offset, cipher, outputSize, outputSize)
         }
 
         override fun doFinal(dest: ByteBuffer): Int {
@@ -540,7 +547,7 @@ open class RsaCodec @JvmOverloads constructor(
         override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
             cipher.init(Cipher.DECRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
-            return encrypt0(data, dest, offset, cipher, outputSize)
+            return encrypt0(data, dest, offset, cipher, outputSize, outputSize)
         }
 
         override fun doFinal(dest: ByteBuffer): Int {

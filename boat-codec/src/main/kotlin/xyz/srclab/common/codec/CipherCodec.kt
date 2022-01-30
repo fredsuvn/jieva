@@ -106,7 +106,7 @@ interface CipherCodec : Codec {
                 val outputSize = cipher.getOutputSize(length)
                 val dest = ByteArray(outputSize)
                 cipher.doFinal(array, arrayOffset, length, dest)
-                data.position(startPos + dest.size)
+                data.position(data.limit())
                 dest
             } else {
                 val outputSize = cipher.getOutputSize(data.remaining())
@@ -124,7 +124,7 @@ interface CipherCodec : Codec {
                 val array = data.array()
                 val arrayOffset = data.arrayOffset() + startPos
                 val cryptLength = cipher.doFinal(array, arrayOffset, data.remaining(), dest, offset)
-                data.position(startPos + cryptLength)
+                data.position(data.limit())
                 cryptLength
             } else {
                 val buffer = ByteBuffer.wrap(dest, offset, length)
