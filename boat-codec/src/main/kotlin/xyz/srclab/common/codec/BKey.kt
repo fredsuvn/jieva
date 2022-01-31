@@ -10,42 +10,58 @@ import xyz.srclab.common.cache.Cache
 import java.nio.charset.Charset
 import java.security.KeyPair
 import java.security.KeyPairGenerator
+import java.security.Provider
 import java.security.SecureRandom
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 
 private val cache = Cache.ofWeak<String, Any>()
 
-fun CharSequence.base64PassphraseToKey(algorithm: CharSequence, size: Int): SecretKey {
-    return this.to8BitBytes().deBase64().passphraseToKey(algorithm, size)
+@JvmOverloads
+fun CharSequence.base64PassphraseToKey(
+    algorithm: CharSequence, size: Int, provider: Provider? = null
+): SecretKey {
+    return this.to8BitBytes().deBase64().passphraseToKey(algorithm, size, provider)
 }
 
 @JvmOverloads
-fun CharSequence.passphraseToKey(algorithm: CharSequence, size: Int, charset: Charset = DEFAULT_CHARSET): SecretKey {
-    return this.byteArray(charset).passphraseToKey(algorithm, size)
+fun CharSequence.passphraseToKey(
+    algorithm: CharSequence, size: Int, charset: Charset = DEFAULT_CHARSET, provider: Provider? = null
+): SecretKey {
+    return this.byteArray(charset).passphraseToKey(algorithm, size, provider)
 }
 
-fun ByteArray.passphraseToKey(algorithm: CharSequence, size: Int): SecretKey {
+@JvmOverloads
+fun ByteArray.passphraseToKey(algorithm: CharSequence, size: Int, provider: Provider? = null): SecretKey {
     //val random = SecureRandom.getInstance(CodecAlgorithm.SHA1PRNG_NAME)
     //random.setSeed(this)
     val algorithmString = algorithm.toString()
     val keyGenerator = cache.getOrLoad("passphraseToKey[$algorithmString]") {
-        KeyGenerator.getInstance(algorithmString)
+        if (provider === null)
+            KeyGenerator.getInstance(algorithmString)
+        else
+            KeyGenerator.getInstance(algorithmString, provider)
     } as KeyGenerator
+    val secureRandom = SecureRandom.getInstance(CodecAlgorithm.SHA1PRNG_NAME)
     synchronized(keyGenerator) {
-        keyGenerator.init(size, SecureRandom(this))
+        keyGenerator.init(size, secureRandom)
         return keyGenerator.generateKey()
     }
     //return SecretKeySpec(secretKey.encoded, algorithmString)
 }
 
-fun generateKeyPair(algorithm: CharSequence, size: Int): KeyPair {
+@JvmOverloads
+fun generateKeyPair(algorithm: CharSequence, size: Int, provider: Provider? = null): KeyPair {
     val algorithmString = algorithm.toString()
     val keyPairGenerator = cache.getOrLoad("generateKeyPair[$algorithmString]") {
-        KeyPairGenerator.getInstance(algorithmString)
+        if (provider === null)
+            KeyPairGenerator.getInstance(algorithmString)
+        else
+            KeyPairGenerator.getInstance(algorithmString, provider)
     } as KeyPairGenerator
+    val secureRandom = SecureRandom.getInstance(CodecAlgorithm.SHA1PRNG_NAME)
     synchronized(keyPairGenerator) {
-        keyPairGenerator.initialize(size, SecureRandom())
+        keyPairGenerator.initialize(size, secureRandom)
         return keyPairGenerator.generateKeyPair()
     }
 }

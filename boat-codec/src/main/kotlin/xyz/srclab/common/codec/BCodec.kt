@@ -99,6 +99,10 @@ fun sm2(): CipherCodec {
     return CipherCodec.sm2()
 }
 
+fun sm4(): CipherCodec {
+    return CipherCodec.sm4()
+}
+
 fun sha1WithRsa(): SignCodec {
     return SignCodec.sha1WithRsa()
 }

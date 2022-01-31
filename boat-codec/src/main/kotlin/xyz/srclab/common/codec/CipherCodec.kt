@@ -3,11 +3,13 @@ package xyz.srclab.common.codec
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
+import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
 import xyz.srclab.common.codec.rsa.RsaCodec
-import xyz.srclab.common.codec.sm2.Sm2Codec
+import xyz.srclab.common.codec.sm.Sm2Codec
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.Key
+import java.security.Provider
 import java.util.function.Supplier
 import javax.crypto.Cipher
 
@@ -375,18 +377,28 @@ interface CipherCodec : Codec {
                 .build()
         }
 
-        @JvmName("forAlgorithm")
         @JvmStatic
-        fun CharSequence.toCipherCodec(): CipherCodec {
-            return this.toCodecAlgorithm(CodecAlgorithmType.CIPHER).toCipherCodec()
+        fun sm4(): CipherCodec {
+            return CodecAlgorithm.SM4_NAME.toCipherCodec(DEFAULT_BCPROV_PROVIDER)
         }
 
         @JvmName("forAlgorithm")
         @JvmStatic
-        fun CodecAlgorithm.toCipherCodec(): CipherCodec {
+        fun CharSequence.toCipherCodec(provider: Provider? = null): CipherCodec {
+            return this.toCodecAlgorithm(CodecAlgorithmType.CIPHER).toCipherCodec(provider)
+        }
+
+        @JvmName("forAlgorithm")
+        @JvmStatic
+        fun CodecAlgorithm.toCipherCodec(provider: Provider? = null): CipherCodec {
             return newBuilder()
                 .algorithm(this)
-                .cipherSupplier { Cipher.getInstance(this.name) }
+                .cipherSupplier {
+                    if (provider === null)
+                        Cipher.getInstance(this.name)
+                    else
+                        Cipher.getInstance(this.name, provider)
+                }
                 .build()
         }
     }

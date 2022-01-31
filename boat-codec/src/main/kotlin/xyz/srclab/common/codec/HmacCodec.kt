@@ -6,6 +6,7 @@ import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.Key
+import java.security.Provider
 import java.util.function.Supplier
 import javax.crypto.Mac
 
@@ -279,16 +280,21 @@ interface HmacCodec : Codec {
 
         @JvmName("forAlgorithm")
         @JvmStatic
-        fun CharSequence.toHmacCodec(): HmacCodec {
-            return this.toCodecAlgorithm(CodecAlgorithmType.HMAC).toHmacCodec()
+        fun CharSequence.toHmacCodec(provider: Provider? = null): HmacCodec {
+            return this.toCodecAlgorithm(CodecAlgorithmType.HMAC).toHmacCodec(provider)
         }
 
         @JvmName("forAlgorithm")
         @JvmStatic
-        fun CodecAlgorithm.toHmacCodec(): HmacCodec {
+        fun CodecAlgorithm.toHmacCodec(provider: Provider? = null): HmacCodec {
             return newBuilder()
                 .algorithm(this)
-                .hmacSupplier { Mac.getInstance(this.name) }
+                .hmacSupplier {
+                    if (provider === null)
+                        Mac.getInstance(this.name)
+                    else
+                        Mac.getInstance(this.name, provider)
+                }
                 .build()
         }
     }

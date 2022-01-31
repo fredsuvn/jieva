@@ -7,6 +7,7 @@ import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest
+import java.security.Provider
 import java.util.function.Supplier
 
 /**
@@ -274,24 +275,26 @@ interface DigestCodec : Codec {
 
         @JvmStatic
         fun sm3(): DigestCodec {
-            return newBuilder()
-                .algorithm(CodecAlgorithm.SM3)
-                .digestSupplier { MessageDigest.getInstance(CodecAlgorithm.SM3_NAME, DEFAULT_BCPROV_PROVIDER) }
-                .build()
+            return CodecAlgorithm.SM3.toDigestCodec(DEFAULT_BCPROV_PROVIDER)
         }
 
         @JvmName("forAlgorithm")
         @JvmStatic
-        fun CharSequence.toDigestCodec(): DigestCodec {
-            return this.toCodecAlgorithm(CodecAlgorithmType.DIGEST).toDigestCodec()
+        fun CharSequence.toDigestCodec(provider: Provider? = null): DigestCodec {
+            return this.toCodecAlgorithm(CodecAlgorithmType.DIGEST).toDigestCodec(provider)
         }
 
         @JvmName("forAlgorithm")
         @JvmStatic
-        fun CodecAlgorithm.toDigestCodec(): DigestCodec {
+        fun CodecAlgorithm.toDigestCodec(provider: Provider? = null): DigestCodec {
             return newBuilder()
                 .algorithm(this)
-                .digestSupplier { MessageDigest.getInstance(this.name) }
+                .digestSupplier {
+                    if (provider === null)
+                        MessageDigest.getInstance(this.name)
+                    else
+                        MessageDigest.getInstance(this.name, provider)
+                }
                 .build()
         }
     }

@@ -66,6 +66,9 @@ interface CodecAlgorithm {
         val SM2_NAME = "SM2"
 
         @JvmField
+        val SM4_NAME = "SM4"
+
+        @JvmField
         val SHA1PRNG_NAME = "SHA1PRNG"
 
         @JvmField
@@ -130,6 +133,9 @@ interface CodecAlgorithm {
 
         @JvmField
         val SM2 = of(SM2_NAME, CodecAlgorithmType.CIPHER)
+
+        @JvmField
+        val SM4 = of(SM4_NAME, CodecAlgorithmType.CIPHER)
 
         @JvmField
         val SHA1_WITH_RSA = of(SHA1_WITH_RSA_NAME, CodecAlgorithmType.SIGN)
