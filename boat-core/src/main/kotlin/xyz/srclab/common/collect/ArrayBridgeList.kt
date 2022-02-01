@@ -1,5 +1,6 @@
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import java.io.Serializable
 
 /**
@@ -21,7 +22,7 @@ class ArrayBridgeList<T>(
     override fun removeAt(index: Int): T = throw UnsupportedOperationException()
 
     companion object {
-        private const val serialVersionUID = -2764017481108945198L
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
     }
 }
 
@@ -29,7 +30,7 @@ class ArrayBridgeList<T>(
  * Provides base info for [ArrayBridgeList].
  */
 // Fuck un-supporting-primitive-generic-type! DAMN!
-interface ArrayBridge<T> {
+interface ArrayBridge<T> : Serializable {
     val size: Int
     fun isEmpty(): Boolean
     fun contains(element: T): Boolean

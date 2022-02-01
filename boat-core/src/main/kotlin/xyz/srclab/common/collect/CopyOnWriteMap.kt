@@ -1,5 +1,7 @@
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+import java.io.Serializable
 import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -10,7 +12,7 @@ import java.util.function.Function
 open class CopyOnWriteMap<K, V>(
     initMap: Map<out K, V>,
     private val newMap: (Map<out K, V>) -> MutableMap<K, V>
-) : MutableMap<K, V> {
+) : Serializable, MutableMap<K, V> {
 
     private var currentMap: MutableMap<K, V> = newMap(initMap)
 
@@ -122,5 +124,9 @@ open class CopyOnWriteMap<K, V>(
 
     override fun toString(): String {
         return currentMap.toString()
+    }
+
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
     }
 }

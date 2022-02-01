@@ -1,14 +1,16 @@
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import xyz.srclab.common.reflect.parameterizedType
 import xyz.srclab.common.reflect.rawClass
+import java.io.Serializable
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 /**
  * To describe [Iterable], [Collection], [Set], [List] and other collect types.
  */
-interface IterableType : ParameterizedType {
+interface IterableType : Serializable, ParameterizedType {
 
     val rawClass: Class<*>
     val componentType: Type
@@ -89,6 +91,10 @@ interface IterableType : ParameterizedType {
                 result = 31 * result + componentType.hashCode()
                 return result
             }
+
+            companion object {
+                private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            }
         }
     }
 }
@@ -96,7 +102,7 @@ interface IterableType : ParameterizedType {
 /**
  * To describe [Map] types.
  */
-interface MapType : ParameterizedType {
+interface MapType : Serializable, ParameterizedType {
 
     val rawClass: Class<*>
     val keyType: Type
@@ -172,6 +178,10 @@ interface MapType : ParameterizedType {
                 result = 31 * result + keyType.hashCode()
                 result = 31 * result + valueType.hashCode()
                 return result
+            }
+
+            companion object {
+                private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
             }
         }
     }

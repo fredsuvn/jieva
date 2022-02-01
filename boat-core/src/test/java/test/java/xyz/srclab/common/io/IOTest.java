@@ -2,13 +2,13 @@ package test.java.xyz.srclab.common.io;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.BDefault;
 import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.collect.BArray;
+import xyz.srclab.common.io.BFile;
 import xyz.srclab.common.io.BIO;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,5 +58,37 @@ public class IOTest {
         input.reset();
         writer.flush();
         Assert.assertEquals(output.toByteArray(), text.getBytes());
+    }
+
+    @Test
+    public void testSerial() throws Exception {
+        File temp = File.createTempFile("ttt", ".txt");
+        S s = new S();
+        s.setS1("555555");
+        BIO.writeObject(s, BFile.openOutputStream(temp), true);
+        S s2 = BIO.readObject(BFile.openInputStream(temp), true);
+        Assert.assertEquals(s2.getS1(), s.getS1());
+
+        List<Byte> list = BArray.asList("1234".getBytes(BDefault.DEFAULT_CHARSET));
+        BIO.writeObject(list, BFile.openOutputStream(temp), true);
+        List<Byte> list2 = BIO.readObject(BFile.openInputStream(temp), true);
+        Assert.assertEquals(list2, list);
+
+        temp.delete();
+    }
+
+    public static class S implements Serializable {
+
+        private static final long serialVersionUID = BDefault.DEFAULT_SERIAL_VERSION;
+
+        private String s1 = "s1";
+
+        public String getS1() {
+            return s1;
+        }
+
+        public void setS1(String s1) {
+            this.s1 = s1;
+        }
     }
 }

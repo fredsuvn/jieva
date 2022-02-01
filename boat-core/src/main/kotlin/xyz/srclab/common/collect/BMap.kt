@@ -79,67 +79,85 @@ fun <K, T : Any> Map<K, *>.getOrDefault(key: K, defaultValue: T, converter: Conv
 }
 
 fun <K> Map<K, *>.getBoolean(key: K): Boolean {
-    return get(key)!!.toBoolean()
+    return this[key]!!.toBoolean()
 }
 
 fun <K> Map<K, *>.getBooleanOrNull(key: K): Boolean? {
-    return get(key)?.toBoolean()
+    return this[key]?.toBoolean()
 }
 
 fun <K> Map<K, *>.getByte(key: K): Byte {
-    return get(key)!!.toByte()
+    return this[key]!!.toByte()
 }
 
 fun <K> Map<K, *>.getByteOrNull(key: K): Byte? {
-    return get(key)?.toByte()
+    return this[key]?.toByte()
 }
 
 fun <K> Map<K, *>.getShort(key: K): Short {
-    return get(key)!!.toShort()
+    return this[key]!!.toShort()
 }
 
 fun <K> Map<K, *>.getShortOrNull(key: K): Short? {
-    return get(key)?.toShort()
+    return this[key]?.toShort()
 }
 
 fun <K> Map<K, *>.getChar(key: K): Char {
-    return get(key)!!.toChar()
+    return this[key]!!.toChar()
 }
 
 fun <K> Map<K, *>.getCharOrNull(key: K): Char? {
-    return get(key)?.toChar()
+    return this[key]?.toChar()
 }
 
 fun <K> Map<K, *>.getInt(key: K): Int {
-    return get(key)!!.toInt()
+    return this[key]!!.toInt()
 }
 
 fun <K> Map<K, *>.getIntOrNull(key: K): Int? {
-    return get(key)?.toInt()
+    return this[key]?.toInt()
 }
 
 fun <K> Map<K, *>.getLong(key: K): Long {
-    return get(key)!!.toLong()
+    return this[key]!!.toLong()
 }
 
 fun <K> Map<K, *>.getLongOrNull(key: K): Long? {
-    return get(key)?.toLong()
+    return this[key]?.toLong()
 }
 
 fun <K> Map<K, *>.getFloat(key: K): Float {
-    return get(key)!!.toFloat()
+    return this[key]!!.toFloat()
 }
 
 fun <K> Map<K, *>.getFloatOrNull(key: K): Float? {
-    return get(key)?.toFloat()
+    return this[key]?.toFloat()
 }
 
 fun <K> Map<K, *>.getDouble(key: K): Double {
-    return get(key)!!.toDouble()
+    return this[key]!!.toDouble()
 }
 
 fun <K> Map<K, *>.getDoubleOrNull(key: K): Double? {
-    return get(key)?.toDouble()
+    return this[key]?.toDouble()
+}
+
+fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, value: V, collection: Function<K, C>): Boolean {
+    val coll = this.computeIfAbsent(key, collection)
+    return coll.add(value)
+}
+
+fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.addAll(
+    key: K,
+    values: Iterable<V>,
+    collection: Function<K, C>
+): Boolean {
+    val coll = this.computeIfAbsent(key, collection)
+    return coll.addAll(values)
+}
+
+fun <K, V, C : Collection<V>> Map<K, C>.getFirst(key: K): V {
+    return this[key]?.iterator()?.next().asTyped()
 }
 
 fun <K, V> Map<K, V>.filter(predicate: Predicate<in Map.Entry<K, V>>): Map<K, V> {

@@ -18,15 +18,11 @@ fun CharSequence.toPath(): Path {
     return Paths.get(this.toString())
 }
 
-fun CharSequence.openInputStream(): InputStream {
-    return this.toPath().openInputStream()
+fun CharSequence.openFileInputStream(): FileInputStream {
+    return FileInputStream(this.toString())
 }
 
-fun File.openInputStream(): InputStream {
-    return this.toPath().openInputStream()
-}
-
-fun File.fileInputStream(): FileInputStream {
+fun File.openInputStream(): FileInputStream {
     return FileInputStream(this)
 }
 
@@ -34,15 +30,11 @@ fun Path.openInputStream(): InputStream {
     return Files.newInputStream(this)
 }
 
-fun CharSequence.openOutputStream(): OutputStream {
-    return this.toPath().openOutputStream()
+fun CharSequence.openFileOutputStream(): FileOutputStream {
+    return FileOutputStream(this.toString())
 }
 
-fun File.openOutputStream(): OutputStream {
-    return this.toPath().openOutputStream()
-}
-
-fun File.fileOutputStream(): FileOutputStream {
+fun File.openOutputStream(): FileOutputStream {
     return FileOutputStream(this)
 }
 
@@ -67,7 +59,7 @@ fun Path.openRandomAccessFile(mode: CharSequence = "r"): RandomAccessFile {
 
 fun Path.readByteBuffer(): MappedByteBuffer {
     val file = this.toFile()
-    val fis = file.fileInputStream()
+    val fis = file.openInputStream()
     val channel = fis.channel
     return channel.map(FileChannel.MapMode.READ_ONLY, 0, file.length())
 }

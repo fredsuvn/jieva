@@ -6,6 +6,7 @@ import org.apache.commons.io.input.ReaderInputStream
 import org.apache.commons.io.output.WriterOutputStream
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
+import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.remainingLength
 import java.io.*
 import java.net.URL
@@ -187,6 +188,28 @@ fun RandomAccessFile.asOutputStream(
 
 fun URL.toInputStream(): InputStream {
     return this.openStream()
+}
+
+@JvmName("writeObject")
+@JvmOverloads
+fun Any.writeTo(output: OutputStream, close: Boolean = false) {
+    val oop = ObjectOutputStream(output)
+    oop.writeObject(this)
+    if (close) {
+        oop.close()
+    }
+}
+
+@JvmName("writeObject")
+@JvmOverloads
+fun Any.writeTo(outputFile: CharSequence, close: Boolean = false) {
+    return writeTo(outputFile.openFileOutputStream(), close)
+}
+
+@JvmOverloads
+fun <T> InputStream.readObject(close: Boolean = false): T {
+    val ooi = ObjectInputStream(this)
+    return ooi.readObject().asTyped()
 }
 
 /**

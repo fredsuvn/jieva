@@ -26,6 +26,9 @@ object Boat {
     val VERSION: SemVer = buildInfos["build.version"]!!.parseSemVer()
 
     @JvmField
+    val SERIAL_VERSION: Long = buildInfos["build.serial.version"]!!.toLong()
+
+    @JvmField
     val ABOUT: About = About.of(
         "Boat",
         VERSION.toString(),

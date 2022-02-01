@@ -1,6 +1,8 @@
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import xyz.srclab.common.base.asTyped
+import java.io.Serializable
 
 /**
  * A type of Multi-Map of which values are [MutableSet].
@@ -8,7 +10,7 @@ import xyz.srclab.common.base.asTyped
 open class MutableSetMap<K, V> constructor(
     private val map: MutableMap<K, MutableSet<V>>,
     private val valueSet: (K) -> MutableSet<V>
-) : MutableMap<K, MutableSet<V>> by map {
+) : Serializable, MutableMap<K, MutableSet<V>> by map {
 
     fun add(key: K, value: V): Boolean {
         val set = map.computeIfAbsent(key, valueSet)
@@ -28,6 +30,10 @@ open class MutableSetMap<K, V> constructor(
     fun getFirst(key: K): V {
         return get(key)?.iterator()?.next().asTyped()
     }
+
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+    }
 }
 
 /**
@@ -35,10 +41,14 @@ open class MutableSetMap<K, V> constructor(
  */
 open class SetMap<K, V> constructor(
     private val map: Map<K, Set<V>>
-) : Map<K, Set<V>> by map {
+) : Serializable, Map<K, Set<V>> by map {
 
     fun getFirst(key: K): V {
         return get(key)?.iterator()?.next().asTyped()
+    }
+
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
     }
 }
 
@@ -48,7 +58,7 @@ open class SetMap<K, V> constructor(
 open class MutableListMap<K, V> constructor(
     private val map: MutableMap<K, MutableList<V>>,
     private val valueList: (K) -> MutableList<V>
-) : MutableMap<K, MutableList<V>> by map {
+) : Serializable, MutableMap<K, MutableList<V>> by map {
 
     fun add(key: K, value: V): Boolean {
         val list = map.computeIfAbsent(key, valueList)
@@ -76,6 +86,10 @@ open class MutableListMap<K, V> constructor(
     fun get(key: K, index: Int): V {
         return get(key)?.get(index).asTyped()
     }
+
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+    }
 }
 
 /**
@@ -83,7 +97,7 @@ open class MutableListMap<K, V> constructor(
  */
 open class ListMap<K, V> constructor(
     private val map: Map<K, List<V>>,
-) : Map<K, List<V>> by map {
+) : Serializable, Map<K, List<V>> by map {
 
     fun getFirst(key: K): V {
         return get(key)?.get(0).asTyped()
@@ -95,5 +109,9 @@ open class ListMap<K, V> constructor(
 
     fun get(key: K, index: Int): V {
         return get(key)?.get(index).asTyped()
+    }
+
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
     }
 }
