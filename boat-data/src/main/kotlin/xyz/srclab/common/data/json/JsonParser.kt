@@ -22,7 +22,7 @@ interface JsonParser : DataParser<Json> {
     }
 
     fun toJson(obj: Any?): Json {
-        return toDataNode(obj)
+        return toDataElement(obj)
     }
 
     companion object {

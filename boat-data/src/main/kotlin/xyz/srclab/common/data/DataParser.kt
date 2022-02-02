@@ -9,9 +9,9 @@ import java.nio.ByteBuffer
 /**
  * Parser to convert or parse between java object and [T].
  *
- * @see DataNode
+ * @see DataElement
  */
-interface DataParser<T : DataNode> {
+interface DataParser<T : DataElement> {
 
     fun toString(obj: Any?): String
 
@@ -25,7 +25,7 @@ interface DataParser<T : DataNode> {
         return ByteBuffer.wrap(toBytes(obj))
     }
 
-    fun toDataNode(obj: Any?): T
+    fun toDataElement(obj: Any?): T
 
     fun write(obj: Any?, output: OutputStream): Long {
         return toInputStream(obj).copyTo(output)

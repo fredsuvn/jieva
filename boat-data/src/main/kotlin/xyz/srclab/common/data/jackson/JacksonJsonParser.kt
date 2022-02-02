@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.node.JsonNodeType
 import com.fasterxml.jackson.datatype.jsr310.PackageVersion
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import xyz.srclab.common.data.json.Json
 import xyz.srclab.common.data.json.JsonType
 import xyz.srclab.common.io.asInputStream
@@ -15,6 +14,7 @@ import java.io.InputStream
 import java.io.Serializable
 import java.lang.reflect.Type
 import java.nio.ByteBuffer
+
 
 open class JacksonJsonParser(
     private val objectMapper: ObjectMapper
@@ -32,33 +32,32 @@ open class JacksonJsonParser(
         return objectMapper.writeValueAsBytes(obj)
     }
 
-    override fun toDataNode(obj: Any?): Json {
+    override fun toDataElement(obj: Any?): Json {
         val jsonNode = objectMapper.convertValue(obj, JsonNode::class.java)
-        return JsonImpl(objectMapper, jsonNode)
+        return JsonImpl(jsonNode)
     }
 
     override fun parse(chars: CharSequence): Json {
         val jsonNode = if (chars is String) objectMapper.readTree(chars) else objectMapper.readTree(chars.asReader())
-        return JsonImpl(objectMapper, jsonNode)
+        return JsonImpl(jsonNode)
     }
 
     override fun parse(bytes: ByteArray, offset: Int, length: Int): Json {
         val jsonNode = objectMapper.readTree(bytes, offset, length)
-        return JsonImpl(objectMapper, jsonNode)
+        return JsonImpl(jsonNode)
     }
 
     override fun parse(input: InputStream): Json {
         val jsonNode = objectMapper.readTree(input)
-        return JsonImpl(objectMapper, jsonNode)
+        return JsonImpl(jsonNode)
     }
 
     override fun parse(byteBuffer: ByteBuffer): Json {
         val jsonNode = objectMapper.readTree(byteBuffer.asInputStream())
-        return JsonImpl(objectMapper, jsonNode)
+        return JsonImpl(jsonNode)
     }
 
-    class JsonImpl(
-        private val objectMapper: ObjectMapper,
+    private inner class JsonImpl(
         val jsonNode: JsonNode
     ) : Json, Serializable {
 
@@ -69,6 +68,7 @@ open class JacksonJsonParser(
         }
 
         override fun toBytes(): ByteArray {
+            jsonNode.binaryValue()
             return objectMapper.writeValueAsBytes(jsonNode)
         }
 
@@ -107,10 +107,6 @@ open class JacksonJsonParser(
         override fun hashCode(): Int {
             return jsonNode.hashCode()
         }
-
-        companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
-        }
     }
 
     private inner class JsonImplModule : SimpleModule(PackageVersion.VERSION) {
@@ -142,7 +138,6 @@ open class JacksonJsonParser(
                 ctxt: DeserializationContext
             ): Json {
                 return JsonImpl(
-                    objectMapper,
                     objectMapper.readValue(parser, JsonNode::class.java)
                 )
             }

@@ -1,14 +1,14 @@
 package xyz.srclab.common.data.json
 
-import xyz.srclab.common.data.DataNode
+import xyz.srclab.common.data.DataElement
 import xyz.srclab.common.reflect.TypeRef
 
 /**
  * Represents a json type.
  *
- * @see DataNode
+ * @see DataElement
  */
-interface Json : DataNode {
+interface Json : DataElement {
 
     /**
      * Returns type of json.

@@ -212,9 +212,7 @@ public class JsonTest {
     }
 
     private <K, V> Map<K, V> newMap(K key, V value) {
-        Map<K, V> result = new HashMap<>(1);
-        result.put(key, value);
-        return result;
+        return BMap.newMap(key, value);
     }
 
     public static class TestObject {
