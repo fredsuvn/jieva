@@ -5,6 +5,7 @@ import xyz.srclab.common.io.*
 import xyz.srclab.common.reflect.TypeRef
 import java.io.InputStream
 import java.io.OutputStream
+import java.io.Serializable
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -16,7 +17,7 @@ import java.nio.ByteBuffer
  * @see DataParser
  * @see Json
  */
-interface DataNode {
+interface DataNode : Serializable {
 
     override fun toString(): String
 
