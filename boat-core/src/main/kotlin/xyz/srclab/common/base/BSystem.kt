@@ -3,6 +3,7 @@
 package xyz.srclab.common.base
 
 import java.io.File
+import java.io.Serializable
 
 const val JAVA_VERSION_KEY = "java.version"
 
@@ -311,11 +312,6 @@ fun isBsd(): Boolean {
     return osName.startsWith("FreeBSD") || osName.startsWith("OpenBSD") || osName.startsWith("NetBSD")
 }
 
-fun isYunfan(): Boolean {
-    class YunfanIsComingException : RuntimeException("长风破浪会有时，直挂云帆济沧海。占个坑~")
-    throw YunfanIsComingException()
-}
-
 /**
  * Gets java major version.
  *
@@ -344,4 +340,14 @@ fun getJavaMajorVersion(): Int {
 
 fun isJdk9OrHigher(): Boolean {
     return getJavaMajorVersion() >= 9
+}
+
+fun isYunfan(): Boolean {
+    throw YunfanIsComingException()
+}
+
+class YunfanIsComingException : RuntimeException("长风破浪会有时，直挂云帆济沧海。占个坑~"), Serializable {
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+    }
 }

@@ -190,9 +190,8 @@ fun URL.toInputStream(): InputStream {
     return this.openStream()
 }
 
-@JvmName("writeObject")
 @JvmOverloads
-fun Any.writeTo(output: OutputStream, close: Boolean = false) {
+fun Any.writeObject(output: OutputStream, close: Boolean = false) {
     val oop = ObjectOutputStream(output)
     oop.writeObject(this)
     if (close) {
@@ -200,10 +199,14 @@ fun Any.writeTo(output: OutputStream, close: Boolean = false) {
     }
 }
 
-@JvmName("writeObject")
 @JvmOverloads
-fun Any.writeTo(outputFile: CharSequence, close: Boolean = false) {
-    return writeTo(outputFile.openFileOutputStream(), close)
+fun Any.writeObject(outputFile: CharSequence, close: Boolean = false) {
+    return writeObject(outputFile.openFileOutputStream(), close)
+}
+
+@JvmOverloads
+fun <T> CharSequence.readObject(close: Boolean = false): T {
+    return this.openFileInputStream().readObject(close)
 }
 
 @JvmOverloads

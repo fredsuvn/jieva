@@ -18,9 +18,9 @@ open class BeanType(
     val classType: Class<*>
         get() = type.rawClass
 
-    @Throws(PropertyNotFoundException::class)
+    @Throws(NoSuchPropertyException::class)
     fun getProperty(name: String): PropertyType {
-        return getPropertyOrNull(name) ?: throw PropertyNotFoundException(name)
+        return getPropertyOrNull(name) ?: throw NoSuchPropertyException(name)
     }
 
     fun getPropertyOrNull(name: String): PropertyType? {

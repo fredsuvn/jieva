@@ -20,29 +20,29 @@ interface Converter {
 
     val convertHandlers: List<ConvertHandler>
 
-    @Throws(UnsupportedConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, toType: Class<T>): T {
-        return convertOrNull(from, toType) ?: throw UnsupportedConvertException(from, toType)
+        return convertOrNull(from, toType) ?: throw ConvertException(from, toType)
     }
 
-    @Throws(UnsupportedConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, toType: Type): T {
-        return convertOrNull(from, toType) ?: throw UnsupportedConvertException(from, toType)
+        return convertOrNull(from, toType) ?: throw ConvertException(from, toType)
     }
 
-    @Throws(UnsupportedConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, toType: TypeRef<T>): T {
         return convert(from, toType.type)
     }
 
-    @Throws(UnsupportedConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, fromType: Type, toType: Class<T>): T {
-        return convertOrNull(from, fromType, toType) ?: throw UnsupportedConvertException(fromType, toType)
+        return convertOrNull(from, fromType, toType) ?: throw ConvertException(fromType, toType)
     }
 
-    @Throws(UnsupportedConvertException::class)
+    @Throws(ConvertException::class)
     fun <T : Any> convert(from: Any?, fromType: Type, toType: Type): T {
-        return convertOrNull(from, fromType, toType) ?: throw UnsupportedConvertException(fromType, toType)
+        return convertOrNull(from, fromType, toType) ?: throw ConvertException(fromType, toType)
     }
 
     fun <T : Any> convertOrNull(from: Any?, toType: Class<T>): T? {

@@ -15,7 +15,6 @@ import java.util.*
  * BEscapes.escape("{\"ss\": \"sss\\n\"}", '\\', "\"{}");
  * ```
  */
-@Throws(StringEscapeException::class)
 fun CharSequence.escape(escapeChar: Char, escapedChars: CharSequence): String {
     if (this.isEmpty()) {
         return this.toString()
@@ -65,7 +64,6 @@ fun CharSequence.escape(escapeChar: Char, escapedChars: CharSequence): String {
  * BEscapes.unescape("\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}", '\\', "\"{}");
  * ```
  */
-@Throws(StringEscapeException::class)
 fun CharSequence.unescape(escapeChar: Char, escapedChars: CharSequence): String {
     if (this.isEmpty()) {
         return this.toString()
@@ -120,10 +118,8 @@ fun CharSequence.unescape(escapeChar: Char, escapedChars: CharSequence): String 
 @ThreadSafe
 interface StringEscape {
 
-    @Throws(StringEscapeException::class)
     fun escape(chars: CharSequence): String
 
-    @Throws(StringEscapeException::class)
     fun unescape(chars: CharSequence): String
 }
 
@@ -154,7 +150,3 @@ open class SimpleEscape(
         return chars.unescape(escapeChar, escapedChars)
     }
 }
-
-open class StringEscapeException @JvmOverloads constructor(
-    message: String? = null, cause: Throwable? = null
-) : RuntimeException(message, cause)

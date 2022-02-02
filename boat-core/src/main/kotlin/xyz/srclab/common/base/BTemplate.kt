@@ -4,6 +4,7 @@ package xyz.srclab.common.base
 
 import xyz.srclab.annotations.Accepted
 import xyz.srclab.common.base.StringRef.Companion.stringRef
+import java.io.Serializable
 import java.util.*
 
 /**
@@ -60,13 +61,13 @@ interface StringTemplate {
      * Resolved nodes of this string template.
      * Some elements' type is [Parameter] although all elements' type is [CharSequence],
      */
-    @get:Throws(StringTemplateException::class)
+    @get:Throws(TemplateException::class)
     val nodes: List<CharSequence>
 
     /**
      * Process with [args].
      */
-    @Throws(StringTemplateException::class)
+    @Throws(TemplateException::class)
     fun process(args: Map<@Accepted(String::class, Integer::class) Any, Any?>): String {
         val nodesArray = nodes.toTypedArray()
         var i = 0
@@ -83,7 +84,7 @@ interface StringTemplate {
     /**
      * Processes with [args].
      */
-    @Throws(StringTemplateException::class)
+    @Throws(TemplateException::class)
     fun processTo(dest: Appendable, args: Map<@Accepted(String::class, Integer::class) Any, Any?>) {
         for (node in nodes) {
             if (node is Parameter) {
@@ -329,7 +330,7 @@ open class SimpleTemplate(
                 if (suffix === null) {
                     //Find next whitespace
                     if (template[i].isWhitespace()) {
-                        throw StringTemplateException("Parameter name cannot be whitespace.")
+                        throw TemplateException("Parameter name cannot be whitespace.")
                     }
                     val paramNameStart = i
                     i++
@@ -345,7 +346,7 @@ open class SimpleTemplate(
                 //Find suffix
                 val suffixIndex = template.indexOf(suffix, i)
                 if (suffixIndex < 0) {
-                    throw StringTemplateException("Parameter prefix is not enclose at index: $i.")
+                    throw TemplateException("Parameter prefix is not enclose at index: $i.")
                 }
                 if (suffixIndex == i) {
                     getBuffer().add(StringTemplate.Parameter.of(paramIndex++))
@@ -372,6 +373,10 @@ open class SimpleTemplate(
     }
 }
 
-open class StringTemplateException @JvmOverloads constructor(
+open class TemplateException @JvmOverloads constructor(
     message: String? = null, cause: Throwable? = null
-) : RuntimeException(message, cause)
+) : RuntimeException(message, cause), Serializable {
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+    }
+}

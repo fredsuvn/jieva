@@ -46,7 +46,6 @@ import java.util.*
  *
  * @see FastFormat
  */
-@Throws(StringFormatException::class)
 fun CharSequence.fastFormat(vararg args: Any?): String {
     return FastFormat.format(this, *args)
 }
@@ -59,7 +58,6 @@ fun CharSequence.fastFormat(vararg args: Any?): String {
 @ThreadSafe
 interface StringFormat {
 
-    @Throws(StringFormatException::class)
     fun format(pattern: CharSequence, vararg args: Any?): String
 }
 
@@ -190,7 +188,3 @@ object FastFormat : StringFormat {
         return getBuffer().joinToString("") { it.deepToString() }
     }
 }
-
-open class StringFormatException @JvmOverloads constructor(
-    message: String? = null, cause: Throwable? = null
-) : RuntimeException(message, cause)

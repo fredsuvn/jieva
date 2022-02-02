@@ -2,11 +2,13 @@
 
 package xyz.srclab.common.base
 
+import java.io.Serializable
+
 @JvmName("getValue")
-@Throws(EnumNotFoundException::class)
+@Throws(NoSuchEnumException::class)
 @JvmOverloads
 fun <T : Enum<T>> Class<*>.enumValue(name: CharSequence, ignoreCase: Boolean = false): T {
-    return enumValueOrNull(name, ignoreCase) ?: throw EnumNotFoundException("$this.$name")
+    return enumValueOrNull(name, ignoreCase) ?: throw NoSuchEnumException("$this.$name")
 }
 
 @JvmName("getValueOrNull")
@@ -32,9 +34,9 @@ fun <T> Class<*>.enumValueOrNull(name: CharSequence, ignoreCase: Boolean = false
 }
 
 @JvmName("getValue")
-@Throws(EnumNotFoundException::class)
+@Throws(NoSuchEnumException::class)
 fun <T> Class<*>.enumValue(index: Int): T {
-    return enumValueOrNull(index) ?: throw EnumNotFoundException("$this[$index]")
+    return enumValueOrNull(index) ?: throw NoSuchEnumException("$this[$index]")
 }
 
 @JvmName("getValueOrNull")
@@ -57,4 +59,8 @@ private fun String.toEnumOrNull(type: Class<*>): Any? {
     }
 }
 
-open class EnumNotFoundException(message: String?) : RuntimeException(message)
+open class NoSuchEnumException(message: String?) : RuntimeException(message), Serializable {
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+    }
+}

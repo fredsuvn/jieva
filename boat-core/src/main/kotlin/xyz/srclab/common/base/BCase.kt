@@ -25,7 +25,6 @@ val LOWER_HYPHEN: NamingCase = SeparatorCase("-") { it.lowerCase() }
 @JvmField
 val UPPER_HYPHEN: NamingCase = SeparatorCase("-") { it.upperCase() }
 
-@Throws(NamingCaseException::class)
 fun CharSequence.toCase(from: NamingCase, to: NamingCase): String {
     return from.convert(this, to)
 }
@@ -54,13 +53,11 @@ interface NamingCase {
     /**
      * Splits [name] by case boundary.
      */
-    @Throws(NamingCaseException::class)
     fun <T : CharSequence> split(name: T): Words<T>
 
     /**
      * Joins [words] with current case style.
      */
-    @Throws(NamingCaseException::class)
     fun <T : CharSequence> join(words: Words<T>): String {
         val sb = StringBuilder()
         joinTo(sb, words)
@@ -70,13 +67,11 @@ interface NamingCase {
     /**
      * Joins [words] with current case style into [dest].
      */
-    @Throws(NamingCaseException::class)
     fun <T : CharSequence> joinTo(dest: Appendable, words: Words<T>)
 
     /**
      * Converts [name] to [target] style.
      */
-    @Throws(NamingCaseException::class)
     fun convert(name: CharSequence, target: NamingCase): String {
         val words = split(name)
         return target.join(words)
@@ -312,7 +307,3 @@ open class SeparatorCase @JvmOverloads constructor(
         words.splitList.joinTo(appendable, separator) { wordProcessor.apply(it) }
     }
 }
-
-open class NamingCaseException @JvmOverloads constructor(
-    message: String? = null, cause: Throwable? = null
-) : RuntimeException(message, cause)

@@ -8,15 +8,16 @@ import xyz.srclab.common.io.toFileOrNull
 import xyz.srclab.common.reflect.defaultClassLoader
 import java.io.File
 import java.io.InputStream
+import java.io.Serializable
 import java.net.URL
 import java.nio.charset.Charset
 import java.util.*
 
 @JvmName("load")
 @JvmOverloads
-@Throws(ResourceNotFoundException::class)
+@Throws(NoSuchResourceException::class)
 fun CharSequence.loadResource(classLoader: ClassLoader = defaultClassLoader()): URL {
-    return loadResourceOrNull(classLoader) ?: throw ResourceNotFoundException("$this")
+    return loadResourceOrNull(classLoader) ?: throw NoSuchResourceException("$this")
 }
 
 @JvmName("loadOrNull")
@@ -27,7 +28,7 @@ fun CharSequence.loadResourceOrNull(classLoader: ClassLoader = defaultClassLoade
 
 @JvmName("loadStream")
 @JvmOverloads
-@Throws(ResourceNotFoundException::class)
+@Throws(NoSuchResourceException::class)
 fun CharSequence.loadResourceStream(classLoader: ClassLoader = defaultClassLoader()): InputStream {
     return loadResource(classLoader).openStream()
 }
@@ -40,7 +41,7 @@ fun CharSequence.loadResourceStreamOrNull(classLoader: ClassLoader = defaultClas
 
 @JvmName("loadFile")
 @JvmOverloads
-@Throws(ResourceNotFoundException::class)
+@Throws(NoSuchResourceException::class)
 fun CharSequence.loadResourceFile(classLoader: ClassLoader = defaultClassLoader()): File {
     return loadResource(classLoader).toFile()
 }
@@ -53,7 +54,7 @@ fun CharSequence.loadResourceFileOrNull(classLoader: ClassLoader = defaultClassL
 
 @JvmName("loadString")
 @JvmOverloads
-@Throws(ResourceNotFoundException::class)
+@Throws(NoSuchResourceException::class)
 fun CharSequence.loadResourceString(
     charset: Charset = DEFAULT_CHARSET, classLoader: ClassLoader = defaultClassLoader()
 ): String {
@@ -151,4 +152,8 @@ private fun CharSequence.removeAbsolute(): String {
     return this.removeIfStartWith("/")
 }
 
-open class ResourceNotFoundException(message: String?) : RuntimeException(message)
+open class NoSuchResourceException(message: String?) : RuntimeException(message), Serializable {
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+    }
+}

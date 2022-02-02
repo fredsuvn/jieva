@@ -8,27 +8,27 @@ import java.lang.reflect.Type
 private val defaultConverter
     get() = Converter.defaultConverter()
 
-@Throws(UnsupportedConvertException::class)
+@Throws(ConvertException::class)
 fun <T : Any> Any?.convert(toType: Class<T>): T {
     return defaultConverter.convert(this, toType)
 }
 
-@Throws(UnsupportedConvertException::class)
+@Throws(ConvertException::class)
 fun <T : Any> Any?.convert(toType: Type): T {
     return defaultConverter.convert(this, toType)
 }
 
-@Throws(UnsupportedConvertException::class)
+@Throws(ConvertException::class)
 fun <T : Any> Any?.convert(toType: TypeRef<T>): T {
     return defaultConverter.convert(this, toType)
 }
 
-@Throws(UnsupportedConvertException::class)
+@Throws(ConvertException::class)
 fun <T : Any> Any?.convert(fromType: Type, toType: Class<T>): T {
     return defaultConverter.convert(this, fromType, toType)
 }
 
-@Throws(UnsupportedConvertException::class)
+@Throws(ConvertException::class)
 fun <T : Any> Any?.convert(fromType: Type, toType: Type): T {
     return defaultConverter.convert(this, fromType, toType)
 }
