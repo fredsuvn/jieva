@@ -1,7 +1,9 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.func.InstFunc
+import java.io.Serializable
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
@@ -11,13 +13,16 @@ import java.lang.reflect.Type
  *
  * @see BeanType
  */
-interface PropertyType {
-
-    val name: String
-
-    val type: Type
-
-    val ownerType: BeanType
+open class PropertyType(
+    val ownerType: BeanType,
+    val name: String,
+    val type: Type,
+    val getter: InstFunc?,
+    val setter: InstFunc?,
+    val field: Field?,
+    val getterMethod: Method?,
+    val setterMethod: Method?,
+) : Serializable {
 
     val isReadable: Boolean
         get() {
@@ -29,42 +34,29 @@ interface PropertyType {
             return setter !== null
         }
 
-    val getter: InstFunc?
-
-    val setter: InstFunc?
-
-    val field: Field?
-
-    val getterMethod: Method?
-
-    val setterMethod: Method?
-
-    val fieldAnnotations: List<Annotation>
-        get() {
-            val f = this.field
-            if (f === null) {
-                return emptyList()
-            }
-            return f.annotations.toList()
+    val fieldAnnotations: List<Annotation> by lazy {
+        val f = this.field
+        if (f === null) {
+            return@lazy emptyList()
         }
+        f.annotations.toList()
+    }
 
-    val getterAnnotations: List<Annotation>
-        get() {
-            val getterMethod = this.getterMethod
-            if (getterMethod === null) {
-                return emptyList()
-            }
-            return getterMethod.annotations.toList()
+    val getterAnnotations: List<Annotation> by lazy {
+        val getterMethod = this.getterMethod
+        if (getterMethod === null) {
+            return@lazy emptyList()
         }
+        getterMethod.annotations.toList()
+    }
 
-    val setterAnnotations: List<Annotation>
-        get() {
-            val setterMethod = this.setterMethod
-            if (setterMethod === null) {
-                return emptyList()
-            }
-            return setterMethod.annotations.toList()
+    val setterAnnotations: List<Annotation> by lazy {
+        val setterMethod = this.setterMethod
+        if (setterMethod === null) {
+            return@lazy emptyList()
         }
+        setterMethod.annotations.toList()
+    }
 
     fun getValue(bean: Any): Any? {
         val getter = this.getter
@@ -86,56 +78,27 @@ interface PropertyType {
         setter.invoke(bean, value)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PropertyType) return false
+        if (ownerType != other.ownerType) return false
+        if (name != other.name) return false
+        if (type != other.type) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = ownerType.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + type.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "property: ${ownerType.type.typeName}.$name[${type.typeName}]"
+    }
+
     companion object {
-
-        @JvmStatic
-        fun newPropertyType(
-            ownerType: BeanType,
-            name: String,
-            type: Type,
-            getter: InstFunc?,
-            setter: InstFunc?,
-            field: Field?,
-            getterMethod: Method?,
-            setterMethod: Method?,
-        ): PropertyType {
-            return PropertyTypeImpl(ownerType, name, type, getter, setter, field, getterMethod, setterMethod)
-        }
-
-        private class PropertyTypeImpl(
-            override val ownerType: BeanType,
-            override val name: String,
-            override val type: Type,
-            override val getter: InstFunc?,
-            override val setter: InstFunc?,
-            override val field: Field?,
-            override val getterMethod: Method?,
-            override val setterMethod: Method?,
-        ) : PropertyType {
-
-            override val fieldAnnotations: List<Annotation> by lazy { super.fieldAnnotations }
-            override val getterAnnotations: List<Annotation> by lazy { super.getterAnnotations }
-            override val setterAnnotations: List<Annotation> by lazy { super.setterAnnotations }
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other !is PropertyType) return false
-                if (ownerType != other.ownerType) return false
-                if (name != other.name) return false
-                if (type != other.type) return false
-                return true
-            }
-
-            override fun hashCode(): Int {
-                var result = ownerType.hashCode()
-                result = 31 * result + name.hashCode()
-                result = 31 * result + type.hashCode()
-                return result
-            }
-
-            override fun toString(): String {
-                return "property: ${ownerType.type.typeName}.$name[${type.typeName}]"
-            }
-        }
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
     }
 }

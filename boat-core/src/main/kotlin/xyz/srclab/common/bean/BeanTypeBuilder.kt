@@ -25,6 +25,6 @@ open class BeanTypeBuilder(open val type: Type) {
     }
 
     open fun build(): BeanType {
-        return BeanType.newBeanType(type, properties)
+        return BeanType(type, properties)
     }
 }

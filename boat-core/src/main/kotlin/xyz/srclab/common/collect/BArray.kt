@@ -5,6 +5,7 @@ package xyz.srclab.common.collect
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.checkIndexInBounds
 import xyz.srclab.common.base.toKotlinFun
+import xyz.srclab.common.collect.ArrayBridge.Companion.toArrayBridge
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
 import java.util.function.Function
@@ -82,139 +83,63 @@ fun <T> Any.arrayAsList(): MutableList<T> {
  * Returns a [MutableList] that wraps the original array.
  */
 fun <T> Array<T>.asList(): MutableList<T> {
-    return ArrayBridgeList(object : ArrayBridge<T> {
-        override val size: Int get() = this@asList.size
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: T): Boolean = this@asList.contains(element)
-        override fun get(index: Int): T = this@asList[index]
-        override fun set(index: Int, element: T): T = this@asList[index].let { this@asList[index] = element;it }
-        override fun indexOf(element: T): Int = this@asList.indexOf(element)
-        override fun lastIndexOf(element: T): Int = this@asList.lastIndexOf(element)
-    })
+    return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
  * Returns a [MutableList] that wraps the original array.
  */
 fun ByteArray.asList(): MutableList<Byte> {
-    return ArrayBridgeList(object : ArrayBridge<Byte> {
-        override val size: Int get() = this@asList.size
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Byte): Boolean = this@asList.contains(element)
-        override fun get(index: Int): Byte = this@asList[index]
-        override fun set(index: Int, element: Byte): Byte = this@asList[index].let { this@asList[index] = element;it }
-        override fun indexOf(element: Byte): Int = this@asList.indexOf(element)
-        override fun lastIndexOf(element: Byte): Int = this@asList.lastIndexOf(element)
-    })
+    return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
  * Returns a [MutableList] that wraps the original array.
  */
 fun ShortArray.asList(): MutableList<Short> {
-    return ArrayBridgeList(object : ArrayBridge<Short> {
-        override val size: Int get() = this@asList.size
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Short): Boolean = this@asList.contains(element)
-        override fun get(index: Int): Short = this@asList[index]
-        override fun set(index: Int, element: Short): Short = this@asList[index].let { this@asList[index] = element;it }
-        override fun indexOf(element: Short): Int = this@asList.indexOf(element)
-        override fun lastIndexOf(element: Short): Int = this@asList.lastIndexOf(element)
-    })
+    return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
  * Returns a [MutableList] that wraps the original array.
  */
 fun IntArray.asList(): MutableList<Int> {
-    return ArrayBridgeList(object : ArrayBridge<Int> {
-        override val size: Int get() = this@asList.size
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Int): Boolean = this@asList.contains(element)
-        override fun get(index: Int): Int = this@asList[index]
-        override fun set(index: Int, element: Int): Int = this@asList[index].let { this@asList[index] = element;it }
-        override fun indexOf(element: Int): Int = this@asList.indexOf(element)
-        override fun lastIndexOf(element: Int): Int = this@asList.lastIndexOf(element)
-    })
+    return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
  * Returns a [MutableList] that wraps the original array.
  */
 fun LongArray.asList(): MutableList<Long> {
-    return ArrayBridgeList(object : ArrayBridge<Long> {
-        override val size: Int get() = this@asList.size
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Long): Boolean = this@asList.contains(element)
-        override fun get(index: Int): Long = this@asList[index]
-        override fun set(index: Int, element: Long): Long = this@asList[index].let { this@asList[index] = element;it }
-        override fun indexOf(element: Long): Int = this@asList.indexOf(element)
-        override fun lastIndexOf(element: Long): Int = this@asList.lastIndexOf(element)
-    })
+    return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
  * Returns a [MutableList] that wraps the original array.
  */
 fun FloatArray.asList(): MutableList<Float> {
-    return ArrayBridgeList(object : ArrayBridge<Float> {
-        override val size: Int get() = this@asList.size
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Float): Boolean = this@asList.any { it == element }
-        override fun get(index: Int): Float = this@asList[index]
-        override fun set(index: Int, element: Float): Float = this@asList[index].let { this@asList[index] = element;it }
-        override fun indexOf(element: Float): Int = this@asList.indexOfFirst { it == element }
-        override fun lastIndexOf(element: Float): Int = this@asList.indexOfLast { it == element }
-    })
+    return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
  * Returns a [MutableList] that wraps the original array.
  */
 fun DoubleArray.asList(): MutableList<Double> {
-    return ArrayBridgeList(object : ArrayBridge<Double> {
-        override val size: Int get() = this@asList.size
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Double): Boolean = this@asList.any { it == element }
-        override fun get(index: Int): Double = this@asList[index]
-        override fun set(index: Int, element: Double): Double =
-            this@asList[index].let { this@asList[index] = element;it }
-
-        override fun indexOf(element: Double): Int = this@asList.indexOfFirst { it == element }
-        override fun lastIndexOf(element: Double): Int = this@asList.indexOfLast { it == element }
-    })
+    return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
  * Returns a [MutableList] that wraps the original array.
  */
 fun BooleanArray.asList(): MutableList<Boolean> {
-    return ArrayBridgeList(object : ArrayBridge<Boolean> {
-        override val size: Int get() = this@asList.size
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Boolean): Boolean = this@asList.contains(element)
-        override fun get(index: Int): Boolean = this@asList[index]
-        override fun set(index: Int, element: Boolean): Boolean =
-            this@asList[index].let { this@asList[index] = element;it }
-
-        override fun indexOf(element: Boolean): Int = this@asList.indexOf(element)
-        override fun lastIndexOf(element: Boolean): Int = this@asList.lastIndexOf(element)
-    })
+    return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
  * Returns a [MutableList] that wraps the original array.
  */
 fun CharArray.asList(): MutableList<Char> {
-    return ArrayBridgeList(object : ArrayBridge<Char> {
-        override val size: Int get() = this@asList.size
-        override fun isEmpty(): Boolean = this@asList.isEmpty()
-        override fun contains(element: Char): Boolean = this@asList.contains(element)
-        override fun get(index: Int): Char = this@asList[index]
-        override fun set(index: Int, element: Char): Char = this@asList[index].let { this@asList[index] = element;it }
-        override fun indexOf(element: Char): Int = this@asList.indexOf(element)
-        override fun lastIndexOf(element: Char): Int = this@asList.lastIndexOf(element)
-    })
+    return ArrayBridgeList(this.toArrayBridge())
 }
 
 @JvmOverloads

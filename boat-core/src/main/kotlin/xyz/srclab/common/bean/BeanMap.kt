@@ -1,6 +1,8 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import xyz.srclab.common.collect.mapEntries
+import java.io.Serializable
 
 /**
  * A [Map] which is associated with a `bean`,
@@ -13,13 +15,13 @@ import xyz.srclab.common.collect.mapEntries
 open class BeanMap(
     open val bean: Any,
     open val beanType: BeanType = bean::class.java.resolveBean()
-) : AbstractMutableMap<String, Any?>() {
+) : AbstractMutableMap<String, Any?>(), Serializable {
 
     //private val properties: Map<String, PropertyType> =
     //    beanType.properties.filter { it.key != "class" }
 
     private val entryMap: Map<String, MutableMap.MutableEntry<String, Any?>> =
-        beanType.properties.mapEntries { name, propertyType -> name to BeanEntry(propertyType) }
+        beanType.properties.mapEntries { name, propertyType -> name to BeanEntry(bean, propertyType) }
 
     override val size: Int
         get() = entries.size
@@ -58,9 +60,10 @@ open class BeanMap(
         throw UnsupportedOperationException()
     }
 
-    private inner class BeanEntry(
+    private class BeanEntry(
+        private val bean: Any,
         private val propertyType: PropertyType
-    ) : MutableMap.MutableEntry<String, Any?> {
+    ) : MutableMap.MutableEntry<String, Any?>, Serializable {
 
         override val key: String = propertyType.name
 
@@ -74,5 +77,13 @@ open class BeanMap(
             propertyType.setValue(bean, newValue)
             return old
         }
+
+        companion object {
+            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        }
+    }
+
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
     }
 }

@@ -1,6 +1,8 @@
 package xyz.srclab.common.bean
 
+import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import xyz.srclab.common.reflect.rawClass
+import java.io.Serializable
 import java.lang.reflect.Type
 
 /**
@@ -8,14 +10,13 @@ import java.lang.reflect.Type
  *
  * @see PropertyType
  */
-interface BeanType {
-
-    val type: Type
+open class BeanType(
+    val type: Type,
+    val properties: Map<String, PropertyType>
+) : Serializable {
 
     val classType: Class<*>
         get() = type.rawClass
-
-    val properties: Map<String, PropertyType>
 
     @Throws(PropertyNotFoundException::class)
     fun getProperty(name: String): PropertyType {
@@ -26,40 +27,25 @@ interface BeanType {
         return properties[name]
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BeanType) return false
+        if (type != other.type) return false
+        if (properties != other.properties) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + properties.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "bean ${type.typeName}"
+    }
+
     companion object {
-
-        @JvmStatic
-        fun newBeanType(type: Type, properties: Map<String, PropertyType>): BeanType {
-            return BeanTypeImpl(type, properties)
-        }
-
-        @JvmName("parse")
-        fun Type.parseBeanType(resolver: BeanResolver = BeanResolver.defaultResolver()): BeanType {
-            return resolver.resolve(this)
-        }
-
-        private class BeanTypeImpl(
-            override val type: Type,
-            override val properties: Map<String, PropertyType>
-        ) : BeanType {
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other !is BeanType) return false
-                if (type != other.type) return false
-                if (properties != other.properties) return false
-                return true
-            }
-
-            override fun hashCode(): Int {
-                var result = type.hashCode()
-                result = 31 * result + properties.hashCode()
-                return result
-            }
-
-            override fun toString(): String {
-                return "bean ${type.typeName}"
-            }
-        }
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
     }
 }

@@ -69,7 +69,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
             val getter = getterEntry.value
             val setter = setters[propertyName]
             if (setter === null) {
-                val propertyType = PropertyType.newPropertyType(
+                val propertyType = PropertyType(
                     beanType,
                     propertyName,
                     getter.type,
@@ -81,7 +81,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
                 )
                 builder.addProperty(propertyType)
             } else if (getter.type == setter.type) {
-                val propertyType = PropertyType.newPropertyType(
+                val propertyType = PropertyType(
                     beanType,
                     propertyName,
                     getter.type,
@@ -99,7 +99,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
         for (setterEntry in setters) {
             val propertyName = setterEntry.key
             val setter = setterEntry.value
-            val propertyType = PropertyType.newPropertyType(
+            val propertyType = PropertyType(
                 beanType,
                 propertyName,
                 setter.type,

@@ -10,13 +10,13 @@ object Boat {
 
     private val buildInfos: Map<String, String> = "META-INF/build.properties".loadResourceProperties()
 
-    private val sunqian = Author.of(
+    private val sunqian = Author(
         "Sun Qian",
         "fredsuvn@163.com",
         "https://github.com/fredsuvn"
     )
 
-    private val srclab = Author.of(
+    private val srclab = Author(
         "SrcLab",
         "srclab@163.com",
         "https://github.com/srclab-projects"
@@ -29,7 +29,7 @@ object Boat {
     val SERIAL_VERSION: Long = buildInfos["build.serial.version"]!!.toLong()
 
     @JvmField
-    val ABOUT: About = About.of(
+    val ABOUT: About = About(
         "Boat",
         VERSION.toString(),
         listOf(sunqian, srclab),

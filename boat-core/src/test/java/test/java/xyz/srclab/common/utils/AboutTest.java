@@ -37,14 +37,14 @@ public class AboutTest {
 
     @Test
     public void testAbout() {
-        About about = About.of(
+        About about = new About(
             "name",
             "1.2.3",
-            Collections.singletonList(Author.of("name", "author@mail.com", null)),
+            Collections.singletonList(new Author("name", "author@mail.com", null)),
             "123@123.com",
             "url",
             Collections.singletonList("licence"),
-            Collections.singletonList(About.of(
+            Collections.singletonList(new About(
                 "poweredBy",
                 null,
                 Collections.emptyList(),

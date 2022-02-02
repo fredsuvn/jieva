@@ -349,6 +349,10 @@ fun <K, V> newMutableSetMap(
     return MutableSetMap(map, valueSet)
 }
 
+fun <K, V> MutableMap<K, MutableSet<V>>.toMutableSetMap(): MutableSetMap<K, V> {
+    return MutableSetMap(this) { LinkedHashSet() }
+}
+
 fun <K, V> Map<K, Set<V>>.toSetMap(): SetMap<K, V> {
     return SetMap(this)
 }
@@ -377,4 +381,8 @@ fun <K, V> newMutableListMap(
 
 fun <K, V> Map<K, List<V>>.toListMap(): ListMap<K, V> {
     return ListMap(this)
+}
+
+fun <K, V> MutableMap<K, MutableList<V>>.toMutableListMap(): MutableListMap<K, V> {
+    return MutableListMap(this) { LinkedList() }
 }

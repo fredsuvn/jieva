@@ -1,5 +1,6 @@
 package xyz.srclab.common.exception
 
+import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import xyz.srclab.common.status.Status
 import xyz.srclab.common.status.StringStatus
 import xyz.srclab.common.status.statusToString
@@ -39,6 +40,8 @@ open class StatusException @JvmOverloads constructor(
     }
 
     companion object {
+
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
 
         @JvmField
         val INTERNAL_STATUS = StringStatus("B0999000", "Internal Error")

@@ -1,5 +1,7 @@
 package xyz.srclab.common.exception
 
+import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+
 /**
  * Exception represents an impossible cause.
  */
@@ -15,4 +17,8 @@ open class ImpossibleException : StatusException {
     )
 
     constructor(cause: Throwable?) : this(null, cause)
+
+    companion object {
+        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+    }
 }
