@@ -3,6 +3,7 @@ package xyz.srclab.common.codec
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
+import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.Key
@@ -15,10 +16,15 @@ import javax.crypto.Mac
  */
 interface HmacCodec : Codec {
 
-    val hmac: Mac
+    fun getHmac(): Mac {
+        return getHmacOrNull() ?: throw CodecException("${this.algorithm.name} codec doesn't have a Mac!")
+    }
 
-    val hmacLength: Int
-        get() = hmac.macLength
+    fun getHmacOrNull(): Mac?
+
+    fun getHmacLength(): Int {
+        return getHmac().macLength
+    }
 
     fun hmac(key: Key, data: ByteArray): PreparedCodec {
         return hmac(key, data, 0)
@@ -29,15 +35,15 @@ interface HmacCodec : Codec {
     }
 
     fun hmac(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-        return ByteArrayPreparedCodec(hmac, key, data, offset, length)
+        return ByteArrayPreparedCodec(getHmac(), key, data, offset, length)
     }
 
     fun hmac(key: Key, data: ByteBuffer): PreparedCodec {
-        return ByteBufferPreparedCodec(hmac, key, data)
+        return ByteBufferPreparedCodec(getHmac(), key, data)
     }
 
     fun hmac(key: Key, data: InputStream): PreparedCodec {
-        return InputStreamPreparedCodec(hmac, key, data)
+        return InputStreamPreparedCodec(getHmac(), key, data)
     }
 
     open class ByteArrayPreparedCodec(
@@ -169,35 +175,38 @@ interface HmacCodec : Codec {
         ) : HmacCodec {
 
             override val algorithm: CodecAlgorithm = hmacCodec.algorithm
-            override val hmac: Mac = hmacCodec.hmac
 
-            @get:Synchronized
-            override val hmacLength: Int
-                get() = hmacCodec.hmacLength
+            override fun getHmac(): Mac {
+                return hmacCodec.getHmac()
+            }
+
+            override fun getHmacOrNull(): Mac? {
+                return hmacCodec.getHmacOrNull()
+            }
 
             @Synchronized
+            override fun getHmacLength(): Int {
+                return hmacCodec.getHmacLength()
+            }
+
             override fun hmac(key: Key, data: ByteArray): PreparedCodec {
-                return hmacCodec.hmac(key, data)
+                return hmacCodec.hmac(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun hmac(key: Key, data: ByteArray, offset: Int): PreparedCodec {
-                return hmacCodec.hmac(key, data, offset)
+                return hmacCodec.hmac(key, data, offset).toSync(this)
             }
 
-            @Synchronized
             override fun hmac(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-                return hmacCodec.hmac(key, data, offset, length)
+                return hmacCodec.hmac(key, data, offset, length).toSync(this)
             }
 
-            @Synchronized
             override fun hmac(key: Key, data: ByteBuffer): PreparedCodec {
-                return hmacCodec.hmac(key, data)
+                return hmacCodec.hmac(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun hmac(key: Key, data: InputStream): PreparedCodec {
-                return hmacCodec.hmac(key, data)
+                return hmacCodec.hmac(key, data).toSync(this)
             }
         }
 
@@ -210,11 +219,17 @@ interface HmacCodec : Codec {
             override val algorithm: CodecAlgorithm
                 get() = threadLocal.get().algorithm
 
-            override val hmac: Mac
-                get() = threadLocal.get().hmac
+            override fun getHmac(): Mac {
+                return threadLocal.get().getHmac()
+            }
 
-            override val hmacLength: Int
-                get() = threadLocal.get().hmacLength
+            override fun getHmacOrNull(): Mac? {
+                return threadLocal.get().getHmacOrNull()
+            }
+
+            override fun getHmacLength(): Int {
+                return threadLocal.get().getHmacLength()
+            }
 
             override fun hmac(key: Key, data: ByteArray): PreparedCodec {
                 return threadLocal.get().hmac(key, data)
@@ -243,8 +258,10 @@ interface HmacCodec : Codec {
         @JvmStatic
         fun simpleImpl(algorithm: CodecAlgorithm, hmac: Mac): HmacCodec {
             return object : HmacCodec {
-                override val hmac: Mac = hmac
                 override val algorithm: CodecAlgorithm = algorithm
+                override fun getHmacOrNull(): Mac {
+                    return hmac
+                }
             }
         }
 
@@ -280,12 +297,14 @@ interface HmacCodec : Codec {
 
         @JvmName("forAlgorithm")
         @JvmStatic
+        @JvmOverloads
         fun CharSequence.toHmacCodec(provider: Provider? = null): HmacCodec {
             return this.toCodecAlgorithm(CodecAlgorithmType.HMAC).toHmacCodec(provider)
         }
 
         @JvmName("forAlgorithm")
         @JvmStatic
+        @JvmOverloads
         fun CodecAlgorithm.toHmacCodec(provider: Provider? = null): HmacCodec {
             return newBuilder()
                 .algorithm(this)

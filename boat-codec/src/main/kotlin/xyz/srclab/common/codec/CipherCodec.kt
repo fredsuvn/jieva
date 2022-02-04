@@ -3,9 +3,10 @@ package xyz.srclab.common.codec
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
+import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
+import xyz.srclab.common.codec.gm.Sm2Codec
 import xyz.srclab.common.codec.rsa.RsaCodec
-import xyz.srclab.common.codec.sm.Sm2Codec
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.Key
@@ -21,13 +22,18 @@ import javax.crypto.Cipher
  */
 interface CipherCodec : Codec {
 
-    val cipher: Cipher
+    fun getCipher(): Cipher {
+        return getCipherOrNull() ?: throw CodecException("${this.algorithm.name} codec doesn't have a Cipher!")
+    }
 
-    val blockSize: Int
-        get() = cipher.blockSize
+    fun getCipherOrNull(): Cipher?
+
+    fun getBlockSize(): Int {
+        return getCipher().blockSize
+    }
 
     fun getOutputSize(inputSize: Int): Int {
-        val cipher = this.cipher
+        val cipher = getCipher()
         return cipher.getOutputSize(inputSize)
     }
 
@@ -40,15 +46,15 @@ interface CipherCodec : Codec {
     }
 
     fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-        return ByteArrayPreparedCodec(cipher, Cipher.ENCRYPT_MODE, key, data, offset, length)
+        return ByteArrayPreparedCodec(getCipher(), Cipher.ENCRYPT_MODE, key, data, offset, length)
     }
 
     fun encrypt(key: Key, data: ByteBuffer): PreparedCodec {
-        return ByteBufferPreparedCodec(cipher, Cipher.ENCRYPT_MODE, key, data)
+        return ByteBufferPreparedCodec(getCipher(), Cipher.ENCRYPT_MODE, key, data)
     }
 
     fun encrypt(key: Key, data: InputStream): PreparedCodec {
-        return InputStreamPreparedCodec(cipher, Cipher.ENCRYPT_MODE, key, data)
+        return InputStreamPreparedCodec(getCipher(), Cipher.ENCRYPT_MODE, key, data)
     }
 
     fun decrypt(key: Key, data: ByteArray): PreparedCodec {
@@ -60,15 +66,15 @@ interface CipherCodec : Codec {
     }
 
     fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-        return ByteArrayPreparedCodec(cipher, Cipher.DECRYPT_MODE, key, data, offset, length)
+        return ByteArrayPreparedCodec(getCipher(), Cipher.DECRYPT_MODE, key, data, offset, length)
     }
 
     fun decrypt(key: Key, data: ByteBuffer): PreparedCodec {
-        return ByteBufferPreparedCodec(cipher, Cipher.DECRYPT_MODE, key, data)
+        return ByteBufferPreparedCodec(getCipher(), Cipher.DECRYPT_MODE, key, data)
     }
 
     fun decrypt(key: Key, data: InputStream): PreparedCodec {
-        return InputStreamPreparedCodec(cipher, Cipher.DECRYPT_MODE, key, data)
+        return InputStreamPreparedCodec(getCipher(), Cipher.DECRYPT_MODE, key, data)
     }
 
     open class ByteArrayPreparedCodec(
@@ -220,65 +226,63 @@ interface CipherCodec : Codec {
         ) : CipherCodec {
 
             override val algorithm: CodecAlgorithm = cipherCodec.algorithm
-            override val cipher: Cipher = cipherCodec.cipher
 
-            @get:Synchronized
-            override val blockSize: Int
-                get() = cipherCodec.blockSize
+            override fun getCipher(): Cipher {
+                return cipherCodec.getCipher()
+            }
+
+            override fun getCipherOrNull(): Cipher? {
+                return cipherCodec.getCipherOrNull()
+            }
+
+            @Synchronized
+            override fun getBlockSize(): Int {
+                return cipherCodec.getBlockSize()
+            }
 
             @Synchronized
             override fun getOutputSize(inputSize: Int): Int {
                 return cipherCodec.getOutputSize(inputSize)
             }
 
-            @Synchronized
             override fun encrypt(key: Key, data: ByteArray): PreparedCodec {
-                return cipherCodec.encrypt(key, data)
+                return cipherCodec.encrypt(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun encrypt(key: Key, data: ByteArray, offset: Int): PreparedCodec {
-                return cipherCodec.encrypt(key, data, offset)
+                return cipherCodec.encrypt(key, data, offset).toSync(this)
             }
 
-            @Synchronized
             override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-                return cipherCodec.encrypt(key, data, offset, length)
+                return cipherCodec.encrypt(key, data, offset, length).toSync(this)
             }
 
-            @Synchronized
             override fun encrypt(key: Key, data: ByteBuffer): PreparedCodec {
-                return cipherCodec.encrypt(key, data)
+                return cipherCodec.encrypt(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun encrypt(key: Key, data: InputStream): PreparedCodec {
-                return cipherCodec.encrypt(key, data)
+                return cipherCodec.encrypt(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun decrypt(key: Key, data: ByteArray): PreparedCodec {
-                return cipherCodec.decrypt(key, data)
+                return cipherCodec.decrypt(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun decrypt(key: Key, data: ByteArray, offset: Int): PreparedCodec {
-                return cipherCodec.decrypt(key, data, offset)
+                return cipherCodec.decrypt(key, data, offset).toSync(this)
             }
 
-            @Synchronized
             override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-                return cipherCodec.decrypt(key, data, offset, length)
+                return cipherCodec.decrypt(key, data, offset, length).toSync(this)
             }
 
-            @Synchronized
             override fun decrypt(key: Key, data: ByteBuffer): PreparedCodec {
-                return cipherCodec.decrypt(key, data)
+                return cipherCodec.decrypt(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun decrypt(key: Key, data: InputStream): PreparedCodec {
-                return cipherCodec.decrypt(key, data)
+                return cipherCodec.decrypt(key, data).toSync(this)
             }
         }
 
@@ -291,11 +295,17 @@ interface CipherCodec : Codec {
             override val algorithm: CodecAlgorithm
                 get() = threadLocal.get().algorithm
 
-            override val cipher: Cipher
-                get() = threadLocal.get().cipher
+            override fun getCipher(): Cipher {
+                return threadLocal.get().getCipher()
+            }
 
-            override val blockSize: Int
-                get() = threadLocal.get().blockSize
+            override fun getCipherOrNull(): Cipher? {
+                return threadLocal.get().getCipherOrNull()
+            }
+
+            override fun getBlockSize(): Int {
+                return threadLocal.get().getBlockSize()
+            }
 
             override fun getOutputSize(inputSize: Int): Int {
                 return threadLocal.get().getOutputSize(inputSize)
@@ -348,8 +358,10 @@ interface CipherCodec : Codec {
         @JvmStatic
         fun simpleImpl(algorithm: CodecAlgorithm, cipher: Cipher): CipherCodec {
             return object : CipherCodec {
-                override val cipher: Cipher = cipher
                 override val algorithm: CodecAlgorithm = algorithm
+                override fun getCipherOrNull(): Cipher {
+                    return cipher
+                }
             }
         }
 
@@ -384,12 +396,14 @@ interface CipherCodec : Codec {
 
         @JvmName("forAlgorithm")
         @JvmStatic
+        @JvmOverloads
         fun CharSequence.toCipherCodec(provider: Provider? = null): CipherCodec {
             return this.toCodecAlgorithm(CodecAlgorithmType.CIPHER).toCipherCodec(provider)
         }
 
         @JvmName("forAlgorithm")
         @JvmStatic
+        @JvmOverloads
         fun CodecAlgorithm.toCipherCodec(provider: Provider? = null): CipherCodec {
             return newBuilder()
                 .algorithm(this)

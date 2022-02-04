@@ -17,33 +17,39 @@ import kotlin.math.min
  * RSA cipher codec.
  */
 open class RsaCodec @JvmOverloads constructor(
-    override val cipher: Cipher = Cipher.getInstance(CodecAlgorithm.RSA_NAME)
+    cipher: Cipher = Cipher.getInstance(CodecAlgorithm.RSA_NAME)
 ) : CipherCodec {
+
+    private val cipher0 = cipher
 
     override val algorithm = CodecAlgorithm.RSA
 
+    override fun getCipherOrNull(): Cipher? {
+        return cipher0
+    }
+
     override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-        return ByteArrayEnPreparedCodec(cipher, key, data, offset, length)
+        return ByteArrayEnPreparedCodec(cipher0, key, data, offset, length)
     }
 
     override fun encrypt(key: Key, data: ByteBuffer): PreparedCodec {
-        return ByteBufferEnPreparedCodec(cipher, key, data)
+        return ByteBufferEnPreparedCodec(cipher0, key, data)
     }
 
     override fun encrypt(key: Key, data: InputStream): PreparedCodec {
-        return InputStreamEnPreparedCodec(cipher, key, data)
+        return InputStreamEnPreparedCodec(cipher0, key, data)
     }
 
     override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-        return ByteArrayDePreparedCodec(cipher, key, data, offset, length)
+        return ByteArrayDePreparedCodec(cipher0, key, data, offset, length)
     }
 
     override fun decrypt(key: Key, data: ByteBuffer): PreparedCodec {
-        return ByteBufferDePreparedCodec(cipher, key, data)
+        return ByteBufferDePreparedCodec(cipher0, key, data)
     }
 
     override fun decrypt(key: Key, data: InputStream): PreparedCodec {
-        return InputStreamDePreparedCodec(cipher, key, data)
+        return InputStreamDePreparedCodec(cipher0, key, data)
     }
 
     private fun encrypt0(

@@ -1,6 +1,6 @@
-@file:JvmName("BSm")
+@file:JvmName("BGm")
 
-package xyz.srclab.common.codec.sm
+package xyz.srclab.common.codec.gm
 
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.codec.CodecAlgorithm
@@ -17,7 +17,6 @@ import javax.crypto.SecretKey
 
 const val DEFAULT_SM4_KEY_SIZE = 16
 
-@JvmName("generateKeyPair")
 fun generateSm2KeyPair(): KeyPair {
 
     //KeyPairGenerator.getInstance("", DEFAULT_BCPROV_PROVIDER)
@@ -49,11 +48,11 @@ fun generateSm2KeyPair(): KeyPair {
     //return KeyPair(keyFac.generatePublic(spkiKeySpec), keyFac.generatePrivate(pkcs8KeySpec))
     //val sm2Spec = ECGenParameterSpec("sm2p256v1")
     val keyPairGenerator = KeyPairGenerator.getInstance("EC", DEFAULT_BCPROV_PROVIDER)
-    keyPairGenerator.initialize(DEFAULT_EC_PARAMETER_SPEC, SecureRandom())
+    val secureRandom = SecureRandom.getInstance(CodecAlgorithm.SHA1PRNG_NAME)
+    keyPairGenerator.initialize(DEFAULT_EC_PARAMETER_SPEC, secureRandom)
     return keyPairGenerator.generateKeyPair()
 }
 
-@JvmName("base64PassphraseToKey")
 @JvmOverloads
 fun CharSequence.base64PassphraseToSm4Key(
     size: Int = DEFAULT_SM4_KEY_SIZE * 8, provider: Provider? = null
@@ -61,7 +60,6 @@ fun CharSequence.base64PassphraseToSm4Key(
     return this.base64PassphraseToKey(CodecAlgorithm.SM4_NAME, size, getProvider(provider))
 }
 
-@JvmName("passphraseToKey")
 @JvmOverloads
 fun CharSequence.passphraseToSm4Key(
     charset: Charset = DEFAULT_CHARSET,
@@ -71,7 +69,6 @@ fun CharSequence.passphraseToSm4Key(
     return this.passphraseToKey(CodecAlgorithm.SM4_NAME, size, charset, getProvider(provider))
 }
 
-@JvmName("passphraseToKey")
 @JvmOverloads
 fun ByteArray.passphraseToSm4Key(
     size: Int = DEFAULT_SM4_KEY_SIZE * 8, provider: Provider? = null

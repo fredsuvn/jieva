@@ -40,4 +40,54 @@ interface PreparedCodec {
         dest.write(array)
         return array.size
     }
+
+    companion object {
+
+        @JvmStatic
+        fun PreparedCodec.toSync(lock: Any): PreparedCodec {
+            return SyncPreparedCodec(this, lock)
+        }
+
+        private class SyncPreparedCodec(
+            private val preparedCodec: PreparedCodec,
+            private val lock: Any
+        ) : PreparedCodec {
+
+            override fun doFinal(): ByteArray {
+                return synchronized(lock) {
+                    preparedCodec.doFinal()
+                }
+            }
+
+            override fun doFinal(dest: ByteArray): Int {
+                return synchronized(lock) {
+                    preparedCodec.doFinal(dest)
+                }
+            }
+
+            override fun doFinal(dest: ByteArray, offset: Int): Int {
+                return synchronized(lock) {
+                    preparedCodec.doFinal(dest, offset)
+                }
+            }
+
+            override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
+                return synchronized(lock) {
+                    preparedCodec.doFinal(dest, offset, length)
+                }
+            }
+
+            override fun doFinal(dest: ByteBuffer): Int {
+                return synchronized(lock) {
+                    preparedCodec.doFinal(dest)
+                }
+            }
+
+            override fun doFinal(dest: OutputStream): Int {
+                return synchronized(lock) {
+                    preparedCodec.doFinal(dest)
+                }
+            }
+        }
+    }
 }

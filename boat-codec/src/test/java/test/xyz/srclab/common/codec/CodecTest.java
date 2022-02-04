@@ -4,8 +4,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BRandom;
 import xyz.srclab.common.codec.*;
+import xyz.srclab.common.codec.gm.BGm;
 import xyz.srclab.common.codec.rsa.BRsa;
-import xyz.srclab.common.codec.sm.BSm;
 import xyz.srclab.common.io.BBuffer;
 import xyz.srclab.common.io.BIO;
 import xyz.srclab.common.io.BytesAppender;
@@ -41,7 +41,7 @@ public class CodecTest {
     public void testSign() {
         KeyPair rsaKeys = BRsa.generateKeyPair();
         testSign(BCodec.sha256WithRsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
-        KeyPair sm2Keys = BSm.generateKeyPair();
+        KeyPair sm2Keys = BGm.generateSm2KeyPair();
         testSign(BCodec.sm3WithSm2(), sm2Keys.getPublic(), sm2Keys.getPrivate());
     }
 
@@ -50,12 +50,12 @@ public class CodecTest {
         String password = "123";
         //Key key = BAes.passphraseToKey(password);
         //testCipher(BCodec.aes(), key, key);
-        Key sm4Key = BSm.passphraseToKey(password);
-        testCipher(BCodec.sm4(), sm4Key, sm4Key);
+        //Key sm4Key = BGm.passphraseToKey(password);
+        //testCipher(BCodec.sm4(), sm4Key, sm4Key);
         //KeyPair rsaKeys = BRsa.generateKeyPair();
         //testCipher(BCodec.rsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
-        //KeyPair sm2Keys = BSm.generateKeyPair();
-        //testCipher(BCodec.sm2(), sm2Keys.getPrivate(), sm2Keys.getPublic());
+        KeyPair sm2Keys = BGm.generateSm2KeyPair();
+        testCipher(BCodec.sm2(), sm2Keys.getPrivate(), sm2Keys.getPublic());
     }
 
     private void testDigest(DigestCodec digestCodec) {

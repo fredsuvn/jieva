@@ -3,6 +3,7 @@ package xyz.srclab.common.codec
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
+import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -11,14 +12,19 @@ import java.security.Provider
 import java.util.function.Supplier
 
 /**
- * Digest codec such as `MD5`.
+ * Digest codec such as `MD5`, `SHA256`.
  */
 interface DigestCodec : Codec {
 
-    val digest: MessageDigest
+    fun getDigest(): MessageDigest {
+        return getDigestOrNull() ?: throw CodecException("${this.algorithm.name} codec doesn't have a MessageDigest!")
+    }
 
-    val digestLength: Int
-        get() = digest.digestLength
+    fun getDigestOrNull(): MessageDigest?
+
+    fun getDigestLength(): Int {
+        return getDigest().digestLength
+    }
 
     fun digest(data: ByteArray): PreparedCodec {
         return digest(data, 0)
@@ -29,15 +35,15 @@ interface DigestCodec : Codec {
     }
 
     fun digest(data: ByteArray, offset: Int, length: Int): PreparedCodec {
-        return ByteArrayPreparedCodec(digest, data, offset, length)
+        return ByteArrayPreparedCodec(getDigest(), data, offset, length)
     }
 
     fun digest(data: ByteBuffer): PreparedCodec {
-        return ByteBufferPreparedCodec(digest, data)
+        return ByteBufferPreparedCodec(getDigest(), data)
     }
 
     fun digest(data: InputStream): PreparedCodec {
-        return InputStreamPreparedCodec(digest, data)
+        return InputStreamPreparedCodec(getDigest(), data)
     }
 
     open class ByteArrayPreparedCodec(
@@ -62,7 +68,8 @@ interface DigestCodec : Codec {
 
     open class ByteBufferPreparedCodec(
         private val digest: MessageDigest,
-        private val data: ByteBuffer
+        private val data: ByteBuffer,
+        isSync: Boolean = false
     ) : PreparedCodec {
 
         override fun doFinal(): ByteArray {
@@ -80,7 +87,8 @@ interface DigestCodec : Codec {
 
     open class InputStreamPreparedCodec(
         private val digest: MessageDigest,
-        private val data: InputStream
+        private val data: InputStream,
+        isSync: Boolean = false
     ) : PreparedCodec {
 
         override fun doFinal(): ByteArray {
@@ -159,35 +167,38 @@ interface DigestCodec : Codec {
         ) : DigestCodec {
 
             override val algorithm: CodecAlgorithm = digestCodec.algorithm
-            override val digest: MessageDigest = digestCodec.digest
 
-            @get:Synchronized
-            override val digestLength: Int
-                get() = digestCodec.digestLength
+            override fun getDigest(): MessageDigest {
+                return digestCodec.getDigest()
+            }
+
+            override fun getDigestOrNull(): MessageDigest? {
+                return digestCodec.getDigestOrNull()
+            }
 
             @Synchronized
+            override fun getDigestLength(): Int {
+                return digestCodec.getDigestLength()
+            }
+
             override fun digest(data: ByteArray): PreparedCodec {
-                return digestCodec.digest(data)
+                return digestCodec.digest(data).toSync(this)
             }
 
-            @Synchronized
             override fun digest(data: ByteArray, offset: Int): PreparedCodec {
-                return digestCodec.digest(data, offset)
+                return digestCodec.digest(data, offset).toSync(this)
             }
 
-            @Synchronized
             override fun digest(data: ByteArray, offset: Int, length: Int): PreparedCodec {
-                return digestCodec.digest(data, offset, length)
+                return digestCodec.digest(data, offset, length).toSync(this)
             }
 
-            @Synchronized
             override fun digest(data: ByteBuffer): PreparedCodec {
-                return digestCodec.digest(data)
+                return digestCodec.digest(data).toSync(this)
             }
 
-            @Synchronized
             override fun digest(data: InputStream): PreparedCodec {
-                return digestCodec.digest(data)
+                return digestCodec.digest(data).toSync(this)
             }
         }
 
@@ -200,11 +211,17 @@ interface DigestCodec : Codec {
             override val algorithm: CodecAlgorithm
                 get() = threadLocal.get().algorithm
 
-            override val digest: MessageDigest
-                get() = threadLocal.get().digest
+            override fun getDigest(): MessageDigest {
+                return threadLocal.get().getDigest()
+            }
 
-            override val digestLength: Int
-                get() = threadLocal.get().digestLength
+            override fun getDigestOrNull(): MessageDigest? {
+                return threadLocal.get().getDigestOrNull()
+            }
+
+            override fun getDigestLength(): Int {
+                return threadLocal.get().getDigestLength()
+            }
 
             override fun digest(data: ByteArray): PreparedCodec {
                 return threadLocal.get().digest(data)
@@ -233,8 +250,10 @@ interface DigestCodec : Codec {
         @JvmStatic
         fun simpleImpl(algorithm: CodecAlgorithm, digest: MessageDigest): DigestCodec {
             return object : DigestCodec {
-                override val digest: MessageDigest = digest
                 override val algorithm: CodecAlgorithm = algorithm
+                override fun getDigestOrNull(): MessageDigest {
+                    return digest
+                }
             }
         }
 
@@ -280,12 +299,14 @@ interface DigestCodec : Codec {
 
         @JvmName("forAlgorithm")
         @JvmStatic
+        @JvmOverloads
         fun CharSequence.toDigestCodec(provider: Provider? = null): DigestCodec {
             return this.toCodecAlgorithm(CodecAlgorithmType.DIGEST).toDigestCodec(provider)
         }
 
         @JvmName("forAlgorithm")
         @JvmStatic
+        @JvmOverloads
         fun CodecAlgorithm.toDigestCodec(provider: Provider? = null): DigestCodec {
             return newBuilder()
                 .algorithm(this)

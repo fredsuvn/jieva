@@ -3,11 +3,14 @@ package xyz.srclab.common.codec
 import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
+import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
+import xyz.srclab.common.codec.PreparedVerify.Companion.toSync
 import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
 import xyz.srclab.common.io.toBytes
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.PrivateKey
+import java.security.Provider
 import java.security.PublicKey
 import java.security.Signature
 import java.util.function.Supplier
@@ -17,8 +20,13 @@ import java.util.function.Supplier
  */
 interface SignCodec : Codec {
 
-    val signature: Signature
     val digestCodec: DigestCodec
+
+    fun getSignature(): Signature {
+        return getSignatureOrNull() ?: throw CodecException("${this.algorithm.name} codec doesn't have a Signature!")
+    }
+
+    fun getSignatureOrNull(): Signature?
 
     fun sign(key: PrivateKey, data: ByteArray): PreparedCodec {
         return sign(key, data, 0)
@@ -29,15 +37,15 @@ interface SignCodec : Codec {
     }
 
     fun sign(key: PrivateKey, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-        return ByteArrayPreparedCodec(signature, digestCodec, key, data, offset, length)
+        return ByteArrayPreparedCodec(getSignature(), digestCodec, key, data, offset, length)
     }
 
     fun sign(key: PrivateKey, data: ByteBuffer): PreparedCodec {
-        return ByteBufferPreparedCodec(signature, digestCodec, key, data)
+        return ByteBufferPreparedCodec(getSignature(), digestCodec, key, data)
     }
 
     fun sign(key: PrivateKey, data: InputStream): PreparedCodec {
-        return InputStreamPreparedCodec(signature, digestCodec, key, data)
+        return InputStreamPreparedCodec(getSignature(), digestCodec, key, data)
     }
 
     fun verify(key: PublicKey, data: ByteArray): PreparedVerify {
@@ -49,15 +57,15 @@ interface SignCodec : Codec {
     }
 
     fun verify(key: PublicKey, data: ByteArray, offset: Int, length: Int): PreparedVerify {
-        return ByteArrayPreparedVerify(signature, digestCodec, key, data, offset, length)
+        return ByteArrayPreparedVerify(getSignature(), digestCodec, key, data, offset, length)
     }
 
     fun verify(key: PublicKey, data: ByteBuffer): PreparedVerify {
-        return ByteBufferPreparedVerify(signature, digestCodec, key, data)
+        return ByteBufferPreparedVerify(getSignature(), digestCodec, key, data)
     }
 
     fun verify(key: PublicKey, data: InputStream): PreparedVerify {
-        return InputStreamPreparedVerify(signature, digestCodec, key, data)
+        return InputStreamPreparedVerify(getSignature(), digestCodec, key, data)
     }
 
     open class ByteArrayPreparedCodec(
@@ -255,57 +263,54 @@ interface SignCodec : Codec {
         ) : SignCodec {
 
             override val algorithm: CodecAlgorithm = signCodec.algorithm
-            override val signature: Signature = signCodec.signature
             override val digestCodec: DigestCodec = signCodec.digestCodec
 
-            @Synchronized
+            override fun getSignature(): Signature {
+                return signCodec.getSignature()
+            }
+
+            override fun getSignatureOrNull(): Signature? {
+                return signCodec.getSignatureOrNull()
+            }
+
             override fun sign(key: PrivateKey, data: ByteArray): PreparedCodec {
-                return signCodec.sign(key, data)
+                return signCodec.sign(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun sign(key: PrivateKey, data: ByteArray, offset: Int): PreparedCodec {
-                return signCodec.sign(key, data, offset)
+                return signCodec.sign(key, data, offset).toSync(this)
             }
 
-            @Synchronized
             override fun sign(key: PrivateKey, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-                return signCodec.sign(key, data, offset, length)
+                return signCodec.sign(key, data, offset, length).toSync(this)
             }
 
-            @Synchronized
             override fun sign(key: PrivateKey, data: ByteBuffer): PreparedCodec {
-                return signCodec.sign(key, data)
+                return signCodec.sign(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun sign(key: PrivateKey, data: InputStream): PreparedCodec {
-                return signCodec.sign(key, data)
+                return signCodec.sign(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun verify(key: PublicKey, data: ByteArray): PreparedVerify {
-                return signCodec.verify(key, data)
+                return signCodec.verify(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun verify(key: PublicKey, data: ByteArray, offset: Int): PreparedVerify {
-                return signCodec.verify(key, data, offset)
+                return signCodec.verify(key, data, offset).toSync(this)
             }
 
-            @Synchronized
             override fun verify(key: PublicKey, data: ByteArray, offset: Int, length: Int): PreparedVerify {
-                return signCodec.verify(key, data, offset, length)
+                return signCodec.verify(key, data, offset, length).toSync(this)
             }
 
-            @Synchronized
             override fun verify(key: PublicKey, data: ByteBuffer): PreparedVerify {
-                return signCodec.verify(key, data)
+                return signCodec.verify(key, data).toSync(this)
             }
 
-            @Synchronized
             override fun verify(key: PublicKey, data: InputStream): PreparedVerify {
-                return signCodec.verify(key, data)
+                return signCodec.verify(key, data).toSync(this)
             }
         }
 
@@ -318,11 +323,16 @@ interface SignCodec : Codec {
             override val algorithm: CodecAlgorithm
                 get() = threadLocal.get().algorithm
 
-            override val signature: Signature
-                get() = threadLocal.get().signature
-
             override val digestCodec: DigestCodec
                 get() = threadLocal.get().digestCodec
+
+            override fun getSignature(): Signature {
+                return threadLocal.get().getSignature()
+            }
+
+            override fun getSignatureOrNull(): Signature? {
+                return threadLocal.get().getSignatureOrNull()
+            }
 
             override fun sign(key: PrivateKey, data: ByteArray): PreparedCodec {
                 return threadLocal.get().sign(key, data)
@@ -371,9 +381,11 @@ interface SignCodec : Codec {
         @JvmStatic
         fun simpleImpl(algorithm: CodecAlgorithm, signature: Signature, digestCodec: DigestCodec): SignCodec {
             return object : SignCodec {
-                override val signature: Signature = signature
-                override val digestCodec: DigestCodec = digestCodec
                 override val algorithm: CodecAlgorithm = algorithm
+                override val digestCodec: DigestCodec = digestCodec
+                override fun getSignatureOrNull(): Signature {
+                    return signature
+                }
             }
         }
 
@@ -411,16 +423,23 @@ interface SignCodec : Codec {
 
         @JvmName("forAlgorithm")
         @JvmStatic
-        fun CharSequence.toSignCodec(): SignCodec {
-            return this.toCodecAlgorithm(CodecAlgorithmType.CIPHER).toSignCodec()
+        @JvmOverloads
+        fun CharSequence.toSignCodec(provider: Provider? = null): SignCodec {
+            return this.toCodecAlgorithm(CodecAlgorithmType.CIPHER).toSignCodec(provider)
         }
 
         @JvmName("forAlgorithm")
         @JvmStatic
-        fun CodecAlgorithm.toSignCodec(): SignCodec {
+        @JvmOverloads
+        fun CodecAlgorithm.toSignCodec(provider: Provider? = null): SignCodec {
             return newBuilder()
                 .algorithm(this)
-                .signatureSupplier { Signature.getInstance(this.name) }
+                .signatureSupplier {
+                    if (provider === null)
+                        Signature.getInstance(this.name)
+                    else
+                        Signature.getInstance(this.name, provider)
+                }
                 .build()
         }
     }
