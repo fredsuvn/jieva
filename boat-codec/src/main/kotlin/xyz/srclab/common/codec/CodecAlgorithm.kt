@@ -3,22 +3,30 @@ package xyz.srclab.common.codec
 /**
  * Represents codec algorithm.
  */
-interface CodecAlgorithm {
-
-    val name: String
-
+open class CodecAlgorithm(
+    val name: String,
     val type: CodecAlgorithmType
+) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CodecAlgorithm) return false
+        if (name != other.name) return false
+        if (type != other.type) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + type.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "$name[$type]"
+    }
 
     companion object {
-
-        //@JvmField
-        //val PLAIN_NAME = "PLAIN"
-        //
-        //@JvmField
-        //val HEX_NAME = "HEX"
-        //
-        //@JvmField
-        //val BASE64_NAME = "BASE64"
 
         @JvmField
         val MD2_NAME = "MD2"
@@ -72,79 +80,76 @@ interface CodecAlgorithm {
         val SHA1PRNG_NAME = "SHA1PRNG"
 
         @JvmField
-        val SHA1_WITH_RSA_NAME = "SHA1withRSA"
+        val SHA1_WITH_RSA_NAME = "SHA1WithRSA"
 
         @JvmField
-        val SHA256_WITH_RSA_NAME = "SHA256withRSA"
+        val SHA256_WITH_RSA_NAME = "SHA256WithRSA"
+
+        @JvmField
+        val SHA256_WITH_SM2_NAME = "SHA256WithSM2"
 
         @JvmField
         val SM3_WITH_SM2_NAME = "SM3WithSM2"
 
-        //@JvmField
-        //val PLAIN = newAlgorithm(PLAIN_NAME, CodecAlgorithmType.ENCODE)
-        //
-        //@JvmField
-        //val HEX = newAlgorithm(HEX_NAME, CodecAlgorithmType.ENCODE)
-        //
-        //@JvmField
-        //val BASE64 = newAlgorithm(BASE64_NAME, CodecAlgorithmType.ENCODE)
+        @JvmField
+        val MD2 = CodecAlgorithm(MD2_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
-        val MD2 = of(MD2_NAME, CodecAlgorithmType.DIGEST)
+        val MD5 = CodecAlgorithm(MD5_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
-        val MD5 = of(MD5_NAME, CodecAlgorithmType.DIGEST)
+        val SHA1 = CodecAlgorithm(SHA1_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
-        val SHA1 = of(SHA1_NAME, CodecAlgorithmType.DIGEST)
+        val SHA256 = CodecAlgorithm(SHA256_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
-        val SHA256 = of(SHA256_NAME, CodecAlgorithmType.DIGEST)
+        val SHA384 = CodecAlgorithm(SHA384_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
-        val SHA384 = of(SHA384_NAME, CodecAlgorithmType.DIGEST)
+        val SHA512 = CodecAlgorithm(SHA512_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
-        val SHA512 = of(SHA512_NAME, CodecAlgorithmType.DIGEST)
+        val SM3 = CodecAlgorithm(SM3_NAME, CodecAlgorithmType.DIGEST)
 
         @JvmField
-        val SM3 = of(SM3_NAME, CodecAlgorithmType.DIGEST)
+        val HMAC_MD5 = CodecAlgorithm(HMAC_MD5_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
-        val HMAC_MD5 = of(HMAC_MD5_NAME, CodecAlgorithmType.HMAC)
+        val HMAC_SHA1 = CodecAlgorithm(HMAC_SHA1_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
-        val HMAC_SHA1 = of(HMAC_SHA1_NAME, CodecAlgorithmType.HMAC)
+        val HMAC_SHA256 = CodecAlgorithm(HMAC_SHA256_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
-        val HMAC_SHA256 = of(HMAC_SHA256_NAME, CodecAlgorithmType.HMAC)
+        val HMAC_SHA384 = CodecAlgorithm(HMAC_SHA384_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
-        val HMAC_SHA384 = of(HMAC_SHA384_NAME, CodecAlgorithmType.HMAC)
+        val HMAC_SHA512 = CodecAlgorithm(HMAC_SHA512_NAME, CodecAlgorithmType.HMAC)
 
         @JvmField
-        val HMAC_SHA512 = of(HMAC_SHA512_NAME, CodecAlgorithmType.HMAC)
+        val AES = CodecAlgorithm(AES_NAME, CodecAlgorithmType.CIPHER)
 
         @JvmField
-        val AES = of(AES_NAME, CodecAlgorithmType.CIPHER)
+        val RSA = CodecAlgorithm(RSA_NAME, CodecAlgorithmType.CIPHER)
 
         @JvmField
-        val RSA = of(RSA_NAME, CodecAlgorithmType.CIPHER)
+        val SM2 = CodecAlgorithm(SM2_NAME, CodecAlgorithmType.CIPHER)
 
         @JvmField
-        val SM2 = of(SM2_NAME, CodecAlgorithmType.CIPHER)
+        val SM4 = CodecAlgorithm(SM4_NAME, CodecAlgorithmType.CIPHER)
 
         @JvmField
-        val SM4 = of(SM4_NAME, CodecAlgorithmType.CIPHER)
+        val SHA1_WITH_RSA = CodecAlgorithm(SHA1_WITH_RSA_NAME, CodecAlgorithmType.SIGN)
 
         @JvmField
-        val SHA1_WITH_RSA = of(SHA1_WITH_RSA_NAME, CodecAlgorithmType.SIGN)
+        val SHA256_WITH_RSA = CodecAlgorithm(SHA256_WITH_RSA_NAME, CodecAlgorithmType.SIGN)
 
         @JvmField
-        val SHA256_WITH_RSA = of(SHA256_WITH_RSA_NAME, CodecAlgorithmType.SIGN)
+        val SHA256_WITH_SM2 = CodecAlgorithm(SHA256_WITH_SM2_NAME, CodecAlgorithmType.SIGN)
 
         @JvmField
-        val SM3_WITH_SM2 = of(SM3_WITH_SM2_NAME, CodecAlgorithmType.SIGN)
+        val SM3_WITH_SM2 = CodecAlgorithm(SM3_WITH_SM2_NAME, CodecAlgorithmType.SIGN)
 
         @JvmStatic
         fun CharSequence.toCodecAlgorithm(): CodecAlgorithm {
@@ -158,25 +163,18 @@ interface CodecAlgorithm {
             if (result !== null && result.type == algorithmType) {
                 return result
             }
-            return of(this.toString(), algorithmType)
-        }
-
-        @JvmStatic
-        fun of(name: CharSequence, type: CodecAlgorithmType): CodecAlgorithm {
-            return CodecAlgorithmImpl(name.toString(), type)
+            return CodecAlgorithm(this.toString(), algorithmType)
         }
 
         private fun CharSequence.searchPrepared(): CodecAlgorithm? {
             return when (this.toString()) {
-                //PLAIN_NAME -> PLAIN
-                //HEX_NAME -> HEX
-                //BASE64_NAME -> BASE64
                 MD2_NAME -> MD2
                 MD5_NAME -> MD5
                 SHA1_NAME -> SHA1
                 SHA256_NAME -> SHA256
                 SHA384_NAME -> SHA384
                 SHA512_NAME -> SHA512
+                SM3_NAME -> SM3
                 HMAC_MD5_NAME -> HMAC_MD5
                 HMAC_SHA1_NAME -> HMAC_SHA1
                 HMAC_SHA256_NAME -> HMAC_SHA256
@@ -185,31 +183,12 @@ interface CodecAlgorithm {
                 AES_NAME -> AES
                 RSA_NAME -> RSA
                 SM2_NAME -> SM2
+                SM4_NAME -> SM4
+                SHA1_WITH_RSA_NAME -> SHA1_WITH_RSA
+                SHA256_WITH_RSA_NAME -> SHA256_WITH_RSA
+                SHA256_WITH_SM2_NAME -> SHA256_WITH_SM2
+                SM3_WITH_SM2_NAME -> SM3_WITH_SM2
                 else -> null
-            }
-        }
-
-        private class CodecAlgorithmImpl(
-            override val name: String,
-            override val type: CodecAlgorithmType
-        ) : CodecAlgorithm {
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other !is CodecAlgorithm) return false
-                if (name != other.name) return false
-                if (type != other.type) return false
-                return true
-            }
-
-            override fun hashCode(): Int {
-                var result = name.hashCode()
-                result = 31 * result + type.hashCode()
-                return result
-            }
-
-            override fun toString(): String {
-                return "$name($type)"
             }
         }
     }
@@ -220,9 +199,4 @@ interface CodecAlgorithm {
  */
 enum class CodecAlgorithmType {
     DIGEST, HMAC, CIPHER, SIGN,
-}
-
-@JvmSynthetic
-fun codecAlgorithm(name: CharSequence, type: CodecAlgorithmType): CodecAlgorithm {
-    return CodecAlgorithm.of(name, type)
 }

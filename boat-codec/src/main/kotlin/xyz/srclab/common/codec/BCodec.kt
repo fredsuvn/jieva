@@ -111,6 +111,10 @@ fun sha256WithRsa(): SignCodec {
     return SignCodec.sha256WithRsa()
 }
 
+fun sha256WithSm2(): SignCodec {
+    return SignCodec.sha256WithSm2()
+}
+
 fun sm3WithSm2(): SignCodec {
     return SignCodec.sm3WithSm2()
 }

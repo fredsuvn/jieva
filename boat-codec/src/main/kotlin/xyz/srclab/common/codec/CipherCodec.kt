@@ -391,7 +391,7 @@ interface CipherCodec : Codec {
 
         @JvmStatic
         fun sm4(): CipherCodec {
-            return CodecAlgorithm.SM4_NAME.toCipherCodec(DEFAULT_BCPROV_PROVIDER)
+            return CodecAlgorithm.SM4.toCipherCodec(DEFAULT_BCPROV_PROVIDER)
         }
 
         @JvmName("forAlgorithm")

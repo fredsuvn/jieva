@@ -1,22 +1,16 @@
 package xyz.srclab.common.codec.gm
 
 import org.bouncycastle.crypto.engines.SM2Engine
-import org.bouncycastle.crypto.params.ParametersWithRandom
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil
-import xyz.srclab.common.base.checkLengthInRange
+import org.bouncycastle.jcajce.provider.asymmetric.ec.GMCipherSpi
 import xyz.srclab.common.codec.CipherCodec
 import xyz.srclab.common.codec.CodecAlgorithm
-import xyz.srclab.common.codec.CodecException
 import xyz.srclab.common.codec.PreparedCodec
 import xyz.srclab.common.io.toBytes
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.Key
-import java.security.PrivateKey
-import java.security.PublicKey
 import java.security.SecureRandom
 import javax.crypto.Cipher
-import kotlin.math.min
 
 /**
  * SM2 cipher codec.
@@ -27,13 +21,16 @@ open class Sm2Codec @JvmOverloads constructor(
 
     override val algorithm: CodecAlgorithm = CodecAlgorithm.SM2
 
-    private val engine = SM2Engine(
-        if (mode == MODE_C1C2C3) {
-            SM2Engine.Mode.C1C2C3
-        } else {
-            SM2Engine.Mode.C1C3C2
-        }
-    )
+    private val cipher = run {
+        val engine = SM2Engine(
+            if (mode == MODE_C1C2C3) {
+                SM2Engine.Mode.C1C2C3
+            } else {
+                SM2Engine.Mode.C1C3C2
+            }
+        )
+        GMCipherSpi(engine)
+    }
 
     override fun getCipherOrNull(): Cipher? {
         return null
@@ -44,11 +41,11 @@ open class Sm2Codec @JvmOverloads constructor(
     }
 
     override fun getOutputSize(inputSize: Int): Int {
-        return engine.getOutputSize(inputSize)
+        return cipher.engineGetOutputSize(inputSize)
     }
 
     override fun encrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-        return ByteArrayPreparedCodec(engine, Cipher.ENCRYPT_MODE, key, data, offset, length)
+        return ByteArrayPreparedCodec(cipher, Cipher.ENCRYPT_MODE, key, data, offset, length)
     }
 
     override fun encrypt(key: Key, data: ByteBuffer): PreparedCodec {
@@ -67,7 +64,7 @@ open class Sm2Codec @JvmOverloads constructor(
     }
 
     override fun decrypt(key: Key, data: ByteArray, offset: Int, length: Int): PreparedCodec {
-        return ByteArrayPreparedCodec(engine, Cipher.DECRYPT_MODE, key, data, offset, length)
+        return ByteArrayPreparedCodec(cipher, Cipher.DECRYPT_MODE, key, data, offset, length)
     }
 
     override fun decrypt(key: Key, data: ByteBuffer): PreparedCodec {
@@ -86,7 +83,7 @@ open class Sm2Codec @JvmOverloads constructor(
     }
 
     open class ByteArrayPreparedCodec(
-        private val engine: SM2Engine,
+        private val cipher: GMCipherSpi,
         private val mode: Int,
         private val key: Key,
         private val data: ByteArray,
@@ -95,26 +92,28 @@ open class Sm2Codec @JvmOverloads constructor(
     ) : PreparedCodec {
 
         override fun doFinal(): ByteArray {
-            init()
-            return engine.processBlock(data, dataOffset, dataLength)
+            cipher.engineInit(mode, key, SecureRandom())
+            return cipher.engineDoFinal(data, dataOffset, dataLength)
         }
 
         override fun doFinal(dest: ByteArray, offset: Int, length: Int): Int {
-            length.checkLengthInRange(offset, dest.size)
-            val outBytes = doFinal()
-            val placedSize = min(length, outBytes.size)
-            System.arraycopy(outBytes, 0, dest, offset, placedSize)
-            return placedSize
+            //length.checkLengthInRange(offset, dest.size)
+            //val outBytes = doFinal()
+            //val placedSize = min(length, outBytes.size)
+            //System.arraycopy(outBytes, 0, dest, offset, placedSize)
+            //return placedSize
+            cipher.engineInit(mode, key, SecureRandom())
+            return cipher.engineDoFinal(data, dataOffset, dataLength, dest, offset)
         }
 
         private fun init() {
-            val isEncrypt = (mode == Cipher.ENCRYPT_MODE || mode == Cipher.WRAP_MODE)
-            val keyParameters = when (key) {
-                is PublicKey -> ECUtil.generatePublicKeyParameter(key)
-                is PrivateKey -> ECUtil.generatePrivateKeyParameter(key)
-                else -> throw CodecException("Wrong SM2 key type: ${key.javaClass}")
-            }
-            engine.init(isEncrypt, ParametersWithRandom(keyParameters, SecureRandom()))
+            //val isEncrypt = (mode == Cipher.ENCRYPT_MODE || mode == Cipher.WRAP_MODE)
+            //val keyParameters = when (key) {
+            //    is PublicKey -> ECUtil.generatePublicKeyParameter(key)
+            //    is PrivateKey -> ECUtil.generatePrivateKeyParameter(key)
+            //    else -> throw CodecException("Wrong SM2 key type: ${key.javaClass}")
+            //}
+            //engine.init(isEncrypt, ParametersWithRandom(keyParameters, SecureRandom()))
         }
     }
 

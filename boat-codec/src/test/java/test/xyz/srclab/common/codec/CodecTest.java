@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BRandom;
 import xyz.srclab.common.codec.*;
+import xyz.srclab.common.codec.aes.BAes;
 import xyz.srclab.common.codec.gm.BGm;
 import xyz.srclab.common.codec.rsa.BRsa;
 import xyz.srclab.common.io.BBuffer;
@@ -43,19 +44,20 @@ public class CodecTest {
         testSign(BCodec.sha256WithRsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
         KeyPair sm2Keys = BGm.generateSm2KeyPair();
         testSign(BCodec.sm3WithSm2(), sm2Keys.getPublic(), sm2Keys.getPrivate());
+        testSign(BCodec.sha256WithSm2(), sm2Keys.getPublic(), sm2Keys.getPrivate());
     }
 
     @Test
     public void testCipher() throws Exception {
         String password = "123";
-        //Key key = BAes.passphraseToKey(password);
-        //testCipher(BCodec.aes(), key, key);
-        //Key sm4Key = BGm.passphraseToKey(password);
-        //testCipher(BCodec.sm4(), sm4Key, sm4Key);
-        //KeyPair rsaKeys = BRsa.generateKeyPair();
-        //testCipher(BCodec.rsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
+        Key key = BAes.passphraseToKey(password);
+        testCipher(BCodec.aes(), key, key);
+        Key sm4Key = BGm.passphraseToSm4Key(password);
+        testCipher(BCodec.sm4(), sm4Key, sm4Key);
+        KeyPair rsaKeys = BRsa.generateKeyPair();
+        testCipher(BCodec.rsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
         KeyPair sm2Keys = BGm.generateSm2KeyPair();
-        testCipher(BCodec.sm2(), sm2Keys.getPrivate(), sm2Keys.getPublic());
+        testCipher(BCodec.sm2(), sm2Keys.getPublic(), sm2Keys.getPrivate());
     }
 
     private void testDigest(DigestCodec digestCodec) {
@@ -132,15 +134,15 @@ public class CodecTest {
         InputStream dataStream = BIO.asInputStream(data, offset, length);
 
         //1 bytes -> bytes
-        byte[] en1 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal();
-        byte[] de1 = cipherCodec.decrypt(publicKey, en1).doFinal();
+        byte[] en1 = cipherCodec.encrypt(publicKey, data, offset, length).doFinal();
+        byte[] de1 = cipherCodec.decrypt(privateKey, en1).doFinal();
         Assert.assertEquals(de1, Arrays.copyOfRange(data, offset, offset + length));
 
         //2 bytes -> dest bytes
         byte[] dest2 = new byte[111111];
-        int enLength2 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal(dest2, destOffset);
+        int enLength2 = cipherCodec.encrypt(publicKey, data, offset, length).doFinal(dest2, destOffset);
         byte[] de2 = new byte[dest2.length];
-        int deLength2 = cipherCodec.decrypt(publicKey, dest2, destOffset, enLength2).doFinal(de2, 0);
+        int deLength2 = cipherCodec.decrypt(privateKey, dest2, destOffset, enLength2).doFinal(de2, 0);
         Assert.assertEquals(
             Arrays.copyOfRange(de2, 0, deLength2),
             Arrays.copyOfRange(data, offset, offset + length)
@@ -148,10 +150,10 @@ public class CodecTest {
 
         //3 bytes -> buffer
         ByteBuffer dest3 = ByteBuffer.allocateDirect(111111);
-        int enLength3 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal(dest3);
+        int enLength3 = cipherCodec.encrypt(publicKey, data, offset, length).doFinal(dest3);
         ByteBuffer de3 = ByteBuffer.allocate(dest3.capacity());
         dest3.flip();
-        int deLength3 = cipherCodec.decrypt(publicKey, BBuffer.toBytes(BBuffer.getBuffer(dest3, enLength3))).doFinal(de3);
+        int deLength3 = cipherCodec.decrypt(privateKey, BBuffer.toBytes(BBuffer.getBuffer(dest3, enLength3))).doFinal(de3);
         de3.flip();
         Assert.assertEquals(
             BBuffer.toBytes(BBuffer.getBuffer(de3, deLength3)),
@@ -160,25 +162,25 @@ public class CodecTest {
 
         //4 bytes -> output
         BytesAppender dest4 = new BytesAppender();
-        int enLength4 = cipherCodec.encrypt(privateKey, data, offset, length).doFinal(dest4);
+        int enLength4 = cipherCodec.encrypt(publicKey, data, offset, length).doFinal(dest4);
         BytesAppender de4 = new BytesAppender();
-        int deLength4 = cipherCodec.decrypt(publicKey, dest4.toBytes()).doFinal(de4);
+        int deLength4 = cipherCodec.decrypt(privateKey, dest4.toBytes()).doFinal(de4);
         Assert.assertEquals(de4.toBytes(), Arrays.copyOfRange(data, offset, offset + length));
         Assert.assertEquals(enLength4, enLength3);
         Assert.assertEquals(deLength4, deLength3);
 
         //5 buffer -> bytes
-        byte[] en5 = cipherCodec.encrypt(privateKey, dataBuffer).doFinal();
+        byte[] en5 = cipherCodec.encrypt(publicKey, dataBuffer).doFinal();
         dataBuffer.flip();
-        byte[] de5 = cipherCodec.decrypt(publicKey, en5).doFinal();
+        byte[] de5 = cipherCodec.decrypt(privateKey, en5).doFinal();
         Assert.assertEquals(de5, Arrays.copyOfRange(data, offset, offset + length));
 
         //6 buffer -> dest bytes
         byte[] dest6 = new byte[111111];
-        int enLength6 = cipherCodec.encrypt(privateKey, dataBuffer).doFinal(dest6, destOffset);
+        int enLength6 = cipherCodec.encrypt(publicKey, dataBuffer).doFinal(dest6, destOffset);
         dataBuffer.flip();
         byte[] de6 = new byte[dest6.length];
-        int deLength6 = cipherCodec.decrypt(publicKey, dest6, destOffset, enLength6).doFinal(de6, 0);
+        int deLength6 = cipherCodec.decrypt(privateKey, dest6, destOffset, enLength6).doFinal(de6, 0);
         Assert.assertEquals(
             Arrays.copyOfRange(de6, 0, deLength6),
             Arrays.copyOfRange(data, offset, offset + length)
@@ -186,11 +188,11 @@ public class CodecTest {
 
         //7 buffer -> buffer
         ByteBuffer dest7 = ByteBuffer.allocateDirect(111111);
-        int enLength7 = cipherCodec.encrypt(privateKey, dataBuffer).doFinal(dest7);
+        int enLength7 = cipherCodec.encrypt(publicKey, dataBuffer).doFinal(dest7);
         dataBuffer.flip();
         ByteBuffer de7 = ByteBuffer.allocate(dest7.capacity());
         dest7.flip();
-        int deLength7 = cipherCodec.decrypt(publicKey, BBuffer.toBytes(BBuffer.getBuffer(dest7, enLength7))).doFinal(de7);
+        int deLength7 = cipherCodec.decrypt(privateKey, BBuffer.toBytes(BBuffer.getBuffer(dest7, enLength7))).doFinal(de7);
         de7.flip();
         Assert.assertEquals(
             BBuffer.toBytes(BBuffer.getBuffer(de7, deLength7)),
@@ -199,26 +201,26 @@ public class CodecTest {
 
         //8 buffer -> output
         BytesAppender dest8 = new BytesAppender();
-        int enLength8 = cipherCodec.encrypt(privateKey, dataBuffer).doFinal(dest8);
+        int enLength8 = cipherCodec.encrypt(publicKey, dataBuffer).doFinal(dest8);
         dataBuffer.flip();
         BytesAppender de8 = new BytesAppender();
-        int deLength8 = cipherCodec.decrypt(publicKey, dest8.toBytes()).doFinal(de8);
+        int deLength8 = cipherCodec.decrypt(privateKey, dest8.toBytes()).doFinal(de8);
         Assert.assertEquals(de8.toBytes(), Arrays.copyOfRange(data, offset, offset + length));
         Assert.assertEquals(enLength8, enLength7);
         Assert.assertEquals(deLength8, deLength7);
 
         //a stream -> bytes
-        byte[] enA = cipherCodec.encrypt(privateKey, dataStream).doFinal();
+        byte[] enA = cipherCodec.encrypt(publicKey, dataStream).doFinal();
         dataStream.reset();
-        byte[] deA = cipherCodec.decrypt(publicKey, enA).doFinal();
+        byte[] deA = cipherCodec.decrypt(privateKey, enA).doFinal();
         Assert.assertEquals(deA, Arrays.copyOfRange(data, offset, offset + length));
 
         //b stream -> dest bytes
         byte[] destB = new byte[111111];
-        int enLengthB = cipherCodec.encrypt(privateKey, dataStream).doFinal(destB, destOffset);
+        int enLengthB = cipherCodec.encrypt(publicKey, dataStream).doFinal(destB, destOffset);
         dataStream.reset();
         byte[] deB = new byte[dest6.length];
-        int deLengthB = cipherCodec.decrypt(publicKey, destB, destOffset, enLengthB).doFinal(deB, 0);
+        int deLengthB = cipherCodec.decrypt(privateKey, destB, destOffset, enLengthB).doFinal(deB, 0);
         Assert.assertEquals(
             Arrays.copyOfRange(deB, 0, deLengthB),
             Arrays.copyOfRange(data, offset, offset + length)
@@ -226,11 +228,11 @@ public class CodecTest {
 
         //c stream -> buffer
         ByteBuffer destC = ByteBuffer.allocateDirect(111111);
-        int enLengthC = cipherCodec.encrypt(privateKey, dataStream).doFinal(destC);
+        int enLengthC = cipherCodec.encrypt(publicKey, dataStream).doFinal(destC);
         dataStream.reset();
         ByteBuffer deC = ByteBuffer.allocate(destC.capacity());
         destC.flip();
-        int deLengthC = cipherCodec.decrypt(publicKey, BBuffer.toBytes(BBuffer.getBuffer(destC, enLengthC))).doFinal(deC);
+        int deLengthC = cipherCodec.decrypt(privateKey, BBuffer.toBytes(BBuffer.getBuffer(destC, enLengthC))).doFinal(deC);
         deC.flip();
         Assert.assertEquals(
             BBuffer.toBytes(BBuffer.getBuffer(deC, deLengthC)),
@@ -239,10 +241,10 @@ public class CodecTest {
 
         //d stream -> output
         BytesAppender destD = new BytesAppender();
-        int enLengthD = cipherCodec.encrypt(privateKey, dataStream).doFinal(destD);
+        int enLengthD = cipherCodec.encrypt(publicKey, dataStream).doFinal(destD);
         dataStream.reset();
         BytesAppender deD = new BytesAppender();
-        int deLengthD = cipherCodec.decrypt(publicKey, destD.toBytes()).doFinal(deD);
+        int deLengthD = cipherCodec.decrypt(privateKey, destD.toBytes()).doFinal(deD);
         Assert.assertEquals(deD.toBytes(), Arrays.copyOfRange(data, offset, offset + length));
         Assert.assertEquals(enLengthD, enLength7);
         Assert.assertEquals(deLengthD, deLength7);

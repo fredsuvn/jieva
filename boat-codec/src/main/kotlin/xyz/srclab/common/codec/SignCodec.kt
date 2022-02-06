@@ -413,6 +413,20 @@ interface SignCodec : Codec {
         }
 
         @JvmStatic
+        fun sha256WithSm2(): SignCodec {
+            return newBuilder()
+                .algorithm(CodecAlgorithm.SHA256_WITH_SM2)
+                .digestCodec(sm3())
+                .signatureSupplier {
+                    Signature.getInstance(
+                        CodecAlgorithm.SHA256_WITH_SM2_NAME,
+                        DEFAULT_BCPROV_PROVIDER
+                    )
+                }
+                .build()
+        }
+
+        @JvmStatic
         fun sm3WithSm2(): SignCodec {
             return newBuilder()
                 .algorithm(CodecAlgorithm.SM3_WITH_SM2)
