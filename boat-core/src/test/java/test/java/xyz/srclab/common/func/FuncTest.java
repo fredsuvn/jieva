@@ -34,11 +34,13 @@ public class FuncTest {
         A.stack.clear();
 
         A a1 = factory.createStaticFunc(BConstructor.getConstructor(A.class)).invokeTyped();
+        Assert.assertNotNull(a1);
         Assert.assertEquals(
             A.stack.get(0),
             "A()"
         );
         A a2 = factory.createStaticFunc(BConstructor.getDeclaredConstructor(A.class, String.class), true).invokeTyped("123");
+        Assert.assertNotNull(a2);
         Assert.assertEquals(
             A.stack,
             BList.newList("A()", "A(123)")
