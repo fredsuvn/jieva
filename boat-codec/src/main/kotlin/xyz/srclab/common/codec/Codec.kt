@@ -1,7 +1,7 @@
 package xyz.srclab.common.codec
 
+import xyz.srclab.common.codec.gm.SM2Codec
 import xyz.srclab.common.codec.rsa.RsaCodec
-import xyz.srclab.common.codec.gm.Sm2Codec
 
 /**
  * Codec interface, represents a type of codec way.
@@ -11,7 +11,7 @@ import xyz.srclab.common.codec.gm.Sm2Codec
  * @see CipherCodec
  * @see CodecAlgorithm
  * @see RsaCodec
- * @see Sm2Codec
+ * @see SM2Codec
  */
 interface Codec {
 

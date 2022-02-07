@@ -5,7 +5,7 @@ import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.codec.PreparedVerify.Companion.toSync
-import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
+import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
 import xyz.srclab.common.io.toBytes
 import java.io.InputStream
 import java.nio.ByteBuffer

@@ -15,7 +15,7 @@ import javax.crypto.Cipher
 /**
  * SM2 cipher codec.
  */
-open class Sm2Codec @JvmOverloads constructor(
+open class SM2Codec @JvmOverloads constructor(
     mode: Int = MODE_C1C3C2
 ) : CipherCodec {
 

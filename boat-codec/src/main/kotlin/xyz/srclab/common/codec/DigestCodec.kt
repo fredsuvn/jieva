@@ -4,7 +4,7 @@ import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
-import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
+import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest

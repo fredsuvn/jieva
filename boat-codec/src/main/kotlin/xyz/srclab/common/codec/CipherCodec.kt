@@ -4,8 +4,8 @@ import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
-import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
-import xyz.srclab.common.codec.gm.Sm2Codec
+import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
+import xyz.srclab.common.codec.gm.SM2Codec
 import xyz.srclab.common.codec.rsa.RsaCodec
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -18,7 +18,7 @@ import javax.crypto.Cipher
  * Cipher codec which support `encrypt` and `decrypt` such as `AES`.
  *
  * @see RsaCodec
- * @see Sm2Codec
+ * @see SM2Codec
  */
 interface CipherCodec : Codec {
 
@@ -382,10 +382,11 @@ interface CipherCodec : Codec {
                 .build()
         }
 
+        @JvmOverloads
         @JvmStatic
-        fun sm2(): CipherCodec {
+        fun sm2(mode: Int = SM2Codec.MODE_C1C3C2): CipherCodec {
             return newBuilder()
-                .codecSupplier { Sm2Codec() }
+                .codecSupplier { SM2Codec(mode) }
                 .build()
         }
 

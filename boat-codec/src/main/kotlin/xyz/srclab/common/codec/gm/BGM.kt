@@ -1,12 +1,12 @@
-@file:JvmName("BGm")
+@file:JvmName("BGM")
 
 package xyz.srclab.common.codec.gm
 
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.codec.CodecAlgorithm
 import xyz.srclab.common.codec.base64PassphraseToKey
-import xyz.srclab.common.codec.bcprov.DEFAULT_BCPROV_PROVIDER
-import xyz.srclab.common.codec.bcprov.DEFAULT_EC_PARAMETER_SPEC
+import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
+import xyz.srclab.common.codec.bc.DEFAULT_EC_PARAMETER_SPEC
 import xyz.srclab.common.codec.passphraseToKey
 import java.nio.charset.Charset
 import java.security.KeyPair

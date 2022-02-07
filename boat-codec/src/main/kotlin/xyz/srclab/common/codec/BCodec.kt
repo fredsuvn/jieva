@@ -2,6 +2,7 @@
 
 package xyz.srclab.common.codec
 
+import xyz.srclab.common.codec.gm.SM2Codec
 import java.security.MessageDigest
 import java.security.Signature
 import javax.crypto.Cipher
@@ -95,8 +96,9 @@ fun rsa(): CipherCodec {
     return CipherCodec.rsa()
 }
 
-fun sm2(): CipherCodec {
-    return CipherCodec.sm2()
+@JvmOverloads
+fun sm2(mode: Int = SM2Codec.MODE_C1C3C2): CipherCodec {
+    return CipherCodec.sm2(mode)
 }
 
 fun sm4(): CipherCodec {
