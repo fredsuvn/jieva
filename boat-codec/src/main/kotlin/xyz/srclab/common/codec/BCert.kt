@@ -35,9 +35,9 @@ fun KeyStore.getX509(): X509Certificate {
 
 fun KeyStore.getX509OrNull(): X509Certificate? {
     for (alias in this.aliases()) {
-        if (this.isCertificateEntry(alias)) {
-            return this.getCertificate(alias) as X509Certificate
-        }
+        //if (this.isCertificateEntry(alias)) {
+        return this.getCertificate(alias) as X509Certificate
+        //}
     }
     return null
 }
@@ -49,9 +49,9 @@ fun KeyStore.getKey(password: CharArray): Key {
 
 fun KeyStore.getKeyOrNull(password: CharArray): Key? {
     for (alias in this.aliases()) {
-        if (this.isKeyEntry(alias)) {
-            return this.getKey(alias, password)
-        }
+        //if (this.isKeyEntry(alias)) {
+        return this.getKey(alias, password)
+        //}
     }
     return null
 }
