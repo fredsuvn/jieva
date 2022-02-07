@@ -11,7 +11,7 @@ import xyz.srclab.common.reflect.newInst
 interface BeanCreator {
 
     /**
-     * Returns a new bean builder.
+     * Returns a new bean builder for [type].
      */
     fun <T> newBuilder(type: Class<T>): T
 

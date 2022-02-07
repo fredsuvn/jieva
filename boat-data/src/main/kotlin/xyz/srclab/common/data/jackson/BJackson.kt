@@ -19,7 +19,7 @@ val JAVA_TIME_MODULE = JavaTimeModule()
  * * [JavaTimeModule]
  * * [KotlinModule]
  */
-fun ObjectMapper.addCommonSettings() = apply {
+fun ObjectMapper.setCommon() = apply {
     this.registerModule(JAVA_TIME_MODULE)
     this.registerKotlinModule()
     this.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

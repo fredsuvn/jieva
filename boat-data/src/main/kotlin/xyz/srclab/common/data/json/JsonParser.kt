@@ -2,7 +2,7 @@ package xyz.srclab.common.data.json
 
 import com.fasterxml.jackson.databind.json.JsonMapper
 import xyz.srclab.common.data.DataParser
-import xyz.srclab.common.data.jackson.addCommonSettings
+import xyz.srclab.common.data.jackson.setCommon
 import xyz.srclab.common.data.jackson.toJsonSerializer
 
 /**
@@ -28,7 +28,7 @@ interface JsonParser : DataParser<Json> {
     companion object {
 
         private var defaultParser: JsonParser =
-            JsonMapper().addCommonSettings().toJsonSerializer()
+            JsonMapper().setCommon().toJsonSerializer()
 
         @JvmStatic
         fun defaultParser(): JsonParser {

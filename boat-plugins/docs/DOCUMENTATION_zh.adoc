@@ -18,7 +18,7 @@ Boat others 为 link:../../README.md[Boat]提供第三方支持和扩展.
 boat-protobuf 提供为 `bean`, `convert` 何 `data` 领域的针对 protobuf 类型的处理器:
 
 * `ProtobufBeanResolveHandler`: 支持 protobuf 类型的bean解析器, 从 `BeanResolveHandler` (boat-core) 扩展;
-* `ProtobufBeanGenerator`: 支持 protobuf 类型的 `BeanConvertHandler.NewBeanProvider` (boat-core);
+* `ProtobufBeanCreator`: 支持 protobuf 类型的 `BeanConvertHandler.NewBeanProvider` (boat-core);
 * `ProtobufBeans.PROTOBUF_BEAN_RESOLVER`: 支持 protobuf 类型的bean解析器处理器, 从 `BeanResolver` (boat-core) 扩展;
 * ProtobufConverts.PROTOBUF_CONVERTER: 支持 protobuf 类型的类型转换器, 从 `Converter` (boat-core) 扩展;
 * ProtobufJsons.PROTOBUF_OBJECT_MAPPER: ``Jackson``的 `ObjectMapper` (boat-data), 支持 protobuf 类型;

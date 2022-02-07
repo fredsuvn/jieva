@@ -4,22 +4,18 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import test.xyz.srclab.common.protobuf.protogen.MessageData;
 import test.xyz.srclab.common.protobuf.protogen.RequestMessage;
+import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.bean.BBean;
 import xyz.srclab.common.bean.BeanResolver;
 import xyz.srclab.common.bean.BeanType;
-import xyz.srclab.common.bean.Beans;
-import xyz.srclab.common.collect.Collects;
-import xyz.srclab.common.lang.Anys;
-import xyz.srclab.common.protobuf.ProtobufBeans;
-import xyz.srclab.common.protobuf.ProtobufConverts;
-import xyz.srclab.common.protobuf.ProtobufJsons;
-import xyz.srclab.common.data.json.JsonSerials;
-import xyz.srclab.common.test.TestLogger;
+import xyz.srclab.common.collect.BCollect;
+import xyz.srclab.common.collect.BMap;
+import xyz.srclab.common.data.json.BJson;
+import xyz.srclab.common.protobuf.BProtobuf;
 
 import java.util.*;
 
 public class ProtobufTest {
-
-    private static final TestLogger logger = TestLogger.DEFAULT;
 
     @Test
     public void testProtobufResolver() {
@@ -35,85 +31,85 @@ public class ProtobufTest {
             .setData(messageData)
             .build();
 
-        BeanResolver beanResolver = ProtobufBeans.PROTOBUF_BEAN_RESOLVER;
+        BeanResolver beanResolver = BProtobuf.defaultProtobufBeanResolver();
         BeanType dataType = beanResolver.resolve(messageData.getClass());
         Assert.assertEquals(
-            Collects.sorted(dataType.properties().keySet(), String.CASE_INSENSITIVE_ORDER),
-            Collects.sorted(Collects.newCollection(new HashSet<>(),
-                "type", "message", "numberList", "entryMap", "class"),
+            BCollect.sorted(dataType.getProperties().keySet(), String.CASE_INSENSITIVE_ORDER),
+            BCollect.sorted(BCollect.collect(new HashSet<>(),
+                    "type", "message", "numberList", "entryMap", "class"),
                 String.CASE_INSENSITIVE_ORDER
             )
         );
         BeanType requestType = beanResolver.resolve(requestMessage.getClass());
         Assert.assertEquals(
-            Collects.sorted(requestType.properties().keySet(), String.CASE_INSENSITIVE_ORDER),
-            Collects.sorted(Collects.newCollection(new HashSet<>(),
-                "id", "data", "class"),
+            BCollect.sorted(requestType.getProperties().keySet(), String.CASE_INSENSITIVE_ORDER),
+            BCollect.sorted(BCollect.collect(new HashSet<>(),
+                    "id", "data", "class"),
                 String.CASE_INSENSITIVE_ORDER
             )
         );
 
         JavaMessageData javaMessageData = new JavaMessageData();
-        Beans.copyProperties(
+        BBean.copyProperties(
             messageData, javaMessageData,
-            ProtobufBeans.PROTOBUF_BEAN_RESOLVER, ProtobufConverts.PROTOBUF_CONVERTER
+            BProtobuf.defaultProtobufBeanResolver(), BProtobuf.defaultProtobufConverter()
         );
-        logger.log("javaMessageData: {}", JsonSerials.toJsonString(javaMessageData));
+        BLog.info("javaMessageData: {}", BJson.toJsonString(javaMessageData));
         Assert.assertEquals(javaMessageData.getType(), "TYPE_0");
         Assert.assertEquals(javaMessageData.getMessage(), "666");
         Assert.assertEquals(javaMessageData.getNumberList(), Arrays.asList("7", "8", "9"));
         Assert.assertEquals(
             javaMessageData.getEntryMap(),
-            Collects.newMap(new LinkedHashMap<>(), "m1", "mm1", "m2", "mm2")
+            BMap.collect(new LinkedHashMap<>(), "m1", "mm1", "m2", "mm2")
         );
 
         JavaRequestMessage javaRequestMessage = new JavaRequestMessage();
-        Beans.copyProperties(
+        BBean.copyProperties(
             requestMessage, javaRequestMessage,
-            ProtobufBeans.PROTOBUF_BEAN_RESOLVER, ProtobufConverts.PROTOBUF_CONVERTER
+            BProtobuf.defaultProtobufBeanResolver(), BProtobuf.defaultProtobufConverter()
         );
-        logger.log("javaRequestMessage: {}", JsonSerials.toJsonString(javaRequestMessage));
+        BLog.info("javaRequestMessage: {}", BJson.toJsonString(javaRequestMessage));
         Assert.assertEquals(javaRequestMessage.getId(), "123");
         Assert.assertEquals(javaRequestMessage.getData().getType(), "TYPE_0");
         Assert.assertEquals(javaRequestMessage.getData().getMessage(), "666");
         Assert.assertEquals(javaRequestMessage.getData().getNumberList(), Arrays.asList("7", "8", "9"));
         Assert.assertEquals(
             javaRequestMessage.getData().getEntryMap(),
-            Collects.newMap(new LinkedHashMap<>(), "m1", "mm1", "m2", "mm2")
+            BMap.collect(new LinkedHashMap<>(), "m1", "mm1", "m2", "mm2")
         );
 
         javaRequestMessage.setId("999");
         javaMessageData.setType("type_1");
         javaMessageData.setMessage("java");
         javaMessageData.setNumberList(Arrays.asList("5", "6", "7"));
-        javaMessageData.setEntryMap(Anys.as(Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")));
+        javaMessageData.setEntryMap(BMap.collect(new LinkedHashMap<>(), "j1", "jj1"));
         javaRequestMessage.setData(javaMessageData);
 
         MessageData.Builder messageDataBuilder = MessageData.newBuilder();
-        Beans.copyProperties(
+        BBean.copyProperties(
             javaMessageData, messageDataBuilder,
-            ProtobufBeans.PROTOBUF_BEAN_RESOLVER, ProtobufConverts.PROTOBUF_CONVERTER
+            BProtobuf.defaultProtobufBeanResolver(), BProtobuf.defaultProtobufConverter()
         );
-        logger.log(
+        BLog.info(
             "messageDataBuilder: {}",
-            ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJson(messageDataBuilder).toJsonString()
+            BProtobuf.defaultProtobufJsonParser().toJson(messageDataBuilder).toJsonString()
         );
         Assert.assertEquals(messageDataBuilder.getType(), MessageData.Type.TYPE_1);
         Assert.assertEquals(messageDataBuilder.getMessage(), "java");
         Assert.assertEquals(messageDataBuilder.getNumberList(), Arrays.asList("5", "6", "7"));
         Assert.assertEquals(
             messageDataBuilder.getEntryMap(),
-            Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")
+            BMap.collect(new LinkedHashMap<>(), "j1", "jj1")
         );
 
         RequestMessage.Builder requestMessageBuilder = RequestMessage.newBuilder();
-        Beans.copyProperties(
+        BBean.copyProperties(
             javaRequestMessage, requestMessageBuilder,
-            ProtobufBeans.PROTOBUF_BEAN_RESOLVER, ProtobufConverts.PROTOBUF_CONVERTER
+            BProtobuf.defaultProtobufBeanResolver(), BProtobuf.defaultProtobufConverter()
         );
-        logger.log(
+        BLog.info(
             "requestMessageBuilder: {}",
-            ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJson(requestMessageBuilder).toJsonString()
+            BProtobuf.defaultProtobufJsonParser().toJson(requestMessageBuilder).toJsonString()
         );
         Assert.assertEquals(requestMessageBuilder.getId(), "999");
         Assert.assertEquals(requestMessageBuilder.getData().getType(), MessageData.Type.TYPE_1);
@@ -121,14 +117,14 @@ public class ProtobufTest {
         Assert.assertEquals(requestMessageBuilder.getData().getNumberList(), Arrays.asList("5", "6", "7"));
         Assert.assertEquals(
             requestMessageBuilder.getData().getEntryMap(),
-            Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")
+            BMap.collect(new LinkedHashMap<>(), "j1", "jj1")
         );
 
         RequestMessage convertRequestMessage =
-            ProtobufConverts.PROTOBUF_CONVERTER.convert(javaRequestMessage, RequestMessage.class);
-        logger.log(
+            BProtobuf.defaultProtobufConverter().convert(javaRequestMessage, RequestMessage.class);
+        BLog.info(
             "convertRequestMessage: {}",
-            ProtobufJsons.PROTOBUF_JSON_SERIALIZER.toJson(convertRequestMessage).toJsonString()
+            BProtobuf.defaultProtobufJsonParser().toJson(convertRequestMessage).toJsonString()
         );
         Assert.assertEquals(convertRequestMessage.getId(), "999");
         Assert.assertEquals(convertRequestMessage.getData().getType(), MessageData.Type.TYPE_1);
@@ -136,7 +132,7 @@ public class ProtobufTest {
         Assert.assertEquals(convertRequestMessage.getData().getNumberList(), Arrays.asList("5", "6", "7"));
         Assert.assertEquals(
             convertRequestMessage.getData().getEntryMap(),
-            Collects.newMap(new LinkedHashMap<>(), "j1", "jj1")
+            BMap.collect(new LinkedHashMap<>(), "j1", "jj1")
         );
     }
 
