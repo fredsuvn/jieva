@@ -3,6 +3,7 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BCase;
+import xyz.srclab.common.base.CamelCase;
 
 public class BCaseTest {
 
@@ -47,6 +48,26 @@ public class BCaseTest {
         Assert.assertEquals(
             BCase.UPPER_CAMEL.convert("upper2Camel", BCase.LOWER_UNDERSCORE),
             "upper2_camel"
+        );
+        Assert.assertEquals(
+            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.AS_LOWER).convert("upper2Camel", BCase.LOWER_UNDERSCORE),
+            "upper2_camel"
+        );
+        Assert.assertEquals(
+            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.AS_UPPER).convert("upper2camel", BCase.LOWER_UNDERSCORE),
+            "upper_2camel"
+        );
+        Assert.assertEquals(
+            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.AS_UPPER).convert("upper2Camel", BCase.LOWER_UNDERSCORE),
+            "upper_2_camel"
+        );
+        Assert.assertEquals(
+            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOWER_STARTS_WITH_LOWER).convert("2upper2Camel", BCase.LOWER_UNDERSCORE),
+            "2upper2_camel"
+        );
+        Assert.assertEquals(
+            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOWER_STARTS_WITH_UPPER).convert("2upper2Camel", BCase.LOWER_UNDERSCORE),
+            "2upper2_camel"
         );
         Assert.assertEquals(
             BCase.UPPER_CAMEL.convert("upper@#$%Camel", BCase.LOWER_UNDERSCORE),

@@ -8,25 +8,57 @@ import java.util.*
 import java.util.function.Function
 
 @JvmField
-val LOWER_CAMEL: NamingCase = CamelCase { it.uncapitalize() }
+val LOWER_CAMEL: NamingCase = lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOWER_STARTS_WITH_LOWER)
 
 @JvmField
-val UPPER_CAMEL: NamingCase = CamelCase { it.capitalize() }
+val UPPER_CAMEL: NamingCase = upperCamelCase(CamelCase.NonLetterPolicy.FOLLOWER_STARTS_WITH_LOWER)
 
 @JvmField
-val LOWER_UNDERSCORE: NamingCase = SeparatorCase("_") { it.lowerCase() }
+val LOWER_UNDERSCORE: NamingCase = separatorCase("_") { it.lowerCase() }
 
 @JvmField
-val UPPER_UNDERSCORE: NamingCase = SeparatorCase("_") { it.upperCase() }
+val UPPER_UNDERSCORE: NamingCase = separatorCase("_") { it.upperCase() }
 
 @JvmField
-val LOWER_HYPHEN: NamingCase = SeparatorCase("-") { it.lowerCase() }
+val LOWER_HYPHEN: NamingCase = separatorCase("-") { it.lowerCase() }
 
 @JvmField
-val UPPER_HYPHEN: NamingCase = SeparatorCase("-") { it.upperCase() }
+val UPPER_HYPHEN: NamingCase = separatorCase("-") { it.upperCase() }
 
 fun CharSequence.toCase(from: NamingCase, to: NamingCase): String {
     return from.convert(this, to)
+}
+
+fun lowerCamelCase(nonLetterPolicy: CamelCase.NonLetterPolicy): NamingCase {
+    return object : CamelCase() {
+        override fun isLowerLetter(c: Char, index: Int, isLastLower: Boolean): Boolean {
+            return nonLetterPolicy.isLowerLetter(c, index, isLastLower)
+        }
+
+        override fun doFirstWord(firstWord: CharSequence): String {
+            return firstWord.uncapitalize()
+        }
+    }
+}
+
+fun upperCamelCase(nonLetterPolicy: CamelCase.NonLetterPolicy): NamingCase {
+    return object : CamelCase() {
+        override fun isLowerLetter(c: Char, index: Int, isLastLower: Boolean): Boolean {
+            return nonLetterPolicy.isLowerLetter(c, index, isLastLower)
+        }
+
+        override fun doFirstWord(firstWord: CharSequence): String {
+            return firstWord.capitalize()
+        }
+    }
+}
+
+fun separatorCase(separator: CharSequence, wordProcess: Function<CharSequence, CharSequence>): NamingCase {
+    return object : SeparatorCase(separator) {
+        override fun doProcessWord(word: CharSequence): CharSequence {
+            return wordProcess.apply(word)
+        }
+    }
 }
 
 /**
@@ -83,9 +115,9 @@ interface NamingCase {
     interface Words<T : CharSequence> {
 
         /**
-         * Name.
+         * Source name.
          */
-        val name: T
+        val source: T
 
         /**
          * Split words list,
@@ -104,18 +136,18 @@ interface NamingCase {
              * Name itself as a [Words].
              */
             @JvmStatic
-            fun <T : CharSequence> nameSelf(name: T): Words<T> {
+            fun <T : CharSequence> nameSelf(source: T): Words<T> {
                 return object : Words<T> {
-                    override val name: T = name
+                    override val source: T = source
                     override val splitList: List<CharSequence> = emptyList()
-                    override val splitCharCount: Int = name.length
+                    override val splitCharCount: Int = source.length
                 }
             }
 
             @JvmStatic
-            fun <T : CharSequence> of(name: T, splitList: List<CharSequence>, splitCharCount: Int): Words<T> {
+            fun <T : CharSequence> of(source: T, splitList: List<CharSequence>, splitCharCount: Int): Words<T> {
                 return object : Words<T> {
-                    override val name: T = name
+                    override val source: T = source
                     override val splitList: List<CharSequence> = splitList
                     override val splitCharCount: Int = splitCharCount
                 }
@@ -127,17 +159,13 @@ interface NamingCase {
 /**
  * Camel-Case class.
  */
-open class CamelCase(private val firstWord: Function<CharSequence, String>) : NamingCase {
+abstract class CamelCase : NamingCase {
+
+    protected abstract fun isLowerLetter(c: Char, index: Int, isLastLower: Boolean): Boolean
+
+    protected abstract fun doFirstWord(firstWord: CharSequence): CharSequence
 
     override fun <T : CharSequence> split(name: T): NamingCase.Words<T> {
-
-        fun Char.isUpper(): Boolean {
-            return this.isUpperCase()
-        }
-
-        fun Char.isLower(): Boolean {
-            return this.isLowerCase() || (this in '0'..'9')
-        }
 
         val length = name.length
         if (length <= 1) {
@@ -160,23 +188,24 @@ open class CamelCase(private val firstWord: Function<CharSequence, String>) : Na
         var isLastLower = true
         for (i in name.indices) {
             val c = name[i]
-            if (i - startIndex == 0) {
-                isLastLower = c.isLower()
+            val isCurLower = isLowerLetter(c, i, isLastLower)
+            if (i == startIndex) {
+                isLastLower = isCurLower
                 continue
             }
-            if (isLastLower && c.isLower()) {
+            if (isLastLower && isCurLower) {
                 continue
             }
-            if (!isLastLower && c.isUpper()) {
+            if (!isLastLower && !isCurLower) {
                 continue
             }
-            if (isLastLower && c.isUpper()) {
+            if (isLastLower && !isCurLower) {
                 getSplitList().add(name.stringRef(startIndex, i))
                 startIndex = i
                 isLastLower = false
                 continue
             }
-            if (!isLastLower && c.isLower()) {
+            if (!isLastLower && isCurLower) {
                 //"Ab" or "AAb":
                 //"Ab" is one word;
                 //"AAb" are two words: "A" and "Ab";
@@ -202,7 +231,7 @@ open class CamelCase(private val firstWord: Function<CharSequence, String>) : Na
 
     override fun <T : CharSequence> join(words: NamingCase.Words<T>): String {
         if (words.splitList.isEmpty()) {
-            return firstWord.apply(words.name)
+            return doFirstWord(words.source).toString()
         }
         val sb = StringBuilder(words.splitCharCount)
         join0(words, sb)
@@ -211,7 +240,7 @@ open class CamelCase(private val firstWord: Function<CharSequence, String>) : Na
 
     override fun <T : CharSequence> joinTo(dest: Appendable, words: NamingCase.Words<T>) {
         if (words.splitList.isEmpty()) {
-            dest.append(firstWord.apply(words.name))
+            dest.append(doFirstWord(words.source))
             return
         }
         join0(words, dest)
@@ -219,11 +248,58 @@ open class CamelCase(private val firstWord: Function<CharSequence, String>) : Na
 
     private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
         val splitList = words.splitList
-        appendable.append(firstWord.apply(splitList[0]))
+        appendable.append(doFirstWord(splitList[0]))
         var i = 1
         while (i < splitList.size) {
             appendable.append(splitList[i].capitalize())
             i++
+        }
+    }
+
+    /**
+     * Camel-Case policy for non-letter char.
+     */
+    enum class NonLetterPolicy {
+
+        /**
+         * Non-Letter will be seen as lower case.
+         */
+        AS_LOWER,
+
+        /**
+         * Non-Letter will be seen as upper case.
+         */
+        AS_UPPER,
+
+        /**
+         * Case of non-letter will follow the former, or lower if at the beginning.
+         */
+        FOLLOWER_STARTS_WITH_LOWER,
+
+        /**
+         * Case of non-letter will follow the former, or upper if at the beginning.
+         */
+        FOLLOWER_STARTS_WITH_UPPER,
+        ;
+
+        fun isLowerLetter(c: Char, index: Int, isLastLower: Boolean): Boolean {
+            if (c in 'a'..'z') {
+                return true
+            }
+            if (c in 'A'..'Z') {
+                return false
+            }
+            if (index == 0) {
+                return when (this) {
+                    AS_LOWER, FOLLOWER_STARTS_WITH_LOWER -> true
+                    AS_UPPER, FOLLOWER_STARTS_WITH_UPPER -> false
+                }
+            }
+            return when (this) {
+                AS_LOWER -> true
+                AS_UPPER -> false
+                else -> isLastLower
+            }
         }
     }
 }
@@ -231,10 +307,11 @@ open class CamelCase(private val firstWord: Function<CharSequence, String>) : Na
 /**
  * [NamingCase] splits and join by specified separator.
  */
-open class SeparatorCase @JvmOverloads constructor(
+abstract class SeparatorCase(
     private val separator: CharSequence,
-    private val wordProcessor: Function<CharSequence, String> = Function { it.toString() }
 ) : NamingCase {
+
+    protected abstract fun doProcessWord(word: CharSequence): CharSequence
 
     override fun <T : CharSequence> split(name: T): NamingCase.Words<T> {
 
@@ -288,7 +365,7 @@ open class SeparatorCase @JvmOverloads constructor(
 
     override fun <T : CharSequence> join(words: NamingCase.Words<T>): String {
         if (words.splitList.isEmpty()) {
-            return wordProcessor.apply(words.name)
+            return doProcessWord(words.source).toString()
         }
         val sb = StringBuilder(words.splitCharCount + separator.length * (words.splitList.size - 1))
         join0(words, sb)
@@ -297,13 +374,13 @@ open class SeparatorCase @JvmOverloads constructor(
 
     override fun <T : CharSequence> joinTo(dest: Appendable, words: NamingCase.Words<T>) {
         if (words.splitList.isEmpty()) {
-            dest.append(wordProcessor.apply(words.name))
+            dest.append(doProcessWord(words.source))
             return
         }
         join0(words, dest)
     }
 
     private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
-        words.splitList.joinTo(appendable, separator) { wordProcessor.apply(it) }
+        words.splitList.joinTo(appendable, separator) { doProcessWord(it) }
     }
 }
