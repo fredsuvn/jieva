@@ -6,6 +6,7 @@ import xyz.srclab.common.base.BString;
 import xyz.srclab.common.io.BIO;
 import xyz.srclab.common.io.BytesAppender;
 import xyz.srclab.common.io.UncloseInputStream;
+import xyz.srclab.common.io.UncloseOutputStream;
 
 import java.io.*;
 import java.nio.BufferOverflowException;
@@ -124,6 +125,13 @@ public class StreamTest {
         Assert.assertEquals(ubip.getCount(), 100);
         ubip.reset();
         Assert.assertEquals(ubip.getCount(), 50);
+
+        ByteArrayOutputStream bop = new ByteArrayOutputStream();
+        UncloseOutputStream<ByteArrayOutputStream> ubop = BIO.unclose(bop);
+        ubop.write(1);
+        ubop.write(new byte[50]);
+        ubop.write(new byte[50], 10, 20);
+        Assert.assertEquals(ubop.getCount(), 71);
     }
 
     private static class TestUncloseInStream extends InputStream {
