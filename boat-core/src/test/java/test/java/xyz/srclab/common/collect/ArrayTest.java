@@ -37,4 +37,45 @@ public class ArrayTest {
         BArray.asList(ints).set(2, 333);
         Assert.assertEquals(BCollect.joinToString(BArray.asList(ints)), "111, 222, 333");
     }
+
+    @Test
+    public void testIndexOfArray() {
+        String[] array = new String[]{"1", "2", "3"};
+        Assert.assertEquals(
+            BArray.indexOfArray(array, new String[]{"1", "2", "3"}),
+            0
+        );
+        Assert.assertEquals(
+            BArray.indexOfArray(array, new String[]{"1", "2"}),
+            0
+        );
+        Assert.assertEquals(
+            BArray.indexOfArray(array, new String[]{"1", "3"}),
+            -1
+        );
+        Assert.assertEquals(
+            BArray.indexOfArray(array, new String[]{"2", "3"}),
+            1
+        );
+        Assert.assertEquals(
+            BArray.indexOfArray(array, new String[]{"2"}),
+            1
+        );
+        Assert.assertEquals(
+            BArray.indexOfArray(array, new String[]{"2", "4"}),
+            -1
+        );
+        Assert.assertEquals(
+            BArray.indexOfArray(array, new String[]{"3"}),
+            2
+        );
+        Assert.assertEquals(
+            BArray.indexOfArray(array, new String[]{"3", "4"}),
+            -1
+        );
+        Assert.assertEquals(
+            BArray.indexOfArray(array, new String[]{"4"}),
+            -1
+        );
+    }
 }
