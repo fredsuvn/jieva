@@ -17,7 +17,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Arrays;
 
-public class TestUtil {
+public class CipherTester {
 
     static void testDigest(DigestCodec digestCodec) {
         int offset = 6;
