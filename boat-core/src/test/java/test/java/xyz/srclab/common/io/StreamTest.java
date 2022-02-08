@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.BString;
 import xyz.srclab.common.io.BIO;
 import xyz.srclab.common.io.BytesAppender;
+import xyz.srclab.common.io.UncloseInputStream;
 
 import java.io.*;
 import java.nio.BufferOverflowException;
@@ -113,6 +114,16 @@ public class StreamTest {
         OutputStream uo = BIO.unclose(to);
         uo.close();
         Assert.assertFalse(to.isClose());
+
+        ByteArrayInputStream bip = new ByteArrayInputStream(new byte[100]);
+        UncloseInputStream<ByteArrayInputStream> ubip = BIO.unclose(bip);
+        ubip.read(new byte[50]);
+        Assert.assertEquals(ubip.getCount(), 50);
+        ubip.mark(50);
+        ubip.read(new byte[50]);
+        Assert.assertEquals(ubip.getCount(), 100);
+        ubip.reset();
+        Assert.assertEquals(ubip.getCount(), 50);
     }
 
     private static class TestUncloseInStream extends InputStream {

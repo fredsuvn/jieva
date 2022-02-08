@@ -216,105 +216,21 @@ fun <T> InputStream.readObject(close: Boolean = false): T {
 }
 
 /**
- * Returns a [InputStream] which wraps all method of given stream but prevents the `close` method.
+ * Returns a [InputStream] which wraps all method of given stream,
+ * but prevents the `close` method, and count the read bytes.
+ *
+ * @see UncloseInputStream
  */
-fun InputStream.unclose(): InputStream {
+fun <T : InputStream> T.unclose(): UncloseInputStream<T> {
     return UncloseInputStream(this)
 }
 
 /**
- * Returns a [OutputStream] which wraps all method of given stream but prevents the `close` method.
+ * Returns a [OutputStream] which wraps all method of given stream,
+ * but prevents the `close` method, and count the written bytes.
+ *
+ * @see UncloseOutputStream
  */
-fun OutputStream.unclose(): OutputStream {
+fun <T : OutputStream> T.unclose(): UncloseOutputStream<T> {
     return UncloseOutputStream(this)
-}
-
-private class UncloseInputStream(private val source: InputStream) : InputStream() {
-
-    override fun close() {
-    }
-
-    override fun read(): Int {
-        return source.read()
-    }
-
-    override fun read(b: ByteArray): Int {
-        return source.read(b)
-    }
-
-    override fun read(b: ByteArray, off: Int, len: Int): Int {
-        return source.read(b, off, len)
-    }
-
-    override fun skip(n: Long): Long {
-        return source.skip(n)
-    }
-
-    override fun available(): Int {
-        return source.available()
-    }
-
-    override fun mark(readlimit: Int) {
-        source.mark(readlimit)
-    }
-
-    override fun reset() {
-        source.reset()
-    }
-
-    override fun markSupported(): Boolean {
-        return source.markSupported()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (other is UncloseInputStream) {
-            return source == other.source
-        }
-        return source == other
-    }
-
-    override fun hashCode(): Int {
-        return source.hashCode()
-    }
-
-    override fun toString(): String {
-        return source.toString()
-    }
-}
-
-private class UncloseOutputStream(private val source: OutputStream) : OutputStream() {
-
-    override fun close() {
-    }
-
-    override fun flush() {
-        source.flush()
-    }
-
-    override fun write(b: Int) {
-        source.write(b)
-    }
-
-    override fun write(b: ByteArray) {
-        source.write(b)
-    }
-
-    override fun write(b: ByteArray, off: Int, len: Int) {
-        source.write(b, off, len)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (other is UncloseOutputStream) {
-            return source == other.source
-        }
-        return source == other
-    }
-
-    override fun hashCode(): Int {
-        return source.hashCode()
-    }
-
-    override fun toString(): String {
-        return source.toString()
-    }
 }
