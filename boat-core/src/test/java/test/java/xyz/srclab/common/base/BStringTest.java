@@ -60,5 +60,9 @@ public class BStringTest {
             expectedChars[i] = (char) (bytes[i] & 0xff);
         }
         Assert.assertEquals(randomString, new String(expectedChars));
+        Assert.assertEquals(
+            BString.to8BitChars(bytes),
+            randomString.toCharArray()
+        );
     }
 }

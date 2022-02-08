@@ -320,30 +320,49 @@ fun CharSequence.removeIfStartWith(prefix: CharSequence): String {
     }
 }
 
-fun CharSequence.to8BitBytes(): ByteArray {
-    val array = ByteArray(this.length)
-    for (c in this.withIndex()) {
-        array[c.index] = c.value.code.toByte()
+@JvmOverloads
+fun CharSequence.to8BitBytes(offset: Int = 0, length: Int = remainingLength(this.length, offset)): ByteArray {
+    checkRangeInBounds(offset, offset + length, 0, this.length)
+    val array = ByteArray(length)
+    var i = offset
+    var j = 0
+    while (i < offset + length) {
+        array[j] = this[i].code.toByte()
+        i++
+        j++
     }
     return array
 }
 
-fun CharArray.to8BitBytes(): ByteArray {
-    val array = ByteArray(this.size)
-    for (c in this.withIndex()) {
-        array[c.index] = c.value.code.toByte()
+@JvmOverloads
+fun CharArray.to8BitBytes(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ByteArray {
+    checkRangeInBounds(offset, offset + length, 0, this.size)
+    val array = ByteArray(length)
+    var i = offset
+    var j = 0
+    while (i < offset + length) {
+        array[j] = this[i].code.toByte()
+        i++
+        j++
     }
     return array
 }
 
-fun ByteArray.to8BitString(): String {
-    return String(this, StandardCharsets.US_ASCII)
+@JvmOverloads
+fun ByteArray.to8BitString(offset: Int = 0, length: Int = remainingLength(this.size, offset)): String {
+    return String(this, offset, length, StandardCharsets.US_ASCII)
 }
 
-fun ByteArray.to8BitChars(): CharArray {
-    val array = CharArray(this.size)
-    for (c in this.withIndex()) {
-        array[c.index] = c.value.toUnsignedInt().toChar()
+@JvmOverloads
+fun ByteArray.to8BitChars(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharArray {
+    checkRangeInBounds(offset, offset + length, 0, this.size)
+    val array = CharArray(length)
+    var i = offset
+    var j = 0
+    while (i < offset + length) {
+        array[j] = this[i].toUnsignedInt().toChar()
+        i++
+        j++
     }
     return array
 }
