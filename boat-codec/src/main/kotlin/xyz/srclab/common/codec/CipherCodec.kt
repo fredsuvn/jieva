@@ -5,14 +5,19 @@ import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
-import xyz.srclab.common.codec.gm.SM2Codec
+import xyz.srclab.common.codec.gm.SM2Cipher
 import xyz.srclab.common.codec.rsa.RsaCodec
+import xyz.srclab.common.io.asInputStream
+import xyz.srclab.common.io.unclose
 import java.io.InputStream
+import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.security.Key
 import java.security.Provider
 import java.util.function.Supplier
 import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.CipherOutputStream
 
 /**
  * Cipher codec which support `encrypt` and `decrypt` such as `AES`.
@@ -95,6 +100,21 @@ interface CipherCodec : Codec {
             cipher.init(mode, key)
             return cipher.doFinal(data, dataOffset, dataLength, dest, offset)
         }
+
+        override fun doFinal(dest: OutputStream): Long {
+            cipher.init(mode, key)
+            val wrapDest = dest.unclose()
+            if (mode.isEncryptMode()) {
+                val cop = CipherOutputStream(wrapDest, cipher)
+                data.asInputStream(dataOffset, dataLength).copyTo(cop)
+                cop.close()
+            } else {
+                val cip = CipherInputStream(data.asInputStream(dataOffset, dataLength), cipher)
+                cip.copyTo(wrapDest)
+                cip.close()
+            }
+            return wrapDest.count
+        }
     }
 
     open class ByteBufferPreparedCodec(
@@ -144,6 +164,21 @@ interface CipherCodec : Codec {
             cipher.init(mode, key)
             return cipher.doFinal(data, dest)
         }
+
+        override fun doFinal(dest: OutputStream): Long {
+            cipher.init(mode, key)
+            val wrapDest = dest.unclose()
+            if (mode.isEncryptMode()) {
+                val cop = CipherOutputStream(wrapDest, cipher)
+                data.asInputStream().copyTo(cop)
+                cop.close()
+            } else {
+                val cip = CipherInputStream(data.asInputStream(), cipher)
+                cip.copyTo(wrapDest)
+                cip.close()
+            }
+            return wrapDest.count
+        }
     }
 
     open class InputStreamPreparedCodec(
@@ -162,6 +197,21 @@ interface CipherCodec : Codec {
             cipher.init(mode, key)
             val src = data.readBytes()
             return cipher.doFinal(src, 0, src.size, dest, offset)
+        }
+
+        override fun doFinal(dest: OutputStream): Long {
+            cipher.init(mode, key)
+            val wrapDest = dest.unclose()
+            if (mode.isEncryptMode()) {
+                val cop = CipherOutputStream(wrapDest, cipher)
+                data.copyTo(cop)
+                cop.close()
+            } else {
+                val cip = CipherInputStream(data, cipher)
+                cip.copyTo(wrapDest)
+                cip.close()
+            }
+            return wrapDest.count
         }
     }
 
@@ -384,9 +434,10 @@ interface CipherCodec : Codec {
 
         @JvmOverloads
         @JvmStatic
-        fun sm2(mode: Int = SM2Codec.MODE_C1C3C2): CipherCodec {
+        fun sm2(mode: Int = SM2Cipher.MODE_C1C3C2): CipherCodec {
             return newBuilder()
-                .codecSupplier { SM2Codec(mode) }
+                .algorithm(CodecAlgorithm.SM2)
+                .cipherSupplier { SM2Cipher(mode) }
                 .build()
         }
 

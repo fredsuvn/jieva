@@ -121,9 +121,9 @@ public class CipherTester {
 
         //4 bytes -> output
         BytesAppender dest4 = new BytesAppender();
-        int enLength4 = cipherCodec.encrypt(publicKey, data, offset, length).doFinal(dest4);
+        long enLength4 = cipherCodec.encrypt(publicKey, data, offset, length).doFinal(dest4);
         BytesAppender de4 = new BytesAppender();
-        int deLength4 = cipherCodec.decrypt(privateKey, dest4.toBytes()).doFinal(de4);
+        long deLength4 = cipherCodec.decrypt(privateKey, dest4.toBytes()).doFinal(de4);
         Assert.assertEquals(de4.toBytes(), Arrays.copyOfRange(data, offset, offset + length));
         Assert.assertEquals(enLength4, enLength3);
         Assert.assertEquals(deLength4, deLength3);
@@ -160,10 +160,10 @@ public class CipherTester {
 
         //8 buffer -> output
         BytesAppender dest8 = new BytesAppender();
-        int enLength8 = cipherCodec.encrypt(publicKey, dataBuffer).doFinal(dest8);
+        long enLength8 = cipherCodec.encrypt(publicKey, dataBuffer).doFinal(dest8);
         dataBuffer.flip();
         BytesAppender de8 = new BytesAppender();
-        int deLength8 = cipherCodec.decrypt(privateKey, dest8.toBytes()).doFinal(de8);
+        long deLength8 = cipherCodec.decrypt(privateKey, dest8.toBytes()).doFinal(de8);
         Assert.assertEquals(de8.toBytes(), Arrays.copyOfRange(data, offset, offset + length));
         Assert.assertEquals(enLength8, enLength7);
         Assert.assertEquals(deLength8, deLength7);
@@ -200,10 +200,10 @@ public class CipherTester {
 
         //d stream -> output
         BytesAppender destD = new BytesAppender();
-        int enLengthD = cipherCodec.encrypt(publicKey, dataStream).doFinal(destD);
+        long enLengthD = cipherCodec.encrypt(publicKey, dataStream).doFinal(destD);
         dataStream.reset();
         BytesAppender deD = new BytesAppender();
-        int deLengthD = cipherCodec.decrypt(privateKey, destD.toBytes()).doFinal(deD);
+        long deLengthD = cipherCodec.decrypt(privateKey, destD.toBytes()).doFinal(deD);
         Assert.assertEquals(deD.toBytes(), Arrays.copyOfRange(data, offset, offset + length));
         Assert.assertEquals(enLengthD, enLength7);
         Assert.assertEquals(deLengthD, deLength7);

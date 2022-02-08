@@ -2,10 +2,16 @@
 
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.codec.gm.SM2Codec
+import xyz.srclab.common.codec.gm.SM2Cipher
+import xyz.srclab.common.io.unclose
+import java.io.InputStream
+import java.io.OutputStream
+import java.security.DigestOutputStream
 import java.security.MessageDigest
 import java.security.Signature
 import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.CipherOutputStream
 import javax.crypto.Mac
 
 fun simpleDigest(algorithm: CodecAlgorithm, digest: MessageDigest): DigestCodec {
@@ -97,7 +103,7 @@ fun rsa(): CipherCodec {
 }
 
 @JvmOverloads
-fun sm2(mode: Int = SM2Codec.MODE_C1C3C2): CipherCodec {
+fun sm2(mode: Int = SM2Cipher.MODE_C1C3C2): CipherCodec {
     return CipherCodec.sm2(mode)
 }
 
@@ -119,4 +125,36 @@ fun sha256WithSm2(): SignCodec {
 
 fun sm3WithSm2(): SignCodec {
     return SignCodec.sm3WithSm2()
+}
+
+fun Int.isEncryptMode(): Boolean {
+    return this == Cipher.ENCRYPT_MODE || this == Cipher.WRAP_MODE
+}
+
+/**
+ * Encrypts/Decrypts from [from] to [to], return length of output (not input).
+ */
+fun Cipher.encryptAfterInit(from: InputStream, to: OutputStream, mode: Int): Long {
+    val wrapDest = to.unclose()
+    if (mode.isEncryptMode()) {
+        val cop = CipherOutputStream(wrapDest, this)
+        from.copyTo(cop)
+        cop.close()
+    } else {
+        val cip = CipherInputStream(from, this)
+        cip.copyTo(wrapDest)
+        cip.close()
+    }
+    return wrapDest.count
+}
+
+/**
+ * Digests from [from] to [to], return length of output (not input).
+ */
+fun MessageDigest.digestAfterInit(from: InputStream, to: OutputStream): Long {
+    val wrapDest = to.unclose()
+    val cop = DigestOutputStream(wrapDest, this)
+    from.copyTo(cop)
+    cop.close()
+    return wrapDest.count
 }

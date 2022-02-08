@@ -113,10 +113,10 @@ open class RsaCodec @JvmOverloads constructor(
         data: ByteArray, offset: Int, length: Int,
         dest: OutputStream,
         cipher: Cipher, blockSize: Int, outputSize: Int
-    ): Int {
+    ): Long {
         val outBuffer = ByteArray(max(blockSize, outputSize))
         var curDataOffset = offset
-        var cryptLength = 0
+        var cryptLength = 0L
         while (curDataOffset < offset + length) {
             val inLength = inLength(offset, length, curDataOffset, blockSize)
             val outLength = cipher.doFinal(data, curDataOffset, inLength, outBuffer)
@@ -236,7 +236,7 @@ open class RsaCodec @JvmOverloads constructor(
         data: ByteBuffer,
         dest: OutputStream,
         cipher: Cipher, blockSize: Int, outputSize: Int
-    ): Int {
+    ): Long {
         if (data.hasArray()) {
             val startPos = data.position()
             val array = data.array()
@@ -249,7 +249,7 @@ open class RsaCodec @JvmOverloads constructor(
         val inBuffer = ByteArray(blockSize)
         val outBuffer = ByteArray(max(blockSize, outputSize))
         var curDataOffset = 0
-        var cryptLength = 0
+        var cryptLength = 0L
         while (curDataOffset < length) {
             val inLength = inLength(data, blockSize)
             data.get(inBuffer)
@@ -326,10 +326,10 @@ open class RsaCodec @JvmOverloads constructor(
         data: InputStream,
         dest: OutputStream,
         cipher: Cipher, blockSize: Int, outputSize: Int
-    ): Int {
+    ): Long {
         val inBuffer = ByteArray(blockSize)
         val outBuffer = ByteArray(max(blockSize, outputSize))
-        var cryptLength = 0
+        var cryptLength = 0L
         while (true) {
             val inLength = data.read(inBuffer)
             if (inLength < 0) {
@@ -389,7 +389,7 @@ open class RsaCodec @JvmOverloads constructor(
             return encrypt0(data, dataOffset, dataLength, dest, cipher, blockSize, outputSize)
         }
 
-        override fun doFinal(dest: OutputStream): Int {
+        override fun doFinal(dest: OutputStream): Long {
             cipher.init(Cipher.ENCRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
             val blockSize = outputSize - 11
@@ -424,7 +424,7 @@ open class RsaCodec @JvmOverloads constructor(
             return encrypt0(data, dest, cipher, blockSize, outputSize)
         }
 
-        override fun doFinal(dest: OutputStream): Int {
+        override fun doFinal(dest: OutputStream): Long {
             cipher.init(Cipher.ENCRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
             val blockSize = outputSize - 11
@@ -459,7 +459,7 @@ open class RsaCodec @JvmOverloads constructor(
             return encrypt0(data, dest, cipher, blockSize, outputSize)
         }
 
-        override fun doFinal(dest: OutputStream): Int {
+        override fun doFinal(dest: OutputStream): Long {
             cipher.init(Cipher.ENCRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
             val blockSize = outputSize - 11
@@ -495,7 +495,7 @@ open class RsaCodec @JvmOverloads constructor(
             return encrypt0(data, dataOffset, dataLength, dest, cipher, outputSize, blockSize)
         }
 
-        override fun doFinal(dest: OutputStream): Int {
+        override fun doFinal(dest: OutputStream): Long {
             cipher.init(Cipher.DECRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
             val blockSize = outputSize - 11
@@ -529,7 +529,7 @@ open class RsaCodec @JvmOverloads constructor(
             return encrypt0(data, dest, cipher, outputSize, blockSize)
         }
 
-        override fun doFinal(dest: OutputStream): Int {
+        override fun doFinal(dest: OutputStream): Long {
             cipher.init(Cipher.DECRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
             val blockSize = outputSize - 11
@@ -563,7 +563,7 @@ open class RsaCodec @JvmOverloads constructor(
             return encrypt0(data, dest, cipher, outputSize, blockSize)
         }
 
-        override fun doFinal(dest: OutputStream): Int {
+        override fun doFinal(dest: OutputStream): Long {
             cipher.init(Cipher.DECRYPT_MODE, key)
             val outputSize = cipher.getOutputSize(0)
             val blockSize = outputSize - 11

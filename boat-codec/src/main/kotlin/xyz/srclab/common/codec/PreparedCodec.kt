@@ -35,10 +35,11 @@ interface PreparedCodec {
         return array.size
     }
 
-    fun doFinal(dest: OutputStream): Int {
+    fun doFinal(dest: OutputStream): Long
+    {
         val array = doFinal()
         dest.write(array)
-        return array.size
+        return array.size.toLong()
     }
 
     companion object {
@@ -83,7 +84,7 @@ interface PreparedCodec {
                 }
             }
 
-            override fun doFinal(dest: OutputStream): Int {
+            override fun doFinal(dest: OutputStream): Long {
                 return synchronized(lock) {
                     preparedCodec.doFinal(dest)
                 }

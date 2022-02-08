@@ -1,6 +1,6 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.codec.gm.SM2Codec
+import xyz.srclab.common.codec.gm.SM2Cipher
 import xyz.srclab.common.codec.rsa.RsaCodec
 
 /**
@@ -11,7 +11,7 @@ import xyz.srclab.common.codec.rsa.RsaCodec
  * @see CipherCodec
  * @see CodecAlgorithm
  * @see RsaCodec
- * @see SM2Codec
+ * @see SM2Cipher
  */
 interface Codec {
 
