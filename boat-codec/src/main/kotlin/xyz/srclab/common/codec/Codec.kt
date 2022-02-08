@@ -1,6 +1,5 @@
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.codec.gm.SM2Cipher
 import xyz.srclab.common.codec.rsa.RsaCodec
 
 /**

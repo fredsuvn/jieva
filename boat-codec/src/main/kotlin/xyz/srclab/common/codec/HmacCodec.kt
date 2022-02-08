@@ -4,7 +4,9 @@ import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
+import xyz.srclab.common.io.toBytes
 import java.io.InputStream
+import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.security.Key
 import java.security.Provider
@@ -68,6 +70,15 @@ interface HmacCodec : Codec {
             hmac.doFinal(dest, offset)
             return hmac.macLength
         }
+
+        override fun doFinal(dest: OutputStream): Long {
+            hmac.reset()
+            hmac.init(key)
+            hmac.update(data, dataOffset, dataLength)
+            val d = hmac.doFinal()
+            dest.write(d)
+            return d.size.toLong()
+        }
     }
 
     open class ByteBufferPreparedCodec(
@@ -89,6 +100,23 @@ interface HmacCodec : Codec {
             hmac.update(data)
             hmac.doFinal(dest, offset)
             return hmac.macLength
+        }
+
+        override fun doFinal(dest: OutputStream): Long {
+            hmac.reset()
+            hmac.init(key)
+            if (data.hasArray()) {
+                val startPos = data.position()
+                val array = data.array()
+                val arrayOffset = data.arrayOffset() + startPos
+                hmac.update(array, arrayOffset, data.remaining())
+                data.position(data.limit())
+            } else {
+                hmac.update(data.toBytes())
+            }
+            val d = hmac.doFinal()
+            dest.write(d)
+            return d.size.toLong()
         }
     }
 
@@ -112,6 +140,15 @@ interface HmacCodec : Codec {
             hmac.doFinal(dest, offset)
             return hmac.macLength
         }
+
+        override fun doFinal(dest: OutputStream): Long {
+            hmac.reset()
+            hmac.init(key)
+            hmac.updateFromStream(data)
+            val result = hmac.doFinal()
+            dest.write(result)
+            return result.size.toLong()
+        }
     }
 
     /**
@@ -122,7 +159,7 @@ interface HmacCodec : Codec {
         private var algorithm: CodecAlgorithm? = null
         private var hmacSupplier: Supplier<Mac>? = null
         private var codecSupplier: Supplier<HmacCodec>? = null
-        private var threadSafePolicy: ThreadSafePolicy = ThreadSafePolicy.SYNCHRONIZED
+        private var threadSafePolicy: ThreadSafePolicy = ThreadSafePolicy.THREAD_LOCAL
 
         open fun algorithm(algorithm: CodecAlgorithm) = apply {
             this.algorithm = algorithm
@@ -137,7 +174,7 @@ interface HmacCodec : Codec {
         }
 
         /**
-         * Default is [ThreadSafePolicy.SYNCHRONIZED].
+         * Default is [ThreadSafePolicy.THREAD_LOCAL].
          */
         open fun threadSafePolicy(threadSafePolicy: ThreadSafePolicy) = apply {
             this.threadSafePolicy = threadSafePolicy

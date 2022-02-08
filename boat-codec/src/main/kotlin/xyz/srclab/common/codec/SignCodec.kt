@@ -8,6 +8,7 @@ import xyz.srclab.common.codec.PreparedVerify.Companion.toSync
 import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
 import xyz.srclab.common.io.toBytes
 import java.io.InputStream
+import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.security.PrivateKey
 import java.security.Provider
@@ -88,6 +89,14 @@ interface SignCodec : Codec {
             signature.update(digestCodec.digest(data, dataOffset, dataLength).doFinal())
             return signature.sign(dest, offset, length)
         }
+
+        override fun doFinal(dest: OutputStream): Long {
+            signature.initSign(key)
+            signature.update(data, dataOffset, dataLength)
+            val d = signature.sign()
+            dest.write(d)
+            return d.size.toLong()
+        }
     }
 
     open class ByteBufferPreparedCodec(
@@ -107,6 +116,22 @@ interface SignCodec : Codec {
             signature.initSign(key)
             signature.update(digestCodec.digest(data).doFinal())
             return signature.sign(dest, offset, length)
+        }
+
+        override fun doFinal(dest: OutputStream): Long {
+            signature.initSign(key)
+            if (data.hasArray()) {
+                val startPos = data.position()
+                val array = data.array()
+                val arrayOffset = data.arrayOffset() + startPos
+                signature.update(array, arrayOffset, data.remaining())
+                data.position(data.limit())
+            } else {
+                signature.update(data.toBytes())
+            }
+            val d = signature.sign()
+            dest.write(d)
+            return d.size.toLong()
         }
     }
 
@@ -128,6 +153,14 @@ interface SignCodec : Codec {
             signature.update(digestCodec.digest(data).doFinal())
             return signature.sign(dest, offset, length)
         }
+
+        override fun doFinal(dest: OutputStream): Long {
+            signature.initSign(key)
+            signature.updateFromStream(data)
+            val result = signature.sign()
+            dest.write(result)
+            return result.size.toLong()
+        }
     }
 
     open class ByteArrayPreparedVerify(
@@ -137,11 +170,11 @@ interface SignCodec : Codec {
         private val data: ByteArray,
         private val dataOffset: Int,
         private val dataLength: Int
-    ) : AbstractPreparedVerify() {
-        override fun getInitializedSign(): Signature {
+    ) : PreparedVerify {
+        override fun verify(sign: ByteArray, offset: Int, length: Int): Boolean {
             signature.initVerify(key)
             signature.update(digestCodec.digest(data, dataOffset, dataLength).doFinal())
-            return signature
+            return signature.verify(sign, offset, length)
         }
     }
 
@@ -150,11 +183,11 @@ interface SignCodec : Codec {
         private val digestCodec: DigestCodec,
         private val key: PublicKey,
         private val data: ByteBuffer
-    ) : AbstractPreparedVerify() {
-        override fun getInitializedSign(): Signature {
+    ) : PreparedVerify {
+        override fun verify(sign: ByteArray, offset: Int, length: Int): Boolean {
             signature.initVerify(key)
             signature.update(digestCodec.digest(data).doFinal())
-            return signature
+            return signature.verify(sign, offset, length)
         }
     }
 
@@ -163,33 +196,11 @@ interface SignCodec : Codec {
         private val digestCodec: DigestCodec,
         private val key: PublicKey,
         private val data: InputStream
-    ) : AbstractPreparedVerify() {
-        override fun getInitializedSign(): Signature {
+    ) : PreparedVerify {
+        override fun verify(sign: ByteArray, offset: Int, length: Int): Boolean {
             signature.initVerify(key)
             signature.update(digestCodec.digest(data).doFinal())
-            return signature
-        }
-    }
-
-    abstract class AbstractPreparedVerify : PreparedVerify {
-
-        protected abstract fun getInitializedSign(): Signature
-
-        override fun verify(sign: ByteArray, offset: Int, length: Int): Boolean {
-            val signature = getInitializedSign()
             return signature.verify(sign, offset, length)
-        }
-
-        override fun verify(sign: ByteBuffer): Boolean {
-            val signature = getInitializedSign()
-            if (sign.hasArray()) {
-                val startPos = sign.position()
-                val array = sign.array()
-                val arrayOffset = sign.arrayOffset() + startPos
-                sign.position(sign.limit())
-                return signature.verify(array, arrayOffset, sign.remaining())
-            }
-            return signature.verify(sign.toBytes(false))
         }
     }
 

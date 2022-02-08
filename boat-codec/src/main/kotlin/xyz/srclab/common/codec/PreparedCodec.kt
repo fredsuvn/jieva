@@ -36,11 +36,6 @@ interface PreparedCodec {
     }
 
     fun doFinal(dest: OutputStream): Long
-    {
-        val array = doFinal()
-        dest.write(array)
-        return array.size.toLong()
-    }
 
     companion object {
 

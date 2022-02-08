@@ -2,11 +2,11 @@
 
 package xyz.srclab.common.codec
 
-import xyz.srclab.common.codec.gm.SM2Cipher
+import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
+import xyz.srclab.common.codec.gm.SM2Codec
 import xyz.srclab.common.io.unclose
 import java.io.InputStream
 import java.io.OutputStream
-import java.security.DigestOutputStream
 import java.security.MessageDigest
 import java.security.Signature
 import javax.crypto.Cipher
@@ -103,7 +103,7 @@ fun rsa(): CipherCodec {
 }
 
 @JvmOverloads
-fun sm2(mode: Int = SM2Cipher.MODE_C1C3C2): CipherCodec {
+fun sm2(mode: Int = SM2Codec.MODE_C1C3C2): CipherCodec {
     return CipherCodec.sm2(mode)
 }
 
@@ -149,12 +149,40 @@ fun Cipher.encryptAfterInit(from: InputStream, to: OutputStream, mode: Int): Lon
 }
 
 /**
- * Digests from [from] to [to], return length of output (not input).
+ * Updates from given [InputStream].
  */
-fun MessageDigest.digestAfterInit(from: InputStream, to: OutputStream): Long {
-    val wrapDest = to.unclose()
-    val cop = DigestOutputStream(wrapDest, this)
-    from.copyTo(cop)
-    cop.close()
-    return wrapDest.count
+@JvmOverloads
+fun MessageDigest.updateFromStream(from: InputStream, bufferSize: Int = DEFAULT_IO_BUFFER_SIZE) {
+    val buffer = ByteArray(bufferSize)
+    var c = from.read(buffer)
+    while (c >= 0) {
+        this.update(buffer, 0, c)
+        c = from.read(buffer)
+    }
+}
+
+/**
+ * Updates from given [InputStream].
+ */
+@JvmOverloads
+fun Mac.updateFromStream(from: InputStream, bufferSize: Int = DEFAULT_IO_BUFFER_SIZE) {
+    val buffer = ByteArray(bufferSize)
+    var c = from.read(buffer)
+    while (c >= 0) {
+        this.update(buffer, 0, c)
+        c = from.read(buffer)
+    }
+}
+
+/**
+ * Updates from given [InputStream].
+ */
+@JvmOverloads
+fun Signature.updateFromStream(from: InputStream, bufferSize: Int = DEFAULT_IO_BUFFER_SIZE) {
+    val buffer = ByteArray(bufferSize)
+    var c = from.read(buffer)
+    while (c >= 0) {
+        this.update(buffer, 0, c)
+        c = from.read(buffer)
+    }
 }

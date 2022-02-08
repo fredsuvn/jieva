@@ -5,7 +5,9 @@ import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
+import xyz.srclab.common.io.toBytes
 import java.io.InputStream
+import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 import java.security.Provider
@@ -64,12 +66,19 @@ interface DigestCodec : Codec {
             digest.update(data, dataOffset, dataLength)
             return digest.digest(dest, offset, length)
         }
+
+        override fun doFinal(dest: OutputStream): Long {
+            digest.reset()
+            digest.update(data, dataOffset, dataLength)
+            val d = digest.digest()
+            dest.write(d)
+            return d.size.toLong()
+        }
     }
 
     open class ByteBufferPreparedCodec(
         private val digest: MessageDigest,
-        private val data: ByteBuffer,
-        isSync: Boolean = false
+        private val data: ByteBuffer
     ) : PreparedCodec {
 
         override fun doFinal(): ByteArray {
@@ -82,13 +91,28 @@ interface DigestCodec : Codec {
             digest.reset()
             digest.update(data)
             return digest.digest(dest, offset, length)
+        }
+
+        override fun doFinal(dest: OutputStream): Long {
+            digest.reset()
+            if (data.hasArray()) {
+                val startPos = data.position()
+                val array = data.array()
+                val arrayOffset = data.arrayOffset() + startPos
+                digest.update(array, arrayOffset, data.remaining())
+                data.position(data.limit())
+            } else {
+                digest.update(data.toBytes())
+            }
+            val d = digest.digest()
+            dest.write(d)
+            return d.size.toLong()
         }
     }
 
     open class InputStreamPreparedCodec(
         private val digest: MessageDigest,
-        private val data: InputStream,
-        isSync: Boolean = false
+        private val data: InputStream
     ) : PreparedCodec {
 
         override fun doFinal(): ByteArray {
@@ -101,6 +125,14 @@ interface DigestCodec : Codec {
             digest.reset()
             digest.update(data.readBytes())
             return digest.digest(dest, offset, length)
+        }
+
+        override fun doFinal(dest: OutputStream): Long {
+            digest.reset()
+            digest.updateFromStream(data)
+            val result = digest.digest()
+            dest.write(result)
+            return result.size.toLong()
         }
     }
 
@@ -112,7 +144,7 @@ interface DigestCodec : Codec {
         private var algorithm: CodecAlgorithm? = null
         private var digestSupplier: Supplier<MessageDigest>? = null
         private var codecSupplier: Supplier<DigestCodec>? = null
-        private var threadSafePolicy: ThreadSafePolicy = ThreadSafePolicy.SYNCHRONIZED
+        private var threadSafePolicy: ThreadSafePolicy = ThreadSafePolicy.THREAD_LOCAL
 
         open fun algorithm(algorithm: CodecAlgorithm) = apply {
             this.algorithm = algorithm
@@ -128,7 +160,7 @@ interface DigestCodec : Codec {
         }
 
         /**
-         * Default is [ThreadSafePolicy.SYNCHRONIZED].
+         * Default is [ThreadSafePolicy.THREAD_LOCAL].
          */
         open fun threadSafePolicy(threadSafePolicy: ThreadSafePolicy) = apply {
             this.threadSafePolicy = threadSafePolicy

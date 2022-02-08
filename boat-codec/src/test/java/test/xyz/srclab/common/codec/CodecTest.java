@@ -1,7 +1,6 @@
 package test.xyz.srclab.common.codec;
 
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BRandom;
 import xyz.srclab.common.codec.BCodec;
 import xyz.srclab.common.codec.BKey;
 import xyz.srclab.common.codec.CodecAlgorithm;
@@ -9,10 +8,6 @@ import xyz.srclab.common.codec.aes.BAes;
 import xyz.srclab.common.codec.gm.BGM;
 import xyz.srclab.common.codec.rsa.BRsa;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.security.Key;
 import java.security.KeyPair;
 
@@ -46,23 +41,14 @@ public class CodecTest {
 
     @Test
     public void testCipher() throws Exception {
-        //String password = "123";
-        //Key key = BAes.passphraseToKey(password);
-        //CipherTester.testCipher(BCodec.aes(), key, key);
-        //Key sm4Key = BGM.passphraseToSm4Key(password);
-        //CipherTester.testCipher(BCodec.sm4(), sm4Key, sm4Key);
-        //KeyPair rsaKeys = BRsa.generateKeyPair();
-        //CipherTester.testCipher(BCodec.rsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
+        String password = "123";
+        Key key = BAes.passphraseToKey(password);
+        CipherTester.testCipher(BCodec.aes(), key, key);
+        Key sm4Key = BGM.passphraseToSm4Key(password);
+        CipherTester.testCipher(BCodec.sm4(), sm4Key, sm4Key);
+        KeyPair rsaKeys = BRsa.generateKeyPair();
+        CipherTester.testCipher(BCodec.rsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
         KeyPair sm2Keys = BGM.generateSm2KeyPair();
         CipherTester.testCipher(BCodec.sm2(), sm2Keys.getPublic(), sm2Keys.getPrivate());
-    }
-
-    @Test
-    public void test()throws Exception{
-        Cipher cipher = Cipher.getInstance("AES");
-        byte[] data = BRandom.randomString(66666).getBytes();
-        CipherInputStream cipherInputStream = new CipherInputStream(new ByteArrayInputStream(data), cipher);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
     }
 }
