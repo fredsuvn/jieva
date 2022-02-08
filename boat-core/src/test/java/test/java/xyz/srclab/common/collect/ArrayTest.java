@@ -77,5 +77,15 @@ public class ArrayTest {
             BArray.indexOfArray(array, new String[]{"4"}),
             -1
         );
+
+        String[] array2 = new String[]{"1", "2", "3", "2", "3"};
+        Assert.assertEquals(
+            BArray.indexOfArray(array2, 1, new String[]{"2", "3"}),
+            1
+        );
+        Assert.assertEquals(
+            BArray.indexOfArray(array2, 2, new String[]{"2", "3"}),
+            3
+        );
     }
 }

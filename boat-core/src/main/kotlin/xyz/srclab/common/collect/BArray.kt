@@ -144,168 +144,52 @@ fun CharArray.asList(): MutableList<Char> {
 
 @JvmOverloads
 fun <T> Array<T>.indexOfArray(content: Array<T>, start: Int = 0, end: Int = content.size): Int {
-    var i = 0
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
+    return this.indexOfArray(0, content, start, end)
 }
 
 @JvmOverloads
 fun BooleanArray.indexOfArray(content: BooleanArray, start: Int = 0, end: Int = content.size): Int {
-    var i = 0
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
+    return this.indexOfArray(0, content, start, end)
 }
 
 @JvmOverloads
 fun ByteArray.indexOfArray(content: ByteArray, start: Int = 0, end: Int = content.size): Int {
-    var i = 0
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
+    return this.indexOfArray(0, content, start, end)
 }
 
 @JvmOverloads
 fun ShortArray.indexOfArray(content: ShortArray, start: Int = 0, end: Int = content.size): Int {
-    var i = 0
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
+    return this.indexOfArray(0, content, start, end)
 }
 
 @JvmOverloads
 fun CharArray.indexOfArray(content: CharArray, start: Int = 0, end: Int = content.size): Int {
-    var i = 0
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
+    return this.indexOfArray(0, content, start, end)
 }
 
 @JvmOverloads
 fun IntArray.indexOfArray(content: IntArray, start: Int = 0, end: Int = content.size): Int {
-    var i = 0
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
+    return this.indexOfArray(0, content, start, end)
 }
 
 @JvmOverloads
 fun LongArray.indexOfArray(content: LongArray, start: Int = 0, end: Int = content.size): Int {
-    var i = 0
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
+    return this.indexOfArray(0, content, start, end)
 }
 
 @JvmOverloads
 fun FloatArray.indexOfArray(content: FloatArray, start: Int = 0, end: Int = content.size): Int {
-    var i = 0
+    return this.indexOfArray(0, content, start, end)
+}
+
+@JvmOverloads
+fun DoubleArray.indexOfArray(content: DoubleArray, start: Int = 0, end: Int = content.size): Int {
+    return this.indexOfArray(0, content, start, end)
+}
+
+@JvmOverloads
+fun <T> Array<T>.indexOfArray(offset: Int, content: Array<T>, start: Int = 0, end: Int = content.size): Int {
+    var i = offset
     while (i < this.size) {
         var j = i
         var k = start
@@ -327,8 +211,169 @@ fun FloatArray.indexOfArray(content: FloatArray, start: Int = 0, end: Int = cont
 }
 
 @JvmOverloads
-fun DoubleArray.indexOfArray(content: DoubleArray, start: Int = 0, end: Int = content.size): Int {
-    var i = 0
+fun BooleanArray.indexOfArray(offset: Int, content: BooleanArray, start: Int = 0, end: Int = content.size): Int {
+    var i = offset
+    while (i < this.size) {
+        var j = i
+        var k = start
+        while (j < this.size && k < end) {
+            if (this[j] == content[k]) {
+                j++
+                k++
+            } else {
+                break
+            }
+        }
+        if (k == end) {
+            return i
+        } else {
+            i++
+        }
+    }
+    return -1
+}
+
+@JvmOverloads
+fun ByteArray.indexOfArray(offset: Int, content: ByteArray, start: Int = 0, end: Int = content.size): Int {
+    var i = offset
+    while (i < this.size) {
+        var j = i
+        var k = start
+        while (j < this.size && k < end) {
+            if (this[j] == content[k]) {
+                j++
+                k++
+            } else {
+                break
+            }
+        }
+        if (k == end) {
+            return i
+        } else {
+            i++
+        }
+    }
+    return -1
+}
+
+@JvmOverloads
+fun ShortArray.indexOfArray(offset: Int, content: ShortArray, start: Int = 0, end: Int = content.size): Int {
+    var i = offset
+    while (i < this.size) {
+        var j = i
+        var k = start
+        while (j < this.size && k < end) {
+            if (this[j] == content[k]) {
+                j++
+                k++
+            } else {
+                break
+            }
+        }
+        if (k == end) {
+            return i
+        } else {
+            i++
+        }
+    }
+    return -1
+}
+
+@JvmOverloads
+fun CharArray.indexOfArray(offset: Int, content: CharArray, start: Int = 0, end: Int = content.size): Int {
+    var i = offset
+    while (i < this.size) {
+        var j = i
+        var k = start
+        while (j < this.size && k < end) {
+            if (this[j] == content[k]) {
+                j++
+                k++
+            } else {
+                break
+            }
+        }
+        if (k == end) {
+            return i
+        } else {
+            i++
+        }
+    }
+    return -1
+}
+
+@JvmOverloads
+fun IntArray.indexOfArray(offset: Int, content: IntArray, start: Int = 0, end: Int = content.size): Int {
+    var i = offset
+    while (i < this.size) {
+        var j = i
+        var k = start
+        while (j < this.size && k < end) {
+            if (this[j] == content[k]) {
+                j++
+                k++
+            } else {
+                break
+            }
+        }
+        if (k == end) {
+            return i
+        } else {
+            i++
+        }
+    }
+    return -1
+}
+
+@JvmOverloads
+fun LongArray.indexOfArray(offset: Int, content: LongArray, start: Int = 0, end: Int = content.size): Int {
+    var i = offset
+    while (i < this.size) {
+        var j = i
+        var k = start
+        while (j < this.size && k < end) {
+            if (this[j] == content[k]) {
+                j++
+                k++
+            } else {
+                break
+            }
+        }
+        if (k == end) {
+            return i
+        } else {
+            i++
+        }
+    }
+    return -1
+}
+
+@JvmOverloads
+fun FloatArray.indexOfArray(offset: Int, content: FloatArray, start: Int = 0, end: Int = content.size): Int {
+    var i = offset
+    while (i < this.size) {
+        var j = i
+        var k = start
+        while (j < this.size && k < end) {
+            if (this[j] == content[k]) {
+                j++
+                k++
+            } else {
+                break
+            }
+        }
+        if (k == end) {
+            return i
+        } else {
+            i++
+        }
+    }
+    return -1
+}
+
+@JvmOverloads
+fun DoubleArray.indexOfArray(offset: Int, content: DoubleArray, start: Int = 0, end: Int = content.size): Int {
+    var i = offset
     while (i < this.size) {
         var j = i
         var k = start
