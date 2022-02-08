@@ -23,6 +23,9 @@ object Boat {
     )
 
     @JvmField
+    val NAME: String = "Boat"
+
+    @JvmField
     val VERSION: SemVer = buildInfos["build.version"]!!.parseSemVer()
 
     @JvmField
