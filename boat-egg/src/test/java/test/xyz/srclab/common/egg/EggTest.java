@@ -4,9 +4,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.collect.Collects;
 import xyz.srclab.common.egg.Egg;
-import xyz.srclab.common.egg.EggNotFoundException;
-import xyz.srclab.common.egg.HelloBoat;
-import xyz.srclab.common.egg.WrongSpellException;
+import xyz.srclab.common.egg.NoSuchEggException;
+import xyz.srclab.common.egg.HelloEgg;
+import xyz.srclab.common.egg.WrongMagicException;
 import xyz.srclab.common.lang.Defaults;
 import xyz.srclab.common.test.TestLogger;
 
@@ -26,12 +26,12 @@ public class EggTest {
 
     @Test
     public void testEgg() throws Exception {
-        Assert.expectThrows(EggNotFoundException.class, () -> {
+        Assert.expectThrows(NoSuchEggException.class, () -> {
             Egg.pick("Hello, Egg!");
         });
 
-        Egg hello = Egg.pick(HelloBoat.class.getName());
-        Assert.expectThrows(WrongSpellException.class, () -> {
+        Egg hello = Egg.pick(HelloEgg.class.getName());
+        Assert.expectThrows(WrongMagicException.class, () -> {
             hello.hatchOut("123456", Collections.emptyMap());
         });
 
