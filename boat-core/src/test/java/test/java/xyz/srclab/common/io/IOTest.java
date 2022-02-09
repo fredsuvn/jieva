@@ -86,8 +86,8 @@ public class IOTest {
         Map<Object, Object> map = new HashMap<>();
         map.put("a", a);
         map.put("b", b);
-        BIO.writeObject(map, temp2);
-        Map<Object, Object> mapRead = BIO.readObject(temp2);
+        BIO.writeObject(map, temp2, true);
+        Map<Object, Object> mapRead = BIO.readObject(temp2, true);
         A ar = (A) mapRead.get("a");
         B br = (B) mapRead.get("b");
         Assert.assertEquals(ar.getS(), a.getS());
