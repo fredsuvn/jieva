@@ -1,0 +1,18 @@
+plugins {
+  id 'build.jar'
+}
+
+description = "Boat Netty: Netty support for Boat."
+
+java {
+  registerFeature('optionalSupport') {
+    usingSourceSet(sourceSets.main)
+  }
+}
+
+dependencies {
+  api project(":boat-core")
+  api "io.netty:netty-all"
+
+  testImplementation project(":boat-test")
+}
