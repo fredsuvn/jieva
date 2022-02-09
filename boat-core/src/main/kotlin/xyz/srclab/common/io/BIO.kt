@@ -205,6 +205,11 @@ fun Any.writeObject(outputFile: CharSequence, close: Boolean = false) {
 }
 
 @JvmOverloads
+fun Any.writeObject(outputFile: File, close: Boolean = false) {
+    return writeObject(outputFile.openOutputStream(), close)
+}
+
+@JvmOverloads
 fun <T> CharSequence.readObject(close: Boolean = false): T {
     return this.openFileInputStream().readObject(close)
 }
@@ -213,6 +218,11 @@ fun <T> CharSequence.readObject(close: Boolean = false): T {
 fun <T> InputStream.readObject(close: Boolean = false): T {
     val ooi = ObjectInputStream(this)
     return ooi.readObject().asTyped()
+}
+
+@JvmOverloads
+fun <T> File.readObject(close: Boolean = false): T {
+    return this.openInputStream().readObject(close)
 }
 
 /**
