@@ -5,6 +5,14 @@ import java.io.Serializable
 
 open class OConfig : Serializable {
 
+    var screenWidth: Int = 800
+    var screenHeight: Int = 1200
+    var preparedWidth: Int = 100
+    var preparedHeight: Int = 100
+
+    var unitX: Double = 5.0
+    var unitY: Double = 5.0
+
     companion object {
         private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
         val EMPTY = OConfig()
