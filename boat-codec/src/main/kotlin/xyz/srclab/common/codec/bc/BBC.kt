@@ -1,4 +1,4 @@
-@file:JvmName("BBcprov")
+@file:JvmName("BBC")
 
 package xyz.srclab.common.codec.bc
 

@@ -5,6 +5,7 @@ import xyz.srclab.common.codec.BCodec;
 import xyz.srclab.common.codec.BKey;
 import xyz.srclab.common.codec.CodecAlgorithm;
 import xyz.srclab.common.codec.aes.BAes;
+import xyz.srclab.common.codec.bc.BBC;
 import xyz.srclab.common.codec.gm.BGM;
 import xyz.srclab.common.codec.rsa.BRsa;
 
@@ -50,5 +51,7 @@ public class CodecTest {
         CipherTester.testCipher(BCodec.rsa(), rsaKeys.getPublic(), rsaKeys.getPrivate());
         KeyPair sm2Keys = BGM.generateSm2KeyPair();
         CipherTester.testCipher(BCodec.sm2(), sm2Keys.getPublic(), sm2Keys.getPrivate());
+        CipherTester.testCipher(BCodec.forCipherAlgorithm(
+            "SM2", BBC.DEFAULT_BCPROV_PROVIDER), sm2Keys.getPublic(), sm2Keys.getPrivate());
     }
 }

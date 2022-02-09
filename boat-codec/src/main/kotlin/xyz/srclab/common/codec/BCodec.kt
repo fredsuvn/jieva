@@ -8,11 +8,16 @@ import xyz.srclab.common.io.unclose
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.MessageDigest
+import java.security.Provider
 import java.security.Signature
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
 import javax.crypto.CipherOutputStream
 import javax.crypto.Mac
+import xyz.srclab.common.codec.CipherCodec.Companion.toCipherCodec as toCipherCodecC
+import xyz.srclab.common.codec.DigestCodec.Companion.toDigestCodec as toDigestCodecC
+import xyz.srclab.common.codec.HmacCodec.Companion.toHmacCodec as toHmacCodecC
+import xyz.srclab.common.codec.SignCodec.Companion.toSignCodec as toSignCodecC
 
 fun simpleDigest(algorithm: CodecAlgorithm, digest: MessageDigest): DigestCodec {
     return DigestCodec.simpleImpl(algorithm, digest)
@@ -44,6 +49,30 @@ fun newCipherBuilder(): CipherCodec.Builder {
 
 fun newSignBuilder(): SignCodec.Builder {
     return SignCodec.newBuilder()
+}
+
+@JvmName("forDigestAlgorithm")
+@JvmOverloads
+fun CharSequence.toDigestCodec(provider: Provider? = null): DigestCodec {
+    return this.toDigestCodecC(provider)
+}
+
+@JvmName("forHmacAlgorithm")
+@JvmOverloads
+fun CharSequence.toHmacCodec(provider: Provider? = null): HmacCodec {
+    return this.toHmacCodecC(provider)
+}
+
+@JvmName("forCipherAlgorithm")
+@JvmOverloads
+fun CharSequence.toCipherCodec(provider: Provider? = null): CipherCodec {
+    return this.toCipherCodecC(provider)
+}
+
+@JvmName("forSignAlgorithm")
+@JvmOverloads
+fun CharSequence.toSignCodec(provider: Provider? = null): SignCodec {
+    return this.toSignCodecC(provider)
 }
 
 fun md2(): DigestCodec {
