@@ -34,15 +34,19 @@ open class OScenario {
     }
 
     fun onFire(tank: OTank, targetX: Double, targetY: Double, tick: Long) {
-        if (tank.state != OUnit.STATE_ALIVE) {
-            return
-        }
-        for (weapon in tank.weapons) {
-            if (tick - weapon.lastFileTick <= weapon.coolDownTick) {
-                continue
-            }
-            //TODO
-            weapon.lastFileTick = tick
-        }
+        //if (tank.state != OUnit.STATE_ALIVE) {
+        //    return
+        //}
+        //for (weapon in tank.weapons) {
+        //    if (tick - weapon.lastFileTick <= weapon.coolDownTick) {
+        //        continue
+        //    }
+        //    //TODO
+        //    weapon.lastFileTick = tick
+        //}
+    }
+
+    fun onBotFire(tank: OTank, tick: Long) {
+
     }
 }
