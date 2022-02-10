@@ -87,6 +87,15 @@ public class BufferTest {
         Assert.expectThrows(IndexOutOfBoundsException.class, () -> BBuffer.getBuffer(buffer, 101, true));
     }
 
+    @Test
+    public void testBytesGetBuffer() {
+        byte[] bytes = initArray(new byte[100]);
+        ByteBuffer buffer = BBuffer.getBuffer(bytes, true);
+        Assert.assertEquals(BBuffer.getBytes(buffer), bytes);
+        ByteBuffer buffer2 = BBuffer.getBuffer(bytes);
+        Assert.assertEquals(BBuffer.getBytes(buffer2), bytes);
+    }
+
     private void initBuffer(ByteBuffer buffer) {
         for (int i = 0; i < 100; i++) {
             buffer.put((byte) i);

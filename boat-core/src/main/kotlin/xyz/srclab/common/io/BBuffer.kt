@@ -5,6 +5,7 @@ package xyz.srclab.common.io
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.checkLengthInRange
 import xyz.srclab.common.base.getString
+import xyz.srclab.common.base.remainingLength
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
@@ -60,4 +61,20 @@ fun ByteBuffer.getBuffer(length: Int, direct: Boolean = false): ByteBuffer {
         result.flip()
         result
     }
+}
+
+@JvmOverloads
+fun ByteArray.getBuffer(
+    offset: Int = 0,
+    length: Int = remainingLength(this.size, offset),
+    direct: Boolean = false
+): ByteBuffer {
+    val buffer = if (direct) ByteBuffer.allocateDirect(length) else ByteBuffer.allocate(length)
+    buffer.put(this, offset, length)
+    buffer.flip()
+    return buffer
+}
+
+fun ByteArray.getBuffer(direct: Boolean): ByteBuffer {
+    return getBuffer(0, size, direct)
 }

@@ -23,7 +23,7 @@ public class CipherTester {
         int offset = 6;
         int length = 998;
         byte[] data = BRandom.randomString(1888).getBytes();
-        ByteBuffer dataBuffer = BBuffer.toBuffer(data, offset, length);
+        ByteBuffer dataBuffer = BBuffer.getBuffer(data, offset, length);
         byte[] d1 = digestCodec.digest(data, offset, length).doFinal();
         byte[] d2 = digestCodec.digest(dataBuffer).doFinal();
         Assert.assertEquals(d1, d2);
@@ -44,7 +44,7 @@ public class CipherTester {
         int offset = 6;
         int length = 998;
         byte[] data = BRandom.randomString(1888).getBytes();
-        ByteBuffer dataBuffer = BBuffer.toBuffer(data, offset, length);
+        ByteBuffer dataBuffer = BBuffer.getBuffer(data, offset, length);
         byte[] d1 = hmacCodec.hmac(key, data, offset, length).doFinal();
         byte[] d2 = hmacCodec.hmac(key, dataBuffer).doFinal();
         Assert.assertEquals(d1, d2);
@@ -63,7 +63,7 @@ public class CipherTester {
         int offset = 6;
         int length = 998;
         byte[] data = BRandom.randomString(1888).getBytes();
-        ByteBuffer dataBuffer = BBuffer.toBuffer(data, offset, length);
+        ByteBuffer dataBuffer = BBuffer.getBuffer(data, offset, length);
         byte[] d1 = signCodec.sign(privateKey, data, offset, length).doFinal();
         byte[] d2 = signCodec.sign(privateKey, dataBuffer).doFinal();
         //Assert.assertEquals(d1, d2);
@@ -89,7 +89,7 @@ public class CipherTester {
         int length = 55555;
         int destOffset = 66;
         byte[] data = BRandom.randomString(66666).getBytes();
-        ByteBuffer dataBuffer = BBuffer.toBuffer(data, offset, length);
+        ByteBuffer dataBuffer = BBuffer.getBuffer(data, offset, length);
         InputStream dataStream = BIO.asInputStream(data, offset, length);
 
         //1 bytes -> bytes
