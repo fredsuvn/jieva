@@ -21,15 +21,15 @@ private fun distance(x1: Double, y1: Double, x2: Double, y2: Double): Double {
 }
 
 fun isInBounds(u: OUnit, config: OConfig): Boolean {
-    return u.x >= -config.preparedWidth.toDouble()
-        && u.x <= (config.preparedWidth + config.screenWidth).toDouble()
-        && u.y >= -config.preparedHeight.toDouble()
-        && u.y <= (config.preparedHeight + config.screenHeight).toDouble()
+    return u.x >= -config.preparedWidth.toDouble() - u.radius - 1
+        && u.x <= config.preparedWidth + config.screenWidth + u.radius + 1
+        && u.y >= -config.preparedHeight.toDouble() - u.radius - 1
+        && u.y <= config.preparedHeight + config.screenHeight + u.radius + 1)
 }
 
 fun isInScreen(u: OUnit, config: OConfig): Boolean {
-    return u.x >= 0
-        && u.x <= config.screenWidth
-        && u.y >= 0
-        && u.y <= config.screenHeight
+    return u.x >= 0 - u.radius
+        && u.x <= config.screenWidth + u.radius
+        && u.y >= 0 - u.radius
+        && u.y <= config.screenHeight + u.radius
 }

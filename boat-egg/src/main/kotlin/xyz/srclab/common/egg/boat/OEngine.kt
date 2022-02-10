@@ -1,60 +1,19 @@
 package xyz.srclab.common.egg.boat
 
-import xyz.srclab.common.run.RunLatch
-import java.util.*
-
 open class OEngine(
     private val data: OData,
-    private val config: OConfig,
     private val scenario: OScenario
 ) {
 
-    private var pauseFlag = false
-    private val runLatch = RunLatch.newRunLatch()
-    private val orders: MutableList<Order> = Collections.synchronizedList(LinkedList())
-
-    fun start() {
-
-        var tick = 0L
-
+    fun tick(tick: Long, orders: List<OOrder>) {
+        executeOrders(orders, data.config, tick)
+        checkCollision(data.tanks, data.bullets, tick)
+        autoMove(data.tanks, data.bullets, data.config, tick)
+        autoClean(data.tanks, data.bullets, data.config, tick)
+        autoFire(data.tanks, tick)
     }
 
-    fun pause() {
-        runLatch.close()
-        pauseFlag = true
-    }
-
-    fun go() {
-        pauseFlag = false
-        runLatch.open()
-    }
-
-    fun tickOne(tick: Long) {
-        if (tick == 0L) {
-            scenario.init(data)
-        }
-
-        while (true) {
-
-            executeOrders(orders, config, tick)
-            orders.clear()
-
-            checkCollision(data.tanks, data.bullets, tick)
-
-            autoMove(data.tanks, data.bullets, tick)
-
-            autoClear(data.tanks, data.bullets, tick)
-
-            autoFire(data.tanks, tick)
-
-            if (!pauseFlag) {
-                continue
-            }
-            runLatch.await()
-        }
-    }
-
-    private fun executeOrders(orders: List<Order>, config: OConfig, tick: Long) {
+    private fun executeOrders(orders: List<OOrder>, config: OConfig, tick: Long) {
         for (order in orders) {
             val tank = data.tanks[order.player]
             when (order.order) {
@@ -114,7 +73,7 @@ open class OEngine(
         }
     }
 
-    private fun autoMove(tanks: List<OTank>, bullets: List<OBullet>, tick: Long) {
+    private fun autoMove(tanks: List<OTank>, bullets: List<OBullet>, config: OConfig, tick: Long) {
         for (tank in tanks) {
             if (tank.state != OUnit.STATE_ALIVE) {
                 continue
@@ -134,7 +93,7 @@ open class OEngine(
         }
     }
 
-    private fun autoClear(tanks: MutableList<OTank>, bullets: MutableList<OBullet>, tick: Long) {
+    private fun autoClean(tanks: MutableList<OTank>, bullets: MutableList<OBullet>, config: OConfig, tick: Long) {
         val tankIt = tanks.iterator()
         while (tankIt.hasNext()) {
             val tank = tankIt.next()
@@ -145,7 +104,7 @@ open class OEngine(
                 (tank.state == OUnit.STATE_DEAD && tick - tank.deathTick > tank.deathDuration)
                 || !isInBounds(tank, config)
             ) {
-                scenario.onClearUnit(tank, tick)
+                scenario.onClean(tank, tick)
                 tankIt.remove()
             }
         }
@@ -156,7 +115,7 @@ open class OEngine(
                 (bullet.state == OUnit.STATE_DEAD && tick - bullet.deathTick > bullet.deathDuration)
                 || !isInBounds(bullet, config)
             ) {
-                scenario.onClearUnit(bullet, tick)
+                scenario.onClean(bullet, tick)
                 bulletIt.remove()
             }
         }
@@ -175,9 +134,4 @@ open class OEngine(
             }
         }
     }
-
-    private data class Order(
-        val player: Int,
-        val order: Int,
-    )
 }

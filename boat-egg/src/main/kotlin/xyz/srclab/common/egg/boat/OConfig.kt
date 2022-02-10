@@ -13,8 +13,9 @@ open class OConfig : Serializable {
     var unitX: Double = 5.0
     var unitY: Double = 5.0
 
+    var weaponManager: String = OWeaponManager::class.java.name
+
     companion object {
         private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
-        val EMPTY = OConfig()
     }
 }

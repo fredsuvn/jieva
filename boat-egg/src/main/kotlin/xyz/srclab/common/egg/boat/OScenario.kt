@@ -1,6 +1,15 @@
 package xyz.srclab.common.egg.boat
 
-open class OScenario {
+import xyz.srclab.common.reflect.classForName
+import xyz.srclab.common.reflect.newInst
+
+open class OScenario(private val config: OConfig) {
+
+    private val weaponManager: OWeaponManager
+
+    init {
+        weaponManager = config.weaponManager.classForName<OWeaponManager>().newInst()
+    }
 
     fun init(data: OData) {
 
@@ -20,7 +29,7 @@ open class OScenario {
         }
     }
 
-    fun onClearUnit(unit: OUnit, tick: Long) {
+    fun onClean(unit: OUnit, tick: Long) {
 
     }
 
