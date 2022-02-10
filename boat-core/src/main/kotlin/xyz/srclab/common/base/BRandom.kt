@@ -54,7 +54,7 @@ fun CharSequence.randomString(size: Int, random: Random = defaultRandom): String
         result[i] = this[random.between(0, this.length)]
         i++
     }
-    return result.string()
+    return String(result)
 }
 
 /**

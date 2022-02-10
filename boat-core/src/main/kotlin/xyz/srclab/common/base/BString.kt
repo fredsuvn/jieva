@@ -273,59 +273,55 @@ fun CharSequence.lines(): List<String> {
 }
 
 @JvmOverloads
-fun CharSequence.byteArray(charset: Charset = DEFAULT_CHARSET): ByteArray {
+fun CharSequence.getBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
     return this.toString().toByteArray(charset)
 }
 
 @JvmOverloads
-fun CharArray.byteArray(charset: Charset = DEFAULT_CHARSET): ByteArray {
-    return String(this).toByteArray(charset)
+fun CharArray.getBytes(
+    offset: Int = 0,
+    length: Int = remainingLength(this.size, offset),
+    charset: Charset = DEFAULT_CHARSET
+): ByteArray {
+    return String(this, offset, length).toByteArray(charset)
+}
+
+fun CharArray.getBytes(charset: Charset): ByteArray {
+    return getBytes(0, this.size, charset)
 }
 
 @JvmOverloads
-fun ByteArray.string(
-    charset: Charset = DEFAULT_CHARSET,
+fun ByteArray.getString(
     offset: Int = 0,
-    length: Int = remainingLength(this.size, offset)
+    length: Int = remainingLength(this.size, offset),
+    charset: Charset = DEFAULT_CHARSET
 ): String {
     return String(this, offset, length, charset)
 }
 
-@JvmOverloads
-fun ByteArray.string(
-    offset: Int,
-    length: Int = remainingLength(this.size, offset)
-): String {
-    return string(DEFAULT_CHARSET, offset, length)
+fun ByteArray.getString(charset: Charset): String {
+    return String(this, charset)
 }
 
 @JvmOverloads
-fun ByteArray.charArray(
-    charset: Charset = DEFAULT_CHARSET,
+fun ByteArray.getChars(
     offset: Int = 0,
-    length: Int = remainingLength(this.size, offset)
+    length: Int = remainingLength(this.size, offset),
+    charset: Charset = DEFAULT_CHARSET
 ): CharArray {
-    return String(this, offset, length, charset).toCharArray()
+    return getString(offset, length, charset).toCharArray()
 }
 
-@JvmOverloads
-fun ByteArray.charArray(
-    offset: Int,
-    length: Int = remainingLength(this.size, offset)
-): CharArray {
-    return charArray(DEFAULT_CHARSET, offset, length)
+fun ByteArray.getChars(charset: Charset): CharArray {
+    return getString(charset).toCharArray()
 }
 
-fun CharSequence.charArray(): CharArray {
+fun CharSequence.getChars(): CharArray {
     val array = CharArray(this.length)
     for (c in this.withIndex()) {
         array[c.index] = c.value
     }
     return array
-}
-
-fun CharArray.string(): String {
-    return String(this)
 }
 
 fun CharSequence.addIfNotStartWith(prefix: CharSequence): String {

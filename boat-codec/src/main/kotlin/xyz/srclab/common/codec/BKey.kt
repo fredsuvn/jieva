@@ -3,8 +3,8 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.DEFAULT_CHARSET
-import xyz.srclab.common.base.byteArray
 import xyz.srclab.common.base.deBase64
+import xyz.srclab.common.base.getBytes
 import xyz.srclab.common.base.to8BitBytes
 import xyz.srclab.common.cache.Cache
 import java.nio.charset.Charset
@@ -28,7 +28,7 @@ fun CharSequence.base64PassphraseToKey(
 fun CharSequence.passphraseToKey(
     algorithm: CharSequence, size: Int, charset: Charset = DEFAULT_CHARSET, provider: Provider? = null
 ): SecretKey {
-    return this.byteArray(charset).passphraseToKey(algorithm, size, provider)
+    return this.getBytes(charset).passphraseToKey(algorithm, size, provider)
 }
 
 @JvmOverloads

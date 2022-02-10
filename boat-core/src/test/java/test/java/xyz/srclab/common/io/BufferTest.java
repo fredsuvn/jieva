@@ -15,20 +15,26 @@ import java.util.Arrays;
 public class BufferTest {
 
     @Test
-    public void testReadBytes() {
+    public void testGetBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(100);
         initBuffer(buffer);
         byte[] bytes = BBuffer.getBytes(buffer);
         Assert.assertEquals(bytes, buffer.array());
+        buffer.flip();
+        Assert.assertEquals(BBuffer.getBytes(buffer, 11), Arrays.copyOfRange(buffer.array(), 0, 11));
 
         ByteBuffer buffer2 = ByteBuffer.allocateDirect(100);
         initBuffer(buffer2);
         byte[] bytes2 = BBuffer.getBytes(buffer2);
         Assert.assertEquals(bytes2, initArray(new byte[100]));
+        buffer2.flip();
+        Assert.assertEquals(BBuffer.getBytes(buffer2, 11), Arrays.copyOfRange(bytes2, 0, 11));
 
         byte[] bytes3 = initArray(new byte[100]);
         ByteBuffer buffer3 = ByteBuffer.wrap(bytes3, 10, 90);
         Assert.assertEquals(BBuffer.getBytes(buffer3), Arrays.copyOfRange(bytes3, 10, 100));
+        buffer3.flip();
+        Assert.assertEquals(BBuffer.getBytes(buffer3, 11), Arrays.copyOfRange(bytes3, 0, 11));
 
         byte[] bytes4 = initArray(new byte[100]);
         ByteBuffer buffer4 = ByteBuffer.wrap(bytes4);
@@ -39,43 +45,46 @@ public class BufferTest {
         byte[] bytes4f = BBuffer.getBytes(buffer4);
         Assert.assertNotSame(bytes4f, bytes4);
         Assert.assertEquals(bytes4f, bytes4);
+
+        buffer.flip();
+        Assert.expectThrows(IndexOutOfBoundsException.class, () -> BBuffer.getBuffer(buffer, 101, true));
     }
 
     @Test
-    public void testReadString() {
+    public void testGetString() {
         byte[] bytes1 = BRandom.randomString(100).getBytes(BDefault.DEFAULT_CHARSET);
         ByteBuffer buffer1 = ByteBuffer.wrap(bytes1, 10, 90);
         Assert.assertEquals(
-            BBuffer.getString(buffer1),
-            new String(Arrays.copyOfRange(bytes1, 10, 100), BDefault.DEFAULT_CHARSET)
+            BBuffer.getString(buffer1, 80),
+            new String(Arrays.copyOfRange(bytes1, 10, 90), BDefault.DEFAULT_CHARSET)
         );
         ByteBuffer buffer2 = ByteBuffer.allocateDirect(99999);
-        buffer2.put(bytes1, 10, 90);
+        buffer2.put(bytes1, 10, 80);
         buffer2.flip();
         Assert.assertEquals(
             BBuffer.getString(buffer2),
-            new String(Arrays.copyOfRange(bytes1, 10, 100), BDefault.DEFAULT_CHARSET)
+            new String(Arrays.copyOfRange(bytes1, 10, 90), BDefault.DEFAULT_CHARSET)
         );
+        buffer1.flip();
+        Assert.expectThrows(IndexOutOfBoundsException.class, () -> BBuffer.getBuffer(buffer1, 101, true));
     }
 
     @Test
     public void testGetBuffer() {
         byte[] bytes = initArray(new byte[100]);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        ByteBuffer getBuffer = BBuffer.getBuffer(buffer, 50);
+        ByteBuffer get1 = BBuffer.getBuffer(buffer, 50);
         Assert.assertEquals(
-            getBuffer.array(),
+            get1.array(),
             Arrays.copyOfRange(bytes, 0, 50)
         );
-    }
-
-    @Test
-    public void testToBuffer() {
-        byte[] bytes = initArray(new byte[100]);
-        ByteBuffer buffer = BBuffer.toBuffer(bytes, true);
-        Assert.assertEquals(BBuffer.getBytes(buffer), bytes);
-        ByteBuffer buffer2 = BBuffer.toBuffer(bytes);
-        Assert.assertEquals(BBuffer.getBytes(buffer2), bytes);
+        ByteBuffer get2 = BBuffer.getBuffer(buffer, 50, true);
+        Assert.assertEquals(
+            BBuffer.getBytes(get2),
+            Arrays.copyOfRange(bytes, 50, 100)
+        );
+        buffer.flip();
+        Assert.expectThrows(IndexOutOfBoundsException.class, () -> BBuffer.getBuffer(buffer, 101, true));
     }
 
     private void initBuffer(ByteBuffer buffer) {

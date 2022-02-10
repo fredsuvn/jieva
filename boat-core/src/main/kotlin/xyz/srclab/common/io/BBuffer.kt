@@ -3,72 +3,61 @@
 package xyz.srclab.common.io
 
 import xyz.srclab.common.base.DEFAULT_CHARSET
-import xyz.srclab.common.base.remainingLength
-import xyz.srclab.common.base.string
+import xyz.srclab.common.base.checkLengthInRange
+import xyz.srclab.common.base.getString
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-/**
- * Reads all bytes of given [ByteBuffer].
- *
- * If [useInternalArray] is true, and the [ByteBuffer] wraps an array, and
- *
- * ```
- * buffer.arrayOffset() == 0 && buffer.position() == 0 && buffer.limit() == array.size
- * ```
- *
- * then `buffer.array()` will be returned.
- */
 @JvmOverloads
-fun ByteBuffer.getBytes(useInternalArray: Boolean = false): ByteArray {
-    if (useInternalArray && this.hasArray()) {
-        val array = this.array()
-        if (this.arrayOffset() == 0 && this.position() == 0 && this.limit() == array.size) {
-            this.position(this.limit())
-            return array
-        }
+fun ByteBuffer.getBytes(length: Int = this.remaining(), useWrappedArray: Boolean = false): ByteArray {
+    length.checkLengthInRange(0, this.remaining())
+    if (
+        useWrappedArray
+        && this.hasArray()
+        && length == this.remaining()
+        && this.arrayOffset() == 0
+        && this.position() == 0
+        && this.remaining() == this.array().size
+    ) {
+        this.position(this.remaining())
+        return this.array()
     }
-    val array = ByteArray(this.remaining())
+    val array = ByteArray(length)
     this.get(array)
     return array
 }
 
+fun ByteBuffer.getBytes(useWrappedArray: Boolean): ByteArray {
+    return getBytes(this.remaining(), useWrappedArray)
+}
+
 @JvmOverloads
-fun ByteBuffer.getString(charset: Charset = DEFAULT_CHARSET): String {
+fun ByteBuffer.getString(length: Int = this.remaining(), charset: Charset = DEFAULT_CHARSET): String {
+    length.checkLengthInRange(0, this.remaining())
     if (this.hasArray()) {
         val array = this.array()
         val arrayOffset = this.arrayOffset() + this.position()
-        val result = array.string(charset, arrayOffset, remainingLength(this.limit(), arrayOffset))
-        this.position(this.limit())
+        val result = array.getString(arrayOffset, length, charset)
+        this.position(this.position() + length)
         return result
     }
-    return getBytes().string(charset)
+    return getBytes().getString(charset)
 }
 
-fun ByteBuffer.getBuffer(length: Int): ByteBuffer {
-    val array = ByteArray(length)
-    this.get(array)
-    return ByteBuffer.wrap(array)
-}
-
-/**
- * Return a [ByteBuffer] with full data come from [this] array, of which position is `0`, limit is size of array.
- */
-fun ByteArray.toBuffer(direct: Boolean): ByteBuffer {
-    return toBuffer(0, this.size, direct)
-}
-
-/**
- * Return a [ByteBuffer] with full data come from [this] array, of which position is `0`, limit is [length].
- */
 @JvmOverloads
-fun ByteArray.toBuffer(
-    offset: Int = 0,
-    length: Int = remainingLength(this.size, offset),
-    direct: Boolean = false
-): ByteBuffer {
-    val buffer = if (direct) ByteBuffer.allocateDirect(length) else ByteBuffer.allocate(length)
-    buffer.put(this, offset, length)
-    buffer.flip()
-    return buffer
+fun ByteBuffer.getBuffer(length: Int, direct: Boolean = false): ByteBuffer {
+    length.checkLengthInRange(0, this.remaining())
+    return if (!direct) {
+        val array = ByteArray(length)
+        this.get(array)
+        ByteBuffer.wrap(array)
+    } else {
+        val result = ByteBuffer.allocateDirect(length)
+        val oldLimit = this.limit()
+        this.limit(this.position() + length)
+        result.put(this)
+        this.limit(oldLimit)
+        result.flip()
+        result
+    }
 }
