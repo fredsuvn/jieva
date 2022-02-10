@@ -6,7 +6,7 @@ import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.codec.PreparedVerify.Companion.toSync
 import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
-import xyz.srclab.common.io.toBytes
+import xyz.srclab.common.io.readBytes
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -127,7 +127,7 @@ interface SignCodec : Codec {
                 signature.update(array, arrayOffset, data.remaining())
                 data.position(data.limit())
             } else {
-                signature.update(data.toBytes())
+                signature.update(data.readBytes())
             }
             val d = signature.sign()
             dest.write(d)

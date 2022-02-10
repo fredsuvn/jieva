@@ -6,7 +6,7 @@ import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.codec.CipherCodec
 import xyz.srclab.common.codec.CodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec
-import xyz.srclab.common.io.toBytes
+import xyz.srclab.common.io.readBytes
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.ByteBuffer
@@ -58,7 +58,7 @@ open class SM2Codec @JvmOverloads constructor(
             data.position(data.limit())
             return encrypt(key, array, arrayOffset, length)
         }
-        return encrypt(key, data.toBytes())
+        return encrypt(key, data.readBytes())
     }
 
     override fun encrypt(key: Key, data: InputStream): PreparedCodec {
@@ -77,7 +77,7 @@ open class SM2Codec @JvmOverloads constructor(
             data.position(data.limit())
             return decrypt(key, array, arrayOffset, length)
         }
-        return decrypt(key, data.toBytes())
+        return decrypt(key, data.readBytes())
     }
 
     override fun decrypt(key: Key, data: InputStream): PreparedCodec {

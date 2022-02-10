@@ -283,13 +283,37 @@ fun CharArray.byteArray(charset: Charset = DEFAULT_CHARSET): ByteArray {
 }
 
 @JvmOverloads
-fun ByteArray.string(charset: Charset = DEFAULT_CHARSET): String {
-    return String(this, charset)
+fun ByteArray.string(
+    charset: Charset = DEFAULT_CHARSET,
+    offset: Int = 0,
+    length: Int = remainingLength(this.size, offset)
+): String {
+    return String(this, offset, length, charset)
 }
 
 @JvmOverloads
-fun ByteArray.charArray(charset: Charset = DEFAULT_CHARSET): CharArray {
-    return String(this, charset).toCharArray()
+fun ByteArray.string(
+    offset: Int,
+    length: Int = remainingLength(this.size, offset)
+): String {
+    return string(DEFAULT_CHARSET, offset, length)
+}
+
+@JvmOverloads
+fun ByteArray.charArray(
+    charset: Charset = DEFAULT_CHARSET,
+    offset: Int = 0,
+    length: Int = remainingLength(this.size, offset)
+): CharArray {
+    return String(this, offset, length, charset).toCharArray()
+}
+
+@JvmOverloads
+fun ByteArray.charArray(
+    offset: Int,
+    length: Int = remainingLength(this.size, offset)
+): CharArray {
+    return charArray(DEFAULT_CHARSET, offset, length)
 }
 
 fun CharSequence.charArray(): CharArray {

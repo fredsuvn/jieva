@@ -2,13 +2,16 @@
 
 package xyz.srclab.common.io
 
+import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.base.string
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 /**
  * Reads all bytes of given [ByteBuffer].
  *
- * If [tryInternalArray] is true, and the [ByteBuffer] wraps an array, and
+ * If [useInternalArray] is true, and the [ByteBuffer] wraps an array, and
  *
  * ```
  * buffer.arrayOffset() == 0 && buffer.position() == 0 && buffer.limit() == array.size
@@ -17,8 +20,8 @@ import java.nio.ByteBuffer
  * then `buffer.array()` will be returned.
  */
 @JvmOverloads
-fun ByteBuffer.toBytes(tryInternalArray: Boolean = false): ByteArray {
-    if (tryInternalArray && this.hasArray()) {
+fun ByteBuffer.readBytes(useInternalArray: Boolean = false): ByteArray {
+    if (useInternalArray && this.hasArray()) {
         val array = this.array()
         if (this.arrayOffset() == 0 && this.position() == 0 && this.limit() == array.size) {
             this.position(this.limit())
@@ -30,7 +33,19 @@ fun ByteBuffer.toBytes(tryInternalArray: Boolean = false): ByteArray {
     return array
 }
 
-fun ByteBuffer.getBuffer(length: Int): ByteBuffer {
+@JvmOverloads
+fun ByteBuffer.readString(charset: Charset = DEFAULT_CHARSET): String {
+    if (this.hasArray()) {
+        val array = this.array()
+        val arrayOffset = this.arrayOffset() + this.position()
+        val result = array.string(charset, arrayOffset, remainingLength(this.limit(), arrayOffset))
+        this.position(this.limit())
+        return result
+    }
+    return readBytes().string(charset)
+}
+
+fun ByteBuffer.readBuffer(length: Int): ByteBuffer {
     val array = ByteArray(length)
     this.get(array)
     return ByteBuffer.wrap(array)

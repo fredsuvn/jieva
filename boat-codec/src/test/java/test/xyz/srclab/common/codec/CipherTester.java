@@ -31,7 +31,7 @@ public class CipherTester {
         dataBuffer.position(0);
         digestCodec.digest(dataBuffer).doFinal(destBuffer);
         destBuffer.flip();
-        Assert.assertEquals(BBuffer.toBytes(destBuffer), d2);
+        Assert.assertEquals(BBuffer.readBytes(destBuffer), d2);
         dataBuffer.position(0);
         BytesAppender appender = new BytesAppender();
         digestCodec.digest(dataBuffer).doFinal(appender);
@@ -52,7 +52,7 @@ public class CipherTester {
         dataBuffer.position(0);
         hmacCodec.hmac(key, dataBuffer).doFinal(destBuffer);
         destBuffer.flip();
-        Assert.assertEquals(BBuffer.toBytes(destBuffer), d2);
+        Assert.assertEquals(BBuffer.readBytes(destBuffer), d2);
         dataBuffer.position(0);
         BytesAppender appender = new BytesAppender();
         hmacCodec.hmac(key, dataBuffer).doFinal(appender);
@@ -112,10 +112,10 @@ public class CipherTester {
         int enLength3 = cipherCodec.encrypt(publicKey, data, offset, length).doFinal(dest3);
         ByteBuffer de3 = ByteBuffer.allocate(dest3.capacity());
         dest3.flip();
-        int deLength3 = cipherCodec.decrypt(privateKey, BBuffer.toBytes(BBuffer.getBuffer(dest3, enLength3))).doFinal(de3);
+        int deLength3 = cipherCodec.decrypt(privateKey, BBuffer.readBytes(BBuffer.readBuffer(dest3, enLength3))).doFinal(de3);
         de3.flip();
         Assert.assertEquals(
-            BBuffer.toBytes(BBuffer.getBuffer(de3, deLength3)),
+            BBuffer.readBytes(BBuffer.readBuffer(de3, deLength3)),
             Arrays.copyOfRange(data, offset, offset + length)
         );
 
@@ -151,10 +151,10 @@ public class CipherTester {
         dataBuffer.flip();
         ByteBuffer de7 = ByteBuffer.allocate(dest7.capacity());
         dest7.flip();
-        int deLength7 = cipherCodec.decrypt(privateKey, BBuffer.toBytes(BBuffer.getBuffer(dest7, enLength7))).doFinal(de7);
+        int deLength7 = cipherCodec.decrypt(privateKey, BBuffer.readBytes(BBuffer.readBuffer(dest7, enLength7))).doFinal(de7);
         de7.flip();
         Assert.assertEquals(
-            BBuffer.toBytes(BBuffer.getBuffer(de7, deLength7)),
+            BBuffer.readBytes(BBuffer.readBuffer(de7, deLength7)),
             Arrays.copyOfRange(data, offset, offset + length)
         );
 
@@ -191,10 +191,10 @@ public class CipherTester {
         dataStream.reset();
         ByteBuffer deC = ByteBuffer.allocate(destC.capacity());
         destC.flip();
-        int deLengthC = cipherCodec.decrypt(privateKey, BBuffer.toBytes(BBuffer.getBuffer(destC, enLengthC))).doFinal(deC);
+        int deLengthC = cipherCodec.decrypt(privateKey, BBuffer.readBytes(BBuffer.readBuffer(destC, enLengthC))).doFinal(deC);
         deC.flip();
         Assert.assertEquals(
-            BBuffer.toBytes(BBuffer.getBuffer(deC, deLengthC)),
+            BBuffer.readBytes(BBuffer.readBuffer(deC, deLengthC)),
             Arrays.copyOfRange(data, offset, offset + length)
         );
 

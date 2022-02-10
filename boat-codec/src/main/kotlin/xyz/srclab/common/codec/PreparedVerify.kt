@@ -1,7 +1,7 @@
 package xyz.srclab.common.codec
 
 import xyz.srclab.common.base.remainingLength
-import xyz.srclab.common.io.toBytes
+import xyz.srclab.common.io.readBytes
 import java.io.InputStream
 import java.nio.ByteBuffer
 
@@ -28,7 +28,7 @@ interface PreparedVerify {
             sign.position(sign.limit())
             return verify(array, arrayOffset, sign.remaining())
         }
-        return verify(sign.toBytes())
+        return verify(sign.readBytes())
     }
 
     fun verify(sign: InputStream): Boolean {
