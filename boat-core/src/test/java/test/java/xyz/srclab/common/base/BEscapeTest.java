@@ -3,32 +3,48 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BEscape;
+import xyz.srclab.common.io.BIO;
+import xyz.srclab.common.io.BytesAppender;
 
 public class BEscapeTest {
 
     @Test
     public void testEscape() {
-        String text = "{\"abc\":\"xyz\"}";
-        String eText = BEscape.escape(text, '\\', "\"");
-        Assert.assertEquals(eText, "{\\\"abc\\\":\\\"xyz\\\"}");
-
-        text = "{\"ss\": \"sss\\n\"}";
-        eText = BEscape.escape(text, '\\', "\"{}");
-        Assert.assertEquals(eText, "\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}");
+        doTestEscape('\\', "\"", "{\"abc\":\"xyz\"}", "{\\\"abc\\\":\\\"xyz\\\"}");
+        doTestEscape('\\', "\"{}", "{\"ss\": \"sss\\n\"}", "\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}");
     }
 
     @Test
     public void testUnescape() {
-        String text = "{\\\"abc\\\":\\\"xyz\\\"}";
-        String uText = BEscape.unescape(text, '\\', "\"");
-        Assert.assertEquals(uText, "{\"abc\":\"xyz\"}");
+        doTestUnescape('\\', "\"", "{\\\"abc\\\":\\\"xyz\\\"}", "{\"abc\":\"xyz\"}");
+        doTestUnescape('\\', "\"", "{\\\"abc\\\":\\\"x\\yz\\\"}\\", "{\"abc\":\"x\\yz\"}\\");
+        doTestUnescape('\\', "\"{}", "\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}", "{\"ss\": \"sss\\n\"}");
+        doTestUnescape('\\', "\"{}", "\\{\\\"ss\\\": \\\"s\\css\\\\n\\\"\\}", "{\"ss\": \"s\\css\\n\"}");
+    }
 
-        text = "{\\\"abc\\\":\\\"x\\yz\\\"}\\";
-        uText = BEscape.unescape(text, '\\', "\"");
-        Assert.assertEquals(uText, "{\"abc\":\"x\\yz\"}\\");
+    private void doTestEscape(char escape, String escapedChars, String input, String expected) {
+        String encoded = BEscape.escape(input, escape, escapedChars);
+        Assert.assertEquals(encoded, expected);
 
-        text = "\\{\\\"ss\\\": \\\"sss\\\\n\\\"\\}";
-        uText = BEscape.unescape(text, '\\', "\"{}");
-        Assert.assertEquals(uText, "{\"ss\": \"sss\\n\"}");
+        BytesAppender bytesDest = new BytesAppender();
+        BEscape.escape(BIO.asInputStream(input.getBytes()), (byte) escape, escapedChars.getBytes(), bytesDest);
+        Assert.assertEquals(new String(bytesDest.toBytes()), expected);
+
+        StringBuilder charsDest = new StringBuilder();
+        BEscape.escape(BIO.asReader(input), escape, escapedChars, charsDest);
+        Assert.assertEquals(charsDest.toString(), expected);
+    }
+
+    private void doTestUnescape(char escape, String escapedChars, String input, String expected) {
+        String encoded = BEscape.unescape(input, escape, escapedChars);
+        Assert.assertEquals(encoded, expected);
+
+        BytesAppender bytesDest = new BytesAppender();
+        BEscape.unescape(BIO.asInputStream(input.getBytes()), (byte) escape, escapedChars.getBytes(), bytesDest);
+        Assert.assertEquals(new String(bytesDest.toBytes()), expected);
+
+        StringBuilder charsDest = new StringBuilder();
+        BEscape.unescape(BIO.asReader(input), escape, escapedChars, charsDest);
+        Assert.assertEquals(charsDest.toString(), expected);
     }
 }
