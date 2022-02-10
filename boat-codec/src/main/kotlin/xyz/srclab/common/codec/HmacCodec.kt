@@ -4,6 +4,7 @@ import xyz.srclab.common.base.ThreadSafePolicy
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
+import xyz.srclab.common.io.getBytes
 import xyz.srclab.common.io.readBytes
 import java.io.InputStream
 import java.io.OutputStream
@@ -112,7 +113,7 @@ interface HmacCodec : Codec {
                 hmac.update(array, arrayOffset, data.remaining())
                 data.position(data.limit())
             } else {
-                hmac.update(data.readBytes())
+                hmac.update(data.getBytes())
             }
             val d = hmac.doFinal()
             dest.write(d)

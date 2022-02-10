@@ -18,25 +18,25 @@ public class BufferTest {
     public void testReadBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(100);
         initBuffer(buffer);
-        byte[] bytes = BBuffer.readBytes(buffer);
+        byte[] bytes = BBuffer.getBytes(buffer);
         Assert.assertEquals(bytes, buffer.array());
 
         ByteBuffer buffer2 = ByteBuffer.allocateDirect(100);
         initBuffer(buffer2);
-        byte[] bytes2 = BBuffer.readBytes(buffer2);
+        byte[] bytes2 = BBuffer.getBytes(buffer2);
         Assert.assertEquals(bytes2, initArray(new byte[100]));
 
         byte[] bytes3 = initArray(new byte[100]);
         ByteBuffer buffer3 = ByteBuffer.wrap(bytes3, 10, 90);
-        Assert.assertEquals(BBuffer.readBytes(buffer3), Arrays.copyOfRange(bytes3, 10, 100));
+        Assert.assertEquals(BBuffer.getBytes(buffer3), Arrays.copyOfRange(bytes3, 10, 100));
 
         byte[] bytes4 = initArray(new byte[100]);
         ByteBuffer buffer4 = ByteBuffer.wrap(bytes4);
-        byte[] bytes4t = BBuffer.readBytes(buffer4, true);
+        byte[] bytes4t = BBuffer.getBytes(buffer4, true);
         Assert.assertSame(bytes4t, bytes4);
         Assert.assertEquals(bytes4t, bytes4);
         buffer4.flip();
-        byte[] bytes4f = BBuffer.readBytes(buffer4);
+        byte[] bytes4f = BBuffer.getBytes(buffer4);
         Assert.assertNotSame(bytes4f, bytes4);
         Assert.assertEquals(bytes4f, bytes4);
     }
@@ -46,14 +46,14 @@ public class BufferTest {
         byte[] bytes1 = BRandom.randomString(100).getBytes(BDefault.DEFAULT_CHARSET);
         ByteBuffer buffer1 = ByteBuffer.wrap(bytes1, 10, 90);
         Assert.assertEquals(
-            BBuffer.readString(buffer1),
+            BBuffer.getString(buffer1),
             new String(Arrays.copyOfRange(bytes1, 10, 100), BDefault.DEFAULT_CHARSET)
         );
         ByteBuffer buffer2 = ByteBuffer.allocateDirect(99999);
         buffer2.put(bytes1, 10, 90);
         buffer2.flip();
         Assert.assertEquals(
-            BBuffer.readString(buffer2),
+            BBuffer.getString(buffer2),
             new String(Arrays.copyOfRange(bytes1, 10, 100), BDefault.DEFAULT_CHARSET)
         );
     }
@@ -62,7 +62,7 @@ public class BufferTest {
     public void testGetBuffer() {
         byte[] bytes = initArray(new byte[100]);
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        ByteBuffer getBuffer = BBuffer.readBuffer(buffer, 50);
+        ByteBuffer getBuffer = BBuffer.getBuffer(buffer, 50);
         Assert.assertEquals(
             getBuffer.array(),
             Arrays.copyOfRange(bytes, 0, 50)
@@ -73,9 +73,9 @@ public class BufferTest {
     public void testToBuffer() {
         byte[] bytes = initArray(new byte[100]);
         ByteBuffer buffer = BBuffer.toBuffer(bytes, true);
-        Assert.assertEquals(BBuffer.readBytes(buffer), bytes);
+        Assert.assertEquals(BBuffer.getBytes(buffer), bytes);
         ByteBuffer buffer2 = BBuffer.toBuffer(bytes);
-        Assert.assertEquals(BBuffer.readBytes(buffer2), bytes);
+        Assert.assertEquals(BBuffer.getBytes(buffer2), bytes);
     }
 
     private void initBuffer(ByteBuffer buffer) {

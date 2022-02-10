@@ -20,7 +20,7 @@ import java.nio.charset.Charset
  * then `buffer.array()` will be returned.
  */
 @JvmOverloads
-fun ByteBuffer.readBytes(useInternalArray: Boolean = false): ByteArray {
+fun ByteBuffer.getBytes(useInternalArray: Boolean = false): ByteArray {
     if (useInternalArray && this.hasArray()) {
         val array = this.array()
         if (this.arrayOffset() == 0 && this.position() == 0 && this.limit() == array.size) {
@@ -34,7 +34,7 @@ fun ByteBuffer.readBytes(useInternalArray: Boolean = false): ByteArray {
 }
 
 @JvmOverloads
-fun ByteBuffer.readString(charset: Charset = DEFAULT_CHARSET): String {
+fun ByteBuffer.getString(charset: Charset = DEFAULT_CHARSET): String {
     if (this.hasArray()) {
         val array = this.array()
         val arrayOffset = this.arrayOffset() + this.position()
@@ -42,10 +42,10 @@ fun ByteBuffer.readString(charset: Charset = DEFAULT_CHARSET): String {
         this.position(this.limit())
         return result
     }
-    return readBytes().string(charset)
+    return getBytes().string(charset)
 }
 
-fun ByteBuffer.readBuffer(length: Int): ByteBuffer {
+fun ByteBuffer.getBuffer(length: Int): ByteBuffer {
     val array = ByteArray(length)
     this.get(array)
     return ByteBuffer.wrap(array)

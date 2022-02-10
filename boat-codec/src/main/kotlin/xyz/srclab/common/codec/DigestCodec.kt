@@ -5,6 +5,7 @@ import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.codec.CodecAlgorithm.Companion.toCodecAlgorithm
 import xyz.srclab.common.codec.PreparedCodec.Companion.toSync
 import xyz.srclab.common.codec.bc.DEFAULT_BCPROV_PROVIDER
+import xyz.srclab.common.io.getBytes
 import xyz.srclab.common.io.readBytes
 import java.io.InputStream
 import java.io.OutputStream
@@ -102,7 +103,7 @@ interface DigestCodec : Codec {
                 digest.update(array, arrayOffset, data.remaining())
                 data.position(data.limit())
             } else {
-                digest.update(data.readBytes())
+                digest.update(data.getBytes())
             }
             val d = digest.digest()
             dest.write(d)
