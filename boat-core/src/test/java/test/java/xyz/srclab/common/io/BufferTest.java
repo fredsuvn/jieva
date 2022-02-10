@@ -32,19 +32,23 @@ public class BufferTest {
 
         byte[] bytes3 = initArray(new byte[100]);
         ByteBuffer buffer3 = ByteBuffer.wrap(bytes3, 10, 90);
+        ByteBuffer buffer33 = BBuffer.getBuffer(bytes3, 10, 90);
         Assert.assertEquals(BBuffer.getBytes(buffer3), Arrays.copyOfRange(bytes3, 10, 100));
+        Assert.assertEquals(BBuffer.getBytes(buffer33), Arrays.copyOfRange(bytes3, 10, 100));
         buffer3.flip();
         Assert.assertEquals(BBuffer.getBytes(buffer3, 11), Arrays.copyOfRange(bytes3, 0, 11));
+        buffer33.flip();
+        Assert.assertEquals(BBuffer.getBytes(buffer33, 11), Arrays.copyOfRange(bytes3, 10, 10 + 11));
 
         byte[] bytes4 = initArray(new byte[100]);
         ByteBuffer buffer4 = ByteBuffer.wrap(bytes4);
-        byte[] bytes4t = BBuffer.getBytes(buffer4, true);
-        Assert.assertSame(bytes4t, bytes4);
-        Assert.assertEquals(bytes4t, bytes4);
+        byte[] bytes4w = BBuffer.getBytes(buffer4, true);
+        Assert.assertSame(bytes4w, bytes4);
+        Assert.assertEquals(bytes4w, bytes4);
         buffer4.flip();
-        byte[] bytes4f = BBuffer.getBytes(buffer4);
-        Assert.assertNotSame(bytes4f, bytes4);
-        Assert.assertEquals(bytes4f, bytes4);
+        byte[] bytes4b = BBuffer.getBytes(buffer4);
+        Assert.assertNotSame(bytes4b, bytes4);
+        Assert.assertEquals(bytes4b, bytes4);
 
         buffer.flip();
         Assert.expectThrows(IndexOutOfBoundsException.class, () -> BBuffer.getBuffer(buffer, 101, true));

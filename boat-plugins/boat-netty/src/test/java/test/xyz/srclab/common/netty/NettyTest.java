@@ -1,6 +1,7 @@
 package test.xyz.srclab.common.netty;
 
 import com.google.common.net.HttpHeaders;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -15,7 +16,10 @@ import xyz.srclab.common.net.http.BHttp;
 import xyz.srclab.common.net.http.HttpConnect;
 import xyz.srclab.common.net.http.HttpReq;
 import xyz.srclab.common.net.http.HttpResp;
+import xyz.srclab.common.netty.BNetty;
+import xyz.srclab.common.netty.SimpleNettyClient;
 import xyz.srclab.common.netty.SimpleNettyServer;
+import xyz.srclab.common.run.RunLatch;
 
 import java.nio.charset.StandardCharsets;
 
@@ -25,8 +29,13 @@ public class NettyTest {
     private static final String TEST_RESP_BODY = "TEST_RESP_BODY";
     private static final String TEST_REQ_BODY = "TEST_REQ_BODY";
 
+    private static final String SIMPLE_CLIENT_MESSAGE = "Hello, Server!";
+    private static final String SIMPLE_SERVER_MESSAGE = "Hello, Client!";
+
+    private static final RunLatch runLatch = RunLatch.newRunLatch();
+
     @Test
-    public void testNettyServer() throws Exception {
+    public void testHttpServer() throws Exception {
         SimpleNettyServer testServer = new SimpleNettyServer(
             BList.newList(HttpResponseEncoder::new, HttpRequestDecoder::new, HttpServerHandler::new)
         );
@@ -63,6 +72,23 @@ public class NettyTest {
         Assert.assertEquals(body, TEST_RESP_BODY);
 
         testServer.close();
+    }
+
+    @Test
+    public void testSimple() {
+        SimpleNettyServer simpleNettyServer = new SimpleNettyServer(
+            BList.newList(SimpleServerHandler::new)
+        );
+        simpleNettyServer.start();
+        SimpleNettyClient simpleNettyClient = new SimpleNettyClient(
+            "localhost:" + simpleNettyServer.getPort(),
+            BList.newList(SimpleClientHandler::new)
+        );
+        runLatch.close();
+        simpleNettyClient.start();
+        runLatch.await();
+        simpleNettyClient.close();
+        simpleNettyServer.close();
     }
 
     private static class HttpServerHandler extends ChannelInboundHandlerAdapter {
@@ -117,5 +143,39 @@ public class NettyTest {
             ctx.write(response);
             ctx.flush();
         }
+    }
+
+    private class SimpleClientHandler extends ChannelInboundHandlerAdapter {
+
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            BLog.info("Send simple client message");
+            ctx.writeAndFlush(Unpooled.wrappedBuffer(SIMPLE_CLIENT_MESSAGE.getBytes()));
+        }
+
+        @Override
+        public void channelRead(ChannelHandlerContext ctx, Object msg) {
+            String message = msgToString(msg);
+            BLog.info("Receive simple server message: {}", message);
+            Assert.assertEquals(message, SIMPLE_SERVER_MESSAGE);
+            runLatch.open();
+        }
+    }
+
+    private class SimpleServerHandler extends ChannelInboundHandlerAdapter {
+        @Override
+        public void channelRead(ChannelHandlerContext ctx, Object msg) {
+            String message = msgToString(msg);
+            BLog.info("Receive simple client message: {}", message);
+            Assert.assertEquals(message, SIMPLE_CLIENT_MESSAGE);
+            ctx.writeAndFlush(Unpooled.wrappedBuffer(SIMPLE_SERVER_MESSAGE.getBytes()));
+        }
+    }
+
+    private String msgToString(Object msg) {
+        if (msg instanceof ByteBuf) {
+            return BNetty.getString((ByteBuf) msg);
+        }
+        return String.valueOf(msg);
     }
 }

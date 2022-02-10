@@ -33,7 +33,6 @@ open class SimpleNettyServer(
             bootstrap.handler(channelHandler)
         }
         bootstrap.childHandler(object : ChannelInitializer<SocketChannel>() {
-
             override fun initChannel(ch: SocketChannel) {
                 val pipeline = ch.pipeline()
                 for (childChannelHandler in childChannelHandlers) {
