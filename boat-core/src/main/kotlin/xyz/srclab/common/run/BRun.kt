@@ -6,56 +6,56 @@ import xyz.srclab.common.base.availableProcessors
 import java.time.Duration
 import java.util.concurrent.*
 
-fun singleThreadRunner(): ExecutorServiceRunner {
-    return executorServiceRunner(Executors.newSingleThreadExecutor())
+fun newSingleThreadRunner(): ExecutorServiceRunner {
+    return newExecutorServiceRunner(Executors.newSingleThreadExecutor())
 }
 
-fun cachedThreadPoolRunner(): ExecutorServiceRunner {
-    return executorServiceRunner(Executors.newCachedThreadPool())
+fun newCachedThreadPoolRunner(): ExecutorServiceRunner {
+    return newExecutorServiceRunner(Executors.newCachedThreadPool())
 }
 
-fun fixedThreadPoolRunner(threadNumber: Int): ExecutorServiceRunner {
-    return executorServiceRunner(Executors.newFixedThreadPool(threadNumber))
+fun newFixedThreadPoolRunner(threadNumber: Int): ExecutorServiceRunner {
+    return newExecutorServiceRunner(Executors.newFixedThreadPool(threadNumber))
 }
 
 @JvmOverloads
-fun workStealingPool(parallelism: Int = availableProcessors()): ExecutorServiceRunner {
-    return executorServiceRunner(Executors.newWorkStealingPool(parallelism))
+fun newWorkStealingPool(parallelism: Int = availableProcessors()): ExecutorServiceRunner {
+    return newExecutorServiceRunner(Executors.newWorkStealingPool(parallelism))
 }
 
-fun executorServiceRunner(executorService: ExecutorService): ExecutorServiceRunner {
+fun newExecutorServiceRunner(executorService: ExecutorService): ExecutorServiceRunner {
     return ExecutorServiceRunner(executorService)
 }
 
-fun threadPoolRunner(threadPoolExecutor: ThreadPoolExecutor): ThreadPoolRunner {
+fun newThreadPoolRunner(threadPoolExecutor: ThreadPoolExecutor): ThreadPoolRunner {
     return ThreadPoolRunner(threadPoolExecutor)
 }
 
-fun threadPoolRunnerBuilder(): ThreadPoolRunner.Builder {
+fun newThreadPoolRunnerBuilder(): ThreadPoolRunner.Builder {
     return ThreadPoolRunner.Builder()
 }
 
-fun singleThreadScheduler(): ScheduledExecutorServiceScheduler {
-    return executorServiceScheduler(Executors.newSingleThreadScheduledExecutor())
+fun newSingleThreadScheduler(): ScheduledExecutorServiceScheduler {
+    return newExecutorServiceScheduler(Executors.newSingleThreadScheduledExecutor())
 }
 
-fun executorServiceScheduler(
+fun newExecutorServiceScheduler(
     scheduledExecutorService: ScheduledExecutorService
 ): ScheduledExecutorServiceScheduler {
     return ScheduledExecutorServiceScheduler(scheduledExecutorService)
 }
 
-fun threadPoolScheduler(corePoolSize: Int): ScheduledExecutorServiceScheduler {
-    return executorServiceScheduler(Executors.newScheduledThreadPool(corePoolSize))
+fun newThreadPoolScheduler(corePoolSize: Int): ScheduledExecutorServiceScheduler {
+    return newExecutorServiceScheduler(Executors.newScheduledThreadPool(corePoolSize))
 }
 
-fun threadPoolScheduler(
+fun newThreadPoolScheduler(
     scheduledThreadPoolExecutor: ScheduledThreadPoolExecutor
 ): ScheduledThreadPoolScheduler {
     return ScheduledThreadPoolScheduler(scheduledThreadPoolExecutor)
 }
 
-fun threadPoolSchedulerBuilder(): ScheduledThreadPoolScheduler.Builder {
+fun newThreadPoolSchedulerBuilder(): ScheduledThreadPoolScheduler.Builder {
     return ScheduledThreadPoolScheduler.Builder()
 }
 
