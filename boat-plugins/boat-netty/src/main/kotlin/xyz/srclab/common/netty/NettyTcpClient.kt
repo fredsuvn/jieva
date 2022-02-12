@@ -9,26 +9,29 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.net.socket.parseInetSocketAddress
+import xyz.srclab.common.net.tcp.TcpClient
 import java.net.InetSocketAddress
-import java.net.SocketAddress
+import java.nio.ByteBuffer
 import java.util.function.Supplier
 
 /**
- * Simple Netty Client.
+ * Simple Netty Client implementation for [TcpClient].
+ *
+ * Note netty implementation doesn't support `send` and `receive` methods, do these operation in channel handlers.
  */
-open class SimpleNettyClient @JvmOverloads constructor(
-    val remoteAddress: SocketAddress,
+open class NettyTcpClient @JvmOverloads constructor(
+    override val remoteAddress: InetSocketAddress,
     channelHandlers: List<Supplier<ChannelHandler>>,
     options: Map<ChannelOption<*>, Any?> = emptyMap()
-) {
+) : TcpClient {
 
     private val group = NioEventLoopGroup()
     private val bootstrap = Bootstrap()
 
-    private var _localPort: Int = -1
-
-    val localPort: Int
-        get() = _localPort
+    //private var _localPort: Int = -1
+    //
+    //val localPort: Int
+    //    get() = _localPort
 
     init {
         bootstrap.group(group).channel(NioSocketChannel::class.java)
@@ -50,28 +53,36 @@ open class SimpleNettyClient @JvmOverloads constructor(
 
     @JvmOverloads
     constructor(
-        host: CharSequence,
-        port: Int,
-        channelHandlers: List<Supplier<ChannelHandler>>,
-        options: Map<ChannelOption<*>, Any?> = emptyMap()
-    ) : this(InetSocketAddress(host.toString(), port), channelHandlers, options)
-
-    @JvmOverloads
-    constructor(
         address: CharSequence,
         channelHandlers: List<Supplier<ChannelHandler>>,
         options: Map<ChannelOption<*>, Any?> = emptyMap()
     ) : this(address.parseInetSocketAddress(), channelHandlers, options)
 
-    fun start() {
+    override fun connect() {
         bootstrap.connect()
     }
 
-    fun startSync() {
-        bootstrap.connect().channel().closeFuture().sync()
+    override fun disconnect(immediately: Boolean) {
+        group.shutdownGracefully()
     }
 
-    fun close() {
-        group.shutdownGracefully()
+    override fun send(data: ByteBuffer) {
+        throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
+    }
+
+    override fun receive(dest: ByteBuffer): Int {
+        throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
+    }
+
+    override fun receive(dest: ByteBuffer, readTimeoutMillis: Long): Int {
+        throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
+    }
+
+    override fun receiveBytes(): ByteArray {
+        throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
+    }
+
+    override fun receiveBytes(readTimeoutMillis: Long): ByteArray {
+        throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
     }
 }

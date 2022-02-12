@@ -4,11 +4,16 @@ package xyz.srclab.common.netty
 
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import io.netty.channel.ChannelHandler
+import io.netty.channel.ChannelOption
 import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.checkLengthInRange
 import xyz.srclab.common.base.getString
 import xyz.srclab.common.base.remainingLength
+import xyz.srclab.common.collect.newMap
+import java.net.InetSocketAddress
 import java.nio.charset.Charset
+import java.util.function.Supplier
 
 fun newByteBuf(capacity: Int, direct: Boolean): ByteBuf {
     return if (direct) Unpooled.directBuffer(capacity, capacity) else Unpooled.buffer(capacity, capacity)
@@ -81,4 +86,43 @@ fun ByteArray.getBuffer(
 
 fun ByteArray.getBuffer(direct: Boolean): ByteBuf {
     return getBuffer(0, size, direct)
+}
+
+@JvmOverloads
+fun newNettyServer(
+    port: Int,
+    childChannelHandlers: List<Supplier<ChannelHandler>>,
+    options: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_BACKLOG, 128),
+    childOptions: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_KEEPALIVE, true),
+    channelHandler: ChannelHandler? = null
+): NettyTcpServer {
+    return NettyTcpServer(port, childChannelHandlers, options, childOptions, channelHandler)
+}
+
+@JvmOverloads
+fun newNettyServer(
+    childChannelHandlers: List<Supplier<ChannelHandler>>,
+    options: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_BACKLOG, 128),
+    childOptions: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_KEEPALIVE, true),
+    channelHandler: ChannelHandler? = null
+): NettyTcpServer {
+    return NettyTcpServer(childChannelHandlers, options, childOptions, channelHandler)
+}
+
+@JvmOverloads
+fun newNettyClient(
+    remoteAddress: InetSocketAddress,
+    channelHandlers: List<Supplier<ChannelHandler>>,
+    options: Map<ChannelOption<*>, Any?> = emptyMap()
+): NettyTcpClient {
+    return NettyTcpClient(remoteAddress, channelHandlers, options)
+}
+
+@JvmOverloads
+fun newNettyClient(
+    remoteAddress: CharSequence,
+    channelHandlers: List<Supplier<ChannelHandler>>,
+    options: Map<ChannelOption<*>, Any?> = emptyMap()
+): NettyTcpClient {
+    return NettyTcpClient(remoteAddress, channelHandlers, options)
 }

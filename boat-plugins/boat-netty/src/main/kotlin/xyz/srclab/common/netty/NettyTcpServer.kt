@@ -1,6 +1,7 @@
 package xyz.srclab.common.netty
 
 import io.netty.bootstrap.ServerBootstrap
+import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandler
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelOption
@@ -8,24 +9,26 @@ import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.availableProcessors
 import xyz.srclab.common.collect.newMap
-import xyz.srclab.common.net.socket.availableSocketPort
+import xyz.srclab.common.net.tcp.TcpServer
 import java.util.function.Supplier
 
 /**
- * Simple Netty server.
+ * Simple Netty server implementation for [TcpServer].
  */
-open class SimpleNettyServer(
-    channelHandler: ChannelHandler?,
+open class NettyTcpServer @JvmOverloads constructor(
+    val port: Int,
     childChannelHandlers: List<Supplier<ChannelHandler>>,
-    options: Map<ChannelOption<*>, Any?>,
-    childOptions: Map<ChannelOption<*>, Any?>,
-    val port: Int
-) {
+    options: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_BACKLOG, 128),
+    childOptions: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_KEEPALIVE, true),
+    channelHandler: ChannelHandler? = null
+) : TcpServer {
 
     private val bossGroup = NioEventLoopGroup()
     private val workerGroup = NioEventLoopGroup()
     private val bootstrap = ServerBootstrap()
+    private var channelFuture: ChannelFuture? = null
 
     init {
         bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel::class.java)
@@ -52,34 +55,25 @@ open class SimpleNettyServer(
 
     @JvmOverloads
     constructor(
-        channelInboundHandlers: List<Supplier<ChannelHandler>>,
-        options: Map<ChannelOption<*>, Any?>,
-        childOptions: Map<ChannelOption<*>, Any?>,
-        port: Int = availableSocketPort()
-    ) : this(null, channelInboundHandlers, options, childOptions, port)
+        childChannelHandlers: List<Supplier<ChannelHandler>>,
+        options: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_BACKLOG, 128),
+        childOptions: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_KEEPALIVE, true),
+        channelHandler: ChannelHandler? = null
+    ) : this(availableProcessors(), childChannelHandlers, options, childOptions, channelHandler)
 
-    @JvmOverloads
-    constructor(
-        channelInboundHandlers: List<Supplier<ChannelHandler>>,
-        port: Int = availableSocketPort()
-    ) : this(
-        null,
-        channelInboundHandlers,
-        newMap(ChannelOption.SO_BACKLOG, 128),
-        newMap(ChannelOption.SO_KEEPALIVE, true),
-        port
-    )
-
-    fun start() {
-        bootstrap.bind(port).channel().closeFuture()
+    override fun start() {
+        channelFuture = bootstrap.bind(port).channel().closeFuture()
     }
 
-    fun startSync() {
-        bootstrap.bind(port).channel().closeFuture().sync()
-    }
-
-    fun close() {
+    override fun stop(immediately: Boolean) {
         workerGroup.shutdownGracefully()
         bossGroup.shutdownGracefully()
+    }
+
+    override fun await() {
+        val channelFuture = this.channelFuture
+        if (channelFuture !== null) {
+            channelFuture.sync()
+        }
     }
 }

@@ -17,8 +17,8 @@ import xyz.srclab.common.net.http.HttpConnect;
 import xyz.srclab.common.net.http.HttpReq;
 import xyz.srclab.common.net.http.HttpResp;
 import xyz.srclab.common.netty.BNetty;
-import xyz.srclab.common.netty.SimpleNettyClient;
-import xyz.srclab.common.netty.SimpleNettyServer;
+import xyz.srclab.common.netty.NettyTcpClient;
+import xyz.srclab.common.netty.NettyTcpServer;
 import xyz.srclab.common.run.RunLatch;
 
 import java.nio.charset.StandardCharsets;
@@ -36,7 +36,7 @@ public class NettyTest {
 
     @Test
     public void testHttpServer() throws Exception {
-        SimpleNettyServer testServer = new SimpleNettyServer(
+        NettyTcpServer testServer = BNetty.newNettyServer(
             BList.newList(HttpResponseEncoder::new, HttpRequestDecoder::new, HttpServerHandler::new)
         );
         int port = testServer.getPort();
@@ -71,24 +71,24 @@ public class NettyTest {
         BLog.info("resp: {}", body);
         Assert.assertEquals(body, TEST_RESP_BODY);
 
-        testServer.close();
+        testServer.stop();
     }
 
     @Test
     public void testSimple() {
-        SimpleNettyServer simpleNettyServer = new SimpleNettyServer(
+        NettyTcpServer nettyTcpServer = BNetty.newNettyServer(
             BList.newList(SimpleServerHandler::new)
         );
-        simpleNettyServer.start();
-        SimpleNettyClient simpleNettyClient = new SimpleNettyClient(
-            "localhost:" + simpleNettyServer.getPort(),
+        nettyTcpServer.start();
+        NettyTcpClient nettyTcpClient = BNetty.newNettyClient(
+            "localhost:" + nettyTcpServer.getPort(),
             BList.newList(SimpleClientHandler::new)
         );
         runLatch.close();
-        simpleNettyClient.start();
+        nettyTcpClient.connect();
         runLatch.await();
-        simpleNettyClient.close();
-        simpleNettyServer.close();
+        nettyTcpClient.disconnect();
+        nettyTcpServer.stop();
     }
 
     private static class HttpServerHandler extends ChannelInboundHandlerAdapter {
