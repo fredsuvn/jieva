@@ -88,42 +88,56 @@ public class TcpTest {
 
     @Test
     public void testOpenClose() {
+
+        int clientCount = 1000;
+        RunLatch latch = RunLatch.newRunLatch(clientCount * 4);
+
         InetSocketAddress address = BSocket.availableLocalhost();
         AtomicInteger openCount = new AtomicInteger(0);
         AtomicInteger closeCount = new AtomicInteger(0);
+        AtomicInteger receiveCount = new AtomicInteger(0);
         TcpServer tcpServer = TcpServer.simpleServer(
             address,
             new TcpChannelHandler() {
                 @Override
                 public void onOpen(@NotNull TcpContext context) {
                     openCount.incrementAndGet();
+                    latch.unlock();
                 }
 
                 @Override
                 public void onReceive(@NotNull TcpContext context, @NotNull ByteBuffer data) {
-
+                    receiveCount.incrementAndGet();
+                    latch.unlock();
                 }
 
                 @Override
                 public void onClose(@NotNull TcpContext context) {
                     closeCount.incrementAndGet();
+                    latch.unlock();
                 }
             }
         );
         tcpServer.start();
 
-
-        int clientCount = 1000;
-        RunLatch latch = RunLatch.newRunLatch();
-        latch.lock();
         Runner runner = AsyncRunner.INSTANCE;
         for (int i = 0; i < clientCount; i++) {
             runner.run(() -> {
                 TcpClient tcpClient = TcpClient.simpleClient(address);
                 tcpClient.connect();
+                tcpClient.send("123");
                 tcpClient.disconnect();
+                latch.unlock();
             });
         }
+        latch.await();
+        tcpServer.stop();
+        BLog.info("openCount: {}", openCount);
+        BLog.info("closeCount: {}", closeCount);
+        BLog.info("receiveCount: {}", receiveCount);
+        Assert.assertEquals(openCount.get(), clientCount);
+        Assert.assertEquals(closeCount.get(), clientCount);
+        Assert.assertEquals(receiveCount.get(), clientCount);
     }
 
     private static final class ServerHandler implements TcpChannelHandler {
