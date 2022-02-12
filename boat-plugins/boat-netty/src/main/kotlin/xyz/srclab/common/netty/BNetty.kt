@@ -10,6 +10,10 @@ import xyz.srclab.common.base.getString
 import xyz.srclab.common.base.remainingLength
 import java.nio.charset.Charset
 
+fun newByteBuf(capacity: Int, direct: Boolean): ByteBuf {
+    return if (direct) Unpooled.directBuffer(capacity, capacity) else Unpooled.buffer(capacity, capacity)
+}
+
 @JvmOverloads
 fun ByteBuf.getBytes(length: Int = this.readableBytes(), useWrappedArray: Boolean = false): ByteArray {
     length.checkLengthInRange(0, this.readableBytes())
@@ -43,7 +47,11 @@ fun ByteBuf.getString(length: Int = this.readableBytes(), charset: Charset = DEF
         this.readerIndex(this.readerIndex() + length)
         return result
     }
-    return getBytes().getString(charset)
+    return getBytes(length).getString(charset)
+}
+
+fun ByteBuf.getString(charset: Charset): String {
+    return getString(this.readableBytes(), charset)
 }
 
 @JvmOverloads
@@ -66,7 +74,7 @@ fun ByteArray.getBuffer(
     length: Int = remainingLength(this.size, offset),
     direct: Boolean = false
 ): ByteBuf {
-    val buffer = if (direct) Unpooled.directBuffer(length, length) else Unpooled.buffer(length, length)
+    val buffer = newByteBuf(length, direct)
     buffer.writeBytes(this, offset, length)
     return buffer
 }

@@ -63,8 +63,8 @@ public class NettyBufferTest {
         buffer2.writeBytes(bytes1, 10, 80);
         buffer2.readerIndex(0);
         Assert.assertEquals(
-            BNetty.getString(buffer2),
-            new String(Arrays.copyOfRange(bytes1, 10, 90), BDefault.DEFAULT_CHARSET)
+            BNetty.getString(buffer2, 2),
+            new String(Arrays.copyOfRange(bytes1, 10, 12), BDefault.DEFAULT_CHARSET)
         );
         buffer1.readerIndex(0);
         Assert.expectThrows(IndexOutOfBoundsException.class, () -> BNetty.getBuffer(buffer1, 101, true));

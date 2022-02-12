@@ -66,8 +66,8 @@ public class BufferTest {
         buffer2.put(bytes1, 10, 80);
         buffer2.flip();
         Assert.assertEquals(
-            BBuffer.getString(buffer2),
-            new String(Arrays.copyOfRange(bytes1, 10, 90), BDefault.DEFAULT_CHARSET)
+            BBuffer.getString(buffer2, 2),
+            new String(Arrays.copyOfRange(bytes1, 10, 12), BDefault.DEFAULT_CHARSET)
         );
         buffer1.flip();
         Assert.expectThrows(IndexOutOfBoundsException.class, () -> BBuffer.getBuffer(buffer1, 101, true));

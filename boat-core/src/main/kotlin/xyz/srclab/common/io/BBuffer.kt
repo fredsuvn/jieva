@@ -9,6 +9,10 @@ import xyz.srclab.common.base.remainingLength
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
+fun newByteBuffer(capacity: Int, direct: Boolean): ByteBuffer {
+    return if (direct) ByteBuffer.allocateDirect(capacity) else ByteBuffer.allocate(capacity)
+}
+
 @JvmOverloads
 fun ByteBuffer.getBytes(length: Int = this.remaining(), useWrappedArray: Boolean = false): ByteArray {
     length.checkLengthInRange(0, this.remaining())
@@ -42,7 +46,11 @@ fun ByteBuffer.getString(length: Int = this.remaining(), charset: Charset = DEFA
         this.position(this.position() + length)
         return result
     }
-    return getBytes().getString(charset)
+    return getBytes(length).getString(charset)
+}
+
+fun ByteBuffer.getString(charset: Charset): String {
+    return getString(this.remaining(), charset)
 }
 
 @JvmOverloads
@@ -69,7 +77,7 @@ fun ByteArray.getBuffer(
     length: Int = remainingLength(this.size, offset),
     direct: Boolean = false
 ): ByteBuffer {
-    val buffer = if (direct) ByteBuffer.allocateDirect(length) else ByteBuffer.allocate(length)
+    val buffer = newByteBuffer(length, direct)
     buffer.put(this, offset, length)
     buffer.flip()
     return buffer

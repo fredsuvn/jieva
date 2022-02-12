@@ -12,6 +12,4 @@ interface TcpChannelHandler {
     fun onReceive(context: TcpContext, data: ByteBuffer)
 
     fun onClose(context: TcpContext)
-
-    fun onException()
 }

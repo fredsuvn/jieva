@@ -29,11 +29,11 @@ val TIMESTAMP_PATTERN: DatePattern = run {
     TIMESTAMP_PATTERN_STRING.toDatePattern(formatter)
 }
 
-fun epochSecond(): Long {
-    return epochMilli() / 1000L
+fun epochSeconds(): Long {
+    return epochMillis() / 1000L
 }
 
-fun epochMilli(): Long {
+fun epochMillis(): Long {
     return System.currentTimeMillis()
 }
 
