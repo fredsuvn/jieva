@@ -16,14 +16,14 @@ import java.util.concurrent.TimeUnit
 interface RunLatch {
 
     /**
-     * Opens latch.
+     * Locks this latch.
      */
-    fun open()
+    fun lock()
 
     /**
-     * Closes latch.
+     * Unlocks this latch.
      */
-    fun close()
+    fun unlock()
 
     /**
      * Awaits forever.
@@ -59,7 +59,7 @@ interface RunLatch {
             private var countDownLatch: CountDownLatch = CountDownLatch(1)
 
             @Synchronized
-            override fun open() {
+            override fun unlock() {
                 if (open) {
                     return
                 }
@@ -68,7 +68,7 @@ interface RunLatch {
             }
 
             @Synchronized
-            override fun close() {
+            override fun lock() {
                 if (!open) {
                     return
                 }

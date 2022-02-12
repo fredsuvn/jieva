@@ -84,7 +84,7 @@ public class NettyTest {
             "localhost:" + nettyTcpServer.getPort(),
             BList.newList(SimpleClientHandler::new)
         );
-        runLatch.close();
+        runLatch.lock();
         nettyTcpClient.connect();
         runLatch.await();
         nettyTcpClient.disconnect();
@@ -158,7 +158,7 @@ public class NettyTest {
             String message = msgToString(msg);
             BLog.info("Receive simple server message: {}", message);
             Assert.assertEquals(message, SIMPLE_SERVER_MESSAGE);
-            runLatch.open();
+            runLatch.unlock();
         }
     }
 

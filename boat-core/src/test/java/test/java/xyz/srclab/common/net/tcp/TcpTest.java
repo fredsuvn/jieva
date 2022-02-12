@@ -10,9 +10,13 @@ import xyz.srclab.common.net.tcp.TcpChannelHandler;
 import xyz.srclab.common.net.tcp.TcpClient;
 import xyz.srclab.common.net.tcp.TcpContext;
 import xyz.srclab.common.net.tcp.TcpServer;
+import xyz.srclab.common.run.AsyncRunner;
 import xyz.srclab.common.run.RunLatch;
+import xyz.srclab.common.run.Runner;
 
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TcpTest {
 
@@ -40,11 +44,11 @@ public class TcpTest {
         TcpClient tcpClient = TcpClient.simpleClient(address);
         tcpClient.connect();
 
-        latch.close();
+        latch.lock();
         BLog.info("Send message1: {}", CLIENT_MESSAGE);
         tcpClient.send(CLIENT_MESSAGE);
         latch.await();
-        latch.close();
+        latch.lock();
         BLog.info("Send message2: {}", CLIENT_MESSAGE);
         tcpClient.send(CLIENT_MESSAGE);
         latch.await();
@@ -60,7 +64,7 @@ public class TcpTest {
             SERVER_OPEN + SERVER_RECEIVE + SERVER_RECEIVE
         );
 
-        latch.close();
+        latch.lock();
         BLog.info("Send message3: {}", CLIENT_MESSAGE);
         tcpClient.send(CLIENT_MESSAGE);
         latch.await();
@@ -72,7 +76,7 @@ public class TcpTest {
             SERVER_OPEN + SERVER_RECEIVE + SERVER_RECEIVE + SERVER_RECEIVE
         );
 
-        latch.close();
+        latch.lock();
         tcpClient.disconnect();
         latch.await();
 
@@ -80,6 +84,46 @@ public class TcpTest {
             serverSentMessage,
             SERVER_OPEN + SERVER_RECEIVE + SERVER_RECEIVE + SERVER_RECEIVE + SERVER_CLOSE
         );
+    }
+
+    @Test
+    public void testOpenClose() {
+        InetSocketAddress address = BSocket.availableLocalhost();
+        AtomicInteger openCount = new AtomicInteger(0);
+        AtomicInteger closeCount = new AtomicInteger(0);
+        TcpServer tcpServer = TcpServer.simpleServer(
+            address,
+            new TcpChannelHandler() {
+                @Override
+                public void onOpen(@NotNull TcpContext context) {
+                    openCount.incrementAndGet();
+                }
+
+                @Override
+                public void onReceive(@NotNull TcpContext context, @NotNull ByteBuffer data) {
+
+                }
+
+                @Override
+                public void onClose(@NotNull TcpContext context) {
+                    closeCount.incrementAndGet();
+                }
+            }
+        );
+        tcpServer.start();
+
+
+        int clientCount = 1000;
+        RunLatch latch = RunLatch.newRunLatch();
+        latch.lock();
+        Runner runner = AsyncRunner.INSTANCE;
+        for (int i = 0; i < clientCount; i++) {
+            runner.run(() -> {
+                TcpClient tcpClient = TcpClient.simpleClient(address);
+                tcpClient.connect();
+                tcpClient.disconnect();
+            });
+        }
     }
 
     private static final class ServerHandler implements TcpChannelHandler {
@@ -104,7 +148,7 @@ public class TcpTest {
             serverReceivedMessage += read;
             context.write(SERVER_RECEIVE.getBytes());
             BLog.info("Server receive: {}@{}", context.getRemoteAddress(), read);
-            latch.open();
+            latch.unlock();
         }
 
         @Override
@@ -112,7 +156,7 @@ public class TcpTest {
             serverSentMessage += SERVER_CLOSE;
             //context.write(SERVER_CLOSE.getBytes());
             BLog.info("Server close: {}", context.getRemoteAddress());
-            latch.open();
+            latch.unlock();
         }
     }
 }

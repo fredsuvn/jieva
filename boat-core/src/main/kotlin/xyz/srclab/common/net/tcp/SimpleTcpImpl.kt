@@ -226,7 +226,7 @@ open class SimpleTcpServer @JvmOverloads constructor(
     }
 
     private fun listen(selector: Selector, listenLatch: RunLatch, executor: Executor, handler: (SelectionKey) -> Unit) {
-        listenLatch.close()
+        listenLatch.lock()
         while (true) {
             try {
                 val readyChannels = selector.select()
@@ -244,7 +244,7 @@ open class SimpleTcpServer @JvmOverloads constructor(
                 break
             }
         }
-        listenLatch.open()
+        listenLatch.unlock()
     }
 
     private fun handleKey(key: SelectionKey) {

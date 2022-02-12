@@ -15,6 +15,13 @@ fun availableSocketPort(): Int {
     return port
 }
 
+/**
+ * Returns available [InetSocketAddress] with host of `localhost` and port form [availableSocketPort].
+ */
+fun availableLocalhost(): InetSocketAddress {
+    return InetSocketAddress("localhost", availableSocketPort())
+}
+
 fun CharSequence.parseInetSocketAddress(): InetSocketAddress {
     val split = this.toString().split(":")
     if (split.size != 2) {
