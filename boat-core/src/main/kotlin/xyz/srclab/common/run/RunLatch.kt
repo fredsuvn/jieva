@@ -6,92 +6,129 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 /**
- * Run latch, switch to go on or pause current running thread.
- *
- * Note this is thread-safe.
+ * Represents a thread latch,
+ * a synchronization aid that allows one or more threads to wait until
+ * this latch's lock value gas counted down to zero or less.
  *
  * @see CountDownLatch
  */
 @ThreadSafe
 interface RunLatch {
 
-    /**
-     * Locks this latch.
-     */
-    fun lock()
+    val lockValue: Long
 
     /**
-     * Unlocks this latch.
+     * Locks this latch with `1`.
      */
-    fun unlock()
+    fun lock() {
+        lock(1)
+    }
 
     /**
-     * Awaits forever.
+     * Locks this latch with [value].
+     */
+    fun lock(value: Long)
+
+    /**
+     * Unlocks this latch, minus lock with `1`.
+     */
+    fun unlock() {
+        unlock(1)
+    }
+
+    /**
+     * Unlocks this latch, minus lock with [value].
+     */
+    fun unlock(value: Long)
+
+    /**
+     * Causes the current thread to wait until the latch lock value has counted down to zero or less.
      */
     fun await()
 
     /**
-     * Awaits for [timeout] milliseconds.
+     * Causes the current thread to wait until the latch lock value has counted down to zero or less,
+     * for [timeoutMillis] millis.
      */
-    fun await(timeout: Long)
+    fun await(timeoutMillis: Long)
 
     /**
-     * Awaits for [timeout].
+     * Causes the current thread to wait until the latch lock value has counted down to zero or less,
+     * for [timeout] duration.
      */
     fun await(timeout: Duration)
 
     companion object {
 
         /**
-         * Returns a new [RunLatch] with `close` status.
+         * Returns a new [RunLatch] with lock value [initLockValue].
          */
+        @JvmOverloads
         @JvmStatic
-        fun newRunLatch(): RunLatch {
-            return RunLatchImpl()
+        fun newRunLatch(initLockValue: Long = 1): RunLatch {
+            return RunLatchImpl(initLockValue)
         }
 
-        private class RunLatchImpl : RunLatch {
+        private class RunLatchImpl(
+            override var lockValue: Long
+        ) : RunLatch {
 
             @Volatile
-            private var open: Boolean = false
+            private var countDownLatch: CountDownLatch? = null
 
-            @Volatile
-            private var countDownLatch: CountDownLatch = CountDownLatch(1)
-
-            @Synchronized
-            override fun unlock() {
-                if (open) {
-                    return
-                }
-                open = true
-                countDownLatch.countDown()
+            init {
+                resetCountDownLatch()
             }
 
             @Synchronized
-            override fun lock() {
-                if (!open) {
-                    return
+            override fun unlock(value: Long) {
+                lockValue -= value
+                resetCountDownLatch()
+            }
+
+            @Synchronized
+            override fun lock(value: Long) {
+                lockValue += value
+                resetCountDownLatch()
+            }
+
+            private fun resetCountDownLatch() {
+                val countDownLatch = this.countDownLatch
+                if (lockValue > 0) {
+                    if (countDownLatch === null) {
+                        this.countDownLatch = CountDownLatch(1)
+                    } else {
+                        if (countDownLatch.count <= 0) {
+                            this.countDownLatch = CountDownLatch(1)
+                        }
+                    }
+                } else {
+                    if (countDownLatch !== null) {
+                        countDownLatch.countDown()
+                        this.countDownLatch = null
+                    }
                 }
-                open = false
-                countDownLatch = CountDownLatch(1)
             }
 
             override fun await() {
-                if (open) {
+                val countDownLatch = this.countDownLatch
+                if (countDownLatch === null) {
                     return
                 }
                 countDownLatch.await()
             }
 
-            override fun await(timeout: Long) {
-                if (open) {
+            override fun await(timeoutMillis: Long) {
+                val countDownLatch = this.countDownLatch
+                if (countDownLatch === null) {
                     return
                 }
-                countDownLatch.await(timeout, TimeUnit.MILLISECONDS)
+                countDownLatch.await(timeoutMillis, TimeUnit.MILLISECONDS)
             }
 
             override fun await(timeout: Duration) {
-                if (open) {
+                val countDownLatch = this.countDownLatch
+                if (countDownLatch === null) {
                     return
                 }
                 countDownLatch.await(timeout.toNanos(), TimeUnit.NANOSECONDS)

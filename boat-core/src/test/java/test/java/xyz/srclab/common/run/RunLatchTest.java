@@ -26,6 +26,7 @@ public class RunLatchTest {
         BThread.sleep(1000);
         BLog.info("sum after 1000 millis sleep: {}", sum.get());
         Assert.assertEquals(sum.get(), 0);
+        //BThread.sleep(5000);
         latch.unlock();
         countDownLatch.await();
         BLog.info("sum after latch: {}", sum.get());
