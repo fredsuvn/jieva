@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.base.BThread;
+import xyz.srclab.common.base.BooleanRef;
 import xyz.srclab.common.base.IntRef;
 import xyz.srclab.common.run.*;
 import xyz.srclab.common.utils.Counter;
@@ -11,6 +12,7 @@ import xyz.srclab.common.utils.Counter;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author sunqian
@@ -129,5 +131,48 @@ public class RunTest {
             countDownLatch.countDown();
         });
         countDownLatch.await();
+    }
+
+    @Test
+    public void testSyncRunner() {
+        Runner runner = SyncRunner.INSTANCE;
+        Thread thread = Thread.currentThread();
+        int totalThread = 100;
+        IntRef count = IntRef.of(0);
+        BooleanRef sync = BooleanRef.of(true);
+        for (int j = 0; j < totalThread; j++) {
+            runner.run(() -> {
+                count.set(count.get() + 1);
+                if (!Thread.currentThread().equals(thread)) {
+                    sync.set(false);
+                }
+            });
+        }
+        Assert.assertEquals(count.get(), totalThread);
+        Assert.assertTrue(sync.get());
+    }
+
+    @Test
+    public void testAsyncRunner() throws Exception {
+        Runner runner = AsyncRunner.INSTANCE;
+        int totalThread = 100;
+        AtomicInteger count = new AtomicInteger(0);
+        CountDownLatch mainLatch = new CountDownLatch(1);
+        CountDownLatch threadLatch = new CountDownLatch(totalThread);
+        for (int j = 0; j < totalThread; j++) {
+            runner.run(() -> {
+                try {
+                    mainLatch.await();
+                    count.incrementAndGet();
+                    threadLatch.countDown();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        Assert.assertEquals(count.get(), 0);
+        mainLatch.countDown();
+        threadLatch.await();
+        Assert.assertEquals(count.get(), totalThread);
     }
 }
