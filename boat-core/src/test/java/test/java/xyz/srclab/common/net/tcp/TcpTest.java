@@ -33,9 +33,9 @@ public class TcpTest {
     public void testTcp() {
         int port = BSocket.availableSocketPort();
         String address = "localhost:" + port;
-        RunLatch latch = RunLatch.newRunLatch();
+        RunLatch latch = RunLatch.newRunLatch(0);
 
-        TcpServer tcpServer = TcpServer.simpleServer(
+        TcpServer tcpServer = TcpServer.nioServer(
             BSocket.parseInetSocketAddress(address),
             new ServerHandler(latch)
         );
@@ -96,7 +96,7 @@ public class TcpTest {
         AtomicInteger openCount = new AtomicInteger(0);
         AtomicInteger closeCount = new AtomicInteger(0);
         AtomicInteger receiveCount = new AtomicInteger(0);
-        TcpServer tcpServer = TcpServer.simpleServer(
+        TcpServer tcpServer = TcpServer.nioServer(
             address,
             new TcpChannelHandler() {
                 @Override
