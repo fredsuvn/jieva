@@ -18,28 +18,33 @@ interface RunLatch {
     val lockValue: Long
 
     /**
-     * Locks this latch with `1`.
+     * Adds lock value with `1`.
      */
     fun lock() {
         lock(1)
     }
 
     /**
-     * Locks this latch with [value].
+     * Adds lock value [value].
      */
     fun lock(value: Long)
 
     /**
-     * Unlocks this latch, minus lock with `1`.
+     * Minus lock value with `1`.
      */
     fun unlock() {
         unlock(1)
     }
 
     /**
-     * Unlocks this latch, minus lock with [value].
+     * Minus lock value with [value].
      */
     fun unlock(value: Long)
+
+    /**
+     * Sets lock value with [value].
+     */
+    fun lockTo(value: Long)
 
     /**
      * Causes the current thread to wait until the latch lock value has counted down to zero or less.
@@ -83,6 +88,12 @@ interface RunLatch {
             @Synchronized
             override fun unlock(value: Long) {
                 lockValue -= value
+                resetCountDownLatch()
+            }
+
+            @Synchronized
+            override fun lockTo(value: Long) {
+                lockValue = value
                 resetCountDownLatch()
             }
 
