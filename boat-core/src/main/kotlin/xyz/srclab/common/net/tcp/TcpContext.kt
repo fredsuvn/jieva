@@ -3,7 +3,7 @@ package xyz.srclab.common.net.tcp
 import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.base.remainingLength
 import java.io.InputStream
-import java.net.InetSocketAddress
+import java.net.SocketAddress
 import java.nio.ByteBuffer
 
 /**
@@ -11,7 +11,7 @@ import java.nio.ByteBuffer
  */
 interface TcpContext {
 
-    val remoteAddress: InetSocketAddress
+    val remoteAddress: SocketAddress
 
     fun write(data: ByteArray) {
         write(data, 0)
@@ -39,5 +39,5 @@ interface TcpContext {
         }
     }
 
-    fun closeChannel()
+    fun close()
 }

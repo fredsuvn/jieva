@@ -5,8 +5,8 @@ import xyz.srclab.common.io.getBytes
 import xyz.srclab.common.net.socket.parseInetSocketAddress
 import java.io.InputStream
 import java.io.OutputStream
-import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
@@ -14,11 +14,9 @@ import java.nio.channels.SocketChannel
 import java.nio.charset.Charset
 
 /**
- * Server with TCP/IP.
+ * Client for TCP/IP.
  */
 interface TcpClient {
-
-    val remoteAddress: InetSocketAddress
 
     /**
      * Connects to server.
@@ -99,7 +97,7 @@ interface TcpClient {
         @JvmOverloads
         @JvmStatic
         fun bioClient(
-            remoteAddress: InetSocketAddress,
+            remoteAddress: SocketAddress,
             timeoutMillis: Long = 5000,
             bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
         ): TcpClient {
@@ -125,7 +123,7 @@ interface TcpClient {
         @JvmOverloads
         @JvmStatic
         fun nioClient(
-            remoteAddress: InetSocketAddress,
+            remoteAddress: SocketAddress,
             timeoutMillis: Long = 5000,
             bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
         ): TcpClient {
@@ -146,7 +144,7 @@ interface TcpClient {
         }
 
         private class BIOTcpClient(
-            override val remoteAddress: InetSocketAddress,
+            private val remoteAddress: SocketAddress,
             private val timeoutMillis: Long,
             private val bufferSize: Int
         ) : TcpClient {
@@ -225,7 +223,7 @@ interface TcpClient {
         }
 
         private class NIOTcpClient(
-            override val remoteAddress: InetSocketAddress,
+            private val remoteAddress: SocketAddress,
             private val timeoutMillis: Long,
             private val bufferSize: Int,
         ) : TcpClient {

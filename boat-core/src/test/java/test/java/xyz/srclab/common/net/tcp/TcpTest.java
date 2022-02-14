@@ -17,6 +17,8 @@ import xyz.srclab.common.run.Runner;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.NetworkChannel;
+import java.nio.channels.SelectableChannel;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -162,7 +164,7 @@ public class TcpTest {
                     String read = BBuffer.getString(data);
                     if ("close".equals(read)) {
                         BLog.info("Disconnect client: {}@{}", context.getRemoteAddress(), read);
-                        context.closeChannel();
+                        context.close();
                         return;
                     }
                     receiveCount.incrementAndGet();
@@ -272,4 +274,9 @@ public class TcpTest {
             latch.unlock();
         }
     }
+
+    public static class S<T extends SelectableChannel & NetworkChannel> {
+    }
 }
+
+

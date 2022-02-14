@@ -1,41 +1,25 @@
-package xyz.srclab.common.net.tcp
+package xyz.srclab.common.net.udp
 
-import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.io.newByteBuffer
 import xyz.srclab.common.net.NetServer
+import xyz.srclab.common.net.tcp.TcpChannelHandler
+import xyz.srclab.common.net.tcp.TcpServer
 import xyz.srclab.common.run.RunLatch
-import xyz.srclab.common.run.newCachedThreadPoolRunner
 import java.io.IOException
-import java.io.InputStream
-import java.net.InetSocketAddress
 import java.net.SocketAddress
-import java.nio.ByteBuffer
 import java.nio.channels.*
 import java.util.concurrent.Executor
 
 /**
- * Server for TCP/IP.
+ * Server for UDP.
  */
-interface TcpServer : NetServer {
+interface UdpServer : NetServer {
 
     companion object {
 
-        /**
-         * Creates a new simple NIO [TcpServer].
-         */
-        @JvmOverloads
-        @JvmStatic
-        fun nioServer(
-            bindAddress: SocketAddress,
-            channelHandler: TcpChannelHandler,
-            executor: Executor = newCachedThreadPoolRunner().asExecutor(),
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
-            directBuffer: Boolean = false
-        ): TcpServer {
-            return NIOTcpServer(bindAddress, channelHandler, executor, bufferSize, directBuffer)
-        }
 
-        private class NIOTcpServer(
+
+        private class NIOUdpServer(
             private val bindAddress: SocketAddress,
             private val channelHandler: TcpChannelHandler,
             private val executor: Executor,
@@ -43,16 +27,15 @@ interface TcpServer : NetServer {
             private val directBuffer: Boolean = false
         ) : TcpServer {
 
+            private var datagramChannel:DatagramChannel? = null
             private var selector: Selector? = null
-            private var serverSocketChannel: ServerSocketChannel? = null
             private val listenLatch: RunLatch = RunLatch.newRunLatch()
 
             @Synchronized
             override fun start() {
-                if (selector !== null || serverSocketChannel !== null) {
+                if (selector == null || datagramChannel !== null) {
                     throw IllegalStateException("Server has been started, stop it first!")
                 }
-                start0()
             }
 
             @Synchronized
@@ -61,14 +44,14 @@ interface TcpServer : NetServer {
                 if (selector === null) {
                     throw IllegalStateException("Server has not been started, start it first!")
                 }
-                val serverSocketChannel = this.serverSocketChannel
-                if (serverSocketChannel === null) {
+                val datagramChannel = this.datagramChannel
+                if (datagramChannel === null) {
                     throw IllegalStateException("Server has not been started, start it first!")
                 }
                 selector.close()
-                serverSocketChannel.close()
+                datagramChannel.close()
                 this.selector = null
-                this.serverSocketChannel = null
+                this.datagramChannel = null
             }
 
             override fun await() {
@@ -77,12 +60,12 @@ interface TcpServer : NetServer {
 
             private fun start0() {
                 val selector = Selector.open()
-                val serverSocketChannel = ServerSocketChannel.open()
-                serverSocketChannel.configureBlocking(false)
-                serverSocketChannel.bind(bindAddress)
-                serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT)
+                val datagramChannel = DatagramChannel.open()
+                datagramChannel.configureBlocking(false)
+                datagramChannel.bind(bindAddress)
+                datagramChannel.register(selector, SelectionKey.OP_ACCEPT)
                 this.selector = selector
-                this.serverSocketChannel = serverSocketChannel
+                this.datagramChannel = datagramChannel
                 executor.execute { listen(selector) { handleKey(it) } }
             }
 
@@ -137,34 +120,6 @@ interface TcpServer : NetServer {
                     }
                     buffer.flip()
                     executor.execute { channelHandler.onReceive(context, buffer.asReadOnlyBuffer()) }
-                }
-            }
-
-            private inner class SimpleContext(
-                private val selector: Selector,
-                private val socketChannel: SocketChannel
-            ) : TcpContext {
-
-                override val remoteAddress: SocketAddress = socketChannel.remoteAddress
-
-                override fun write(data: ByteBuffer) {
-                    socketChannel.write(data)
-                    socketChannel.register(selector, SelectionKey.OP_READ)
-                }
-
-                override fun write(data: InputStream) {
-                    val buffer = ByteArray(bufferSize)
-                    var len = data.read(buffer)
-                    while (len >= 0) {
-                        if (len > 0) {
-                            write(buffer)
-                        }
-                        len = data.read(buffer)
-                    }
-                }
-
-                override fun close() {
-                    socketChannel.close()
                 }
             }
         }
