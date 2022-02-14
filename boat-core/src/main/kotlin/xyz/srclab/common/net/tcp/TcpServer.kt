@@ -41,7 +41,7 @@ interface TcpServer {
     companion object {
 
         /**
-         * Creates a new simple [TcpServer].
+         * Creates a new simple NIO [TcpServer].
          */
         @JvmOverloads
         @JvmStatic
