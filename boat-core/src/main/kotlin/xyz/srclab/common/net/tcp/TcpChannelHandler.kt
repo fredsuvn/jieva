@@ -1,8 +1,15 @@
 package xyz.srclab.common.net.tcp
 
-import xyz.srclab.common.net.NetChannelHandler
+import java.nio.ByteBuffer
 
 /**
  * Handler for TCP channel.
  */
-interface TcpChannelHandler : NetChannelHandler<TcpContext>
+interface TcpChannelHandler {
+
+    fun onOpen(context: TcpContext)
+
+    fun onReceive(context: TcpContext, data: ByteBuffer)
+
+    fun onClose(context: TcpContext)
+}

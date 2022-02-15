@@ -1,8 +1,12 @@
 package xyz.srclab.common.net.udp
 
-import xyz.srclab.common.net.NetChannelHandler
+import java.net.SocketAddress
+import java.nio.ByteBuffer
 
 /**
  * Handler for UDP channel.
  */
-interface UdpChannelHandler : NetChannelHandler<UdpContext>
+interface UdpChannelHandler {
+
+    fun onReceive(remoteAddress: SocketAddress, data: ByteBuffer)
+}

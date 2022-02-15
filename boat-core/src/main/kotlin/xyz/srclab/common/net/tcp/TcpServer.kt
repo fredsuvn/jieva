@@ -128,6 +128,7 @@ interface TcpServer : NetServer {
             ) : TcpContext {
 
                 override val remoteAddress: SocketAddress = socketChannel.remoteAddress
+                override val server: TcpServer = this@NIOTcpServer
 
                 override fun write(data: ByteBuffer) {
                     socketChannel.write(data)
@@ -145,7 +146,7 @@ interface TcpServer : NetServer {
                     }
                 }
 
-                override fun close() {
+                override fun disconnect() {
                     socketChannel.close()
                 }
             }

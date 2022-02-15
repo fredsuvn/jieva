@@ -162,7 +162,7 @@ public class TcpTest {
                     String read = BBuffer.getString(data);
                     if ("close".equals(read)) {
                         BLog.info("Disconnect client: {}@{}", context.getRemoteAddress(), read);
-                        context.close();
+                        context.disconnect();
                         return;
                     }
                     receiveCount.incrementAndGet();
