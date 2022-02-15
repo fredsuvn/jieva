@@ -97,8 +97,7 @@ public class NettyTest {
         private boolean isEmpty = false;
 
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg)
-            throws Exception {
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             if (msg instanceof LastHttpContent) {
                 return;
             }
@@ -129,8 +128,7 @@ public class NettyTest {
         }
 
         @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-            throws Exception {
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             ctx.close();
         }
 
