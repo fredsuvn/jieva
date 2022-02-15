@@ -10,7 +10,8 @@ import io.netty.channel.socket.nio.NioSocketChannel
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.net.socket.parseInetSocketAddress
 import xyz.srclab.common.net.tcp.TcpClient
-import java.net.InetSocketAddress
+import java.io.InputStream
+import java.net.SocketAddress
 import java.nio.ByteBuffer
 import java.util.function.Supplier
 
@@ -20,7 +21,7 @@ import java.util.function.Supplier
  * Note netty implementation doesn't support `send` and `receive` methods, do these operation in channel handlers.
  */
 open class NettyTcpClient @JvmOverloads constructor(
-    override val remoteAddress: InetSocketAddress,
+    remoteAddress: SocketAddress,
     channelHandlers: List<Supplier<ChannelHandler>>,
     options: Map<ChannelOption<*>, Any?> = emptyMap()
 ) : TcpClient {
@@ -74,15 +75,11 @@ open class NettyTcpClient @JvmOverloads constructor(
         throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
     }
 
-    override fun receive(dest: ByteBuffer, readTimeoutMillis: Long): Int {
+    override fun receive(): InputStream {
         throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
     }
 
     override fun receiveBytes(): ByteArray {
-        throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
-    }
-
-    override fun receiveBytes(readTimeoutMillis: Long): ByteArray {
         throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
     }
 }

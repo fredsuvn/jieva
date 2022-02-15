@@ -9,16 +9,18 @@ import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.base.availableProcessors
 import xyz.srclab.common.collect.newMap
+import xyz.srclab.common.net.socket.availableLocalhost
 import xyz.srclab.common.net.tcp.TcpServer
+import java.net.InetSocketAddress
+import java.net.SocketAddress
 import java.util.function.Supplier
 
 /**
  * Simple Netty server implementation for [TcpServer].
  */
 open class NettyTcpServer @JvmOverloads constructor(
-    val port: Int,
+    override val bindAddress: SocketAddress,
     childChannelHandlers: List<Supplier<ChannelHandler>>,
     options: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_BACKLOG, 128),
     childOptions: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_KEEPALIVE, true),
@@ -55,14 +57,23 @@ open class NettyTcpServer @JvmOverloads constructor(
 
     @JvmOverloads
     constructor(
+        port: Int,
         childChannelHandlers: List<Supplier<ChannelHandler>>,
         options: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_BACKLOG, 128),
         childOptions: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_KEEPALIVE, true),
         channelHandler: ChannelHandler? = null
-    ) : this(availableProcessors(), childChannelHandlers, options, childOptions, channelHandler)
+    ) : this(InetSocketAddress(port), childChannelHandlers, options, childOptions, channelHandler)
+
+    @JvmOverloads
+    constructor(
+        childChannelHandlers: List<Supplier<ChannelHandler>>,
+        options: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_BACKLOG, 128),
+        childOptions: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_KEEPALIVE, true),
+        channelHandler: ChannelHandler? = null
+    ) : this(availableLocalhost(), childChannelHandlers, options, childOptions, channelHandler)
 
     override fun start() {
-        channelFuture = bootstrap.bind(port).channel().closeFuture()
+        channelFuture = bootstrap.bind(bindAddress).channel().closeFuture()
     }
 
     override fun stop(immediately: Boolean) {

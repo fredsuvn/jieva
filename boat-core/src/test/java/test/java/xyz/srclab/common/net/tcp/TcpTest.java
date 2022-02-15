@@ -17,8 +17,6 @@ import xyz.srclab.common.run.Runner;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.NetworkChannel;
-import java.nio.channels.SelectableChannel;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -273,9 +271,6 @@ public class TcpTest {
             BLog.info("Server close: {}", context.getRemoteAddress());
             latch.unlock();
         }
-    }
-
-    public static class S<T extends SelectableChannel & NetworkChannel> {
     }
 }
 

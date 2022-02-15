@@ -12,6 +12,7 @@ import xyz.srclab.common.base.getString
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.collect.newMap
 import java.net.InetSocketAddress
+import java.net.SocketAddress
 import java.nio.charset.Charset
 import java.util.function.Supplier
 
@@ -86,6 +87,17 @@ fun ByteArray.getBuffer(
 
 fun ByteArray.getBuffer(direct: Boolean): ByteBuf {
     return getBuffer(0, size, direct)
+}
+
+@JvmOverloads
+fun newNettyServer(
+    bindAddress: SocketAddress,
+    childChannelHandlers: List<Supplier<ChannelHandler>>,
+    options: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_BACKLOG, 128),
+    childOptions: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_KEEPALIVE, true),
+    channelHandler: ChannelHandler? = null
+): NettyTcpServer {
+    return NettyTcpServer(bindAddress, childChannelHandlers, options, childOptions, channelHandler)
 }
 
 @JvmOverloads

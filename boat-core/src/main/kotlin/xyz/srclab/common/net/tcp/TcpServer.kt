@@ -3,14 +3,17 @@ package xyz.srclab.common.net.tcp
 import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.io.newByteBuffer
 import xyz.srclab.common.net.NetServer
+import xyz.srclab.common.net.nioListen
 import xyz.srclab.common.run.RunLatch
 import xyz.srclab.common.run.newCachedThreadPoolRunner
 import java.io.IOException
 import java.io.InputStream
-import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.nio.ByteBuffer
-import java.nio.channels.*
+import java.nio.channels.SelectionKey
+import java.nio.channels.Selector
+import java.nio.channels.ServerSocketChannel
+import java.nio.channels.SocketChannel
 import java.util.concurrent.Executor
 
 /**
@@ -36,7 +39,7 @@ interface TcpServer : NetServer {
         }
 
         private class NIOTcpServer(
-            private val bindAddress: SocketAddress,
+            override val bindAddress: SocketAddress,
             private val channelHandler: TcpChannelHandler,
             private val executor: Executor,
             private val bufferSize: Int,
@@ -83,40 +86,19 @@ interface TcpServer : NetServer {
                 serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT)
                 this.selector = selector
                 this.serverSocketChannel = serverSocketChannel
-                executor.execute { listen(selector) { handleKey(it) } }
-            }
-
-            private fun listen(selector: Selector, handler: (SelectionKey) -> Unit) {
-                listenLatch.lockTo(1)
-                while (true) {
-                    try {
-                        val readyChannels = selector.select()
-                        if (readyChannels == 0) {
-                            continue
-                        }
-                        val selectedKeys = selector.selectedKeys()
-                        val iterator = selectedKeys.iterator()
-                        while (iterator.hasNext()) {
-                            val key = iterator.next()
-                            handler(key)
-                            iterator.remove();
-                        }
-                    } catch (e: ClosedSelectorException) {
-                        break
-                    }
-                }
-                listenLatch.unlock()
+                executor.execute { nioListen(listenLatch, selector) { handleKey(it) } }
             }
 
             private fun handleKey(key: SelectionKey) {
                 val selector = key.selector()
                 if (key.isAcceptable) {
-                    //val server = key.channel() as ServerSocketChannel
-                    val socketChannel = serverSocketChannel!!.accept()
-                    socketChannel.configureBlocking(false)
-                    socketChannel.register(selector, SelectionKey.OP_READ)
+                    //val socketChannel = serverSocketChannel!!.accept()
+                    val serverChannel = key.channel() as ServerSocketChannel
+                    val clientChannel = serverChannel.accept()
+                    clientChannel.configureBlocking(false)
+                    clientChannel.register(selector, SelectionKey.OP_READ)
                     //socketChannel.register(selector, SelectionKey.OP_WRITE)
-                    val context = SimpleContext(selector, socketChannel)
+                    val context = SimpleContext(selector, clientChannel)
                     executor.execute { channelHandler.onOpen(context) }
                 }
                 if (key.isReadable) {

@@ -76,6 +76,7 @@ public class NettyTest {
 
     @Test
     public void testSimple() {
+        runLatch.lockTo(0);
         NettyTcpServer nettyTcpServer = BNetty.newNettyServer(
             BList.newList(SimpleServerHandler::new)
         );
