@@ -1,8 +1,10 @@
 package xyz.srclab.common.net.udp
 
+import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.io.newByteBuffer
 import xyz.srclab.common.net.NetServer
 import xyz.srclab.common.net.nioListen
+import xyz.srclab.common.run.AsyncRunner
 import xyz.srclab.common.run.RunLatch
 import java.io.IOException
 import java.net.SocketAddress
@@ -18,11 +20,13 @@ interface UdpServer : NetServer {
 
     companion object {
 
+        @JvmOverloads
+        @JvmStatic
         fun nioServer(
             bindAddress: SocketAddress,
             channelHandler: UdpChannelHandler,
-            executor: Executor,
-            bufferSize: Int,
+            executor: Executor = AsyncRunner.asExecutor(),
+            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
             directBuffer: Boolean = false
         ): UdpServer {
             return NIOUdpServer(bindAddress, channelHandler, executor, bufferSize, directBuffer)
@@ -33,7 +37,7 @@ interface UdpServer : NetServer {
             private val channelHandler: UdpChannelHandler,
             private val executor: Executor,
             private val bufferSize: Int,
-            private val directBuffer: Boolean = false
+            private val directBuffer: Boolean
         ) : UdpServer {
 
             private var datagramChannel: DatagramChannel? = null
@@ -42,7 +46,7 @@ interface UdpServer : NetServer {
 
             @Synchronized
             override fun start() {
-                if (selector == null || datagramChannel !== null) {
+                if (selector !== null || datagramChannel !== null) {
                     throw IllegalStateException("Server has been started, stop it first!")
                 }
                 start0()
@@ -73,7 +77,7 @@ interface UdpServer : NetServer {
                 val datagramChannel = DatagramChannel.open()
                 datagramChannel.configureBlocking(false)
                 datagramChannel.bind(bindAddress)
-                datagramChannel.register(selector, SelectionKey.OP_ACCEPT)
+                //datagramChannel.register(selector, SelectionKey.OP_ACCEPT)
                 datagramChannel.register(selector, SelectionKey.OP_READ)
                 this.selector = selector
                 this.datagramChannel = datagramChannel

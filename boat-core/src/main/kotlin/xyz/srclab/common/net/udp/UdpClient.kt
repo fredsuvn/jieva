@@ -26,7 +26,12 @@ interface UdpClient {
         send(address, data, offset, remainingLength(data.size, offset))
     }
 
-    fun send(address: SocketAddress, data: ByteArray, offset: Int = 0, length: Int = remainingLength(data.size, offset)) {
+    fun send(
+        address: SocketAddress,
+        data: ByteArray,
+        offset: Int = 0,
+        length: Int = remainingLength(data.size, offset)
+    ) {
         val buffer = ByteBuffer.wrap(data, offset, length)
         send(address, buffer)
     }
@@ -45,12 +50,19 @@ interface UdpClient {
 
     companion object {
 
-        fun newClient(bufferSize: Int = DEFAULT_IO_BUFFER_SIZE) {
+        @JvmOverloads
+        @JvmStatic
+        fun bioClient(bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): UdpClient {
+            return BIOUdpClient(bufferSize)
+        }
 
+        @JvmStatic
+        fun nioClient(): UdpClient {
+            return NIOUdpClient()
         }
 
         private class BIOUdpClient(
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
+            bufferSize: Int
         ) : UdpClient {
 
             private val socket = DatagramSocket().let {
@@ -72,19 +84,16 @@ interface UdpClient {
             }
         }
 
-        private class NIOUdpClient(
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
-        ) : UdpClient {
+        private class NIOUdpClient : UdpClient {
 
             private val channel = DatagramChannel.open()
 
             override fun send(address: SocketAddress, data: ByteArray, offset: Int, length: Int) {
-                val dataPkg = DatagramPacket(data, offset, length, address)
-                socket.send(dataPkg)
+                channel.send(ByteBuffer.wrap(data, offset, length), address)
             }
 
             override fun send(address: SocketAddress, data: ByteBuffer) {
-                channel.send(data,address)
+                channel.send(data, address)
             }
 
             override fun send(address: SocketAddress, data: InputStream) {

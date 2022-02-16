@@ -186,7 +186,7 @@ public class TcpTest {
 
         List<TcpClient> bioClients = new LinkedList<>();
         for (int i = 0; i < clientCount; i++) {
-            TcpClient tcpClient = TcpClient.nioClient(address);
+            TcpClient tcpClient = TcpClient.bioClient(address);
             bioClients.add(tcpClient);
         }
         testOpenClose0(tcpServer, bioClients, openCount, closeCount, receiveCount, latch);
@@ -223,16 +223,20 @@ public class TcpTest {
         Assert.assertEquals(closeCount.get(), tcpClients.size());
         Assert.assertEquals(receiveCount.get(), tcpClients.size());
 
+        //latch.lockTo(2);
         TcpClient tcpClient = tcpClients.iterator().next();
         tcpClient.connect();
         tcpClient.send("close");
+        //latch.await();
         InputStream inputStream = tcpClient.receive();
         Assert.assertEquals(inputStream.read(), -1);
 
+        //latch.lockTo(2);
         tcpClient.disconnect();
         tcpClient.connect();
         tcpClient.send("close");
         ByteBuffer buffer = ByteBuffer.allocate(999);
+        //latch.await();
         int bufferCount = tcpClient.receive(buffer);
         Assert.assertEquals(bufferCount, -1);
 

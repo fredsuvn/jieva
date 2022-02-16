@@ -4,8 +4,8 @@ import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.io.newByteBuffer
 import xyz.srclab.common.net.NetServer
 import xyz.srclab.common.net.nioListen
+import xyz.srclab.common.run.AsyncRunner
 import xyz.srclab.common.run.RunLatch
-import xyz.srclab.common.run.newCachedThreadPoolRunner
 import java.io.IOException
 import java.io.InputStream
 import java.net.SocketAddress
@@ -31,7 +31,7 @@ interface TcpServer : NetServer {
         fun nioServer(
             bindAddress: SocketAddress,
             channelHandler: TcpChannelHandler,
-            executor: Executor = newCachedThreadPoolRunner().asExecutor(),
+            executor: Executor = AsyncRunner.asExecutor(),
             bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
             directBuffer: Boolean = false
         ): TcpServer {
