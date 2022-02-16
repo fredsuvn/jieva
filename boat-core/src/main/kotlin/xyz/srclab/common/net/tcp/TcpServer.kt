@@ -43,7 +43,7 @@ interface TcpServer : NetServer {
             private val channelHandler: TcpChannelHandler,
             private val executor: Executor,
             private val bufferSize: Int,
-            private val directBuffer: Boolean = false
+            private val directBuffer: Boolean
         ) : TcpServer {
 
             private var selector: Selector? = null

@@ -50,16 +50,7 @@ interface TcpClient {
 
     fun send(data: ByteBuffer)
 
-    fun send(data: InputStream) {
-        val buffer = ByteArray(DEFAULT_IO_BUFFER_SIZE)
-        var len = data.read(buffer)
-        while (len >= 0) {
-            if (len > 0) {
-                send(buffer)
-            }
-            len = data.read(buffer)
-        }
-    }
+    fun send(data: InputStream)
 
     fun send(data: String) {
         send(data.getBytes(DEFAULT_CHARSET))

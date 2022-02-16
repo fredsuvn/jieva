@@ -3,7 +3,6 @@ package xyz.srclab.common.net.udp
 import xyz.srclab.common.io.newByteBuffer
 import xyz.srclab.common.net.NetServer
 import xyz.srclab.common.net.nioListen
-import xyz.srclab.common.net.tcp.TcpServer
 import xyz.srclab.common.run.RunLatch
 import java.io.IOException
 import java.net.SocketAddress
@@ -19,6 +18,15 @@ interface UdpServer : NetServer {
 
     companion object {
 
+        fun nioServer(
+            bindAddress: SocketAddress,
+            channelHandler: UdpChannelHandler,
+            executor: Executor,
+            bufferSize: Int,
+            directBuffer: Boolean = false
+        ): UdpServer {
+            return NIOUdpServer(bindAddress, channelHandler, executor, bufferSize, directBuffer)
+        }
 
         private class NIOUdpServer(
             override val bindAddress: SocketAddress,
@@ -26,7 +34,7 @@ interface UdpServer : NetServer {
             private val executor: Executor,
             private val bufferSize: Int,
             private val directBuffer: Boolean = false
-        ) : TcpServer {
+        ) : UdpServer {
 
             private var datagramChannel: DatagramChannel? = null
             private var selector: Selector? = null
@@ -37,6 +45,7 @@ interface UdpServer : NetServer {
                 if (selector == null || datagramChannel !== null) {
                     throw IllegalStateException("Server has been started, stop it first!")
                 }
+                start0()
             }
 
             @Synchronized
@@ -91,7 +100,7 @@ interface UdpServer : NetServer {
                     val buffer = newByteBuffer(bufferSize, directBuffer)
                     try {
                         val clientAddress = channel.receive(buffer)
-                        if (clientAddress == null) {
+                        if (clientAddress === null) {
                             return
                         }
                         executor.execute {
