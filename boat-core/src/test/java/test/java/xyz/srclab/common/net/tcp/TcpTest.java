@@ -58,7 +58,7 @@ public class TcpTest {
         tcpServer.start();
         tcpClient.connect();
 
-        latch.lock();
+        latch.lockUp();
         BLog.info("Send message1: {}", CLIENT_MESSAGE);
         tcpClient.send(CLIENT_MESSAGE);
         latch.await();
@@ -74,7 +74,7 @@ public class TcpTest {
             SERVER_OPEN + SERVER_RECEIVE
         );
 
-        latch.lock();
+        latch.lockUp();
         BLog.info("Send message2: {}", CLIENT_MESSAGE);
         tcpClient.send(CLIENT_MESSAGE);
         latch.await();
@@ -90,7 +90,7 @@ public class TcpTest {
             SERVER_OPEN + SERVER_RECEIVE + SERVER_RECEIVE
         );
 
-        latch.lock();
+        latch.lockUp();
         BLog.info("Send message3: {}", CLIENT_MESSAGE);
         tcpClient.send(CLIENT_MESSAGE);
         latch.await();
@@ -109,7 +109,7 @@ public class TcpTest {
             SERVER_OPEN + SERVER_RECEIVE + SERVER_RECEIVE + SERVER_RECEIVE
         );
 
-        latch.lock();
+        latch.lockUp();
         BLog.info("Send message4: {}", CLIENT_MESSAGE);
         tcpClient.send(CLIENT_MESSAGE);
         latch.await();
@@ -128,7 +128,7 @@ public class TcpTest {
             SERVER_OPEN + SERVER_RECEIVE + SERVER_RECEIVE + SERVER_RECEIVE + SERVER_RECEIVE
         );
 
-        latch.lock();
+        latch.lockUp();
         tcpClient.disconnect();
         latch.await();
 
@@ -154,7 +154,7 @@ public class TcpTest {
                 @Override
                 public void onOpen(@NotNull TcpContext context) {
                     openCount.incrementAndGet();
-                    latch.unlock();
+                    latch.lockDown();
                 }
 
                 @Override
@@ -166,13 +166,13 @@ public class TcpTest {
                         return;
                     }
                     receiveCount.incrementAndGet();
-                    latch.unlock();
+                    latch.lockDown();
                 }
 
                 @Override
                 public void onClose(@NotNull TcpContext context) {
                     closeCount.incrementAndGet();
-                    latch.unlock();
+                    latch.lockDown();
                 }
             }
         );
@@ -212,7 +212,7 @@ public class TcpTest {
                 tcpClient.connect();
                 tcpClient.send("123");
                 tcpClient.disconnect();
-                latch.unlock();
+                latch.lockDown();
             });
         }
         latch.await();
@@ -261,7 +261,7 @@ public class TcpTest {
             serverReceivedMessage += read;
             context.write(SERVER_RECEIVE.getBytes());
             BLog.info("Server receive: {}@{}", context.getRemoteAddress(), read);
-            latch.unlock();
+            latch.lockDown();
         }
 
         @Override
@@ -269,9 +269,7 @@ public class TcpTest {
             serverSentMessage += SERVER_CLOSE;
             //context.write(SERVER_CLOSE.getBytes());
             BLog.info("Server close: {}", context.getRemoteAddress());
-            latch.unlock();
+            latch.lockDown();
         }
     }
 }
-
-

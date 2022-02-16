@@ -20,26 +20,26 @@ interface RunLatch {
     /**
      * Adds lock value with `1`.
      */
-    fun lock() {
-        lock(1)
+    fun lockUp() {
+        lockUp(1)
     }
 
     /**
      * Adds lock value [value].
      */
-    fun lock(value: Long)
+    fun lockUp(value: Long)
 
     /**
      * Minus lock value with `1`.
      */
-    fun unlock() {
-        unlock(1)
+    fun lockDown() {
+        lockDown(1)
     }
 
     /**
      * Minus lock value with [value].
      */
-    fun unlock(value: Long)
+    fun lockDown(value: Long)
 
     /**
      * Sets lock value with [value].
@@ -67,6 +67,8 @@ interface RunLatch {
 
         /**
          * Returns a new [RunLatch] with lock value [initLockValue].
+         *
+         * Default [initLockValue] is 1.
          */
         @JvmOverloads
         @JvmStatic
@@ -86,7 +88,7 @@ interface RunLatch {
             }
 
             @Synchronized
-            override fun unlock(value: Long) {
+            override fun lockDown(value: Long) {
                 lockValue -= value
                 resetCountDownLatch()
             }
@@ -98,7 +100,7 @@ interface RunLatch {
             }
 
             @Synchronized
-            override fun lock(value: Long) {
+            override fun lockUp(value: Long) {
                 lockValue += value
                 resetCountDownLatch()
             }
