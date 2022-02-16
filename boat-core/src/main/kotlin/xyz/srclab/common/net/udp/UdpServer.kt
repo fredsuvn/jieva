@@ -3,12 +3,13 @@ package xyz.srclab.common.net.udp
 import xyz.srclab.common.io.newByteBuffer
 import xyz.srclab.common.net.NetServer
 import xyz.srclab.common.net.nioListen
-import xyz.srclab.common.net.tcp.TcpChannelHandler
 import xyz.srclab.common.net.tcp.TcpServer
 import xyz.srclab.common.run.RunLatch
 import java.io.IOException
 import java.net.SocketAddress
-import java.nio.channels.*
+import java.nio.channels.DatagramChannel
+import java.nio.channels.SelectionKey
+import java.nio.channels.Selector
 import java.util.concurrent.Executor
 
 /**
@@ -19,7 +20,6 @@ interface UdpServer : NetServer {
     companion object {
 
 
-
         private class NIOUdpServer(
             override val bindAddress: SocketAddress,
             private val channelHandler: UdpChannelHandler,
@@ -28,7 +28,7 @@ interface UdpServer : NetServer {
             private val directBuffer: Boolean = false
         ) : TcpServer {
 
-            private var datagramChannel:DatagramChannel? = null
+            private var datagramChannel: DatagramChannel? = null
             private var selector: Selector? = null
             private val listenLatch: RunLatch = RunLatch.newRunLatch()
 
@@ -68,7 +68,11 @@ interface UdpServer : NetServer {
                 datagramChannel.register(selector, SelectionKey.OP_READ)
                 this.selector = selector
                 this.datagramChannel = datagramChannel
-                executor.execute { nioListen(listenLatch, selector) { handleKey(it) } }
+                executor.execute {
+                    listenLatch.lockTo(1)
+                    nioListen(selector) { handleKey(it) }
+                    listenLatch.lockDown()
+                }
             }
 
             private fun handleKey(key: SelectionKey) {
@@ -90,12 +94,12 @@ interface UdpServer : NetServer {
                         if (clientAddress == null) {
                             return
                         }
-                        buffer.flip()
-                            executor.execute { channelHandler.onReceive(clientAddress, buffer) }
-                            return
+                        executor.execute {
+                            buffer.flip()
+                            channelHandler.onReceive(clientAddress, buffer)
+                        }
+                        return
                     } catch (e: IOException) {
-                        channel.close()
-                        executor.execute { channelHandler.onClose(context) }
                         return
                     }
                 }

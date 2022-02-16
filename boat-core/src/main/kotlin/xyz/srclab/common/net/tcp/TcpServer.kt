@@ -86,7 +86,11 @@ interface TcpServer : NetServer {
                 serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT)
                 this.selector = selector
                 this.serverSocketChannel = serverSocketChannel
-                executor.execute { nioListen(listenLatch, selector) { handleKey(it) } }
+                executor.execute {
+                    listenLatch.lockTo(1)
+                    nioListen(selector) { handleKey(it) }
+                    listenLatch.lockDown()
+                }
             }
 
             private fun handleKey(key: SelectionKey) {
@@ -98,36 +102,48 @@ interface TcpServer : NetServer {
                     clientChannel.configureBlocking(false)
                     clientChannel.register(selector, SelectionKey.OP_READ)
                     //socketChannel.register(selector, SelectionKey.OP_WRITE)
-                    val context = SimpleContext(selector, clientChannel)
-                    executor.execute { channelHandler.onOpen(context) }
+                    val remoteAddress = clientChannel.remoteAddress
+                    executor.execute {
+                        val context = SimpleContext(selector, clientChannel, remoteAddress)
+                        channelHandler.onOpen(context)
+                    }
                 }
                 if (key.isReadable) {
                     val socketChannel = key.channel() as SocketChannel
-                    val context = SimpleContext(selector, socketChannel)
+                    val remoteAddress = socketChannel.remoteAddress
                     val buffer = newByteBuffer(bufferSize, directBuffer)
                     try {
                         val readCount = socketChannel.read(buffer)
                         if (readCount < 0) {
                             socketChannel.close()
-                            executor.execute { channelHandler.onClose(context) }
+                            executor.execute {
+                                val context = SimpleContext(selector, socketChannel, remoteAddress)
+                                channelHandler.onClose(context)
+                            }
                             return
                         }
                     } catch (e: IOException) {
                         socketChannel.close()
-                        executor.execute { channelHandler.onClose(context) }
+                        executor.execute {
+                            val context = SimpleContext(selector, socketChannel, remoteAddress)
+                            channelHandler.onClose(context)
+                        }
                         return
                     }
-                    buffer.flip()
-                    executor.execute { channelHandler.onReceive(context, buffer.asReadOnlyBuffer()) }
+                    executor.execute {
+                        buffer.flip()
+                        val context = SimpleContext(selector, socketChannel, remoteAddress)
+                        channelHandler.onReceive(context, buffer.asReadOnlyBuffer())
+                    }
                 }
             }
 
             private inner class SimpleContext(
                 private val selector: Selector,
-                private val socketChannel: SocketChannel
+                private val socketChannel: SocketChannel,
+                override val remoteAddress: SocketAddress
             ) : TcpContext {
 
-                override val remoteAddress: SocketAddress = socketChannel.remoteAddress
                 override val server: TcpServer = this@NIOTcpServer
 
                 override fun write(data: ByteBuffer) {

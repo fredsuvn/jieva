@@ -2,13 +2,11 @@
 
 package xyz.srclab.common.net
 
-import xyz.srclab.common.run.RunLatch
 import java.nio.channels.ClosedSelectorException
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 
-fun nioListen(listenLatch: RunLatch, selector: Selector, handler: (SelectionKey) -> Unit) {
-    listenLatch.lockTo(1)
+fun nioListen(selector: Selector, handler: (SelectionKey) -> Unit) {
     while (true) {
         try {
             val readyChannels = selector.select()
@@ -26,5 +24,4 @@ fun nioListen(listenLatch: RunLatch, selector: Selector, handler: (SelectionKey)
             break
         }
     }
-    listenLatch.unlock()
 }
