@@ -289,14 +289,6 @@ interface TcpClient {
                 }
             }
 
-            //override fun receive(dest: ByteBuffer): Int {
-            //    val socketChannel = this.socketChannel
-            //    if (socketChannel === null) {
-            //        throw IllegalStateException("Client has not been connected, disconnect it first!")
-            //    }
-            //    return socketChannel.read(dest)
-            //}
-
             override fun receive(dest: ByteBuffer): Int {
                 val selector = this.selector
                 val socketChannel = this.socketChannel
@@ -314,17 +306,6 @@ interface TcpClient {
                 }
                 return NIOInputStream(selector, socketChannel)
             }
-
-            //override fun receiveBytes(): ByteArray {
-            //    val socketChannel = this.socketChannel
-            //    if (socketChannel === null) {
-            //        throw IllegalStateException("Client has not been connected, disconnect it first!")
-            //    }
-            //    val buffer = ByteBuffer.allocate(bufferSize)
-            //    socketChannel.read(buffer)
-            //    buffer.flip()
-            //    return buffer.getBytes()
-            //}
 
             override fun receiveBytes(): ByteArray {
                 val selector = this.selector

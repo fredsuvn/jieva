@@ -1,7 +1,7 @@
 package xyz.srclab.common.net.tcp
 
 import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
-import xyz.srclab.common.io.newByteBuffer
+import xyz.srclab.common.net.ByteBufferPool
 import xyz.srclab.common.net.NetServer
 import xyz.srclab.common.net.nioListen
 import xyz.srclab.common.run.AsyncRunner
@@ -33,9 +33,9 @@ interface TcpServer : NetServer {
             channelHandler: TcpChannelHandler,
             executor: Executor = AsyncRunner.asExecutor(),
             bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
-            directBuffer: Boolean = false
+            bufferPool: ByteBufferPool = ByteBufferPool.simpleByteBufferPool()
         ): TcpServer {
-            return NIOTcpServer(bindAddress, channelHandler, executor, bufferSize, directBuffer)
+            return NIOTcpServer(bindAddress, channelHandler, executor, bufferSize, bufferPool)
         }
 
         private class NIOTcpServer(
@@ -43,12 +43,14 @@ interface TcpServer : NetServer {
             private val channelHandler: TcpChannelHandler,
             private val executor: Executor,
             private val bufferSize: Int,
-            private val directBuffer: Boolean
+            private val bufferPool: ByteBufferPool
         ) : TcpServer {
 
             private var selector: Selector? = null
             private var serverSocketChannel: ServerSocketChannel? = null
             private val listenLatch: RunLatch = RunLatch.newRunLatch()
+
+            private var tempBuffer: ByteBufferPool.PooledByteBuffer? = null
 
             @Synchronized
             override fun start() {
@@ -72,6 +74,7 @@ interface TcpServer : NetServer {
                 serverSocketChannel.close()
                 this.selector = null
                 this.serverSocketChannel = null
+                listenLatch.lockDown()
             }
 
             override fun await() {
@@ -111,31 +114,50 @@ interface TcpServer : NetServer {
                 if (key.isReadable) {
                     val socketChannel = key.channel() as SocketChannel
                     val remoteAddress = socketChannel.remoteAddress
-                    val buffer = newByteBuffer(bufferSize, directBuffer)
+                    val buffer = getBuffer()
+                    val buf = buffer.asByteBuffer()
                     try {
-                        val readCount = socketChannel.read(buffer)
+                        val readCount = socketChannel.read(buf)
                         if (readCount < 0) {
+                            //println("0000000000000000000")
                             socketChannel.close()
                             executor.execute {
                                 val context = SimpleContext(selector, socketChannel, remoteAddress)
                                 channelHandler.onClose(context)
                             }
+                            tempBuffer = buffer
+                            return
+                        }
+                        if (readCount == 0) {
+                            tempBuffer = buffer
                             return
                         }
                     } catch (e: IOException) {
+                        println("eeeeeeeeee: $e")
                         socketChannel.close()
                         executor.execute {
                             val context = SimpleContext(selector, socketChannel, remoteAddress)
                             channelHandler.onClose(context)
                         }
+                        tempBuffer = buffer
                         return
                     }
                     executor.execute {
-                        buffer.flip()
+                        buf.flip()
                         val context = SimpleContext(selector, socketChannel, remoteAddress)
-                        channelHandler.onReceive(context, buffer.asReadOnlyBuffer())
+                        channelHandler.onReceive(context, buf.asReadOnlyBuffer())
+                        bufferPool.releaseBuffer(buffer)
                     }
+                    tempBuffer = null
                 }
+            }
+
+            private fun getBuffer(): ByteBufferPool.PooledByteBuffer {
+                val tempBuffer = this.tempBuffer
+                if (tempBuffer !== null) {
+                    return tempBuffer
+                }
+                return bufferPool.getBuffer()
             }
 
             private inner class SimpleContext(

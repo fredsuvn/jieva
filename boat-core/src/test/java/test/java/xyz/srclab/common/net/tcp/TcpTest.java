@@ -16,6 +16,7 @@ import xyz.srclab.common.run.Runner;
 
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -142,12 +143,51 @@ public class TcpTest {
 
     @Test
     public void testOpenClose() throws Exception {
-        InetSocketAddress address = BSocket.availableLocalhost();
+        SocketAddress address = new InetSocketAddress(18080);
         int clientCount = 1000;
+        List<TcpClient> nioClients = new LinkedList<>();
+        for (int i = 0; i < clientCount; i++) {
+            TcpClient tcpClient = TcpClient.nioClient(address);
+            nioClients.add(tcpClient);
+        }
+        List<TcpClient> bioClients = new LinkedList<>();
+        for (int i = 0; i < clientCount; i++) {
+            TcpClient tcpClient = TcpClient.bioClient(address);
+            bioClients.add(tcpClient);
+        }
+        testClientClose0(address, nioClients);
+        testClientClose0(address, bioClients);
+
+        //address = new InetSocketAddress(18088);
+        nioClients = new LinkedList<>();
+        for (int i = 0; i < clientCount; i++) {
+            TcpClient tcpClient = TcpClient.nioClient(address);
+            nioClients.add(tcpClient);
+        }
+        bioClients = new LinkedList<>();
+        for (int i = 0; i < clientCount; i++) {
+            TcpClient tcpClient = TcpClient.bioClient(address);
+            bioClients.add(tcpClient);
+        }
+        testServerClose0(address, nioClients);
+        testServerClose0(address, bioClients);
+    }
+
+    private void testClientClose0(
+        SocketAddress address,
+        Collection<TcpClient> tcpClients
+    ) throws Exception {
+
         AtomicInteger openCount = new AtomicInteger(0);
         AtomicInteger closeCount = new AtomicInteger(0);
         AtomicInteger receiveCount = new AtomicInteger(0);
         RunLatch latch = RunLatch.newRunLatch(0);
+
+        latch.lockTo(tcpClients.size() * 4L);
+        openCount.set(0);
+        closeCount.set(0);
+        receiveCount.set(0);
+
         TcpServer tcpServer = TcpServer.nioServer(
             address,
             new TcpChannelHandler() {
@@ -159,12 +199,6 @@ public class TcpTest {
 
                 @Override
                 public void onReceive(@NotNull TcpContext context, @NotNull ByteBuffer data) {
-                    String read = BBuffer.getString(data);
-                    if ("close".equals(read)) {
-                        BLog.info("Disconnect client: {}@{}", context.getRemoteAddress(), read);
-                        context.disconnect();
-                        return;
-                    }
                     receiveCount.incrementAndGet();
                     latch.lockDown();
                 }
@@ -176,35 +210,7 @@ public class TcpTest {
                 }
             }
         );
-
-        List<TcpClient> nioClients = new LinkedList<>();
-        for (int i = 0; i < clientCount; i++) {
-            TcpClient tcpClient = TcpClient.nioClient(address);
-            nioClients.add(tcpClient);
-        }
-        testOpenClose0(tcpServer, nioClients, openCount, closeCount, receiveCount, latch);
-
-        List<TcpClient> bioClients = new LinkedList<>();
-        for (int i = 0; i < clientCount; i++) {
-            TcpClient tcpClient = TcpClient.bioClient(address);
-            bioClients.add(tcpClient);
-        }
-        testOpenClose0(tcpServer, bioClients, openCount, closeCount, receiveCount, latch);
-    }
-
-    private void testOpenClose0(
-        TcpServer tcpServer,
-        Collection<TcpClient> tcpClients,
-        AtomicInteger openCount,
-        AtomicInteger closeCount,
-        AtomicInteger receiveCount,
-        RunLatch latch
-    ) throws Exception {
-        latch.lockTo(tcpClients.size() * 4L);
         tcpServer.start();
-        openCount.set(0);
-        closeCount.set(0);
-        receiveCount.set(0);
 
         Runner runner = AsyncRunner.INSTANCE;
         for (TcpClient tcpClient : tcpClients) {
@@ -223,24 +229,76 @@ public class TcpTest {
         Assert.assertEquals(closeCount.get(), tcpClients.size());
         Assert.assertEquals(receiveCount.get(), tcpClients.size());
 
-        //latch.lockTo(2);
-        TcpClient tcpClient = tcpClients.iterator().next();
-        tcpClient.connect();
-        tcpClient.send("close");
-        //latch.await();
-        InputStream inputStream = tcpClient.receive();
-        Assert.assertEquals(inputStream.read(), -1);
+        tcpServer.stop();
+        tcpServer.await();
+    }
 
-        //latch.lockTo(2);
-        tcpClient.disconnect();
-        tcpClient.connect();
-        tcpClient.send("close");
-        ByteBuffer buffer = ByteBuffer.allocate(999);
-        //latch.await();
-        int bufferCount = tcpClient.receive(buffer);
-        Assert.assertEquals(bufferCount, -1);
+    private void testServerClose0(
+        SocketAddress address,
+        Collection<TcpClient> tcpClients
+    ) throws Exception {
+
+        AtomicInteger openCount = new AtomicInteger(0);
+        AtomicInteger closeCount = new AtomicInteger(0);
+        AtomicInteger receiveCount = new AtomicInteger(0);
+        RunLatch latch = RunLatch.newRunLatch(0);
+
+        latch.lockTo(tcpClients.size());
+        openCount.set(0);
+        closeCount.set(0);
+        receiveCount.set(0);
+
+        TcpServer tcpServer = TcpServer.nioServer(
+            address,
+            new TcpChannelHandler() {
+                @Override
+                public void onOpen(@NotNull TcpContext context) {
+                }
+
+                @Override
+                public void onReceive(@NotNull TcpContext context, @NotNull ByteBuffer data) {
+                    context.disconnect();
+                    receiveCount.incrementAndGet();
+                    latch.lockDown();
+                }
+
+                @Override
+                public void onClose(@NotNull TcpContext context) {
+                }
+            }
+        );
+        tcpServer.start();
+
+        latch.lockTo(tcpClients.size());
+        openCount.set(0);
+        closeCount.set(0);
+        receiveCount.set(0);
+
+        Runner runner = AsyncRunner.INSTANCE;
+        for (TcpClient tcpClient : tcpClients) {
+            runner.run(() -> {
+                tcpClient.connect();
+                tcpClient.send("123");
+            });
+        }
+        latch.await();
+        BLog.info("openCount: {}", openCount);
+        BLog.info("closeCount: {}", closeCount);
+        BLog.info("receiveCount: {}", receiveCount);
+        Assert.assertEquals(openCount.get(), 0);
+        Assert.assertEquals(closeCount.get(), 0);
+        Assert.assertEquals(receiveCount.get(), tcpClients.size());
+
+        for (TcpClient tcpClient : tcpClients) {
+            InputStream inputStream = tcpClient.receive();
+            Assert.assertEquals(inputStream.read(), -1);
+            ByteBuffer buffer = ByteBuffer.allocate(999);
+            int bufferCount = tcpClient.receive(buffer);
+            Assert.assertEquals(bufferCount, -1);
+        }
 
         tcpServer.stop();
+        tcpServer.await();
     }
 
     private static final class ServerHandler implements TcpChannelHandler {
@@ -264,7 +322,7 @@ public class TcpTest {
             serverSentMessage += SERVER_RECEIVE;
             serverReceivedMessage += read;
             context.write(SERVER_RECEIVE.getBytes());
-            BLog.info("Server receive: {}@{}", context.getRemoteAddress(), read);
+            BLog.info("Server receive from {}: {}", context.getRemoteAddress(), read);
             latch.lockDown();
         }
 
