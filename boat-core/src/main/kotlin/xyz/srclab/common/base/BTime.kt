@@ -13,6 +13,9 @@ import java.time.temporal.ChronoField
 import java.time.temporal.TemporalAccessor
 import java.util.*
 
+/**
+ * Default timestamp pattern.
+ */
 const val TIMESTAMP_PATTERN_STRING = "yyyyMMddHHmmssSSS"
 
 @JvmField
@@ -56,63 +59,77 @@ fun Instant.getZoneOffset(zoneId: ZoneId = ZoneId.systemDefault()): ZoneOffset {
     return zoneId.rules.getOffset(this)
 }
 
-fun Date.toZonedDateTime(): ZonedDateTime {
-    return this.toInstant().toZonedDateTime()
+@JvmOverloads
+fun Date.toZonedDateTime(tryBuild: Boolean = true): ZonedDateTime {
+    return this.toInstant().toZonedDateTime(tryBuild)
 }
 
-fun Date.toOffsetDateTime(): OffsetDateTime {
-    return this.toInstant().toOffsetDateTime()
+@JvmOverloads
+fun Date.toOffsetDateTime(tryBuild: Boolean = true): OffsetDateTime {
+    return this.toInstant().toOffsetDateTime(tryBuild)
 }
 
-fun Date.toLocalDateTime(): LocalDateTime {
-    return this.toInstant().toLocalDateTime()
+@JvmOverloads
+fun Date.toLocalDateTime(tryBuild: Boolean = true): LocalDateTime {
+    return this.toInstant().toLocalDateTime(tryBuild)
 }
 
-fun Date.toLocalDate(): LocalDate {
-    return this.toInstant().toLocalDate()
+@JvmOverloads
+fun Date.toLocalDate(tryBuild: Boolean = true): LocalDate {
+    return this.toInstant().toLocalDate(tryBuild)
 }
 
-fun Date.toLocalTime(): LocalTime {
-    return this.toInstant().toLocalTime()
+@JvmOverloads
+fun Date.toLocalTime(tryBuild: Boolean = true): LocalTime {
+    return this.toInstant().toLocalTime(tryBuild)
 }
 
-fun TemporalAccessor.toDate(): Date {
-    return toDateOrNull() ?: throw DateTimeException("toDate failed: $this")
+@JvmOverloads
+fun TemporalAccessor.toDate(tryBuild: Boolean = true): Date {
+    return toDateOrNull(tryBuild) ?: throw DateTimeException("toDate failed: $this")
 }
 
-fun TemporalAccessor.toInstant(): Instant {
-    return toInstantOrNull() ?: throw DateTimeException("toInstant failed: $this")
+@JvmOverloads
+fun TemporalAccessor.toInstant(tryBuild: Boolean = true): Instant {
+    return toInstantOrNull(tryBuild) ?: throw DateTimeException("toInstant failed: $this")
 }
 
-fun TemporalAccessor.toZonedDateTime(): ZonedDateTime {
-    return toZonedDateTimeOrNull() ?: throw DateTimeException("toZonedDateTime failed: $this")
+@JvmOverloads
+fun TemporalAccessor.toZonedDateTime(tryBuild: Boolean = true): ZonedDateTime {
+    return toZonedDateTimeOrNull(tryBuild) ?: throw DateTimeException("toZonedDateTime failed: $this")
 }
 
-fun TemporalAccessor.toOffsetDateTime(): OffsetDateTime {
-    return toOffsetDateTimeOrNull() ?: throw DateTimeException("toOffsetDateTime failed: $this")
+@JvmOverloads
+fun TemporalAccessor.toOffsetDateTime(tryBuild: Boolean = true): OffsetDateTime {
+    return toOffsetDateTimeOrNull(tryBuild) ?: throw DateTimeException("toOffsetDateTime failed: $this")
 }
 
-fun TemporalAccessor.toLocalDateTime(): LocalDateTime {
-    return toLocalDateTimeOrNull() ?: throw DateTimeException("toLocalDateTime failed: $this")
+@JvmOverloads
+fun TemporalAccessor.toLocalDateTime(tryBuild: Boolean = true): LocalDateTime {
+    return toLocalDateTimeOrNull(tryBuild) ?: throw DateTimeException("toLocalDateTime failed: $this")
 }
 
-fun TemporalAccessor.toLocalDate(): LocalDate {
-    return toLocalDateOrNull() ?: throw DateTimeException("toLocalDate failed: $this")
+@JvmOverloads
+fun TemporalAccessor.toLocalDate(tryBuild: Boolean = true): LocalDate {
+    return toLocalDateOrNull(tryBuild) ?: throw DateTimeException("toLocalDate failed: $this")
 }
 
-fun TemporalAccessor.toLocalTime(): LocalTime {
-    return toLocalTimeOrNull() ?: throw DateTimeException("toLocalTime failed: $this")
+@JvmOverloads
+fun TemporalAccessor.toLocalTime(tryBuild: Boolean = true): LocalTime {
+    return toLocalTimeOrNull(tryBuild) ?: throw DateTimeException("toLocalTime failed: $this")
 }
 
-fun TemporalAccessor.toDateOrNull(): Date? {
-    val instant = toInstantOrNull()
+@JvmOverloads
+fun TemporalAccessor.toDateOrNull(tryBuild: Boolean = true): Date? {
+    val instant = toInstantOrNull(tryBuild)
     if (instant === null) {
         return null
     }
     return Date.from(instant)
 }
 
-fun TemporalAccessor.toInstantOrNull(): Instant? {
+@JvmOverloads
+fun TemporalAccessor.toInstantOrNull(tryBuild: Boolean = true): Instant? {
     return when (this) {
         is Instant -> this
         is LocalDateTime -> this.toInstant(this.getZoneOffset())
@@ -123,11 +140,17 @@ fun TemporalAccessor.toInstantOrNull(): Instant? {
             localDateTime.toInstant(localDateTime.getZoneOffset())
         }
         is LocalTime -> null
-        else -> buildInstantOrNull()
+        else -> {
+            if (!tryBuild) {
+                return null
+            }
+            buildInstantOrNull()
+        }
     }
 }
 
-fun TemporalAccessor.toZonedDateTimeOrNull(): ZonedDateTime? {
+@JvmOverloads
+fun TemporalAccessor.toZonedDateTimeOrNull(tryBuild: Boolean = true): ZonedDateTime? {
     return when (this) {
         is Instant -> ZonedDateTime.ofInstant(this, ZoneId.systemDefault())
         is LocalDateTime -> this.atZone(ZoneId.systemDefault())
@@ -135,11 +158,17 @@ fun TemporalAccessor.toZonedDateTimeOrNull(): ZonedDateTime? {
         is OffsetDateTime -> this.toZonedDateTime()
         is LocalDate -> ZonedDateTime.of(this, LocalTime.MIN, ZoneId.systemDefault())
         is LocalTime -> ZonedDateTime.of(LocalDate.MIN, this, ZoneId.systemDefault())
-        else -> buildZonedDateTimeOrNull()
+        else -> {
+            if (!tryBuild) {
+                return null
+            }
+            buildZonedDateTimeOrNull()
+        }
     }
 }
 
-fun TemporalAccessor.toOffsetDateTimeOrNull(): OffsetDateTime? {
+@JvmOverloads
+fun TemporalAccessor.toOffsetDateTimeOrNull(tryBuild: Boolean = true): OffsetDateTime? {
     return when (this) {
         is Instant -> OffsetDateTime.ofInstant(this, ZoneId.systemDefault())
         is LocalDateTime -> this.atOffset(this.getZoneOffset())
@@ -147,11 +176,17 @@ fun TemporalAccessor.toOffsetDateTimeOrNull(): OffsetDateTime? {
         is OffsetDateTime -> this
         is LocalDate -> OffsetDateTime.of(this, LocalTime.MIN, currentZoneOffset())
         is LocalTime -> OffsetDateTime.of(LocalDate.MIN, this, currentZoneOffset())
-        else -> buildOffsetDateTimeOrNull()
+        else -> {
+            if (!tryBuild) {
+                return null
+            }
+            buildOffsetDateTimeOrNull()
+        }
     }
 }
 
-fun TemporalAccessor.toLocalDateTimeOrNull(): LocalDateTime? {
+@JvmOverloads
+fun TemporalAccessor.toLocalDateTimeOrNull(tryBuild: Boolean = true): LocalDateTime? {
     return when (this) {
         is Instant -> LocalDateTime.ofInstant(this, ZoneId.systemDefault())
         is LocalDateTime -> this
@@ -159,11 +194,17 @@ fun TemporalAccessor.toLocalDateTimeOrNull(): LocalDateTime? {
         is OffsetDateTime -> this.toLocalDateTime()
         is LocalDate -> LocalDateTime.of(this, LocalTime.MIN)
         is LocalTime -> LocalDateTime.of(LocalDate.MIN, this)
-        else -> buildLocalDateTimeOrNull()
+        else -> {
+            if (!tryBuild) {
+                return null
+            }
+            buildLocalDateTimeOrNull()
+        }
     }
 }
 
-fun TemporalAccessor.toLocalDateOrNull(): LocalDate? {
+@JvmOverloads
+fun TemporalAccessor.toLocalDateOrNull(tryBuild: Boolean = true): LocalDate? {
     return when (this) {
         is Instant -> this.atZone(ZoneId.systemDefault()).toLocalDate()
         is LocalDateTime -> this.toLocalDate()
@@ -171,11 +212,17 @@ fun TemporalAccessor.toLocalDateOrNull(): LocalDate? {
         is OffsetDateTime -> this.toLocalDate()
         is LocalDate -> this
         is LocalTime -> null
-        else -> buildLocalDateOrNull()
+        else -> {
+            if (!tryBuild) {
+                return null
+            }
+            buildLocalDateOrNull()
+        }
     }
 }
 
-fun TemporalAccessor.toLocalTimeOrNull(): LocalTime? {
+@JvmOverloads
+fun TemporalAccessor.toLocalTimeOrNull(tryBuild: Boolean = true): LocalTime? {
     return when (this) {
         is Instant -> this.atZone(ZoneId.systemDefault()).toLocalTime()
         is LocalDateTime -> this.toLocalTime()
@@ -183,7 +230,12 @@ fun TemporalAccessor.toLocalTimeOrNull(): LocalTime? {
         is OffsetDateTime -> this.toLocalTime()
         is LocalDate -> null
         is LocalTime -> this
-        else -> buildLocalTimeOrNull()
+        else -> {
+            if (!tryBuild) {
+                return null
+            }
+            buildLocalTimeOrNull()
+        }
     }
 }
 
@@ -345,7 +397,7 @@ fun TemporalAccessor.getYear(): Int {
 
 
 /**
- * Pattern of datetime.
+ * Pattern of datetime, used to convert between string types and Date types.
  */
 interface DatePattern {
 
@@ -514,210 +566,6 @@ interface DatePattern {
         return parseLocalTime(obj.toString())
     }
 
-    fun buildInstant(chars: CharSequence): Instant {
-        return parseTemporalAccessor(chars).toInstant()
-    }
-
-    fun buildInstant(obj: Any): Instant {
-        if (obj is Instant) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toInstant()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toInstant()
-        }
-        return buildInstant(obj.toString())
-    }
-
-    fun buildZonedDateTime(chars: CharSequence): ZonedDateTime {
-        return parseTemporalAccessor(chars).toZonedDateTime()
-    }
-
-    fun buildZonedDateTime(obj: Any): ZonedDateTime {
-        if (obj is ZonedDateTime) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toZonedDateTime()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toZonedDateTime()
-        }
-        return buildZonedDateTime(obj.toString())
-    }
-
-    fun buildOffsetDateTime(chars: CharSequence): OffsetDateTime {
-        return parseTemporalAccessor(chars).toOffsetDateTime()
-    }
-
-    fun buildOffsetDateTime(obj: Any): OffsetDateTime {
-        if (obj is OffsetDateTime) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toOffsetDateTime()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toOffsetDateTime()
-        }
-        return buildOffsetDateTime(obj.toString())
-    }
-
-    fun buildLocalDateTime(chars: CharSequence): LocalDateTime {
-        return parseTemporalAccessor(chars).toLocalDateTime()
-    }
-
-    fun buildLocalDateTime(obj: Any): LocalDateTime {
-        if (obj is LocalDateTime) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toLocalDateTime()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toLocalDateTime()
-        }
-        return buildLocalDateTime(obj.toString())
-    }
-
-    fun buildLocalDate(chars: CharSequence): LocalDate {
-        return parseTemporalAccessor(chars).toLocalDate()
-    }
-
-    fun buildLocalDate(obj: Any): LocalDate {
-        if (obj is LocalDate) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toLocalDate()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toLocalDate()
-        }
-        return buildLocalDate(obj.toString())
-    }
-
-    fun buildLocalTime(chars: CharSequence): LocalTime {
-        return parseTemporalAccessor(chars).toLocalTime()
-    }
-
-    fun buildLocalTime(obj: Any): LocalTime {
-        if (obj is LocalTime) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toLocalTime()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toLocalTime()
-        }
-        return buildLocalTime(obj.toString())
-    }
-
-    fun buildInstantOrNull(chars: CharSequence): Instant? {
-        return parseTemporalAccessorOrNull(chars)?.toInstantOrNull()
-    }
-
-    fun buildInstantOrNull(obj: Any): Instant? {
-        if (obj is Instant) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toInstant()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toInstantOrNull()
-        }
-        return buildInstantOrNull(obj.toString())
-    }
-
-    fun buildZonedDateTimeOrNull(chars: CharSequence): ZonedDateTime? {
-        return parseTemporalAccessorOrNull(chars)?.toZonedDateTimeOrNull()
-    }
-
-    fun buildZonedDateTimeOrNull(obj: Any): ZonedDateTime? {
-        if (obj is ZonedDateTime) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toZonedDateTime()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toZonedDateTimeOrNull()
-        }
-        return buildZonedDateTimeOrNull(obj.toString())
-    }
-
-    fun buildOffsetDateTimeOrNull(chars: CharSequence): OffsetDateTime? {
-        return parseTemporalAccessorOrNull(chars)?.toOffsetDateTimeOrNull()
-    }
-
-    fun buildOffsetDateTimeOrNull(obj: Any): OffsetDateTime? {
-        if (obj is OffsetDateTime) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toOffsetDateTime()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toOffsetDateTimeOrNull()
-        }
-        return buildOffsetDateTimeOrNull(obj.toString())
-    }
-
-    fun buildLocalDateTimeOrNull(chars: CharSequence): LocalDateTime? {
-        return parseTemporalAccessorOrNull(chars)?.toLocalDateTimeOrNull()
-    }
-
-    fun buildLocalDateTimeOrNull(obj: Any): LocalDateTime? {
-        if (obj is LocalDateTime) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toLocalDateTime()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toLocalDateTimeOrNull()
-        }
-        return buildLocalDateTimeOrNull(obj.toString())
-    }
-
-    fun buildLocalDateOrNull(chars: CharSequence): LocalDate? {
-        return parseTemporalAccessorOrNull(chars)?.toLocalDateOrNull()
-    }
-
-    fun buildLocalDateOrNull(obj: Any): LocalDate? {
-        if (obj is LocalDate) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toLocalDate()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toLocalDateOrNull()
-        }
-        return buildLocalDateOrNull(obj.toString())
-    }
-
-    fun buildLocalTimeOrNull(chars: CharSequence): LocalTime? {
-        return parseTemporalAccessorOrNull(chars)?.toLocalTimeOrNull()
-    }
-
-    fun buildLocalTimeOrNull(obj: Any): LocalTime? {
-        if (obj is LocalTime) {
-            return obj
-        }
-        if (obj is Date) {
-            return obj.toLocalTime()
-        }
-        if (obj is TemporalAccessor) {
-            return obj.toLocalTimeOrNull()
-        }
-        return buildLocalTimeOrNull(obj.toString())
-    }
-
     companion object {
 
         @JvmName("of")
@@ -733,7 +581,9 @@ interface DatePattern {
         }
 
         /**
-         * Note `pattern` and `toDateFormat` is unsupported for returned [DatePattern].
+         * Returns a [DatePattern] from given [DateTimeFormatter].
+         *
+         * This implementation of [DatePattern] doesn't support `pattern` and `toDateFormat`.
          */
         @JvmName("of")
         @JvmStatic

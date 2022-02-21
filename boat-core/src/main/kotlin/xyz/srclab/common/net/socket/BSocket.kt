@@ -19,7 +19,7 @@ fun availableSocketPort(): Int {
  * Returns available [InetSocketAddress] with host of `localhost` and port form [availableSocketPort].
  */
 fun availableLocalhost(): InetSocketAddress {
-    return InetSocketAddress("localhost", availableSocketPort())
+    return InetSocketAddress(availableSocketPort())
 }
 
 fun CharSequence.parseInetSocketAddress(): InetSocketAddress {

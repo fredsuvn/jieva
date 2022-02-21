@@ -143,7 +143,7 @@ public class TcpTest {
 
     @Test
     public void testOpenClose() throws Exception {
-        SocketAddress address = new InetSocketAddress(18080);
+        SocketAddress address = BSocket.availableLocalhost();
         int clientCount = 1000;
         List<TcpClient> nioClients = new LinkedList<>();
         for (int i = 0; i < clientCount; i++) {

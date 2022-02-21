@@ -1,33 +1,28 @@
-@file:JvmName("BLang")
+@file:JvmName("BFunction")
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.JumpState.*
 import java.util.concurrent.Callable
 import java.util.function.*
 import java.util.function.Function
 
 @FunctionalInterface
-interface IndexPredicate<T> {
-
+interface IndexedPredicate<T> {
     fun test(index: Int, t: T): Boolean
 }
 
 @FunctionalInterface
-interface IndexFunction<T, R> {
-
+interface IndexedFunction<T, R> {
     fun apply(index: Int, t: T): R
 }
 
 @FunctionalInterface
-interface IndexBiFunction<T, U, R> {
-
+interface IndexedBiFunction<T, U, R> {
     fun apply(index: Int, t: T, u: U): R
 }
 
 @FunctionalInterface
-interface IndexConsumer<T> {
-
+interface IndexedConsumer<T> {
     fun accept(index: Int, t: T)
 }
 
@@ -63,19 +58,19 @@ fun <T, U> BiConsumer<T, U>.toKotlinFun(): (T, U) -> Unit = { it0, it1 ->
     this.accept(it0, it1)
 }
 
-fun <T> IndexPredicate<T>.toKotlinFun(): (Int, T) -> Boolean = { i, it ->
+fun <T> IndexedPredicate<T>.toKotlinFun(): (Int, T) -> Boolean = { i, it ->
     this.test(i, it)
 }
 
-fun <T, R> IndexFunction<T, R>.toKotlinFun(): (Int, T) -> R = { i, it ->
+fun <T, R> IndexedFunction<T, R>.toKotlinFun(): (Int, T) -> R = { i, it ->
     this.apply(i, it)
 }
 
-fun <T, U, R> IndexBiFunction<T, U, R>.toKotlinFun(): (Int, T, U) -> R = { i, it0, it1 ->
+fun <T, U, R> IndexedBiFunction<T, U, R>.toKotlinFun(): (Int, T, U) -> R = { i, it0, it1 ->
     this.apply(i, it0, it1)
 }
 
-fun <T> IndexConsumer<T>.toKotlinFun(): (Int, T) -> Unit = { i, it ->
+fun <T> IndexedConsumer<T>.toKotlinFun(): (Int, T) -> Unit = { i, it ->
     this.accept(i, it)
 }
 
@@ -119,99 +114,34 @@ fun <R> (() -> R).toCallable(): Callable<R> {
     return Callable { this() }
 }
 
-fun <T> ((Int, T) -> Boolean).toIndexPredicate(): IndexPredicate<T> {
-    return object : IndexPredicate<T> {
+fun <T> ((Int, T) -> Boolean).toIndexPredicate(): IndexedPredicate<T> {
+    return object : IndexedPredicate<T> {
         override fun test(index: Int, t: T): Boolean {
             return this@toIndexPredicate(index, t)
         }
     }
 }
 
-fun <T, R> ((Int, T) -> R).toIndexFunction(): IndexFunction<T, R> {
-    return object : IndexFunction<T, R> {
+fun <T, R> ((Int, T) -> R).toIndexFunction(): IndexedFunction<T, R> {
+    return object : IndexedFunction<T, R> {
         override fun apply(index: Int, t: T): R {
             return this@toIndexFunction(index, t)
         }
     }
 }
 
-fun <T, U, R> ((Int, T, U) -> R).toIndexFunction(): IndexBiFunction<T, U, R> {
-    return object : IndexBiFunction<T, U, R> {
+fun <T, U, R> ((Int, T, U) -> R).toIndexFunction(): IndexedBiFunction<T, U, R> {
+    return object : IndexedBiFunction<T, U, R> {
         override fun apply(index: Int, t: T, u: U): R {
             return this@toIndexFunction(index, t, u)
         }
     }
 }
 
-fun <T> ((Int, T) -> Any?).toIndexConsumer(): IndexConsumer<T> {
-    return object : IndexConsumer<T> {
+fun <T> ((Int, T) -> Any?).toIndexConsumer(): IndexedConsumer<T> {
+    return object : IndexedConsumer<T> {
         override fun accept(index: Int, t: T) {
             this@toIndexConsumer(index, t)
         }
     }
-}
-
-/**
- * Jump statement for process control: [CONTINUE], [BREAK] or [RETURN].
- */
-enum class JumpState {
-
-    /**
-     * Stops the current execution of the iteration and proceeds to the next iteration in the loop.
-     */
-    CONTINUE,
-
-    /**
-     * Stops loop.
-     */
-    BREAK,
-
-    /**
-     * Stops the current execution of the method and returns.
-     */
-    RETURN,
-    ;
-
-    fun isContinue(): Boolean {
-        return this == CONTINUE
-    }
-
-    fun isBreak(): Boolean {
-        return this == BREAK
-    }
-
-    fun isReturn(): Boolean {
-        return this == RETURN
-    }
-}
-
-/**
- * Policy of thread-safe.
- */
-enum class ThreadSafePolicy {
-
-    /**
-     * None thread-safe.
-     */
-    NONE,
-
-    /**
-     * Synchronized.
-     */
-    SYNCHRONIZED,
-
-    /**
-     * Concurrent.
-     */
-    CONCURRENT,
-
-    /**
-     * Thread-local.
-     */
-    THREAD_LOCAL,
-
-    /**
-     * Copy-on-write.
-     */
-    COPY_ON_WRITE,
 }

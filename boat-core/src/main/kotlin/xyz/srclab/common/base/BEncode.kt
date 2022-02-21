@@ -12,13 +12,13 @@ import java.nio.charset.Charset
 import java.util.*
 
 fun getBase64Length(sourceSize: Int): Int {
-    val rl = sourceSize / 3 * 4
-    return if (sourceSize % 3 == 0) rl else rl + 4
+    val expected = sourceSize / 3 * 4
+    return if (sourceSize % 3 == 0) expected else expected + 4
 }
 
 fun getBase64Length(sourceSize: Long): Long {
-    val rl = sourceSize / 3 * 4
-    return if (sourceSize % 3 == 0L) rl else rl + 4
+    val expected = sourceSize / 3 * 4
+    return if (sourceSize % 3 == 0L) expected else expected + 4
 }
 
 fun getDeBase64Length(base64Size: Int): Int {

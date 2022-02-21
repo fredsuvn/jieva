@@ -191,7 +191,7 @@ fun <S, T : S> List<T>.reduceRight(operation: BiFunction<in T, in S, S>): S {
     return this.reduceRightKt(operation.toKotlinFun())
 }
 
-fun <S, T : S> List<T>.reduceRightIndexed(operation: IndexBiFunction<in T, in S, S>): S {
+fun <S, T : S> List<T>.reduceRightIndexed(operation: IndexedBiFunction<in T, in S, S>): S {
     return this.reduceRightIndexedKt(operation.toKotlinFun())
 }
 
@@ -199,7 +199,7 @@ fun <S, T : S> List<T>.reduceRightOrNull(operation: BiFunction<in T, in S, S>): 
     return this.reduceRightOrNullKt(operation.toKotlinFun())
 }
 
-fun <S, T : S> List<T>.reduceRightIndexedOrNull(operation: IndexBiFunction<in T, in S, S>): S? {
+fun <S, T : S> List<T>.reduceRightIndexedOrNull(operation: IndexedBiFunction<in T, in S, S>): S? {
     return this.reduceRightIndexedOrNullKt(operation.toKotlinFun())
 }
 
@@ -207,7 +207,7 @@ fun <T, R> List<T>.reduceRight(initial: R, operation: BiFunction<in T, in R, R>)
     return this.foldRightKt(initial, operation.toKotlinFun())
 }
 
-fun <T, R> List<T>.reduceRightIndexed(initial: R, operation: IndexBiFunction<in T, in R, R>): R {
+fun <T, R> List<T>.reduceRightIndexed(initial: R, operation: IndexedBiFunction<in T, in R, R>): R {
     return this.foldRightIndexedKt(initial, operation.toKotlinFun())
 }
 

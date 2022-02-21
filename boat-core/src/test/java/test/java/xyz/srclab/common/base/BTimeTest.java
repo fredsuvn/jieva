@@ -7,6 +7,7 @@ import xyz.srclab.common.base.DatePattern;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -42,12 +43,12 @@ public class BTimeTest {
         DatePattern pattern = DatePattern.of("yyyy-MM-dd hh:mm:ss");
         String date = "2021-09-16 03:00:18";
         Assert.assertEquals(
-            pattern.buildLocalDateTime(date),
+            BTime.toLocalDateTime(pattern.parseTemporalAccessor(date)),
             LocalDateTime.of(2021, 9, 16, 3, 0, 18)
         );
         Assert.assertEquals(
-            pattern.buildLocalDateTimeOrNull(date),
-            LocalDateTime.of(2021, 9, 16, 3, 0, 18)
+            BTime.toZonedDateTime(pattern.parseTemporalAccessor(date)),
+            ZonedDateTime.of(LocalDateTime.of(2021, 9, 16, 3, 0, 18), ZoneId.systemDefault())
         );
     }
 }

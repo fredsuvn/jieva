@@ -26,7 +26,7 @@ public class BStringTest {
         Assert.assertEquals(sr.charAt(1), '1');
         cs[1] = '6';
         Assert.assertEquals(sr.charAt(1), '6');
-        Assert.assertEquals(sr.subSequence(2, 4), StringRef.of(cs, 2));
+        Assert.assertEquals(sr.subSequence(2, 4).toString(), StringRef.of(cs, 2).toString());
         Assert.assertEquals(sr.toString(), "0623");
     }
 

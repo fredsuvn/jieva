@@ -6,37 +6,37 @@ package xyz.srclab.common.base
  * @param A type of array
  * @param R type of array ref
  */
-interface ArrayRefBase<A, R : ArrayRefBase<A, R>> {
+interface BaseArrayRef<A, R : BaseArrayRef<A, R>> {
 
     /**
-     * Start index inclusive.
+     * Start index of referenced array.
      */
     val startIndex: Int
 
     /**
-     * End index exclusive.
+     * End index of referenced array, exclusive.
      */
     val endIndex: Int
 
     /**
-     * Offset position inclusive.
+     * Offset of referenced array.
      */
     val offset: Int get() = startIndex
 
     /**
-     * Length.
+     * Length of referenced part.
      */
     val length: Int get() = endIndex - startIndex
 
     /**
-     * Returns actual index of super-sequence, computed from given [index] which is a relative index.
+     * Returns actual index of referenced array, computed from given [index] which is a relative index of this ref.
      */
     fun actualIndex(index: Int) = startIndex + index
 
     /**
-     * Returns a new array ref which refers to subsequence of current ref.
+     * Returns a new sub-array-ref.
      */
-    fun subArray(startIndex: Int, endIndex: Int): R
+    fun subRef(startIndex: Int, endIndex: Int): R
 
     /**
      * Copies and returns a new array of current range.
@@ -47,7 +47,7 @@ interface ArrayRefBase<A, R : ArrayRefBase<A, R>> {
 /**
  * Array reference.
  */
-interface ArrayRef<T> : ArrayRefBase<Array<T>, ArrayRef<T>> {
+interface ArrayRef<T> : BaseArrayRef<Array<T>, ArrayRef<T>> {
 
     val array: Array<T>
 
@@ -91,7 +91,7 @@ interface ArrayRef<T> : ArrayRefBase<Array<T>, ArrayRef<T>> {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
-            override fun subArray(startIndex: Int, endIndex: Int): ArrayRef<T> {
+            override fun subRef(startIndex: Int, endIndex: Int): ArrayRef<T> {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 return ArrayRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
@@ -102,7 +102,7 @@ interface ArrayRef<T> : ArrayRefBase<Array<T>, ArrayRef<T>> {
 /**
  * Boolean array reference.
  */
-interface BooleansRef : ArrayRefBase<BooleanArray, BooleansRef> {
+interface BooleansRef : BaseArrayRef<BooleanArray, BooleansRef> {
 
     val array: BooleanArray
 
@@ -146,7 +146,7 @@ interface BooleansRef : ArrayRefBase<BooleanArray, BooleansRef> {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
-            override fun subArray(startIndex: Int, endIndex: Int): BooleansRef {
+            override fun subRef(startIndex: Int, endIndex: Int): BooleansRef {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 return BooleansRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
@@ -157,7 +157,7 @@ interface BooleansRef : ArrayRefBase<BooleanArray, BooleansRef> {
 /**
  * Byte array reference.
  */
-interface BytesRef : ArrayRefBase<ByteArray, BytesRef> {
+interface BytesRef : BaseArrayRef<ByteArray, BytesRef> {
 
     val array: ByteArray
 
@@ -198,7 +198,7 @@ interface BytesRef : ArrayRefBase<ByteArray, BytesRef> {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
-            override fun subArray(startIndex: Int, endIndex: Int): BytesRef {
+            override fun subRef(startIndex: Int, endIndex: Int): BytesRef {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 return BytesRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
@@ -209,7 +209,7 @@ interface BytesRef : ArrayRefBase<ByteArray, BytesRef> {
 /**
  * Char array reference.
  */
-interface CharsRef : ArrayRefBase<CharArray, CharsRef> {
+interface CharsRef : BaseArrayRef<CharArray, CharsRef> {
 
     val array: CharArray
 
@@ -250,7 +250,7 @@ interface CharsRef : ArrayRefBase<CharArray, CharsRef> {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
-            override fun subArray(startIndex: Int, endIndex: Int): CharsRef {
+            override fun subRef(startIndex: Int, endIndex: Int): CharsRef {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 return CharsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
@@ -261,7 +261,7 @@ interface CharsRef : ArrayRefBase<CharArray, CharsRef> {
 /**
  * Short array reference.
  */
-interface ShortsRef : ArrayRefBase<ShortArray, ShortsRef> {
+interface ShortsRef : BaseArrayRef<ShortArray, ShortsRef> {
 
     val array: ShortArray
 
@@ -302,7 +302,7 @@ interface ShortsRef : ArrayRefBase<ShortArray, ShortsRef> {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
-            override fun subArray(startIndex: Int, endIndex: Int): ShortsRef {
+            override fun subRef(startIndex: Int, endIndex: Int): ShortsRef {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 return ShortsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
@@ -313,7 +313,7 @@ interface ShortsRef : ArrayRefBase<ShortArray, ShortsRef> {
 /**
  * Int array reference.
  */
-interface IntsRef : ArrayRefBase<IntArray, IntsRef> {
+interface IntsRef : BaseArrayRef<IntArray, IntsRef> {
 
     val array: IntArray
 
@@ -354,7 +354,7 @@ interface IntsRef : ArrayRefBase<IntArray, IntsRef> {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
-            override fun subArray(startIndex: Int, endIndex: Int): IntsRef {
+            override fun subRef(startIndex: Int, endIndex: Int): IntsRef {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 return IntsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
@@ -365,7 +365,7 @@ interface IntsRef : ArrayRefBase<IntArray, IntsRef> {
 /**
  * Long array reference.
  */
-interface LongsRef : ArrayRefBase<LongArray, LongsRef> {
+interface LongsRef : BaseArrayRef<LongArray, LongsRef> {
 
     val array: LongArray
 
@@ -406,7 +406,7 @@ interface LongsRef : ArrayRefBase<LongArray, LongsRef> {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
-            override fun subArray(startIndex: Int, endIndex: Int): LongsRef {
+            override fun subRef(startIndex: Int, endIndex: Int): LongsRef {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 return LongsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
@@ -417,7 +417,7 @@ interface LongsRef : ArrayRefBase<LongArray, LongsRef> {
 /**
  * Float array reference.
  */
-interface FloatsRef : ArrayRefBase<FloatArray, FloatsRef> {
+interface FloatsRef : BaseArrayRef<FloatArray, FloatsRef> {
 
     val array: FloatArray
 
@@ -458,7 +458,7 @@ interface FloatsRef : ArrayRefBase<FloatArray, FloatsRef> {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
-            override fun subArray(startIndex: Int, endIndex: Int): FloatsRef {
+            override fun subRef(startIndex: Int, endIndex: Int): FloatsRef {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 return FloatsRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }
@@ -469,7 +469,7 @@ interface FloatsRef : ArrayRefBase<FloatArray, FloatsRef> {
 /**
  * Double array reference.
  */
-interface DoublesRef : ArrayRefBase<DoubleArray, DoublesRef> {
+interface DoublesRef : BaseArrayRef<DoubleArray, DoublesRef> {
 
     val array: DoubleArray
 
@@ -513,7 +513,7 @@ interface DoublesRef : ArrayRefBase<DoubleArray, DoublesRef> {
                 return array.copyOfRange(startIndex, endIndex)
             }
 
-            override fun subArray(startIndex: Int, endIndex: Int): DoublesRef {
+            override fun subRef(startIndex: Int, endIndex: Int): DoublesRef {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
                 return DoublesRefImpl(array, actualIndex(startIndex), actualIndex(endIndex))
             }

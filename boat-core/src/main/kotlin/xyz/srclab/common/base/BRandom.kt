@@ -47,6 +47,7 @@ fun randomString(size: Int, random: Random = defaultRandom): String {
     return randomString.randomString(size, random)
 }
 
+@JvmOverloads
 fun CharSequence.randomString(size: Int, random: Random = defaultRandom): String {
     val result = CharArray(size)
     var i = 0

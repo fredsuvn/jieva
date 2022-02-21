@@ -6,12 +6,18 @@ import java.util.*
 
 val DEFAULT_SNOWFLAKE_ID = SnowflakeId(0)
 
+private val snowflakeMap: MutableMap<Int, SnowflakeId> = HashMap()
+
 fun uuid(): String {
     return UUID.randomUUID().toString()
 }
 
 fun snowflakeId(): Long {
     return DEFAULT_SNOWFLAKE_ID.next()
+}
+
+fun snowflakeId(workerId: Int): Long {
+    return snowflakeMap.computeIfAbsent(workerId) { newSnowflakeId(workerId) }.next()
 }
 
 fun newSnowflakeId(workerId: Int): SnowflakeId {

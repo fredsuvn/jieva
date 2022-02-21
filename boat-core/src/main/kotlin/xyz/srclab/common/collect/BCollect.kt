@@ -335,7 +335,7 @@ fun <T> Iterable<T>.filter(predicate: Predicate<in T>): List<T> {
     return this.filterKt(predicate.toKotlinFun())
 }
 
-fun <T> Iterable<T>.filterIndexed(predicate: IndexPredicate<in T>): List<T> {
+fun <T> Iterable<T>.filterIndexed(predicate: IndexedPredicate<in T>): List<T> {
     return this.filterIndexedKt(predicate.toKotlinFun())
 }
 
@@ -347,7 +347,7 @@ fun <T, C : MutableCollection<in T>> Iterable<T>.filterTo(destination: C, predic
     return this.filterToKt(destination, predicate.toKotlinFun())
 }
 
-fun <T, C : MutableCollection<in T>> Iterable<T>.filterIndexedTo(destination: C, predicate: IndexPredicate<in T>): C {
+fun <T, C : MutableCollection<in T>> Iterable<T>.filterIndexedTo(destination: C, predicate: IndexedPredicate<in T>): C {
     return this.filterIndexedToKt(destination, predicate.toKotlinFun())
 }
 
@@ -359,7 +359,7 @@ fun <T, R> Iterable<T>.map(transform: Function<in T, R>): List<R> {
     return this.mapKt(transform.toKotlinFun())
 }
 
-fun <T, R> Iterable<T>.mapIndexed(transform: IndexFunction<in T, R>): List<R> {
+fun <T, R> Iterable<T>.mapIndexed(transform: IndexedFunction<in T, R>): List<R> {
     return this.mapIndexedKt(transform.toKotlinFun())
 }
 
@@ -369,7 +369,7 @@ fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapTo(destination: C, transf
 
 fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapIndexedTo(
     destination: C,
-    transform: IndexFunction<in T, R>
+    transform: IndexedFunction<in T, R>
 ): C {
     return this.mapIndexedToKt(destination, transform.toKotlinFun())
 }
@@ -378,7 +378,7 @@ fun <T, R> Iterable<T>.flatMap(transform: Function<in T, Iterable<R>>): List<R> 
     return this.flatMapKt(transform.toKotlinFun())
 }
 
-fun <T, R> Iterable<T>.flatMapIndexed(transform: IndexFunction<in T, Iterable<R>>): List<R> {
+fun <T, R> Iterable<T>.flatMapIndexed(transform: IndexedFunction<in T, Iterable<R>>): List<R> {
     return this.flatMapIndexedKt(transform.toKotlinFun())
 }
 
@@ -391,7 +391,7 @@ fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapTo(
 
 fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapIndexedTo(
     destination: C,
-    transform: IndexFunction<in T, Iterable<R>>
+    transform: IndexedFunction<in T, Iterable<R>>
 ): C {
     return this.flatMapIndexedToKt(destination, transform.toKotlinFun())
 }
@@ -658,7 +658,7 @@ fun <S, T : S> Iterable<T>.reduce(operation: BiFunction<in S, in T, S>): S {
     return this.reduceKt(operation.toKotlinFun())
 }
 
-fun <S, T : S> Iterable<T>.reduceIndexed(operation: IndexBiFunction<in S, in T, S>): S {
+fun <S, T : S> Iterable<T>.reduceIndexed(operation: IndexedBiFunction<in S, in T, S>): S {
     return this.reduceIndexedKt(operation.toKotlinFun())
 }
 
@@ -666,7 +666,7 @@ fun <S, T : S> Iterable<T>.reduceOrNull(operation: BiFunction<in S, in T, S>): S
     return this.reduceOrNullKt(operation.toKotlinFun())
 }
 
-fun <S, T : S> Iterable<T>.reduceIndexedOrNull(operation: IndexBiFunction<in S, in T, S>): S? {
+fun <S, T : S> Iterable<T>.reduceIndexedOrNull(operation: IndexedBiFunction<in S, in T, S>): S? {
     return this.reduceIndexedOrNullKt(operation.toKotlinFun())
 }
 
@@ -674,7 +674,7 @@ fun <T, R> Iterable<T>.reduce(initial: R, operation: BiFunction<in R, in T, R>):
     return this.foldKt(initial, operation.toKotlinFun())
 }
 
-fun <T, R> Iterable<T>.reduceIndexed(initial: R, operation: IndexBiFunction<in R, in T, R>): R {
+fun <T, R> Iterable<T>.reduceIndexed(initial: R, operation: IndexedBiFunction<in R, in T, R>): R {
     return this.foldIndexedKt(initial, operation.toKotlinFun())
 }
 
@@ -818,7 +818,7 @@ fun <T> Iterable<T>.shuffled(random: Random): List<T> {
     return this.shuffledKt(random)
 }
 
-fun <T> Iterable<T>.forEachIndexed(action: IndexConsumer<in T>) {
+fun <T> Iterable<T>.forEachIndexed(action: IndexedConsumer<in T>) {
     return this.forEachIndexedKt(action.toKotlinFun())
 }
 

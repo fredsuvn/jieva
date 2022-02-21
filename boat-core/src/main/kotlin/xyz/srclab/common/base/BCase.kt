@@ -120,15 +120,14 @@ interface NamingCase {
         val source: T
 
         /**
-         * Split words list,
-         * or `empty` if the [name] consists of only one word which is name itself.
+         * Words list, or `empty` if the [source] consists of only one word which is name itself.
          */
-        val splitList: List<CharSequence>
+        val wordList: List<CharSequence>
 
         /**
-         * Char number of split words.
+         * Char count of words.
          */
-        val splitCharCount: Int
+        val charCount: Int
 
         companion object {
 
@@ -139,8 +138,8 @@ interface NamingCase {
             fun <T : CharSequence> nameSelf(source: T): Words<T> {
                 return object : Words<T> {
                     override val source: T = source
-                    override val splitList: List<CharSequence> = emptyList()
-                    override val splitCharCount: Int = source.length
+                    override val wordList: List<CharSequence> = emptyList()
+                    override val charCount: Int = source.length
                 }
             }
 
@@ -148,8 +147,8 @@ interface NamingCase {
             fun <T : CharSequence> of(source: T, splitList: List<CharSequence>, splitCharCount: Int): Words<T> {
                 return object : Words<T> {
                     override val source: T = source
-                    override val splitList: List<CharSequence> = splitList
-                    override val splitCharCount: Int = splitCharCount
+                    override val wordList: List<CharSequence> = splitList
+                    override val charCount: Int = splitCharCount
                 }
             }
         }
@@ -230,16 +229,16 @@ abstract class CamelCase : NamingCase {
     }
 
     override fun <T : CharSequence> join(words: NamingCase.Words<T>): String {
-        if (words.splitList.isEmpty()) {
+        if (words.wordList.isEmpty()) {
             return doFirstWord(words.source).toString()
         }
-        val sb = StringBuilder(words.splitCharCount)
+        val sb = StringBuilder(words.charCount)
         join0(words, sb)
         return sb.toString()
     }
 
     override fun <T : CharSequence> joinTo(dest: Appendable, words: NamingCase.Words<T>) {
-        if (words.splitList.isEmpty()) {
+        if (words.wordList.isEmpty()) {
             dest.append(doFirstWord(words.source))
             return
         }
@@ -247,7 +246,7 @@ abstract class CamelCase : NamingCase {
     }
 
     private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
-        val splitList = words.splitList
+        val splitList = words.wordList
         appendable.append(doFirstWord(splitList[0]))
         var i = 1
         while (i < splitList.size) {
@@ -364,16 +363,16 @@ abstract class SeparatorCase(
     }
 
     override fun <T : CharSequence> join(words: NamingCase.Words<T>): String {
-        if (words.splitList.isEmpty()) {
+        if (words.wordList.isEmpty()) {
             return doProcessWord(words.source).toString()
         }
-        val sb = StringBuilder(words.splitCharCount + separator.length * (words.splitList.size - 1))
+        val sb = StringBuilder(words.charCount + separator.length * (words.wordList.size - 1))
         join0(words, sb)
         return sb.toString()
     }
 
     override fun <T : CharSequence> joinTo(dest: Appendable, words: NamingCase.Words<T>) {
-        if (words.splitList.isEmpty()) {
+        if (words.wordList.isEmpty()) {
             dest.append(doProcessWord(words.source))
             return
         }
@@ -381,6 +380,6 @@ abstract class SeparatorCase(
     }
 
     private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
-        words.splitList.joinTo(appendable, separator) { doProcessWord(it) }
+        words.wordList.joinTo(appendable, separator) { doProcessWord(it) }
     }
 }

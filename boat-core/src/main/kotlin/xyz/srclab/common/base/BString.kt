@@ -485,22 +485,6 @@ interface StringRef : CharSequence {
 
             private fun Int.actualIndex() = this + startIndex
 
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other !is CharSeqStringRef) return false
-                if (chars !== other.chars) return false
-                if (startIndex != other.startIndex) return false
-                if (endIndex != other.endIndex) return false
-                return true
-            }
-
-            override fun hashCode(): Int {
-                var result = chars.hashCode()
-                result = 31 * result + startIndex
-                result = 31 * result + endIndex
-                return result
-            }
-
             override fun toString(): String {
                 return copyOfRange()
             }
@@ -529,22 +513,6 @@ interface StringRef : CharSequence {
             }
 
             private fun Int.actualIndex() = this + startIndex
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other !is CharsStringRef) return false
-                if (chars !== other.chars) return false
-                if (startIndex != other.startIndex) return false
-                if (endIndex != other.endIndex) return false
-                return true
-            }
-
-            override fun hashCode(): Int {
-                var result = chars.hashCode()
-                result = 31 * result + startIndex
-                result = 31 * result + endIndex
-                return result
-            }
 
             override fun toString(): String {
                 return copyOfRange()
