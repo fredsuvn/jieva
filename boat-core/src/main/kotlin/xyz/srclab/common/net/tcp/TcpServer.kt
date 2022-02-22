@@ -1,8 +1,9 @@
 package xyz.srclab.common.net.tcp
 
 import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
-import xyz.srclab.common.net.ByteBufferPool
 import xyz.srclab.common.net.NetServer
+import xyz.srclab.common.net.buffer.ByteBufferPool
+import xyz.srclab.common.net.buffer.PooledByteBuffer
 import xyz.srclab.common.net.nioListen
 import xyz.srclab.common.run.AsyncRunner
 import xyz.srclab.common.run.RunLatch
@@ -14,7 +15,9 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
+import java.util.concurrent.BlockingQueue
 import java.util.concurrent.Executor
+import java.util.concurrent.LinkedBlockingQueue
 
 /**
  * Server for TCP/IP.
@@ -35,10 +38,10 @@ interface TcpServer : NetServer {
             bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
             bufferPool: ByteBufferPool = ByteBufferPool.simpleByteBufferPool()
         ): TcpServer {
-            return NIOTcpServer(bindAddress, channelHandler, executor, bufferSize, bufferPool)
+            return NioTcpServer(bindAddress, channelHandler, executor, bufferSize, bufferPool)
         }
 
-        private class NIOTcpServer(
+        private class NioTcpServer(
             override val bindAddress: SocketAddress,
             private val channelHandler: TcpChannelHandler,
             private val executor: Executor,
@@ -50,7 +53,7 @@ interface TcpServer : NetServer {
             private var serverSocketChannel: ServerSocketChannel? = null
             private val listenLatch: RunLatch = RunLatch.newRunLatch()
 
-            private var tempBuffer: ByteBufferPool.PooledByteBuffer? = null
+            private var tempBuffer: PooledByteBuffer? = null
 
             @Synchronized
             override fun start() {
@@ -160,13 +163,28 @@ interface TcpServer : NetServer {
                 return bufferPool.getBuffer()
             }
 
+            private class SelectHandler(
+                private val server: ServerSocketChannel,
+                private val executor: Executor
+            ) {
+
+                private val blockingQueue: BlockingQueue<SocketChannel> = LinkedBlockingQueue()
+
+                fun start() {
+                }
+
+                private fun start0() {
+
+                }
+            }
+
             private inner class SimpleContext(
                 private val selector: Selector,
                 private val socketChannel: SocketChannel,
                 override val remoteAddress: SocketAddress
             ) : TcpContext {
 
-                override val server: TcpServer = this@NIOTcpServer
+                override val server: TcpServer = this@NioTcpServer
 
                 override fun write(data: ByteBuffer) {
                     socketChannel.write(data)

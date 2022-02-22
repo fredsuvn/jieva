@@ -1,8 +1,9 @@
-package xyz.srclab.common.net
+package xyz.srclab.common.net.buffer
 
 import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.base.epochMillis
 import xyz.srclab.common.io.newByteBuffer
+import xyz.srclab.common.net.buffer.PooledByteBuffer.Companion.asPooledByteBuffer
 import java.nio.ByteBuffer
 
 /**
@@ -21,10 +22,6 @@ interface ByteBufferPool {
      * Releases given [buffer] which come from [getBuffer].
      */
     fun releaseBuffer(buffer: PooledByteBuffer)
-
-    interface PooledByteBuffer {
-        fun asByteBuffer(): ByteBuffer
-    }
 
     companion object {
 
@@ -132,9 +129,7 @@ interface ByteBufferPool {
                 }
                 lastUseExtTime = epochMillis()
                 val buffer = newByteBuffer(bufferSize, bufferDirect)
-                return object : PooledByteBuffer {
-                    override fun asByteBuffer(): ByteBuffer = buffer
-                }
+                return buffer.asPooledByteBuffer()
             }
 
             private fun tryReleaseExt() {
