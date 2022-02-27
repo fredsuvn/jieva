@@ -8,7 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.net.socket.parseInetSocketAddress
+import xyz.srclab.common.net.parseInetSocketAddress
 import xyz.srclab.common.net.tcp.TcpClient
 import java.io.InputStream
 import java.net.SocketAddress

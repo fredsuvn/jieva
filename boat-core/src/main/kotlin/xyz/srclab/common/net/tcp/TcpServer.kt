@@ -1,23 +1,19 @@
 package xyz.srclab.common.net.tcp
 
 import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
+import xyz.srclab.common.net.ByteBufferPool
+import xyz.srclab.common.net.NetSelector
+import xyz.srclab.common.net.NetSelector.Companion.toNetSelector
 import xyz.srclab.common.net.NetServer
-import xyz.srclab.common.net.buffer.ByteBufferPool
-import xyz.srclab.common.net.buffer.PooledByteBuffer
-import xyz.srclab.common.net.nioListen
+import xyz.srclab.common.net.PooledByteBuffer
 import xyz.srclab.common.run.AsyncRunner
 import xyz.srclab.common.run.RunLatch
 import java.io.IOException
 import java.io.InputStream
 import java.net.SocketAddress
 import java.nio.ByteBuffer
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
-import java.nio.channels.ServerSocketChannel
-import java.nio.channels.SocketChannel
-import java.util.concurrent.BlockingQueue
+import java.nio.channels.*
 import java.util.concurrent.Executor
-import java.util.concurrent.LinkedBlockingQueue
 
 /**
  * Server for TCP/IP.
@@ -49,15 +45,15 @@ interface TcpServer : NetServer {
             private val bufferPool: ByteBufferPool
         ) : TcpServer {
 
-            private var selector: Selector? = null
-            private var serverSocketChannel: ServerSocketChannel? = null
-            private val listenLatch: RunLatch = RunLatch.newRunLatch()
+            private var selector: NetSelector? = null
+            private var serverChannel: ServerSocketChannel? = null
+            private val waitLatch: RunLatch = RunLatch.newRunLatch()
 
             private var tempBuffer: PooledByteBuffer? = null
 
             @Synchronized
             override fun start() {
-                if (selector !== null || serverSocketChannel !== null) {
+                if (selector !== null || serverChannel !== null) {
                     throw IllegalStateException("Server has been started, stop it first!")
                 }
                 start0()
@@ -69,33 +65,40 @@ interface TcpServer : NetServer {
                 if (selector === null) {
                     throw IllegalStateException("Server has not been started, start it first!")
                 }
-                val serverSocketChannel = this.serverSocketChannel
-                if (serverSocketChannel === null) {
+                val serverChannel = this.serverChannel
+                if (serverChannel === null) {
                     throw IllegalStateException("Server has not been started, start it first!")
                 }
                 selector.close()
-                serverSocketChannel.close()
+                serverChannel.close()
                 this.selector = null
-                this.serverSocketChannel = null
-                listenLatch.lockDown()
+                this.serverChannel = null
+                waitLatch.lockDown()
             }
 
             override fun await() {
-                listenLatch.await()
+                waitLatch.await()
             }
 
             private fun start0() {
-                val selector = Selector.open()
-                val serverSocketChannel = ServerSocketChannel.open()
-                serverSocketChannel.configureBlocking(false)
-                serverSocketChannel.bind(bindAddress)
-                serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT)
+                val select = Selector.open()
+                val serverChannel = ServerSocketChannel.open()
+                serverChannel.configureBlocking(false)
+                serverChannel.bind(bindAddress)
+                serverChannel.register(select, SelectionKey.OP_ACCEPT)
+                val selector = select.toNetSelector()
                 this.selector = selector
-                this.serverSocketChannel = serverSocketChannel
+                this.serverChannel = serverChannel
                 executor.execute {
-                    listenLatch.lockTo(1)
-                    nioListen(selector) { handleKey(it) }
-                    listenLatch.lockDown()
+                    waitLatch.lockTo(1)
+                    while (true) {
+                        try {
+                            handleKey(selector.next())
+                        } catch (e: ClosedSelectorException) {
+                            break
+                        }
+                    }
+                    waitLatch.lockDown()
                 }
             }
 
@@ -136,7 +139,7 @@ interface TcpServer : NetServer {
                             return
                         }
                     } catch (e: IOException) {
-                        println("eeeeeeeeee: $e")
+                        //println("eeeeeeeeee: $e")
                         socketChannel.close()
                         executor.execute {
                             val context = SimpleContext(selector, socketChannel, remoteAddress)
@@ -155,27 +158,12 @@ interface TcpServer : NetServer {
                 }
             }
 
-            private fun getBuffer(): ByteBufferPool.PooledByteBuffer {
+            private fun getBuffer(): PooledByteBuffer {
                 val tempBuffer = this.tempBuffer
                 if (tempBuffer !== null) {
                     return tempBuffer
                 }
                 return bufferPool.getBuffer()
-            }
-
-            private class SelectHandler(
-                private val server: ServerSocketChannel,
-                private val executor: Executor
-            ) {
-
-                private val blockingQueue: BlockingQueue<SocketChannel> = LinkedBlockingQueue()
-
-                fun start() {
-                }
-
-                private fun start0() {
-
-                }
             }
 
             private inner class SimpleContext(

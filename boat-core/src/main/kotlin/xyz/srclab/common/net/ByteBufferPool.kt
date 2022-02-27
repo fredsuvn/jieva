@@ -1,15 +1,15 @@
-package xyz.srclab.common.net.buffer
+package xyz.srclab.common.net
 
 import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.base.epochMillis
 import xyz.srclab.common.io.newByteBuffer
-import xyz.srclab.common.net.buffer.PooledByteBuffer.Companion.asPooledByteBuffer
+import xyz.srclab.common.net.PooledByteBuffer.Companion.asPooledByteBuffer
 import java.nio.ByteBuffer
 
 /**
  * Pool for byte buffer.
  *
- * Use [getBuffer] to get an unused buffer, and [releaseBuffer] to return.
+ * Use [getBuffer] to get a pooled buffer, and [releaseBuffer] to return.
  */
 interface ByteBufferPool {
 
@@ -34,18 +34,16 @@ interface ByteBufferPool {
             coreSize: Int = 10,
             maxSize: Int = 20,
             bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
-            bufferDirect: Boolean = true,
-            bufferKeepAliveMillis: Long = 60_000
+            bufferKeepAliveMillis: Long = 60_000,
         ): ByteBufferPool {
-            return SimpleByteBufferPool(coreSize, maxSize, bufferSize, bufferDirect, bufferKeepAliveMillis)
+            return SimpleByteBufferPool(coreSize, maxSize, bufferKeepAliveMillis, bufferSize)
         }
 
         private class SimpleByteBufferPool(
             private val coreSize: Int,
             private val maxSize: Int,
-            private val bufferSize: Int,
-            private val bufferDirect: Boolean,
             private val bufferKeepAliveMillis: Long,
+            private val bufferSize: Int
         ) : ByteBufferPool {
 
             private var coreNode: BufferNode
@@ -54,11 +52,12 @@ interface ByteBufferPool {
             private var lastUseExtTime: Long = -1
 
             init {
-                coreNode = BufferNode(newByteBuffer(bufferSize, bufferDirect))
+                //Using direct buffer in initializing.
+                coreNode = BufferNode(newByteBuffer(bufferSize, true))
                 val head = coreNode
                 var i = 1
                 while (i < coreSize) {
-                    val newNode = BufferNode(newByteBuffer(bufferSize, bufferDirect))
+                    val newNode = BufferNode(newByteBuffer(bufferSize, true))
                     coreNode.next = newNode
                     coreNode = newNode
                     i++
@@ -92,9 +91,10 @@ interface ByteBufferPool {
                     }
                     coreNode = coreNode.next!!
                 }
-                //Use ext nodes
+
+                //Using heap buffer for ext nodes
                 if (extSize == 0) {
-                    val newNode = BufferNode(newByteBuffer(bufferSize, bufferDirect), true)
+                    val newNode = BufferNode(newByteBuffer(bufferSize, false), true)
                     extNode = newNode
                     extNode!!.next = newNode
                     extSize = 1
@@ -120,7 +120,7 @@ interface ByteBufferPool {
                     extNode = extNode!!.next!!
                 }
                 if (extSize < maxSize - coreSize) {
-                    val newNode = BufferNode(newByteBuffer(bufferSize, bufferDirect), true)
+                    val newNode = BufferNode(newByteBuffer(bufferSize, false), true)
                     newNode.next = extNode!!.next
                     extNode!!.next = newNode
                     lastUseExtTime = epochMillis()
@@ -128,7 +128,9 @@ interface ByteBufferPool {
                     return newNode
                 }
                 lastUseExtTime = epochMillis()
-                val buffer = newByteBuffer(bufferSize, bufferDirect)
+
+                //Using heap buffer if node not enough.
+                val buffer = newByteBuffer(bufferSize, false)
                 return buffer.asPooledByteBuffer()
             }
 

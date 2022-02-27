@@ -10,7 +10,7 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.collect.newMap
-import xyz.srclab.common.net.socket.availableLocalhost
+import xyz.srclab.common.net.availableSocketAddress
 import xyz.srclab.common.net.tcp.TcpServer
 import java.net.InetSocketAddress
 import java.net.SocketAddress
@@ -70,7 +70,7 @@ open class NettyTcpServer @JvmOverloads constructor(
         options: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_BACKLOG, 128),
         childOptions: Map<ChannelOption<*>, Any?> = newMap(ChannelOption.SO_KEEPALIVE, true),
         channelHandler: ChannelHandler? = null
-    ) : this(availableLocalhost(), childChannelHandlers, options, childOptions, channelHandler)
+    ) : this(availableSocketAddress(), childChannelHandlers, options, childOptions, channelHandler)
 
     override fun start() {
         channelFuture = bootstrap.bind(bindAddress).channel().closeFuture()

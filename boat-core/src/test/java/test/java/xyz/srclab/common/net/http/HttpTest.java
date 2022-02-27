@@ -14,11 +14,11 @@ import xyz.srclab.common.base.BDefault;
 import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.collect.BMap;
 import xyz.srclab.common.io.BIO;
+import xyz.srclab.common.net.BSocket;
 import xyz.srclab.common.net.http.BHttp;
 import xyz.srclab.common.net.http.HttpConnect;
 import xyz.srclab.common.net.http.HttpReq;
 import xyz.srclab.common.net.http.HttpResp;
-import xyz.srclab.common.net.socket.BSocket;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -62,7 +62,7 @@ public class HttpTest {
 
     @Test
     public void testRequest() throws Exception {
-        int port = BSocket.availableSocketPort();
+        int port = BSocket.availablePort();
         TestServer testServer = new TestServer();
         testServer.start(port);
 

@@ -1,13 +1,14 @@
 @file:JvmName("BSocket")
 
-package xyz.srclab.common.net.socket
+package xyz.srclab.common.net
 
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 
 /**
- * Returns available socket port.
+ * Returns an available socket port.
  */
+@JvmName("availablePort")
 fun availableSocketPort(): Int {
     val serverSocket = ServerSocket(0)
     val port = serverSocket.localPort
@@ -16,12 +17,16 @@ fun availableSocketPort(): Int {
 }
 
 /**
- * Returns available [InetSocketAddress] with host of `localhost` and port form [availableSocketPort].
+ * Returns an available socket address.
  */
-fun availableLocalhost(): InetSocketAddress {
+@JvmName("availableAddress")
+fun availableSocketAddress(): InetSocketAddress {
     return InetSocketAddress(availableSocketPort())
 }
 
+/**
+ * Parses a string like `127.0.0.1:8080` to [InetSocketAddress].
+ */
 fun CharSequence.parseInetSocketAddress(): InetSocketAddress {
     val split = this.toString().split(":")
     if (split.size != 2) {

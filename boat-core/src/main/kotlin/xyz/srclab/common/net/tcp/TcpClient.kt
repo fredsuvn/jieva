@@ -2,7 +2,7 @@ package xyz.srclab.common.net.tcp
 
 import xyz.srclab.common.base.*
 import xyz.srclab.common.io.getBytes
-import xyz.srclab.common.net.socket.parseInetSocketAddress
+import xyz.srclab.common.net.parseInetSocketAddress
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.Socket
@@ -167,16 +167,19 @@ interface TcpClient {
             override fun send(data: ByteBuffer) {
                 val out = getOutputStream()
                 out.write(data.getBytes())
+                out.flush()
             }
 
             override fun send(data: ByteArray, offset: Int, length: Int) {
                 val out = getOutputStream()
                 out.write(data, offset, length)
+                out.flush()
             }
 
             override fun send(data: InputStream) {
                 val out = getOutputStream()
                 data.copyTo(out, bufferSize)
+                out.flush()
             }
 
             private fun getOutputStream(): OutputStream {

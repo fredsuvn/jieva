@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.net.socket;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.net.socket.BSocket;
+import xyz.srclab.common.net.BSocket;
 
 import java.net.InetSocketAddress;
 
@@ -11,7 +11,7 @@ public class SocketTest {
 
     @Test
     public void testSocket() {
-        BLog.info("Available socket port: {}", BSocket.availableSocketPort());
+        BLog.info("Available socket port: {}", BSocket.availablePort());
     }
 
     @Test

@@ -1,14 +1,16 @@
-package xyz.srclab.common.net.buffer
+package xyz.srclab.common.net
 
 import java.nio.ByteBuffer
 
 /**
- * Byte buffer which is managed by [ByteBufferPool].
+ * Pooled [ByteBuffer] which is usually managed by [ByteBufferPool].
+ *
+ * Using [asByteBuffer] can simply create a [PooledByteBuffer] from a [ByteBuffer].
  */
 interface PooledByteBuffer {
 
     /**
-     * Returns a [ByteBuffer] associated by this, any operation is reflected each other.
+     * Returns this as [ByteBuffer], any operation is reflected each other.
      */
     fun asByteBuffer(): ByteBuffer
 

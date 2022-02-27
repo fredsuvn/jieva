@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.io.BBuffer;
-import xyz.srclab.common.net.socket.BSocket;
+import xyz.srclab.common.net.BSocket;
 import xyz.srclab.common.net.udp.UdpChannelHandler;
 import xyz.srclab.common.net.udp.UdpClient;
 import xyz.srclab.common.net.udp.UdpServer;
@@ -20,7 +20,7 @@ public class UdpTest {
 
     @Test
     public void testUdp() throws Exception {
-        int port = BSocket.availableSocketPort();
+        int port = BSocket.availablePort();
         String address = "localhost:" + port;
         InetSocketAddress socketAddress = BSocket.parseInetSocketAddress(address);
         RunLatch latch = RunLatch.newRunLatch();

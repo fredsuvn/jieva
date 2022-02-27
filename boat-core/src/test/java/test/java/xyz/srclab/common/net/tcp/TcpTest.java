@@ -5,7 +5,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.io.BBuffer;
-import xyz.srclab.common.net.socket.BSocket;
+import xyz.srclab.common.net.BSocket;
 import xyz.srclab.common.net.tcp.TcpChannelHandler;
 import xyz.srclab.common.net.tcp.TcpClient;
 import xyz.srclab.common.net.tcp.TcpContext;
@@ -15,7 +15,6 @@ import xyz.srclab.common.run.RunLatch;
 import xyz.srclab.common.run.Runner;
 
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Collection;
@@ -36,7 +35,7 @@ public class TcpTest {
 
     @Test
     public void testTcp() throws Exception {
-        int port = BSocket.availableSocketPort();
+        int port = BSocket.availablePort();
         String address = "localhost:" + port;
         RunLatch latch = RunLatch.newRunLatch(0);
         TcpServer tcpServer = TcpServer.nioServer(
@@ -143,7 +142,8 @@ public class TcpTest {
 
     @Test
     public void testOpenClose() throws Exception {
-        SocketAddress address = BSocket.availableLocalhost();
+        SocketAddress address = BSocket.availableAddress();
+        System.out.println("address: " + address);
         int clientCount = 1000;
         List<TcpClient> nioClients = new LinkedList<>();
         for (int i = 0; i < clientCount; i++) {

@@ -4,7 +4,7 @@ import org.testng.annotations.Test
 import xyz.srclab.common.base.getBytes
 import xyz.srclab.common.base.sleep
 import xyz.srclab.common.io.getString
-import xyz.srclab.common.net.socket.availableLocalhost
+import xyz.srclab.common.net.availableSocketAddress
 import xyz.srclab.common.run.runAsync
 import java.net.SocketAddress
 import java.nio.ByteBuffer
@@ -17,7 +17,7 @@ class NioTest {
 
     @Test(enabled = false)
     fun testNio() {
-        val address = availableLocalhost()
+        val address = availableSocketAddress()
         runAsync { startServer(address) }
         sleep(1000)
         val client = SocketChannel.open(address)
