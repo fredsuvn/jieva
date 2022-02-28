@@ -44,10 +44,13 @@ interface NetSelector {
             override fun next(): SelectionKey {
                 if (keyIterator.hasNext()) {
                     val next = keyIterator.next()
+                    next.channel()
                     keyIterator.remove()
+                    println("next>>>>>>>> $next")
                     return next
                 }
                 var selectCount = selector.select()
+                println("selectCount>>>>>>>>> $selectCount")
                 while (selectCount == 0) {
                     val now = epochMillis()
                     if (now == lastEmptySelectTime) {
@@ -55,7 +58,7 @@ interface NetSelector {
                         if (emptySelectCount >= emptySelectThreshold) {
                             //High CPU if select count is always 0
                             emptySelectCount = 0
-                            resetSelector()
+                            rebuildSelector()
                             return next()
                         } else {
                             selectCount = selector.select()
@@ -71,7 +74,7 @@ interface NetSelector {
                 return next()
             }
 
-            private fun resetSelector() {
+            private fun rebuildSelector() {
                 val newSelector = Selector.open()
                 for (key in selector.keys()) {
                     if (!key.isValid || key.interestOps() == 0) {
@@ -81,6 +84,7 @@ interface NetSelector {
                     val channel = key.channel()
                     val attachment = key.attachment()
                     channel.register(newSelector, key.interestOps(), attachment)
+                    selector.selectNow()
                 }
                 synchronized(this) {
                     selector.close()

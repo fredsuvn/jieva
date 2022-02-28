@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.io.BBuffer;
 import xyz.srclab.common.net.BSocket;
-import xyz.srclab.common.net.tcp.TcpChannelHandler;
+import xyz.srclab.common.net.tcp.TcpListener;
 import xyz.srclab.common.net.tcp.TcpClient;
 import xyz.srclab.common.net.tcp.TcpContext;
 import xyz.srclab.common.net.tcp.TcpServer;
@@ -190,7 +190,7 @@ public class TcpTest {
 
         TcpServer tcpServer = TcpServer.nioServer(
             address,
-            new TcpChannelHandler() {
+            new TcpListener() {
                 @Override
                 public void onOpen(@NotNull TcpContext context) {
                     openCount.incrementAndGet();
@@ -250,7 +250,7 @@ public class TcpTest {
 
         TcpServer tcpServer = TcpServer.nioServer(
             address,
-            new TcpChannelHandler() {
+            new TcpListener() {
                 @Override
                 public void onOpen(@NotNull TcpContext context) {
                 }
@@ -301,7 +301,7 @@ public class TcpTest {
         tcpServer.await();
     }
 
-    private static final class ServerHandler implements TcpChannelHandler {
+    private static final class ServerHandler implements TcpListener {
 
         private final RunLatch latch;
 
@@ -312,7 +312,7 @@ public class TcpTest {
         @Override
         public void onOpen(@NotNull TcpContext context) {
             serverSentMessage += SERVER_OPEN;
-            context.write(SERVER_OPEN.getBytes());
+            context.send(SERVER_OPEN.getBytes());
             BLog.info("Server open: {}", context.getRemoteAddress());
         }
 
@@ -321,7 +321,7 @@ public class TcpTest {
             String read = BBuffer.getString(data);
             serverSentMessage += SERVER_RECEIVE;
             serverReceivedMessage += read;
-            context.write(SERVER_RECEIVE.getBytes());
+            context.send(SERVER_RECEIVE.getBytes());
             BLog.info("Server receive from {}: {}", context.getRemoteAddress(), read);
             latch.lockDown();
         }

@@ -1,6 +1,7 @@
 package xyz.srclab.common.net.tcp
 
 import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
+import xyz.srclab.common.base.sleep
 import xyz.srclab.common.net.ByteBufferPool
 import xyz.srclab.common.net.NetSelector
 import xyz.srclab.common.net.NetSelector.Companion.toNetSelector
@@ -29,17 +30,17 @@ interface TcpServer : NetServer {
         @JvmStatic
         fun nioServer(
             bindAddress: SocketAddress,
-            channelHandler: TcpChannelHandler,
+            tcpListener: TcpListener,
             executor: Executor = AsyncRunner.asExecutor(),
             bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
             bufferPool: ByteBufferPool = ByteBufferPool.simpleByteBufferPool()
         ): TcpServer {
-            return NioTcpServer(bindAddress, channelHandler, executor, bufferSize, bufferPool)
+            return NioTcpServer(bindAddress, tcpListener, executor, bufferSize, bufferPool)
         }
 
         private class NioTcpServer(
             override val bindAddress: SocketAddress,
-            private val channelHandler: TcpChannelHandler,
+            private val tcpListener: TcpListener,
             private val executor: Executor,
             private val bufferSize: Int,
             private val bufferPool: ByteBufferPool
@@ -50,6 +51,9 @@ interface TcpServer : NetServer {
             private val waitLatch: RunLatch = RunLatch.newRunLatch()
 
             private var tempBuffer: PooledByteBuffer? = null
+
+            private var readNode: KeyNode? = null
+            private var writeNode: KeyNode? = null
 
             @Synchronized
             override fun start() {
@@ -62,17 +66,17 @@ interface TcpServer : NetServer {
             @Synchronized
             override fun stop(immediately: Boolean) {
                 val selector = this.selector
-                if (selector === null) {
-                    throw IllegalStateException("Server has not been started, start it first!")
+                if (selector !== null) {
+                    selector.close()
+                    this.selector = null
                 }
                 val serverChannel = this.serverChannel
-                if (serverChannel === null) {
-                    throw IllegalStateException("Server has not been started, start it first!")
+                if (serverChannel !== null) {
+                    serverChannel.close()
+                    this.serverChannel = null
                 }
-                selector.close()
-                serverChannel.close()
-                this.selector = null
-                this.serverChannel = null
+                readNode = null
+                writeNode = null
                 waitLatch.lockDown()
             }
 
@@ -91,45 +95,89 @@ interface TcpServer : NetServer {
                 this.serverChannel = serverChannel
                 executor.execute {
                     waitLatch.lockTo(1)
-                    while (true) {
-                        try {
-                            handleKey(selector.next())
-                        } catch (e: ClosedSelectorException) {
-                            break
-                        }
-                    }
+                    selectKeys(selector)
                     waitLatch.lockDown()
                 }
             }
 
+            private fun selectKeys(selector: NetSelector) {
+                while (true) {
+                    try {
+                        val key = selector.next()
+                        handleKey(key)
+                        //val newNode = KeyNode(key)
+                        //val writeNode = this.writeNode
+                        //if (writeNode === null) {
+                        //    this.writeNode = newNode
+                        //    this.readNode = newNode
+                        //    executor.execute {
+                        //        handleKeys()
+                        //    }
+                        //} else {
+                        //    writeNode.next = newNode
+                        //    this.writeNode = newNode
+                        //}
+                    } catch (e: ClosedSelectorException) {
+                        break
+                    }
+                }
+            }
+
+            private fun handleKeys() {
+                while (true) {
+                    val currentRead = this.readNode
+                    if (currentRead === null) {
+                        return
+                    }
+                    if (currentRead.isUsed) {
+                        val nextRead = currentRead.next
+                        if (nextRead === null) {
+                            sleep(1)
+                            continue
+                        } else {
+                            this.readNode = nextRead
+                            continue
+                        }
+                    }
+                    //Do with key
+                    val key = currentRead.key
+                    handleKey(key)
+                    currentRead.isUsed = true
+                }
+            }
+
             private fun handleKey(key: SelectionKey) {
-                val selector = key.selector()
                 if (key.isAcceptable) {
-                    //val socketChannel = serverSocketChannel!!.accept()
                     val serverChannel = key.channel() as ServerSocketChannel
                     val clientChannel = serverChannel.accept()
-                    clientChannel.configureBlocking(false)
-                    clientChannel.register(selector, SelectionKey.OP_READ)
-                    //socketChannel.register(selector, SelectionKey.OP_WRITE)
-                    val remoteAddress = clientChannel.remoteAddress
-                    executor.execute {
-                        val context = SimpleContext(selector, clientChannel, remoteAddress)
-                        channelHandler.onOpen(context)
+                    try {
+                        val clientContext = NioTcpContext(clientChannel)
+                        clientChannel.configureBlocking(false)
+                        clientChannel.register(key.selector(), SelectionKey.OP_READ, clientContext)
+                        executor.execute {
+                            tcpListener.onOpen(clientContext)
+                        }
+                    } catch (e: ClosedChannelException) {
+                        clientChannel.close()
                     }
                 }
                 if (key.isReadable) {
-                    val socketChannel = key.channel() as SocketChannel
-                    val remoteAddress = socketChannel.remoteAddress
+                    val clientChannel = key.channel() as SocketChannel
+                    val clientContext = clientChannels[clientChannel]
+                    if (clientContext === null) {
+                        key.cancel()
+                        clientChannel.close()
+                        return
+                    }
                     val buffer = getBuffer()
                     val buf = buffer.asByteBuffer()
                     try {
-                        val readCount = socketChannel.read(buf)
+                        val readCount = clientChannel.read(buf)
                         if (readCount < 0) {
-                            //println("0000000000000000000")
-                            socketChannel.close()
                             executor.execute {
-                                val context = SimpleContext(selector, socketChannel, remoteAddress)
-                                channelHandler.onClose(context)
+                                tcpListener.onClose(NioTcpContext(clientChannel))
+                                key.interestOps(0)
+                                clientChannel.close()
                             }
                             tempBuffer = buffer
                             return
@@ -139,19 +187,17 @@ interface TcpServer : NetServer {
                             return
                         }
                     } catch (e: IOException) {
-                        //println("eeeeeeeeee: $e")
-                        socketChannel.close()
                         executor.execute {
-                            val context = SimpleContext(selector, socketChannel, remoteAddress)
-                            channelHandler.onClose(context)
+                            tcpListener.onClose(NioTcpContext(clientChannel))
+                            key.interestOps(0)
+                            clientChannel.close()
                         }
                         tempBuffer = buffer
                         return
                     }
                     executor.execute {
                         buf.flip()
-                        val context = SimpleContext(selector, socketChannel, remoteAddress)
-                        channelHandler.onReceive(context, buf.asReadOnlyBuffer())
+                        tcpListener.onReceive(NioTcpContext(clientChannel), buf.asReadOnlyBuffer())
                         bufferPool.releaseBuffer(buffer)
                     }
                     tempBuffer = null
@@ -166,25 +212,27 @@ interface TcpServer : NetServer {
                 return bufferPool.getBuffer()
             }
 
-            private inner class SimpleContext(
-                private val selector: Selector,
+            private inner class NioTcpContext(
                 private val socketChannel: SocketChannel,
-                override val remoteAddress: SocketAddress
             ) : TcpContext {
+
+                var onOpen: Boolean = false
+
+                override val remoteAddress: SocketAddress = socketChannel.remoteAddress
+                override val remoteChannel: Any = socketChannel
 
                 override val server: TcpServer = this@NioTcpServer
 
-                override fun write(data: ByteBuffer) {
+                override fun send(data: ByteBuffer) {
                     socketChannel.write(data)
-                    socketChannel.register(selector, SelectionKey.OP_READ)
                 }
 
-                override fun write(data: InputStream) {
+                override fun send(data: InputStream) {
                     val buffer = ByteArray(bufferSize)
                     var len = data.read(buffer)
                     while (len >= 0) {
                         if (len > 0) {
-                            write(buffer)
+                            send(buffer)
                         }
                         len = data.read(buffer)
                     }
@@ -194,6 +242,12 @@ interface TcpServer : NetServer {
                     socketChannel.close()
                 }
             }
+
+            private data class KeyNode(
+                val key: SelectionKey,
+                var next: KeyNode? = null,
+                var isUsed: Boolean = false,
+            )
         }
     }
 }

@@ -3,9 +3,9 @@ package xyz.srclab.common.net.tcp
 import java.nio.ByteBuffer
 
 /**
- * Handler for TCP channel.
+ * Listener for TCP connection.
  */
-interface TcpChannelHandler {
+interface TcpListener {
 
     fun onOpen(context: TcpContext)
 
