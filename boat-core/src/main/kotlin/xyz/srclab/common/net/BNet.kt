@@ -6,6 +6,7 @@ import java.nio.channels.ClosedSelectorException
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 
+
 fun nioListen(selector: Selector, handler: (SelectionKey) -> Unit) {
     while (true) {
         try {
@@ -24,4 +25,18 @@ fun nioListen(selector: Selector, handler: (SelectionKey) -> Unit) {
             break
         }
     }
+}
+
+/**
+ * Opens a new [Selector] and move all registered ops from [this] to the new [Selector].
+ */
+@JvmName("reopenSelector")
+fun Selector.reopen(): Selector {
+    val newSelector = Selector.open()
+    for (key in this.keys()) {
+        key.cancel()
+        key.channel().register(newSelector, key.interestOps(), key.attachment())
+    }
+    this.selectNow()
+    return newSelector
 }

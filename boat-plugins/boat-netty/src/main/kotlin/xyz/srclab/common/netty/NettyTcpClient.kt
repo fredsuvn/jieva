@@ -71,6 +71,10 @@ open class NettyTcpClient @JvmOverloads constructor(
         throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
     }
 
+    override fun send(data: InputStream) {
+        TODO("Not yet implemented")
+    }
+
     override fun receive(dest: ByteBuffer): Int {
         throw UnsupportedOperationException("Do this operation in ChannelHandler of Netty.")
     }

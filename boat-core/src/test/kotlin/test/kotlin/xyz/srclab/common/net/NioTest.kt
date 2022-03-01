@@ -15,7 +15,7 @@ import java.nio.channels.SocketChannel
 
 class NioTest {
 
-    @Test(enabled = false)
+    @Test(enabled = true)
     fun testNio() {
         val address = availableSocketAddress()
         runAsync { startServer(address) }

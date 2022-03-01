@@ -14,6 +14,7 @@ import java.io.InputStream
 import java.net.SocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.*
+import java.security.AccessController
 import java.util.concurrent.Executor
 
 /**
@@ -52,8 +53,8 @@ interface TcpServer : NetServer {
 
             private var tempBuffer: PooledByteBuffer? = null
 
-            private var readNode: KeyNode? = null
-            private var writeNode: KeyNode? = null
+            //private var readNode: KeyNode? = null
+            //private var writeNode: KeyNode? = null
 
             @Synchronized
             override fun start() {
@@ -75,8 +76,8 @@ interface TcpServer : NetServer {
                     serverChannel.close()
                     this.serverChannel = null
                 }
-                readNode = null
-                writeNode = null
+                //readNode = null
+                //writeNode = null
                 waitLatch.lockDown()
             }
 
@@ -123,28 +124,28 @@ interface TcpServer : NetServer {
                 }
             }
 
-            private fun handleKeys() {
-                while (true) {
-                    val currentRead = this.readNode
-                    if (currentRead === null) {
-                        return
-                    }
-                    if (currentRead.isUsed) {
-                        val nextRead = currentRead.next
-                        if (nextRead === null) {
-                            sleep(1)
-                            continue
-                        } else {
-                            this.readNode = nextRead
-                            continue
-                        }
-                    }
-                    //Do with key
-                    val key = currentRead.key
-                    handleKey(key)
-                    currentRead.isUsed = true
-                }
-            }
+            //private fun handleKeys() {
+            //    while (true) {
+            //        val currentRead = this.readNode
+            //        if (currentRead === null) {
+            //            return
+            //        }
+            //        if (currentRead.isUsed) {
+            //            val nextRead = currentRead.next
+            //            if (nextRead === null) {
+            //                sleep(1)
+            //                continue
+            //            } else {
+            //                this.readNode = nextRead
+            //                continue
+            //            }
+            //        }
+            //        //Do with key
+            //        val key = currentRead.key
+            //        handleKey(key)
+            //        currentRead.isUsed = true
+            //    }
+            //}
 
             private fun handleKey(key: SelectionKey) {
                 if (key.isAcceptable) {
@@ -163,12 +164,12 @@ interface TcpServer : NetServer {
                 }
                 if (key.isReadable) {
                     val clientChannel = key.channel() as SocketChannel
-                    val clientContext = clientChannels[clientChannel]
-                    if (clientContext === null) {
-                        key.cancel()
-                        clientChannel.close()
-                        return
-                    }
+                    //val clientContext = clientChannels[clientChannel]
+                    //if (clientContext === null) {
+                    //    key.cancel()
+                    //    clientChannel.close()
+                    //    return
+                    //}
                     val buffer = getBuffer()
                     val buf = buffer.asByteBuffer()
                     try {
@@ -213,13 +214,13 @@ interface TcpServer : NetServer {
             }
 
             private inner class NioTcpContext(
-                private val socketChannel: SocketChannel,
+                private var socketChannel: SocketChannel,
             ) : TcpContext {
 
                 var onOpen: Boolean = false
 
                 override val remoteAddress: SocketAddress = socketChannel.remoteAddress
-                override val remoteChannel: Any = socketChannel
+                override val remoteChannel: Any get() = socketChannel
 
                 override val server: TcpServer = this@NioTcpServer
 
@@ -242,12 +243,6 @@ interface TcpServer : NetServer {
                     socketChannel.close()
                 }
             }
-
-            private data class KeyNode(
-                val key: SelectionKey,
-                var next: KeyNode? = null,
-                var isUsed: Boolean = false,
-            )
         }
     }
 }
