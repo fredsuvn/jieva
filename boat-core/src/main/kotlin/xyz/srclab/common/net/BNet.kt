@@ -28,10 +28,11 @@ fun nioListen(selector: Selector, handler: (SelectionKey) -> Unit) {
 }
 
 /**
- * Opens a new [Selector] and move all registered ops from [this] to the new [Selector].
+ * Opens a new [Selector] and registers all keys of old [Selector] to the new [Selector].
+ * Old keys will be canceled and old selector will be closed.
  */
-@JvmName("reopenSelector")
-fun Selector.reopen(): Selector {
+@JvmName("copyAndCloseSelector")
+fun Selector.copyAndClose(): Selector {
     val newSelector = Selector.open()
     for (key in this.keys()) {
         key.cancel()
