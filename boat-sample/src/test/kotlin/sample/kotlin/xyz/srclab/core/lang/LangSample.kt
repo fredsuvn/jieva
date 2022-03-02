@@ -132,7 +132,7 @@ class BaseSample {
         logger.log("b: {}", b)
 
         //Dates examples:
-        val timestamp = timestamp()
+        val timestamp = currentTimestamp()
         val localDateTime = "2011-12-03T10:15:30".toLocalDateTime()
         //20210207144816045
         logger.log("timestamp: {}", timestamp)

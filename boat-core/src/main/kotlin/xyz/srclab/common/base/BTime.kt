@@ -18,6 +18,9 @@ import java.util.*
  */
 const val TIMESTAMP_PATTERN_STRING = "yyyyMMddHHmmssSSS"
 
+/**
+ * Default timestamp pattern: [TIMESTAMP_PATTERN_STRING].
+ */
 @JvmField
 val TIMESTAMP_PATTERN: DatePattern = run {
     //Fuck jdk8
@@ -32,19 +35,38 @@ val TIMESTAMP_PATTERN: DatePattern = run {
     TIMESTAMP_PATTERN_STRING.toDatePattern(formatter)
 }
 
+/**
+ * Returns epoch seconds.
+ */
 fun epochSeconds(): Long {
     return epochMillis() / 1000L
 }
 
+/**
+ * Returns epoch milliseconds.
+ */
 fun epochMillis(): Long {
     return System.currentTimeMillis()
 }
 
+/**
+ * Returns system nanosecond.
+ */
+fun systemNanos(): Long {
+    return System.nanoTime()
+}
+
+/**
+ * Returns current timestamp pattern with: [TIMESTAMP_PATTERN_STRING].
+ */
 @JvmOverloads
-fun timestamp(pattern: DatePattern = TIMESTAMP_PATTERN, zoneId: ZoneId = ZoneId.systemDefault()): String {
+fun currentTimestamp(pattern: DatePattern = TIMESTAMP_PATTERN, zoneId: ZoneId = ZoneId.systemDefault()): String {
     return pattern.format(LocalDateTime.now(zoneId))
 }
 
+/**
+ * Returns current zone offset.
+ */
 fun currentZoneOffset(): ZoneOffset {
     return LocalDateTime.now().getZoneOffset()
 }
