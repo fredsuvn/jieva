@@ -9,37 +9,43 @@ package xyz.srclab.common.base
 interface BaseArrayRef<A, R : BaseArrayRef<A, R>> {
 
     /**
-     * Start index of referenced array.
+     * Returns the referenced array.
+     */
+    val array: A
+
+    /**
+     * Start index of the referenced array, inclusive.
      */
     val startIndex: Int
 
     /**
-     * End index of referenced array, exclusive.
+     * End index of the referenced array, exclusive, exclusive.
      */
     val endIndex: Int
 
     /**
-     * Offset of referenced array.
+     * Offset of the referenced array.
      */
     val offset: Int get() = startIndex
 
     /**
-     * Length of referenced part.
+     * Length of the range of the referenced array.
      */
     val length: Int get() = endIndex - startIndex
 
     /**
-     * Returns actual index of referenced array, computed from given [index] which is a relative index of this ref.
+     * Returns absolute index of the referenced array,
+     * computed from given [index] which is a relative index of this ref.
      */
     fun actualIndex(index: Int) = startIndex + index
 
     /**
-     * Returns a new sub-array-ref.
+     * Returns a new array ref which is subrange of this ref from [startIndex] inclusive to [endIndex] exclusive.
      */
     fun subRef(startIndex: Int, endIndex: Int): R
 
     /**
-     * Copies and returns a new array of current range.
+     * Copies and returns a new array which contains data from the range specified by this ref.
      */
     fun copyOfRange(): A
 }
@@ -48,8 +54,6 @@ interface BaseArrayRef<A, R : BaseArrayRef<A, R>> {
  * Array reference.
  */
 interface ArrayRef<T> : BaseArrayRef<Array<T>, ArrayRef<T>> {
-
-    val array: Array<T>
 
     fun get(index: Int): T {
         index.checkIndexInBounds(0, length)
@@ -104,8 +108,6 @@ interface ArrayRef<T> : BaseArrayRef<Array<T>, ArrayRef<T>> {
  */
 interface BooleansRef : BaseArrayRef<BooleanArray, BooleansRef> {
 
-    val array: BooleanArray
-
     fun get(index: Int): Boolean {
         index.checkIndexInBounds(0, length)
         return array[actualIndex(index)]
@@ -159,8 +161,6 @@ interface BooleansRef : BaseArrayRef<BooleanArray, BooleansRef> {
  */
 interface BytesRef : BaseArrayRef<ByteArray, BytesRef> {
 
-    val array: ByteArray
-
     fun get(index: Int): Byte {
         index.checkIndexInBounds(0, length)
         return array[actualIndex(index)]
@@ -210,8 +210,6 @@ interface BytesRef : BaseArrayRef<ByteArray, BytesRef> {
  * Char array reference.
  */
 interface CharsRef : BaseArrayRef<CharArray, CharsRef> {
-
-    val array: CharArray
 
     fun get(index: Int): Char {
         index.checkIndexInBounds(0, length)
@@ -263,8 +261,6 @@ interface CharsRef : BaseArrayRef<CharArray, CharsRef> {
  */
 interface ShortsRef : BaseArrayRef<ShortArray, ShortsRef> {
 
-    val array: ShortArray
-
     fun get(index: Int): Short {
         index.checkIndexInBounds(0, length)
         return array[actualIndex(index)]
@@ -314,8 +310,6 @@ interface ShortsRef : BaseArrayRef<ShortArray, ShortsRef> {
  * Int array reference.
  */
 interface IntsRef : BaseArrayRef<IntArray, IntsRef> {
-
-    val array: IntArray
 
     fun get(index: Int): Int {
         index.checkIndexInBounds(0, length)
@@ -367,8 +361,6 @@ interface IntsRef : BaseArrayRef<IntArray, IntsRef> {
  */
 interface LongsRef : BaseArrayRef<LongArray, LongsRef> {
 
-    val array: LongArray
-
     fun get(index: Int): Long {
         index.checkIndexInBounds(0, length)
         return array[actualIndex(index)]
@@ -419,8 +411,6 @@ interface LongsRef : BaseArrayRef<LongArray, LongsRef> {
  */
 interface FloatsRef : BaseArrayRef<FloatArray, FloatsRef> {
 
-    val array: FloatArray
-
     fun get(index: Int): Float {
         index.checkIndexInBounds(0, length)
         return array[actualIndex(index)]
@@ -470,8 +460,6 @@ interface FloatsRef : BaseArrayRef<FloatArray, FloatsRef> {
  * Double array reference.
  */
 interface DoublesRef : BaseArrayRef<DoubleArray, DoublesRef> {
-
-    val array: DoubleArray
 
     fun get(index: Int): Double {
         index.checkIndexInBounds(0, length)

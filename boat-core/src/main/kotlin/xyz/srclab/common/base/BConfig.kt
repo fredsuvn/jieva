@@ -10,7 +10,7 @@ import java.nio.charset.Charset
 import java.util.*
 
 @JvmOverloads
-fun InputStream.readProperties(charset: Charset = DEFAULT_CHARSET): Map<String, String> {
+fun InputStream.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
     return this.reader(charset).readProperties()
 }
 
@@ -23,12 +23,12 @@ fun Reader.readProperties(): Map<String, String> {
 }
 
 @JvmOverloads
-fun File.readProperties(charset: Charset = DEFAULT_CHARSET): Map<String, String> {
+fun File.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
     return this.reader(charset).readProperties()
 }
 
 @JvmOverloads
-fun URL.readProperties(charset: Charset = DEFAULT_CHARSET): Map<String, String> {
+fun URL.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
     return this.openStream().readProperties(charset)
 }
 

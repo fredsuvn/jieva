@@ -7,18 +7,19 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
 /**
- * Default charset: UTF-8.
+ * Returns default charset, generally it is _UTF-8_.
  */
-@JvmField
-val DEFAULT_CHARSET: Charset = StandardCharsets.UTF_8
+@JvmName("charset")
+fun defaultCharset(): Charset = StandardCharsets.UTF_8
 
 /**
- * Default io buffer size: 8 * 1024.
+ * Returns default buffer size, generally it is _8 * 1024_
  */
-const val DEFAULT_IO_BUFFER_SIZE: Int = 8 * 1024
+@JvmName("bufferSize")
+fun defaultBufferSize(): Int = 8 * 1024
 
 /**
- * Default serial version UID.
+ * Returns default serial version.
  */
-@JvmField
-val DEFAULT_SERIAL_VERSION = Boat.SERIAL_VERSION
+@JvmName("serialVersion")
+fun defaultSerialVersion(): Long = Boat.SERIAL_VERSION

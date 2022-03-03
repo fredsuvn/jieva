@@ -2,10 +2,8 @@
 
 package xyz.srclab.common.base
 
-import kotlin.text.toBoolean as toBooleanKt
-
 fun CharSequence?.toBoolean(): Boolean {
-    return this?.toString().toBooleanKt()
+    return this.contentEquals("true", true)
 }
 
 fun Any?.toBoolean(): Boolean {
@@ -89,15 +87,9 @@ fun allFalse(charSeqs: Iterable<CharSequence?>): Boolean {
 }
 
 fun Boolean.toInt(): Int {
-    if (this) {
-        return 1
-    }
-    return 0
+    return if (this) 1 else 0
 }
 
 fun Boolean?.toInt(): Int {
-    if (this !== null && this) {
-        return 1
-    }
-    return 0
+    return if (this !== null && this) 1 else 0
 }
