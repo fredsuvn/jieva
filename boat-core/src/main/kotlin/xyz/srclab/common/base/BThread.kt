@@ -95,7 +95,7 @@ fun callerStackTraceOrNull(
                 result = filter.apply(stackTrace[j], true)
                 if (result == 1) {
                     val callerIndex = j + offset
-                    if (callerIndex.isIndexInBounds(0, stackTrace.size)) {
+                    if (callerIndex.isInBounds(0, stackTrace.size)) {
                         return stackTrace[callerIndex]
                     }
                     return null

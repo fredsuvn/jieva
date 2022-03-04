@@ -1,6 +1,6 @@
 package xyz.srclab.common.io
 
-import xyz.srclab.common.base.checkIndexInBounds
+import xyz.srclab.common.base.checkInBounds
 import xyz.srclab.common.base.checkRangeInBounds
 import java.io.Writer
 
@@ -20,7 +20,7 @@ open class CharsWriter(
     private var pos = offset
 
     override fun write(b: Int) {
-        pos.checkIndexInBounds(offset, offset + length)
+        pos.checkInBounds(offset, offset + length)
         destination[pos] = b.toChar()
         pos++
     }
@@ -28,7 +28,7 @@ open class CharsWriter(
     override fun write(b: CharArray, off: Int, len: Int) {
         checkRangeInBounds(off, off + len, 0, b.size)
         val nextPos = pos + len
-        (nextPos - 1).checkIndexInBounds(offset, offset + length)
+        (nextPos - 1).checkInBounds(offset, offset + length)
         System.arraycopy(b, off, destination, pos, len)
         pos = nextPos
     }

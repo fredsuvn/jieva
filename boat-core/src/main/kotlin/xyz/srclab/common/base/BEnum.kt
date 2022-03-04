@@ -45,7 +45,7 @@ fun <T> Class<*>.enumValueOrNull(index: Int): T? {
     if (values.isNullOrEmpty()) {
         return null
     }
-    if (index.isIndexInBounds(0, values.size)) {
+    if (index.isInBounds(0, values.size)) {
         return values[index].asTyped()
     }
     return null

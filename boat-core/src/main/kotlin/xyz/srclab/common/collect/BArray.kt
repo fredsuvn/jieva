@@ -3,7 +3,7 @@
 package xyz.srclab.common.collect
 
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.base.checkIndexInBounds
+import xyz.srclab.common.base.checkInBounds
 import xyz.srclab.common.base.toKotlinFun
 import xyz.srclab.common.collect.ArrayBridge.Companion.toArrayBridge
 import xyz.srclab.common.reflect.rawClass
@@ -69,7 +69,7 @@ fun <T> Array<T>.add(element: T, index: Int = this.size): Array<T> {
         result[this.size] = element
         return result.asTyped()
     }
-    index.checkIndexInBounds(0, this.size)
+    index.checkInBounds(0, this.size)
     val result: Array<T?> = this.javaClass.componentType.newArray(this.size + 1).asTyped()
     System.arraycopy(this, 0, result, 0, index)
     result[index] = element
@@ -83,7 +83,7 @@ fun <T> Array<T>.remove(index: Int = this.size - 1): Array<T> {
         val result = this.copyOf(this.size - 1)
         return result.asTyped()
     }
-    index.checkIndexInBounds(0, this.size)
+    index.checkInBounds(0, this.size)
     val result: Array<T?> = this.javaClass.componentType.newArray(this.size - 1).asTyped()
     System.arraycopy(this, 0, result, 0, index)
     System.arraycopy(this, index + 1, result, index, this.size - index - 1)

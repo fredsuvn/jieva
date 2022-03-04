@@ -2,7 +2,7 @@
 
 package xyz.srclab.common.io
 
-import xyz.srclab.common.base.checkLengthInRange
+import xyz.srclab.common.base.checkInBounds
 import xyz.srclab.common.base.defaultCharset
 import xyz.srclab.common.base.getString
 import xyz.srclab.common.base.remainingLength
@@ -15,7 +15,7 @@ fun newByteBuffer(capacity: Int, direct: Boolean): ByteBuffer {
 
 @JvmOverloads
 fun ByteBuffer.getBytes(length: Int = this.remaining(), useWrappedArray: Boolean = false): ByteArray {
-    length.checkLengthInRange(0, this.remaining())
+    length.checkInBounds(0, this.remaining())
     if (
         useWrappedArray
         && this.hasArray()
@@ -38,7 +38,7 @@ fun ByteBuffer.getBytes(useWrappedArray: Boolean): ByteArray {
 
 @JvmOverloads
 fun ByteBuffer.getString(length: Int = this.remaining(), charset: Charset = defaultCharset()): String {
-    length.checkLengthInRange(0, this.remaining())
+    length.checkInBounds(0, this.remaining())
     if (this.hasArray()) {
         val array = this.array()
         val arrayOffset = this.arrayOffset() + this.position()
@@ -55,7 +55,7 @@ fun ByteBuffer.getString(charset: Charset): String {
 
 @JvmOverloads
 fun ByteBuffer.getBuffer(length: Int, direct: Boolean = false): ByteBuffer {
-    length.checkLengthInRange(0, this.remaining())
+    length.checkInBounds(0, this.remaining())
     return if (!direct) {
         val array = ByteArray(length)
         this.get(array)

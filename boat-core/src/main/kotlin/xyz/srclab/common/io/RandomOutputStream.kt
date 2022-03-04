@@ -1,6 +1,6 @@
 package xyz.srclab.common.io
 
-import xyz.srclab.common.base.checkIndexInBounds
+import xyz.srclab.common.base.checkInBounds
 import xyz.srclab.common.base.checkRangeInBounds
 import java.io.OutputStream
 import java.io.RandomAccessFile
@@ -22,7 +22,7 @@ open class RandomOutputStream(
     private var pos = offset
 
     override fun write(b: Int) {
-        pos.checkIndexInBounds(offset, offset + length)
+        pos.checkInBounds(offset, offset + length)
         destination.write(b)
         pos++
     }
@@ -30,7 +30,7 @@ open class RandomOutputStream(
     override fun write(b: ByteArray, off: Int, len: Int) {
         checkRangeInBounds(off, off + len, 0, b.size)
         val nextPos = pos + len
-        (nextPos - 1).checkIndexInBounds(offset, offset + length)
+        (nextPos - 1).checkInBounds(offset, offset + length)
         destination.write(b, off, len)
         pos = nextPos
     }

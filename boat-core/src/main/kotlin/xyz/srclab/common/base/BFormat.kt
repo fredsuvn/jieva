@@ -161,7 +161,7 @@ object FastFormat : StringFormat {
                 val cn = pattern[i]
                 if (cn == '}') {
                     //Insert parameter
-                    if (!argIndex.isIndexInBounds(0, args.size)) {
+                    if (!argIndex.isInBounds(0, args.size)) {
                         //Args bounds out of bounds
                         //throw StringFormatException("Argument index out of bounds: $argIndex")
                         i++

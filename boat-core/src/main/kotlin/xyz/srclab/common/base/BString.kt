@@ -470,7 +470,7 @@ interface StringRef : CharSequence {
             override val length: Int = endIndex - startIndex
 
             override fun get(index: Int): Char {
-                index.checkIndexInBounds(0, endIndex)
+                index.checkInBounds(0, endIndex)
                 return chars[index.actualIndex()]
             }
 
@@ -499,7 +499,7 @@ interface StringRef : CharSequence {
             override val length: Int = endIndex - startIndex
 
             override fun get(index: Int): Char {
-                index.checkIndexInBounds(0, endIndex)
+                index.checkInBounds(0, endIndex)
                 return chars[index.actualIndex()]
             }
 

@@ -4,240 +4,319 @@ package xyz.srclab.common.base
 
 import java.util.function.Supplier
 
+/**
+ * Checks and if [expr] returns false, throw [exception].
+ */
+fun checkThrow(expr: Boolean, exception: Supplier<Throwable>) {
+    if (!expr) {
+        throw exception.get()
+    }
+}
+
+/**
+ * Checks and if [expr] returns false, throw [exception].
+ */
+@JvmSynthetic
+inline fun checkThrow(expr: Boolean, exception: () -> Throwable) {
+    if (!expr) {
+        throw exception()
+    }
+}
+
+/**
+ * Checks and if [expr] returns false, throw [NullPointerException].
+ */
 @Throws(NullPointerException::class)
-fun checkNotNull(expression: Boolean) {
-    if (!expression) {
+fun checkNull(expr: Boolean) {
+    if (!expr) {
         throw NullPointerException()
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [NullPointerException] with [message].
+ */
 @Throws(NullPointerException::class)
-fun checkNotNull(expression: Boolean, message: CharSequence?) {
-    if (!expression) {
+fun checkNull(expr: Boolean, message: Any?) {
+    if (!expr) {
         throw NullPointerException(message?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [NullPointerException] with [message].
+ */
 @Throws(NullPointerException::class)
-fun checkNotNull(expression: Boolean, message: Supplier<CharSequence?>) {
-    if (!expression) {
+fun checkNull(expr: Boolean, message: Supplier<Any?>) {
+    if (!expr) {
         throw NullPointerException(message.get()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [NullPointerException] with [message].
+ */
 @Throws(NullPointerException::class)
 @JvmSynthetic
-fun checkNotNull(expression: Boolean, message: () -> CharSequence?) {
-    if (!expression) {
+inline fun checkNull(expr: Boolean, message: () -> Any?) {
+    if (!expr) {
         throw NullPointerException(message()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IllegalArgumentException].
+ */
 @Throws(IllegalArgumentException::class)
-fun checkArgument(expression: Boolean) {
-    if (!expression) {
+fun checkArgument(expr: Boolean) {
+    if (!expr) {
         throw IllegalArgumentException()
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IllegalArgumentException] with [message].
+ */
 @Throws(IllegalArgumentException::class)
-fun checkArgument(expression: Boolean, message: CharSequence?) {
-    if (!expression) {
+fun checkArgument(expr: Boolean, message: Any?) {
+    if (!expr) {
         throw IllegalArgumentException(message?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IllegalArgumentException] with [message].
+ */
 @Throws(IllegalArgumentException::class)
-fun checkArgument(expression: Boolean, message: Supplier<CharSequence?>) {
-    if (!expression) {
+fun checkArgument(expr: Boolean, message: Supplier<Any?>) {
+    if (!expr) {
         throw IllegalArgumentException(message.get()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IllegalArgumentException] with [message].
+ */
 @Throws(IllegalArgumentException::class)
 @JvmSynthetic
-fun checkArgument(expression: Boolean, message: () -> CharSequence?) {
-    if (!expression) {
+inline fun checkArgument(expr: Boolean, message: () -> Any?) {
+    if (!expr) {
         throw IllegalArgumentException(message()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IllegalStateException].
+ */
 @Throws(IllegalStateException::class)
-fun checkState(expression: Boolean) {
-    if (!expression) {
+fun checkState(expr: Boolean) {
+    if (!expr) {
         throw IllegalStateException()
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IllegalStateException] with [message].
+ */
 @Throws(IllegalStateException::class)
-fun checkState(expression: Boolean, message: CharSequence?) {
-    if (!expression) {
+fun checkState(expr: Boolean, message: Any?) {
+    if (!expr) {
         throw IllegalStateException(message?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IllegalStateException] with [message].
+ */
 @Throws(IllegalStateException::class)
-fun checkState(expression: Boolean, message: Supplier<CharSequence?>) {
-    if (!expression) {
+fun checkState(expr: Boolean, message: Supplier<Any?>) {
+    if (!expr) {
         throw IllegalStateException(message.get()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IllegalStateException] with [message].
+ */
 @Throws(IllegalStateException::class)
 @JvmSynthetic
-fun checkState(expression: Boolean, message: () -> CharSequence?) {
-    if (!expression) {
+inline fun checkState(expr: Boolean, message: () -> Any?) {
+    if (!expr) {
         throw IllegalStateException(message()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [UnsupportedOperationException].
+ */
 @Throws(UnsupportedOperationException::class)
-fun checkSupported(expression: Boolean) {
-    if (!expression) {
+fun checkSupported(expr: Boolean) {
+    if (!expr) {
         throw UnsupportedOperationException()
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [UnsupportedOperationException] with [message].
+ */
 @Throws(UnsupportedOperationException::class)
-fun checkSupported(expression: Boolean, message: CharSequence?) {
-    if (!expression) {
+fun checkSupported(expr: Boolean, message: Any?) {
+    if (!expr) {
         throw UnsupportedOperationException(message?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [UnsupportedOperationException] with [message].
+ */
 @Throws(UnsupportedOperationException::class)
-fun checkSupported(expression: Boolean, message: Supplier<CharSequence?>) {
-    if (!expression) {
+fun checkSupported(expr: Boolean, message: Supplier<Any?>) {
+    if (!expr) {
         throw UnsupportedOperationException(message.get()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [UnsupportedOperationException] with [message].
+ */
 @Throws(UnsupportedOperationException::class)
 @JvmSynthetic
-fun checkSupported(expression: Boolean, message: () -> CharSequence?) {
-    if (!expression) {
+inline fun checkSupported(expr: Boolean, message: () -> Any?) {
+    if (!expr) {
         throw UnsupportedOperationException(message()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [NoSuchElementException].
+ */
 @Throws(NoSuchElementException::class)
-fun checkElement(expression: Boolean) {
-    if (!expression) {
+fun checkElement(expr: Boolean) {
+    if (!expr) {
         throw NoSuchElementException()
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [NoSuchElementException] with [message].
+ */
 @Throws(NoSuchElementException::class)
-fun checkElement(expression: Boolean, message: CharSequence?) {
-    if (!expression) {
+fun checkElement(expr: Boolean, message: Any?) {
+    if (!expr) {
         throw NoSuchElementException(message?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [NoSuchElementException] with [message].
+ */
 @Throws(NoSuchElementException::class)
-fun checkElement(expression: Boolean, message: Supplier<CharSequence?>) {
-    if (!expression) {
+fun checkElement(expr: Boolean, message: Supplier<Any?>) {
+    if (!expr) {
         throw NoSuchElementException(message.get()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [NoSuchElementException] with [message].
+ */
 @Throws(NoSuchElementException::class)
 @JvmSynthetic
-fun checkElement(expression: Boolean, message: () -> CharSequence?) {
-    if (!expression) {
+inline fun checkElement(expr: Boolean, message: () -> Any?) {
+    if (!expr) {
         throw NoSuchElementException(message()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IndexOutOfBoundsException].
+ */
 @Throws(IndexOutOfBoundsException::class)
-fun checkInBounds(expression: Boolean) {
-    if (!expression) {
+fun checkBounds(expr: Boolean) {
+    if (!expr) {
         throw IndexOutOfBoundsException()
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IndexOutOfBoundsException] with [message].
+ */
 @Throws(IndexOutOfBoundsException::class)
-fun checkInBounds(expression: Boolean, message: CharSequence?) {
-    if (!expression) {
+fun checkBounds(expr: Boolean, message: Any?) {
+    if (!expr) {
         throw IndexOutOfBoundsException(message?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IndexOutOfBoundsException] with [message].
+ */
 @Throws(IndexOutOfBoundsException::class)
-fun checkInBounds(expression: Boolean, message: Supplier<CharSequence?>) {
-    if (!expression) {
+fun checkBounds(expr: Boolean, message: Supplier<Any?>) {
+    if (!expr) {
         throw IndexOutOfBoundsException(message.get()?.toString())
     }
 }
 
+/**
+ * Checks and if [expr] returns false, throw [IndexOutOfBoundsException] with [message].
+ */
 @Throws(IndexOutOfBoundsException::class)
 @JvmSynthetic
-fun checkInBounds(expression: Boolean, message: () -> CharSequence?) {
-    if (!expression) {
+inline fun checkBounds(expr: Boolean, message: () -> Any?) {
+    if (!expr) {
         throw IndexOutOfBoundsException(message()?.toString())
     }
 }
 
-fun Int.isIndexInBounds(startInclusive: Int, endExclusive: Int): Boolean {
+/**
+ * Returns whether [this] is in bounds from [startInclusive] to [endExclusive].
+ */
+fun Int.isInBounds(startInclusive: Int, endExclusive: Int): Boolean {
     return this in startInclusive until endExclusive
 }
 
-fun Long.isIndexInBounds(startInclusive: Long, endExclusive: Long): Boolean {
+/**
+ * Returns whether [this] is in bounds from [startInclusive] to [endExclusive].
+ */
+fun Long.isInBounds(startInclusive: Long, endExclusive: Long): Boolean {
     return this in startInclusive until endExclusive
 }
 
+/**
+ * Checks whether [this] is in bounds from [startInclusive] to [endExclusive].
+ */
+@JvmOverloads
 @Throws(IndexOutOfBoundsException::class)
-fun Int.checkIndexInBounds(startInclusive: Int, endExclusive: Int) {
-    if (!this.isIndexInBounds(startInclusive, endExclusive)) {
-        throw IndexOutOfBoundsException(
-            "Index out of bounds[" +
-                "index: $this, startInclusive: $startInclusive, endExclusive: $endExclusive" +
-                "]."
-        )
+fun Int.checkInBounds(
+    startInclusive: Int,
+    endExclusive: Int,
+    message: Any? = "$this is out of bounds: [$startInclusive, $endExclusive)!"
+) {
+    if (!this.isInBounds(startInclusive, endExclusive)) {
+        throw IndexOutOfBoundsException(message?.toString())
     }
 }
 
+/**
+ * Checks whether [this] is in bounds from [startInclusive] to [endExclusive].
+ */
+@JvmOverloads
 @Throws(IndexOutOfBoundsException::class)
-fun Long.checkIndexInBounds(startInclusive: Long, endExclusive: Long) {
-    if (!this.isIndexInBounds(startInclusive, endExclusive)) {
-        throw IndexOutOfBoundsException(
-            "Index out of bounds[" +
-                "index: $this, startInclusive: $startInclusive, endExclusive: $endExclusive" +
-                "]."
-        )
+fun Long.checkInBounds(
+    startInclusive: Long,
+    endExclusive: Long,
+    message: Any? = "$this is out of bounds: [$startInclusive, $endExclusive)!"
+) {
+    if (!this.isInBounds(startInclusive, endExclusive)) {
+        throw IndexOutOfBoundsException(message?.toString())
     }
 }
 
-fun Int.isLengthInRange(startInclusive: Int, endExclusive: Int): Boolean {
-    return startInclusive <= endExclusive && endExclusive - startInclusive >= this
-}
-
-fun Long.isLengthInRange(startInclusive: Long, endExclusive: Long): Boolean {
-    return startInclusive <= endExclusive && endExclusive - startInclusive >= this
-}
-
-@Throws(IndexOutOfBoundsException::class)
-fun Int.checkLengthInRange(startInclusive: Int, endExclusive: Int) {
-    if (!this.isLengthInRange(startInclusive, endExclusive)) {
-        throw IndexOutOfBoundsException(
-            "Length out of range[" +
-                "length: $this, startInclusive: $startInclusive, endExclusive: $endExclusive" +
-                "]."
-        )
-    }
-}
-
-@Throws(IndexOutOfBoundsException::class)
-fun Long.checkLengthInRange(startInclusive: Long, endExclusive: Long) {
-    if (!this.isLengthInRange(startInclusive, endExclusive)) {
-        throw IndexOutOfBoundsException(
-            "Length out of range[" +
-                "length: $this, startInclusive: $startInclusive, endExclusive: $endExclusive" +
-                "]."
-        )
-    }
-}
-
+/**
+ * Returns whether the range from [rangeStartInclusive] to [rangeEndExclusive]
+ * is in bounds from [boundStartInclusive] to [boundEndExclusive].
+ */
 fun isRangeInBounds(
     rangeStartInclusive: Int, rangeEndExclusive: Int, boundStartInclusive: Int, boundEndExclusive: Int
 ): Boolean {
@@ -246,6 +325,10 @@ fun isRangeInBounds(
         && rangeStartInclusive <= rangeEndExclusive
 }
 
+/**
+ * Returns whether the range from [rangeStartInclusive] to [rangeEndExclusive]
+ * is in bounds from [boundStartInclusive] to [boundEndExclusive].
+ */
 fun isRangeInBounds(
     rangeStartInclusive: Long, rangeEndExclusive: Long, boundStartInclusive: Long, boundEndExclusive: Long
 ): Boolean {
@@ -263,10 +346,7 @@ fun checkRangeInBounds(
 ) {
     if (!isRangeInBounds(rangeStartInclusive, rangeEndExclusive, boundStartInclusive, boundEndExclusive)) {
         throw IndexOutOfBoundsException(
-            "Range out of bounds[" +
-                "rangeStartInclusive: $rangeStartInclusive, rangeEndExclusive: $rangeEndExclusive, " +
-                "boundStartInclusive: $boundStartInclusive, boundEndExclusive: $boundEndExclusive" +
-                "]."
+            "[$rangeStartInclusive, $rangeEndExclusive) is of bounds: [$boundStartInclusive, $boundEndExclusive)"
         )
     }
 }
@@ -280,10 +360,7 @@ fun checkRangeInBounds(
 ) {
     if (!isRangeInBounds(rangeStartInclusive, rangeEndExclusive, boundStartInclusive, boundEndExclusive)) {
         throw IndexOutOfBoundsException(
-            "Range out of bounds[" +
-                "rangeStartInclusive: $rangeStartInclusive, rangeEndExclusive: $rangeEndExclusive, " +
-                "boundStartInclusive: $boundStartInclusive, boundEndExclusive: $boundEndExclusive" +
-                "]."
+            "[$rangeStartInclusive, $rangeEndExclusive) is of bounds: [$boundStartInclusive, $boundEndExclusive)"
         )
     }
 }

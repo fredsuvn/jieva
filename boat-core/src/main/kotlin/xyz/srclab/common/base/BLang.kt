@@ -28,7 +28,7 @@ inline fun <T> getOrNew(
 }
 
 /**
- * Abstract object represents a final object, which will cache the values of [hashCode] and [toString].
+ * Abstract class represents a final object, which will cache the values of [hashCode] and [toString].
  * The subclass should implement [hashCode0] and [toString0] to compute the values of [hashCode] and [toString],
  * each computation will be processed only once.
  */
