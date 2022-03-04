@@ -337,6 +337,10 @@ fun isRangeInBounds(
         && rangeStartInclusive <= rangeEndExclusive
 }
 
+/**
+ * Checks whether the range from [rangeStartInclusive] to [rangeEndExclusive]
+ * is in bounds from [boundStartInclusive] to [boundEndExclusive].
+ */
 @Throws(IndexOutOfBoundsException::class)
 fun checkRangeInBounds(
     rangeStartInclusive: Int,
@@ -351,6 +355,10 @@ fun checkRangeInBounds(
     }
 }
 
+/**
+ * Checks whether the range from [rangeStartInclusive] to [rangeEndExclusive]
+ * is in bounds from [boundStartInclusive] to [boundEndExclusive].
+ */
 @Throws(IndexOutOfBoundsException::class)
 fun checkRangeInBounds(
     rangeStartInclusive: Long,
