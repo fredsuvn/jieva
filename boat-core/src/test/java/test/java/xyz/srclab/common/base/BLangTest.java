@@ -3,8 +3,11 @@ package test.java.xyz.srclab.common.base;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.ArraySeg;
 import xyz.srclab.common.base.FinalObject;
 import xyz.srclab.common.base.IntRef;
+
+import java.util.Arrays;
 
 public class BLangTest {
 
@@ -42,5 +45,21 @@ public class BLangTest {
         Assert.assertEquals(tf.hashCode(), 1);
         Assert.assertEquals(tf.toString(), "1");
         Assert.assertEquals(i.get(), 100);
+    }
+
+    @Test
+    public void testArraySeg() {
+        int[] array = new int[]{31312, 31312, 3232, 454, 676, 8878};
+        int offset = 2;
+        ArraySeg<int[]> seg = new ArraySeg<>(array, offset);
+        Assert.assertEquals(seg.absIndex(1), offset + 1);
+        Assert.assertEquals(seg.absIndex(2), offset + 2);
+        ArraySeg<int[]> seg2 = new ArraySeg<>(array, offset);
+        Assert.assertEquals(seg2.absIndex(3), offset + 3);
+        Assert.assertEquals(seg2, seg);
+        Assert.assertEquals(seg2.array(), seg.array());
+        Assert.assertEquals(seg2.copyOfRange(), seg.copyOfRange());
+        Assert.assertEquals(seg2.copyOfRange(), Arrays.copyOfRange(seg.array(), seg.startIndex(), seg.endIndex()));
+        Assert.assertEquals(seg2.copyOfRange(), Arrays.copyOfRange(array, offset, array.length));
     }
 }

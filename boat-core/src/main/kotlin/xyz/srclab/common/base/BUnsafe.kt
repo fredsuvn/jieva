@@ -2,9 +2,9 @@
 
 package xyz.srclab.common.base
 
-/**
- * Returns given length of given array ([this]).
- */
-fun Any.arrayLength(): Int {
-    return java.lang.reflect.Array.getLength(this)
-}
+//fun testUnsafe() {
+//    val unsafe: sun.misc.Unsafe = sun.misc.Unsafe.getUnsafe()
+//    1 Field f = Unsafe.class.getDeclaredField("theUnsafe");
+//    2 f.setAccessible(true);
+//    3 Unsafe unsafe = (Unsafe) f.get(null);
+//}

@@ -14,6 +14,37 @@ import kotlin.collections.joinToString as joinToStringKt
 
 private const val NOT_ARRAY_TYPE_PREFIX = "Not an array type"
 
+/**
+ * Returns given length of given array ([this]).
+ */
+@JvmName("getLength")
+fun Any.arrayLength(): Int {
+    return java.lang.reflect.Array.getLength(this)
+}
+
+/**
+ * Returns a new array which is a copy of the specified range of the original array.
+ *
+ * @param fromIndex start index inclusive
+ * @param toIndex end index exclusive
+ */
+@JvmName("copyOfRange")
+@JvmOverloads
+fun <A : Any> A.arrayCopyOfRannge(fromIndex: Int = 0, toIndex: Int = this.arrayLength()): A {
+    return when (this) {
+        is Array<*> -> this.copyOfRange(fromIndex, toIndex)
+        is BooleanArray -> this.copyOfRange(fromIndex, toIndex)
+        is ByteArray -> this.copyOfRange(fromIndex, toIndex)
+        is ShortArray -> this.copyOfRange(fromIndex, toIndex)
+        is CharArray -> this.copyOfRange(fromIndex, toIndex)
+        is IntArray -> this.copyOfRange(fromIndex, toIndex)
+        is LongArray -> this.copyOfRange(fromIndex, toIndex)
+        is FloatArray -> this.copyOfRange(fromIndex, toIndex)
+        is DoubleArray -> this.copyOfRange(fromIndex, toIndex)
+        else -> throw IllegalArgumentException("Not an array: $this!")
+    }.asTyped()
+}
+
 @JvmName("arrayOf")
 fun <T> newArrayOf(vararg elements: T): Array<T> {
     return elements.asTyped()
