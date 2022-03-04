@@ -70,7 +70,7 @@ public class IOTest {
         BIO.writeObject(s, BFile.openOutputStream(temp), true);
         S s2 = BIO.readObject(BFile.openInputStream(temp), true);
         Assert.assertEquals(s2.getS1(), s.getS1());
-        List<Byte> list = BArray.asList("1234".getBytes(BDefault.DEFAULT_CHARSET));
+        List<Byte> list = BArray.asList("1234".getBytes(BDefault.charset()));
         BIO.writeObject(list, BFile.openOutputStream(temp), true);
         List<Byte> list2 = BIO.readObject(BFile.openInputStream(temp), true);
         Assert.assertEquals(list2, list);
@@ -99,7 +99,7 @@ public class IOTest {
 
     public static class S implements Serializable {
 
-        private static final long serialVersionUID = BDefault.DEFAULT_SERIAL_VERSION;
+        private static final long serialVersionUID = BDefault.serialVersion();
 
         private String s1 = "s1";
 

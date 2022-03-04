@@ -2,8 +2,8 @@
 
 package xyz.srclab.common.io
 
-import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.checkLengthInRange
+import xyz.srclab.common.base.defaultCharset
 import xyz.srclab.common.base.getString
 import xyz.srclab.common.base.remainingLength
 import java.nio.ByteBuffer
@@ -37,7 +37,7 @@ fun ByteBuffer.getBytes(useWrappedArray: Boolean): ByteArray {
 }
 
 @JvmOverloads
-fun ByteBuffer.getString(length: Int = this.remaining(), charset: Charset = DEFAULT_CHARSET): String {
+fun ByteBuffer.getString(length: Int = this.remaining(), charset: Charset = defaultCharset()): String {
     length.checkLengthInRange(0, this.remaining())
     if (this.hasArray()) {
         val array = this.array()

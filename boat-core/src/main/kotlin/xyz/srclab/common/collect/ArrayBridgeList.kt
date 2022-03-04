@@ -1,6 +1,6 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
 
 /**
@@ -22,7 +22,7 @@ class ArrayBridgeList<T>(
     override fun removeAt(index: Int): T = throw UnsupportedOperationException()
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }
 
@@ -50,7 +50,7 @@ interface ArrayBridge<T> {
         override fun lastIndexOf(element: T): Int = array.lastIndexOf(element)
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 
@@ -64,7 +64,7 @@ interface ArrayBridge<T> {
         override fun lastIndexOf(element: Boolean): Int = array.lastIndexOf(element)
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 
@@ -78,7 +78,7 @@ interface ArrayBridge<T> {
         override fun lastIndexOf(element: Byte): Int = array.lastIndexOf(element)
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 
@@ -92,7 +92,7 @@ interface ArrayBridge<T> {
         override fun lastIndexOf(element: Short): Int = array.lastIndexOf(element)
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 
@@ -106,7 +106,7 @@ interface ArrayBridge<T> {
         override fun lastIndexOf(element: Char): Int = array.lastIndexOf(element)
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 
@@ -120,7 +120,7 @@ interface ArrayBridge<T> {
         override fun lastIndexOf(element: Int): Int = array.lastIndexOf(element)
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 
@@ -134,7 +134,7 @@ interface ArrayBridge<T> {
         override fun lastIndexOf(element: Long): Int = array.lastIndexOf(element)
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 
@@ -148,7 +148,7 @@ interface ArrayBridge<T> {
         override fun lastIndexOf(element: Float): Int = array.indexOfLast { it == element }
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 
@@ -162,7 +162,7 @@ interface ArrayBridge<T> {
         override fun lastIndexOf(element: Double): Int = array.indexOfLast { it == element }
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 

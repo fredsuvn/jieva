@@ -1,6 +1,6 @@
 package xyz.srclab.common.convert
 
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
 import java.lang.reflect.Type
 
@@ -9,6 +9,6 @@ open class ConvertException : RuntimeException, Serializable {
     constructor(from: Any?, toType: Type) : super("Unsupported convert: ${from?.javaClass} -> $toType")
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

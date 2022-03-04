@@ -118,7 +118,7 @@ object LowerBoundConvertHandler : ConvertHandler {
  * * [CharArray], [ByteArray], [Array<Char>], [Array<Byte>];
  */
 open class StringConvertHandler @JvmOverloads constructor(
-    private val charset: Charset = DEFAULT_CHARSET
+    private val charset: Charset = defaultCharset()
 ) : ConvertHandler {
     override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (toType !is Class<*>) {

@@ -273,7 +273,7 @@ fun CharSequence.lines(): List<String> {
 }
 
 @JvmOverloads
-fun CharSequence.getBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
+fun CharSequence.getBytes(charset: Charset = defaultCharset()): ByteArray {
     return this.toString().toByteArray(charset)
 }
 
@@ -281,7 +281,7 @@ fun CharSequence.getBytes(charset: Charset = DEFAULT_CHARSET): ByteArray {
 fun CharArray.getBytes(
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
-    charset: Charset = DEFAULT_CHARSET
+    charset: Charset = defaultCharset()
 ): ByteArray {
     return String(this, offset, length).toByteArray(charset)
 }
@@ -294,7 +294,7 @@ fun CharArray.getBytes(charset: Charset): ByteArray {
 fun ByteArray.getString(
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
-    charset: Charset = DEFAULT_CHARSET
+    charset: Charset = defaultCharset()
 ): String {
     return String(this, offset, length, charset)
 }
@@ -307,7 +307,7 @@ fun ByteArray.getString(charset: Charset): String {
 fun ByteArray.getChars(
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
-    charset: Charset = DEFAULT_CHARSET
+    charset: Charset = defaultCharset()
 ): CharArray {
     return getString(offset, length, charset).toCharArray()
 }

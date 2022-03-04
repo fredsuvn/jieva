@@ -53,7 +53,7 @@ interface TcpClient {
     fun send(data: InputStream)
 
     fun send(data: String) {
-        send(data.getBytes(DEFAULT_CHARSET))
+        send(data.getBytes(defaultCharset()))
     }
 
     fun send(data: String, charset: Charset) {
@@ -73,7 +73,7 @@ interface TcpClient {
     fun receiveBytes(): ByteArray
 
     fun receiveString(): String {
-        return receiveString(DEFAULT_CHARSET)
+        return receiveString(defaultCharset())
     }
 
     fun receiveString(charset: Charset): String {
@@ -90,7 +90,7 @@ interface TcpClient {
         fun bioClient(
             remoteAddress: SocketAddress,
             timeoutMillis: Long = 5000,
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
+            bufferSize: Int = defaultBufferSize()
         ): TcpClient {
             return BIOTcpClient(remoteAddress, timeoutMillis, bufferSize)
         }
@@ -103,7 +103,7 @@ interface TcpClient {
         fun bioClient(
             remoteAddress: CharSequence,
             timeoutMillis: Long = 5000,
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
+            bufferSize: Int = defaultBufferSize()
         ): TcpClient {
             return BIOTcpClient(remoteAddress.parseInetSocketAddress(), timeoutMillis, bufferSize)
         }
@@ -116,7 +116,7 @@ interface TcpClient {
         fun nioClient(
             remoteAddress: SocketAddress,
             timeoutMillis: Long = 5000,
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
+            bufferSize: Int = defaultBufferSize()
         ): TcpClient {
             return NIOTcpClient(remoteAddress, timeoutMillis, bufferSize)
         }
@@ -129,7 +129,7 @@ interface TcpClient {
         fun nioClient(
             remoteAddress: CharSequence,
             timeoutMillis: Long = 5000,
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
+            bufferSize: Int = defaultBufferSize()
         ): TcpClient {
             return NIOTcpClient(remoteAddress.parseInetSocketAddress(), timeoutMillis, bufferSize)
         }

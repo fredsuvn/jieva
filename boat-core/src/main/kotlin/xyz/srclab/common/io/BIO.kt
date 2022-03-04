@@ -4,9 +4,9 @@ package xyz.srclab.common.io
 
 import org.apache.commons.io.input.ReaderInputStream
 import org.apache.commons.io.output.WriterOutputStream
-import xyz.srclab.common.base.DEFAULT_CHARSET
-import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
 import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.defaultBufferSize
+import xyz.srclab.common.base.defaultCharset
 import xyz.srclab.common.base.remainingLength
 import java.io.*
 import java.net.URL
@@ -28,12 +28,12 @@ fun InputStream.readBytes(close: Boolean = false): ByteArray {
 }
 
 @JvmOverloads
-fun InputStream.readString(charset: Charset = DEFAULT_CHARSET, close: Boolean = false): String {
+fun InputStream.readString(charset: Charset = defaultCharset(), close: Boolean = false): String {
     return String(readBytes(close), charset)
 }
 
 @JvmOverloads
-fun InputStream.readLines(charset: Charset = DEFAULT_CHARSET, close: Boolean = false): List<String> {
+fun InputStream.readLines(charset: Charset = defaultCharset(), close: Boolean = false): List<String> {
     return readString(charset, close).lines()
 }
 
@@ -52,12 +52,12 @@ fun InputStream.availableBytes(close: Boolean = false): ByteArray {
 }
 
 @JvmOverloads
-fun InputStream.availableString(charset: Charset = DEFAULT_CHARSET, close: Boolean = false): String {
+fun InputStream.availableString(charset: Charset = defaultCharset(), close: Boolean = false): String {
     return String(availableBytes(close), charset)
 }
 
 @JvmOverloads
-fun InputStream.availableLines(charset: Charset = DEFAULT_CHARSET, close: Boolean = false): List<String> {
+fun InputStream.availableLines(charset: Charset = defaultCharset(), close: Boolean = false): List<String> {
     return availableString(charset, close).lines()
 }
 
@@ -77,60 +77,60 @@ fun Reader.readLines(close: Boolean = false): List<String> {
 }
 
 @JvmOverloads
-fun InputStream.readTo(output: OutputStream, bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): Long {
+fun InputStream.readTo(output: OutputStream, bufferSize: Int = defaultBufferSize()): Long {
     return this.copyTo(output, bufferSize)
 }
 
 @JvmOverloads
-fun Reader.readTo(output: Writer, bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): Long {
+fun Reader.readTo(output: Writer, bufferSize: Int = defaultBufferSize()): Long {
     return this.copyTo(output, bufferSize)
 }
 
 //Convert:
 
 @JvmOverloads
-fun InputStream.asBuffered(bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): BufferedInputStream {
+fun InputStream.asBuffered(bufferSize: Int = defaultBufferSize()): BufferedInputStream {
     return this.buffered(bufferSize)
 }
 
 @JvmOverloads
-fun OutputStream.asBuffered(bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): BufferedOutputStream {
+fun OutputStream.asBuffered(bufferSize: Int = defaultBufferSize()): BufferedOutputStream {
     return this.buffered(bufferSize)
 }
 
 @JvmOverloads
-fun InputStream.asReader(charset: Charset = DEFAULT_CHARSET): Reader {
+fun InputStream.asReader(charset: Charset = defaultCharset()): Reader {
     return InputStreamReader(this, charset)
 }
 
 @JvmOverloads
-fun OutputStream.asWriter(charset: Charset = DEFAULT_CHARSET): Writer {
+fun OutputStream.asWriter(charset: Charset = defaultCharset()): Writer {
     return OutputStreamWriter(this, charset)
 }
 
 @JvmOverloads
 fun InputStream.asBufferedReader(
-    charset: Charset = DEFAULT_CHARSET,
-    bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
+    charset: Charset = defaultCharset(),
+    bufferSize: Int = defaultBufferSize()
 ): BufferedReader {
     return this.reader(charset).buffered(bufferSize)
 }
 
 @JvmOverloads
 fun OutputStream.asBufferedWriter(
-    charset: Charset = DEFAULT_CHARSET,
-    bufferSize: Int = DEFAULT_IO_BUFFER_SIZE
+    charset: Charset = defaultCharset(),
+    bufferSize: Int = defaultBufferSize()
 ): BufferedWriter {
     return this.writer(charset).buffered(bufferSize)
 }
 
 @JvmOverloads
-fun Reader.asInputStream(charset: Charset = DEFAULT_CHARSET): InputStream {
+fun Reader.asInputStream(charset: Charset = defaultCharset()): InputStream {
     return ReaderInputStream(this, charset)
 }
 
 @JvmOverloads
-fun Writer.asOutputStream(charset: Charset = DEFAULT_CHARSET): OutputStream {
+fun Writer.asOutputStream(charset: Charset = defaultCharset()): OutputStream {
     return WriterOutputStream(this, charset)
 }
 

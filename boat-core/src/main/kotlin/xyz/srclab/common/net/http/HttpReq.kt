@@ -1,6 +1,6 @@
 package xyz.srclab.common.net.http
 
-import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
+import xyz.srclab.common.base.defaultBufferSize
 import java.io.InputStream
 
 /**
@@ -22,7 +22,7 @@ open class HttpReq {
     /**
      * If it is positive, use this (will add chunked header). Default is [DEFAULT_IO_BUFFER_SIZE].
      */
-    open var chunkedSize: Int = DEFAULT_IO_BUFFER_SIZE
+    open var chunkedSize: Int = defaultBufferSize()
 
     /**
      * If ture, use this (will add cache header). Default is false.

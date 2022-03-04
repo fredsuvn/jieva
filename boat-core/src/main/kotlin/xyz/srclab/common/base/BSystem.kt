@@ -348,6 +348,6 @@ fun isYunfan(): Boolean {
 
 class YunfanIsComingException : RuntimeException("长风破浪会有时，直挂云帆济沧海。占个坑~"), Serializable {
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

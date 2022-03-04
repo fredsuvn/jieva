@@ -1,7 +1,7 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.defaultSerialVersion
 import xyz.srclab.common.func.InstFunc
 import java.io.Serializable
 import java.lang.reflect.Field
@@ -99,6 +99,6 @@ open class PropertyType(
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

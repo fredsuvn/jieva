@@ -1,6 +1,6 @@
 package xyz.srclab.common.net
 
-import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
+import xyz.srclab.common.base.defaultBufferSize
 import xyz.srclab.common.base.epochMillis
 import xyz.srclab.common.io.newByteBuffer
 import xyz.srclab.common.net.PooledByteBuffer.Companion.asPooledByteBuffer
@@ -33,7 +33,7 @@ interface ByteBufferPool {
         fun simpleByteBufferPool(
             coreSize: Int = 10,
             maxSize: Int = 20,
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
+            bufferSize: Int = defaultBufferSize(),
             bufferKeepAliveMillis: Long = 60_000,
         ): ByteBufferPool {
             return SimpleByteBufferPool(coreSize, maxSize, bufferKeepAliveMillis, bufferSize)

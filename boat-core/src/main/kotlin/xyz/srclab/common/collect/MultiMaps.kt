@@ -1,7 +1,7 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
 import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
 
 /**
@@ -32,7 +32,7 @@ open class MutableSetMap<K, V> constructor(
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }
 
@@ -48,7 +48,7 @@ open class SetMap<K, V> constructor(
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }
 
@@ -88,7 +88,7 @@ open class MutableListMap<K, V> constructor(
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }
 
@@ -112,6 +112,6 @@ open class ListMap<K, V> constructor(
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

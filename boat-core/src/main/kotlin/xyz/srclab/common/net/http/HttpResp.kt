@@ -1,6 +1,6 @@
 package xyz.srclab.common.net.http
 
-import xyz.srclab.common.base.DEFAULT_CHARSET
+import xyz.srclab.common.base.defaultCharset
 import xyz.srclab.common.io.readString
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -14,7 +14,7 @@ open class HttpResp {
     open var status: HttpStatus = HttpStatus.OK
     open var headers: Map<String, List<String>> = emptyMap()
     open var body: InputStream? = null
-    open var charset: Charset = DEFAULT_CHARSET
+    open var charset: Charset = defaultCharset()
 
     open fun bodyAsString(): String? {
         return body?.readString(charset, true)

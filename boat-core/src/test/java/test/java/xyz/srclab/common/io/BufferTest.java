@@ -56,18 +56,18 @@ public class BufferTest {
 
     @Test
     public void testGetString() {
-        byte[] bytes1 = BRandom.randomString(100).getBytes(BDefault.DEFAULT_CHARSET);
+        byte[] bytes1 = BRandom.randomString(100).getBytes(BDefault.charset());
         ByteBuffer buffer1 = ByteBuffer.wrap(bytes1, 10, 90);
         Assert.assertEquals(
             BBuffer.getString(buffer1, 80),
-            new String(Arrays.copyOfRange(bytes1, 10, 90), BDefault.DEFAULT_CHARSET)
+            new String(Arrays.copyOfRange(bytes1, 10, 90), BDefault.charset())
         );
         ByteBuffer buffer2 = ByteBuffer.allocateDirect(99999);
         buffer2.put(bytes1, 10, 80);
         buffer2.flip();
         Assert.assertEquals(
             BBuffer.getString(buffer2, 2),
-            new String(Arrays.copyOfRange(bytes1, 10, 12), BDefault.DEFAULT_CHARSET)
+            new String(Arrays.copyOfRange(bytes1, 10, 12), BDefault.charset())
         );
         buffer1.flip();
         Assert.expectThrows(IndexOutOfBoundsException.class, () -> BBuffer.getBuffer(buffer1, 101, true));

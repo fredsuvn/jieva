@@ -1,7 +1,7 @@
 package xyz.srclab.common.net.udp
 
-import xyz.srclab.common.base.DEFAULT_CHARSET
-import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
+import xyz.srclab.common.base.defaultBufferSize
+import xyz.srclab.common.base.defaultCharset
 import xyz.srclab.common.base.getBytes
 import xyz.srclab.common.base.remainingLength
 import xyz.srclab.common.io.getBytes
@@ -41,7 +41,7 @@ interface UdpClient {
     fun send(address: SocketAddress, data: InputStream)
 
     fun send(address: SocketAddress, data: String) {
-        send(address, data.getBytes(DEFAULT_CHARSET))
+        send(address, data.getBytes(defaultCharset()))
     }
 
     fun send(address: SocketAddress, data: String, charset: Charset) {
@@ -52,7 +52,7 @@ interface UdpClient {
 
         @JvmOverloads
         @JvmStatic
-        fun bioClient(bufferSize: Int = DEFAULT_IO_BUFFER_SIZE): UdpClient {
+        fun bioClient(bufferSize: Int = defaultBufferSize()): UdpClient {
             return BIOUdpClient(bufferSize)
         }
 

@@ -2,7 +2,7 @@ package test.kotlin.xyz.srclab.common.io
 
 import org.testng.Assert
 import org.testng.annotations.Test
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+import xyz.srclab.common.base.defaultSerialVersion
 import xyz.srclab.common.io.readObject
 import xyz.srclab.common.io.writeObject
 import java.io.File
@@ -26,7 +26,7 @@ class IOTest {
         lateinit var a: String
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 }

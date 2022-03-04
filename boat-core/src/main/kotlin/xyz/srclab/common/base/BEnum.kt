@@ -61,6 +61,6 @@ private fun String.toEnumOrNull(type: Class<*>): Any? {
 
 open class NoSuchEnumException(message: String?) : RuntimeException(message), Serializable {
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

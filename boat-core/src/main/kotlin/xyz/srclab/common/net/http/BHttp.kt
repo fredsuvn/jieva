@@ -2,8 +2,8 @@
 
 package xyz.srclab.common.net.http
 
-import xyz.srclab.common.base.DEFAULT_CHARSET
 import xyz.srclab.common.base.addIfNotStartWith
+import xyz.srclab.common.base.defaultCharset
 import java.io.InputStream
 import java.net.URLEncoder
 
@@ -126,8 +126,8 @@ fun Map<*, *>.httpQueryToString(): String {
     return this.map {
         val key = it.key.toString()
         val value = it.value.toString()
-        val encodedKey = URLEncoder.encode(key, DEFAULT_CHARSET.name()).replace("+", "%20")
-        val encodedValue = URLEncoder.encode(value, DEFAULT_CHARSET.name()).replace("+", "%20")
+        val encodedKey = URLEncoder.encode(key, defaultCharset().name()).replace("+", "%20")
+        val encodedValue = URLEncoder.encode(value, defaultCharset().name()).replace("+", "%20")
         "$encodedKey=$encodedValue"
     }.joinToString("&")
 }

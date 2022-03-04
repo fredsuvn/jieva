@@ -1,6 +1,6 @@
 package xyz.srclab.common.net.udp
 
-import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
+import xyz.srclab.common.base.defaultBufferSize
 import xyz.srclab.common.io.newByteBuffer
 import xyz.srclab.common.net.NetServer
 import xyz.srclab.common.net.nioListen
@@ -26,7 +26,7 @@ interface UdpServer : NetServer {
             bindAddress: SocketAddress,
             channelHandler: UdpChannelHandler,
             executor: Executor = AsyncRunner.asExecutor(),
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
+            bufferSize: Int = defaultBufferSize(),
             directBuffer: Boolean = false
         ): UdpServer {
             return NIOUdpServer(bindAddress, channelHandler, executor, bufferSize, directBuffer)

@@ -1,6 +1,6 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
 import java.util.function.BiConsumer
 import java.util.function.BiFunction
@@ -127,6 +127,6 @@ open class CopyOnWriteMap<K, V>(
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

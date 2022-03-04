@@ -1,6 +1,6 @@
 package xyz.srclab.common.status
 
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
 
 /**
@@ -38,6 +38,6 @@ open class StringStatus @JvmOverloads constructor(
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

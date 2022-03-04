@@ -1,7 +1,6 @@
 package xyz.srclab.common.net.tcp
 
-import xyz.srclab.common.base.DEFAULT_IO_BUFFER_SIZE
-import xyz.srclab.common.base.sleep
+import xyz.srclab.common.base.defaultBufferSize
 import xyz.srclab.common.net.ByteBufferPool
 import xyz.srclab.common.net.NetSelector
 import xyz.srclab.common.net.NetSelector.Companion.toNetSelector
@@ -14,7 +13,6 @@ import java.io.InputStream
 import java.net.SocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.*
-import java.security.AccessController
 import java.util.concurrent.Executor
 
 /**
@@ -33,7 +31,7 @@ interface TcpServer : NetServer {
             bindAddress: SocketAddress,
             tcpListener: TcpListener,
             executor: Executor = AsyncRunner.asExecutor(),
-            bufferSize: Int = DEFAULT_IO_BUFFER_SIZE,
+            bufferSize: Int = defaultBufferSize(),
             bufferPool: ByteBufferPool = ByteBufferPool.simpleByteBufferPool()
         ): TcpServer {
             return NioTcpServer(bindAddress, tcpListener, executor, bufferSize, bufferPool)

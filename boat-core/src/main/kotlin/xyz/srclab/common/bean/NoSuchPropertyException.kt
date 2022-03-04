@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
 
 /**
@@ -8,6 +8,6 @@ import java.io.Serializable
  */
 open class NoSuchPropertyException(name: String) : RuntimeException(name), Serializable {
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }

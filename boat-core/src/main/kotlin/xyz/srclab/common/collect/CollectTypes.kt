@@ -1,6 +1,6 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+import xyz.srclab.common.base.defaultSerialVersion
 import xyz.srclab.common.reflect.parameterizedType
 import xyz.srclab.common.reflect.rawClass
 import java.io.Serializable
@@ -93,7 +93,7 @@ interface IterableType : Serializable, ParameterizedType {
             }
 
             companion object {
-                private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }
@@ -181,7 +181,7 @@ interface MapType : Serializable, ParameterizedType {
             }
 
             companion object {
-                private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+                private val serialVersionUID: Long = defaultSerialVersion()
             }
         }
     }

@@ -59,7 +59,7 @@ open class About @JvmOverloads constructor(
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }
 
@@ -104,7 +104,7 @@ open class Author @JvmOverloads constructor(
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }
 
@@ -217,7 +217,7 @@ open class SemVer @JvmOverloads constructor(
 
     companion object {
 
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
 
         private val IDENTIFIER_CHAR_MATCHER = NUMERIC_MATCHER
             .or(UPPER_CASE_MATCHER)

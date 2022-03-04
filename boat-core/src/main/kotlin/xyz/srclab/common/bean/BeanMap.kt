@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.DEFAULT_SERIAL_VERSION
+import xyz.srclab.common.base.defaultSerialVersion
 import xyz.srclab.common.collect.mapEntries
 import java.io.Serializable
 
@@ -79,11 +79,11 @@ open class BeanMap(
         }
 
         companion object {
-            private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+            private val serialVersionUID: Long = defaultSerialVersion()
         }
     }
 
     companion object {
-        private val serialVersionUID: Long = DEFAULT_SERIAL_VERSION
+        private val serialVersionUID: Long = defaultSerialVersion()
     }
 }
