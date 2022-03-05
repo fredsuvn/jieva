@@ -286,30 +286,20 @@ fun Long.isInBounds(startInclusive: Long, endExclusive: Long): Boolean {
 /**
  * Checks whether [this] is in bounds from [startInclusive] to [endExclusive].
  */
-@JvmOverloads
 @Throws(IndexOutOfBoundsException::class)
-fun Int.checkInBounds(
-    startInclusive: Int,
-    endExclusive: Int,
-    message: Any? = "$this is out of bounds: [$startInclusive, $endExclusive)!"
-) {
+fun Int.checkInBounds(startInclusive: Int, endExclusive: Int) {
     if (!this.isInBounds(startInclusive, endExclusive)) {
-        throw IndexOutOfBoundsException(message?.toString())
+        throw IndexOutOfBoundsException("$this is out of bounds: [$startInclusive, $endExclusive)!")
     }
 }
 
 /**
  * Checks whether [this] is in bounds from [startInclusive] to [endExclusive].
  */
-@JvmOverloads
 @Throws(IndexOutOfBoundsException::class)
-fun Long.checkInBounds(
-    startInclusive: Long,
-    endExclusive: Long,
-    message: Any? = "$this is out of bounds: [$startInclusive, $endExclusive)!"
-) {
+fun Long.checkInBounds(startInclusive: Long, endExclusive: Long) {
     if (!this.isInBounds(startInclusive, endExclusive)) {
-        throw IndexOutOfBoundsException(message?.toString())
+        throw IndexOutOfBoundsException("$this is out of bounds: [$startInclusive, $endExclusive)!")
     }
 }
 
