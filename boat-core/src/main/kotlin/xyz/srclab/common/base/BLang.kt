@@ -2,9 +2,6 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.collect.arrayCopyOfRannge
-import xyz.srclab.common.collect.arrayLength
-
 /**
  * Gets or creates a new value.
  * This function is usually used for operation which checks the value is null, if it is not, return,
@@ -67,54 +64,43 @@ abstract class FinalObject {
 }
 
 /**
- * This class specifies a segment for an array of type [A].
+ * Functional interface represents [java.util.function.Predicate] with index.
  */
-open class ArraySeg<A : Any> @JvmOverloads constructor(
-    @get:JvmName("array") val array: A,
-    @get:JvmName("offset") val offset: Int = 0,
-    @get:JvmName("length") val length: Int = remainingLength(array.arrayLength(), offset),
-) : FinalObject() {
+fun interface IndexedPredicate<T> {
+    fun test(index: Int, t: T): Boolean
+}
 
-    init {
-        checkState(array.javaClass.isArray) { "Not an array: $array!" }
-    }
+/**
+ * Functional interface represents [java.util.function.Function] with index.
+ */
+fun interface IndexedFunction<T, R> {
+    fun apply(index: Int, t: T): R
+}
 
-    @get:JvmName("startIndex")
-    val startIndex: Int = offset
+/**
+ * Functional interface represents [java.util.function.Consumer] with index.
+ */
+fun interface IndexedConsumer<T> {
+    fun accept(index: Int, t: T)
+}
 
-    @get:JvmName("endIndex")
-    val endIndex: Int = startIndex + length
+/**
+ * Functional interface represents [java.util.function.BiPredicate] with index.
+ */
+fun interface IndexedBiPredicate<T, U> {
+    fun test(index: Int, t: T, u: U): Boolean
+}
 
-    /**
-     * Returns the absolute index of [array],
-     * which is computed from given [index] -- a relative index of the offset of this segment.
-     */
-    fun absIndex(index: Int): Int {
-        return offset + index
-    }
+/**
+ * Functional interface represents [java.util.function.BiFunction] with index.
+ */
+fun interface IndexedBiFunction<T, U, R> {
+    fun apply(index: Int, t: T, u: U): R
+}
 
-    /**
-     * Returns the copy of array range which is specified by this segment.
-     */
-    fun copyOfRange(): A {
-        return array.arrayCopyOfRannge(startIndex, endIndex)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as ArraySeg<*>
-        if (array != other.array) return false
-        if (offset != other.offset) return false
-        if (length != other.length) return false
-        return true
-    }
-
-    override fun hashCode0(): Int {
-        return toString().hashCode()
-    }
-
-    override fun toString0(): String {
-        return "ArraySeg[$array, $offset, $length]"
-    }
+/**
+ * Functional interface represents [java.util.function.BiConsumer] with index.
+ */
+fun interface IndexedBiConsumer<T, U> {
+    fun accept(index: Int, t: T, u: U)
 }
