@@ -3,7 +3,7 @@ package test.java.xyz.srclab.common.bus;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.StringRef;
+import xyz.srclab.common.base.CharsRef;
 import xyz.srclab.common.bus.EventBus;
 import xyz.srclab.common.bus.EventBusHandler;
 import xyz.srclab.common.collect.BList;
@@ -21,7 +21,7 @@ public class EventBusTest {
         eventBus.registerAll(BList.newList(new CharSeqHandler(), new StringHandler(), new IntegerHandler()));
 
         eventBus.post("x");
-        eventBus.post(StringRef.of("y"));
+        eventBus.post(CharsRef.of("y"));
         eventBus.post(6);
 
         Assert.assertEquals(chars, BList.newList("xs", "x", "y", "7"));

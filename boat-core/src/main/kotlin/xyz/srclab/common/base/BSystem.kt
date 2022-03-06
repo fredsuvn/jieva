@@ -320,7 +320,7 @@ fun isBsd(): Boolean {
  */
 fun getJavaMajorVersion(): Int {
     val javaVersion = getJavaVersion()
-    val dotIndex = DOT_MATCHER.indexIn(javaVersion)
+    val dotIndex = dotMatcher().indexIn(javaVersion)
     if (dotIndex <= 0) {
         return javaVersion.toInt()
     }
@@ -329,7 +329,7 @@ fun getJavaMajorVersion(): Int {
         return v
     }
     if (v == 1) {
-        val nextDotIndex = DOT_MATCHER.indexIn(javaVersion, dotIndex + 1)
+        val nextDotIndex = dotMatcher().indexIn(javaVersion, dotIndex + 1)
         if (nextDotIndex < 0) {
             return -1
         }

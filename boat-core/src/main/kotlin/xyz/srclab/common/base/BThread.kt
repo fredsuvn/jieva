@@ -123,5 +123,5 @@ fun callerStackTraceOrNull(
     offset: Int,
     filter: (StackTraceElement, findCalled: Boolean) -> Int
 ): StackTraceElement? {
-    return callerStackTraceOrNull(offset, filter.toFunction())
+    return callerStackTraceOrNull(offset, filter.asJavaFun())
 }

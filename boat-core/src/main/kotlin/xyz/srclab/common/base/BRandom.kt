@@ -78,7 +78,7 @@ open class RandomSupplierBuilder<T : Any> {
 
     @JvmSynthetic
     fun score(score: Int, supplier: () -> T): RandomSupplierBuilder<T> {
-        return score(score, supplier.toSupplier())
+        return score(score, supplier.asJavaFun())
     }
 
     fun score(score: Int, supplier: Supplier<T>): RandomSupplierBuilder<T> {

@@ -2,7 +2,7 @@
 
 package xyz.srclab.common.jvm
 
-import xyz.srclab.common.base.DOT_MATCHER
+import xyz.srclab.common.base.dotMatcher
 import java.lang.reflect.Method
 
 val Class<*>.typeSignature: String
@@ -20,7 +20,7 @@ val Class<*>.typeSignature: String
             else -> if (this.isArray) {
                 "[${this.componentType.typeSignature}"
             } else {
-                "L${DOT_MATCHER.replaceFrom(this.name, '/')};"
+                "L${dotMatcher().replaceFrom(this.name, '/')};"
             }
         }
     }

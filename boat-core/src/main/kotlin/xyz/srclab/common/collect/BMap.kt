@@ -161,14 +161,14 @@ fun <K, V, C : Collection<V>> Map<K, C>.getFirst(key: K): V {
 }
 
 fun <K, V> Map<K, V>.filter(predicate: Predicate<in Map.Entry<K, V>>): Map<K, V> {
-    return this.filterKt(predicate.toKotlinFun())
+    return this.filterKt(predicate.asKotlinFun())
 }
 
 fun <K, V, M : MutableMap<in K, in V>> Map<K, V>.filterTo(
     destination: M,
     predicate: Predicate<in Map.Entry<K, V>>
 ): M {
-    return this.filterToKt(destination, predicate.toKotlinFun())
+    return this.filterToKt(destination, predicate.asKotlinFun())
 }
 
 fun <K, V, RK, RV> Map<K, V>.mapEntries(
@@ -200,7 +200,7 @@ fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     keySelector: Function<in K, RK>,
     valueTransform: Function<in V, RV>
 ): C {
-    return mapEntriesTo(destination, keySelector.toKotlinFun(), valueTransform.toKotlinFun())
+    return mapEntriesTo(destination, keySelector.asKotlinFun(), valueTransform.asKotlinFun())
 }
 
 fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
@@ -237,25 +237,25 @@ inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
 }
 
 fun <K, V, R> Map<K, V>.map(transform: Function<in Map.Entry<K, V>, R>): List<R> {
-    return this.mapKt(transform.toKotlinFun())
+    return this.mapKt(transform.asKotlinFun())
 }
 
 fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.mapTo(
     destination: C,
     transform: Function<in Map.Entry<K, V>, R>
 ): C {
-    return this.mapToKt(destination, transform.toKotlinFun())
+    return this.mapToKt(destination, transform.asKotlinFun())
 }
 
 fun <K, V, R> Map<K, V>.flatMap(transform: Function<in Map.Entry<K, V>, Iterable<R>>): List<R> {
-    return this.flatMapKt(transform.toKotlinFun())
+    return this.flatMapKt(transform.asKotlinFun())
 }
 
 fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
     destination: C,
     transform: Function<in Map.Entry<K, V>, Iterable<R>>
 ): C {
-    return this.flatMapToKt(destination, transform.toKotlinFun())
+    return this.flatMapToKt(destination, transform.asKotlinFun())
 }
 
 @JvmOverloads
@@ -316,7 +316,7 @@ fun <K, V> copyOnWriteMap(
     initMap: Map<out K, V> = emptyMap(),
     newMap: Function<in Map<out K, V>, MutableMap<K, V>> = Function { HashMap(it) }
 ): CopyOnWriteMap<K, V> {
-    return newCopyOnWriteMap(initMap, newMap.toKotlinFun())
+    return newCopyOnWriteMap(initMap, newMap.asKotlinFun())
 }
 
 @JvmSynthetic
@@ -338,7 +338,7 @@ fun <K, V> mutableSetMap(
     map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
     valueSet: Function<K, MutableSet<V>> = Function { LinkedHashSet() }
 ): MutableSetMap<K, V> {
-    return newMutableSetMap(map, valueSet.toKotlinFun())
+    return newMutableSetMap(map, valueSet.asKotlinFun())
 }
 
 @JvmSynthetic
@@ -368,7 +368,7 @@ fun <K, V> mutableListMap(
     map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
     valueList: Function<K, MutableList<V>> = Function { LinkedList() }
 ): MutableListMap<K, V> {
-    return newMutableListMap(map, valueList.toKotlinFun())
+    return newMutableListMap(map, valueList.asKotlinFun())
 }
 
 @JvmSynthetic

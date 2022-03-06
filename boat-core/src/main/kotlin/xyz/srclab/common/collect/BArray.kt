@@ -2,9 +2,7 @@
 
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.base.checkInBounds
-import xyz.srclab.common.base.toKotlinFun
+import xyz.srclab.common.base.*
 import xyz.srclab.common.collect.ArrayBridge.Companion.toArrayBridge
 import xyz.srclab.common.reflect.rawClass
 import java.lang.reflect.Type
@@ -470,15 +468,15 @@ private fun Any.arrayJoinToString0(
     transform: Function<Any?, CharSequence>? = null
 ): String {
     return when (this) {
-        is Array<*> -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is BooleanArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is ByteArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is ShortArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is CharArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is IntArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is LongArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is FloatArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is DoubleArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
+        is Array<*> -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is BooleanArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is ByteArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is ShortArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is CharArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is IntArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is LongArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is FloatArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is DoubleArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
         else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
     }
 }
@@ -533,15 +531,70 @@ private fun <A : Appendable> Any.arrayJoinTo0(
     transform: Function<Any?, CharSequence>? = null
 ): A {
     return when (this) {
-        is Array<*> -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is BooleanArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is ByteArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is ShortArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is CharArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is IntArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is LongArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is FloatArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
-        is DoubleArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
+        is Array<*> -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is BooleanArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is ByteArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is ShortArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is CharArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is IntArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is LongArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is FloatArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is DoubleArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
         else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
+    }
+}
+
+/**
+ * This class specifies a segment for an array of type [A].
+ */
+open class ArraySeg<A : Any> @JvmOverloads constructor(
+    @get:JvmName("array") val array: A,
+    @get:JvmName("offset") val offset: Int = 0,
+    @get:JvmName("length") val length: Int = remainingLength(array.arrayLength(), offset),
+) : FinalObject() {
+
+    init {
+        checkState(array.javaClass.isArray) { "Not an array: $array!" }
+    }
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    @get:JvmName("startIndex")
+    open val startIndex: Int = offset
+
+    @Suppress(INAPPLICABLE_JVM_NAME)
+    @get:JvmName("endIndex")
+    open val endIndex: Int = startIndex + length
+
+    /**
+     * Returns the absolute index of [array],
+     * which is computed from given [index] -- a relative index of the offset of this segment.
+     */
+    fun absIndex(index: Int): Int {
+        return offset + index
+    }
+
+    /**
+     * Returns the copy of array range which is specified by this segment.
+     */
+    fun copyOfRange(): A {
+        return array.arrayCopyOfRannge(startIndex, endIndex)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as ArraySeg<*>
+        if (array != other.array) return false
+        if (offset != other.offset) return false
+        if (length != other.length) return false
+        return true
+    }
+
+    override fun hashCode0(): Int {
+        return toString().hashCode()
+    }
+
+    override fun toString0(): String {
+        return "ArraySeg[$array, $offset, $length]"
     }
 }

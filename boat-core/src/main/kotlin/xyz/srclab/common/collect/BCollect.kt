@@ -108,7 +108,7 @@ fun <T> Iterable<T>.count(): Int {
 }
 
 fun <T> Iterable<T>.count(predicate: Predicate<in T>): Int {
-    return this.countKt(predicate.toKotlinFun())
+    return this.countKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.isEmpty(): Boolean {
@@ -130,7 +130,7 @@ fun <T> Iterable<T>.any(): Boolean {
 }
 
 fun <T> Iterable<T>.any(predicate: Predicate<in T>): Boolean {
-    return this.anyKt(predicate.toKotlinFun())
+    return this.anyKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.none(): Boolean {
@@ -138,11 +138,11 @@ fun <T> Iterable<T>.none(): Boolean {
 }
 
 fun <T> Iterable<T>.none(predicate: Predicate<in T>): Boolean {
-    return this.noneKt(predicate.toKotlinFun())
+    return this.noneKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.all(predicate: Predicate<in T>): Boolean {
-    return this.allKt(predicate.toKotlinFun())
+    return this.allKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.first(): T {
@@ -150,7 +150,7 @@ fun <T> Iterable<T>.first(): T {
 }
 
 fun <T> Iterable<T>.first(predicate: Predicate<in T>): T {
-    return this.firstKt(predicate.toKotlinFun())
+    return this.firstKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.firstOrNull(): T? {
@@ -158,7 +158,7 @@ fun <T> Iterable<T>.firstOrNull(): T? {
 }
 
 fun <T> Iterable<T>.firstOrNull(predicate: Predicate<in T>): T? {
-    return this.firstOrNullKt(predicate.toKotlinFun())
+    return this.firstOrNullKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.last(): T {
@@ -166,7 +166,7 @@ fun <T> Iterable<T>.last(): T {
 }
 
 fun <T> Iterable<T>.last(predicate: Predicate<in T>): T {
-    return this.lastKt(predicate.toKotlinFun())
+    return this.lastKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.lastOrNull(): T? {
@@ -174,7 +174,7 @@ fun <T> Iterable<T>.lastOrNull(): T? {
 }
 
 fun <T> Iterable<T>.lastOrNull(predicate: Predicate<in T>): T? {
-    return this.lastOrNullKt(predicate.toKotlinFun())
+    return this.lastOrNullKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.random(): T {
@@ -206,7 +206,7 @@ fun <T> Iterable<T>.getOrDefault(index: Int, defaultValue: T): T {
 }
 
 fun <T> Iterable<T>.getOrElse(index: Int, defaultValue: IntFunction<T>): T {
-    return this.elementAtOrElseKt(index, defaultValue.toKotlinFun())
+    return this.elementAtOrElseKt(index, defaultValue.asKotlinFun())
 }
 
 @JvmOverloads
@@ -292,11 +292,11 @@ fun Iterable<*>.getDoubleOrNull(index: Int): Double? {
 }
 
 fun <T> Iterable<T>.find(predicate: Predicate<in T>): T? {
-    return this.findKt(predicate.toKotlinFun())
+    return this.findKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.findLast(predicate: Predicate<in T>): T? {
-    return this.firstKt(predicate.toKotlinFun())
+    return this.firstKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.indexOf(element: T): Int {
@@ -304,7 +304,7 @@ fun <T> Iterable<T>.indexOf(element: T): Int {
 }
 
 fun <T> Iterable<T>.indexOf(predicate: Predicate<in T>): Int {
-    return this.indexOfFirstKt(predicate.toKotlinFun())
+    return this.indexOfFirstKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.lastIndexOf(element: T): Int {
@@ -312,7 +312,7 @@ fun <T> Iterable<T>.lastIndexOf(element: T): Int {
 }
 
 fun <T> Iterable<T>.lastIndexOf(predicate: Predicate<in T>): Int {
-    return this.indexOfLastKt(predicate.toKotlinFun())
+    return this.indexOfLastKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.take(n: Int): List<T> {
@@ -320,7 +320,7 @@ fun <T> Iterable<T>.take(n: Int): List<T> {
 }
 
 fun <T> Iterable<T>.take(predicate: Predicate<in T>): List<T> {
-    return this.takeWhileKt(predicate.toKotlinFun())
+    return this.takeWhileKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.drop(n: Int): List<T> {
@@ -328,15 +328,15 @@ fun <T> Iterable<T>.drop(n: Int): List<T> {
 }
 
 fun <T> Iterable<T>.drop(predicate: Predicate<in T>): List<T> {
-    return this.dropWhileKt(predicate.toKotlinFun())
+    return this.dropWhileKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.filter(predicate: Predicate<in T>): List<T> {
-    return this.filterKt(predicate.toKotlinFun())
+    return this.filterKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.filterIndexed(predicate: IndexedPredicate<in T>): List<T> {
-    return this.filterIndexedKt(predicate.toKotlinFun())
+    return this.filterIndexedKt(predicate.asKotlinFun())
 }
 
 fun <T> Iterable<T>.filterNotNull(): List<T> {
@@ -344,11 +344,11 @@ fun <T> Iterable<T>.filterNotNull(): List<T> {
 }
 
 fun <T, C : MutableCollection<in T>> Iterable<T>.filterTo(destination: C, predicate: Predicate<in T>): C {
-    return this.filterToKt(destination, predicate.toKotlinFun())
+    return this.filterToKt(destination, predicate.asKotlinFun())
 }
 
 fun <T, C : MutableCollection<in T>> Iterable<T>.filterIndexedTo(destination: C, predicate: IndexedPredicate<in T>): C {
-    return this.filterIndexedToKt(destination, predicate.toKotlinFun())
+    return this.filterIndexedToKt(destination, predicate.asKotlinFun())
 }
 
 fun <C : MutableCollection<in T>, T> Iterable<T>.filterNotNullTo(destination: C): C {
@@ -356,51 +356,51 @@ fun <C : MutableCollection<in T>, T> Iterable<T>.filterNotNullTo(destination: C)
 }
 
 fun <T, R> Iterable<T>.map(transform: Function<in T, R>): List<R> {
-    return this.mapKt(transform.toKotlinFun())
+    return this.mapKt(transform.asKotlinFun())
 }
 
 fun <T, R> Iterable<T>.mapIndexed(transform: IndexedFunction<in T, R>): List<R> {
-    return this.mapIndexedKt(transform.toKotlinFun())
+    return this.mapIndexedKt(transform.asKotlinFun())
 }
 
 fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapTo(destination: C, transform: Function<in T, R>): C {
-    return this.mapToKt(destination, transform.toKotlinFun())
+    return this.mapToKt(destination, transform.asKotlinFun())
 }
 
 fun <T, R, C : MutableCollection<in R>> Iterable<T>.mapIndexedTo(
     destination: C,
     transform: IndexedFunction<in T, R>
 ): C {
-    return this.mapIndexedToKt(destination, transform.toKotlinFun())
+    return this.mapIndexedToKt(destination, transform.asKotlinFun())
 }
 
 fun <T, R> Iterable<T>.flatMap(transform: Function<in T, Iterable<R>>): List<R> {
-    return this.flatMapKt(transform.toKotlinFun())
+    return this.flatMapKt(transform.asKotlinFun())
 }
 
 fun <T, R> Iterable<T>.flatMapIndexed(transform: IndexedFunction<in T, Iterable<R>>): List<R> {
-    return this.flatMapIndexedKt(transform.toKotlinFun())
+    return this.flatMapIndexedKt(transform.asKotlinFun())
 }
 
 fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapTo(
     destination: C,
     transform: Function<in T, Iterable<R>>
 ): C {
-    return this.flatMapToKt(destination, transform.toKotlinFun())
+    return this.flatMapToKt(destination, transform.asKotlinFun())
 }
 
 fun <T, R, C : MutableCollection<in R>> Iterable<T>.flatMapIndexedTo(
     destination: C,
     transform: IndexedFunction<in T, Iterable<R>>
 ): C {
-    return this.flatMapIndexedToKt(destination, transform.toKotlinFun())
+    return this.flatMapIndexedToKt(destination, transform.asKotlinFun())
 }
 
 fun <T, K, V> Iterable<T>.toMap(
     keySelector: Function<in T, K>,
     valueTransform: Function<in T, V>
 ): Map<K, V> {
-    return this.associateByKt(keySelector.toKotlinFun(), valueTransform.toKotlinFun())
+    return this.associateByKt(keySelector.asKotlinFun(), valueTransform.asKotlinFun())
 }
 
 fun <T, K, V> Iterable<T>.toMap(transform: Function<in T, Map.Entry<K, V>>): Map<K, V> {
@@ -462,7 +462,7 @@ fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMap(
     keySelector: Function<in T, K>,
     valueTransform: Function<in T, V>
 ): M {
-    return this.associateByToKt(destination, keySelector.toKotlinFun(), valueTransform.toKotlinFun())
+    return this.associateByToKt(destination, keySelector.asKotlinFun(), valueTransform.asKotlinFun())
 }
 
 fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMap(
@@ -629,21 +629,21 @@ inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
 }
 
 fun <T, K> Iterable<T>.groupBy(keySelector: Function<in T, K>): Map<K, List<T>> {
-    return this.groupByKt(keySelector.toKotlinFun())
+    return this.groupByKt(keySelector.asKotlinFun())
 }
 
 fun <T, K, V> Iterable<T>.groupBy(
     keySelector: Function<in T, K>,
     valueTransform: Function<in T, V>
 ): Map<K, List<V>> {
-    return this.groupByKt(keySelector.toKotlinFun(), valueTransform.toKotlinFun())
+    return this.groupByKt(keySelector.asKotlinFun(), valueTransform.asKotlinFun())
 }
 
 fun <T, K, M : MutableMap<in K, MutableList<T>>> Iterable<T>.groupByTo(
     destination: M,
     keySelector: Function<in T, K>
 ): M {
-    return this.groupByToKt(destination, keySelector.toKotlinFun())
+    return this.groupByToKt(destination, keySelector.asKotlinFun())
 }
 
 fun <T, K, V, M : MutableMap<in K, MutableList<V>>> Iterable<T>.groupByTo(
@@ -651,43 +651,43 @@ fun <T, K, V, M : MutableMap<in K, MutableList<V>>> Iterable<T>.groupByTo(
     keySelector: Function<in T, K>,
     valueTransform: Function<in T, V>
 ): M {
-    return this.groupByToKt(destination, keySelector.toKotlinFun(), valueTransform.toKotlinFun())
+    return this.groupByToKt(destination, keySelector.asKotlinFun(), valueTransform.asKotlinFun())
 }
 
 fun <S, T : S> Iterable<T>.reduce(operation: BiFunction<in S, in T, S>): S {
-    return this.reduceKt(operation.toKotlinFun())
+    return this.reduceKt(operation.asKotlinFun())
 }
 
 fun <S, T : S> Iterable<T>.reduceIndexed(operation: IndexedBiFunction<in S, in T, S>): S {
-    return this.reduceIndexedKt(operation.toKotlinFun())
+    return this.reduceIndexedKt(operation.asKotlinFun())
 }
 
 fun <S, T : S> Iterable<T>.reduceOrNull(operation: BiFunction<in S, in T, S>): S? {
-    return this.reduceOrNullKt(operation.toKotlinFun())
+    return this.reduceOrNullKt(operation.asKotlinFun())
 }
 
 fun <S, T : S> Iterable<T>.reduceIndexedOrNull(operation: IndexedBiFunction<in S, in T, S>): S? {
-    return this.reduceIndexedOrNullKt(operation.toKotlinFun())
+    return this.reduceIndexedOrNullKt(operation.asKotlinFun())
 }
 
 fun <T, R> Iterable<T>.reduce(initial: R, operation: BiFunction<in R, in T, R>): R {
-    return this.foldKt(initial, operation.toKotlinFun())
+    return this.foldKt(initial, operation.asKotlinFun())
 }
 
 fun <T, R> Iterable<T>.reduceIndexed(initial: R, operation: IndexedBiFunction<in R, in T, R>): R {
-    return this.foldIndexedKt(initial, operation.toKotlinFun())
+    return this.foldIndexedKt(initial, operation.asKotlinFun())
 }
 
 fun <T, R, V> Iterable<T>.zip(other: Array<out R>, transform: BiFunction<in T, in R, V>): List<V> {
-    return this.zipKt(other, transform.toKotlinFun())
+    return this.zipKt(other, transform.asKotlinFun())
 }
 
 fun <T, R, V> Iterable<T>.zip(other: Iterable<R>, transform: BiFunction<in T, in R, V>): List<V> {
-    return this.zipKt(other, transform.toKotlinFun())
+    return this.zipKt(other, transform.asKotlinFun())
 }
 
 fun <T, R> Iterable<T>.zipWithNext(transform: BiFunction<in T, in T, R>): List<R> {
-    return this.zipWithNextKt(transform.toKotlinFun())
+    return this.zipWithNextKt(transform.asKotlinFun())
 }
 
 fun <K, V> Iterable<K>.zipMap(other: Array<out V>): Map<K, V> {
@@ -760,7 +760,7 @@ fun <T> Iterable<T>.chunked(size: Int): List<List<T>> {
 }
 
 fun <T, R> Iterable<T>.chunked(size: Int, transform: Function<in List<T>, R>): List<R> {
-    return this.chunkedKt(size, transform.toKotlinFun())
+    return this.chunkedKt(size, transform.asKotlinFun())
 }
 
 @JvmOverloads
@@ -769,7 +769,7 @@ fun <T> Iterable<T>.windowed(size: Int, step: Int = 1, partialWindows: Boolean =
 }
 
 fun <T, R> Iterable<T>.windowed(size: Int, transform: Function<in List<T>, R>): List<R> {
-    return this.windowedKt(size, 1, false, transform.toKotlinFun())
+    return this.windowedKt(size, 1, false, transform.asKotlinFun())
 }
 
 fun <T, R> Iterable<T>.windowed(
@@ -778,7 +778,7 @@ fun <T, R> Iterable<T>.windowed(
     partialWindows: Boolean,
     transform: Function<in List<T>, R>
 ): List<R> {
-    return this.windowedKt(size, step, partialWindows, transform.toKotlinFun())
+    return this.windowedKt(size, step, partialWindows, transform.asKotlinFun())
 }
 
 fun <T> Iterable<T>.intersect(other: Iterable<T>): Set<T> {
@@ -798,7 +798,7 @@ fun <T> Iterable<T>.distinct(): List<T> {
 }
 
 fun <T, K> Iterable<T>.distinct(selector: Function<in T, K>): List<T> {
-    return this.distinctByKt(selector.toKotlinFun())
+    return this.distinctByKt(selector.asKotlinFun())
 }
 
 @JvmOverloads
@@ -819,7 +819,7 @@ fun <T> Iterable<T>.shuffled(random: Random): List<T> {
 }
 
 fun <T> Iterable<T>.forEachIndexed(action: IndexedConsumer<in T>) {
-    return this.forEachIndexedKt(action.toKotlinFun())
+    return this.forEachIndexedKt(action.asKotlinFun())
 }
 
 @JvmOverloads
@@ -971,11 +971,11 @@ fun <T : R, R> Iterable<T>.toArray(array: Array<R>): Array<R> {
 }
 
 fun <T, R> Iterable<T>.toArray(type: Class<R>, transform: Function<in T, R>): Array<R> {
-    return toArray(type, transform.toKotlinFun())
+    return toArray(type, transform.asKotlinFun())
 }
 
 fun <T, R> Iterable<T>.toArray(array: Array<R>, transform: Function<in T, R>): Array<R> {
-    return toArray(array, transform.toKotlinFun())
+    return toArray(array, transform.asKotlinFun())
 }
 
 @JvmSynthetic
@@ -1102,7 +1102,7 @@ fun <T> MutableIterable<T>.removeFirst(n: Int): Boolean {
 }
 
 fun <T> MutableIterable<T>.removeAll(predicate: Predicate<in T>): Boolean {
-    return this.removeAllKt(predicate.toKotlinFun())
+    return this.removeAllKt(predicate.asKotlinFun())
 }
 
 fun <T> MutableCollection<T>.removeAll(elements: Array<out T>): Boolean {
@@ -1114,7 +1114,7 @@ fun <T> MutableCollection<T>.removeAll(elements: Iterable<T>): Boolean {
 }
 
 fun <T> MutableIterable<T>.retainAll(predicate: Predicate<in T>): Boolean {
-    return this.retainAllKt(predicate.toKotlinFun())
+    return this.retainAllKt(predicate.asKotlinFun())
 }
 
 fun <T> MutableCollection<T>.retainAll(elements: Array<out T>): Boolean {
@@ -1152,7 +1152,7 @@ fun <T> Iterable<T>.joinToString(
     separator: CharSequence = ", ",
     transform: Function<in T, CharSequence>? = null
 ): String {
-    return this.joinToStringKt(separator = separator, transform = transform?.toKotlinFun())
+    return this.joinToStringKt(separator = separator, transform = transform?.asKotlinFun())
 }
 
 fun <T> Iterable<T>.joinToString(
@@ -1163,7 +1163,7 @@ fun <T> Iterable<T>.joinToString(
     truncated: CharSequence,
     transform: Function<in T, CharSequence>?
 ): String {
-    return this.joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
+    return this.joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
 }
 
 @JvmOverloads
@@ -1172,7 +1172,7 @@ fun <T, A : Appendable> Iterable<T>.joinTo(
     separator: CharSequence = ", ",
     transform: Function<in T, CharSequence>? = null
 ): A {
-    return this.joinToKt(buffer = destination, separator = separator, transform = transform?.toKotlinFun())
+    return this.joinToKt(buffer = destination, separator = separator, transform = transform?.asKotlinFun())
 }
 
 fun <T, A : Appendable> Iterable<T>.joinTo(
@@ -1184,7 +1184,7 @@ fun <T, A : Appendable> Iterable<T>.joinTo(
     truncated: CharSequence,
     transform: Function<in T, CharSequence>?
 ): A {
-    return this.joinToKt(destination, separator, prefix, suffix, limit, truncated, transform?.toKotlinFun())
+    return this.joinToKt(destination, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
 }
 
 //Iterator

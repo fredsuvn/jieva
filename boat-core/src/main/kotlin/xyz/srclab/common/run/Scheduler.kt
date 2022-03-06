@@ -1,7 +1,7 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.toCallable
-import xyz.srclab.common.base.toRunnable
+import xyz.srclab.common.base.asCallable
+import xyz.srclab.common.base.asRunnable
 import java.time.Duration
 import java.util.concurrent.Callable
 import java.util.concurrent.RejectedExecutionException
@@ -23,7 +23,7 @@ interface Scheduler : Runner {
     @Throws(RejectedExecutionException::class)
     @JvmSynthetic
     fun <V> schedule(delay: Duration, task: () -> V): ScheduleWork<V> {
-        return schedule(delay, task.toCallable())
+        return schedule(delay, task.asCallable())
     }
 
     /**
@@ -53,7 +53,7 @@ interface Scheduler : Runner {
     @Throws(RejectedExecutionException::class)
     @JvmSynthetic
     fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: () -> Any?): ScheduleWork<*> {
-        return scheduleFixedRate(initialDelay, period, task.toRunnable())
+        return scheduleFixedRate(initialDelay, period, task.asRunnable())
     }
 
     /**
@@ -77,7 +77,7 @@ interface Scheduler : Runner {
     @Throws(RejectedExecutionException::class)
     @JvmSynthetic
     fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> Any?): ScheduleWork<*> {
-        return scheduleFixedDelay(initialDelay, period, task.toRunnable())
+        return scheduleFixedDelay(initialDelay, period, task.asRunnable())
     }
 
     /**

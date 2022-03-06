@@ -6,8 +6,8 @@ import com.google.common.collect.MapMaker
 import xyz.srclab.annotations.concurrent.ThreadSafe
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.availableProcessors
-import xyz.srclab.common.base.toFunction
-import xyz.srclab.common.base.toKotlinFun
+import xyz.srclab.common.base.asJavaFun
+import xyz.srclab.common.base.asKotlinFun
 import java.time.Duration
 import java.util.*
 import java.util.function.Function
@@ -106,7 +106,7 @@ interface Cache<K : Any, V> {
      */
     @JvmSynthetic
     fun getOrLoadAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
-        return getOrLoadAll(keys, loader.toFunction())
+        return getOrLoadAll(keys, loader.asJavaFun())
     }
 
     fun put(key: K, value: V) {
@@ -204,7 +204,7 @@ interface Cache<K : Any, V> {
         }
 
         fun loader(loader: Function<in K, V>): Builder<K, V> = apply {
-            this.loader = loader.toKotlinFun()
+            this.loader = loader.asKotlinFun()
         }
 
         @JvmSynthetic

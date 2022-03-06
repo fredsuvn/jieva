@@ -4,9 +4,9 @@ package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
 import xyz.srclab.common.base.BytesClassLoader
-import xyz.srclab.common.base.DOT_MATCHER
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.currentThread
+import xyz.srclab.common.base.dotMatcher
 import java.lang.reflect.Modifier
 
 val Class<*>.isStatic: Boolean
@@ -62,7 +62,7 @@ val Class<*>.isVoidType: Boolean
 val Class<*>.shortName: String
     get() {
         val name = this.name
-        val lastDotIndex = DOT_MATCHER.lastIndexIn(name)
+        val lastDotIndex = dotMatcher().lastIndexIn(name)
         return if (lastDotIndex < 0) name else name.substring(lastDotIndex + 1, name.length)
     }
 

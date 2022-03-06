@@ -22,11 +22,11 @@ public class BStringTest {
     @Test
     public void testStringRef() {
         char[] cs = {'0', '1', '2', '3'};
-        StringRef sr = StringRef.of(cs);
+        CharsRef sr = CharsRef.of(cs);
         Assert.assertEquals(sr.charAt(1), '1');
         cs[1] = '6';
         Assert.assertEquals(sr.charAt(1), '6');
-        Assert.assertEquals(sr.subSequence(2, 4).toString(), StringRef.of(cs, 2).toString());
+        Assert.assertEquals(sr.subSequence(2, 4).toString(), CharsRef.of(cs, 2).toString());
         Assert.assertEquals(sr.toString(), "0623");
     }
 

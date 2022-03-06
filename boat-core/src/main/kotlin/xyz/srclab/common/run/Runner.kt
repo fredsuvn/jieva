@@ -1,7 +1,7 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.toCallable
-import xyz.srclab.common.base.toRunnable
+import xyz.srclab.common.base.asCallable
+import xyz.srclab.common.base.asRunnable
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
 import java.util.concurrent.RejectedExecutionException
@@ -24,7 +24,7 @@ interface Runner {
     @Throws(RejectedExecutionException::class)
     @JvmSynthetic
     fun <V> submit(task: () -> V): RunWork<V> {
-        return submit(task.toCallable())
+        return submit(task.asCallable())
     }
 
     /**
@@ -56,7 +56,7 @@ interface Runner {
     @Throws(RejectedExecutionException::class)
     @JvmSynthetic
     fun run(task: () -> Any?) {
-        return run(task.toRunnable())
+        return run(task.asRunnable())
     }
 
     /**

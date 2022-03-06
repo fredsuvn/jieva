@@ -1,7 +1,8 @@
 package xyz.srclab.common.utils
 
+import com.google.common.base.CharMatcher
 import xyz.srclab.common.base.*
-import xyz.srclab.common.base.StringRef.Companion.stringRef
+import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.io.Serializable
 
 /**
@@ -219,10 +220,13 @@ open class SemVer @JvmOverloads constructor(
 
         private val serialVersionUID: Long = defaultSerialVersion()
 
-        private val IDENTIFIER_CHAR_MATCHER = NUMERIC_MATCHER
-            .or(UPPER_CASE_MATCHER)
-            .or(LOWER_CASE_MATCHER)
-            .or(HYPHEN_MATCHER)
+        private val hyphenMatcher: CharMatcher = hyphenMatcher()
+        private val plusMatcher: CharMatcher = CharMatcher.`is`('+')
+
+        private val IDENTIFIER_CHAR_MATCHER = CharMatcher.inRange('0', '9')
+            .or(CharMatcher.inRange('a', 'z'))
+            .or(CharMatcher.inRange('A', 'Z'))
+            .or(hyphenMatcher)
 
         private const val ILLEGAL_SEM_VER_CHARS = "Illegal SemVer: "
 
@@ -237,7 +241,7 @@ open class SemVer @JvmOverloads constructor(
                 if (!this.isNumeric()) {
                     return false
                 }
-                return !this.numericWithLeadingZero()
+                return !this.isLeadingZero()
             }
 
             fun CharSequence.checkAndParseNormal(): Int {
@@ -248,7 +252,7 @@ open class SemVer @JvmOverloads constructor(
             }
 
             fun CharSequence.checkPreRelease() {
-                if (this.isNumeric() && this.numericWithLeadingZero()) {
+                if (this.isNumeric() && this.isLeadingZero()) {
                     throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
                 }
                 if (!IDENTIFIER_CHAR_MATCHER.matchesAllOf(this)) {
@@ -266,29 +270,29 @@ open class SemVer @JvmOverloads constructor(
             var preReleaseSeq: CharSequence? = null
             var buildMetadataSeq: CharSequence? = null
 
-            val iPre = HYPHEN_MATCHER.indexIn(this)
+            val iPre = hyphenMatcher.indexIn(this)
             if (iPre in 0..4) {
                 throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
             }
-            val iPlus = PLUS_MATCHER.indexIn(this)
+            val iPlus = plusMatcher.indexIn(this)
             if (iPlus in 0..4) {
                 throw IllegalArgumentException(ILLEGAL_SEM_VER_CHARS + this)
             }
             if (iPre < 0 && iPlus < 0) {
                 normalSeq = this
             } else if (iPre > 0 && iPlus < 0) {
-                normalSeq = this.stringRef(0, iPre)
-                preReleaseSeq = this.stringRef(iPre + 1)
+                normalSeq = this.charsRef(0, iPre)
+                preReleaseSeq = this.charsRef(iPre + 1)
             } else if (iPre < 0) {
-                normalSeq = this.stringRef(0, iPlus)
-                buildMetadataSeq = this.stringRef(iPlus + 1)
+                normalSeq = this.charsRef(0, iPlus)
+                buildMetadataSeq = this.charsRef(iPlus + 1)
             } else if (iPre < iPlus) {
-                normalSeq = this.stringRef(0, iPre)
-                preReleaseSeq = this.stringRef(iPre + 1, iPlus)
-                buildMetadataSeq = this.stringRef(iPlus + 1)
+                normalSeq = this.charsRef(0, iPre)
+                preReleaseSeq = this.charsRef(iPre + 1, iPlus)
+                buildMetadataSeq = this.charsRef(iPlus + 1)
             } else {
-                normalSeq = this.stringRef(0, iPlus)
-                buildMetadataSeq = this.stringRef(iPlus + 1)
+                normalSeq = this.charsRef(0, iPlus)
+                buildMetadataSeq = this.charsRef(iPlus + 1)
             }
 
             val normals = normalSeq.split('.')

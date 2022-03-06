@@ -54,7 +54,7 @@ fun <T> List<T>.last(): T {
 }
 
 fun <T> List<T>.last(predicate: Predicate<in T>): T {
-    return this.lastKt(predicate.toKotlinFun())
+    return this.lastKt(predicate.asKotlinFun())
 }
 
 fun <T> List<T>.lastOrNull(): T? {
@@ -62,7 +62,7 @@ fun <T> List<T>.lastOrNull(): T? {
 }
 
 fun <T> List<T>.lastOrNull(predicate: Predicate<in T>): T? {
-    return this.lastOrNullKt(predicate.toKotlinFun())
+    return this.lastOrNullKt(predicate.asKotlinFun())
 }
 
 fun <T> List<T>.getOrNull(index: Int): T? {
@@ -74,7 +74,7 @@ fun <T> List<T>.getOrDefault(index: Int, defaultValue: T): T {
 }
 
 fun <T> List<T>.getOrElse(index: Int, defaultValue: IntFunction<T>): T {
-    return this.elementAtOrElseKt(index, defaultValue.toKotlinFun())
+    return this.elementAtOrElseKt(index, defaultValue.asKotlinFun())
 }
 
 @JvmOverloads
@@ -160,15 +160,15 @@ fun List<*>.getDoubleOrNull(index: Int): Double? {
 }
 
 fun <T> List<T>.findLast(predicate: Predicate<in T>): T? {
-    return this.findLastKt(predicate.toKotlinFun())
+    return this.findLastKt(predicate.asKotlinFun())
 }
 
 fun <T> List<T>.indexOf(predicate: Predicate<in T>): Int {
-    return this.indexOfFirstKt(predicate.toKotlinFun())
+    return this.indexOfFirstKt(predicate.asKotlinFun())
 }
 
 fun <T> List<T>.lastIndexOf(predicate: Predicate<in T>): Int {
-    return this.indexOfLastKt(predicate.toKotlinFun())
+    return this.indexOfLastKt(predicate.asKotlinFun())
 }
 
 fun <T> List<T>.takeLast(n: Int): List<T> {
@@ -176,7 +176,7 @@ fun <T> List<T>.takeLast(n: Int): List<T> {
 }
 
 fun <T> List<T>.takeLast(predicate: Predicate<in T>): List<T> {
-    return this.takeLastWhileKt(predicate.toKotlinFun())
+    return this.takeLastWhileKt(predicate.asKotlinFun())
 }
 
 fun <T> List<T>.dropLast(n: Int): List<T> {
@@ -184,31 +184,31 @@ fun <T> List<T>.dropLast(n: Int): List<T> {
 }
 
 fun <T> List<T>.dropLast(predicate: Predicate<in T>): List<T> {
-    return this.dropLastWhileKt(predicate.toKotlinFun())
+    return this.dropLastWhileKt(predicate.asKotlinFun())
 }
 
 fun <S, T : S> List<T>.reduceRight(operation: BiFunction<in T, in S, S>): S {
-    return this.reduceRightKt(operation.toKotlinFun())
+    return this.reduceRightKt(operation.asKotlinFun())
 }
 
 fun <S, T : S> List<T>.reduceRightIndexed(operation: IndexedBiFunction<in T, in S, S>): S {
-    return this.reduceRightIndexedKt(operation.toKotlinFun())
+    return this.reduceRightIndexedKt(operation.asKotlinFun())
 }
 
 fun <S, T : S> List<T>.reduceRightOrNull(operation: BiFunction<in T, in S, S>): S? {
-    return this.reduceRightOrNullKt(operation.toKotlinFun())
+    return this.reduceRightOrNullKt(operation.asKotlinFun())
 }
 
 fun <S, T : S> List<T>.reduceRightIndexedOrNull(operation: IndexedBiFunction<in T, in S, S>): S? {
-    return this.reduceRightIndexedOrNullKt(operation.toKotlinFun())
+    return this.reduceRightIndexedOrNullKt(operation.asKotlinFun())
 }
 
 fun <T, R> List<T>.reduceRight(initial: R, operation: BiFunction<in T, in R, R>): R {
-    return this.foldRightKt(initial, operation.toKotlinFun())
+    return this.foldRightKt(initial, operation.asKotlinFun())
 }
 
 fun <T, R> List<T>.reduceRightIndexed(initial: R, operation: IndexedBiFunction<in T, in R, R>): R {
-    return this.foldRightIndexedKt(initial, operation.toKotlinFun())
+    return this.foldRightIndexedKt(initial, operation.asKotlinFun())
 }
 
 fun <T> List<T>.slice(indices: IntArray): List<T> {
@@ -241,7 +241,7 @@ fun <T> MutableList<T>.shuffle(random: Random) {
 }
 
 fun <T> MutableList<T>.removeAll(predicate: Predicate<in T>): Boolean {
-    return this.removeAllKt(predicate.toKotlinFun())
+    return this.removeAllKt(predicate.asKotlinFun())
 }
 
 fun <T> MutableList<T>.removeFirst(): T {
@@ -261,7 +261,7 @@ fun <T> MutableList<T>.removeLastOrNull(): T? {
 }
 
 fun <T> MutableList<T>.retainAll(predicate: Predicate<in T>): Boolean {
-    return this.retainAllKt(predicate.toKotlinFun())
+    return this.retainAllKt(predicate.asKotlinFun())
 }
 
 @JvmName("concat")

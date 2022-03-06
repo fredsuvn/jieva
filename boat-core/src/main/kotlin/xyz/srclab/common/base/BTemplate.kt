@@ -3,7 +3,7 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.annotations.Accepted
-import xyz.srclab.common.base.StringRef.Companion.stringRef
+import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.io.Serializable
 import java.util.*
 
@@ -310,14 +310,14 @@ open class SimpleTemplate(
                 val cn = template[i]
                 if (cn == escapeChar) {
                     //Escape itself
-                    getBuffer().add(template.stringRef(start, i))
+                    getBuffer().add(template.charsRef(start, i))
                     i++
                     start = i
                     continue
                 }
                 if (isParameterPrefix(i)) {
                     //Escape parameter prefix
-                    getBuffer().add(template.stringRef(start, i - 1))
+                    getBuffer().add(template.charsRef(start, i - 1))
                     getBuffer().add(prefix)
                     i += prefix.length
                     start = i
@@ -325,7 +325,7 @@ open class SimpleTemplate(
                 }
             }
             if (isParameterPrefix(i)) {
-                getBuffer().add(template.stringRef(start, i))
+                getBuffer().add(template.charsRef(start, i))
                 i += prefix.length
                 if (suffix === null) {
                     //Find next whitespace
@@ -337,7 +337,7 @@ open class SimpleTemplate(
                     while (!template[i].isWhitespace()) {
                         i++
                     }
-                    val nameRef = template.stringRef(paramNameStart, i)
+                    val nameRef = template.charsRef(paramNameStart, i)
                     getBuffer().add(StringTemplate.Parameter.of(nameRef, paramIndex++))
                     start = i
                     i++
@@ -354,7 +354,7 @@ open class SimpleTemplate(
                     start = i
                     continue
                 }
-                val nameRef = template.stringRef(i, suffixIndex)
+                val nameRef = template.charsRef(i, suffixIndex)
                 getBuffer().add(StringTemplate.Parameter.of(nameRef, paramIndex++))
                 i = suffixIndex + 1
                 start = i
@@ -367,7 +367,7 @@ open class SimpleTemplate(
             return listOf(template)
         }
         if (start < template.length) {
-            getBuffer().add(template.stringRef(start))
+            getBuffer().add(template.charsRef(start))
         }
         return getBuffer()
     }

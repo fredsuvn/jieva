@@ -3,7 +3,7 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.annotations.concurrent.ThreadSafe
-import xyz.srclab.common.base.StringRef.Companion.stringRef
+import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.util.*
 import java.util.function.Function
 
@@ -199,7 +199,7 @@ abstract class CamelCase : NamingCase {
                 continue
             }
             if (isLastLower && !isCurLower) {
-                getSplitList().add(name.stringRef(startIndex, i))
+                getSplitList().add(name.charsRef(startIndex, i))
                 startIndex = i
                 isLastLower = false
                 continue
@@ -212,7 +212,7 @@ abstract class CamelCase : NamingCase {
                     //Case "Ab"
                 } else {
                     //Case "AAb"
-                    getSplitList().add(name.stringRef(startIndex, i - 1))
+                    getSplitList().add(name.charsRef(startIndex, i - 1))
                     startIndex = i - 1
                 }
                 isLastLower = true
@@ -223,7 +223,7 @@ abstract class CamelCase : NamingCase {
             return NamingCase.Words.nameSelf(name)
         }
         if (startIndex < name.length) {
-            getSplitList().add(name.stringRef(startIndex))
+            getSplitList().add(name.charsRef(startIndex))
         }
         return NamingCase.Words.of(name, splitList!!, name.length)
     }
@@ -339,7 +339,7 @@ abstract class SeparatorCase(
 
         fun addToDest(startIndex: Int, endIndex: Int) {
             if (endIndex > startIndex) {
-                getSplitList().add(name.stringRef(startIndex, endIndex))
+                getSplitList().add(name.charsRef(startIndex, endIndex))
                 splitCharCount += endIndex - startIndex
             }
         }
