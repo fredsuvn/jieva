@@ -14,16 +14,6 @@ fun checkThrow(expr: Boolean, exception: Supplier<Throwable>) {
 }
 
 /**
- * Checks and if [expr] returns false, throw [exception].
- */
-@JvmSynthetic
-inline fun checkThrow(expr: Boolean, exception: () -> Throwable) {
-    if (!expr) {
-        throw exception()
-    }
-}
-
-/**
  * Checks and if [expr] returns false, throw [NullPointerException].
  */
 @Throws(NullPointerException::class)
@@ -37,7 +27,7 @@ fun checkNull(expr: Boolean) {
  * Checks and if [expr] returns false, throw [NullPointerException] with [message].
  */
 @Throws(NullPointerException::class)
-fun checkNull(expr: Boolean, message: Any?) {
+fun checkNull(expr: Boolean, message: CharSequence?) {
     if (!expr) {
         throw NullPointerException(message?.toString())
     }
@@ -47,20 +37,9 @@ fun checkNull(expr: Boolean, message: Any?) {
  * Checks and if [expr] returns false, throw [NullPointerException] with [message].
  */
 @Throws(NullPointerException::class)
-fun checkNull(expr: Boolean, message: Supplier<Any?>) {
+fun checkNull(expr: Boolean, message: Supplier<CharSequence?>) {
     if (!expr) {
         throw NullPointerException(message.get()?.toString())
-    }
-}
-
-/**
- * Checks and if [expr] returns false, throw [NullPointerException] with [message].
- */
-@Throws(NullPointerException::class)
-@JvmSynthetic
-inline fun checkNull(expr: Boolean, message: () -> Any?) {
-    if (!expr) {
-        throw NullPointerException(message()?.toString())
     }
 }
 
@@ -69,6 +48,7 @@ inline fun checkNull(expr: Boolean, message: () -> Any?) {
  */
 @Throws(IllegalArgumentException::class)
 fun checkArgument(expr: Boolean) {
+    checkNull(true) { "sdas" }
     if (!expr) {
         throw IllegalArgumentException()
     }
@@ -78,7 +58,7 @@ fun checkArgument(expr: Boolean) {
  * Checks and if [expr] returns false, throw [IllegalArgumentException] with [message].
  */
 @Throws(IllegalArgumentException::class)
-fun checkArgument(expr: Boolean, message: Any?) {
+fun checkArgument(expr: Boolean, message: CharSequence?) {
     if (!expr) {
         throw IllegalArgumentException(message?.toString())
     }
@@ -88,20 +68,9 @@ fun checkArgument(expr: Boolean, message: Any?) {
  * Checks and if [expr] returns false, throw [IllegalArgumentException] with [message].
  */
 @Throws(IllegalArgumentException::class)
-fun checkArgument(expr: Boolean, message: Supplier<Any?>) {
+fun checkArgument(expr: Boolean, message: Supplier<CharSequence?>) {
     if (!expr) {
         throw IllegalArgumentException(message.get()?.toString())
-    }
-}
-
-/**
- * Checks and if [expr] returns false, throw [IllegalArgumentException] with [message].
- */
-@Throws(IllegalArgumentException::class)
-@JvmSynthetic
-inline fun checkArgument(expr: Boolean, message: () -> Any?) {
-    if (!expr) {
-        throw IllegalArgumentException(message()?.toString())
     }
 }
 
@@ -119,7 +88,7 @@ fun checkState(expr: Boolean) {
  * Checks and if [expr] returns false, throw [IllegalStateException] with [message].
  */
 @Throws(IllegalStateException::class)
-fun checkState(expr: Boolean, message: Any?) {
+fun checkState(expr: Boolean, message: CharSequence?) {
     if (!expr) {
         throw IllegalStateException(message?.toString())
     }
@@ -129,20 +98,9 @@ fun checkState(expr: Boolean, message: Any?) {
  * Checks and if [expr] returns false, throw [IllegalStateException] with [message].
  */
 @Throws(IllegalStateException::class)
-fun checkState(expr: Boolean, message: Supplier<Any?>) {
+fun checkState(expr: Boolean, message: Supplier<CharSequence?>) {
     if (!expr) {
         throw IllegalStateException(message.get()?.toString())
-    }
-}
-
-/**
- * Checks and if [expr] returns false, throw [IllegalStateException] with [message].
- */
-@Throws(IllegalStateException::class)
-@JvmSynthetic
-inline fun checkState(expr: Boolean, message: () -> Any?) {
-    if (!expr) {
-        throw IllegalStateException(message()?.toString())
     }
 }
 
@@ -160,7 +118,7 @@ fun checkSupported(expr: Boolean) {
  * Checks and if [expr] returns false, throw [UnsupportedOperationException] with [message].
  */
 @Throws(UnsupportedOperationException::class)
-fun checkSupported(expr: Boolean, message: Any?) {
+fun checkSupported(expr: Boolean, message: CharSequence?) {
     if (!expr) {
         throw UnsupportedOperationException(message?.toString())
     }
@@ -170,20 +128,9 @@ fun checkSupported(expr: Boolean, message: Any?) {
  * Checks and if [expr] returns false, throw [UnsupportedOperationException] with [message].
  */
 @Throws(UnsupportedOperationException::class)
-fun checkSupported(expr: Boolean, message: Supplier<Any?>) {
+fun checkSupported(expr: Boolean, message: Supplier<CharSequence?>) {
     if (!expr) {
         throw UnsupportedOperationException(message.get()?.toString())
-    }
-}
-
-/**
- * Checks and if [expr] returns false, throw [UnsupportedOperationException] with [message].
- */
-@Throws(UnsupportedOperationException::class)
-@JvmSynthetic
-inline fun checkSupported(expr: Boolean, message: () -> Any?) {
-    if (!expr) {
-        throw UnsupportedOperationException(message()?.toString())
     }
 }
 
@@ -201,7 +148,7 @@ fun checkElement(expr: Boolean) {
  * Checks and if [expr] returns false, throw [NoSuchElementException] with [message].
  */
 @Throws(NoSuchElementException::class)
-fun checkElement(expr: Boolean, message: Any?) {
+fun checkElement(expr: Boolean, message: CharSequence?) {
     if (!expr) {
         throw NoSuchElementException(message?.toString())
     }
@@ -211,20 +158,9 @@ fun checkElement(expr: Boolean, message: Any?) {
  * Checks and if [expr] returns false, throw [NoSuchElementException] with [message].
  */
 @Throws(NoSuchElementException::class)
-fun checkElement(expr: Boolean, message: Supplier<Any?>) {
+fun checkElement(expr: Boolean, message: Supplier<CharSequence?>) {
     if (!expr) {
         throw NoSuchElementException(message.get()?.toString())
-    }
-}
-
-/**
- * Checks and if [expr] returns false, throw [NoSuchElementException] with [message].
- */
-@Throws(NoSuchElementException::class)
-@JvmSynthetic
-inline fun checkElement(expr: Boolean, message: () -> Any?) {
-    if (!expr) {
-        throw NoSuchElementException(message()?.toString())
     }
 }
 
@@ -242,7 +178,7 @@ fun checkBounds(expr: Boolean) {
  * Checks and if [expr] returns false, throw [IndexOutOfBoundsException] with [message].
  */
 @Throws(IndexOutOfBoundsException::class)
-fun checkBounds(expr: Boolean, message: Any?) {
+fun checkBounds(expr: Boolean, message: CharSequence?) {
     if (!expr) {
         throw IndexOutOfBoundsException(message?.toString())
     }
@@ -252,20 +188,9 @@ fun checkBounds(expr: Boolean, message: Any?) {
  * Checks and if [expr] returns false, throw [IndexOutOfBoundsException] with [message].
  */
 @Throws(IndexOutOfBoundsException::class)
-fun checkBounds(expr: Boolean, message: Supplier<Any?>) {
+fun checkBounds(expr: Boolean, message: Supplier<CharSequence?>) {
     if (!expr) {
         throw IndexOutOfBoundsException(message.get()?.toString())
-    }
-}
-
-/**
- * Checks and if [expr] returns false, throw [IndexOutOfBoundsException] with [message].
- */
-@Throws(IndexOutOfBoundsException::class)
-@JvmSynthetic
-inline fun checkBounds(expr: Boolean, message: () -> Any?) {
-    if (!expr) {
-        throw IndexOutOfBoundsException(message()?.toString())
     }
 }
 
