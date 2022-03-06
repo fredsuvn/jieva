@@ -8,277 +8,277 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.function.Supplier
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.text.lines as linesKt
 import kotlin.text.toCollection as toCollectionKt
-import kotlin.text.toHashSet as toHashSetKt
 import kotlin.text.toList as toListKt
 import kotlin.text.toSet as toSetKt
-import kotlin.text.toSortedSet as toSortedSetKt
+
+private val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
+private val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
+private val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')
 
 /**
- * [CharMatcher] of pattern dot: `.`
+ * Returns a [CharMatcher] for char dot: ".".
  */
-@JvmField
-val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
+fun dotMatcher(): CharMatcher = DOT_MATCHER
 
 /**
- * [CharMatcher] of pattern underscore: `_`
+ * Returns a [CharMatcher] for char hyphen: "-".
  */
-@JvmField
-val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')
+fun hyphenMatcher(): CharMatcher = HYPHEN_MATCHER
 
 /**
- * [CharMatcher] of pattern space: ` `
+ * Returns a [CharMatcher] for char underscore: "_".
  */
-@JvmField
-val SPACE_MATCHER: CharMatcher = CharMatcher.`is`(' ')
+fun underscoreMatcher(): CharMatcher = UNDERSCORE_MATCHER
 
 /**
- * [CharMatcher] of pattern hyphen: `-`
+ * Returns charset of UTF-8.
  */
-@JvmField
-val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
+fun utf8(): Charset = StandardCharsets.UTF_8
 
 /**
- * [CharMatcher] of pattern plus sign: `+`
+ * Returns whether given chars is empty or null.
  */
-@JvmField
-val PLUS_MATCHER: CharMatcher = CharMatcher.`is`('+')
-
-/**
- * [CharMatcher] of pattern `[0-9]`
- */
-@JvmField
-val NUMERIC_MATCHER: CharMatcher = CharMatcher.inRange('0', '9')
-
-/**
- * [CharMatcher] of pattern `[A-Z]`
- */
-@JvmField
-val UPPER_CASE_MATCHER: CharMatcher = CharMatcher.inRange('A', 'Z')
-
-/**
- * [CharMatcher] of pattern `[a-z]`
- */
-@JvmField
-val LOWER_CASE_MATCHER: CharMatcher = CharMatcher.inRange('a', 'z')
-
-/**
- * [CharMatcher] of pattern `[A-Z][a-z]`
- */
-@JvmField
-val LETTER_MATCHER: CharMatcher = UPPER_CASE_MATCHER.and(LOWER_CASE_MATCHER)
-
-//Utils:
-
-/**
- * Checks if given chars is empty or null.
- */
+@OptIn(ExperimentalContracts::class)
 fun CharSequence?.isEmpty(): Boolean {
+    contract {
+        returns(false) implies (this@isEmpty !== null)
+    }
+
     return this.isNullOrEmpty()
 }
 
 /**
- * Checks if given chars is empty or all blank.
+ * Returns whether given chars is empty or blank.
  */
+@OptIn(ExperimentalContracts::class)
 fun CharSequence?.isBlank(): Boolean {
+    contract {
+        returns(false) implies (this@isBlank !== null)
+    }
+
     return this.isNullOrBlank()
 }
 
 /**
- * Checks if given chars is numeric by [Character.isDigit].
+ * Returns whether given chars is not empty and numeric with [Character.isDigit].
  */
+@OptIn(ExperimentalContracts::class)
 fun CharSequence?.isNumeric(): Boolean {
-    return StringUtils.isNumeric(this)
+    contract {
+        returns(true) implies (this@isNumeric !== null)
+    }
+
+    if (this.isNullOrEmpty()) {
+        return false
+    }
+    for (c in this) {
+        if (!Character.isDigit(c)) {
+            return false
+        }
+    }
+    return true
 }
 
 /**
- * Checks if given chars are all white space by [Character.isWhitespace].
+ * Returns whether given chars is not empty and only contains white space with [Character.isWhitespace].
  */
+@OptIn(ExperimentalContracts::class)
 fun CharSequence?.isWhitespace(): Boolean {
-    return StringUtils.isWhitespace(this)
+    contract {
+        returns(true) implies (this@isWhitespace !== null)
+    }
+
+    if (this.isNullOrEmpty()) {
+        return false
+    }
+    for (c in this) {
+        if (!Character.isWhitespace(c)) {
+            return false
+        }
+    }
+    return true
 }
 
 /**
- * Returns whether [this] has a leading zero (assumed [this] is numeric).
+ * Returns whether given chars is empty with [isNumeric], and has a leading zero.
  */
-fun CharSequence?.numericWithLeadingZero(): Boolean {
-    if (this === null || this.length < 2) {
+@OptIn(ExperimentalContracts::class)
+fun CharSequence?.isNumericLeadingZero(): Boolean {
+    contract {
+        returns(true) implies (this@isNumericLeadingZero !== null)
+    }
+
+    if (!this.isNumeric()) {
+        return false
+    }
+    return this.isLeadingZero()
+}
+
+/**
+ * Returns whether given chars has a leading zero and its length is greater than 1.
+ */
+fun CharSequence.isLeadingZero(): Boolean {
+    if (this.length < 2) {
         return false
     }
     return this[0] == '0'
 }
 
-fun anyEmpty(vararg charSeqs: CharSequence?): Boolean {
-    for (charSeq in charSeqs) {
+/**
+ * Returns true if any of given strings is empty with [isEmpty].
+ */
+fun anyEmpty(vararg strings: CharSequence?): Boolean {
+    for (charSeq in strings) {
         if (charSeq.isEmpty()) {
             return true
         }
     }
     return false
-}
-
-fun anyEmpty(charSeqs: Iterable<CharSequence?>): Boolean {
-    for (charSeq in charSeqs) {
-        if (charSeq.isEmpty()) {
-            return true
-        }
-    }
-    return false
-}
-
-fun allEmpty(vararg charSeqs: CharSequence?): Boolean {
-    for (charSeq in charSeqs) {
-        if (!charSeq.isEmpty()) {
-            return false
-        }
-    }
-    return true
-}
-
-fun allEmpty(charSeqs: Iterable<CharSequence?>): Boolean {
-    for (charSeq in charSeqs) {
-        if (!charSeq.isEmpty()) {
-            return false
-        }
-    }
-    return true
-}
-
-fun anyBlank(vararg charSeqs: CharSequence?): Boolean {
-    for (charSeq in charSeqs) {
-        if (charSeq.isBlank()) {
-            return true
-        }
-    }
-    return false
-}
-
-fun anyBlank(charSeqs: Iterable<CharSequence?>): Boolean {
-    for (charSeq in charSeqs) {
-        if (charSeq.isBlank()) {
-            return true
-        }
-    }
-    return false
-}
-
-fun allBlank(vararg charSeqs: CharSequence?): Boolean {
-    for (charSeq in charSeqs) {
-        if (!charSeq.isBlank()) {
-            return false
-        }
-    }
-    return true
-}
-
-fun allBlank(charSeqs: Iterable<CharSequence?>): Boolean {
-    for (charSeq in charSeqs) {
-        if (!charSeq.isBlank()) {
-            return false
-        }
-    }
-    return true
-}
-
-fun CharSequence.lowerCase(): String {
-    return this.toString().lowercase()
-}
-
-fun CharSequence.upperCase(): String {
-    return this.toString().uppercase()
 }
 
 /**
- * Sets first character of given chars upper case.
+ * Returns true if each of given strings is empty with [isEmpty].
+ */
+fun allEmpty(vararg strings: CharSequence?): Boolean {
+    for (charSeq in strings) {
+        if (!charSeq.isEmpty()) {
+            return false
+        }
+    }
+    return true
+}
+
+/**
+ * Returns true if any of given strings is blank with [isBlank].
+ */
+fun anyBlank(vararg strings: CharSequence?): Boolean {
+    for (charSeq in strings) {
+        if (charSeq.isBlank()) {
+            return true
+        }
+    }
+    return false
+}
+
+/**
+ * Returns true if each given strings is blank with [isBlank].
+ */
+fun allBlank(vararg strings: CharSequence?): Boolean {
+    for (charSeq in strings) {
+        if (!charSeq.isBlank()) {
+            return false
+        }
+    }
+    return true
+}
+
+/**
+ * Returns the [String] of which first char was capitalized.
  */
 fun CharSequence.capitalize(): String {
     return StringUtils.capitalize(this.toString())
 }
 
 /**
- * Sets first character of given chars lower case.
+ * Returns the [String] of which first char was uncapitalized.
  */
 fun CharSequence.uncapitalize(): String {
     return StringUtils.uncapitalize(this.toString())
 }
 
+/**
+ * Returns the [String] of which chars were converted to lower case.
+ */
+fun CharSequence.lowercase(): String {
+    return this.toString().lowercase(Locale.ENGLISH)
+}
+
+/**
+ * Returns the [String] of which chars were converted to upper case.
+ */
+fun CharSequence.uppercase(): String {
+    return this.toString().uppercase(Locale.ENGLISH)
+}
+
+/**
+ * Returns whether char sequence of [this] equals to [other]'s.
+ */
+@JvmName("equals")
 @JvmOverloads
-fun CharSequence?.equals(other: CharSequence?, ignoreCase: Boolean = false): Boolean {
+fun CharSequence?.charsEquals(other: CharSequence?, ignoreCase: Boolean = false): Boolean {
     return this.contentEquals(other, ignoreCase)
 }
 
-fun CharSequence?.equalsAny(vararg others: CharSequence?): Boolean {
+/**
+ * Returns true if any of [others]'s char sequence equals to [this]'s with [charsEquals].
+ */
+@JvmName("equalsAny")
+fun CharSequence?.charsEqualsAny(vararg others: CharSequence?): Boolean {
+    return this.charsEqualsAny(false, *others)
+}
+
+/**
+ * Returns true if each of [others]'s char sequence equals to [this]'s with [charsEquals].
+ */
+@JvmName("equalsAll")
+fun CharSequence?.charsEqualsAll(vararg others: CharSequence?): Boolean {
+    return this.charsEqualsAll(false, *others)
+}
+
+/**
+ * Returns true if any of [others]'s char sequence equals to [this]'s with [charsEquals].
+ */
+@JvmName("equalsAny")
+fun CharSequence?.charsEqualsAny(ignoreCase: Boolean, vararg others: CharSequence?): Boolean {
     for (other in others) {
-        if (this == other) {
+        if (this.charsEquals(other, ignoreCase)) {
             return true
         }
     }
     return false
 }
 
-fun CharSequence?.equalsAll(vararg others: CharSequence?): Boolean {
+/**
+ * Returns true if each of [others]'s char sequence equals to [this]'s with [charsEquals].
+ */
+@JvmName("equalsAll")
+fun CharSequence?.charsEqualsAll(ignoreCase: Boolean, vararg others: CharSequence?): Boolean {
     for (other in others) {
-        if (this != other) {
+        if (!this.charsEquals(other, ignoreCase)) {
             return false
         }
     }
     return true
 }
 
-fun CharSequence?.equalsAnyIgnoreCase(vararg others: CharSequence?): Boolean {
-    for (other in others) {
-        if (this.equals(other, true)) {
-            return true
-        }
-    }
-    return false
-}
-
-fun CharSequence?.equalsAllIgnoreCase(vararg others: CharSequence?): Boolean {
-    for (other in others) {
-        if (this.equals(other, true)) {
-            return false
-        }
-    }
-    return true
-}
-
-@JvmOverloads
-fun CharSequence?.equalsAny(others: Iterable<CharSequence?>, ignoreCase: Boolean = false): Boolean {
-    for (other in others) {
-        if (this.equals(other, ignoreCase)) {
-            return true
-        }
-    }
-    return false
-}
-
-@JvmOverloads
-fun CharSequence?.equalsAll(others: Iterable<CharSequence?>, ignoreCase: Boolean = false): Boolean {
-    for (other in others) {
-        if (this.equals(other, ignoreCase)) {
-            return false
-        }
-    }
-    return true
-}
-
-fun CharSequence.charset(): Charset {
-    return Charset.forName(this.toString())
-}
-
+/**
+ * Splits this char sequence to a list of lines delimited by any of the following character sequences: CRLF, LF or CR.
+ *
+ * The lines returned do not include terminating line separators.
+ */
 fun CharSequence.lines(): List<String> {
     return this.linesKt()
 }
 
+/**
+ * Converts chars to bytes with [charset].
+ */
+@JvmName("toBytes")
 @JvmOverloads
-fun CharSequence.getBytes(charset: Charset = defaultCharset()): ByteArray {
+fun CharSequence.charsToBytes(charset: Charset = defaultCharset()): ByteArray {
     return this.toString().toByteArray(charset)
 }
 
+/**
+ * Converts chars to bytes with [charset].
+ */
+@JvmName("toBytes")
 @JvmOverloads
-fun CharArray.getBytes(
+fun CharArray.charsToBytes(
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
     charset: Charset = defaultCharset()
@@ -286,12 +286,20 @@ fun CharArray.getBytes(
     return String(this, offset, length).toByteArray(charset)
 }
 
-fun CharArray.getBytes(charset: Charset): ByteArray {
-    return getBytes(0, this.size, charset)
+/**
+ * Converts chars to bytes with [charset].
+ */
+@JvmName("toBytes")
+fun CharArray.charsToBytes(charset: Charset): ByteArray {
+    return charsToBytes(0, this.size, charset)
 }
 
+/**
+ * Converts bytes to String with [charset].
+ */
+@JvmName("toString")
 @JvmOverloads
-fun ByteArray.getString(
+fun ByteArray.bytesToString(
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
     charset: Charset = defaultCharset()
@@ -299,24 +307,98 @@ fun ByteArray.getString(
     return String(this, offset, length, charset)
 }
 
-fun ByteArray.getString(charset: Charset): String {
+/**
+ * Converts bytes to String with [charset].
+ */
+@JvmName("toString")
+fun ByteArray.bytesToString(charset: Charset): String {
     return String(this, charset)
 }
 
+/**
+ * Converts bytes to chars with [charset].
+ */
+@JvmName("toChars")
 @JvmOverloads
-fun ByteArray.getChars(
+fun ByteArray.bytesToChars(
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
     charset: Charset = defaultCharset()
 ): CharArray {
-    return getString(offset, length, charset).toCharArray()
+    return bytesToString(offset, length, charset).toCharArray()
 }
 
-fun ByteArray.getChars(charset: Charset): CharArray {
-    return getString(charset).toCharArray()
+/**
+ * Converts bytes to chars with [charset].
+ */
+@JvmName("toChars")
+fun ByteArray.bytesToChars(charset: Charset): CharArray {
+    return bytesToString(charset).toCharArray()
 }
 
-fun CharSequence.getChars(): CharArray {
+/**
+ * Converts chars to bytes, each of char will be seen as an 8-bit byte.
+ */
+@JvmName("toBytes8Bit")
+@JvmOverloads
+fun CharSequence.charsToBytes8Bit(offset: Int = 0, length: Int = remainingLength(this.length, offset)): ByteArray {
+    checkRangeInBounds(offset, offset + length, 0, this.length)
+    return charsToBytes8Bit(length) { this[it + offset] }
+}
+
+/**
+ * Converts chars to bytes, each of char will be seen as an 8-bit byte.
+ */
+@JvmName("toBytes8Bit")
+@JvmOverloads
+fun CharArray.charsToBytes8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ByteArray {
+    checkRangeInBounds(offset, offset + length, 0, this.size)
+    return charsToBytes8Bit(length) { this[it + offset] }
+}
+
+private inline fun charsToBytes8Bit(
+    length: Int,
+    getChar: (Int) -> Char,
+): ByteArray {
+    val array = ByteArray(length)
+    var i = 0
+    while (i < length) {
+        val char = getChar(i)
+        array[i] = char.code.toByte()
+        i++
+    }
+    return array
+}
+
+/**
+ * Converts bytes to String, each of char will be seen as an 8-bit byte.
+ */
+@JvmName("toString8Bit")
+@JvmOverloads
+fun ByteArray.bytesToString8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): String {
+    return String(this, offset, length, StandardCharsets.ISO_8859_1)
+}
+
+/**
+ * Converts bytes to chars, each of char will be seen as an 8-bit byte.
+ */
+@JvmName("toChars8Bit")
+@JvmOverloads
+fun ByteArray.bytesToChars8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharArray {
+    checkRangeInBounds(offset, offset + length, 0, this.size)
+    val array = CharArray(length)
+    var i = offset
+    while (i < length) {
+        array[i] = this[i + offset].toUnsignedInt().toChar()
+        i++
+    }
+    return array
+}
+
+/**
+ * Converts char sequence to char array.
+ */
+fun CharSequence.toCharArray(): CharArray {
     val array = CharArray(this.length)
     for (c in this.withIndex()) {
         array[c.index] = c.value
@@ -324,6 +406,9 @@ fun CharSequence.getChars(): CharArray {
     return array
 }
 
+/**
+ * If [this] does not start with [prefix], add the [prefix] as prefix and return; else return itself to String.
+ */
 fun CharSequence.addIfNotStartWith(prefix: CharSequence): String {
     return if (this.startsWith(prefix)) {
         this.toString()
@@ -332,6 +417,9 @@ fun CharSequence.addIfNotStartWith(prefix: CharSequence): String {
     }
 }
 
+/**
+ * If [this] starts with [prefix], remove the [prefix] and return; else return itself to String.
+ */
 fun CharSequence.removeIfStartWith(prefix: CharSequence): String {
     return if (this.startsWith(prefix)) {
         this.substring(prefix.length)
@@ -340,86 +428,61 @@ fun CharSequence.removeIfStartWith(prefix: CharSequence): String {
     }
 }
 
-@JvmOverloads
-fun CharSequence.to8BitBytes(offset: Int = 0, length: Int = remainingLength(this.length, offset)): ByteArray {
-    checkRangeInBounds(offset, offset + length, 0, this.length)
-    val array = ByteArray(length)
-    var i = offset
-    var j = 0
-    while (i < offset + length) {
-        array[j] = this[i].code.toByte()
-        i++
-        j++
+/**
+ * If [this] does not end with [suffix], add the [suffix] as suffix and return; else return itself to String.
+ */
+fun CharSequence.addIfNotEndWith(suffix: CharSequence): String {
+    return if (this.endsWith(suffix)) {
+        this.toString()
+    } else {
+        "$this$suffix"
     }
-    return array
 }
 
-@JvmOverloads
-fun CharArray.to8BitBytes(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ByteArray {
-    checkRangeInBounds(offset, offset + length, 0, this.size)
-    val array = ByteArray(length)
-    var i = offset
-    var j = 0
-    while (i < offset + length) {
-        array[j] = this[i].code.toByte()
-        i++
-        j++
+/**
+ * If [this] ends with [suffix], remove the [suffix] and return; else return itself to String.
+ */
+fun CharSequence.removeIfEndWith(suffix: CharSequence): String {
+    return if (this.endsWith(suffix)) {
+        this.substring(0, this.length - suffix.length)
+    } else {
+        this.toString()
     }
-    return array
 }
 
-@JvmOverloads
-fun ByteArray.to8BitString(offset: Int = 0, length: Int = remainingLength(this.size, offset)): String {
-    return String(this, offset, length, StandardCharsets.US_ASCII)
-}
-
-@JvmOverloads
-fun ByteArray.to8BitChars(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharArray {
-    checkRangeInBounds(offset, offset + length, 0, this.size)
-    val array = CharArray(length)
-    var i = offset
-    var j = 0
-    while (i < offset + length) {
-        array[j] = this[i].toUnsignedInt().toChar()
-        i++
-        j++
-    }
-    return array
-}
-
-//toCollection:
-
+/**
+ * Puts and returns each char of [this] into a [Collection].
+ */
 fun <C : MutableCollection<in Char>> CharSequence.toCollection(destination: C): C {
     return this.toCollectionKt(destination)
 }
 
+/**
+ * Returns a [Set] which contains all chars of [this].
+ */
 fun CharSequence.toSet(): Set<Char> {
     return this.toSetKt()
 }
 
-fun CharSequence.toHashSet(): HashSet<Char> {
-    return this.toHashSetKt()
-}
-
-fun CharSequence.toSortedSet(): SortedSet<Char> {
-    return this.toSortedSetKt()
-}
-
+/**
+ * Returns a [List] which contains all chars of [this].
+ */
 fun CharSequence.toList(): List<Char> {
     return this.toListKt()
 }
 
-//Lazy:
-
+/**
+ * Returns a [LazyString].
+ */
 @JvmSynthetic
-fun lazyString(supplier: () -> String): LazyString {
-    return LazyString.of(supplier.toSupplier())
+fun lazyString(supplier: Supplier<Any?>): LazyString {
+    return LazyString.of(supplier)
 }
 
 /**
- * String reference, to refer to a range of [CharSequence] with indexes but not store the copy of data.
+ * Chars ref represents a range of [CharSequence] with indexes, but not store the copy of data.
  */
-interface StringRef : CharSequence {
+interface CharsRef : CharSequence {
 
     /**
      * Copies and returns a new String of current range.
@@ -431,17 +494,17 @@ interface StringRef : CharSequence {
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun CharSequence.stringRef(startIndex: Int = 0, endIndex: Int = this.length): StringRef {
+        fun CharSequence.charsRef(startIndex: Int = 0, endIndex: Int = this.length): CharsRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.length)
-            return CharSeqStringRef(this, startIndex, endIndex)
+            return CharSeqRef(this, startIndex, endIndex)
         }
 
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun CharArray.stringRef(startIndex: Int = 0, endIndex: Int = this.size): StringRef {
+        fun CharArray.charsRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
             checkRangeInBounds(startIndex, endIndex, 0, this.size)
-            return CharsStringRef(this, startIndex, endIndex)
+            return CharArrayRef(this, startIndex, endIndex)
         }
 
         @JvmName("offset")
@@ -450,22 +513,22 @@ interface StringRef : CharSequence {
         fun CharSequence.stringRefByOffset(
             offset: Int = 0,
             length: Int = remainingLength(this.length, offset)
-        ): StringRef {
-            return stringRef(offset, offset + length)
+        ): CharsRef {
+            return charsRef(offset, offset + length)
         }
 
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun CharArray.stringRefByOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): StringRef {
-            return stringRef(offset, offset + length)
+        fun CharArray.stringRefByOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsRef {
+            return charsRef(offset, offset + length)
         }
 
-        private class CharSeqStringRef(
+        private class CharSeqRef(
             private val chars: CharSequence,
             private val startIndex: Int,
             private val endIndex: Int
-        ) : StringRef {
+        ) : CharsRef {
 
             override val length: Int = endIndex - startIndex
 
@@ -476,7 +539,7 @@ interface StringRef : CharSequence {
 
             override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
-                return CharSeqStringRef(chars, startIndex.actualIndex(), endIndex.actualIndex())
+                return CharSeqRef(chars, startIndex.actualIndex(), endIndex.actualIndex())
             }
 
             override fun copyOfRange(): String {
@@ -490,11 +553,11 @@ interface StringRef : CharSequence {
             }
         }
 
-        private class CharsStringRef(
+        private class CharArrayRef(
             private val chars: CharArray,
             private val startIndex: Int,
             private val endIndex: Int
-        ) : StringRef {
+        ) : CharsRef {
 
             override val length: Int = endIndex - startIndex
 
@@ -505,7 +568,7 @@ interface StringRef : CharSequence {
 
             override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
-                return CharsStringRef(chars, startIndex.actualIndex(), endIndex.actualIndex())
+                return CharArrayRef(chars, startIndex.actualIndex(), endIndex.actualIndex())
             }
 
             override fun copyOfRange(): String {
@@ -531,27 +594,29 @@ interface LazyString : CharSequence {
     companion object {
 
         @JvmStatic
-        fun of(supplier: Supplier<String>): LazyString {
+        fun of(supplier: Supplier<Any?>): LazyString {
             return LazyStringImpl(supplier)
         }
 
-        private class LazyStringImpl(private val supplier: Supplier<String>) : LazyString {
-
-            private val value: String by lazy { supplier.get() }
+        private class LazyStringImpl(private val supplier: Supplier<Any?>) : LazyString, FinalObject() {
 
             override val length: Int
-                get() = value.length
+                get() = toString().length
 
             override fun get(index: Int): Char {
-                return value[index]
+                return toString()[index]
             }
 
             override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
-                return value.subSequence(startIndex, endIndex)
+                return toString().subSequence(startIndex, endIndex)
             }
 
-            override fun toString(): String {
-                return value
+            override fun hashCode0(): Int {
+                return toString().hashCode()
+            }
+
+            override fun toString0(): String {
+                return supplier.get().toString()
             }
         }
     }
