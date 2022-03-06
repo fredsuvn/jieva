@@ -4,13 +4,12 @@ package xyz.srclab.common.base
 
 import xyz.srclab.common.Boat
 import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
 
 /**
  * Returns default charset, generally it is _UTF-8_.
  */
 @JvmName("charset")
-fun defaultCharset(): Charset = StandardCharsets.UTF_8
+fun defaultCharset(): Charset = utf8()
 
 /**
  * Returns default buffer size, generally it is _8 * 1024_
