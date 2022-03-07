@@ -3,6 +3,7 @@
 package xyz.srclab.common.base
 
 import org.apache.commons.lang3.StringUtils
+import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
@@ -16,65 +17,109 @@ import kotlin.text.toLong as toLongKt
 import kotlin.text.toShort as toShortKt
 
 /**
- * Default radix: 10.
+ * Returns 100 of which type is [BigInteger].
  */
-const val DEFAULT_RADIX: Int = 10
+fun hundredInt(): BigInteger = BigInteger("100")
 
+/**
+ * Returns 1000 of which type is [BigInteger].
+ */
+fun thousandInt(): BigInteger = BigInteger("1000")
+
+/**
+ * Returns 100 of which type is [BigDecimal].
+ */
+fun hundredDecimal(): BigDecimal = BigDecimal("100")
+
+/**
+ * Returns 1000 of which type is [BigDecimal].
+ */
+fun thousandDecimal(): BigDecimal = BigDecimal("1000")
+
+/**
+ * Converts chars to byte.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun CharSequence.toByte(radix: Int = DEFAULT_RADIX): Byte {
+fun CharSequence.toByte(radix: Int = defaultRadix()): Byte {
     return this.toString().toByteKt(radix)
 }
 
+/**
+ * Converts chars to short.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun CharSequence.toShort(radix: Int = DEFAULT_RADIX): Short {
+fun CharSequence.toShort(radix: Int = defaultRadix()): Short {
     return this.toString().toShortKt(radix)
 }
 
+/**
+ * Converts chars to int then to char.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun CharSequence.toChar(radix: Int = DEFAULT_RADIX): Char {
+fun CharSequence.toChar(radix: Int = defaultRadix()): Char {
     return this.toString().toIntKt(radix).toChar()
 }
 
+/**
+ * Converts chars to int.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun CharSequence.toInt(radix: Int = DEFAULT_RADIX): Int {
+fun CharSequence.toInt(radix: Int = defaultRadix()): Int {
     return this.toString().toIntKt(radix)
 }
 
+/**
+ * Converts chars to long.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun CharSequence.toLong(radix: Int = DEFAULT_RADIX): Long {
+fun CharSequence.toLong(radix: Int = defaultRadix()): Long {
     return this.toString().toLongKt(radix)
 }
 
+/**
+ * Converts chars to float.
+ */
 @Throws(NumberFormatException::class)
 fun CharSequence.toFloat(): Float {
     return this.toString().toFloatKt()
 }
 
+/**
+ * Converts chars to double.
+ */
 @Throws(NumberFormatException::class)
 fun CharSequence.toDouble(): Double {
     return this.toString().toDoubleKt()
 }
 
+/**
+ * Converts chars to [BigInteger].
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun CharSequence.toBigInteger(radix: Int = DEFAULT_RADIX): BigInteger {
+fun CharSequence.toBigInteger(radix: Int = defaultRadix()): BigInteger {
     val str = this.toString()
     if (radix == 10) {
         return when (str) {
             "0" -> BigInteger.ZERO
             "1" -> BigInteger.ONE
             "10" -> BigInteger.TEN
+            "100" -> hundredInt()
+            "1000" -> thousandInt()
             else -> str.toBigIntegerKt()
         }
     }
     return str.toBigIntegerKt(radix)
 }
 
+/**
+ * Converts chars to [BigDecimal].
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
 fun CharSequence.toBigDecimal(mathContext: MathContext = MathContext.UNLIMITED): BigDecimal {
@@ -82,121 +127,229 @@ fun CharSequence.toBigDecimal(mathContext: MathContext = MathContext.UNLIMITED):
         "0" -> BigDecimal.ZERO
         "1" -> BigDecimal.ONE
         "10" -> BigDecimal.TEN
+        "100" -> hundredDecimal()
+        "1000" -> hundredDecimal()
         else -> str.toBigDecimalKt(mathContext)
     }
 }
 
+/**
+ * Converts [this] to byte:
+ *
+ * * If this is null, return 0;
+ * * If this is byte, return itself;
+ * * If this is number, return byte value;
+ * * If this is boolean ,return 1 for `true` or 0 for `false`;
+ * * Else calls the [toCharSeq] then converts the char sequence to byte.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toByte(radix: Int = DEFAULT_RADIX): Byte {
+fun Any?.toByte(radix: Int = defaultRadix()): Byte {
     return when (this) {
         null -> 0
         is Byte -> this
         is Number -> this.toByte()
+        is Boolean -> if (this) 1 else 0
         else -> this.toCharSeq().toByte(radix)
     }
 }
 
+/**
+ * Converts [this] to short:
+ *
+ * * If this is null, return 0;
+ * * If this is short, return itself;
+ * * If this is number, return short value;
+ * * If this is boolean ,return 1 for `true` or 0 for `false`;
+ * * Else calls the [toCharSeq] then converts the char sequence to short.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toShort(radix: Int = DEFAULT_RADIX): Short {
+fun Any?.toShort(radix: Int = defaultRadix()): Short {
     return when (this) {
         null -> 0
         is Short -> this
         is Number -> this.toShort()
+        is Boolean -> if (this) 1 else 0
         else -> this.toCharSeq().toShort(radix)
     }
 }
 
+/**
+ * Converts [this] to char:
+ *
+ * * If this is null, return 0;
+ * * If this is char, return itself;
+ * * If this is number, return int value to char;
+ * * If this is boolean ,return 1 for `true` or 0 for `false`;
+ * * Else calls the [toCharSeq] then converts the char sequence to char.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toChar(radix: Int = DEFAULT_RADIX): Char {
+fun Any?.toChar(radix: Int = defaultRadix()): Char {
     return when (this) {
         null -> 0.toChar()
         is Char -> this
         is Number -> this.toInt().toChar()
+        is Boolean -> if (this) 1.toChar() else 0.toChar()
         else -> this.toCharSeq().toChar(radix)
     }
 }
 
+/**
+ * Converts [this] to int:
+ *
+ * * If this is null, return 0;
+ * * If this is int, return itself;
+ * * If this is number, return int value;
+ * * If this is boolean ,return 1 for `true` or 0 for `false`;
+ * * Else calls the [toCharSeq] then converts the char sequence to int.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toInt(radix: Int = DEFAULT_RADIX): Int {
+fun Any?.toInt(radix: Int = defaultRadix()): Int {
     return when (this) {
         null -> 0
         is Int -> this
         is Number -> this.toInt()
+        is Boolean -> if (this) 1 else 0
         else -> this.toCharSeq().toInt(radix)
     }
 }
 
+/**
+ * Converts [this] to long:
+ *
+ * * If this is null, return 0;
+ * * If this is long, return itself;
+ * * If this is number, return long value;
+ * * If this is boolean ,return 1 for `true` or 0 for `false`;
+ * * Else calls the [toCharSeq] then converts the char sequence to long.
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toLong(radix: Int = DEFAULT_RADIX): Long {
+fun Any?.toLong(radix: Int = defaultRadix()): Long {
     return when (this) {
         null -> 0
         is Long -> this
         is Number -> this.toLong()
+        is Boolean -> if (this) 1 else 0
         else -> this.toCharSeq().toLong(radix)
     }
 }
 
+/**
+ * Converts [this] to float:
+ *
+ * * If this is null, return 0;
+ * * If this is float, return itself;
+ * * If this is number, return float value;
+ * * If this is boolean ,return 1 for `true` or 0 for `false`;
+ * * Else calls the [toCharSeq] then converts the char sequence to float.
+ */
 @Throws(NumberFormatException::class)
 fun Any?.toFloat(): Float {
     return when (this) {
         null -> 0f
         is Float -> this
         is Number -> this.toFloat()
+        is Boolean -> if (this) 1.0f else 0.0f
         else -> this.toCharSeq().toFloat()
     }
 }
 
+/**
+ * Converts [this] to double:
+ *
+ * * If this is null, return 0;
+ * * If this is double, return itself;
+ * * If this is number, return double value;
+ * * If this is boolean ,return 1 for `true` or 0 for `false`;
+ * * Else calls the [toCharSeq] then converts the char sequence to double.
+ */
 @Throws(NumberFormatException::class)
 fun Any?.toDouble(): Double {
     return when (this) {
         null -> 0.0
         is Double -> this
         is Number -> this.toDouble()
+        is Boolean -> if (this) 1.0 else 0.0
         else -> this.toCharSeq().toDouble()
     }
 }
 
+/**
+ * Converts [this] to [BigInteger]:
+ *
+ * * If this is null, return 0;
+ * * If this is [BigInteger], return itself;
+ * * If this is number, return big int value;
+ * * If this is boolean ,return 1 for `true` or 0 for `false`;
+ * * Else calls the [toCharSeq] then converts the char sequence to [BigInteger].
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
-fun Any?.toBigInteger(radix: Int = DEFAULT_RADIX): BigInteger {
+fun Any?.toBigInteger(radix: Int = defaultRadix()): BigInteger {
     return when (this) {
         null -> BigInteger.ZERO
         is BigInteger -> this
+        is BigDecimal -> this.toBigInteger()
+        is Boolean -> if (this) BigInteger.ONE else BigInteger.ZERO
         else -> this.toCharSeq().toBigInteger(radix)
     }
 }
 
+/**
+ * Converts [this] to [BigDecimal]:
+ *
+ * * If this is null, return 0;
+ * * If this is [BigDecimal], return itself;
+ * * If this is number, return big decimal value;
+ * * If this is boolean ,return 1 for `true` or 0 for `false`;
+ * * Else calls the [toCharSeq] then converts the char sequence to [BigDecimal].
+ */
 @Throws(NumberFormatException::class)
 @JvmOverloads
 fun Any?.toBigDecimal(mathContext: MathContext = MathContext.UNLIMITED): BigDecimal {
     return when (this) {
         null -> BigDecimal.ZERO
         is BigDecimal -> this
+        is Boolean -> if (this) BigDecimal.ONE else BigDecimal.ZERO
         else -> this.toCharSeq().toBigDecimal(mathContext)
     }
 }
 
+/**
+ * Returns unsigned int.
+ */
 fun Byte.toUnsignedInt(): Int {
     return this.toInt() and 0x0000_00FF
 }
 
+/**
+ * Returns unsigned long.
+ */
 fun Byte.toUnsignedLong(): Int {
     return this.toUnsignedInt() and 0x0000_00FF
 }
 
+/**
+ * Returns unsigned int.
+ */
 fun Short.toUnsignedInt(): Int {
     return this.toInt() and 0x0000_FFFF
 }
 
+/**
+ * Returns unsigned long.
+ */
 fun Short.toUnsignedLong(): Long {
     return this.toUnsignedInt().toLong() and 0x0000_FFFF
 }
 
+/**
+ * Returns unsigned long.
+ */
 fun Int.toUnsignedLong(): Long {
     return this.toLong() and 0x0000_0000_FFFF_FFFF
 }
@@ -258,104 +411,93 @@ fun Long.toOctalString(size: Int = 22): String {
 /**
  * Parses given chars to int.
  *
- * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
+ * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0B/0x/0X/0`):
  *
  * * 123456: positive decimal
  * * 0xffeecc: positive hex;
  * * -0xffeecc: negative hex;
  * * +0774411: positive octal;
- * * 0b001100: positive binary;
+ * * 0B001100: positive binary;
  */
 fun CharSequence.parseInt(): Int {
-
-    fun parse(offset: Int): Int {
-        if (this.startsWith("0x", offset)) {
-            return this.substring(offset + 2).toIntKt(16)
-        }
-        if (this.startsWith("0b", offset)) {
-            return this.substring(offset + 2).toIntKt(2)
-        }
-        if (this.startsWith("0", offset)) {
-            return this.substring(offset + 1).toIntKt(8)
-        }
-        return this.substring(offset).toIntKt()
-    }
-
-    return if (this.startsWith("-")) {
-        -parse(1)
-    } else if (this.startsWith("+")) {
-        parse(1)
-    } else {
-        parse(0)
-    }
+    return ParsedChars(this).toInt()
 }
 
 /**
  * Parses given chars to int.
  *
- * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
+ * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0B/0x/0X/0`):
  *
  * * 123456: positive decimal
  * * 0xffeecc: positive hex;
  * * -0xffeecc: negative hex;
  * * +0774411: positive octal;
- * * 0b001100: positive binary;
+ * * 0B001100: positive binary;
  */
 fun CharSequence.parseLong(): Long {
-
-    fun parse(offset: Int): Long {
-        if (this.startsWith("0x", offset)) {
-            return this.substring(offset + 2).toLongKt(16)
-        }
-        if (this.startsWith("0b", offset)) {
-            return this.substring(offset + 2).toLongKt(2)
-        }
-        if (this.startsWith("0", offset)) {
-            return this.substring(offset + 1).toLongKt(8)
-        }
-        return this.substring(offset).toLongKt()
-    }
-
-    return if (this.startsWith("-")) {
-        -parse(1)
-    } else if (this.startsWith("+")) {
-        parse(1)
-    } else {
-        parse(0)
-    }
+    return ParsedChars(this).toLong()
 }
 
 /**
  * Parses given chars to [BigInteger].
  *
- * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0x/0`):
+ * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0B/0x/0X/0`):
  *
  * * 123456: positive decimal
  * * 0xffeecc: positive hex;
  * * -0xffeecc: negative hex;
  * * +0774411: positive octal;
- * * 0b001100: positive binary;
+ * * 0B001100: positive binary;
  */
 fun CharSequence.parseBigInteger(): BigInteger {
+    return ParsedChars(this).toBigInteger()
+}
 
-    fun parse(offset: Int): BigInteger {
-        if (this.startsWith("0x", offset)) {
-            return BigInteger(this.substring(offset + 2), 16)
+private class ParsedChars(chars: CharSequence) {
+
+    private val positive: Boolean
+    private val radix: Int
+    private val content: CharSequence
+
+    init {
+        var offset = 0
+        if (chars.startsWith('-')) {
+            positive = false
+            offset = 1
+        } else if (chars.startsWith('+')) {
+            positive = true
+            offset = 1
+        } else {
+            positive = true
+            offset = 0
         }
-        if (this.startsWith("0b", offset)) {
-            return BigInteger(this.substring(offset + 2), 2)
+        if (chars.startsWith("0x", offset) || chars.startsWith("0X", offset)) {
+            radix = 16
+            content = chars.charsRef(offset + 2)
+        } else if (chars.startsWith("0b", offset) || chars.startsWith("0B", offset)) {
+            radix = 2
+            content = chars.charsRef(offset + 2)
+        } else if (chars.startsWith("0", offset)) {
+            radix = 8
+            content = chars.charsRef(offset + 1)
+        } else {
+            radix = 10
+            content = chars.subChars(offset)
         }
-        if (this.startsWith("0", offset)) {
-            return BigInteger(this.substring(offset + 1), 8)
-        }
-        return BigInteger(this.substring(offset))
     }
 
-    return if (this.startsWith("-")) {
-        parse(1).negate()
-    } else if (this.startsWith("+")) {
-        parse(1)
-    } else {
-        parse(0)
+    fun toInt(): Int {
+        val value = content.toInt(radix)
+        return if (positive) value else -value
+    }
+
+    fun toLong(): Long {
+        val value = content.toLong(radix)
+        return if (positive) value else -value
+    }
+
+    fun toBigInteger(): BigInteger {
+        val value = content.toBigInteger(radix)
+        return if (positive) value else -value
     }
 }

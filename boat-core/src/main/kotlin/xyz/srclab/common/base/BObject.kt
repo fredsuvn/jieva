@@ -5,40 +5,61 @@ package xyz.srclab.common.base
 import java.util.*
 import kotlin.toString as toStringKt
 
+/**
+ * Casts [this] to any type.
+ */
 @JvmName("as")
 fun <T> Any?.asTyped(): T {
     return this as T
 }
 
+/**
+ * Casts [this] to any type.
+ */
+@JvmSynthetic
 @JvmName("as")
 fun <T> Nothing?.asTyped(): T {
     return this as T
 }
 
+/**
+ * Casts [this] to any type, not null.
+ */
 fun <T : Any> T?.asNotNull(): T {
     return this as T
 }
 
-//Null:
-
+/**
+ * Returns whether [this] is null.
+ */
 fun Any?.isNull(): Boolean {
     return this === null
 }
 
+/**
+ * Returns whether [this] is not null.
+ */
 fun Any?.isNotNull(): Boolean {
     return this !== null
 }
 
-//Equals:
-
+/**
+ * Returns whether [this] equals [other].
+ */
 fun Any?.equals(other: Any?): Boolean {
     return Objects.equals(this, other)
 }
 
+/**
+ * Returns whether [this] equals [other], or deep equals for array types.
+ */
 fun Any?.deepEquals(other: Any?): Boolean {
     return Objects.deepEquals(this, other)
 }
 
+/**
+ * Returns true if [this] equals any of [others].
+ */
 fun Any?.equalsAny(vararg others: Any?): Boolean {
     for (other in others) {
         if (equals(other)) {
@@ -48,6 +69,9 @@ fun Any?.equalsAny(vararg others: Any?): Boolean {
     return false
 }
 
+/**
+ * Returns true if [this] equals each of [others].
+ */
 fun Any?.equalsAll(vararg others: Any?): Boolean {
     for (other in others) {
         if (!equals(other)) {
@@ -57,12 +81,16 @@ fun Any?.equalsAll(vararg others: Any?): Boolean {
     return true
 }
 
-//Hash:
-
+/**
+ * Returns hash code of [this].
+ */
 fun Any?.hash(): Int {
     return this.hashCode()
 }
 
+/**
+ * Returns hash code of [this], or array hash code if this is an array.
+ */
 fun Any?.arrayHash(): Int {
     return when (this) {
         is BooleanArray -> Arrays.hashCode(this)
@@ -78,6 +106,11 @@ fun Any?.arrayHash(): Int {
     }
 }
 
+/**
+ * Returns hash code of [this],
+ * or array hash code if this is an array,
+ * or deep array hash code if this is a deep array.
+ */
 fun Any?.deepHash(): Int {
     return when (this) {
         is BooleanArray -> Arrays.hashCode(this)
@@ -93,20 +126,37 @@ fun Any?.deepHash(): Int {
     }
 }
 
+/**
+ * Returns array hash code of [args].
+ */
 fun arrayHash(vararg args: Any?): Int {
     return args.contentHashCode()
 }
 
+/**
+ * Returns deep array hash code of [args].
+ */
 fun deepHash(vararg args: Any?): Int {
     return args.contentDeepHashCode()
 }
 
-//ToString:
+/**
+ * Returns identity hash code with [System.identityHashCode].
+ */
+fun Any?.idHashCode(): Int {
+    return System.identityHashCode(this)
+}
 
+/**
+ * Returns `toString` of [this].
+ */
 fun Any?.toString(): String {
     return this.toStringKt()
 }
 
+/**
+ * Returns `toString` of [this], or array `toString` if this is an array.
+ */
 fun Any?.arrayToString(): String {
     return when (this) {
         is BooleanArray -> Arrays.toString(this)
@@ -122,6 +172,11 @@ fun Any?.arrayToString(): String {
     }
 }
 
+/**
+ * Returns `toString` of [this],
+ * or array `toString` if this is an array,
+ * or deep array `toString` if this is a deep array.
+ */
 fun Any?.deepToString(): String {
     return when (this) {
         is BooleanArray -> Arrays.toString(this)
@@ -137,6 +192,9 @@ fun Any?.deepToString(): String {
     }
 }
 
+/**
+ * If [this] is a [CharSequence], return itself; else return `toString` of this.
+ */
 fun Any?.toCharSeq(): CharSequence {
     return if (this is CharSequence)
         this

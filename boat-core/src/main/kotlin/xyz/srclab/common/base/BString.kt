@@ -4,9 +4,9 @@ package xyz.srclab.common.base
 
 import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.StringUtils
+import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-import java.util.*
 import java.util.function.Supplier
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -194,14 +194,14 @@ fun CharSequence.uncapitalize(): String {
  * Returns the [String] of which chars were converted to lower case.
  */
 fun CharSequence.lowerCase(): String {
-    return this.toString().lowercase(Locale.ENGLISH)
+    return this.toString().lowercase(defaultLocale())
 }
 
 /**
  * Returns the [String] of which chars were converted to upper case.
  */
 fun CharSequence.upperCase(): String {
-    return this.toString().uppercase(Locale.ENGLISH)
+    return this.toString().uppercase(defaultLocale())
 }
 
 /**
@@ -451,6 +451,18 @@ fun CharSequence.removeIfEndWith(suffix: CharSequence): String {
 }
 
 /**
+ * Returns sub char sequence of [this].
+ *
+ * If [startIndex] is 0 and [endIndex] is length of this, return itself; else return a [CharsRef].
+ */
+fun CharSequence.subChars(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
+    if (startIndex == 0 && endIndex == this.length) {
+        return this
+    }
+    return this.charsRef(startIndex, endIndex)
+}
+
+/**
  * Puts and returns each char of [this] into a [Collection].
  */
 fun <C : MutableCollection<in Char>> CharSequence.toCollection(destination: C): C {
@@ -491,6 +503,9 @@ interface CharsRef : CharSequence {
 
     companion object {
 
+        /**
+         * Returns a [CharsRef] of [this] from [startIndex] inclusive to [endIndex] exclusive.
+         */
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
@@ -499,6 +514,9 @@ interface CharsRef : CharSequence {
             return CharSeqRef(this, startIndex, endIndex)
         }
 
+        /**
+         * Returns a [CharsRef] of [this] from [startIndex] inclusive to [endIndex] exclusive.
+         */
         @JvmName("of")
         @JvmOverloads
         @JvmStatic
@@ -507,20 +525,26 @@ interface CharsRef : CharSequence {
             return CharArrayRef(this, startIndex, endIndex)
         }
 
+        /**
+         * Returns a [CharsRef] of [this] offset at [offset] and length is [length].
+         */
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun CharSequence.stringRefByOffset(
+        fun CharSequence.charsRefOffset(
             offset: Int = 0,
             length: Int = remainingLength(this.length, offset)
         ): CharsRef {
             return charsRef(offset, offset + length)
         }
 
+        /**
+         * Returns a [CharsRef] of [this] offset at [offset] and length is [length].
+         */
         @JvmName("offset")
         @JvmOverloads
         @JvmStatic
-        fun CharArray.stringRefByOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsRef {
+        fun CharArray.charsRefOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsRef {
             return charsRef(offset, offset + length)
         }
 
@@ -593,6 +617,9 @@ interface LazyString : CharSequence {
 
     companion object {
 
+        /**
+         * Returns a [LazyString] supplied by [supplier].
+         */
         @JvmStatic
         fun of(supplier: Supplier<Any?>): LazyString {
             return LazyStringImpl(supplier)
