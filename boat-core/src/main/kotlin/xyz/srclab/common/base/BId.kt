@@ -104,7 +104,7 @@ open class SnowflakeId {
      */
     @Synchronized
     open fun next(): Long {
-        val startTime = epochMillis()
+        val startTime = currentMillis()
         var timestamp = startTime
         do {
             //Clock moved backwards
@@ -121,7 +121,7 @@ open class SnowflakeId {
             //Overflow
             if (nextSequence == 0L) {
                 sleep(1)
-                timestamp = epochMillis()
+                timestamp = currentMillis()
                 if (timestamp - startTime > maxWaitTimeMilli) {
                     throw IllegalStateException("Sequence overflow.")
                 }

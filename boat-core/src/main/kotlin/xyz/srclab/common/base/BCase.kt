@@ -8,10 +8,10 @@ import java.util.*
 import java.util.function.Function
 
 @JvmField
-val LOWER_CAMEL: NamingCase = lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOWER_STARTS_WITH_LOWER)
+val LOWER_CAMEL: NamingCase = lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOW_START_LOWER)
 
 @JvmField
-val UPPER_CAMEL: NamingCase = upperCamelCase(CamelCase.NonLetterPolicy.FOLLOWER_STARTS_WITH_LOWER)
+val UPPER_CAMEL: NamingCase = upperCamelCase(CamelCase.NonLetterPolicy.FOLLOW_START_LOWER)
 
 @JvmField
 val LOWER_UNDERSCORE: NamingCase = separatorCase("_") { it.lowerCase() }
@@ -273,15 +273,25 @@ abstract class CamelCase : NamingCase {
         /**
          * Case of non-letter will follow the former, or lower if at the beginning.
          */
-        FOLLOWER_STARTS_WITH_LOWER,
+        FOLLOW_START_LOWER,
 
         /**
          * Case of non-letter will follow the former, or upper if at the beginning.
          */
-        FOLLOWER_STARTS_WITH_UPPER,
+        FOLLOW_START_UPPER,
+
+        /**
+         * Case of non-letter will be contrary to the former, or lower if at the beginning.
+         */
+        CONTRARY_START_LOWER,
+
+        /**
+         * Case of non-letter will be contrary to the former, or upper if at the beginning.
+         */
+        CONTRARY_START_UPPER,
         ;
 
-        fun isLowerLetter(c: Char, index: Int, isLastLower: Boolean): Boolean {
+        fun isLowerLetter(c: Char, index: Int, isLastLower: Boolean, isLastLetter: Boolean): Boolean {
             if (c in 'a'..'z') {
                 return true
             }
@@ -290,13 +300,14 @@ abstract class CamelCase : NamingCase {
             }
             if (index == 0) {
                 return when (this) {
-                    AS_LOWER, FOLLOWER_STARTS_WITH_LOWER -> true
-                    AS_UPPER, FOLLOWER_STARTS_WITH_UPPER -> false
+                    AS_LOWER, FOLLOW_START_LOWER,CONTRARY_START_LOWER -> true
+                    AS_UPPER, FOLLOW_START_UPPER,CONTRARY_START_UPPER -> false
                 }
             }
             return when (this) {
                 AS_LOWER -> true
                 AS_UPPER -> false
+                FOLLOW_START_LOWER, FOLLOW_START_UPPER -> isLastLower
                 else -> isLastLower
             }
         }
