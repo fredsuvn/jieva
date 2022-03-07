@@ -42,7 +42,7 @@ public class BEncodeTest {
         //Test output stream
         BytesAppender out = new BytesAppender();
         BEncode.base64(BIO.asInputStream(rd1.getBytes(BDefault.charset())), out);
-        String outBase64String = BString.to8BitString(out.toBytes());
+        String outBase64String = BString.toString8Bit(out.toBytes());
         BLog.info("outBase64String: {}", outBase64String);
         Assert.assertEquals(outBase64String, rd1Base64);
     }

@@ -193,14 +193,14 @@ fun CharSequence.uncapitalize(): String {
 /**
  * Returns the [String] of which chars were converted to lower case.
  */
-fun CharSequence.lowercase(): String {
+fun CharSequence.lowerCase(): String {
     return this.toString().lowercase(Locale.ENGLISH)
 }
 
 /**
  * Returns the [String] of which chars were converted to upper case.
  */
-fun CharSequence.uppercase(): String {
+fun CharSequence.upperCase(): String {
     return this.toString().uppercase(Locale.ENGLISH)
 }
 

@@ -1,6 +1,5 @@
 package xyz.srclab.common.net.http
 
-import xyz.srclab.common.base.charset
 import xyz.srclab.common.base.defaultBufferSize
 import xyz.srclab.common.base.defaultCharset
 import xyz.srclab.common.io.asInputStream
@@ -56,7 +55,7 @@ object JDK8HttpClient : HttpClient {
                 it.status = status
                 it.headers = conn.headerFields
                 it.body = if (readAll) conn.inputStream.readBytes().asInputStream() else conn.inputStream
-                it.charset = charset?.charset() ?: defaultCharset()
+                it.charset = if (charset !== null) charset(charset) else defaultCharset()
                 it
             }
         }

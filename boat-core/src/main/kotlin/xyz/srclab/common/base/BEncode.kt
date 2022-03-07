@@ -31,7 +31,7 @@ fun getDeBase64Length(base64Size: Long): Long {
 
 @JvmOverloads
 fun CharSequence.base64(charset: Charset = defaultCharset()): String {
-    return this.getBytes(charset).base64().to8BitString()
+    return this.charsToBytes(charset).base64().bytesToString8Bit()
 }
 
 fun ByteArray.base64(): ByteArray {
@@ -65,7 +65,7 @@ fun InputStream.base64(output: OutputStream): Long {
 
 @JvmOverloads
 fun CharSequence.deBase64(charset: Charset = defaultCharset()): String {
-    return this.to8BitBytes().deBase64().getString(charset)
+    return this.charsToBytes8Bit().deBase64().bytesToString(charset)
 }
 
 fun ByteArray.deBase64(): ByteArray {

@@ -20,14 +20,18 @@ public class BStringTest {
     }
 
     @Test
-    public void testStringRef() {
+    public void testCharsRef() {
         char[] cs = {'0', '1', '2', '3'};
-        CharsRef sr = CharsRef.of(cs);
-        Assert.assertEquals(sr.charAt(1), '1');
+        CharsRef cr = CharsRef.of(cs);
+        Assert.assertEquals(cr.charAt(1), '1');
         cs[1] = '6';
-        Assert.assertEquals(sr.charAt(1), '6');
-        Assert.assertEquals(sr.subSequence(2, 4).toString(), CharsRef.of(cs, 2).toString());
-        Assert.assertEquals(sr.toString(), "0623");
+        Assert.assertEquals(cr.charAt(1), '6');
+        Assert.assertEquals(cr.subSequence(2, 4).toString(), CharsRef.of(cs, 2).toString());
+        Assert.assertEquals(cr.toString(), "0623");
+        CharsRef cr2 = CharsRef.of(cr);
+        Assert.assertEquals(cr2.charAt(1), '6');
+        Assert.assertEquals(cr2.subSequence(2, 4).toString(), CharsRef.of(cr2, 2).toString());
+        Assert.assertEquals(cr2.toString(), "0623");
     }
 
     @Test
@@ -47,8 +51,8 @@ public class BStringTest {
     @Test
     public void test8Bit() {
         String randomString = BRandom.randomString(100);
-        byte[] bytes = BString.to8BitBytes(randomString);
-        byte[] bytes2 = BString.to8BitBytes(randomString.toCharArray());
+        byte[] bytes = BString.toBytes8Bit(randomString);
+        byte[] bytes2 = BString.toBytes8Bit(randomString.toCharArray());
         byte[] expectedBytes = new byte[100];
         for (int i = 0; i < expectedBytes.length; i++) {
             expectedBytes[i] = (byte) randomString.charAt(i);
@@ -61,7 +65,7 @@ public class BStringTest {
         }
         Assert.assertEquals(randomString, new String(expectedChars));
         Assert.assertEquals(
-            BString.to8BitChars(bytes),
+            BString.toChars8Bit(bytes),
             randomString.toCharArray()
         );
     }

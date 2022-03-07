@@ -2,9 +2,9 @@
 
 package xyz.srclab.common.io
 
+import xyz.srclab.common.base.bytesToString
 import xyz.srclab.common.base.checkInBounds
 import xyz.srclab.common.base.defaultCharset
-import xyz.srclab.common.base.getString
 import xyz.srclab.common.base.remainingLength
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
@@ -42,11 +42,11 @@ fun ByteBuffer.getString(length: Int = this.remaining(), charset: Charset = defa
     if (this.hasArray()) {
         val array = this.array()
         val arrayOffset = this.arrayOffset() + this.position()
-        val result = array.getString(arrayOffset, length, charset)
+        val result = array.bytesToString(arrayOffset, length, charset)
         this.position(this.position() + length)
         return result
     }
-    return getBytes(length).getString(charset)
+    return getBytes(length).bytesToString(charset)
 }
 
 fun ByteBuffer.getString(charset: Charset): String {

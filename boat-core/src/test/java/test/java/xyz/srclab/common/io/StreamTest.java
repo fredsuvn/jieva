@@ -101,7 +101,7 @@ public class StreamTest {
         bytesAppender.append('a');
         bytesAppender.append(ByteBuffer.wrap(new byte[]{'b', 'c'}));
         bytesAppender.append(new byte[]{'d', 'e'}, 1);
-        Assert.assertEquals(BString.to8BitString(bytesAppender.toBytes()), "abce");
+        Assert.assertEquals(BString.toString8Bit(bytesAppender.toBytes()), "abce");
     }
 
     @Test
