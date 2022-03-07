@@ -9,6 +9,8 @@ import xyz.srclab.common.utils.SemVer.Companion.parseSemVer
 object Boat {
 
     private val buildInfos: Map<String, String> = "META-INF/build.properties".loadResourceProperties()
+    private val serialVersion: Long = buildInfos["build.serial.version"]!!.toLong()
+    private val version: SemVer = buildInfos["build.version"]!!.parseSemVer()
 
     private val sunqian = Author(
         "Sun Qian",
@@ -22,19 +24,9 @@ object Boat {
         "https://github.com/srclab-projects"
     )
 
-    @JvmField
-    val NAME: String = "Boat"
-
-    @JvmField
-    val VERSION: SemVer = buildInfos["build.version"]!!.parseSemVer()
-
-    @JvmField
-    val SERIAL_VERSION: Long = buildInfos["build.serial.version"]!!.toLong()
-
-    @JvmField
-    val ABOUT: About = About(
+    private val about: About = About(
         "Boat",
-        VERSION.toString(),
+        version.toString(),
         listOf(sunqian, srclab),
         srclab.mail,
         "https://github.com/srclab-projects/boat",
@@ -43,9 +35,37 @@ object Boat {
         "© 2021 SrcLab"
     )
 
-    @JvmField
-    val SECRET_CODES: List<String> = listOf(
+    /**
+     * Returns name of this lib.
+     */
+    @JvmStatic
+    fun name(): String = "Boat"
+
+    /**
+     * Returns current version of boat.
+     */
+    @JvmStatic
+    fun version(): SemVer = version
+
+    /**
+     * Returns about info of boat.
+     */
+    @JvmStatic
+    fun about(): About = about
+
+    /**
+     * Returns serial version for current boat version.
+     */
+    @JvmStatic
+    fun serialVersion(): Long = serialVersion
+
+    private val secretCodes: List<String> = listOf(
         "Thank you, Taro.",
         "谢谢你，泰罗。",
     )
+
+    /**
+     * WOW!
+     */
+    fun secretCodes(): List<String> = secretCodes
 }
