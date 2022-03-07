@@ -1,6 +1,7 @@
 package xyz.srclab.common.convert
 
 import xyz.srclab.common.base.*
+import xyz.srclab.common.base.ParsedDate.Companion.toParsedDate
 import xyz.srclab.common.bean.BeanCreator
 import xyz.srclab.common.bean.BeanResolver
 import xyz.srclab.common.bean.copyProperties
@@ -14,7 +15,7 @@ import java.math.BigInteger
 import java.nio.charset.Charset
 import java.time.*
 import java.time.temporal.Temporal
-import java.time.temporal.TemporalAdjuster
+import java.time.temporal.TemporalAccessor
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -159,7 +160,7 @@ open class StringConvertHandler @JvmOverloads constructor(
  * * [Number];
  */
 open class NumberBooleanConvertHandler @JvmOverloads constructor(
-    private val radix: Int = DEFAULT_RADIX
+    private val radix: Int = defaultRadix()
 ) : ConvertHandler {
     override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (toType !is Class<*>) {
@@ -191,7 +192,7 @@ open class NumberBooleanConvertHandler @JvmOverloads constructor(
  * * [Duration], [Temporal];
  */
 open class DateTimeConvertHandler @JvmOverloads constructor(
-    private val pattern: DatePattern = TIMESTAMP_PATTERN
+    private val pattern: DatePattern = defaultTimestampPattern()
 ) : ConvertHandler {
     override fun convert(from: Any?, fromType: Type, toType: Type, context: ConvertContext): Any? {
         if (from === null) {
@@ -200,16 +201,26 @@ open class DateTimeConvertHandler @JvmOverloads constructor(
         if (toType !is Class<*>) {
             return null
         }
+        if (toType == Duration::class.java) {
+            if (from is Duration) {
+                return from
+            }
+            Duration.ofMillis(from.toLong())
+        }
+        val parsedDate = when (from) {
+            is Date -> from.toParsedDate()
+            is TemporalAccessor -> from.toParsedDate()
+            else -> from.toString().toParsedDate(pattern)
+        }
         return when (toType) {
-            Date::class.java -> pattern.parseDate(from)
-            Instant::class.java -> pattern.parseInstant(from)
-            LocalDateTime::class.java -> pattern.parseLocalDateTime(from)
-            ZonedDateTime::class.java -> pattern.parseZonedDateTime(from)
-            OffsetDateTime::class.java -> pattern.parseOffsetDateTime(from)
-            LocalDate::class.java -> pattern.parseLocalDate(from)
-            LocalTime::class.java -> pattern.parseLocalTime(from)
-            Duration::class.java -> Duration.ofMillis(from.toLong())
-            Temporal::class.java, TemporalAdjuster::class.java -> pattern.parseTemporalAccessor(from)
+            Date::class.java -> parsedDate.toDate()
+            Instant::class.java -> parsedDate.toInstant()
+            LocalDateTime::class.java -> parsedDate.toLocalDateTime()
+            ZonedDateTime::class.java -> parsedDate.toZonedDateTime()
+            OffsetDateTime::class.java -> parsedDate.toOffsetDateTime()
+            LocalDate::class.java -> parsedDate.toLocalDate()
+            LocalTime::class.java -> parsedDate.toLocalTime()
+            TemporalAccessor::class.java -> parsedDate.toTemporal()
             else -> null
         }
     }

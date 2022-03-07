@@ -62,11 +62,11 @@ public class BCaseTest {
             "upper_2_camel"
         );
         Assert.assertEquals(
-            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOWER_STARTS_WITH_LOWER).convert("2upper2Camel", BCase.LOWER_UNDERSCORE),
+            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOW_START_LOWER).convert("2upper2Camel", BCase.LOWER_UNDERSCORE),
             "2upper2_camel"
         );
         Assert.assertEquals(
-            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOWER_STARTS_WITH_UPPER).convert("2upper2Camel", BCase.LOWER_UNDERSCORE),
+            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOW_START_UPPER).convert("2upper2Camel", BCase.LOWER_UNDERSCORE),
             "2upper2_camel"
         );
         Assert.assertEquals(

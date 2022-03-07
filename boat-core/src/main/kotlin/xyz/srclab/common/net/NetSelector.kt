@@ -1,6 +1,6 @@
 package xyz.srclab.common.net
 
-import xyz.srclab.common.base.epochMillis
+import xyz.srclab.common.base.currentMillis
 import java.nio.channels.ClosedSelectorException
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
@@ -52,7 +52,7 @@ interface NetSelector {
                 var selectCount = selector.select()
                 println("selectCount>>>>>>>>> $selectCount")
                 while (selectCount == 0) {
-                    val now = epochMillis()
+                    val now = currentMillis()
                     if (now == lastEmptySelectTime) {
                         emptySelectCount++
                         if (emptySelectCount >= emptySelectThreshold) {

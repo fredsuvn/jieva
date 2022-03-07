@@ -2,8 +2,10 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import xyz.srclab.common.base.BDefault;
 import xyz.srclab.common.base.BTime;
 import xyz.srclab.common.base.DatePattern;
+import xyz.srclab.common.base.ParsedDate;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,8 +21,8 @@ public class BTimeTest {
     @Test
     public void testTime() {
         String timestamp = BTime.currentTimestamp();
-        LocalDateTime now = LocalDateTime.from(BTime.TIMESTAMP_PATTERN.toFormatter().parse(timestamp));
-        Assert.assertEquals(DateTimeFormatter.ofPattern(BTime.TIMESTAMP_PATTERN.getPattern()).format(now), timestamp);
+        LocalDateTime now = LocalDateTime.from(BDefault.timestampPattern().formatter().parse(timestamp));
+        Assert.assertEquals(DateTimeFormatter.ofPattern(BDefault.timestampPattern().getPattern()).format(now), timestamp);
         Assert.assertEquals(BTime.toInstant(now), now.atZone(ZoneId.systemDefault()).toInstant());
         Assert.assertEquals(BTime.toDate(now), Date.from(BTime.toInstant(now)));
         Assert.assertEquals(BTime.toLocalDate(now), now.toLocalDate());
@@ -43,12 +45,20 @@ public class BTimeTest {
         DatePattern pattern = DatePattern.of("yyyy-MM-dd hh:mm:ss");
         String date = "2021-09-16 03:00:18";
         Assert.assertEquals(
-            BTime.toLocalDateTime(pattern.parseTemporalAccessor(date)),
+            BTime.toLocalDateTime(pattern.parseTemporal(date)),
             LocalDateTime.of(2021, 9, 16, 3, 0, 18)
         );
         Assert.assertEquals(
-            BTime.toZonedDateTime(pattern.parseTemporalAccessor(date)),
+            BTime.toZonedDateTime(pattern.parseTemporal(date)),
             ZonedDateTime.of(LocalDateTime.of(2021, 9, 16, 3, 0, 18), ZoneId.systemDefault())
         );
+    }
+
+    @Test
+    public void testParsedDate() {
+        String time = "20220307171330007";
+        ParsedDate parsedDate = ParsedDate.of(time);
+        LocalDateTime localDateTime = LocalDateTime.of(2022, 3, 7, 17, 13, 30, 7_000_000);
+        Assert.assertEquals(parsedDate.toLocalDateTime(), localDateTime);
     }
 }

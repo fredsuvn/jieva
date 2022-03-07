@@ -1,6 +1,6 @@
 package xyz.srclab.common.cache
 
-import xyz.srclab.common.base.epochMillis
+import xyz.srclab.common.base.currentMillis
 import java.util.*
 import java.util.function.Supplier
 
@@ -141,7 +141,7 @@ interface Pool<T : Any> {
                 var count = 0
                 val extSize = extNodes.size
                 var findOne = false
-                val now = epochMillis()
+                val now = currentMillis()
                 while (count < extSize) {
                     val node = extNodes.pollFirst()
                     if (node === null) {
@@ -191,7 +191,7 @@ interface Pool<T : Any> {
             ) : Node<T> {
                 override fun release() {
                     inUse = false
-                    lastReleaseMillis = epochMillis()
+                    lastReleaseMillis = currentMillis()
                 }
             }
 

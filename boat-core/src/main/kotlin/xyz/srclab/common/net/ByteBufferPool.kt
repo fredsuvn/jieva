@@ -1,7 +1,7 @@
 package xyz.srclab.common.net
 
 import xyz.srclab.common.base.defaultBufferSize
-import xyz.srclab.common.base.epochMillis
+import xyz.srclab.common.base.currentMillis
 import xyz.srclab.common.io.newByteBuffer
 import xyz.srclab.common.net.PooledByteBuffer.Companion.asPooledByteBuffer
 import java.nio.ByteBuffer
@@ -98,14 +98,14 @@ interface ByteBufferPool {
                     extNode = newNode
                     extNode!!.next = newNode
                     extSize = 1
-                    lastUseExtTime = epochMillis()
+                    lastUseExtTime = currentMillis()
                     return newNode
                 }
                 val curExt = extNode!!
                 if (!curExt.inUse) {
                     curExt.inUse = true
                     extNode = curExt.next!!
-                    lastUseExtTime = epochMillis()
+                    lastUseExtTime = currentMillis()
                     return curExt
                 }
                 extNode = extNode!!.next!!
@@ -114,7 +114,7 @@ interface ByteBufferPool {
                         val node = extNode!!
                         node.inUse = true
                         extNode = node.next!!
-                        lastUseExtTime = epochMillis()
+                        lastUseExtTime = currentMillis()
                         return node
                     }
                     extNode = extNode!!.next!!
@@ -123,11 +123,11 @@ interface ByteBufferPool {
                     val newNode = BufferNode(newByteBuffer(bufferSize, false), true)
                     newNode.next = extNode!!.next
                     extNode!!.next = newNode
-                    lastUseExtTime = epochMillis()
+                    lastUseExtTime = currentMillis()
                     extSize++
                     return newNode
                 }
-                lastUseExtTime = epochMillis()
+                lastUseExtTime = currentMillis()
 
                 //Using heap buffer if node not enough.
                 val buffer = newByteBuffer(bufferSize, false)
@@ -135,7 +135,7 @@ interface ByteBufferPool {
             }
 
             private fun tryReleaseExt() {
-                if (extSize > 0 && epochMillis() - lastUseExtTime > bufferKeepAliveMillis) {
+                if (extSize > 0 && currentMillis() - lastUseExtTime > bufferKeepAliveMillis) {
                     extNode = null
                     extSize = 0
                 }

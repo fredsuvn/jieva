@@ -328,7 +328,7 @@ interface TcpClient {
                 dest: ByteBuffer,
                 readTimeoutMillis: Long
             ): Int {
-                val startTime = epochMillis()
+                val startTime = currentMillis()
                 while (true) {
                     val readyChannels = selector.select(readTimeoutMillis)
                     if (readyChannels == 0) {
@@ -344,7 +344,7 @@ interface TcpClient {
                             return socketChannel.read(dest)
                         }
                     }
-                    val now = epochMillis()
+                    val now = currentMillis()
                     if (now - startTime > readTimeoutMillis) {
                         throw IllegalStateException("Receive timeout in $timeoutMillis millis: $remoteAddress")
                     }

@@ -677,3 +677,251 @@ interface DatePattern {
         }
     }
 }
+
+/**
+ * Represents a parsed date which can be used to convert to any date time types.
+ */
+interface ParsedDate {
+
+    /**
+     * Formats to string.
+     */
+    fun format(pattern: DatePattern): String
+
+    /**
+     * Converts to [Date].
+     */
+    fun toDate(): Date
+
+    /**
+     * Converts to [Date], or null if failed.
+     */
+    fun toDateOrNull(): Date?
+
+    /**
+     * Converts to [TemporalAccessor].
+     */
+    fun toTemporal(): TemporalAccessor
+
+    /**
+     * Converts to [TemporalAccessor], or null if failed.
+     */
+    fun toTemporalOrNull(): TemporalAccessor?
+
+    /**
+     * Converts to [Instant].
+     */
+    fun toInstant(): Instant {
+        return toTemporal().toInstant()
+    }
+
+    /**
+     * Converts to [Instant], or null if failed.
+     */
+    fun toInstantOrNull(): Instant? {
+        return toTemporalOrNull()?.toInstantOrNull()
+    }
+
+    /**
+     * Converts to [ZonedDateTime].
+     */
+    fun toZonedDateTime(): ZonedDateTime {
+        return toTemporal().toZonedDateTime()
+    }
+
+    /**
+     * Converts to [ZonedDateTime], or null if failed.
+     */
+    fun toZonedDateTimeOrNull(): ZonedDateTime? {
+        return toTemporalOrNull()?.toZonedDateTimeOrNull()
+    }
+
+    /**
+     * Converts to [OffsetDateTime].
+     */
+    fun toOffsetDateTime(): OffsetDateTime {
+        return toTemporal().toOffsetDateTime()
+    }
+
+    /**
+     * Converts to [OffsetDateTime], or null if failed.
+     */
+    fun toOffsetDateTimeOrNull(): OffsetDateTime? {
+        return toTemporalOrNull()?.toOffsetDateTimeOrNull()
+    }
+
+    /**
+     * Converts to [LocalDateTime].
+     */
+    fun toLocalDateTime(): LocalDateTime {
+        return toTemporal().toLocalDateTime()
+    }
+
+    /**
+     * Converts to [LocalDateTime], or null if failed.
+     */
+    fun toLocalDateTimeOrNull(): LocalDateTime? {
+        return toTemporalOrNull()?.toLocalDateTimeOrNull()
+    }
+
+    /**
+     * Converts to [LocalDate].
+     */
+    fun toLocalDate(): LocalDate {
+        return toTemporal().toLocalDate()
+    }
+
+    /**
+     * Converts to [LocalDate], or null if failed.
+     */
+    fun toLocalDateOrNull(): LocalDate? {
+        return toTemporalOrNull()?.toLocalDateOrNull()
+    }
+
+    /**
+     * Converts to [LocalTime].
+     */
+    fun toLocalTime(): LocalTime {
+        return toTemporal().toLocalTime()
+    }
+
+    /**
+     * Converts to [LocalTime], or null if failed.
+     */
+    fun toLocalTimeOrNull(): LocalTime? {
+        return toTemporalOrNull()?.toLocalTimeOrNull()
+    }
+
+    companion object {
+
+        /**
+         * Parses and returns [ParsedDate] from [this].
+         */
+        @JvmName("of")
+        @JvmStatic
+        fun Date.toParsedDate(): ParsedDate {
+            return OfDate(this)
+        }
+
+        /**
+         * Parses and returns [ParsedDate] from [this].
+         */
+        @JvmName("of")
+        @JvmStatic
+        fun TemporalAccessor.toParsedDate(): ParsedDate {
+            return OfTemporal(this)
+        }
+
+        /**
+         * Parses and returns [ParsedDate] from [this].
+         */
+        @JvmName("of")
+        @JvmOverloads
+        @JvmStatic
+        fun CharSequence.toParsedDate(pattern: DatePattern = defaultTimestampPattern()): ParsedDate {
+            return OfChars(this, pattern)
+        }
+
+        private class OfDate(private val date: Date) : ParsedDate {
+            override fun format(pattern: DatePattern): String {
+                return pattern.format(date)
+            }
+
+            override fun toDate(): Date {
+                return date
+            }
+
+            override fun toDateOrNull(): Date {
+                return toDate()
+            }
+
+            override fun toTemporal(): TemporalAccessor {
+                return date.toInstant()
+            }
+
+            override fun toTemporalOrNull(): TemporalAccessor {
+                return toTemporal()
+            }
+        }
+
+        private class OfTemporal(private val temporal: TemporalAccessor) : ParsedDate {
+            override fun format(pattern: DatePattern): String {
+                return pattern.format(temporal)
+            }
+
+            override fun toDate(): Date {
+                return Date.from(temporal.toInstant())
+            }
+
+            override fun toDateOrNull(): Date? {
+                val instant = temporal.toInstantOrNull()
+                return if (instant === null) null else Date.from(instant)
+            }
+
+            override fun toTemporal(): TemporalAccessor {
+                return temporal
+            }
+
+            override fun toTemporalOrNull(): TemporalAccessor {
+                return toTemporal()
+            }
+        }
+
+        private class OfChars(chars: CharSequence, pattern: DatePattern) : ParsedDate {
+
+            private val temporal: TemporalAccessor?
+            private val date: Date?
+
+            init {
+                temporal = try {
+                    pattern.parseTemporal(chars)
+                } catch (e: Exception) {
+                    null
+                }
+                date = try {
+                    pattern.parseDate(chars)
+                } catch (e: Exception) {
+                    null
+                }
+                if (temporal === null && date === null) {
+                    throw DateTimeException("Cannot parse $chars to pattern: $pattern")
+                }
+            }
+
+            override fun format(pattern: DatePattern): String {
+                if (temporal !== null) {
+                    return pattern.format(temporal)
+                }
+                return pattern.format(date!!)
+            }
+
+            override fun toDate(): Date {
+                if (date !== null) {
+                    return date
+                }
+                return temporal!!.toDate()
+            }
+
+            override fun toDateOrNull(): Date? {
+                if (date !== null) {
+                    return date
+                }
+                return temporal?.toDateOrNull()
+            }
+
+            override fun toTemporal(): TemporalAccessor {
+                if (temporal !== null) {
+                    return temporal
+                }
+                return date!!.toInstant()
+            }
+
+            override fun toTemporalOrNull(): TemporalAccessor? {
+                if (temporal !== null) {
+                    return temporal
+                }
+                return date?.toInstant()
+            }
+        }
+    }
+}
