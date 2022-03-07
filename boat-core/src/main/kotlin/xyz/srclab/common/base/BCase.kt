@@ -132,10 +132,10 @@ interface NamingCase {
         companion object {
 
             /**
-             * Name itself as a [Words].
+             * Returns the single word: source itself.
              */
             @JvmStatic
-            fun <T : CharSequence> nameSelf(source: T): Words<T> {
+            fun <T : CharSequence> of(source: T): Words<T> {
                 return object : Words<T> {
                     override val source: T = source
                     override val wordList: List<CharSequence> = emptyList()
@@ -143,6 +143,9 @@ interface NamingCase {
                 }
             }
 
+            /**
+             * Returns the words built from [source], [splitList] and [splitCharCount].
+             */
             @JvmStatic
             fun <T : CharSequence> of(source: T, splitList: List<CharSequence>, splitCharCount: Int): Words<T> {
                 return object : Words<T> {
@@ -156,19 +159,46 @@ interface NamingCase {
 }
 
 /**
- * Camel-Case class.
+ * Camel-Case implementation of [NamingCase].
  */
-abstract class CamelCase : NamingCase {
-
-    protected abstract fun isLowerLetter(c: Char, index: Int, isLastLower: Boolean): Boolean
-
-    protected abstract fun doFirstWord(firstWord: CharSequence): CharSequence
+open class CamelCase @JvmOverloads constructor(
+    private val capitalized: Boolean,
+    private val nonLetterCasePolicy: NonLetterCasePolicy = NonLetterCasePolicy.CONTRARY
+) : NamingCase {
 
     override fun <T : CharSequence> split(name: T): NamingCase.Words<T> {
 
         val length = name.length
         if (length <= 1) {
-            return NamingCase.Words.nameSelf(name)
+            return NamingCase.Words.of(name)
+        }
+
+        fun isSameCase(c1: Char, c2: Char): Boolean {
+            if (c1.isLowerCase()) {
+                if (c2.isLowerCase()) {
+                    return true
+                }
+                if (c2.isUpperCase()) {
+                    return false
+                }
+                return nonLetterCasePolicy.isSameCaseLN()
+            } else if (c1.isUpperCase()) {
+                if (c2.isLowerCase()) {
+                    return false
+                }
+                if (c2.isUpperCase()) {
+                    return true
+                }
+                return nonLetterCasePolicy.isSameCaseUN()
+            } else {
+                if (c2.isLowerCase()) {
+                    return nonLetterCasePolicy.isSameCaseNL()
+                }
+                if (c2.isUpperCase()) {
+                    return nonLetterCasePolicy.isSameCaseNU()
+                }
+                return true
+            }
         }
 
         var splitList: MutableList<CharSequence>? = null
@@ -184,9 +214,19 @@ abstract class CamelCase : NamingCase {
         }
 
         var startIndex = 0
-        var isLastLower = true
-        for (i in name.indices) {
+        var lastChar = name[0]
+        var isLastLower =
+        var i = 1
+        while (i <name.length) {
             val c = name[i]
+            if (isSameCase(lastChar, c)) {
+                lastChar = c
+                i++
+                continue
+            }
+
+
+
             val isCurLower = isLowerLetter(c, i, isLastLower)
             if (i == startIndex) {
                 isLastLower = isCurLower
@@ -255,61 +295,106 @@ abstract class CamelCase : NamingCase {
         }
     }
 
+    private fun Char.isLowerLetter(): Boolean {
+        return this in 'a'..'z'
+    }
+
+    private fun Char.isUpperLetter(): Boolean {
+        return this in 'A'..'Z'
+    }
+
     /**
-     * Camel-Case policy for non-letter char.
+     * Camel-Case policy for non-letter chars.
      */
-    enum class NonLetterPolicy {
+    enum class NonLetterCasePolicy {
 
         /**
-         * Non-Letter will be seen as lower case.
+         * Non-Letter chars will be seen as lower case.
          */
         AS_LOWER,
 
         /**
-         * Non-Letter will be seen as upper case.
+         * Non-Letter chars will be seen as upper case.
          */
         AS_UPPER,
 
         /**
-         * Case of non-letter will follow the former, or lower if at the beginning.
+         * Letters and non-letter will be seen as same case if they are adjoined.
          */
-        FOLLOW_START_LOWER,
+        FOLLOWING,
 
         /**
-         * Case of non-letter will follow the former, or upper if at the beginning.
+         * Letters and non-letter will be seen as different case if they are adjoined.
          */
-        FOLLOW_START_UPPER,
-
-        /**
-         * Case of non-letter will be contrary to the former, or lower if at the beginning.
-         */
-        CONTRARY_START_LOWER,
-
-        /**
-         * Case of non-letter will be contrary to the former, or upper if at the beginning.
-         */
-        CONTRARY_START_UPPER,
+        CONTRARY,
         ;
 
-        fun isLowerLetter(c: Char, index: Int, isLastLower: Boolean, isLastLetter: Boolean): Boolean {
-            if (c in 'a'..'z') {
+        /**
+         * Returns whether two char are same case if a lower letter followed by a non-letter.
+         */
+        fun isSameCaseLN(): Boolean {
+            if (this === AS_LOWER) {
                 return true
             }
-            if (c in 'A'..'Z') {
+            if (this === AS_UPPER) {
                 return false
             }
-            if (index == 0) {
-                return when (this) {
-                    AS_LOWER, FOLLOW_START_LOWER,CONTRARY_START_LOWER -> true
-                    AS_UPPER, FOLLOW_START_UPPER,CONTRARY_START_UPPER -> false
-                }
+            if (this === FOLLOWING) {
+                return true
             }
-            return when (this) {
-                AS_LOWER -> true
-                AS_UPPER -> false
-                FOLLOW_START_LOWER, FOLLOW_START_UPPER -> isLastLower
-                else -> isLastLower
+            // CONTRARY
+            return false
+        }
+
+        /**
+         * Returns whether two char are same case if a upper letter followed by a non-letter.
+         */
+        fun isSameCaseUN(): Boolean {
+            if (this === AS_LOWER) {
+                return false
             }
+            if (this === AS_UPPER) {
+                return true
+            }
+            if (this === FOLLOWING) {
+                return true
+            }
+            // CONTRARY
+            return false
+        }
+
+        /**
+         * Returns whether two char are same case if a non-letter followed by a lower letter.
+         */
+        fun isSameCaseNL(): Boolean {
+            if (this === AS_LOWER) {
+                return true
+            }
+            if (this === AS_UPPER) {
+                return false
+            }
+            if (this === FOLLOWING) {
+                return true
+            }
+            // CONTRARY
+            return false
+        }
+
+        /**
+         * Returns whether two char are same case if a non-letter followed by a upper letter.
+         */
+        fun isSameCaseNU(): Boolean {
+            if (this === AS_LOWER) {
+                return false
+            }
+            if (this === AS_UPPER) {
+                return true
+            }
+            if (this === FOLLOWING) {
+                return true
+            }
+            // CONTRARY
+            return false
         }
     }
 }
