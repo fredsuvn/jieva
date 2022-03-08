@@ -68,6 +68,10 @@ public class BCaseTest {
             "0address"
         );
         Assert.assertEquals(
+            BCase.toCase("idA0123", BCase.lowerCamel(), BCase.lowerUnderscore()),
+            "id_a0123"
+        );
+        Assert.assertEquals(
             BCase.toCase("AA_BB", BCase.upperUnderscore(), toLowerUpperCamel),
             "AaBb"
         );
