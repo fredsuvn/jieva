@@ -74,7 +74,7 @@ fun CharSequence.loadResourceStringOrNull(
 fun CharSequence.loadResourceProperties(
     charset: Charset = defaultCharset(), classLoader: ClassLoader = defaultClassLoader()
 ): Map<String, String> {
-    return loadResource(classLoader).readProperties(charset)
+    return loadResource(classLoader).openStream().readProperties(charset)
 }
 
 @JvmName("loadPropertiesOrNull")
@@ -82,7 +82,7 @@ fun CharSequence.loadResourceProperties(
 fun CharSequence.loadResourcePropertiesOrNull(
     charset: Charset = defaultCharset(), classLoader: ClassLoader = defaultClassLoader()
 ): Map<String, String>? {
-    return loadResourceOrNull(classLoader)?.readProperties(charset)
+    return loadResourceOrNull(classLoader)?.openStream()?.readProperties(charset)
 }
 
 @JvmName("loadAll")
@@ -139,7 +139,7 @@ fun CharSequence.loadResourcePropertiesList(
     val enumeration = loadAll0(classLoader)
     val result = mutableListOf<Map<String, String>>()
     while (enumeration.hasMoreElements()) {
-        result.add(enumeration.nextElement().readProperties(charset))
+        result.add(enumeration.nextElement().openStream().readProperties(charset))
     }
     return result
 }

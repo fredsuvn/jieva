@@ -2,8 +2,6 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.reflect.canAssignedBy
-
 /**
  * Represents `less than` in compare.
  */
@@ -20,53 +18,10 @@ const val EQUAL_TO = 0
 const val GREATER_THAN = 1
 
 /**
- * [Comparator] of which arguments will be seen as [Comparable] type.
+ * Returns a [Comparator] for [this] comparable type.
  */
-@JvmField
-val CAST_COMPARABLE_COMPARATOR: Comparator<Comparable<*>> =
-    Comparator { o1, o2 ->
-        val c1: Comparable<Any?> = o1.asTyped()
-        val c2: Comparable<Any?> = o2.asTyped()
-        c1.compareTo(c2)
-    }
-
-/**
- * [Comparator] which compares the order in inheritance tree in natural order (low to high):
- *
- * * Parent type is greater than subtype;
- * * If there is no inheritance relationship in two classes, return 0;
- */
-@JvmField
-val CLASS_INHERITANCE_COMPARATOR: Comparator<Class<*>> =
-    Comparator { c1, c2 ->
-        if (c1.canAssignedBy(c2)) {
-            return@Comparator 1
-        }
-        if (c2.canAssignedBy(c1)) {
-            return@Comparator -1
-        }
-        0
-    }
-
-/**
- * Returns a [Comparator] of which arguments will be seen as [Comparable] type.
- *
- * @see CAST_COMPARABLE_COMPARATOR
- */
-fun <T> castComparableComparator(): Comparator<T> {
-    return CAST_COMPARABLE_COMPARATOR.asTyped()
-}
-
-/**
- * Returns a [Comparator] which compares the order in inheritance tree in natural order (low to high):
- *
- * * Parent type is greater than subtype;
- * * If there is no inheritance relationship in two classes, return 0;
- *
- * @see CLASS_INHERITANCE_COMPARATOR
- */
-fun <T> classInheritanceComparator(): Comparator<Class<T>> {
-    return CLASS_INHERITANCE_COMPARATOR.asTyped()
+fun <T : Comparable<Any?>> Class<out T>.comparator(): Comparator<T> {
+    return Comparator { o1, o2 -> o1.compareTo(o2) }
 }
 
 /**

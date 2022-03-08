@@ -258,8 +258,7 @@ fun <K, V, R, C : MutableCollection<in R>> Map<K, V>.flatMapTo(
     return this.flatMapToKt(destination, transform.asKotlinFun())
 }
 
-@JvmOverloads
-fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>> = castComparableComparator()): Map<K, V> {
+fun <K, V> Map<K, V>.sorted(comparator: Comparator<in Map.Entry<K, V>>): Map<K, V> {
     return this.entries.sortedWithKt(comparator).associateToKt(LinkedHashMap()) { it.key to it.value }
 }
 
@@ -385,4 +384,23 @@ fun <K, V> Map<K, List<V>>.toListMap(): ListMap<K, V> {
 
 fun <K, V> MutableMap<K, MutableList<V>>.toMutableListMap(): MutableListMap<K, V> {
     return MutableListMap(this) { LinkedList() }
+}
+
+/**
+ * Reads and converts all non-null keys and values to a string map.
+ */
+fun Map<*, *>.toStringMap(): Map<String, String> {
+    val map = HashMap<String, String>(this.size)
+    for (entry in this) {
+        val key = entry.key
+        if (key === null) {
+            continue
+        }
+        val value = entry.value
+        if (value === null) {
+            continue
+        }
+        map[key.toString()] = value.toString()
+    }
+    return map
 }

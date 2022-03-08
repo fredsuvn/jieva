@@ -223,8 +223,7 @@ fun <T> List<T>.slice(indices: IntRange): List<T> {
     return this.sliceKt(indices)
 }
 
-@JvmOverloads
-fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T> = castComparableComparator()): Int {
+fun <T> List<T>.binarySearch(element: T, comparator: Comparator<in T>): Int {
     return this.binarySearchKt(element, comparator)
 }
 

@@ -801,8 +801,7 @@ fun <T, K> Iterable<T>.distinct(selector: Function<in T, K>): List<T> {
     return this.distinctByKt(selector.asKotlinFun())
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.sorted(comparator: Comparator<in T> = castComparableComparator()): List<T> {
+fun <T> Iterable<T>.sorted(comparator: Comparator<in T>): List<T> {
     return this.sortedWithKt(comparator)
 }
 
@@ -822,23 +821,19 @@ fun <T> Iterable<T>.forEachIndexed(action: IndexedConsumer<in T>) {
     return this.forEachIndexedKt(action.asKotlinFun())
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.max(comparator: Comparator<in T> = castComparableComparator()): T {
+fun <T> Iterable<T>.max(comparator: Comparator<in T>): T {
     return maxOrNull(comparator) ?: throw NoSuchElementException()
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T> = castComparableComparator()): T? {
+fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T>): T? {
     return this.maxWithOrNullKt(comparator)
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.min(comparator: Comparator<in T> = castComparableComparator()): T {
+fun <T> Iterable<T>.min(comparator: Comparator<in T>): T {
     return minOrNull(comparator) ?: throw NoSuchElementException()
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T> = castComparableComparator()): T? {
+fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T>): T? {
     return this.minWithOrNullKt(comparator)
 }
 
@@ -862,14 +857,12 @@ fun <T> Iterable<T>.toLinkedHashSet(): LinkedHashSet<T> {
     return if (this is Collection<T>) this.toCollectionKt(LinkedHashSet(size)) else this.toCollectionKt(LinkedHashSet())
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T>? = null): SortedSet<T> {
-    return if (comparator === null) this.toSortedSetKt(castComparableComparator()) else this.toSortedSetKt(comparator)
+fun <T> Iterable<T>.toSortedSet(comparator: Comparator<in T>): SortedSet<T> {
+    return this.toSortedSetKt(comparator)
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.toTreeSet(comparator: Comparator<in T>? = null): TreeSet<T> {
-    return this.toCollectionKt(if (comparator === null) TreeSet() else TreeSet(comparator))
+fun <T> Iterable<T>.toTreeSet(comparator: Comparator<in T>): TreeSet<T> {
+    return TreeSet(comparator)
 }
 
 fun <T> Iterable<T>.toList(): List<T> {
@@ -912,13 +905,11 @@ fun <T> Iterable<T>.asToLinkedHashSet(): LinkedHashSet<T> {
     return if (this is LinkedHashSet<T>) this else toLinkedHashSet()
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.asToSortedSet(comparator: Comparator<in T>? = null): SortedSet<T> {
+fun <T> Iterable<T>.asToSortedSet(comparator: Comparator<in T>): SortedSet<T> {
     return if (this is SortedSet<T>) this else toSortedSet(comparator)
 }
 
-@JvmOverloads
-fun <T> Iterable<T>.asToTreeSet(comparator: Comparator<in T>? = null): TreeSet<T> {
+fun <T> Iterable<T>.asToTreeSet(comparator: Comparator<in T>): TreeSet<T> {
     return if (this is TreeSet<T>) this else toTreeSet(comparator)
 }
 

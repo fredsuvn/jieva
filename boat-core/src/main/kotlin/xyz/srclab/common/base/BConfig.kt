@@ -2,18 +2,24 @@
 
 package xyz.srclab.common.base
 
+import xyz.srclab.common.collect.toStringMap
 import java.io.File
 import java.io.InputStream
 import java.io.Reader
-import java.net.URL
 import java.nio.charset.Charset
 import java.util.*
 
+/**
+ * Reads and parses properties.
+ */
 @JvmOverloads
 fun InputStream.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
     return this.reader(charset).readProperties()
 }
 
+/**
+ * Reads and parses properties.
+ */
 fun Reader.readProperties(): Map<String, String> {
     val props = Properties()
     props.load(this)
@@ -22,22 +28,10 @@ fun Reader.readProperties(): Map<String, String> {
     return map
 }
 
+/**
+ * Reads and parses properties.
+ */
 @JvmOverloads
 fun File.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
     return this.reader(charset).readProperties()
-}
-
-@JvmOverloads
-fun URL.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
-    return this.openStream().readProperties(charset)
-}
-
-fun Properties.toStringMap(): Map<String, String> {
-    val result = mutableMapOf<String, String>()
-    for (mutableEntry in this) {
-        if (mutableEntry.key !== null || mutableEntry.value !== null) {
-            result[mutableEntry.key.toString()] = mutableEntry.value.toString()
-        }
-    }
-    return result
 }
