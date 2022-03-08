@@ -3,75 +3,73 @@ package test.java.xyz.srclab.common.base;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BCase;
+import xyz.srclab.common.base.BString;
 import xyz.srclab.common.base.CamelCase;
+import xyz.srclab.common.base.NamingCase;
 
 public class BCaseTest {
 
+    private static final NamingCase asUpperLowerCamel = new CamelCase(true, CamelCase.NonLetterPolicy.AS_UPPER);
+    private static final NamingCase separateLowerCamel = new CamelCase(true, CamelCase.NonLetterPolicy.SEPARATE);
+    private static final NamingCase toLowerUpperCamel = new CamelCase(true, BString::lowerCase);
+
     @Test
-    public void testNamingCase() {
+    public void testCase() {
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("UpperCamel", BCase.LOWER_CAMEL),
-            "upperCamel"
+            BCase.toCase("AaBb", BCase.upperCamel(), BCase.lowerCamel()),
+            "aaBb"
         );
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("UpperCamel", BCase.LOWER_HYPHEN),
-            "upper-camel"
+            BCase.toCase("AAaBb00a", BCase.upperCamel(), BCase.lowerCamel()),
+            "aAaBb00a"
         );
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("UpperCamel", BCase.LOWER_UNDERSCORE),
-            "upper_camel"
+            BCase.toCase("AAAaBb00a", BCase.upperCamel(), BCase.lowerCamel()),
+            "AAAaBb00a"
         );
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("AUpperCamel", BCase.LOWER_CAMEL),
-            "aUpperCamel"
+            BCase.toCase("aaAaAa", BCase.upperCamel(), BCase.upperCamel()),
+            "AaAaAa"
         );
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("AUpperCamel", BCase.LOWER_HYPHEN),
-            "a-upper-camel"
+            BCase.toCase("URLAddress", BCase.lowerCamel(), BCase.lowerCamel()),
+            "URLAddress"
         );
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("AUpperCamel", BCase.LOWER_UNDERSCORE),
-            "a_upper_camel"
+            BCase.toCase("URLAddress", BCase.lowerCamel(), BCase.lowerUnderscore()),
+            "url_address"
         );
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("upperCamel", BCase.LOWER_CAMEL),
-            "upperCamel"
+            BCase.toCase("IDAddress", BCase.lowerCamel(), BCase.lowerUnderscore()),
+            "id_address"
         );
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("upperCamel", BCase.LOWER_HYPHEN),
-            "upper-camel"
+            BCase.toCase("XAddress", BCase.lowerCamel(), BCase.lowerUnderscore()),
+            "x_address"
         );
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("upperCamel", BCase.LOWER_UNDERSCORE),
-            "upper_camel"
+            BCase.toCase("XAddress", BCase.lowerCamel(), BCase.lowerCamel()),
+            "xAddress"
         );
         Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("upper2Camel", BCase.LOWER_UNDERSCORE),
-            "upper2_camel"
+            BCase.toCase("AAA000aBb00a0", asUpperLowerCamel, BCase.lowerUnderscore()),
+            "aaa00_0a_bb_0_0a_0"
         );
         Assert.assertEquals(
-            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.AS_LOWER).convert("upper2Camel", BCase.LOWER_UNDERSCORE),
-            "upper2_camel"
+            BCase.toCase("AAA000aBBb00a", separateLowerCamel, BCase.lowerUnderscore()),
+            "aaa_000_a_b_bb_00_a"
         );
         Assert.assertEquals(
-            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.AS_UPPER).convert("upper2camel", BCase.LOWER_UNDERSCORE),
-            "upper_2camel"
+            BCase.toCase("0Address", asUpperLowerCamel, BCase.lowerUnderscore()),
+            "0_address"
         );
         Assert.assertEquals(
-            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.AS_UPPER).convert("upper2Camel", BCase.LOWER_UNDERSCORE),
-            "upper_2_camel"
+            BCase.toCase("0address", asUpperLowerCamel, BCase.lowerUnderscore()),
+            "0address"
         );
         Assert.assertEquals(
-            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOW_START_LOWER).convert("2upper2Camel", BCase.LOWER_UNDERSCORE),
-            "2upper2_camel"
-        );
-        Assert.assertEquals(
-            BCase.lowerCamelCase(CamelCase.NonLetterPolicy.FOLLOW_START_UPPER).convert("2upper2Camel", BCase.LOWER_UNDERSCORE),
-            "2upper2_camel"
-        );
-        Assert.assertEquals(
-            BCase.UPPER_CAMEL.convert("upper@#$%Camel", BCase.LOWER_UNDERSCORE),
-            "upper@#$%_camel"
+            BCase.toCase("AA_BB", BCase.upperUnderscore(), toLowerUpperCamel),
+            "AaBb"
         );
     }
 }

@@ -450,7 +450,7 @@ fun CharSequence.removeIfEndWith(suffix: CharSequence): String {
 }
 
 /**
- * Returns sub char sequence reference of [this].
+ * Returns sub char sequence reference of [this] from [startIndex] inclusive to [endIndex] exclusive.
  *
  * If [startIndex] is 0 and [endIndex] is length of this, return itself; else return a [CharsRef].
  */
@@ -462,7 +462,7 @@ fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharS
 }
 
 /**
- * Returns [CharsRef] of [this].
+ * Returns [CharsRef] of [this] from [startIndex] inclusive to [endIndex] exclusive.
  */
 fun CharArray.charsRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
     return CharsRef.of(this, startIndex, endIndex)
