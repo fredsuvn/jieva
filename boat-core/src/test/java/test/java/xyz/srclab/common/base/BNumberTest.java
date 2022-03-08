@@ -26,4 +26,12 @@ public class BNumberTest {
         Assert.assertEquals(BNumber.toBinaryString(i), "0000000000" + "0000000000" + "0000000000" + "10");
         Assert.assertEquals(BNumber.toHexString(i), "00000002");
     }
+
+    @Test
+    public void testConstant() {
+        Assert.assertSame(BNumber.hundredInt(), BNumber.hundredInt());
+        Assert.assertSame(BNumber.hundredDecimal(), BNumber.hundredDecimal());
+        Assert.assertSame(BNumber.thousandInt(), BNumber.thousandInt());
+        Assert.assertSame(BNumber.thousandDecimal(), BNumber.thousandDecimal());
+    }
 }

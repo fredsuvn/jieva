@@ -7,54 +7,47 @@ import xyz.srclab.common.base.CamelCase.NonLetterPolicy
 import java.util.*
 import java.util.function.Function
 
-private val LOWER_CAMEL: NamingCase = CamelCase(false)
-private val UPPER_CAMEL: NamingCase = CamelCase(true)
-private val LOWER_UNDERSCORE: NamingCase = SeparatorCase("_") { it.lowerCase() }
-private val UPPER_UNDERSCORE: NamingCase = SeparatorCase("_") { it.upperCase() }
-private val LOWER_HYPHEN: NamingCase = SeparatorCase("-") { it.lowerCase() }
-private val UPPER_HYPHEN: NamingCase = SeparatorCase("-") { it.upperCase() }
-
 /**
  * Returns [NamingCase] for lower-camel, such as `firstSecond`.
  * @see CamelCase
  */
 @JvmName("lowerCamel")
-fun lowerCamelCase(): NamingCase = LOWER_CAMEL
+fun lowerCamelCase(): NamingCase = BCaseHolder.LOWER_CAMEL
 
 /**
  * Returns [NamingCase] for lower-camel, such as `FirstSecond`.
  * @see CamelCase
  */
 @JvmName("upperCamel")
-fun upperCamelCase(): NamingCase = UPPER_CAMEL
+fun upperCamelCase(): NamingCase = BCaseHolder.UPPER_CAMEL
 
 /**
  * Returns [NamingCase] for lower-camel, such as `first_second`.
  * @see SeparatorCase
  */
 @JvmName("lowerUnderscore")
-fun lowerUnderscoreCase(): NamingCase = LOWER_UNDERSCORE
+fun lowerUnderscoreCase(): NamingCase = BCaseHolder.LOWER_UNDERSCORE
 
 /**
  * Returns [NamingCase] for lower-camel, such as `FIRST_SECOND`.
  * @see SeparatorCase
  */
 @JvmName("upperUnderscore")
-fun upperUnderscoreCase(): NamingCase = UPPER_UNDERSCORE
+fun upperUnderscoreCase(): NamingCase = BCaseHolder.UPPER_UNDERSCORE
 
 /**
  * Returns [NamingCase] for lower-camel, such as `first-second`.
  * @see SeparatorCase
  */
 @JvmName("lowerHyphen")
-fun lowerHyphenCase(): NamingCase = LOWER_HYPHEN
+fun lowerHyphenCase(): NamingCase = BCaseHolder.LOWER_HYPHEN
 
 /**
  * Returns [NamingCase] for lower-camel, such as `FIRST-SECOND`.
  * @see SeparatorCase
  */
 @JvmName("upperHyphen")
-fun upperHyphenCase(): NamingCase = UPPER_HYPHEN
+fun upperHyphenCase(): NamingCase = BCaseHolder.UPPER_HYPHEN
 
 /**
  * Converts case of [this] chars from [from] case to [to] case. For example:
@@ -482,4 +475,13 @@ open class SeparatorCase(
     private fun <T : CharSequence> join0(words: NamingCase.Words<T>, appendable: Appendable) {
         words.wordList.joinTo(appendable, separator) { wordHandler.apply(it) }
     }
+}
+
+private object BCaseHolder {
+    val LOWER_CAMEL: NamingCase = CamelCase(false)
+    val UPPER_CAMEL: NamingCase = CamelCase(true)
+    val LOWER_UNDERSCORE: NamingCase = SeparatorCase("_") { it.lowerCase() }
+    val UPPER_UNDERSCORE: NamingCase = SeparatorCase("_") { it.upperCase() }
+    val LOWER_HYPHEN: NamingCase = SeparatorCase("-") { it.lowerCase() }
+    val UPPER_HYPHEN: NamingCase = SeparatorCase("-") { it.upperCase() }
 }

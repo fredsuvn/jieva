@@ -18,22 +18,22 @@ import kotlin.text.toShort as toShortKt
 /**
  * Returns 100 of which type is [BigInteger].
  */
-fun hundredInt(): BigInteger = BigInteger("100")
+fun hundredInt(): BigInteger = BNumberHolder.HUNDRED_INT
 
 /**
  * Returns 1000 of which type is [BigInteger].
  */
-fun thousandInt(): BigInteger = BigInteger("1000")
+fun thousandInt(): BigInteger = BNumberHolder.THOUSAND_INT
 
 /**
  * Returns 100 of which type is [BigDecimal].
  */
-fun hundredDecimal(): BigDecimal = BigDecimal("100")
+fun hundredDecimal(): BigDecimal = BNumberHolder.HUNDRED_DECIMAL
 
 /**
  * Returns 1000 of which type is [BigDecimal].
  */
-fun thousandDecimal(): BigDecimal = BigDecimal("1000")
+fun thousandDecimal(): BigDecimal = BNumberHolder.THOUSAND_DECIMAL
 
 /**
  * Converts chars to byte.
@@ -499,4 +499,11 @@ private class ParsedChars(chars: CharSequence) {
         val value = content.toBigInteger(radix)
         return if (positive) value else -value
     }
+}
+
+private object BNumberHolder {
+    val HUNDRED_INT: BigInteger = BigInteger("100")
+    val THOUSAND_INT: BigInteger = BigInteger("1000")
+    val HUNDRED_DECIMAL: BigDecimal = BigDecimal("100")
+    val THOUSAND_DECIMAL: BigDecimal = BigDecimal("1000")
 }

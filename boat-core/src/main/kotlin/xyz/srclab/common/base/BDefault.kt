@@ -10,21 +10,6 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.util.*
 
-private const val defaultTimestampPatternString: String = "yyyyMMddHHmmssSSS"
-
-private val defaultTimestampPattern: DatePattern = run {
-    // JDK8 bug:
-    // Error for "yyyyMMddHHmmssSSS".toDatePattern()
-    if (isJdk9OrHigher()) {
-        return@run defaultTimestampPatternString.toDatePattern()
-    }
-    val formatter: DateTimeFormatter = DateTimeFormatterBuilder() // date/time
-        .appendPattern("yyyyMMddHHmmss") // milliseconds
-        .appendValue(ChronoField.MILLI_OF_SECOND, 3) // create formatter
-        .toFormatter()
-    DatePattern.of(defaultTimestampPatternString, formatter)
-}
-
 /**
  * Returns default charset: UTF-8.
  */
@@ -59,4 +44,20 @@ fun defaultLocale(): Locale = Locale.ENGLISH
  * Returns default timestamp pattern: yyyyMMddHHmmssSSS.
  */
 @JvmName("timestampPattern")
-fun defaultTimestampPattern(): DatePattern = defaultTimestampPattern
+fun defaultTimestampPattern(): DatePattern = BDefaultHolder.defaultTimestampPattern
+
+private object BDefaultHolder {
+    private const val defaultTimestampPatternString: String = "yyyyMMddHHmmssSSS"
+    val defaultTimestampPattern: DatePattern = run {
+        // JDK8 bug:
+        // Error for "yyyyMMddHHmmssSSS".toDatePattern()
+        if (isJdk9OrHigher()) {
+            return@run defaultTimestampPatternString.toDatePattern()
+        }
+        val formatter: DateTimeFormatter = DateTimeFormatterBuilder() // date/time
+            .appendPattern("yyyyMMddHHmmss") // milliseconds
+            .appendValue(ChronoField.MILLI_OF_SECOND, 3) // create formatter
+            .toFormatter()
+        DatePattern.of(defaultTimestampPatternString, formatter)
+    }
+}

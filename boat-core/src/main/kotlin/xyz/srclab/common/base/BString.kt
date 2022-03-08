@@ -14,24 +14,20 @@ import kotlin.text.toCollection as toCollectionKt
 import kotlin.text.toList as toListKt
 import kotlin.text.toSet as toSetKt
 
-private val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
-private val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
-private val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')
-
 /**
  * Returns a [CharMatcher] for char dot: ".".
  */
-fun dotMatcher(): CharMatcher = DOT_MATCHER
+fun dotMatcher(): CharMatcher = BStringHolder.DOT_MATCHER
 
 /**
  * Returns a [CharMatcher] for char hyphen: "-".
  */
-fun hyphenMatcher(): CharMatcher = HYPHEN_MATCHER
+fun hyphenMatcher(): CharMatcher = BStringHolder.HYPHEN_MATCHER
 
 /**
  * Returns a [CharMatcher] for char underscore: "_".
  */
-fun underscoreMatcher(): CharMatcher = UNDERSCORE_MATCHER
+fun underscoreMatcher(): CharMatcher = BStringHolder.UNDERSCORE_MATCHER
 
 /**
  * Returns charset of UTF-8.
@@ -628,4 +624,10 @@ interface LazyString : CharSequence {
             }
         }
     }
+}
+
+private object BStringHolder {
+    val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
+    val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
+    val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')
 }

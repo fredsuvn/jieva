@@ -13,6 +13,15 @@ public class BEncodeTest {
 
     @Test
     public void testBase64() {
+        Assert.assertEquals(
+            BEncode.base64("123456"),
+            "MTIzNDU2"
+        );
+        Assert.assertEquals(
+            BEncode.deBase64("MTIzNDU2"),
+            "123456"
+        );
+
         String rd1 = BRandom.randomString(100);
         String rd1Base64 = BEncode.base64(rd1);
         byte[] rd1Bytes = rd1.getBytes(BDefault.charset());
@@ -45,5 +54,23 @@ public class BEncodeTest {
         String outBase64String = BString.toString8Bit(out.toBytes());
         BLog.info("outBase64String: {}", outBase64String);
         Assert.assertEquals(outBase64String, rd1Base64);
+    }
+
+    @Test
+    public void testHex() {
+        // BEncode.hex2();
+        // BEncode.hex();
+    }
+
+    private final static char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+
+        return new String(hexChars);
     }
 }
