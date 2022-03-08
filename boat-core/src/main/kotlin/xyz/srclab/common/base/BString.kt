@@ -451,11 +451,11 @@ fun CharSequence.removeIfEndWith(suffix: CharSequence): String {
 }
 
 /**
- * Returns sub char sequence of [this].
+ * Returns sub char sequence reference of [this].
  *
  * If [startIndex] is 0 and [endIndex] is length of this, return itself; else return a [CharsRef].
  */
-fun CharSequence.subChars(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
+fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
     if (startIndex == 0 && endIndex == this.length) {
         return this
     }

@@ -482,7 +482,7 @@ private class ParsedChars(chars: CharSequence) {
             content = chars.charsRef(offset + 1)
         } else {
             radix = 10
-            content = chars.subChars(offset)
+            content = chars.subRef(offset)
         }
     }
 
