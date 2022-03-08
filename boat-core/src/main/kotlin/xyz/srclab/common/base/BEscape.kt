@@ -2,7 +2,6 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.Reader
@@ -96,7 +95,7 @@ fun CharSequence.escape(escapeChar: Char, escapedChars: CharSequence): String {
         val c = this[i]
         if (c == escapeChar || escapedChars.contains(c)) {
             //Escape: \ -> \\
-            getBuffer().add(this.charsRef(start, i))
+            getBuffer().add(this.subRef(start, i))
             getBuffer().add(escapeChar)
             start = i
         }
@@ -107,7 +106,7 @@ fun CharSequence.escape(escapeChar: Char, escapedChars: CharSequence): String {
         return this.toString()
     }
     if (start < this.length) {
-        getBuffer().add(this.charsRef(start))
+        getBuffer().add(this.subRef(start))
     }
 
     return getBuffer().joinToString("")
@@ -231,7 +230,7 @@ fun CharSequence.unescape(escapeChar: Char, escapedChars: CharSequence): String 
             val cn = this[i]
             if (cn == escapeChar || escapedChars.contains(cn)) {
                 //Unescape: \\ -> \
-                getBuffer().add(this.charsRef(start, i - 1))
+                getBuffer().add(this.subRef(start, i - 1))
                 start = i
             }
         }
@@ -242,7 +241,7 @@ fun CharSequence.unescape(escapeChar: Char, escapedChars: CharSequence): String 
         return this.toString()
     }
     if (start < this.length) {
-        getBuffer().add(this.charsRef(start))
+        getBuffer().add(this.subRef(start))
     }
 
     return getBuffer().joinToString("")

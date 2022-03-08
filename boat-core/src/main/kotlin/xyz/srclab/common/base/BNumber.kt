@@ -3,7 +3,6 @@
 package xyz.srclab.common.base
 
 import org.apache.commons.lang3.StringUtils
-import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
@@ -473,13 +472,13 @@ private class ParsedChars(chars: CharSequence) {
         }
         if (chars.startsWith("0x", offset) || chars.startsWith("0X", offset)) {
             radix = 16
-            content = chars.charsRef(offset + 2)
+            content = chars.subRef(offset + 2)
         } else if (chars.startsWith("0b", offset) || chars.startsWith("0B", offset)) {
             radix = 2
-            content = chars.charsRef(offset + 2)
+            content = chars.subRef(offset + 2)
         } else if (chars.startsWith("0", offset)) {
             radix = 8
-            content = chars.charsRef(offset + 1)
+            content = chars.subRef(offset + 1)
         } else {
             radix = 10
             content = chars.subRef(offset)

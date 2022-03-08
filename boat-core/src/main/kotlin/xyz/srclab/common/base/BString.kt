@@ -4,7 +4,6 @@ package xyz.srclab.common.base
 
 import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.StringUtils
-import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.function.Supplier
@@ -459,7 +458,14 @@ fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharS
     if (startIndex == 0 && endIndex == this.length) {
         return this
     }
-    return this.charsRef(startIndex, endIndex)
+    return CharsRef.of(this, startIndex, endIndex)
+}
+
+/**
+ * Returns [CharsRef] of [this].
+ */
+fun CharArray.charsRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
+    return CharsRef.of(this, startIndex, endIndex)
 }
 
 /**
@@ -504,48 +510,23 @@ interface CharsRef : CharSequence {
     companion object {
 
         /**
-         * Returns a [CharsRef] of [this] from [startIndex] inclusive to [endIndex] exclusive.
+         * Returns a [CharsRef] of [chars] from [startIndex] inclusive to [endIndex] exclusive.
          */
-        @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun CharSequence.charsRef(startIndex: Int = 0, endIndex: Int = this.length): CharsRef {
-            checkRangeInBounds(startIndex, endIndex, 0, this.length)
-            return CharSeqRef(this, startIndex, endIndex)
+        fun of(chars: CharSequence, startIndex: Int = 0, endIndex: Int = chars.length): CharsRef {
+            checkRangeInBounds(startIndex, endIndex, 0, chars.length)
+            return CharSeqRef(chars, startIndex, endIndex)
         }
 
         /**
-         * Returns a [CharsRef] of [this] from [startIndex] inclusive to [endIndex] exclusive.
+         * Returns a [CharsRef] of [chars] from [startIndex] inclusive to [endIndex] exclusive.
          */
-        @JvmName("of")
         @JvmOverloads
         @JvmStatic
-        fun CharArray.charsRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
-            checkRangeInBounds(startIndex, endIndex, 0, this.size)
-            return CharArrayRef(this, startIndex, endIndex)
-        }
-
-        /**
-         * Returns a [CharsRef] of [this] offset at [offset] and length is [length].
-         */
-        @JvmName("offset")
-        @JvmOverloads
-        @JvmStatic
-        fun CharSequence.charsRefOffset(
-            offset: Int = 0,
-            length: Int = remainingLength(this.length, offset)
-        ): CharsRef {
-            return charsRef(offset, offset + length)
-        }
-
-        /**
-         * Returns a [CharsRef] of [this] offset at [offset] and length is [length].
-         */
-        @JvmName("offset")
-        @JvmOverloads
-        @JvmStatic
-        fun CharArray.charsRefOffset(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsRef {
-            return charsRef(offset, offset + length)
+        fun of(chars: CharArray, startIndex: Int = 0, endIndex: Int = chars.size): CharsRef {
+            checkRangeInBounds(startIndex, endIndex, 0, chars.size)
+            return CharArrayRef(chars, startIndex, endIndex)
         }
 
         private class CharSeqRef(

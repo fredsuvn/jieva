@@ -3,7 +3,6 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.annotations.concurrent.ThreadSafe
-import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.util.*
 
 /**
@@ -133,7 +132,7 @@ object FastFormat : StringFormat {
                 val cn = pattern[i]
                 if (cn == '\\') {
                     //Escape: \\ -> \
-                    getBuffer().add(pattern.charsRef(start, i))
+                    getBuffer().add(pattern.subRef(start, i))
                     i++
                     start = i
                     continue
@@ -146,7 +145,7 @@ object FastFormat : StringFormat {
                     val cnn = pattern[i]
                     if (cnn == '}') {
                         //Escape: \{} -> {}
-                        getBuffer().add(pattern.charsRef(start, i - 2))
+                        getBuffer().add(pattern.subRef(start, i - 2))
                         start = i - 1
                         i++
                         continue
@@ -167,7 +166,7 @@ object FastFormat : StringFormat {
                         i++
                         continue
                     }
-                    getBuffer().add(pattern.charsRef(start, i - 1))
+                    getBuffer().add(pattern.subRef(start, i - 1))
                     getBuffer().add(args[argIndex])
                     i++
                     start = i
@@ -182,7 +181,7 @@ object FastFormat : StringFormat {
             return pattern.toString()
         }
         if (start < pattern.length) {
-            getBuffer().add(pattern.charsRef(start))
+            getBuffer().add(pattern.subRef(start))
         }
 
         return getBuffer().joinToString("") { it.deepToString() }

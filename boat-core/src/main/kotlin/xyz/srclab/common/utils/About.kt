@@ -2,7 +2,6 @@ package xyz.srclab.common.utils
 
 import com.google.common.base.CharMatcher
 import xyz.srclab.common.base.*
-import xyz.srclab.common.base.CharsRef.Companion.charsRef
 import java.io.Serializable
 
 /**
@@ -281,18 +280,18 @@ open class SemVer @JvmOverloads constructor(
             if (iPre < 0 && iPlus < 0) {
                 normalSeq = this
             } else if (iPre > 0 && iPlus < 0) {
-                normalSeq = this.charsRef(0, iPre)
-                preReleaseSeq = this.charsRef(iPre + 1)
+                normalSeq = this.subRef(0, iPre)
+                preReleaseSeq = this.subRef(iPre + 1)
             } else if (iPre < 0) {
-                normalSeq = this.charsRef(0, iPlus)
-                buildMetadataSeq = this.charsRef(iPlus + 1)
+                normalSeq = this.subRef(0, iPlus)
+                buildMetadataSeq = this.subRef(iPlus + 1)
             } else if (iPre < iPlus) {
-                normalSeq = this.charsRef(0, iPre)
-                preReleaseSeq = this.charsRef(iPre + 1, iPlus)
-                buildMetadataSeq = this.charsRef(iPlus + 1)
+                normalSeq = this.subRef(0, iPre)
+                preReleaseSeq = this.subRef(iPre + 1, iPlus)
+                buildMetadataSeq = this.subRef(iPlus + 1)
             } else {
-                normalSeq = this.charsRef(0, iPlus)
-                buildMetadataSeq = this.charsRef(iPlus + 1)
+                normalSeq = this.subRef(0, iPlus)
+                buildMetadataSeq = this.subRef(iPlus + 1)
             }
 
             val normals = normalSeq.split('.')
