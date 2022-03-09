@@ -3,7 +3,7 @@
 package xyz.srclab.common.base
 
 import java.time.Duration
-import java.util.function.BiFunction
+import java.util.function.BiPredicate
 
 /**
  * [Thread] of current context.
@@ -30,73 +30,56 @@ fun sleep(duration: Duration) {
 /**
  * Try to find caller stack trace element, usually used in logging.
  *
- * This function invokes [filter] for each stack trace element of current [Thread.getStackTrace], and:
+ * This function invokes [predicate] for each stack trace element of current [Thread.getStackTrace]:
  *
- * * Find first element as `called` of which invoking result is `0`;
- * * Then from next element continue to find first element as `caller` of which invoking result is `1`;
- * * Return `caller` element.
- *
- * Note second parameter (boolean type) indicates whether `called` element has found.
+ * * Invokes `predicate.test(element, false)` for each stack trace element util the `true` has returned,
+ * let the index of this element be `loggerIndex`;
+ * * Invokes `predicate.test(element, true)` for each stack trace element
+ * from the `loggerIndex` exclusive util the `true` has returned
+ * let the index of this element be `callerIndex`;
+ * * Return element of which index is `callerIndex`.
  *
  * Note if stack trace elements of current thread is null,
- * or index of `caller` is out of bounds, return null.
+ * or index of returned element is out of bounds, return null.
  */
-fun callerStackTraceOrNull(
-    filter: BiFunction<StackTraceElement, Boolean, Int>
+fun callerStackTrace(
+    predicate: BiPredicate<StackTraceElement, Boolean>
 ): StackTraceElement? {
-    return callerStackTraceOrNull(0, filter)
+    return callerStackTrace(0, predicate)
 }
 
 /**
  * Try to find caller stack trace element, usually used in logging.
  *
- * This function invokes [filter] for each stack trace element of current [Thread.getStackTrace], and:
+ * This function invokes [predicate] for each stack trace element of current [Thread.getStackTrace]:
  *
- * * Find first element as `called` of which invoking result is `0`;
- * * Then from next element continue to find first element as `caller` of which invoking result is `1`;
- * * Return `caller` element.
- *
- * Note if stack trace elements of current thread is null,
- * or index of `caller` is out of bounds, return null.
- */
-@JvmSynthetic
-fun callerStackTraceOrNull(
-    filter: (StackTraceElement, findCalled: Boolean) -> Int
-): StackTraceElement? {
-    return callerStackTraceOrNull(0, filter)
-}
-
-/**
- * Try to find caller stack trace element, usually used in logging.
- *
- * This function invokes [filter] for each stack trace element of current [Thread.getStackTrace], and:
- *
- * * Find first element as `called` of which invoking result is `0`;
- * * Then from next element continue to find first element as `caller` of which invoking result is `1`;
- * * Return element of which index is ([offset] + index of `caller` element).
- *
- * Note second parameter (boolean type) indicates whether `called` element has found.
+ * * Invokes `predicate.test(element, false)` for each stack trace element util the `true` has returned,
+ * let the index of this element be `loggerIndex`;
+ * * Invokes `predicate.test(element, true)` for each stack trace element
+ * from the `loggerIndex` exclusive util the `true` has returned
+ * let the index of this element be `callerIndex`;
+ * * Return element of which index is ([offset] + `callerIndex`).
  *
  * Note if stack trace elements of current thread is null,
- * or index of `caller` is out of bounds, return null.
+ * or index of returned element is out of bounds, return null.
  */
-fun callerStackTraceOrNull(
+fun callerStackTrace(
     offset: Int,
-    filter: BiFunction<StackTraceElement, Boolean, Int>
+    predicate: BiPredicate<StackTraceElement, Boolean>
 ): StackTraceElement? {
     val stackTrace = currentThread().stackTrace
     if (stackTrace.isNullOrEmpty()) {
         return null
     }
     for (i in stackTrace.indices) {
-        var result = filter.apply(stackTrace[i], false)
-        if (result == 0) {
+        var result = predicate.test(stackTrace[i], false)
+        if (result) {
             for (j in i + 1 until stackTrace.size) {
-                result = filter.apply(stackTrace[j], true)
-                if (result == 1) {
-                    val callerIndex = j + offset
-                    if (callerIndex.isInBounds(0, stackTrace.size)) {
-                        return stackTrace[callerIndex]
+                result = predicate.test(stackTrace[j], true)
+                if (result) {
+                    val index = j + offset
+                    if (index.isInBounds(0, stackTrace.size)) {
+                        return stackTrace[index]
                     }
                     return null
                 }
@@ -104,24 +87,4 @@ fun callerStackTraceOrNull(
         }
     }
     return null
-}
-
-/**
- * Try to find caller stack trace element, usually used in logging.
- *
- * This function invokes [filter] for each stack trace element of current [Thread.getStackTrace], and:
- *
- * * Find first element as `called` of which invoking result is `0`;
- * * Then from next element continue to find first element as `caller` of which invoking result is `1`;
- * * Return element of which index is ([offset] + index of `caller` element).
- *
- * Note if stack trace elements of current thread is null,
- * or index of `caller` is out of bounds, return null.
- */
-@JvmSynthetic
-fun callerStackTraceOrNull(
-    offset: Int,
-    filter: (StackTraceElement, findCalled: Boolean) -> Int
-): StackTraceElement? {
-    return callerStackTraceOrNull(offset, filter.asJavaFun())
 }

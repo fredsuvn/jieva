@@ -2,100 +2,155 @@
 
 package xyz.srclab.common.base
 
-import java.io.PrintStream
+import java.io.OutputStream
+import java.nio.charset.Charset
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-private val logger: Logger = Logger.simpleLogger(callerOffset = 1)
+private var defaultLogger: LogPrinter = LogPrinter.simpleLogger(callerOffset = 1)
 
 /**
- * Trace level.
+ * Sets the default logger for `BLog`.
+ */
+fun setDefaultLogLogger(logger: LogPrinter) {
+    defaultLogger = logger
+}
+
+/**
+ * Sets the default logger for `BLog`.
+ */
+fun getDefaultLogLogger(): LogPrinter {
+    return defaultLogger
+}
+
+/**
+ * Logs trace level.
  */
 fun trace(message: String?, vararg args: Any?) {
-    logger.trace(message, *args)
+    defaultLogger.trace(message, *args)
 }
 
 /**
- * Debug level.
+ * Logs debug level.
  */
 fun debug(message: String?, vararg args: Any?) {
-    logger.debug(message, *args)
+    defaultLogger.debug(message, *args)
 }
 
 /**
- * Info level.
+ * Logs info level.
  */
 fun info(message: String?, vararg args: Any?) {
-    logger.info(message, *args)
+    defaultLogger.info(message, *args)
 }
 
 /**
- * Warn level.
+ * Logs warn level.
  */
 fun warn(message: String?, vararg args: Any?) {
-    logger.warn(message, *args)
+    defaultLogger.warn(message, *args)
 }
 
 /**
- * Error level.
+ * Logs error level.
  */
 fun error(message: String?, vararg args: Any?) {
-    logger.error(message, *args)
+    defaultLogger.error(message, *args)
 }
 
 /**
- * Logs with specified [level].
+ * Logs with specified message level.
  */
-fun log(level: Int, message: String?, vararg args: Any?) {
-    logger.log(level, message, *args)
+fun log(messageLevel: Int, message: String?, vararg args: Any?) {
+    defaultLogger.log(messageLevel, message, *args)
 }
 
 /**
- * Logger.
+ * Simple logger interface (and default implementation), used for demo and simple test codes.
+ * It is named `LogPrinter` rather than `Logger` to avoid polluting the name `Logger`,
+ * which is used by other logging system.
+ *
+ * This logger and its default implementation is simple and light,
+ * better to use mature logging system such `SLF4j` and `common-logging` if you need richer functions.
  */
-interface Logger {
+interface LogPrinter {
 
     val level: Int
 
     /**
-     * Trace level.
+     * Returns whether level of this logger can output [TRACE_LEVEL] level message.
+     */
+    fun isTraceEnabled(): Boolean {
+        return level <= TRACE_LEVEL
+    }
+
+    /**
+     * Returns whether level of this logger can output [DEBUG_LEVEL] level message.
+     */
+    fun isDebugEnabled(): Boolean {
+        return level <= DEBUG_LEVEL
+    }
+
+    /**
+     * Returns whether level of this logger can output [INFO_LEVEL] level message.
+     */
+    fun isInfoEnabled(): Boolean {
+        return level <= INFO_LEVEL
+    }
+
+    /**
+     * Returns whether level of this logger can output [WARN_LEVEL] level message.
+     */
+    fun isWarnEnabled(): Boolean {
+        return level <= WARN_LEVEL
+    }
+
+    /**
+     * Returns whether level of this logger can output [ERROR_LEVEL] level message.
+     */
+    fun isErrorEnabled(): Boolean {
+        return level <= ERROR_LEVEL
+    }
+
+    /**
+     * Logs trace level.
      */
     fun trace(message: String?, vararg args: Any?) {
         log(TRACE_LEVEL, message, *args)
     }
 
     /**
-     * Debug level.
+     * Logs debug level.
      */
     fun debug(message: String?, vararg args: Any?) {
         log(DEBUG_LEVEL, message, *args)
     }
 
     /**
-     * Info level.
+     * Logs info level.
      */
     fun info(message: String?, vararg args: Any?) {
         log(INFO_LEVEL, message, *args)
     }
 
     /**
-     * Warn level.
+     * Logs warn level.
      */
     fun warn(message: String?, vararg args: Any?) {
         log(WARN_LEVEL, message, *args)
     }
 
     /**
-     * Error level.
+     * Logs error level.
      */
     fun error(message: String?, vararg args: Any?) {
         log(ERROR_LEVEL, message, *args)
     }
 
     /**
-     * Logs with specified [level].
+     * Logs with specified message level.
      */
-    fun log(level: Int, message: String?, vararg args: Any?)
+    fun log(messageLevel: Int, message: String?, vararg args: Any?)
 
     companion object {
 
@@ -105,31 +160,30 @@ interface Logger {
         const val WARN_LEVEL = 3000
         const val ERROR_LEVEL = 4000
 
+        /**
+         * Creates a simple implementation of [LogPrinter].
+         */
         @JvmOverloads
         @JvmStatic
-        fun simpleLogger(level: Int = DEBUG_LEVEL, output: PrintStream = System.out, callerOffset: Int = 0): Logger {
-            return SimpleLogger(level, output, callerOffset)
+        fun simpleLogger(
+            level: Int = DEBUG_LEVEL,
+            output: OutputStream = System.out,
+            callerOffset: Int = 0,
+            charset: Charset = defaultCharset(),
+        ): LogPrinter {
+            return SimpleLogPrinter(level, output, callerOffset, charset)
         }
 
-        private class SimpleLogger(
+        private class SimpleLogPrinter(
             override val level: Int,
-            private val output: PrintStream,
-            private val callerOffset: Int
-        ) : Logger {
+            private val output: OutputStream,
+            private val callerOffset: Int,
+            private val charset: Charset,
+        ) : LogPrinter {
 
-            override fun log(level: Int, message: String?, vararg args: Any?) {
-                if (level < this.level) {
+            override fun log(messageLevel: Int, message: String?, vararg args: Any?) {
+                if (messageLevel < this.level) {
                     return
-                }
-
-                fun levelToString(level: Int): String {
-                    return when {
-                        level < DEBUG_LEVEL -> "TRACE"
-                        level < INFO_LEVEL -> "DEBUG"
-                        level < WARN_LEVEL -> "INFO"
-                        level < ERROR_LEVEL -> "WARN"
-                        else -> "ERROR"
-                    }
                 }
 
                 //Configures args.
@@ -143,42 +197,91 @@ interface Logger {
                 }
 
                 //Builds message.
-                val formattedMessage = message?.fastFormat(*args)
-                val levelDescription = levelToString(level)
-                val timestamp = TIMESTAMP_FORMATTER.format(LocalDateTime.now())
+                val formattedMessage = message?.fastFormat(*arguments) ?: "null"
+                val timestamp = timeFormatter.format(LocalDateTime.now())
 
                 //Computes caller stack trace.
-                val callerTrace = callerStackTraceOrNull(callerOffset) { trace, findCalled ->
-                    if (!findCalled) {
-                        if (trace.className == SimpleLogger::class.java.name
-                            || trace.className == Logger::class.java.name
+                val callerTrace = callerStackTrace(callerOffset) { trace, findLogger ->
+                    if (!findLogger) {
+                        if (trace.className == SimpleLogPrinter::class.java.name
+                            || trace.className == LogPrinter::class.java.name
                         ) {
-                            return@callerStackTraceOrNull 0
+                            return@callerStackTrace true
                         }
                     }
-                    if (findCalled) {
-                        if (trace.className != SimpleLogger::class.java.name
-                            && trace.className != Logger::class.java.name
+                    if (findLogger) {
+                        if (trace.className != SimpleLogPrinter::class.java.name
+                            && trace.className != LogPrinter::class.java.name
                         ) {
-                            return@callerStackTraceOrNull 1
+                            return@callerStackTrace true
                         }
                     }
-                    -1
+                    false
+                }
+
+                //Level string
+                val levelString: ByteArray = run {
+                    when (messageLevel) {
+                        TRACE_LEVEL -> "TRACE".toByteArray()
+                        DEBUG_LEVEL -> "DEBUG".toByteArray()
+                        INFO_LEVEL -> "INFO".toByteArray()
+                        WARN_LEVEL -> "WARN".toByteArray()
+                        ERROR_LEVEL -> "ERROR".toByteArray()
+                        else -> "LOG".toByteArray()
+                    }
                 }
 
                 if (callerTrace === null) {
-                    output.println("[$levelDescription][$timestamp]: $formattedMessage")
+                    writeBytes(
+                        levelString, timestamp.toByteArray(), formattedMessage.charsToBytes(charset),
+                        false,
+                        EMPTY_BYTES, EMPTY_BYTES, EMPTY_BYTES
+                    )
                 } else {
-                    output.println(
-                        "[$levelDescription][$timestamp]" +
-                            "[${callerTrace.className}.${callerTrace.methodName}" +
-                            "(${callerTrace.lineNumber})]: $formattedMessage"
+                    writeBytes(
+                        levelString, timestamp.toByteArray(), formattedMessage.charsToBytes(charset),
+                        true,
+                        callerTrace.className.charsToBytes(charset),
+                        callerTrace.methodName.charsToBytes(charset),
+                        "${callerTrace.lineNumber}".toByteArray()
                     )
                 }
             }
 
+            private fun writeBytes(
+                levelString: ByteArray,
+                timestamp: ByteArray,
+                message: ByteArray,
+                detail: Boolean,
+                className: ByteArray,
+                methodName: ByteArray,
+                lineNumber: ByteArray,
+            ) {
+                output.write('['.code)
+                output.write(levelString)
+                output.write(']'.code)
+                output.write('['.code)
+                output.write(timestamp)
+                output.write(']'.code)
+                if (detail) {
+                    output.write('['.code)
+                    output.write(className)
+                    output.write('.'.code)
+                    output.write(methodName)
+                    output.write('.'.code)
+                    output.write(lineNumber)
+                    output.write(']'.code)
+                }
+                output.write(':'.code)
+                output.write(' '.code)
+                output.write(message)
+                output.write(LINE_SEPARATOR)
+            }
+
             companion object {
-                private val TIMESTAMP_FORMATTER: DateTimeFormatter =
+                private val EMPTY_BYTES: ByteArray = byteArrayOf()
+                private val LINE_SEPARATOR: ByteArray = System.lineSeparator().toByteArray()
+                private val timeFormatter: DateTimeFormatter =
                     DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
             }
         }
