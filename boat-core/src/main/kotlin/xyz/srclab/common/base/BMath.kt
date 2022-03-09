@@ -13,6 +13,24 @@ fun remainingLength(size: Int, offset: Int): Int = size - offset
 fun remainingLength(size: Long, offset: Long): Long = size - offset
 
 /**
+ * Returns end index exclusive computed from [offset] and [length]:
+ *
+ * ```
+ * return offset + length;
+ * ```
+ */
+fun endIndex(offset: Int, length: Int): Int = offset + length
+
+/**
+ * Returns end index exclusive computed from [offset] and [length]:
+ *
+ * ```
+ * return offset + length;
+ * ```
+ */
+fun endIndex(offset: Long, length: Long): Long = offset + length
+
+/**
  * Returns the least number to meet: [blockSize] * `number` >= [size].
  */
 fun blockNumber(size: Int, blockSize: Int): Int {

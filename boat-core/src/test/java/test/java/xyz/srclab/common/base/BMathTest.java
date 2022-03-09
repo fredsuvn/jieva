@@ -14,5 +14,7 @@ public class BMathTest {
         Assert.assertEquals(BMath.blockNumber(9, 10), 1);
         Assert.assertEquals(BMath.newSizeForBlock(12, 3, 4), 16);
         Assert.assertEquals(BMath.newSizeForBlock(13, 3, 4), 20);
+        Assert.assertEquals(BMath.endIndex(0, 10), 10);
+        Assert.assertEquals(BMath.endIndex(1, 10), 11);
     }
 }
