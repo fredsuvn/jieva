@@ -7,9 +7,9 @@ import java.io.Serializable
 import java.util.*
 
 /**
- * Resolves receiver string to [StringTemplate] implemented by [SimpleTemplate].
+ * Parses [this] to [CharsTemplate] implemented by [SimpleTemplate].
  *
- * @see StringTemplate
+ * @see CharsTemplate
  * @see SimpleTemplate
  */
 @JvmName("parse")
@@ -18,7 +18,7 @@ fun CharSequence.parseTemplate(
     escapeChar: Char,
     parameterPrefix: CharSequence,
     parameterSuffix: CharSequence? = null
-): StringTemplate {
+): CharsTemplate {
     return SimpleTemplate(this, escapeChar, parameterPrefix, parameterSuffix)
 }
 
@@ -54,11 +54,13 @@ fun CharSequence.parseTemplate(
  * * Parameter suffix token can be used before parameter prefix token --
  *   in this case, it will be seen as a common text;
  */
-interface StringTemplate {
+interface CharsTemplate {
 
     /**
-     * Resolved nodes of this string template.
-     * Some elements' type is [Parameter] although all elements' type is [CharSequence],
+     * Parsed nodes of this template. There are two type of node:
+     *
+     * * Chars node: general node represents a sequence of chars;
+     * * [Parameter] node: represents a parameter;
      */
     @get:Throws(TemplateException::class)
     val nodes: List<CharSequence>
@@ -67,13 +69,32 @@ interface StringTemplate {
      * Process with [args].
      */
     @Throws(TemplateException::class)
-    fun process(args: Map<@Accepted(String::class, Integer::class) Any, Any?>): String {
+    fun process(vararg args:Any?): String {
+        val nodesArray = nodes.toTypedArray()
+        var i = 0
+        var p = 0
+        while (i < nodesArray.size) {
+            val node = nodesArray[i]
+            if (node is Parameter) {
+                nodesArray[i] = args[p].toCharSeq()
+            }
+            i++
+            p++
+        }
+        return nodesArray.joinToString("")
+    }
+
+    /**
+     * Process with [args].
+     */
+    @Throws(TemplateException::class)
+    fun processMap(args: Map<String, Any?>): String {
         val nodesArray = nodes.toTypedArray()
         var i = 0
         while (i < nodesArray.size) {
             val node = nodesArray[i]
             if (node is Parameter) {
-                nodesArray[i] = args[node].toCharSeq()
+                nodesArray[i] = args[node.toString()].toCharSeq()
             }
             i++
         }
@@ -102,8 +123,7 @@ interface StringTemplate {
     }
 
     /**
-     * Represents current node is a parameter in this string template.
-     * Note content of [Parameter] may be empty.
+     * Represents parameter node.
      */
     interface Parameter : CharSequence {
 
@@ -114,75 +134,42 @@ interface StringTemplate {
 
         companion object {
 
+            /**
+             * Returns a [Parameter] with [chars] and [index].
+             */
             @JvmStatic
             fun of(chars: CharSequence, index: Int): Parameter {
-                return StringParameter(chars, index)
+                return ParameterImpl(chars, index)
             }
 
+            /**
+             * Returns a [Parameter] with empty chars and [index].
+             */
             @JvmStatic
             fun of(index: Int): Parameter {
-                return IndexParameter(index)
+                return of("", index)
             }
 
-            private class StringParameter(
-                chars: CharSequence, override val index: Int
-            ) : Parameter {
+            private class ParameterImpl(
+                private val chars: CharSequence, override val index: Int
+            ) : Parameter, FinalObject() {
 
-                private val value = chars.toString()
-                override val length: Int = value.length
+                override val length: Int = chars.length
 
                 override fun get(index: Int): Char {
-                    return value[index]
+                    return chars[index]
                 }
 
                 override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
-                    return value.subSequence(startIndex, endIndex)
+                    return chars.subSequence(startIndex, endIndex)
                 }
 
-                override fun equals(other: Any?): Boolean {
-                    if (this === other) return true
-                    if (other !is CharSequence) return false
-                    return value == other
+                override fun hashCode0(): Int {
+                    return toString().hashCode()
                 }
 
-                override fun hashCode(): Int {
-                    return value.hashCode()
-                }
-
-                override fun toString(): String {
-                    return value
-                }
-            }
-
-            private class IndexParameter(
-                override val index: Int
-            ) : Parameter {
-
-                override val length: Int = 0
-
-                override fun get(index: Int): Char {
-                    throw IndexOutOfBoundsException("$index")
-                }
-
-                override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
-                    if (startIndex == endIndex) {
-                        return this
-                    }
-                    throw IndexOutOfBoundsException("startIndex: $startIndex, endIndex: $endIndex")
-                }
-
-                override fun equals(other: Any?): Boolean {
-                    if (this === other) return true
-                    if (other !is Int) return false
-                    return index == other
-                }
-
-                override fun hashCode(): Int {
-                    return index.hashCode()
-                }
-
-                override fun toString(): String {
-                    return index.toString()
+                override fun toString0(): String {
+                    return chars.toString()
                 }
             }
         }
@@ -190,7 +177,7 @@ interface StringTemplate {
 }
 
 /**
- * Simple [StringTemplate] implementation.
+ * Simple [CharsTemplate] implementation.
  * It supports an [escapeChar], a parameter prefix and a parameter suffix (may null). For example:
  *
  * ```
@@ -259,7 +246,7 @@ open class SimpleTemplate(
     private val escapeChar: Char,
     parameterPrefix: CharSequence,
     parameterSuffix: CharSequence? = null
-) : StringTemplate {
+) : CharsTemplate {
 
     override val nodes: List<CharSequence> by lazy { resolve() }
 
@@ -337,7 +324,7 @@ open class SimpleTemplate(
                         i++
                     }
                     val nameRef = template.subRef(paramNameStart, i)
-                    getBuffer().add(StringTemplate.Parameter.of(nameRef, paramIndex++))
+                    getBuffer().add(CharsTemplate.Parameter.of(nameRef, paramIndex++))
                     start = i
                     i++
                     continue
@@ -348,13 +335,13 @@ open class SimpleTemplate(
                     throw TemplateException("Parameter prefix is not enclose at index: $i.")
                 }
                 if (suffixIndex == i) {
-                    getBuffer().add(StringTemplate.Parameter.of(paramIndex++))
+                    getBuffer().add(CharsTemplate.Parameter.of(paramIndex++))
                     i++
                     start = i
                     continue
                 }
                 val nameRef = template.subRef(i, suffixIndex)
-                getBuffer().add(StringTemplate.Parameter.of(nameRef, paramIndex++))
+                getBuffer().add(CharsTemplate.Parameter.of(nameRef, paramIndex++))
                 i = suffixIndex + 1
                 start = i
                 continue
@@ -372,6 +359,9 @@ open class SimpleTemplate(
     }
 }
 
+/**
+ * Template exception.
+ */
 open class TemplateException @JvmOverloads constructor(
     message: String? = null, cause: Throwable? = null
 ) : RuntimeException(message, cause), Serializable {
