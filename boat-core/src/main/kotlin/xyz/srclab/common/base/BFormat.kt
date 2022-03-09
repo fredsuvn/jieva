@@ -6,7 +6,7 @@ import xyz.srclab.annotations.concurrent.ThreadSafe
 import java.util.*
 
 /**
- * Using [FastFormat] (slf4j-like style, may not exactly same) format receiver pattern:
+ * Using [FastFormat] (slf4j-like style, but not exactly same) format receiver pattern:
  *
  * ```
  * BFormats.fastFormat("1 + 1 = {}, 2 + 2 = {}", 2, 4);
@@ -44,6 +44,7 @@ import java.util.*
  * ```
  *
  * @see FastFormat
+ * @see CharsFormat
  */
 fun CharSequence.fastFormat(vararg args: Any?): String {
     return FastFormat.format(this, *args)
@@ -55,8 +56,11 @@ fun CharSequence.fastFormat(vararg args: Any?): String {
  * @see FastFormat
  */
 @ThreadSafe
-interface StringFormat {
+interface CharsFormat {
 
+    /**
+     * Formats given [pattern] with [args].
+     */
     fun format(pattern: CharSequence, vararg args: Any?): String
 }
 
@@ -98,7 +102,7 @@ interface StringFormat {
  * C:\file.zip\_{}
  * ```
  */
-object FastFormat : StringFormat {
+object FastFormat : CharsFormat {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         //return MessageFormatterSlf4j.arrayFormat(this.toString(), args, null).message

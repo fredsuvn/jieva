@@ -3,6 +3,7 @@ package test.java.xyz.srclab.common.utils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
+import xyz.srclab.common.base.BTime;
 import xyz.srclab.common.utils.CompareSerial;
 import xyz.srclab.common.utils.Counter;
 
@@ -11,11 +12,16 @@ public class CompareSerialTest {
     @Test
     public void testCompareSerial() {
         Counter counter = Counter.startsAt(0);
-        CompareSerial<Long, Long, String> compareSerial = new CompareSerial<Long, Long, String>(
+        CompareSerial<Long, Long, String> compareSerial = new CompareSerial<>(
             -1L,
             0L,
             it -> counter.getLong(),
-            it -> it + 1,
+            it -> {
+                if (it < 2) {
+                    return it + 1;
+                }
+                return null;
+            },
             (it1, it2) -> "" + it1 + it2
         );
         String n1 = compareSerial.next();
@@ -32,5 +38,10 @@ public class CompareSerialTest {
         Assert.assertEquals(n4, "10");
         Assert.assertEquals(n5, "11");
         Assert.assertEquals(n6, "12");
+
+        long now = BTime.currentMillis();
+        String nn = compareSerial.nextOrNull(3, 500);
+        Assert.assertNull(nn);
+        Assert.assertTrue(BTime.currentMillis() - now >= 500 * 3);
     }
 }
