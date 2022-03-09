@@ -46,10 +46,10 @@ open class CompareSerial<C : Any, S : Any, T : Any>(
     }
 
     /**
-     * Returns next value, same as `next(retryCount, 1000)`.
+     * Returns next value, same as `next(retryCount, 1)`.
      */
     fun next(retryCount: Int): T {
-        return next(retryCount, 1000L)
+        return next(retryCount, 1)
     }
 
     /**
@@ -71,10 +71,10 @@ open class CompareSerial<C : Any, S : Any, T : Any>(
     }
 
     /**
-     * Returns next value, or null if serial was overflow, same as `nextOrNull(retryCount, 1000)`.
+     * Returns next value, or null if serial was overflow, same as `nextOrNull(retryCount, 1)`.
      */
     fun nextOrNull(retryCount: Int): T? {
-        return nextOrNull(retryCount, 1000L)
+        return nextOrNull(retryCount, 1)
     }
 
     /**
