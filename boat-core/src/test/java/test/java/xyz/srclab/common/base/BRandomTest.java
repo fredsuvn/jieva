@@ -13,7 +13,7 @@ public class BRandomTest {
     public void testRandoms() {
         for (int i = 0; i < 10000; i++) {
             int r = BRandom.between(10, 20);
-            BLog.info("random[10, 20): {}", r);
+            // BLog.info("random[10, 20): {}", r);
             Assert.assertTrue(r >= 10 && r < 20);
         }
         String rd = BRandom.randomString(100);

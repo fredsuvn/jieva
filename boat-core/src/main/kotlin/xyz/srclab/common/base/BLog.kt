@@ -10,14 +10,14 @@ import java.time.format.DateTimeFormatter
 private var defaultLogger: LogPrinter = LogPrinter.simpleLogger(callerOffset = 1)
 
 /**
- * Sets the default logger for `BLog`.
+ * Sets default logger.
  */
 fun setDefaultLogLogger(logger: LogPrinter) {
     defaultLogger = logger
 }
 
 /**
- * Sets the default logger for `BLog`.
+ * Gets default logger for.
  */
 fun getDefaultLogLogger(): LogPrinter {
     return defaultLogger

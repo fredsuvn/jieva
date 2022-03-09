@@ -85,15 +85,15 @@ public class LangSample {
         args.put("name}", "DogX");
         args.put(1, "Cat");
         args.put(2, "Bird");
-        StringTemplate template1 = StringTemplate.resolve(
+        CharsTemplate template1 = CharsTemplate.resolve(
             "This is a {name}, that is a {}", "{", "}");
         //This is a Dog, that is a Cat
         logger.log(template1.process(args));
-        StringTemplate template2 = StringTemplate.resolve(
+        CharsTemplate template2 = CharsTemplate.resolve(
             "This is a } {name}, that is a {}}", "{", "}");
         //This is a } Dog, that is a Cat}
         logger.log(template2.process(args));
-        StringTemplate template3 = StringTemplate.resolve(
+        CharsTemplate template3 = CharsTemplate.resolve(
             "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
         //This is a } {DogX (Dog), that is a Bird\{\
         logger.log(template3.process(args));

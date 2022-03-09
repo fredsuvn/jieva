@@ -9,6 +9,9 @@ import java.util.function.Consumer
 import java.util.function.Function
 import java.util.function.Supplier
 
+/**
+ * Returns a [Ref] of which value from the [Optional].
+ */
 fun <T : Any> Optional<T>.toRef(): Ref<T> {
     return this.orElse(null).ref()
 }
@@ -16,20 +19,22 @@ fun <T : Any> Optional<T>.toRef(): Ref<T> {
 /**
  * Presents a reference holds a value.
  *
- * It supports chain operation in Java:
+ * Using `Ref` can implement chain operation in Java:
  *
  * ```
  * Date dateValue = Ref.of(intValue)
- *     .map(StringUtils::intToString)
- *     .accept(SystemUtils::printString)
+ *     .map(Utils::intToString)
+ *     .accept(Utils::printString)
+ *     .map(Utils::stringToDate)
  *     .get();
  * ```
  *
- * Same as:
+ * It is equivalent to:
  *
  * ```
- * String stringValue = StringUtils.intToString(intValue);
- * SystemUtils.printString(stringValue);
+ * String stringValue = Utils.intToString(intValue);
+ * Utils.printString(stringValue);
+ * Date dateValue = Utils.stringToDate(stringValue);
  * ```
  *
  * It also provides mutable operation for final variable:
@@ -38,68 +43,56 @@ fun <T : Any> Optional<T>.toRef(): Ref<T> {
  * Ref<String> ref = Ref.of("a");
  * List<String> list = Arrays.asList("b", "c", "d");
  * list.forEach(i -> ref.set(ref.get() + "-" + i));
- * SystemUtils.printString(ref.get());//a-b-c-d
+ * Utils.printString(ref.get());//a-b-c-d
  * ```
  *
  * This interface is similar to [Optional] in chain operations, the differences are:
  *
  * * [Ref] is mutable but [Optional] is immutable;
- * * [Ref] always return itself (although generic type may be changed) but [Optional] return a new object;
+ * * [Ref] always returns itself (although generic type may be changed) but [Optional] returns a new object;
  */
 @ForJava
 interface Ref<T : Any> : GetRef<T>, SetRef<T> {
 
     /**
-     * If current value is null, sets null, else sets result of [func]. Returns this as typed.
+     * Sets current value to result of [func], returns this as typed.
      */
-    fun <R : Any> map(func: Function<T, R?>): Ref<R> {
-        val value = orNull()
-        return if (value === null) {
-            set(null)
-            this.asTyped()
-        } else {
-            val result: Ref<R> = this.asTyped()
-            result.set(func.apply(value))
-            result
-        }
+    fun <R : Any> map(func: Function<T?, R?>): Ref<R> {
+        val thisObj = this.asTyped<Ref<R>>()
+        thisObj.set(func.apply(orNull()))
+        return thisObj
     }
 
     /**
-     * Sets result of [func] whatever current value is null or null. Returns this as typed.
+     * Gets held value to [consumer], returns this.
      */
-    fun <R : Any> mapNullable(func: Function<T?, R?>): Ref<R> {
-        val result: Ref<R> = this.asTyped()
-        result.set(func.apply(orNull()))
-        return result
-    }
-
-    /**
-     * If current value is null, does nothing, else calls [consumer]. Returns this.
-     */
-    fun <R : Any> accept(consumer: Consumer<T>) = apply {
-        val value = orNull()
-        if (value !== null) {
-            consumer.accept(value)
-        }
-    }
-
-    /**
-     * Calls [consumer] whatever current value is null or null. Returns this.
-     */
-    fun <R : Any> acceptNullable(consumer: Consumer<T?>) = apply {
+    fun <R : Any> accept(consumer: Consumer<T?>) = apply {
         consumer.accept(orNull())
     }
 
+    /**
+     * Returns a new [Ref] holds the value of this ref.
+     */
     fun copy(): Ref<T> {
         return orNull().ref()
     }
 
+    /**
+     * Returns an [Optional] of held value:
+     *
+     * ```
+     * return Optional.ofNullable(orNull());
+     * ```
+     */
     fun toOptional(): Optional<T> {
         return Optional.ofNullable(orNull())
     }
 
     companion object {
 
+        /**
+         * Returns a [Ref] holds the value.
+         */
         @JvmName("of")
         @JvmStatic
         fun <T : Any> T?.ref(): Ref<T> {
@@ -119,49 +112,55 @@ interface Ref<T : Any> : GetRef<T>, SetRef<T> {
     }
 }
 
+/**
+ * `Get` operation for [Ref].
+ */
 interface GetRef<T : Any> {
 
+    /**
+     * Returns true if held value is not null, else false.
+     */
     val isPresent: Boolean
         get() {
             return orNull() !== null
         }
 
-    @Throws(NullPointerException::class)
+    /**
+     * Return held value, or throw [NoSuchElementException] if it is null.
+     */
+    @Throws(NoSuchElementException::class)
     fun get(): T {
-        return orNull()!!
+        return orNull() ?: throw NoSuchElementException()
     }
 
+    /**
+     * Return held value, may be null.
+     */
     fun orNull(): T?
 
+    /**
+     * Return held value, or default value if it is null.
+     */
     fun orDefault(value: T): T {
         return orNull() ?: value
     }
 
+    /**
+     * Return held value, or else value if it is null.
+     */
     fun orElse(value: Supplier<T>): T {
         return orNull() ?: value.get()
     }
-
-    @JvmSynthetic
-    fun orElse(value: () -> T): T {
-        return orNull() ?: value()
-    }
-
-    fun orNullableDefault(value: T?): T? {
-        return orNull() ?: value
-    }
-
-    fun orNullableElse(value: Supplier<T?>): T? {
-        return orNull() ?: value.get()
-    }
-
-    @JvmSynthetic
-    fun orNullableElse(value: () -> T?): T? {
-        return orNull() ?: value()
-    }
 }
 
+/**
+ * `Set` operation for [Ref].
+ */
 interface SetRef<T : Any> {
 
+    /**
+     * Sets the held value.
+     */
     fun set(value: T?)
 }
 
