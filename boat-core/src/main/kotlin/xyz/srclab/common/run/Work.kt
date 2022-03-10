@@ -24,21 +24,21 @@ interface Work<T> {
      * Awaits util the computation has completed, returns the result.
      */
     @Throws(WorkException::class)
-    fun get(): T
+    fun getResult(): T
 
     /**
      * Awaits util the computation has completed or timeout for [millis],
      * returns the result or throws [WorkException] caused by [TimeoutException].
      */
     @Throws(WorkException::class)
-    fun get(millis: Long): T
+    fun getResult(millis: Long): T
 
     /**
      * Awaits util the computation has completed or timeout for [duration],
      * returns the result or throws [WorkException] caused by [TimeoutException].
      */
     @Throws(WorkException::class)
-    fun get(duration: Duration): T
+    fun getResult(duration: Duration): T
 
     /**
      * Cancels or interrupts the task associated by this [Work].

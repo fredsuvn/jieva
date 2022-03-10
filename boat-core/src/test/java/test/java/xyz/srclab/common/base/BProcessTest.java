@@ -26,7 +26,7 @@ public class BProcessTest {
     @Test
     public void testPing() {
         ProcWork work = BProcess.startProcess("ping 127.0.0.1");
-        work.get(Duration.ofSeconds(2));
+        work.getResult(Duration.ofSeconds(2));
         String output = work.availableOutputString();
         BLog.info(output);
         work.cancel(true);
@@ -34,7 +34,7 @@ public class BProcessTest {
 
     private void echo(String... command) {
         ProcWork work = BProcess.startProcess(command);
-        work.get();
+        work.getResult();
         String output = work.outputString();
         BLog.info(output);
         Assert.assertEquals(output, ECHO_CONTENT + BSystem.getLineSeparator());

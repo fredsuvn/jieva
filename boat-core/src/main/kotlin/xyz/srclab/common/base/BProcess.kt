@@ -47,7 +47,7 @@ open class ProcWork(
 
     override fun isCancelled(): Boolean = false
 
-    override fun get(): Process {
+    override fun getResult(): Process {
         try {
             process.waitFor()
             return process
@@ -56,7 +56,7 @@ open class ProcWork(
         }
     }
 
-    override fun get(millis: Long): Process {
+    override fun getResult(millis: Long): Process {
         try {
             process.waitFor(millis, TimeUnit.MILLISECONDS)
             return process
@@ -65,7 +65,7 @@ open class ProcWork(
         }
     }
 
-    override fun get(duration: Duration): Process {
+    override fun getResult(duration: Duration): Process {
         try {
             process.waitFor(duration.toNanos(), TimeUnit.NANOSECONDS)
             return process
@@ -108,7 +108,7 @@ open class ProcWork(
      *  This method will return immediately after read available bytes, rather than all bytes like [outputString].
      */
     fun availableOutputString(): String? {
-        return process.inputStream?.availableString(charset("GBK"))
+        return process.inputStream?.availableString(defaultCharset())
     }
 
     /**
