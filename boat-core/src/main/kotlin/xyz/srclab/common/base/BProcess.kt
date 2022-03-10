@@ -2,93 +2,104 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.base.ProcessWork.Companion.toProcessWork
 import xyz.srclab.common.io.availableString
 import xyz.srclab.common.io.readString
-import java.io.InputStream
-import java.io.OutputStream
+import xyz.srclab.common.run.Work
+import xyz.srclab.common.run.WorkException
 import java.nio.charset.Charset
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
-fun CharSequence.startProcess(): ProcessWork {
-    return Runtime.getRuntime().exec(this.toString()).toProcessWork()
-}
-
-fun startProcess(vararg cmd: CharSequence): ProcessWork {
-    return Runtime.getRuntime().exec(cmd.map { it.toString() }.toTypedArray()).toProcessWork()
+/**
+ * Returns [this] process as [ProcWork].
+ */
+fun Process.asWork(): ProcWork {
+    return ProcWork(this)
 }
 
 /**
- * Represents process-work associated with [Process].
+ * Starts a process as [ProcWork].
  */
-interface ProcessWork {
+fun CharSequence.startProcess(): ProcWork {
+    return Runtime.getRuntime().exec(this.toString()).asWork()
+}
 
+/**
+ * Starts a process as [ProcWork].
+ */
+fun startProcess(vararg cmd: CharSequence): ProcWork {
+    return Runtime.getRuntime().exec(cmd.map { it.toString() }.toTypedArray()).asWork()
+}
+
+/**
+ * [Work] for [Process].
+ */
+open class ProcWork(
+    /**
+     * The process.
+     */
     val process: Process
+) : Work<Process> {
 
-    val outputStream: OutputStream?
-        get() {
-            return process.outputStream
+    override fun isDone(): Boolean {
+        return !process.isAlive
+    }
+
+    override fun isCancelled(): Boolean = false
+
+    override fun get(): Process {
+        try {
+            process.waitFor()
+            return process
+        } catch (e: Exception) {
+            throw WorkException(e)
         }
+    }
 
-    val inputStream: InputStream?
-        get() {
-            kotlin.run { }
-            return process.inputStream
+    override fun get(millis: Long): Process {
+        try {
+            process.waitFor(millis, TimeUnit.MILLISECONDS)
+            return process
+        } catch (e: Exception) {
+            throw WorkException(e)
         }
+    }
 
-    val errorStream: InputStream?
-        get() {
-            return process.errorStream
+    override fun get(duration: Duration): Process {
+        try {
+            process.waitFor(duration.toNanos(), TimeUnit.NANOSECONDS)
+            return process
+        } catch (e: Exception) {
+            throw WorkException(e)
         }
-
-    val isAlive: Boolean
-        get() {
-            return process.isAlive
-        }
-
-    val exitValue: Int
-        get() {
-            return process.exitValue()
-        }
-
-    /**
-     * @throws InterruptedException
-     */
-    fun await() = apply {
-        process.waitFor()
     }
 
     /**
-     * @throws InterruptedException
+     * Kills the process.
+     *
+     * Note the killing may not block the current thread, so the result is inaccurate.
      */
-    fun await(timeout: Duration): Boolean {
-        return process.waitFor(timeout.toNanos(), TimeUnit.NANOSECONDS)
-    }
-
-    fun destroy() {
-        destroy(false)
-    }
-
-    fun destroy(force: Boolean) {
-        if (force)
-            process.destroy()
-        else
-            process.destroyForcibly()
+    override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+        try {
+            val p = process.destroyForcibly()
+            return !p.isAlive
+        } catch (e: Exception) {
+            throw WorkException(e)
+        }
     }
 
     /**
      * Returns all output stream as `String`.
      */
     fun outputString(): String? {
-        return inputStream?.readString()
+        return process.inputStream?.readString(Charset.defaultCharset())
     }
 
     /**
      * Returns all output stream as `String`.
      */
     fun outputString(charset: Charset): String? {
-        return inputStream?.readString(charset)
+        return process.inputStream?.readString(charset)
     }
 
     /**
@@ -97,7 +108,7 @@ interface ProcessWork {
      *  This method will return immediately after read available bytes, rather than all bytes like [outputString].
      */
     fun availableOutputString(): String? {
-        return inputStream?.availableString()
+        return process.inputStream?.availableString(charset("GBK"))
     }
 
     /**
@@ -106,21 +117,21 @@ interface ProcessWork {
      *  This method will return immediately after read available bytes, rather than all bytes like [outputString].
      */
     fun availableOutputString(charset: Charset): String? {
-        return inputStream?.availableString(charset)
+        return process.inputStream?.availableString(charset)
     }
 
     /**
      * Returns all error stream as `String`.
      */
     fun errorString(): String? {
-        return errorStream?.readString()
+        return process.errorStream?.readString(Charset.defaultCharset())
     }
 
     /**
      * Returns all error stream as `String`.
      */
     fun errorString(charset: Charset): String? {
-        return errorStream?.readString(charset)
+        return process.errorStream?.readString(charset)
     }
 
     /**
@@ -129,7 +140,7 @@ interface ProcessWork {
      *  This method will return immediately after read available bytes, rather than all bytes like [errorString].
      */
     fun availableErrorString(): String? {
-        return errorStream?.availableString()
+        return process.errorStream?.availableString(Charset.defaultCharset())
     }
 
     /**
@@ -138,33 +149,6 @@ interface ProcessWork {
      *  This method will return immediately after read available bytes, rather than all bytes like [errorString].
      */
     fun availableErrorString(charset: Charset): String? {
-        return errorStream?.availableString(charset)
-    }
-
-    companion object {
-
-        @JvmName("of")
-        @JvmStatic
-        fun Process.toProcessWork(): ProcessWork {
-            return ProcessWorkImpl(this)
-        }
-
-        private class ProcessWorkImpl(override val process: Process) : ProcessWork {
-
-            override fun equals(other: Any?): Boolean {
-                if (other is ProcessWork) {
-                    return this.process == other.process
-                }
-                return false
-            }
-
-            override fun hashCode(): Int {
-                return this.process.hashCode()
-            }
-
-            override fun toString(): String {
-                return this.process.toString()
-            }
-        }
+        return process.errorStream?.availableString(charset)
     }
 }

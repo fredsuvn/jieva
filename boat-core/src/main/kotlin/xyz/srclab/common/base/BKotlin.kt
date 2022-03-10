@@ -6,7 +6,7 @@ import java.util.concurrent.Callable
 import java.util.function.*
 
 /*
-Java functional interfaces to kotlin function:
+ * Java functional interfaces to kotlin function:
  */
 
 fun <T> Supplier<T>.asKotlinFun(): (() -> T) = { this.get() }
@@ -43,7 +43,7 @@ fun Runnable.asKotlinFun(): () -> Unit = { this.run() }
 fun <V> Callable<V>.asKotlinFun(): () -> V = { this.call() }
 
 /*
-Kotlin functions to java functional interfaces:
+ * Kotlin functions to java functional interfaces:
  */
 
 private typealias IBiPredicate<T, U> = IndexedBiPredicate<T, U>

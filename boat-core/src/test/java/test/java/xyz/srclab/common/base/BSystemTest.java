@@ -27,10 +27,16 @@ public class BSystemTest {
     public void testJavaVersion() {
         int versionNumber = BSystem.getJavaMajorVersion();
         String version = BSystem.getJavaSpecificationVersion();
+        BLog.info("Current version: {}, number: {}", version, versionNumber);
         if (versionNumber <= 8) {
             Assert.assertTrue(version.startsWith("1." + versionNumber));
         } else {
             Assert.assertTrue(version.startsWith("" + versionNumber));
         }
+    }
+
+    @Test
+    public void testSystemDefault(){
+        System.out.println(BSystem.jvmCharset());
     }
 }

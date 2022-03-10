@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.base.BProcess;
 import xyz.srclab.common.base.BSystem;
-import xyz.srclab.common.base.ProcessWork;
+import xyz.srclab.common.base.ProcWork;
 
 import java.time.Duration;
 
@@ -25,17 +25,17 @@ public class BProcessTest {
 
     @Test
     public void testPing() {
-        ProcessWork processing = BProcess.startProcess("ping 127.0.0.1");
-        processing.await(Duration.ofSeconds(2));
-        String output = processing.availableOutputString();
+        ProcWork work = BProcess.startProcess("ping 127.0.0.1");
+        work.get(Duration.ofSeconds(2));
+        String output = work.availableOutputString();
         BLog.info(output);
-        processing.destroy(true);
+        work.cancel(true);
     }
 
     private void echo(String... command) {
-        ProcessWork processWork = BProcess.startProcess(command);
-        processWork.await();
-        String output = processWork.outputString();
+        ProcWork work = BProcess.startProcess(command);
+        work.get();
+        String output = work.outputString();
         BLog.info(output);
         Assert.assertEquals(output, ECHO_CONTENT + BSystem.getLineSeparator());
     }

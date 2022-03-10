@@ -2,85 +2,46 @@
 
 package xyz.srclab.common.base
 
-import java.io.File
+import xyz.srclab.common.collect.toStringMap
 import java.io.Serializable
+import java.nio.charset.Charset
+
+/*
+ * System properties keys.
+ */
 
 const val JAVA_VERSION_KEY = "java.version"
-
 const val JAVA_VENDOR_KEY = "java.vendor"
-
 const val JAVA_VENDOR_URL_KEY = "java.vendor.url"
-
 const val JAVA_HOME_KEY = "java.home"
-
 const val JAVA_VM_SPECIFICATION_VERSION_KEY = "java.vm.specification.version"
-
 const val JAVA_VM_SPECIFICATION_VENDOR_KEY = "java.vm.specification.vendor"
-
 const val JAVA_VM_SPECIFICATION_NAME_KEY = "java.vm.specification.name"
-
 const val JAVA_VM_VERSION_KEY = "java.vm.version"
-
 const val JAVA_VM_VENDOR_KEY = "java.vm.vendor"
-
 const val JAVA_VM_NAME_KEY = "java.vm.name"
-
 const val JAVA_SPECIFICATION_VERSION_KEY = "java.specification.version"
-
 const val JAVA_SPECIFICATION_VENDOR_KEY = "java.specification.vendor"
-
 const val JAVA_SPECIFICATION_NAME_KEY = "java.specification.name"
-
 const val JAVA_CLASS_VERSION_KEY = "java.class.version"
-
 const val JAVA_CLASS_PATH_KEY = "java.class.path"
-
 const val JAVA_LIBRARY_PATH_KEY = "java.library.path"
-
 const val JAVA_IO_TMPDIR_KEY = "java.io.tmpdir"
-
 const val JAVA_COMPILER_KEY = "java.compiler"
-
 const val JAVA_EXT_DIRS_KEY = "java.ext.dirs"
-
 const val OS_NAME_KEY = "os.name"
-
 const val OS_ARCH_KEY = "os.arch"
-
 const val OS_VERSION_KEY = "os.version"
-
 const val FILE_SEPARATOR_KEY = "file.separator"
-
 const val PATH_SEPARATOR_KEY = "path.separator"
-
 const val LINE_SEPARATOR_KEY = "line.separator"
-
 const val USER_NAME_KEY = "user.name"
-
 const val USER_HOME_KEY = "user.home"
-
 const val USER_DIR_KEY = "user.dir"
 
-/**
- * Default file separator: [File.separator].
- * "/" on Unix, "\\" on Windows.
+/*
+ * Functions for get system properties.
  */
-@JvmField
-val FILE_SEPARATOR: String = File.separator
-
-/**
- * Default path separator: [File.pathSeparator].
- * ":" on Unix, ";" on Windows.
- */
-@JvmField
-val PATH_SEPARATOR: String = File.pathSeparator
-
-/**
- * Default line separator: [System.lineSeparator].
- * "\n" on Unix, "\r\n" on Windows, "\r" on Mac.
- */
-@JvmField
-val LINE_SEPARATOR: String = System.lineSeparator()
 
 fun getJavaVersion(): String {
     return getSystemProperty(JAVA_VERSION_KEY)
@@ -204,8 +165,9 @@ fun getUserDir(): String {
  * @see System.getProperty
  */
 @JvmName("getProperty")
-fun getSystemProperty(key: String): String {
-    return getSystemPropertyOrNull(key) ?: throw NullPointerException("Value not found: $key")
+@Throws(NoSuchSystemPropertyException::class)
+fun getSystemProperty(key: CharSequence): String {
+    return getSystemPropertyOrNull(key) ?: throw NoSuchSystemPropertyException(key.toString())
 }
 
 /**
@@ -214,8 +176,9 @@ fun getSystemProperty(key: String): String {
  * @see System.getProperty
  */
 @JvmName("getPropertyOrNull")
-fun getSystemPropertyOrNull(key: String): String? {
-    return System.getProperty(key)
+fun getSystemPropertyOrNull(key: CharSequence): String? {
+    val k = key.toString()
+    return System.getProperty(k)
 }
 
 /**
@@ -235,13 +198,7 @@ fun setSystemProperty(key: String, value: String) {
  */
 @JvmName("getProperties")
 fun getSystemProperties(): Map<String, String> {
-    val result: MutableMap<String, String> = HashMap()
-    System.getProperties().forEach {
-        val key = it.key.toString()
-        val value = it.value.toString()
-        result[key] = value
-    }
-    return result
+    return System.getProperties().toStringMap()
 }
 
 /**
@@ -249,8 +206,9 @@ fun getSystemProperties(): Map<String, String> {
  *
  * @see System.getenv
  */
-fun getEnv(key: String): String {
-    return getEnvOrNull(key) ?: throw NullPointerException("Env not found: $key")
+@Throws(NoSuchSystemPropertyException::class)
+fun getEnv(key: CharSequence): String {
+    return getEnvOrNull(key) ?: throw NoSuchSystemPropertyException(key.toString())
 }
 
 /**
@@ -258,8 +216,8 @@ fun getEnv(key: String): String {
  *
  * @see System.getenv
  */
-fun getEnvOrNull(key: String): String? {
-    return System.getenv(key)
+fun getEnvOrNull(key: CharSequence): String? {
+    return System.getenv(key.toString())
 }
 
 /**
@@ -280,6 +238,16 @@ fun availableProcessors(): Int {
     return Runtime.getRuntime().availableProcessors()
 }
 
+/**
+ * Returns the default charset of JVM.
+ */
+fun jvmCharset(): Charset {
+    return Charset.defaultCharset()
+}
+
+/**
+ * Returns whether current OS is Windows.
+ */
 fun isWindows(): Boolean {
     val osName = getOsNameOrNull()
     if (osName === null) {
@@ -288,6 +256,9 @@ fun isWindows(): Boolean {
     return osName.startsWith("Windows")
 }
 
+/**
+ * Returns whether current OS is Linux.
+ */
 fun isLinux(): Boolean {
     val osName = getOsNameOrNull()
     if (osName === null) {
@@ -296,6 +267,9 @@ fun isLinux(): Boolean {
     return osName.startsWith("Linux") || osName.startsWith("LINUX")
 }
 
+/**
+ * Returns whether current OS is Mac.
+ */
 fun isMac(): Boolean {
     val osName = getOsNameOrNull()
     if (osName === null) {
@@ -304,6 +278,9 @@ fun isMac(): Boolean {
     return osName.startsWith("Mac")
 }
 
+/**
+ * Returns whether current OS is FreeBSD, OpenBSD or NetBSD.
+ */
 fun isBsd(): Boolean {
     val osName = getOsNameOrNull()
     if (osName === null) {
@@ -315,8 +292,8 @@ fun isBsd(): Boolean {
 /**
  * Gets java major version.
  *
- * If java version is equal to or less than 1.8, return second version number such as _6 of 1.6.x_, _8 of 1.8.x_.
- * Else return first number such as _9 of 9.0_.
+ * If java version is equal to or less than 1.8, return second version number such as _6_ for _1.6.x_, _8_ for _1.8.x_.
+ * Else return first number such as _9_ of _9.0_.
  */
 fun getJavaMajorVersion(): Int {
     val javaVersion = getJavaVersion()
@@ -338,16 +315,38 @@ fun getJavaMajorVersion(): Int {
     return -1
 }
 
+/**
+ * Returns whether current JDK version is higher than 9.
+ */
 fun isJdk9OrHigher(): Boolean {
     return getJavaMajorVersion() >= 9
 }
 
-fun isYunfan(): Boolean {
-    throw YunfanIsComingException()
-}
-
-class YunfanIsComingException : RuntimeException("长风破浪会有时，直挂云帆济沧海。占个坑~"), Serializable {
+/**
+ * No such system property exception.
+ */
+open class NoSuchSystemPropertyException @JvmOverloads constructor(
+    message: String? = null, cause: Throwable? = null
+) : RuntimeException(message, cause), Serializable {
     companion object {
         private val serialVersionUID: Long = defaultSerialVersion()
     }
+}
+
+/**
+ * Returns whether current OS is YunFan.
+ *
+ * **长风****破浪**会**有时**，直挂**云帆**济**沧海**。占个坑~
+ */
+fun isYunfan(): Boolean {
+    return YunFanOS.isOk()
+}
+
+private object YunFanOS {
+
+    init {
+        println("长风破浪会有时，直挂云帆济沧海。占个坑~")
+    }
+
+    fun isOk(): Boolean = false
 }

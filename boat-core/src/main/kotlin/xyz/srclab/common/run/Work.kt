@@ -23,6 +23,7 @@ interface Work<T> {
     /**
      * Awaits util the computation has completed, returns the result.
      */
+    @Throws(WorkException::class)
     fun get(): T
 
     /**
@@ -45,6 +46,7 @@ interface Work<T> {
      *
      * @return true if success
      */
+    @Throws(WorkException::class)
     fun cancel(): Boolean {
         return cancel(true)
     }
@@ -54,6 +56,7 @@ interface Work<T> {
      *
      * @return true if success
      */
+    @Throws(WorkException::class)
     fun cancel(mayInterruptIfRunning: Boolean): Boolean
 }
 
@@ -63,6 +66,9 @@ interface Work<T> {
 open class WorkException @JvmOverloads constructor(
     message: String? = null, cause: Throwable? = null
 ) : RuntimeException(message, cause), Serializable {
+
+    constructor(cause: Throwable?) : this(null, cause)
+
     companion object {
         private val serialVersionUID: Long = defaultSerialVersion()
     }
