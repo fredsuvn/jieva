@@ -38,6 +38,10 @@ const val LINE_SEPARATOR_KEY = "line.separator"
 const val USER_NAME_KEY = "user.name"
 const val USER_HOME_KEY = "user.home"
 const val USER_DIR_KEY = "user.dir"
+const val FILE_ENCODING_KEY = "file.encoding"
+
+//Add on JDK17:
+const val NATIVE_ENCODING_KEY = "native.encoding"
 
 /*
  * Functions for get system properties.
@@ -159,6 +163,14 @@ fun getUserDir(): String {
     return getSystemProperty(USER_DIR_KEY)
 }
 
+fun getFileEncoding(): String {
+    return getSystemProperty(FILE_ENCODING_KEY)
+}
+
+fun getNativeEncoding(): String {
+    return getSystemProperty(NATIVE_ENCODING_KEY)
+}
+
 /**
  * Gets the system property indicated by the specified key.
  *
@@ -239,10 +251,54 @@ fun availableProcessors(): Int {
 }
 
 /**
- * Returns the default charset of JVM.
+ * Returns the default charset of JVM, equivalent to: [Charset.defaultCharset].
  */
 fun jvmCharset(): Charset {
     return Charset.defaultCharset()
+}
+
+/**
+ * Returns native charset.
+ * This will search following system properties in order:
+ *
+ * * `native.encoding`;
+ * * `sun.jnu.encoding`;
+ * * `file.encoding`;
+ *
+ * If still not found, return [Charset.defaultCharset]
+ */
+fun nativeCharset(): Charset {
+    val init = BSystemHolder.nativeCharset
+    if (init !== null) {
+        return init
+    }
+    synchronized(BSystemHolder::class.java) {
+        val init2 = BSystemHolder.nativeCharset
+        if (init2 !== null) {
+            return init2
+        }
+        val nativeEncoding = getSystemPropertyOrNull(NATIVE_ENCODING_KEY)
+        if (nativeEncoding !== null) {
+            val nativeCharset = charset(nativeEncoding)
+            BSystemHolder.nativeCharset = nativeCharset
+            return nativeCharset
+        }
+        val sunEncoding = getSystemPropertyOrNull("sun.jnu.encoding")
+        if (sunEncoding !== null) {
+            val sunCharset = charset(sunEncoding)
+            BSystemHolder.nativeCharset = sunCharset
+            return sunCharset
+        }
+        val fileEncoding = getSystemPropertyOrNull(FILE_ENCODING_KEY)
+        if (fileEncoding !== null) {
+            val fileCharset = charset(fileEncoding)
+            BSystemHolder.nativeCharset = fileCharset
+            return fileCharset
+        }
+        val jvmCharset = jvmCharset()
+        BSystemHolder.nativeCharset = jvmCharset
+        return jvmCharset
+    }
 }
 
 /**
@@ -331,6 +387,10 @@ open class NoSuchSystemPropertyException @JvmOverloads constructor(
     companion object {
         private val serialVersionUID: Long = defaultSerialVersion()
     }
+}
+
+private object BSystemHolder {
+    var nativeCharset: Charset? = null
 }
 
 /**

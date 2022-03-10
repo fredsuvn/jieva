@@ -36,7 +36,8 @@ public class BSystemTest {
     }
 
     @Test
-    public void testSystemDefault(){
-        System.out.println(BSystem.jvmCharset());
+    public void testSystemDefault() {
+        BLog.info("JVM charset: {}", BSystem.jvmCharset());
+        BLog.info("Native charset: {}", BSystem.nativeCharset());
     }
 }

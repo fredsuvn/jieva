@@ -89,10 +89,10 @@ open class ProcWork(
     }
 
     /**
-     * Returns all output stream as `String`.
+     * Returns all output stream as `String` with native charset.
      */
     fun outputString(): String? {
-        return process.inputStream?.readString(Charset.defaultCharset())
+        return process.inputStream?.readString(nativeCharset())
     }
 
     /**
@@ -103,12 +103,13 @@ open class ProcWork(
     }
 
     /**
-     *  Returns available output stream as `String`.
+     *  Returns available output stream as `String` with native charset.
      *
      *  This method will return immediately after read available bytes, rather than all bytes like [outputString].
      */
     fun availableOutputString(): String? {
-        return process.inputStream?.availableString(defaultCharset())
+        //TODO
+        return process.inputStream?.availableString(nativeCharset())
     }
 
     /**
@@ -121,10 +122,10 @@ open class ProcWork(
     }
 
     /**
-     * Returns all error stream as `String`.
+     * Returns all error stream as `String` with native charset.
      */
     fun errorString(): String? {
-        return process.errorStream?.readString(Charset.defaultCharset())
+        return process.errorStream?.readString(nativeCharset())
     }
 
     /**
@@ -135,12 +136,12 @@ open class ProcWork(
     }
 
     /**
-     *  Returns available output stream as `String`.
+     *  Returns available output stream as `String` with native charset.
      *
      *  This method will return immediately after read available bytes, rather than all bytes like [errorString].
      */
     fun availableErrorString(): String? {
-        return process.errorStream?.availableString(Charset.defaultCharset())
+        return process.errorStream?.availableString(nativeCharset())
     }
 
     /**
