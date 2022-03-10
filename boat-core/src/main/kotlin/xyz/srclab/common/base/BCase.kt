@@ -181,7 +181,6 @@ open class CamelCase @JvmOverloads constructor(
         }
 
         var wordList: MutableList<CaseRef>? = null
-
         fun getWordList(): MutableList<CaseRef> {
             val wl = wordList
             if (wl === null) {
@@ -419,7 +418,6 @@ open class SeparatorCase(
 
         var splitList: MutableList<CharSequence>? = null
         var splitCharCount = 0
-
         fun getSplitList(): MutableList<CharSequence> {
             val sl = splitList
             if (sl === null) {

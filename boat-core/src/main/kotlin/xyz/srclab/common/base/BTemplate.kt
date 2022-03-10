@@ -2,20 +2,25 @@
 
 package xyz.srclab.common.base
 
-import xyz.srclab.annotations.Accepted
 import java.io.Serializable
 import java.util.*
 
 /**
  * Parses [this] to [CharsTemplate] implemented by [SimpleTemplate].
  *
+ * @receiver this source text to be template
+ * @param escapeChar escape char, may be null if no escape
+ * @param parameterPrefix parameter prefix
+ * @param parameterSuffix parameter suffix, or null if no suffix
+ *
  * @see CharsTemplate
  * @see SimpleTemplate
  */
 @JvmName("parse")
+@Throws(TemplateException::class)
 @JvmOverloads
 fun CharSequence.parseTemplate(
-    escapeChar: Char,
+    escapeChar: Char?,
     parameterPrefix: CharSequence,
     parameterSuffix: CharSequence? = null
 ): CharsTemplate {
@@ -23,36 +28,18 @@ fun CharSequence.parseTemplate(
 }
 
 /**
- * Chars template, to process a char sequence template:
+ * Chars template, to process on a parameterized char sequence.
+ * Default implementation is [SimpleTemplate], for example:
  *
  * ```
- * Map<Object, Object> args = new HashMap<>();
- * args.put("name", "Dog");
- * args.put("name}", "DogX");
- * args.put(1, "Cat");
- * args.put(2, "Bird");
- * BTemplate template1 = BTemplates.resolve(
- * "This is a {name}, that is a {}", "{", "}");
+ * Map<String, Object> args = new HashMap<>();
+ * args.put("n1", "Dog");
+ * args.put("n2}", "Cat");
+ * CharsTemplate template1 = BTemplate.parse("This is a {n1}, that is a {n2}", null, "{", "}");
  * Assert.assertEquals(template1.process(args), "This is a Dog, that is a Cat");
- * BTemplate template2 = BTemplates.resolve(
- * "This is a } {name}, that is a {}}", "{", "}");
- * Assert.assertEquals(template2.process(args), "This is a } Dog, that is a Cat}");
  * ```
  *
- * Chars template supports escape:
- *
- * ```
- * BTemplate template3 = BTemplates.resolve(
- * "This is a } \\{{name\\}} ({name}), that is a {}\\\\\\{\\", "{", "}", "\\");
- * logger.log(template3.process(args));
- * Assert.assertEquals(template3.process(args), "This is a } {DogX (Dog), that is a Bird\\{");
- * ```
- *
- * Note:
- *
- * * Escape works in front of any token;
- * * Parameter suffix token can be used before parameter prefix token --
- *   in this case, it will be seen as a common text;
+ * @see SimpleTemplate
  */
 interface CharsTemplate {
 
@@ -66,29 +53,10 @@ interface CharsTemplate {
     val nodes: List<CharSequence>
 
     /**
-     * Process with [args].
+     * Processes on this template with named [args].
      */
     @Throws(TemplateException::class)
-    fun process(vararg args:Any?): String {
-        val nodesArray = nodes.toTypedArray()
-        var i = 0
-        var p = 0
-        while (i < nodesArray.size) {
-            val node = nodesArray[i]
-            if (node is Parameter) {
-                nodesArray[i] = args[p].toCharSeq()
-            }
-            i++
-            p++
-        }
-        return nodesArray.joinToString("")
-    }
-
-    /**
-     * Process with [args].
-     */
-    @Throws(TemplateException::class)
-    fun processMap(args: Map<String, Any?>): String {
+    fun process(args: Map<String, Any?>): String {
         val nodesArray = nodes.toTypedArray()
         var i = 0
         while (i < nodesArray.size) {
@@ -102,24 +70,52 @@ interface CharsTemplate {
     }
 
     /**
-     * Processes with [args].
+     * Processes on this template with unnamed [args].
      */
     @Throws(TemplateException::class)
-    fun processTo(dest: Appendable, args: Map<@Accepted(String::class, Integer::class) Any, Any?>) {
+    fun processArgs(vararg args: Any?): String {
+        val nodesArray = nodes.toTypedArray()
+        var i = 0
+        var p = 0
+        while (i < nodesArray.size) {
+            val node = nodesArray[i]
+            if (node is Parameter) {
+                nodesArray[i] = args[p++].toCharSeq()
+            }
+            i++
+        }
+        return nodesArray.joinToString("")
+    }
+
+    /**
+     * Processes on this template with named [args] to [dest].
+     */
+    @Throws(TemplateException::class)
+    fun <T : Appendable> processTo(dest: T, args: Map<String, Any?>): T {
         for (node in nodes) {
             if (node is Parameter) {
-                dest.append(args[node].toCharSeq())
+                dest.append(args[node.toString()].toCharSeq())
             } else {
                 dest.append(node)
             }
         }
+        return dest
     }
 
-    private fun Map<@Accepted(String::class, Integer::class) Any, Any?>.getValue(node: Parameter): Any? {
-        if (node.isEmpty()) {
-            return this[node.index]
+    /**
+     * Processes on this template with unnamed [args] to [dest].
+     */
+    @Throws(TemplateException::class)
+    fun <T : Appendable> processArgsTo(dest: T, vararg args: Any?): T {
+        var p = 0
+        for (node in nodes) {
+            if (node is Parameter) {
+                dest.append(args[p++].toCharSeq())
+            } else {
+                dest.append(node)
+            }
         }
-        return this[node.toString()] ?: this[node.index]
+        return dest
     }
 
     /**
@@ -135,33 +131,26 @@ interface CharsTemplate {
         companion object {
 
             /**
-             * Returns a [Parameter] with [chars] and [index].
+             * Returns a [Parameter] with [index] and [content].
              */
             @JvmStatic
-            fun of(chars: CharSequence, index: Int): Parameter {
-                return ParameterImpl(chars, index)
-            }
-
-            /**
-             * Returns a [Parameter] with empty chars and [index].
-             */
-            @JvmStatic
-            fun of(index: Int): Parameter {
-                return of("", index)
+            fun of(index: Int, content: CharSequence = ""): Parameter {
+                return ParameterImpl(index, content)
             }
 
             private class ParameterImpl(
-                private val chars: CharSequence, override val index: Int
+                override val index: Int,
+                private val content: CharSequence,
             ) : Parameter, FinalObject() {
 
-                override val length: Int = chars.length
+                override val length: Int = content.length
 
                 override fun get(index: Int): Char {
-                    return chars[index]
+                    return content[index]
                 }
 
                 override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
-                    return chars.subSequence(startIndex, endIndex)
+                    return content.subSequence(startIndex, endIndex)
                 }
 
                 override fun hashCode0(): Int {
@@ -169,7 +158,7 @@ interface CharsTemplate {
                 }
 
                 override fun toString0(): String {
-                    return chars.toString()
+                    return content.toString()
                 }
             }
         }
@@ -177,78 +166,54 @@ interface CharsTemplate {
 }
 
 /**
- * Simple [CharsTemplate] implementation.
- * It supports an [escapeChar], a parameter prefix and a parameter suffix (may null). For example:
+ * Default and simple implementation of [CharsTemplate],
+ * supporting escape, parameter prefix and parameter suffix (may null if needn't).
  *
  * ```
- * Map<Object, Object> args = BMaps.newMap("name", "Zero")
- * SimpleTemplate st = new SimpleTemplate(
- *     "Ultraman ${name} is strongest!",
- *     '\\',
- *     "${",
- *     "}"
- * );
- * //"Ultraman Zero is strongest!"
- * st.process(args)
+ * //Using named ars:
+ * Map<String, Object> args = new HashMap<>();
+ * args.put("n1", "Dog");
+ * args.put("n2}", "Cat");
+ * CharsTemplate template1 = BTemplate.parse("This is a {n1}, that is a {n2}", null, "{", "}");
+ * Assert.assertEquals(template1.process(args), "This is a Dog, that is a Cat");
+ *
+ * //Using unnamed args:
+ * CharsTemplate template2 = BTemplate.parse("This is a {}, that is a {}", null, "{", "}");
+ * Assert.assertEquals(template2.processArgs("Dog", "Cat"), "This is a Dog, that is a Cat");
+ *
+ * //Using only prefix:
+ * CharsTemplate template3 = BTemplate.parse("This is a $n1, that is a $n2", null, "$");
+ * Assert.assertEquals(template3.process(args), "This is a Dog, that is a Cat");
+ * CharsTemplate template4 = BTemplate.parse("This is a $, that is a $", null, "$");
+ * Assert.assertEquals(template4.processArgs("Dog", "Cat"), "This is a Dog, that is a Cat");
  * ```
  *
- * Parameter suffix may be null, in this case [SimpleTemplate] use [Character.isWhitespace] to split a parameter:
+ * It supports escape:
  *
  * ```
- * SimpleTemplate st = new SimpleTemplate(
- *     "Ultraman $name is strongest!",
- *     '\\',
- *     "$"
- * );
- * //"Ultraman Zero is strongest!"
- * st.process(args)
+ * CharsTemplate template5 = BTemplate.parse("This \\is a \\{{n1}, that is a {n2}\\", '\\', "{", "}");
+ * Assert.assertEquals(template5.process(args), "This \\is a {Dog, that is a Cat\\");
  * ```
  *
- * Parameter name may be empty if suffix is not null, in this case use index instead of name:
+ * Note:
  *
- * ```
- * Map<Object, Object> args = BMaps.newMap(0, "Zero")
- * SimpleTemplate st = new SimpleTemplate(
- *     "Ultraman ${} is strongest!",
- *     '\\',
- *     "${",
- *     "}"
- * );
- * //"Ultraman Zero is strongest!"
- * st.process(args)
- * ```
+ * * Escape is valid only before the parameter prefix or escape itself;
+ * * Parameter suffix before the prefix is permitted, the suffix will be seen as a normal char in this case;
+ * * If there is no parameter suffix, the parameter name only consists of `[0, 9]`, `[a, z]`, `[A, Z]`, `$`, `#` or `@`;
  *
- * Escape char is valid in following cases:
- *
- * * Escape char followed by parameter prefix;
- * * Escape char followed by escape char;
- * * If a parameter prefix is found, this template will find next delimiter (suffix or whitespace)
- * and escape char is ignored;
- * * Otherwise no escape;
- *
- * For example:
- *
- * ```
- * Map<Object, Object> args = BMaps.newMap("name", "Taiga", "${name", "Zero")
- * //Note java string `\\` means `\`
- * String template = "Ultraman \\${} \\\\ } ${${name} is strongest rather than ${name}!";
- *
- * ```
- *
- * will output:
- *
- * ```
- * Ultraman ${} \ } Zero is strongest rather than Taiga!
- * ```
+ * @param source source text to be template
+ * @param escapeChar escape char, may be null if no escape
+ * @param parameterPrefix parameter prefix
+ * @param parameterSuffix parameter suffix, or null if no suffix
  */
 open class SimpleTemplate(
-    private val template: CharSequence,
-    private val escapeChar: Char,
+    private val source: CharSequence,
+    private val escapeChar: Char?,
     parameterPrefix: CharSequence,
     parameterSuffix: CharSequence? = null
 ) : CharsTemplate {
 
-    override val nodes: List<CharSequence> by lazy { resolve() }
+    override val nodes: List<CharSequence> by lazy { parse0() }
 
     init {
         checkState(parameterPrefix.isNotEmpty(), "Parameter prefix cannot empty.")
@@ -261,14 +226,13 @@ open class SimpleTemplate(
     private val prefix = parameterPrefix.toString()
     private val suffix = parameterSuffix?.toString()
 
-    private fun resolve(): List<CharSequence> {
+    private fun parse0(): List<CharSequence> {
 
-        if (template.isEmpty()) {
-            return listOf(template)
+        if (source.isEmpty()) {
+            return listOf(source)
         }
 
         var buffer: MutableList<CharSequence>? = null
-
         fun getBuffer(): MutableList<CharSequence> {
             val bf = buffer
             if (bf === null) {
@@ -280,30 +244,39 @@ open class SimpleTemplate(
         }
 
         fun isParameterPrefix(index: Int): Boolean {
-            return template.startsWith(prefix, index)
+            return source.startsWith(prefix, index)
+        }
+
+        fun Char.isPrefixOnlyName(): Boolean {
+            return this in '0'..'9'
+                || this in 'a'..'z'
+                || this in 'A'..'Z'
+                || this == '$'
+                || this == '#'
+                || this == '@'
         }
 
         var start = 0
         var i = 0
         var paramIndex = 0
-        while (i < template.length) {
-            val c = template[i]
-            if (c == escapeChar) {
+        while (i < source.length) {
+            val c = source[i]
+            if (escapeChar !== null && c == escapeChar) {
                 i++
-                if (i >= template.length) {
+                if (i >= source.length) {
                     break
                 }
-                val cn = template[i]
+                val cn = source[i]
                 if (cn == escapeChar) {
                     //Escape itself
-                    getBuffer().add(template.subRef(start, i))
+                    getBuffer().add(source.subRef(start, i))
                     i++
                     start = i
                     continue
                 }
                 if (isParameterPrefix(i)) {
                     //Escape parameter prefix
-                    getBuffer().add(template.subRef(start, i - 1))
+                    getBuffer().add(source.subRef(start, i - 1))
                     getBuffer().add(prefix)
                     i += prefix.length
                     start = i
@@ -311,37 +284,39 @@ open class SimpleTemplate(
                 }
             }
             if (isParameterPrefix(i)) {
-                getBuffer().add(template.subRef(start, i))
+                getBuffer().add(source.subRef(start, i))
                 i += prefix.length
                 if (suffix === null) {
-                    //Find next whitespace
-                    if (template[i].isWhitespace()) {
-                        throw TemplateException("Parameter name cannot be whitespace.")
-                    }
+                    //Case no suffix: find next whitespace
                     val paramNameStart = i
-                    i++
-                    while (!template[i].isWhitespace()) {
+                    while (i < source.length && source[i].isPrefixOnlyName()) {
                         i++
                     }
-                    val nameRef = template.subRef(paramNameStart, i)
-                    getBuffer().add(CharsTemplate.Parameter.of(nameRef, paramIndex++))
+                    if (paramNameStart == i) {
+                        //empty name
+                        getBuffer().add(CharsTemplate.Parameter.of(paramIndex++))
+                    } else {
+                        val nameRef = source.subRef(paramNameStart, i)
+                        getBuffer().add(CharsTemplate.Parameter.of(paramIndex++, nameRef))
+                    }
                     start = i
                     i++
                     continue
                 }
                 //Find suffix
-                val suffixIndex = template.indexOf(suffix, i)
+                val suffixIndex = source.indexOf(suffix, i)
                 if (suffixIndex < 0) {
                     throw TemplateException("Parameter prefix is not enclose at index: $i.")
                 }
                 if (suffixIndex == i) {
+                    //empty name
                     getBuffer().add(CharsTemplate.Parameter.of(paramIndex++))
                     i++
                     start = i
                     continue
                 }
-                val nameRef = template.subRef(i, suffixIndex)
-                getBuffer().add(CharsTemplate.Parameter.of(nameRef, paramIndex++))
+                val nameRef = source.subRef(i, suffixIndex)
+                getBuffer().add(CharsTemplate.Parameter.of(paramIndex++, nameRef))
                 i = suffixIndex + 1
                 start = i
                 continue
@@ -350,10 +325,10 @@ open class SimpleTemplate(
         }
 
         if (buffer === null) {
-            return listOf(template)
+            return listOf(source)
         }
-        if (start < template.length) {
-            getBuffer().add(template.subRef(start))
+        if (start < source.length) {
+            getBuffer().add(source.subRef(start))
         }
         return getBuffer()
     }

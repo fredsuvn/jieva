@@ -6,42 +6,8 @@ import xyz.srclab.annotations.concurrent.ThreadSafe
 import java.util.*
 
 /**
- * Using [FastFormat] (slf4j-like style, but not exactly same) format receiver pattern:
- *
- * ```
- * BFormats.fastFormat("1 + 1 = {}, 2 + 2 = {}", 2, 4);
- * ```
- *
- * Using `\` as escape in following cases:
- *
- * * `\{}` will be escaped as `{}`;
- * * `\\` will be escaped as `\`;
- * * Otherwise no escape;
- *
- * For example:
- *
- * ```
- * //Note java string `\\` means `\`
- * BFormats.fastFormat("C:\\\\{}\\_\\{}", "file.zip");
- * ```
- *
- * will output:
- *
- * ```
- * C:\file.zip\_{}
- * ```
- *
- * If Args' size less than `{}`, will output `{}` itself:
- *
- * ```
- * BFormats.fastFormat("C:\\\\{}\\_{}", "file.zip");
- * ```
- *
- * will output:
- *
- * ```
- * C:\file.zip\_{}
- * ```
+ * Using [FastFormat] (slf4j-like style, but not exactly same) format receiver pattern,
+ * seeing [FastFormat].
  *
  * @see FastFormat
  * @see CharsFormat
@@ -112,7 +78,6 @@ object FastFormat : CharsFormat {
         }
 
         var buffer: MutableList<Any?>? = null
-
         fun getBuffer(): MutableList<Any?> {
             val bf = buffer
             if (bf === null) {

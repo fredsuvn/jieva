@@ -78,7 +78,6 @@ fun CharSequence.escape(escapeChar: Char, escapedChars: CharSequence): String {
     }
 
     var buffer: MutableList<Any>? = null
-
     fun getBuffer(): MutableList<Any> {
         val bf = buffer
         if (bf === null) {
@@ -207,7 +206,6 @@ fun CharSequence.unescape(escapeChar: Char, escapedChars: CharSequence): String 
     }
 
     var buffer: MutableList<CharSequence>? = null
-
     fun getBuffer(): MutableList<CharSequence> {
         val bf = buffer
         if (bf === null) {
