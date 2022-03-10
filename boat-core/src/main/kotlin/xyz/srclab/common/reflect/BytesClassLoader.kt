@@ -1,5 +1,6 @@
-package xyz.srclab.common.base
+package xyz.srclab.common.reflect
 
+import xyz.srclab.common.base.remainingLength
 import java.io.InputStream
 import java.nio.ByteBuffer
 

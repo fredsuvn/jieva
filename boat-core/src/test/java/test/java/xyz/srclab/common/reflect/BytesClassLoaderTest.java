@@ -1,4 +1,4 @@
-package test.java.xyz.srclab.common.base;
+package test.java.xyz.srclab.common.reflect;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -6,7 +6,7 @@ import org.objectweb.asm.Opcodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.base.BytesClassLoader;
+import xyz.srclab.common.reflect.BytesClassLoader;
 
 public class BytesClassLoaderTest {
 

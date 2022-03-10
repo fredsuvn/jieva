@@ -5,15 +5,17 @@ package xyz.srclab.common.base
 import java.time.Duration
 import java.util.function.BiPredicate
 
+private val local: ThreadLocal<MutableMap<Any, Any?>> = ThreadLocal.withInitial { HashMap() }
+
 /**
- * [Thread] of current context.
+ * Returns current [Thread].
  */
 fun currentThread(): Thread {
     return Thread.currentThread()
 }
 
 /**
- * Sleeps for [millis] and [nanos].
+ * Sleeps current thread for [millis] and [nanos].
  */
 @JvmOverloads
 fun sleep(millis: Long, nanos: Int = 0) {
@@ -21,10 +23,36 @@ fun sleep(millis: Long, nanos: Int = 0) {
 }
 
 /**
- * Sleeps for [duration].
+ * Sleeps current thread for [duration].
  */
 fun sleep(duration: Duration) {
     sleep(duration.toMillis(), duration.nano)
+}
+
+/**
+ * Returns thread local value of [key].
+ */
+@JvmName("getLocal")
+fun <T> getThreadLocal(key: Any): T {
+    return local.get()[key].asTyped()
+}
+
+/**
+ * Sets thread local value of [key], returns old value.
+ */
+@JvmName("setLocal")
+fun <T> setThreadLocal(key: Any, value: Any?): T {
+    return local.get().put(key, value).asTyped()
+}
+
+/**
+ * Returns container of all thread local values managed by `BThread`.
+ *
+ * Note any change for returned map will reflect [getThreadLocal] and [setThreadLocal], and vice versa.
+ */
+@JvmName("getLocals")
+fun threadLocals(): MutableMap<Any, Any?> {
+    return local.get()
 }
 
 /**

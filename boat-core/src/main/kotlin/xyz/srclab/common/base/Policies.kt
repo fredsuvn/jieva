@@ -1,7 +1,7 @@
 package xyz.srclab.common.base
 
 /**
- * Policy of jump statement for process control: [CONTINUE], [BREAK] or [RETURN].
+ * Policy of jump statement for process control: [CONTINUE], [BREAK] and [RETURN].
  */
 enum class JumpPolicy {
 
@@ -35,7 +35,7 @@ enum class JumpPolicy {
 }
 
 /**
- * Policy of thread-safe.
+ * Policy for thread-safe.
  */
 enum class ThreadSafePolicy {
 

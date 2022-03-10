@@ -3,7 +3,6 @@
 package xyz.srclab.common.reflect
 
 import org.apache.commons.lang3.ArrayUtils
-import xyz.srclab.common.base.BytesClassLoader
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.currentThread
 import xyz.srclab.common.base.dotMatcher
