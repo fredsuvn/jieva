@@ -4,7 +4,7 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 /**
- * Represents a reference of a type:
+ * Represents a reference of a type, usually use for get a generic type:
  *
  * ```
  * TypeRef<String> stringTypeRef = new TypeRef<String>(){};
@@ -22,12 +22,21 @@ import java.lang.reflect.Type
  */
 abstract class TypeRef<T> {
 
+    /**
+     * Actual runtime type.
+     */
     val type: Type
 
+    /**
+     * Empty constructor, used to get a generic type.
+     */
     protected constructor() {
         type = reflectToActualType()
     }
 
+    /**
+     * Specifies the [type].
+     */
     protected constructor(type: Type) {
         this.type = type
     }
@@ -57,6 +66,9 @@ abstract class TypeRef<T> {
     }
 
     companion object {
+        /**
+         * Returns a [TypeRef] with [type].
+         */
         @JvmStatic
         fun <T> of(type: Type): TypeRef<T> {
             return object : TypeRef<T>(type) {}

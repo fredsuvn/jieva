@@ -4,8 +4,10 @@ package xyz.srclab.common.reflect
 
 import xyz.srclab.common.base.asTyped
 import java.lang.reflect.Field
+import java.util.function.Predicate
 
 /**
+ * Returns public field of [this] class.
  * @throws NoSuchFieldException
  */
 @JvmName("getField")
@@ -17,6 +19,9 @@ fun Class<*>.field(name: String): Field {
     }
 }
 
+/**
+ * Returns public field of [this] class, or null if failed.
+ */
 @JvmName("getFieldOrNull")
 fun Class<*>.fieldOrNull(name: String): Field? {
     return try {
@@ -26,12 +31,16 @@ fun Class<*>.fieldOrNull(name: String): Field? {
     }
 }
 
+/**
+ * Returns all public fields of [this] class.
+ */
 @JvmName("getFields")
 fun Class<*>.fields(): List<Field> {
     return this.fields.asList()
 }
 
 /**
+ * Returns declared field of [this] class.
  * @throws NoSuchFieldException
  */
 @JvmName("getDeclaredField")
@@ -43,6 +52,9 @@ fun Class<*>.declaredField(name: String): Field {
     }
 }
 
+/**
+ * Returns declared field of [this] class, or null if failed.
+ */
 @JvmName("getDeclaredFieldOrNull")
 fun Class<*>.declaredFieldOrNull(name: String): Field? {
     return try {
@@ -52,13 +64,16 @@ fun Class<*>.declaredFieldOrNull(name: String): Field? {
     }
 }
 
+/**
+ * Returns declared public fields of [this] class.
+ */
 @JvmName("getDeclaredFields")
 fun Class<*>.declaredFields(): List<Field> {
     return this.declaredFields.asList()
 }
 
 /**
- * Return public or declared field.
+ * Return public or declared field of [this] class.
  *
  * @throws NoSuchFieldException
  */
@@ -68,7 +83,7 @@ fun Class<*>.ownedField(name: String): Field {
 }
 
 /**
- * Return public or declared field.
+ * Return public or declared field of [this] class., or null if failed.
  */
 @JvmName("getOwnedFieldOrNull")
 fun Class<*>.ownedFieldOrNull(name: String): Field? {
@@ -76,7 +91,7 @@ fun Class<*>.ownedFieldOrNull(name: String): Field? {
 }
 
 /**
- * Return declared and public fields.
+ * Return all declared and public fields of [this] class.
  */
 @JvmName("getOwnedFields")
 fun Class<*>.ownedFields(): List<Field> {
@@ -90,6 +105,12 @@ fun Class<*>.ownedFields(): List<Field> {
     return set.toList()
 }
 
+/**
+ * Searches and returns field for [this] class.
+ *
+ * @param name field name
+ * @param deep whether recursively search to super class
+ */
 @JvmOverloads
 fun Class<*>.searchFieldOrNull(name: String, deep: Boolean = true): Field? {
     var field = ownedFieldOrNull(name)
@@ -110,27 +131,39 @@ fun Class<*>.searchFieldOrNull(name: String, deep: Boolean = true): Field? {
     return null
 }
 
+/**
+ * Searches and returns fields for [this] class.
+ *
+ * @param deep whether recursively search to super class
+ * @param predicate true if the field is matched and will be return
+ */
 @JvmOverloads
 fun Class<*>.searchFields(
     deep: Boolean = true,
-    predicate: (Field) -> Boolean = { true }
+    predicate: Predicate<Field> = Predicate { true }
 ): List<Field> {
-    return searchFields(ArrayList(), deep, predicate)
+    return searchFieldsTo(ArrayList(), deep, predicate)
 }
 
+/**
+ * Searches and returns fields for [this] class into [destination].
+ *
+ * @param deep whether recursively search to super class
+ * @param predicate true if the field is matched and will be return
+ */
 @JvmOverloads
-fun <C : MutableCollection<in Field>> Class<*>.searchFields(
+fun <C : MutableCollection<in Field>> Class<*>.searchFieldsTo(
     destination: C,
     deep: Boolean = true,
-    predicate: (Field) -> Boolean = { true }
+    predicate: Predicate<Field> = Predicate { true }
 ): C {
     for (field in this.fields) {
-        if (predicate(field)) {
+        if (predicate.test(field)) {
             destination.add(field)
         }
     }
     for (field in this.declaredFields) {
-        if (!destination.contains(field) && predicate(field)) {
+        if (!destination.contains(field) && predicate.test(field)) {
             destination.add(field)
         }
     }
@@ -140,7 +173,7 @@ fun <C : MutableCollection<in Field>> Class<*>.searchFields(
     var superClass = this.superclass
     while (superClass !== null) {
         for (field in superClass.declaredFields) {
-            if (!destination.contains(field) && predicate(field)) {
+            if (!destination.contains(field) && predicate.test(field)) {
                 destination.add(field)
             }
         }
@@ -150,6 +183,7 @@ fun <C : MutableCollection<in Field>> Class<*>.searchFields(
 }
 
 /**
+ * Gets value of [this] field.
  * @throws IllegalAccessException
  */
 @JvmName("getFieldValue")
@@ -166,6 +200,7 @@ fun <T> Field.getValue(owner: Any?, force: Boolean = false): T {
 }
 
 /**
+ * Sets value of [this] field.
  * @throws IllegalAccessException
  */
 @JvmName("setFieldValue")
@@ -182,6 +217,8 @@ fun Field.setValue(owner: Any?, value: Any?, force: Boolean = false) {
 }
 
 /**
+ * Gets value of field.
+ *
  * @throws NoSuchFieldException
  * @throws IllegalAccessException
  */
@@ -192,6 +229,8 @@ fun <T> Class<*>.getFieldValue(name: String, owner: Any?, force: Boolean = false
 }
 
 /**
+ * Sets value of field.
+ *
  * @throws NoSuchFieldException
  * @throws IllegalAccessException
  */
@@ -225,7 +264,6 @@ fun Class<*>.setStaticFieldValue(name: String, value: Any?, force: Boolean = fal
 
 /**
  * Uses [searchFieldOrNull] to find deep field and gets its value.
- *
  * @throws NoSuchFieldException
  */
 fun <T> Class<*>.getDeepFieldValue(name: String, owner: Any?): T {
@@ -238,7 +276,6 @@ fun <T> Class<*>.getDeepFieldValue(name: String, owner: Any?): T {
 
 /**
  * Uses [searchFieldOrNull] to find deep field and sets its value.
- *
  * @throws NoSuchFieldException
  */
 fun Class<*>.setDeepFieldValue(name: String, owner: Any?, value: Any?) {

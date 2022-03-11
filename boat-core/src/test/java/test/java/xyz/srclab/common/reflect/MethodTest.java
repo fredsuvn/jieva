@@ -81,14 +81,14 @@ public class MethodTest {
             "superPublicField"
         );
         Assert.assertEquals(
-            BMethod.enforce(privateMethod, reflectClass),
+            BMethod.invokeForcibly(privateMethod, reflectClass),
             "privateField"
         );
         Assert.expectThrows(IllegalAccessException.class, () ->
             BMethod.invoke(superPrivateMethod, reflectClass)
         );
         Assert.assertEquals(
-            BMethod.enforce(superPrivateMethod, reflectClass),
+            BMethod.invokeForcibly(superPrivateMethod, reflectClass),
             "superPrivateField"
         );
     }

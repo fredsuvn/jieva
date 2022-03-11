@@ -6,6 +6,7 @@ import xyz.srclab.common.base.asTyped
 import java.lang.reflect.Constructor
 
 /**
+ * Returns public constructor of [this] class.
  * @throws NoSuchMethodException
  */
 @JvmName("getConstructor")
@@ -17,6 +18,9 @@ fun <T> Class<T>.constructor(vararg parameterTypes: Class<*>): Constructor<T> {
     }
 }
 
+/**
+ * Returns public constructor of [this] class, or null if failed.
+ */
 @JvmName("getConstructorOrNull")
 fun <T> Class<T>.constructorOrNull(vararg parameterTypes: Class<*>): Constructor<T>? {
     return try {
@@ -26,12 +30,17 @@ fun <T> Class<T>.constructorOrNull(vararg parameterTypes: Class<*>): Constructor
     }
 }
 
+/**
+ * Returns all public constructors of [this] class.
+ * @throws NoSuchMethodException
+ */
 @JvmName("getConstructors")
 fun <T> Class<T>.constructors(): List<Constructor<T>> {
     return this.constructors.asList().asTyped()
 }
 
 /**
+ * Returns declared constructor of [this] class.
  * @throws NoSuchMethodException
  */
 @JvmName("getDeclaredConstructor")
@@ -43,6 +52,9 @@ fun <T> Class<T>.declaredConstructor(vararg parameterTypes: Class<*>): Construct
     }
 }
 
+/**
+ * Returns declared constructor of [this] class, or null if failed.
+ */
 @JvmName("getDeclaredConstructorOrNull")
 fun <T> Class<T>.declaredConstructorOrNull(vararg parameterTypes: Class<*>): Constructor<T>? {
     return try {
@@ -52,16 +64,25 @@ fun <T> Class<T>.declaredConstructorOrNull(vararg parameterTypes: Class<*>): Con
     }
 }
 
+/**
+ * Returns all declared constructors of [this] class.
+ */
 @JvmName("getDeclaredConstructors")
 fun <T> Class<T>.declaredConstructors(): List<Constructor<T>> {
     return this.declaredConstructors.asList().asTyped()
 }
 
+/**
+ * Invokes [this] constructor.
+ */
 fun <T> Constructor<T>.invoke(vararg args: Any?): T {
     return this.newInstance(*args)
 }
 
-fun <T> Constructor<T>.enforce(vararg args: Any?): T {
+/**
+ * Invokes [this] constructor forcibly.
+ */
+fun <T> Constructor<T>.invokeForcibly(vararg args: Any?): T {
     this.isAccessible = true
     return this.newInstance(*args)
 }

@@ -4,8 +4,10 @@ package xyz.srclab.common.reflect
 
 import xyz.srclab.common.base.asTyped
 import java.lang.reflect.Method
+import java.util.function.Predicate
 
 /**
+ * Returns public method of [this] class.
  * @throws NoSuchMethodException
  */
 @JvmName("getMethod")
@@ -17,6 +19,9 @@ fun Class<*>.method(name: String, vararg parameterTypes: Class<*>): Method {
     }
 }
 
+/**
+ * Returns public method of [this] class, or null if failed.
+ */
 @JvmName("getMethodOrNull")
 fun Class<*>.methodOrNull(
     name: String, vararg parameterTypes: Class
@@ -29,12 +34,16 @@ fun Class<*>.methodOrNull(
     }
 }
 
+/**
+ * Returns all public methods of [this] class.
+ */
 @JvmName("getMethods")
 fun Class<*>.methods(): List<Method> {
     return this.methods.asList()
 }
 
 /**
+ * Returns declared method of [this] class.
  * @throws NoSuchMethodException
  */
 @JvmName("getDeclaredMethod")
@@ -46,6 +55,9 @@ fun Class<*>.declaredMethod(name: String, vararg parameterTypes: Class<*>): Meth
     }
 }
 
+/**
+ * Returns declared method of [this] class, or null if failed.
+ */
 @JvmName("getDeclaredMethodOrNull")
 fun Class<*>.declaredMethodOrNull(name: String, vararg parameterTypes: Class<*>): Method? {
     return try {
@@ -55,14 +67,16 @@ fun Class<*>.declaredMethodOrNull(name: String, vararg parameterTypes: Class<*>)
     }
 }
 
+/**
+ * Returns all declared methods of [this] class.
+ */
 @JvmName("getDeclaredMethods")
 fun Class<*>.declaredMethods(): List<Method> {
     return this.declaredMethods.asList()
 }
 
 /**
- * Return public or declared method.
- *
+ * Returns public or declared method of [this] class.
  * @throws NoSuchMethodException
  */
 @JvmName("getOwnedMethod")
@@ -71,7 +85,7 @@ fun Class<*>.ownedMethod(name: String, vararg parameterTypes: Class<*>): Method 
 }
 
 /**
- * Return public or declared method.
+ * Returns public or declared method of [this] class, or null if failed.
  */
 @JvmName("getOwnedMethodOrNull")
 fun Class<*>.ownedMethodOrNull(name: String, vararg parameterTypes: Class<*>): Method? {
@@ -79,7 +93,7 @@ fun Class<*>.ownedMethodOrNull(name: String, vararg parameterTypes: Class<*>): M
 }
 
 /**
- * Return declared and public methods.
+ * Returns all declared and public methods of [this] class.
  */
 @JvmName("getOwnedMethods")
 fun Class<*>.ownedMethods(): List<Method> {
@@ -93,6 +107,12 @@ fun Class<*>.ownedMethods(): List<Method> {
     return set.toList()
 }
 
+/**
+ * Searches and returns method for [this] class.
+ *
+ * @param name field name
+ * @param deep whether recursively search to super class
+ */
 @JvmOverloads
 fun Class<*>.searchMethodOrNull(
     name: String,
@@ -117,27 +137,39 @@ fun Class<*>.searchMethodOrNull(
     return null
 }
 
+/**
+ * Searches and returns methods for [this] class.
+ *
+ * @param deep whether recursively search to super class
+ * @param predicate true if the field is matched and will be return
+ */
 @JvmOverloads
 fun Class<*>.searchMethods(
     deep: Boolean = true,
-    predicate: (Method) -> Boolean = { true }
+    predicate: Predicate<Method> = Predicate { true }
 ): List<Method> {
     return searchMethods(ArrayList(), deep, predicate)
 }
 
+/**
+ * Searches and returns methods for [this] class into [destination].
+ *
+ * @param deep whether recursively search to super class
+ * @param predicate true if the field is matched and will be return
+ */
 @JvmOverloads
 fun <C : MutableCollection<in Method>> Class<*>.searchMethods(
     destination: C,
     deep: Boolean = true,
-    predicate: (Method) -> Boolean = { true }
+    predicate: Predicate<Method> = Predicate { true }
 ): C {
     for (method in this.methods) {
-        if (predicate(method)) {
+        if (predicate.test(method)) {
             destination.add(method)
         }
     }
     for (method in this.declaredMethods) {
-        if (!destination.contains(method) && predicate(method)) {
+        if (!destination.contains(method) && predicate.test(method)) {
             destination.add(method)
         }
     }
@@ -147,7 +179,7 @@ fun <C : MutableCollection<in Method>> Class<*>.searchMethods(
     var superClass = this.superclass
     while (superClass !== null) {
         for (method in superClass.declaredMethods) {
-            if (!destination.contains(method) && predicate(method)) {
+            if (!destination.contains(method) && predicate.test(method)) {
                 destination.add(method)
             }
         }
@@ -157,6 +189,8 @@ fun <C : MutableCollection<in Method>> Class<*>.searchMethods(
 }
 
 /**
+ * Invokes [this] method.
+ *
  * @throws  IllegalAccessException
  * @throws  IllegalArgumentException
  * @throws  ReflectiveOperationException
@@ -170,10 +204,12 @@ fun <T> Method.invoke(owner: Any?, vararg args: Any?): T {
 }
 
 /**
+ * Invokes [this] method forcibly.
+ *
  * @throws  IllegalArgumentException
  * @throws  ReflectiveOperationException
  */
-fun <T> Method.enforce(owner: Any?, vararg args: Any?): T {
+fun <T> Method.invokeForcibly(owner: Any?, vararg args: Any?): T {
     return try {
         this.isAccessible = true
         this.invoke(owner, *args).asTyped()
@@ -183,6 +219,8 @@ fun <T> Method.enforce(owner: Any?, vararg args: Any?): T {
 }
 
 /**
+ * Invokes [this] static method.
+ *
  * @throws  IllegalAccessException
  * @throws  IllegalArgumentException
  * @throws  ReflectiveOperationException
@@ -196,18 +234,16 @@ fun <T> Method.invokeStatic(vararg args: Any?): T {
 }
 
 /**
+ * Invokes [this] static method forcibly.
+ *
  * @throws  IllegalArgumentException
  * @throws  ReflectiveOperationException
  */
-fun <T> Method.enforceStatic(vararg args: Any?): T {
+fun <T> Method.invokeStaticForcibly(vararg args: Any?): T {
     return try {
         this.isAccessible = true
         this.invoke(null, *args).asTyped()
     } catch (e: Exception) {
         throw e
     }
-}
-
-fun Array<out Class<*>>.parameterTypesToString(): String {
-    return this.joinToString { it.name }
 }

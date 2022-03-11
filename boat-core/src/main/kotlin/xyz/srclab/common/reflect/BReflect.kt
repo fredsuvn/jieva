@@ -7,6 +7,9 @@ import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.asTyped
 import java.lang.reflect.*
 
+/**
+ * Returns whether this is array type.
+ */
 val Type.isArray: Boolean
     get() {
         return when (this) {
@@ -16,6 +19,9 @@ val Type.isArray: Boolean
         }
     }
 
+/**
+ * Returns component type of this array type, or null if it is not array type.
+ */
 val Type.componentTypeOrNull: Type?
     get() {
         return when (this) {
@@ -25,11 +31,17 @@ val Type.componentTypeOrNull: Type?
         }
     }
 
+/**
+ * Returns raw class of this type.
+ */
 val ParameterizedType.rawClass: Class<*>
     get() {
         return this.rawType.asTyped()
     }
 
+/**
+ * Returns raw class of this type.
+ */
 val GenericArrayType.rawClass: Class<*>
     get() {
         var deep = 0
@@ -45,6 +57,10 @@ val GenericArrayType.rawClass: Class<*>
         return arrayClass
     }
 
+/**
+ * Returns raw class of this type,
+ * the type must be one of [Class], [ParameterizedType] or [GenericArrayType].
+ */
 val Type.rawClass: Class<*>
     @Accepted(Class::class, ParameterizedType::class, GenericArrayType::class)
     @Throws(IllegalArgumentException::class)
@@ -54,6 +70,11 @@ val Type.rawClass: Class<*>
         )
     }
 
+/**
+ * Returns raw class of this type,
+ * the type should be one of [Class], [ParameterizedType] or [GenericArrayType].
+ * Or null if the type is not in the type range.
+ */
 val Type.rawClassOrNull: Class<*>?
     get() {
         return when (this) {
@@ -64,6 +85,9 @@ val Type.rawClassOrNull: Class<*>?
         }
     }
 
+/**
+ * Returns upper bound of this type.
+ */
 val TypeVariable<*>.upperBound: Type
     get() {
         val bounds = this.bounds
@@ -74,6 +98,9 @@ val TypeVariable<*>.upperBound: Type
         }
     }
 
+/**
+ * Returns upper bound of this type.
+ */
 val WildcardType.upperBound: Type
     get() {
         val upperBounds = this.upperBounds
@@ -84,6 +111,9 @@ val WildcardType.upperBound: Type
         }
     }
 
+/**
+ * Returns upper bound of this type.
+ */
 val Type.upperBound: Type
     get() {
         return when (this) {
@@ -93,6 +123,9 @@ val Type.upperBound: Type
         }
     }
 
+/**
+ * Returns lower bound of this type, or null if we don't know.
+ */
 val WildcardType.lowerBound: Type?
     get() {
         val lowerBounds = this.lowerBounds
@@ -103,6 +136,9 @@ val WildcardType.lowerBound: Type?
         }
     }
 
+/**
+ * Returns lower bound of this type, or null if we don't know.
+ */
 val Type.lowerBound: Type?
     get() {
         return when (this) {
