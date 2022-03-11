@@ -116,7 +116,12 @@ fun <T : Any> List<*>.getConvertOrNull(
 /**
  * Returns conversion of result of `getOrNull` operation, or [defaultValue] if result of conversion is null.
  */
-fun <T : Any> List<*>.getConvertOrDefault(index: Int, defaultValue: T, converter: Converter): T {
+@JvmOverloads
+fun <T : Any> List<*>.getConvertOrDefault(
+    index: Int,
+    defaultValue: T,
+    converter: Converter = Converter.defaultConverter()
+): T {
     return converter.convertOrNull(this.getOrNull(index), defaultValue.javaClass) ?: defaultValue
 }
 

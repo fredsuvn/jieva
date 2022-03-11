@@ -54,7 +54,7 @@ public class CollectTest {
         Assert.assertEquals((Object) BCollect.getOrElse(list, 100, (i) -> 88), 88);
         Assert.assertEquals(BCollect.getConvert(list, 1, String.class), "1");
         Assert.assertEquals(
-            BCollect.getConvertOrDefault(list, 100, "66", Converter.defaultConverter()),
+            BCollect.getConvertOrDefault(list, 100, "66"),
             "null"
         );
         Assert.assertEquals(
@@ -68,7 +68,7 @@ public class CollectTest {
         Assert.assertEquals((Object) BList.getOrElse(list, 100, (i) -> 88), 88);
         Assert.assertEquals(BList.getConvert(list, 1, String.class), "1");
         Assert.assertEquals(
-            BList.getConvertOrDefault(list, 100, "66", Converter.defaultConverter()),
+            BList.getConvertOrDefault(list, 100, "66"),
             "null"
         );
         Assert.assertEquals(
