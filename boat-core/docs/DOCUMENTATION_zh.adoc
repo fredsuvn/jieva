@@ -37,7 +37,7 @@ Lang包提供一系列核心接口和组件:
 * 全局系统对象: `Current`, `Defaults`, `Environment`;
 * 语法增强 (主要针对Java): `Let`, `Ref`, `Lazy`, `BLazyGetterCharSeq`;
 * 字符串功能: `CharsFormat`, `CharsTemplate`, `BNamingCase`;
-* 特殊字符支持: `BCtlChars`, `BEscChars`, `BCsiChars`, `BSgrChars`;
+* 特殊字符支持: `CtlChars`, `EscChars`, `BCsiChars`, `SgrChars`;
 * 访问接口: `ObjectAccessor`, `MapAccessor`, `BAccessRef`, `BMapAccessor`;
 * 辅助对象: SpecParser, CachingProductBuilder, Processing;
 * 公共工具: Anys, Bools, Chars, Nums, Dates, Randoms, RandomSupplier, Compares, Checks, Requires, Enums, Loaders.

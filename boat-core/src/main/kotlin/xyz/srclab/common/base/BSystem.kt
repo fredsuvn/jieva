@@ -272,6 +272,13 @@ fun nativeCharset(): Charset {
 }
 
 /**
+ * Returns the system-dependent line separator string.
+ */
+fun lineSeparator(): String {
+    return System.lineSeparator()
+}
+
+/**
  * Returns whether current OS is Windows.
  */
 fun isWindows(): Boolean {

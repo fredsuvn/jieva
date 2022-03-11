@@ -296,25 +296,25 @@ public class LangSample {
     @Test
     public void testShell() {
         logger.log("Hello, world!");
-        logger.log("123{}456{}{}", BEscChars.linefeed(), BEscChars.newline(), BEscChars.reset());
+        logger.log("123{}456{}{}", EscChars.linefeed(), EscChars.newline(), EscChars.reset());
         logger.log("{}{}{}",
-            BSgrChars.foregroundRed("red"),
-            BSgrChars.backgroundCyan(" "),
-            BSgrChars.foregroundGreen("green")
+            SgrChars.foregroundRed("red"),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.foregroundGreen("green")
         );
         logger.log("{}{}{}",
-            BSgrChars.withParam("bright red", BSgrParam.FOREGROUND_BRIGHT_RED),
-            BSgrChars.backgroundCyan(" "),
-            BSgrChars.withParam("bright green", BSgrParam.FOREGROUND_BRIGHT_GREEN)
+            SgrChars.withParam("bright red", SgrParam.FOREGROUND_BRIGHT_RED),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.withParam("bright green", SgrParam.FOREGROUND_BRIGHT_GREEN)
         );
         logger.log("{}{}{}",
-            BSgrChars.withParam("color 8", BSgrParam.foregroundColor(8)),
-            BSgrChars.backgroundCyan(" "),
-            BSgrChars.withParam("rgb(100, 100, 50)", BSgrParam.foregroundColor(100, 100, 50))
+            SgrChars.withParam("color 8", SgrParam.foregroundColor(8)),
+            SgrChars.backgroundCyan(" "),
+            SgrChars.withParam("rgb(100, 100, 50)", SgrParam.foregroundColor(100, 100, 50))
         );
-        logger.log(BCtlChars.beep());
+        logger.log(CtlChars.beep());
         logger.log("123\010456\007");
-        logger.log("123{}456{}", BCtlChars.backspaces(), BCtlChars.beep());
+        logger.log("123{}456{}", CtlChars.backspaces(), CtlChars.beep());
     }
 
     @Test

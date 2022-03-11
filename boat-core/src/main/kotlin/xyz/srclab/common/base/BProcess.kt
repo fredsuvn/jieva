@@ -108,7 +108,6 @@ open class ProcWork(
      *  This method will return immediately after read available bytes, rather than all bytes like [outputString].
      */
     fun availableOutputString(): String? {
-        //TODO
         return process.inputStream?.availableString(nativeCharset())
     }
 
