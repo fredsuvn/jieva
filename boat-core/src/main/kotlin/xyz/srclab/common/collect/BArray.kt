@@ -13,7 +13,7 @@ import kotlin.collections.joinToString as joinToStringKt
 private const val NOT_ARRAY_TYPE_PREFIX = "Not an array type"
 
 /**
- * Returns given length of given array ([this]).
+ * Returns length of [this] array.
  */
 @JvmName("getLength")
 fun Any.arrayLength(): Int {
@@ -28,7 +28,7 @@ fun Any.arrayLength(): Int {
  */
 @JvmName("copyOfRange")
 @JvmOverloads
-fun <A : Any> A.arrayCopyOfRannge(fromIndex: Int = 0, toIndex: Int = this.arrayLength()): A {
+fun <A : Any> A.arrayCopyOfRange(fromIndex: Int = 0, toIndex: Int = this.arrayLength()): A {
     return when (this) {
         is Array<*> -> this.copyOfRange(fromIndex, toIndex)
         is BooleanArray -> this.copyOfRange(fromIndex, toIndex)
@@ -43,49 +43,20 @@ fun <A : Any> A.arrayCopyOfRannge(fromIndex: Int = 0, toIndex: Int = this.arrayL
     }.asTyped()
 }
 
-@JvmName("arrayOf")
-fun <T> newArrayOf(vararg elements: T): Array<T> {
+/**
+ * Returns new array of [elements].
+ */
+fun <T> newArray(vararg elements: T): Array<T> {
     return elements.asTyped()
 }
 
-fun <T> Class<T>.newArray(length: Int): Array<T> {
-    return java.lang.reflect.Array.newInstance(this, length).asTyped()
-}
-
-fun <T> Type.newArray(length: Int): Array<T> {
-    return this.rawClass.newArray(length).asTyped()
-}
-
-fun Class<*>.newPrimitiveArray(length: Int): Any {
-    return java.lang.reflect.Array.newInstance(this, length)
-}
-
-@JvmOverloads
-fun <T> Array<T>.add(element: T, index: Int = this.size): Array<T> {
-    if (index == this.size) {
-        val result = this.copyOf(this.size + 1)
-        result[this.size] = element
-        return result.asTyped()
-    }
-    index.checkInBounds(0, this.size)
-    val result: Array<T?> = this.javaClass.componentType.newArray(this.size + 1).asTyped()
-    System.arraycopy(this, 0, result, 0, index)
-    result[index] = element
-    System.arraycopy(this, index, result, index + 1, this.size - index)
-    return result.asTyped()
-}
-
-@JvmOverloads
-fun <T> Array<T>.remove(index: Int = this.size - 1): Array<T> {
-    if (index == this.size - 1) {
-        val result = this.copyOf(this.size - 1)
-        return result.asTyped()
-    }
-    index.checkInBounds(0, this.size)
-    val result: Array<T?> = this.javaClass.componentType.newArray(this.size - 1).asTyped()
-    System.arraycopy(this, 0, result, 0, index)
-    System.arraycopy(this, index + 1, result, index, this.size - index - 1)
-    return result.asTyped()
+/**
+ * Returns new array of [type].
+ *
+ * @param A array type
+ */
+fun <A> newArrayOfType(type: Type, length: Int): A {
+    return java.lang.reflect.Array.newInstance(type.rawClass, length).asTyped()
 }
 
 /**
@@ -104,126 +75,230 @@ fun <T> Any.arrayAsList(): MutableList<T> {
         is LongArray -> this.asList().asTyped()
         is FloatArray -> this.asList().asTyped()
         is DoubleArray -> this.asList().asTyped()
-        else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
+        else -> throw IllegalArgumentException("Not an array: $this!")
     }
 }
 
 /**
- * Returns a [MutableList] that wraps the original array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun <T> Array<T>.asList(): MutableList<T> {
     return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
- * Returns a [MutableList] that wraps the original array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun ByteArray.asList(): MutableList<Byte> {
     return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
- * Returns a [MutableList] that wraps the original array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun ShortArray.asList(): MutableList<Short> {
     return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
- * Returns a [MutableList] that wraps the original array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun IntArray.asList(): MutableList<Int> {
     return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
- * Returns a [MutableList] that wraps the original array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun LongArray.asList(): MutableList<Long> {
     return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
- * Returns a [MutableList] that wraps the original array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun FloatArray.asList(): MutableList<Float> {
     return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
- * Returns a [MutableList] that wraps the original array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun DoubleArray.asList(): MutableList<Double> {
     return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
- * Returns a [MutableList] that wraps the original array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun BooleanArray.asList(): MutableList<Boolean> {
     return ArrayBridgeList(this.toArrayBridge())
 }
 
 /**
- * Returns a [MutableList] that wraps the original array.
+ * Returns a fixed-size [MutableList] that wraps the original array.
  */
 fun CharArray.asList(): MutableList<Char> {
     return ArrayBridgeList(this.toArrayBridge())
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun <T> Array<T>.indexOfArray(content: Array<T>, start: Int = 0, end: Int = content.size): Int {
-    return this.indexOfArray(0, content, start, end)
+fun <T> Array<T>.indexOf(elements: Array<T>, start: Int = 0, end: Int = elements.size): Int {
+    return this.indexOf(0, elements, start, end)
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun BooleanArray.indexOfArray(content: BooleanArray, start: Int = 0, end: Int = content.size): Int {
-    return this.indexOfArray(0, content, start, end)
+fun BooleanArray.indexOf(elements: BooleanArray, start: Int = 0, end: Int = elements.size): Int {
+    return this.indexOf(0, elements, start, end)
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun ByteArray.indexOfArray(content: ByteArray, start: Int = 0, end: Int = content.size): Int {
-    return this.indexOfArray(0, content, start, end)
+fun ByteArray.indexOf(elements: ByteArray, start: Int = 0, end: Int = elements.size): Int {
+    return this.indexOf(0, elements, start, end)
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun ShortArray.indexOfArray(content: ShortArray, start: Int = 0, end: Int = content.size): Int {
-    return this.indexOfArray(0, content, start, end)
+fun ShortArray.indexOf(elements: ShortArray, start: Int = 0, end: Int = elements.size): Int {
+    return this.indexOf(0, elements, start, end)
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun CharArray.indexOfArray(content: CharArray, start: Int = 0, end: Int = content.size): Int {
-    return this.indexOfArray(0, content, start, end)
+fun CharArray.indexOf(elements: CharArray, start: Int = 0, end: Int = elements.size): Int {
+    return this.indexOf(0, elements, start, end)
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun IntArray.indexOfArray(content: IntArray, start: Int = 0, end: Int = content.size): Int {
-    return this.indexOfArray(0, content, start, end)
+fun IntArray.indexOf(elements: IntArray, start: Int = 0, end: Int = elements.size): Int {
+    return this.indexOf(0, elements, start, end)
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun LongArray.indexOfArray(content: LongArray, start: Int = 0, end: Int = content.size): Int {
-    return this.indexOfArray(0, content, start, end)
+fun LongArray.indexOf(elements: LongArray, start: Int = 0, end: Int = elements.size): Int {
+    return this.indexOf(0, elements, start, end)
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun FloatArray.indexOfArray(content: FloatArray, start: Int = 0, end: Int = content.size): Int {
-    return this.indexOfArray(0, content, start, end)
+fun FloatArray.indexOf(elements: FloatArray, start: Int = 0, end: Int = elements.size): Int {
+    return this.indexOf(0, elements, start, end)
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun DoubleArray.indexOfArray(content: DoubleArray, start: Int = 0, end: Int = content.size): Int {
-    return this.indexOfArray(0, content, start, end)
+fun DoubleArray.indexOf(elements: DoubleArray, start: Int = 0, end: Int = elements.size): Int {
+    return this.indexOf(0, elements, start, end)
 }
 
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
 @JvmOverloads
-fun <T> Array<T>.indexOfArray(offset: Int, content: Array<T>, start: Int = 0, end: Int = content.size): Int {
+fun <T> Array<T>.indexOf(offset: Int, elements: Array<T>, start: Int = 0, end: Int = elements.size): Int {
+    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+}
+
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
+@JvmOverloads
+fun BooleanArray.indexOf(offset: Int, elements: BooleanArray, start: Int = 0, end: Int = elements.size): Int {
+    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+}
+
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
+@JvmOverloads
+fun ByteArray.indexOf(offset: Int, elements: ByteArray, start: Int = 0, end: Int = elements.size): Int {
+    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+}
+
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
+@JvmOverloads
+fun ShortArray.indexOf(offset: Int, elements: ShortArray, start: Int = 0, end: Int = elements.size): Int {
+    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+}
+
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
+@JvmOverloads
+fun CharArray.indexOf(offset: Int, elements: CharArray, start: Int = 0, end: Int = elements.size): Int {
+    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+}
+
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
+@JvmOverloads
+fun IntArray.indexOf(offset: Int, elements: IntArray, start: Int = 0, end: Int = elements.size): Int {
+    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+}
+
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
+@JvmOverloads
+fun LongArray.indexOf(offset: Int, elements: LongArray, start: Int = 0, end: Int = elements.size): Int {
+    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+}
+
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
+@JvmOverloads
+fun FloatArray.indexOf(offset: Int, elements: FloatArray, start: Int = 0, end: Int = elements.size): Int {
+    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+}
+
+/**
+ * Returns index of [elements] segment in [this] array.
+ */
+@JvmOverloads
+fun DoubleArray.indexOf(offset: Int, elements: DoubleArray, start: Int = 0, end: Int = elements.size): Int {
+    return indexOf0(this.size, offset, start, end, { this[it] }, { elements[it] })
+}
+
+private inline fun <T> indexOf0(
+    size: Int, offset: Int, start: Int, end: Int,
+    arrayGetter: (Int) -> T,
+    elementsGetter: (Int) -> T
+): Int {
+    offset.checkInBounds(0, size)
+    checkRangeInBounds(start, end, 0, size)
     var i = offset
-    while (i < this.size) {
+    while (i < size) {
         var j = i
         var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
+        while (j < size && k < end) {
+            if (arrayGetter(j) == elementsGetter(k)) {
                 j++
                 k++
             } else {
@@ -239,315 +314,88 @@ fun <T> Array<T>.indexOfArray(offset: Int, content: Array<T>, start: Int = 0, en
     return -1
 }
 
-@JvmOverloads
-fun BooleanArray.indexOfArray(offset: Int, content: BooleanArray, start: Int = 0, end: Int = content.size): Int {
-    var i = offset
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
-}
-
-@JvmOverloads
-fun ByteArray.indexOfArray(offset: Int, content: ByteArray, start: Int = 0, end: Int = content.size): Int {
-    var i = offset
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
-}
-
-@JvmOverloads
-fun ShortArray.indexOfArray(offset: Int, content: ShortArray, start: Int = 0, end: Int = content.size): Int {
-    var i = offset
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
-}
-
-@JvmOverloads
-fun CharArray.indexOfArray(offset: Int, content: CharArray, start: Int = 0, end: Int = content.size): Int {
-    var i = offset
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
-}
-
-@JvmOverloads
-fun IntArray.indexOfArray(offset: Int, content: IntArray, start: Int = 0, end: Int = content.size): Int {
-    var i = offset
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
-}
-
-@JvmOverloads
-fun LongArray.indexOfArray(offset: Int, content: LongArray, start: Int = 0, end: Int = content.size): Int {
-    var i = offset
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
-}
-
-@JvmOverloads
-fun FloatArray.indexOfArray(offset: Int, content: FloatArray, start: Int = 0, end: Int = content.size): Int {
-    var i = offset
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
-}
-
-@JvmOverloads
-fun DoubleArray.indexOfArray(offset: Int, content: DoubleArray, start: Int = 0, end: Int = content.size): Int {
-    var i = offset
-    while (i < this.size) {
-        var j = i
-        var k = start
-        while (j < this.size && k < end) {
-            if (this[j] == content[k]) {
-                j++
-                k++
-            } else {
-                break
-            }
-        }
-        if (k == end) {
-            return i
-        } else {
-            i++
-        }
-    }
-    return -1
-}
-
-@JvmOverloads
+/**
+ * Joins array to string.
+ */
 @JvmName("joinToString")
+@JvmOverloads
 fun Any.arrayJoinToString(
     separator: CharSequence = ", ",
     transform: Function<Any?, CharSequence>? = null
 ): String {
-    return this.arrayJoinToString0(separator = separator, transform = transform)
+    return this.arrayJoinToString(separator, -1, "...", transform)
 }
 
+/**
+ * Joins array to string.
+ */
 @JvmName("joinToString")
+@JvmOverloads
 fun Any.arrayJoinToString(
-    separator: CharSequence = ", ",
-    limit: Int = -1,
-    truncated: CharSequence = "...",
-    transform: Function<Any?, CharSequence>? = null
-): String {
-    return this.arrayJoinToString0(
-        separator = separator,
-        limit = limit,
-        truncated = truncated,
-        transform = transform,
-    )
-}
-
-@JvmName("joinToString")
-fun Any.arrayJoinToString(
-    separator: CharSequence = ", ",
-    prefix: CharSequence = "",
-    suffix: CharSequence = "",
-    limit: Int = -1,
-    truncated: CharSequence = "...",
-    transform: Function<Any?, CharSequence>? = null
-): String {
-    return this.arrayJoinToString0(separator, prefix, suffix, limit, truncated, transform)
-}
-
-private fun Any.arrayJoinToString0(
-    separator: CharSequence = ", ",
-    prefix: CharSequence = "",
-    suffix: CharSequence = "",
-    limit: Int = -1,
-    truncated: CharSequence = "...",
+    separator: CharSequence,
+    limit: Int,
+    truncated: CharSequence,
     transform: Function<Any?, CharSequence>? = null
 ): String {
     return when (this) {
-        is Array<*> -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is BooleanArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is ByteArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is ShortArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is CharArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is IntArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is LongArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is FloatArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is DoubleArray -> joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
-    }
-}
-
-@JvmOverloads
-@JvmName("joinTo")
-fun <A : Appendable> Any.arrayJoinTo(
-    dest: A,
-    separator: CharSequence = ", ",
-    transform: Function<Any?, CharSequence>? = null
-): A {
-    return this.arrayJoinTo0(dest = dest, separator = separator, transform = transform)
-}
-
-@JvmName("joinTo")
-fun <A : Appendable> Any.arrayJoinTo(
-    dest: A,
-    separator: CharSequence = ", ",
-    limit: Int = -1,
-    truncated: CharSequence = "...",
-    transform: Function<Any?, CharSequence>? = null
-): A {
-    return this.arrayJoinTo0(
-        dest = dest,
-        separator = separator,
-        limit = limit,
-        truncated = truncated,
-        transform = transform
-    )
-}
-
-@JvmName("joinTo")
-fun <A : Appendable> Any.arrayJoinTo(
-    dest: A,
-    separator: CharSequence = ", ",
-    prefix: CharSequence = "",
-    suffix: CharSequence = "",
-    limit: Int = -1,
-    truncated: CharSequence = "...",
-    transform: Function<Any?, CharSequence>? = null
-): A {
-    return this.arrayJoinTo0(dest, separator, prefix, suffix, limit, truncated, transform)
-}
-
-private fun <A : Appendable> Any.arrayJoinTo0(
-    dest: A,
-    separator: CharSequence = ", ",
-    prefix: CharSequence = "",
-    suffix: CharSequence = "",
-    limit: Int = -1,
-    truncated: CharSequence = "...",
-    transform: Function<Any?, CharSequence>? = null
-): A {
-    return when (this) {
-        is Array<*> -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is BooleanArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is ByteArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is ShortArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is CharArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is IntArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is LongArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is FloatArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
-        is DoubleArray -> joinToKt(dest, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+        is Array<*> -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is BooleanArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is ByteArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is ShortArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is CharArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is IntArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is LongArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is FloatArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is DoubleArray -> joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
         else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
     }
 }
 
 /**
- * This class specifies a segment for an array of type [A].
+ * Joins array to string to [dest].
  */
-open class ArraySeg<A : Any> @JvmOverloads constructor(
+@JvmName("joinTo")
+@JvmOverloads
+fun <A : Appendable> Any.arrayJoinTo(
+    dest: A,
+    separator: CharSequence = ", ",
+    transform: Function<Any?, CharSequence>? = null
+): A {
+    return this.arrayJoinTo(dest, separator, -1, "...", transform)
+}
+
+/**
+ * Joins array to string to [dest].
+ */
+@JvmName("joinTo")
+@JvmOverloads
+fun <A : Appendable> Any.arrayJoinTo(
+    dest: A,
+    separator: CharSequence,
+    limit: Int,
+    truncated: CharSequence,
+    transform: Function<Any?, CharSequence>? = null
+): A {
+    return when (this) {
+        is Array<*> -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is BooleanArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is ByteArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is ShortArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is CharArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is IntArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is LongArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is FloatArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        is DoubleArray -> joinToKt(dest, separator, "", "", limit, truncated, transform?.asKotlinFun())
+        else -> throw IllegalArgumentException("$NOT_ARRAY_TYPE_PREFIX: ${this.javaClass}")
+    }
+}
+
+/**
+ * This class represents reference of segment of array.
+ *
+ * @param A array type
+ */
+open class ArrayRef<A : Any> @JvmOverloads constructor(
     @get:JvmName("array") val array: A,
     @get:JvmName("offset") val offset: Int = 0,
     @get:JvmName("length") val length: Int = remainingLength(array.arrayLength(), offset),
@@ -569,21 +417,21 @@ open class ArraySeg<A : Any> @JvmOverloads constructor(
      * Returns the absolute index of [array],
      * which is computed from given [index] -- a relative index of the offset of this segment.
      */
-    fun absIndex(index: Int): Int {
+    open fun absIndex(index: Int): Int {
         return offset + index
     }
 
     /**
      * Returns the copy of array range which is specified by this segment.
      */
-    fun copyOfRange(): A {
-        return array.arrayCopyOfRannge(startIndex, endIndex)
+    open fun copyOfRange(): A {
+        return array.arrayCopyOfRange(startIndex, endIndex)
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-        other as ArraySeg<*>
+        other as ArrayRef<*>
         if (array != other.array) return false
         if (offset != other.offset) return false
         if (length != other.length) return false
