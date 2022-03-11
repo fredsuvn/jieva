@@ -3,157 +3,98 @@
 package xyz.srclab.common.base
 
 import xyz.srclab.common.io.readString
-import xyz.srclab.common.io.toFile
-import xyz.srclab.common.io.toFileOrNull
 import xyz.srclab.common.reflect.defaultClassLoader
-import java.io.File
 import java.io.InputStream
-import java.io.Serializable
 import java.net.URL
 import java.nio.charset.Charset
-import java.util.*
 
-@JvmName("load")
+/**
+ * Loads resource in current classpath.
+ * It finds first resource specified by the [path] (generally in current jar).
+ * The [path] may start with `/` or not, they are equivalent.
+ */
 @JvmOverloads
-@Throws(NoSuchResourceException::class)
-fun CharSequence.loadResource(classLoader: ClassLoader = defaultClassLoader()): URL {
-    return loadResourceOrNull(classLoader) ?: throw NoSuchResourceException("$this")
+fun loadClasspathResource(path: CharSequence, classLoader: ClassLoader = defaultClassLoader()): URL? {
+    return classLoader.getResource(path.removeAbsolute().removeAbsolute())
 }
 
-@JvmName("loadOrNull")
+/**
+ * Loads resource as [InputStream] in current classpath.
+ * It finds first resource specified by the [path] (generally in current jar).
+ * The [path] may start with `/` or not, they are equivalent.
+ */
 @JvmOverloads
-fun CharSequence.loadResourceOrNull(classLoader: ClassLoader = defaultClassLoader()): URL? {
-    return classLoader.getResource(this.removeAbsolute())
+fun loadClasspathStream(path: CharSequence, classLoader: ClassLoader = defaultClassLoader()): InputStream? {
+    return classLoader.getResource(path.removeAbsolute().removeAbsolute())?.openStream()
 }
 
-@JvmName("loadStream")
+/**
+ * Loads content of resource as string in current classpath.
+ * It finds first resource specified by the [path] (generally in current jar).
+ * The [path] may start with `/` or not, they are equivalent.
+ */
 @JvmOverloads
-@Throws(NoSuchResourceException::class)
-fun CharSequence.loadResourceStream(classLoader: ClassLoader = defaultClassLoader()): InputStream {
-    return loadResource(classLoader).openStream()
-}
-
-@JvmName("loadStreamOrNull")
-@JvmOverloads
-fun CharSequence.loadResourceStreamOrNull(classLoader: ClassLoader = defaultClassLoader()): InputStream? {
-    return loadResourceOrNull(classLoader)?.openStream()
-}
-
-@JvmName("loadFile")
-@JvmOverloads
-@Throws(NoSuchResourceException::class)
-fun CharSequence.loadResourceFile(classLoader: ClassLoader = defaultClassLoader()): File {
-    return loadResource(classLoader).toFile()
-}
-
-@JvmName("loadFileOrNull")
-@JvmOverloads
-fun CharSequence.loadResourceFileOrNull(classLoader: ClassLoader = defaultClassLoader()): File? {
-    return loadResourceOrNull(classLoader)?.toFileOrNull()
-}
-
-@JvmName("loadString")
-@JvmOverloads
-@Throws(NoSuchResourceException::class)
-fun CharSequence.loadResourceString(
-    charset: Charset = defaultCharset(), classLoader: ClassLoader = defaultClassLoader()
-): String {
-    return loadResourceStream(classLoader).readString(charset, true)
-}
-
-@JvmName("loadStringOrNull")
-@JvmOverloads
-fun CharSequence.loadResourceStringOrNull(
-    charset: Charset = defaultCharset(), classLoader: ClassLoader = defaultClassLoader()
+fun loadClasspathString(
+    path: CharSequence,
+    charset: Charset = defaultCharset(),
+    classLoader: ClassLoader = defaultClassLoader()
 ): String? {
-    return loadResourceStreamOrNull(classLoader)?.readString(charset, true)
+    return loadClasspathResource(path.removeAbsolute(), classLoader)?.openStream()?.readString(charset, true)
 }
 
-@JvmName("loadProperties")
+/**
+ * Loads content of resource as properties in current classpath.
+ * It finds first resource specified by the [path] (generally in current jar).
+ * The [path] may start with `/` or not, they are equivalent.
+ */
 @JvmOverloads
-fun CharSequence.loadResourceProperties(
-    charset: Charset = defaultCharset(), classLoader: ClassLoader = defaultClassLoader()
-): Map<String, String> {
-    return loadResource(classLoader).openStream().readProperties(charset)
-}
-
-@JvmName("loadPropertiesOrNull")
-@JvmOverloads
-fun CharSequence.loadResourcePropertiesOrNull(
-    charset: Charset = defaultCharset(), classLoader: ClassLoader = defaultClassLoader()
+fun loadClasspathProperties(
+    path: CharSequence,
+    charset: Charset = defaultCharset(),
+    classLoader: ClassLoader = defaultClassLoader()
 ): Map<String, String>? {
-    return loadResourceOrNull(classLoader)?.openStream()?.readProperties(charset)
+    return loadClasspathResource(path.removeAbsolute(), classLoader)?.openStream()?.readProperties(charset, true)
 }
 
-@JvmName("loadAll")
+/**
+ * Loads all same-path resources in current classpath.
+ * The [path] may start with `/` or not, they are equivalent.
+ */
 @JvmOverloads
-fun CharSequence.loadResources(classLoader: ClassLoader = defaultClassLoader()): List<URL> {
-    val enumeration = loadAll0(classLoader)
-    val result = mutableListOf<URL>()
-    while (enumeration.hasMoreElements()) {
-        result.add(enumeration.nextElement())
-    }
-    return result
+fun loadClasspathResources(path: CharSequence, classLoader: ClassLoader = defaultClassLoader()): List<URL> {
+    return classLoader.getResources(path.removeAbsolute()).toList()
 }
 
-@JvmName("loadStreams")
+/**
+ * Loads all same-path contents of resources as strings in current classpath.
+ * The [path] may start with `/` or not, they are equivalent.
+ */
 @JvmOverloads
-fun CharSequence.loadResourceStreams(classLoader: ClassLoader = defaultClassLoader()): List<InputStream> {
-    val enumeration = loadAll0(classLoader)
-    val result = mutableListOf<InputStream>()
-    while (enumeration.hasMoreElements()) {
-        result.add(enumeration.nextElement().openStream())
-    }
-    return result
-}
-
-@JvmName("loadFiles")
-@JvmOverloads
-fun CharSequence.loadResourceFiles(classLoader: ClassLoader = defaultClassLoader()): List<File> {
-    val enumeration = loadAll0(classLoader)
-    val result = mutableListOf<File>()
-    while (enumeration.hasMoreElements()) {
-        result.add(enumeration.nextElement().toFile())
-    }
-    return result
-}
-
-@JvmName("loadStrings")
-@JvmOverloads
-fun CharSequence.loadResourceStrings(
-    charset: Charset = defaultCharset(), classLoader: ClassLoader = defaultClassLoader()
+fun loadClasspathStrings(
+    path: CharSequence,
+    charset: Charset = defaultCharset(),
+    classLoader: ClassLoader = defaultClassLoader()
 ): List<String> {
-    val enumeration = loadAll0(classLoader)
-    val result = mutableListOf<String>()
-    while (enumeration.hasMoreElements()) {
-        result.add(enumeration.nextElement().openStream().readString(charset, true))
-    }
-    return result
+    return classLoader.getResources(path.removeAbsolute()).asSequence().map {
+        it.openStream().readString(charset, true)
+    }.toList()
 }
 
-@JvmName("loadPropertiesList")
+/**
+ * Loads all same-path contents of resources as properties list in current classpath.
+ * The [path] may start with `/` or not, they are equivalent.
+ */
 @JvmOverloads
-fun CharSequence.loadResourcePropertiesList(
-    charset: Charset = defaultCharset(), classLoader: ClassLoader = defaultClassLoader()
+fun loadClasspathPropertiesList(
+    path: CharSequence,
+    charset: Charset = defaultCharset(),
+    classLoader: ClassLoader = defaultClassLoader()
 ): List<Map<String, String>> {
-    val enumeration = loadAll0(classLoader)
-    val result = mutableListOf<Map<String, String>>()
-    while (enumeration.hasMoreElements()) {
-        result.add(enumeration.nextElement().openStream().readProperties(charset))
-    }
-    return result
-}
-
-private fun CharSequence.loadAll0(classLoader: ClassLoader = defaultClassLoader()): Enumeration<URL> {
-    return classLoader.getResources(this.removeAbsolute())
+    return classLoader.getResources(path.removeAbsolute()).asSequence().map {
+        it.openStream().readProperties(charset, true)
+    }.toList()
 }
 
 private fun CharSequence.removeAbsolute(): String {
     return this.removeIfStartWith("/")
-}
-
-open class NoSuchResourceException(message: String?) : RuntimeException(message), Serializable {
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
 }

@@ -14,14 +14,14 @@ public class BConfigTest {
 
     @Test
     public void testProperties() {
-        InputStream inputStream = BResource.loadStream("META-INF/test.properties");
+        InputStream inputStream = BResource.loadClasspathStream("META-INF/test.properties");
         Map<String, String> properties = BConfig.readProperties(inputStream);
         Assert.assertEquals(properties.get("info"), "123");
     }
 
     @Test
     public void testLoadAll() {
-        List<String> strings = BResource.loadStrings("META-INF/test.properties");
+        List<String> strings = BResource.loadClasspathStrings("META-INF/test.properties");
         Assert.assertEquals(strings, BList.newList("info=123"));
     }
 }

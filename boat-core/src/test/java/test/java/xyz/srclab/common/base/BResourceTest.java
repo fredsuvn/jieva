@@ -7,7 +7,6 @@ import xyz.srclab.common.base.BResource;
 import xyz.srclab.common.collect.BMap;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,18 +14,22 @@ public class BResourceTest {
 
     @Test
     public void testLoadResource() {
-        List<String> texts = BResource.loadStrings("META-INF/test.properties");
-        BLog.info("Load texts: {}", texts);
+        String test = BResource.loadClasspathString("/META-INF/test.properties");
+        BLog.info("loadClasspathString: {}", test);
+        Assert.assertEquals(test, "info=123");
+
+        List<String> texts = BResource.loadClasspathStrings("META-INF/test.properties");
+        BLog.info("loadClasspathStrings: {}", texts);
         Assert.assertEquals(
             texts,
             Collections.singletonList("info=123")
         );
 
-        List<Map<String, String>> properties = BResource.loadPropertiesList("META-INF/test.properties");
-        BLog.info("Load properties: {}", properties);
+        List<Map<String, String>> properties = BResource.loadClasspathPropertiesList("META-INF/test.properties");
+        BLog.info("loadClasspathPropertiesList: {}", properties);
         Assert.assertEquals(
             properties,
-            Collections.singletonList(BMap.collect(new HashMap<>(), "info", "123"))
+            Collections.singletonList(BMap.newMap("info", "123"))
         );
     }
 }

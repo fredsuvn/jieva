@@ -14,14 +14,14 @@ public class FileTest {
 
     @Test
     public void testReadMappedByteBuffer() {
-        URL url = BResource.load("META-INF/test.mapped.txt");
+        URL url = BResource.loadClasspathResource("META-INF/test.mapped.txt");
         MappedByteBuffer buffer = BFile.readByteBuffer(BFile.toPath(url));
         BLog.info("testReadMappedByteBuffer: {}", BIO.readString(BIO.asInputStream(buffer)));
     }
 
     @Test
     public void testMappedByteBuffer() {
-        URL url = BResource.load("META-INF/test.mapped.txt");
+        URL url = BResource.loadClasspathResource("META-INF/test.mapped.txt");
         MappedByteBuffer buffer = BFile.mappedByteBuffer(BFile.toPath(url));
         String content = BIO.readString(BIO.asInputStream(buffer));
         BLog.info("testMappedByteBuffer: {}", content);

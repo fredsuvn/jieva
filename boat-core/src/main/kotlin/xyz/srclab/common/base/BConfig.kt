@@ -13,18 +13,21 @@ import java.util.*
  * Reads and parses properties.
  */
 @JvmOverloads
-fun InputStream.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
-    return this.reader(charset).readProperties()
+fun InputStream.readProperties(charset: Charset = defaultCharset(), close: Boolean = false): Map<String, String> {
+    return this.reader(charset).readProperties(close)
 }
 
 /**
  * Reads and parses properties.
  */
-fun Reader.readProperties(): Map<String, String> {
+@JvmOverloads
+fun Reader.readProperties(close: Boolean = false): Map<String, String> {
     val props = Properties()
     props.load(this)
     val map = props.toStringMap()
-    this.close()
+    if (close) {
+        this.close()
+    }
     return map
 }
 
@@ -33,5 +36,5 @@ fun Reader.readProperties(): Map<String, String> {
  */
 @JvmOverloads
 fun File.readProperties(charset: Charset = defaultCharset()): Map<String, String> {
-    return this.reader(charset).readProperties()
+    return this.reader(charset).readProperties(true)
 }

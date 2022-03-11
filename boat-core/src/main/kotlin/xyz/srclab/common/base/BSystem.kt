@@ -268,37 +268,7 @@ fun jvmCharset(): Charset {
  * If still not found, return [Charset.defaultCharset]
  */
 fun nativeCharset(): Charset {
-    val init = BSystemHolder.nativeCharset
-    if (init !== null) {
-        return init
-    }
-    synchronized(BSystemHolder::class.java) {
-        val init2 = BSystemHolder.nativeCharset
-        if (init2 !== null) {
-            return init2
-        }
-        val nativeEncoding = getSystemPropertyOrNull(NATIVE_ENCODING_KEY)
-        if (nativeEncoding !== null) {
-            val nativeCharset = charset(nativeEncoding)
-            BSystemHolder.nativeCharset = nativeCharset
-            return nativeCharset
-        }
-        val sunEncoding = getSystemPropertyOrNull("sun.jnu.encoding")
-        if (sunEncoding !== null) {
-            val sunCharset = charset(sunEncoding)
-            BSystemHolder.nativeCharset = sunCharset
-            return sunCharset
-        }
-        val fileEncoding = getSystemPropertyOrNull(FILE_ENCODING_KEY)
-        if (fileEncoding !== null) {
-            val fileCharset = charset(fileEncoding)
-            BSystemHolder.nativeCharset = fileCharset
-            return fileCharset
-        }
-        val jvmCharset = jvmCharset()
-        BSystemHolder.nativeCharset = jvmCharset
-        return jvmCharset
-    }
+    return BSystemHolder.nativeCharset
 }
 
 /**
@@ -390,7 +360,22 @@ open class NoSuchSystemPropertyException @JvmOverloads constructor(
 }
 
 private object BSystemHolder {
-    var nativeCharset: Charset? = null
+    var nativeCharset: Charset = getNativeCharset0()
+    fun getNativeCharset0(): Charset {
+        val nativeEncoding = getSystemPropertyOrNull(NATIVE_ENCODING_KEY)
+        if (nativeEncoding !== null) {
+            return charset(nativeEncoding)
+        }
+        val sunEncoding = getSystemPropertyOrNull("sun.jnu.encoding")
+        if (sunEncoding !== null) {
+            return charset(sunEncoding)
+        }
+        val fileEncoding = getSystemPropertyOrNull(FILE_ENCODING_KEY)
+        if (fileEncoding !== null) {
+            return charset(fileEncoding)
+        }
+        return jvmCharset()
+    }
 }
 
 /**
