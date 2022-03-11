@@ -2,6 +2,7 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.defaultSerialVersion
 import xyz.srclab.common.collect.mapEntries
+import xyz.srclab.common.collect.newEntry
 import java.io.Serializable
 
 /**
@@ -21,7 +22,7 @@ open class BeanMap(
     //    beanType.properties.filter { it.key != "class" }
 
     private val entryMap: Map<String, MutableMap.MutableEntry<String, Any?>> =
-        beanType.properties.mapEntries { name, propertyType -> name to BeanEntry(bean, propertyType) }
+        beanType.properties.mapEntries { name, propertyType -> newEntry(name, BeanEntry(bean, propertyType)) }
 
     override val size: Int
         get() = entries.size

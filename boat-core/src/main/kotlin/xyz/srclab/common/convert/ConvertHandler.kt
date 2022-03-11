@@ -319,7 +319,7 @@ object CollectionConvertHandler : ConvertHandler {
                 converter.convertOrNull(it, fromComponentType, toComponentType)
             }
         }
-        val primitiveArray = toComponentType.newPrimitiveArray(from.count())
+        val primitiveArray = newArray(toComponentType, from.count())
         for ((i, any) in from.withIndex()) {
             val element = any.convert(toComponentType)
             Array.set(primitiveArray, i, element)
@@ -435,7 +435,7 @@ open class BeanConvertHandler @JvmOverloads constructor(
     }
 
     private fun toMutableSetMap(from: Any, toType: Type, converter: Converter): MutableSetMap<Any, Any?> {
-        return from.copyProperties(newMutableSetMap(), toType, beanResolver, converter)
+        return from.copyProperties(mutableSetMap(), toType, beanResolver, converter)
     }
 
     private fun toMutableListMap(from: Any, toType: Type, converter: Converter): MutableListMap<Any, Any?> {

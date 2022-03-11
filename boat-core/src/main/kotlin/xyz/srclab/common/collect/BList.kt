@@ -37,6 +37,9 @@ import kotlin.collections.slice as sliceKt
 import kotlin.collections.takeLast as takeLastKt
 import kotlin.collections.takeLastWhile as takeLastWhileKt
 
+/**
+ * Returns new [ArrayList] with [elements].
+ */
 fun <T> newList(vararg elements: T): ArrayList<T> {
     return ArrayList<T>().collect(*elements)
 }
@@ -65,23 +68,38 @@ fun <T> List<T>.lastOrNull(predicate: Predicate<in T>): T? {
     return this.lastOrNullKt(predicate.asKotlinFun())
 }
 
+/**
+ * Returns element at [index], or null if index out of bounds.
+ */
 fun <T> List<T>.getOrNull(index: Int): T? {
     return this[index]
 }
 
+/**
+ * Returns element at [index], or [defaultValue] if index out of bounds.
+ */
 fun <T> List<T>.getOrDefault(index: Int, defaultValue: T): T {
     return this.elementAtOrElseKt(index) { defaultValue }
 }
 
-fun <T> List<T>.getOrElse(index: Int, defaultValue: IntFunction<T>): T {
-    return this.elementAtOrElseKt(index, defaultValue.asKotlinFun())
+/**
+ * Returns element at [index], or [elseValue] if index out of bounds.
+ */
+fun <T> List<T>.getOrElse(index: Int, elseValue: IntFunction<T>): T {
+    return this.elementAtOrElseKt(index, elseValue.asKotlinFun())
 }
 
+/**
+ * Returns result of conversion of element at [index].
+ */
 @JvmOverloads
 fun <T : Any> List<*>.get(index: Int, type: Class<out T>, converter: Converter = Converter.defaultConverter()): T {
     return converter.convert(getOrNull(index), type)
 }
 
+/**
+ * Returns result of conversion of element at [index], or null if index out of bounds.
+ */
 @JvmOverloads
 fun <T : Any> List<*>.getOrNull(
     index: Int,
@@ -91,6 +109,9 @@ fun <T : Any> List<*>.getOrNull(
     return converter.convertOrNull(getOrNull(index), type)
 }
 
+/**
+ * Returns result of conversion of element at [index], or [defaultValue] if index out of bounds.
+ */
 fun <T : Any> List<*>.getOrDefault(index: Int, defaultValue: T, converter: Converter): T {
     return converter.convertOrNull(getOrNull(index), defaultValue.javaClass) ?: defaultValue
 }

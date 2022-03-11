@@ -5,6 +5,9 @@ package xyz.srclab.common.collect
 import kotlin.collections.minus as minusKt
 import kotlin.collections.plus as plusKt
 
+/**
+ * Returns new [LinkedHashSet] with [elements].
+ */
 fun <T> newSet(vararg elements: T): LinkedHashSet<T> {
     return LinkedHashSet<T>().collect(*elements)
 }

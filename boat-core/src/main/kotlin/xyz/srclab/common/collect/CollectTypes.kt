@@ -1,5 +1,6 @@
 package xyz.srclab.common.collect
 
+import xyz.srclab.common.base.FinalObject
 import xyz.srclab.common.base.defaultSerialVersion
 import xyz.srclab.common.reflect.parameterizedType
 import xyz.srclab.common.reflect.rawClass
@@ -12,34 +13,55 @@ import java.lang.reflect.Type
  */
 interface IterableType : Serializable, ParameterizedType {
 
-    val rawClass: Class<*>
+    val containerType: Class<*>
     val componentType: Type
 
     companion object {
 
+        /**
+         * Raw [Iterable] type.
+         */
         @JvmField
         val RAW_ITERABLE: IterableType = of(Iterable::class.java, Any::class.java)
 
+        /**
+         * Raw [Collection] type.
+         */
         @JvmField
         val RAW_COLLECTION: IterableType = of(Collection::class.java, Any::class.java)
 
+        /**
+         * Raw [Set] type.
+         */
         @JvmField
         val RAW_SET: IterableType = of(Set::class.java, Any::class.java)
 
+        /**
+         * Raw [List] type.
+         */
         @JvmField
         val RAW_LIST: IterableType = of(List::class.java, Any::class.java)
 
+        /**
+         * Returns [IterableType] consists of [containerType] and [componentType].
+         */
         @JvmStatic
-        fun of(rawClass: Class<*>, componentType: Type): IterableType {
-            return parameterizedType(rawClass, componentType).toIterableType()
+        fun of(containerType: Class<*>, componentType: Type): IterableType {
+            return parameterizedType(containerType, componentType).toIterableType()
         }
 
+        /**
+         * Converts [ParameterizedType] to [IterableType].
+         */
         @JvmName("of")
         @JvmStatic
         fun ParameterizedType.toIterableType(): IterableType {
-            return CollectTypeImpl(this)
+            return IterableTypeImpl(this)
         }
 
+        /**
+         * Converts [Type] to [IterableType], the [Type] must be [ParameterizedType] or [Class].
+         */
         @JvmName("of")
         @JvmStatic
         fun Type.toIterableType(): IterableType {
@@ -50,11 +72,11 @@ interface IterableType : Serializable, ParameterizedType {
             }
         }
 
-        private class CollectTypeImpl(
+        private class IterableTypeImpl(
             private val parameterizedType: ParameterizedType
-        ) : IterableType {
+        ) : IterableType, FinalObject() {
 
-            override val rawClass: Class<*>
+            override val containerType: Class<*>
             override val componentType: Type
 
             init {
@@ -62,7 +84,7 @@ interface IterableType : Serializable, ParameterizedType {
                 if (args.size > 1) {
                     throw IllegalArgumentException("Number of actual arguments must <= 1.")
                 }
-                rawClass = parameterizedType.rawClass
+                containerType = parameterizedType.rawClass
                 componentType = args[0]
             }
 
@@ -81,15 +103,19 @@ interface IterableType : Serializable, ParameterizedType {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is IterableType) return false
-                if (rawClass != other.rawClass) return false
+                if (containerType != other.containerType) return false
                 if (componentType != other.componentType) return false
                 return true
             }
 
-            override fun hashCode(): Int {
-                var result = rawClass.hashCode()
+            override fun hashCode0(): Int {
+                var result = containerType.hashCode()
                 result = 31 * result + componentType.hashCode()
                 return result
+            }
+
+            override fun toString0(): String {
+                return "$containerType<$containerType>"
             }
 
             companion object {
@@ -104,26 +130,38 @@ interface IterableType : Serializable, ParameterizedType {
  */
 interface MapType : Serializable, ParameterizedType {
 
-    val rawClass: Class<*>
+    val containerType: Class<*>
     val keyType: Type
     val valueType: Type
 
     companion object {
 
+        /**
+         * Raw [Map] type.
+         */
         @JvmField
         val RAW_MAP: MapType = of(Map::class.java, Any::class.java, Any::class.java)
 
+        /**
+         * Returns [MapType] consists of [containerType], [keyType] and [valueType].
+         */
         @JvmStatic
-        fun of(rawClass: Class<*>, keyType: Type, valueType: Type): MapType {
-            return parameterizedType(rawClass, keyType, valueType).toMapType()
+        fun of(containerType: Class<*>, keyType: Type, valueType: Type): MapType {
+            return parameterizedType(containerType, keyType, valueType).toMapType()
         }
 
+        /**
+         * Converts [ParameterizedType] to [MapType].
+         */
         @JvmName("of")
         @JvmStatic
         fun ParameterizedType.toMapType(): MapType {
             return MapTypeImpl(this)
         }
 
+        /**
+         * Converts [Type] to [MapType], the [Type] must be [ParameterizedType] or [Class].
+         */
         @JvmName("of")
         @JvmStatic
         fun Type.toMapType(): MapType {
@@ -136,9 +174,9 @@ interface MapType : Serializable, ParameterizedType {
 
         private class MapTypeImpl(
             private val parameterizedType: ParameterizedType
-        ) : MapType {
+        ) : MapType, FinalObject() {
 
-            override val rawClass: Class<*>
+            override val containerType: Class<*>
             override val keyType: Type
             override val valueType: Type
 
@@ -147,7 +185,7 @@ interface MapType : Serializable, ParameterizedType {
                 if (args.isNotEmpty() && args.size != 2) {
                     throw IllegalArgumentException("Number of actual arguments must be 0 or 2.")
                 }
-                rawClass = parameterizedType.rawClass
+                containerType = parameterizedType.rawClass
                 keyType = args[0]
                 valueType = args[1]
             }
@@ -167,17 +205,21 @@ interface MapType : Serializable, ParameterizedType {
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other !is MapType) return false
-                if (rawClass != other.rawClass) return false
+                if (containerType != other.containerType) return false
                 if (keyType != other.keyType) return false
                 if (valueType != other.valueType) return false
                 return true
             }
 
-            override fun hashCode(): Int {
-                var result = rawClass.hashCode()
+            override fun hashCode0(): Int {
+                var result = containerType.hashCode()
                 result = 31 * result + keyType.hashCode()
                 result = 31 * result + valueType.hashCode()
                 return result
+            }
+
+            override fun toString0(): String {
+                return "$containerType<$keyType, $valueType>"
             }
 
             companion object {

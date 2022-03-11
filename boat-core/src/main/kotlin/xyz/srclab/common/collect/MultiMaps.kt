@@ -7,9 +7,9 @@ import java.io.Serializable
 /**
  * A type of Multi-Map of which values are [MutableSet].
  */
-open class MutableSetMap<K, V> constructor(
+open class MutableSetMap<K, V> @JvmOverloads constructor(
     private val map: MutableMap<K, MutableSet<V>>,
-    private val valueSet: (K) -> MutableSet<V>
+    private val valueSet: java.util.function.Function<K, MutableSet<V>>
 ) : Serializable, MutableMap<K, MutableSet<V>> by map {
 
     fun add(key: K, value: V): Boolean {
@@ -57,7 +57,7 @@ open class SetMap<K, V> constructor(
  */
 open class MutableListMap<K, V> constructor(
     private val map: MutableMap<K, MutableList<V>>,
-    private val valueList: (K) -> MutableList<V>
+    private val valueList: java.util.function.Function<K, MutableList<V>>
 ) : Serializable, MutableMap<K, MutableList<V>> by map {
 
     fun add(key: K, value: V): Boolean {

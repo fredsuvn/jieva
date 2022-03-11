@@ -1,8 +1,8 @@
 package xyz.srclab.common.bus
 
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.collect.add
-import xyz.srclab.common.collect.remove
+import xyz.srclab.common.collect.arrayAdd
+import xyz.srclab.common.collect.arrayRemove
 import xyz.srclab.common.reflect.canAssignedBy
 import xyz.srclab.common.run.SyncRunner
 import java.util.concurrent.Executor
@@ -60,11 +60,11 @@ interface EventBus {
                     val ci = hi.eventType
                     val c = handler.eventType
                     if (ci == c) {
-                        handlers = handlers.add(handler, i)
+                        handlers = handlers.arrayAdd(handler, i)
                         return
                     }
                     if (ci.canAssignedBy(c)) {
-                        handlers = handlers.add(handler, i)
+                        handlers = handlers.arrayAdd(handler, i)
                         return
                     }
                     if (c.canAssignedBy(ci)) {
@@ -77,26 +77,26 @@ interface EventBus {
                             }
                             val cx = hx.eventType
                             if (cx == c) {
-                                handlers = handlers.add(handler, i)
+                                handlers = handlers.arrayAdd(handler, i)
                                 return
                             }
                             if (cx.canAssignedBy(c)) {
-                                handlers = handlers.add(handler, i)
+                                handlers = handlers.arrayAdd(handler, i)
                                 return
                             }
                             if (c.canAssignedBy(cx)) {
                                 i++
                                 continue
                             }
-                            handlers = handlers.add(handler, i)
+                            handlers = handlers.arrayAdd(handler, i)
                             return
                         }
-                        handlers = handlers.add(handler, i)
+                        handlers = handlers.arrayAdd(handler, i)
                         return
                     }
                     i++
                 }
-                handlers = handlers.add(handler, 0)
+                handlers = handlers.arrayAdd(handler, 0)
             }
 
             @Synchronized
@@ -105,7 +105,7 @@ interface EventBus {
                 while (i < handlers.size) {
                     val hi = handlers[i]
                     if (hi == handler) {
-                        handlers = handlers.remove(i)
+                        handlers = handlers.arrayRemove(i)
                         return
                     }
                     i++

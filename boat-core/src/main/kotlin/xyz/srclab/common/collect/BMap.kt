@@ -19,14 +19,29 @@ import kotlin.collections.minus as minusKt
 import kotlin.collections.plus as plusKt
 import kotlin.collections.sortedWith as sortedWithKt
 
+/**
+ * Returns new [LinkedHashMap] with [keyValues] which be seen as key-value pairs,
+ * which mean the first element is first key, the second is first value,
+ * the third is second key, the fourth is second value, and so on.
+ */
 fun <K, V> newMap(vararg keyValues: Any?): LinkedHashMap<K, V> {
     return LinkedHashMap<K, V>().collect(*keyValues)
 }
 
+/**
+ * Returns new [LinkedHashMap] with [keyValues] which be seen as key-value pairs,
+ * which mean the first element is first key, the second is first value,
+ * the third is second key, the fourth is second value, and so on.
+ */
 fun <K, V> newMap(keyValues: Iterable<Any?>): LinkedHashMap<K, V> {
     return LinkedHashMap<K, V>().collect(keyValues)
 }
 
+/**
+ * Puts [keyValues] which be seen as key-value pairs into [this],
+ * which mean the first element is first key, the second is first value,
+ * the third is second key, the fourth is second value, and so on.
+ */
 fun <K, V, C : MutableMap<in K, in V>> C.collect(vararg keyValues: Any?): C {
     return collect(keyValues.asList())
 }
@@ -60,21 +75,21 @@ fun <K, V> newEntry(key: K, value: V): MutableMap.MutableEntry<K, V> {
     }
 }
 
+fun <K, V : Any> Map<K, V>.getNotNull(key: K, defaultValue: V): V {
+    return this[key] ?: defaultValue
+}
+
 @JvmOverloads
 fun <K, T : Any> Map<K, *>.get(key: K, type: Class<out T>, converter: Converter = Converter.defaultConverter()): T {
     return converter.convert(this[key], type)
 }
 
 @JvmOverloads
-fun <K, T : Any> Map<K, *>.getOrNull(
+fun <K, T : Any> Map<K, *>.getOrDefault(
     key: K,
-    type: Class<out T>,
+    defaultValue: T,
     converter: Converter = Converter.defaultConverter()
-): T? {
-    return converter.convertOrNull(this[key], type)
-}
-
-fun <K, T : Any> Map<K, *>.getOrDefault(key: K, defaultValue: T, converter: Converter): T {
+): T {
     return converter.convertOrNull(this[key], defaultValue.javaClass) ?: defaultValue
 }
 
@@ -182,19 +197,6 @@ fun <K, V, RK, RV> Map<K, V>.mapEntries(transform: BiFunction<in K, in V, Map.En
     return mapEntriesTo(LinkedHashMap(), transform)
 }
 
-@JvmSynthetic
-inline fun <K, V, RK, RV> Map<K, V>.mapEntries(
-    crossinline keySelector: (K) -> RK,
-    crossinline valueTransform: (V) -> RV
-): Map<RK, RV> {
-    return mapEntriesTo(LinkedHashMap(), keySelector, valueTransform)
-}
-
-@JvmSynthetic
-inline fun <K, V, RK, RV> Map<K, V>.mapEntries(transform: (K, V) -> Pair<RK, RV>): Map<RK, RV> {
-    return mapEntriesTo(LinkedHashMap(), transform)
-}
-
 fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     destination: C,
     keySelector: Function<in K, RK>,
@@ -207,31 +209,9 @@ fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
     destination: C,
     transform: BiFunction<in K, in V, Map.Entry<RK, RV>>
 ): C {
-    return mapEntriesTo(destination) { it0, it1 -> transform.apply(it0, it1).toPair() }
-}
-
-@JvmSynthetic
-inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
-    destination: C,
-    crossinline keySelector: (K) -> RK,
-    crossinline valueTransform: (V) -> RV
-): C {
     this.forEach { (k, v) ->
-        val rk = keySelector(k)
-        val rv = valueTransform(v)
-        destination.put(rk, rv)
-    }
-    return destination
-}
-
-@JvmSynthetic
-inline fun <K, V, RK, RV, C : MutableMap<in RK, in RV>> Map<K, V>.mapEntriesTo(
-    destination: C,
-    transform: (K, V) -> Pair<RK, RV>
-): C {
-    this.forEach { (k, v) ->
-        val pair = transform(k, v)
-        destination.put(pair.first, pair.second)
+        val pair = transform.apply(k, v)
+        destination.put(pair.key, pair.value)
     }
     return destination
 }
@@ -304,26 +284,24 @@ fun <K, V> MutableMap<K, V>.removeAll(keys: Iterable<K>) {
     }
 }
 
+/**
+ * Returns a [CopyOnWriteMap] which uses [ThreadSafePolicy.COPY_ON_WRITE] to implement threadsafe.
+ */
 fun <K, V> copyOnWriteMap(
     newMap: Function<in Map<out K, V>, MutableMap<K, V>>
 ): CopyOnWriteMap<K, V> {
     return copyOnWriteMap(emptyMap(), newMap)
 }
 
+/**
+ * Returns a [CopyOnWriteMap] which uses [ThreadSafePolicy.COPY_ON_WRITE] to implement threadsafe.
+ */
 @JvmOverloads
 fun <K, V> copyOnWriteMap(
     initMap: Map<out K, V> = emptyMap(),
     newMap: Function<in Map<out K, V>, MutableMap<K, V>> = Function { HashMap(it) }
 ): CopyOnWriteMap<K, V> {
-    return newCopyOnWriteMap(initMap, newMap.asKotlinFun())
-}
-
-@JvmSynthetic
-fun <K, V> newCopyOnWriteMap(
-    initMap: Map<out K, V> = emptyMap(),
-    newMap: (Map<out K, V>) -> MutableMap<K, V> = { HashMap(it) }
-): CopyOnWriteMap<K, V> {
-    return CopyOnWriteMap(initMap, newMap)
+    return CopyOnWriteMap(initMap, newMap.asKotlinFun())
 }
 
 fun <K, V> mutableSetMap(
@@ -336,14 +314,6 @@ fun <K, V> mutableSetMap(
 fun <K, V> mutableSetMap(
     map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
     valueSet: Function<K, MutableSet<V>> = Function { LinkedHashSet() }
-): MutableSetMap<K, V> {
-    return newMutableSetMap(map, valueSet.asKotlinFun())
-}
-
-@JvmSynthetic
-fun <K, V> newMutableSetMap(
-    map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
-    valueSet: (K) -> MutableSet<V> = { LinkedHashSet() }
 ): MutableSetMap<K, V> {
     return MutableSetMap(map, valueSet)
 }
@@ -367,15 +337,7 @@ fun <K, V> mutableListMap(
     map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
     valueList: Function<K, MutableList<V>> = Function { LinkedList() }
 ): MutableListMap<K, V> {
-    return newMutableListMap(map, valueList.asKotlinFun())
-}
-
-@JvmSynthetic
-fun <K, V> newMutableListMap(
-    map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
-    valueList: (K) -> MutableList<V> = { LinkedList() }
-): MutableListMap<K, V> {
-    return MutableListMap(map, valueList)
+    return MutableListMap(map, valueList.asKotlinFun())
 }
 
 fun <K, V> Map<K, List<V>>.toListMap(): ListMap<K, V> {

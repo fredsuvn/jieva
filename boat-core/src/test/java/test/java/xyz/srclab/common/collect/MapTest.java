@@ -81,4 +81,11 @@ public class MapTest {
         Assert.assertEquals(sml.get("1", 0), "1");
         Assert.assertEquals(sml.get("1", 1), "1");
     }
+
+    @Test
+    public void testGet() {
+        Map<Integer, Integer> map = BMap.newMap(0, 1, 2, 3);
+        Assert.assertEquals(BMap.get(map, 2, String.class), "3");
+        Assert.assertEquals(BMap.getOrDefault(map, 100, "66"), "66");
+    }
 }

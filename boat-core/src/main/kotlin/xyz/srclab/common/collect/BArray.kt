@@ -56,7 +56,42 @@ fun <T> newArray(vararg elements: T): Array<T> {
  * @param A array type
  */
 fun <A> newArrayOfType(type: Type, length: Int): A {
-    return java.lang.reflect.Array.newInstance(type.rawClass, length).asTyped()
+    return java.lang.reflect.Array.newInstance(type.rawClass.componentType, length).asTyped()
+}
+
+/**
+ * Array adds [value] at [index], returns a new array.
+ */
+@JvmName("add")
+fun <A : Any> A.arrayAdd(value: Any?, index: Int): A {
+    val length = this.arrayLength()
+    index.checkInBounds(0, length + 1)
+    val newArray = newArrayOfType<A>(this.javaClass, length + 1)
+    if (index > 0) {
+        System.arraycopy(this, 0, newArray, 0, index)
+    }
+    java.lang.reflect.Array.set(newArray, index, value)
+    if (index < length) {
+        System.arraycopy(this, index, newArray, index + 1, remainingLength(length + 1, index + 1))
+    }
+    return newArray
+}
+
+/**
+ * Array removes element at [index], return a new array.
+ */
+@JvmName("remove")
+fun <A : Any> A.arrayRemove(index: Int): A {
+    val length = this.arrayLength()
+    index.checkInBounds(0, length)
+    val newArray = newArrayOfType<A>(this.javaClass, length - 1)
+    if (index > 0) {
+        System.arraycopy(this, 0, newArray, 0, index)
+    }
+    if (index < length) {
+        System.arraycopy(this, index + 1, newArray, index, remainingLength(length - 1, index))
+    }
+    return newArray
 }
 
 /**

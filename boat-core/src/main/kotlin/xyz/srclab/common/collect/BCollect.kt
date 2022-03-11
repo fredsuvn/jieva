@@ -91,10 +91,16 @@ import kotlin.collections.windowed as windowedKt
 import kotlin.collections.zip as zipKt
 import kotlin.collections.zipWithNext as zipWithNextKt
 
+/**
+ * Adds [elements] into [this] and returns [this].
+ */
 fun <T, C : MutableCollection<in T>> C.collect(vararg elements: T): C = apply {
     this.addAllKt(elements)
 }
 
+/**
+ * Adds [elements] into [this] and returns [this].
+ */
 fun <T, C : MutableCollection<in T>> C.collect(elements: Iterable<T>): C = apply {
     this.addAllKt(elements)
 }
@@ -193,27 +199,45 @@ fun <T> Iterable<T>.randomOrNull(random: Random): T? {
     return asToList().randomOrNullKt(random)
 }
 
+/**
+ * Returns element at [index].
+ */
 fun <T> Iterable<T>.get(index: Int): T {
     return this.elementAtKt(index)
 }
 
+/**
+ * Returns element at [index], or null if index out of bounds.
+ */
 fun <T> Iterable<T>.getOrNull(index: Int): T? {
     return this.elementAtOrNullKt(index)
 }
 
+/**
+ * Returns element at [index], or [defaultValue] if index out of bounds.
+ */
 fun <T> Iterable<T>.getOrDefault(index: Int, defaultValue: T): T {
     return this.elementAtOrElseKt(index) { defaultValue }
 }
 
-fun <T> Iterable<T>.getOrElse(index: Int, defaultValue: IntFunction<T>): T {
-    return this.elementAtOrElseKt(index, defaultValue.asKotlinFun())
+/**
+ * Returns element at [index], or [elseValue] if index out of bounds.
+ */
+fun <T> Iterable<T>.getOrElse(index: Int, elseValue: IntFunction<T>): T {
+    return this.elementAtOrElseKt(index, elseValue.asKotlinFun())
 }
 
+/**
+ * Returns result of conversion of element at [index].
+ */
 @JvmOverloads
 fun <T : Any> Iterable<*>.get(index: Int, type: Class<out T>, converter: Converter = Converter.defaultConverter()): T {
     return converter.convert(getOrNull(index), type)
 }
 
+/**
+ * Returns result of conversion of element at [index], or null if index out of bounds.
+ */
 @JvmOverloads
 fun <T : Any> Iterable<*>.getOrNull(
     index: Int,
@@ -223,6 +247,9 @@ fun <T : Any> Iterable<*>.getOrNull(
     return converter.convertOrNull(getOrNull(index), type)
 }
 
+/**
+ * Returns result of conversion of element at [index], or [defaultValue] if index out of bounds.
+ */
 fun <T : Any> Iterable<*>.getOrDefault(index: Int, defaultValue: T, converter: Converter): T {
     return converter.convertOrNull(getOrNull(index), defaultValue.javaClass) ?: defaultValue
 }
@@ -433,30 +460,6 @@ fun <T, K, V> Iterable<T>.toMapWithNext(
     return toMapWithNext(LinkedHashMap(), defaultValue, transform)
 }
 
-@JvmSynthetic
-inline fun <T, K, V> Iterable<T>.toMapWithNext(keySelector: (T) -> K, valueTransform: (T) -> V): Map<K, V> {
-    return toMapWithNext(LinkedHashMap(), keySelector, valueTransform)
-}
-
-@JvmSynthetic
-inline fun <T, K, V> Iterable<T>.toMapWithNext(transform: (T, T) -> Pair<K, V>): Map<K, V> {
-    return toMapWithNext(LinkedHashMap(), transform)
-}
-
-@JvmSynthetic
-inline fun <T, K, V> Iterable<T>.toMapWithNext(
-    defaultValue: T,
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
-): Map<K, V> {
-    return toMapWithNext(LinkedHashMap(), defaultValue, keySelector, valueTransform)
-}
-
-@JvmSynthetic
-inline fun <T, K, V> Iterable<T>.toMapWithNext(defaultValue: T, transform: (T, T) -> Pair<K, V>): Map<K, V> {
-    return toMapWithNext(LinkedHashMap(), defaultValue, transform)
-}
-
 fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMap(
     destination: M,
     keySelector: Function<in T, K>,
@@ -544,86 +547,6 @@ fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
         }
         val entry = transform.apply(e1, e2)
         destination[entry.key] = entry.value
-    }
-    return destination
-}
-
-@JvmSynthetic
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
-    destination: M,
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
-): M {
-    val iterator = this.iterator()
-    while (iterator.hasNext()) {
-        val e1 = iterator.next()
-        if (!iterator.hasNext()) {
-            return destination
-        }
-        val e2 = iterator.next()
-        val k = keySelector(e1)
-        val v = valueTransform(e2)
-        destination[k] = v
-    }
-    return destination
-}
-
-@JvmSynthetic
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
-    destination: M,
-    transform: (T, T) -> Pair<K, V>
-): M {
-    val iterator = this.iterator()
-    while (iterator.hasNext()) {
-        val e1 = iterator.next()
-        if (!iterator.hasNext()) {
-            return destination
-        }
-        val e2 = iterator.next()
-        val entry = transform(e1, e2)
-        destination[entry.first] = entry.second
-    }
-    return destination
-}
-
-@JvmSynthetic
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
-    destination: M,
-    defaultValue: T,
-    keySelector: (T) -> K,
-    valueTransform: (T) -> V
-): M {
-    val iterator = this.iterator()
-    while (iterator.hasNext()) {
-        val e1 = iterator.next()
-        val e2 = if (iterator.hasNext()) {
-            iterator.next()
-        } else {
-            defaultValue
-        }
-        val k = keySelector(e1)
-        val v = valueTransform(e2)
-        destination[k] = v
-    }
-    return destination
-}
-
-@JvmSynthetic
-inline fun <T, K, V, M : MutableMap<in K, in V>> Iterable<T>.toMapWithNext(
-    destination: M,
-    defaultValue: T,
-    transform: (T, T) -> Pair<K, V>
-): M {
-    val iterator = this.iterator()
-    while (iterator.hasNext()) {
-        val e1 = iterator.next()
-        val e2 = if (iterator.hasNext()) {
-            iterator.next()
-        } else {
-            defaultValue
-        }
-        val entry = transform(e1, e2)
-        destination[entry.first] = entry.second
     }
     return destination
 }
@@ -822,7 +745,7 @@ fun <T> Iterable<T>.forEachIndexed(action: IndexedConsumer<in T>) {
 }
 
 fun <T> Iterable<T>.max(comparator: Comparator<in T>): T {
-    return maxOrNull(comparator) ?: throw NoSuchElementException()
+    return this.maxOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T>): T? {
@@ -830,7 +753,7 @@ fun <T> Iterable<T>.maxOrNull(comparator: Comparator<in T>): T? {
 }
 
 fun <T> Iterable<T>.min(comparator: Comparator<in T>): T {
-    return minOrNull(comparator) ?: throw NoSuchElementException()
+    return this.minOrNull(comparator) ?: throw NoSuchElementException()
 }
 
 fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T>): T? {
@@ -838,7 +761,7 @@ fun <T> Iterable<T>.minOrNull(comparator: Comparator<in T>): T? {
 }
 
 fun <T> Iterable<T>.toMutableCollection(): MutableCollection<T> {
-    return toMutableSet()
+    return this.toMutableSet()
 }
 
 fun <T> Iterable<T>.toSet(): Set<T> {
@@ -886,47 +809,47 @@ fun <T> Iterable<T>.asToCollection(): Collection<T> {
 }
 
 fun <T> Iterable<T>.asToMutableCollection(): MutableCollection<T> {
-    return if (this is MutableCollection<T>) this else toMutableCollection()
+    return if (this is MutableCollection<T>) this else this.toMutableCollection()
 }
 
 fun <T> Iterable<T>.asToSet(): Set<T> {
-    return if (this is Set<T>) this else toSet()
+    return if (this is Set<T>) this else this.toSet()
 }
 
 fun <T> Iterable<T>.asToMutableSet(): MutableSet<T> {
-    return if (this is MutableSet<T>) this else toMutableSet()
+    return if (this is MutableSet<T>) this else this.toMutableSet()
 }
 
 fun <T> Iterable<T>.asToHashSet(): HashSet<T> {
-    return if (this is HashSet<T>) this else toHashSet()
+    return if (this is HashSet<T>) this else this.toHashSet()
 }
 
 fun <T> Iterable<T>.asToLinkedHashSet(): LinkedHashSet<T> {
-    return if (this is LinkedHashSet<T>) this else toLinkedHashSet()
+    return if (this is LinkedHashSet<T>) this else this.toLinkedHashSet()
 }
 
 fun <T> Iterable<T>.asToSortedSet(comparator: Comparator<in T>): SortedSet<T> {
-    return if (this is SortedSet<T>) this else toSortedSet(comparator)
+    return if (this is SortedSet<T>) this else this.toSortedSet(comparator)
 }
 
 fun <T> Iterable<T>.asToTreeSet(comparator: Comparator<in T>): TreeSet<T> {
-    return if (this is TreeSet<T>) this else toTreeSet(comparator)
+    return if (this is TreeSet<T>) this else this.toTreeSet(comparator)
 }
 
 fun <T> Iterable<T>.asToList(): List<T> {
-    return if (this is List<T>) this else toList()
+    return if (this is List<T>) this else this.toList()
 }
 
 fun <T> Iterable<T>.asToMutableList(): MutableList<T> {
-    return if (this is MutableList<T>) this else toMutableList()
+    return if (this is MutableList<T>) this else this.toMutableList()
 }
 
 fun <T> Iterable<T>.asToArrayList(): ArrayList<T> {
-    return if (this is ArrayList<T>) this else toArrayList()
+    return if (this is ArrayList<T>) this else this.toArrayList()
 }
 
 fun <T> Iterable<T>.asToLinkedList(): LinkedList<T> {
-    return if (this is LinkedList<T>) this else toLinkedList()
+    return if (this is LinkedList<T>) this else this.toLinkedList()
 }
 
 @JvmOverloads
@@ -935,17 +858,17 @@ fun <T> Iterable<T>.toStream(parallel: Boolean = false): Stream<T> {
 }
 
 inline fun <reified T> Iterable<T>.toTypedArray(): Array<T> {
-    return asToCollection().toTypedArrayKt()
+    return this.asToCollection().toTypedArrayKt()
 }
 
 fun <T> Iterable<T>.toArray(): Array<Any?> {
-    return asToCollection().toTypedArrayKt()
+    return this.asToCollection().toTypedArrayKt()
 }
 
 fun <T : R, R> Iterable<T>.toArray(type: Class<R>): Array<R> {
-    val set = asToCollection()
-    val array = type.newArray(set.size)
-    return toArray(array)
+    val set = this.asToCollection()
+    val array = newArrayOfType<Array<R>>(type, set.size)
+    return this.toArray(array)
 }
 
 fun <T : R, R> Iterable<T>.toArray(array: Array<R>): Array<R> {
@@ -962,26 +885,16 @@ fun <T : R, R> Iterable<T>.toArray(array: Array<R>): Array<R> {
 }
 
 fun <T, R> Iterable<T>.toArray(type: Class<R>, transform: Function<in T, R>): Array<R> {
-    return toArray(type, transform.asKotlinFun())
+    val set = asToCollection()
+    val array = newArrayOfType<Array<R>>(type, set.size)
+    return this.toArray(array, transform)
 }
 
 fun <T, R> Iterable<T>.toArray(array: Array<R>, transform: Function<in T, R>): Array<R> {
-    return toArray(array, transform.asKotlinFun())
-}
-
-@JvmSynthetic
-inline fun <T, R> Iterable<T>.toArray(type: Class<R>, transform: (T) -> R): Array<R> {
-    val set = asToCollection()
-    val array = type.newArray(set.size)
-    return toArray(array, transform)
-}
-
-@JvmSynthetic
-inline fun <T, R> Iterable<T>.toArray(array: Array<R>, transform: (T) -> R): Array<R> {
     var i = 0
     for (t in this) {
         if (i < array.size) {
-            array[i] = transform(t)
+            array[i] = transform.apply(t)
             i++
         } else {
             break
@@ -1148,13 +1061,11 @@ fun <T> Iterable<T>.joinToString(
 
 fun <T> Iterable<T>.joinToString(
     separator: CharSequence,
-    prefix: CharSequence,
-    suffix: CharSequence,
     limit: Int,
     truncated: CharSequence,
     transform: Function<in T, CharSequence>?
 ): String {
-    return this.joinToStringKt(separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+    return this.joinToStringKt(separator, "", "", limit, truncated, transform?.asKotlinFun())
 }
 
 @JvmOverloads
@@ -1169,13 +1080,11 @@ fun <T, A : Appendable> Iterable<T>.joinTo(
 fun <T, A : Appendable> Iterable<T>.joinTo(
     destination: A,
     separator: CharSequence,
-    prefix: CharSequence,
-    suffix: CharSequence,
     limit: Int,
     truncated: CharSequence,
     transform: Function<in T, CharSequence>?
 ): A {
-    return this.joinToKt(destination, separator, prefix, suffix, limit, truncated, transform?.asKotlinFun())
+    return this.joinToKt(destination, separator, "", "", limit, truncated, transform?.asKotlinFun())
 }
 
 //Iterator
@@ -1193,7 +1102,7 @@ fun <T> Enumeration<T>.asIterator(): Iterator<T> {
 }
 
 fun <T> Enumeration<T>.asIterable(): Iterable<T> {
-    return asIterator().asIterable()
+    return this.asIterator().asIterable()
 }
 
 fun <T> Iterator<T>.asEnumeration(): Enumeration<T> {

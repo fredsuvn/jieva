@@ -11,7 +11,7 @@ import java.util.function.Function
  */
 open class CopyOnWriteMap<K, V>(
     initMap: Map<out K, V>,
-    private val newMap: (Map<out K, V>) -> MutableMap<K, V>
+    private val newMap: Function<Map<out K, V>, MutableMap<K, V>>
 ) : Serializable, MutableMap<K, V> {
 
     private var currentMap: MutableMap<K, V> = newMap(initMap)
@@ -69,7 +69,7 @@ open class CopyOnWriteMap<K, V>(
     }
 
     override fun merge(key: K, value: V, remappingFunction: BiFunction<in V, in V, out V?>): V? {
-        return cow { it.merge(key, value, remappingFunction) }
+        return cow { it.merge(key, value!!, remappingFunction) }
     }
 
     override fun put(key: K, value: V): V? {
@@ -107,7 +107,7 @@ open class CopyOnWriteMap<K, V>(
     private inline fun <T> cow(action: (MutableMap<K, V>) -> T): T {
         return synchronized(this) {
             val curMap = currentMap
-            val newMap = newMap(curMap)
+            val newMap = newMap.apply(curMap)
             val result = action(newMap)
             currentMap = newMap
             result
