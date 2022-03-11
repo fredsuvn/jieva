@@ -4,6 +4,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.collect.*;
+import xyz.srclab.common.convert.CompatibleConvertHandler;
+import xyz.srclab.common.convert.Converter;
 
 import java.util.*;
 
@@ -50,6 +52,29 @@ public class CollectTest {
         Assert.assertNull(BCollect.getOrNull(list, 100));
         Assert.assertEquals((Object) BCollect.getOrDefault(list, 100, 66), 66);
         Assert.assertEquals((Object) BCollect.getOrElse(list, 100, (i) -> 88), 88);
-        Assert.assertEquals(BCollect.get(list, 1, String.class), "1");
+        Assert.assertEquals(BCollect.getConvert(list, 1, String.class), "1");
+        Assert.assertEquals(
+            BCollect.getConvertOrDefault(list, 100, "66", Converter.defaultConverter()),
+            "null"
+        );
+        Assert.assertEquals(
+            BCollect.getConvertOrDefault(list, 100, "66",
+                Converter.newConverter(BList.newList(CompatibleConvertHandler.INSTANCE))),
+            "66"
+        );
+
+        Assert.assertNull(BList.getOrNull(list, 100));
+        Assert.assertEquals((Object) BList.getOrDefault(list, 100, 66), 66);
+        Assert.assertEquals((Object) BList.getOrElse(list, 100, (i) -> 88), 88);
+        Assert.assertEquals(BList.getConvert(list, 1, String.class), "1");
+        Assert.assertEquals(
+            BList.getConvertOrDefault(list, 100, "66", Converter.defaultConverter()),
+            "null"
+        );
+        Assert.assertEquals(
+            BCollect.getConvertOrDefault(list, 100, "66",
+                Converter.newConverter(BList.newList(CompatibleConvertHandler.INSTANCE))),
+            "66"
+        );
     }
 }

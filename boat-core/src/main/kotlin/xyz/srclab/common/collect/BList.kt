@@ -72,7 +72,7 @@ fun <T> List<T>.lastOrNull(predicate: Predicate<in T>): T? {
  * Returns element at [index], or null if index out of bounds.
  */
 fun <T> List<T>.getOrNull(index: Int): T? {
-    return this[index]
+    return this.elementAtOrNull(index)
 }
 
 /**
@@ -90,30 +90,34 @@ fun <T> List<T>.getOrElse(index: Int, elseValue: IntFunction<T>): T {
 }
 
 /**
- * Returns result of conversion of element at [index].
+ * Returns conversion of result of `get` operation.
  */
 @JvmOverloads
-fun <T : Any> List<*>.get(index: Int, type: Class<out T>, converter: Converter = Converter.defaultConverter()): T {
-    return converter.convert(getOrNull(index), type)
+fun <T : Any> List<*>.getConvert(
+    index: Int,
+    type: Class<out T>,
+    converter: Converter = Converter.defaultConverter()
+): T {
+    return converter.convert(this[index], type)
 }
 
 /**
- * Returns result of conversion of element at [index], or null if index out of bounds.
+ * Returns conversion of result of `getOrNull` operation.
  */
 @JvmOverloads
-fun <T : Any> List<*>.getOrNull(
+fun <T : Any> List<*>.getConvertOrNull(
     index: Int,
     type: Class<out T>,
     converter: Converter = Converter.defaultConverter()
 ): T? {
-    return converter.convertOrNull(getOrNull(index), type)
+    return converter.convertOrNull(this.getOrNull(index), type)
 }
 
 /**
- * Returns result of conversion of element at [index], or [defaultValue] if index out of bounds.
+ * Returns conversion of result of `getOrNull` operation, or [defaultValue] if result of conversion is null.
  */
-fun <T : Any> List<*>.getOrDefault(index: Int, defaultValue: T, converter: Converter): T {
-    return converter.convertOrNull(getOrNull(index), defaultValue.javaClass) ?: defaultValue
+fun <T : Any> List<*>.getConvertOrDefault(index: Int, defaultValue: T, converter: Converter): T {
+    return converter.convertOrNull(this.getOrNull(index), defaultValue.javaClass) ?: defaultValue
 }
 
 fun List<*>.getBoolean(index: Int): Boolean {

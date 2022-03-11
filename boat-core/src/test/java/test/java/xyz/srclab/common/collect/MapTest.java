@@ -4,6 +4,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BId;
 import xyz.srclab.common.collect.*;
+import xyz.srclab.common.convert.CompatibleConvertHandler;
+import xyz.srclab.common.convert.Converter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,7 +87,12 @@ public class MapTest {
     @Test
     public void testGet() {
         Map<Integer, Integer> map = BMap.newMap(0, 1, 2, 3);
-        Assert.assertEquals(BMap.get(map, 2, String.class), "3");
-        Assert.assertEquals(BMap.getOrDefault(map, 100, "66"), "66");
+        Assert.assertEquals(BMap.getConvert(map, 2, String.class), "3");
+        Assert.assertEquals(BMap.getConvertOrDefault(map, 100, "66"), "null");
+        Assert.assertEquals(
+            BMap.getConvertOrDefault(map, 100, "66",
+                Converter.newConverter(BList.newList(CompatibleConvertHandler.INSTANCE))),
+            "66"
+        );
     }
 }

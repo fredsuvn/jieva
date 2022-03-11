@@ -61,31 +61,33 @@ fun <K, V, C : MutableMap<in K, in V>> C.collect(keyValues: Iterable<Any?>): C {
 }
 
 fun <K, V> newEntry(key: K, value: V): MutableMap.MutableEntry<K, V> {
-    return object : MutableMap.MutableEntry<K, V> {
-        private var v = value
-        override val key: K = key
-        override val value: V
-            get() = v
-
-        override fun setValue(newValue: V): V {
-            val result = v
-            v = newValue
-            return result
-        }
-    }
+    return EntryImpl(key, value)
 }
 
+/**
+ * Returns not-null value of [key], or [defaultValue] if the value is null.
+ */
 fun <K, V : Any> Map<K, V>.getNotNull(key: K, defaultValue: V): V {
     return this[key] ?: defaultValue
 }
 
+/**
+ * Returns conversion of result of `get` operation.
+ */
 @JvmOverloads
-fun <K, T : Any> Map<K, *>.get(key: K, type: Class<out T>, converter: Converter = Converter.defaultConverter()): T {
+fun <K, T : Any> Map<K, *>.getConvert(
+    key: K,
+    type: Class<out T>,
+    converter: Converter = Converter.defaultConverter()
+): T {
     return converter.convert(this[key], type)
 }
 
+/**
+ * Returns conversion of result of `get` operation, or [defaultValue] if result of conversion is null.
+ */
 @JvmOverloads
-fun <K, T : Any> Map<K, *>.getOrDefault(
+fun <K, T : Any> Map<K, *>.getConvertOrDefault(
     key: K,
     defaultValue: T,
     converter: Converter = Converter.defaultConverter()
@@ -365,4 +367,15 @@ fun Map<*, *>.toStringMap(): Map<String, String> {
         map[key.toString()] = value.toString()
     }
     return map
+}
+
+private data class EntryImpl<K, V>(
+    override val key: K,
+    override var value: V
+) : MutableMap.MutableEntry<K, V> {
+    override fun setValue(newValue: V): V {
+        val old = value
+        value = newValue
+        return old
+    }
 }
