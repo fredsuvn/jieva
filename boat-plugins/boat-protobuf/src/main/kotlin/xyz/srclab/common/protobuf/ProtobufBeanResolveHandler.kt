@@ -8,9 +8,9 @@ import xyz.srclab.common.bean.AbstractBeanResolveHandler
 import xyz.srclab.common.bean.BeanResolveContext
 import xyz.srclab.common.bean.BeanResolveHandler
 import xyz.srclab.common.bean.BeanTypeBuilder
-import xyz.srclab.common.func.InstFunc
-import xyz.srclab.common.func.InstFunc.Companion.toInstFunc
-import xyz.srclab.common.func.StaticFunc.Companion.toStaticFunc
+import xyz.srclab.common.invoke.InstInvoke
+import xyz.srclab.common.invoke.InstInvoke.Companion.toInstInvoke
+import xyz.srclab.common.invoke.StaticInvoke.Companion.toStaticInvoke
 import xyz.srclab.common.reflect.getTypeSignature
 import xyz.srclab.common.reflect.method
 import xyz.srclab.common.reflect.methodOrNull
@@ -40,8 +40,8 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
 
         fun addProperty(field: Descriptors.FieldDescriptor, isBuilder: Boolean) {
 
-            fun createSetter(clearMethod: Method, addAllMethod: Method): InstFunc {
-                return object : InstFunc {
+            fun createSetter(clearMethod: Method, addAllMethod: Method): InstInvoke {
+                return object : InstInvoke {
                     override fun invoke(inst: Any, vararg args: Any?): Any? {
                         clearMethod.invoke(inst)
                         addAllMethod.invoke(inst, *args)
@@ -60,7 +60,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                     return
                 }
                 val type = getterMethod.genericReturnType.getTypeSignature(Map::class.java)
-                val getter = getterMethod.toInstFunc()
+                val getter = getterMethod.toInstInvoke()
                 getters[name] = GetterInfo(name, type, getter, null, getterMethod)
 
                 if (isBuilder) {
@@ -88,7 +88,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                     return
                 }
                 val type = getterMethod.genericReturnType.getTypeSignature(List::class.java)
-                val getter = getterMethod.toInstFunc()
+                val getter = getterMethod.toInstInvoke()
                 getters[name] = GetterInfo(name, type, getter, null, getterMethod)
 
                 if (isBuilder) {
@@ -114,7 +114,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                 return
             }
             val type = getterMethod.genericReturnType
-            val getter = getterMethod.toInstFunc()
+            val getter = getterMethod.toInstInvoke()
             getters[rawName] = GetterInfo(rawName, type, getter, null, getterMethod)
 
             if (isBuilder) {
@@ -122,14 +122,14 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
                 if (setterMethod === null) {
                     throw IllegalStateException("Cannot find setter method of field: $rawName")
                 }
-                val setter = setterMethod.toInstFunc()
+                val setter = setterMethod.toInstInvoke()
                 setters[rawName] = SetterInfo(rawName, type, setter, null, setterMethod)
             }
         }
 
         //com.google.protobuf.Descriptors.Descriptor getDescriptor()
         val getDescriptorMethod = rawClass.getMethod("getDescriptor")
-        val descriptor: Descriptors.Descriptor = getDescriptorMethod.toStaticFunc().invokeTyped()
+        val descriptor: Descriptors.Descriptor = getDescriptorMethod.toStaticInvoke().invokeTyped()
         val isBuilder = Message.Builder::class.java.isAssignableFrom(rawClass)
         for (field in descriptor.fields) {
             addProperty(field, isBuilder)
@@ -137,7 +137,7 @@ object ProtobufBeanResolveHandler : AbstractBeanResolveHandler() {
 
         //Add class property
         val getClassMethod = rawClass.method("getClass")
-        getters["class"] = GetterInfo("class", Class::class.java, getClassMethod.toInstFunc(), null, getClassMethod)
+        getters["class"] = GetterInfo("class", Class::class.java, getClassMethod.toInstInvoke(), null, getClassMethod)
 
         //break
         context.complete()

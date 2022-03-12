@@ -2,7 +2,7 @@ package xyz.srclab.common.proxy
 
 import org.springframework.cglib.proxy.*
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.func.StaticFunc
+import xyz.srclab.common.invoke.StaticInvoke
 import java.lang.reflect.Method
 import java.util.*
 
@@ -46,7 +46,7 @@ object SpringProxyFactory : ClassProxyFactory {
 
     private class ProxyMethodInterceptor(val proxyMethod: ProxyMethod) : MethodInterceptor {
         override fun intercept(obj: Any, method: Method, args: Array<out Any?>?, proxy: MethodProxy): Any? {
-            val sourceInvoker = object : StaticFunc {
+            val sourceInvoker = object : StaticInvoke {
                 override fun invoke(vararg args: Any?): Any? {
                     return proxy.invokeSuper(obj, args)
                 }

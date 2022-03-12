@@ -2,8 +2,8 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
 import xyz.srclab.common.base.uncapitalize
-import xyz.srclab.common.func.InstFunc
-import xyz.srclab.common.func.InstFunc.Companion.toInstFunc
+import xyz.srclab.common.invoke.InstInvoke
+import xyz.srclab.common.invoke.InstInvoke.Companion.toInstInvoke
 import xyz.srclab.common.reflect.eraseTypeParameters
 import xyz.srclab.common.reflect.rawClass
 import xyz.srclab.common.reflect.searchFieldOrNull
@@ -116,7 +116,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     data class GetterInfo(
         val name: String,
         val type: Type,
-        val getter: InstFunc?,
+        val getter: InstInvoke?,
         val field: Field?,
         val getterMethod: Method?,
     )
@@ -124,7 +124,7 @@ abstract class AbstractBeanResolveHandler : BeanResolveHandler {
     data class SetterInfo(
         val name: String,
         val type: Type,
-        val setter: InstFunc?,
+        val setter: InstInvoke?,
         val field: Field?,
         val setterMethod: Method?,
     )
@@ -164,7 +164,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
                 }
                 val type = method.genericReturnType.eraseTypeParameters(context.typeArguments)
                 val field = beanClass.searchFieldOrNull(propertyName, true)
-                getters[propertyName] = GetterInfo(propertyName, type, method.toInstFunc(), field, method)
+                getters[propertyName] = GetterInfo(propertyName, type, method.toInstInvoke(), field, method)
                 continue
             }
             if (name.startsWith("set") && method.parameterCount == 1) {
@@ -174,7 +174,7 @@ object BeanStyleBeanResolveHandler : AbstractBeanResolveHandler() {
                 }
                 val type = method.genericParameterTypes[0].eraseTypeParameters(context.typeArguments)
                 val field = beanClass.searchFieldOrNull(propertyName, true)
-                setters[propertyName] = SetterInfo(propertyName, type, method.toInstFunc(), field, method)
+                setters[propertyName] = SetterInfo(propertyName, type, method.toInstInvoke(), field, method)
                 continue
             }
         }
@@ -210,13 +210,13 @@ object RecordStyleBeanResolveHandler : AbstractBeanResolveHandler() {
             if (method.parameterCount == 0) {
                 val type = method.genericReturnType.eraseTypeParameters(context.typeArguments)
                 val field = beanClass.searchFieldOrNull(propertyName, true)
-                getters[propertyName] = GetterInfo(propertyName, type, method.toInstFunc(), field, method)
+                getters[propertyName] = GetterInfo(propertyName, type, method.toInstInvoke(), field, method)
                 continue
             }
             if (method.parameterCount == 1) {
                 val type = method.genericParameterTypes[0].eraseTypeParameters(context.typeArguments)
                 val field = beanClass.searchFieldOrNull(propertyName, true)
-                setters[propertyName] = SetterInfo(propertyName, type, method.toInstFunc(), field, method)
+                setters[propertyName] = SetterInfo(propertyName, type, method.toInstInvoke(), field, method)
                 continue
             }
         }

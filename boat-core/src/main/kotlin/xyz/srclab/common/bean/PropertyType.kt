@@ -2,7 +2,7 @@ package xyz.srclab.common.bean
 
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.defaultSerialVersion
-import xyz.srclab.common.func.InstFunc
+import xyz.srclab.common.invoke.InstInvoke
 import java.io.Serializable
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -17,8 +17,8 @@ open class PropertyType(
     val ownerType: BeanType,
     val name: String,
     val type: Type,
-    val getter: InstFunc?,
-    val setter: InstFunc?,
+    val getter: InstInvoke?,
+    val setter: InstInvoke?,
     val field: Field?,
     val getterMethod: Method?,
     val setterMethod: Method?,

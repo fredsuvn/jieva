@@ -1,7 +1,7 @@
 package xyz.srclab.common.proxy
 
 import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.func.StaticFunc
+import xyz.srclab.common.invoke.StaticInvoke
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
@@ -49,7 +49,7 @@ object JdkProxyFactory : ClassProxyFactory {
         }
     }
 
-    private object UnsupportedSourceInvoke : StaticFunc {
+    private object UnsupportedSourceInvoke : StaticInvoke {
         override fun invoke(vararg args: Any?): Any? {
             throw IllegalStateException("Interface's method is not implemented.")
         }

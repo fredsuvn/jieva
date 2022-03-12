@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.func.StaticFunc;
+import xyz.srclab.common.invoke.StaticInvoke;
 import xyz.srclab.common.proxy.ClassProxy;
 import xyz.srclab.common.proxy.ClassProxyFactory;
 import xyz.srclab.common.proxy.ProxyMethod;
@@ -43,7 +43,7 @@ public class ProxyTest {
             public Object invoke(
                 @NotNull Object sourceObject,
                 @NotNull Method sourceMethod,
-                @NotNull StaticFunc sourceInvoke,
+                @NotNull StaticInvoke sourceInvoke,
                 Object[] args
             ) {
                 BLog.info("method: {}, declaring class: {}", sourceMethod, sourceMethod.getDeclaringClass());
