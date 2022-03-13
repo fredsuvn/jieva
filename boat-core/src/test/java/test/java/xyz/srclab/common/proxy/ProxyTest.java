@@ -24,7 +24,7 @@ public class ProxyTest {
 
     @Test
     public void testInterfaceProxy() {
-        //doTestProxy(CglibProxyClassFactory.INSTANCE, TI.class);
+
         doTestProxy(ClassProxyProvider.springCglib(), TI.class);
         doTestProxy(ClassProxyProvider.jdk(), TI.class);
     }
