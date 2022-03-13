@@ -3,10 +3,18 @@ package test.java.xyz.srclab.common.io;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BDefault;
+import xyz.srclab.common.base.BLog;
 import xyz.srclab.common.base.BRandom;
+import xyz.srclab.common.base.BResource;
 import xyz.srclab.common.io.BBuffer;
+import xyz.srclab.common.io.BFile;
+import xyz.srclab.common.io.BIO;
 
+import java.io.File;
+import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 /**
@@ -98,6 +106,38 @@ public class BufferTest {
         Assert.assertEquals(BBuffer.getBytes(buffer), bytes);
         ByteBuffer buffer2 = BBuffer.getBuffer(bytes);
         Assert.assertEquals(BBuffer.getBytes(buffer2), bytes);
+    }
+
+    @Test
+    public void testReadMappedByteBuffer() throws Exception {
+        URL url = BResource.loadClasspathResource("META-INF/test.mapped.txt");
+        assert url != null;
+        File file = BFile.toFile(url);
+        FileChannel fileChannel = BFile.openRandomAccessFile(file).getChannel();
+        MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, file.length());
+        BLog.info("testReadMappedByteBuffer: {}", BIO.readString(BBuffer.asInputStream(buffer), true));
+        BBuffer.closeBuffer(buffer);
+    }
+
+    @Test
+    public void testMappedByteBuffer() throws Exception {
+        URL url = BResource.loadClasspathResource("META-INF/test.mapped.txt");
+        assert url != null;
+        File file = BFile.toFile(url);
+        FileChannel fileChannel = BFile.openRandomAccessFile(file).getChannel();
+        MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, file.length());
+        String content = BIO.readString(BBuffer.asInputStream(buffer));
+        BLog.info("testMappedByteBuffer: {}", content);
+        buffer.flip();
+        String newContent = "666777888";
+        buffer.put(newContent.getBytes());
+
+        Assert.assertEquals(BIO.readString(url.openStream(), true), newContent + content.substring(newContent.length()));
+        buffer.clear();
+        buffer.put(content.getBytes());
+        Assert.assertEquals(BIO.readString(url.openStream(), true), content);
+        fileChannel.close();
+        BBuffer.closeBuffer(buffer);
     }
 
     private void initBuffer(ByteBuffer buffer) {

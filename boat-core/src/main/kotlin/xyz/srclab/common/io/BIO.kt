@@ -4,18 +4,18 @@ package xyz.srclab.common.io
 
 import org.apache.commons.io.input.ReaderInputStream
 import org.apache.commons.io.output.WriterOutputStream
-import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.base.defaultBufferSize
 import xyz.srclab.common.base.defaultCharset
 import xyz.srclab.common.base.remainingLength
 import java.io.*
 import java.net.URL
-import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import kotlin.io.readBytes as readBytesKt
 
-//Read write:
-
+/**
+ * Reads all bytes and returns.
+ * @param close whether close this stream after reading
+ */
 @JvmOverloads
 fun InputStream.readBytes(close: Boolean = false): ByteArray {
     return this.let {
@@ -27,40 +27,76 @@ fun InputStream.readBytes(close: Boolean = false): ByteArray {
     }
 }
 
+/**
+ * Reads all bytes and returns as string.
+ * @param close whether close this stream after reading
+ */
 @JvmOverloads
 fun InputStream.readString(charset: Charset = defaultCharset(), close: Boolean = false): String {
     return String(readBytes(close), charset)
 }
 
+/**
+ * Reads all bytes and returns as string with [defaultCharset].
+ * @param close whether close this stream after reading
+ */
+fun InputStream.readString(close: Boolean): String {
+    return this.readString(defaultCharset(), close)
+}
+
+/**
+ * Reads all bytes and returns as string in lines.
+ * @param close whether close this stream after reading
+ */
 @JvmOverloads
 fun InputStream.readLines(charset: Charset = defaultCharset(), close: Boolean = false): List<String> {
     return readString(charset, close).lines()
 }
 
-@JvmOverloads
-fun InputStream.availableBytes(close: Boolean = false): ByteArray {
+/**
+ * Reads all bytes and returns as string with [defaultCharset] in lines.
+ * @param close whether close this stream after reading
+ */
+fun InputStream.readLines(close: Boolean): List<String> {
+    return this.readLines(defaultCharset(), close)
+}
+
+/**
+ * Reads available bytes and returns.
+ */
+fun InputStream.availableBytes(): ByteArray {
     val available = this.available()
     if (available == 0) {
         return byteArrayOf()
     }
     val bytes = ByteArray(available)
-    this.read(bytes)
-    if (close) {
-        this.close()
+    val count = this.read(bytes)
+    return if (count == bytes.size) {
+        bytes
+    } else {
+        bytes.copyOfRange(0, count)
     }
-    return bytes
 }
 
+/**
+ * Reads available bytes and returns as string.
+ */
 @JvmOverloads
-fun InputStream.availableString(charset: Charset = defaultCharset(), close: Boolean = false): String {
-    return String(availableBytes(close), charset)
+fun InputStream.availableString(charset: Charset = defaultCharset()): String {
+    return String(availableBytes(), charset)
 }
 
+/**
+ * Reads available bytes and returns as string in lines.
+ */
 @JvmOverloads
-fun InputStream.availableLines(charset: Charset = defaultCharset(), close: Boolean = false): List<String> {
-    return availableString(charset, close).lines()
+fun InputStream.availableLines(charset: Charset = defaultCharset()): List<String> {
+    return availableString(charset).lines()
 }
 
+/**
+ * Reads all chars and returns.
+ */
 @JvmOverloads
 fun Reader.readString(close: Boolean = false): String {
     return this.readText().let {
@@ -71,89 +107,97 @@ fun Reader.readString(close: Boolean = false): String {
     }
 }
 
+/**
+ * Reads all chars and returns in lines.
+ */
 @JvmOverloads
 fun Reader.readLines(close: Boolean = false): List<String> {
     return readString(close).lines()
 }
 
+/**
+ * Reads bytes to [dest], returning the number of bytes read.
+ */
 @JvmOverloads
-fun InputStream.readTo(output: OutputStream, bufferSize: Int = defaultBufferSize()): Long {
-    return this.copyTo(output, bufferSize)
+fun InputStream.readTo(dest: OutputStream, bufferSize: Int = defaultBufferSize()): Long {
+    return this.copyTo(dest, bufferSize)
 }
 
+/**
+ * Reads chars to [dest], returning the number of bytes read.
+ */
 @JvmOverloads
-fun Reader.readTo(output: Writer, bufferSize: Int = defaultBufferSize()): Long {
-    return this.copyTo(output, bufferSize)
+fun Reader.readTo(dest: Writer, bufferSize: Int = defaultBufferSize()): Long {
+    return this.copyTo(dest, bufferSize)
 }
 
-//Convert:
-
-@JvmOverloads
-fun InputStream.asBuffered(bufferSize: Int = defaultBufferSize()): BufferedInputStream {
-    return this.buffered(bufferSize)
-}
-
-@JvmOverloads
-fun OutputStream.asBuffered(bufferSize: Int = defaultBufferSize()): BufferedOutputStream {
-    return this.buffered(bufferSize)
-}
-
+/**
+ * Returns a [Reader] of which content from [this] [InputStream].
+ */
 @JvmOverloads
 fun InputStream.asReader(charset: Charset = defaultCharset()): Reader {
     return InputStreamReader(this, charset)
 }
 
+/**
+ * Returns a [Writer] of which content from [this] [OutputStream].
+ */
 @JvmOverloads
 fun OutputStream.asWriter(charset: Charset = defaultCharset()): Writer {
     return OutputStreamWriter(this, charset)
 }
 
-@JvmOverloads
-fun InputStream.asBufferedReader(
-    charset: Charset = defaultCharset(),
-    bufferSize: Int = defaultBufferSize()
-): BufferedReader {
-    return this.reader(charset).buffered(bufferSize)
-}
-
-@JvmOverloads
-fun OutputStream.asBufferedWriter(
-    charset: Charset = defaultCharset(),
-    bufferSize: Int = defaultBufferSize()
-): BufferedWriter {
-    return this.writer(charset).buffered(bufferSize)
-}
-
+/**
+ * Returns a [InputStream] of which content from [this] [Reader].
+ */
 @JvmOverloads
 fun Reader.asInputStream(charset: Charset = defaultCharset()): InputStream {
     return ReaderInputStream(this, charset)
 }
 
+/**
+ * Returns a [OutputStream] of which content from [this] [Writer].
+ */
 @JvmOverloads
 fun Writer.asOutputStream(charset: Charset = defaultCharset()): OutputStream {
     return WriterOutputStream(this, charset)
 }
 
+/**
+ * Returns a [BytesInputStream] of which content is [this] [ByteArray].
+ */
 @JvmOverloads
 fun ByteArray.asInputStream(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesInputStream {
     return BytesInputStream(this, offset, length)
 }
 
+/**
+ * Returns a [BytesOutputStream] of which content is [this] [ByteArray].
+ */
 @JvmOverloads
 fun ByteArray.asOutputStream(offset: Int = 0, length: Int = remainingLength(this.size, offset)): BytesOutputStream {
     return BytesOutputStream(this, offset, length)
 }
 
+/**
+ * Returns a [CharsReader] of which content is [this] [CharArray].
+ */
 @JvmOverloads
 fun CharArray.asReader(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsReader {
     return CharsReader(this, offset, length)
 }
 
+/**
+ * Returns a [CharsWriter] of which content is [this] [CharArray].
+ */
 @JvmOverloads
 fun CharArray.asWriter(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharsWriter {
     return CharsWriter(this, offset, length)
 }
 
+/**
+ * Returns a [CharSeqReader] of which content is [this] [T].
+ */
 @JvmOverloads
 fun <T : CharSequence> T.asReader(
     offset: Int = 0,
@@ -162,67 +206,38 @@ fun <T : CharSequence> T.asReader(
     return CharSeqReader(this, offset, length)
 }
 
+/**
+ * Returns a [AppendableWriter] of which content is [this] [T].
+ */
 fun <T : Appendable> T.asWriter(): AppendableWriter<T> {
     return AppendableWriter(this)
 }
 
-fun ByteBuffer.asInputStream(): ByteBufferInputStream {
-    return ByteBufferInputStream(this)
-}
-
-fun ByteBuffer.asOutputStream(): ByteBufferOutputStream {
-    return ByteBufferOutputStream(this)
-}
-
+/**
+ * Returns a [RandomInputStream] of which content from [this] [RandomAccessFile].
+ */
+@JvmOverloads
 fun RandomAccessFile.asInputStream(
     offset: Long = 0, length: Long = remainingLength(this.length(), offset)
 ): RandomInputStream {
     return RandomInputStream(this, offset, length)
 }
 
+/**
+ * Returns a [RandomInputStream] of which content from [this] [RandomAccessFile].
+ */
+@JvmOverloads
 fun RandomAccessFile.asOutputStream(
     offset: Long = 0, length: Long = remainingLength(this.length(), offset)
 ): RandomOutputStream {
     return RandomOutputStream(this, offset, length)
 }
 
-fun URL.toInputStream(): InputStream {
+/**
+ * Returns a [InputStream] of which content from [this] [URL].
+ */
+fun URL.asInputStream(): InputStream {
     return this.openStream()
-}
-
-@JvmOverloads
-fun Any.writeObject(output: OutputStream, close: Boolean = false) {
-    val oop = ObjectOutputStream(output)
-    oop.writeObject(this)
-    if (close) {
-        oop.close()
-    }
-}
-
-@JvmOverloads
-fun Any.writeObject(outputFile: CharSequence, close: Boolean = false) {
-    return writeObject(outputFile.openFileOutputStream(), close)
-}
-
-@JvmOverloads
-fun Any.writeObject(outputFile: File, close: Boolean = false) {
-    return writeObject(outputFile.openOutputStream(), close)
-}
-
-@JvmOverloads
-fun <T> CharSequence.readObject(close: Boolean = false): T {
-    return this.openFileInputStream().readObject(close)
-}
-
-@JvmOverloads
-fun <T> InputStream.readObject(close: Boolean = false): T {
-    val ooi = ObjectInputStream(this)
-    return ooi.readObject().asTyped()
-}
-
-@JvmOverloads
-fun <T> File.readObject(close: Boolean = false): T {
-    return this.openInputStream().readObject(close)
 }
 
 /**

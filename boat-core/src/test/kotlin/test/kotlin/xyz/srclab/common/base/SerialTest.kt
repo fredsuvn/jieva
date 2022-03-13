@@ -1,14 +1,14 @@
-package test.kotlin.xyz.srclab.common.io
+package test.kotlin.xyz.srclab.common.base
 
 import org.testng.Assert
 import org.testng.annotations.Test
 import xyz.srclab.common.base.defaultSerialVersion
-import xyz.srclab.common.io.readObject
-import xyz.srclab.common.io.writeObject
+import xyz.srclab.common.base.readObject
+import xyz.srclab.common.base.writeObject
 import java.io.File
 import java.io.Serializable
 
-class IOTest {
+class SerialTest {
 
     @Test
     fun testSerialize() {

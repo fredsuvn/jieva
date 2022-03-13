@@ -2,9 +2,22 @@
 
 package xyz.srclab.common.base
 
-//fun testUnsafe() {
-//    val unsafe: sun.misc.Unsafe = sun.misc.Unsafe.getUnsafe()
-//    1 Field f = Unsafe.class.getDeclaredField("theUnsafe");
-//    2 f.setAccessible(true);
-//    3 Unsafe unsafe = (Unsafe) f.get(null);
-//}
+import sun.misc.Unsafe
+import java.lang.reflect.Field
+import java.nio.ByteBuffer
+
+private val unsafe: Unsafe = run {
+    val unsafeClass = Class.forName("sun.misc.Unsafe")
+    val unsafeField: Field = unsafeClass.getDeclaredField("theUnsafe")
+    unsafeField.isAccessible = true
+    unsafeField.get(null).asTyped()
+}
+
+/**
+ * Cleans [this] buffer.
+ */
+fun ByteBuffer.invokeCleaner() {
+    val invokeCleaner = unsafe.javaClass.getMethod("invokeCleaner", ByteBuffer::class.java)
+    invokeCleaner.isAccessible = true
+    invokeCleaner.invoke(unsafe, this)
+}

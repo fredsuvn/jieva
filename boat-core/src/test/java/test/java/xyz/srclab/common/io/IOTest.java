@@ -2,17 +2,15 @@ package test.java.xyz.srclab.common.io;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BDefault;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.collect.BArray;
-import xyz.srclab.common.io.BFile;
-import xyz.srclab.common.io.BIO;
+import xyz.srclab.common.base.BString;
+import xyz.srclab.common.io.*;
 
 import java.io.*;
+import java.nio.BufferOverflowException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author sunqian
@@ -63,94 +61,159 @@ public class IOTest {
     }
 
     @Test
-    public void testSerial() throws Exception {
-        File temp = File.createTempFile("ttt", ".txt");
-        S s = new S();
-        s.setS1("555555");
-        BIO.writeObject(s, BFile.openOutputStream(temp), true);
-        S s2 = BIO.readObject(BFile.openInputStream(temp), true);
-        Assert.assertEquals(s2.getS1(), s.getS1());
-        List<Byte> list = BArray.asList("1234".getBytes(BDefault.charset()));
-        BIO.writeObject(list, BFile.openOutputStream(temp), true);
-        List<Byte> list2 = BIO.readObject(BFile.openInputStream(temp), true);
-        Assert.assertEquals(list2, list);
-        temp.delete();
-
-        File temp2 = File.createTempFile("ttt", ".txt");
-        A a = new A();
-        B b = new B();
-        a.setS("123");
-        a.setB(b);
-        b.setS("456");
-        b.setA(a);
-        Map<Object, Object> map = new HashMap<>();
-        map.put("a", a);
-        map.put("b", b);
-        BIO.writeObject(map, temp2, true);
-        Map<Object, Object> mapRead = BIO.readObject(temp2, true);
-        A ar = (A) mapRead.get("a");
-        B br = (B) mapRead.get("b");
-        Assert.assertEquals(ar.getS(), a.getS());
-        Assert.assertEquals(br.getS(), b.getS());
-        Assert.assertEquals(ar.getB(), br);
-        Assert.assertEquals(br.getA(), ar);
-        temp2.delete();
+    public void testBytesInputStreamWrapper() throws Exception {
+        byte[] array = new byte[]{1, 2, 3, 4};
+        InputStream inputStream = BIO.asInputStream(array, 1);
+        inputStream.mark(0);
+        int b1 = inputStream.read();
+        byte[] dest = new byte[3];
+        int len1 = inputStream.read(dest, 1, 2);
+        Assert.assertEquals(b1, 2);
+        Assert.assertEquals(dest, new byte[]{0, 3, 4});
+        Assert.assertEquals(len1, 2);
+        inputStream.reset();
+        Assert.assertEquals(b1, inputStream.read());
+        int len2 = inputStream.read(dest, 0, 3);
+        Assert.assertEquals(dest, new byte[]{3, 4, 4});
+        Assert.assertEquals(len2, 2);
     }
 
-    public static class S implements Serializable {
+    @Test
+    public void testBytesOutputStreamWrapper() throws Exception {
+        byte[] array = new byte[4];
+        OutputStream outputStream = BIO.asOutputStream(array, 1);
+        outputStream.write(1);
+        outputStream.write(array, 1, 1);
+        outputStream.write(2);
+        Assert.assertEquals(array, new byte[]{0, 1, 1, 2});
+        Assert.assertThrows(IndexOutOfBoundsException.class, () -> outputStream.write(2));
+    }
 
-        private static final long serialVersionUID = BDefault.serialVersion();
+    @Test
+    public void testByteBufferInputStreamWrapper() throws Exception {
+        byte[] array = new byte[]{1, 2, 3};
+        ByteBuffer byteBuffer = ByteBuffer.wrap(array);
+        InputStream inputStream = BBuffer.asInputStream(byteBuffer);
+        inputStream.mark(0);
+        int b1 = inputStream.read();
+        byte[] dest = new byte[3];
+        int len1 = inputStream.read(dest, 1, 2);
+        Assert.assertEquals(b1, 1);
+        Assert.assertEquals(dest, new byte[]{0, 2, 3});
+        Assert.assertEquals(len1, 2);
+        inputStream.reset();
+        Assert.assertEquals(b1, inputStream.read());
+        int len2 = inputStream.read(dest, 0, 3);
+        Assert.assertEquals(dest, new byte[]{2, 3, 3});
+        Assert.assertEquals(len2, 2);
+    }
 
-        private String s1 = "s1";
+    @Test
+    public void testByteBufferOutputStream() throws Exception {
+        byte[] array = new byte[3];
+        ByteBuffer byteBuffer = ByteBuffer.wrap(array);
+        OutputStream outputStream = BBuffer.asOutputStream(byteBuffer);
+        outputStream.write(1);
+        outputStream.write(array, 0, 1);
+        outputStream.write(2);
+        Assert.assertEquals(array, new byte[]{1, 1, 2});
+        Assert.assertThrows(BufferOverflowException.class, () -> outputStream.write(2));
+    }
 
-        public String getS1() {
-            return s1;
+    @Test
+    public void testCharsReader() throws Exception {
+        String str = "123";
+        Reader reader = BIO.asReader(str);
+        Assert.assertEquals(reader.read(), '1');
+        reader.mark(0);
+        Assert.assertEquals(reader.read(), '2');
+        Assert.assertEquals(reader.read(), '3');
+        reader.reset();
+        Assert.assertEquals(reader.read(), '2');
+        Assert.assertEquals(reader.read(), '3');
+    }
+
+    @Test
+    public void testAppenderWriter() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        Writer writer = BIO.asWriter(sb);
+        writer.write("hello");
+        Assert.assertEquals(sb.toString(), "hello");
+    }
+
+    @Test
+    public void testBytesAppender() {
+        BytesAppender bytesAppender = new BytesAppender();
+        bytesAppender.append('a');
+        bytesAppender.append(ByteBuffer.wrap(new byte[]{'b', 'c'}));
+        bytesAppender.append(new byte[]{'d', 'e'}, 1);
+        Assert.assertEquals(BString.toString8Bit(bytesAppender.toBytes()), "abce");
+    }
+
+    @Test
+    public void testUnclose() throws Exception {
+        TestUncloseInStream ti = new TestUncloseInStream();
+        InputStream ui = BIO.unclose(ti);
+        ui.close();
+        Assert.assertFalse(ti.isClose());
+
+        TestUncloseOutStream to = new TestUncloseOutStream();
+        OutputStream uo = BIO.unclose(to);
+        uo.close();
+        Assert.assertFalse(to.isClose());
+
+        ByteArrayInputStream bip = new ByteArrayInputStream(new byte[100]);
+        UncloseInputStream<ByteArrayInputStream> ubip = BIO.unclose(bip);
+        ubip.read(new byte[50]);
+        Assert.assertEquals(ubip.getCount(), 50);
+        ubip.mark(50);
+        ubip.read(new byte[50]);
+        Assert.assertEquals(ubip.getCount(), 100);
+        ubip.reset();
+        Assert.assertEquals(ubip.getCount(), 50);
+
+        ByteArrayOutputStream bop = new ByteArrayOutputStream();
+        UncloseOutputStream<ByteArrayOutputStream> ubop = BIO.unclose(bop);
+        ubop.write(1);
+        ubop.write(new byte[50]);
+        ubop.write(new byte[50], 10, 20);
+        Assert.assertEquals(ubop.getCount(), 71);
+    }
+
+    private static class TestUncloseInStream extends InputStream {
+
+        private boolean isClose = false;
+
+        @Override
+        public int read() throws IOException {
+            return 0;
         }
 
-        public void setS1(String s1) {
-            this.s1 = s1;
+        @Override
+        public void close() throws IOException {
+            isClose = true;
+        }
+
+        public boolean isClose() {
+            return isClose;
         }
     }
 
-    public static class A implements Serializable {
-        private String s = "A";
-        private B b;
+    private static class TestUncloseOutStream extends OutputStream {
 
-        public String getS() {
-            return s;
+        private boolean isClose = false;
+
+        @Override
+        public void write(int b) throws IOException {
         }
 
-        public void setS(String s) {
-            this.s = s;
+        @Override
+        public void close() throws IOException {
+            isClose = true;
         }
 
-        public B getB() {
-            return b;
-        }
-
-        public void setB(B b) {
-            this.b = b;
-        }
-    }
-
-    public static class B implements Serializable {
-        private String s = "B";
-        private A a;
-
-        public String getS() {
-            return s;
-        }
-
-        public void setS(String s) {
-            this.s = s;
-        }
-
-        public A getA() {
-            return a;
-        }
-
-        public void setA(A a) {
-            this.a = a;
+        public boolean isClose() {
+            return isClose;
         }
     }
 }
