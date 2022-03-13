@@ -20,7 +20,7 @@ open class StatusException @JvmOverloads
 constructor(
     override val code: String,
     override val description: String? = null,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : RuntimeException(statusToString(code, description), cause), Status<String, String, StringStatus> {
 
     /**

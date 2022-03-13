@@ -9,7 +9,7 @@ import java.io.Serializable
  */
 open class IntStringStatus @JvmOverloads constructor(
     override val code: Int,
-    override val description: String? = null
+    override val description: String? = null,
 ) : Status<Int, String, IntStringStatus>, FinalObject(), Serializable {
 
     override fun withMoreDescription(addition: String): IntStringStatus {
