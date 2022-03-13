@@ -4,6 +4,6 @@ import xyz.srclab.common.run.Runner.Companion.toRunner
 import java.util.concurrent.Executors
 
 /**
- * A type of [Runner] with [Executors.newCachedThreadPool].
+ * [Runner] with [Executors.newCachedThreadPool].
  */
 object AsyncRunner : Runner by Executors.newCachedThreadPool().toRunner()

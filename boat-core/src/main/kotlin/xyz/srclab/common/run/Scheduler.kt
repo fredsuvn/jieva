@@ -10,8 +10,7 @@ import java.util.concurrent.ScheduledExecutorService
  *
  * @see ScheduleWork
  * @see SingleThreadScheduler
- * @see ScheduledExecutorServiceScheduler
- * @see ScheduledThreadPoolScheduler
+ * @see ExecutorServiceScheduler
  * @see Runner
  */
 interface Scheduler : Runner {

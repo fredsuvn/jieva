@@ -12,7 +12,6 @@ import java.util.concurrent.RejectedExecutionException
  * @see SyncRunner
  * @see AsyncRunner
  * @see ExecutorServiceRunner
- * @see ThreadPoolRunner
  * @see Scheduler
  */
 interface Runner : Executor {
