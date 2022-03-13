@@ -7,14 +7,17 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Represents a thread latch,
- * a synchronization aid that allows one or more threads to wait until
- * this latch's lock value gas counted down to zero or less.
+ * a synchronization helper that allows one or more threads block to wait,
+ * until the lock value of this latch equals to less than zero.
  *
  * @see CountDownLatch
  */
 @ThreadSafe
 interface RunLatch {
 
+    /**
+     * The lock value.
+     */
     val lockValue: Long
 
     /**
@@ -47,18 +50,18 @@ interface RunLatch {
     fun lockTo(value: Long)
 
     /**
-     * Causes the current thread to wait until the latch lock value has counted down to zero or less.
+     * Blocks the current thread until the lock value of this latch equals to less than zero.
      */
     fun await()
 
     /**
-     * Causes the current thread to wait until the latch lock value has counted down to zero or less,
+     * Blocks the current thread until the lock value of this latch equals to less than zero.,
      * for [timeoutMillis] millis.
      */
     fun await(timeoutMillis: Long)
 
     /**
-     * Causes the current thread to wait until the latch lock value has counted down to zero or less,
+     * Blocks the current thread until the lock value of this latch equals to less than zero.,
      * for [timeout] duration.
      */
     fun await(timeout: Duration)

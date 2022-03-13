@@ -1,10 +1,9 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.asCallable
-import xyz.srclab.common.base.asRunnable
 import java.time.Duration
 import java.util.concurrent.Callable
 import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.ScheduledExecutorService
 
 /**
  * Scheduler is used to run or schedule tasks, with thread, coroutine, or others.
@@ -16,15 +15,6 @@ import java.util.concurrent.RejectedExecutionException
  * @see Runner
  */
 interface Scheduler : Runner {
-
-    /**
-     * Schedules and returns [ScheduleWork].
-     */
-    @Throws(RejectedExecutionException::class)
-    @JvmSynthetic
-    fun <V> schedule(delay: Duration, task: () -> V): ScheduleWork<V> {
-        return schedule(delay, task.asCallable())
-    }
 
     /**
      * Schedules and returns [ScheduleWork].
@@ -44,16 +34,7 @@ interface Scheduler : Runner {
     @Throws(RejectedExecutionException::class)
     fun <V> schedule(delay: Duration, task: RunTask<V>): ScheduleWork<V> {
         task.prepare()
-        return schedule(delay, task.toCallable())
-    }
-
-    /**
-     * Schedules and returns [ScheduleWork].
-     */
-    @Throws(RejectedExecutionException::class)
-    @JvmSynthetic
-    fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: () -> Any?): ScheduleWork<*> {
-        return scheduleFixedRate(initialDelay, period, task.asRunnable())
+        return schedule(delay, Callable { task.run() })
     }
 
     /**
@@ -68,16 +49,7 @@ interface Scheduler : Runner {
     @Throws(RejectedExecutionException::class)
     fun scheduleFixedRate(initialDelay: Duration, period: Duration, task: RunTask<*>): ScheduleWork<*> {
         task.prepare()
-        return scheduleFixedRate(initialDelay, period, task.toRunnable())
-    }
-
-    /**
-     * Schedules and returns [ScheduleWork].
-     */
-    @Throws(RejectedExecutionException::class)
-    @JvmSynthetic
-    fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: () -> Any?): ScheduleWork<*> {
-        return scheduleFixedDelay(initialDelay, period, task.asRunnable())
+        return scheduleFixedRate(initialDelay, period, Runnable { task.run() })
     }
 
     /**
@@ -92,6 +64,18 @@ interface Scheduler : Runner {
     @Throws(RejectedExecutionException::class)
     fun scheduleFixedDelay(initialDelay: Duration, period: Duration, task: RunTask<*>): ScheduleWork<*> {
         task.prepare()
-        return scheduleFixedDelay(initialDelay, period, task.toRunnable())
+        return scheduleFixedDelay(initialDelay, period, Runnable { task.run() })
+    }
+
+    companion object {
+
+        /**
+         * Returns an [Scheduler] of [this] [ScheduledExecutorService].
+         */
+        @JvmName("of")
+        @JvmStatic
+        fun <T : ScheduledExecutorService> T.toScheduler(): Scheduler {
+            return ExecutorServiceScheduler(this)
+        }
     }
 }

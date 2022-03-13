@@ -1,86 +1,68 @@
 package xyz.srclab.common.run
 
 import java.time.Duration
-import java.util.concurrent.*
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 
 /**
- * Represents run-work submitted by [Runner].
+ * Represents a type of [Work] submitted by [Runner].
  *
  * @see Runner
  */
-interface RunWork<V> {
+interface RunWork<V> : Work<V> {
 
     /**
      * [Future] associated with this work.
      */
     val future: Future<V>
 
-    /**
-     * Returns whether this work is done.
-     *
-     * @see Future.isDone
-     */
-    val isDone: Boolean
-        get() {
-            return future.isDone
+    override fun isDone(): Boolean {
+        return future.isDone
+    }
+
+    override fun isCancelled(): Boolean {
+        return future.isCancelled
+    }
+
+    override fun getResult(): V {
+        try {
+            return future.get()
+        } catch (e: Exception) {
+            throw WorkException(e)
         }
+    }
 
-    /**
-     * Returns whether this work is cancelled.
-     *
-     * @see Future.isCancelled
-     */
-    val isCancelled: Boolean
-        get() {
-            return future.isCancelled
+    override fun getResult(millis: Long): V {
+        try {
+            return future.get(millis, TimeUnit.MILLISECONDS)
+        } catch (e: Exception) {
+            throw WorkException(e)
         }
-
-    /**
-     * Waits if necessary for the computation to complete, and then retrieves its result.
-     *
-     * @throws CancellationException if the computation was cancelled
-     * @throws ExecutionException if the computation threw an
-     * exception
-     * @throws InterruptedException if the current thread was interrupted
-     */
-    fun getResult(): V {
-        return future.get()
     }
 
-    /**
-     * Waits if necessary for at most the given time for the computation to complete,
-     * and then retrieves its result, if available.
-     *
-     * @throws CancellationException if the computation was cancelled
-     * @throws ExecutionException if the computation threw an
-     * exception
-     * @throws InterruptedException if the current thread was interrupted
-     * while waiting
-     * @throws TimeoutException if the wait timed out
-     */
-    fun getResult(duration: Duration): V {
-        return future.get(duration.nano.toLong(), TimeUnit.NANOSECONDS)
+    override fun getResult(duration: Duration): V {
+        try {
+            return future.get(duration.toNanos(), TimeUnit.NANOSECONDS)
+        } catch (e: Exception) {
+            throw WorkException(e)
+        }
     }
 
-    /**
-     * Cancels or interrupts the task associated by this [RunWork]. This method is equivalent to:
-     *
-     * ```
-     * cancel(true)
-     * ```
-     *
-     * @see Future.cancel
-     */
-    fun cancel(): Boolean {
-        return cancel(true)
-    }
-
-    /**
-     * Cancel the task associated by this [RunWork].
-     *
-     * @see Future.cancel
-     */
-    fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+    override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
         return future.cancel(mayInterruptIfRunning)
+    }
+
+    companion object {
+
+        /**
+         * Returns [RunWork] from [this].
+         */
+        @JvmName("of")
+        @JvmStatic
+        fun <V> Future<V>.toRunWork(): RunWork<V> {
+            return object : RunWork<V> {
+                override val future: Future<V> = this@toRunWork
+            }
+        }
     }
 }

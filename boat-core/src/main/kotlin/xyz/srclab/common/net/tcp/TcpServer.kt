@@ -30,7 +30,7 @@ interface TcpServer : NetServer {
         fun nioServer(
             bindAddress: SocketAddress,
             tcpListener: TcpListener,
-            executor: Executor = AsyncRunner.asExecutor(),
+            executor: Executor = AsyncRunner,
             bufferSize: Int = defaultBufferSize(),
             bufferPool: ByteBufferPool = ByteBufferPool.simpleByteBufferPool()
         ): TcpServer {

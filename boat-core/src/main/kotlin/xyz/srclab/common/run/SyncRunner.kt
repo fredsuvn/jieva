@@ -28,8 +28,6 @@ object SyncRunner : Runner, Executor {
         run(command)
     }
 
-    override fun asExecutor(): Executor = this
-
     private class RunWorkImpl<V> : RunWork<V> {
 
         override val future: SyncFuture<V>

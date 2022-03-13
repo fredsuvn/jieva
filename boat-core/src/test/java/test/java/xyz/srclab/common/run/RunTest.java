@@ -10,8 +10,7 @@ import xyz.srclab.common.run.*;
 import xyz.srclab.common.utils.Counter;
 
 import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -42,7 +41,9 @@ public class RunTest {
 
     @Test
     public void testThreadPoolRunner() {
-        Runner runner = ThreadPoolRunner.newBuilder().build();
+        Runner runner = Runner.of(
+            new ThreadPoolExecutor(5, 5, 0, TimeUnit.MILLISECONDS, new SynchronousQueue<>())
+        );
         doTestAsync(runner);
     }
 
@@ -78,7 +79,9 @@ public class RunTest {
 
     @Test
     public void testScheduledThreadPoolRunSync() {
-        Scheduler scheduler = ScheduledThreadPoolScheduler.newBuilder().build();
+        Scheduler scheduler = Scheduler.of(
+            Executors.newScheduledThreadPool(5)
+        );
         doTestScheduledRunSync(scheduler);
     }
 
@@ -115,22 +118,6 @@ public class RunTest {
         Assert.assertFalse(scheduling.isDone());
         scheduling.cancel(false);
         Assert.assertTrue(scheduling.isDone());
-    }
-
-    @Test
-    public void testRunContext() throws Exception {
-        RunContext runContext = RunContext.current();
-        runContext.set("1", "666");
-        Assert.assertEquals("666", runContext.get("1"));
-        Map<Object, Object> attach = runContext.asMap();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        AsyncRunner.INSTANCE.run(() -> {
-            RunContext detach = RunContext.current();
-            detach.asMap().putAll(attach);
-            Assert.assertEquals("666", detach.get("1"));
-            countDownLatch.countDown();
-        });
-        countDownLatch.await();
     }
 
     @Test

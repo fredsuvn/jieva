@@ -25,7 +25,7 @@ interface UdpServer : NetServer {
         fun nioServer(
             bindAddress: SocketAddress,
             channelHandler: UdpChannelHandler,
-            executor: Executor = AsyncRunner.asExecutor(),
+            executor: Executor = AsyncRunner,
             bufferSize: Int = defaultBufferSize(),
             directBuffer: Boolean = false
         ): UdpServer {

@@ -1,13 +1,12 @@
 package xyz.srclab.common.run
 
-import xyz.srclab.common.base.asCallable
-import xyz.srclab.common.base.asRunnable
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException
 
 /**
- * Runner is used to run tasks, with thread, coroutine, or others.
+ * Runner is used to run tasks, generally used with thread pool.
  *
  * @see RunWork
  * @see SyncRunner
@@ -16,16 +15,7 @@ import java.util.concurrent.RejectedExecutionException
  * @see ThreadPoolRunner
  * @see Scheduler
  */
-interface Runner {
-
-    /**
-     * Runs and returns [RunWork].
-     */
-    @Throws(RejectedExecutionException::class)
-    @JvmSynthetic
-    fun <V> submit(task: () -> V): RunWork<V> {
-        return submit(task.asCallable())
-    }
+interface Runner : Executor {
 
     /**
      * Runs and returns [RunWork].
@@ -45,18 +35,7 @@ interface Runner {
     @Throws(RejectedExecutionException::class)
     fun <V> submit(task: RunTask<V>): RunWork<V> {
         task.prepare()
-        return submit(task.toCallable())
-    }
-
-    /**
-     * Runs and no return.
-     *
-     * @see Executor.execute
-     */
-    @Throws(RejectedExecutionException::class)
-    @JvmSynthetic
-    fun run(task: () -> Any?) {
-        return run(task.asRunnable())
+        return submit(Callable { task.run() })
     }
 
     /**
@@ -75,8 +54,22 @@ interface Runner {
     @Throws(RejectedExecutionException::class)
     fun run(task: RunTask<*>) {
         task.prepare()
-        return run(task.toRunnable())
+        return run(Runnable { task.run() })
     }
 
-    fun asExecutor(): Executor
+    override fun execute(command: Runnable) {
+        run(command)
+    }
+
+    companion object {
+
+        /**
+         * Returns an [Runner] of [this] [ExecutorService].
+         */
+        @JvmName("of")
+        @JvmStatic
+        fun <T : ExecutorService> T.toRunner(): Runner {
+            return ExecutorServiceRunner(this)
+        }
+    }
 }
