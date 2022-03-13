@@ -2,7 +2,7 @@ package sample.kotlin.xyz.srclab.core.proxy
 
 import org.testng.annotations.Test
 import xyz.srclab.common.proxy.ClassProxy
-import xyz.srclab.common.proxy.ProxyMethod
+import xyz.srclab.common.proxy.ProxyInvoker
 import java.lang.reflect.Method
 import java.util.*
 
@@ -13,7 +13,7 @@ class ProxySample {
         val proxyClass = ClassProxy.newProxyClass(
             Any::class.java,
             listOf(
-                object : ProxyMethod<Any> {
+                object : ProxyInvoker<Any> {
 
                     override fun isProxy(method: Method): Boolean {
                         return method.name == "toString" && Arrays.equals(

@@ -3,7 +3,7 @@ package sample.java.xyz.srclab.core.proxy;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 import xyz.srclab.common.proxy.ClassProxy;
-import xyz.srclab.common.proxy.ProxyMethod;
+import xyz.srclab.common.proxy.ProxyInvoker;
 import xyz.srclab.common.proxy.SourceInvoker;
 import xyz.srclab.common.test.TestLogger;
 
@@ -19,10 +19,10 @@ public class ProxySample {
         ClassProxy<Object> proxyClass = ClassProxy.newProxyClass(
             Object.class,
             Arrays.asList(
-                new ProxyMethod<Object>() {
+                new ProxyInvoker<Object>() {
 
                     @Override
-                    public boolean isProxy(@NotNull Method method) {
+                    public boolean isTarget(@NotNull Method method) {
                         return method.getName().equals("toString")
                             && Arrays.equals(method.getParameterTypes(), new Class[0]);
                     }

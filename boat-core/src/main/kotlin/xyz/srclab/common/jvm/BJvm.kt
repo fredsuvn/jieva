@@ -5,6 +5,9 @@ package xyz.srclab.common.jvm
 import xyz.srclab.common.base.dotMatcher
 import java.lang.reflect.Method
 
+/**
+ * Returns JVM signature of this class.
+ */
 val Class<*>.typeSignature: String
     get() {
         return when (this) {
@@ -25,6 +28,9 @@ val Class<*>.typeSignature: String
         }
     }
 
+/**
+ * Returns JVM signature of this method.
+ */
 val Method.typeSignature: String
     get() {
         val parameterTypesDescriptors = this.parameterTypes.parametersTypeSignature
@@ -32,6 +38,9 @@ val Method.typeSignature: String
         return "($parameterTypesDescriptors)$returnDescriptor"
     }
 
+/**
+ * Returns JVM signature of these parameters.
+ */
 val Array<out Class<*>>.parametersTypeSignature: String
     get() {
         return this.joinToString("") { it.typeSignature }
