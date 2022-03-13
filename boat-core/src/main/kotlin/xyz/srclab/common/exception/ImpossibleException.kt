@@ -3,7 +3,7 @@ package xyz.srclab.common.exception
 import xyz.srclab.common.base.defaultSerialVersion
 
 /**
- * Exception represents an impossible cause.
+ * It's IMPOSSIBLE!.
  */
 open class ImpossibleException : StatusException {
 

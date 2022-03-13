@@ -1,5 +1,6 @@
 package xyz.srclab.common.status
 
+import xyz.srclab.common.base.FinalObject
 import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
 
@@ -9,7 +10,7 @@ import java.io.Serializable
 open class StringStatus @JvmOverloads constructor(
     override val code: String,
     override val description: String? = null
-) : Status<String, String, StringStatus>, Serializable {
+) : Status<String, String, StringStatus>, FinalObject(), Serializable {
 
     override fun withMoreDescription(addition: String): StringStatus {
         return StringStatus(code, "$description[$addition]")
@@ -27,13 +28,13 @@ open class StringStatus @JvmOverloads constructor(
         return true
     }
 
-    override fun hashCode(): Int {
+    override fun hashCode0(): Int {
         var result = code.hashCode()
         result = 31 * result + (description?.hashCode() ?: 0)
         return result
     }
 
-    override fun toString(): String {
+    override fun toString0(): String {
         return statusToString(code, description)
     }
 
