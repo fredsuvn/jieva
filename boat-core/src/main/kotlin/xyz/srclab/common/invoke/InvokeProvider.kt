@@ -46,7 +46,7 @@ interface InvokeProvider {
 
     companion object {
 
-        private var defaultFactory: InvokeProvider = run {
+        private var defaultProvider: InvokeProvider = run {
             val javaVersion = getJavaMajorVersion()
             if (javaVersion <= 8) {
                 return@run withReflected()
@@ -58,16 +58,16 @@ interface InvokeProvider {
          * Gets default [InvokeProvider].
          */
         @JvmStatic
-        fun defaultFactory(): InvokeProvider {
-            return defaultFactory
+        fun defaultProvider(): InvokeProvider {
+            return defaultProvider
         }
 
         /**
          * Sets default [InvokeProvider].
          */
         @JvmStatic
-        fun setDefaultFactory(defaultFactory: InvokeProvider) {
-            this.defaultFactory = defaultFactory
+        fun setDefaultProvider(provider: InvokeProvider) {
+            this.defaultProvider = provider
         }
 
         /**

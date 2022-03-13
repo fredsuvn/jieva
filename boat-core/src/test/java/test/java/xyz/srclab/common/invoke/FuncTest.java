@@ -17,7 +17,7 @@ public class FuncTest {
 
     @Test
     public void testInvoke() throws Exception {
-        testInvokerGenerator(InvokeProvider.defaultFactory());
+        testInvokerGenerator(InvokeProvider.defaultProvider());
     }
 
     @Test

@@ -39,13 +39,13 @@ fun interface InstInvoke {
     companion object {
 
         /**
-         * Creates [InstInvoke] from [this] method, using [InvokeProvider.defaultFactory].
+         * Creates [InstInvoke] from [this] method, using [InvokeProvider.defaultProvider].
          * @param force whether invoke forcibly if the method is not accessible.
          */
         @JvmName("of")
         @JvmOverloads
         fun Method.toInstInvoke(force: Boolean = false): InstInvoke {
-            return InvokeProvider.defaultFactory().getInstInvoke(this, force)
+            return InvokeProvider.defaultProvider().getInstInvoke(this, force)
         }
 
         private class InstInvokeAsStaticInvoke(

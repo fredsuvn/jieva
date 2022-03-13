@@ -8,7 +8,7 @@ import java.lang.reflect.Method
  * Represents invocation operation which doesn't depend on an instance,
  * similar to [Method.invoke] of which `obj` parameter is null.
  */
-interface StaticInvoke {
+fun interface StaticInvoke {
 
     /**
      * Do this invocation operation.
@@ -29,23 +29,23 @@ interface StaticInvoke {
     companion object {
 
         /**
-         * Creates [StaticInvoke] from [this] method, using [InvokeProvider.defaultFactory].
+         * Creates [StaticInvoke] from [this] method, using [InvokeProvider.defaultProvider].
          * @param force whether invoke forcibly if the method is not accessible.
          */
         @JvmName("of")
         @JvmOverloads
         fun Method.toStaticInvoke(force: Boolean = false): StaticInvoke {
-            return InvokeProvider.defaultFactory().getStaticInvoke(this, force)
+            return InvokeProvider.defaultProvider().getStaticInvoke(this, force)
         }
 
         /**
-         * Creates [StaticInvoke] from [this] constructor, using [InvokeProvider.defaultFactory].
+         * Creates [StaticInvoke] from [this] constructor, using [InvokeProvider.defaultProvider].
          * @param force whether invoke forcibly if the constructor is not accessible.
          */
         @JvmName("of")
         @JvmOverloads
         fun Constructor<*>.toStaticInvoke(force: Boolean = false): StaticInvoke {
-            return InvokeProvider.defaultFactory().getStaticInvoke(this, force)
+            return InvokeProvider.defaultProvider().getStaticInvoke(this, force)
         }
     }
 }

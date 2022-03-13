@@ -1,16 +1,19 @@
 package xyz.srclab.common.proxy
 
-import net.sf.cglib.proxy.*
+import org.springframework.cglib.proxy.*
 import xyz.srclab.common.base.asTyped
 import xyz.srclab.common.invoke.StaticInvoke
 import java.lang.reflect.Method
 import java.util.*
 
-object CglibProxyFactory : ClassProxyFactory {
+/**
+ * Spring-cglib implementation for [ClassProxyProvider].
+ */
+object SpringProxyProvider : ClassProxyProvider {
 
-    override fun <T : Any> generate(
+    override fun <T : Any> getProxy(
         sourceClass: Class<T>,
-        proxyMethods: Iterable<ProxyMethod>,
+        proxyInvoker: ProxyInvoker,
         classLoader: ClassLoader
     ): ClassProxy<T> {
         val enhancer = Enhancer()
@@ -20,48 +23,39 @@ object CglibProxyFactory : ClassProxyFactory {
         } else {
             enhancer.setSuperclass(sourceClass)
         }
-
         val callbacks = LinkedList<Callback>()
+        val proxyInterceptor = ProxyMethodInterceptor(proxyInvoker)
         //index 0
         callbacks.add(NoOp.INSTANCE)
-        //index 1..
-        for (proxyMethod in proxyMethods) {
-            callbacks.add(ProxyMethodInterceptor(proxyMethod))
-        }
+        //index 1
+        callbacks.add(proxyInterceptor)
         val callbackFilter = CallbackFilter { method ->
-            for ((i, callback) in callbacks.withIndex()) {
-                if (callback is ProxyMethodInterceptor) {
-                    if (callback.proxyMethod.isProxy(method)) {
-                        return@CallbackFilter i
-                    }
-                }
+            if (proxyInvoker.isTarget(method)) {
+                return@CallbackFilter 1
             }
             0
         }
-
         enhancer.setCallbacks(callbacks.toTypedArray())
         enhancer.setCallbackFilter(callbackFilter)
         return ProxyClassImpl(enhancer)
     }
 
-    private class ProxyMethodInterceptor(val proxyMethod: ProxyMethod) : MethodInterceptor {
+    private class ProxyMethodInterceptor(val proxyInvoker: ProxyInvoker) : MethodInterceptor {
         override fun intercept(obj: Any, method: Method, args: Array<out Any?>?, proxy: MethodProxy): Any? {
-            val sourceInvoker = object : StaticInvoke {
-                override fun invoke(vararg args: Any?): Any? {
-                    return proxy.invokeSuper(obj, args)
-                }
+            val sourceInvoker = StaticInvoke {
+                proxy.invokeSuper(obj, args)
             }
-            return proxyMethod.invoke(obj, method, sourceInvoker, args)
+            return proxyInvoker.invokeProxy(obj, method, sourceInvoker, args)
         }
     }
 
     private class ProxyClassImpl<T : Any>(private val enhancer: Enhancer) : ClassProxy<T> {
 
-        override fun create(): T {
+        override fun newInst(): T {
             return enhancer.create().asTyped()
         }
 
-        override fun create(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
+        override fun newInst(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
             return enhancer.create(parameterTypes, args).asTyped()
         }
     }

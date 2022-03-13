@@ -5,7 +5,7 @@ package xyz.srclab.common.base
 import java.io.Serializable
 
 /**
- * Returns enum instant of given [name].
+ * Returns enum instance of given [name].
  */
 @JvmName("getValue")
 @Throws(NoSuchEnumException::class)
@@ -27,7 +27,7 @@ fun <T : Enum<T>> Class<*>.enumValue(name: CharSequence, ignoreCase: Boolean = f
 }
 
 /**
- * Returns enum instant of given [name], or null if it doesn't exit.
+ * Returns enum instance of given [name], or null if it doesn't exit.
  */
 @JvmName("getValueOrNull")
 @JvmOverloads
@@ -52,7 +52,7 @@ fun <T> Class<*>.enumValueOrNull(name: CharSequence, ignoreCase: Boolean = false
 }
 
 /**
- * Returns enum instant of given [index].
+ * Returns enum instance of given [index].
  */
 @JvmName("getValue")
 @Throws(NoSuchEnumException::class)
@@ -61,7 +61,7 @@ fun <T> Class<*>.enumValue(index: Int): T {
 }
 
 /**
- * Returns enum instant of given [index], or null if it doesn't exit or index out of bounds.
+ * Returns enum instance of given [index], or null if it doesn't exit or index out of bounds.
  */
 @JvmName("getValueOrNull")
 fun <T> Class<*>.enumValueOrNull(index: Int): T? {
