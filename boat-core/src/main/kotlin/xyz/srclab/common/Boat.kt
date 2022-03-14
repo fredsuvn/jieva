@@ -1,39 +1,12 @@
 package xyz.srclab.common
 
 import xyz.srclab.common.base.loadClasspathProperties
-import xyz.srclab.common.utils.About
-import xyz.srclab.common.utils.Author
-import xyz.srclab.common.utils.SemVer
-import xyz.srclab.common.utils.SemVer.Companion.parseSemVer
 
 object Boat {
 
     private val buildInfos: Map<String, String> = loadClasspathProperties("META-INF/build.properties")!!
     private val serialVersion: Long = buildInfos["build.serial.version"]!!.toLong()
-    private val version: SemVer = buildInfos["build.version"]!!.parseSemVer()
-
-    private val sunqian = Author(
-        "Sun Qian",
-        "fredsuvn@163.com",
-        "https://github.com/fredsuvn"
-    )
-
-    private val srclab = Author(
-        "SrcLab",
-        "srclab@163.com",
-        "https://github.com/srclab-projects"
-    )
-
-    private val about: About = About(
-        "Boat",
-        version.toString(),
-        listOf(sunqian, srclab),
-        srclab.mail,
-        "https://github.com/srclab-projects/boat",
-        listOf("Apache 2.0 license"),
-        emptyList(),
-        "© 2021 SrcLab"
-    )
+    private val version: String = buildInfos["build.version"]!!
 
     /**
      * Returns name of this lib.
@@ -45,13 +18,7 @@ object Boat {
      * Returns current version of boat.
      */
     @JvmStatic
-    fun version(): SemVer = version
-
-    /**
-     * Returns about info of boat.
-     */
-    @JvmStatic
-    fun about(): About = about
+    fun version(): String = version
 
     /**
      * Returns serial version for current boat version.
@@ -59,13 +26,65 @@ object Boat {
     @JvmStatic
     fun serialVersion(): Long = serialVersion
 
-    private val secretCodes: List<String> = listOf(
-        "Thank you, Taro.",
-        "谢谢你，泰罗。",
-    )
+    /**
+     * Returns url of boat.
+     */
+    @JvmStatic
+    fun url(): String = "https://github.com/srclab-projects/boat"
+
+    /**
+     * Returns author of boat.
+     */
+    @JvmStatic
+    fun author(): String = "孙谦"
+
+    /**
+     * Returns author mail of boat.
+     */
+    @JvmStatic
+    fun authorMail(): String = "fredsuvn@163.com"
+
+    /**
+     * Returns author home of boat.
+     */
+    @JvmStatic
+    fun authorHome(): String = "https://github.com/fredsuvn"
+
+    /**
+     * Returns team of boat.
+     */
+    @JvmStatic
+    fun team(): String = "SrcLab"
+
+    /**
+     * Returns team mail of boat.
+     */
+    @JvmStatic
+    fun teamMail(): String = "srclab@163.com"
+
+    /**
+     * Returns team home of boat.
+     */
+    @JvmStatic
+    fun teamHome(): String = "https://github.com/srclab-projects"
+
+    /**
+     * Returns join us of boat.
+     */
+    @JvmStatic
+    fun joinUs(): String = "https://github.com/srclab-projects"
+
+    @JvmStatic
+    fun license(): String = "https://www.apache.org/licenses/LICENSE-2.0"
+
+    @JvmStatic
+    fun copyright(): String = "© 2019-9999 SrcLab"
 
     /**
      * WOW!
      */
-    fun secretCodes(): List<String> = secretCodes
+    fun secretCodes(): List<String> = listOf(
+        "Thank you, Taro.",
+        "谢谢你，泰罗。",
+    )
 }

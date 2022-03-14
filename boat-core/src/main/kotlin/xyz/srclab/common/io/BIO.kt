@@ -17,7 +17,7 @@ import kotlin.io.readBytes as readBytesKt
  * @param close whether close this stream after reading
  */
 @JvmOverloads
-fun InputStream.readBytes(close: Boolean = false): ByteArray {
+fun InputStream.readBytes(close: Boolean = true): ByteArray {
     return this.let {
         val bytes = readBytesKt()
         if (close) {
@@ -32,7 +32,7 @@ fun InputStream.readBytes(close: Boolean = false): ByteArray {
  * @param close whether close this stream after reading
  */
 @JvmOverloads
-fun InputStream.readString(charset: Charset = defaultCharset(), close: Boolean = false): String {
+fun InputStream.readString(charset: Charset = defaultCharset(), close: Boolean = true): String {
     return String(readBytes(close), charset)
 }
 
@@ -49,7 +49,7 @@ fun InputStream.readString(close: Boolean): String {
  * @param close whether close this stream after reading
  */
 @JvmOverloads
-fun InputStream.readLines(charset: Charset = defaultCharset(), close: Boolean = false): List<String> {
+fun InputStream.readLines(charset: Charset = defaultCharset(), close: Boolean = true): List<String> {
     return readString(charset, close).lines()
 }
 
@@ -98,7 +98,7 @@ fun InputStream.availableLines(charset: Charset = defaultCharset()): List<String
  * Reads all chars and returns.
  */
 @JvmOverloads
-fun Reader.readString(close: Boolean = false): String {
+fun Reader.readString(close: Boolean = true): String {
     return this.readText().let {
         if (close) {
             this.close()
@@ -111,7 +111,7 @@ fun Reader.readString(close: Boolean = false): String {
  * Reads all chars and returns in lines.
  */
 @JvmOverloads
-fun Reader.readLines(close: Boolean = false): List<String> {
+fun Reader.readLines(close: Boolean = true): List<String> {
     return readString(close).lines()
 }
 

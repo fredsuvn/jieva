@@ -3,13 +3,9 @@ package test.java.xyz.srclab.common.utils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BLog;
-import xyz.srclab.common.utils.About;
-import xyz.srclab.common.utils.Author;
 import xyz.srclab.common.utils.SemVer;
 
-import java.util.Collections;
-
-public class AboutTest {
+public class SemVerTest {
 
     @Test
     public void testVersion() {
@@ -33,29 +29,5 @@ public class AboutTest {
         Assert.assertTrue(v3.compareTo(v2) > 0);
         Assert.assertEquals(v3.compareTo(v4), 0);
         Assert.assertTrue(v3.compareTo(v5) < 0);
-    }
-
-    @Test
-    public void testAbout() {
-        About about = new About(
-            "name",
-            "1.2.3",
-            Collections.singletonList(new Author("name", "author@mail.com", null)),
-            "123@123.com",
-            "url",
-            Collections.singletonList("licence"),
-            Collections.singletonList(new About(
-                "poweredBy",
-                null,
-                Collections.emptyList(),
-                null,
-                null,
-                Collections.emptyList(),
-                Collections.emptyList(),
-                null
-            )),
-            "© 2021 SrcLab"
-        );
-        BLog.info("about: {}", about);
     }
 }

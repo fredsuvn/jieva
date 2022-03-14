@@ -5,129 +5,69 @@ import xyz.srclab.common.base.*
 import java.io.Serializable
 
 /**
- * Project about info.
+ * Semantic version info, format as:
  *
- * @see Author
- * @see SemVer
- */
-open class About @JvmOverloads constructor(
-    val name: String,
-    val version: String? = null,
-    val authors: List<Author> = emptyList(),
-    val mail: String? = null,
-    val url: String? = null,
-    val licences: List<String> = emptyList(),
-    val poweredBy: List<About> = emptyList(),
-    val copyright: String? = null,
-) : Serializable {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is About) return false
-        if (name != other.name) return false
-        if (version != other.version) return false
-        if (authors != other.authors) return false
-        if (mail != other.mail) return false
-        if (url != other.url) return false
-        if (licences != other.licences) return false
-        if (poweredBy != other.poweredBy) return false
-        if (copyright != other.copyright) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + version.hashCode()
-        result = 31 * result + authors.hashCode()
-        result = 31 * result + mail.hashCode()
-        result = 31 * result + url.hashCode()
-        result = 31 * result + licences.hashCode()
-        result = 31 * result + poweredBy.hashCode()
-        result = 31 * result + copyright.hashCode()
-        return result
-    }
-
-    override fun toString(): String {
-        val builder = StringBuilder(name)
-        if (version !== null) {
-            builder.append(" V$version")
-        }
-        if (copyright !== null) {
-            builder.append(" $copyright")
-        }
-        return builder.toString()
-    }
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
-}
-
-/**
- * Author info.
+ * ```
+ * major.minor.patch[-preRelease][+buildMetadata]
+ * ```
  *
- * @see About
- */
-open class Author @JvmOverloads constructor(
-    val name: String,
-    val mail: String? = null,
-    val url: String? = null
-) : Serializable {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Author) return false
-        if (name != other.name) return false
-        if (mail != other.mail) return false
-        if (url != other.url) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + (mail?.hashCode() ?: 0)
-        result = 31 * result + (url?.hashCode() ?: 0)
-        return result
-    }
-
-    override fun toString(): String {
-        if (mail === null && url === null) {
-            return name
-        }
-        if (mail === null) {
-            return "$name[$url]"
-        }
-        if (url === null) {
-            return "$name[$mail]"
-        }
-        return "$name[$mail, $url]"
-    }
-
-    companion object {
-        private val serialVersionUID: Long = defaultSerialVersion()
-    }
-}
-
-/**
- * Semantic version info, See: [SemVer](https://semver.org/).
- * The difference is this interface supports more than 3 version numbers.
+ * See: [SemVer](https://semver.org/).
  *
- * @see About
+ * @param major major version
+ * @param minor minor version
+ * @param patch patch version
+ * @param preRelease pre-release version info
+ * @param buildMetadata build info
  */
 open class SemVer @JvmOverloads constructor(
+    /**
+     * Gets major version.
+     */
     val major: Int,
+    /**
+     * Gets minor version.
+     */
     val minor: Int,
+    /**
+     * Gets patch version.
+     */
     val patch: Int,
+    /**
+     * Gets pre-release version info.
+     */
     val preRelease: List<String> = emptyList(),
+    /**
+     * Gets build info.
+     */
     val buildMetadata: List<String> = emptyList()
-) : Comparable<SemVer>, Serializable {
+) : FinalObject(), Comparable<SemVer>, Serializable {
 
+    /**
+     * Returns this version as normal string:
+     *
+     * ```
+     * major.minor.patch
+     * ```
+     */
     fun normalString(): String = "$major.$minor.$patch"
 
+    /**
+     * Returns pre-release version info as string.
+     */
     fun preReleaseString(): String = preRelease.joinDotToString()
 
+    /**
+     * Returns build info as string.
+     */
     fun buildMetadataString(): String = buildMetadata.joinDotToString()
 
+    /**
+     * Returns full version info as string:
+     *
+     * ```
+     * major.minor.patch-preRelease+buildMetadata
+     * ```
+     */
     fun fullString(): String {
         if (preRelease.isEmpty() && buildMetadata.isEmpty()) {
             return normalString()
@@ -199,7 +139,7 @@ open class SemVer @JvmOverloads constructor(
         return this.compareTo(other) == 0
     }
 
-    override fun hashCode(): Int {
+    override fun hashCode0(): Int {
         var result = major
         result = 31 * result + minor
         result = 31 * result + patch
@@ -207,7 +147,7 @@ open class SemVer @JvmOverloads constructor(
         return result
     }
 
-    override fun toString(): String {
+    override fun toString0(): String {
         return fullString()
     }
 
@@ -229,6 +169,9 @@ open class SemVer @JvmOverloads constructor(
 
         private const val ILLEGAL_SEM_VER_CHARS = "Illegal SemVer: "
 
+        /**
+         * Parse [SemVer] from [this] chars.
+         */
         @JvmName("parse")
         @JvmStatic
         fun CharSequence.parseSemVer(): SemVer {

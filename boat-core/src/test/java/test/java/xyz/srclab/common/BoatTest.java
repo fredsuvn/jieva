@@ -11,7 +11,7 @@ public class BoatTest {
         BLog.info("Boat name: {}", Boat.name());
         BLog.info("Boat version: {}", Boat.version());
         BLog.info("Boat serial version: {}", Boat.serialVersion());
-        BLog.info("About Boat: {}", Boat.about());
+        BLog.info("Boat author: {}", Boat.author());
         BLog.info("Boat secret codes: {}", Boat.INSTANCE.secretCodes());
     }
 }
