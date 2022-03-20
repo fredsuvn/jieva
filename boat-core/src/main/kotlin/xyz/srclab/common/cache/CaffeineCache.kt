@@ -4,8 +4,6 @@ import java.util.function.Function
 
 /**
  * [Cache] based on [caffeine](https://github.com/ben-manes/caffeine).
- *
- * `null` value is not permitted.
  */
 open class CaffeineCache<K : Any, V : Any>(
     private val caffeine: com.github.benmanes.caffeine.cache.Cache<K, V>
@@ -13,6 +11,10 @@ open class CaffeineCache<K : Any, V : Any>(
 
     override fun getOrNull(key: K): V? {
         return caffeine.getIfPresent(key)
+    }
+
+    override fun getOrLoad(key: K, loader: Function<in K, V>): V {
+        return caffeine.get(key, loader) ?: throw NoSuchElementException(key.toString())
     }
 
     override fun getAllPresent(keys: Iterable<K>): Map<K, V> {
@@ -23,8 +25,8 @@ open class CaffeineCache<K : Any, V : Any>(
         return caffeine.getAll(keys) { loader.apply(it) }
     }
 
-    override fun getOrLoadAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
-        return caffeine.getAll(keys, loader)
+    override fun put(key: K, value: V) {
+        caffeine.put(key, value)
     }
 
     override fun cleanUp() {
@@ -38,14 +40,12 @@ open class CaffeineCache<K : Any, V : Any>(
 
 /**
  * [Cache] based on loading [caffeine](https://github.com/ben-manes/caffeine).
- *
- * `null` value is not permitted.
  */
 open class CaffeineLoadingCache<K : Any, V : Any>(
     private val caffeine: com.github.benmanes.caffeine.cache.LoadingCache<K, V>
 ) : CaffeineCache<K, V>(caffeine) {
 
-    override fun get(key: K): V {
-        return caffeine.get(key)!!
+    override fun getOrNull(key: K): V? {
+        return caffeine.get(key)
     }
 }

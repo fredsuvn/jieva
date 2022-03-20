@@ -4,12 +4,18 @@ import java.util.function.Function
 
 /**
  * [Cache] based on [google guava](https://github.com/google/guava).
- *
- * `null` value is not permitted.
  */
 open class GuavaCache<K : Any, V : Any>(
     private val guava: com.google.common.cache.Cache<K, V>
 ) : Cache<K, V> {
+
+    override fun getOrNull(key: K): V? {
+        return guava.getIfPresent(key)
+    }
+
+    override fun getOrLoad(key: K, loader: Function<in K, V>): V {
+        return guava.get(key) { loader.apply(key) } ?: throw NoSuchElementException(key.toString())
+    }
 
     override fun getAllPresent(keys: Iterable<K>): Map<K, V> {
         return guava.getAllPresent(keys)
@@ -25,14 +31,8 @@ open class GuavaCache<K : Any, V : Any>(
         return present.plus(loaded)
     }
 
-    override fun getOrLoadAll(keys: Iterable<K>, loader: (Iterable<K>) -> Map<K, V>): Map<K, V> {
-        val present = guava.getAllPresent(keys)
-        val remaining = keys.minus(present.keys)
-        if (remaining.isEmpty()) {
-            return present
-        }
-        val loaded = loader(remaining)
-        return present.plus(loaded)
+    override fun put(key: K, value: V) {
+        guava.put(key, value)
     }
 
     override fun cleanUp() {
@@ -46,8 +46,6 @@ open class GuavaCache<K : Any, V : Any>(
 
 /**
  * [Cache] based on loading [google guava](https://github.com/google/guava).
- *
- * `null` value is not permitted.
  */
 open class GuavaLoadingCache<K : Any, V : Any>(
     private val guava: com.google.common.cache.LoadingCache<K, V>
@@ -57,3 +55,40 @@ open class GuavaLoadingCache<K : Any, V : Any>(
         return guava.get(key)
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

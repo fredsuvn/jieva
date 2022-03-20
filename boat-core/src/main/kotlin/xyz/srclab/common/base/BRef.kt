@@ -57,7 +57,7 @@ interface Ref<T : Any> : GetRef<T>, SetRef<T> {
     /**
      * Sets current value to result of [func], returns this as typed.
      */
-    fun <R : Any> map(func: Function<T?, R?>): Ref<R> {
+    fun <R : Any> map(func: Function<in T?, R?>): Ref<R> {
         val thisObj = this.asTyped<Ref<R>>()
         thisObj.set(func.apply(orNull()))
         return thisObj
@@ -66,7 +66,7 @@ interface Ref<T : Any> : GetRef<T>, SetRef<T> {
     /**
      * Gets held value to [consumer], returns this.
      */
-    fun <R : Any> accept(consumer: Consumer<T?>) = apply {
+    fun <R : Any> accept(consumer: Consumer<in T?>) = apply {
         consumer.accept(orNull())
     }
 

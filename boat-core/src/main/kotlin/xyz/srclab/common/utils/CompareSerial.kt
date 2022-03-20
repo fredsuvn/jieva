@@ -30,9 +30,9 @@ import java.util.function.Function
 open class CompareSerial<C : Any, S : Any, T : Any>(
     private val initCompare: C,
     private val initSerial: S,
-    private val compare: Function<C, C>,
-    private val serial: Function<S, S?>,
-    private val doFinal: BiFunction<C, S, T>,
+    private val compare: Function<in C, C>,
+    private val serial: Function<in S, S?>,
+    private val doFinal: BiFunction<in C, in S, T>,
 ) {
 
     private var lastCompare: C = initCompare

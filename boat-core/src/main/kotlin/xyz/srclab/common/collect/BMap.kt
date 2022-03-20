@@ -159,7 +159,7 @@ fun <K> Map<K, *>.getDoubleOrNull(key: K): Double? {
     return this[key]?.toDouble()
 }
 
-fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, value: V, collection: Function<K, C>): Boolean {
+fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, value: V, collection: Function<in K, C>): Boolean {
     val coll = this.computeIfAbsent(key, collection)
     return coll.add(value)
 }
@@ -167,7 +167,7 @@ fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, value: V, coll
 fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.addAll(
     key: K,
     values: Iterable<V>,
-    collection: Function<K, C>
+    collection: Function<in K, C>
 ): Boolean {
     val coll = this.computeIfAbsent(key, collection)
     return coll.addAll(values)
@@ -307,7 +307,7 @@ fun <K, V> copyOnWriteMap(
 }
 
 fun <K, V> mutableSetMap(
-    valueSet: Function<K, MutableSet<V>>
+    valueSet: Function<in K, MutableSet<V>>
 ): MutableSetMap<K, V> {
     return mutableSetMap(LinkedHashMap(), valueSet)
 }
@@ -315,7 +315,7 @@ fun <K, V> mutableSetMap(
 @JvmOverloads
 fun <K, V> mutableSetMap(
     map: MutableMap<K, MutableSet<V>> = LinkedHashMap(),
-    valueSet: Function<K, MutableSet<V>> = Function { LinkedHashSet() }
+    valueSet: Function<in K, MutableSet<V>> = Function { LinkedHashSet() }
 ): MutableSetMap<K, V> {
     return MutableSetMap(map, valueSet)
 }
@@ -329,7 +329,7 @@ fun <K, V> Map<K, Set<V>>.toSetMap(): SetMap<K, V> {
 }
 
 fun <K, V> mutableListMap(
-    valueList: Function<K, MutableList<V>>
+    valueList: Function<in K, MutableList<V>>
 ): MutableListMap<K, V> {
     return mutableListMap(LinkedHashMap(), valueList)
 }
@@ -337,7 +337,7 @@ fun <K, V> mutableListMap(
 @JvmOverloads
 fun <K, V> mutableListMap(
     map: MutableMap<K, MutableList<V>> = LinkedHashMap(),
-    valueList: Function<K, MutableList<V>> = Function { LinkedList() }
+    valueList: Function<in K, MutableList<V>> = Function { LinkedList() }
 ): MutableListMap<K, V> {
     return MutableListMap(map, valueList.asKotlinFun())
 }
