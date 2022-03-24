@@ -18,6 +18,10 @@ inline fun <T> getOrNew(
         return current
     }
     synchronized(lock) {
+        val current = getter()
+        if (current !== null) {
+            return current
+        }
         val newOne = creator()
         setter(newOne)
         return newOne
