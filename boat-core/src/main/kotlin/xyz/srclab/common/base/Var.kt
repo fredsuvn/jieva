@@ -14,11 +14,12 @@ interface Var<T> {
     companion object {
 
         /**
-         * Returns a [Var] with [value].
+         * Returns a [Var] with [this].
          */
+        @JvmName("of")
         @JvmStatic
-        fun <T> of(value: T): Var<T> {
-            return VarImpl(value)
+        fun <T> T.toVar(): Var<T> {
+            return VarImpl(this)
         }
 
         private data class VarImpl<T>(override var value: T) : Var<T>
@@ -36,14 +37,28 @@ interface BooleanVar {
      */
     var value: Boolean
 
+    /**
+     * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     */
+    fun asVar(): Var<Boolean> {
+        return object : Var<Boolean> {
+            override var value: Boolean
+                get() = this@BooleanVar.value
+                set(v) {
+                    this@BooleanVar.value = v
+                }
+        }
+    }
+
     companion object {
 
         /**
-         * Returns a [BooleanVar] with [value].
+         * Returns a [Var] with [this].
          */
+        @JvmName("of")
         @JvmStatic
-        fun of(value: Boolean): BooleanVar {
-            return BooleanVarImpl(value)
+        fun Boolean.toBooleanVar(): BooleanVar {
+            return BooleanVarImpl(this)
         }
 
         private data class BooleanVarImpl(override var value: Boolean) : BooleanVar
@@ -61,14 +76,28 @@ interface ByteVar {
      */
     var value: Byte
 
+    /**
+     * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     */
+    fun asVar(): Var<Byte> {
+        return object : Var<Byte> {
+            override var value: Byte
+                get() = this@ByteVar.value
+                set(v) {
+                    this@ByteVar.value = v
+                }
+        }
+    }
+
     companion object {
 
         /**
-         * Returns a [ByteVar] with [value].
+         * Returns a [Var] with [this].
          */
+        @JvmName("of")
         @JvmStatic
-        fun of(value: Byte): ByteVar {
-            return ByteVarImpl(value)
+        fun Byte.toByteVar(): ByteVar {
+            return ByteVarImpl(this)
         }
 
         private data class ByteVarImpl(override var value: Byte) : ByteVar
@@ -86,14 +115,28 @@ interface ShortVar {
      */
     var value: Short
 
+    /**
+     * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     */
+    fun asVar(): Var<Short> {
+        return object : Var<Short> {
+            override var value: Short
+                get() = this@ShortVar.value
+                set(v) {
+                    this@ShortVar.value = v
+                }
+        }
+    }
+
     companion object {
 
         /**
-         * Returns a [ShortVar] with [value].
+         * Returns a [Var] with [this].
          */
+        @JvmName("of")
         @JvmStatic
-        fun of(value: Short): ShortVar {
-            return ShortVarImpl(value)
+        fun Short.toShortVar(): ShortVar {
+            return ShortVarImpl(this)
         }
 
         private data class ShortVarImpl(override var value: Short) : ShortVar
@@ -111,14 +154,28 @@ interface CharVar {
      */
     var value: Char
 
+    /**
+     * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     */
+    fun asVar(): Var<Char> {
+        return object : Var<Char> {
+            override var value: Char
+                get() = this@CharVar.value
+                set(v) {
+                    this@CharVar.value = v
+                }
+        }
+    }
+
     companion object {
 
         /**
-         * Returns a [CharVar] with [value].
+         * Returns a [Var] with [this].
          */
+        @JvmName("of")
         @JvmStatic
-        fun of(value: Char): CharVar {
-            return CharVarImpl(value)
+        fun Char.toCharVar(): CharVar {
+            return CharVarImpl(this)
         }
 
         private data class CharVarImpl(override var value: Char) : CharVar
@@ -136,14 +193,28 @@ interface IntVar {
      */
     var value: Int
 
+    /**
+     * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     */
+    fun asVar(): Var<Int> {
+        return object : Var<Int> {
+            override var value: Int
+                get() = this@IntVar.value
+                set(v) {
+                    this@IntVar.value = v
+                }
+        }
+    }
+
     companion object {
 
         /**
-         * Returns a [IntVar] with [value].
+         * Returns a [Var] with [this].
          */
+        @JvmName("of")
         @JvmStatic
-        fun of(value: Int): IntVar {
-            return IntVarImpl(value)
+        fun Int.toIntVar(): IntVar {
+            return IntVarImpl(this)
         }
 
         private data class IntVarImpl(override var value: Int) : IntVar
@@ -161,14 +232,28 @@ interface LongVar {
      */
     var value: Long
 
+    /**
+     * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     */
+    fun asVar(): Var<Long> {
+        return object : Var<Long> {
+            override var value: Long
+                get() = this@LongVar.value
+                set(v) {
+                    this@LongVar.value = v
+                }
+        }
+    }
+
     companion object {
 
         /**
-         * Returns a [LongVar] with [value].
+         * Returns a [Var] with [this].
          */
+        @JvmName("of")
         @JvmStatic
-        fun of(value: Long): LongVar {
-            return LongVarImpl(value)
+        fun Long.toLongVar(): LongVar {
+            return LongVarImpl(this)
         }
 
         private data class LongVarImpl(override var value: Long) : LongVar
@@ -186,14 +271,28 @@ interface FloatVar {
      */
     var value: Float
 
+    /**
+     * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     */
+    fun asVar(): Var<Float> {
+        return object : Var<Float> {
+            override var value: Float
+                get() = this@FloatVar.value
+                set(v) {
+                    this@FloatVar.value = v
+                }
+        }
+    }
+
     companion object {
 
         /**
-         * Returns a [FloatVar] with [value].
+         * Returns a [Var] with [this].
          */
+        @JvmName("of")
         @JvmStatic
-        fun of(value: Float): FloatVar {
-            return FloatVarImpl(value)
+        fun Float.toFloatVar(): FloatVar {
+            return FloatVarImpl(this)
         }
 
         private data class FloatVarImpl(override var value: Float) : FloatVar
@@ -211,14 +310,28 @@ interface DoubleVar {
      */
     var value: Double
 
+    /**
+     * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
+     */
+    fun asVar(): Var<Double> {
+        return object : Var<Double> {
+            override var value: Double
+                get() = this@DoubleVar.value
+                set(v) {
+                    this@DoubleVar.value = v
+                }
+        }
+    }
+
     companion object {
 
         /**
-         * Returns a [DoubleVar] with [value].
+         * Returns a [Var] with [this].
          */
+        @JvmName("of")
         @JvmStatic
-        fun of(value: Double): DoubleVar {
-            return DoubleVarImpl(value)
+        fun Double.toDoubleVar(): DoubleVar {
+            return DoubleVarImpl(this)
         }
 
         private data class DoubleVarImpl(override var value: Double) : DoubleVar
