@@ -22,15 +22,14 @@ import com.google.common.cache.RemovalCause as guavaRemovalCause
  * A cache may have a default [Loader], when use `get` methods,
  * the default loader will be called automatically if the value doesn't exist.
  *
- * Null keys are not allowed in this cache, but null values are supported,
- * this means the `null` may be a correct value.
+ * Null keys and values are unsupported.
  *
  * @see Loader
  * @see Listener
  * @see Builder
  */
 @ThreadSafe
-interface Cache<K : Any, V> {
+interface Cache<K : Any, V : Any> {
 
     /**
      * Returns the value associated with the [key] in this cache.
@@ -38,7 +37,17 @@ interface Cache<K : Any, V> {
      * If the default loader still can't get the value, a [NoSuchElementException] will be thrown.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    operator fun get(key: K): V
+    operator fun get(key: K): V {
+        return getOrNull(key) ?: throw NoSuchElementException(key.toString())
+    }
+
+    /**
+     * Returns the value associated with the [key] in this cache.
+     * If not found and this cache has a default [Loader], try to load, cache and return.
+     * If the default loader still can't get the value, return null.
+     */
+    @Throws(CacheException::class)
+    fun getOrNull(key: K): V?
 
     /**
      * Returns the value associated with the [key] in this cache.
@@ -46,39 +55,37 @@ interface Cache<K : Any, V> {
      * If the [loader] returns null, a [NoSuchElementException] will be thrown.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun get(key: K, loader: Function<in K, Val<V>?>): V
+    fun get(key: K, loader: Function<in K, V?>): V {
+        return getOrNull(key, loader) ?: throw NoSuchElementException(key.toString())
+    }
 
     /**
-     * Returns the value wrapped by [Val] associated with the [key] in this cache.
-     * If not found and this cache has a default [Loader], try to load, cache and return.
-     * If the default loader still can't get the value, return null.
-     */
-    @Throws(CacheException::class)
-    fun getVal(key: K): Val<V>?
-
-    /**
-     * Returns the value wrapped by [Val] associated with the [key] in this cache.
+     * Returns the value associated with the [key] in this cache.
      * If not found, use [loader] to load, cache and return.
      * If the [loader] returns null, return null.
      */
     @Throws(CacheException::class)
-    fun getVal(key: K, loader: Function<in K, Val<V>?>): Val<V>?
+    fun getOrNull(key: K, loader: Function<in K, V?>): V?
 
     /**
      * Returns the value associated with the [key] in this cache.
      * If not found, a [NoSuchElementException] will be thrown.
-     * Whatever this cache has a default loader, it never loads the new value.
+     *
+     * Note whatever this cache has a default loader, it never loads the new value.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun getPresent(key: K): V
+    fun getPresent(key: K): V {
+        return getPresentOrNull(key) ?: throw NoSuchElementException(key.toString())
+    }
 
     /**
-     * Returns the value wrapped by [Val] associated with the [key] in this cache.
+     * Returns the value associated with the [key] in this cache.
      * If not found, return null.
-     * Whatever this cache has a default loader, it never loads the new value.
+     *
+     * Note whatever this cache has a default loader, it never loads the new value.
      */
     @Throws(CacheException::class)
-    fun getPresentVal(key: K): Val<V>?
+    fun getPresentOrNull(key: K): V?
 
     /**
      * Returns all values associated with the [keys].
@@ -100,7 +107,8 @@ interface Cache<K : Any, V> {
 
     /**
      * Returns all present values associated with the [keys] in this cache.
-     * Whatever this cache has a default loader, it never loads the new value.
+     *
+     * Note whatever this cache has a default loader, it never loads the new value.
      */
     fun getAllPresent(keys: Iterable<K>): Map<K, V>
 
@@ -112,7 +120,11 @@ interface Cache<K : Any, V> {
     /**
      * Puts the key value entries.
      */
-    fun putAll(entries: Map<out K, V>)
+    fun putAll(entries: Map<out K, V>) {
+        for (entry in entries) {
+            put(entry.key, entry.value)
+        }
+    }
 
     /**
      * Removes value associated with [key].
@@ -122,12 +134,18 @@ interface Cache<K : Any, V> {
     /**
      * Removes values associated with [keys].
      */
-    fun removeAll(keys: Iterable<K>)
+    fun removeAll(keys: Iterable<K>) {
+        for (key in keys) {
+            remove(key)
+        }
+    }
 
     /**
      * Removes all entries of this cache.
      */
-    fun removeAll()
+    fun removeAll() {
+        asMap().clear()
+    }
 
     /**
      * Cleans up the cache, may remove the expired data.
@@ -142,13 +160,13 @@ interface Cache<K : Any, V> {
     /**
      * Loader for [Cache], used to load new value if target value is not found in the cache.
      */
-    interface Loader<K : Any, V> {
+    interface Loader<K : Any, V : Any> {
 
         /**
          * Loads value wrapped by [Val] associated by [key],
          * if target value cannot be load, return null.
          */
-        fun load(key: K): Val<V>?
+        fun load(key: K): V?
 
         /**
          * Loads all values associated by [keys].
@@ -161,7 +179,7 @@ interface Cache<K : Any, V> {
             for (key in keys) {
                 val newValue = load(key)
                 if (newValue !== null) {
-                    result[key] = newValue.value
+                    result[key] = newValue
                 }
             }
             return result
@@ -177,7 +195,7 @@ interface Cache<K : Any, V> {
      *
      * @see RemoveCause
      */
-    interface Listener<K : Any, V> {
+    interface Listener<K : Any, V : Any> {
 
         /**
          * Callback before creating new entry.
@@ -292,7 +310,7 @@ interface Cache<K : Any, V> {
     /**
      * Builder for [Cache].
      */
-    class Builder<K : Any, V> {
+    class Builder<K : Any, V : Any> {
 
         var initialCapacity: Int? = null
         var maxCapacity: Long? = null

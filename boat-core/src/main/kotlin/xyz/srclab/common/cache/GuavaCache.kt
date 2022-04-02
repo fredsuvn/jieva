@@ -4,187 +4,138 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.RemovalCause
 import com.google.common.cache.RemovalListener
-import xyz.srclab.common.base.Val
-import xyz.srclab.common.base.Val.Companion.toVal
 import xyz.srclab.common.base.asTyped
 import java.util.concurrent.ExecutionException
 import java.util.function.Function
 
-open class GuavaCache<K : Any, V>(builder: Cache.Builder<K, V>) : Cache<K, V> {
+/**
+ * Base [Cache] implementation using [guava](https://github.com/google/guava).
+ */
+abstract class BaseGuavaCache<K : Any, V : Any> : Cache<K, V> {
 
-    protected val cache: com.google.common.cache.Cache<Any, Any> = run {
-        val guavaBuilder = buildGuavaBuilder(builder)
+    protected abstract val cache: com.google.common.cache.Cache<K, V>
+
+    override fun getOrNull(key: K, loader: Function<in K, V?>): V? {
+        try {
+            return cache.get(key) { loader.apply(key) ?: throw GuavaLoadingNullException() }
+        } catch (e: ExecutionException) {
+            val cause = e.cause
+            if (cause is GuavaLoadingNullException) {
+                return null
+            }
+            throw CacheException(e)
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
+    }
+
+    override fun getPresentOrNull(key: K): V? {
+        return cache.getIfPresent(key)
+    }
+
+    override fun getAll(keys: Iterable<K>): Map<K, V> {
+        throw CacheException(UnsupportedOperationException())
+    }
+
+    override fun getAll(keys: Iterable<K>, loader: Function<in Iterable<K>, Map<K, V>>): Map<K, V> {
+        throw CacheException(UnsupportedOperationException())
+    }
+
+    override fun getAllPresent(keys: Iterable<K>): Map<K, V> {
+        return cache.getAllPresent(keys)
+    }
+
+    override fun put(key: K, value: V) {
+        cache.put(key, value)
+    }
+
+    override fun putAll(entries: Map<out K, V>) {
+        cache.putAll(entries)
+    }
+
+    override fun remove(key: K) {
+        cache.invalidate(key)
+    }
+
+    override fun removeAll(keys: Iterable<K>) {
+        cache.invalidateAll(keys)
+    }
+
+    override fun removeAll() {
+        cache.invalidateAll()
+    }
+
+    override fun cleanUp() {
+        cache.cleanUp()
+    }
+
+    override fun asMap(): MutableMap<K, V> {
+        return cache.asMap()
+    }
+}
+
+/**
+ * [Cache] implementation using [guava](https://github.com/google/guava).
+ */
+open class GuavaCache<K : Any, V : Any>(builder: Cache.Builder<K, V>) : BaseGuavaCache<K, V>() {
+
+    override val cache: com.google.common.cache.Cache<K, V> = run {
+        val guavaBuilder: CacheBuilder<K, V> = buildGuavaBuilder(builder)
         val loader = builder.loader
         if (loader === null) {
             guavaBuilder.build()
         } else {
-            guavaBuilder.build(buildGuavaLoader(NULL, loader))
+            guavaBuilder.build(buildGuavaLoader(loader))
         }
     }
 
-    override fun get(key: K): V {
-        val result = cache.getIfPresent(key)
-        if (result === null) {
-            throw NoSuchElementException(key.toString())
+    override fun getOrNull(key: K): V? {
+        return getPresentOrNull(key)
+    }
+}
+
+/**
+ * [Cache] implementation using [guava](https://github.com/google/guava).
+ */
+open class GuavaLoadingCache<K : Any, V : Any>(builder: Cache.Builder<K, V>) : BaseGuavaCache<K, V>() {
+
+    override val cache: com.google.common.cache.LoadingCache<K, V> = run {
+        val loader = builder.loader
+        if (loader === null) {
+            throw IllegalArgumentException("Loader cannot be null!")
         }
-        return if (result === NULL) {
-            null.asTyped()
-        } else {
-            result.asTyped()
-        }
+        val guavaBuilder: CacheBuilder<K, V> = buildGuavaBuilder(builder)
+        guavaBuilder.build(buildGuavaLoader(loader))
     }
 
-    override fun get(key: K, loader: Function<in K, Val<V>?>): V {
-        val result = try {
-            cache.get(key) {
-                val result = loader.apply(key)
-                if (result === null) {
-                    throw GuavaLoadingFailedException()
-                }
-                result.value ?: NULL
-            }
+    override fun getOrNull(key: K): V? {
+        try {
+            return cache.get(key)
         } catch (e: ExecutionException) {
             val cause = e.cause
-            if (cause === null || cause !is GuavaLoadingFailedException) {
-                throw e
+            if (cause is GuavaLoadingNullException) {
+                return null
             }
-            NOT_FOUND
+            throw CacheException(e)
+        } catch (e: Exception) {
+            throw CacheException(e)
         }
-        if (result === NOT_FOUND) {
-            throw NoSuchElementException(key.toString())
-        }
-        return if (result === NULL) {
-            null.asTyped()
-        } else {
-            result.asTyped()
-        }
-    }
-
-    override fun getVal(key: K): Val<V>? {
-        val result = cache.getIfPresent(key)
-        if (result === null) {
-            return null
-        }
-        return if (result === NULL) {
-            null.toVal().asTyped()
-        } else {
-            result.toVal().asTyped()
-        }
-    }
-
-    override fun getVal(key: K, loader: Function<in K, Val<V>?>): Val<V>? {
-        TODO("Not yet implemented")
-    }
-
-    override fun getPresent(key: K): V {
-        TODO("Not yet implemented")
-    }
-
-    override fun getPresentVal(key: K): Val<V>? {
-        TODO("Not yet implemented")
     }
 
     override fun getAll(keys: Iterable<K>): Map<K, V> {
-        TODO("Not yet implemented")
+        try {
+            return cache.getAll(keys)
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
     }
 
     override fun getAll(keys: Iterable<K>, loader: Function<in Iterable<K>, Map<K, V>>): Map<K, V> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAllPresent(keys: Iterable<K>): Map<K, V> {
-        TODO("Not yet implemented")
-    }
-
-    override fun put(key: K, value: V) {
-        TODO("Not yet implemented")
-    }
-
-    override fun putAll(entries: Map<out K, V>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun remove(key: K) {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeAll(keys: Iterable<K>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeAll() {
-        TODO("Not yet implemented")
-    }
-
-    override fun cleanUp() {
-        TODO("Not yet implemented")
-    }
-
-    override fun asMap(): MutableMap<K, V> {
-        TODO("Not yet implemented")
-    }
-
-    companion object {
-        private const val NULL = "GuavaCache.NULL"
-        private const val NOT_FOUND = "GuavaCache.NOT_FOUND"
+        throw CacheException(UnsupportedOperationException())
     }
 }
 
-/**
- * [Cache] based on [google guava](https://github.com/google/guava).
- */
-open class GuavaCache2<K : Any, V : Any>(
-    private val guava: com.google.common.cache.Cache<K, V>
-) : Cache<K, V> {
-
-    override fun getOrNull(key: K): V? {
-        return guava.getIfPresent(key)
-    }
-
-    override fun getOrLoad(key: K, loader: Function<in K, V>): V {
-        return guava.get(key) { loader.apply(key) } ?: throw NoSuchElementException(key.toString())
-    }
-
-    override fun getAllPresent(keys: Iterable<K>): Map<K, V> {
-        return guava.getAllPresent(keys)
-    }
-
-    override fun getOrLoadAll(keys: Iterable<K>, loader: Function<in Iterable<K>, Map<K, V>>): Map<K, V> {
-        val present = guava.getAllPresent(keys)
-        val remaining = keys.minus(present.keys)
-        if (remaining.isEmpty()) {
-            return present
-        }
-        val loaded = loader.apply(remaining)
-        return present.plus(loaded)
-    }
-
-    override fun put(key: K, value: V) {
-        guava.put(key, value)
-    }
-
-    override fun cleanUp() {
-        guava.cleanUp()
-    }
-
-    override fun asMap(): MutableMap<K, V> {
-        return guava.asMap()
-    }
-}
-
-/**
- * [Cache] based on loading [google guava](https://github.com/google/guava).
- */
-open class GuavaLoadingCache<K : Any, V : Any>(
-    private val guava: com.google.common.cache.LoadingCache<K, V>
-) : GuavaCache<K, V>(guava) {
-
-    override fun get(key: K): V {
-        return guava.get(key)
-    }
-}
-
-private fun <K : Any, V> buildGuavaBuilder(builder: Cache.Builder<K, V>): CacheBuilder<Any, Any> {
+private fun <K : Any, V : Any> buildGuavaBuilder(builder: Cache.Builder<K, V>): CacheBuilder<K, V> {
     val guavaBuilder = CacheBuilder.newBuilder()
     val initialCapacity = builder.initialCapacity
     if (initialCapacity !== null) {
@@ -223,27 +174,27 @@ private fun <K : Any, V> buildGuavaBuilder(builder: Cache.Builder<K, V>): CacheB
             listener.afterRemove(notification.key.asTyped(), notification.value.asTyped(), removeCause)
         })
     }
-    return guavaBuilder
+    return guavaBuilder.asTyped()
 }
 
-private fun <K : Any, V> buildGuavaLoader(nullValue: Any, loader: Cache.Loader<K, V>): CacheLoader<Any, Any> {
-    return object : CacheLoader<Any, Any>() {
+private fun <K : Any, V : Any> buildGuavaLoader(loader: Cache.Loader<K, V>): CacheLoader<K, V> {
+    return object : CacheLoader<K, V>() {
 
-        override fun load(key: Any): Any {
-            val result = loader.load(key.asTyped())
+        override fun load(key: K): V {
+            val result = loader.load(key)
             if (result === null) {
-                throw Exception(GuavaLoadingFailedException())
+                throw GuavaLoadingNullException()
             }
-            return result.value ?: nullValue
+            return result
         }
 
-        override fun loadAll(keys: Iterable<Any>): Map<Any, Any> {
-            return loader.loadAll(keys.asTyped()).asTyped()
+        override fun loadAll(keys: Iterable<K>): Map<K, V> {
+            return loader.loadAll(keys)
         }
     }
 }
 
-private class GuavaLoadingFailedException : RuntimeException()
+private class GuavaLoadingNullException : RuntimeException()
 
 
 
