@@ -14,303 +14,105 @@ import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
 import com.google.common.cache.RemovalCause as guavaRemovalCause
 
 /**
- * Cache interface, thread-safe, default implemented by:
+ * A simple cache interface, thread-safe, default implemented by:
  *
  * * [guava](https://github.com/google/guava)
  * * [caffeine](https://github.com/ben-manes/caffeine).
  *
- * A cache may have a default [Loader], when use `get` methods,
+ * A cache may have a default loader, when use `get` methods,
  * the default loader will be called automatically if the value doesn't exist.
+ * The loader uses [Val] to wrap loaded value, or -- if loading failed, return null.
  *
- * Null keys and values are unsupported.
+ * The key must not null but null value is permitted.
  *
- * @see Loader
- * @see Listener
  * @see Builder
  */
 @ThreadSafe
-interface Cache<K : Any, V : Any> {
+interface Cache<K : Any, V> {
 
     /**
      * Returns the value associated with the [key] in this cache.
-     * If not found and this cache has a default [Loader], try to load, cache and return.
-     * If the default loader still can't get the value, a [NoSuchElementException] will be thrown.
+     * If the value is not found in this cache, and this cache has a default [Loader], try to load, cache and return.
+     * If the default loader still can't get the value, or this cache doesn't have a default loader,
+     * a [NoSuchElementException] will be thrown.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    operator fun get(key: K): V {
-        return getOrNull(key) ?: throw NoSuchElementException(key.toString())
-    }
+    operator fun get(key: K): V
 
     /**
-     * Returns the value associated with the [key] in this cache.
-     * If not found and this cache has a default [Loader], try to load, cache and return.
-     * If the default loader still can't get the value, return null.
+     * Returns the value associated with the [key] in this cache, wrapped by [Val].
+     * If the value is not found in this cache, and this cache has a default [Loader], try to load, cache and return.
+     * If the default loader still can't get the value, or this cache doesn't have a default loader, return null.
      */
     @Throws(CacheException::class)
-    fun getOrNull(key: K): V?
+    fun getVal(key: K): Val<V>?
 
     /**
      * Returns the value associated with the [key] in this cache.
-     * If not found, use [loader] to load, cache and return.
-     * If the [loader] returns null, a [NoSuchElementException] will be thrown.
+     * If the value is not found in this cache, try to load by [loader], cache and return.
+     * If the [loader] still can't get the value, a [NoSuchElementException] will be thrown.
+     *
+     * The [loader] should use [Val] to wrap the loaded value, or return null if it can't load the value.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun get(key: K, loader: Function<in K, V?>): V {
-        return getOrNull(key, loader) ?: throw NoSuchElementException(key.toString())
-    }
+    fun get(key: K, loader: Function<in K, Val<V>?>): V
 
     /**
-     * Returns the value associated with the [key] in this cache.
-     * If not found, use [loader] to load, cache and return.
-     * If the [loader] returns null, return null.
+     * Returns the value associated with the [key] in this cache, wrapped by [Val].
+     * If the value is not found in this cache, try to load by [loader], cache and return.
+     * If the [loader] still can't get the value, return null.
+     *
+     * The [loader] should use [Val] to wrap the loaded value, or return null if it can't load the value.
      */
     @Throws(CacheException::class)
-    fun getOrNull(key: K, loader: Function<in K, V?>): V?
+    fun getVal(key: K, loader: Function<in K, Val<V>?>): Val<V>?
 
     /**
      * Returns the value associated with the [key] in this cache.
-     * If not found, a [NoSuchElementException] will be thrown.
+     * If the value is not found in this cache, a [NoSuchElementException] will be thrown.
      *
      * Note whatever this cache has a default loader, it never loads the new value.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun getPresent(key: K): V {
-        return getPresentOrNull(key) ?: throw NoSuchElementException(key.toString())
-    }
+    fun getPresent(key: K): V
 
     /**
-     * Returns the value associated with the [key] in this cache.
-     * If not found, return null.
+     * Returns the value associated with the [key] in this cache, wrapped by [Val].
+     * If the value is not found in this cache, return null.
      *
      * Note whatever this cache has a default loader, it never loads the new value.
      */
     @Throws(CacheException::class)
-    fun getPresentOrNull(key: K): V?
+    fun getPresentVal(key: K): Val<V>?
 
     /**
-     * Returns all values associated with the [keys].
-     * If some values are not cached and there exists a default loader, try to load new values then cache.
-     * The returned map contains present cached and newly loaded values.
-     *
-     * Note returned map may not contain all values, some of them may be still not found after loading.
+     * Puts the key-value pair into this cache.
      */
-    fun getAll(keys: Iterable<K>): Map<K, V>
-
-    /**
-     * Returns all values associated with the [keys].
-     * If some values are not cached, the [loader] will try to load new values then cache.
-     * The returned map contains present cached and newly loaded values.
-     *
-     * Note returned map may not contain all values, some of them may be still not found after loading.
-     */
-    fun getAll(keys: Iterable<K>, loader: Function<in Iterable<K>, Map<K, V>>): Map<K, V>
-
-    /**
-     * Returns all present values associated with the [keys] in this cache.
-     *
-     * Note whatever this cache has a default loader, it never loads the new value.
-     */
-    fun getAllPresent(keys: Iterable<K>): Map<K, V>
-
-    /**
-     * Puts the key with associated value.
-     */
+    @Throws(CacheException::class)
     fun put(key: K, value: V)
 
     /**
-     * Puts the key value entries.
+     * Removes the key-value pair from this cache
      */
-    fun putAll(entries: Map<out K, V>) {
-        for (entry in entries) {
-            put(entry.key, entry.value)
-        }
-    }
-
-    /**
-     * Removes value associated with [key].
-     */
+    @Throws(CacheException::class)
     fun remove(key: K)
 
     /**
-     * Removes values associated with [keys].
+     * Removes all entries from this cache.
      */
-    fun removeAll(keys: Iterable<K>) {
-        for (key in keys) {
-            remove(key)
-        }
-    }
-
-    /**
-     * Removes all entries of this cache.
-     */
-    fun removeAll() {
-        asMap().clear()
-    }
+    @Throws(CacheException::class)
+    fun clear()
 
     /**
      * Cleans up the cache, may remove the expired data.
      */
+    @Throws(CacheException::class)
     fun cleanUp()
-
-    /**
-     * Returns this cache as [MutableMap], any operation for this cache or the returned map will reflect each other.
-     */
-    fun asMap(): MutableMap<K, V>
-
-    /**
-     * Loader for [Cache], used to load new value if target value is not found in the cache.
-     */
-    interface Loader<K : Any, V : Any> {
-
-        /**
-         * Loads value wrapped by [Val] associated by [key],
-         * if target value cannot be load, return null.
-         */
-        fun load(key: K): V?
-
-        /**
-         * Loads all values associated by [keys].
-         * The default implementation is: calling [load] for each key.
-         *
-         * Note returned map may not contain all target values, some of them may be loading failed.
-         */
-        fun loadAll(keys: Iterable<K>): Map<K, V> {
-            val result = LinkedHashMap<K, V>(keys.count())
-            for (key in keys) {
-                val newValue = load(key)
-                if (newValue !== null) {
-                    result[key] = newValue
-                }
-            }
-            return result
-        }
-    }
-
-    /**
-     * Listener for [Cache], used to listen on each cache event.
-     * All methods' default implementations are empty.
-     *
-     * Whether the listening action execute depends on the implementation.
-     * For `guava` and `caffeine`, only [afterRemove] is valid.
-     *
-     * @see RemoveCause
-     */
-    interface Listener<K : Any, V : Any> {
-
-        /**
-         * Callback before creating new entry.
-         */
-        fun beforeCreate(key: K) {}
-
-        /**
-         * Callback after creating new entry.
-         */
-        fun afterCreate(key: K, value: V) {}
-
-        /**
-         * Callback before reading.
-         */
-        fun beforeRead(key: K) {}
-
-        /**
-         * Callback on hitting the key.
-         */
-        fun onHit(key: K, value: V) {}
-
-        /**
-         * Callback on missing the key.
-         */
-        fun onMiss(key: K) {}
-
-        /**
-         * Callback before updating the entry.
-         */
-        fun beforeUpdate(key: K, oldValue: V) {}
-
-        /**
-         * Callback after updating the entry.
-         */
-        fun afterUpdate(key: K, oldValue: V, newValue: V) {}
-
-        /**
-         * Callback before removing the entry.
-         */
-        fun beforeRemove(key: K, value: V, removeCause: RemoveCause) {}
-
-        /**
-         * Callback after removing the entry.
-         */
-        fun afterRemove(key: K, value: V, removeCause: RemoveCause) {}
-    }
-
-    /**
-     * The cause why the entry was removed.
-     */
-    enum class RemoveCause {
-
-        /**
-         * The entry was manually removed by the user.
-         */
-        EXPLICIT {
-            override val isEvicted: Boolean
-                get() {
-                    return false
-                }
-        },
-
-        /**
-         * The entry itself was not actually removed, but its value was replaced by the user.
-         */
-        REPLACED {
-            override val isEvicted: Boolean
-                get() {
-                    return false
-                }
-        },
-
-        /**
-         * The entry was removed automatically because its key or value was garbage-collected.
-         */
-        COLLECTED {
-            override val isEvicted: Boolean
-                get() {
-                    return true
-                }
-        },
-
-        /**
-         * The entry is expired.
-         */
-        EXPIRED {
-            override val isEvicted: Boolean
-                get() {
-                    return true
-                }
-        },
-
-        /**
-         * The entry was evicted due to size constraints.
-         */
-        SIZE {
-            override val isEvicted: Boolean
-                get() {
-                    return true
-                }
-        };
-
-        /**
-         * Returns `true` if there was an automatic removal due to eviction (the cause is neither
-         * [EXPLICIT] nor [REPLACED]).
-         *
-         * @return if the entry was automatically removed due to eviction
-         */
-        abstract val isEvicted: Boolean
-    }
 
     /**
      * Builder for [Cache].
      */
-    class Builder<K : Any, V : Any> {
+    class Builder<K : Any, V> {
 
         var initialCapacity: Int? = null
         var maxCapacity: Long? = null
@@ -318,8 +120,7 @@ interface Cache<K : Any, V : Any> {
         var expireAfterAccess: Duration? = null
         var expireAfterWrite: Duration? = null
         var refreshAfterWrite: Duration? = null
-        var loader: Loader<in K, V>? = null
-        var listener: Listener<in K, in V>? = null
+        var loader: Function<in K, Val<V>?>? = null
         var useGuava = false
 
         /**
@@ -367,16 +168,10 @@ interface Cache<K : Any, V : Any> {
 
         /**
          * Sets loader used to automatically load the value if the entry is miss.
+         * The loader should use [Val] to wrap loaded value, or -- if loading failed, return null.
          */
-        fun loader(loader: Loader<in K, V>): Builder<K, V> = apply {
+        fun loader(loader: Function<in K, Val<V>?>): Builder<K, V> = apply {
             this.loader = loader
-        }
-
-        /**
-         * Sets cache listener.
-         */
-        fun listener(listener: Listener<in K, in V>): Builder<K, V> = apply {
-            this.listener = listener
         }
 
         /**

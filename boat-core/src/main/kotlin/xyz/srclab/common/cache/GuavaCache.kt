@@ -4,6 +4,8 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.RemovalCause
 import com.google.common.cache.RemovalListener
+import xyz.srclab.common.base.Val
+import xyz.srclab.common.base.Val.Companion.toVal
 import xyz.srclab.common.base.asTyped
 import java.util.concurrent.ExecutionException
 import java.util.function.Function
@@ -11,13 +13,47 @@ import java.util.function.Function
 /**
  * Base [Cache] implementation using [guava](https://github.com/google/guava).
  */
-abstract class BaseGuavaCache<K : Any, V : Any> : Cache<K, V> {
+abstract class BaseGuavaCache<K : Any, V>(
+    protected val cache: com.google.common.cache.Cache<K, Any>
+) : Cache<K, V> {
 
-    protected abstract val cache: com.google.common.cache.Cache<K, V>
-
-    override fun getOrNull(key: K, loader: Function<in K, V?>): V? {
+    override fun get(key: K, loader: Function<in K, Val<V>?>): V {
         try {
-            return cache.get(key) { loader.apply(key) ?: throw GuavaLoadingNullException() }
+            val v = cache.get(key) {
+                val newVal = loader.apply(key)
+                if (newVal === null) {
+                    throw GuavaLoadingNullException()
+                }
+                val newV = newVal.value
+                if (newV === null) NULL else newV
+            }
+            if (v === NULL) {
+                return null.asTyped()
+            }
+            return v.asTyped()
+        } catch (e: ExecutionException) {
+            val cause = e.cause
+            if (cause is GuavaLoadingNullException) {
+                throw NoSuchElementException(key.toString())
+            }
+            throw CacheException(e)
+        } catch (e: Exception) {
+            throw CacheException(e)
+        }
+    }
+
+    override fun getVal(key: K, loader: Function<in K, Val<V>?>): Val<V>? {
+        try {
+            val v = cache.get(key) {
+                val newVal = loader.apply(key)
+                if (newVal === null) {
+                    throw GuavaLoadingNullException()
+                }
+                val newV = newVal.value
+                if (newV === null) NULL else newV
+            }
+            val asV:V = if (v === NULL) null.asTyped() else v.asTyped()
+            return asV.toVal()
         } catch (e: ExecutionException) {
             val cause = e.cause
             if (cause is GuavaLoadingNullException) {
@@ -29,39 +65,35 @@ abstract class BaseGuavaCache<K : Any, V : Any> : Cache<K, V> {
         }
     }
 
-    override fun getPresentOrNull(key: K): V? {
-        return cache.getIfPresent(key)
+    override fun getPresent(key: K): V {
+        val v = cache.getIfPresent(key)
+        if (v === null) {
+            throw NoSuchElementException(key.toString())
+        }
+        if (v === NULL){
+            return null.asTyped()
+        }
+        return v.asTyped()
     }
 
-    override fun getAll(keys: Iterable<K>): Map<K, V> {
-        throw CacheException(UnsupportedOperationException())
-    }
-
-    override fun getAll(keys: Iterable<K>, loader: Function<in Iterable<K>, Map<K, V>>): Map<K, V> {
-        throw CacheException(UnsupportedOperationException())
-    }
-
-    override fun getAllPresent(keys: Iterable<K>): Map<K, V> {
-        return cache.getAllPresent(keys)
+    override fun getPresentVal(key: K): Val<V>?{
+        val v = cache.getIfPresent(key)
+        if (v === null) {
+            return null
+        }
+        val asV:V = if (v === NULL) null.asTyped() else v.asTyped()
+        return asV.toVal()
     }
 
     override fun put(key: K, value: V) {
-        cache.put(key, value)
-    }
-
-    override fun putAll(entries: Map<out K, V>) {
-        cache.putAll(entries)
+        cache.put(key, if (value === null) NULL else value)
     }
 
     override fun remove(key: K) {
         cache.invalidate(key)
     }
 
-    override fun removeAll(keys: Iterable<K>) {
-        cache.invalidateAll(keys)
-    }
-
-    override fun removeAll() {
+    override fun clear() {
         cache.invalidateAll()
     }
 
@@ -69,8 +101,8 @@ abstract class BaseGuavaCache<K : Any, V : Any> : Cache<K, V> {
         cache.cleanUp()
     }
 
-    override fun asMap(): MutableMap<K, V> {
-        return cache.asMap()
+    companion object {
+        private val NULL:Any = "GuavaNull"
     }
 }
 
