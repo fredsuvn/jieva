@@ -40,7 +40,7 @@ interface BooleanVal {
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
-    fun asVar(): Val<Boolean> {
+    fun asVal(): Val<Boolean> {
         return object : Val<Boolean> {
             override val value: Boolean
                 get() = this@BooleanVal.value
@@ -76,7 +76,7 @@ interface ByteVal {
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
-    fun asVar(): Val<Byte> {
+    fun asVal(): Val<Byte> {
         return object : Val<Byte> {
             override val value: Byte
                 get() = this@ByteVal.value
@@ -112,7 +112,7 @@ interface ShortVal {
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
-    fun asVar(): Val<Short> {
+    fun asVal(): Val<Short> {
         return object : Val<Short> {
             override val value: Short
                 get() = this@ShortVal.value
@@ -148,7 +148,7 @@ interface CharVal {
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
-    fun asVar(): Val<Char> {
+    fun asVal(): Val<Char> {
         return object : Val<Char> {
             override val value: Char
                 get() = this@CharVal.value
@@ -184,7 +184,7 @@ interface IntVal {
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
-    fun asVar(): Val<Int> {
+    fun asVal(): Val<Int> {
         return object : Val<Int> {
             override val value: Int
                 get() = this@IntVal.value
@@ -220,7 +220,7 @@ interface LongVal {
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
-    fun asVar(): Val<Long> {
+    fun asVal(): Val<Long> {
         return object : Val<Long> {
             override val value: Long
                 get() = this@LongVal.value
@@ -256,7 +256,7 @@ interface FloatVal {
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
-    fun asVar(): Val<Float> {
+    fun asVal(): Val<Float> {
         return object : Val<Float> {
             override val value: Float
                 get() = this@FloatVal.value
@@ -292,7 +292,7 @@ interface DoubleVal {
     /**
      * Returns this as [Val], they are equivalent and have same status, any operation will affect each other.
      */
-    fun asVar(): Val<Double> {
+    fun asVal(): Val<Double> {
         return object : Val<Double> {
             override val value: Double
                 get() = this@DoubleVal.value
