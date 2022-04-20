@@ -14,23 +14,12 @@ import java.util.function.Function
  * Base [Cache] implementation using [guava](https://github.com/google/guava).
  */
 abstract class BaseGuavaCache<K : Any, V>(
-    protected val cache: com.google.common.cache.Cache<K, Any>
+    protected val cache: com.google.common.cache.Cache<K, CacheVal<V>>
 ) : Cache<K, V> {
 
-    override fun get(key: K, loader: Function<in K, Val<V>?>): V {
+    override fun get(key: K, loader: Function<in K, CacheVal<V>?>): V {
         try {
-            val v = cache.get(key) {
-                val newVal = loader.apply(key)
-                if (newVal === null) {
-                    throw GuavaLoadingNullException()
-                }
-                val newV = newVal.value
-                if (newV === null) NULL else newV
-            }
-            if (v === NULL) {
-                return null.asTyped()
-            }
-            return v.asTyped()
+            return get0(key, loader)
         } catch (e: ExecutionException) {
             val cause = e.cause
             if (cause is GuavaLoadingNullException) {
@@ -42,7 +31,7 @@ abstract class BaseGuavaCache<K : Any, V>(
         }
     }
 
-    override fun getVal(key: K, loader: Function<in K, Val<V>?>): Val<V>? {
+    override fun getVal(key: K, loader: Function<in K, CacheVal<V>?>): CacheVal<V>? {
         try {
             val v = cache.get(key) {
                 val newVal = loader.apply(key)
@@ -52,7 +41,7 @@ abstract class BaseGuavaCache<K : Any, V>(
                 val newV = newVal.value
                 if (newV === null) NULL else newV
             }
-            val asV:V = if (v === NULL) null.asTyped() else v.asTyped()
+            val asV: V = if (v === NULL) null.asTyped() else v.asTyped()
             return asV.toVal()
         } catch (e: ExecutionException) {
             val cause = e.cause
@@ -65,23 +54,34 @@ abstract class BaseGuavaCache<K : Any, V>(
         }
     }
 
+    private fun get0(key: K, loader: Function<in K, CacheVal<V>?>): V{
+        val cv = cache.get(key){
+            val newCv = loader.apply(key)
+            if (newCv === null){
+                throw GuavaLoadingNullException()
+            }
+            newCv
+        }
+        return cv.value
+    }
+
     override fun getPresent(key: K): V {
         val v = cache.getIfPresent(key)
         if (v === null) {
             throw NoSuchElementException(key.toString())
         }
-        if (v === NULL){
+        if (v === NULL) {
             return null.asTyped()
         }
         return v.asTyped()
     }
 
-    override fun getPresentVal(key: K): Val<V>?{
+    override fun getPresentVal(key: K): CacheVal<V>? {
         val v = cache.getIfPresent(key)
         if (v === null) {
             return null
         }
-        val asV:V = if (v === NULL) null.asTyped() else v.asTyped()
+        val asV: V = if (v === NULL) null.asTyped() else v.asTyped()
         return asV.toVal()
     }
 
@@ -102,7 +102,7 @@ abstract class BaseGuavaCache<K : Any, V>(
     }
 
     companion object {
-        private val NULL:Any = "GuavaNull"
+        private val NULL: Any = "GuavaNull"
     }
 }
 

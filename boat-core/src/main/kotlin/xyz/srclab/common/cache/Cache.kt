@@ -32,40 +32,46 @@ interface Cache<K : Any, V> {
 
     /**
      * Returns the value associated with the [key] in this cache.
-     * If the value is not found in this cache, and this cache has a default [Loader], try to load, cache and return.
+     * If the value is not found in this cache, and this cache has a default Loader, try to load, cache and return.
      * If the default loader still can't get the value, or this cache doesn't have a default loader,
      * a [NoSuchElementException] will be thrown.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    operator fun get(key: K): V
+    operator fun get(key: K): V {
+        val cv = getVal(key)
+        if (cv === null) {
+            throw NoSuchElementException(key.toString())
+        }
+        return cv.value
+    }
 
     /**
-     * Returns the value associated with the [key] in this cache, wrapped by [Val].
-     * If the value is not found in this cache, and this cache has a default [Loader], try to load, cache and return.
+     * Returns the value associated with the [key] in this cache, wrapped by [CacheVal].
+     * If the value is not found in this cache, and this cache has a default Loader, try to load, cache and return.
      * If the default loader still can't get the value, or this cache doesn't have a default loader, return null.
      */
     @Throws(CacheException::class)
-    fun getVal(key: K): Val<V>?
+    fun getVal(key: K): CacheVal<V>?
 
     /**
      * Returns the value associated with the [key] in this cache.
      * If the value is not found in this cache, try to load by [loader], cache and return.
      * If the [loader] still can't get the value, a [NoSuchElementException] will be thrown.
      *
-     * The [loader] should use [Val] to wrap the loaded value, or return null if it can't load the value.
+     * The [loader] should use [CacheVal] to wrap the loaded value, or return null if it can't load the value.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun get(key: K, loader: Function<in K, Val<V>?>): V
+    fun get(key: K, loader: Function<in K, CacheVal<V>?>): V
 
     /**
-     * Returns the value associated with the [key] in this cache, wrapped by [Val].
+     * Returns the value associated with the [key] in this cache, wrapped by [CacheVal].
      * If the value is not found in this cache, try to load by [loader], cache and return.
      * If the [loader] still can't get the value, return null.
      *
-     * The [loader] should use [Val] to wrap the loaded value, or return null if it can't load the value.
+     * The [loader] should use [CacheVal] to wrap the loaded value, or return null if it can't load the value.
      */
     @Throws(CacheException::class)
-    fun getVal(key: K, loader: Function<in K, Val<V>?>): Val<V>?
+    fun getVal(key: K, loader: Function<in K, CacheVal<V>?>): Val<V>?
 
     /**
      * Returns the value associated with the [key] in this cache.
@@ -77,13 +83,13 @@ interface Cache<K : Any, V> {
     fun getPresent(key: K): V
 
     /**
-     * Returns the value associated with the [key] in this cache, wrapped by [Val].
+     * Returns the value associated with the [key] in this cache, wrapped by [CacheVal].
      * If the value is not found in this cache, return null.
      *
      * Note whatever this cache has a default loader, it never loads the new value.
      */
     @Throws(CacheException::class)
-    fun getPresentVal(key: K): Val<V>?
+    fun getPresentVal(key: K): CacheVal<V>?
 
     /**
      * Puts the key-value pair into this cache.
