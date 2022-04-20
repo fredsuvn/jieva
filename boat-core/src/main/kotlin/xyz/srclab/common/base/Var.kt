@@ -4,12 +4,12 @@ package xyz.srclab.common.base
  * [Var] represents a variable wrapper, of which [value] is a variable reference can be reassigned,
  * just like the kotlin keyword: `var`.
  */
-interface Var<T> {
+interface Var<T> : Val<T> {
 
     /**
      * Value of this [Var].
      */
-    var value: T
+    override var value: T
 
     companion object {
 
@@ -30,12 +30,12 @@ interface Var<T> {
  * Boolean version of [Var].
  * @see Var
  */
-interface BooleanVar {
+interface BooleanVar : BooleanVal {
 
     /**
      * Value of this [Var].
      */
-    var value: Boolean
+    override var value: Boolean
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
@@ -69,12 +69,12 @@ interface BooleanVar {
  * Byte version of [Var].
  * @see Var
  */
-interface ByteVar {
+interface ByteVar : ByteVal {
 
     /**
      * Value of this [Var].
      */
-    var value: Byte
+    override var value: Byte
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
@@ -108,12 +108,12 @@ interface ByteVar {
  * Short version of [Var].
  * @see Var
  */
-interface ShortVar {
+interface ShortVar : ShortVal {
 
     /**
      * Value of this [Var].
      */
-    var value: Short
+    override var value: Short
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
@@ -147,12 +147,12 @@ interface ShortVar {
  * Char version of [Var].
  * @see Var
  */
-interface CharVar {
+interface CharVar : CharVal {
 
     /**
      * Value of this [Var].
      */
-    var value: Char
+    override var value: Char
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
@@ -186,12 +186,12 @@ interface CharVar {
  * Int version of [Var].
  * @see Var
  */
-interface IntVar {
+interface IntVar : IntVal {
 
     /**
      * Value of this [Var].
      */
-    var value: Int
+    override var value: Int
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
@@ -225,12 +225,12 @@ interface IntVar {
  * Long version of [Var].
  * @see Var
  */
-interface LongVar {
+interface LongVar : LongVal {
 
     /**
      * Value of this [Var].
      */
-    var value: Long
+    override var value: Long
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
@@ -264,12 +264,12 @@ interface LongVar {
  * Float version of [Var].
  * @see Var
  */
-interface FloatVar {
+interface FloatVar : FloatVal {
 
     /**
      * Value of this [Var].
      */
-    var value: Float
+    override var value: Float
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
@@ -303,12 +303,12 @@ interface FloatVar {
  * Double version of [Var].
  * @see Var
  */
-interface DoubleVar {
+interface DoubleVar : DoubleVal {
 
     /**
      * Value of this [Var].
      */
-    var value: Double
+    override var value: Double
 
     /**
      * Returns this as [Var], they are equivalent and have same status, any operation will affect each other.
