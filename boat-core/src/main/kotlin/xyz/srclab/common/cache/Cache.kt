@@ -1,27 +1,28 @@
 package xyz.srclab.common.cache
 
-import com.github.benmanes.caffeine.cache.Caffeine
-import com.google.common.cache.RemovalListener
 import com.google.common.collect.MapMaker
 import xyz.srclab.annotations.concurrent.ThreadSafe
 import xyz.srclab.common.base.Val
-import xyz.srclab.common.base.asTyped
-import xyz.srclab.common.base.availableProcessors
-import xyz.srclab.common.cache.Cache.*
+import xyz.srclab.common.base.defaultConcurrencyLevel
+import xyz.srclab.common.cache.Cache.Builder
+import xyz.srclab.common.cache.Cache.Companion.newBuilder
 import java.time.Duration
 import java.util.function.Function
-import com.github.benmanes.caffeine.cache.RemovalCause as caffeineRemovalCause
-import com.google.common.cache.RemovalCause as guavaRemovalCause
 
 /**
- * A simple cache interface, thread-safe, default implemented by:
+ * A simple cache interface, thread-safe, built-in implemented by:
  *
- * * [guava](https://github.com/google/guava)
- * * [caffeine](https://github.com/ben-manes/caffeine).
+ * * [caffeine](https://github.com/ben-manes/caffeine): [CaffeineCache], [LoadingCaffeineCache];
+ * * [guava](https://github.com/google/guava): [GuavaCache], [LoadingGuavaCache];
+ * * Map: [MapCache], [LoadingMapCache];
  *
- * A cache may have a default loader, when use `get` methods,
+ * To create a [Cache], you can use static methods of [Cache], or [Cache.Builder] from [newBuilder].
+ * [Cache.Builder] uses `caffeine`(default) and `guava` to build [Cache].
+ *
+ * A cache may have a default loader ([Cache.Builder.loader]). When use `get` methods,
  * the default loader will be called automatically if the value doesn't exist.
- * The loader uses [Val] to wrap loaded value, or -- if loading failed, return null.
+ * The loader uses [CacheVal] to wrap loaded value, or -- if loading failed, return null.
+ * Generally we call the [Cache] which has a default loader -- Loading Cache.
  *
  * The key must not null but null value is permitted.
  *
@@ -61,7 +62,13 @@ interface Cache<K : Any, V> {
      * The [loader] should use [CacheVal] to wrap the loaded value, or return null if it can't load the value.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun get(key: K, loader: Function<in K, CacheVal<V>?>): V
+    fun get(key: K, loader: Function<in K, out CacheVal<V>?>): V {
+        val cv = getVal(key, loader)
+        if (cv === null) {
+            throw NoSuchElementException(key.toString())
+        }
+        return cv.value
+    }
 
     /**
      * Returns the value associated with the [key] in this cache, wrapped by [CacheVal].
@@ -71,7 +78,7 @@ interface Cache<K : Any, V> {
      * The [loader] should use [CacheVal] to wrap the loaded value, or return null if it can't load the value.
      */
     @Throws(CacheException::class)
-    fun getVal(key: K, loader: Function<in K, CacheVal<V>?>): Val<V>?
+    fun getVal(key: K, loader: Function<in K, out CacheVal<V>?>): CacheVal<V>?
 
     /**
      * Returns the value associated with the [key] in this cache.
@@ -80,7 +87,13 @@ interface Cache<K : Any, V> {
      * Note whatever this cache has a default loader, it never loads the new value.
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun getPresent(key: K): V
+    fun getPresent(key: K): V {
+        val cv = getPresentVal(key)
+        if (cv === null) {
+            throw NoSuchElementException(key.toString())
+        }
+        return cv.value
+    }
 
     /**
      * Returns the value associated with the [key] in this cache, wrapped by [CacheVal].
@@ -126,7 +139,7 @@ interface Cache<K : Any, V> {
         var expireAfterAccess: Duration? = null
         var expireAfterWrite: Duration? = null
         var refreshAfterWrite: Duration? = null
-        var loader: Function<in K, Val<V>?>? = null
+        var loader: Function<in K, out CacheVal<V>?>? = null
         var useGuava = false
 
         /**
@@ -176,7 +189,7 @@ interface Cache<K : Any, V> {
          * Sets loader used to automatically load the value if the entry is miss.
          * The loader should use [Val] to wrap loaded value, or -- if loading failed, return null.
          */
-        fun loader(loader: Function<in K, Val<V>?>): Builder<K, V> = apply {
+        fun loader(loader: Function<in K, out CacheVal<V>?>): Builder<K, V> = apply {
             this.loader = loader
         }
 
@@ -192,119 +205,13 @@ interface Cache<K : Any, V> {
          * Builds the cache.
          */
         fun build(): Cache<K, V> {
-            val params = Params(
-                initialCapacity,
-                maxCapacity,
-                concurrencyLevel,
-                expireAfterAccess,
-                expireAfterWrite,
-                refreshAfterWrite,
-                loader,
-                listener,
-            )
+            val loader = this.loader
             return if (useGuava) {
-                buildGuavaCache(params)
+                if (loader === null) GuavaCache(this) else LoadingGuavaCache(this)
             } else {
-                buildCaffeineCache(params)
+                if (loader === null) CaffeineCache(this) else LoadingCaffeineCache(this)
             }
         }
-
-        private fun buildGuavaCache(params: Params<K, V>): Cache<K, V> {
-            val guavaBuilder = com.google.common.cache.CacheBuilder.newBuilder()
-            if (params.initialCapacity !== null) {
-                guavaBuilder.initialCapacity(params.initialCapacity)
-            }
-            if (params.maxCapacity !== null) {
-                guavaBuilder.maximumSize(params.maxCapacity)
-            }
-            if (params.concurrencyLevel !== null) {
-                guavaBuilder.concurrencyLevel(params.concurrencyLevel)
-            }
-            if (params.expireAfterAccess !== null) {
-                guavaBuilder.expireAfterAccess(params.expireAfterAccess)
-            }
-            if (params.expireAfterWrite !== null) {
-                guavaBuilder.expireAfterWrite(params.expireAfterWrite)
-            }
-            if (params.refreshAfterWrite !== null) {
-                guavaBuilder.refreshAfterWrite(params.refreshAfterWrite)
-            }
-            if (params.listener !== null) {
-                guavaBuilder.removalListener(RemovalListener<K, V> { notification ->
-                    val removeCause: RemoveCause = when (notification.cause!!) {
-                        guavaRemovalCause.EXPLICIT -> RemoveCause.EXPLICIT
-                        guavaRemovalCause.REPLACED -> RemoveCause.REPLACED
-                        guavaRemovalCause.COLLECTED -> RemoveCause.COLLECTED
-                        guavaRemovalCause.EXPIRED -> RemoveCause.EXPIRED
-                        guavaRemovalCause.SIZE -> RemoveCause.SIZE
-                    }
-                    params.listener.afterRemove(notification.key, notification.value, removeCause)
-                })
-            }
-            val loader = params.loader
-            return if (loader === null) {
-                val guavaCache = guavaBuilder.build<K, V>()
-                GuavaCache(guavaCache)
-            } else {
-                val loadingGuavaCache =
-                    guavaBuilder.build(object : com.google.common.cache.CacheLoader<K, V>() {
-                        override fun load(key: K): V {
-                            val wrapper = loader.load(key)
-                        }
-                    })
-                GuavaLoadingCache(loadingGuavaCache)
-            }
-        }
-
-        private fun buildCaffeineCache(params: Params<K, V>): Cache<K, V> {
-            val caffeineBuilder = Caffeine.newBuilder()
-            if (params.initialCapacity !== null) {
-                caffeineBuilder.initialCapacity(params.initialCapacity)
-            }
-            if (params.maxCapacity !== null) {
-                caffeineBuilder.maximumSize(params.maxCapacity)
-            }
-            if (params.expireAfterAccess !== null) {
-                caffeineBuilder.expireAfterAccess(params.expireAfterAccess)
-            }
-            if (params.expireAfterWrite !== null) {
-                caffeineBuilder.expireAfterWrite(params.expireAfterWrite)
-            }
-            if (params.refreshAfterWrite !== null) {
-                caffeineBuilder.refreshAfterWrite(params.refreshAfterWrite)
-            }
-            if (params.removeListener !== null) {
-                caffeineBuilder.removalListener<K, V> { key, value, cause ->
-                    val removeCause: CacheRemoveListener.Cause = when (cause) {
-                        caffeineRemovalCause.EXPLICIT -> CacheRemoveListener.Cause.EXPLICIT
-                        caffeineRemovalCause.REPLACED -> CacheRemoveListener.Cause.REPLACED
-                        caffeineRemovalCause.COLLECTED -> CacheRemoveListener.Cause.COLLECTED
-                        caffeineRemovalCause.EXPIRED -> CacheRemoveListener.Cause.EXPIRED
-                        caffeineRemovalCause.SIZE -> CacheRemoveListener.Cause.SIZE
-                    }
-                    params.removeListener.afterRemove(key.asTyped(), value.asTyped(), removeCause)
-                }
-            }
-            val loader = params.loader
-            return if (loader === null) {
-                val guavaCache = caffeineBuilder.build<K, V>()
-                CaffeineCache(guavaCache)
-            } else {
-                val loadingGuavaCache = caffeineBuilder.build<K, V> { k -> loader.apply(k) }
-                CaffeineLoadingCache(loadingGuavaCache)
-            }
-        }
-
-        private data class Params<K : Any, V>(
-            val initialCapacity: Int? = null,
-            val maxCapacity: Long? = null,
-            val concurrencyLevel: Int? = null,
-            val expireAfterAccess: Duration? = null,
-            val expireAfterWrite: Duration? = null,
-            val refreshAfterWrite: Duration? = null,
-            val loader: Loader<in K, V>? = null,
-            val listener: Listener<in K, in V>? = null,
-        )
     }
 
     companion object {
@@ -313,7 +220,7 @@ interface Cache<K : Any, V> {
          * Returns new builder for Cache interface.
          */
         @JvmStatic
-        fun <K : Any, V : Any> newBuilder(): Builder<K, V> {
+        fun <K : Any, V> newBuilder(): Builder<K, V> {
             return Builder()
         }
 
@@ -323,9 +230,12 @@ interface Cache<K : Any, V> {
          * Note whether the returned cache is thread-safe depends on given [this] map.
          */
         @JvmName("ofMap")
+        @JvmOverloads
         @JvmStatic
-        fun <K : Any, V : Any> MutableMap<K, V>.toCache(): Cache<K, V> {
-            return MapCache(this)
+        fun <K : Any, V> MutableMap<K, CacheVal<V>>.asCache(
+            loader: Function<in K, out CacheVal<V>?>? = null
+        ): Cache<K, V> {
+            return if (loader === null) MapCache(this) else LoadingMapCache(this, loader)
         }
 
         /**
@@ -333,8 +243,11 @@ interface Cache<K : Any, V> {
          */
         @JvmOverloads
         @JvmStatic
-        fun <K : Any, V : Any> ofWeak(concurrencyLevel: Int = availableProcessors() * 2): Cache<K, V> {
-            return MapMaker().concurrencyLevel(concurrencyLevel).weakValues().makeMap<K, V>().toCache()
+        fun <K : Any, V> ofWeak(
+            concurrencyLevel: Int = defaultConcurrencyLevel(),
+            loader: Function<in K, out CacheVal<V>?>? = null,
+        ): Cache<K, V> {
+            return MapMaker().concurrencyLevel(concurrencyLevel).weakValues().makeMap<K, CacheVal<V>>().asCache(loader)
         }
     }
 }
