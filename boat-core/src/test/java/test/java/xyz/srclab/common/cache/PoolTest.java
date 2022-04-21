@@ -78,7 +78,7 @@ public class PoolTest {
         verify.set(0);
 
         // check clean
-        pool.clean();
+        pool.cleanUp();
         for (int i = 0; i < maxSize; i++) {
             Pool.Node<String> node = pool.get();
             //System.out.println(node);
