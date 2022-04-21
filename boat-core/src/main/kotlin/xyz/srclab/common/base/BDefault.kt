@@ -41,6 +41,12 @@ fun defaultRadix(): Int = 10
 fun defaultLocale(): Locale = Locale.ENGLISH
 
 /**
+ * Returns default concurrency level: [availableProcessors] * 2.
+ */
+@JvmName("defaultConcurrencyLevel")
+fun defaultConcurrencyLevel(): Int = availableProcessors() * 4
+
+/**
  * Returns default timestamp pattern: yyyyMMddHHmmssSSS.
  */
 @JvmName("timestampPattern")
