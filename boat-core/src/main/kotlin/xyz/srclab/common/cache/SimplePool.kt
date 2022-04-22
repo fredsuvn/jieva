@@ -6,6 +6,16 @@ import java.util.function.Supplier
 
 /**
  * Simple implementation for [Pool], not thread-safe.
+ *
+ * This implementation has a [coreSize] to specify min number of nodes to keep alive forever,
+ * a [maxSize] to specify max number of nodes.
+ * The nodes in range of [maxSize] - [coreSize] are called `ext` nodes,
+ * [keepAliveMillis] is used to set time to keep alive in millis for them.
+ *
+ * @param coreSize core nodes number
+ * @param maxSize max nodes number
+ * @param keepAliveMillis time for `ext` nodes to keep alive in millis
+ * @param loader value loader when this pool needs to create a new node
  */
 open class SimplePool<T : Any>(
     private val coreSize: Int,
