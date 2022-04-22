@@ -12,9 +12,15 @@ abstract class BaseCaffeineCache<K : Any, V>(
     protected open val cache: com.github.benmanes.caffeine.cache.Cache<K, CacheVal<V>>
 ) : Cache<K, V> {
 
-    override fun getVal(key: K, loader: Function<in K, out CacheVal<V>?>): CacheVal<V>? {
+    override fun getVal(key: K, loader: Function<in K, out V>): CacheVal<V>? {
         try {
-            return cache.get(key, loader)
+            return cache.get(key) {
+                try {
+                    CacheVal.of(loader.apply(it))
+                } catch (e: NoSuchElementException) {
+                    null
+                }
+            }
         } catch (e: Exception) {
             throw CacheException(e)
         }
@@ -125,11 +131,15 @@ private fun <K : Any, V> buildCaffeine(builder: Cache.Builder<K, V>): Caffeine<K
     return caffeine.asTyped()
 }
 
-private fun <K : Any, V> buildCaffeineLoader(loader: Function<in K, out CacheVal<V>?>?): CacheLoader<in K, CacheVal<V>?> {
+private fun <K : Any, V> buildCaffeineLoader(loader: Function<in K, out V>?): CacheLoader<in K, CacheVal<V>?> {
     if (loader === null) {
         throw IllegalArgumentException("Loader must not be null!")
     }
     return CacheLoader {
-        loader.apply(it)
+        try {
+            CacheVal.of(loader.apply(it))
+        } catch (e: NoSuchElementException) {
+            null
+        }
     }
 }

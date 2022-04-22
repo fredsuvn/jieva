@@ -13,9 +13,13 @@ open class MapCache<K : Any, V>(
         return getPresentVal(key)
     }
 
-    override fun getVal(key: K, loader: Function<in K, out CacheVal<V>?>): CacheVal<V>? {
-        try {
-            return map.computeIfAbsent(key, loader)
+    override fun getVal(key: K, loader: Function<in K, out V>): CacheVal<V>? {
+        return try {
+            map.computeIfAbsent(key) {
+                CacheVal.of(loader.apply(key))
+            }
+        } catch (e: NoSuchElementException) {
+            null
         } catch (e: Exception) {
             throw CacheException(e)
         }
@@ -44,8 +48,8 @@ open class MapCache<K : Any, V>(
  * Loading [Cache] based on [MutableMap].
  */
 open class LoadingMapCache<K : Any, V> constructor(
-    private val map: MutableMap<K, CacheVal<V>>,
-    private val loader: Function<in K, out CacheVal<V>?>
+    map: MutableMap<K, CacheVal<V>>,
+    private val loader: Function<in K, out V>
 ) : MapCache<K, V>(map) {
     override fun getVal(key: K): CacheVal<V>? {
         return getVal(key, loader)

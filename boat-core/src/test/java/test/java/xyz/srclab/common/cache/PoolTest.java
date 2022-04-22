@@ -3,6 +3,8 @@ package test.java.xyz.srclab.common.cache;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.cache.Pool;
+import xyz.srclab.common.cache.PoolNode;
+import xyz.srclab.common.cache.SimplePool;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,8 +23,8 @@ public class PoolTest {
         doTestPool(coreSize, maxSize, keepAliveMillis, count, verify, pool);
 
         count.set(0);
-        Pool<String> pool2 = Pool.simplePool(coreSize, maxSize, keepAliveMillis, () -> String.valueOf(count.getAndIncrement()));
-        Pool<String> syncPool = Pool.synchronizedPool(pool2);
+        SimplePool<String> pool2 = Pool.simplePool(coreSize, maxSize, keepAliveMillis, () -> String.valueOf(count.getAndIncrement()));
+        Pool<String> syncPool = pool2.asSynchronized();
         doTestPool(coreSize, maxSize, keepAliveMillis, count, verify, syncPool);
     }
 
@@ -36,16 +38,16 @@ public class PoolTest {
     ) throws Exception {
 
         verify.set(0);
-        List<Pool.Node<String>> nodes = new LinkedList<>();
+        List<PoolNode<String>> nodes = new LinkedList<>();
 
         // check core nodes and ext nodes
         for (int i = 0; i < maxSize; i++) {
-            Pool.Node<String> node = pool.get();
+            PoolNode<String> node = pool.get();
             //System.out.println(node);
             Assert.assertEquals(node.getValue(), String.valueOf(verify.getAndIncrement()));
             nodes.add(node);
         }
-        for (Pool.Node<String> node : nodes) {
+        for (PoolNode<String> node : nodes) {
             node.release();
         }
         nodes.clear();
@@ -53,12 +55,12 @@ public class PoolTest {
 
         // check excess
         for (int i = 0; i < maxSize * 2; i++) {
-            Pool.Node<String> node = pool.get();
+            PoolNode<String> node = pool.get();
             //System.out.println(node);
             Assert.assertEquals(node.getValue(), String.valueOf(verify.getAndIncrement()));
             nodes.add(node);
         }
-        for (Pool.Node<String> node : nodes) {
+        for (PoolNode<String> node : nodes) {
             node.release();
         }
         nodes.clear();
@@ -66,12 +68,12 @@ public class PoolTest {
 
         // check after excess
         for (int i = 0; i < maxSize; i++) {
-            Pool.Node<String> node = pool.get();
+            PoolNode<String> node = pool.get();
             //System.out.println(node);
             Assert.assertEquals(node.getValue(), String.valueOf(verify.getAndIncrement()));
             nodes.add(node);
         }
-        for (Pool.Node<String> node : nodes) {
+        for (PoolNode<String> node : nodes) {
             node.release();
         }
         nodes.clear();
@@ -80,7 +82,7 @@ public class PoolTest {
         // check clean
         pool.cleanUp();
         for (int i = 0; i < maxSize; i++) {
-            Pool.Node<String> node = pool.get();
+            PoolNode<String> node = pool.get();
             //System.out.println(node);
             Assert.assertEquals(node.getValue(), String.valueOf(verify.getAndIncrement()));
             nodes.add(node);
@@ -88,7 +90,7 @@ public class PoolTest {
                 verify.set(count.get());
             }
         }
-        for (Pool.Node<String> node : nodes) {
+        for (PoolNode<String> node : nodes) {
             node.release();
         }
         nodes.clear();
@@ -97,7 +99,7 @@ public class PoolTest {
         // check ext timeout
         Thread.sleep(keepAliveMillis * 2);
         for (int i = 0; i < maxSize; i++) {
-            Pool.Node<String> node = pool.get();
+            PoolNode<String> node = pool.get();
             //System.out.println(node);
             if (verify.get() != coreSize) {
                 // note that pool will return first unused node whatever it is timeout
@@ -108,7 +110,7 @@ public class PoolTest {
                 verify.set(count.get());
             }
         }
-        for (Pool.Node<String> node : nodes) {
+        for (PoolNode<String> node : nodes) {
             node.release();
         }
         nodes.clear();

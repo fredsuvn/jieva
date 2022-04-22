@@ -74,7 +74,7 @@ interface BeanResolver {
             private val cache: Cache<Type, BeanType>
         ) : BeanResolver {
             override fun resolve(type: Type): BeanType {
-                return cache.getOrLoad(type) {
+                return cache.get(type) {
                     super.resolve(type)
                 }
             }

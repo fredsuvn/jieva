@@ -13,18 +13,14 @@ abstract class BaseGuavaCache<K : Any, V>(
     protected open val cache: com.google.common.cache.Cache<K, CacheVal<V>>
 ) : Cache<K, V> {
 
-    override fun getVal(key: K, loader: Function<in K, out CacheVal<V>?>): CacheVal<V>? {
+    override fun getVal(key: K, loader: Function<in K, out V>): CacheVal<V>? {
         try {
             return cache.get(key) {
-                val newCv = loader.apply(key)
-                if (newCv === null) {
-                    throw GuavaLoadingFailedException
-                }
-                newCv
+                CacheVal.of(loader.apply(key))
             }
         } catch (e: ExecutionException) {
             val cause = e.cause
-            if (cause === GuavaLoadingFailedException) {
+            if (cause is NoSuchElementException) {
                 return null
             }
             throw CacheException(e)
@@ -109,7 +105,7 @@ open class LoadingGuavaCache<K : Any, V>(
             return cache.get(key)
         } catch (e: ExecutionException) {
             val cause = e.cause
-            if (cause === GuavaLoadingFailedException) {
+            if (cause is NoSuchElementException) {
                 return null
             }
             throw CacheException(e)
@@ -148,19 +144,17 @@ private fun <K : Any, V> buildGuavaBuilder(builder: Cache.Builder<K, V>): CacheB
     return guavaBuilder.asTyped()
 }
 
-private fun <K : Any, V> buildGuavaLoader(loader: Function<in K, out CacheVal<V>?>?): CacheLoader<K, CacheVal<V>> {
+private fun <K : Any, V> buildGuavaLoader(loader: Function<in K, out V>?): CacheLoader<K, CacheVal<V>> {
     if (loader === null) {
         throw IllegalArgumentException("Loader must not be null!")
     }
     return object : CacheLoader<K, CacheVal<V>>() {
         override fun load(key: K): CacheVal<V> {
-            val newCv = loader.apply(key)
-            if (newCv === null) {
-                throw GuavaLoadingFailedException
+            try {
+                return CacheVal.of(loader.apply(key))
+            } catch (e: NoSuchElementException) {
+                throw e
             }
-            return newCv
         }
     }
 }
-
-private object GuavaLoadingFailedException : RuntimeException()

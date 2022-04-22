@@ -109,6 +109,13 @@ open class SimplePool<T : Any>(
         extNodes.clear()
     }
 
+    /**
+     * Returns synchronized version of this simple pool.
+     */
+    fun asSynchronized(): SynchronizedSimplePool<T> {
+        return SynchronizedSimplePool(this)
+    }
+
     private data class CoreNode<T : Any>(
         override val value: T,
         var inUse: Boolean = false,

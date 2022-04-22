@@ -42,7 +42,7 @@ interface Pool<T : Any> {
             maxSize: Int,
             keepAliveMillis: Long,
             loader: Supplier<T>,
-        ): Pool<T> {
+        ): SimplePool<T> {
             return SimplePool(coreSize, maxSize, keepAliveMillis, loader)
         }
 
@@ -57,7 +57,7 @@ interface Pool<T : Any> {
             maxSize: Int,
             keepAliveMillis: Long,
             loader: Supplier<T>,
-        ): Pool<T> {
+        ): SynchronizedSimplePool<T> {
             val pool = SimplePool(coreSize, maxSize, keepAliveMillis, loader)
             return SynchronizedSimplePool(pool)
         }

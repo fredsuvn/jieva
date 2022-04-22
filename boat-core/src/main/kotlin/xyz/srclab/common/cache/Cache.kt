@@ -5,7 +5,6 @@ import xyz.srclab.annotations.concurrent.ThreadSafe
 import xyz.srclab.common.base.Val
 import xyz.srclab.common.base.defaultConcurrencyLevel
 import xyz.srclab.common.cache.Cache.Builder
-import xyz.srclab.common.cache.Cache.Companion.newBuilder
 import java.time.Duration
 import java.util.function.Function
 
@@ -16,13 +15,12 @@ import java.util.function.Function
  * * [guava](https://github.com/google/guava): [GuavaCache], [LoadingGuavaCache];
  * * Map: [MapCache], [LoadingMapCache];
  *
- * To create a [Cache], you can use static methods of [Cache], or [Cache.Builder] from [newBuilder].
- * [Cache.Builder] uses `caffeine`(default) and `guava` to build [Cache].
+ * To create a [Cache], you can use static methods of [Cache], or [Cache.Builder].
  *
  * A cache may have a default loader ([Cache.Builder.loader]). When use `get` methods,
  * the default loader will be called automatically if the value doesn't exist.
- * The loader uses [CacheVal] to wrap loaded value, or -- if loading failed, return null.
- * Generally we call the [Cache] which has a default loader -- Loading Cache.
+ * If loading failed, the loader will throw a [NoSuchElementException].
+ * If a [Cache] has a default loader, we will call it `Loading Cache`.
  *
  * The key must not null but null value is permitted.
  *
@@ -59,10 +57,10 @@ interface Cache<K : Any, V> {
      * If the value is not found in this cache, try to load by [loader], cache and return.
      * If the [loader] still can't get the value, a [NoSuchElementException] will be thrown.
      *
-     * The [loader] should use [CacheVal] to wrap the loaded value, or return null if it can't load the value.
+     * Note for [loader] if loading failed, the [loader] will throw a [NoSuchElementException].
      */
     @Throws(CacheException::class, NoSuchElementException::class)
-    fun get(key: K, loader: Function<in K, out CacheVal<V>?>): V {
+    fun get(key: K, loader: Function<in K, out V?>): V {
         val cv = getVal(key, loader)
         if (cv === null) {
             throw NoSuchElementException(key.toString())
@@ -75,10 +73,10 @@ interface Cache<K : Any, V> {
      * If the value is not found in this cache, try to load by [loader], cache and return.
      * If the [loader] still can't get the value, return null.
      *
-     * The [loader] should use [CacheVal] to wrap the loaded value, or return null if it can't load the value.
+     * Note for [loader] if loading failed, the [loader] will throw a [NoSuchElementException].
      */
     @Throws(CacheException::class)
-    fun getVal(key: K, loader: Function<in K, out CacheVal<V>?>): CacheVal<V>?
+    fun getVal(key: K, loader: Function<in K, out V?>): CacheVal<V>?
 
     /**
      * Returns the value associated with the [key] in this cache.
@@ -111,6 +109,16 @@ interface Cache<K : Any, V> {
     fun put(key: K, value: V)
 
     /**
+     * Puts the key-value pair into this cache.
+     *
+     * This method is a kotlin `operator` method for [put].
+     */
+    @Throws(CacheException::class)
+    operator fun set(key: K, value: V) {
+        put(key, value)
+    }
+
+    /**
      * Removes the key-value pair from this cache
      */
     @Throws(CacheException::class)
@@ -129,7 +137,7 @@ interface Cache<K : Any, V> {
     fun cleanUp()
 
     /**
-     * Builder for [Cache].
+     * Builder for [Cache]. This builder can build [Cache] based on `caffeine`(default) and `guava`.
      */
     class Builder<K : Any, V> {
 
@@ -139,7 +147,7 @@ interface Cache<K : Any, V> {
         var expireAfterAccess: Duration? = null
         var expireAfterWrite: Duration? = null
         var refreshAfterWrite: Duration? = null
-        var loader: Function<in K, out CacheVal<V>?>? = null
+        var loader: Function<in K, out V>? = null
         var useGuava = false
 
         /**
@@ -189,7 +197,7 @@ interface Cache<K : Any, V> {
          * Sets loader used to automatically load the value if the entry is miss.
          * The loader should use [Val] to wrap loaded value, or -- if loading failed, return null.
          */
-        fun loader(loader: Function<in K, out CacheVal<V>?>): Builder<K, V> = apply {
+        fun loader(loader: Function<in K, out V>): Builder<K, V> = apply {
             this.loader = loader
         }
 
@@ -233,7 +241,7 @@ interface Cache<K : Any, V> {
         @JvmOverloads
         @JvmStatic
         fun <K : Any, V> MutableMap<K, CacheVal<V>>.asCache(
-            loader: Function<in K, out CacheVal<V>?>? = null
+            loader: Function<in K, out V>? = null
         ): Cache<K, V> {
             return if (loader === null) MapCache(this) else LoadingMapCache(this, loader)
         }
@@ -245,7 +253,7 @@ interface Cache<K : Any, V> {
         @JvmStatic
         fun <K : Any, V> ofWeak(
             concurrencyLevel: Int = defaultConcurrencyLevel(),
-            loader: Function<in K, out CacheVal<V>?>? = null,
+            loader: Function<in K, out V>? = null,
         ): Cache<K, V> {
             return MapMaker().concurrencyLevel(concurrencyLevel).weakValues().makeMap<K, CacheVal<V>>().asCache(loader)
         }
