@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets
 import java.util.function.Supplier
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.math.min
 import kotlin.text.lines as linesKt
 import kotlin.text.toCollection as toCollectionKt
 import kotlin.text.toList as toListKt
@@ -402,6 +403,19 @@ fun CharSequence.toCharArray(): CharArray {
 }
 
 /**
+ * Fills [dest] char array with [this] char sequence.
+ */
+@JvmOverloads
+fun CharSequence.fillCharArray(dest: CharArray, offset: Int = 0, length: Int = remainingLength(dest.size, offset)) {
+    val minLen = min(this.length, length)
+    var i = 0
+    while (i < minLen) {
+        dest[offset + i] = this[i]
+        i++
+    }
+}
+
+/**
  * If [this] does not start with [prefix], add the [prefix] as prefix and return; else return itself to String.
  */
 fun CharSequence.addIfNotStartWith(prefix: CharSequence): String {
@@ -491,6 +505,14 @@ fun CharSequence.toList(): List<Char> {
 @JvmSynthetic
 fun lazyString(supplier: Supplier<Any?>): LazyString {
     return LazyString.of(supplier)
+}
+
+/**
+ * Returns this as [java.lang.String].
+ */
+@JvmSynthetic
+fun String.asJavaString(): java.lang.String {
+    return this.asTyped()
 }
 
 /**
@@ -624,6 +646,67 @@ interface LazyString : CharSequence {
             }
         }
     }
+}
+
+/**
+ * [Appendable] implementation using linked nodes to buffer the appended [CharSequence].
+ * This implementation has higher performance than [StringBuilder] in case of frequent appending,
+ * which may cause frequent growing of [StringBuilder].
+ */
+open class StringAppender : Appendable {
+
+    private var charCount = 0
+    private val head = Node("")
+    private var tail = head
+
+    override fun append(csq: CharSequence?): Appendable {
+        return append0(csq ?: defaultNullString())
+    }
+
+    override fun append(csq: CharSequence?, start: Int, end: Int): Appendable {
+        val chars = csq ?: defaultNullString()
+        return append(chars.subRef(start, end))
+    }
+
+    override fun append(c: Char): Appendable {
+        return append0(c.toString())
+    }
+
+    private fun append0(csq: CharSequence): Appendable {
+        val len = csq.length
+        if (len == 0) {
+            return this
+        }
+        charCount += len
+        val newNode = Node(csq)
+        tail.next = newNode
+        tail = newNode
+        return this
+    }
+
+    override fun toString(): String {
+        var curNode = head.next
+        val charArray = CharArray(charCount)
+        var i = 0
+        while (curNode !== null) {
+            val csq = curNode.value
+            val len = csq.length
+            when (csq) {
+                is java.lang.String -> csq.getChars(0, len, charArray, i)
+                is java.lang.StringBuilder -> csq.getChars(0, len, charArray, i)
+                is StringBuffer -> csq.getChars(0, len, charArray, i)
+                else -> csq.fillCharArray(charArray, i)
+            }
+            i += len
+            curNode = curNode.next
+        }
+        return String(charArray)
+    }
+
+    private data class Node(
+        val value: CharSequence,
+        var next: Node? = null,
+    )
 }
 
 private object BStringHolder {

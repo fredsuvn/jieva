@@ -69,4 +69,24 @@ public class BStringTest {
             randomString.toCharArray()
         );
     }
+
+    @Test
+    public void testStringAppender() {
+        StringAppender stringAppender = new StringAppender();
+        StringBuilder stringBuilder = new StringBuilder();
+        String msg = BRandom.randomString(100);
+        for (int i = 0; i < 100; i++) {
+            stringAppender.append(msg);
+            stringBuilder.append(msg);
+        }
+        for (int i = 0; i < 100; i++) {
+            stringAppender.append(msg, 8, 88);
+            stringBuilder.append(msg, 8, 88);
+        }
+        for (int i = 0; i < 100; i++) {
+            stringAppender.append(BString.subRef(msg, 10, 30));
+            stringBuilder.append(BString.subRef(msg, 10, 30));
+        }
+        Assert.assertEquals(stringAppender.toString(), stringBuilder.toString());
+    }
 }

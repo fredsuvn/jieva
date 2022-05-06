@@ -43,7 +43,7 @@ fun defaultLocale(): Locale = Locale.ENGLISH
 /**
  * Returns default concurrency level: [availableProcessors] * 2.
  */
-@JvmName("defaultConcurrencyLevel")
+@JvmName("concurrencyLevel")
 fun defaultConcurrencyLevel(): Int = availableProcessors() * 4
 
 /**
@@ -51,6 +51,12 @@ fun defaultConcurrencyLevel(): Int = availableProcessors() * 4
  */
 @JvmName("timestampPattern")
 fun defaultTimestampPattern(): DatePattern = BDefaultHolder.defaultTimestampPattern
+
+/**
+ * Returns default [String] for `null`.
+ */
+@JvmName("nullString")
+fun defaultNullString(): String = "null"
 
 private object BDefaultHolder {
     private const val defaultTimestampPatternString: String = "yyyyMMddHHmmssSSS"
