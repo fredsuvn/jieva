@@ -5,6 +5,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import xyz.srclab.common.base.BRandom;
+import xyz.srclab.common.base.BString;
 import xyz.srclab.common.base.StringAppender;
 
 import java.util.concurrent.TimeUnit;
@@ -69,35 +70,35 @@ public class CharsBenchmark {
         useStringBuilder0(10000, shortContent);
     }
 
-    @Benchmark
-    public void useStringAppenderCommon() {
-        useStringAppender0(10, commonContent);
-    }
+    //@Benchmark
+    //public void useStringAppenderCommon() {
+    //    useStringAppender0(10, commonContent);
+    //}
+    //
+    //@Benchmark
+    //public void useStringBuilderCommon() {
+    //    useStringBuilder0(10, commonContent);
+    //}
+    //
+    //@Benchmark
+    //public void useStringAppenderAddCommon() {
+    //    useStringAppender0(10000, commonContent);
+    //}
+    //
+    //@Benchmark
+    //public void useStringBuilderAddCommon() {
+    //    useStringBuilder0(10000, commonContent);
+    //}
 
-    @Benchmark
-    public void useStringBuilderCommon() {
-        useStringBuilder0(10, commonContent);
-    }
-
-    @Benchmark
-    public void useStringAppenderAddCommon() {
-        useStringAppender0(10000, commonContent);
-    }
-
-    @Benchmark
-    public void useStringBuilderAddCommon() {
-        useStringBuilder0(10000, commonContent);
-    }
-
-    @Benchmark
-    public void useStringAppenderLong() {
-        useStringAppender0(10, longContent);
-    }
-
-    @Benchmark
-    public void useStringBuilderLong() {
-        useStringBuilder0(10, longContent);
-    }
+    //@Benchmark
+    //public void useStringAppenderLong() {
+    //    useStringAppender0(10, longContent);
+    //}
+    //
+    //@Benchmark
+    //public void useStringBuilderLong() {
+    //    useStringBuilder0(10, longContent);
+    //}
 
     @Benchmark
     public void useStringAppenderAddLong() {
@@ -112,7 +113,7 @@ public class CharsBenchmark {
     public void useStringAppender0(int times, String content) {
         StringAppender stringAppender = new StringAppender();
         for (int i = 0; i < times; i++) {
-            stringAppender.append(content);
+            stringAppender.append(BString.subRef(content, 1));
         }
         stringAppender.toString();
     }
@@ -120,7 +121,7 @@ public class CharsBenchmark {
     public void useStringBuilder0(int times, String content) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < times; i++) {
-            stringBuilder.append(content);
+            stringBuilder.append(BString.subRef(content, 1));
         }
         stringBuilder.toString();
     }

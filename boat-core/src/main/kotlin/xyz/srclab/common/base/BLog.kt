@@ -233,16 +233,16 @@ interface LogPrinter {
 
                 if (callerTrace === null) {
                     writeBytes(
-                        levelString, timestamp.toByteArray(), formattedMessage.charsToBytes(charset),
+                        levelString, timestamp.toByteArray(), formattedMessage.toByteArray(charset),
                         false,
                         EMPTY_BYTES, EMPTY_BYTES, EMPTY_BYTES
                     )
                 } else {
                     writeBytes(
-                        levelString, timestamp.toByteArray(), formattedMessage.charsToBytes(charset),
+                        levelString, timestamp.toByteArray(), formattedMessage.toByteArray(charset),
                         true,
-                        callerTrace.className.charsToBytes(charset),
-                        callerTrace.methodName.charsToBytes(charset),
+                        callerTrace.className.toByteArray(charset),
+                        callerTrace.methodName.toByteArray(charset),
                         "${callerTrace.lineNumber}".toByteArray()
                     )
                 }

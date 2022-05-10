@@ -4,6 +4,7 @@ package xyz.srclab.common.base
 
 import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.StringUtils
+import java.io.Writer
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.function.Supplier
@@ -263,31 +264,21 @@ fun CharSequence.lines(): List<String> {
 /**
  * Converts chars to bytes with [charset].
  */
-@JvmName("toBytes")
 @JvmOverloads
-fun CharSequence.charsToBytes(charset: Charset = defaultCharset()): ByteArray {
-    return this.toString().toByteArray(charset)
+fun CharSequence.toByteArray(charset: Charset = defaultCharset()): ByteArray {
+    return this.toString().asJavaString().getBytes(charset)
 }
 
 /**
  * Converts chars to bytes with [charset].
  */
-@JvmName("toBytes")
 @JvmOverloads
-fun CharArray.charsToBytes(
+fun CharArray.toByteArray(
+    charset: Charset = defaultCharset(),
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
-    charset: Charset = defaultCharset()
 ): ByteArray {
-    return String(this, offset, length).toByteArray(charset)
-}
-
-/**
- * Converts chars to bytes with [charset].
- */
-@JvmName("toBytes")
-fun CharArray.charsToBytes(charset: Charset): ByteArray {
-    return charsToBytes(0, this.size, charset)
+    return String(this, offset, length).asJavaString().getBytes(charset)
 }
 
 /**
@@ -296,63 +287,32 @@ fun CharArray.charsToBytes(charset: Charset): ByteArray {
 @JvmName("toString")
 @JvmOverloads
 fun ByteArray.bytesToString(
+    charset: Charset = defaultCharset(),
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
-    charset: Charset = defaultCharset()
 ): String {
     return String(this, offset, length, charset)
 }
 
 /**
- * Converts bytes to String with [charset].
+ * Converts chars to bytes, each of char will be seen as an 8-bit byte.
  */
-@JvmName("toString")
-fun ByteArray.bytesToString(charset: Charset): String {
-    return String(this, charset)
-}
-
-/**
- * Converts bytes to chars with [charset].
- */
-@JvmName("toChars")
 @JvmOverloads
-fun ByteArray.bytesToChars(
-    offset: Int = 0,
-    length: Int = remainingLength(this.size, offset),
-    charset: Charset = defaultCharset()
-): CharArray {
-    return bytesToString(offset, length, charset).toCharArray()
-}
-
-/**
- * Converts bytes to chars with [charset].
- */
-@JvmName("toChars")
-fun ByteArray.bytesToChars(charset: Charset): CharArray {
-    return bytesToString(charset).toCharArray()
+fun CharSequence.toByteArray8Bit(offset: Int = 0, length: Int = remainingLength(this.length, offset)): ByteArray {
+    //checkRangeInBounds(offset, offset + length, 0, this.length)
+    return toByteArray8Bit(length) { this[it + offset] }
 }
 
 /**
  * Converts chars to bytes, each of char will be seen as an 8-bit byte.
  */
-@JvmName("toBytes8Bit")
 @JvmOverloads
-fun CharSequence.charsToBytes8Bit(offset: Int = 0, length: Int = remainingLength(this.length, offset)): ByteArray {
-    checkRangeInBounds(offset, offset + length, 0, this.length)
-    return charsToBytes8Bit(length) { this[it + offset] }
+fun CharArray.toByteArray8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ByteArray {
+    //checkRangeInBounds(offset, offset + length, 0, this.size)
+    return toByteArray8Bit(length) { this[it + offset] }
 }
 
-/**
- * Converts chars to bytes, each of char will be seen as an 8-bit byte.
- */
-@JvmName("toBytes8Bit")
-@JvmOverloads
-fun CharArray.charsToBytes8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ByteArray {
-    checkRangeInBounds(offset, offset + length, 0, this.size)
-    return charsToBytes8Bit(length) { this[it + offset] }
-}
-
-private inline fun charsToBytes8Bit(
+private inline fun toByteArray8Bit(
     length: Int,
     getChar: (Int) -> Char,
 ): ByteArray {
@@ -376,22 +336,6 @@ fun ByteArray.bytesToString8Bit(offset: Int = 0, length: Int = remainingLength(t
 }
 
 /**
- * Converts bytes to chars, each of char will be seen as an 8-bit byte.
- */
-@JvmName("toChars8Bit")
-@JvmOverloads
-fun ByteArray.bytesToChars8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): CharArray {
-    checkRangeInBounds(offset, offset + length, 0, this.size)
-    val array = CharArray(length)
-    var i = offset
-    while (i < length) {
-        array[i] = this[i + offset].toUnsignedInt().toChar()
-        i++
-    }
-    return array
-}
-
-/**
  * Converts char sequence to char array.
  */
 fun CharSequence.toCharArray(): CharArray {
@@ -406,7 +350,7 @@ fun CharSequence.toCharArray(): CharArray {
  * Fills [dest] char array with [this] char sequence.
  */
 @JvmOverloads
-fun CharSequence.fillCharArray(dest: CharArray, offset: Int = 0, length: Int = remainingLength(dest.size, offset)) {
+fun CharSequence.toCharArray(dest: CharArray, offset: Int = 0, length: Int = remainingLength(dest.size, offset)) {
     val minLen = min(this.length, length)
     var i = 0
     while (i < minLen) {
@@ -464,6 +408,7 @@ fun CharSequence.removeIfEndWith(suffix: CharSequence): String {
  *
  * If [startIndex] is 0 and [endIndex] is length of this, return itself; else return a [CharsRef].
  */
+@JvmOverloads
 fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
     if (startIndex == 0 && endIndex == this.length) {
         return this
@@ -474,6 +419,7 @@ fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharS
 /**
  * Returns [CharsRef] of [this] from [startIndex] inclusive to [endIndex] exclusive.
  */
+@JvmOverloads
 fun CharArray.charsRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
     return CharsRef.of(this, startIndex, endIndex)
 }
@@ -511,7 +457,7 @@ fun lazyString(supplier: Supplier<Any?>): LazyString {
  * Returns this as [java.lang.String].
  */
 @JvmSynthetic
-fun String.asJavaString(): java.lang.String {
+fun String.asJavaString(): JavaString {
     return this.asTyped()
 }
 
@@ -649,62 +595,148 @@ interface LazyString : CharSequence {
 }
 
 /**
- * [Appendable] implementation using linked nodes to buffer the appended [CharSequence].
+ * [Appendable] implementation using linked list to buffer appended objects.
  * This implementation has higher performance than [StringBuilder] in case of frequent appending,
- * which may cause frequent growing of [StringBuilder].
+ * which may cause frequent growing of char array of [StringBuilder].
  */
-open class StringAppender : Appendable {
+open class StringAppender : SegAppender<StringAppender, CharSequence?>, Appendable, Writer() {
 
     private var charCount = 0
-    private val head = Node("")
+    private var head = Node("")
     private var tail = head
 
-    override fun append(csq: CharSequence?): Appendable {
+    override fun append(csq: CharSequence?): StringAppender {
         return append0(csq ?: defaultNullString())
     }
 
-    override fun append(csq: CharSequence?, start: Int, end: Int): Appendable {
-        val chars = csq ?: defaultNullString()
-        return append(chars.subRef(start, end))
+    override fun append(csq: CharSequence?, start: Int): StringAppender {
+        val chars = (csq ?: defaultNullString()).subRef(start)
+        return append0(chars)
     }
 
-    override fun append(c: Char): Appendable {
-        return append0(c.toString())
+    override fun append(csq: CharSequence?, start: Int, end: Int): StringAppender {
+        val chars = (csq ?: defaultNullString()).subRef(start, end)
+        return append0(chars)
     }
 
-    private fun append0(csq: CharSequence): Appendable {
+    override fun append(c: Char): StringAppender {
+        return append0(c)
+    }
+
+    open fun append(obj: Any?): StringAppender {
+        return when (obj) {
+            null -> append(defaultNullString())
+            is CharSequence -> append0(obj)
+            is CharArray -> append0(obj)
+            is Char -> append0(obj)
+            else -> append0(obj.toString())
+        }
+    }
+
+    override fun write(c: Int) {
+        append(c.toChar())
+    }
+
+    override fun write(cbuf: CharArray) {
+        append0(cbuf)
+    }
+
+    override fun write(str: String) {
+        append0(str)
+    }
+
+    override fun write(str: String, off: Int, len: Int) {
+        append0(str.subRef(off, endIndex(off, len)))
+    }
+
+    override fun write(cbuf: CharArray, off: Int, len: Int) {
+        append0(cbuf.charsRef(off, endIndex(off, len)))
+    }
+
+    /**
+     * Clears content.
+     */
+    open fun clear() {
+        charCount = 0
+        head.next = null
+        tail = head
+    }
+
+    private fun append0(csq: CharSequence): StringAppender {
         val len = csq.length
         if (len == 0) {
             return this
         }
+        val newNode = Node(csq.toString())
         charCount += len
-        val newNode = Node(csq)
         tail.next = newNode
         tail = newNode
         return this
     }
 
+    private fun append0(chars: CharArray): StringAppender {
+        val len = chars.size
+        if (len == 0) {
+            return this
+        }
+        val newNode = Node(chars.copyOf(len))
+        charCount += len
+        tail.next = newNode
+        tail = newNode
+        return this
+    }
+
+    private fun append0(c: Char): StringAppender {
+        val newNode = Node(c)
+        charCount += 1
+        tail.next = newNode
+        tail = newNode
+        return this
+    }
+
+    /**
+     * Builds appended parts as one [String].
+     */
     override fun toString(): String {
-        var curNode = head.next
+        var curNode: Node? = head
         val charArray = CharArray(charCount)
         var i = 0
         while (curNode !== null) {
-            val csq = curNode.value
-            val len = csq.length
-            when (csq) {
-                is java.lang.String -> csq.getChars(0, len, charArray, i)
-                is java.lang.StringBuilder -> csq.getChars(0, len, charArray, i)
-                is StringBuffer -> csq.getChars(0, len, charArray, i)
-                else -> csq.fillCharArray(charArray, i)
+            val value = curNode.value
+            var len = 0
+            when (value) {
+                is JavaString -> {
+                    len = value.length
+                    value.getChars(0, len, charArray, i)
+                }
+                is CharArray -> {
+                    len = value.size
+                    System.arraycopy(value, 0, charArray, i, len)
+                }
+                is Char -> {
+                    len = 1
+                    charArray[i] = value
+                }
+                else -> throw IllegalStateException("Unknown value type: ${value.javaClass}")
             }
             i += len
             curNode = curNode.next
         }
-        return String(charArray)
+        val result = String(charArray)
+        val newNode = Node(result)
+        head.next = newNode
+        tail = newNode
+        return result
+    }
+
+    override fun close() {
+    }
+
+    override fun flush() {
     }
 
     private data class Node(
-        val value: CharSequence,
+        val value: Any,
         var next: Node? = null,
     )
 }

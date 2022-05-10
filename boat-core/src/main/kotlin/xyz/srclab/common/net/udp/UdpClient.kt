@@ -1,6 +1,6 @@
 package xyz.srclab.common.net.udp
 
-import xyz.srclab.common.base.charsToBytes
+import xyz.srclab.common.base.toByteArray
 import xyz.srclab.common.base.defaultBufferSize
 import xyz.srclab.common.base.defaultCharset
 import xyz.srclab.common.base.remainingLength
@@ -45,7 +45,7 @@ interface UdpClient {
     }
 
     fun send(address: SocketAddress, data: String, charset: Charset) {
-        send(address, data.charsToBytes(charset))
+        send(address, data.toByteArray(charset))
     }
 
     companion object {

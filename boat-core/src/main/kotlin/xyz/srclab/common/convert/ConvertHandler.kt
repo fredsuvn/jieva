@@ -143,8 +143,8 @@ open class StringConvertHandler @JvmOverloads constructor(
                 else -> null
             }
             ByteArray::class.java -> when (from) {
-                is CharSequence -> from.charsToBytes(charset)
-                is CharArray -> from.charsToBytes(charset)
+                is CharSequence -> from.toByteArray(charset)
+                is CharArray -> from.toByteArray(charset)
                 else -> null
             }
             else -> null

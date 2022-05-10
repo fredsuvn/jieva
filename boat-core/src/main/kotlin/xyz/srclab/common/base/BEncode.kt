@@ -44,7 +44,7 @@ fun getDeBase64Length(base64Size: Long): Long {
  */
 @JvmOverloads
 fun CharSequence.base64(charset: Charset = defaultCharset()): String {
-    return this.charsToBytes(charset).base64().bytesToString8Bit()
+    return this.toByteArray(charset).base64().bytesToString8Bit()
 }
 
 /**
@@ -96,7 +96,7 @@ fun InputStream.base64(dest: OutputStream): Long {
  */
 @JvmOverloads
 fun CharSequence.deBase64(charset: Charset = defaultCharset()): String {
-    return this.charsToBytes8Bit().deBase64().bytesToString(charset)
+    return this.toByteArray8Bit().deBase64().bytesToString(charset)
 }
 
 /**
@@ -174,7 +174,7 @@ fun getDeHexLength(hexSize: Long): Long {
  */
 @JvmOverloads
 fun CharSequence.hex(charset: Charset = defaultCharset()): String {
-    return this.charsToBytes(charset).hex().bytesToString8Bit()
+    return this.toByteArray(charset).hex().bytesToString8Bit()
 }
 
 /**
@@ -258,7 +258,7 @@ fun InputStream.hex(dest: OutputStream): Long {
  */
 @JvmOverloads
 fun CharSequence.deHex(charset: Charset = defaultCharset()): String {
-    return this.charsToBytes8Bit().deHex().bytesToString(charset)
+    return this.toByteArray8Bit().deHex().bytesToString(charset)
 }
 
 /**
