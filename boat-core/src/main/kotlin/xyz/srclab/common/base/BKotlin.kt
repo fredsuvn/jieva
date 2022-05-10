@@ -5,9 +5,7 @@ package xyz.srclab.common.base
 import java.util.concurrent.Callable
 import java.util.function.*
 
-/*
- * Java functional interfaces to kotlin function:
- */
+// Java functional interfaces to kotlin function:
 
 fun <T> Supplier<T>.asKotlinFun(): (() -> T) = { this.get() }
 fun IntSupplier.asKotlinFun(): (() -> Int) = { this.asInt }
@@ -15,7 +13,7 @@ fun LongSupplier.asKotlinFun(): (() -> Long) = { this.asLong }
 fun DoubleSupplier.asKotlinFun(): (() -> Double) = { this.asDouble }
 
 fun <T> Predicate<T>.asKotlinFun(): (T) -> Boolean = { this.test(it) }
-fun <T, R> java.util.function.Function<T, R>.asKotlinFun(): (T) -> R = { this.apply(it) }
+fun <T, R> JavaFunction<T, R>.asKotlinFun(): (T) -> R = { this.apply(it) }
 fun <T> Consumer<T>.asKotlinFun(): (T) -> Unit = { this.accept(it) }
 
 fun <T, U> BiPredicate<T, U>.asKotlinFun(): (T, U) -> Boolean = { t, u -> this.test(t, u) }
@@ -42,9 +40,7 @@ fun <T, U> IndexedBiConsumer<T, U>.asKotlinFun(): (Int, T, U) -> Unit = { i, t, 
 fun Runnable.asKotlinFun(): () -> Unit = { this.run() }
 fun <V> Callable<V>.asKotlinFun(): () -> V = { this.call() }
 
-/*
- * Kotlin functions to java functional interfaces:
- */
+// Kotlin functions to java functional interfaces:
 
 private typealias IBiPredicate<T, U> = IndexedBiPredicate<T, U>
 private typealias IBiFunction<T, U, R> = IndexedBiFunction<T, U, R>
@@ -56,7 +52,7 @@ fun <T> (() -> Long).asJavaFun(): LongSupplier = LongSupplier { this() }
 fun <T> (() -> Double).asJavaFun(): DoubleSupplier = DoubleSupplier { this() }
 
 fun <T> ((T) -> Boolean).asJavaFun(): Predicate<T> = Predicate { this(it) }
-fun <T, R> ((T) -> R).asJavaFun(): java.util.function.Function<T, R> = Function { this(it) }
+fun <T, R> ((T) -> R).asJavaFun(): JavaFunction<T, R> = Function { this(it) }
 fun <T> ((T) -> Unit).asJavaFun(): Consumer<T> = Consumer { this(it) }
 
 fun <T, U> ((T, U) -> Boolean).asJavaFun(): BiPredicate<T, U> = BiPredicate { t, u -> this(t, u) }
@@ -82,3 +78,54 @@ fun <T, U> ((Int, T, U) -> Unit).asJavaFun(): IndexedBiConsumer<T, U> = IBiConsu
 
 fun (() -> Any?).asRunnable(): Runnable = Runnable { this() }
 fun <R> (() -> R).asCallable(): Callable<R> = Callable { this() }
+
+// Java types:
+
+/**
+ * Alias for [java.lang.String].
+ */
+typealias JavaString = java.lang.String
+/**
+ * Alias for [java.lang.Boolean].
+ */
+typealias JavaBoolean = java.lang.Boolean
+/**
+ * Alias for [java.lang.Byte].
+ */
+typealias JavaByte = java.lang.Byte
+/**
+ * Alias for [java.lang.Short].
+ */
+typealias JavaShort = java.lang.Short
+/**
+ * Alias for [java.lang.Character].
+ */
+typealias JavaChar = java.lang.Character
+/**
+ * Alias for [java.lang.Integer].
+ */
+typealias JavaInt = java.lang.Integer
+/**
+ * Alias for [java.lang.Long].
+ */
+typealias JavaLong = java.lang.Long
+/**
+ * Alias for [java.lang.Float].
+ */
+typealias JavaFloat = java.lang.Float
+/**
+ * Alias for [java.lang.Double].
+ */
+typealias JavaDouble = java.lang.Double
+/**
+ * Alias for [java.lang.Void].
+ */
+typealias JavaVoid = java.lang.Void
+/**
+ * Alias for [java.lang.Enum].
+ */
+typealias JavaEnum<T> = java.lang.Enum<T>
+/**
+ * Alias for [java.util.function.Function].
+ */
+typealias JavaFunction<T, R> = java.util.function.Function<T, R>
