@@ -30,20 +30,6 @@ fun <T : Any> T?.asNotNull(): T {
 }
 
 /**
- * Returns whether [this] is null.
- */
-fun Any?.isNull(): Boolean {
-    return this === null
-}
-
-/**
- * Returns whether [this] is not null.
- */
-fun Any?.isNotNull(): Boolean {
-    return this !== null
-}
-
-/**
  * Returns whether [this] equals [other].
  */
 fun Any?.equals(other: Any?): Boolean {
@@ -60,38 +46,28 @@ fun Any?.deepEquals(other: Any?): Boolean {
 /**
  * Returns true if [this] equals any of [others].
  */
-fun Any?.equalsAny(vararg others: Any?): Boolean {
-    for (other in others) {
-        if (equals(other)) {
-            return true
-        }
-    }
-    return false
+fun Any?.anyEquals(vararg others: Any?): Boolean {
+    return anyPredicate({ obj -> this.equals(obj) }, *others)
 }
 
 /**
  * Returns true if [this] equals each of [others].
  */
-fun Any?.equalsAll(vararg others: Any?): Boolean {
-    for (other in others) {
-        if (!equals(other)) {
-            return false
-        }
-    }
-    return true
+fun Any?.allEquals(vararg others: Any?): Boolean {
+    return allPredicate({ obj -> this.equals(obj) }, *others)
 }
 
 /**
  * Returns hash code of [this].
  */
-fun Any?.hash(): Int {
+fun Any?.toHash(): Int {
     return this.hashCode()
 }
 
 /**
  * Returns hash code of [this], or array hash code if this is an array.
  */
-fun Any?.arrayHash(): Int {
+fun Any?.arrayToHash(): Int {
     return when (this) {
         is BooleanArray -> Arrays.hashCode(this)
         is ByteArray -> Arrays.hashCode(this)
@@ -102,7 +78,7 @@ fun Any?.arrayHash(): Int {
         is FloatArray -> Arrays.hashCode(this)
         is DoubleArray -> Arrays.hashCode(this)
         is Array<*> -> Arrays.hashCode(this)
-        else -> hash()
+        else -> toHash()
     }
 }
 
@@ -111,7 +87,7 @@ fun Any?.arrayHash(): Int {
  * or array hash code if this is an array,
  * or deep array hash code if this is a deep array.
  */
-fun Any?.deepHash(): Int {
+fun Any?.deepToHash(): Int {
     return when (this) {
         is BooleanArray -> Arrays.hashCode(this)
         is ByteArray -> Arrays.hashCode(this)
@@ -122,19 +98,22 @@ fun Any?.deepHash(): Int {
         is FloatArray -> Arrays.hashCode(this)
         is DoubleArray -> Arrays.hashCode(this)
         is Array<*> -> Arrays.deepHashCode(this)
-        else -> hash()
+        else -> toHash()
     }
 }
 
 /**
- * Returns array hash code of [args].
+ * Returns a hash code based on the contents of this array as if it is `List`.
  */
-fun arrayHash(vararg args: Any?): Int {
+fun hash(vararg args: Any?): Int {
     return args.contentHashCode()
 }
 
 /**
- * Returns deep array hash code of [args].
+ * Returns a hash code based on the contents of this array as if it is `List`.
+ * Nested arrays are treated as lists too.
+ *
+ * If any of arrays contains itself on any nesting level the behavior is undefined.
  */
 fun deepHash(vararg args: Any?): Int {
     return args.contentDeepHashCode()
@@ -143,7 +122,7 @@ fun deepHash(vararg args: Any?): Int {
 /**
  * Returns identity hash code with [System.identityHashCode].
  */
-fun Any?.idHashCode(): Int {
+fun Any?.idHash(): Int {
     return System.identityHashCode(this)
 }
 

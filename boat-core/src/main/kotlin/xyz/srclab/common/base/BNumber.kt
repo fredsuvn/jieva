@@ -16,22 +16,22 @@ import kotlin.text.toLong as toLongKt
 import kotlin.text.toShort as toShortKt
 
 /**
- * Returns 100 of which type is [BigInteger].
+ * Returns value 100 in [BigInteger].
  */
 fun hundredInt(): BigInteger = BNumberHolder.HUNDRED_INT
 
 /**
- * Returns 1000 of which type is [BigInteger].
+ * Returns value 1000 in [BigInteger].
  */
 fun thousandInt(): BigInteger = BNumberHolder.THOUSAND_INT
 
 /**
- * Returns 100 of which type is [BigDecimal].
+ * Returns value 100 in [BigDecimal].
  */
 fun hundredDecimal(): BigDecimal = BNumberHolder.HUNDRED_DECIMAL
 
 /**
- * Returns 1000 of which type is [BigDecimal].
+ * Returns value 1000 in [BigDecimal].
  */
 fun thousandDecimal(): BigDecimal = BNumberHolder.THOUSAND_DECIMAL
 
@@ -343,14 +343,14 @@ fun Short.toUnsignedInt(): Int {
  * Returns unsigned long.
  */
 fun Short.toUnsignedLong(): Long {
-    return this.toUnsignedInt().toLong() and 0x0000_FFFF
+    return this.toUnsignedInt().toLong() and 0x0000_FFFFL
 }
 
 /**
  * Returns unsigned long.
  */
 fun Int.toUnsignedLong(): Long {
-    return this.toLong() and 0x0000_0000_FFFF_FFFF
+    return this.toLong() and 0x0000_0000_FFFF_FFFFL
 }
 
 /**
@@ -472,16 +472,16 @@ private class ParsedChars(chars: CharSequence) {
         }
         if (chars.startsWith("0x", offset) || chars.startsWith("0X", offset)) {
             radix = 16
-            content = chars.subRef(offset + 2)
+            content = chars.substring(offset + 2)
         } else if (chars.startsWith("0b", offset) || chars.startsWith("0B", offset)) {
             radix = 2
-            content = chars.subRef(offset + 2)
+            content = chars.substring(offset + 2)
         } else if (chars.startsWith("0", offset)) {
             radix = 8
-            content = chars.subRef(offset + 1)
+            content = chars.substring(offset + 1)
         } else {
             radix = 10
-            content = chars.subRef(offset)
+            content = chars.substring(offset)
         }
     }
 

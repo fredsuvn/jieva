@@ -1,7 +1,7 @@
 package xyz.srclab.common.base
 
 /**
- * Appender interface to append same-type object into one.
+ * Appender interface, to append objects as one.
  *
  * @param A type of this appender
  * @param T type of appendable object

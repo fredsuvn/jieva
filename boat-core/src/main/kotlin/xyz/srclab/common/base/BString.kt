@@ -129,48 +129,28 @@ fun CharSequence.isLeadingZero(): Boolean {
  * Returns true if any of given strings is empty with [isEmpty].
  */
 fun anyEmpty(vararg strings: CharSequence?): Boolean {
-    for (charSeq in strings) {
-        if (charSeq.isEmpty()) {
-            return true
-        }
-    }
-    return false
-}
-
-/**
- * Returns true if each of given strings is empty with [isEmpty].
- */
-fun allEmpty(vararg strings: CharSequence?): Boolean {
-    for (charSeq in strings) {
-        if (!charSeq.isEmpty()) {
-            return false
-        }
-    }
-    return true
+    return anyPredicate({ str -> str.isEmpty() }, *strings)
 }
 
 /**
  * Returns true if any of given strings is blank with [isBlank].
  */
 fun anyBlank(vararg strings: CharSequence?): Boolean {
-    for (charSeq in strings) {
-        if (charSeq.isBlank()) {
-            return true
-        }
-    }
-    return false
+    return anyPredicate({ str -> str.isBlank() }, *strings)
+}
+
+/**
+ * Returns true if each of given strings is empty with [isEmpty].
+ */
+fun allEmpty(vararg strings: CharSequence?): Boolean {
+    return allPredicate({ str -> str.isEmpty() }, *strings)
 }
 
 /**
  * Returns true if each given strings is blank with [isBlank].
  */
 fun allBlank(vararg strings: CharSequence?): Boolean {
-    for (charSeq in strings) {
-        if (!charSeq.isBlank()) {
-            return false
-        }
-    }
-    return true
+    return allPredicate({ str -> str.isBlank() }, *strings)
 }
 
 /**
@@ -213,43 +193,29 @@ fun CharSequence?.charsEquals(other: CharSequence?, ignoreCase: Boolean = false)
 /**
  * Returns true if any of [others]'s char sequence equals to [this]'s with [charsEquals].
  */
-@JvmName("equalsAny")
-fun CharSequence?.charsEqualsAny(vararg others: CharSequence?): Boolean {
-    return this.charsEqualsAny(false, *others)
+fun CharSequence?.anyEquals(vararg others: CharSequence?): Boolean {
+    return this.anyEquals(false, *others)
 }
 
 /**
  * Returns true if each of [others]'s char sequence equals to [this]'s with [charsEquals].
  */
-@JvmName("equalsAll")
-fun CharSequence?.charsEqualsAll(vararg others: CharSequence?): Boolean {
-    return this.charsEqualsAll(false, *others)
+fun CharSequence?.allEquals(vararg others: CharSequence?): Boolean {
+    return this.allEquals(false, *others)
 }
 
 /**
  * Returns true if any of [others]'s char sequence equals to [this]'s with [charsEquals].
  */
-@JvmName("equalsAny")
-fun CharSequence?.charsEqualsAny(ignoreCase: Boolean, vararg others: CharSequence?): Boolean {
-    for (other in others) {
-        if (this.charsEquals(other, ignoreCase)) {
-            return true
-        }
-    }
-    return false
+fun CharSequence?.anyEquals(ignoreCase: Boolean, vararg others: CharSequence?): Boolean {
+    return anyPredicate({ str -> this.charsEquals(str, ignoreCase) }, *others)
 }
 
 /**
  * Returns true if each of [others]'s char sequence equals to [this]'s with [charsEquals].
  */
-@JvmName("equalsAll")
-fun CharSequence?.charsEqualsAll(ignoreCase: Boolean, vararg others: CharSequence?): Boolean {
-    for (other in others) {
-        if (!this.charsEquals(other, ignoreCase)) {
-            return false
-        }
-    }
-    return true
+fun CharSequence?.allEquals(ignoreCase: Boolean, vararg others: CharSequence?): Boolean {
+    return allPredicate({ str -> this.charsEquals(str, ignoreCase) }, *others)
 }
 
 /**
@@ -270,18 +236,6 @@ fun CharSequence.toByteArray(charset: Charset = defaultCharset()): ByteArray {
 }
 
 /**
- * Converts chars to bytes with [charset].
- */
-@JvmOverloads
-fun CharArray.toByteArray(
-    charset: Charset = defaultCharset(),
-    offset: Int = 0,
-    length: Int = remainingLength(this.size, offset),
-): ByteArray {
-    return String(this, offset, length).asJavaString().getBytes(charset)
-}
-
-/**
  * Converts bytes to String with [charset].
  */
 @JvmName("toString")
@@ -291,6 +245,7 @@ fun ByteArray.bytesToString(
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
 ): String {
+    this.decodeToString()
     return String(this, offset, length, charset)
 }
 

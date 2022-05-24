@@ -28,12 +28,12 @@ public class BObjectTest {
     @Test
     public void testHash() {
         Object obj = new Object();
-        Assert.assertEquals(BObject.hash(obj), obj.hashCode());
-        Assert.assertNotEquals(BObject.hash(new int[]{1, 2, 3}), BObject.hash(new int[]{1, 2, 3}));
+        Assert.assertEquals(BObject.toHash(obj), obj.hashCode());
+        Assert.assertNotEquals(BObject.toHash(new int[]{1, 2, 3}), BObject.toHash(new int[]{1, 2, 3}));
 
-        Assert.assertEquals(BObject.arrayHash(new int[]{1, 2, 3}), BObject.arrayHash(new int[]{1, 2, 3}));
+        Assert.assertEquals(BObject.arrayToHash(new int[]{1, 2, 3}), BObject.arrayToHash(new int[]{1, 2, 3}));
         Assert.assertNotEquals(
-            BObject.arrayHash(1, new int[]{1, 2, 3}, 3), BObject.arrayHash(1, new int[]{1, 2, 3}, 3));
+            BObject.hash(1, new int[]{1, 2, 3}, 3), BObject.hash(1, new int[]{1, 2, 3}, 3));
 
         Assert.assertEquals(
             BObject.deepHash(1, new int[]{1, 2, 3}, 3), BObject.deepHash(1, new int[]{1, 2, 3}, 3));
