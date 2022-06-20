@@ -1,11 +1,12 @@
-@file:JvmName("BLang")
+@file:JvmName("BtLang")
 
 package xyz.srclab.common.base
 
 /**
  * Gets or creates a new value.
- * This function is usually used for operation which checks the value is null, if it is not, return,
- * else create a new one then set and return.
+ * This function is usually used for the pattern:
+ *
+ * Checks whether the value is null, if it is not, return, else create a new one and set and return.
  */
 inline fun <T> getOrNew(
     lock: Any,
@@ -13,27 +14,27 @@ inline fun <T> getOrNew(
     setter: (T) -> Unit,
     creator: () -> T
 ): T {
-    val current = getter()
-    if (current !== null) {
-        return current
+    val v = getter()
+    if (v !== null) {
+        return v
     }
     synchronized(lock) {
-        val current = getter()
-        if (current !== null) {
-            return current
+        val v0 = getter()
+        if (v0 !== null) {
+            return v0
         }
-        val newOne = creator()
-        setter(newOne)
-        return newOne
+        val nv = creator()
+        setter(nv)
+        return nv
     }
 }
 
 /**
- * Abstract class represents a final object, which will cache the values of [hashCode] and [toString].
+ * Abstract class represents a final class, which will cache the values of [hashCode] and [toString].
  * The subclass should implement [hashCode0] and [toString0] to compute the values of [hashCode] and [toString],
  * each computation will be processed only once.
  */
-abstract class FinalObject {
+abstract class FinalClass {
 
     private var _hashCode: Int? = null
     private var _toString: String? = null
@@ -66,6 +67,12 @@ abstract class FinalObject {
      */
     protected abstract fun toString0(): String
 }
+
+/*
+ * --------------------------------------------------------------------------------
+ *  Extension Java functional interfaces start:
+ * --------------------------------------------------------------------------------
+ */
 
 /**
  * Functional interface represents [java.util.function.Predicate] with index.
@@ -108,3 +115,9 @@ fun interface IndexedBiFunction<T, U, R> {
 fun interface IndexedBiConsumer<T, U> {
     fun accept(index: Int, t: T, u: U)
 }
+
+/*
+ * --------------------------------------------------------------------------------
+ *  Extension Java functional interfaces end:
+ * --------------------------------------------------------------------------------
+ */
