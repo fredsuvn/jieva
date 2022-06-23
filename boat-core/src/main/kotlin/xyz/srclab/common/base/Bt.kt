@@ -1,15 +1,16 @@
-@file:JvmName("BObject")
+@file:JvmName("Bt")
 
 package xyz.srclab.common.base
 
 import java.util.*
+import java.util.function.Supplier
 import kotlin.toString as toStringKt
 
 /**
  * Casts [this] to any type.
  */
 @JvmName("as")
-fun <T> Any?.asTyped(): T {
+fun <T> Any?.asType(): T {
     return this as T
 }
 
@@ -18,12 +19,12 @@ fun <T> Any?.asTyped(): T {
  */
 @JvmSynthetic
 @JvmName("as")
-fun <T> Nothing?.asTyped(): T {
+fun <T> Nothing?.asType(): T {
     return this as T
 }
 
 /**
- * Casts [this] to any type, not null.
+ * Casts [this] to any non-null type.
  */
 fun <T : Any> T?.asNotNull(): T {
     return this as T
@@ -60,14 +61,21 @@ fun Any?.allEquals(vararg others: Any?): Boolean {
 /**
  * Returns hash code of [this].
  */
-fun Any?.toHash(): Int {
+fun Any?.hash(): Int {
     return this.hashCode()
+}
+
+/**
+ * Returns identity hash code with [System.identityHashCode].
+ */
+fun Any?.idHash(): Int {
+    return System.identityHashCode(this)
 }
 
 /**
  * Returns hash code of [this], or array hash code if this is an array.
  */
-fun Any?.arrayToHash(): Int {
+fun Any?.arrayHash(): Int {
     return when (this) {
         is BooleanArray -> Arrays.hashCode(this)
         is ByteArray -> Arrays.hashCode(this)
@@ -78,7 +86,7 @@ fun Any?.arrayToHash(): Int {
         is FloatArray -> Arrays.hashCode(this)
         is DoubleArray -> Arrays.hashCode(this)
         is Array<*> -> Arrays.hashCode(this)
-        else -> toHash()
+        else -> hash()
     }
 }
 
@@ -87,7 +95,7 @@ fun Any?.arrayToHash(): Int {
  * or array hash code if this is an array,
  * or deep array hash code if this is a deep array.
  */
-fun Any?.deepToHash(): Int {
+fun Any?.deepHash(): Int {
     return when (this) {
         is BooleanArray -> Arrays.hashCode(this)
         is ByteArray -> Arrays.hashCode(this)
@@ -98,7 +106,7 @@ fun Any?.deepToHash(): Int {
         is FloatArray -> Arrays.hashCode(this)
         is DoubleArray -> Arrays.hashCode(this)
         is Array<*> -> Arrays.deepHashCode(this)
-        else -> toHash()
+        else -> hash()
     }
 }
 
@@ -117,13 +125,6 @@ fun hash(vararg args: Any?): Int {
  */
 fun deepHash(vararg args: Any?): Int {
     return args.contentDeepHashCode()
-}
-
-/**
- * Returns identity hash code with [System.identityHashCode].
- */
-fun Any?.idHash(): Int {
-    return System.identityHashCode(this)
 }
 
 /**
@@ -179,4 +180,18 @@ fun Any?.toCharSeq(): CharSequence {
         this
     else
         this.toStringKt()
+}
+
+/**
+ * Returns [t] if it is not null, or [defaultValue] if [t] is null.
+ */
+fun <T : Any> getOrDefault(t: T?, defaultValue: T): T {
+    return t ?: defaultValue
+}
+
+/**
+ * Returns [t] if it is not null, or computes [supplier] and returns if [t] is null.
+ */
+fun <T : Any> getOrElse(t: T?, supplier: Supplier<T>): T {
+    return t ?: supplier.get()
 }
