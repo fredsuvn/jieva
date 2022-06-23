@@ -1,8 +1,12 @@
 package xyz.srclab.common.base
 
+import java.util.function.Function
+
 /**
  * [Var] represents a variable wrapper, of which [value] is a variable reference can be reassigned,
  * just like the kotlin keyword: `var`.
+ *
+ * @param T type of wrapped value
  */
 interface Var<T> : Val<T> {
 
@@ -10,6 +14,25 @@ interface Var<T> : Val<T> {
      * Value of this [Var].
      */
     override var value: T
+
+    /**
+     * Maps current [value] by [func], returns a new [Var] to wrap the new value.
+     */
+    override fun <R> map(func: Function<in T, out R>): Var<R> {
+        return func.apply(value).toVar()
+    }
+
+    /**
+     * Maps current [value] by [func], returns this [Var] to wrap the new value.
+     *
+     * Note: [map] method will create a new [Var] instance,
+     * but [mapSet] returns this instance itself, it only changes the [value] and casts the generic type of [T].
+     */
+    fun <R> mapSet(func: Function<in T, out R>): Var<R> {
+        val thisVar = this.asType<Var<R>>()
+        thisVar.value = func.apply(value)
+        return thisVar
+    }
 
     companion object {
 

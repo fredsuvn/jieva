@@ -1,8 +1,13 @@
 package xyz.srclab.common.base
 
+import java.util.*
+import java.util.function.Function
+
 /**
  * [Val] represents a value wrapper, of which [value] is a final reference cannot be reassigned,
  * just like the kotlin keyword: `val`.
+ *
+ * @param T type of wrapped value
  */
 interface Val<T> {
 
@@ -10,6 +15,20 @@ interface Val<T> {
      * Value of this [Val].
      */
     val value: T
+
+    /**
+     * Maps current [value] by [func], returns a new [Val] to wrap the new value.
+     */
+    fun <R> map(func: Function<in T, out R>): Val<R> {
+        return func.apply(value).toVal()
+    }
+
+    /**
+     * Returns [Optional] from current [value].
+     */
+    fun toOptional(): Optional<T> {
+        return Optional.ofNullable(value)
+    }
 
     companion object {
 
