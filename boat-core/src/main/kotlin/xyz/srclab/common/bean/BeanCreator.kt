@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.reflect.newInst
 
 /**
@@ -42,6 +42,6 @@ object EmptyConstructorBeanCreator : BeanCreator {
     }
 
     override fun <T, R> build(builder: T): R {
-        return builder.asTyped()
+        return builder.asType()
     }
 }

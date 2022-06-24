@@ -12,9 +12,9 @@ import java.io.Serializable
 @JvmOverloads
 fun <T : Enum<T>> Class<*>.enumValue(name: CharSequence, ignoreCase: Boolean = false): T {
     if (!ignoreCase) {
-        return name.toEnum(this).asTyped()
+        return name.toEnum(this).asType()
     }
-    val values: Array<out Enum<*>>? = this.enumConstants?.asTyped()
+    val values: Array<out Enum<*>>? = this.enumConstants?.asType()
     if (values.isNullOrEmpty()) {
         throw NoSuchEnumException(name.toString())
     }
@@ -33,10 +33,10 @@ fun <T : Enum<T>> Class<*>.enumValue(name: CharSequence, ignoreCase: Boolean = f
 @JvmOverloads
 fun <T> Class<*>.enumValueOrNull(name: CharSequence, ignoreCase: Boolean = false): T? {
     if (!ignoreCase) {
-        return name.toEnumOrNull(this).asTyped()
+        return name.toEnumOrNull(this).asType()
     }
     return try {
-        val values: Array<out Enum<*>>? = this.enumConstants?.asTyped()
+        val values: Array<out Enum<*>>? = this.enumConstants?.asType()
         if (values.isNullOrEmpty()) {
             return null
         }
@@ -70,14 +70,14 @@ fun <T> Class<*>.enumValueOrNull(index: Int): T? {
         return null
     }
     if (index.isInBounds(0, values.size)) {
-        return values[index].asTyped()
+        return values[index].asType()
     }
     return null
 }
 
 private fun CharSequence.toEnum(type: Class<*>): Any {
     try {
-        return JavaEnum.valueOf(type.asTyped<Class<Enum<*>>>(), this.toString())
+        return JavaEnum.valueOf(type.asType<Class<Enum<*>>>(), this.toString())
     } catch (e: Exception) {
         throw NoSuchEnumException(this.toString())
     }

@@ -105,7 +105,7 @@ class BaseSample {
     fun testBaseTypes() {
 
         //Anys examples:
-        val lists = arrayOf<List<*>>().asTyped<Array<List<String>>>()
+        val lists = arrayOf<List<*>>().asType<Array<List<String>>>()
         val hash = Arrays.asList("", 1).anyOrArrayHash()
         val equals = Arrays.asList("", 1).anyOrArrayEquals(Arrays.asList("", 1))
 

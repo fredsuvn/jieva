@@ -40,14 +40,14 @@ fun <A : Any> A.arrayCopyOfRange(fromIndex: Int = 0, toIndex: Int = this.arrayLe
         is FloatArray -> this.copyOfRange(fromIndex, toIndex)
         is DoubleArray -> this.copyOfRange(fromIndex, toIndex)
         else -> throw IllegalArgumentException("Not an array: $this!")
-    }.asTyped()
+    }.asType()
 }
 
 /**
  * Returns new array of [elements].
  */
 fun <T> newArray(vararg elements: T): Array<T> {
-    return elements.asTyped()
+    return elements.asType()
 }
 
 /**
@@ -56,7 +56,7 @@ fun <T> newArray(vararg elements: T): Array<T> {
  * @param A array type
  */
 fun <A> newArrayOfType(type: Type, length: Int): A {
-    return java.lang.reflect.Array.newInstance(type.rawClass.componentType, length).asTyped()
+    return java.lang.reflect.Array.newInstance(type.rawClass.componentType, length).asType()
 }
 
 /**
@@ -101,15 +101,15 @@ fun <A : Any> A.arrayRemove(index: Int): A {
 @JvmName("asList")
 fun <T> Any.arrayAsList(): MutableList<T> {
     return when (this) {
-        is Array<*> -> this.asList().asTyped()
-        is BooleanArray -> this.asList().asTyped()
-        is ByteArray -> this.asList().asTyped()
-        is ShortArray -> this.asList().asTyped()
-        is CharArray -> this.asList().asTyped()
-        is IntArray -> this.asList().asTyped()
-        is LongArray -> this.asList().asTyped()
-        is FloatArray -> this.asList().asTyped()
-        is DoubleArray -> this.asList().asTyped()
+        is Array<*> -> this.asList().asType()
+        is BooleanArray -> this.asList().asType()
+        is ByteArray -> this.asList().asType()
+        is ShortArray -> this.asList().asType()
+        is CharArray -> this.asList().asType()
+        is IntArray -> this.asList().asType()
+        is LongArray -> this.asList().asType()
+        is FloatArray -> this.asList().asType()
+        is DoubleArray -> this.asList().asType()
         else -> throw IllegalArgumentException("Not an array: $this!")
     }
 }
@@ -434,7 +434,7 @@ open class ArrayRef<A : Any> @JvmOverloads constructor(
     @get:JvmName("array") val array: A,
     @get:JvmName("offset") val offset: Int = 0,
     @get:JvmName("length") val length: Int = remainingLength(array.arrayLength(), offset),
-) : FinalObject() {
+) : FinalClass() {
 
     init {
         checkState(array.javaClass.isArray) { "Not an array: $array!" }

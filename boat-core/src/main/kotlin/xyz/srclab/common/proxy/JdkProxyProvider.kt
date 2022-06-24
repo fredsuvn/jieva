@@ -1,6 +1,6 @@
 package xyz.srclab.common.proxy
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.invoke.StaticInvoke
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
@@ -30,7 +30,7 @@ object JdkProxyProvider : ClassProxyProvider {
                 classLoader,
                 arrayOf(sourceClass),
                 ProxyMethodInterceptor(proxyInvoker)
-            ).asTyped()
+            ).asType()
         }
 
         override fun newInst(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {

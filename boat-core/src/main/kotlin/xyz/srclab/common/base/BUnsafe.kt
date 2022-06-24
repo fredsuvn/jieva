@@ -10,7 +10,7 @@ private val unsafe: Unsafe = run {
     val unsafeClass = Class.forName("sun.misc.Unsafe")
     val unsafeField: Field = unsafeClass.getDeclaredField("theUnsafe")
     unsafeField.isAccessible = true
-    unsafeField.get(null).asTyped()
+    unsafeField.get(null).asType()
 }
 
 /**

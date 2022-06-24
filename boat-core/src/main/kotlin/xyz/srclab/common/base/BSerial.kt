@@ -42,7 +42,7 @@ fun Any.writeObject(fileName: CharSequence, close: Boolean = false) {
 @JvmOverloads
 fun <T> InputStream.readObject(close: Boolean = false): T {
     val ooi = ObjectInputStream(this)
-    return ooi.readObject().asTyped<T>().let {
+    return ooi.readObject().asType<T>().let {
         if (close) {
             this.close()
         }

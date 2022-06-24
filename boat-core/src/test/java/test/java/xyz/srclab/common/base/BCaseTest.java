@@ -2,10 +2,7 @@ package test.java.xyz.srclab.common.base;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BCase;
-import xyz.srclab.common.base.BString;
-import xyz.srclab.common.base.CamelCase;
-import xyz.srclab.common.base.NamingCase;
+import xyz.srclab.common.base.*;
 
 public class BCaseTest {
 

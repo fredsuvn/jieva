@@ -2,7 +2,7 @@ package xyz.srclab.common.cache
 
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import java.util.concurrent.ExecutionException
 import java.util.function.Function
 
@@ -141,7 +141,7 @@ private fun <K : Any, V> buildGuavaBuilder(builder: Cache.Builder<K, V>): CacheB
     if (refreshAfterWrite !== null) {
         guavaBuilder.refreshAfterWrite(refreshAfterWrite)
     }
-    return guavaBuilder.asTyped()
+    return guavaBuilder.asType()
 }
 
 private fun <K : Any, V> buildGuavaLoader(loader: Function<in K, out V>?): CacheLoader<K, CacheVal<V>> {

@@ -2,7 +2,7 @@
 
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import java.lang.reflect.Constructor
 
 /**
@@ -36,7 +36,7 @@ fun <T> Class<T>.constructorOrNull(vararg parameterTypes: Class<*>): Constructor
  */
 @JvmName("getConstructors")
 fun <T> Class<T>.constructors(): List<Constructor<T>> {
-    return this.constructors.asList().asTyped()
+    return this.constructors.asList().asType()
 }
 
 /**
@@ -69,7 +69,7 @@ fun <T> Class<T>.declaredConstructorOrNull(vararg parameterTypes: Class<*>): Con
  */
 @JvmName("getDeclaredConstructors")
 fun <T> Class<T>.declaredConstructors(): List<Constructor<T>> {
-    return this.declaredConstructors.asList().asTyped()
+    return this.declaredConstructors.asList().asType()
 }
 
 /**

@@ -187,7 +187,7 @@ interface LogPrinter {
                 }
 
                 //Configures args.
-                val arguments: Array<Any?> = args.asTyped()
+                val arguments: Array<Any?> = args.asType()
                 val length = arguments.size
                 if (arguments.isNotEmpty()) {
                     val lastArgument = arguments[length - 1]

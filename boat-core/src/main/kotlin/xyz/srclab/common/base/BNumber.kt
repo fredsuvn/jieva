@@ -419,7 +419,7 @@ fun Long.toOctalString(size: Int = 22): String {
  * * 0B001100: positive binary;
  */
 fun CharSequence.parseInt(): Int {
-    return ParsedChars(this).toInt()
+    return NumericString(this).toInt()
 }
 
 /**
@@ -434,7 +434,7 @@ fun CharSequence.parseInt(): Int {
  * * 0B001100: positive binary;
  */
 fun CharSequence.parseLong(): Long {
-    return ParsedChars(this).toLong()
+    return NumericString(this).toLong()
 }
 
 /**
@@ -449,14 +449,25 @@ fun CharSequence.parseLong(): Long {
  * * 0B001100: positive binary;
  */
 fun CharSequence.parseBigInteger(): BigInteger {
-    return ParsedChars(this).toBigInteger()
+    return NumericString(this).toBigInteger()
 }
 
-private class ParsedChars(chars: CharSequence) {
+/**
+ * Represents a char sequence of which content is numeric.
+ *
+ * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0B/0x/0X/0`):
+ *
+ * * 123456: positive decimal
+ * * 0xffeecc: positive hex;
+ * * -0xffeecc: negative hex;
+ * * +0774411: positive octal;
+ * * 0B001100: positive binary;
+ */
+class NumericString(chars: CharSequence) {
 
-    private val positive: Boolean
-    private val radix: Int
-    private val content: CharSequence
+     val positive: Boolean
+     val radix: Int
+     val content: CharSequence
 
     init {
         var offset = 0
@@ -485,17 +496,17 @@ private class ParsedChars(chars: CharSequence) {
         }
     }
 
-    fun toInt(): Int {
+     fun toInt(): Int {
         val value = content.toInt(radix)
         return if (positive) value else -value
     }
 
-    fun toLong(): Long {
+     fun toLong(): Long {
         val value = content.toLong(radix)
         return if (positive) value else -value
     }
 
-    fun toBigInteger(): BigInteger {
+     fun toBigInteger(): BigInteger {
         val value = content.toBigInteger(radix)
         return if (positive) value else -value
     }

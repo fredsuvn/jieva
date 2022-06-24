@@ -1,6 +1,6 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
 
@@ -28,7 +28,7 @@ open class MutableSetMap<K, V> @JvmOverloads constructor(
     }
 
     fun getFirst(key: K): V {
-        return get(key)?.iterator()?.next().asTyped()
+        return get(key)?.iterator()?.next().asType()
     }
 
     companion object {
@@ -44,7 +44,7 @@ open class SetMap<K, V> constructor(
 ) : Serializable, Map<K, Set<V>> by map {
 
     fun getFirst(key: K): V {
-        return get(key)?.iterator()?.next().asTyped()
+        return get(key)?.iterator()?.next().asType()
     }
 
     companion object {
@@ -76,15 +76,15 @@ open class MutableListMap<K, V> constructor(
     }
 
     fun getFirst(key: K): V {
-        return get(key)?.get(0).asTyped()
+        return get(key)?.get(0).asType()
     }
 
     fun getLast(key: K): V {
-        return get(key)?.last().asTyped()
+        return get(key)?.last().asType()
     }
 
     fun get(key: K, index: Int): V {
-        return get(key)?.get(index).asTyped()
+        return get(key)?.get(index).asType()
     }
 
     companion object {
@@ -100,15 +100,15 @@ open class ListMap<K, V> constructor(
 ) : Serializable, Map<K, List<V>> by map {
 
     fun getFirst(key: K): V {
-        return get(key)?.get(0).asTyped()
+        return get(key)?.get(0).asType()
     }
 
     fun getLast(key: K): V {
-        return get(key)?.last().asTyped()
+        return get(key)?.last().asType()
     }
 
     fun get(key: K, index: Int): V {
-        return get(key)?.get(index).asTyped()
+        return get(key)?.get(index).asType()
     }
 
     companion object {

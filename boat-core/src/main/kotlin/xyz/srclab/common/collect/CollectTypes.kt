@@ -1,6 +1,6 @@
 package xyz.srclab.common.collect
 
-import xyz.srclab.common.base.FinalObject
+import xyz.srclab.common.base.FinalClass
 import xyz.srclab.common.base.defaultSerialVersion
 import xyz.srclab.common.reflect.parameterizedType
 import xyz.srclab.common.reflect.rawClass
@@ -74,7 +74,7 @@ interface IterableType : Serializable, ParameterizedType {
 
         private class IterableTypeImpl(
             private val parameterizedType: ParameterizedType
-        ) : IterableType, FinalObject() {
+        ) : IterableType, FinalClass() {
 
             override val containerType: Class<*>
             override val componentType: Type
@@ -174,7 +174,7 @@ interface MapType : Serializable, ParameterizedType {
 
         private class MapTypeImpl(
             private val parameterizedType: ParameterizedType
-        ) : MapType, FinalObject() {
+        ) : MapType, FinalClass() {
 
             override val containerType: Class<*>
             override val keyType: Type

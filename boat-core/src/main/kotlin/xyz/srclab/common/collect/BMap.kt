@@ -52,7 +52,7 @@ fun <K, V, C : MutableMap<in K, in V>> C.collect(keyValues: Iterable<Any?>): C {
         val key = iterator.next()
         if (iterator.hasNext()) {
             val value = iterator.next()
-            this[key.asTyped()] = value.asTyped()
+            this[key.asType()] = value.asType()
         } else {
             break
         }
@@ -174,7 +174,7 @@ fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.addAll(
 }
 
 fun <K, V, C : Collection<V>> Map<K, C>.getFirst(key: K): V {
-    return this[key]?.iterator()?.next().asTyped()
+    return this[key]?.iterator()?.next().asType()
 }
 
 fun <K, V> Map<K, V>.filter(predicate: Predicate<in Map.Entry<K, V>>): Map<K, V> {

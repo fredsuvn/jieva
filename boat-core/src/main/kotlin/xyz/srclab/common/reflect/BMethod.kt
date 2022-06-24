@@ -2,7 +2,7 @@
 
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import java.lang.reflect.Method
 import java.util.function.Predicate
 
@@ -197,7 +197,7 @@ fun <C : MutableCollection<in Method>> Class<*>.searchMethods(
  */
 fun <T> Method.invoke(owner: Any?, vararg args: Any?): T {
     return try {
-        this.invoke(owner, *args).asTyped()
+        this.invoke(owner, *args).asType()
     } catch (e: Exception) {
         throw e
     }
@@ -212,7 +212,7 @@ fun <T> Method.invoke(owner: Any?, vararg args: Any?): T {
 fun <T> Method.invokeForcibly(owner: Any?, vararg args: Any?): T {
     return try {
         this.isAccessible = true
-        this.invoke(owner, *args).asTyped()
+        this.invoke(owner, *args).asType()
     } catch (e: Exception) {
         throw e
     }
@@ -227,7 +227,7 @@ fun <T> Method.invokeForcibly(owner: Any?, vararg args: Any?): T {
  */
 fun <T> Method.invokeStatic(vararg args: Any?): T {
     return try {
-        this.invoke(null, *args).asTyped()
+        this.invoke(null, *args).asType()
     } catch (e: Exception) {
         throw e
     }
@@ -242,7 +242,7 @@ fun <T> Method.invokeStatic(vararg args: Any?): T {
 fun <T> Method.invokeStaticForcibly(vararg args: Any?): T {
     return try {
         this.isAccessible = true
-        this.invoke(null, *args).asTyped()
+        this.invoke(null, *args).asType()
     } catch (e: Exception) {
         throw e
     }

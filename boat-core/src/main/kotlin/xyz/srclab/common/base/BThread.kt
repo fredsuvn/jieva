@@ -34,7 +34,7 @@ fun sleep(duration: Duration) {
  */
 @JvmName("getLocal")
 fun <T> getThreadLocal(key: Any): T {
-    return local.get()[key].asTyped()
+    return local.get()[key].asType()
 }
 
 /**
@@ -42,7 +42,7 @@ fun <T> getThreadLocal(key: Any): T {
  */
 @JvmName("setLocal")
 fun <T> setThreadLocal(key: Any, value: Any?): T {
-    return local.get().put(key, value).asTyped()
+    return local.get().put(key, value).asType()
 }
 
 /**

@@ -1,6 +1,6 @@
 package xyz.srclab.common.invoke
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import java.lang.reflect.Method
 
 /**
@@ -24,7 +24,7 @@ fun interface InstInvoke {
      * @param args the arguments of this invocation
      */
     fun <T> invokeTyped(inst: Any, vararg args: Any?): T {
-        return this.invoke(inst, *args).asTyped()
+        return this.invoke(inst, *args).asType()
     }
 
     /**

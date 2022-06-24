@@ -1,6 +1,6 @@
 package xyz.srclab.common.bean
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.base.defaultSerialVersion
 import xyz.srclab.common.invoke.InstInvoke
 import java.io.Serializable
@@ -67,7 +67,7 @@ open class PropertyType(
     }
 
     fun <T> getTypedValue(bean: Any): T {
-        return getValue(bean).asTyped()
+        return getValue(bean).asType()
     }
 
     fun setValue(bean: Any, value: Any?) {

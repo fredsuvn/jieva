@@ -8,7 +8,7 @@ import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.collect.newMap
 import xyz.srclab.common.net.availableSocketAddress
 import xyz.srclab.common.net.tcp.TcpServer
@@ -46,10 +46,10 @@ open class NettyTcpServer @JvmOverloads constructor(
             }
         })
         for (option in options) {
-            bootstrap.option(option.key, option.value.asTyped())
+            bootstrap.option(option.key, option.value.asType())
         }
         for (option in childOptions) {
-            bootstrap.childOption(option.key, option.value.asTyped())
+            bootstrap.childOption(option.key, option.value.asType())
         }
         //val f = bootstrap.bind(port).channel().closeFuture()
         //f.sync()

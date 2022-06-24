@@ -315,7 +315,7 @@ object CollectionConvertHandler : ConvertHandler {
     ): Any {
         val toComponentType = toType.componentType
         if (!toComponentType.isPrimitive) {
-            return from.toArray(toComponentType.asTyped<Class<Any?>>()) {
+            return from.toArray(toComponentType.asType<Class<Any?>>()) {
                 converter.convertOrNull(it, fromComponentType, toComponentType)
             }
         }

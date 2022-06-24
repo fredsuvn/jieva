@@ -4,7 +4,7 @@ package xyz.srclab.common.reflect
 
 import com.google.common.base.CharMatcher
 import org.apache.commons.lang3.ArrayUtils
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.base.currentThread
 import xyz.srclab.common.base.dotMatcher
 import java.lang.reflect.Modifier
@@ -106,7 +106,7 @@ fun defaultClassLoader(): ClassLoader {
 @JvmName("forName")
 @JvmOverloads
 fun <T> CharSequence.classForName(classLoader: ClassLoader = defaultClassLoader()): Class<T> {
-    return Class.forName(this.toString(), true, classLoader).asTyped()
+    return Class.forName(this.toString(), true, classLoader).asType()
 }
 
 /**
@@ -119,7 +119,7 @@ fun <T> CharSequence.classForNameOrNull(classLoader: ClassLoader = defaultClassL
         Class.forName(this.toString(), true, classLoader)
     } catch (e: ClassNotFoundException) {
         null
-    }.asTyped()
+    }.asType()
 }
 
 /**
@@ -147,7 +147,7 @@ fun <T> Class<*>.newInst(parameterTypes: Array<out Class<*>>, args: Array<out An
     } catch (e: NoSuchMethodException) {
         throw e
     }
-    return constructor.newInstance(*args).asTyped()
+    return constructor.newInstance(*args).asType()
 }
 
 /**
@@ -159,7 +159,7 @@ fun <T> Class<*>.newInstOrNull(parameterTypes: Array<out Class<*>>, args: Array<
     } catch (e: NoSuchMethodException) {
         null
     }
-    return constructor?.newInstance(*args)?.asTyped()
+    return constructor?.newInstance(*args)?.asType()
 }
 
 /**

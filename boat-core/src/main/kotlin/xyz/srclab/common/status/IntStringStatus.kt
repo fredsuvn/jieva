@@ -1,6 +1,6 @@
 package xyz.srclab.common.status
 
-import xyz.srclab.common.base.FinalObject
+import xyz.srclab.common.base.FinalClass
 import xyz.srclab.common.base.defaultSerialVersion
 import java.io.Serializable
 
@@ -10,7 +10,7 @@ import java.io.Serializable
 open class IntStringStatus @JvmOverloads constructor(
     override val code: Int,
     override val description: String? = null,
-) : Status<Int, String, IntStringStatus>, FinalObject(), Serializable {
+) : Status<Int, String, IntStringStatus>, FinalClass(), Serializable {
 
     override fun withMoreDescription(addition: String): IntStringStatus {
         return IntStringStatus(code, "$description[$addition]")

@@ -16,10 +16,10 @@ public class BRefTest {
     @Test
     public void testRef() {
         Ref<String> ref = Ref.of(null);
-        Assert.assertEquals(ref.orDefault("null"), "null");
+        Assert.assertEquals(ref.getOrDefault("null"), "null");
         Assert.assertFalse(ref.isPresent());
         ref.set("123");
-        Assert.assertEquals(ref.orDefault("null"), "123");
+        Assert.assertEquals(ref.getOrDefault("null"), "123");
         Assert.assertTrue(ref.isPresent());
     }
 

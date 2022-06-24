@@ -3,7 +3,7 @@
 package xyz.srclab.common.bean
 
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.collect.MapType.Companion.toMapType
 import xyz.srclab.common.convert.Converter
 import java.lang.reflect.Type
@@ -67,7 +67,7 @@ fun <T : Any> Any.copyProperties(
 ): T {
     return when {
         this is Map<*, *> && to is MutableMap<*, *> -> {
-            val toMap = to.asTyped<MutableMap<Any?, Any?>>()
+            val toMap = to.asType<MutableMap<Any?, Any?>>()
             val toMapType = toType.toMapType()
             this.forEach { (k, v) ->
                 if (v === null && !copyNull) {
@@ -101,7 +101,7 @@ fun <T : Any> Any.copyProperties(
         this !is Map<*, *> && to is MutableMap<*, *> -> {
             val fromBeanType = beanResolver.resolve(this.javaClass)
             val fromProperties = fromBeanType.properties
-            val toMap = to.asTyped<MutableMap<Any?, Any?>>()
+            val toMap = to.asType<MutableMap<Any?, Any?>>()
             val toMapType = toType.toMapType()
             fromProperties.forEach { (name, fromProperty) ->
                 if (!fromProperty.isReadable) {

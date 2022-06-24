@@ -4,7 +4,7 @@ package xyz.srclab.common.reflect
 
 import xyz.srclab.annotations.Accepted
 import xyz.srclab.annotations.Written
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import java.lang.reflect.*
 
 /**
@@ -36,7 +36,7 @@ val Type.componentTypeOrNull: Type?
  */
 val ParameterizedType.rawClass: Class<*>
     get() {
-        return this.rawType.asTyped()
+        return this.rawType.asType()
     }
 
 /**
@@ -272,7 +272,7 @@ fun Type.eraseTypeParameters(
     typeArguments: Map<TypeVariable<*>, Type>,
     @Written searchStack: MutableSet<TypeVariable<*>> = HashSet()
 ): Type {
-    return eraseTypeParameters(typeArguments.asTyped(), searchStack, false)
+    return eraseTypeParameters(typeArguments.asType(), searchStack, false)
 }
 
 private fun Type.eraseTypeParameters(

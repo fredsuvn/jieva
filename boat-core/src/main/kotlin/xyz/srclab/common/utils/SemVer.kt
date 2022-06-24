@@ -40,7 +40,7 @@ open class SemVer @JvmOverloads constructor(
      * Gets build info.
      */
     val buildMetadata: List<String> = emptyList()
-) : FinalObject(), Comparable<SemVer>, Serializable {
+) : FinalClass(), Comparable<SemVer>, Serializable {
 
     /**
      * Returns this version as normal string:

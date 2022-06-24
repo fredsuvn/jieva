@@ -1,7 +1,7 @@
 package xyz.srclab.common.proxy
 
 import net.sf.cglib.proxy.*
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.invoke.StaticInvoke
 import java.lang.reflect.Method
 import java.util.*
@@ -52,11 +52,11 @@ object CglibProxyProvider : ClassProxyProvider {
     private class ProxyClassImpl<T : Any>(private val enhancer: Enhancer) : ClassProxy<T> {
 
         override fun newInst(): T {
-            return enhancer.create().asTyped()
+            return enhancer.create().asType()
         }
 
         override fun newInst(parameterTypes: Array<Class<*>>, args: Array<Any?>): T {
-            return enhancer.create(parameterTypes, args).asTyped()
+            return enhancer.create(parameterTypes, args).asType()
         }
     }
 }

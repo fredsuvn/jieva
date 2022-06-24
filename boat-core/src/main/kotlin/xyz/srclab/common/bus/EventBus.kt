@@ -1,6 +1,6 @@
 package xyz.srclab.common.bus
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.collect.arrayAdd
 import xyz.srclab.common.collect.arrayRemove
 import xyz.srclab.common.reflect.canAssignedBy
@@ -115,7 +115,7 @@ interface EventBus {
             override fun post(event: Any) {
                 val type = event.javaClass
                 for (handler in handlers) {
-                    val h = handler.asTyped<EventBusHandler<Any>>()
+                    val h = handler.asType<EventBusHandler<Any>>()
                     val ht = handler.eventType
                     if (ht.canAssignedBy(type)) {
                         executor.execute {

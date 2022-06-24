@@ -2,7 +2,7 @@ package xyz.srclab.common.protobuf
 
 import com.google.protobuf.Message
 import com.google.protobuf.MessageOrBuilder
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.bean.BeanCreator
 import xyz.srclab.common.reflect.methodOrNull
 
@@ -22,7 +22,7 @@ object ProtobufBeanCreator : BeanCreator {
                 if (newBuilderMethod === null) {
                     throw IllegalStateException("Cannot find newBuilder method for $outClass")
                 }
-                newBuilderMethod.invoke(null).asTyped()
+                newBuilderMethod.invoke(null).asType()
             }
             //Message
             MessageOrBuilder::class.java.isAssignableFrom(type) -> {
@@ -30,7 +30,7 @@ object ProtobufBeanCreator : BeanCreator {
                 if (newBuilderMethod === null) {
                     throw IllegalStateException("Cannot find newBuilder method for $type")
                 }
-                newBuilderMethod.invoke(null).asTyped()
+                newBuilderMethod.invoke(null).asType()
             }
             //Other bean
             else -> type.newInstance()
@@ -54,12 +54,12 @@ object ProtobufBeanCreator : BeanCreator {
 
     override fun <T, R> build(builder: T): R {
         if (builder === null) {
-            return null.asTyped()
+            return null.asType()
         }
         if (builder is Message.Builder) {
-            return builder.build().asTyped()
+            return builder.build().asType()
         }
-        return builder.asTyped()
+        return builder.asType()
         //val builderType = builder.javaClass
         //return when {
         //    //Message but not builder

@@ -1,6 +1,6 @@
 package xyz.srclab.common.convert
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import xyz.srclab.common.collect.asToList
 import xyz.srclab.common.collect.isEmpty
 import xyz.srclab.common.collect.plusBefore
@@ -66,7 +66,7 @@ interface Converter {
         if (result === ConvertHandler.NULL) {
             return null
         }
-        return result.asTyped()
+        return result.asType()
     }
 
     private fun convertOrNull0(from: Any?, fromType: Type, toType: Type): Any? {

@@ -141,7 +141,7 @@ interface CharsTemplate {
             private class ParameterImpl(
                 override val index: Int,
                 private val content: CharSequence,
-            ) : Parameter, FinalObject() {
+            ) : Parameter, FinalClass() {
 
                 override val length: Int = content.length
 

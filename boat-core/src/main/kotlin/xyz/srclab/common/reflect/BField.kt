@@ -2,7 +2,7 @@
 
 package xyz.srclab.common.reflect
 
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import java.lang.reflect.Field
 import java.util.function.Predicate
 
@@ -193,7 +193,7 @@ fun <T> Field.getValue(owner: Any?, force: Boolean = false): T {
         if (force) {
             this.isAccessible = true
         }
-        this.get(owner).asTyped()
+        this.get(owner).asType()
     } catch (e: IllegalAccessException) {
         throw e
     }

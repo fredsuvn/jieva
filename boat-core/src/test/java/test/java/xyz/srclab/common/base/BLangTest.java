@@ -3,12 +3,9 @@ package test.java.xyz.srclab.common.base;
 import org.jetbrains.annotations.NotNull;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import xyz.srclab.common.base.BString;
-import xyz.srclab.common.base.FinalObject;
+import xyz.srclab.common.base.FinalClass;
 import xyz.srclab.common.base.IndexedPredicate;
 import xyz.srclab.common.base.IntRef;
-
-import java.util.Arrays;
 
 public class BLangTest {
 
@@ -17,7 +14,7 @@ public class BLangTest {
 
         IntRef i = IntRef.of(1);
 
-        class TestFinal extends FinalObject {
+        class TestFinal extends FinalClass {
 
             @Override
             protected int hashCode0() {

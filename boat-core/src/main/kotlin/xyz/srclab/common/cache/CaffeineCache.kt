@@ -2,7 +2,7 @@ package xyz.srclab.common.cache
 
 import com.github.benmanes.caffeine.cache.CacheLoader
 import com.github.benmanes.caffeine.cache.Caffeine
-import xyz.srclab.common.base.asTyped
+import xyz.srclab.common.base.asType
 import java.util.function.Function
 
 /**
@@ -128,7 +128,7 @@ private fun <K : Any, V> buildCaffeine(builder: Cache.Builder<K, V>): Caffeine<K
     if (refreshAfterWrite !== null) {
         caffeine.refreshAfterWrite(refreshAfterWrite)
     }
-    return caffeine.asTyped()
+    return caffeine.asType()
 }
 
 private fun <K : Any, V> buildCaffeineLoader(loader: Function<in K, out V>?): CacheLoader<in K, CacheVal<V>?> {
