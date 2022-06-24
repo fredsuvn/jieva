@@ -59,6 +59,18 @@ fun Any?.allEquals(vararg others: Any?): Boolean {
 }
 
 /**
+ * Returns whether all [args] are equals each other.
+ */
+fun equals(vararg args: Any?): Boolean {
+    for (i in 0..args.size - 2) {
+        if (!Objects.equals(args[i], args[i + 1])) {
+            return false
+        }
+    }
+    return true
+}
+
+/**
  * Returns hash code of [this].
  */
 fun Any?.hash(): Int {
@@ -170,6 +182,20 @@ fun Any?.deepToString(): String {
         is Array<*> -> Arrays.deepToString(this)
         else -> this.toStringKt()
     }
+}
+
+/**
+ * Returns `toString` of given [args] by [arrayToString].
+ */
+fun toString(vararg args: Any?): String {
+    return args.arrayToString()
+}
+
+/**
+ * Returns `deepToString` of given [args] by [deepToString].
+ */
+fun deepToString(vararg args: Any?): String {
+    return args.deepToString()
 }
 
 /**
