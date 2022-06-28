@@ -1,44 +1,66 @@
 package xyz.srclab.common.base
 
+import xyz.srclab.common.base.ByteArrayRef.Companion.arrayRef
+import xyz.srclab.common.base.CharArrayRef.Companion.arrayRef
+import java.io.OutputStream
 import java.io.Writer
-import java.util.LinkedList
+import java.nio.ByteBuffer
 
 /**
  * String appender, used to append objects and finally join them into a [String].
  *
- * This appender is lazy, it stores the given appended object without other computation.
- * It computes join operation only when the [toString] method is called.
+ * This class is lazy, it stores the given appended object without any other computation.
+ * It computes `join-to-string` operation only when the [toString] method is called,
+ * so if content of object previously appended is modified, the final result value will be changed accordingly.
+ *
+ * Note, **DO NOT** modify content of appended object in `join-to-string` processing,
+ * it may cause [ArrayIndexOutOfBoundsException].
  */
 open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appendable, Writer() {
 
-    private val nodes: MutableList<Any?> = LinkedList()
+    private var head = SNode<Any>()
+    private var cur = head
 
     override fun append(t: CharSequence?): StringAppender {
-        nodes.add(t)
+        cur.value = t
+        newTail()
         return this
     }
 
     override fun append(t: CharSequence, startIndex: Int): StringAppender {
-        nodes.add(t.subRef(startIndex))
+        cur.value = t.charsRef(startIndex)
+        newTail()
         return this
     }
 
     override fun append(t: CharSequence, startIndex: Int, endIndex: Int): StringAppender {
+        cur.value = t.charsRef(startIndex, endIndex)
+        newTail()
         return this
     }
 
     override fun append(c: Char): StringAppender {
-        return append0(c)
+        cur.value = c
+        newTail()
+        return this
     }
 
     open fun append(obj: Any?): StringAppender {
-        return when (obj) {
-            null -> append(defaultNullString())
-            is CharSequence -> append0(obj)
-            is CharArray -> append0(obj)
-            is Char -> append0(obj)
-            else -> append0(obj.toString())
-        }
+        cur.value = obj
+        newTail()
+        return this
+    }
+
+    open fun append(chars: CharArray, startIndex: Int): StringAppender {
+        cur.value = chars.arrayRef(startIndex)
+        newTail()
+        return this
+    }
+
+    open fun append(chars: CharArray, startIndex: Int, endIndex: Int): StringAppender {
+        cur.value = chars.arrayRef(startIndex, endIndex)
+        newTail()
+        return this
     }
 
     override fun write(c: Int) {
@@ -46,95 +68,87 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
     }
 
     override fun write(cbuf: CharArray) {
-        append0(cbuf)
+        append(cbuf)
     }
 
     override fun write(str: String) {
-        append0(str)
+        append(str)
     }
 
     override fun write(str: String, off: Int, len: Int) {
-        append0(str.subRef(off, endIndex(off, len)))
+        append(str, off, len)
     }
 
     override fun write(cbuf: CharArray, off: Int, len: Int) {
-        append0(cbuf.subRef(off, endIndex(off, len)))
+        append(cbuf, off, len)
     }
 
     /**
-     * Clears content.
+     * Clears content of this appender.
      */
     open fun clear() {
-        charCount = 0
-        head.next = null
-        tail = head
-    }
-
-    private fun append0(csq: CharSequence): StringAppender {
-        val len = csq.length
-        if (len == 0) {
-            return this
-        }
-        val newNode = Node(csq.toString())
-        charCount += len
-        tail.next = newNode
-        tail = newNode
-        return this
-    }
-
-    private fun append0(chars: CharArray): StringAppender {
-        val len = chars.size
-        if (len == 0) {
-            return this
-        }
-        val newNode = Node(chars.copyOf(len))
-        charCount += len
-        tail.next = newNode
-        tail = newNode
-        return this
-    }
-
-    private fun append0(c: Char): StringAppender {
-        val newNode = Node(c)
-        charCount += 1
-        tail.next = newNode
-        tail = newNode
-        return this
+        val newNode = SNode<Any>()
+        head = newNode
+        cur = newNode
     }
 
     /**
-     * Builds appended parts as one [String].
+     * Joins appended objects into a [String].
      */
     override fun toString(): String {
-        var curNode: Node? = head
-        val charArray = CharArray(charCount)
+        // Computes size:
+        var size = 0
+        var n = head
+        while (n.next !== null) {
+            when (val v = n.value) {
+                null -> size += defaultNullString().length
+                is CharSequence -> size += v.length
+                is CharArray -> size += v.size
+                is CharArrayRef -> size += v.length
+                is Char -> size += 1
+                else -> {
+                    val s = v.toString()
+                    n.value = s
+                    size += s.length
+                }
+            }
+            n = n.next!!
+        }
+        // Fills buffer
+        val buffer = CharArray(size)
         var i = 0
-        while (curNode !== null) {
-            val value = curNode.value
-            var len = 0
-            when (value) {
-                is JavaString -> {
-                    len = value.length
-                    value.getChars(0, len, charArray, i)
+        n = head
+        while (n.next !== null) {
+            val s: Int = when (val v = n.value) {
+                null -> {
+                    defaultNullString().asJavaString().getChars(0, defaultNullString().length, buffer, i)
+                    defaultNullString().length
+                }
+                is String -> {
+                    v.asJavaString().getChars(0, v.length, buffer, i)
+                    v.length
+                }
+                is CharSequence -> {
+                    v.copyTo(buffer, i, v.length)
+                    v.length
                 }
                 is CharArray -> {
-                    len = value.size
-                    System.arraycopy(value, 0, charArray, i, len)
+                    System.arraycopy(v, 0, buffer, i, v.size)
+                    v.size
+                }
+                is CharArrayRef -> {
+                    v.copyTo(buffer, i)
                 }
                 is Char -> {
-                    len = 1
-                    charArray[i] = value
+                    buffer[i] = v
+                    1
                 }
-                else -> throw IllegalStateException("Unknown value type: ${value.javaClass}")
+                else -> throw IllegalStateException("Unknown node value type: ${v.javaClass}")
             }
-            i += len
-            curNode = curNode.next
+            i += s
+            n = n.next!!
         }
-        val result = String(charArray)
-        val newNode = Node(result)
-        head.next = newNode
-        tail = newNode
-        return result
+        return String(buffer)
     }
 
     override fun close() {
@@ -143,10 +157,138 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
     override fun flush() {
     }
 
-    private data class Node(
-        val value: Any,
-        var next: Node? = null,
-    )
+    private fun newTail() {
+        val newNode = SNode<Any>()
+        cur.next = newNode
+        cur = newNode
+    }
+}
+
+/**
+ * Bytes appender, used to append objects and finally join them into a [ByteArray].
+ *
+ * This class is lazy, it stores the given appended object without any other computation.
+ * It computes `join-to-bytes` operation only when the [toByteArray] method is called,
+ * so if content of object previously appended is modified, the final result value will be changed accordingly.
+ *
+ * Note, **DO NOT** modify content of appended object in `join-to-bytes` processing,
+ * it may cause [ArrayIndexOutOfBoundsException].
+ */
+open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStream() {
+
+    private var head = SNode<Any>()
+    private var cur = head
+
+    /**
+     * No operation. Appending null is unsupported by [BytesAppender].
+     */
+    override fun append(t: ByteArray?): BytesAppender {
+        return this
+    }
+
+    override fun append(t: ByteArray, startIndex: Int): BytesAppender {
+        cur.value = t.arrayRef(startIndex)
+        newTail()
+        return this
+    }
+
+    override fun append(t: ByteArray, startIndex: Int, endIndex: Int): BytesAppender {
+        cur.value = t.arrayRef(startIndex, endIndex)
+        newTail()
+        return this
+    }
+
+    fun append(b: Byte): BytesAppender {
+        cur.value = b
+        newTail()
+        return this
+    }
+
+    fun append(buf: ByteBuffer): BytesAppender {
+        cur.value = buf
+        newTail()
+        return this
+    }
+
+    override fun write(b: Int) {
+        append(b.toByte())
+    }
+
+    override fun write(buf: ByteArray) {
+        append(buf)
+    }
+
+    override fun write(buf: ByteArray, off: Int, len: Int) {
+        append(buf, off, len)
+    }
+
+    /**
+     * Clears content of this appender.
+     */
+    open fun clear() {
+        val newNode = SNode<Any>()
+        head = newNode
+        cur = newNode
+    }
+
+    /**
+     * Joins appended objects into a [String].
+     */
+    fun toByteArray(): ByteArray {
+        // Computes size:
+        var size = 0
+        var n = head
+        while (n.next !== null) {
+            size += when (val v = n.value) {
+                is ByteArray -> v.size
+                is ByteArrayRef -> v.length
+                is ByteBuffer -> v.remaining()
+                is Byte -> 1
+                else -> throw IllegalStateException("Unknown node value type: ${v?.javaClass}")
+            }
+            n = n.next!!
+        }
+        // Fills buffer
+        val buffer = ByteArray(size)
+        var i = 0
+        n = head
+        while (n.next !== null) {
+            val s: Int = when (val v = n.value) {
+                is ByteArray -> {
+                    System.arraycopy(v, 0, buffer, i, v.size)
+                    v.size
+                }
+                is ByteArrayRef -> {
+                    v.copyTo(buffer, i)
+                }
+                is ByteBuffer -> {
+                    val remaining = v.remaining()
+                    v.get(buffer, i, remaining)
+                    remaining
+                }
+                is Byte -> {
+                    buffer[i] = v
+                    1
+                }
+                else -> throw IllegalStateException("Unknown node value type: ${v?.javaClass}")
+            }
+            i += s
+            n = n.next!!
+        }
+        return buffer
+    }
+
+    override fun close() {
+    }
+
+    override fun flush() {
+    }
+
+    private fun newTail() {
+        val newNode = SNode<Any>()
+        cur.next = newNode
+        cur = newNode
+    }
 }
 
 /**
@@ -155,12 +297,12 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
  * @param A type of this appender
  * @param T type of appended object
  */
-interface Appender<A : Appender<A, T>, T> {
+interface Appender<A : Appender<A, T>, T : Any> {
 
     /**
      * Appends and returns this.
      */
-    fun append(t: T): A
+    fun append(t: T?): A
 }
 
 /**
@@ -169,7 +311,7 @@ interface Appender<A : Appender<A, T>, T> {
  * @param A type of this appender
  * @param T type of appended object
  */
-interface SegmentAppender<A : SegmentAppender<A, T>, T> : Appender<A, T> {
+interface SegmentAppender<A : SegmentAppender<A, T>, T : Any> : Appender<A, T> {
 
     /**
      * Appends with [startIndex] and returns this.
