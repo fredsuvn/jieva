@@ -80,7 +80,7 @@ interface BooleanVar : BooleanVal {
          */
         @JvmName("of")
         @JvmStatic
-        fun Boolean.toBooleanVar(): BooleanVar {
+        fun Boolean.toVar(): BooleanVar {
             return BooleanVarImpl(this)
         }
 
@@ -119,7 +119,7 @@ interface ByteVar : ByteVal {
          */
         @JvmName("of")
         @JvmStatic
-        fun Byte.toByteVar(): ByteVar {
+        fun Byte.toVar(): ByteVar {
             return ByteVarImpl(this)
         }
 
@@ -158,7 +158,7 @@ interface ShortVar : ShortVal {
          */
         @JvmName("of")
         @JvmStatic
-        fun Short.toShortVar(): ShortVar {
+        fun Short.toVar(): ShortVar {
             return ShortVarImpl(this)
         }
 
@@ -197,7 +197,7 @@ interface CharVar : CharVal {
          */
         @JvmName("of")
         @JvmStatic
-        fun Char.toCharVar(): CharVar {
+        fun Char.toVar(): CharVar {
             return CharVarImpl(this)
         }
 
@@ -236,7 +236,7 @@ interface IntVar : IntVal {
          */
         @JvmName("of")
         @JvmStatic
-        fun Int.toIntVar(): IntVar {
+        fun Int.toVar(): IntVar {
             return IntVarImpl(this)
         }
 
@@ -275,7 +275,7 @@ interface LongVar : LongVal {
          */
         @JvmName("of")
         @JvmStatic
-        fun Long.toLongVar(): LongVar {
+        fun Long.toVar(): LongVar {
             return LongVarImpl(this)
         }
 
@@ -314,7 +314,7 @@ interface FloatVar : FloatVal {
          */
         @JvmName("of")
         @JvmStatic
-        fun Float.toFloatVar(): FloatVar {
+        fun Float.toVar(): FloatVar {
             return FloatVarImpl(this)
         }
 
@@ -353,7 +353,7 @@ interface DoubleVar : DoubleVal {
          */
         @JvmName("of")
         @JvmStatic
-        fun Double.toDoubleVar(): DoubleVar {
+        fun Double.toVar(): DoubleVar {
             return DoubleVarImpl(this)
         }
 
