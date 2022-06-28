@@ -77,7 +77,7 @@ interface ArrayRef<T> {
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
-        fun <T> Array<T>.subRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<T> {
+        fun <T> Array<T>.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): ArrayRef<T> {
             return ArrayRefImpl(this, startIndex, endIndex)
         }
 
@@ -188,7 +188,7 @@ interface BooleanArrayRef {
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
-        fun <T> BooleanArray.subRef(startIndex: Int = 0, endIndex: Int = this.size): BooleanArrayRef {
+        fun <T> BooleanArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): BooleanArrayRef {
             return BooleanArrayRefImp(this, startIndex, endIndex)
         }
 
@@ -299,7 +299,7 @@ interface ByteArrayRef {
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
-        fun <T> ByteArray.subRef(startIndex: Int = 0, endIndex: Int = this.size): ByteArrayRef {
+        fun <T> ByteArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): ByteArrayRef {
             return ByteArrayRefImp(this, startIndex, endIndex)
         }
 
@@ -410,7 +410,7 @@ interface ShortArrayRef {
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
-        fun <T> ShortArray.subRef(startIndex: Int = 0, endIndex: Int = this.size): ShortArrayRef {
+        fun <T> ShortArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): ShortArrayRef {
             return ShortArrayRefImp(this, startIndex, endIndex)
         }
 
@@ -521,7 +521,7 @@ interface CharArrayRef {
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
-        fun <T> CharArray.subRef(startIndex: Int = 0, endIndex: Int = this.size): CharArrayRef {
+        fun <T> CharArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): CharArrayRef {
             return CharArrayRefImp(this, startIndex, endIndex)
         }
 
@@ -632,7 +632,7 @@ interface IntArrayRef {
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
-        fun <T> IntArray.subRef(startIndex: Int = 0, endIndex: Int = this.size): IntArrayRef {
+        fun <T> IntArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): IntArrayRef {
             return IntArrayRefImp(this, startIndex, endIndex)
         }
 
@@ -743,7 +743,7 @@ interface LongArrayRef {
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
-        fun <T> LongArray.subRef(startIndex: Int = 0, endIndex: Int = this.size): LongArrayRef {
+        fun <T> LongArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): LongArrayRef {
             return LongArrayRefImp(this, startIndex, endIndex)
         }
 
@@ -854,7 +854,7 @@ interface FloatArrayRef {
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
-        fun <T> FloatArray.subRef(startIndex: Int = 0, endIndex: Int = this.size): FloatArrayRef {
+        fun <T> FloatArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): FloatArrayRef {
             return FloatArrayRefImp(this, startIndex, endIndex)
         }
 
@@ -965,7 +965,7 @@ interface DoubleArrayRef {
         @JvmName("of")
         @JvmStatic
         @JvmOverloads
-        fun <T> DoubleArray.subRef(startIndex: Int = 0, endIndex: Int = this.size): DoubleArrayRef {
+        fun <T> DoubleArray.arrayRef(startIndex: Int = 0, endIndex: Int = this.size): DoubleArrayRef {
             return DoubleArrayRefImp(this, startIndex, endIndex)
         }
 
