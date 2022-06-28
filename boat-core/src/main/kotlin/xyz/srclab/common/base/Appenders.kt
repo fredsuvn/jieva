@@ -14,7 +14,7 @@ import java.nio.ByteBuffer
  * so if content of object previously appended is modified, the final result value will be changed accordingly.
  *
  * Note, **DO NOT** modify content of appended object in `join-to-string` processing,
- * it may cause [ArrayIndexOutOfBoundsException].
+ * it may cause [IndexOutOfBoundsException].
  */
 open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appendable, Writer() {
 
@@ -172,7 +172,7 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
  * so if content of object previously appended is modified, the final result value will be changed accordingly.
  *
  * Note, **DO NOT** modify content of appended object in `join-to-bytes` processing,
- * it may cause [ArrayIndexOutOfBoundsException].
+ * it may cause [IndexOutOfBoundsException].
  */
 open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStream() {
 

@@ -1,4 +1,4 @@
-@file:JvmName("BCheck")
+@file:JvmName("CheckBt")
 
 package xyz.srclab.common.base
 

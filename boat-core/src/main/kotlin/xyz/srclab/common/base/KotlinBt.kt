@@ -1,9 +1,14 @@
-@file: JvmName("BtKotlin")
+@file: JvmName("KotlinBt")
 
 package xyz.srclab.common.base
 
 import java.util.concurrent.Callable
 import java.util.function.*
+
+/**
+ * Argument to suppress kotlin compile warn.
+ */
+const val INAPPLICABLE_JVM_NAME = "INAPPLICABLE_JVM_NAME"
 
 /*
  * --------------------------------------------------------------------------------

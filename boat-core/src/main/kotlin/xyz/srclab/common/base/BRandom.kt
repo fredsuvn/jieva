@@ -167,12 +167,12 @@ open class RandomSupplierBuilder<T : Any> {
                 val score = random.between(0, totalScore)
                 val index = values.binarySearch {
                     if (it.scoreFrom <= score && it.scoreTo > score) {
-                        return@binarySearch EQUAL_TO
+                        return@binarySearch COMPARE_EQ
                     }
                     if (it.scoreFrom > score) {
-                        return@binarySearch GREATER_THAN
+                        return@binarySearch COMPARE_GT
                     }
-                    LESS_THAN
+                    COMPARE_LT
                 }
                 return values[index].supplier.get()
             }

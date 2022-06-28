@@ -1,4 +1,4 @@
-@file:JvmName("BUnsafe")
+@file:JvmName("UnsafeBt")
 
 package xyz.srclab.common.base
 

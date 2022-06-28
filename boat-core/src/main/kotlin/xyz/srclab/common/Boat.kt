@@ -1,10 +1,10 @@
 package xyz.srclab.common
 
-import xyz.srclab.common.base.loadClasspathProperties
+import xyz.srclab.common.base.loadProperties
 
 object Boat {
 
-    private val buildInfos: Map<String, String> = loadClasspathProperties("META-INF/build.properties")!!
+    private val buildInfos: Map<String, String> = loadProperties("META-INF/build.properties")!!
     private val serialVersion: Long = buildInfos["build.serial.version"]!!.toLong()
     private val version: String = buildInfos["build.version"]!!
 

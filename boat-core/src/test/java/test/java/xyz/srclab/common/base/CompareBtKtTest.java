@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BCompare;
 
-public class BCompareTest {
+public class CompareBtKtTest {
 
     @Test
     public void testCompares() {

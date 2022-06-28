@@ -205,13 +205,13 @@ open class CamelCase @JvmOverloads constructor(
                     //join the former word
                 } else if (cCase == UPPER) {
                     //aA -> a,A
-                    getWordList().add(CaseRef(name.subRef(startIndex, i), false))
+                    getWordList().add(CaseRef(name.charsRef(startIndex, i), false))
                     startIndex = i
                     isAllUpper = false
                 } else if (nonLetterPolicy === NonLetterPolicy.SEPARATE) {
                     //a0 -> a,0
                     //split to new word for non-letter chars
-                    getWordList().add(CaseRef(name.subRef(startIndex, i), false))
+                    getWordList().add(CaseRef(name.charsRef(startIndex, i), false))
                     startIndex = i
                     isAllUpper = false
                 } else {
@@ -222,7 +222,7 @@ open class CamelCase @JvmOverloads constructor(
                     if (startIndex < i - 1) {
                         //AAa -> A,Aa
                         //AAAa -> AA,Aa
-                        getWordList().add(CaseRef(name.subRef(startIndex, i - 1), isAllUpper))
+                        getWordList().add(CaseRef(name.charsRef(startIndex, i - 1), isAllUpper))
                         startIndex = i - 1
                     } else {
                         //Aa -> Aa
@@ -238,7 +238,7 @@ open class CamelCase @JvmOverloads constructor(
                 } else if (nonLetterPolicy === NonLetterPolicy.SEPARATE) {
                     //A0 -> A,0
                     //split to new word for non-letter chars
-                    getWordList().add(CaseRef(name.subRef(startIndex, i), isAllUpper))
+                    getWordList().add(CaseRef(name.charsRef(startIndex, i), isAllUpper))
                     startIndex = i
                     isAllUpper = false
                 } else {
@@ -249,13 +249,13 @@ open class CamelCase @JvmOverloads constructor(
                     if (cCase == LOWER) {
                         //0a -> 0,a
                         //split to new word for non-letter chars
-                        getWordList().add(CaseRef(name.subRef(startIndex, i), false))
+                        getWordList().add(CaseRef(name.charsRef(startIndex, i), false))
                         startIndex = i
                         isAllUpper = false
                     } else if (cCase == UPPER) {
                         //0A -> 0,A
                         //split to new word for non-letter chars
-                        getWordList().add(CaseRef(name.subRef(startIndex, i), false))
+                        getWordList().add(CaseRef(name.charsRef(startIndex, i), false))
                         startIndex = i
                         isAllUpper = false
                     } else {
@@ -273,7 +273,7 @@ open class CamelCase @JvmOverloads constructor(
             return CamelWords(name, emptyList(), name.length)
         }
         if (startIndex < name.length) {
-            getWordList().add(CaseRef(name.subRef(startIndex), isAllUpper))
+            getWordList().add(CaseRef(name.charsRef(startIndex), isAllUpper))
         }
         return CamelWords(name, getWordList(), name.length)
     }
@@ -430,7 +430,7 @@ open class SeparatorCase(
 
         fun addToDest(startIndex: Int, endIndex: Int) {
             if (endIndex > startIndex) {
-                getSplitList().add(name.subRef(startIndex, endIndex))
+                getSplitList().add(name.charsRef(startIndex, endIndex))
                 splitCharCount += endIndex - startIndex
             }
         }

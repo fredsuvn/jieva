@@ -223,18 +223,18 @@ open class SemVer @JvmOverloads constructor(
             if (iPre < 0 && iPlus < 0) {
                 normalSeq = this
             } else if (iPre > 0 && iPlus < 0) {
-                normalSeq = this.subRef(0, iPre)
-                preReleaseSeq = this.subRef(iPre + 1)
+                normalSeq = this.charsRef(0, iPre)
+                preReleaseSeq = this.charsRef(iPre + 1)
             } else if (iPre < 0) {
-                normalSeq = this.subRef(0, iPlus)
-                buildMetadataSeq = this.subRef(iPlus + 1)
+                normalSeq = this.charsRef(0, iPlus)
+                buildMetadataSeq = this.charsRef(iPlus + 1)
             } else if (iPre < iPlus) {
-                normalSeq = this.subRef(0, iPre)
-                preReleaseSeq = this.subRef(iPre + 1, iPlus)
-                buildMetadataSeq = this.subRef(iPlus + 1)
+                normalSeq = this.charsRef(0, iPre)
+                preReleaseSeq = this.charsRef(iPre + 1, iPlus)
+                buildMetadataSeq = this.charsRef(iPlus + 1)
             } else {
-                normalSeq = this.subRef(0, iPlus)
-                buildMetadataSeq = this.subRef(iPlus + 1)
+                normalSeq = this.charsRef(0, iPlus)
+                buildMetadataSeq = this.charsRef(iPlus + 1)
             }
 
             val normals = normalSeq.split('.')

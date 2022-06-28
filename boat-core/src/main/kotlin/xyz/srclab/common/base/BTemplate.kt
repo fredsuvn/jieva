@@ -269,14 +269,14 @@ open class SimpleTemplate(
                 val cn = source[i]
                 if (cn == escapeChar) {
                     //Escape itself
-                    getBuffer().add(source.subRef(start, i))
+                    getBuffer().add(source.charsRef(start, i))
                     i++
                     start = i
                     continue
                 }
                 if (isParameterPrefix(i)) {
                     //Escape parameter prefix
-                    getBuffer().add(source.subRef(start, i - 1))
+                    getBuffer().add(source.charsRef(start, i - 1))
                     getBuffer().add(prefix)
                     i += prefix.length
                     start = i
@@ -284,7 +284,7 @@ open class SimpleTemplate(
                 }
             }
             if (isParameterPrefix(i)) {
-                getBuffer().add(source.subRef(start, i))
+                getBuffer().add(source.charsRef(start, i))
                 i += prefix.length
                 if (suffix === null) {
                     //Case no suffix: find next whitespace
@@ -296,7 +296,7 @@ open class SimpleTemplate(
                         //empty name
                         getBuffer().add(CharsTemplate.Parameter.of(paramIndex++))
                     } else {
-                        val nameRef = source.subRef(paramNameStart, i)
+                        val nameRef = source.charsRef(paramNameStart, i)
                         getBuffer().add(CharsTemplate.Parameter.of(paramIndex++, nameRef))
                     }
                     start = i
@@ -315,7 +315,7 @@ open class SimpleTemplate(
                     start = i
                     continue
                 }
-                val nameRef = source.subRef(i, suffixIndex)
+                val nameRef = source.charsRef(i, suffixIndex)
                 getBuffer().add(CharsTemplate.Parameter.of(paramIndex++, nameRef))
                 i = suffixIndex + 1
                 start = i
@@ -328,7 +328,7 @@ open class SimpleTemplate(
             return listOf(source)
         }
         if (start < source.length) {
-            getBuffer().add(source.subRef(start))
+            getBuffer().add(source.charsRef(start))
         }
         return getBuffer()
     }

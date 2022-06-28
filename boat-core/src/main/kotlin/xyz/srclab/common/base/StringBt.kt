@@ -1,4 +1,4 @@
-@file:JvmName("BString")
+@file:JvmName("StringBt")
 
 package xyz.srclab.common.base
 
@@ -304,12 +304,14 @@ fun CharSequence.toCharArray(): CharArray {
  * Fills [dest] char array with [this] char sequence.
  */
 @JvmOverloads
-fun CharSequence.toCharArray(dest: CharArray, offset: Int = 0, length: Int = remainingLength(dest.size, offset)) {
+fun CharSequence.copyTo(dest: CharArray, offset: Int = 0, length: Int = remainingLength(dest.size, offset)) {
     val minLen = min(this.length, length)
-    var i = 0
-    while (i < minLen) {
+    if (this is JavaString) {
+        this.getChars(0, minLen, dest, offset)
+        return
+    }
+    for (i in 0 until minLen) {
         dest[offset + i] = this[i]
-        i++
     }
 }
 
@@ -363,7 +365,7 @@ fun CharSequence.removeIfEndWith(suffix: CharSequence): String {
  * If [startIndex] is 0 and [endIndex] is length of this, return itself; else return a [CharsRef].
  */
 @JvmOverloads
-fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
+fun CharSequence.charsRef(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
     if (startIndex == 0 && endIndex == this.length) {
         return this
     }
@@ -374,7 +376,7 @@ fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharS
  * Returns [CharsRef] of [this] from [startIndex] inclusive to [endIndex] exclusive.
  */
 @JvmOverloads
-fun CharArray.subRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
+fun CharArray.charsRef(startIndex: Int = 0, endIndex: Int = this.size): CharsRef {
     return CharsRef.of(this, startIndex, endIndex)
 }
 

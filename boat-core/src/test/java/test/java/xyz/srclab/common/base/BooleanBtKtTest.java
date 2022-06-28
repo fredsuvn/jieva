@@ -4,7 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.BBoolean;
 
-public class BBooleanTest {
+public class BooleanBtKtTest {
 
     @Test
     public void testBoolean() {

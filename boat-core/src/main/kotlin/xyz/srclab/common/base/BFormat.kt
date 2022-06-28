@@ -101,7 +101,7 @@ object FastFormat : CharsFormat {
                 val cn = pattern[i]
                 if (cn == '\\') {
                     //Escape: \\ -> \
-                    getBuffer().add(pattern.subRef(start, i))
+                    getBuffer().add(pattern.charsRef(start, i))
                     i++
                     start = i
                     continue
@@ -114,7 +114,7 @@ object FastFormat : CharsFormat {
                     val cnn = pattern[i]
                     if (cnn == '}') {
                         //Escape: \{} -> {}
-                        getBuffer().add(pattern.subRef(start, i - 2))
+                        getBuffer().add(pattern.charsRef(start, i - 2))
                         start = i - 1
                         i++
                         continue
@@ -135,7 +135,7 @@ object FastFormat : CharsFormat {
                         i++
                         continue
                     }
-                    getBuffer().add(pattern.subRef(start, i - 1))
+                    getBuffer().add(pattern.charsRef(start, i - 1))
                     getBuffer().add(args[argIndex])
                     i++
                     start = i
@@ -150,7 +150,7 @@ object FastFormat : CharsFormat {
             return pattern.toString()
         }
         if (start < pattern.length) {
-            getBuffer().add(pattern.subRef(start))
+            getBuffer().add(pattern.charsRef(start))
         }
 
         return getBuffer().joinToString("") { it.deepToString() }

@@ -6,7 +6,7 @@ import xyz.srclab.common.base.BCheck;
 
 import java.util.NoSuchElementException;
 
-public class BCheckTest {
+public class CheckBtKtTest {
 
     @Test
     public void testCheck() {
