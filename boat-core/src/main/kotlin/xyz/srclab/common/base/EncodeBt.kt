@@ -1,8 +1,10 @@
-@file:JvmName("BEncode")
+/**
+ * Encode utilities.
+ */
+@file:JvmName("EncodeBt")
 
 package xyz.srclab.common.base
 
-import xyz.srclab.common.io.BytesAppender
 import xyz.srclab.common.io.asInputStream
 import xyz.srclab.common.io.unclose
 import java.io.InputStream
@@ -44,7 +46,7 @@ fun getDeBase64Length(base64Size: Long): Long {
  */
 @JvmOverloads
 fun CharSequence.base64(charset: Charset = defaultCharset()): String {
-    return this.toByteArray(charset).base64().bytesToString8Bit()
+    return this.getBytes(charset).base64().getString8Bit()
 }
 
 /**
@@ -73,11 +75,11 @@ fun ByteArray.base64(offset: Int, length: Int = remainingLength(this.size, offse
  * Base64 encodes [this].
  */
 fun InputStream.base64(): ByteArray {
-    val output = BytesAppender(getBase64Length(this.available()))
+    val output = BytesAppender()
     val encOut = Base64.getEncoder().wrap(output)
-    this.copyTo(encOut)
+    this.copyTo(encOut, defaultBufferSize())
     encOut.close()
-    return output.toBytes()
+    return output.toByteArray()
 }
 
 /**
@@ -96,7 +98,7 @@ fun InputStream.base64(dest: OutputStream): Long {
  */
 @JvmOverloads
 fun CharSequence.deBase64(charset: Charset = defaultCharset()): String {
-    return this.toByteArray8Bit().deBase64().bytesToString(charset)
+    return this.getBytes8Bit().deBase64().getString(charset)
 }
 
 /**
@@ -126,9 +128,9 @@ fun ByteArray.deBase64(offset: Int, length: Int = remainingLength(this.size, off
  */
 fun InputStream.deBase64(): ByteArray {
     val encIn = Base64.getDecoder().wrap(this)
-    val output = BytesAppender(getBase64Length(this.available()))
+    val output = BytesAppender()
     encIn.copyTo(output)
-    return output.toBytes()
+    return output.toByteArray()
 }
 
 /**
@@ -174,7 +176,7 @@ fun getDeHexLength(hexSize: Long): Long {
  */
 @JvmOverloads
 fun CharSequence.hex(charset: Charset = defaultCharset()): String {
-    return this.toByteArray(charset).hex().bytesToString8Bit()
+    return this.getBytes(charset).hex().getString8Bit()
 }
 
 /**
@@ -208,9 +210,9 @@ fun ByteArray.hex(offset: Int, length: Int = remainingLength(this.size, offset))
  * Hex encodes [this].
  */
 fun InputStream.hex(): ByteArray {
-    val output = BytesAppender(getHexLength(this.available()))
+    val output = BytesAppender()
     this.hex(output)
-    return output.toBytes()
+    return output.toByteArray()
 }
 
 /**
@@ -258,7 +260,7 @@ fun InputStream.hex(dest: OutputStream): Long {
  */
 @JvmOverloads
 fun CharSequence.deHex(charset: Charset = defaultCharset()): String {
-    return this.toByteArray8Bit().deHex().bytesToString(charset)
+    return this.getBytes8Bit().deHex().getString(charset)
 }
 
 /**
@@ -292,9 +294,9 @@ fun ByteArray.deHex(offset: Int, length: Int = remainingLength(this.size, offset
  * Hex decodes [this].
  */
 fun InputStream.deHex(): ByteArray {
-    val output = BytesAppender(getDeHexLength(this.available()))
+    val output = BytesAppender()
     this.deHex(output)
-    return output.toBytes()
+    return output.toByteArray()
 }
 
 /**
@@ -342,24 +344,24 @@ fun InputStream.deHex(dest: OutputStream): Long {
 }
 
 private fun hex0(i: Int): Byte {
-    return BEncodeHolder.hexCodes[i * 2]
+    return EncodeBtHolder.hexCodes[i * 2]
 }
 
 private fun deHex0(i: Byte): Int {
     val c = i.toInt().toChar()
     if (c in '0'..'9') {
-        return BEncodeHolder.hexCodes[(c - '0') * 2 + 1].toInt()
+        return EncodeBtHolder.hexCodes[(c - '0') * 2 + 1].toInt()
     }
     if (c in 'a'..'f') {
-        return BEncodeHolder.hexCodes[(c - 'a' + 10) * 2 + 1].toInt()
+        return EncodeBtHolder.hexCodes[(c - 'a' + 10) * 2 + 1].toInt()
     }
     if (c in 'A'..'F') {
-        return BEncodeHolder.hexCodes[(c - 'a' + 10) * 2 + 1].toInt()
+        return EncodeBtHolder.hexCodes[(c - 'a' + 10) * 2 + 1].toInt()
     }
     throw IllegalArgumentException("Illegal hex char: ${i.toInt().toChar()}")
 }
 
-private object BEncodeHolder {
+private object EncodeBtHolder {
     val hexCodes = byteArrayOf(
         '0'.code.toByte(), 0,
         '1'.code.toByte(), 1,
