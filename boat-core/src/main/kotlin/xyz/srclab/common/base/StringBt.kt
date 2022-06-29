@@ -1,3 +1,6 @@
+/**
+ * String utilities.
+ */
 @file:JvmName("StringBt")
 
 package xyz.srclab.common.base
@@ -18,17 +21,17 @@ import kotlin.text.toSet as toSetKt
 /**
  * Returns a [CharMatcher] for char dot: ".".
  */
-fun dotMatcher(): CharMatcher = BStringHolder.DOT_MATCHER
+fun dotMatcher(): CharMatcher = StringBtHolder.DOT_MATCHER
 
 /**
  * Returns a [CharMatcher] for char hyphen: "-".
  */
-fun hyphenMatcher(): CharMatcher = BStringHolder.HYPHEN_MATCHER
+fun hyphenMatcher(): CharMatcher = StringBtHolder.HYPHEN_MATCHER
 
 /**
  * Returns a [CharMatcher] for char underscore: "_".
  */
-fun underscoreMatcher(): CharMatcher = BStringHolder.UNDERSCORE_MATCHER
+fun underscoreMatcher(): CharMatcher = StringBtHolder.UNDERSCORE_MATCHER
 
 /**
  * Returns charset of UTF-8.
@@ -230,7 +233,7 @@ fun CharSequence.lines(): List<String> {
  * Converts chars to bytes with [charset].
  */
 @JvmOverloads
-fun CharSequence.toByteArray(charset: Charset = defaultCharset()): ByteArray {
+fun CharSequence.getBytes(charset: Charset = defaultCharset()): ByteArray {
     return this.toString().asJavaString().getBytes(charset)
 }
 
@@ -239,12 +242,11 @@ fun CharSequence.toByteArray(charset: Charset = defaultCharset()): ByteArray {
  */
 @JvmName("toString")
 @JvmOverloads
-fun ByteArray.bytesToString(
+fun ByteArray.getString(
     charset: Charset = defaultCharset(),
     offset: Int = 0,
     length: Int = remainingLength(this.size, offset),
 ): String {
-    this.decodeToString()
     return String(this, offset, length, charset)
 }
 
@@ -252,30 +254,28 @@ fun ByteArray.bytesToString(
  * Converts chars to bytes, each of char will be seen as an 8-bit byte.
  */
 @JvmOverloads
-fun CharSequence.toByteArray8Bit(offset: Int = 0, length: Int = remainingLength(this.length, offset)): ByteArray {
+fun CharSequence.getBytes8Bit(offset: Int = 0, length: Int = remainingLength(this.length, offset)): ByteArray {
     //checkRangeInBounds(offset, offset + length, 0, this.length)
-    return toByteArray8Bit(length) { this[it + offset] }
+    return getBytes8Bit(length) { this[it + offset] }
 }
 
 /**
  * Converts chars to bytes, each of char will be seen as an 8-bit byte.
  */
 @JvmOverloads
-fun CharArray.toByteArray8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ByteArray {
+fun CharArray.getBytes8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): ByteArray {
     //checkRangeInBounds(offset, offset + length, 0, this.size)
-    return toByteArray8Bit(length) { this[it + offset] }
+    return getBytes8Bit(length) { this[it + offset] }
 }
 
-private inline fun toByteArray8Bit(
+private inline fun getBytes8Bit(
     length: Int,
     getChar: (Int) -> Char,
 ): ByteArray {
     val array = ByteArray(length)
-    var i = 0
-    while (i < length) {
+    for (i in 0 until length) {
         val char = getChar(i)
         array[i] = char.code.toByte()
-        i++
     }
     return array
 }
@@ -285,17 +285,17 @@ private inline fun toByteArray8Bit(
  */
 @JvmName("toString8Bit")
 @JvmOverloads
-fun ByteArray.bytesToString8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): String {
+fun ByteArray.getString8Bit(offset: Int = 0, length: Int = remainingLength(this.size, offset)): String {
     return String(this, offset, length, StandardCharsets.ISO_8859_1)
 }
 
 /**
  * Converts char sequence to char array.
  */
-fun CharSequence.toCharArray(): CharArray {
+fun CharSequence.getChars(): CharArray {
     val array = CharArray(this.length)
-    for (c in this.withIndex()) {
-        array[c.index] = c.value
+    for (i in 0 until this.length) {
+        array[i] = this[i]
     }
     return array
 }
@@ -304,7 +304,7 @@ fun CharSequence.toCharArray(): CharArray {
  * Fills [dest] char array with [this] char sequence.
  */
 @JvmOverloads
-fun CharSequence.copyTo(dest: CharArray, offset: Int = 0, length: Int = remainingLength(dest.size, offset)) {
+fun CharSequence.getChars(dest: CharArray, offset: Int = 0, length: Int = remainingLength(dest.size, offset)) {
     val minLen = min(this.length, length)
     if (this is JavaString) {
         this.getChars(0, minLen, dest, offset)
@@ -365,8 +365,21 @@ fun CharSequence.removeIfEndWith(suffix: CharSequence): String {
  * If [startIndex] is 0 and [endIndex] is length of this, return itself; else return a [CharsRef].
  */
 @JvmOverloads
-fun CharSequence.charsRef(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
+fun CharSequence.subRef(startIndex: Int = 0, endIndex: Int = this.length): CharSequence {
     if (startIndex == 0 && endIndex == this.length) {
+        return this
+    }
+    return CharsRef.of(this, startIndex, endIndex)
+}
+
+/**
+ * Returns sub char sequence as [CharsRef] reference of [this] from [startIndex] inclusive to [endIndex] exclusive.
+ *
+ * If [startIndex] is 0 and [endIndex] is length of this, return itself; else return a [CharsRef].
+ */
+@JvmOverloads
+fun CharSequence.charsRef(startIndex: Int = 0, endIndex: Int = this.length): CharsRef {
+    if (startIndex == 0 && endIndex == this.length && this is CharsRef) {
         return this
     }
     return CharsRef.of(this, startIndex, endIndex)
@@ -426,32 +439,45 @@ interface CharsRef : CharSequence {
     /**
      * Copies and returns a new String of current range.
      */
-    fun copyOfRange(): String
+    fun copy(): String
+
+    /**
+     * Copies chars of current range into [dest], returns copied size.
+     */
+    fun copyTo(dest: CharArray): Int {
+        return copyTo(dest, 0)
+    }
+
+    /**
+     * Copies chars of current range into [dest], returns copied size.
+     */
+    @Throws(IndexOutOfBoundsException::class)
+    fun copyTo(dest: CharArray, offset: Int): Int
 
     companion object {
 
         /**
-         * Returns a [CharsRef] of [chars] from [startIndex] inclusive to [endIndex] exclusive.
+         * Returns a [CharsRef] of [source] from [startIndex] inclusive to [endIndex] exclusive.
          */
         @JvmOverloads
         @JvmStatic
-        fun of(chars: CharSequence, startIndex: Int = 0, endIndex: Int = chars.length): CharsRef {
-            checkRangeInBounds(startIndex, endIndex, 0, chars.length)
-            return CharSeqRef(chars, startIndex, endIndex)
+        fun of(source: CharSequence, startIndex: Int = 0, endIndex: Int = source.length): CharsRef {
+            checkRangeInBounds(startIndex, endIndex, 0, source.length)
+            return OfCharSeq(source, startIndex, endIndex)
         }
 
         /**
-         * Returns a [CharsRef] of [chars] from [startIndex] inclusive to [endIndex] exclusive.
+         * Returns a [CharsRef] of [source] from [startIndex] inclusive to [endIndex] exclusive.
          */
         @JvmOverloads
         @JvmStatic
-        fun of(chars: CharArray, startIndex: Int = 0, endIndex: Int = chars.size): CharsRef {
-            checkRangeInBounds(startIndex, endIndex, 0, chars.size)
-            return CharArrayRef(chars, startIndex, endIndex)
+        fun of(source: CharArray, startIndex: Int = 0, endIndex: Int = source.size): CharsRef {
+            checkRangeInBounds(startIndex, endIndex, 0, source.size)
+            return OfCharArray(source, startIndex, endIndex)
         }
 
-        private class CharSeqRef(
-            private val chars: CharSequence,
+        private class OfCharSeq(
+            private val source: CharSequence,
             private val startIndex: Int,
             private val endIndex: Int
         ) : CharsRef {
@@ -460,27 +486,39 @@ interface CharsRef : CharSequence {
 
             override fun get(index: Int): Char {
                 index.checkInBounds(0, endIndex)
-                return chars[index.actualIndex()]
+                return source[index.actualIndex()]
             }
 
             override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
-                return CharSeqRef(chars, startIndex.actualIndex(), endIndex.actualIndex())
+                return OfCharSeq(source, startIndex.actualIndex(), endIndex.actualIndex())
             }
 
-            override fun copyOfRange(): String {
-                return chars.subSequence(startIndex, endIndex).toString()
+            override fun copy(): String {
+                return source.subSequence(startIndex, endIndex).toString()
+            }
+
+            override fun copyTo(dest: CharArray, offset: Int): Int {
+                val len = min(this.length, remainingLength(dest.size, offset))
+                if (source is String) {
+                    source.asJavaString().getChars(this.startIndex, this.startIndex + len, dest, offset)
+                } else {
+                    for (i in 0 until len) {
+                        dest[offset + i] = source[this.startIndex + i]
+                    }
+                }
+                return len
             }
 
             private fun Int.actualIndex() = this + startIndex
 
             override fun toString(): String {
-                return copyOfRange()
+                return copy()
             }
         }
 
-        private class CharArrayRef(
-            private val chars: CharArray,
+        private class OfCharArray(
+            private val source: CharArray,
             private val startIndex: Int,
             private val endIndex: Int
         ) : CharsRef {
@@ -489,22 +527,28 @@ interface CharsRef : CharSequence {
 
             override fun get(index: Int): Char {
                 index.checkInBounds(0, endIndex)
-                return chars[index.actualIndex()]
+                return source[index.actualIndex()]
             }
 
             override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
                 checkRangeInBounds(startIndex, endIndex, 0, this.endIndex)
-                return CharArrayRef(chars, startIndex.actualIndex(), endIndex.actualIndex())
+                return OfCharArray(source, startIndex.actualIndex(), endIndex.actualIndex())
             }
 
-            override fun copyOfRange(): String {
-                return String(chars, startIndex, remainingLength(chars.size, startIndex))
+            override fun copy(): String {
+                return String(source, startIndex, remainingLength(source.size, startIndex))
+            }
+
+            override fun copyTo(dest: CharArray, offset: Int): Int {
+                val len = min(this.length, remainingLength(dest.size, offset))
+                System.arraycopy(source, this.startIndex, dest, offset, len)
+                return len
             }
 
             private fun Int.actualIndex() = this + startIndex
 
             override fun toString(): String {
-                return copyOfRange()
+                return copy()
             }
         }
     }
@@ -551,7 +595,7 @@ interface LazyString : CharSequence {
     }
 }
 
-private object BStringHolder {
+private object StringBtHolder {
     val DOT_MATCHER: CharMatcher = CharMatcher.`is`('.')
     val HYPHEN_MATCHER: CharMatcher = CharMatcher.`is`('-')
     val UNDERSCORE_MATCHER: CharMatcher = CharMatcher.`is`('_')
