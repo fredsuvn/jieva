@@ -1,19 +1,47 @@
-@file:JvmName("BFormat")
+/**
+ * Format utilities.
+ */
+@file:JvmName("FormatBt")
 
 package xyz.srclab.common.base
 
 import xyz.srclab.annotations.concurrent.ThreadSafe
 import java.util.*
 
+private var defaultFormat: StringFormat = FastFormat
+
 /**
- * Using [FastFormat] (slf4j-like style, but not exactly same) format receiver pattern,
- * seeing [FastFormat].
+ * Sets default [StringFormat] for format functions.
  *
  * @see FastFormat
- * @see CharsFormat
+ * @see PrintFormat
  */
-fun CharSequence.fastFormat(vararg args: Any?): String {
-    return FastFormat.format(this, *args)
+fun setDefaultFormat(format: StringFormat) {
+    defaultFormat = format
+}
+
+/**
+ * Gets default [StringFormat] for format functions.
+ * Default is [FastFormat].
+ *
+ * @see FastFormat
+ * @see PrintFormat
+ */
+fun defaultFormat(): StringFormat {
+    return defaultFormat
+}
+
+/**
+ * Formats [pattern] with [args].
+ *
+ * Default Formatter is [FastFormat].
+ *
+ * @see FastFormat
+ * @see PrintFormat
+ * @see setDefaultFormat
+ */
+fun format(pattern: CharSequence, vararg args: Any?): String {
+    return defaultFormat.format(pattern, *args)
 }
 
 /**
@@ -22,7 +50,7 @@ fun CharSequence.fastFormat(vararg args: Any?): String {
  * @see FastFormat
  */
 @ThreadSafe
-interface CharsFormat {
+interface StringFormat {
 
     /**
      * Formats given [pattern] with [args].
@@ -68,7 +96,7 @@ interface CharsFormat {
  * C:\file.zip\_{}
  * ```
  */
-object FastFormat : CharsFormat {
+object FastFormat : StringFormat {
 
     override fun format(pattern: CharSequence, vararg args: Any?): String {
         //return MessageFormatterSlf4j.arrayFormat(this.toString(), args, null).message
@@ -101,7 +129,7 @@ object FastFormat : CharsFormat {
                 val cn = pattern[i]
                 if (cn == '\\') {
                     //Escape: \\ -> \
-                    getBuffer().add(pattern.charsRef(start, i))
+                    getBuffer().add(pattern.subRef(start, i))
                     i++
                     start = i
                     continue
@@ -114,7 +142,7 @@ object FastFormat : CharsFormat {
                     val cnn = pattern[i]
                     if (cnn == '}') {
                         //Escape: \{} -> {}
-                        getBuffer().add(pattern.charsRef(start, i - 2))
+                        getBuffer().add(pattern.subRef(start, i - 2))
                         start = i - 1
                         i++
                         continue
@@ -135,7 +163,7 @@ object FastFormat : CharsFormat {
                         i++
                         continue
                     }
-                    getBuffer().add(pattern.charsRef(start, i - 1))
+                    getBuffer().add(pattern.subRef(start, i - 1))
                     getBuffer().add(args[argIndex])
                     i++
                     start = i
@@ -150,9 +178,18 @@ object FastFormat : CharsFormat {
             return pattern.toString()
         }
         if (start < pattern.length) {
-            getBuffer().add(pattern.charsRef(start))
+            getBuffer().add(pattern.subRef(start))
         }
 
-        return getBuffer().joinToString("") { it.deepToString() }
+        return getBuffer().joinToString("") { it.toString() }
+    }
+}
+
+/**
+ * `printf` style format.
+ */
+object PrintFormat : StringFormat {
+    override fun format(pattern: CharSequence, vararg args: Any?): String {
+        return JavaString.format(defaultLocale(), pattern.toString(), *args)
     }
 }
