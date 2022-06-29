@@ -1,4 +1,7 @@
-@file:JvmName("BNumber")
+/**
+ * Number utilities.
+ */
+@file:JvmName("NumberBt")
 
 package xyz.srclab.common.base
 
@@ -18,22 +21,22 @@ import kotlin.text.toShort as toShortKt
 /**
  * Returns value 100 in [BigInteger].
  */
-fun hundredInt(): BigInteger = BNumberHolder.HUNDRED_INT
+fun hundredInt(): BigInteger = NumberBtHolder.HUNDRED_INT
 
 /**
  * Returns value 1000 in [BigInteger].
  */
-fun thousandInt(): BigInteger = BNumberHolder.THOUSAND_INT
+fun thousandInt(): BigInteger = NumberBtHolder.THOUSAND_INT
 
 /**
  * Returns value 100 in [BigDecimal].
  */
-fun hundredDecimal(): BigDecimal = BNumberHolder.HUNDRED_DECIMAL
+fun hundredDecimal(): BigDecimal = NumberBtHolder.HUNDRED_DECIMAL
 
 /**
  * Returns value 1000 in [BigDecimal].
  */
-fun thousandDecimal(): BigDecimal = BNumberHolder.THOUSAND_DECIMAL
+fun thousandDecimal(): BigDecimal = NumberBtHolder.THOUSAND_DECIMAL
 
 /**
  * Converts chars to byte.
@@ -419,7 +422,7 @@ fun Long.toOctalString(size: Int = 22): String {
  * * 0B001100: positive binary;
  */
 fun CharSequence.parseInt(): Int {
-    return NumericString(this).toInt()
+    return NumberParsing(this).toInt()
 }
 
 /**
@@ -434,7 +437,7 @@ fun CharSequence.parseInt(): Int {
  * * 0B001100: positive binary;
  */
 fun CharSequence.parseLong(): Long {
-    return NumericString(this).toLong()
+    return NumberParsing(this).toLong()
 }
 
 /**
@@ -449,21 +452,10 @@ fun CharSequence.parseLong(): Long {
  * * 0B001100: positive binary;
  */
 fun CharSequence.parseBigInteger(): BigInteger {
-    return NumericString(this).toBigInteger()
+    return NumberParsing(this).toBigInteger()
 }
 
-/**
- * Represents a char sequence of which content is numeric.
- *
- * Given chars may have a sign prefix (`+/-`) followed by a radix prefix (`0b/0B/0x/0X/0`):
- *
- * * 123456: positive decimal
- * * 0xffeecc: positive hex;
- * * -0xffeecc: negative hex;
- * * +0774411: positive octal;
- * * 0B001100: positive binary;
- */
-class NumericString(chars: CharSequence) {
+private class NumberParsing(chars: CharSequence) {
 
      val positive: Boolean
      val radix: Int
@@ -512,7 +504,7 @@ class NumericString(chars: CharSequence) {
     }
 }
 
-private object BNumberHolder {
+private object NumberBtHolder {
     val HUNDRED_INT: BigInteger = BigInteger("100")
     val THOUSAND_INT: BigInteger = BigInteger("1000")
     val HUNDRED_DECIMAL: BigDecimal = BigDecimal("100")
