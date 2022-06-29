@@ -1,4 +1,7 @@
-@file:JvmName("BEnum")
+/**
+ * Enum utilities.
+ */
+@file:JvmName("EnumBt")
 
 package xyz.srclab.common.base
 
@@ -7,12 +10,11 @@ import java.io.Serializable
 /**
  * Returns enum instance of given [name].
  */
-@JvmName("getValue")
 @Throws(NoSuchEnumException::class)
 @JvmOverloads
-fun <T : Enum<T>> Class<*>.enumValue(name: CharSequence, ignoreCase: Boolean = false): T {
+fun <T : Enum<T>> Class<*>.getEnum(name: CharSequence, ignoreCase: Boolean = false): T {
     if (!ignoreCase) {
-        return name.toEnum(this).asType()
+        return name.getEnum(this).asType()
     }
     val values: Array<out Enum<*>>? = this.enumConstants?.asType()
     if (values.isNullOrEmpty()) {
@@ -20,7 +22,7 @@ fun <T : Enum<T>> Class<*>.enumValue(name: CharSequence, ignoreCase: Boolean = f
     }
     for (value in values) {
         if (value.name.contentEquals(name, true)) {
-            return value.asTyped()
+            return value.asType()
         }
     }
     throw NoSuchEnumException(name.toString())
@@ -29,11 +31,10 @@ fun <T : Enum<T>> Class<*>.enumValue(name: CharSequence, ignoreCase: Boolean = f
 /**
  * Returns enum instance of given [name], or null if it doesn't exit.
  */
-@JvmName("getValueOrNull")
 @JvmOverloads
-fun <T> Class<*>.enumValueOrNull(name: CharSequence, ignoreCase: Boolean = false): T? {
+fun <T> Class<*>.getEnumOrNull(name: CharSequence, ignoreCase: Boolean = false): T? {
     if (!ignoreCase) {
-        return name.toEnumOrNull(this).asType()
+        return name.getEnumOrNull(this).asType()
     }
     return try {
         val values: Array<out Enum<*>>? = this.enumConstants?.asType()
@@ -42,7 +43,7 @@ fun <T> Class<*>.enumValueOrNull(name: CharSequence, ignoreCase: Boolean = false
         }
         for (value in values) {
             if (value.name.contentEquals(name, true)) {
-                return value.asTyped()
+                return value.asType()
             }
         }
         null
@@ -56,15 +57,15 @@ fun <T> Class<*>.enumValueOrNull(name: CharSequence, ignoreCase: Boolean = false
  */
 @JvmName("getValue")
 @Throws(NoSuchEnumException::class)
-fun <T> Class<*>.enumValue(index: Int): T {
-    return enumValueOrNull(index) ?: throw NoSuchEnumException("$this[$index]")
+fun <T> Class<*>.getEnum(index: Int): T {
+    return getEnumOrNull(index) ?: throw NoSuchEnumException("$this[$index]")
 }
 
 /**
  * Returns enum instance of given [index], or null if it doesn't exit or index out of bounds.
  */
 @JvmName("getValueOrNull")
-fun <T> Class<*>.enumValueOrNull(index: Int): T? {
+fun <T> Class<*>.getEnumOrNull(index: Int): T? {
     val values = this.enumConstants
     if (values.isNullOrEmpty()) {
         return null
@@ -75,17 +76,17 @@ fun <T> Class<*>.enumValueOrNull(index: Int): T? {
     return null
 }
 
-private fun CharSequence.toEnum(type: Class<*>): Any {
+private fun CharSequence.getEnum(type: Class<*>): Any {
     try {
-        return JavaEnum.valueOf(type.asType<Class<Enum<*>>>(), this.toString())
+        return JavaBt.getEnum(type, this.toString())
     } catch (e: Exception) {
-        throw NoSuchEnumException(this.toString())
+        throw NoSuchEnumException(this.toString(), e)
     }
 }
 
-private fun CharSequence.toEnumOrNull(type: Class<*>): Any? {
+private fun CharSequence.getEnumOrNull(type: Class<*>): Any? {
     return try {
-        this.toEnum(type)
+        this.getEnum(type)
     } catch (e: Exception) {
         null
     }
@@ -94,7 +95,8 @@ private fun CharSequence.toEnumOrNull(type: Class<*>): Any? {
 /**
  * No such enum exception.
  */
-open class NoSuchEnumException(message: String?) : RuntimeException(message), Serializable {
+open class NoSuchEnumException @JvmOverloads constructor(
+    message: String?, cause: Throwable? = null) : RuntimeException(message, cause), Serializable {
     companion object {
         private val serialVersionUID: Long = defaultSerialVersion()
     }
