@@ -69,9 +69,9 @@ public class LangSample {
 
     @Test
     public void testCharsFormat() {
-        String byFast = CharsFormat.fastFormat("1, 2, {}", 3);
-        String byMessage = CharsFormat.messageFormat("1, 2, {0}", 3);
-        String byPrintf = CharsFormat.printfFormat("1, 2, %d", 3);
+        String byFast = StringFormat.fastFormat("1, 2, {}", 3);
+        String byMessage = StringFormat.messageFormat("1, 2, {0}", 3);
+        String byPrintf = StringFormat.printfFormat("1, 2, %d", 3);
         //1, 2, 3
         logger.log("byFast: {}", byFast);
         logger.log("byMessage: {}", byMessage);

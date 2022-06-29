@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import xyz.srclab.common.base.BEnum;
 import xyz.srclab.common.base.NoSuchEnumException;
 
-public class BEnumTest {
+public class EnumBtKtTest {
 
     @Test
     public void test() {

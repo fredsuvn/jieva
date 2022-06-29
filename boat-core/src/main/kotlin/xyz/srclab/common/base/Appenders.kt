@@ -6,6 +6,8 @@ import java.io.OutputStream
 import java.io.Writer
 import java.nio.ByteBuffer
 
+private const val BUFFER_SIZE = 1024
+
 /**
  * String appender, used to append objects and finally join them into a [String].
  *
@@ -21,43 +23,65 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
     private var head = SNode<Any>()
     private var cur = head
 
+    private var buffer: CharArray? = null
+    private var bufferOffset = 0
+
     override fun append(t: CharSequence?): StringAppender {
+        flushBuffer()
         cur.value = t
         newTail()
         return this
     }
 
     override fun append(t: CharSequence, startIndex: Int): StringAppender {
+        flushBuffer()
         cur.value = t.charsRef(startIndex)
         newTail()
         return this
     }
 
     override fun append(t: CharSequence, startIndex: Int, endIndex: Int): StringAppender {
+        flushBuffer()
         cur.value = t.charsRef(startIndex, endIndex)
         newTail()
         return this
     }
 
     override fun append(c: Char): StringAppender {
-        cur.value = c
-        newTail()
+        val buf = buffer
+        if (buf === null) {
+            val newBuffer = CharArray(BUFFER_SIZE)
+            newBuffer[0] = c
+            bufferOffset = 1
+            buffer = newBuffer
+            return this
+        }
+        buf[bufferOffset] = c
+        bufferOffset++
+        if (bufferOffset >= buf.size) {
+            cur.value = buf.copyOf()
+            bufferOffset = 0
+            newTail()
+        }
         return this
     }
 
     open fun append(obj: Any?): StringAppender {
+        flushBuffer()
         cur.value = obj
         newTail()
         return this
     }
 
     open fun append(chars: CharArray, startIndex: Int): StringAppender {
+        flushBuffer()
         cur.value = chars.arrayRef(startIndex)
         newTail()
         return this
     }
 
     open fun append(chars: CharArray, startIndex: Int, endIndex: Int): StringAppender {
+        flushBuffer()
         cur.value = chars.arrayRef(startIndex, endIndex)
         newTail()
         return this
@@ -129,7 +153,7 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
                     v.length
                 }
                 is CharSequence -> {
-                    v.copyTo(buffer, i, v.length)
+                    v.getChars(buffer, i, v.length)
                     v.length
                 }
                 is CharArray -> {
@@ -157,6 +181,16 @@ open class StringAppender : SegmentAppender<StringAppender, CharSequence>, Appen
     override fun flush() {
     }
 
+    private fun flushBuffer() {
+        val buf = buffer
+        if (buf === null || bufferOffset == 0) {
+            return
+        }
+        cur.value = buf.copyOfRange(0, bufferOffset)
+        bufferOffset = 0
+        newTail()
+    }
+
     private fun newTail() {
         val newNode = SNode<Any>()
         cur.next = newNode
@@ -179,32 +213,57 @@ open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStre
     private var head = SNode<Any>()
     private var cur = head
 
+    private var buffer: ByteArray? = null
+    private var bufferOffset = 0
+
     /**
      * No operation. Appending null is unsupported by [BytesAppender].
      */
     override fun append(t: ByteArray?): BytesAppender {
+        if (t === null) {
+            return this
+        }
+        flushBuffer()
+        cur.value = t
+        newTail()
         return this
     }
 
     override fun append(t: ByteArray, startIndex: Int): BytesAppender {
+        flushBuffer()
         cur.value = t.arrayRef(startIndex)
         newTail()
         return this
     }
 
     override fun append(t: ByteArray, startIndex: Int, endIndex: Int): BytesAppender {
+        flushBuffer()
         cur.value = t.arrayRef(startIndex, endIndex)
         newTail()
         return this
     }
 
     fun append(b: Byte): BytesAppender {
-        cur.value = b
-        newTail()
+        val buf = buffer
+        if (buf === null) {
+            val newBuffer = ByteArray(BUFFER_SIZE)
+            newBuffer[0] = b
+            bufferOffset = 1
+            buffer = newBuffer
+            return this
+        }
+        buf[bufferOffset] = b
+        bufferOffset++
+        if (bufferOffset >= buf.size) {
+            cur.value = buf.copyOf()
+            bufferOffset = 0
+            newTail()
+        }
         return this
     }
 
     fun append(buf: ByteBuffer): BytesAppender {
+        flushBuffer()
         cur.value = buf
         newTail()
         return this
@@ -282,6 +341,16 @@ open class BytesAppender : SegmentAppender<BytesAppender, ByteArray>, OutputStre
     }
 
     override fun flush() {
+    }
+
+    private fun flushBuffer() {
+        val buf = buffer
+        if (buf === null || bufferOffset == 0) {
+            return
+        }
+        cur.value = buf.copyOfRange(0, bufferOffset)
+        bufferOffset = 0
+        newTail()
     }
 
     private fun newTail() {

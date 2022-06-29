@@ -57,7 +57,7 @@ interface TcpClient {
     }
 
     fun send(data: String, charset: Charset) {
-        send(data.toByteArray(charset))
+        send(data.getBytes(charset))
     }
 
     /**
@@ -77,7 +77,7 @@ interface TcpClient {
     }
 
     fun receiveString(charset: Charset): String {
-        return receiveBytes().bytesToString(charset)
+        return receiveBytes().getString(charset)
     }
 
     companion object {

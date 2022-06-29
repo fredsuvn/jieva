@@ -1,5 +1,5 @@
 /**
- * Bt includes common utilities for: default values, Objects, Booleans, Compares, Parameters, Maths, Threads, and Misc.
+ * Bt includes common and misc utilities.
  */
 @file:JvmName("Bt")
 
@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.util.*
 import java.util.function.BiPredicate
+import java.util.function.Consumer
 import java.util.function.Supplier
 import kotlin.stackTraceToString as stackTraceToStringKt
 import kotlin.toString as toStringKt
@@ -301,6 +302,51 @@ fun <T : Any> getOrDefault(t: T?, defaultValue: T): T {
  */
 fun <T : Any> getOrElse(t: T?, supplier: Supplier<T>): T {
     return t ?: supplier.get()
+}
+
+/**
+ * Gets or creates a new value.
+ * This function is usually used for the pattern:
+ *
+ * Checks whether the value is null, if it is not, return, else create a new one and set and return.
+ */
+fun <T : Any> getOrNew(lock: Any, getter: Supplier<T?>, setter: Consumer<T?>, creator: Supplier<T>): T {
+    val v = getter.get()
+    if (v !== null) {
+        return v
+    }
+    synchronized(lock) {
+        val v0 = getter.get()
+        if (v0 !== null) {
+            return v0
+        }
+        val nv = creator.get()
+        setter.accept(nv)
+        return nv
+    }
+}
+
+/**
+ * Gets or creates a new value.
+ * This function is usually used for the pattern:
+ *
+ * Checks whether the value is null, if it is not, return, else create a new one and set and return.
+ */
+@JvmSynthetic
+inline fun <T : Any> getOrNew(lock: Any, getter: () -> T?, setter: (T?) -> Unit, creator: () -> T): T {
+    val v = getter()
+    if (v !== null) {
+        return v
+    }
+    synchronized(lock) {
+        val v0 = getter()
+        if (v0 !== null) {
+            return v0
+        }
+        val nv = creator()
+        setter(nv)
+        return nv
+    }
 }
 
 /**

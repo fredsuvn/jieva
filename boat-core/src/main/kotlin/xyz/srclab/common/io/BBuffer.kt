@@ -59,11 +59,11 @@ fun ByteBuffer.getString(length: Int = this.remaining(), charset: Charset = defa
     if (this.hasArray()) {
         val array = this.array()
         val arrayOffset = this.arrayOffset() + this.position()
-        val result = array.bytesToString(arrayOffset, length, charset)
+        val result = array.getString(arrayOffset, length, charset)
         this.position(this.position() + length)
         return result
     }
-    return getBytes(length).bytesToString(charset)
+    return getBytes(length).getString(charset)
 }
 
 /**

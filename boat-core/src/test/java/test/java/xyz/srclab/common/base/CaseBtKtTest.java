@@ -4,10 +4,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import xyz.srclab.common.base.*;
 
-public class BCaseTest {
+public class CaseBtKtTest {
 
     private static final NamingCase asUpperLowerCamel = new CamelCase(true, CamelCase.NonLetterPolicy.AS_UPPER);
-    private static final NamingCase separateLowerCamel = new CamelCase(true, CamelCase.NonLetterPolicy.SEPARATE);
+    private static final NamingCase separateLowerCamel = new CamelCase(true, CamelCase.NonLetterPolicy.INDEPENDENT);
     private static final NamingCase toLowerUpperCamel = new CamelCase(true, BString::lowerCase);
 
     @Test

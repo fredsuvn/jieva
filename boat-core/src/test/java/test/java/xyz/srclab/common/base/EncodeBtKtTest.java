@@ -10,7 +10,7 @@ import xyz.srclab.common.io.BytesAppender;
 import java.util.Arrays;
 import java.util.Base64;
 
-public class BEncodeTest {
+public class EncodeBtKtTest {
 
     @Test
     public void testBase64() {

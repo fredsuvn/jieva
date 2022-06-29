@@ -222,28 +222,28 @@ interface LogPrinter {
                 //Level string
                 val levelString: ByteArray = run {
                     when (messageLevel) {
-                        TRACE_LEVEL -> "TRACE".toByteArray()
-                        DEBUG_LEVEL -> "DEBUG".toByteArray()
-                        INFO_LEVEL -> "INFO".toByteArray()
-                        WARN_LEVEL -> "WARN".toByteArray()
-                        ERROR_LEVEL -> "ERROR".toByteArray()
-                        else -> "LOG".toByteArray()
+                        TRACE_LEVEL -> "TRACE".getBytes()
+                        DEBUG_LEVEL -> "DEBUG".getBytes()
+                        INFO_LEVEL -> "INFO".getBytes()
+                        WARN_LEVEL -> "WARN".getBytes()
+                        ERROR_LEVEL -> "ERROR".getBytes()
+                        else -> "LOG".getBytes()
                     }
                 }
 
                 if (callerTrace === null) {
                     writeBytes(
-                        levelString, timestamp.toByteArray(), formattedMessage.toByteArray(charset),
+                        levelString, timestamp.getBytes(), formattedMessage.getBytes(charset),
                         false,
                         EMPTY_BYTES, EMPTY_BYTES, EMPTY_BYTES
                     )
                 } else {
                     writeBytes(
-                        levelString, timestamp.toByteArray(), formattedMessage.toByteArray(charset),
+                        levelString, timestamp.getBytes(), formattedMessage.getBytes(charset),
                         true,
-                        callerTrace.className.toByteArray(charset),
-                        callerTrace.methodName.toByteArray(charset),
-                        "${callerTrace.lineNumber}".toByteArray()
+                        callerTrace.className.getBytes(charset),
+                        callerTrace.methodName.getBytes(charset),
+                        "${callerTrace.lineNumber}".getBytes()
                     )
                 }
             }
@@ -280,7 +280,7 @@ interface LogPrinter {
 
             companion object {
                 private val EMPTY_BYTES: ByteArray = byteArrayOf()
-                private val LINE_SEPARATOR: ByteArray = System.lineSeparator().toByteArray()
+                private val LINE_SEPARATOR: ByteArray = System.lineSeparator().getBytes()
                 private val timeFormatter: DateTimeFormatter =
                     DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS")
             }

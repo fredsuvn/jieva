@@ -110,7 +110,7 @@ class BaseSample {
         val equals = Arrays.asList("", 1).anyOrArrayEquals(Arrays.asList("", 1))
 
         //Chars examples:
-        val bytes = "message10086".toByteArray()
+        val bytes = "message10086".getBytes()
         val toChars = bytes.toChars()
         val toBytes = toChars.toBytes()
         //message10086

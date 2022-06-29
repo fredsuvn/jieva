@@ -16,7 +16,7 @@ import java.util.Date;
 /**
  * @author sunqian
  */
-public class BTimeTest {
+public class DateBtKtTest {
 
     @Test
     public void testTime() {

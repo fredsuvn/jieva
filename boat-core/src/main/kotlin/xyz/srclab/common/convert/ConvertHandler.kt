@@ -83,7 +83,7 @@ object CompatibleConvertHandler : ConvertHandler {
                 return from
             }
             if (fromClass == String::class.java && toType.isEnum) {
-                return toType.enumValueOrNull<Any>(from.toString(), true)
+                return toType.getEnumOrNull<Any>(from.toString(), true)
             }
             if (fromClass.isEnum && toType == String::class.java) {
                 return from.toString()
@@ -127,7 +127,7 @@ open class StringConvertHandler @JvmOverloads constructor(
         }
         fun fromToCharSeq(): CharSequence {
             return when (from) {
-                is ByteArray -> from.bytesToString(charset)
+                is ByteArray -> from.getString(charset)
                 is CharArray -> String(from)
                 else -> from.toCharSeq()
             }
@@ -138,12 +138,12 @@ open class StringConvertHandler @JvmOverloads constructor(
             StringBuilder::class.java -> StringBuilder(fromToCharSeq())
             StringBuffer::class.java -> StringBuffer(fromToCharSeq())
             CharArray::class.java -> when (from) {
-                is CharSequence -> from.toCharArray()
+                is CharSequence -> from.getChars()
                 is ByteArray -> from.bytesToChars(charset)
                 else -> null
             }
             ByteArray::class.java -> when (from) {
-                is CharSequence -> from.toByteArray(charset)
+                is CharSequence -> from.getBytes(charset)
                 is CharArray -> from.toByteArray(charset)
                 else -> null
             }
