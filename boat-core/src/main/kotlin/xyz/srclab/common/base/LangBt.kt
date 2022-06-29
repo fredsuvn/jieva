@@ -3,33 +3,6 @@
 package xyz.srclab.common.base
 
 /**
- * Gets or creates a new value.
- * This function is usually used for the pattern:
- *
- * Checks whether the value is null, if it is not, return, else create a new one and set and return.
- */
-inline fun <T> getOrNew(
-    lock: Any,
-    getter: () -> T?,
-    setter: (T) -> Unit,
-    creator: () -> T
-): T {
-    val v = getter()
-    if (v !== null) {
-        return v
-    }
-    synchronized(lock) {
-        val v0 = getter()
-        if (v0 !== null) {
-            return v0
-        }
-        val nv = creator()
-        setter(nv)
-        return nv
-    }
-}
-
-/**
  * Abstract class represents a final class, which will cache the values of [hashCode] and [toString].
  * The subclass should implement [hashCode0] and [toString0] to compute the values of [hashCode] and [toString],
  * each computation will be processed only once.
